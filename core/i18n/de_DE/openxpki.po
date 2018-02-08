@@ -153,6 +153,46 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
 msgstr "Erstellen von CRLs"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY"
+msgstr "Erstellen von CRLs"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_GT"
+msgstr "Zertifikats-ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_LT"
+msgstr "Zertifikats-ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTAFTER_GT"
+msgstr "Zertifikats-ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTAFTER_LT"
+msgstr "Zertifikats-ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTBEFORE_GT"
+msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTBEFORE_LT"
+msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_REVOKED_GT"
+msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_REVOKED_LT"
+msgstr "Ändern der zusätzlichen Informationen des Zertifzierungsantrages"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_VALID_AT"
+msgstr "Zertifikats-ID"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_LABEL"
 msgstr "Übergeordneter Workflow"
 
@@ -8017,6 +8057,10 @@ msgstr "Benutzername"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_LABEL"
 #~ msgstr "PEM (CRT) Format"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INTRO"
+#~ msgstr "Zertifikats-ID"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CRL_LAST_ITEMCNT"

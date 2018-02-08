@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2018-01-09 11:21+0100\n"
+"PO-Revision-Date: 2018-02-08 17:19+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -125,6 +125,36 @@ msgstr "Status"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
 msgstr "Subject"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY"
+msgstr "Validity"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_GT"
+msgstr "invalid after"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_LT"
+msgstr "invalid before"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTAFTER_GT"
+msgstr "not after greater than"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTAFTER_LT"
+msgstr "not after less than"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTBEFORE_GT"
+msgstr "not before greater than"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTBEFORE_LT"
+msgstr "not before less than"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_REVOKED_GT"
+msgstr "revoked after"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_REVOKED_LT"
+msgstr "revoked before"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_VALID_AT"
+msgstr "valid at"
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_LABEL"
 msgstr "Action"
@@ -3064,6 +3094,9 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_LABEL"
 #~ msgstr "Download private key for certificate"
+
+#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INTRO"
+#~ msgstr "Please select property and date"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CRL_LAST_ITEMCNT"

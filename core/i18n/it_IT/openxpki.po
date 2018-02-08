@@ -143,6 +143,46 @@ msgstr "non dopo il"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
 msgstr "Soggetto"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY"
+msgstr "Numero di serie del certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_GT"
+msgstr "non dopo il"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_LT"
+msgstr "non dopo il"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTAFTER_GT"
+msgstr "non dopo il"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTAFTER_LT"
+msgstr "non dopo il"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTBEFORE_GT"
+msgstr "non prima del"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTBEFORE_LT"
+msgstr "non prima del"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_REVOKED_GT"
+msgstr "non prima del"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_REVOKED_LT"
+msgstr "non prima del"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_VALID_AT"
+msgstr "non dopo il"
+
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_LABEL"
 msgstr "Azione"
 
@@ -3372,6 +3412,10 @@ msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_LABEL"
 #~ msgstr "Scarica la chiave privata del certificato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INTRO"
+#~ msgstr "Identificatore del certificato"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CRL_LAST_ITEMCNT"

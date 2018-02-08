@@ -95,12 +95,26 @@ sub init_search {
         $preset = $result->{input};
     }
 
+    my @validity_options = (
+        { value => 'valid_at', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_VALID_AT' },
+        { value => 'notbefore_lt', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTBEFORE_LT' },
+        { value => 'notbefore_gt', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTBEFORE_GT' },
+        { value => 'notafter_lt', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTAFTER_LT' },
+        { value => 'notafter_gt', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTAFTER_GT' },
+#        { value => 'revoked_lt', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_REVOKED_LT' },
+#        { value => 'revoked_gt', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_REVOKED_GT' },
+#        { value => 'invalid_lt', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_LT' },
+#        { value => 'invalid_gt', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_GT' },
+
+    );
+
     my @fields = (
         { name => 'subject', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', type => 'text', is_optional => 1, value => $preset->{subject} },
         { name => 'san', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SAN', type => 'text', is_optional => 1, value => $preset->{san} },
         { name => 'status', label => 'I18N_OPENXPKI_UI_CERTIFICATE_STATUS', type => 'select', is_optional => 1, prompt => 'all', options => \@states, , value => $preset->{status} },
         { name => 'profile', label => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE', type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list, value => $preset->{profile} },
         { name => 'issuer_identifier', label => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER', type => 'select', is_optional => 1, prompt => 'all', options => \@issuer_list, value => $preset->{issuer_identifier} },
+        { name => 'validity', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY', 'keys' => \@validity_options, type => 'datetime', is_optional => 1, clonable => 1, value => $preset->{validity_options} || [ { key => 'valid_at', value => '' }], },
    );
 
     my $attributes = $self->_client->session()->param('certsearch')->{default}->{attributes};
@@ -116,7 +130,7 @@ sub init_search {
             type => 'text',
             is_optional => 1,
             'clonable' => 1,
-            'value' => $preset->{attributes} || [],
+            'value' => $preset->{attributes} || [{ 'key' => $attrib[0]->{value}, value => ''}],
         } if (@attrib);
     }
 
@@ -1069,6 +1083,9 @@ sub action_search {
     my $self = shift;
     my $args = shift;
 
+
+    $self->logger()->trace("input params: " . Dumper $self->cgi()->param());
+
     my $query = { ENTITY_ONLY => 1 };
     my $input = {}; # store the input data the reopen the form later
     foreach my $key (qw(subject issuer_dn)) {
@@ -1091,12 +1108,62 @@ sub action_search {
         $input->{'status'} = $status;
         if ($status eq 'VALID') {
             $status = 'ISSUED';
-            $query->{VALID_AT} = time();
+            $query->{NOTBEFORE} = { OPERATOR => 'GREATER_THAN', VALUE => time() };
+            $query->{NOTAFTER} = { OPERATOR => 'LESS_THAN', VALUE => time() };
         }
         $query->{STATUS} = $status;
     }
 
-    $self->logger()->trace("query : " . Dumper $self->cgi()->param());
+    # Validity
+    $input->{validity_options} = [];
+    foreach my $key (qw(valid_at notbefore_gt notbefore_lt notafter_lt notafter_gt revoked_lt revoked_gt invalid_lt invalid_gt)) {
+        my @val = $self->param($key.'[]');
+        next unless ($val[0]);
+        if ($val[0] =~ /[^0-9]/) {
+            $self->logger()->warn('skipping non-numeric value for validity option ' .$key);
+            next;
+        }
+        push @{$input->{validity_options}}, { key => $key, value => $val[0] };
+
+        if ($key eq 'valid_at') {
+            $query->{NOTBEFORE} = { OPERATOR => 'FROM', VALUE => $val[0] };
+            $query->{NOTAFTER} = { OPERATOR => 'TO', VALUE => $val[0] };
+
+        } elsif ($key eq 'notbefore_gt') {
+            $query->{NOTBEFORE} = { OPERATOR => 'FROM', VALUE => $val[0] };
+        } elsif ($key eq 'notbefore_lt') {
+            if ($query->{NOTBEFORE}) {
+                $query->{NOTBEFORE} = { OPERATOR => 'BETWEEN', VALUE =>  [ $query->{NOTBEFORE}->{VALUE}, $val[0] ] };
+            } else {
+                $query->{NOTBEFORE} = { OPERATOR => 'TO', VALUE => $val[0] };
+            }
+        } elsif ($key eq 'notafter_lt') {
+            $query->{NOTAFTER} = { OPERATOR => 'TO', VALUE => $val[0] };
+        } elsif ($key eq 'notafter_gt') {
+            if ($query->{NOTAFTER}) {
+                $query->{NOTAFTER} = { OPERATOR => 'BETWEEN', VALUE => [ $val[0], $query->{NOTAFTER}->{VALUE} ] };
+            } else {
+                $query->{NOTAFTER} = { OPERATOR => 'FROM', VALUE => $val[0] };
+            }
+        # THIS IS NOT IMPLEMENTED YET!
+        } elsif ($key eq 'revoked_lt') {
+            $query->{revocation_time} = { '<=', $val[0] };
+        } elsif ($key eq 'revoked_gt') {
+            if ($query->{revocation_time}) {
+                $query->{revocation_time} = { '-between', [ $val[0], $query->{revocation_time}->[1] ] };
+            } else {
+                $query->{revocation_time} = { '>=', $val[0] };
+            }
+        } elsif ($key eq 'invalid_lt') {
+            $query->{invalidity_time} = { '<=', $val[0] };
+        } elsif ($key eq 'invalid_gt') {
+            if ($query->{invalidity_time}) {
+                $query->{invalidity_time} = { '-between', [ $val[0], $query->{invalidity_time}->[1] ] };
+            } else {
+                $query->{invalidity_time} = { '>=', $val[0] };
+            }
+        }
+    }
 
     # Read the query pattern for extra attributes from the session
     my $spec = $self->_client->session()->param('certsearch')->{default};

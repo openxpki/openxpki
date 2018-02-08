@@ -155,6 +155,46 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_GT"
+msgstr "Идентификатор сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_LT"
+msgstr "Идентификатор сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTAFTER_GT"
+msgstr "Идентификатор сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTAFTER_LT"
+msgstr "Идентификатор сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTBEFORE_GT"
+msgstr "Изменить дополнительную информацию"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTBEFORE_LT"
+msgstr "Изменить дополнительную информацию"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_REVOKED_GT"
+msgstr "Изменить дополнительную информацию"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_REVOKED_LT"
+msgstr "Изменить дополнительную информацию"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_VALID_AT"
+msgstr "Идентификатор сертификата"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_LABEL"
 msgstr "Родительский технологический процесс"
 
@@ -8230,6 +8270,10 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_LABEL"
 #~ msgstr "Загрузка сертификата в форматах PEM или CRT"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INTRO"
+#~ msgstr "Идентификатор сертификата"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CRL_LAST_ITEMCNT"
