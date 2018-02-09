@@ -240,6 +240,10 @@ B<Positional parameters>
 =cut
 sub send_ok {
     my ($self, $msg, $args) = @_;
+
+    die "Please call 'connect', 'init_session' or at least 'login' before sending commands"
+     unless $self->is_connected;
+
     lives_and {
         $self->response($self->client->send_receive_service_msg($msg, $args));
         if (my $err = $self->get_error) {
@@ -275,6 +279,29 @@ B<Positional parameters>
 sub send_command_ok {
     my ($self, $command, $params) = @_;
     return $self->send_ok('COMMAND', { COMMAND => $command, PARAMS => $params });
+}
+
+=head2 send_command_api2_ok
+
+Sends the given command (ie. message "COMMAND") to the server for execution via
+the new API (API2) and wraps that in a test.
+
+Returns the server response (I<HashRef>).
+
+B<Positional parameters>
+
+=over
+
+=item * I<$command> (Str) - command to send to the server
+
+=item * I<$params> (HashRef) - additional command parameters
+
+=back
+
+=cut
+sub send_command_api2_ok {
+    my ($self, $command, $params) = @_;
+    return $self->send_ok('COMMAND', { COMMAND => $command, PARAMS => $params, API2 => 1 });
 }
 
 =head2 is_service_msg
