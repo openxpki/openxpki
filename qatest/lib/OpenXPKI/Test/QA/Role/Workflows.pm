@@ -40,7 +40,7 @@ This role adds the following methods to L<OpenXPKI::Test>:
 
 =cut
 
-=head2 create_workflow_instance
+=head2 wf_create
 
 Creates a workflow by calling API command I<create_workflow_instance> and stores
 the workflow's ID in object attribute I<_workflow_id>.
@@ -58,7 +58,7 @@ B<Positional Parameters>
 =back
 
 =cut
-sub create_workflow_instance {
+sub wf_create {
     my ($self, $workflow, $params) = @_;
 
     my $result = $self->api_command(

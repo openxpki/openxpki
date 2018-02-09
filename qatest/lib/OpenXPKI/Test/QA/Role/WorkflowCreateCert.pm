@@ -32,7 +32,7 @@ use OpenXPKI::Serialization::Simple;
 requires 'also_init';
 requires 'default_realm'; # effectively requires 'OpenXPKI::Test::QA::Role::SampleConfig'
                           # we can't use with '...' because if other roles also said that then it would be applied more than once
-requires 'create_workflow_instance'; # effectively requires 'OpenXPKI::Test::QA::Role::Workflows'
+requires 'wf_create';     # effectively requires 'OpenXPKI::Test::QA::Role::Workflows'
 requires 'session';
 
 
@@ -100,7 +100,7 @@ sub create_cert {
         $sess_data->user('raop');
         $sess_data->role('RA Operator');
 
-        $self->create_workflow_instance(
+        $self->wf_create(
             "certificate_signing_request_v2" => {
                 cert_profile => $params->profile,
                 cert_subject_style => "00_basic_style",

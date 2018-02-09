@@ -54,7 +54,7 @@ $oxitest->session->data->role("CA Operator");
 # get_ui_system_status
 
 lives_ok {
-    $oxitest->create_workflow_instance(
+    $oxitest->wf_create(
         "certificate_revocation_request_v2" => {
             cert_identifier => $cert_info->{identifier},
             reason_code => 'keyCompromise',
@@ -68,7 +68,7 @@ lives_ok {
     # Go to pending
     $oxitest->wf_is_state('CHECK_FOR_REVOCATION') or die "workflow state is not 'CHECK_FOR_REVOCATION'";
 
-    $oxitest->create_workflow_instance(
+    $oxitest->wf_create(
         "crl_issuance" => { force_issue => 1 }
     );
 
