@@ -16,6 +16,7 @@ OpenXPKI::Server::API::UI
 
 use Data::Dumper;
 
+use Sys::Hostname;
 use Class::Std;
 use OpenXPKI::Control;
 use OpenXPKI::Debug;
@@ -108,6 +109,7 @@ sub get_ui_system_status {
         worker          => scalar @{$pids->{worker}},
         workflow        => scalar @{$pids->{workflow}},
         version         => $OpenXPKI::VERSION::VERSION,
+        hostname        => hostname,
     }
 }
 

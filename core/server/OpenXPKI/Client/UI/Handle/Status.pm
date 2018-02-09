@@ -143,6 +143,9 @@ sub render_system_status {
     push @fields, {
         label  => 'System Version',
         value  => $status->{version},
+    }, {
+        label  => 'Hostname',
+        value  => $status->{hostname},
     };
 
     $self->add_section({
