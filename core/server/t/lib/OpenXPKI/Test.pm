@@ -790,15 +790,15 @@ B<Positional Parameters>
 
 =item * C<$command> I<Str> - command name
 
-=item * C<%params> I<Hash> - parameters as plain list
+=item * C<$params> I<HashRef> - parameters
 
 =back
 
 =cut
 sub api2_command {
-    my ($self, $command, %params) = @_;
+    my ($self, $command, $params) = @_;
 
-    my $result = OpenXPKI::Server::Context::CTX('api2')->$command(%params);
+    my $result = OpenXPKI::Server::Context::CTX('api2')->$command($params ? (%$params) : ());
     $self->last_api_result($result);
 
     return $result;

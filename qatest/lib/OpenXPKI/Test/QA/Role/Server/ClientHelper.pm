@@ -271,14 +271,14 @@ B<Positional parameters>
 
 =item * I<$command> (Str) - command to send to the server
 
-=item * I<$params> (HashRef) - additional command parameters
+=item * I<$params> (HashRef) - command parameters. Optional, defult: {}
 
 =back
 
 =cut
 sub send_command_ok {
     my ($self, $command, $params) = @_;
-    return $self->send_ok('COMMAND', { COMMAND => $command, PARAMS => $params });
+    return $self->send_ok('COMMAND', { COMMAND => $command, PARAMS => $params ? $params : {} });
 }
 
 =head2 send_command_api2_ok
@@ -294,14 +294,14 @@ B<Positional parameters>
 
 =item * I<$command> (Str) - command to send to the server
 
-=item * I<$params> (HashRef) - additional command parameters
+=item * I<$params> (HashRef) - command parameters. Optional, defult: {}
 
 =back
 
 =cut
 sub send_command_api2_ok {
     my ($self, $command, $params) = @_;
-    return $self->send_ok('COMMAND', { COMMAND => $command, PARAMS => $params, API2 => 1 });
+    return $self->send_ok('COMMAND', { COMMAND => $command, PARAMS => $params ? $params : {}, API2 => 1 });
 }
 
 =head2 is_service_msg

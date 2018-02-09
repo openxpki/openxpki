@@ -22,7 +22,6 @@ use Log::Log4perl qw(:easy);
 use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 use OpenXPKI::Test::QA::CertHelper::Workflow;
-use OpenXPKI::Server::Context;
 use OpenXPKI::Serialization::Simple;
 
 plan tests => 11;
@@ -95,7 +94,7 @@ lives_and {
 my $client = $oxitest->new_client_tester;
 $client->login("caop");
 lives_and {
-    my $data = $client->send_command_api2_ok("list_process" => {});
+    my $data = $client->send_command_api2_ok("list_process");
     cmp_deeply $data, bag(
         {
             info => re(qr/openxpki.*main/),
@@ -134,9 +133,9 @@ lives_and {
 # render_template
 
 lives_and {
-    my $data = $oxitest->api2_command('render_template',
+    my $data = $oxitest->api2_command('render_template' => {
         template => "\n  \n\t[% animal %] does [% sound %]\n\n  ",
         params => { animal => "rabbit", sound => "meditate" },
-    );
+    });
     is $data, 'rabbit does meditate';
 } "render_template (and remove leading/trailing whitespaces)";

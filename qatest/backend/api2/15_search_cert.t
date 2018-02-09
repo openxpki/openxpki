@@ -18,9 +18,8 @@ use Log::Log4perl qw(:easy);
 use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 use OpenXPKI::Test::QA::CertHelper::Workflow;
-use OpenXPKI::Server::Context;
 
-plan tests => 40;
+plan tests => 39;
 
 
 #
@@ -33,11 +32,6 @@ my $oxitest = OpenXPKI::Test->new(
 );
 my $dbdata = $oxitest->certhelper_database;
 $oxitest->insert_testcerts;
-
-my $api;
-lives_ok {
-    $api = OpenXPKI::Server::Context::CTX("api2");
-} "instantiate API";
 
 =pod
 
@@ -95,7 +89,7 @@ sub search_cert_ok {
     if (scalar(@expected_names) and $expected_names[0] eq "NO_CHECK") {
         my $result = [];
         lives_ok {
-            $result = $api->search_cert(%$conditions);
+            $result = $oxitest->api2_command(search_cert => $conditions);
         } "Search cert $message";
         return $result;
     }
@@ -111,7 +105,7 @@ sub search_cert_ok {
 
     my $result;
     lives_and {
-        $result = $api->search_cert(%$conditions);
+        $result = $oxitest->api2_command(search_cert => $conditions);
         cmp_deeply $result, ($respect_order ? \@hashes : bag(@hashes));
     } "Search cert $message";
 }
