@@ -19,6 +19,15 @@ L<OpenXPKI::Test::QA::Role::SampleConfig>, i.e.:
         ...
     );
 
+To start the server watchdog process, specify C<start_watchdog =E<gt> 1> (see
+L<OpenXPKI::Test::QA::Role::SampleConfig>):
+
+    my $oxitest = OpenXPKI::Test->new(
+        with => [ "SampleConfig", "Server" ],
+        start_watchdog => 1,
+        ...
+    );
+
 =cut
 
 # Core modules
