@@ -178,7 +178,7 @@ around 'init_server' => sub {
 
     # wait till child process unlocks semaphore
     # (# semaphore #0, operation 0)
-    for (my $tick = 0; $tick < 3 and not $sem->op(0, 0, IPC_NOWAIT); $tick++) {
+    for (my $tick = 0; $tick < 5 and not $sem->op(0, 0, IPC_NOWAIT); $tick++) {
         sleep 1;
     }
     if (not $sem->op(0, 0, IPC_NOWAIT)) { $self->stop_server; die "Server init seems to have failed" }
