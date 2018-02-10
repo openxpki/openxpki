@@ -11,8 +11,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use Data::Dumper;
 use OpenXPKI::Serialization::Simple;
-
-use OpenXPKI::Server::Workflow::WFObject::WFArray;
+use Workflow::Exception qw(configuration_error workflow_error);
 
 sub execute {
     ##! 1: 'execute'
@@ -21,13 +20,9 @@ sub execute {
     my $serializer = OpenXPKI::Serialization::Simple->new();
     my $pki_realm  = CTX('api')->get_pki_realm();
     my $context   = $workflow->context();
+    my $target_key = $self->param('target_key') || 'token_alias_list';
 
     my $config = CTX('config');
-
-    my $token_alias_list = OpenXPKI::Server::Workflow::WFObject::WFArray->new({
-        workflow => $workflow,
-        context_key => 'token_alias_list',
-    });
 
     my $group_name;
 
@@ -35,10 +30,10 @@ sub execute {
     if ($self->param('token')) {
         # Determine the name of the key group for cert signing
         $group_name = $config->get(['crypto','type', $self->param('token') ]);
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_LIST_ACTIVE_TOKEN_NO_GROUP_FOUND_FOR_TYPE",
-            params => { TOKEN => $self->param('token') }
-        ) unless ($group_name);
+        if (!$group_name) {
+            workflow_error( "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_LIST_ACTIVE_TOKEN_NO_GROUP_FOUND_FOR_TYPE",
+                     { TOKEN => $self->param('token') } );
+        }
 
     # explicit group name
     } elsif ($self->param('group')) {
@@ -46,24 +41,22 @@ sub execute {
 
     # oops
     } else {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_LIST_ACTIVE_TOKEN_NO_GROUP_OR_TYPE_GIVEN",
-        );
+        configuration_error( 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_LIST_ACTIVE_TOKEN_NO_GROUP_OR_TYPE_GIVEN' );
     }
 
     my $token_list = CTX('api')->list_active_aliases( { GROUP => $group_name } );
 
     if (!@{$token_list} && !$self->param('empty_ok')) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_LIST_ACTIVE_TOKEN_DID_NOT_FIND_ANY_TOKEN",
-            params => { GROUP => $group_name }
+        workflow_error(
+            "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_LIST_ACTIVE_TOKEN_DID_NOT_FIND_ANY_TOKEN",
+            { GROUP => $group_name }
         );
     }
 
     ##! 32: "Active tokens found " . Dumper $token_list
-    foreach my $alias (@{$token_list}) {
-        $token_alias_list->push($alias->{ALIAS});
-    }
+    my @token_alias_list = map { $_->{ALIAS} } @{$token_list};
+
+    $context->param( $target_key  => \@token_alias_list );
 
     return 1;
 }
@@ -80,8 +73,35 @@ OpenXPKI::Server::Workflow::Activity::Tools::ListActiveToken
 
 Load the alias names of all active tokens in the given token group (parameter
 I<group>) or with the given token type (paramater I<token>).
-The list of token names will be in the context with key token_alias_list as
-array, sorted by notbefore data, most current first.
+The list of token names will be in the context with key token_alias_list
+as array, sorted by notbefore data, most current first. The target
+key can be set using the target_key parameter
 
 The class will throw an exception if no items are found unless the "empty_ok"
 parameter is set to a true value.
+
+=head1 Configuration
+
+=head2 Activity parameters
+
+=over
+
+=item token
+
+Name of the token type to look up, e.g. certsign
+
+=item group
+
+Name of the group to look up, e.g. ca-one-signer
+
+token and group are mutually exclusive, token has precedence.
+
+=item target_key
+
+Context item to write the result to
+
+=item empty_ok
+
+Boolean, if true does not throw an error if the token list is empty.
+
+=back
