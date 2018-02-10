@@ -122,6 +122,18 @@ sub issueCertificate {
 
         CTX('log')->application()->debug("Use ca set by user $issuing_ca to issue $csr_serial");
 
+        # check if this is a certsign alias
+        my $group = $config->get([ 'crypto', 'type', 'certsign']);
+        $issuing_ca =~ / \A (.+)-(\d+) \z/x;
+        if ($1 ne $group) {
+            OpenXPKI::Exception->throw(
+                message => "I18N_OPENXPKI_SERVER_NICE_LOCAL_ISSUER_NOT_IN_CERTSIGN_GROUP",
+                params  => {
+                    CA_ALIAS => $issuing_ca,
+                    GROUP => $group,
+            });
+        }
+
         my $cert = CTX('api')->get_certificate_for_alias({ ALIAS => $issuing_ca });
 
         if ($notafter->epoch() > $cert->{NOTAFTER}) {
