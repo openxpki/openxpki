@@ -149,8 +149,8 @@ Moose::Exporter->setup_import_methods(
     as_is     => [ \&OpenXPKI::Server::Context::CTX ],
 );
 
-subtype 'ArrayRefOrStr', as 'ArrayRef[Any]';
-coerce 'ArrayRefOrStr', from 'Str', via { [ $_ ] };
+subtype 'TestArrayRefOrStr', as 'ArrayRef[Any]';
+coerce 'TestArrayRefOrStr', from 'Str', via { [ $_ ] };
 
 =head1 DESCRIPTION
 
@@ -297,7 +297,7 @@ prerequisites for each task are met.
 =cut
 has also_init => (
     is => 'rw',
-    isa => 'ArrayRefOrStr',
+    isa => 'TestArrayRefOrStr',
     lazy => 1,
     coerce => 1,
     default => sub { [] },

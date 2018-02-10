@@ -40,7 +40,30 @@ other connector punctuation chars, Unicode marks, dash ("-"), colon (":"), space
 =cut
 subtype 'AlphaPunct', # named $re_alpha_string in old API
     as 'Str',
-    where { $_ =~ qr{ \A [ \w \- \. : \s ]* \z }xms };
+    where { $_ =~ qr{ \A [ \w \- \. : \s ]* \z }xms },
+    message { "$_ is not an alphanumeric string plus punctuation chars" };
+
+=head2 ArrayRefOrStr
+
+An I<ArrayRef> of I<Str> that will also accept a scalar I<Str> (which is
+automatically wrapped into an I<ArrayRef>).
+
+Note that you must specify C<coerce =E<gt> 1> for this to work, e.g.:
+
+    command "doit" => {
+        types => { isa => 'ArrayRefOrStr', coerce => 1, },
+    } => sub {
+        my ($self, $params) = @_;
+        print join(", ", @{ $params->types }), "\n";
+    };
+
+=cut
+subtype 'ArrayRefOrStr',
+    as 'ArrayRef[Str]';
+
+coerce 'ArrayRefOrStr',
+    from 'Str',
+    via { [ $_ ] };
 
 =head2 TokenType
 
