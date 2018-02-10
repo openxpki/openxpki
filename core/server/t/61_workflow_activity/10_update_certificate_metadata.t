@@ -28,7 +28,7 @@ plan tests => 4;
 #
 # Setup test context
 #
-my $oxitest = OpenXPKI::Test->new->setup_env->init_server;
+my $oxitest = OpenXPKI::Test->new;
 
 sub insert_meta_attribute {
     my ($db, $cert_id, $key, $value) = @_;

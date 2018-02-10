@@ -62,4 +62,4 @@ $result = $client->mock_request({
     'password' => 'openxpki'
 });
 
-is($result->{goto}, 'welcome', 'Logged in');
+is($result->{goto}, 'redirect!welcome', 'Logged in');

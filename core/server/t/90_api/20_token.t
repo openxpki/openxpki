@@ -5,6 +5,7 @@ use warnings;
 # Core modules
 use English;
 use FindBin qw( $Bin );
+use MIME::Base64;
 
 # CPAN modules
 use Test::More;
@@ -17,23 +18,24 @@ use lib "$Bin/../lib";
 use OpenXPKI::Test;
 use OpenXPKI::Test::CertHelper::Database;
 
-plan tests => 13;
+plan tests => 16;
 
 #
 # Setup test context
 #
-my $oxitest = OpenXPKI::Test->new;
-$oxitest->realm_config(
-    "alpha",
-    "auth.handler.Signature" => {
-        type             => "ChallengeX509",
-        challenge_length => 256,
-        role             => "User",
-        realm            => [ "alpha" ],
-        cacert           => [ "MyCertId" ],
-    }
+my $oxitest = OpenXPKI::Test->new(
+    with => [ qw( TestRealms CryptoLayer ) ],
+    add_config => {
+        "realm.alpha.auth.handler.Signature" => {
+            type             => "ChallengeX509",
+            challenge_length => 256,
+            role             => "User",
+            realm            => [ "alpha" ],
+            cacert           => [ "MyCertId" ],
+        },
+    },
 );
-$oxitest->setup_env->init_server('crypto_layer');
+
 $oxitest->insert_testcerts;
 CTX('session')->data->pki_realm('alpha');
 
@@ -47,8 +49,9 @@ my $av1 = $oxitest->certhelper_database->cert("alpha_datavault_1");
 my $av2 = $oxitest->certhelper_database->cert("alpha_datavault_2");
 my $bs1 = $oxitest->certhelper_database->cert("beta_signer_1");
 
+#
 # get_ca_list
-
+#
 lives_and {
     my $data = CTX('api')->get_ca_list();
 
@@ -97,9 +100,9 @@ lives_and {
     );
 } "get_ca_list - list signing CAs with correct status (using PKI_REALM)";
 
-
+#
 # get_certificate_for_alias
-
+#
 lives_and {
     my $data = CTX('api')->get_certificate_for_alias({
         ALIAS => $as1->db_alias->{alias}
@@ -114,9 +117,22 @@ lives_and {
     };
 } "get_certificate_for_alias - correct cert data";
 
+#
+# get_default_token
+#
+lives_and {
+    my $token = CTX('api')->get_default_token();
+    my $rand_base64 = $token->command({
+        COMMAND       => 'create_random',
+        RANDOM_LENGTH => 10,
+    });
+    is length(decode_base64($rand_base64)), 10;
+} "get_default_token - return usable token";
 
+#
+#
 # get_token_alias_by_group
-
+#
 lives_and {
     my $data = CTX('api')->get_token_alias_by_group({
         GROUP => $as2->db_alias->{group_id}
@@ -151,8 +167,9 @@ lives_and {
     is $data, $as3->db_alias->{alias};
 } "get_token_alias_by_group - return newer certificate if VALIDITY points to overlap period";
 
+#
 # get_token_alias_by_type
-
+#
 lives_and {
     my $data = CTX('api')->get_token_alias_by_type({ TYPE => "datasafe" });
     is $data, $av2->db_alias->{alias};
@@ -169,8 +186,37 @@ lives_and {
     is $data, $av1->db_alias->{alias};
 } "get_token_alias_by_type - previously valid token/cert alias (VALIDITY with DateTime objects)";
 
-# list_active_aliases
+#
+# get_trust_anchors
+#
+lives_and {
+    my $a2 = $oxitest->certhelper_database->cert("alpha_signer_2");
 
+    my $data = CTX('api')->get_trust_anchors({ PATH => "realm.alpha.auth.handler.Signature" });
+    cmp_deeply $data, bag("MyCertId", $a2->db->{identifier});
+} "get_trust_anchors";
+
+#
+# is_token_usable
+#
+lives_and {
+    my $data = CTX('api')->is_token_usable({
+        ALIAS => $as2->db_alias->{alias},
+    });
+    is $data, 1;
+} "is_token_usable - using ALIAS";
+
+lives_and {
+    my $data = CTX('api')->is_token_usable({
+        ALIAS => $as2->db_alias->{alias},
+        ENGINE => 1,
+    });
+    is $data, 1;
+} "is_token_usable - using ALIAS and ENGINE = 1";
+
+#
+# list_active_aliases
+#
 lives_and {
     my $data = CTX('api')->list_active_aliases({
         GROUP => $as2->db_alias->{group_id},
@@ -247,16 +293,6 @@ lives_and {
         },
     );
 } "list_active_aliases - using TYPE and CHECK_ONLINE";
-
-
-# get_trust_anchors
-
-lives_and {
-    my $a2 = $oxitest->certhelper_database->cert("alpha_signer_2");
-
-    my $data = CTX('api')->get_trust_anchors({ PATH => "realm.alpha.auth.handler.Signature" });
-    cmp_deeply $data, bag("MyCertId", $a2->db->{identifier});
-} "get_trust_anchors";
 
 #
 # Cleanup

@@ -40,6 +40,18 @@ sub AUTOLOAD {
     $command =~ s/.*:://;
     return if $command eq "DESTROY";
 
+    if (scalar @args > 0 and ref $args[0]) {
+        OpenXPKI::Exception->throw(
+            message => "Wrong usage of API command. Expected parameters as plain hash, got: reference",
+            params => { command => $command },
+        );
+    }
+    if (scalar @args % 2 == 1) {
+        OpenXPKI::Exception->throw(
+            message => "Odd number of parameters given to API command. Expected: plain hash",
+            params => { command => $command },
+        );
+    }
     $self->{api}->dispatch(
         command => $command,
         params => { @args },

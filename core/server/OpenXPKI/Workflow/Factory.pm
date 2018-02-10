@@ -355,16 +355,12 @@ sub check_acl {
     my ($type, $wf_creator, $user, $role) = @_;
 
     if (!$user) {
-        $role = 'Anonymous' unless($role);
         $user = CTX('session')->data->user;
-        $role = CTX('session')->data->role;
+        $role = CTX('session')->data->has_role ? CTX('session')->data->role : 'Anonymous';
     }
 
-    my $allowed_creator_re = CTX('config')->get([ 'workflow', 'def', $type, 'acl', $role, 'creator' ] );
-
-    if (!defined $allowed_creator_re) {
-        return;
-    }
+    my $allowed_creator_re = CTX('config')->get([ 'workflow', 'def', $type, 'acl', $role, 'creator' ]);
+    return unless defined $allowed_creator_re;
 
     # Creator can be self, any, others or a regex
     my $is_allowed = 0;

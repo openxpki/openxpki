@@ -13,7 +13,7 @@ use Test::Exception;
 use DateTime;
 
 # Project modules
-use lib "$Bin/../lib";
+use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 use OpenXPKI::Test::CertHelper::Database;
 
@@ -151,15 +151,17 @@ sub test_wf_instance {
 
 
 
-use Data::Dumper;
-
-
-my $oxitest = OpenXPKI::Test->new;
-$oxitest->workflow_config("alpha", "wf_type_1", workflow_def("wf_type_1"));
-$oxitest->workflow_config("alpha", "wf_type_2", workflow_def("wf_type_2"));
-$oxitest->workflow_config("alpha", "wf_type_3_unused", workflow_def("wf_type_3_unused"));
-$oxitest->workflow_config("beta",  "wf_type_4", workflow_def("wf_type_4"));
-$oxitest->setup_env->init_server('workflow_factory');
+my $oxitest = OpenXPKI::Test->new(
+    with => [ qw( TestRealms Workflows ) ],
+    add_config => {
+        "realm.alpha.workflow.def.wf_type_1" => workflow_def("wf_type_1"),
+        "realm.alpha.workflow.def.wf_type_2" => workflow_def("wf_type_2"),
+        "realm.alpha.workflow.def.wf_type_3_unused" => workflow_def("wf_type_3_unused"),
+        "realm.beta.workflow.def.wf_type_4" => workflow_def("wf_type_4"),
+    }
+);
+# while testing we do not log to database by default
+$oxitest->enable_workflow_log;
 
 CTX('session')->data->role('User');
 

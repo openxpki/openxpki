@@ -24,7 +24,9 @@ plan tests => 16;
 #
 # Setup env
 #
-my $oxitest = OpenXPKI::Test->new->setup_env->init_server();
+my $oxitest = OpenXPKI::Test->new(
+    with => "CryptoLayer",
+);
 $oxitest->insert_testcerts;
 
 my $passwd = "vcgT7MtIRrZJmWVTgTsO+w";

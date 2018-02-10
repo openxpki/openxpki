@@ -178,11 +178,6 @@ sub BUILD {
                     type  => SCALAR,
                     regex => $re_alpha_string,
                 },
-                'TYPE' => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                    optional => 1
-                },
                 'ENGINE' => {
                     type  => SCALAR,
                     regex => $re_boolean,

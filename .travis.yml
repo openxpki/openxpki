@@ -100,5 +100,9 @@ script:
     - popd
     - pushd ./qatest/backend/api/   && prove -q .
     - popd
+    - pushd ./qatest/backend/api2/  && prove -q .
+    - popd
     - pushd ./qatest/backend/webui/ && prove -q .
+    - popd
+    - pushd ./qatest/client/        && prove -q .
     - popd

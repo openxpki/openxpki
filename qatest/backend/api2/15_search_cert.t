@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use utf8;
 
 # Core modules
 use English;
@@ -17,9 +18,8 @@ use Log::Log4perl qw(:easy);
 use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 use OpenXPKI::Test::QA::CertHelper::Workflow;
-use OpenXPKI::Server::Context;
 
-plan tests => 38;
+plan tests => 39;
 
 
 #
@@ -27,21 +27,11 @@ plan tests => 38;
 #
 
 # Import test certificates
-my $oxitest = OpenXPKI::Test->new(with_workflows => 1);
+my $oxitest = OpenXPKI::Test->new(
+    with => [ qw( SampleConfig Workflows WorkflowCreateCert ) ],
+);
 my $dbdata = $oxitest->certhelper_database;
 $oxitest->insert_testcerts;
-$oxitest->realm_config("alpha", "acl.rules" => {
-    supertux => { allow_all_commands => 1 },
-});
-$oxitest->setup_env;
-$oxitest->init_server('api2');
-
-$oxitest->session->data->role("supertux");
-
-my $api;
-lives_ok {
-    $api = OpenXPKI::Server::Context::CTX("api2");
-} "instantiate API";
 
 =pod
 
@@ -99,7 +89,7 @@ sub search_cert_ok {
     if (scalar(@expected_names) and $expected_names[0] eq "NO_CHECK") {
         my $result = [];
         lives_ok {
-            $result = $api->search_cert(%$conditions);
+            $result = $oxitest->api2_command(search_cert => $conditions);
         } "Search cert $message";
         return $result;
     }
@@ -115,7 +105,7 @@ sub search_cert_ok {
 
     my $result;
     lives_and {
-        $result = $api->search_cert(%$conditions);
+        $result = $oxitest->api2_command(search_cert => $conditions);
         cmp_deeply $result, ($respect_order ? \@hashes : bag(@hashes));
     } "Search cert $message";
 }
@@ -209,7 +199,8 @@ search_cert_ok "by issuer DN (with wildcards)", {
 }, qw( gamma_bob_1 );
 
 search_cert_ok "by validity date", {
-    valid_at => $dbdata->cert("alpha_root_1")->db->{notbefore} + 100,
+    valid_before  => $dbdata->cert("alpha_root_1")->db->{notbefore} + 100,
+    expires_after => $dbdata->cert("alpha_root_1")->db->{notbefore} + 100,
     pki_realm => "_ANY"
 }, $dbdata->cert_names_by_realm_gen(alpha => 1);
 
@@ -260,20 +251,27 @@ cmp_bag $result, [
     superhashof({ identifier => $cert_info->{identifier} })
 ], "Correct result";
 
-# By NOTBEFORE/NOTAFTER (Int: searches "other side" of validity)
-search_cert_ok "whose validity period started before given date (NOTBEFORE < x)", {
-    notbefore => $dbdata->cert("alpha_root_1")->db->{notbefore} + 100,
+# By validity date
+search_cert_ok "whose validity period started before given date (valid_before)", {
+    valid_before => $dbdata->cert("alpha_root_1")->db->{notbefore} + 100,
     pki_realm => "_ANY"
 }, $dbdata->cert_names_by_realm_gen(alpha => 1); # chain #1 are expired certificates
 
-search_cert_ok "that was not yet valid at given date (NOTBEFORE > x)", {
-    # TODO #legacydb Using old DB layer syntax in "search_cert"
-    notbefore => { OPERATOR => "GREATER_THAN", VALUE => $dbdata->cert("alpha_root_3")->db->{notbefore} - 100 },
+search_cert_ok "that was not yet valid at given date (valid_after)", {
+    valid_after => $dbdata->cert("alpha_root_3")->db->{notbefore} - 100,
     pki_realm => $dbdata->cert("alpha_root_3")->db->{pki_realm}
 }, $dbdata->cert_names_by_realm_gen(alpha => 3); # chain #3 are future certificates
 
-search_cert_ok "whose validity period ends after given date (NOTAFTER > x)", {
-    notafter => $dbdata->cert("alpha_root_2")->db->{notafter} - 100,
+my $ar3nb = $dbdata->cert("alpha_root_3")->db->{notbefore};
+
+search_cert_ok "whose validity starts between two given dates", {
+    valid_after => $ar3nb - 100,
+    valid_before => $ar3nb + 100,
+    pki_realm => $dbdata->cert("alpha_root_3")->db->{pki_realm}
+}, $dbdata->cert_names_by_realm_gen(alpha => 3); # chain #3 are future certificates
+
+search_cert_ok "whose validity period ends after given date (expires_after)", {
+    expires_after => $dbdata->cert("alpha_root_2")->db->{notafter} - 100,
     pki_realm => $dbdata->cert("alpha_root_2")->db->{pki_realm}
 }, $dbdata->cert_names_by_realm_gen(alpha => 2), $dbdata->cert_names_by_realm_gen(alpha => 3);
 
@@ -342,5 +340,13 @@ $result = search_cert_ok "by attributes and with ORDER = 'identifier' (issue #57
 cmp_deeply $result, [
     superhashof({ subject => re(qr/$uuid/i) })
 ], "Correct result";
+
+$uuid = Data::UUID->new->create_str;
+my $umlaut_cert_info = $oxitest->create_cert(
+    hostname => "acme-$uuid.local",
+    requestor_gname => 'Till Tyskøl',
+    requestor_name => $uuid,
+    requestor_email => 'tilltom@morning',
+);
 
 $oxitest->delete_testcerts; # only deletes those from OpenXPKI::Test::CertHelper::Database

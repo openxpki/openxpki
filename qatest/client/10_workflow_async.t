@@ -18,14 +18,12 @@ use Test::Exception;
 use DateTime;
 
 # Project modules
-use lib "$Bin/lib";
-use lib "$Bin/../lib";
+use lib "$Bin/lib", "$Bin/../lib", "$Bin/../../core/server/t/lib";
 use OpenXPKI::Test;
-use OpenXPKI::Test::CertHelper::Database;
-use OpenXPKI::Test::Server;
-use OpenXPKI::Test::Client;
+
 
 # plan tests => 14; WE CANNOT PLAN tests as there is a while loop that sends commands (which are tests)
+
 
 #
 # Setup test context
@@ -81,31 +79,25 @@ sub workflow_def {
     };
 };
 
-my $oxitest = OpenXPKI::Test->new(start_watchdog => 1);
-$oxitest->workflow_config("alpha", "wf_type_1", workflow_def("wf_type_1"));
-$oxitest->setup_env;
+my $oxitest = OpenXPKI::Test->new(
+    with => [ "SampleConfig", "Server", "Workflows" ],
+    also_init => "crypto_layer",
+    start_watchdog => 1,
+    add_config => {
+        "realm.ca-one.workflow.def.wf_type_1" => workflow_def("wf_type_1"),
+    },
+);
 
-my $server = OpenXPKI::Test::Server->new(oxitest => $oxitest);
-$server->init_tasks( ['crypto_layer', 'workflow_factory'] );
-$server->start;
-
-my $tester = OpenXPKI::Test::Client->new(oxitest => $oxitest);
-$tester->connect;
-$tester->init_session;
+my $tester = $oxitest->new_client_tester;
 $tester->login("caop");
-
-sub send_command {
-    my ($command, $args) = @_;
-    return $tester->send_ok('COMMAND', { COMMAND => $command, PARAMS => $args });
-}
 
 sub wait_for_proc_state {
     my ($wfid, $state_regex) = @_;
     my $testname = "Waiting for workflow state $state_regex";
     my $result;
     my $count = 0;
-    while ($count++ < 10) {
-        $result = send_command "search_workflow_instances" => { SERIAL => [ $wfid ] };
+    while ($count++ < 20) {
+        $result = $tester->send_command_ok("search_workflow_instances" => { SERIAL => [ $wfid ] });
         # no workflow found?
         if ($result->[0]->{'WORKFLOW.WORKFLOW_SERIAL'} != $wfid) {
             diag "Workflow with ID $wfid not found!";
@@ -124,11 +116,11 @@ sub wait_for_proc_state {
 }
 my $result;
 
-lives_ok {
-    $result = send_command "create_workflow_instance" => {
+lives_and {
+    $result = $tester->send_command_ok("create_workflow_instance" => {
         WORKFLOW => "wf_type_1",
         PARAMS => {},
-    };
+    });
 } "create_workflow_instance()";
 
 my $wf_t1_a = $result->{WORKFLOW};
@@ -152,7 +144,7 @@ cmp_deeply $result, [ superhashof({
 # get_workflow_info - check action results
 #
 lives_and {
-    $result = send_command "get_workflow_info" => { ID => $wf_t1_a->{ID} };
+    $result = $tester->send_command_ok("get_workflow_info" => { ID => $wf_t1_a->{ID} });
     cmp_deeply $result->{WORKFLOW}->{CONTEXT}->{is_13_prime}, 1;
 } "Workflow action returns correct result";
 
@@ -160,7 +152,7 @@ lives_and {
 # get_workflow_history - check correct execution history
 #
 lives_and {
-    $result = send_command "get_workflow_history" => { ID => $wf_t1_a->{ID} };
+    $result = $tester->send_command_ok("get_workflow_history" => { ID => $wf_t1_a->{ID} });
     cmp_deeply $result, [
         superhashof({ WORKFLOW_STATE => "INITIAL", WORKFLOW_ACTION => re(qr/create/i) }),
         superhashof({ WORKFLOW_STATE => "INITIAL", WORKFLOW_ACTION => re(qr/initialize/i) }),
@@ -171,7 +163,7 @@ lives_and {
     ] or diag explain $result;
 } "get_workflow_history()";
 
-$server->stop;
+$oxitest->stop_server;
 
 done_testing;
 

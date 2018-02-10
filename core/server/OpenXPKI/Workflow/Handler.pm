@@ -142,18 +142,10 @@ sub get_factory {
     ##! 16: Dumper $args
 
     my $pki_realm = CTX('session')->data->pki_realm;
+
     # Check if we already have that factory in the cache
     if (defined $self->_cache->{ $pki_realm } ) {
         return $self->_cache->{ $pki_realm };
-    }
-
-    # Fetch the serialized Workflow definition from the config layer
-    my $conn = CTX('config');
-
-    if (!$conn->exists('workflow.def')) {
-         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_WORKFLOW_FACTORY_NO_CONFIG_FOUND',
-        );
     }
 
     my $yaml_config = OpenXPKI::Workflow::Config->new()->workflow_config();

@@ -55,11 +55,9 @@ sub is_logentry_count {
 # Setup test context
 #
 use OpenXPKI::Test;
-my $oxitest = OpenXPKI::Test->new;
-
 my $threshold_screen = $ENV{TEST_VERBOSE} ? 'INFO' : 'OFF';
-$oxitest->config_writer->conf_log4perl(
-    qq(
+my $oxitest = OpenXPKI::Test->new(
+    conf_log4perl => qq(
         log4perl.category.openxpki.auth         = INFO, Screen
         log4perl.category.openxpki.audit        = INFO, Screen
         log4perl.category.openxpki.monitor      = INFO, Screen
@@ -77,7 +75,6 @@ $oxitest->config_writer->conf_log4perl(
         log4perl.appender.DBI.warp_message      = 0
     )
 );
-$oxitest->setup_env->init_server;
 
 my $dbi = CTX('dbi');
 my $log = CTX('log');

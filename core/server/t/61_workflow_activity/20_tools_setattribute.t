@@ -25,26 +25,31 @@ plan tests => 5;
 # Setup test context
 #
 my $workflow_type = "TESTWORKFLOW".int(rand(2**32));
-my $oxitest = OpenXPKI::Test->new;
-$oxitest->realm_config("alpha", "workflow.def.$workflow_type" => {
-    head => { prefix => "testwf", persister => 'OpenXPKI' },
-    state => {
-        INITIAL => { action => [ 'doit > DONE' ] },
-        DONE    => { },
-    },
-    action => {
-        doit => {
-            class => 'OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute',
-            param => {
-                shoesize => 10,
-                hairstyle => undef,
+my $oxitest = OpenXPKI::Test->new(
+    with => [ qw( TestRealms ) ],
+    also_init => "workflow_factory",
+    add_config => {
+        "realm.alpha.workflow.def.$workflow_type" => {
+            head => { prefix => "testwf", persister => 'OpenXPKI' },
+            state => {
+                INITIAL => { action => [ 'doit > DONE' ] },
+                DONE    => { },
             },
+            action => {
+                doit => {
+                    class => 'OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute',
+                    param => {
+                        shoesize => 10,
+                        hairstyle => undef,
+                    },
+                },
+            },
+            acl => { PrincesOfTheUniverse => { creator => 'any' } },
         },
     },
-    acl => { Anonymous => { creator => 'any' } },
-});
-$oxitest->setup_env;
-$oxitest->init_server('workflow_factory');
+);
+
+$oxitest->session->data->role("PrincesOfTheUniverse");
 
 sub insert_meta_attribute {
     my ($db, $wf_id, $key, $value) = @_;
@@ -67,7 +72,7 @@ my $workflow;
 lives_and {
     $workflow = CTX('workflow_factory')->get_factory->create_workflow($workflow_type);
     ok ref $workflow;
-} "Create test workflow";
+} "Create test workflow" or BAIL_OUT "Could not create workflow";
 
 # Insert the workflow attributes to be changed
 insert_meta_attribute($oxitest->dbi, $workflow->id, shoesize  => 9);

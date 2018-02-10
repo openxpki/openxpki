@@ -24,8 +24,9 @@ plan tests => 17;
 #
 # Setup env
 #
-my $oxitest = OpenXPKI::Test->new->setup_env->init_server();
-#$oxitest->insert_testcerts;
+my $oxitest = OpenXPKI::Test->new(
+    with => "CryptoLayer",
+);
 
 my $csr    = "-----BEGIN CERTIFICATE REQUEST-----\nMIIChzCCAW8CAQAwQjETMBEGCgmSJomT8ixkARkWA29yZzEYMBYGCgmSJomT8ixk\nARkWCE9wZW5YUEtJMREwDwYDVQQDDAhKb2huIETDtjCCASIwDQYJKoZIhvcNAQEB\nBQADggEPADCCAQoCggEBAO6ulq2Jj5DDOcSpqesTMsxlzdNixpYTHVMxslRl+Lob\nu18yQNRyTSp6JpoiAlW0QHLwUO5o9EJ7lT0WBkuVsfL8I1o5RYVzl5/stLEvC1BV\nLQqw21TNuj7jkWDKiz1ekkkeVqZVfBJdTooVYfhL2FFM6ctLFg5z9eWpkdmfaKbQ\nIqmwEfu6XdWozqzdseX3/Q6CH2Q6g4tZsklGZf/+3XAdGf32OtWDBFU+4KpiU5DL\nwwCWbs3CFLVGBZR9ZQNSJYGmqeP+HqoUgi/l+JqyK3j3X/3Aa8z8E+hmpxjBh10b\nZyR18oTOvyRD9c+CPHUPMvnd28i+asV8qa282jAPMZECAwEAAaAAMA0GCSqGSIb3\nDQEBCwUAA4IBAQCLNy08onPziRPLxvtqeI5staff0qSXVKmT1nKPGGnNp5PHg8NJ\n4q17cUVNY/mP9GfVl6J3lp8iv8FoqdaOP5O/cAx1ROSPHKAN9P347OZ5hAPxCazg\nrZdRhCVcQsDb1pRXLWvTOo8phKBOa9yIQQqO+oGMB7oSGe39+wN7QmyQGD1f4+dq\nkaQa2kzEMOsCRYKtcQrRm2rNtqzwe/vLUdqsuSYvTFY2WRNkOj548L3sG0AI9+Nl\nxZVvgZqgRlX3naIVKtZt3lBkIJjiNvVxGrgBRLeSoJ5hZRbAMSuX+En0dy/90DQk\n8ToYNrytQlgEsyg9kTZaYbMPTn/aJSrgNYdM\n-----END CERTIFICATE REQUEST-----\n";
 
