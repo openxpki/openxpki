@@ -13,6 +13,7 @@ functions
 use Module::Load;
 use File::Spec;
 use IO::Dir 1.03;
+use Scalar::Util qw( blessed );
 
 # CPAN modules
 use Try::Tiny;
@@ -23,7 +24,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::MooseParams;
 use OpenXPKI::Server::API2::PluginRole;
 use OpenXPKI::Server::API2::Autoloader;
-
+use OpenXPKI::Server::API2::Types;
 
 =head1 SYNOPSIS
 
@@ -107,6 +108,26 @@ has log => (
     isa => 'Log::Log4perl::Logger',
     lazy => 1,
     default => sub { OpenXPKI::Server::Log->new(CONFIG => undef)->system },
+);
+
+=head2 autoloader
+
+Returns an instance of L<OpenXPKI::Server::API2::Autoloader> that allows to
+directly call API commands:
+
+    my $api = OpenXPKI::Server::API2->new( ... );
+    my $api_direct = $api->autoloader;
+    $api_direct->search_cert(pki_realm => ...)
+
+=cut
+has autoloader => (
+    is => 'ro',
+    isa => 'OpenXPKI::Server::API2::Autoloader',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        return OpenXPKI::Server::API2::Autoloader->new(api => $self);
+    },
 );
 
 =head2 enable_acls
@@ -334,7 +355,28 @@ sub dispatch {
 
     $self->log->debug("API call to '$p{command}'") if $self->log->is_debug;
 
-    return $package->new->execute($p{command}, $all_params);
+    my $result;
+    try {
+        $result = $package
+            ->new(api => $self->autoloader)
+            ->execute($p{command}, $all_params);
+    }
+    catch {
+        my $err = $_;
+        if (blessed($_)) {
+            if ($_->isa("OpenXPKI::Exception")) {
+                $_->rethrow;
+            }
+            elsif ($_->isa("Moose::Exception")) {
+                $err = $_->message;
+            }
+        }
+        OpenXPKI::Exception->throw(
+            message => "Error while executing API command",
+            params => { command => $p{command}, error => $err }, # stringify in case error is an object
+        );
+    };
+    return $result;
 }
 
 #=head2 _apply_acl_rules
@@ -545,22 +587,6 @@ sub _list_modules {
     }
     return \%results;
 }
-
-=head2 autoloader
-
-Returns an instance of L<OpenXPKI::Server::API2::Autoloader> that allows to
-directly call API commands:
-
-    my $api = OpenXPKI::Server::API2->new( ... );
-    my $api_direct = $api->autoloader;
-    $api_direct->search_cert(pki_realm => ...)
-
-=cut
-sub autoloader {
-    my $self = shift;
-    return OpenXPKI::Server::API2::Autoloader->new(api => $self);
-}
-
 
 __PACKAGE__->meta->make_immutable;
 

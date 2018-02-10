@@ -21,7 +21,7 @@ Log::Log4perl->easy_init({
 use lib "$Bin/lib";
 
 
-plan tests => 10;
+plan tests => 11;
 
 
 use_ok "OpenXPKI::Server::API2";
@@ -56,20 +56,25 @@ throws_ok {
 } "OpenXPKI::Exception", "complain about unknown API command";
 
 throws_ok {
-    $api->dispatch(command => "givetheparams", params => { name => "Max", size => "blah" });
-} "Moose::Exception::ValidationFailedForTypeConstraint", "complain about wrong parameter type";
+    $api->dispatch(command => "givetheparams", params => { name => "Max", size => 1, level => 'WRONGVAL' });
+} qr/ level .* 'Int' .* WRONGVAL /msxi, "complain about wrong parameter type";
+
+use DateTime;
+throws_ok {
+    $api->dispatch(command => "givetheparams", params => { name => DateTime->now });
+} qr/ name .* matching /msxi, "complain about wrong parameter type (with 'matching' defined)";
 
 throws_ok {
     $api->dispatch(command => "givetheparams", params => { name => "Donald" });
-} "Moose::Exception::ValidationFailedForTypeConstraint", "complain about parameter validation failure (regex)";
+} qr/ name .* matching /msxi, "complain about parameter validation failure (regex)";
 
 throws_ok {
     $api->dispatch(command => "givetheparams", params => { name => "Max", size => -1 });
-} "Moose::Exception::ValidationFailedForTypeConstraint", "complain about parameter validation failure (sub)";
+} qr/ size .* matching /msxi, "complain about parameter validation failure (sub)";
 
 lives_and {
-    my $result = $api->dispatch(command => "givetheparams", params => { name => "Max", size => 5 });
-    cmp_deeply $result, { name => "Max", size => 5 };
+    my $result = $api->dispatch(command => "givetheparams", params => { name => "Max", size => 5, level => 4 });
+    cmp_deeply $result, { name => "Max", size => 5, level => 4 };
 } "correctly execute command";
 
 1;

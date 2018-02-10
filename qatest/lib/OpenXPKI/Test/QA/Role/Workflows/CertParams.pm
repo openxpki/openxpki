@@ -1,10 +1,10 @@
-package OpenXPKI::Test::Role::WithWorkflows::CertParams;
+package OpenXPKI::Test::QA::Role::Workflows::CertParams;
 use Moose;
 use utf8;
 
 =head1 NAME
 
-OpenXPKI::Test::Role::WithWorkflows::CertParams - data container for certificate
+OpenXPKI::Test::QA::Role::Workflows::CertParams - data container for certificate
 attributes
 
 =cut

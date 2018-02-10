@@ -9,9 +9,6 @@ OpenXPKI::Server::API2::EasyPlugin - Define an OpenXPKI API plugin
 # CPAN modules
 use Moose ();
 use Moose::Exporter;
-use Moose::Util;
-use Moose::Util::MetaRole;
-use B::Hooks::EndOfScope;
 
 # Project modules
 use OpenXPKI::Server::API2::EasyPluginRole;
@@ -35,7 +32,7 @@ This will modify your package as follows:
 
 =over
 
-=item * imports Moose (i.e. adds "use Moose;" so you don't have to do it)
+=item * imports C<Moose> (i.e. adds "use Moose;" so you don't have to do it)
 
 =item * provides the L</command> keyword (just an imported sub really) to
 define API commands
@@ -117,6 +114,10 @@ plus the following ones:
 L<TRUE|perldata/"Scalar values"> value is returned.
 
 =back
+
+You can use all Moose types (I<Str>, I<Int> etc) plus OpenXPKI's own types
+defined in L<OpenXPKI::Server::API2::Types> (C<OpenXPKI::Server::API2>
+automatically imports them).
 
 =item * C<$function> - I<CodeRef> with the command implementation. On invocation
 it gets passed two parameters:

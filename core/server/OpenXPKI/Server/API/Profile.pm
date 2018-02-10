@@ -594,7 +594,7 @@ sub render_metadata_from_template {
 }
 
 sub list_supported_san {
-    my %san_names = map { lc($_) => $_ } ('email','URI','DNS','RID','IP','dirName','otherName','GUID','UPN','RID');
+    my %san_names = map { lc($_) => $_ } ('email','URI','DNS','RID','IP','dirName','otherName','GUID','UPN');
     ##! 16: 'Supported san names ' . Dumper %san_names
     return \%san_names;
 }

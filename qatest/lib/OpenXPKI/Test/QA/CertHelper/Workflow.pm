@@ -1,3 +1,14 @@
+#
+#
+#
+#                                DEPRECATED!
+#
+#
+#
+# You should use OpenXPKI::Test(with => [ "Workflows" ]) for new tests instead.
+#
+#
+#
 package OpenXPKI::Test::QA::CertHelper::Workflow;
 use Moose;
 use utf8;

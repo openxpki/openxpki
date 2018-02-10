@@ -49,6 +49,11 @@ has param_classes => (
 
 Adds parameter specifications for the given API command.
 
+A new L<Moose::Meta::Class> is created with the name I<${command}_ParamObject>.
+Attributes are added to the class that will hold the API command parameters.
+Type constraints specified via 'matching' are created and attached to the
+attributes.
+
 B<Parameters>
 
 =over
@@ -90,7 +95,7 @@ sub add_param_specs {
             # FIXME Implement
             my $matching = delete $spec->{matching};
             OpenXPKI::Exception->throw(
-                message => "'matching' must be a referenc either of type Regexp or CODE",
+                message => "'matching' must be a reference either of type Regexp or CODE",
                 params => { command => $command, parameter => $param_name }
             ) unless (ref $matching eq 'Regexp' or ref $matching eq 'CODE');
 
@@ -100,7 +105,7 @@ sub add_param_specs {
             $isa = Moose::Meta::TypeConstraint->new(
                 parent => $parent_type,
                 constraint => ( ref $matching eq 'CODE' ? $matching : sub { $_ =~ $matching } ),
-                message => sub { my $val = shift; return "constraints defined in 'matching' where violated (API command '$command')" },
+                message => sub { my $val = shift; return "either attribute is not a '$parent_type' or constraints defined in 'matching' where violated" },
             );
         }
         # add a Moose attribute to the parameter container class
@@ -112,7 +117,7 @@ sub add_param_specs {
             %{ $spec },
         );
     }
-
+    # internally register the new parameter class
     $self->param_classes->{$command} = $param_metaclass;
 }
 

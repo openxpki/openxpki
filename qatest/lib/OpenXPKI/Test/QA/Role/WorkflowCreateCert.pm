@@ -1,10 +1,21 @@
-package OpenXPKI::Test::Role::WithWorkflows;
+package OpenXPKI::Test::QA::Role::WorkflowCreateCert;
 use Moose::Role;
 
 =head1 NAME
 
-OpenXPKI::Test::Role::WithWorkflows - Moose role that extends L<OpenXPKI::Test> to
-prepare the test server for workflow execution.
+OpenXPKI::Test::QA::Role::Workflows - Moose role that extends L<OpenXPKI::Test>
+with a quick way to create certificates
+
+=head1 DESCRIPTION
+
+Please note that this role requires two other roles to be applied:
+L<OpenXPKI::Test::QA::Role::SampleConfig> and
+L<OpenXPKI::Test::QA::Role::Workflows>, i.e.:
+
+    my $oxitest = OpenXPKI::Test->new(
+        with => [ qw( SampleConfig Workflow WorkflowCreateCert ],
+        ...
+    );
 
 =cut
 
@@ -14,95 +25,33 @@ use Test::Exception;
 
 # Project modules
 use OpenXPKI::Server::Context;
-use OpenXPKI::Test::Role::WithWorkflows::Definition;
-use OpenXPKI::Test::Role::WithWorkflows::CertParams;
+use OpenXPKI::Test::QA::Role::Workflows::CertParams;
 use OpenXPKI::Serialization::Simple;
 
 
-requires '_build_default_tasks';
-requires 'setup_env';
-requires 'realm_config';
-requires 'get_default_realm';
+requires 'also_init';
+requires 'default_realm'; # effectively requires 'OpenXPKI::Test::QA::Role::SampleConfig'
+                          # we can't use with '...' because if other roles also said that then it would be applied more than once
+requires 'wf_create';     # effectively requires 'OpenXPKI::Test::QA::Role::Workflows'
+requires 'session';
 
 
-has _last_api_result => (
-    is => 'rw',
-    isa => 'HashRef',
-    init_arg => undef,
-    default => sub { {} },
-);
-has _workflow_id => (
-    is => 'rw',
-    isa => 'Str',
-    init_arg => undef,
-);
-
-
-around '_build_default_tasks' => sub {
-    my $orig = shift;
+before 'init_server' => sub {
     my $self = shift;
-
-    return [ @{ $self->$orig }, 'workflow_factory', 'crypto_layer', 'volatile_vault' ];
-};
-
-before 'setup_env' => sub {
-    my $self = shift;
-
-    my $realm = $self->get_default_realm;
-
-    $self->realm_config($realm, "workflow.global.action",
-        OpenXPKI::Test::Role::WithWorkflows::Definition->global_action);
-    $self->realm_config($realm, "workflow.global.condition",
-        OpenXPKI::Test::Role::WithWorkflows::Definition->global_condition);
-    $self->realm_config($realm, "workflow.global.field",
-        OpenXPKI::Test::Role::WithWorkflows::Definition->global_field);
-    $self->realm_config($realm, "workflow.global.validator",
-        OpenXPKI::Test::Role::WithWorkflows::Definition->global_validator);
-    $self->realm_config($realm, "workflow.def.certificate_signing_request_v2",
-        OpenXPKI::Test::Role::WithWorkflows::Definition->def_certificate_signing_request_v2);
+    # prepend to existing array in case a user supplied "also_init" needs our modules
+    unshift @{ $self->also_init }, 'crypto_layer', 'volatile_vault';
 };
 
 =head1 METHODS
 
-The following methods are added to L<OpenXPKI::Test> when this role is applied:
-
-=cut
-
-sub api_command {
-    my ($self, $command, $params) = @_;
-
-    my $result;
-    lives_ok {
-        $result = OpenXPKI::Server::Context::CTX('api')->$command($params);
-        $self->_last_api_result($result);
-    } "API command '$command'";
-
-    return $result;
-}
-
-sub wf_activity {
-    my ($self, $expected_state, $activity, $params) = @_;
-
-    if ($expected_state) {
-        is $self->_last_api_result->{WORKFLOW}->{STATE}, $expected_state, "state is '$expected_state'";
-    }
-
-    return $self->api_command(
-        execute_workflow_activity => {
-            ID => $self->_workflow_id,
-            ACTIVITY => $activity,
-            PARAMS => $params,
-        }
-    );
-}
+This role adds the following methods to L<OpenXPKI::Test>:
 
 =head2 create_cert
 
-Runs a L<subtest|Test::More/subtest> that creates a certificate via workflow
-I<certificate_signing_request_v2> (which is part of this role) and returns a
-I<HashRef> with some certificate info.
+Runs a L<lives_ok|Test::Exception/lives_ok> test that creates a certificate via
+API by starting the workflow I<certificate_signing_request_v2>.
 
-Returned I<HashRef>:
+Returns a I<HashRef> with some certificate info:
 
     {
         req_key    => ...,
@@ -110,11 +59,15 @@ Returned I<HashRef>:
         profile    => ...,
     }
 
+Please note that if used in conjunction with L<OpenXPKI::Test::QA::Role::Server>
+the workflow is still directly created by accessing the API methods, i.e. there
+is NO socket communication to the running server daemon.
+
 =cut
 sub create_cert {
     my ($self, @args) = @_;
 
-    my $params = OpenXPKI::Test::Role::WithWorkflows::CertParams->new(@args);
+    my $params = OpenXPKI::Test::QA::Role::Workflows::CertParams->new(@args);
 
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
@@ -135,10 +88,7 @@ sub create_cert {
 
     my $cert_info = {};
 
-    subtest "Create certificate (hostname ".$params->hostname.")" => sub {
-        plan tests => 20 + ($is_server_profile ? 2 : 0);
-        #plan tests => 16 + ($self->notbefore ? 2 : 0);
-
+    lives_ok {
         my $result;
 
         # change PKI realm, user and role to get permission to create workflow
@@ -146,26 +96,16 @@ sub create_cert {
         my $old_realm = $sess_data->has_pki_realm ? $sess_data->pki_realm : undef;
         my $old_user =  $sess_data->has_user      ? $sess_data->user : undef;
         my $old_role =  $sess_data->has_role      ? $sess_data->role : undef;
-        $sess_data->pki_realm($self->config_writer->realms->[0]);
+        $sess_data->pki_realm($self->default_realm);
         $sess_data->user('raop');
         $sess_data->role('RA Operator');
 
-        lives_ok {
-            $result = $self->api_command(
-                create_workflow_instance => {
-                    WORKFLOW => "certificate_signing_request_v2",
-                    PARAMS => {
-                        cert_profile => $params->profile,
-                        cert_subject_style => "00_basic_style",
-                    },
-                }
-            );
-        } "Create workflow instance";
-
-        ok $result->{WORKFLOW}->{ID} or die explain $result;
-
-        $self->_workflow_id($result->{WORKFLOW}->{ID});
-        note "Created workflow #".$self->_workflow_id;
+        $self->wf_create(
+            "certificate_signing_request_v2" => {
+                cert_profile => $params->profile,
+                cert_subject_style => "00_basic_style",
+            }
+        );
 
         $self->wf_activity(
             'SETUP_REQUEST_TYPE',
@@ -210,16 +150,14 @@ sub create_cert {
             },
         );
 
-        is $self->_last_api_result->{WORKFLOW}->{STATE}, 'SUBJECT_COMPLETE', "state is 'SUBJECT_COMPLETE'";
+        die "workflow state is not 'SUBJECT_COMPLETE'" unless $self->wf_is_state('SUBJECT_COMPLETE');
 
         # Test FQDNs should not validate so we need a policy exception request
         # (on rare cases the responsible router might return a valid address, so we check)
-        my $msg;
-        lives_ok {
-            $msg = $self->api_command(
-                get_workflow_info => { ID => $self->_workflow_id }
-            );
-        };
+        my $msg = $self->api_command(
+            get_workflow_info => { ID => $self->_workflow_id }
+        );
+
         my $actions = $msg->{STATE}->{option};
         my $intermediate_state;
         if (grep { /^csr_enter_policy_violation_comment$/ } @$actions) {
@@ -251,23 +189,21 @@ sub create_cert {
             $intermediate_state,
             csr_approve_csr => {},
         );
-        is $self->_last_api_result->{WORKFLOW}->{STATE}, 'SUCCESS';
+        die "workflow state is not 'SUCCESS'" unless $self->wf_is_state('SUCCESS');
 
-        lives_ok {
-            my $temp = $self->api_command(
-                get_workflow_info => { ID => $self->_workflow_id }
-            );
-            $cert_info = {
-                req_key    => $temp->{WORKFLOW}->{CONTEXT}->{csr_serial},
-                identifier => $temp->{WORKFLOW}->{CONTEXT}->{cert_identifier},
-                profile    => $temp->{WORKFLOW}->{CONTEXT}->{cert_profile},
-            }
+        my $temp = $self->api_command(
+            get_workflow_info => { ID => $self->_workflow_id }
+        );
+        $cert_info = {
+            req_key    => $temp->{WORKFLOW}->{CONTEXT}->{csr_serial},
+            identifier => $temp->{WORKFLOW}->{CONTEXT}->{cert_identifier},
+            profile    => $temp->{WORKFLOW}->{CONTEXT}->{cert_profile},
         };
 
         if ($old_realm) { $sess_data->pki_realm($old_realm) } else { $sess_data->clear_pki_realm }
         if ($old_user)  { $sess_data->user($old_user) }       else { $sess_data->clear_user }
         if ($old_role)  { $sess_data->role($old_role) }       else { $sess_data->clear_role }
-    };
+    } "Create certificate (hostname ".$params->hostname.")";
 
     return $cert_info;
 }

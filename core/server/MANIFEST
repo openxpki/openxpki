@@ -222,12 +222,50 @@ OpenXPKI/Server/API/Token.pm
 OpenXPKI/Server/API/UI.pm
 OpenXPKI/Server/API/Workflow.pm
 OpenXPKI/Server/API2.pm
+OpenXPKI/Server/API2/Autoloader.pm
 OpenXPKI/Server/API2/EasyPlugin.pm
 OpenXPKI/Server/API2/EasyPluginMetaClassTrait.pm
 OpenXPKI/Server/API2/EasyPluginRole.pm
-OpenXPKI/Server/API2/Plugin/Cert/Actions.pm
 OpenXPKI/Server/API2/Plugin/Cert/search_cert.pm
+OpenXPKI/Server/API2/Plugin/Profile/Util.pm
+OpenXPKI/Server/API2/Plugin/Profile/get_additional_information_fields.pm
+OpenXPKI/Server/API2/Plugin/Profile/get_cert_profiles.pm
+OpenXPKI/Server/API2/Plugin/Profile/get_cert_subject_profiles.pm
+OpenXPKI/Server/API2/Plugin/Profile/get_cert_subject_styles.pm
+OpenXPKI/Server/API2/Plugin/Profile/get_field_definition.pm
+OpenXPKI/Server/API2/Plugin/Profile/get_key_algs.pm
+OpenXPKI/Server/API2/Plugin/Profile/get_key_enc.pm
+OpenXPKI/Server/API2/Plugin/Profile/get_key_params.pm
+OpenXPKI/Server/API2/Plugin/Profile/list_supported_san.pm
+OpenXPKI/Server/API2/Plugin/Profile/list_used_profiles.pm
+OpenXPKI/Server/API2/Plugin/Profile/render_templates.pm
+OpenXPKI/Server/API2/Plugin/Token/Util.pm
+OpenXPKI/Server/API2/Plugin/Token/get_ca_list.pm
+OpenXPKI/Server/API2/Plugin/Token/get_certificate_for_alias.pm
+OpenXPKI/Server/API2/Plugin/Token/get_default_token.pm
+OpenXPKI/Server/API2/Plugin/Token/get_token_alias_by_x.pm
+OpenXPKI/Server/API2/Plugin/Token/get_trust_anchors.pm
+OpenXPKI/Server/API2/Plugin/Token/is_token_usable.pm
+OpenXPKI/Server/API2/Plugin/Token/list_active_aliases.pm
+OpenXPKI/Server/API2/Plugin/UI/get_menu.pm
+OpenXPKI/Server/API2/Plugin/UI/get_motd.pm
+OpenXPKI/Server/API2/Plugin/UI/get_ui_system_status.pm
+OpenXPKI/Server/API2/Plugin/UI/list_process.pm
+OpenXPKI/Server/API2/Plugin/UI/render_template.pm
+OpenXPKI/Server/API2/Plugin/Workflow/Util.pm
+OpenXPKI/Server/API2/Plugin/Workflow/create_workflow_instance.pm
+OpenXPKI/Server/API2/Plugin/Workflow/execute_workflow_activity.pm
+OpenXPKI/Server/API2/Plugin/Workflow/fail_workflow.pm
+OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_activities.pm
+OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_activities_params.pm
+OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_creator.pm
+OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_history.pm
+OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_instance_types.pm
+OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_log.pm
+OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_type_for_id.pm
+OpenXPKI/Server/API2/Plugin/Workflow/search_workflow_instances.pm
 OpenXPKI/Server/API2/PluginRole.pm
+OpenXPKI/Server/API2/Types.pm
 OpenXPKI/Server/Context.pm
 OpenXPKI/Server/Init.pm
 OpenXPKI/Server/Session.pm
@@ -499,6 +537,7 @@ OpenXPKI/Serialization/Legacy.pm
 OpenXPKI/Service.pm
 OpenXPKI/Service/Default.pm
 OpenXPKI/Service/Default/Command.pm
+OpenXPKI/Service/Default/CommandApi2.pm
 
 OpenXPKI/Service/SCEP.pm
 OpenXPKI/Service/SCEP/Command/PKIOperation.pm
@@ -640,21 +679,18 @@ t/80_config_versioning/config.patch
 
 t/90_api/10_housekeeping_purge_applog.t
 t/90_api/20_token.t
-t/90_api/30_workflow.t
 
 t/91_api2/10_base.t
 t/91_api2/11_autoloader.t
 t/91_api2/20_acl.t
+t/91_api2/30_plugin_token.t
 t/91_api2/lib/OpenXPKI/TestCommands/Ignored.pm
 t/91_api2/lib/OpenXPKI/TestCommands/givetheparams.pm
+t/91_api2/lib/OpenXPKI/TestCommands/scream.pm
 t/91_api2/lib/OpenXPKI/Testalienplugin.pm
 
 t/95_openxpkiadm/10_certificate.t
 t/95_openxpkiadm/CommandlineTest.pm
-
-t/97_client/01_login_and_resume.t
-t/97_client/10_workflow_async.t
-t/97_client/lib/OpenXPKI/Test/Is13Prime.pm
 
 t/99_cleanup/28_log.t
 t/99_cleanup/50_auth.t
@@ -710,15 +746,12 @@ t/config.d/system/server.yaml
 t/config.d/system/watchdog.yaml
 
 t/lib/OpenXPKI/Test.pm
-t/lib/OpenXPKI/Test/Client.pm
 t/lib/OpenXPKI/Test/ConfigWriter.pm
-t/lib/OpenXPKI/Test/Server.pm
 t/lib/OpenXPKI/Test/WorkflowMock.pm
 t/lib/OpenXPKI/Test/CertHelper/Database.pm
 t/lib/OpenXPKI/Test/CertHelper/Database/PEM.pm
-t/lib/OpenXPKI/Test/Role/WithWorkflows.pm
-t/lib/OpenXPKI/Test/Role/WithWorkflows/CertParams.pm
-t/lib/OpenXPKI/Test/Role/WithWorkflows/Definition.pm
+t/lib/OpenXPKI/Test/Role/CryptoLayer.pm
+t/lib/OpenXPKI/Test/Role/TestRealms.pm
 
 t/tests.mk
 

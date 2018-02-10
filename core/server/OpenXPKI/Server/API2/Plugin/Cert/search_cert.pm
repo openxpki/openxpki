@@ -1,11 +1,11 @@
 package OpenXPKI::Server::API2::Plugin::Cert::search_cert;
 use OpenXPKI::Server::API2::EasyPlugin;
 
-=head1 Name
+=head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Cert::search_cert - search certificates
+OpenXPKI::Server::API2::Plugin::Cert::search_cert
 
-=head1 Parameters
+=head1 COMMANDS
 
 =cut
 
@@ -39,28 +39,102 @@ my $re_approval_lang     = qr{ \A (de_DE|en_US|ru_RU) \z }xms;
 my $re_csr_format        = qr{ \A (PEM|DER|TXT) \z }xms;
 my $re_pkcs10            = qr{ \A [A-za-z0-9\+/=_\-\r\n\ ]+ \z}xms;
 
+=head2 search_cert
+
+Search certificates by various attributes.
+
+Returns an I<ArrayRef> of I<HashRefs>. The I<HashRefs> do not contain the data
+field of the database to reduce the transport costs an avoid parser
+implementations on the client.
+
+B<Parameters>
+
+All parameters are optional and can be used to filter the result list:
+
+=over
+
+=item * C<pki_realm> I<Str> - certificate realm. Specify "_any"
+for a global search. Default: current session's realm
+
+=item * C<entity_only> I<Bool> - certificate CA
+
+=item * C<subject> I<Str> - subject pattern (does an SQL LIKE search
+so you can use asterisk (*) as placeholder)
+
+=item * C<issuer_dn> I<Str> - issuer pattern (does an SQL LIKE search
+so you can use asterisk (*) as placeholder)
+
+=item * C<cert_serial> I<Str> - serial number of certificate
+
+=item * C<csr_serial> I<Str> - serial number of certificate request
+
+=item * C<subject_key_identifier> I<Str> - X.509 certificate subject identifier
+
+=item * C<issuer_identifier> I<Str> - issuer identifier
+
+=item * C<authority_key_identifier> I<Str> - CA identifier
+
+=item * C<identifier> I<Str> - internal certificate identifier (hash of PEM)
+
+=item * C<profile> I<Str> - certificate profile name
+
+=item * C<valid_before> I<Int> - certificate validity must start before this UNIX epoch timestamp
+
+=item * C<valid_after> I<Int> - certificate validity must after before this UNIX epoch timestamp
+
+=item * C<expires_before> I<Int> - certificate validity must end before this UNIX epoch timestamp
+
+=item * C<expires_after> I<Int> - certificate validity must end after this UNIX epoch timestamp
+
+=item * C<status> I<Str> - certificate status (for possible values see
+L<OpenXPKI::Server::API2::Types/CertStatus>)
+
+=item * C<cert_attributes> I<ArrayRef> - list of condition I<HashRefs> to search
+in attributes (KEY, VALUE, OPERATOR). Operator can be "EQUAL", "LIKE" or
+"BETWEEN".
+
+=item * C<limit> I<Int> - result paging: only return the given number of results
+
+=item * C<start> I<Int> - result paging: only return entries starting at given
+index (can only be used if C<limit> was specified)
+
+=item * C<order> I<Str> - order results by this table column (descending). Default: "cert_key"
+
+=item * C<reverse> I<Bool> - order results ascending
+
+=back
+
+B<Changes compared to API v1:> The following parameters where removed in favor
+of C<[valid|expires]_[before|after]>:
+
+    valid_at
+    notbefore
+    notafter
+
+=cut
+
 command "search_cert" => {
     authority_key_identifier => {isa => 'Value',         matching => $re_alpha_string,      },
     cert_attributes          => {isa => 'ArrayRef',      },
     cert_serial              => {isa => 'Value',         matching => $re_int_or_hex_string, },
     csr_serial               => {isa => 'Value',         matching => $re_integer_string,    },
-    email                    => {isa => 'Value' },
     entity_only              => {isa => 'Value',         matching => $re_boolean,           },
+    expires_after            => {isa => 'Int', },
+    expires_before           => {isa => 'Int', },
     identifier               => {isa => 'Value',         matching => $re_base64_string,     },
     issuer_dn                => {isa => 'Value' },
     issuer_identifier        => {isa => 'Value',         matching => $re_base64_string,     },
     limit                    => {isa => 'Value',         matching => $re_integer_string,    },
-    notafter                 => {isa => 'Value|HashRef', },
-    notbefore                => {isa => 'Value|HashRef', },
     order                    => {isa => 'Value' },
     pki_realm                => {isa => 'Value',         matching => $re_alpha_string,      },
     profile                  => {isa => 'Value',         matching => $re_alpha_string,      },
     reverse                  => {isa => 'Value',         matching => $re_boolean,           },
     start                    => {isa => 'Value',         matching => $re_integer_string,    },
-    status                   => {isa => 'Value' },
+    status                   => {isa => 'CertStatus' },
     subject                  => {isa => 'Value' },
     subject_key_identifier   => {isa => 'Value' },
-    valid_at                 => {isa => 'Value',         matching => $re_integer_string,    },
+    valid_after              => {isa => 'Int', },
+    valid_before             => {isa => 'Int', },
 } => sub {
     my ($self, $params) = @_;
 
@@ -79,7 +153,54 @@ command "search_cert" => {
 
 =head2 search_cert_count
 
-Same as cert_search, returns the number of matching rows
+Similar to L</cert_search> but only returns the number of matching rows.
+
+B<Parameters>
+
+All parameters are optional and can be used to filter the result list:
+
+=over
+
+=item * C<pki_realm> I<Str> - certificate realm. Specify "_any"
+for a global search. Default: current session's realm
+
+=item * C<entity_only> I<Bool> - certificate CA
+
+=item * C<subject> I<Str> - subject pattern (does an SQL LIKE search
+so you can use asterisk (*) as placeholder)
+
+=item * C<issuer_dn> I<Str> - issuer pattern (does an SQL LIKE search
+so you can use asterisk (*) as placeholder)
+
+=item * C<cert_serial> I<Str> - serial number of certificate
+
+=item * C<csr_serial> I<Str> - serial number of certificate request
+
+=item * C<subject_key_identifier> I<Str> - X.509 certificate subject identifier
+
+=item * C<issuer_identifier> I<Str> - issuer identifier
+
+=item * C<authority_key_identifier> I<Str> - CA identifier
+
+=item * C<identifier> I<Str> - internal certificate identifier (hash of PEM)
+
+=item * C<profile> I<Str> - certificate profile name
+
+=item * C<status> I<Str> - certificate status (for possible values see
+L<OpenXPKI::Server::API2::Types/CertStatus>)
+
+=item * C<cert_attributes> I<ArrayRef> - list of condition I<HashRefs> to search
+in attributes (KEY, VALUE, OPERATOR). Operator can be "EQUAL", "LIKE" or
+"BETWEEN".
+
+=back
+
+B<Changes compared to API v1:> The following parameters where removed in favor
+of C<[valid|expires]_[before|after]>:
+
+    valid_at
+    notbefore
+    notafter
 
 =cut
 command "search_cert_count" => {
@@ -87,19 +208,19 @@ command "search_cert_count" => {
     cert_attributes          => {isa => 'ArrayRef', },
     cert_serial              => {isa => 'Value',    matching => $re_int_or_hex_string, },
     csr_serial               => {isa => 'Value',    matching => $re_integer_string,    },
-    email                    => {isa => 'Value' },
     entity_only              => {isa => 'Value',    matching => $re_boolean,           },
+    expires_after            => {isa => 'Int', },
+    expires_before           => {isa => 'Int', },
     identifier               => {isa => 'Value',    matching => $re_base64_string,     },
     issuer_dn                => {isa => 'Value' },
     issuer_identifier        => {isa => 'Value',    matching => $re_base64_string,     },
-    notafter                 => {isa => 'Value|HashRef', },
-    notbefore                => {isa => 'Value|HashRef', },
     pki_realm                => {isa => 'Value',    matching => $re_alpha_string,      },
     profile                  => {isa => 'Value',    matching => $re_alpha_string,      },
-    status                   => {isa => 'Value' },
+    status                   => {isa => 'CertStatus' },
     subject                  => {isa => 'Value' },
     subject_key_identifier   => {isa => 'Value' },
-    valid_at                 => {isa => 'Value',    matching => $re_integer_string,    },
+    valid_after              => {isa => 'Int', },
+    valid_before             => {isa => 'Int', },
 } => sub {
     my ($self, $params) = @_;
 
@@ -120,7 +241,7 @@ sub _make_db_query_additional_params {
 
     if ( $po->has_limit ) {
         $params->{limit} = $po->limit;
-        $params->{offset} = $po->start if $po->start;
+        $params->{offset} = $po->start if $po->has_start;
     }
 
     # Custom ordering
@@ -190,26 +311,10 @@ sub _make_db_query {
     $where->{'certificate.subject'}                   = { -like => $po->subject }       if $po->has_subject;
     $where->{'certificate.issuer_dn'}                 = { -like => $po->issuer_dn }     if $po->has_issuer_dn;
 
-    if ($po->has_valid_at) {
-        $where->{'certificate.notbefore'} = { '<=', $po->valid_at };
-        $where->{'certificate.notafter'} =  { '>=', $po->valid_at };
-    }
-
-    # notbefore/notafter should only be used for timestamps outside
-    # the validity interval, therefore the operators are fixed
-    if ($po->has_notbefore) {
-        # TODO #legacydb search_cert's NOTBEFORE allows old DB layer syntax
-        $where->{'certificate.notbefore'} = ref $po->notbefore eq 'HASH'
-            ? OpenXPKI::Server::Database::Legacy->convert_dynamic_cond($po->notbefore)
-            : { '<', $po->notbefore };
-    }
-
-    if ($po->has_notafter ) {
-        # TODO #legacydb search_cert's NOTAFTER allows old DB layer syntax
-        $where->{'certificate.notafter'} = ref $po->notafter eq 'HASH'
-            ? OpenXPKI::Server::Database::Legacy->convert_dynamic_cond($po->notafter)
-            : { '>', $po->notafter };
-    }
+    $where->{'certificate.notbefore'} = { '<', $po->valid_before }   if $po->has_valid_before;
+    $where->{'certificate.notbefore'} = { '>', $po->valid_after }    if $po->has_valid_after;
+    $where->{'certificate.notafter'} =  { '<', $po->expires_before } if $po->has_expires_before;
+    $where->{'certificate.notafter'} =  { '>', $po->expires_after}   if $po->has_expires_after;
 
     my @join_spec = ();
 
@@ -255,50 +360,5 @@ sub _make_db_query {
 
     return $params;
 }
-
-=over
-
-=item * CERT_SERIAL
-
-=item * LIMIT
-
-=item * LAST
-
-=item * FIRST
-
-=item * CSR_SERIAL
-
-=item * SUBJECT
-
-=item * ISSUER_DN
-
-=item * ISSUER_IDENTIFIER
-
-=item * PKI_REALM (default is the sessions realm, _any for global search)
-
-=item * PROFILE
-
-=item * VALID_AT
-
-=item * NOTBEFORE/NOTAFTER (with SCALAR searches "other side" of validity or pass HASH with operator)
-
-=item * CERT_ATTRIBUTES list of conditions to search in attributes (KEY, VALUE, OPERATOR)
-Operator can be "EQUAL", "LIKE" or "BETWEEN" and any other value will lead to
-error "I18N_OPENXPKI_SERVER_DBI_SQL_SELECT_UNKNOWN_OPERATOR".
-
-=item * ENTITY_ONLY (show only certificates issued by this ca)
-
-=item * SUBJECT_KEY_IDENTIFIER
-
-=item * AUTHORITY_KEY_IDENTIFIER
-
-=back
-
-The result is an array of hashes. The hashes do not contain the data field
-of the database to reduce the transport costs an avoid parser implementations
-on the client.
-
-=cut
-
 
 __PACKAGE__->meta->make_immutable;

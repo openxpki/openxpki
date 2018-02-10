@@ -26,7 +26,6 @@ plan tests => 5;
 # Setup test env
 #
 my $oxitest = OpenXPKI::Test->new;
-$oxitest->setup_env;
 
 #
 # Tests
