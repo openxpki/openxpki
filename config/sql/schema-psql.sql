@@ -388,6 +388,7 @@ CREATE TABLE workflow_history (
     workflow_description text,
     workflow_state text,
     workflow_user text,
+    workflow_node integer,
     workflow_history_date timestamp without time zone
 );
 
