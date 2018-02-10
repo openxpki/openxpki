@@ -27,7 +27,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow::Observer::AddExecuteHistory;
 use OpenXPKI::Server::Workflow::Observer::Log;
 use OpenXPKI::Serialization::Simple;
-
+use OpenXPKI::Connector::WorkflowContext;
 
 
 sub START {
@@ -268,9 +268,14 @@ sub __get_workflow_ui_info {
     }
 
     $result->{ACTIVITY} = {};
+
+
+    OpenXPKI::Connector::WorkflowContext::set_context( $result->{WORKFLOW}->{CONTEXT} );
+
     foreach my $wf_action (@activities) {
         $result->{ACTIVITY}->{$wf_action} = $factory->get_action_info( $wf_action, $result->{WORKFLOW}->{TYPE} );
     }
+    OpenXPKI::Connector::WorkflowContext::set_context();
 
     # Add Workflow UI Info
     my $head = CTX('config')->get_hash([ 'workflow', 'def', $result->{WORKFLOW}->{TYPE}, 'head' ]);
