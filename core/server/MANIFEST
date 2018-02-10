@@ -222,6 +222,7 @@ OpenXPKI/Server/API/Token.pm
 OpenXPKI/Server/API/UI.pm
 OpenXPKI/Server/API/Workflow.pm
 OpenXPKI/Server/API2.pm
+OpenXPKI/Server/API2/Autoloader.pm
 OpenXPKI/Server/API2/EasyPlugin.pm
 OpenXPKI/Server/API2/EasyPluginMetaClassTrait.pm
 OpenXPKI/Server/API2/EasyPluginRole.pm
@@ -253,6 +254,8 @@ OpenXPKI/Server/Notification/ServiceNow.pm
 OpenXPKI/Server/Notification/Base.pm
 OpenXPKI/Server/Notification/Handler.pm
 OpenXPKI/Server/Notification/SMTP.pm
+OpenXPKI/Server/Notification/SMTP/SSL.pm
+
 
 # SOAP
 OpenXPKI/SOAP.pm
