@@ -1,0 +1,9 @@
+name: ca_alias
+label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTSIGN_TOKEN
+type: select
+option:
+      item@: connector:workflow.global.field.certsign_token_select.connector
+
+connector:
+    class: OpenXPKI::Connector::WorkflowContext
+    LOCATION: token_alias_list

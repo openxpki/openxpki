@@ -1848,6 +1848,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_PROFILE_LABEL"
 msgstr "Изменить профиль сертификата "
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_ISSUER_LABEL"
+msgstr "Изменить имя в заявке"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SUBMIT_DESC"
 msgstr "Технологические процессы"
 
@@ -2028,6 +2032,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 msgstr "Пауза"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SET_ISSUER_DESC"
+msgstr "Сохранить заявку в базе данных и выдать сертификат"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SLEEP_LABEL"
 msgstr "Родительский технологический процесс"
 
@@ -2191,6 +2199,10 @@ msgstr "Идентификатор сертификата"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_PLACEHOLDER"
 msgstr "Идентификатор сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTSIGN_TOKEN"
+msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC"

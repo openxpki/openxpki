@@ -252,6 +252,7 @@ state:
           - edit_validity > CHECK_VALIDITY  ? acl_can_approve
           - global_noop > RUN_POLICY_CHECKS ? acl_can_approve
           - approve_csr > CHECK_APPROVALS ? acl_can_approve
+          - load_issuer_list > SET_ISSUER ? acl_can_approve allow_isuer_override
           - put_request_on_hold > ONHOLD ? acl_can_approve
           - reject_request > NOTIFY_REJECT ? acl_can_reject
         output:
@@ -264,6 +265,7 @@ state:
           - notbefore
           - notafter
           - cert_profile
+          - certsign_token_select
           - cert_info
 #          - approval_count
         button:
@@ -279,6 +281,9 @@ state:
             format: expected
           global_noop:
             label: I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL
+            format: alternative
+          load_issuer_list:
+            label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_ISSUER_LABEL
             format: alternative
           reject_request:
             format: failure
@@ -302,6 +307,7 @@ state:
           - edit_validity > CHECK_VALIDITY  ? acl_can_approve
           - global_noop > RUN_POLICY_CHECKS ? has_policy_violation acl_can_approve
           - approve_csr > CHECK_APPROVALS ? acl_can_approve
+          - load_issuer_list > SET_ISSUER ? acl_can_approve allow_isuer_override
           - put_request_on_hold > ONHOLD ? acl_can_approve
           - reject_request > NOTIFY_REJECT ? acl_can_reject
         output:
@@ -314,6 +320,7 @@ state:
           - notbefore
           - notafter
           - cert_profile
+          - certsign_token_select
           - cert_info
 #          - approval_count
 
@@ -331,10 +338,16 @@ state:
             format: optional
           edit_validity:
             format: optional
+          load_issuer_list:
+            label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_ISSUER_LABEL
+            format: alternative
           reject_request:
             format: failure
           put_request_on_hold:
             format: alternative
+
+    SET_ISSUER:
+        action: set_issuer > RUN_POLICY_CHECKS
 
     PKCS10_GENERATED:
         autorun: 1
@@ -426,6 +439,7 @@ state:
           - notbefore
           - notafter
           - cert_profile
+          - certsign_token_select
           - cert_info
 
     RUN_POLICY_CHECKS:
@@ -567,6 +581,11 @@ action:
             namespace: workflow.csr.keygen_password
             target_key: _password
 
+    load_issuer_list:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::ListActiveToken
+        param:
+            token: certsign
+
     move_key_to_dp:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
         param:
@@ -682,6 +701,15 @@ action:
         param:
             message: csr_created
 
+    set_issuer:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetSource
+        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_ISSUER_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SET_ISSUER_DESC
+        input:
+          - certsign_token_select
+        param:
+          source: USER
+
     set_workflow_attributes:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
         param:
@@ -754,6 +782,13 @@ condition:
             condition1: global_is_operator
 #            condition2: "!global_is_creator"
 
+    # The default is to autodetect the issuer token, in case you want to
+    # give the Ra Operator the option to select a special CA Token for
+    # signing, set this to AlwaysTrue. Note that this works only with the
+    # default "NICE::Local" implementation and has some limitations.
+    allow_isuer_override:
+        class: OpenXPKI::Server::Workflow::Condition::AlwaysFalse
+
     # If you want a 4-eyes approval, just add a second "RA Operator"
     # e.g. "role: RA Operator, RA Operator" - you should add also
     # add current approval count to the output in the relevant states
@@ -823,6 +858,7 @@ condition:
             _map_cert_profile: $cert_profile
             _map_notbefore: $notbefore
             _map_notafter: $notafter
+
 
 field:
     cert_profile:

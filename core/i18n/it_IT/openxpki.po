@@ -1564,6 +1564,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_PROFILE_LABEL"
 msgstr "Seleziona Profilo"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_ISSUER_LABEL"
+msgstr "Modifica Soggetto"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SUBMIT_DESC"
 msgstr "Invia Richiesta"
 
@@ -1731,6 +1735,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 msgstr "Genera Codice"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SET_ISSUER_DESC"
+msgstr "Emetti una nuova Lista Revoche"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SLEEP_LABEL"
 msgstr "Termina Workflow"
 
@@ -1880,6 +1888,12 @@ msgstr "Certificato"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_PLACEHOLDER"
 msgstr "Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTSIGN_TOKEN"
+msgstr ""
+"Il Nome Alternativo (oppure i Nomi Alternativi) per il campo Soggetto (SAN = "
+"Subject Alternative Name)."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC"
 msgstr ""

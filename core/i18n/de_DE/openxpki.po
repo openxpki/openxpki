@@ -1845,6 +1845,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_PROFILE_LABEL"
 msgstr "Ändern des Zertifikats-Profils"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_ISSUER_LABEL"
+msgstr "Ändern des Namens des zukünftigen Zertifikates"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SUBMIT_DESC"
 msgstr "Arbeitsabläufe"
 
@@ -2025,6 +2029,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 msgstr "Warten"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SET_ISSUER_DESC"
+msgstr "Speichern des Zertifzierungsantrages"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SLEEP_LABEL"
 msgstr "Übergeordneter Workflow"
 
@@ -2194,6 +2202,10 @@ msgstr "Zertifikats-ID"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_PLACEHOLDER"
 msgstr "Zertifikats-ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTSIGN_TOKEN"
+msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC"

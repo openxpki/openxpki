@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2018-02-08 17:19+0100\n"
+"PO-Revision-Date: 2018-02-10 13:01+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -1372,6 +1372,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_PROFILE_LABEL"
 msgstr "Select Profile"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_ISSUER_LABEL"
+msgstr "Set Issuer"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SUBMIT_DESC"
 msgstr "Submit request"
 
@@ -1529,6 +1532,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 msgstr "Generate Code"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SET_ISSUER_DESC"
+msgstr ""
+"Usually the most recent issuing ca that matches the required validity window "
+"is used to sign a certificate. This dialog allows you to set a dedicated "
+"issuer certificate to be used. Note that notbefore/notafter dates of the "
+"issued certificate will be tailored to fit into the validity window of the "
+"used ca certificate -  this will only work if the validities overlap."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SLEEP_LABEL"
 msgstr "Sleeping"
 
@@ -1658,6 +1669,9 @@ msgstr "Certificate List"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_PLACEHOLDER"
 msgstr "List of certificate identifiers, seperated by space or newline"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTSIGN_TOKEN"
+msgstr "Issuing CA"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC"
 msgstr ""
