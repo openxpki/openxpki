@@ -28,6 +28,7 @@ use OpenXPKI::Server;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Service::Default::Command;
+use OpenXPKI::Service::Default::CommandApi2;
 use Log::Log4perl::MDC;
 
 my %state_of :ATTR;     # the current state of the service
@@ -714,6 +715,12 @@ sub __handle_COMMAND : PRIVATE {
 
     my $command;
     eval {
+        if ($data->{PARAMS}->{API2}) {
+            $command = OpenXPKI::Service::Default::CommandApi2->new(
+                command => $data->{PARAMS}->{COMMAND},
+                params  => $data->{PARAMS}->{PARAMS},
+            );
+        }
         $command = OpenXPKI::Service::Default::Command->new({
             COMMAND => $data->{PARAMS}->{COMMAND},
             PARAMS  => $data->{PARAMS}->{PARAMS},
