@@ -51,6 +51,8 @@ B<Parameters>
 
 =item * C<params> I<HashRef> - command parameters
 
+=back
+
 =head2 execute
 
 Executes the command via API.
