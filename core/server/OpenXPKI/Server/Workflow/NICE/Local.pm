@@ -407,13 +407,17 @@ sub issueCRL {
     # use LEFT JOIN as there can be revoked certificates without CRR items!
     my $certs = $dbi->select(
         from_join => 'certificate =>certificate.identifier=crr.identifier crr',
-        columns => [ 'cert_key', 'certificate.identifier identifier', 'revocation_time', 'reason_code', 'invalidity_time', 'status' ],
+        columns => [ 'cert_key', 'certificate.identifier identifier',
+            'crr.revocation_time revocation_time',
+            'crr.reason_code reason_code',
+            'crr.invalidity_time invalidity_time',
+            'status' ],
         where => {
             'certificate.pki_realm' => $pki_realm,
             issuer_identifier => $ca_identifier,
             status => [ 'REVOKED', 'CRL_ISSUANCE_PENDING' ],
         },
-        order_by => [ 'cert_key', 'revocation_time desc' ]
+        order_by => [ 'cert_key', 'crr.revocation_time desc' ]
     );
 
     push @cert_timestamps, $self->__prepare_crl_data($certs);
