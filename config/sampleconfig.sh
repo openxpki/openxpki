@@ -48,7 +48,7 @@ REVOCATION_SUFFIX='crl'
 PASS_SUFFIX='pass'
 BACKUP_SUFFIX='~'
 
-# root CA selfsigned (or on productiv usage use company's root certificate)
+# root CA selfsigned (in production use company's root certificate)
 ROOT_CA='OpenXPKI_CA-One_Root_CA'
 ROOT_CA_REQUEST="${SSL_REALM}/${ROOT_CA}.${REQUEST_SUFFIX}"
 ROOT_CA_KEY="${SSL_REALM}/${ROOT_CA}.${KEY_SUFFIX}"
@@ -239,7 +239,7 @@ echo "Creating certificates .. "
 if [ ! -e "${ROOT_CA_CERTIFICATE}" ]
 then
    echo "Did not find a root ca certificate file."
-   echo -n "Creating an own self singned root ca .. "
+   echo -n "Creating an own self signed root ca .. "
    test -f "${ROOT_CA_KEY}" && \
     mv "${ROOT_CA_KEY}" "${ROOT_CA_KEY}${BACKUP_SUFFIX}"
    test -f "${ROOT_CA_KEY_PASSWORD}" && \

@@ -35,7 +35,7 @@ To avoid an "untrusted package" warning, you should add our package signing key 
 
 The https connection is protected by a Let's Encrypt certificate but if you want to validate the key on your own, the fingerprint is::
 
-    gpg --print-md sha256 Release.key 
+    gpg --print-md sha256 Release.key
     Release.key: 78FE9779 A10D64CA 3CBB8D4C CE1DE44C 1AC69A93 FF2EFCF9 3AADBEC9 D3378F7B
 
 As the init script uses mysql as default, but does not force it as a dependency, it is crucial that you have the mysql server and the perl mysql binding installed before you pull the OpenXPKI package::
@@ -95,7 +95,7 @@ available for mysql).
 Example call when debian packages are installed::
 
     zcat /usr/share/doc/libopenxpki-perl/examples/schema-mysql.sql.gz | \
-        mysql -u root -p openxpki
+         mysql -u root --password --database  openxpki
 
 If you do not use debian packages, you can get a copy from the config/sql/
 folder of the repository.
@@ -190,7 +190,7 @@ In the process list, you should see two process running::
     14302 ?        S      0:00 openxpki watchdog ( main )
     14303 ?        S      0:00 openxpki server ( main )
 
-If this is not the case, check */var/log/openxpki/stderr.log*. 
+If this is not the case, check */var/log/openxpki/stderr.log*.
 
 Adding the Webclient
 ^^^^^^^^^^^^^^^^^^^^
@@ -200,7 +200,7 @@ The new webclient is included in the core packages now. Just open your browser a
 You can log in as user with any username/password combination, the operator login has two preconfigured operator accounts raop and raop2 with password openxpki.
 
 If you only get the "Open Source Trustcenter" banner without a login prompt,
-check that fcgid is enabled as described above with 
+check that fcgid is enabled as described above with
 (*a2enmod fcgid; service apache2 restart).
 
 Testdrive
