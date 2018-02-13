@@ -10,8 +10,7 @@ OpenXPKI::Server::API2::Plugin::UI::get_ui_system_status
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
-
-
+use use Sys::Hostname;
 
 =head1 COMMANDS
 
@@ -27,6 +26,8 @@ Returns a I<HashRef> with informations about critical items of the system:
         worker          => 2,       # worker process count
         workflow        => 1,       # workflow process count
         version         => '...'    # OpenXPKI version string
+        hostname        => oxi-test # Name of the host (from sys::hostname)
+
     }
 
 B<Changes compared to API v1:> parameter C<ITEMS> was removed as it was unused.
@@ -91,6 +92,7 @@ command "get_ui_system_status" => {
         worker          => scalar @{$pids->{worker}},
         workflow        => scalar @{$pids->{workflow}},
         version         => $OpenXPKI::VERSION::VERSION,
+        hostname        => hostname,
     }
 };
 
