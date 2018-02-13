@@ -13,7 +13,7 @@ if [ -f "${OPENXPKI_CONFIG}" ]
 then
    eval `egrep '^user:|^group:' "${OPENXPKI_CONFIG}" | sed -e 's/:  */=/g'`
 else
-   echo "ERROR: It seems that openXPKI ist not installed at the default location (${BASE})!" >&2
+   echo "ERROR: It seems that openXPKI is not installed at the default location (${BASE})!" >&2
    echo "Please install openXPKI or set BASE to the new PATH!" >&2
    exit 1
 fi

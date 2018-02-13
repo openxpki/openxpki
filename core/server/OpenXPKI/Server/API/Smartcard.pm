@@ -188,7 +188,7 @@ sub sc_analyze_smartcard {
     my $res  = $config->walkQueryPoints('smartcard.cardstatus', $tokenid, 'get');
 
     ##! 32: ' SC Info: Token Id '.$tokenid.' - cardstatus ' . Dumper( $res->{VALUE} );
-    # There should never be a match when tokenid ist not an exact match
+    # There should never be a match when tokenid is not an exact match
     # So we should be able to omit the sanity check some lines below..
 
     if (!$res->{VALUE}) {
