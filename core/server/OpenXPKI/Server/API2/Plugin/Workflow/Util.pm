@@ -6,7 +6,7 @@ use English;
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
-
+use OpenXPKI::Connector::WorkflowContext;
 
 =head2 validate_input_params
 
@@ -367,9 +367,12 @@ sub get_workflow_ui_info {
     }
 
     $result->{activity} = {};
+
+    OpenXPKI::Connector::WorkflowContext::set_context( $result->{WORKFLOW}->{CONTEXT} );
     foreach my $wf_action (@activities) {
         $result->{activity}->{$wf_action} = $factory->get_action_info( $wf_action, $result->{workflow}->{type} );
     }
+    OpenXPKI::Connector::WorkflowContext::set_context();
 
     # Add Workflow UI Info
     my $head = CTX('config')->get_hash([ 'workflow', 'def', $result->{workflow}->{type}, 'head' ]);
