@@ -5,7 +5,7 @@ OpenXPKI comes with a set of subsystems that can be used to search
 for certificates and handle workflows using different established or
 custom APIs.
 
-The most common one ist the SCEP interface that supports enrollment
+The most common one is the SCEP interface that supports enrollment
 of certificates using the "Simple Certificate Enrollment Protocol" which
 was developed by Cisco and is widely used in hardware devices.
 

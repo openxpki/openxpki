@@ -137,7 +137,7 @@ sub __process_workflow {
 
         # We are not interessted in eye candy, just the logic
         # action attribute has a list/scalar with a combo string
-        # left hand ist action name, right hand the target state
+        # left hand is action name, right hand the target state
         # action: run_test1 > PENDING
 
         my @actions;
