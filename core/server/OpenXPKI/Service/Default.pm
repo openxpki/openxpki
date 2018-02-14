@@ -720,11 +720,12 @@ sub __handle_COMMAND : PRIVATE {
                 command => $data->{PARAMS}->{COMMAND},
                 params  => $data->{PARAMS}->{PARAMS},
             );
+        } else {
+            $command = OpenXPKI::Service::Default::Command->new({
+                COMMAND => $data->{PARAMS}->{COMMAND},
+                PARAMS  => $data->{PARAMS}->{PARAMS},
+            });
         }
-        $command = OpenXPKI::Service::Default::Command->new({
-            COMMAND => $data->{PARAMS}->{COMMAND},
-            PARAMS  => $data->{PARAMS}->{PARAMS},
-        });
     };
     if (my $exc = OpenXPKI::Exception->caught()) {
         if ($exc->message() =~ m{ I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_INVALID_COMMAND }xms) {

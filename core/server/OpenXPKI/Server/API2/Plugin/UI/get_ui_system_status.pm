@@ -10,7 +10,7 @@ OpenXPKI::Server::API2::Plugin::UI::get_ui_system_status
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
-use use Sys::Hostname;
+use Sys::Hostname;
 
 =head1 COMMANDS
 
