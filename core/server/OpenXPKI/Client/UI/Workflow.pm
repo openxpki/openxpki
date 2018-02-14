@@ -1844,9 +1844,18 @@ sub __render_from_workflow {
         }
 
         # set status decorator on final states, use proc state
+        # to finalize without status message use state name "NOSTATUS"
         my $desc = $wf_info->{STATE}->{description};
 
-        if ($wf_proc_state eq 'finished') {
+        if ($wf_proc_state eq 'exception') {
+
+            $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION','error');
+
+        } elsif ( $wf_info->{STATE}->{status} && ref $wf_info->{STATE}->{status} eq 'HASH' ) {
+
+            $self->_status( $wf_info->{STATE}->{status} );
+
+        } elsif ($wf_proc_state eq 'finished') {
             # add special colors for success and failure
 
             if ( $wf_info->{WORKFLOW}->{STATE} eq 'SUCCESS') {
@@ -1855,15 +1864,11 @@ sub __render_from_workflow {
                 $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE','error');
             } elsif ( $wf_info->{WORKFLOW}->{STATE} eq 'CANCELED') {
                 $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED','warn');
+            } elsif ( $wf_info->{WORKFLOW}->{STATE} ne 'NOSTATUS') {
 
-            } else {
                 $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATE_MISC_FINAL','warn');
             }
-        } elsif ($wf_proc_state eq 'exception') {
-
-            $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION','error');
         }
-
     }
 
     # Right block
