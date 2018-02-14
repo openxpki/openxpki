@@ -186,6 +186,40 @@ sub send_command {
 
 }
 
+=head2 send_command_v2
+
+Copy of send_command but uses the API2 methods.
+
+=cut
+
+sub send_command_v2 {
+
+    my $self = shift;
+    my $command = shift;
+    my $params = shift || {};
+    my $nostatus = shift || 0;
+
+    my $backend = $self->_client()->backend();
+    my $reply = $backend->send_receive_service_msg(
+        'COMMAND', { COMMAND => $command, PARAMS => $params, API2 => 1 }
+    );
+    $self->_last_reply( $reply );
+
+    $self->logger()->trace('send command raw reply: '. Dumper $reply);
+
+    if ( $reply->{SERVICE_MSG} ne 'COMMAND' ) {
+        if (!$nostatus) {
+            $self->logger()->error("command $command failed ($reply->{SERVICE_MSG})");
+            $self->logger()->trace("command reply ". Dumper $reply);
+            $self->set_status_from_error_reply( $reply );
+        }
+        return undef;
+    }
+
+    return $reply->{PARAMS};
+
+}
+
 sub set_status_from_error_reply {
 
     my $self = shift;
