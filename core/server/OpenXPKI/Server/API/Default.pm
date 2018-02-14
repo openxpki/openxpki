@@ -331,13 +331,12 @@ sub list_issuers {
 
     my $result = CTX('dbi')->select(
         from   => 'certificate',
-        columns => [ 'issuer_identifier', 'issuer_dn' ],
+        columns => [ -distinct => 'issuer_identifier', 'issuer_dn' ],
         where => {
             pki_realm => $requested_pki_realm,
             issuer_identifier => { '!=' => 'unkown' },
             req_key => { '!=' => undef },
         },
-        group_by => 'issuer_identifier',
     )->fetchall_arrayref({});
 
     return [
