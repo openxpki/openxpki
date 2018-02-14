@@ -13,6 +13,7 @@ OpenXPKI::Server::API::API2 - Wrapper that redirects calls to the new API2
 
 # CPAN modules
 use Class::Std;
+use Data::Dumper;
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
