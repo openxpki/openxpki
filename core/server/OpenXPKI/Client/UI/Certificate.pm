@@ -19,13 +19,13 @@ has __default_grid_head => (
     lazy => 1,
 
     default => sub { return [
-        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_SERIAL", sortkey => 'CERTIFICATE.CERT_KEY' },
-        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT", sortkey => 'CERTIFICATE.SUBJECT' },
-        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_STATUS", format => 'certstatus', sortkey => 'CERTIFICATE.STATUS' },
-        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE", format => 'timestamp', sortkey => 'CERTIFICATE.NOTBEFORE' },
-        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER", format => 'timestamp', sortkey => 'CERTIFICATE.NOTAFTER' },
-        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_ISSUER", sortkey => 'CERTIFICATE.ISSUER_DN'},
-        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER", sortkey => 'CERTIFICATE.IDENTIFIER'},
+        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_SERIAL", sortkey => 'cert_key' },
+        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT", sortkey => 'subject' },
+        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_STATUS", format => 'certstatus', sortkey => 'status' },
+        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE", format => 'timestamp', sortkey => 'notbefore' },
+        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER", format => 'timestamp', sortkey => 'notafter' },
+        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_ISSUER", sortkey => 'issuer_dn'},
+        { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER", sortkey => 'identifier'},
         { sTitle => 'identifier', bVisible => 0 },
         { sTitle => "_className"},
     ]; }
@@ -36,15 +36,15 @@ has __default_grid_row => (
     isa => 'ArrayRef',
     lazy => 1,
     default => sub { return [
-        { source => 'certificate', field => 'CERTIFICATE_SERIAL' },
-        { source => 'certificate', field => 'SUBJECT' },
-        { source => 'certificate', field => 'STATUS' },
-        { source => 'certificate', field => 'NOTBEFORE' },
-        { source => 'certificate', field => 'NOTAFTER' },
-        { source => 'certificate', field => 'ISSUER_DN' },
-        { source => 'certificate', field => 'IDENTIFIER' },
-        { source => 'certificate', field => 'IDENTIFIER' },
-        { source => 'certificate', field => 'CERTSTATUS' },
+        { source => 'certificate', field => 'cert_key' },
+        { source => 'certificate', field => 'subject' },
+        { source => 'certificate', field => 'status' },
+        { source => 'certificate', field => 'notbefore' },
+        { source => 'certificate', field => 'notafter' },
+        { source => 'certificate', field => 'issuer_dn' },
+        { source => 'certificate', field => 'identifier' },
+        { source => 'certificate', field => 'identifier' },
+        { source => 'certificate', field => 'status' },
     ]; }
 );
 
@@ -70,7 +70,7 @@ sub init_search {
         description => '',
     });
 
-    my $profile = $self->send_command( 'list_used_profiles' );
+    my $profile = $self->send_command_v2( 'list_used_profiles' );
 
     # TODO Sorting / I18
 
@@ -97,14 +97,14 @@ sub init_search {
 
     my @validity_options = (
         { value => 'valid_at', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_VALID_AT' },
-        { value => 'notbefore_lt', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTBEFORE_LT' },
-        { value => 'notbefore_gt', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTBEFORE_GT' },
-        { value => 'notafter_lt', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTAFTER_LT' },
-        { value => 'notafter_gt', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTAFTER_GT' },
-#        { value => 'revoked_lt', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_REVOKED_LT' },
-#        { value => 'revoked_gt', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_REVOKED_GT' },
-#        { value => 'invalid_lt', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_LT' },
-#        { value => 'invalid_gt', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_GT' },
+        { value => 'valid_before', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTBEFORE_LT' },
+        { value => 'valid_after', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTBEFORE_GT' },
+        { value => 'expires_before', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTAFTER_LT' },
+        { value => 'expires_after', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTAFTER_GT' },
+#        { value => 'revoked_before', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_REVOKED_LT' },
+#        { value => 'revoked_after', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_REVOKED_GT' },
+#        { value => 'invalid_before', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_LT' },
+#        { value => 'invalid_after', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_GT' },
 
     );
 
@@ -175,7 +175,6 @@ sub init_result {
     my $queryid = $self->param('id');
     my $limit = $self->param('limit') || 25;
 
-
     my $startat = $self->param('startat') || 0;
 
     # Safety rule
@@ -192,21 +191,21 @@ sub init_result {
 
     # Add limits
     my $query = $result->{query};
-    $query->{LIMIT} = $limit;
-    $query->{START} = $startat;
+    $query->{limit} = $limit;
+    $query->{start} = $startat;
 
-    if (!$query->{ORDER}) {
-        $query->{ORDER} = 'CERTIFICATE.NOTBEFORE';
-        if (!defined $query->{REVERSE}) {
-            $query->{REVERSE} = 1;
+    if (!$query->{order}) {
+        $query->{order} = 'notbefore';
+        if (!defined $query->{reverse}) {
+            $query->{reverse} = 1;
         }
     }
 
-    $self->logger()->trace( "persisted query: " . Dumper $result);
+    $self->logger()->debug( "persisted query: " . Dumper $result);
 
-    my $search_result = $self->send_command( 'search_cert', $query );
+    my $search_result = $self->send_command_v2( 'search_cert', $query );
 
-    $self->logger()->trace( "search result: " . Dumper $search_result);
+    $self->logger()->debug( "search result: " . Dumper $search_result);
 
     $self->_page({
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL',
@@ -297,19 +296,19 @@ sub init_export {
 
     # Add limits
     my $query = $result->{query};
-    $query->{LIMIT} = $limit;
-    $query->{START} = $startat;
+    $query->{limit} = $limit;
+    $query->{start} = $startat;
 
-    if (!$query->{ORDER}) {
-        $query->{ORDER} = 'CERTIFICATE.NOTBEFORE';
-        if (!defined $query->{REVERSE}) {
-            $query->{REVERSE} = 1;
+    if (!$query->{order}) {
+        $query->{order} = 'certificate.notbefore';
+        if (!defined $query->{reverse}) {
+            $query->{reverse} = 1;
         }
     }
 
     $self->logger()->trace( "persisted query: " . Dumper $result);
 
-    my $search_result = $self->send_command( 'search_cert', $query );
+    my $search_result = $self->send_command_v2( 'search_cert', $query );
 
     $self->logger()->trace( "search result: " . Dumper $search_result);
 
@@ -336,21 +335,22 @@ sub init_export {
 
     foreach my $item (@{$search_result}) {
 
-        $item->{STATUS} = 'EXPIRED' if ($item->{STATUS} eq 'ISSUED' && $item->{NOTAFTER} < time());
+        $item->{status} = 'EXPIRED' if ($item->{status} eq 'ISSUED' && $item->{notafter} < time());
 
         my @line;
         foreach my $cc (@cols) {
 
             my $col = $body->[$cc];
-            if ($col->{field} eq 'STATUS') {
+            my $field = lc($col->{field}); # lowercase to ease migration from 1.0 syntax
+            if ($field eq 'status') {
                 push @line, i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{STATUS});
 
-            } elsif ($col->{field} =~ /(NOTAFTER|NOTBEFORE)/) {
+            } elsif ($field =~ /(notafter|notbefore)/) {
 
-                push @line,  DateTime->from_epoch( epoch => $item->{ $col->{field} } )->iso8601();
+                push @line,  DateTime->from_epoch( epoch => $item->{ $field } )->iso8601();
 
             } else {
-                push @line, $item->{  $col->{field} };
+                push @line, $item->{ $field };
             }
         }
         $buffer .= join("\t", @line)."\n";
@@ -403,21 +403,21 @@ sub init_pager {
 
     # Add limits
     my $query = $result->{query};
-    $query->{LIMIT} = $limit;
-    $query->{START} = $startat;
+    $query->{limit} = $limit;
+    $query->{start} = $startat;
 
     if ($self->param('order')) {
-        $query->{ORDER} = uc($self->param('order'));
+        $query->{order} = $self->param('order');
     }
 
     if (defined $self->param('reverse')) {
-        $query->{REVERSE} = $self->param('reverse');
+        $query->{reverse} = $self->param('reverse');
     }
 
     $self->logger()->trace( "persisted query: " . Dumper $result);
     $self->logger()->trace( "executed query: " . Dumper $query);
 
-    my $search_result = $self->send_command( 'search_cert', $query );
+    my $search_result = $self->send_command_v2( 'search_cert', $query );
 
     $self->logger()->trace( "search result: " . Dumper $search_result);
 
@@ -454,27 +454,25 @@ sub init_mine {
     my $startat = $self->param('startat') || 0;
 
     my $query = {
-        CERT_ATTRIBUTES => [{
-            KEY => 'system_cert_owner',
-            VALUE =>  $self->_session->param('user')->{name},
-            OPERATOR => 'EQUAL'
-        }],
-        ORDER => 'CERTIFICATE.NOTBEFORE',
-        REVERSE => 1,
+        cert_attributes => {
+            'system_cert_owner' => { '=', $self->_session->param('user')->{name} }
+        },
+        order => 'notbefore',
+        reverse => 1,
     };
 
     $self->logger()->trace( "search query: " . Dumper $query);
 
-    my $search_result = $self->send_command( 'search_cert', { %$query, ( LIMIT => $limit, START => $startat ) } );
+    my $search_result = $self->send_command_v2( 'search_cert', { %$query, ( limit => $limit, start => $startat ) } );
 
     my $result_count = scalar @{$search_result};
     my $pager;
     if ($result_count == $limit) {
         my %count_query = %{$query};
-        delete $count_query{ORDER};
-        delete $count_query{REVERSE};
+        delete $count_query{order};
+        delete $count_query{reverse};
 
-        $result_count = $self->send_command( 'search_cert_count', \%count_query );
+        $result_count = $self->send_command_v2( 'search_cert_count', \%count_query );
 
         my $queryid = $self->__generate_uid();
         my $_query = {
@@ -992,21 +990,22 @@ sub action_autocomplete {
     }
 
     if (!@result) {
-        my $search_result = $self->send_command( 'search_cert', {
-            SUBJECT => "%$term%",
-            VALID_AT => time(),
-            STATUS => 'ISSUED',
-            ENTITY_ONLY => 1
+        my $search_result = $self->send_command_v2( 'search_cert', {
+            subject => "%$term%",
+            valid_before => time(),
+            expires_after => time(),
+            status => 'ISSUED',
+            entity_only => 1
         });
 
         $self->logger()->trace( "search result: " . Dumper $search_result);
 
         foreach my $item (@{$search_result}) {
             push @result, {
-                value => $item->{IDENTIFIER},
-                label => $self->_escape($item->{SUBJECT}),
-                notbefore => $item->{NOTBEFORE},
-                notafter => $item->{NOTAFTER}
+                value => $item->{identifier},
+                label => $self->_escape($item->{subject}),
+                notbefore => $item->{notbefore},
+                notafter => $item->{notafter}
             };
         }
     }
@@ -1048,9 +1047,9 @@ sub action_find {
             my $sn = Math::BigInt->new( $serial );
             $serial = $sn->bstr();
         }
-        my $search_result = $self->send_command( 'search_cert', {
-            CERT_SERIAL => $serial,
-            ENTITY_ONLY => 1
+        my $search_result = $self->send_command_v2( 'search_cert', {
+            cert_serial => $serial,
+            entity_only => 1
         });
         if (!$search_result) {
             $self->set_status('Unable to find a certificate with this serial number.','error');
@@ -1060,7 +1059,7 @@ sub action_find {
             $self->set_status('Query ambigous - got more than one result on this serial number?!.','error');
             return $self->init_search();
         } else {
-            $cert_identifier = $search_result->[0]->{"IDENTIFIER"};
+            $cert_identifier = $search_result->[0]->{"identifier"};
         }
     } else {
         $self->set_status('Please enter either certificate identifier or certificate serial number.','error');
@@ -1086,12 +1085,12 @@ sub action_search {
 
     $self->logger()->trace("input params: " . Dumper $self->cgi()->param());
 
-    my $query = { ENTITY_ONLY => 1 };
+    my $query = { entity_only => 1 };
     my $input = {}; # store the input data the reopen the form later
     foreach my $key (qw(subject issuer_dn)) {
         my $val = $self->param($key);
         if (defined $val && $val ne '') {
-            $query->{uc($key)} = '%'.$val.'%';
+            $query->{$key} = '%'.$val.'%';
             $input->{$key} = $val;
         }
     }
@@ -1100,7 +1099,7 @@ sub action_search {
         my $val = $self->param($key);
         if (defined $val && $val ne '') {
             $input->{$key} = $val;
-            $query->{uc($key)} = $val;
+            $query->{$key} = $val;
         }
     }
 
@@ -1108,15 +1107,17 @@ sub action_search {
         $input->{'status'} = $status;
         if ($status eq 'VALID') {
             $status = 'ISSUED';
-            $query->{NOTBEFORE} = { OPERATOR => 'GREATER_THAN', VALUE => time() };
-            $query->{NOTAFTER} = { OPERATOR => 'LESS_THAN', VALUE => time() };
+            my $now = time();
+            $query->{notbefore_after} = $now;
+            $query->{notafter_before} = $now;
         }
-        $query->{STATUS} = $status;
+        $query->{status} = $status;
     }
 
     # Validity
     $input->{validity_options} = [];
-    foreach my $key (qw(valid_at notbefore_gt notbefore_lt notafter_lt notafter_gt revoked_lt revoked_gt invalid_lt invalid_gt)) {
+    foreach my $key (qw(valid_before valid_after expires_before expires_after
+        revoked_before revoked_after invalid_before invalid_after valid_at)) {
         my @val = $self->param($key.'[]');
         next unless ($val[0]);
         if ($val[0] =~ /[^0-9]/) {
@@ -1126,67 +1127,39 @@ sub action_search {
         push @{$input->{validity_options}}, { key => $key, value => $val[0] };
 
         if ($key eq 'valid_at') {
-            $query->{NOTBEFORE} = { OPERATOR => 'GREATER_THAN', VALUE => $val[0] };
-            $query->{NOTAFTER} = { OPERATOR => 'LESS_THAN', VALUE => $val[0] };
-
-        } elsif ($key eq 'notbefore_gt') {
-            $query->{NOTBEFORE} = { OPERATOR => 'GREATER_THAN', VALUE => $val[0] };
-        } elsif ($key eq 'notbefore_lt') {
-            if ($query->{NOTBEFORE}) {
-                $query->{NOTBEFORE} = { OPERATOR => 'BETWEEN', VALUE =>  [ $query->{NOTBEFORE}->{VALUE}, $val[0] ] };
-            } else {
-                $query->{NOTBEFORE} = { OPERATOR => 'LESS_THAN', VALUE => $val[0] };
+            if (!$query->{valid_before} || $query->{valid_before} < $val[0]) {
+                $query->{valid_before} = $val[0];
             }
-        } elsif ($key eq 'notafter_lt') {
-            $query->{NOTAFTER} = { OPERATOR => 'LESS_THAN', VALUE => $val[0] };
-        } elsif ($key eq 'notafter_gt') {
-            if ($query->{NOTAFTER}) {
-                $query->{NOTAFTER} = { OPERATOR => 'BETWEEN', VALUE => [ $val[0], $query->{NOTAFTER}->{VALUE} ] };
-            } else {
-                $query->{NOTAFTER} = { OPERATOR => 'GREATER_THAN', VALUE => $val[0] };
+            if (!$query->{expires_after} || $query->{expires_after} > $val[0]) {
+                $query->{expires_after} = $val[0];
             }
-        # THIS IS NOT IMPLEMENTED YET!
-        } elsif ($key eq 'revoked_lt') {
-            $query->{revocation_time} = { '<=', $val[0] };
-        } elsif ($key eq 'revoked_gt') {
-            if ($query->{revocation_time}) {
-                $query->{revocation_time} = { '-between', [ $val[0], $query->{revocation_time}->[1] ] };
-            } else {
-                $query->{revocation_time} = { '>=', $val[0] };
-            }
-        } elsif ($key eq 'invalid_lt') {
-            $query->{invalidity_time} = { '<=', $val[0] };
-        } elsif ($key eq 'invalid_gt') {
-            if ($query->{invalidity_time}) {
-                $query->{invalidity_time} = { '-between', [ $val[0], $query->{invalidity_time}->[1] ] };
-            } else {
-                $query->{invalidity_time} = { '>=', $val[0] };
-            }
+        } else {
+            $query->{$key} = $val[0];
         }
     }
 
     # Read the query pattern for extra attributes from the session
     my $spec = $self->_client->session()->param('certsearch')->{default};
-    my @attr = @{$self->__build_attribute_subquery( $spec->{attributes} )};
+    my $attr = $self->__build_attribute_subquery( $spec->{attributes} );
 
-    if (@attr) {
+    if ($attr) {
         $input->{attributes} = $self->__build_attribute_preset( $spec->{attributes} );
     }
 
     # Add san search to attributes
     if (my $val = $self->param('san')) {
         $input->{'san'} = $val;
-        push @attr, { KEY => 'subject_alt_name', VALUE => '%'.$val.'%' };
+        $attr->{subject_alt_name} = { -like => '%'.$val.'%' };
     }
 
-    if (scalar @attr) {
-        $query->{CERT_ATTRIBUTES} = \@attr;
+    if ($attr) {
+        $query->{cert_attributes} = $attr;
     }
 
-    $self->logger()->trace("query : " . Dumper $query);
+    $self->logger()->debug("query : " . Dumper $query);
 
 
-    my $result_count = $self->send_command( 'search_cert_count', $query );
+    my $result_count = $self->send_command_v2( 'search_cert_count', $query  );
 
     # No results founds
     if (!$result_count) {
@@ -1235,14 +1208,14 @@ sub __render_result_list {
     my @result;
     foreach my $item (@{$search_result}) {
 
-        $item->{STATUS} = 'EXPIRED' if ($item->{STATUS} eq 'ISSUED' && $item->{NOTAFTER} < time());
+        $item->{status} = 'EXPIRED' if ($item->{status} eq 'ISSUED' && $item->{notafter} < time());
 
         my @line;
         foreach my $col (@{$colums}) {
-            if ($col->{field} eq 'STATUS') {
-                push @line, { label => 'I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{STATUS} , value => $item->{STATUS} };
-            } elsif ($col->{field} eq 'STATUSCLASS') {
-                push @line, lc($item->{STATUS});
+            if ($col->{field} eq 'status') {
+                push @line, { label => 'I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{status} , value => $item->{status} };
+            } elsif ($col->{field} eq 'statusclass') {
+                push @line, lc($item->{status});
             } else {
                 push @line, $item->{  $col->{field} };
             }
@@ -1292,7 +1265,7 @@ sub __render_list_spec {
 
         } else {
             $col{source} = 'certificate';
-            $col{field} = uc($col{field})
+            $col{field} = $col{field}
 
         }
         push @column, \%col;
@@ -1301,8 +1274,8 @@ sub __render_list_spec {
     push @header, { sTitle => 'serial', bVisible => 0 };
     push @header, { sTitle => "_className"};
 
-    push @column, { source => 'certificate', field => 'IDENTIFIER' };
-    push @column, { source => 'certificate', field => 'STATUSCLASS' };
+    push @column, { source => 'certificate', field => 'identifier' };
+    push @column, { source => 'certificate', field => 'statusclass' };
 
     return ( \@header, \@column );
 }

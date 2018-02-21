@@ -841,7 +841,7 @@ sub __build_attribute_subquery {
         return [];
     }
 
-    my @attr;
+    my $attr;
 
     foreach my $item (@{$attributes}) {
         my $key = $item->{key};
@@ -857,7 +857,7 @@ sub __build_attribute_subquery {
             $val = sprintf($pattern, $val) if ($pattern);
 
             # replace asterisk as wildcard for like fields
-            if ($operator =~ /LIKE/) {
+            if ($operator =~ /LIKE/i) {
                 $val =~ s/\*/%/g;
             }
 
@@ -876,19 +876,21 @@ sub __build_attribute_subquery {
         }
 
         if ($operator eq 'IN') {
-            push @attr,  { KEY => $key, VALUE => \@preprocessed };
+            $attr->{$key} = { '=', \@preprocessed };
+
         } elsif ($operator eq 'INLIKE' ) {
-            push @attr,  { KEY => $key, VALUE => \@preprocessed, OPERATOR => 'LIKE' };
+            $attr->{$key} = { -like => \@preprocessed };
         } else {
-            map {
-                push @attr,  { KEY => $key, VALUE => $_, OPERATOR => $operator };
-            } @preprocessed;
+            # and'ed together - very tricky syntax...
+            my @t = map { { $operator, $_ } } @preprocessed;
+            unshift @t, '-and';
+            $attr->{$key} = \@t;
         }
     }
 
-    $self->logger()->trace('Attribute subquery ' . Dumper \@attr);
+    $self->logger()->trace('Attribute subquery ' . Dumper $attr);
 
-    return \@attr;
+    return $attr;
 
 }
 

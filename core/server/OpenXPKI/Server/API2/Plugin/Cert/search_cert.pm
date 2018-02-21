@@ -91,7 +91,10 @@ so you can use asterisk (*) as placeholder)
 =item * C<status> I<Str> - certificate status (for possible values see
 L<OpenXPKI::Server::API2::Types/CertStatus>)
 
-=item * C<cert_attributes> I<ArrayRef> - list of condition I<HashRefs> to search
+=item * C<cert_attributes> I<HashRef> - key is attribute name, value is passed
+"as is" as where statement on value, see documentation of SQL::Abstract.
+
+Legacy: I<ArrayRef> - list of condition I<HashRefs> to search
 in attributes (KEY, VALUE, OPERATOR). Operator can be "EQUAL", "LIKE" or
 "BETWEEN".
 
@@ -117,7 +120,7 @@ of C<[valid|expires]_[before|after]>:
 
 command "search_cert" => {
     authority_key_identifier => {isa => 'Value',         matching => $re_alpha_string,      },
-    cert_attributes          => {isa => 'ArrayRef',      },
+    cert_attributes          => {isa => 'ArrayRef|HashRef',      },
     cert_serial              => {isa => 'Value',         matching => $re_int_or_hex_string, },
     csr_serial               => {isa => 'Value',         matching => $re_integer_string,    },
     entity_only              => {isa => 'Value',         matching => $re_boolean,           },
@@ -191,7 +194,10 @@ so you can use asterisk (*) as placeholder)
 =item * C<status> I<Str> - certificate status (for possible values see
 L<OpenXPKI::Server::API2::Types/CertStatus>)
 
-=item * C<cert_attributes> I<ArrayRef> - list of condition I<HashRefs> to search
+=item * C<cert_attributes> I<HashRef> - key is attribute name, value is passed
+"as is" as where statement on value, see documentation of SQL::Abstract.
+
+Legacy: I<ArrayRef> - list of condition I<HashRefs> to search
 in attributes (KEY, VALUE, OPERATOR). Operator can be "EQUAL", "LIKE" or
 "BETWEEN".
 
@@ -207,7 +213,7 @@ of C<[valid|expires]_[before|after]>:
 =cut
 command "search_cert_count" => {
     authority_key_identifier => {isa => 'Value',    matching => $re_alpha_string,      },
-    cert_attributes          => {isa => 'ArrayRef', },
+    cert_attributes          => {isa => 'ArrayRef|HashRef', },
     cert_serial              => {isa => 'Value',    matching => $re_int_or_hex_string, },
     csr_serial               => {isa => 'Value',    matching => $re_integer_string,    },
     entity_only              => {isa => 'Value',    matching => $re_boolean,           },
@@ -335,27 +341,48 @@ sub _make_db_query {
     if ( $po->has_cert_attributes ) {
         # we need to join over the certificate_attributes table
         my $ii = 0;
-        foreach my $attrib ( @{ $po->cert_attributes } ) {
-            ##! 16: 'certificate attribute: ' . Dumper $entry
-            my $table_alias = "certattr$ii";
 
-            # add join table
-            push @join_spec, ( 'certificate.identifier=identifier', "certificate_attributes|$table_alias" );
+        # Legacy API
+        if (ref $po->cert_attributes eq 'ARRAY') {
 
-            # add search constraint
-            $where->{ "$table_alias.attribute_contentkey" } = $attrib->{KEY};
+            foreach my $attrib ( @{ $po->cert_attributes } ) {
+                ##! 16: 'certificate attribute: ' . Dumper $entry
+                my $table_alias = "certattr$ii";
 
-            $attrib->{OPERATOR} //= 'LIKE';
-            # sanitize wildcards (don't overdo it...)
-            if ($attrib->{OPERATOR} eq 'LIKE' && !(ref $attrib->{VALUE})) {
-                $attrib->{VALUE} =~ s/\*/%/g;
-                $attrib->{VALUE} =~ s/%%+/%/g;
+                # add join table
+                push @join_spec, ( 'certificate.identifier=identifier', "certificate_attributes|$table_alias" );
+
+                # add search constraint
+                $where->{ "$table_alias.attribute_contentkey" } = $attrib->{KEY};
+
+                $attrib->{OPERATOR} //= 'LIKE';
+                # sanitize wildcards (don't overdo it...)
+                if ($attrib->{OPERATOR} eq 'LIKE' && !(ref $attrib->{VALUE})) {
+                    $attrib->{VALUE} =~ s/\*/%/g;
+                    $attrib->{VALUE} =~ s/%%+/%/g;
+                }
+                # TODO #legacydb search_cert's CERT_ATTRIBUTES allows old DB layer syntax
+                $where->{ "$table_alias.attribute_value" } =
+                    OpenXPKI::Server::Database::Legacy->convert_dynamic_cond($attrib);
+
+                $ii++;
             }
-            # TODO #legacydb search_cert's CERT_ATTRIBUTES allows old DB layer syntax
-            $where->{ "$table_alias.attribute_value" } =
-                OpenXPKI::Server::Database::Legacy->convert_dynamic_cond($attrib);
+        } else {
 
-            $ii++;
+            foreach my $key (keys %{$po->cert_attributes}) {
+
+                my $table_alias = "certattr$ii";
+
+                # add join table
+                push @join_spec, ( 'certificate.identifier=identifier', "certificate_attributes|$table_alias" );
+
+                # add search constraint
+                $where->{ "$table_alias.attribute_contentkey" } = $key;
+                $where->{ "$table_alias.attribute_value" } = $po->cert_attributes->{$key};
+                $ii++;
+
+            }
+
         }
     }
 
