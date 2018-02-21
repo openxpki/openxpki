@@ -223,7 +223,6 @@ sub _build_certs {
                 identifier => 'Jnb3BE57l0gUA2jRRTHAhhg-TeU',
                 issuer_dn => 'CN=ALPHA Signing CA,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => '8TVMheiCLs5wpq1pP173aHN4Om4',
-                loa => undef,
                 notafter => '1170287999', # 2007-01-31T23:59:59
                 notbefore => '1136073600', # 2006-01-01T00:00:00
                 pki_realm => 'alpha',
@@ -249,7 +248,6 @@ sub _build_certs {
                 identifier => 'Zq_MIqX67OAi1LKLlhqBqbDeQeQ',
                 issuer_dn => 'CN=ALPHA Signing CA,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => 'EFi_tFWQvJEuZitEwvcJUDgV8hQ',
-                loa => undef,
                 notafter => '4105123199', # 2100-01-31T23:59:59
                 notbefore => '1167609600', # 2007-01-01T00:00:00
                 pki_realm => 'alpha',
@@ -275,7 +273,6 @@ sub _build_certs {
                 identifier => 'Oevkst7Otxx3gJyrynpABx6FrTw',
                 issuer_dn => 'CN=ALPHA Signing CA,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => '3x5J1m3w9RZcEokteXDXvVpo5nY',
-                loa => undef,
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '4102444800', # 2100-01-01T00:00:00
                 pki_realm => 'alpha',
@@ -301,7 +298,6 @@ sub _build_certs {
                 identifier => 'BZOha7YNxqhdOQc0fVMp6QFG-cc',
                 issuer_dn => 'CN=ALPHA Signing CA,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => '8TVMheiCLs5wpq1pP173aHN4Om4',
-                loa => undef,
                 notafter => '1170287999', # 2007-01-31T23:59:59
                 notbefore => '1136073600', # 2006-01-01T00:00:00
                 pki_realm => 'alpha',
@@ -327,7 +323,6 @@ sub _build_certs {
                 identifier => 'mzsvHMjhCBBEGbDVf5voHeU1pIk',
                 issuer_dn => 'CN=ALPHA Signing CA,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => 'EFi_tFWQvJEuZitEwvcJUDgV8hQ',
-                loa => undef,
                 notafter => '4105123199', # 2100-01-31T23:59:59
                 notbefore => '1167609600', # 2007-01-01T00:00:00
                 pki_realm => 'alpha',
@@ -353,7 +348,6 @@ sub _build_certs {
                 identifier => 'rvxKqWXA1rf2LvjN52dkuzwL9Os',
                 issuer_dn => 'CN=ALPHA Signing CA,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => '3x5J1m3w9RZcEokteXDXvVpo5nY',
-                loa => undef,
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '4102444800', # 2100-01-01T00:00:00
                 pki_realm => 'alpha',
@@ -379,7 +373,6 @@ sub _build_certs {
                 identifier => 'CptEnoADAZlshByaPBG6Sf3Z8QQ',
                 issuer_dn => 'CN=ALPHA DataVault,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => 'CptEnoADAZlshByaPBG6Sf3Z8QQ',
-                loa => undef,
                 notafter => '1170287999', # 2007-01-31T23:59:59
                 notbefore => '1136073600', # 2006-01-01T00:00:00
                 pki_realm => 'alpha',
@@ -405,7 +398,6 @@ sub _build_certs {
                 identifier => 'gCpIAK0oPznkNA9dODXDAzLgUk8',
                 issuer_dn => 'CN=ALPHA DataVault,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => 'gCpIAK0oPznkNA9dODXDAzLgUk8',
-                loa => undef,
                 notafter => '4105123199', # 2100-01-31T23:59:59
                 notbefore => '1167609600', # 2007-01-01T00:00:00
                 pki_realm => 'alpha',
@@ -431,7 +423,6 @@ sub _build_certs {
                 identifier => 'NPZqP7ZH3A6JhEoYPcwZOvuI4lE',
                 issuer_dn => 'CN=ALPHA DataVault,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => 'NPZqP7ZH3A6JhEoYPcwZOvuI4lE',
-                loa => undef,
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '4102444800', # 2100-01-01T00:00:00
                 pki_realm => 'alpha',
@@ -457,7 +448,6 @@ sub _build_certs {
                 identifier => 'QNRn1pFrYd4njIQsFSi9O9MPUgU',
                 issuer_dn => 'CN=ALPHA Root CA,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => 'rYQgnYCRgPJiRtoWt40fddTmAbs',
-                loa => undef,
                 notafter => '1170287999', # 2007-01-31T23:59:59
                 notbefore => '1136073600', # 2006-01-01T00:00:00
                 pki_realm => 'alpha',
@@ -483,7 +473,6 @@ sub _build_certs {
                 identifier => 'V9clEgSMGEBtu7FiuyJh663eh_8',
                 issuer_dn => 'CN=ALPHA Root CA,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => 'asAST1gRMwlYUBkZk4ACsOmXRhw',
-                loa => undef,
                 notafter => '4105123199', # 2100-01-31T23:59:59
                 notbefore => '1167609600', # 2007-01-01T00:00:00
                 pki_realm => 'alpha',
@@ -509,7 +498,6 @@ sub _build_certs {
                 identifier => 'Tx9ktn-Yc3G8wFXNtb_2Ge5CTjs',
                 issuer_dn => 'CN=ALPHA Root CA,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => 'pfN4ipk-rgBwldRIG0T2SmEiT-k',
-                loa => undef,
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '4102444800', # 2100-01-01T00:00:00
                 pki_realm => 'alpha',
@@ -535,7 +523,6 @@ sub _build_certs {
                 identifier => '8TVMheiCLs5wpq1pP173aHN4Om4',
                 issuer_dn => 'CN=ALPHA Root CA,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => 'rYQgnYCRgPJiRtoWt40fddTmAbs',
-                loa => undef,
                 notafter => '1170287999', # 2007-01-31T23:59:59
                 notbefore => '1136073600', # 2006-01-01T00:00:00
                 pki_realm => 'alpha',
@@ -561,7 +548,6 @@ sub _build_certs {
                 identifier => 'EFi_tFWQvJEuZitEwvcJUDgV8hQ',
                 issuer_dn => 'CN=ALPHA Root CA,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => 'asAST1gRMwlYUBkZk4ACsOmXRhw',
-                loa => undef,
                 notafter => '4105123199', # 2100-01-31T23:59:59
                 notbefore => '1167609600', # 2007-01-01T00:00:00
                 pki_realm => 'alpha',
@@ -587,7 +573,6 @@ sub _build_certs {
                 identifier => '3x5J1m3w9RZcEokteXDXvVpo5nY',
                 issuer_dn => 'CN=ALPHA Root CA,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => 'pfN4ipk-rgBwldRIG0T2SmEiT-k',
-                loa => undef,
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '4102444800', # 2100-01-01T00:00:00
                 pki_realm => 'alpha',
@@ -613,7 +598,6 @@ sub _build_certs {
                 identifier => 'rYQgnYCRgPJiRtoWt40fddTmAbs',
                 issuer_dn => 'CN=ALPHA Root CA,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => 'rYQgnYCRgPJiRtoWt40fddTmAbs',
-                loa => undef,
                 notafter => '1170287999', # 2007-01-31T23:59:59
                 notbefore => '1136073600', # 2006-01-01T00:00:00
                 pki_realm => 'alpha',
@@ -639,7 +623,6 @@ sub _build_certs {
                 identifier => 'asAST1gRMwlYUBkZk4ACsOmXRhw',
                 issuer_dn => 'CN=ALPHA Root CA,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => 'asAST1gRMwlYUBkZk4ACsOmXRhw',
-                loa => undef,
                 notafter => '4105123199', # 2100-01-31T23:59:59
                 notbefore => '1167609600', # 2007-01-01T00:00:00
                 pki_realm => 'alpha',
@@ -665,7 +648,6 @@ sub _build_certs {
                 identifier => 'pfN4ipk-rgBwldRIG0T2SmEiT-k',
                 issuer_dn => 'CN=ALPHA Root CA,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => 'pfN4ipk-rgBwldRIG0T2SmEiT-k',
-                loa => undef,
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '4102444800', # 2100-01-01T00:00:00
                 pki_realm => 'alpha',
@@ -691,7 +673,6 @@ sub _build_certs {
                 identifier => 'D2zjkzwU4ySEnjekxNp2B8ELUuU',
                 issuer_dn => 'CN=BETA Signing CA,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => 'rFncrP5tXWSFW4ilL10f6voTSic',
-                loa => undef,
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '1483228800', # 2017-01-01T00:00:00
                 pki_realm => 'beta',
@@ -717,7 +698,6 @@ sub _build_certs {
                 identifier => 'sQq_TTintnV2HsYZdgOLa5AB05I',
                 issuer_dn => 'CN=BETA Signing CA,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => 'rFncrP5tXWSFW4ilL10f6voTSic',
-                loa => undef,
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '1483228800', # 2017-01-01T00:00:00
                 pki_realm => 'beta',
@@ -743,7 +723,6 @@ sub _build_certs {
                 identifier => 'WeHf1aA74gcksDXUNeBTcwpzmp8',
                 issuer_dn => 'CN=BETA DataVault,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => 'WeHf1aA74gcksDXUNeBTcwpzmp8',
-                loa => undef,
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '1483228800', # 2017-01-01T00:00:00
                 pki_realm => 'beta',
@@ -769,7 +748,6 @@ sub _build_certs {
                 identifier => '-qo66FGsqfwhS4yi3qihLtHdvIw',
                 issuer_dn => 'CN=BETA Root CA,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => 'UEQpo4rgCODRWcSxvp1X_CjmDtA',
-                loa => undef,
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '1483228800', # 2017-01-01T00:00:00
                 pki_realm => 'beta',
@@ -795,7 +773,6 @@ sub _build_certs {
                 identifier => 'rFncrP5tXWSFW4ilL10f6voTSic',
                 issuer_dn => 'CN=BETA Root CA,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => 'UEQpo4rgCODRWcSxvp1X_CjmDtA',
-                loa => undef,
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '1483228800', # 2017-01-01T00:00:00
                 pki_realm => 'beta',
@@ -821,7 +798,6 @@ sub _build_certs {
                 identifier => 'UEQpo4rgCODRWcSxvp1X_CjmDtA',
                 issuer_dn => 'CN=BETA Root CA,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => 'UEQpo4rgCODRWcSxvp1X_CjmDtA',
-                loa => undef,
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '1483228800', # 2017-01-01T00:00:00
                 pki_realm => 'beta',
@@ -847,7 +823,6 @@ sub _build_certs {
                 identifier => 'attk9H00DLvksVxWKnNM4rDHn9E',
                 issuer_dn => 'CN=GAMMA Signing CA,OU=ACME,DC=OpenXPKI,DC=ORG',
                 issuer_identifier => '',
-                loa => undef,
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '1483228800', # 2017-01-01T00:00:00
                 pki_realm => 'gamma',
