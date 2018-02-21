@@ -17,18 +17,19 @@ use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 use OpenXPKI::Test::CertHelper::Database;
 
-plan tests => 35;
+plan tests => 39;
 
 #
 # Setup test context
 #
 sub workflow_def {
     my ($name, $acl) = @_;
+    (my $cleanname = $name) =~ s/[^0-9a-z]//gi;
     return {
         'head' => {
             'label' => $name,
             'persister' => 'OpenXPKI',
-            'prefix' => $name,
+            'prefix' => $cleanname,
         },
         'state' => {
             'INITIAL' => {
@@ -82,6 +83,7 @@ sub workflow_def {
                     hash_key => "href",
                     _map_hash_value => '$link',
                 },
+                label => "Adds the link",
             },
         },
         'field' => {
@@ -244,7 +246,7 @@ throws_ok {
 lives_and {
     my $result = $oxitest->api2_command("execute_workflow_activity" => {
         id => $wf_t1_a->{id},
-        activity => "wf_type_1_add_message", # "wf_type_1" is the prefix defined in the workflow
+        activity => "wftype1_add_message", # "wftype1" is the prefix defined in the workflow
     });
     # ... this will automatically call "add_link" and "set_motd"
     is $result->{workflow}->{state}, 'SUCCESS';
@@ -268,6 +270,102 @@ lives_and {
 #   $wf_t4      manual      PERSIST     wilhelm     beta
 #
 
+
+#
+# get_workflow_info
+#
+lives_and {
+    my $result = $oxitest->api2_command("get_workflow_info" => { id => $wf_t2->{id} });
+    cmp_deeply $result, {
+        workflow => superhashof({
+            id => re(qr/^\d+$/),
+            count_try => re(qr/^\d+$/),
+            context => {
+                workflow_id => $wf_t2->{id},
+                role => 'User',
+                creator => 'wilhelm',
+                creator_role => 'User',
+                link => 'http://www.denic.de',
+                message => 'Lucy in the sky with diamonds (wf_type_2)',
+                wf_current_action => 'wftype2_initialize',
+            },
+            last_update => ignore(),
+            proc_state => 'manual',
+            reap_at => re(qr/^\d+$/),
+            state => 'PERSIST',
+            type => 'wf_type_2',
+            wake_up_at => ignore(),
+            description => ignore(),
+            label => 'wf_type_2',
+        }),
+        state => {
+            button => {},
+            option => [ 'wftype2_add_message' ],
+        },
+        activity => {
+            wftype2_add_message => {
+                label => 'wftype2_add_message',
+                name => 'wftype2_add_message',
+                field => [
+                    {
+                        name => 'dummy_arg',
+                        required => '0',
+                        type => 'text',
+                        clonable => 0,
+                    },
+                ],
+            },
+        },
+        handles => [],
+    };
+} "get_workflow_info() - via ID";
+
+lives_and {
+    my $result = $oxitest->api2_command("get_workflow_info" => { type => $wf_t2->{type} });
+    cmp_deeply $result, {
+        workflow => superhashof({
+            id => re(qr/^\d+$/),
+            state => 'INITIAL',
+            type => 'wf_type_2',
+            description => ignore(),
+            label => 'wf_type_2',
+        }),
+        state => {
+            button => {},
+            option => [ 'wftype2_initialize' ],
+        },
+        activity => {
+            wftype2_initialize => superhashof({
+                name => 'wftype2_initialize',
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_ACTION_MOTD_INITIALIZE_LABEL',
+                field => ignore(),
+            }),
+        },
+    };
+} "get_workflow_info() - via TYPE ".$wf_t2->{TYPE};
+
+lives_and {
+    my $result = $oxitest->api2_command("get_workflow_info" => { id => $wf_t2->{id}, activity => 'wftype2_add_link' });
+    cmp_deeply $result, superhashof({
+        activity => {
+            wftype2_add_link => {
+                label => 'Adds the link',
+                name => 'wftype2_add_link',
+            },
+        },
+    });
+} "get_workflow_info() - via ID with given ACTIVITY";
+
+lives_and {
+    my $result = $oxitest->api2_command("get_workflow_info" => { id => $wf_t2->{id}, attribute => 1 });
+    cmp_deeply $result, superhashof({
+        workflow => superhashof({
+            attribute => superhashof({
+                creator => 'wilhelm',
+            }),
+        }),
+    });
+} "get_workflow_info() - via ID with ATTRIBUTE = 1";
 
 #
 # get_workflow_log
@@ -328,7 +426,7 @@ lives_and {
         id => $wf_t2->{id},
     });
     cmp_deeply $result, [
-        "wf_type_2_add_message",
+        "wftype2_add_message",
     ];
 } "get_workflow_activities()";
 
@@ -341,7 +439,7 @@ lives_and {
         id => $wf_t2->{id},
     });
     cmp_deeply $result, [
-        "wf_type_2_add_message",
+        "wftype2_add_message",
         [
             superhashof({ name => "dummy_arg", requirement => "optional" }),
         ],

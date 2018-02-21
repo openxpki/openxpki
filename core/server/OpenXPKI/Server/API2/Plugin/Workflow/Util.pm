@@ -257,10 +257,10 @@ sub _run_activity {
 
 =head2 get_workflow_ui_info
 
-Return a hash with the informations taken from the workflow engine plus
-additional informations taken from the workflow config via connector.
+Returns a I<HashRef> with informations from the workflow engine plus additional
+informations taken from the workflow config.
 
-Expects one of:
+Parameter I<HashRef>:
 
 =over
 
@@ -269,6 +269,12 @@ Expects one of:
 =item * TYPE - workflow type
 
 =item * WORKFLOW - workflow object
+
+=item * ACTIVITY - Only return informations about this workflow action. Default:
+all actions available in the current state.
+
+Note: you have to prepend the workflow prefix to the action separated by an
+underscore.
 
 =back
 
