@@ -203,7 +203,7 @@ CREATE TABLE IF NOT EXISTS `workflow_history` (
   `workflow_description` longtext,
   `workflow_state` varchar(255) DEFAULT NULL,
   `workflow_user` varchar(255) DEFAULT NULL,
-  `workflow_node` int(10) unsigned DEFAULT 0,
+  `workflow_node` varchar(64) DEFAULT NULL,
   `workflow_history_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

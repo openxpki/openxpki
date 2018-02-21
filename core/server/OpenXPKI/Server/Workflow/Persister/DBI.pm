@@ -5,6 +5,7 @@ use base qw( Workflow::Persister );
 use utf8;
 use English;
 
+use Sys::Hostname;
 use OpenXPKI::Debug;
 
 use OpenXPKI::Workflow::Context;
@@ -337,6 +338,7 @@ sub create_history {
                 ## user set by workflow factory class
                 workflow_user         => ($entry->user ne 'n/a' ? $entry->user : CTX('session')->data->user),
                 workflow_history_date => DateTime->now->strftime('%Y-%m-%d %H:%M:%S'),
+                workflow_node         => hostname,
             },
         );
 
@@ -372,6 +374,7 @@ sub fetch_history {
             workflow_state
             workflow_user
             workflow_history_date
+            workflow_node
         ) ],
         order_by => [ '-workflow_history_date' ],
         where => { workflow_id => $id },
@@ -388,6 +391,7 @@ sub fetch_history {
             state       => $entry->{workflow_state},
             user        => $entry->{workflow_user},
             date => $parser->parse_datetime( $entry->{workflow_history_date} ),
+            node        => $entry->{workflow_node},
         });
         $hist->set_saved();
         push @history, $hist;

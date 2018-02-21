@@ -67,8 +67,8 @@ sub execute
             status => 'CRL_ISSUANCE_PENDING',
             reason_code     => $context->param('reason_code'),
             revocation_time => $dt->epoch(),
-            invalidity_time => $context->param('invalidity_time'),
-            hold_instruction_code => $context->param('hold_code'),
+            invalidity_time => $context->param('invalidity_time') || undef,
+            hold_instruction_code => $context->param('hold_code') || undef,
         },
         where => {
             pki_realm  => $pki_realm,

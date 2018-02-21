@@ -268,7 +268,7 @@ CREATE TABLE workflow_history (
   workflow_state varchar2(255),
   workflow_user varchar2(255),
   workflow_history_date date DEFAULT current_timestamp NOT NULL,
-  workflow_node number,
+  workflow_node varchar2(64),
   PRIMARY KEY (workflow_hist_id)
 );
 

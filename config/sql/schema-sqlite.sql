@@ -334,7 +334,7 @@ CREATE TABLE workflow_history (
   workflow_description longtext,
   workflow_state varchar(255),
   workflow_user varchar(255),
-  workflow_node integer,
+  workflow_node varchar(64),
   workflow_history_date timestamp NOT NULL DEFAULT current_timestamp
 );
 

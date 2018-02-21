@@ -388,6 +388,7 @@ sub get_workflow_history {
                 WORKFLOW_STATE          => $_->{workflow_state},
                 WORKFLOW_USER           => $_->{workflow_user},
                 WORKFLOW_HISTORY_DATE   => $_->{workflow_history_date},
+                WORKFLOW_NODE           => $_->{workflow_node},
             }
         }
         @$history

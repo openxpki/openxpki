@@ -573,7 +573,7 @@ sub init_history {
             $item->{'WORKFLOW_STATE'},
             $item->{'WORKFLOW_ACTION'},
             $item->{'WORKFLOW_DESCRIPTION'},
-            $item->{'WORKFLOW_USER'}
+            $item->{'WORKFLOW_USER'},
         ]
     }
 
