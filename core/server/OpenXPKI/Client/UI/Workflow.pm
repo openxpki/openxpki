@@ -14,10 +14,10 @@ has __default_grid_head => (
     lazy => 1,
 
     default => sub { return [
-        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL', sortkey => 'WORKFLOW.WORKFLOW_SERIAL' },
-        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL', sortkey => 'WORKFLOW.WORKFLOW_LAST_UPDATE' },
-        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', sortkey => 'WORKFLOW.WORKFLOW_TYPE'},
-        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', sortkey => 'WORKFLOW.WORKFLOW_STATE' },
+        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL', sortkey => 'workflow_id' },
+        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL', sortkey => 'workflow_last_update' },
+        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', sortkey => 'workflow_type'},
+        { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', sortkey => 'workflow_state' },
         { sTitle => 'serial', bVisible => 0 },
         { sTitle => "_className"},
     ]; }
@@ -28,11 +28,11 @@ has __default_grid_row => (
     isa => 'ArrayRef',
     lazy => 1,
     default => sub { return [
-        { source => 'workflow', field => 'WORKFLOW_SERIAL' },
-        { source => 'workflow', field => 'WORKFLOW_LAST_UPDATE' },
-        { source => 'workflow', field => 'WORKFLOW_TYPE' },
-        { source => 'workflow', field => 'WORKFLOW_STATE' },
-        { source => 'workflow', field => 'WORKFLOW_SERIAL' }
+        { source => 'workflow', field => 'workflow_id' },
+        { source => 'workflow', field => 'workflow_last_update' },
+        { source => 'workflow', field => 'workflow_type' },
+        { source => 'workflow', field => 'workflow_state' },
+        { source => 'workflow', field => 'workflow_id' }
     ]; }
 );
 
@@ -386,23 +386,23 @@ sub init_result {
     my $query = $result->{query};
 
     if ($limit) {
-        $query->{LIMIT} = $limit;
-    } elsif (!$query->{LIMIT}) {
-        $query->{LIMIT} = 25;
+        $query->{limit} = $limit;
+    } elsif (!$query->{limit}) {
+        $query->{limit} = 25;
     }
 
-    $query->{START} = $startat;
+    $query->{start} = $startat;
 
-    if (!$query->{ORDER}) {
-        $query->{ORDER} = 'WORKFLOW.WORKFLOW_SERIAL';
-        if (!defined $query->{REVERSE}) {
-            $query->{REVERSE} = 1;
+    if (!$query->{order}) {
+        $query->{order} = 'workflow_id';
+        if (!defined $query->{reverse}) {
+            $query->{reverse} = 1;
         }
     }
 
     $self->logger()->trace( "persisted query: " . Dumper $result);
 
-    my $search_result = $self->send_command( 'search_workflow_instances', $query );
+    my $search_result = $self->send_command_v2( 'search_workflow_instances', $query );
 
     $self->logger()->trace( "search result: " . Dumper $search_result);
 
@@ -417,8 +417,8 @@ sub init_result {
     }
 
     my $pager;
-    if ($startat != 0 || @{$search_result} == $query->{LIMIT}) {
-        $pager = $self->__render_pager( $result, { limit => $query->{LIMIT}, startat => $query->{START} } );
+    if ($startat != 0 || @{$search_result} == $query->{limit}) {
+        $pager = $self->__render_pager( $result, { limit => $query->{limit}, startat => $query->{start} } );
     }
 
 
@@ -427,7 +427,7 @@ sub init_result {
 
     my @lines = $self->__render_result_list( $search_result, $body );
 
-    $self->logger()->trace( "dumper result: " . Dumper @lines);
+    $self->logger()->trace( "dumper result: " . Dumper \@lines);
 
     my $header = $result->{header};
     $header = $self->__default_grid_head() if(!$header);
@@ -509,21 +509,21 @@ sub init_pager {
 
     # Add limits
     my $query = $result->{query};
-    $query->{LIMIT} = $limit;
-    $query->{START} = $startat;
+    $query->{limit} = $limit;
+    $query->{start} = $startat;
 
     if ($self->param('order')) {
-        $query->{ORDER} = uc($self->param('order'));
+        $query->{order} = uc($self->param('order'));
     }
 
     if (defined $self->param('reverse')) {
-        $query->{REVERSE} = $self->param('reverse');
+        $query->{reverse} = $self->param('reverse');
     }
 
     $self->logger()->trace( "persisted query: " . Dumper $result);
     $self->logger()->trace( "executed query: " . Dumper $query);
 
-    my $search_result = $self->send_command( 'search_workflow_instances', $query );
+    my $search_result = $self->send_command_v2( 'search_workflow_instances', $query );
 
     $self->logger()->trace( "search result: " . Dumper $search_result);
 
@@ -617,22 +617,22 @@ sub init_mine {
     my $startat = $self->param('startat') || 0;
 
     my $query = {
-        ATTRIBUTE => [{ KEY => 'creator', VALUE => $self->_session->param('user')->{name} }],
-        ORDER => 'WORKFLOW.WORKFLOW_SERIAL',
-        REVERSE => 1,
+        attribute => { 'creator' => $self->_session->param('user')->{name} },
+        order => 'workflow_id',
+        reverse => 1,
     };
 
-    my $search_result = $self->send_command( 'search_workflow_instances',
-        { %{$query}, ( LIMIT => $limit, START => $startat ) } );
+    my $search_result = $self->send_command_v2( 'search_workflow_instances',
+        { %{$query}, ( limit => $limit, start => $startat ) } );
 
     # if size of result is equal to limit, check for full result count
     my $result_count = scalar @{$search_result};
     if ($result_count == $limit) {
         # we need to remove order/reverse
         my %count_query = %{$query};
-        delete $count_query{ORDER};
-        delete $count_query{REVERSE};
-        $result_count = $self->send_command( 'search_workflow_instances_count', \%count_query );
+        delete $count_query{order};
+        delete $count_query{reverse};
+        $result_count = $self->send_command_v2( 'search_workflow_instances_count', \%count_query );
     }
 
     $self->logger()->trace( "search result: " . Dumper $search_result);
@@ -714,15 +714,15 @@ sub init_task {
         my $query = $item->{query};
         my $limit = 25;
 
-        if ($query->{LIMIT}) {
-            $limit = $query->{LIMIT};
-            delete $query->{LIMIT};
+        if ($query->{limit}) {
+            $limit = $query->{limit};
+            delete $query->{limit};
         }
 
-        if (!$query->{ORDER}) {
-            $query->{ORDER} = 'WORKFLOW.WORKFLOW_SERIAL';
-            if (!defined $query->{REVERSE}) {
-                $query->{REVERSE} = 1;
+        if (!$query->{order}) {
+            $query->{order} = 'workflow_id';
+            if (!defined $query->{reverse}) {
+                $query->{reverse} = 1;
             }
         }
 
@@ -731,10 +731,10 @@ sub init_task {
             @cols = @{$item->{cols}};
         } else {
             @cols = (
-                { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL', field => 'WORKFLOW_SERIAL', sortkey => 'WORKFLOW.WORKFLOW_SERIAL' },
-                { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL', field => 'WORKFLOW_LAST_UPDATE', sortkey => 'WORKFLOW.WORKFLOW_LAST_UPDATE' },
-                { label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', field => 'WORKFLOW_TYPE' },
-                { label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', field => 'WORKFLOW_STATE' },
+                { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL', field => 'workflow_id', sortkey => 'workflow_id' },
+                { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL', field => 'workflow_last_update', sortkey => 'workflow_last_update' },
+                { label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', field => 'workflow_type' },
+                { label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', field => 'workflow_state' },
             );
         }
 
@@ -743,7 +743,7 @@ sub init_task {
 
         $self->logger()->trace( "columns : " . Dumper $column);
 
-        my $search_result = $self->send_command( 'search_workflow_instances', { (LIMIT => $limit), %$query } );
+        my $search_result = $self->send_command_v2( 'search_workflow_instances', { (limit => $limit), %$query } );
 
         # empty message
         my $empty = $item->{ifempty} || 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL';
@@ -765,9 +765,9 @@ sub init_task {
 
             if ($limit == scalar @$search_result) {
                 my %count_query = %{$query};
-                delete $count_query{ORDER};
-                delete $count_query{REVERSE};
-                my $result_count= $self->send_command( 'search_workflow_instances_count', \%count_query  );
+                delete $count_query{order};
+                delete $count_query{reverse};
+                my $result_count= $self->send_command_v2( 'search_workflow_instances_count', \%count_query  );
                 my $queryid = $self->__generate_uid();
                 my $_query = {
                     'id' => $queryid,
@@ -1199,41 +1199,40 @@ sub action_search {
     my $input;
 
     if ($self->param('wf_type')) {
-        $query->{TYPE} = $self->param('wf_type');
+        $query->{type} = $self->param('wf_type');
         $input->{wf_type} = $self->param('wf_type');
 
     }
 
     if ($self->param('wf_state')) {
-        $query->{STATE} = $self->param('wf_state');
+        $query->{state} = $self->param('wf_state');
         $input->{wf_state} = $self->param('wf_state');
 
     }
 
     if ($self->param('wf_proc_state')) {
-        $query->{PROC_STATE} = $self->param('wf_proc_state');
+        $query->{proc_state} = $self->param('wf_proc_state');
         $input->{wf_proc_state} = $self->param('wf_proc_state');
     }
 
     # Read the query pattern for extra attributes from the session
     my $spec = $self->_session->param('wfsearch')->{default};
-    my @attr = @{$self->__build_attribute_subquery( $spec->{attributes} )};
+    my $attr = $self->__build_attribute_subquery( $spec->{attributes} );
 
-    if (@attr) {
+    if ($attr) {
         $input->{attributes} = $self->__build_attribute_preset(  $spec->{attributes} );
+        $query->{attribute} = $attr;
     }
 
     if ($self->param('wf_creator')) {
         $input->{wf_creator} = $self->param('wf_creator');
-        push @attr, { KEY => 'creator', VALUE => ~~ $self->param('wf_creator') };
-
+        $attr->{'creator'} = ~~$self->param('wf_creator');
     }
 
-    $query->{ATTRIBUTE} = \@attr;
 
     $self->logger()->trace("query : " . Dumper $query);
 
-    my $result_count = $self->send_command( 'search_workflow_instances_count', $query );
+    my $result_count = $self->send_command_v2( 'search_workflow_instances_count', $query );
 
     # No results founds
     if (!$result_count) {
@@ -1314,7 +1313,7 @@ sub action_bulk {
         $self->_status({message => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_HAS_FAILED_ITEMS_STATUS', 'level' => 'error' });
 
         my @failed_id = keys %{$errors};
-        my $failed_result = $self->send_command( 'search_workflow_instances', { SERIAL => \@failed_id } );
+        my $failed_result = $self->send_command_v2( 'search_workflow_instances', { serial => \@failed_id } );
 
         my @result_failed = $self->__render_result_list( $failed_result, $self->__default_grid_row );
 
@@ -2191,20 +2190,23 @@ sub __render_result_list {
             $context = $wf_info->{WORKFLOW}->{CONTEXT};
             $attrib = $wf_info->{WORKFLOW}->{ATTRIBUTE};
             $wf_item = {
-                'WORKFLOW.WORKFLOW_LAST_UPDATE' => $wf_info->{WORKFLOW}->{LAST_UPDATE},
-                'WORKFLOW.WORKFLOW_SERIAL' => $wf_info->{WORKFLOW}->{ID},
-                'WORKFLOW.WORKFLOW_TYPE' => $wf_info->{WORKFLOW}->{TYPE},
-                'WORKFLOW.WORKFLOW_STATE' => $wf_info->{WORKFLOW}->{STATE},
-                'WORKFLOW.WORKFLOW_PROC_STATE' => $wf_info->{WORKFLOW}->{PROC_STATE},
-                'WORKFLOW.WORKFLOW_WAKEUP_AT' => $wf_info->{WORKFLOW}->{WAKE_UP_AT},
+                'workflow_last_update' => $wf_info->{WORKFLOW}->{LAST_UPDATE},
+                'workflow_id' => $wf_info->{WORKFLOW}->{ID},
+                'workflow_type' => $wf_info->{WORKFLOW}->{TYPE},
+                'workflow_state' => $wf_info->{WORKFLOW}->{STATE},
+                'workflow_proc_state' => $wf_info->{WORKFLOW}->{PROC_STATE},
+                'workflow_wakeup_at' => $wf_info->{WORKFLOW}->{WAKE_UP_AT},
             };
         }
 
         foreach my $col (@{$colums}) {
 
+            my $field = lc($col->{field}); # migration helper, lowercase uicontrol input
+            $field = 'workflow_id' if ($field eq 'workflow_serial');
+
             # we need to load the wf info
             if (!$wf_info && ($col->{template} || $col->{source} ne 'workflow')) {
-                $wf_info = $self->send_command( 'get_workflow_info', { ID => $wf_item->{'WORKFLOW.WORKFLOW_SERIAL'}, ATTRIBUTE => 1 });
+                $wf_info = $self->send_command( 'get_workflow_info', { ID => $wf_item->{'workflow_id'}, ATTRIBUTE => 1 });
                 $self->logger()->trace( "fetch wf info : " . Dumper $wf_info);
                 $context = $wf_info->{WORKFLOW}->{CONTEXT};
                 $attrib = $wf_info->{WORKFLOW}->{ATTRIBUTE};
@@ -2221,23 +2223,24 @@ sub __render_result_list {
 
             } elsif ($col->{source} eq 'workflow') {
 
-                # Special handling of the state field
-                if ($col->{field} eq "WORKFLOW_STATE") {
-                    my $state = $wf_item->{'WORKFLOW.WORKFLOW_STATE'};
 
-                    if ($wf_item->{'WORKFLOW.WORKFLOW_PROC_STATE'} eq 'exception') {
+                # Special handling of the state field
+                if ($field eq "workflow_state") {
+                    my $state = $wf_item->{'workflow_state'};
+                    my $proc_state = $wf_item->{'workflow_proc_state'};
+                    if ($proc_state eq 'exception') {
                         $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION )";
 
-                    } elsif ($wf_item->{'WORKFLOW.WORKFLOW_PROC_STATE'} eq 'pause') {
+                    } elsif ($proc_state eq 'pause') {
                         $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE )";
 
-                    } elsif ($wf_item->{'WORKFLOW.WORKFLOW_PROC_STATE'} eq 'retry_exceeded') {
+                    } elsif ($proc_state eq 'retry_exceeded') {
                         $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED )";
 
                     }
                     push @line, $state;
                 } else {
-                    push @line, $wf_item->{ 'WORKFLOW.'.$col->{field} };
+                    push @line, $wf_item->{ $field };
 
                 }
 
@@ -2253,9 +2256,9 @@ sub __render_result_list {
 
         # special color for workflows in final failure
 
-        my $status = $wf_item->{'WORKFLOW.WORKFLOW_PROC_STATE'};
+        my $status = $wf_item->{'workflow_proc_state'};
 
-        if ($status eq 'finished' && $wf_item->{'WORKFLOW.WORKFLOW_STATE'} eq 'FAILURE') {
+        if ($status eq 'finished' && $wf_item->{'workflow_state'} eq 'FAILURE') {
             $status  = 'failed';
         }
 
@@ -2314,7 +2317,7 @@ sub __render_list_spec {
     push @header, { sTitle => 'serial', bVisible => 0 };
     push @header, { sTitle => "_className"};
 
-    push @column, { source => 'workflow', field => 'WORKFLOW_SERIAL' };
+    push @column, { source => 'workflow', field => 'workflow_id' };
 
     return ( \@header, \@column );
 }
