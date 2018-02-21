@@ -17,18 +17,19 @@ use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 use OpenXPKI::Test::CertHelper::Database;
 
-plan tests => 27;
+plan tests => 31;
 
 #
 # Setup test context
 #
 sub workflow_def {
     my ($name) = @_;
+    (my $cleanname = $name) =~ s/[^0-9a-z]//gi;
     return {
         'head' => {
             'label' => $name,
             'persister' => 'OpenXPKI',
-            'prefix' => $name,
+            'prefix' => $cleanname,
         },
         'state' => {
             'INITIAL' => {
@@ -82,6 +83,7 @@ sub workflow_def {
                     hash_key => "href",
                     _map_hash_value => '$link',
                 },
+                label => "Adds the link",
             },
         },
         'field' => {
@@ -216,7 +218,7 @@ throws_ok {
 lives_and {
     my $result = CTX('api')->execute_workflow_activity({
         ID => $wf_t1_a->{ID},
-        ACTIVITY => "wf_type_1_add_message", # "wf_type_1" is the prefix defined in the workflow
+        ACTIVITY => "wftype1_add_message", # "wftype1" is the prefix defined in the workflow
     });
     # ... this will automatically call "add_link" and "set_motd"
     is $result->{WORKFLOW}->{STATE}, 'SUCCESS';
@@ -240,6 +242,101 @@ lives_and {
 #   $wf_t4      manual      PERSIST     wilhelm     beta
 #
 
+#
+# get_workflow_info
+#
+lives_and {
+    my $result = CTX('api')->get_workflow_info({ ID => $wf_t2->{ID} });
+    cmp_deeply $result, {
+        WORKFLOW => superhashof({
+            ID => re(qr/^\d+$/),
+            COUNT_TRY => re(qr/^\d+$/),
+            CONTEXT => {
+                workflow_id => $wf_t2->{ID},
+                role => 'User',
+                creator => 'wilhelm',
+                creator_role => 'User',
+                link => 'http://www.denic.de',
+                message => 'Lucy in the sky with diamonds (wf_type_2)',
+                wf_current_action => 'wftype2_initialize',
+            },
+            LAST_UPDATE => ignore(),
+            PROC_STATE => 'manual',
+            REAP_AT => re(qr/^\d+$/),
+            STATE => 'PERSIST',
+            TYPE => 'wf_type_2',
+            WAKE_UP_AT => ignore(),
+            description => ignore(),
+            label => 'wf_type_2',
+        }),
+        STATE => {
+            button => {},
+            option => [ 'wftype2_add_message' ],
+        },
+        ACTIVITY => {
+            wftype2_add_message => {
+                label => 'wftype2_add_message',
+                name => 'wftype2_add_message',
+                field => [
+                    {
+                        name => 'dummy_arg',
+                        required => '0',
+                        type => 'text',
+                        clonable => 0,
+                    },
+                ],
+            },
+        },
+        HANDLES => [],
+    };
+} "get_workflow_info() - via ID";
+
+lives_and {
+    my $result = CTX('api')->get_workflow_info({ TYPE => $wf_t2->{TYPE} });
+    cmp_deeply $result, {
+        WORKFLOW => superhashof({
+            ID => re(qr/^\d+$/),
+            STATE => 'INITIAL',
+            TYPE => 'wf_type_2',
+            description => ignore(),
+            label => 'wf_type_2',
+        }),
+        STATE => {
+            button => {},
+            option => [ 'wftype2_initialize' ],
+        },
+        ACTIVITY => {
+            wftype2_initialize => superhashof({
+                name => 'wftype2_initialize',
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_ACTION_MOTD_INITIALIZE_LABEL',
+                field => ignore(),
+            }),
+        },
+    };
+} "get_workflow_info() - via TYPE ".$wf_t2->{TYPE};
+
+lives_and {
+    my $result = CTX('api')->get_workflow_info({ ID => $wf_t2->{ID}, ACTIVITY => 'wftype2_add_link' });
+    cmp_deeply $result, superhashof({
+        ACTIVITY => {
+            wftype2_add_link => {
+                label => 'Adds the link',
+                name => 'wftype2_add_link',
+            },
+        },
+    });
+} "get_workflow_info() - via ID with given ACTIVITY";
+
+lives_and {
+    my $result = CTX('api')->get_workflow_info({ ID => $wf_t2->{ID}, ATTRIBUTE => 1 });
+    cmp_deeply $result, superhashof({
+        WORKFLOW => superhashof({
+            ATTRIBUTE => superhashof({
+                creator => 'wilhelm',
+            }),
+        }),
+    });
+} "get_workflow_info() - via ID with ATTRIBUTE = 1";
 
 #
 # get_workflow_log
@@ -300,7 +397,7 @@ lives_and {
         ID => $wf_t2->{ID},
     });
     cmp_deeply $result, [
-        "wf_type_2_add_message",
+        "wftype2_add_message",
     ];
 } "get_workflow_activities()";
 
@@ -313,7 +410,7 @@ lives_and {
         ID => $wf_t2->{ID},
     });
     cmp_deeply $result, [
-        "wf_type_2_add_message",
+        "wftype2_add_message",
         [
             superhashof({ name => "dummy_arg", requirement => "optional" }),
         ],
