@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2018-02-10 13:01+0100\n"
+"PO-Revision-Date: 2018-02-21 17:51+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -2257,6 +2257,9 @@ msgstr "Execution time"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_HISTORY_LABEL"
 msgstr "Workflow History"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HISTORY_NODE_LABEL"
+msgstr "Node"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_HISTORY_STATE_LABEL"
 msgstr "State"

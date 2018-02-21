@@ -561,7 +561,7 @@ sub init_history {
         className => 'modal-lg'
     });
 
-    my $workflow_history = $self->send_command( 'get_workflow_history', { ID => $id } );
+    my $workflow_history = $self->send_command_v2( 'get_workflow_history', { id => $id } );
 
     $self->logger()->trace( "dumper result: " . Dumper $workflow_history);
 
@@ -569,11 +569,12 @@ sub init_history {
     my @result;
     foreach my $item (@{$workflow_history}) {
         push @result, [
-            $item->{'WORKFLOW_HISTORY_DATE'},
-            $item->{'WORKFLOW_STATE'},
-            $item->{'WORKFLOW_ACTION'},
-            $item->{'WORKFLOW_DESCRIPTION'},
-            $item->{'WORKFLOW_USER'},
+            $item->{'workflow_history_date'},
+            $item->{'workflow_state'},
+            $item->{'workflow_action'},
+            $item->{'workflow_description'},
+            $item->{'workflow_user'},
+            $item->{'workflow_node'},
         ]
     }
 
@@ -589,6 +590,7 @@ sub init_history {
                 { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_ACTION_LABEL' },
                 { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_DESCRIPTION_LABEL' },
                 { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_USER_LABEL' },
+                { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_NODE_LABEL' },
             ],
             data => \@result,
         },

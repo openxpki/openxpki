@@ -2536,6 +2536,10 @@ msgstr "Tempo di esecuzione"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_HISTORY_LABEL"
 msgstr "Workflow History"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HISTORY_NODE_LABEL"
+msgstr "Workflow History"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_HISTORY_STATE_LABEL"
 msgstr "Stato"
 

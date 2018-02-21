@@ -3010,6 +3010,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_HISTORY_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HISTORY_NODE_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_HISTORY_STATE_LABEL"
 msgstr "Дочерние технологические процессы"
 
