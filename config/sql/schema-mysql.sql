@@ -68,19 +68,6 @@ CREATE TABLE IF NOT EXISTS `crl` (
   `publication_date` int(10) unsigned DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `crr` (
-  `crr_key` bigint(20) unsigned NOT NULL,
-  `pki_realm` varchar(255) NOT NULL,
-  `identifier` varchar(64) NOT NULL,
-  `creator` varchar(255) DEFAULT NULL,
-  `creator_role` varchar(255) DEFAULT NULL,
-  `reason_code` varchar(255) DEFAULT NULL,
-  `invalidity_time` int(10) unsigned DEFAULT NULL,
-  `crr_comment` text,
-  `hold_code` varchar(255) DEFAULT NULL,
-  `revocation_time` int(10) unsigned DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE IF NOT EXISTS `csr` (
   `req_key` bigint(20) unsigned NOT NULL,
   `pki_realm` varchar(255) NOT NULL,
@@ -154,11 +141,6 @@ CREATE TABLE IF NOT EXISTS `seq_certificate_attributes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `seq_crl` (
-  `seq_number` bigint(20) NOT NULL,
-  `dummy` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `seq_crr` (
   `seq_number` bigint(20) NOT NULL,
   `dummy` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

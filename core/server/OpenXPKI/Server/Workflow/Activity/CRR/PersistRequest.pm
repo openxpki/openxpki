@@ -31,36 +31,52 @@ sub execute
         );
     }
 
-    my $dt = DateTime->now();
-    my $crr_serial = $dbi->next_id('crr');
-    $dbi->insert(
-        into => 'crr',
-        values => {
-            crr_key         => $crr_serial,
-            pki_realm       => $pki_realm,
-            creator         => $context->param('creator'),
-            creator_role    => $context->param('creator_role'),
-            identifier      => $context->param('cert_identifier'),
-            reason_code     => $context->param('reason_code'),
-            revocation_time => $dt->epoch(),
-            invalidity_time => $context->param('invalidity_time'),
-            crr_comment     => $context->param('comment'),
-            hold_code       => $context->param('hold_code'),
+    my $cert = $dbi->select_one(
+        from => 'certificate',
+        columns => [ '*' ],
+        where => {
+            pki_realm  => $pki_realm,
+            identifier => $identifier,
         },
     );
+
+    if (!$cert) {
+        OpenXPKI::Exception->throw(
+            message => 'No such certificate in realm',
+            params => {
+                pki_realm  => $pki_realm,
+                identifier => $identifier,
+            }
+        );
+    }
+
+    if ($cert->{status} ne 'ISSUED') {
+        OpenXPKI::Exception->throw(
+            message => 'Can not persist CRR, certificate is not in issued state',
+            params => {
+                identifier => $identifier,
+                status => $cert->{status},
+            }
+        );
+    }
+
+    my $dt = DateTime->now();
     $dbi->update(
         table => 'certificate',
         set => {
             status => 'CRL_ISSUANCE_PENDING',
+            reason_code     => $context->param('reason_code'),
+            revocation_time => $dt->epoch(),
+            invalidity_time => $context->param('invalidity_time'),
+            hold_instruction_code => $context->param('hold_code'),
         },
         where => {
             pki_realm  => $pki_realm,
             identifier => $identifier,
         },
     );
-    $context->param('crr_serial' => $crr_serial);
 
-    CTX('log')->application()->debug("crr for $identifier persisted");
+    CTX('log')->application()->debug("revocation request for $identifier written to database");
 
 }
 

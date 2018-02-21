@@ -119,22 +119,6 @@ CREATE TABLE crl (
     publication_date numeric(49,0)
 );
 
---
--- Name: crr; Type: TABLE; Schema: public; Tablespace:
---
-
-CREATE TABLE crr (
-    crr_key numeric(49,0) NOT NULL,
-    pki_realm text NOT NULL,
-    identifier text NOT NULL,
-    creator text,
-    creator_role text,
-    reason_code text,
-    invalidity_time numeric(49,0),
-    crr_comment text,
-    hold_code text,
-    revocation_time numeric(49,0)
-);
 
 --
 -- Name: csr; Type: TABLE; Schema: public; Tablespace:
@@ -267,17 +251,6 @@ CREATE SEQUENCE seq_certificate_attributes
 --
 
 CREATE SEQUENCE seq_crl
-    START WITH 0
-    INCREMENT BY 1
-    MINVALUE 0
-    NO MAXVALUE
-    CACHE 1;
-
---
--- Name: seq_crr; Type: SEQUENCE; Schema: public;
---
-
-CREATE SEQUENCE seq_crr
     START WITH 0
     INCREMENT BY 1
     MINVALUE 0
@@ -439,13 +412,6 @@ ALTER TABLE ONLY certificate
 
 ALTER TABLE ONLY crl
     ADD CONSTRAINT crl_pkey PRIMARY KEY (pki_realm, issuer_identifier, crl_key);
-
---
--- Name: crr_pkey; Type: CONSTRAINT; Schema: public; Tablespace:
---
-
-ALTER TABLE ONLY crr
-    ADD CONSTRAINT crr_pkey PRIMARY KEY (crr_key, pki_realm, identifier);
 
 --
 -- Name: csr_attributes_pkey; Type: CONSTRAINT; Schema: public; Tablespace:

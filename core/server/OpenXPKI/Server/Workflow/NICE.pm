@@ -414,7 +414,7 @@ supported by the backend, "unspecified" should be used.
 
 =over
 
-=item crr_serial - the serial number of the certificate revocation request
+=item cert_identifier - the certificate identifier of the cert to revoke
 
 =back
 

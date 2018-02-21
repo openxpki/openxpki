@@ -116,26 +116,6 @@ CREATE TABLE crl (
 );
 
 --
--- Table: crr
---;
-
-DROP TABLE crr CASCADE CONSTRAINTS;
-
-CREATE TABLE crr (
-  crr_key number NOT NULL,
-  pki_realm varchar2(255) NOT NULL,
-  identifier varchar2(64) NOT NULL,
-  creator varchar2(255),
-  creator_role varchar2(255),
-  reason_code varchar2(255),
-  invalidity_time number,
-  crr_comment clob,
-  hold_code varchar2(255),
-  revocation_time number,
-  PRIMARY KEY (pki_realm, crr_key)
-);
-
---
 -- Table: csr
 --;
 
@@ -330,8 +310,6 @@ DROP SEQUENCE seq_certificate_attributes;
 CREATE SEQUENCE seq_certificate_attributes START WITH 0 INCREMENT BY 1 MINVALUE 0;
 DROP SEQUENCE seq_crl;
 CREATE SEQUENCE seq_crl START WITH 0 INCREMENT BY 1 MINVALUE 0;
-DROP SEQUENCE seq_crr;
-CREATE SEQUENCE seq_crr START WITH 0 INCREMENT BY 1 MINVALUE 0;
 DROP SEQUENCE seq_csr;
 CREATE SEQUENCE seq_csr START WITH 0 INCREMENT BY 1 MINVALUE 0;
 DROP SEQUENCE seq_csr_attributes;

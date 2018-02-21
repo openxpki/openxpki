@@ -107,25 +107,6 @@ CREATE TABLE crl (
 );
 
 --
--- Table: crr
---
-DROP TABLE IF EXISTS crr;
-
-CREATE TABLE crr (
-  crr_key bigint NOT NULL,
-  pki_realm varchar(255) NOT NULL,
-  identifier varchar(64) NOT NULL,
-  creator varchar(255),
-  creator_role varchar(255),
-  reason_code varchar(255),
-  invalidity_time integer,
-  crr_comment text,
-  hold_code varchar(255),
-  revocation_time integer,
-  PRIMARY KEY (pki_realm, crr_key)
-);
-
---
 -- Table: csr
 --
 DROP TABLE IF EXISTS csr;
@@ -244,16 +225,6 @@ CREATE TABLE seq_certificate_attributes (
 DROP TABLE IF EXISTS seq_crl;
 
 CREATE TABLE seq_crl (
-  seq_number INTEGER PRIMARY KEY NOT NULL,
-  dummy integer
-);
-
---
--- Table: seq_crr
---
-DROP TABLE IF EXISTS seq_crr;
-
-CREATE TABLE seq_crr (
   seq_number INTEGER PRIMARY KEY NOT NULL,
   dummy integer
 );

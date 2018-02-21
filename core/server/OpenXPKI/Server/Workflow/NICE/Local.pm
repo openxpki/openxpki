@@ -316,15 +316,10 @@ sub renewCertificate {
 
 sub revokeCertificate {
 
-   my $self       = shift;
-   my $crr  = shift;
+    my $self       = shift;
+    # nothing to do here
+    return;
 
-   # We need the cert_identifier to check for revocation later
-   # usually it is already there
-   # TODO Context parameters should be returned and set by calling method just like issueCertificate() does
-   $self->_set_context_param('cert_identifier', $crr->{IDENTIFIER}) if (!$self->_get_context_param('cert_identifier'));
-
-   return;
 }
 
 sub checkForRevocation {
@@ -418,18 +413,16 @@ sub issueCRL {
     # fetch certificates that are already revoked or to be revoked, must
     # use LEFT JOIN as there can be revoked certificates without CRR items!
     my $certs = $dbi->select(
-        from_join => 'certificate =>certificate.identifier=crr.identifier crr',
-        columns => [ 'cert_key', 'certificate.identifier identifier',
-            'crr.revocation_time revocation_time',
-            'crr.reason_code reason_code',
-            'crr.invalidity_time invalidity_time',
+        from => 'certificate',
+        columns => [ 'cert_key', 'identifier',
+            'revocation_time', 'reason_code', 'invalidity_time',
             'status' ],
         where => {
             'certificate.pki_realm' => $pki_realm,
             issuer_identifier => $ca_identifier,
             status => [ 'REVOKED', 'CRL_ISSUANCE_PENDING' ],
         },
-        order_by => [ 'cert_key', 'crr.revocation_time desc' ]
+        order_by => [ 'cert_key' ]
     );
 
     push @cert_timestamps, $self->__prepare_crl_data($certs);
@@ -494,15 +487,10 @@ sub __prepare_crl_data {
     my $dbi       = CTX('dbi');
     my $pki_realm = CTX('session')->data->pki_realm;
 
-    my $last_serial = '';
     while (my $cert = $sth_certs->fetchrow_hashref) {
         ##! 32: 'cert to be revoked: ' . Data::Dumper->new([$cert])->Indent(0)->Terse(1)->Sortkeys(1)->Dump
         my $serial      = $cert->{cert_key};
-        if ($last_serial eq $serial) {
-            ##! 16: 'Skipping duplicate crr for serial ' . $serial
-            next;
-        }
-        $last_serial = $serial;
+
         my $identifier  = $cert->{identifier};
         my $reason_code = $cert->{reason_code}  || '';
         my $revocation_time = $cert->{revocation_time};
