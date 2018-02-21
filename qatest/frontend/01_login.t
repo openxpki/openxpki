@@ -1,4 +1,4 @@
-#!/usr/bin/perl 
+#!/usr/bin/perl
 
 use lib qw(../lib);
 use strict;
@@ -43,5 +43,5 @@ $result = $client->mock_request({
     'password' => 'openxpki'
 });
 
-is($result->{goto}, 'welcome', 'Logged in');
+like($result->{goto}, "/(redirect\!)?welcome/", 'Logged in');
 

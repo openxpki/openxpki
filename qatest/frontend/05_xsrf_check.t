@@ -39,7 +39,7 @@ $result = $client->mock_request({
 });
 
 # no request token was given, so action is not accepted
-is($result->{goto}, 'login');
+like($result->{goto}, "/login\!_status\![a-zA-Z0-9]+/");
 
 # load rtoken and try again
 $client->update_rtoken();
@@ -56,7 +56,7 @@ $result = $client->mock_request({
     'password' => 'openxpki'
 });
 
-is($result->{goto}, 'welcome');
+is($result->{goto}, 'redirect!welcome');
 
 
 $result = $client->mock_request({
