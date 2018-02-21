@@ -101,10 +101,10 @@ sub init_search {
         { value => 'valid_after', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTBEFORE_GT' },
         { value => 'expires_before', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTAFTER_LT' },
         { value => 'expires_after', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTAFTER_GT' },
-#        { value => 'revoked_before', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_REVOKED_LT' },
-#        { value => 'revoked_after', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_REVOKED_GT' },
-#        { value => 'invalid_before', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_LT' },
-#        { value => 'invalid_after', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_GT' },
+        { value => 'revoked_before', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_REVOKED_LT' },
+        { value => 'revoked_after', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_REVOKED_GT' },
+        { value => 'invalid_before', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_LT' },
+        { value => 'invalid_after', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_GT' },
 
     );
 

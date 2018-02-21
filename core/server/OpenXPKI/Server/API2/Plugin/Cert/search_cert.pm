@@ -88,6 +88,14 @@ so you can use asterisk (*) as placeholder)
 
 =item * C<expires_after> I<Int> - certificate validity must end after this UNIX epoch timestamp
 
+=item * C<revoked_before> I<Int> - certificate revocation date is before this UNIX epoch timestamp
+
+=item * C<revoked_after> I<Int> - certificate revocation date is after this UNIX epoch timestamp
+
+=item * C<invalid_before> I<Int> - certificate invalidity date is before this UNIX epoch timestamp
+
+=item * C<invalid_after> I<Int> - certificate invalidity  date is after this UNIX epoch timestamp
+
 =item * C<status> I<Str> - certificate status (for possible values see
 L<OpenXPKI::Server::API2::Types/CertStatus>)
 
@@ -140,6 +148,10 @@ command "search_cert" => {
     subject_key_identifier   => {isa => 'Value' },
     valid_after              => {isa => 'Int', },
     valid_before             => {isa => 'Int', },
+    revoked_before           => {isa => 'Int', },
+    revoked_after            => {isa => 'Int', },
+    invalid_before           => {isa => 'Int', },
+    invalid_after            => {isa => 'Int', },
 } => sub {
     my ($self, $params) = @_;
 
@@ -164,44 +176,7 @@ B<Parameters>
 
 All parameters are optional and can be used to filter the result list:
 
-=over
-
-=item * C<pki_realm> I<Str> - certificate realm. Specify "_any"
-for a global search. Default: current session's realm
-
-=item * C<entity_only> I<Bool> - certificate CA
-
-=item * C<subject> I<Str> - subject pattern (does an SQL LIKE search
-so you can use asterisk (*) as placeholder)
-
-=item * C<issuer_dn> I<Str> - issuer pattern (does an SQL LIKE search
-so you can use asterisk (*) as placeholder)
-
-=item * C<cert_serial> I<Str> - serial number of certificate
-
-=item * C<csr_serial> I<Str> - serial number of certificate request
-
-=item * C<subject_key_identifier> I<Str> - X.509 certificate subject identifier
-
-=item * C<issuer_identifier> I<Str> - issuer identifier
-
-=item * C<authority_key_identifier> I<Str> - CA identifier
-
-=item * C<identifier> I<Str> - internal certificate identifier (hash of PEM)
-
-=item * C<profile> I<Str> - certificate profile name
-
-=item * C<status> I<Str> - certificate status (for possible values see
-L<OpenXPKI::Server::API2::Types/CertStatus>)
-
-=item * C<cert_attributes> I<HashRef> - key is attribute name, value is passed
-"as is" as where statement on value, see documentation of SQL::Abstract.
-
-Legacy: I<ArrayRef> - list of condition I<HashRefs> to search
-in attributes (KEY, VALUE, OPERATOR). Operator can be "EQUAL", "LIKE" or
-"BETWEEN".
-
-=back
+see search_cert, limit and order parameters are not applied.
 
 B<Changes compared to API v1:> The following parameters where removed in favor
 of C<[valid|expires]_[before|after]>:
@@ -229,6 +204,10 @@ command "search_cert_count" => {
     subject_key_identifier   => {isa => 'Value' },
     valid_after              => {isa => 'Int', },
     valid_before             => {isa => 'Int', },
+    revoked_before           => {isa => 'Int', },
+    revoked_after            => {isa => 'Int', },
+    invalid_before           => {isa => 'Int', },
+    invalid_after            => {isa => 'Int', },
 } => sub {
     my ($self, $params) = @_;
 
@@ -334,6 +313,23 @@ sub _make_db_query {
     } elsif ($po->has_expires_after) {
         $where->{'certificate.notbefore'} = { '>', $po->expires_after }
     }
+
+    if ($po->has_revoked_before && $po->has_revoked_after) {
+        $where->{'certificate.revocation_time'} = { -between => [ $po->revoked_after, $po->revoked_before ] };
+    } elsif ($po->has_revoked_before) {
+        $where->{'certificate.revocation_time'} = { '<', $po->revoked_before }
+    } elsif ($po->has_revoked_after) {
+        $where->{'certificate.revocation_time'} = { '>', $po->revoked_after }
+    }
+
+    if ($po->has_invalid_before && $po->has_invalid_after) {
+        $where->{'certificate.invalidity_time'} = { -between => [ $po->invalid_after, $po->invalid_before ] };
+    } elsif ($po->has_invalid_before) {
+        $where->{'certificate.invalidity_time'} = { '<', $po->invalid_before }
+    } elsif ($po->has_invalid_after) {
+        $where->{'certificate.invalidity_time'} = { '>', $po->invalid_after }
+    }
+
 
     my @join_spec = ();
 
