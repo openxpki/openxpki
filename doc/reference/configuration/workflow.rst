@@ -12,7 +12,8 @@ Each workflow is represented by a file or directory structure below ``workflow.d
     head:
         label: The verbose name of the workflow, shown on the UI
         description: The verbose description of the workflow, shown on the UI
-        prefix: internal short name, used to prefix the actions, must be unique.
+        prefix: internal short name, used to prefix the actions, must be unique
+                Must not contain any other characters than [a-z0-9]
 
     state:
         name_of_state:  (used as literal name in the engine)
