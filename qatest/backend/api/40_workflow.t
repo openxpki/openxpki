@@ -17,7 +17,7 @@ use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 use OpenXPKI::Test::CertHelper::Database;
 
-plan tests => 31;
+plan tests => 32;
 
 #
 # Setup test context
@@ -243,11 +243,25 @@ lives_and {
 #   $wf_t4      manual      PERSIST     wilhelm     beta
 #
 
+
+#
+# list_workflow_titles
+#
+lives_and {
+    my $result = CTX('api')->list_workflow_titles();
+    cmp_deeply $result, superhashof({
+        'wf_type_1'         => { label => ignore(), description => ignore(), },
+        'wf_type_2'         => { label => ignore(), description => ignore(), },
+        'wf_type_3_unused'  => { label => ignore(), description => ignore(), },
+    });
+} "list_workflow_titles()";
+
 #
 # get_workflow_info
 #
 lives_and {
     my $result = CTX('api')->get_workflow_info({ ID => $wf_t2->{ID} });
+    diag explain $result;
     cmp_deeply $result, {
         WORKFLOW => superhashof({
             ID => re(qr/^\d+$/),
