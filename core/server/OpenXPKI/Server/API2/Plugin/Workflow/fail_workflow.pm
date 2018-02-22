@@ -58,7 +58,7 @@ command "fail_workflow" => {
 
     CTX('log')->workflow()->info("Failed workflow $wf_id (type '$wf_type') with error $error");
 
-    return $util->get_workflow_ui_info({ WORKFLOW => $workflow });
+    return $util->get_ui_info(workflow => $workflow);
 };
 
 __PACKAGE__->meta->make_immutable;

@@ -37,6 +37,7 @@ sub workflow_def {
             },
             'PERSIST' => {
                 'action' => [ 'add_message add_link set_motd > SUCCESS' ],
+                'output' => [ 'dummy_arg', ],
             },
             'SUCCESS' => {
                 'label' => 'I18N_OPENXPKI_UI_WORKFLOW_SET_MOTD_SUCCESS_LABEL',
@@ -145,8 +146,7 @@ my $oxitest = OpenXPKI::Test->new(
         "realm.alpha.workflow.def.wf_type_no_initial_action" => $wf_def_noinit,
         "realm.alpha.workflow.def.wf_type_5_restricted" => workflow_def("wf_type_5", "self"),
         "realm.beta.workflow.def.wf_type_4" => workflow_def("wf_type_4"),
-
-    }
+    },
 );
 # while testing we do not log to database by default
 $oxitest->enable_workflow_log;
@@ -301,6 +301,13 @@ lives_and {
         state => {
             button => {},
             option => [ 'wftype2_add_message' ],
+            output => [
+                {
+                    name => 'dummy_arg',
+                    type => 'text',
+                    required => 0,
+                },
+            ],
         },
         activity => {
             wftype2_add_message => {
@@ -321,7 +328,33 @@ lives_and {
 } "get_workflow_info() - via ID";
 
 lives_and {
-    my $result = $oxitest->api2_command("get_workflow_info" => { type => $wf_t2->{type} });
+    my $result = $oxitest->api2_command("get_workflow_info" => { id => $wf_t2->{id}, activity => 'wftype2_add_link' });
+    cmp_deeply $result, superhashof({
+        activity => {
+            wftype2_add_link => {
+                label => 'Adds the link',
+                name => 'wftype2_add_link',
+            },
+        },
+    });
+} "get_workflow_info() - via ID with given ACTIVITY";
+
+lives_and {
+    my $result = $oxitest->api2_command("get_workflow_info" => { id => $wf_t2->{id}, with_attributes => 1 });
+    cmp_deeply $result, superhashof({
+        workflow => superhashof({
+            attribute => superhashof({
+                creator => 'wilhelm',
+            }),
+        }),
+    });
+} "get_workflow_info() - via ID with ATTRIBUTE = 1";
+
+#
+# get_workflow_base_info
+#
+lives_and {
+    my $result = $oxitest->api2_command("get_workflow_base_info" => { type => $wf_t2->{type} });
     cmp_deeply $result, {
         workflow => superhashof({
             id => re(qr/^\d+$/),
@@ -342,30 +375,7 @@ lives_and {
             }),
         },
     };
-} "get_workflow_info() - via TYPE ".$wf_t2->{TYPE};
-
-lives_and {
-    my $result = $oxitest->api2_command("get_workflow_info" => { id => $wf_t2->{id}, activity => 'wftype2_add_link' });
-    cmp_deeply $result, superhashof({
-        activity => {
-            wftype2_add_link => {
-                label => 'Adds the link',
-                name => 'wftype2_add_link',
-            },
-        },
-    });
-} "get_workflow_info() - via ID with given ACTIVITY";
-
-lives_and {
-    my $result = $oxitest->api2_command("get_workflow_info" => { id => $wf_t2->{id}, attribute => 1 });
-    cmp_deeply $result, superhashof({
-        workflow => superhashof({
-            attribute => superhashof({
-                creator => 'wilhelm',
-            }),
-        }),
-    });
-} "get_workflow_info() - via ID with ATTRIBUTE = 1";
+} "get_workflow_base_info() - via TYPE";
 
 #
 # get_workflow_log
@@ -481,8 +491,8 @@ my $wf_t4_data = superhashof({
     'workflow_state' => 'PERSIST',
 });
 
-search_result { id => [ $wf_t1_a->{id}, $wf_t2->{id} ] },
-    bag($wf_t1_a_data, $wf_t2_data),
+search_result { id => [ $wf_t1_a->{id}, $wf_t1_b->{id}, $wf_t2->{id} ] },
+    bag($wf_t1_a_data, $wf_t1_b_data, $wf_t2_data),
     "search_workflow_instances() - search by ID";
 
 # TODO Tests: Remove superbagof() constructs below once we have a clean test database
@@ -607,6 +617,8 @@ search_result { check_acl => 1 },
 #
 # search_workflow_instances_count
 #
+note "Sleep a second to give workflow persister time to write to DB";
+sleep 1;
 lives_and {
     my $result = $oxitest->api2_command("search_workflow_instances_count" => { id => [ $wf_t1_a->{id}, $wf_t1_b->{id}, $wf_t2->{id} ] });
     is $result, 3;

@@ -7,6 +7,7 @@ use English;
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Connector::WorkflowContext;
+use OpenXPKI::MooseParams;
 
 =head2 validate_input_params
 
@@ -255,201 +256,242 @@ sub _run_activity {
     } while($ac);
 }
 
-=head2 get_workflow_ui_info
+=head2 get_ui_info
 
-Returns a I<HashRef> with informations from the workflow engine plus additional
-informations taken from the workflow config.
+Returns informations about a workflow from the workflow engine and the config
+as a I<HashRef>:
 
-Parameter I<HashRef>:
+    {
+        workflow => {
+                type        => ...,
+                id          => ...,
+                state       => ...,
+                label       => ...,
+                description => ...,
+                last_update => ...,
+                proc_state  => ...,
+                count_try   => ...,
+                wake_up_at  => ...,
+                reap_at     => ...,
+                context     => { ... },
+                attribute   => { ... },   # only if "attribute => 1"
+            },
+            handles  => [ ... ],
+            activity => { ... },
+            state => {
+                button => { ... },
+                option => [ ... ],
+                output => [ ... ],
+            },
+        }
+    }
+
+The workflow can be specified using an ID or an L<OpenXPKI::Server::Workflow>
+object.
+
+B<Named parameters>:
 
 =over
 
-=item * ID - numeric workflow id
+=item * C<id> I<Int> - numeric workflow id
 
-=item * TYPE - workflow type
+=item * C<workflow> I<OpenXPKI::Server::Workflow> - workflow object
 
-=item * WORKFLOW - workflow object
-
-=item * ACTIVITY - Only return informations about this workflow action. Default:
-all actions available in the current state.
+=item * C<activity> I<Str> - only return informations about this workflow action.
+Default: all actions available in the current state.
 
 Note: you have to prepend the workflow prefix to the action separated by an
 underscore.
 
-=back
-
-You can pass certain flags to turn on/off components in the returned hash:
-
-=over
-
-=item * ATTRIBUTE - Boolean, set to get the extra attributes.
+=item * C<attribute> I<Bool> - set to 1 to get the extra attribute informations
 
 =back
 
 =cut
-sub get_workflow_ui_info {
-    ##! 1: 'start'
-    my ($self, $args) = @_;
+sub get_ui_info {
+    my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
+        id        => { isa => 'Int',  optional => 1 },
+        workflow  => { isa => 'OpenXPKI::Server::Workflow', optional => 1 },
+        attribute => { isa => 'Bool', optional => 1, default => 0 },
+        activity  => { isa => 'Str',  optional => 1, },
+    );
 
-    my $factory;
-    my $result = {};
+    die "Please specify either 'id' or 'workflow'" unless ($args{id} or $args{workflow});
 
-    # initial info receives a workflow title
-    my ($wf_description, $wf_state);
-    my @activities;
-    # TODO #spaghetti split into several methods instead of IF ELSE branches
-    # (one for search via ID/WORKFLOW and one for TYPE. Move code at bottom to separate method)
-    if (!$args->{ID} && !$args->{WORKFLOW}) {
+    my $workflow = $args{workflow}
+        ? $args{workflow}
+        : CTX('workflow_factory')->get_workflow({ ID => $args{id} });
 
-        if (!$args->{TYPE}) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_INFO_NO_WORKFLOW_GIVEN',
-                params => { ARGS => $args }
-            );
-        }
+    my $type = $workflow->type;
+    my $state = $workflow->state;
+    my $head = CTX('config')->get_hash([ 'workflow', 'def', $type, 'head' ]);
+    my $context = { %{$workflow->context->param } }; # make a copy
+    my $result = {
+        workflow => {
+            type        => $type,
+            id          => $workflow->id,
+            state       => $state,
+            label       => $head->{label},
+            description => $head->{description},
+            last_update => $workflow->last_update->iso8601,
+            proc_state  => $workflow->proc_state,
+            count_try   => $workflow->count_try,
+            wake_up_at  => $workflow->wakeup_at,
+            reap_at     => $workflow->reap_at,
+            context     => $context,
+            $args{attribute}
+                ? ( attribute => $workflow->attrib)
+                : (),
+        },
+        handles => $workflow->get_global_actions(),
+    };
 
-        # TODO we might use the OpenXPKI::Workflow::Config object for this
-        # Note: Using create_workflow shreds a workflow id and creates an orphaned entry in the history table
-        $factory = CTX('workflow_factory')->get_factory();
+    # fetch actions of current state (or use given action)
+    my @activities = $args{activity} ? ($args{activity}) : $workflow->get_current_actions();
 
-        if (!$factory->authorize_workflow({ ACTION => 'create', TYPE => $args->{TYPE} })) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_INFO_NOT_AUTHORIZED',
-                params => { ARGS => $args }
-            );
-        }
-
-        my $wf_config = $factory->_get_workflow_config($args->{TYPE});
-        # extract the action in the initial state from the config
-        foreach my $state (@{$wf_config->{state}}) {
-            next if ($state->{name} ne 'INITIAL');
-            @activities = ($state->{action}->[0]->{name});
-            last;
-        }
-
-        $result->{workflow} = {
-            type        => $args->{TYPE},
-            id          => 0,
-            state       => 'INITIAL',
-        };
-
-    } else {
-
-        my $workflow;
-        if ($args->{ID}) {
-            $workflow = CTX('workflow_factory')->get_workflow({ ID => $args->{ID}} );
-        } else {
-            $workflow = $args->{WORKFLOW};
-        }
-
-        ##! 32: 'Workflow raw result ' . Dumper $workflow
-
-        $factory = $workflow->factory();
-
-        $result->{workflow} = {
-            id          => $workflow->id(),
-            state       => $workflow->state(),
-            type        => $workflow->type(),
-            last_update => $workflow->last_update()->iso8601(),
-            proc_state  => $workflow->proc_state(),
-            count_try   => $workflow->count_try(),
-            wake_up_at  => $workflow->wakeup_at(),
-            reap_at     => $workflow->reap_at(),
-            context     => { %{$workflow->context()->param() } },
-        };
-
-        if ($args->{ATTRIBUTE}) {
-            $result->{workflow}->{attribute} = $workflow->attrib();
-        }
-
-        $result->{handles} = $workflow->get_global_actions();
-
-        ##! 32: 'Workflow result ' . Dumper $result
-        if ($args->{ACTIVITY}) {
-            @activities = ( $args->{ACTIVITY} );
-        } else {
-            @activities = $workflow->get_current_actions();
-        }
-    }
-
-    $result->{activity} = {};
-
-    OpenXPKI::Connector::WorkflowContext::set_context( $result->{WORKFLOW}->{CONTEXT} );
-    foreach my $wf_action (@activities) {
-        $result->{activity}->{$wf_action} = $factory->get_action_info( $wf_action, $result->{workflow}->{type} );
-    }
-    OpenXPKI::Connector::WorkflowContext::set_context();
-
-    # Add Workflow UI Info
-    my $head = CTX('config')->get_hash([ 'workflow', 'def', $result->{workflow}->{type}, 'head' ]);
-    $result->{workflow}->{label} = $head->{label};
-    $result->{workflow}->{description} = $head->{description};
-
-    # Add State UI Info
-    my $ui_state = CTX('config')->get_hash([ 'workflow', 'def', $result->{workflow}->{type}, 'state', $result->{workflow}->{state} ]);
-    my @ui_state_out;
-    if ($ui_state->{output}) {
-        if (ref $ui_state->{output} eq 'ARRAY') {
-            @ui_state_out = @{$ui_state->{output}};
-        } else {
-            @ui_state_out = CTX('config')->get_list([ 'workflow', 'def', $result->{workflow}->{type}, 'state', $result->{workflow}->{state}, 'output' ]);
-        }
-
-        $ui_state->{output} = [];
-        foreach my $field (@ui_state_out) {
-            # Load the field definitions
-            push @{$ui_state->{output}}, $factory->get_field_info($field, $result->{workflow}->{type} );
-        }
-    }
-
-    # Info for buttons
-    $result->{state} = $ui_state;
-
-    my $button = $result->{state}->{button};
-    $result->{state}->{button} = {};
-    delete $result->{state}->{action};
-
-
-    # Add the possible options (=activity names) in the right order
-    my @options = CTX('config')->get_scalar_as_list([ 'workflow', 'def', $result->{workflow}->{type},  'state', $result->{workflow}->{state}, 'action' ]);
-
-    # Check defined actions against possible ones, non global actions are prefixed
-    $result->{state}->{option} = [];
-
-    ##! 16: 'Testing actions ' .  Dumper \@options
-    foreach my $option (@options) {
-
-        $option =~ m{ \A (((global_)?)([^\s>]+))}xs;
-        $option = $1;
-        my $option_base = $4;
-
-        my $action;
-        if ($3) { # global or not
-            $action = 'global_'.$option_base;
-        } else {
-            $action = $head->{prefix}.'_'.$option_base;
-        }
-        ##! 16: 'Activity ' . $action
-        ##! 64: 'Available actions ' . Dumper keys %{$result->{ACTIVITY}}
-        if ($result->{activity}->{$action}) {
-            push @{$result->{state}->{option}}, $action;
-        }
-
-        # Add button config if available
-        $result->{state}->{button}->{$action} = $button->{$option} if ($button->{$option});
-    }
-
-    # add button markup (head)
-    if ($button->{_head}) {
-        $result->{state}->{button}->{_head} = $button->{_head};
-    }
+    # additional infos
+    my $add = $self->_get_config_details($workflow->factory, $result->{workflow}->{type}, $head->{prefix}, $state, \@activities, $context);
+    $result->{$_} = $add->{$_} for keys %{ $add };
 
     return $result;
 }
 
+=head2 get_ui_base_info
+
+Returns informations about a workflow type from the workflow config as a I<HashRef>:
+
+    {
+        workflow => {
+                type        => ...,
+                id          => ...,
+                state       => ...,
+                label       => ...,
+                description => ...,
+            },
+            activity => { ... },
+            state => {
+                button => { ... },
+                option => [ ... ],
+                output => [ ... ],
+            },
+        }
+    }
+
+B<Positional parameters>:
+
+=over
+
+=item * C<$type> I<Str> - workflow type
+
+=back
+
+=cut
+sub get_ui_base_info {
+    my ($self, $type) = @_;
+
+    # TODO we might use the OpenXPKI::Workflow::Config object for this
+    # Note: Using create_workflow shreds a workflow id and creates an orphaned entry in the history table
+    my $factory = CTX('workflow_factory')->get_factory();
+
+    if (not $factory->authorize_workflow({ ACTION => 'create', TYPE => $type })) {
+        OpenXPKI::Exception->throw(
+            message => 'User is not authorized to fetch workflow info',
+            params => { type => $type }
+        );
+    }
+
+    my $state = 'INITIAL';
+    my $head = CTX('config')->get_hash([ 'workflow', 'def', $type, 'head' ]);
+    my $result = {
+        workflow => {
+            type        => $type,
+            id          => 0,
+            state       => $state,
+            label       => $head->{label},
+            description => $head->{description},
+        },
+    };
+
+    # fetch actions in state INITIAL from the config
+    my $wf_config = $factory->_get_workflow_config($type);
+    my @actions;
+    for my $state (@{$wf_config->{state}}) {
+        next unless $state->{name} eq 'INITIAL';
+        @actions = ($state->{action}->[0]->{name});
+        last;
+    }
+
+    # additional infos
+    my $add = $self->_get_config_details($factory, $type, $head->{prefix}, $state, \@actions, undef);
+    $result->{$_} = $add->{$_} for keys %{ $add };
+
+    return $result;
+}
+
+# Returns a HashRef with configuration details (actions, states) of the given
+# workflow type and state.
+sub _get_config_details {
+    my ($self, $factory, $type, $prefix, $state, $actions, $context) = @_;
+    my $result = {};
+
+    # add activities (= actions)
+    $result->{activity} = {};
+
+    OpenXPKI::Connector::WorkflowContext::set_context($context) if $context;
+    for my $action (@{ $actions }) {
+        $result->{activity}->{$action} = $factory->get_action_info($action, $type);
+    }
+    OpenXPKI::Connector::WorkflowContext::set_context() if $context;
+
+    # add state UI info
+    my $ui_state = CTX('config')->get_hash([ 'workflow', 'def', $type, 'state', $state ]);
+    # replace hash key "output" with detailed field informations
+    if ($ui_state->{output}) {
+        my @output_fields = ref $ui_state->{output} eq 'ARRAY'
+            ? @{ $ui_state->{output} }
+            : CTX('config')->get_list([ 'workflow', 'def', $type, 'state', $state, 'output' ]);
+
+        # query detailed field informations
+        $ui_state->{output} = [ map { $factory->get_field_info($_, $type) } @output_fields ];
+    }
+    $result->{state} = $ui_state;
+
+    # delete "action"
+    delete $result->{state}->{action};
+
+    # add button info
+    my $button = $result->{state}->{button};
+    $result->{state}->{button} = {};
+
+    # possible options (=activity names) in the right order
+    my @options = CTX('config')->get_scalar_as_list([ 'workflow', 'def', $type, 'state', $state, 'action' ]);
+
+    # check defined actions and only list the possible ones
+    # (non global actions are prefixed)
+    $result->{state}->{option} = [];
+    for my $option (@options) {
+        $option =~ m{ \A (((global_)?)([^\s>]+))}xs;
+        $option = $1;
+        my $global = $3;
+        my $option_base = $4;
+
+        my $action = sprintf("%s_%s", $global ? "global" : $prefix, $option_base);
+        ##! 16: 'Activity ' . $action
+        ##! 64: 'Available actions ' . Dumper keys %{$result->{ACTIVITY}}
+        push @{$result->{state}->{option}}, $action if $result->{activity}->{$action};
+
+        # Add button config if available
+        $result->{state}->{button}->{$action} = $button->{$option} if $button->{$option};
+    }
+
+    # add button markup (head)
+    $result->{state}->{button}->{_head} = $button->{_head} if $button->{_head};
+
+    return $result;
+}
 =head2 get_workflow_info
 
-Return a hash with the informations taken from the workflow engine plus.
+Return a hash with the informations taken from the workflow engine.
 
 B<Positional parameters>:
 

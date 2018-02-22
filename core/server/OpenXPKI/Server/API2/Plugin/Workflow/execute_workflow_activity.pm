@@ -100,7 +100,7 @@ command "execute_workflow_activity" => {
     }
 
     if ($params->ui_info) {
-        return $util->get_workflow_ui_info({ WORKFLOW => $workflow });
+        return $util->get_ui_info(id => $wf_id);
     }
     else {
         return $util->get_workflow_info($workflow);

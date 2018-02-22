@@ -37,6 +37,7 @@ sub workflow_def {
             },
             'PERSIST' => {
                 'action' => [ 'add_message add_link set_motd > SUCCESS' ],
+                'output' => [ 'dummy_arg', ],
             },
             'SUCCESS' => {
                 'label' => 'I18N_OPENXPKI_UI_WORKFLOW_SET_MOTD_SUCCESS_LABEL',
@@ -272,6 +273,13 @@ lives_and {
         STATE => {
             button => {},
             option => [ 'wftype2_add_message' ],
+            output => [
+                {
+                    name => 'dummy_arg',
+                    type => 'text',
+                    required => 0,
+                },
+            ],
         },
         ACTIVITY => {
             wftype2_add_message => {
