@@ -17,7 +17,7 @@ use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 use OpenXPKI::Test::CertHelper::Database;
 
-plan tests => 39;
+plan tests => 40;
 
 #
 # Setup test context
@@ -270,6 +270,18 @@ lives_and {
 #   $wf_t4      manual      PERSIST     wilhelm     beta
 #
 
+
+#
+# list_workflow_titles
+#
+lives_and {
+    my $result = $oxitest->api2_command("list_workflow_titles");
+    cmp_deeply $result, superhashof({
+        'wf_type_1'         => { label => ignore(), description => ignore(), },
+        'wf_type_2'         => { label => ignore(), description => ignore(), },
+        'wf_type_3_unused'  => { label => ignore(), description => ignore(), },
+    });
+} "list_workflow_titles()";
 
 #
 # get_workflow_info
@@ -617,8 +629,8 @@ search_result { check_acl => 1 },
 #
 # search_workflow_instances_count
 #
-note "Sleep a second to give workflow persister time to write to DB";
-sleep 1;
+note "Sleep two seconds to give workflow persister time to write to DB";
+sleep 2;
 lives_and {
     my $result = $oxitest->api2_command("search_workflow_instances_count" => { id => [ $wf_t1_a->{id}, $wf_t1_b->{id}, $wf_t2->{id} ] });
     is $result, 3;
