@@ -157,6 +157,7 @@ sub get_session_info {
         pki_realm_label => CTX('config')->get([ 'system', 'realms', $session->data->pki_realm, 'label' ]),
         lang => 'en',
         checksum => CTX('config')->checksum(),
+        sid => substr($session->id,0,4),
     }
 
 }
