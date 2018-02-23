@@ -15,6 +15,7 @@ use Data::Dumper;
 use JSON;
 
 use OpenXPKI::Client;
+use OpenXPKI::Log4perl;
 
 my %params = (
     authstack => '_System',
@@ -26,18 +27,31 @@ my %params = (
     arg => [],
     timeout => 30,
     json => undef,
+    session  => undef,
     );
 
 sub debug {
     my $arg = shift;
     if ($params{debug}) {
-    print $arg . "\n";
+        Log::Log4perl->get_logger("")->debug( $arg );
     }
 }
 
 sub print_json {
     my $msg = shift;
     print JSON->new->pretty(1)->encode($msg);
+}
+
+sub output {
+
+    my $msg = shift;
+
+    if ($params{json}) {
+        print_json($msg);
+    } elsif (!$msg->{error}) {
+        print Dumper $msg;
+        print "\ndone\n";
+    }
 }
 
 GetOptions(\%params,
@@ -54,6 +68,7 @@ GetOptions(\%params,
             param|set=s@
             arg=s@
             timeout|to=i
+            session
             debug
             json
          )) or pod2usage(-verbose => 0);
@@ -98,8 +113,10 @@ if($params{instance}){
     $params{socketfile} = sprintf '/var/openxpki/%s/openxpki.socket', $params{instance};
 } elsif(!$params{socketfile}){
     $params{socketfile} = '/var/openxpki/openxpki.socket';
-    printf STDERR "using default socket %s \n", $params{socketfile};
+    debug("using default socket %s \n", $params{socketfile});
 }
+
+OpenXPKI::Log4perl::init_or_fallback('' , $params{debug} ? 'DEBUG' : 'WARN');
 
 debug(sprintf("Socketfile: %s", $params{socketfile}));
 
@@ -116,6 +133,27 @@ if (! defined $client) {
 
 if (! $client->init_session()) {
     die "Could not initiate OpenXPKI server session. Stopped";
+}
+if ($params{session}) {
+
+    if ($params{json}) {
+        output({ error => "json together with session is not supported yet" });
+        exit 1;
+    }
+
+    # session mode and session id in env, try to reinit session
+    if ($command eq 'login') {
+        # noop
+    } elsif ($ENV{OPENXPKI_SESSION_ID}) {
+        $reply = $client->init_session( { SESSION_ID => $ENV{OPENXPKI_SESSION_ID} } );
+        if ($reply->{SERVICE_MSG} ne 'SERVICE_READY') {
+            die "Login with session id failed";
+        }
+    # no session in env and login not requested
+    } else {
+        die "Please set the session id via environment OPENXPKI_SESSION_ID";
+    }
+
 }
 
 my $session_id = $client->get_session_id();
@@ -176,14 +214,17 @@ while (1) {
     }
 
     if ($reply->{SERVICE_MSG} eq 'SERVICE_READY') {
+
+        # if we are in session mode login sequence print session id
+        if ($command eq 'login') {
+            printf "OPENXPKI_SESSION_ID=%s; export OPENXPKI_SESSION_ID;\n", $client->get_session_id();
+            exit 0;
+        }
         last SERVICE_MESSAGE;
     }
 
-    if ($params{json}) {
-        print_json({ error => $reply });
-    } else {
-        print Dumper $reply;
-    }
+    output({ error => $reply  });
+
     die "Unhandled service message. Stopped";
 }
 
@@ -199,29 +240,28 @@ if (%parameters) {
     }
 }
 
-$reply = $client->send_receive_service_msg('COMMAND', {
-    COMMAND => $command,
-    PARAMS => \%args
-});
 
-if ($reply->{SERVICE_MSG} eq 'COMMAND') {
-
-    if (!$params{json}) {
-        print Dumper $reply->{PARAMS};
-        print "done\n";
-    } else {
-       print_json({ result => $reply->{PARAMS} });
+if ($command ne 'logout') {
+    $reply = $client->send_receive_service_msg('COMMAND', {
+        COMMAND => $command,
+        PARAMS => \%args
+    });
+    # terminate the login session if we are not in "session reuse" mode
+    if (!$params{session}) {
+        $client->logout();
     }
-    exit 0;
+
+    if ($reply->{SERVICE_MSG} eq 'COMMAND') {
+        output({ result => $reply->{PARAMS} });
+        exit 0;
+    } else {
+        output({ error => $reply  });
+        exit 1;
+    }
+
 } else {
-    if (!$params{json}) {
-        print "Error:\n";
-        print Dumper $reply;
-        print "\n";
-    } else {
-        print_json({ error => $reply });
-    }
-    exit 1;
+    $client->logout();
+    debug('Client session terminated');
 }
 
 
@@ -250,6 +290,7 @@ openxpkicli [options] command
     --debug               enable debug mode
     --timeout             socket timeout in seconds (default 30s)
     --json
+    --session             session mode, see below for details
 
 =head1 INVOCATION
 
@@ -263,4 +304,49 @@ calls on one command.
 =head1 EXAMPLES
 
 openxpkicli --realm "Server CA" --arg message=testmail --param rcpt=pki@mycompany.local send_notification
+
+=head1 Operational Modes
+
+=head2 Batch
+
+This is the default mode, you must pass all parameters as arguments as
+stated above. The client will try to login with the credentials given
+(or as anonymous) and run the provided command.
+
+=head2 Session
+
+Activated by adding I<--session> to the command line. This mode allows you
+to reuse an existing session id for subsequent calls to a command. The
+session id must be passed in the environment variable OPENXPKI_SESSION_ID.
+
+To initialize a session, call openxpkicli with the expected auth* parameters
+and pass I<login> as command. This will perform the login and print the
+session id as output. Put the received id into the environment and run your
+commands. If you are done, pass command I<logout>.
+
+If you are using bash, the output of the init command can be directly
+passed to an I<eval> to set the environment.
+
+B<Note>: session mode is currently not fully compatible with --json (session
+init and error handling do not print proper json).
+
+B<Example>
+
+    `openxpkicli --authstack=Testing --authuser=raop --authpass=openxpki \
+        --session login`
+
+    echo $OPENXPKI_SESSION_ID
+
+    openxpkicli --session get_session_info
+
+    openxpkicli --session logout
+
+Pass I<--session> as parameter and pass the ID of an existings session in
+
+=head2 Interactive
+
+Not supported yet :)
+
+
+
 
