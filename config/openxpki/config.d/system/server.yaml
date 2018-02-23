@@ -1,11 +1,6 @@
 # Shown in the processlist to distinguish multiple instances
 name: main
 
-# this is the former server_id/server_shift from the database config
-shift: 8
-node:
-    id: 0
-
 # Location of the log4perl configuration
 log4perl: /etc/openxpki/log.conf
 
@@ -16,7 +11,7 @@ socket_file:  /var/openxpki/openxpki.socket
 pid_file:     /var/run/openxpkid.pid
 stderr:       /var/log/openxpki/stderr.log
 tmpdir:       /var/tmp
-environment:
+# environment:
 #    key: value
 
 # Session - default is now to use the database to enable node failover
@@ -45,10 +40,4 @@ service:
 i18n:
     locale_directory: /usr/share/locale
     default_language: C
-
-# Dataexhange directories - might be wise to have this per realm?
-data_exchange:
-    export: /var/openxpki/dataexchange/export
-    import: /var/openxpki/dataexchange/import
-
 
