@@ -48,12 +48,21 @@ B<Parameters:>
 
 =over
 
-=item * C<$config> - configuration: file path, reference to SCALAR or HashRef
+=item * C<$config>
 
-=item * C<$fallback_prio> - log priority (level) to use for output to STDERR if
-there is a problem with the given config (optional, default: WARN)
+configuration: file path, reference to SCALAR or HashRef or empty string
+
+=item * C<$fallback_prio>
+
+log priority (level) to use for output to STDERR if there is a problem with
+the given config (optional, default: WARN)
 
 =back
+
+If the first parameter is undef or the config file is not found, the
+constructor will print a warning message. So if you are fine with the default
+screen logger, pass an empty string as first an, optional, the wanted log
+level as second parameter.
 
 =cut
 
@@ -70,16 +79,22 @@ sub init_or_fallback {
 
     my @warnings = ();
 
-    if (defined $config) {
-        if (ref $config eq 'SCALAR' or ref $config eq 'HASH' or -f $config) {
+    # config is set and not empty
+    if ($config) {
+
+        if (!ref $config) {
+            push @warnings, "Log4perl configuration file $config not found" unless (-f $config);
+        } elsif (!(ref $config eq 'SCALAR' or ref $config eq 'HASH')) {
+            push @warnings, "Log4perl configuration  unsupported format";
+        } else {
             Log::Log4perl->init($config);
             return;
         }
-        push @warnings, "Log4perl configuration file $config not found";
+    # pass an empty string to tell us you are fine with the default logger
+    } elsif (!defined $config) {
+        # if not initialized: complain and init screen logger
+        push @warnings, "Initializing Log4perl in fallback mode (output to STDERR)";
     }
-
-    # if not initialized: complain and init screen logger
-    push @warnings, "Initializing Log4perl in fallback mode (output to STDERR)";
 
     Log::Log4perl->init({
         "log4perl.rootLogger" => uc($fallback_prio).", SCREEN",
@@ -111,3 +126,5 @@ sub _add_patternlayout_spec {
 }
 
 1;
+
+__END__;
