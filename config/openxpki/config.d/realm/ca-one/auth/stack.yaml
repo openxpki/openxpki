@@ -1,37 +1,31 @@
 Anonymous:
-    description: I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_ANONYMOUS
     handler: Anonymous
 
 User:
-    description: I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_USER
     handler: User NoAuth
 
 Operator:
-    description: I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_OPERATOR
     handler: Operator Password
 
 Testing:
-    description: This handler is used internally for testing, REMOVE IT
     handler: TestAccounts
 
+OTP:
+  handler: OneTimePassword
+
 #External Dynamic:
-#    description: I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_EXTERNAL_DYNAMIC
 #    handler: External Dynamic Role
 
 #External Static:
-#    description: I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_EXTERNAL_STATIC
 #    handler: External Static Role
 
 #Certificate Challenge/Response:
-#    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE
 #    handler: Signature
 
 #Certificate via Webserver:
-#    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE_WEBSERVER
 #    handler: Certificate
 
 _System:
-    description: I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_AUTH_SYSTEM
     handler: System
 
 _SmartCard:

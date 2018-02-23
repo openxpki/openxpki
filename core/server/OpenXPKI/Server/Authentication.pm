@@ -18,14 +18,6 @@ use Data::Dumper;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
-use OpenXPKI::Server::Authentication::Anonymous;
-use OpenXPKI::Server::Authentication::External;
-use OpenXPKI::Server::Authentication::Password;
-use OpenXPKI::Server::Authentication::ChallengeX509;
-use OpenXPKI::Server::Authentication::ClientSSO;
-use OpenXPKI::Server::Authentication::ClientX509;
-use OpenXPKI::Server::Authentication::Connector;
-
 ## constructor and destructor stuff
 
 sub new {
@@ -126,26 +118,21 @@ sub __load_handler
     ##! 8: "load handler type"
 
     my $type = $config->get("auth.handler.$handler.type");
+    $type =~ s/[^a-zA-Z0-9]//g;
 
     ##! 8: "name ::= $handler"
     ##! 8: "type ::= $type"
     my $class = "OpenXPKI::Server::Authentication::$type";
-    $self->{PKI_REALM}->{$realm}->{HANDLER}->{$handler} = eval {
-        $class->new( "auth.handler.$handler" );
-    };
-    if (my $exc = OpenXPKI::Exception->caught())
-    {
-        ##! 16: "exception from authentication sub module $class detected"
+    eval "use $class;1";
+    if ($EVAL_ERROR) {
         OpenXPKI::Exception->throw (
-            message  => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOAD_HANDLER_FAILED",
-            children => [ $exc ]);
+            message => "Unable to load authentication handler class $type",
+            params  => {ERRVAL => $EVAL_ERROR});
     }
-    elsif ($EVAL_ERROR)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOAD_HANDLER_CRASHED",
-            params  => {ERRVAL => $EVAL_ERROR->message()});
-    }
+
+    $self->{PKI_REALM}->{$realm}->{HANDLER}->{$handler} = $class->new( "auth.handler.$handler" );
+
+    CTX('log')->auth()->info('Loaded auth handler ' . $handler);
 
     ##! 4: "end"
     return 1;

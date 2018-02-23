@@ -97,6 +97,11 @@ SmartCard:
     role: SmartCard
     user: scpers
 
+OneTimePassword:
+  type: OneTimePassword
+  salt: openxpki
+  role: User
+
 # Sample using a Password "bind" connector
 Password Connector:
     type: Connector

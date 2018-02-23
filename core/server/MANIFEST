@@ -285,6 +285,7 @@ OpenXPKI/Server/Authentication/X509.pm
 OpenXPKI/Server/Authentication/ClientX509.pm
 OpenXPKI/Server/Authentication/ChallengeX509.pm
 OpenXPKI/Server/Authentication/Connector.pm
+OpenXPKI/Server/Authentication/OneTimePassword.pm
 #OpenXPKI/Server/ACL.pm
 
 OpenXPKI/Server/Notification/RT.pm
