@@ -81,14 +81,14 @@ sub init_or_fallback {
 
     # config is set and not empty
     if ($config) {
-
         if (!ref $config) {
-            push @warnings, "Log4perl configuration file $config not found" unless (-f $config);
+            if (!-f $config) {
+                push @warnings, "Log4perl configuration file $config not found";
+                $config = undef;
+            }
         } elsif (!(ref $config eq 'SCALAR' or ref $config eq 'HASH')) {
             push @warnings, "Log4perl configuration  unsupported format";
-        } else {
-            Log::Log4perl->init($config);
-            return;
+            $config = undef;
         }
     # pass an empty string to tell us you are fine with the default logger
     } elsif (!defined $config) {
@@ -96,14 +96,16 @@ sub init_or_fallback {
         push @warnings, "Initializing Log4perl in fallback mode (output to STDERR)";
     }
 
-    Log::Log4perl->init({
+    $config = {
         "log4perl.rootLogger" => uc($fallback_prio).", SCREEN",
         "log4perl.appender.SCREEN" => "Log::Log4perl::Appender::Screen",
         "log4perl.appender.SCREEN.layout" => "PatternLayout",
         "log4perl.appender.SCREEN.layout.ConversionPattern" => "%d [%p] %i %m%n",
-    });
+    } unless($config);
 
+    Log::Log4perl->init($config);
     Log::Log4perl->get_logger("")->warn($_) for @warnings;
+
 }
 
 # Add custom PatternLayout placeholder %i which shows all MDC variables
