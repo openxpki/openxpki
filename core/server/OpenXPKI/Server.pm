@@ -449,6 +449,13 @@ sub do_process_request {
         });
         $transport->write($serializer->serialize('OK'));
     }
+    elsif ($data eq 'LibSCEP') {
+        $service = OpenXPKI::Service::LibSCEP->new({
+            TRANSPORT     => $transport,
+            SERIALIZATION => $serializer,
+        });
+        $transport->write($serializer->serialize('OK'));
+    }
     else {
         $transport->write($serializer->serialize("OpenXPKI::Server: Unsupported service.\n"));
         $log->fatal("Unsupported service.");
