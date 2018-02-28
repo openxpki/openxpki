@@ -36,6 +36,20 @@ has __default_grid_row => (
     ]; }
 );
 
+
+has __proc_states  => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    lazy => 1,
+    default => sub { return [
+        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL', value => 'manual' },
+        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE', value => 'pause' },
+        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED', value => 'retry_exceeded' },
+        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION', value => 'exception' },
+        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED', value => 'finished' },
+    ]; }
+);
+
 extends 'OpenXPKI::Client::UI::Result';
 
 =head1 OpenXPKI::Client::UI::Workflow
@@ -262,16 +276,6 @@ sub init_search {
     my @wfl_list = map { $_ = {'value' => $_, 'label' => $workflows->{$_}->{label}} } @wf_names ;
     @wfl_list = sort { lc($a->{'label'}) cmp lc($b->{'label'}) } @wfl_list;
 
-    my @proc_states = (
-
-        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL', value => 'manual' },
-        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE', value => 'pause' },
-        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED', value => 'retry_exceeded' },
-        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION', value => 'exception' },
-        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED', value => 'finished' },
-
-    );
-
     my @fields = (
         { name => 'wf_type',
           label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_LABEL',
@@ -287,7 +291,7 @@ sub init_search {
           type => 'select',
           is_optional => 1,
           prompt => '',
-          options => \@proc_states,
+          options => $self->__proc_states(),
           value => $preset->{wf_proc_state}
         },
         { name => 'wf_state',
@@ -410,9 +414,10 @@ sub init_result {
     if ($result->{page} && ref $result->{page} ne 'HASH') {
         $self->_page($result->{page});
     } else {
+        my $criteria = '<br>' . (join ", ", @{$result->{criteria}});
         $self->_page({
             label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE',
-            description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION',
+            description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION' . $criteria ,
         });
     }
 
@@ -1198,23 +1203,26 @@ sub action_search {
     my $args = shift;
 
     my $query = { };
+    my $verbose = {};
     my $input;
 
     if ($self->param('wf_type')) {
         $query->{type} = $self->param('wf_type');
         $input->{wf_type} = $self->param('wf_type');
+        $verbose->{wf_type} = $self->param('wf_type');
 
     }
 
     if ($self->param('wf_state')) {
         $query->{state} = $self->param('wf_state');
         $input->{wf_state} = $self->param('wf_state');
-
+        $verbose->{wf_state} = $self->param('wf_state');
     }
 
     if ($self->param('wf_proc_state')) {
         $query->{proc_state} = $self->param('wf_proc_state');
         $input->{wf_proc_state} = $self->param('wf_proc_state');
+        $verbose->{wf_proc_state} = 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_' . uc($self->param('wf_proc_state'));
     }
 
     # Read the query pattern for extra attributes from the session
@@ -1229,6 +1237,7 @@ sub action_search {
     if ($self->param('wf_creator')) {
         $input->{wf_creator} = $self->param('wf_creator');
         $attr->{'creator'} = ~~$self->param('wf_creator');
+        $verbose->{wf_creator} = $self->param('wf_creator');
     }
 
 
@@ -1251,6 +1260,20 @@ sub action_search {
         $header = $self->__default_grid_head;
     }
 
+    my @criteria;
+    foreach my $item ((
+        { name => 'wf_type', label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_LABEL' },
+        { name => 'wf_proc_state', label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL' },
+        { name => 'wf_state', label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_LABEL' },
+        { name => 'wf_creator', label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL'}
+        )) {
+        my $val = $verbose->{ $item->{name} };
+        next unless ($val);
+        $val =~ s/[^\w\s*\,]//g;
+        push @criteria, sprintf '<nobr><b>%s:</b> <i>%s</i></nobr>', $item->{label}, $val;
+    }
+
+
     my $queryid = $self->__generate_uid();
     $self->_client->session()->param('query_wfl_'.$queryid, {
         'id' => $queryid,
@@ -1260,6 +1283,7 @@ sub action_search {
         'input' => $input,
         'header' => $header,
         'column' => $body,
+        'criteria' => \@criteria
     });
 
     $self->redirect( 'workflow!result!id!'.$queryid  );
