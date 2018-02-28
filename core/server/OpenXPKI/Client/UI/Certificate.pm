@@ -48,6 +48,24 @@ has __default_grid_row => (
     ]; }
 );
 
+has __validity_options => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    lazy => 1,
+    default => sub { return [
+        { value => 'valid_at', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_VALID_AT' },
+        { value => 'valid_before', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTBEFORE_LT' },
+        { value => 'valid_after', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTBEFORE_GT' },
+        { value => 'expires_before', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTAFTER_LT' },
+        { value => 'expires_after', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTAFTER_GT' },
+        { value => 'revoked_before', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_REVOKED_LT' },
+        { value => 'revoked_after', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_REVOKED_GT' },
+        { value => 'invalid_before', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_LT' },
+        { value => 'invalid_after', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_GT' },
+    ]; }
+);
+
+
 extends 'OpenXPKI::Client::UI::Result';
 
 sub BUILD {
@@ -95,26 +113,13 @@ sub init_search {
         $preset = $result->{input};
     }
 
-    my @validity_options = (
-        { value => 'valid_at', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_VALID_AT' },
-        { value => 'valid_before', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTBEFORE_LT' },
-        { value => 'valid_after', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTBEFORE_GT' },
-        { value => 'expires_before', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTAFTER_LT' },
-        { value => 'expires_after', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_NOTAFTER_GT' },
-        { value => 'revoked_before', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_REVOKED_LT' },
-        { value => 'revoked_after', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_REVOKED_GT' },
-        { value => 'invalid_before', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_LT' },
-        { value => 'invalid_after', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_GT' },
-
-    );
-
     my @fields = (
         { name => 'subject', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', type => 'text', is_optional => 1, value => $preset->{subject} },
         { name => 'san', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SAN', type => 'text', is_optional => 1, value => $preset->{san} },
         { name => 'status', label => 'I18N_OPENXPKI_UI_CERTIFICATE_STATUS', type => 'select', is_optional => 1, prompt => 'all', options => \@states, , value => $preset->{status} },
         { name => 'profile', label => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE', type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list, value => $preset->{profile} },
         { name => 'issuer_identifier', label => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER', type => 'select', is_optional => 1, prompt => 'all', options => \@issuer_list, value => $preset->{issuer_identifier} },
-        { name => 'validity', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY', 'keys' => \@validity_options, type => 'datetime', is_optional => 1, clonable => 1, value => $preset->{validity_options} || [ { key => 'valid_at', value => '' }], },
+        { name => 'validity', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY', 'keys' => $self->__validity_options(), type => 'datetime', is_optional => 1, clonable => 1, value => $preset->{validity_options} || [ { key => 'valid_at', value => '' }], },
    );
 
     my $attributes = $self->_client->session()->param('certsearch')->{default}->{attributes};
@@ -207,9 +212,11 @@ sub init_result {
 
     $self->logger()->debug( "search result: " . Dumper $search_result);
 
+    my $criteria = '<br>' . (join ", ", @{$result->{criteria}});
+
     $self->_page({
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL',
-        description => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_DESC',
+        description => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_DESC' . $criteria ,
     });
 
     my $pager;
@@ -1087,11 +1094,13 @@ sub action_search {
 
     my $query = { entity_only => 1 };
     my $input = {}; # store the input data the reopen the form later
+    my $verbose = {};
     foreach my $key (qw(subject issuer_dn)) {
         my $val = $self->param($key);
         if (defined $val && $val ne '') {
             $query->{$key} = '%'.$val.'%';
             $input->{$key} = $val;
+            $verbose->{$key} = $val;
         }
     }
 
@@ -1100,11 +1109,21 @@ sub action_search {
         if (defined $val && $val ne '') {
             $input->{$key} = $val;
             $query->{$key} = $val;
+            if ($key eq 'profile') {
+                $verbose->{$key} = $self->send_command( 'render_template', {
+                    TEMPLATE => '[% USE Profile %][% Profile.name(value) %]', PARAMS => { value => $val }
+                });
+            } elsif ($key eq 'issuer_identifier') {
+                $verbose->{$key} = $self->send_command( 'render_template', {
+                    TEMPLATE => '[% USE Certificate %][% Certificate.body(value, "subject") %]', PARAMS => { value => $val }
+                });
+            }
         }
     }
 
     if (my $status = $self->param('status')) {
         $input->{'status'} = $status;
+        $verbose->{'status'} = 'I18N_OPENXPKI_UI_CERT_STATUS_'.uc($status);
         if ($status eq 'VALID') {
             $status = 'ISSUED';
             my $now = time();
@@ -1125,6 +1144,8 @@ sub action_search {
             next;
         }
         push @{$input->{validity_options}}, { key => $key, value => $val[0] };
+
+        $verbose->{$key} = DateTime->from_epoch( epoch => $val[0] )->iso8601();
 
         if ($key eq 'valid_at') {
             if (!$query->{valid_before} || $query->{valid_before} < $val[0]) {
@@ -1176,6 +1197,27 @@ sub action_search {
         $header = $self->__default_grid_head;
     }
 
+    my @criteria;
+    foreach my $item ((
+        { name => 'subject', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT' },
+        { name => 'san', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SAN' },
+        { name => 'status', label => 'I18N_OPENXPKI_UI_CERTIFICATE_STATUS'  },
+        { name => 'profile', label => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE' },
+        { name => 'issuer_identifier', label => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER' }
+        )) {
+
+        my $val = $verbose->{ $item->{name} };
+        next unless ($val);
+        $val =~ s/[^\w\s*\,]//g;
+        push @criteria, sprintf '<nobr><b>%s:</b> <i>%s</i></nobr>', $item->{label}, $val;
+    }
+
+    foreach my $item (@{$self->__validity_options()}) {
+        my $val = $verbose->{ $item->{value} };
+        next unless ($val);
+        push @criteria, sprintf '<nobr><b>%s:</b> <i>%s</i></nobr>', $item->{label}, $val;
+    }
+
     my $queryid = $self->__generate_uid();
     $self->_client->session()->param('query_cert_'.$queryid, {
         'id' => $queryid,
@@ -1185,6 +1227,7 @@ sub action_search {
         'input' => $input,
         'header' => $header,
         'column' => $body,
+        'criteria' => \@criteria
     });
 
     $self->redirect( 'certificate!result!id!'.$queryid  );
