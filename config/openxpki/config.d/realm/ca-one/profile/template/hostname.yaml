@@ -5,4 +5,4 @@ type: freetext
 preset: "[% CN.0.replace(':.*','') %]"
 match: \A [a-zA-Z0-9] [a-zA-Z0-9-]* (\.[a-zA-Z0-9-]*[a-zA-Z0-9])* \z
 width: 60
-default: fully.qualified.example.com
+placeholder: fully.qualified.example.com

@@ -17,4 +17,7 @@ max: 1
 width: 40
 # The dispay size of the html element (only with textarea)
 height: 10
-# Default value to be filled in the form
+# Hint shown in the field as text
+placeholder: OpenXPKI Inc
+# Tooltip shown when user hovers over the item
+tooltip: Enter your company name here

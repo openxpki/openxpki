@@ -3,3 +3,4 @@ label: I18N_OPENXPKI_UI_PROFILE_REQUESTOR_FIRSTNAME
 description: I18N_OPENXPKI_UI_PROFILE_REQUESTOR_FIRSTNAME_DESC
 type: freetext
 width: 40
+placeholder: John

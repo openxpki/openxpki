@@ -4,4 +4,4 @@ description: I18N_OPENXPKI_UI_PROFILE_USERID_DESC
 type: freetext
 match: \A [0-9]+ \z
 width: 40
-default: 12345
+placeholder: 12345

@@ -5,6 +5,6 @@ type: freetext
 preset: SAN_DNS.X
 match: \A [a-zA-Z0-9] [a-zA-Z0-9-]* (\.[a-zA-Z0-9-]*[a-zA-Z0-9])* \z
 width: 60
-default: fully.qualified.example.com
+placeholder: fully.qualified.example.com
 min: 0
 max: 100

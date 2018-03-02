@@ -4,3 +4,4 @@ description: I18N_OPENXPKI_UI_PROFILE_REALNAME_DESC
 type: freetext
 match: .+
 width: 40
+placeholder: John Doe

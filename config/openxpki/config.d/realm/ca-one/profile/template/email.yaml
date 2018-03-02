@@ -4,3 +4,4 @@ description: I18N_OPENXPKI_UI_PROFILE_EMAILADDRESS_DESC
 type: freetext
 match: .+@.+
 width: 30
+placeholder: john.doe@openxpki.org
