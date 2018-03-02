@@ -165,6 +165,8 @@ command "search_cert" => {
         columns => [ 'certificate.*' ],
     )->fetchall_arrayref({});
 
+    ##! 128: 'Result ' . Dumper $result
+
     return $result;
 };
 
@@ -307,11 +309,11 @@ sub _make_db_query {
     }
 
     if ($po->has_expires_before && $po->has_expires_after) {
-        $where->{'certificate.notbefore'} = { -between => [ $po->expires_after, $po->expires_before ] };
+        $where->{'certificate.notafter'} = { -between => [ $po->expires_after, $po->expires_before ] };
     } elsif ($po->has_expires_before) {
-        $where->{'certificate.notbefore'} = { '<', $po->expires_before }
+        $where->{'certificate.notafter'} = { '<', $po->expires_before }
     } elsif ($po->has_expires_after) {
-        $where->{'certificate.notbefore'} = { '>', $po->expires_after }
+        $where->{'certificate.notafter'} = { '>', $po->expires_after }
     }
 
     if ($po->has_revoked_before && $po->has_revoked_after) {
