@@ -212,7 +212,7 @@ ALTER TABLE `aliases`
  ADD PRIMARY KEY (`pki_realm`,`alias`);
 
 ALTER TABLE `application_log`
- ADD PRIMARY KEY (`application_log_id`), ADD KEY `workflow_id` (`workflow_id`), ADD KEY `workflow_id_2` (`workflow_id`,`category`,`priority`);
+ ADD PRIMARY KEY (`application_log_id`),  ADD KEY `workflow_id` (`workflow_id`), ADD KEY `workflow_id_2` (`workflow_id`,`category`,`priority`);
 
 ALTER TABLE `audittrail`
  ADD PRIMARY KEY (`audittrail_key`);
@@ -225,9 +225,6 @@ ALTER TABLE `certificate_attributes`
 
 ALTER TABLE `crl`
  ADD PRIMARY KEY (`issuer_identifier`,`crl_key`), ADD KEY `issuer_identifier` (`issuer_identifier`), ADD KEY `pki_realm` (`pki_realm`), ADD KEY `issuer_identifier_2` (`issuer_identifier`,`last_update`), ADD KEY `crl_number` (`issuer_identifier`,`crl_number`);
-
-ALTER TABLE `crr`
- ADD PRIMARY KEY (`pki_realm`,`crr_key`), ADD KEY `identifier` (`identifier`), ADD KEY `pki_realm` (`pki_realm`), ADD KEY `creator` (`creator`);
 
 ALTER TABLE `csr`
  ADD PRIMARY KEY (`pki_realm`,`req_key`), ADD KEY `pki_realm` (`pki_realm`), ADD KEY `profile` (`profile`), ADD KEY `subject` (`subject`(255));
@@ -260,9 +257,6 @@ ALTER TABLE `seq_certificate_attributes`
  ADD PRIMARY KEY (`seq_number`);
 
 ALTER TABLE `seq_crl`
- ADD PRIMARY KEY (`seq_number`);
-
-ALTER TABLE `seq_crr`
  ADD PRIMARY KEY (`seq_number`);
 
 ALTER TABLE `seq_csr`
@@ -304,8 +298,6 @@ MODIFY `seq_number` bigint(20) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `seq_certificate_attributes`
 MODIFY `seq_number` bigint(20) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `seq_crl`
-MODIFY `seq_number` bigint(20) NOT NULL AUTO_INCREMENT;
-ALTER TABLE `seq_crr`
 MODIFY `seq_number` bigint(20) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `seq_csr`
 MODIFY `seq_number` bigint(20) NOT NULL AUTO_INCREMENT;
