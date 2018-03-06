@@ -1314,7 +1314,7 @@ sub __render_list_spec {
         push @column, \%col;
     }
 
-    push @header, { sTitle => 'serial', bVisible => 0 };
+    push @header, { sTitle => 'identifier', bVisible => 0 };
     push @header, { sTitle => "_className"};
 
     push @column, { source => 'certificate', field => 'identifier' };
