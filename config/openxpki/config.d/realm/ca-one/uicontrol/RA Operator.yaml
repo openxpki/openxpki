@@ -244,18 +244,46 @@ wfsearch:
 
 
 certsearch:
-   - label: I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL
-     key: meta_requestor
-     pattern: '*%s*'
-     operator: inlike
+    default:
+        cols:
+           - label: I18N_OPENXPKI_UI_CERTIFICATE_SERIAL
+             field: cert_key
+             sortkey: cert_key
+           - label: I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT
+             sortkey: subject
+             field: subject
+           - label: I18N_OPENXPKI_UI_CERTIFICATE_STATUS
+             format: certstatus
+             sortkey: status
+             field: status
+           - label: I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE
+             format: timestamp
+             sortkey: notbefore
+             field: notbefore
+           - label: I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER
+             format: timestamp
+             sortkey: notafter
+             field: notafter
+           - label: I18N_OPENXPKI_UI_CERTIFICATE_ISSUER
+             sortkey: issuer_dn
+             field: issuer_dn
+           - label: I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER
+             sortkey: identifier
+             field: identifier
 
-   - label: I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_LABEL
-     key: meta_email
-     operator: in
+        attributes:
+         - label: I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL
+           key: meta_requestor
+           pattern: '*%s*'
+           operator: inlike
 
-   - label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENTITY_LABEL
-     key: meta_entity
-     operator: inlike
+         - label: I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_LABEL
+           key: meta_email
+           operator: in
+
+         - label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENTITY_LABEL
+           key: meta_entity
+           operator: inlike
 
 
 certaction:

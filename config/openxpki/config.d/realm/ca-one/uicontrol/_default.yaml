@@ -33,9 +33,11 @@ main:
     label: I18N_OPENXPKI_UI_MENU_CSR_CHECK
 
 certsearch:
-   - label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENTITY_LABEL
-     key: meta_entity
-     operator: inlike
+    default:
+        attributes:
+         - label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENTITY_LABEL
+           key: meta_entity
+           operator: inlike
 
 certaction:
    - label: I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY
