@@ -414,7 +414,7 @@ sub init_result {
     if ($result->{page} && ref $result->{page} ne 'HASH') {
         $self->_page($result->{page});
     } else {
-        my $criteria = '<br>' . (join ", ", @{$result->{criteria}});
+        my $criteria = $result->{criteria} ? '<br>' . (join ", ", @{$result->{criteria}}) : '';
         $self->_page({
             label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE',
             description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION' . $criteria ,

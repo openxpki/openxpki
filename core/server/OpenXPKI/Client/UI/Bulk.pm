@@ -94,36 +94,39 @@ sub action_result {
         return $self->redirect('bulk!index');
     }
 
-    my @attr;
-    my $attributes = $spec->{attributes};
-    @attr = @{$self->__build_attribute_subquery( $attributes )} if ($attributes);
 
-    my $query = $spec->{query};
+
+    my $query = {};
+    map {
+        $query->{lc($_)} = $spec->{query}->{$_};
+    } keys %{$spec->{query}};
+
+    my $attributes = $spec->{attributes};
+
+    my $attr = $self->__build_attribute_subquery( $spec->{attributes} );
 
     if ($self->param('wf_creator')) {
-        push @attr, { KEY => 'creator', VALUE => ~~ $self->param('wf_creator') };
+        $attr->{'creator'} = ~~$self->param('wf_creator');
     }
 
-    if (!$query->{LIMIT}) {
-        $query->{LIMIT} = 25;
+    if ($attr) {
+        $query->{attribute} = $attr;
     }
 
-    if (!$query->{ORDER}) {
-        $query->{ORDER} = 'WORKFLOW.WORKFLOW_SERIAL';
-        if (!defined $query->{REVERSE}) {
-            $query->{REVERSE} = 1;
+    if (!$query->{limit}) {
+        $query->{limit} = 25;
+    }
+
+    if (!$query->{order}) {
+        $query->{order} = 'workflow_id';
+        if (!defined $query->{reverse}) {
+            $query->{reverse} = 1;
         }
     }
 
-    $query->{ATTRIBUTE} = \@attr;
-
     $self->logger()->trace("query : " . Dumper $query);
 
-    my $result_count = $self->send_command( 'search_workflow_instances_count',  {
-        'STATE' => $query->{STATE},
-        'TYPE' => $query->{TYPE},
-        'ATTRIBUTE' => $query->{ATTRIBUTE},
-    });
+    my $result_count = $self->send_command_v2( 'search_workflow_instances_count',  $query );
 
     # No results founds
     if (!$result_count) {
