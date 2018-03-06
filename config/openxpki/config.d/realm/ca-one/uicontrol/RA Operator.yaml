@@ -270,6 +270,9 @@ certsearch:
            - label: I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER
              sortkey: identifier
              field: identifier
+# adding attribute from metadata
+#           - label: Mail
+#             field: attribute.meta_email
 
         attributes:
          - label: I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL

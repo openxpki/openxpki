@@ -1189,12 +1189,16 @@ sub action_search {
     }
 
     # check if there is a custom column set defined
-    my ($header,  $body);
+    my ($header,  $body, $cols);
     if ($spec->{cols} && ref $spec->{cols} eq 'ARRAY') {
-        ($header, $body) = $self->__render_list_spec( $spec->{cols} );
+        ($header, $body, $cols) = $self->__render_list_spec( $spec->{cols} );
     } else {
         $body = $self->__default_grid_row;
         $header = $self->__default_grid_head;
+    }
+
+    if ($cols) {
+        $query->{return_attributes} = $cols;
     }
 
     my @criteria;
@@ -1285,6 +1289,7 @@ sub __render_list_spec {
 
     my @header;
     my @column;
+    my @attrib;
 
     for (my $ii = 0; $ii < scalar @{$cols}; $ii++) {
 
@@ -1306,6 +1311,7 @@ sub __render_list_spec {
             $col{source} = $1;
             $col{field} = $2;
 
+            push @attrib, $2 if ($1 eq 'attribute');
         } else {
             $col{source} = 'certificate';
             $col{field} = $col{field}
@@ -1320,6 +1326,6 @@ sub __render_list_spec {
     push @column, { source => 'certificate', field => 'identifier' };
     push @column, { source => 'certificate', field => 'statusclass' };
 
-    return ( \@header, \@column );
+    return ( \@header, \@column, \@attrib );
 }
 1;
