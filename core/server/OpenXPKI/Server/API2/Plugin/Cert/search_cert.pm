@@ -115,6 +115,14 @@ index (can only be used if C<limit> was specified)
 
 =item * C<reverse> I<Bool> - order results ascending
 
+=item * C<return_attributes> I<ArrayRef> - add the given attributes as
+columns to the result set. Each attribute is added as extra column
+using the attribute name as key.
+
+Note: If the attribute is multivalued or you use an attribute query that
+causes multiple result lines for a single certificate you will get more
+than one line for the same certificate!
+
 =back
 
 B<Changes compared to API v1:> The following parameters where removed in favor
@@ -129,6 +137,7 @@ of C<[valid|expires]_[before|after]>:
 command "search_cert" => {
     authority_key_identifier => {isa => 'Value',         matching => $re_alpha_string,      },
     cert_attributes          => {isa => 'ArrayRef|HashRef',      },
+    return_attributes        => {isa => 'ArrayRef', },
     cert_serial              => {isa => 'Value',         matching => $re_int_or_hex_string, },
     csr_serial               => {isa => 'Value',         matching => $re_integer_string,    },
     entity_only              => {isa => 'Value',         matching => $re_boolean,           },
@@ -160,9 +169,11 @@ command "search_cert" => {
         %{ $self->_make_db_query_additional_params($params) },
     };
 
+    ##! 32: 'Result ' . Dumper $sql_params
+
+
     my $result = CTX('dbi')->select(
         %{$sql_params},
-        columns => [ 'certificate.*' ],
     )->fetchall_arrayref({});
 
     ##! 128: 'Result ' . Dumper $result
@@ -191,6 +202,7 @@ of C<[valid|expires]_[before|after]>:
 command "search_cert_count" => {
     authority_key_identifier => {isa => 'Value',    matching => $re_alpha_string,      },
     cert_attributes          => {isa => 'ArrayRef|HashRef', },
+    return_attributes        => {isa => 'ArrayRef', },
     cert_serial              => {isa => 'Value',    matching => $re_int_or_hex_string, },
     csr_serial               => {isa => 'Value',    matching => $re_integer_string,    },
     entity_only              => {isa => 'Value',    matching => $re_boolean,           },
@@ -246,6 +258,7 @@ sub _make_db_query {
 
     my $where = {};
     my $params = {
+        columns => [ 'certificate.*' ],
         where => $where,
     };
 
@@ -335,10 +348,16 @@ sub _make_db_query {
 
     my @join_spec = ();
 
+
+    my $return_attrib = {};
+    if ($po->has_return_attributes) {
+        map { $return_attrib->{$_} = '' } @{$po->return_attributes};
+    }
+
+    my $ii = 0;
     # handle certificate attributes (such as SANs)
     if ( $po->has_cert_attributes ) {
         # we need to join over the certificate_attributes table
-        my $ii = 0;
 
         # Legacy API
         if (ref $po->cert_attributes eq 'ARRAY') {
@@ -371,18 +390,37 @@ sub _make_db_query {
 
                 my $table_alias = "certattr$ii";
 
-                # add join table
-                push @join_spec, ( 'certificate.identifier=identifier', "certificate_attributes|$table_alias" );
+                if (!defined $po->cert_attributes->{$key}) {
+                    next;
+                }
 
+                push @join_spec, ( "certificate.identifier=identifier,$table_alias.attribute_contentkey='$key'", "certificate_attributes|$table_alias" );
                 # add search constraint
-                $where->{ "$table_alias.attribute_contentkey" } = $key;
                 $where->{ "$table_alias.attribute_value" } = $po->cert_attributes->{$key};
+
+                # if the attribute should be returned we add the table name used
+                $return_attrib->{$key} = $table_alias if (defined $return_attrib->{$key});
                 $ii++;
 
             }
-
         }
     }
+
+    ##! 64: 'return_attrib ' . Dumper $return_attrib
+    foreach my $key (keys %{$return_attrib}) {
+
+        # if the attribute was used in the query, it is already joined
+        my $table_alias = $return_attrib->{$key};
+
+        if (!$table_alias) {
+            $table_alias = "certattr$ii";
+            # outer join to also get empty values
+            push @join_spec, ( "=>certificate.identifier=identifier,$table_alias.attribute_contentkey='$key'", "certificate_attributes|$table_alias" );
+            $ii++;
+        }
+        push @{$params->{columns}}, "$table_alias.attribute_value as $key";
+    }
+
 
     if ( $po->has_profile ) {
         push @join_spec, qw( certificate.req_key=req_key csr );
