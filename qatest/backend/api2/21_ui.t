@@ -96,7 +96,7 @@ my $client = $oxitest->new_client_tester;
 $client->login("caop");
 lives_and {
     my $data = $client->send_command_api2_ok("list_process");
-    cmp_deeply $data, bag(
+    cmp_deeply $data, superbagof(
         {
             info => re(qr/openxpki.*main/),
             pid =>  re(qr/^\d+$/),
