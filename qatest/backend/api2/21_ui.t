@@ -85,6 +85,7 @@ lives_and {
         watchdog =>         re(qr/^\d+$/),
         worker =>           re(qr/^\d+$/),
         workflow =>         re(qr/^\d+$/),
+        hostname =>         ignore(),
     };
 } "get_ui_system_status";
 
