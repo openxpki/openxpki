@@ -143,7 +143,6 @@ cmp_deeply($params, superhashof({
     'IDENTIFIER'                => re(qr/^.+$/),            # 'oLhPSQTJAkc7KmtKW1fA9Te6aVk'
     'ISSUER_DN'                 => re(qr/^.+$/),            # 'CN=CA ONE,OU=Test CA,DC=OpenXPKI,DC=ORG',
     'ISSUER_IDENTIFIER'         => re(qr/^.+$/),            # 'k1izCpwZwEu6jFJZbwul-fVoQFY',
-    'LOA'                       => ignore(),                # might be undef,
     'NOTAFTER'                  => re(qr/\d+$/),            # '1496094413',
     'NOTBEFORE'                 => re(qr/\d+$/),            # '1480456013',
     'PKI_REALM'                 => re(qr/^.+$/),            # 'ca-one',
