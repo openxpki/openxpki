@@ -261,7 +261,6 @@ lives_and {
 #
 lives_and {
     my $result = CTX('api')->get_workflow_info({ ID => $wf_t2->{ID} });
-    diag explain $result;
     cmp_deeply $result, {
         WORKFLOW => superhashof({
             ID => re(qr/^\d+$/),
