@@ -43,7 +43,7 @@ before 'init_user_config' => sub { # ... so we do not overwrite user supplied co
                 "workflow" => {
                     "persister" => $self->_workflow_persister,
                     # OpenXPKI::Workflow::Handler checks existance of workflow.def
-                    "def" => { "empty" => { state => { INITIAL => { } } } },
+                    "def" => { "dummy" => { head => { label => "dummy", prefix => "${realm}dummywf" }, state => { INITIAL => { } } } },
                 },
                 # certificate profiles
                 "profile" => {
