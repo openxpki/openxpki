@@ -51,8 +51,6 @@ around BUILDARGS => sub {
     my $orig  = shift;
     my $class = shift;
 
-    my @path = split /\./, ;
-
     my $config = CTX('config')->get_hash($_[0]);
 
     return $class->$orig( $config );
