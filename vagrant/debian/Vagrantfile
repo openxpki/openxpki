@@ -21,7 +21,7 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant virtual environment requires a box to build off of.
   #config.vm.box = "openxpki/wheezy-alldeps"  
-  config.vm.box = "debian/contrib-jessie64"
+  config.vm.box = "debian/jessie64"
 
 #  if config_values[:mirrors]
 #    config.vm.synced_folder config_values[:mirrors], "/mirrors"
@@ -52,17 +52,6 @@ Vagrant.configure("2") do |config|
       config.vm.provision :shell, :path => "provision-develop.sh"
       config.vm.network :forwarded_port, guest: 80, host: 8080
       config.vm.network :forwarded_port, guest: 443, host: 8443
-      config.vm.synced_folder "../..", "/code-repo"
-      config.vm.synced_folder "../../../libscep", "/libscep-repo"
-  end
-
-  # development machine, share codetree, debian stretch
-  config.vm.define "develop-stretch", primary:true do |test|
-      config.vm.box = "debian/contrib-stretch64"
-      config.vm.hostname = "oxi-dev-stretch"
-      config.vm.provision :shell, :path => "provision-develop.sh"
-      config.vm.network :forwarded_port, guest: 80, host: 9080
-      config.vm.network :forwarded_port, guest: 443, host: 9443
       config.vm.synced_folder "../..", "/code-repo"
   end
 
