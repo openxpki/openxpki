@@ -338,4 +338,13 @@ CREATE TABLE workflow_history (
   workflow_history_date timestamp NOT NULL DEFAULT current_timestamp
 );
 
+CREATE TABLE ocsp_responses (
+  identifier               varchar(64),
+  serial_number            blob NOT NULL,
+  authority_key_identifier blob NOT NULL,
+  body                     blob NOT NULL,
+  expiry                   timestamp,
+  PRIMARY KEY(serial_number, authority_key_identifier)
+);
+
 COMMIT;

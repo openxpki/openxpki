@@ -207,6 +207,13 @@ CREATE TABLE IF NOT EXISTS `workflow_history` (
   `workflow_history_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `ocsp_responses` (
+  `identifier` varchar(64),
+  `serial_number` varbinary(128) NOT NULL,
+  `authority_key_identifier` varbinary(128) NOT NULL,
+  `body` varbinary(4096) NOT NULL,
+  `expiry` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE `aliases`
  ADD PRIMARY KEY (`pki_realm`,`alias`);
@@ -285,6 +292,9 @@ ALTER TABLE `workflow_context`
 
 ALTER TABLE `workflow_history`
  ADD PRIMARY KEY (`workflow_hist_id`), ADD KEY `workflow_id` (`workflow_id`);
+
+ALTER TABLE `ocsp_responses`
+ ADD PRIMARY KEY (`serial_number`,`authority_key_identifier`), ADD KEY `identifier` (`identifier`);
 
 
 ALTER TABLE `audittrail`

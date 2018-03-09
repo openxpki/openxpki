@@ -14,6 +14,29 @@ not behave correctly or even wont start.
 For a quick overview of config changes, you should always check the
 config repository at https://github.com/openxpki/openxpki-config.
 
+Release vX.XX
+-------------
+
+OpenXPKI now supports the Cloudflare OCSP Responder
+https://github.com/cloudflare/cfssl
+
+The Cloudflare OCSP responder can seamlessly access the OpenXPKI
+database and serve precomputed responses.
+
+In order to upgrade to this version you need to create a new table:
+
+  CREATE TABLE IF NOT EXISTS `ocsp_responses` (
+    `identifier` varchar(64),
+    `serial_number` varbinary(128) NOT NULL,
+    `authority_key_identifier` varbinary(128) NOT NULL,
+    `body` varbinary(4096) NOT NULL,
+    `expiry` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+  ALTER TABLE `ocsp_responses`
+   ADD PRIMARY KEY (`serial_number`,`authority_key_identifier`), ADD KEY `identifier` (`identifier`);
+
+
 
 Release v1.19
 -------------

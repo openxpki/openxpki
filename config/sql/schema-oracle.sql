@@ -272,6 +272,18 @@ CREATE TABLE workflow_history (
   PRIMARY KEY (workflow_hist_id)
 );
 
+DROP TABLE ocsp_responses CASCADE CONSTRAINTS;
+
+CREATE TABLE ocsp_responses (
+  identifier varchar2(64),
+  serial_number varbinary(128) NOT NULL,
+  authority_key_identifier varbinary(128) NOT NULL,
+  body varbinary(4096) NOT NULL,
+  expiry timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (serial_number, authority_key_identifier)
+);
+
+
 CREATE OR REPLACE TRIGGER ai_audittrail_audittrail_key
 BEFORE INSERT ON audittrail
 FOR EACH ROW WHEN (

@@ -366,6 +366,25 @@ CREATE TABLE workflow_history (
 );
 
 --
+-- Name: ocsp_responses; Type: TABLE; Schema: public; Tablespace:
+--
+
+CREATE TABLE ocsp_responses (
+    identifier text,
+    serial_number bytea NOT NULL,
+    authority_key_identifier bytea NOT NULL,
+    body bytea NOT NULL,
+    expiry timestamp with time zone
+);
+
+--
+-- Name: workflow_history; Type: TABLE; Schema: public; Tablespace:
+--
+
+ALTER TABLE ONLY ocsp_responses
+    ADD CONSTRAINT ocsp_responses_pkey PRIMARY KEY (serial_number, authority_key_identifier);
+
+--
 -- Name: audittrail_key; Type: DEFAULT; Schema: public;
 --
 
@@ -480,6 +499,7 @@ ALTER TABLE ONLY workflow
 -- Name: cert_attributes_key_index; Type: INDEX; Schema: public; Tablespace:
 --
 
+
 CREATE INDEX cert_attributes_key_index ON certificate_attributes USING btree (attribute_contentkey);
 
 --
@@ -589,6 +609,13 @@ CREATE INDEX workflow_state_index ON workflow USING btree (workflow_state);
 --
 
 CREATE INDEX workflow_type_index ON workflow USING btree (workflow_type);
+
+--
+-- Name: cert_identifier_index; Type: INDEX; Schema: public; Tablespace:
+--
+
+CREATE INDEX ocsp_responses_index ON ocsp_responses USING btree (identifier);
+
 
 --
 -- PostgreSQL database dump complete
