@@ -14,6 +14,7 @@ use Data::Dumper;
 use English;
 use OpenXPKI::Crypto::Backend::API;
 use OpenXPKI::Crypto::Tool::SCEP::API;
+use OpenXPKI::Crypto::Tool::LibSCEP::API;
 use OpenXPKI::Crypto::Tool::CreateJavaKeystore::API;
 use OpenXPKI::Crypto::Secret;
 

@@ -31,6 +31,7 @@ while (my $cgi = CGI::Fast->new()) {
 
     my $conf = $config->config();
 
+    my $service = $conf->{global}->{service} || 'SCEP';
     my $socket  = $conf->{global}->{socket};
     my $realm   = $conf->{global}->{realm};
     my $iprange = $conf->{global}->{iprange};
@@ -39,8 +40,8 @@ while (my $cgi = CGI::Fast->new()) {
     my $enc_alg = $conf->{global}->{encryption_algorithm};
     my $hash_alg = $conf->{global}->{hash_algorithm};
 
-    my $log = $config->logger();
 
+    my $log = $config->logger();
     Log::Log4perl::MDC->put('endpoint', $config->endpoint());
     Log::Log4perl::MDC->put('server', $server);
 
@@ -86,7 +87,7 @@ while (my $cgi = CGI::Fast->new()) {
 
     # OpenXPKI::Client::SCEP does the actual work
     my $scep_client = OpenXPKI::Client::SCEP->new({
-        SERVICE    => 'SCEP',
+        SERVICE    => $service,
         REALM      => $realm,
         SOCKETFILE => $socket,
         TIMEOUT    => 120, # TODO - make configurable?
