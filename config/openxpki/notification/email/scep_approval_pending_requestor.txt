@@ -17,5 +17,4 @@ request, please reply to this mail keeping the subject intact.
 We will notify you once the certificate has been issued and is
 ready for download.
 
-Regards,
-  PKI Team
+[% INCLUDE _footer.txt %]

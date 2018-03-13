@@ -4,3 +4,5 @@ If you can read this, your OpenXPKI system can send mail.
 
 Originating realm: [% meta_label %].
 The base address of this installation is [% meta_baseurl %].
+
+[% INCLUDE _footer.txt %]

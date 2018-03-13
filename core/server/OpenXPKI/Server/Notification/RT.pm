@@ -37,13 +37,6 @@ has 'rt' => (
     lazy => 1,
 );
 
-has 'template_dir' => (
-    is  => 'ro',
-    isa => 'Str',
-    builder => '_init_template_dir',
-    lazy => 1,
-);
-
 sub _init_transport {
 
     my $self = shift;
@@ -73,15 +66,6 @@ sub _init_transport {
 
     return $rt;
 }
-
-sub _init_template_dir {
-    my $self = shift;
-    my $template_dir = CTX('config')->get( $self->config().'.template.dir' );
-    $template_dir .= '/' unless($template_dir =~ /\/$/);
-    return $template_dir;
-}
-
-
 
 =head1 Functions
 =head2 notify
@@ -192,7 +176,7 @@ sub notify {
                         );
                     }
 
-                    my $text = $self->_render_template_file( $self->template_dir().$cfg->{template}.'.txt', $template_vars );
+                    my $text = $self->_render_template_file( $cfg->{template}.'.txt', $template_vars );
                     ##! 16: 'rendering message template ' . $cfg->{template}
                     delete $cfg->{template};
 
@@ -271,7 +255,7 @@ sub _rt_open {
 
     # for whatever reason you must first store the ticket before you can set the requestor
     if ($cfg->{template}) {
-        my $text = $self->_render_template_file( $self->template_dir().$cfg->{template}.'.txt', $vars );
+        my $text = $self->_render_template_file( $cfg->{template}.'.txt', $vars );
         $ticket->store(text => $text);
     } else {
         $ticket->store();

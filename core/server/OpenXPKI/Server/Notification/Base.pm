@@ -43,6 +43,21 @@ has 'failed' => (
     isa => 'ArrayRef',
 );
 
+has 'template_dir' => (
+    is      => 'ro',
+    isa     => 'Str',
+    builder => '_init_template_dir',
+    lazy    => 1,
+);
+
+sub _init_template_dir {
+    my $self = shift;
+    my $template_dir = CTX('config')->get( $self->config().'.template.dir' );
+    $template_dir .= '/' unless($template_dir =~ /\/$/);
+    return $template_dir;
+}
+
+
 =head1 Functions
 
 =head2 notify({ MESSAGE, VARS, TOKEN })
@@ -67,8 +82,9 @@ sub notify {
 =head2 _render_template_file( FILENAME, VARS )
 
 Read template form filename and render using TT.
-Expects full path to the template and hashref to the vars.
+Expects path to the template and hashref to the vars.
 returns the template with vars inserted as string.
+If path is relative, it is prefixed with template dir.
 
 =cut
 sub _render_template_file {
@@ -78,10 +94,13 @@ sub _render_template_file {
     my $filename = shift;
     my $vars = shift;
 
+    if ($filename !~ m{\A/}) {
+        $filename = $self->template_dir() . $filename;
+    }
+
     ##! 16: 'Load template: ' . $filename
     if (! -e $filename  ) {
-        CTX('log')->system()->warn("Template file missing $filename  ");
-
+        CTX('log')->system()->warn("Template file $filename does not exist");
         return undef;
     }
 
@@ -89,7 +108,7 @@ sub _render_template_file {
     # Parse using TT
     my $output;
 
-    my $tt = OpenXPKI::Template->new();
+    my $tt = OpenXPKI::Template->new({ INCLUDE_PATH => $self->template_dir() });
     if (!$tt->process(\$template, $vars, \$output)) {
         CTX('log')->system()->error("Error parsing templatefile ($filename): " . $tt->error());
 
@@ -117,7 +136,7 @@ sub _render_template {
     # Parse using TT
     my $output;
 
-    my $tt = OpenXPKI::Template->new();
+    my $tt = OpenXPKI::Template->new({ INCLUDE_PATH => $self->template_dir() });
     if (!$tt->process(\$template, $vars, \$output)) {
         CTX('log')->system()->error("Error parsing template ($template): " . $tt->error());
 

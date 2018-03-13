@@ -38,13 +38,6 @@ has 'transport' => (
     lazy    => 1,
 );
 
-has 'template_dir' => (
-    is      => 'ro',
-    isa     => 'Str',
-    builder => '_init_template_dir',
-    lazy    => 1,
-);
-
 has 'xmlns' => (
     is        => 'ro',
     isa       => 'Str',
@@ -79,13 +72,6 @@ sub _init_transport {
     }
 
     return $soap;
-}
-
-sub _init_template_dir {
-    my $self         = shift;
-    my $template_dir = CTX('config')->get( $self->config() . '.template.dir' );
-    $template_dir .= '/' unless ( $template_dir =~ /\/$/ );
-    return $template_dir;
 }
 
 =head1 Functions
@@ -354,7 +340,7 @@ sub _prepare_params {
 
     # Add the message to the params - if any (can be empty if only attributes are updated)
     my $text;
-    $text = $self->_render_template_file( $self->template_dir() . $cfg->{template} . '.txt', $vars ) if($cfg->{template});
+    $text = $self->_render_template_file( $cfg->{template} . '.txt', $vars ) if($cfg->{template});
     delete $cfg->{template};
     ##! 32: 'render the text' . $text
     push( @params, SOAP::Data->name( comments => $text ) ) if($text);

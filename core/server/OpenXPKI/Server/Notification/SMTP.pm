@@ -124,13 +124,6 @@ has 'default_envelope' => (
     lazy => 1,
 );
 
-has 'template_dir' => (
-    is  => 'ro',
-    isa => 'Str',
-    builder => '_init_template_dir',
-    lazy => 1,
-);
-
 has 'use_html' => (
     is  => 'ro',
     isa => 'Bool',
@@ -217,7 +210,7 @@ sub _init_transport {
             PRIORITY => "debug",
             FACILITY => [ "system", "monitor" ]
         );
-        
+
         if(!$transport->auth($cfg->{username}, $cfg->{password})) {
           CTX('log')->log(
               MESSAGE  => sprintf("SMTP SASL authentication failed (user: %s, error: %s)", $cfg->{username}, $transport->message),
@@ -246,13 +239,6 @@ sub _init_default_envelope {
     ##! 8: 'Envelope data ' . Dumper $envelope
 
     return $envelope;
-}
-
-sub _init_template_dir {
-    my $self = shift;
-    my $template_dir = CTX('config')->get( $self->config().'.template.dir' );
-    $template_dir .= '/' unless($template_dir =~ /\/$/);
-    return $template_dir;
 }
 
 sub _init_use_html {
@@ -500,7 +486,7 @@ sub _send_plain {
     my $cfg = shift;
     my $vars = shift;
 
-    my $output = $self->_render_template_file( $self->template_dir().$cfg->{template}.'.txt', $vars );
+    my $output = $self->_render_template_file( $cfg->{template}.'.txt', $vars );
 
     if (!$output) {
         CTX('log')->system()->error("Mail body is empty ($cfg->{template})");
@@ -581,8 +567,8 @@ sub _send_html {
     require MIME::Entity;
 
     # Parse the templates - txt and html
-    my $plain = $self->_render_template_file( $self->template_dir().$cfg->{template}.'.txt', $vars );
-    my $html = $self->_render_template_file( $self->template_dir().$cfg->{template}.'.html', $vars );
+    my $plain = $self->_render_template_file( $cfg->{template}.'.txt', $vars );
+    my $html = $self->_render_template_file( $cfg->{template}.'.html', $vars );
 
     if (!$plain && !$html) {
         CTX('log')->system()->error("Both mail parts are empty ($cfg->{template})");

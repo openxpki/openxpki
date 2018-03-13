@@ -14,7 +14,7 @@ A request to reset the PIN of the Smartcard belonging to
 has been made.
 
 That person has specified you as one of the authorizing persons and requests
-that you authorize the transaction. To assist this person, please do the 
+that you authorize the transaction. To assist this person, please do the
 following:
 
 1. Fetch your activation code at the following address:
@@ -31,9 +31,8 @@ security officer immediately to report the incident.
 Note: The request tracking ticket for this notification will be automatically
 closed.
 
+[% INCLUDE _footer.txt %]
 
 
 
-
-  
 

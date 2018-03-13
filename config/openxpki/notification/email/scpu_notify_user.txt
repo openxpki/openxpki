@@ -9,6 +9,4 @@ Plese contact them to get your unblocking codes.
 
 If you have any questions on this matter, please contact us.
 
-Regards,
-  PKI Team
-            
+[% INCLUDE _footer.txt %]
