@@ -991,7 +991,8 @@ sub action_autocomplete {
         }
     }
 
-    if (!@result) {
+    # do not search with less then 3 letters
+    if (!@result && (length($term) >= 3)) {
         my $search_result = $self->send_command( 'search_cert', {
             SUBJECT => "%$term%",
             VALID_AT => time(),
