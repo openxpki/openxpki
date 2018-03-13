@@ -1,7 +1,7 @@
 {{#if buttons}}
     {{#if hasDescription}}
         {{#each buttons as |btn|}}
-            <div class="row stacked-buttons">            
+            <div class="row stacked-buttons">
                 {{#if btn.section}}
                     <div class="col-xs-12">
                         <strong>{{btn.section}}</strong>
@@ -19,11 +19,21 @@
     {{else}}
         <div class="btn-group">
             {{#each buttons as |btn|}}
+
+                {{#if btn.break_before}}
+                    <div class="spacer"></div>
+                {{/if}}
+
                 {{#if btn.section}}
                     <!-- Section are not supported yet -->
                 {{else}}
                     {{oxi-button button=btn klass="btn btn-default" click="click"}}
                 {{/if}}
+
+                {{#if btn.break_after}}
+                    <div class="spacer"></div>
+                {{/if}}
+
             {{/each}}
         </div>
     {{/if}}

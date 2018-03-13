@@ -2040,9 +2040,13 @@ sub __get_action_buttons {
                     description => $hint->{confirm}->{description} || 'I18N_OPENXPKI_UI_PLEASE_CONFIRM_DESC',
                 }
             }
-        }
+            if ($hint->{break} && $hint->{break} =~ /(before|after)/) {
+                $button{'break_'. $hint->{break}} = 1;
+            }
 
-       push @buttons, \%button;
+        }
+        push @buttons, \%button;
+
     }
 
     $self->logger()->trace('Buttons are ' . Dumper \@buttons);

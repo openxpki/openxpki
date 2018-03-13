@@ -282,6 +282,7 @@ state:
           global_noop:
             label: I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL
             format: alternative
+            break: before
           load_issuer_list:
             label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_ISSUER_LABEL
             format: alternative
@@ -330,6 +331,7 @@ state:
           global_noop:
             label: I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL
             format: expected
+            break: before
           edit_subject:
             format: optional
           edit_san:

@@ -8488,6 +8488,10 @@ div.section {
   background-color: #79d1f3;
 }
 
+.oxi-button-container div.spacer {
+  margin: 5px;
+}
+
 img.toplogo {
   padding-top: 6px;
   padding-right: 12px;
