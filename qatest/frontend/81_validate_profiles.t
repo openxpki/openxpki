@@ -203,15 +203,38 @@ subjectAltName=" . join ",", @san;
 
         push @errors, "Subject" unless (join(',',@{$x509->Subject}) eq join(',',@{$x509new->Subject}) );
 
-        foreach my $attr (qw(CRLDistributionPoints KeyUsage ExtKeyUsage SubjectAltName BasicConstraints)) {
+        foreach my $attr (qw(KeyUsage ExtKeyUsage SubjectAltName BasicConstraints)) {
             my $src = $x509->$attr;
             my $new = $x509new->$attr;
+
             if (defined $new && defined $src) {
                 if ( join(',', sort @{$x509->$attr}) ne join(',', sort @{$x509new->$attr})) {
                     push @errors, $attr;
                 }
+            } elsif (defined $new || defined $src) {
+                push @errors, $attr . ' (missing)';
             }
         }
+
+        my %src = $x509->CRLDistributionPoints2;
+        my %new = $x509new->CRLDistributionPoints2;
+        if (%new && %src) {
+            my @srccrl;
+            my @newcrl;
+            foreach my $key (keys %src) {
+                push @srccrl, @{$src{$key}};
+            }
+            foreach my $key (keys %new) {
+                push @newcrl, @{$new{$key}};
+            }
+            if ( join(',', sort @srccrl) ne join(',', sort @newcrl)) {
+                push @errors, 'CDP';
+            }
+            print Dumper \@newcrl;
+        } elsif (%new || %src) {
+            push @errors, 'CDP (missing)';
+        }
+
     }
 
     if (scalar @errors) {
