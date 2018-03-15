@@ -126,9 +126,6 @@ use Module::Load qw( autoload );
 use Moose::Exporter;
 use Moose::Util;
 use Moose::Meta::Class;
-use Log::Log4perl qw(:easy);
-use Log::Log4perl::Appender;
-use Log::Log4perl::Filter::MDC;
 use Moose::Util::TypeConstraints;
 use Test::More;
 use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in a test
@@ -137,6 +134,9 @@ use MIME::Base64;
 
 # Project modules
 use OpenXPKI::Config;
+use OpenXPKI::Log4perl;
+use Log::Log4perl::Appender;
+use Log::Log4perl::Filter::MDC;
 use OpenXPKI::MooseParams;
 use OpenXPKI::Server::Database;
 use OpenXPKI::Server::Context;
@@ -493,18 +493,18 @@ sub _log4perl_screen {
     my $threshold_screen = $ENV{TEST_VERBOSE} ? $self->log_level : 'OFF';
     return qq(
         log4perl.rootLogger                     = INFO,  Screen
-        log4perl.category.openxpki.auth         = DEBUG, Screen
-        log4perl.category.openxpki.audit        = DEBUG, Screen
-        log4perl.category.openxpki.system       = DEBUG, Screen
-        log4perl.category.openxpki.workflow     = DEBUG, Screen
-        log4perl.category.openxpki.application  = DEBUG, Screen
-        log4perl.category.openxpki.deprecated   = WARN,  Screen
-        log4perl.category.connector             = WARN,  Screen
+        log4perl.category.openxpki.auth         = DEBUG
+        log4perl.category.openxpki.audit        = DEBUG
+        log4perl.category.openxpki.system       = DEBUG
+        log4perl.category.openxpki.workflow     = DEBUG
+        log4perl.category.openxpki.application  = DEBUG
+        log4perl.category.openxpki.deprecated   = WARN
+        log4perl.category.connector             = WARN
         log4perl.category.Workflow              = OFF
 
         log4perl.appender.Screen                = Log::Log4perl::Appender::Screen
         log4perl.appender.Screen.layout         = Log::Log4perl::Layout::PatternLayout
-        log4perl.appender.Screen.layout.ConversionPattern = # %d %c %p %m [pid=%P|%i]%n
+        log4perl.appender.Screen.layout.ConversionPattern = # %d %c.%p %m [pid=%P|%i]%n
         log4perl.appender.Screen.Threshold      = $threshold_screen
     );
 }
@@ -565,7 +565,7 @@ Basic test setup: logging.
 =cut
 sub init_logging {
     my ($self) = @_;
-    Log::Log4perl->init( \($self->_log4perl_screen) );
+    OpenXPKI::Log4perl->init_or_fallback( \($self->_log4perl_screen) );
 }
 
 =head2 init_base_config
