@@ -17,7 +17,7 @@ use Log::Log4perl qw(:easy);
 # Project modules
 use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
-use OpenXPKI::Test::QA::CertHelper::Workflow;
+
 
 plan tests => 39;
 
