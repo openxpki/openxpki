@@ -26,6 +26,9 @@ To define a new API plugin simply say:
         # parameters
     } => sub {
         # actions
+        ...
+        $self->api->another_command();
+        ...
     };
 
 This will modify your package as follows:
@@ -95,6 +98,8 @@ Note that this can be written as (except for the dots obviously)
             return { ... };
         }
     );
+
+You can access the API via C<$self-E<gt>api> to call another command.
 
 B<Parameters>
 
