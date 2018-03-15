@@ -399,7 +399,6 @@ has config_writer => (
         OpenXPKI::Test::ConfigWriter->new(
             basedir => $self->testenv_root,
             db_conf => $self->db_conf,
-            log_level => $self->log_level,
         )
     },
 );
