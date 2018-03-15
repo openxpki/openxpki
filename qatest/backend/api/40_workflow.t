@@ -181,10 +181,10 @@ CTX('session')->data->pki_realm('alpha');
 #
 lives_and {
     my $result = CTX('api')->get_workflow_instance_types;
-    cmp_deeply $result, {
+    cmp_deeply $result, superhashof({
         wf_type_1 => superhashof({ label => "wf_type_1" }),
         wf_type_2 => superhashof({ label => "wf_type_2" }),
-    }, "get_workflow_instance_types()";
+    }), "get_workflow_instance_types()";
 }
 
 #

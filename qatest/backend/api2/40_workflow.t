@@ -202,12 +202,11 @@ CTX('session')->data->pki_realm('alpha');
 #
 lives_and {
     my $result = $oxitest->api2_command("get_workflow_instance_types");
-    cmp_deeply $result, {
+    cmp_deeply $result, superhashof({
         wf_type_1 => superhashof({ label => "wf_type_1" }),
         wf_type_2 => superhashof({ label => "wf_type_2" }),
-        wf_type_2 => superhashof({ label => "wf_type_2" }),
         wf_type_5_restricted => superhashof({ label => "wf_type_5" }),
-    }, "get_workflow_instance_types()";
+    }), "get_workflow_instance_types()";
 }
 
 #
