@@ -449,8 +449,6 @@ The name of the workflow, optional (read from the tables)
 
 =item ASYNC
 
-B<DO NOT USE THIS FLAG - IT IS NOT FULLY WORKING YET> - see #517
-
 By default, the action is executed inline and the method returns after
 all actions are handled. You can detach from the execution by adding
 I<ASYNC> as argument: I<fork> will do the fork and return the ui control
@@ -1163,7 +1161,6 @@ sub __validate_input_param {
 Execute the named activity on the given workflow object. Returns
 0 on success and throws exceptions on errors.
 
-B<DO NOT USE THIS FLAG - IT IS NOT FULLY WORKING YET> - see #517
 The third argument is an optional boolean flag weather to executed
 the activity in the background. If used, the return value is the PID
 of the forked child.
