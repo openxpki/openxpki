@@ -17,7 +17,7 @@ use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 use OpenXPKI::Test::CertHelper::Database;
 
-plan tests => 40;
+plan tests => 35;
 
 #
 # Setup test context
@@ -151,44 +151,34 @@ my $oxitest = OpenXPKI::Test->new(
 # while testing we do not log to database by default
 $oxitest->enable_workflow_log;
 
-sub test_wf_instance {
-    my ($pki_realm, $name) = @_;
-    CTX('session')->data->pki_realm($pki_realm);
-
-    my $wfinfo;
-    lives_and {
-        $wfinfo = $oxitest->api2_command("create_workflow_instance" => {
-            workflow => $name,
-            params => {
-                message => "Lucy in the sky with diamonds ($name)",
-                link => "http://www.denic.de",
-                role => "User",
-            },
-        });
-
-        BAIL_OUT($wfinfo->{LIST}->[0]->{LABEL} || 'Unknown error occured during workflow creation')
-            if $wfinfo and exists $wfinfo->{SERVICE_MSG} and $wfinfo->{SERVICE_MSG} eq 'ERROR';
-
-        like $wfinfo->{workflow}->{id}, qr/^\d+$/;
-    } "create_workflow_instance() - creates test workflow '$name'";
-
-    return $wfinfo->{workflow};
-}
+my $params = {
+    message => "Lucy in the sky with diamonds",
+    link => "http://www.denic.de",
+    role => "User",
+};
 
 #
 # create_workflow_instance
 #
 CTX('session')->data->role('User');
 
+CTX('session')->data->pki_realm("alpha");
+
 CTX('session')->data->user('wilhelm');
-my $wf_t1_a = test_wf_instance "alpha", "wf_type_1";
+my $wf_t1_a = $oxitest->create_workflow("wf_type_1", $params);
+
 CTX('session')->data->user('franz');
-my $wf_t1_b = test_wf_instance "alpha", "wf_type_1";
+my $wf_t1_b = $oxitest->create_workflow("wf_type_1", $params);
+
 CTX('session')->data->user('wilhelm');
-my $wf_t2 =   test_wf_instance "alpha", "wf_type_2";
-my $wf_t4 =   test_wf_instance "beta",  "wf_type_4";
+my $wf_t2 =   $oxitest->create_workflow("wf_type_2", $params);
+
+CTX('session')->data->pki_realm("beta");
+my $wf_t4 =   $oxitest->create_workflow("wf_type_4", $params);
+
+CTX('session')->data->pki_realm("alpha");
 CTX('session')->data->user('edeltraut');
-my $wf_t5 =   test_wf_instance "alpha", "wf_type_5_restricted";
+my $wf_t5 =   $oxitest->create_workflow("wf_type_5_restricted", $params);
 
 throws_ok {
     CTX('session')->data->pki_realm("alpha");
@@ -224,7 +214,7 @@ lives_and {
 # get_workflow_type_for_id
 #
 lives_and {
-    my $result = $oxitest->api2_command("get_workflow_type_for_id" => { id => $wf_t1_a->{id} });
+    my $result = $oxitest->api2_command("get_workflow_type_for_id" => { id => $wf_t1_a->id });
     is $result, "wf_type_1", "get_workflow_type_for_id()";
 }
 
@@ -237,7 +227,7 @@ dies_ok {
 #
 throws_ok {
     my $result = $oxitest->api2_command("execute_workflow_activity" => {
-        id => $wf_t1_a->{id},
+        id => $wf_t1_a->id,
         activity => "dummy",
     });
 } qr/state.*PERSIST.*dummy/i,
@@ -245,7 +235,7 @@ throws_ok {
 
 lives_and {
     my $result = $oxitest->api2_command("execute_workflow_activity" => {
-        id => $wf_t1_a->{id},
+        id => $wf_t1_a->id,
         activity => "wftype1_add_message", # "wftype1" is the prefix defined in the workflow
     });
     # ... this will automatically call "add_link" and "set_motd"
@@ -256,7 +246,7 @@ lives_and {
 # fail_workflow
 #
 lives_and {
-    my $result = $oxitest->api2_command("fail_workflow" => { id => $wf_t1_b->{id} });
+    my $result = $oxitest->api2_command("fail_workflow" => { id => $wf_t1_b->id });
     is $result->{workflow}->{state}, 'FAILURE';
 } "fail_workflow() - transition to state FAILURE";
 
@@ -287,18 +277,18 @@ lives_and {
 # get_workflow_info
 #
 lives_and {
-    my $result = $oxitest->api2_command("get_workflow_info" => { id => $wf_t2->{id} });
+    my $result = $oxitest->api2_command("get_workflow_info" => { id => $wf_t2->id });
     cmp_deeply $result, {
         workflow => superhashof({
             id => re(qr/^\d+$/),
             count_try => re(qr/^\d+$/),
             context => {
-                workflow_id => $wf_t2->{id},
+                workflow_id => $wf_t2->id,
                 role => 'User',
                 creator => 'wilhelm',
                 creator_role => 'User',
                 link => 'http://www.denic.de',
-                message => 'Lucy in the sky with diamonds (wf_type_2)',
+                message => 'Lucy in the sky with diamonds',
                 wf_current_action => 'wftype2_initialize',
             },
             last_update => ignore(),
@@ -340,7 +330,7 @@ lives_and {
 } "get_workflow_info() - via ID";
 
 lives_and {
-    my $result = $oxitest->api2_command("get_workflow_info" => { id => $wf_t2->{id}, activity => 'wftype2_add_link' });
+    my $result = $oxitest->api2_command("get_workflow_info" => { id => $wf_t2->id, activity => 'wftype2_add_link' });
     cmp_deeply $result, superhashof({
         activity => {
             wftype2_add_link => {
@@ -352,7 +342,7 @@ lives_and {
 } "get_workflow_info() - via ID with given ACTIVITY";
 
 lives_and {
-    my $result = $oxitest->api2_command("get_workflow_info" => { id => $wf_t2->{id}, with_attributes => 1 });
+    my $result = $oxitest->api2_command("get_workflow_info" => { id => $wf_t2->id, with_attributes => 1 });
     cmp_deeply $result, superhashof({
         workflow => superhashof({
             attribute => superhashof({
@@ -366,7 +356,7 @@ lives_and {
 # get_workflow_base_info
 #
 lives_and {
-    my $result = $oxitest->api2_command("get_workflow_base_info" => { type => $wf_t2->{type} });
+    my $result = $oxitest->api2_command("get_workflow_base_info" => { type => $wf_t2->type });
     cmp_deeply $result, {
         workflow => superhashof({
             id => re(qr/^\d+$/),
@@ -392,12 +382,12 @@ lives_and {
 #
 # get_workflow_log
 #
-throws_ok { $oxitest->api2_command("get_workflow_log" => { id => $wf_t1_a->{id} }) } qr/unauthorized/i,
+throws_ok { $oxitest->api2_command("get_workflow_log" => { id => $wf_t1_a->id }) } qr/unauthorized/i,
     "get_workflow_log() - throw exception on unauthorized user";
 
 CTX('session')->data->role('Guard');
 lives_and {
-    my $result = $oxitest->api2_command("get_workflow_log" => { id => $wf_t1_a->{id} });
+    my $result = $oxitest->api2_command("get_workflow_log" => { id => $wf_t1_a->id });
     my $i = -1;
     $i = -2 if $result->[$i]->[2] =~ / during .* startup /msxi;
     like $result->[$i]->[2], qr/ execute .* initialize /msxi or diag explain $result;
@@ -419,7 +409,7 @@ CTX('session')->data->role('User');
 #
 CTX('session')->data->role('Guard');
 lives_and {
-    my $result = $oxitest->api2_command("get_workflow_history" => { id => $wf_t1_a->{id} });
+    my $result = $oxitest->api2_command("get_workflow_history" => { id => $wf_t1_a->id });
     cmp_deeply $result, [
         superhashof({ workflow_state => "INITIAL", workflow_action => re(qr/create/i) }),
         superhashof({ workflow_state => "INITIAL", workflow_action => re(qr/initialize/i) }),
@@ -434,7 +424,7 @@ CTX('session')->data->role('User');
 # get_workflow_creator
 #
 lives_and {
-    my $result = $oxitest->api2_command("get_workflow_creator" => { id => $wf_t1_a->{id} });
+    my $result = $oxitest->api2_command("get_workflow_creator" => { id => $wf_t1_a->id });
     is $result, "wilhelm";
 } "get_workflow_creator()";
 
@@ -445,7 +435,7 @@ lives_and {
 lives_and {
     my $result = $oxitest->api2_command("get_workflow_activities" => {
         workflow => "wf_type_2",
-        id => $wf_t2->{id},
+        id => $wf_t2->id,
     });
     cmp_deeply $result, [
         "wftype2_add_message",
@@ -458,7 +448,7 @@ lives_and {
 lives_and {
     my $result = $oxitest->api2_command("get_workflow_activities_params" => {
         workflow => "wf_type_2",
-        id => $wf_t2->{id},
+        id => $wf_t2->id,
     });
     cmp_deeply $result, [
         "wftype2_add_message",
@@ -480,30 +470,30 @@ sub search_result {
 }
 
 my $wf_t1_a_data = superhashof({
-    'workflow_type' => $wf_t1_a->{type},
-    'workflow_id' => $wf_t1_a->{id},
+    'workflow_type' => $wf_t1_a->type,
+    'workflow_id' => $wf_t1_a->id,
     'workflow_state' => 'SUCCESS',
 });
 
 my $wf_t1_b_data = superhashof({
-    'workflow_type' => $wf_t1_b->{type},
-    'workflow_id' => $wf_t1_b->{id},
+    'workflow_type' => $wf_t1_b->type,
+    'workflow_id' => $wf_t1_b->id,
     'workflow_state' => 'FAILURE',
 });
 
 my $wf_t2_data = superhashof({
-    'workflow_type' => $wf_t2->{type},
-    'workflow_id' => $wf_t2->{id},
+    'workflow_type' => $wf_t2->type,
+    'workflow_id' => $wf_t2->id,
     'workflow_state' => 'PERSIST',
 });
 
 my $wf_t4_data = superhashof({
-    'workflow_type' => $wf_t4->{type},
-    'workflow_id' => $wf_t4->{id},
+    'workflow_type' => $wf_t4->type,
+    'workflow_id' => $wf_t4->id,
     'workflow_state' => 'PERSIST',
 });
 
-search_result { id => [ $wf_t1_a->{id}, $wf_t1_b->{id}, $wf_t2->{id} ] },
+search_result { id => [ $wf_t1_a->id, $wf_t1_b->id, $wf_t2->id ] },
     bag($wf_t1_a_data, $wf_t1_b_data, $wf_t2_data),
     "search_workflow_instances() - search by ID";
 
@@ -512,7 +502,7 @@ search_result { id => [ $wf_t1_a->{id}, $wf_t1_b->{id}, $wf_t2->{id} ] },
 search_result { attribute => [ { KEY => "creator", VALUE => "franz" } ] },
     all(
         superbagof($wf_t1_b_data),                                                  # expected record
-        array_each(superhashof({ 'workflow_type' => $wf_t1_b->{type} })),  # make sure we got no other types (=other creators)
+        array_each(superhashof({ 'workflow_type' => $wf_t1_b->type })),  # make sure we got no other types (=other creators)
     ),
     "search_workflow_instances() - search by ATTRIBUTE";
 
@@ -523,7 +513,7 @@ search_result { type => [ "wf_type_1", "wf_type_2" ] },
 search_result { type => "wf_type_2" },
     all(
         superbagof($wf_t2_data),                                                    # expected record
-        array_each(superhashof({ 'workflow_type' => $wf_t2->{type} })),    # make sure we got no other types
+        array_each(superhashof({ 'workflow_type' => $wf_t2->type })),    # make sure we got no other types
     ),
     "search_workflow_instances() - search by TYPE (String)";
 
@@ -587,7 +577,7 @@ lives_and {
 
 search_result
     {
-        id => [ $wf_t1_a->{id}, $wf_t1_b->{id}, $wf_t2->{id} ],
+        id => [ $wf_t1_a->id, $wf_t1_b->id, $wf_t2->id ],
         limit => 2,
     },
     [ $wf_t2_data, $wf_t1_b_data ],
@@ -595,7 +585,7 @@ search_result
 
 search_result
     {
-        id => [ $wf_t1_a->{id}, $wf_t1_b->{id}, $wf_t2->{id} ],
+        id => [ $wf_t1_a->id, $wf_t1_b->id, $wf_t2->id ],
         start => 1, limit => 2,
     },
     [ $wf_t1_b_data, $wf_t1_a_data ],
@@ -603,7 +593,7 @@ search_result
 
 search_result
     {
-        id => [ $wf_t1_a->{id}, $wf_t1_b->{id}, $wf_t2->{id} ],
+        id => [ $wf_t1_a->id, $wf_t1_b->id, $wf_t2->id ],
         attribute => [ { KEY => "creator", VALUE => "wilhelm" } ],
         state => [ "SUCCESS", "FAILURE" ],
     },
@@ -616,14 +606,14 @@ TODO: {
     # check_acl (edeltraut should see her workflow)
     CTX('session')->data->user('edeltraut');
     search_result { check_acl => 1 },
-            any( superhashof({ 'workflow_type' => $wf_t5->{type} }) ),
+            any( superhashof({ 'workflow_type' => $wf_t5->type }) ),
          "search_workflow_instances() - search with CHECK_ACL part 1";
 };
 
 # check_acl (user wilhelm should not see edeltrauts workflow)
 CTX('session')->data->user('wilhelm');
 search_result { check_acl => 1 },
-    array_each( superhashof({ 'workflow_type' => re(qr/^(.*)$/, noneof($wf_t5->{type})) }) ),
+    array_each( superhashof({ 'workflow_type' => re(qr/^(.*)$/, noneof($wf_t5->type)) }) ),
      "search_workflow_instances() - search with CHECK_ACL part 2";
 
 #
@@ -632,7 +622,7 @@ search_result { check_acl => 1 },
 note "Sleep two seconds to give workflow persister time to write to DB";
 sleep 2;
 lives_and {
-    my $result = $oxitest->api2_command("search_workflow_instances_count" => { id => [ $wf_t1_a->{id}, $wf_t1_b->{id}, $wf_t2->{id} ] });
+    my $result = $oxitest->api2_command("search_workflow_instances_count" => { id => [ $wf_t1_a->id, $wf_t1_b->id, $wf_t2->id ] });
     is $result, 3;
 } "search_workflow_instances_count()";
 

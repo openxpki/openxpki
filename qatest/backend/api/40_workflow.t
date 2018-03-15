@@ -134,24 +134,6 @@ sub workflow_def {
     };
 };
 
-sub test_wf_instance {
-    my ($pki_realm, $name) = @_;
-    CTX('session')->data->pki_realm($pki_realm);
-    my $wfinfo = CTX('api')->create_workflow_instance({
-        WORKFLOW => $name,
-        PARAMS => {
-            message => "Lucy in the sky with diamonds ($name)",
-            link => "http://www.denic.de",
-            role => "User",
-        },
-    });
-
-    die($wfinfo->{LIST}->[0]->{LABEL} || 'Unknown error occured during workflow creation')
-        if $wfinfo and exists $wfinfo->{SERVICE_MSG} and $wfinfo->{SERVICE_MSG} eq 'ERROR';
-
-    return $wfinfo->{WORKFLOW};
-}
-
 
 
 my $oxitest = OpenXPKI::Test->new(
@@ -166,15 +148,27 @@ my $oxitest = OpenXPKI::Test->new(
 # while testing we do not log to database by default
 $oxitest->enable_workflow_log;
 
+my $params = {
+    message => "Lucy in the sky with diamonds",
+    link => "http://www.denic.de",
+    role => "User",
+};
+
 CTX('session')->data->role('User');
 
+CTX('session')->data->pki_realm("alpha");
+
 CTX('session')->data->user('wilhelm');
-my $wf_t1_a = test_wf_instance "alpha", "wf_type_1";
+my $wf_t1_a = $oxitest->create_workflow("wf_type_1", $params);
+
 CTX('session')->data->user('franz');
-my $wf_t1_b = test_wf_instance "alpha", "wf_type_1";
+my $wf_t1_b = $oxitest->create_workflow("wf_type_1", $params);
+
 CTX('session')->data->user('wilhelm');
-my $wf_t2 =   test_wf_instance "alpha", "wf_type_2";
-my $wf_t4 =   test_wf_instance "beta",  "wf_type_4";
+my $wf_t2 =   $oxitest->create_workflow("wf_type_2", $params);
+
+CTX('session')->data->pki_realm("beta");
+my $wf_t4 =   $oxitest->create_workflow("wf_type_4", $params);
 
 
 
@@ -197,7 +191,7 @@ lives_and {
 # get_workflow_type_for_id
 #
 lives_and {
-    my $result = CTX('api')->get_workflow_type_for_id({ ID => $wf_t1_a->{ID} });
+    my $result = CTX('api')->get_workflow_type_for_id({ ID => $wf_t1_a->id });
     is $result, "wf_type_1", "get_workflow_type_for_id()";
 }
 
@@ -210,7 +204,7 @@ dies_ok {
 #
 throws_ok {
     my $result = CTX('api')->execute_workflow_activity({
-        ID => $wf_t1_a->{ID},
+        ID => $wf_t1_a->id,
         ACTIVITY => "dummy",
     });
 } qr/state.*PERSIST.*dummy/i,
@@ -218,7 +212,7 @@ throws_ok {
 
 lives_and {
     my $result = CTX('api')->execute_workflow_activity({
-        ID => $wf_t1_a->{ID},
+        ID => $wf_t1_a->id,
         ACTIVITY => "wftype1_add_message", # "wftype1" is the prefix defined in the workflow
     });
     # ... this will automatically call "add_link" and "set_motd"
@@ -229,7 +223,7 @@ lives_and {
 # fail_workflow
 #
 lives_and {
-    my $result = CTX('api')->fail_workflow({ ID => $wf_t1_b->{ID} });
+    my $result = CTX('api')->fail_workflow({ ID => $wf_t1_b->id });
     is $result->{WORKFLOW}->{STATE}, 'FAILURE';
 } "fail_workflow() - transition to state FAILURE";
 
@@ -260,18 +254,18 @@ lives_and {
 # get_workflow_info
 #
 lives_and {
-    my $result = CTX('api')->get_workflow_info({ ID => $wf_t2->{ID} });
+    my $result = CTX('api')->get_workflow_info({ ID => $wf_t2->id });
     cmp_deeply $result, {
         WORKFLOW => superhashof({
             ID => re(qr/^\d+$/),
             COUNT_TRY => re(qr/^\d+$/),
             CONTEXT => {
-                workflow_id => $wf_t2->{ID},
+                workflow_id => $wf_t2->id,
                 role => 'User',
                 creator => 'wilhelm',
                 creator_role => 'User',
                 link => 'http://www.denic.de',
-                message => 'Lucy in the sky with diamonds (wf_type_2)',
+                message => 'Lucy in the sky with diamonds',
                 wf_current_action => 'wftype2_initialize',
             },
             LAST_UPDATE => ignore(),
@@ -313,7 +307,7 @@ lives_and {
 } "get_workflow_info() - via ID";
 
 lives_and {
-    my $result = CTX('api')->get_workflow_info({ TYPE => $wf_t2->{TYPE} });
+    my $result = CTX('api')->get_workflow_info({ TYPE => $wf_t2->type });
     cmp_deeply $result, {
         WORKFLOW => superhashof({
             ID => re(qr/^\d+$/),
@@ -334,10 +328,10 @@ lives_and {
             }),
         },
     };
-} "get_workflow_info() - via TYPE ".$wf_t2->{TYPE};
+} "get_workflow_info() - via TYPE ".$wf_t2->type;
 
 lives_and {
-    my $result = CTX('api')->get_workflow_info({ ID => $wf_t2->{ID}, ACTIVITY => 'wftype2_add_link' });
+    my $result = CTX('api')->get_workflow_info({ ID => $wf_t2->id, ACTIVITY => 'wftype2_add_link' });
     cmp_deeply $result, superhashof({
         ACTIVITY => {
             wftype2_add_link => {
@@ -349,7 +343,7 @@ lives_and {
 } "get_workflow_info() - via ID with given ACTIVITY";
 
 lives_and {
-    my $result = CTX('api')->get_workflow_info({ ID => $wf_t2->{ID}, ATTRIBUTE => 1 });
+    my $result = CTX('api')->get_workflow_info({ ID => $wf_t2->id, ATTRIBUTE => 1 });
     cmp_deeply $result, superhashof({
         WORKFLOW => superhashof({
             ATTRIBUTE => superhashof({
@@ -362,12 +356,12 @@ lives_and {
 #
 # get_workflow_log
 #
-throws_ok { CTX('api')->get_workflow_log({ ID => $wf_t1_a->{ID} }) } qr/unauthorized/i,
+throws_ok { CTX('api')->get_workflow_log({ ID => $wf_t1_a->id }) } qr/unauthorized/i,
     "get_workflow_log() - throw exception on unauthorized user";
 
 CTX('session')->data->role('Guard');
 lives_and {
-    my $result = CTX('api')->get_workflow_log({ ID => $wf_t1_a->{ID} });
+    my $result = CTX('api')->get_workflow_log({ ID => $wf_t1_a->id });
     my $i = -1;
     $i = -2 if $result->[$i]->[2] =~ / during .* startup /msxi;
     like $result->[$i]->[2], qr/ execute .* initialize /msxi or diag explain $result;
@@ -389,7 +383,7 @@ CTX('session')->data->role('User');
 #
 CTX('session')->data->role('Guard');
 lives_and {
-    my $result = CTX('api')->get_workflow_history({ ID => $wf_t1_a->{ID} });
+    my $result = CTX('api')->get_workflow_history({ ID => $wf_t1_a->id });
     cmp_deeply $result, [
         superhashof({ WORKFLOW_STATE => "INITIAL", WORKFLOW_ACTION => re(qr/create/i) }),
         superhashof({ WORKFLOW_STATE => "INITIAL", WORKFLOW_ACTION => re(qr/initialize/i) }),
@@ -404,7 +398,7 @@ CTX('session')->data->role('User');
 # get_workflow_creator
 #
 lives_and {
-    my $result = CTX('api')->get_workflow_creator({ ID => $wf_t1_a->{ID} });
+    my $result = CTX('api')->get_workflow_creator({ ID => $wf_t1_a->id });
     is $result, "wilhelm";
 } "get_workflow_creator()";
 
@@ -415,7 +409,7 @@ lives_and {
 lives_and {
     my $result = CTX('api')->get_workflow_activities({
         WORKFLOW => "wf_type_2",
-        ID => $wf_t2->{ID},
+        ID => $wf_t2->id,
     });
     cmp_deeply $result, [
         "wftype2_add_message",
@@ -428,7 +422,7 @@ lives_and {
 lives_and {
     my $result = CTX('api')->get_workflow_activities_params({
         WORKFLOW => "wf_type_2",
-        ID => $wf_t2->{ID},
+        ID => $wf_t2->id,
     });
     cmp_deeply $result, [
         "wftype2_add_message",
@@ -450,30 +444,30 @@ sub search_result {
 }
 
 my $wf_t1_a_data = superhashof({
-    'WORKFLOW.WORKFLOW_TYPE' => $wf_t1_a->{TYPE},
-    'WORKFLOW.WORKFLOW_SERIAL' => $wf_t1_a->{ID},
+    'WORKFLOW.WORKFLOW_TYPE' => $wf_t1_a->type,
+    'WORKFLOW.WORKFLOW_SERIAL' => $wf_t1_a->id,
     'WORKFLOW.WORKFLOW_STATE' => 'SUCCESS',
 });
 
 my $wf_t1_b_data = superhashof({
-    'WORKFLOW.WORKFLOW_TYPE' => $wf_t1_b->{TYPE},
-    'WORKFLOW.WORKFLOW_SERIAL' => $wf_t1_b->{ID},
+    'WORKFLOW.WORKFLOW_TYPE' => $wf_t1_b->type,
+    'WORKFLOW.WORKFLOW_SERIAL' => $wf_t1_b->id,
     'WORKFLOW.WORKFLOW_STATE' => 'FAILURE',
 });
 
 my $wf_t2_data = superhashof({
-    'WORKFLOW.WORKFLOW_TYPE' => $wf_t2->{TYPE},
-    'WORKFLOW.WORKFLOW_SERIAL' => $wf_t2->{ID},
+    'WORKFLOW.WORKFLOW_TYPE' => $wf_t2->type,
+    'WORKFLOW.WORKFLOW_SERIAL' => $wf_t2->id,
     'WORKFLOW.WORKFLOW_STATE' => 'PERSIST',
 });
 
 my $wf_t4_data = superhashof({
-    'WORKFLOW.WORKFLOW_TYPE' => $wf_t4->{TYPE},
-    'WORKFLOW.WORKFLOW_SERIAL' => $wf_t4->{ID},
+    'WORKFLOW.WORKFLOW_TYPE' => $wf_t4->type,
+    'WORKFLOW.WORKFLOW_SERIAL' => $wf_t4->id,
     'WORKFLOW.WORKFLOW_STATE' => 'PERSIST',
 });
 
-search_result { SERIAL => [ $wf_t1_a->{ID}, $wf_t2->{ID} ] },
+search_result { SERIAL => [ $wf_t1_a->id, $wf_t2->id ] },
     bag($wf_t1_a_data, $wf_t2_data),
     "search_workflow_instances() - search by SERIAL";
 
@@ -482,7 +476,7 @@ search_result { SERIAL => [ $wf_t1_a->{ID}, $wf_t2->{ID} ] },
 search_result { ATTRIBUTE => [ { KEY => "creator", VALUE => "franz" } ] },
     all(
         superbagof($wf_t1_b_data),                                                  # expected record
-        array_each(superhashof({ 'WORKFLOW.WORKFLOW_TYPE' => $wf_t1_b->{TYPE} })),  # make sure we got no other types (=other creators)
+        array_each(superhashof({ 'WORKFLOW.WORKFLOW_TYPE' => $wf_t1_b->type })),  # make sure we got no other types (=other creators)
     ),
     "search_workflow_instances() - search by ATTRIBUTE";
 
@@ -493,7 +487,7 @@ search_result { TYPE => [ "wf_type_1", "wf_type_2" ] },
 search_result { TYPE => "wf_type_2" },
     all(
         superbagof($wf_t2_data),                                                    # expected record
-        array_each(superhashof({ 'WORKFLOW.WORKFLOW_TYPE' => $wf_t2->{TYPE} })),    # make sure we got no other types
+        array_each(superhashof({ 'WORKFLOW.WORKFLOW_TYPE' => $wf_t2->type })),    # make sure we got no other types
     ),
     "search_workflow_instances() - search by TYPE (String)";
 
@@ -557,7 +551,7 @@ lives_and {
 
 search_result
     {
-        SERIAL => [ $wf_t1_a->{ID}, $wf_t1_b->{ID}, $wf_t2->{ID} ],
+        SERIAL => [ $wf_t1_a->id, $wf_t1_b->id, $wf_t2->id ],
         LIMIT => 2,
     },
     [ $wf_t2_data, $wf_t1_b_data ],
@@ -565,7 +559,7 @@ search_result
 
 search_result
     {
-        SERIAL => [ $wf_t1_a->{ID}, $wf_t1_b->{ID}, $wf_t2->{ID} ],
+        SERIAL => [ $wf_t1_a->id, $wf_t1_b->id, $wf_t2->id ],
         START => 1, LIMIT => 2,
     },
     [ $wf_t1_b_data, $wf_t1_a_data ],
@@ -573,7 +567,7 @@ search_result
 
 search_result
     {
-        SERIAL => [ $wf_t1_a->{ID}, $wf_t1_b->{ID}, $wf_t2->{ID} ],
+        SERIAL => [ $wf_t1_a->id, $wf_t1_b->id, $wf_t2->id ],
         ATTRIBUTE => [ { KEY => "creator", VALUE => "wilhelm" } ],
         STATE => [ "SUCCESS", "FAILURE" ],
     },
@@ -584,7 +578,7 @@ search_result
 # search_workflow_instances_count
 #
 lives_and {
-    my $result = CTX('api')->search_workflow_instances_count({ SERIAL => [ $wf_t1_a->{ID}, $wf_t1_b->{ID}, $wf_t2->{ID} ] });
+    my $result = CTX('api')->search_workflow_instances_count({ SERIAL => [ $wf_t1_a->id, $wf_t1_b->id, $wf_t2->id ] });
     is $result, 3;
 } "search_workflow_instances_count()";
 

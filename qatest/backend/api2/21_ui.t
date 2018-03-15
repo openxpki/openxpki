@@ -21,10 +21,9 @@ use Log::Log4perl qw(:easy);
 # Project modules
 use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
-use OpenXPKI::Test::QA::CertHelper::Workflow;
 use OpenXPKI::Serialization::Simple;
 
-plan tests => 11;
+plan tests => 12;
 
 
 #
@@ -53,8 +52,8 @@ $oxitest->session->data->role("CA Operator");
 
 # get_ui_system_status
 
-lives_ok {
-    $oxitest->wf_create(
+lives_and {
+    my $wftest = $oxitest->create_workflow(
         "certificate_revocation_request_v2" => {
             cert_identifier => $cert_info->{identifier},
             reason_code => 'keyCompromise',
@@ -66,13 +65,13 @@ lives_ok {
     );
 
     # Go to pending
-    $oxitest->wf_is_state('CHECK_FOR_REVOCATION') or die "workflow state is not 'CHECK_FOR_REVOCATION'";
+    $wftest->state_is('CHECK_FOR_REVOCATION');
 
-    $oxitest->wf_create(
+    $wftest = $oxitest->create_workflow(
         "crl_issuance" => { force_issue => 1 }
     );
 
-    $oxitest->wf_is_state('SUCCESS') or die "workflow state is not 'SUCCESS'";
+    $wftest->state_is('SUCCESS');
 } 'Create workflow: auto-revoke certificate' or die "Creating workflow failed";
 
 lives_and {

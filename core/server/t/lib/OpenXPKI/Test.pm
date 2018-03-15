@@ -417,19 +417,6 @@ has session => (
     predicate => 'has_session',
 );
 
-=head2 last_api_result
-
-Returns the result of last call to L</api_command> or L</api2_command>.
-
-=cut
-#
-has last_api_result => (
-    is => 'rw',
-    isa => 'Any',
-    init_arg => undef,
-    predicate => 'has_last_api_result',
-);
-
 has path_log4perl_conf  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/etc/openxpki/log.conf" } );
 has conf_log4perl       => ( is => 'rw', isa => 'Str',    lazy => 1, builder => "_build_log4perl" );
 has conf_session        => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => "_build_conf_session" );
@@ -752,8 +739,7 @@ sub get_config {
 
 =head2 api_command
 
-Executes the given API2 command and stores the result in L</last_api_result>
-(additionally to returning it).
+Executes the given API2 command and returns the result.
 
 Convenience method to prevent usage of CTX('api') in test files.
 
@@ -770,17 +756,12 @@ B<Positional Parameters>
 =cut
 sub api_command {
     my ($self, $command, $params) = @_;
-
-    my $result = OpenXPKI::Server::Context::CTX('api')->$command($params);
-    $self->last_api_result($result);
-
-    return $result;
+    return OpenXPKI::Server::Context::CTX('api')->$command($params);
 }
 
 =head2 api2_command
 
-Executes the given API2 command and stores the result in L</last_api_result>
-(additionally to returning it).
+Executes the given API2 command and returns the result.
 
 Convenience method to prevent usage of CTX('api2') in test files.
 
@@ -797,11 +778,7 @@ B<Positional Parameters>
 =cut
 sub api2_command {
     my ($self, $command, $params) = @_;
-
-    my $result = OpenXPKI::Server::Context::CTX('api2')->$command($params ? (%$params) : ());
-    $self->last_api_result($result);
-
-    return $result;
+    return OpenXPKI::Server::Context::CTX('api2')->$command($params ? (%$params) : ());
 }
 
 =head2 insert_testcerts

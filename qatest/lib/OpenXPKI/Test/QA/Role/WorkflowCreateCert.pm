@@ -30,9 +30,9 @@ use OpenXPKI::Serialization::Simple;
 
 
 requires 'also_init';
-requires 'default_realm'; # effectively requires 'OpenXPKI::Test::QA::Role::SampleConfig'
-                          # we can't use with '...' because if other roles also said that then it would be applied more than once
-requires 'wf_create';     # effectively requires 'OpenXPKI::Test::QA::Role::Workflows'
+requires 'default_realm';   # effectively requires 'OpenXPKI::Test::QA::Role::SampleConfig'
+                            # we can't use with '...' because if other roles also said that then it would be applied more than once
+requires 'create_workflow'; # effectively requires 'OpenXPKI::Test::QA::Role::Workflows'
 requires 'session';
 
 
@@ -88,9 +88,7 @@ sub create_cert {
 
     my $cert_info = {};
 
-    lives_ok {
-        my $result;
-
+    subtest "Create certificate (hostname ".$params->hostname.")" => sub {
         # change PKI realm, user and role to get permission to create workflow
         my $sess_data = $self->session->data;
         my $old_realm = $sess_data->has_pki_realm ? $sess_data->pki_realm : undef;
@@ -100,110 +98,112 @@ sub create_cert {
         $sess_data->user('raop');
         $sess_data->role('RA Operator');
 
-        $self->wf_create(
-            "certificate_signing_request_v2" => {
-                cert_profile => $params->profile,
-                cert_subject_style => "00_basic_style",
-            }
-        );
+        my $result;
+        lives_and {
+            my $wftest = $self->create_workflow(
+                "certificate_signing_request_v2" => {
+                    cert_profile => $params->profile,
+                    cert_subject_style => "00_basic_style",
+                }
+            );
 
-        $self->wf_activity(
-            'SETUP_REQUEST_TYPE',
-            csr_provide_server_key_params => {
-                key_alg => "rsa",
-                enc_alg => 'aes256',
-                key_gen_params => $serializer->serialize( { KEY_LENGTH => 2048 } ),
-                password_type => 'client',
-                csr_type => 'pkcs10'
-            },
-        );
-
-        $self->wf_activity(
-            'ENTER_KEY_PASSWORD',
-            csr_ask_client_password => { _password => "m4#bDf7m3abd" },
-        );
-
-        $self->wf_activity(
-            'ENTER_SUBJECT',
-            csr_edit_subject => {
-                cert_subject_parts => $serializer->serialize( \%cert_subject_parts ),
-            },
-        );
-
-        if ($is_server_profile) {
-            $self->wf_activity(
-                'ENTER_SAN',
-                csr_edit_san => {
-                    cert_san_parts => $serializer->serialize( { } ),
+            $wftest->start_activity(
+                'SETUP_REQUEST_TYPE',
+                csr_provide_server_key_params => {
+                    key_alg => "rsa",
+                    enc_alg => 'aes256',
+                    key_gen_params => $serializer->serialize( { KEY_LENGTH => 2048 } ),
+                    password_type => 'client',
+                    csr_type => 'pkcs10'
                 },
             );
-        }
 
-        $self->wf_activity(
-            'ENTER_CERT_INFO',
-            'csr_edit_cert_info' => {
-                cert_info => $serializer->serialize( {
-                    requestor_gname => $params->requestor_gname,
-                    requestor_name  => $params->requestor_name,
-                    requestor_email => $params->requestor_email,
-                } )
-            },
-        );
-
-        die "workflow state is not 'SUBJECT_COMPLETE'" unless $self->wf_is_state('SUBJECT_COMPLETE');
-
-        # Test FQDNs should not validate so we need a policy exception request
-        # (on rare cases the responsible router might return a valid address, so we check)
-        my $msg = $self->api_command(
-            get_workflow_info => { ID => $self->_workflow_id }
-        );
-
-        my $actions = $msg->{STATE}->{option};
-        my $intermediate_state;
-        if (grep { /^csr_enter_policy_violation_comment$/ } @$actions) {
-            diag "Test FQDNs do not resolve - handling policy violation" if $ENV{TEST_VERBOSE};
-            $self->wf_activity(
-                undef,
-                csr_enter_policy_violation_comment => { policy_comment => 'This is just a test' },
+            $wftest->start_activity(
+                'ENTER_KEY_PASSWORD',
+                csr_ask_client_password => { _password => "m4#bDf7m3abd" },
             );
-            $intermediate_state = 'PENDING_POLICY_VIOLATION';
-        }
-        else {
-            diag "For whatever reason test FQDNs do resolve - submitting request" if $ENV{TEST_VERBOSE};
-            $self->wf_activity(
-                undef,
-                csr_submit => {},
+
+            $wftest->start_activity(
+                'ENTER_SUBJECT',
+                csr_edit_subject => {
+                    cert_subject_parts => $serializer->serialize( \%cert_subject_parts ),
+                },
             );
-            $intermediate_state = 'PENDING';
-        }
 
-#        if ($self->notbefore) {
-#            $test->execute_ok('csr_edit_validity', {
-#                notbefore => $self->notbefore,
-#                notafter => $self->notafter,
-#            });
-#            $test->state_is( ??? );
-#        }
+            if ($is_server_profile) {
+                $wftest->start_activity(
+                    'ENTER_SAN',
+                    csr_edit_san => {
+                        cert_san_parts => $serializer->serialize( { } ),
+                    },
+                );
+            }
 
-        $self->wf_activity(
-            $intermediate_state,
-            csr_approve_csr => {},
-        );
-        die "workflow state is not 'SUCCESS'" unless $self->wf_is_state('SUCCESS');
+            $wftest->start_activity(
+                'ENTER_CERT_INFO',
+                'csr_edit_cert_info' => {
+                    cert_info => $serializer->serialize( {
+                        requestor_gname => $params->requestor_gname,
+                        requestor_name  => $params->requestor_name,
+                        requestor_email => $params->requestor_email,
+                    } )
+                },
+            );
 
-        my $temp = $self->api_command(
-            get_workflow_info => { ID => $self->_workflow_id }
-        );
-        $cert_info = {
-            req_key    => $temp->{WORKFLOW}->{CONTEXT}->{csr_serial},
-            identifier => $temp->{WORKFLOW}->{CONTEXT}->{cert_identifier},
-            profile    => $temp->{WORKFLOW}->{CONTEXT}->{cert_profile},
-        };
+            $wftest->state_is('SUBJECT_COMPLETE') or BAIL_OUT;
 
+            # Test FQDNs should not validate so we need a policy exception request
+            # (on rare cases the responsible router might return a valid address, so we check)
+            my $msg = $self->api_command(
+                get_workflow_info => { ID => $wftest->id }
+            );
+
+            my $actions = $msg->{STATE}->{option};
+            my $intermediate_state;
+            if (grep { /^csr_enter_policy_violation_comment$/ } @$actions) {
+                diag "Test FQDNs do not resolve - handling policy violation" if $ENV{TEST_VERBOSE};
+                $wftest->start_activity(
+                    undef,
+                    csr_enter_policy_violation_comment => { policy_comment => 'This is just a test' },
+                );
+                $intermediate_state = 'PENDING_POLICY_VIOLATION';
+            }
+            else {
+                diag "For whatever reason test FQDNs do resolve - submitting request" if $ENV{TEST_VERBOSE};
+                $wftest->start_activity(
+                    undef,
+                    csr_submit => {},
+                );
+                $intermediate_state = 'PENDING';
+            }
+
+    #        if ($self->notbefore) {
+    #            $test->execute_ok('csr_edit_validity', {
+    #                notbefore => $self->notbefore,
+    #                notafter => $self->notafter,
+    #            });
+    #            $test->state_is( ??? );
+    #        }
+
+            $wftest->start_activity(
+                $intermediate_state,
+                csr_approve_csr => {},
+            );
+            $wftest->state_is('SUCCESS') or BAIL_OUT;
+
+            my $temp = $self->api_command(
+                get_workflow_info => { ID => $wftest->id }
+            );
+            $cert_info = {
+                req_key    => $temp->{WORKFLOW}->{CONTEXT}->{csr_serial},
+                identifier => $temp->{WORKFLOW}->{CONTEXT}->{cert_identifier},
+                profile    => $temp->{WORKFLOW}->{CONTEXT}->{cert_profile},
+            };
+        } "successfully run workflow";
         if ($old_realm) { $sess_data->pki_realm($old_realm) } else { $sess_data->clear_pki_realm }
         if ($old_user)  { $sess_data->user($old_user) }       else { $sess_data->clear_user }
         if ($old_role)  { $sess_data->role($old_role) }       else { $sess_data->clear_role }
-    } "Create certificate (hostname ".$params->hostname.")";
+    };
 
     return $cert_info;
 }
