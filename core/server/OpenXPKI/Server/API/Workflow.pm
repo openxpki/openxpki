@@ -495,21 +495,19 @@ sub execute_workflow_activity {
     $context->param ( $params ) if ($params);
 
     ##! 64: Dumper $workflow
-    if ($fork_mode) {
-        $self->__execute_workflow_activity( $workflow, $wf_activity, 1);
-        CTX('log')->workflow()->debug("Background execution of workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_type')");
+    CTX('log')->workflow()->debug(sprintf(
+        "%s of workflow activity '%s' on workflow #%s ('%s')",
+        $fork_mode ? "Forked execution ($fork_mode)" : "Execution",
+        $wf_activity,
+        $wf_id,
+        $wf_type
+    ));
+    my $updated_workflow = $self->__exec_activity( $workflow, $wf_activity, $fork_mode);
 
-        if ($fork_mode eq 'watch') {
-            $workflow = $self->__watch_workflow( $workflow );
-        }
-    } else {
-        $self->__execute_workflow_activity( $workflow, $wf_activity );
-        CTX('log')->workflow()->debug("Executed workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_type')");
-
-    }
-
-    return $self->__get_workflow_ui_info({ WORKFLOW => $workflow }) if $wf_uiinfo;
-    return $self->__get_workflow_info($workflow);
+    return ($wf_uiinfo
+        ? $self->__get_workflow_ui_info({ WORKFLOW => $updated_workflow })
+        : $self->__get_workflow_info($updated_workflow)
+    );
 }
 
 sub fail_workflow {
@@ -635,23 +633,19 @@ sub __wakeup_resume_workflow {
     # get the last action from the context
     my $wf_activity = $workflow->context()->param('wf_current_action');
 
-    if ($fork_mode) {
-        $mode .= "($fork_mode)";
-    }
-
-    CTX('log')->workflow()->info("$mode workflow $wf_id (type '$wf_type') with activity $wf_activity");
-
     ##! 16: 'execute activity ' . $wf_activity
+    CTX('log')->workflow()->info(sprintf(
+        "%s%s workflow %s (type '%s') with activity %s",
+        ucfirst($mode),
+        $fork_mode ? " ($fork_mode)" : "",
+        $wf_id,
+        $wf_type,
+        $wf_activity
+    ));
 
-    if ($fork_mode) {
-        $self->__execute_workflow_activity( $workflow, $wf_activity, 1);
-        if ($fork_mode eq 'watch') {
-            $workflow = $self->__watch_workflow( $workflow );
-        }
-    } else {
-        $self->__execute_workflow_activity( $workflow, $wf_activity );
-    }
-    return $self->__get_workflow_ui_info({ WORKFLOW => $workflow });
+    my $updated_workflow = $self->__exec_activity( $workflow, $wf_activity, $fork_mode);
+
+    return $self->__get_workflow_ui_info({ WORKFLOW => $updated_workflow });
 }
 
 sub get_workflow_activities_params {
@@ -761,7 +755,7 @@ sub create_workflow_instance {
 
     ##! 64: Dumper $workflow
 
-    $self->__execute_workflow_activity( $workflow, $initial_action );
+    $self->__exec_activity( $workflow, $initial_action );
 
     # FIXME - ported from old factory but I do not understand if this ever can happen..
     # From theory, the workflow should throw an exception if the action can not be handled
@@ -1156,26 +1150,35 @@ sub __validate_input_param {
     return $result;
 }
 
-=head2 __execute_workflow_activity( workflow, activity, fork )
+=head2 __exec_activity
 
-Execute the named activity on the given workflow object. Returns
-0 on success and throws exceptions on errors.
+Executes the named activity on the given workflow object. Returns 0 on success
+and throws exceptions on errors.
+
+B<Parameters>
+
+=over
+
+=item * C<$workflow> I<OpenXPKI::Server::Workflow> - workflow object
+
+=item * C<$wf_activity> I<Str> - name of the workflow activity to execute
+
+=item * C<$fork_mode> I<Str> - set this to 1 or 'fork' to execute the activity
+in the background.
+
+=back
 
 The third argument is an optional boolean flag weather to executed
-the activity in the background. If used, the return value is the PID
-of the forked child.
+the activity in the background. If used, the
 
 =cut
 
-sub __execute_workflow_activity {
-    my $self = shift;
-    my $workflow = shift;
-    my $wf_activity = shift;
-    my $run_async = shift || '';
+sub __exec_activity {
+    my ($self, $workflow, $wf_activity, $fork_mode) = @_;
 
     my $log = CTX('log')->workflow;
 
-    my $activity = sub {
+    my $activity_cb = sub {
         ##! 8: 'execute activity ' . $wf_activity
 
         # This is a hack to handle simple "autorun" actions which we use to
@@ -1207,73 +1210,98 @@ sub __execute_workflow_activity {
         } while( $wf_activity );
     };
 
+    my $updated_workflow = $workflow; # in synchronous execution the object is modified
 
-    #
     # ASYNCHRONOUS - fork
-    #
-    if ($run_async) {
-        $log->info(sprintf ("Workflow called with fork mode set! State %s in workflow id %01d (type %s)",
-            $workflow->state(), $workflow->id(), $workflow->type()));
-
-        # FORK
-        my $pid = OpenXPKI::Daemonize->new->fork_child; # parent returns PID, child returns 0
-
-        # parent process
-        if ($pid > 0) {
-            ##! 32: ' Workflow instance succesfully forked with pid ' . $pid
-            $log->trace("Forked workflow instance with PID $pid") if $log->is_trace;
-            return $pid;
+    if ($fork_mode) {
+        $self->__exec_activity_async($workflow, $wf_activity, $activity_cb); # returns the background process PID
+        if ($fork_mode eq 'watch') {
+            $updated_workflow = $self->__watch_workflow($workflow);
         }
+    }
+    # SYNCHRONOUS
+    else {
+        $self->__exec_activity_sync($workflow, $wf_activity, $activity_cb);
+    }
+    return $updated_workflow;
+}
 
-        # child process
-        try {
-            ##! 16: ' Workflow instance succesfully forked - I am the workflow'
-            # append fork info to process name
-            OpenXPKI::Server::__set_process_name("workflow: id %d (detached)", $workflow->id());
+#
+# Executes the given workflow action asynchronously (by spawning a child process).
+#
+# Returns the PID of the forked child process.
+#
+sub __exec_activity_async {
+    my ($self, $workflow, $wf_activity, $activity_cb) = @_;
 
-            # create memory-only session for workflow if it's not already one
-            if (CTX('session')->type ne 'Memory') {
-                my $session = OpenXPKI::Server::Session->new(type => "Memory")->create;
-                $session->data->user( CTX('session')->data->user );
-                $session->data->role( CTX('session')->data->role );
-                $session->data->pki_realm( CTX('session')->data->pki_realm );
+    my $log = CTX('log')->workflow;
 
-                OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
-                Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
-            }
+    $log->info(sprintf ("Workflow called with fork mode set! State %s in workflow id %01d (type %s)",
+        $workflow->state(), $workflow->id(), $workflow->type()));
 
-            # run activity
-            $activity->();
+    # FORK
+    my $pid = OpenXPKI::Daemonize->new->fork_child; # parent returns PID, child returns 0
 
-            # DB commits are done inside the workflow engine
-        }
-        catch {
-            # DB rollback is not needed as this process will terminate now anyway
-            local $@ = $_; # makes OpenXPKI::Exception compatible with Try::Tiny
-            if (my $exc = OpenXPKI::Exception->caught) {
-                $exc->show_trace(1);
-            }
-            # make sure the cleanup code does not die as this would escape this method
-            eval { CTX('log')->system->error($_) };
-        };
-
-        eval { CTX('dbi')->disconnect };
-
-        ##! 16: 'Backgrounded workflow finished - exit child'
-        exit;
+    # parent process
+    if ($pid > 0) {
+        ##! 32: ' Workflow instance succesfully forked with pid ' . $pid
+        $log->trace("Forked workflow instance with PID $pid") if $log->is_trace;
+        return $pid;
     }
 
-    #
-    # SYNCHRONOUS
-    #
+    # child process
+    try {
+        ##! 16: ' Workflow instance succesfully forked - I am the workflow'
+        # append fork info to process name
+        OpenXPKI::Server::__set_process_name("workflow: id %d (detached)", $workflow->id());
+
+        # create memory-only session for workflow if it's not already one
+        if (CTX('session')->type ne 'Memory') {
+            my $session = OpenXPKI::Server::Session->new(type => "Memory")->create;
+            $session->data->user( CTX('session')->data->user );
+            $session->data->role( CTX('session')->data->role );
+            $session->data->pki_realm( CTX('session')->data->pki_realm );
+
+            OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
+            Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
+        }
+
+        # run activity
+        $activity_cb->();
+
+        # DB commits are done inside the workflow engine
+    }
+    catch {
+        # DB rollback is not needed as this process will terminate now anyway
+        local $@ = $_; # makes OpenXPKI::Exception compatible with Try::Tiny
+        if (my $exc = OpenXPKI::Exception->caught) {
+            $exc->show_trace(1);
+        }
+        # make sure the cleanup code does not die as this would escape this method
+        eval { CTX('log')->system->error($_) };
+    };
+
+    eval { CTX('dbi')->disconnect };
+
+    ##! 16: 'Backgrounded workflow finished - exit child'
+    exit;
+}
+
+#
+# Executes the given workflow action synchronously.
+#
+# Returns 0.
+#
+sub __exec_activity_sync {
+    my ($self, $workflow, $wf_activity, $activity_cb) = @_;
 
     ##! 64: Dumper $workflow
     OpenXPKI::Server::__set_process_name("workflow: id %d", $workflow->id());
     # run activity
-    eval { $activity->() };
+    eval { $activity_cb->() };
 
     if (my $eval_err = $EVAL_ERROR) {
-       $log->error(sprintf ("Error executing workflow activity '%s' on workflow id %01d (type %s): %s",
+       CTX('log')->workflow->error(sprintf ("Error executing workflow activity '%s' on workflow id %01d (type %s): %s",
             $wf_activity, $workflow->id(), $workflow->type(), $eval_err));
 
         OpenXPKI::Server::__set_process_name("workflow: id %d (exception)", $workflow->id());
@@ -1324,6 +1352,7 @@ sub __execute_workflow_activity {
 
     OpenXPKI::Server::__set_process_name("workflow: id %d (cleanup)", $workflow->id());
     return 0;
+
 }
 
 =head2 __watch_workflow ( workflow, duration = 15, sleep = 2 )
