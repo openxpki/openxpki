@@ -637,7 +637,7 @@ t/25_crypto/35_object_pkcs7.t
 t/25_crypto/51_volatile_vault.t
 t/25_crypto/52_object_secret.t
 t/25_crypto/53_is_issuer.t
-t/25_crypto/60_secret_cache.t
+t/25_crypto/60_tokenmanager.t
 
 t/28_log/01.t
 t/28_log/log4perl.conf
