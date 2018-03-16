@@ -548,47 +548,53 @@ sub get_workflow_info {
     return $result;
 }
 
-=head2 watch ( workflow, duration = 15, sleep = 2 )
+=head2 watch
 
-Watch a workflow for changes based on the last_update column.
-Expects the workflow object as first parameter, the duration to watch
-and the sleep interval between the checks can be passed as second and
-third parameters, default is 15s/2s.
+Watch a workflow for changes based on the C<workflow_state>,
+C<workflow_proc_state> and C<workflow_last_update> columns.
+
+Expects the workflow object as parameter.
 
 The method returns the changed workflow object if a change was detected
-or the initial workflow object if no change happend.
+or the initial workflow object if no change happened after 15 seconds.
 
 =cut
 sub watch {
-    my $self = shift;
-    my $workflow = shift;
-    my $duration= shift || 15;
-    my $sleep = shift || 2;
+    my ($self, $workflow) = @_;
 
-    # we poll the workflow table and watch if the update timestamp changed
-    my $old_time = $workflow->last_update->strftime("%Y-%m-%d %H:%M:%S");
-    my $timeout = time() + $duration;
-    ##! 32:' Fork mode watch - timeout - '.$timeout.' - last update ' . $old_time
+    my $timeout = time() + 15;
+    ##! 32:' Fork mode watch - timeout: '.$timeout
 
+    my $orig_state = {
+        'state'       => $workflow->state,
+        'proc_state'  => $workflow->proc_state,
+        'last_update' => $workflow->last_update->strftime("%Y-%m-%d %H:%M:%S"),
+    };
+
+    # loop till changes occur or time runs out
     do {
-        my $workflow_state = CTX('dbi')->select_one(
+        my $state = CTX('dbi')->select_one(
             from => 'workflow',
-            columns => [ 'workflow_last_update' ],
+            columns => [ qw( workflow_state workflow_proc_state workflow_last_update ) ],
             where => { 'workflow_id' => $workflow->id() },
         );
-        ##! 64: 'Wfl update is ' . $workflow_state->{workflow_last_update}
-        if ($workflow_state->{workflow_last_update} ne $old_time) {
+
+        if (
+            $state->{workflow_state}       ne $orig_state->{state}      or
+            $state->{workflow_proc_state}  ne $orig_state->{proc_state} or
+            $state->{workflow_last_update} ne $orig_state->{last_update}
+        ) {
             ##! 8: 'Refetch workflow'
             # refetch the workflow to get the updates
             my $factory = $workflow->factory();
-            $workflow = $factory->fetch_workflow( $workflow->type(), $workflow->id() );
-            $timeout = 0;
+            return $factory->fetch_workflow($workflow->type, $workflow->id);
         } else {
             ##! 64: 'sleep'
             sleep 2;
         }
     } while (time() < $timeout);
 
+    # return original workflow if there were no changes
     return $workflow;
 }
 
