@@ -282,12 +282,16 @@ OpenXPKI/Server/API2/Plugin/Workflow/execute_workflow_activity.pm
 OpenXPKI/Server/API2/Plugin/Workflow/fail_workflow.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_activities.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_activities_params.pm
+OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_base_info.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_creator.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_history.pm
+OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_info.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_instance_types.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_log.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_type_for_id.pm
+OpenXPKI/Server/API2/Plugin/Workflow/list_workflow_titles.pm
 OpenXPKI/Server/API2/Plugin/Workflow/search_workflow_instances.pm
+OpenXPKI/Server/API2/Plugin/Workflow/wakeup_resume_workflow.pm
 OpenXPKI/Server/API2/PluginRole.pm
 OpenXPKI/Server/API2/Types.pm
 OpenXPKI/Server/Context.pm
