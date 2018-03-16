@@ -250,7 +250,8 @@ lives_and {
     my $result = $oxitest->api2_command("execute_workflow_activity" => {
         id => $wf_t1_async1->id,
         activity => "wftype1_add_message", # "wftype1" is the prefix defined in the workflow
-        async => "watch",
+        async => 1,
+        wait => 1,
     });
     # ... this will automatically call "add_link" and "set_motd"
     is $result->{workflow}->{state}, 'SUCCESS';
@@ -260,7 +261,7 @@ lives_and {
     my $info = $oxitest->api2_command("execute_workflow_activity" => {
         id => $wf_t1_async2->id,
         activity => "wftype1_add_message", # "wftype1" is the prefix defined in the workflow
-        async => "fork",
+        async => 1,
     });
     # ... this will automatically call "add_link" and "set_motd"
 
