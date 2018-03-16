@@ -78,8 +78,40 @@ command "wakeup_workflow" => {
     wait  => { isa => 'Bool', },
 } => sub {
     my ($self, $params) = @_;
-
     return $self->_wakeup_or_resume_workflow(1, $params->id, $params->type, $params->async, $params->wait);
+};
+
+=head2 resume_workflow
+
+Resumes a workflow that is in exception state.
+
+For details see similar command L</wakeup_workflow>
+
+B<Changes compared to API v1:>
+
+=over
+
+=item 1. Unused parameter C<WORKFLOW> was removed
+
+=item 2. String parameter C<ASYNC> was split into two boolean parameters C<async>
+and C<wait>:
+
+    CTX('api') ->wakeup_workflow(.. ASYNC => "fork")       # old API
+    CTX('api2')->wakeup_workflow(.. async => 1)            # new API
+
+    CTX('api') ->wakeup_workflow(.. ASYNC => "watch")      # old API
+    CTX('api2')->wakeup_workflow(.. async => 1, wait => 1) # new API
+
+=back
+
+=cut
+command "resume_workflow" => {
+    id    => { isa => 'Int', required => 1, },
+    async => { isa => 'Bool', },
+    wait  => { isa => 'Bool', },
+} => sub {
+    my ($self, $params) = @_;
+    return $self->_wakeup_or_resume_workflow(0, $params->id, undef, $params->async, $params->wait);
 };
 
 =head2 _wakeup_or_resume_workflow
