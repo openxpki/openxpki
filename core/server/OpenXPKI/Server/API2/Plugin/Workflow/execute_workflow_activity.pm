@@ -87,24 +87,17 @@ command "execute_workflow_activity" => {
     $context->param($wf_params) if $wf_params;
 
     ##! 64: Dumper $workflow
-    if ($params->has_async) {
-        $util->execute_activity_async($workflow, $wf_activity);
-        CTX('log')->workflow()->debug("Background execution of workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_type')");
+    CTX('log')->workflow()->debug(sprintf(
+        "%s of workflow activity '%s' on workflow #%s ('%s')",
+        $params->has_async ? sprintf("Background execution (%s)", $params->async) : "Execution",
+        $wf_activity, $wf_id, $wf_type
+    ));
+    my $updated_workflow = $util->execute_activity($workflow, $wf_activity, $params->has_async, ($params->async // "") eq 'watch');
 
-        if ($params->async eq 'watch') {
-            $workflow = $util->watch($workflow);
-        }
-    } else {
-        $util->execute_activity($workflow, $wf_activity);
-        CTX('log')->workflow()->debug("Executed workflow activity '$wf_activity' on workflow id $wf_id (type '$wf_type')");
-    }
-
-    if ($params->ui_info) {
-        return $util->get_ui_info(id => $wf_id);
-    }
-    else {
-        return $util->get_workflow_info($workflow);
-    }
+    return ($params->ui_info
+        ? $util->get_ui_info(id => $wf_id)
+        : $util->get_workflow_info($updated_workflow)
+    );
 };
 
 __PACKAGE__->meta->make_immutable;

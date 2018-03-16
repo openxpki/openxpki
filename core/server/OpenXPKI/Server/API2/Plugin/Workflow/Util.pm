@@ -3,6 +3,7 @@ use Moose;
 
 # Core modules
 use English;
+use Try::Tiny;
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
@@ -70,6 +71,50 @@ sub validate_input_params {
 
 Executes the named activity on the given workflow object.
 
+See L<API command "execute_workflow_activity"|OpenXPKI::Server::API2::Plugin::Workflow::execute_workflow_activity/execute_workflow_activity>
+for more details.
+
+Returns an L<OpenXPKI::Workflow> object.
+
+B<Positional parameters>
+
+=over
+
+=item * C<$workflow> I<Str> - workflow type / name
+
+=item * C<$activity> I<Str> - workflow activity
+
+=item * C<$async> I<Bool> - "background" execution: forks a new process.
+
+=item * C<$wait> I<Bool> - wait for background execution to start (max. 15 seconds).
+
+=back
+
+=cut
+sub execute_activity {
+    my ($self, $wf, $activity, $async, $wait) = @_;
+
+    # ASYNCHRONOUS - fork
+    if ($async) {
+        $self->_execute_activity_async($wf, $activity); # returns the background process PID
+        if ($wait) {
+            return $self->watch($wf); # wait and fetch updated workflow state
+        }
+        else {
+            return $wf; # return old workflow state
+        }
+    }
+    # SYNCHRONOUS
+    else {
+        $self->_execute_activity_sync($wf, $activity); # modifies the $workflow object (and so $updated_workflow)
+        return $wf;
+    }
+}
+
+=head2 _execute_activity_sync
+
+Executes the named activity on the given workflow object.
+
 Returns 0 on success and throws exceptions on errors.
 
 B<Positional parameters>
@@ -83,7 +128,7 @@ B<Positional parameters>
 =back
 
 =cut
-sub execute_activity {
+sub _execute_activity_sync {
     my ($self, $workflow, $activity) = @_;
 
     my $log = CTX('log')->workflow;
@@ -147,7 +192,7 @@ sub execute_activity {
     return 0;
 }
 
-=head2 execute_activity_async
+=head2 _execute_activity_async
 
 Execute the named activity on the given workflow object ASYNCHRONOUSLY, i.e.
 forks off a child process.
@@ -165,7 +210,7 @@ B<Positional parameters>
 =back
 
 =cut
-sub execute_activity_async {
+sub _execute_activity_async {
     my ($self, $workflow, $activity) = @_;
 
     my $log = CTX('log')->workflow;
