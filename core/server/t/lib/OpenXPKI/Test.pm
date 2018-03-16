@@ -489,14 +489,14 @@ sub _build_log4perl {
 sub _log4perl_screen {
     my ($self) = @_;
 
-    my $threshold_screen = $ENV{TEST_VERBOSE} ? $self->log_level : 'OFF';
+    my $threshold_screen = $ENV{TEST_VERBOSE} ? uc($self->log_level) : 'OFF';
     return qq(
         log4perl.rootLogger                     = INFO,  Screen
-        log4perl.category.openxpki.auth         = DEBUG
-        log4perl.category.openxpki.audit        = DEBUG
-        log4perl.category.openxpki.system       = DEBUG
-        log4perl.category.openxpki.workflow     = DEBUG
-        log4perl.category.openxpki.application  = DEBUG
+        log4perl.category.openxpki.auth         = TRACE
+        log4perl.category.openxpki.audit        = TRACE
+        log4perl.category.openxpki.system       = TRACE
+        log4perl.category.openxpki.workflow     = TRACE
+        log4perl.category.openxpki.application  = TRACE
         log4perl.category.openxpki.deprecated   = WARN
         log4perl.category.connector             = WARN
         log4perl.category.Workflow              = OFF
