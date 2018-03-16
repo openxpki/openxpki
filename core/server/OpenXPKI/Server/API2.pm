@@ -237,9 +237,9 @@ sub _build_commands {
     my $self = shift;
 
     my @modules = ();
-    my $candidates = {};
+    my $pkg_map = {};
     try {
-        $candidates = _list_modules($self->namespace."::");
+        $pkg_map = _list_modules($self->namespace."::");
     }
     catch {
         OpenXPKI::Exception->throw (
@@ -248,7 +248,7 @@ sub _build_commands {
         );
     };
 
-    return $self->_load_plugins( [ keys %{ $candidates } ] );
+    return $self->_load_plugins($pkg_map);
 }
 
 #
@@ -257,29 +257,39 @@ sub _build_commands {
 # Returns a HashRef that contains the C<command =E<gt> package> mappings.
 #
 sub _load_plugins {
-    my ($self, $packages) = @_;
+    my ($self, $pkg_map) = @_;
 
     my $cmd_package_map = {};
 
-    for my $pkg (@{ $packages }) {
+    for my $pkg (keys %{ $pkg_map }) {
+        my $file = $pkg_map->{$pkg};
         my $ok;
-        try {
-            load $pkg;
-            $ok = 1;
-        }
+        try { load $pkg; $ok = 1; }
         catch {
-            $self->log->warn("Error loading API plugin $pkg: $_");
-            next;
+            $self->log->warn("Error loading API plugin $pkg (".$pkg_map->{$pkg}."): $_");
         };
+        next if not $ok; # continue on errors
 
         if (not $pkg->DOES($self->command_role)) {
-            $self->log->debug("API - ignore   $pkg (does not have role ".$self->command_role.")");
+            $self->log->debug("API - ignore   $pkg: does not have role ".$self->command_role." ($file)");
             next;
         }
 
-        $self->log->debug("API - register $pkg: ".join(", ", @{ $pkg->commands }));
-        # FIXME test for duplicate command names
-        $cmd_package_map->{$_} = $pkg for @{ $pkg->commands };
+        $self->log->debug("API - register $pkg: ".join(", ", @{ $pkg->commands })." ($file)");
+
+        # store commands and their source package
+        for my $cmd (@{ $pkg->commands }) {
+            # check if command was previously defined by another package
+            my $earlier_pkg = $cmd_package_map->{$cmd};
+            if ($earlier_pkg) {
+                my $earlier_file = $pkg_map->{$earlier_pkg};
+                OpenXPKI::Exception->throw(
+                    message => "API command '$cmd' now defined in $pkg was previously found in $earlier_pkg",
+                    params => { now_file => $file, previous_file => $earlier_file }
+                );
+            }
+            $cmd_package_map->{$cmd} = $pkg;
+        }
     }
 
     return $cmd_package_map;
@@ -305,9 +315,12 @@ B<Parameters>
 =cut
 sub register_plugin {
     my ($self, $packages) = @_;
+    # convert string to arrayref
     $packages = [ $packages ] unless (ref $packages or "") eq "ARRAY";
+    # convert arrayref to hashref
+    my $pkg_map = { map { $_ => "manually added" } @$packages };
 
-    my $pkg_by_cmd = $self->_load_plugins($packages);
+    my $pkg_by_cmd = $self->_load_plugins($pkg_map);
     $self->add_commands( %{ $pkg_by_cmd } );
     return ( keys %{ $pkg_by_cmd } );
 }
@@ -556,17 +569,20 @@ sub _list_modules {
         my $pm_rx = qr/\A($module_rx)\.pm\z/;
         my $dir_rx = $prefix eq "" ? $root_rx : $notroot_rx;
         $dir_rx = qr/\A$dir_rx\z/;
-        for my $incdir (@INC) {
+        # Reverse @INC so that modules paths listed earlier win (by overwriting
+        # previously found modules in $results{...}.
+        # This is similar to Perl's behaviour when including modules.
+        for my $incdir (reverse @INC) {
             my $dir = File::Spec->catdir($incdir, @dir_suffix);
             my $dh = IO::Dir->new($dir) or next;
             my @entries = $dh->read;
             $dh->close;
             # list modules
             for my $pmish_rx ($pmc_rx, $pm_rx) {
-                foreach my $entry (@entries) {
+                for my $entry (@entries) {
                     if($entry =~ $pmish_rx) {
                         my $name = $prefix.$1;
-                        $results{$name} = undef;
+                        $results{$name} = File::Spec->catdir($dir, $entry);
                     }
                 }
             }
