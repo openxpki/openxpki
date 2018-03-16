@@ -403,7 +403,8 @@ sub get_ui_info {
 
 =head2 get_ui_base_info
 
-Returns informations about a workflow type from the workflow config as a I<HashRef>:
+Returns basic informations about a workflow type from the workflow config as a
+I<HashRef>:
 
     {
         workflow => {
