@@ -94,7 +94,7 @@ sub BUILD {
 
     my $id = $data->{WORKFLOW}->{ID} or die explain $data;
     $self->id($id);
-    note "Created workflow #$id";
+    note "Created workflow #$id (".$self->type.")";
 }
 
 =head2 start_activity
