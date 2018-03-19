@@ -51,6 +51,7 @@ command "get_field_definition" => {
     # If 'style' is given we do the field lookup ourself
     else {
         my $section = $params->has_section ? $params->section : 'subject';
+        # TODO Complain if no field definition is found (?)
         my @fields = CTX('config')->get_list([ 'profile', $params->profile, 'style', $params->style, 'ui', $section ]);
         ##! 16: 'fields ' . Dumper \@fields
         $fields = \@fields;
