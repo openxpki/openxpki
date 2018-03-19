@@ -782,13 +782,40 @@ sub api2_command {
 
 =head2 insert_testcerts
 
-Inserts all test certificates from L<OpenXPKI::Test::CertHelper::Database> into
-the database.
+Inserts all or the specified list of test certificates from
+L<OpenXPKI::Test::CertHelper::Database> into the database.
+
+B<Parameters>
+
+=over
+
+=item * C<only> I<ArrayRef> - only add the given certificates (expects names like I<alpha_root_1>)
+
+=item * C<exclude> I<ArrayRef> - exclude the given certificates
+
+=back
 
 =cut
 sub insert_testcerts {
-    my ($self) = @_;
+    my ($self, %args) = named_args(\@_,
+        exclude => { isa => 'ArrayRef', optional => 1 },
+        only => { isa => 'ArrayRef', optional => 1 },
+    );
+
+    die "Either specify 'only' or 'exclude', not both." if $args{only} && $args{exclude};
+
     my $certhelper = $self->certhelper_database;
+    my $certnames;
+    if ($args{only}) {
+        $certnames = $args{only};
+    }
+    elsif ($args{exclude}) {
+        my $exclude = { map { $_ => 1 } @{ $args{exclude} } };
+        $certnames = [ grep { not $exclude->{$_} } @{ $certhelper->all_cert_names } ];
+    }
+    else {
+        $certnames = $certhelper->all_cert_names;
+    }
 
     $self->dbi->start_txn;
 
@@ -796,9 +823,9 @@ sub insert_testcerts {
         into => "certificate",
         set => $certhelper->cert($_)->db,
         where => { subject_key_identifier => $certhelper->cert($_)->id },
-    ) for @{ $certhelper->all_cert_names };
+    ) for @{ $certnames };
 
-    for (@{ $certhelper->all_cert_names }) {
+    for (@{ $certnames }) {
         next unless $certhelper->cert($_)->db_alias->{alias};
         $self->dbi->merge(
             into => "aliases",
