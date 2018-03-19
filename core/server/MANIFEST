@@ -263,6 +263,10 @@ OpenXPKI/Server/API2/Plugin/Profile/get_key_params.pm
 OpenXPKI/Server/API2/Plugin/Profile/list_supported_san.pm
 OpenXPKI/Server/API2/Plugin/Profile/list_used_profiles.pm
 OpenXPKI/Server/API2/Plugin/Profile/render_templates.pm
+OpenXPKI/Server/API2/Plugin/Secret/clear_secret.pm
+OpenXPKI/Server/API2/Plugin/Secret/get_secrets.pm
+OpenXPKI/Server/API2/Plugin/Secret/is_secret_complete.pm
+OpenXPKI/Server/API2/Plugin/Secret/set_secret_part.pm
 OpenXPKI/Server/API2/Plugin/Token/Util.pm
 OpenXPKI/Server/API2/Plugin/Token/get_ca_list.pm
 OpenXPKI/Server/API2/Plugin/Token/get_certificate_for_alias.pm
