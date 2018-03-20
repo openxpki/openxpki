@@ -9,16 +9,16 @@ use strict;
 use warnings;
 
 use FindBin qw( $Bin );
-use lib "$Bin/../../core/server/t/lib";
-use OpenXPKI::Test::ConfigWriter;
+use lib "$Bin/../../core/server/t/lib", "$Bin/../../qatest/lib";
+use OpenXPKI::Test;
 
 die "Base path for OpenXPKI test environment must be specified as first parameter"
     unless $ARGV[0] and -d $ARGV[0];
 
 print "Setting up OpenXPKI test environment in $ARGV[0]\n";
 
-OpenXPKI::Test::ConfigWriter->new(
-    basedir => $ARGV[0],
+my $config = OpenXPKI::Test->new(
+    testenv_root => $ARGV[0],
     db_conf => {
         type => "MySQL",
         name => $ENV{OXI_TEST_DB_MYSQL_NAME},
@@ -26,5 +26,6 @@ OpenXPKI::Test::ConfigWriter->new(
         port => $ENV{OXI_TEST_DB_MYSQL_DBPORT},
         user => $ENV{OXI_TEST_DB_MYSQL_USER},
         passwd => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},
-    }
-)->create;
+    },
+    with => [qw( TestRealms CryptoLayer )],
+);
