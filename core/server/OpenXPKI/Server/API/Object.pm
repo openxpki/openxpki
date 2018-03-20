@@ -1289,9 +1289,13 @@ sub validate_certificate {
             });
         }
 
+        my $last_in_chain_is_root =
+            $last_in_chain->get_parsed('BODY','ISSUER') eq
+            $last_in_chain->get_parsed('BODY','SUBJECT');
+
         # Nothing found - check if the issuer is already selfsigned
         if (!$result->[0]) {
-            if ($last_in_chain->get_parsed('BODY','ISSUER') ne $last_in_chain->get_parsed('BODY','SUBJECT')) {
+            if (not $last_in_chain_is_root) {
                 ##! 16: 'No issuer on top of pkcs7 found'
                 return { STATUS => 'NOROOT', CHAIN => \@signer_chain };
             } else {
@@ -1303,13 +1307,13 @@ sub validate_certificate {
             # Check if it is already a root certificate (most likely it is)
             if ($result->[0]->{'ISSUER_IDENTIFIER'} eq
               $result->[0]->{'IDENTIFIER'}) {
-                   ##! 16: 'Next issuer is already a trusted root'
-
-                # Load the PEM from the database
-                my $issuer_cert = CTX('api')->get_cert({ IDENTIFIER => $result->[0]->{'IDENTIFIER'}, 'FORMAT' => 'PEM' });
-                ##! 32: 'Push PEM of root ca to chain ' . $issuer_cert
-                push @signer_chain, $issuer_cert;
-
+                ##! 16: 'Next issuer is already a trusted root'
+                if (not $last_in_chain_is_root) {
+                    # Load the PEM from the database
+                    my $issuer_cert = CTX('api')->get_cert({ IDENTIFIER => $result->[0]->{'IDENTIFIER'}, 'FORMAT' => 'PEM' });
+                    ##! 32: 'Push PEM of root ca to chain ' . $issuer_cert
+                    push @signer_chain, $issuer_cert;
+                }
             }  else {
 
                 # The first known certificate is an intermediate, so fetch the
