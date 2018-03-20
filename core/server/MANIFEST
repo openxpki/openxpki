@@ -83,6 +83,11 @@ OpenXPKI/Connector/DataPool.pm
 OpenXPKI/Connector/Secret.pm
 OpenXPKI/Connector/WorkflowContext.pm
 
+# Wrappers around Crypt::* modules
+OpenXPKI/Crypt/CRL.pm
+OpenXPKI/Crypt/PKCS10.pm
+OpenXPKI/Crypt/X509.pm
+
 ## Crypto layer
 
 OpenXPKI/Crypto/API.pm
