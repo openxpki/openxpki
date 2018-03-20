@@ -149,15 +149,15 @@ sub crl {
     return $self->_crls->{$realm_gen};
 }
 
-=head2 all_cert_ids
+=head2 all_cert_subject_key_ids
 
-Returns an ArrayRef with the IDs ("subject_key_identifier") of all test
+Returns an ArrayRef with the "subject_key_identifier" of all test
 certificates handled by this class.
 
 =cut
-sub all_cert_ids {
+sub all_cert_subject_key_ids {
     my $self = shift;
-    return [ map { $_->id } values %{$self->_certs} ];
+    return [ map { $_->subject_key_id } values %{$self->_certs} ];
 }
 
 =head2 cert_names_where

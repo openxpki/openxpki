@@ -854,7 +854,7 @@ sub delete_testcerts {
     my $certhelper = $self->certhelper_database;
 
     $self->dbi->start_txn;
-    $self->dbi->delete(from => 'certificate', where => { subject_key_identifier => $certhelper->all_cert_ids } );
+    $self->dbi->delete(from => 'certificate', where => { subject_key_identifier => $certhelper->all_cert_subject_key_ids } );
     $self->dbi->delete(from => 'aliases',     where => { identifier => [ map { $_->db->{identifier} } values %{$certhelper->_certs} ] } );
     $self->dbi->commit;
 }
