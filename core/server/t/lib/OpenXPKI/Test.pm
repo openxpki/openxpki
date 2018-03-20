@@ -141,6 +141,7 @@ use OpenXPKI::MooseParams;
 use OpenXPKI::Server::Database;
 use OpenXPKI::Server::Context;
 use OpenXPKI::Server::Init;
+use OpenXPKI::Server::Log;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Test::ConfigWriter;
 use OpenXPKI::Test::CertHelper::Database;
@@ -650,7 +651,7 @@ sub init_server {
     my ($self) = @_;
 
     # Init basic CTX objects
-    my @tasks = qw( config_versioned log dbi_log dbi api2 api authentication );
+    my @tasks = qw( config_versioned log dbi_log api2 api authentication );
     my %task_hash = map { $_ => 1 } @tasks;
     # add tasks requested via constructor parameter "also_init" (or injected by roles)
     for (grep { not $task_hash{$_} } @{ $self->also_init }) {
@@ -658,6 +659,10 @@ sub init_server {
         $task_hash{$_} = 1; # prevent duplicate tasks in "also_init"
     }
     OpenXPKI::Server::Init::init({ TASKS  => \@tasks, SILENT => 1, CLI => 0 });
+
+    # use the same DB connection as the test object to be able to do COMMITS
+    # etc. in tests
+    OpenXPKI::Server::Context::setcontext({ dbi => $self->dbi });
 }
 
 =head2 init_session_and_context
@@ -864,7 +869,8 @@ sub _build_dbi {
 
     #Log::Log4perl->easy_init($OFF);
     return OpenXPKI::Server::Database->new(
-        log => Log::Log4perl->get_logger(),
+        # "CONFIG => undef" prevents OpenXPKI::Server::Log from re-initializing Log4perl
+        log => OpenXPKI::Server::Log->new(CONFIG => undef)->system,
         db_params => $self->db_conf,
     );
 }
