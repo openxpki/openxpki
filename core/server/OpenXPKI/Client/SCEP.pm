@@ -105,6 +105,7 @@ use Data::Dumper;
         }
         # get resulting command message from server
         my $server_result = $self->collect();
+        $self->close_connection();
         return $server_result->{PARAMS};
     }
 }
