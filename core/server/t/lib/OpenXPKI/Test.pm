@@ -425,7 +425,6 @@ has conf_database       => ( is => 'rw', isa => 'HashRef', lazy => 1, builder =>
 # password for all openxpki users
 has password            => ( is => 'rw', isa => 'Str', lazy => 1, default => "openxpki" );
 has password_hash       => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { my $self = shift; $self->_get_password_hash($self->password) } );
-has testcerts_inserted  => ( is => 'rw', isa => 'Bool', default => 0, init_arg => undef );
 
 around BUILDARGS => sub {
     my $orig  = shift;
@@ -465,11 +464,6 @@ sub BUILD {
     $self->init_server;
     $self->init_session_and_context;
     note sprintf("Starting tests with PKI realm '%s' and role '%s'", $self->session->data->pki_realm, $self->session->data->role);
-}
-
-sub DEMOLISH {
-    my $self = shift;
-    $self->delete_testcerts if $self->testcerts_inserted;
 }
 
 sub _build_log4perl {
@@ -854,7 +848,6 @@ sub insert_testcerts {
         );
     }
     $self->dbi->commit;
-    $self->testcerts_inserted(1);
 }
 
 =head2 delete_all

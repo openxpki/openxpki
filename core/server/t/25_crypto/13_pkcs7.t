@@ -108,4 +108,9 @@ lives_and {
     cmp_deeply $result, [ $cert ];
 } "Extract certificate (chain) from signature";
 
+#
+# Cleanup
+#
+$oxitest->delete_testcerts;
+
 1;
