@@ -137,6 +137,7 @@ use OpenXPKI::Config;
 use OpenXPKI::Log4perl;
 use Log::Log4perl::Appender;
 use Log::Log4perl::Filter::MDC;
+use Log::Log4perl::Layout::NoopLayout;
 use OpenXPKI::MooseParams;
 use OpenXPKI::Server::Database;
 use OpenXPKI::Server::Context;
@@ -553,10 +554,10 @@ sub enable_workflow_log {
 
     my $appender = Log::Log4perl::Appender->new(
         "OpenXPKI::Server::Log::Appender::Database",
-        layout   => Log::Log4perl::Layout::PatternLayout->new("%m (%X{user}"),
         table => "application_log",
         microseconds => 1,
     );
+    $appender->layout(Log::Log4perl::Layout::NoopLayout->new()),
     $appender->filter(Log::Log4perl::Filter::MDC->new(
         KeyToMatch    => "wfid",
         RegexToMatch  => '\d+',
