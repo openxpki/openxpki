@@ -4,25 +4,63 @@ head:
     description: I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_DESC
 
 state:
+    # Extract information from CSR, set profile and render subject
+    # All information required for the certificate are in place
     INITIAL:
-        action: initialize global_load_policy set_profile parse_pkcs10 render_subject > CREATED
+        action: initialize global_map_url_params set_workflow_attributes global_load_policy global_set_profile parse_pkcs10 > PARSED
 
-    CREATED:
+    # check for certificateTemplate to override profile
+    PARSED:
         autorun: 1
         action:
-          - global_check_authorized_signer > CHECK_AUTHORIZATION ? global_is_signed_request
-          - global_set_error_not_authenticated > FAILURE ? !is_manual_authentication_allowed !global_is_signed_request
-          - global_noop > MANUAL_APPROVAL ? !global_is_signed_request is_manual_authentication_allowed
+          - set_profile_from_extension render_subject set_workflow_attributes > READY_TO_PROCESS ? has_certificate_template
+          - render_subject set_workflow_attributes > READY_TO_PROCESS ? !has_certificate_template
 
-
-    CHECK_AUTHORIZATION:
+    # shortcut to inital if no signer cert is set
+    READY_TO_PROCESS:
         autorun: 1
         action:
-          - global_set_error_signer_not_authorized > MANUAL_AUTHORIZATION ? !is_requestor_authorized is_manual_authentication_allowed
-          - global_set_error_signer_not_authorized > FAILURE ? !is_requestor_authorized !is_manual_authentication_allowed
-          - global_set_error_signer_expired > FAILURE ? is_requestor_authorized !is_requestor_validity_ok
-          - global_set_error_signer_revoked > FAILURE ? is_requestor_revoked is_requestor_authorized is_requestor_validity_ok
-          - global_noop > AUTHORIZED ? is_requestor_authorized !is_requestor_revoked is_requestor_validity_ok
+          - set_mode_initial > START_INITIAL ? !global_is_signed_request
+          - global_check_authorized_signer > SIGNED_REQUEST ? global_is_signed_request
+
+    # Determine the type of request
+    # inital anonymous = self signed (key and subject)
+    # initial on behalf = signed by other entity
+    # self signed renewal = same subject but other key
+    SIGNED_REQUEST:
+        autorun: 1
+        action:
+          - set_mode_initial > START_INITIAL ? signer_subject_matches_csr_subject signer_key_matches_subject_key
+          - set_mode_onbehalf > START_ONBEHALF ? !signer_subject_matches_csr_subject
+          - set_mode_renewal > START_RENEWAL ? signer_subject_matches_csr_subject !signer_key_matches_subject_key
+
+    # Authorizations for Inital Enrollment
+    START_INITIAL:
+        autorun: 1
+        action:
+          - global_noop2 > AUTHORIZED ? is_anonymous_enrollment_allowed
+          - calculate_hmac compare_hmac > VALIDATE_HMAC ? need_hmac !is_anonymous_enrollment_allowed
+          - global_noop > CHECK_CHALLENGE_PASSWORD ? !need_hmac !is_anonymous_enrollment_allowed
+
+    VALIDATE_HMAC:
+        autorun: 1
+        action:
+          - global_noop > AUTHORIZED ? is_valid_hmac
+          - global_noop2 > CHECK_CHALLENGE_PASSWORD ? !is_valid_hmac
+
+    CHECK_CHALLENGE_PASSWORD:
+        autorun: 1
+        action:
+          - global_validate_challenge_password > VALIDATE_CHALLENGE_PASSWORD ? need_challenge_password
+          - global_noop > MANUAL_AUTHORIZATION ? !need_challenge_password is_manual_authentication_allowed
+          - global_set_error_signer_not_authorized > FAILURE ? !need_challenge_password !is_manual_authentication_allowed
+
+    VALIDATE_CHALLENGE_PASSWORD:
+        autorun: 1
+        action:
+          - global_noop > AUTHORIZED ? is_valid_challenge_password
+          - global_noop2 > MANUAL_AUTHORIZATION ? !is_valid_challenge_password is_manual_authentication_allowed
+          - global_set_error_signer_not_authorized > FAILURE ? !is_valid_challenge_password !is_manual_authentication_allowed
 
     MANUAL_AUTHORIZATION:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_LABEL
@@ -48,6 +86,31 @@ state:
           reject_request:
             format: failure
 
+    # Renewal case
+    START_RENEWAL:
+        autorun: 1
+        action:
+          - global_set_error_signer_revoked > FAILURE ? is_requestor_revoked
+          - global_set_error_signer_expired > FAILURE ? !is_requestor_revoked !is_requestor_validity_ok
+          - set_renewal_period prepare_renewal > RENEWAL_PREPARED ? !is_requestor_revoked is_requestor_validity_ok
+
+    RENEWAL_PREPARED:
+        autorun: 1
+        action:
+          - global_noop > AUTHORIZED ? is_in_renewal_window
+          - set_mode_renewal set_replace_validity > AUTHORIZED ? !is_in_renewal_window is_replacement_allowed
+          - global_set_error_not_in_renewal_window > FAILURE ? !is_in_renewal_window !is_replacement_allowed
+
+    # on behalf enrollment
+    START_ONBEHALF:
+        autorun: 1
+        action:
+          - global_set_error_signer_not_authorized > FAILURE ? !is_requestor_authorized !is_requestor_revoked
+          - global_set_error_signer_expired > FAILURE ? is_requestor_authorized !is_requestor_revoked !is_requestor_validity_ok
+          - global_set_error_signer_revoked > FAILURE ? is_requestor_revoked is_requestor_validity_ok
+          - global_noop > AUTHORIZED ? is_requestor_authorized !is_requestor_revoked is_requestor_validity_ok
+
+    # common workflow
     AUTHORIZED:
         autorun: 1
         action: global_noop > PERFORM_POLICY_CHECK
@@ -59,12 +122,12 @@ state:
     CHECK_POLICY_VIOLATION:
         autorun: 1
         action:
-          - global_set_error_code_policy_violated > PENDING_POLICY ? has_policy_violations
+          - global_set_error_code_policy_violated > PENDING_POLICY_VIOLATION ? has_policy_violations
           - global_noop > ELIGIBILITY ? !has_policy_violations
 
-    PENDING_POLICY:
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_POLICY_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_POLICY_DESC
+    PENDING_POLICY_VIOLATION:
+        label:  I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_DESC
         action:
           - reevaluate_policy > PERFORM_POLICY_CHECK
           - override_policy > ELIGIBILITY
@@ -95,15 +158,40 @@ state:
          - global_clear_error_code > APPROVED ? is_approved
 
     PENDING:
-       action:
-        - reject_request notify_rejected global_set_error_rejected > FAILURE
-        - approve_csr calculate_approval_points > RECHECK_APPROVAL
+        action:
+          - reject_request notify_rejected global_set_error_rejected > FAILURE
+          - approve_csr calculate_approval_points > RECHECK_APPROVAL
+        output:
+          - error_code
+          - server
+          - interface
+          - cert_subject
+          - comment
+          - cert_profile
+          - request_mode
+          - is_replace
+          - is_eligible
+          - eligibility_result
+          - scep_tid
+          - signer_cert_identifier
+          - signer_revoked
+          - signer_trusted
+          - signer_authorized
+          - signer_validity_ok
+          - has_valid_challenge_password
+          - has_valid_hmac
+
+        button:
+          approve_csr:
+            format: expected
+          reject_request:
+            format: failure
 
     RECHECK_APPROVAL:
         autorun: 1
         action:
-         - global_set_error_not_approved > PENDING ? !is_approved
-         - global_clear_error_code > APPROVED ? is_approved
+          - global_set_error_not_approved > PENDING ? !is_approved
+          - global_clear_error_code > APPROVED ? is_approved
 
     APPROVED:
         autorun: 1
@@ -131,10 +219,11 @@ action:
             - pkcs10
             - server
             - interface
-#            - csr_subject
             - signer_cert
             - comment
-#            - cert_profile
+            - _pkcs7
+            - _url_params
+            - scep_tid
 
     accept_request:
         class: OpenXPKI::Server::Workflow::Activity::Noop
@@ -145,6 +234,12 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::Noop
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_REJECT_REQUEST_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_REJECT_REQUEST_DESC
+
+    prepare_renewal:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::PrepareRenewal
+        param:
+          _map_cert_identifier: $signer_cert_identifier
+          _map_renewal_period: $renewal_period
 
     approve_csr:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Approve
@@ -165,7 +260,7 @@ action:
     check_eligibility:
         class: OpenXPKI::Server::Workflow::Activity::Tools::EvaluateEligibility
         param:
-            _map_config_path: "[% context.interface %].[% context.server %].eligibility"
+            _map_config_path: "[% context.interface %].[% context.server %].eligible.[% context.request_mode %]"
             target_key: is_eligible
             raw_result: eligibility_result
 
@@ -174,6 +269,16 @@ action:
         param:
             mode: generated
             _map_comment: "Auto-Approval based on eligibility result: [% context.eligibility_result %]"
+
+    calculate_hmac:
+        class: OpenXPKI::Server::Workflow::Activity::SCEPv2::CalculateRequestHMAC
+        param:
+            target_key: csr_hmac
+
+    compare_hmac:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        param:
+            _map_is_valid_hmac: "[% IF (context.csr_hmac && context.url_hmac) && (context.csr_hmac == context.url_hmac) %]1[% ELSE %]0[% END %]"
 
     calculate_approval_points:
         class: OpenXPKI::Server::Workflow::Activity::Tools::CalculateApprovalPoints
@@ -190,17 +295,58 @@ action:
 
     parse_pkcs10:
         class: OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10
+        param:
+            cert_profile: none
+            req_extensions: certificateTemplateName
+            req_attributes: challengePassword
+            key_params: 1
 
     render_subject:
         class: OpenXPKI::Server::Workflow::Activity::Tools::RenderSubject
         param:
             cert_subject_style: enroll
 
-    set_profile:
+    # If the extension is set and there is a node with the given name the
+    # value is loaded, otherwise it falls back to the default value
+    set_profile_from_extension:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue
         param:
-            mode: hash
-            _map_config_path: "[% context.interface %].[% context.server %].profile"
+          _map_config_path: "[% context.interface %].[% context.server %].profile_map.[% context.req_extensions.certificateTemplateName %]"
+          target_key: cert_profile
+          _map_default_value: $cert_profile
+
+    set_renewal_period:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue
+        param:
+          _map_config_path: "[% context.interface %].[% context.server %].renewal_period"
+          target_key: renewal_period
+
+    set_workflow_attributes:
+         class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
+         param:
+            _map_cert_subject: "[% IF context.cert_subject %][% context.cert_subject %][% ELSE %][% context.csr_subject %][% END %]"
+            _map_scep_tid: $scep_tid
+
+    set_mode_renewal:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        param:
+            request_mode: renewal
+
+    set_mode_initial:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        param:
+            request_mode: initial
+
+    set_mode_onbehalf:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        param:
+            request_mode: initial
+
+    set_replace_validity:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        param:
+            _map_notafter: "[% USE Certificate %][% Certificate.notafter(context.signer_cert_identifier, 'epoch') %]"
+            is_replace: 1
 
 condition:
     is_requestor_authorized:
@@ -218,6 +364,11 @@ condition:
         param:
             test: ($context->{signer_revoked})
 
+    is_anonymous_enrollment_allowed:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{p_allow_anon_enroll};
+
     is_manual_authentication_allowed:
         class: Workflow::Condition::Evaluate
         param:
@@ -227,6 +378,23 @@ condition:
         class: Workflow::Condition::Evaluate
         param:
             test: $context->{p_allow_man_approv};
+
+    is_in_renewal_window:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{in_renewal_window}
+
+    is_replacement_allowed:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{p_allow_replace}
+
+    has_certificate_template:
+        class: OpenXPKI::Server::Workflow::Condition::WFHash
+        param:
+            hash_name: req_extensions
+            condition: key_nonempty
+            ds_key: certificateTemplateName
 
     has_policy_violations:
         class: Workflow::Condition::Evaluate
@@ -242,6 +410,84 @@ condition:
         class: Workflow::Condition::Evaluate
         param:
             test: $context->{approval_points} >= $context->{p_approval_points}
+
+    is_self_signed:
+        class: Workflow::Condition::LazyAND
+        param:
+            condition2: enroll_signer_subject_matches_csr_subject
+            condition3: enroll_signer_key_matches_subject_key
+
+    signer_key_matches_subject_key:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: $context->{signer_subject_key_identifier} && ($context->{signer_subject_key_identifier} eq $context->{csr_subject_key_identifier})
+
+    signer_subject_matches_csr_subject:
+        class: OpenXPKI::Server::Workflow::Condition::SubjectsMatch
+        param:
+            _map_subject1: $signer_subject
+            _map_subject2: $csr_subject
+
+    need_hmac:
+        class: OpenXPKI::Server::Workflow::Condition::Connector::Exists
+        param:
+            _map_config_path: "[% context.interface %].[% context.server %].hmac"
+
+    is_valid_hmac:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: ($context->{is_valid_hmac} == 1)
+
+    need_challenge_password:
+        class: OpenXPKI::Server::Workflow::Condition::Connector::Exists
+        param:
+            _map_config_path: "[% context.interface %].[% context.server %].challenge"
+
+    is_valid_challenge_password:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: ($context->{challenge_password_valid})
+
+
+field:
+    _pkcs7:
+        name: _pkcs7
+        required: 1
+        type: text
+
+    _url_params:
+        name: _url_params
+        type: text
+        required: 0
+
+    scep_tid:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_LABEL
+        name: scep_tid
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_DESC
+        required: 1
+        type: text
+
+    is_replace:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_REPLACE_LABEL
+        name: is_replace
+        template: "[% IF value %]failed:I18N_OPENXPKI_UI_YES[% END %]"
+        format: styled
+
+    has_valid_hmac:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_HMAC_LABEL
+        name: is_valid_hmac
+        template: "[% IF value %]valid:I18N_OPENXPKI_UI_YES[% END %]"
+        format: styled
+
+    has_valid_challenge_password:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_CHALLENGE_PASSWORD_LABEL
+        name: challenge_password_valid
+        template: "[% IF value %]valid:I18N_OPENXPKI_UI_YES[% END %]"
+        format: styled
+
+    request_mode:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_REQUEST_MODE_LABEL
+        name: request_mode
 
 
 acl:

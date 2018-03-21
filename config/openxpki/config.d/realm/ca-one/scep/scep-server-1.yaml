@@ -3,16 +3,23 @@
 # a group name from the alias table
 #token: ca-one-special-scep
 
-# Earliest time to create a renewal request
-renewal_period: 000014
+# A renewal request is only accpeted if the used certificate will
+# expire within this period of time.
+renewal:
+    # allow renewal 14 days before the certificate expires
+    notbefore: 000014
+    # allow renewal with already expired certificate (usually not set)
+    # replaces "allow_expired_signer", not implemented yet!
+    notafter: 0
 
-replace_period: 05
-
+# If the request was a replacement, optionally revoke the replaced
+# certificate after a grace period
 revoke_on_replace:
     reason_code: keyCompromise
     invalidity_time: +000014
 
-workflow_type: enrollment
+
+workflow_type: certificate_enroll
 
 # allow rsa keys with 1020 to 2048 bit
 # the 1020 is necessary as some implementations can have
@@ -20,11 +27,12 @@ workflow_type: enrollment
 key_size:
     rsaEncryption: 1020-2048
 
-hash_type: 
+# allowed digest algorithms used for the CSR
+hash_type:
   - sha1
   - sha256
 
-authorized_signer_on_behalf:
+authorized_signer:
     rule1:
         # Full DN
         subject: CN=.+:scepclient,.*
@@ -32,15 +40,46 @@ authorized_signer_on_behalf:
         # Full DN
         subject: CN=.+:pkiclient,.*
 
-policy:         
-    allow_anon_enroll: 0
+policy:
+    # Authentication Options
+    # Initial requests need ONE authentication.
+    # Activate Challenge Password and/or HMAC by setting the appropriate
+    # options below.
+
+    # if set requests can be authenticated by an operator
     allow_man_authen: 1
+
+    # if set, no authentication is required at all and hmac/challenge is
+    # not evaluated even if it is set/present in the request!
+    allow_anon_enroll: 0
+
+    # Approval
+    # If not autoapproved, allow opeerator to add approval by hand
     allow_man_approv: 1
+
+    # if the eligibiliyt check failed the first time
+    # show a button to run a recheck (Workflow goes to PENDING)
     allow_eligibility_recheck: 0
-    max_active_certs: 1
-    allow_expired_signer: 0
-    auto_revoke_existing_certs: 1
+
+    # Approval points requirede (eligibity and operator count as one point each)
     approval_points: 1
+
+    # The number of active certs with the same subject that are allowed
+    # to exist at the same time, deducted by one if a renewal is seen
+    max_active_certs: 1
+
+    # option will be removed
+    allow_expired_signer: 0
+
+    # If an initial enrollment is seen
+    # all existing certificates with the same subject are revoked
+    auto_revoke_existing_certs: 1
+
+    # allows a "renewal" outside the renewal window, the notafter date
+    # is aligned to the old certificate. Set revoke_on_replace option
+    # to revoke the replaced certificate.
+    # This substitutes the "replace_window" from the OpenXPKI v1 config
+    allow_replace: 1
 
 response:
     # The scep standard is a bit unclear if the root should be in the chain or not
@@ -48,9 +87,13 @@ response:
     # as most clients seem to expect it, we include the root by default
     # If you are sure your clients do not need the root, set this to 1
     getcacert_strip_root: 0
-    
-# Mapping of names to OpenXPKI profiles to be used with the 
-# Microsoft Certificate Template Name Ext. (1.3.6.1.4.1.311.20.2)       
+
+profile:
+  cert_profile: I18N_OPENXPKI_PROFILE_TLS_SERVER
+  cert_subject_style: enroll
+
+# Mapping of names to OpenXPKI profiles to be used with the
+# Microsoft Certificate Template Name Ext. (1.3.6.1.4.1.311.20.2)
 profile_map:
     pc-client: I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION
 
@@ -60,20 +103,20 @@ subject_style: enroll
 hmac: verysecret
 
 challenge:
-   value: SecretChallenge
+    value: SecretChallenge
 
 eligible:
     initial:
        value@: connector:scep.scep-server-1.connector.initial
        args: '[% context.cert_subject_parts.CN.0 %]'
-       expect: 
+       expect:
          - Build
          - New
 
     renewal:
        value: 1
 
- 
+
 connector:
     initial:
         class: Connector::Proxy::YAML

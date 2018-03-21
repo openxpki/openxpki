@@ -52,7 +52,7 @@ $result = $client->mock_request({
     'wf_creator' => '',
     'wf_proc_state' => '',
     'wf_state' => '',
-    'wf_type' => 'enrollment',
+    'wf_type' => 'certificate_enroll',
     'scep_tid[]' => $sceptid,
 });
 
@@ -66,7 +66,7 @@ $result = $client->mock_request({
 my $workflow_id = $result->{main}->[0]->{content}->{data}->[0]->[0];
 diag('Found workflow ' . $workflow_id );
 
-is($result->{main}->[0]->{content}->{data}->[0]->[3], 'PENDING_APPROVAL');
+is($result->{main}->[0]->{content}->{data}->[0]->[3], 'PENDING');
 
 # force failure
 $result = $client->mock_request({
@@ -79,6 +79,6 @@ $result = $client->mock_request({
     'page' => 'workflow!context!wf_id!' . $workflow_id
 });
 
-is($result->{main}->[0]->{content}->{data}->[7]->{value}, $hmac);
-is($result->{main}->[0]->{content}->{data}->[43]->{value}, $hmac);
+is($client->get_field_from_result('url_hmac'), $hmac);
+ok($client->get_field_from_result('is_valid_hmac'));
 

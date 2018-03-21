@@ -399,7 +399,6 @@ sub __pkcs_req : PRIVATE {
         ) unless($workflow_type);
 
 
-
         CTX('log')->application()->info("SCEP try to start new workflow for $transaction_id");
 
 
@@ -474,13 +473,14 @@ sub __pkcs_req : PRIVATE {
                 PARAMS   => {
                     'scep_tid'    => $transaction_id,
                     'signer_cert' => $signer_cert,
-                    'pkcs10'         => $pkcs10,
+                    'pkcs10'      => $pkcs10,
 
                     #'expires' => $expirydate->epoch(),
 
                     # getting the profile should be moved into the workflow
-                    'cert_profile' => $profile,
+#                    'cert_profile' => $profile,
                     'server'       => $server,
+                    'interface'    => 'scep',
 
                     # necessary to check the signature - volatile only
                     '_pkcs7' => $pkcs7, # contains scep_tid, signer_cert, csr

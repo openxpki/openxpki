@@ -69,20 +69,20 @@ sub execute {
     my $divides64;
     ##! 64: 'length: ' . length($pkcs7_base64)
     if ( length($pkcs7_base64) % 64 == 0 ) {
-	$divides64 = 1;
+    $divides64 = 1;
     }
     $pkcs7_base64 =~ s{ (.{64}) }{$1\n}xmsg;
-    
+
     if ( !$divides64 ) {
-	##! 64: 'pkcs7 length does not divide 64, add an additional newline'
-	$pkcs7_base64 .= "\n";
+    ##! 64: 'pkcs7 length does not divide 64, add an additional newline'
+    $pkcs7_base64 .= "\n";
     }
 
     if ($pkcs7_base64 !~ /^-----BEGIN/) {
-	##! 64: 'adding PEM header/footer line'
-	$pkcs7_base64 = "-----BEGIN PKCS7-----\n" 
-	    . $pkcs7_base64 
-	    . "-----END PKCS7-----\n";
+    ##! 64: 'adding PEM header/footer line'
+    $pkcs7_base64 = "-----BEGIN PKCS7-----\n"
+        . $pkcs7_base64
+        . "-----END PKCS7-----\n";
     }
 
     ##! 64: 'pkcs7_base64: ' . $pkcs7_base64
@@ -92,15 +92,15 @@ sub execute {
     my $scep_handle = $token->command({
         COMMAND        => 'unwrap',
         PKCS7          => $pkcs7_base64,
-	ENCRYPTION_ALG => CTX('session')->data->enc_alg,
-	HASH_ALG       => CTX('session')->data->hash_alg,
+    ENCRYPTION_ALG => CTX('session')->data->enc_alg,
+    HASH_ALG       => CTX('session')->data->hash_alg,
     });
 
     ##! 32: 'unwrapped data ' . Dumper $scep_handle
 
     my $message_type = $token->command(
-	{  
-	    COMMAND     => 'get_message_type',
+    {
+        COMMAND     => 'get_message_type',
             SCEP_HANDLE => $scep_handle,
         }
     );
@@ -112,7 +112,7 @@ sub execute {
         my $resp = $self->__pkcs_req(
             {   TOKEN       => $token,
                 PKCS7       => $pkcs7_base64,
-		SCEP_HANDLE => $scep_handle,
+        SCEP_HANDLE => $scep_handle,
                 PARAMS      => $url_params,
             }
         );
@@ -125,9 +125,9 @@ sub execute {
         # used by sscep after sending first request for polling
         my $resp = $self->__pkcs_req(
             {
-		TOKEN       => $token,
+        TOKEN       => $token,
                 PKCS7       => $pkcs7_base64,
-		SCEP_HANDLE => $scep_handle,
+        SCEP_HANDLE => $scep_handle,
                 PARAMS      => $url_params,
             }
         );
@@ -136,20 +136,20 @@ sub execute {
     elsif ( $message_type eq 'GetCert' ) {
         $result = $self->__send_cert(
             {   TOKEN       => $token,
-		SCEP_HANDLE => $scep_handle,
+        SCEP_HANDLE => $scep_handle,
                 PARAMS      => $url_params,
             }
         );
     }
     elsif ( $message_type eq 'GetCRL' ) {
-	# FIXME: not yet implemented
-	CTX('log')->application()->warn("LibSCEP PKIOperation; GetCRL is not supported yet");
+    # FIXME: not yet implemented
+    CTX('log')->application()->warn("LibSCEP PKIOperation; GetCRL is not supported yet");
 
         $result = $token->command(
             {   COMMAND        => 'create_error_reply',
                 SCEP_HANDLE    => $scep_handle,
                 HASH_ALG       => CTX('session')->data->hash_alg,
-		ENCRYPTION_ALG => CTX('session')->data->enc_alg,
+        ENCRYPTION_ALG => CTX('session')->data->enc_alg,
                 ERROR_CODE     => 'badRequest',
             }
         );
@@ -168,7 +168,7 @@ sub execute {
             {   COMMAND        => 'create_error_reply',
                 SCEP_HANDLE    => $scep_handle,
                 HASH_ALG       => CTX('session')->data->hash_alg,
-		ENCRYPTION_ALG => CTX('session')->data->enc_alg,
+        ENCRYPTION_ALG => CTX('session')->data->enc_alg,
                 ERROR_CODE     => 'badRequest',
             }
         );
@@ -232,10 +232,10 @@ sub __send_cert : PRIVATE {
 
 
         return $token->command(
-            {   
-		COMMAND         => 'create_error_reply',
-		SCEP_HANDLE     => $scep_handle,
-		ENCRYPTION_ALG  => CTX('session')->data->enc_alg,
+            {
+        COMMAND         => 'create_error_reply',
+        SCEP_HANDLE     => $scep_handle,
+        ENCRYPTION_ALG  => CTX('session')->data->enc_alg,
                 HASH_ALG        => CTX('session')->data->hash_alg,
                 'ERROR_CODE'    => 'badCertId',
             }
@@ -348,7 +348,7 @@ Called by execute if the message type is 'PKCSReq' (19). This is the
 message type that is used when an SCEP client asks for a certificate.
 Named parameters are TOKEN and PKCS7, where token is a token from the
 OpenXPKI::Crypto::TokenManager of type 'SCEP'. PKCS7 is the sanitized PKCS#7 data
-received from the client including an (artificial) start and end line. 
+received from the client including an (artificial) start and end line.
 Using the crypto token, the transaction ID of
 the request is acquired. Using this transaction ID, a database lookup is done
 (using the datapool) to see whether
@@ -391,7 +391,7 @@ sub __pkcs_req : PRIVATE {
 
     my $transaction_id = $token->command(
         {
-	    COMMAND     => 'get_transaction_id',
+        COMMAND     => 'get_transaction_id',
             SCEP_HANDLE => $scep_handle,
         }
     );
@@ -500,24 +500,21 @@ sub __pkcs_req : PRIVATE {
             );
         }
 
-	my $wf_context = {
-	    'scep_tid'    => $transaction_id,
-	    'signer_cert' => $signer_cert,
-	    'pkcs10'      => $pkcs10,
-	    
-	    #'expires' => $expirydate->epoch(),
-	    
-	    # getting the profile should be moved into the workflow
-	    'cert_profile' => $profile,
-	    'server'       => $server,
-	    
-	    # necessary to check the signature - volatile only
-	    '_pkcs7' => $pkcs7_base64, # contains scep_tid, signer_cert, csr
-	    
-	    # Extra url params - as we never write them to the backend,
-	    # we can pass the plain hash here (no serialization)
-	    '_url_params' => $url_params,
-	};
+        my $wf_context = {
+            'scep_tid'    => $transaction_id,
+            'signer_cert' => $signer_cert,
+            'pkcs10'      => $pkcs10,
+
+            'server'       => $server,
+            'interface'    => 'scep',
+
+            # necessary to check the signature - volatile only
+            '_pkcs7' => $pkcs7_base64, # contains scep_tid, signer_cert, csr
+
+            # Extra url params - as we never write them to the backend,
+            # we can pass the plain hash here (no serialization)
+            '_url_params' => $url_params,
+        };
 
         $wf_info = $api->create_workflow_instance({
                 WORKFLOW => $workflow_type,
