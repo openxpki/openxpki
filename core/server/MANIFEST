@@ -505,6 +505,7 @@ OpenXPKI/Server/Workflow/Condition/DatapoolEntry.pm
 
 OpenXPKI/Server/Workflow/Condition/CertificateHasStatus.pm
 OpenXPKI/Server/Workflow/Condition/SubjectMatchesPKCS10.pm
+OpenXPKI/Server/Workflow/Condition/SubjectsMatch.pm
 
 OpenXPKI/Server/Workflow/Condition/Connector/Exists.pm
 OpenXPKI/Server/Workflow/Condition/Connector/IsValue.pm
