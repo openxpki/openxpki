@@ -416,6 +416,8 @@ OpenXPKI/Server/Workflow/Activity/Tools/Datapool/AppendToEntry.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/EvaluateSignerTrust.pm
 
+OpenXPKI/Server/Workflow/Activity/Tools/ValidateChallengePassword.pm
+
 OpenXPKI/Server/Workflow/Activity/Tools/WFArray.pm
 OpenXPKI/Server/Workflow/Activity/Tools/WFHash.pm
 
