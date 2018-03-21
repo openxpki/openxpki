@@ -719,13 +719,23 @@ sub __handle_COMMAND : PRIVATE {
     ##! 16: "access to command granted"
 
     my $command;
+    my $api = $data->{PARAMS}->{API} || 2;
+    if ($api !~ /[12]/) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_UNKNWON_COMMAND_API_VERSION",
+            params  => { API => $api },
+        );
+    }
+
     eval {
-        if ($data->{PARAMS}->{API2}) {
+        my $api = $data->{PARAMS}->{API} || 2;
+        if ($api != 1) {
             $command = OpenXPKI::Service::Default::CommandApi2->new(
                 command => $data->{PARAMS}->{COMMAND},
                 params  => $data->{PARAMS}->{PARAMS},
             );
         } else {
+            ##! 4: 'Call to old command api ' . $data->{PARAMS}->{COMMAND}
             $command = OpenXPKI::Service::Default::Command->new({
                 COMMAND => $data->{PARAMS}->{COMMAND},
                 PARAMS  => $data->{PARAMS}->{PARAMS},

@@ -229,6 +229,7 @@ sub send_command_msg {
     {
         COMMAND     => $cmd,
         PARAMS      => $arg,
+        API => 1
     });
 }
 

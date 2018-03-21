@@ -28,6 +28,7 @@ my %params = (
     timeout => 30,
     json => undef,
     session  => undef,
+    legacy => undef,
     );
 
 sub debug {
@@ -71,6 +72,7 @@ GetOptions(\%params,
             session
             debug
             json
+            legacy
          )) or pod2usage(-verbose => 0);
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
@@ -244,7 +246,8 @@ if (%parameters) {
 if ($command ne 'logout') {
     $reply = $client->send_receive_service_msg('COMMAND', {
         COMMAND => $command,
-        PARAMS => \%args
+        PARAMS => \%args,
+        API => ($params{legacy} || $ENV{OPENXPKI_LEGACY_API}) ? 1 : 2
     });
     # terminate the login session if we are not in "session reuse" mode
     if (!$params{session}) {
@@ -291,6 +294,10 @@ openxpkicli [options] command
     --timeout             socket timeout in seconds (default 30s)
     --json
     --session             session mode, see below for details
+    --legacy              if set the old OpenXPKI 1.x API calls will be
+                          used. This will be removed in future versions
+                          and is only provided to assist script migration!
+                          Also active when OPENXPKI_LEGACY_API=1 is set
 
 =head1 INVOCATION
 

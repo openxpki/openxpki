@@ -129,7 +129,7 @@ sub handle_get_card_status {
     $log->info( "Analyze: " . Dumper(%params) );
     my $reply;
     eval {
-        $reply = $self->_client()->run_command( 'sc_analyze_smartcard', \%params );
+        $reply = $self->_client()->run_legacy_command( 'sc_analyze_smartcard', \%params );
     };
     if ($EVAL_ERROR) {
         my $err = $self->_client()->last_error();

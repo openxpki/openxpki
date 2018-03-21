@@ -88,7 +88,7 @@ sub __dispatch_revoke {
 
         # if revoke by serial is requested, use API to resolve the identifier
         if (!$arg->{cert_identifier}) {
-            my $res = $client->run_command( 'search_cert', {
+            my $res = $client->run_legacy_command( 'search_cert', {
                 CERT_SERIAL => $arg->{serial},
                 ISSUER_DN   => $arg->{issuer_dn},
                 ENTITY_ONLY => 1

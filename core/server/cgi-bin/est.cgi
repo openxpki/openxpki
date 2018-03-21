@@ -112,7 +112,7 @@ while (my $cgi = CGI::Fast->new()) {
         });
 
         my $cert_identifier = $workflow->{CONTEXT}->{cert_identifier};
-        $out = $client->run_command('get_cert',{
+        $out = $client->run_legacy_command('get_cert',{
             FORMAT => 'PKCS7',
             IDENTIFIER => $cert_identifier,
         });

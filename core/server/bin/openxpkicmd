@@ -272,7 +272,8 @@ if ($params{wfid}) {
                            PARAMS => {
                            WORKFLOW => $wf_type,
                            PARAMS => \%wf_parameters,
-                           }
+                           },
+                           API    => 1
                        });
 
     if ($reply->{SERVICE_MSG} eq 'COMMAND') {

@@ -116,9 +116,9 @@ while (my $cgi = CGI::Fast->new()) {
             $ext = '.crt';
         }
 
-        my $cert = $client->run_command('get_cert', {  IDENTIFIER => $cert_identifier, FORMAT => $cert_format });
+        my $cert = $client->run_legacy_command('get_cert', {  IDENTIFIER => $cert_identifier, FORMAT => $cert_format });
 
-        my $cert_info = $client->run_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'HASH' });
+        my $cert_info = $client->run_legacy_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'HASH' });
         my $filename = $cert_info->{BODY}->{SUBJECT_HASH}->{CN}->[0] || $cert_info->{BODY}->{IDENTIFIER};
 
         if (!$cert || !$filename) {

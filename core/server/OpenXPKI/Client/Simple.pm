@@ -164,15 +164,22 @@ sub _build_client {
     return $client;
 }
 
+sub run_legacy_command {
+    my $self = shift;
+    return $self->run_command( shift, shift, 1 );
+}
+
 sub run_command {
 
     my $self = shift;
     my $command = shift;
     my $params = shift || {};
+    my $api = shift || 2;
 
     my $reply = $self->client()->send_receive_service_msg('COMMAND', {
         COMMAND => $command,
-        PARAMS => $params
+        PARAMS => $params,
+        API => $api
     });
 
     $self->last_reply( $reply );
@@ -245,7 +252,7 @@ sub handle_workflow {
 
         $self->logger()->info(sprintf('execute workflow action %s on %01d', $params->{ACTIVITY}, $params->{ID}));
         $self->logger()->trace('workflow params:  '. Dumper $params->{PARAMS});
-        $reply = $self->run_command('execute_workflow_activity',{
+        $reply = $self->run_legacy_command('execute_workflow_activity',{
             ID => $params->{ID},
             ACTIVITY => $params->{ACTIVITY},
             PARAMS => $params->{PARAMS},
@@ -262,7 +269,7 @@ sub handle_workflow {
 
         $self->logger()->debug(sprintf('request for workflow info on %01d', $params->{ID}));
 
-        $reply = $self->run_command('get_workflow_info',{
+        $reply = $self->run_legacy_command('get_workflow_info',{
             ID => $params->{ID},
         });
 
@@ -274,7 +281,7 @@ sub handle_workflow {
         $self->logger()->trace($reply->{WORKFLOW});
 
     } elsif ($params->{TYPE}) {
-        $reply = $self->run_command('create_workflow_instance',{
+        $reply = $self->run_legacy_command('create_workflow_instance',{
             WORKFLOW => $params->{TYPE},
             PARAMS => $params->{PARAMS},
         });

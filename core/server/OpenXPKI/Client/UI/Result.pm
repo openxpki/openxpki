@@ -167,7 +167,7 @@ sub send_command {
 
     my $backend = $self->_client()->backend();
     my $reply = $backend->send_receive_service_msg(
-        'COMMAND', { COMMAND => $command, PARAMS => $params }
+        'COMMAND', { COMMAND => $command, PARAMS => $params, API => 1 }
     );
     $self->_last_reply( $reply );
 
@@ -201,7 +201,7 @@ sub send_command_v2 {
 
     my $backend = $self->_client()->backend();
     my $reply = $backend->send_receive_service_msg(
-        'COMMAND', { COMMAND => $command, PARAMS => $params, API2 => 1 }
+        'COMMAND', { COMMAND => $command, PARAMS => $params, API => 2 }
     );
     $self->_last_reply( $reply );
 

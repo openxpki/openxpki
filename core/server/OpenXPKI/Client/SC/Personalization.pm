@@ -496,7 +496,7 @@ sub handle_server_personalization {
         eval {
             my $count = 0;
             do {
-                my $rndmsg = $self->_client()->run_command( 'get_random', { 'LENGTH' => 15 } );
+                my $rndmsg = $self->_client()->run_legacy_command( 'get_random', { 'LENGTH' => 15 } );
                 $rnd = lc( $rndmsg );
                 $rnd =~ tr{[a-z0-9]}{}cd;
                 $count++;
