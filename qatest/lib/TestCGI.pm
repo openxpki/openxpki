@@ -50,6 +50,12 @@ has logger => (
     default =>  sub { return  Log::Log4perl->get_logger(); }
 );
 
+has last_result => (
+    is => 'rw',
+    isa => 'HashRef',
+    default => sub { return { }; }
+);
+
 sub mock_request {
 
     my $self = shift;
@@ -108,7 +114,21 @@ sub mock_request {
         }
     }
 
+    $self->last_result($json);
     return $json;
+}
+
+sub get_field_from_result {
+    my $self = shift;
+    my $field = shift;
+
+    my @data = @{$self->last_result()->{main}->[0]->{content}->{data}};
+    while (my $line = shift @data ) {
+        $self->logger()->trace( Dumper $line );
+        return $line->{value} if ($line->{label} eq $field);
+    }
+    $self->logger()->debug( 'No result for field ' . $field );
+    return undef;
 }
 
 # Static call that generates a ready-to-use client
