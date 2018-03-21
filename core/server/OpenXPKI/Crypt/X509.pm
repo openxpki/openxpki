@@ -73,7 +73,13 @@ has subject_key_id => (
     lazy => 1,
     default => sub {
         my $self = shift;
-        return uc join ':', ( unpack '(A2)*', ( unpack 'H*', $self->_cert()->subject_keyidentifier() ) );
+        my $keyid = $self->_cert()->subject_keyidentifier();
+        if ($keyid) {
+            $keyid = unpack 'H*', $self->_cert()->subject_keyidentifier();
+        } else {
+            $keyid = sha1_hex( $self->_cert()->pubkey() );
+        }
+        return uc join ':', ( unpack '(A2)*', $keyid);
     }
 );
 
@@ -88,6 +94,29 @@ has authority_key_id => (
         return uc join ':', ( unpack '(A2)*', ( unpack 'H*', $self->_cert()->key_identifier() ) );
     }
 );
+
+has notbefore => (
+    is => 'ro',
+    required => 0,
+    isa => 'Int',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        return $self->_cert()->not_before();
+    }
+);
+
+has notafter => (
+    is => 'ro',
+    required => 0,
+    isa => 'Int',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        return $self->_cert()->not_after();
+    }
+);
+
 
 around BUILDARGS => sub {
 
@@ -108,6 +137,36 @@ around BUILDARGS => sub {
 
 };
 
+sub get_notbefore {
+    my $self = shift;
+    return $self->_get_validity( $self->notbefore(), shift );
+}
+
+sub get_notafter {
+    my $self = shift;
+    return $self->_get_validity( $self->notafter(), shift );
+}
+
+sub _get_validity {
+    my $self = shift;
+    my $date = shift;
+    my $format = shift;
+
+    if ($format eq 'epoch') {
+        return $date;
+    }
+
+    $date = DateTime->from_epoch( epoch => $date);
+
+    if (!$format) {
+        return $date;
+    }
+
+    return OpenXPKI::DateTime::convert_date({
+        DATE      => $date,
+        OUTFORMAT => $format,
+    });
+}
 
 1;
 
