@@ -26,6 +26,43 @@ use OpenXPKI::Server::API2::PluginRole;
 use OpenXPKI::Server::API2::Autoloader;
 use OpenXPKI::Server::API2::Types;
 
+sub not_migrated {
+    my $self = shift;
+    my @old_api = qw(
+        clear_secret control_watchdog convert_certificate convert_csr
+        create_workflow_instance execute_workflow_activity fail_workflow
+        generate_key get_additional_information_fields get_alg_names
+        get_approval_message get_ca_cert get_ca_list get_cert get_cert_actions
+        get_cert_attributes get_cert_identifier get_cert_profiles
+        get_cert_subject_profiles get_cert_subject_styles
+        get_certificate_for_alias get_chain get_crl get_crl_list
+        get_csr_info_hash_from_data get_data_pool_entry get_default_token
+        get_field_definition get_key_algs get_key_enc
+        get_key_identifier_from_data get_key_params get_menu get_motd
+        get_param_names get_param_values get_pki_realm get_private_key_for_cert
+        get_profile_for_cert get_random get_report get_report_list get_role
+        get_secrets get_session_info get_token_alias_by_group
+        get_token_alias_by_type get_trust_anchors get_ui_system_status get_user
+        get_workflow_activities get_workflow_activities_params
+        get_workflow_creator get_workflow_history get_workflow_info
+        get_workflow_instance_types get_workflow_log get_workflow_type_for_id
+        import_certificate import_chain import_crl is_certificate_owner
+        is_secret_complete is_token_usable list_active_aliases
+        list_data_pool_entries list_process list_supported_san
+        list_used_profiles list_workflow_titles modify_data_pool_entry
+        private_key_exists_for_cert purge_application_log
+        render_metadata_from_template render_san_from_template
+        render_subject_from_template render_template resume_workflow
+        sc_analyze_certificate sc_analyze_smartcard sc_parse_certificates
+        search_cert search_cert_count search_workflow_instances
+        search_workflow_instances_count send_notification set_data_pool_entry
+        set_secret_part validate_certificate wakeup_workflow
+    );
+    my $new_api = $self->commands;
+    my @not_migrated = sort grep { not $new_api->{$_} } @old_api;
+    return @not_migrated;
+}
+
 =head1 SYNOPSIS
 
 B<Default usage>:
