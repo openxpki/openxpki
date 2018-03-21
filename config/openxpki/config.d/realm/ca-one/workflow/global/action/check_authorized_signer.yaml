@@ -1,3 +1,5 @@
 class: OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust
 param:
     _map_rules: "[% context.interface %].[% context.server %].authorized_signer"
+    export_key_identifier: 1
+    export_subject: 1

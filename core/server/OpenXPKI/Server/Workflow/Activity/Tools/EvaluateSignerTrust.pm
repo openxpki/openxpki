@@ -7,6 +7,7 @@ use base qw( OpenXPKI::Server::Workflow::Activity );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
+use OpenXPKI::Crypt::X509;
 use English;
 
 sub execute {
@@ -30,16 +31,12 @@ sub execute {
         return 1;
     }
 
-    my $default_token = CTX('api')->get_default_token();
-    my $x509 = OpenXPKI::Crypto::X509->new(
-        DATA  => $signer_cert,
-        TOKEN => $default_token
-    );
+    my $x509 = OpenXPKI::Crypt::X509->new( $signer_cert );
 
     # Check if the certificate is valid
     my $now = DateTime->now();
-    my $notbefore = $x509->get_parsed('BODY', 'NOTBEFORE');
-    my $notafter = $x509->get_parsed('BODY', 'NOTAFTER');
+    my $notbefore = $x509->get_notbefore();
+    my $notafter = $x509->get_notafter();
 
     if ( ( DateTime->compare( $notbefore, $now ) <= 0)  && ( DateTime->compare( $now,  $notafter) < 0) ) {
         $context->param('signer_validity_ok' => '1');
@@ -48,7 +45,7 @@ sub execute {
     }
 
     # Check the chain
-    my $signer_identifier = $x509->get_identifier();
+    my $signer_identifier = $x509->get_cert_identifier();
 
     $context->param('signer_cert_identifier' => $signer_identifier);
 
@@ -106,8 +103,16 @@ sub execute {
 
     # End chain validation, now check the authorization
 
-    my $signer_subject = $x509->get_parsed('BODY', 'SUBJECT');
+    my $signer_subject = $x509->get_subject();
     ##! 32: 'Check signer '.$signer_subject.' against trustlist'
+
+    if ($self->param('export_subject')) {
+        $context->param( 'signer_subject' => $signer_subject );
+    }
+
+    if ($self->param('export_key_identifier')) {
+        $context->param( 'signer_subject_key_identifier' => $x509->get_subject_key_id() );
+    }
 
     my $rules_prefix = $self->param('rules');
     my @rules = $config->get_keys( $rules_prefix );
@@ -141,7 +146,7 @@ sub execute {
                 $matched = ($signer_profile eq $match);
 
             } else {
-                CTX('log')->system()->error("Trusted Signer Authorization unknown ruleset $key:$match");
+                CTX('log')->system()->error("Trusted Signer Authorization unknown ruleset $key/$match");
 
                 $matched = 0;
             }
@@ -210,6 +215,16 @@ true if the certificate is marked revoked.
 
 the identifier of the signer certificate
 
+=item signer_subject
+
+the subject of the signer certificate,
+only exported if export_subject parameter is set
+
+=item signer_subject_key_identifier
+
+the signer_key_identifier of the signer certificate,
+only exported if export_key_identifier parameter is set
+
 =back
 
 =head1 Configuration
@@ -232,4 +247,16 @@ realm are matched as is, realm is always the session realm if not set.
 The rules in one entry are ANDed together. If you want to provide
 alternatives, add multiple list items.
 
+=head2 Parameters
 
+=over
+
+=item export_subject
+
+Boolean, if set the signer_subject is exported to the context.
+
+=item export_key_identifier
+
+Boolean, if set the signer_subject_key_identifier is exported to the context.
+
+=back
