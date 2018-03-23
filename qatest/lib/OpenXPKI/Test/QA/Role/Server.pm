@@ -164,6 +164,8 @@ around 'init_server' => sub {
     unless ($parentpid) {
         # start up server
         eval {
+            # re-init logging after fork to open files that might have been closed
+            $self->init_logging;
             # init_server() must be called after Proc::Daemon->Init() because the latter
             # closes all file handles which would cause problems with Log4perl
             $self->$orig();                  # OpenXPKI::Test->init_server

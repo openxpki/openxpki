@@ -721,8 +721,11 @@ Initializes the basic server context objects:
 sub init_server {
     my ($self) = @_;
 
+    # init log object (and force it to NOT reinitialize Log4perl)
+    OpenXPKI::Server::Context::setcontext({ log => OpenXPKI::Server::Log->new(CONFIG => undef) });
+
     # Init basic CTX objects
-    my @tasks = qw( config_versioned log dbi_log api2 api authentication );
+    my @tasks = qw( config_versioned dbi_log api2 api authentication );
     my %task_hash = map { $_ => 1 } @tasks;
     # add tasks requested via constructor parameter "also_init" (or injected by roles)
     for (grep { not $task_hash{$_} } @{ $self->also_init }) {
