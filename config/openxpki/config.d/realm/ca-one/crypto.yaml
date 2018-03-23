@@ -41,8 +41,7 @@ token:
 
   ca-one-scep:
     inherit: default
-    backend: OpenXPKI::Crypto::Tool::SCEP
-    shell: /usr/bin/openca-scep
+    backend: OpenXPKI::Crypto::Tool::LibSCEP
 
   # A different scep token for another scep server
   ca-one-special-scep:
