@@ -197,7 +197,8 @@ sub __load_config_realm_token {
     my $template_vars = {
         'ALIAS' => $name,
         'GROUP' => $group,
-        'GENERATION' => $generation
+        'GENERATION' => $generation,
+        'PKI_REALM' => CTX('api')->get_pki_realm(),
     };
 
     ##! 16: 'Building key name from template ' . $params_of{$ident}->{KEY}
