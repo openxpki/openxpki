@@ -29,6 +29,7 @@ while (my $cgi = CGI::Fast->new()) {
 
     my $conf = $config->config();
 
+    my $method = $cgi->param('method');
     my $servername = $conf->{$method}->{servername} || '';
 
     Log::Log4perl::MDC->put('server', $servername);
@@ -40,7 +41,6 @@ while (my $cgi = CGI::Fast->new()) {
     # prepare response header
     print $cgi->header( -type => 'application/json', charset => 'utf8' );
 
-    my $method = $cgi->param('method');
     if ( !$method ) {
         # TODO: Return as "400 Bad Request"?
         $log->error("RPC no method set in request");
