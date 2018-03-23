@@ -386,7 +386,7 @@ sub dispatch {
     my $package = $self->commands->{ $p{command} }
         or OpenXPKI::Exception->throw(
             message => "Unknown API command",
-            params => { command => $p{command} },
+            params => { command => $p{command}, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) },
         );
 
     my $all_params;
@@ -394,7 +394,7 @@ sub dispatch {
         my $rules = $self->_get_acl_rules($p{command})
             or OpenXPKI::Exception->throw(
                 message => "ACL does not permit call to API command",
-                params => { command => $p{command} }
+                params => { command => $p{command}, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) }
             );
 
         $all_params = $self->_apply_acl_rules($p{command}, $rules, $p{params});
@@ -408,7 +408,7 @@ sub dispatch {
     my $result;
     try {
         $result = $package
-            ->new(api => $self->autoloader)
+            ->new(rawapi => $self)
             ->execute($p{command}, $all_params);
     }
     catch {
@@ -423,10 +423,57 @@ sub dispatch {
         }
         OpenXPKI::Exception->throw(
             message => "Error while executing API command",
-            params => { command => $p{command}, error => $err }, # stringify in case error is an object
+            params => { command => $p{command}, error => $err, caller => sprintf("%s:%s", ($self->my_caller())[1,2]) }, # stringify in case error is an object
         );
     };
     return $result;
+}
+
+=head2 my_caller
+
+Returns informations about the caller of the code that invokes this method:
+a I<list> (!) as returned by Perls L<caller>.
+
+This is like a wrapper for Perls C<caller> that skips / steps over subroutines
+that are part of the API infrastructure (except plugins), so we get the "real"
+calling code.
+
+E.g.
+
+    package OpenXPKI::Server::API2::Plugin::test
+
+    command "who_is_it" => { ... } => sub {
+        my ($self, $params) = @_;
+        return $self->get_info;
+    }
+
+    sub get_info {
+        return $self->rawapi->my_caller(1); # who invoked API command "who_is_it"
+    }
+
+B<Parameters>
+
+=over
+
+=item * C<$skip> I<Int> - how many callers to step over. Default: 0
+
+=back
+
+=cut
+sub my_caller {
+    my ($self, $skip) = @_;
+    my $start_stackframe = 1 + ($skip // 0); # 1 = skip the code that called us
+
+    # skip API in call chain
+    my @caller; my $i = $start_stackframe;
+    my $cache_key;
+    while (@caller = caller($i)) {
+        $i++;
+        next if $caller[0] =~ m{ ^ OpenXPKI::Server::API2 (?!::Plugin::) }x;
+        next if $caller[0] =~ m{ ^ Try::Tiny }x;
+        last;
+    }
+    return @caller;
 }
 
 #=head2 _apply_acl_rules
