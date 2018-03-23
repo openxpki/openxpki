@@ -403,6 +403,10 @@ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_AUTHENTICATED"
 msgstr "Профиль пользователя общего назначения"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_IN_RENEWAL_WINDOW"
+msgstr "Отменить утверждение заявки на отзыв сертификата (CRR)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_KEY_DUPLICATE"
 msgstr "Дочерние технологические процессы"
 
@@ -1425,6 +1429,14 @@ msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
 msgstr "Загрузка сертификата в форматах PEM или CRT"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SUBJECT_MATCH_DONT_MATCH"
+msgstr "Статус"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SUBJECT_MATCH_SUBJECT_IS_EMPTY"
+msgstr "Статус"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
 msgstr "Прием заявок на сертификаты по протоколу SCEP"
 
@@ -1624,6 +1636,22 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_VALIDITY_STRING_FAILED"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_AUTHORITY_KEY_ID_MISMATCH_ERROR"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_PARSE_ERROR"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_SUBJECT_KEY_ID_MISMATCH_ERROR"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_SUBJECT_MISMATCH_ERROR"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WELCOME_PAGE"
 msgstr "Имя учетной записи"
 
@@ -1713,6 +1741,14 @@ msgstr "Отклонить заявку на отзыв сертификата"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_LABEL"
+msgstr "Отклонить заявку на отзыв сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRW_DESC"
+msgstr "Отклонить заявку на отзыв сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRW_LABEL"
 msgstr "Отклонить заявку на отзыв сертификата"
 
 #, fuzzy
@@ -2520,6 +2556,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IN_REPLACE_WINDOW_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_REPLACE_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_SELF_SIGNED_LABEL"
 msgstr "Родительский технологический процесс"
 
@@ -2929,6 +2969,18 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_OK_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_DESC"
+msgstr ""
+"Для использования данного профиля сертификата достаточно ввести Ваше имя, "
+"имя Вашей учетной записи и адрес электронной почты. Это простейший профиль "
+"пользователя, который следует использовать, если нет особых требований к "
+"сертифкату. В противном случае следует использовать расширенный профиль."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_CHALLENGE_PASSWORD_LABEL"
 msgstr ""
 "Используйте данный профиль сертификата только если Вы отчетливо "
@@ -2936,6 +2988,31 @@ msgstr ""
 "знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
 "части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
 "также произвольный набор альтернативных имен."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_HMAC_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_DESC"
+msgstr ""
+"Используйте данный профиль сертификата только если Вы отчетливо "
+"представляете себе необходимую структуру имени субъекта сертификата, хорошо "
+"знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
+"части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
+"также произвольный набор альтернативных имен."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_PLACEHOLDER"
+msgstr "Последнее обновление"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_TOOLTIP"
+msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON"
@@ -3119,6 +3196,10 @@ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
@@ -3826,6 +3907,14 @@ msgstr "Выпуск списка отзыва сертификатов (CRL)"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL"
 msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_DESC"
+msgstr "Отзыв сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_LABEL"
+msgstr "Отзыв сертификата"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
@@ -9730,10 +9819,6 @@ msgstr "Имя учетной записи"
 #~ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_LABEL"
-#~ msgstr "Дочерние технологические процессы"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_PLACEHOLDER"
 #~ msgstr "SPKAC-строка пуста."
 
@@ -9848,19 +9933,6 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TMP_QUEUE_TOOLTIP"
 #~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_DESC"
-#~ msgstr ""
-#~ "Для использования данного профиля сертификата достаточно ввести Ваше имя, "
-#~ "имя Вашей учетной записи и адрес электронной почты. Это простейший "
-#~ "профиль пользователя, который следует использовать, если нет особых "
-#~ "требований к сертифкату. В противном случае следует использовать "
-#~ "расширенный профиль."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_LABEL"
-#~ msgstr "Родительский технологический процесс"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_PLACEHOLDER"

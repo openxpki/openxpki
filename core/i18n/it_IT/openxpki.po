@@ -380,6 +380,10 @@ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_AUTHENTICATED"
 msgstr "Revoca Certificato"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_IN_RENEWAL_WINDOW"
+msgstr "Errore sconosciuto"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_KEY_DUPLICATE"
 msgstr ""
 "Questa richiesta non soddisfa uno o più criteri della policy, tuttavia il "
@@ -1183,6 +1187,16 @@ msgstr "Incompleto"
 msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
 msgstr "Scarica"
 
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SUBJECT_MATCH_DONT_MATCH"
+msgstr "Stato del Certificato"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SUBJECT_MATCH_SUBJECT_IS_EMPTY"
+msgstr "Stato del Certificato"
+
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
 msgstr "Workflow Adesione SCEP in attesa di approvazione."
 
@@ -1353,6 +1367,22 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_VALIDITY_STRING_FAILED"
 msgstr "Il valore date/time inserito non è stato convalidato."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_AUTHORITY_KEY_ID_MISMATCH_ERROR"
+msgstr "Uno o più campi Soggetto contengono errori."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_PARSE_ERROR"
+msgstr "La richiesta PKCS10 non può essere letta"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_SUBJECT_KEY_ID_MISMATCH_ERROR"
+msgstr "Uno o più campi Soggetto contengono errori."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_SUBJECT_MISMATCH_ERROR"
+msgstr "La richiesta PKCS10 non può essere letta"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WELCOME_PAGE"
 msgstr "Curva Ellittica"
 
@@ -1434,6 +1464,17 @@ msgstr ""
 "trovare il tuo certificato."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_LABEL"
+msgstr "Inizia la Revoca"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRW_DESC"
+msgstr ""
+"Crea una richiesta di revoca per il tuo certificato. Inserisci "
+"l’identificatore del certificato o usa la funzione di autoricerca per "
+"trovare il tuo certificato."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRW_LABEL"
 msgstr "Inizia la Revoca"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CA_DESC"
@@ -2163,6 +2204,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IN_REPLACE_WINDOW_LABEL"
 msgstr "Informazioni Richiedente"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_REPLACE_LABEL"
+msgstr "Informazioni Richiedente"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_SELF_SIGNED_LABEL"
 msgstr "SCEP TID"
 
@@ -2477,8 +2522,41 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_OK_LABEL"
 msgstr "Validità Firmatario"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_DESC"
+msgstr "Transaction Id of this SCEP request"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_LABEL"
+msgstr "SCEP TID"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_CHALLENGE_PASSWORD_LABEL"
 msgstr "Password"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_HMAC_LABEL"
+msgstr "CSR Valid"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_DESC"
+msgstr ""
+"Incolla la tua richiesta in formato PKCS10 direttamente nel campo testuale "
+"oppure usa il pulsante upload per caricare un file dal tuo computer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_LABEL"
+msgstr "Richiesta PKCS10"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_PLACEHOLDER"
+msgstr ""
+"Incolla la tua richiesta in formato PEM qui (deve iniziare con -----BEGIN "
+"CERTIFICATE REQUEST——) oppure usa il pulsante browse/upload qui sotto per "
+"caricare un file dal tuo computer."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_TOOLTIP"
+msgstr "La tua richiesta codificata in formato PKCS10"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON"
 msgstr "Forza Fallimento"
@@ -2637,6 +2715,10 @@ msgstr "Stato"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL"
 msgstr "Motivo Sospensione"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE"
+msgstr "Stato Esecuzione"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
 msgstr "eccezione"
@@ -3258,6 +3340,14 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL"
 msgstr "Pubblica Informazioni CA"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_DESC"
+msgstr "Richiesta Revoca Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_LABEL"
+msgstr "Richiesta Revoca Certificato (CRR, Certificate Revocation Request)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
 msgstr "Richiesta Revoca Certificato"
@@ -4270,9 +4360,6 @@ msgstr "Chiave"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_DESC"
 #~ msgstr " "
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_LABEL"
-#~ msgstr "CSR Valid"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_DESC"
 #~ msgstr "ID Transazione SCEP"
 
@@ -4350,14 +4437,6 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TMP_QUEUE_TOOLTIP"
 #~ msgstr "The type of csr, usually PKCS10."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_DESC"
-#~ msgstr "Transaction Id of this SCEP request"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_LABEL"
-#~ msgstr "SCEP TID"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_PLACEHOLDER"

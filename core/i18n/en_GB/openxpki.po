@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2018-03-08 15:24+0100\n"
+"PO-Revision-Date: 2018-03-23 08:39+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -320,6 +320,10 @@ msgstr "Request was not approved"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_AUTHENTICATED"
 msgstr "Request was not authenticated"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_IN_RENEWAL_WINDOW"
+msgstr "Request was not approved"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_KEY_DUPLICATE"
 msgstr "Policy failed (key reuse detected)"
@@ -974,7 +978,7 @@ msgid "I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY"
 msgstr "Search result expired or empty!"
 
 msgid "I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL"
-msgstr "SCEP Transaction Id"
+msgstr "Transaction Id"
 
 msgid "I18N_OPENXPKI_UI_SECRET_CLEAR_SECRET_LABEL"
 msgstr "clear secret"
@@ -1022,6 +1026,14 @@ msgstr "Unlock"
 
 msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
 msgstr "Unlock"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SUBJECT_MATCH_DONT_MATCH"
+msgstr "Your query did not return any matches!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SUBJECT_MATCH_SUBJECT_IS_EMPTY"
+msgstr "Search result expired or empty!"
 
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
 msgstr "SCEP Enrollment workflows awaiting approval."
@@ -1169,6 +1181,22 @@ msgstr "Given FQDN has an invalid format"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_VALIDITY_STRING_FAILED"
 msgstr "The entered date/time could not be validated."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_AUTHORITY_KEY_ID_MISMATCH_ERROR"
+msgstr "An error occured during input validation"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_PARSE_ERROR"
+msgstr "PKCS10 request can not be read"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_SUBJECT_KEY_ID_MISMATCH_ERROR"
+msgstr "One or more subject fields have errors."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_SUBJECT_MISMATCH_ERROR"
+msgstr "PKCS10 request has no subject set"
+
 msgid "I18N_OPENXPKI_UI_WELCOME_PAGE"
 msgstr "Welcome to your OpenXPKI Trustcenter"
 
@@ -1245,6 +1273,17 @@ msgstr ""
 "certificate."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_LABEL"
+msgstr "Start revocation"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRW_DESC"
+msgstr ""
+"Create a revocation request for your certificate. Please type the "
+"certificate identifier or use the autosearch function to find your "
+"certificate."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRW_LABEL"
 msgstr "Start revocation"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CA_DESC"
@@ -1918,6 +1957,10 @@ msgstr "In Renewal Period"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IN_REPLACE_WINDOW_LABEL"
 msgstr "In Replace Period"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_REPLACE_LABEL"
+msgstr "In Replace Period"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_SELF_SIGNED_LABEL"
 msgstr "Request is SelfSigned"
 
@@ -2201,8 +2244,39 @@ msgstr "Signer is Trusted"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_OK_LABEL"
 msgstr "Signer Validity ok"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_DESC"
+msgstr "Transaction Id of this request"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_LABEL"
+msgstr "Transaction ID"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_CHALLENGE_PASSWORD_LABEL"
 msgstr "Has Valid Password"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_HMAC_LABEL"
+msgstr "CSR Valid"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_DESC"
+msgstr ""
+" Paste your PKCS10 formated request directly into the field or use the "
+"upload button to load a file from your local computer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_LABEL"
+msgstr "PKCS10 Request"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_PLACEHOLDER"
+msgstr ""
+" Please paste your PEM encoded request here (must look like  -----BEGIN "
+"CERTIFICATE REQUEST-----) or use the browse/upload button below to load a "
+"file from your computer."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_TOOLTIP"
+msgstr "Your PKCS10 encoded request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON"
 msgstr "Force Failure"
@@ -2346,6 +2420,10 @@ msgstr "Outstanding Tasks"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL"
 msgstr "Pause Reason"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE"
+msgstr "Run State"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
 msgstr "exception"
@@ -2959,6 +3037,14 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL"
 msgstr "Publish CA Information"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_DESC"
+msgstr "Certificate Revocation Request"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_LABEL"
+msgstr "Certificate Revocation Request (CRR)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
 msgstr "Certificate Revocation Request"
@@ -3949,9 +4035,6 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_DESC"
 #~ msgstr " "
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_LABEL"
-#~ msgstr "CSR Valid"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_DESC"
 #~ msgstr " "
 
@@ -4026,14 +4109,6 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TMP_QUEUE_TOOLTIP"
 #~ msgstr "The type of csr, usually PKCS10."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_DESC"
-#~ msgstr "Transaction Id of this SCEP request"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_LABEL"
-#~ msgstr "SCEP TID"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_PLACEHOLDER"

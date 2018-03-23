@@ -483,7 +483,7 @@ sub __pkcs_req : PRIVATE {
                     'interface'    => 'scep',
 
                     # necessary to check the signature - volatile only
-                    '_pkcs7' => $pkcs7, # contains scep_tid, signer_cert, csr
+                    #'_pkcs7' => $pkcs7, # contains scep_tid, signer_cert, csr
 
                     # Extra url params - as we never write them to the backend,
                     # we can pass the plain hash here (no serialization)

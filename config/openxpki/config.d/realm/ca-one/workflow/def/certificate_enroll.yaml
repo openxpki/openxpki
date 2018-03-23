@@ -172,7 +172,7 @@ state:
           - is_replace
           - is_eligible
           - eligibility_result
-          - scep_tid
+          - transaction_id
           - signer_cert_identifier
           - signer_revoked
           - signer_trusted
@@ -221,9 +221,8 @@ action:
             - interface
             - signer_cert
             - comment
-            - _pkcs7
             - _url_params
-            - scep_tid
+            - transaction_id
 
     accept_request:
         class: OpenXPKI::Server::Workflow::Activity::Noop
@@ -325,7 +324,7 @@ action:
          class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
          param:
             _map_cert_subject: "[% IF context.cert_subject %][% context.cert_subject %][% ELSE %][% context.csr_subject %][% END %]"
-            _map_scep_tid: $scep_tid
+            _map_transaction_id: $transaction_id
 
     set_mode_renewal:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
@@ -459,13 +458,6 @@ field:
         name: _url_params
         type: text
         required: 0
-
-    scep_tid:
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_LABEL
-        name: scep_tid
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_DESC
-        required: 1
-        type: text
 
     is_replace:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_REPLACE_LABEL
