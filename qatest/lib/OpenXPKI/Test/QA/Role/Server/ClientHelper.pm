@@ -17,17 +17,18 @@ L<OpenXPKI::Test::QA::Role::Server/new_client_tester>, ie:
 
 To automatically connect and start a new session just call L</login>:
 
-    $client = $oxitest->login("caop");
+    $client->login("caop");
 
 This is equivalent to:
 
-    $client = $oxitest->connect;
-    $client = $oxitest->init_session;
-    $client = $oxitest->login("caop");
+    $client->connect;
+    $client->init_session;
+    $client->login("caop");
 
 Alternatively to continue an existing session:
 
-    $client = $oxitest->init_session({ SESSION_ID => $session_id });
+    ...
+    $client->init_session({ SESSION_ID => $session_id });
 
 =cut
 
