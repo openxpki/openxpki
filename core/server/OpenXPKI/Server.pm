@@ -730,13 +730,14 @@ sub __get_server_config {
 }
 
 sub __set_process_name {
+
     my $identity = shift;
     my @args = @_;
     if (@args) {
         $identity = sprintf $identity, @args;
     }
+
     my $alias = CTX('config')->get(['system','server','name']) || 'main';
-    # if you change the following string please also see OpenXPKI::Control->get_pids()
     $0 = "openxpkid ($alias) $identity";
     return;
 
