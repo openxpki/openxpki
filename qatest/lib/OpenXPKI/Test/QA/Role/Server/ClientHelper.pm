@@ -199,7 +199,9 @@ sub login {
 
         $self->send_ok('GET_PASSWD_LOGIN', { LOGIN => $user, PASSWD => $self->password });
         $self->is_next_step("SERVICE_READY");
-    }
+    };
+
+    return $self;
 }
 
 =head2 is_next_step
