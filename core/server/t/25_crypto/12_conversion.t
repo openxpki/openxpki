@@ -217,4 +217,9 @@ lives_and {
     like $txt, qr/ X509v3\ CRL\ Number: \s* 23 /msxi;
 } "Convert CRL (PEM --> TXT)";
 
+#
+# Cleanup
+#
+$oxitest->delete_testcerts;
+
 1;

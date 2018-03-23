@@ -923,7 +923,6 @@ sub certificate_list {
                     'certificate.subject_key_identifier',
                     'certificate.authority_key_identifier',
                     'certificate.notafter',
-                    'certificate.loa',
                     'certificate.notbefore',
                     'certificate.req_key',
                 ],

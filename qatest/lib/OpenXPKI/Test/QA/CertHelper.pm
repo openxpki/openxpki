@@ -89,6 +89,8 @@ Returns a HashRef containing some info about the created certificate.
 =cut
 sub via_workflow {
     my $class = shift;
+    use Test::More;
+    note "OpenXPKI::Test::QA::CertHelper->via_workflow() is deprecated. OpenXPKI::Test(with => ['Workflows']) should be used instead";
     my $helper = OpenXPKI::Test::QA::CertHelper::Workflow->new(@_);
     return $helper->create_cert; # returns certificate info HashRef
 }

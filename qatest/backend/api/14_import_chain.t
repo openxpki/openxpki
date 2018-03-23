@@ -49,12 +49,12 @@ $dbdata->cert_names_by_realm_gen(alpha => 1);
 my @alpha_list = qw( alpha_alice_2  alpha_signer_2  alpha_root_2 );
 my @beta_list =  qw( beta_alice_1   beta_signer_1   beta_root_1 );
 my $alpha_pem = [ map { $dbdata->cert($_)->data }  @alpha_list ];
-my $alpha_ids = [ map { $dbdata->cert($_)->id }    @alpha_list ];
+my $alpha_ids = [ map { $dbdata->cert($_)->subject_key_id }    @alpha_list ];
 my $alpha_pem_string = join "\n", @$alpha_pem;
 my $beta_pem = [ map { $dbdata->cert($_)->data } @beta_list ];
-my $beta_ids = [ map { $dbdata->cert($_)->id }   @beta_list ];
+my $beta_ids = [ map { $dbdata->cert($_)->subject_key_id }   @beta_list ];
 my $all_pem =  [ map { $dbdata->cert($_)->data }  @alpha_list, @beta_list ];
-my $all_ids =  [ map { $dbdata->cert($_)->id  }   @alpha_list, @beta_list ];
+my $all_ids =  [ map { $dbdata->cert($_)->subject_key_id  }   @alpha_list, @beta_list ];
 
 
 # Array import: Try chain with root cert (should fail)
@@ -84,8 +84,8 @@ $test->runcmd_ok('import_chain', { DATA => $dbdata->cert("beta_root_1")->data, I
 $test->runcmd_ok('import_chain', { DATA => $beta_pem, IMPORT_ROOT => 1 }, "Array import: chain whose root cert is already in PKI");
 cmp_deeply $test->get_msg->{PARAMS},
     superhashof({
-        existed =>  bag( map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } $dbdata->cert("beta_root_1")->id),
-        imported => bag( map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } ($dbdata->cert("beta_signer_1")->id, $dbdata->cert("beta_alice_1")->id) ),
+        existed =>  bag( map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } $dbdata->cert("beta_root_1")->subject_key_id),
+        imported => bag( map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } ($dbdata->cert("beta_signer_1")->subject_key_id, $dbdata->cert("beta_alice_1")->subject_key_id) ),
     }),
     "List certs as imported and existing";
 

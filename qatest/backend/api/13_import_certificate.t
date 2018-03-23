@@ -56,7 +56,7 @@ sub import_ok {
     my $params = $tester->get_msg->{PARAMS};
     $tester->is(
         ref $params eq 'HASH' ? $params->{SUBJECT_KEY_IDENTIFIER} : "",
-        $test_cert->id,
+        $test_cert->subject_key_id,
         "Correctly list imported certificate"
     );
 }

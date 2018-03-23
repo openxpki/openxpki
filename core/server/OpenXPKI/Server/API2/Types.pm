@@ -43,6 +43,16 @@ subtype 'AlphaPunct', # named $re_alpha_string in old API
     where { $_ =~ qr{ \A [ \w \- \. : \s ]* \z }xms },
     message { "$_ is not an alphanumeric string plus punctuation chars" };
 
+=head2 PEM
+
+A PEM encoded certificate (i.e. Base64 encoded string separated by newlines).
+
+=cut
+subtype 'PEM', # named $re_cert_string in old API (where it also wrongly included the underscore)
+    as 'Str',
+    where { $_ =~ qr{ \A [ A-Z a-z 0-9 \+ / = \- \  \n ]+ \z }xms },
+    message { "$_ contains characters not allow in PEM encoded certificates" };
+
 =head2 ArrayRefOrStr
 
 An I<ArrayRef> of I<Str> that will also accept a scalar I<Str> (which is

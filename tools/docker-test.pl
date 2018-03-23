@@ -18,6 +18,7 @@ use Pod::Usage;
 use Symbol qw( gensym );
 use IPC::Open3 qw( open3 );
 use POSIX ":sys_wait_h";
+use File::Copy;
 
 # $interactive
 #   1 = STDIN can be used for input
@@ -138,13 +139,27 @@ if ($batch) {
     print "Skipping (batch mode)\n";
 }
 else {
-    print "(This might take more than 10 minutes on first execution)\n";
+    `which sha256sum` or die "Sorry, I need the 'sha256sum' command line tool\n";
 
+    print "(This might take more than 10 minutes on first execution)\n";
     # Make scripts accessible for "docker build" (Dockerfile).
-    # Without "--append" Docker would always see a new file and rebuild the image
-    my $tar_mode = -f "$Bin/docker-test/scripts.tar" ? '--update' : '--create';
+    # Only update TAR file if neccessary to prevent Docker from always rebuilding the image
+    my $tarfile = "$Bin/docker-test/scripts.tar";
     my $olddir = getcwd; chdir $Bin;
-    `tar $tar_mode -f "$Bin/docker-test/scripts.tar" scripts testenv`;
+    # keep existing TAR file (and its timestamp) unless there were changes
+    if (-f $tarfile) {
+        # create a temp TAR file and compare checksums
+        `tar --create -f "$tarfile.new" scripts testenv`;
+        if (`sha256sum "$tarfile.new"` eq `sha256sum "$tarfile"`) {
+            move("$tarfile.new", $tarfile);
+        }
+        else {
+            unlink "$tarfile.new";
+        }
+    }
+    else {
+        `tar --create -f "$tarfile" scripts testenv`;
+    }
     chdir $olddir;
 
     @cmd = ( qw( docker build -t oxi-test ), "$Bin/docker-test");

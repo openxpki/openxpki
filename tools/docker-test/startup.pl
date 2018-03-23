@@ -96,21 +96,7 @@ elsif ($mode eq "selected") {
 }
 
 #
-# Info
-#
-print  "\n.--==##[ Run tests in Docker container ]##==\n";
-printf "| Repo:   %s\n", $ENV{OXI_TEST_GITREPO} ? $ENV{OXI_TEST_GITREPO} : "local";
-printf "| Branch: %s\n", $ENV{OXI_TEST_GITBRANCH} // "(default)";
-printf "| Commit: %s\n", $ENV{OXI_TEST_GITCOMMIT} // "HEAD";
-my $msg = $ENV{OXI_TEST_ALL} ? " all tests" : ($ENV{OXI_TEST_COVERAGE} ? " code coverage" : " selected tests:");
-my $big_msg = `figlet '$msg'`; $big_msg =~ s/^/| /msg;
-print $big_msg;
-printf "|      - $_\n" for @test_only;
-print  "|\n";
-print  ".--==#####################################==\n";
-
-#
-# Repository clone
+# Test arguments and repository
 #
 my $repo;
 my $is_local_repo = 0;
@@ -131,21 +117,42 @@ else {
 
 _stop 103, "Code coverage tests only work with local repo" if ($mode eq "coverage" and not $is_local_repo);
 
-print "\n====[ Git checkout ]====\n";
-print "Testing repo\n";
 my $code = execute code => [ "git", "ls-remote", "-h", $repo ];
 _stop 104, "Remote repo either does not exist or is not readable" if $code;
 
-# clone repo
-print "Cloning repo\n";
+#
+# Clone repository
+#
+print "\n.--==##[ Run tests in Docker container ]##==\n";
+print "| Cloning repo... ";
 my @branch_spec = $ENV{OXI_TEST_GITBRANCH} ? "--branch=".$ENV{OXI_TEST_GITBRANCH} : ();
 my @restrict_depth = $ENV{OXI_TEST_GITCOMMIT} ? () : ("--depth=1");
 execute capture => [ "git", "clone", @restrict_depth, @branch_spec, $repo, $clone_dir ];
 if ($ENV{OXI_TEST_GITCOMMIT}) {
-    print "Checking out commit $ENV{OXI_TEST_GITCOMMIT}\n";
+    print "Checking out given commit... ";
     chdir $clone_dir;
     execute capture => [ "git", "checkout", $ENV{OXI_TEST_GITCOMMIT} ];
 }
+print "\n";
+
+#
+# Info
+#
+printf "| Repo:   %s\n", $ENV{OXI_TEST_GITREPO} ? $ENV{OXI_TEST_GITREPO} : "local";
+printf "| Branch: %s\n", $ENV{OXI_TEST_GITBRANCH} // "(default)";
+printf "| Commit: %s\n", $ENV{OXI_TEST_GITCOMMIT} // "HEAD";
+chdir $clone_dir;
+my $logmsg = execute capture => [ "git", "log", "--format=%B", "-n" => 1, $ENV{OXI_TEST_GITCOMMIT} // "HEAD", ];
+$logmsg =~ s/\R$//gm;            # remove trailing newline
+($logmsg) = split /\R/, $logmsg; # only print first line
+printf "|         » %s «\n", $logmsg;
+
+my $msg = $ENV{OXI_TEST_ALL} ? " all tests" : ($ENV{OXI_TEST_COVERAGE} ? " code coverage" : " selected tests:");
+my $big_msg = `figlet '$msg'`; $big_msg =~ s/^/| /msg;
+print $big_msg;
+printf "|      - $_\n" for @test_only;
+print  "|\n";
+print  ".--==#####################################==\n";
 
 #
 # Grab and install Perl module dependencies from Makefile.PL using PPI

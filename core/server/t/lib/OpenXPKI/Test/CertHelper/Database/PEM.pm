@@ -4,7 +4,7 @@ use utf8;
 
 =head1 NAME
 
-OpenXPKI::Test::CertHelper::Database::PEM - Represents a test certificate (PEM + meta data)
+OpenXPKI::Test::CertHelper::Database::PEM - represents a test certificate (PEM + meta data)
 
 =head1 SYNOPSIS
 
@@ -17,8 +17,15 @@ OpenXPKI::Test::CertHelper::Database::PEM - Represents a test certificate (PEM +
         },
     );
 
-    print $pem->id, "\n";
-    print $pem->data, "\n";
+    diag $pem->label;
+
+    # shortscuts to some DB fields:
+    diag $pem->id;               # identifier
+    diag $pem->subject_key_id;   # subject_key_identifier
+    diag $pem->data;             # PEM encoded data
+
+    # access to all DB fields:
+    diag $pem->db->{authority_key_identifier};
 
 =cut
 
@@ -43,6 +50,11 @@ has label => (
 );
 
 sub id {
+    my $self = shift;
+    return $self->db->{identifier};
+}
+
+sub subject_key_id {
     my $self = shift;
     return $self->db->{subject_key_identifier};
 }

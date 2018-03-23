@@ -17,7 +17,7 @@ use Log::Log4perl qw(:easy);
 # Project modules
 use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
-use OpenXPKI::Test::QA::CertHelper::Workflow;
+
 
 plan tests => 39;
 
@@ -101,7 +101,7 @@ sub search_cert_ok {
     my $respect_order = scalar(@expected_names)
         ? (($val = pop @expected_names) eq "ORDERED") ? 1 : push(@expected_names, $val) && 0
         : 0;
-    my @hashes = map { superhashof({ subject_key_identifier => $dbdata->cert($_)->id }) } @expected_names;
+    my @hashes = map { superhashof({ subject_key_identifier => $dbdata->cert($_)->subject_key_id }) } @expected_names;
 
     my $result;
     lives_and {

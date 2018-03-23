@@ -251,6 +251,10 @@ OpenXPKI/Server/API2/EasyPlugin.pm
 OpenXPKI/Server/API2/EasyPluginMetaClassTrait.pm
 OpenXPKI/Server/API2/EasyPluginRole.pm
 OpenXPKI/Server/API2/Plugin/Cert/search_cert.pm
+OpenXPKI/Server/API2/Plugin/Cert/validate_certificate.pm
+OpenXPKI/Server/API2/Plugin/Crypto/generate_key.pm
+OpenXPKI/Server/API2/Plugin/Housekeeping/purge_application_log.pm
+OpenXPKI/Server/API2/Plugin/Import/import_crl.pm
 OpenXPKI/Server/API2/Plugin/Profile/Util.pm
 OpenXPKI/Server/API2/Plugin/Profile/get_additional_information_fields.pm
 OpenXPKI/Server/API2/Plugin/Profile/get_cert_profiles.pm
@@ -263,6 +267,10 @@ OpenXPKI/Server/API2/Plugin/Profile/get_key_params.pm
 OpenXPKI/Server/API2/Plugin/Profile/list_supported_san.pm
 OpenXPKI/Server/API2/Plugin/Profile/list_used_profiles.pm
 OpenXPKI/Server/API2/Plugin/Profile/render_templates.pm
+OpenXPKI/Server/API2/Plugin/Secret/clear_secret.pm
+OpenXPKI/Server/API2/Plugin/Secret/get_secrets.pm
+OpenXPKI/Server/API2/Plugin/Secret/is_secret_complete.pm
+OpenXPKI/Server/API2/Plugin/Secret/set_secret_part.pm
 OpenXPKI/Server/API2/Plugin/Token/Util.pm
 OpenXPKI/Server/API2/Plugin/Token/get_ca_list.pm
 OpenXPKI/Server/API2/Plugin/Token/get_certificate_for_alias.pm
@@ -282,12 +290,16 @@ OpenXPKI/Server/API2/Plugin/Workflow/execute_workflow_activity.pm
 OpenXPKI/Server/API2/Plugin/Workflow/fail_workflow.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_activities.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_activities_params.pm
+OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_base_info.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_creator.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_history.pm
+OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_info.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_instance_types.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_log.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_type_for_id.pm
+OpenXPKI/Server/API2/Plugin/Workflow/list_workflow_titles.pm
 OpenXPKI/Server/API2/Plugin/Workflow/search_workflow_instances.pm
+OpenXPKI/Server/API2/Plugin/Workflow/wakeup_resume_workflow.pm
 OpenXPKI/Server/API2/PluginRole.pm
 OpenXPKI/Server/API2/Types.pm
 OpenXPKI/Server/Context.pm
@@ -633,7 +645,7 @@ t/25_crypto/35_object_pkcs7.t
 t/25_crypto/51_volatile_vault.t
 t/25_crypto/52_object_secret.t
 t/25_crypto/53_is_issuer.t
-t/25_crypto/60_secret_cache.t
+t/25_crypto/60_tokenmanager.t
 
 t/28_log/01.t
 t/28_log/log4perl.conf

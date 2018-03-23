@@ -126,9 +126,6 @@ use Module::Load qw( autoload );
 use Moose::Exporter;
 use Moose::Util;
 use Moose::Meta::Class;
-use Log::Log4perl qw(:easy);
-use Log::Log4perl::Appender;
-use Log::Log4perl::Filter::MDC;
 use Moose::Util::TypeConstraints;
 use Test::More;
 use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in a test
@@ -137,10 +134,15 @@ use MIME::Base64;
 
 # Project modules
 use OpenXPKI::Config;
+use OpenXPKI::Log4perl;
+use Log::Log4perl::Appender;
+use Log::Log4perl::Filter::MDC;
+use Log::Log4perl::Layout::NoopLayout;
 use OpenXPKI::MooseParams;
 use OpenXPKI::Server::Database;
 use OpenXPKI::Server::Context;
 use OpenXPKI::Server::Init;
+use OpenXPKI::Server::Log;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Test::ConfigWriter;
 use OpenXPKI::Test::CertHelper::Database;
@@ -399,7 +401,6 @@ has config_writer => (
         OpenXPKI::Test::ConfigWriter->new(
             basedir => $self->testenv_root,
             db_conf => $self->db_conf,
-            log_level => $self->log_level,
         )
     },
 );
@@ -415,19 +416,6 @@ has session => (
     isa => 'Object',
     init_arg => undef,
     predicate => 'has_session',
-);
-
-=head2 last_api_result
-
-Returns the result of last call to L</api_command> or L</api2_command>.
-
-=cut
-#
-has last_api_result => (
-    is => 'rw',
-    isa => 'Any',
-    init_arg => undef,
-    predicate => 'has_last_api_result',
 );
 
 has path_log4perl_conf  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/etc/openxpki/log.conf" } );
@@ -503,21 +491,21 @@ sub _build_log4perl {
 sub _log4perl_screen {
     my ($self) = @_;
 
-    my $threshold_screen = $ENV{TEST_VERBOSE} ? $self->log_level : 'OFF';
+    my $threshold_screen = $ENV{TEST_VERBOSE} ? uc($self->log_level) : 'OFF';
     return qq(
         log4perl.rootLogger                     = INFO,  Screen
-        log4perl.category.openxpki.auth         = DEBUG, Screen
-        log4perl.category.openxpki.audit        = DEBUG, Screen
-        log4perl.category.openxpki.system       = DEBUG, Screen
-        log4perl.category.openxpki.workflow     = DEBUG, Screen
-        log4perl.category.openxpki.application  = DEBUG, Screen
-        log4perl.category.openxpki.deprecated   = WARN,  Screen
-        log4perl.category.connector             = WARN,  Screen
+        log4perl.category.openxpki.auth         = TRACE
+        log4perl.category.openxpki.audit        = TRACE
+        log4perl.category.openxpki.system       = TRACE
+        log4perl.category.openxpki.workflow     = TRACE
+        log4perl.category.openxpki.application  = TRACE
+        log4perl.category.openxpki.deprecated   = WARN
+        log4perl.category.connector             = WARN
         log4perl.category.Workflow              = OFF
 
         log4perl.appender.Screen                = Log::Log4perl::Appender::Screen
         log4perl.appender.Screen.layout         = Log::Log4perl::Layout::PatternLayout
-        log4perl.appender.Screen.layout.ConversionPattern = # %d %c %p %m [pid=%P|%i]%n
+        log4perl.appender.Screen.layout.ConversionPattern = # %d %c.%p %m [pid=%P|%i]%n
         log4perl.appender.Screen.Threshold      = $threshold_screen
     );
 }
@@ -560,10 +548,10 @@ sub enable_workflow_log {
 
     my $appender = Log::Log4perl::Appender->new(
         "OpenXPKI::Server::Log::Appender::Database",
-        layout   => Log::Log4perl::Layout::PatternLayout->new("%m (%X{user}"),
         table => "application_log",
         microseconds => 1,
     );
+    $appender->layout(Log::Log4perl::Layout::NoopLayout->new()),
     $appender->filter(Log::Log4perl::Filter::MDC->new(
         KeyToMatch    => "wfid",
         RegexToMatch  => '\d+',
@@ -578,7 +566,7 @@ Basic test setup: logging.
 =cut
 sub init_logging {
     my ($self) = @_;
-    Log::Log4perl->init( \($self->_log4perl_screen) );
+    OpenXPKI::Log4perl->init_or_fallback( \($self->_log4perl_screen) );
 }
 
 =head2 init_base_config
@@ -664,7 +652,7 @@ sub init_server {
     my ($self) = @_;
 
     # Init basic CTX objects
-    my @tasks = qw( config_versioned log dbi_log dbi api2 api authentication );
+    my @tasks = qw( config_versioned log dbi_log api2 api authentication );
     my %task_hash = map { $_ => 1 } @tasks;
     # add tasks requested via constructor parameter "also_init" (or injected by roles)
     for (grep { not $task_hash{$_} } @{ $self->also_init }) {
@@ -672,6 +660,10 @@ sub init_server {
         $task_hash{$_} = 1; # prevent duplicate tasks in "also_init"
     }
     OpenXPKI::Server::Init::init({ TASKS  => \@tasks, SILENT => 1, CLI => 0 });
+
+    # use the same DB connection as the test object to be able to do COMMITS
+    # etc. in tests
+    OpenXPKI::Server::Context::setcontext({ dbi => $self->dbi });
 }
 
 =head2 init_session_and_context
@@ -752,8 +744,7 @@ sub get_config {
 
 =head2 api_command
 
-Executes the given API2 command and stores the result in L</last_api_result>
-(additionally to returning it).
+Executes the given API2 command and returns the result.
 
 Convenience method to prevent usage of CTX('api') in test files.
 
@@ -770,17 +761,12 @@ B<Positional Parameters>
 =cut
 sub api_command {
     my ($self, $command, $params) = @_;
-
-    my $result = OpenXPKI::Server::Context::CTX('api')->$command($params);
-    $self->last_api_result($result);
-
-    return $result;
+    return OpenXPKI::Server::Context::CTX('api')->$command($params);
 }
 
 =head2 api2_command
 
-Executes the given API2 command and stores the result in L</last_api_result>
-(additionally to returning it).
+Executes the given API2 command and returns the result.
 
 Convenience method to prevent usage of CTX('api2') in test files.
 
@@ -797,32 +783,55 @@ B<Positional Parameters>
 =cut
 sub api2_command {
     my ($self, $command, $params) = @_;
-
-    my $result = OpenXPKI::Server::Context::CTX('api2')->$command($params ? (%$params) : ());
-    $self->last_api_result($result);
-
-    return $result;
+    return OpenXPKI::Server::Context::CTX('api2')->$command($params ? (%$params) : ());
 }
 
 =head2 insert_testcerts
 
-Inserts all test certificates from L<OpenXPKI::Test::CertHelper::Database> into
-the database.
+Inserts all or the specified list of test certificates from
+L<OpenXPKI::Test::CertHelper::Database> into the database.
+
+B<Parameters>
+
+=over
+
+=item * C<only> I<ArrayRef> - only add the given certificates (expects names like I<alpha_root_1>)
+
+=item * C<exclude> I<ArrayRef> - exclude the given certificates
+
+=back
 
 =cut
 sub insert_testcerts {
-    my ($self) = @_;
+    my ($self, %args) = named_args(\@_,
+        exclude => { isa => 'ArrayRef', optional => 1 },
+        only => { isa => 'ArrayRef', optional => 1 },
+    );
+
+    die "Either specify 'only' or 'exclude', not both." if $args{only} && $args{exclude};
+
     my $certhelper = $self->certhelper_database;
+    my $certnames;
+    if ($args{only}) {
+        $certnames = $args{only};
+    }
+    elsif ($args{exclude}) {
+        my $exclude = { map { $_ => 1 } @{ $args{exclude} } };
+        $certnames = [ grep { not $exclude->{$_} } @{ $certhelper->all_cert_names } ];
+    }
+    else {
+        $certnames = $certhelper->all_cert_names;
+    }
 
     $self->dbi->start_txn;
 
     $self->dbi->merge(
         into => "certificate",
         set => $certhelper->cert($_)->db,
-        where => { subject_key_identifier => $certhelper->cert($_)->id },
-    ) for @{ $certhelper->all_cert_names };
+        where => { subject_key_identifier => $certhelper->cert($_)->subject_key_id },
+    ) for @{ $certnames };
 
-    for (@{ $certhelper->all_cert_names }) {
+    for (@{ $certnames }) {
         next unless $certhelper->cert($_)->db_alias->{alias};
         $self->dbi->merge(
             into => "aliases",
@@ -851,8 +860,9 @@ sub delete_testcerts {
     my $certhelper = $self->certhelper_database;
 
     $self->dbi->start_txn;
-    $self->dbi->delete(from => 'certificate', where => { subject_key_identifier => $certhelper->all_cert_ids } );
+    $self->dbi->delete(from => 'certificate', where => { subject_key_identifier => $certhelper->all_cert_subject_key_ids } );
     $self->dbi->delete(from => 'aliases',     where => { identifier => [ map { $_->db->{identifier} } values %{$certhelper->_certs} ] } );
+    $self->dbi->delete(from => 'crl',         where => { issuer_identifier => [ map { $_->id } values %{$certhelper->_certs} ] } );
     $self->dbi->commit;
 }
 
@@ -861,7 +871,8 @@ sub _build_dbi {
 
     #Log::Log4perl->easy_init($OFF);
     return OpenXPKI::Server::Database->new(
-        log => Log::Log4perl->get_logger(),
+        # "CONFIG => undef" prevents OpenXPKI::Server::Log from re-initializing Log4perl
+        log => OpenXPKI::Server::Log->new(CONFIG => undef)->system,
         db_params => $self->db_conf,
     );
 }

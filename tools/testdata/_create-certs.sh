@@ -130,10 +130,10 @@ issue_cert() {
 make_certs() {
     local TARGET_DIR=$1
     local REALM=$2
-    local GENERATION=$3
+    local GEN=$3
     local VALID_FROM=$4
     local VALID_TO=$5
-    local ORPHAN=$6
+    local SPECIAL=$6
 
     local SUBJECT_BASE="/DC=ORG/DC=OpenXPKI/OU=ACME/CN=$(echo "$REALM" | tr [:lower:] [:upper:])"
     local BASEPATH="$TEMPDIR/$REALM"
@@ -143,71 +143,95 @@ make_certs() {
     touch $TEMPDIR/index.txt
     touch $TEMPDIR/index.txt.attr
 
-    echo "Certificates for CA $2 (generation $GENERATION)"
+    echo "Certificates for CA $2 (generation $GEN)"
 
     echo " - creation using OpenSSL"
     # Self signed DataVault cert
     issue_cert "-extensions vault_cert" \
-        $BASEPATH-datavault-$GENERATION "$SUBJECT_BASE DataVault" \
+        $BASEPATH-datavault-$GEN "$SUBJECT_BASE DataVault $GEN" \
         SELF \
         $VALID_FROM $VALID_TO
 
     # Self signed Root CA cert
     issue_cert "-extensions v3_ca" \
-        $BASEPATH-root-$GENERATION "$SUBJECT_BASE Root CA" \
+        $BASEPATH-root-$GEN "$SUBJECT_BASE Root CA $GEN" \
         SELF \
         $VALID_FROM $VALID_TO
 
     # Signing CA cert (signed by Root CA)
     issue_cert "-extensions v3_ca" \
-        $BASEPATH-signer-$GENERATION "$SUBJECT_BASE Signing CA" \
-        $BASEPATH-root-$GENERATION \
+        $BASEPATH-signer-$GEN "$SUBJECT_BASE Signing CA $GEN" \
+        $BASEPATH-root-$GEN \
         $VALID_FROM $VALID_TO
 
     # SCEP cert (signed by Root CA)
     issue_cert "" \
-        $BASEPATH-scep-$GENERATION "$SUBJECT_BASE SCEP" \
-        $BASEPATH-root-$GENERATION \
+        $BASEPATH-scep-$GEN "$SUBJECT_BASE SCEP $GEN" \
+        $BASEPATH-root-$GEN \
         $VALID_FROM $VALID_TO
 
     # Client cert #1 (signed by Signing CA)
     issue_cert "" \
-        $BASEPATH-alice-$GENERATION "$SUBJECT_BASE Client Alice" \
-        $BASEPATH-signer-$GENERATION $VALID_FROM $VALID_TO
+        $BASEPATH-alice-$GEN "$SUBJECT_BASE Client Alice $GEN" \
+        $BASEPATH-signer-$GEN $VALID_FROM $VALID_TO
 
     # Client cert #2 (signed by Signing CA)
     issue_cert "" \
-        $BASEPATH-bob-$GENERATION "$SUBJECT_BASE Client Bob" \
-        $BASEPATH-signer-$GENERATION $VALID_FROM $VALID_TO
+        $BASEPATH-bob-$GEN "$SUBJECT_BASE Client Bob $GEN" \
+        $BASEPATH-signer-$GEN $VALID_FROM $VALID_TO
+
+    # Create two more client certs that will be revoked
+    if [ "$SPECIAL" == "REVOKE" ]; then
+        # Client cert #3 (signed by Signing CA)
+        issue_cert "" \
+            $BASEPATH-christine-$GEN "$SUBJECT_BASE Client Christine $GEN" \
+            $BASEPATH-signer-$GEN $VALID_FROM $VALID_TO
+
+        # Client cert #4 (signed by Signing CA)
+        issue_cert "" \
+            $BASEPATH-don-$GEN "$SUBJECT_BASE Client Don $GEN" \
+            $BASEPATH-signer-$GEN $VALID_FROM $VALID_TO
+
+        echo " - revoking certificates christine and don"
+        param=(-config $TEMPDIR/openssl.cnf -batch -verbose -keyfile $BASEPATH-signer-$GEN.pem -cert $BASEPATH-signer-$GEN.crt -passin pass:root)
+        openssl ca ${param[@]} -revoke $BASEPATH-christine-$GEN.crt -crl_compromise 20100304070830Z   > $TEMPDIR/log 2>&1
+        openssl ca ${param[@]} -revoke $BASEPATH-don-$GEN.crt       -crl_reason cessationOfOperation  > $TEMPDIR/log 2>&1
+        echo " - creating CRL"
+        openssl ca ${param[@]} -gencrl -crldays 18250 -out $TARGET_DIR/ssl/$REALM/$REALM-$GEN.crl     > $TEMPDIR/log 2>&1
+    fi
 
     # PKCS7 for client alice
     openssl crl2pkcs7 -nocrl \
-        -certfile $BASEPATH-root-$GENERATION.crt \
-        -certfile $BASEPATH-signer-$GENERATION.crt \
-        -certfile $BASEPATH-alice-$GENERATION.crt \
-        -out      $BASEPATH-alice-$GENERATION.p7b > $TEMPDIR/log 2>&1
+        -certfile $BASEPATH-root-$GEN.crt \
+        -certfile $BASEPATH-signer-$GEN.crt \
+        -certfile $BASEPATH-alice-$GEN.crt \
+        -out      $BASEPATH-alice-$GEN.p7b > $TEMPDIR/log 2>&1
 
     echo " - import into OpenXPKI"
 
-    local OXI_IMPORT="openxpkiadm certificate import --force-no-verify --gen $GENERATION --realm $REALM"
-    if [ -z "$ORPHAN" ]; then
-        $OXI_IMPORT --file $BASEPATH-root-$GENERATION.crt      --token root             > $TEMPDIR/log 2>&1
-        $OXI_IMPORT --file $BASEPATH-signer-$GENERATION.crt    --token certsign         > $TEMPDIR/log 2>&1
-        $OXI_IMPORT --file $BASEPATH-datavault-$GENERATION.crt --token datasafe         > $TEMPDIR/log 2>&1
-        $OXI_IMPORT --file $BASEPATH-scep-$GENERATION.crt      --token scep             > $TEMPDIR/log 2>&1
-        $OXI_IMPORT --file $BASEPATH-alice-$GENERATION.crt --alias "$REALM-alice-${GENERATION}" > $TEMPDIR/log 2>&1
-        $OXI_IMPORT --file $BASEPATH-bob-$GENERATION.crt   --alias "$REALM-bob-${GENERATION}"   > $TEMPDIR/log 2>&1
+    local OXI_IMPORT="openxpkiadm certificate import --force-no-verify --gen $GEN --realm $REALM"
+    if [ "$SPECIAL" != "ORPHAN" ]; then
+        $OXI_IMPORT --file $BASEPATH-root-$GEN.crt      --token root                  > $TEMPDIR/log 2>&1
+        $OXI_IMPORT --file $BASEPATH-signer-$GEN.crt    --token certsign              > $TEMPDIR/log 2>&1
+        $OXI_IMPORT --file $BASEPATH-datavault-$GEN.crt --token datasafe              > $TEMPDIR/log 2>&1
+        $OXI_IMPORT --file $BASEPATH-scep-$GEN.crt      --token scep                  > $TEMPDIR/log 2>&1
+        $OXI_IMPORT --file $BASEPATH-alice-$GEN.crt     --alias "$REALM-alice-${GEN}" > $TEMPDIR/log 2>&1
+        $OXI_IMPORT --file $BASEPATH-bob-$GEN.crt       --alias "$REALM-bob-${GEN}"   > $TEMPDIR/log 2>&1
+        if [ "$SPECIAL" == "REVOKE" ]; then
+            $OXI_IMPORT --file $BASEPATH-christine-$GEN.crt --alias "$REALM-christine-${GEN}" > $TEMPDIR/log 2>&1
+            $OXI_IMPORT --file $BASEPATH-don-$GEN.crt       --alias "$REALM-don-${GEN}"       > $TEMPDIR/log 2>&1
+        fi
     else
-        $OXI_IMPORT --file $BASEPATH-bob-$GENERATION.crt   --alias "$REALM-bob-${GENERATION}" --force-no-chain  > $TEMPDIR/log 2>&1
+        $OXI_IMPORT --file $BASEPATH-bob-$GEN.crt   --alias "$REALM-bob-${GEN}" --force-no-chain  > $TEMPDIR/log 2>&1
     fi
 
     mkdir -p $TARGET_DIR/ssl/$REALM
-    if [ -z "$ORPHAN" ]; then
+    if [ "$SPECIAL" != "ORPHAN" ]; then
         mv $BASEPATH*.crt $TARGET_DIR/ssl/$REALM || true
         mv $BASEPATH*.pem $TARGET_DIR/ssl/$REALM || true
         mv $BASEPATH*.p7b $TARGET_DIR/ssl/$REALM || true
     else
-        mv $BASEPATH-bob-$GENERATION.* $TARGET_DIR/ssl/$REALM || true
+        mv $BASEPATH-bob-$GEN.* $TARGET_DIR/ssl/$REALM || true
     fi
 }
 
@@ -219,7 +243,7 @@ write_openssl_config
 export OPENXPKI_CONF_PATH=$OXI_CONF/config.d
 
 make_certs $OXI_CONF alpha 1 20060101000000Z 20070131235959Z
-make_certs $OXI_CONF alpha 2 20070101000000Z 21000131235959Z
+make_certs $OXI_CONF alpha 2 20070101000000Z 21000131235959Z REVOKE
 make_certs $OXI_CONF alpha 3 21000101000000Z 21050131235959Z
 
 make_certs $OXI_CONF beta 1  20170101000000Z 21050131235959Z

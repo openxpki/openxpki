@@ -26,6 +26,43 @@ use OpenXPKI::Server::API2::PluginRole;
 use OpenXPKI::Server::API2::Autoloader;
 use OpenXPKI::Server::API2::Types;
 
+sub not_migrated {
+    my $self = shift;
+    my @old_api = qw(
+        clear_secret control_watchdog convert_certificate convert_csr
+        create_workflow_instance execute_workflow_activity fail_workflow
+        generate_key get_additional_information_fields get_alg_names
+        get_approval_message get_ca_cert get_ca_list get_cert get_cert_actions
+        get_cert_attributes get_cert_identifier get_cert_profiles
+        get_cert_subject_profiles get_cert_subject_styles
+        get_certificate_for_alias get_chain get_crl get_crl_list
+        get_csr_info_hash_from_data get_data_pool_entry get_default_token
+        get_field_definition get_key_algs get_key_enc
+        get_key_identifier_from_data get_key_params get_menu get_motd
+        get_param_names get_param_values get_pki_realm get_private_key_for_cert
+        get_profile_for_cert get_random get_report get_report_list get_role
+        get_secrets get_session_info get_token_alias_by_group
+        get_token_alias_by_type get_trust_anchors get_ui_system_status get_user
+        get_workflow_activities get_workflow_activities_params
+        get_workflow_creator get_workflow_history get_workflow_info
+        get_workflow_instance_types get_workflow_log get_workflow_type_for_id
+        import_certificate import_chain import_crl is_certificate_owner
+        is_secret_complete is_token_usable list_active_aliases
+        list_data_pool_entries list_process list_supported_san
+        list_used_profiles list_workflow_titles modify_data_pool_entry
+        private_key_exists_for_cert purge_application_log
+        render_metadata_from_template render_san_from_template
+        render_subject_from_template render_template resume_workflow
+        sc_analyze_certificate sc_analyze_smartcard sc_parse_certificates
+        search_cert search_cert_count search_workflow_instances
+        search_workflow_instances_count send_notification set_data_pool_entry
+        set_secret_part validate_certificate wakeup_workflow
+    );
+    my $new_api = $self->commands;
+    my @not_migrated = sort grep { not $new_api->{$_} } @old_api;
+    return @not_migrated;
+}
+
 =head1 SYNOPSIS
 
 B<Default usage>:
@@ -237,9 +274,9 @@ sub _build_commands {
     my $self = shift;
 
     my @modules = ();
-    my $candidates = {};
+    my $pkg_map = {};
     try {
-        $candidates = _list_modules($self->namespace."::");
+        $pkg_map = _list_modules($self->namespace."::");
     }
     catch {
         OpenXPKI::Exception->throw (
@@ -248,7 +285,7 @@ sub _build_commands {
         );
     };
 
-    return $self->_load_plugins( [ keys %{ $candidates } ] );
+    return $self->_load_plugins($pkg_map);
 }
 
 #
@@ -257,29 +294,39 @@ sub _build_commands {
 # Returns a HashRef that contains the C<command =E<gt> package> mappings.
 #
 sub _load_plugins {
-    my ($self, $packages) = @_;
+    my ($self, $pkg_map) = @_;
 
     my $cmd_package_map = {};
 
-    for my $pkg (@{ $packages }) {
+    for my $pkg (keys %{ $pkg_map }) {
+        my $file = $pkg_map->{$pkg};
         my $ok;
-        try {
-            load $pkg;
-            $ok = 1;
-        }
+        try { load $pkg; $ok = 1; }
         catch {
-            $self->log->warn("Error loading API plugin $pkg: $_");
-            next;
+            $self->log->warn("Error loading API plugin $pkg (".$pkg_map->{$pkg}."): $_");
         };
+        next if not $ok; # continue on errors
 
         if (not $pkg->DOES($self->command_role)) {
-            $self->log->debug("API - ignore   $pkg (does not have role ".$self->command_role.")");
+            $self->log->debug("API - ignore   $pkg: does not have role ".$self->command_role." ($file)");
             next;
         }
 
-        $self->log->debug("API - register $pkg: ".join(", ", @{ $pkg->commands }));
-        # FIXME test for duplicate command names
-        $cmd_package_map->{$_} = $pkg for @{ $pkg->commands };
+        $self->log->debug("API - register $pkg: ".join(", ", @{ $pkg->commands })." ($file)");
+
+        # store commands and their source package
+        for my $cmd (@{ $pkg->commands }) {
+            # check if command was previously defined by another package
+            my $earlier_pkg = $cmd_package_map->{$cmd};
+            if ($earlier_pkg) {
+                my $earlier_file = $pkg_map->{$earlier_pkg};
+                OpenXPKI::Exception->throw(
+                    message => "API command '$cmd' now defined in $pkg was previously found in $earlier_pkg",
+                    params => { now_file => $file, previous_file => $earlier_file }
+                );
+            }
+            $cmd_package_map->{$cmd} = $pkg;
+        }
     }
 
     return $cmd_package_map;
@@ -305,9 +352,12 @@ B<Parameters>
 =cut
 sub register_plugin {
     my ($self, $packages) = @_;
+    # convert string to arrayref
     $packages = [ $packages ] unless (ref $packages or "") eq "ARRAY";
+    # convert arrayref to hashref
+    my $pkg_map = { map { $_ => "manually added" } @$packages };
 
-    my $pkg_by_cmd = $self->_load_plugins($packages);
+    my $pkg_by_cmd = $self->_load_plugins($pkg_map);
     $self->add_commands( %{ $pkg_by_cmd } );
     return ( keys %{ $pkg_by_cmd } );
 }
@@ -556,17 +606,20 @@ sub _list_modules {
         my $pm_rx = qr/\A($module_rx)\.pm\z/;
         my $dir_rx = $prefix eq "" ? $root_rx : $notroot_rx;
         $dir_rx = qr/\A$dir_rx\z/;
-        for my $incdir (@INC) {
+        # Reverse @INC so that modules paths listed earlier win (by overwriting
+        # previously found modules in $results{...}.
+        # This is similar to Perl's behaviour when including modules.
+        for my $incdir (reverse @INC) {
             my $dir = File::Spec->catdir($incdir, @dir_suffix);
             my $dh = IO::Dir->new($dir) or next;
             my @entries = $dh->read;
             $dh->close;
             # list modules
             for my $pmish_rx ($pmc_rx, $pm_rx) {
-                foreach my $entry (@entries) {
+                for my $entry (@entries) {
                     if($entry =~ $pmish_rx) {
                         my $name = $prefix.$1;
-                        $results{$name} = undef;
+                        $results{$name} = File::Spec->catdir($dir, $entry);
                     }
                 }
             }

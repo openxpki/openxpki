@@ -278,7 +278,7 @@ B<Positional parameters>
 =cut
 sub send_command_ok {
     my ($self, $command, $params) = @_;
-    return $self->send_ok('COMMAND', { COMMAND => $command, PARAMS => $params ? $params : {} });
+    return $self->send_ok('COMMAND', { COMMAND => $command, PARAMS => $params ? $params : {}, API => 1 });
 }
 
 =head2 send_command_api2_ok
@@ -301,7 +301,7 @@ B<Positional parameters>
 =cut
 sub send_command_api2_ok {
     my ($self, $command, $params) = @_;
-    return $self->send_ok('COMMAND', { COMMAND => $command, PARAMS => $params ? $params : {}, API2 => 1 });
+    return $self->send_ok('COMMAND', { COMMAND => $command, PARAMS => $params ? $params : {}, API => 2 });
 }
 
 =head2 is_service_msg

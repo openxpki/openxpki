@@ -215,9 +215,6 @@ lives_and {
 ## otherwise test 34 fails
 $crl_profile->set_serial (23);
 
-
-
-
 #### issue crl...
 my $crl;
 lives_and {
@@ -228,5 +225,10 @@ lives_and {
     });
     like $crl, qr/^-----BEGIN X509 CRL-----/;
 } "Create CRL";
+
+#
+# Cleanup
+#
+$oxitest->delete_testcerts;
 
 1;

@@ -281,9 +281,13 @@ sub new_client_tester {
     );
 }
 
-sub DEMOLISH {
+# no-op DEMOLISH in case the consuming class does not have one. If it does have
+# one, that will win. Then we modify it (theirs or ours)
+# Also see: http://www.perlmonks.org/?node_id=837397
+sub DEMOLISH {}
+before DEMOLISH => sub {
     my $self = shift;
     $self->stop_server;
-}
+};
 
 1;

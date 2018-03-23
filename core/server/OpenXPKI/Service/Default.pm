@@ -728,7 +728,6 @@ sub __handle_COMMAND : PRIVATE {
     }
 
     eval {
-        my $api = $data->{PARAMS}->{API} || 2;
         if ($api != 1) {
             $command = OpenXPKI::Service::Default::CommandApi2->new(
                 command => $data->{PARAMS}->{COMMAND},

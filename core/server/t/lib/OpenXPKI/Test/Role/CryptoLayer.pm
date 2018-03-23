@@ -44,7 +44,7 @@ before 'init_user_config' => sub { # ... so we do not overwrite user supplied co
 before 'init_server' => sub {
     my $self = shift;
     # prepend to existing array in case a user supplied "also_init" needs our modules
-    unshift @{ $self->also_init }, 'crypto_layer';
+    unshift @{ $self->also_init }, qw( crypto_layer volatile_vault );
 };
 
 1;

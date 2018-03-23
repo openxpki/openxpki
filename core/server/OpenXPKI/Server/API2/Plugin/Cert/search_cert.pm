@@ -189,7 +189,8 @@ B<Parameters>
 
 All parameters are optional and can be used to filter the result list:
 
-see search_cert, limit and order parameters are not applied.
+see L</search_cert> for parameter list (except C<limit>, C<start>, C<order> and
+C<reverse> parameters which are not used in C<search_cert_count>).
 
 B<Changes compared to API v1:> The following parameters where removed in favor
 of C<[valid|expires]_[before|after]>:

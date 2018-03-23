@@ -31,9 +31,14 @@ sub get_files {
 
 my $pkcs7 = get_files($ARGV[0], "p7b");
 my $privkeys = get_files($ARGV[0], "pem");
+my $crl = get_files($ARGV[0], "crl");
 
 print "sub _build_pkcs7 {\n    return {\n";
 printf "        '%s' => \"%s\",\n", $_, $pkcs7->{$_} for sort keys %$pkcs7;
+print "    };\n}\n";
+
+print "sub _build_crl {\n    return {\n";
+printf "        '%s' => \"%s\",\n", $_, $crl->{$_} for sort keys %$crl;
 print "    };\n}\n";
 
 print "sub _build_private_keys {\n    return {\n";

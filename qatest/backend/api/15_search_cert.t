@@ -107,7 +107,7 @@ sub search_cert_ok {
     my $val;
     # Only extract last element if it equals "ORDERED" (otherwise put it back and make term return 0)
     my $respect_order = (($val = pop @expected_names) eq "ORDERED") ? 1 : push(@expected_names, $val) && 0;
-    my @hashes = map { superhashof({ SUBJECT_KEY_IDENTIFIER => $dbdata->cert($_)->id }) } @expected_names;
+    my @hashes = map { superhashof({ SUBJECT_KEY_IDENTIFIER => $dbdata->cert($_)->subject_key_id }) } @expected_names;
 
     $test->runcmd_ok('search_cert', $conditions, "Search cert $message")
         or die Dumper($test->get_msg);

@@ -467,6 +467,12 @@ sub drop_table {
 sub start_txn {
     my $self = shift;
     return $self->log->warn("AutoCommit is on, start_txn() is useless") if $self->autocommit;
+
+    # we have to enforce the actual DB connection which clears
+    # $self->_txn_starter at this point as otherwise the very first commit()
+    # $self->_txn_starter and think there is no running transaction.
+    $self->ping;
+
     my $caller = [ caller ];
     if ($self->in_txn) {
         $self->log->debug(
@@ -481,7 +487,7 @@ sub start_txn {
     $self->_txn_starter($caller);
 
     $self->log->trace(
-        sprintf "start_txn() in %s, %i", $caller->[0], $caller->[2],
+        sprintf "start_txn() in %s:%i", $caller->[0], $caller->[2],
     ) if $self->log->is_trace;
 }
 
@@ -493,7 +499,7 @@ sub commit {
         if ($self->log->is_trace) {
             my $caller = [ caller ];
             $self->log->trace(
-                sprintf "commit for txn from %s, %i called in %s, %i",
+                sprintf "commit for txn started at %s:%i called in %s:%i",
                     $self->_txn_starter->[0], $self->_txn_starter->[2],
                     $caller->[0], $caller->[2]
             );

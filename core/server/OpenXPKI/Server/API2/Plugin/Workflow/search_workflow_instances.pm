@@ -121,8 +121,6 @@ of workflows found.
 
 see search_workflow_instances, limit and order fields are not applicable.
 
-=back
-
 =cut
 command "search_workflow_instances_count" => {
     pki_realm  => { isa => 'AlphaPunct', },

@@ -30,11 +30,12 @@ use OpenXPKI::Test;
 #
 sub workflow_def {
     my ($name) = @_;
+    (my $cleanname = $name) =~ s/[^0-9a-z]//gi;
     return {
         'head' => {
             'label' => $name,
             'persister' => 'OpenXPKI',
-            'prefix' => $name,
+            'prefix' => $cleanname,
         },
         'state' => {
             'INITIAL' => {
