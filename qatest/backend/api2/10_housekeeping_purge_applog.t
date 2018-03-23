@@ -26,7 +26,10 @@ my $maxage = 60*60*24;  # 1 day
 #
 # Setup test context
 #
-my $oxitest = OpenXPKI::Test->new(log_level => 'info');
+my $oxitest = OpenXPKI::Test->new(
+    log_level => 'info',
+    enable_workflow_log => 1, # while testing we do not log to database by default
+);
 
 ## add database logger
 #my $appender = Log::Log4perl::Appender->new(
@@ -66,7 +69,6 @@ OpenXPKI::Server::Context::setcontext({
     workflow_id => $wf_id
 });
 Log::Log4perl::MDC->put('wfid', $wf_id);
-$oxitest->enable_workflow_log;
 
 # Insert and validate test message via API
 my $msg = sprintf "DBI Log Workflow Test %01d", $wf_id;

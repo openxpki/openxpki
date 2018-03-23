@@ -372,6 +372,32 @@ has log_level => (
     default => "WARN",
 );
 
+=item * I<enable_workflow_log> (optional) - if set to 1 workflow related log
+entries will be written into the database. This allows e.g. for querying the
+workflow log / history.
+
+Per default when using this test class there is only screen logging.
+
+=cut
+has enable_workflow_log => (
+    is => 'rw',
+    isa => 'Bool',
+    default => 0,
+);
+
+=item * I<enable_file_log> - if set to 1 all log messages above log level DEBUG
+are written to a temporary file for manual inspection.
+
+Also see L</log_path> and L</diag_log>.
+
+=cut
+has enable_file_log => (
+    is => 'rw',
+    isa => 'Bool',
+    default => 0,
+);
+
+
 =back
 
 =head2 certhelper_database
@@ -416,6 +442,20 @@ has session => (
     isa => 'Object',
     init_arg => undef,
     predicate => 'has_session',
+);
+
+=head2 log_path
+
+Returns the path to the log file if the constructor has been called with
+C<enable_file_log =E<gt> 1>.
+
+=cut
+has log_path => (
+    is => 'rw',
+    isa => 'Str',
+    lazy => 1,
+    default => sub { my $self = shift; $self->testenv_root."/openxpki.log" },
+    init_arg => undef,
 );
 
 has path_log4perl_conf  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/etc/openxpki/log.conf" } );
@@ -492,8 +532,9 @@ sub _log4perl_screen {
     my ($self) = @_;
 
     my $threshold_screen = $ENV{TEST_VERBOSE} ? uc($self->log_level) : 'OFF';
+    my $log_path = $self->log_path;
     return qq(
-        log4perl.rootLogger                     = INFO,  Screen
+        log4perl.rootLogger                     = INFO, Screen, File
         log4perl.category.openxpki.auth         = TRACE
         log4perl.category.openxpki.audit        = TRACE
         log4perl.category.openxpki.system       = TRACE
@@ -507,6 +548,15 @@ sub _log4perl_screen {
         log4perl.appender.Screen.layout         = Log::Log4perl::Layout::PatternLayout
         log4perl.appender.Screen.layout.ConversionPattern = # %d %c.%p %m [pid=%P|%i]%n
         log4perl.appender.Screen.Threshold      = $threshold_screen
+
+        # "File" is disabled by default
+        log4perl.appender.File                  = Log::Log4perl::Appender::File
+        log4perl.appender.File.filename         = $log_path
+        log4perl.appender.File.syswrite         = 1
+        log4perl.appender.File.utf8             = 1
+        log4perl.appender.File.layout           = Log::Log4perl::Layout::PatternLayout
+        log4perl.appender.File.layout.ConversionPattern = # %d %c.%p %m [pid=%P|%i]%n
+        log4perl.appender.File.Threshold        = OFF
     );
 }
 
@@ -534,31 +584,6 @@ sub _build_conf_database {
     };
 }
 
-# while testing we do not log to database by default
-=head2 enable_workflow_log
-
-Enables writing of workflow related log entries into the database. This allows
-e.g. for querying the workflow log.
-
-Per default when using this test class there is only screen logging.
-
-=cut
-sub enable_workflow_log {
-    my ($self) = @_;
-
-    my $appender = Log::Log4perl::Appender->new(
-        "OpenXPKI::Server::Log::Appender::Database",
-        table => "application_log",
-        microseconds => 1,
-    );
-    $appender->layout(Log::Log4perl::Layout::NoopLayout->new()),
-    $appender->filter(Log::Log4perl::Filter::MDC->new(
-        KeyToMatch    => "wfid",
-        RegexToMatch  => '\d+',
-    ));
-    Log::Log4perl->get_logger("openxpki.application")->add_appender($appender);
-}
-
 =head2 init_logging
 
 Basic test setup: logging.
@@ -567,6 +592,51 @@ Basic test setup: logging.
 sub init_logging {
     my ($self) = @_;
     OpenXPKI::Log4perl->init_or_fallback( \($self->_log4perl_screen) );
+
+    # additional workflow log (database)
+    if ($self->enable_workflow_log) {
+        my $appender = Log::Log4perl::Appender->new(
+            "OpenXPKI::Server::Log::Appender::Database",
+            table => "application_log",
+            microseconds => 1,
+        );
+        $appender->layout(Log::Log4perl::Layout::NoopLayout->new()),
+        $appender->filter(Log::Log4perl::Filter::MDC->new(
+            KeyToMatch    => "wfid",
+            RegexToMatch  => '\d+',
+        ));
+    }
+
+    # additional file log
+    if ($self->enable_file_log) {
+        # We cannot use Log::Log4perl->appender_by_name("File")->threshold(uc($self->log_level));
+        # as this accesses the actual appender class, but we need the wrapper class Log::Log4perl::Appender
+        # (https://www.perlmonks.org/?node_id=1199218)
+        $Log::Log4perl::Logger::APPENDER_BY_NAME{'File'}->threshold('DEBUG');
+        note ">";
+        note "> All log messages (log level DEBUG) will be written to:";
+        note "> ".$self->log_path;
+        note ">";
+    }
+}
+
+=head2 diag_log
+
+Outputs all log entries in the log file (only if enabled via constructor
+parameter C<enable_file_log>).
+
+Output is done via C<diag()>.
+
+=cut
+sub diag_log {
+    my ($self) = @_;
+    return unless $self->enable_file_log;
+    open my $fh, '<', $self->log_path or return;
+
+    local $/; # slurp mode
+    my $logs = <$fh>;
+    close $fh;
+    diag $logs;
 }
 
 =head2 init_base_config

@@ -143,10 +143,9 @@ my $oxitest = OpenXPKI::Test->new(
         "realm.alpha.workflow.def.wf_type_2" => workflow_def("wf_type_2"),
         "realm.alpha.workflow.def.wf_type_3_unused" => workflow_def("wf_type_3_unused"),
         "realm.beta.workflow.def.wf_type_4" => workflow_def("wf_type_4"),
-    }
+    },
+    enable_workflow_log => 1, # while testing we do not log to database by default
 );
-# while testing we do not log to database by default
-$oxitest->enable_workflow_log;
 
 my $params = {
     message => "Lucy in the sky with diamonds",
