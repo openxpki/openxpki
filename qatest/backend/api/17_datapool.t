@@ -3,43 +3,30 @@ use strict;
 use warnings;
 
 # Core modules
-use Carp;
 use English;
-use Data::Dumper;
-use File::Basename qw( dirname );
 use FindBin qw( $Bin );
 
 # CPAN modules
-use Log::Log4perl qw(:easy);
-Log::Log4perl->easy_init($WARN);
 use Test::More;
 use Test::Deep;
+use Test::Exception;
 use Data::UUID;
 
 # Project modules
-use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
-use TestCfg;
-use OpenXPKI::Test::QA::More;
+use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 
+
+plan tests => 34;
+
+
 #
-# Init client
+# Init helpers
 #
-our $cfg = {};
-TestCfg->new->read_config_path( 'api.cfg', $cfg, dirname($0) );
-
-my $test = OpenXPKI::Test::QA::More->new({
-    socketfile => $cfg->{instance}{socketfile},
-    realm => $cfg->{instance}{realm},
-}) or die "Error creating new test instance: $@";
-
-$test->set_verbose($cfg->{instance}{verbose});
-$test->plan( tests => 37 );
-
-$test->connect_ok(
-    user => $cfg->{operator}{name},
-    password => $cfg->{operator}{password},
-) or die "Error - connect failed: $@";
+my $oxitest = OpenXPKI::Test->new(
+    with => [qw( TestRealms CryptoLayer )],
+    #log_level => 'trace',
+);
 
 
 
@@ -47,34 +34,33 @@ my $namespace = sprintf "test-%s", Data::UUID->new->create_str;
 
 sub set_entry_ok {
     my ($params, $message) = @_;
-    $test->runcmd_ok('set_data_pool_entry', { NAMESPACE => $namespace, %$params }, $message)
-        or diag Dumper($test->get_msg);
+    lives_and {
+        ok $oxitest->api_command('set_data_pool_entry' => { NAMESPACE => $namespace, %$params });
+    } $message;
 }
 
 sub set_entry_fails {
     my ($params, $error, $message) = @_;
-    my $ok = $test->runcmd('set_data_pool_entry', { NAMESPACE => $namespace, %$params });
-    if ($ok) {
-        fail $message;
-        return;
-    }
-    like $test->error || '', ref $error eq 'Regexp' ? $error : qr(\Q$error\E), $message;
+    throws_ok {
+        $oxitest->api_command('set_data_pool_entry' => { NAMESPACE => $namespace, %$params });
+    } (ref $error eq 'Regexp' ? $error : qr(\Q$error\E)), $message;
 }
 
 sub entry_is {
     my ($key, @expected_entries, $message) = @_;
-    $test->runcmd('get_data_pool_entry', { NAMESPACE => $namespace, KEY => $key }) or die Dumper($test->get_msg);
-    cmp_deeply $test->get_msg->{PARAMS}, @expected_entries, $message;
+    lives_and {
+        my $result = $oxitest->api_command('get_data_pool_entry' => { NAMESPACE => $namespace, KEY => $key });
+        cmp_deeply $result, @expected_entries;
+    } $message;
 }
 
 #
 # Check parameter validation
 #
-$test->runcmd('set_data_pool_entry', { KEY => "pill", VALUE => "red" });
-$test->error_is(
-    "I18N_OPENXPKI_SERVER_API_INVALID_PARAMETER",
-    "Complain when trying to store entry without NAMESPACE"
-);
+throws_ok {
+    $oxitest->api_command('set_data_pool_entry' => { KEY => "pill", VALUE => "red" });
+}   qr/I18N_OPENXPKI_SERVER_API_INVALID_PARAMETER/,
+    "Complain when trying to store entry without NAMESPACE";
 
 set_entry_fails { VALUE => "red" },
     "I18N_OPENXPKI_SERVER_API_INVALID_PARAMETER",
@@ -136,7 +122,7 @@ my $namespace2 = sprintf "test-%s", Data::UUID->new->create_str;
 my @some_uuids = map { Data::UUID->new->create_str } (1..10);
 my $entry_no = 0;
 for (@some_uuids) {
-    $test->runcmd('set_data_pool_entry', {
+    $oxitest->api_command('set_data_pool_entry' => {
         NAMESPACE => $namespace2,
         KEY => sprintf("pill-%02d", $entry_no, $_),
         VALUE => $_,
@@ -145,22 +131,23 @@ for (@some_uuids) {
 is $entry_no, scalar(@some_uuids), "Listing: store some entries";
 
 # List entries
-$test->runcmd_ok('list_data_pool_entries', {
-    NAMESPACE => $namespace2,
-}, "Listing: query all entries") or diag Dumper($test->get_msg);
-
-$entry_no = 0;
-cmp_deeply $test->get_msg->{PARAMS}, bag(
-    map { { NAMESPACE => $namespace2, KEY => sprintf("pill-%02d", $entry_no++, $_) } } @some_uuids,
-), "Listing: all stored entries are returned";
+lives_and {
+    my $result = $oxitest->api_command('list_data_pool_entries' => {
+        NAMESPACE => $namespace2,
+    });
+    $entry_no = 0;
+    cmp_deeply $result, bag(
+        map { { NAMESPACE => $namespace2, KEY => sprintf("pill-%02d", $entry_no++, $_) } } @some_uuids,
+    );
+} "Listing: all stored entries";
 
 # List limited amount of entries
-$test->runcmd_ok('list_data_pool_entries', { NAMESPACE => $namespace2, LIMIT => 1 },
-    "Listing: query only first entry"
-) or diag Dumper($test->get_msg);
-
-cmp_deeply $test->get_msg->{PARAMS}, [ { NAMESPACE => $namespace2, KEY => "pill-00" } ],
-    "Listing: correct entry is returned";
+lives_and {
+    my $result = $oxitest->api_command('list_data_pool_entries' => {
+        NAMESPACE => $namespace2, LIMIT => 1
+    });
+    cmp_deeply $result, [ { NAMESPACE => $namespace2, KEY => "pill-00" } ];
+} "Listing: first entry";
 
 #
 # Modify entry
@@ -170,11 +157,13 @@ cmp_deeply $test->get_msg->{PARAMS}, [ { NAMESPACE => $namespace2, KEY => "pill-
 set_entry_ok { KEY => "renameme", VALUE => "secret" },
     "Create dummy entry to be renamed";
 
-$test->runcmd_ok('modify_data_pool_entry', {
-    NAMESPACE => $namespace,
-    KEY => "renameme",
-    NEWKEY => "shinynewname",
-}, "Modify entry to set new key name") or diag Dumper($test->get_msg);
+lives_ok {
+    $oxitest->api_command('modify_data_pool_entry' => {
+        NAMESPACE => $namespace,
+        KEY => "renameme",
+        NEWKEY => "shinynewname",
+    });
+} "Modify entry to set new key name";
 
 entry_is "renameme", undef,
     "Entry with old key is overwritten";
@@ -189,12 +178,14 @@ set_entry_ok { KEY => "deleteme", VALUE => "dummy" },
 entry_is "deleteme", superhashof({ VALUE => "dummy" }),
     "Dummy entry exists";
 
-$test->runcmd_ok('modify_data_pool_entry', {
-    NAMESPACE => $namespace,
-    KEY => "deleteme",
-    NEWKEY => "deleteme",
-    EXPIRATION_DATE => 0,
-}, "Delete entry via 'modify_data_pool_entry' with EXPIRATION_DATE => 0") or diag Dumper($test->get_msg);
+lives_ok {
+    $oxitest->api_command('modify_data_pool_entry' => {
+        NAMESPACE => $namespace,
+        KEY => "deleteme",
+        NEWKEY => "deleteme",
+        EXPIRATION_DATE => 0,
+    });
+} "Delete entry via 'modify_data_pool_entry' with EXPIRATION_DATE => 0";
 
 set_entry_ok { KEY => "dummy", VALUE => "dummy" },
     "Trigger datapool cleanup by creating another entry";
@@ -209,7 +200,6 @@ set_entry_ok { KEY => "pill-99", VALUE => "green", ENCRYPT => 1 },
     "Encrypted: store entry";
 
 # Clear secrets cache
-my $oxitest = OpenXPKI::Test->new(with => "CryptoLayer");
 my $dbi = $oxitest->dbi;
 # helper init already empties table "secret", but we want to play safe
 $dbi->start_txn;
