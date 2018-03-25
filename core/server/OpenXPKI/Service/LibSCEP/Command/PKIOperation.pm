@@ -142,26 +142,14 @@ sub execute {
         );
     }
     elsif ( $message_type eq 'GetCRL' ) {
-    # FIXME: not yet implemented
-    CTX('log')->application()->warn("LibSCEP PKIOperation; GetCRL is not supported yet");
-
-        $result = $token->command(
-            {   COMMAND        => 'create_error_reply',
-                SCEP_HANDLE    => $scep_handle,
-                HASH_ALG       => CTX('session')->data->hash_alg,
-        ENCRYPTION_ALG => CTX('session')->data->enc_alg,
-                ERROR_CODE     => 'badRequest',
-            }
-        );
-
-        # ##! 32: 'PKCS7 GetCRL ' . $pkcs7_base64
-        # $result = $self->__send_crl(
-        #     {   TOKEN => $token,
-        #         PKCS7 => $pkcs7_base64,
-        #         PARAMS => $url_params,
-        #     }
-        # );
-
+       $result = $self->__send_crl(
+	    {   TOKEN => $token,
+		SCEP_HANDLE => $scep_handle,
+		# FIXME: remove PKCS7 argument once bug in LibSCEP is fixed
+		PKCS7       => $pkcs7_base64,
+		PARAMS => $url_params,
+	    }
+	    );
     }
     else {
         $result = $token->command(
@@ -271,19 +259,20 @@ sub __send_crl : PRIVATE {
     my $arg_ref   = shift;
 
     my $token = $arg_ref->{TOKEN};
+    my $scep_handle  = $arg_ref->{SCEP_HANDLE};
     my $pkcs7_base64 = $arg_ref->{PKCS7};
-    my $pkcs7_decoded = decode_base64($pkcs7_base64);
 
-    my $requested_issuer_serial = $token->command({
-        COMMAND => 'get_getcrl_issuer_serial',
-        PKCS7   => $pkcs7_decoded
+    my $serial = $token->command({
+        COMMAND => 'get_getcert_serial',
+	SCEP_HANDLE => $scep_handle,
     });
+    ##! 16: 'serial: ' . $serial
 
-    ##! 16: 'Issuer Serial ' . Dumper $requested_issuer_serial
-
-    # convert serial to decimal
-    my $mbi = Math::BigInt->from_hex( $requested_issuer_serial->{SERIAL} );
-    my $issuer_serial = scalar $mbi->bstr();
+#    my $issuer = $token->command({
+#        COMMAND => 'get_issuer',
+#	SCEP_HANDLE => $scep_handle,
+#    });
+#    ##! 16: 'issuer: ' . $issuer
 
     # from scep draft (as of March 2015)
     # ..containing the issuer name and serial number of
@@ -294,18 +283,20 @@ sub __send_crl : PRIVATE {
 
     my $res = CTX('api')->search_cert({
         PKI_REALM => '_ANY',
-        ISSUER_DN => $requested_issuer_serial->{ISSUER},
-        CERT_SERIAL => $issuer_serial,
+#        ISSUER_DN => $issuer,
+        CERT_SERIAL => $serial,
     });
 
     if (!$res || scalar @{$res} != 1) {
-          CTX('log')->application()->error("SCEP getcrl - no issuer found for serial $issuer_serial and issuer " . $requested_issuer_serial->{ISSUER});
+#          CTX('log')->application()->error("SCEP getcrl - no issuer found for serial $serial and issuer $issuer);
+          CTX('log')->application()->error("SCEP getcrl - no issuer found for serial $serial");
 
 
         return $token->command(
             {   COMMAND      => 'create_error_reply',
-                PKCS7        => $pkcs7_decoded,
+                SCEP_HANDLE  => $scep_handle,
                 HASH_ALG     => CTX('session')->data->hash_alg,
+		ENCRYPTION_ALG  => CTX('session')->data->enc_alg,
                 'ERROR_CODE' => 'badCertId',
             }
         );
@@ -322,8 +313,9 @@ sub __send_crl : PRIVATE {
     if (!scalar $crl_res) {
         return $token->command(
             {   COMMAND      => 'create_error_reply',
-                PKCS7        => $pkcs7_decoded,
+                SCEP_HANDLE  => $scep_handle,
                 HASH_ALG     => CTX('session')->data->hash_alg,
+		ENCRYPTION_ALG  => CTX('session')->data->enc_alg,
                 'ERROR_CODE' => 'badCertId',
             }
         );
@@ -334,7 +326,8 @@ sub __send_crl : PRIVATE {
 
     my $result = $token->command(
         {   COMMAND        => 'create_crl_reply',
-            PKCS7          => $pkcs7_decoded,
+            SCEP_HANDLE    => $scep_handle,
+            PKCS7          => $pkcs7_base64,
             CRL            => $crl_pem,
             HASH_ALG       => CTX('session')->data->hash_alg,
             ENCRYPTION_ALG => CTX('session')->data->enc_alg,

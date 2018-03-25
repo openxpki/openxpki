@@ -49,8 +49,11 @@ sub __init_command_params : PRIVATE {
             'CHAIN' => 1,
             'HASH_ALG' => 1,
         },
+	# FIXME: fix command create_crl_reply which currently needs the raw pkcs7 instead of the handle due to a bug in
+	# the Crypt::LibSCEP::create_crl_reply_wop7 library function
         'create_crl_reply' => {
-            'PKCS7'       => 1,
+            'SCEP_HANDLE'   => 1,
+            'PKCS7'   => 1,
             'CRL' => 1,
             'ENCRYPTION_ALG' => 1,
             'HASH_ALG' => 1,
@@ -76,8 +79,8 @@ sub __init_command_params : PRIVATE {
         'get_getcert_serial' => {
             'SCEP_HANDLE' => 1,
         },
-        'get_getcrl_issuer_serial' => {
-            'PKCS7' => 1,
+        'get_issuer' => {
+            'SCEP_HANDLE' => 1,
         },
     });
 }
