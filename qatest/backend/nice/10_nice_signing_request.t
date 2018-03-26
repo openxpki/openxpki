@@ -1,61 +1,42 @@
 #!/usr/bin/perl
-#
-# 045_activity_tools.t
-#
-# Tests misc workflow tools like WFObject, etc.
-#
-# Note: these tests are non-destructive. They create their own instance
-# of the tools workflow, which is exclusively for such test purposes.
-
 use strict;
 use warnings;
 
-use FindBin qw( $Bin );
-use lib "$Bin/../../lib";
-
-use Carp;
+# Core modules
 use English;
-use Data::Dumper;
-use Config::Std;
-use File::Basename;
+use FindBin qw( $Bin );
 use File::Temp qw( tempfile );
 
-use Log::Log4perl qw(:easy);
-Log::Log4perl->easy_init($WARN);
-
+# CPAN modules
 use Test::More;
 use Test::Deep;
-use OpenXPKI::Test::QA::More;
-use TestCfg;
-use utf8;
+use Test::Exception;
 
-our %cfg = ();
-my $testcfg = new TestCfg;
-$testcfg->read_config_path( '9x_nice.cfg', \%cfg, dirname($0) );
+# Project modules
+use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
+use OpenXPKI::Test;
 
-my $test = OpenXPKI::Test::QA::More->new({
-    socketfile => $cfg{instance}{socketfile},
-    realm      => $cfg{instance}{realm},
-}) or die "Error creating new test instance: $@";
 
-$test->set_verbose($cfg{instance}{verbose});
+plan tests => 26;
 
-$test->plan( tests => 29 );
 
-$test->connect_ok(
-    user => $cfg{user}{name},
-    password => $cfg{user}{password},
-) or die "Error - connect failed: $@";
+#
+# Init helpers
+#
+my $oxitest = OpenXPKI::Test->new(
+    with => [qw( SampleConfig Workflows CryptoLayer )],
+    #log_level => 'debug',
+);
 
 my $serializer = OpenXPKI::Serialization::Simple->new();
 srand();
-my $sSubject = sprintf "nicetest-%01x.openxpki.test", rand(10000000);
+my $subject = sprintf "nicetest-%01x.openxpki.test", rand(10000000);
 my $sAlternateSubject = sprintf "nicetest-%01x.openxpki.test", rand(10000000);
 
 my %cert_subject_parts = (
-	hostname => $sSubject,
-	hostname2 => [ "www2.$sSubject" , "www3.$sSubject" ],
-	port => 8080,
+    hostname => $subject,
+    hostname2 => [ "www2.$subject" , "www3.$subject" ],
+    port => 8080,
 );
 
 my %cert_info = (
@@ -64,20 +45,22 @@ my %cert_info = (
     requestor_email => "andreas.anders\@mycompany.local",
 );
 
-my %cert_subject_alt_name_parts = (
-);
+note "CSR Subject: $subject\n";
 
-note "CSR Subject: $sSubject\n";
+CTX('session')->data->user('me');
+CTX('session')->data->role('User');
 
-$test->create_ok( 'certificate_signing_request_v2' , {
-    cert_profile => $cfg{csr}{profile},
-    cert_subject_style => "00_basic_style",
-}, 'Create Issue Test Workflow')
- or die "Workflow Create failed: $@";
 
-$test->state_is('SETUP_REQUEST_TYPE');
+my $wf;
+lives_ok {
+    $wf = $oxitest->create_workflow('certificate_signing_request_v2' => {
+        cert_profile => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+        cert_subject_style => "00_basic_style",
+    }, 1);
+} "Create workflow";
 
-$test->execute_ok( 'csr_provide_server_key_params', {
+$wf->state_is("SETUP_REQUEST_TYPE");
+$wf->start_activity('csr_provide_server_key_params' => {
     key_alg => "rsa",
     enc_alg => 'aes256',
     key_gen_params => $serializer->serialize( { KEY_LENGTH => 2048 } ),
@@ -85,98 +68,97 @@ $test->execute_ok( 'csr_provide_server_key_params', {
     csr_type => 'pkcs10'
 });
 
-$test->state_is('ENTER_KEY_PASSWORD');
-$test->execute_ok( 'csr_ask_client_password', {
+$wf->state_is("ENTER_KEY_PASSWORD");
+$wf->start_activity('csr_ask_client_password' => {
     _password => "m4#bDf7m3abd",
 });
 
-$test->state_is('ENTER_SUBJECT');
-
-$test->execute_ok( 'csr_edit_subject', {
+$wf->state_is("ENTER_SUBJECT");
+$wf->start_activity('csr_edit_subject' => {
     cert_subject_parts => $serializer->serialize( \%cert_subject_parts )
 });
 
-$test->state_is('ENTER_SAN');
-$test->execute_ok( 'csr_edit_san', {
-    cert_san_parts => $serializer->serialize( { %cert_subject_alt_name_parts } )
+$wf->state_is("ENTER_SAN");
+$wf->start_activity('csr_edit_san' => {
+    cert_san_parts => $serializer->serialize( {  } )
 });
 
-$test->state_is('ENTER_CERT_INFO');
-$test->execute_ok( 'csr_edit_cert_info', {
+$wf->state_is("ENTER_CERT_INFO");
+$wf->start_activity('csr_edit_cert_info' => {
     cert_info => $serializer->serialize( \%cert_info )
 });
 
-$test->state_is('SUBJECT_COMPLETE');
+$wf->state_is('SUBJECT_COMPLETE');
 
 # Nicetest FQDNs should not validate so we need a policy expcetion request
 # (on rare cases the responsible router might return a valid address, so we check)
-my $msg = $test->get_client->send_receive_command_msg('get_workflow_info', { ID => $test->get_wfid });
-my $actions = $msg->{PARAMS}->{STATE}->{option};
+my $result = $oxitest->api_command('get_workflow_info' => { ID => $wf->id });
+my $actions = $result->{STATE}->{option};
 my $intermediate_state;
 if (grep { /^csr_enter_policy_violation_comment$/ } @$actions) {
     note "Test FQDNs do not resolve - handling policy violation";
-    $test->execute_ok( 'csr_enter_policy_violation_comment', { policy_comment => 'This is just a test' } );
+    $wf->start_activity('csr_enter_policy_violation_comment' => { policy_comment => 'This is just a test' } );
     $intermediate_state ='PENDING_POLICY_VIOLATION';
 }
 else {
     note "For whatever reason test FQDNs do resolve - submitting request";
-    $test->execute_ok( 'csr_submit' );
+    $wf->start_activity('csr_submit' );
     $intermediate_state ='PENDING';
 }
-$test->state_is($intermediate_state);
+
+$wf->state_is($intermediate_state);
 
 # ACL Test - should not be allowed to user
-$test->execute_nok( 'csr_put_request_on_hold', { onhold_comment => 'No Comment'}, 'Disallow on hold to user' );
+$wf->execute_fails('csr_put_request_on_hold' => { onhold_comment => 'No Comment'}, qr/csr_acl_can_approve/);
 
-$test->disconnect();
 
-# Re-login with Operator for approval
-$test->connect_ok(
-    user => $cfg{operator}{name},
-    password => $cfg{operator}{password},
-) or die "Error - connect failed: $@";
+# set current user to: operator
+$wf->change_user('raop', 'RA Operator');
 
-$test->execute_ok( 'csr_put_request_on_hold', { onhold_comment => 'No Comment'} );
-$test->state_is('ONHOLD');
 
-$test->execute_ok( 'csr_put_request_on_hold', { onhold_comment => 'Still on hold'} );
-$test->state_is('ONHOLD');
+$wf->start_activity('csr_put_request_on_hold' => { onhold_comment => 'No Comment'} );
+$wf->state_is("ONHOLD");
 
-$test->execute_ok( 'csr_release_on_hold' );
-$test->state_is($intermediate_state);
+$wf->start_activity('csr_put_request_on_hold' => { onhold_comment => 'Still on hold'} );
+$wf->state_is("ONHOLD");
 
-$test->execute_ok( 'csr_approve_csr' );
-$test->state_is('SUCCESS');
+$wf->start_activity('csr_release_on_hold');
+$wf->state_is($intermediate_state);
 
-$test->param_like( 'cert_subject', "/^CN=$sSubject:8080,.*/" , 'Certificate Subject');
+$wf->start_activity('csr_approve_csr');
 
-$test->disconnect();
+$wf->state_is('SUCCESS');
 
-$test->connect_ok(
-    user => $cfg{user}{name},
-    password => $cfg{user}{password},
-) or die "Error - connect failed: $@";
+my $info = $oxitest->api_command('get_workflow_info' => { ID => $wf->id } );
+like $info->{WORKFLOW}->{CONTEXT}->{cert_subject}, "/^CN=$subject:8080,.*/", 'correct certificate subject';
+
+
+# set current user to: normal user
+$wf->change_user('me', 'User');
+
 
 #
 # Fetch certificate via API
 #
-my $cert_id = $test->param( 'cert_identifier' );
+$info = $oxitest->api_command('get_workflow_info' => { ID => $wf->id } );
+my $cert_id = $info->{WORKFLOW}->{CONTEXT}->{cert_identifier};
 note "Test certificate ID: $cert_id";
 
 #
 # Fetch private key
 #
-$test->runcmd('get_private_key_for_cert', { IDENTIFIER => $cert_id, FORMAT => 'PKCS12', 'PASSWORD' => 'm4#bDf7m3abd' });
-$test->ok ( $test->get_msg()->{PARAMS}->{PRIVATE_KEY} ne '', 'Fetch PKCS12');
+my $privkey;
+lives_and {
+    my $result = $oxitest->api_command('get_private_key_for_cert' => { IDENTIFIER => $cert_id, FORMAT => 'PKCS12', 'PASSWORD' => 'm4#bDf7m3abd' } );
+    $privkey = $result->{PRIVATE_KEY};
+    isnt $privkey, "";
+} "Fetch PKCS12";
 
 my ($tmp, $tmp_name) = tempfile(UNLINK => 1);
-print $tmp $test->get_msg()->{PARAMS}->{PRIVATE_KEY};
+print $tmp $privkey;
 close $tmp;
 
-$test->disconnect();
-
-$test->like( `openssl pkcs12 -in $tmp_name -nokeys -noout -passin pass:'m4#bDf7m3abd' 2>&1`, "/MAC verified OK/", 'Test PKCS12' );
-
-open(CERT, ">$cfg{instance}{buffer}");
-print CERT $serializer->serialize({ cert_identifier => $cert_id  });
-close CERT;
+# test PKCS12 container
+like `OPENSSL_CONF=/dev/null openssl pkcs12 -in $tmp_name -nokeys -noout -passin pass:'m4#bDf7m3abd' 2>&1`,
+    "/MAC verified OK/",
+    'Test PKCS12 container via OpenSSL';
