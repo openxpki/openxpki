@@ -82,9 +82,10 @@ sub execute {
         } else {
             %attrmap = map { split(/\s*[=-]>\s*/) } split( /\s*,\s*/, $map );
         }
+        ##! 32: 'Attrmap: ' . Dumper \%attrmap
         foreach my $key (keys %attrmap) {
-            ##! 32: 'Add item key: ' . $key .' - Value: ' . $attrmap{$key};
-            $context->param( $key, $hash->{$attrmap{$key}});
+            ##! 32: 'Add item key: ' . $key .' - Value: ' . $hash->{$attrmap{$key}}
+            $context->param( $key => $hash->{$attrmap{$key}});
         }
 
     } elsif ($mode eq 'hash') {
@@ -92,7 +93,7 @@ sub execute {
         my $hash = $config->get_hash( \@path );
         foreach my $key (keys %{$hash}) {
             if ($key =~ /^(wf_|workflow_|creator|_)/) { next; }
-            ##! 32: 'Add item key: ' . $key .' - Value: ' . $attrmap{$key};
+            ##! 32: 'Add item key: ' . $key .' - Value: ' . $hash->{$key};
             $context->param( $key, $hash->{$key});
         }
 
