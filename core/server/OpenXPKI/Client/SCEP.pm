@@ -23,7 +23,6 @@ use Data::Dumper;
     my %operation_of :ATTR( :init_arg<OPERATION> ); # SCEP operation
     my %message_of   :ATTR( :init_arg<MESSAGE>   ); # SCEP message
     my %realm_of     :ATTR( :init_arg<REALM>     ); # PKI realm to use
-    my %profile_of   :ATTR( :init_arg<PROFILE>   ); # endentity profile to use
     my %server_of    :ATTR( :init_arg<SERVER>    ); # server to use
     my %enc_alg_of   :ATTR( :init_arg<ENCRYPTION_ALGORITHM> );
     my %hash_alg_of  :ATTR( :init_arg<HASH_ALGORITHM> );
@@ -33,7 +32,6 @@ use Data::Dumper;
         GetCACert
         GetNextCACert
         GetCACertChain
-
         PKIOperation
     );
 
@@ -47,11 +45,6 @@ use Data::Dumper;
         if ($message eq 'NOTFOUND') {
             die("The configured realm (" . $realm_of{$ident} . ") was not found"
                 . " on the server");
-        }
-        $self->talk('SELECT_PROFILE ' . $profile_of{$ident});
-        $message = $self->collect();
-        if ($message eq 'NOTFOUND') {
-            die("The configured profile (" . $profile_of{$ident} . ") was not found on the server");
         }
         $self->talk('SELECT_SERVER ' . $server_of{$ident});
         $message = $self->collect();
@@ -137,7 +130,6 @@ This document describes OpenXPKI::Client::SCEP version $VERSION
         REALM      => $realm,
         SOCKETFILE => $socket,
         TIMEOUT    => 120, # TODO - make configurable?
-        PROFILE    => $profile,
         OPERATION  => $operation,
         MESSAGE    => $message,
         SERVER     => $server,

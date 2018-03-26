@@ -33,7 +33,6 @@ sub init {
     $self->__init_session();
 
     CTX('session')->data->pki_realm($self->__init_pki_realm);
-    CTX('session')->data->profile($self->__init_profile);
 
     my $server = $self->__init_server;
     CTX('session')->data->server($server);
@@ -43,46 +42,6 @@ sub init {
     CTX('session')->data->hash_alg($self->__init_hash_alg);
 
     return 1;
-}
-
-sub __init_profile : PRIVATE {
-    ##! 4: 'start'
-    my $self    = shift;
-    my $ident   = ident $self;
-    my $arg_ref = shift;
-
-    my $config = CTX('config');
-
-    my $message = $self->collect();
-    ##! 16: "message collected: " . Dumper($message)
-    my $requested_profile;
-    if ( $message =~ /^SELECT_PROFILE (.*)/ ) {
-        $requested_profile = $1;
-        ##! 16: "requested profile: $requested_profile"
-    }
-    else {
-        OpenXPKI::Exception->throw( message =>
-                "I18N_OPENXPKI_SERVICE_LIBSCEP_NO_SELECT_PROFILE_RECEIVED", );
-
-        # this is an uncaught exception
-    }
-
-    # Retrieve the profiles from the connector
-    my @profiles = $config->get_keys('profile');
-    my %profiles = map {$_ => 1} @profiles;
-
-    if ( defined $profiles{$requested_profile} )
-    {    # the profile is valid
-        $self->talk('OK');
-        return $requested_profile;
-    }
-    else {   # the requested profile was not found in the server configuration
-        $self->talk('NOTFOUND');
-        OpenXPKI::Exception->throw(
-            message => "I18N_OPENXPKI_SERVICE_LIBSCEP_INVALID_PROFILE_REQUESTED",
-            params  => { REQUESTED_PROFILE => $requested_profile },
-        );
-    }
 }
 
 sub __init_server : PRIVATE {
@@ -191,10 +150,10 @@ sub __init_encryption_alg : PRIVATE {
     }
     if ($requested_encryption_alg =~ m{ (?: des | 3des | des3 | aes128 | aes192 | aes256 | blowfish | cast ) }xms)
     {
-	# LibSCEP uses OpenSSL cipher names, and they use des3 instead of 3des
-	if ($requested_encryption_alg eq '3des') {
-	    $requested_encryption_alg = 'des3';
-	}
+    # LibSCEP uses OpenSSL cipher names, and they use des3 instead of 3des
+    if ($requested_encryption_alg eq '3des') {
+        $requested_encryption_alg = 'des3';
+    }
 
         # the encryption_alg is valid
         $self->talk('OK');

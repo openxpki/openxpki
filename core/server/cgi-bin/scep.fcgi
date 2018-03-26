@@ -35,7 +35,6 @@ while (my $cgi = CGI::Fast->new()) {
     my $socket  = $conf->{global}->{socket};
     my $realm   = $conf->{global}->{realm};
     my $iprange = $conf->{global}->{iprange};
-    my $profile = $conf->{global}->{profile};
     my $server  = $conf->{global}->{servername};
     my $enc_alg = $conf->{global}->{encryption_algorithm};
     my $hash_alg = $conf->{global}->{hash_algorithm};
@@ -91,7 +90,6 @@ while (my $cgi = CGI::Fast->new()) {
         REALM      => $realm,
         SOCKETFILE => $socket,
         TIMEOUT    => 120, # TODO - make configurable?
-        PROFILE    => $profile,
         OPERATION  => $operation,
         MESSAGE    => $message,
         SERVER     => $server,
@@ -125,7 +123,6 @@ The config file is parsed using Config::Std, all params are mandatory.
     socket=/var/openxpki/openxpki.socket
     realm=ca-one
     iprange=0.0.0.0/0
-    profile=I18N_OPENXPKI_PROFILE_TLS_SERVER
     servername=tls-scep-1
     encryption_algorithm=3DES
 
@@ -144,11 +141,6 @@ The realm of the ca to be used.
 Implements a simple ip based access control, the clients ip adress is checked
 to be included in the given network. Only a single network definition is
 supported, the default of 0.0.0.0/0 allows all ips to connect.
-
-=item profile
-
-The profile of the certificate to be requested, note that depending on the
-backing workflow this might be ignored or overridden by other paramters.
 
 =item servername
 
