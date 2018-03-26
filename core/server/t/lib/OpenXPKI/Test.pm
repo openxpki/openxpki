@@ -605,6 +605,7 @@ sub init_logging {
             KeyToMatch    => "wfid",
             RegexToMatch  => '\d+',
         ));
+        Log::Log4perl->get_logger("openxpki.application")->add_appender($appender);
     }
 
     # additional file log
