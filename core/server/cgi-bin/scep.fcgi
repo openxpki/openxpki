@@ -31,7 +31,7 @@ while (my $cgi = CGI::Fast->new()) {
 
     my $conf = $config->config();
 
-    my $service = $conf->{global}->{service} || 'SCEP';
+    my $service = $conf->{global}->{service} || 'LibSCEP';
     my $socket  = $conf->{global}->{socket};
     my $realm   = $conf->{global}->{realm};
     my $iprange = $conf->{global}->{iprange};
