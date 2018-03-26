@@ -38,6 +38,7 @@ use Test::More;
 
 # CPAN modules
 use Proc::Daemon;
+use Try::Tiny;
 
 # Project modules
 use OpenXPKI;
@@ -163,12 +164,17 @@ around 'init_server' => sub {
     # Proc::Daemon child (forked server)...
     unless ($parentpid) {
         # start up server
-        eval {
+        try {
+            # re-init logging after fork to open files that might have been closed
+            $self->init_logging;
             # init_server() must be called after Proc::Daemon->Init() because the latter
             # closes all file handles which would cause problems with Log4perl
             $self->$orig();                  # OpenXPKI::Test->init_server
             $self->init_session_and_context; # this step from OpenXPKI::Test->BUILD would otherwise not be executed as this method never returns
             $self->_start_openxpki_server($orig);
+        }
+        catch {
+            eval { Log::Log4perl->get_logger()->error($_) };
         };
         exit;
     }
@@ -181,14 +187,14 @@ around 'init_server' => sub {
     for (my $tick = 0; $tick < 5 and not $sem->op(0, 0, IPC_NOWAIT); $tick++) {
         sleep 1;
     }
-    if (not $sem->op(0, 0, IPC_NOWAIT)) { $self->stop_server; die "Server init seems to have failed" }
+    if (not $sem->op(0, 0, IPC_NOWAIT)) { $self->diag_log; $self->stop_server; die "Server init seems to have failed" }
 
     # wait for Net::Server->run() to initialize (includes forking)
     note "Waiting for OpenXPKI to initialize";
     my $count = 0;
     my $pidfile = $self->path_pid_file;
     while ($count++ < 5 and not -f $pidfile) { sleep 1 }
-    if (not -f $pidfile) { $self->stop_server; die "Server forking seems to have failed" }
+    if (not -f $pidfile) { $self->diag_log; $self->stop_server; die "Server forking seems to have failed" }
 
     # read PID
     my $pid = do { local $/; open my $fh, '<', $pidfile; <$fh> }; # slurp
@@ -200,7 +206,7 @@ around 'init_server' => sub {
     $count = 0;
     my $socket = $self->path_socket_file;
     while ($count++ < 5 and not -e $socket) { sleep 1 }
-    if (not -e $socket) { $self->stop_server; die "Server startup seems to have failed" }
+    if (not -e $socket) { $self->diag_log; $self->stop_server; die "Server startup seems to have failed" }
 
     note "Main test process: server startup completed";
     $self->$orig(); # to make context etc. also available to main test process

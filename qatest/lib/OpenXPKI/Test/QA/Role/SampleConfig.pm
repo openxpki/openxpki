@@ -47,7 +47,7 @@ This role add the following parameters to L<OpenXPKI::Test>s constructor:
 =over
 
 =item * I<start_watchdog> (optional) - Set to 1 to start the watchdog when the
-test server starts up. Default: 0
+test server starts up and allow later starts via API. Default: 0
 
 =back
 

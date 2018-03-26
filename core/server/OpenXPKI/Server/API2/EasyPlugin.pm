@@ -47,6 +47,14 @@ L<OpenXPKI::Server::API2::EasyPluginMetaClassTrait>
 
 =back
 
+It currently does not seem to be possible to set a custom base class for your
+plugin, but you can instead easily add another role to it:
+
+    package OpenXPKI::Server::API2::Plugin::MyTopic::MyActions;
+    use OpenXPKI::Server::API2::EasyPlugin;
+
+    with "OpenXPKI::Server::API2::Plugin::MyTopic::Base";
+
 =cut
 Moose::Exporter->setup_import_methods(
     also => [ "Moose" ],

@@ -252,8 +252,14 @@ OpenXPKI/Server/API2/EasyPluginMetaClassTrait.pm
 OpenXPKI/Server/API2/EasyPluginRole.pm
 OpenXPKI/Server/API2/Plugin/Cert/search_cert.pm
 OpenXPKI/Server/API2/Plugin/Cert/validate_certificate.pm
+OpenXPKI/Server/API2/Plugin/Control/control_watchdog.pm
+OpenXPKI/Server/API2/Plugin/Control/purge_application_log.pm
 OpenXPKI/Server/API2/Plugin/Crypto/generate_key.pm
-OpenXPKI/Server/API2/Plugin/Housekeeping/purge_application_log.pm
+OpenXPKI/Server/API2/Plugin/Datapool/get_data_pool_entry.pm
+OpenXPKI/Server/API2/Plugin/Datapool/list_data_pool_entries.pm
+OpenXPKI/Server/API2/Plugin/Datapool/modify_data_pool_entry.pm
+OpenXPKI/Server/API2/Plugin/Datapool/set_data_pool_entry.pm
+OpenXPKI/Server/API2/Plugin/Datapool/Util.pm
 OpenXPKI/Server/API2/Plugin/Import/import_crl.pm
 OpenXPKI/Server/API2/Plugin/Profile/Util.pm
 OpenXPKI/Server/API2/Plugin/Profile/get_additional_information_fields.pm
@@ -389,6 +395,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/CalculateApprovalPoints.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Disconnect.pm
 OpenXPKI/Server/Workflow/Activity/Tools/EvaluateEligibility.pm
 OpenXPKI/Server/Workflow/Activity/Tools/LoadPolicy.pm
+OpenXPKI/Server/Workflow/Activity/Tools/PrepareRenewal.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetAttribute.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetSource.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetErrorCode.pm

@@ -17,7 +17,7 @@ use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 
 
-plan tests => 34;
+plan tests => 31;
 
 
 #
@@ -25,7 +25,6 @@ plan tests => 34;
 #
 my $oxitest = OpenXPKI::Test->new(
     with => [qw( TestRealms CryptoLayer )],
-    #log_level => 'trace',
 );
 $oxitest->insert_testcerts; # needed for encryption tests that eventually access alias "alpha-datavault"
 
@@ -35,21 +34,21 @@ my $namespace = sprintf "test-%s", Data::UUID->new->create_str;
 sub set_entry_ok {
     my ($params, $message) = @_;
     lives_and {
-        ok $oxitest->api_command('set_data_pool_entry' => { NAMESPACE => $namespace, %$params });
+        ok $oxitest->api2_command('set_data_pool_entry' => { namespace => $namespace, %$params });
     } $message;
 }
 
 sub set_entry_fails {
     my ($params, $error, $message) = @_;
     throws_ok {
-        $oxitest->api_command('set_data_pool_entry' => { NAMESPACE => $namespace, %$params });
+        $oxitest->api2_command('set_data_pool_entry' => { namespace => $namespace, %$params });
     } (ref $error eq 'Regexp' ? $error : qr(\Q$error\E)), $message;
 }
 
 sub entry_is {
     my ($key, @expected_entries, $message) = @_;
     lives_and {
-        my $result = $oxitest->api_command('get_data_pool_entry' => { NAMESPACE => $namespace, KEY => $key });
+        my $result = $oxitest->api2_command('get_data_pool_entry' => { namespace => $namespace, key => $key });
         cmp_deeply $result, @expected_entries;
     } $message;
 }
@@ -57,20 +56,7 @@ sub entry_is {
 #
 # Check parameter validation
 #
-throws_ok {
-    $oxitest->api_command('set_data_pool_entry' => { KEY => "pill", VALUE => "red" });
-}   qr/I18N_OPENXPKI_SERVER_API_INVALID_PARAMETER/,
-    "Complain when trying to store entry without NAMESPACE";
-
-set_entry_fails { VALUE => "red" },
-    "I18N_OPENXPKI_SERVER_API_INVALID_PARAMETER",
-    "Complain when trying to store entry without KEY";
-
-set_entry_fails { KEY => "pill" },
-    "I18N_OPENXPKI_SERVER_API_INVALID_PARAMETER",
-    "Complain when trying to store entry without VALUE";
-
-set_entry_fails { KEY => "pill", VALUE => "red", EXPIRATION_DATE => -1000 },
+set_entry_fails { key => "pill", value => "red", expiration_date => -1000 },
     "I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_INVALID_EXPIRATION_DATE",
     "Complain when trying to store datapool entry with invalid expiration";
 
@@ -81,32 +67,32 @@ entry_is "drug", undef,
     "Query non-existing entry";
 
 # Store entry
-set_entry_ok { KEY => "pill-01", VALUE => "red" },
+set_entry_ok { key => "pill-01", value => "red" },
     "Plaintext: store datapool entry";
 
 # Try inserting a second time
-set_entry_fails { KEY => "pill-01", VALUE => "red" },
+set_entry_fails { key => "pill-01", value => "red" },
     qr/.+/,
     "Plaintext: complain when trying to store same entry again";
 
 # Forced overwrite
-set_entry_ok { KEY => "pill-01", VALUE => "blue", FORCE => 1 },
+set_entry_ok { key => "pill-01", value => "blue", force => 1 },
     "Plaintext: store entry again while FORCE is with us";
 
-entry_is "pill-01", superhashof({ VALUE => "blue" }),
+entry_is "pill-01", superhashof({ value => "blue" }),
     "Plaintext: load datapool entry";
 
 # With expiration date
-set_entry_ok { KEY => "pill-33", VALUE => "blue", EXPIRATION_DATE => time+1 },
+set_entry_ok { key => "pill-33", value => "blue", expiration_date => time+1 },
     "Expiration: store entry with expiration date (now + 2 seconds)";
 
-entry_is "pill-33", superhashof({ VALUE => "blue" }),
+entry_is "pill-33", superhashof({ value => "blue" }),
     "Expiration: load entry";
 
 note "Wait for 2 seconds";
 sleep 2;
 
-set_entry_ok { KEY => "pill-dummy", VALUE => "dummy" },
+set_entry_ok { key => "pill-dummy", value => "dummy" },
     "Expiration: trigger datapool cleanup by creating another entry";
 
 
@@ -122,31 +108,31 @@ my $namespace2 = sprintf "test-%s", Data::UUID->new->create_str;
 my @some_uuids = map { Data::UUID->new->create_str } (1..10);
 my $entry_no = 0;
 for (@some_uuids) {
-    $oxitest->api_command('set_data_pool_entry' => {
-        NAMESPACE => $namespace2,
-        KEY => sprintf("pill-%02d", $entry_no, $_),
-        VALUE => $_,
+    $oxitest->api2_command('set_data_pool_entry' => {
+        namespace => $namespace2,
+        key => sprintf("pill-%02d", $entry_no, $_),
+        value => $_,
     }) and $entry_no++;
 }
 is $entry_no, scalar(@some_uuids), "Listing: store some entries";
 
 # List entries
 lives_and {
-    my $result = $oxitest->api_command('list_data_pool_entries' => {
-        NAMESPACE => $namespace2,
+    my $result = $oxitest->api2_command('list_data_pool_entries' => {
+        namespace => $namespace2,
     });
     $entry_no = 0;
     cmp_deeply $result, bag(
-        map { { NAMESPACE => $namespace2, KEY => sprintf("pill-%02d", $entry_no++, $_) } } @some_uuids,
+        map { { namespace => $namespace2, key => sprintf("pill-%02d", $entry_no++, $_) } } @some_uuids,
     );
 } "Listing: all stored entries";
 
 # List limited amount of entries
 lives_and {
-    my $result = $oxitest->api_command('list_data_pool_entries' => {
-        NAMESPACE => $namespace2, LIMIT => 1
+    my $result = $oxitest->api2_command('list_data_pool_entries' => {
+        namespace => $namespace2, limit => 1
     });
-    cmp_deeply $result, [ { NAMESPACE => $namespace2, KEY => "pill-00" } ];
+    cmp_deeply $result, [ { namespace => $namespace2, key => "pill-00" } ];
 } "Listing: first entry";
 
 #
@@ -154,40 +140,40 @@ lives_and {
 #
 
 # Modify key name
-set_entry_ok { KEY => "renameme", VALUE => "secret" },
+set_entry_ok { key => "renameme", value => "secret" },
     "Create dummy entry to be renamed";
 
 lives_ok {
-    $oxitest->api_command('modify_data_pool_entry' => {
-        NAMESPACE => $namespace,
-        KEY => "renameme",
-        NEWKEY => "shinynewname",
+    $oxitest->api2_command('modify_data_pool_entry' => {
+        namespace => $namespace,
+        key => "renameme",
+        newkey => "shinynewname",
     });
 } "Modify entry to set new key name";
 
 entry_is "renameme", undef,
     "Entry with old key is overwritten";
 
-entry_is "shinynewname", superhashof({ VALUE => "secret" }),
+entry_is "shinynewname", superhashof({ value => "secret" }),
     "Entry with new key is available";
 
 # Delete entry by setting expiration date
-set_entry_ok { KEY => "deleteme", VALUE => "dummy" },
+set_entry_ok { key => "deleteme", value => "dummy" },
     "Create dummy entry to be deleted";
 
-entry_is "deleteme", superhashof({ VALUE => "dummy" }),
+entry_is "deleteme", superhashof({ value => "dummy" }),
     "Dummy entry exists";
 
 lives_ok {
-    $oxitest->api_command('modify_data_pool_entry' => {
-        NAMESPACE => $namespace,
-        KEY => "deleteme",
-        NEWKEY => "deleteme",
-        EXPIRATION_DATE => 0,
+    $oxitest->api2_command('modify_data_pool_entry' => {
+        namespace => $namespace,
+        key => "deleteme",
+        newkey => "deleteme",
+        expiration_date => 0,
     });
 } "Delete entry via 'modify_data_pool_entry' with EXPIRATION_DATE => 0";
 
-set_entry_ok { KEY => "dummy", VALUE => "dummy" },
+set_entry_ok { key => "dummy", value => "dummy" },
     "Trigger datapool cleanup by creating another entry";
 
 entry_is "deleteme", undef,
@@ -196,7 +182,7 @@ entry_is "deleteme", undef,
 #
 # Insert and read data (encrypted)
 #
-set_entry_ok { KEY => "pill-99", VALUE => "green", ENCRYPT => 1 },
+set_entry_ok { key => "pill-99", value => "green", encrypt => 1 },
     "Encrypted: store entry";
 
 # Clear secrets cache
@@ -212,7 +198,7 @@ is scalar(@$secrets), 0,
     "Secrets cache is empty after we cleared it";
 
 # Read test data (encrypted)
-entry_is "pill-99", superhashof({ VALUE => "green" }),
+entry_is "pill-99", superhashof({ value => "green" }),
     "Encrypted: entry matches the one we stored";
 
 # Check secrets cache
@@ -221,7 +207,7 @@ is scalar(@$secrets), 1,
     "Secrets cache contains one entry for data pool symmetric key";
 
 # Read test data (encrypted) using cached key
-entry_is "pill-99", superhashof({ VALUE => "green" }),
+entry_is "pill-99", superhashof({ value => "green" }),
     "Encrypted: entry matches again the one we stored";
 
 #
@@ -234,24 +220,24 @@ use OpenXPKI::Test; # to import CTX into this package
 
 # Try accessing another PKI realm from within OpenXPKI::Server::Workflow namespace
 throws_ok {
-    CTX('api')->set_data_pool_entry(
-        { NAMESPACE => $namespace, PKI_REALM => "dummy", KEY => "pill-78", VALUE => "red" },
+    CTX('api2')->set_data_pool_entry(
+        namespace => $namespace, pki_realm => "dummy", key => "pill-78", value => "red",
     )
 }
     qr/pki realm/i,
     "Complain about access to other PKI realm from within OpenXPKI::Server::Workflow (set_data_pool_entry)";
 
 throws_ok {
-    CTX('api')->get_data_pool_entry(
-        { NAMESPACE => $namespace, PKI_REALM => "dummy", KEY => "pill-78" },
+    CTX('api2')->get_data_pool_entry(
+        namespace => $namespace, pki_realm => "dummy", key => "pill-78",
     )
 }
     qr/pki realm/i,
     "Complain about access to other PKI realm from within OpenXPKI::Server::Workflow (get_data_pool_entry)";
 
 throws_ok {
-    CTX('api')->list_data_pool_entries(
-        { NAMESPACE => $namespace, PKI_REALM => "dummy" },
+    CTX('api2')->list_data_pool_entries(
+        namespace => $namespace, pki_realm => "dummy",
     )
 }
     qr/pki realm/i,
@@ -259,8 +245,8 @@ throws_ok {
 
 # Try accessing "sys." namespace from within OpenXPKI::Server::Workflow namespace
 throws_ok {
-    CTX('api')->set_data_pool_entry(
-        { NAMESPACE => "sys.test", KEY => "pill-79", VALUE => "red" },
+    CTX('api2')->set_data_pool_entry(
+        namespace => "sys.test", key => "pill-79", value => "red",
     )
 }
     qr/namespace/i,

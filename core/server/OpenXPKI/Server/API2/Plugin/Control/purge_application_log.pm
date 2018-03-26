@@ -1,9 +1,9 @@
-package OpenXPKI::Server::API2::Plugin::Housekeeping::purge_application_log;
+package OpenXPKI::Server::API2::Plugin::Control::purge_application_log;
 use OpenXPKI::Server::API2::EasyPlugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Housekeeping::purge_application_log
+OpenXPKI::Server::API2::Plugin::Control::purge_application_log
 
 =cut
 

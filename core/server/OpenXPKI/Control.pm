@@ -40,15 +40,20 @@ package OpenXPKI::Control;
 use strict;
 use warnings;
 use English;
-use OpenXPKI::Debug;
-use POSIX ":sys_wait_h";
-use Proc::ProcessTable;
 
+# Core modules
+use POSIX ":sys_wait_h";
+use Data::Dumper;
+use Digest::SHA qw( sha256_base64 );
+
+# CPAN modules
+use Proc::ProcessTable;
 use Log::Log4perl qw( :easy );
 Log::Log4perl->easy_init($ERROR);
 
-#use OpenXPKI::Server::Context qw( CTX );
-use Data::Dumper;
+# Project modules
+use OpenXPKI::Debug;
+
 
 =head2 start {CONFIG, SILENT, PID, FOREGROUND, DEBUG}
 
@@ -455,30 +460,26 @@ watchdog and user initiated requests).
 =cut
 
 sub get_pids {
-
-    my $args = shift;
-
-    my $proc = new Proc::ProcessTable;
+    my $proc = Proc::ProcessTable->new;
     my $result = { 'server' => 0, 'watchdog' => [], 'worker' => [], 'workflow' => [] };
     my $pgrp = getpgrp($$); # Process Group of myself
-    foreach my $p ( @{$proc->table} ) {
-
-        if ($pgrp != $p->pgrp) {
-            next;
-        }
+    for my $p ( @{$proc->table} ) {
+        next unless $pgrp == $p->pgrp;
 
         my $cmd = $p->cmndline;
-        if ( $cmd  =~ /server/ ) {
-            $result->{server} = $p->pid;
-        } elsif( $cmd =~ /watchdog/ ) {
-            push @{$result->{watchdog}}, $p->pid;
-        } elsif( $cmd =~ /worker/ ) {
-            push @{$result->{worker}}, $p->pid;
-        } elsif( $cmd =~ /workflow/ ) {
-            push @{$result->{workflow}}, $p->pid;
+        if ($cmd =~ / ^ openxpkid .* server /x) {
+            $result->{server} = $p->pid; next;
+        }
+        if ($cmd =~ / ^ openxpkid .* watchdog /x) {
+            push @{$result->{watchdog}}, $p->pid; next;
+        }
+        if ($cmd =~ / ^ openxpkid .* worker /x) {
+            push @{$result->{worker}}, $p->pid; next;
+        }
+        if ($cmd =~ / ^ openxpkid .* workflow /x) {
+            push @{$result->{workflow}}, $p->pid; next;
         }
     }
-
     return $result;
 }
 
