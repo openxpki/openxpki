@@ -366,11 +366,11 @@ lives_and {
     like $result->[$i]->[2], qr/ execute .* initialize /msxi or diag explain $result;
 
     # Check sorting
-    my $prev_ts = '30000101120000000000'; # year 3000
+    my $prev_ts = 4294967295; # 2106-02-07T06:28:15
     my $sorting_ok = 1;
     for (@{$result}) {
         my ($timestamp, $priority, $message) = @$_;
-        $sorting_ok = 0 if ($timestamp cmp $prev_ts) > 0; # messages should get older down the list
+        $sorting_ok = 0 if $timestamp > $prev_ts; # messages should get older down the list
         $prev_ts = $timestamp;
     }
     is $sorting_ok, 1;
