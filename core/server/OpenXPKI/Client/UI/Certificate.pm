@@ -1213,7 +1213,7 @@ sub action_search {
 
         my $val = $verbose->{ $item->{name} };
         next unless ($val);
-        $val =~ s/[^\w\s*\,]//g;
+        $val =~ s/[^\w\s*\,\-\=]//g;
         push @criteria, sprintf '<nobr><b>%s:</b> <i>%s</i></nobr>', $item->{label}, $val;
     }
 
