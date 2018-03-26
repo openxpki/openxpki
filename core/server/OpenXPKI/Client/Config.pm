@@ -22,6 +22,9 @@ config is initialized from the file I<default.conf>. If you use
 the config autodiscovery feature (config name from script name), those
 files need to be here, too.
 
+Note: Dashes in the servicename are replaced by underscores, e.g. the
+name for I<scep-test> is I<OPENXPKI_SCEP_TEST_CLIENT_CONF_DIR>.
+
 It is B<not> used if an expicit config file is set with
 OPENXPKI_I<SERVICE>_CLIENT_CONF_FILE!
 
@@ -142,6 +145,7 @@ sub __init_basepath {
 
     # generate name of the environemnt values from the service name
     my $env_dir = 'OPENXPKI_'.uc($self->service()).'_CLIENT_CONF_DIR';
+    $env_dir =~ s{-}{_}g;
 
     # check for service specific basedir in env
     if ( $ENV{$env_dir} ) {
