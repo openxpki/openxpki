@@ -26,7 +26,7 @@ plan tests => 31;
 my $oxitest = OpenXPKI::Test->new(
     with => [qw( TestRealms CryptoLayer )],
 );
-
+$oxitest->insert_testcerts; # needed for encryption tests that eventually access alias "alpha-datavault"
 
 
 my $namespace = sprintf "test-%s", Data::UUID->new->create_str;
@@ -251,3 +251,5 @@ throws_ok {
 }
     qr/namespace/i,
     "Complain about access to system namespace from within OpenXPKI::Server::Workflow";
+
+$oxitest->delete_testcerts;
