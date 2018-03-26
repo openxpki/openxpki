@@ -1,12 +1,8 @@
-# OpenXPKI::Server::Workflow::Condition::WFArray
-# Written by Scott Hardin for the OpenXPKI project 2010
-# Copyright (c) 2010 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Condition::WFArray;
 
 use strict;
 use warnings;
-use base qw( Workflow::Condition );
+use base qw( OpenXPKI::Server::Workflow::Condition );
 use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Workflow::WFObject::WFArray;
@@ -16,6 +12,8 @@ use English;
 my @parameters = qw(
     array_name
     condition
+    value
+    error
 );
 
 __PACKAGE__->mk_accessors(@parameters);
@@ -36,7 +34,8 @@ sub _init {
     }
 }
 
-sub evaluate {
+sub _evaluate {
+
     my ( $self, $wf ) = @_;
     my $context = $wf->context();
 
@@ -53,15 +52,30 @@ sub evaluate {
         if ( $array->count() == 0 ) {
             return 1;
         }
-        condition_error
-            'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WFARRAY_ARRAY_NOT_EMPTY';
+        condition_error ($self->error() || 'I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_NOT_EMPTY');
     }
-    elsif ( $self->condition() eq 'count_is' ) {
-        CTX('log')->application()->debug("Testing if WFArray ".$self->array_name()." is " . $self->operand());
+    elsif ( $self->condition() =~ /count_(is|lt|lte|gt|gte)/ ) {
+        my $op = $1;
+        my $cnt = $array->count();
+        my $val = $self->value() || 0;
 
-        if ( $array->count() == $self->operand() ) {
-            return 1;
+        CTX('log')->application()->debug("Testing if WFArray ".$self->array_name()." $op " . $self->value());
+
+        if ($op eq 'is') {
+            return 1 if ($cnt == $val);
+        } elsif ($op eq 'is') {
+            return 1 if ($cnt != $val);
+        } elsif ($op eq 'lt') {
+            return 1 if ($cnt < $val);
+        } elsif ($op eq 'lte') {
+            return 1 if ($cnt <= $val);
+        } elsif ($op eq 'gt') {
+            return 1 if ($cnt > $val);
+        } elsif ($op eq 'gte') {
+            return 1 if ($cnt >= $val);
         }
+        condition_error ($self->error() || 'I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_INVALID_ITEM_COUNT');
+
     }
     else {
         configuration_error "Invalid condition "
@@ -80,12 +94,11 @@ OpenXPKI::Server::Workflow::Condition::WFArray
 
 =head1 SYNOPSIS
 
-  <condition
-     name="queue_is_empty"
-     class="OpenXPKI::Server::Workflow::Condition::WFArray">
-    <param name="array_name" value="cert_queue"/>
-    <param name="condition" value="is_empty"/>
-  </condition>
+    class: OpenXPKI::Server::Workflow::Condition::WFArray
+    param
+        array_name: cert_queue
+        condition: count_lt
+        value: 5
 
 =head1 DESCRIPTION
 
@@ -106,19 +119,35 @@ The following conditions are supported:
 
 =item is_empty
 
-Condition is true if the array is either non-existent or is empty.
+Condition is true if the array is either non-existent or is empty (I<value> is not used).
 
 =item count_is
 
-Condition is true if the number of elements matches the value set in C<operand>.
+Condition is true if the number of elements matches the value set in C<value>.
 
 =item count_ne
 
-Condition is true if the number of elements does not match the value set in C<operand>.
+Condition is true if the number of elements does not match the value set in C<value>.
+
+=item count_lt
+
+Condition is true if the number of elements is less than the value set in C<value>.
+
+=item count_lte
+
+Condition is true if the number of elements is less than or equal the value set in C<value>.
+
+=item count_gt
+
+Condition is true if the number of elements is greater than the value set in C<value>.
+
+=item count_gte
+
+Condition is true if the number of elements is greater than or equal the value set in C<value>.
 
 =back
 
-head2 operand
+head2 value
 
 Value of the operand for the given condition operator.
 
