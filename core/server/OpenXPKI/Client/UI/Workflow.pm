@@ -2231,7 +2231,7 @@ sub __render_result_list {
 
         foreach my $col (@{$colums}) {
 
-            my $field = lc($col->{field}); # migration helper, lowercase uicontrol input
+            my $field = lc($col->{field} // ''); # migration helper, lowercase uicontrol input
             $field = 'workflow_id' if ($field eq 'workflow_serial');
 
             # we need to load the wf info

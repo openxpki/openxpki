@@ -658,6 +658,8 @@ sub __fetch_wf_token {
     my $id = shift;
     my $purge = shift || 0;
 
+    return {} unless $id;
+
     $self->logger()->debug( "load wf_token " . $id );
 
     my $token = $self->_client->session()->param($id);
