@@ -504,7 +504,7 @@ sub __pkcs_req : PRIVATE {
         my $params = CTX('config')->get_hash(['scep', $server, 'workflow', 'param']);
 
         $params = {
-            scep_tid => 'transaction_id',
+            transaction_id => 'transaction_id',
             signer_cert => 'signer_cert',
             pkcs10 => 'pkcs10',
             _url_params => 'url_params',

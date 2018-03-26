@@ -471,7 +471,7 @@ sub __pkcs_req : PRIVATE {
         $wf_info = $api->create_workflow_instance({
                 WORKFLOW => $workflow_type,
                 PARAMS   => {
-                    'scep_tid'    => $transaction_id,
+                    'transaction_id'    => $transaction_id,
                     'signer_cert' => $signer_cert,
                     'pkcs10'      => $pkcs10,
 
