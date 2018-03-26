@@ -24,7 +24,7 @@ ok((-s "tmp/cacert-0"),'CA certs present') || die;
 
 # Chain for TLS based requests later
 `cat tmp/cacert-* > tmp/chain.pem`;
-`rm tmp/entity.*`;
+`rm -f tmp/entity.*`;
 
 # Create the pkcs10
 `openssl req -new -nodes -keyout tmp/entity.key -out tmp/entity.csr  -config openssl.conf -reqexts req_template_v1 2>/dev/null`;
@@ -32,14 +32,19 @@ ok((-s "tmp/cacert-0"),'CA certs present') || die;
 ok((-s "tmp/entity.csr"), 'csr present') || die;
 
 # do on behalf request with pkiclient certificate
-`$sscep enroll -u http://localhost/scep/scep -K tmp/pkiclient.key -O tmp/pkiclient.crt -r tmp/entity.csr -k tmp/entity.key -c tmp/cacert-0 -l tmp/entity.crt  -t 1 -n 1`;
+my $scep = `$sscep enroll -v -u http://localhost/scep/scep -K tmp/pkiclient.key -O tmp/pkiclient.crt -r tmp/entity.csr -k tmp/entity.key -c tmp/cacert-0 -l tmp/entity.crt  -t 1 -n 1 |  grep "Read request with transaction id"`;
+
+my @t = split(/:\s+/, $scep);
+my $sceptid = $t[2];
+
+diag("Transaction Id: $sceptid");
 
 # Log in and approve request
 $result = $client->mock_request({
     'action' => 'workflow!search',
-    'wf_state' => 'PENDING',
     'wf_type' => 'certificate_enroll',
     'wf_token' => undef,
+    'transaction_id[]' => $sceptid,
 });
 
 ok($result->{goto});

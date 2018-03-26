@@ -131,6 +131,24 @@ sub get_field_from_result {
     return undef;
 }
 
+sub fail_workflow {
+
+    my $self = shift;
+    my $workflow_id = shift;
+
+    my $result = $self->mock_request({
+        'page' => 'workflow!load!wf_id!' . $workflow_id
+    });
+
+    # force failure
+    $result = $self->mock_request({
+        'action' => $result->{right}->[0]->{content}->{buttons}->[0]->{action},
+        'wf_token' => undef
+    });
+
+    return $result->{right}->[0]->{content}->{data}->[2]->{value};
+}
+
 # Static call that generates a ready-to-use client
 sub factory {
 

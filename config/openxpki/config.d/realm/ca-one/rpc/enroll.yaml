@@ -10,12 +10,16 @@ authorized_signer:
 # condition in the workflow definition
 policy:
     allow_man_authen: 0
-    allow_man_approv: 1
+    allow_man_approv: 0
+    auto_revoke_existing_certs: 1
     approval_points: 1
 
 profile:
     cert_profile: I18N_OPENXPKI_PROFILE_TLS_SERVER
     cert_subject_style: enroll
 
-eligibility:
-    value: 1
+
+
+eligible:
+    initial:
+        value: 1

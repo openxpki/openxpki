@@ -142,7 +142,7 @@ state:
           - eligibility_result
           - eligible_for_initial_enroll
           - eligible_for_renewal
-          - scep_tid
+          - transaction_id
           - signer_revoked
           - signer_validity_ok
           - signer_signature_valid
@@ -203,7 +203,7 @@ state:
           - eligible_for_initial_enroll
           - eligible_for_renewal
           - request_mode
-          - scep_tid
+          - transaction_id
           - signer_revoked
           - signer_validity_ok
           - signer_signature_valid
@@ -236,7 +236,7 @@ state:
           - eligibility_result
           - eligible_for_initial_enroll
           - eligible_for_renewal
-          - scep_tid
+          - transaction_id
           - signer_revoked
           - signer_validity_ok
           - signer_signature_valid
@@ -275,7 +275,7 @@ state:
           - eligibility_result
           - eligible_for_initial_enroll
           - eligible_for_renewal
-          - scep_tid
+          - transaction_id
           - signer_trusted
           - signer_authorized
           - signer_revoked
@@ -326,7 +326,7 @@ state:
           - in_renewal_window
           - in_replace_window
           - eligibility_result
-          - scep_tid
+          - transaction_id
 
 action:
     calculate_hmac:
@@ -352,7 +352,7 @@ action:
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ALLOW_RETRY_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ALLOW_RETRY_DESC
         param:
-            _map_ds_key_name: "[% context.server %]:[% context.scep_tid %]"
+            _map_ds_key_name: "[% context.server %]:[% context.transaction_id %]"
             ds_namespace: scep.transaction_id
 
     calc_approvals:
@@ -365,7 +365,7 @@ action:
         param:
             _map_notify_cc: $url_notifycc
             _map_notify_to: $url_requester
-            _map_scep_tid: $scep_tid
+            _map_transaction_id: $transaction_id
             message: scep_auth_denied
 
     reject_request:
@@ -375,7 +375,7 @@ action:
         param:
             _map_notify_cc: $url_notifycc
             _map_notify_to: $url_requester
-            _map_scep_tid: $scep_tid
+            _map_transaction_id: $transaction_id
             message: scep_approval_rejected
 
     eval_challenge:
@@ -412,7 +412,7 @@ action:
           - _url_params
           - cert_profile
           - pkcs10
-          - scep_tid
+          - transaction_id
           - server
           - signer_cert
         param:
@@ -446,7 +446,7 @@ action:
         param:
             _map_notify_cc: $url_notifycc
             _map_notify_to: $url_requester
-            _map_scep_tid: $scep_tid
+            _map_transaction_id: $transaction_id
             message: scep_cert_issued
 
     notify_pending_approval:
@@ -454,7 +454,7 @@ action:
         param:
             _map_notify_cc: $url_notifycc
             _map_notify_to: $url_requester
-            _map_scep_tid: $scep_tid
+            _map_transaction_id: $transaction_id
             message: scep_approval_pending
 
     persist_cert_metadata:
@@ -509,7 +509,7 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
         param:
            _map_cert_subject: $cert_subject
-           _map_scep_tid: $scep_tid
+           _map_transaction_id: $transaction_id
 
     set_error_not_approved:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetErrorCode
@@ -798,10 +798,10 @@ field:
         required: 1
         type: text
 
-    scep_tid:
-        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_LABEL
-        name: scep_tid
-        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_DESC
+    transaction_id:
+        label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_LABEL
+        name: transaction_id
+        description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_DESC
         required: 1
         type: text
 

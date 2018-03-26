@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2018-03-23 08:39+0100\n"
+"PO-Revision-Date: 2018-03-26 15:12+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -214,13 +214,17 @@ msgstr "Unable to check certificates status as identifier was not found."
 msgid "I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_DOES_NOT_MATCH"
 msgstr "The certificates status does not match the expected one."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CONDITION_NICE_NO_USEABLE_CA_TOKEN_FOUND"
-msgstr "Unable to check certificates status as identifier was not found."
+msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_INVALID_ITEM_COUNT"
+msgstr "List has unexpected item count"
 
-#, fuzzy
+msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_NOT_EMPTY"
+msgstr "List is not empty"
+
+msgid "I18N_OPENXPKI_UI_CONDITION_NICE_NO_USEABLE_CA_TOKEN_FOUND"
+msgstr "No useable CA token was found"
+
 msgid "I18N_OPENXPKI_UI_CONDITION_NICE_UNABLE_TO_DETERMINE_NOTAFTER_DATE"
-msgstr "The certificates status does not match the expected one."
+msgstr "Notafter date could not be determined"
 
 msgid "I18N_OPENXPKI_UI_CRL_BACK_TO_LIST"
 msgstr "back to overview"
@@ -255,13 +259,11 @@ msgstr "CRL Serial"
 msgid "I18N_OPENXPKI_UI_CRL_VIEW_IN_BROWSER"
 msgstr "show details in brower"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CSR_EXT_CERTIFICATE_TEMPLATE"
-msgstr "not after"
+msgstr "Certificate Template"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CSR_EXT_CHALLENGE_PASSWORD"
-msgstr "Key password"
+msgstr "Challenge password"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
@@ -321,9 +323,8 @@ msgstr "Request was not approved"
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_AUTHENTICATED"
 msgstr "Request was not authenticated"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_IN_RENEWAL_WINDOW"
-msgstr "Request was not approved"
+msgstr "Request is not in renewal window"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_KEY_DUPLICATE"
 msgstr "Policy failed (key reuse detected)"
@@ -977,7 +978,7 @@ msgstr "Requestor"
 msgid "I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY"
 msgstr "Search result expired or empty!"
 
-msgid "I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL"
+msgid "I18N_OPENXPKI_UI_SEARCH_TRANSACTION_ID_LABEL"
 msgstr "Transaction Id"
 
 msgid "I18N_OPENXPKI_UI_SECRET_CLEAR_SECRET_LABEL"
@@ -1027,13 +1028,11 @@ msgstr "Unlock"
 msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
 msgstr "Unlock"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_SUBJECT_MATCH_DONT_MATCH"
-msgstr "Your query did not return any matches!"
+msgstr "Subjects do not match"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_SUBJECT_MATCH_SUBJECT_IS_EMPTY"
-msgstr "Search result expired or empty!"
+msgstr "Subject is empty"
 
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
 msgstr "SCEP Enrollment workflows awaiting approval."
@@ -1181,21 +1180,17 @@ msgstr "Given FQDN has an invalid format"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_VALIDITY_STRING_FAILED"
 msgstr "The entered date/time could not be validated."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_AUTHORITY_KEY_ID_MISMATCH_ERROR"
-msgstr "An error occured during input validation"
+msgstr "Authority Key IDs do not match"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_PARSE_ERROR"
-msgstr "PKCS10 request can not be read"
+msgstr "Certificate can not be read"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_SUBJECT_KEY_ID_MISMATCH_ERROR"
-msgstr "One or more subject fields have errors."
+msgstr "Subject Key IDs do not match"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_SUBJECT_MISMATCH_ERROR"
-msgstr "PKCS10 request has no subject set"
+msgstr "Subjects do not match"
 
 msgid "I18N_OPENXPKI_UI_WELCOME_PAGE"
 msgstr "Welcome to your OpenXPKI Trustcenter"
@@ -1429,11 +1424,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_UPLOAD_PKCS10_LABEL"
 msgstr "Upload CSR (PKCS10)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ACCEPT_REQUEST_DESC"
-msgstr "Reject Request"
+msgstr "Accept Request"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ACCEPT_REQUEST_LABEL"
 msgstr "Reject Request"
 
@@ -1840,12 +1833,11 @@ msgstr "Creator"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_LABEL"
 msgstr "Extra Information"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SUBJECT_DESC"
-msgstr "The certificate's subject."
+msgstr "Request Subject"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SUBJECT_LABEL"
-msgstr "Request Subject"
+msgstr "The requests subject"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_DESC"
 msgstr "Type of CSR (PCKS10, server generated, SPKAC"
@@ -1957,9 +1949,8 @@ msgstr "In Renewal Period"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IN_REPLACE_WINDOW_LABEL"
 msgstr "In Replace Period"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_REPLACE_LABEL"
-msgstr "In Replace Period"
+msgstr "Is Replacement"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_SELF_SIGNED_LABEL"
 msgstr "Request is SelfSigned"
@@ -2199,12 +2190,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RUN_IN_BACKGROUND_LABEL"
 msgstr "run in background"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_DESC"
-msgstr "Transaction Id of this SCEP request"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_LABEL"
-msgstr "SCEP Transaction Id"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_DESC"
 msgstr "Name of the SCEP endpoint receiving this request."
 
@@ -2253,9 +2238,8 @@ msgstr "Transaction ID"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_CHALLENGE_PASSWORD_LABEL"
 msgstr "Has Valid Password"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_HMAC_LABEL"
-msgstr "CSR Valid"
+msgstr "HMAC is valid"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_DESC"
@@ -2263,20 +2247,17 @@ msgstr ""
 " Paste your PKCS10 formated request directly into the field or use the "
 "upload button to load a file from your local computer"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_LABEL"
-msgstr "PKCS10 Request"
+msgstr "Certificate (PEM)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_PLACEHOLDER"
 msgstr ""
-" Please paste your PEM encoded request here (must look like  -----BEGIN "
-"CERTIFICATE REQUEST-----) or use the browse/upload button below to load a "
-"file from your computer."
+" Please paste your PEM encoded certificate here (must look like  -----BEGIN "
+"CERTIFICATE-----) or use the browse/upload button below to load a file from "
+"your computer."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_TOOLTIP"
-msgstr "Your PKCS10 encoded request"
+msgstr "Your PEM encoded certificate"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON"
 msgstr "Force Failure"
@@ -2421,9 +2402,8 @@ msgstr "Outstanding Tasks"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL"
 msgstr "Pause Reason"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE"
-msgstr "Run State"
+msgstr "Process State"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
 msgstr "exception"
@@ -2540,10 +2520,8 @@ msgstr "This workflow was canceled."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_LABEL"
 msgstr "Canceled by User"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_DESC"
-msgstr ""
-"The certificate was issued and will be send to the SCEP client on request."
+msgstr "The certificate was issued and will be send to the client on request."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_LABEL"
@@ -3058,13 +3036,13 @@ msgstr "Certificate Signing Request (CSR)"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_LABEL"
 msgstr "Certificate Signing Request (CSR)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_DESC"
-msgstr "Certificate Export"
+msgstr ""
+"Certificate Enrollment workflow used for certificate enrollment via "
+"automated interfaces (e.g. SCEP, RPC)."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_LABEL"
-msgstr "Certificate Export"
+msgstr "Certificate Enrollment"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_DESC"
 msgstr "Certificate Export"
@@ -4072,6 +4050,12 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_LOGIN_IDS_TOOLTIP"
 #~ msgstr "Check this box to force issuance."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_DESC"
+#~ msgstr "Transaction Id of this SCEP request"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_LABEL"
+#~ msgstr "SCEP Transaction Id"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SC_ERROR_REASON_LABEL"

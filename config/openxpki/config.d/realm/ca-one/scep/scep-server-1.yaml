@@ -16,7 +16,7 @@ renewal:
 # certificate after a grace period
 revoke_on_replace:
     reason_code: keyCompromise
-    invalidity_time: +000014
+    delay_revocation_time: +000014
 
 
 workflow:
@@ -73,6 +73,7 @@ policy:
     allow_eligibility_recheck: 0
 
     # Approval points requirede (eligibity and operator count as one point each)
+    # if you set this to "0", all authenticated requests are auto-approved!
     approval_points: 1
 
     # The number of active certs with the same subject that are allowed
@@ -80,7 +81,7 @@ policy:
     max_active_certs: 1
 
     # option will be removed
-    allow_expired_signer: 0
+    # allow_expired_signer: 0
 
     # If an initial enrollment is seen
     # all existing certificates with the same subject are revoked

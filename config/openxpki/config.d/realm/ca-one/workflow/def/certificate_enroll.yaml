@@ -97,9 +97,15 @@ state:
     RENEWAL_PREPARED:
         autorun: 1
         action:
-          - global_noop > AUTHORIZED ? is_in_renewal_window
-          - set_mode_renewal set_replace_validity > AUTHORIZED ? !is_in_renewal_window is_replacement_allowed
+          - global_noop > START_APPROVAL ? is_in_renewal_window
+          - set_mode_renewal set_replace_validity > CHECK_FOR_REVOKE_ON_REPLACE ? !is_in_renewal_window is_replacement_allowed
           - global_set_error_not_in_renewal_window > FAILURE ? !is_in_renewal_window !is_replacement_allowed
+
+    CHECK_FOR_REVOKE_ON_REPLACE:
+        autorun: 1
+        action:
+          - queue_replacement_to_revoke set_revoke_on_replace_details > START_APPROVAL ? need_revoke_on_replace
+          - global_noop > START_APPROVAL ? !need_revoke_on_replace
 
     # on behalf enrollment
     START_ONBEHALF:
@@ -113,25 +119,43 @@ state:
     # common workflow
     AUTHORIZED:
         autorun: 1
-        action: global_noop > PERFORM_POLICY_CHECK
+        action: search_subject_duplicate > HANDLE_DUPLICATES
 
-    PERFORM_POLICY_CHECK:
-        autorun: 1
-        action: global_noop > CHECK_POLICY_VIOLATION
-
-    CHECK_POLICY_VIOLATION:
+    HANDLE_DUPLICATES:
         autorun: 1
         action:
-          - global_set_error_code_policy_violated > PENDING_POLICY_VIOLATION ? has_policy_violations
-          - global_noop > ELIGIBILITY ? !has_policy_violations
+          - queue_duplicates_to_revoke > START_APPROVAL ? has_subject_duplicate need_auto_revoke_existing_certs
+          - global_noop > START_APPROVAL ? has_subject_duplicate !need_auto_revoke_existing_certs is_max_count_ok
+          - global_set_error_policy_violated > PENDING_POLICY_VIOLATION ? has_subject_duplicate !need_auto_revoke_existing_certs !is_max_count_ok
+          - global_noop2 > START_APPROVAL ? !has_subject_duplicate
 
     PENDING_POLICY_VIOLATION:
         label:  I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_DESC
         action:
-          - reevaluate_policy > PERFORM_POLICY_CHECK
-          - override_policy > ELIGIBILITY
+          - reevaluate_policy > AUTHORIZED
+          - override_policy > START_APPROVAL
           - reject_request global_set_error_rejected > FAILURE
+        output:
+          - error_code
+          - check_policy_subject_duplicate
+          - cert_subject
+          - server
+          - interface
+          - comment
+          - cert_profile
+          - request_mode
+          - is_replace
+          - is_eligible
+          - eligibility_result
+          - transaction_id
+          - signer_cert_identifier
+          - signer_revoked
+          - signer_trusted
+          - signer_authorized
+          - signer_validity_ok
+          - has_valid_challenge_password
+          - has_valid_hmac
         button:
           override_policy:
             format: alternative
@@ -140,7 +164,7 @@ state:
           reject_request:
             format: failure
 
-    ELIGIBILITY:
+    START_APPROVAL:
         autorun: 1
         action: check_eligibility > EVALUATE_AUTOAPPROVAL
 
@@ -159,8 +183,9 @@ state:
 
     PENDING:
         action:
-          - reject_request notify_rejected global_set_error_rejected > FAILURE
-          - approve_csr calculate_approval_points > RECHECK_APPROVAL
+          - reject_request notify_rejected global_set_error_rejected > FAILURE ? global_is_operator
+          - approve_csr calculate_approval_points > RECHECK_APPROVAL ? global_is_operator is_manual_approval_allowed
+          - global_clear_error_code > START_APPROVAL ? is_eligibility_recheck_allowed
         output:
           - error_code
           - server
@@ -180,10 +205,12 @@ state:
           - signer_validity_ok
           - has_valid_challenge_password
           - has_valid_hmac
-
         button:
           approve_csr:
             format: expected
+          global_clear_error_code:
+            label: I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ELIGIBILITY_RECHECK_LABEL
+            format: alternative
           reject_request:
             format: failure
 
@@ -200,15 +227,54 @@ state:
     PREPARED:
         autorun: 1
         action:
-          - global_nice_issue_certificate > SUCCESS
+          - global_nice_issue_certificate > REVOKE_CERTS
+
+    REVOKE_CERTS:
+        autorun: 1
+        action:
+          - global_noop > REVOKE_DONE ? global_is_tmp_queue_empty
+          - get_next_cert_to_revoke revoke_cert register_revoke_workflow_id > REVOKE_CERTS ? !global_is_tmp_queue_empty
+
+    REVOKE_DONE:
+        autorun: 1
+        action: cleanup_revocation_context > SUCCESS
 
     SUCCESS:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_DESC
+        output:
+          - cert_identifier
+          - server
+          - interface
+          - cert_subject
+          - cert_profile
+          - request_mode
+          - is_replace
+          - transaction_id
+          - signer_cert_identifier
 
     FAILURE:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_DESC
+          - error_code
+          - check_policy_subject_duplicate
+          - cert_subject
+          - server
+          - interface
+          - comment
+          - cert_profile
+          - request_mode
+          - is_replace
+          - is_eligible
+          - eligibility_result
+          - transaction_id
+          - signer_cert_identifier
+          - signer_revoked
+          - signer_trusted
+          - signer_authorized
+          - signer_validity_ok
+          - has_valid_challenge_password
+          - has_valid_hmac
 
 action:
     initialize:
@@ -253,8 +319,7 @@ action:
     reevaluate_policy:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
         param:
-            check_policy_duplicate: ''
-            check_policy_dns: ''
+            check_policy_subject_duplicate: ''
 
     check_eligibility:
         class: OpenXPKI::Server::Workflow::Activity::Tools::EvaluateEligibility
@@ -305,6 +370,63 @@ action:
         param:
             cert_subject_style: enroll
 
+    search_subject_duplicate:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SearchCertificates
+        param:
+            _map_profile: $cert_profile
+            _map_cert_subject: $cert_subject
+            target_key: check_policy_subject_duplicate
+            entity_only: 1
+
+    queue_duplicates_to_revoke:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        param:
+            _map_tmp_queue: $check_policy_subject_duplicate
+
+    queue_replacement_to_revoke:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        param:
+            array_name: tmp_queue
+            function: push
+            context_key: signer_cert_identifier
+
+    get_next_cert_to_revoke:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        input:
+          - tmp_queue
+        param:
+            array_name: tmp_queue
+            context_key: revoke_cert_identifier
+            function: shift
+
+    revoke_cert:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate
+        param:
+            workflow: certificate_revocation_request_v2
+            target_key: revoke_workflow_id
+            _map_cert_identifier: $revoke_cert_identifier
+            flag_auto_approval: 1
+            flag_batch_mode: 1
+            _map_reason_code: "[% IF context.revoke_reason_code %][% context.revoke_reason_code %][% ELSE %]superseded[% END %]"
+            _map_delay_revocation_time: $revoke_delay_revocation_time
+
+    register_revoke_workflow_id:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
+        input:
+          - tmp_queue
+        param:
+            array_name: revocation_workflow_id
+            context_key: revoke_workflow_id
+            function: push
+
+    cleanup_revocation_context:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        param:
+            revoke_cert_identifier: ''
+            revoke_reason_code: ''
+            revoke_delay_revocation_time: ''
+            revoke_workflow_id: ''
+
     # If the extension is set and there is a node with the given name the
     # value is loaded, otherwise it falls back to the default value
     set_profile_from_extension:
@@ -347,6 +469,15 @@ action:
             _map_notafter: "[% USE Certificate %][% Certificate.notafter(context.signer_cert_identifier, 'epoch') %]"
             is_replace: 1
 
+    set_revoke_on_replace_details:
+      class: OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue
+      param:
+          mode: map
+          _map_config_path: "[% context.interface %].[% context.server %].revoke_on_replace"
+          attrmap:
+              revoke_reason_code: reason_code
+              revoke_delay_revocation_time: delay_revocation_time
+
 condition:
     is_requestor_authorized:
         class: Workflow::Condition::Evaluate
@@ -388,6 +519,16 @@ condition:
         param:
             test: $context->{p_allow_replace}
 
+    is_eligibility_recheck_allowed:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{p_allow_eligibility_recheck};
+
+    need_auto_revoke_existing_certs:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{p_auto_revoke_existing_certs}
+
     has_certificate_template:
         class: OpenXPKI::Server::Workflow::Condition::WFHash
         param:
@@ -408,7 +549,8 @@ condition:
     is_approved:
         class: Workflow::Condition::Evaluate
         param:
-            test: $context->{approval_points} >= $context->{p_approval_points}
+            # the defined prevents any accidental "autoapprovals" by missing parameters
+            test: (defined $context->{p_approval_points} && $context->{approval_points} >= $context->{p_approval_points})
 
     is_self_signed:
         class: Workflow::Condition::LazyAND
@@ -447,6 +589,27 @@ condition:
         param:
              test: ($context->{challenge_password_valid})
 
+    is_renewal_mode:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: ($context->{request_mode} eq 'renewal')
+
+    has_subject_duplicate:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: ($context->{check_policy_subject_duplicate})
+
+    is_max_count_ok:
+        class: OpenXPKI::Server::Workflow::Condition::WFArray
+        param:
+            array_name: check_policy_subject_duplicate
+            condition: count_lt
+            _map_value: $p_max_active_certs
+
+    need_revoke_on_replace:
+        class: OpenXPKI::Server::Workflow::Condition::Connector::Exists
+        param:
+            _map_config_path: "[% context.interface %].[% context.server %].revoke_on_replace"
 
 field:
     _pkcs7:

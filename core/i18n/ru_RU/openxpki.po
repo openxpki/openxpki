@@ -267,6 +267,14 @@ msgid "I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_DOES_NOT_MATCH"
 msgstr "SPKAC строка пуста."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_INVALID_ITEM_COUNT"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_NOT_EMPTY"
+msgstr "SPKAC строка пуста."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CONDITION_NICE_NO_USEABLE_CA_TOKEN_FOUND"
 msgstr "SPKAC строка пуста."
 
@@ -1365,7 +1373,7 @@ msgid "I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY"
 msgstr "Статус"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL"
+msgid "I18N_OPENXPKI_UI_SEARCH_TRANSACTION_ID_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
@@ -2889,18 +2897,6 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RUN_IN_BACKGROUND_LABEL"
-msgstr "Родительский технологический процесс"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_DESC"
-msgstr ""
-"Для использования данного профиля сертификата достаточно ввести Ваше имя, "
-"имя Вашей учетной записи и адрес электронной почты. Это простейший профиль "
-"пользователя, который следует использовать, если нет особых требований к "
-"сертифкату. В противном случае следует использовать расширенный профиль."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
@@ -7667,10 +7663,6 @@ msgstr "Имя учетной записи"
 #~ msgstr "SPKAC строка пуста."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WFARRAY_ARRAY_NOT_EMPTY"
-#~ msgstr "SPKAC строка пуста."
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WFHASH_KEY_IS_EMPTY"
 #~ msgstr "SPKAC строка пуста."
 
@@ -9892,6 +9884,19 @@ msgstr "Имя учетной записи"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_LOGIN_IDS_TOOLTIP"
+#~ msgstr "Родительский технологический процесс"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_DESC"
+#~ msgstr ""
+#~ "Для использования данного профиля сертификата достаточно ввести Ваше имя, "
+#~ "имя Вашей учетной записи и адрес электронной почты. Это простейший "
+#~ "профиль пользователя, который следует использовать, если нет особых "
+#~ "требований к сертифкату. В противном случае следует использовать "
+#~ "расширенный профиль."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_LABEL"
 #~ msgstr "Родительский технологический процесс"
 
 #, fuzzy

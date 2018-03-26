@@ -265,6 +265,14 @@ msgid "I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_DOES_NOT_MATCH"
 msgstr "Prozesse anzeigen"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_INVALID_ITEM_COUNT"
+msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_NOT_EMPTY"
+msgstr "Prozesse anzeigen"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CONDITION_NICE_NO_USEABLE_CA_TOKEN_FOUND"
 msgstr "Prozesse anzeigen"
 
@@ -1366,7 +1374,7 @@ msgid "I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY"
 msgstr "Status"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL"
+msgid "I18N_OPENXPKI_UI_SEARCH_TRANSACTION_ID_LABEL"
 msgstr "Übergeordneter Workflow"
 
 #, fuzzy
@@ -2892,18 +2900,6 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RUN_IN_BACKGROUND_LABEL"
-msgstr "Übergeordneter Workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_DESC"
-msgstr ""
-"Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, "
-"müssenSie nur ihren Namen, ihren Benutzernamen und ihre eMail-Adresse "
-"angeben.Nutzen Sie diese Art, wenn Sie keine spezifischen Anforderungen "
-"haben, diedie Verwendung der erweiterten Benennungsart erfordern."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_LABEL"
 msgstr "Übergeordneter Workflow"
 
 #, fuzzy
@@ -7539,10 +7535,6 @@ msgstr "Benutzername"
 #~ msgstr "Prozesse anzeigen"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WFARRAY_ARRAY_NOT_EMPTY"
-#~ msgstr "Prozesse anzeigen"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WFHASH_KEY_IS_EMPTY"
 #~ msgstr "Prozesse anzeigen"
 
@@ -9686,6 +9678,18 @@ msgstr "Benutzername"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_LOGIN_IDS_TOOLTIP"
+#~ msgstr "Übergeordneter Workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_DESC"
+#~ msgstr ""
+#~ "Dies ist die einfachste Benennungsart. Um ein Zertifikat zu erhalten, "
+#~ "müssenSie nur ihren Namen, ihren Benutzernamen und ihre eMail-Adresse "
+#~ "angeben.Nutzen Sie diese Art, wenn Sie keine spezifischen Anforderungen "
+#~ "haben, diedie Verwendung der erweiterten Benennungsart erfordern."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_LABEL"
 #~ msgstr "Übergeordneter Workflow"
 
 #, fuzzy

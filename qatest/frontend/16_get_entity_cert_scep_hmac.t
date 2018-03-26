@@ -11,7 +11,7 @@ use TestCGI;
 use MIME::Base64 qw(decode_base64);
 use Digest::SHA qw(hmac_sha256_hex);
 
-use Test::More tests => 8;
+use Test::More tests => 9;
 
 package main;
 
@@ -38,7 +38,7 @@ $pem =~ s/\s//xmsg;
 my $hmac = hmac_sha256_hex(decode_base64($pem), 'verysecret');
 
 # do on with hmac attached certificate
-my $scep = `$sscep enroll -u http://localhost/scep/scep?hmac=$hmac -r tmp/entity-hmac.csr -k tmp/entity-hmac.key -c tmp/cacert-0 -l tmp/entity-hmac.crt  -t 1 -n 1 -v |  grep "Read request with transaction id"
+my $scep = `$sscep enroll -v -u http://localhost/scep/scep?hmac=$hmac -r tmp/entity-hmac.csr -k tmp/entity-hmac.key -c tmp/cacert-0 -l tmp/entity-hmac.crt  -t 1 -n 1 -v |  grep "Read request with transaction id"
 `;
 my @t = split(/:\s+/, $scep);
 my $sceptid = $t[2];
@@ -53,7 +53,7 @@ $result = $client->mock_request({
     'wf_proc_state' => '',
     'wf_state' => '',
     'wf_type' => 'certificate_enroll',
-    'scep_tid[]' => $sceptid,
+    'transaction_id[]' => $sceptid,
 });
 
 ok($result->{goto});
@@ -68,12 +68,6 @@ diag('Found workflow ' . $workflow_id );
 
 is($result->{main}->[0]->{content}->{data}->[0]->[3], 'PENDING');
 
-# force failure
-$result = $client->mock_request({
-    'action' => $result->{right}->[0]->{buttons}->[0]->{action},
-    'wf_token' => undef
-});
-
 # load raw context to find certificate id
 $result = $client->mock_request({
     'page' => 'workflow!context!wf_id!' . $workflow_id
@@ -82,3 +76,4 @@ $result = $client->mock_request({
 is($client->get_field_from_result('url_hmac'), $hmac);
 ok($client->get_field_from_result('is_valid_hmac'));
 
+is ($client->fail_workflow($workflow_id), 'FAILURE');

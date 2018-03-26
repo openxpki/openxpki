@@ -111,8 +111,8 @@ tasklist:
         field: WORKFLOW_STATE
       - label: I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT
         field: context.cert_subject
-      - label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_LABEL
-        template: "[% context.scep_tid %]"
+      - label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_LABEL
+        template: "[% context.transaction_id %]"
 
   - label: I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_LABEL
     description: I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_DESCRIPTION
@@ -136,8 +136,8 @@ bulk:
      - label: I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL
        key: requestor
 
-     - label: I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL
-       key: scep_tid
+     - label: I18N_OPENXPKI_UI_SEARCH_TRANSACTION_ID_LABEL
+       key: transaction_id
 
     query:
       TYPE:
@@ -239,8 +239,8 @@ wfsearch:
           - label: I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL
             key: requestor
 
-          - label: I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL
-            key: scep_tid
+          - label: I18N_OPENXPKI_UI_SEARCH_TRANSACTION_ID_LABEL
+            key: transaction_id
 
 
 certsearch:

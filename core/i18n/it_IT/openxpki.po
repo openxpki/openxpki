@@ -250,6 +250,19 @@ msgstr ""
 "Non_prima_del / Non_dopo_il."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_INVALID_ITEM_COUNT"
+msgstr "Richiesta non valida - nessuna azione"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_NOT_EMPTY"
+msgstr ""
+"Modulo per la ricerca dei certificati. Il campo SAN richiede che il tipo SAN "
+"venga separato con i due punti, ad es. DNS:www2.openxpki.org.<br>Gli stati "
+"Valido/Scaduto presuppongono che il certificato sia nello stato Emesso: "
+"viene eseguito un controllo relativo alla finestra di validità "
+"Non_prima_del / Non_dopo_il."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CONDITION_NICE_NO_USEABLE_CA_TOKEN_FOUND"
 msgstr "non prima del"
 
@@ -1126,7 +1139,7 @@ msgid "I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY"
 msgstr "Stato del Certificato"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL"
+msgid "I18N_OPENXPKI_UI_SEARCH_TRANSACTION_ID_LABEL"
 msgstr "Azione"
 
 #, fuzzy
@@ -2466,12 +2479,6 @@ msgstr "Inizializzo..."
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RUN_IN_BACKGROUND_LABEL"
 msgstr "Ulteriori Informazioni"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_DESC"
-msgstr "Id Transazione di questa richiesta SCEP"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_LABEL"
-msgstr "Id Transazione SCEP"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_DESC"
 msgstr "Nome del punto di utilizzo SCEP che riceve questa richiesta."
@@ -4397,6 +4404,12 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_LOGIN_IDS_TOOLTIP"
 #~ msgstr "Check this box to force issuance."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_DESC"
+#~ msgstr "Id Transazione di questa richiesta SCEP"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_LABEL"
+#~ msgstr "Id Transazione SCEP"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SC_ERROR_REASON_LABEL"
