@@ -1,73 +1,52 @@
 #!/usr/bin/perl
-
 use strict;
 use warnings;
 
-use FindBin qw( $Bin );
-use lib "$Bin/../../lib";
-
-use Carp;
+# Core modules
 use English;
-use Data::Dumper;
-use Config::Std;
-use File::Basename;
-use File::Temp qw( tempfile );
+use FindBin qw( $Bin );
 
-use Log::Log4perl qw(:easy);
-Log::Log4perl->easy_init($WARN);
-
-use OpenXPKI::Test::QA::More;
+# CPAN modules
 use Test::More;
 use Test::Deep;
-use TestCfg;
-use OpenXPKI::Test::QA::CertHelper;
+use Test::Exception;
 
-our %cfg = ();
-my $testcfg = new TestCfg;
-$testcfg->read_config_path( 'api.cfg', \%cfg, dirname($0) );
+# Project modules
+use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
+use OpenXPKI::Test;
 
-my $test = OpenXPKI::Test::QA::More->new({
-    socketfile => $cfg{instance}{socketfile},
-    realm => $cfg{instance}{realm},
-}) or die "Error creating new test instance: $@";
 
-$test->set_verbose($cfg{instance}{verbose});
-$test->plan( tests => 7 );
+plan tests => 5;
 
-$test->connect_ok(
-    user => $cfg{operator}{name},
-    password => $cfg{operator}{password},
-) or die "Error - connect failed: $@";
 
-# Create certificate
-my $cert_info = OpenXPKI::Test::QA::CertHelper->via_workflow(
-    tester => $test,
-    hostname => "127.0.0.1",
+#
+# Init helpers
+#
+my $oxitest = OpenXPKI::Test->new(
+    with => [qw( TestRealms CryptoLayer )],
 );
+$oxitest->insert_testcerts;
+my $dbdata = $oxitest->certhelper_database;
 
-# Fetch certificate - HASH Format
-$test->runcmd_ok('get_chain', { START_IDENTIFIER => $cert_info->{identifier}, OUTFORMAT => 'HASH' }, "Fetch certificate chain");
-my $params = $test->get_msg()->{PARAMS};
+# Fetch chain - HASH Format
+my $result;
+lives_ok {
+    $result = $oxitest->api_command("get_chain" => { START_IDENTIFIER => $dbdata->cert("alpha_alice_2")->id, OUTFORMAT => 'HASH' });
+} "Fetch certificate chain";
 
-$test->is(scalar @{$params->{CERTIFICATES}}, 3, "Chain contains 3 certificates");
+is scalar @{$result->{CERTIFICATES}}, 3, "Chain contains 3 certificates";
 
-$test->is(
-    $params->{CERTIFICATES}->[0]->{IDENTIFIER},
-    $cert_info->{identifier},
-    "First cert in chain equals requested start cert"
-);
+is $result->{CERTIFICATES}->[0]->{IDENTIFIER},
+    $dbdata->cert("alpha_alice_2")->id,
+    "First cert in chain equals requested start cert";
 
-$test->is(
-    $params->{CERTIFICATES}->[0]->{AUTHORITY_KEY_IDENTIFIER},
-    $params->{CERTIFICATES}->[1]->{SUBJECT_KEY_IDENTIFIER},
-    "Server cert was signed by CA cert"
-);
+is $result->{CERTIFICATES}->[0]->{AUTHORITY_KEY_IDENTIFIER},
+    $result->{CERTIFICATES}->[1]->{SUBJECT_KEY_IDENTIFIER},
+    "Server cert was signed by CA cert";
 
-$test->is(
-    $params->{CERTIFICATES}->[1]->{AUTHORITY_KEY_IDENTIFIER},
-    $params->{CERTIFICATES}->[2]->{SUBJECT_KEY_IDENTIFIER},
-    "CA cert was signed by Root cert"
-);
+is $result->{CERTIFICATES}->[1]->{AUTHORITY_KEY_IDENTIFIER},
+    $result->{CERTIFICATES}->[2]->{SUBJECT_KEY_IDENTIFIER},
+    "CA cert was signed by Root cert";
 
 # TODO Test get_chain with BUNDLE => 1
 
@@ -84,4 +63,4 @@ $test->is(
 # holding the requested certificate and all intermediates (if found). Add
 # "KEEPROOT => 1" to also have the root in PKCS7 container.
 
-$test->disconnect;
+$oxitest->delete_testcerts;
