@@ -3,29 +3,25 @@
 #
 # PLEASE KEEP this test in sync with core/server/t/95_openxpkiadm/10_import_certificate.t
 #
-
 use strict;
 use warnings;
 
 # Core modules
-use Carp;
 use English;
-use Data::Dumper;
-use File::Basename qw( dirname );
 use FindBin qw( $Bin );
 
 # CPAN modules
-use Log::Log4perl qw(:easy);
-Log::Log4perl->easy_init($WARN);
 use Test::More;
 use Test::Deep;
+use Test::Exception;
 
 # Project modules
-use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
-use TestCfg;
-use OpenXPKI::Test::QA::More;
-use OpenXPKI::Test::QA::CertHelper;
+use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
+
+
+plan tests => 12;
+
 
 =pod
 
@@ -43,22 +39,16 @@ Positional parameters:
 
 =cut
 sub import_ok {
-    my ($tester, $test_cert, %args) = @_;
-    # run import
-    $tester->runcmd_ok(
-        "import_certificate",
-        { DATA => $test_cert->data, %args },
-        sprintf('Import "%s"%s', $test_cert->label, scalar(%args) ? " with ".join(", ", map { $_." = ".$args{$_} } sort keys %args) : "")
-    )
-    # catch errors
-    or diag "ERROR: ".$tester->error;
-    # test result
-    my $params = $tester->get_msg->{PARAMS};
-    $tester->is(
-        ref $params eq 'HASH' ? $params->{SUBJECT_KEY_IDENTIFIER} : "",
-        $test_cert->subject_key_id,
-        "Correctly list imported certificate"
-    );
+    my ($oxitest, $test_cert, %args) = @_;
+    lives_and {
+        # run import
+        my $result = $oxitest->api_command("import_certificate" => {
+            DATA => $test_cert->data,
+            %args
+        });
+        # test result
+        is $result->{SUBJECT_KEY_IDENTIFIER}, $test_cert->subject_key_id;
+    } sprintf('Import "%s"%s', $test_cert->label, scalar(%args) ? " with ".join(", ", map { $_." = ".$args{$_} } sort keys %args) : "");
 }
 
 =pod
@@ -80,80 +70,66 @@ Positional parameters:
 
 =cut
 sub import_failsok {
-    my ($tester, $test_cert, $error, %args) = @_;
-    $tester->runcmd(
-        "import_certificate",
-        { DATA => $test_cert->data, %args }
-    );
-    $tester->error_is(
-        $error,
-        sprintf('Import "%s"%s: should fail', $test_cert->label, scalar(%args) ? " with ".join(", ", map { $_." = ".$args{$_} } sort keys %args) : "")
-    );
+    my ($oxitest, $test_cert, $error, %args) = @_;
+    throws_ok {
+        # run import
+        $oxitest->api_command("import_certificate" => {
+            DATA => $test_cert->data,
+            %args
+        });
+    } $error, sprintf('Import "%s"%s: should fail', $test_cert->label, scalar(%args) ? " with ".join(", ", map { $_." = ".$args{$_} } sort keys %args) : "")
 }
-
-#
-# Init client
-#
-our $cfg = {};
-TestCfg->new->read_config_path( 'api.cfg', $cfg, dirname($0) );
-
-my $test = OpenXPKI::Test::QA::More->new({
-    socketfile => $cfg->{instance}{socketfile},
-    realm => $cfg->{instance}{realm},
-}) or die "Error creating new test instance: $@";
-
-$test->set_verbose($cfg->{instance}{verbose});
-$test->plan( tests => 21 );
-
-$test->connect_ok(
-    user => $cfg->{operator}{name},
-    password => $cfg->{operator}{password},
-) or die "Error - connect failed: $@";
 
 #
 # Init helpers
 #
-my $oxitest = OpenXPKI::Test->new;
+my $oxitest = OpenXPKI::Test->new(
+    with => [qw( TestRealms CryptoLayer )],
+    #log_level => 'trace',
+);
 my $dbdata = $oxitest->certhelper_database;
-
-#
-# Create new test certificates on disk
-#
-my $cert_pem = OpenXPKI::Test::QA::CertHelper->via_openssl->cert_pem;
-my $cert_pem2 = OpenXPKI::Test::QA::CertHelper->via_openssl(commonName => 'test2.openxpki.org')->cert_pem;
+my $cert1_pem = $dbdata->cert("alpha_root_2")->data;
+my $cert2_pem = $dbdata->cert("alpha_signer_2")->data;
 
 #
 # Tests
 #
 
 # Import certificate
-$test->runcmd_ok('import_certificate', { DATA => $cert_pem, }, "Import certificate 1")
-    or diag "ERROR: ".$test->error;
-$test->is($test->get_msg->{PARAMS}->{IDENTIFIER}, $test->get_msg->{PARAMS}->{ISSUER_IDENTIFIER}, "Certificate is recognized as self-signed");
+lives_and {
+    my $result = $oxitest->api_command("import_certificate" => { DATA => $cert1_pem });
+    is $result->{IDENTIFIER}, $result->{ISSUER_IDENTIFIER};
+} "Import and recognize self signed root certificate";
 
 # Second import should fail
-$test->runcmd('import_certificate', { DATA => $cert_pem, });
-$test->error_is("I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_CERTIFICATE_ALREADY_EXISTS", "Fail importing same certificate twice");
+throws_ok {
+    $oxitest->api_command("import_certificate" => { DATA => $cert1_pem });
+} qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_CERTIFICATE_ALREADY_EXISTS/,
+    "Fail importing same certificate twice";
 
 # ...except if we want to update
-$test->runcmd_ok('import_certificate', { DATA => $cert_pem, UPDATE => 1 }, "Import same certificate with UPDATE = 1");
+lives_and {
+    my $result = $oxitest->api_command("import_certificate" => { DATA => $cert1_pem, UPDATE => 1 });
+    is $result->{IDENTIFIER}, $result->{ISSUER_IDENTIFIER};
+} "Import same certificate with UPDATE = 1";
 
 # Import second certificate as "REVOKED"
-$test->runcmd_ok('import_certificate', { DATA => $cert_pem2, REVOKED => 1 }, "Import certificate 2 as REVOKED")
-    or diag "ERROR: ".$test->error;
-$test->is($test->get_msg->{PARAMS}->{STATUS}, "REVOKED", "Certificate should be marked as REVOKED");
+lives_and {
+    my $result = $oxitest->api_command("import_certificate" => { DATA => $cert2_pem, REVOKED => 1 });
+    is $result->{STATUS}, "REVOKED";
+} "Import second certificate as REVOKED";
 
-import_failsok($test, $dbdata->cert("gamma_bob_1"), "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER");
-import_ok     ($test, $dbdata->cert("gamma_bob_1"), FORCE_NOCHAIN => 1);
+$oxitest->delete_testcerts;
 
-import_ok     ($test, $dbdata->cert("alpha_root_2"));
-import_ok     ($test, $dbdata->cert("alpha_signer_2"));
-import_ok     ($test, $dbdata->cert("alpha_root_1"));
-import_failsok($test, $dbdata->cert("alpha_signer_1"), "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN");
-import_ok     ($test, $dbdata->cert("alpha_signer_1"), FORCE_ISSUER=>1);
-import_ok     ($test, $dbdata->cert("alpha_alice_1"), FORCE_NOVERIFY=>1);
+import_failsok($oxitest, $dbdata->cert("gamma_bob_1"), qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER/);
+import_ok     ($oxitest, $dbdata->cert("gamma_bob_1"), FORCE_NOCHAIN => 1);
+
+import_ok     ($oxitest, $dbdata->cert("alpha_root_2"));
+import_ok     ($oxitest, $dbdata->cert("alpha_signer_2"));
+import_ok     ($oxitest, $dbdata->cert("alpha_root_1"));
+import_failsok($oxitest, $dbdata->cert("alpha_signer_1"), qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN/);
+import_ok     ($oxitest, $dbdata->cert("alpha_signer_1"), FORCE_ISSUER=>1);
+import_ok     ($oxitest, $dbdata->cert("alpha_alice_1"),  FORCE_NOVERIFY=>1);
 
 # Cleanup database
 $oxitest->delete_testcerts;
-
-$test->disconnect;
