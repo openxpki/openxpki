@@ -28,7 +28,7 @@ cache:
         - $HOME/perl5/lib/perl5
 
 before_cache:
-  - rm -f $HOME/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/OpenXPKI
+  - rm -Rf $HOME/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/OpenXPKI
 
 #
 # OS packages
