@@ -1,4 +1,4 @@
-package OpenXPKI::Test::QA::Role::Workflows::Instance;
+package OpenXPKI::Test::QA::Role::Workflows::InstanceOldApi;
 use Moose;
 use utf8;
 
@@ -11,7 +11,7 @@ use OpenXPKI::Server::Context;
 
 =head1 NAME
 
-OpenXPKI::Test::QA::Role::Workflows::Instance - represents an instance
+OpenXPKI::Test::QA::Role::Workflows::InstanceOldApi - represents an instance
 of a workflow that can be tested
 
 =head1 METHODS
@@ -88,17 +88,17 @@ has last_wf_state => (
 sub BUILD {
     my $self = shift;
 
-    my $data = $self->oxitest->api2_command(
+    my $data = $self->oxitest->api_command(
         create_workflow_instance => {
-            workflow => $self->type,
-            params => $self->params,
+            WORKFLOW => $self->type,
+            PARAMS => $self->params,
         }
     );
-    $self->last_wf_state($data->{workflow}) if $data->{workflow};
+    $self->last_wf_state($data->{WORKFLOW}) if $data->{WORKFLOW};
 
-    my $id = $data->{workflow}->{id} or die explain $data;
+    my $id = $data->{WORKFLOW}->{ID} or die explain $data;
     $self->id($id);
-    note "Created workflow #$id (".$self->type.")";
+    note "Created workflow #$id (".$self->type.") via old API";
 }
 
 =head2 start_activity
@@ -128,14 +128,14 @@ sub start_activity {
 
     my $result;
     lives_ok {
-        $result = $self->oxitest->api2_command(
+        $result = $self->oxitest->api_command(
             execute_workflow_activity => {
-                id => $self->id,
-                activity => $activity,
-                params => $params // {},
+                ID => $self->id,
+                ACTIVITY => $activity,
+                PARAMS => $params // {},
             }
         );
-        $self->last_wf_state($result->{workflow}) if $result->{workflow};
+        $self->last_wf_state($result->{WORKFLOW}) if $result->{WORKFLOW};
     } "Executing workflow activity $activity";
 
     return $result;
@@ -172,11 +172,11 @@ sub execute_fails {
 
     my $result;
     throws_ok {
-        $self->oxitest->api2_command(
+        $self->oxitest->api_command(
             execute_workflow_activity => {
-                id => $self->id,
-                activity => $activity,
-                params => $params // {},
+                ID => $self->id,
+                ACTIVITY => $activity,
+                PARAMS => $params // {},
             }
         );
     } $failure, "Executing workflow activity $activity should fail";
@@ -201,7 +201,7 @@ B<Positional Parameters>
 sub state_is {
     my ($self, $expected_state) = @_;
     if ($self->has_last_wf_state) {
-        is $self->last_wf_state->{state}, $expected_state, "workflow state is '$expected_state'";
+        is $self->last_wf_state->{STATE}, $expected_state, "workflow state is '$expected_state'";
     }
     else {
         fail "workflow state is '$expected_state'";
