@@ -43,15 +43,28 @@ subtype 'AlphaPunct', # named $re_alpha_string in old API
     where { $_ =~ qr{ \A [ \w \- \. : \s ]* \z }xms },
     message { "$_ is not an alphanumeric string plus punctuation chars" };
 
-=head2 PEM
+my $re_base64_string     = qr{ \A [A-Za-z0-9\+/=_\-]* \z }xms;
 
-A PEM encoded certificate (i.e. Base64 encoded string separated by newlines).
+=head2 Base64
+
+A string containing only characters allowed in Base64 and Base64 filename/URL
+safe encoding.
 
 =cut
-subtype 'PEM', # named $re_cert_string in old API (where it also wrongly included the underscore)
+subtype 'Base64', # named $re_base64_string in old API
     as 'Str',
+    where { $_ =~ qr{ \A [ A-Z a-z 0-9 = \+ / \- _ ]+ \z }xms },
+    message { "$_ contains characters not allowed in Base64 encoded strings" };
+
+=head2 PEM
+
+A PEM encoded data (i.e. Base64 encoded string separated by newlines).
+
+=cut
+subtype 'PEM', # named $re_cert_string in old API (where it also wrongly included the underscore).
+    as 'Str',  # "-" is needed for headers like -----BEGIN CERTIFICATE-----
     where { $_ =~ qr{ \A [ A-Z a-z 0-9 \+ / = \- \  \n ]+ \z }xms },
-    message { "$_ contains characters not allow in PEM encoded certificates" };
+    message { "$_ contains characters not allowed in PEM encoded data" };
 
 =head2 ArrayRefOrStr
 
