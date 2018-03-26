@@ -175,10 +175,10 @@ sub set_entry {
 
             # prefix 'p7' for PKCS#7 encryption
 
-            my $safe_id = $self->api->get_token_alias_by_type({ type => 'datasafe' });
+            my $safe_id = $self->api->get_token_alias_by_type(type => 'datasafe');
             $encryption_key_id = 'p7:' . $safe_id;
 
-            my $cert = $self->api->get_certificate_for_alias({ alias => $safe_id });
+            my $cert = $self->api->get_certificate_for_alias(alias => $safe_id);
 
             ##! 16: 'cert: ' . $cert
             if ( !defined $cert ) {
@@ -194,13 +194,11 @@ sub set_entry {
             }
 
             ##! 16: 'asymmetric encryption via passwordsafe ' . $safe_id
-            $value = $token->command(
-                {
-                    COMMAND => 'pkcs7_encrypt',
-                    CERT    => $cert->{DATA},
-                    CONTENT => $value,
-                }
-            );
+            $value = $token->command({
+                COMMAND => 'pkcs7_encrypt',
+                CERT    => $cert->{data},
+                CONTENT => $value,
+            });
         }
     }
 
@@ -296,11 +294,11 @@ sub get_current_encryption_key {
         $associated_vault_key->{KEY_ID} = $associated_vault_key_id;
 
         # save password safe -> key id mapping
-        $self->__set_data_pool_entry( {
-            PKI_REALM => $realm,
-            NAMESPACE => 'sys.datapool.pwsafe',
-            KEY       => 'p7:' . $safe_id,
-            VALUE     => $associated_vault_key_id,
+        $self->set_entry( {
+            pki_realm => $realm,
+            namespace => 'sys.datapool.pwsafe',
+            key       => 'p7:' . $safe_id,
+            value     => $associated_vault_key_id,
         } );
 
         # save this key for future use
