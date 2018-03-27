@@ -409,6 +409,10 @@ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_AUTHENTICATED"
 msgstr "Einfache Benennungsart"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_IN_CURRENT_REALM"
+msgstr "Löschen der Genehmigung(en)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_IN_RENEWAL_WINDOW"
 msgstr "Löschen der Genehmigung(en)"
 

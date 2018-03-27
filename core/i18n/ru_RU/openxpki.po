@@ -411,6 +411,10 @@ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_AUTHENTICATED"
 msgstr "Профиль пользователя общего назначения"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_IN_CURRENT_REALM"
+msgstr "Отменить утверждение заявки на отзыв сертификата (CRR)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_IN_RENEWAL_WINDOW"
 msgstr "Отменить утверждение заявки на отзыв сертификата (CRR)"
 

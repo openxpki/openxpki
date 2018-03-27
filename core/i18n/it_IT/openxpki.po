@@ -393,6 +393,10 @@ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_AUTHENTICATED"
 msgstr "Revoca Certificato"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_IN_CURRENT_REALM"
+msgstr "Errore sconosciuto"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_IN_RENEWAL_WINDOW"
 msgstr "Errore sconosciuto"
 

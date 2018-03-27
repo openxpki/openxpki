@@ -23,6 +23,9 @@ sub execute {
     $context->param('signer_authorized' => 0);
     $context->param('signer_revoked' => 0);
     $context->param('signer_validity_ok' => 0);
+    $context->param('signer_in_current_realm' => 0);
+
+    my $current_realm = CTX('session')->data->pki_realm;
 
     my $signer_cert = $context->param('signer_cert');
 
@@ -70,6 +73,10 @@ sub execute {
             where   => { req_key => $signer_req_key },
         );
         $signer_profile = $csr_hash->{profile} if $csr_hash->{profile};
+
+        if ( $current_realm eq $signer_realm ) {
+            $context->param('signer_in_current_realm' => 1 );
+        }
     }
 
     ##! 32: 'Signer profile ' .$signer_profile
@@ -118,7 +125,6 @@ sub execute {
     my @rules = $config->get_keys( $rules_prefix );
 
     my $matched = 0;
-    my $current_realm = CTX('session')->data->pki_realm;
 
     CTX('log')->application()->debug("Trusted Signer Authorization $signer_profile / $signer_realm / $signer_subject / $signer_identifier");
 
@@ -224,6 +230,10 @@ only exported if export_subject parameter is set
 
 the signer_key_identifier of the signer certificate,
 only exported if export_key_identifier parameter is set
+
+=item signer_in_current_realm
+
+Boolean, weather the signer is an entity in the current realm
 
 =back
 
