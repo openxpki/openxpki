@@ -22,7 +22,6 @@ The config uses plain ini format, a default is deployed by the package::
     realm=ca-one
 
     iprange=0.0.0.0/0
-    profile=I18N_OPENXPKI_PROFILE_TLS_SERVER
     servername=scep-server-1
     encryption_algorithm=3DES
 
@@ -42,11 +41,6 @@ The realm of the ca to be used.
 Implements a simple ip based access control, the clients ip adress is checked
 to be included in the given network. Only a single network definition is
 supported, the default of 0.0.0.0/0 allows all ips to connect.
-
-**profile**
-
-The default profile of the certificate to be requested, note that depending on
-the backing workflow this might be ignored or overridden by other paramters.
 
 **servername**
 

@@ -109,8 +109,6 @@ profile:
 profile_map:
     pc-client: I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION
 
-subject_style: enroll
-
 # HMAC based authentication
 hmac: verysecret
 
