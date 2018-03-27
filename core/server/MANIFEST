@@ -253,11 +253,11 @@ OpenXPKI/Server/API2/EasyPluginRole.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_cert.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_cert_actions.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_chain.pm
-OpenXPKI/Server/API2/Plugin/Cert/get_private_key_for_cert.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_profile_for_cert.pm
 OpenXPKI/Server/API2/Plugin/Cert/import_certificate.pm
 OpenXPKI/Server/API2/Plugin/Cert/import_chain.pm
 OpenXPKI/Server/API2/Plugin/Cert/is_certificate_owner.pm
+OpenXPKI/Server/API2/Plugin/Cert/private_key.pm
 OpenXPKI/Server/API2/Plugin/Cert/search_cert.pm
 OpenXPKI/Server/API2/Plugin/Cert/validate_certificate.pm
 OpenXPKI/Server/API2/Plugin/Control/control_watchdog.pm

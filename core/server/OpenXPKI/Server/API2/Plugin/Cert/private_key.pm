@@ -1,9 +1,9 @@
-package OpenXPKI::Server::API2::Plugin::Cert::get_private_key_for_cert;
+package OpenXPKI::Server::API2::Plugin::Cert::private_key;
 use OpenXPKI::Server::API2::EasyPlugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Cert::get_private_key_for_cert
+OpenXPKI::Server::API2::Plugin::Cert::private_key
 
 =cut
 
@@ -225,6 +225,26 @@ command "get_private_key_for_cert" => {
 
     return $result;
 };
+
+=head2 private_key_exists_for_cert
+
+Checks whether a corresponding CA-generated private key exists for
+the given certificate identifier (named parameter IDENTIFIER).
+Returns true if there is a private key, false otherwise.
+
+=cut
+command "private_key_exists_for_cert" => {
+    identifier => { isa => 'Base64', required => 1, },
+} => sub {
+    my ($self, $params) = @_;
+
+    my $privkey = $self->get_private_key_from_db($params->identifier);
+    return ( defined $privkey );
+};
+
+
+
+=head1 METHODS
 
 =head2 get_private_key_from_db
 
