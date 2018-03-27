@@ -127,7 +127,7 @@ subjectAltName=" . join ",", @san;
 
     my $subject = `openssl  x509 -noout -subject -in $file`;
     $subject =~ s{subject=\s*}{}g;
-    my $pkcs10 = `openssl req -new -nodes $config -subj "$subject" -keyout $keyname | tee $csrname 2>/dev/null`;
+    my $pkcs10 = `openssl req -new -nodes $config -subj "$subject" -keyout $keyname 2>/dev/null | tee $csrname `;
 
     $result = $client->mock_request({
         'action' => 'workflow!index',
