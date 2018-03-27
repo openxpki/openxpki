@@ -295,6 +295,8 @@ OpenXPKI/Server/API2/Plugin/Token/list_active_aliases.pm
 OpenXPKI/Server/API2/Plugin/UI/get_menu.pm
 OpenXPKI/Server/API2/Plugin/UI/get_motd.pm
 OpenXPKI/Server/API2/Plugin/UI/get_ui_system_status.pm
+OpenXPKI/Server/API2/Plugin/UI/get_report.pm
+OpenXPKI/Server/API2/Plugin/UI/get_report_list.pm
 OpenXPKI/Server/API2/Plugin/UI/list_process.pm
 OpenXPKI/Server/API2/Plugin/UI/render_template.pm
 OpenXPKI/Server/API2/Plugin/Workflow/Util.pm

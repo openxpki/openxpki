@@ -101,14 +101,7 @@ subtype 'PEMPKCS7',
 An I<ArrayRef> of L</PEMCertChain> that will also accept a scalar of type
 L</PEMCertChain> (which is automatically wrapped into an I<ArrayRef>).
 
-Note that you must specify C<coerce =E<gt> 1> for this to work, e.g.:
-
-    command "doit" => {
-        types => { isa => 'ArrayRefOrPEMCertChain', coerce => 1, },
-    } => sub {
-        my ($self, $params) = @_;
-        print join(", ", @{ $params->types }), "\n";
-    };
+Please also see L</COERCION>.
 
 =cut
 subtype 'ArrayRefOrPEMCertChain',
@@ -124,14 +117,11 @@ coerce 'ArrayRefOrPEMCertChain',
 An I<ArrayRef> of I<Str> that will also accept a scalar I<Str> (which is
 automatically wrapped into an I<ArrayRef>).
 
-Note that you must specify C<coerce =E<gt> 1> for this to work, e.g.:
+    # this is the same:
+    CTX('api2')->show(animal => "all");
+    CTX('api2')->show(animal => [ "all" ]);
 
-    command "doit" => {
-        types => { isa => 'ArrayRefOrStr', coerce => 1, },
-    } => sub {
-        my ($self, $params) = @_;
-        print join(", ", @{ $params->types }), "\n";
-    };
+Please also see L</COERCION>.
 
 =cut
 subtype 'ArrayRefOrStr',
@@ -140,6 +130,25 @@ subtype 'ArrayRefOrStr',
 coerce 'ArrayRefOrStr',
     from 'Str',
     via { [ $_ ] };
+
+=head2 ArrayRefOrCommaList
+
+An I<ArrayRef> of I<Str> that will also accept a scalar I<Str> with a comma
+separated list of string (which is converted into an I<ArrayRef>).
+
+    # this is the same:
+    CTX('api2')->show(animal => "dog,cat, other");
+    CTX('api2')->show(animal => [ "dog", "cat", "other"]);
+
+Please also see L</COERCION>.
+
+=cut
+subtype 'ArrayRefOrCommaList',
+    as 'ArrayRef[Str]';
+
+coerce 'ArrayRefOrCommaList',
+    from 'Str',
+    via { [ split /\s*,\s*/, $_ ] };
 
 =head2 TokenType
 
@@ -158,5 +167,17 @@ also be I<VALID>.
 
 =cut
 enum 'CertStatus', [qw( ISSUED REVOKED CRL_ISSUANCE_PENDING EXPIRED )];
+
+=head1 COERCION
+
+For some of the types you must also specify C<coerce =E<gt> 1> for the automatic
+type conversions to work, e.g.:
+
+    command "doit" => {
+        types => { isa => 'ArrayRefOrCommaList', coerce => 1, },
+    } => sub {
+        my ($self, $params) = @_;
+        print join(", ", @{ $params->types }), "\n";
+    };
 
 no Moose::Util::TypeConstraints;
