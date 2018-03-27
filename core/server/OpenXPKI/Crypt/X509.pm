@@ -150,7 +150,7 @@ sub get_notafter {
 sub _get_validity {
     my $self = shift;
     my $date = shift;
-    my $format = shift;
+    my $format = shift || '';
 
     if ($format eq 'epoch') {
         return $date;
