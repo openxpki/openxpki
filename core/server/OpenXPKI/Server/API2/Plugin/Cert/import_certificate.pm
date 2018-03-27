@@ -48,7 +48,7 @@ if one of the certificates' CA has expired)
 
 =cut
 command "import_certificate" => {
-    data           => { isa => 'PEM', required => 1, },
+    data           => { isa => 'PEMCert', required => 1, },
     issuer         => { isa => 'AlphaPunct', },
     pki_realm      => { isa => 'AlphaPunct', },
     force_nochain  => { isa => 'Bool', default => 0, },
@@ -267,7 +267,7 @@ sub _is_issuer_valid  {
     #
 
     # validate_certificate
-    my $chain = CTX('API')->get_chain({ START_IDENTIFIER => $issuer_cert->{identifier}, OUTFORMAT => 'PEM' });
+    my $chain = CTX('api')->get_chain({ START_IDENTIFIER => $issuer_cert->{identifier}, OUTFORMAT => 'PEM' });
 
     # verify a complete chain
     if ($chain->{COMPLETE}) {

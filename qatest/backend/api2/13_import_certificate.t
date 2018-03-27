@@ -20,7 +20,7 @@ use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 
 
-plan tests => 12;
+plan tests => 13;
 
 
 =pod
@@ -121,15 +121,24 @@ lives_and {
 
 $oxitest->delete_testcerts;
 
+# unknown issuer
 import_failsok($oxitest, $dbdata->cert("gamma_bob_1"), qr/issuer/i);
+# unknown issuer with forced import
 import_ok     ($oxitest, $dbdata->cert("gamma_bob_1"), force_nochain => 1);
-
+# root certificate
 import_ok     ($oxitest, $dbdata->cert("alpha_root_2"));
+# cert signed by previously imported root certificate
 import_ok     ($oxitest, $dbdata->cert("alpha_signer_2"));
+# expired root certificate
 import_ok     ($oxitest, $dbdata->cert("alpha_root_1"));
+# cert signed with invalid (expired) issuer, i.e. failing chain verification
 import_failsok($oxitest, $dbdata->cert("alpha_signer_1"), qr/chain/i);
+# cert signed by expired issuer with forced acceptance of failed issuer check
 import_ok     ($oxitest, $dbdata->cert("alpha_signer_1"), force_issuer=>1);
+# cert signed by expired issuer with disabled issuer check
 import_ok     ($oxitest, $dbdata->cert("alpha_alice_1"),  force_noverify=>1);
+# known issuer that is not root and triggers chain lookup
+import_ok     ($oxitest, $dbdata->cert("alpha_bob_2"));
 
 # Cleanup database
 $oxitest->delete_testcerts;
