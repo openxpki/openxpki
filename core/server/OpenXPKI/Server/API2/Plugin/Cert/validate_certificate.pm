@@ -50,8 +50,10 @@ B<Parameters>
 
 =over
 
-=item * C<pem> I<Str or ArrayRef> - PEM encoded certificate (I<Str>) or full
-certificate chain (I<ArrayRef>) starting with the entity
+=item * C<pem> I<Str> - PEM encoded certificate (I<Str>)
+
+=item * C<chain> I<ArrayRef> - full certificate chain (list of PEM encoded
+certificates) starting with the entity
 
 =item * C<pkcs7> I<Str> - PEM encoded PKCS7 container
 
