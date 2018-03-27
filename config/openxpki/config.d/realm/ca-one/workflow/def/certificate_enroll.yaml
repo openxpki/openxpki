@@ -66,7 +66,7 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_DESC
         action:
-          - reject_request > FAILURE
+          - reject_request notify_request_rejected global_set_error_rejected > FAILURE
           - accept_request > AUTHORIZED
         output:
           - server
@@ -92,7 +92,7 @@ state:
         action:
           - global_set_error_signer_revoked > FAILURE ? is_requestor_revoked
           - global_set_error_signer_expired > FAILURE ? !is_requestor_revoked !is_requestor_validity_ok
-          - set_renewal_period prepare_renewal > RENEWAL_PREPARED ? !is_requestor_revoked is_requestor_validity_ok
+          - set_renewal_period prepare_renewal load_recent_metadata > RENEWAL_PREPARED ? !is_requestor_revoked is_requestor_validity_ok
 
     RENEWAL_PREPARED:
         autorun: 1
@@ -142,7 +142,7 @@ state:
         action:
           - reevaluate_policy > AUTHORIZED
           - override_policy > START_APPROVAL
-          - reject_request global_set_error_rejected > FAILURE
+          - reject_request notify_request_rejected global_set_error_rejected > FAILURE
         output:
           - error_code
           - check_policy_subject_duplicate
@@ -185,12 +185,12 @@ state:
         autorun: 1
         action:
          - notify_approval_pending global_set_error_not_approved > PENDING ? !is_approved is_manual_approval_allowed
-         - notify_rejected global_set_error_rejected > FAILURE ? !is_approved !is_manual_approval_allowed
+         - notify_request_rejected global_set_error_rejected > FAILURE ? !is_approved !is_manual_approval_allowed
          - global_clear_error_code > APPROVED ? is_approved
 
     PENDING:
         action:
-          - reject_request notify_rejected global_set_error_rejected > FAILURE ? global_is_operator
+          - reject_request notify_request_rejected global_set_error_rejected > FAILURE ? global_is_operator
           - approve_csr calculate_approval_points > RECHECK_APPROVAL ? global_is_operator is_manual_approval_allowed
           - global_clear_error_code > START_APPROVAL ? is_eligibility_recheck_allowed
         output:
@@ -234,7 +234,7 @@ state:
     PREPARED:
         autorun: 1
         action:
-          - global_nice_issue_certificate > REVOKE_CERTS
+          - global_nice_issue_certificate persist_cert_metadata notify_cert_issued > REVOKE_CERTS
 
     REVOKE_CERTS:
         autorun: 1
@@ -355,15 +355,23 @@ action:
     calculate_approval_points:
         class: OpenXPKI::Server::Workflow::Activity::Tools::CalculateApprovalPoints
 
-    notify_approval_pending:
-        class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
-        param:
-            message: enroll_notify_approval_pending
 
     persist_csr:
         class: OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest
         param:
             csr_type: pkcs10
+
+    load_recent_metadata:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::LoadCertificateMetadata
+        param:
+            _map_cert_identifier: $signer_cert_identifier
+            prefix: old_meta
+
+    persist_cert_metadata:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::PersistCertificateMetadata
+        param:
+            _map_cust_id: "[% IF context.url_custid %][% context.url_custid %][% ELSE %][% context.old_meta_system_id %][% END %]"
+            _map_server_id: $server
 
     parse_pkcs10:
         class: OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10
@@ -486,6 +494,30 @@ action:
           attrmap:
               revoke_reason_code: reason_code
               revoke_delay_revocation_time: delay_revocation_time
+
+    notify_approval_pending:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
+        param:
+            message: enroll_approval_pending
+            _map_notify_cc: $url_notifycc
+            _map_notify_to: $url_requester
+            _map_transaction_id: $transaction_id
+
+    notify_cert_issued:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
+        param:
+            _map_notify_cc: $url_notifycc
+            _map_notify_to: $url_requester
+            _map_transaction_id: $transaction_id
+            message: enroll_cert_issued
+
+    notify_request_rejected:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
+        param:
+            _map_notify_cc: $url_notifycc
+            _map_notify_to: $url_requester
+            _map_transaction_id: $transaction_id
+            message: enroll_rejected
 
 condition:
     is_requestor_authorized:
