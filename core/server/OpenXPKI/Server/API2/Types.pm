@@ -66,6 +66,59 @@ subtype 'PEM', # named $re_cert_string in old API (where it also wrongly include
     where { $_ =~ qr{ \A [ A-Z a-z 0-9 \+ / = \- \  \n ]+ \z }xms },
     message { "$_ contains characters not allowed in PEM encoded data" };
 
+=head2 PEMCert
+
+A PEM encoded certificate
+
+=cut
+subtype 'PEMCert',
+    as 'PEM',
+    where { $_ =~ m{ \A -----BEGIN\ CERTIFICATE----- [^-]+ -----END\ CERTIFICATE----- \Z }msx },
+    message { "$_ is not a PEM encoded certificate" };
+
+=head2 PEMCertChain
+
+A PEM encoded certificate chain
+
+=cut
+subtype 'PEMCertChain',
+    as 'PEM',
+    where { $_ =~ m{ \A ( -----BEGIN\ CERTIFICATE----- [^-]+ -----END\ CERTIFICATE----- \s* )+ \Z }msx },
+    message { "$_ is not a PEM encoded certificate chain" };
+
+=head2 PEMCert
+
+A PEM encoded PKCS7 container
+
+=cut
+subtype 'PEMPKCS7',
+    as 'PEM',
+    where { $_ =~ m{ \A -----BEGIN\ PKCS7----- [^-]+ -----END\ PKCS7----- \Z }msx },
+    message { "$_ is not a PEM encoded PKCS7 container" };
+
+=head2 ArrayRefOrPEMCertChain
+
+An I<ArrayRef> of L</PEMCertChain> that will also accept a scalar of type
+L</PEMCertChain> (which is automatically wrapped into an I<ArrayRef>).
+
+Note that you must specify C<coerce =E<gt> 1> for this to work, e.g.:
+
+    command "doit" => {
+        types => { isa => 'ArrayRefOrPEMCertChain', coerce => 1, },
+    } => sub {
+        my ($self, $params) = @_;
+        print join(", ", @{ $params->types }), "\n";
+    };
+
+=cut
+subtype 'ArrayRefOrPEMCertChain',
+    as 'ArrayRef[PEMCertChain]';
+
+coerce 'ArrayRefOrPEMCertChain',
+    from 'PEMCertChain',
+    # /g matches ALL certificates, results are grouped via () and the result list is put into []
+    via { [ $_ =~ m{ ( -----BEGIN\ CERTIFICATE----- [^-]+ -----END\ CERTIFICATE----- ) }gmsx ] };
+
 =head2 ArrayRefOrStr
 
 An I<ArrayRef> of I<Str> that will also accept a scalar I<Str> (which is
