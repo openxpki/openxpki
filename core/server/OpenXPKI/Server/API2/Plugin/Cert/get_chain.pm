@@ -44,6 +44,10 @@ B<Parameters>
 
 B<Changes compared to API v1:>
 
+Parameter C<START_IDENTIFIER> was renamed to C<start_with>.
+
+Parameter C<OUTFORMAT> was renamed to C<format>.
+
 C<format> option I<HASH> was renamed to I<DBINFO> to be consistent with
 L<get_cert|OpenXPKI::Server::API2::Plugin::Cert::get_cert>.
 
@@ -57,10 +61,10 @@ lowercase keys. Additionally the following keys changed:
 
 =cut
 command "get_chain" => {
-    start_identifier => { isa => 'Base64', required => 1, },
-    outformat        => { isa => 'Str', matching => qr{ \A ( PEM | DER | TXT | PKCS7 | DBINFO ) \Z }x, },
-    bundle           => { isa => 'Bool', default=> 0, },
-    keeproot         => { isa => 'Bool', default=> 0, },
+    start_with => { isa => 'Base64', required => 1, },
+    format     => { isa => 'Str', matching => qr{ \A ( PEM | DER | TXT | PKCS7 | DBINFO ) \Z }x, },
+    bundle     => { isa => 'Bool', default=> 0, },
+    keeproot   => { isa => 'Bool', default=> 0, },
 } => sub {
     my ($self, $params) = @_;
 
@@ -74,10 +78,10 @@ command "get_chain" => {
     my $complete = 0;
     my %already_seen; # hash of identifiers that have already been seen
 
-    my $start = $params->start_identifier;
+    my $start = $params->start_with;
     my $current_identifier = $start;
 
-    my $temp_format = $params->bundle ? 'PEM' : $params->outformat;
+    my $temp_format = $params->bundle ? 'PEM' : $params->format;
 
     while (1) {
         ##! 128: '@identifiers: ' . Dumper(\@identifiers)
@@ -138,7 +142,7 @@ command "get_chain" => {
         my $result = $default_token->command({
             COMMAND          => 'convert_cert',
             DATA             => $cert_list,
-            OUT              => (($params->has_outformat and $params->outformat eq 'DER') ? 'DER' : 'PEM'),
+            OUT              => (($params->has_format and $params->format eq 'DER') ? 'DER' : 'PEM'),
             CONTAINER_FORMAT => 'PKCS7',
         });
         return $result;
@@ -148,7 +152,7 @@ command "get_chain" => {
         subject     => $subject_list,
         identifiers => $id_list,
         complete    => $complete,
-        $params->outformat ? (certificates => $cert_list) : (),
+        $params->format ? (certificates => $cert_list) : (),
     };
 };
 
