@@ -9,61 +9,42 @@ use OpenXPKI::Server::Workflow::WFObject::WFArray;
 use OpenXPKI::Debug;
 use English;
 
-my @parameters = qw(
-    array_name
-    condition
-    value
-    error
-);
-
-__PACKAGE__->mk_accessors(@parameters);
-
-sub _init {
-    my ( $self, $params ) = @_;
-
-    # propagate workflow condition parametrisation to our object
-    foreach my $arg (@parameters) {
-        if ( defined $params->{$arg} ) {
-            $self->$arg( $params->{$arg} );
-        }
-    }
-    if ( !( defined $self->array_name() ) ) {
-        configuration_error "Missing parameter 'array_name' in "
-            . "declaration of condition "
-            . $self->name();
-    }
-}
-
 sub _evaluate {
 
     my ( $self, $wf ) = @_;
     my $context = $wf->context();
 
+    my $array_name = $self->param('array_name');
+    my $condition  = $self->param('condition');
+
     my $array = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
         {   workflow    => $wf,
-            context_key => $self->array_name(),
+            context_key => $array_name,
         }
     );
 
-    if ( $self->condition() eq 'is_empty' ) {
+    ##! 32: 'Array ' .$self->name(). ', Condition '. $condition
+    if ( $condition eq 'is_empty' ) {
 
-        CTX('log')->application()->debug("Testing if WFArray ".$self->array_name()." is empty");
+        CTX('log')->application()->debug("Testing if WFArray ".$array_name." is empty");
 
         if ( $array->count() == 0 ) {
             return 1;
         }
-        condition_error ($self->error() || 'I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_NOT_EMPTY');
+        condition_error ($self->param('error') || 'I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_NOT_EMPTY');
     }
-    elsif ( $self->condition() =~ /count_(is|lt|lte|gt|gte)/ ) {
+    elsif ( $condition =~ /count_(is|isnot|lt|lte|gt|gte)\s*$/ ) {
         my $op = $1;
         my $cnt = $array->count();
-        my $val = $self->value() || 0;
+        my $val = $self->param('value') || 0;
 
-        CTX('log')->application()->debug("Testing if WFArray ".$self->array_name()." $op " . $self->value());
+        ##! 32: 'Value: '.$val.', Count: ' . $cnt, ' Op ' . $op
+
+        CTX('log')->application()->debug("Testing if WFArray ".$array_name." $op " . $val);
 
         if ($op eq 'is') {
             return 1 if ($cnt == $val);
-        } elsif ($op eq 'is') {
+        } elsif ($op eq 'isnot') {
             return 1 if ($cnt != $val);
         } elsif ($op eq 'lt') {
             return 1 if ($cnt < $val);
@@ -74,14 +55,18 @@ sub _evaluate {
         } elsif ($op eq 'gte') {
             return 1 if ($cnt >= $val);
         }
-        condition_error ($self->error() || 'I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_INVALID_ITEM_COUNT');
+        ##! 16: 'Condition failed'
+        condition_error ($self->param('error') || 'I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_INVALID_ITEM_COUNT');
 
     }
     else {
+
+        CTX('log')->application()->error('Invalid configuration for Condition::WFArray: ' . $condition . ' on ' . $array_name);
+
         configuration_error "Invalid condition "
-            . $self->condition() . " in "
+            . $condition . " in "
             . "declaration of condition "
-            . $self->name();
+            . $array_name;
     }
 }
 
