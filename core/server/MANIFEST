@@ -132,7 +132,7 @@ OpenXPKI/Crypto/Tool/LibSCEP/Command/create_error_reply.pm
 OpenXPKI/Crypto/Tool/LibSCEP/Command/create_nextca_reply.pm
 OpenXPKI/Crypto/Tool/LibSCEP/Command/create_pending_reply.pm
 OpenXPKI/Crypto/Tool/LibSCEP/Command/get_getcert_serial.pm
-OpenXPKI/Crypto/Tool/LibSCEP/Command/get_getcrl_issuer_serial.pm
+OpenXPKI/Crypto/Tool/LibSCEP/Command/get_issuer.pm
 OpenXPKI/Crypto/Tool/LibSCEP/Command/get_message_type.pm
 OpenXPKI/Crypto/Tool/LibSCEP/Command/get_pkcs10.pm
 OpenXPKI/Crypto/Tool/LibSCEP/Command/get_signer_cert.pm
