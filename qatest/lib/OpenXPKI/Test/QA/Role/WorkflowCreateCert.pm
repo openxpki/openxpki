@@ -3,7 +3,7 @@ use Moose::Role;
 
 =head1 NAME
 
-OpenXPKI::Test::QA::Role::Workflows - Moose role that extends L<OpenXPKI::Test>
+OpenXPKI::Test::QA::Role::WorkflowCreateCert - Moose role that extends L<OpenXPKI::Test>
 with a quick way to create certificates
 
 =head1 DESCRIPTION
@@ -106,9 +106,8 @@ sub create_cert {
                     cert_subject_style => "00_basic_style",
                 }
             );
-
+            $wftest->state_is('SETUP_REQUEST_TYPE');
             $wftest->start_activity(
-                'SETUP_REQUEST_TYPE',
                 csr_provide_server_key_params => {
                     key_alg => "rsa",
                     enc_alg => 'aes256',
@@ -118,29 +117,28 @@ sub create_cert {
                 },
             );
 
+            $wftest->state_is('ENTER_KEY_PASSWORD');
             $wftest->start_activity(
-                'ENTER_KEY_PASSWORD',
                 csr_ask_client_password => { _password => "m4#bDf7m3abd" },
             );
-
+            $wftest->state_is('ENTER_SUBJECT');
             $wftest->start_activity(
-                'ENTER_SUBJECT',
                 csr_edit_subject => {
                     cert_subject_parts => $serializer->serialize( \%cert_subject_parts ),
                 },
             );
 
             if ($is_server_profile) {
+                $wftest->state_is('ENTER_SAN');
                 $wftest->start_activity(
-                    'ENTER_SAN',
                     csr_edit_san => {
                         cert_san_parts => $serializer->serialize( { } ),
                     },
                 );
             }
 
+            $wftest->state_is('ENTER_CERT_INFO');
             $wftest->start_activity(
-                'ENTER_CERT_INFO',
                 'csr_edit_cert_info' => {
                     cert_info => $serializer->serialize( {
                         requestor_gname => $params->requestor_gname,
@@ -163,7 +161,6 @@ sub create_cert {
             if (grep { /^csr_enter_policy_violation_comment$/ } @$actions) {
                 diag "Test FQDNs do not resolve - handling policy violation" if $ENV{TEST_VERBOSE};
                 $wftest->start_activity(
-                    undef,
                     csr_enter_policy_violation_comment => { policy_comment => 'This is just a test' },
                 );
                 $intermediate_state = 'PENDING_POLICY_VIOLATION';
@@ -171,7 +168,6 @@ sub create_cert {
             else {
                 diag "For whatever reason test FQDNs do resolve - submitting request" if $ENV{TEST_VERBOSE};
                 $wftest->start_activity(
-                    undef,
                     csr_submit => {},
                 );
                 $intermediate_state = 'PENDING';
@@ -185,8 +181,8 @@ sub create_cert {
     #            $test->state_is( ??? );
     #        }
 
+            $wftest->state_is($intermediate_state);
             $wftest->start_activity(
-                $intermediate_state,
                 csr_approve_csr => {},
             );
             $wftest->state_is('SUCCESS') or BAIL_OUT;

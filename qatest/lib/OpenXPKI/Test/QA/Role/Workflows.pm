@@ -17,6 +17,7 @@ use OpenXPKI::Server::Context;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Test::QA::Role::Workflows::CertParams;
 use OpenXPKI::Test::QA::Role::Workflows::Instance;
+use OpenXPKI::Test::QA::Role::Workflows::InstanceOldApi;
 
 
 requires 'also_init';
@@ -48,17 +49,28 @@ B<Positional Parameters>
 
 =item * C<$params> I<HashRef> - workflow parameters. Optional.
 
+=item * C<$old_api> I<Bool> - set to 1 to use old API for workflow management
+
 =back
 
 =cut
 sub create_workflow {
-    my ($self, $type, $params) = @_;
+    my ($self, $type, $params, $old_api) = @_;
 
-    return OpenXPKI::Test::QA::Role::Workflows::Instance->new(
-        oxitest => $self,
-        type => $type,
-        $params ? (params => $params) : (),
-    );
+    if ($old_api) {
+        return OpenXPKI::Test::QA::Role::Workflows::InstanceOldApi->new(
+            oxitest => $self,
+            type => $type,
+            $params ? (params => $params) : (),
+        );
+    }
+    else {
+        return OpenXPKI::Test::QA::Role::Workflows::Instance->new(
+            oxitest => $self,
+            type => $type,
+            $params ? (params => $params) : (),
+        );
+    }
 }
 
 1;

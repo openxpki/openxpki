@@ -20,7 +20,7 @@ use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 
 
-plan tests => 12;
+plan tests => 13;
 
 
 =pod
@@ -42,12 +42,12 @@ sub import_ok {
     my ($oxitest, $test_cert, %args) = @_;
     lives_and {
         # run import
-        my $result = $oxitest->api_command("import_certificate" => {
-            DATA => $test_cert->data,
+        my $result = $oxitest->api2_command("import_certificate" => {
+            data => $test_cert->data,
             %args
         });
         # test result
-        is $result->{SUBJECT_KEY_IDENTIFIER}, $test_cert->subject_key_id;
+        is $result->{subject_key_identifier}, $test_cert->subject_key_id;
     } sprintf('Import "%s"%s', $test_cert->label, scalar(%args) ? " with ".join(", ", map { $_." = ".$args{$_} } sort keys %args) : "");
 }
 
@@ -73,8 +73,8 @@ sub import_failsok {
     my ($oxitest, $test_cert, $error, %args) = @_;
     throws_ok {
         # run import
-        $oxitest->api_command("import_certificate" => {
-            DATA => $test_cert->data,
+        $oxitest->api2_command("import_certificate" => {
+            data => $test_cert->data,
             %args
         });
     } $error, sprintf('Import "%s"%s: should fail', $test_cert->label, scalar(%args) ? " with ".join(", ", map { $_." = ".$args{$_} } sort keys %args) : "")
@@ -97,39 +97,48 @@ my $cert2_pem = $dbdata->cert("alpha_signer_2")->data;
 
 # Import certificate
 lives_and {
-    my $result = $oxitest->api_command("import_certificate" => { DATA => $cert1_pem });
-    is $result->{IDENTIFIER}, $result->{ISSUER_IDENTIFIER};
+    my $result = $oxitest->api2_command("import_certificate" => { data => $cert1_pem });
+    is $result->{identifier}, $result->{issuer_identifier};
 } "Import and recognize self signed root certificate";
 
 # Second import should fail
 throws_ok {
-    $oxitest->api_command("import_certificate" => { DATA => $cert1_pem });
-} qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_CERTIFICATE_ALREADY_EXISTS/,
+    $oxitest->api2_command("import_certificate" => { data => $cert1_pem });
+} qr/already exists/i,
     "Fail importing same certificate twice";
 
 # ...except if we want to update
 lives_and {
-    my $result = $oxitest->api_command("import_certificate" => { DATA => $cert1_pem, UPDATE => 1 });
-    is $result->{IDENTIFIER}, $result->{ISSUER_IDENTIFIER};
+    my $result = $oxitest->api2_command("import_certificate" => { data => $cert1_pem, update => 1 });
+    is $result->{identifier}, $result->{issuer_identifier};
 } "Import same certificate with UPDATE = 1";
 
 # Import second certificate as "REVOKED"
 lives_and {
-    my $result = $oxitest->api_command("import_certificate" => { DATA => $cert2_pem, REVOKED => 1 });
-    is $result->{STATUS}, "REVOKED";
+    my $result = $oxitest->api2_command("import_certificate" => { data => $cert2_pem, revoked => 1 });
+    is $result->{status}, "REVOKED";
 } "Import second certificate as REVOKED";
 
 $oxitest->delete_testcerts;
 
-import_failsok($oxitest, $dbdata->cert("gamma_bob_1"), qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER/);
-import_ok     ($oxitest, $dbdata->cert("gamma_bob_1"), FORCE_NOCHAIN => 1);
-
+# unknown issuer
+import_failsok($oxitest, $dbdata->cert("gamma_bob_1"), qr/issuer/i);
+# unknown issuer with forced import
+import_ok     ($oxitest, $dbdata->cert("gamma_bob_1"), force_nochain => 1);
+# root certificate
 import_ok     ($oxitest, $dbdata->cert("alpha_root_2"));
+# cert signed by previously imported root certificate
 import_ok     ($oxitest, $dbdata->cert("alpha_signer_2"));
+# expired root certificate
 import_ok     ($oxitest, $dbdata->cert("alpha_root_1"));
-import_failsok($oxitest, $dbdata->cert("alpha_signer_1"), qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN/);
-import_ok     ($oxitest, $dbdata->cert("alpha_signer_1"), FORCE_ISSUER=>1);
-import_ok     ($oxitest, $dbdata->cert("alpha_alice_1"),  FORCE_NOVERIFY=>1);
+# cert signed with invalid (expired) issuer, i.e. failing chain verification
+import_failsok($oxitest, $dbdata->cert("alpha_signer_1"), qr/chain/i);
+# cert signed by expired issuer with forced acceptance of failed issuer check
+import_ok     ($oxitest, $dbdata->cert("alpha_signer_1"), force_issuer=>1);
+# cert signed by expired issuer with disabled issuer check
+import_ok     ($oxitest, $dbdata->cert("alpha_alice_1"),  force_noverify=>1);
+# known issuer that is not root and triggers chain lookup
+import_ok     ($oxitest, $dbdata->cert("alpha_bob_2"));
 
 # Cleanup database
 $oxitest->delete_testcerts;

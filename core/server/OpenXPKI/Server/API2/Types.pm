@@ -43,29 +43,85 @@ subtype 'AlphaPunct', # named $re_alpha_string in old API
     where { $_ =~ qr{ \A [ \w \- \. : \s ]* \z }xms },
     message { "$_ is not an alphanumeric string plus punctuation chars" };
 
-=head2 PEM
+my $re_base64_string     = qr{ \A [A-Za-z0-9\+/=_\-]* \z }xms;
 
-A PEM encoded certificate (i.e. Base64 encoded string separated by newlines).
+=head2 Base64
+
+A string containing only characters allowed in Base64 and Base64 filename/URL
+safe encoding.
 
 =cut
-subtype 'PEM', # named $re_cert_string in old API (where it also wrongly included the underscore)
+subtype 'Base64', # named $re_base64_string in old API
     as 'Str',
+    where { $_ =~ qr{ \A [ A-Z a-z 0-9 = \+ / \- _ ]+ \z }xms },
+    message { "$_ contains characters not allowed in Base64 encoded strings" };
+
+=head2 PEM
+
+A PEM encoded data (i.e. Base64 encoded string separated by newlines).
+
+=cut
+subtype 'PEM', # named $re_cert_string in old API (where it also wrongly included the underscore).
+    as 'Str',  # "-" is needed for headers like -----BEGIN CERTIFICATE-----
     where { $_ =~ qr{ \A [ A-Z a-z 0-9 \+ / = \- \  \n ]+ \z }xms },
-    message { "$_ contains characters not allow in PEM encoded certificates" };
+    message { "$_ contains characters not allowed in PEM encoded data" };
+
+=head2 PEMCert
+
+A PEM encoded certificate
+
+=cut
+subtype 'PEMCert',
+    as 'PEM',
+    where { $_ =~ m{ \A -----BEGIN\ CERTIFICATE----- [^-]+ -----END\ CERTIFICATE----- \Z }msx },
+    message { "$_ is not a PEM encoded certificate" };
+
+=head2 PEMCertChain
+
+A PEM encoded certificate chain
+
+=cut
+subtype 'PEMCertChain',
+    as 'PEM',
+    where { $_ =~ m{ \A ( -----BEGIN\ CERTIFICATE----- [^-]+ -----END\ CERTIFICATE----- \s* )+ \Z }msx },
+    message { "$_ is not a PEM encoded certificate chain" };
+
+=head2 PEMCert
+
+A PEM encoded PKCS7 container
+
+=cut
+subtype 'PEMPKCS7',
+    as 'PEM',
+    where { $_ =~ m{ \A -----BEGIN\ PKCS7----- [^-]+ -----END\ PKCS7----- \Z }msx },
+    message { "$_ is not a PEM encoded PKCS7 container" };
+
+=head2 ArrayRefOrPEMCertChain
+
+An I<ArrayRef> of L</PEMCertChain> that will also accept a scalar of type
+L</PEMCertChain> (which is automatically wrapped into an I<ArrayRef>).
+
+Please also see L</COERCION>.
+
+=cut
+subtype 'ArrayRefOrPEMCertChain',
+    as 'ArrayRef[PEMCertChain]';
+
+coerce 'ArrayRefOrPEMCertChain',
+    from 'PEMCertChain',
+    # /g matches ALL certificates, results are grouped via () and the result list is put into []
+    via { [ $_ =~ m{ ( -----BEGIN\ CERTIFICATE----- [^-]+ -----END\ CERTIFICATE----- ) }gmsx ] };
 
 =head2 ArrayRefOrStr
 
 An I<ArrayRef> of I<Str> that will also accept a scalar I<Str> (which is
 automatically wrapped into an I<ArrayRef>).
 
-Note that you must specify C<coerce =E<gt> 1> for this to work, e.g.:
+    # this is the same:
+    CTX('api2')->show(animal => "all");
+    CTX('api2')->show(animal => [ "all" ]);
 
-    command "doit" => {
-        types => { isa => 'ArrayRefOrStr', coerce => 1, },
-    } => sub {
-        my ($self, $params) = @_;
-        print join(", ", @{ $params->types }), "\n";
-    };
+Please also see L</COERCION>.
 
 =cut
 subtype 'ArrayRefOrStr',
@@ -74,6 +130,25 @@ subtype 'ArrayRefOrStr',
 coerce 'ArrayRefOrStr',
     from 'Str',
     via { [ $_ ] };
+
+=head2 ArrayRefOrCommaList
+
+An I<ArrayRef> of I<Str> that will also accept a scalar I<Str> with a comma
+separated list of string (which is converted into an I<ArrayRef>).
+
+    # this is the same:
+    CTX('api2')->show(animal => "dog,cat, other");
+    CTX('api2')->show(animal => [ "dog", "cat", "other"]);
+
+Please also see L</COERCION>.
+
+=cut
+subtype 'ArrayRefOrCommaList',
+    as 'ArrayRef[Str]';
+
+coerce 'ArrayRefOrCommaList',
+    from 'Str',
+    via { [ split /\s*,\s*/, $_ ] };
 
 =head2 TokenType
 
@@ -92,5 +167,17 @@ also be I<VALID>.
 
 =cut
 enum 'CertStatus', [qw( ISSUED REVOKED CRL_ISSUANCE_PENDING EXPIRED )];
+
+=head1 COERCION
+
+For some of the types you must also specify C<coerce =E<gt> 1> for the automatic
+type conversions to work, e.g.:
+
+    command "doit" => {
+        types => { isa => 'ArrayRefOrCommaList', coerce => 1, },
+    } => sub {
+        my ($self, $params) = @_;
+        print join(", ", @{ $params->types }), "\n";
+    };
 
 no Moose::Util::TypeConstraints;

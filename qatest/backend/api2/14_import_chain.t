@@ -24,6 +24,7 @@ plan tests => 7;
 #
 my $oxitest = OpenXPKI::Test->new(
     with => [qw( TestRealms CryptoLayer )],
+#    log_level => 'debug',
 );
 my $dbdata = $oxitest->certhelper_database;
 
@@ -43,24 +44,24 @@ my $all_ids =  [ map { $dbdata->cert($_)->subject_key_id  }   @alpha_list, @beta
 
 # Array import: chain with unknown root cert (should fail)
 lives_and {
-    my $result = $oxitest->api_command("import_chain" => { DATA => $alpha_pem });
-    is $result->{failed}->[0]->{error}, "I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER";
+    my $result = $oxitest->api2_command("import_chain" => { chain => $alpha_pem });
+    like $result->{failed}->[0]->{error}, qr/issuer/;
 } "Array import: chain with root cert should fail (unknown issuer)";
 
 # Array import: chain with root cert (IMPORT_ROOT = 1)
 lives_and {
-    my $result = $oxitest->api_command("import_chain" => { DATA => $alpha_pem, IMPORT_ROOT => 1 });
-    cmp_bag $result->{imported}, [
-        map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } @$alpha_ids
-    ];
+    my $result = $oxitest->api2_command("import_chain" => { chain => $alpha_pem, import_root => 1 });
+    cmp_deeply $result->{imported}, bag(
+        map { superhashof({ subject_key_identifier => $_ }) } @$alpha_ids
+    );
 } "Array import: chain with root cert and IMPORT_ROOT = 1";
 
 # Array import: Same chain again (should recognize existing certs)
 lives_and {
-    my $result = $oxitest->api_command("import_chain" => { DATA => $alpha_pem, IMPORT_ROOT => 1 });
-    cmp_bag $result->{existed}, [
-        map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } @$alpha_ids
-    ];
+    my $result = $oxitest->api2_command("import_chain" => { chain => $alpha_pem, import_root => 1 });
+    cmp_deeply $result->{existed}, bag(
+        map { superhashof({ subject_key_identifier => $_ }) } @$alpha_ids
+    );
 } "Array import: same chain again should fail";
 
 
@@ -69,10 +70,10 @@ $oxitest->delete_testcerts;
 # Array import: partly existing chain
 $oxitest->insert_testcerts(only => [ "beta_root_1" ]);
 lives_and {
-    my $result = $oxitest->api_command("import_chain" => { DATA => $beta_pem, IMPORT_ROOT => 1 });
+    my $result = $oxitest->api2_command("import_chain" => { chain => $beta_pem, import_root => 1 });
     cmp_deeply $result, superhashof({
-        existed =>  bag( map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } $dbdata->cert("beta_root_1")->subject_key_id),
-        imported => bag( map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } ($dbdata->cert("beta_signer_1")->subject_key_id, $dbdata->cert("beta_alice_1")->subject_key_id) ),
+        existed =>  bag( map { superhashof({ subject_key_identifier => $_ }) } $dbdata->cert("beta_root_1")->subject_key_id),
+        imported => bag( map { superhashof({ subject_key_identifier => $_ }) } ($dbdata->cert("beta_signer_1")->subject_key_id, $dbdata->cert("beta_alice_1")->subject_key_id) ),
     });
 } "Array import: chain whose root cert is already in PKI";
 
@@ -80,9 +81,9 @@ $oxitest->delete_testcerts;
 
 # Array import: two chains
 lives_and {
-    my $result = $oxitest->api_command("import_chain" => { DATA => $all_pem, IMPORT_ROOT => 1 });
+    my $result = $oxitest->api2_command("import_chain" => { chain => $all_pem, import_root => 1 });
     cmp_deeply $result->{imported}, bag(
-        map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } @$all_ids
+        map { superhashof({ subject_key_identifier => $_ }) } @$all_ids
     );
 } "Array import: two chains";
 
@@ -90,20 +91,20 @@ $oxitest->delete_testcerts;
 
 # PEM block import: Chain with root cert (IMPORT_ROOT = 1)
 lives_and {
-    my $result = $oxitest->api_command("import_chain" => { DATA => $alpha_pem_string, IMPORT_ROOT => 1 });
-    cmp_bag $result->{imported}, [
-        map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } @$alpha_ids
-    ];
+    my $result = $oxitest->api2_command("import_chain" => { chain => $alpha_pem_string, import_root => 1 });
+    cmp_deeply $result->{imported}, bag(
+        map { superhashof({ subject_key_identifier => $_ }) } @$alpha_ids
+    );
 } "String import: chain with root cert and IMPORT_ROOT = 1";
 
 $oxitest->delete_testcerts;
 
 # PKCS7 import
 lives_and {
-    my $result = $oxitest->api_command("import_chain" => { DATA => $dbdata->pkcs7->{'beta-alice-1'}, IMPORT_ROOT => 1 });
-    cmp_bag $result->{imported}, [
-        map { superhashof({ SUBJECT_KEY_IDENTIFIER => $_ }) } @$beta_ids
-    ];
+    my $result = $oxitest->api2_command("import_chain" => { pkcs7 => $dbdata->pkcs7->{'beta-alice-1'}, import_root => 1 });
+    cmp_deeply $result->{imported}, bag(
+        map { superhashof({ subject_key_identifier => $_ }) } @$beta_ids
+    );
 } "PKCS7 import: chain with root cert (IMPORT_ROOT = 1)";
 
 $oxitest->delete_testcerts;

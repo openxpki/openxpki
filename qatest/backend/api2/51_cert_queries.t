@@ -39,15 +39,15 @@ my $cert_id = $cert->{identifier};
 # Tests
 #
 
-# Fetch certificate profile
+# certificate profile
 lives_and {
-    my $result = $oxitest->api_command('get_profile_for_cert' => { IDENTIFIER => $cert_id });
+    my $result = $oxitest->api2_command('get_profile_for_cert' => { identifier => $cert_id });
     is $result, "I18N_OPENXPKI_PROFILE_TLS_SERVER";
 } "query certificate profile";
 
-## Fetch possible certificate actions
+# possible certificate actions
 lives_and {
-    my $result = $oxitest->api_command('get_cert_actions' => { IDENTIFIER => $cert_id, ROLE => "User" });
+    my $result = $oxitest->api2_command('get_cert_actions' => { identifier => $cert_id, role => "User" });
     cmp_deeply $result, superhashof({
         # actions are defined in config/openxpki/config.d/realm/ca-one/uicontrol/_default.yaml,
         # they must exist and "User" must be defined in their "acl" section as creator
@@ -68,9 +68,9 @@ lives_and {
 # the workflow automatically sets this to the workflow creator, which in our
 # case is "raop" (see session user in OpenXPKI::Test::QA::Role::WorkflowCreateCert->create_cert)
 lives_and {
-    is $oxitest->api_command('is_certificate_owner' => { IDENTIFIER => $cert_id, USER => "raop" }), 1;
+    is $oxitest->api2_command('is_certificate_owner' => { identifier => $cert_id, user => "raop" }), 1;
 } "confirm correct certificate owner";
 
 lives_and {
-    isnt $oxitest->api_command('is_certificate_owner' => { IDENTIFIER => $cert_id, USER => "nerd" }), 1;
+    isnt $oxitest->api2_command('is_certificate_owner' => { identifier => $cert_id, user => "nerd" }), 1;
 } "negate wrong certificate owner";

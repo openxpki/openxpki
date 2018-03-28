@@ -41,7 +41,7 @@ my $cert_id = $cert_info->{identifier};
 my ($serial, $serial_f);
 
 lives_and {
-    my $result = $oxitest->api_command("get_cert" => { IDENTIFIER => $cert_id, FORMAT => 'HASH' });
+    my $result = $oxitest->api2_command("get_cert" => { identifier => $cert_id, format => 'HASH' });
     cmp_deeply($result, superhashof({
         'BODY' => superhashof({
             'ALIAS'               => ignore(),              # might be undef
@@ -91,7 +91,7 @@ lives_and {
 my ($tmp, $tmp_name) = tempfile(UNLINK => 1);
 my $pem;
 lives_and {
-    $pem = $oxitest->api_command("get_cert" => { IDENTIFIER => $cert_id, FORMAT => 'PEM' });
+    $pem = $oxitest->api2_command("get_cert" => { identifier => $cert_id, format => 'PEM' });
     print $tmp $pem;
     close $tmp;
     my $cmp_serial = `OPENSSL_CONF=/dev/null openssl x509 -in $tmp_name -inform PEM -serial`;
@@ -101,7 +101,7 @@ lives_and {
 # Fetch certificate - DER Format
 ($tmp, $tmp_name) = tempfile(UNLINK => 1);
 lives_and {
-    my $result = $oxitest->api_command("get_cert" => { IDENTIFIER => $cert_id, FORMAT => 'DER' });
+    my $result = $oxitest->api2_command("get_cert" => { identifier => $cert_id, format => 'DER' });
     print $tmp $result;
     close $tmp;
     my $cmp_serial = `OPENSSL_CONF=/dev/null openssl x509 -in $tmp_name -inform DER -serial`;
@@ -118,7 +118,7 @@ TODO: {
     local $TODO = "TXT does not work (issue #185)";
 
     lives_and {
-        my $result = $oxitest->api_command("get_cert" => { IDENTIFIER => $cert_id, FORMAT => 'TXT' });
+        my $result = $oxitest->api2_command("get_cert" => { identifier => $cert_id, format => 'TXT' });
         like $result, qr/$serial_f/i;
     } "Fetch certificate (TXT)";
 }
@@ -126,10 +126,10 @@ TODO: {
 # Fetch certificate - DBINFO Format
 my $dbinfo_serial;
 lives_and {
-    my $result = $oxitest->api_command("get_cert" => { IDENTIFIER => $cert_id, FORMAT => 'DBINFO' });
-    cmp_deeply($result, superhashof({
-        'AUTHORITY_KEY_IDENTIFIER'  => re(qr/^([[:alnum:]]{2}:)+[[:alnum:]]{2}$/), # '9A:1D:9E:0A:03:95:91:26:5C:42:5F:90:0C:2E:02:C1:6B:29:14:5C',
-        'CERT_ATTRIBUTES' => {
+    my $result = $oxitest->api2_command("get_cert" => { identifier => $cert_id, format => 'DBINFO' });
+    cmp_deeply $result, superhashof({
+        'authority_key_identifier'  => re(qr/^([[:alnum:]]{2}:)+[[:alnum:]]{2}$/), # '9A:1D:9E:0A:03:95:91:26:5C:42:5F:90:0C:2E:02:C1:6B:29:14:5C',
+        'cert_attributes' => {
             'meta_email'            => [ re(qr/^.+$/) ],        # [ 'andreas.anders@mycompany.local' ],
             'meta_entity'           => [ re(qr/^.+$/) ],        # [ 'nicetest-63a0ee.openxpki.test' ]
             'meta_requestor'        => [ re(qr/^.+$/) ],        # [ 'Andreas Anders' ],
@@ -137,21 +137,21 @@ lives_and {
             'system_cert_owner'     => [ re(qr/^\w+$/) ],       # [ 'user' ],
             'system_workflow_csr'   => [ re(qr/\d+$/) ],        # [ '129279' ],
         },
-        'CERTIFICATE_SERIAL'        => re(qr/\d+$/),            # '727900818024539824542719',
-        'CERTIFICATE_SERIAL_HEX'    => re(qr/^[a-f0-9]+$/i),    # '9a239519017fd5bb53ff',
-        'CSR_SERIAL'                => re(qr/\d+$/),            # '39679',
-        'IDENTIFIER'                => re(qr/^.+$/),            # 'oLhPSQTJAkc7KmtKW1fA9Te6aVk'
-        'ISSUER_DN'                 => re(qr/^.+$/),            # 'CN=CA ONE,OU=Test CA,DC=OpenXPKI,DC=ORG',
-        'ISSUER_IDENTIFIER'         => re(qr/^.+$/),            # 'k1izCpwZwEu6jFJZbwul-fVoQFY',
-        'NOTAFTER'                  => re(qr/\d+$/),            # '1496094413',
-        'NOTBEFORE'                 => re(qr/\d+$/),            # '1480456013',
-        'PKI_REALM'                 => re(qr/^.+$/),            # 'ca-one',
-        'PUBKEY'                    => re(qr/^.+$/m),           # multiline
-        'STATUS'                    => re(qr/^\w+$/),           # 'ISSUED',
-        'SUBJECT'                   => re(qr/^.+$/),            # 'CN=nicetest-63a0ee.openxpki.test:8080,DC=Test Deployment,DC=OpenXPKI,DC=org',
-        'SUBJECT_KEY_IDENTIFIER'    => re(qr/^.+$/),            # 'BD:B1:9B:63:70:40:A3:3D:48:2C:0C:7A:0D:33:90:2E:C0:D2:23:89',
-    }), "DBINFO contains relevant elements");
-    $dbinfo_serial = uc($result->{CERTIFICATE_SERIAL_HEX});
+        'cert_key'                  => re(qr/\d+$/),            # '727900818024539824542719',
+        'cert_key_hex'              => re(qr/^[a-f0-9]+$/i),    # '9a239519017fd5bb53ff',
+        'req_key'                   => re(qr/\d+$/),            # '39679',
+        'identifier'                => re(qr/^.+$/),            # 'oLhPSQTJAkc7KmtKW1fA9Te6aVk'
+        'issuer_dn'                 => re(qr/^.+$/),            # 'CN=CA ONE,OU=Test CA,DC=OpenXPKI,DC=ORG',
+        'issuer_identifier'         => re(qr/^.+$/),            # 'k1izCpwZwEu6jFJZbwul-fVoQFY',
+        'notafter'                  => re(qr/\d+$/),            # '1496094413',
+        'notbefore'                 => re(qr/\d+$/),            # '1480456013',
+        'pki_realm'                 => re(qr/^.+$/),            # 'ca-one',
+        'public_key'                => re(qr/^.+$/m),           # multiline
+        'status'                    => re(qr/^\w+$/),           # 'ISSUED',
+        'subject'                   => re(qr/^.+$/),            # 'CN=nicetest-63a0ee.openxpki.test:8080,DC=Test Deployment,DC=OpenXPKI,DC=org',
+        'subject_key_identifier'    => re(qr/^.+$/),            # 'BD:B1:9B:63:70:40:A3:3D:48:2C:0C:7A:0D:33:90:2E:C0:D2:23:89',
+    }), "DBINFO contains relevant elements";
+    $dbinfo_serial = uc($result->{cert_key_hex});
     $dbinfo_serial = "0$dbinfo_serial" if length($dbinfo_serial) % 2 == 1; # prepend 0 if uneven amount of hex digits
     is $dbinfo_serial, $serial;
 } "Fetch certificate (DBINFO)";

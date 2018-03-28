@@ -35,6 +35,7 @@ my $r1_base = {
     mime_type => 'text/plain',
     created => $now,
 };
+my $r1_base_data = [ map { $r1_base->{$_} } qw(report_name created description mime_type) ];
 my $r1 =  {
     %{$r1_base},
     pki_realm => 'ca-one',
@@ -46,6 +47,7 @@ my $r2_base = {
     mime_type => 'text/plain',
     created => $now+1,
 };
+my $r2_base_data = [ map { $r2_base->{$_} } qw(report_name created description mime_type) ];
 my $r2 = {
     %{$r2_base},
     pki_realm => 'ca-one',
@@ -65,17 +67,17 @@ $dbi->commit;
 # get_report_list
 
 lives_and {
-    my $result = $oxitest->api_command("get_report_list" => { NAME => $now.'_%' });
-    cmp_deeply $result, [ $r2_base, $r1_base ];
+    my $result = $oxitest->api2_command("get_report_list" => { name => $now.'_%' });
+    cmp_deeply $result, [ $r2_base_data, $r1_base_data ];
 } "List reports by NAME";
 
 lives_and {
-    my $result = $oxitest->api_command("get_report_list" => { MAXAGE => $now+1 });
-    cmp_deeply $result, [ $r2_base ];
+    my $result = $oxitest->api2_command("get_report_list" => { maxage => $now+1 });
+    cmp_deeply $result, [ $r2_base_data ];
 } "List reports by MAXAGE";
 
 lives_and {
-    my $result = $oxitest->api_command("get_report_list" => { NAME => $now.'_%', COLUMNS => 'report_name, mime_type' });
+    my $result = $oxitest->api2_command("get_report_list" => { name => $now.'_%', columns => 'report_name, mime_type' });
     cmp_deeply $result, [
         [ $r2_base->{report_name}, $r2_base->{mime_type} ],
         [ $r1_base->{report_name}, $r1_base->{mime_type} ],
@@ -83,7 +85,7 @@ lives_and {
 } "List reports and filter columns (string filter)";
 
 lives_and {
-    my $result = $oxitest->api_command("get_report_list" => { NAME => $now.'_%', COLUMNS => [ 'report_name', 'mime_type' ] });
+    my $result = $oxitest->api2_command("get_report_list" => { name => $now.'_%', columns => [ 'report_name', 'mime_type' ] });
     cmp_deeply $result, [
         [ $r2_base->{report_name}, $r2_base->{mime_type} ],
         [ $r1_base->{report_name}, $r1_base->{mime_type} ],
@@ -94,17 +96,17 @@ lives_and {
 # get_report
 
 lives_and {
-    my $result = $oxitest->api_command("get_report" => { NAME => $r1_base->{report_name} });
+    my $result = $oxitest->api2_command("get_report" => { name => $r1_base->{report_name} });
     cmp_deeply $result, $r1_base;
 } "Get report by NAME";
 
 lives_and {
-    my $result = $oxitest->api_command("get_report" => { NAME => $r1_base->{report_name}, FORMAT => 'ALL' });
+    my $result = $oxitest->api2_command("get_report" => { name => $r1_base->{report_name}, format => 'ALL' });
     cmp_deeply $result, $r1;
 } "Get report by NAME with all data";
 
 lives_and {
-    my $result = $oxitest->api_command("get_report" => { NAME => $r1_base->{report_name}, FORMAT => 'DATA' });
+    my $result = $oxitest->api2_command("get_report" => { name => $r1_base->{report_name}, format => 'DATA' });
     cmp_deeply $result, $r1->{report_value};
 } "Get only report data by NAME";
 
