@@ -350,7 +350,7 @@ sub init_export {
             my $col = $body->[$cc];
             my $field = lc($col->{field}); # lowercase to ease migration from 1.0 syntax
             if ($field eq 'status') {
-                push @line, i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{STATUS});
+                push @line, i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{status});
 
             } elsif ($field =~ /(notafter|notbefore)/) {
 
