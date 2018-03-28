@@ -388,7 +388,7 @@ sub __pkcs_req : PRIVATE {
         ##! 16: "no workflow was found, creating a new one"
 
         # get workflow type and profile from config layer
-        my $workflow_type = CTX('config')->get(['scep', $server, 'workflow_type']);
+        my $workflow_type = CTX('config')->get(['scep', $server, 'workflow', 'type']);
 
         OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_NO_WORKFLOW_TYPE_DEFINED",
@@ -468,27 +468,38 @@ sub __pkcs_req : PRIVATE {
             );
         }
 
+
+        my $params = CTX('config')->get_hash(['scep', $server, 'workflow', 'param']);
+
+        $params = {
+            transaction_id => 'transaction_id',
+            signer_cert => 'signer_cert',
+            pkcs10 => 'pkcs10',
+            _url_params => 'url_params',
+        } unless ($params);
+
+        my $values = {
+            'transaction_id'    => $transaction_id,
+            'signer_cert'       => $signer_cert,
+            'pkcs10'            => $pkcs10,
+            'server'            => $server,
+            'interface'         => 'scep',
+            'pkcs7'             => $pkcs7_base64,
+            'url_params'        => $url_params,
+        };
+
+        my $wf_context = {
+            'server'            => $server,
+            'interface'         => 'scep',
+        };
+
+        # map the required params to the workflow context object
+        map { $wf_context->{$_} = $values->{ $params->{$_} } // ''; } keys %{$params};
+
+
         $wf_info = $api->create_workflow_instance({
                 WORKFLOW => $workflow_type,
-                PARAMS   => {
-                    'transaction_id'    => $transaction_id,
-                    'signer_cert' => $signer_cert,
-                    'pkcs10'      => $pkcs10,
-
-                    #'expires' => $expirydate->epoch(),
-
-                    # getting the profile should be moved into the workflow
-#                    'cert_profile' => $profile,
-                    'server'       => $server,
-                    'interface'    => 'scep',
-
-                    # necessary to check the signature - volatile only
-                    #'_pkcs7' => $pkcs7, # contains scep_tid, signer_cert, csr
-
-                    # Extra url params - as we never write them to the backend,
-                    # we can pass the plain hash here (no serialization)
-                    '_url_params' => $url_params,
-                }
+                PARAMS   => $wf_context,
             }
         );
 
