@@ -1,154 +1,123 @@
 #!/usr/bin/perl
-#
-# 045_activity_tools.t
-#
-# Tests misc workflow tools like WFObject, etc.
-#
-# Note: these tests are non-destructive. They create their own instance
-# of the tools workflow, which is exclusively for such test purposes.
-
 use strict;
 use warnings;
 
-use FindBin qw( $Bin );
-use lib "$Bin/../../lib";
-
-use Carp;
+# Core modules
 use English;
-use Data::Dumper;
-use Config::Std;
-use File::Basename;
+use FindBin qw( $Bin );
 
-use Log::Log4perl qw(:easy);
-Log::Log4perl->easy_init($WARN);
-
-use OpenXPKI::Test::QA::More;
+# CPAN modules
 use Test::More;
-use TestCfg;
+use Test::Deep;
+use Test::Exception;
 
-my $dirname = dirname($0);
-
-our @cfgpath = ( $dirname );
-our %cfg = ();
-
-my $testcfg = new TestCfg;
-$testcfg->read_config_path( '9x_nice.cfg', \%cfg, @cfgpath );
-
-my $test = OpenXPKI::Test::QA::More->new(
-    {
-        socketfile => $cfg{instance}{socketfile},
-        realm => $cfg{instance}{realm},
-    }
-) or die "Error creating new test instance: $@";
-
-$test->set_verbose($cfg{instance}{verbose});
-
-$test->plan( tests => 19 );
-
-my $buffer = do { # slurp
-	local $INPUT_RECORD_SEPARATOR;
-    open my $HANDLE, '<', $cfg{instance}{buffer};
-    <$HANDLE>;
-};
-
-my $serializer = OpenXPKI::Serialization::Simple->new();
-my $input_data = $serializer->deserialize( $buffer );
-
-my $cert_identifier = $input_data->{'cert_identifier'};
-
-$test->like( $cert_identifier , "/^[0-9a-zA-Z-_]{27}/", 'Certificate Identifier')
- || die "Unable to proceed without Certificate Identifier: $@";
+# Project modules
+use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
+use OpenXPKI::Test;
 
 
-# Login to use socket
-$test->connect_ok(
-    user => $cfg{user}{name},
-    password => $cfg{user}{password},
-) or die "Error - connect failed: $@";
+plan tests => 18;
 
-# First try an autoapproval request
 
-my %wfparam = (
-    cert_identifier => $cert_identifier,
+#
+# Init helpers
+#
+my $oxitest = OpenXPKI::Test->new(
+    with => [qw( SampleConfig Workflows WorkflowCreateCert )],
+    #log_level => 'debug',
+);
+my $cert = $oxitest->create_cert(
+    profile => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    hostname => "fun",
+    requestor_gname => 'Sarah',
+    requestor_name => 'Dessert',
+    requestor_email => 'sahar@d-sert.d',
+);
+my $cert_id = $cert->{identifier};
+
+#
+# Test auto-approval request
+#
+my $wfparam = {
+    cert_identifier => $cert_id,
     reason_code => 'unspecified',
     comment => 'Automated Test',
     flag_auto_approval => 0,
     flag_batch_mode => 0
-);
+};
 
-$test->create_ok( 'certificate_revocation_request_v2' , \%wfparam, 'Create Revoke Workflow')
- or die "Workflow Create failed: $@";
+my $wf;
+lives_ok {
+    $wf = $oxitest->create_workflow('certificate_revocation_request_v2' => $wfparam, 1);
+} "Create CRR workflow";
 
-$test->state_is('PENDING_USER');
+$wf->state_is('PENDING_USER');
 
-$test->execute_ok( 'crr_submit' );
+$wf->start_activity('crr_submit');
+$wf->state_is('PENDING');
 
-$test->state_is('PENDING');
-
-$test->execute_nok( 'crr_approve_crr' );
-
-$test->disconnect();
-
-# Re-login with Operator for approval
-$test->connect_ok(
-    user => $cfg{operator}{name},
-    password => $cfg{operator}{password},
-) or die "Error - connect failed: $@";
-
-$test->execute_ok( 'crr_update_crr', { reason_code => 'keyCompromise' } );
-
-$test->state_is('PENDING');
-
-$test->execute_ok( 'crr_reject_crr' );
-
-$test->state_is('REJECTED');
+$wf->execute_fails('crr_approve_crr' => {}, qr/no access.*crr_approve_crr/i);
 
 
-# Test delayed revoke
-$wfparam{flag_auto_approval} = 1;
-$wfparam{delay_revocation_time} = time() + 5;
-$wfparam{flag_batch_mode} = 1;
-$test->create_ok( 'certificate_revocation_request_v2' , \%wfparam, 'Create delayed Revoke Workflow')
-   or die "Workflow Create failed: $@";
+# set current user to: operator
+$wf->change_user("raop");
 
-$test->state_is('CHECK_FOR_DELAYED_REVOKE');
-my $delayed_revoke_id =  $test->get_wfid();
+$wf->start_activity('crr_update_crr', { reason_code => 'keyCompromise' });
+$wf->state_is('PENDING');
 
-# Test auto revoke
-delete $wfparam{delay_revocation_time};
-$wfparam{flag_auto_approval} = 1;
-$wfparam{flag_batch_mode} = 1;
-$wfparam{invalidity_time} = time();
+$wf->start_activity('crr_reject_crr');
+$wf->state_is('REJECTED');
 
-$test->create_ok( 'certificate_revocation_request_v2' , \%wfparam, 'Create Auto-Revoke Workflow')
- or die "Workflow Create failed: $@";
+#
+# Test delayed revocation
+#
+$wfparam->{flag_auto_approval} = 1;
+$wfparam->{delay_revocation_time} = time() + 5;
+$wfparam->{flag_batch_mode} = 1;
+
+lives_ok {
+    $wf = $oxitest->create_workflow('certificate_revocation_request_v2' => $wfparam, 1);
+} "Create delayed CRR workflow";
+
+$wf->state_is('CHECK_FOR_DELAYED_REVOKE');
+my $delayed_revoke_id = $wf->id;
+
+#
+# Test auto revocation
+#
+delete $wfparam->{delay_revocation_time};
+$wfparam->{flag_auto_approval} = 1;
+$wfparam->{flag_batch_mode} = 1;
+$wfparam->{invalidity_time} = time();
+
+lives_ok {
+    $wf = $oxitest->create_workflow('certificate_revocation_request_v2' => $wfparam, 1);
+} "Create auto-revoke CRR workflow";
 
 # Go to pending
-$test->state_is('CHECK_FOR_REVOCATION');
+$wf->state_is('CHECK_FOR_REVOCATION');
 
 # Do a second test - should go to success as already approved
-$wfparam{flag_auto_approval} = 0;
+$wf->{flag_auto_approval} = 0;
 
-$test->create_ok( 'certificate_revocation_request_v2' , \%wfparam, 'Create Auto-Revoke Workflow')
- or die "Workflow Create failed: $@";
+lives_ok {
+    $wf = $oxitest->create_workflow('certificate_revocation_request_v2' => $wfparam, 1);
+} "Create auto-revoke CRR workflow";
 
-$test->state_is('CHECK_FOR_REVOCATION');
+$wf->state_is('CHECK_FOR_REVOCATION');
 
+#
 # Finally, check if the delayed workflow has finished
-$test->set_wfid( $delayed_revoke_id );
+#
+lives_ok {
+    $wf = $oxitest->fetch_workflow($delayed_revoke_id, 1);
+} "Switch back to existing delayed workflow";
 
-note('Switch back to delayed workflow #'.$delayed_revoke_id);
 my $i = 0;
 do {
-    sleep 5;
-    $test->reset();
+    sleep 1;
+    $wf->refresh;
     $i++;
-} while($test->state() ne 'CHECK_FOR_REVOCATION' && $i < 6);
-$test->state_is('CHECK_FOR_REVOCATION');
-
-open(CERT, ">$cfg{instance}{buffer}");
-print CERT $serializer->serialize({ cert_identifier => $test->param( 'cert_identifier' ), wf_id => $test->get_wfid() });
-close CERT;
-
-$test->disconnect();
+} while($wf->state ne 'CHECK_FOR_REVOCATION' && $i < 30);
+$wf->state_is('CHECK_FOR_REVOCATION');
 
