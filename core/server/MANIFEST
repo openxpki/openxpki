@@ -266,6 +266,7 @@ OpenXPKI/Server/API2/Plugin/Control/purge_application_log.pm
 OpenXPKI/Server/API2/Plugin/Crypto/generate_key.pm
 OpenXPKI/Server/API2/Plugin/Crypto/get_key_identifier_from_data.pm
 OpenXPKI/Server/API2/Plugin/Crypto/get_random.pm
+OpenXPKI/Server/API2/Plugin/Crypto/validate_key_params.pm
 OpenXPKI/Server/API2/Plugin/Datapool/get_data_pool_entry.pm
 OpenXPKI/Server/API2/Plugin/Datapool/list_data_pool_entries.pm
 OpenXPKI/Server/API2/Plugin/Datapool/modify_data_pool_entry.pm

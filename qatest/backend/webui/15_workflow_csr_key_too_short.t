@@ -71,7 +71,7 @@ $result = $client->mock_request({
 
 is ($result->{status}->{level}, 'error', 'Status is error');
 
-is ($result->{status}->{message}, 'I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_PARAM_NOT_ALLOWED (key_length)', 'Key Param error');
+is ($result->{status}->{message}, 'I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_PARAM_NOT_ALLOWED (key_length: 512)', 'Key Param error');
 
 
 

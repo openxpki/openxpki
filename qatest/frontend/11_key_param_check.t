@@ -57,7 +57,7 @@ $result = $client->mock_request({
 });
 
 is($result->{status}->{level}, 'error');
-is($result->{status}->{message}, 'Used key parameter is not allowed by policy (key_length)');
+is($result->{status}->{message}, 'Used key parameter is not allowed by policy (key_length: 512)');
 
 # ECC Key with bad curves
 for my $curve (qw(secp192r1 secp256k1 prime192v1)) {
@@ -76,7 +76,7 @@ for my $curve (qw(secp192r1 secp256k1 prime192v1)) {
     });
 
     is($result->{status}->{level}, 'error');
-    is($result->{status}->{message}, 'Used key parameter is not allowed by policy (curve_name)');
+    like($result->{status}->{message}, qr/Used key parameter is not allowed by policy \(curve_name: .*\)/);
 
 }
 
