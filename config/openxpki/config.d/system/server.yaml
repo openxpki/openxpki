@@ -33,8 +33,11 @@ service:
         enabled: 1
         timeout: 120
 
-    LibSCEP:
+    SCEP:
         enabled: 1
+
+    LibSCEP:
+        enabled: 0
 
 # settings for i18n
 i18n:
