@@ -83,6 +83,17 @@ GetOptions(\%params,
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
 pod2usage(-verbose => 1) if ($params{help});
+
+my %args;
+# command with json data
+if (scalar @ARGV == 2 && $params{json}) {
+    eval { %args = %{ decode_json(pop @ARGV) }; };
+    if ($EVAL_ERROR) {
+        print STDERR "Unable to decode given JSON ($EVAL_ERROR)\n";
+        exit 0;
+    }
+}
+
 if (scalar @ARGV != 1) {
     print STDERR "Usage: openxpkicli [OPTIONS] COMMAND\n";
     exit 0;
@@ -106,14 +117,20 @@ foreach my $entry (@parameters) {
 }
 
 my @args = split(/,/, join(',', @{$params{arg}}));
-my %args;
 foreach my $entry (@args) {
     my ($key, $value) = ($entry =~ m{ \A (.*?) [=:] (.*) }xms);
-    if (defined $key) {
-        $args{uc($key)} = $value;
-    } else {
-        $args{uc($entry)} = 1;
+
+    if (!defined $key) {
+        $key = $entry;
+        $value = 1;
     }
+
+    # uppercase all keys when legacy api is used
+    if ($params{legacy} || $ENV{OPENXPKI_LEGACY_API}) {
+        $key = uc($key);
+    }
+
+    $args{$key} = $value;
 
 }
 
