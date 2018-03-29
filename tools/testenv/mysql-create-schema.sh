@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Creating MySQL database schema"
+echo "MySQL: creating schema"
 
 SCHEMA="$(readlink -e $(dirname $0)/../../config/sql/schema-mysql.sql)"
 test ! -z "$1" && SCHEMA="$1"
