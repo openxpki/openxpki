@@ -49,7 +49,13 @@ sub output {
 
     if ($params{json}) {
         print_json($msg);
-    } elsif (!$msg->{error}) {
+    } elsif ($msg->{error}) {
+        my $err = $msg->{error}->{LIST}->[0];
+        print STDERR "Error: " . $err->{LABEL} . "\n";
+        if ($err->{PARAMS} && $err->{PARAMS}->{__error__}) {
+            print STDERR "    " . $err->{PARAMS}->{__error__} . "\n";
+        }
+    } else {
         print Dumper $msg;
         print "\ndone\n";
     }
@@ -249,6 +255,7 @@ if ($command ne 'logout') {
         PARAMS => \%args,
         API => ($params{legacy} || $ENV{OPENXPKI_LEGACY_API}) ? 1 : 2
     });
+
     # terminate the login session if we are not in "session reuse" mode
     if (!$params{session}) {
         $client->logout();
