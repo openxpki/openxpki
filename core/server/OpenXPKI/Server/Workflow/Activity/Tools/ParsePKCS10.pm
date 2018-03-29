@@ -93,6 +93,10 @@ sub execute {
         }
     }
 
+    my @t = $decoded->signatureAlgorithm() =~ m{ (with-?(md5|sha\d+))|((md5|sha\d+)with) }ix;
+    my ($csr_digest) = lc($t[1] || $t[3] || 'unknown');
+    $param->{csr_digest_alg} = $csr_digest;
+
     $param->{csr_subject_key_identifier} =
         uc( join ':', ( unpack '(A2)*', sha1_hex(
                 $decoded->{certificationRequestInfo}{subjectPKInfo}{subjectPublicKey}[0]
@@ -426,6 +430,10 @@ email, DNS, dirName, URI, IP, RID).
 =item csr_key_alg
 
 Algorithm of the public key, one of rsa, dsa, ec, unsupported
+
+=item csr_digest_alg
+
+The digest algorithm used to create the signature request (e.g. md5, sha1).
 
 =item csr_key_params
 
