@@ -465,6 +465,7 @@ has conf_database       => ( is => 'rw', isa => 'HashRef', lazy => 1, builder =>
 # password for all openxpki users
 has password            => ( is => 'rw', isa => 'Str', lazy => 1, default => "openxpki" );
 has password_hash       => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { my $self = shift; $self->_get_password_hash($self->password) } );
+has auth_stack          => ( is => 'ro', isa => 'Str', lazy => 1, default => "Testing" );
 
 around BUILDARGS => sub {
     my $orig  = shift;
@@ -757,15 +758,16 @@ sub init_session_and_context {
     my ($self) = @_;
 
     $self->session(OpenXPKI::Server::Session->new(load_config => 1)->create);
-    # set default PKI realm
-    $self->session->data->pki_realm("SomeRealm");
-    $self->session->data->role("SomeRole");
 
     # Set session separately (OpenXPKI::Server::Init::init "killed" any old one)
     OpenXPKI::Server::Context::setcontext({
         session => $self->session,
         force => 1,
     });
+
+    # set default user (after session init as CTX('session') is needed by auth handler
+    $self->session->data->pki_realm($self->config_writer->get_realms->[0]);
+    $self->set_user("user");
 
     # Set fake notification object
     OpenXPKI::Server::Context::setcontext({
@@ -814,6 +816,43 @@ config key is not found
 sub get_config {
     my ($self, $config_key, $allow_undef) = @_;
     $self->config_writer->get_config_node($config_key, $allow_undef);
+}
+
+=head2 set_user
+
+Directly sets the current user in the session without any login process.
+
+The user must exist within the L<authentication config|/auth_config>.
+
+B<Positional Parameters>
+
+=over
+
+=item * C<$user> I<Str> - username
+
+=back
+
+=cut
+sub set_user {
+    my ($self, $user) = @_;
+
+    my ($realuser, $role, $reply) = OpenXPKI::Server::Context::CTX('authentication')->login_step({
+        STACK   => $self->auth_stack,
+        MESSAGE => {
+            PARAMS => { LOGIN => $user, PASSWD => $self->password },
+        },
+    });
+
+    die "Could not set user to '$user': ".Dumper($reply) unless $realuser && $role;
+
+    $self->session->data->user($realuser);
+    $self->session->data->role($role);
+    $self->session->is_valid(1);
+
+    Log::Log4perl::MDC->put('user', $realuser);
+    Log::Log4perl::MDC->put('role', $role);
+
+    note "Changed user to $user, role $role";
 }
 
 =head2 api_command
@@ -1015,6 +1054,55 @@ sub _get_password_hash {
     $ctx->add($password);
     $ctx->add($salt);
     return "{ssha}".encode_base64($ctx->digest . $salt, '');
+}
+
+sub auth_config {
+    my ($self) = @_;
+    return {
+        stack => {
+            $self->auth_stack() => {
+                description => "OpenXPKI test authentication stack",
+                handler => "OxiTest",
+            },
+        },
+        handler => {
+            "OxiTest" => {
+                label => "OpenXPKI test authentication handler",
+                type  => "Password",
+                user  => {
+                    # password is always "openxpki"
+                    caop => {
+                        digest => $self->password_hash, # "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B",
+                        role   => "CA Operator",
+                    },
+                    raop => {
+                        digest => $self->password_hash,
+                        role   => "RA Operator",
+                    },
+                    raop2 => {
+                        digest => $self->password_hash,
+                        role   => "RA Operator",
+                    },
+                    user => {
+                        digest => $self->password_hash,
+                        role   => "User"
+                    },
+                    user2 => {
+                        digest => $self->password_hash,
+                        role   => "User"
+                    },
+                },
+            },
+        },
+        roles => {
+            "Anonymous"   => { label => "Anonymous" },
+            "CA Operator" => { label => "CA Operator" },
+            "RA Operator" => { label => "RA Operator" },
+            "SmartCard"   => { label => "SmartCard" },
+            "System"      => { label => "System" },
+            "User"        => { label => "User" },
+        },
+    };
 }
 
 1;

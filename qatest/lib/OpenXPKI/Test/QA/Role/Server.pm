@@ -284,6 +284,7 @@ sub new_client_tester {
         socket_file => $self->get_config("system.server.socket_file"),
         default_realm => $self->default_realm,
         password => $self->password,
+        auth_stack => $self->auth_stack, # $self->auth_stack comes from OpenXPKI::Test
     );
 }
 

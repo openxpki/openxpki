@@ -73,4 +73,38 @@ sub create_workflow {
     }
 }
 
+=head2 fetch_workflow
+
+Fetches an existing workflow instance wrapped in
+L<OpenXPKI::Test::QA::Role::Workflows::Instance> which can be used for
+further tests.
+
+B<Positional Parameters>
+
+=over
+
+=item * C<$id> I<Str> - workflow ID
+
+=item * C<$old_api> I<Bool> - set to 1 to use old API for workflow management
+
+=back
+
+=cut
+sub fetch_workflow {
+    my ($self, $id, $old_api) = @_;
+
+    if ($old_api) {
+        return OpenXPKI::Test::QA::Role::Workflows::InstanceOldApi->new(
+            oxitest => $self,
+            id => $id,
+        );
+    }
+    else {
+        return OpenXPKI::Test::QA::Role::Workflows::Instance->new(
+            oxitest => $self,
+            id => $id,
+        );
+    }
+}
+
 1;

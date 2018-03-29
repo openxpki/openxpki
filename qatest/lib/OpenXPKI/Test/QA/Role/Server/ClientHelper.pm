@@ -79,6 +79,15 @@ has password => (
     required => 1,
 );
 
+=item * I<auth_stack> (Str) - authentication stack to use (for login)
+
+=cut
+has auth_stack => (
+    is => 'rw',
+    does => 'Str',
+    required => 1,
+);
+
 =back
 
 =head1 METHODS
@@ -194,7 +203,7 @@ sub login {
             plan tests => 4;
         }
 
-        $self->send_ok('GET_AUTHENTICATION_STACK', { AUTHENTICATION_STACK => "Test" });
+        $self->send_ok('GET_AUTHENTICATION_STACK', { AUTHENTICATION_STACK => $self->auth_stack });
         $self->is_next_step("GET_PASSWD_LOGIN");
 
         $self->send_ok('GET_PASSWD_LOGIN', { LOGIN => $user, PASSWD => $self->password });

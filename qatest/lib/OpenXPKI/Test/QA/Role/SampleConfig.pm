@@ -33,8 +33,22 @@ Applying this role performs the following actions:
 
 =item * create various new directories below L<testenv_root|OpenXPKI::Test/testenv_root>.
 
-=item * load the OpenXPKI default configuration (shipped with the project), modify
-it slightly to work with tests and inject it into the test configuration
+=item * load the OpenXPKI default configuration (shipped with the project),
+modify it to work with tests and inject it into the test configuration.
+
+Modifications made:
+
+=over
+
+=item * C<realm.ca-one.auth>: replace stacks, handler and roles with L<OpenXPKI::Test/auth_config>
+
+=item * C<system.server>: replace process user/group and file locations
+
+=item * C<system.watchdog>: set all intervals to 1 second and only activate
+watchdog if constructor parameter C<start_watchdog =E<gt> 1> was passed to
+C<OpenXPKI::Test>.
+
+=back
 
 =item * set C<CTX('session')->data->pki_realm> to I<ca-one>
 
@@ -103,13 +117,13 @@ before 'init_base_config' => sub { # happens before init_user_config() so we do 
     $config->_make_parent_dir($self->path_stderr_file);
 
     # add default configs
-    $self->_load_default_config("realm/ca-one");
+    $self->_load_default_config("realm/ca-one",         $self->can('_customize_ca_one'));          # can() returns a CodeRef
     $self->default_realm("ca-one");
     $self->_load_default_config("system/crypto.yaml");
     # NO $self->_load_default_config("system.database") -- it's completely customized for tests
     $self->_load_default_config("system/realms.yaml");
-    $self->_load_default_config("system/server.yaml",   $self->can('_customize_system_server')); # can() return a CodeRef
-    $self->_load_default_config("system/watchdog.yaml", $self->can('_customize_system_watchdog'));
+    $self->_load_default_config("system/server.yaml",   $self->can('_customize_system_server'));   # can() returns a CodeRef
+    $self->_load_default_config("system/watchdog.yaml", $self->can('_customize_system_watchdog')); # can() returns a CodeRef
 };
 
 after 'init_session_and_context' => sub {
@@ -134,6 +148,11 @@ sub _load_default_config {
     # add configuration
     $self->config_writer->add_user_config(join(".",@parts) => $config_hash);
     return $config_hash;
+}
+
+sub _customize_ca_one {
+    my ($self, $conf) = @_;
+    $conf->{auth} = $self->auth_config;
 }
 
 sub _customize_system_server {
