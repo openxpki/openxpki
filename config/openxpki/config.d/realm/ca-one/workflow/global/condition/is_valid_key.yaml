@@ -1,0 +1,5 @@
+class: OpenXPKI::Server::Workflow::Condition::KeyParams
+param:
+   _map_cert_profile: $cert_profile
+   _map_key_params: $csr_key_params
+   _map_key_alg: $csr_key_alg

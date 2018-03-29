@@ -13,8 +13,9 @@ state:
     PARSED:
         autorun: 1
         action:
-          - set_profile_from_extension render_subject set_workflow_attributes > READY_TO_PROCESS ? has_certificate_template
-          - render_subject set_workflow_attributes > READY_TO_PROCESS ? !has_certificate_template
+          - global_set_error_policy_invalid_key_param > FAILURE ? !global_is_valid_key
+          - set_profile_from_extension render_subject set_workflow_attributes > READY_TO_PROCESS ? global_is_valid_key has_certificate_template
+          - render_subject set_workflow_attributes > READY_TO_PROCESS ? global_is_valid_key !has_certificate_template
 
     # shortcut to inital if no signer cert is set
     READY_TO_PROCESS:
