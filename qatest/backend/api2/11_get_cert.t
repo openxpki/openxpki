@@ -17,7 +17,7 @@ use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 
 
-plan tests => 8;
+plan tests => 10;
 
 
 #
@@ -155,3 +155,26 @@ lives_and {
     $dbinfo_serial = "0$dbinfo_serial" if length($dbinfo_serial) % 2 == 1; # prepend 0 if uneven amount of hex digits
     is $dbinfo_serial, $serial;
 } "Fetch certificate (DBINFO)";
+
+#
+# get_cert_attributes
+#
+lives_and {
+    my $result = $oxitest->api2_command("get_cert_attributes" => { identifier => $cert_id });
+    cmp_deeply $result, {
+        'meta_email'            => [ re(qr/^.+$/) ],        # [ 'andreas.anders@mycompany.local' ],
+        'meta_entity'           => [ re(qr/^.+$/) ],        # [ 'nicetest-63a0ee.openxpki.test' ]
+        'meta_requestor'        => [ re(qr/^.+$/) ],        # [ 'Andreas Anders' ],
+        'subject_alt_name'      => array_each( re(qr/^.+$/) ),
+        'system_cert_owner'     => [ re(qr/^\w+$/) ],       # [ 'user' ],
+        'system_workflow_csr'   => [ re(qr/\d+$/) ],        # [ '129279' ],
+    };
+} "get_cert_attributes - retrieve all";
+
+lives_and {
+    my $result = $oxitest->api2_command("get_cert_attributes" => { identifier => $cert_id, attribute => "system_%" });
+    cmp_deeply $result, {
+        'system_cert_owner'     => [ re(qr/^\w+$/) ],       # [ 'user' ],
+        'system_workflow_csr'   => [ re(qr/\d+$/) ],        # [ '129279' ],
+    };
+} "get_cert_attributes - retrieve filtered list";

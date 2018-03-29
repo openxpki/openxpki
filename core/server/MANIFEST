@@ -252,6 +252,7 @@ OpenXPKI/Server/API2/EasyPluginMetaClassTrait.pm
 OpenXPKI/Server/API2/EasyPluginRole.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_cert.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_cert_actions.pm
+OpenXPKI/Server/API2/Plugin/Cert/get_cert_attributes.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_chain.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_profile_for_cert.pm
 OpenXPKI/Server/API2/Plugin/Cert/import_certificate.pm
