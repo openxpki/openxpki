@@ -50,6 +50,7 @@ my ($tmp_fh, $tmp) = tempfile(UNLINK => 1);
 print $tmp_fh $rsa or die "Could not write key to temp file: $@";
 close $tmp_fh;
 
+$ENV{OPENSSL_CONF} = "/dev/null"; # prevents "WARNING: can't open config file: ..."
 my $spkac = `openssl spkac -key $tmp -passin env:pwd`;
 ok $spkac, 'OpenSSL SPKAC conversion';
 
