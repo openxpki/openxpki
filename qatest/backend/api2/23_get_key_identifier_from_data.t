@@ -55,7 +55,10 @@ SKIP: {
     #
     open my $fh, ">", "$tempdir/csr.pem" or BAIL_OUT "Error creating temporary file $tempdir/csr.pem";
     print $fh $pkcs10 and close $fh;
-    my $csr_info = `OPENSSL_CONF=/dev/null openssl req -in "$tempdir/csr.pem" -passin "pass:blah" -text -noout`;
+
+    $ENV{OPENSSL_CONF} = "/dev/null"; # prevents "WARNING: can't open config file: ..."
+    my $csr_info = `openssl req -in "$tempdir/csr.pem" -passin "pass:blah" -text -noout`;
+
     my ($pub_key_reference) = $csr_info =~ qr{ \A .* Public-Key: [^:]+ Modulus: (.*) (?=Exponent) .* \z }msx;
     # strip whitespace and :
     $pub_key_reference =~ s/[\s:]//gmx;

@@ -159,6 +159,7 @@ print $tmp $privkey;
 close $tmp;
 
 # test PKCS12 container
-like `OPENSSL_CONF=/dev/null openssl pkcs12 -in $tmp_name -nokeys -noout -passin pass:'m4#bDf7m3abd' 2>&1`,
+$ENV{OPENSSL_CONF} = "/dev/null"; # prevents "WARNING: can't open config file: ..."
+like `openssl pkcs12 -in $tmp_name -nokeys -noout -passin pass:'m4#bDf7m3abd' 2>&1`,
     "/MAC verified OK/",
     'Test PKCS12 container via OpenSSL';

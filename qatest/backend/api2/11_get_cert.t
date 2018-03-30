@@ -90,11 +90,12 @@ lives_and {
 # Fetch certificate - PEM Format
 my ($tmp, $tmp_name) = tempfile(UNLINK => 1);
 my $pem;
+$ENV{OPENSSL_CONF} = "/dev/null"; # prevents "WARNING: can't open config file: ..."
 lives_and {
     $pem = $oxitest->api2_command("get_cert" => { identifier => $cert_id, format => 'PEM' });
     print $tmp $pem;
     close $tmp;
-    my $cmp_serial = `OPENSSL_CONF=/dev/null openssl x509 -in $tmp_name -inform PEM -serial`;
+    my $cmp_serial = `openssl x509 -in $tmp_name -inform PEM -serial`;
     like $cmp_serial, qr/$serial/i;
 } "Fetch certificate (PEM)";
 
@@ -104,12 +105,12 @@ lives_and {
     my $result = $oxitest->api2_command("get_cert" => { identifier => $cert_id, format => 'DER' });
     print $tmp $result;
     close $tmp;
-    my $cmp_serial = `OPENSSL_CONF=/dev/null openssl x509 -in $tmp_name -inform DER -serial`;
+    my $cmp_serial = `openssl x509 -in $tmp_name -inform DER -serial`;
     like $cmp_serial, qr/$serial/i;
 } "Fetch certificate (DER)";
 
 ## Compare PEM and DER
-my $pem2 = `OPENSSL_CONF=/dev/null openssl x509 -in $tmp_name -inform DER`;
+my $pem2 = `openssl x509 -in $tmp_name -inform DER`;
 $pem =~ s{\s}{}gxms; $pem2 =~ s{\s}{}gxms; # Clear all whitespace to compare
 is $pem, $pem2, 'DER matches PEM';
 
