@@ -870,7 +870,7 @@ sub set_user {
     Log::Log4perl::MDC->put('user', $realuser);
     Log::Log4perl::MDC->put('role', $role);
 
-    note "Set session to realm $realm: user $user ($role)";
+    note "Set session to realm $realm: user '$user' ($role)";
 }
 
 =head2 api_command
