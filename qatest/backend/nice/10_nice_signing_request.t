@@ -17,7 +17,7 @@ use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 
 
-plan tests => 26;
+plan tests => 30;
 
 
 #
@@ -47,7 +47,8 @@ my %cert_info = (
 
 note "CSR Subject: $subject\n";
 
-$oxitest->set_user('ca-one' => 'user');
+my $user = 'user';
+$oxitest->set_user('ca-one' => $user);
 
 my $wf;
 lives_ok {
@@ -161,3 +162,45 @@ $ENV{OPENSSL_CONF} = "/dev/null"; # prevents "WARNING: can't open config file: .
 like `openssl pkcs12 -in $tmp_name -nokeys -noout -passin pass:'m4#bDf7m3abd' 2>&1`,
     "/MAC verified OK/",
     'Test PKCS12 container via OpenSSL';
+
+#
+# cert profile
+#
+lives_and {
+    my $result = $oxitest->api_command('get_profile_for_cert' => { IDENTIFIER => $cert_id });
+    is $result, "I18N_OPENXPKI_PROFILE_TLS_SERVER";
+} "query certificate profile";
+
+#
+# cert actions
+#
+lives_and {
+    my $result = $oxitest->api_command('get_cert_actions' => { IDENTIFIER => $cert_id, ROLE => "User" });
+    cmp_deeply $result, superhashof({
+        # actions are defined in config/openxpki/config.d/realm/ca-one/uicontrol/_default.yaml,
+        # they must exist and "User" must be defined in their "acl" section as creator
+        workflow => superbagof(
+            {
+                'label' => 'I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY',
+                'workflow' => 'certificate_privkey_export',
+            },
+            {
+                'label' => 'I18N_OPENXPKI_UI_CERT_ACTION_REVOKE',
+                'workflow' => 'certificate_revocation_request_v2',
+            },
+        ),
+    });
+} "query actions for certificate (role 'User')";
+
+#
+# certificate owner
+#
+# the workflow automatically sets this to the workflow creator, which in our
+# case is "user" (see session user in OpenXPKI::Test::QA::Role::WorkflowCreateCert->create_cert)
+lives_and {
+    is $oxitest->api_command('is_certificate_owner' => { IDENTIFIER => $cert_id, USER => $user }), 1;
+} "confirm correct certificate owner";
+
+lives_and {
+    isnt $oxitest->api_command('is_certificate_owner' => { IDENTIFIER => $cert_id, USER => 'nerd' }), 1;
+} "negate wrong certificate owner";
