@@ -125,7 +125,6 @@ OpenXPKI/Crypto/Tool/SCEP/Engine/OpenSSL.pm
 
 OpenXPKI/Crypto/Tool/LibSCEP.pm
 OpenXPKI/Crypto/Tool/LibSCEP/API.pm
-OpenXPKI/Crypto/Tool/LibSCEP/CLI.pm
 OpenXPKI/Crypto/Tool/LibSCEP/Command/create_certificate_reply.pm
 OpenXPKI/Crypto/Tool/LibSCEP/Command/create_crl_reply.pm
 OpenXPKI/Crypto/Tool/LibSCEP/Command/create_error_reply.pm
