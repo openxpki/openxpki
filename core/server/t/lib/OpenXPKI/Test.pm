@@ -504,7 +504,6 @@ sub BUILD {
     $self->write_config;
     $self->init_server;
     $self->init_session_and_context;
-    note sprintf("Starting tests with PKI realm '%s' and role '%s'", $self->session->data->pki_realm, $self->session->data->role);
 }
 
 sub _build_log4perl {
@@ -681,6 +680,15 @@ sub init_user_config {
     for (keys %{ $self->user_config }) {
         $self->config_writer->add_user_config($_ => $self->user_config->{$_});
     }
+    # Add basic test realm if no other realm exists.
+    # Without any realm we cannot set a user via CTX('authentication')
+    if (scalar @{ $self->config_writer->get_realms } == 0) {
+        note "Setting up a basic 'TestRealm' as no other realm was defined";
+        $self->config_writer->add_user_config(
+            "system.realms.test" => { label => "TestRealm", baseurl => "http://127.0.0.1/test/" },
+            "realm.test.auth" => $self->auth_config,
+        );
+    }
 }
 
 =head2 write_config
@@ -766,8 +774,7 @@ sub init_session_and_context {
     });
 
     # set default user (after session init as CTX('session') is needed by auth handler
-    $self->session->data->pki_realm($self->config_writer->get_realms->[0]);
-    $self->set_user("user");
+    $self->set_user($self->config_writer->get_realms->[0] => "user");
 
     # Set fake notification object
     OpenXPKI::Server::Context::setcontext({
@@ -820,7 +827,8 @@ sub get_config {
 
 =head2 set_user
 
-Directly sets the current user in the session without any login process.
+Directly sets the current PKI realm and user in the session without any login
+process.
 
 The user must exist within the L<authentication config|/auth_config>.
 
@@ -828,13 +836,17 @@ B<Positional Parameters>
 
 =over
 
+=item * C<$realm> I<Str> - PKI realm
+
 =item * C<$user> I<Str> - username
 
 =back
 
 =cut
 sub set_user {
-    my ($self, $user) = @_;
+    my ($self, $realm, $user) = @_;
+
+    $self->session->data->pki_realm($realm);
 
     my ($realuser, $role, $reply) = OpenXPKI::Server::Context::CTX('authentication')->login_step({
         STACK   => $self->auth_stack,
@@ -852,7 +864,7 @@ sub set_user {
     Log::Log4perl::MDC->put('user', $realuser);
     Log::Log4perl::MDC->put('role', $role);
 
-    note "Changed user to $user, role $role";
+    note "Set session to realm $realm: user $user ($role)";
 }
 
 =head2 api_command

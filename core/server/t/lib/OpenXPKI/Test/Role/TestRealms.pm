@@ -66,8 +66,7 @@ before 'init_user_config' => sub { # ... so we do not overwrite user supplied co
 after 'init_session_and_context' => sub {
     my $self = shift;
     # set PKI realm after init() as various init procedures overwrite the realm
-    $self->session->data->pki_realm("alpha") if $self->has_session;
-    $self->set_user("user");
+    $self->set_user("alpha" => "user") if $self->has_session;
 };
 
 sub _crypto {

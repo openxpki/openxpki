@@ -250,7 +250,7 @@ Returns an ArrayRef with all realm names defined by default, by roles or user.
 =cut
 sub get_realms {
     my ($self) = @_;
-    return [ keys %{ $self->_config->{realm} } ];
+    return [ keys %{ $self->_config->{system}->{realms} } ];
 }
 
 __PACKAGE__->meta->make_immutable;

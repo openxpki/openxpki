@@ -247,7 +247,7 @@ B<Positional Parameters>
 sub change_user {
     my ($self, $user) = @_;
 
-    $self->oxitest->set_user($user);
+    $self->oxitest->set_user(OpenXPKI::Server::Context::CTX('session')->data->pki_realm => $user);
 
     # reset condition cache so e.g. user role checks are re-evaluated
     my $wf = OpenXPKI::Server::Context::CTX('workflow_factory')->get_factory->fetch_workflow($self->type, $self->id);
