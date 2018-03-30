@@ -23,10 +23,35 @@ use OpenXPKI::Test::QA::Role::Workflows::InstanceOldApi;
 requires 'also_init';
 
 
+#
+# Attributes
+#
+has 'managed_workflows' => (
+    is => "rw",
+    isa => "HashRef[Int]",
+    init_arg => undef,
+    default => sub { {} },
+);
+
+#
+# Modified methods
+#
 before 'init_server' => sub {
     my $self = shift;
     # prepend to existing array in case a user supplied "also_init" needs our modules
     unshift @{ $self->also_init }, 'workflow_factory';
+};
+
+after 'set_user' => sub {
+    my $self = shift;
+    # reset condition cache so e.g. user role checks are re-evaluated
+    for my $id (keys %{ $self->managed_workflows }) {
+        OpenXPKI::Server::Context::CTX('workflow_factory')
+            ->get_factory
+            ->fetch_workflow($self->managed_workflows->{$id}, $id)
+            ->_get_workflow_state
+            ->clear_condition_cache;
+    }
 };
 
 =head1 METHODS
@@ -57,20 +82,23 @@ B<Positional Parameters>
 sub create_workflow {
     my ($self, $type, $params, $old_api) = @_;
 
+    my $wf;
     if ($old_api) {
-        return OpenXPKI::Test::QA::Role::Workflows::InstanceOldApi->new(
+        $wf = OpenXPKI::Test::QA::Role::Workflows::InstanceOldApi->new(
             oxitest => $self,
             type => $type,
             $params ? (params => $params) : (),
         );
     }
     else {
-        return OpenXPKI::Test::QA::Role::Workflows::Instance->new(
+        $wf = OpenXPKI::Test::QA::Role::Workflows::Instance->new(
             oxitest => $self,
             type => $type,
             $params ? (params => $params) : (),
         );
     }
+    $self->managed_workflows->{$wf->id} = $wf->type;
+    return $wf;
 }
 
 =head2 fetch_workflow
@@ -93,18 +121,21 @@ B<Positional Parameters>
 sub fetch_workflow {
     my ($self, $id, $old_api) = @_;
 
+    my $wf;
     if ($old_api) {
-        return OpenXPKI::Test::QA::Role::Workflows::InstanceOldApi->new(
+        $wf = OpenXPKI::Test::QA::Role::Workflows::InstanceOldApi->new(
             oxitest => $self,
             id => $id,
         );
     }
     else {
-        return OpenXPKI::Test::QA::Role::Workflows::Instance->new(
+        $wf = OpenXPKI::Test::QA::Role::Workflows::Instance->new(
             oxitest => $self,
             id => $id,
         );
     }
+    $self->managed_workflows->{$wf->id} = $wf->type;
+    return $wf;
 }
 
 1;

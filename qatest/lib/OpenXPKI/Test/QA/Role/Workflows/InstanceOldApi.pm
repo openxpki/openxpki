@@ -232,27 +232,4 @@ sub state_is {
     is $self->state, $expected_state, "workflow state is '$expected_state'";
 }
 
-=head2 change_user
-
-Change the user that is seen by the workflow actions and conditions.
-
-B<Positional Parameters>
-
-=over
-
-=item * C<$user> I<Str> - username
-
-=back
-
-=cut
-sub change_user {
-    my ($self, $user) = @_;
-
-    $self->oxitest->set_user(OpenXPKI::Server::Context::CTX('session')->data->pki_realm => $user);
-
-    # reset condition cache so e.g. user role checks are re-evaluated
-    my $wf = OpenXPKI::Server::Context::CTX('workflow_factory')->get_factory->fetch_workflow($self->type, $self->id);
-    $wf->_get_workflow_state->clear_condition_cache;
-}
-
 __PACKAGE__->meta->make_immutable;

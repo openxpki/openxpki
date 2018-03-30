@@ -47,9 +47,7 @@ my %cert_info = (
 
 note "CSR Subject: $subject\n";
 
-CTX('session')->data->user('me');
-CTX('session')->data->role('User');
-
+$oxitest->set_user('ca-one' => 'user');
 
 my $wf;
 lives_ok {
@@ -113,7 +111,7 @@ $wf->execute_fails('csr_put_request_on_hold' => { onhold_comment => 'No Comment'
 
 
 # set current user to: operator
-$wf->change_user('raop', 'RA Operator');
+$oxitest->set_user('ca-one' => 'raop');
 
 
 $wf->start_activity('csr_put_request_on_hold' => { onhold_comment => 'No Comment'} );
@@ -134,7 +132,7 @@ like $info->{WORKFLOW}->{CONTEXT}->{cert_subject}, "/^CN=$subject:8080,.*/", 'co
 
 
 # set current user to: normal user
-$wf->change_user('me', 'User');
+$oxitest->set_user('ca-one' => 'user');
 
 
 #
