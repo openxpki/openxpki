@@ -48,8 +48,6 @@ use OpenXPKI::Test::QA::Role::Server::ClientHelper;
 
 
 requires "testenv_root";
-requires 'default_realm'; # effectively requires 'OpenXPKI::Test::QA::Role::SampleConfig'
-                          # we can't use with '...' because if other roles also said that then it would be applied more than once
 
 
 =head1 METHODS
@@ -81,37 +79,6 @@ has semaphore => (
     isa => 'IPC::Semaphore',
     init_arg => undef,
 );
-
-before 'init_user_config' => sub { # ... so we do not overwrite user supplied configs
-    my $self = shift;
-
-    #
-    # add authentication handler required by OpenXPKI::Test::QA::Role::Server::ClientHelper
-    #
-    my $realm = $self->default_realm;
-    $self->add_config(
-        "realm.$realm.auth.stack" => {
-            Test => {
-                description => "OpenXPKI test auth stack",
-                handler => "OxiTest",
-            },
-        },
-        "realm.$realm.auth.handler" => {
-            OxiTest => {
-                label => "OpenXPKI Test Authentication Handler",
-                type  => "Password",
-                user  => {
-                    # password is always "openxpki"
-                    caop =>  { digest => $self->password_hash, role => "CA Operator" },
-                    raop =>  { digest => $self->password_hash, role => "RA Operator" },
-                    raop2 => { digest => $self->password_hash, role => "RA Operator" },
-                    user =>  { digest => $self->password_hash, role => "User" },
-                    user2 => { digest => $self->password_hash, role => "User" },
-                },
-            },
-        },
-    );
-};
 
 =head2 init_server
 
@@ -282,7 +249,6 @@ sub new_client_tester {
 
     return OpenXPKI::Test::QA::Role::Server::ClientHelper->new(
         socket_file => $self->get_config("system.server.socket_file"),
-        default_realm => $self->default_realm,
         password => $self->password,
         auth_stack => $self->auth_stack, # $self->auth_stack comes from OpenXPKI::Test
     );

@@ -77,19 +77,6 @@ has start_watchdog => (
 
 =cut
 
-=head2 default_realm
-
-Returns the name of the default realm in the test environment that can be used
-in test code.
-
-=cut
-# Is set after the realm has been read from the default configs
-has default_realm => (
-    is => 'rw',
-    isa => 'Str',
-    init_arg => undef,
-);
-
 has src_config_dir   => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { my(undef, $mydir, undef) = fileparse(__FILE__); abs_path($mydir."../../../../../../config/openxpki/config.d"); } );
 has path_temp_dir    => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/tmp" } );
 has path_export_dir  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/openxpki/dataexchange/export" } );
@@ -118,7 +105,6 @@ before 'init_base_config' => sub { # happens before init_user_config() so we do 
 
     # add default configs
     $self->_load_default_config("realm/ca-one",         $self->can('_customize_ca_one'));          # can() returns a CodeRef
-    $self->default_realm("ca-one");
     $self->_load_default_config("system/crypto.yaml");
     # NO $self->_load_default_config("system.database") -- it's completely customized for tests
     $self->_load_default_config("system/realms.yaml");

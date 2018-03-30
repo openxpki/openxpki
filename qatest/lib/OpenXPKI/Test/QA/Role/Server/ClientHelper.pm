@@ -17,13 +17,13 @@ L<OpenXPKI::Test::QA::Role::Server/new_client_tester>, ie:
 
 To automatically connect and start a new session just call L</login>:
 
-    $client->login("caop");
+    $client->login("ca-one" => "caop");
 
 This is equivalent to:
 
     $client->connect;
     $client->init_session;
-    $client->login("caop");
+    $client->login("ca-one" => "caop");
 
 Alternatively to continue an existing session:
 
@@ -56,15 +56,6 @@ server and client
 
 =cut
 has socket_file => (
-    is => 'rw',
-    does => 'Str',
-    required => 1,
-);
-
-=item * I<default_realm> (Str) - default PKI realm
-
-=cut
-has default_realm => (
     is => 'rw',
     does => 'Str',
     required => 1,
@@ -182,13 +173,15 @@ B<Positional parameters>
 
 =over
 
+=item * I<$realm> (Str) - PKI realm for the login
+
 =item * I<$user> (Str) - user name to log in (password is taken from C<$self-E<gt>password>)
 
 =back
 
 =cut
 sub login {
-    my ($self, $user) = @_;
+    my ($self, $realm, $user) = @_;
 
     $self->init_session unless ($self->is_connected and $self->client->get_session_id);
 
@@ -196,7 +189,7 @@ sub login {
         # requested by server only if there is more than one realm in the config
         if ($self->is_service_msg("GET_PKI_REALM")) {
             plan tests => 6;
-            $self->send_ok('GET_PKI_REALM', { PKI_REALM => $self->default_realm });
+            $self->send_ok('GET_PKI_REALM', { PKI_REALM => $realm });
             $self->is_next_step("GET_AUTHENTICATION_STACK");
         }
         else {

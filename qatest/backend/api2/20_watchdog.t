@@ -28,7 +28,7 @@ my $oxitest = OpenXPKI::Test->new(
 # processes started by the server as they would be in another process group as
 # the test process (that calls the API).
 #
-my $client = $oxitest->new_client_tester->login("caop");
+my $client = $oxitest->new_client_tester->login("ca-one" => "caop");
 
 #
 # Tests

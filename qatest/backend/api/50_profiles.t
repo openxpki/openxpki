@@ -39,7 +39,7 @@ my $oxitest = OpenXPKI::Test->new(
 my $client = $oxitest->new_client_tester;
 $client->connect;
 $client->init_session;
-$client->login("caop");
+$client->login("ca-one" => "caop");
 
 my $result;
 

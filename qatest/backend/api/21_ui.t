@@ -44,7 +44,7 @@ my $cert_info = $oxitest->create_cert(
 );
 
 # set user role to be allowed to create workflows etc.
-$oxitest->session->data->role("CA Operator");
+$oxitest->set_user("ca-one" => "caop");
 
 #
 # Tests

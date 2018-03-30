@@ -17,6 +17,10 @@ L<OpenXPKI::Test::QA::Role::Workflows>, i.e.:
         ...
     );
 
+You could also omit C<OpenXPKI::Test::QA::Role::SampleConfig> if you set up a
+realm configuration with a I<certificate_signing_request_v2> workflow that is
+compatible to the OpenXPKI default one.
+
 =cut
 
 # CPAN modules
@@ -30,8 +34,6 @@ use OpenXPKI::Serialization::Simple;
 
 
 requires 'also_init';
-requires 'default_realm';   # effectively requires 'OpenXPKI::Test::QA::Role::SampleConfig'
-                            # we can't use with '...' because if other roles also said that then it would be applied more than once
 requires 'create_workflow'; # effectively requires 'OpenXPKI::Test::QA::Role::Workflows'
 requires 'session';
 
@@ -91,12 +93,11 @@ sub create_cert {
     subtest "Create certificate (hostname ".$params->hostname.")" => sub {
         # change PKI realm, user and role to get permission to create workflow
         my $sess_data = $self->session->data;
-        my $old_realm = $sess_data->has_pki_realm ? $sess_data->pki_realm : undef;
-        my $old_user =  $sess_data->has_user      ? $sess_data->user : undef;
-        my $old_role =  $sess_data->has_role      ? $sess_data->role : undef;
-        $sess_data->pki_realm($self->default_realm);
-        $sess_data->user('raop');
-        $sess_data->role('RA Operator');
+        die "Cannot create certificate if session data is not set" unless $sess_data->has_pki_realm;
+
+        my $old_user =  $sess_data->user;
+        my $old_role =  $sess_data->role;
+        $self->set_user($sess_data->pki_realm => "raop");
 
         my $result;
         lives_and {
@@ -196,9 +197,8 @@ sub create_cert {
                 profile    => $temp->{WORKFLOW}->{CONTEXT}->{cert_profile},
             };
         } "successfully run workflow";
-        if ($old_realm) { $sess_data->pki_realm($old_realm) } else { $sess_data->clear_pki_realm }
-        if ($old_user)  { $sess_data->user($old_user) }       else { $sess_data->clear_user }
-        if ($old_role)  { $sess_data->role($old_role) }       else { $sess_data->clear_role }
+        $sess_data->user($old_user);
+        $sess_data->role($old_role);
     };
 
     return $cert_info;
