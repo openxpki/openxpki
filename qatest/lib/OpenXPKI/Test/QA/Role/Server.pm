@@ -89,7 +89,7 @@ before 'init_user_config' => sub { # ... so we do not overwrite user supplied co
     # add authentication handler required by OpenXPKI::Test::QA::Role::Server::ClientHelper
     #
     my $realm = $self->default_realm;
-    $self->config_writer->add_user_config(
+    $self->add_config(
         "realm.$realm.auth.stack" => {
             Test => {
                 description => "OpenXPKI test auth stack",

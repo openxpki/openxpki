@@ -36,7 +36,7 @@ before 'init_user_config' => sub { # ... so we do not overwrite user supplied co
 
     # sample realms
     for my $realm (qw( alpha beta gamma )) {
-        $self->config_writer->add_user_config(
+        $self->add_config(
             "realm.$realm" => {
                 "auth" => $self->auth_config, # $self->auth_config comes from OpenXPKI::Test
                 "crypto" => $self->_crypto($realm),
@@ -57,7 +57,7 @@ before 'init_user_config' => sub { # ... so we do not overwrite user supplied co
                 "crl" => { "default" => $self->_crl_default },
             },
         );
-        $self->config_writer->add_user_config(
+        $self->add_config(
             "system.realms.$realm" => $self->_system_realm($realm)
         );
     }

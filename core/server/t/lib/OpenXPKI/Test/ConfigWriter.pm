@@ -101,7 +101,7 @@ sub write_yaml {
     $self->write_str($filepath, YAML::Tiny->new($data)->write_string);
 }
 
-sub add_user_config {
+sub add_config {
     my ($self, %entries) = @_;
 
     # notify user about added custom config

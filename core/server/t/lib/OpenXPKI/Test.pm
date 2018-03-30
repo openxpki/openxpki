@@ -429,7 +429,13 @@ has config_writer => (
             db_conf => $self->db_conf,
         )
     },
+    handles => [
+        "add_config",
+    ],
 );
+=head2 add_config
+
+Just a shortcut to L<OpenXPKI::Test::ConfigWriter/add_config>.
 
 =head2 session
 
@@ -651,7 +657,7 @@ This is the standard hook for roles to add configuration entries:
 
         # do not overwrite existing node (e.g. inserted by OpenXPKI::Test::QA::Role::SampleConfig)
         if (not $self->config_writer->get_config_node("a.b.c", 1)) {
-            $self->config_writer->add_user_config(
+            $self->add_config(
                 "a.b.c" => {
                     key   => "value",
                 },
@@ -662,7 +668,7 @@ This is the standard hook for roles to add configuration entries:
 =cut
 sub init_base_config {
     my ($self) = @_;
-    $self->config_writer->add_user_config(
+    $self->add_config(
         "system.database" => $self->conf_database,
         "system.server.session" => $self->conf_session,
         "system.server.log4perl" => $self->path_log4perl_conf,
@@ -678,13 +684,13 @@ parameter C<add_config>) to L<OpenXPKI::Test::ConfigWriter>.
 sub init_user_config {
     my ($self) = @_;
     for (keys %{ $self->user_config }) {
-        $self->config_writer->add_user_config($_ => $self->user_config->{$_});
+        $self->add_config($_ => $self->user_config->{$_});
     }
     # Add basic test realm if no other realm exists.
     # Without any realm we cannot set a user via CTX('authentication')
     if (scalar @{ $self->config_writer->get_realms } == 0) {
         note "Setting up a basic 'TestRealm' as no other realm was defined";
-        $self->config_writer->add_user_config(
+        $self->add_config(
             "system.realms.test" => { label => "TestRealm", baseurl => "http://127.0.0.1/test/" },
             "realm.test.auth" => $self->auth_config,
         );

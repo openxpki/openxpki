@@ -146,7 +146,7 @@ sub _load_default_config {
     # customize config (call supplied method)
     $customizer_coderef->($self, $config_hash) if $customizer_coderef;
     # add configuration
-    $self->config_writer->add_user_config(join(".",@parts) => $config_hash);
+    $self->add_config(join(".",@parts) => $config_hash);
     return $config_hash;
 }
 
