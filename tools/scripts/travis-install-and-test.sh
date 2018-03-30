@@ -79,7 +79,6 @@ declare -A testmodes=(
 for mode in "${!testmodes[@]}"; do
     if [ "$mode" == "$OXI_TEST_RUN" -o -z "$OXI_TEST_RUN" ]; then
         figlet "$mode tests"
-        ${testmodes[$mode]}
         cd $TRAVIS_BUILD_DIR/${testmodes[$mode]} && prove -q .
         exit $?
     fi
