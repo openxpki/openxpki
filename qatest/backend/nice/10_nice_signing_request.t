@@ -58,7 +58,7 @@ lives_ok {
 } "Create workflow";
 
 $wf->state_is("SETUP_REQUEST_TYPE");
-$wf->start_activity('csr_provide_server_key_params' => {
+$wf->execute('csr_provide_server_key_params' => {
     key_alg => "rsa",
     enc_alg => 'aes256',
     key_gen_params => $serializer->serialize( { KEY_LENGTH => 2048 } ),
@@ -67,22 +67,22 @@ $wf->start_activity('csr_provide_server_key_params' => {
 });
 
 $wf->state_is("ENTER_KEY_PASSWORD");
-$wf->start_activity('csr_ask_client_password' => {
+$wf->execute('csr_ask_client_password' => {
     _password => "m4#bDf7m3abd",
 });
 
 $wf->state_is("ENTER_SUBJECT");
-$wf->start_activity('csr_edit_subject' => {
+$wf->execute('csr_edit_subject' => {
     cert_subject_parts => $serializer->serialize( \%cert_subject_parts )
 });
 
 $wf->state_is("ENTER_SAN");
-$wf->start_activity('csr_edit_san' => {
+$wf->execute('csr_edit_san' => {
     cert_san_parts => $serializer->serialize( {  } )
 });
 
 $wf->state_is("ENTER_CERT_INFO");
-$wf->start_activity('csr_edit_cert_info' => {
+$wf->execute('csr_edit_cert_info' => {
     cert_info => $serializer->serialize( \%cert_info )
 });
 
@@ -95,12 +95,12 @@ my $actions = $result->{STATE}->{option};
 my $intermediate_state;
 if (grep { /^csr_enter_policy_violation_comment$/ } @$actions) {
     note "Test FQDNs do not resolve - handling policy violation";
-    $wf->start_activity('csr_enter_policy_violation_comment' => { policy_comment => 'This is just a test' } );
+    $wf->execute('csr_enter_policy_violation_comment' => { policy_comment => 'This is just a test' } );
     $intermediate_state ='PENDING_POLICY_VIOLATION';
 }
 else {
     note "For whatever reason test FQDNs do resolve - submitting request";
-    $wf->start_activity('csr_submit' );
+    $wf->execute('csr_submit' );
     $intermediate_state ='PENDING';
 }
 
@@ -114,16 +114,16 @@ $wf->execute_fails('csr_put_request_on_hold' => { onhold_comment => 'No Comment'
 $oxitest->set_user('ca-one' => 'raop');
 
 
-$wf->start_activity('csr_put_request_on_hold' => { onhold_comment => 'No Comment'} );
+$wf->execute('csr_put_request_on_hold' => { onhold_comment => 'No Comment'} );
 $wf->state_is("ONHOLD");
 
-$wf->start_activity('csr_put_request_on_hold' => { onhold_comment => 'Still on hold'} );
+$wf->execute('csr_put_request_on_hold' => { onhold_comment => 'Still on hold'} );
 $wf->state_is("ONHOLD");
 
-$wf->start_activity('csr_release_on_hold');
+$wf->execute('csr_release_on_hold');
 $wf->state_is($intermediate_state);
 
-$wf->start_activity('csr_approve_csr');
+$wf->execute('csr_approve_csr');
 
 $wf->state_is('SUCCESS');
 

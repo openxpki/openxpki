@@ -53,7 +53,7 @@ lives_ok {
 
 $wf->state_is('PENDING_USER');
 
-$wf->start_activity('crr_submit');
+$wf->execute('crr_submit');
 $wf->state_is('PENDING');
 
 $wf->execute_fails('crr_approve_crr' => {}, qr/no access.*crr_approve_crr/i);
@@ -62,10 +62,10 @@ $wf->execute_fails('crr_approve_crr' => {}, qr/no access.*crr_approve_crr/i);
 # set current user to: operator
 $oxitest->set_user('ca-one' => 'raop');
 
-$wf->start_activity('crr_update_crr', { reason_code => 'keyCompromise' });
+$wf->execute('crr_update_crr', { reason_code => 'keyCompromise' });
 $wf->state_is('PENDING');
 
-$wf->start_activity('crr_reject_crr');
+$wf->execute('crr_reject_crr');
 $wf->state_is('REJECTED');
 
 #

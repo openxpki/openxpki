@@ -130,13 +130,13 @@ sub state {
     return $self->last_wf_state->{STATE};
 }
 
-=head2 start_activity
+=head2 execute
 
 Executes the API command I<execute_workflow_activity> as a test.
 
 Example:
 
-    $wf->start_activity(
+    $wf->execute(
         "csr_ask_client_password",
         { _password => "m4#bDf7m3abd" },
     );
@@ -152,7 +152,7 @@ B<Positional Parameters>
 =back
 
 =cut
-sub start_activity {
+sub execute {
     my ($self, $activity, $params) = @_;
 
     my $result;
