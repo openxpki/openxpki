@@ -23,9 +23,6 @@ PACKAGES=			\
 # XML::Filter::XInclude XML::SAX::PurePerl XML::Validator::Schema
 # Exception::Class 1.22 Added Exception::Class::Base->caught() 
 
-# On Ubuntu 12.04 the Digest::SHA1 is renamed to  Digest::SHA which leeds to missing modules.
-# This is a quick hack to have the old module available on such systems
-
 EXTERNAL=				\
 	Crypt__OpenSSL__AES		\
 	Crypt__Cipher__AES \
@@ -40,8 +37,11 @@ EXTERNAL=				\
 	Crypt__X509 \
 	Crypt__X509__CRL \
 	DBIx__Handler \
-    DBIx__TransactionManager
-
+    DBIx__TransactionManager \
+    Log__Log4perl__Layout__JSON \
+    JSON__MaybeXS \
+    YAML__Tiny
+    
 EXTERNAL2= \
 	Connector \
 	Workflow 
