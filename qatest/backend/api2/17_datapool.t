@@ -56,8 +56,8 @@ sub entry_is {
 #
 # Check parameter validation
 #
-set_entry_fails { key => "pill", value => "red", expiration_date => -1000 },
-    "I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_INVALID_EXPIRATION_DATE",
+set_entry_fails { key => "pill", value => "red", expiration_date => 1000 },
+    "expiration_date",
     "Complain when trying to store datapool entry with invalid expiration";
 
 #

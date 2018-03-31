@@ -82,13 +82,19 @@ command "set_data_pool_entry" => {
     namespace       => { isa => 'AlphaPunct', required => 1, },
     key             => { isa => 'AlphaPunct', required => 1, },
     value           => { isa => 'Str', required => 1, },
-    expiration_date => { isa => 'Int', },
+    expiration_date => { isa => 'Int', matching => sub { $_ > time }, },
     force           => { isa => 'Bool', default => 0 },
     encrypt         => { isa => 'Bool', default => 0 },
 } => sub {
     my ($self, $params) = @_;
 
     my $requested_pki_realm = $params->pki_realm;
+
+    # check for illegal characters - not neccesary if we encrypt the value
+    OpenXPKI::Exception->throw(
+        message => "Value contains illegel characters",
+        params => { pki_realm => $params->pki_realm, namespace => $params->namespace, key => $params->key }
+    ) if !$params->has_encrypt and ($params->value =~ m{ (?:\p{Unassigned}|\x00) }xms );
 
     # when called from a workflow we only allow the current realm
     # NOTE: only check direct caller. if workflow is deeper in the caller
@@ -98,26 +104,40 @@ command "set_data_pool_entry" => {
     my @caller = $self->rawapi->my_caller;
     if ($caller[0] =~ m{ \A OpenXPKI::Server::Workflow }xms and $params->namespace =~ m{ \A sys\. }xms) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_INVALID_NAMESPACE',
+            message => 'Access to namespace sys.* not allowed when called from OpenXPKI::Server::Workflow::*',
             params => { namespace => $params->namespace, },
         );
 
     }
 
-    # forward encryption request to the worker function, use symmetric
-    # encryption
-    my $encrypt = $params->encrypt ? 'current_symmetric_key' : undef;
+    my $value;
+    my $encryption_key_id;
+    # plain value
+    if (not $params->encrypt) {
+        $value = $params->value;
+    }
+    # symmetric encryption
+    else {
+        my $enc_key = $self->get_realm_encryption_key(CTX('session')->data->pki_realm); # from ::Util
+        ##! 16: 'setting up volatile vault for symmetric encryption'
+        my $vault = OpenXPKI::Crypto::VolatileVault->new({
+            %{$enc_key},
+            TOKEN => $self->api->get_default_token,
+        });
+        $value = $vault->encrypt($params->value);
+        $encryption_key_id = $enc_key->{KEY_ID};
+    }
 
     # erase expired entries
     $self->cleanup;
     $self->set_entry({
         key         => $params->key,
-        value       => $params->value,
+        value       => $value,
         namespace   => $params->namespace,
         pki_realm   => $requested_pki_realm,
         force       => $params->force,
+        enc_key_id  => $encryption_key_id,
         $params->has_expiration_date ? (expiration_date => $params->expiration_date) : (),
-        $params->encrypt ? (encrypt => 'current_symmetric_key') : (),
     });
     return 1;
 };
