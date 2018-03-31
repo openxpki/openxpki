@@ -19,20 +19,38 @@ use OpenXPKI::Server::API2::Types;
 
 =head2 modify_data_pool_entry
 
-This method has two purposes, both require NAMESPACE and KEY.
-B<This method does not modify the value of the entry>.
+Modifies the specified datapool entry key.
+
+You B<cannot modify the value> with this command. To do so use
+L<OpenXPKI::Server::API2::Plugin::Datapool::set_data_pool_entry/set_data_pool_entry>
+with parameter C<force> instead.
+
+This method supports two operations (which can be done simultaneously):
 
 =over
 
-=item Change the entries key
+=item Rename entry (change it's key)
 
-Used to update the key of entry. Pass the name of the new key in NEWKEY.
-I<Commonly used to deal with temporary keys>
+Pass the name of the new key in C<newkey>. Commonly used to deal with temporary
+keys.
+
+    CTX('api2')->modify_data_pool_entry(
+        pki_realm => $pki_realm,
+        namespace => 'workflow.foo.bar',
+        key       => 'myvariable',
+        newkey    => 'myvar',
+    );
 
 =item Change expiration information
 
-Set the new EXPIRATION_DATE, if you set the parameter to undef, the expiration
-date is set to infity.
+Set the new C<expiration_date>.
+
+    CTX('api2')->modify_data_pool_entry(
+        pki_realm       => $pki_realm,
+        namespace       => 'workflow.foo.bar',
+        key             => 'myvariable',
+        expiration_date => 123456,
+    );
 
 =back
 
@@ -40,9 +58,22 @@ B<Parameters>
 
 =over
 
-=item * C<XXX> I<Bool> - XXX. Default: XXX
+=item * C<pki_realm> I<Str> - PKI realm. Optional, default: current realm
+
+=item * C<namespace> I<Str> - datapool namespace (custom string to organize entries)
+
+=item * C<key> I<Str> - key of entry
+
+=item * C<newkey> I<Str> - new key (for renaming operation)
+
+=item * C<expiration_date> I<Int> - UNIX epoch timestamp when the entry shall be
+deleted. If set I<undef>, the entry is kept infinitely.
 
 =back
+
+B<Changes compared to API v1:>
+
+Previously the parameter C<namespace> was optional which was a bug.
 
 =cut
 command "modify_data_pool_entry" => {

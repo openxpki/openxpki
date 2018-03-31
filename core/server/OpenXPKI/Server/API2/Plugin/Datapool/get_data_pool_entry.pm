@@ -18,49 +18,39 @@ use OpenXPKI::Server::API2::Types;
 
 =head2 get_data_pool_entry
 
-Searches the specified key in the data pool and returns a data structure
-containing the resulting value and additional information.
+Searches the specified key in the datapool and returns a I<HashRef>.
 
-Named parameters:
+    my $info = CTX('api2')->get_data_pool_entry(
+        pki_realm => $pki_realm,
+        namespace => 'workflow.foo.bar',
+        key => 'myvariable',
+    );
 
-=over
+Returns:
 
-=item * PKI_REALM - PKI Realm to address. If the API is called directly
-  from OpenXPKI::Server::Workflow only the PKI Realm of the currently active
-  session is accepted. Realm defaults to the current realm if omitted.
-
-=item * NAMESPACE
-
-=item * KEY
-
-=back
-
-Example:
- $tmpval =
-  CTX('api')->get_data_pool_entry(
-  {
-    PKI_REALM => $pki_realm,
-    NAMESPACE => 'workflow.foo.bar',
-    KEY => 'myvariable',
-  });
-
-The resulting data structure looks like:
- {
-   PKI_REALM       => # PKI Realm
-   NAMESPACE       => # Namespace
-   KEY             => # Data pool key
-   ENCRYPTED       => # 1 or 0, depending on if it was encrypted
-   ENCRYPTION_KEY  => # encryption key id used (may not be available)
-   MTIME           => # date of last modification (epoch)
-   EXPIRATION_DATE => # date of expiration (epoch)
-   VALUE           => # value
- };
+    {
+        pki_realm       => '...',   # PKI realm
+        namespace       => '...',   # namespace
+        key             => '...',   # data pool key
+        value           => '...',   # value
+        encrypted       => 1,       # 1 or 0, depending on if it was encrypted
+        encryption_key  => '...',   # encryption key id used (may not be available)
+        mtime           => 12345,   # date of last modification (epoch)
+        expiration_date => 12356,   # date of expiration (epoch)
+    }
 
 B<Parameters>
 
 =over
 
-=item * C<XXX> I<Bool> - XXX. Default: XXX
+=item * C<pki_realm> I<Str> - PKI realm. Optional, default: current realm
+
+If the API is called directly from OpenXPKI::Server::Workflow only the PKI realm
+of the currently active session is accepted.
+
+=item * C<namespace> I<Str> - datapool namespace (custom string to organize entries)
+
+=item * C<key> I<Str> - entry key
 
 =back
 

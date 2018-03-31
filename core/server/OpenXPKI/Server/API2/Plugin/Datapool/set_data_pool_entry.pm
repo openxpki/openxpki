@@ -19,39 +19,8 @@ use OpenXPKI::Server::API2::Types;
 
 =head2 set_data_pool_entry
 
-Writes the specified information to the global data pool, possibly encrypting
-the value using the password safe defined for the PKI Realm.
-
-Named parameters:
-
-=over
-
-=item * PKI_REALM - PKI Realm to address. If the API is called directly
-  from OpenXPKI::Server::Workflow only the PKI Realm of the currently active
-  session is accepted. If no realm is passed, the current realm is used.
-
-=item * NAMESPACE
-
-=item * KEY
-
-=item * VALUE - Value to store
-
-=item * ENCRYPTED - optional, set to 1 if you wish the entry to be encrypted. Requires a properly set up password safe certificate in the target realm.
-
-=item * FORCE - optional, set to 1 in order to force writing entry to database
-
-=item * EXPIRATION_DATE
-
-optional, seconds since epoch. If current time passes this date the server will
-delete the entry. Default is to keep the value for infinity.
-
-If you call C<set_data_pool_entry> with the C<FORCE> option to update an
-existing value, the (new) expiry date must be passed again or will be reset to
-inifity!
-
-To prevent unwanted deletion, a value of C<0> is not accepted.
-
-=back
+Writes the specified entry (key-value pair) to the global data pool, possibly
+encrypting the value using the password safe defined for the PKI Realm.
 
 Side effect: this method automatically wipes all data pool entries whose
 expiration date has passed.
@@ -64,29 +33,54 @@ password safe key is available during the first access to the symmetric key.
 
 Example:
 
-    CTX('api')->set_data_pool_entry( {
-        PKI_REALM => $pki_realm,
-        NAMESPACE => 'workflow.foo.bar',
-        KEY => 'myvariable',
-        VALUE => $tmpval,
-        ENCRYPT => 1,
-        FORCE => 1,
-        EXPIRATION_DATE => time + 3600 * 24 * 7,
-    } );
+    CTX('api2')->set_data_pool_entry(
+        pki_realm => $pki_realm,
+        namespace => 'workflow.foo.bar',
+        key => 'myvariable',
+        value => $tmpval,
+        encrypt => 1,
+        force => 1,
+        expiration_date => time + 3600 * 24 * 7,
+    );
 
 B<Parameters>
 
 =over
 
-=item * C<XXX> I<Bool> - XXX. Default: XXX
+=item * C<pki_realm> I<Str> - PKI realm. Optional, default: current realm
+
+If the API is called directly from OpenXPKI::Server::Workflow only the PKI realm
+of the currently active session is accepted.
+
+=item * C<namespace> I<Str> - datapool namespace (custom string to organize entries)
+
+=item * C<key> I<Str> - entry key
+
+=item * C<value> I<Str> - entry value to store
+
+=item * C<expiration_date> I<Int> - UNIX epoch timestamp when the entry shall be
+deleted. Optional, default: keep entry infinitely.
+
+To prevent unwanted deletion, a value of C<0> is not accepted.
+
+=item * C<force> I<Bool> - set to 1 to enforce overwriting a possibly existing
+entry.
+
+If set, the (new) C<expiration_date> must be passed again or will be reset to
+inifity!
+
+=item * C<encrypt> I<Bool> - set to 1 if you wish the entry to be encrypted.
+Optional, default: 0
+
+Requires a properly set up password safe certificate in the target realm.
 
 =back
 
 =cut
 command "set_data_pool_entry" => {
+    pki_realm       => { isa => 'AlphaPunct', default => sub { CTX('session')->data->pki_realm } },
     namespace       => { isa => 'AlphaPunct', required => 1, },
     key             => { isa => 'AlphaPunct', required => 1, },
-    pki_realm       => { isa => 'AlphaPunct', default => sub { CTX('session')->data->pki_realm } },
     value           => { isa => 'Str', required => 1, },
     expiration_date => { isa => 'Int', },
     force           => { isa => 'Bool', default => 0 },
