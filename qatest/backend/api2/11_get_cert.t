@@ -6,6 +6,7 @@ use warnings;
 use English;
 use FindBin qw( $Bin );
 use File::Temp qw( tempfile );
+use MIME::Base64;
 
 # CPAN modules
 use Test::More;
@@ -17,7 +18,7 @@ use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 
 
-plan tests => 10;
+plan tests => 11;
 
 
 #
@@ -26,6 +27,7 @@ plan tests => 10;
 my $oxitest = OpenXPKI::Test->new(
     with => [qw( SampleConfig Workflows WorkflowCreateCert )],
 );
+my $tempdir = $oxitest->testenv_root;
 
 # Create certificate
 my $cert_info = $oxitest->create_cert(
@@ -100,19 +102,20 @@ lives_and {
 } "Fetch certificate (PEM)";
 
 # Fetch certificate - DER Format
-($tmp, $tmp_name) = tempfile(UNLINK => 1);
 lives_and {
     my $result = $oxitest->api2_command("get_cert" => { identifier => $cert_id, format => 'DER' });
-    print $tmp $result;
-    close $tmp;
-    my $cmp_serial = `openssl x509 -in $tmp_name -inform DER -serial`;
+    open my $fh, ">", "$tempdir/cert.der";
+    print $fh $result;
+    close $fh;
+    $ENV{OPENSSL_CONF} = "/dev/null"; # prevents "WARNING: can't open config file: ..."
+    my $cmp_serial = `openssl x509 -in "$tempdir/cert.der" -inform DER -serial`;
     like $cmp_serial, qr/$serial/i;
 } "Fetch certificate (DER)";
 
 ## Compare PEM and DER
-my $pem2 = `openssl x509 -in $tmp_name -inform DER`;
-$pem =~ s{\s}{}gxms; $pem2 =~ s{\s}{}gxms; # Clear all whitespace to compare
-is $pem, $pem2, 'DER matches PEM';
+my $pem2 = `openssl x509 -in "$tempdir/cert.der" -inform DER`;
+(my $pem_short = $pem) =~ s{\s}{}gxms; $pem2 =~ s{\s}{}gxms; # Clear all whitespace to compare
+is $pem_short, $pem2, 'DER matches PEM';
 
 # Fetch certificate - TXT Format
 TODO: {
@@ -179,3 +182,23 @@ lives_and {
         'system_workflow_csr'   => [ re(qr/\d+$/) ],        # [ '129279' ],
     };
 } "get_cert_attributes - retrieve filtered list";
+
+#
+# get_cert_identifier
+#
+# note: we cannot compare to $cert_id as this originates from the function we want to test
+
+# query fingerprint (SHA1 hash of DER) via OpenSSL
+$ENV{OPENSSL_CONF} = "/dev/null"; # prevents "WARNING: can't open config file: ..."
+my $fp = `openssl x509 -in "$tempdir/cert.der" -inform der -fingerprint -sha1 -noout`;
+($fp) = $fp =~ / ^ [^=]+ = (.*) /x;             # cut off "SHA1 Fingerprint="
+$fp =~ s/://g;                                  # AA:E8:FD:27:1A... --> AAE8FD271A...
+my $fp_base64 = encode_base64(pack('H*', $fp)); # convert to bytes and then to base64
+$fp_base64 =~ tr/+\//-_/;                       # RFC 3548 URL and filename safe base64
+
+lives_and {
+    my $result = $oxitest->api2_command("get_cert_identifier" => { cert => $pem });
+    # $fp_base64 is padded with "=" at the end but $result is not
+    like $fp_base64, qr/\Q$result\E/;
+} "get_cert_identifier - retrieve certificate ID";
+
