@@ -155,8 +155,23 @@ sub _add_config_entry {
     );
 }
 
-# Returns a hash that contains all config data that was defined for the given
-# config path.
+=head2 get_config_node
+
+Returns a all config data that was defined below the given dot separated config
+path. This might be a HashRef (config node) or a Scalar (config leaf).
+
+B<Parameters>
+
+=over
+
+=item * I<$config_key> - dot separated configuration key/path
+
+=item * I<$allow_undef> - set to 1 to return C<undef> instead of dying if the
+config key is not found
+
+=back
+
+=cut
 sub get_config_node {
     my ($self, $config_key, $allow_undef) = @_;
 
@@ -216,6 +231,17 @@ Returns an ArrayRef with all realm names defined by default, by roles or user.
 sub get_realms {
     my ($self) = @_;
     return [ keys %{ $self->_config->{system}->{realms} } ];
+}
+
+=head2 default_realm
+
+Returns the first defined test realm. The result may be different if other roles
+are applied to C<OpenXPKI::Test>.
+
+=cut
+sub default_realm {
+    my ($self) = @_;
+    return $self->get_realms->[0];
 }
 
 __PACKAGE__->meta->make_immutable;

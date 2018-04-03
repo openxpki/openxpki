@@ -429,13 +429,25 @@ has config_writer => (
             db_conf => $self->db_conf,
         )
     },
-    handles => [
-        "add_config",
-    ],
+    handles => {
+        add_config => "add_config",
+        get_config => "get_config_node",
+        default_realm => "default_realm",
+    },
 );
 =head2 add_config
 
 Just a shortcut to L<OpenXPKI::Test::ConfigWriter/add_config>.
+
+=head2 get_config
+
+Just a shortcut to L<OpenXPKI::Test::ConfigWriter/get_config_node>.
+
+=head2 default_realm
+
+Just a shortcut to L<OpenXPKI::Test::ConfigWriter/default_realm>.
+
+=cut
 
 =head2 session
 
@@ -689,7 +701,7 @@ sub init_user_config {
     # Add basic test realm if no other realm exists.
     # Without any realm we cannot set a user via CTX('authentication')
     if (scalar @{ $self->config_writer->get_realms } == 0) {
-        note "Setting up a basic 'TestRealm' as no other realm was defined";
+        note "Setting up a basic PKI realm 'test' as no other realm was defined";
         $self->add_config(
             "system.realms.test" => { label => "TestRealm", baseurl => "http://127.0.0.1/test/" },
             "realm.test.auth" => $self->auth_config,
@@ -740,8 +752,14 @@ sub init_server {
     # init log object (and force it to NOT reinitialize Log4perl)
     OpenXPKI::Server::Context::setcontext({ log => OpenXPKI::Server::Log->new(CONFIG => undef) });
 
-    # Init basic CTX objects
+    # init basic CTX objects
     my @tasks = qw( config_versioned dbi_log api2 api authentication );
+    # init notification object if needed
+    my $cfg_notification = "realm.".$self->default_realm.".notification";
+    if ($self->get_config($cfg_notification, 1)) {
+        note "Config node $cfg_notification found, initializing real CTX('notification') object";
+        push @tasks, "notification";
+    }
     my %task_hash = map { $_ => 1 } @tasks;
     # add tasks requested via constructor parameter "also_init" (or injected by roles)
     for (grep { not $task_hash{$_} } @{ $self->also_init }) {
@@ -753,12 +771,27 @@ sub init_server {
     # use the same DB connection as the test object to be able to do COMMITS
     # etc. in tests
     OpenXPKI::Server::Context::setcontext({ dbi => $self->dbi });
+
+    # Set fake notification object if there is no real one already
+    # (either via setup above or requested by user)
+    if (not OpenXPKI::Server::Context::hascontext("notification")) {
+        note "Initializing mockup CTX('notification') object";
+        OpenXPKI::Server::Context::setcontext({
+            notification =>
+                Moose::Meta::Class->create('OpenXPKI::Test::AnonymousClass::Notification::Mockup' => (
+                    methods => {
+                        notify => sub { },
+                    },
+                ))->new_object
+        });
+    }
+
 }
 
 =head2 init_session_and_context
 
-Basic test setup: create in-memory session (C<CTX('session')>) and a mock
-notification objection (C<CTX('notification')>).
+Basic test setup: create in-memory session (C<CTX('session')>) and (if there
+is no other object already) a mock notification objection (C<CTX('notification')>).
 
 This is the standard hook for roles to modify session data, e.g.:
 
@@ -780,55 +813,7 @@ sub init_session_and_context {
     });
 
     # set default user (after session init as CTX('session') is needed by auth handler
-    $self->set_user($self->config_writer->get_realms->[0] => "user");
-
-    # Set fake notification object
-    OpenXPKI::Server::Context::setcontext({
-        notification =>
-            Moose::Meta::Class->create('OpenXPKI::Test::AnonymousClass::Notification::Mockup' => (
-                methods => {
-                    notify => sub { },
-                },
-            ))->new_object
-    });
-}
-
-=head2 get_config
-
-Returns a all config data that was defined below the given dot separated config
-path. This might be a HashRef (config node) or a Scalar (config leaf).
-
-The data might be taken from parent and/or child config definitions, e.g.:
-
-C<get_config_entry('realm.alpha.workflow')> might return data from
-
-=over
-
-=item * realm/alpha.yaml
-
-=item * realm/alpha/workflow.yaml
-
-=item * realm/alpha/workflow/def/creation.yaml
-
-=item * realm/alpha/workflow/def/deletion.yaml
-
-=back
-
-B<Parameters>
-
-=over
-
-=item * I<$config_key> - dot separated configuration key/path
-
-=item * I<$allow_undef> - set to 1 to return C<undef> instead of dying if the
-config key is not found
-
-=back
-
-=cut
-sub get_config {
-    my ($self, $config_key, $allow_undef) = @_;
-    $self->config_writer->get_config_node($config_key, $allow_undef);
+    $self->set_user($self->default_realm, "user");
 }
 
 =head2 set_user
