@@ -300,7 +300,8 @@ sub decrypt_passwordsafe {
             $exc->rethrow;
         }
         CTX('log')->application->warn("Decryption of encoded datapool value with safe ID $safe_id failed: $_");
-    }
+    };
+
     return $value;
 }
 
