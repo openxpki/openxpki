@@ -644,10 +644,15 @@ sub __handle_LOGOUT : PRIVATE {
     ##! 8: "logout received - terminate session " . $old_session->id,
     CTX('log')->system->debug('Terminating session ' . $old_session->id);
 
-    OpenXPKI::Server::Context::killsession();
     $self->__change_state({ STATE => 'NEW' });
+
+    OpenXPKI::Server::Context::killsession();
+
     Log::Log4perl::MDC->remove();
-    $old_session->delete();
+
+    if (!$old_session->delete()) {
+        CTX('log')->system->warn('Error terminating session!');
+    }
 
     return { 'SERVICE_MSG' => 'LOGOUT' };
 }
@@ -720,11 +725,12 @@ sub __handle_COMMAND : PRIVATE {
                 command => $data->{PARAMS}->{COMMAND},
                 params  => $data->{PARAMS}->{PARAMS},
             );
+        } else {
+            $command = OpenXPKI::Service::Default::Command->new({
+                COMMAND => $data->{PARAMS}->{COMMAND},
+                PARAMS  => $data->{PARAMS}->{PARAMS},
+            });
         }
-        $command = OpenXPKI::Service::Default::Command->new({
-            COMMAND => $data->{PARAMS}->{COMMAND},
-            PARAMS  => $data->{PARAMS}->{PARAMS},
-        });
     };
     if (my $exc = OpenXPKI::Exception->caught()) {
         if ($exc->message() =~ m{ I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_INVALID_COMMAND }xms) {

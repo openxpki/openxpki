@@ -157,6 +157,7 @@ sub get_session_info {
         pki_realm_label => CTX('config')->get([ 'system', 'realms', $session->data->pki_realm, 'label' ]),
         lang => 'en',
         checksum => CTX('config')->checksum(),
+        sid => substr($session->id,0,4),
     }
 
 }
@@ -331,13 +332,12 @@ sub list_issuers {
 
     my $result = CTX('dbi')->select(
         from   => 'certificate',
-        columns => [ 'issuer_identifier', 'issuer_dn' ],
+        columns => [ -distinct => 'issuer_identifier', 'issuer_dn' ],
         where => {
             pki_realm => $requested_pki_realm,
             issuer_identifier => { '!=' => 'unkown' },
             req_key => { '!=' => undef },
         },
-        group_by => 'issuer_identifier',
     )->fetchall_arrayref({});
 
     return [

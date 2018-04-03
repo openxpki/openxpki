@@ -991,7 +991,8 @@ sub action_autocomplete {
         }
     }
 
-    if (!@result) {
+    # do not search with less then 3 letters
+    if (!@result && (length($term) >= 3)) {
         my $search_result = $self->send_command( 'search_cert', {
             SUBJECT => "%$term%",
             VALID_AT => time(),
@@ -1126,24 +1127,24 @@ sub action_search {
         push @{$input->{validity_options}}, { key => $key, value => $val[0] };
 
         if ($key eq 'valid_at') {
-            $query->{NOTBEFORE} = { OPERATOR => 'FROM', VALUE => $val[0] };
-            $query->{NOTAFTER} = { OPERATOR => 'TO', VALUE => $val[0] };
+            $query->{NOTBEFORE} = { OPERATOR => 'GREATER_THAN', VALUE => $val[0] };
+            $query->{NOTAFTER} = { OPERATOR => 'LESS_THAN', VALUE => $val[0] };
 
         } elsif ($key eq 'notbefore_gt') {
-            $query->{NOTBEFORE} = { OPERATOR => 'FROM', VALUE => $val[0] };
+            $query->{NOTBEFORE} = { OPERATOR => 'GREATER_THAN', VALUE => $val[0] };
         } elsif ($key eq 'notbefore_lt') {
             if ($query->{NOTBEFORE}) {
                 $query->{NOTBEFORE} = { OPERATOR => 'BETWEEN', VALUE =>  [ $query->{NOTBEFORE}->{VALUE}, $val[0] ] };
             } else {
-                $query->{NOTBEFORE} = { OPERATOR => 'TO', VALUE => $val[0] };
+                $query->{NOTBEFORE} = { OPERATOR => 'LESS_THAN', VALUE => $val[0] };
             }
         } elsif ($key eq 'notafter_lt') {
-            $query->{NOTAFTER} = { OPERATOR => 'TO', VALUE => $val[0] };
+            $query->{NOTAFTER} = { OPERATOR => 'LESS_THAN', VALUE => $val[0] };
         } elsif ($key eq 'notafter_gt') {
             if ($query->{NOTAFTER}) {
                 $query->{NOTAFTER} = { OPERATOR => 'BETWEEN', VALUE => [ $val[0], $query->{NOTAFTER}->{VALUE} ] };
             } else {
-                $query->{NOTAFTER} = { OPERATOR => 'FROM', VALUE => $val[0] };
+                $query->{NOTAFTER} = { OPERATOR => 'GREATER_THAN', VALUE => $val[0] };
             }
         # THIS IS NOT IMPLEMENTED YET!
         } elsif ($key eq 'revoked_lt') {

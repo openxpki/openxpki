@@ -159,13 +159,14 @@ sub delete {
 
     my $id = $data->id or OpenXPKI::Exception->throw(message => "Cannot delete session: value 'id' is not set");
 
-    $self->dbi->delete(
+    $self->dbi->delete_and_commit(
         from => $self->table,
         where => {
             session_id  => $id,
         },
     )
     or OpenXPKI::Exception->throw(message => "Failed to delete session from database");
+
 }
 
 sub delete_all_before {

@@ -29,34 +29,39 @@ case "$1" in
         #invoke-rc.d --quiet openxpkid restart
         #if [ $? -gt 0 -a $? -eq 100 ]; then exit $?; fi
 
-        # No config - load sample config - also includes/overwrites other
-        # files in /etc/openxpki/ !
-        if [ ! -e /etc/openxpki/config.d/ ]; then
-            tar --strip-components=1 -zxf /usr/share/doc/libopenxpki-perl/examples/openxpki-etc.tgz -C /etc/openxpki
+        if [ -z "$OPENXPKI_NOCONFIG" ]; then
 
-            # chmod the "inner" config to protect sensitive data
-            # do NOT chmod the top folder as e.g. apache needs access 
-            chmod 750 /etc/openxpki/config.d
-            # Apply chown to main folder
-            chown -R openxpki:root /etc/openxpki/
+            # No config - load sample config - also includes/overwrites other
+            # files in /etc/openxpki/ !
+            if [ ! -e /etc/openxpki/config.d/ ]; then
 
-       fi
+                tar --strip-components=1 -zxf /usr/share/doc/libopenxpki-perl/examples/openxpki-etc.tgz -C /etc/openxpki
 
-       # Ubuntu/Jessie names it conf-enabled while wheezy has conf.d
-       if [ -d /etc/apache2/conf-enabled/ ]; then
-           if [ ! -e /etc/apache2/conf-available/openxpki.conf ]; then
-               cp /usr/share/doc/libopenxpki-perl/examples/openxpki.conf /etc/apache2/conf-available/openxpki.conf
-               # Activate module, this creates the symlink in conf-available
-               /usr/sbin/a2enconf openxpki               
-           fi;           
-       else
-           test -e /etc/apache2/conf.d/openxpki.conf || cp /usr/share/doc/libopenxpki-perl/examples/openxpki.conf /etc/apache2/conf.d/openxpki.conf           
-       fi;
+                # chmod the "inner" config to protect sensitive data
+                # do NOT chmod the top folder as e.g. apache needs access
+                chmod 750 /etc/openxpki/config.d
+
+           fi
+
+           # Ubuntu/Jessie names it conf-enabled while wheezy has conf.d
+           if [ -d /etc/apache2/conf-enabled/ ]; then
+               if [ ! -e /etc/apache2/conf-available/openxpki.conf ]; then
+                   cp /usr/share/doc/libopenxpki-perl/examples/openxpki.conf /etc/apache2/conf-available/openxpki.conf
+                   # Activate module, this creates the symlink in conf-available
+                   /usr/sbin/a2enconf openxpki
+               fi;
+           else
+               test -e /etc/apache2/conf.d/openxpki.conf || cp /usr/share/doc/libopenxpki-perl/examples/openxpki.conf /etc/apache2/conf.d/openxpki.conf
+           fi;
+        fi;
+
+        # Apply chown to main folder
+        chown -R openxpki:root /etc/openxpki/
 
        # Fix directory permissions
        chown openxpki:openxpki /var/openxpki
        chown openxpki:openxpki /var/openxpki/session
-       
+
        chown -R openxpki:openxpki /var/log/openxpki
        chown -R openxpki:root /etc/openxpki/ssl/
        chmod -R 750 /etc/openxpki/ssl/
@@ -64,8 +69,8 @@ case "$1" in
        # add apache user to openxpki group (to allow connecting the socket)
        usermod -G openxpki www-data
 
-       # create index.html as symlink to default.html  
-       test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/index.html 
+       # create index.html as symlink to default.html
+       test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/index.html
 
         # UI logfiles
         for f in scep.log soap.log webui.log rpc.log; do
@@ -73,11 +78,11 @@ case "$1" in
             chown www-data:openxpki /var/log/openxpki/$f
             chmod 640 /var/log/openxpki/$f
         done;
-        
+
         # Setup logrotate
         if [ -e /etc/logrotate.d/ ] &&  [ ! -e /etc/logrotate.d/openxpki ]; then
             cp /usr/share/doc/libopenxpki-perl/examples/logrotate.conf /etc/logrotate.d/openxpki
-        fi; 
+        fi;
 
         # Create the pkiadm user
         COUNT=`grep '^pkiadm:' /etc/passwd | wc -l`;

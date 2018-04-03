@@ -11,8 +11,10 @@ OpenXPKI::Server::API2::Plugin::Cert::search_cert
 
 # CPAN modules
 use Regexp::Common;
+use Data::Dumper;
 
 # Project modules
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Database::Legacy;
@@ -148,6 +150,8 @@ command "search_cert" => {
         columns => [ 'certificate.*' ],
     )->fetchall_arrayref({});
 
+    ##! 128: 'Result ' . Dumper $result
+
     return $result;
 };
 
@@ -261,7 +265,7 @@ sub _make_db_query {
     };
 
     ##! 2: "initialize arguments"
-    ##! 32: 'Arguments ' . Dumper $args
+    ##! 32: 'Arguments ' . Dumper $po
 
     if ( $po->has_cert_serial ) {
         my $serial = $po->cert_serial;
@@ -311,10 +315,21 @@ sub _make_db_query {
     $where->{'certificate.subject'}                   = { -like => $po->subject }       if $po->has_subject;
     $where->{'certificate.issuer_dn'}                 = { -like => $po->issuer_dn }     if $po->has_issuer_dn;
 
-    $where->{'certificate.notbefore'} = { '<', $po->valid_before }   if $po->has_valid_before;
-    $where->{'certificate.notbefore'} = { '>', $po->valid_after }    if $po->has_valid_after;
-    $where->{'certificate.notafter'} =  { '<', $po->expires_before } if $po->has_expires_before;
-    $where->{'certificate.notafter'} =  { '>', $po->expires_after}   if $po->has_expires_after;
+    if ($po->has_valid_before && $po->has_valid_after) {
+        $where->{'certificate.notbefore'} = { -between => [ $po->valid_after, $po->valid_before ] };
+    } elsif ($po->has_valid_before) {
+        $where->{'certificate.notbefore'} = { '<', $po->valid_before }
+    } elsif ($po->has_valid_after) {
+        $where->{'certificate.notbefore'} = { '>', $po->valid_after }
+    }
+
+    if ($po->has_expires_before && $po->has_expires_after) {
+        $where->{'certificate.notafter'} = { -between => [ $po->expires_after, $po->expires_before ] };
+    } elsif ($po->has_expires_before) {
+        $where->{'certificate.notafter'} = { '<', $po->expires_before }
+    } elsif ($po->has_expires_after) {
+        $where->{'certificate.notafter'} = { '>', $po->expires_after }
+    }
 
     my @join_spec = ();
 
@@ -357,6 +372,8 @@ sub _make_db_query {
     else {
         $params->{from} = 'certificate',
     };
+
+    ##! 64: 'where ' . Dumper $where
 
     return $params;
 }
