@@ -1,86 +1,63 @@
 #!/usr/bin/perl
-
 use strict;
 use warnings;
 
-use FindBin qw( $Bin );
-use lib "$Bin/../../lib";
-
-use Carp;
+# Core modules
 use English;
-use Data::Dumper;
-use Config::Std;
-use File::Basename;
+use FindBin qw( $Bin );
+
+# CPAN modules
+use Test::More;
+use Test::Deep;
+use Test::Exception;
+
+# Project modules
+use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
+use OpenXPKI::Test;
 use OpenXPKI::Serialization::Simple;
 
-use Log::Log4perl qw(:easy);
-Log::Log4perl->easy_init($WARN);
+plan tests => 8;
 
-use OpenXPKI::Test::QA::More;
-use TestCfg;
 
-my $dirname = dirname($0);
+#
+# Init helpers
+#
+my $oxitest = OpenXPKI::Test->new(
+    with => [qw( SampleConfig Workflows WorkflowCreateCert )],
+    #log_level => 'debug',
+);
+my $cert = $oxitest->create_cert(
+    profile => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    hostname => "fun",
+    requestor_gname => 'Sarah',
+    requestor_name => 'Dessert',
+    requestor_email => 'sahar@d-sert.d',
+);
+my $cert_id = $cert->{identifier};
 
-our @cfgpath = ( $dirname );
-our %cfg = ();
+#
+# Tests
+#
+my $wf;
+lives_ok {
+    $wf = $oxitest->create_workflow('change_metadata' => { cert_identifier => $cert_id }, 1);
+} "create workflow: change_metadata";
 
-my $testcfg = new TestCfg;
-$testcfg->read_config_path( '9x_nice.cfg', \%cfg, @cfgpath );
-
-my $test = OpenXPKI::Test::QA::More->new(
-    {
-        socketfile => $cfg{instance}{socketfile},
-        realm => $cfg{instance}{realm},
-    }
-) or die "Error creating new test instance: $@";
-
-$test->set_verbose($cfg{instance}{verbose});
-
-$test->plan( tests => 8 );
-
-my $buffer = do { # slurp
-    local $INPUT_RECORD_SEPARATOR;
-    open my $HANDLE, '<', $cfg{instance}{buffer};
-    <$HANDLE>;
-};
+$wf->state_is('DATA_UPDATE');
 
 my $serializer = OpenXPKI::Serialization::Simple->new();
-my $input_data = $serializer->deserialize( $buffer );
-
-my $cert_identifier = $input_data->{'cert_identifier'};
-
-$test->like( $cert_identifier , "/^[0-9a-zA-Z-_]{27}/", 'Certificate Identifier')
- || die "Unable to proceed without Certificate Identifier: $@";
-
-
-# Login to use socket
-$test->connect_ok(
-    user => $cfg{operator}{name},
-    password => $cfg{operator}{password},
-) or die "Error - connect failed: $@";
-
-# First try an autoapproval request
-
-my %wfparam = (
-    cert_identifier => $cert_identifier,
-);
-
-$test->create_ok( 'change_metadata' , \%wfparam, 'Create Workflow')
- or die "Workflow Create failed: $@";
-
-$test->state_is('DATA_UPDATE');
-
-$test->execute_ok( 'metadata_update_context', {
-    'meta_email' => $serializer->serialize( ['uli.update@openxpki.de' ]),
+$wf->execute('metadata_update_context' => {
+    'meta_email'     => $serializer->serialize( ['uli.update@openxpki.de' ]),
     'meta_requestor' => 'Uli Update',
     'meta_system_id' => '',
 });
+$wf->state_is('CHOOSE_ACTION');
 
-$test->state_is('CHOOSE_ACTION');
+$wf->execute('metadata_persist');
+$wf->state_is('SUCCESS');
 
-$test->execute_ok( 'metadata_persist' );
-
-$test->state_is('SUCCESS');
-
-$test->disconnect();
-
+my $info = $oxitest->api_command('get_cert_attributes' => { IDENTIFIER => $cert_id });
+cmp_deeply $info, superhashof({
+    meta_email     => [ $serializer->serialize( ['uli.update@openxpki.de' ]) ],
+    meta_requestor => [ "Uli Update" ],
+}), "confirm changed metadata via API";
