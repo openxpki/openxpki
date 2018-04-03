@@ -63,7 +63,7 @@ A PEM encoded data (i.e. Base64 encoded string separated by newlines).
 =cut
 subtype 'PEM', # named $re_cert_string in old API (where it also wrongly included the underscore).
     as 'Str',  # "-" is needed for headers like -----BEGIN CERTIFICATE-----
-    where { $_ =~ qr{ \A [ A-Z a-z 0-9 \+ / = \- \  \n ]+ \z }xms },
+    where { $_ =~ qr{ \A [ A-Z a-z 0-9 \+ / = \- \  \n \r ]+ \z }xms },
     message { "$_ contains characters not allowed in PEM encoded data" };
 
 =head2 PEMCert
