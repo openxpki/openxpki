@@ -10,11 +10,16 @@ related plugins that provides some utility methods
 
 =cut
 
+# Core modules
+use Data::Dumper;
+
 # CPAN modules
 use Try::Tiny;
 
 # Project modules
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::MooseParams;
 
 
 
@@ -38,7 +43,9 @@ Perls caller()
 
 =cut
 sub assert_current_pki_realm_within_workflow {
-    my ($self, $requested_pki_realm) = @_;
+    my ($self, $requested_pki_realm) = positional_args(\@_, # OpenXPKI::MooseParams
+        { isa => 'Str' },
+    );
 
     my @caller = $self->rawapi->my_caller(1); # who called our calling code?
 
@@ -68,7 +75,11 @@ Fetches a value from the datapool DB table
 
 =cut
 sub get_entry {
-    my ($self, $realm, $namespace, $key) = @_;
+    my ($self, $realm, $namespace, $key) = positional_args(\@_, # OpenXPKI::MooseParams
+        { isa => 'Str' },
+        { isa => 'Str' },
+        { isa => 'Str' },
+    );
     return CTX('dbi')->select_one(
         from  => 'datapool',
         columns => [ '*' ],
@@ -93,18 +104,26 @@ encrypt =>
 
 =cut
 sub set_entry {
-    ##! 1: 'start'
-    my ($self, $args) = @_;
+    my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
+        pki_realm       => { isa => 'Str' },
+        namespace       => { isa => 'Str' },
+        key             => { isa => 'Str' },
+        value           => { isa => 'Str | Undef' },
+        enc_key_id      => { isa => 'Str | Undef', optional => 1 },
+        expiration_date => { isa => 'Int', optional => 1 },
+        force           => { isa => 'Bool', optional => 1 },
+    );
+    ##! 64: "args: ".join(", ", map { "$_=".$args{$_} } sort grep { $_ ne "valuess"} keys %args)
 
     my $dbi = CTX('dbi');
 
-    my $realm      = $args->{pki_realm};
-    my $namespace  = $args->{namespace};
-    my $expiry     = $args->{expiration_date};
-    my $enc_key_id = $args->{enc_key_id};
-    my $force      = $args->{force};
-    my $key        = $args->{key};
-    my $value      = $args->{value};
+    my $realm      = $args{pki_realm};
+    my $namespace  = $args{namespace};
+    my $expiry     = $args{expiration_date};
+    my $enc_key_id = $args{enc_key_id};
+    my $force      = $args{force};
+    my $key        = $args{key};
+    my $value      = $args{value};
 
     # primary key for database
     my $key_values = {
@@ -121,7 +140,7 @@ sub set_entry {
         return 1;
     }
 
-    CTX('log')->system()->debug("Writing data pool entry [$realm / $namespace / $key]");
+    ##! 32: "writing data pool entry: realm=$realm / namespace=$namespace / key=$key";
 
     my $data_values = {
         datapool_value  => $value,
@@ -181,8 +200,9 @@ Creates a new key for the PKI realm if necessary.
 
 =cut
 sub get_realm_encryption_key {
-    ##! 1: 'start'
-    my ($self, $realm) = @_;
+    my ($self, $realm) = positional_args(\@_, # OpenXPKI::MooseParams
+        { isa => 'Str' },
+    );
 
     my $token = $self->api->get_default_token();
 
@@ -222,7 +242,7 @@ sub get_realm_encryption_key {
     #
     # Create new key
     #
-    ##! 16: 'first use of this password safe, generate a new symmetric key'
+    ##! 16: 'first use of this password safe, generate a new symmetric vault key'
     my $associated_vault = OpenXPKI::Crypto::VolatileVault->new( {
         TOKEN      => $self->api->get_default_token,
         EXPORTABLE => 1,
@@ -232,22 +252,23 @@ sub get_realm_encryption_key {
     my $key_id = $associated_vault->get_key_id({ LONG => 1 });
 
     # save password safe -> key id mapping
-    $self->set_entry({
+    $self->set_entry(
         pki_realm => $realm,
         namespace => 'sys.datapool.pwsafe',
         key       => 'p7:' . $safe_id, # 'p7' = PKCS#7 encryption,
         value     => $key_id,
-    });
+    );
 
     # save this key for future use
     my $enc_value = $self->encrypt_passwordsafe($safe_id, join(':', $result->{ALGORITHM}, $result->{IV}, $result->{KEY}));
-    $self->set_entry({
+    ##! 16: "Storing vault key for password safe $safe_id to datapool"
+    $self->set_entry(
         pki_realm  => $realm,
         namespace  => 'sys.datapool.keys',
         key        => $key_id,
         value      => $enc_value,
         enc_key_id => 'p7:' . $safe_id, # 'p7' = PKCS#7 encryption,
-    });
+    );
 
     # add key ID
     $result->{KEY_ID} = $key_id;
@@ -259,11 +280,15 @@ sub get_realm_encryption_key {
 # Note: encryption does not need any key an can be done using
 # the keyless default token.
 sub encrypt_passwordsafe {
-    my ($self, $safe_id, $value) = @_; # $safe_id is the alias name of the token, e.g. server-vault-1
-
-    my $cert = $self->api->get_certificate_for_alias(alias => $safe_id)
-        or OpenXPKI::Exception->throw(message => 'Certificate not found', params => { alias => $safe_id });
-    ##! 16: 'cert: ' . $cert
+    my ($self, $safe_id, $value) = positional_args(\@_, # OpenXPKI::MooseParams
+        { isa => 'Str' },
+        { isa => 'Str' },
+    );
+    # $safe_id is the alias name of the token, e.g. server-vault-1
+    my $cert = $self->api->get_certificate_for_alias(alias => $safe_id);
+    OpenXPKI::Exception->throw(message => 'Certificate not found', params => { alias => $safe_id })
+        unless $cert && $cert->{data};
+    ##! 16: "retrieved cert: id = " . $cert->{identifier}
 
     ##! 16: 'asymmetric encryption via passwordsafe ' . $safe_id
     return $self->api->get_default_token->command({
@@ -275,15 +300,18 @@ sub encrypt_passwordsafe {
 
 # Asymmetric decryption using the given token
 sub decrypt_passwordsafe {
-    my ($self, $safe_id, $enc_value) = @_; # $safe_id is the alias name of the token, e.g. server-vault-1
-
+    my ($self, $safe_id, $enc_value) = positional_args(\@_, # OpenXPKI::MooseParams
+        { isa => 'Str' },
+        { isa => 'Str' },
+    );
+    # $safe_id is the alias name of the token, e.g. server-vault-1
     my $safe_token = CTX('crypto_layer')->get_token({ TYPE => 'datasafe', 'NAME' => $safe_id})
         or OpenXPKI::Exception->throw(
             message => 'Token of password safe referenced in datapool entry not available',
             params => { token_id  => $safe_id }
         );
 
-    ##! 16: 'asymmetric decryption via passwordsafe ' . $safe_id
+    ##! 16: "asymmetric decryption via passwordsafe '$safe_id'"
     my $value;
     try {
         $value = $safe_token->command({ COMMAND => 'pkcs7_decrypt', PKCS7 => $enc_value });
@@ -299,7 +327,6 @@ sub decrypt_passwordsafe {
             }
             $exc->rethrow;
         }
-        CTX('log')->application->warn("Decryption of encoded datapool value with safe ID $safe_id failed: $_");
     };
 
     return $value;
@@ -312,9 +339,12 @@ encrypting datapool values either from the server cache or from the datapool.
 
 =cut
 sub fetch_symmetric_key {
-    my ($self, $realm, $key_id) = @_;
+    my ($self, $realm, $key_id) = positional_args(\@_, # OpenXPKI::MooseParams
+        { isa => 'Str' },
+        { isa => 'Str' },
+    );
 
-    CTX('log')->system->trace("Fetching symmetric key $key_id");
+    ##! 16: "fetching symmetric key $key_id"
 
     # Symmetric keys are cached via the server volatile vault.
     # If asked to decrypt a value via a symmetric key, we first check if the
@@ -332,13 +362,14 @@ sub fetch_symmetric_key {
     # We append the vault's ident to prevent collisions in DB
     # TODO: should be replaced by static server id
     my $secret_id = $key_id. ':'. CTX('volatile_vault')->ident();
-    ##! 16: 'Secret id ' . $secret_id
+    ##! 16: "secret id = $secret_id"
 
     # query server cache for the key
     my $key_str = $self->_get_cached_key($realm, $secret_id);
 
     # if not cached: obtain it from datapool (will decrypt it asymmetrically using volatile vault token)
     if (not $key_str) {
+        ##! 32: "key is NOT cached, obtaining from datapool"
         # determine encryption key
         my $key_data = $self->api->get_data_pool_entry(
             pki_realm => $realm,
@@ -355,10 +386,11 @@ sub fetch_symmetric_key {
                 },
                 log => { priority => 'fatal', facility => 'system' },
             );
-
+        ##! 16: "Returned data: ".Dumper($key_data)
         $key_str = $key_data->{value};
         $self->_cache_key($realm, $secret_id, $key_str); # cache encryption key in volatile vault
     }
+    ##! 32: "key = $key_str"
 
     my ( $algorithm, $iv, $key ) = split( /:/, $key_str );
     return {
@@ -371,7 +403,12 @@ sub fetch_symmetric_key {
 # Read encryption from volatile vault and decrypt it.
 # Returns the decrypted cached key or undef if non was found
 sub _get_cached_key {
-    my ($self, $realm, $secret_id) = @_;
+    my ($self, $realm, $secret_id) = positional_args(\@_, # OpenXPKI::MooseParams
+        { isa => 'Str' },
+        { isa => 'Str' },
+    );
+    ##! 16: "Fetching cached key from database"
+
     my $cached_key = CTX('dbi')->select_one(
         from => 'secret',
         columns => [ 'data' ],
@@ -380,8 +417,6 @@ sub _get_cached_key {
             group_id  => $secret_id,
         }
     );
-    ##! 32: 'Cache result ' . Dumper $cached_key
-
     if (not $cached_key) {
         ##! 16: "Encryption key $secret_id not in server cache"
         return;
@@ -395,7 +430,11 @@ sub _get_cached_key {
 
 # Cache encryption key in volatile vault
 sub _cache_key {
-    my ($self, $realm, $secret_id, $key) = @_;
+    my ($self, $realm, $secret_id, $key) = positional_args(\@_, # OpenXPKI::MooseParams
+        { isa => 'Str' },
+        { isa => 'Str' },
+        { isa => 'Str' },
+    );
 
     ##! 16: "Caching encryption key $secret_id"
     eval {

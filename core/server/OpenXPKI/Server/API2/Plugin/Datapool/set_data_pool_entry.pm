@@ -10,6 +10,7 @@ OpenXPKI::Server::API2::Plugin::Datapool::set_data_pool_entry
 =cut
 
 # Project modules
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 
@@ -87,6 +88,7 @@ command "set_data_pool_entry" => {
     encrypt         => { isa => 'Bool', default => 0 },
 } => sub {
     my ($self, $params) = @_;
+    ##! 8: "Writing datapool entry: realm=".$params->pki_realm.", namespace=".$params->namespace.", key=".$params->key
 
     my $requested_pki_realm = $params->pki_realm;
 
@@ -101,6 +103,7 @@ command "set_data_pool_entry" => {
     # chain we assume it's ok.
     $self->assert_current_pki_realm_within_workflow($requested_pki_realm);
 
+    ##! 32: "checking if caller is workflow class that tries to access sys.* namespace"
     my @caller = $self->rawapi->my_caller;
     if ($caller[0] =~ m{ \A OpenXPKI::Server::Workflow }xms and $params->namespace =~ m{ \A sys\. }xms) {
         OpenXPKI::Exception->throw(
@@ -114,12 +117,13 @@ command "set_data_pool_entry" => {
     my $encryption_key_id;
     # plain value
     if (not $params->encrypt) {
+        ##! 16: "plain text value"
         $value = $params->value;
     }
     # symmetric encryption
     else {
         my $enc_key = $self->get_realm_encryption_key(CTX('session')->data->pki_realm); # from ::Util
-        ##! 16: 'setting up volatile vault for symmetric encryption'
+        ##! 16: "symmetrically encrypted value: setting up volatile vault (".join(", ", map { "$_=".$enc_key->{$_} } sort keys %$enc_key).")"
         my $vault = OpenXPKI::Crypto::VolatileVault->new({
             %{$enc_key},
             TOKEN => $self->api->get_default_token,
@@ -130,7 +134,7 @@ command "set_data_pool_entry" => {
 
     # erase expired entries
     $self->cleanup;
-    $self->set_entry({
+    $self->set_entry(  # from ::Util
         key         => $params->key,
         value       => $value,
         namespace   => $params->namespace,
@@ -138,7 +142,7 @@ command "set_data_pool_entry" => {
         force       => $params->force,
         enc_key_id  => $encryption_key_id,
         $params->has_expiration_date ? (expiration_date => $params->expiration_date) : (),
-    });
+    );
     return 1;
 };
 

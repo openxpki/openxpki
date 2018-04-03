@@ -9,7 +9,11 @@ OpenXPKI::Server::API2::Plugin::Datapool::get_data_pool_entry
 
 =cut
 
+# Core modules
+use Data::Dumper;
+
 # Project modules
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 
@@ -56,18 +60,17 @@ of the currently active session is accepted.
 
 =cut
 command "get_data_pool_entry" => {
+    pki_realm => { isa => 'AlphaPunct', default => sub { CTX('session')->data->pki_realm } },
+    namespace => { isa => 'AlphaPunct', required => 1, },
     # TODO Change type of "key" back to "AlphaPunct" once we have a private method to get encrypted data pool entries (where keys have more characters)
     key       => { isa => 'Str', required => 1, },
-    namespace => { isa => 'AlphaPunct', required => 1, },
-    pki_realm => { isa => 'AlphaPunct', default => sub { CTX('session')->data->pki_realm } },
 } => sub {
     my ($self, $params) = @_;
+    ##! 8: "Reading datapool entry: realm=".$params->pki_realm.", namespace=".$params->namespace.", key=".$params->key
 
     my $namespace = $params->namespace;
     my $key       = $params->key;
     my $realm     = $params->pki_realm;
-
-    CTX('log')->system->debug("Reading data pool entry [$realm / $namespace / $key]");
 
     # when called from a workflow we only allow the current realm
     # NOTE: only check direct caller. if workflow is deeper in the caller
@@ -75,6 +78,7 @@ command "get_data_pool_entry" => {
     $self->assert_current_pki_realm_within_workflow($realm); # from ::Util
 
     my $result = $self->get_entry($realm, $namespace, $key); # from ::Util
+    ##! 64: "Database result: ".Dumper($result)
 
     # no entry found, do not raise exception but simply return undef
     if (not $result) {
@@ -90,16 +94,19 @@ command "get_data_pool_entry" => {
         $encrypted = 1;
         # asymmetric decryption of password safe entry
         if (my ($safe_id) = $encryption_key =~ m{ \A p7:(.*) }xms ) {
+            ##! 16: "Asymmetric decryption (safe_id = $safe_id)"
             # $safe_id: alias of password safe token, e.g. server-vault-1
             $value = $self->decrypt_passwordsafe($safe_id, $result->{datapool_value}); # from ::Util
         }
         # symmetric decryption
         else {
+            ##! 16: "Symmetric decryption (key = $encryption_key)"
             $value = $self->_decrypt_symmetric($realm, $encryption_key, $result->{datapool_value});
         }
     }
     # plaintext value
     else {
+        ##! 16: "Plaintext value"
         $value = $result->{datapool_value};
     }
 
