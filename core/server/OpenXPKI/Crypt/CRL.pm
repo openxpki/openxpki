@@ -39,6 +39,14 @@ has itemcnt => (
     default => sub { 0; } #my $self = shift; scalar keys %{$self->_crl()->revocation_list}; },
 );
 
+has items => (
+    is => 'ro',
+    isa => 'HashRef',
+    required => 0,
+    lazy => 1,
+    default => sub { my $self = shift; return $self->_crl()->revocation_list; },
+);
+
 has _crl => (
     is => 'ro',
     required => 1,
