@@ -107,6 +107,8 @@ command "import_crl" => {
         issuer_identifier => $ca_identifier,
         crl_key           => $serial,
         publication_date  => 0,
+        items             =>  $crl_obj->{PARSED}->{BODY}->{ITEMCNT},
+        crl_number        =>  $crl_obj->{PARSED}->{BODY}->{SERIAL},
     };
 
     my $duplicate = $dbi->select_one(

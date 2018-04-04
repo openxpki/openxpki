@@ -410,8 +410,6 @@ sub issueCRL {
 
     my @cert_timestamps; # array with certificate data and timestamp
 
-    # fetch certificates that are already revoked or to be revoked, must
-    # use LEFT JOIN as there can be revoked certificates without CRR items!
     my $certs = $dbi->select(
         from => 'certificate',
         columns => [ 'cert_key', 'identifier',
@@ -472,6 +470,8 @@ sub issueCRL {
         pki_realm         => $pki_realm,
         issuer_identifier => $ca_identifier,
         crl_key           => $serial,
+        crl_number        => $serial,
+        items             => scalar @cert_timestamps,
         publication_date  => 0,
     };
     $dbi->insert( into => 'crl', values => $data );
