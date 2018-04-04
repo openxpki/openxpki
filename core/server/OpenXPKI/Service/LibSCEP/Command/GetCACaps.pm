@@ -26,10 +26,6 @@ sub execute {
 
     ##! 8: 'start'
 
-    my $algs = CTX('api')->get_alg_names();
-
-    ##! 8: 'Algs ' . Dumper $algs
-
     # we silently asume that all digests are supported and the server can handle post requests
     # which is true on current systems using the suggested toolchain
     # post seems to be a bit more than just post (binary p7) - needs to be fixed
