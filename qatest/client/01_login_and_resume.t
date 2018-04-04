@@ -31,7 +31,7 @@ my $oxitest = OpenXPKI::Test->new(
 # Tests
 #
 my $tester = $oxitest->new_client_tester;
-$tester->login("caop");
+$tester->login("ca-one" => "caop");
 
 my $result = $tester->send_command_ok("get_session_info");
 is $result->{name}, "caop", "session info contains user name";

@@ -25,7 +25,8 @@ of a workflow that can be tested
 =head2 new
 
 Constructor: creates a new workflow instance using API command
-L<create_workflow_instance|OpenXPKI::Server::API2::Plugin::Workflow::create_workflow_instance>.
+L<create_workflow_instance|OpenXPKI::Server::API2::Plugin::Workflow::create_workflow_instance>
+or fetches an existing workflow's state.
 
 Named parameters:
 
@@ -33,9 +34,11 @@ Named parameters:
 
 =item * C<oxitest> I<OpenXPKI::Test> - instance of the test object
 
-=item * C<type> I<Str> - workflow type (i.e. name)
+=item * C<type> I<Str> - new workflow: workflow type (i.e. name)
 
-=item * C<params> I<HashRef> - workflow parameters. Default: {}
+=item * C<params> I<HashRef> - new workflow: workflow parameters. Default: {}
+
+=item * C<id> I<Str> - existing workflow: ID
 
 =back
 
@@ -44,13 +47,11 @@ Named parameters:
 has oxitest => (
     is => 'rw',
     isa => 'OpenXPKI::Test',
-    required => 1,
 );
 
 has type => (
     is => 'rw',
     isa => 'Str',
-    required => 1,
 );
 
 has params => (
@@ -59,14 +60,8 @@ has params => (
     default => sub { {} },
 );
 
-=head2 id
-
-Returns the workflow ID.
-
-=cut
 has id => (
     is => 'rw',
-    init_arg => undef,
 );
 
 =head2 last_wf_state
@@ -88,26 +83,59 @@ has last_wf_state => (
 sub BUILD {
     my $self = shift;
 
-    my $data = $self->oxitest->api2_command(
-        create_workflow_instance => {
-            workflow => $self->type,
-            params => $self->params,
-        }
-    );
-    $self->last_wf_state($data->{workflow}) if $data->{workflow};
+    die "Please specify either 'type' (to create a new workflow) or 'id' (fetch existing one)"
+        unless $self->id || $self->type;
 
-    my $id = $data->{workflow}->{id} or die explain $data;
-    $self->id($id);
-    note "Created workflow #$id (".$self->type.")";
+    # new workflow
+    if ($self->type) {
+        my $data = $self->oxitest->api2_command(
+            create_workflow_instance => { workflow => $self->type, params => $self->params }
+        );
+        my $id = $data->{workflow}->{id} or die explain $data;
+        $self->id($id);
+        $self->last_wf_state($data->{workflow}) if $data->{workflow};
+        note "Created workflow #$id (".$self->type.")";
+    }
+    # existing workflow
+    else {
+        $self->refresh;
+        my $type = $self->last_wf_state->{type} or die explain $self->last_wf_state;
+        $self->type($type);
+        note "Fetched workflow #".$self->id." ($type)";
+    }
 }
 
-=head2 start_activity
+=head2 refresh
+
+Refreshes the workflow information in this wrapper object by querying the API.
+
+=cut
+sub refresh {
+    my ($self) = @_;
+    my $data = $self->oxitest->api2_command(
+        get_workflow_info => { id => $self->id }
+    );
+    $self->last_wf_state($data->{workflow}) if $data->{workflow};
+}
+
+=head2 state
+
+Returns the current workflow state. Please use L</refresh> to get current
+informations.
+
+=cut
+sub state {
+    my $self = shift;
+    return $self->last_wf_state->{state};
+}
+
+=head2 execute
 
 Executes the API command I<execute_workflow_activity> as a test.
 
 Example:
 
-    $wf->start_activity(
+    $wf->execute(
         "csr_ask_client_password",
         { _password => "m4#bDf7m3abd" },
     );
@@ -123,7 +151,7 @@ B<Positional Parameters>
 =back
 
 =cut
-sub start_activity {
+sub execute {
     my ($self, $activity, $params) = @_;
 
     my $result;
@@ -200,39 +228,7 @@ B<Positional Parameters>
 =cut
 sub state_is {
     my ($self, $expected_state) = @_;
-    if ($self->has_last_wf_state) {
-        is $self->last_wf_state->{state}, $expected_state, "workflow state is '$expected_state'";
-    }
-    else {
-        fail "workflow state is '$expected_state'";
-    }
-}
-
-=head2 change_user
-
-Change the user that is seen by the workflow actions and conditions.
-
-B<Positional Parameters>
-
-=over
-
-=item * C<$user> I<Str> - username
-
-=item * C<$role> I<Str> - role
-
-=back
-
-=cut
-sub change_user {
-    my ($self, $user, $role) = @_;
-
-    # set current user to: normal user
-    OpenXPKI::Server::Context::CTX('session')->data->user($user);
-    OpenXPKI::Server::Context::CTX('session')->data->role($role);
-
-    # reset condition cache so e.g. user role checks are re-evaluated
-    my $wf = OpenXPKI::Server::Context::CTX('workflow_factory')->get_factory->fetch_workflow($self->type, $self->id);
-    $wf->_get_workflow_state->clear_condition_cache;
+    is $self->state, $expected_state, "workflow state is '$expected_state'";
 }
 
 __PACKAGE__->meta->make_immutable;

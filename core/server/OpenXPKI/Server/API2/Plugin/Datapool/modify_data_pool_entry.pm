@@ -19,20 +19,38 @@ use OpenXPKI::Server::API2::Types;
 
 =head2 modify_data_pool_entry
 
-This method has two purposes, both require NAMESPACE and KEY.
-B<This method does not modify the value of the entry>.
+Modifies the specified datapool entry key.
+
+You B<cannot modify the value> with this command. To do so use
+L<OpenXPKI::Server::API2::Plugin::Datapool::set_data_pool_entry/set_data_pool_entry>
+with parameter C<force> instead.
+
+This method supports two operations (which can be done simultaneously):
 
 =over
 
-=item Change the entries key
+=item Rename entry (change it's key)
 
-Used to update the key of entry. Pass the name of the new key in NEWKEY.
-I<Commonly used to deal with temporary keys>
+Pass the name of the new key in C<newkey>. Commonly used to deal with temporary
+keys.
+
+    CTX('api2')->modify_data_pool_entry(
+        pki_realm => $pki_realm,
+        namespace => 'workflow.foo.bar',
+        key       => 'myvariable',
+        newkey    => 'myvar',
+    );
 
 =item Change expiration information
 
-Set the new EXPIRATION_DATE, if you set the parameter to undef, the expiration
-date is set to infity.
+Set the new C<expiration_date>.
+
+    CTX('api2')->modify_data_pool_entry(
+        pki_realm       => $pki_realm,
+        namespace       => 'workflow.foo.bar',
+        key             => 'myvariable',
+        expiration_date => 123456,
+    );
 
 =back
 
@@ -40,17 +58,30 @@ B<Parameters>
 
 =over
 
-=item * C<XXX> I<Bool> - XXX. Default: XXX
+=item * C<pki_realm> I<Str> - PKI realm. Optional, default: current realm
+
+=item * C<namespace> I<Str> - datapool namespace (custom string to organize entries)
+
+=item * C<key> I<Str> - key of entry
+
+=item * C<newkey> I<Str> - new key (for renaming operation)
+
+=item * C<expiration_date> I<Int> - UNIX epoch timestamp when the entry shall be
+deleted. If set I<undef>, the entry is kept infinitely.
 
 =back
 
+B<Changes compared to API v1:>
+
+Previously the parameter C<namespace> was optional which was a bug.
+
 =cut
 command "modify_data_pool_entry" => {
-    namespace       => { isa => 'AlphaPunct', },
     pki_realm       => { isa => 'AlphaPunct', default => sub { CTX('session')->data->pki_realm } },
+    namespace       => { isa => 'AlphaPunct', required => 1, },
     key             => { isa => 'Str', matching => qr/(?^msx: \A \$? [ \w \- \. : \s ]* \z )/, required => 1, },
-    newkey          => { isa => 'Str', matching => qr/(?^msx: \A \$? [ \w \- \. : \s ]* \z )/, required => 1, },
-    expiration_date => { isa => 'Str', matching => qr/(?^msx: \A (?:(?:[-+]?)(?:[0123456789]+))* \z )/, },
+    newkey          => { isa => 'Str', matching => qr/(?^msx: \A \$? [ \w \- \. : \s ]* \z )/, },
+    expiration_date => { isa => 'Str|Undef', matching => sub { defined $_ ? ($_ =~ qr/(?^msx: \A (?:(?:[-+]?)(?:[0123456789]+))* \z )/) : 1 }, },
 } => sub {
     my ($self, $params) = @_;
 
@@ -61,25 +92,24 @@ command "modify_data_pool_entry" => {
     # chain we assume it's ok.
     $self->assert_current_pki_realm_within_workflow($requested_pki_realm);
 
-    my %values = (
-        'datapool_key' => $params->newkey,
+    my $new_values = {
+        $params->has_newkey ? ('datapool_key' => $params->newkey) : (),
         'last_update' => time,
-    );
+    };
 
     if ($params->has_expiration_date) {
-        my $expiration_date = $params->expiration_date;
-        $values{notafter} = $expiration_date; # may be undef
+        my $exp = $params->expiration_date;
+        $new_values->{notafter} = $exp; # may be undef
 
-        if ( defined $expiration_date ) {
-            if (   ( $expiration_date < 0 )
-                or ( $expiration_date > 0 and $expiration_date < time ) ) {
+        if (defined $exp) {
+            if ($exp < 0 or ($exp > 0 and $exp < time)) {
                 OpenXPKI::Exception->throw(
-                    message => 'I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_INVALID_EXPIRATION_DATE',
+                    message => 'Invalid expiration date',
                     params => {
                         pki_realm       => $requested_pki_realm,
                         namespace       => $params->namespace,
                         key             => $params->key,
-                        expiration_date => $expiration_date,
+                        expiration_date => $exp,
                     },
                 );
             }
@@ -91,12 +121,11 @@ command "modify_data_pool_entry" => {
 
     my $result = CTX('dbi')->update(
         table => 'datapool',
-        set   => \%values,
+        set   => $new_values,
         where => {
             pki_realm    => $requested_pki_realm,
             datapool_key => $params->key,
-            $params->has_namespace
-                ? ( namespace => $params->namespace ) : (),
+            namespace    => $params->namespace,
         },
     );
 

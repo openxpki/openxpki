@@ -43,8 +43,7 @@ my $cert_info = $oxitest->create_cert(
 );
 
 # set user role to be allowed to create workflows etc.
-$oxitest->session->data->user("caop");
-$oxitest->session->data->role("CA Operator");
+$oxitest->set_user("ca-one" => "caop");
 
 #
 # Tests
@@ -92,7 +91,7 @@ lives_and {
 
 # we use the client to get real server process names
 my $client = $oxitest->new_client_tester;
-$client->login("caop");
+$client->login("ca-one" => "caop");
 lives_and {
     my $data = $client->send_command_api2_ok("list_process");
     cmp_deeply $data, superbagof(

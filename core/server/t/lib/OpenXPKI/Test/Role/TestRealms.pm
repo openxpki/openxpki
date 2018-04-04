@@ -36,9 +36,9 @@ before 'init_user_config' => sub { # ... so we do not overwrite user supplied co
 
     # sample realms
     for my $realm (qw( alpha beta gamma )) {
-        $self->config_writer->add_user_config(
+        $self->add_config(
             "realm.$realm" => {
-                "auth" => $self->_auth,
+                "auth" => $self->auth_config, # $self->auth_config comes from OpenXPKI::Test
                 "crypto" => $self->_crypto($realm),
                 "workflow" => {
                     "persister" => $self->_workflow_persister,
@@ -57,7 +57,7 @@ before 'init_user_config' => sub { # ... so we do not overwrite user supplied co
                 "crl" => { "default" => $self->_crl_default },
             },
         );
-        $self->config_writer->add_user_config(
+        $self->add_config(
             "system.realms.$realm" => $self->_system_realm($realm)
         );
     }
@@ -66,74 +66,8 @@ before 'init_user_config' => sub { # ... so we do not overwrite user supplied co
 after 'init_session_and_context' => sub {
     my $self = shift;
     # set PKI realm after init() as various init procedures overwrite the realm
-    $self->session->data->pki_realm("alpha") if $self->has_session;
+    $self->set_user("alpha" => "user") if $self->has_session;
 };
-
-sub _auth {
-    my ($self) = @_;
-    return {
-        stack => {
-            _System    => {
-                description => "System",
-                handler => "System",
-            },
-            Anonymous => {
-                description => "Anonymous",
-                handler => "Anonymous",
-            },
-            Test => {
-                description => "OpenXPKI test auth stack",
-                handler => "OxiTest",
-            },
-        },
-        handler => {
-            "System" => {
-                type => "Anonymous",
-                label => "System",
-                role => "System",
-            },
-            "Anonymous" => {
-                type => "Anonymous",
-                label => "System",
-            },
-            "OxiTest" => {
-                label => "OpenXPKI Test Authentication Handler",
-                type  => "Password",
-                user  => {
-                    # password is always "openxpki"
-                    caop => {
-                        digest => $self->password_hash, # "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B",
-                        role   => "CA Operator",
-                    },
-                    raop => {
-                        digest => $self->password_hash,
-                        role   => "RA Operator",
-                    },
-                    raop2 => {
-                        digest => $self->password_hash,
-                        role   => "RA Operator",
-                    },
-                    user => {
-                        digest => $self->password_hash,
-                        role   => "User"
-                    },
-                    user2 => {
-                        digest => $self->password_hash,
-                        role   => "User"
-                    },
-                },
-            },
-        },
-        roles => {
-            "Anonymous"   => { label => "Anonymous" },
-            "CA Operator" => { label => "CA Operator" },
-            "RA Operator" => { label => "RA Operator" },
-            "SmartCard"   => { label => "SmartCard" },
-            "System"      => { label => "System" },
-            "User"        => { label => "User" },
-        },
-    };
-}
 
 sub _crypto {
     my ($self, $realm) = @_;

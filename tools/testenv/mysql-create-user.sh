@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Creating MySQL database user"
+echo "MySQL: creating user"
 
 DBPASS=""
 test ! -z "$OXI_TEST_DB_MYSQL_DBPASSWORD" && DBPASS="-p$OXI_TEST_DB_MYSQL_DBPASSWORD" || true

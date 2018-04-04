@@ -125,7 +125,6 @@ OpenXPKI/Crypto/Tool/SCEP/Engine/OpenSSL.pm
 
 OpenXPKI/Crypto/Tool/LibSCEP.pm
 OpenXPKI/Crypto/Tool/LibSCEP/API.pm
-OpenXPKI/Crypto/Tool/LibSCEP/CLI.pm
 OpenXPKI/Crypto/Tool/LibSCEP/Command/create_certificate_reply.pm
 OpenXPKI/Crypto/Tool/LibSCEP/Command/create_crl_reply.pm
 OpenXPKI/Crypto/Tool/LibSCEP/Command/create_error_reply.pm
@@ -252,6 +251,8 @@ OpenXPKI/Server/API2/EasyPluginMetaClassTrait.pm
 OpenXPKI/Server/API2/EasyPluginRole.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_cert.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_cert_actions.pm
+OpenXPKI/Server/API2/Plugin/Cert/get_cert_attributes.pm
+OpenXPKI/Server/API2/Plugin/Cert/get_cert_identifier.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_chain.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_profile_for_cert.pm
 OpenXPKI/Server/API2/Plugin/Cert/import_certificate.pm
@@ -263,6 +264,8 @@ OpenXPKI/Server/API2/Plugin/Cert/validate_certificate.pm
 OpenXPKI/Server/API2/Plugin/Control/control_watchdog.pm
 OpenXPKI/Server/API2/Plugin/Control/purge_application_log.pm
 OpenXPKI/Server/API2/Plugin/Crypto/generate_key.pm
+OpenXPKI/Server/API2/Plugin/Crypto/get_key_identifier_from_data.pm
+OpenXPKI/Server/API2/Plugin/Crypto/get_random.pm
 OpenXPKI/Server/API2/Plugin/Datapool/get_data_pool_entry.pm
 OpenXPKI/Server/API2/Plugin/Datapool/list_data_pool_entries.pm
 OpenXPKI/Server/API2/Plugin/Datapool/modify_data_pool_entry.pm
@@ -302,6 +305,7 @@ OpenXPKI/Server/API2/Plugin/UI/get_report_list.pm
 OpenXPKI/Server/API2/Plugin/UI/get_session_info.pm
 OpenXPKI/Server/API2/Plugin/UI/list_process.pm
 OpenXPKI/Server/API2/Plugin/UI/render_template.pm
+OpenXPKI/Server/API2/Plugin/UI/send_notification.pm
 OpenXPKI/Server/API2/Plugin/Workflow/Util.pm
 OpenXPKI/Server/API2/Plugin/Workflow/create_workflow_instance.pm
 OpenXPKI/Server/API2/Plugin/Workflow/execute_workflow_activity.pm

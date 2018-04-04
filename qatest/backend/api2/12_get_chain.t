@@ -78,7 +78,10 @@ lives_and {
     });
     my ($tmp, $tmp_name) = tempfile(UNLINK => 1);
     print $tmp $result->{certificates}->[0] and close $tmp;
-    my $info = `OPENSSL_CONF=/dev/null openssl x509 -in $tmp_name -inform DER -outform PEM`;
+
+    $ENV{OPENSSL_CONF} = "/dev/null"; # prevents "WARNING: can't open config file: ..."
+    my $info = `openssl x509 -in $tmp_name -inform DER -outform PEM`;
+
     like $info, qr{ \Q$alice\E }msx;
 } "Fetch certificate chain (DER)";
 
@@ -92,7 +95,10 @@ lives_and {
     });
     my ($tmp, $tmp_name) = tempfile(UNLINK => 1);
     print $tmp $result and close $tmp;
-    my $info = `OPENSSL_CONF=/dev/null openssl pkcs7 -in $tmp_name -print_certs`;
+
+    $ENV{OPENSSL_CONF} = "/dev/null"; # prevents "WARNING: can't open config file: ..."
+    my $info = `openssl pkcs7 -in $tmp_name -print_certs`;
+
     like $info, qr{ \Q$alice\E .* \Q$signer\E }msx;
 } "Fetch certificate chain (BUNDLE)";
 
@@ -104,7 +110,10 @@ lives_and {
     });
     my ($tmp, $tmp_name) = tempfile(UNLINK => 1);
     print $tmp $result and close $tmp;
-    my $info = `OPENSSL_CONF=/dev/null openssl pkcs7 -in $tmp_name -print_certs`;
+
+    $ENV{OPENSSL_CONF} = "/dev/null"; # prevents "WARNING: can't open config file: ..."
+    my $info = `openssl pkcs7 -in $tmp_name -print_certs`;
+
     like $info, qr{ \Q$alice\E .* \Q$signer\E .* \Q$root\E }msx;
 } "Fetch certificate chain (BUNDLE and KEEPROOT)";
 

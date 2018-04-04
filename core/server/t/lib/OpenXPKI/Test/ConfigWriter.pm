@@ -46,40 +46,6 @@ has _config => (
     init_arg => undef, # disable assignment via construction
 );
 
-# additional configuration added in tests.
-# They must be declared before we create() everything.
-# HashRef: [dot-separated config path] => [YAML HashRef]
-has _user_config => (
-    is => 'ro',
-    isa => 'ArrayRef[ArrayRef]',
-    traits => [ 'Array' ],
-    default => sub { [] },
-    init_arg => undef, # disable assignment via construction
-    handles => {
-        _add_user_config_pair => 'push',
-        _map_user_config => 'map',
-    },
-);
-
-sub add_user_config {
-    my ($self, %entries) = @_;
-
-    # notify user about added custom config
-    my $pkg = __PACKAGE__; my $line; my $i = 0;
-    while ($pkg and ($pkg eq __PACKAGE__ or $pkg =~ /^(Eval::Closure::|Class::MOP::)/)) {
-        ($pkg, $line) = (caller(++$i))[0,2];
-    }
-
-    for (keys %entries) {
-        $self->_add_user_config_pair([
-            $_ => {
-                source => "$pkg:$line",
-                config => $entries{$_},
-            }
-        ]);
-    }
-}
-
 # Following attributes must be lazy => 1 because their builders access other attributes
 
 has path_config_dir     => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->basedir."/etc/openxpki/config.d" } );
@@ -135,11 +101,26 @@ sub write_yaml {
     $self->write_str($filepath, YAML::Tiny->new($data)->write_string);
 }
 
+sub add_config {
+    my ($self, %entries) = @_;
+
+    # notify user about added custom config
+    my $pkg = __PACKAGE__; my $line; my $i = 0;
+    while ($pkg and ($pkg eq __PACKAGE__ or $pkg =~ /^(Eval::Closure::|Class::MOP::)/)) {
+        ($pkg, $line) = (caller(++$i))[0,2];
+    }
+
+    # user specified config data might overwrite default configs
+    for (keys %entries) {
+        $self->_add_config_entry($_, $entries{$_}, "$pkg:$line");
+    }
+}
+
 # Add a configuration node (I<HashRef>) below the given configuration key
 # (dot separated path in the config hierarchy)
 #
 #     $config_writer->add_config('realm.alpha.workflow', $workflow);
-sub add_config {
+sub _add_config_entry {
     my ($self, $key, $data, $source) = @_;
 
     die "add_config() must be called before create()" if $self->is_written;
@@ -174,16 +155,23 @@ sub add_config {
     );
 }
 
+=head2 get_config_node
 
-sub add_realm_config {
-    my ($self, $realm, $config_relpath, $yaml_hash) = @_;
-    die "add_realm_config() must be called before create()" if $self->is_written;
-    my $config_path = "realm.$realm.$config_relpath";
-    $self->add_config($config_path => $yaml_hash);
-}
+Returns a all config data that was defined below the given dot separated config
+path. This might be a HashRef (config node) or a Scalar (config leaf).
 
-# Returns a hash that contains all config data that was defined for the given
-# config path.
+B<Parameters>
+
+=over
+
+=item * I<$config_key> - dot separated configuration key/path
+
+=item * I<$allow_undef> - set to 1 to return C<undef> instead of dying if the
+config key is not found
+
+=back
+
+=cut
 sub get_config_node {
     my ($self, $config_key, $allow_undef) = @_;
 
@@ -203,14 +191,6 @@ sub create {
 
     $self->_make_dir($self->path_config_dir);
     $self->_make_parent_dir($self->path_log_file);
-
-    # default test config
-    note "Adding config nodes:";
-
-    # user specified config data (might overwrite default configs)
-    $self->_map_user_config(sub {
-        $self->add_config($_->[0], $_->[1]->{config}, $_->[1]->{source})
-    });
 
     # write all config files
     for my $level1 (sort keys %{$self->_config}) {
@@ -250,7 +230,18 @@ Returns an ArrayRef with all realm names defined by default, by roles or user.
 =cut
 sub get_realms {
     my ($self) = @_;
-    return [ keys %{ $self->_config->{realm} } ];
+    return [ keys %{ $self->_config->{system}->{realms} } ];
+}
+
+=head2 default_realm
+
+Returns the first defined test realm. The result may be different if other roles
+are applied to C<OpenXPKI::Test>.
+
+=cut
+sub default_realm {
+    my ($self) = @_;
+    return $self->get_realms->[0];
 }
 
 __PACKAGE__->meta->make_immutable;

@@ -15,6 +15,46 @@ function _exit () {
 }
 trap '_exit $?' EXIT
 
+VBOX="$1"
+
+#
+# Install Virtualbox guest addins
+#
+install_vbox=0
+if $(which VBoxService >/dev/null); then
+    INSTALLED_VBOX=$(VBoxService --version | sed -r 's/^([0-9\.]+).*/\1/')
+    if [ $INSTALLED_VBOX != $VBOX ]; then
+        echo "Installed VBoxGuestAdditions $INSTALLED_VBOX do not match Virtualbox version $VBOX"
+        install_vbox=1
+    else
+        echo "Installed VBoxGuestAdditions match Virtualbox version $VBOX"
+    fi
+else
+    install_vbox=1
+fi
+if [ $install_vbox -eq 1 ]; then
+    echo "Installing VBoxGuestAdditions $VBOX"
+    apt remove virtualbox-guest-utils || echo                         >$LOG 2>&1
+    set -e
+    cd /tmp
+    wget -q http://download.virtualbox.org/virtualbox/$VBOX/VBoxGuestAdditions_$VBOX.iso >$LOG 2>&1
+    mount VBoxGuestAdditions_$VBOX.iso -o loop /mnt                   >$LOG 2>&1
+    sh /mnt/VBoxLinuxAdditions.run --nox11 -- --force                 >$LOG 2>&1
+    umount /mnt
+    rm VBoxGuestAdditions_$VBOX.iso
+    set +e
+fi
+
+#
+# Install some requirements
+#
+set -e
+echo "Installing some requirements"
+apt update                                                            >$LOG 2>&1
+DEBIAN_FRONTEND=noninteractive \
+ apt-get -q=2 install rsync                                           >$LOG 2>&1
+set +e
+
 #
 # Install package dependencies
 #
@@ -22,7 +62,6 @@ installed=$(/usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' 'lib
 if [ $installed -eq 0 ]; then
     set -e
     echo "Installing OpenXPKI package dependencies"
-    apt update                                                        >$LOG 2>&1
     DEBIAN_FRONTEND=noninteractive \
      apt-get -q=2 install apache2 libapache2-mod-fcgid libssl-dev     >$LOG 2>&1
     set +e
@@ -51,32 +90,40 @@ if [ $(grep -c '/vagrant/scripts' /root/.bashrc) -eq 0 ]; then
     echo "export PATH=$PATH:/vagrant/scripts"              >> /home/vagrant/.profile
     echo "/vagrant/scripts/oxi-help"                       >> /home/vagrant/.profile
 fi
-OXI_CORE_DIR=$(mktemp -d)
-echo "OXI_CORE_DIR=$OXI_CORE_DIR" >> /etc/environment
 
-# Read our configuration and the one written by MySQL provisioning script
+if ! $(grep -q OXI_CORE_DIR /etc/environment); then
+    OXI_CORE_DIR=/run-env/openxpki
+    mkdir -p $OXI_CORE_DIR
+    echo "OXI_CORE_DIR=$OXI_CORE_DIR" >> /etc/environment
+fi
+
+# Read our configuration and the one written by previous (DB) provisioning scripts
 while read def; do export $def; done < /etc/environment
 
 # STARTUP SCRIPT
-## Disables because it expects mysql package and is not needed in dev env (?)
+## Disabled because it expects mysql package and is not needed in dev env (?)
 ## cp /code-repo/package/debian/core/libopenxpki-perl.openxpkid.init /etc/init.d/openxpkid
 
 # USERS AND GROUPS
 
 # openxpki
-addgroup --quiet --system openxpki
-adduser  --quiet --system --no-create-home --disabled-password --ingroup openxpki openxpki
+if ! $(grep -q openxpki /etc/passwd); then
+    addgroup --quiet --system openxpki
+    adduser  --quiet --system --no-create-home --disabled-password --ingroup openxpki openxpki
+fi
 
 # add apache user to openxpki group (to allow connecting the socket)
 usermod -G openxpki www-data
 
 # pkiadm
-adduser --quiet --system --disabled-password --group pkiadm
-usermod pkiadm -G openxpki
-# In case somebody decided to change the home base
-HOME=`grep pkiadm /etc/passwd | cut -d":" -f6`
-chown pkiadm:openxpki $HOME
-chmod 750 $HOME
+if ! $(grep -q pkiadm /etc/passwd); then
+    adduser --quiet --system --disabled-password --group pkiadm
+    usermod pkiadm -G openxpki
+    # In case somebody decided to change the home base
+    HOME=`grep pkiadm /etc/passwd | cut -d":" -f6`
+    chown pkiadm:openxpki $HOME
+    chmod 750 $HOME
+fi
 
 # Create the sudo file to restart oxi from pkiadm
 if [ -d /etc/sudoers.d ]; then
@@ -154,7 +201,7 @@ if [ -e /etc/init.d/apache2 ]; then
 
     a2enmod cgid                                                      >$LOG 2>&1
     a2enmod fcgid                                                     >$LOG 2>&1
-    # Need to pickup new group
+    # Needed to pickup new group
     /etc/init.d/apache2 restart                                       >$LOG 2>&1
 fi
 

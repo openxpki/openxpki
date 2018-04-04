@@ -90,7 +90,7 @@ my $oxitest = OpenXPKI::Test->new(
 );
 
 my $tester = $oxitest->new_client_tester;
-$tester->login("caop");
+$tester->login("ca-one" => "caop");
 
 sub wait_for_proc_state {
     my ($wfid, $state_regex) = @_;

@@ -17,6 +17,10 @@ L<OpenXPKI::Test::QA::Role::Workflows>, i.e.:
         ...
     );
 
+You could also omit C<OpenXPKI::Test::QA::Role::SampleConfig> if you set up a
+realm configuration with a I<certificate_signing_request_v2> workflow that is
+compatible to the OpenXPKI default one.
+
 =cut
 
 # CPAN modules
@@ -30,8 +34,6 @@ use OpenXPKI::Serialization::Simple;
 
 
 requires 'also_init';
-requires 'default_realm';   # effectively requires 'OpenXPKI::Test::QA::Role::SampleConfig'
-                            # we can't use with '...' because if other roles also said that then it would be applied more than once
 requires 'create_workflow'; # effectively requires 'OpenXPKI::Test::QA::Role::Workflows'
 requires 'session';
 
@@ -91,12 +93,11 @@ sub create_cert {
     subtest "Create certificate (hostname ".$params->hostname.")" => sub {
         # change PKI realm, user and role to get permission to create workflow
         my $sess_data = $self->session->data;
-        my $old_realm = $sess_data->has_pki_realm ? $sess_data->pki_realm : undef;
-        my $old_user =  $sess_data->has_user      ? $sess_data->user : undef;
-        my $old_role =  $sess_data->has_role      ? $sess_data->role : undef;
-        $sess_data->pki_realm($self->default_realm);
-        $sess_data->user('raop');
-        $sess_data->role('RA Operator');
+        die "Cannot create certificate if session data is not set" unless $sess_data->has_pki_realm;
+
+        my $old_user =  $sess_data->user;
+        my $old_role =  $sess_data->role;
+        $self->set_user($sess_data->pki_realm => "raop");
 
         my $result;
         lives_and {
@@ -107,7 +108,7 @@ sub create_cert {
                 }
             );
             $wftest->state_is('SETUP_REQUEST_TYPE');
-            $wftest->start_activity(
+            $wftest->execute(
                 csr_provide_server_key_params => {
                     key_alg => "rsa",
                     enc_alg => 'aes256',
@@ -118,11 +119,11 @@ sub create_cert {
             );
 
             $wftest->state_is('ENTER_KEY_PASSWORD');
-            $wftest->start_activity(
+            $wftest->execute(
                 csr_ask_client_password => { _password => "m4#bDf7m3abd" },
             );
             $wftest->state_is('ENTER_SUBJECT');
-            $wftest->start_activity(
+            $wftest->execute(
                 csr_edit_subject => {
                     cert_subject_parts => $serializer->serialize( \%cert_subject_parts ),
                 },
@@ -130,7 +131,7 @@ sub create_cert {
 
             if ($is_server_profile) {
                 $wftest->state_is('ENTER_SAN');
-                $wftest->start_activity(
+                $wftest->execute(
                     csr_edit_san => {
                         cert_san_parts => $serializer->serialize( { } ),
                     },
@@ -138,7 +139,7 @@ sub create_cert {
             }
 
             $wftest->state_is('ENTER_CERT_INFO');
-            $wftest->start_activity(
+            $wftest->execute(
                 'csr_edit_cert_info' => {
                     cert_info => $serializer->serialize( {
                         requestor_gname => $params->requestor_gname,
@@ -160,14 +161,14 @@ sub create_cert {
             my $intermediate_state;
             if (grep { /^csr_enter_policy_violation_comment$/ } @$actions) {
                 diag "Test FQDNs do not resolve - handling policy violation" if $ENV{TEST_VERBOSE};
-                $wftest->start_activity(
+                $wftest->execute(
                     csr_enter_policy_violation_comment => { policy_comment => 'This is just a test' },
                 );
                 $intermediate_state = 'PENDING_POLICY_VIOLATION';
             }
             else {
                 diag "For whatever reason test FQDNs do resolve - submitting request" if $ENV{TEST_VERBOSE};
-                $wftest->start_activity(
+                $wftest->execute(
                     csr_submit => {},
                 );
                 $intermediate_state = 'PENDING';
@@ -182,7 +183,7 @@ sub create_cert {
     #        }
 
             $wftest->state_is($intermediate_state);
-            $wftest->start_activity(
+            $wftest->execute(
                 csr_approve_csr => {},
             );
             $wftest->state_is('SUCCESS') or BAIL_OUT;
@@ -196,9 +197,8 @@ sub create_cert {
                 profile    => $temp->{WORKFLOW}->{CONTEXT}->{cert_profile},
             };
         } "successfully run workflow";
-        if ($old_realm) { $sess_data->pki_realm($old_realm) } else { $sess_data->clear_pki_realm }
-        if ($old_user)  { $sess_data->user($old_user) }       else { $sess_data->clear_user }
-        if ($old_role)  { $sess_data->role($old_role) }       else { $sess_data->clear_role }
+        $sess_data->user($old_user);
+        $sess_data->role($old_role);
     };
 
     return $cert_info;

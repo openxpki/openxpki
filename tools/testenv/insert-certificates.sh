@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Inserting test data (root/signer/vault/scep certificates)"
+echo "MySQL: inserting test data (root/signer/vault/scep certificates)"
 
 #
 # Files for /etc

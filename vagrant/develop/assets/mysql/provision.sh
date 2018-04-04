@@ -18,13 +18,15 @@ trap '_exit $?' EXIT
 #
 # Config
 #
-echo "OXI_TEST_DB_MYSQL_NAME=openxpki"     >> /etc/environment
-echo "OXI_TEST_DB_MYSQL_USER=oxitest"      >> /etc/environment
-echo "OXI_TEST_DB_MYSQL_PASSWORD=openxpki" >> /etc/environment
-echo "OXI_TEST_DB_MYSQL_DBHOST=127.0.0.1"  >> /etc/environment
-echo "OXI_TEST_DB_MYSQL_DBPORT=3306"       >> /etc/environment
-echo "OXI_TEST_DB_MYSQL_DBUSER=root"       >> /etc/environment
-echo "OXI_TEST_DB_MYSQL_DBPASSWORD=root"   >> /etc/environment
+if ! $(grep -q OXI_TEST_DB_MYSQL_NAME /etc/environment); then
+    echo "OXI_TEST_DB_MYSQL_NAME=openxpki"     >> /etc/environment
+    echo "OXI_TEST_DB_MYSQL_USER=oxitest"      >> /etc/environment
+    echo "OXI_TEST_DB_MYSQL_PASSWORD=openxpki" >> /etc/environment
+    echo "OXI_TEST_DB_MYSQL_DBHOST=127.0.0.1"  >> /etc/environment
+    echo "OXI_TEST_DB_MYSQL_DBPORT=3306"       >> /etc/environment
+    echo "OXI_TEST_DB_MYSQL_DBUSER=root"       >> /etc/environment
+    echo "OXI_TEST_DB_MYSQL_DBPASSWORD=root"   >> /etc/environment
+fi
 while read def; do export $def; done < /etc/environment
 
 #

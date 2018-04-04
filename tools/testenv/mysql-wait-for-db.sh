@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Waiting for MySQL to initialize (max. 60 seconds)"
+echo "MySQL: waiting for DB to initialize (max. 60 seconds)"
 
 TEST_CMD=(mysql -e "quit" --connect_timeout=1 -h $OXI_TEST_DB_MYSQL_DBHOST -P $OXI_TEST_DB_MYSQL_DBPORT -u$OXI_TEST_DB_MYSQL_DBUSER)
 test ! -z "$OXI_TEST_DB_MYSQL_DBPASSWORD" && TEST_CMD=("${TEST_CMD[@]}" -p$OXI_TEST_DB_MYSQL_DBPASSWORD) || true

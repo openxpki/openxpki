@@ -149,7 +149,7 @@ B<Parameters>
 =cut
 sub new_param_object {
     my ($self, $command, $params) = @_;
-    ##! 4: "API: new_param_object($api_method, ".join(", ", map { "$_ => ".$params->{$_} } keys %{ $params }).")"
+    ##! 4: "API: new_param_object($command => {".join(", ", map { "$_ => ".$params->{$_} } keys %{ $params })."})"
 
     my $param_metaclass = $self->param_classes->{$command}
         or OpenXPKI::Exception->throw (

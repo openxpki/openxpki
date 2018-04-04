@@ -21,24 +21,26 @@ use OpenXPKI::Server::API2::Types;
 
 List all keys in the datapool in a given namespace.
 
+Returns an I<ArrayRef[HashRef]>:
 
-=over
-
-=item * NAMESPACE
-
-=item * PKI_REALM, optional, see get_data_pool_entry for details.
-
-=item * LIMIT, optional, max number of entries returned
-
-=back
-
-Returns an arrayref of Namespace and key of all entries found.
+    [
+        { namespace => '...', key => '...' },
+        { namespace => '...', key => '...' },
+        ...
+    ]
 
 B<Parameters>
 
 =over
 
-=item * C<XXX> I<Bool> - XXX. Default: XXX
+=item * C<pki_realm> I<Str> - PKI realm. Optional, default: current realm
+
+If the API is called directly from OpenXPKI::Server::Workflow only the PKI realm
+of the currently active session is accepted.
+
+=item * C<namespace> I<Str> - datapool namespace (custom string to organize entries)
+
+=item * C<limit> I<Int> - max. number of entries returned. Optional.
 
 =back
 

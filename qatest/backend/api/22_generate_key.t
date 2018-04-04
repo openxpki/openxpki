@@ -42,7 +42,8 @@ sub is_encrypted_key {
             print $fh $key_enc;
             close $fh;
             # decrypt key
-            `OPENSSL_CONF=/dev/null openssl $algo -in "$tempdir/key_enc" -passin "pass:$password" -out "$tempdir/key_dec" > /dev/null 2>&1`;
+            $ENV{OPENSSL_CONF} = "/dev/null"; # prevents "WARNING: can't open config file: ..."
+            `openssl $algo -in "$tempdir/key_enc" -passin "pass:$password" -out "$tempdir/key_dec" > /dev/null 2>&1`;
             # read decrypted key
             open $fh, '<', "$tempdir/key_dec"
                 or BAIL_OUT "Error reading temporary file $tempdir/key_dec";

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Creating OpenXPKI database configuration"
+echo "MySQL: creating OpenXPKI database configuration"
 
 cat <<__DB > /etc/openxpki/config.d/system/database.yaml
 main:

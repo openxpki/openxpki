@@ -17,7 +17,7 @@ use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 
 
-plan tests => 31;
+plan tests => 34;
 
 
 #
@@ -56,8 +56,8 @@ sub entry_is {
 #
 # Check parameter validation
 #
-set_entry_fails { key => "pill", value => "red", expiration_date => -1000 },
-    "I18N_OPENXPKI_SERVER_API_OBJECT_SET_DATA_POOL_INVALID_EXPIRATION_DATE",
+set_entry_fails { key => "pill", value => "red", expiration_date => 1000 },
+    "expiration_date",
     "Complain when trying to store datapool entry with invalid expiration";
 
 #
@@ -171,13 +171,31 @@ lives_ok {
         newkey => "deleteme",
         expiration_date => 0,
     });
-} "Delete entry via 'modify_data_pool_entry' with EXPIRATION_DATE => 0";
+} "Delete entry via 'modify_data_pool_entry' by setting EXPIRATION_DATE to 0";
 
 set_entry_ok { key => "dummy", value => "dummy" },
     "Trigger datapool cleanup by creating another entry";
 
 entry_is "deleteme", undef,
     "Dummy entry was successfully deleted";
+
+# Reset expiration date
+my $expiry = time + 5;
+set_entry_ok { key => "forever", value => "secret", expiration_date => $expiry },
+    "Create dummy entry to be renamed";
+
+entry_is "forever", superhashof({ expiration_date => $expiry }), "Expiration date was correctly set";
+
+lives_and {
+    $oxitest->api2_command('modify_data_pool_entry' => {
+        namespace => $namespace,
+        key => "forever",
+        expiration_date => undef,
+    });
+    my $result = $oxitest->api2_command('get_data_pool_entry' => { namespace => $namespace, key => "forever" });
+    ok not(defined $result->{expiration_date});
+
+} "Modify entry via 'modify_data_pool_entry' to not expire";
 
 #
 # Insert and read data (encrypted)
