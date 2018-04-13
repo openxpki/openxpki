@@ -1479,6 +1479,31 @@ if ($cmd eq 'initdb') {
 
     $ret = 0;
 
+} elsif ($cmd eq 'lintconfig') {
+
+    __init();
+
+    my $conf;
+    if ($ENV{OPENXPKI_CONF_PATH}) {
+        $conf = "/etc/openxpki/config.d/";
+    } elsif ($params{config}) {
+        $conf = $params{config};
+    } else {
+        $conf = "/etc/openxpki/config.d/";
+    }
+
+    -e $conf || die "Given config path $conf does not exist!";
+
+    my $c = OpenXPKI::Config::Backend->new(LOCATION => $conf );
+    print "Checking config at $conf\n";
+    if ($c->get('system')) {
+        print "Config ok\n";
+        $ret = 0;
+    } else {
+        $ret = 2;
+    }
+
+
 } elsif ($cmd eq 'version') {
     print "Version (core): " . $OpenXPKI::VERSION::VERSION . "\n";
     $ret = 0;
@@ -1522,14 +1547,15 @@ openxpkiadm COMMAND [SUBCOMMAND] [OPTIONS]
                          /etc/openxpki/<instance>/config.d
 
  Commands:
-   help                  brief help message
-   man                   full documentation
-   version               print program version and exit
-   key                   Manage keys
-   certificate           Manage certificates
-   hashpwd               Create the salted hash for a password
-   alias                 Manage the token alias table
-   buildconfig           Create (signed) config blob from config tree
+   help               brief help message
+   man                full documentation
+   version            print program version and exit
+   key                Manage keys
+   certificate        Manage certificates
+   hashpwd            Create the salted hash for a password
+   alias              Manage the token alias table
+   lintconfig         Parse config and shows errors from Config::Merge
+   buildconfig        Create (signed) config blob from config tree
 
 =head1 ARGUMENTS
 
@@ -1863,6 +1889,15 @@ Command options:
 
 Prompts for the password and prints the hashed value including the used
  scheme as defined in RFC2307.
+
+=head2 lintconfig
+
+Validate that the config tree is parseable, shows errors from underlying
+Config::Merge such as YAML ident or quoting errors.
+
+Path to the config is read from environment I<OPENXPKI_CONF_PATH> or
+I<--config> switch on commandline. If both are not set, the default
+location I</etc/openxpki/config.d> is used.
 
 =head2 buildconfig
 
