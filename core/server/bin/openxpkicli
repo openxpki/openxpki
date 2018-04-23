@@ -257,11 +257,19 @@ while (1) {
 
 
 if (%parameters) {
+
+    my $p;
     if ($params_is_array) {
         my @t = keys(%parameters);
-        $args{PARAMS} = \@t;
+        $p = \@t;
     } else {
-        $args{PARAMS} = \%parameters;
+        $p = \%parameters;
+    }
+
+    if ($params{legacy}) {
+        $args{PARAMS} = $p;
+    } else {
+        $args{params} = $p;
     }
 }
 
