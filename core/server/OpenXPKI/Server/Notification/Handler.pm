@@ -135,6 +135,8 @@ sub notify {
     my $vars = $self->_prepare_template_vars( $workflow );
     $vars->{data} = $data;
 
+    ##! 32: 'Data is ' . Dumper $vars
+
     ##! 16: 'Got backends ' . Dumper $backends
     foreach my $backend (keys %{$backends}) {
 
