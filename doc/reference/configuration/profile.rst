@@ -140,7 +140,7 @@ match
 width
   size of the field - not implemented yet, definition might change.
 
-default
+placeholder
   A text which is shown as placeholder in the input field (this value is
   NOT a default value for the field)
 
