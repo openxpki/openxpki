@@ -1406,7 +1406,7 @@ sub action_bulk {
         'id' => $queryid,
         'type' => 'workflow',
         'count' => scalar @serials,
-        'query' => { SERIAL => \@serials },
+        'query' => { id => \@serials },
     });
 
     $self->add_section({
