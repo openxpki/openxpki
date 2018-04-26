@@ -14,7 +14,7 @@ Route = Em.Route.extend
             beforeSend: (xhr) ->
                 xhr.setRequestHeader "X-OPENXPKI-Client", "1"
 
-    needReboot: [ "login", "login!logout", "welcome" ]
+    needReboot: [ "login", "logout", "login!logout", "welcome" ]
 
     source: Em.computed -> Em.Object.create
         page: null
