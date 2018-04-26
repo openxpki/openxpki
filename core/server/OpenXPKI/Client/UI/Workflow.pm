@@ -1314,14 +1314,17 @@ sub action_bulk {
     my $errors; # hash with wf_id => error
     foreach my $id (@serials) {
 
-        my $wf_info = $self->send_command( 'execute_workflow_activity',
-            { ID => $id, ACTIVITY => $action } );
+        my $wf_info;
+        eval {
+            $wf_info = $self->send_command( 'execute_workflow_activity',
+              { ID => $id, ACTIVITY => $action } );
+        };
 
         # send_command returns undef if there is an error which usually means
         # that the action was not successful. We can slurp the verbose error
         # from the result status item and display it in the table
         if (!$wf_info) {
-            $errors->{$id} = $self->_status()->{message};
+            $errors->{$id} = $self->_status()->{message} || 'I18N_OPENXPKI_UI_APPLICATION_ERROR';
         } else {
             push @success, $wf_info;
             $self->logger()->trace('Result on '.$id.': '. Dumper $wf_info);
