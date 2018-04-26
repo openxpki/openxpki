@@ -117,6 +117,10 @@ sub action_result {
         $query->{limit} = 25;
     }
 
+    if (!$query->{proc_state}) {
+        $query->{proc_state} = 'manual';
+    }
+
     if (!$query->{order}) {
         $query->{order} = 'workflow_id';
         if (!defined $query->{reverse}) {
