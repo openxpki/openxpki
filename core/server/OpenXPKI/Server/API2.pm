@@ -269,8 +269,8 @@ sub _load_plugins {
         }
         catch {
             $self->log->warn("Error loading API plugin $pkg: $_");
-            next;
         };
+        next unless $ok;
 
         if (not $pkg->DOES($self->command_role)) {
             $self->log->debug("API - ignore   $pkg (does not have role ".$self->command_role.")");
