@@ -46,12 +46,14 @@ lives_and {
     });
     cmp_deeply $result, {
         crl_key => ignore(),
+        crl_number => re(qr/^\d+$/),
         issuer_identifier => $dbdata->cert("alpha_signer_2")->id,
         last_update => ignore(),
         next_update => ignore(),
         pki_realm => 'alpha',
         publication_date => ignore(),
-    };
+        items => 2,
+    } or diag explain $result;
 } "import_crl - import CRL";
 
 # duplicate CRL
