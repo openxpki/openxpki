@@ -19,7 +19,7 @@ use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 use OpenXPKI::Test::QA::CertHelper::Workflow;
 
-plan tests => 39;
+plan tests => 40;
 
 
 #
@@ -270,10 +270,18 @@ search_cert_ok "whose validity starts between two given dates", {
     pki_realm => $dbdata->cert("alpha_root_3")->db->{pki_realm}
 }, $dbdata->cert_names_by_realm_gen(alpha => 3); # chain #3 are future certificates
 
+my $ar2na = $dbdata->cert("alpha_root_2")->db->{notafter};
+
 search_cert_ok "whose validity period ends after given date (expires_after)", {
-    expires_after => $dbdata->cert("alpha_root_2")->db->{notafter} - 100,
+    expires_after => $ar2na - 100,
     pki_realm => $dbdata->cert("alpha_root_2")->db->{pki_realm}
 }, $dbdata->cert_names_by_realm_gen(alpha => 2), $dbdata->cert_names_by_realm_gen(alpha => 3);
+
+search_cert_ok "whose validity period ends betweem two given dates", {
+    expires_after => $ar2na - 100,
+    expires_before => $ar2na + 100,
+    pki_realm => $dbdata->cert("alpha_root_2")->db->{pki_realm}
+}, $dbdata->cert_names_by_realm_gen(alpha => 2);
 
 # By CERT_ATTRIBUTES list of conditions to search in attributes (KEY, VALUE, OPERATOR)
 # OPERATOR = [ EQUAL | LIKE | BETWEEN ]
