@@ -795,8 +795,8 @@ sub __render_pager {
         pagesizes => $args->{pagesizes},
         pagersize => $args->{pagersize},
         pagerurl => $result->{'type'}.'!pager!id!'.$result->{id},
-        order => $result->{query}->{ORDER} || '',
-        reverse => $result->{query}->{REVERSE} ? 1 : 0,
+        order => $result->{query}->{order} || '',
+        reverse => $result->{query}->{reverse} ? 1 : 0,
     }
 }
 
