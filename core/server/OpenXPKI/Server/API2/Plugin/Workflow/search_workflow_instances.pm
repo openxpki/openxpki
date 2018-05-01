@@ -8,9 +8,11 @@ OpenXPKI::Server::API2::Plugin::Workflow::search_workflow_instances
 =cut
 
 # CPAN modules
+use Data::Dumper;
 use Moose::Util::TypeConstraints;
 
 # Project modules
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 
@@ -151,6 +153,8 @@ sub _search_query_params {
     my $params = {
         where => $where,
     };
+
+    ##! 16: 'Input args ' . Dumper $args
 
     # Search for known serials, used e.g. for certificate relations
     $where->{'workflow.workflow_id'} = $args->id if $args->has_id;
