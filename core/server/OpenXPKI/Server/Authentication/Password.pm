@@ -40,6 +40,7 @@ sub new {
     $self->{PREFIX} = \@path;
     $self->{DESC} = $config->get("$path.description");
     $self->{NAME} = $config->get("$path.label");
+    $self->{ROLE} = $config->get("$path.role");
 
     return $self;
 }
@@ -73,12 +74,21 @@ sub login_step {
 
     ##! 2: "account ... $account"
 
-    ## check account - the handler config has a connector at .user
-    # that returns password and role for a requested username
+    my ($digest, $role);
 
-    my $user_info = CTX('config')->get_hash( [ @{$self->{PREFIX}}, $account ] );
+    # check account - the handler config has a connector at .user
+    # that returns password or password and role for a requested username
 
-    if (!$user_info) {
+    if (!$self->{ROLE}) {
+        my $user_info = CTX('config')->get_hash( [ @{$self->{PREFIX}}, $account ] );
+        $digest = $user_info->{digest} || '';
+        $role = $user_info->{role} || '';
+    } else {
+        $digest = CTX('config')->get( [ @{$self->{PREFIX}}, $account ] );
+        $role =  $self->{ROLE};
+    }
+
+    if (!$digest) {
         ##! 4: "No such user: $account"
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED",
@@ -88,12 +98,11 @@ sub login_step {
         );
     }
 
-
     my $encrypted;
     my $scheme;
 
     # digest specified in RFC 2307 userPassword notation?
-    if ($user_info->{digest} =~ m{ \{ (\w+) \} (.*) }xms) {
+    if ($digest =~ m{ \{ (\w+) \} (.*) }xms) {
         ##! 8: "database uses RFC2307 password syntax"
         $scheme = lc($1);
         $encrypted = $2;
@@ -178,7 +187,7 @@ sub login_step {
         );
     }
     else { # hash is fine, return user, role, service ready message
-        return ($account, $user_info->{role},
+        return ($account, $role,
             {
                 SERVICE_MSG => 'SERVICE_READY',
             },
@@ -207,13 +216,17 @@ authentication method. The parameters are passed as a hash reference.
 
 is the constructor. It requires the config prefix as single argument.
 This is the minimum parameter set for any authentication class.
-Every user block in the configuration must include a name, digest and role.
-The digest must have the format
 
-{SCHEME}encrypted_string
+When no I<role> is set in the configuration, the configuration must return
+a hash for each user holding I<digest> and I<role>.
+
+The digest must have the format: C<{SCHEME}encrypted_string>
 
 SCHEME is one of sha (SHA1), md5 (MD5), crypt (Unix crypt), smd5 (salted
 MD5) or ssha (salted SHA1).
+
+If you add the I<role> parameter to the config, the configuration must return
+a scalar value for each username representing the digest.
 
 =head2 login_step
 
