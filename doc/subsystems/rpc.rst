@@ -49,7 +49,7 @@ Example: Revoke Certificate by Certificate Identifier
 -----------------------------------------------------
 
 The endpoint is configured in ``/etc/openxpki/rpc/default.conf`` with
-the following:
+the following::
 
     [RevokeCertificateByIdentifier]
     workflow = certificate_revocation_request_v2
@@ -95,6 +95,25 @@ The following HTTP Response Codes are (to be) supported:
 * 500 Internal Server Error - Returned when there is an error creating an
   instance of the client object or a new workflow, or the workflow terminates
   in an unexpected state.
+
+Workflow Pickup
+===============
+
+If you have a workflow that does not return the final result immediately,
+you can define a search pattern to pickup existing workflows based on
+worflow_attributes::
+
+    [RequestCertificate]
+    workflow = certificate_enroll
+    param = pkcs10, comment
+    output = cert_identifier, error_code, transaction_id
+    env = signer_cert
+    servername = enroll
+    pickup = transaction_id
+
+With a properly prepared workflow, this allows you access an existing
+workflow based on the transaction_id. For now it is only possible to
+read existing workflows, there is no option to interact with them, yet.
 
 See Also
 ========

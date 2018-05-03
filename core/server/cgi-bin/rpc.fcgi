@@ -167,10 +167,37 @@ while (my $cgi = CGI::Fast->new()) {
             next;
         }
 
-        $workflow = $client->handle_workflow({
-            TYPE => $workflow_type,
-            PARAMS => $param
-        });
+        my $wf_id;
+        # check for pickup parameter
+        if ($conf->{$method}->{pickup} && $cgi->param($conf->{$method}->{pickup})) {
+            my $pickup_key = $conf->{$method}->{pickup};
+            my $pickup_value = $cgi->param($conf->{$method}->{pickup});
+
+            $log->debug("Pickup workflow with $pickup_key => $pickup_value" );
+            my $wfl = $client->run_command('search_workflow_instances', {
+                type => $workflow_type,
+                attribute => { $pickup_key => $pickup_value },
+                limit => 2
+            });
+
+            if (@$wfl > 1) {
+                die "Unable to pickup workflow - ambigous search result";
+            } elsif (@$wfl == 1) {
+                $wf_id = $wfl->[0]->{workflow_id};
+            }
+        }
+
+        if ($wf_id) {
+            $workflow = $client->handle_workflow({
+                TYPE => $workflow_type,
+                ID => $wf_id
+            });
+        } else {
+            $workflow = $client->handle_workflow({
+                TYPE => $workflow_type,
+                PARAMS => $param
+            });
+        }
 
         $log->trace( 'Workflow info '  . Dumper $workflow );
     };
@@ -178,7 +205,7 @@ while (my $cgi = CGI::Fast->new()) {
     my $res;
     if ( my $exc = OpenXPKI::Exception->caught() ) {
         # TODO: Return as "500 Internal Server Error"?
-        $log->error("Unable to create workflow: ". $exc->message );
+        $log->error("Unable to instantiate workflow: ". $exc->message );
         $res = { error => { code => 42, message => $exc->message, data => { pid => $$ } } };
     }
     elsif (my $eval_err = $EVAL_ERROR) {
