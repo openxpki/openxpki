@@ -7,7 +7,7 @@ state:
     # Extract information from CSR, set profile and render subject
     # All information required for the certificate are in place
     INITIAL:
-        action: initialize global_map_url_params set_workflow_attributes global_load_policy global_set_profile parse_pkcs10 > PARSED
+        action: initialize global_map_url_params set_transaction_id set_workflow_attributes global_load_policy global_set_profile parse_pkcs10 > PARSED
 
     # check for certificateTemplate to override profile
     PARSED:
@@ -467,6 +467,14 @@ action:
          param:
             _map_cert_subject: "[% IF context.cert_subject %][% context.cert_subject %][% ELSE %][% context.csr_subject %][% END %]"
             _map_transaction_id: $transaction_id
+
+    set_transaction_id:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        param:
+           # For SCEP requests the transaction id is already set
+           _map_transaction_id: >
+              [% IF context.transaction_id %][% context.transaction_id %]
+              [% ELSE %][% USE PKCS10 %][% PKCS10.transaction_id(context.pkcs10) %][% END %]
 
     set_mode_renewal:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
