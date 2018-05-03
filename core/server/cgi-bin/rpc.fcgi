@@ -25,6 +25,30 @@ $log->info("RPC handler initialized");
 
 my $json = new JSON();
 
+sub send_output {
+
+    my $cgi = shift;
+    my $result = shift;
+
+    if ($ENV{'HTTP_ACCEPT'} && $ENV{'HTTP_ACCEPT'} eq 'text/plain') {
+       print $cgi->header( -type => 'text/plain', charset => 'utf8' );
+       if ($result->{error}) {
+           print 'error.code=' . $result->{error}->{code}."\n";
+           print 'error.message=' . $result->{error}->{message}."\n";
+       } else {
+           print 'id=' . $result->{result}->{id}."\n";
+           print 'state=' . $result->{result}->{state}."\n";
+           map { printf "data.%s=%s\n", $_, $result->{result}->{data}->{$_} } keys %{$result->{result}->{data}} if ($result->{result}->{data});
+       }
+
+    } else {
+        # prepare response header
+        print $cgi->header( -type => 'application/json', charset => 'utf8' );
+        print $json->encode( $result );
+    }
+
+}
+
 while (my $cgi = CGI::Fast->new()) {
 
     my $conf = $config->config();
@@ -35,16 +59,12 @@ while (my $cgi = CGI::Fast->new()) {
     Log::Log4perl::MDC->put('server', $servername);
     Log::Log4perl::MDC->put('endpoint', $config->endpoint());
 
-
     my $error = '';
-
-    # prepare response header
-    print $cgi->header( -type => 'application/json', charset => 'utf8' );
 
     if ( !$method ) {
         # TODO: Return as "400 Bad Request"?
         $log->error("RPC no method set in request");
-        print $json->encode( { error => {
+        send_output( $cgi,  { error => {
             code => 42,
             message=> "RPC no method set in request",
             data => { pid => $$ }
@@ -56,7 +76,7 @@ while (my $cgi = CGI::Fast->new()) {
     if ( !defined $workflow_type ) {
         # TODO: Return as "400 Bad Request"?
         $log->error("RPC no workflow_type set for requested method $method");
-        print $json->encode( { error => {
+        send_output( $cgi,  { error => {
             code => 42,
             message=> "RPC no workflow_type set for requested method $method",
             data => { pid => $$ }
@@ -139,7 +159,7 @@ while (my $cgi = CGI::Fast->new()) {
         if ( !$client ) {
             # TODO: Return as "500 Internal Server Error"?
             $log->error("Could not instantiate client object");
-            print $json->encode( { error => {
+            send_output( $cgi,  { error => {
                 code => 42,
                 message=> "Could not instantiate client object",
                 data => { pid => $$ }
@@ -203,7 +223,7 @@ while (my $cgi = CGI::Fast->new()) {
         }
     }
 
-    print $json->encode( $res );
+    send_output( $cgi,  $res );
 
     if ($client) {
         $client->disconnect();

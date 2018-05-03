@@ -31,26 +31,31 @@ The global/auth parameters are described in the common wrapper documentation
 supported.
 
 
-Exposed Methods
-===============
+Parameter Handling
+===================
 
-The default is to expect/return JSON formatted data, but some methods will
-accept/return other formats, too.
+Input parameters are expected to be passed either via query string or in
+the body of the HTTP POST operation (application/x-www-form-urlencoded).
 
-Parameters are expected in the query string or in the body of the
-HTTP POST operation (application/x-www-form-urlencoded). At minimum,
-the parameter "method" must be provided. The name of the method used
-must match a section in the configuration file, which must at least
+At minimum, the parameter "method" must be provided. The name of the method
+used must match a section in the configuration file, which must at least
 contain the name of a workflow.
 
-Revoke Certificate by Certificate Identifier
---------------------------------------------
+The default is to return JSON formatted data, if you set the I<Accept>
+header of your request to "text/plain", you will get the result as plain
+text with each key/parameter pairs on a new line.
+
+Example: Revoke Certificate by Certificate Identifier
+-----------------------------------------------------
 
 The endpoint is configured in ``/etc/openxpki/rpc/default.conf`` with
 the following:
 
     [RevokeCertificateByIdentifier]
     workflow = certificate_revocation_request_v2
+    param = cert_identifier, reason_code, comment, invalidity_time
+    env = signer_cert, signer_dn
+    output = error_code
     servername = signed-revoke
 
 See ``core/server/cgi-bin/rpc.cgi`` for mapping additional parameters,
@@ -65,7 +70,7 @@ Certificates are revoked by specifying the certificate identifier.
         http://demo.openxpki.org/cgi-bin/rpc.cgi
 
 The response is in JSON format (http://www.jsonrpc.org/specification#response_object).
-Except for the "id", the result is identical to the SOAP call:
+Except for the "id" parameter, the result is identical to the definition of JSON RPC:
 
     { result: { id: workflow_id, pid: process_id, state: workflow_state }}
 
