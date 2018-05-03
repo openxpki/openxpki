@@ -77,7 +77,7 @@ sub _load {
         my $decoded = Crypt::PKCS10->new($pkcs10, ignoreNonBase64 => 1, verifySignature => 0);
         if ($decoded) {
             $self->{_pkcs10} = $decoded;
-            $self->{_hash} = sha1_hex($pkcs10);
+            $self->{_hash} = sha1_hex($decoded->csrRequest);
         }
     };
     return $self->{_pkcs10};
@@ -106,6 +106,25 @@ sub subject_key_identifier {
             )
         )
     );
+}
+
+=head2 transaction_id
+
+Return the transaction id which is the sha1 hash on the DER encoded request
+given in hexadecimal format.
+
+=cut
+
+sub transaction_id {
+
+    my $self = shift;
+    my $pkcs10 = shift;
+
+    my $decoded = $self->_load($pkcs10);
+
+    if (!$decoded) { return; }
+    return $self->{_hash};
+
 }
 
 =head2 dn
