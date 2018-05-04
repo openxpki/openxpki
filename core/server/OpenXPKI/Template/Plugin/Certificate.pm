@@ -313,5 +313,23 @@ sub attr {
 
 }
 
+=head2 pem(cert_identifier)
+
+Return the PEM encoded certificate
+
+=cut
+
+sub pem {
+
+    my $self = shift;
+    my $cert_id = shift;
+
+    my $pem;
+    eval {
+        $pem = CTX('api')->get_cert({ IDENTIFIER => $cert_id, 'FORMAT' => 'PEM' });
+    };
+    return $pem;
+
+}
 
 1;
