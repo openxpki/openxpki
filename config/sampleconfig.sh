@@ -33,7 +33,7 @@ make_password() {
     if [ -z "$KEY_PASSWORD" ]; then
         dd if=/dev/urandom bs=32 count=1 2>/dev/null | base64 >"${PASSWORD_FILE}"
     else
-        echo "$KEY_PASSWORD" > "${PASSWORD_FILE}"
+        echo -n "$KEY_PASSWORD" > "${PASSWORD_FILE}"
     fi;
 
 }
