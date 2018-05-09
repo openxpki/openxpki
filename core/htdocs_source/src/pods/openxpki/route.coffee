@@ -50,7 +50,7 @@ Route = Em.Route.extend
 
         if entries.findBy "key", req.model_id
             data.target = "top"
-        else if req.model_id is "login"
+        else if req.model_id in @needReboot
             data.target = "top"
 
         source = @get "source"
