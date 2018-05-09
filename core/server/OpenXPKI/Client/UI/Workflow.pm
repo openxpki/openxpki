@@ -1342,7 +1342,7 @@ sub action_bulk {
         $self->_status({message => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_HAS_FAILED_ITEMS_STATUS', 'level' => 'error' });
 
         my @failed_id = keys %{$errors};
-        my $failed_result = $self->send_command_v2( 'search_workflow_instances', { serial => \@failed_id } );
+        my $failed_result = $self->send_command_v2( 'search_workflow_instances', { id => \@failed_id } );
 
         my @result_failed = $self->__render_result_list( $failed_result, $self->__default_grid_row );
 
