@@ -54,13 +54,29 @@ while (my $cgi = CGI::Fast->new()) {
     my $conf = $config->config();
 
     my $method = $cgi->param('method');
-    my $servername = $conf->{$method}->{servername} || '';
 
-    Log::Log4perl::MDC->put('server', $servername);
-    Log::Log4perl::MDC->put('endpoint', $config->endpoint());
+    # if method is not set via param check for full body post
+    my $postdata;
+    if ( !$method && $conf->{input}->{allow_raw_post} && $cgi->param('POSTDATA')) {
+        # TODO - evaluate security implications regarding blessed objects
+        # and consider to filter out serialized objects for security reasons
+        $json->max_depth(  $conf->{input}->{parse_depth} || 5 );
+        my $raw = $cgi->param('POSTDATA');
+        $log->trace("RPC raw postdata : " . $raw) if ($log->is_trace());
+        eval{$postdata = $json->decode($raw);};
+        if (!$postdata || $EVAL_ERROR) {
+            $log->error("RPC decoding postdata failed: " . $EVAL_ERROR);
+            send_output( $cgi,  { error => {
+                code => 42,
+                message=> "RPC decoding postdata failed",
+                data => { pid => $$ }
+            }});
+            next;
+        }
+        $method = $postdata->{method};
+    }
 
-    my $error = '';
-
+    # method should be set now
     if ( !$method ) {
         # TODO: Return as "400 Bad Request"?
         $log->error("RPC no method set in request");
@@ -71,6 +87,14 @@ while (my $cgi = CGI::Fast->new()) {
         }});
         next;
     }
+
+    my $servername = $conf->{$method}->{servername} || '';
+
+    Log::Log4perl::MDC->put('server', $servername);
+    Log::Log4perl::MDC->put('endpoint', $config->endpoint());
+
+    my $error = '';
+
 
     my $workflow_type = $conf->{$method}->{workflow};
     if ( !defined $workflow_type ) {
@@ -93,12 +117,20 @@ while (my $cgi = CGI::Fast->new()) {
         my @keys;
         @keys = split /\s*,\s*/, $conf->{$method}->{param};
         foreach my $key (@keys) {
-            my $val = $cgi->param($key);
-            if (defined $val) {
+
+            my $val;
+            if ($postdata) {
+                $val = $postdata->{$key};
+            } else {
+                $val = $cgi->param($key);
+            }
+            next unless (defined $val);
+
+            if (!ref $val) {
                 $val =~ s/\A\s+//;
                 $val =~ s/\s+\z//;
-                $param->{$key} = $val;
             }
+            $param->{$key} = $val;
         }
     }
 
@@ -169,21 +201,28 @@ while (my $cgi = CGI::Fast->new()) {
 
         my $wf_id;
         # check for pickup parameter
-        if ($conf->{$method}->{pickup} && $cgi->param($conf->{$method}->{pickup})) {
+        if ($conf->{$method}->{pickup}) {
             my $pickup_key = $conf->{$method}->{pickup};
-            my $pickup_value = $cgi->param($conf->{$method}->{pickup});
+            my $pickup_value;
+            if ($postdata) {
+                $pickup_value = $postdata->{$pickup_key};
+            } else {
+                $pickup_value = $cgi->param($pickup_key);
+            }
 
-            $log->debug("Pickup workflow with $pickup_key => $pickup_value" );
-            my $wfl = $client->run_command('search_workflow_instances', {
-                type => $workflow_type,
-                attribute => { $pickup_key => $pickup_value },
-                limit => 2
-            });
+            if ($pickup_value) {
+                $log->debug("Pickup workflow with $pickup_key => $pickup_value" );
+                my $wfl = $client->run_command('search_workflow_instances', {
+                    type => $workflow_type,
+                    attribute => { $pickup_key => $pickup_value },
+                    limit => 2
+                });
 
-            if (@$wfl > 1) {
-                die "Unable to pickup workflow - ambigous search result";
-            } elsif (@$wfl == 1) {
-                $wf_id = $wfl->[0]->{workflow_id};
+                if (@$wfl > 1) {
+                    die "Unable to pickup workflow - ambigous search result";
+                } elsif (@$wfl == 1) {
+                    $wf_id = $wfl->[0]->{workflow_id};
+                }
             }
         }
 

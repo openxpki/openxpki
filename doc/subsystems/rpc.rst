@@ -26,10 +26,30 @@ The config uses plain ini format, a default is deployed by the package::
   [auth]
   stack = _System
 
+  [input]
+  allow_raw_post = 1
+  parse_depth = 5
+
 The global/auth parameters are described in the common wrapper documentation
 (:ref:`subsystem-wrapper`). Config path extension and TLS Authentication is
 supported.
 
+Input Handling
+==============
+
+allow_raw_post
+--------------
+
+Adds the option to post the parameters as json string as raw http body.
+As we currently do NOT sanitize the parameters send there is a chnace for an
+attacker to inject serialized json objects this way! So do NOT set this until
+you are running in a trusted, controlled environemnt or have other security
+mechanisms in place.
+
+parse_depth
+-----------
+
+Maximum allowed recursion depth for the JSON body, the default is 5.
 
 Parameter Handling
 ===================
