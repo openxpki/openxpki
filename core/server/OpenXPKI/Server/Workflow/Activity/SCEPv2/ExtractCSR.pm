@@ -196,11 +196,11 @@ sub execute {
 
 
             my $csr_info = $csr_obj->get_subject_alt_names({ FORMAT => 'HASH' });
-            @subject_alt_names = @{CTX('api')->render_san_from_template({
-                PROFILE => $profile,
-                STYLE   => $subject_style,
-                VARS    => \%subject_vars,
-                ADDITIONAL => $csr_info || {},
+            @subject_alt_names = @{CTX('api2')->render_san_from_template({
+                profile => $profile,
+                style   => $subject_style,
+                vars    => \%subject_vars,
+                additional => $csr_info || {},
             })};
         }
     }

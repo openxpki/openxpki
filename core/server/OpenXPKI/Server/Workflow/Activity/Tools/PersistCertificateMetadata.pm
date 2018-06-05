@@ -53,10 +53,10 @@ sub execute {
 
     ##! 32: 'Combined vars hash ' . Dumper $subject_vars
 
-    my $metadata = CTX('api')->render_metadata_from_template({
-        PROFILE => $profile,
-        STYLE   => $style,
-        VARS    => $subject_vars
+    my $metadata = CTX('api2')->render_metadata_from_template({
+        profile => $profile,
+        style   => $style,
+        vars    => $subject_vars
     });
 
     if (not defined $metadata) {

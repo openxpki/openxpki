@@ -33,10 +33,10 @@ sub _validate {
         $subject_parts = OpenXPKI::Serialization::Simple->new()->deserialize( $subject_parts );
     }
 
-    my $cert_subject = CTX('api')->render_subject_from_template({
-        PROFILE => $profile,
-        STYLE   => $style,
-        VARS    => $subject_parts
+    my $cert_subject = CTX('api2')->render_subject_from_template({
+        profile => $profile,
+        style   => $style,
+        vars    => $subject_parts
     });
 
     return if (!$cert_subject);

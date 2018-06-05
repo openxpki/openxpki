@@ -311,14 +311,11 @@ sub process_template {
     my ($self, $template, $vars) = @_;
     my $result;
 
-    # process ("render") template
-    $self->tt->process(\$template, $vars, \$result)
-        or OpenXPKI::Exception->throw(
-            message => 'Parsing text template failed',
-            params => { TEMPLATE => $template, ERROR => $self->tt->error, },
-        );
+    my $oxtt = OpenXPKI::Template->new();
+    my $res = $oxtt->render( $template, $vars );
 
-    return $result;
+    return $res;
+
 }
 
 =head2 cleanup_for_tt
