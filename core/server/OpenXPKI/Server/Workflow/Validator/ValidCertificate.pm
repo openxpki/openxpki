@@ -41,8 +41,8 @@ sub _validate {
     my $subject = $self->param('subject');
     if ($subject) {
         CTX('log')->application()->debug("x509 validaton against subject $subject ");
-        $subject = qr/(?xi)$subject/;
-        if ($subject !~ $x509->get_subject()) {
+        $subject = qr/$subject/;
+        if ($x509->get_subject() !~ $subject ) {
             CTX('log')->application()->error("x509 subject mismatch");
             validation_error("I18N_OPENXPKI_UI_VALIDATOR_X509_SUBJECT_MISMATCH_ERROR");
         }
@@ -111,6 +111,8 @@ The PEM formatted x509 certificate
 =item subject
 
 A string or regex to check the subject against.
+Note: The given string is always quoted as regex using qr/I<string>/ which
+might cause problems when your subject has some special characters.
 
 =item subject_key_identifier
 
