@@ -19,8 +19,14 @@ The general configuration block looks like::
         namespace: namespace (to be used with oracle)
         environment:
             db_driver_env_key: value
+        driver:
+            LongReadLen: 10000000
 
-OpenXPKI supports MySQL, PostgreSQL, Oracle and DB2. The *namespace* parameter is used only by the Oracle driver. DB2 uses only the *name* parameter and reads other settings from the environment, which are passed as a key/value list below the *environment* key.
+OpenXPKI supports MySQL, PostgreSQL, Oracle and DB2.
+The *namespace* parameter is used only by the Oracle driver.
+DB2 uses only the *name* parameter and reads other settings from the environment,
+which are passed as a key/value list below the *environment* key.
+Options given to ``driver`` are passed to DBI as extra parameters.
 
 Check perldoc OpenXPKI::Server::Database::Driver::<type> for more info on the parameters.
 

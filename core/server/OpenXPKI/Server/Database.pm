@@ -14,6 +14,7 @@ use OpenXPKI::MooseParams;
 use OpenXPKI::Server::Database::Role::Driver;
 use OpenXPKI::Server::Database::QueryBuilder;
 use OpenXPKI::Server::Database::Query;
+use Data::Dumper;
 use DBIx::Handler;
 use DBI::Const::GetInfoType; # provides %GetInfoType hash
 use Math::BigInt;
@@ -212,6 +213,11 @@ sub _build_dbix_handler {
     ##! 4: "Additional connect() attributes: " . join " | ", map { $_." = ".$params{$_} } keys %params
     ##! 4: "SQL commands after each connect: ".join("; ", @on_connect_do);
 
+    my %driver_params;
+    if ($self->db_params->{driver} && ref $self->db_params->{driver} eq 'HASH') {
+        %driver_params = %{$self->db_params->{driver}};
+    }
+
     my $dbix = DBIx::Handler->new(
         $self->driver->dbi_dsn,
         $self->driver->user,
@@ -226,6 +232,7 @@ sub _build_dbix_handler {
                 $self->_dbi_error_handler($msg, $dbh);
             },
             %params,
+            %driver_params,
         },
         {
             on_connect_do => sub {
@@ -238,6 +245,9 @@ sub _build_dbix_handler {
             },
         }
     );
+
+    ##! 32: 'DBIx Handle ' . Dumper $dbix
+
     return $dbix;
 }
 

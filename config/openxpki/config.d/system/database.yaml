@@ -6,9 +6,10 @@ main:
     port: 3306
     user: openxpki
     passwd: openxpki
-    environment:
-        key: value
 
+    # extra options passed to the driver as parameter
+    #driver:
+    #    LongReadLen: 10000000
 # To log to a different database copy and adjust the upper block
 # logging: ~
 
