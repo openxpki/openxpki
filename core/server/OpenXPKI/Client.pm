@@ -493,6 +493,14 @@ sub close_connection {
     my $ident = ident $self;
 
     shutdown($socket{$ident}, 2); # we have stopped using this socket
+    # for whatever reasons shutdown does not free the handle, see #645
+    close($socket{$ident});
+}
+
+sub DESTROY {
+    ##! 4: 'Destroy'
+    my $self = shift;
+    $self->close_connection();
 }
 
 ###########################################################################
