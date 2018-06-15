@@ -101,8 +101,18 @@ while (my $cgi = CGI::Fast->new()) {
         die "Error creating SCEP Client instance!";
     }
     my $result = $scep_client->send_request($params);
-    print $result;
-    $log->debug('Response send');
+
+    if ($result) {
+        print $result;
+        $log->debug('Response send');
+    } else {
+        print $cgi->header(
+           -type => 'text/plain',
+           -status => '500 Internal Server Error'
+        );
+        print "SCEP Response was empty";
+        $log->error('SCEP response is empty');
+    }
 }
 
 1;
