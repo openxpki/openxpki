@@ -105,6 +105,10 @@ while (my $cgi = CGI::Fast->new()) {
     $log->debug('Response send');
 }
 
+1;
+
+__END__;
+
 =head1 Description
 
 This file is the generic scep handler to be used as cgi script with your

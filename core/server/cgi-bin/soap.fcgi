@@ -29,3 +29,5 @@ my $oSoapHandler = SOAP::Transport::HTTP::FCGI
     ->dispatch_to( @soap_modules )->handle;
 
 1;
+
+__END__;

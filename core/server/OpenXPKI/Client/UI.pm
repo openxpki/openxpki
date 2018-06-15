@@ -516,10 +516,11 @@ sub handle_login {
 
         # SSO Login uses data from the ENV, so no need to render anything
         if ( $login_type eq 'CLIENT_SSO' ) {
+            my $user = $ENV{'REMOTE_USER'} || '';
             $self->logger()->trace('ENV is ' . Dumper \%ENV);
-            $self->logger()->info('Sending SSO Login ( '.$ENV{'REMOTE_USER'}.' )');
+            $self->logger()->info('Sending SSO Login ( '.$user.' )');
             $reply =  $self->backend()->send_receive_service_msg( 'GET_CLIENT_SSO_LOGIN',
-                { LOGIN => $ENV{'REMOTE_USER'}, PSEUDO_ROLE => '' } );
+                { LOGIN => $user, PSEUDO_ROLE => '' } );
             $self->logger()->trace('Auth result ' . Dumper $reply);
 
         } elsif( $login_type  eq 'PASSWD' ) {

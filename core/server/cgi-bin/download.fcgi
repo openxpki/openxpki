@@ -107,7 +107,7 @@ while (my $cgi = CGI::Fast->new()) {
 
         $log->debug('Looking for certificate ' . $cert_identifier );
 
-        my $cert_format = uc($cgi->param('format')) || '';
+        my $cert_format = uc($cgi->param('format') || '');
         my $ext;
         if ($cert_format eq 'DER') {
             $ext = '.cer';
