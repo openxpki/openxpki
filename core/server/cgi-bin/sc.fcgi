@@ -78,6 +78,7 @@ while (my $cgi = CGI::Fast->new()) {
         $result->render();
     }
 
+    $client->disconnect();
 }
 
 $log->info('end fcgi loop ' . $$);

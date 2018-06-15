@@ -312,6 +312,8 @@ sub disconnect {
     $self->logger()->info('Disconnect client');
     my $reply = $self->client->send_receive_service_msg('LOGOUT');
 
+    $self->client->close_connection();
+
     $self->_clear_client();
     return $self;
 }

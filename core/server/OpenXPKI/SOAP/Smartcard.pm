@@ -73,8 +73,9 @@ sub RevokeSmartcard {
     }
 
     my $workflow;
+    my $client;
     eval {
-        my $client = OpenXPKI::Client::Simple->new({
+        $client = OpenXPKI::Client::Simple->new({
             logger => $log,
             config => $config->{global}, # realm and locale
             auth => $config->{auth}, # auth config
@@ -107,6 +108,8 @@ sub RevokeSmartcard {
 
         $log->trace( 'Workflow info '  . Dumper $workflow );
     };
+
+    $client->disconnect() if($client);
 
     if ( my $exc = OpenXPKI::Exception->caught() ) {
         $log->error("Unable to create workflow: ". $exc->message );

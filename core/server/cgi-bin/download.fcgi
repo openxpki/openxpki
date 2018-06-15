@@ -121,6 +121,8 @@ while (my $cgi = CGI::Fast->new()) {
         my $cert_info = $client->run_legacy_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'HASH' });
         my $filename = $cert_info->{BODY}->{SUBJECT_HASH}->{CN}->[0] || $cert_info->{BODY}->{IDENTIFIER};
 
+        $client->disconnect();
+
         if (!$cert || !$filename) {
             die "Unable to get cert data";
         }
