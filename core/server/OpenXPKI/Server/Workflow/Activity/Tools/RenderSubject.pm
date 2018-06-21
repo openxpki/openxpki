@@ -30,6 +30,7 @@ sub execute {
     my $result;
 
 
+
     # Get the profile name and style
     my $profile = $self->param('cert_profile');
     $profile = $context->param('cert_profile') unless($profile);
@@ -67,11 +68,11 @@ sub execute {
     ##! 16: 'Cleaned subject_vars' . Dumper $subject_vars
     CTX('log')->application()->trace("Subject render input vars " . Dumper $subject_vars);
 
-    my $cert_subject = CTX('api2')->render_subject_from_template({
+    my $cert_subject = CTX('api2')->render_subject_from_template(
         profile => $profile,
         style   => $style,
         vars    => $subject_vars
-    });
+    );
 
     if (!$cert_subject) {
         OpenXPKI::Exception->throw(
@@ -99,12 +100,12 @@ sub execute {
     # Try to render using the template mode, will return undef if there is no
     # rendering rule
 
-    $san_list = CTX('api2')->render_san_from_template({
+    $san_list = CTX('api2')->render_san_from_template(
         profile => $profile,
         style   => $style,
         vars    => $subject_vars,
         additional => $extra_san || {},
-    });
+    );
 
     # No SAN template exists - if we have extra san just map them to the
     # array ref structure required by the csr persister
