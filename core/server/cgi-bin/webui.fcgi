@@ -311,3 +311,7 @@ while (my $cgi = CGI::Fast->new()) {
 }
 
 $log->info('end fcgi loop ' . $$);
+
+1;
+
+__END__;

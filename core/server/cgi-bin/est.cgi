@@ -135,5 +135,9 @@ while (my $cgi = CGI::Fast->new()) {
     print "\n";
     print $out;
 
-
 }
+
+1;
+
+__END__;
+

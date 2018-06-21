@@ -300,6 +300,8 @@ while (my $cgi = CGI::Fast->new()) {
 
 1;
 
+__END__;
+
 =head1 rpc.fcgi
 
 A RPC interface to run workflows
