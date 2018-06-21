@@ -63,6 +63,8 @@ style:
     enroll:
         subject:
             dn: CN=[% CN.0 %],DC=Test Deployment,DC=OpenXPKI,DC=org
+            san:
+                dns: "[% FOREACH entry = SAN_DNS %][% entry.lower %] | [% END %]"
 
         metadata:
             system_id: "[% data.cust_id %]"
