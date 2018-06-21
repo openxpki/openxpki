@@ -497,8 +497,8 @@ sub close_connection {
     close($socket{$ident});
 }
 
-sub DESTROY {
-    ##! 4: 'Destroy'
+sub DEMOLISH {
+    ##! 4: 'Demolish'
     my $self = shift;
     $self->close_connection();
 }
