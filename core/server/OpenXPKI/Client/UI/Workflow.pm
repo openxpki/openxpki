@@ -1018,8 +1018,10 @@ sub action_index {
     # Check if we can auto-load the next available action
     my $wf_action;
     my @activities = keys %{$wf_info->{ACTIVITY}};
-    if (scalar @activities == 1 || (scalar @activities == 2 && (grep /global_cancel/, @activities))) {
+    if (scalar @activities == 1) {
         $wf_action = $activities[0];
+    } elsif (scalar @activities == 2 && (grep /global_cancel/, @activities)) {
+        $wf_action = ($activities[1] eq 'global_cancel') ? $activities[0] : $activities[1];
     }
 
     # If we call the token action from within a result list we want
