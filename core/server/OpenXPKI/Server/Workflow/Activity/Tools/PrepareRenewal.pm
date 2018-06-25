@@ -120,8 +120,7 @@ This activity sets the relevant context fields used for certificate renwal.
 
 =item cert_identifier
 
-If given, perform a "real" renewal and load all information from this
-certificate.
+Load information from this certificate.
 
 =item renewal_period
 
