@@ -286,6 +286,7 @@ OpenXPKI/Server/API2/Plugin/Profile/get_key_enc.pm
 OpenXPKI/Server/API2/Plugin/Profile/get_key_params.pm
 OpenXPKI/Server/API2/Plugin/Profile/list_supported_san.pm
 OpenXPKI/Server/API2/Plugin/Profile/list_used_profiles.pm
+OpenXPKI/Server/API2/Plugin/Profile/preset_subject_parts_from_profile.pm
 OpenXPKI/Server/API2/Plugin/Profile/render_templates.pm
 OpenXPKI/Server/API2/Plugin/Secret/clear_secret.pm
 OpenXPKI/Server/API2/Plugin/Secret/get_secrets.pm
