@@ -14,7 +14,6 @@ style:
                 - hostname2
                 - port
             san:
-                - san_dns
                 - san_ipv4
             info:
                 - requestor_gname
