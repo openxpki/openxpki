@@ -329,6 +329,12 @@ msgstr "Password della Chiave"
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
 msgstr "Creator"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
+msgstr ""
+"Con la Revoca ritardata, puoi programmare la revoca di un certificato in una "
+"data futura."
+
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE"
 msgstr ""
 "Scarica la catena di certificazione in formato PEM bundle, incluso il "
@@ -899,6 +905,14 @@ msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC"
 msgstr ""
 "Inserisci il nome completo a dominio (FQN = Fully Qualified Hostname) del "
 "tuo sistema."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_NODEID"
+msgstr "Nome Organizzazione"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_NODEID_DESC"
+msgstr "Nome Organizzazione"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_OPENVPN_CLIENT_LABEL"
 msgstr "Certificato client OpenVPN"
@@ -1861,6 +1875,10 @@ msgstr "Workflow completati con successo"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE"
 msgstr "Bulk handle workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_CONTINUE"
+msgstr "continua"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ELIGIBILITY_RECHECK_LABEL"
@@ -2975,6 +2993,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_SUCCESS_LABEL"
 msgstr "Certificato Revocato"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRW_INITIAL_DESC"
+msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRW_INITIAL_LABEL"
+msgstr "Stato"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_DESC"
 msgstr "Questo Workflow è stato cancellato e non può essere riavviato"
 
@@ -3486,6 +3512,14 @@ msgstr "Ricerca nei Workflow usando i filtri qui sotto."
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_LABEL"
 msgstr "Ricerca nei Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_DESC"
+msgstr "Modifica i Metadati di un certificato."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_LABEL"
+msgstr "Modifica Metadati"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_FETCH_PUK_DESC"
@@ -4570,9 +4604,6 @@ msgstr "Chiave"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_CANCEL"
-#~ msgstr "continua"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE"
 #~ msgstr "continua"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_RESET"

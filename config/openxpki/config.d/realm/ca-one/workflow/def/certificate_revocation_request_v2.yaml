@@ -20,7 +20,7 @@ state:
     CHECK_FOR_REVOCATION:
         autorun: 1
         action:
-          - global_check_for_revocation > SUCCESS 
+          - global_check_for_revocation > SUCCESS
         output:
           - cert_identifier
           - reason_code
@@ -46,7 +46,7 @@ state:
         action:
           - persist_crr > NICE_DISPATCH_REVOKE ? is_not_yet_revoked_or_pending
           - global_noop > CHECK_FOR_REVOCATION ? !is_not_yet_revoked_or_pending
- 
+
     FAILURE:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_DESC
@@ -189,7 +189,7 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Pause
         param:
             _map_wakeup: $delay_revocation_time
-            reason: I18N_OPENXPKI_DELEAYED_REVOCATION_REQUESTED
+            reason: I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED
 
     cleanup:
         class: OpenXPKI::Server::Workflow::Activity::Noop
@@ -305,7 +305,7 @@ validator:
             error: I18N_OPENXPKI_UI_WORKFLOW_ERROR_DELAY_REVOCATION_TIME_NOT_IN_FUTURE
         arg:
           - $delay_revocation_time
-        
+
 field:
     crr_info:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_LABEL
