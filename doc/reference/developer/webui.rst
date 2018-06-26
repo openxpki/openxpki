@@ -189,6 +189,12 @@ Field-Type "text", "hidden", "password", "textarea"
 
 No additional parameters, create a simple html form element without any extras.
 
+Field-Type "static"
+^^^^^^^^^^^^^^^^^^^
+
+No additional parameters, creates a simple "readonly" text element.
+
+
 Field-Type "checkbox/bool"
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
