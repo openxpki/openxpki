@@ -33,22 +33,22 @@ sub execute
     }
 
     my $query = {
-        STATUS => 'ISSUED',
-        ENTITY_ONLY => 1,
+        status => 'ISSUED',
+        entity_only => 1,
     };
 
     if ($self->param('any_realm')) {
         ##! 32: 'Any realm requested'
-        $query->{PKI_REALM} = '_ANY';
+        $query->{pki_realm} = '_any';
     }
 
     if ($self->param('cn_only')) {
         ##! 32: 'match cn only'
         my $dn = new OpenXPKI::DN( $cert_subject );
         my %hash = $dn->get_hashed_content();
-        $query->{SUBJECT} = 'CN='.$hash{CN}[0].',%';
+        $query->{subject} = 'CN='.$hash{CN}[0].',%';
     } else {
-        $query->{SUBJECT} = $cert_subject.'%';
+        $query->{subject} = $cert_subject.'%';
     }
 
     if (my $renewal = $self->param('allow_renewal_period')) {
@@ -58,21 +58,24 @@ sub execute
             VALIDITYFORMAT => 'detect',
         });
 
-        $query->{NOTAFTER} = $notafter->epoch();
+        $query->{valid_before} = $notafter->epoch();
     } else {
-        $query->{NOTAFTER} = time();
+        $query->{valid_before} = time();
     }
 
     if (my $profile = $self->param('profile')) {
-        $query->{PROFILE} = $profile;
+        $query->{profile} = $profile;
     }
 
     ##! 32: 'Search duplicate with query ' . Dumper $query
 
-    my $result = CTX('api')->search_cert($query);
+    my $result = CTX('api2')->search_cert(%{$query});
 
     ##! 16: 'Search returned ' . Dumper $result
-    my @identifier = map {  $_->{IDENTIFIER} } @{$result};
+
+    my $ignore = $self->param('cert_identifier_ignore') || '';
+
+    my @identifier = map {  ($_->{identifier} eq $ignore) ? () : $_->{identifier} } @{$result};
 
     if (@identifier) {
 
@@ -133,5 +136,11 @@ Check only on the common name of the certificate.
 Set to a OpenXPKI::DateTime validity specification (eg. +0003 for three
 month) to allow renewals within a defined period. Certificates which expire
 within the given period are not considered to trigger a duplicate error.
+
+=item cert_identifier_ignore
+
+Pass a single certificate identifier that is removed from the list in case
+it was found. This is useful when running this check on a renewal/replace
+workflow where you already know there is one matching certificate.
 
 =back
