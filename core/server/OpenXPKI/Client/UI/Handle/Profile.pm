@@ -90,6 +90,14 @@ sub render_subject_form {
     my $self = shift; # reference to the wrapping workflow/result
     my $args = shift;
     my $wf_action = shift;
+    my $param = shift;
+
+    my $section;
+    my $mode = 'enroll';
+
+    if ($param) {
+        ($section, $mode) = split /!/, $param;
+    }
 
     my $wf_info = $args->{WF_INFO};
 
@@ -99,16 +107,19 @@ sub render_subject_form {
     my $cert_profile = $context->{'cert_profile'};
     my $cert_subject_style = $context->{'cert_subject_style'};
 
+    my $is_renewal = ($mode eq 'renewal');
+
     # Parse out the field name and type, we assume that there is only one activity with one field
     $wf_action = (keys %{$wf_info->{ACTIVITY}})[0] unless($wf_action);
     my $field_name = $wf_info->{ACTIVITY}->{$wf_action}->{field}[0]->{name};
-    my $field_type = $wf_info->{ACTIVITY}->{$wf_action}->{field}[0]->{type};
+    my $field_type = $section ? $section : substr($wf_info->{ACTIVITY}->{$wf_action}->{field}[0]->{type}, 5);
 
     $self->logger()->debug( " Render subject for $field_name with type $field_type in $wf_action " );
 
     # Allowed types are cert_subject, cert_san, cert_info
-    my $fields = $self->send_command( 'get_field_definition',
-        { PROFILE => $cert_profile, STYLE => $cert_subject_style, 'SECTION' =>  substr($field_type, 5) });
+    my $fields = $self->send_command_v2( 'get_field_definition',
+        { profile => $cert_profile, style => $cert_subject_style, 'section' =>  $section }
+    );
 
     $self->logger()->trace( 'Profile fields' . Dumper $fields );
 
@@ -127,7 +138,7 @@ sub render_subject_form {
     $self->logger()->trace( 'Preset ' . Dumper $values );
 
     # Map the old notation for the new UI
-    $fields = OpenXPKI::Client::UI::Handle::Profile::__translate_form_def( $fields, $field_name, $values );
+    $fields = OpenXPKI::Client::UI::Handle::Profile::__translate_form_def( $fields, $field_name, $values, $is_renewal );
 
     $self->logger()->trace( 'Mapped fields' . Dumper $fields );
 
@@ -308,26 +319,30 @@ sub __translate_form_def {
     my $fields = shift;
     my $field_name = shift;
     my $values = shift;
+    my $is_renewal = shift || 0;
 
     # TODO - Refactor profile definitions to make this obsolete
     my @fields;
     foreach my $field (@{$fields}) {
+
+        my $renew = $is_renewal ? ($field->{renew} || 'preset') : '';
+
         my $new = {
-            name => $field_name.'{'.$field->{ID}.'}',
-            label => $field->{LABEL},
-            tooltip => defined $field->{TOOLTIP} ? $field->{TOOLTIP} : $field->{DESCRIPTION},
+            name => $field_name.'{'.$field->{id}.'}',
+            label => $field->{label},
+            tooltip => defined $field->{tooltip} ? $field->{tooltip} : $field->{description},
              # Placeholder is the new attribute, fallback to old default
-            placeholder => (defined $field->{PLACEHOLDER} ? $field->{PLACEHOLDER} : $field->{DEFAULT}),
-            value => $values->{$field->{ID}}
+            placeholder => (defined $field->{placeholder} ? $field->{placeholder} : $field->{default}),
+            value => $values->{$field->{id}},
         };
 
-        if ($field->{TYPE} eq 'freetext') {
+        if ($field->{type} eq 'freetext') {
             $new->{type} = 'text';
-        } elsif ($field->{TYPE} eq 'select') {
+        } elsif ($field->{type} eq 'select') {
             $new->{type} = 'select';
 
             my @options;
-            foreach my $item (@{$field->{OPTIONS}}) {
+            foreach my $item (@{$field->{options}}) {
                push @options, { label => $item, value => $item};
             }
             $new->{options} = \@options;
@@ -335,22 +350,22 @@ sub __translate_form_def {
             $new->{type} = 'text';
         }
 
-        if (defined $field->{MIN}) {
-            if ($field->{MIN} == 0) {
+        if (defined $field->{min}) {
+            if ($field->{min} == 0) {
                 $new->{is_optional} = 1;
             } else {
-                $new->{min} = $field->{MIN};
+                $new->{min} = $field->{min};
                 $new->{clonable} = 1;
             }
         }
 
-        if (defined $field->{MAX}) {
-            $new->{max} = $field->{MAX};
+        if (defined $field->{max}) {
+            $new->{max} = $field->{max};
             $new->{clonable} = 1;
         }
 
         # Check for key/value field
-        if ($field->{KEYS}) {
+        if ($field->{keys}) {
             $new->{name} =  $field_name.'{*}';
             my $format = $field_name.'{%s}';
             $format .= '[]' if ($new->{clonable});
@@ -358,7 +373,7 @@ sub __translate_form_def {
             my @keys = map { {
                 value => sprintf ($format, $_->{value}),
                 label => $_->{label}
-            } } @{$field->{KEYS}};
+            } } @{$field->{keys}};
             $new->{keys} = \@keys;
         }
 
@@ -366,8 +381,16 @@ sub __translate_form_def {
             $new->{name} .= '[]';
         }
 
+        if ($renew eq 'clear') {
+            $new->{value} = undef;
+
+        } elsif ($renew eq 'keep') {
+            $new->{type} = 'static';
+
+        }
 
         push @fields, $new;
+
     }
 
     return \@fields;

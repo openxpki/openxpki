@@ -144,6 +144,14 @@ placeholder
   A text which is shown as placeholder in the input field (this value is
   NOT a default value for the field)
 
+renew
+  How to handle this field during a certificate renewal request. Can be one of::
+
+     keep: the field is set to the existing value and can not be changed
+
+     preset: the field is set to the existing value but can be changed
+
+     clear: the current value is unset
 
 Subject Rendering
 ^^^^^^^^^^^^^^^^^
