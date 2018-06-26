@@ -120,6 +120,15 @@ CREATE TABLE IF NOT EXISTS `session` (
   `ip_address` varchar(45) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `session_frontend` (
+  `session_id` varchar(255) NOT NULL,
+  `data` longtext,
+  `created` int(10) unsigned NOT NULL,
+  `modified` int(10) unsigned NOT NULL,
+  `ip_address` varchar(45) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 CREATE TABLE IF NOT EXISTS `seq_application_log` (
   `seq_number` bigint(20) unsigned NOT NULL,
   `dummy` int(11) DEFAULT NULL
@@ -249,6 +258,9 @@ ALTER TABLE `secret`
  ADD PRIMARY KEY (`pki_realm`,`group_id`);
 
 ALTER TABLE `session`
+ ADD PRIMARY KEY (`session_id`), ADD INDEX(`modified`);
+
+ALTER TABLE `session_frontend`
  ADD PRIMARY KEY (`session_id`), ADD INDEX(`modified`);
 
 ALTER TABLE `seq_application_log`
