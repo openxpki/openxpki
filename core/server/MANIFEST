@@ -386,7 +386,6 @@ OpenXPKI/Server/Workflow/Activity/Noop.pm
 OpenXPKI/Server/Workflow/Activity/Sleep.pm
 
 # FIXME: Remove for production
-OpenXPKI/Server/Workflow/Activity/Test.pm
 OpenXPKI/Server/Workflow/Activity/WorkflowTest.pm
 
 OpenXPKI/Server/Workflow/Activity/CertRenewal/FetchOrgCertData.pm
