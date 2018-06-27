@@ -1128,8 +1128,8 @@ sub action_search {
         if ($status eq 'VALID') {
             $status = 'ISSUED';
             my $now = time();
-            $query->{notbefore_after} = $now;
-            $query->{notafter_before} = $now;
+            $query->{valid_before} = $now;
+            $query->{expires_after} = $now;
         }
         $query->{status} = $status;
     }
