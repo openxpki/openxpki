@@ -237,7 +237,8 @@ state:
     PREPARED:
         autorun: 1
         action:
-          - global_nice_issue_certificate persist_cert_metadata notify_cert_issued > REVOKE_CERTS
+          - global_nice_issue_certificate persist_cert_metadata notify_cert_issued > REVOKE_CERTS ? !is_renewal_mode
+          - global_nice_renew_certificate persist_cert_metadata notify_cert_issued > REVOKE_CERTS ? is_renewal_mode
 
     REVOKE_CERTS:
         autorun: 1
@@ -480,6 +481,8 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
         param:
             request_mode: renewal
+            _map_renewal_cert_identifier: $signer_cert_identifier
+
 
     set_mode_initial:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
