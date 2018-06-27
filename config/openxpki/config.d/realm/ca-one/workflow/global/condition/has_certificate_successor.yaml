@@ -1,0 +1,2 @@
+class: OpenXPKI::Server::Workflow::Condition::CertificateHasSuccessor
+

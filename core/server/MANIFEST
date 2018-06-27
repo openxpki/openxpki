@@ -535,6 +535,7 @@ OpenXPKI/Server/Workflow/Condition/HasRole.pm
 
 OpenXPKI/Server/Workflow/Condition/KeyParams.pm
 OpenXPKI/Server/Workflow/Condition/KeyGenerationMode.pm
+OpenXPKI/Server/Workflow/Condition/CertificateHasSuccessor.pm
 OpenXPKI/Server/Workflow/Condition/IsServerKeyGeneration.pm
 OpenXPKI/Server/Workflow/Condition/CertificateNotYetRevoked.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowCreator.pm
