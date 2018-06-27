@@ -13,7 +13,7 @@ state:
     BUILD_SUBJECT:
         autorun: 1
         action:
-          - render_subject set_workflow_attributes check_policy_dns check_policy_subject_duplicate check_policy_key_duplicate > SUBJECT_COMPLETE
+          - global_render_subject set_workflow_attributes check_policy_dns check_policy_subject_duplicate check_policy_key_duplicate > SUBJECT_COMPLETE
 
 
     CHECK_VALIDITY:
@@ -46,7 +46,7 @@ state:
     UPDATE_REQUEST:
         autorun: 1
         action:
-          - cancel_approvals render_subject set_workflow_attributes > RUN_POLICY_CHECKS
+          - cancel_approvals global_render_subject set_workflow_attributes > RUN_POLICY_CHECKS
 
     CHECK_APPROVALS:
         autorun: 1
@@ -368,7 +368,7 @@ state:
     REQUEST_COMPLETE:
         autorun: 1
         action:
-          - persist_csr > NICE_ISSUE_CERTIFICATE
+          - global_persist_csr > NICE_ISSUE_CERTIFICATE
 
     SETUP_REQUEST_TYPE:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SETUP_REQUEST_TYPE_LABEL
@@ -613,11 +613,6 @@ action:
         param:
             message: csr_rejected
 
-    persist_csr:
-        class: OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PERSIST_CSR_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PERSIST_CSR_DESC
-
     persist_key_password:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
         param:
@@ -675,9 +670,6 @@ action:
             ds_key: $workflow_id
             ds_namespace: certificate.privatekey
             ds_newkey: $cert_identifier
-
-    render_subject:
-        class: OpenXPKI::Server::Workflow::Activity::Tools::RenderSubject
 
     retype_server_password:
         class: OpenXPKI::Server::Workflow::Activity::Noop

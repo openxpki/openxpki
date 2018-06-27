@@ -178,7 +178,7 @@ state:
     ISSUANCE:
         autorun: 1
         action:
-          - persist_csr > PREPARED
+          - global_persist_csr > PREPARED
 
     NOTIFIED_CERT_ISSUED:
         autorun: 1
@@ -462,10 +462,6 @@ action:
         param:
             _map_cust_id: "[% IF context.url_custid %][% context.url_custid %][% else %][% old_meta_system_id %][% END %]"
             _map_server_id: $server
-
-    persist_csr:
-        class: OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest
-
 
     override_policy:
         class: Workflow::Action::Null

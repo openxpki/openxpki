@@ -4,7 +4,7 @@ head:
 
 state:
     INITIAL:
-        action: initialize parse_request set_profile render_subject persist_csr global_nice_issue_certificate > SUCCESS
+        action: initialize parse_request set_profile global_render_subject global_persist_csr global_nice_issue_certificate > SUCCESS
 
     SUCCESS: ~
 
@@ -26,16 +26,6 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10
         param:
             req_extensions: certificateTemplate certificateTemplateName challengePassword
-
-    render_subject:
-        class: OpenXPKI::Server::Workflow::Activity::Tools::RenderSubject
-
-
-    persist_csr:
-        class: OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PERSIST_CSR_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PERSIST_CSR_DESC
-
 
 acl:
     System:

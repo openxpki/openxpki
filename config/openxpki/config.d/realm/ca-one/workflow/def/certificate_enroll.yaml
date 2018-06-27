@@ -232,7 +232,7 @@ state:
 
     APPROVED:
         autorun: 1
-        action: persist_csr > PREPARED
+        action: global_persist_csr > PREPARED
 
     PREPARED:
         autorun: 1
@@ -358,12 +358,6 @@ action:
 
     calculate_approval_points:
         class: OpenXPKI::Server::Workflow::Activity::Tools::CalculateApprovalPoints
-
-
-    persist_csr:
-        class: OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest
-        param:
-            csr_type: pkcs10
 
     load_recent_metadata:
         class: OpenXPKI::Server::Workflow::Activity::Tools::LoadCertificateMetadata
