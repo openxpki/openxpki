@@ -148,7 +148,8 @@ sub param {
         return $self->{PARAMS}{$name};
     } else {
         my $map = $self->_map();
-        return undef unless ($map->{$name});
+        return undef unless ( defined $map->{$name});
+        return unless ($map->{$name});
         ##! 16: 'query for mapped key ' . $name
 
         my $template = $map->{$name};
