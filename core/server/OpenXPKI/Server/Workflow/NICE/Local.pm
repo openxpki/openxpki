@@ -35,11 +35,11 @@ sub issueCertificate {
     my $realm = CTX('session')->data->pki_realm;
     my $config = CTX('config');
 
-    my $csr_serial = $csr->{CSR_SERIAL};
+    my $csr_serial = $csr->{req_key};
 
     ##! 8: 'csr serial  ' . $csr_serial
 
-    my $cert_profile = $csr->{PROFILE};
+    my $cert_profile = $csr->{profile};
     ##! 64: 'certificate profile: ' . $cert_profile
 
     # Determine the expected validity of the certificate to find the right ca
@@ -194,8 +194,8 @@ sub issueCertificate {
         TYPE      => 'ENDENTITY', # FIXME - should be useless
     );
 
-    ##! 64: 'propagating cert subject: ' . $csr->{SUBJECT}
-    $profile->set_subject( $csr->{SUBJECT} );
+    ##! 64: 'propagating cert subject: ' . $csr->{subject}
+    $profile->set_subject( $csr->{subject} );
 
     ##! 51: 'SAN List ' . Dumper ( @subject_alt_names )
     if (scalar @subject_alt_names) {
@@ -277,7 +277,7 @@ sub issueCertificate {
     my $certificate = $ca_token->command({
         COMMAND => "issue_cert",
         PROFILE => $profile,
-        CSR     => $csr->{DATA},
+        CSR     => $csr->{data},
     });
 
     # SPKAC Requests return binary format - so we need to convert that

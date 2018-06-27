@@ -26,8 +26,8 @@ sub execute {
 
     my $nice_backend = OpenXPKI::Server::Workflow::NICE::Factory->getHandler( $self );
 
-    # Load the CSR indicated by the context parameter from the database
-    my $csr_serial = $context->param( 'csr_serial' );
+    # Load the CSR indicated by the activity or context parameter from the database
+    my $csr_serial = $self->param( 'csr_serial' ) || $context->param( 'csr_serial' );
 
     ##! 32: 'load csr from db: ' . $csr_serial
     my $csr = CTX('dbi')->select_one(
@@ -55,10 +55,15 @@ sub execute {
 
     CTX('log')->application()->info("start cert issue for serial $csr_serial, workflow " . $workflow->id);
 
+    my $renewal_cert_identifier = $self->param('renewal_cert_identifier');
+
     my $set_context;
     eval {
-        # TODO #legacydb CSR parameters are converted
-        $set_context = $nice_backend->issueCertificate( OpenXPKI::Server::Database::Legacy->csr_to_legacy($csr), $ca_alias );
+        if ($renewal_cert_identifier) {
+            $set_context = $nice_backend->renewCertificate( $csr, $ca_alias, $renewal_cert_identifier );
+        } else {
+            $set_context = $nice_backend->issueCertificate( $csr, $ca_alias );
+        }
     };
 
     if (my $eval_err = $EVAL_ERROR) {
@@ -104,6 +109,18 @@ sub execute {
             },
         );
     }
+
+    if ($renewal_cert_identifier) {
+        CTX('dbi')->insert(
+            into => 'certificate_attributes',
+            values => {
+                attribute_key => AUTO_ID,
+                identifier => $set_context->{cert_identifier},
+                attribute_contentkey => 'system_renewal_cert_identifier',
+                attribute_value => $renewal_cert_identifier,
+            },
+        );
+    }
 }
 
 1;
@@ -132,15 +149,23 @@ See OpenXPKI::Server::Workflow::NICE::issueCertificate for details
 
 =over
 
-=item csr_serial
+=item csr_serial (optional)
 
-the serial number of the certificate signing request
+the serial number of the certificate signing request.
+If not set the context value with key I<csr_serial> is used.
 
 =item ca_alias (optional)
 
 the ca alias to use for this signing operation, the default is to use
 the "latest" token from the certsign group.
 B<Might not be supported by all backends!>
+
+=item renewal_cert_identifier
+
+Set to the originating certificate identifier if this is a renewal request.
+This will route the processing to the renewCertificate method of the NICE
+backend and add the old certificate identifier as predecessor using the
+certificate_attributes table (key I<system_renewal_cert_identifier>).
 
 =back
 
