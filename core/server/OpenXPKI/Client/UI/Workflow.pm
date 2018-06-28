@@ -2152,8 +2152,9 @@ sub __render_input_field {
     # special handling of preset cert_identifier fields
     if ($type eq 'cert_identifier' && $value) {
         $item->{type} = 'static';
-        $item->{value} = $value;
-    } elsif (defined $value) {
+    }
+
+    if (defined $value) {
         # clonables need array as value
         if ($item->{clonable}) {
             if (ref $value) {
@@ -2170,6 +2171,10 @@ sub __render_input_field {
         }
     } elsif ($field->{default}) {
         $item->{value} = $field->{default};
+    }
+
+    if ($item->{type} eq 'static' && $field->{template}) {
+        $item->{verbose} = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $item } );
     }
 
     return $item;
