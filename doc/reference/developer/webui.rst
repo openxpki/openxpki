@@ -192,7 +192,9 @@ No additional parameters, create a simple html form element without any extras.
 Field-Type "static"
 ^^^^^^^^^^^^^^^^^^^
 
-No additional parameters, creates a simple "readonly" text element.
+No additional parameters, creates a simple "readonly" text element with the
+value treated as a "hidden" form element. If you want to display a formatted
+version of the value, you can pass this using the ``verbose`` key.
 
 
 Field-Type "checkbox/bool"
