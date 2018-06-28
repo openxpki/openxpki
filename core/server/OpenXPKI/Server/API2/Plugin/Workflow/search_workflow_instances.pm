@@ -71,6 +71,10 @@ Legacy: I<ArrayRef> - attribute values (legacy search syntax)
 
 =item * C<reverse> I<Bool> - set to 1 for reverse ordering (ascending). Default: descending
 
+=item * C<return_attributes> I<ArrayRef> - add the given attributes as
+columns to the result set. Each attribute is added as extra column
+using the attribute name as key.
+
 =back
 
 =cut
@@ -86,6 +90,7 @@ command "search_workflow_instances" => {
     order      => { isa => 'Str', },
     reverse    => { isa => 'Bool', },
     check_acl  => { isa => 'Bool', default => 0 },
+    return_attributes => {isa => 'ArrayRef', },
 } => sub {
     my ($self, $params) = @_;
 
@@ -95,15 +100,6 @@ command "search_workflow_instances" => {
     );
     my $result = CTX('dbi')->select(
         %sql_params,
-        columns => [ qw(
-            workflow_last_update
-            workflow.workflow_id
-            workflow_type
-            workflow_state
-            workflow_proc_state
-            workflow_wakeup_at
-            pki_realm
-        ) ],
     )->fetchall_arrayref({});
 
     # check_acl: only return items that the user can access
@@ -131,8 +127,11 @@ command "search_workflow_instances_count" => {
     state      => { isa => 'ArrayOrAlphaPunct', coerce => 1, },
     proc_state => { isa => 'AlphaPunct', },
     attribute  => { isa => 'ArrayRef|HashRef', },
+    return_attributes => {isa => 'ArrayRef', },
 } => sub {
     my ($self, $params) = @_;
+
+    $params->return_attributes([]);
 
     my $sql_params = $self->_search_query_params($params);
     my $result = CTX('dbi')->select_one(
@@ -152,18 +151,33 @@ sub _search_query_params {
     my $where = {};
     my $params = {
         where => $where,
+        columns => [ qw(
+            workflow_last_update
+            workflow.workflow_id
+            workflow_type
+            workflow_state
+            workflow_proc_state
+            workflow_wakeup_at
+            pki_realm
+        ) ],
     };
 
     ##! 16: 'Input args ' . Dumper $args
+
+
+    my $return_attrib = {};
+    if ($args->has_return_attributes) {
+        map { $return_attrib->{$_} = '' } @{$args->return_attributes};
+    }
 
     # Search for known serials, used e.g. for certificate relations
     $where->{'workflow.workflow_id'} = $args->id if $args->has_id;
 
     my @join_spec = ();
+    my $ii = 0;
     if ( $args->has_attribute ) {
 
         # we need to join over the workflow_attributes table
-        my $ii = 0;
         # Legacy API
         if (ref $args->attribute eq 'ARRAY') {
 
@@ -203,10 +217,29 @@ sub _search_query_params {
                 $where->{ "$table_alias.attribute_value" } = $args->attribute->{$key};
                 $ii++;
 
+                # if the attribute should be returned we add the table name used
+                $return_attrib->{$key} = $table_alias if (defined $return_attrib->{$key});
+
             }
 
         }
     }
+
+    ##! 64: 'return_attrib ' . Dumper $return_attrib
+    foreach my $key (keys %{$return_attrib}) {
+
+        # if the attribute was used in the query, it is already joined
+        my $table_alias = $return_attrib->{$key};
+
+        if (!$table_alias) {
+            $table_alias = "workflowattr$ii";
+            # outer join to also get empty values
+            push @join_spec, ( "=>workflow.workflow_id=workflow_id=identifier,$table_alias.attribute_contentkey='$key'", "workflow_attributes|$table_alias" );
+            $ii++;
+        }
+        push @{$params->{columns}}, "$table_alias.attribute_value as $key";
+    }
+
 
     if (scalar @join_spec) {
         $params->{from_join} = join " ", 'workflow', @join_spec;
