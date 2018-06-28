@@ -2149,7 +2149,11 @@ sub __render_input_field {
         $item->{label} .= '*';
     }
 
-    if (defined $value) {
+    # special handling of preset cert_identifier fields
+    if ($type eq 'cert_identifier' && $value) {
+        $item->{type} = 'static';
+        $item->{value} = $value;
+    } elsif (defined $value) {
         # clonables need array as value
         if ($item->{clonable}) {
             if (ref $value) {
