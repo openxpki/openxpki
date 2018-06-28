@@ -228,7 +228,7 @@ wfsearch:
           - label: I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT
             template: "[% IF context.cert_subject %][% context.cert_subject %][% ELSIF context.cert_identifier %][% USE Certificate %][% Certificate.body(context.cert_identifier, 'subject') %][% ELSE %]-[% END %]"
           - label: I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL
-            template: "[% context.creator %] / [% context.cert_info.requestor_email %]"
+            field: attribute.creator
 
         attributes:
           - label: I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL

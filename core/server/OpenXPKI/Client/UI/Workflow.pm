@@ -742,7 +742,11 @@ sub init_task {
         }
 
         # create the header from the columns spec
-        my ($header, $column) = $self->__render_list_spec( \@cols );
+        my ($header, $column, $rattrib) = $self->__render_list_spec( \@cols );
+
+        if ($rattrib) {
+            $query->{return_attributes} = $rattrib;
+        }
 
         $self->logger()->trace( "columns : " . Dumper $column);
 
@@ -1238,6 +1242,16 @@ sub action_search {
         $verbose->{wf_creator} = $self->param('wf_creator');
     }
 
+    # check if there is a custom column set defined
+    my ($header,  $body, $rattrib);
+    if ($spec->{cols} && ref $spec->{cols} eq 'ARRAY') {
+        ($header, $body, $rattrib) = $self->__render_list_spec( $spec->{cols} );
+    } else {
+        $body = $self->__default_grid_row;
+        $header = $self->__default_grid_head;
+    }
+
+    $query->{return_attributes} = $rattrib if ($rattrib);
 
     $self->logger()->trace("query : " . Dumper $query);
 
@@ -1249,14 +1263,6 @@ sub action_search {
         return $self->init_search({ preset => $input });
     }
 
-    # check if there is a custom column set defined
-    my ($header,  $body);
-    if ($spec->{cols} && ref $spec->{cols} eq 'ARRAY') {
-        ($header, $body) = $self->__render_list_spec( $spec->{cols} );
-    } else {
-        $body = $self->__default_grid_row;
-        $header = $self->__default_grid_head;
-    }
 
     my @criteria;
     foreach my $item ((
@@ -2249,7 +2255,7 @@ sub __render_result_list {
             $field = 'workflow_id' if ($field eq 'workflow_serial');
 
             # we need to load the wf info
-            if (!$wf_info && ($col->{template} || $col->{source} ne 'workflow')) {
+            if (!$wf_info && ($col->{template} || $col->{source} ne 'context')) {
                 $wf_info = $self->send_command( 'get_workflow_info', { ID => $wf_item->{'workflow_id'}, ATTRIBUTE => 1 });
                 $self->logger()->trace( "fetch wf info : " . Dumper $wf_info);
                 $context = $wf_info->{WORKFLOW}->{CONTEXT};
@@ -2266,7 +2272,6 @@ sub __render_result_list {
                 push @line, $self->send_command( 'render_template', { TEMPLATE => $col->{template}, PARAMS => $ttp } );
 
             } elsif ($col->{source} eq 'workflow') {
-
 
                 # Special handling of the state field
                 if ($field eq "workflow_state") {
@@ -2291,8 +2296,7 @@ sub __render_result_list {
             } elsif ($col->{source} eq 'context') {
                 push @line, $context->{ $col->{field} };
             } elsif ($col->{source} eq 'attribute') {
-                # to be implemented if required
-                push @line, $attrib->{$col->{field}}
+                push @line, $wf_item->{ $col->{field} }
             } else {
                 # hu ?
             }
@@ -2329,6 +2333,7 @@ sub __render_list_spec {
 
     my @header;
     my @column;
+    my %attrib;
 
     for (my $ii = 0; $ii < scalar @{$cols}; $ii++) {
 
@@ -2345,7 +2350,12 @@ sub __render_list_spec {
 
         if ($col{template}) {
 
-        } elsif ($col{field} =~ m{\A (context|attribute)\.(\S+) }xi) {
+        } elsif ($col{field} =~ m{\A (attribute)\.(\S+) }xi) {
+            $col{source} = $1;
+            $col{field} = $2;
+            $attrib{$2} = 1;
+
+        } elsif ($col{field} =~ m{\A (context)\.(\S+) }xi) {
             # we use this later to avoid the pattern match
             $col{source} = $1;
             $col{field} = $2;
@@ -2363,7 +2373,7 @@ sub __render_list_spec {
 
     push @column, { source => 'workflow', field => 'workflow_id' };
 
-    return ( \@header, \@column );
+    return ( \@header, \@column, [ keys(%attrib) ] );
 }
 
 =head2 __render_fields
