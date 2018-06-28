@@ -90,10 +90,6 @@ sub RevokeSmartcard {
 
         my %param = (
             token_id => $card_identifier,
-            crr_info        => $serializer->serialize({
-                requester_sn    => $auth_dn || '',    # default to empty string (must not be undef)
-                client_ip       => $client_ip,
-            }),
             server => $servername,
             interface => 'soap',
             signer_cert => $auth_pem
@@ -119,6 +115,9 @@ sub RevokeSmartcard {
         return SOAP::Data->new( name => 'responseCode', value => 1 );
     } elsif (!$workflow->{ID} || $workflow->{'PROC_STATE'} eq 'exception' || $workflow->{'STATE'} eq 'FAILURE') {
         $log->error("Workflow terminated in unexpected state " );
+        return SOAP::Data->new( name => 'responseCode', value => 1 );
+    } elsif ($workflow->{'STATE'} ne 'SUCCESS') {
+        $log->error("Workflow did not terminate with SUCCESS" );
         return SOAP::Data->new( name => 'responseCode', value => 1 );
     }
 
