@@ -81,6 +81,10 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
 msgstr "Untergeordnete Workflows"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_HAS_SUCCESSOR_FAILED"
+msgstr "Erstellen von CRLs"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
 msgstr "Zertifikats-ID"
 
@@ -874,6 +878,10 @@ msgid "I18N_OPENXPKI_UI_NO"
 msgstr "Benutzername"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_NOT_IN_RENWAL_WINDOW_WARNING"
+msgstr "Löschen der Genehmigung(en)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "testuser"
 
@@ -1318,6 +1326,10 @@ msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_RENEWAL_SUBJECT_CHANGED_WARNING"
+msgstr "Auf Start wartend"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_REPORT_CONFIG"
 msgstr "Benutzername"
 
@@ -1355,6 +1367,10 @@ msgstr "Untergeordnete Workflows"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID"
 msgstr "Seriennummer des Workflowprozesses"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REVOCATION_WORKFLOW_ID"
+msgstr "Untergeordnete Workflows"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
@@ -2910,6 +2926,14 @@ msgstr "Seriennummer des Workflowprozesses"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_TOOLTIP"
 msgstr "Prozesse anzeigen"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_SUBJECT_CHANGED_WARNING"
+msgstr "Name"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENWAL_WINDOW_WARNING"
+msgstr "Übergeordneter Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_DESC"

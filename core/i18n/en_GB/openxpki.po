@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2018-06-26 15:29+0200\n"
+"PO-Revision-Date: 2018-06-28 11:23+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -66,6 +66,9 @@ msgstr "Common Name"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
 msgstr "Certificate Information"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_HAS_SUCCESSOR_FAILED"
+msgstr "No successor certificate found"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
 msgstr "Certificate Identifier"
@@ -160,13 +163,13 @@ msgid "I18N_OPENXPKI_UI_CERT_ACTION_LABEL"
 msgstr "Action"
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_RENEW"
-msgstr "Renew"
+msgstr "Raise certificate renewal request"
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_REVOKE"
-msgstr "Revoke"
+msgstr "Raise certificate revocation request"
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA"
-msgstr "Update Metadata"
+msgstr "Change metadata of this certificate"
 
 msgid "I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT"
 msgstr ""
@@ -668,6 +671,9 @@ msgstr "My Workflows"
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "No"
 
+msgid "I18N_OPENXPKI_UI_NOT_IN_RENWAL_WINDOW_WARNING"
+msgstr "Request is not in renewal window!"
+
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Requested page not found"
 
@@ -763,9 +769,8 @@ msgstr "Hostname"
 msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC"
 msgstr "Enter the fully qualified hostname (domain name) of your system."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_NODEID"
-msgstr "Organization name"
+msgstr "Node ID"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_NODEID_DESC"
@@ -933,6 +938,9 @@ msgstr "3 years"
 msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "Reason code given is not supported"
 
+msgid "I18N_OPENXPKI_UI_RENEWAL_SUBJECT_CHANGED_WARNING"
+msgstr "The new certificates subject will not match the old one!"
+
 # Remove?
 msgid "I18N_OPENXPKI_UI_REPORT_CONFIG"
 msgstr "Report"
@@ -961,6 +969,9 @@ msgstr "Report Name"
 
 msgid "I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID"
 msgstr "Unable to perform action -  security token was invalid!"
+
+msgid "I18N_OPENXPKI_UI_REVOCATION_WORKFLOW_ID"
+msgstr "Revocation Workflow"
 
 msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
 msgstr "Unknown error when analyzing card status"
@@ -1287,16 +1298,13 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_LABEL"
 msgstr "Start revocation"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRW_DESC"
 msgstr ""
-"Create a revocation request for your certificate. Please type the "
-"certificate identifier or use the autosearch function to find your "
-"certificate."
+"Create a renewal request for your certificate. Please type the certificate "
+"identifier or use the autosearch function to find your certificate."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRW_LABEL"
-msgstr "Start revocation"
+msgstr "Certificate Renewal"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CA_DESC"
 msgstr "Publish CA Certificate and CRLs to defined targets."
@@ -1641,7 +1649,6 @@ msgstr "Successful Workflows"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE"
 msgstr "Bulk handle workflows"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_CONTINUE"
 msgstr "continue"
 
@@ -2193,6 +2200,12 @@ msgstr ""
 "The autosearch will search for certificates that contain the given words in "
 "the subject and will show them in a drop down list below. Select the needed "
 "certificate from the list by clicking on it."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_SUBJECT_CHANGED_WARNING"
+msgstr "Subject Modified Warning"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENWAL_WINDOW_WARNING"
+msgstr "Renewal Warning"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_DESC"
 msgstr "The certificate to be replaced by this workflow."
@@ -3042,13 +3055,13 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL"
 msgstr "Publish CA Information"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_DESC"
-msgstr "Certificate Revocation Request"
+msgstr ""
+"Certificate Renewal Request - create a certifcate signing request reusing "
+"the information from an existing certificate."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_LABEL"
-msgstr "Certificate Revocation Request (CRR)"
+msgstr "Certificate Renewal Request (CRW)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
 msgstr "Certificate Revocation Request"

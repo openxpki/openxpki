@@ -77,6 +77,10 @@ msgstr "I miei certificati"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
 msgstr "Informazioni Certificato"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_HAS_SUCCESSOR_FAILED"
+msgstr "Numero di serie del certificato"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
 msgstr "Identificatore del certificato"
 
@@ -806,6 +810,10 @@ msgstr "Workflow"
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "Chiave"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NOT_IN_RENWAL_WINDOW_WARNING"
+msgstr "Errore sconosciuto"
+
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Pagina richiesta non trovata"
 
@@ -1077,6 +1085,10 @@ msgstr "3 anni"
 msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "entità / certificato non più attivi"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_RENEWAL_SUBJECT_CHANGED_WARNING"
+msgstr "In attesa"
+
 # Remove?
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_REPORT_CONFIG"
@@ -1114,6 +1126,10 @@ msgstr "Nessun dato disponibile"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID"
 msgstr "Il token di firma della CRL non è online"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REVOCATION_WORKFLOW_ID"
+msgstr "Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
@@ -2490,6 +2506,14 @@ msgstr ""
 "La funzione di autoricerca ricercherà i certificati che i contengono i "
 "termini inseriti e li mostrerà in una lista a scorrimento verticale. "
 "Seleziona il certificato cliccando sull’elemento della lista."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_SUBJECT_CHANGED_WARNING"
+msgstr "Soggetto Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENWAL_WINDOW_WARNING"
+msgstr "Ulteriori Informazioni"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_DESC"
 msgstr "Il certificato che viene sostituito con questo Workflow"

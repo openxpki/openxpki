@@ -83,6 +83,10 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_HAS_SUCCESSOR_FAILED"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
 msgstr "Идентификатор сертификата"
 
@@ -870,6 +874,10 @@ msgid "I18N_OPENXPKI_UI_NO"
 msgstr "Имя учетной записи"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_NOT_IN_RENWAL_WINDOW_WARNING"
+msgstr "Отменить утверждение заявки на отзыв сертификата (CRR)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Тестировщик"
 
@@ -1317,6 +1325,10 @@ msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_RENEWAL_SUBJECT_CHANGED_WARNING"
+msgstr "В состоянии ожидания запуска"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_REPORT_CONFIG"
 msgstr "Имя учетной записи"
 
@@ -1353,6 +1365,10 @@ msgid "I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID"
 msgstr ""
 "Выбранный способ построения имени требует наличия, как минимум, одного "
 "названия подразделения и двух компонентов доменного имени."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REVOCATION_WORKFLOW_ID"
+msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
@@ -2907,6 +2923,14 @@ msgstr "SPKAC-строка пуста."
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_TOOLTIP"
 msgstr "SPKAC строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_SUBJECT_CHANGED_WARNING"
+msgstr "Субъект"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENWAL_WINDOW_WARNING"
+msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_DESC"

@@ -1,5 +1,5 @@
 label: I18N_OPENXPKI_UI_FIELD_ERROR_CODE
 name: error_code
 format: styled
-template: failed:[% value %]
+template: "[% IF value %]failed:[% value %][% END %]"
 
