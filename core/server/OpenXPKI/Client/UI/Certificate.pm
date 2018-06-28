@@ -219,10 +219,7 @@ sub init_result {
         description => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_DESC' . $criteria ,
     });
 
-    my $pager;
-    if ($startat != 0 || @{$search_result} == $limit) {
-        $pager = $self->__render_pager( $result, { limit => $limit, startat => $startat } );
-    }
+    my $pager = $self->__render_pager( $result, { limit => $limit, startat => $startat } );
 
     my $body = $result->{column};
     $body = $self->__default_grid_row() if(!$body);

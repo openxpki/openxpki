@@ -421,11 +421,7 @@ sub init_result {
         });
     }
 
-    my $pager;
-    if ($startat != 0 || @{$search_result} == $query->{limit}) {
-        $pager = $self->__render_pager( $result, { limit => $query->{limit}, startat => $query->{start} } );
-    }
-
+    my $pager = $self->__render_pager( $result, { limit => $query->{limit}, startat => $query->{start} } );
 
     my $body = $result->{column};
     $body = $self->__default_grid_row() if(!$body);
