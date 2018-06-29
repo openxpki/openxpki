@@ -94,8 +94,6 @@ sub action_result {
         return $self->redirect('bulk!index');
     }
 
-
-
     my $query = {};
     map {
         $query->{lc($_)} = $spec->{query}->{$_};
@@ -175,6 +173,7 @@ sub action_result {
         'input' => {},
         'header' => $header,
         'column' => $body,
+        'pager' => $spec->{pager} || {},
         'page' => {
             label => $spec->{label} || 'I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE',
             description =>  $spec->{description},

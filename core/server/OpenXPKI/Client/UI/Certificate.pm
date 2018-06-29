@@ -1229,6 +1229,7 @@ sub action_search {
         'input' => $input,
         'header' => $header,
         'column' => $body,
+        'pager'  => $spec->{pager} || {},
         'criteria' => \@criteria
     });
 

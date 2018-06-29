@@ -421,7 +421,9 @@ sub init_result {
         });
     }
 
-    my $pager = $self->__render_pager( $result, { limit => $query->{limit}, startat => $query->{start} } );
+    my $pager_args = $result->{pager} || {};
+
+    my $pager = $self->__render_pager( $result, { %$pager_args, limit => $query->{limit}, startat => $query->{start} } );
 
     my $body = $result->{column};
     $body = $self->__default_grid_row() if(!$body);
@@ -729,6 +731,11 @@ sub init_task {
             }
         }
 
+        my $pager_args = { limit => $limit };
+        if ($item->{pager}) {
+            $pager_args = $item->{pager};
+        }
+
         my @cols;
         if ($item->{cols}) {
             @cols = @{$item->{cols}};
@@ -781,10 +788,11 @@ sub init_task {
                     'type' => 'workflow',
                     'count' => $result_count,
                     'query' => $query,
-                    'column' => $column
+                    'column' => $column,
+                    'pager' => $pager_args,
                 };
                 $self->_client->session()->param('query_wfl_'.$queryid, $_query );
-                $pager = $self->__render_pager( $_query, { limit => $limit } );
+                $pager = $self->__render_pager( $_query, $pager_args );
             }
 
         }
@@ -1277,7 +1285,6 @@ sub action_search {
         push @criteria, sprintf '<nobr><b>%s:</b> <i>%s</i></nobr>', $item->{label}, $val;
     }
 
-
     my $queryid = $self->__generate_uid();
     $self->_client->session()->param('query_wfl_'.$queryid, {
         'id' => $queryid,
@@ -1287,6 +1294,7 @@ sub action_search {
         'input' => $input,
         'header' => $header,
         'column' => $body,
+        'pager'  => $spec->{pager} || {},
         'criteria' => \@criteria
     });
 
@@ -2255,7 +2263,7 @@ sub __render_result_list {
             $field = 'workflow_id' if ($field eq 'workflow_serial');
 
             # we need to load the wf info
-            if (!$wf_info && ($col->{template} || $col->{source} ne 'context')) {
+            if (!$wf_info && ($col->{template} || $col->{source} eq 'context')) {
                 $wf_info = $self->send_command( 'get_workflow_info', { ID => $wf_item->{'workflow_id'}, ATTRIBUTE => 1 });
                 $self->logger()->trace( "fetch wf info : " . Dumper $wf_info);
                 $context = $wf_info->{WORKFLOW}->{CONTEXT};

@@ -775,6 +775,8 @@ sub __render_pager {
 
     if (!$args->{pagesizes}) {
         $args->{pagesizes} = [25,50,100,250,500];
+    } elsif (!ref $args->{pagesizes}) {
+        $args->{pagesizes} = [ (split /\s*,\s*/, $args->{pagesizes}) ];
     }
 
     if (!grep (/^$limit$/, @{$args->{pagesizes}}) ) {
