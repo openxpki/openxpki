@@ -112,9 +112,10 @@ sub render_subject_form {
     # Parse out the field name and type, we assume that there is only one activity with one field
     $wf_action = (keys %{$wf_info->{ACTIVITY}})[0] unless($wf_action);
     my $field_name = $wf_info->{ACTIVITY}->{$wf_action}->{field}[0]->{name};
-    my $field_type = $section ? $section : substr($wf_info->{ACTIVITY}->{$wf_action}->{field}[0]->{type}, 5);
 
-    $self->logger()->debug( " Render subject for $field_name with type $field_type in $wf_action " );
+    $section = substr($wf_info->{ACTIVITY}->{$wf_action}->{field}[0]->{type}, 5) unless($section);
+
+    $self->logger()->debug( " Render subject for $field_name, section $section in $wf_action" );
 
     # Allowed types are cert_subject, cert_san, cert_info
     my $fields = $self->send_command_v2( 'get_field_definition',
