@@ -2264,10 +2264,10 @@ sub __render_result_list {
 
             # we need to load the wf info
             if (!$wf_info && ($col->{template} || $col->{source} eq 'context')) {
-                $wf_info = $self->send_command( 'get_workflow_info', { ID => $wf_item->{'workflow_id'}, ATTRIBUTE => 1 });
+                $wf_info = $self->send_command_v2( 'get_workflow_data', { id => $wf_item->{'workflow_id'}  });
                 $self->logger()->trace( "fetch wf info : " . Dumper $wf_info);
-                $context = $wf_info->{WORKFLOW}->{CONTEXT};
-                $attrib = $wf_info->{WORKFLOW}->{ATTRIBUTE};
+                $context = $wf_info->{workflow}->{context};
+                $attrib = $wf_info->{workflow}->{attribute};
             }
 
             if ($col->{template}) {
@@ -2275,7 +2275,7 @@ sub __render_result_list {
                 my $ttp = {
                     context => $context,
                     attribute => $attrib,
-                    workflow => $wf_info->{WORKFLOW}
+                    workflow => $wf_info->{workflow}
                 };
                 push @line, $self->send_command( 'render_template', { TEMPLATE => $col->{template}, PARAMS => $ttp } );
 
