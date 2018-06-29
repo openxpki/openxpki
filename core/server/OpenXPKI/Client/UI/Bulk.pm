@@ -128,6 +128,19 @@ sub action_result {
         }
     }
 
+    # check if there is a custom column set defined
+    my ($header,  $body, $rattrib);
+    if ($spec->{cols} && ref $spec->{cols} eq 'ARRAY') {
+        ($header, $body, $rattrib) = $self->__render_list_spec( $spec->{cols} );
+    } else {
+         $body = $self->__default_grid_row;
+         $header = $self->__default_grid_head;
+    }
+
+    if ($rattrib) {
+        $query->{return_attributes} = $rattrib;
+    }
+
     $self->logger()->trace("query : " . Dumper $query);
 
     my $result_count = $self->send_command_v2( 'search_workflow_instances_count',  $query );
@@ -136,16 +149,6 @@ sub action_result {
     if (!$result_count) {
         $self->set_status('I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES','error');
         return $self->init_index();
-    }
-
-
-    # check if there is a custom column set defined
-    my ($header,  $body);
-    if ($spec->{cols} && ref $spec->{cols} eq 'ARRAY') {
-        ($header, $body) = $self->__render_list_spec( $spec->{cols} );
-    } else {
-         $body = $self->__default_grid_row;
-         $header = $self->__default_grid_head;
     }
 
     my @buttons;
