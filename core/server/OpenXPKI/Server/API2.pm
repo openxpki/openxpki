@@ -312,7 +312,7 @@ sub _load_plugins {
             next;
         }
 
-        $self->log->debug("API - register $pkg: ".join(", ", @{ $pkg->commands })." ($file)");
+        $self->log->trace("API - register $pkg: ".join(", ", @{ $pkg->commands })." ($file)");
 
         # store commands and their source package
         for my $cmd (@{ $pkg->commands }) {
