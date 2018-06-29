@@ -74,9 +74,9 @@ tasklist:
   - label: I18N_OPENXPKI_UI_TASKLIST_PENDING_REQUEST_LABEL
     description: I18N_OPENXPKI_UI_TASKLIST_PENDING_REQUEST_DESCRIPTION
     query:
-      TYPE:
+      type:
         - certificate_signing_request_v2
-      STATE:
+      state:
         - ONHOLD
         - PENDING
         - PENDING_POLICY_VIOLATION
@@ -96,9 +96,9 @@ tasklist:
     description: I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION
     ifempty: hide
     query:
-      TYPE:
+      type:
         - enrollment
-      STATE:
+      state:
         - PENDING_APPROVAL
         - PENDING_MANUAL_AUTHENTICATION
         - PENDING_POLICY
@@ -112,15 +112,15 @@ tasklist:
       - label: I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT
         field: context.cert_subject
       - label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_LABEL
-        template: "[% context.transaction_id %]"
+        field: attribute.transaction_id
 
   - label: I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_LABEL
     description: I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_DESCRIPTION
     ifempty: hide
     query:
-      TYPE:
+      type:
         - certificate_revocation_request_v2
-      STATE:
+      state:
         - PENDING
 
 
@@ -140,9 +140,9 @@ bulk:
        key: transaction_id
 
     query:
-      TYPE:
+      type:
         - certificate_signing_request_v2
-      STATE:
+      state:
         - ONHOLD
         - PENDING
         - PENDING_POLICY_VIOLATION
@@ -182,9 +182,9 @@ bulk:
        operator: like
 
     query:
-      TYPE:
+      type:
         - certificate_revocation_request_v2
-      STATE:
+      state:
         - PENDING
 
     cols:
