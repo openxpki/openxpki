@@ -79,6 +79,10 @@ sub deserialize
     my $self = shift;
     my $string = shift;
 
+    if (!defined $string || $string eq '') {
+        return undef;
+    }
+
     # Catch situations where the value is already deserialized, this can
     # happens when the workflow context is handed over via memory
     if ($string && (ref $string eq 'HASH') || (ref $string eq 'ARRAY')) {
