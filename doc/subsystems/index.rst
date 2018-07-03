@@ -128,7 +128,7 @@ Webserver Config
 Config Path Expansion
 ^^^^^^^^^^^^^^^^^^^^^
 
-The most convenient was to enable the path expansion is to use the ``Alias``
+The most convenient way to enable the path expansion is to use the ``Alias``
 directive::
 
     # Same for RPC

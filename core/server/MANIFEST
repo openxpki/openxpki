@@ -627,6 +627,10 @@ OpenXPKI/Service/SCEP/Command/GetNextCACert.pm
 OpenXPKI/Service/SCEP/Command/GetCACaps.pm
 OpenXPKI/Service/SCEP/Command.pm
 
+
+# Outside of namespace
+CGI/Session/Driver/openxpki.pm
+
 ## test stuff
 
 t/01_pod/1.t

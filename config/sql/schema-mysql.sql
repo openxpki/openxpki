@@ -120,14 +120,13 @@ CREATE TABLE IF NOT EXISTS `session` (
   `ip_address` varchar(45) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `session_frontend` (
+CREATE TABLE IF NOT EXISTS `frontend_session` (
   `session_id` varchar(255) NOT NULL,
   `data` longtext,
   `created` int(10) unsigned NOT NULL,
   `modified` int(10) unsigned NOT NULL,
   `ip_address` varchar(45) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 
 CREATE TABLE IF NOT EXISTS `seq_application_log` (
   `seq_number` bigint(20) unsigned NOT NULL,
@@ -260,7 +259,7 @@ ALTER TABLE `secret`
 ALTER TABLE `session`
  ADD PRIMARY KEY (`session_id`), ADD INDEX(`modified`);
 
-ALTER TABLE `session_frontend`
+ALTER TABLE `frontend_session`
  ADD PRIMARY KEY (`session_id`), ADD INDEX(`modified`);
 
 ALTER TABLE `seq_application_log`

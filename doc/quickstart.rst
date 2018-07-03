@@ -67,7 +67,7 @@ You should now restart the apache server to activate the new config::
 use the openxpkiadm command to verify if the system was installed correctly::
 
     openxpkiadm version
-    Version (core): 1.17.4
+    Version (core): 2.1.0
 
 Now, create an empty database and assign a database user::
 
@@ -195,7 +195,7 @@ If this is not the case, check */var/log/openxpki/stderr.log*.
 Adding the Webclient
 ^^^^^^^^^^^^^^^^^^^^
 
-The new webclient is included in the core packages now. Just open your browser and navigate to *http://yourhost/openxpki/*. You should see the main authentication page. If you get an internal server error, make sure you have the en_US.utf8 locale installed (*locale -a | grep en_US*)!
+The webclient is included in the core packages. Just open your browser and navigate to *http://yourhost/openxpki/*. You should see the main authentication page. If you get an internal server error, make sure you have the en_US.utf8 locale installed (*locale -a | grep en_US*)!
 
 You can log in as user with any username/password combination, the operator login has two preconfigured operator accounts raop and raop2 with password openxpki.
 

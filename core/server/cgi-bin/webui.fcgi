@@ -21,6 +21,7 @@ use OpenXPKI::Log4perl;
 use Log::Log4perl::MDC;
 use MIME::Base64 qw( encode_base64 decode_base64 );
 
+use Crypt::CBC;
 use OpenXPKI::i18n qw( i18nGettext set_language set_locale_prefix);
 use OpenXPKI::Client::UI;
 use OpenXPKI::Client;

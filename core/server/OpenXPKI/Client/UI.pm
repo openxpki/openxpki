@@ -116,6 +116,8 @@ sub _init_backend {
     }
     $session->param('backend_session_id', $client_id);
 
+    Log::Log4perl::MDC->put('ssid', substr($client_id,0,4));
+
     $self->logger()->trace( Dumper $session );
     return $client;
 }
