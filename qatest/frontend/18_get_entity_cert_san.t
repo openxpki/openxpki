@@ -11,7 +11,7 @@ use TestCGI;
 use Crypt::X509;
 use MIME::Base64;
 
-use Test::More tests => 6;
+use Test::More tests => 8;
 
 package main;
 
