@@ -74,6 +74,7 @@ GetOptions(\%params,
             command|cmd|c=s
             param|set=s@
             arg=s@
+            filearg=s@
             timeout|to=i
             session
             debug
@@ -87,7 +88,20 @@ pod2usage(-verbose => 1) if ($params{help});
 my %args;
 # command with json data
 if (scalar @ARGV == 2 && $params{json}) {
-    eval { %args = %{ decode_json(pop @ARGV) }; };
+
+    # If it does not start with a { it is a filename
+    my $json_data = pop @ARGV;
+
+    if ($json_data !~ m/^\s*{/) {
+        -e $json_data || die "JSON input file not found\n";
+        $json_data = do {
+            local $INPUT_RECORD_SEPARATOR;
+            open my $HANDLE, '<', $json_data;
+            <$HANDLE>;
+        };
+    }
+
+    eval { %args = %{ decode_json($json_data) }; };
     if ($EVAL_ERROR) {
         print STDERR "Unable to decode given JSON ($EVAL_ERROR)\n";
         exit 0;
@@ -134,6 +148,27 @@ foreach my $entry (@args) {
 
 }
 
+foreach my $entry (@{$params{filearg}}) {
+    my ($key, $value) = ($entry =~ m{ \A (.*?) [=:] (.*) }xms);
+
+    if (!defined $key) {
+        die "filearg must be given as key=filename ($entry)\n";
+    }
+
+    # uppercase all keys when legacy api is used
+    if ($params{legacy} || $ENV{OPENXPKI_LEGACY_API}) {
+        $key = uc($key);
+    }
+
+    -e $value || die "filearg input file not found ($value)\n";
+    $args{$key} = do {
+        local $INPUT_RECORD_SEPARATOR;
+        open my $HANDLE, '<', $value;
+        <$HANDLE>;
+    };
+
+}
+
 if($params{instance}){
     $params{socketfile} = sprintf '/var/openxpki/%s/openxpki.socket', $params{instance};
 } elsif(!$params{socketfile}){
@@ -153,18 +188,15 @@ my $client = OpenXPKI::Client->new({
 
 
 if (! defined $client) {
-    die "Could not instantiate OpenXPKI client. Stopped";
+    output({'error' => "Could not instantiate OpenXPKI client. Stopped"});
+    exit 1;
 }
 
 if (! $client->init_session()) {
-    die "Could not initiate OpenXPKI server session. Stopped";
+    output({'error' => "Could not initiate OpenXPKI server session. Stopped"});
+    exit 1;
 }
 if ($params{session}) {
-
-    if ($params{json}) {
-        output({ error => "json together with session is not supported yet" });
-        exit 1;
-    }
 
     # session mode and session id in env, try to reinit session
     if ($command eq 'login') {
@@ -172,11 +204,13 @@ if ($params{session}) {
     } elsif ($ENV{OPENXPKI_SESSION_ID}) {
         $reply = $client->init_session( { SESSION_ID => $ENV{OPENXPKI_SESSION_ID} } );
         if ($reply->{SERVICE_MSG} ne 'SERVICE_READY') {
-            die "Login with session id failed";
+            output({'error' => "Login with session id failed"});
+            exit 1;
         }
     # no session in env and login not requested
     } else {
-        die "Please set the session id via environment OPENXPKI_SESSION_ID";
+        output({'error' => "Please set the session id via environment OPENXPKI_SESSION_ID"});
+        exit 1;
     }
 
 }
@@ -320,11 +354,14 @@ openxpkicli [options] command
     --authuser USER       authentication user
     --authpass PASS       password for authentication user
     --arg KEY=VALUE       pass VALUE to method as parameter KEY
+    --filearg KEY=FILE    as --arg but read value from file name
     --param VALUE         stack VALUE onto methods PARAMS array
     --param KEY=VALUE     set VALUE in methods PARAMS hash using KEY
     --debug               enable debug mode
     --timeout             socket timeout in seconds (default 30s)
-    --json
+    --json                activate json output mode
+    --json {"key":"val"}  parse given string and merge with arguments
+    --json FILE           read json string from FILE and merge with arguments
     --session             session mode, see below for details
     --legacy              if set the old OpenXPKI 1.x API calls will be
                           used. This will be removed in future versions
