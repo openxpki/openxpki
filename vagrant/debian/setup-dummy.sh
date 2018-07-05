@@ -6,11 +6,13 @@ if [ -x /opt/myperl/bin/openxpkiadm ]; then
     export PATH=/opt/myperl/bin:$PATH
 fi
 
-echo " 
+echo "
 DROP database if exists openxpki;
 CREATE database openxpki CHARSET utf8;
 CREATE USER 'openxpki'@'localhost' IDENTIFIED BY 'openxpki';
 GRANT ALL ON openxpki.* TO 'openxpki'@'localhost';
+CREATE USER 'openxpki_session'@'localhost' IDENTIFIED BY 'mysecret';
+GRANT SELECT, INSERT, UPDATE, DELETE ON openxpki.frontend_session TO 'openxpki_session'@'localhost';
 flush privileges;" | mysql -u root
 
 if [ -d /opt/myperl/share/examples/ ]; then
@@ -28,7 +30,7 @@ fi
 
 # example script might be packed or not
 if [ -f "$BASE/sampleconfig.sh.gz" ]; then
-    zcat "$BASE/sampleconfig.sh.gz" | /bin/bash  
+    zcat "$BASE/sampleconfig.sh.gz" | /bin/bash
 else
     /bin/bash "$BASE/sampleconfig.sh"
 fi
