@@ -82,6 +82,7 @@ while (my $cgi = CGI::Fast->new()) {
         $pki_realm = $config{global}{realm};
     }
 
+    my $client;
     eval {
 
         my $cert_identifier = $cgi->param('cert_identifier');
@@ -103,7 +104,7 @@ while (my $cgi = CGI::Fast->new()) {
             $opts->{auth} = $config{auth};
         }
 
-        my $client = OpenXPKI::Client::Simple->new( $opts );
+        $client = OpenXPKI::Client::Simple->new( $opts );
 
         $log->debug('Looking for certificate ' . $cert_identifier );
 
@@ -121,8 +122,6 @@ while (my $cgi = CGI::Fast->new()) {
         my $cert_info = $client->run_legacy_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'HASH' });
         my $filename = $cert_info->{BODY}->{SUBJECT_HASH}->{CN}->[0] || $cert_info->{BODY}->{IDENTIFIER};
 
-        $client->disconnect();
-
         if (!$cert || !$filename) {
             die "Unable to get cert data";
         }
@@ -139,6 +138,8 @@ while (my $cgi = CGI::Fast->new()) {
             $cgi->h1('Requested entity not found'),
             $cgi->end_html;
     }
+
+    $client->disconnect() if ($client);
 
 }
 

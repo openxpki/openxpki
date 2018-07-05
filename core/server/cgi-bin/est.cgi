@@ -135,6 +135,8 @@ while (my $cgi = CGI::Fast->new()) {
     print "\n";
     print $out;
 
+    $client->disconnect();
+
 }
 
 1;
