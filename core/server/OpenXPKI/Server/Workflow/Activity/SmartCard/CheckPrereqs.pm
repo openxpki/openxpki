@@ -5,6 +5,7 @@
 
 package OpenXPKI::Server::Workflow::Activity::SmartCard::CheckPrereqs;
 
+use English;
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
@@ -44,13 +45,34 @@ sub execute {
         $params{WORKFLOW_TYPES} = \@wf_type_list;
     }
 
-    my $result = CTX('api')->sc_analyze_smartcard(
-        {
-         CERTS => \@certs,
-        CERTFORMAT => 'BASE64',
-        SMARTCARDID => $context->param('token_id'),
-        %params,
+
+    my $result;
+    my $on_error = $self->param('on_error') || 'exception';
+    if ($on_error eq 'context') {
+
+        $context->param({ 'error_code' => '' });
+        eval{ $result = CTX('api')->sc_analyze_smartcard({
+             CERTS => \@certs,
+            CERTFORMAT => 'BASE64',
+            SMARTCARDID => $context->param('token_id'),
+            %params,
+        }); };
+
+        if (!$result || $EVAL_ERROR) {
+            my $ee = ~~$EVAL_ERROR || 'sc_analyse returned empty result';
+            $context->param({ 'error_code' => $ee });
+            CTX('log')->application()->error('SC Analyse failed: '. $ee );
+            return 0;
+        }
+
+    } else {
+        $result = CTX('api')->sc_analyze_smartcard({
+             CERTS => \@certs,
+            CERTFORMAT => 'BASE64',
+            SMARTCARDID => $context->param('token_id'),
+            %params,
         });
+    }
 
     ##! 16: 'smartcard analyzed: ' . Dumper $result
 
@@ -231,6 +253,16 @@ met and sets flags for the tasks that are still to be completed.
 The following context parameters set during initialize are read:
 
 token_id, login_id, certs_on_card, owner_id, user_group, token_status
+
+=head2 Activity Parameters
+
+=item on_error
+
+How to behave when the sc_analyse call fails, options are
+
+  I<exception>: bubble up the exception (workflow dies)
+
+  I<context>: write the exception message into the context key I<error_code>
 
 =head1 Functions
 
