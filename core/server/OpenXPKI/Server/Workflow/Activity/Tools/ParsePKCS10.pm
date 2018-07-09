@@ -33,13 +33,16 @@ sub execute {
     my $pkcs10 = $self->param('pkcs10');
     $pkcs10 = $context->param('pkcs10') unless($pkcs10);
 
+    my $subject_prefix = $self->param('subject_prefix') || 'cert_';
+
     # Cleanup any existing values
     $context->param({
         'csr_subject' => '',
-        'cert_subject_parts' => '',
-        'cert_san_parts' => '',
-        'cert_subject_alt_name' => '',
         'csr_subject_key_identifier' => '',
+        $subject_prefix.'subject_parts' => '',
+        $subject_prefix.'san_parts' => '',
+        $subject_prefix.'subject_alt_name' => '',
+
     });
 
     # Source hash
@@ -192,12 +195,12 @@ sub execute {
     # If the profile has NO ui section, we write the parsed hash and the SANs "as is" to the context
     if (!$cert_profile or !$cert_subject_style or !$config->exists(['profile', $cert_profile, 'style', $cert_subject_style, 'ui' ])) {
 
-        $param->{'cert_subject_parts'} = $serializer->serialize( \%hashed_dn ) ;
-        $source_ref->{'cert_subject_parts'} = 'PKCS10';
+        $param->{$subject_prefix.'subject_parts'} = $serializer->serialize( \%hashed_dn ) ;
+        $source_ref->{$subject_prefix.'subject_parts'} = 'PKCS10';
 
         if (scalar @san_list) {
-            $param->{'cert_subject_alt_name'} = $serializer->serialize( \@san_list );
-            $source_ref->{'cert_subject_alt_name'} = 'PKCS10';
+            $param->{$subject_prefix.'subject_alt_name'} = $serializer->serialize( \@san_list );
+            $source_ref->{$subject_prefix.'subject_alt_name'} = 'PKCS10';
         }
 
     } else {
@@ -209,8 +212,8 @@ sub execute {
             preset => \%hashed_dn
         );
 
-        $param->{'cert_subject_parts'} = $serializer->serialize( $cert_subject_parts );
-        $source_ref->{'cert_subject_parts'} = 'Parser';
+        $param->{$subject_prefix.'subject_parts'} = $serializer->serialize( $cert_subject_parts );
+        $source_ref->{$subject_prefix.'subject_parts'} = 'Parser';
 
         # Load the field spec for the san
         # FIXME: this implies that the id of the field matches the san types name
@@ -243,8 +246,8 @@ sub execute {
             }
             ##! 16: 'san preset:' . Dumper $cert_san_parts
             if ($cert_san_parts) {
-                $param->{'cert_san_parts'} = $serializer->serialize( $cert_san_parts );
-                $source_ref->{'cert_san_parts'} = 'Parser';
+                $param->{$subject_prefix.'san_parts'} = $serializer->serialize( $cert_san_parts );
+                $source_ref->{$subject_prefix.'san_parts'} = 'Parser';
             }
         }
     }
@@ -299,6 +302,12 @@ in the I<key_params> context entry. Note that this requires additional
 
 modules to be installed (Crypt::OpenSSL::RSA/DSA, Crypt::PK::ECC).
 
+=item subject_prefix
+
+Prefix for context output keys to write the subject information into
+(cert_subject_parts, cert_san_parts, cert_subject_alt_name).
+Default is I<cert_>.
+
 =back
 
 =head2 Expected context values
@@ -332,6 +341,8 @@ List of OIDs (or names) of request attributes, similar to req_extension.
 =back
 
 =head2 Context value to be written
+
+Prefix I<cert_> can be changed by setting I<subject_prefix>.
 
 =over
 
