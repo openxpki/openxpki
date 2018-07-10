@@ -10,9 +10,8 @@ echo "
 DROP database if exists openxpki;
 CREATE database openxpki CHARSET utf8;
 CREATE USER 'openxpki'@'localhost' IDENTIFIED BY 'openxpki';
-GRANT ALL ON openxpki.* TO 'openxpki'@'localhost';
 CREATE USER 'openxpki_session'@'localhost' IDENTIFIED BY 'mysecret';
-GRANT SELECT, INSERT, UPDATE, DELETE ON openxpki.frontend_session TO 'openxpki_session'@'localhost';
+GRANT ALL ON openxpki.* TO 'openxpki'@'localhost';
 flush privileges;" | mysql -u root
 
 if [ -d /opt/myperl/share/examples/ ]; then
@@ -27,6 +26,11 @@ if [ -f "$BASE/schema-mysql.sql.gz" ]; then
 else
     mysql -u root openxpki < "$BASE/schema-mysql.sql"
 fi
+
+# tables must exist to grant privileges so we need to out this here
+echo "
+GRANT SELECT, INSERT, UPDATE, DELETE ON openxpki.frontend_session TO 'openxpki_session'@'localhost';
+flush privileges;" | mysql -u root
 
 # example script might be packed or not
 if [ -f "$BASE/sampleconfig.sh.gz" ]; then
