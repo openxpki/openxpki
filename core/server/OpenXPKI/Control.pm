@@ -218,7 +218,7 @@ sub start {
                 ## SILENT is required to work correctly with start-stop-daemons
                 ## during a normal System V init
                 require OpenXPKI::Server;
-                my $server = OpenXPKI::Server->new ( "SILENT" => $silent ? 1 : 0 );
+                my $server = OpenXPKI::Server->new ( "SILENT" => $silent ? 1 : 0 , TYPE => $config->{TYPE} );
                 $server->start;
             };
             if ($EVAL_ERROR)
@@ -567,6 +567,7 @@ sub __probe_config {
     return {
         PIDFILE  => $config->get('system.server.pid_file'),
         SOCKETFILE => $config->get('system.server.socket_file'),
+        TYPE => $config->get('system.server.type') || 'Fork',
     };
 
 }

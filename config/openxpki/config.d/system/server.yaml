@@ -11,6 +11,15 @@ socket_file:  /var/openxpki/openxpki.socket
 pid_file:     /var/run/openxpkid.pid
 stderr:       /var/log/openxpki/stderr.log
 tmpdir:       /var/tmp
+
+# This is experimental!
+#type: PreFork
+prefork:
+  min_servers: 5
+  min_spare_servers: 5
+  max_servers: 25
+  max_spare_servers: 10
+
 # environment:
 #    key: value
 

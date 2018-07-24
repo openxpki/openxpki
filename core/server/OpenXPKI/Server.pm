@@ -139,7 +139,7 @@ sub DESTROY {
     ##! 1: 'start'
     my $self = shift;
 
-    if ($self->{TYPE} ne 'Fork') {
+    if ($self->{TYPE} eq 'Simple') {
         # for servers in the foreground, call the pre_server_close_hook
         # on destruction ...
         $self->pre_server_close_hook();
@@ -278,6 +278,14 @@ sub pre_loop_hook {
 
 }
 
+# calles with PreFork when child is forked
+sub child_init_hook {
+
+    my $self = shift;
+    OpenXPKI::Server::__set_process_name("worker: init");
+
+}
+
 sub sig_term {
     # in the TERM signal handler, just set the global 'stop_soon' variable,
     # which will be checked in the services
@@ -378,7 +386,7 @@ sub do_process_request {
     umask $self->{umask};
 
     # masquerade process...
-    OpenXPKI::Server::__set_process_name("worker: new");
+    OpenXPKI::Server::__set_process_name("worker: connecting");
 
     ##! 2: "transport protocol detector"
     my $transport = undef;
@@ -484,6 +492,9 @@ sub do_process_request {
     ## use user interface
     ##! 16: 'calling OpenXPKI::Service::*->run()'
     $service->run();
+
+    OpenXPKI::Server::__set_process_name("worker: wfc");
+
 }
 
 ###########################################################################
@@ -621,8 +632,20 @@ sub __get_server_config {
         $params{server_type} = 'Single';
     }
     elsif ($self->{TYPE} eq 'Fork') {
-        $params{server_type} = 'Fork'; # TODO - try to make it possible to use PreFork
+        $params{server_type} = 'Fork';
         $params{background}  = 1;
+    }
+    elsif ($self->{TYPE} eq 'PreFork') {
+        $params{server_type} = 'PreFork';
+        $params{background}  = 1;
+
+        foreach my $key (('min_servers','min_spare_servers','max_spare_servers','max_servers','max_requests')) {
+            if (my $val = $config->get(['system','server','prefork',$key])) {
+                $params{$key} = $val;
+            }
+        }
+        ##! 32: 'Start prefork with params ' . Dumper \%params
+
     }
     else {
         OpenXPKI::Exception->throw(
@@ -901,3 +924,46 @@ Initialize the supported user interfaces (i.e. load classes).
 
 Prepares the complete server configuration to startup a socket
 based server with Net::Server::Fork. It returns a hashref.
+
+=head2 __set_process_name
+
+Set the process name that is visible via e.g. ps.
+
+Values used inside OpenXPKI (for easy reference):
+
+=over
+
+=item server
+
+Initial value of all childs, remains for the main server process
+
+=item watchdog
+
+The watchdog process
+
+=item worker: init
+
+PreForked child before its first usage
+
+=item worker: connecting
+
+Worker handling a connection (if the worker stays in this state its likely
+that the connection attempt failed and the worker is send back to the pool)
+
+=item worker: connected
+
+Connected to a client, waiting for a session to be started
+
+=item worker: <User> (<Role>)
+
+Connected to a client with active session as User/Role
+
+=item workflow: id <id> (<state>)
+
+Worker currently handling a workflow.
+
+=item worker: wfc
+
+Worker after finishing a request, back in the pool
+
+=back

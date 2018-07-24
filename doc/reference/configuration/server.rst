@@ -98,6 +98,28 @@ The *service* block lists all services to be enabled, the key is the name of the
 
 TODO - this is not used yet
 
+Server Type (Fork vs. PreFork)
+------------------------------
+
+The default is ``Fork`` which create a new child on every incoming
+connection, handles the current request and exits. The webui resuses the
+backend connection as long as the CGI wrapper is running but most of the
+other clients don't and there require a new fork on every request.
+
+To reuse existing childs you can set the server type to prefork which
+forkes of child process on server startup and reuses them for multiple
+connections. In server.yaml uncomment this block::
+
+    type: PreFork
+    prefork:
+      min_servers: 5
+      min_spare_servers: 5
+      max_servers: 25
+      max_spare_servers: 10
+
+The option is optional, if not provided the defaults of the Net::Server
+module are used.
+
 Watchdog
 --------
 

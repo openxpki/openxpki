@@ -48,6 +48,10 @@ sub init {
 
     $state_of{$ident} = 'NEW';
 
+    # in case we reuse a child in PreFork mode make sure there is
+    # no session left in context
+    OpenXPKI::Server::Context::killsession();
+
     # TODO - this should be handled by the run method after some cleanup
     # do session init, PKI realm selection and authentication
     while ($state_of{$ident} ne 'MAIN_LOOP') {
@@ -881,7 +885,7 @@ sub __change_state : PRIVATE {
     if ($new_state eq "MAIN_LOOP") {
         OpenXPKI::Server::__set_process_name("worker: %s (%s)", CTX('session')->data->user, CTX('session')->data->role);
     } elsif ($new_state eq "NEW") {
-        OpenXPKI::Server::__set_process_name("worker: idle");
+        OpenXPKI::Server::__set_process_name("worker: connected");
     }
 
     return 1;
