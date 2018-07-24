@@ -58,9 +58,9 @@ sub execute
             VALIDITYFORMAT => 'detect',
         });
 
-        $query->{valid_before} = $notafter->epoch();
+        $query->{expires_after} = $notafter->epoch();
     } else {
-        $query->{valid_before} = time();
+        $query->{expires_after} = time();
     }
 
     if (my $profile = $self->param('profile')) {
