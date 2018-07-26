@@ -397,10 +397,14 @@ sub detach {
     my $ident = ident $self;
     my $args  = shift;
 
+    # already detached (happens on logout)
+    if (!defined $sessionid{$ident}) {
+        return 2;
+    }
 
     my $msg;
     eval {
-        $msg = $self->send_receive_service_msg('DETACH_SESSION')
+        $msg = $self->send_receive_service_msg('DETACH_SESSION');
     };
 
     $sessionid{$ident} = undef;
@@ -492,15 +496,24 @@ sub close_connection {
     my $self = shift;
     my $ident = ident $self;
 
+    if (!$socket{$ident}) {
+        warn "got close_connection on already closed socket";
+        return;
+    }
     shutdown($socket{$ident}, 2); # we have stopped using this socket
     # for whatever reasons shutdown does not free the handle, see #645
     close($socket{$ident});
+
+    $socket{$ident} = undef;
+
 }
 
 sub DEMOLISH {
     ##! 4: 'Demolish'
     my $self = shift;
-    $self->close_connection();
+    my $ident = ident $self;
+
+    $self->close_connection() if ($socket{$ident});
 }
 
 ###########################################################################

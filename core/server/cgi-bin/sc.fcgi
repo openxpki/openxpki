@@ -49,6 +49,8 @@ while (my $cgi = CGI::Fast->new()) {
     my $session_front = new CGI::Session(undef, $sess_id, {Directory=>'/tmp'});
     $log->debug('session id (front) is '. $session_front->id);
 
+    Log::Log4perl::MDC->put('sid', substr($session_front->id,0,4));
+
     our $cookie = {
         -name => 'oxisess-sc',
         -value => $session_front->id,

@@ -310,7 +310,14 @@ sub disconnect {
     my $self = shift;
 
     $self->logger()->info('Disconnect client');
-    my $reply = $self->client->send_receive_service_msg('LOGOUT');
+
+    # Use detach if an external session was provided
+    # otherwise the session will be terminated!
+    if ($self->session()) {
+        $self->client->detach();
+    } else {
+        $self->client->logout();
+    }
 
     $self->client->close_connection();
 
