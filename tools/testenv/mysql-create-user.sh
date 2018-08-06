@@ -10,3 +10,8 @@ CREATE USER '$OXI_TEST_DB_MYSQL_USER'@'%' IDENTIFIED BY '$OXI_TEST_DB_MYSQL_PASS
 GRANT ALL ON $OXI_TEST_DB_MYSQL_NAME.* TO '$OXI_TEST_DB_MYSQL_USER'@'%';
 flush privileges;
 __SQL
+
+# Create hardcoded frontend session user
+cat <<__SQL | mysql -h $OXI_TEST_DB_MYSQL_DBHOST -P $OXI_TEST_DB_MYSQL_DBPORT -u$OXI_TEST_DB_MYSQL_DBUSER $DBPASS
+CREATE USER 'openxpki_session'@'%' IDENTIFIED BY 'mysecret';
+__SQL
