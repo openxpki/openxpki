@@ -23,6 +23,11 @@ sub dbi_driver { 'Oracle' };
 # DSN string including all parameters.
 sub dbi_dsn {
     my $self = shift;
+
+    # Tell Oracle that the client character set is UTF8
+    # (assuming that all data that we send is already UTF8 encoded)
+    $ENV{NLS_LANG} = '.AL32UTF8';
+
     return sprintf("dbi:%s:%s",
         $self->dbi_driver,
         $self->name,
