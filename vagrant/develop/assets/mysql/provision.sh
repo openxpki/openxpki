@@ -38,7 +38,7 @@ docker run -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root \
            --name mariadb mariadb:10.1                    >$LOG 2>&1 || _exit $?
 
 #
-# Install MySQL client (sqlplus64)
+# Install MySQL client
 #
 installed=$(/usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' 'mariadb-client' 2>&1 | grep -ci installed)
 if [ $installed -eq 0 ]; then

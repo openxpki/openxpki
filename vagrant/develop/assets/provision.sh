@@ -34,7 +34,7 @@ else
 fi
 if [ $install_vbox -eq 1 ]; then
     echo "Installing VBoxGuestAdditions $VBOX"
-    apt remove virtualbox-guest-utils || echo                         >$LOG 2>&1
+    apt -y remove virtualbox-guest-utils || echo                      >$LOG 2>&1
     set -e
     cd /tmp
     wget -q http://download.virtualbox.org/virtualbox/$VBOX/VBoxGuestAdditions_$VBOX.iso >$LOG 2>&1
@@ -203,6 +203,10 @@ if [ -e /etc/init.d/apache2 ]; then
     a2enmod fcgid                                                     >$LOG 2>&1
     # Needed to pickup new group
     /etc/init.d/apache2 restart                                       >$LOG 2>&1
+
+    # Specify hostname to force MySQL connection via TCP, not socket
+    echo "Configuration OpenXPKI WebUI"
+    sed -r 's/^(DataSource\s*=).*/\1 dbi:mysql:dbname=openxpki;host=127.0.0.1/' /etc/openxpki/webui/default.conf
 fi
 
 #
