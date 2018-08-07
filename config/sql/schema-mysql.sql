@@ -183,7 +183,7 @@ CREATE TABLE IF NOT EXISTS `workflow` (
   `pki_realm` varchar(255) DEFAULT NULL,
   `workflow_type` varchar(255) DEFAULT NULL,
   `workflow_state` varchar(255) DEFAULT NULL,
-  `workflow_last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `workflow_last_update` timestamp NOT NULL,
   `workflow_proc_state` varchar(32) DEFAULT NULL,
   `workflow_wakeup_at` int(10) unsigned DEFAULT NULL,
   `workflow_count_try` int(10) unsigned DEFAULT NULL,
@@ -212,7 +212,7 @@ CREATE TABLE IF NOT EXISTS `workflow_history` (
   `workflow_state` varchar(255) DEFAULT NULL,
   `workflow_user` varchar(255) DEFAULT NULL,
   `workflow_node` varchar(64) DEFAULT NULL,
-  `workflow_history_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `workflow_history_date` timestamp NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `ocsp_responses` (

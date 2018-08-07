@@ -106,7 +106,7 @@ CREATE TABLE crl (
   pki_realm varchar2(255) NOT NULL,
   issuer_identifier varchar2(64) NOT NULL,
   crl_key number(38,0) NOT NULL,
-  crl_number number(49,0),
+  crl_number number(38,0),
   items number,
   data clob,
   last_update number,
@@ -169,14 +169,16 @@ CREATE TABLE datapool (
 -- Table: report
 --;
 
-create table REPORT (
+DROP TABLE report CASCADE CONSTRAINTS;
+
+create table report (
   report_name varchar2(63),
   pki_realm varchar2(255),
   created number(38), -- unix timestamp
   mime_type varchar2(63), -- advisory, e.g. text/csv, text/plain, application/pdf, ...
   description varchar2(255),
   report_value clob,
-  primary key ("report_name", "pki_realm")
+  primary key (report_name, pki_realm)
 );
 
 --
@@ -233,7 +235,7 @@ CREATE TABLE workflow (
   pki_realm varchar2(255),
   workflow_type varchar2(255),
   workflow_state varchar2(255),
-  workflow_last_update date DEFAULT current_timestamp NOT NULL,
+  workflow_last_update varchar2(20) NOT NULL,
   workflow_proc_state varchar2(32),
   workflow_wakeup_at number,
   workflow_count_try number,
@@ -282,7 +284,7 @@ CREATE TABLE workflow_history (
   workflow_description clob,
   workflow_state varchar2(255),
   workflow_user varchar2(255),
-  workflow_history_date date DEFAULT current_timestamp NOT NULL,
+  workflow_history_date varchar2(20) NOT NULL,
   workflow_node varchar2(64),
   PRIMARY KEY (workflow_hist_id)
 );
@@ -291,10 +293,10 @@ DROP TABLE ocsp_responses CASCADE CONSTRAINTS;
 
 CREATE TABLE ocsp_responses (
   identifier varchar2(64),
-  serial_number varbinary(128) NOT NULL,
-  authority_key_identifier varbinary(128) NOT NULL,
-  body varbinary(4096) NOT NULL,
-  expiry timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  serial_number varchar2(128) NOT NULL,
+  authority_key_identifier varchar2(128) NOT NULL,
+  body clob NOT NULL,
+  expiry timestamp DEFAULT current_timestamp NOT NULL,
   PRIMARY KEY (serial_number, authority_key_identifier)
 );
 
@@ -308,22 +310,6 @@ BEGIN
  SELECT sq_audittrail_audittrail_key.nextval
  INTO :new.audittrail_key
  FROM dual;
-END;
-/
-
-CREATE OR REPLACE TRIGGER ts_workflow_workflow_last_upda
-BEFORE INSERT OR UPDATE ON workflow
-FOR EACH ROW WHEN (new.workflow_last_update IS NULL)
-BEGIN
- SELECT sysdate INTO :new.workflow_last_update FROM dual;
-END;
-/
-
-CREATE OR REPLACE TRIGGER ts_workflow_history_workflow_h
-BEFORE INSERT OR UPDATE ON workflow_history
-FOR EACH ROW WHEN (new.workflow_history_date IS NULL)
-BEGIN
- SELECT sysdate INTO :new.workflow_history_date FROM dual;
 END;
 /
 

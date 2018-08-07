@@ -303,7 +303,7 @@ CREATE TABLE workflow (
   pki_realm varchar(255),
   workflow_type varchar(255),
   workflow_state varchar(255),
-  workflow_last_update timestamp NOT NULL DEFAULT current_timestamp,
+  workflow_last_update timestamp NOT NULL,
   workflow_proc_state varchar(32),
   workflow_wakeup_at integer,
   workflow_count_try integer,
@@ -349,7 +349,7 @@ CREATE TABLE workflow_history (
   workflow_state varchar(255),
   workflow_user varchar(255),
   workflow_node varchar(64),
-  workflow_history_date timestamp NOT NULL DEFAULT current_timestamp
+  workflow_history_date timestamp NOT NULL
 );
 
 CREATE TABLE ocsp_responses (
