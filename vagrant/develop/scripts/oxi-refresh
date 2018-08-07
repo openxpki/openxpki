@@ -44,6 +44,9 @@ rsync -a --delete \
   /etc/openxpki/config.d/realm/ca-one/                                >$LOG 2>&1
 chown -R openxpki:root /etc/openxpki/config.d/realm/ca-one            >$LOG 2>&1
 
+# set /var/tmp instead of /tmp (where only root has write access)
+sed -ri 's/(LOCATION:)\s*\/tmp.*/\1 \/var\/tmp/g' /etc/openxpki/config.d/realm/ca-one/publishing.yaml
+
 #
 # Compile OpenXPKI
 #
