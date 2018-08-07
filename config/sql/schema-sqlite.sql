@@ -166,11 +166,11 @@ CREATE TABLE secret (
 );
 
 --
--- Table: session
+-- Table: backend_session
 --
-DROP TABLE IF EXISTS session;
+DROP TABLE IF EXISTS backend_session;
 
-CREATE TABLE session (
+CREATE TABLE backend_session (
   session_id varchar(255) NOT NULL,
   data longtext,
   created decimal(49,0) NOT NULL,

@@ -195,12 +195,12 @@ CREATE TABLE secret (
 );
 
 --
--- Table: session
+-- Table: backend_session
 --;
 
-DROP TABLE session CASCADE CONSTRAINTS;
+DROP TABLE backend_session CASCADE CONSTRAINTS;
 
-CREATE TABLE session (
+CREATE TABLE backend_session (
   session_id varchar2(255) NOT NULL,
   data clob,
   created number NOT NULL,

@@ -112,7 +112,7 @@ CREATE TABLE IF NOT EXISTS `secret` (
   `data` longtext
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `session` (
+CREATE TABLE IF NOT EXISTS `backend_session` (
   `session_id` varchar(255) NOT NULL,
   `data` longtext,
   `created` int(10) unsigned NOT NULL,
@@ -256,7 +256,7 @@ ALTER TABLE `report`
 ALTER TABLE `secret`
  ADD PRIMARY KEY (`pki_realm`,`group_id`);
 
-ALTER TABLE `session`
+ALTER TABLE `backend_session`
  ADD PRIMARY KEY (`session_id`), ADD INDEX(`modified`);
 
 ALTER TABLE `frontend_session`
