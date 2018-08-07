@@ -415,7 +415,7 @@ sub __main_loop {
 
             my $threshold = $self->max_exception_threshhold();
             if ($threshold > 0 and $self->_exception_count > $threshold) {
-                my $msg = 'Watchdog exception limit ($threshold) reached, exiting!';
+                my $msg = "Watchdog exception limit ($threshold) reached, exiting!";
                 print STDERR $msg, "\n";
                 OpenXPKI::Exception->throw(
                     message => $msg,
