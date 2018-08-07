@@ -178,10 +178,10 @@ sub execute {
         if (my $eval_err = $EVAL_ERROR) {
             if ($on_error eq 'queue') {
                 push @failed, $target;
-                CTX('log')->application()->info("Entity pubication failed for target $target, requeuing");
+                CTX('log')->application()->info("Entity publication failed for target $target, requeuing");
 
             } elsif ($on_error eq 'skip') {
-                CTX('log')->application()->warn("Entity pubication failed for target $target and skip is set");
+                CTX('log')->application()->warn("Entity publication failed for target $target and skip is set");
 
             } else {
                 OpenXPKI::Exception->throw(
