@@ -180,6 +180,20 @@ CREATE TABLE session (
 );
 
 --
+-- Table: frontend_session
+--
+DROP TABLE IF EXISTS frontend_session;
+
+CREATE TABLE frontend_session (
+  session_id varchar(255) NOT NULL,
+  data longtext,
+  created decimal(49,0) NOT NULL,
+  modified decimal(49,0) NOT NULL,
+  ip_address varchar(45),
+  PRIMARY KEY (session_id)
+);
+
+--
 -- Table: seq_application_log
 --
 DROP TABLE IF EXISTS seq_application_log;

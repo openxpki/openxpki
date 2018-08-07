@@ -197,6 +197,18 @@ CREATE TABLE session (
 );
 
 --
+-- Name: frontend_session; Type: TABLE; Schema: public; Tablespace:
+--
+
+CREATE TABLE frontend_session (
+    session_id text NOT NULL,
+    data text,
+    created numeric(49,0) NOT NULL,
+    modified numeric(49,0) NOT NULL,
+    ip_address text
+);
+
+--
 -- Name: seq_application_log; Type: SEQUENCE; Schema: public;
 --
 
@@ -468,6 +480,13 @@ ALTER TABLE ONLY session
     ADD CONSTRAINT session_pkey PRIMARY KEY (session_id);
 
 --
+-- Name: frontend_session_pkey; Type: CONSTRAINT; Schema: public; Tablespace:
+--
+
+ALTER TABLE ONLY frontend_session
+    ADD CONSTRAINT frontend_session_pkey PRIMARY KEY (session_id);
+
+--
 -- Name: workflow_attributes_pkey; Type: CONSTRAINT; Schema: public; Tablespace:
 --
 
@@ -561,6 +580,12 @@ CREATE INDEX csr_subject_index ON csr USING btree (subject);
 --
 
 CREATE INDEX session_modified_index ON session USING btree (modified);
+
+--
+-- Name: frontend_session_modified_index; Type: INDEX; Schema: public; Tablespace:
+--
+
+CREATE INDEX frontend_session_modified_index ON frontend_session USING btree (modified);
 
 --
 -- Name: wf_attributes_key_index; Type: INDEX; Schema: public; Tablespace:

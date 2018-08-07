@@ -208,6 +208,21 @@ CREATE TABLE session (
 );
 
 --
+-- Table: frontend_session
+--;
+
+DROP TABLE frontend_session CASCADE CONSTRAINTS;
+
+CREATE TABLE frontend_session (
+  session_id varchar2(255) NOT NULL,
+  data clob,
+  created number NOT NULL,
+  modified number NOT NULL,
+  ip_address varchar2(45),
+  PRIMARY KEY (session_id)
+);
+
+--
 -- Table: workflow
 --;
 
