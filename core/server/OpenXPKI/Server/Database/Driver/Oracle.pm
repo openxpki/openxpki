@@ -26,7 +26,7 @@ sub dbi_dsn {
 
     # Tell Oracle that the client character set is UTF8
     # (assuming that all data that we send is already UTF8 encoded)
-    $ENV{NLS_LANG} = '.AL32UTF8';
+    $ENV{"NLS_LANG"} = '.AL32UTF8' unless(defined $ENV{"NLS_LANG"});
 
     return sprintf("dbi:%s:%s",
         $self->dbi_driver,

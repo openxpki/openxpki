@@ -17,3 +17,8 @@ main:
 # log:
 #     debug: 0
 #     ...
+
+# Set environment values, e.g. locales for Oracle
+# this was inside the db section prior v2.2 which does not work as expected
+# environment:
+#    key: value

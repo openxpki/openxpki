@@ -15,6 +15,7 @@ use utf8;
 
 use English;
 use Errno;
+use Log::Log4perl;
 use OpenXPKI::Debug;
 use OpenXPKI::i18n qw(set_language set_locale_prefix);
 use OpenXPKI::Exception;
@@ -427,17 +428,23 @@ sub get_database {
     #
     my $config = CTX('config');
     # Fallback for logger/audit configs which can be separate
-    my $config_section = $section;
-    $config_section = 'main' unless $config->exists(['system','database',$section]);
-    my $db_config = $config->get_hash(['system','database',$config_section]);
+
+    $section = 'main' unless $config->exists(['system','database',$section]);
+    my $db_config = $config->get_hash(['system','database',$section]);
 
     # Set environment variables
-    my $db_env = $config->get_hash(['system','database',$section,'environment']);
+    my $db_env = $config->get_hash(['system','database','environment']);
+
+    if (!$db_env && $db_config->{environment}) {
+        $db_env = $config->get_hash(['system','database',$section,'environment']);
+        delete $db_config->{environment};
+        Log::Log4perl->get_logger('openxpki.deprecated')->info('Please move your database environment config to database.environment');
+    }
+
     for my $env_name (keys %{$db_env}) {
         $ENV{$env_name} = $db_env->{$env_name};
         ##! 4: "DBI Environment: $env_name => ".$db_env->{$env_name}
     }
-    delete $db_config->{environment};
 
     # TODO #legacydb Remove treatment of DB parameters "debug" and "log" (occurs in example database.yaml)
     delete $db_config->{log};
