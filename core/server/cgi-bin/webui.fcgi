@@ -181,8 +181,8 @@ while (my $cgi = CGI::Fast->new()) {
 
     my $session_front;
 
+    Log::Log4perl::MDC->remove();
     Log::Log4perl::MDC->put('sid', $sess_id ? substr($sess_id,0,4) : undef);
-    Log::Log4perl::MDC->put('ssid', undef);
 
     eval {
         if (!$backend_client || !$backend_client->is_connected()) {

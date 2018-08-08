@@ -134,6 +134,9 @@ sub BUILD {
     } elsif (my $user = $self->session()->param('user')) {
         Log::Log4perl::MDC->put('name', $user->{name});
         Log::Log4perl::MDC->put('role', $user->{role});
+    } else {
+        Log::Log4perl::MDC->put('name', undef);
+        Log::Log4perl::MDC->put('role', undef);
     }
 
 }
