@@ -65,6 +65,18 @@ has subject => (
     }
 );
 
+has issuer => (
+    is => 'ro',
+    required => 0,
+    isa => 'Str',
+    reader => 'get_issuer',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        return join(',', reverse @{$self->_cert()->Issuer});
+    }
+);
+
 has subject_key_id => (
     is => 'rw',
     required => 0,
@@ -114,6 +126,22 @@ has notafter => (
     default => sub {
         my $self = shift;
         return $self->_cert()->not_after();
+    }
+);
+
+has serial => (
+    is => 'ro',
+    required => 0,
+    isa => 'Str',
+    reader => 'get_serial',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        my $serial = $self->_cert()->serial;
+        if (ref $serial eq 'Math::BigInt') {
+            $serial = $serial->bstr();
+        }
+        return $serial;
     }
 );
 
