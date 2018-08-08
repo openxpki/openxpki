@@ -145,6 +145,12 @@ sub _build_client {
 
     if ($reply->{SERVICE_MSG} =~ /GET_(.*)_LOGIN/) {
         my $login_type = $1;
+
+        if( $login_type ne 'PASSWD' ) {
+            $log->error("Unsupported login scheme: $login_type");
+            die "Unsupported login scheme: $login_type. Stopped";
+        }
+
         my $auth = $self->auth();
         if (! $auth || !$auth->{stack}) {
             $log->fatal("Login/Password required but not configured");
