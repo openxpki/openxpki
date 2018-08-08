@@ -18,6 +18,8 @@ tmpdir:       /var/tmp
 session:
     type: Database
     lifetime: 1200
+    # introduced in v2.2: (previous default was hard coded "session")
+    table: backend_session
 
 # if you want to keep the session in the filesystem, switch to
 # type: File

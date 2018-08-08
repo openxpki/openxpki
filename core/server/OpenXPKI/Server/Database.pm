@@ -43,7 +43,7 @@ has 'log' => (
     required => 1,
 );
 
-# Parameters to construct DSN
+# Parameters to construct DSN, mostly from config: system.database.[main|log]
 has 'db_params' => (
     is => 'ro',
     isa => 'HashRef',
@@ -213,9 +213,9 @@ sub _build_dbix_handler {
     ##! 4: "Additional connect() attributes: " . join " | ", map { $_." = ".$params{$_} } keys %params
     ##! 4: "SQL commands after each connect: ".join("; ", @on_connect_do);
 
-    my %driver_params;
+    my %params_from_config;
     if ($self->db_params->{driver} && ref $self->db_params->{driver} eq 'HASH') {
-        %driver_params = %{$self->db_params->{driver}};
+        %params_from_config = %{$self->db_params->{driver}};
     }
 
     my $dbix = DBIx::Handler->new(
@@ -232,7 +232,7 @@ sub _build_dbix_handler {
                 $self->_dbi_error_handler($msg, $dbh);
             },
             %params,
-            %driver_params,
+            %params_from_config,
         },
         {
             on_connect_do => sub {

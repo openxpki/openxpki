@@ -3,7 +3,6 @@
 
 use strict;
 use warnings;
-use utf8;
 
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_random;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkcs10;
@@ -170,12 +169,8 @@ sub get_openssl_dn
             params   => {"DN" => $dn});
     }
 
-    ## this is necessary because OpenSSL needs the utf8 bytes
-    #pack/unpack is too slow, try to use "use utf8;"
-    #$dn = pack "C*", unpack "C0U*", $dn_obj->get_openssl_dn ();
-    $dn = $dn_obj->get_openssl_dn ();
+    $dn = $dn_obj->get_openssl_dn();
     ##! 2: "OpenSSL X.500: $dn"
-
     return $dn;
 }
 

@@ -166,11 +166,25 @@ CREATE TABLE secret (
 );
 
 --
--- Table: session
+-- Table: backend_session
 --
-DROP TABLE IF EXISTS session;
+DROP TABLE IF EXISTS backend_session;
 
-CREATE TABLE session (
+CREATE TABLE backend_session (
+  session_id varchar(255) NOT NULL,
+  data longtext,
+  created decimal(49,0) NOT NULL,
+  modified decimal(49,0) NOT NULL,
+  ip_address varchar(45),
+  PRIMARY KEY (session_id)
+);
+
+--
+-- Table: frontend_session
+--
+DROP TABLE IF EXISTS frontend_session;
+
+CREATE TABLE frontend_session (
   session_id varchar(255) NOT NULL,
   data longtext,
   created decimal(49,0) NOT NULL,
@@ -289,7 +303,7 @@ CREATE TABLE workflow (
   pki_realm varchar(255),
   workflow_type varchar(255),
   workflow_state varchar(255),
-  workflow_last_update timestamp NOT NULL DEFAULT current_timestamp,
+  workflow_last_update timestamp NOT NULL,
   workflow_proc_state varchar(32),
   workflow_wakeup_at integer,
   workflow_count_try integer,
@@ -335,7 +349,7 @@ CREATE TABLE workflow_history (
   workflow_state varchar(255),
   workflow_user varchar(255),
   workflow_node varchar(64),
-  workflow_history_date timestamp NOT NULL DEFAULT current_timestamp
+  workflow_history_date timestamp NOT NULL
 );
 
 CREATE TABLE ocsp_responses (

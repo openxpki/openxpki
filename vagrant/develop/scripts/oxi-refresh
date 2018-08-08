@@ -44,6 +44,9 @@ rsync -a --delete \
   /etc/openxpki/config.d/realm/ca-one/                                >$LOG 2>&1
 chown -R openxpki:root /etc/openxpki/config.d/realm/ca-one            >$LOG 2>&1
 
+# set /var/tmp instead of /tmp (where only root has write access)
+sed -ri 's/(LOCATION:)\s*\/tmp.*/\1 \/var\/tmp/g' /etc/openxpki/config.d/realm/ca-one/publishing.yaml
+
 #
 # Compile OpenXPKI
 #
@@ -67,7 +70,13 @@ echo "Installing OpenXPKI"
 make install                                                          >$LOG 2>&1
 popd                                                                  >$LOG 2>&1
 
-if [[ ! "${@#--no-i18n}" = "$@" && ! "${@#--fast}" = "$@" ]]; then
+echo "Copying CGI::Session::Driver::openxpki"
+mkdir -p /usr/share/perl5/CGI/Session/Driver
+cp $OXI_CORE_DIR/server/CGI/Session/Driver/openxpki.pm /usr/share/perl5/CGI/Session/Driver/
+
+# if --no-i18n and --fast are NOT given
+# (use # to strip text off $@ and see if string still equals original $@)
+if [[ "${@#--no-i18n}" = "$@" && "${@#--fast}" = "$@" ]]; then
     echo "Compiling and installing I18N files"
     echo "$OXI_VERSION" > $OXI_CORE_DIR/i18n/VERSION
     pushd $OXI_CORE_DIR/i18n                                              >$LOG 2>&1
@@ -77,7 +86,8 @@ if [[ ! "${@#--no-i18n}" = "$@" && ! "${@#--fast}" = "$@" ]]; then
     popd                                                                  >$LOG 2>&1
 fi
 
-if [[ ! "${@#--no-restart}" = "$@" && ! "${@#--fast}" = "$@" ]]; then
+# if --no-restart and --fast are NOT given
+if [[ "${@#--no-restart}" = "$@" && "${@#--fast}" = "$@" ]]; then
     echo "Restarting OpenXPKI"
     openxpkictl restart                                               >$LOG 2>&1
 

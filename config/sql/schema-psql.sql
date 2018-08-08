@@ -185,10 +185,22 @@ CREATE TABLE secret (
 );
 
 --
--- Name: session; Type: TABLE; Schema: public; Tablespace:
+-- Name: backend_session; Type: TABLE; Schema: public; Tablespace:
 --
 
-CREATE TABLE session (
+CREATE TABLE backend_session (
+    session_id text NOT NULL,
+    data text,
+    created numeric(49,0) NOT NULL,
+    modified numeric(49,0) NOT NULL,
+    ip_address text
+);
+
+--
+-- Name: frontend_session; Type: TABLE; Schema: public; Tablespace:
+--
+
+CREATE TABLE frontend_session (
     session_id text NOT NULL,
     data text,
     created numeric(49,0) NOT NULL,
@@ -461,11 +473,18 @@ ALTER TABLE ONLY secret
     ADD CONSTRAINT secret_pkey PRIMARY KEY (pki_realm, group_id);
 
 --
--- Name: session_pkey; Type: CONSTRAINT; Schema: public; Tablespace:
+-- Name: backend_session_pkey; Type: CONSTRAINT; Schema: public; Tablespace:
 --
 
-ALTER TABLE ONLY session
-    ADD CONSTRAINT session_pkey PRIMARY KEY (session_id);
+ALTER TABLE ONLY backend_session
+    ADD CONSTRAINT backend_session_pkey PRIMARY KEY (session_id);
+
+--
+-- Name: frontend_session_pkey; Type: CONSTRAINT; Schema: public; Tablespace:
+--
+
+ALTER TABLE ONLY frontend_session
+    ADD CONSTRAINT frontend_session_pkey PRIMARY KEY (session_id);
 
 --
 -- Name: workflow_attributes_pkey; Type: CONSTRAINT; Schema: public; Tablespace:
@@ -557,10 +576,16 @@ CREATE INDEX csr_profile_index ON csr USING btree (profile);
 CREATE INDEX csr_subject_index ON csr USING btree (subject);
 
 --
--- Name: session_modified_index; Type: INDEX; Schema: public; Tablespace:
+-- Name: backend_session_modified_index; Type: INDEX; Schema: public; Tablespace:
 --
 
-CREATE INDEX session_modified_index ON session USING btree (modified);
+CREATE INDEX backend_session_modified_index ON backend_session USING btree (modified);
+
+--
+-- Name: frontend_session_modified_index; Type: INDEX; Schema: public; Tablespace:
+--
+
+CREATE INDEX frontend_session_modified_index ON frontend_session USING btree (modified);
 
 --
 -- Name: wf_attributes_key_index; Type: INDEX; Schema: public; Tablespace:

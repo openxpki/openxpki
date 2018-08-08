@@ -79,6 +79,7 @@ has dbi_params => (
 has table => (
     is => 'ro',
     isa => 'Str',
+    # TODO LEGACY session tablename should be "backend_session", but this would break old user installations
     default => "session",
 );
 
