@@ -154,7 +154,7 @@ sub execute_action {
     ##! 16: 'set proc_state "running"'
     $self->_set_proc_state('running'); # writes workflow metadata
 
-    CTX('log')->application()->info("Execute action $action_name on workflow #" . $self->id);
+    CTX('log')->application()->debug("Execute action $action_name on workflow #" . $self->id);
 
 
     my $state='';
