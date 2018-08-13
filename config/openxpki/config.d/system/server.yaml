@@ -42,7 +42,10 @@ transport:
 service:
     Default:
         enabled: 1
-        timeout: 120
+        idle_timeout: 120
+        # Kill server process if command does not return after n seconds
+        # this is still in beta phase, use with caution!
+        # max_execution_time: 20
 
     SCEP:
         enabled: 1

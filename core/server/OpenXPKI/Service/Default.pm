@@ -17,6 +17,8 @@ use List::Util qw( first );
 
 use Class::Std;
 
+use Sys::SigAction qw( sig_alarm set_sig_handler );
+
 use Data::Dumper;
 
 ## used modules
@@ -31,7 +33,10 @@ use OpenXPKI::Service::Default::Command;
 use OpenXPKI::Service::Default::CommandApi2;
 use Log::Log4perl::MDC;
 
+
 my %state_of :ATTR;     # the current state of the service
+
+my %max_execution_time  : ATTR( :set<max_execution_time> );
 
 sub init {
     my $self  = shift;
@@ -41,10 +46,12 @@ sub init {
     ##! 1: "start"
 
     # timeout idle clients
-
-    my $timeout = CTX('config')->get("system.server.service.default.timeout") || 120;
+    my $timeout = CTX('config')->get("system.server.service.Default.idle_timeout") || 120;
 
     $self->set_timeout($timeout);
+
+    my $max_execution_time = CTX('config')->get("system.server.service.Default.max_execution_time") || 0;
+    $self->set_max_execution_time($max_execution_time);
 
     $state_of{$ident} = 'NEW';
 
@@ -184,6 +191,7 @@ sub __is_valid_message : PRIVATE {
 sub __handle_message : PRIVATE {
     ##! 1: 'start'
     my $self    = shift;
+    my $ident   = ident $self;
     my $arg_ref = shift;
     my $message = $arg_ref->{'MESSAGE'};
     my $message_name = $message->{'SERVICE_MSG'};
@@ -765,10 +773,30 @@ sub __handle_COMMAND : PRIVATE {
     my $result;
     eval {
         CTX('log')->system->debug("Executing command ".$data->{PARAMS}->{COMMAND});
+
+        my $sh;
+        if ($max_execution_time{$ident}) {
+            $sh = set_sig_handler( 'ALRM' ,sub {
+                CTX('log')->system->error("Service command ".$data->{PARAMS}->{COMMAND}." was aborted after " . $max_execution_time{$ident});
+                CTX('log')->system->trace("Call was " . Dumper $data->{PARAMS} );
+                OpenXPKI::Exception->throw(
+                    message => "Server took too long to respond to your request - aborted!",
+                    params => {
+                        COMMAND => $data->{PARAMS}->{COMMAND}
+                    }
+                );
+            });
+            sig_alarm( $max_execution_time{$ident} );
+        }
+
         # enclose command with DBI transaction
         CTX('dbi')->start_txn();
         $result = $command->execute();
         CTX('dbi')->commit();
+
+        if ($sh) {
+            sig_alarm(0);
+        }
     };
 
     if (my $error = $EVAL_ERROR) {
