@@ -254,9 +254,12 @@ B<Parameters>
 
 =cut
 sub resume {
-    my ($self, $id) = @_;
+    my $self = shift;
+    my $id = shift || '';
 
     # TODO Implement somewhere: OpenXPKI::i18n::set_language ($self->get_language());
+
+    ##! 1: "resume() with id " . $id
 
     OpenXPKI::Exception->throw(
         message => "Attempt to load data into an active session",
@@ -313,7 +316,7 @@ sub persist {
     );
     ##! 1: "persist()"
     return unless ($self->is_initialized and ($self->data->is_dirty or $params{force}));
-    ##! 1: "- data is set and dirty (or 'force' was specified)"
+    ##! 4: "- data is set and dirty (or 'force' was specified)"
     $self->data->modified(time);        # update timestamp
     $self->driver->save($self->data);   # implemented by the class that consumes this role
     $self->data->is_dirty(0);
