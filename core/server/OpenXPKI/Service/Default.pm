@@ -259,18 +259,22 @@ sub __handle_CONTINUE_SESSION {
 
     my $session;
 
-    ##! 4: "try to continue session"
+    # for whatever reason prior to the Client rewrite continue_session
+    # has the session id not in params
+    my $sess_id = exists $msg->{SESSION_ID} ? $msg->{SESSION_ID} : $msg->{PARAMS}->{SESSION_ID};
+
+    ##! 4: "try to continue session " . $sess_id
     $session = OpenXPKI::Server::Session->new(load_config => 1);
-    $session->resume($msg->{SESSION_ID})
+    $session->resume($sess_id)
         or OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVICE_DEFAULT_HANDLE_CONTINUE_SESSION_SESSION_CONTINUE_FAILED',
-            params  => {ID => $msg->{SESSION_ID}}
+            params  => {ID => $sess_id}
         );
 
     # There might be an exisiting session if the child did some work before
     # we therefore use force to overwrite exisiting entries
     OpenXPKI::Server::Context::setcontext({'session' => $session, force => 1});
-    Log::Log4perl::MDC->put('sid', substr($msg->{SESSION_ID},0,4));
+    Log::Log4perl::MDC->put('sid', substr($sess_id,0,4));
     CTX('log')->system->debug('Session resumed');
 
     # do not use __change_state here, as we want to have access

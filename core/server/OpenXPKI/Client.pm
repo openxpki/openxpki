@@ -9,13 +9,12 @@ use strict;
 use Carp;
 use English;
 
-use Class::Std;
+use Moose;
 
 use Socket;
 
-use OpenXPKI::Debug 'OpenXPKI::Client';
+use Sys::SigAction qw( sig_alarm set_sig_handler );
 
-use OpenXPKI::Client::API;
 use OpenXPKI::Exception;
 use OpenXPKI::Transport::Simple;
 use OpenXPKI::Serialization::Simple;
@@ -27,229 +26,193 @@ $OUTPUT_AUTOFLUSH = 1;
 # use Smart::Comments;
 use Data::Dumper;
 
-my %socketfile             : ATTR( :init_arg<SOCKETFILE> );
-my %transport_protocol     : ATTR( :init_arg<TRANSPORT>     :default('Simple') );
-my %serialization_protocol : ATTR( :init_arg<SERIALIZATION> :default('Simple') );
-my %service_protocol       : ATTR( :init_arg<SERVICE>       :default('Default') );
-my %read_timeout           : ATTR( :init_arg<TIMEOUT>       :default(30) :set<timeout> );
+has socketfile => (
+    is      => 'ro',
+    isa     => 'Str',
+    required => 1,
+);
 
-my %sessionid              : ATTR( :get<session_id> );
-my %api                    : ATTR( :get<API> );
-my %communication_state    : ATTR( :get<communication_state> :set<communication_state> );
+has timeout => (
+    is      => 'ro',
+    isa     => 'Int',
+    default => 30
+);
 
-my %socket                 : ATTR;
-my %transport              : ATTR;
-my %serialization          : ATTR;
+has transport => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => 'Simple',
+);
 
-#sub catch_signal {
-#    my $signame = shift;
-#    OpenXPKI::Exception->throw(
-#        message => 'I18N_OPENXPKI_CLIENT_SIGNAL_CAUGHT',
-#        params  => {
-#            'SIGNAL' => $signame,
-#        },
-#    );
-#    return 1;
-#}
+has serialization => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => 'Simple',
+);
 
-#$SIG{CHLD} = \&catch_signal;
-#$SIG{PIPE} = \&catch_signal;
+has service => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => 'Default',
+);
 
-sub START {
-    my ($self, $ident, $arg_ref) = @_;
+has session_id => (
+    is      => 'rw',
+    isa     => 'Str',
+    init_arg => undef,   # not settable via constructor
+    lazy    => 1,
+    default => '',
+);
 
-    ##! 1: "Initialize protocol stack"
-    $self->__init_connection();
-    $self->__init_transport_protocol();
-    $self->__init_serialization_protocol();
-    $self->__init_service_protocol();
+has _channel => (
+    is       => 'rw',
+    lazy     => 1,
+    builder  => '__build_channel',
+    clearer   => 'clear_channel',
+    predicate => 'has_channel',
+);
 
-    # attach API to this instance
-    $api{$ident} = OpenXPKI::Client::API->new(
-        {
-        CLIENT => $self,
-    });
+has _serializer => (
+    is       => 'rw',
+    lazy     => 1,
+    init_arg => undef,   # not settable via constructor
+    default => sub {
+        my $self = shift;
+        my $class = "OpenXPKI::Serialization::" . $self->serialization();
+        return $class->new();
+    }
+);
 
-}
+has _socket => (
+    is       => 'rw',
+    lazy     => 1,
+    init_arg => undef,   # not settable via constructor
+    builder  => '__build_socket',
+    clearer   => 'clear_socket',
+    predicate => 'has_socket',
+);
 
+around BUILDARGS => sub {
 
-###########################################################################
-# interface methods
+    my $orig = shift;
+    my $class = shift;
 
-# send message to server
-sub talk {
-    my $self  = shift;
-    my $arg   = shift;
-    my $ident = ident $self;
-
-    ##! 1: "talk"
-    if ($self->get_communication_state() eq 'can_send') {
-        my $rc;
-        eval {
-        $rc = $transport{$ident}->write(
-            $serialization{$ident}->serialize($arg)
-            );
-        $self->set_communication_state('can_receive');
-        };
-        if ($EVAL_ERROR) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_CLIENT_TALK_ERROR_DURING_WRITE',
-                params  => {
-                    'EVAL_ERROR' => $EVAL_ERROR,
-                    'ARGUMENT'   => $arg,
-                },
-            );
+    # old call format using hash
+    if ( @_ == 1 && ref $_[0] eq 'HASH' ) {
+        my %params = %{$_[0]};
+        foreach my $key (qw(TIMEOUT SOCKETFILE TRANSPORT SERIALIZATION SERVICE)) {
+            #warn $params->{$key};
+            if ($params{$key}) {
+                $params{lc($key)} = $params{$key};
+                delete $params{$key};
+            }
         }
-    return $rc;
+
+        return $class->$orig(%params);
     } else {
+        return $class->$orig(@_);
+    }
+
+};
+
+sub __build_socket {
+
+    my $self = shift;
+
+    ##! 2: "Initialize server socket connection"
+    ##! 4: "socket..."
+    my $socket;
+    if (! socket($socket, PF_UNIX, SOCK_STREAM, 0)) {
     OpenXPKI::Exception->throw(
-        message => "I18N_OPENXPKI_CLIENT_INCORRECT_COMMUNICATION_STATE",
-        params => {
-        STATUS => $self->get_communication_state(),
-        },
+        message => "I18N_OPENXPKI_CLIENT_INIT_CONNECTION_NO_SOCKET",
         );
     }
-    return 1;
+    ##! 4: "connect..."
+    if (! connect($socket, sockaddr_un($self->socketfile()))) {
+    OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_CLIENT_INIT_CONNECTION_FAILED",
+        params  => {
+            SOCKETFILE => $self->socketfile(),
+            ERROR      => $!,
+        });
+    }
+    ##! 4: "finished"
+    return $socket;
 }
 
-# get server response
-sub collect {
-    my $self  = shift;
-    my $ident = ident $self;
+sub __build_channel {
 
-    ##! 1: "collect"
-    if ($self->get_communication_state() ne 'can_receive') {
-    OpenXPKI::Exception->throw(
-        message => "I18N_OPENXPKI_CLIENT_INCORRECT_COMMUNICATION_STATE",
-        params => {
-        STATUS => $self->get_communication_state(),
-        },
-        );
-    }
+    my $self = shift;
 
-    my $result;
-    eval {
-        local $SIG{ALRM} = sub { die "alarm\n" };
+    my $msg;
 
-        alarm $read_timeout{$ident};
-        $result = $serialization{$ident}->deserialize(
-            $transport{$ident}->read()
-        );
-        $self->set_communication_state('can_send');
-        alarm 0;
-    };
-    if (my $exc = OpenXPKI::Exception->caught()) {
-        $self->set_communication_state('can_send');
-        if ($exc->message() eq 'I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_FAILED'
-         && $exc->params()->{'__EVAL_ERROR__'} eq 'alarm') {
-            # timeout, return
-            return;
-        }
-        die $exc->message();
-    }
-    elsif (my $eval_err = $EVAL_ERROR) {
-        $self->set_communication_state('can_send');
-        if ($eval_err =~ m{\A alarm }xms) {
-            # Timeout from the above alarm signal handler
-            return {
-                'SERVICE_MSG' => 'ERROR',
-                'LIST' => [
-                    {
-                        'LABEL' => 'I18N_OPENXPKI_CLIENT_COLLECT_TIMEOUT',
-                    },
-                ],
-            };
-        }
-        else {
-            return {
-                'SERVICE_MSG' => 'ERROR',
-                'LIST' => [
-                    {
-                        'LABEL'  => 'I18N_OPENXPKI_CLIENT_COLLECT_EVAL_ERROR',
-                        'PARAMS' => {
-                            ERROR => $eval_err,
-                        },
-                    },
-                ],
-            };
-        }
-    }
-    return $result;
-}
+    ##! 8: "send requested transport protocol to server"
+    send($self->_socket(), sprintf("start %s\n", $self->transport()), 0);
 
-###########################################################################
-# send-only functions
+    ##! 8: "receive answer from server"
+    read($self->_socket(), $msg, 3); ## read OK
 
-# send service message
-sub send_service_msg {
-    my $self  = shift;
-    my $ident = ident $self;
-    my $cmd   = shift;
-    my $arg   = shift || {};
-
-    ##! 1: "send_service_msg"
-    ##! 2: $cmd
-    ##! 4: Dumper $arg
-
-    my %arguments = (
-    SERVICE_MSG => $cmd,
-    PARAMS => $arg,
-    );
-
-    ##! 4: Dumper \%arguments
-    eval {
-        $self->talk(\%arguments);
-    };
-    if ($EVAL_ERROR) {
-        ##! 16: 'eval error during send_service_msg!'
+    ##! 8: "evaluate answer"
+    if ($msg !~ /^OK/) {
+        ##! 16: "transport protocol was not accepted by server - $msg"
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_CLIENT_SEND_SERVICE_MSG_TALK_FAILED',
-            params  => {
-                EVAL_ERROR => $EVAL_ERROR,
-            },
+            message => "I18N_OPENXPKI_CLIENT_INIT_TRANSPORT_PROTOCOL_REJECTED",
         );
     }
 
-    return 1;
-}
-
-# send service command message
-sub send_command_msg {
-    my $self  = shift;
-    my $ident = ident $self;
-    my $cmd   = shift;
-    my $arg   = shift;
-
-    ##! 1: "send_command_msg"
-    ##! 2: $cmd
-    ##! 4: Dumper $arg
-
-    return $self->send_service_msg(
-    'COMMAND',
-    {
-        COMMAND     => $cmd,
-        PARAMS      => $arg,
-        API => 1
+    ##! 8: "intializing transport protocol"
+    # FIXME: dynamically assign transport protocol
+    my $channel = OpenXPKI::Transport::Simple->new({
+        SOCKET => $self->_socket(),
     });
+
+    ##! 4: "channel established"
+
+    # initializate serialization protocol
+    $channel->write($self->serialization());
+
+    ##! 8: "receive answer from server"
+    $msg = $channel->read();   ## read 'OK'
+
+    ##! 8: "evaluate answer"
+    if ($msg !~ /^OK/) {
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_CLIENT_INIT_SERIALIZATION_PROTOCOL_REJECTED",
+        );
+    }
+
+    ##! 8: "intializing serialization protocol"
+    my $class = "OpenXPKI::Serialization::" . $self->serialization();
+    $self->_serializer( $class->new() );
+
+    ##! 4: "request service protocol"
+    $channel->write( $self->_serializer()->serialize( $self->service() ) );
+    $msg = $self->_serializer()->deserialize( $channel->read() );
+
+    if ($msg ne "OK") {
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_CLIENT_INIT_SERVICE_PROTOCOL_REJECTED",
+        );
+    }
+
+    ##! 4: "finished"
+
+    return $channel;
+
 }
 
-###########################################################################
-# all-in-one functions
+sub talk {
 
-# send service message and read response
-sub send_receive_service_msg {
     my $self  = shift;
-    my $ident = ident $self;
-    my $cmd   = shift;
-    my $arg   = shift;
 
-    ##! 1: "send_receive_service_msg"
-    ##! 2: $cmd
-    ##! 4: Dumper $arg
+    my $msg  = shift;
 
     eval {
-        $self->send_service_msg($cmd, $arg);
+        $self->_channel()->write(
+            $self->_serializer()->serialize($msg)
+        );
     };
+
     if ($EVAL_ERROR) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_CLIENT_SEND_RECEIVE_SERVICE_MSG_ERROR_DURING_SEND_SERVICE_MSG',
@@ -258,80 +221,93 @@ sub send_receive_service_msg {
             },
         );
     }
-    my $rc;
-    eval {
-        $rc = $self->collect();
-    };
+
+    my $result;
+    my $sh = set_sig_handler('ALRM', sub {
+        $self->close_connection();
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_CLIENT_COLLECT_TIMEOUT",
+        );
+    });
+
+    sig_alarm( $self->timeout() );
+    $result = $self->_serializer()->deserialize(
+        $self->_channel()->read()
+    );
+    sig_alarm( 0 );
+
     if (my $eval_err = $EVAL_ERROR) {
-
-        # TODO - server closes socket when getting the LOGOUT command
-        # which crahes the collect method, should be fixed in server, see #300
-        if ($cmd eq 'LOGOUT') {
-             return { 'SERVICE_MSG' => 'LOGOUT' };
-        }
-
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_CLIENT_SEND_RECEIVE_SERVICE_MSG_ERROR_DURING_COLLECT',
             params  => {
                 EVAL_ERROR => $eval_err,
-                STATE      => $self->get_communication_state(),
             },
         );
     }
-    ##! 4: Dumper $rc
-    return $rc;
+    ##! 4: Dumper $result
+    return $result;
+
 }
 
+# send service message and read response
+sub send_receive_service_msg {
+
+    my $self  = shift;
+
+    my $cmd   = shift;
+    my $arg   = shift;
+
+    ##! 1: "send_receive_service_msg"
+    ##! 2: $cmd
+    ##! 4: Dumper $arg
+
+    return $self->talk({
+        SERVICE_MSG => $cmd,
+        PARAMS => $arg,
+    });
+
+}
 
 # send service message and read response
 sub send_receive_command_msg {
     my $self  = shift;
-    my $ident = ident $self;
     my $cmd   = shift;
     my $arg   = shift;
 
-    ##! 1: "send_receive_command_msg"
-    ##! 2: $cmd
-    ##! 4: Dumper $arg
+    return $self->send_receive_service_msg(
+        'COMMAND',
+        {
+            COMMAND     => $cmd,
+            PARAMS      => $arg,
+            API => 1
+        }
+    );
 
-    $self->send_command_msg($cmd, $arg);
-    my $rc = $self->collect();
-    ##! 4: Dumper $rc
-    return $rc;
 }
 
-
-###########################################################################
-
 sub init_session {
+
     my $self  = shift;
-    my $ident = ident $self;
     my $args  = shift;
 
+    my $msg;
     ##! 4: "initialize session"
     if (defined $args->{SESSION_ID}) {
         ##! 8: "using existing session"
-        $self->talk({
-            SERVICE_MSG => 'CONTINUE_SESSION',
-            SESSION_ID  => $args->{SESSION_ID},
-        });
+        $msg = $self->send_receive_service_msg(
+            'CONTINUE_SESSION',
+            { SESSION_ID  => $args->{SESSION_ID} }
+        );
     } else {
         ##! 8: "creating new session"
         ##! 8: "FIXME: we should send the preferred language here"
-        $self->talk({
-            SERVICE_MSG => "NEW_SESSION",
-        });
+        $msg = $self->send_receive_service_msg( 'NEW_SESSION' );
     }
-
-    my $msg = $self->collect();
 
     # init a new session if reload failed
     if (! defined $msg->{SESSION_ID} &&
         $args->{SESSION_ID} && $args->{NEW_ON_FAIL}) {
-        $self->talk({
-            SERVICE_MSG => "NEW_SESSION",
-        });
-        $msg = $self->collect();
+        $msg = $self->send_receive_service_msg( 'NEW_SESSION' );
     }
 
     if (! defined $msg->{SESSION_ID}) {
@@ -339,66 +315,48 @@ sub init_session {
             message => "I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED",
             params  => {
                 MESSAGE_FROM_SERVER => Dumper $msg,
-            });
+        });
     }
 
-    $sessionid{$ident} = $msg->{SESSION_ID};
+    $self->session_id( $msg->{SESSION_ID} );
 
-    $self->talk(
-    {
-        SERVICE_MSG => 'SESSION_ID_ACCEPTED',
-    });
+    return $self->send_receive_service_msg('SESSION_ID_ACCEPTED');
 
-    # we want to be able to send after initialization, so collect a message!
-    $msg = $self->collect();
-    return $msg;
 }
 
 sub rekey_session {
+
     my $self  = shift;
-    my $ident = ident $self;
     my $args  = shift;
 
     # if no session exists (e.g after logout or socket timeout)
     # we start a new session
-    if (!$sessionid{$ident}) {
+    if (!$self->session_id()) {
         return $self->init_session();
     }
 
-    $self->talk({
-        SERVICE_MSG => "RESET_SESSIONID",
-    });
-
-    my $msg = $self->collect();
+    my $msg = $self->send_receive_service_msg('RESET_SESSIONID');
 
     if (! defined $msg->{SESSION_ID}) {
         OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_CLIENT_REKEY_SESSION_FAILED",
             params  => {
                 MESSAGE_FROM_SERVER => Dumper $msg,
-            });
+        });
     }
 
-    $sessionid{$ident} = $msg->{SESSION_ID};
+    $self->session_id( $msg->{SESSION_ID} );
 
-    $self->talk(
-    {
-        SERVICE_MSG => 'SESSION_ID_ACCEPTED',
-    });
-
-    # we want to be able to send after initialization, so collect a message!
-    $msg = $self->collect();
-    return $msg;
+    return $self->send_receive_service_msg('SESSION_ID_ACCEPTED');
 }
 
 
 sub detach {
     my $self  = shift;
-    my $ident = ident $self;
     my $args  = shift;
 
     # already detached (happens on logout)
-    if (!defined $sessionid{$ident}) {
+    if (!$self->session_id()) {
         return 2;
     }
 
@@ -407,7 +365,7 @@ sub detach {
         $msg = $self->send_receive_service_msg('DETACH_SESSION');
     };
 
-    $sessionid{$ident} = undef;
+    $self->session_id( '' );
 
     if (defined $msg &&
         ref $msg eq 'HASH' &&
@@ -420,20 +378,17 @@ sub detach {
         params  => {
             MESSAGE_FROM_SERVER => Dumper $msg,
     });
-    return undef;
+
 }
 
 
 sub logout {
     my $self  = shift;
-    my $ident = ident $self;
     my $args  = shift;
 
-    my $msg;
+    my $msg = $self->send_receive_service_msg('LOGOUT');
 
-    $msg = $self->send_receive_service_msg('LOGOUT');
-
-    $sessionid{$ident} = undef;
+    $self->session_id( '' );
 
     if (defined $msg &&
         ref $msg eq 'HASH' &&
@@ -448,7 +403,6 @@ sub logout {
     });
 
 }
-
 
 sub is_logged_in {
     my $self = shift;
@@ -469,6 +423,10 @@ sub is_connected
 {
     my $self = shift;
 
+    if (!$self->has_socket() || !$self->has_channel() ) {
+        return 0;
+    }
+
     # get current session status
     eval
     {
@@ -476,9 +434,8 @@ sub is_connected
     };
     if (my $exc = OpenXPKI::Exception->caught())
     {
-        if ($exc->message() eq 'I18N_OPENXPKI_TRANSPORT_SIMPLE_WRITE_ERROR_DURING___SEND') {
-            # this is probably an OpenXPKI server that died at the
-            # other end
+        if ($exc->message() eq 'I18N_OPENXPKI_TRANSPORT_SIMPLE_WRITE_ERROR_DURING_SOCKET_SEND') {
+            # this is probably an OpenXPKI server that died at the other end
             # normal missing connection => 0
             return 0;
         } else {
@@ -494,138 +451,34 @@ sub is_connected
 
 sub close_connection {
     my $self = shift;
-    my $ident = ident $self;
 
-    if (!$socket{$ident}) {
+    if (!$self->has_socket()) {
         warn "got close_connection on already closed socket";
         return;
     }
-    shutdown($socket{$ident}, 2); # we have stopped using this socket
+    shutdown($self->_socket(), 2); # we have stopped using this socket
     # for whatever reasons shutdown does not free the handle, see #645
-    close($socket{$ident});
+    close($self->_socket());
 
-    $socket{$ident} = undef;
+    $self->clear_channel();
+    $self->clear_socket();
 
 }
 
 sub DEMOLISH {
     ##! 4: 'Demolish'
     my $self = shift;
-    my $ident = ident $self;
 
-    $self->close_connection() if ($socket{$ident});
+    if ($self->has_socket()) {
+        $self->close_connection();
+    }
+
 }
 
-###########################################################################
-# private methods
-
-sub __init_connection : PRIVATE {
+# for legacy clients
+sub get_session_id {
     my $self = shift;
-    my $ident = ident $self;
-
-    ##! 2: "Initialize server socket connection"
-    ##! 4: "socket..."
-    if (! socket($socket{$ident}, PF_UNIX, SOCK_STREAM, 0))
-    {
-    OpenXPKI::Exception->throw(
-        message => "I18N_OPENXPKI_CLIENT_INIT_CONNECTION_NO_SOCKET",
-        );
-    }
-    ##! 4: "connect..."
-    if (! connect($socket{$ident}, sockaddr_un($socketfile{$ident})))
-    {
-    OpenXPKI::Exception->throw(
-        message => "I18N_OPENXPKI_CLIENT_INIT_CONNECTION_FAILED",
-        params  => {
-            SOCKETFILE => $socketfile{$ident},
-            ERROR      => $!,
-        });
-    }
-    ##! 4: "finished"
-    return 1;
-}
-
-sub __init_transport_protocol : PRIVATE {
-    my $self = shift;
-    my $ident = ident $self;
-
-    my $msg;
-
-    ##! 8: "send requested transport protocol to server"
-    send($socket{$ident}, "start $transport_protocol{$ident}\n", 0);
-
-    ##! 8: "receive answer from server"
-    read($socket{$ident}, $msg, 3); ## read OK
-
-    ##! 8: "evaluate answer"
-    if ($msg ne "OK\n")
-    {
-        ##! 16: "transport protocol was not accepted by server - $msg"
-        OpenXPKI::Exception->throw(
-            message => "I18N_OPENXPKI_CLIENT_INIT_TRANSPORT_PROTOCOL_REJECTED",
-        );
-    }
-
-    ##! 8: "intializing transport protocol"
-    # FIXME: dynamically assign transport protocol
-    $transport{$ident} = OpenXPKI::Transport::Simple->new(
-    {
-        SOCKET => $socket{$ident},
-    });
-
-    ##! 4: "finished"
-    return 1;
-}
-
-
-sub __init_serialization_protocol : PRIVATE {
-    my $self = shift;
-    my $ident = ident $self;
-
-    ##! 4: "request serialization protocol"
-    ##! 8: "send requested protocol to server"
-    $transport{$ident}->write($serialization_protocol{$ident}); ## send simple
-
-    ##! 8: "receive answer from server"
-    my $msg = $transport{$ident}->read();   ## read 'OK'
-
-    ##! 8: "evaluate answer"
-    if ($msg ne "OK")
-    {
-        OpenXPKI::Exception->throw(
-            message => "I18N_OPENXPKI_CLIENT_INIT_SERIALIZATION_PROTOCOL_REJECTED",
-        );
-    }
-
-    ##! 8: "intializing serialization protocol"
-    my $class = "OpenXPKI::Serialization::" . $serialization_protocol{$ident};
-    $serialization{$ident} = $class->new();
-
-    # initialize communication state; the first message must be a write
-    # operation to the socket
-    $self->set_communication_state('can_send');
-
-    ##! 4: "finished"
-    return 1;
-}
-
-sub __init_service_protocol : PRIVATE {
-    my $self = shift;
-    my $ident = ident $self;
-
-    ##! 4: "request service protocol"
-    $self->talk($service_protocol{$ident});
-    my $msg = $self->collect();
-
-    if ($msg ne "OK")
-    {
-        OpenXPKI::Exception->throw(
-            message => "I18N_OPENXPKI_CLIENT_INIT_SERVICE_PROTOCOL_REJECTED",
-        );
-    }
-
-    ##! 4: "finished"
-    return 1;
+    return $self->session_id();
 }
 
 1;

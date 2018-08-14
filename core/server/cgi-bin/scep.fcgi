@@ -90,17 +90,17 @@ while (my $cgi = CGI::Fast->new()) {
         REALM      => $realm,
         SOCKETFILE => $socket,
         TIMEOUT    => 120, # TODO - make configurable?
-        OPERATION  => $operation,
-        MESSAGE    => $message,
         SERVER     => $server,
         ENCRYPTION_ALGORITHM => $enc_alg,
         HASH_ALGORITHM => $hash_alg
     });
+
     if (! defined $scep_client) {
         $log->error("Error creating SCEP Client instance!");
         die "Error creating SCEP Client instance!";
     }
-    my $result = $scep_client->send_request($params);
+
+    my $result = $scep_client->send_request($operation, $message, $params);
 
     if ($result) {
         print $result;
