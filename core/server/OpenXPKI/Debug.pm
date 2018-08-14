@@ -90,7 +90,7 @@ sub filter
                 ## higher levels mean more noise
                 my $level = $1;
                 my $color = $2;
-                if ($1 <= $LEVEL{$self->{MODULE}})
+                if ($1 & $LEVEL{$self->{MODULE}})
                 {
                     $msg =~ s/\n//s;
                     ##--------------------------------------------------##

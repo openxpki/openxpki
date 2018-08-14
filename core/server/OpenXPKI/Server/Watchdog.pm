@@ -390,7 +390,7 @@ sub __main_loop {
     my $self = shift;
 
     while (not $TERMINATE) {
-        ##! 80: 'watchdog: do loop'
+        ##! 64: 'watchdog: do loop'
         try {
             $self->__reload if $RELOAD;
             $self->__purge_expired_sessions;
@@ -398,7 +398,7 @@ sub __main_loop {
 
             # duration of pause depends on whether a workflow was found or not
             my $sec = $wf_id ? $self->interval_loop_run : $self->interval_loop_idle;
-            ##! 80: sprintf('watchdog sleeps %d secs (%s)', $sec, $wf_id ? 'busy' : 'idle')
+            ##! 64: sprintf('watchdog sleeps %d secs (%s)', $sec, $wf_id ? 'busy' : 'idle')
             sleep($sec);
             # Reset the exception counter after every successfull loop
             $self->_exception_count(0);
@@ -510,7 +510,7 @@ sub __scan_for_paused_workflows {
     );
 
     if ( !defined $workflow ) {
-        ##! 80: 'no paused WF found, can be idle again...'
+        ##! 64: 'no paused WF found, can be idle again...'
         return;
     }
 

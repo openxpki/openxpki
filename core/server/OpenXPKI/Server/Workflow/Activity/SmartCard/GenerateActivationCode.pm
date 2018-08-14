@@ -254,7 +254,7 @@ sub execute {
         ##! 16: "user=$user, auth=$a, val=" . $context->param($a . '_id')
         if ( lc($user) eq lc($context->param( $a . '_id' )) ) {
         $found++;
-        ##! 10: "Setting hash and salt in $a for user $user"
+        ##! 16: "Setting hash and salt in $a for user $user"
             # writing hash is easy... just put it in the context
             $context->param( $a . '_hash', $hash );
             $context->param( '+' . $a . '_salt', $salt );

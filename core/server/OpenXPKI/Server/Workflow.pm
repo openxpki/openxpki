@@ -592,7 +592,7 @@ sub _set_proc_state{
     my $self = shift;
     my $proc_state = shift;
 
-    ##! 20: sprintf('_set_proc_state from %s to %s, Wfl State: %s', $self->proc_state(), $proc_state, $self->state());
+    ##! 16: sprintf('_set_proc_state from %s to %s, Wfl State: %s', $self->proc_state(), $proc_state, $self->state());
 
     if(!$known_proc_states{$proc_state}){
         OpenXPKI::Exception->throw (
@@ -618,7 +618,7 @@ sub _proc_state_exception {
         my $params = $error->params();
         $next_proc_state = (defined $params->{__next_proc_state__})?$params->{__next_proc_state__}:'';
         ##! 128: sprintf('next proc-state defined in exception: %s',$next_proc_state)
-        ##! 228: Dumper($params)
+        ##! 128: Dumper($params)
     }else{
         $error_code = $error_msg = $error;
     }
@@ -710,7 +710,7 @@ sub _get_next_state {
 
 sub _save {
     my $self = shift;
-    ##! 20: 'save workflow!'
+    ##! 16: 'save workflow!'
 
     # do not save if we are in the startup phase of a workflow
     # Some niffy tasks create broken workflows for validating
@@ -720,7 +720,7 @@ sub _save {
     if ($self->state() eq 'INITIAL' &&
         ($proc_state eq 'init' || $proc_state eq 'running' || $proc_state eq 'exception' )) {
         CTX('log')->workflow()->debug("Workflow save requested during startup - wont save! ($proc_state)");
-        ##! 20: sprintf 'dont save as we are in startup phase (proc state %s) !', $proc_state ;
+        ##! 16: sprintf 'dont save as we are in startup phase (proc state %s) !', $proc_state ;
         return;
     }
 

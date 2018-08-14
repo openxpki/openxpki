@@ -13,7 +13,7 @@ sub START {
     ##! 4: 'loglevel 4'
     ##! 2 red: 'red text'
     ##! 16: 'loglevel 16'
-    ##! 32000: 'loglevel 32000'
+    ##! 256: 'loglevel 256'
     print "new()\n";
     return 1;
 }

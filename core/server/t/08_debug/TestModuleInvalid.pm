@@ -16,7 +16,7 @@ sub START {
     ##! 2: 'calling an unknown method: ' . blafasel()
     ##! 4: 'calling something from an unknown package: ' . Nonsense::ThisDoesNotExist::bla()
     ##! 16: 'loglevel 16'
-    ##! 32000: 'loglevel 32000'
+    ##! 256: 'loglevel 256'
     print "new()\n";
     return 1;
 }

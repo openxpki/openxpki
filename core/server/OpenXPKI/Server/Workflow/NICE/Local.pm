@@ -197,7 +197,7 @@ sub issueCertificate {
     ##! 64: 'propagating cert subject: ' . $csr->{subject}
     $profile->set_subject( $csr->{subject} );
 
-    ##! 51: 'SAN List ' . Dumper ( @subject_alt_names )
+    ##! 64: 'SAN List ' . Dumper ( @subject_alt_names )
     if (scalar @subject_alt_names) {
         ##! 64: 'propagating subject alternative names: ' . Dumper @subject_alt_names
        $profile->set_subject_alt_name(\@subject_alt_names);

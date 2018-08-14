@@ -342,8 +342,8 @@ MESSAGE:
                         CTX('dbi')->rollback();
                         CTX('log')->system()->error("Error executing SCEP command '$received_command': $eval_err");
 
-                        ##! 14: "Exception caught during command execution"
-                        ##! 14: "$eval_err"
+                        ##! 16: "Exception caught during command execution"
+                        ##! 16: "$eval_err"
                         $self->talk(
                             $self->__get_error(
                                 {   ERROR =>

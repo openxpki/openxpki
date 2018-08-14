@@ -11,7 +11,7 @@ sub START {
     ##! 2: 'loglevel 2'
     ##! 4: 'loglevel 4'
     ##! 16: 'loglevel 16'
-    ##! 32000: 'loglevel 32000'
+    ##! 256: 'loglevel 256'
     print "new()\n";
     return 1;
 }
