@@ -42,6 +42,10 @@ Or if you want to specify config and logger explicitely:
         ->create;
     ...
 
+The parameters in the C<config> HashRef are directly passed as constructor
+parameters to the session driver class (i.e. to
+C<OpenXPKI::Server::Session::Driver::Database-E<gt>new> in the example)
+
 =cut
 
 ################################################################################
