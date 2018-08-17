@@ -256,6 +256,8 @@ token_id, login_id, certs_on_card, owner_id, user_group, token_status
 
 =head2 Activity Parameters
 
+=over
+
 =item on_error
 
 How to behave when the sc_analyse call fails, options are
@@ -263,6 +265,8 @@ How to behave when the sc_analyse call fails, options are
   I<exception>: bubble up the exception (workflow dies)
 
   I<context>: write the exception message into the context key I<error_code>
+
+=back
 
 =head1 Functions
 
