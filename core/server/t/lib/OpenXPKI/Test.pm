@@ -583,6 +583,7 @@ sub _build_conf_session {
     return {
         type => "Database",
         lifetime => "1200",
+        table => "backend_session",
     };
 }
 

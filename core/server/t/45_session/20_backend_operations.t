@@ -153,7 +153,7 @@ ok dir_empty($tempdir), "Session storage directory is empty";
 # DATABASE backed session
 driver_ok {
     type => "Database",
-    config => { dbi => $oxitest->dbi },
+    config => { dbi => $oxitest->dbi, table => "backend_session" },
     descr => "Session with database backend (existing DB handle)",
 };
 
