@@ -166,8 +166,8 @@ An example config to authenticate RA Operators against ActiveDirectory using the
         class: Connector::Builtin::Authentication::LDAP
         LOCATION: ldap://ad.company.com
         base: dc=company,dc=loc
-        binddn@: cn=binduser
-        password@: secret
+        binddn: cn=binduser
+        password: secret
         filter: "(&(mail=[% LOGIN %])(memberOf=CN=RA Operator,OU=SecurityGroups,DC=company,DC=loc))"
 
 
