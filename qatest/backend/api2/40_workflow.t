@@ -17,7 +17,7 @@ use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 use OpenXPKI::Test::CertHelper::Database;
 
-plan tests => 37;
+plan tests => 35;
 
 #
 # Setup test context
@@ -144,7 +144,6 @@ my $oxitest = OpenXPKI::Test->new(
         "realm.alpha.workflow.def.wf_type_2" => workflow_def("wf_type_2"),
         "realm.alpha.workflow.def.wf_type_3_unused" => workflow_def("wf_type_3_unused"),
         "realm.alpha.workflow.def.wf_type_no_initial_action" => $wf_def_noinit,
-        "realm.alpha.workflow.def.wf_type_5_restricted" => workflow_def("wf_type_5", "self"),
         "realm.beta.workflow.def.wf_type_4" => workflow_def("wf_type_4"),
     },
     enable_workflow_log => 1, # while testing we do not log to database by default
@@ -177,10 +176,6 @@ my $wf_t2 =   $oxitest->create_workflow("wf_type_2", $params);
 CTX('session')->data->pki_realm("beta");
 my $wf_t4 =   $oxitest->create_workflow("wf_type_4", $params);
 
-CTX('session')->data->pki_realm("alpha");
-CTX('session')->data->user('edeltraut');
-my $wf_t5 =   $oxitest->create_workflow("wf_type_5_restricted", $params);
-
 throws_ok {
     CTX('session')->data->pki_realm("alpha");
     $oxitest->api2_command("create_workflow_instance" => {
@@ -206,7 +201,6 @@ lives_and {
     cmp_deeply $result, superhashof({
         wf_type_1 => superhashof({ label => "wf_type_1" }),
         wf_type_2 => superhashof({ label => "wf_type_2" }),
-        wf_type_5_restricted => superhashof({ label => "wf_type_5" }),
     }), "get_workflow_instance_types()";
 }
 
@@ -630,22 +624,6 @@ search_result
     },
     [ $wf_t1_sync_data ],
     "search_workflow_instances() - complex query";
-
-TODO: {
-    local $TODO = "Parameter 'check_acl' to search_workflow_instances() does not work properly.";
-
-    # check_acl (edeltraut should see her workflow)
-    CTX('session')->data->user('edeltraut');
-    search_result { check_acl => 1 },
-            any( superhashof({ 'workflow_type' => $wf_t5->type }) ),
-         "search_workflow_instances() - search with CHECK_ACL part 1";
-};
-
-# check_acl (user wilhelm should not see edeltrauts workflow)
-CTX('session')->data->user('wilhelm');
-search_result { check_acl => 1 },
-    array_each( superhashof({ 'workflow_type' => re(qr/^(.*)$/, noneof($wf_t5->type)) }) ),
-     "search_workflow_instances() - search with CHECK_ACL part 2";
 
 #
 # search_workflow_instances_count
