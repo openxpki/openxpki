@@ -15,6 +15,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 use OpenXPKI::MooseParams;
+use OpenXPKI::Crypt::X509;
 
 use OpenXPKI::Server::Database; # to get AUTO_ID
 
