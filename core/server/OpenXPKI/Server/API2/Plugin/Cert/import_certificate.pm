@@ -26,7 +26,6 @@ use OpenXPKI::Server::Database; # to get AUTO_ID
 Parameters:
 
 =over
-=item * C<XXX> I<Bool> - XXX. Default: XXX
 
 =item * C<data> I<Str> - certificate data (PEM encoded)
 
