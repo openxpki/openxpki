@@ -165,6 +165,8 @@ script that acts as the SCEP server.
 
 PKI Realm to access (must match server configuration).
 
+=back
+
 =head2 send_request
 
 Sends SCEP request to OpenXPKI server, expects operation and message as
