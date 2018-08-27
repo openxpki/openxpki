@@ -21,7 +21,6 @@ Start an OpenXPKI test server:
     $client->init_session;
     $client->login("caop");
 
-
 =head1 DESCRIPTION
 
 This class is the central new (as of 2017) test vehicle for OpenXPKI that sets
@@ -114,6 +113,22 @@ Use default configuration shipped with OpenXPKI and start a test server (only
 available for QA tests):
 
     my $oxitest = OpenXPKI::Test->new(with => [ qw( SampleConfig Server ) ]);
+
+=head2 Debugging
+
+To display debug statements just use L<OpenXPKI::Debug> in your test files
+B<before> you use C<OpenXPKI::Test>:
+
+    # e.g. in t/mytest.t
+    use strict;
+    use warnings;
+
+    use Test::More;
+
+    use OpenXPKI::Debug;
+    BEGIN { $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Database.*'} = 0b1111111 }
+
+    use OpenXPKI::Test;
 
 =cut
 
