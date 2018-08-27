@@ -26,25 +26,28 @@ use OpenXPKI::Server::Database; # to get AUTO_ID
 Parameters:
 
 =over
+=item * C<XXX> I<Bool> - XXX. Default: XXX
 
-=item * B<DATA>, certificate data (PEM encoded)
+=item * C<data> I<Str> - certificate data (PEM encoded)
 
-=item * B<PKI_REALM> (optional), set the PKI realm to this value (might be overridden by an
-issuer's realm)
+=item * C<pki_realm> I<Str> - set the PKI realm to this value (optional, might be
+overridden by an issuer's realm)
 
-=item * B<FORCE_NOCHAIN> (optional), 1 = import certificate even if issuer is
+=item * C<force_nochain> I<Str> - 1 = import certificate even if issuer is
 unknown (then I<issuer_identifier> will not be set) or has an incomplete
-signature chain.
+signature chain. Default: 0
 
-=item * B<FORCE_ISSUER> (optional), 1 = enforce import even if it has an invalid
-signature chain (i.e. verification failed).
+=item * C<force_issuer> I<Bool> - 1 = enforce import even if it has an invalid
+signature chain (i.e. verification failed). Default: 0
 
-=item * B<FORCE_NOVERIFY> (optional), 1 = do not validate signature chain (e.g.
-if one of the certificates' CA has expired)
+=item * C<force_noverify> I<Bool> - 1 = do not validate signature chain (e.g.
+if one of the certificates' CAs has expired). Default: 0
 
-=item * B<REVOKED> (optional), Set to 1 to set the certificate status to "REVOKED"
+=item * C<revoked> I<Bool> - set to 1 to set the certificate status to
+I<REVOKED>. Default: 0
 
-=item * B<UPDATE> (optional), Do not throw an exception if certificate already exists, update it instead
+=item * C<update> I<Bool> - do not throw an exception if certificate already
+exists, update it instead. Default: 0
 
 =back
 
@@ -95,6 +98,8 @@ command "import_certificate" => {
     my $cert_hash = {
         status => 'ISSUED',
         identifier => $cert_identifier,
+        data => $x509->pem,
+        # FIXME public_key is missing !
         issuer_dn => $x509->get_issuer,
         cert_key => $x509->get_serial,
         subject => $x509->get_subject,
@@ -186,7 +191,7 @@ command "import_certificate" => {
         if (!$valid) {
             # force the invalid issuer
             if ($params->force_issuer) {
-                CTX('log')->system->warn("Importing certificate with invalid chain with force! $cert_identifier / " . $x509->get_subject());
+                CTX('log')->system->warn("Forced import of certificate with invalid! $cert_identifier / " . $x509->get_subject());
                 CTX('log')->audit('system')->warn('certificate import without chain validation', {
                     certid    => $cert_identifier,
                     key       => $x509->get_subject_key_id(),
