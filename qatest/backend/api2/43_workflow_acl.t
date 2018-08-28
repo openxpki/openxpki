@@ -15,10 +15,11 @@ use Data::UUID;
 
 # Project modules
 use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
+#use OpenXPKI::Debug; BEGIN { $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::API2::Plugin::Workflow.*'} = 0b1111111 }
 use OpenXPKI::Test;
 use OpenXPKI::Test::CertHelper::Database;
 
-plan tests => 3;
+plan tests => 6;
 
 #
 # Setup test context
@@ -164,10 +165,18 @@ search_result { check_acl => 0, id => $all_ids },
         superhashof({ 'workflow_id' => $edel_regex->id }),
         superhashof({ 'workflow_id' => $edel_noaccess->id }),
     ),
-     "search_workflow_instances() - search without ACL check";
+     "search_workflow_instances() - no ACL check";
+
+# count workflows
+lives_and {
+    my $result = $oxitest->api2_command("search_workflow_instances_count" => { id => $all_ids });
+    is $result, 9;
+} "search_workflow_instances_count() - no ACL check";
 
 # search with ACL check
-search_result { check_acl => 1, id => $all_ids },
+my $query_with_acl_check = { check_acl => 1, id => $all_ids };
+
+search_result $query_with_acl_check,
     bag(
         superhashof({ 'workflow_id' => $alma_any->id }), # ACL 'any' - workflows by all users
         superhashof({ 'workflow_id' => $alma_self->id }), # ACL 'self' - own workflows
@@ -175,14 +184,26 @@ search_result { check_acl => 1, id => $all_ids },
         superhashof({ 'workflow_id' => $edel_others->id }), # ACL 'others' - workflow by other users
         superhashof({ 'workflow_id' => $edel_regex->id }), # ACL with regex - workflow by matching users
     ),
-     "search_workflow_instances() - search with ACL check";
+     "search_workflow_instances() - with ACL check";
 
+# count workflows
+lives_and {
+    my $result = $oxitest->api2_command("search_workflow_instances_count" => $query_with_acl_check);
+    is $result, 5;
+} "search_workflow_instances_count() - with ACL check";
+
+# search with ACL check but no access to ANY workflow
 CTX('session')->data->role('NonExistingRole');
 CTX('session')->data->user('fred');
 
-# search with ACL check but no access to ANY workflow
-search_result { check_acl => 1, id => $all_ids },
+search_result $query_with_acl_check,
     [],
-     "search_workflow_instances() - search with ACL check and no access to any workflow";
+     "search_workflow_instances() - with ACL check and no access to any workflow";
+
+# count workflows
+lives_and {
+    my $result = $oxitest->api2_command("search_workflow_instances_count" => $query_with_acl_check);
+    is $result, 0;
+} "search_workflow_instances_count() - with ACL check and no access to any workflow";
 
 1;

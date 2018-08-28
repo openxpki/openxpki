@@ -24,6 +24,12 @@ coerce 'ArrayOrAlphaPunct',
     from 'AlphaPunct',
     via { [ $_ ] };
 
+has 'count_only' => (
+    isa => 'Bool',
+    is => 'rw',
+    default => 0,
+);
+
 # helper / cache: maps each (queried) workflow type to the ACL defined for the current user's role
 has 'acl_by_wftype' => (
     isa => 'HashRef',
@@ -99,19 +105,77 @@ command "search_workflow_instances" => {
     return_attributes => {isa => 'ArrayRef', default => sub { [] } },
 } => sub {
     my ($self, $params) = @_;
+    ##! 1: "start"
 
-    # build db query parameters
-    my %sql_params = (
-        %{ $self->_search_query_params($params, $params->check_acl) },
-        %{ $self->_search_query_params_exclusive($params) },
-    );
+    my $columns = [ qw(
+        workflow_last_update
+        workflow.workflow_id
+        workflow_type
+        workflow_state
+        workflow_proc_state
+        workflow_wakeup_at
+        pki_realm
+    ) ];
+
+    return $self->_search($params, $columns);
+};
+
+=head2 search_workflow_instances_count
+
+Searches workflow instances using the given parameters and returns the number
+of workflows found.
+
+See L</search_workflow_instances> for available parameters. Note that for
+compatibility with I<search_workflow_instances> the following parameters are
+accepted but ignored: C<attribute>, C<return_attributes>, C<start>, C<limit>,
+C<order>, C<reverse>.
+
+=cut
+command "search_workflow_instances_count" => {
+    pki_realm  => { isa => 'AlphaPunct', },
+    id         => { isa => 'ArrayRef', },
+    type       => { isa => 'ArrayOrAlphaPunct', coerce => 1, },
+    state      => { isa => 'ArrayOrAlphaPunct', coerce => 1, },
+    proc_state => { isa => 'AlphaPunct', },
+    check_acl  => { isa => 'Bool', default => 0 },
+    # these are ignored, but included to be compatible to "search_workflow_instances":
+    attribute  => { isa => 'ArrayRef|HashRef', },
+    start      => { isa => 'Int', },
+    limit      => { isa => 'Int', },
+    order      => { isa => 'Str', },
+    reverse    => { isa => 'Bool', },
+    return_attributes => {isa => 'ArrayRef', },
+} => sub {
+    my ($self, $params) = @_;
+
+    ##! 1: "start"
+
+    $params->attribute([]);
+    $params->clear_start;
+    $params->clear_limit;
+    $params->clear_order;
+    $params->clear_reverse;
+
+    $self->count_only(1);
+
+    # 'workflow_type' and 'creator' needed to apply regex ACLs later on
+    $params->return_attributes([ 'creator' ]);
+    my $columns = [ qw( workflow_type ) ];
+    my $result = $self->_search($params, $columns);
+
+    return scalar @$result;
+};
+
+# Execute search and apply ACL checks
+sub _search {
+    my ($self, $params, $columns) = @_;
+
+    my %sql = %{ $self->_make_query_params($params, $columns) };
 
     # run SELECT query
-    my $result = CTX('dbi')->select(
-        %sql_params,
-    )->fetchall_arrayref({});
+    my $result = CTX('dbi')->select(%sql)->fetchall_arrayref({});
 
-    # ACLs part 3: filter result by applying ACL checks of type regex
+    # ACLs part 3: apply ACL checks of type RegEx by filtering 'creator'
     if ($params->check_acl) {
         $result = [ grep {
             my $acl = $self->acl_by_wftype->{ $_->{workflow_type} };
@@ -122,56 +186,18 @@ command "search_workflow_instances" => {
     }
 
     return $result;
-};
+}
 
-=head2 search_workflow_instances_count
-
-Searches workflow instances using the given parameters and returns the number
-of workflows found.
-
-see search_workflow_instances, limit and order fields are not applicable.
-
-=cut
-command "search_workflow_instances_count" => {
-    pki_realm  => { isa => 'AlphaPunct', },
-    id         => { isa => 'ArrayRef', },
-    type       => { isa => 'ArrayOrAlphaPunct', coerce => 1, },
-    state      => { isa => 'ArrayOrAlphaPunct', coerce => 1, },
-    proc_state => { isa => 'AlphaPunct', },
-    attribute  => { isa => 'ArrayRef|HashRef', },
-    return_attributes => {isa => 'ArrayRef', },
-} => sub {
-    my ($self, $params) = @_;
-
-    $params->return_attributes([]);
-
-    my $sql_params = $self->_search_query_params($params, 0);
-    my $result = CTX('dbi')->select_one(
-        %{ $sql_params },
-        columns => [ 'COUNT(workflow.workflow_id)|amount' ],
-    );
-
-    ##! 1: "finished"
-    return $result->{amount};
-};
-
-sub _search_query_params {
-    my ($self, $args, $check_acl) = @_;
+# Create SQL query parameters by processing API command parameters
+sub _make_query_params {
+    my ($self, $args, $columns) = @_;
 
     my $re_alpha_string = qr{ \A [ \w \- \. : \s ]* \z }xms;
 
     my $where = {};
     my $params = {
         where => $where,
-        columns => [ qw(
-            workflow_last_update
-            workflow.workflow_id
-            workflow_type
-            workflow_state
-            workflow_proc_state
-            workflow_wakeup_at
-            pki_realm
-        ) ],
+        columns => $columns,
     };
 
     ##! 16: 'Input args ' . Dumper $args
@@ -180,7 +206,7 @@ sub _search_query_params {
     # ACLs part 1: filter out workflow types with undefined ACLs (= no access)
     #
     my $user;
-    if ($check_acl) {
+    if ($args->check_acl) {
         $user = CTX('session')->data->user;
         my $role = CTX('session')->data->has_role ? CTX('session')->data->role : 'Anonymous';
 
@@ -208,6 +234,8 @@ sub _search_query_params {
             # add 'creator' column to be able to filter on it using WHERE later on
             $add_creator = 1 if $creator_acl ne 'any'; # 'any': no restriction - user may see all workflows
         }
+
+        ##! 32: 'ACL check - workflow types and ACLs: ' . join(", ", map { sprintf "%s=%s", $_, $self->acl_by_wftype->{$_} } keys %{ $self->acl_by_wftype })
 
         # add the "creator" column
         push @{ $args->return_attributes }, 'creator' if $add_creator;
@@ -316,7 +344,7 @@ sub _search_query_params {
     #
     # ACLs part 2: filter by 'creator'
     #
-    if ($check_acl) {
+    if ($args->check_acl) {
         my @where_additions = ();
         for my $type (keys %{ $self->acl_by_wftype }) {
             my $acl = $self->acl_by_wftype->{$type};
@@ -356,26 +384,21 @@ sub _search_query_params {
     $where->{workflow_state} = $args->state if $args->has_state;
     $where->{workflow_proc_state} = $args->proc_state if $args->has_proc_state;
 
-    ##! 32: 'params: ' . Dumper $params
-    return $params;
-}
+    # process special API command parameters for non-counting search
+    if (not $self->count_only) {
+        if ($args->has_limit ) {
+            $params->{limit} = $args->limit;
+            $params->{offset} = $args->start if $args->has_start;
+        }
 
-sub _search_query_params_exclusive {
-    my ($self, $args) = @_;
-
-    my $params = {};
-
-    if ($args->has_limit ) {
-        $params->{limit} = $args->limit;
-        $params->{offset} = $args->start if $args->has_start;
+        # Custom ordering
+        my $desc = "-"; # not set or 0 means: DESCENDING, i.e. "-"
+        $desc = "" if $args->has_reverse and $args->reverse == 0;
+        my $order = $args->has_order ? $args->order : 'workflow_id';
+        $params->{order_by} = sprintf "%s%s", $desc, $order;
     }
 
-    # Custom ordering
-    my $desc = "-"; # not set or 0 means: DESCENDING, i.e. "-"
-    $desc = "" if $args->has_reverse and $args->reverse == 0;
-    my $order = $args->has_order ? $args->order : 'workflow_id';
-    $params->{order_by} = sprintf "%s%s", $desc, $order;
-
+    ##! 32: 'generated parameters: ' . Dumper $params
     return $params;
 }
 
