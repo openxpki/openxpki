@@ -246,7 +246,7 @@ sub _make_query_params {
         for my $type (@wf_types_to_check) {
             my $creator_acl = CTX('config')->get([ 'workflow', 'def', $type, 'acl', $role, 'creator' ]);
 
-            # do not query workflow types if there's no ACL (i.e. no access) for the current user's role
+            # do not query this workflow type if there's no ACL (i.e. no access) for the current user's role
             next unless $creator_acl;
 
             push @include_wf_types, $type;
@@ -257,7 +257,7 @@ sub _make_query_params {
             $self->acl_by_wftype->{$type} = $creator_acl;
 
             # add 'creator' column to be able to filter on it using WHERE later on
-            $add_creator = 1 if $creator_acl ne 'any'; # 'any': no restriction - user may see all workflows
+            $add_creator = 1 if $creator_acl ne 'any'; # any = no restriction: user may see all workflows
         }
 
         ##! 32: 'ACL check - workflow types and ACLs: ' . join(", ", map { sprintf "%s=%s", $_, $self->acl_by_wftype->{$_} } keys %{ $self->acl_by_wftype })
@@ -265,8 +265,7 @@ sub _make_query_params {
         # add the "creator" column
         push @{ $args->return_attributes }, 'creator' if $add_creator;
 
-        # filter by workflow type
-        $where->{workflow_type} = \@include_wf_types;
+        # we do not add $where->{workflow_type} here, it's done later on in more detail
     }
     else {
         $where->{workflow_type} = $args->type if $args->has_type;
@@ -370,7 +369,10 @@ sub _make_query_params {
     # ACLs part 2: filter by 'creator'
     #
     if ($args->check_acl) {
-        my @where_additions = ();
+        my @where_additions = ( \"0 = 1" );
+        # WHERE ( 0 = 1 OR ... ) is a trick to make sure that NO rows are
+        # returned (instead of ALL rows) if $self->acl_by_wftype is empty and
+        # thus no other conditions are added.
         for my $type (keys %{ $self->acl_by_wftype }) {
             my $acl = $self->acl_by_wftype->{$type};
             my $creator_col = $attr_value_colspec{'creator'};
