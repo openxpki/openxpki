@@ -206,4 +206,9 @@ lives_and {
     is $result, 0;
 } "search_workflow_instances_count() - with ACL check and no access to any workflow";
 
+# delete test workflows
+$oxitest->dbi->start_txn;
+$oxitest->dbi->delete(from => 'workflow', where => { workflow_type => [ -like => "%$uuid" ] } );
+$oxitest->dbi->commit;
+
 1;
