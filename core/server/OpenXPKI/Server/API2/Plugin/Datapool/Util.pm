@@ -47,6 +47,9 @@ sub assert_current_pki_realm_within_workflow {
         { isa => 'Str' },
     );
 
+    # access to the _global realm is always allowed
+    return 1 if $requested_pki_realm eq '_global';
+
     my @caller = $self->rawapi->my_caller(1); # who called our calling code?
 
     # if there is no caller left (shouldn't happen)

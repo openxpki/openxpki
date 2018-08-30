@@ -18,7 +18,7 @@ sub execute {
     my $workflow   = shift;
     my $context    = $workflow->context();
     my $serializer = OpenXPKI::Serialization::Simple->new();
-    my $params     = { PKI_REALM => CTX('api')->get_pki_realm(), };
+    my $params     = {};
 
     my $target_key;
     my $default_value;
@@ -38,7 +38,7 @@ sub execute {
         }
 
         foreach my $key (qw( namespace )) {
-            $params->{ uc($key) } = $self->param( 'ds_' . $key );
+            $params->{ $key } = $self->param( 'ds_' . $key );
         }
 
         my $keyparam = $self->param('ds_key_param');
@@ -48,7 +48,7 @@ sub execute {
                   . 'MISSPARAM_KEY_PARAM' );
         }
 
-        $params->{KEY} = $context->param($keyparam);
+        $params->{key} = $context->param($keyparam);
 
         $target_key = $self->param('ds_value_param');
         if ( not $target_key ) {
@@ -61,13 +61,13 @@ sub execute {
 
     } else {
 
-        $params->{NAMESPACE} = $self->param('namespace');
-        if (!$params->{NAMESPACE}) {
+        $params->{namespace} = $self->param('namespace');
+        if (!$params->{namespace}) {
             configuration_error('Datapool::GetEntry requires the namespace parameter');
         }
 
-        $params->{KEY} = $self->param('key');
-        if (!$params->{KEY}) {
+        $params->{key} = $self->param('key');
+        if (!$params->{key}) {
             configuration_error('Datapool::GetEntry requires the key parameter');
         }
 
@@ -77,18 +77,26 @@ sub execute {
     }
 
 
+    if ($self->param('pki_realm')) {
+        if ($self->param('pki_realm') eq '_global') {
+            $params->{pki_realm} = '_global';
+        } elsif($self->param('pki_realm') ne CTX('session')->data->pki_realm) {
+            workflow_error( 'Access to foreign realm is not allowed' );
+        }
+    }
+
     ##! 16: ' Fetch from datapool ' . Dumper $params
 
-    my $msg = CTX('api')->get_data_pool_entry($params);
+    my $msg = CTX('api2')->get_data_pool_entry(%$params);
 
     ##! 32: ' Result from datapool ' . Dumper $msg
 
     # Prevent export of encrypted data to persisted context items
-    if ($msg->{ENCRYPTED} && ($target_key !~ /^_/)) {
+    if ($msg->{encrypted} && ($target_key !~ /^_/)) {
          workflow_error( 'persisting encrypted data is not allowed' );
     }
 
-    my $retval = $msg->{VALUE};
+    my $retval = $msg->{value};
 
     if ( (not defined $retval) && (defined $default_value)) {
         ##! 16: 'No result - using default value'
@@ -139,6 +147,14 @@ The context target key to write the result to, the default is I<_tmp>.
 
 B<Note:> If the retrieved value was encrypted in the datapool, the
 target parameter must start with an underscore (=volatile parameter).
+
+=item pki_realm
+
+The realm of the datapool item to load, default is the current realm.
+
+B<Note:> For security reasons it is not allowed to load items from other
+realms except from special I<system> realms. The only system realm
+defined for now is I<_global> which is available from all other realms.
 
 =item ds_key_param, deprecated
 
