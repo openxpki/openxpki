@@ -8,6 +8,7 @@ use FindBin qw( $Bin );
 
 # CPAN modules
 use Test::More;
+use Data::UUID;
 
 # Project modules
 use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
@@ -55,10 +56,12 @@ my $workflow_def = {
     },
 };
 
+my $uuid = Data::UUID->new->create_str; # so we don't see workflows from previous test runs
+
 my $oxitest = OpenXPKI::Test->new(
     with => [ qw( TestRealms Workflows ) ],
     add_config => {
-        "realm.alpha.workflow.def.wf_with_a_rest" => $workflow_def,
+        "realm.alpha.workflow.def.wf_with_a_rest_$uuid" => $workflow_def,
     },
     #log_level => "debug",
 );
@@ -69,16 +72,16 @@ my $oxitest = OpenXPKI::Test->new(
 CTX('session')->data->pki_realm('alpha');
 CTX('session')->data->role('User');
 CTX('session')->data->user('wilhelm');
-my $wf = $oxitest->create_workflow("wf_with_a_rest");
+my $wf = $oxitest->create_workflow("wf_with_a_rest_$uuid");
 $wf->state_is("RESTING");
 
-my $info = $oxitest->api2_command("wakeup_workflow" => { id => $wf->id, type => "wf_with_a_rest" });
+my $info = $oxitest->api2_command("wakeup_workflow" => { id => $wf->id, type => "wf_with_a_rest_$uuid" });
 is $info->{workflow}->{state}, "SUCCESS", "synchronous wakeup successful";
 
 #
 # asynchronous wakeup ('watch'), but watching and waiting
 #
-$wf = $oxitest->create_workflow("wf_with_a_rest");
+$wf = $oxitest->create_workflow("wf_with_a_rest_$uuid");
 $wf->state_is("RESTING");
 
 $info = $oxitest->api2_command("wakeup_workflow" => { id => $wf->id, async => 1, wait => 1 });
@@ -87,7 +90,7 @@ is $info->{workflow}->{state}, "SUCCESS", "asynchronous wakeup successful (block
 #
 # asynchronous wakeup ('fork')
 #
-$wf = $oxitest->create_workflow("wf_with_a_rest");
+$wf = $oxitest->create_workflow("wf_with_a_rest_$uuid");
 $wf->state_is("RESTING");
 
 $info = $oxitest->api2_command("wakeup_workflow" => { id => $wf->id, async => 1 });
@@ -99,5 +102,10 @@ while (time < $timeout) {
     sleep 1;
 }
 is $info->{workflow}->{state}, "SUCCESS", "asynchronous wakeup successful (nonblocking mode)";
+
+# delete test workflows
+$oxitest->dbi->start_txn;
+$oxitest->dbi->delete(from => 'workflow', where => { workflow_type => [ -like => "%$uuid" ] } );
+$oxitest->dbi->commit;
 
 1;
