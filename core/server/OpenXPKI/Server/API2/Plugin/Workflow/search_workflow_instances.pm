@@ -27,6 +27,7 @@ coerce 'ArrayOrAlphaPunct',
 has 'count_only' => (
     isa => 'Bool',
     is => 'rw',
+    init_arg => undef,
     default => 0,
 );
 
@@ -34,6 +35,7 @@ has 'count_only' => (
 has 'acl_by_wftype' => (
     isa => 'HashRef',
     is => 'rw',
+    init_arg => undef,
     default => sub { {} },
 );
 
@@ -177,12 +179,35 @@ sub _search {
 
     # ACLs part 3: apply ACL checks of type RegEx by filtering 'creator'
     if ($params->check_acl) {
-        $result = [ grep {
-            my $acl = $self->acl_by_wftype->{ $_->{workflow_type} };
-            $acl !~ /^(any|self|others)$/    # ACL of type regex?
-                ? $_->{creator} =~ qr/$acl/  # --> apply it
-                : 1
-        } @$result ];
+        my ($acl, $is_regex);
+
+        # check if there's any regex ACL
+        my $at_least_one_regex_acl = 0;
+
+        # map: workflow_type => is_regex_acl
+        my $acl_by_type = {
+            map {
+                $acl = $self->acl_by_wftype->{$_};
+                # ACL of type regex?
+                $is_regex = $acl !~ /^(any|self|others)$/;
+                $at_least_one_regex_acl |= $is_regex;
+                ( $_ => { acl => $acl, is_regex => $is_regex } )
+            }
+            keys %{ $self->acl_by_wftype }
+        };
+
+        if ($at_least_one_regex_acl) {
+            # apply regex checks
+            my $type;
+            $result = [ grep {
+                $type = $_->{workflow_type};
+                $acl = $acl_by_type->{$type}->{acl};
+                # if it's a regex...
+                $acl_by_type->{$type}->{is_regex}
+                    ? $_->{creator} =~ qr/$acl/  # ...apply it
+                    : 1
+            } @$result ];
+        }
     }
 
     return $result;
