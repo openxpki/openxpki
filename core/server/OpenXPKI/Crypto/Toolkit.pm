@@ -298,6 +298,7 @@ sub __instantiate_engine {
     delete $engine_of{$ident};
     $engine_of{$ident} = eval {
         $engine->new(
+            TMP => $tmp_dir_of{$ident},
             %{$params_of{$ident}},
         )
     };

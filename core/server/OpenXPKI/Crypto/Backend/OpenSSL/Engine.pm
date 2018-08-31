@@ -6,6 +6,8 @@ use warnings;
 
 package OpenXPKI::Crypto::Backend::OpenSSL::Engine;
 
+use File::Basename;
+use OpenXPKI::FileUtils;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use English;
@@ -35,6 +37,7 @@ sub new {
                         ENGINE_SECTION
                         ENGINE_USAGE
                         KEY_STORE
+                        TMP
                        }) {
 
     if (exists $keys->{$key}) {
@@ -75,7 +78,7 @@ sub __check_engine_usage {
 
 sub __check_key_store {
     my $self = shift;
-    if ($self->{KEY_STORE} !~ m{( \A ENGINE \z )|( \A OPENXPKI \z ) }xms) {
+    if ($self->{KEY_STORE} !~ m{\A ( ENGINE|OPENXPKI|DATAPOOL) \z}xms) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_WRONG_KEY_STORE",
             params  => { "ATTRIBUTE" => $self->{KEY_STORE}},
@@ -187,6 +190,30 @@ sub get_key_store
 sub get_keyfile
 {
     my $self = shift;
+
+    if ($self->get_key_store() eq "DATAPOOL") {
+        ##! 16: 'Get key from datapool ' . $self->{KEY}
+        if (!$self->{'tmp_keyfile'} || ! -e $self->{'tmp_keyfile'}) {
+            my $fu = OpenXPKI::FileUtils->new();
+            my $dir = $fu->get_safe_tmpdir({
+                TMP => $self->{TMP},
+            });
+            $self->{'tmp_keyfile'} = $dir.'/'.$self->{KEY};
+
+            my $dp = CTX('api2')->get_data_pool_entry(
+                namespace => 'sys.crypto.keys',
+                key => $self->{KEY},
+            );
+
+            ##! 16: 'Writing keyfile ' . $self->{'tmp_keyfile'}
+            $fu->write_file({
+                FILENAME => $self->{'tmp_keyfile'},
+                CONTENT => $dp->{value}
+            });
+        }
+        return $self->{'tmp_keyfile'};
+    }
+
     return $self->{KEY};
 }
 
@@ -257,6 +284,21 @@ sub key_usable {
         return 0;
     }
     return 1;
+}
+
+# cleanup temporary key files
+sub DESTROY{
+    my $self = shift;
+
+    if ($self->{'tmp_keyfile'} && -e $self->{'tmp_keyfile'}) {
+        unlink $self->{'tmp_keyfile'};
+        rmdir dirname($self->{'tmp_keyfile'});;
+    }
+
+    if ($self->{CERT} && -e $self->{CERT} && dirname($self->{CERT}) eq $self->{TMP}) {
+        unlink $self->{CERT};
+    }
+
 }
 
 1;
