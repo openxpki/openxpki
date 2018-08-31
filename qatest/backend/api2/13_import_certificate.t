@@ -17,11 +17,10 @@ use Test::Exception;
 
 # Project modules
 use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
+# use OpenXPKI::Debug; BEGIN { $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Database.*'} = 0b1111111 }
 use OpenXPKI::Test;
 
-
-plan tests => 13;
-
+plan tests => 15;
 
 =pod
 
@@ -100,6 +99,15 @@ lives_and {
     my $result = $oxitest->api2_command("import_certificate" => { data => $cert1_pem });
     is $result->{identifier}, $result->{issuer_identifier};
 } "Import and recognize self signed root certificate";
+
+use_ok "OpenXPKI::Crypt::X509";
+
+lives_and {
+    my $cert_id = $dbdata->cert("alpha_root_2")->id;
+    my $result = $oxitest->api2_command("get_cert" => { identifier => $cert_id, format => 'PEM' });
+    my $cert = OpenXPKI::Crypt::X509->new($result); # initialize with PEM data
+    is $cert->cert_identifier, $cert_id;
+} "Querying imported certificate matches original data";
 
 # Second import should fail
 throws_ok {

@@ -20,11 +20,12 @@ has data => (
 
 has pem => (
     is => 'ro',
-    required => 0,
+    init_arg => undef,
     isa => 'Str',
     lazy => 1,
     default => sub {
         my $self = shift;
+        # convert DER to PEM
         my $pem = encode_base64($self->data());
         $pem =~ s{\s}{}g;
         $pem =~ s{ (.{64}) }{$1\n}xmsg;
@@ -40,7 +41,7 @@ has _cert => (
 
 has cert_identifier => (
     is => 'rw',
-    required => 0,
+    init_arg => undef,
     isa => 'Str',
     reader => 'get_cert_identifier',
     lazy => 1,
@@ -55,7 +56,7 @@ has cert_identifier => (
 
 has subject => (
     is => 'ro',
-    required => 0,
+    init_arg => undef,
     isa => 'Str',
     reader => 'get_subject',
     lazy => 1,
@@ -67,7 +68,7 @@ has subject => (
 
 has issuer => (
     is => 'ro',
-    required => 0,
+    init_arg => undef,
     isa => 'Str',
     reader => 'get_issuer',
     lazy => 1,
@@ -79,7 +80,7 @@ has issuer => (
 
 has subject_key_id => (
     is => 'rw',
-    required => 0,
+    init_arg => undef,
     isa => 'Str',
     reader => 'get_subject_key_id',
     lazy => 1,
@@ -97,7 +98,7 @@ has subject_key_id => (
 
 has authority_key_id => (
     is => 'rw',
-    required => 0,
+    init_arg => undef,
     isa => 'Str',
     reader => 'get_authority_key_id',
     lazy => 1,
@@ -109,7 +110,7 @@ has authority_key_id => (
 
 has notbefore => (
     is => 'ro',
-    required => 0,
+    init_arg => undef,
     isa => 'Int',
     lazy => 1,
     default => sub {
@@ -120,7 +121,7 @@ has notbefore => (
 
 has notafter => (
     is => 'ro',
-    required => 0,
+    init_arg => undef,
     isa => 'Int',
     lazy => 1,
     default => sub {
@@ -131,7 +132,7 @@ has notafter => (
 
 has serial => (
     is => 'ro',
-    required => 0,
+    init_arg => undef,
     isa => 'Str',
     reader => 'get_serial',
     lazy => 1,

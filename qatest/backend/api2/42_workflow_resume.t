@@ -8,6 +8,7 @@ use FindBin qw( $Bin );
 
 # CPAN modules
 use Test::More;
+use Data::UUID;
 
 # Project modules
 use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
@@ -53,6 +54,8 @@ my $workflow_def = {
     },
 };
 
+my $uuid = Data::UUID->new->create_str; # so we don't see workflows from previous test runs
+
 my $oxitest = OpenXPKI::Test->new(
     with => [ qw( TestRealms Workflows ) ],
     add_config => {
@@ -89,5 +92,10 @@ my $info = $oxitest->api2_command("resume_workflow" => { id => $wf->id, async =>
 
 is $info->{workflow}->{proc_state}, "finished", "workflow is finished";
 is $info->{workflow}->{state}, "SUCCESS", "workflow is in state SUCCESS";
+
+# delete test workflows
+$oxitest->dbi->start_txn;
+$oxitest->dbi->delete(from => 'workflow', where => { workflow_type => "wf_that_explodes" } );
+$oxitest->dbi->commit;
 
 1;

@@ -339,6 +339,7 @@ sub run {
     $self->log->trace(sprintf "DB query: %s", $query_string) if $self->log->is_trace;
 
     my $rownum = $sth->execute;
+    ##! 16: "$rownum rows affected"
 
     return $return_rownum ? $rownum : $sth;
 }
@@ -519,7 +520,7 @@ sub commit {
         $self->log->debug("commit() was called without indicating a transaction start via start_txn() first")
     }
 
-    ##! 16: "Commit of changes"
+    ##! 16: "Commiting changes"
     $self->dbh->commit;
     $self->_clear_txn_starter;
 }
