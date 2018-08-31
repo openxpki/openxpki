@@ -12,7 +12,7 @@ use TestCGI;
 #Log::Log4perl->easy_init($DEBUG);
 Log::Log4perl->easy_init($ERROR);
 
-use Test::More tests => 4;
+use Test::More tests => 8;
 
 package main;
 
@@ -43,5 +43,36 @@ $result = $client->mock_request({
     'password' => 'openxpki'
 });
 
-like($result->{goto}, "/(redirect\!)?welcome/", 'Logged in');
+like($result->{goto}, "/(redirect\!)?welcome/", 'Logged in - Welcome');
+
+$result = $client->mock_request({
+    'page' => 'logout',
+});
+
+like($result->{goto}, "/login!logout/", 'Logout Page');
+
+$result = $client->mock_request({
+    'page' => 'information!issuer',
+});
+
+like($result->{goto}, "/login/", 'Login requested');
+
+$result = $client->mock_request({
+    'action' => 'login!stack',
+    'auth_stack' => "Testing",
+});
+
+$result = $client->mock_request({
+    'action' => 'login!password',
+    'username' => 'raop',
+    'password' => 'openxpki'
+});
+
+like($result->{goto}, "/(redirect\!)?welcome/", 'Logged in - Welcome');
+
+$result = $client->mock_request({
+    'page' => 'welcome',
+});
+
+like($result->{goto}, "/information!issuer/", 'Redirect to requested page');
 

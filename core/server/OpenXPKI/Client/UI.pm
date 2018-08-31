@@ -584,6 +584,11 @@ sub handle_login {
 
                 $self->logger()->debug('New frontend session id : '. $session->id );
 
+                if ($redirect) {
+                    $self->logger()->trace('Carry over redirect target ' . $redirect);
+                    $session->param('redirect', $redirect);
+                }
+
                 # set some data
                 $session->param('backend_session_id', $self->backend()->get_session_id() );
                 Log::Log4perl::MDC->put('sid', substr($session->id,0,4));
