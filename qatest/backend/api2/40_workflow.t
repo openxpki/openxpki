@@ -11,6 +11,7 @@ use Test::More;
 use Test::Deep;
 use Test::Exception;
 use DateTime;
+use Data::UUID;
 
 # Project modules
 use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
@@ -137,14 +138,16 @@ sub workflow_def {
 my $wf_def_noinit = workflow_def("wf_type_no_initial_action");
 $wf_def_noinit->{state}->{INITIAL} = {};
 
+my $uuid = Data::UUID->new->create_str; # so we don't see workflows from previous test runs
+
 my $oxitest = OpenXPKI::Test->new(
     with => [ qw( TestRealms Workflows ) ],
     add_config => {
-        "realm.alpha.workflow.def.wf_type_1" => workflow_def("wf_type_1"),
-        "realm.alpha.workflow.def.wf_type_2" => workflow_def("wf_type_2"),
-        "realm.alpha.workflow.def.wf_type_3_unused" => workflow_def("wf_type_3_unused"),
-        "realm.alpha.workflow.def.wf_type_no_initial_action" => $wf_def_noinit,
-        "realm.beta.workflow.def.wf_type_4" => workflow_def("wf_type_4"),
+        "realm.alpha.workflow.def.wf_type_1_$uuid" => workflow_def("wf_type_1"),
+        "realm.alpha.workflow.def.wf_type_2_$uuid" => workflow_def("wf_type_2"),
+        "realm.alpha.workflow.def.wf_type_3_unused_$uuid" => workflow_def("wf_type_3_unused"),
+        "realm.alpha.workflow.def.wf_type_no_initial_action_$uuid" => $wf_def_noinit,
+        "realm.beta.workflow.def.wf_type_4_$uuid" => workflow_def("wf_type_4"),
     },
     enable_workflow_log => 1, # while testing we do not log to database by default
 );
@@ -163,23 +166,23 @@ CTX('session')->data->role('User');
 CTX('session')->data->pki_realm("alpha");
 
 CTX('session')->data->user('wilhelm');
-my $wf_t1_sync =   $oxitest->create_workflow("wf_type_1", $params);
-my $wf_t1_async1 = $oxitest->create_workflow("wf_type_1", $params);
-my $wf_t1_async2 = $oxitest->create_workflow("wf_type_1", $params);
+my $wf_t1_sync =   $oxitest->create_workflow("wf_type_1_$uuid", $params);
+my $wf_t1_async1 = $oxitest->create_workflow("wf_type_1_$uuid", $params);
+my $wf_t1_async2 = $oxitest->create_workflow("wf_type_1_$uuid", $params);
 
 CTX('session')->data->user('franz');
-my $wf_t1_fail = $oxitest->create_workflow("wf_type_1", $params);
+my $wf_t1_fail = $oxitest->create_workflow("wf_type_1_$uuid", $params);
 
 CTX('session')->data->user('wilhelm');
-my $wf_t2 =   $oxitest->create_workflow("wf_type_2", $params);
+my $wf_t2 =   $oxitest->create_workflow("wf_type_2_$uuid", $params);
 
 CTX('session')->data->pki_realm("beta");
-my $wf_t4 =   $oxitest->create_workflow("wf_type_4", $params);
+my $wf_t4 =   $oxitest->create_workflow("wf_type_4_$uuid", $params);
 
 throws_ok {
     CTX('session')->data->pki_realm("alpha");
     $oxitest->api2_command("create_workflow_instance" => {
-        workflow => "wf_type_no_initial_action",
+        workflow => "wf_type_no_initial_action_$uuid",
         params => {
             message => "Lucy in the sky with diamonds",
             link => "http://www.denic.de",
@@ -199,8 +202,8 @@ CTX('session')->data->pki_realm('alpha');
 lives_and {
     my $result = $oxitest->api2_command("get_workflow_instance_types");
     cmp_deeply $result, superhashof({
-        wf_type_1 => superhashof({ label => "wf_type_1" }),
-        wf_type_2 => superhashof({ label => "wf_type_2" }),
+        $wf_t1_sync->type => superhashof({ label => "wf_type_1" }),
+        $wf_t2->type      => superhashof({ label => "wf_type_2" }),
     }), "get_workflow_instance_types()";
 }
 
@@ -209,7 +212,7 @@ lives_and {
 #
 lives_and {
     my $result = $oxitest->api2_command("get_workflow_type_for_id" => { id => $wf_t1_sync->id });
-    is $result, "wf_type_1", "get_workflow_type_for_id()";
+    is $result, $wf_t1_sync->type, "get_workflow_type_for_id()";
 }
 
 dies_ok {
@@ -292,9 +295,9 @@ lives_and {
 lives_and {
     my $result = $oxitest->api2_command("list_workflow_titles");
     cmp_deeply $result, superhashof({
-        'wf_type_1'         => { label => ignore(), description => ignore(), },
-        'wf_type_2'         => { label => ignore(), description => ignore(), },
-        'wf_type_3_unused'  => { label => ignore(), description => ignore(), },
+        $wf_t1_sync->type         => { label => ignore(), description => ignore(), },
+        $wf_t2->type              => { label => ignore(), description => ignore(), },
+        "wf_type_3_unused_$uuid"  => { label => ignore(), description => ignore(), },
     });
 } "list_workflow_titles()";
 
@@ -320,7 +323,7 @@ lives_and {
             proc_state => 'manual',
             reap_at => re(qr/^\d+$/),
             state => 'PERSIST',
-            type => 'wf_type_2',
+            type => $wf_t2->type,
             wake_up_at => ignore(),
             description => ignore(),
             label => 'wf_type_2',
@@ -386,7 +389,7 @@ lives_and {
         workflow => superhashof({
             id => re(qr/^\d+$/),
             state => 'INITIAL',
-            type => 'wf_type_2',
+            type => $wf_t2->type,
             description => ignore(),
             label => 'wf_type_2',
         }),
@@ -459,7 +462,7 @@ lives_and {
 #
 lives_and {
     my $result = $oxitest->api2_command("get_workflow_activities" => {
-        workflow => "wf_type_2",
+        workflow => $wf_t2->type,
         id => $wf_t2->id,
     });
     cmp_deeply $result, [
@@ -472,7 +475,7 @@ lives_and {
 #
 lives_and {
     my $result = $oxitest->api2_command("get_workflow_activities_params" => {
-        workflow => "wf_type_2",
+        workflow => $wf_t2->type,
         id => $wf_t2->id,
     });
     cmp_deeply $result, [
@@ -524,18 +527,18 @@ search_result { id => [ $wf_t1_sync->id, $wf_t1_fail->id, $wf_t2->id ] },
 
 # TODO Tests: Remove superbagof() constructs below once we have a clean test database
 
-search_result { attribute => [ { KEY => "creator", VALUE => "franz" } ] },
+search_result { type => $wf_t1_fail->type, attribute => [ { KEY => "creator", VALUE => "franz" } ] },
     all(
-        superbagof($wf_t1_fail_data),                                                  # expected record
+        superbagof($wf_t1_fail_data),                                       # expected record
         array_each(superhashof({ 'workflow_type' => $wf_t1_fail->type })),  # make sure we got no other types (=other creators)
     ),
     "search_workflow_instances() - search by ATTRIBUTE";
 
-search_result { type => [ "wf_type_1", "wf_type_2" ] },
+search_result { type => [ $wf_t1_sync->type, $wf_t2->type ] },
     superbagof($wf_t1_sync_data, $wf_t1_fail_data, $wf_t2_data),
     "search_workflow_instances() - search by TYPE (ArrayRef)";
 
-search_result { type => "wf_type_2" },
+search_result { type => $wf_t2->type },
     all(
         superbagof($wf_t2_data),                                                    # expected record
         array_each(superhashof({ 'workflow_type' => $wf_t2->type })),    # make sure we got no other types
@@ -590,15 +593,15 @@ lives_and {
 
 # Check custom order by TYPE
 lives_and {
-    my $result = $oxitest->api2_command("search_workflow_instances" => { pki_realm => "alpha", order => "WORKFLOW_TYPE" });
-    my $prev_type;
+    my $result = $oxitest->api2_command("search_workflow_instances" => { pki_realm => "alpha", order => "workflow_proc_state" });
+    my $prev_val;
     my $sorting_ok = 1;
     for (@{$result}) {
-        $sorting_ok = 0 if $prev_type and ($_->{'workflow_type'} cmp $prev_type) > 0;
-        $prev_type = $_->{'workflow_type'};
+        $sorting_ok = 0 if $prev_val and ($_->{'workflow_proc_state'} cmp $prev_val) > 0;
+        $prev_val = $_->{'workflow_proc_state'};
     }
     is $sorting_ok, 1;
-} "search_workflow_instances() - result ordering by custom TYPE";
+} "search_workflow_instances() - result ordering by custom column";
 
 search_result
     {
@@ -633,5 +636,10 @@ lives_and {
     is $result, 3;
 
 } "search_workflow_instances_count()";
+
+# delete test workflows
+$oxitest->dbi->start_txn;
+$oxitest->dbi->delete(from => 'workflow', where => { workflow_type => [ -like => "%$uuid" ] } );
+$oxitest->dbi->commit;
 
 1;
