@@ -51,8 +51,8 @@ sub dump_workflow {
         } else {
             print "\n===Context===\n";
             my $context = $reply->{PARAMS}->{WORKFLOW}->{CONTEXT};
-            foreach my $key (keys %{$context}) {
-                printf "=%-20s: %s\n", $key, $context->{$key};
+            foreach my $key (sort keys %{$context}) {
+                printf "=%-20s: %s\n", $key, $context->{$key} if (defined $context->{$key});
             }
         }
     }
