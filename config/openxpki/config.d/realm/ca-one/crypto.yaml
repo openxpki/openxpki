@@ -45,9 +45,11 @@ token:
     shell: /usr/bin/openca-scep
     #backend: OpenXPKI::Crypto::Tool::LibSCEP
 
-  # A different scep token for another scep server
-  ca-one-special-scep:
-    inherit: ca-one-scep
+  # A different scep token for another scep server, served from datapool
+  #ca-one-special-scep:
+  #  inherit: ca-one-scep
+  #  key_store: DATAPOOL
+  #  key: "[% ALIAS %]"
 
 # Define the secret groups
 secret:

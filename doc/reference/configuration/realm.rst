@@ -1,11 +1,11 @@
 Realm configuration
 ====================================
 
-In order to create a new realm the easiest way is to copy the sample directory 
-tree ``realm/ca-one`` to a new directoy within the ``realm`` directory. Adjust the 
+In order to create a new realm the easiest way is to copy the sample directory
+tree ``realm/ca-one`` to a new directoy within the ``realm`` directory. Adjust the
 realm configuration file contents accordingly (see below).
 
-Then add a new section in the file ``system/realms.yaml`` where the new section key is 
+Then add a new section in the file ``system/realms.yaml`` where the new section key is
 identical to the new realm directory name used for the realm copy. Change the new realm
 section entries to match the desired values for the new realm.
 
@@ -331,11 +331,39 @@ The example above will then look like::
 If you need to name your keys according to a custom scheme, you also have GROUP (ca-one-certsign) and
 GENERATION (1) available for substitution.
 
+**token in datapool**
+
+Instead of having the tokens key files on the filesystem it is possible to
+store them in the datapool. Please be aware of the security implications of
+putting your CAs PRIVATE KEYS into the datapool which is readable by anbody
+with access to the database or the openxpki socket!
+
+You must set the attribute ``key_store`` to ``DATAPOOL`` and provide the
+name of the used datapool key using the ``key`` attribute::
+
+    ca-one-scep:
+        inherit: default
+        key_store: DATAPOOL
+        key: "[% ALIAS %]"
+
+This will read the SCEP key from the datapool, the used namespace is
+``sys.crypto.keys``. You must import the key yourself, e.g. from the CLI::
+
+    openxpkicli set_data_pool_entry --arg namespace=sys.crypto.keys \
+        --arg key=ca-one-scep-1 \
+        --arg encrypt=1 \
+        --filearg value=file_with_key.pem
+
+Using the datapool encryption hides the value of the key from database
+admins but still exposes it in clear text to anybody with access to the
+command line tool! It should be obvious that you can not store the
+data-vault token this way as it is neede to decrypt the datapool items!
+
 secret groups
 ^^^^^^^^^^^^^
 
-A secret group maintains the password cache for your keys and PINs. 
-You need to setup at least one secret group for each realm. The most 
+A secret group maintains the password cache for your keys and PINs.
+You need to setup at least one secret group for each realm. The most
 common version is the plain password::
 
     secret:
@@ -346,10 +374,10 @@ common version is the plain password::
 
 
 This tells the OpenXPKI daemon to ask for the default only once and then
-store it "forever". If you want to have the secret cleared at the end of 
+store it "forever". If you want to have the secret cleared at the end of
 the session, set *cache: session*.
 
-To increase the security of your key material, you can configure secret 
+To increase the security of your key material, you can configure secret
 splitting (k of n). ::
 
     secret:
@@ -362,7 +390,7 @@ splitting (k of n). ::
 
 TODO: How to create the password segments?
 
-If you have a good reason to put your password into the configuration, 
+If you have a good reason to put your password into the configuration,
 use the *literal* type::
 
     secret:
@@ -372,9 +400,9 @@ use the *literal* type::
         value: my_not_so_secret_password
         cache: daemon
 
-You can also use the secret groups for other purposes, in this case you 
+You can also use the secret groups for other purposes, in this case you
 need to add "export: 1" to the group. This allows you to use the get_secret
-method of the TokenManager (OpenXPKI::Crypto::TokenManager) to retrieve the 
+method of the TokenManager (OpenXPKI::Crypto::TokenManager) to retrieve the
 plain value of the secret.
 
 
