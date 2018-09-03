@@ -146,7 +146,7 @@ sub _build_client {
     if ($reply->{SERVICE_MSG} =~ /GET_(.*)_LOGIN/) {
         my $login_type = $1;
 
-        if( $login_type ne 'PASSWD' ) {
+        if( $login_type !~ /\A(CLIENT_SSO|CLIENT_X509|X509|PASSWD)\z/ ) {
             $log->error("Unsupported login scheme: $login_type");
             die "Unsupported login scheme: $login_type. Stopped";
         }
@@ -157,7 +157,7 @@ sub _build_client {
             die "No login/password specified";
         }
         $log->debug("Do login with user ". $auth->{user});
-        $reply = $client->send_receive_service_msg('GET_PASSWD_LOGIN',{
+        $reply = $client->send_receive_service_msg('GET_'.$login_type.'_LOGIN',{
             LOGIN => $auth->{user}, PASSWD => $auth->{pass},
         });
     }
