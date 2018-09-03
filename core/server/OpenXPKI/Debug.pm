@@ -7,9 +7,10 @@
 
 ## BIG FAT WARNING: This class works using so called compile time filters
 # The decission weather to apply debugging to a class or not is made based
-# on the %FILTER hash at the time the module is included for the first time
-# In turn, if you load a module before you set up the %FILTER hash, the
-# module will not be decorated with debug output!
+# on the %BITMASK and %LEVEL hashes at the time the module is included for
+# the first time.
+# In turn, if you load a module before you set up the %BITMASK / %LEVEL hashes,
+# the module will not be decorated with debug output!
 # The fastest way to ruin the story is "use" in the head of your start scripts.
 
 use strict;
@@ -23,12 +24,12 @@ use Filter::Util::Call;
 use Data::Dumper;
 
 our %LEVEL;
+our %BITMASK;
 our $USE_COLOR = 0;
 
-sub import
-{
+sub import {
     my($self,$module) = @_ ;
-    if (! defined $module) {
+    if (not defined $module) {
         # if the module name was not passed explicitly using
         # use OpenXPKI::Debug 'ModuleName',
         # we just assume that the module is the caller of the
@@ -39,27 +40,40 @@ sub import
     if ($USE_COLOR) {
         use Term::ANSIColor;
     }
+
     ## only for debugging of this module
     #print STDERR "OpenXPKI::Debug: Checking module $module ...\n";
-    #print STDERR Dumper %LEVEL;
+    #print STDERR Dumper %BITMASK;
 
-    ## perhaps a regex was used in the LEVEL spec
-    if (not exists $LEVEL{$module})
-    {
-        foreach my $regex (keys %LEVEL)
-        {
-            #print STDERR "Regex $regex ~ $module\n";
-           if ($module =~ /^$regex$/) {
-              print STDERR "Debugging module(s) '$module' with level $LEVEL{$regex}.\n";
-              $LEVEL{$module} = $LEVEL{$regex};
-           }
+    if (not exists $BITMASK{$module}) {
+        if (exists $LEVEL{$module}) {
+            $BITMASK{$module} = __level_to_bitmask($LEVEL{$module});
+        }
+        else {
+            ## try to interpret BITMASK specs as regex
+            for my $regex (keys %BITMASK) {
+               if ($module =~ /^$regex$/) {
+                  $BITMASK{$module} = $BITMASK{$regex};
+                  last;
+               }
+            }
+            ## try to interpret LEVEL specs as regex
+            if (not exists $BITMASK{$module}) {
+                for my $regex (keys %LEVEL) {
+                   if ($module =~ /^$regex$/) {
+                      $BITMASK{$module} = __level_to_bitmask($LEVEL{$regex});
+                      last;
+                   }
+                }
+            }
         }
     }
 
     ## return if the module is not in debug mode
     ## debug messages no longer influence the performance now
-    return if (not exists $LEVEL{$module} or
-               $LEVEL{$module} < 1);
+    return unless $BITMASK{$module}; # not defined or 0
+
+    printf STDERR "Debugging module '%s' with bitmask %b.\n", $module, $BITMASK{$module};
 
     #print STDERR "Add Debug in $module\n";
     ## activate debugging for this module
@@ -67,23 +81,26 @@ sub import
     filter_add($self) ;
 }
 
-sub filter
-{
+sub __level_to_bitmask {
+    my ($level) = @_;
+    # get the exponent of the last power of 2
+    my $log_base_2 = floor( log($level) / log(2) );
+    # set all bits up to that power of 2
+    return 2 ** ($log_base_2 + 1) - 1;
+}
+
+sub filter {
     my $self = shift;
     my($status) ;
 
-    if (($status = filter_read()) > 0)
-    {
-        if ($_ =~ /^\s*##!/)
-        {
+    if (($status = filter_read()) > 0) {
+        if ($_ =~ /^\s*##!/) {
             my $msg = $_;
-            if ($msg =~ s/^\s*##!\s*(\d+)\s*([\w\s]*):\s*//)
-            {
+            if ($msg =~ s/^\s*##!\s*(\d+)\s*([\w\s]*):\s*//) {
                 ## higher levels mean more noise
                 my $level = $1;
                 my $color = $2;
-                if ($1 & $LEVEL{$self->{MODULE}})
-                {
+                if ($1 & $BITMASK{$self->{MODULE}}) {
                     $msg =~ s/\n//s;
                     ##--------------------------------------------------##
                     # HERE BE DRAGONS ... HERE BE DRAGONS ...
@@ -121,7 +138,7 @@ sub filter
             MESSAGE    => sub { $msg },
             LINE       => \$line,
             SUBROUTINE => \$subroutine,
-            LEVEL      => q{$level},
+            BITMASK    => q{$level},
             COLOR      => q{$color}
         });
     };
@@ -149,8 +166,7 @@ XEOF
     $status ;
 }
 
-sub debug
-{
+sub debug {
     my $arg_ref    = shift;
     my $msg        = $arg_ref->{MESSAGE};
     if (ref $msg ne 'CODE') {
@@ -166,7 +182,7 @@ sub debug
     $msg = &$msg();
     my $line       = $arg_ref->{LINE};
     my $subroutine = $arg_ref->{SUBROUTINE};
-    my $level      = $arg_ref->{LEVEL} || "0";
+    my $bitmask    = $arg_ref->{BITMASK} || "0";
     my $color      = $arg_ref->{COLOR};
 
     $msg = OpenXPKI::Debug::__censor_msg($msg);
@@ -185,7 +201,7 @@ sub debug
         my ($seconds, $microseconds) = Time::HiRes::gettimeofday();
         $timestamp .= '.' . sprintf("%06d", $microseconds);
     };
-    my $output = "$timestamp DEBUG:$level PID:$PROCESS_ID $msg";
+    my $output = "$timestamp DEBUG:$bitmask PID:$PROCESS_ID $msg";
     if ($USE_COLOR && $color) {
         eval {
             # try to color the output
@@ -236,30 +252,31 @@ your code then you have to do the following.
 my $variable = "some critical content";
 ##! 2: $variable
 
-A debug statement must be started with "\s*##!". The next number
-specifies the debug level. Higher levels mean more messages. If the
-message is important then you should choose a small number bigger
+A debug statement must be started with "\s*##!". The next number specifies
+the debug level. It has to be a power of 2. Higher levels mean more messages.
+If the message is important then you should choose a small number bigger
 than zero. The colon is a separator. After the colon the code follows
 which will be executed.
 
-If we use debug level 1 for this module then the above message will
-not be displayed. If you use 3 then the above message will be displayed.
+If later on you set debug level 1 for this module then the above message will
+not be displayed. If you set level 4 the message will be displayed.
 
 =item 2. Use your module:
 
-Add to the startup script the following lines:
+Add the following lines to the startup script:
 
-use OpenXPKI::Debug;
-$OpenXPKI::Debug::LEVEL{'MyM.*'} = 100;
+    use OpenXPKI::Debug;
+    $OpenXPKI::Debug::BITMASK{'MyM.*'} = 0b1010; # BITMASK: show level 2 and 8 messages
+    # $OpenXPKI::Debug::LEVEL{'MyM.*'} = 4;      # LEVEL: show messages up to level 4
 
-require MyModule; ## or require a module which use my Module
+    require MyModule; ## or require a module which use my Module
 
-In practice you will only have to add the LEVEL line because
-require is used to load the server which does the rest for you.
+In practice you will only have to add the BITMASK or LEVEL line because
+C<require> is used to load the server which does the rest for you.
 
-Please remember to not implement a use statement before you run
-require after you specified the debug level. This debug module
-manipulates the code parsing of Perl!!!
+Please remember to not implement a C<use> statement before you run
+C<require> after you specified the debug level. This debug module
+manipulates the code parsing of Perl!
 
 =back
 
@@ -267,26 +284,36 @@ manipulates the code parsing of Perl!!!
 
 =head2 import
 
-This function is executed if you call use or require for a module.
-It checks if debugging is activated for this module and decides
-whether a source filter has to be loaded or not.
+Executed if you C<use> or C<require> this module in another module. Checks if
+debugging is activated for the calling module and decides whether a source
+filter has to be applied or not.
 
 =head2 filter
 
-is the function which implements the source filtering for the debugging.
-The function will only be used if the debugging was activated by the
-import function. Please see Filter::Util::Call for more details.
+Implements the source filtering.
+
+This function will only be used if the debugging was activated by the
+import function. Please see L<Filter::Util::Call> for more details.
 
 =head2 debug
 
-This function builds the debug message. It outputs such things like
-the debug level, the module name and the source code line.
+Build the debug message. Also output debug level, module name and source code
+line.
 
 =head2 __censor_msg
 
-This method is used to censor debug messages that potentially contain
-confidential information such as passwords or private keys.
+Censor debug messages that potentially contain confidential information such as
+passwords or private keys.
+
+=head2 __level_to_bitmask
+
+Converts a maximum debug level to a bitmask. The bitmask will be the minimum
+value that includes the given level and where all bits are set.
+
+    7  => 111  (7)
+    8  => 1111 (15)
+    12 => 1111 (15)
 
 =head1 See also
 
-Filter::Util::Call
+L<Filter::Util::Call>
