@@ -214,7 +214,7 @@ sub get_reap_at_interval{
         ##! 16: 'manual set: '.$self->{REAP_AT_INTERVAL}
         return $self->{REAP_AT_INTERVAL};
     }
-    ##! 16: nothing defined, return default'
+    ##! 16: 'nothing defined, return default'
     return "+0000000005";
 }
 
@@ -250,7 +250,7 @@ sub get_retry_interval {
         return $self->param('retry_interval');
     }
     # TODO default setting?
-    ##! 16: nothing defined, return default'
+    ##! 16: 'nothing defined, return default'
     return "+0000000005";
 }
 
