@@ -6467,10 +6467,6 @@ msgstr "Benutzername"
 #~ msgstr "Seriennummer des Workflowprozesses"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_TYPE_FOR_ID_NO_RESULT_FOR_ID"
-#~ msgstr "Seriennummer des Workflowprozesses"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS"
 #~ msgstr "Seriennummer des Workflowprozesses"
 
