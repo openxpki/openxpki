@@ -756,7 +756,7 @@ sub sc_analyze_smartcard {
         SOFT => 1,
     };
 
-    foreach my $type (keys %{$user_certs->{by_type}}) {
+    foreach my $type (sort keys %{$user_certs->{by_type}}) {
 
         CTX('log')->application()->debug("Start evaluation for type $type");
 
