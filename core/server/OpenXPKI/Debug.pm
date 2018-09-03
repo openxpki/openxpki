@@ -36,14 +36,6 @@ sub import
         $module = (caller(0))[0];
     }
 
-     #foreach my $key (keys %LEVEL)
-     #{
-     #   print STDERR "Debugging module(s) '$key' with level $LEVEL{$key}.\n";
-     #}
-
-    ## import only be called to specify the different levels
-    return if (not defined $module);
-
     if ($USE_COLOR) {
         use Term::ANSIColor;
     }
