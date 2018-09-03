@@ -17,7 +17,7 @@ use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 
 
-plan tests => 30;
+plan tests => 31;
 
 
 #
@@ -152,6 +152,11 @@ lives_and {
     $privkey = $result->{PRIVATE_KEY};
     isnt $privkey, "";
 } "Fetch PKCS12";
+
+lives_and {
+    my $exists = $oxitest->api2_command('private_key_exists_for_cert' => { identifier => $cert_id } );
+    is $exists, 1;
+} "confirm that private key exists";
 
 my ($tmp, $tmp_name) = tempfile(UNLINK => 1);
 print $tmp $privkey;
