@@ -17,12 +17,12 @@ TODO: {
 
 diag("Deploying OpenXPKI test instance\n");
 
-# The server tests relys on the ca and database which is setup 
+# The server tests relys on the ca and database which is setup
 # in the earlier tests
 
 `mkdir -p t/var/openxpki/session/`;
 
-my $socketfile = 't/var/openxpki/openxpki.socket'; 
+my $socketfile = 't/var/openxpki/openxpki.socket';
 my $pidfile = 't/var/openxpki/openxpkid.pid';
 
 -e $socketfile && die "Socketfile exists - please stop server/remove socket";
@@ -34,7 +34,7 @@ use OpenXPKI::Server;
 $ENV{OPENXPKI_CONF_DB} = 't/config.git';
 
 # FIXME - prove becomes defunct - seems to be some issue with stdout/stderr
-#ok!(OpenXPKI::Control::start({ SILENT => 0, DEBUG =>  0 }));
+#ok!(OpenXPKI::Control::start({ SILENT => 0, DEBUG_BITMASK =>  0 }));
 ok(!system('OPENXPKI_CONF_DB="t/config.git" perl t/60_workflow/start.pl 2>/dev/null 1>/dev/null'));
 
 # wait for server startup
