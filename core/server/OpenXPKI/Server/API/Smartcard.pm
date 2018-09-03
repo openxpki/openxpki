@@ -462,8 +462,11 @@ sub sc_analyze_smartcard {
     if (defined $wf_types) {
         # get workflow information (existing workflows for card)
         foreach my $wf_type (@{$wf_types}) {
-            $result->{WORKFLOWS}->{$wf_type} =
-            CTX('api')->search_workflow_instances({
+
+            # we just need the most recent SUCCESS and most recent PENDING one
+            my @instances;
+
+            my $res = CTX('api')->search_workflow_instances({
                 TYPE => $wf_type,
                 ATTRIBUTE => [
                     {
@@ -471,9 +474,29 @@ sub sc_analyze_smartcard {
                         VALUE => $tokenid,
                     },
                 ],
+                STATE => 'SUCCESS',
                 ORDER => 'WORKFLOW.WORKFLOW_LAST_UPDATE',
                 REVERSE => 1,
+                LIMIT => 1,
             });
+            push @instances, $res->[0] if (@$res);
+
+            $res = CTX('api')->search_workflow_instances({
+                TYPE => $wf_type,
+                ATTRIBUTE => [
+                    {
+                        KEY => 'token_id',
+                        VALUE => $tokenid,
+                    },
+                ],
+                PROC_STATE => 'manual',
+                ORDER => 'WORKFLOW.WORKFLOW_LAST_UPDATE',
+                REVERSE => 1,
+                LIMIT => 1,
+            });
+            push @instances, $res->[0] if (@$res);
+
+            $result->{WORKFLOWS}->{$wf_type} = \@instances;
         }
     }
 
