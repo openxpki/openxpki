@@ -17,9 +17,15 @@ use OpenXPKI::Server::API2::Types;
 
 =head2 get_cert
 
-returns the requested certificate. The supported arguments are IDENTIFIER and
-FORMAT. IDENTIFIER is required whilst FORMAT is optional. FORMAT can have the
-following values:
+returns the requested certificate.
+
+B<Parameters>
+
+=over
+
+=item * identifier
+
+=item * format
 
 =over
 
@@ -34,12 +40,6 @@ following values:
 =item * DBINFO - information from the certificate and attributes table
 
 =back
-
-B<Parameters>
-
-=over
-
-=item * C<XXX> I<Bool> - XXX. Default: XXX
 
 =back
 

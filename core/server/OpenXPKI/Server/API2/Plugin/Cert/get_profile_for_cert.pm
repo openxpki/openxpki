@@ -24,7 +24,7 @@ B<Parameters>
 
 =over
 
-=item * C<XXX> I<Bool> - XXX. Default: XXX
+=item * identifier
 
 =back
 
