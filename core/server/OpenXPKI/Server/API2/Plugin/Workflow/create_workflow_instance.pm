@@ -61,11 +61,11 @@ command "create_workflow_instance" => {
             message => "Could not start workflow (type might be unknown)",
             params => { type => $type }
         );
-
     $workflow->reload_observer;
 
     ## init creator
     my $id = $workflow->id;
+    ##! 2: "New workflow's ID: $id"
 
     Log::Log4perl::MDC->put('wfid',   $id);
     Log::Log4perl::MDC->put('wftype', $type);

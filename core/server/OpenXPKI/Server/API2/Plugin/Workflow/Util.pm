@@ -9,6 +9,7 @@ use Try::Tiny;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Connector::WorkflowContext;
 use OpenXPKI::MooseParams;
+use OpenXPKI::Debug;
 
 =head2 validate_input_params
 
@@ -93,6 +94,7 @@ B<Positional parameters>
 =cut
 sub execute_activity {
     my ($self, $wf, $activity, $async, $wait) = @_;
+    ##! 2: 'execute activity ' . $activity
 
     # ASYNCHRONOUS - fork
     if ($async) {
@@ -130,6 +132,7 @@ B<Positional parameters>
 =cut
 sub _execute_activity_sync {
     my ($self, $workflow, $activity) = @_;
+    ##! 4: 'start'
 
     my $log = CTX('log')->workflow;
 
@@ -212,6 +215,7 @@ B<Positional parameters>
 =cut
 sub _execute_activity_async {
     my ($self, $workflow, $activity) = @_;
+    ##! 4: 'start'
 
     my $log = CTX('log')->workflow;
 
@@ -269,7 +273,7 @@ sub _execute_activity_async {
 # runs the given workflow activity on the Workflow engine
 sub _run_activity {
     my ($self, $wf, $ac) = @_;
-    ##! 8: 'execute activity ' . $ac
+    ##! 8: 'start'
 
     my $log = CTX('log')->workflow;
 
@@ -360,6 +364,7 @@ sub get_ui_info {
         attribute => { isa => 'Bool', optional => 1, default => 0 },
         activity  => { isa => 'Str',  optional => 1, },
     );
+    ##! 2: 'start'
 
     die "Please specify either 'id' or 'workflow'" unless ($args{id} or $args{workflow});
 
@@ -434,6 +439,7 @@ B<Positional parameters>:
 =cut
 sub get_ui_base_info {
     my ($self, $type) = @_;
+    ##! 2: 'start'
 
     # TODO we might use the OpenXPKI::Workflow::Config object for this
     # Note: Using create_workflow shreds a workflow id and creates an orphaned entry in the history table
@@ -479,6 +485,7 @@ sub get_ui_base_info {
 sub _get_config_details {
     my ($self, $factory, $type, $prefix, $state, $actions, $context) = @_;
     my $result = {};
+    ##! 4: 'start'
 
     # add activities (= actions)
     $result->{activity} = {};
@@ -551,8 +558,7 @@ B<Positional parameters>:
 =cut
 sub get_workflow_info {
     my ($self, $workflow) = @_;
-
-    ##! 1: "get_workflow_info"
+    ##! 2: 'start'
 
     ##! 64: Dumper $workflow
 
@@ -609,7 +615,7 @@ sub watch {
     my ($self, $workflow) = @_;
 
     my $timeout = time() + 15;
-    ##! 32:' Fork mode watch - timeout: '.$timeout
+    ##! 16: 'Fork mode watch - timeout: '.$timeout
 
     my $orig_state = {
         'state'       => $workflow->state,
@@ -647,6 +653,7 @@ sub watch {
 # Returns an instance of OpenXPKI::Server::Workflow
 sub fetch_workflow {
     my ($self, $type, $id) = @_;
+    ##! 2: 'start'
 
     my $factory = CTX('workflow_factory')->get_factory;
 
