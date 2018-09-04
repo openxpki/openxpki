@@ -13,30 +13,27 @@ minutes and will give you a ready to run OXI install available at http://localho
 Debian/Ubuntu Builds
 ----------------------
 
+**Note** Due to problems with packaging and outdated perl libs we discontinued support for Ubuntu!
+New users should use the v2 release branch which is available for Debian 8 (Jessie), for
+those running a v1 version we still maintain security and major bug fixes for the old release.
+
 **Packages are for 64bit systems (arch amd64), make sure that the en_US.utf8 locale is installed as the translation stuff will crash otherwise!**
 
 Start with a debian minimal install, we recommend to add "SSH Server" and "Web Server" in the package selection menu, as this will speed up the install later::
 
-Current release is |version| which is out for debian jessie and ubuntu trusty (14.04 LTS) on the package mirror at http://packages.openxpki.org/.
-
 Add the repository to your source list (jessie)::
 
-    echo "deb http://packages.openxpki.org/debian/ jessie release" > /etc/apt/sources.list.d/openxpki.list
-    aptitude update
-
-or ubuntu *trusty (14.04 LTS)* (those *DONT* work on recent Xenial 16.04!) ::
-
-    echo "deb http://packages.openxpki.org/ubuntu/ dists/trusty/release/binary-amd64/" > /etc/apt/sources.list.d/openxpki.list
+    echo "deb http://packages.openxpki.org/v2/debian/ jessie release" > /etc/apt/sources.list.d/openxpki.list
     aptitude update
 
 To avoid an "untrusted package" warning, you should add our package signing key (works only on debian yet)::
 
-    wget https://packages.openxpki.org/debian/Release.key -O - | apt-key add -
+    wget https://packages.openxpki.org/v2/debian/Release.key -O - | apt-key add -
 
 The https connection is protected by a Let's Encrypt certificate but if you want to validate the key on your own, the fingerprint is::
 
     gpg --print-md sha256 Release.key
-    Release.key: 78FE9779 A10D64CA 3CBB8D4C CE1DE44C 1AC69A93 FF2EFCF9 3AADBEC9 D3378F7B
+    Release.key: 9B156AD0 F0E6A6C7 86FABE7A D8363C4E 1611A2BE 2B251336 01D1CDB4 6C24BEF3
 
 As the init script uses mysql as default, but does not force it as a dependency, it is crucial that you have the mysql server and the perl mysql binding installed before you pull the OpenXPKI package::
 
