@@ -60,7 +60,7 @@ sub get_workflow_type_for_id {
         where => { workflow_id => $id },
     )
     or OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_TYPE_FOR_ID_NO_RESULT_FOR_ID',
+        message => 'No workflow found with the given ID',
         params  => { ID => $id },
     );
     my $type = $db_result->{workflow_type};

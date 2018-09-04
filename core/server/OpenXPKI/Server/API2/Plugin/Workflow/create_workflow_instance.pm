@@ -6,6 +6,11 @@ use OpenXPKI::Server::API2::EasyPlugin;
 OpenXPKI::Server::API2::Plugin::Workflow::create_workflow_instance
 
 =cut
+# Core modules
+use Scalar::Util 'blessed';
+
+# CPAN modules
+use Try::Tiny;
 
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
@@ -61,11 +66,11 @@ command "create_workflow_instance" => {
             message => "Could not start workflow (type might be unknown)",
             params => { type => $type }
         );
-
     $workflow->reload_observer;
 
     ## init creator
     my $id = $workflow->id;
+    ##! 2: "New workflow's ID: $id"
 
     Log::Log4perl::MDC->put('wfid',   $id);
     Log::Log4perl::MDC->put('wftype', $type);
@@ -94,49 +99,47 @@ command "create_workflow_instance" => {
             params => { type => $type }
         );
     }
-    my $initial_action = shift @actions;
 
-    ##! 8: "initial action: " . $initial_action
+    my $updated_workflow = $workflow;
 
-    # check the input params
-    my $wf_params = $util->validate_input_params($workflow, $initial_action, $params->params);
-    ##! 16: ' initial params ' . Dumper  $wf_params
+    # executing INITAL action: might throw exceptions which are usually caught,
+    # handled and rethrown deeper down the hierarchy
+    try {
+        my $initial_action = shift @actions;
 
-    $context->param($wf_params) if $wf_params;
+        ##! 8: "initial action: " . $initial_action
 
-    ##! 64: Dumper $workflow
+        # check the input params
+        my $wf_params = $util->validate_input_params($workflow, $initial_action, $params->params);
+        ##! 16: ' initial params ' . Dumper  $wf_params
 
-    $util->execute_activity($workflow, $initial_action);
+        $context->param($wf_params) if $wf_params;
 
-    # FIXME - ported from old factory but I do not understand if this ever can happen..
-    # From theory, the workflow should throw an exception if the action can not be handled
-    # Workflow is still in initial state - so something went wrong.
-    if ($workflow->state eq 'INITIAL') {
-        OpenXPKI::Exception->throw (
-            message => "Failed to create workflow instance!",
-            log =>  {
-                priority => 'error',
-                facility => 'workflow'
-            }
-        );
+        ##! 64: Dumper $workflow
+
+        # $updated_workflow is the same as $workflow as long as we do not execute
+        # the first workflow step asynchronously: execute_activity(..., async => 1, wait => 1)
+        $updated_workflow = $util->execute_activity($workflow, $initial_action);
+
+        # check back for the creator in the context and copy it to the attribute table
+        # doh - somebody deleted the creator from the context
+        $context->param('creator' => $creator) unless $context->param('creator');
+        $workflow->attrib({ creator => $context->param('creator') });
     }
-
-    # check back for the creator in the context and copy it to the attribute table
-    # doh - somebody deleted the creator from the context
-    $context->param('creator' => $creator) unless $context->param('creator');
-    $workflow->attrib({ creator => $context->param('creator') });
-
-    # TODO - we need to persist the workflow here again!
+    catch {
+        # Safety net: bubble up unknown exceptions.
+        # We assume that all OpenXPKI::Exception that may occur have already
+        # been handled properly further down the execution chain
+        die $_ unless blessed $_ && $_->isa('OpenXPKI::Exception');
+    };
 
     Log::Log4perl::MDC->put('wfid',   undef);
     Log::Log4perl::MDC->put('wftype', undef);
 
-    if ($params->ui_info) {
-        return $util->get_ui_info(workflow => $workflow);
-    }
-    else {
-        return $util->get_workflow_info($workflow);
-    }
+    return ($params->ui_info
+        ? $util->get_ui_info(workflow => $updated_workflow)
+        : $util->get_workflow_info($updated_workflow)
+    );
 };
 
 __PACKAGE__->meta->make_immutable;

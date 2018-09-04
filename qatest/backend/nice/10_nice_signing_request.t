@@ -17,7 +17,7 @@ use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 
 
-plan tests => 30;
+plan tests => 31;
 
 
 #
@@ -91,8 +91,8 @@ $wf->state_is('SUBJECT_COMPLETE');
 
 # Nicetest FQDNs should not validate so we need a policy expcetion request
 # (on rare cases the responsible router might return a valid address, so we check)
-my $result = $oxitest->api_command('get_workflow_info' => { ID => $wf->id });
-my $actions = $result->{STATE}->{option};
+my $result = $oxitest->api2_command('get_workflow_info' => { id => $wf->id });
+my $actions = $result->{state}->{option};
 my $intermediate_state;
 if (grep { /^csr_enter_policy_violation_comment$/ } @$actions) {
     note "Test FQDNs do not resolve - handling policy violation";
@@ -128,8 +128,8 @@ $wf->execute('csr_approve_csr');
 
 $wf->state_is('SUCCESS');
 
-my $info = $oxitest->api_command('get_workflow_info' => { ID => $wf->id } );
-like $info->{WORKFLOW}->{CONTEXT}->{cert_subject}, "/^CN=$subject:8080,.*/", 'correct certificate subject';
+my $info = $oxitest->api2_command('get_workflow_info' => { id => $wf->id } );
+like $info->{workflow}->{context}->{cert_subject}, "/^CN=$subject:8080,.*/", 'correct certificate subject';
 
 
 # set current user to: normal user
@@ -139,8 +139,8 @@ $oxitest->set_user('ca-one' => 'user');
 #
 # Fetch certificate via API
 #
-$info = $oxitest->api_command('get_workflow_info' => { ID => $wf->id } );
-my $cert_id = $info->{WORKFLOW}->{CONTEXT}->{cert_identifier};
+$info = $oxitest->api2_command('get_workflow_info' => { id => $wf->id } );
+my $cert_id = $info->{workflow}->{context}->{cert_identifier};
 note "Test certificate ID: $cert_id";
 
 #
@@ -148,10 +148,15 @@ note "Test certificate ID: $cert_id";
 #
 my $privkey;
 lives_and {
-    my $result = $oxitest->api_command('get_private_key_for_cert' => { IDENTIFIER => $cert_id, FORMAT => 'PKCS12', 'PASSWORD' => 'm4#bDf7m3abd' } );
-    $privkey = $result->{PRIVATE_KEY};
+    my $result = $oxitest->api2_command('get_private_key_for_cert' => { identifier => $cert_id, format => 'PKCS12', 'password' => 'm4#bDf7m3abd' } );
+    $privkey = $result;
     isnt $privkey, "";
-} "Fetch PKCS12";
+} "Fetch PKCS12 private key";
+
+lives_and {
+    my $exists = $oxitest->api2_command('private_key_exists_for_cert' => { identifier => $cert_id } );
+    is $exists, 1;
+} "confirm that private key exists";
 
 my ($tmp, $tmp_name) = tempfile(UNLINK => 1);
 print $tmp $privkey;
@@ -167,7 +172,7 @@ like `openssl pkcs12 -in $tmp_name -nokeys -noout -passin pass:'m4#bDf7m3abd' 2>
 # cert profile
 #
 lives_and {
-    my $result = $oxitest->api_command('get_profile_for_cert' => { IDENTIFIER => $cert_id });
+    my $result = $oxitest->api2_command('get_profile_for_cert' => { identifier => $cert_id });
     is $result, "I18N_OPENXPKI_PROFILE_TLS_SERVER";
 } "query certificate profile";
 
@@ -175,7 +180,7 @@ lives_and {
 # cert actions
 #
 lives_and {
-    my $result = $oxitest->api_command('get_cert_actions' => { IDENTIFIER => $cert_id, ROLE => "User" });
+    my $result = $oxitest->api2_command('get_cert_actions' => { identifier => $cert_id, role => "User" });
     cmp_deeply $result, superhashof({
         # actions are defined in config/openxpki/config.d/realm/ca-one/uicontrol/_default.yaml,
         # they must exist and "User" must be defined in their "acl" section as creator
@@ -198,9 +203,9 @@ lives_and {
 # the workflow automatically sets this to the workflow creator, which in our
 # case is "user" (see session user in OpenXPKI::Test::QA::Role::WorkflowCreateCert->create_cert)
 lives_and {
-    is $oxitest->api_command('is_certificate_owner' => { IDENTIFIER => $cert_id, USER => $user }), 1;
+    is $oxitest->api2_command('is_certificate_owner' => { identifier => $cert_id, user => $user }), 1;
 } "confirm correct certificate owner";
 
 lives_and {
-    isnt $oxitest->api_command('is_certificate_owner' => { IDENTIFIER => $cert_id, USER => 'nerd' }), 1;
+    isnt $oxitest->api2_command('is_certificate_owner' => { identifier => $cert_id, user => 'nerd' }), 1;
 } "negate wrong certificate owner";

@@ -33,8 +33,8 @@ sub instance {
 }
 
 sub create_workflow{
-
     my ( $self, $wf_type, $context ) = @_;
+    ##! 1: 'start'
 
     $self->__authorize_workflow({
         ACTION => 'create',
@@ -50,8 +50,9 @@ sub create_workflow{
 
 sub fetch_workflow {
     my ( $self, $wf_type, $wf_id ) = @_;
+    ##! 1: 'start'
 
-
+    ##! 2: 'calling Workflow::Factory::fetch_workflow()'
     my $wf = $self->SUPER::fetch_workflow($wf_type, $wf_id, undef, 'OpenXPKI::Server::Workflow' )
         or OpenXPKI::Exception->throw(
             message => 'Requested workflow not found',
@@ -80,6 +81,8 @@ sub fetch_workflow {
 
 sub fetch_unfiltered_workflow {
     my ( $self, $wf_type, $wf_id ) = @_;
+    ##! 1: 'start'
+
     my $wf = $self->SUPER::fetch_workflow($wf_type, $wf_id, undef, 'OpenXPKI::Server::Workflow' )
         or OpenXPKI::Exception->throw(
             message => 'Requested workflow not found',
@@ -102,8 +105,8 @@ sub fetch_unfiltered_workflow {
 }
 
 sub list_workflow_titles {
-
     my $self = shift;
+    ##! 1: 'start'
 
     my $result = {};
     # Nothing initialised
@@ -128,10 +131,11 @@ be useful to merge this into a helper. Might be useful in the API.
 
 =cut
 sub get_action_info {
-
     my $self = shift;
     my $action_name = shift;
     my $wf_name = shift; # this can be replaced after creating a lookup map for prefix -> workflow
+    ##! 1: 'start'
+
     my $conn = CTX('config');
 
     # Check if it is a global or local action
@@ -171,10 +175,10 @@ sub get_action_info {
 }
 
 sub get_field_info {
-
     my $self = shift;
     my $field_name = shift;
     my $wf_name = shift;
+    ##! 1: 'start'
 
     my $conn = CTX('config');
 
@@ -218,9 +222,9 @@ access it granted).
 =cut
 
 sub authorize_workflow {
-
     my $self     = shift;
     my $arg_ref  = shift;
+    ##! 1: 'start'
 
     eval {
         $self->__authorize_workflow( $arg_ref );
@@ -234,9 +238,9 @@ sub authorize_workflow {
 
 
 sub __authorize_workflow {
-
     my $self     = shift;
     my $arg_ref  = shift;
+    ##! 1: 'start'
 
     my $conn = CTX('config');
 
@@ -350,9 +354,8 @@ authorize the current user.
 =cut
 
 sub check_acl {
-
-    my $self = shift;
-    my ($type, $wf_creator, $user, $role) = @_;
+    my ($self, $type, $wf_creator, $user, $role) = @_;
+    ##! 1: 'start'
 
     if (!$user) {
         $user = CTX('session')->data->user;

@@ -712,18 +712,6 @@ sub _save {
     my $self = shift;
     ##! 16: 'save workflow!'
 
-    # do not save if we are in the startup phase of a workflow
-    # Some niffy tasks create broken workflows for validating
-    # parameters and we will get tons of init/exception entries
-    my $proc_state = $self->proc_state;
-
-    if ($self->state() eq 'INITIAL' &&
-        ($proc_state eq 'init' || $proc_state eq 'running' || $proc_state eq 'exception' )) {
-        CTX('log')->workflow()->debug("Workflow save requested during startup - wont save! ($proc_state)");
-        ##! 16: sprintf 'dont save as we are in startup phase (proc state %s) !', $proc_state ;
-        return;
-    }
-
     $self->_factory()->save_workflow($self);
 
     # If using a DBI persister with no autocommit, commit here.

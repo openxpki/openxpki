@@ -57,6 +57,7 @@ OpenXPKI::Workflow.
 =cut
 sub get_workflow {
     my ($self, $args) = @_;
+    ##! 1: 'start'
 
     my $wf_id = $args->{ID};
 
@@ -137,7 +138,6 @@ Return a workflow factory using the versioned config.
 =cut
 sub get_factory {
     my ($self, $args) = @_;
-
     ##! 1: 'start'
     ##! 16: Dumper $args
 
