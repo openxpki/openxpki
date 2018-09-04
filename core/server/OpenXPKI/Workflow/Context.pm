@@ -27,20 +27,19 @@ sub reset_updated {
 }
 
 sub param {
-
     my $self = shift;
     my @arg = @_;
 
     my $name = shift @arg;
     if ( ref $name eq 'HASH' ) {
-        ##! 1: 'Mark updated from hash ' . join (",", keys %{$name})
+        ##! 16: 'Mark updated values from hash: ' . join (",", keys %{$name})
         map { $self->{_updated}->{$_} = 1; } keys %{$name};
 
     } elsif ( exists $arg[0] ) {
-        ##! 1: 'Mark updated from scalar ' . $name
+        ##! 16: 'Mark updated values from scalar: ' . $name
         $self->{_updated}->{$name} = 1;
     } else {
-        ##! 1: 'Call without value'
+        ##! 16: 'Call without value'
     }
 
     return $self->SUPER::param( @_ );

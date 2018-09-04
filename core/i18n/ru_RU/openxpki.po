@@ -6494,10 +6494,6 @@ msgstr "Имя учетной записи"
 #~ msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_INFO_NO_WORKFLOW_GIVEN"
 #~ msgstr "SPKAC-строка пуста."
 
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_GET_WORKFLOW_TYPE_FOR_ID_NO_RESULT_FOR_ID"
-#~ msgstr "SPKAC-строка пуста."
-
 #~ msgid "I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS"
 #~ msgstr ""
 #~ "Для выполнения следющего действия технологическому процессу необходимы "

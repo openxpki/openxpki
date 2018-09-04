@@ -57,10 +57,9 @@ sub update_workflow {
     my ($self, $workflow) = @_;
 
     my $id  = $workflow->id;
-    ##! 1: "Updating WF #$id"
+    ##! 1: "Saving WF #$id to DB"
     my $dbi = CTX('dbi');
 
-    ##! 1: "WF #$id: update_workflow"
     $self->__update_workflow($workflow);
 
     if ($workflow->persist_context) {
@@ -115,8 +114,8 @@ sub __update_workflow_context {
     my $params  = $context->param;
     my $dbi = CTX('dbi');
 
-    ##! 32: 'WF #$id: Context is ' . ref $context
-    ##! 128: 'WF #$id: Params from context: ' . Dumper $params
+    ##! 32: "WF #$id: Context is " . ref $context
+    ##! 128: "WF #$id: Params from context: " . Dumper $params
     my @updated = keys %{ $context->{_updated} };
 
     ##! 32: "WF #$id: Params with updates: " . join(":", @updated )
@@ -229,7 +228,7 @@ sub fetch_workflow {
     my $self = shift;
     my $id   = shift;
 
-    ##! 1: "fetch_workflow id: $id"
+    ##! 1: "id = $id"
 
     my $dbi = CTX("dbi");
 
@@ -402,6 +401,7 @@ sub fetch_history {
 }
 
 sub commit_transaction {
+    ##! 1: "COMMIT"
     CTX('log')->workflow->debug("Executing database COMMIT (requested by workflow engine)");
     CTX('dbi')->commit;
     CTX('dbi')->start_txn;
@@ -409,6 +409,7 @@ sub commit_transaction {
 }
 
 sub rollback_transaction {
+    ##! 1: "ROLLBACK"
     CTX('log')->workflow->debug("Executing database ROLLBACK (requested by workflow engine)");
     CTX('dbi')->rollback;
     CTX('dbi')->start_txn;

@@ -72,8 +72,11 @@ Weather to start the daemon in foreground (implies restart)
 =item RESTART (0|1)
 Weather to restart a running server
 
-=item DEBUG
-single scalar as global debug level or hashref of module => level
+=item DEBUG_LEVEL
+hashref: module => level
+
+=item DEBUG_BITMASK
+hashref: module => bitmask
 
 =back
 
@@ -86,28 +89,31 @@ sub start {
     my $pid        = $args->{PID};
     my $foreground = $args->{FOREGROUND};
     my $restart = $args->{RESTART} || $args->{FOREGROUND};
-    my $debug      = $args->{DEBUG} || 0;
+    my $debug_level = $args->{DEBUG_LEVEL} || 0;
+    my $debug_bitmask = $args->{DEBUG_BITMASK} || 0;
 
 
     # We must set the debug options before loading any OXI classes
-    # Parsing any class before the debug level is set, will exlude the class
+    # Parsing any class before the debug level is set will exlude the class
     # from debugging!
     #
-    # Set debug options - DEBUG is hash with the module name (wildcard)
+    # DEBUG_LEVEL is a hash with the module name (or regex)
     # as key and the level as value or just an integer for the global level
-    if (ref $debug eq '') {
-        if ($debug > 0) {
-            $OpenXPKI::Debug::LEVEL{'.*'} = $debug;
-        }
-    } elsif(ref $debug eq 'HASH') {
-        foreach my $module (keys %{$debug}) {
-            my $level = $debug->{$module};
-            print STDERR "Debug level for module '$module': $level\n";
+    if (ref $debug_level eq 'HASH') {
+        foreach my $module (keys %{$debug_level}) {
+            my $level = $debug_level->{$module};
             $OpenXPKI::Debug::LEVEL{$module} = $level;
         }
-        #print Dumper %OpenXPKI::Debug::LEVEL;
     }
 
+    # DEBUG_BITMASK is a hash with the module name (or regex)
+    # as key and the bitmask as value or just an integer for the global bitmask
+    if (ref $debug_bitmask eq 'HASH') {
+        foreach my $module (keys %{$debug_bitmask}) {
+            my $bitmask = $debug_bitmask->{$module};
+            $OpenXPKI::Debug::BITMASK{$module} = $bitmask;
+        }
+    }
 
     # Load the required locations from the config
     my $config = OpenXPKI::Control::__probe_config( $args );
