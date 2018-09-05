@@ -32,7 +32,8 @@ state:
     GENERATE:
         autorun: 1
         action:
-          - generate > EXPORT
+          - generate_unencrypted > EXPORT ? is_unencrypted
+          - generate > EXPORT ? !is_unencrypted
 
     EXPORT:
         autorun: 1
@@ -86,6 +87,8 @@ action:
           - cert_identifier_hidden
           - key_format
           - _password
+          - export_password
+          - unencrypted
           - alias
         validator:
           - global_cert_identifier_exists
@@ -104,6 +107,18 @@ action:
           _map_cert_identifier: $cert_identifier
           _map_key_password: $_password
           _map_alias: $alias
+          _map_export_password: $export_password
+
+    generate_unencrypted:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::CertificateExport
+        param:
+          target_key: _export
+          _map_key_format: $key_format
+          _map_cert_identifier: $cert_identifier
+          _map_key_password: $_password
+          _map_alias: $alias
+          export_password: ''
+          unencrypted: 1
 
     export:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
@@ -168,6 +183,11 @@ action:
 
 
 condition:
+    is_unencrypted:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{unencrypted}
+
     is_pkcs12:
         class: Workflow::Condition::Evaluate
         param:
@@ -222,6 +242,20 @@ field:
         required: 1
         label: I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_LABEL
         description: I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_DESC
+
+    export_password:
+        name: export_password
+        type: passwordverify
+        required: 0
+        label: I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_LABEL
+        description: I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_DESC
+        tooltip: I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_TOOLTIP
+
+    unencrypted:
+        name: unencrypted
+        type: bool
+        label: I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_UNENCRYPTED_LABEL
+        description: I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_UNENCRYPTED_DESC
 
 validator:
     keystore_alias:
