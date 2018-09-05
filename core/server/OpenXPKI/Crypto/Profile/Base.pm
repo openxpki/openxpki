@@ -100,12 +100,20 @@ sub load_extension
 
     if ($ext eq "basic_constraints")
     {
-        $values[0] = ["CA", ($config->get("$path.ca") || 0) ];
-        my $path_length = $config->get("$path.path_length");
-        if (defined $path_length)
-        {
-            $values[1] = ["PATH_LENGTH", $path_length];
+
+        my $ca = $config->get("$path.ca") || '0';
+        if ($ca !~ /\A(true|1)\z/) {
+            $values[0] = ["CA", 'false'];
+
+        } else {$values[0] = ["CA", 'true'];
+
+            my $path_length = $config->get("$path.path_length");
+            if (defined $path_length)
+            {
+                $values[1] = ["PATH_LENGTH", $path_length];
+            }
         }
+
         $self->set_extension (NAME     => "basic_constraints",
                               CRITICAL => $critical,
                               VALUES   => [@values]);
@@ -326,7 +334,7 @@ sub load_extension
                      "ssl_client_ca", "smime_client_ca", "object_signing_ca", "ssl_server", "reserved" );
 
         foreach my $bit (@bits) {
-            push @values, $bit if (  $config->get("$path.$bit") );
+            push @values, $bit if ( $config->get("$path.$bit") );
         }
 
         if (scalar @values) {

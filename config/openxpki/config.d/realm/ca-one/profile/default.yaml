@@ -82,6 +82,7 @@ extensions:
     basic_constraints:
         critical: 1
         ca: 0
+        path_length: 0
 
     subject_key_identifier:
         critical: 0
