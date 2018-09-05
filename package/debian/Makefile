@@ -16,7 +16,8 @@
 # some packages have build dependencies
 PACKAGES=			\
 	core			\
-	i18n 			
+	i18n 			\
+	cgi-session-driver
 
 # Data::Password Data::Serializer DateTime::Format::DateParse IPC::ShareLite 
 # Locale::TextDomain Proc::ProcessTable Sys::SigAction Workflow 

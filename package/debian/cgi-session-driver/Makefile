@@ -1,0 +1,42 @@
+
+TOPDIR=../../..
+SRCBASE=$(TOPDIR)/core/server/CGI_Session_Driver
+PERLNAME=OpenXPKI
+PACKAGE=openxpki-cgi-session-driver
+PKGDIR=../deb/core
+
+# Makefile.inc contains common settings for all packages (checked in)
+include ../Makefile.inc
+# Makefile.local may be used locally to override settings (not checked in)
+-include ../Makefile.local
+
+openxpki-archive:
+	cd $(SRCBASE); \
+	make install; \
+	make dist; \
+	mv $(PACKAGE)-*.tar.gz /tmp
+
+source:
+	cd /tmp; \
+	tar -xzf $(PACKAGE)-*.tar.gz; \
+	cd $(PACKAGE)-*/; \
+	mkdir debian; \
+	cd debian; \
+	tar -xzf /tmp/openxpki-debian.tar.gz;
+
+package:
+	cd /tmp/$(PACKAGE)-*/; \
+	fakeroot dpkg-buildpackage || echo ignoring error - usually signing ...
+	test -d $(PKGDIR) || mkdir $(PKGDIR)
+	mv /tmp/$(PACKAGE)_* $(PKGDIR)/
+
+source-clean:
+	rm -rf /tmp/$(PACKAGE)-*
+	rm -f /tmp/$(PACKAGE)-*.tar.gz
+	rm -f /tmp/openxpki-debian.tar.gz
+
+clean:	source-clean
+	if [ -e changelog ]; then rm changelog; fi
+	if [ -e control ]; then rm control; fi
+	rm -f *.dsc *.dsc.asc *.tar.gz $(PKGDIR)/$(PACKAGE)_* *.changes
+

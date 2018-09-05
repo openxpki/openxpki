@@ -1,0 +1,22 @@
+Source: openxpki-cgi-session-driver
+Maintainer: OpenXPKI Foundation <debian@openxpki.org>
+Priority: optional
+Build-Depends: debhelper (>= 3.0.18), perl (>= 5.6.0), libversion-perl
+
+Package: openxpki-cgi-session-driver
+Architecture: any
+Recommends: libopenxpki-perl
+Section: perl
+Priority: optional
+Depends:
+Description: CGI Session Driver for OpenXPKI
+ OpenXPKI is an Open Source PKI project.
+ .
+ This package contains a session database handler based on CGI::Session
+ .
+ Packaging information:
+ OpenXPKI version       2.2.0
+ Git commit hash:       ef4b9b861117478110296bbb68b38ca17e6b556b
+ Git description:       v2.1.2-89-gef4b9b8
+ Git tags:               <no tag set>
+

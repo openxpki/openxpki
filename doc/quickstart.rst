@@ -53,9 +53,9 @@ Some people reported that a2enmod is not available on their system, in this case
 
     aptitude install libcgi-perl libmodule-load-perl
 
-Now install the OpenXPKI core package and the translation package::
+Now install the OpenXPKI core package, session driver and the translation package::
 
-    aptitude install libopenxpki-perl openxpki-i18n
+    aptitude install libopenxpki-perl openxpki-cgi-session-driver openxpki-i18n
 
 You should now restart the apache server to activate the new config::
 

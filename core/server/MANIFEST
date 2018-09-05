@@ -629,7 +629,7 @@ OpenXPKI/Service/SCEP/Command.pm
 
 
 # Outside of namespace
-CGI/Session/Driver/openxpki.pm
+CGI_Session_Driver/openxpki.pm
 
 ## test stuff
 

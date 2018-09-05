@@ -45,7 +45,8 @@ if [ "$DIST" == "ubuntu" ]; then
     apt-get --assume-yes --force-yes install libcgi-perl libmodule-load-perl
 fi;
 
-apt-get install --assume-yes --force-yes libdbd-mysql-perl libopenxpki-perl openxpki-i18n libapache2-mod-fcgid
+apt-get install --assume-yes --force-yes libdbd-mysql-perl libapache2-mod-fcgid \
+    libopenxpki-perl openxpki-i18n openxpki-cgi-session-driver
 
 # packages required for testing only
 apt-get install --assume-yes libtest-deep-perl
