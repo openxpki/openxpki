@@ -592,8 +592,8 @@ sub _send_html {
         Charset => 'UTF-8',
     );
 
-    push @args, (Cc => join(",", @{$vars->{cc}})) if ($vars->{cc});
-    push @args, ("Reply-To" => $cfg->{reply}) if ($cfg->{reply});
+    push @args, (Cc => $self->_render_template(join(",", @{$vars->{cc}}),$vars)) if ($vars->{cc});
+    push @args, ("Reply-To" => $self->_render_template($cfg->{reply},$vars)) if ($cfg->{reply});
 
     ##! 16: 'Building with args: ' . Dumper @args
 
