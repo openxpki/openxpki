@@ -98,8 +98,17 @@ sub param {
 
             ##! 16: 'parse using tt ' . $template
             my $oxtt = OpenXPKI::Template->new();
-            my $out = $oxtt->render( $template, {  context => $self->workflow()->context()->param() } );
-
+            my $out = $oxtt->render( $template, {
+                context => $self->workflow()->context()->param(),
+                workflow => {
+                    id => $self->workflow()->{ID}
+                },
+                session => {
+                    user => CTX('session')->data->user,
+                    role => CTX('session')->data->role,
+                    pki_realm => CTX('session')->data->pki_realm
+                }
+            });
             ##! 32: 'tt result ' . $out
             return $out;
         }

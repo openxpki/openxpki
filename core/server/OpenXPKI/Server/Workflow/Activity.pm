@@ -171,7 +171,14 @@ sub param {
             my $oxtt = OpenXPKI::Template->new();
             my $out = $oxtt->render( $template, {
                 context => $self->workflow()->context()->param(),
-                workflow => { id => $self->workflow()->{ID} }
+                workflow => {
+                    id => $self->workflow()->{ID}
+                },
+                session => {
+                    user => CTX('session')->data->user,
+                    role => CTX('session')->data->role,
+                    pki_realm => CTX('session')->data->pki_realm
+                }
             });
 
             ##! 32: 'tt result ' . $out
