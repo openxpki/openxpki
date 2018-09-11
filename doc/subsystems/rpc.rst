@@ -5,10 +5,6 @@ The RPC Service provides a simple HTTP-Based API to the OpenXPKI backend.
 The builtin REST Server provides methods to request, renew and revoke
 certificates. The service is implemented using a cgi-wrapper script.
 
-@todo: This need updating
-
-Currently, the only method implemented is for revoking certificates.
-
 Server-Side Configuration
 =========================
 
@@ -33,6 +29,26 @@ The config uses plain ini format, a default is deployed by the package::
 The global/auth parameters are described in the common wrapper documentation
 (:ref:`subsystem-wrapper`). Config path extension and TLS Authentication is
 supported.
+
+
+TLS Authentication
+-------------------
+
+In case you want to use TLS Client authentication you must tell the
+webserver to pass the client certificate to the script. For apache,
+put the following lines into your SSL Host section::
+
+    <Location /rpc>
+        SSLVerifyClient optional
+        SSLOptions +StdEnvVars +ExportCertData
+    </Location>
+
+Note: We need the apache just to check if the client has access to the
+private key of the certificate. Trust and /revocation checking is done
+inside of OpenXPKI so you can also use "optional_no_ca" if you dont
+want to deal with setting up the correct chains in apache.
+Blocking clients on TLS level might be a good idea if your service is
+exposed to "unfriendly users".
 
 Input Handling
 ==============
@@ -98,6 +114,9 @@ On error, the content returned is:
 
     { error: { code: 1, message: "Verbose error", data: { id, pid, state } } }
 
+
+**We currently always send 200 OK with a JSON error structure**
+
 The following HTTP Response Codes are (to be) supported:
 
 * 200 OK - Request was successful
@@ -134,6 +153,7 @@ worflow_attributes::
 With a properly prepared workflow, this allows you access an existing
 workflow based on the transaction_id. For now it is only possible to
 read existing workflows, there is no option to interact with them, yet.
+
 
 See Also
 ========

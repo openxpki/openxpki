@@ -405,3 +405,15 @@ error, the return structure looks different:
  The message gives a verbose description on what happend, the data node will
  contain the workflow id only in case it was started.
 
+=head2 TLS Authentication
+
+In case you want to use TLS Client authentication you must tell the
+webserver to pass the client certificate to the script. For apache,
+put the following lines into your SSL Host section:
+
+    <Location /rpc>
+        SSLVerifyClient optional
+        SSLOptions +StdEnvVars +ExportCertData
+    </Location>
+
+
