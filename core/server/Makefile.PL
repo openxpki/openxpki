@@ -353,6 +353,7 @@ WriteMakefile(
         'JSON'                          => 0,
         'Locale::gettext_pp'            => 0,
         'Log::Log4perl'                 => '0.51',
+        'Log::Log4perl::Layout::JSON'   => 0,
         'LWP::UserAgent'                => '6.05',      # Constituent of module  libwww-perl
         'Math::BigInt'                  => '1.9993',    # makes FreeBSD happy
         'MIME::Entity'                  => 0,
