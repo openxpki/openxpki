@@ -295,7 +295,7 @@ sub DESTROY{
         rmdir dirname($self->{'tmp_keyfile'});;
     }
 
-    if ($self->{CERT} && -e $self->{CERT} && dirname($self->{CERT}) eq $self->{TMP}) {
+    if ($self->{TMP} && $self->{CERT} && -e $self->{CERT} && dirname($self->{CERT}) eq $self->{TMP}) {
         unlink $self->{CERT};
     }
 
