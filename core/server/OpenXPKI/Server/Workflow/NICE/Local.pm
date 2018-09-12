@@ -459,7 +459,7 @@ sub issueCRL {
     my $data = { $crl_obj->to_db_hash() };
 
     CTX('log')->audit('cakey')->info('crl issued', {
-        cakey     => $data->{authority_key_identifier},
+        cakey     => $ca_identifier,
         token     => $ca_alias,
         pki_realm => $pki_realm,
     });
