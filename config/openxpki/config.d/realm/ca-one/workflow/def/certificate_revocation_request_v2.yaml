@@ -15,7 +15,8 @@ state:
         autorun: 1
         action:
           - global_noop > PENDING_USER ? !global_is_automated_request
-          - check_authorized_signer > CHECK_APPROVALS ? global_is_automated_request
+          - global_noop2 > CHECK_APPROVALS ? global_is_automated_request !global_is_signed_request
+          - check_authorized_signer > CHECK_APPROVALS ? global_is_automated_request global_is_signed_request
 
     CHECK_FOR_REVOCATION:
         autorun: 1
