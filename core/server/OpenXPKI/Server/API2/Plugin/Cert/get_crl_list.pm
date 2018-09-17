@@ -29,7 +29,13 @@ To find CRLs valid within a certain period in time, you can query on the
 last_update/next_update fields using valid_after/valid_before and
 expires_after/expires_before (expect epoch).
 
-The I<format> parameter determines the return format:
+B<Parameters>
+
+=over
+
+=item * C<format>
+
+Determines the return format.
 
 Possible values for format are:
 
@@ -39,15 +45,26 @@ Possible values for format are:
 
 =item * DER
 
-=item * DBINFO - unmodified result from the database
+=item * DBINFO - unmodified result from the database (without PEM data)
 
 =back
 
-B<Parameters>
+=item issuer_identifier
 
-=over
+Get only the CRLs for the provided issuer. If not set CRLs for all issuers
+in the current realm are returned.
 
-=item * C<XXX> I<Bool> - XXX. Default: XXX
+=item limit
+
+=item pki_realm
+
+=item valid_after
+
+=item valid_before
+
+=item expires_after
+
+=item expires_before
 
 =back
 
@@ -107,7 +124,7 @@ command "get_crl_list" => {
 
     my $db_results = CTX('dbi')->select(
         from => 'crl',
-        columns => ( $format eq 'DBHASH' ? ['*'] : ['data'] ),
+        columns => ( $format eq 'DBINFO' ? ['*'] : ['data'] ),
         where => $where,
         order_by => '-last_update',
         limit => $limit,
@@ -129,6 +146,7 @@ command "get_crl_list" => {
 
     } else {
         while (my $entry = $db_results->fetchrow_hashref) {
+            delete $entry->{data};
             push @result, $entry;
         }
     }
