@@ -78,7 +78,7 @@ command "import_crl" => {
     ##! 16: 'Look for issuer ' . $issuer_aik . '/' . $issuer_dn . ' in group ' . $group
 
     my $where = {
-        'certificate.pki_realm' => $pki_realm,
+        'aliases.pki_realm' => $pki_realm,
         'aliases.group_id' => $group,
         $issuer_aik
             ? ('certificate.subject_key_identifier' => $issuer_aik)
@@ -86,7 +86,7 @@ command "import_crl" => {
     };
 
     my $issuer = $dbi->select_one(
-        from_join => 'certificate  identifier=identifier,pki_realm=pki_realm  aliases',
+        from_join => 'certificate  identifier=identifier aliases',
         columns => [ 'certificate.identifier' ],
         where => $where
     ) or OpenXPKI::Exception->throw(
