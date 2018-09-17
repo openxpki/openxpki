@@ -25,18 +25,18 @@ sub init_index {
         label => 'Current Revocation Lists',
     });
 
-    my $issuers = $self->send_command( 'get_ca_list' );
+    my $issuers = $self->send_command_v2( 'get_ca_list' );
 
     my $empty = 1;
     foreach my $issuer (@$issuers) {
 
         $self->logger()->trace("Issuer: " . Dumper $issuer);
 
-        my $crl_list = $self->send_command( 'get_crl_list' , {
-            FORMAT => 'HASH',
-            VALID_AT => time(),
-            LIMIT => 1,
-            ISSUER => $issuer->{IDENTIFIER}
+        my $crl_list = $self->send_command_v2( 'get_crl_list' , {
+            format => 'DBINFO',
+            expires_after => time(),
+            limit => 1,
+            issuer_identifier => $issuer->{identifier}
         });
 
         my $crl_hash = $crl_list->[0];
@@ -47,23 +47,23 @@ sub init_index {
             $self->add_section({
                 type => 'text',
                 content => {
-                    label => $self->_escape($issuer->{SUBJECT}),
+                    label => $self->_escape($issuer->{subject}),
                     description => 'I18N_OPENXPKI_UI_CRL_NONE_FOR_CA'
                 }
             });
             next;
         } else {
 
-            my @fields = $self->__print_detail( $crl_hash );
+            my @fields = $self->__print_detail( $crl_hash, $issuer );
 
             $self->add_section({
                 type => 'keyvalue',
                 content => {
-                    label => $self->_escape($issuer->{SUBJECT}),
+                    label => $self->_escape($issuer->{subject}),
                     description => '',
                     data => \@fields,
                     buttons => [{
-                        page => 'crl!list!issuer!'.$issuer->{IDENTIFIER},
+                        page => 'crl!list!issuer!'.$issuer->{identifier},
                         label  => 'I18N_OPENXPKI_UI_CRL_LIST_OLD',
                     }]
                 }
@@ -85,24 +85,29 @@ sub init_list {
     my $self = shift;
     my $args = shift;
 
-    my $crl_list = $self->send_command( 'get_crl_list' , {
-        FORMAT => 'HASH',
-        ISSUER => $self->param('issuer')
+    my $crl_list = $self->send_command_v2( 'get_crl_list' , {
+        issuer_identifier => $self->param('issuer')
+    });
+
+    my $issuer_info = $self->send_command_v2( 'get_cert' , {
+        format => 'DBINFO',
+        identifier => $self->param('issuer')
     });
 
     $self->logger()->trace("result: " . Dumper $crl_list);
 
     $self->_page({
-        label => 'I18N_OPENXPKI_UI_CRL_LIST_FOR_ISSUER ' . $self->_escape($crl_list->[0]->{BODY}->{'ISSUER'}),
+        label => 'I18N_OPENXPKI_UI_CRL_LIST_FOR_ISSUER ',
+        description => $self->_escape( $issuer_info->{subject} ),
     });
 
     my @result;
     foreach my $crl (@{$crl_list}) {
         push @result, [
-            $crl->{BODY}->{'SERIAL'},
-            $crl->{BODY}->{'LAST_UPDATE'},
-            $crl->{BODY}->{'NEXT_UPDATE'},
-            $crl->{BODY}->{'ITEMCNT'},
+            $crl->{'crl_number'},
+            $crl->{'last_update'},
+            $crl->{'next_update'},
+            $crl->{'items'},
             $crl->{'crl_key'},
         ];
     }
@@ -143,15 +148,15 @@ sub init_detail {
 
     my $crl_key = $self->param('crl_key');
 
-    my $crl_hash = $self->send_command( 'get_crl', {
-        CRL_KEY => $crl_key,
-        FORMAT => 'HASH'
+    my $crl_hash = $self->send_command_v2( 'get_crl', {
+        format => 'DBINFO',
+        crl_serial => $crl_key,
     });
     $self->logger()->trace("result: " . Dumper $crl_hash);
 
     $self->_page({
-        label => 'I18N_OPENXPKI_UI_CRL_LIST_VIEW_DETAIL #' . $crl_hash->{SERIAL},
-        shortlabel => 'CRL #' . $crl_hash->{BODY}->{SERIAL},
+        label => 'I18N_OPENXPKI_UI_CRL_LIST_VIEW_DETAIL #' . $crl_hash->{crl_number},
+        shortlabel => 'CRL #' . $crl_hash->{crl_number},
     });
 
     my @fields = $self->__print_detail( $crl_hash );
@@ -202,13 +207,19 @@ sub __print_detail {
 
     my $self = shift;
     my $crl_hash = shift;
+    my $issuer_info = shift;
+
+    $issuer_info = $self->send_command_v2( 'get_cert' , {
+        format => 'DBINFO',
+        identifier => $crl_hash->{'issuer_identifier'}
+    }) unless($issuer_info);
 
     my @fields = (
-        { label => 'I18N_OPENXPKI_UI_CRL_SERIAL', value => $crl_hash->{BODY}->{'SERIAL'} },
-        { label => 'I18N_OPENXPKI_UI_CRL_ISSUER',  value => $crl_hash->{BODY}->{'ISSUER'} } ,
-        { label => 'I18N_OPENXPKI_UI_CRL_LAST_UPDATE', value => $crl_hash->{BODY}->{'LAST_UPDATE'}, format => 'timestamp'  },
-        { label => 'I18N_OPENXPKI_UI_CRL_NEXT_UPDATE', value => $crl_hash->{BODY}->{'NEXT_UPDATE'} ,format => 'timestamp' },
-        { label => 'I18N_OPENXPKI_UI_CRL_ITEMCNT', value => $crl_hash->{BODY}->{'ITEMCNT'} },
+        { label => 'I18N_OPENXPKI_UI_CRL_SERIAL', value => $crl_hash->{'crl_number'} },
+        { label => 'I18N_OPENXPKI_UI_CRL_ISSUER',  value => $issuer_info->{subject} } ,
+        { label => 'I18N_OPENXPKI_UI_CRL_LAST_UPDATE', value => $crl_hash->{'last_update'}, format => 'timestamp'  },
+        { label => 'I18N_OPENXPKI_UI_CRL_NEXT_UPDATE', value => $crl_hash->{'next_update'} ,format => 'timestamp' },
+        { label => 'I18N_OPENXPKI_UI_CRL_ITEMCNT', value => $crl_hash->{'items'} },
     );
 
     my $crl_key = $crl_hash->{crl_key};
