@@ -1259,6 +1259,8 @@ if ($cmd eq 'initdb') {
             gen|generation=s
             group=s
             token=s
+            notbefore=s
+            notafter=s
         );
 
         # alias, gen, group, token are for alias shortcut
