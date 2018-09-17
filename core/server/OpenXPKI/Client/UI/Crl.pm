@@ -182,12 +182,12 @@ sub init_download {
         $self->redirect('crl!detail!crl_key!'.$crl_key);
     }
 
-    my $data = $self->send_command( 'get_crl', {
-        CRL_KEY => $crl_key,
-        FORMAT => uc($format)
+    my $data = $self->send_command_v2( 'get_crl', {
+        crl_serial => $crl_key,
+        format => uc($format)
     });
 
-    my $content_type = 'application/pkcs7-crl';
+    my $content_type = 'application/x-pkcs7-crl';
 
     my $filename = 'crl.'.$format;
 
