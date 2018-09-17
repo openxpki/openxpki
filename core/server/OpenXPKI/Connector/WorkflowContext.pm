@@ -19,17 +19,6 @@ has key => (
     isa => 'Str',
 );
 
-has value => (
-    is  => 'rw',
-    isa => 'HashRef|Str',
-);
-
-has encrypt => (
-    is => 'ro',
-    isa => 'Bool',
-    default => 0,
-);
-
 sub set_context {
    $CONTEXT = shift;
 }
@@ -47,7 +36,18 @@ sub get {
 
     my $val = $self->_get_node();
 
-    if (defined $val && ref $val ne '') {
+    if (!defined $val) {
+        return $self->_node_not_exists();
+    }
+
+    if (ref $val eq 'HASH' && $self->key()) {
+        $val = $val->{$self->key()};
+        if (!defined $val) {
+            return $self->_node_not_exists();
+        }
+    }
+
+    if (ref $val ne '') {
         die "requested value is not a scalar " . Dumper $val;
     }
 
@@ -122,3 +122,10 @@ as the context key. The path is not evaluated and ignored.
 
 The content of the context must be set into the global/static class
 variable using the static method set_context.
+
+=head2 Parameters
+
+=item key
+
+Return a single key from the HASH inside the context value at LOCATION.
+

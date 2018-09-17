@@ -426,6 +426,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/ListActiveToken.pm
 
 OpenXPKI/Server/Workflow/Activity/Tools/GenerateKey.pm
 OpenXPKI/Server/Workflow/Activity/Tools/GeneratePassword.pm
+OpenXPKI/Server/Workflow/Activity/Tools/MergeContextHash.pm
 OpenXPKI/Server/Workflow/Activity/Tools/RetrieveCertificate.pm
 OpenXPKI/Server/Workflow/Activity/Tools/RenameContext.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetContext.pm
