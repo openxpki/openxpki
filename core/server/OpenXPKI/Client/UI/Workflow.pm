@@ -1924,18 +1924,6 @@ sub __render_from_workflow {
             });
         }
 
-        # create a "blind" query to generate an initial search form
-        my $queryid = $self->__generate_uid();
-        my $_query = {
-            'id' => $queryid,
-            'type' => 'workflow',
-            'input' => {
-                wf_creator => $wf_info->{WORKFLOW}->{CONTEXT}->{creator},
-                wf_type => $wf_info->{WORKFLOW}->{TYPE},
-            },
-        };
-        $self->__temp_param('query_wfl_'.$queryid, $_query );
-
         my @data = (
             { label => 'I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL', 'format' => 'link', value => {
                 'label' => $wf_info->{WORKFLOW}->{ID},
@@ -1945,11 +1933,7 @@ sub __render_from_workflow {
             { label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', value => $wf_info->{WORKFLOW}->{TYPE} },
             { label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', value => $wf_info->{WORKFLOW}->{STATE} },
             { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL', value => $wf_info->{WORKFLOW}->{PROC_STATE} },
-            { label => 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL', 'format' => 'link', value => {
-                'label' => $wf_info->{WORKFLOW}->{CONTEXT}->{creator},
-                'page' => 'workflow!search!query!'.$queryid,
-                'target' => '_blank',
-            }}
+            { label => 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL', value => $wf_info->{WORKFLOW}->{CONTEXT}->{creator} }
         );
 
 
