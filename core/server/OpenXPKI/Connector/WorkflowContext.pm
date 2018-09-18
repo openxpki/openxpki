@@ -48,6 +48,7 @@ sub get {
     }
 
     if (ref $val ne '') {
+        $self->log()->error('requested value is not a scalar');
         die "requested value is not a scalar " . Dumper $val;
     }
 
@@ -62,6 +63,7 @@ sub get_hash {
     my $val = $self->_get_node();
 
     if (defined $val && ref $val ne 'HASH') {
+        $self->log()->error('requested value is not a hash');
         die "requested value is not a HASH " . Dumper $val;
     }
 
@@ -77,6 +79,7 @@ sub get_list {
     my $val = $self->_get_node();
 
     if (defined $val && ref $val ne 'ARRAY') {
+        $self->log()->error('requested value is not a list');
         die "requested value is not a list " . Dumper $val;
     }
 
@@ -101,7 +104,7 @@ sub _get_node {
         $val = $ser->deserialize( $val );
     }
 
-    $self->log()->error('value is '. Dumper $val );
+    $self->log()->debug('value is '. Dumper $val );
 
     return $val;
 }
