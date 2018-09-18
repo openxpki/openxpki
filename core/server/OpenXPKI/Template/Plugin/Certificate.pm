@@ -332,4 +332,23 @@ sub pem {
 
 }
 
+=head2 profile(cert_identifier)
+
+Return the internal name of the profile
+
+=cut
+
+sub profile {
+
+    my $self = shift;
+    my $cert_id = shift;
+
+    my $profile = '';
+    eval {
+        $profile = CTX('api2')->get_profile_for_cert( identifier => $cert_id );
+    };
+    return $profile;
+
+}
+
 1;
