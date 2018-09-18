@@ -199,6 +199,19 @@ sub __load_config_realm_token {
         }
     }
 
+    my $certificate = $arg_ref->{CERTIFICATE};
+    $certificate = CTX('api')->get_certificate_for_alias({ALIAS => $name}) unless($certificate);
+    if (!defined $certificate || !$certificate->{DATA}) {
+        # Should never show up if the api is not broken
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_CRYPTO_TOOLKIT_CERTIFICATE_NOT_DEFINED',
+        );
+    }
+
+    $cert_identifier_of{$ident} = $certificate->{IDENTIFIER};
+
+    ##! 16: 'certificate subject: ' . $certificate->{SUBJECT}
+    ##! 64: 'certificate pem: ' .$certificate->{DATA}
 
     # Use Template Toolkit to assemble the key name, we offer the internal
     # realm name, full alias, group and generation as vars (similar to cdp)
@@ -213,6 +226,7 @@ sub __load_config_realm_token {
         'GROUP' => $group,
         'GENERATION' => $generation,
         'PKI_REALM' => CTX('api')->get_pki_realm(),
+        'IDENTIFIER' => $cert_identifier_of{$ident},
     };
 
     ##! 16: 'Building key name from template ' . $params_of{$ident}->{KEY}
@@ -233,20 +247,6 @@ sub __load_config_realm_token {
     ) unless ($output);
 
     $params_of{$ident}->{KEY} = $output;
-
-    my $certificate = $arg_ref->{CERTIFICATE};
-    $certificate = CTX('api')->get_certificate_for_alias({ALIAS => $name}) unless($certificate);
-    if (!defined $certificate || !$certificate->{DATA}) {
-        # Should never show up if the api is not broken
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_CRYPTO_TOOLKIT_CERTIFICATE_NOT_DEFINED',
-        );
-    }
-
-    $cert_identifier_of{$ident} = $certificate->{IDENTIFIER};
-
-    ##! 16: 'certificate subject: ' . $certificate->{SUBJECT}
-    ##! 64: 'certificate pem: ' .$certificate->{DATA}
 
     my $fu = OpenXPKI::FileUtils->new();
     my $cert_filename = $fu->get_safe_tmpfile({

@@ -329,7 +329,7 @@ The example above will then look like::
             inherit: default
 
 If you need to name your keys according to a custom scheme, you also have GROUP (ca-one-certsign) and
-GENERATION (1) available for substitution.
+GENERATION (1) available for substitution. The certificate identifier is also available via IDENTIFIER.
 
 **token in datapool**
 
@@ -358,6 +358,8 @@ Using the datapool encryption hides the value of the key from database
 admins but still exposes it in clear text to anybody with access to the
 command line tool! It should be obvious that you can not store the
 data-vault token this way as it is neede to decrypt the datapool items!
+
+Tip: Use "
 
 secret groups
 ^^^^^^^^^^^^^
