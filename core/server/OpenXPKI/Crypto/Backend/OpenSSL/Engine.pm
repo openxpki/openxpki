@@ -205,6 +205,13 @@ sub get_keyfile
                 key => $self->{KEY},
             );
 
+            if (!$dp || !$dp->{value}) {
+                OpenXPKI::Exception->throw (
+                    message => "Unable to load key from datapool",
+                    params => { KEY => $self->{KEY} }
+                );
+            }
+
             ##! 16: 'Writing keyfile ' . $self->{'tmp_keyfile'}
             $fu->write_file({
                 FILENAME => $self->{'tmp_keyfile'},
