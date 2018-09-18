@@ -271,7 +271,7 @@ sub alias_add {
             );
             if ($check_duplicate) {
                 print STDERR sprintf("A token with generation %01d for group %s already exists:\n",
-                    $params{gen}, $params{token}, $check_duplicate->{identifier});
+                    $params{gen}, $params{token});
                 __alias_print($check_duplicate);
                 return 2;
             }
