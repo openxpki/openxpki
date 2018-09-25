@@ -158,7 +158,7 @@ sub execute
 
     if ($cert_serial) {
         $cert_serial =~ s/[\s:]//g;
-        if ($cert_serial =~ /[a-f]/ && substr($cert_serial,0,2) ne '0x') {
+        if ($cert_serial =~ /[a-f]/i && substr($cert_serial,0,2) ne '0x') {
             $cert_serial = '0x' . $cert_serial;
         }
         $query->{cert_serial} = $cert_serial;
