@@ -1044,6 +1044,7 @@ sub action_find {
     } elsif (my $serial = $self->param('cert_serial')) {
 
         if ($serial =~ /[a-f]/ && substr($serial,0,2) ne '0x') {
+            $serial =~ s/://g;
             $serial = '0x' . $serial;
         }
         if (substr($serial,0,2) eq '0x') {
