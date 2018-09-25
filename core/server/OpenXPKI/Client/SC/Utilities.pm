@@ -126,7 +126,7 @@ sub handle_get_card_status {
 
 
     # run analyze with default client (system user)
-    $log->info( "Analyze: " . Dumper(%params) );
+    $log->debug( "Analyze: " . Dumper(%params) );
     my $reply;
     eval {
         $reply = $self->_client()->run_legacy_command( 'sc_analyze_smartcard', \%params );
@@ -219,7 +219,7 @@ sub handle_get_card_status {
         $ECDHPubkey =~ s/^\s+//;
         $ECDHPubkey =~ s/\s+$//;
 
-        $log->info( "ECDHPeerPubkey:\n " . $ECDHPubkey );
+        $log->debug( "ECDHPeerPubkey:\n " . $ECDHPubkey );
 
         $session->param('rndPIN', '');
 
@@ -232,7 +232,7 @@ sub handle_get_card_status {
 
         } else {
 
-            $log->info( "ECDHPubkey:\n " . $ecdhkey->{'PEMECPubKey'} );
+            $log->debug( "ECDHPubkey:\n " . $ecdhkey->{'PEMECPubKey'} );
 
             $result->{'ecdhpubkey'} = $ecdhkey->{'PEMECPubKey'};
 
