@@ -32,20 +32,21 @@ sub execute
     my $cutoff_notbefore = $self->param('cutoff_notbefore');
     my $cutoff_notafter = $self->param('cutoff_notafter');
     my $entity_only = $self->param('entity_only');
+    my $cert_serial = $self->param('cert_serial');
 
     my @param = $self->param();
 
     my $query = {
-        ENTITY_ONLY => 1,
-        CERT_ATTRIBUTES => []
+        entity_only => 0,
+        cert_attributes => {}
     };
 
     if (!$include_revoked) {
-        $query->{STATUS} = 'ISSUED';
+        $query->{status} = 'ISSUED';
     };
 
     if ($entity_only) {
-        $query->{ENTITY_ONLY} = 1;
+        $query->{entity_only} = 1;
     }
 
     my $valid_at;
@@ -70,14 +71,15 @@ sub execute
         })->epoch();
 
         if ($epoch > $cutoff) {
-             $query->{NOTBEFORE} = { VALUE => [ $cutoff, $epoch ], OPERATOR => "BETWEEN" };
+            $query->{valid_after} = $cutoff;
+            $query->{valid_before} = $epoch;
         } else {
-            $query->{NOTBEFORE} = { VALUE => [ $epoch, $cutoff ], OPERATOR => "BETWEEN" };
+            $query->{valid_after} = $epoch;
+            $query->{valid_before} = $cutoff;
         }
     } else {
-        $query->{NOTBEFORE} = { VALUE => $epoch, OPERATOR => "LESS_THAN" };
+        $query->{valid_before} = $epoch + 1;
     }
-
 
     my $expiry_cutoff = 0;
     # if expired certs should be included, we just move the notafter limit
@@ -99,42 +101,43 @@ sub execute
             VALIDITY => $cutoff_notafter,
             VALIDITYFORMAT => 'detect',
         })->epoch();
-
-        $query->{NOTAFTER} = { VALUE => [ $expiry_cutoff, $cutoff ], OPERATOR => "BETWEEN" };
+        $query->{expires_after} = $expiry_cutoff;
+        $query->{expires_before} = $cutoff;
     } elsif($expiry_cutoff) {
-        $query->{NOTAFTER} = { VALUE => $expiry_cutoff, OPERATOR => "GREATER_THAN" };
+        $query->{expires_after} = $expiry_cutoff;
+    } else {
+        $query->{expires_after} = $epoch - 1;
     }
-
 
     if ($cert_subject) {
         ##! 16: 'Adding subject ' . $cert_subject
-        $query->{SUBJECT} = $cert_subject;
+        $query->{subject} = $cert_subject;
     }
 
     if ($realm) {
         ##! 16: 'Adding realm ' . $realm
-        $query->{PKI_REALM} = $realm;
+        $query->{pki_realm} = $realm;
     }
 
     if ($profile) {
         ##! 16: 'Adding profile ' . $profile
-        $query->{PROFILE} = $profile;
+        $query->{profile} = $profile;
     }
 
     if ($issuer) {
         ##! 16: 'Adding issuer ' . $issuer
-        $query->{ISSUER_IDENTIFIER} = $issuer;
+        $query->{issuer_identifier} = $issuer;
     }
 
     if ($order && ($order =~ /\A ([a-z0-9]+)(\s+(asc|desc))? \z/xms)) {
         my $col = uc($1);
         my $reverse = lc($3) || '';
-        $query->{ORDER} = "CERTIFICATE." . $col;
-        $query->{REVERSE} = ($reverse eq 'desc') ? 1 : 0;
+        $query->{order} = $col;
+        $query->{reverse} = ($reverse eq 'desc') ? 1 : 0;
     }
 
     if ($limit && ($limit =~ /\A\d+\z/)) {
-        $query->{LIMIT} = $limit;
+        $query->{limit} = $limit;
     }
 
 
@@ -142,25 +145,34 @@ sub execute
         ##! 16: 'Checking key ' . $key
         if ($key =~ /^(meta_|system_|subject_alt_name)/) {
             my $value = $self->param($key);
+            next unless $value ne '';
             ##! 16: 'Add key with value ' . $value
-            push @{$query->{CERT_ATTRIBUTES}},  { KEY => $key, VALUE => $value };
+            $query->{cert_attributes}->{$key} = { '=', $value };
         }
     }
 
     if ($self->param('subject_key_identifier')) {
         # uppercase the value to match the database format
-        $query->{'SUBJECT_KEY_IDENTIFIER'} = uc($self->param('subject_key_identifier'));
+        $query->{'subject_key_identifier'} = uc($self->param('subject_key_identifier'));
     }
 
-    if (scalar (keys %{$query}) == 3 && scalar(@{$query->{CERT_ATTRIBUTES}}) == 0) {
+    if ($cert_serial) {
+        $cert_serial =~ s/[\s:]//g;
+        if ($cert_serial =~ /[a-f]/ && substr($cert_serial,0,2) ne '0x') {
+            $cert_serial = '0x' . $cert_serial;
+        }
+        $query->{cert_serial} = $cert_serial;
+    }
+
+    if (scalar (keys %{$query}) == 3 && !$query->{cert_attributes}) {
         configuration_error('I18N_OPENXPKI_UI_SEARCH_CERTIFICATES_QUERY_IS_EMPTY');
     }
 
     ##! 32: 'Full query ' . Dumper $query;
-    my $result = CTX('api')->search_cert($query);
+    my $result = CTX('api2')->search_cert(%$query);
 
     ##! 64: 'Search returned ' . Dumper $result
-    my @identifier = map {  $_->{IDENTIFIER} } @{$result};
+    my @identifier = map {  $_->{identifier} } @{$result};
 
     my $target_key = $self->param('target_key') || 'cert_identifier_list';
 
@@ -238,6 +250,11 @@ The certificate identifier of the issuer
 =item subject_key_identifier
 
 The certificate subject_key_identifier (hex notation with colon)
+
+=item cert_serial
+
+The certificate serial number (as hex with 0x prefix or integer, separator
+and casing is handled internally)
 
 =item meta_*, system_*
 
