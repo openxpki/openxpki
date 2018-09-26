@@ -76,7 +76,7 @@ sub execute {
 
         } elsif ($mode eq 'overwrite') {
             $dbi->update(
-                into => 'certificate_attributes',
+                table => 'certificate_attributes',
                 set => {
                     attribute_value  => $value,
                 },
