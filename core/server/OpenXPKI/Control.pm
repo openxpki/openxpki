@@ -132,7 +132,7 @@ sub start {
 
     # If a pid is given, we just check if the server is there
     if (defined $pid && kill(0, $pid)) {
-        if (OpenXPKI::Control::status({SOCKETFILE => $socketfile,SILENT => 1,}) == 0) {
+        if (OpenXPKI::Control::status({SOCKETFILE => $socketfile,SILENT => 1}) == 0) {
             if ($restart) {
                 OpenXPKI::Control::stop({SOCKETFILE => $socketfile, PID => $pid, SILENT => $silent});
             } else {
@@ -206,7 +206,7 @@ sub start {
             }
 
             # find out if the server is REALLY running properly
-            if (OpenXPKI::Control::status({ SOCKETFILE => $socketfile })) {
+            if (OpenXPKI::Control::status({ SOCKETFILE => $socketfile, SLEEP => undef })) {
                 print STDERR "Status check failed\n";
                 return 2;
             }
@@ -364,7 +364,7 @@ sub status {
     my $args = shift;
     my $silent = $args->{SILENT};
 
-    if (exists $args->{SLEEP} and $args->{SLEEP} > 0)
+    if (defined $args->{SLEEP} and $args->{SLEEP} > 0)
     {
         ## this helps to give the server some reaction time
         sleep $args->{SLEEP};
@@ -381,13 +381,14 @@ sub status {
 
     my $client = OpenXPKI::Control::__connect_openxpki_daemon($socketfile);
     if (!$client) {
-        if (not exists $args->{SLEEP})
+        if (not $args->{SLEEP})
         {
             ## wait for a starting server ...
             return OpenXPKI::Control::status ({SOCKETFILE => $args->{SOCKETFILE}, SLEEP => 5, SILENT => $silent});
         }
         print STDERR "OpenXPKI server is not running or does not accept requests.\n" if (not $silent);
         return 2;
+
     }
     print STDOUT "OpenXPKI Server is running and accepting requests.\n" unless ($silent);
     return 0;
@@ -582,14 +583,25 @@ sub __probe_config {
 sub __connect_openxpki_daemon {
 
     my $socketfile = shift;
+
+    # if there is no socket it does not make sense to test the client
+    return unless (-e $socketfile);
+
     my $client;
     eval {
         ## do not make a use statement from this
         ## a use would disturb the server initialization
         require OpenXPKI::Client;
-        $client = OpenXPKI::Client->new({
+        # this only creates the class but does not fire up the socket!
+        my $cc= OpenXPKI::Client->new({
             SOCKETFILE => $socketfile,
         });
+
+        # try to talk to the daemon
+        my $reply = $cc->send_receive_service_msg('PING');
+        if ($reply && $reply->{SERVICE_MSG} eq 'START_SESSION') {
+            $client = $cc;
+        }
     };
     return $client;
 
