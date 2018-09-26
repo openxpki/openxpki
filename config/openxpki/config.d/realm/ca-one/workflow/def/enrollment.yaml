@@ -738,11 +738,6 @@ condition:
         param:
              test: ($context->{url_hmac} && $context->{url_hmac} eq $context->{csr_hmac})
 
-    signer_validity_ok:
-        class: Workflow::Condition::Evaluate
-        param:
-             test: $context->{signer_validity_ok}
-
     allow_expired_signer:
         class: Workflow::Condition::Evaluate
         param:

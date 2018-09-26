@@ -92,8 +92,8 @@ state:
         autorun: 1
         action:
           - global_set_error_signer_revoked > FAILURE ? is_requestor_revoked is_signer_in_current_realm
-          - global_set_error_signer_expired > FAILURE ? !is_requestor_revoked !is_requestor_validity_ok is_signer_in_current_realm
-          - set_renewal_period prepare_renewal load_recent_metadata > RENEWAL_PREPARED ? !is_requestor_revoked is_requestor_validity_ok is_signer_in_current_realm
+          - global_set_error_signer_expired > FAILURE ? !is_requestor_revoked !global_is_signer_validity_ok is_signer_in_current_realm
+          - set_renewal_period prepare_renewal load_recent_metadata > RENEWAL_PREPARED ? !is_requestor_revoked global_is_signer_validity_ok is_signer_in_current_realm
           - global_set_error_not_in_current_realm > FAILURE ? !is_signer_in_current_realm
 
 
@@ -115,9 +115,9 @@ state:
         autorun: 1
         action:
           - global_set_error_signer_not_authorized > FAILURE ? !is_requestor_authorized !is_requestor_revoked
-          - global_set_error_signer_expired > FAILURE ? is_requestor_authorized !is_requestor_revoked !is_requestor_validity_ok
-          - global_set_error_signer_revoked > FAILURE ? is_requestor_revoked is_requestor_validity_ok
-          - global_noop > AUTHORIZED ? is_requestor_authorized !is_requestor_revoked is_requestor_validity_ok
+          - global_set_error_signer_expired > FAILURE ? is_requestor_authorized !is_requestor_revoked !global_is_signer_validity_ok
+          - global_set_error_signer_revoked > FAILURE ? is_requestor_revoked global_is_signer_validity_ok
+          - global_noop > AUTHORIZED ? is_requestor_authorized !is_requestor_revoked global_is_signer_validity_ok
 
     # common workflow
     AUTHORIZED:
@@ -532,11 +532,6 @@ condition:
         class: Workflow::Condition::Evaluate
         param:
             test: ($context->{signer_trusted} and $context->{signer_authorized})
-
-    is_requestor_validity_ok:
-        class: Workflow::Condition::Evaluate
-        param:
-            test: ($context->{signer_validity_ok})
 
     is_requestor_revoked:
         class: Workflow::Condition::Evaluate
