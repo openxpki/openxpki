@@ -66,6 +66,15 @@ has subject => (
     }
 );
 
+has subject_alt_name => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'ArrayRef',
+    reader => 'get_subject_alt_name',
+    lazy => 1,
+    builder => '_build_san'
+);
+
 has issuer => (
     is => 'ro',
     init_arg => undef,
@@ -174,6 +183,39 @@ sub get_notbefore {
 sub get_notafter {
     my $self = shift;
     return $self->_get_validity( $self->notafter(), shift );
+}
+
+
+sub _build_san {
+
+    my $self = shift;
+
+    my $san_map = {
+        otherName => 'otherName',
+        rfc822Name => 'email',
+        dNSName => 'DNS',
+        x400Address => '', # not supported by openssl
+        directoryName => 'dirName',
+        ediPartyName => '', # not supported by openssl
+        uniformResourceIdentifier => 'URI',
+        iPAddress  => 'IP',
+        registeredID => 'RID',
+    };
+
+    my @san_list;
+
+    # List where eacht item is a string with "type=value"
+    my $san_names = $self->_cert->SubjectAltName();
+
+    # Walk all san lines
+    foreach my $san (@$san_names) {
+        my ($type, $value) = $san =~ m{\A(\w+)=(.+)\z};
+        my $san_type = $san_map->{$type};
+        next unless($san_type);
+        push @san_list, [ $san_type, $value ];
+    }
+
+    return \@san_list;
 }
 
 sub _get_validity {
