@@ -208,7 +208,6 @@ command "import_certificate" => {
         $cert_hash->{pki_realm} = $issuer_cert->{pki_realm} if $issuer_cert->{pki_realm};
     }
 
-
     $dbi->merge(
         into => 'certificate',
         set => $cert_hash,
@@ -335,10 +334,12 @@ sub _is_issuer_valid  {
     my $issuer_cert     = $args{issuer_cert};
     my $force_nochain   = $args{force_nochain};
 
+    ##! 64: 'Cert ' . Dumper $cert
     #
     # If issuer is already a root
     #
     if ($issuer_cert->{identifier} eq $issuer_cert->{issuer_identifier}) {
+        ##! 32: 'Validate self-signed ' . $issuer_cert->{identifier}
         return $default_token->command({
             COMMAND => 'verify_cert',
             CERTIFICATE => $cert->pem,
@@ -354,16 +355,19 @@ sub _is_issuer_valid  {
     my $chain = CTX('api')->get_chain({ START_IDENTIFIER => $issuer_cert->{identifier}, OUTFORMAT => 'PEM' });
 
     # verify a complete chain
+    ##! 64: 'Validate chain ' . Dumper $chain
     if ($chain->{COMPLETE}) {
         my @work_chain = @{$chain->{CERTIFICATES}};
         my $root = pop @work_chain;
 
-        return $default_token->command({
+        my $res = $default_token->command({
             COMMAND => 'verify_cert',
             CERTIFICATE => $cert->pem,
             TRUSTED => $root,
             CHAIN => join "\n", @work_chain
         });
+        ##! 32: 'verify result ' . Dumper $res
+        return $res;
     }
 
     # Accept an incomplete chain

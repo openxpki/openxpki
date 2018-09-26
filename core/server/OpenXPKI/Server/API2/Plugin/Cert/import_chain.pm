@@ -21,12 +21,12 @@ use Try::Tiny;
 
 Expects a set of certificates as PKCS7 container, concated PEM or array
 of PEM blocks - expected sorting is "entity first". For security reasons
-the root is not imported by default, set IMPORT_ROOT => 1 to import root
+the root is not imported by default, set I<import_root> to import root
 certificates. If the chain can not be build, the import will fail unless
-you set FORCE_NOCHAIN => 1, which will import the chain as far as it can
+you set I<force_nochain>, which will import the chain as far as it can
 be built. Certificates from the chain that are already in the database
 are ignored. If the data contain certs from different chains, all chains
-are built (works only with PEM array/block yet!)
+are built (works only with PEM array/block)
 
 Return value is a hash with keys imported and failed. Imported contains
 the db_hash of the successful imports, failed contains the cert_identifier
@@ -36,12 +36,16 @@ B<Parameters>
 
 =over
 
-=item * C<XXX> I<Bool> - XXX. Default: XXX
-
-=item * C<pem> I<Str or ArrayRef> - PEM encoded certificate (I<Str>) or full
-certificate chain (list of PEM encoded certificates) starting with the entity
+=item * C<chain> I<Str or ArrayRef> - PEM encoded certificate (I<Str>) or full certificate chain
+(list of PEM encoded certificates) starting with the entity
 
 =item * C<pkcs7> I<Str> - PEM encoded PKCS7 container
+
+=item * C<pki_realm> I<Str> - realm to import to, default is the current realm
+
+=item * C<force_nochain> I<Bool> - force import of incomplete chains
+
+=item * C<import_root> I<Bool> - import the root certificate if required
 
 =back
 
@@ -66,8 +70,14 @@ command "import_chain" => {
     my @chain;
     # take given chain
     if ($params->has_chain) {
+
+        if (!ref $params->chain) {
+            @chain = ($params->chain =~ m/(-----BEGIN (\w+\s)?CERTIFICATE-----[^-]+-----END (\w+\s)?CERTIFICATE-----)/gm);
+        } else {
+            @chain = @{ $params->chain };
+        }
         CTX('log')->system()->debug("Importing certificate chain with ".scalar(@chain)." element(s)");
-        @chain = @{ $params->chain };
+
     }
     # extract entity certificate from pkcs7
     elsif ($params->has_pkcs7) {

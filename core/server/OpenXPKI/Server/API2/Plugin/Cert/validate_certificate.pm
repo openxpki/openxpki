@@ -7,7 +7,10 @@ OpenXPKI::Server::API2::Plugin::Cert::validate_certificate
 
 =cut
 
+use Data::Dumper;
+
 # Project modules
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 
@@ -196,6 +199,8 @@ command "validate_certificate" => {
         TRUSTED => $root,
         CHAIN => join "\n", @work_chain
     });
+
+    ##! 64: 'Validation result ' . Dumper $valid
 
     $chain_status = 'BROKEN' unless($valid);
 
