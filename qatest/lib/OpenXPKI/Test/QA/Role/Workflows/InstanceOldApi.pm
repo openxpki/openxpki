@@ -99,29 +99,30 @@ sub BUILD {
     }
     # existing workflow
     else {
-        $self->refresh;
+        $self->metadata;
         my $type = $self->last_wf_state->{TYPE} or die explain $self->last_wf_state;
         $self->type($type);
         note "Fetched workflow #".$self->id." ($type) via old API";
     }
 }
 
-=head2 refresh
+=head2 metadata
 
-Refreshes the workflow information in this wrapper object by querying the API.
+Queries the API for the current workflow metadata and returns it (I<HashRef>).
 
 =cut
-sub refresh {
+sub metadata {
     my ($self) = @_;
     my $data = $self->oxitest->api_command(
         get_workflow_info => { ID => $self->id }
     );
     $self->last_wf_state($data->{WORKFLOW}) if $data->{WORKFLOW};
+    return $data;
 }
 
 =head2 state
 
-Returns the current workflow state. Please use L</refresh> to get current
+Returns the current workflow state. Please use L</metadata> to get current
 informations.
 
 =cut
