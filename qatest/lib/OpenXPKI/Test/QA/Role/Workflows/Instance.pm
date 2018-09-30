@@ -149,11 +149,13 @@ B<Positional Parameters>
 
 =item * C<$params> I<HashRef> - parameters
 
+=item * C<$async> I<Bool> - asynchronous execution. Default: 0
+
 =back
 
 =cut
 sub execute {
-    my ($self, $activity, $params) = @_;
+    my ($self, $activity, $params, $async) = @_;
 
     my $result;
     lives_ok {
@@ -162,6 +164,7 @@ sub execute {
                 id => $self->id,
                 activity => $activity,
                 params => $params // {},
+                async => $async // 0,
             }
         );
         $self->last_wf_state($result->{workflow}) if $result->{workflow};
