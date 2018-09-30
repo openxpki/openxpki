@@ -467,8 +467,8 @@ sub _handle_proc_state{
     if(!$action_needed){
 
         OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_WORKFLOW_UNKNOWN_PROC_STATE",
-                params  => {DESCRIPTION => sprintf('unkown proc-state: %s',$self->proc_state)}
+                message => "Workflow is in unknown process state",
+                params  => { DESCRIPTION => sprintf('unknown proc-state: %s',$self->proc_state) }
             );
 
     }
