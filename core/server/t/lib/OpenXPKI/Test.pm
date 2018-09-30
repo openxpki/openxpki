@@ -531,6 +531,9 @@ around BUILDARGS => sub {
 
 sub BUILD {
     my $self = shift;
+
+    $ENV{OXI_TESTENV_ROOT} = $self->testenv_root;
+
     $self->init_logging;
     $self->init_base_config;
     $self->init_user_config;
