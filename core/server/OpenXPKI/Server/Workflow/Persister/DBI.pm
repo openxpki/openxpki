@@ -68,7 +68,7 @@ sub update_workflow {
         if ($workflow->persist_context > 1) {
             $self->__update_workflow_attributes($workflow) ;
             # Reset the update marker (after COMMIT) if full update was requested
-            $workflow->context->reset_updated if $workflow->persist_context > 1;
+            $workflow->context->reset_updated;
         }
     }
 
