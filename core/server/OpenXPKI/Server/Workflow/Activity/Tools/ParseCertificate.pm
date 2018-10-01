@@ -33,10 +33,11 @@ sub execute {
         message => 'No certificate data received'
     ) unless ($pem);
 
+    my ($data) = $pem =~ m{(-----BEGIN ([\w\s]*)CERTIFICATE-----.*?-----END \2CERTIFICATE-----)}xms;
+
     OpenXPKI::Exception->throw(
         message => 'Data is not a PEM encoded certificate'
-    ) unless ($pem =~ /-----BEGIN ([A-Z ]*)CERTIFICATE-----/);
-
+    ) unless ($data);
 
     my $subject_prefix = $self->param('subject_prefix') || 'cert_';
 
@@ -51,7 +52,7 @@ sub execute {
         $subject_prefix.'subject_alt_name' => '',
     });
 
-    my $x509 = OpenXPKI::Crypt::X509->new($pem);
+    my $x509 = OpenXPKI::Crypt::X509->new($data);
 
     my %hashed_dn;
     my $cert_subject = $x509->get_subject();
@@ -105,7 +106,8 @@ Take a PEM encoded certificate and extract information to the context.
 
 =item pem
 
-The PEM formatted certificate.
+The PEM formatted certificate. If the input string consists of multiple
+concatenated PEM blocks, the first one is used, the remainder discarded.
 
 =item subject_prefix
 
