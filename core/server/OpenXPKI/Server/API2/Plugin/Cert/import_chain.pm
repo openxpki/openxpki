@@ -8,6 +8,8 @@ OpenXPKI::Server::API2::Plugin::Cert::import_chain
 =cut
 
 # Project modules
+use OpenXPKI::Exception;
+use OpenXPKI::Crypt::X509;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 
@@ -28,16 +30,31 @@ be built. Certificates from the chain that are already in the database
 are ignored. If the data contain certs from different chains, all chains
 are built (works only with PEM array/block)
 
-Return value is a hash with keys imported and failed. Imported contains
-the db_hash of the successful imports, failed contains the cert_identifier
-and error message of failed imports ([{cert_identifier, error}]).
+Return value is a hash with keys imported, existed and failed:
+
+=over
+
+=item imported
+
+array ref holding the db_hash of the successful imports
+
+=item  existed
+
+array ref holding the db_hash of items that have been in the database already.
+
+=item failed
+
+array ref holding the cert_identifier and error message of failed imports
+([{ cert_identifier => ..., error => .... }])
+
+=back
 
 B<Parameters>
 
 =over
 
-=item * C<chain> I<Str or ArrayRef> - PEM encoded certificate (I<Str>) or full certificate chain
-(list of PEM encoded certificates) starting with the entity
+=item * C<chain> I<Str or ArrayRef> - PEM encoded certificate (I<Str>) or full
+certificate chain (list of PEM encoded certificates) starting with the entity
 
 =item * C<pkcs7> I<Str> - PEM encoded PKCS7 container
 
@@ -70,14 +87,8 @@ command "import_chain" => {
     my @chain;
     # take given chain
     if ($params->has_chain) {
-
-        if (!ref $params->chain) {
-            @chain = ($params->chain =~ m/(-----BEGIN (\w+\s)?CERTIFICATE-----[^-]+-----END (\w+\s)?CERTIFICATE-----)/gm);
-        } else {
-            @chain = @{ $params->chain };
-        }
+        @chain = @{$params->chain};
         CTX('log')->system()->debug("Importing certificate chain with ".scalar(@chain)." element(s)");
-
     }
     # extract entity certificate from pkcs7
     elsif ($params->has_pkcs7) {
@@ -99,11 +110,9 @@ command "import_chain" => {
 
     # We start at the end of the list
     while (my $pem = pop @chain) {
-        my $cert = OpenXPKI::Crypto::X509->new(
-            TOKEN => $default_token,
-            DATA  => $pem,
-        );
-        my $cert_identifier = $cert->get_identifier();
+        my $cert = OpenXPKI::Crypt::X509->new($pem);
+
+        my $cert_identifier = $cert->get_cert_identifier();
 
         # Check if the certificate is already in the PKI
         my $cert_hash = $dbi->select_one(
@@ -119,13 +128,8 @@ command "import_chain" => {
             next;
         }
 
-        # Check if root certificate
-        my $self_signed = (defined $cert->get_subject_key_id and defined $cert->get_authority_key_id)
-            ? ($cert->get_subject_key_id eq $cert->get_authority_key_id)
-            : ($cert->{PARSED}->{BODY}->{SUBJECT} eq $cert->{PARSED}->{BODY}->{ISSUER});
-
         # Do not import root certs unless specified
-        if ($self_signed and not $params->import_root) {
+        if ($cert->is_selfsigned and not $params->import_root) {
             CTX('log')->system()->debug("Certificate $cert_identifier is self-signed, skipping");
             next;
         }
@@ -135,7 +139,7 @@ command "import_chain" => {
         # does the chain validation
         try {
             my $db_insert = $self->api->import_certificate(
-                data          => $pem,
+                data          => $cert->pem,
                 pki_realm     => $realm,
                 force_nochain => $params->force_nochain,
             );

@@ -83,7 +83,7 @@ A PEM encoded certificate chain
 =cut
 subtype 'PEMCertChain',
     as 'PEM',
-    where { $_ =~ m{ \A ( -----BEGIN\ CERTIFICATE----- [^-]+ -----END\ CERTIFICATE----- \s* )+ \Z }msx },
+    where { $_ =~ m{ \A ( -----BEGIN\ ([\w\s]*)CERTIFICATE----- [^-]+ -----END\ \2CERTIFICATE----- \s* )+ \Z }msx },
     message { "$_ is not a PEM encoded certificate chain" };
 
 =head2 PEMCert
@@ -110,7 +110,7 @@ subtype 'ArrayRefOrPEMCertChain',
 coerce 'ArrayRefOrPEMCertChain',
     from 'PEMCertChain',
     # /g matches ALL certificates, results are grouped via () and the result list is put into []
-    via { [ $_ =~ m{ ( -----BEGIN\ CERTIFICATE----- [^-]+ -----END\ CERTIFICATE----- ) }gmsx ] };
+    via { [ $_ =~ m{ ( -----BEGIN\ [\w\s]*CERTIFICATE----- [^-]+ -----END\ [\w\s]*CERTIFICATE----- ) }gmsx ] };
 
 =head2 ArrayRefOrStr
 
