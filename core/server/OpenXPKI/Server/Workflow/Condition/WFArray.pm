@@ -32,6 +32,17 @@ sub _evaluate {
             return 1;
         }
         condition_error ($self->param('error') || 'I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_NOT_EMPTY');
+
+    }
+    elsif ( $condition eq 'is_not_empty' ) {
+
+        CTX('log')->application()->debug("Testing if WFArray ".$array_name." is not empty");
+
+        if ( $array->count() > 0 ) {
+            return 1;
+        }
+        condition_error ($self->param('error') || 'I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_IS_EMPTY');
+
     }
     elsif ( $condition =~ /count_(is|isnot|lt|lte|gt|gte)\s*$/ ) {
         my $op = $1;
@@ -105,6 +116,10 @@ The following conditions are supported:
 =item is_empty
 
 Condition is true if the array is either non-existent or is empty (I<value> is not used).
+
+=item is_not_empty
+
+Condition is true if the array is not empty (I<value> is not used).
 
 =item count_is
 
