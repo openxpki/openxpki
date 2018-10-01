@@ -1,25 +1,30 @@
-
 package OpenXPKI::Server::Workflow;
 
 use base qw( Workflow );
 
 use strict;
 use warnings;
-use utf8;
+
+# Core modules
 use English;
-use Carp qw(croak carp);
-use Scalar::Util 'blessed';
+use Carp qw( croak carp );
+use Scalar::Util qw( blessed );
+use Data::Dumper;
+
+# CPAN modules
+use Try::Tiny;
 use Workflow::Exception qw( workflow_error );
 
+# Project modules
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::DateTime;
 
-use Data::Dumper;
 
 __PACKAGE__->mk_accessors( qw( proc_state count_try wakeup_at reap_at session_info persist_context ) );
+
 
 my $default_reap_at_interval = '+0000000005';
 
@@ -113,61 +118,68 @@ sub context {
 
 
 sub execute_action {
-
     my ( $self, $action_name, $autorun ) = @_;
     ##! 1: 'execute_action '.$action_name
 
     # if we are in a recursive run or in an initial create the dbi
     # transaction is already open and the autorun flag is set
-    if (!$autorun) {
-        CTX('dbi')->start_txn;
-    }
+    CTX('dbi')->start_txn unless $autorun;
 
-    $self->persist_context(1);
+    try {
+        $self->persist_context(1);
 
-    $self->session_info(
-        CTX('session')->data->freeze(only => [ "user", "role" ])
-    );
+        $self->session_info(
+            CTX('session')->data->freeze(only => [ "user", "role" ])
+        );
 
-    # The workflow module internally caches conditions and does NOT clear
-    # this cache if you just refetch a workflow! As the workflow state
-    # object is shares, this leads to wrong states in the condition cache
-    # if you reopen two different workflows in the same state!
-    my $wf_state = $self->_get_workflow_state();
+        # The workflow module internally caches conditions and does NOT clear
+        # this cache if you just refetch a workflow! As the workflow state
+        # object is shares, this leads to wrong states in the condition cache
+        # if you reopen two different workflows in the same state!
+        my $wf_state = $self->_get_workflow_state();
 
-    ##! 16: 'Clear cache for state ' . $wf_state->state
-    $wf_state->clear_condition_cache();
+        ##! 16: 'Clear cache for state ' . $wf_state->state
+        $wf_state->clear_condition_cache();
 
     ##! 128: 'state object cond. cache ' . Dumper $wf_state->{_condition_result_cache}
 
-    #set "reap at" info
-    my $action = $self->_get_action($action_name);
+        #set "reap at" info
+        my $action = $self->_get_action($action_name);
 
-    $self->{_CURRENT_ACTION} = $action_name;
-    $self->context->param( wf_current_action => $action_name );
+        $self->{_CURRENT_ACTION} = $action_name;
+        $self->context->param( wf_current_action => $action_name );
 
-    # reset context-key exception
-    $self->context->param( wf_exception => undef ) if $self->context->param('wf_exception');
+        # reset context-key exception
+        $self->context->param( wf_exception => undef ) if $self->context->param('wf_exception');
 
-    # check and handle current proc_state
-    $self->_handle_proc_state($action_name);
+        # check and handle current proc_state
+        $self->_handle_proc_state($action_name);
 
-    my $reap_at_interval = $default_reap_at_interval;
-    if (blessed( $action ) && $action->isa('OpenXPKI::Server::Workflow::Activity')) {
-        $reap_at_interval = $action->get_reap_at_interval();
+        my $reap_at_interval = $default_reap_at_interval;
+        if (blessed( $action ) && $action->isa('OpenXPKI::Server::Workflow::Activity')) {
+            $reap_at_interval = $action->get_reap_at_interval();
+        }
+
+        # skip auto-persist as this will happen on next call anyway
+        $self->set_reap_at_interval($reap_at_interval, 1);
+
+        # if proc_state is "manual" then make sure no other process modified it
+        # meanwhile (i.e. is executing the same action in parallel)
+        if ($self->proc_state eq 'manual') {
+            $self->_check_and_set_proc_state($self->proc_state, 'running');
+        }
+        else {
+            $self->_set_proc_state('running'); # writes workflow metadata
+        }
     }
-
-    # skip auto-persist as this will happen on next call anyway
-    $self->set_reap_at_interval($reap_at_interval, 1);
-
-    # if proc_state is "manual" then make sure no other process modified it
-    # meanwhile (i.e. is executing the same action in parallel)
-    if ($self->proc_state eq 'manual') {
-        $self->_check_and_set_proc_state($self->proc_state, 'running');
-    }
-    else {
-        $self->_set_proc_state('running'); # writes workflow metadata
-    }
+    # catch exceptions during initialization to do database rollback
+    catch {
+        # make sure the cleanup code does not die as this would escape this method
+        eval { CTX('dbi')->rollback() unless $autorun };
+        # $autorun = 1 means nested workflow action, rollback will then be
+        # performed on a higher level by code further down
+        die $_; # rethrow
+    };
 
     CTX('log')->application()->debug("Execute action $action_name");
 
@@ -283,8 +295,10 @@ sub execute_action {
         }
     }
 
-    return $state;
+    # commit the last transaction (most likely started by OpenXPKI::Server::Workflow::Persister::DBI->commit_transaction)
+    CTX('dbi')->commit unless $autorun;
 
+    return $state;
 }
 
 sub set_failed {
