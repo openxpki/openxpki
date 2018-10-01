@@ -545,7 +545,7 @@ sub BUILD {
 sub _build_log4perl {
     my ($self, $is_early_init) = @_;
 
-    # special behaviour CI environments: log to file
+    # special behaviour in CI environments: log to file
     # (detects Travis CI/CircleCI/Gitlab CI/Appveyor/CodeShip + Jenkins/TeamCity)
     if ($ENV{CI} or $ENV{BUILD_NUMBER}) {
         my $logfile = $self->config_writer->path_log_file;
@@ -555,7 +555,7 @@ sub _build_log4perl {
             log4perl.appender.CatchAll = Log::Log4perl::Appender::File
             log4perl.appender.CatchAll.filename = $logfile
             log4perl.appender.CatchAll.layout = Log::Log4perl::Layout::PatternLayout
-            log4perl.appender.CatchAll.layout.ConversionPattern = %d %c.%p %m [pid=%P|%i]%n
+            log4perl.appender.CatchAll.layout.ConversionPattern = %d %m [pid=%P|%i]%n
             log4perl.appender.CatchAll.syswrite  = 1
             log4perl.appender.CatchAll.utf8 = 1
         );
@@ -582,7 +582,7 @@ sub _log4perl_screen {
 
         log4perl.appender.Screen                = Log::Log4perl::Appender::Screen
         log4perl.appender.Screen.layout         = Log::Log4perl::Layout::PatternLayout
-        log4perl.appender.Screen.layout.ConversionPattern = # %d %c.%p %m [pid=%P|%i]%n
+        log4perl.appender.Screen.layout.ConversionPattern = # %d %m [pid=%P|%i]%n
         log4perl.appender.Screen.Threshold      = $threshold_screen
 
         # "File" is disabled by default
@@ -591,7 +591,7 @@ sub _log4perl_screen {
         log4perl.appender.File.syswrite         = 1
         log4perl.appender.File.utf8             = 1
         log4perl.appender.File.layout           = Log::Log4perl::Layout::PatternLayout
-        log4perl.appender.File.layout.ConversionPattern = # %d %c.%p %m [pid=%P|%i]%n
+        log4perl.appender.File.layout.ConversionPattern = # %d %m [pid=%P|%i]%n
         log4perl.appender.File.Threshold        = OFF
     );
 }
