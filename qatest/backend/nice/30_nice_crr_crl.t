@@ -116,7 +116,7 @@ lives_ok {
 my $i = 0;
 do {
     sleep 1;
-    $wf->refresh;
+    $wf->metadata;
     $i++;
 } while($wf->state ne 'CHECK_FOR_REVOCATION' && $i < 30);
 $wf->state_is('CHECK_FOR_REVOCATION');
@@ -155,7 +155,7 @@ lives_ok {
 if ($wf->state eq 'CHECK_FOR_REVOCATION') {
     $oxitest->api_command('wakeup_workflow' => { ID => $delayed_revoke_id });
     $i = 0;
-    do { sleep 1; $wf->refresh; } while ($wf->state ne 'SUCCESS' && $i++ < 10);
+    do { sleep 1; $wf->metadata; } while ($wf->state ne 'SUCCESS' && $i++ < 10);
     is $wf->state, 'SUCCESS', "Wake up and finish CRR workflow";
 }
 else {

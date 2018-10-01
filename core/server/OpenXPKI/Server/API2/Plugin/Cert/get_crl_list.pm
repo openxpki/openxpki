@@ -49,22 +49,22 @@ Possible values for format are:
 
 =back
 
-=item issuer_identifier
+=item * C<issuer_identifier>
 
 Get only the CRLs for the provided issuer. If not set CRLs for all issuers
 in the current realm are returned.
 
-=item limit
+=item * C<limit>
 
-=item pki_realm
+=item * C<pki_realm>
 
-=item valid_after
+=item * C<valid_after>
 
-=item valid_before
+=item * C<valid_before>
 
-=item expires_after
+=item * C<expires_after>
 
-=item expires_before
+=item * C<expires_before>
 
 =back
 

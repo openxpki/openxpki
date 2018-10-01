@@ -98,30 +98,31 @@ sub BUILD {
     }
     # existing workflow
     else {
-        $self->refresh;
+        $self->metadata;
         my $type = $self->last_wf_state->{type} or die explain $self->last_wf_state;
         $self->type($type);
         note "Fetched workflow #".$self->id." ($type)";
     }
 }
 
-=head2 refresh
+=head2 metadata
 
-Refreshes the workflow information in this wrapper object by querying the API.
+Queries the API for the current workflow metadata and returns it (I<HashRef>).
 
 =cut
-sub refresh {
+sub metadata {
     my ($self) = @_;
     my $data = $self->oxitest->api2_command(
         get_workflow_info => { id => $self->id }
     );
     $self->last_wf_state($data->{workflow}) if $data->{workflow};
+    return $data;
 }
 
 =head2 state
 
-Returns the current workflow state. Please use L</refresh> to get current
-informations.
+Returns the current workflow state. Please use L</metadata> to get all current
+workflow informations.
 
 =cut
 sub state {
@@ -148,11 +149,13 @@ B<Positional Parameters>
 
 =item * C<$params> I<HashRef> - parameters
 
+=item * C<$async> I<Bool> - asynchronous execution. Default: 0
+
 =back
 
 =cut
 sub execute {
-    my ($self, $activity, $params) = @_;
+    my ($self, $activity, $params, $async) = @_;
 
     my $result;
     lives_ok {
@@ -161,6 +164,7 @@ sub execute {
                 id => $self->id,
                 activity => $activity,
                 params => $params // {},
+                async => $async // 0,
             }
         );
         $self->last_wf_state($result->{workflow}) if $result->{workflow};

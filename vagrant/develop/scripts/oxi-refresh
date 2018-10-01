@@ -72,7 +72,7 @@ popd                                                                  >$LOG 2>&1
 
 echo "Copying CGI::Session::Driver::openxpki"
 mkdir -p /usr/share/perl5/CGI/Session/Driver
-cp $OXI_CORE_DIR/server/CGI/Session/Driver/openxpki.pm /usr/share/perl5/CGI/Session/Driver/
+cp $OXI_CORE_DIR/server/CGI_Session_Driver/openxpki.pm /usr/share/perl5/CGI/Session/Driver/
 
 # if --no-i18n and --fast are NOT given
 # (use # to strip text off $@ and see if string still equals original $@)

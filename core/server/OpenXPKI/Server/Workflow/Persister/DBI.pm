@@ -11,6 +11,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Workflow::Context;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
+use DateTime;
 use DateTime::Format::Strptime;
 
 use Data::Dumper;
@@ -68,7 +69,7 @@ sub update_workflow {
         if ($workflow->persist_context > 1) {
             $self->__update_workflow_attributes($workflow) ;
             # Reset the update marker (after COMMIT) if full update was requested
-            $workflow->context->reset_updated if $workflow->persist_context > 1;
+            $workflow->context->reset_updated;
         }
     }
 
@@ -400,6 +401,45 @@ sub fetch_history {
     return @history;
 }
 
+sub update_proc_state {
+    my ($self, $wf_id, $old_state, $new_state) = @_;
+
+    my $row_count;
+    eval {
+        $row_count = CTX('dbi')->update(
+            table => 'workflow',
+            set => {
+                workflow_proc_state => $new_state,
+                workflow_last_update => DateTime->now->strftime( '%Y-%m-%d %H:%M:%S' ),
+            },
+            where => {
+                workflow_proc_state => $old_state,
+                workflow_id => $wf_id,
+            },
+        );
+    };
+    # We use DB transaction isolation level "READ COMMITTED":
+    # So in the meantime another process might have changed the database.
+    # Two things can happen:
+    # 1. other process committed changes -> our update's where clause misses ($row_count = 0).
+    # 2. other process did not commit -> timeout exception because of DB row lock
+    if ($@ or $row_count < 1) {
+        my $info = CTX('dbi')->select_one(
+            from => 'workflow',
+            columns => [ 'workflow_proc_state' ],
+            where => { workflow_id => $wf_id },
+        );
+        CTX('log')->workflow->warn(sprintf(
+            'Could not update workflow #%s to proc_state "%s". Expected previous state: "%s", found: "%s"',
+            $wf_id, $new_state,$old_state, $info->{workflow_proc_state}
+        ));
+        return 0;
+    }
+    else {
+        return 1;
+    }
+}
+
 sub commit_transaction {
     ##! 1: "COMMIT"
     CTX('log')->workflow->debug("Executing database COMMIT (requested by workflow engine)");
@@ -486,4 +526,9 @@ Creates a workflow history entry.
 
 Fetches a workflow history object from the persistant storage.
 
+=head2 update_proc_state($old_state, $new_state)
 
+Tries to update the C<proc_state> in the database to C<$new_state>.
+
+Returns 1 on success and 0 if e.g. another parallel process already changed the
+given C<$old_state>.
