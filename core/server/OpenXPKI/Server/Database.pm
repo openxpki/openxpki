@@ -477,7 +477,8 @@ sub drop_table {
 
 sub start_txn {
     my $self = shift;
-    return $self->log->warn("AutoCommit is on, start_txn() is useless") if $self->autocommit;
+    return $self->log->warn("AutoCommit is on, start_txn() is useless")
+      if $self->autocommit;
 
     # we have to enforce the actual DB connection which clears
     # $self->_txn_starter at this point as otherwise the very first commit()
@@ -487,40 +488,41 @@ sub start_txn {
     my $caller = [ caller ];
     if ($self->in_txn) {
         $self->log->debug(
-            sprintf "start_txn() was called from %s, line %i during a running transaction (started in %s, line %i).",
-            $caller->[0],
-            $caller->[2],
-            $self->_txn_starter->[0],
-            $self->_txn_starter->[2],
-        );
+            sprintf "transaction start requested during a running transaction (started in %s:%i) in %s:%i",
+                $caller->[0],
+                $caller->[2],
+                $self->_txn_starter->[0],
+                $self->_txn_starter->[2],
+        ) if $self->log->is_debug;
     }
-    ##! 16: "Flagging a transaction start"
+    ##! 16: "Transaction start"
     $self->_txn_starter($caller);
 
-    $self->log->trace(
-        sprintf "start_txn() in %s:%i", $caller->[0], $caller->[2],
-    ) if $self->log->is_trace;
+    $self->log->trace(sprintf "transaction start in %s:%i", $caller->[0], $caller->[2])
+      if $self->log->is_trace;
 }
 
 sub commit {
     my $self = shift;
-    return $self->log->warn("AutoCommit is on, commit() is useless") if $self->autocommit;
+    return $self->log->warn("AutoCommit is on, commit() is useless")
+      if $self->autocommit;
 
+    my $caller = [ caller ];
     if ($self->in_txn) {
-        if ($self->log->is_trace) {
-            my $caller = [ caller ];
-            $self->log->trace(
-                sprintf "commit for txn started at %s:%i called in %s:%i",
-                    $self->_txn_starter->[0], $self->_txn_starter->[2],
-                    $caller->[0], $caller->[2]
-            );
-        }
+        $self->log->trace(
+            sprintf "commit for txn (started at %s:%i) in %s:%i",
+                $self->_txn_starter->[0], $self->_txn_starter->[2],
+                $caller->[0], $caller->[2]
+        ) if $self->log->is_trace;
     }
     else {
-        $self->log->debug("commit() was called without indicating a transaction start via start_txn() first")
+        $self->log->debug(
+            sprintf "commit was requested without prior transaction start in %s:%i",
+                $caller->[0], $caller->[2]
+        ) if $self->log->is_debug;
     }
 
-    ##! 16: "Commiting changes"
+    ##! 16: "Commit"
     $self->dbh->commit;
     $self->_clear_txn_starter;
 }
@@ -529,18 +531,22 @@ sub rollback {
     my $self = shift;
     return $self->log->warn("AutoCommit is on, rollback() is useless") if $self->autocommit;
 
+    my $caller = [ caller ];
+
     if ($self->in_txn) {
         if ($self->log->is_trace) {
-            my $caller = [ caller ];
             $self->log->trace(
-                sprintf "rollback for txn from %s, %i called in %s, %i",
+                sprintf "rollback for txn (started at %s:%i) in %s:%i",
                     $self->_txn_starter->[0], $self->_txn_starter->[2],
                     $caller->[0], $caller->[2]
-            );
+            ) if $self->log->is_trace;
         }
     }
     else {
-        $self->log->debug("rollback() was called without indicating a transaction start via start_txn() first");
+        $self->log->debug(
+            sprintf "rollback was requested without prior transaction start in %s:%i",
+                $caller->[0], $caller->[2]
+        ) if $self->log->is_debug;
     }
 
     ##! 16: "Rollback of changes"
@@ -713,7 +719,7 @@ C<undef> is interpreted as C<NULL> (I<HashRef>, required).
 
 =head2 update
 
-Updates rows in the database and rreturns the number of affected rows.
+Updates rows in the database and returns the number of affected rows.
 
 Please note that C<NULL> values will be converted to Perl C<undef>.
 
