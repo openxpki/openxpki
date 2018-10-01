@@ -388,6 +388,22 @@ sub check_acl {
 
 }
 
+=head2 update_proc_state($wf, $old_state, $new_state)
+
+Tries to update the C<proc_state> in the database to C<$new_state>.
+
+Returns 1 on success and 0 if e.g. another parallel process already changed the
+given C<$old_state>.
+
+=cut
+sub update_proc_state {
+    my ($self, $wf, $old_state, $new_state) = @_;
+
+    my $wf_config = $self->_get_workflow_config( $wf->type );
+    my $persister = $self->get_persister( $wf_config->{persister} );
+    return $persister->update_proc_state($wf->id, $old_state, $new_state);
+}
+
 1;
 __END__
 

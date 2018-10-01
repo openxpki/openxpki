@@ -90,12 +90,15 @@ command "execute_workflow_activity" => {
     ##! 2: "load workflow"
     my $workflow = $util->fetch_workflow($wf_type, $wf_id);
 
+    # Make sure workflow is in state "manual".
+    # A proc_state other than "manual" should be prevented by the UI but may
+    # occur if the workflow moves on while the UI shows the old state or if the
+    # user manages to fire up the same action multiple times.
     my $proc_state = $workflow->proc_state();
-    # should be prevented by the UI but can happen if workflow moves while UI shows old state
     if ($proc_state ne "manual") {
         OpenXPKI::Exception->throw(
-            message => 'Attempt to execute a workflow activity that is not in MANUAL state',
-            params => { id => $wf_id, proc_state => $proc_state }
+            message => 'Attempt to execute activity on workflow that is not in proc_state "manual"',
+            params => { wf_id => $wf_id, activity => $wf_activity, proc_state => $proc_state }
         );
     }
     $workflow->reload_observer;

@@ -151,10 +151,16 @@ sub execute_action {
     # skip auto-persist as this will happen on next call anyway
     $self->set_reap_at_interval($reap_at_interval, 1);
 
-    ##! 16: 'set proc_state "running"'
-    $self->_set_proc_state('running'); # writes workflow metadata
+    # if proc_state is "manual" then make sure no other process modified it
+    # meanwhile (i.e. is executing the same action in parallel)
+    if ($self->proc_state eq 'manual') {
+        $self->_check_and_set_proc_state($self->proc_state, 'running');
+    }
+    else {
+        $self->_set_proc_state('running'); # writes workflow metadata
+    }
 
-    CTX('log')->application()->debug("Execute action $action_name on workflow #" . $self->id);
+    CTX('log')->application()->debug("Execute action $action_name");
 
 
     my $state='';
@@ -588,22 +594,46 @@ sub _runtime_exception {
 
 
 
-sub _set_proc_state{
+sub _set_proc_state {
     my $self = shift;
     my $proc_state = shift;
 
     ##! 16: sprintf('_set_proc_state from %s to %s, Wfl State: %s', $self->proc_state(), $proc_state, $self->state());
 
-    if(!$known_proc_states{$proc_state}){
+    if (not $known_proc_states{$proc_state}) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_WORKFLOW_UNKNOWN_PROC_STATE",
-            params  => {DESCRIPTION => sprintf('unkown proc-state: %s',$proc_state)}
+            params  => { description => sprintf('unknown proc-state: %s',$proc_state) }
         );
     }
 
     $self->proc_state($proc_state);
     $self->_save();
+}
 
+sub _check_and_set_proc_state {
+    my ($self, $old_state, $new_state) = @_;
+
+    ##! 16: sprintf('_check_and_change_proc_state from %s to %s, Wfl State: %s', $old_state, $new_state, $self->state());
+    if (not $known_proc_states{$new_state}) {
+        OpenXPKI::Exception->throw (
+            message => "Unknown workflow proc_state specified",
+            params  => { description => sprintf('unknown proc-state: %s', $new_state) }
+        );
+    }
+
+    $self->_factory->update_proc_state($self, $old_state, $new_state)
+        or OpenXPKI::Exception->throw(
+            message => 'Attempt to execute activity on workflow that is in wrong proc_state',
+            params => {
+                wf_id => $self->id,
+                activity => $self->{_CURRENT_ACTION},
+                expected_state => $old_state,
+            }
+        );
+
+    $self->proc_state($new_state);
+    $self->_save();
 }
 
 sub _proc_state_exception {
@@ -809,7 +839,18 @@ after calling Activity::runtime_exception() throws I18N_OPENXPKI_WORKFLOW_RUNTIM
 
 =head2 _set_proc_state($state)
 
-stores the proc_state in  the class field "proc_state" and calls $self->_save();
+stores the proc_state in  the class field "proc_state" and calls L</_save>.
+
+=head2 _check_and_set_proc_state($old_state, $new_state)
+
+Stores C<$new_state> in the class attribute C<proc_state> if the previous
+state in the database can be updated successfully.
+
+Returns 1 on success and 0 if the database did not show the expected
+C<$old_state>, e.g. if another parallel process already changed C<$old_state>.
+
+After successful update, calls C<$self-E<gt>_save()> which persists other
+workflow information and performs a database COMMIT.
 
 =head2 _proc_state_exception
 
@@ -843,7 +884,7 @@ return a ref to the workflows factory
 
 =head2 _save
 
-calls $self->_factory()->save_workflow($self);
+Calls $self->_factory()->save_workflow($self);
 
 =head2 set
 
