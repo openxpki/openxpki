@@ -222,7 +222,7 @@ sub stop_server {
 
     # Try to stop the OpenXPKI process and wait max. 5 seconds for OpenXPKI to finish shutdown
     if ($self->server_pid) {
-        OpenXPKI::Control::stop({ PID => $self->server_pid}); # stop server and child processes
+        OpenXPKI::Control::stop({ PID => $self->server_pid}) if kill(0, $self->server_pid) != 0; # stop server and child processes
 #        kill 'INT', $self->server_pid;
 #        my $count = 0;
 #        while ($count++ < 5 and $self->is_server_alive) { sleep 1 }
