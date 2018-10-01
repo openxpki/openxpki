@@ -1,7 +1,8 @@
 package OpenXPKI::Server::Database::Role::Driver;
 use Moose::Role;
 use utf8;
-=head1 Name
+
+=head1 NAME
 
 OpenXPKI::Server::Database::Role::Driver - Moose role that every database driver
 has to consume
@@ -23,18 +24,34 @@ has 'passwd'       => ( is => 'ro', isa => 'Str' );
 ################################################################################
 # Required in drivers classes that consume this role
 #
-requires 'dbi_driver';         # String: DBI compliant case sensitive driver name
-requires 'dbi_dsn';            # String: DSN parameters after "dbi:<driver>:"
-requires 'dbi_connect_params'; # HashRef: optional parameters to pass to connect()
-requires 'dbi_on_connect_do';  # ArrayRef or Str: commands to execute after connecting
-requires 'sqlam_params';       # HashRef: optional parameters for SQL::Abstract::More
-requires 'next_id';            # Int: next insert ID ("serial")
-requires 'sequence_create_query';     # OpenXPKI::Server::Database::Query: query to create a new sequence
-requires 'merge_query';        # OpenXPKI::Server::Database::Query: MERGE query (="REPLACE" = "UPSERT" = UPDATE or INSERT)
+
+# Returns String: DBI compliant case sensitive driver name
+requires 'dbi_driver';
+
+# Returns String: DSN parameters after "dbi:<driver>:"
+requires 'dbi_dsn';
+
+# Returns HashRef: optional parameters to pass to connect()
+requires 'dbi_connect_params';
+
+# Returns ArrayRef or Str: commands to execute after connecting
+requires 'dbi_on_connect_do';
+
+# Returns HashRef: optional parameters for SQL::Abstract::More
+requires 'sqlam_params';
+
+# Returns Int: next insert ID ("serial")
+requires 'next_id';
+
+# Returns OpenXPKI::Server::Database::Query: query to create a new sequence
+requires 'sequence_create_query';
+
+# Returns OpenXPKI::Server::Database::Query: MERGE query (="REPLACE" = "UPSERT" = UPDATE or INSERT)
+requires 'merge_query';
 
 1;
 
-=head1 Synopsis
+=head1 SYNOPSIS
 
     package OpenXPKI::Server::Database::Driver::MyDB2;
     use Moose;
@@ -72,7 +89,7 @@ Then e.g. in your database.yaml:
 
 The above code is actually the current driver for IBM DB2 databases.
 
-=head1 Description
+=head1 DESCRIPTION
 
 This Moose role must be consumed by every OpenXPKI database driver. It defines
 some standard attributes which represent database connection parameters of the
@@ -128,7 +145,7 @@ C<*::Driver::>, case sensitive) in your configuration file.
 
 =back
 
-=head1 Attributes
+=head1 ATTRIBUTES
 
 =over
 
@@ -146,7 +163,7 @@ C<*::Driver::>, case sensitive) in your configuration file.
 
 =back
 
-=head1 Methods
+=head1 METHODS
 
 Please note that the following methods are implemented in the driver class that
 consumes this Moose role.
@@ -244,20 +261,20 @@ C<<{ col1 => val1, col2 => val2 }>> (I<HashRef>)
 
 =back
 
-=head2 table_drop_query
-
-Returns an L<OpenXPKI::Server::Database::Query> object containing the SQL query
-that removes a table. If possible the query should contain something like
-C<IF EXISTS> so that the DMBS does not complain about non-existing tables.
-
-Parameters:
-
-=over
-
-=item * B<$dbi> - OpenXPKI database handler (C<OpenXPKI::Server::Database>, required)
-
-=item * B<$table> - Name of table to be dropped (I<Str>, required)
-
-=back
-
 =cut
+
+#=head2 table_drop_query
+#
+#Returns an L<OpenXPKI::Server::Database::Query> object containing the SQL query
+#that removes a table. If possible the query should contain something like
+#C<IF EXISTS> so that the DMBS does not complain about non-existing tables.
+#
+#Parameters:
+#
+#=over
+#
+#=item * B<$dbi> - OpenXPKI database handler (C<OpenXPKI::Server::Database>, required)
+#
+#=item * B<$table> - Name of table to be dropped (I<Str>, required)
+#
+#=back
