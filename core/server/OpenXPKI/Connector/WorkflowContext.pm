@@ -128,7 +128,10 @@ variable using the static method set_context.
 
 =head2 Parameters
 
+=over
+
 =item key
 
 Return a single key from the HASH inside the context value at LOCATION.
 
+=back
