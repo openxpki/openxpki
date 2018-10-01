@@ -185,6 +185,16 @@ sub get_notafter {
     return $self->_get_validity( $self->notafter(), shift );
 }
 
+sub is_selfsigned {
+
+    my $self = shift;
+    # todo - calculate signature might be better
+    if ($self->get_authority_key_id() && $self->get_subject_key_id()) {
+        return $self->get_authority_key_id() eq $self->get_subject_key_id();
+    }
+    return $self->get_issuer eq $self->get_subject;
+
+}
 
 sub _build_san {
 
