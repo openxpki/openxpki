@@ -165,7 +165,7 @@ sub execute {
     my $self          = shift;
     my $workflow      = shift;
     my $context       = $workflow->context();
-    my $user          = CTX('session')->get_user();
+    my $user          = CTX('session')->data->user;
     my $default_token = CTX('api')->get_default_token();
 
     my $code = '';
@@ -236,7 +236,7 @@ sub execute {
         RETURN_LENGTH => $salt_len,
         RANDOM_LENGTH => $salt_len,
     };
-    
+
     $salt = $default_token->command($command);
 
     #
@@ -253,8 +253,8 @@ sub execute {
     foreach my $a (qw( auth1 auth2 )) {
         ##! 16: "user=$user, auth=$a, val=" . $context->param($a . '_id')
         if ( lc($user) eq lc($context->param( $a . '_id' )) ) {
-	    $found++;
-	    ##! 10: "Setting hash and salt in $a for user $user"
+        $found++;
+        ##! 16: "Setting hash and salt in $a for user $user"
             # writing hash is easy... just put it in the context
             $context->param( $a . '_hash', $hash );
             $context->param( '+' . $a . '_salt', $salt );
@@ -267,27 +267,26 @@ sub execute {
     #
     if ($found) {
 
-        CTX('log')->log(
-            MESSAGE => 'SmartCard delivered activation code to ' . $user,
-            PRIORITY => 'info',
-            FACILITY => ['audit','application']
-        );
+        $context->param('error_code', '');
+
+        CTX('log')->application()->info('SmartCard delivered activation code to ' . $user);
+        CTX('log')->audit('smartcard')->info('delivered smartcard activation code', {
+            user => $user,
+            sctoken_id => $context->param('token_id'),
+        });
+
         # pass on the activation code back to the user interface
         $context->param( '_password', $code );
         return $self;
     }
     else {
+
+        $context->param('error_code','I18N_OPENXPKI_UI_CLIENT_GETAUTHCODE_USER_NOT_AUTH_PERS');
+
         ##! 1: "Failed to set salt/hash for user $user - not in auth1,2"
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GENACTCODE_USER_NOT_AUTH_PERS',
-            params => {},
-            log => {
-                logger => CTX('log'),
-                priority => 'warn',
-                facility => 'application',
-            },
-        );
-        return;
+        CTX('log')->application()->warn('current user is not a listed auth person');
+
+        return $self;
     }
 }
 

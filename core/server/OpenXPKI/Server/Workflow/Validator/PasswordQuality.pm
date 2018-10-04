@@ -42,11 +42,8 @@ sub validate {
     ## prepare the environment
     if (my $reason = IsBadPassword($password)) {
         ##! 16: 'bad password entered: ' . $reason
-        CTX('log')->log(
-            MESSAGE  => "Validator password quality failed: " . $reason ,
-            PRIORITY => 'error',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->error("Validator password quality failed: " . $reason );
+
         validation_error("I18N_OPENXPKI_UI_PASSWORD_QUALITY_BAD_PASSWORD");
     }
     return 1;

@@ -34,42 +34,35 @@ sub _validate {
         TOKEN  => $default_token,
         FORMAT => 'PKCS10',
     );
-    
+
     my $csr_info = $csr->get_info_hash();
     ##! 64: 'csr_info: ' . Dumper $csr_info
     my $pubkey   = $csr_info->{BODY}->{PUBKEY};
 
-
-    my $query = {
-        'PUBKEY' => { VALUE => $pubkey, OPERATOR => 'LIKE' }
-    };
-    
-    if ($self->param('realm_only') ){
-       $query->{PKI_REALM} = CTX('session')->get_pki_realm(); 
-    }
-
-    my $cert_with_same_pubkey = CTX('dbi_backend')->first(
-        TABLE   => 'CERTIFICATE',
-        DYNAMIC => $query,        
+    my $cert_with_same_pubkey = CTX('dbi')->select_one(
+        from => 'certificate',
+        columns => ['identifier'],
+        where => {
+            public_key => { -like => $pubkey },
+            $self->param('realm_only')
+                ? ( pki_realm => CTX('session')->data->pki_realm )
+                : (),
+        },
     );
-    
+
     if (defined $cert_with_same_pubkey) {
-        
-        # someone is trying to reuse the same public key ...        
+        # someone is trying to reuse the same public key ...
         $context->param ("__validation_error" => [{
             error => 'I18N_OPENXPKI_UI_VALIDATOR_KEYREUSE_KEY_ALREADY_EXISTS',
             subject => $cert_with_same_pubkey->{SUBJECT},
             identifier => $cert_with_same_pubkey->{IDENTIFIER},
         }]);
-        
-	    CTX('log')->log(
-	        MESSAGE => "Trying to reuse private key of certificate " . $cert_with_same_pubkey->{IDENTIFIER},
-	        PRIORITY => 'error',
-	        FACILITY => 'application',
-	    );
+
+        CTX('log')->application()->error("Trying to reuse private key of certificate " . $cert_with_same_pubkey->{IDENTIFIER});
+
         validation_error ( 'I18N_OPENXPKI_UI_VALIDATOR_KEYREUSE_KEY_ALREADY_EXISTS' );
     }
-    
+
     ##! 1: 'end'
     return 1;
 }
@@ -79,7 +72,7 @@ sub _validate {
 __END__
 
 =head1 NAME
- 
+
 OpenXPKI::Server::Workflow::Validator::KeyReuse
 
 =head1 SYNOPSIS
@@ -88,31 +81,31 @@ OpenXPKI::Server::Workflow::Validator::KeyReuse
     class: OpenXPKI::Server::Workflow::Validator::KeyReuse
     param:
       realm_only: 0|1
-    arg: 
+    arg:
       - $pkcs10
-  
+
 =head1 DESCRIPTION
 
 This validator checks whether a CSR is trying to reuse a key by
 checking the public key against those that are in the certificate
-database.  
+database.
 
 =head2 Argument
 
-=over 
+=over
 
 =item pkcs10
 
 The PKCS10 encoded csr.
 
-=back 
- 
+=back
+
 =head2 Parameter
 
-=over 
+=over
 
 =item realm_only
 
-Check key only against certificates in the same realm. 
+Check key only against certificates in the same realm.
 
 =back

@@ -12,15 +12,16 @@ Each workflow is represented by a file or directory structure below ``workflow.d
     head:
         label: The verbose name of the workflow, shown on the UI
         description: The verbose description of the workflow, shown on the UI
-        prefix: internal short name, used to prefix the actions, must be unique.
+        prefix: internal short name, used to prefix the actions, must be unique
+                Must not contain any other characters than [a-z0-9]
 
-    state: 
+    state:
         name_of_state:  (used as literal name in the engine)
             autorun: 0/1
             autofail: 0/1
             label: visible name
             description: the text for the page head
-            action: 
+            action:
               - name_of_action > state_on_success ? condition_name
               - name_of_other_action > other_state_on_success !condition_name
             hint:
@@ -35,9 +36,9 @@ Each workflow is represented by a file or directory structure below ``workflow.d
             class: Name of the implementation class
             abort: state to jump to on abort (UI button, optional) # not implemented yet
             resume: state to jump to on resume (after exception, optional) # not implemented yet
-            validator: 
+            validator:
               - name_of_validator (defined below)
-            input: 
+            input:
               - name_of_field (defined below)
               - name_of_other_field
             param:
@@ -56,12 +57,12 @@ Each workflow is represented by a file or directory structure below ``workflow.d
 
     validator:
         class: OpenXPKI::Server::Workflow::Validator::CertIdentifierExists
-        param: 
+        param:
             emptyok: 1
-        arg: 
+        arg:
           - $cert_identifier
 
-       
+
 Note: All entity names must contain only letters (lower ascii), digits and the underscore.
 
 Below is a simple, but working workflow config (no conditions, no validators, the global action is defined outside this file)::
@@ -71,7 +72,7 @@ Below is a simple, but working workflow config (no conditions, no validators, th
         description: This is a Workflow for Testing
         prefix: test
 
-    state: 
+    state:
         INITIAL:
             label: initial state
             description: This is where everything starts
@@ -81,21 +82,23 @@ Below is a simple, but working workflow config (no conditions, no validators, th
             label: pending state
             description: We hold here for a while
             action: global_run_test2 > SUCCESS
-        
+
         SUCCESS:
             label: finals state
             description: It's done - really!
-        
-        
+            status:
+                level: success
+                message: This is shown as green status bar on top of the page
+
     action:
         run_test1:
         label: The first Action
         description: I am first!
-        class: Workflow::Action::Null  
+        class: Workflow::Action::Null
         input: comment
         param:
             message: "Hi, I am a log message"
- 
+
     field:
         comment: (as used above)
             name: comment
@@ -114,7 +117,7 @@ States
 ^^^^^^
 
 The ``action`` attribute is a list (or scalar) holding the action name and the
-follow up state. Put the name of the action and the expected state on success, 
+follow up state. Put the name of the action and the expected state on success,
 seperated by the ``>`` sign (is greater than).
 
 Action
@@ -138,13 +141,13 @@ Field
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION
 
 If the label tag is given (below option!), the values in the drop down are
-i18n strings made from label + uppercase(key), e.g 
+i18n strings made from label + uppercase(key), e.g
 I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_UNSPECIFIED
 
 UI Rendering
 ------------
 
-The UI uses information from the workflow definition to render display and input pages. There are two different kinds of pages, switches and inputs. 
+The UI uses information from the workflow definition to render display and input pages. There are two different kinds of pages, switches and inputs.
 
 Action Switch Page
 ^^^^^^^^^^^^^^^^^^
@@ -169,7 +172,7 @@ One button is created for each available action, the button label is taken from 
 
 *button bar / advanced layout*
 
-If you set the state.hint attribute, each button is drawn on its own row with a help text shown aside. 
+If you set the state.hint attribute, each button is drawn on its own row with a help text shown aside.
 
 Form Input Page
 ^^^^^^^^^^^^^^^
@@ -186,8 +189,23 @@ String as defined in action.description, can contain HTML tags
 
 *form fields*
 
-The field itself is created from label, placeholder and tooltip. If at least one form field has the description attribute set, 
-an explanatory block for the fields is added to the bottom of the page. 
+The field itself is created from label, placeholder and tooltip. If at least one form field has the description attribute set,
+an explanatory block for the fields is added to the bottom of the page.
+
+Markup of Final States
+^^^^^^^^^^^^^^^^^^^^^^
+
+If the workflow is in a final state, the default is to render a colored
+status bar on with a message that depends on the name of the state.
+Recognized names are SUCCESS, CANCELED and FAILURE which generate a
+green/yellow/red bar with a corresponding error message. The state name
+NOSTATUS has no status bar at all.
+
+If the state does not match one of those names, a yellow bar saying
+"The workflow is in final state" is show.
+
+To customize/suppress the status bar you can add level and message
+to the state definition (see above).
 
 Global Entities
 ---------------
@@ -197,15 +215,15 @@ You can define entities for action, condition and validator for global use in th
 Creating Macros (not implemented yet!)
 --------------------------------------
 
-If you have a sequence of states/actions you need in multiple workflows, you can 
+If you have a sequence of states/actions you need in multiple workflows, you can
 define them globally as macro. Just put the necessary state and action sections
 as written above into a file below ``workflow.macros.<name>``. You need to have
-one state named ``INITIAL`` and one ``FINAL``. 
+one state named ``INITIAL`` and one ``FINAL``.
 
-To reference such a macro, create an action in your main workflow and replace the 
+To reference such a macro, create an action in your main workflow and replace the
 ``class`` atttribute with ``macro``. Note that this is NOT an extension to the workflow
-engine but only merges the definitions from the macro file with those of the current 
-workflow. After successful execution, the workflow will be in the state passed in the 
+engine but only merges the definitions from the macro file with those of the current
+workflow. After successful execution, the workflow will be in the state passed in the
 ``success`` attribute ofthe surrounding action.
 
 

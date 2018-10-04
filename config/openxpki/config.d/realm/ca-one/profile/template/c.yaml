@@ -5,3 +5,4 @@ preset: C
 type: freetext
 width: 2
 min: 0
+placeholder: DE

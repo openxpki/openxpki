@@ -20,21 +20,24 @@ use warnings;
 use utf8;
 use English;
 
-use Class::Std;
-
+# Core modules
 use Data::Dumper;
+use Digest::SHA qw( sha1_base64 );
+use Scalar::Util qw( blessed );
 
-#use Regexp::Common;
+# CPAN modules
+use Class::Std;
+use DateTime;
+use Workflow;
 
+# Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::DateTime;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::i18n qw( set_language );
-use Digest::SHA qw( sha1_base64 );
-use DateTime;
 
-use Workflow;
+
 
 sub START {
 
@@ -108,62 +111,39 @@ sign a request with the given validity. Undef values default to now.
 =cut
 
 sub get_token_alias_by_group {
-
+    my ($self, $keys) = @_;
     ##! 1: 'start'
-    my $self = shift;
-    my $keys = shift;
-
-    my $group  = $keys->{GROUP};
-
-    if (!$group) {
-        OpenXPKI::Exception->throw (
-            message => 'I18N_OPENXPKI_API_TOKEN_GET_TOKEN_ALIAS_BY_GROUP_NO_GROUP',
-        );
-    }
-
-    my $pki_realm = CTX('session')->get_pki_realm();
-
+    my $group  = $keys->{GROUP} or OpenXPKI::Exception->throw (
+        message => 'I18N_OPENXPKI_API_TOKEN_GET_TOKEN_ALIAS_BY_GROUP_NO_GROUP',
+    );
+    my $pki_realm = CTX('session')->data->pki_realm;
     ##! 16: "Find token for group $group in realm $pki_realm"
 
-    my %validity;
-    foreach my $key (qw(notbefore notafter) ) {
-        if ($keys->{VALIDITY}->{NOTBEFORE}) {
-            $validity{$key} = $keys->{VALIDITY}->{uc($key)}->epoch();
-        } else {
-            $validity{$key} = time();
-        }
-    }
+    my $validity = $self->_validity_param_to_epoch($keys->{VALIDITY});
 
-    my $alias = CTX('dbi_backend')->first(
-        TABLE   => 'ALIASES',
-        COLUMNS => [
-            'NOTBEFORE', # Necessary to use the column in ordering - FIXME: Pimp SQL Layer
-            'ALIAS',
-        ],
-        DYNAMIC => {
-            'PKI_REALM' => { VALUE => $pki_realm },
-            'GROUP_ID' => { VALUE => $group },
-            'NOTBEFORE' => { VALUE => $validity{notbefore}, OPERATOR => 'LESS_THAN' },
-            'NOTAFTER' => { VALUE => $validity{notafter}, OPERATOR => 'GREATER_THAN' },
+    my $alias = CTX('dbi')->select_one(
+        from => 'aliases',
+        columns => [ 'alias' ],
+        where => {
+            pki_realm => $pki_realm,
+            group_id  => $group,
+            notbefore => { '<' => $validity->{notbefore} },
+            notafter  => { '>' => $validity->{notafter} },
         },
-        'ORDER' => [ 'NOTBEFORE' ],
-        'REVERSE' => 1,
+        order_by => [ '-notbefore' ],
+    )
+    or OpenXPKI::Exception->throw (
+        message => 'I18N_OPENXPKI_API_TOKEN_GET_TOKEN_ALIAS_BY_GROUP_NO_RESULT',
+        params => {
+            'GROUP'     => $group,
+            'NOTBEFORE' => $validity->{notbefore},
+            'NOAFTER'   => $validity->{notafter},
+            'PKI_REALM' => $pki_realm
+        }
     );
 
-    if (!$alias->{'ALIAS'}) {
-        OpenXPKI::Exception->throw (
-            message => 'I18N_OPENXPKI_API_TOKEN_GET_TOKEN_ALIAS_BY_GROUP_NO_RESULT',
-            params => {
-                'GROUP' => $group,
-                'NOTBEFORE' => $validity{notbefore},
-                'NOAFTER' => $validity{notafter},
-                'PKI_REALM' => $pki_realm
-            }
-        );
-    }
-
-    ##! 16: "Suggesting $alias->{'ALIAS'} as best match"
-    return $alias->{'ALIAS'};
+    ##! 16: "Suggesting $alias->{'alias'} as best match"
+    return $alias->{alias};
 
 }
 
@@ -176,54 +156,41 @@ and NOTBEFORE/NOTAFTER as epoch. Dates are the real certificate dates!
 =cut
 
 sub get_certificate_for_alias {
-
+    my ($self, $keys) = @_;
     ##! 1: 'start'
-    my $self = shift;
-    my $keys = shift;
 
-    if (not $keys->{ALIAS}) {
-        OpenXPKI::Exception->throw (
-            message => 'I18N_OPENXPKI_API_TOKEN_GET_CERTIFICATE_NO_ALIAS_GIVEN',
-        );
-    }
+    OpenXPKI::Exception->throw (
+        message => 'I18N_OPENXPKI_API_TOKEN_GET_CERTIFICATE_NO_ALIAS_GIVEN',
+    ) unless $keys->{ALIAS};
 
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
     ##! 32: "Search for alias $keys->{ALIAS}"
-    my $certificate = CTX('dbi_backend')->first(
-        TABLE   => [ 'CERTIFICATE', 'ALIASES' ],
-        COLUMNS => [
-            'CERTIFICATE.DATA',
-            'CERTIFICATE.SUBJECT',
-            'CERTIFICATE.IDENTIFIER',
-            'CERTIFICATE.NOTBEFORE',
-            'CERTIFICATE.NOTAFTER',
+    my $certificate = CTX('dbi')->select_one(
+        from_join => 'certificate identifier=identifier aliases',
+        columns => [
+            'certificate.data',
+            'certificate.subject',
+            'certificate.identifier',
+            'certificate.notbefore',
+            'certificate.notafter',
         ],
-        JOIN => [
-            [ 'IDENTIFIER', 'IDENTIFIER' ],
-        ],
-        DYNAMIC => {
-            'ALIASES.ALIAS' => { VALUE => $keys->{ALIAS} },
-            'ALIASES.PKI_REALM' => { VALUE => $pki_realm },
+        where => {
+            'aliases.alias'     => $keys->{ALIAS},
+            'aliases.pki_realm' => $pki_realm,
         }
+    )
+    or OpenXPKI::Exception->throw (
+        message => 'I18N_OPENXPKI_API_TOKEN_GET_CERTIFICATE_NOT_FOUND_FOR_ALIAS',
+        params => { ALIAS => $keys->{ALIAS} }
     );
-
-    if (not $certificate) {
-        OpenXPKI::Exception->throw (
-            message => 'I18N_OPENXPKI_API_TOKEN_GET_CERTIFICATE_NOT_FOUND_FOR_ALIAS',
-            params => {
-                'ALIAS' => $keys->{ALIAS},
-            }
-        );
-    }
-
-    ##! 32: "Found certificate $certificate->{SUBJECT}"
+    ##! 32: "Found certificate $certificate->{subject}"
     ##! 64: "Found certificate " . Dumper $certificate
     return {
-        DATA => $certificate->{"CERTIFICATE.DATA"},
-        SUBJECT => $certificate->{"CERTIFICATE.SUBJECT"},
-        IDENTIFIER => $certificate->{"CERTIFICATE.IDENTIFIER"},
-        NOTBEFORE => $certificate->{'CERTIFICATE.NOTBEFORE'},
-        NOTAFTER => $certificate->{'CERTIFICATE.NOTAFTER'},
+        DATA        => $certificate->{data},
+        SUBJECT     => $certificate->{subject},
+        IDENTIFIER  => $certificate->{identifier},
+        NOTBEFORE   => $certificate->{notbefore},
+        NOTAFTER    => $certificate->{notafter},
     };
 
 }
@@ -245,90 +212,69 @@ alias and the result of the check is included in the key STATUS
 =cut
 
 sub list_active_aliases {
-
+    my ($self, $keys) = @_;
     ##! 1: 'start'
-    my $self = shift;
-    my $keys = shift;
+    my $group = $keys->{GROUP};
+    my $type = $keys->{TYPE};
+    my $pki_realm = $keys->{PKI_REALM} // CTX('session')->data->pki_realm;
 
-    my $group  = $keys->{GROUP};
-
-    my $pki_realm = $keys->{PKI_REALM};
-    $pki_realm = CTX('session')->get_pki_realm() unless($pki_realm);
-
-    if (!$group) {
-
-        if ($keys->{TYPE}) {
-           $group = CTX('config')->get("realm.$pki_realm.crypto.type.".$keys->{TYPE});
-        }
-
+    if (not $group) {
+       $group = CTX('config')->get("realm.$pki_realm.crypto.type.$type") if $type;
         OpenXPKI::Exception->throw (
             message => 'I18N_OPENXPKI_API_TOKEN_GET_TOKEN_ALIAS_BY_GROUP_NO_GROUP',
-        ) if (!$group);
+        ) unless $group;
     }
 
-    my %validity;
-    foreach my $key (qw(notbefore notafter) ) {
-        if ($keys->{VALIDITY}->{NOTBEFORE}) {
-            $validity{$key} = $keys->{VALIDITY}->{uc($key)}->epoch();
-        } else {
-            $validity{$key} = time();
-        }
-    }
+    my $validity = $self->_validity_param_to_epoch($keys->{VALIDITY});
 
-    my $db_results = CTX('dbi_backend')->select(
-        TABLE   => [ 'CERTIFICATE', 'ALIASES' ],
-        COLUMNS => [
-            #  Necessary to use the column in ordering - FIXME: Pimp SQL Layer
-            'ALIASES.NOTBEFORE',
-            'ALIASES.NOTAFTER',
-            'ALIASES.ALIAS',
-            'ALIASES.IDENTIFIER',
+    my $aliases = CTX('dbi')->select(
+        from => 'aliases',
+        columns => [
+            'aliases.notbefore',
+            'aliases.notafter',
+            'aliases.alias',
+            'aliases.identifier',
         ],
-        JOIN => [
-            [ 'IDENTIFIER', 'IDENTIFIER' ],
-        ],
-        DYNAMIC => {
-            'ALIASES.PKI_REALM' => { VALUE => $pki_realm },
-            'ALIASES.GROUP_ID' => { VALUE => $group },
-            'ALIASES.NOTBEFORE' => { VALUE => $validity{notbefore}, OPERATOR => 'LESS_THAN' },
-            'ALIASES.NOTAFTER' => { VALUE => $validity{notafter}, OPERATOR => 'GREATER_THAN' },
+        where => {
+            'aliases.pki_realm' => $pki_realm,
+            'aliases.group_id'  => $group,
+            'aliases.notbefore' => { '<' => $validity->{notbefore} },
+            'aliases.notafter'  => { '>' => $validity->{notafter} },
         },
-        'ORDER' => [ 'ALIASES.NOTBEFORE' ],
-        'REVERSE' => 1,
+        order_by => [ '-aliases.notbefore' ],
     );
 
-    my @token;
-    foreach my $entry (@{ $db_results }) {
-
+    my @result;
+    while (my $row = $aliases->fetchrow_hashref) {
         my $item = {
-            ALIAS => $entry->{'ALIASES.ALIAS'},
-            IDENTIFIER => $entry->{'ALIASES.IDENTIFIER'},
-            NOTBEFORE => $entry->{'ALIASES.NOTBEFORE'},
-            NOTAFTER  => $entry->{ 'ALIASES.NOTAFTER'},
+            ALIAS => $row->{alias},
+            IDENTIFIER => $row->{identifier},
+            NOTBEFORE => $row->{notbefore},
+            NOTAFTER  => $row->{notafter},
         };
         if ($keys->{CHECK_ONLINE}) {
-            if ($self->is_token_usable({ ALIAS => $entry->{'ALIASES.ALIAS'} })) {
-                $item->{STATUS} = 'ONLINE';
-            } else {
-                $item->{STATUS} = 'OFFLINE';
-            }
+            $item->{STATUS} = $self->is_token_usable({ ALIAS => $row->{alias} })
+                ? 'ONLINE'
+                : 'OFFLINE';
         }
-        push @token, $item;
+        push @result, $item;
     }
     ##! 32: "Found tokens " . Dumper @token
 
-    return \@token;
+    return \@result;
 
 }
 
-=head2 get_ca_list( {REALM} )
+=head2 get_ca_list( {PKI_REALM} )
 
 List all items in the certsign group of the requested REALM.
 REALM is optional and defaults to the session realm.
 Each entry of the list is a hashref holding the full alias name (ALIAS),
 the certificate identifier (IDENTIFIER), the notbefore/notafter date,
-the subject and the verbose status of the token. Possbile status values are
-EXPIRED, UPCOMING, ONLINE, OFFLINE OR UNKNOWN.
+the subject and the verbose status of the token. Possbile status values
+are EXPIRED, UPCOMING, ONLINE, OFFLINE OR UNKNOWN. The ONLINE/OFFLINE
+check is only possible from within the current realm, for requests outside
+the current realm the status of a valid token is always UNKNOWN.
 
 The list is sorted by notbefore date, starting with the newest date.
 Dates are taken from the alias table and therefore might differ
@@ -342,77 +288,69 @@ sub get_ca_list {
     my $self = shift;
     my $keys = shift;
 
-    my $pki_realm = $keys->{REALM};
-    $pki_realm = CTX('session')->get_pki_realm() unless($pki_realm);
+    my $pki_realm = $keys->{PKI_REALM};
+    my $session_pki_realm = CTX('session')->data->pki_realm;
+    if (!$pki_realm) {
+        $pki_realm = $session_pki_realm;
+    }
 
     ##! 32: "Lookup group name for certsign"
-    my $group = CTX('config')->get("realm.$pki_realm.crypto.type.certsign");
+    my $group = CTX('config')->get(['realm', $pki_realm, 'crypto', 'type', 'certsign']);
 
-    my $db_results = CTX('dbi_backend')->select(
-        TABLE   => [ 'CERTIFICATE', 'ALIASES' ],
-        COLUMNS => [
-            'ALIASES.NOTBEFORE',
-            'ALIASES.NOTAFTER',
-            'CERTIFICATE.DATA',
-            'CERTIFICATE.SUBJECT',
-            'ALIASES.ALIAS',
-            'ALIASES.IDENTIFIER',
+    my $db_results = CTX('dbi')->select(
+        from_join => 'certificate identifier=identifier aliases',
+        columns => [
+            'certificate.data',
+            'certificate.subject',
+            'aliases.notbefore',
+            'aliases.notafter',
+            'aliases.alias',
+            'aliases.identifier',
         ],
-        JOIN => [
-            [ 'IDENTIFIER', 'IDENTIFIER' ],
-        ],
-        DYNAMIC => {
-            'ALIASES.PKI_REALM' => { VALUE => $pki_realm },
-            'ALIASES.GROUP_ID' => { VALUE => $group },
+        where => {
+            'aliases.pki_realm' => $pki_realm,
+            'aliases.group_id'  => $group,
         },
-        'ORDER' => [ 'ALIASES.NOTBEFORE' ],
-        'REVERSE' => 1,
+        order_by => [ '-aliases.notbefore' ],
     );
 
     my @token;
-    foreach my $entry (@{ $db_results }) {
-
+    while (my $row = $db_results->fetchrow_hashref) {
         my $item = {
-            ALIAS => $entry->{'ALIASES.ALIAS'},
-            IDENTIFIER => $entry->{'ALIASES.IDENTIFIER'},
-            SUBJECT => $entry->{'CERTIFICATE.SUBJECT'},
-            NOTBEFORE => $entry->{'ALIASES.NOTBEFORE'},
-            NOTAFTER => $entry->{'ALIASES.NOTAFTER'},
-            STATUS => 'UNKNOWN'
+            ALIAS       => $row->{alias},
+            IDENTIFIER  => $row->{identifier},
+            SUBJECT     => $row->{subject},
+            NOTBEFORE   => $row->{notbefore},
+            NOTAFTER    => $row->{notafter},
+            STATUS      => 'UNKNOWN'
         };
 
         # Check if the token is still valid - dates are already unix timestamps
-        my $now = time();
-        if ($entry->{'ALIASES.NOTBEFORE'} > $now) {
+        my $now = time;
+        if ($row->{notbefore} > $now) {
             $item->{STATUS} = 'UPCOMING';
-        } elsif ($entry->{'ALIASES.NOTAFTER'} < $now) {
+        } elsif ($row->{notafter} < $now) {
             $item->{STATUS} = 'EXPIRED';
-        } else {
-            # Check if the key is usable
+        } elsif ($pki_realm eq $session_pki_realm) {
+            # Check if the key is usable, only in current realm
             my $token;
             eval {
                 $token = CTX('crypto_layer')->get_token({
                     TYPE => 'certsign',
-                    'NAME' => $entry->{'ALIASES.ALIAS'},
-                    'CERTIFICATE' => {
-                        DATA => $entry->{'CERTIFICATE.DATA'},
-                        IDENTIFIER => $entry->{'CERTIFICATE.IDENTIFIER'},
+                    NAME => $row->{alias},
+                    CERTIFICATE => {
+                        DATA => $row->{data},
+                        IDENTIFIER => $row->{identifier},
                     }
                 } );
-                if ($self->is_token_usable({ TOKEN => $token })) {
-                    $item->{STATUS} = 'ONLINE';
-                } else {
-                    $item->{STATUS} = 'OFFLINE';
-                }
+                $item->{STATUS} = $self->is_token_usable({ TOKEN => $token })
+                    ? 'ONLINE'
+                    : 'OFFLINE';
             };
             if ($EVAL_ERROR) {
-
-                CTX('log')->log(
-                    MESSAGE  => 'I18N_OPENXPKI_API_TOKEN_GET_CA_LIST_TOKEN_STATUS_EVAL_ERROR',
-                    PRIORITY => "error",
-                    FACILITY => [ 'application', 'system', 'monitor' ],
-                );
+                CTX('log')->application()->error("Eval error getting ca token ".$row->{alias}." for ca_list");
             }
+
         }
 
         push @token, $item;
@@ -510,21 +448,15 @@ sub is_token_usable {
 
     # Shortcut method, ask the token engine
     if ($keys->{ENGINE}) {
-        CTX('log')->log(
-            MESSAGE  => 'Check if token is usable using engine',
-            PRIORITY => "debug",
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->debug('Check if token is usable using engine');
+
         return $token->key_usable()
     }
 
     eval {
 
-        CTX('log')->log(
-            MESSAGE  => 'Check if token is usable using crypto operation',
-            PRIORITY => "debug",
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->debug('Check if token is usable using crypto operation');
+
 
         my $probe = 'OpenXPKI Encryption Test';
 
@@ -548,9 +480,8 @@ sub is_token_usable {
         }
         ##! 16: 'probe matches'
     };
-    if ($EVAL_ERROR) {
-        my $ee = $EVAL_ERROR;
-        ##! 16: 'got eval error ' . $ee
+    if (my $eval_err = $EVAL_ERROR) {
+        ##! 16: 'got eval error ' . $eval_err
         return 0;
     }
 
@@ -559,5 +490,33 @@ sub is_token_usable {
 
 }
 
+#
+# Expects undef or DateTime objects in a HashRef like this:
+#    {
+#        NOTBEFORE => DateTime->new(year => 1980, month => 12, day => 1),
+#        NOTAFTER => undef, # means: now
+#    }
+#
+# and converts it to:
+#    {
+#        notbefore => 344476800,
+#        notafter => 1491328939,
+#    }
+#
+sub _validity_param_to_epoch {
+    my ($self, $validity) = @_;
+    my $result = {};
+
+    for my $key (qw(notbefore notafter) ) {
+        my $value = $validity->{uc($key)};
+        OpenXPKI::Exception->throw(
+            message => 'Values in VALIDITY must be specified as DateTime object',
+            params => { key => uc($key), type => blessed($value) },
+        ) unless (not defined $value or (defined blessed($value) and $value->isa('DateTime')));
+        $result->{$key} = $value ? $value->epoch : time;
+    }
+
+    return $result;
+}
 
 1;

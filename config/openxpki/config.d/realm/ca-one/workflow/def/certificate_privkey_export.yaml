@@ -2,16 +2,16 @@ head:
     prefix: exportprivkey
     label: I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_LABEL
     description: I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_DESC
-# If you use a persister, every download creates a workflow which is handy 
+# If you use a persister, every download creates a workflow which is handy
 # for audit but increases your database size. Persistance is also required
-# to have the error handling loop using the FAILED state. so if you decide 
-# to make this volatile, please use "FAILURE" as action target in EXPORT.        
+# to have the error handling loop using the FAILED state. so if you decide
+# to make this volatile, please use "FAILURE" as action target in EXPORT.
 #    persister: Volatile
 
 state:
     INITIAL:
         action:
-          - initialize > CHECKACCESS        
+          - initialize global_relate_workflow > CHECKACCESS
 
     CHECKACCESS:
         autorun: 1
@@ -43,12 +43,12 @@ state:
     FAILED:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_RETRY_PASSWORD_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_RETRY_PASSWORD_DESC
-        action: 
+        action:
          - retry_password > GENERATE
          - global_noop > CANCELED
-        output: 
+        output:
           - error_code
-        button:  
+        button:
           retry_password:
             format: expected
             label: I18N_OPENXPKI_UI_WORKFLOW_EXPORT_PRIVATEKEY_RETRY_PASSWORD_BUTTON_LABEL
@@ -59,14 +59,14 @@ state:
     FAILURE:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_FAILURE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_FAILURE_DESC
-        output: 
+        output:
           - cert_identifier
           - error_code
 
     SUCCESS:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_DESC
-        output: 
+        output:
          - cert_identifier
          - download
          - creator
@@ -74,9 +74,9 @@ state:
     CANCELED:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_DESC
-        output: 
+        output:
           - cert_identifier
-        
+
 action:
     initialize:
         class: OpenXPKI::Server::Workflow::Activity::Noop
@@ -87,7 +87,7 @@ action:
           - key_format
           - _password
           - alias
-        validator: 
+        validator:
           - global_cert_identifier_exists
           - keystore_alias
 
@@ -98,14 +98,14 @@ action:
 
     generate:
         class: OpenXPKI::Server::Workflow::Activity::Tools::CertificateExport
-        param: 
+        param:
           target_key: _export
           _map_key_format: $key_format
           _map_cert_identifier: $cert_identifier
           _map_key_password: $_password
           _map_alias: $alias
 
-    export:  
+    export:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
         param:
             namespace: workflow.download
@@ -113,11 +113,11 @@ action:
             _map_value: $_export
             encrypt: 1
             force: 1
-            expiration_date: "+00000003"
+            expiration_date: "+0000000003"
 
     set_alias:
         class: OpenXPKI::Server::Workflow::Activity::Noop
-        input: 
+        input:
          - alias
 
     setfile_pkcs12:
@@ -159,14 +159,14 @@ action:
           _map_filename: "[% USE Certificate %][% Certificate.dn(context.cert_identifier, 'CN') %].jks"
           mime: application/x-java-keystore
           _map_source: datapool:[% context.uuid %]
-          
+
     retry_password:
         class: OpenXPKI::Server::Workflow::Activity::Noop
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_RETRY_PASSWORD_LABEL
         input:
          - _password
 
-        
+
 condition:
     is_pkcs12:
         class: Workflow::Condition::Evaluate
@@ -197,9 +197,9 @@ condition:
         class: Workflow::Condition::Evaluate
         param:
             test: $context->{_export}
-            
-            
-field: 
+
+
+field:
     cert_identifier_hidden:
         name: cert_identifier
         type: hidden

@@ -21,12 +21,8 @@ sub execute
     my $context    = $workflow->context();
     my $pki_realm  = CTX('api')->get_pki_realm();
     my $serializer = OpenXPKI::Serialization::Simple->new();
-    my $dbi        = CTX('dbi_backend');
+    my $dbi        = CTX('dbi');
     my $identifier = $context->param('cert_identifier');
-
-    my $crr_serial = $dbi->get_new_serial(
-        TABLE => 'CRR',
-    );
 
     my $source_ref = $serializer->deserialize($context->param('sources'));
     if (! defined $source_ref) {
@@ -35,40 +31,53 @@ sub execute
         );
     }
 
+    my $cert = $dbi->select_one(
+        from => 'certificate',
+        columns => [ '*' ],
+        where => {
+            pki_realm  => $pki_realm,
+            identifier => $identifier,
+        },
+    );
+
+    if (!$cert) {
+        OpenXPKI::Exception->throw(
+            message => 'No such certificate in realm',
+            params => {
+                pki_realm  => $pki_realm,
+                identifier => $identifier,
+            }
+        );
+    }
+
+    if ($cert->{status} ne 'ISSUED') {
+        OpenXPKI::Exception->throw(
+            message => 'Can not persist CRR, certificate is not in issued state',
+            params => {
+                identifier => $identifier,
+                status => $cert->{status},
+            }
+        );
+    }
+
     my $dt = DateTime->now();
-    $dbi->insert(
-            TABLE => 'CRR',
-            HASH  => {
-                'CRR_SERIAL'       => $crr_serial,
-                'PKI_REALM'        => $pki_realm,
-                'CREATOR'          => $context->param('creator'),
-                'CREATOR_ROLE'     => $context->param('creator_role'),
-                'IDENTIFIER'       => $context->param('cert_identifier'),
-                'REASON_CODE'      => $context->param('reason_code'),
-                'REVOCATION_TIME'  => $dt->epoch(),
-                'INVALIDITY_TIME'  => $context->param('invalidity_time'),
-                'COMMENT'          => $context->param('comment'),
-                'HOLD_CODE'        => $context->param('hold_code'),
-            },
-    );
     $dbi->update(
-        TABLE => 'CERTIFICATE',
-        DATA  => {
-            'STATUS' => 'CRL_ISSUANCE_PENDING',
+        table => 'certificate',
+        set => {
+            status => 'CRL_ISSUANCE_PENDING',
+            reason_code     => $context->param('reason_code'),
+            revocation_time => $dt->epoch(),
+            invalidity_time => $context->param('invalidity_time') || undef,
+            hold_instruction_code => $context->param('hold_code') || undef,
         },
-        WHERE => {
-            'PKI_REALM'  => $pki_realm,
-            'IDENTIFIER' => $identifier,
+        where => {
+            pki_realm  => $pki_realm,
+            identifier => $identifier,
         },
     );
-    $dbi->commit();
-    $context->param('crr_serial' => $crr_serial);
-    
-    CTX('log')->log(
-        MESSAGE  => "crr for $identifier persisted",
-        PRIORITY => 'debug',
-        FACILITY => 'application',
-    );
+
+    CTX('log')->application()->debug("revocation request for $identifier written to database");
+
 }
 
 1;

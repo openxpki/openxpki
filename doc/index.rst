@@ -12,6 +12,7 @@ Table of Contents:
 
 .. toctree::
    :maxdepth: 2
+   :caption: Basics
 
    introduction
    quickstart
@@ -21,6 +22,7 @@ Setup and Configuration
 
 .. toctree::
    :maxdepth: 2
+   :caption: Setup and Configuration
 
    configuration/index.rst
    admin/installation/building
@@ -37,6 +39,7 @@ Setup and Configuration
    reference/configuration/realm
    reference/configuration/workflow
    reference/configuration/output
+   reference/configuration/uicontrol
    reference/configuration/profile
    reference/configuration/workflows/certrequest
    reference/configuration/workflows/certrevocation
@@ -46,39 +49,54 @@ Setup and Configuration
    reference/tools/openxpkiadm
    reference/tools/openxpkictl
    reference/tools/openxpkicmd
-   reference/tools/openxpkicli   
+   reference/tools/openxpkicli
    reference/interfaces
    reference/developer/conventions
    reference/developer/coding
    reference/developer/api
    reference/developer/webui
 
+Automation / External APIs
+
+.. toctree::
+   :maxdepth: 3
+   :caption: Automation / External APIs
+
+   subsystems/index
+   subsystems/rpc
+   subsystems/scep
+   subsystems/soap
+   subsystems/certep
+   subsystems/enroll-ui
+
 Operation
 
 .. toctree::
    :maxdepth: 3
+   :caption: Operation
 
    operation/index
+   operation/logging
    operation/tokenconfig
    operation/maintenance
    operation/troubleshooting
+
 
 Architecture
 
 .. toctree::
    :maxdepth: 2
+   :caption: Architecture
 
    architecture/connectors
    architecture/workflows
    architecture/datapool
-   architecture/subsystems/scep
-   architecture/subsystems/soap
-   architecture/subsystems/enroll-ui
 
 Developer
 
 .. toctree::
    :maxdepth: 2
+   :caption: Developer
 
    developer/index
 

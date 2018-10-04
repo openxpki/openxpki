@@ -71,20 +71,20 @@ sub convert_openssl_dn
     my $dn = shift;
 
     my $openssl_format
- 	= Text::CSV_XS->new({
- 	    sep_char    => q{/},    # Fields are separated by /
- 	    escape_char => q{\\},   # Backslashed characters are always data
-	});
-    
+     = Text::CSV_XS->new({
+         sep_char    => q{/},    # Fields are separated by /
+         escape_char => q{\\},   # Backslashed characters are always data
+    });
+
     if (!$openssl_format->parse($dn)) {
- 	OpenXPKI::Exception->throw (
- 	    message => "I18N_OPENXPKI_DN_CONVERT_OPENSSL_DN_PARSE_ERROR",
- 	    params  => {
- 		DN          => $dn,
- 		BADARGUMENT => $openssl_format->error_input(),
- 	    });
+     OpenXPKI::Exception->throw (
+         message => "I18N_OPENXPKI_DN_CONVERT_OPENSSL_DN_PARSE_ERROR",
+         params  => {
+         DN          => $dn,
+         BADARGUMENT => $openssl_format->error_input(),
+         });
     }
-    
+
     my @rdn = $openssl_format->fields();
 
     # remove first empty element (OpenSSL DN starts with /)
@@ -137,8 +137,8 @@ sub get_openssl_dn
     my @rdns = @{$self->{RDNS}};
 
     # escape / to \/ and return /-separated DN
-    return "/" . join("/", 
-		      reverse map { s{/}{\\/}xsg; $_; } @rdns);
+    return "/" . join("/",
+              reverse map { s{/}{\\/}xsg; $_; } @rdns);
 }
 
 sub get_hashed_content
@@ -147,11 +147,11 @@ sub get_hashed_content
     my %result = ();
 
     for my $rdn (@{$self->{PARSED}}) {
-	for my $attribute (@{$rdn}) {
-	    my $key = uc($attribute->[0]);
+    for my $attribute (@{$rdn}) {
+        my $key = uc($attribute->[0]);
 
-	    push @{$result{$key}}, $attribute->[1];
-	}
+        push @{$result{$key}}, $attribute->[1];
+    }
     }
 
     return %result;
@@ -172,7 +172,7 @@ sub __build_rdns
     $self->__build_attributes() if (not $self->{ATTRIBUTES});
 
     for my $attribute (@{$self->{ATTRIBUTES}}) {
-	push(@{$self->{RDNS}}, join("+", @{$attribute}));
+    push(@{$self->{RDNS}}, join("+", @{$attribute}));
     }
 
     return 1;
@@ -184,18 +184,18 @@ sub __build_attributes
     $self->{ATTRIBUTES} = ();
 
     for my $entry (@{$self->{PARSED}}) {
-	my @attributes = ();
-	
- 	for my $item (@{$entry}) {
- 	    my $key   = $item->[0];
- 	    my $value = $item->[1];
+    my @attributes = ();
 
-	    # escape + and , 
-	    $value =~ s{ ([+,]) }{\\$1}xs;
- 	    push(@attributes, $key . '=' . $value);
- 	}
-	
- 	push(@{$self->{ATTRIBUTES}}, \@attributes);
+     for my $item (@{$entry}) {
+         my $key   = $item->[0];
+         my $value = $item->[1];
+
+        # escape + and ,
+        $value =~ s{ ([+,]) }{\\$1}xs;
+         push(@attributes, $key . '=' . $value);
+     }
+
+     push(@{$self->{ATTRIBUTES}}, \@attributes);
      }
 
     return 1;
@@ -218,11 +218,11 @@ sub __get_parsed_rfc_2253
 
     while ($string)
     {
-	my $rdn;
+    my $rdn;
         ($rdn, $string) = $self->__get_next_rdn ($string);
-	if (defined $rdn && $rdn ne "") {
-	    push(@result, $rdn);
-	}
+    if (defined $rdn && $rdn ne "") {
+        push(@result, $rdn);
+    }
 
         $string = substr ($string, 1) if ($string); ## remove seperator
     }
@@ -278,7 +278,7 @@ sub __get_attribute_type
 
     ## fix type to be comliant with OpenSSL
     if (exists $mapping_of{uc($type)}) {
-	$type = $mapping_of{uc($type)};
+    $type = $mapping_of{uc($type)};
     }
 
     return ($type, $string);
@@ -328,7 +328,7 @@ foreach my $function (qw (__get_parsed_rfc_2253
     memoize($function);
 }
 
-		      
+
 1;
 __END__
 
@@ -366,7 +366,7 @@ OpenXPKI::DN.
 
 This is a static function which requires an OpenSSL DN as
 argument. It returns a proper RFC 2253 DN. It is used by the 'new'
-constructor to convert OpenSSL DNs but you can use it also if you 
+constructor to convert OpenSSL DNs but you can use it also if you
 don't need a full parser (which is slower).
 
 =head1 Output Functions

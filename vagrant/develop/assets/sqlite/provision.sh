@@ -18,11 +18,15 @@ trap '_exit $?' EXIT
 #
 # Config
 #
-SQLITE_PATH=$(mktemp)
+SQLITE_PATH=/run-env/sqlite.db
+rm -f $SQLITE_PATH
+touch $SQLITE_PATH
 chmod 0666 $SQLITE_PATH
 
-echo "OXI_TEST_DB_SQLITE_NAME=$SQLITE_PATH" >> /etc/environment
-cat /etc/environment | while read def; do export $def; done
+if ! $(grep -q OXI_TEST_DB_SQLITE_NAME /etc/environment); then
+    echo "OXI_TEST_DB_SQLITE_NAME=$SQLITE_PATH" >> /etc/environment
+fi
+while read def; do export $def; done < /etc/environment
 
 #
 # Install SQLite client (sqlite3)

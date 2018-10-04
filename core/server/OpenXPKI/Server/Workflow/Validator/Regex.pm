@@ -9,16 +9,31 @@ use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Serialization::Simple;
 
-__PACKAGE__->mk_accessors(qw(regex error modifier));
+__PACKAGE__->mk_accessors(qw(regex error modifier field));
 
 sub _init {
     my ( $self, $params ) = @_;
-    $self->regex( $params->{regex} ) if ($params->{regex});
+    $self->regex( $params->{regex} // '' );
 
     # Default modifier is /xi
     $self->modifier( $params->{modifier} ? $params->{modifier} : 'xi') ;
-    $self->error( 'I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED' );
-    $self->error( $params->{error} ) if ($params->{error});
+
+    if ($params->{error}) {
+        $self->error( $params->{error} );
+    } elsif ($self->regex() eq 'email') {
+        $self->error( 'I18N_OPENXPKI_UI_VALIDATOR_REGEX_EMAIL_FAILED' );
+    } elsif ($self->regex() eq 'fqdn') {
+        $self->error( 'I18N_OPENXPKI_UI_VALIDATOR_REGEX_FQDN_FAILED' );
+    } else {
+        $self->error( 'I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED' );
+    }
+
+    if ($params->{field}) {
+        $self->field($params->{field});
+    } else {
+        $self->field('');
+    }
+
 }
 
 sub validate {
@@ -27,11 +42,8 @@ sub validate {
     ##! 1: 'start'
 
     if (!defined $value || $value eq '') {
-         CTX('log')->log(
-            MESSAGE  => "Regex validator skipped - value is empty",
-            PRIORITY => 'info',
-            FACILITY => 'application',
-        );
+         CTX('log')->application()->info("Regex validator skipped - value is empty");
+
         return 1;
     }
 
@@ -43,11 +55,11 @@ sub validate {
 
     # replace named regexes
     if ($regex eq 'email') {
-        $regex = qr/ \A [a-z0-9\.-]+\@([\w_-]+\.)+(\w+) \z /xi;
+        $regex = qr/ \A \S+\@([\w-]+\.)+(\w+) \z /xi;
 
     } elsif ($regex eq 'fqdn') {
-        $regex = qr/ \A (([\w\-]+\.)+)[\w\-]{2,} \z /xi;        
-        
+        $regex = qr/ \A (([\w\-]+\.)+)[\w\-]{2,} \z /xi;
+
     # or quote the string if no named match
     } else {
         # Extended Pattern notation, see http://perldoc.perl.org/perlre.html#Extended-Patterns
@@ -67,7 +79,7 @@ sub validate {
     # Array Magic
     my @errors;
     ##! 32: 'ref of value ' . ref $value
-    if (ref $value eq 'ARRAY' || $value =~ /^ARRAY/) {
+    if (ref $value eq 'ARRAY' || OpenXPKI::Serialization::Simple::is_serialized($value)) {
         ##! 8: 'Array mode'
         if (!ref $value) {
             $value = OpenXPKI::Serialization::Simple->new()->deserialize( $value );
@@ -87,14 +99,11 @@ sub validate {
         # Need to implement this in New UI first
         #$wf->context()->param( '__error' => [ $self->error(), { FIELD => $field, VALUES => \@errors }]);
         ##! 32: 'Regex errors with regex ' . $regex. ', values '  . Dumper \@errors
-        CTX('log')->log(
-            MESSAGE  => "Regex validator failed on regex $regex",
-            PRIORITY => 'error',
-            FACILITY => 'application',
-        );
-        my @fields_with_error = ({ name => 'link', error => $self->error() }); 
+        CTX('log')->application()->error("Regex validator failed on regex $regex");
+
+        my @fields_with_error = ({ name => $self->field(), error => $self->error() });
         validation_error( $self->error(), { invalid_fields => \@fields_with_error } );
-        
+
         return 0;
     }
 
@@ -108,33 +117,41 @@ sub validate {
 
 OpenXPKI::Server::Workflow::Validator::Regex
 
-=head1 SYNOPSIS
-
-    class: OpenXPKI::Server::Workflow::Validator::Regex
-    arg: 
-     - $link
-    param:
-        regex: "\\A http(s)?://[a-zA-Z0-9-\\.]+"
-        modifier: xi
-        error: Please provide a well-formed URL starting with http://
-            
 =head1 DESCRIPTION
 
 Validates the context value referenced by argument against a regex. The regex
 can be passed either as second argument or specified in the param section.
 The value given as argument is always preferred.
 
+=head1 Configuration
+
+=head2 Example with arguments
+
     class: OpenXPKI::Server::Workflow::Validator::Regex
-    arg: 
+    arg:
      - $link
      - email
 
-The error parameter is optional, if set this is shown in the UI if the validator
-fails instead of the default message.
+=head2 Example with parameters
 
-The regex must be given as pattern without delimiters and modifiers. The 
-default modifier is "xi" (case-insensitive, whitespace pattern), you can 
-override it using the key "modifier" in the param section. (@see 
+    class: OpenXPKI::Server::Workflow::Validator::Regex
+    arg:
+     - $link
+    param:
+        regex: "\\A http(s)?://[a-zA-Z0-9-\\.]+"
+        modifier: xi
+        error: Please provide a well-formed URL starting with http://
+        field: link
+
+=head2 Parameters
+
+=over
+
+=item regex
+
+The regex must be given as pattern without delimiters and modifiers. The
+default modifier is "xi" (case-insensitive, whitespace pattern), you can
+override it using the key "modifier" in the param section. (@see
 http://perldoc.perl.org/perlre.html#Modifiers).
 
 Some common formats can also be referenced by name:
@@ -147,8 +164,26 @@ Basic check for valid email syntax
 
 =item fqdn
 
-A fully qualified domain name, must have at least one dot, all "word" 
+A fully qualified domain name, must have at least one dot, all "word"
 characters are accepted for the domain parts. Last domain part must have
 at least two characters
+
+=back
+
+=item modifier
+
+=item error
+
+The error parameter is optional, if set this is shown in the UI if the validator
+fails instead of the default message.
+
+=item field
+
+As the validator only received the value, it does not know which field holds
+the faulty input. If you pass the name of the input field here the UI will
+highlight the field with the error.
+
+B<Note>: You still need to pass the value as argument to the validator as
+there is no way to get it from the field name.
 
 =back

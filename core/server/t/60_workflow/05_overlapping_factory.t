@@ -16,7 +16,7 @@ if ($ENV{DEBUG}) {
     $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Init'} = 128;
 }
 
-diag "Test overlapping use of two factories" if $ENV{VERBOSE};
+note "Test overlapping use of two factories";
 
 my $xml_config = OpenXPKI::XML::Cache->new(CONFIG => 't/60_workflow/05_workflow.xml');
 my $ser = $xml_config->get_serialized();

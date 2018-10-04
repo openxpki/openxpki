@@ -13,47 +13,47 @@ use Data::Dumper;
 use File::Temp;
 use Proc::SafeExec;
 use Workflow::Exception qw( configuration_error );
-	
+
 sub execute {
-	
+
     ##! 1: 'execute'
-    
+
     my $self       = shift;
     my $workflow   = shift;
     my $context = $workflow->context();
-    
+
     my $config_path = $self->param('transfer');
-    
-    ##! 16: 'using config at ' . $config_path 
-    
+
+    ##! 16: 'using config at ' . $config_path
+
     if (!$config_path) {
-    	configuration_error( 'OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_NO_CONFIG_PATH' );
+        configuration_error( 'OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_NO_CONFIG_PATH' );
     }
-    
+
     my $config = CTX('config')->get_hash( $config_path );
-        
-	##! 32: 'Config is ' . Dumper $config        
+
+    ##! 32: 'Config is ' . Dumper $config
 
     if (!$config->{'target'}) {
-    	configuration_error( 'OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_NO_TARGET_SPEC' );
-    }	
-	    
-    my $source_file = $self->param('source');
-    
-    if (!$source_file) {
-    	configuration_error( 'OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_NO_SOURCEFILE' );    		    
+        configuration_error( 'OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_NO_TARGET_SPEC' );
     }
 
-	if (! -f $source_file ) {
-		OpenXPKI::Exception->throw (
-			message => 'OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_SOURCEFILE_NOT_EXISTS',
-			params => { SOURCE => $source_file }
-		);	
-	}        
+    my $source_file = $self->param('source');
 
-    my $target_file = $self->param('target'); 
+    if (!$source_file) {
+        configuration_error( 'OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_NO_SOURCEFILE' );
+    }
 
-	my %filehandles;        
+    if (! -f $source_file ) {
+        OpenXPKI::Exception->throw (
+            message => 'OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_SOURCEFILE_NOT_EXISTS',
+            params => { SOURCE => $source_file }
+        );
+    }
+
+    my $target_file = $self->param('target');
+
+    my %filehandles;
     my $stdout = File::Temp->new();
     $filehandles{stdout} = \*$stdout;
 
@@ -62,73 +62,66 @@ sub execute {
 
     # compose the system command to execute
     my @cmd;
-    
+
     push @cmd, ($config->{'command'} || '/usr/bin/scp');
-            
-	push @cmd, '-P'.$config->{'port'} if ($config->{'port'});
+
+    push @cmd, '-P'.$config->{'port'} if ($config->{'port'});
     push @cmd, '-F'.$config->{'sshconfig'} if ($config->{'sshconfig'});
-	push @cmd, '-i'.$config->{'identity'} if ($config->{'identity'});
-	
+    push @cmd, '-i'.$config->{'identity'} if ($config->{'identity'});
+
     push @cmd, $source_file;
-    
+
     # If we have an explicit filename, we append this to the base target
     if ($target_file) {
-    	my $base = $config->{'target'};
-    	if ($base != /\/$/) {
-    		$base .= '/';
-    	}
-    	push @cmd, $base.$target_file;
+        my $base = $config->{'target'};
+        if ($base != /\/$/) {
+            $base .= '/';
+        }
+        push @cmd, $base.$target_file;
     } else {
         push @cmd, $config->{'target'};
-    } 
+    }
 
-	##! 16: 'Command ' . join " ",@cmd
+    ##! 16: 'Command ' . join " ",@cmd
 
     my $command = Proc::SafeExec->new(
-	{
-	    exec => \@cmd,
-	    %filehandles,
-	});
-	
-	#TODO - improve handling of temporary errors 
+    {
+        exec => \@cmd,
+        %filehandles,
+    });
+
+    #TODO - improve handling of temporary errors
     eval{
-		local $SIG{ALRM} = sub { die "alarm\n" };
-		alarm ($config->{'timeout'} || 30);
-		$command->wait();
-		
-		if ($command->exit_status() != 0) {
-			OpenXPKI::Exception->throw (
-				message => 'OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_EXEC_ERROR',
-				params => { EXITSTATUS => $command->exit_status() }
-			);	
-		}
+        local $SIG{ALRM} = sub { die "alarm\n" };
+        alarm ($config->{'timeout'} || 30);
+        $command->wait();
+
+        if ($command->exit_status() != 0) {
+            OpenXPKI::Exception->throw (
+                message => 'OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TRANSFER_SCP_EXEC_ERROR',
+                params => { EXITSTATUS => $command->exit_status() }
+            );
+        }
     };
-	if ($EVAL_ERROR) {		
-		# possibly a temporary network error, pause and try again
-		my $ee = $EVAL_ERROR;
-		##! 16: 'Eval said ' . $ee
-		CTX('log')->log(
-	        MESSAGE => 'Transfer failed, do pause' ,
-	        PRIORITY => 'info',
-	        FACILITY => 'application',
-	    );
-		$self->pause('I18N_OPENXPKI_UI_PAUSED_TRANSFER_SCP_TIMEOUT');
-	}
-	
-	alarm 0;
-	
-	if ($config->{'unlink'}) {
-		unlink $source_file;
-	} 
-	    
-    CTX('log')->log(
-		MESSAGE => 'Transfer of file successful' ,
-		PRIORITY => 'info',
-		FACILITY => 'application',
-	);
-    
+    if (my $eval_err = $EVAL_ERROR) {
+        # possibly a temporary network error, pause and try again
+        ##! 16: 'Eval said ' . $eval_err
+        CTX('log')->application()->info('Transfer failed, do pause' );
+
+        $self->pause('I18N_OPENXPKI_UI_PAUSED_TRANSFER_SCP_TIMEOUT');
+    }
+
+    alarm 0;
+
+    if ($config->{'unlink'}) {
+        unlink $source_file;
+    }
+
+    CTX('log')->application()->info('Transfer of file successful' );
+
+
     return 1;
-    
+
 }
 
 1;
@@ -155,19 +148,19 @@ The configuration is twofold, you need to give some data in the action config
         transfer: export.transfer
 
 Transfer points to a datapoint of the config where the connection information
-for scp is set (see below). Source is the name of the source file, target is 
+for scp is set (see below). Source is the name of the source file, target is
 optional and appended to the target given in the transfer config.
 
 The configuration of the transport layer is done via the config layer:
 
-	target: upload@localhost:~/incoming/
-	command: /my/local/version/of/bin/scp
+    target: upload@localhost:~/incoming/
+    command: /my/local/version/of/bin/scp
     port: 22
     identity: /home/pkiadm/id_scp
-    sshconfig: /home/pkiadm/ssh_copy_config   
+    sshconfig: /home/pkiadm/ssh_copy_config
     timeout: 30
-    
+
 Target is mandatory and must contain the full target as expected by the scp command.
 As default command /usr/bin/scp is used, you might give an alternative here.
-All other options are optional and passed to the scp command using the 
-appropriate command line flags.    
+All other options are optional and passed to the scp command using the
+appropriate command line flags.

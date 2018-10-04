@@ -1,7 +1,7 @@
--- 
+--
 -- Created by SQL::Translator::Producer::Oracle
 -- Created on Thu Nov  3 23:31:57 2016
--- 
+--
 --
 -- Table: aliases
 --;
@@ -72,7 +72,10 @@ CREATE TABLE certificate (
   authority_key_identifier varchar2(255),
   notbefore number,
   notafter number,
-  loa varchar2(255),
+  revocation_time number,
+  invalidity_time number,
+  reason_code varchar2(64),
+  hold_instruction_code varchar2(64),
   req_key number,
   public_key clob,
   data clob,
@@ -103,31 +106,13 @@ CREATE TABLE crl (
   pki_realm varchar2(255) NOT NULL,
   issuer_identifier varchar2(64) NOT NULL,
   crl_key number(38,0) NOT NULL,
+  crl_number number(38,0),
+  items number,
   data clob,
   last_update number,
   next_update number,
   publication_date number,
   PRIMARY KEY (issuer_identifier, crl_key)
-);
-
---
--- Table: crr
---;
-
-DROP TABLE crr CASCADE CONSTRAINTS;
-
-CREATE TABLE crr (
-  crr_key number NOT NULL,
-  pki_realm varchar2(255) NOT NULL,
-  identifier varchar2(64) NOT NULL,
-  creator varchar2(255),
-  creator_role varchar2(255),
-  reason_code varchar2(255),
-  invalidity_time number,
-  crr_comment clob,
-  hold_code varchar2(255),
-  revocation_time number,
-  PRIMARY KEY (pki_realm, crr_key)
 );
 
 --
@@ -181,6 +166,22 @@ CREATE TABLE datapool (
 );
 
 --
+-- Table: report
+--;
+
+DROP TABLE report CASCADE CONSTRAINTS;
+
+create table report (
+  report_name varchar2(63),
+  pki_realm varchar2(255),
+  created number(38), -- unix timestamp
+  mime_type varchar2(63), -- advisory, e.g. text/csv, text/plain, application/pdf, ...
+  description varchar2(255),
+  report_value clob,
+  primary key (report_name, pki_realm)
+);
+
+--
 -- Table: secret
 --;
 
@@ -194,6 +195,36 @@ CREATE TABLE secret (
 );
 
 --
+-- Table: backend_session
+--;
+
+DROP TABLE backend_session CASCADE CONSTRAINTS;
+
+CREATE TABLE backend_session (
+  session_id varchar2(255) NOT NULL,
+  data clob,
+  created number NOT NULL,
+  modified number NOT NULL,
+  ip_address varchar2(45),
+  PRIMARY KEY (session_id)
+);
+
+--
+-- Table: frontend_session
+--;
+
+DROP TABLE frontend_session CASCADE CONSTRAINTS;
+
+CREATE TABLE frontend_session (
+  session_id varchar2(255) NOT NULL,
+  data clob,
+  created number NOT NULL,
+  modified number NOT NULL,
+  ip_address varchar2(45),
+  PRIMARY KEY (session_id)
+);
+
+--
 -- Table: workflow
 --;
 
@@ -204,7 +235,7 @@ CREATE TABLE workflow (
   pki_realm varchar2(255),
   workflow_type varchar2(255),
   workflow_state varchar2(255),
-  workflow_last_update date DEFAULT current_timestamp NOT NULL,
+  workflow_last_update varchar2(20) NOT NULL,
   workflow_proc_state varchar2(32),
   workflow_wakeup_at number,
   workflow_count_try number,
@@ -253,9 +284,22 @@ CREATE TABLE workflow_history (
   workflow_description clob,
   workflow_state varchar2(255),
   workflow_user varchar2(255),
-  workflow_history_date date DEFAULT current_timestamp NOT NULL,
+  workflow_history_date varchar2(20) NOT NULL,
+  workflow_node varchar2(64),
   PRIMARY KEY (workflow_hist_id)
 );
+
+DROP TABLE ocsp_responses CASCADE CONSTRAINTS;
+
+CREATE TABLE ocsp_responses (
+  identifier varchar2(64),
+  serial_number varchar2(128) NOT NULL,
+  authority_key_identifier varchar2(128) NOT NULL,
+  body clob NOT NULL,
+  expiry timestamp DEFAULT current_timestamp NOT NULL,
+  PRIMARY KEY (serial_number, authority_key_identifier)
+);
+
 
 CREATE OR REPLACE TRIGGER ai_audittrail_audittrail_key
 BEFORE INSERT ON audittrail
@@ -269,22 +313,6 @@ BEGIN
 END;
 /
 
-CREATE OR REPLACE TRIGGER ts_workflow_workflow_last_upda
-BEFORE INSERT OR UPDATE ON workflow
-FOR EACH ROW WHEN (new.workflow_last_update IS NULL)
-BEGIN
- SELECT sysdate INTO :new.workflow_last_update FROM dual;
-END;
-/
-
-CREATE OR REPLACE TRIGGER ts_workflow_history_workflow_h
-BEFORE INSERT OR UPDATE ON workflow_history
-FOR EACH ROW WHEN (new.workflow_history_date IS NULL)
-BEGIN
- SELECT sysdate INTO :new.workflow_history_date FROM dual;
-END;
-/
-
 DROP SEQUENCE seq_application_log;
 CREATE SEQUENCE seq_application_log START WITH 0 INCREMENT BY 1 MINVALUE 0;
 DROP SEQUENCE seq_audittrail;
@@ -295,8 +323,6 @@ DROP SEQUENCE seq_certificate_attributes;
 CREATE SEQUENCE seq_certificate_attributes START WITH 0 INCREMENT BY 1 MINVALUE 0;
 DROP SEQUENCE seq_crl;
 CREATE SEQUENCE seq_crl START WITH 0 INCREMENT BY 1 MINVALUE 0;
-DROP SEQUENCE seq_crr;
-CREATE SEQUENCE seq_crr START WITH 0 INCREMENT BY 1 MINVALUE 0;
 DROP SEQUENCE seq_csr;
 CREATE SEQUENCE seq_csr START WITH 0 INCREMENT BY 1 MINVALUE 0;
 DROP SEQUENCE seq_csr_attributes;

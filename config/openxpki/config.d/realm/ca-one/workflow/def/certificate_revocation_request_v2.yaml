@@ -15,12 +15,13 @@ state:
         autorun: 1
         action:
           - global_noop > PENDING_USER ? !global_is_automated_request
-          - check_authorized_signer > CHECK_APPROVALS ? global_is_automated_request
+          - global_noop2 > CHECK_APPROVALS ? global_is_automated_request !global_is_signed_request
+          - check_authorized_signer > CHECK_APPROVALS ? global_is_automated_request global_is_signed_request
 
     CHECK_FOR_REVOCATION:
         autorun: 1
         action:
-          - global_check_for_revocation > SUCCESS 
+          - global_check_for_revocation > SUCCESS
         output:
           - cert_identifier
           - reason_code
@@ -46,30 +47,6 @@ state:
         action:
           - persist_crr > NICE_DISPATCH_REVOKE ? is_not_yet_revoked_or_pending
           - global_noop > CHECK_FOR_REVOCATION ? !is_not_yet_revoked_or_pending
-
-    EDIT_REQUEST:
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_DESC
-        action:
-          - update_crr > PENDING
-        output:
-          - cert_identifier
-          - reason_code
-          - invalidity_time
-          - delay_revocation_time
-          - comment
-
-    EDIT_REQUEST_USER:
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_DESC
-        action:
-          - update_crr > PENDING_USER
-        output:
-          - cert_identifier
-          - reason_code
-          - invalidity_time
-          - delay_revocation_time
-          - comment
 
     FAILURE:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_LABEL
@@ -102,7 +79,7 @@ state:
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_PENDING_DESC
         action:
           - approve_crr > CHECK_APPROVALS ? acl_can_approve is_not_yet_revoked_or_pending
-          - edit_crr > EDIT_REQUEST ? acl_can_approve is_not_yet_revoked_or_pending
+          - update_crr > PENDING ? acl_can_approve is_not_yet_revoked_or_pending
           - reject_crr > REJECTED ? acl_can_reject is_not_yet_revoked_or_pending
           - cleanup > SUCCESS ? !is_not_yet_revoked_or_pending
         output:
@@ -117,7 +94,7 @@ state:
           - signer_trusted
           - signer_authorized
         button:
-          edit_crr:
+          update_crr:
             format: optional
           approve_crr:
             format: expected
@@ -131,7 +108,7 @@ state:
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REQUEST_COMPLETE_DESC
         action:
           - submit > CHECK_APPROVALS
-          - edit_crr > EDIT_REQUEST_USER
+          - update_crr > PENDING_USER
           - global_cancel > CANCELED
         output:
           - cert_identifier
@@ -142,7 +119,7 @@ state:
         button:
           submit:
             format: expected
-          edit_crr:
+          update_crr:
             format: optional
           cancel:
             format: failure
@@ -198,6 +175,7 @@ action:
           - server
           - interface
           - signer_cert
+          - creator
         validator:
           - validate_invalidity_time
           - validate_delay_revocation_time
@@ -213,7 +191,7 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Pause
         param:
             _map_wakeup: $delay_revocation_time
-            reason: I18N_OPENXPKI_DELEAYED_REVOCATION_REQUESTED
+            reason: I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED
 
     cleanup:
         class: OpenXPKI::Server::Workflow::Activity::Noop
@@ -227,11 +205,6 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::Noop
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_DESC
-
-    edit_crr:
-        class: OpenXPKI::Server::Workflow::Activity::Noop
-        label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDIT_CRR_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDIT_CRR_DESC
 
     flag_pending_notification_send:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
@@ -334,7 +307,7 @@ validator:
             error: I18N_OPENXPKI_UI_WORKFLOW_ERROR_DELAY_REVOCATION_TIME_NOT_IN_FUTURE
         arg:
           - $delay_revocation_time
-        
+
 field:
     crr_info:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_LABEL
@@ -370,6 +343,11 @@ field:
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_LABEL
         name: signer_cert
         description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_DESC
+        required: 0
+        type: server
+
+    creator:
+        name: creator
         required: 0
         type: server
 

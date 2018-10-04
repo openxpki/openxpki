@@ -19,16 +19,15 @@ ok(1);
 ok(OpenXPKI::Server::Init::init(
        {
 	   CONFIG => 't/config_test.xml',
-	   TASKS  => [ 'current_xml_config', 
-		       'i18n', 
+	   TASKS  => [ 'current_xml_config',
+		       'i18n',
                'dbi_log',
-		       'log', 
-#		       'redirect_stderr', 
-		       'dbi_backend', 
-		       'dbi_workflow',
+		       'log',
+#		       'redirect_stderr',
+		       'dbi',
                'xml_config',
 		       'crypto_layer',
-		       'pki_realm', 
+		       'pki_realm',
 		       'volatile_vault',
                ],
        }));
@@ -40,14 +39,14 @@ my $realm = 'Test Root CA';
 
 
 # check PKI realm data structure
-ok(ref $realms->{$realm}, 
+ok(ref $realms->{$realm},
    'HASH');
 
 # default token
-ok(ref $realms->{$realm}->{crypto}, 
+ok(ref $realms->{$realm}->{crypto},
    'HASH');
 
-ok(blessed $realms->{$realm}->{crypto}->{default}, 
+ok(blessed $realms->{$realm}->{crypto}->{default},
    'OpenXPKI::Crypto::Backend::API');
 
 # profile validities
@@ -74,10 +73,10 @@ foreach my $profile ('User', 'TLS Server') {
 
 
 # CA information
-ok(ref $realms->{$realm}->{ca}, 
+ok(ref $realms->{$realm}->{ca},
    'HASH');
 
-ok(ref $realms->{$realm}->{ca}->{id}, 
+ok(ref $realms->{$realm}->{ca}->{id},
    'HASH');
 
 # FIXME: we can only test this once we have a real initialization
@@ -85,19 +84,19 @@ ok(ref $realms->{$realm}->{ca}->{id},
 # -> test in 70_server ?
 #foreach my $ca (qw( INTERNAL_CA_1 INTERNAL_CA_2 )) {
     # check for CA certificate and token information
-#    ok(ref $realms->{$realm}->{ca}->{id}->{$ca}, 
+#    ok(ref $realms->{$realm}->{ca}->{id}->{$ca},
 #   'HASH');
-#    
-    #ok(blessed $realms->{$realm}->{ca}->{id}->{$ca}->{cacert}, 
+#
+    #ok(blessed $realms->{$realm}->{ca}->{id}->{$ca}->{cacert},
     #   'OpenXPKI::Crypto::X509');
 
-    #ok(blessed $realms->{$realm}->{ca}->{id}->{$ca}->{notbefore}, 
+    #ok(blessed $realms->{$realm}->{ca}->{id}->{$ca}->{notbefore},
     #   'DateTime');
 
-    #ok(blessed $realms->{$realm}->{ca}->{id}->{$ca}->{notafter}, 
+    #ok(blessed $realms->{$realm}->{ca}->{id}->{$ca}->{notafter},
     #   'DateTime');
 
-    #ok(blessed $realms->{$realm}->{ca}->{id}->{$ca}->{crypto}, 
+    #ok(blessed $realms->{$realm}->{ca}->{id}->{$ca}->{crypto},
     #   'OpenXPKI::Crypto::Backend::API');
 
     # check for profile validities
@@ -106,7 +105,7 @@ ok(ref $realms->{$realm}->{ca}->{id},
 #    ok(ref $realms->{$realm}->{crl}->{id}->{$ca}->{validity},
 #       'HASH');
 #    ok(! exists $realms->{$realm}->{crl}->{id}->{$ca}->{validity}->{notbefore});
-#    
+#
 #    ok(ref $realms->{$realm}->{crl}->{id}->{$ca}->{validity}->{notafter},
 #       'HASH');
 #    ok($realms->{$realm}->{crl}->{id}->{$ca}->{validity}->{notafter}->{format},
@@ -114,13 +113,13 @@ ok(ref $realms->{$realm}->{ca}->{id},
 #    ok($realms->{$realm}->{crl}->{id}->{$ca}->{validity}->{notafter}->{validity},
 #       '+000014');
 #
-#    
+#
 #    # selfsigned CA validities
     #ok(ref $realms->{$realm}->{selfsignedca}->{id}->{$ca}->{validity},
 #       'HASH');
 
     # no check for notbefore date, we trust it's OK...
-    
+
     #ok(ref $realms->{$realm}->{selfsignedca}->{id}->{$ca}->{validity}->{notafter},
 #       'HASH');
     #ok($realms->{$realm}->{selfsignedca}->{id}->{$ca}->{validity}->{notafter}->{format},

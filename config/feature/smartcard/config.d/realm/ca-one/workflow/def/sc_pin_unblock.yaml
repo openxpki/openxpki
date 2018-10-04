@@ -44,8 +44,8 @@ state:
 
     HAVE_CODES: 
         autorun: 1
-        action: 
-          - global_noop > CAN_FETCH_PUK ? auth_codes_valid
+        action:
+          - global_noop set_next_try > CAN_FETCH_PUK ? auth_codes_valid
           - global_noop2 > CHECK_MAX_PIN_ITERAT ? !auth_codes_valid
 
     HAVE_TOKEN_ID: 
@@ -176,7 +176,13 @@ action:
         param: 
             error_code: ''
 
-    set_workflow_attributes: 
+    set_next_try:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        param:
+          _map_num_tries: "[% context.num_tries +1 %]"
+
+
+    set_workflow_attributes:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
         param: 
             _map_token_id: $token_id
@@ -263,6 +269,9 @@ acl:
         fail: 1
         resume: 1
         wakeup: 1
+        context: 1
+        history: 1
+        techlog: 1
 
     SmartCard:
         creator: any

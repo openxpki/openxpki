@@ -15,12 +15,12 @@ use OpenXPKI::Debug;
 use English;
 
 sub evaluate {
-    
+
     ##! 1: 'start'
     my ( $self, $workflow ) = @_;
-    
+
     my $context     = $workflow->context();
-    
+
     my $subject  = $context->param('cert_subject');
     my $pkcs10  = $context->param('pkcs10');
 
@@ -34,19 +34,13 @@ sub evaluate {
     # parse PKCS#10 request
     my $default_token = CTX('api')->get_default_token();
 
-    if (! defined $default_token) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_TOKEN_UNAVAILABLE",
-            );
-    };
-
     my $csr;
     eval {
-	$csr = OpenXPKI::Crypto::CSR->new(
-	    TOKEN => $default_token, 
-	    DATA => $pkcs10,
-	    );
-    };	
+    $csr = OpenXPKI::Crypto::CSR->new(
+        TOKEN => $default_token,
+        DATA => $pkcs10,
+        );
+    };
     if ($EVAL_ERROR) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_PARSE_ERROR",
@@ -59,14 +53,11 @@ sub evaluate {
             message => "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_PARSE_ERROR",
             );
     }
-    
-    CTX('log')->log(
-        MESSAGE => "Subject mismatch $subject != $parsed_subject",
-        PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    ); 
-       
-    condition_error( "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SUBJECT_MISMATCH_PKCS10" ) 
+
+    CTX('log')->application()->debug("Subject mismatch $subject != $parsed_subject");
+
+
+    condition_error( "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SUBJECT_MISMATCH_PKCS10" )
         if ( $subject != $parsed_subject );
 
     return 1;
@@ -92,7 +83,7 @@ OpenXPKI::Server::Workflow::Condition::SubjectMatchesPKCS10
 
 =head1 DESCRIPTION
 
-This validator checks if the passed subject string is equal to the one 
+This validator checks if the passed subject string is equal to the one
 contained in the pkcs10 request. The validator assumes a properly formated
 pkcs10 request, if you are unsure put OpenXPKI::Server::Workflow::Validator::PKCS10
 in front of this validator.

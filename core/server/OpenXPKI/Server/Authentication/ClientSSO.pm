@@ -1,4 +1,4 @@
-## OpenXPKI::Server::Authentication::ClientSSO.pm 
+## OpenXPKI::Server::Authentication::ClientSSO.pm
 ##
 ## Based on code Written 2005 by Martin Bartosch and Michael Bell
 ## Re-Written 2007 by Michael Bell
@@ -18,23 +18,23 @@ use OpenXPKI::Server::Context qw( CTX );
 use base qw( OpenXPKI::Server::Authentication::External );
 
 sub login_step {
-    ##! 1: 'start' 
+    ##! 1: 'start'
     my $self    = shift;
     my $arg_ref = shift;
- 
+
     my $name    = $arg_ref->{HANDLER};
     my $msg     = $arg_ref->{MESSAGE};
     my $answer  = $msg->{PARAMS};
 
     if (! exists $msg->{PARAMS}->{LOGIN}) {
-        ##! 4: 'no login data received (yet)' 
-        return (undef, undef, 
+        ##! 4: 'no login data received (yet)'
+        return (undef, undef,
             {
-		SERVICE_MSG => "GET_CLIENT_SSO_LOGIN",
-		PARAMS      => {
+        SERVICE_MSG => "GET_CLIENT_SSO_LOGIN",
+        PARAMS      => {
                     NAME        => $self->{NAME},
                     DESCRIPTION => $self->{DESC},
-	        },
+            },
             },
         );
     }
@@ -55,7 +55,7 @@ sub login_step {
 
         foreach my $name (keys %{$self->{ENV}})
         {
-            my $value = $self->{ENV}->{$name};
+            my $value = $self->{ENV}->{$name} || '';
             # we don't want to see expanded credentials in the log file,
             # so we just replace the credentials after logging it
             $value =~ s/__USER__/$account/g;
@@ -71,7 +71,7 @@ sub login_step {
         # is taken literally from the configuration.
         # NOTE: do not extend this code to allow login parameters
         # to be passed on the command line.
-        # - the credentials may be visible in the OS process 
+        # - the credentials may be visible in the OS process
         #   environment
         # - worse yet, it is untrusted user input that might
         #   easily be used to execute arbitrary commands on the
@@ -81,14 +81,14 @@ sub login_step {
         map { delete $ENV{$_} } @{$self->{CLEARENV}}; # clear environment
 
         ##! 2: "command returned $CHILD_ERROR, STDOUT was: $out"
-		
+
         if ($CHILD_ERROR != 0)
         {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_CLIENT_SSO_LOGIN_FAILED",
                 params  => {
-		    USER => $account,
-		});
+            USER => $account,
+        });
             return (undef, undef, {});
         }
 
@@ -138,7 +138,7 @@ OpenXPKI::Server::Authentication::ClientSSO - support for client based SSO.
 This is the class which supports OpenXPKI with an authentication method
 via an SSO mechanism on the client side of the daemon. This can be for example
 an installed Shibboleth system on the web server. Please notice that you must
-trust the web server in this case. 
+trust the web server in this case.
 The parameters are passed as a hash reference.
 
 =head1 Functions

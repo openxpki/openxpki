@@ -1,4 +1,4 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Engine 
+## OpenXPKI::Crypto::Backend::OpenSSL::Engine
 ## Copyright (C) 2003-2005 Michael Bell
 
 use strict;
@@ -6,6 +6,8 @@ use warnings;
 
 package OpenXPKI::Crypto::Backend::OpenSSL::Engine;
 
+use File::Basename;
+use OpenXPKI::FileUtils;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use English;
@@ -35,16 +37,17 @@ sub new {
                         ENGINE_SECTION
                         ENGINE_USAGE
                         KEY_STORE
+                        TMP
                        }) {
 
-	if (exists $keys->{$key}) {
+    if (exists $keys->{$key}) {
             ##! 128: 'setting key ' . $key . ' to value ' . Dumper $keys->{$key}
-	    $self->{$key} = $keys->{$key};
-	}
+        $self->{$key} = $keys->{$key};
+    }
     }
     $self->__check_engine_usage();
     $self->__check_key_store();
-    
+
     return $self;
 }
 
@@ -58,11 +61,11 @@ sub __check_engine_usage {
             if ($part !~ m{( \A ALWAYS \z )|( \A NEVER \z )|( \A NEW_ALG \z )|( \A PRIV_KEY_OPS \z )|( \A RANDOM \z ) }xms) {
                 OpenXPKI::Exception->throw (
                     message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_WRONG_ENGINE_USAGE",
-                    params  => { "ATTRIBUTE" => $part},   
+                    params  => { "ATTRIBUTE" => $part},
                     );
             }
             # if NEVER is not the only one value
-            if (($part =~ m{ \A NEVER \z }xms) and 
+            if (($part =~ m{ \A NEVER \z }xms) and
                 ($#{engine_usage_parts} >= 1)) {
                 OpenXPKI::Exception->throw (
                     message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_WRONG_NEVER_ENGINE_USAGE" );
@@ -75,7 +78,7 @@ sub __check_engine_usage {
 
 sub __check_key_store {
     my $self = shift;
-    if ($self->{KEY_STORE} !~ m{( \A ENGINE \z )|( \A OPENXPKI \z ) }xms) {
+    if ($self->{KEY_STORE} !~ m{\A ( ENGINE|OPENXPKI|DATAPOOL) \z}xms) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_WRONG_KEY_STORE",
             params  => { "ATTRIBUTE" => $self->{KEY_STORE}},
@@ -117,10 +120,10 @@ sub login {
     } elsif ($EVAL_ERROR) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_OPENSSL_LOGIN_FAILED_EVAL_ERROR",
-	    params => {
-		EVAL_ERROR => $EVAL_ERROR,
-	    },
-	);
+        params => {
+        EVAL_ERROR => $EVAL_ERROR,
+        },
+    );
     }
 
     $self->{ONLINE} = 1;
@@ -187,6 +190,37 @@ sub get_key_store
 sub get_keyfile
 {
     my $self = shift;
+
+    if ($self->get_key_store() eq "DATAPOOL") {
+        ##! 16: 'Get key from datapool ' . $self->{KEY}
+        if (!$self->{'tmp_keyfile'} || ! -e $self->{'tmp_keyfile'}) {
+            my $fu = OpenXPKI::FileUtils->new();
+            my $dir = $fu->get_safe_tmpdir({
+                TMP => $self->{TMP},
+            });
+            $self->{'tmp_keyfile'} = $dir.'/'.$self->{KEY};
+
+            my $dp = CTX('api2')->get_data_pool_entry(
+                namespace => 'sys.crypto.keys',
+                key => $self->{KEY},
+            );
+
+            if (!$dp || !$dp->{value}) {
+                OpenXPKI::Exception->throw (
+                    message => "Unable to load key from datapool",
+                    params => { KEY => $self->{KEY} }
+                );
+            }
+
+            ##! 16: 'Writing keyfile ' . $self->{'tmp_keyfile'}
+            $fu->write_file({
+                FILENAME => $self->{'tmp_keyfile'},
+                CONTENT => $dp->{value}
+            });
+        }
+        return $self->{'tmp_keyfile'};
+    }
+
     return $self->{KEY};
 }
 
@@ -196,8 +230,8 @@ sub get_passwd
     my $self = shift;
 
     if (defined $self->{SECRET} && $self->{SECRET}->is_complete()) {
-	##! 16: 'secret is_complete: ' . $self->{SECRET}->is_complete()
-	return $self->{SECRET}->get_secret();
+    ##! 16: 'secret is_complete: ' . $self->{SECRET}->is_complete()
+    return $self->{SECRET}->get_secret();
     }
 
     return $self->{PASSWD} if (exists $self->{PASSWD});
@@ -257,6 +291,21 @@ sub key_usable {
         return 0;
     }
     return 1;
+}
+
+# cleanup temporary key files
+sub DESTROY{
+    my $self = shift;
+
+    if ($self->{'tmp_keyfile'} && -e $self->{'tmp_keyfile'}) {
+        unlink $self->{'tmp_keyfile'};
+        rmdir dirname($self->{'tmp_keyfile'});;
+    }
+
+    if ($self->{TMP} && $self->{CERT} && -e $self->{CERT} && dirname($self->{CERT}) eq $self->{TMP}) {
+        unlink $self->{CERT};
+    }
+
 }
 
 1;
@@ -330,12 +379,12 @@ returns the OpenSSL engine section from the configuration or the empty string if
 is used or the engine section is empty.
 
 =head2 get_engine_usage
- 
+
 returns the OpenSSL engine_usage section from the configuration or the empty string if no engine
 is used or the engine_usage section is empty.
 
 =head2 get_key_store
- 
+
 returns the OpenSSL key_store section from the configuration.
 
 =head2 get_keyfile

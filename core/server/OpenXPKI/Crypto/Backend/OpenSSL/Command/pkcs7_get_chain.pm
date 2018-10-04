@@ -71,10 +71,10 @@ sub get_result
 
     my $fu = OpenXPKI::FileUtils->new();
     my $pkcs7 = $fu->read_file ($self->{OUTFILE});
-     
-    # We want to have the end entity certificate, which we autodetect by looking for 
-    # the certificate whoes subject is not an issuer in the found list 
-    
+
+    # We want to have the end entity certificate, which we autodetect by looking for
+    # the certificate whoes subject is not an issuer in the found list
+
     ##! 16: 'pkcs7: ' . $pkcs7
     ##! 2: "split certs"
     my %certsBySubject = ();
@@ -97,10 +97,10 @@ sub get_result
                            FUNCTION => "issuer"});
             $self->{XS}->free_object ($x509);
         };
-        ##! 8: 'Subject: ' . $subject        
-        ##! 8: 'Issuer: ' . $issuer        
-        
-        if (exists $certsBySubject{$subject} && 
+        ##! 8: 'Subject: ' . $subject
+        ##! 8: 'Issuer: ' . $issuer
+
+        if (exists $certsBySubject{$subject} &&
             $certsBySubject{$subject}->{ISSUER} ne $issuer &&
             $certsBySubject{$subject}->{CERT} ne $cert) {
             ##! 64: 'something funny is going on, the same certificate subject with different issuer or data is present'
@@ -108,45 +108,45 @@ sub get_result
                 message => 'I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_END_ENTITY_MULTIPLE_SAME_SUBJECTS_WITH_DIFFERENT_DATA',
             );
         }
-        
+
         $certsBySubject{$subject}->{ISSUER} = $issuer;
         $certsBySubject{$subject}->{CERT}   = $cert;
-        
+
         push @issuers, $issuer;
-        
+
     }
-    
+
     ##! 64: 'certs: ' . Dumper \%certsBySubject
-    
+
     # Find subjects which are not issuers = entities
-    
+
     my %entity =  map { $_ => 1 } keys %certsBySubject;
-    
-    # Now unset all items where the subject is listes in @issuers  
+
+    # Now unset all items where the subject is listes in @issuers
     foreach my $issuer (@issuers) {
-        ##! 16: "Remove issuer " . $issuer        
-        delete( $entity{$issuer} ) if ($entity{$issuer});        
+        ##! 16: "Remove issuer " . $issuer
+        delete( $entity{$issuer} ) if ($entity{$issuer});
     }
-    
-    # Hopefully we have only one remaining now    
-    my @subjectsRemaining = keys %entity; 
+
+    # Hopefully we have only one remaining now
+    my @subjectsRemaining = keys %entity;
      if ( scalar @subjectsRemaining != 1 ) {
-        ##! 2: "Too many remaining certs " . Dumper ( @subjectsRemaining )          
+        ##! 2: "Too many remaining certs " . Dumper ( @subjectsRemaining )
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_END_ENTITY_UNABLE_TOO_DETECT_CORRECT_END_ENTITY_CERTIFICATE',
         );
-     } 
-     
+     }
+
     my $subject = shift @subjectsRemaining;
-     
+
     # Requestor was just interessted in the entity
     if ($self->{NOCHAIN}) {
-    	##! 8: 'entity only requested '
-    	##! 32: 'Entity pem ' . $certsBySubject{$subject}->{CERT}
-    	return $certsBySubject{$subject}->{CERT};
-    } 
-     
-    # Start with the entity and build the chain    
+        ##! 8: 'entity only requested '
+        ##! 32: 'Entity pem ' . $certsBySubject{$subject}->{CERT}
+        return $certsBySubject{$subject}->{CERT};
+    }
+
+    # Start with the entity and build the chain
     ##! 16: 'entity subject: ' . $subject
     ##! 2: "create ordered cert list"
     my @chain;
@@ -167,8 +167,8 @@ sub get_result
             message => 'I18N_OPENXPKI_CRYPTO_BACKEND_OPENSSL_COMMAND_PKCS7_GET_CHAIN_COULD_NOT_CREATE_CHAIN',
         );
     }
-    return \@chain;         
-     
+    return \@chain;
+
 }
 
 sub __convert_subject {
@@ -202,17 +202,9 @@ OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_chain
 
 =head2 get_command
 
-You must specify the SIGNER or the SIGNER_SUBJECT.
-
 =over
 
 =item * PKCS7 (a signature)
-
-=item * ENGINE_USAGE
-
-=item * SIGNER (the signer to find the chain's begin)
-
-=item * SIGNER_SUBJECT (the subject of the signer's certificate)
 
 =back
 

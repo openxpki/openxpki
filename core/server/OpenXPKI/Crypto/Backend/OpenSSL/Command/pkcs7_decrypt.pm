@@ -30,7 +30,7 @@ sub get_command
         $passwd  = $self->{ENGINE}->get_passwd();
         $self->{CERTFILE} = $self->{ENGINE}->get_certfile();
         $self->{KEYFILE}  = $self->{ENGINE}->get_keyfile();
-    }    
+    }
     ## external signature
     elsif ($self->{PASSWD} or $self->{KEY})
     {
@@ -61,11 +61,11 @@ sub get_command
             $self->get_tmpfile ('KEY', 'CERT');
             $self->write_file (FILENAME => $self->{KEYFILE},
                                CONTENT  => $self->{KEY},
-	                       FORCE    => 1);
+                           FORCE    => 1);
 
             $self->write_file (FILENAME => $self->{CERTFILE},
                                CONTENT  => $self->{CERT},
-	                       FORCE    => 1);
+                           FORCE    => 1);
     } else {
             ##! 16: 'external signature '
             ## CA external signature
@@ -76,7 +76,7 @@ sub get_command
             $self->{CERTFILE} = $self->{ENGINE}->get_certfile();
             ##! 16: 'certfile: ' . $self->{CERTFILE}
             $self->{KEYFILE}  = $self->{ENGINE}->get_keyfile();
-            ##! 16: 'keyfile: ' . $self->{KEYFILE}            
+            ##! 16: 'keyfile: ' . $self->{KEYFILE}
     }
 
     ## check parameters
@@ -101,7 +101,7 @@ sub get_command
 
     $self->write_file (FILENAME => $self->{PKCS7FILE},
                        CONTENT  => $self->{PKCS7},
-	               FORCE    => 1);
+                   FORCE    => 1);
 
     ## build the command
 

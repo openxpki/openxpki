@@ -9,7 +9,7 @@ OpenXPKI::Server::Database::QueryBuilder - Programmatic interface to SQL queries
 
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Database::Query;
-use OpenXPKI::Server::Database::Util;
+use OpenXPKI::MooseParams;
 use SQL::Abstract::More; # TODO Use SQL::Maker instead of SQL::Abstract::More? (but the former only supports Oracle type LIMITs)
 
 ################################################################################
@@ -36,8 +36,7 @@ has 'namespace' => ( # database namespace (i.e. schema) to prepend to tables
 # Prefixes the given DB table name with a namespace (if there's not already
 # one part of the table name)
 sub _add_namespace_to {
-    my $self = shift;
-    my ($obj_param) = positional_args(\@_, # OpenXPKI::Server::Database::Util
+    my ($self, $obj_param) = positional_args(\@_, # OpenXPKI::MooseParams
         { isa => 'Str | ArrayRef[Str]' },
     );
     # no namespace defined
@@ -53,7 +52,7 @@ sub _add_namespace_to {
 # Calls the given SQL::Abstract::More method after converting the parameters.
 # Sets $self->sql_str and $self->sql_params
 sub _make_query {
-    my ($self, %args) = named_args(\@_,   # OpenXPKI::Server::Database::Util
+    my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
         method    => { isa => 'Str' },
         args      => { isa => 'HashRef' },
         query_obj => { isa => 'OpenXPKI::Server::Database::Query', optional => 1 },
@@ -74,7 +73,7 @@ sub _make_query {
 }
 
 sub select {
-    my ($self, %params) = named_args(\@_,   # OpenXPKI::Server::Database::Util
+    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
         columns   => { isa => 'ArrayRef[Str]' },
         from      => { isa => 'Str | ArrayRef[Str]', optional => 1 },
         from_join => { isa => 'Str', optional => 1 },
@@ -130,7 +129,7 @@ sub select {
 }
 
 sub insert {
-    my ($self, %params) = named_args(\@_,   # OpenXPKI::Server::Database::Util
+    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
         into     => { isa => 'Str' },
         values   => { isa => 'HashRef' },
     );
@@ -142,7 +141,7 @@ sub insert {
 }
 
 sub update {
-    my ($self, %params) = named_args(\@_,   # OpenXPKI::Server::Database::Util
+    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
         table => { isa => 'Str' },
         set   => { isa => 'HashRef' },
         where => { isa => 'Str | ArrayRef | HashRef' }, # require WHERE clause to prevent accidential updates on all rows
@@ -154,7 +153,7 @@ sub update {
 }
 
 sub delete {
-    my ($self, %params) = named_args(\@_,   # OpenXPKI::Server::Database::Util
+    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
         from      => { isa => 'Str' },
         where     => { isa => 'Str | ArrayRef | HashRef', optional => 1 },
         all       => { isa => 'Bool', optional => 1 },

@@ -36,13 +36,12 @@ sub execute {
 
     if ( !$holder_id ) {
         OpenXPKI::Exception->throw(
-            message => 
+            message =>
                 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETOWNERBYCARDID',
             params => { TOKEN_ID => $tokenid, },
             log    => {
-                logger   => CTX('log'),
                 priority => 'error',
-                facility => ['application'],
+                facility => 'application',
             },
         );
     }
@@ -58,9 +57,8 @@ sub execute {
                 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETOWNERBYCARDID_SEARCH_PERSON_FAILED',
             params => { EMPLOYEEID => $holder_id },
             log    => {
-                logger   => CTX('log'),
                 priority => 'error',
-                facility => ['application'],
+                facility => 'application'
             },
         );
     }
@@ -70,18 +68,14 @@ sub execute {
                 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETOWNERBYCARDID_PERSON_ENTRY_DOES_NOT_HAVE_MAIL_ATTRIBUTE',
             params => { EMPLOYEEINFO => $employeeinfo->{VALUE} },
             log    => {
-                logger   => CTX('log'),
                 priority => 'error',
-                facility => [ 'application', ],
+                facility => 'application',
             },
         );
     }
-    
-    CTX('log')->log(
-        MESSAGE => "SmartCard got owner for $tokenid, ". $employeeinfo->{VALUE}->{mail} ." / ". $employeeinfo->{VALUE}->{cn}, 
-        PRIORITY => 'info',
-        FACILITY => 'application'
-    );
+
+    CTX('log')->application()->info("SmartCard got owner for $tokenid, ". $employeeinfo->{VALUE}->{mail} ." / ". $employeeinfo->{VALUE}->{cn});
+
 
     $context->param( 'owner_mail' => $employeeinfo->{VALUE}->{mail} );
     $context->param( 'owner_cn'   => $employeeinfo->{VALUE}->{cn} );
@@ -98,7 +92,7 @@ OpenXPKI::Server::Workflow::Activity::SmartCard::GetOwnerByCardID
 
 =head1 Description
 
-Obtain the holder of a Smartcard (by querying the connector) 
+Obtain the holder of a Smartcard (by querying the connector)
 Duplicates the methods used in API::Smartcard to first find the
 employee-id and then get the user information.
 

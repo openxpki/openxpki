@@ -37,7 +37,7 @@ sub execute {
     my ( $puk_length, $puk );
 
 
-    if ( $puk_policy eq 'gem2' ) {
+    if ( $puk_policy =~ /gem[23]/ ) {
         $puk_length = 24; # bytes
 
         my $command = {
@@ -52,9 +52,9 @@ sub execute {
 
         # Convert to hex string
         my $puk_hex = unpack( 'H*', $puk_raw );
-        $puk_hex = substr($puk_hex . "00" x ($puk_length * 2), 
-			  0, 
-			  $puk_length * 2);
+        $puk_hex = substr($puk_hex . "00" x ($puk_length * 2),
+              0,
+              $puk_length * 2);
 
         # In this next block, we fetch the current puk from the datapool
         # and save this new puk together with the current puk in an array.
@@ -100,13 +100,8 @@ sub execute {
         $params->{VALUE} = $raw;
         $params->{ENCRYPT} = 1;
         $msg = CTX('api')->set_data_pool_entry($params);
-        CTX('dbi_backend')->commit();
 
-        CTX('log')->log(
-            MESSAGE => 'SmartCard new puk generated for token ' . $context->param('token_id'),
-            PRIORITY => 'info',
-            FACILITY => ['audit','application']
-        );
+        CTX('log')->application()->info('SmartCard new puk generated for token ' . $context->param('token_id'));
 
 #        # set a flag in the context so the wf knows this was successful
         $context->param( 'generated_new_puk', 'yes' );
@@ -117,12 +112,6 @@ sub execute {
         OpenXPKI::Exception->throw(
             message =>
                 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GENERATEPUK_BAD_POLICY',
-            params => {},
-            log    => {
-                logger   => CTX('log'),
-                priority => 'warn',
-                facility => 'system',
-            },
         );
     }
 
@@ -146,14 +135,14 @@ Implements the GeneratePUK workflow action.
 
 =item _default_puk
 
-If no datapool entry is found for the token, but this context value is 
+If no datapool entry is found for the token, but this context value is
 present, it is also added to the datapool.
- 
+
 =back
 
 =head2 Activity parameters
 
-Expects the following activity parameters  
+Expects the following activity parameters
 
 =over 12
 
@@ -163,7 +152,7 @@ B<Note:> Planned for future version. For now, 'gem2' is always used.
 
 Specifies the name of the puk policy to use. Possible choices are:
 
- gem2   48 hex chars, as required by Gemalto 2 cards [default]
+ gem2/gem3  48 hex chars, as required by Gemalto 2 cards [default]
 
 =back
 

@@ -8,6 +8,7 @@ use Data::Dumper;
 use English;
 use MIME::Base64;
 use OpenXPKI::Client::SC;
+use Log::Log4perl qw(:easy);
 
 has 'session' => (
     is => 'rw',
@@ -42,6 +43,8 @@ sub _init_client {
     my $configfile = '/etc/openxpki/sc/default.conf';
     read_config $configfile => my %config;
     my %card_config = %config;
+
+    Log::Log4perl->init('/etc/openxpki/sc/log.conf');
 
     return OpenXPKI::Client::SC->new({
         session => $self->session(),

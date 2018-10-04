@@ -11,56 +11,60 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Server::Database; # to get AUTO_ID
 
 use OpenXPKI::Server::Workflow::NICE::Factory;
 
 use Data::Dumper;
 
 sub execute {
-    my $self     = shift;
-    my $workflow = shift;
+    my ($self, $workflow) = @_;
     my $context  = $workflow->context();
-    
     ##! 32: 'context: ' . Dumper( $context )
-    
+
     my $nice_backend = OpenXPKI::Server::Workflow::NICE::Factory->getHandler( $self );
-    
-	my $crr_serial = $context->param('crr_serial');	
-	my $dbi = CTX('dbi_backend');
-	
-    ##! 16: 'searching for crr serial ' . $crr_serial
-	my $crr = $dbi->first(
-	    TABLE   => 'CRR',
-	    COLUMNS => [ 'REASON_CODE', 'IDENTIFIER' ],	    
-		KEY => $crr_serial,		   	    
+    my $cert_identifier = $self->param('cert_identifier') || $context->param('cert_identifier');
+    my $dbi = CTX('dbi');
+
+    ##! 16: 'start revocation for cert identifier' . $cert_identifier
+    my $cert = $dbi->select_one(
+        from => 'certificate',
+        columns => [ 'identifier', 'reason_code', 'invalidity_time' ],
+        where => { identifier => $cert_identifier },
     );
-    
-    if (! defined $crr) {
-	   OpenXPKI::Exception->throw(
-	       message => 'I18N_OPENXPKI_SERVER_NICE_CRR_NOT_FOUND_IN_DATABASE',
-	       params => { crr_serial => $crr_serial }
+
+    if (! defined $cert) {
+       OpenXPKI::Exception->throw(
+           message => 'nice certificate to revoked not found in database',
+           params => { identifier => $cert_identifier }
        );
     }
-      
-    CTX('log')->log(
-        MESSAGE  => "start cert revocation for crr_serial $crr_serial, workflow " . $workflow->id,
-        PRIORITY => 'info',
-        FACILITY => 'application',
-    );
-           
-    $nice_backend->revokeCertificate( $crr );
 
-    ##! 32: 'Add workflow id ' . $workflow->id.' to cert_attributes ' for cert ' . $set_context->{cert_identifier} 
-    CTX('dbi_backend')->insert(
-        TABLE => 'CERTIFICATE_ATTRIBUTES', 
-        HASH => {            
-            IDENTIFIER => $context->param('cert_identifier'),
-            ATTRIBUTE_KEY => 'system_workflow_crr',
-            ATTRIBUTE_VALUE => $workflow->id
+    if (!$cert->{reason_code}) {
+        OpenXPKI::Exception->throw(
+            message => 'nice certificate to revoked has no reason code set',
+            params => { identifier => $cert_identifier }
+        );
+    }
+
+    CTX('log')->application()->info("start cert revocation for identifier $cert_identifier, workflow " . $workflow->id);
+
+    $nice_backend->revokeCertificate( {
+        IDENTIFIER => $cert->{identifier},
+        REASON_CODE => $cert->{reason_code},
+        INVALIDITY_TIME => $cert->{invalidity_time},
+    } );
+
+    ##! 32: 'Add workflow id ' . $workflow->id.' to cert_attributes ' for cert ' . $set_context->{cert_identifier}
+    CTX('dbi')->insert(
+        into => 'certificate_attributes',
+        values => {
+            attribute_key => AUTO_ID,
+            identifier => $cert->{identifier},
+            attribute_contentkey => 'system_workflow_crr',
+            attribute_value => $workflow->id,
         }
-    );          
-    CTX('dbi_backend')->commit();       
-    	
+    );
 }
 
 1;

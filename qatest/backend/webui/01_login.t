@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 
-use lib qw(../../lib);
+use FindBin qw( $Bin );
+use lib "$Bin/../../lib";
+
 use strict;
 use warnings;
 use CGI::Session;
@@ -37,6 +39,7 @@ my $client = MockUI->new({
     config => { socket => '/var/openxpki/openxpki.socket' }
 });
 
+$client->update_rtoken();
 
 $result = $client->mock_request({});
 is($result->{goto}, 'login');
@@ -59,4 +62,4 @@ $result = $client->mock_request({
     'password' => 'openxpki'
 });
 
-is($result->{goto}, 'welcome', 'Logged in');
+is($result->{goto}, 'redirect!welcome', 'Logged in');

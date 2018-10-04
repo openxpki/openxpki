@@ -43,6 +43,25 @@ are read from the filesystem.
 Calling the notifier with C<MESSAGE=csr_created> will send out two mails.
 One to the requestor and one to the ra-officer, both are CC'ed to helpdesk.
 
+=head2 Recipients
+
+=over
+
+=item to
+
+Must be a single address, can be a template toolkit string.
+
+=item cc
+
+Can be a single address or a list of address seperated by a single comma.
+The string is processed by template toolkit and afterwards splitted into
+a list at the comma, so you can use loop/join to create multiple recipients.
+
+If you directly pass an array, each item is processed using template toolkit
+but must return a single address.
+
+=back
+
 B<Note>: The settings To, Cc and Prefix are stored in the workflow on the first
 message and reused for each subsequent message on the same channel, so you can
 gurantee that each message in a thread is sent to the same people. All settings
@@ -84,6 +103,7 @@ use OpenXPKI::Serialization::Simple;
 use Net::SMTP;
 
 use Moose;
+use Encode;
 
 extends 'OpenXPKI::Server::Notification::Base';
 
@@ -101,13 +121,6 @@ has 'default_envelope' => (
     is  => 'ro',
     isa => 'HashRef',
     builder => '_init_default_envelope',
-    lazy => 1,
-);
-
-has 'template_dir' => (
-    is  => 'ro',
-    isa => 'Str',
-    builder => '_init_template_dir',
     lazy => 1,
 );
 
@@ -148,32 +161,65 @@ sub transport {
 
 }
 
-sub _init_transport {
+sub _new_smtp {
+  my $self = shift;
+  return Net::SMTP->new( @_ );
+}
 
+sub _cfg_to_smtp_new_args {
     my $self = shift;
-
-    ##! 8: 'creating Net::SMTP transport'
-    my $cfg = CTX('config')->get_hash( $self->config() . '.backend' );
-
+    my $cfg = shift;
     my %smtp = (
         Host => $cfg->{host} || 'localhost',
     );
-
     $smtp{'Port'} = $cfg->{port} if ($cfg->{port});
     $smtp{'User'} = $cfg->{username} if ($cfg->{username});
     $smtp{'Password'} = $cfg->{password} if ($cfg->{password});
     $smtp{'Timeout'} = $cfg->{timeout} if ($cfg->{timeout});
     $smtp{'Debug'} = 1 if ($cfg->{debug});
+    return %smtp;
+}
 
-    my $transport = Net::SMTP->new( %smtp );
+sub _init_transport {
+    my $self = shift;
+
+    ##! 8: 'creating Net::SMTP transport'
+    my $cfg = CTX('config')->get_hash( $self->config() . '.backend' );
+
+    my %smtp =  $self->_cfg_to_smtp_new_args($cfg);
+    my $transport = $self->_new_smtp( %smtp );
+
     # Net::SMTP returns undef if it can not reach the configured socket
     if (!$transport || !ref $transport) {
+        CTX('log')->system()->fatal(sprintf("Failed creating smtp transport (host: %s, user: %s)", $smtp{Host}, $smtp{User}));
+        return undef;
+    }
+
+    if($cfg->{username}) {
+        if(!$cfg->{password}) {
+          CTX('log')->log(
+              MESSAGE  => sprintf("Empty password or no password provided (for user %s)", $cfg->{username}),
+              PRIORITY => "error",
+              FACILITY => [ "system", "monitor" ]
+          );
+          $transport->quit;
+          return undef;
+        }
         CTX('log')->log(
-            MESSAGE  => sprintf("Failed creating smtp transport (host: %s, user: %s)", $smtp{Host}, $smtp{User}),
-            PRIORITY => "fatal",
+            MESSAGE  => sprintf("Authenticating to server (user %s)", $cfg->{username}),
+            PRIORITY => "debug",
             FACILITY => [ "system", "monitor" ]
         );
-        return undef;
+
+        if(!$transport->auth($cfg->{username}, $cfg->{password})) {
+          CTX('log')->log(
+              MESSAGE  => sprintf("SMTP SASL authentication failed (user: %s, error: %s)", $cfg->{username}, $transport->message),
+              PRIORITY => "error",
+              FACILITY => [ "system", "monitor" ]
+          );
+          $transport->quit;
+          return undef;
+        }
     }
     $self->is_smtp_open(1);
     return $transport;
@@ -195,13 +241,6 @@ sub _init_default_envelope {
     return $envelope;
 }
 
-sub _init_template_dir {
-    my $self = shift;
-    my $template_dir = CTX('config')->get( $self->config().'.template.dir' );
-    $template_dir .= '/' unless($template_dir =~ /\/$/);
-    return $template_dir;
-}
-
 sub _init_use_html {
 
     my $self = shift;
@@ -214,11 +253,7 @@ sub _init_use_html {
         # Try to load the Mime class
         eval "use MIME::Entity;1";
         if ($EVAL_ERROR) {
-            CTX('log')->log(
-                MESSAGE  => "Initialization of MIME::Entity failed, falling back to plain text",
-                PRIORITY => "fatal",
-                FACILITY => [ "system", "monitor" ]
-            );
+            CTX('log')->system()->error("Initialization of MIME::Entity failed, falling back to plain text");
             return 0;
         } else {
             return 1;
@@ -236,14 +271,10 @@ sub _init_smime {
     if (!$cfg) {
         return;
     }
-    
+
     eval "use Crypt::SMIME;1";
     if ($EVAL_ERROR) {
-        CTX('log')->log(
-            MESSAGE  => "Initialization of Crypt::SMIME failed!",
-            PRIORITY => "error",
-            FACILITY => [ "system", "monitor" ]
-        );
+        CTX('log')->system()->fatal("Initialization of Crypt::SMIME failed!");
         OpenXPKI::Exception->throw(
             message => "Initialization of Crypt::SMIME failed!",
         );
@@ -256,11 +287,8 @@ sub _init_smime {
         my $pkcs12 = OpenXPKI::FileUtils->read_file( $cfg->{certificate_p12_file} );
         $smime = Crypt::SMIME->new()->setPrivateKeyPkcs12($pkcs12, $cfg->{certificate_key_password});
 
-        CTX('log')->log(
-            MESSAGE  => "Enable SMIME signer for notification backend (PKCS12)",
-            PRIORITY => "debug",
-            FACILITY => "application",
-        );
+        CTX('log')->system()->debug("Enable SMIME signer for notification backend (PKCS12)");
+
 
     } elsif( $cfg->{certificate_key_file} )  {
 
@@ -268,11 +296,8 @@ sub _init_smime {
         my $cert = OpenXPKI::FileUtils->read_file( $cfg->{certificate_file} );
         $smime = Crypt::SMIME->new()->setPrivateKey( $key, $cert, $cfg->{certificate_key_password} );
 
-        CTX('log')->log(
-            MESSAGE  => "Enable SMIME signer for notification backend",
-            PRIORITY => "debug",
-            FACILITY => "application",
-        );
+        CTX('log')->system()->debug("Enable SMIME signer for notification backend");
+
 
     }
 
@@ -309,11 +334,8 @@ sub notify {
     ##! 16: 'Found handles ' . Dumper @handles
 
     if (!@handles) {
-        CTX('log')->log(
-            MESSAGE  => "No notifcations to send for $msgconfig",
-            PRIORITY => "debug",
-            FACILITY => "application",
-        );
+        CTX('log')->system()->debug("No notifcations to send for $msgconfig");
+
         return undef;
     }
 
@@ -373,20 +395,23 @@ sub notify {
 
             ##! 32: 'Building new cc list'
             # explicit from configuration, can be a comma sep. list
-            my @ccrcpt;
             if(!$cfg->{cc}) {
                 # noop
             } elsif (ref $cfg->{cc} eq '') {
-                @ccrcpt = split(/,/, $cfg->{cc});
+                my $cc = $self->_render_template( $cfg->{cc}, \%vars );
+                ##! 32: 'Parsed cc ' . $cc
+                # split at comma with optional whitespace and filter out
+                # strings that do not look like a mail address
+                @cclist = map { $_ =~ /^[\w\.-]+\@[\w\.-]+$/ ? $_ : () } split(/\s*,\s*/, $cc);
             } elsif (ref $cfg->{cc} eq 'ARRAY') {
-                @ccrcpt = @{$cfg->{cc}};
+                ##! 32: 'CC from array ' . Dumper $cfg->{cc}
+                foreach my $cc (@{$cfg->{cc}}) {
+                    my $rcpt = $self->_render_receipient( $cc, \%vars );
+                    ##! 32: 'New cc rcpt: ' . $cc . ' -> ' . $rcpt
+                    push @cclist, $rcpt if($rcpt);
+                }
             }
 
-            foreach my $cc (@ccrcpt) {
-                my $rcpt = $self->_render_receipient( $cc, \%vars );
-                ##! 32: 'New cc rcpt: ' . $cc . ' -> ' . $rcpt
-                push @cclist, $rcpt if($rcpt);
-            }
             $pi->{cc} = \@cclist;
             ##! 32: 'New cclist ' . Dumper $pi->{cc}
 
@@ -401,13 +426,10 @@ sub notify {
         }
 
         if (!$vars{to}) {
-        	CTX('log')->log(
-            	MESSAGE  => "Failed sending notification - no receipient",
-            	PRIORITY => "warn",
-            	FACILITY => "application",
-	        );
-	        push @failed, $handle;
-	        next MAIL_HANDLE;
+            CTX('log')->system()->warn("Failed sending notification - no receipient");
+
+            push @failed, $handle;
+            next MAIL_HANDLE;
         }
 
         if ($self->use_html()) {
@@ -444,11 +466,8 @@ sub _render_receipient {
 
     if ($mail !~ /^[\w\.-]+\@[\w\.-]+$/) {
         ##! 8: 'This is not an address ' . $mail
-        CTX('log')->log(
-            MESSAGE  => "Not a mail address: $mail",
-            PRIORITY => "warn",
-            FACILITY => "application",
-        );
+        CTX('log')->system()->warn("Not a mail address: $mail");
+
         return undef;
     }
 
@@ -467,24 +486,18 @@ sub _send_plain {
     my $cfg = shift;
     my $vars = shift;
 
-    my $output = $self->_render_template_file( $self->template_dir().$cfg->{template}.'.txt', $vars );
+    my $output = $self->_render_template_file( $cfg->{template}.'.txt', $vars );
 
     if (!$output) {
-        CTX('log')->log(
-            MESSAGE  => "Mail body is empty ($cfg->{template})",
-            PRIORITY => "error",
-            FACILITY => "system",
-        );
+        CTX('log')->system()->error("Mail body is empty ($cfg->{template})");
+
         return 0;
     }
 
     my $subject = $self->_render_template( $cfg->{subject}, $vars );
     if (!$subject) {
-        CTX('log')->log(
-            MESSAGE  => "Mail subject is empty ($cfg->{template})",
-            PRIORITY => "error",
-            FACILITY => "system",
-        );
+        CTX('log')->system()->error("Mail subject is empty ($cfg->{template})");
+
         return 0;
     }
 
@@ -504,11 +517,8 @@ sub _send_plain {
 
     my $smtp = $self->transport();
     if (!$smtp) {
-        CTX('log')->log(
-            MESSAGE  => sprintf("Failed sending notification - no smtp transport"),
-            PRIORITY => "error",
-            FACILITY => "system",
-        );
+        CTX('log')->system()->error(sprintf("Failed sending notification - no smtp transport"));
+
         return undef;
     }
 
@@ -532,18 +542,11 @@ sub _send_plain {
     $smtp->datasend($smtpmsg);
 
     if( !$smtp->dataend() ) {
-        CTX('log')->log(
-            MESSAGE  => sprintf("Failed sending notification (%s, %s)", $vars->{to}, $subject),
-            PRIORITY => "error",
-            FACILITY => "system",
-        );
+        CTX('log')->system()->warn(sprintf("Failed sending notification (%s, %s)", $vars->{to}, $subject));
         return 0;
     }
-    CTX('log')->log(
-        MESSAGE  => sprintf("Notification was send (%s, %s)", $vars->{to}, $subject),
-        PRIORITY => "info",
-        FACILITY => "system",
-    );
+    CTX('log')->system()->info(sprintf("Notification was send (%s, %s)", $vars->{to}, $subject));
+
 
     return 1;
 
@@ -564,34 +567,29 @@ sub _send_html {
     require MIME::Entity;
 
     # Parse the templates - txt and html
-    my $plain = $self->_render_template_file( $self->template_dir().$cfg->{template}.'.txt', $vars );
-    my $html = $self->_render_template_file( $self->template_dir().$cfg->{template}.'.html', $vars );
+    my $plain = $self->_render_template_file( $cfg->{template}.'.txt', $vars );
+    my $html = $self->_render_template_file( $cfg->{template}.'.html', $vars );
 
     if (!$plain && !$html) {
-        CTX('log')->log(
-            MESSAGE  => "Both mail parts are empty ($cfg->{template})",
-            PRIORITY => "error",
-            FACILITY => "system",
-        );
+        CTX('log')->system()->error("Both mail parts are empty ($cfg->{template})");
+
         return 0;
     }
 
     # Parse the subject
     my $subject = $self->_render_template($cfg->{subject}, $vars);
     if (!$subject) {
-        CTX('log')->log(
-            MESSAGE  => "Mail subject is empty ($cfg->{template})",
-            PRIORITY => "error",
-            FACILITY => "system",
-        );
+        CTX('log')->system()->error("Mail subject is empty ($cfg->{template})");
+
         return 0;
     }
 
     my @args = (
-        From    => $cfg->{from},
-        To      => $vars->{to},
-        Subject => "$vars->{prefix} $subject",
+        From    => Encode::encode_utf8($cfg->{from}),
+        To      => Encode::encode_utf8($vars->{to}),
+        Subject => Encode::encode_utf8("$vars->{prefix} $subject"),
         Type    =>'multipart/alternative',
+        Charset => 'UTF-8',
     );
 
     push @args, (Cc => join(",", @{$vars->{cc}})) if ($vars->{cc});
@@ -603,11 +601,11 @@ sub _send_html {
 
     # Plain part
     if ($plain) {
-    	##! 16: ' Attach plain text'
-    	$msg->attach(
-        	Type     =>'text/plain',
-        	Data     => $plain
-	    );
+        ##! 16: ' Attach plain text'
+        $msg->attach(
+            Type     =>'text/plain',
+            Data     => Encode::encode_utf8($plain)
+        );
     }
 
     ##! 16: 'base created'
@@ -615,7 +613,7 @@ sub _send_html {
     # look for images - makes the mail a bit complicated as we need to build a second mime container
     if ($html && $cfg->{images}) {
 
-		##! 16: ' Multipart html + image'
+        ##! 16: ' Multipart html + image'
 
         my $html_part = MIME::Entity->build(
             'Type' => 'multipart/related',
@@ -624,7 +622,7 @@ sub _send_html {
         # The HTML Body
         $html_part->attach(
             Type        =>'text/html',
-            Data        => $html
+            Data        => Encode::encode_utf8($html)
         );
 
         # The hash contains the image id and the filename
@@ -632,11 +630,8 @@ sub _send_html {
         foreach my $imgid (keys(%{$cfg->{images}})) {
             my $imgfile = $self->template_dir().'images/'.$cfg->{images}->{$imgid};
             if (! -e $imgfile) {
-                CTX('log')->log(
-                    MESSAGE  => sprintf("HTML Notify - imagefile not found (%s)", $imgfile),
-                    PRIORITY => "error",
-                    FACILITY => "system",
-                );
+                CTX('log')->system()->error(sprintf("HTML Notify - imagefile not found (%s)", $imgfile));
+
                 next ATTACH_IMAGE;
             }
 
@@ -644,11 +639,8 @@ sub _send_html {
             my $mime = lc($1);
 
             if (!$mime) {
-                CTX('log')->log(
-                    MESSAGE  => sprintf("HTML Notify - invalid image extension", $imgfile),,
-                    PRIORITY => "error",
-                    FACILITY => "system",
-                );
+                CTX('log')->system()->error(sprintf("HTML Notify - invalid image extension", $imgfile));
+
                 next ATTACH_IMAGE;
             }
 
@@ -662,23 +654,20 @@ sub _send_html {
         $msg->add_part($html_part);
 
     } elsif ($html) {
-		##! 16: ' html without image'
+        ##! 16: ' html without image'
         ## Add the html part:
         $msg->attach(
             Type        =>'text/html',
-            Data        => $html
+            Data        => Encode::encode_utf8($html)
         );
     }
 
-	# a reusable Net::SMTP object
+    # a reusable Net::SMTP object
     my $smtp = $self->transport();
 
     if (!$smtp) {
-        CTX('log')->log(
-            MESSAGE  => sprintf("Failed sending notification - no smtp transport"),
-            PRIORITY => "error",
-            FACILITY => "system",
-        );
+        CTX('log')->system()->error(sprintf("Failed sending notification - no smtp transport"));
+
         return undef;
     }
 
@@ -704,19 +693,13 @@ sub _send_html {
     }
 
     if(!$res) {
-        CTX('log')->log(
-            MESSAGE  => sprintf("Failed sending notification (%s, %s)", $vars->{to}, $subject),
-            PRIORITY => "error",
-            FACILITY => "system",
-        );
+        CTX('log')->system()->error(sprintf("Failed sending notification (%s, %s)", $vars->{to}, $subject));
+
         return 0;
     }
 
-    CTX('log')->log(
-        MESSAGE  => sprintf("Notification was send (%s, %s)", $vars->{to}, $subject),
-        PRIORITY => "info",
-        FACILITY => "system",
-    );
+    CTX('log')->system()->info(sprintf("Notification was send (%s, %s)", $vars->{to}, $subject));
+
 
     return 1;
 

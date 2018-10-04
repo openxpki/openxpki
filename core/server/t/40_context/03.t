@@ -12,30 +12,29 @@ use OpenXPKI::Exception;
 
 #plan tests => 10;
 
-diag "OpenXPKI::Server::Context - global context entries\n" if $ENV{VERBOSE};
+note "OpenXPKI::Server::Context - global context entries\n";
 
 $ENV{OPENXPKI_CONF_DB} = 't/config.git/';
 
 ## init Context
 ok(OpenXPKI::Server::Init::init(
-       {	   
-	   TASKS  => [ 
+       {
+	   TASKS  => [
                 'api',
-               'config_versioned',   
-		       'i18n', 
+               'config_versioned',
+		       'i18n',
                'dbi_log',
-		       'log', 
-		       'dbi_backend', 
-		       'dbi_workflow',               
+		       'log',
+		       'dbi',
 		       'crypto_layer',
 		       'volatile_vault',
-#               'acl',               
+#               'acl',
                'authentication',
                ],
        }));
 
 
-is(ref CTX('config'), 
+is(ref CTX('config'),
     'OpenXPKI::Config', "CTX('config')");
 
 is(ref CTX('crypto_layer'),
@@ -47,12 +46,8 @@ is(ref CTX('volatile_vault'),
 is(ref CTX('log'),
     'OpenXPKI::Server::Log', "CTX('log')");
 
-is(ref CTX('dbi_backend'),
-   'OpenXPKI::Server::DBI', "CTX('dbi_backend')"
-);
-
-is(ref CTX('dbi_workflow'),
-   'OpenXPKI::Server::DBI', "CTX('dbi_workflow')"
+is(ref CTX('dbi'),
+   'OpenXPKI::Server::Database', "CTX('dbi')"
 );
 
 is(ref CTX('api'),

@@ -1,7 +1,6 @@
-cgi-bin/scep    usr/lib/cgi-bin
 cgi-bin/scep.fcgi   usr/lib/cgi-bin
 cgi-bin/webui.fcgi    usr/lib/cgi-bin
 cgi-bin/soap.fcgi    usr/lib/cgi-bin
 cgi-bin/rpc.fcgi    usr/lib/cgi-bin
-
+cgi-bin/download.fcgi usr/lib/cgi-bin
 htdocs/* /var/www/openxpki/

@@ -19,7 +19,7 @@ my $binary = decode_base64("MIIJGQIBAzCCCN8GCSqGSIb3DQEHAaCCCNAEggjMMIIIyDCCA38G
 
 my $b64 = $ref->serialize( $binary );
 
-is($b64, "BASE64\n77\nMIIJGQIBAzCCCN8GCSqGSIb3DQEHAaCCCNAEggjMMIIIyDCCA38GCSqGSIb3DQEHBqCCA3AwggNs\n\n");
+is($b64, "OXB64:MIIJGQIBAzCCCN8GCSqGSIb3DQEHAaCCCNAEggjMMIIIyDCCA38GCSqGSIb3DQEHBqCCA3AwggNs\n");
 
 my $bin = $ref->deserialize( $b64 );
 

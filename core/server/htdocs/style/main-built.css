@@ -8464,26 +8464,32 @@ div.section {
 
 /* Button format from workflow defs */
 
-.oxi-button-container button.btn.expected,
+.oxi-button-container .btn.expected,
 .oxi-form-button button.btn.submit {
   background-color: #c9e2b3;
 }
 
-.oxi-button-container button.btn.optional {
+.oxi-button-container .btn.optional {
   background-color: #e4e4da;
 }
 
-.oxi-button-container button.btn.failure,
-.oxi-form-button button.btn.reset {
+.oxi-button-container .btn.failure,
+.oxi-form-button .btn.failure,
+.oxi-form-button .btn.cancel {
   background-color: #e39f9f;
 }
 
-.oxi-button-container button.btn.alternative {
+.oxi-form-button .btn.reset,
+.oxi-button-container .btn.alternative {
   background-color: #ffd78c;
 }
 
-.oxi-button-container button.btn.exceptional {
+.oxi-button-container .btn.exceptional {
   background-color: #79d1f3;
+}
+
+.oxi-button-container div.spacer {
+  margin: 5px;
 }
 
 img.toplogo {
@@ -8509,6 +8515,12 @@ img.toplogo {
 
 .clonable-icon.clonable-remove {
   background: url("../img/remove.png") no-repeat scroll left center;
+}
+
+/* class attached to the column holding the clonable buttons */
+
+.clonable-btn-group {
+  white-space: nowrap;
 }
 
 /*
@@ -8620,16 +8632,19 @@ ul.pagination li:not(.disabled) > a {
 
 /* Status Labels inside key/value lists, e.g */
 
+span.styled-valid,
 span.dns-valid,
 span.certstatus-issued {
   color: green;
 }
 
+span.styled-failed,
 span.dns-failed,
 span.certstatus-revoked {
   color: red;
 }
 
+span.styled-attention,
 span.certstatus-crl_issuance_pending {
   color: orange;
 }
@@ -8638,8 +8653,14 @@ span.certstatus-expired {
   color: #444;
 }
 
+span.dns-timeout,
 span.certstatus-unknown {
   color: #79d1f3;
+}
+
+span.styled-attention,
+span.styled-failed {
+  font-weight: bold;
 }
 
 /* keep line wraps in code */

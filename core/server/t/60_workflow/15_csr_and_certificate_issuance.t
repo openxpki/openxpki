@@ -10,7 +10,7 @@ use Data::Dumper;
 use OpenXPKI::Serialization::Simple;
 
 # this is needed because we need to manually output the number of tests run
-diag("CSR with cert issuance workflow forking\n") if $ENV{VERBOSE};
+note("CSR with cert issuance workflow forking\n");
 
 TODO: {
     todo_skip 'See Issue #188', 20;

@@ -12,59 +12,44 @@ use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Debug;
 use English;
 use OpenXPKI::Exception;
- 
-sub evaluate
-{
+
+sub evaluate {
     ##! 1: 'start'
     my ( $self, $workflow ) = @_;
     my $context     = $workflow->context();
     my $identifier  = $context->param('cert_identifier');
     my $reason_code = $context->param('reason_code');
-    my $pki_realm   = CTX('session')->get_pki_realm();
+    my $pki_realm   = CTX('session')->data->pki_realm;
 
-    if (! defined $identifier) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_IDENTIFIER_MISSING',
-        );
-    }
-    CTX('dbi_backend')->commit();
-    my $cert = CTX('dbi_backend')->first(
-        TABLE   => 'CERTIFICATE',
-        COLUMNS => [
-            'STATUS',
-        ],
-        DYNAMIC => {
-            'IDENTIFIER' => {VALUE => $identifier},
-            'PKI_REALM'  => {VALUE => $pki_realm},
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_IDENTIFIER_MISSING',
+    ) unless $identifier;
+
+    my $cert = CTX('dbi')->select_one(
+        from => 'certificate',
+        columns => [ 'status' ],
+        where => {
+            identifier => $identifier,
+            pki_realm  => $pki_realm,
         }
     );
-        
-    CTX('log')->log(
-        MESSAGE => "Cert status is ".$cert->{'STATUS'},
-        PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    ); 
-    
+
+    CTX('log')->application()->debug("Cert status is ".$cert->{status});
+
+
     ##! 16: 'status: ' . $cert->{'STATUS'}
-    if ($cert->{'STATUS'} eq 'CRL_ISSUANCE_PENDING') {
-        # certificate is in state 'CRL_ISSUANCE_PENDING', throw
-        # an exception if the crl_issuance_pending_accept config param
-        # is not set
-        condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_CERT_IN_STATE_CRL_ISSUANCE_PENDING';
-    }
-    if ($cert->{'STATUS'} eq 'REVOKED') {
-        # certificate has been revoked already, throw an exception
-        condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_CERT_IN_STATE_REVOKED';
-    }
-    elsif ($cert->{'STATUS'} eq 'HOLD' && $reason_code ne 'removeFromCRL') {
-        # certificate is in state hold and reason code is not 'removeFromCRL'
-        condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_CERT_ON_HOLD_AND_REASON_CODE_NOT_REMOVE_FROM_CRL';
-    }
-    elsif ($reason_code eq 'removeFromCRL' && $cert->{'STATUS'} ne 'HOLD') {
-        # the other way round: reason is removeFromCRL but status is not
-        # HOLD.
-        condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_CERT_NOT_ON_HOLD_AND_REASON_CODE_REMOVE_FROM_CRL';
-    }
+
+    condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_CERT_IN_STATE_CRL_ISSUANCE_PENDING'
+        if ('CRL_ISSUANCE_PENDING' eq $cert->{status});
+
+    condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_CERT_IN_STATE_REVOKED'
+        if ('REVOKED' eq $cert->{status});
+
+    condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_CERT_ON_HOLD_AND_REASON_CODE_NOT_REMOVE_FROM_CRL'
+        if ('HOLD' eq $cert->{status} and $reason_code ne 'removeFromCRL');
+
+    condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_CERT_NOT_ON_HOLD_AND_REASON_CODE_REMOVE_FROM_CRL'
+        if ($cert->{status} ne 'HOLD' and $reason_code eq 'removeFromCRL');
 
     return 1;
 }

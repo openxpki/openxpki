@@ -10,14 +10,20 @@ specific drivers/functions.
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use OpenXPKI::Server::Database::Util;
+use OpenXPKI::MooseParams;
 use OpenXPKI::Server::Database::Role::Driver;
 use OpenXPKI::Server::Database::QueryBuilder;
 use OpenXPKI::Server::Database::Query;
+use Data::Dumper;
 use DBIx::Handler;
 use DBI::Const::GetInfoType; # provides %GetInfoType hash
 use Math::BigInt;
 use SQL::Abstract::More;
+use Moose::Exporter;
+
+# Export AUTO_ID
+Moose::Exporter->setup_import_methods(with_meta => [ 'AUTO_ID' ]);
+sub AUTO_ID { return bless {}, "OpenXPKI::Server::Database::AUTOINCREMENT" }
 
 ## TODO special handling for SQLite databases from OpenXPKI::Server::Init->get_dbi()
 # if ($params{TYPE} eq "SQLite") {
@@ -37,11 +43,17 @@ has 'log' => (
     required => 1,
 );
 
-# Parameters to construct DSN
+# Parameters to construct DSN, mostly from config: system.database.[main|log]
 has 'db_params' => (
     is => 'ro',
     isa => 'HashRef',
     required => 1,
+);
+
+has 'autocommit' => (
+    is => 'ro',
+    isa => 'Bool',
+    default => 0,
 );
 
 has 'driver' => (
@@ -154,6 +166,38 @@ sub _build_driver {
     return $instance;
 }
 
+# Converts DBI errors into OpenXPKI exceptions
+sub _dbi_error_handler {
+    my ($self, $msg, $dbh, $more_details) = @_;
+
+    my $details = {
+        source => "?",
+        dbi_error => $dbh->errstr,
+        dsn => $self->driver->dbi_dsn,
+        user => $self->driver->user,
+        $more_details ? %$more_details : (),
+    };
+
+    my $method = "";
+    my $our_msg;
+
+    # original message is like: [class] [method] failed: [message]
+    if ($msg =~ m/^(?<class>[a-z:_]+)\s+(?<method>[^\(\s]+)/i) {
+        $details->{source} = sprintf("%s::%s", $+{class}, $+{method});
+        $method = $+{method};
+    }
+
+    $our_msg = "connection failed"                          if "connect" eq $method;
+    $our_msg = "preparing SQL query failed"                 if "prepare" eq $method;
+    $our_msg = "binding parameters to SQL statement failed" if "bind_params" eq $method;
+    $our_msg = "execution of SQL query failed"              if "execute" eq $method;
+
+    OpenXPKI::Exception->throw(
+        message => "Database error" . ($our_msg ? ": $our_msg" : ""),
+        params => $details,
+    );
+};
+
 sub _build_dbix_handler {
     my $self = shift;
     ##! 4: "DSN: ".$self->driver->dbi_dsn
@@ -168,16 +212,27 @@ sub _build_dbix_handler {
     );
     ##! 4: "Additional connect() attributes: " . join " | ", map { $_." = ".$params{$_} } keys %params
     ##! 4: "SQL commands after each connect: ".join("; ", @on_connect_do);
+
+    my %params_from_config;
+    if ($self->db_params->{driver} && ref $self->db_params->{driver} eq 'HASH') {
+        %params_from_config = %{$self->db_params->{driver}};
+    }
+
     my $dbix = DBIx::Handler->new(
         $self->driver->dbi_dsn,
         $self->driver->user,
         $self->driver->passwd,
         {
+            AutoCommit => $self->autocommit,
+            LongReadLen => 10_000_000,
             RaiseError => 0,
             PrintError => 0,
-            AutoCommit => 0,
-            LongReadLen => 10_000_000,
+            HandleError => sub {
+                my ($msg, $dbh, $retval) = @_;
+                $self->_dbi_error_handler($msg, $dbh);
+            },
             %params,
+            %params_from_config,
         },
         {
             on_connect_do => sub {
@@ -189,14 +244,10 @@ sub _build_dbix_handler {
                 $self->_clear_txn_starter;
             },
         }
-    ) or OpenXPKI::Exception->throw(
-        message => "Could not connect to database",
-        params => {
-            dbi_error => $DBI::errstr,
-            dsn => $self->driver->dbi_dsn,
-            user => $self->driver->user,
-        },
     );
+
+    ##! 32: 'DBIx Handle ' . Dumper $dbix
+
     return $dbix;
 }
 
@@ -253,11 +304,16 @@ sub dbh {
     return $dbh;
 }
 
+sub ping {
+    my $self = shift;
+    return $self->_dbix_handler->dbh->ping();
+}
+
 # Execute given query
 sub run {
-    my $self = shift;
-    my ($query) = positional_args(\@_,
+    my ($self, $query, $return_rownum) = positional_args(\@_,
         { isa => 'OpenXPKI::Server::Database::Query|Str' },
+        { isa => 'Bool', optional => 1, default => 0 },
     );
     my $query_string;
     my $query_params;
@@ -268,38 +324,24 @@ sub run {
     else {
         $query_string = $query;
     }
+
+    # pass extra info about $query_string to our error handler
+    local $self->dbh->{HandleError} = sub {
+        my ($msg, $dbh, $retval) = @_;
+        $self->_dbi_error_handler($msg, $dbh, { query => $query_string });
+    };
+
     ##! 16: "Query: " . $query_string;
-    my $sth = $self->dbh->prepare($query_string)
-        or OpenXPKI::Exception->throw(
-            message => "Could not prepare SQL query",
-            params => {
-                query => $query_string,
-                dbi_error => $self->dbh->errstr,
-            },
-        );
-
+    my $sth = $self->dbh->prepare($query_string);
     # bind parameters via SQL::Abstract::More to do some magic
-    if ($query_params) {
-        $self->sqlam->bind_params($sth, @{$query_params}); # can't use "or ..." here
-        OpenXPKI::Exception->throw(
-            message => "Could not bind parameters to SQL statement",
-            params => {
-                query => $query_string,
-                dbi_error => $sth->errstr,
-            },
-        ) if $sth->err;
-    }
+    $self->sqlam->bind_params($sth, @{$query_params}) if $query_params;
 
-    $sth->execute
-        or OpenXPKI::Exception->throw(
-            message => "Could not execute SQL query",
-            params => {
-                query => $query_string,
-                dbi_error => $sth->errstr,
-            },
-        );
+    $self->log->trace(sprintf "DB query: %s", $query_string) if $self->log->is_trace;
 
-    return $sth;
+    my $rownum = $sth->execute;
+    ##! 16: "$rownum rows affected"
+
+    return $return_rownum ? $rownum : $sth;
 }
 
 # SELECT
@@ -321,9 +363,19 @@ sub select_one {
 # INSERT
 # Returns: DBI statement handle
 sub insert {
-    my $self = shift;
-    my $query = $self->query_builder->insert(@_);
-    return $self->run($query);
+    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
+        into     => { isa => 'Str' },
+        values   => { isa => 'HashRef' },
+    );
+
+    # Replace AUTO_ID with value of next_id()
+    for (keys %{ $params{values} }) {
+        $params{values}->{$_} = $self->next_id($params{into})
+            if (ref $params{values}->{$_} eq "OpenXPKI::Server::Database::AUTOINCREMENT");
+    }
+
+    my $query = $self->query_builder->insert(%params);
+    return $self->run($query, 1); # 1 = return number of affected rows
 }
 
 # UPDATE
@@ -331,13 +383,13 @@ sub insert {
 sub update {
     my $self = shift;
     my $query = $self->query_builder->update(@_);
-    return $self->run($query);
+    return $self->run($query, 1); # 1 = return number of affected rows
 }
 
 # MERGE
 # Returns: DBI statement handle
 sub merge {
-    my ($self, %args) = named_args(\@_,   # OpenXPKI::Server::Database::Util
+    my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
         into     => { isa => 'Str' },
         set      => { isa => 'HashRef' },
         set_once => { isa => 'HashRef', optional => 1, default => {} },
@@ -354,7 +406,7 @@ sub merge {
         $args{set_once},
         $args{where},
     );
-    return $self->run($query);
+    return $self->run($query, 1); # 1 = return number of affected rows
 }
 
 # DELETE
@@ -362,15 +414,30 @@ sub merge {
 sub delete {
     my $self = shift;
     my $query = $self->query_builder->delete(@_);
-    return $self->run($query);
+    return $self->run($query, 1); # 1 = return number of affected rows
 }
+
+#
+sub _run_and_commit {
+    my ($self, $method, @args) = @_;
+    $self->start_txn unless $self->autocommit;
+    my $result = $self->$method(@args);
+    $self->commit unless $self->autocommit;
+    return $result;
+}
+
+#
+sub insert_and_commit { shift->_run_and_commit("insert", @_); }
+sub update_and_commit { shift->_run_and_commit("update", @_); }
+sub merge_and_commit  { shift->_run_and_commit("merge",  @_); }
+sub delete_and_commit { shift->_run_and_commit("delete", @_); }
 
 # Create a new insert ID ("serial")
 sub next_id {
     my ($self, $table) = @_;
 
     # get new serial number from DBMS (SQL sequence or emulation via table)
-    
+
     my $seq_table = $self->query_builder->_add_namespace_to("seq_$table");
     my $id_int = $self->driver->next_id($self, $seq_table );
     my $id = Math::BigInt->new($id_int);
@@ -385,33 +452,97 @@ sub next_id {
     return $id->bstr();
 }
 
+# Create a new sequence
+sub create_sequence {
+    my ($self, $table) = @_;
+    my $seq_table = $self->query_builder->_add_namespace_to("seq_$table");
+    my $query = $self->driver->sequence_create_query($self, $seq_table);
+    return $self->run($query, 0);
+}
+
+# Drop a sequence
+sub drop_sequence {
+    my ($self, $table) = @_;
+    my $seq_table = $self->query_builder->_add_namespace_to("seq_$table");
+    my $query = $self->driver->sequence_drop_query($self, $seq_table);
+    return $self->run($query, 0);
+}
+
+# Drop a table
+sub drop_table {
+    my ($self, $table) = @_;
+    my $query = $self->driver->table_drop_query($self, $self->query_builder->_add_namespace_to($table));
+    return $self->run($query, 0);
+}
+
 sub start_txn {
     my $self = shift;
+    return $self->log->warn("AutoCommit is on, start_txn() is useless") if $self->autocommit;
+
+    # we have to enforce the actual DB connection which clears
+    # $self->_txn_starter at this point as otherwise the very first commit()
+    # $self->_txn_starter and think there is no running transaction.
+    $self->ping;
+
+    my $caller = [ caller ];
     if ($self->in_txn) {
-        $self->log->error(
-            sprintf "start_txn() was called during a running transaction (started in %s, line %i). Most likely this error is caused by a missing commit() or exception handling without rollback()",
-            $self->_txn_starter->[1],
+        $self->log->debug(
+            sprintf "start_txn() was called from %s, line %i during a running transaction (started in %s, line %i).",
+            $caller->[0],
+            $caller->[2],
+            $self->_txn_starter->[0],
             $self->_txn_starter->[2],
         );
-        $self->rollback;
     }
     ##! 16: "Flagging a transaction start"
-    $self->_txn_starter([ caller ]);
+    $self->_txn_starter($caller);
+
+    $self->log->trace(
+        sprintf "start_txn() in %s:%i", $caller->[0], $caller->[2],
+    ) if $self->log->is_trace;
 }
 
 sub commit {
     my $self = shift;
-    $self->log->debug("commit() was called without indicating a transaction start via start_txn() first")
-        unless $self->in_txn;
-    ##! 16: "Commit of changes"
+    return $self->log->warn("AutoCommit is on, commit() is useless") if $self->autocommit;
+
+    if ($self->in_txn) {
+        if ($self->log->is_trace) {
+            my $caller = [ caller ];
+            $self->log->trace(
+                sprintf "commit for txn started at %s:%i called in %s:%i",
+                    $self->_txn_starter->[0], $self->_txn_starter->[2],
+                    $caller->[0], $caller->[2]
+            );
+        }
+    }
+    else {
+        $self->log->debug("commit() was called without indicating a transaction start via start_txn() first")
+    }
+
+    ##! 16: "Commiting changes"
     $self->dbh->commit;
     $self->_clear_txn_starter;
 }
 
 sub rollback {
     my $self = shift;
-    $self->log->warn("rollback() was called without indicating a transaction start via start_txn() first")
-        unless $self->in_txn;
+    return $self->log->warn("AutoCommit is on, rollback() is useless") if $self->autocommit;
+
+    if ($self->in_txn) {
+        if ($self->log->is_trace) {
+            my $caller = [ caller ];
+            $self->log->trace(
+                sprintf "rollback for txn from %s, %i called in %s, %i",
+                    $self->_txn_starter->[0], $self->_txn_starter->[2],
+                    $caller->[0], $caller->[2]
+            );
+        }
+    }
+    else {
+        $self->log->debug("rollback() was called without indicating a transaction start via start_txn() first");
+    }
+
     ##! 16: "Rollback of changes"
     $self->dbh->rollback;
     $self->_clear_txn_starter;
@@ -480,7 +611,7 @@ For more details see L<OpenXPKI::Server::Database::Role::Driver>.
 =item * B<log> - Log object (I<OpenXPKI::Server::Log>, required)
 
 =item * B<db_params> - I<HashRef> with parameters for the DBI data source name
-string.
+string (required).
 
 Required keys in this hash:
 
@@ -493,6 +624,8 @@ Required keys in this hash:
 =item * Additional parameters required by the specific driver
 
 =back
+
+=item * B<autocommit> - I<Bool> to switch on L<DBI/AutoCommit> (optional, default: 0)
 
 =back
 
@@ -549,17 +682,38 @@ Please note that C<NULL> values will be converted to Perl C<undef>.
 
 =head2 insert
 
-Inserts rows into the database and returns the results as a I<DBI::st> statement
-handle.
+Inserts rows into the database and returns the number of affected rows.
 
-Please note that C<NULL> values will be converted to Perl C<undef>.
+    $db->insert(
+        into => "certificate",
+        values => {
+            identifier => AUTO_ID, # use the sequence associated with this table
+            cert_key => $key,
+            ...
+        }
+    );
 
-For parameters see L<OpenXPKI::Server::Database::QueryBuilder/insert>.
+To automatically set a primary key to the next serial number (i.e. sequence
+associated with this table) set it to C<AUTO_ID>. C<AUTO_ID> is a function that
+is exported by C<OpenXPKI::Server::Database>.
+
+Throws an L<OpenXPKI::Exception> if there are errors in the query or during
+it's execution.
+
+Named parameters:
+
+=over
+
+=item * B<into> - Table name (I<Str>, required)
+
+=item * B<values> - Hash with column name / value pairs. Please note that
+C<undef> is interpreted as C<NULL> (I<HashRef>, required).
+
+=back
 
 =head2 update
 
-Updates rows in the database and returns the results as a I<DBI::st> statement
-handle.
+Updates rows in the database and rreturns the number of affected rows.
 
 Please note that C<NULL> values will be converted to Perl C<undef>.
 
@@ -568,7 +722,10 @@ For parameters see L<OpenXPKI::Server::Database::QueryBuilder/update>.
 =head2 merge
 
 Either directly executes or emulates an SQL MERGE (you could also call it
-REPLACE) function and returns the results as a I<DBI::st> statement handle.
+REPLACE) function and returns the number of affected rows.
+
+Please note that e.g. MySQL returns 2 (not 1) if an update was performed. So
+you should only use the return value to test for 0 / FALSE.
 
 Named parameters:
 
@@ -632,6 +789,46 @@ Logs an error if L</start_txn> was not called first.
 
 =cut
 
+=head2 insert_and_commit
+
+Calling this method is the same as:
+
+    $db->start_txn;
+    $db->insert(...);
+    $db->commit;
+
+For more informations see L<OpenXPKI::Server::Database/insert>.
+
+=head2 update_and_commit
+
+Calling this method is the same as:
+
+    $db->start_txn;
+    $db->update(...);
+    $db->commit;
+
+For more informations see L<OpenXPKI::Server::Database/update>.
+
+=head2 merge_and_commit
+
+Calling this method is the same as:
+
+    $db->start_txn;
+    $db->merge(...);
+    $db->commit;
+
+For more informations see L<OpenXPKI::Server::Database/merge>.
+
+=head2 delete_and_commit
+
+Calling this method is the same as:
+
+    $db->start_txn;
+    $db->delete(...);
+    $db->commit;
+
+For more informations see L<OpenXPKI::Server::Database/delete>.
+
 ################################################################################
 
 =head1 Low level methods
@@ -646,9 +843,19 @@ To remain fork safe DO NOT CACHE this (also do not convert into a lazy attribute
 
 =head2 run
 
-Executes the given query and returns a DBI statement handle.
+Executes the given query and returns a DBI statement handle. Throws an exception
+in case of errors.
 
-    my $sth = $db->run($query) or die "Error executing query: $@";
+    my $sth;
+    eval {
+        $sth = $db->run($query);
+    };
+    if (my $e = OpenXPKI::Exception->caught) {
+        die "OpenXPKI exception executing query: $e";
+    }
+    elsif ($@) {
+        die "Unknown error: $e";
+    };
 
 Parameters:
 
@@ -656,6 +863,12 @@ Parameters:
 
 =item * B<$query> - query to run (either a I<OpenXPKI::Server::Database::Query>
 or a literal SQL string)
+
+=item * B<$return_rownum> - return number of affected rows instead of DBI
+statement handle (optional, default: 0).
+
+If no rows were affected, then "0E0" is returned which Perl will treat as 0 but
+will regard as true.
 
 =back
 

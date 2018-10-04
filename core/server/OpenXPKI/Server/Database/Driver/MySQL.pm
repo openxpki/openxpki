@@ -1,9 +1,11 @@
 package OpenXPKI::Server::Database::Driver::MySQL;
 use Moose;
 use utf8;
-with 'OpenXPKI::Server::Database::Role::SequenceEmulation';
-with 'OpenXPKI::Server::Database::Role::MergeSupport';
-with 'OpenXPKI::Server::Database::Role::Driver';
+with qw(
+    OpenXPKI::Server::Database::Role::SequenceEmulation
+    OpenXPKI::Server::Database::Role::MergeSupport
+    OpenXPKI::Server::Database::Role::Driver
+);
 
 =head1 Name
 
@@ -53,14 +55,26 @@ sub sqlam_params {
 }
 
 ################################################################################
+# required by OpenXPKI::Server::Database::Role::Driver
+#
+
+sub table_drop_query {
+    my ($self, $dbi, $table) = @_;
+    return OpenXPKI::Server::Database::Query->new(
+        string => "DROP TABLE IF EXISTS $table",
+    );
+}
+
+################################################################################
 # required by OpenXPKI::Server::Database::Role::SequenceEmulation
 #
+
+sub sql_autoinc_column { return "INT PRIMARY KEY AUTO_INCREMENT" }
 
 sub last_auto_id {
     my ($self, $dbi) = @_;
     my $sth = $dbi->run('select last_insert_id()');
-    my $row = $sth->fetchrow_arrayref
-        or OpenXPKI::Exception->throw(message => "Failed to query last insert id from database");
+    my $row = $sth->fetchrow_arrayref;
     return $row->[0];
 }
 

@@ -6,9 +6,19 @@ main:
     port: 3306
     user: openxpki
     passwd: openxpki
-    environment:          
-        key: value
-    
-# To log to a different database copy and adjust the upper block
-# logging: ~
-     
+
+    # extra options passed to the driver as parameter
+    #driver:
+    #    LongReadLen: 10000000
+
+# To log to a different database create a section "log" by copying and adjusting
+# the upper block, e.g.:
+#
+# log:
+#     debug: 0
+#     ...
+
+# Set environment values, e.g. locales for Oracle
+# this was inside the db section prior v2.2 which does not work as expected
+# environment:
+#    key: value

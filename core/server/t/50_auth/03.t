@@ -4,23 +4,22 @@ use English;
 use Test::More skip_all => 'See Issue #188 [fix password access to travis-ci]';
 #plan tests => 3;
 
-diag "OpenXPKI::Server::Authentication::Anonymous\n" if $ENV{VERBOSE};
+note "OpenXPKI::Server::Authentication::Anonymous\n";
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
-use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Authentication;
 ok(1);
 
 ## init XML cache
 OpenXPKI::Server::Init::init(
-    {	
-	TASKS => [
-        'config_test',
+    {
+    TASKS => [
+        'config_versioned',
         'log',
-        'dbi_backend',
+        'dbi',
     ],
-	SILENT => 1,
+    SILENT => 1,
     });
 
 my $auth = OpenXPKI::Server::Authentication::Anonymous->new('auth.handler.Anonymous');

@@ -19,7 +19,6 @@ use OpenXPKI::Crypto::CRL;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow::WFObject::WFArray;
-use MIME::Base64;
 
 use Moose;
 #use namespace::autoclean; # Conflicts with Debugger
@@ -29,47 +28,56 @@ sub issueCertificate {
 
     my $self = shift;
     my $csr = shift;
+    my $issuing_ca = shift || '';
 
     ##! 1: 'Starting '
     my $serializer = OpenXPKI::Serialization::Simple->new();
-    my $realm = CTX('session')->get_pki_realm();
+    my $realm = CTX('session')->data->pki_realm;
     my $config = CTX('config');
 
-    my $csr_serial = $csr->{CSR_SERIAL};
+    my $csr_serial = $csr->{req_key};
 
     ##! 8: 'csr serial  ' . $csr_serial
 
-    my $cert_profile = $csr->{PROFILE};
+    my $cert_profile = $csr->{profile};
     ##! 64: 'certificate profile: ' . $cert_profile
 
     # Determine the expected validity of the certificate to find the right ca
     # Requries that we load the CSR attributes
     my ($notbefore, $notafter);
     my @subject_alt_names;
+    my @extension;
 
-    my $csr_metadata = CTX('dbi_backend')->select(
-        TABLE   => 'CSR_ATTRIBUTES',
-        DYNAMIC => {
-            'CSR_SERIAL' => $csr_serial,
-        },
+    my $cert_attr = CTX('dbi')->select(
+        columns => [ qw(
+            attribute_contentkey
+            attribute_value
+        ) ],
+        from => 'csr_attributes',
+        where => { req_key => $csr_serial },
     );
-    ##! 50: ' Size of csr_metadata '. scalar( @{$csr_metadata} )
 
-    foreach my $metadata (@{$csr_metadata}) {
-        ##! 51: 'Examine Key ' . $metadata->{ATTRIBUTE_KEY}
-        if ($metadata->{ATTRIBUTE_KEY} eq 'subject_alt_name') {
-            push @subject_alt_names,  $serializer->deserialize($metadata->{ATTRIBUTE_VALUE});
-        } elsif ($metadata->{ATTRIBUTE_KEY} eq 'notbefore') {
+    while (my $attr = $cert_attr->fetchrow_hashref) {
+        my $key = $attr->{attribute_contentkey};
+        my $val = $attr->{attribute_value};
+
+        if ($key eq 'subject_alt_name') {
+            push @subject_alt_names,  $serializer->deserialize($val);
+        } elsif ($key eq 'x509v3_extension') {
+            push @extension, $serializer->deserialize($val);
+        } elsif ($key eq 'notbefore') {
             $notbefore = OpenXPKI::DateTime::get_validity({
                 VALIDITYFORMAT => 'detect',
-                VALIDITY        => $metadata->{ATTRIBUTE_VALUE},
+                VALIDITY        => $val,
             });
-       } elsif ($metadata->{ATTRIBUTE_KEY} eq 'notafter') {
+        } elsif ($key eq 'notafter') {
             $notafter = OpenXPKI::DateTime::get_validity({
                 VALIDITYFORMAT => 'detect',
-                VALIDITY        => $metadata->{ATTRIBUTE_VALUE},
+                VALIDITY        => $val,
             });
         }
+
+
     }
 
     # Set notbefore/notafter according to profile settings if it was not set in csr
@@ -109,22 +117,64 @@ sub issueCertificate {
         });
     }
 
-    # Determine issuing ca
-    my $issuing_ca = CTX('api')->get_token_alias_by_type( {
-        TYPE => 'certsign',
-        VALIDITY => {
-            NOTBEFORE => $notbefore,
-            NOTAFTER => $notafter,
-        },
-    });
+    # $issuing_ca set by user, check if the validity is ok
+    if ($issuing_ca) {
+
+        CTX('log')->application()->debug("Use ca set by user $issuing_ca to issue $csr_serial");
+
+        # check if this is a certsign alias
+        my $group = $config->get([ 'crypto', 'type', 'certsign']);
+        $issuing_ca =~ / \A (.+)-(\d+) \z/x;
+        if ($1 ne $group) {
+            OpenXPKI::Exception->throw(
+                message => "I18N_OPENXPKI_SERVER_NICE_LOCAL_ISSUER_NOT_IN_CERTSIGN_GROUP",
+                params  => {
+                    CA_ALIAS => $issuing_ca,
+                    GROUP => $group,
+            });
+        }
+
+        my $cert = CTX('api')->get_certificate_for_alias({ ALIAS => $issuing_ca });
+
+        if ($notafter->epoch() > $cert->{NOTAFTER}) {
+            $notafter = DateTime->from_epoch( epoch => $cert->{NOTAFTER} );
+            CTX('log')->application()->warn("Validity exceeds selected issuing ca - truncating notafter");
+
+        } elsif ($notafter->epoch() < $cert->{NOTBEFORE}) {
+            CTX('log')->application()->error("Expected notafter is before CA lifetime!");
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_NICE_LOCAL_CA_NOTAFTER_BEFORE_CA_LIFETIME',
+            );
+        }
+
+        if ($notbefore->epoch() < $cert->{NOTBEFORE}) {
+            $notbefore = DateTime->from_epoch( epoch => $cert->{NOTBEFORE} );
+            CTX('log')->application()->warn("Validity exceeds selected issuing ca - truncating notbefore");
+
+        } elsif ($notbefore->epoch() > $cert->{NOTAFTER}) {
+            CTX('log')->application()->error("Expected notbefore is after CA lifetime!");
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_NICE_LOCAL_CA_NOTBEFORE_AFTER_CA_LIFETIME',
+            );
+        }
+
+
+    } else {
+        # Determine issuing ca
+        $issuing_ca = CTX('api')->get_token_alias_by_type( {
+            TYPE => 'certsign',
+            VALIDITY => {
+                NOTBEFORE => $notbefore,
+                NOTAFTER => $notafter,
+            },
+        });
+
+        CTX('log')->application()->debug("Found $issuing_ca to issue $csr_serial");
+
+    }
 
     ##! 32: 'issuing ca: ' . $issuing_ca
 
-    CTX('log')->log(
-       MESSAGE => "try to issue csr $csr_serial using token $issuing_ca",
-       PRIORITY => 'debug',
-       FACILITY => [ 'application', ],
-    );
 
     my $default_token = CTX('api')->get_default_token();
     my $ca_token = CTX('crypto_layer')->get_token({
@@ -144,33 +194,63 @@ sub issueCertificate {
         TYPE      => 'ENDENTITY', # FIXME - should be useless
     );
 
-    ##! 64: 'propagating cert subject: ' . $csr->{SUBJECT}
-    $profile->set_subject( $csr->{SUBJECT} );
+    ##! 64: 'propagating cert subject: ' . $csr->{subject}
+    $profile->set_subject( $csr->{subject} );
 
-    ##! 51: 'SAN List ' . Dumper ( @subject_alt_names )
+    ##! 64: 'SAN List ' . Dumper ( @subject_alt_names )
     if (scalar @subject_alt_names) {
         ##! 64: 'propagating subject alternative names: ' . Dumper @subject_alt_names
        $profile->set_subject_alt_name(\@subject_alt_names);
     }
 
+    ## 64: 'Extensions ' . Dumper \@extension
+    if (scalar @extension) {
+        foreach my $ext (@extension) {
+            # we only support oids for the moment
+            my $oid = $ext->{oid};
+            if (!$oid || $oid !~ /\A(\d+\.)+\d+\z/) {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_SERVER_NICE_LOCAL_UNSUPPORTED_EXTENSION',
+                    param => { NAME => $oid }
+                );
+            }
+
+            # We dont want those to be set from external
+            # (might be used to overwrite essential settings like CA:true )
+            if ($oid =~ /^0?2\.0?5\.0?29\./) {
+                OpenXPKI::Exception->throw (
+                    message => "I18N_OPENXPKI_SERVER_NICE_LOCAL_EXTENSION_NOT_ALLOWED",
+                    params => { NAME => $oid }
+                );
+            }
+
+            # scalar case
+            if ($ext->{value}) {
+                $profile->set_extension(
+                    NAME     => $oid,
+                    CRITICAL => $ext->{critical} ? 'true' : 'false',
+                    VALUES   => $ext->{value},
+                );
+            } elsif ($ext->{section}) {
+                $profile->set_oid_extension_sequence(
+                    NAME     => $oid,
+                    CRITICAL => $ext->{critical} ? 'true' : 'false',
+                    VALUES   => $ext->{section},
+                );
+            }
+        }
+    }
+
+
     my $rand_length = $profile->get_randomized_serial_bytes();
     my $increasing  = $profile->get_increasing_serials();
 
-    my $random_data = '';
-    if ($rand_length > 0) {
-        $random_data = $default_token->command({
-            COMMAND       => 'create_random',
-            RANDOM_LENGTH => $rand_length,
-        });
-        $random_data = decode_base64($random_data);
-    }
-
     # determine serial number (atomically)
-    my $serial = CTX('dbi_backend')->get_new_serial(
-        TABLE         => 'CERTIFICATE',
-        INCREASING    => $increasing,
-        RANDOM_LENGTH => $rand_length,
-        RANDOM_PART   => $random_data,
+    my $serial = $profile->create_random_serial(
+        $increasing
+            ? (PREFIX => CTX('dbi')->next_id('certificate'))
+            : (),
+        RANDOM_LENGTH => $profile->get_randomized_serial_bytes(),
     );
     ##! 32: 'propagating serial number: ' . $serial
     $profile->set_serial($serial);
@@ -187,22 +267,17 @@ sub issueCertificate {
 
     ##! 16: 'performing key online test'
     if (! $ca_token->key_usable()) {
-        CTX('log')->log(
-                MESSAGE => "Token for $issuing_ca not usable",
-                PRIORITY => 'info',
-                FACILITY => [ 'monitor', 'audit', 'application' ],
-        );
+        CTX('log')->application()->warn("Token for $issuing_ca not usable");
         $self->_get_activity()->pause('I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_NOT_USABLE');
     }
 
 
     ##! 32: 'issuing certificate'
     ##! 64: 'certificate profile '. Dumper( $profile )
-    my $certificate = $ca_token->command(
-    {
+    my $certificate = $ca_token->command({
         COMMAND => "issue_cert",
         PROFILE => $profile,
-        CSR     => $csr->{DATA},
+        CSR     => $csr->{data},
     });
 
     # SPKAC Requests return binary format - so we need to convert that
@@ -215,15 +290,10 @@ sub issueCertificate {
             IN      => "DER",
         });
     }
-
-    CTX('log')->log(
-       MESSAGE => "CA '$issuing_ca' issued certificate with serial $serial and DN=" . $profile->get_subject() . " in PKI realm '" . CTX('api')->get_pki_realm() . "'",
-       PRIORITY => 'info',
-       FACILITY => [ 'audit', 'application', ],
-    );
-
-
     ##! 64: 'cert: ' . $certificate
+
+    my $msg = sprintf("Certificate %s (%s) issued by %s", $profile->get_subject(), $serial, $issuing_ca);
+    CTX('log')->application()->info($msg);
 
     my $cert_identifier = $self->__persistCertificateInformation(
         {
@@ -237,7 +307,6 @@ sub issueCertificate {
     ##! 16: 'cert_identifier: ' . $cert_identifier
 
     return { 'cert_identifier' => $cert_identifier };
-
 }
 
 
@@ -247,39 +316,29 @@ sub renewCertificate {
 
 sub revokeCertificate {
 
-   my $self       = shift;
-   my $crr  = shift;
+    my $self       = shift;
+    # nothing to do here
+    return;
 
-   # We need the cert_identifier to check for revocation later
-   # usually it is already there
-   $self->_set_context_param('cert_identifier', $crr->{IDENTIFIER}) if (!$self->_get_context_param('cert_identifier'));
-
-   return;
 }
 
-sub checkForRevocation{
-
+sub checkForRevocation {
     my $self = shift;
 
     # As the local crl issuance process will set the state in the certificate
     # table directly, we get the certificate status from the local table
 
     ##! 16: 'Checking revocation status'
-    my $cert = CTX('dbi_backend')->first (
-        TABLE => 'CERTIFICATE',
-        COLUMNS => ['STATUS'],
-        DYNAMIC => {
-            IDENTIFIER => {VALUE => $self->_get_context_param('cert_identifier')},
-        }
+    my $id = $self->_get_context_param('cert_identifier');
+    my $cert = CTX('dbi')->select_one(
+        from => 'certificate',
+        columns => ['status'],
+        where => { identifier => $id },
     );
 
-    CTX('log')->log(
-       MESSAGE => "Check for revocation of ".$self->_get_context_param('cert_identifier').", result: " . $cert->{STATUS},
-       PRIORITY => 'debug',
-       FACILITY => 'application',
-    );
+    CTX('log')->application()->debug("Check for revocation of $id, result: " . $cert->{status});
 
-    if ($cert->{STATUS} eq 'REVOKED') {
+    if ($cert->{status} eq 'REVOKED') {
        ##! 32: 'certificate revoked'
        return 1;
     }
@@ -297,7 +356,7 @@ sub issueCRL {
     my $self = shift;
     my $ca_alias = shift;
 
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
     my $dbi = CTX('dbi');
 
     # FIXME - we want to have a context free api....
@@ -351,36 +410,32 @@ sub issueCRL {
 
     my @cert_timestamps; # array with certificate data and timestamp
 
-    # fetch certificates that are already revoked or to be revoked
     my $certs = $dbi->select(
         from => 'certificate',
-        columns => [ 'cert_key', 'identifier' ],
+        columns => [ 'cert_key', 'identifier',
+            'revocation_time', 'reason_code', 'invalidity_time',
+            'status' ],
         where => {
-            pki_realm => $pki_realm,
+            'certificate.pki_realm' => $pki_realm,
             issuer_identifier => $ca_identifier,
             status => [ 'REVOKED', 'CRL_ISSUANCE_PENDING' ],
         },
+        order_by => [ 'cert_key' ]
     );
-
-    $dbi->start_txn;
 
     push @cert_timestamps, $self->__prepare_crl_data($certs);
 
-    ##! 2: 'maxhq cert_timestamps: ' . join(", ", map { join "/", @$_ } @cert_timestamps)
+    ##! 32: 'cert_timestamps: ' . join(", ", map { join "/", @$_ } @cert_timestamps)
 
     my $serial = $dbi->next_id('crl');
 
-    ##! 2: "maxhq id: $serial"
+    ##! 2: "id: $serial"
 
     $crl_profile->set_serial($serial);
     #
     ##! 16: 'performing key online test'
     if (! $ca_token->key_usable()) {
-        CTX('log')->log(
-            MESSAGE => "Token for $ca_identifier not usable",
-            PRIORITY => 'info',
-            FACILITY => [ 'monitor', 'audit', 'workflow' ],
-        );
+        CTX('log')->application()->warn("Token for $ca_identifier not usable");
         $self->_get_activity()->pause('I18N_OPENXPKI_UI_PAUSED_CRL_TOKEN_NOT_USABLE');
     }
     #
@@ -396,26 +451,30 @@ sub issueCRL {
     );
     ##! 128: 'crl: ' . Dumper($crl)
     #
-    CTX('log')->log(
-        MESSAGE => 'CRL issued for CA ' . $ca_alias . ' in realm ' . $pki_realm,
-        PRIORITY => 'info',
-        FACILITY => [ 'audit', 'system' ],
-    );
+    CTX('log')->application()->info('CRL issued for CA ' . $ca_alias . ' in realm ' . $pki_realm);
+
     #
     # publish_crl can then publish all those with a PUBLICATION_DATE of 0
     # and set it accordingly
     my $data = { $crl_obj->to_db_hash() };
+
+    CTX('log')->audit('cakey')->info('crl issued', {
+        cakey     => $ca_identifier,
+        token     => $ca_alias,
+        pki_realm => $pki_realm,
+    });
+
     $data = {
-        # FIXME Change upper to lower case in OpenXPKI::Crypto::CRL->to_db_hash(), not here
+        # FIXME #legacydb Change upper to lower case in OpenXPKI::Crypto::CRL->to_db_hash(), not here
         ( map { lc($_) => $data->{$_} } keys %$data ),
         pki_realm         => $pki_realm,
         issuer_identifier => $ca_identifier,
         crl_key           => $serial,
+        crl_number        => $serial,
+        items             => scalar @cert_timestamps,
         publication_date  => 0,
     };
     $dbi->insert( into => 'crl', values => $data );
-    
-    $dbi->commit;
 
     return { crl_serial => $serial };
 }
@@ -426,41 +485,35 @@ sub __prepare_crl_data {
 
     my @cert_timestamps = ();
     my $dbi       = CTX('dbi');
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
 
     while (my $cert = $sth_certs->fetchrow_hashref) {
         ##! 32: 'cert to be revoked: ' . Data::Dumper->new([$cert])->Indent(0)->Terse(1)->Sortkeys(1)->Dump
         my $serial      = $cert->{cert_key};
-        my $identifier  = $cert->{identifier};
-        my $reason_code = '';
 
-        my $crr = $dbi->select_one(
-            from => 'crr',
-            columns => [ qw( revocation_time reason_code invalidity_time ) ],
-            where => {
-                identifier => $identifier,
-                pki_realm => $pki_realm,
-            },
-            order_by => [ '-revocation_time' ],
-            limit => 1,
-        );
-        if ($crr) {
-            $reason_code = $crr->{reason_code};
-            ##! 32: 'last approved crr present: ' . $crr->{revocation_time}
-            push @cert_timestamps, [ $serial, $crr->{revocation_time}, $reason_code, $crr->{invalidity_time} ];
-        }
-        else {
+        my $identifier  = $cert->{identifier};
+        my $reason_code = $cert->{reason_code}  || '';
+        my $revocation_time = $cert->{revocation_time};
+        my $invalidity_time = $cert->{invalidity_time};
+
+        # there might be certificates set to revoked that do not have a CRR item
+        if ($reason_code) {
+            ##! 32: 'approved crr present: ' . Dumper $cert
+            push @cert_timestamps, [ $serial, $revocation_time, $reason_code, $invalidity_time ];
+        } else {
             push @cert_timestamps, [ $serial ];
         }
+
         # update certificate database:
         my $status = 'REVOKED';
         $status = 'HOLD'   if $reason_code eq 'certificateHold';
         $status = 'ISSUED' if $reason_code eq 'removeFromCRL';
+
         $dbi->update(
             table => 'certificate',
             set   => { status => $status },
             where => { identifier => $identifier },
-        );
+        ) if ($status ne $cert->{status});
     }
     return @cert_timestamps;
 }
@@ -485,7 +538,9 @@ The module does not require nor accept any configuration options.
 =head2 issueCertificate
 
 Issues a certitficate, will autodetect the most current ca for the requested
-profile.
+profile. Issuer can be enforced by passing the issuer alias as second
+parameter, the certificates validity will be tailored to fit into the CA
+validity window.
 
 Takes only the key information from the pkcs10 and requires subject, SAN and
 validity to be given as context parameters. Also supports SPKAC request format.

@@ -82,7 +82,7 @@ sub get_validity {
     if ( $validityformat eq 'detect' ) {
         if ( $validity =~ m{\A [+\-]}xms ) {
             $validityformat = 'relativedate';
-        } 
+        }
         # we hopefully wont have validities that far in the past
         # and I guess this software wont run if we reach the next epoch
         # so it should be safe to distinguish between terse date and epoch
@@ -90,8 +90,8 @@ sub get_validity {
             $validityformat = 'epoch';
 
         } else {
-            # strip non-digits from iso date            
-            if($validity =~ m{\A \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2} \z}) {    
+            # strip non-digits from iso date
+            if($validity =~ m{\A \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2} \z}) {
                 $validity =~ s/[^0-9]//g;
             }
             $validityformat = 'absolutedate';
@@ -190,7 +190,7 @@ sub get_validity {
 }
 
 sub parse_date_utc {
-    
+
     my $date_string = shift;
 
     my ( $ss, $mm, $hh, $day, $month, $year, $zone ) = strptime($date_string);
@@ -270,15 +270,15 @@ terse date string. This is the default.
 
 =item *
 
-'absolutedate': the specified validity is interpreted as an absolute 
+'absolutedate': the specified validity is interpreted as an absolute
 terse date string.
 
-=item * 
+=item *
 
 'days': the specified validity is interpreted as an integer number of days
 (positive or negative) as an offset to the reference date.
 
-=item * 
+=item *
 
 'epoch': the specified validity is a unix epoch, used as absolute date.
 
@@ -286,7 +286,7 @@ terse date string.
 
 'detect': tries to guess what it got, relativedate if it has a sign (+/-),
 epoch if it has between 8 and 10 digits and absolutedate otherwise. Also
-consumes iso8601 formated strings. Days can not be autodetected as they 
+consumes iso8601 formated strings. Days can not be autodetected as they
 look like relativedate.
 
 =back
@@ -297,7 +297,7 @@ If a relative validity is specified the duration is added to a reference
 date that defaults to the current time (UTC).
 
 If the named parameter REFERENCEDATE is specified, this date is taken as the basis for calculating the relative
-date. The parameter could either contain a DateTime object or a parsable date string 
+date. The parameter could either contain a DateTime object or a parsable date string
 (i.e. '2012-05-24T08:33:47' see Date::Parse for a list of valid strings) which will be converted to an UTC DateTime object.
 
 =head3 Terse date strings
@@ -308,7 +308,7 @@ Absolute validities are specified in the format
 
   YYYYMMDD[HH[MM[SS]]]
 
-Missing optional time specifications are replaced with '00'. 
+Missing optional time specifications are replaced with '00'.
 Example:
 
   2006031618   is interpreted as 2006-03-16 18:00:00 UTC
@@ -335,12 +335,12 @@ Examples:
   $offset->add( months => 2 );
 
   my $somedate = OpenXPKI::DateTime::get_validity(
-	    {
-		REFERENCEDATE => $offset,
-		VALIDITY => '+0205',
-		VALIDITYFORMAT => 'relativedate',
-	    },
-	);
+        {
+        REFERENCEDATE => $offset,
+        VALIDITY => '+0205',
+        VALIDITYFORMAT => 'relativedate',
+        },
+    );
   print $somedate->datetime()
 
 After this has been executed a date should be printed that is 2 years
@@ -354,4 +354,4 @@ Helpermethod. Passes the given parameter $date_string  to Date::Parse::strptime 
 =head2 is_relative
 
 Static helper, check if a datestring looks like a relative format.
-(Check if the first character is a +/-). 
+(Check if the first character is a +/-).

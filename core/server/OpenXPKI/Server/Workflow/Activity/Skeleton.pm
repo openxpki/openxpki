@@ -14,50 +14,47 @@ use OpenXPKI::Exception;
 sub execute {
     my $self = shift;
     my $workflow = shift;
-  
+
     my $context = $workflow->context();
-  
+
     my $need_to_wait;
-  	# do some work
-  	if ($need_to_wait) {
-  		# The text is written to the logs and is optional
-  		$self->pause('I18N_OPENXPKI_UI_PAUSED_WAITING');
-  	}
-  	
-  	CTX('log')->log(
-        MESSAGE => "Please use the application facility to log your stuff, and please be verbose!",
-        PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    );         
-     
-    
+      # do some work
+      if ($need_to_wait) {
+          # The text is written to the logs and is optional
+          $self->pause('I18N_OPENXPKI_UI_PAUSED_WAITING');
+      }
+
+      CTX('log')->application()->debug("Please use the application facility to log your stuff, and please be verbose!");
+
+
+
 }
 
 sub resume{
-	
+
     my $self = shift;
     my ($workflow, $resume_from) = @_;
-	
-	if ($resume_from eq "retry_exceeded") {
-		# This code gets executed if you restart the workflow after
-		# the configured number of retries was exceeded 
-		
-	}
 
-	# Put any code here you need to run after you resumed this
-	# activity after it crashed with an exception	
+    if ($resume_from eq "retry_exceeded") {
+        # This code gets executed if you restart the workflow after
+        # the configured number of retries was exceeded
 
-		
-	
+    }
+
+    # Put any code here you need to run after you resumed this
+    # activity after it crashed with an exception
+
+
+
 }
 
 sub wake_up{
     my $self     = shift;
     my ($workflow) = @_;
 
-	# This code gets executed when the watchdog reruns the activity 
-	# while the set retry_count is not reached.
-    
+    # This code gets executed when the watchdog reruns the activity
+    # while the set retry_count is not reached.
+
 }
 
 1;
@@ -75,19 +72,19 @@ Implements the FIXME workflow action.
 
 =head2 Activity parameters
 
-=over 
+=over
 
 =item my_control_param
 
 Explain values and effects of my_control_param.
 
-=back 
+=back
 
 =head2 Context parameters
 
 Expects the following context parameters:
 
-=over 
+=over
 
 =item ...
 

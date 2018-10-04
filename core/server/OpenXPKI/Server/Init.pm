@@ -15,6 +15,7 @@ use utf8;
 
 use English;
 use Errno;
+use Log::Log4perl;
 use OpenXPKI::Debug;
 use OpenXPKI::i18n qw(set_language set_locale_prefix);
 use OpenXPKI::Exception;
@@ -23,18 +24,16 @@ use OpenXPKI::Config;
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::VolatileVault;
 use OpenXPKI::Server;
-use OpenXPKI::Server::DBI;
 use OpenXPKI::Server::Database;
 use OpenXPKI::Server::Log;
-use OpenXPKI::Server::Log::NOOP;
 use OpenXPKI::Server::Log::CLI;
 use OpenXPKI::Server::API;
+use OpenXPKI::Server::API2;
 use OpenXPKI::Server::Authentication;
 use OpenXPKI::Server::Notification::Handler;
 use OpenXPKI::Workflow::Handler;
-use OpenXPKI::Server::Watchdog;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::Session::Mock;
+use OpenXPKI::Server::Session;
 
 use OpenXPKI::Crypto::X509;
 
@@ -43,8 +42,6 @@ use OpenXPKI::Serialization::Fast;
 
 use Data::Dumper;
 
-use Test::More;
-
 use Digest::SHA qw( sha1_base64 );
 
 # define an array of hash refs mapping the task id to the corresponding
@@ -52,23 +49,20 @@ use Digest::SHA qw( sha1_base64 );
 # order.
 my @init_tasks = qw(
   config_versioned
-  config_test
   i18n
-  dbi_log
   log
+  dbi_log
   redirect_stderr
   prepare_daemon
-  dbi_backend
-  dbi_workflow
   dbi
   crypto_layer
+  api2
   api
   workflow_factory
   volatile_vault
   authentication
   notification
   server
-  watchdog
 );
 #
 
@@ -81,105 +75,72 @@ my @log_queue;
 sub init {
     my $keys = shift;
 
-    # We need a valid session to access the realm parts of the config
-    if (!OpenXPKI::Server::Context::hascontext('session')) {
-        my $session = OpenXPKI::Server::Session::Mock->new();
-        OpenXPKI::Server::Context::setcontext({'session' => $session});
-    }
+    # TODO Rework this: we create a temporary in-memory session to allow access to realm parts of the config
+    OpenXPKI::Server::Context::setcontext({ 'session' =>
+        OpenXPKI::Server::Session->new(type => "Memory")->create()
+    }) unless OpenXPKI::Server::Context::hascontext('session');
 
-    if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
-    log_wrapper(
-        {
-        MESSAGE  => "OpenXPKI initialization",
-        PRIORITY => "info",
-        FACILITY => "system",
-        });
-    }
+    log_wrapper("OpenXPKI initialization")
+        unless (exists $keys->{SILENT} and $keys->{SILENT});
 
     my @tasks;
 
     if (defined $keys->{TASKS} && (ref $keys->{TASKS} eq 'ARRAY')) {
-    @tasks = @{$keys->{TASKS}};
+        @tasks = @{$keys->{TASKS}};
     } else {
-    @tasks = @init_tasks;
+        @tasks = @init_tasks;
     }
 
     delete $keys->{TASKS};
 
 
-
   TASK:
     foreach my $task (@tasks) {
         ##! 16: 'task: ' . $task
-    if (! exists $is_initialized{$task}) {
-        OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_SERVER_INIT_TASK_ILLEGAL_TASK_ACTION",
-        params  => {
-            task => $task,
-        });
-    }
-    next TASK if $is_initialized{$task};
+        if (! exists $is_initialized{$task}) {
+            OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_INIT_TASK_ILLEGAL_TASK_ACTION",
+            params  => {
+                task => $task,
+            });
+        }
+        next TASK if $is_initialized{$task};
 
-    ##! 16: 'do_init_' . $task
-    if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
-        log_wrapper(
+        ##! 16: 'do_init_' . $task
+        if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
+            log_wrapper("Initialization task '$task'");
+        }
+
+        eval "__do_init_$task(\$keys);";
+        if (my $exc = OpenXPKI::Exception->caught())
         {
-            MESSAGE  => "Initialization task '$task'",
-            PRIORITY => "info",
-            FACILITY => "system",
-        });
-    }
-
-    eval "__do_init_$task(\$keys);";
-    if (my $exc = OpenXPKI::Exception->caught())
-    {
-        my $msg = $exc->message() || '<no message>';
-        log_wrapper(
+            my $msg = $exc->message() || '<no message>';
+            log_wrapper("Exception during initialization task '$task': " . $msg, "fatal");
+            print "Exception during initialization task '$task': " . $msg;
+            $exc->rethrow();
+        }
+        elsif (my $eval_err = $EVAL_ERROR)
         {
-            MESSAGE  => "Exception during initialization task '$task': " . $msg,
-            PRIORITY => "fatal",
-            FACILITY => "system",
-        });
-        print "Exception during initialization task '$task': " . $msg;
-        $exc->rethrow();
-    }
-    elsif ($EVAL_ERROR)
-    {
-        my $error = $EVAL_ERROR;
-        log_wrapper({
-            MESSAGE  => "Eval error during initialization task '$task': " . $error,
-            PRIORITY => "fatal",
-            FACILITY => "system",
-        });
+            log_wrapper("Eval error during initialization task '$task': " . $eval_err, "fatal");
 
-        OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_SERVER_INIT_TASK_INIT_FAILURE",
-        params  => {
-            task => $task,
-            EVAL_ERROR => $error,
-        });
-    }
+            OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_SERVER_INIT_TASK_INIT_FAILURE",
+            params  => {
+                task => $task,
+                EVAL_ERROR => $eval_err,
+            });
+        }
 
-    $is_initialized{$task}++;
+        $is_initialized{$task}++;
 
-    # suppress informational output if SILENT is specified
-    if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
-        log_wrapper(
-        {
-            MESSAGE  => "Initialization task '$task' finished",
-            PRIORITY => "debug",
-            FACILITY => "system",
-        });
-    }
+        # suppress informational output if SILENT is specified
+        if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
+            log_wrapper("Initialization task '$task' finished","debug");
+        }
     }
 
     if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
-    log_wrapper(
-        {
-        MESSAGE  => "OpenXPKI initialization finished",
-        PRIORITY => "info",
-        FACILITY => "system",
-        });
+        log_wrapper("OpenXPKI initialization finished");
     }
 
     OpenXPKI::Server::Context::killsession();
@@ -189,23 +150,23 @@ sub init {
 
 
 sub log_wrapper {
-    my $arg = shift;
+    my $msg = shift;
+    my $prio = shift || 'info';
 
     if ($is_initialized{'log'}) {
-    if (scalar @log_queue) {
-        foreach my $entry (@log_queue) {
-        CTX('log')->log(
-            %{$entry},
-            );
+
+        if (scalar @log_queue) {
+            foreach my $entry (@log_queue) {
+                my $msg = $entry->[0];
+                my $prio = $entry->[1];
+                CTX('log')->system()->$prio($msg);
+            }
+            @log_queue = ();
         }
-        @log_queue = ();
-    }
-    CTX('log')->log(
-        %{$arg},
-        );
+        CTX('log')->system()->$prio($msg);
     } else {
-    # log system not yet prepared, queue log statement
-    push @log_queue, $arg;
+        # log system not yet prepared, queue log statement
+        push @log_queue, [$msg, $prio];
     }
     return 1;
 }
@@ -248,20 +209,6 @@ sub __do_init_config_versioned {
         config => $config,
     });
     # Otherwise the init all routine tries to instantiate the test config
-    $is_initialized{config_test} = 1;
-    return 1;
-}
-
-
-# Special init for test cases
-sub __do_init_config_test {
-    ##! 1: "init OpenXPKI config"
-    require OpenXPKI::Config::Test;
-    my $config = OpenXPKI::Config::Test->new();
-    OpenXPKI::Server::Context::setcontext(
-    {
-        config => $config,
-    });
     return 1;
 }
 
@@ -333,11 +280,6 @@ sub __do_init_volatile_vault {
 
     my $token = CTX('api')->get_default_token();
 
-    if (! defined $token) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_DO_INIT_VOLATILEVAULT_MISSING_TOKEN");
-    }
-
     OpenXPKI::Server::Context::setcontext(
     {
         volatile_vault => OpenXPKI::Crypto::VolatileVault->new(
@@ -347,87 +289,17 @@ sub __do_init_volatile_vault {
     });
 }
 
-sub __do_init_dbi_backend {
-    ### init backend dbi...
-    my $dbi = get_dbi(
-    {
-        PURPOSE => 'backend',
-    });
-
-    OpenXPKI::Server::Context::setcontext(
-    {
-        dbi_backend => $dbi,
-    });
-    # delete leftover secrets
-    CTX('dbi_backend')->connect();
-    CTX('dbi_backend')->delete(
-        TABLE => 'SECRET',
-        ALL   => 1,
-    );
-    CTX('dbi_backend')->commit();
-    CTX('dbi_backend')->disconnect();
-}
-
-sub __do_init_dbi_workflow {
-    ### init backend dbi...
-    my $dbi = get_dbi(
-    {
-        PURPOSE => 'workflow',
-    });
-
-    OpenXPKI::Server::Context::setcontext(
-    {
-        dbi_workflow => $dbi,
-    });
-}
-
 sub __do_init_dbi_log {
-    ### init backend dbi...
-    my $dbi = get_dbi(
-    {
-        PURPOSE => 'log',
-    });
-
-    OpenXPKI::Server::Context::setcontext(
-    {
-        dbi_log => $dbi,
-    });
-    CTX('dbi_log')->connect();
+    ##! 1: "start"
+    OpenXPKI::Server::Context::setcontext({ dbi_log => get_database("log") });
 }
 
-
+# TODO #legacydb Add delete(from => "secret", all => 1) either here or in separate init function
 sub __do_init_dbi {
-
-    my $args = shift;
-
     ##! 1: "start"
-
-    my $config = CTX('config');
-    my $dbpath = [ 'system','database','main' ];
-    my $db_config = $config->get_hash( $dbpath );
-
-    # Set environment variables
-    my $db_env = $config->get_hash("$dbpath.environment");
-    foreach my $env_name (keys %{$db_env}) {
-        $ENV{$env_name} = $db_env->{$env_name};
-        ##! 4: "DBI Environment: $env_name => ".$db_env->{$env_name}
-    }
-
-    # Read database driver/DSN parameters
-    my %params = (
-        db_type => 'MySQL', # default
-        %{$db_config},
-    );
-    delete $params{environment};
-    delete $params{log};
-    delete $params{debug};         # TODO Legacy: remove treatment of DB parameter "debug" (occurs in example database.yaml)
-
-    OpenXPKI::Server::Context::setcontext({
-        dbi => OpenXPKI::Server::Database->new(
-            log => CTX('log'),
-            db_params => \%params,
-        ),
-    });
+    my $keys = shift;
+    # enforce autocommit for init from CLI script
+    OpenXPKI::Server::Context::setcontext({ dbi => get_database("main", ($keys->{CLI} ? 1 : 0) ) });
 }
 
 sub __do_init_acl {
@@ -443,6 +315,17 @@ sub __do_init_api {
     OpenXPKI::Server::Context::setcontext(
     {
         api => OpenXPKI::Server::API->new(),
+    });
+}
+
+sub __do_init_api2 {
+    my $api = OpenXPKI::Server::API2->new(
+        enable_acls => 0,
+        # acl_rule_accessor => sub { CTX('config')->get_hash('acl.rules.' . CTX('session')->data->role ) },
+        log => CTX('log')->system,
+    );
+    OpenXPKI::Server::Context::setcontext({
+        api2 => $api->autoloader,
     });
 }
 
@@ -477,25 +360,6 @@ sub __do_init_notification {
     });
     return 1;
 }
-
-sub __do_init_watchdog{
-    my $keys = shift;
-
-    my $config = CTX('config');
-
-    my $Watchdog = OpenXPKI::Server::Watchdog->new( {
-        user => OpenXPKI::Server::__get_numerical_user_id( $config->get('system.server.user') ),
-        group => OpenXPKI::Server::__get_numerical_group_id( $config->get('system.server.group') )
-    } );
-
-    $Watchdog->run() unless ( $config->get('system.watchdog.disabled') );
-
-    OpenXPKI::Server::Context::setcontext({
-        watchdog => $Watchdog
-    });
-    return 1;
-}
-
 
 ###########################################################################
 
@@ -534,58 +398,6 @@ sub get_crypto_layer
     }
 }
 
-sub get_dbi
-{
-    my $args = shift;
-
-    ##! 1: "start"
-
-    my $config = CTX('config');
-    my %params;
-
-    my $dbpath = 'system.database.main';
-    if (exists $args->{PURPOSE} && $args->{PURPOSE} eq 'log') {
-        ##! 16: 'purpose: log'
-        # if there is a logging section we use it
-        if ($config->exists('system.database.logging')) {
-            ##! 16: 'use logging section'
-            $dbpath = 'system.database.logging';
-        }
-        %params = (LOG => OpenXPKI::Server::Log::NOOP->new());
-    }
-    else {
-        %params = (LOG => CTX('log'));
-    }
-
-    my $db_config = $config->get_hash($dbpath);
-
-    foreach my $key (qw(type name namespace host port user passwd)) {
-        ##! 16: "dbi: $key => " . $db_config->{$key}
-        $params{uc($key)} = $db_config->{$key};
-    }
-
-   $params{SERVER_ID} = $config->get('system.server.node.id');
-   $params{SERVER_SHIFT} = $config->get('system.server.shift');
-
-    # environment
-    my $db_env = $config->get_hash("$dbpath.environment");
-    foreach my $env_name (keys %{$db_env}) {
-        my $env_value = $db_env->{$env_name};
-        $ENV{$env_name} = $env_value;
-        ##! 4: "DBI Environment: $env_name => $env_value"
-    }
-
-    # special handling for SQLite databases
-    if ($params{TYPE} eq "SQLite") {
-        if (defined $args->{PURPOSE} && ($args->{PURPOSE} ne "")) {
-            $params{NAME} .= "._" . $args->{PURPOSE} . "_";
-            ##! 16: 'SQLite, name: ' . $params{NAME}
-        }
-    }
-
-    return OpenXPKI::Server::DBI->new (%params);
-}
-
 sub get_log
 {
     ##! 1: "start"
@@ -599,6 +411,58 @@ sub get_log
     ##! 64: 'log during get_log: ' . $log
 
     return $log;
+}
+
+sub get_database {
+    my ($section, $autocommit) = @_;
+
+    # enforce autocommit on the log handle if not explicitly disabled
+    if ($section eq 'log' && !defined $autocommit){
+        $autocommit = 1;
+    }
+
+    ##! 1: "start"
+
+    #
+    # Read DB config
+    #
+    my $config = CTX('config');
+    # Fallback for logger/audit configs which can be separate
+
+    $section = 'main' unless $config->exists(['system','database',$section]);
+    my $db_config = $config->get_hash(['system','database',$section]);
+
+    # Set environment variables
+    my $db_env = $config->get_hash(['system','database','environment']);
+
+    if (!$db_env && $db_config->{environment}) {
+        $db_env = $config->get_hash(['system','database',$section,'environment']);
+        delete $db_config->{environment};
+        Log::Log4perl->get_logger('openxpki.deprecated')->info('Please move your database environment config to database.environment');
+    }
+
+    for my $env_name (keys %{$db_env}) {
+        $ENV{$env_name} = $db_env->{$env_name};
+        ##! 4: "DBI Environment: $env_name => ".$db_env->{$env_name}
+    }
+
+    # TODO #legacydb Remove treatment of DB parameters "debug" and "log" (occurs in example database.yaml)
+    delete $db_config->{log};
+    delete $db_config->{debug};
+
+    my $db = OpenXPKI::Server::Database->new(
+        # if this DB object should be used for logging: we prevent recursive
+        # calls to log functions in OpenXPKI::Server::Log::Appender::DBI
+        log => CTX('log')->system(),
+        db_params => {
+            db_type => 'MySQL', # default
+            %{ $db_config },
+        },
+        $autocommit ? (autocommit => 1) : (),
+    );
+    # do a database ping to ensure the DB is connected
+    $db->ping();
+    return $db;
 }
 
 sub redirect_stderr
@@ -767,29 +631,19 @@ The ID of CRL validities is the internal CA name.
 
 =head2 Non-Cryptographic Object Initialization
 
-=head3 get_dbi
-
-Initializes the database interface and returns the database object reference.
-
-Requires 'log' and 'config' in the Server Context.
-
-If database type is SQLite and the named parameter 'PURPOSE' exists,
-this parameter is appended to the SQLite database name.
-This is necessary because of a limitation in SQLite that prevents multiple
-open transactions on the same database.
-
 =head3 get_log
 
 Returns an instance of the module OpenXPKI::Log.
 
 Requires 'config' in the Server Context.
 
-=head3 get_log
+=head3 get_database
 
-requires no arguments.
-It returns an instance of the module OpenXPKI::Server::Authentication.
-The context must be already established because OpenXPKI::XML::Config is
-loaded from the context.
+Returns an instance of the L<OpenXPKI::Server::Database>.
+
+A section name must be given below the config path I<system.database>.
+
+Requires 'log' in the Server Context.
 
 =head3 redirect_stderr
 

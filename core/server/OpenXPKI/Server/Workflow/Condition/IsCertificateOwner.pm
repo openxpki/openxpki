@@ -16,7 +16,7 @@ sub evaluate {
 
     my $context  = $workflow->context();
     ##! 64: 'context: ' . Dumper($context)
-    
+
     my $cert_identifier = $self->param('cert_identifier');
     $cert_identifier = $context->param('cert_identifier') unless($cert_identifier);
 
@@ -25,26 +25,20 @@ sub evaluate {
     }
 
     my $user = $self->param('cert_owner') || '';
-    
+
     my $res = CTX('api')->is_certificate_owner({ IDENTIFIER => $cert_identifier , USER => $user });
-    
+
     if (!defined $res) {
         ##! 16: 'owner is not defined'
-        CTX('log')->log(
-            MESSAGE  => "IsCertificateOwner condition failed - no owner found",
-            PRIORITY => 'warn',
-            FACILITY => 'application',
-        );
-        condition_error('I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_NO_OWNER_FOUND');       
-    } 
-    
+        CTX('log')->application()->warn("IsCertificateOwner condition failed - no owner found");
+
+        condition_error('I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_NO_OWNER_FOUND');
+    }
+
     if (!$res) {
         ##! 16: 'owner does not match'
-        CTX('log')->log(        
-            MESSAGE  => "IsCertificateOwner condition failed - owner not matches",
-            PRIORITY => 'debug',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->debug("IsCertificateOwner condition failed - owner not matches");
+
         condition_error('I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_FAILED');
     }
 
@@ -61,9 +55,9 @@ __END__
 OpenXPKI::Server::Workflow::Condition::IsCertificateOwner
 
 =head1 SYNOPSIS
- 
+
 
 =head1 DESCRIPTION
 
 This condition checks whether a given user (or the session user) is the
-owner of the given certificate. 
+owner of the given certificate.

@@ -17,22 +17,22 @@ sub execute {
     my $self     = shift;
     my $workflow = shift;
     my $context  = $workflow->context();
-    
+
     my $default_token = CTX('api')->get_default_token();
 
-    my $dp_namespace = $self->param('dp_namespace');    
+    my $dp_namespace = $self->param('dp_namespace');
     my $dp_key   = $self->param('dp_key');
-    
+
     my $key_alg    = $self->param('key_alg') || 'RSA';
     my $key_size   = $self->param('key_size') || 2048;
     my $enc_alg   = $self->param('enc_size') || 'aes256';
-    
+
     my $key_param =  { KEY_LENGTH => $key_size };
-    
+
     # use fixed password because the key will be stored encrypted in the
     # datapool, might move this to a config item / keynanny
     my $passwd = 'OpenXPKI';
-        
+
     # command definition
     my $private_key = CTX('api')->generate_key({
          KEY_ALG    => $key_alg,
@@ -40,41 +40,43 @@ sub execute {
          PASSWD     => $passwd,
          PARAMS     => $key_param,
     });
-        
+
     # ultimately we want to save the key under the corresponding certificate
     # identifier, but we don't know this yet. we use a temporary handle
     # and will later rename it.
-    # Add some random if we have more than one escrow cert to create 
+    # Add some random if we have more than one escrow cert to create
     my $temp_handle = $dp_key . '_' . $workflow->id() . '_'. sprintf('%01d',rand()*100000);
- 
+
     CTX('api')->set_data_pool_entry({
-	    NAMESPACE => $dp_namespace,
-	    KEY       => $temp_handle,
-	    VALUE     => $private_key,
-	    # autocleanup of keys which are not crafted into certificates
-	    # later in this process
-	    EXPIRATION_DATE => time + 24 * 3600,
-	    FORCE     => 1,
-#	    ENCRYPT   => 1,
-	});
+        NAMESPACE => $dp_namespace,
+        KEY       => $temp_handle,
+        VALUE     => $private_key,
+        # autocleanup of keys which are not crafted into certificates
+        # later in this process
+        EXPIRATION_DATE => time + 24 * 3600,
+        FORCE     => 1,
+#        ENCRYPT   => 1,
+    });
 
     ##! 16: 'datapool entry saved to ' . $namespace . ':' . $temp_handle
-    CTX('log')->log(
-    	MESSAGE => 'Created ' . $key_alg . ' private key for ' . $context->param('creator') . ', saved to datapool entry ' . $dp_namespace . '/' . $temp_handle,
-    	PRIORITY => 'info',
-    	FACILITY => ['audit','application']
-	);
-    
+    CTX('log')->application()->info('Created ' . $key_alg . ' private key for ' . $context->param('creator') . ', saved to datapool entry ' . $dp_namespace . '/' . $temp_handle);
+
+
+    CTX('log')->audit('key')->info("generating private key", {
+        'key_alg' => $key_alg,
+        %{$key_param}
+    });
+
     my $csr = $default_token->command (
-	{
-	    COMMAND => "create_pkcs10",
-	    KEY     => $private_key,
-	    PASSWD  => $passwd,
-	    SUBJECT => 'dummy subject',
-	});
-    
+    {
+        COMMAND => "create_pkcs10",
+        KEY     => $private_key,
+        PASSWD  => $passwd,
+        SUBJECT => 'dummy subject',
+    });
+
     $context->param('pkcs10' => $csr);
-    
+
     $context->param('temp_key_handle' => $temp_handle);
 
     return 1;
@@ -92,7 +94,7 @@ OpenXPKI::Server::Workflow::Activity::SmartCard::CreateEscrowedKey
     class: OpenXPKI::Server::Workflow::Activity::SmartCard::CreateEscrowedKey
     label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_ESCROWED_KEY_LABEL
     description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_ESCROWED_KEY_DESC
-    param: 
+    param:
         dp_namespace: certificate.privatekey
         _map_dp_key: $token_id
         key_alg: RSA
@@ -130,11 +132,11 @@ Public key algorithm to use. Default: 'RSA'
 
 Public key size in bits. Default: 2048
 
-=back 
+=back
 
 =head2 Context parameters
 
-=over 
+=over
 
 =item pkcs10
 

@@ -85,11 +85,6 @@ sub validate {
                     'LDAP_SERVER' => $self->ldap_server,
                     'LDAP_PORT'   => $self->ldap_port,
                 },
-                log => {
-                    logger   => CTX('log'),
-                    priority => 'error',
-                    facility => 'monitor',
-                },
             );
         }
 
@@ -102,11 +97,6 @@ sub validate {
                 params => {
                     ERROR      => $mesg->error(),
                     ERROR_DESC => $mesg->error_desc(),
-                },
-                log => {
-                    logger   => CTX('log'),
-                    priority => 'error',
-                    facility => 'monitor',
                 },
             );
         }
@@ -134,13 +124,10 @@ sub validate {
     }
 
     if ( scalar @{$errors} ) {
-        CTX('log')->log(
-            MESSAGE  => "Errors valdiating authorizing persons",
-            PRIORITY => 'error',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->error("Errors valdiating authorizing persons");
 
-        #		validation_error($errors->[scalar @{$errors} -1]);
+
+        #        validation_error($errors->[scalar @{$errors} -1]);
         validation_error( Dumper($errors) );
         return -1;
     }

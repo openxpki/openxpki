@@ -22,31 +22,28 @@ sub execute
     my $context    = $workflow->context();
 
     ##! 1: 'start'
-  
+
     my $params = $self->param();
     ##! 16: ' parameters: ' . Dumper $params
-    
-    
-    
+
+
+
   KEY:
     foreach my $key (keys %{$params}) {
 
         ##! 16: 'Key ' . $key
-    	my $value = $self->param($key);
-     
+        my $value = $self->param($key);
+
         ##! 16: 'Value ' . Dumper $value
-     
-    	if (defined $value) {
-		    $context->param($key => $value);
-	    }
-         
-        CTX('log')->log(
-            MESSAGE => "Setting context $key to $value",
-            PRIORITY => 'debug',
-            FACILITY => [ 'application', ],
-        );
+
+        if (defined $value) {
+            $context->param($key => $value);
+        }
+
+        CTX('log')->application()->debug("Setting context $key to $value");
+
     }
-             
+
     return 1;
 }
 
@@ -59,15 +56,15 @@ OpenXPKI::Server::Workflow::Activity::Tools::SetContext
 
 =head1 Description
 
-Set context parameters from the activity definition. 
+Set context parameters from the activity definition.
 
-=head2 Configuration 
+=head2 Configuration
 
     class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
     param:
-       token: certsign,datasafe       
-       
-This will create a new context item with key "token" and value 
-"certsign,datasafe".       
+       token: certsign,datasafe
+
+This will create a new context item with key "token" and value
+"certsign,datasafe".
 
 

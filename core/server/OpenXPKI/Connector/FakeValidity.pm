@@ -56,11 +56,8 @@ sub get {
 
     $notafter->add( days => $diff_day );
 
-    CTX('log')->log(
-       MESSAGE => "certificate validity adjusted from ". $org_notafter ." to ". $notafter->strftime("%Y-%m-%d %H:%M:%S"),
-       PRIORITY => 'debug',
-       FACILITY => [ 'application', ],
-    );
+    CTX('log')->application()->debug("certificate validity adjusted from ". $org_notafter ." to ". $notafter->strftime("%Y-%m-%d %H:%M:%S"));
+
 
     return $notafter->strftime("%Y%m%d%H%M%S");
 }

@@ -20,9 +20,9 @@ sub _preset_args {
 }
 
 sub _validate {
-    
+
     ##! 1: 'start'
-    
+
     my ( $self, $wf, $invalidity_time, $identifier ) = @_;
 
     ##! 16: 'invalidity_time ' . $invalidity_time
@@ -36,18 +36,17 @@ sub _validate {
     if (!defined $identifier || $identifier !~ m{\A [a-zA-Z0-9\-_]+ \z}xms) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_INVALID_IDENTIFIER',
-    	    log => {
-        		logger => CTX('log'),
-        		priority => 'warn',
-        		facility => 'application',
-	        },
+            log => {
+                priority => 'warn',
+                facility => 'application',
+            },
         );
     }
-    
+
     ##! 16: 'invalidity time: ' . $invalidity_time
     ##! 16: 'identifier: ' . $identifier
 
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
     my $now = time();
     ##! 16: 'now: ' . $now
 
@@ -60,7 +59,7 @@ sub _validate {
     if (! defined $cert) {
         validation_error('I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_CERTIFICATE_NOT_FOUND_IN_DB');
     }
-    
+
     my $notbefore = $cert->{'notbefore'};
     my $notafter  = $cert->{'notafter'};
     ##! 16: 'notbefore: ' . $notbefore
@@ -68,12 +67,12 @@ sub _validate {
 
     if ($invalidity_time < $notbefore) {
         validation_error('I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_BEFORE_CERT_NOTBEFORE');
-        
+
     }
     if ($invalidity_time > $notafter) {
         validation_error('I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER');
     }
-       
+
     # Add some grace interval for clock skews
     if ($invalidity_time > ($now + 60)) {
         validation_error('I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_IN_FUTURE');
@@ -99,15 +98,15 @@ OpenXPKI::Server::Workflow::Validator::InvalidityTime
 
 =head1 DESCRIPTION
 
-This validator checks whether a given invalidity time is valid for a 
+This validator checks whether a given invalidity time is valid for a
 certificate, i.e. it is not in the future and within the the certificate
-validity time. It expects the timestamp and certificate identifier as 
+validity time. It expects the timestamp and certificate identifier as
 arguments. If invalidity time is a false value, the validator returns true.
 
-The validator has a preset definiton using the context keys as given in 
+The validator has a preset definiton using the context keys as given in
 the example.
 
-=over 
+=over
 
 =item cert_identifier
 

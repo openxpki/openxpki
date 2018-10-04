@@ -4,6 +4,7 @@
 </head>
 <body>
 
+<!-- Embed an image, needs to be defined in the config -->
 <img src="cid:banner">
 
 <p>If you can read this, your OpenXPKI system can send mail.</p>
@@ -11,5 +12,7 @@
 <p>Originating realm: <b>[% meta_label %].</b><br/>
 The base address of this installation is <a href="[% meta_baseurl %]">[% meta_baseurl %]</a>.</p>
 
+<!-- Load a common footer from an include file -->
+[% INCLUDE _footer.html %]
 </body>
 </html>

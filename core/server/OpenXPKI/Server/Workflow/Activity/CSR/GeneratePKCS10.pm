@@ -20,7 +20,7 @@ sub execute
     my $workflow   = shift;
     my $context    = $workflow->context();
     my $default_token = CTX('api')->get_default_token();
-    
+
     my $private_key = $self->param('private_key');
     my $password    = $self->param('password');
     my $subject     = $self->param('cert_subject');
@@ -30,7 +30,7 @@ sub execute
     $private_key = $context->param('private_key') unless($private_key);
     $password    = $context->param('_password') unless($password);
     $subject     = $context->param('cert_subject') unless($subject);
-    
+
 
     my $pkcs10 = $default_token->command({
         COMMAND => 'create_pkcs10',
@@ -42,11 +42,8 @@ sub execute
 
     # TODO - add SANs
 
-    CTX('log')->log(
-        MESSAGE  => "generated pkcs#10 request for $subject",
-        PRIORITY => 'debug',
-        FACILITY => 'application',
-    );
+    CTX('log')->application()->debug("generated pkcs#10 request for $subject");
+
 
     $context->param($target_key => $pkcs10);
 
@@ -71,8 +68,8 @@ This request is saved in the context parameter pkcs10.
 
 =head2 Activity Parameters
 
-To support legacy workflows, the values for private_key, password and 
-cert_subject are read from the context if not set in the activity 
+To support legacy workflows, the values for private_key, password and
+cert_subject are read from the context if not set in the activity
 definition. This behaviour is deprecated and will be removed in the future.
 
 =over

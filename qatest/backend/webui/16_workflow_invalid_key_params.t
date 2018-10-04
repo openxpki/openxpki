@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 
-use lib qw(../../lib);
+use FindBin qw( $Bin );
+use lib "$Bin/../../lib";
+
 use strict;
 use warnings;
 use CGI::Session;
@@ -10,8 +12,8 @@ use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use MockUI;
 
-#Log::Log4perl->easy_init($DEBUG);
-Log::Log4perl->easy_init($ERROR);
+# We expect error messages but hide them unless we're in verbose testing
+Log::Log4perl->easy_init($ENV{TEST_VERBOSE} ? $ERROR : $OFF);
 
 use Test::More tests => 10;
 
@@ -43,7 +45,7 @@ like($result->{goto}, qr/workflow!load!wf_id!\d+/, 'Got redirect');
 
 my ($wf_id) = $result->{goto} =~ /workflow!load!wf_id!(\d+)/;
 
-diag("Workflow Id is $wf_id");
+note("Workflow Id is $wf_id");
 
 $result = $client->mock_request({
     'page' => $result->{goto},

@@ -1,5 +1,5 @@
 # OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate
-# 
+#
 # Copyright (c) 2012 by The OpenXPKI Project
 #
 
@@ -22,11 +22,11 @@ sub execute {
     my $context = $workflow->context();
 
     my $workflow_type = $self->param('workflow');
-    
-    # we assume that a cert_identifier is always required even for 
+
+    # we assume that a cert_identifier is always required even for
     # alternative workflows
     my $param = { cert_identifier     => undef };
-    
+
     # Fallback to support old configs, set workflow type and preset params
     if (!$workflow_type) {
         $workflow_type = 'certificate_revocation_request_v2';
@@ -41,40 +41,36 @@ sub execute {
             comment             => '',
             flag_auto_approval  => 0,
         };
-        
-        # Overwrite defaults from activity params  
+
+        # Overwrite defaults from activity params
         foreach my $key (keys(%{$param})) {
             my $val = $self->param($key);
             if (defined $val) {
-                $param->{$key} = $val; 
+                $param->{$key} = $val;
             }
         }
     } else {
         # map all action parameters exluding the workflow
-        
+
         my @keys = $self->param();
-        
+
         ##! 32: 'Got keys ' . Dumper \@keys
-        
+
         foreach my $key (@keys) {
             next if ($key =~ /^(wf_|workflow$|target_key$)/);
             my $val = $self->param($key);
             if (defined $val) {
-                $param->{$key} = $val; 
+                $param->{$key} = $val;
             }
         }
     }
-    
+
     # We read cert_identifier from context if none is given in map
-    $param->{cert_identifier} = $context->param('cert_identifier') unless($param->{cert_identifier});    
-    
+    $param->{cert_identifier} = $context->param('cert_identifier') unless($param->{cert_identifier});
+
     OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_REVOKE_CERTIFICATE_NO_CERT_IDENTIFIER',    
-        log => {
-            logger   => CTX('log'),
-            priority => 'error',
-            facility => 'system',
-    }) unless($param->{cert_identifier});
+        message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_REVOKE_CERTIFICATE_NO_CERT_IDENTIFIER',
+    ) unless($param->{cert_identifier});
 
     # Backward compatibility... Use 0|1 instead of no|yes for boolean value
     if ($param->{flag_auto_approval}) {
@@ -86,11 +82,8 @@ sub execute {
     }
 
     ##! 32: 'Prepare revocation with params: ' . Dumper $param
-    CTX('log')->log(
-        MESSAGE => 'Prepare revocation with params: ' . Dumper $param, 
-        PRIORITY => 'debug',
-        FACILITY => [ 'application' ],
-    );
+    CTX('log')->application()->trace('Prepare revocation with params: ' . Dumper $param);
+
 
     # Parse invalidity_time if set - workflow requires epoch
     if ($param->{invalidity_time}) {
@@ -102,7 +95,7 @@ sub execute {
 
     # check if delay_revoked is requested and in the future
     if ($param->{delay_revocation_time}) {
-        
+
         # parse and convert it
         $param->{delay_revocation_time} = OpenXPKI::DateTime::get_validity({
             VALIDITY => $param->{delay_revocation_time},
@@ -110,21 +103,15 @@ sub execute {
         })->epoch();
 
 
-        CTX('log')->log(
-            MESSAGE => 'Delayed revoke requested', 
-            PRIORITY => 'info',
-            FACILITY => [ 'application' ],
-        );
-      
+        CTX('log')->application()->info('Delayed revoke requested');
+
+
         # Remove delayed revocation if the requested date is in the past
         # or near future as its useless and the validator wont accept it!
         if ($param->{delay_revocation_time} < (time() + 15)) {
             $param->{delay_revocation_time} = 0;
-            CTX('log')->log(
-                MESSAGE => 'Delayed revoke with timestamp in the past - removing it', 
-                PRIORITY => 'warn',
-                FACILITY => [ 'application' ],
-            );
+            CTX('log')->application()->warn('Delayed revoke with timestamp in the past - removing it');
+
         }
     }
 
@@ -133,17 +120,14 @@ sub execute {
         WORKFLOW      => $workflow_type,
         PARAMS        => $param
     });
-        
+
     ##! 16: 'Revocation Workflow created with id ' . $wf_info->{WORKFLOW}->{ID}
-    
+
     # put together the log statement
     my $msg = join (",", map {  $_ . ' => ' . $param->{$_} } keys(%{$param}));
 
-    CTX('log')->log(
-	    MESSAGE => 'Revocation workflow #'. $wf_info->{WORKFLOW}->{ID}.' '. $msg,
-	    PRIORITY => 'info',
-	    FACILITY => [ 'application' ],
-    );
+    CTX('log')->application()->info('Revocation workflow #'. $wf_info->{WORKFLOW}->{ID}.' '. $msg);
+
 
     if ($self->param('target_key')) {
         $context->param( $self->param('target_key') => $wf_info->{WORKFLOW}->{ID} );
@@ -151,7 +135,7 @@ sub execute {
 
 
     return 1;
-    
+
 }
 
 
@@ -164,18 +148,18 @@ OpenXPKI::Server::Workflow::Activity::Tools::RevokeCertificate;
 
 =head1 Description
 
-Trigger revocation of a certificate by starting an unwatched workflow. 
-Intendend usage is to provide the workflow name plus all parameters that 
+Trigger revocation of a certificate by starting an unwatched workflow.
+Intendend usage is to provide the workflow name plus all parameters that
 are mandatory to start the given workflow. All parameters given to the
-activity definition will be used as input parameters for the workflow, 
+activity definition will be used as input parameters for the workflow,
 except of the I<workflow> and I<target_key> parameter (system namespace
 I<wf_> is obviously also filtered).
 
 The parameters I<invalidity_time> and I<delay_revocation_time> are parsed
 using OpenXPKI::DateTime and passed as epoch to the workflow.
 
-To support legacy configurations, the class assumes the default workflow 
-and presets reason_code and flag_batch_mode to default values when the 
+To support legacy configurations, the class assumes the default workflow
+and presets reason_code and flag_batch_mode to default values when the
 I<workflow> parameter is not given.
 
 =head2 Action Parameters
@@ -201,7 +185,7 @@ Optional, if set receives the id of the revocation workflow.
 
 Based on the legacy workflow, some parameters are preprocessed:
 
-=over 
+=over
 
 =item flag_auto_approval
 

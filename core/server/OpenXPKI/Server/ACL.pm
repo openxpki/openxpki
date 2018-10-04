@@ -1,4 +1,4 @@
-## OpenXPKI::Server::ACL.pm 
+## OpenXPKI::Server::ACL.pm
 ##
 ## Written by Michael Bell 2006
 ## cleaned up a bit to support multiple PKI realms
@@ -36,7 +36,7 @@ sub new {
     ##! 1: "end"
     return $self;
 }
- 
+
 ########################################################################
 ##                          identify the user                         ##
 ########################################################################
@@ -45,26 +45,26 @@ sub new {
 sub authorize_workflow {
     OpenXPKI::Exception->throw(
         message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_HAS_MOVED',
-    );       
+    );
 }
-     
 
-#FIXME - ACL - needs concept and implementation 
+
+#FIXME - ACL - needs concept and implementation
 sub authorize
 {
     my $self = shift;
     my $keys = shift;
- 
+
     OpenXPKI::Exception->throw(
         message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_NOT_IMPLEMENTED',
-    );   
+    );
     return 1;
 }
 
 sub get_roles
 {
     my $self  = shift;
-    return CTX('config')->get_keys('auth.roles');   
+    return CTX('config')->get_keys('auth.roles');
 }
 
 sub get_servers

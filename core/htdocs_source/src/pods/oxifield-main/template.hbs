@@ -16,16 +16,16 @@
         {{/if}}
     </div>
     {{#if content.clonable}}
-        <div class="col-md-1">
-            {{#if content.isLast}}
-                <button class="btn btn-primary clone" type="button" {{action "addClone"}}>
-                    <span class="glyphicon glyphicon-plus"></span>
-                </button>
-            {{else}}
-                <button class="btn btn-danger clone" type="button" {{action "delClone"}}>
-                    <span class="glyphicon glyphicon-minus"></span>
-                </button>
+        <div class="col-md-1 clonable-btn-group">
+            
+            {{#if content.canDelete}}
+            <button class="btn btn-danger clone" type="button" {{action "delClone"}}>
+                <span class="glyphicon glyphicon-minus"></span>
+            </button>
             {{/if}}
+            <button class="btn btn-primary clone" type="button" {{action "addClone"}}>
+                <span class="glyphicon glyphicon-plus"></span>
+            </button>            
         </div>
     {{/if}}
 </div>

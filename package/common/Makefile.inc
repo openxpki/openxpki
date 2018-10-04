@@ -16,7 +16,7 @@ $(error Makefile must set TOPDIR must be set to the top level directory of the r
 endif
 
 VERGEN := $(TOPDIR)/tools/vergen
-PERL   := $(shell which perl)
+PERL   ?= $(shell which perl)
 
 # test if vergen is found and executable
 ifneq (EXISTS, $(shell test -x $(VERGEN) && echo "EXISTS"))
@@ -33,13 +33,13 @@ endif
 
 # For the Packager field in the RPM files
 ifndef GIT_AUTHOR_NAME
-GIT_AUTHOR_NAME := $(shell git config --get user.name)
+GIT_AUTHOR_NAME ?= $(shell git config --get user.name)
 endif
 ifndef GIT_AUTHOR_EMAIL
-GIT_AUTHOR_EMAIL := $(shell git config --get user.email)
+GIT_AUTHOR_EMAIL ?= $(shell git config --get user.email)
 endif
 
-PACKAGER := $(strip $(GIT_AUTHOR_NAME) <$(GIT_AUTHOR_EMAIL)>)
+PACKAGER ?= $(strip $(GIT_AUTHOR_NAME) <$(GIT_AUTHOR_EMAIL)>)
 
 # $(call assert-packager)
 define assert-packager
@@ -47,10 +47,13 @@ define assert-packager
       $(error ERROR: You must set GIT_AUTHOR_NAME and GIT_AUTHOR_EMAIL))
 endef
 
-OXI_VERSION := $(shell $(VERGEN) --format version)
+# NOTE: The version-related variables are conditionally-assigned to allow
+# them to be set via shell environment in special cases where the build
+# environment has incomplete Git information.
+OXI_VERSION ?= $(shell $(VERGEN) --format version)
 
 # all vergen symbols in tpage(1) compatible format
-TT_VERSION_SYMBOLS = $(shell \
+TT_VERSION_SYMBOLS ?= $(shell \
 	$(VERGEN) --dump --dumpformat "--define KEYWORD=\"VALUE\" " 2>/dev/null ; \
 	for i in `$(VERGEN) --list-formats` ; do value=`$(VERGEN) --format $$i 2>/dev/null` ; [ -n "$$value" ] && echo "--define $$i=\"$$value\"" ; done \
 ) --define PACKAGER="$(PACKAGER)"

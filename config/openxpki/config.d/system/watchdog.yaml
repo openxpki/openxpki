@@ -7,6 +7,8 @@ interval_wait_initial: 30
 interval_loop_idle: 5
 interval_loop_run: 1
 
+interval_session_purge: 300
+
 # You should not change this unless you know what you are doing
 max_instance_count: 1
 disabled: 0

@@ -10,7 +10,6 @@ use Pod::Usage;
 use POSIX ":sys_wait_h";
 use Errno;
 use File::Spec;
-use Proc::ProcessTable;
 
 use OpenXPKI::VERSION;
 
@@ -81,19 +80,31 @@ if ($cmd eq 'status') {
     }
 
     if (defined $params{debug}) {
-
         @{$params{debug}} = split(m{,}, join(',', @{$params{debug}}));
+        $args->{DEBUG_LEVEL} = {};
+        $args->{DEBUG_BITMASK} = {};
 
-        $args->{DEBUG} = {};
-        foreach my $param (@{$params{debug}}) {
-            my ($module, $level) = ($param =~ m{ \A (.*?):?(\d*) \z }xms);
-            if ($level eq '') {
-                $level = 1;
+        for my $param (@{ $params{debug} }) {
+            my ($module, $op, $level) = ($param =~ m{ \A ((?!\d).+?)?([:=])?((0b)?\d+)? \z }xms);
+
+            # default values if not specified
+            $level //= 1;
+            $op = ':' if (not $module and not $op); # if only number was given: interpret as level
+            $module //= '.*';
+
+            # convert binary bitmask/level specifications
+            if ($level =~ /^0b(.*)/) {
+                $level = unpack("N", pack("B32", substr("0"x32 . $1, -32)));
             }
-            if ($module eq '') {
-                $args->{DEBUG} = $level;
-            } else {
-                $args->{DEBUG}->{$module} = $level;
+
+            # operator ":" - a maximum level
+            if ($op and $op eq ":") {
+                $args->{DEBUG_LEVEL}->{$module} = $level;
+            }
+            # operator "=" - a bitmask
+            else {
+                # also assume it's a bitmask if no operator and no number were given
+                $args->{DEBUG_BITMASK}->{$module} = $level;
             }
         }
     }
@@ -126,17 +137,32 @@ openxpkictl - start/stop script for OpenXPKI server
 openxpkictl [options] COMMAND
 
  Options:
-   --help                brief help message
-   --man                 full documentation
-   --config PATH         use configuration from path (base of yaml tree)
-   --instance|i NAME     Shortcut to set the config path to
-                         /etc/openxpki/<instance>/config.d
-   --debug  MODULE:LEVEL set MODULE debug level to LEVEL
-                         (positive integer value).
-                         MODULE defaults to '.*'
-                         LEVEL defaults to 1
-   --foreground          Uses a non-forking server. This is only
-                         useful for debugging or profiling.
+   --help
+        Brief help message
+
+   --man
+        Full documentation
+
+   --config PATH
+        Use configuration from path (base of yaml tree)
+
+   --instance|i NAME
+        Shortcut to set the config path to /etc/openxpki/<instance>/config.d
+
+   --debug [MODULE:]LEVEL
+        Show debug messages of MODULE whose level are lower or equal to the
+        given LEVEL.
+        LEVEL can be specified as a decadic or binary number (e.g. 5 or 0b101).
+        If MODULE is omitted the given LEVEL will be set for all modules.
+
+   --debug MODULE[=BITMASK]
+        Show debug messages of MODULE whose level fits into the given BITMASK
+        (i.e. "level AND BITMASK == level").
+        BITMASK can be specified as a decadic or binary number (e.g. 5 or
+        0b101). If not given BITMASK defaults to 1.
+
+   --foreground
+        Use a non-forking server: only useful for debugging or profiling.
 
  Commands:
    start            Start OpenXPKI daemon

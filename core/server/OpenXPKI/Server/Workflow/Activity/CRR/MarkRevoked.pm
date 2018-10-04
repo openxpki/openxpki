@@ -1,5 +1,5 @@
 # OpenXPKI::Server::Workflow::Activity::CRR::MarkRevoked
-# Written by Oliver Welter for the OpenXPKI project 2012 
+# Written by Oliver Welter for the OpenXPKI project 2012
 # Copyright (c) 2012 by The OpenXPKI Project
 
 package OpenXPKI::Server::Workflow::Activity::CRR::MarkRevoked;
@@ -19,38 +19,32 @@ sub execute
     my $workflow   = shift;
     my $context    = $workflow->context();
 
-    my $dbi        = CTX('dbi_backend');
-    my $pki_realm = CTX('api')->get_pki_realm();     
+    my $dbi        = CTX('dbi');
+    my $pki_realm = CTX('api')->get_pki_realm();
     my $identifier = $context->param('cert_identifier');
- 
+
    # TODO: Improve - load certificate, check status and fail on any error.
-   # Status in db might already be revoked when using local issuance 
+   # Status in db might already be revoked when using local issuance
    # Fetch reason code from CRR db (onHold)
-   
-	# update certificate database:
+
+    # update certificate database:
     #my $status = 'REVOKED';
     #if ($reason_code eq 'certificateHold') {
     #        $status = 'HOLD';
     #}
-   
+
    $dbi->update(
-   		TABLE => 'CERTIFICATE',
-        DATA  => {
-            'STATUS' => 'REVOKED',
-        },
-        WHERE => {
-        	'STATUS' => 'CRL_ISSUANCE_PENDING',
-            'PKI_REALM'  => $pki_realm,
-            'IDENTIFIER' => $identifier,
+           table => 'certificate',
+        set  => { status => 'REVOKED' },
+        where => {
+            status => 'CRL_ISSUANCE_PENDING',
+            pki_realm  => $pki_realm,
+            identifier => $identifier,
         },
     );
-    $dbi->commit();    
-    
-    CTX('log')->log(
-        MESSAGE  => "mark certificate $identifier as revoked in database",
-        PRIORITY => 'debug',
-        FACILITY => 'application',
-    );   
+
+    CTX('log')->application()->debug("mark certificate $identifier as revoked in database");
+
 }
 
 1;
@@ -64,7 +58,7 @@ OpenXPKI::Server::Workflow::Activity::CRR::MarkRevoked
 
 Mark the certificate as "revoked"
 if reason_code is set to certificateHold, the certificate is put on status
-HOLD, otherwise its set to REVOKED. 
+HOLD, otherwise its set to REVOKED.
 
 =over
 

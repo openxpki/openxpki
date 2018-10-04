@@ -14,12 +14,12 @@ use Data::Dumper;
 use Config::Std;
 use File::Basename;
 use File::Slurp;
-use Digest::SHA1 qw(sha1_hex);
+use Digest::SHA qw(sha1_hex);
 
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($WARN);
 
-use OpenXPKI::Test::More;
+use OpenXPKI::Test::QA::More;
 use TestCfg;
 
 my $dirname = dirname($0);
@@ -30,7 +30,7 @@ our %cfg = ();
 my $testcfg = new TestCfg;
 $testcfg->read_config_path( '5x_personalize.cfg', \%cfg, @cfgpath );
 
-my $test = OpenXPKI::Test::More->new(
+my $test = OpenXPKI::Test::QA::More->new(
     {
         socketfile => $cfg{instance}{socketfile},
         realm => $cfg{instance}{realm},

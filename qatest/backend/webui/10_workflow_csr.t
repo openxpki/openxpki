@@ -1,6 +1,11 @@
 #!/usr/bin/perl
 
-use lib qw(../../lib);
+use FindBin qw( $Bin );
+use lib "$Bin/../../lib";
+
+use Cwd 'abs_path';
+use File::Basename;
+
 use strict;
 use warnings;
 use CGI::Session;
@@ -25,6 +30,7 @@ require_ok( 'OpenXPKI::Client::UI' );
 
 my $result;
 my $client = MockUI::factory();
+my $openssl_conf = dirname(abs_path($0)).'/openssl.cnf';
 
 $result = $client->mock_request({
     'page' => 'workflow!index!wf_type!certificate_signing_request_v2',
@@ -43,7 +49,7 @@ like($result->{goto}, qr/workflow!load!wf_id!\d+/, 'Got redirect');
 
 my ($wf_id) = $result->{goto} =~ /workflow!load!wf_id!(\d+)/;
 
-diag("Workflow Id is $wf_id");
+note("Workflow Id is $wf_id");
 
 $result = $client->mock_request({
     'page' => $result->{goto},
@@ -54,7 +60,7 @@ $result = $client->mock_request({
 });
 
 # Create a pkcs10
-my $pkcs10 = `openssl req -new -subj "/DC=org/DC=OpenXPKI/DC=Test Deployment/CN=www.example.com" -config openssl.cnf -nodes -keyout /dev/null 2>/dev/null`;
+my $pkcs10 = `openssl req -new -subj "/DC=org/DC=OpenXPKI/DC=Test Deployment/CN=www.example.com" -config $openssl_conf -nodes -keyout /dev/null 2>/dev/null`;
 
 $result = $client->mock_request({
     'action' => 'workflow!index',
@@ -92,7 +98,7 @@ if ($result->{main}->[0]->{content}->{buttons}->[0]->{action} =~ /csr_submit/) {
     $result = $client->mock_request({
         'action' => 'workflow!select!wf_action!csr_enter_policy_violation_comment!wf_id!' . $wf_id
     });
-    
+
     $result = $client->mock_request({
         'action' => 'workflow!index',
         'policy_comment' => 'Reason for Exception',

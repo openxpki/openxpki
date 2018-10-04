@@ -20,13 +20,13 @@ sub execute {
     my $workflow   = shift;
     my $context    = $workflow->context();
     my $serializer = OpenXPKI::Serialization::Simple->new();
-    my $params     = { PKI_REALM => CTX('api')->get_pki_realm(), };
+    my $params     = {};
 
     # fallback to old parameter format
-    my $prefix = '';        
+    my $prefix = '';
     if ($self->param('ds_namespace')) {
         $prefix = 'ds_';
-        
+
         # get the name of the key and resolve it
         my $dp_key_param = $self->param('ds_key_param');
         if ( not $dp_key_param ) {
@@ -34,69 +34,70 @@ sub execute {
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_MISSPARAM_KEY_PARAM'
             );
         }
-        $params->{ KEY } = $context->param( $dp_key_param );
-        
+        $params->{ key } = $context->param( $dp_key_param );
+
         my $dp_value_param = $self->param('ds_value_param');
         if ( not $dp_value_param ) {
             OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_MISSPARAM_VALUE_PARAM' 
+                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_MISSPARAM_VALUE_PARAM'
             );
-        }        
-        $params->{ VALUE } = $context->param( $dp_value_param ); 
+        }
+        $params->{ value } = $context->param( $dp_value_param );
 
-        CTX('log')->log(
-            MESSAGE => 'Old parameter format found in set datapool activity',
-            PRIORITY => 'debug',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->debug('Old parameter format found in set datapool activity');
+
 
     } else {
-        $params->{ KEY } = $self->param( 'key' );
-        $params->{ VALUE } = $self->param( 'value' );    
+        $params->{ key } = $self->param( 'key' );
+        $params->{ value } = $self->param( 'value' );
     }
 
-    # map those parameters 1:1 to the API method    
+    # map those parameters 1:1 to the API method
     foreach my $key (qw( namespace encrypt force expiration_date )) {
         my $val =  $self->param($prefix.$key);
         if (defined $val) {
-            $params->{ uc($key) } = $val;            
+            $params->{ $key } = $val;
         }
     }
-    
+
     # check for mandatory fields
-    foreach my $key (qw( namespace key encrypt force )) {                
-        if ( not defined $params->{ uc($key) } ) {
+    foreach my $key (qw( namespace key encrypt force )) {
+        if ( not defined $params->{ $key } ) {
             OpenXPKI::Exception->throw( message =>
                 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_' .
-                'MISSPARAM_' . uc($key) 
+                'MISSPARAM_' . uc($key)
             );
         }
     }
 
-    if (defined $params->{EXPIRATION_DATE}) {
-	    my $then = OpenXPKI::DateTime::get_validity({
+    if (defined $params->{expiration_date}) {
+        my $then = OpenXPKI::DateTime::get_validity({
             REFERENCEDATE  => DateTime->now(),
-            VALIDITY       => $params->{EXPIRATION_DATE},
+            VALIDITY       => $params->{expiration_date},
             VALIDITYFORMAT => 'detect',
-	    });
-	    $params->{EXPIRATION_DATE} = $then->epoch();
+        });
+        $params->{expiration_date} = $then->epoch();
     }
 
-    CTX('api')->set_data_pool_entry($params);
-    CTX('dbi_backend')->commit();
+    if ($self->param('pki_realm')) {
+        if ($self->param('pki_realm') eq '_global') {
+            $params->{pki_realm} = '_global';
+        } elsif($self->param('pki_realm') ne CTX('session')->data->pki_realm) {
+            workflow_error( 'Access to foreign realm is not allowed' );
+        }
+    }
 
-    # we support this feature only in legacy mode 
+    CTX('api2')->set_data_pool_entry(%$params);
+
+    # we support this feature only in legacy mode
     if ($self->param('ds_unset_context_value')) {
-    	##! 16: 'clearing context parameter ' . $valparam
+        ##! 16: 'clearing context parameter ' . $valparam
         my $valparam  = $self->param('ds_value_param');
-	    $context->param( $valparam => undef );
+        $context->param( $valparam => undef );
     }
 
-    CTX('log')->log(
-        MESSAGE => 'Set datapool entry for key '.$params->{KEY}.' in namespace '.$params->{NAMESPACE},
-        PRIORITY => 'info',
-        FACILITY => [ 'application' ],
-    );
+    CTX('log')->application()->info('Set datapool entry for key '.$params->{key}.' in namespace '.$params->{namespace});
+
 
     # TODO: handle return code from set_data_pool_entry()
 
@@ -118,8 +119,8 @@ This class sets an entry in the Datapool.
 
 =head2 Parameters
 
-In the activity definition, the following parameters must be set. The syntax 
-using the I<ds_> prefix is deprecated, use the I<_map> syntax to load key and 
+In the activity definition, the following parameters must be set. The syntax
+using the I<ds_> prefix is deprecated, use the I<_map> syntax to load key and
 value from the context. It is not allowed to mix prefixed and non-prefixed
 parameters!
 
@@ -144,7 +145,7 @@ Causes the set action to overwrite an existing entry.
 
 Sets expiration date of the datapool entry to the specified value.
 The value should be a time specification recognized by OpenXPKI::DateTime
-autodetection. (such as '+000001', which means one day), a terse data or 
+autodetection. (such as '+000001', which means one day), a terse data or
 epoch. See OpenXPKI::DateTime::get_validity for details.
 
 =item key
@@ -155,6 +156,14 @@ The value used as datapool key, use I<_map> syntax to use values from context!
 
 The actual value written to the datapool, use I<_map> syntax to use values
 from context!
+
+=item pki_realm
+
+The realm of the datapool item to load, default is the current realm.
+
+B<Note:> For security reasons it is not allowed to load items from other
+realms except from special I<system> realms. The only system realm
+defined for now is I<_global> which is available from all other realms.
 
 =item ds_key_param, deprecated
 
@@ -190,11 +199,11 @@ I<ds_value_param> parameters.
             _map_key: $token_id
             _map_value: $_puk
             encrypt: 1
-            force: 1            
-            expiration_date: "+10"        
+            force: 1
+            expiration_date: "+10"
 
 =head2 Example (Legacy format - same result as above)
-  
+
     set_puk_in_datapool:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
         param:
@@ -205,4 +214,4 @@ I<ds_value_param> parameters.
             ds_force: 1
             ds_unset_context_value: 0
             ds_expiration_date: "+10"
-        
+

@@ -50,14 +50,9 @@ sub evaluate {
     }
 
     condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SCEPCLIENT_INVALID_TID');
-    CTX('log')->log(
-        MESSAGE => 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_SCEPCLIENT_INVALID_TID',
-        PARAMS => {
-            SCEP_TID => (defined $scep_tid ? $scep_tid : '<undef>'),
-            SCEP_TIT_LEN => length($scep_tid),            
-        },
-        FACILITY => [ 'application', ],                     
-    );
+
+    CTX('log')->application()->info("Received SCEP transaction id is invalid");
+    CTX('log')->application()->debug("transaction id is $scep_tid");
 
 }
 

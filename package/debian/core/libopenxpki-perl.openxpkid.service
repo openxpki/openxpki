@@ -1,0 +1,11 @@
+[Unit]
+Description=OpenXPKI Trustcenter Backend
+After=network.target apache2.service
+
+[Service]
+ExecStart=/usr/bin/openxpkictl start
+ExecStop=/usr/bin/openxpkictl stop
+ExecReload=/usr/bin/openxpkictl reload
+Type=forking
+KillMode=process
+Restart=on-failure

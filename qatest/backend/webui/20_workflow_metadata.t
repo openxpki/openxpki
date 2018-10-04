@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 
-use lib qw(../../lib);
+use FindBin qw( $Bin );
+use lib "$Bin/../../lib";
+
 use strict;
 use warnings;
 use CGI::Session;
@@ -13,7 +15,7 @@ use MockUI;
 #Log::Log4perl->easy_init($DEBUG);
 Log::Log4perl->easy_init($ERROR);
 
-use Test::More tests => 8;
+use Test::More tests => 6;
 
 package main;
 
@@ -40,30 +42,7 @@ $buffer = JSON->new->decode($buffer);
 my $cert_identifier = $buffer->{cert_identifier};
 
 my $result;
-my $client = MockUI->new({
-    session => $session,
-    logger => $log,
-    config => { socket => '/var/openxpki/openxpki.socket' }
-});
-
-
-$result = $client->mock_request({
-    page => 'login'
-});
-
-is($result->{page}->{label}, 'Please log in');
-is($result->{main}->[0]->{action}, 'login!stack');
-
-$result = $client->mock_request({
-    'action' => 'login!stack',
-    'auth_stack' => "Testing",
-});
-
-$result = $client->mock_request({
-    'action' => 'login!password',
-    'username' => 'raop',
-    'password' => 'openxpki'
-});
+my $client = MockUI::factory();
 
 $result = $client->mock_request({
     'page' => 'workflow!index!wf_type!change_metadata',
@@ -79,7 +58,7 @@ like($result->{goto}, qr/workflow!load!wf_id!\d+/, 'Got redirect');
 
 my ($wf_id) = $result->{goto} =~ /workflow!load!wf_id!(\d+)/;
 
-diag("Workflow Id is $wf_id");
+note("Workflow Id is $wf_id");
 
 $result = $client->mock_request({
     'page' => $result->{goto},
@@ -88,14 +67,7 @@ $result = $client->mock_request({
 $result = $client->mock_request({
     'action' => 'workflow!index',
     'wf_token' => undef,
-    'meta_email[]' => [ 'mail1@openxpki.org', 'mail2@openxpki.org' ],
-});
-
-
-$result = $client->mock_request({
-    'action' => 'workflow!index',
-    'wf_token' => undef,
-    'meta_email[]' => [ 'mail1@openxpki.org', 'mail2@openxpki.org' ],
+    'meta_email' =>  'mail1@openxpki.org',
 });
 
 $result = $client->mock_request({
@@ -104,6 +76,5 @@ $result = $client->mock_request({
 
 
 is ($result->{status}->{level}, 'success', 'Status is success');
-
-is( $result->{main}->[0]->{content}->{data}->[3]->{value}->[0], 'mail1@openxpki.org', 'data validated');
+is( $result->{main}->[0]->{content}->{data}->[3]->{value}, 'mail1@openxpki.org', 'data validated');
 

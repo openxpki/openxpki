@@ -23,14 +23,14 @@ sub get_command
     my $engine = "";
     my $engine_usage = $self->{ENGINE}->get_engine_usage();
     $engine = $self->{ENGINE}->get_engine()
-        if ($self->{ENGINE}->get_engine() and                                                  
+        if ($self->{ENGINE}->get_engine() and
             (($engine_usage =~ m{ ALWAYS }xms) or
              ($engine_usage =~ m{ PRIV_KEY_OPS }xms)));
-             
-    $self->{PKCS12_PASSWD} = $self->{PASSWD} 
+
+    $self->{PKCS12_PASSWD} = $self->{PASSWD}
         if (not exists $self->{PKCS12_PASSWD});
-    
-                
+
+
     ## check parameters
 
     if (not $self->{KEY})
@@ -53,13 +53,13 @@ sub get_command
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS12_EMPTY_PASSWD");
     }
-    
+
     if (length ($self->{PKCS12_PASSWD}) < 4)
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS12_PASSWD_TOO_SHORT");
-    } 
-    
+    }
+
     if (exists $self->{CSP}) {
         # input validation, as this will be passed on to the
         # command, i.e. a shell
@@ -73,7 +73,7 @@ sub get_command
             );
         }
     }
-        
+
     if ($self->{ALIAS}) {
         # input validation, as this will be passed on to the
         # command, i.e. a shell
@@ -91,16 +91,16 @@ sub get_command
 
     $self->write_file (FILENAME => $self->{KEYFILE},
                        CONTENT  => $self->{KEY},
-	               FORCE    => 1);
+                   FORCE    => 1);
     $self->write_file (FILENAME => $self->{CERTFILE},
                        CONTENT  => $self->{CERT},
-	               FORCE    => 1);
+                   FORCE    => 1);
     if (exists $self->{CHAIN} && scalar @{$self->{CHAIN}}) {
         my $chain = join("\n", @{$self->{CHAIN}});
         $self->write_file(
             FILENAME => $self->{CHAINFILE},
             CONTENT  => $chain,
-	        FORCE    => 1
+            FORCE    => 1
         );
     } else {
         $self->{CHAIN} = undef;
@@ -113,10 +113,10 @@ sub get_command
     $command .= " -inkey ".$self->{KEYFILE};
     $command .= " -in ".$self->{CERTFILE};
     $command .= " -out ".$self->{OUTFILE};
-    
+
     $command .= " -keypbe ".$self->{KEY_PBE} if ($self->{KEY_PBE});
     $command .= " -certpbe ".$self->{CERT_PBE} if ($self->{CERT_PBE});
-        
+
     $command .= " -name " . $self->{ALIAS} if ($self->{ALIAS});
 
     if (defined $self->{CSP}) {
@@ -129,14 +129,14 @@ sub get_command
 
     $command .= " -passin env:pwd";
     $self->set_env ("pwd" => $self->{PASSWD});
-    
+
     $command .= " -passout env:p12pwd";
     if ($self->{PKCS12_PASSWD} && !$self->{NOPASSWD}) {
         $self->set_env ('p12pwd' => $self->{PKCS12_PASSWD});
     } else {
         $self->set_env ('p12pwd' => '');
     }
-    
+
     return [ $command ];
 }
 
@@ -186,7 +186,7 @@ not designed for the tokens themselves.
 =item * PKCS12_PASSWD (optional)
 
 If you do not specify this option then we use PASSWD to encrypt the new
-PKCS#12 file.  To export the key without password, you must explicitly 
+PKCS#12 file.  To export the key without password, you must explicitly
 set NOPASSWD to 1.
 
 =item * NOPASSWD (optional)

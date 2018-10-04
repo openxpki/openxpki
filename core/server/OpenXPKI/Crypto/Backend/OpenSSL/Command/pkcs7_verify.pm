@@ -56,12 +56,12 @@ sub get_command
     if ($self->{CONTENT}) {
         $self->write_file (FILENAME => $self->{CONTENTFILE},
                            CONTENT  => $self->{CONTENT},
-    	               FORCE    => 1);
+                       FORCE    => 1);
     }
 
     $self->write_file (FILENAME => $self->{PKCS7FILE},
                        CONTENT  => $self->{PKCS7},
-	               FORCE    => 1);
+                   FORCE    => 1);
 
     ## build the command
 

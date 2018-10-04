@@ -21,7 +21,6 @@ sub execute
     my $self       = shift;
     my $workflow   = shift;
     my $context    = $workflow->context();
-    my $default_token = CTX('api')->get_default_token();
 
     my $key_alg = $self->param('key_alg');
     ##! 16: 'key_type: ' . $key_type
@@ -71,11 +70,11 @@ sub execute
          PARAMS     => $param,
     });
 
-    CTX('log')->log(
-    	MESSAGE => 'Created ' . $key_alg . ' private key for ' . $context->param('creator'),
-    	PRIORITY => 'info',
-    	FACILITY => 'audit',
-	);
+
+    CTX('log')->audit('key')->info("generating private key", {
+        'key_alg' => $key_alg,
+        %{$param}
+    });
 
     my $target_key = $self->param('target_key') || 'private_key';
 
@@ -102,10 +101,10 @@ written to the context parameter private_key.
 
 =head2 Activity Parameters
 
-The key specification parameters are not validated and handed over to the 
+The key specification parameters are not validated and handed over to the
 generate_key method of the crypto token.
 
-=over 
+=over
 
 =item key_alg
 

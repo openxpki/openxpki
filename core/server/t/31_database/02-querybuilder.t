@@ -3,21 +3,19 @@ use warnings;
 use English;
 use Test::More;
 use Test::Exception;
-use File::Spec::Functions qw( catfile catdir splitpath rel2abs );
-
-my $basedir = catdir((splitpath(rel2abs(__FILE__)))[0,1]);
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($ENV{TEST_VERBOSE} ? $ERROR : $OFF);
 
 #
 # setup
 #
-use_ok "OpenXPKI::Server::Log";
-my $log;
-lives_ok { $log = OpenXPKI::Server::Log->new(CONFIG => catfile($basedir, "log4perl.conf")) };
+my $log = Log::Log4perl->get_logger;
 
 use_ok("OpenXPKI::Server::Database");
 my $dbi;
 lives_ok { $dbi = OpenXPKI::Server::Database->new(
-    log => $log, db_params => { type => "SQLite", name => ":memory:" },
+    log => $log,
+    db_params => { type => "SQLite", name => ":memory:" },
 ) } "dbi instance";
 
 #

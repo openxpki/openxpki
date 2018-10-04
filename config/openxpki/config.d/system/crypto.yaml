@@ -1,9 +1,10 @@
-# API classs to be used for different types of *realm* tokens 
+# API classs to be used for different types of *realm* tokens
 # Undefined values default to OpenXPKI::Crypto::Backend::API
 tokenapi:
   certsign:      OpenXPKI::Crypto::Backend::API
   crlsign:       OpenXPKI::Crypto::Backend::API
   datasafe:      OpenXPKI::Crypto::Backend::API
+# scep:          OpenXPKI::Crypto::Tool::LibSCEP::API
   scep:          OpenXPKI::Crypto::Tool::SCEP::API
 
 
@@ -22,12 +23,12 @@ token:
         wrapper: ''
 
         # random file to use for OpenSSL
-        randfile: /var/openxpki/rand       
-     
+        randfile: /var/openxpki/rand
+
     javaks:
         backend: OpenXPKI::Crypto::Tool::CreateJavaKeystore
-        api: OpenXPKI::Crypto::Tool::CreateJavaKeystore::API    
-        engine:  OpenSSL        
+        api: OpenXPKI::Crypto::Tool::CreateJavaKeystore::API
+        engine:  OpenSSL
         key_store: OPENXPKI
         shell: /usr/bin/keytool
         randfile: /var/openxpki/rand

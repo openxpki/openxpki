@@ -9,7 +9,7 @@ use OpenXPKI::Client;
 use Data::Dumper;
 use OpenXPKI::Serialization::Simple;
 
-diag("Certificate revocation request workflow\n") if $ENV{VERBOSE};
+note("Certificate revocation request workflow\n");
 
 TODO: {
     todo_skip 'See Issue #188', 23;

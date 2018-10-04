@@ -19,22 +19,19 @@ sub execute {
     my $workflow   = shift;
     my $context   = $workflow->context();
     my $config = CTX('config');
-    
+
     my $server = $context->param('server');
-    
-#    my $pki_realm  = CTX('session')->get_pki_realm();
+
+#    my $pki_realm  = CTX('session')->data->pki_realm;
 
     my @policy_params = $config->get_keys("scep.$server.policy");
 
     foreach my $key (@policy_params) {
-        $context->param( "p_$key" => $config->get("scep.$server.policy.$key") );        
+        $context->param( "p_$key" => $config->get("scep.$server.policy.$key") );
     }
 
-    CTX('log')->log(
-        MESSAGE => "SCEP policy loaded for $server", 
-        PRIORITY => 'debug',
-        FACILITY => 'application',
-    );       
+    CTX('log')->application()->debug("SCEP policy loaded for $server");
+
 
     # Set static policy for our test CA
     #$context->param( p_allow_anon_enroll => 0 );
@@ -57,6 +54,6 @@ This activity fetches the group policy for the SCEPv2 workflow.
 
 The policy is read from the config connector at scep.$server.policy where
 server is the name of the server instance as given by the scep client.
-The I<p_> prefix is always added by the activitiy! 
+The I<p_> prefix is always added by the activitiy!
 
 

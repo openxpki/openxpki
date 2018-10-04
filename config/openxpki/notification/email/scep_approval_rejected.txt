@@ -6,5 +6,4 @@ has been rejected.
 
 If you have any questions on this matter, please contact us.
 
-Regards,
-  PKI Team
+[% INCLUDE _footer.txt %]

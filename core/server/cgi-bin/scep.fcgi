@@ -18,6 +18,7 @@ use OpenXPKI::Client::Config;
 use OpenXPKI::Serialization::Simple;
 
 use Log::Log4perl;
+use Log::Log4perl::MDC;
 
 our $config = OpenXPKI::Client::Config->new('scep');
 my $log = $config->logger();
@@ -29,19 +30,22 @@ my $json = new JSON();
 while (my $cgi = CGI::Fast->new()) {
 
     my $conf = $config->config();
- 
+
+    my $service = $conf->{global}->{service} || 'SCEP';
     my $socket  = $conf->{global}->{socket};
     my $realm   = $conf->{global}->{realm};
     my $iprange = $conf->{global}->{iprange};
-    my $profile = $conf->{global}->{profile};
     my $server  = $conf->{global}->{servername};
     my $enc_alg = $conf->{global}->{encryption_algorithm};
     my $hash_alg = $conf->{global}->{hash_algorithm};
 
+
     my $log = $config->logger();
+    Log::Log4perl::MDC->put('endpoint', $config->endpoint());
+    Log::Log4perl::MDC->put('server', $server);
 
     # the allowed IP range from the config file
-    my $allowed_range = new NetAddr::IP $iprange; 
+    my $allowed_range = new NetAddr::IP $iprange;
 
     my $requesting_host = new NetAddr::IP $ENV{'REMOTE_ADDR'}; # the host
 
@@ -53,13 +57,13 @@ while (my $cgi = CGI::Fast->new()) {
            -type => 'text/plain',
            -status => '403 Access denied'
         );
-        
+
         print "Access to this service was denied by configuration.";
-        
+
         $log->error("Unauthorized access from $requesting_host");
         next;
-    } 
-    
+    }
+
     # Fetch SCEP message from CGI (cf. Section 3.1 of the SCEP draft)
     # http://www.ietf.org/internet-drafts/draft-nourse-scep-13.txt
     my $operation = $cgi->param('operation') || '';
@@ -82,26 +86,38 @@ while (my $cgi = CGI::Fast->new()) {
 
     # OpenXPKI::Client::SCEP does the actual work
     my $scep_client = OpenXPKI::Client::SCEP->new({
-        SERVICE    => 'SCEP',
+        SERVICE    => $service,
         REALM      => $realm,
         SOCKETFILE => $socket,
         TIMEOUT    => 120, # TODO - make configurable?
-        PROFILE    => $profile,
-        OPERATION  => $operation,
-        MESSAGE    => $message,
         SERVER     => $server,
         ENCRYPTION_ALGORITHM => $enc_alg,
         HASH_ALGORITHM => $hash_alg
     });
+
     if (! defined $scep_client) {
         $log->error("Error creating SCEP Client instance!");
         die "Error creating SCEP Client instance!";
     }
-    my $result = $scep_client->send_request($params);
-    print $result;
-    
-    $log->debug('Response send');
+
+    my $result = $scep_client->send_request($operation, $message, $params);
+
+    if ($result) {
+        print $result;
+        $log->debug('Response send');
+    } else {
+        print $cgi->header(
+           -type => 'text/plain',
+           -status => '500 Internal Server Error'
+        );
+        print "SCEP Response was empty";
+        $log->error('SCEP response is empty');
+    }
 }
+
+1;
+
+__END__;
 
 =head1 Description
 
@@ -121,7 +137,6 @@ The config file is parsed using Config::Std, all params are mandatory.
     socket=/var/openxpki/openxpki.socket
     realm=ca-one
     iprange=0.0.0.0/0
-    profile=I18N_OPENXPKI_PROFILE_TLS_SERVER
     servername=tls-scep-1
     encryption_algorithm=3DES
 
@@ -140,11 +155,6 @@ The realm of the ca to be used.
 Implements a simple ip based access control, the clients ip adress is checked
 to be included in the given network. Only a single network definition is
 supported, the default of 0.0.0.0/0 allows all ips to connect.
-
-=item profile
-
-The profile of the certificate to be requested, note that depending on the
-backing workflow this might be ignored or overridden by other paramters.
 
 =item servername
 

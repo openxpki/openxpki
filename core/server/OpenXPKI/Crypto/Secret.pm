@@ -1,4 +1,4 @@
-## OpenXPKI::Crypto::Secret.pm 
+## OpenXPKI::Crypto::Secret.pm
 ##
 ## Written 2006 by Martin Bartosch for the OpenXPKI project
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
@@ -20,80 +20,80 @@ use OpenXPKI::Exception;
 {
     my %impl : ATTR;
     my %exportable : ATTR( :default(0) );
-    
+
 
     sub START {
-	my ($self, $ident, $arg_ref) = @_;
+    my ($self, $ident, $arg_ref) = @_;
 
-	# only in Command.pm base class: get implementation
-	if (ref $self eq 'OpenXPKI::Crypto::Secret') {
-	    $self->attach_impl($arg_ref);
-	}
+    # only in Command.pm base class: get implementation
+    if (ref $self eq 'OpenXPKI::Crypto::Secret') {
+        $self->attach_impl($arg_ref);
+    }
     }
 
     sub attach_impl : PRIVATE {
-	my $self = shift;
-	my $ident = ident $self;
-	my $arg_ref = shift;
+    my $self = shift;
+    my $ident = ident $self;
+    my $arg_ref = shift;
 
-	my $type = 'Plain';
-	if (defined $arg_ref 
-	    && defined $arg_ref->{TYPE} 
-	    && (ref $arg_ref->{TYPE} eq '')) {
-	    $type = $arg_ref->{TYPE};
-	}
+    my $type = 'Plain';
+    if (defined $arg_ref
+        && defined $arg_ref->{TYPE}
+        && (ref $arg_ref->{TYPE} eq '')) {
+        $type = $arg_ref->{TYPE};
+    }
 
     # Mark exportable
     if (defined $arg_ref->{EXPORT} && $arg_ref->{EXPORT}) {
         $exportable{$ident} = 1;
-    } 
+    }
 
-	my $base = 'OpenXPKI::Crypto::Secret';
-	my $class = $base . '::' . $type;
+    my $base = 'OpenXPKI::Crypto::Secret';
+    my $class = $base . '::' . $type;
 
-	##! 8: "try to load class $class"
-	eval "use $class;";
-	if ($EVAL_ERROR) {
-	    OpenXPKI::Exception->throw(
-		message => "I18N_OPENXPKI_CRYPTO_SECRET_IMPLEMENTATION_UNAVAILABLE",
-		params  => 
-		{
-		    EVAL_ERROR => $EVAL_ERROR,
-		    MODULE     => $class,
-		});
-	}
+    ##! 8: "try to load class $class"
+    eval "use $class;";
+    if ($EVAL_ERROR) {
+        OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_CRYPTO_SECRET_IMPLEMENTATION_UNAVAILABLE",
+        params  =>
+        {
+            EVAL_ERROR => $EVAL_ERROR,
+            MODULE     => $class,
+        });
+    }
 
-	$impl{$ident} = eval "$class->new(\$arg_ref)";
+    $impl{$ident} = eval "$class->new(\$arg_ref)";
 
-	if (! defined $impl{$ident}) {
-	    OpenXPKI::Exception->throw(
-		message => "I18N_OPENXPKI_CRYPTO_SECRET_INSTANTIATION_FAILED",
-		params  => 
-		{
-		    EVAL_ERROR => $EVAL_ERROR,
-		    MODULE     => $class,
-		});
-	}
+    if (! defined $impl{$ident}) {
+        OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_CRYPTO_SECRET_INSTANTIATION_FAILED",
+        params  =>
+        {
+            EVAL_ERROR => $EVAL_ERROR,
+            MODULE     => $class,
+        });
+    }
 
-	return 1;
+    return 1;
     }
 
     # dispatch client call to secret class implementation
     sub AUTOMETHOD {
-	my ($self, $ident, @other_args) = @_;
-	
-	##! 1: "AUTOMETHOD($_)"
+    my ($self, $ident, @other_args) = @_;
 
-	my $method = $_;
-	return sub {
-	    return $impl{$ident}->$method(@other_args);
-	}
+    ##! 1: "AUTOMETHOD($_)"
+
+    my $method = $_;
+    return sub {
+        return $impl{$ident}->$method(@other_args);
     }
-    
+    }
+
     sub is_exportable {
         ##! 1: 'start'
         my $self = shift;
-        my $ident = ident $self;        
+        my $ident = ident $self;
         return $exportable{$ident} ? 1 : 0;
     }
 
@@ -110,7 +110,7 @@ OpenXPKI::Crypto::Secret - Base class for secrets (e. g. PINs).
 Base class for secret storage.
 
 Subclasses must implement the methods set_secret(), get_secret() and
-is_complete(). 
+is_complete().
 
 If the secret is fully known, the subclass must return a true value
 whenever is_complete() is called.
@@ -135,7 +135,7 @@ Must be implemented by subclasses.
 
 =head3 is_exportable
 
-If this secret value should be exposed outside the crypto manager. 
+If this secret value should be exposed outside the crypto manager.
 
 =head3 get_secret
 
@@ -144,6 +144,6 @@ Must be implemented by subclasses.
 
 =head3 set_secret
 
-Sets (part of) the secret. 
+Sets (part of) the secret.
 Must be implemented by subclasses.
 

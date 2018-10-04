@@ -11,10 +11,10 @@ PACKAGE			:= myperl-openxpki-i18n
 SRCBASE			:= $(TOPDIR)/core/i18n
 SRCNAME			:= $(PACKAGE)
 
-# Makefile.inc contains common settings for all packages (checked in)
-include ../Makefile.inc
 # Makefile.local may be used locally to override settings (not checked in)
 -include ../Makefile.local
+# Makefile.inc contains common settings for all packages (checked in)
+include ../Makefile.inc
 
 OXI_VERSION 		:= $(shell $(VERGEN) --format version)
 

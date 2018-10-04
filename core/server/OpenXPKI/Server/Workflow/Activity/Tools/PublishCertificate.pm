@@ -42,11 +42,8 @@ sub execute {
     my $prefix = $self->param('prefix');
     if (defined $prefix) {
         if (!$prefix || !$config->exists( $prefix )) {
-            CTX('log')->log(
-                MESSAGE => 'Publication in prefix mode but prefix not set or empty',
-                PRIORITY => 'debug',
-                FACILITY => [ 'application' ],
-            );
+            CTX('log')->application()->debug('Publication in prefix mode but prefix not set or empty');
+
             return 1;
         }
 
@@ -88,36 +85,28 @@ sub execute {
     ##! 16: 'Start publishing - load certificate for identifier ' . $cert_identifier
 
     # Load and convert the certificate
-    CTX('dbi_backend')->commit();
-    my $hash = CTX('dbi_backend')->first (
-        TABLE => 'CERTIFICATE',
-        DYNAMIC => {
-           IDENTIFIER => { VALUE => $cert_identifier },
+    my $cert = CTX('dbi')->select_one(
+        from => 'certificate',
+        columns => [ 'data', 'subject' ],
+        where => {
+           identifier => $cert_identifier,
         },
     );
 
-    if (!$hash || !$hash->{DATA}) {
+    if (!$cert || !$cert->{data}) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CERTIFICATE_UNABLE_TO_LOAD_CERTIFICATE',
             params => { 'CERT_IDENTIFIER' => $cert_identifier },
-            log => {
-                logger => CTX('log'),
-                priority => 'error',
-                facility => 'system',
-            },
         );
     }
 
-    CTX('log')->log(
-        MESSAGE => 'Publication for ' . $hash->{SUBJECT} . ', targets ' . join(",", @target),
-        PRIORITY => 'debug',
-        FACILITY => [ 'application' ],
-    );
+    CTX('log')->application()->debug('Publication for ' . $cert->{subject} . ', targets ' . join(",", @target));
+
 
     # Prepare the data
     my $data = {};
-    $data->{pem} = $hash->{DATA};
-    $data->{subject} = $hash->{SUBJECT};
+    $data->{pem} = $cert->{data};
+    $data->{subject} = $cert->{subject};
 
     # Convert to DER
     $data->{der} = $default_token->command({
@@ -129,11 +118,6 @@ sub execute {
     if (!defined $data->{der} || $data->{der} eq '') {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CERTIFICATES_COULD_NOT_CONVERT_CERT_TO_DER',
-            log => {
-            logger => CTX('log'),
-                priority => 'error',
-                facility => 'system',
-            },
         );
     }
 
@@ -142,11 +126,8 @@ sub execute {
 
     # Defined but empty, stop publication
     if (defined($publish_key) && !$publish_key) {
-        CTX('log')->log(
-            MESSAGE => 'Dont publish as publish_key is defined but empty for ' .$data->{subject},
-            PRIORITY => 'info',
-            FACILITY => [ 'application' ],
-        );
+        CTX('log')->application()->info('Dont publish as publish_key is defined but empty for ' .$data->{subject});
+
         return 1;
     }
 
@@ -160,11 +141,6 @@ sub execute {
         if (!$rdn_hash{CN}[0]) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CERTIFICATES_UNABLE_TO_PARSE_SUBJECT',
-                log => {
-                logger => CTX('log'),
-                    priority => 'error',
-                    facility => 'system',
-                },
             );
         }
         $publish_key = $rdn_hash{CN}[0];
@@ -173,11 +149,8 @@ sub execute {
 
     ##! 32: 'Data for publication '. Dumper ( $data )
 
-    CTX('log')->log(
-        MESSAGE => 'Start publication to '.$publish_key.' for ' .$data->{subject},
-        PRIORITY => 'info',
-        FACILITY => [ 'application' ],
-    );
+    CTX('log')->application()->info('Start publication to '.$publish_key.' for ' .$data->{subject});
+
 
     # Required for special connectors (grabbing extended data from the workflow)
     # TODO: should be replaced by e.g. a static factory
@@ -192,54 +165,45 @@ sub execute {
         my $queue =  $context->param( 'tmp_publish_queue' );
         ##! 16: 'Load targets from context queue'
         if (!ref $queue) {
-            $queue  = OpenXPKI::Serialization::Simple->new()->deserialize( $queue ); 
+            $queue  = OpenXPKI::Serialization::Simple->new()->deserialize( $queue );
         }
         @target = @{$queue};
     }
-    
+
     my $on_error = $self->param('on_error') || '';
     my @failed;
     ##! 32: 'Targets ' . Dumper \@target
     foreach my $target (@target) {
         eval{ $config->set( [ @path, $target, $publish_key ], $data, $param ); };
-        if ($EVAL_ERROR) {
+        if (my $eval_err = $EVAL_ERROR) {
             if ($on_error eq 'queue') {
                 push @failed, $target;
-                CTX('log')->log(
-                    MESSAGE => "Entity pubication failed for target $target, requeuing",
-                    PRIORITY => 'info',
-                    FACILITY => [ 'application' ],
-                );
+                CTX('log')->application()->info("Entity publication failed for target $target, requeuing");
+
             } elsif ($on_error eq 'skip') {
-                CTX('log')->log(
-                    MESSAGE => "Entity pubication failed for target $target and skip is set",
-                    PRIORITY => 'warn',
-                    FACILITY => [ 'application' ],
-                );
+                CTX('log')->application()->warn("Entity publication failed for target $target and skip is set");
+
             } else {
                 OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PUBLICATION_FAILED',
                     params => {
                         TARGET => $target,
-                        ERROR => $EVAL_ERROR 
+                        ERROR => $eval_err
                     }
                 );
             }
         } else {
-            CTX('log')->log(
-                MESSAGE => "Entity pubication to $target for ". $publish_key." done",
-                PRIORITY => 'debug',
-                FACILITY => [ 'application' ],
-            );
+            CTX('log')->application()->debug("Entity pubication to $target for ". $publish_key." done");
+
         }
     }
-  
+
     if (@failed) {
         $context->param( 'tmp_publish_queue' => \@failed );
         $self->pause('I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION');
         # pause stops execution of the remaining code
     }
-    
+
     $context->param( { 'tmp_publish_queue' => undef });
 
     ##! 4: 'end'
@@ -337,6 +301,6 @@ the queue is not empty, pause/wake_up is used to retry those targets
 with the retry parameters set. This obvioulsy requires I<retry_count>
 to be set.
 
-=back 
+=back
 
 =back

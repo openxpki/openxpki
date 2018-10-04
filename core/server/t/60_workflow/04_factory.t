@@ -8,7 +8,7 @@ plan tests => 2;
 
 use_ok('OpenXPKI::Workflow::Factory', 'class loading');
 
-diag "OpenXPKI specific workflow factory" if $ENV{VERBOSE};
+note "OpenXPKI specific workflow factory";
 
 my $instance1 = OpenXPKI::Workflow::Factory->new();
 my $instance2 = OpenXPKI::Workflow::Factory->new();

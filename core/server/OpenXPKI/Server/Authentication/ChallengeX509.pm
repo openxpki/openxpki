@@ -37,19 +37,19 @@ sub login_step {
         # remember the challenge (which could only be done in the
         # session anyways as people might talk to different servers
         # in different login steps) ...
-        my $challenge = CTX('session')->get_id();
+        my $challenge = CTX('session')->data->id;
         ##! 64: 'challenge: ' . $challenge
         # save the pending challenge to check later that we
         # received a valid challenge
 
         return (undef, undef,
             {
-		SERVICE_MSG => "GET_X509_LOGIN",
-		PARAMS      => {
+        SERVICE_MSG => "GET_X509_LOGIN",
+        PARAMS      => {
                     NAME        => $self->{NAME},
                     DESCRIPTION => $self->{DESC},
                     CHALLENGE   => $challenge,
-	        },
+            },
             },
         );
     }
@@ -58,7 +58,7 @@ sub login_step {
         ##! 2: 'login data / signature received'
         my $challenge = $msg->{PARAMS}->{CHALLENGE};
         my $signature = $msg->{PARAMS}->{SIGNATURE};
-        my $pki_realm = CTX('session')->get_pki_realm();
+        my $pki_realm = CTX('session')->data->pki_realm;
 
         if ($signature !~ m{ \A .* \n \z }xms) {
             # signature does not end with \n, add it
@@ -67,13 +67,13 @@ sub login_step {
         ##! 64: 'challenge: ' . $challenge
         ##! 64: 'signature: ' . $signature
 
-        if ($challenge ne CTX('session')->get_id()) {
+        if ($challenge ne CTX('session')->data->id) {
             # the sent challenge is not for this session ID
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CHALLENGE_DOES_NOT_MATCH_SESSION_ID',
                 params  => {
                     CHALLENGE  => $challenge,
-                    SESSION_ID => CTX('session')->get_id(),
+                    SESSION_ID => CTX('session')->data->id,
                 },
             );
         }
@@ -112,8 +112,8 @@ sub login_step {
         # Looks like firefox adds \r to the p7
         $pkcs7 =~ s/\r//g;
         my $validate = CTX('api')->validate_certificate({
-        	PKCS7 => $pkcs7,
-        	ANCHOR => $self->trust_anchors(),
+            PKCS7 => $pkcs7,
+            ANCHOR => $self->trust_anchors(),
         });
 
         return $self->_validation_result( $validate );

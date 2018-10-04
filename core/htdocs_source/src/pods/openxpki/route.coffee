@@ -14,13 +14,14 @@ Route = Em.Route.extend
             beforeSend: (xhr) ->
                 xhr.setRequestHeader "X-OPENXPKI-Client", "1"
 
-    needReboot: [ "login", "logout", "welcome" ]
+    needReboot: [ "login", "logout", "login!logout", "welcome" ]
 
     source: Em.computed -> Em.Object.create
         page: null
         ping: null
         refresh: null
         structure: null
+        rtoken: null
         status: null
         tabs: []
         navEntries: []
@@ -49,7 +50,7 @@ Route = Em.Route.extend
 
         if entries.findBy "key", req.model_id
             data.target = "top"
-        else if req.model_id is "login"
+        else if req.model_id in @needReboot
             data.target = "top"
 
         source = @get "source"
@@ -75,6 +76,10 @@ Route = Em.Route.extend
         $(".loading").addClass "in-progress"
 
         source = @get "source"
+
+        if req.type is "POST"
+            req.data._rtoken = source.rtoken
+
         target = req.data.target or "self"
         if target is "self"
             if source.get "modal"
@@ -118,6 +123,7 @@ Route = Em.Route.extend
                 else if doc.structure
                     source.set "navEntries", doc.structure
                     source.set "user", doc.user
+                    source.set "rtoken", doc.rtoken
 
                 else
                     if doc.page and doc.main
@@ -147,8 +153,12 @@ Route = Em.Route.extend
 
                 source.endPropertyChanges()
                 resolve doc
-            , (err) ->
+            , (err) =>
                 $(".loading").removeClass "in-progress"
+                @controllerFor("openxpki").set("model", source)
+                Em.run.scheduleOnce "afterRender", ->
+                    $ ".modal.oxi-error-modal"
+                    .modal "show"
                 source.set "error",
                     message: "The server did not return JSON data as
                     expected.\nMaybe your authentication session has expired."

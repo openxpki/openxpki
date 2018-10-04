@@ -1,10 +1,10 @@
-package OpenXPKI::Test::More::Workflow::TestPausedWorkflow;
+package OpenXPKI::Test::QA::More::Workflow::TestPausedWorkflow;
 
 
 use Data::Dumper;
 
 {
-    use base qw( OpenXPKI::Test::More );
+    use base qw( OpenXPKI::Test::QA::More );
     sub wftype { return qw( I18N_OPENXPKI_WF_TYPE_TESTING ) };
 
     sub proc_state_is {
@@ -35,12 +35,12 @@ use Data::Dumper;
         
         #difference should be 5 secs
         my $timestamp_expected = OpenXPKI::DateTime::get_validity(
-            	    {		
-            		REFERENCEDATE => $last_update,
-            		VALIDITY => $expected_diff,
-                	VALIDITYFORMAT => 'relativedate',
-            	    },
-            	)->epoch();
+                    {        
+                    REFERENCEDATE => $last_update,
+                    VALIDITY => $expected_diff,
+                    VALIDITYFORMAT => 'relativedate',
+                    },
+                )->epoch();
         
         $self->is($timestamp,$timestamp_expected, $testname);
         

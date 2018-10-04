@@ -1,5 +1,5 @@
 {{#if button.href}}
-    <a class="{{klass}}" href="{{button.href}}" target="_blank" title="{{button.tooltip}}">{{button.label}}</a>
+    <a class="{{klass}} {{button.className}}" href="{{button.href}}" target="_blank" title="{{button.tooltip}}">{{button.label}}</a>
 {{else}}
     <button class="{{klass}} {{if button.loading "btn-loading"}} {{button.className}}" {{action "click"}} title="{{button.tooltip}}" disabled={{button.disabled}}>{{button.label}}</button>
     {{#if button.confirm}}

@@ -1,228 +1,4 @@
-## OpenXPKI::Server::Log.pm 
-##
-## Written by Michael Bell for the OpenCA project 2004
-## Migrated to the OpenXPKI Project 2005
-## Copyright transfered from Michael Bell to The OpenXPKI Project in 2005
-## (C) Copyright 2004-2006 by The OpenXPKI Project
-
 package OpenXPKI::Server::Log;
-
-use strict;
-use warnings;
-use English;
-
-use Log::Log4perl qw(:easy);
-use Log::Log4perl::Level;
-use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Exception;
-use OpenXPKI::Server::Log::Appender::DBI;
-
-# cache for package filenames (truncate log entries)
-my %filename_of_package;
-
-##! 1: "init Log::Log4perl to avoid warnings - this can be overwritten later"
-Log::Log4perl->easy_init($ERROR);
-
-sub new {
-    my $that = shift;
-    my $class = ref($that) || $that;
-
-    my $self = {};
-
-    bless $self, $class;
-
-    my $keys = { @_ };
-
-    ## load config
-    $self->{configfile} = $keys->{CONFIG};
-
-    if (not $self->{configfile})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_LOG_NEW_NO_CONFIGFILE");
-    }
-
-    ## scan the configuration all 10 seconds
-    ## $self->{log4perl} = Log::Log4perl::init_and_watch($self->{configfile}, 10);
-    $self->init();
-
-    return $self;
-}
-
-sub init {
-    my $self = shift;
-
-    $self->{log4perl} = Log::Log4perl->init($self->{configfile});
-    if (not  $self->{log4perl})
-    {
-	# Log4Perl does not export any initialization errors
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_LOG_NEW_LOG4PERL_INIT_FAILED");
-    }
-
-    ## ensure that all relevant loggers are present
-    foreach my $facility ("auth", "audit", "monitor", "system", "workflow", "application", "usage" )
-    {
-        ## get the relevant logger
-        $self->{$facility} = Log::Log4perl->get_logger("openxpki.$facility");
-        if (not $self->{$facility})
-        {
-            # backwards compatibility
-            if ($facility eq "usage") {
-                $self->{'usage'} = $self->{'monitor'};
-                $self->{'system'}->warn("Log facility 'usage' is missing - falling back to monitor");
-                return 1;
-            } 
-            
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_LOG_NEW_MISSING_LOGGER",
-                params  => {"FACILITY" => $facility});
-        }
-    }
-
-    return 1;
-}
-
-sub re_init {
-    my $self = shift;
-
-    return $self->init();
-}
-
-# todo - if this PoC is valuable, we should change all logger calls 
-sub usage {
-    
-    my $self = shift;
-    return $self->{'usage'};    
-    
-}
-
-sub log
-{
-    my $self = shift;
-    my $keys = { @_ };
-
-    my ($facility, $prio, $msg) =
-       ("monitor", "FATAL", "EMPTY LOG MESSAGE WAS USED!");
-
-    my $callerlevel = 0;
-    if (defined $keys->{CALLERLEVEL}) {
-	$callerlevel = $keys->{CALLERLEVEL};
-    }
-    my ($package, $filename, $line, $subroutine, $hasargs,
-        $wantarray, $evaltext, $is_require, $hints, $bitmask) 
-	= caller($callerlevel);
-
-    ## get parameters
-    if (ref $keys->{FACILITY} eq 'ARRAY') {
-	foreach my $entry (@{$keys->{FACILITY}}) {
-	    $self->log(
-		%{$keys},
-		FACILITY    => $entry,
-		CALLERLEVEL => $callerlevel + 1,
-		);
-	}
-	return 1;
-    }
-
-    $facility = lc($keys->{FACILITY})
-        if (exists $keys->{FACILITY} and
-            $keys->{FACILITY} =~ m{ \A (?:auth|audit|monitor|system|workflow|application|usage) \z }xms);
-
-    $prio = uc($keys->{PRIORITY})
-        if (exists $keys->{PRIORITY} and
-            $keys->{PRIORITY} =~ m{ \A (?:debug|info|warn|error|fatal) \z }xms);
-
-    if (exists $keys->{MESSAGE} and length ($keys->{MESSAGE}))
-    {
-        $package  = $keys->{MODULE}   if (exists $keys->{MODULE});
-        $filename = $keys->{FILENAME} if (exists $keys->{FILENAME});
-        $line     = $keys->{LINE}     if (exists $keys->{LINE});
-        $msg      = $keys->{MESSAGE};
-    }
-
-    # only write the full filename for this module once (don't clobber log
-    # with the same filename over and over again)
-    if (exists $filename_of_package{$package} && ($filename_of_package{$package} eq $filename)) {
-	$filename = undef;
-    } else {
-	# write out the full file name this time, but remember it for the
-	# next message
-	$filename_of_package{$package} = $filename;
-    }
-
-    # get session information
-    my $user;
-    my $role = '';
-    my $session_short;
-    if (OpenXPKI::Server::Context::hascontext('session')) {
-        eval {
-    	no warnings;
-    	$user = CTX('session')->get_user();
-        };
-        eval {
-    	no warnings;
-    	$role = '(' . CTX('session')->get_role() . ')';
-        };
-        eval {
-    	no warnings;
-    	# first 4 characters of session id are enough to trace flow in sessions
-    	$session_short = substr(CTX('session')->get_id(), 0, 4);
-        };
-    }
-
-    # get workflow instance information
-    my $wf_id;
-    if (OpenXPKI::Server::Context::hascontext('workflow_id')) {
-	$wf_id = CTX('workflow_id');
-    }
-
-    ## build and store message
-    $msg = "[$package"
-	. " (" 
-	. (defined $filename      ? $filename . ':'      : '') 
-	. "$line)"
-	. (defined $user          ? '; ' . $user . $role : '')
-	. (defined $session_short ? '@' . $session_short : '')
-	. (defined $wf_id         ? '#' . $wf_id : '')
-        . "] $msg";
-
-    # remove trailing newline characters
-    {
-	local $INPUT_RECORD_SEPARATOR = '';
-	chomp $msg;    
-    }
-
-    ## get an ID for the message
-    
-    #FIXME - eval for logger prio is ugly 
-    my $return = $self->{$facility}->log (eval ("\$${prio}"), $msg);
-
-    return $return if (defined $keys->{MESSAGE} and length ($keys->{MESSAGE}));
-
-    OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_SERVER_LOG_EMPTY_LOG_MESSAGE",
-        params  => {"PACKAGE"  => $package,
-                    "FILENAME" => $filename,
-                    "LINE"     => $line});
-}
-
-# install wrapper / helper subs
-no strict 'refs';
-for my $prio (qw/ debug info warn error fatal /) {
-    *{$prio} = sub {
-        my ($self, $message, $facility) = @_;
-        $self->log(
-            MESSAGE  => $message,
-            PRIORITY => $prio,
-            CALLERLEVEL => 1,
-            FACILITY => $facility // "monitor",
-        );
-    };
-}
-
-1;
-__END__
 
 =head1 Name
 
@@ -238,21 +14,87 @@ things to meet our requirements.
 
 =head1 Functions
 
-=head2 new
+=cut
 
-This function only accepts one parameter - C<CONFIG>.
-C<CONFIG> includes the filename of the Log::Log4perl configuration.
+use strict;
+use warnings;
+use English;
+use Moose;
 
-=head2 init
+use OpenXPKI::Log4perl;
+use Log::Log4perl::Level;
+use Log::Log4perl::MDC;
+use OpenXPKI::Exception;
 
-is used by both new and re_init to initialize the Log4perl objects
+has 'CONFIG' => (
+    isa     => 'Str|ScalarRef|Undef',
+    is      => 'ro',
+    default => '/etc/openxpki/log.conf',
+);
 
-=head2 re_init
+for my $name (qw( application auth system workflow )) {
+    my $logger = 'openxpki.' . $name;
+    has $name => (
+        is      => 'ro',
+        isa     => 'Log::Log4perl::Logger',
+        default => sub { Log::Log4perl->get_logger($logger) }
+    );
+}
 
-is just a fancier name for init, is called in the forked child
-at ForkWorkflowInstance.pm
+=head2 Constructor
 
-=head2 log
+The constructor only accepts the named parameter C<CONFIG> which can either be
+
+=over
+
+=item * a path to the L<Log::Log4perl> configuration file,
+
+=item * a reference to a scalar holding the Log4perl configuration string or
+
+=item * undef to either use an already initialized Log4perl or create a screen
+only logger using L<Log::Log4perl/easy_init>
+
+=back
+
+=cut
+
+sub BUILD {
+    my $self = shift;
+
+    my $config = $self->CONFIG();
+
+    # caller explicitely asked to NOT use config: try reusing Log4perl
+    return if not(defined $config) and Log::Log4perl->initialized;
+
+    # CONFIG was provided
+    OpenXPKI::Log4perl->init_or_fallback( $config );
+}
+
+=head2 audit
+
+Returns the audit logger of the given subcategory I<openxpki.audit.$subcat>.
+
+Positional parameters:
+
+=over
+
+=item * B<$subcat> sub category - optional, default: I<system>
+
+=back
+
+
+=cut
+
+sub audit {
+    my $self = shift;
+    my $subcat = shift || 'system';
+    return Log::Log4perl->get_logger("openxpki.audit.$subcat");
+}
+
+=head2 log DEPRECATED
+
+This is the old method used in pre 1.18 and shouldnt be used any longer!
+Each call triggers a deprecation warning with facility "openxpki.deprecated"
 
 This function creates a new log message it accept the following
 parameters:
@@ -278,9 +120,94 @@ reference here.
 
 Default is C<system.fatal: [OpenXPKI] undefined message>.
 
+=cut
+
+sub log {
+
+    my $self = shift;
+    my $keys = {@_};
+
+    my ( $facility, $prio, $msg ) =
+      ( "system", "FATAL", "EMPTY LOG MESSAGE WAS USED!" );
+
+    my $callerlevel = 0;
+    if ( defined $keys->{CALLERLEVEL} ) {
+        $callerlevel = $keys->{CALLERLEVEL};
+    }
+    my ($package,   $filename, $line,       $subroutine, $hasargs,
+        $wantarray, $evaltext, $is_require, $hints,      $bitmask
+    ) = caller($callerlevel);
+
+    ## get parameters
+    if ( ref $keys->{FACILITY} eq 'ARRAY' ) {
+        foreach my $entry ( @{ $keys->{FACILITY} } ) {
+            $self->log(
+                %{$keys},
+                FACILITY    => $entry,
+                CALLERLEVEL => $callerlevel + 1,
+            );
+        }
+        return 1;
+    }
+
+    $facility = lc( $keys->{FACILITY} )
+      if ( exists $keys->{FACILITY}
+        and $keys->{FACILITY} =~
+        m{ \A (?:application|auth|audit|system|workflow|) \z }xms
+      );
+
+    $prio = uc( $keys->{PRIORITY} )
+      if ( exists $keys->{PRIORITY}
+        and $keys->{PRIORITY} =~
+        m{ \A (?:debug|info|warn|error|fatal) \z }xms );
+
+    if ( exists $keys->{MESSAGE} and length( $keys->{MESSAGE} ) ) {
+        $package = $keys->{MODULE} if ( exists $keys->{MODULE} );
+        $line    = $keys->{LINE}   if ( exists $keys->{LINE} );
+        $msg     = $keys->{MESSAGE};
+    }
+
+    OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_SERVER_LOG_EMPTY_LOG_MESSAGE",
+        params  => {
+            "PACKAGE"  => $package,
+            "FILENAME" => $filename,
+            "LINE"     => $line
+        }
+    ) unless ($msg);
+
+    # get session information
+    my $user = Log::Log4perl::MDC->get('user');
+    my $role = Log::Log4perl::MDC->get('role');
+    my $session_short = Log::Log4perl::MDC->get('sid');
+
+    # get workflow instance information
+    my $wf_id = Log::Log4perl::MDC->get('wfid');
+
+    ## build and store message
+    $msg =
+        "[$package" . " ($line)"
+      . ( $user ? '; ' . $user . ($role ? "($role)" : "") : '' )
+      . ( $session_short ? '@' . $session_short : '' )
+      . ( $wf_id         ? '#' . $wf_id         : '' )
+      . "] $msg";
+
+    # remove trailing newline characters
+    {
+        local $INPUT_RECORD_SEPARATOR = '';
+        chomp $msg;
+    }
+
+    Log::Log4perl->get_logger('openxpki.deprecated')->info(sprintf(
+        'Deprecated log call, %s from %s:%i', lc( $keys->{FACILITY} ), $package, $line));
+
+    return $self->$facility()->log( Log::Log4perl::Level::to_priority( ${prio} ), $msg );
+
+}
+
 =head2 debug
 
-Shortcut to L</log> that logs a message with C<< PRIORITY => "debug" >>.
+Shortcut method that logs a message with C<< PRIORITY => "debug" >>.
 
 Positional parameters:
 
@@ -288,30 +215,43 @@ Positional parameters:
 
 =item * B<$message> log message
 
-=item * B<$facility> the logging facility - optional, default: C<monitor>
+=item * B<$facility> the logging facility - optional, default: C<system>
 
 =back
 
 =head2 info
 
-Shortcut to L</log> that logs a message with C<< PRIORITY => "info" >>.
-
-Similar to L</debug>.
+Shortcut method that logs a message with C<< PRIORITY => "info" >>. Similar to L</debug>.
 
 =head2 warn
 
-Shortcut to L</log> that logs a message with C<< PRIORITY => "warn" >>.
-
-Similar to L</debug>.
+Shortcut method that logs a message with C<< PRIORITY => "warn" >>. Similar to L</debug>.
 
 =head2 error
 
-Shortcut to L</log> that logs a message with C<< PRIORITY => "error" >>.
-
-Similar to L</debug>.
+Shortcut method that logs a message with C<< PRIORITY => "error" >>. Similar to L</debug>.
 
 =head2 fatal
 
-Shortcut to L</log> that logs a message with C<< PRIORITY => "fatal" >>.
+Shortcut method that logs a message with C<< PRIORITY => "fatal" >>. Similar to L</debug>.
 
-Similar to L</debug>.
+=cut
+
+# install wrapper / helper subs - DEPRECATED, use new format
+no strict 'refs';
+for my $prio (qw/ debug info warn error fatal trace /) {
+    *{$prio} = sub {
+        my ( $self, $message, $facility ) = @_;
+
+        if (!$facility ||
+            $facility !~ m{ \A (?:application|auth|audit|system|workflow) \z }xms) {
+            $facility = 'system';
+        }
+        $self->$facility()->$prio($message);
+    };
+}
+
+1;
+
+__END__
+

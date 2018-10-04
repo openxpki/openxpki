@@ -1,0 +1,31 @@
+#!/bin/bash
+## <info> Reset OpenXPKI certificates and database
+test $(whoami) != "root" && echo "Please run this as root: sudo $0" && exit 1
+set -o pipefail
+
+#
+# Exit handler
+#
+LOG=$(mktemp)
+function _exit () {
+    if [ $1 -ne 0 -a $1 -ne 333 ]; then
+        echo "$0: ERROR - last command exited with code $1, output:" && cat $LOG
+    fi
+    rm -f $LOG
+    exit $1
+}
+trap '_exit $?' EXIT
+
+#
+# Recreate certificates and DB
+#
+openxpkictl stop
+
+set -e
+/code-repo/tools/testenv/mysql-create-db.sh
+/code-repo/tools/testenv/mysql-create-schema.sh
+
+rm -rf /etc/openxpki/ssl/
+/code-repo/tools/testenv/insert-certificates.sh
+
+openxpkictl start

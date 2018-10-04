@@ -12,8 +12,10 @@ use POSIX qw( strftime );
 use Getopt::Long;
 use Pod::Usage;
 use Data::Dumper;
+use JSON;
 
 use OpenXPKI::Client;
+use OpenXPKI::Log4perl;
 
 my %params = (
     authstack => '_System',
@@ -24,12 +26,38 @@ my %params = (
     param => [],
     arg => [],
     timeout => 30,
+    json => undef,
+    session  => undef,
+    legacy => undef,
     );
 
 sub debug {
     my $arg = shift;
     if ($params{debug}) {
-    print $arg . "\n";
+        Log::Log4perl->get_logger("")->debug( $arg );
+    }
+}
+
+sub print_json {
+    my $msg = shift;
+    print JSON->new->pretty(1)->encode($msg);
+}
+
+sub output {
+
+    my $msg = shift;
+
+    if ($params{json}) {
+        print_json($msg);
+    } elsif ($msg->{error}) {
+        my $err = $msg->{error}->{LIST}->[0];
+        print STDERR "Error: " . $err->{LABEL} . "\n";
+        if ($err->{PARAMS} && $err->{PARAMS}->{__error__}) {
+            print STDERR "    " . $err->{PARAMS}->{__error__} . "\n";
+        }
+    } else {
+        print Dumper $msg;
+        print "\ndone\n";
     }
 }
 
@@ -46,12 +74,40 @@ GetOptions(\%params,
             command|cmd|c=s
             param|set=s@
             arg=s@
+            filearg=s@
             timeout|to=i
+            session
             debug
+            json
+            legacy
          )) or pod2usage(-verbose => 0);
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
 pod2usage(-verbose => 1) if ($params{help});
+
+my %args;
+# command with json data
+if (scalar @ARGV == 2 && $params{json}) {
+
+    # If it does not start with a { it is a filename
+    my $json_data = pop @ARGV;
+
+    if ($json_data !~ m/^\s*{/) {
+        -e $json_data || die "JSON input file not found\n";
+        $json_data = do {
+            local $INPUT_RECORD_SEPARATOR;
+            open my $HANDLE, '<', $json_data;
+            <$HANDLE>;
+        };
+    }
+
+    eval { %args = %{ decode_json($json_data) }; };
+    if ($EVAL_ERROR) {
+        print STDERR "Unable to decode given JSON ($EVAL_ERROR)\n";
+        exit 0;
+    }
+}
+
 if (scalar @ARGV != 1) {
     print STDERR "Usage: openxpkicli [OPTIONS] COMMAND\n";
     exit 0;
@@ -75,14 +131,41 @@ foreach my $entry (@parameters) {
 }
 
 my @args = split(/,/, join(',', @{$params{arg}}));
-my %args;
 foreach my $entry (@args) {
     my ($key, $value) = ($entry =~ m{ \A (.*?) [=:] (.*) }xms);
-    if (defined $key) {
-        $args{uc($key)} = $value;
-    } else {
-        $args{uc($entry)} = 1;
+
+    if (!defined $key) {
+        $key = $entry;
+        $value = 1;
     }
+
+    # uppercase all keys when legacy api is used
+    if ($params{legacy} || $ENV{OPENXPKI_LEGACY_API}) {
+        $key = uc($key);
+    }
+
+    $args{$key} = $value;
+
+}
+
+foreach my $entry (@{$params{filearg}}) {
+    my ($key, $value) = ($entry =~ m{ \A (.*?) [=:] (.*) }xms);
+
+    if (!defined $key) {
+        die "filearg must be given as key=filename ($entry)\n";
+    }
+
+    # uppercase all keys when legacy api is used
+    if ($params{legacy} || $ENV{OPENXPKI_LEGACY_API}) {
+        $key = uc($key);
+    }
+
+    -e $value || die "filearg input file not found ($value)\n";
+    $args{$key} = do {
+        local $INPUT_RECORD_SEPARATOR;
+        open my $HANDLE, '<', $value;
+        <$HANDLE>;
+    };
 
 }
 
@@ -90,25 +173,46 @@ if($params{instance}){
     $params{socketfile} = sprintf '/var/openxpki/%s/openxpki.socket', $params{instance};
 } elsif(!$params{socketfile}){
     $params{socketfile} = '/var/openxpki/openxpki.socket';
-    printf("using default socket %s \n", $params{socketfile});
+    debug("using default socket %s \n", $params{socketfile});
 }
+
+OpenXPKI::Log4perl::init_or_fallback('' , $params{debug} ? 'DEBUG' : 'WARN');
 
 debug(sprintf("Socketfile: %s", $params{socketfile}));
 
 my $reply;
-my $client = OpenXPKI::Client->new(
-    {
+my $client = OpenXPKI::Client->new({
     SOCKETFILE => $params{socketfile},
     TIMEOUT  => $params{timeout},
     });
 
 
 if (! defined $client) {
-    die "Could not instantiate OpenXPKI client. Stopped";
+    output({'error' => "Could not instantiate OpenXPKI client. Stopped"});
+    exit 1;
 }
 
 if (! $client->init_session()) {
-    die "Could not initiate OpenXPKI server session. Stopped";
+    output({'error' => "Could not initiate OpenXPKI server session. Stopped"});
+    exit 1;
+}
+if ($params{session}) {
+
+    # session mode and session id in env, try to reinit session
+    if ($command eq 'login') {
+        # noop
+    } elsif ($ENV{OPENXPKI_SESSION_ID}) {
+        $reply = $client->init_session( { SESSION_ID => $ENV{OPENXPKI_SESSION_ID} } );
+        if ($reply->{SERVICE_MSG} ne 'SERVICE_READY') {
+            output({'error' => "Login with session id failed"});
+            exit 1;
+        }
+    # no session in env and login not requested
+    } else {
+        output({'error' => "Please set the session id via environment OPENXPKI_SESSION_ID"});
+        exit 1;
+    }
+
 }
 
 my $session_id = $client->get_session_id();
@@ -122,52 +226,64 @@ while (1) {
     my $status = $reply->{SERVICE_MSG};
 
     if ($status eq 'GET_PKI_REALM') {
-    if (! $params{realm}) {
-        print "Available PKI realms:\n";
-        foreach my $entry (keys %{$reply->{PARAMS}->{PKI_REALMS}}) {
-        print "  $entry\n";
+        if (! $params{realm}) {
+            if ($params{json}) {
+                print_json({ result => { pki_realm => keys %{$reply->{PARAMS}->{PKI_REALMS}} } });
+            } else {
+                print "Available PKI realms:\n";
+                foreach my $entry (keys %{$reply->{PARAMS}->{PKI_REALMS}}) {
+                    print "  $entry\n";
+                }
+            }
+            die "No --realm specified. Stopped";
         }
-        die "No --realm specified. Stopped";
-    }
-    $reply = $client->send_receive_service_msg('GET_PKI_REALM',
-                           {
-                               PKI_REALM => $params{realm},
-                           });
-    next SERVICE_MESSAGE;
+        $reply = $client->send_receive_service_msg('GET_PKI_REALM',{
+            PKI_REALM => $params{realm},
+        });
+      next SERVICE_MESSAGE;
     }
 
     if ($reply->{SERVICE_MSG} eq 'GET_AUTHENTICATION_STACK') {
-    if (! $params{authstack}) {
-        print "Available authentication stacks:\n";
-        foreach my $entry (keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}}) {
-        print "  $entry\n";
+        if (!$params{authstack}) {
+            if ($params{json}) {
+                print_json({ result => { auth_stack => keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}} } });
+            } else {
+                print "Available authentication stacks:\n";
+                foreach my $entry (keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}}) {
+                    print "  $entry\n";
+                }
+            }
+            die "No --authstack specified. Stopped";
         }
-        die "No --authstack specified. Stopped";
-    }
-    $reply = $client->send_receive_service_msg('GET_AUTHENTICATION_STACK',
-                           {
-                               AUTHENTICATION_STACK => $params{authstack},
-                           });
-    next SERVICE_MESSAGE;
+        $reply = $client->send_receive_service_msg('GET_AUTHENTICATION_STACK', {
+               AUTHENTICATION_STACK => $params{authstack},
+        });
+        next SERVICE_MESSAGE;
     }
 
     if ($reply->{SERVICE_MSG} eq 'GET_PASSWD_LOGIN') {
-    if (! $params{authuser}) {
-        die "No --authuser specified. Stopped";
-    }
-    $reply = $client->send_receive_service_msg('GET_PASSWD_LOGIN',
-                           {
-                               LOGIN => $params{authuser},
-                               PASSWD => $params{authpass},
-                           });
-    next SERVICE_MESSAGE;
+        if (! $params{authuser}) {
+            die "No --authuser specified. Stopped";
+        }
+        $reply = $client->send_receive_service_msg('GET_PASSWD_LOGIN', {
+            LOGIN => $params{authuser},
+            PASSWD => $params{authpass},
+        });
+        next SERVICE_MESSAGE;
     }
 
     if ($reply->{SERVICE_MSG} eq 'SERVICE_READY') {
-    last SERVICE_MESSAGE;
+
+        # if we are in session mode login sequence print session id
+        if ($command eq 'login') {
+            printf "OPENXPKI_SESSION_ID=%s; export OPENXPKI_SESSION_ID;\n", $client->get_session_id();
+            exit 0;
+        }
+        last SERVICE_MESSAGE;
     }
 
-    print Dumper $reply;
+    output({ error => $reply  });
+
     die "Unhandled service message. Stopped";
 }
 
@@ -175,27 +291,46 @@ while (1) {
 
 
 if (%parameters) {
+
+    my $p;
     if ($params_is_array) {
         my @t = keys(%parameters);
-        $args{PARAMS} = \@t;
+        $p = \@t;
     } else {
-        $args{PARAMS} = \%parameters;
+        $p = \%parameters;
+    }
+
+    if ($params{legacy}) {
+        $args{PARAMS} = $p;
+    } else {
+        $args{params} = $p;
     }
 }
 
-$reply = $client->send_receive_service_msg('COMMAND', {
-    COMMAND => $command,
-    PARAMS => \%args
-});
 
-if ($reply->{SERVICE_MSG} eq 'COMMAND') {
-    print Dumper $reply->{PARAMS};
-    print "done\n";
-    exit 0;
+if ($command ne 'logout') {
+    $reply = $client->send_receive_service_msg('COMMAND', {
+        COMMAND => $command,
+        PARAMS => \%args,
+        API => ($params{legacy} || $ENV{OPENXPKI_LEGACY_API}) ? 1 : 2
+    });
+
+    # terminate the login session if we are not in "session reuse" mode
+    if (!$params{session}) {
+        $client->logout();
+    }
+
+    if ($reply->{SERVICE_MSG} eq 'COMMAND') {
+        output({ result => $reply->{PARAMS} });
+        exit 0;
+    } else {
+        output({ error => $reply  });
+        exit 1;
+    }
+
 } else {
-    print "Error:\n";
-    print Dumper $reply;
-    exit 1;
+    $client->logout();
+    debug('Client session terminated');
 }
 
 
@@ -219,10 +354,19 @@ openxpkicli [options] command
     --authuser USER       authentication user
     --authpass PASS       password for authentication user
     --arg KEY=VALUE       pass VALUE to method as parameter KEY
-    --param VALUE     	  stack VALUE onto methods PARAMS array
+    --filearg KEY=FILE    as --arg but read value from file name
+    --param VALUE         stack VALUE onto methods PARAMS array
     --param KEY=VALUE     set VALUE in methods PARAMS hash using KEY
     --debug               enable debug mode
-    --timeout             socket timeout in seconds (default 30s)    
+    --timeout             socket timeout in seconds (default 30s)
+    --json                activate json output mode
+    --json {"key":"val"}  parse given string and merge with arguments
+    --json FILE           read json string from FILE and merge with arguments
+    --session             session mode, see below for details
+    --legacy              if set the old OpenXPKI 1.x API calls will be
+                          used. This will be removed in future versions
+                          and is only provided to assist script migration!
+                          Also active when OPENXPKI_LEGACY_API=1 is set
 
 =head1 INVOCATION
 
@@ -236,4 +380,49 @@ calls on one command.
 =head1 EXAMPLES
 
 openxpkicli --realm "Server CA" --arg message=testmail --param rcpt=pki@mycompany.local send_notification
+
+=head1 Operational Modes
+
+=head2 Batch
+
+This is the default mode, you must pass all parameters as arguments as
+stated above. The client will try to login with the credentials given
+(or as anonymous) and run the provided command.
+
+=head2 Session
+
+Activated by adding I<--session> to the command line. This mode allows you
+to reuse an existing session id for subsequent calls to a command. The
+session id must be passed in the environment variable OPENXPKI_SESSION_ID.
+
+To initialize a session, call openxpkicli with the expected auth* parameters
+and pass I<login> as command. This will perform the login and print the
+session id as output. Put the received id into the environment and run your
+commands. If you are done, pass command I<logout>.
+
+If you are using bash, the output of the init command can be directly
+passed to an I<eval> to set the environment.
+
+B<Note>: session mode is currently not fully compatible with --json (session
+init and error handling do not print proper json).
+
+B<Example>
+
+    `openxpkicli --authstack=Testing --authuser=raop --authpass=openxpki \
+        --session login`
+
+    echo $OPENXPKI_SESSION_ID
+
+    openxpkicli --session get_session_info
+
+    openxpkicli --session logout
+
+Pass I<--session> as parameter and pass the ID of an existings session in
+
+=head2 Interactive
+
+Not supported yet :)
+
+
+
 

@@ -88,7 +88,7 @@ print Dumper $result ;
 
 # {"wf_state":"NEED_NON_ESCROW_CSR","action":"upload_csr","perso_wfID":"28159","exec":"GenerateKeyPair;CardSerial=12345678;UserPIN=pipcd1ld9x;SubjectCN=thomas.tester@mycompany.local;KeyLength=1024;"}
 
-$test->plan( tests => $number_of_tests );
+done_testing();
 
 sub makeCSR {
     

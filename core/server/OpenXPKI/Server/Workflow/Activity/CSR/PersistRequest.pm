@@ -20,22 +20,23 @@ sub execute
     my $self       = shift;
     my $workflow   = shift;
     my $context    = $workflow->context();
-    my $pki_realm  = CTX('session')->get_pki_realm();
+    my $pki_realm  = CTX('session')->data->pki_realm;
     my $serializer = OpenXPKI::Serialization::Simple->new();
-    my $dbi        = CTX('dbi_backend');
-    my $csr_serial = $dbi->get_new_serial(
-        TABLE => 'CSR',
-    );
+    my $dbi        = CTX('dbi');
 
     my $type = $self->param('csr_type') || 'pkcs10';
 
-    my $profile = $context->param('cert_profile');
+    my $profile = $self->param('cert_profile');
+    $profile = $context->param('cert_profile') unless ($profile);
     if (! defined $profile) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_PROFILE_UNDEFINED',
         );
     }
-    my $subject = $context->param('cert_subject');
+
+
+    my $subject = $self->param('cert_subject');
+    $subject = $context->param('cert_subject') unless($subject);
     if (! defined $subject) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_PERSISTREQUEST_CSR_SUBJECT_UNDEFINED',
@@ -69,25 +70,24 @@ sub execute
         );
     }
 
-    # TODO: LOA (currently NULL)
-    $dbi->insert(
-        TABLE => 'CSR',
-        HASH  => {
-            'PKI_REALM'  => $pki_realm,
-            'CSR_SERIAL' => $csr_serial,
-            'TYPE'       => $type,
-            'DATA'       => $data,
-            'PROFILE'    => $profile,
-            'SUBJECT'    => $subject,
-        },
-    );
-
     my $source_ref = $serializer->deserialize($context->param('sources'));
     if (! defined $source_ref) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WF_ACTIVITY_CSR_PERSISTREQUEST_SOURCES_UNDEFINED',
         );
     }
+
+    my $csr_serial = $dbi->next_id('csr');
+
+    $dbi->insert( into => 'csr', values => {
+        'pki_realm'  => $pki_realm,
+        'req_key'    => $csr_serial,
+        'format'     => $type,
+        'data'       => $data,
+        'profile'    => $profile,
+        'subject'    => $subject,
+    });
+
 
     my $san_serialized = $context->param('cert_subject_alt_name');
     if ($san_serialized) {
@@ -110,18 +110,15 @@ sub execute
 
         foreach my $san (@subj_alt_names) {
             ##! 64: 'san: ' . $san
-            my $attrib_serial = $dbi->get_new_serial(
-                TABLE => 'CSR_ATTRIBUTES',
-            );
             $dbi->insert(
-                TABLE => 'CSR_ATTRIBUTES',
-                HASH  => {
-                    'ATTRIBUTE_SERIAL' => $attrib_serial,
-                    'PKI_REALM'        => $pki_realm,
-                    'CSR_SERIAL'       => $csr_serial,
-                    'ATTRIBUTE_KEY'    => 'subject_alt_name',
-                    'ATTRIBUTE_VALUE'  => $serializer->serialize($san),
-                    'ATTRIBUTE_SOURCE' => $san_source,
+                into => 'csr_attributes',
+                values => {
+                    'attribute_key'        => $dbi->next_id('csr_attributes'),
+                    'pki_realm'            => $pki_realm,
+                    'req_key'              => $csr_serial,
+                    'attribute_contentkey' => 'subject_alt_name',
+                    'attribute_value'      => $serializer->serialize($san),
+                    'attribute_source'     => $san_source,
                 },
             );
         }
@@ -130,18 +127,37 @@ sub execute
     foreach my $validity_param (qw( notbefore notafter )) {
         if (defined $context->param($validity_param)) {
             my $source = $source_ref->{$validity_param};
-            my $attrib_serial = $dbi->get_new_serial(
-                TABLE => 'CSR_ATTRIBUTES',
-            );
+            my $val = $context->param($validity_param);
+            ##! 16: $validity_param . ' ' .$val
             $dbi->insert(
-                TABLE => 'CSR_ATTRIBUTES',
-                HASH  => {
-                    'ATTRIBUTE_SERIAL' => $attrib_serial,
-                    'PKI_REALM'        => $pki_realm,
-                    'CSR_SERIAL'       => $csr_serial,
-                    'ATTRIBUTE_KEY'    => $validity_param,
-                    'ATTRIBUTE_VALUE'  => $context->param($validity_param),
-                    'ATTRIBUTE_SOURCE' => $source,
+                into => 'csr_attributes',
+                values  => {
+                    'attribute_key'        => $dbi->next_id('csr_attributes'),
+                    'pki_realm'            => $pki_realm,
+                    'req_key'              => $csr_serial,
+                    'attribute_contentkey' => $validity_param,
+                    'attribute_value'      => $val ,
+                    'attribute_source'     => $source,
+                },
+            );
+        }
+    }
+
+    # x509 extensions - array of extension items
+    my $cert_ext = $context->param('cert_extension');
+    if ($cert_ext) {
+        foreach my $ext (@{$serializer->deserialize($cert_ext)}) {
+            ##! 32: 'Persist x509 extension ' . Dumper $ext
+            my $source = $source_ref->{'cert_extension'}->{$ext->{oid}} || '';
+            $dbi->insert(
+                into => 'csr_attributes',
+                values => {
+                    'attribute_key'        => $dbi->next_id('csr_attributes'),
+                    'pki_realm'            => $pki_realm,
+                    'req_key'              => $csr_serial,
+                    'attribute_contentkey' => 'x509v3_extension',
+                    'attribute_value'      => $serializer->serialize($ext),
+                    'attribute_source'     => $source,
                 },
             );
         }
@@ -149,43 +165,36 @@ sub execute
 
     # process additional information (user configurable in profile)
     if (defined $context->param('cert_info')) {
-    my $cert_info = $serializer->deserialize($context->param('cert_info'));
-    ##! 16: 'additional certificate information: ' . Dumper $cert_info
+        my $cert_info = $serializer->deserialize($context->param('cert_info'));
+        ##! 16: 'additional certificate information: ' . Dumper $cert_info
 
-    foreach my $custom_key (keys %{$cert_info}) {
-        my $attrib_serial = $dbi->get_new_serial(
-        TABLE => 'CSR_ATTRIBUTES',
-        );
+        foreach my $custom_key (keys %{$cert_info}) {
 
-        # We can have array/hash values from the input, need serialize
-        my $value = $cert_info->{$custom_key};
-        if (ref $value) {
-            ##! 32: 'Serializing non scalar item for key ' . $custom_key
-            $value= $serializer->serialize( $value );
+            # We can have array/hash values from the input, need serialize
+            my $value = $cert_info->{$custom_key};
+            if (ref $value) {
+                ##! 32: 'Serializing non scalar item for key ' . $custom_key
+                $value= $serializer->serialize( $value );
+            }
+
+            $dbi->insert(
+                into => 'csr_attributes',
+                values => {
+                    'attribute_key'        => $dbi->next_id('csr_attributes'),
+                    'pki_realm'            => $pki_realm,
+                    'req_key'              => $csr_serial,
+                    'attribute_contentkey' => 'custom_' . $custom_key,
+                    'attribute_value'      => $value,
+                    'attribute_source'     => $source_ref->{'cert_info'},
+                }
+            );
         }
-
-        $dbi->insert(
-        TABLE => 'CSR_ATTRIBUTES',
-        HASH  => {
-            'ATTRIBUTE_SERIAL' => $attrib_serial,
-            'PKI_REALM'        => $pki_realm,
-            'CSR_SERIAL'       => $csr_serial,
-            'ATTRIBUTE_KEY'    => 'custom_' . $custom_key,
-            'ATTRIBUTE_VALUE'  => $value,
-            'ATTRIBUTE_SOURCE' => $source_ref->{'cert_info'},
-        },
-        );
-    }
     }
 
-    $dbi->commit();
     $context->param('csr_serial' => $csr_serial);
 
-    CTX('log')->log(
-        MESSAGE  => "persisted csr for $subject with csr_serial $csr_serial",
-        PRIORITY => 'info',
-        FACILITY => 'application',
-    );
+    CTX('log')->application()->info("persisted csr for $subject with csr_serial $csr_serial");
+
 }
 
 1;
@@ -217,5 +226,13 @@ requests that are not formated as expected.
 
 If you want to persist the CSR "as is", set this to a true value and we
 wont touch it.
+
+=item cert_profile
+
+The profile to use. Read from cert_profile context value if not set.
+
+=item cert_subject
+
+The subject to use. Read from cert_subject context value if not set.
 
 =back

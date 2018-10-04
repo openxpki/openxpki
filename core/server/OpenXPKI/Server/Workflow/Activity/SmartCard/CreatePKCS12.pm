@@ -24,36 +24,33 @@ sub execute {
     my $default_token = CTX('api')->get_default_token();
 
     my $password    = $self->param('passin');
-    my $p12password = $self->param('passout');    
+    my $p12password = $self->param('passout');
     my $certificate = $self->param('certificate');
     my $key         = $self->param('privatekey');
 
     if (! defined $p12password || $p12password eq '') {
        $p12password = $password;
     }
-    
+
     my $command = {
-	   COMMAND       => 'create_pkcs12',
-	   PASSWD        => $password,
-	   PKCS12_PASSWD => $p12password,
-	   KEY           => $key,
-	   CERT          => $certificate,
+       COMMAND       => 'create_pkcs12',
+       PASSWD        => $password,
+       PKCS12_PASSWD => $p12password,
+       KEY           => $key,
+       CERT          => $certificate,
     };
-    
-    ##! 32: 'Command ' . Dumper $command 
-    
+
+    ##! 32: 'Command ' . Dumper $command
+
     my $pkcs12 = $default_token->command($command);
-    
+
     # convert to base64
     $pkcs12 = encode_base64($pkcs12, '');
-    
+
     $context->param('_pkcs12' => $pkcs12 );
-    
-    CTX('log')->log(
-        MESSAGE => 'SmartCard created pkcs12 container',
-        PRIORITY => 'info',
-        FACILITY => ['audit','application']
-    );
+
+    CTX('log')->application()->info('SmartCard created pkcs12 container');
+
     return 1;
 }
 1;
@@ -72,21 +69,21 @@ is put into the context with key I<_pkcs12> (volatile!).
 
 =head2 Activity parameters
 
-=over 
+=over
 
 =item passin
 
 Passphrase of private key
 
-=item passout   
+=item passout
 
 Output passphrase for the generated PKCS#12 (defaults to value of _password)
 
-=item certificate       
+=item certificate
 
 Certificate to wrap (PEM block)
 
-=item private_key      
+=item private_key
 
 Private key to wrap (PEM formatted PKCS8)
 

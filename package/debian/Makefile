@@ -16,18 +16,17 @@
 # some packages have build dependencies
 PACKAGES=			\
 	core			\
-	i18n 			
+	i18n 			\
+	cgi-session-driver
 
 # Data::Password Data::Serializer DateTime::Format::DateParse IPC::ShareLite 
 # Locale::TextDomain Proc::ProcessTable Sys::SigAction Workflow 
 # XML::Filter::XInclude XML::SAX::PurePerl XML::Validator::Schema
 # Exception::Class 1.22 Added Exception::Class::Base->caught() 
 
-# On Ubuntu 12.04 the Digest::SHA1 is renamed to  Digest::SHA which leeds to missing modules.
-# This is a quick hack to have the old module available on such systems
-
 EXTERNAL=				\
 	Crypt__OpenSSL__AES		\
+	Crypt__Cipher__AES \
 	Data__SpreadPagination		\
 	Class__Observable 		\
 	Git__PurePerl \
@@ -36,17 +35,22 @@ EXTERNAL=				\
 	Proc__SafeExec \
 	XML__Filter__XInclude \
 	Crypt__PKCS10 \
+	Crypt__X509 \
+	Crypt__X509__CRL \
 	DBIx__Handler \
-    DBIx__TransactionManager
-
+    DBIx__TransactionManager \
+    Log__Log4perl__Layout__JSON \
+    JSON__MaybeXS \
+    YAML__Tiny
+    
 EXTERNAL2= \
 	Connector \
 	Workflow 
 
 CORE = \
     CGI \
-    Module__Build__Tiny
-
+    Module__Build__Tiny \
+    Module__Load
 
 .PHONY : $(PACKAGES) $(EXTERNAL) $(EXTERNAL2) CGI DateTime__Format__DateParse
 
@@ -54,7 +58,7 @@ cpan_dependency: $(EXTERNAL)
 
 cpan_dependency2: $(EXTERNAL2) 
 
-trusty: CGI Module__Build__Tiny
+trusty: CGI Module__Build__Tiny Module__Load
 
 default:	clean
 	$(MAKE) $(EXTERNAL)

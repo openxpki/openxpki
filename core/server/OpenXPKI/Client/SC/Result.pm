@@ -34,7 +34,7 @@ has cardData => (
     is => 'rw',
     isa => 'HashRef',
     lazy => 1,
-    builder => '_init_carddata'       
+    builder => '_init_carddata'
 );
 
 has _client => (
@@ -78,98 +78,98 @@ has _result => (
     isa => 'HashRef|Undef',
     default => sub { return {}; }
 );
- 
+
 has serializer => (
     is => 'ro',
     isa => 'Object',
     lazy => 1,
     default => sub { return OpenXPKI::Serialization::Simple->new(); }
 );
-  
+
 sub _init_session {
-   
+
     my $self = shift;
     return $self->_client()->session();
-   
-} 
+
+}
 
 sub _add_error {
-    
+
     my $self = shift;
     my $msg = shift;
     $self->logger()->error($msg);
     push @{$self->_error}, $msg;
     return $self;
-    
+
 }
 
-sub has_errors {    
+sub has_errors {
     my $self = shift;
     return (scalar @{$self->_error}) > 0;
 }
 
-    
-sub _init_carddata { 
-    
+
+sub _init_carddata {
+
     my $self = shift;
-       
+
     my $cardID = $self->param('cardID');
     my $cardType = $self->param('cardtype');
     my $ChipSerial = $self->param('ChipSerial');
-    
+
     my $session = $self->_session();
-    
+
     my $cardData = {};
-    if ($session->param('cardData')) {        
+    if ($session->param('cardData')) {
         $cardData = $session->param('cardData');
-        $self->logger()->debug('Restore card data from session: ' . Dumper $cardData); 
+        $self->logger()->trace('Restore card data from session: ' . Dumper $cardData);
     }
-    
+
     if ( ! defined $cardID ) {
         $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_MISSING_CARDID");
-        
+
     } elsif ( $cardData->{'cardID'} && $cardData->{'cardID'} ne $cardID ) {
-        
+
         $session->clear();
         $session->flush();
         $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CARDID_NOTACCEPTED");
         die "I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CARDID_NOTACCEPTED";
-        
+
     } elsif ($cardID) {
-                
+
         $cardData->{'cardID'} = $cardID;
         $session->param('cardID', $cardID);
-                
+
     }
 
     if ( ! $cardType ) {
-        
+
         $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_MISSING_PARAMETER_CARDTYPE");
-        
+
     } elsif ($cardType) {
-        
+
         $cardData->{'cardtype'} = $cardType;
-        
+
         my $card_id_prefix = $self->config()->{'cardtypeids'}->{ $cardType };
-        if ( defined $card_id_prefix ) {  
+        if ( defined $card_id_prefix ) {
             $cardData->{'id_cardID'} = $card_id_prefix . $cardData->{'cardID'};
-                        
+
         } else {
             $self->_add_error("I18N_OPENXPKI_CLIENT_WEBAPI_SC_START_SESSION_ERROR_CARDTYPE_INVALID");
-            
+
         }
     }
 
     if ($ChipSerial) {
         $cardData->{'ChipSerial'} = $ChipSerial;
     }
-    
-    $self->logger()->debug('Card Data ' . Dumper $cardData);
-    
+
+    $self->logger()->trace('Card Data ' . Dumper $cardData);
+
     $session->param('cardData', $cardData );
-    
+
     return $cardData;
-    
+
 }
 
 =head2 logger
@@ -183,7 +183,7 @@ sub logger {
     my $self = shift;
     return $self->_client()->logger();
 }
- 
+
 
 =head2 render
 
@@ -195,37 +195,37 @@ sub render {
 
     my $self = shift;
     my $output  = shift;
-    
+
     my $json = new JSON()->utf8;
 
     my %result = %{$self->_result};
-    
+
     # auto add those card data items from the card data
     #my $cardData = $self->_session();
     #foreach my $key (qw(id_cardID cardtype cardID)) {
-    #    $result{$key} = $session->param($key);    
+    #    $result{$key} = $session->param($key);
     #}
-    
+
     # add error handling
     if (scalar @{$self->_error} && !$result{error}) {
         $result{error} = 'error';
         $result{errors} = $self->_error;
     }
-    
+
     # Start output stream
     my $cgi = $self->cgi();
 
 
     my $body = $json->encode( \%result );
-    
+
     # Return the output into the given pointer
     if ($output && ref $output eq 'SCALAR') {
         $$output = $body;
     } else {
         # Start output stream
         my $cgi = $self->cgi();
-        
-        print $cgi->header( @main::header );        
+
+        print $cgi->header( @main::header );
         print $body;
     }
 
@@ -234,52 +234,52 @@ sub render {
 
 
 
-=head2 session_encrypt 
+=head2 session_encrypt
 
 Expects the cleartext as parameter and aes encrypts the data using the aeskey
-stored in the session. Will return empty string if input is empty, will die 
+stored in the session. Will return empty string if input is empty, will die
 if session key is not set or encryption fails for any other reason.
 
 =cut
 
 sub session_encrypt {
-    
+
     my $self  = shift;
     my $data = shift;
-       
+
     if (!$data) { return ''; }
-        
+
     my $session = $self->_session();
-    
+
     if (!$session->param('aeskey')) {
         $self->logger()->error("No session secret defined!");
         die "No session secret defined!";
     }
-    
-    my $b64enc;       
+
+    my $b64enc;
 
     eval{
         my $cipher = Crypt::CBC->new( -key => pack('H*', $session->param('aeskey')),
             -cipher => 'Crypt::OpenSSL::AES' );
-            
+
         my $enc = $cipher->encrypt($data);
-        $b64enc = encode_base64($enc);    
+        $b64enc = encode_base64($enc);
     };
-    
+
     if($EVAL_ERROR || !$b64enc) {
         $self->logger()->error('Unable to do encryption!');
         $self->logger()->debug($EVAL_ERROR);
-        die "Unable to do encryption!";            
+        die "Unable to do encryption!";
     }
-    
+
     return $b64enc ;
-    
+
 }
 
 
 =head2 param
 
-This method returns values from the input. Its a wrapper around the 
+This method returns values from the input. Its a wrapper around the
 cgi->param method.
 
 =over
@@ -325,7 +325,7 @@ sub param {
 
         # We need to fetch from cgi as array for multivalues
         if (wantarray) {
-            my @raw = $cgi->param($key);
+            my @raw = $cgi->multi_param($key);
             @raw = map { $_ =~ s/^\s+|\s+$//g; decode utf8 => $_ } @raw if(defined $raw[0]);
             return @raw;
         }
@@ -364,7 +364,7 @@ sub param {
         }
     } else {
         $result = $self->extra();
-        @keys = $cgi->param if ($cgi);
+        @keys = $cgi->multi_param if ($cgi);
         $self->logger()->trace('Param request for full set - cgi keys ' . Dumper \@keys );
     }
 
@@ -385,7 +385,7 @@ sub param {
         if ($name =~ m{ \A (\w+)\[\] \z }xms) {
             my @val = $self->param($name);
             $result->{$1} = \@val;
-        } elsif ($name =~ m{ \A (\w+){(\w+)}(\[\])? \z }xms) {
+        } elsif ($name =~ m{ \A (\w+)\{(\w+)\}(\[\])? \z }xms) {
             # if $3 is set we have an array element of a named parameter
             # (e.g. multivalued subject_parts)
             $result->{$1} = {} unless( $result->{$1} );
@@ -395,7 +395,7 @@ sub param {
             } else {
                 $result->{$1}->{$2} = $self->param($name);
             }
-        } else {            
+        } else {
             my $val = $self->param($name);
             $result->{$name} = $val;
         }

@@ -22,10 +22,10 @@ sub AUTOMETHOD {
 
     ### mapping server API call...
     ### $_
-    
+
     my $cmd = $_;
     return sub {
-	return $client{$ident}->send_receive_command_msg($cmd, $arg);
+    return $client{$ident}->send_receive_command_msg($cmd, $arg);
     }
 }
 

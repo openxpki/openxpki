@@ -27,9 +27,9 @@ sub read_file {
     my $filename = shift;
 
     if (! defined $filename) {
-	OpenXPKI::Exception->throw (
-	    message => 'I18N_OPENXPKI_FILEUTILS_READ_FILE_MISSING_PARAMETER',
-	    );
+    OpenXPKI::Exception->throw (
+        message => 'I18N_OPENXPKI_FILEUTILS_READ_FILE_MISSING_PARAMETER',
+        );
     }
 
     if (! -e $filename) {
@@ -45,15 +45,15 @@ sub read_file {
     }
 
     my $result = do {
-	open my $HANDLE, '<', $filename;
-	if (! $HANDLE) {
-	    OpenXPKI::Exception->throw (
-		message => 'I18N_OPENXPKI_FILEUTILS_READ_FILE_OPEN_FAILED',
-		params  => {'FILENAME' => $filename});
-	}
-	# slurp mode
-	local $INPUT_RECORD_SEPARATOR;     # long version of $/
-	<$HANDLE>;
+    open my $HANDLE, '<', $filename;
+    if (! $HANDLE) {
+        OpenXPKI::Exception->throw (
+        message => 'I18N_OPENXPKI_FILEUTILS_READ_FILE_OPEN_FAILED',
+        params  => {'FILENAME' => $filename});
+    }
+    # slurp mode
+    local $INPUT_RECORD_SEPARATOR;     # long version of $/
+    <$HANDLE>;
     };
 
     return $result;
@@ -70,13 +70,13 @@ sub write_file {
     if (! defined $filename) {
         OpenXPKI::Exception->throw (
             message => 'I18N_OPENXPKI_FILEUTILS_WRITE_FILE_NO_FILENAME_SPECIFIED',
-	    );
+        );
     }
 
     if (! defined $content) {
         OpenXPKI::Exception->throw (
             message => 'I18N_OPENXPKI_FILEUTILS_WRITE_FILE_NO_CONTENT_SPECIFIED',
-	    );
+        );
     }
 
     if ((-e $filename) and
@@ -91,7 +91,7 @@ sub write_file {
 
     my $mode = O_WRONLY | O_TRUNC;
     if (! -e $filename) {
-	$mode |= O_EXCL | O_CREAT;
+    $mode |= O_EXCL | O_CREAT;
     }
 
     my $HANDLE;
@@ -115,7 +115,7 @@ sub get_safe_tmpfile {
     my $template = $self->__get_safe_template ($arg_ref);
 
     ##! 2: 'build tmp file'
-    my $fh = File::Temp->new( TEMPLATE => $template, UNLINK => 1 );      
+    my $fh = File::Temp->new( TEMPLATE => $template, UNLINK => 1 );
     if (! $fh) {
         OpenXPKI::Exception->throw (
             message => 'I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_MAKE_FAILED'
@@ -183,14 +183,14 @@ sub cleanup {
 
     my $self = shift;
     my $ident = ident $self;
-    
+
     foreach my $file (keys %{$safe_filename_of{$ident}}) {
         if (-e $file) {
             unlink($file);
             delete $safe_filename_of{$ident}->{$file};
         }
     }
-    return 1;    
+    return 1;
 }
 
 1;

@@ -12,5 +12,4 @@ If the service is still in use, please make sure to request a new certificate
 in time. If you already renewed the certificate or the service is no longer in 
 use, you can silently ignore this mail.
 
-Regards,
-  PKI Team
+[% INCLUDE _footer.txt %]

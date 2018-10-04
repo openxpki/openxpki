@@ -24,34 +24,29 @@ sub execute {
     my $self       = shift;
     my $workflow   = shift;
     my $context    = $workflow->context();
-     
-    my $params     = { 
+
+    my $params     = {
       PKI_REALM => CTX('api')->get_pki_realm(),
       NEWKEY => $context->param('cert_identifier'),
       NAMESPACE => 'certificate.privatekey',
-      EXPIRATION_DATE => undef  
+      EXPIRATION_DATE => undef
     };
-    
+
     $params->{NAMESPACE} = $self->param('ds_namespace') if ($self->param('ds_namespace'));
-    
-        
+
+
     my $cert_escrow_handle_context = OpenXPKI::Server::Workflow::WFObject::WFHash->new(
-                { workflow => $workflow , context_key => 'cert_escrow_handle' } );        
+                { workflow => $workflow , context_key => 'cert_escrow_handle' } );
 
     # Fetch the temporary keyhandle, stored with the csr_serial as key
     $params->{KEY} = $cert_escrow_handle_context->valueForKey( $context->param('csr_serial') );
-                   
+
     ##! 16: 'modify_data_pool_entry params: ' . Dumper $params
     CTX('api')->modify_data_pool_entry($params);
 
-    CTX('dbi_backend')->commit();
-    
-    CTX('log')->log(
-        MESSAGE => "SmartCard escrow key renamed for csr_serial " . $context->param('csr_serial'), 
-        PRIORITY => 'info',
-        FACILITY => 'application'
-    );
-    
+    CTX('log')->application()->info("SmartCard escrow key renamed for csr_serial " . $context->param('csr_serial'));
+
+
     return 1;
 }
 

@@ -109,7 +109,7 @@ cmd=/usr/share/spec-helper/compress_files
 find %{buildroot} -name "perllocal.pod" \
     -o -name ".packlist"                \
     -o -name "*.bs"                     \
-    |xargs -i rm -f {}
+    |xargs rm -f
 
 # myperl issue #2 - until I can get Pinto running, just remove the offending files
 # DESTDIR = %{buildroot}
@@ -117,7 +117,7 @@ find %{buildroot} -name "perllocal.pod" \
 # This kludge automates the above explicit listing of files...
 rpm -ql myperl myperl-buildtools \
     | perl -ne "chomp; print \"$DESTDIR/\$_ \" if -f \"$DESTDIR\$_\";" \
-    | xargs rm -v
+    | xargs rm -f
 
 # TODO: SOAPsh.pl has /bin/env in shebang, which causes a dependency
 # problem when rpm searches for automatic dependencies

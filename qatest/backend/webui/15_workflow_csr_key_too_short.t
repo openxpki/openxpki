@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 
-use lib qw(../../lib);
+use FindBin qw( $Bin );
+use lib "$Bin/../../lib";
+
 use strict;
 use warnings;
 use CGI::Session;
@@ -10,8 +12,11 @@ use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use MockUI;
 
-#Log::Log4perl->easy_init($DEBUG);
-Log::Log4perl->easy_init($ERROR);
+use Cwd 'abs_path';
+use File::Basename;
+
+# We expect error messages but hide them unless we're in verbose testing
+Log::Log4perl->easy_init($ENV{TEST_VERBOSE} ? $ERROR : $OFF);
 
 use Test::More tests => 6;
 
@@ -25,6 +30,7 @@ require_ok( 'OpenXPKI::Client::UI' );
 
 my $result;
 my $client = MockUI::factory();
+my $openssl_conf = dirname(abs_path($0)).'/openssl.cnf';
 
 $result = $client->mock_request({
     'page' => 'workflow!index!wf_type!certificate_signing_request_v2',
@@ -43,7 +49,7 @@ like($result->{goto}, qr/workflow!load!wf_id!\d+/, 'Got redirect');
 
 my ($wf_id) = $result->{goto} =~ /workflow!load!wf_id!(\d+)/;
 
-diag("Workflow Id is $wf_id");
+note("Workflow Id is $wf_id");
 
 $result = $client->mock_request({
     'page' => $result->{goto},
@@ -54,7 +60,7 @@ $result = $client->mock_request({
 });
 
 # Create a pkcs10
-my $pkcs10 = `openssl req -new -subj "/DC=org/DC=OpenXPKI/DC=Test Deployment/CN=www.example.com" -config openssl.cnf  -newkey rsa:512 -nodes -keyout /dev/null 2>/dev/null`;
+my $pkcs10 = `openssl req -new -subj "/DC=org/DC=OpenXPKI/DC=Test Deployment/CN=www.example.com" -config $openssl_conf -newkey rsa:512 -nodes -keyout /dev/null 2>/dev/null`;
 
 $result = $client->mock_request({
     'action' => 'workflow!index',
@@ -65,7 +71,7 @@ $result = $client->mock_request({
 
 is ($result->{status}->{level}, 'error', 'Status is error');
 
-is ($result->{status}->{message}, 'I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_PARAM_NOT_ALLOWED (key_length)', 'Key Param error');
+is ($result->{status}->{message}, 'I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_PARAM_NOT_ALLOWED (key_length: 512)', 'Key Param error');
 
 
 

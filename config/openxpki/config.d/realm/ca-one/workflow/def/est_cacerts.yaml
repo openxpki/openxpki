@@ -1,0 +1,29 @@
+head:
+    prefix: estca
+    persister: Volatile
+
+state:
+    INITIAL:
+        action: initialize > SUCCESS
+
+    SUCCESS: ~
+
+action:
+    initialize:
+        class: OpenXPKI::Server::Workflow::Activity::EST::CACerts
+        input:
+          - server
+          - interface
+
+        param:
+          target_key: output
+
+acl:
+    System:
+        creator: any
+        context: 1
+
+    RA Operator:
+        creator: any
+        context: 1
+

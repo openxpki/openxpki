@@ -13,7 +13,7 @@ use OpenXPKI::Debug;
 
 use Data::Dumper;
 
-my @parameters = qw( 
+my @parameters = qw(
     cert_attrmap
     certificate
 );
@@ -21,41 +21,36 @@ my @parameters = qw(
 __PACKAGE__->mk_accessors(@parameters);
 
 
-sub execute
-{
+sub execute {
     my $self       = shift;
     my $workflow   = shift;
     my $context    = $workflow->context();
-    my $dbi         = CTX('dbi_backend');
     my $default_token = CTX('api')->get_default_token();
 
     ##! 16: 'ParseCert'
     my %contextentry_of = (
-		certificatein => 'certificate',
-		certidentifierout => 'cert_identifier',
-	);
-	
+        certificatein => 'certificate',
+        certidentifierout => 'cert_identifier',
+    );
+
     foreach my $contextkey (keys %contextentry_of) {
-	if (defined $self->param($contextkey . 'contextkey')) {
-	    $contextentry_of{$contextkey} = $self->param($contextkey . 'contextkey');
-	}
+        if (defined $self->param($contextkey . 'contextkey')) {
+            $contextentry_of{$contextkey} = $self->param($contextkey . 'contextkey');
+        }
     }
-    
+
     my $certificate = $context->param($contextentry_of{'certificatein'});
 
     my $x509 = OpenXPKI::Crypto::X509->new(
-    	TOKEN => $default_token,
-    	DATA  => $certificate,
-	);
+        TOKEN => $default_token,
+        DATA  => $certificate,
+    );
     my $cert_identifier  = $x509->get_identifier();
 
-    CTX('log')->log(
-        MESSAGE => 'Identifier of certificate is ' . $cert_identifier,   
-        PRIORITY => 'debug',
-        FACILITY => [ 'application' ],
-    );  
-	$context->param($contextentry_of{'certidentifierout'} => $cert_identifier );
-    
+    CTX('log')->application()->debug('Identifier of certificate is ' . $cert_identifier);
+
+    $context->param($contextentry_of{'certidentifierout'} => $cert_identifier );
+
     return 1;
 }
 
@@ -68,10 +63,10 @@ OpenXPKI::Server::Workflow::Activity::Tools::GetCertificateIdentifier
 
 =head1 Description
 
-Calculate the certificate's identifier 
+Calculate the certificate's identifier
 
 =head1 Parameters
- 
+
 
 =head2 certificateincontextkey
 
@@ -79,6 +74,6 @@ Context parameter to use for input certificate (default: certificate)
 
 =head2 certidentifieroutcontextkey
 
-Context parameter to use for certificate identifier output 
+Context parameter to use for certificate identifier output
 (default: cert_identifier)
 

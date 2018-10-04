@@ -1,0 +1,5 @@
+This folder contains scripts and data which is used to set up test various
+environments:
+ - Docker container for tests
+ - Vagrant box for development
+ - TravisCI VM

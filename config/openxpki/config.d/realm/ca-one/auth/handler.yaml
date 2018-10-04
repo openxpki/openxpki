@@ -7,23 +7,23 @@ Certificate:
         handler@: connector:auth.connector.role
         argument: cn
     cacert: Piv38gMblvOM5sTYqF0-LVhHag8
-        
+
 Signature:
     type: ChallengeX509
     label: Signature
     description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_SIGNATURE
     challenge_length: 256
-    role: 
+    role:
         default: 'User'
         handler@: connector:auth.connector.role
         argument: cn
     # define your trust anchors here
     # Allows every known user of the realm to login
     realm:
-        - ca-one 
+        - ca-one
     cacert:
         - list of extra cert identifiers
-        
+
 Anonymous:
     type: Anonymous
     label: Anonymous
@@ -36,7 +36,7 @@ User NoAuth:
     role: User
     env:
        LOGIN: __USER__
- 
+
 User Password:
     type: Password
     label: User Password
@@ -50,16 +50,10 @@ Operator Password:
     description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD
     # The passwords can be generated with "openxpkiadm hashpwd"
     # The password below is "openxpki" for all three users
+    role: RA Operator
     user:
-        caop:
-            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
-            role: CA Operator
-        raop:
-            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
-            role: RA Operator
-        raop2:
-            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
-            role: RA Operator 
+        raop: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
+        raop2: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
 
 External Dynamic Role:
     type: External
@@ -97,11 +91,16 @@ SmartCard:
     role: SmartCard
     user: scpers
 
+OneTimePassword:
+  type: OneTimePassword
+  salt: openxpki
+  role: User
+
 # Sample using a Password "bind" connector
 Password Connector:
     type: Connector
     label: User Password
-    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD   
+    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD
     role: User
     source@: connector:auth.connector.localuser
 
@@ -118,10 +117,10 @@ TestAccounts:
             role: RA Operator
         raop2:
             digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
-            role: RA Operator 
+            role: RA Operator
         user:
             digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
-            role: User 
+            role: User
         user2:
             digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
             role: User

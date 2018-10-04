@@ -1,7 +1,5 @@
-## OpenXPKI::Server::Watchdog.pm
-##
-## Written by Dieter Siebeck and Oliver Welter for the OpenXPKI project
-## Copyright (C) 2012-2013 by The OpenXPKI Project
+package OpenXPKI::Server::Watchdog;
+use Moose;
 
 
 =head1 NAME
@@ -68,29 +66,34 @@ default: 1
 
 =cut
 
-package OpenXPKI::Server::Watchdog;
-use strict;
+# Core modules
 use English;
+use Data::Dumper;
+use POSIX;
+
+# CPAN modules
+use Log::Log4perl::MDC;
+use Try::Tiny;
+
+# Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
+use OpenXPKI::Control;
+use OpenXPKI::Server;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::Watchdog::WorkflowInstance;
 use OpenXPKI::DateTime;
-use Proc::ProcessTable;
+use OpenXPKI::Daemonize;
 
-use Net::Server::Daemonize qw( set_uid set_gid );
 
-use Moose;
+our $TERMINATE = 0;
+our $RELOAD = 0;
 
-use Data::Dumper;
-
-our $terminate = 0;
 
 has workflow_table => (
     is => 'ro',
     isa => 'Str',
-    default => 'WORKFLOW',
+    default => 'workflow',
 );
 
 has max_fork_redo => (
@@ -141,6 +144,12 @@ has interval_loop_run => (
     default =>  1
 );
 
+has interval_session_purge => (
+    is => 'rw',
+    isa => 'Int',
+    default => 0
+);
+
 has _uid => (
     is => 'ro',
     isa => 'Str',
@@ -152,6 +161,29 @@ has _gid => (
     isa => 'Str',
     default => '0',
 );
+
+### TODO: maybe we should measure the count of exception in a certain time interval?
+has _exception_count => (
+    is => 'rw',
+    isa => 'Int',
+    init_arg => undef,
+    default => 0,
+);
+
+has _next_session_cleanup => (
+    is => 'rw',
+    isa => 'Int',
+    init_arg => undef,
+);
+
+has _session_purge_handler => (
+    is => 'rw',
+    isa => 'OpenXPKI::Server::Session',
+    init_arg => undef,
+    predicate => 'do_session_purge',
+);
+
+
 
 around BUILDARGS => sub {
 
@@ -175,7 +207,89 @@ around BUILDARGS => sub {
 
 };
 
-=head1 Methods
+=head1 STATIC METHODS
+
+=head2 _sig_hup
+
+Signal handler for SIGHUP registered with the forked worker process.
+
+Triggered by the master process when a reload happens.
+
+=cut
+sub _sig_hup {
+    ##! 1: 'Got HUP'
+    $RELOAD = 1;
+    CTX('log')->system->info("Watchdog worker $$ got HUP signal - reloading config");
+}
+
+=head2 _sig_term
+
+Signal handler for SIGTERM registered with the forked worker process.
+
+Trigger by the master process to terminate the worker.
+
+=cut
+sub _sig_term {
+    ##! 1: 'Got TERM'
+    $TERMINATE  = 1;
+    CTX('log')->system->info("Watchdog worker $$ got TERM signal - stopping");
+}
+
+=head2 start_or_reload
+
+Static method to instantiate and start the watchdog or make it reload it's
+config.
+
+=cut
+sub start_or_reload {
+    ##! 1: 'start_or_reload'
+    my $pids = OpenXPKI::Control::get_pids();
+
+    # Start watchdog if not running
+    if (not scalar @{$pids->{watchdog}}) {
+        my $config = CTX('config');
+
+        return 0 if $config->get('system.watchdog.disabled');
+
+        my $watchdog = OpenXPKI::Server::Watchdog->new( {
+            user  => OpenXPKI::Server::__get_numerical_user_id(  $config->get('system.server.user') ),
+            group => OpenXPKI::Server::__get_numerical_group_id( $config->get('system.server.group') ),
+        } );
+
+        $watchdog->run;
+    }
+    # Signal reload
+    else {
+        kill 'HUP', @{$pids->{watchdog}};
+    }
+
+    return 1;
+}
+
+=head2 terminate
+
+Static method that looks for watchdog instances and sends them a SIGHUP signal.
+
+This will NOT kill the watchdog but tell it to gracefully stop.
+
+=cut
+sub terminate {
+    ##! 1: 'terminate'
+    my $pids = OpenXPKI::Control::get_pids();
+
+    if (scalar $pids->{watchdog}) {
+        kill 'TERM', @{$pids->{watchdog}};
+        CTX('log')->system()->info('Told watchdog to terminate');
+    }
+    else {
+        CTX('log')->system()->error('No watchdog instances to terminate');
+    }
+
+    return 1;
+}
+
+=head1 METHODS
+
 =head2 run
 
 Forks away a worker child, returns the pid of the worker
@@ -185,8 +299,7 @@ Forks away a worker child, returns the pid of the worker
 sub run {
     my $self = shift;
 
-    my $pid;
-    my $redo_count = 0;
+    CTX('log')->system->info('Starting watchdog');
 
     # Check if we already have a watchdog running
     my $result = OpenXPKI::Control::get_pids();
@@ -198,242 +311,163 @@ sub run {
                 'instance_running' => $instance_count,
                 'max_instance_count' =>  $self->max_instance_count()
             },
-            log => {
-                logger => CTX('log'),
-                priority => 'error',
-                facility => 'system',
-        });
+            log => { priority => 'error', facility => 'system' }
+        );
     }
 
-    $SIG{CHLD} = 'IGNORE';
-    while ( !defined $pid && $redo_count < $self->max_fork_redo() ) {
-        ##! 16: 'trying to fork'
-        $pid = fork();
-        ##! 16: 'pid: ' . $pid
-        if ( !defined $pid ) {
-            if ( $!{EAGAIN} ) {
+    my $fork_helper = OpenXPKI::Daemonize->new(
+        sighup_handler  => \&OpenXPKI::Server::Watchdog::_sig_hup,
+        sigterm_handler => \&OpenXPKI::Server::Watchdog::_sig_term,
+    );
+    $fork_helper->gid($self->_gid) if $self->_gid;
+    $fork_helper->uid($self->_uid) if $self->_uid;
 
-                # recoverable fork error
-                sleep 2;
-                $redo_count++;
+    # FORK
+    my $pid = $fork_helper->fork_child; # parent returns PID, child returns 0
 
-            } else {
+    # parent process: return
+    if ($pid > 0) { return $pid }
 
-                # other fork error
-                OpenXPKI::Exception->throw(
-                    message => 'I18N_OPENXPKI_SERVER_INIT_WATCHDOG_FORK_FAILED_UNRECOVERABLE',
-                    log => {
-                        logger => CTX('log'),
-                        priority => 'fatal',
-                        facility => 'system',
-                });
-            }
-        }
+    # child process
+    ##! 16: 'child here'
+    try {
+        #
+        # init
+        #
+        # create memory-only session for workflow
+        my $session = OpenXPKI::Server::Session->new(type => "Memory")->create;
+        OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
+        Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
 
-    }
-
-    OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_SERVER_INIT_WATCHDOG_FORK_FAILED_MAX_REDO',
-        log => {
-            logger => CTX('log'),
-            priority => 'fatal',
-            facility => 'system',
-        }
-    ) unless(defined $pid);
-
-    # Reconnect the dbi
-    CTX('dbi_log')->new_dbh();
-    CTX('dbi_backend')->new_dbh();
-    # creates a new handle to free the ref but we dont need to connect
-    CTX('dbi_workflow')->new_dbh();
-    
-    CTX('dbi_log')->connect();    
-    CTX('dbi_backend')->connect();
-
-    if ( $pid != 0 ) {
-
-        ##! 16: 'parent here - process group: ' . getpgrp(0)
-        return $pid;
-
-    } else {
-
-        $SIG{'HUP'} = \&OpenXPKI::Server::Watchdog::_sig_hup;
-        $SIG{'TERM'} = \&OpenXPKI::Server::Watchdog::_sig_term;
-        # The caller sets the watchdog only in the global context
-        # we reuse the context to set a pointer to ourselves for signal handling
-        # in the forked process - we need the force if the watchdog is forked
-        # during runtime to overwrite the main context
-        OpenXPKI::Server::Context::setcontext({
-            watchdog => $self, force => 1
-        });
-
-        ##! 16: 'child here'
-
-        # Re-seed Perl random number generator
-        srand(time ^ $PROCESS_ID);
-
-        $self->{dbi}                      = CTX('dbi_backend');
+        $self->{dbi}                      = CTX('dbi');
         $self->{hanging_workflows}        = {};
         $self->{hanging_workflows_warned} = {};
         $self->{original_pid}             = $PID;
 
         # set process name
+        OpenXPKI::Server::__set_process_name("watchdog");
 
-        $0 = sprintf ('openxpkid (%s) watchdog', CTX('config')->get('system.server.name') || 'main');
-
-        set_gid($self->_gid()) if( $self->_gid() );
-        set_uid($self->_uid()) if( $self->_uid() );
+        CTX('log')->system()->info(sprintf( 'Watchdog initialized, delays are: initial: %01d, idle: %01d, run: %01d"',
+                $self->interval_wait_initial(), $self->interval_loop_idle(), $self->interval_loop_run() ));
 
         # wait some time for server startup...
         ##! 16: sprintf('watchdog: original PID %d, initail wait for %d seconds', $self->{original_pid} , $self->interval_wait_initial());
-
-        # Force new session as the initialized session is a Mock-Session which we can not use!
-        $self->__check_session(1);
-
-        CTX('log')->log(
-            MESSAGE  => sprintf( 'Watchdog initialized, delays are: initial: %01d, idle: %01d, run: %01d"',
-                $self->interval_wait_initial(), $self->interval_loop_idle(), $self->interval_loop_run() ),
-            PRIORITY => "info",
-            FACILITY => "system",
-        );
-
         sleep($self->interval_wait_initial());
 
-        ### TODO: maybe we should measure the count of exception in a certain time interval?
-        my $exception_count = 0;
+        $self->_exception_count(0);
 
-        ##! 16: 'watchdog: start looping'
-
-        while ( ! $OpenXPKI::Server::Watchdog::terminate ) {
-
-            ##! 80: 'watchdog: do loop'
-            #ensure that we have a valid session
-            $self->__check_session();
-
-            eval {
-
-                my $wf_id = $self->__scan_for_paused_workflows();
-
-                # Duration of Pause depends on weather a workflow was found or not
-                if ($wf_id) {
-                    ##! 80: sprintf('watchdog sleeps %d secs (busy)', $self->interval_loop_run())
-                    sleep($self->interval_loop_run());
-                } else {
-                    ##! 80: sprintf('watchdog sleeps %d secs (idle)', $self->interval_loop_idle())
-                    sleep($self->interval_loop_idle());
-                }
-
-                # Reset the exception counter after every successfull loop
-                $exception_count = 0;
-
-            };
-            my $error_msg;
-            if ( my $exc = OpenXPKI::Exception->caught() ) {
-                ##! 16: 'Got OpenXPKI::Exception in watchdog - count is ' . $exception_count                 
-                my $em = $exc->message_code();
-                
-                ##! 32: 'Exception message is ' . $em
-                # Special handling of DBI errors - reconnect dbh and try again
-                # only if this is not the first exception
-                if (($exception_count > 0) && ($em =~ /I18N_OPENXPKI_SERVER_DBI_DBH/)) {
-                    CTX('log')->log(
-                        MESSAGE  => "DBI error in watchdog - trying reconnect",
-                        PRIORITY => "warn",
-                        FACILITY => "system"
-                    );
-                    # Ping the database
-                    if (!$self->{dbi}->is_connected()) {
-
-                        eval {
-                            CTX('dbi_log')->connect();
-                            CTX('dbi_backend')->connect();
-                            $self->{dbi} = CTX('dbi_backend');
-                        };
-                    }
-                    if (!$self->{dbi}->is_connected()) {
-                        $error_msg = "Watchdog, fatal exception: DBI error and reconnect failed";
-                    } else {
-                        # ping was successful
-                        CTX('log')->log(
-                            MESSAGE  => "DBI error in watchdog - reconnected",
-                            PRIORITY => "info",
-                            FACILITY => "system"
-                        );
-                        # no error message, so next loop will start just immediatley
-                    }
-                } else {
-                    $error_msg = "Watchdog, fatal exception: " . $em;
-                }
-            } elsif ($EVAL_ERROR) {
-                $error_msg = "Watchdog, fatal error: " . $EVAL_ERROR;
-            }
-            if ($error_msg) {
-
-                $exception_count++;
-                print STDERR $error_msg, "\n";
-
-                my $sleep = $self->interval_sleep_exception();
-                CTX('log')->log(
-                    MESSAGE  => "Watchdog error, have a nap ($sleep sec, $exception_count cnt, $error_msg)",
-                    PRIORITY => "error",
-                    FACILITY => "system"
-                );
-
-                my $threshold = $self->max_exception_threshhold();
-                if (($threshold > 0) && ($exception_count > $threshold )) {
-                    my $msg = 'Watchdog exception limit ($threshold) reached, exiting!';
-                    print STDERR $msg, "\n";
-                    OpenXPKI::Exception->throw(
-                        message => $msg,
-                        log => {
-                            logger => CTX('log'),
-                            priority => 'fatal',
-                            facility => 'system',
-                    });
-                }
-
-                # sleep to give the system a chance to recover
-                sleep($sleep);
-
-
-            }
-
+        # setup helper object for purging expired sessions
+        if ($self->interval_session_purge) {
+            $self->_next_session_cleanup( time );
+            $self->_session_purge_handler( OpenXPKI::Server::Session->new(load_config => 1) );
+            CTX('log')->system()->info("Initialize session purge from watchdog with interval " . $self->interval_session_purge());
         }
-        exit;
+
+        #
+        # main loop
+        #
+        $self->__main_loop;
     }
-    ##! 4: 'End of run'
+    catch {
+        # make sure the cleanup code does not die as this would escape run()
+        eval { CTX('log')->system->error($_) };
+    };
+
+    eval { $self->{dbi}->disconnect };
+
+    ##! 1: 'End of run()'
+    exit;   # child process MUST never leave run()
 }
 
-=head2 _sig_hup
+=head2 __main_loop
 
-signalhandler registered with the forked worker.
-Trigger via IPC by the master process when a reload happens.
+Watchdog main loop (child process).
+
+Runs until the package scope variable C<$TERMINATE> is set to C<1>.
 
 =cut
-sub _sig_hup {
+sub __main_loop {
+    my $self = shift;
 
-    ##! 1: 'Got HUP'
-    my $watchdog = CTX('watchdog');
+    while (not $TERMINATE) {
+        ##! 64: 'watchdog: do loop'
+        try {
+            $self->__reload if $RELOAD;
+            $self->__purge_expired_sessions;
+            my $wf_id = $self->__scan_for_paused_workflows();
 
-    ##! 4: 'run update head on watchdog child ' . $$
+            # duration of pause depends on whether a workflow was found or not
+            my $sec = $wf_id ? $self->interval_loop_run : $self->interval_loop_idle;
+            ##! 64: sprintf('watchdog sleeps %d secs (%s)', $sec, $wf_id ? 'busy' : 'idle')
+            sleep($sec);
+            # Reset the exception counter after every successfull loop
+            $self->_exception_count(0);
+        }
+        catch {
+            $self->_exception_count($self->_exception_count + 1);
+
+            my $error_msg = "Watchdog fatal error: $_";
+            my $sleep = $self->interval_sleep_exception();
+
+            print STDERR $error_msg, "\n";
+
+            CTX('log')->system->error("$error_msg (having a nap for $sleep sec; ".$self->_exception_count." exceptions in a row)");
+
+            my $threshold = $self->max_exception_threshhold();
+            if ($threshold > 0 and $self->_exception_count > $threshold) {
+                my $msg = "Watchdog exception limit ($threshold) reached, exiting!";
+                print STDERR $msg, "\n";
+                OpenXPKI::Exception->throw(
+                    message => $msg,
+                    log => { priority => 'fatal', facility => 'system' },
+                );
+            }
+
+            # sleep to give the system a chance to recover
+            sleep($sleep);
+        };
+    }
+}
+
+=head2 __purge_expired_sessions
+
+Purge expired sessions from backend if enough time elapsed.
+
+=cut
+sub __purge_expired_sessions {
+    my $self = shift;
+
+    return unless $self->do_session_purge and time > $self->_next_session_cleanup;
+
+    CTX('log')->system()->debug("Init session purge from watchdog");
+    $self->_session_purge_handler->purge_expired;
+    $self->_next_session_cleanup( time + $self->interval_session_purge );
+}
+
+# Does the actual reloading during the main loop
+sub __reload {
+    my $self = shift;
+
+    $RELOAD = 0;
+
     my $config = CTX('config');
-    $config->update_head();
 
-    ##! 16: 'new head version is ' . $config->get_head_version()
     my $new_cfg = $config->get_hash('system.watchdog');
 
     # set the config values from new head
-    foreach my $key (qw(max_fork_redo
+    for my $key (qw(
+        max_fork_redo
         max_exception_threshhold
         interval_sleep_exception
         max_tries_hanging_workflows
         interval_wait_initial
         interval_loop_idle
-        interval_loop_run)) {
-
+        interval_loop_run
+        interval_session_purge
+    )) {
         if ($new_cfg->{$key}) {
             ##! 16: 'Update key ' . $key
-            $watchdog->$key( $new_cfg->{$key} )
+            $self->$key( $new_cfg->{$key} )
         }
     }
 
@@ -443,209 +477,62 @@ sub _sig_hup {
         force => 1,
     });
 
-
-    CTX('log')->log(
-        MESSAGE  => 'Watchdog worker reloaded',
-        PRIORITY => "info",
-        FACILITY => "system",
-    );
-    return;
-
+    CTX('log')->system()->info('Watchdog worker reloaded');
 }
 
-=head2 _sig_term
-
-signalhandler registered with the forked worker.
-Trigger via IPC by the master process to terminate the worker.
-
-=cut
-sub _sig_term {
-
-    ##! 1: 'Got TERM'
-    $OpenXPKI::Server::Watchdog::terminate  = 1;
-
-    CTX('log')->log(
-        MESSAGE  => "Watchdog worker $$ got term signal - cleaning up.",
-        PRIORITY => "info",
-        FACILITY => "system",
-    );
-
-    return;
-}
-
-=head2 reload
-
-This method is called from the main server to inform the watchdog
-to reload the config. You should not call this from inside a watchdog worker.
-
-=cut
-
-sub reload {
-
-    ##! 1: 'reloading'
-    my $self = shift;
-
-    my $result = OpenXPKI::Control::get_pids();
-
-    # Check for enable/disable change
-    my $disabled = CTX('config')->get('system.watchdog.disabled') || 0;
-
-    # Terminate if we have a watchdog where we dont should have
-    if ($disabled && scalar @{$result->{watchdog}}) {
-
-        CTX('log')->log(
-            MESSAGE  => 'Watchdog should not run - terminating.',
-            PRIORITY => "info",
-            FACILITY => "system",
-        );
-        kill 'TERM', @{$result->{watchdog}};
-
-    } elsif (!scalar @{$result->{watchdog}}) {
-
-        CTX('log')->log(
-            MESSAGE  => 'Watchdog missing - start it.',
-            PRIORITY => "info",
-            FACILITY => "system",
-        );
-        CTX('watchdog')->run();
-
-    } else {
-        kill 'HUP', @{$result->{watchdog}};
-    }
-
-    return 1;
-
-}
-
-=head2 terminate
-
-This method uses the process table to look for watchdog instances and workers
-and sends them a SIGHUP signal. This will NOT kill the watchdog but tell him
-to not start any new workers. Running workers wont be touched.
-You should not call this from inside a watchdog worker.
-
-=cut
-
-sub terminate {
-
-   ##! 1: 'terminate'
-    my $self = shift;
-
-    my $result = OpenXPKI::Control::get_pids();
-
-    if (ref $result->{watchdog}) {
-        kill 'TERM', @{$result->{watchdog}};
-
-         CTX('log')->log(
-            MESSAGE  => 'Told watchdog to terminate',
-            PRIORITY => "info",
-            FACILITY => "system",
-       );
-    } else {
-        CTX('log')->log(
-            MESSAGE  => 'No watchdog pids to terminate',
-            PRIORITY => "error",
-            FACILITY => "system",
-       );
-    }
-
-    return 1;
-}
-
-=head2
+=head2 __scan_for_paused_workflows
 
 Do a select on the database to check for waiting or stale workflows,
 if found, the workflow is marked and reinstantiated, the id of the
 workflow is returned. Returns undef, if nothing is found.
 
-
 =cut
 sub __scan_for_paused_workflows {
-
-    ##! 1: 'start'
-
     my $self = shift;
-
-    # commit to get a current snapshot of the database in the highest isolation level.
-    $self->{dbi}->commit();
+    ##! 1: 'start'
 
     # Search table for paused workflows that are ready to wake up
     # There is no ordering here, so we might not get the earliest hit
     # This is useful in distributed environments to prevent locks/races
-    my $db_result = $self->{dbi}->first(
-        TABLE   => $self->workflow_table(),
-        COLUMNS => ['WORKFLOW_SERIAL'],
-        DYNAMIC => {
-            'WORKFLOW_PROC_STATE' => { VALUE => 'pause' },
-            'WATCHDOG_KEY'        => { VALUE => '__CATCHME' },
-            'WORKFLOW_WAKEUP_AT'  => { VALUE => time(), OPERATOR => 'LESS_THAN' },
+    my $workflow = $self->{dbi}->select_one(
+        from  => $self->workflow_table,
+        columns => [ qw(
+            workflow_id
+            workflow_type
+            workflow_session
+            pki_realm
+        ) ],
+        where => {
+            'workflow_proc_state' => 'pause',
+            'watchdog_key'        => '__CATCHME',
+            'workflow_wakeup_at'  => { '<', time() },
         },
     );
 
-    if ( !defined $db_result ) {
-        ##! 80: 'no paused WF found, can be idle again...'
+    if ( !defined $workflow ) {
+        ##! 64: 'no paused WF found, can be idle again...'
         return;
     }
 
-    ##! 16: 'found paused workflow: '.Dumper($db_result)
+    ##! 16: 'found paused workflow: '.Dumper($workflow)
 
     #select again:
-    my $wf_id = $db_result->{WORKFLOW_SERIAL};
-    $db_result = $self->__flag_and_fetch_workflow( $wf_id );
-    if ( !defined $db_result ) {
-        ##! 16: sprintf('some other process took wf %s, return', $wf_id)
-        return;
-    }
+    my $wf_id = $workflow->{workflow_id};
+    $self->__flag_and_fetch_workflow( $wf_id ) or return;
 
-    ##! 16: 'WF now ready to re-instantiate: '.Dumper($db_result)
-    CTX('log')->log(
-        MESSAGE  => sprintf( 'watchdog, paused wf %d now ready to re-instantiate, start fork process', $wf_id ),
-        PRIORITY => "info",
-        FACILITY => "workflow",
-    );
-    $self->{dbi}->commit();
+    ##! 16: 'WF now ready to re-instantiate '
+    CTX('log')->workflow()->info(sprintf( 'watchdog, paused wf %d now ready to re-instantiate, start fork process', $wf_id ));
 
-    eval{
-        #this command effectively creates a forked child process which "wakes up the workflow"
-        my $Instance = OpenXPKI::Server::Watchdog::WorkflowInstance->new();
-        $Instance->run($db_result);
-    };
 
-    # all exceptions/fatals which occur in the forked child will be handled there
-    # if an error/exception occurs here, it must be within the main (watchdog) process, so we log it as "system" error
-    my $error_msg;
-    if ( my $exc = OpenXPKI::Exception->caught() ) {
-        $exc->show_trace(1);
-        $error_msg = "Exception caught while forking child instance: $exc";
-    } elsif ($EVAL_ERROR) {
-        $error_msg = "Fatal error while forking child instance:" . $EVAL_ERROR;
-    }
-    if ($error_msg) {
-        CTX('log')->log(
-            MESSAGE  => $error_msg,
-            PRIORITY => "fatal",
-            FACILITY => "system"
-        );
-    }
-
-    # security measure: for child processes no further than here! (all childprocesses in WorkflowInstance should
-    # exit properly and handle their exceptions on their own... but just in case...)
-    # $self->{original_pid} == PID of Watchdog process
-    if( $self->{original_pid} ne $PID ){
-        ##! 16: sprintf('exit this process: actual pid %s is not original pid %s' , $PID, $self->{original_pid});
-        CTX('log')->log(
-            MESSAGE  => "Crashed workflow from watchdog bubbbled up!",
-            PRIORITY => "fatal",
-            FACILITY => "system"
-        );
-        exit;
-    }
+    $self->__wake_up_workflow({
+        workflow_id         => $workflow->{workflow_id},
+        workflow_type       => $workflow->{workflow_type},
+        workflow_session    => $workflow->{workflow_session},
+        pki_realm           => $workflow->{pki_realm},
+    });
 
     return $wf_id;
-
 }
-
-
 
 =head2 __flag_and_fetch_workflow( wf_id )
 
@@ -656,106 +543,90 @@ method first writes a random marker to create "row lock" and tries to reload
 the row using this marker. If either one fails, returnes undef.
 
 =cut
-sub __flag_and_fetch_workflow {
 
-    my $self = shift;
-    my $wf_id = shift;
+sub __flag_and_fetch_workflow {
+    my ($self, $wf_id) = @_;
 
     return unless $wf_id;    #this is real defensive programming ...;-)
-
 
     #FIXME: Might add some more entropy or the server id for cluster oepration
     my $rand_key = sprintf( '%s_%s_%s', $PID, time(), sprintf( '%02.d', rand(100) ) );
 
     ##! 16: 'set random key '.$rand_key
 
-    CTX('log')->log(
-        MESSAGE  => sprintf( 'watchdog: paused wf %d found, mark with flag "%s"', $wf_id, $rand_key ),
-        PRIORITY => "debug",
-        FACILITY => "workflow",
-    );
+    CTX('log')->workflow()->debug(sprintf( 'watchdog: paused wf %d found, mark with flag "%s"', $wf_id, $rand_key ));
+
+
+    $self->{dbi}->start_txn;
 
     # it is necessary to explicitely set WORKFLOW_LAST_UPDATE,
     # because otherwise ON UPDATE CURRENT_TIMESTAMP will set (maybe) a non UTC timestamp
 
-    # watchdog key will be reseted automatically, when the workflow is updated from within
+    # watchdog key will be reset automatically, when the workflow is updated from within
     # the API (via factory::save_workflow()), which happens immediately, when the action is executed
     # (see OpenXPKI::Server::Workflow::Persister::DBI::update_workflow())
-    my $update_ok = $self->{dbi}->update(
-        TABLE => $self->workflow_table(),
-        DATA  => {
-            WATCHDOG_KEY => $rand_key,
-            WORKFLOW_LAST_UPDATE => DateTime->now->strftime( '%Y-%m-%d %H:%M:%S' ),
-        },
-        WHERE => {
-            WATCHDOG_KEY        => '__CATCHME',
-            WORKFLOW_SERIAL     => $wf_id,
-            WORKFLOW_PROC_STATE => 'pause'
-        }
-    );
-
-    if ( !$update_ok ) {
-        CTX('log')->log(
-            MESSAGE  => sprintf( 'watchdog, paused wf %d: update with mark "%s" not succesfull', $wf_id, $rand_key ),
-            PRIORITY => "warn",
-            FACILITY => ["workflow","system"]
+    my $row_count;
+    eval {
+        $row_count = $self->{dbi}->update(
+            table => $self->workflow_table,
+            set => {
+                watchdog_key => $rand_key,
+                workflow_last_update => DateTime->now->strftime( '%Y-%m-%d %H:%M:%S' ),
+            },
+            where => {
+                workflow_proc_state => 'pause',
+                watchdog_key        => '__CATCHME',
+                workflow_id         => $wf_id,
+            },
         );
+        $self->{dbi}->commit;
+    };
+    # We use DB transaction isolation level "READ COMMITTED":
+    # So in the meantime another watchdog process might have picked up this
+    # workflow and changed the database. Two things can happen:
+    # 1. other process committed changes -> our update's where clause misses ($row_count = 0).
+    # 2. other process did not commit -> timeout exception because of DB row lock
+    if ($@ or $row_count < 1) {
+        ##! 16: sprintf('some other process took wf %s, return', $wf_id)
+        $self->{dbi}->rollback;
+        CTX('log')->system()->warn(sprintf( 'watchdog, paused wf %d: update with mark "%s" failed', $wf_id, $rand_key ));
         return;
     }
 
-    # We must commit, otherwise the flag might be hidden in a transaction!
-    $self->{dbi}->commit();
-
-    my $db_result = $self->{dbi}->first(
-        TABLE   => $self->workflow_table(),
-        COLUMNS => ['WORKFLOW_SERIAL'],
-        DYNAMIC => {
-            'WATCHDOG_KEY'        => { VALUE => $rand_key },
-            'WORKFLOW_SERIAL'     => { VALUE => $wf_id },
-        },
-    );
-
-    unless ( defined $db_result ) {
-        CTX('log')->log(
-            MESSAGE  => sprintf( 'watchdog, refetching wf %d with mark "%s" not succesfull', $wf_id, $rand_key ),
-            PRIORITY => "error",
-            FACILITY => ["workflow","system"]
-        );
-        return;
-    }
-
-    return $db_result;
-
+    return $wf_id;
 }
 
-=head2
 
-Check and, if necessary, create the session context
+=head2 __wake_up_workflow
+
+Restore the session environment and execute the action, runs in eval
+block and returns the error message in case of error.
 
 =cut
 
-sub __check_session {
+sub __wake_up_workflow {
+    my ($self, $args) = @_;
 
-    my $self = shift;
-    my ($force_new) = @_;
-    my $session;
-    unless($force_new){
-        eval{$session = CTX('session');};
-        return if $session;
-    }
+    CTX('session')->data->pki_realm($args->{pki_realm});
+    CTX('session')->data->thaw($args->{workflow_session}); # "user" and "role" will be set
 
-    my $directory = CTX('config')->get("system.server.session.directory");
-    my $lifetime  = CTX('config')->get("system.server.session.lifetime");
+    # Set MDC for logging
+    Log::Log4perl::MDC->put('user', CTX('session')->data->user);
+    Log::Log4perl::MDC->put('role', CTX('session')->data->role);
+    Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
 
-    ##! 4: "create new session dir: $directory, lifetime: $lifetime "
-    $session = OpenXPKI::Server::Session->new({
-        DIRECTORY => $directory,
-        LIFETIME  => $lifetime,
+    $self->{dbi}->start_txn;
+
+    ##! 1: 'call wakeup'
+    my $wf_info = CTX('api')->wakeup_workflow({
+        WORKFLOW => $args->{workflow_type},
+        ID => $args->{workflow_id},
+        ASYNC => 'fork',
     });
-    OpenXPKI::Server::Context::setcontext({'session' => $session,'force'=> $force_new});
-    ##! 4: sprintf(" session %s created" , $session->get_id())
-}
+    ##! 32: 'wakeup returned ' . Dumper $wf_info
 
+    # commit/rollback is done inside workflow engine
+}
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

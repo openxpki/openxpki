@@ -26,11 +26,8 @@ sub create_workflow {
     my $workflow = shift;
     ##! 1: "create volatile workflow"
 
-    CTX('log')->log(
-        MESSAGE  => "Created volatile workflow for type ".$workflow->type(),
-        PRIORITY => "info",
-        FACILITY => "workflow"
-    );
+    CTX('log')->workflow()->info("Created volatile workflow for type ".$workflow->type());
+
 
     return 0;
 }

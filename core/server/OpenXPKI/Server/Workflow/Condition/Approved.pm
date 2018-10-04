@@ -26,11 +26,11 @@ sub _init
 
     ## role can be comma sep. list
     my $role = $params->{role};
-      
+
     if ($role =~ /,/)
     {
-        my @roles = split /\s*,\s*/, $role; 
-        $role = \@roles;        
+        my @roles = split /\s*,\s*/, $role;
+        $role = \@roles;
     } else {
         $role = [ $role ];
     }
@@ -75,7 +75,7 @@ sub evaluate
 
     ## remove available approvals from the required list
     foreach my $approval (@{$approvals}) {
-        
+
         my $role = $approval->{session_role};
         ##! 16: 'Role of current approval ' . $role
         if ($required{$role} > 1) {
@@ -85,12 +85,9 @@ sub evaluate
             delete $required{$role};
         }
     }
- 
-    CTX('log')->log(
-        MESSAGE => "Too few approvals, missing: " . Dumper \%required,
-        PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    ); 
+
+    CTX('log')->application()->trace("Too few approvals, missing: " . Dumper \%required);
+
 
     ## if the required list contains still some requirements
     ## then the approval is not complete

@@ -12,24 +12,24 @@ use Workflow::Exception qw( validation_error configuration_error );
 sub _preset_args {
     return [ qw(cert_profile key_alg key_gen_params enc_alg) ];
 }
-  
+
 sub _validate {
-    
+
     ##! 1: 'start'
     my ( $self, $wf, $cert_profile, $key_alg, $key_gen_params, $enc_alg ) = @_;
-    
+
     if (!$key_alg) {
-        ##! 8: 'skip - no algorithm' 
-        return 1; 
+        ##! 8: 'skip - no algorithm'
+        return 1;
     }
-    
+
     # might be serialized
     if (!ref $key_gen_params) {
         $key_gen_params = OpenXPKI::Serialization::Simple->new()->deserialize( $key_gen_params );
     }
-          
+
     my $key_params = {};
-    
+
     if ($key_alg eq 'rsa') {
         $key_params = { key_length =>  $key_gen_params->{KEY_LENGTH} };
     } elsif ($key_alg eq 'dsa') {
@@ -40,66 +40,54 @@ sub _validate {
     } else {
         validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_ALGO_NOT_SUPPORTED');
     }
-    
+
     ##! 16: "Alg: $key_alg"
     ##! 16: 'Params ' . Dumper $key_params
-    
+
     # get the list of allowed algorithms from the config
     my $algs = CTX('api')->get_key_algs({ PROFILE => $cert_profile, NOHIDE => 1 });
-    
+
     ##! 32: 'Alg expected ' . Dumper $algs
-    
+
     if (!grep(/\A$key_alg\z/, @{$algs})) {
         ##! 8: "KeyParam validation failed on algo $key_alg"
-        CTX('log')->log(
-            MESSAGE  => "KeyParam validation failed on algo $key_alg",
-            PRIORITY => 'error',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->error("KeyParam validation failed on algo $key_alg");
+
         validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_ALGO_NOT_ALLOWED');
     }
-    
+
     my $params = CTX('api')->get_key_params({ PROFILE => $cert_profile, ALG => $key_alg, NOHIDE => 1 });
-    
+
     ##! 32: 'Params expected ' . Dumper $params
-    
+
     foreach my $param (keys %{$params}) {
         my $val = $key_params->{$param} || '';
-        
+
         if ($val eq '_any') { next; }
-        
+
         my @expect = @{$params->{$param}};
-        ##! 32: "Validate param $param, $val, " . Dumper \@expect 
+        ##! 32: "Validate param $param, $val, " . Dumper \@expect
         if (!grep(/$val/, @expect)) {
             ##! 32: 'Failed on ' . $val
-            CTX('log')->log(
-                MESSAGE  => "KeyParam validation failed on $param with value $val",
-                PRIORITY => 'error',
-                FACILITY => 'application',
-            );
+            CTX('log')->application()->error("KeyParam validation failed on $param with value $val");
+
             validation_error("I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_PARAM_NOT_ALLOWED ($param)");
         }
     }
-    
+
     my $enc_algs = CTX('api')->get_key_enc({ PROFILE => $cert_profile, NOHIDE => 1 });
     if ($enc_alg && !grep(/\A$enc_alg\z/, @{$enc_algs})) {
         ##! 32: 'Failed on ' . $enc_alg
-        CTX('log')->log(
-            MESSAGE  => "KeyParam validation failed on enc_alg with value $enc_alg",
-            PRIORITY => 'error',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->error("KeyParam validation failed on enc_alg with value $enc_alg");
+
         validation_error("I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_PARAM_NOT_ALLOWED (enc_alg)");
     }
-    
+
 
     ##! 1: 'Validation succeeded'
-    CTX('log')->log(
-        MESSAGE  => "KeyParam validation succeeded",
-        PRIORITY => 'debug',
-        FACILITY => 'application',
-    );
-        
+    CTX('log')->application()->debug("KeyParam validation succeeded");
+
+
     return 1;
 }
 
@@ -124,7 +112,7 @@ Check if the key specification passed fits the requirements of the profile.
        - $key_alg
        - $key_gen_params
        - $enc_alg
-      
+
 =head2 Arguments
 
 =over

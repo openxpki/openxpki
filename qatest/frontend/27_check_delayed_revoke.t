@@ -8,7 +8,7 @@ use English;
 use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use TestCGI;
-  
+
 use Test::More tests => 3;
 
 package main;
@@ -40,20 +40,20 @@ my @certlist = @{$result->{main}->[0]->{content}->{data}};
 ok(scalar @certlist);
 CERTLIST:
 while (my $line = shift @certlist) {
-   
+
     $result = $client->mock_request({
         # load the workflow and check for the correct cert identifier
         page => sprintf("workflow!load!wf_id!%01d!view!context", $line->[0])
     });
-    
+
     foreach my $data (@{$result->{main}->[0]->{content}->{data}}) {
         next unless($data->{label} eq 'cert_identifier');
         next unless($data->{value}->{label} eq $cert_identifier);
-        
-        ok (1, "Found workflow");
-              
+        diag('Found workflow for ' . $cert_identifier . ': ' .$line->[0]);
+        ok (1, "Found workflow ");
+
         is($result->{right}->[0]->{content}->{data}->[2]->{value}, "CHECK_FOR_DELAYED_REVOKE", "State is delayed revoke");
-        
+
         last CERTLIST;
     }
 }

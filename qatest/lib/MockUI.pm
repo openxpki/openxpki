@@ -25,6 +25,13 @@ has wf_token => (
     default => ''
 );
 
+has rtoken => (
+    is => 'rw',
+    isa => 'Str',
+    lazy => 1,
+    default => ''
+);
+
 sub mock_request {
 
     my $self = shift;
@@ -32,6 +39,10 @@ sub mock_request {
 
     if (exists $data->{wf_token} && !$data->{wf_token}) {
         $data->{wf_token} = $self->wf_token();
+    }
+   
+    if (!exists $data->{_rtoken}) {
+        $data->{_rtoken} = $self->rtoken();
     }
 
     $self->cgi->data( $data );
@@ -50,6 +61,16 @@ sub mock_request {
     return $json;
 }
 
+sub update_rtoken {
+
+    my $self = shift;    
+    my $result = $self->mock_request({'page' => 'bootstrap!structure'});
+    my $rtoken = $result->{rtoken};
+    $self->rtoken( $rtoken );
+    return $rtoken;
+    
+}
+
 # Static call that generates a ready-to-use client
 sub factory {
 
@@ -63,6 +84,8 @@ sub factory {
         config => { socket => '/var/openxpki/openxpki.socket' }
     });
     
+    $client->update_rtoken();
+        
     $client ->mock_request({ page => 'login'});
 
     $client ->mock_request({
@@ -75,6 +98,8 @@ sub factory {
         'username' => 'raop',
         'password' => 'openxpki'
     });
+    
+    $client->update_rtoken();
     
     return $client;
 }

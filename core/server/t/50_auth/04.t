@@ -4,7 +4,7 @@ use English;
 use Test::More skip_all => 'See Issue #188 [fix password access to travis-ci]';
 #plan tests => 10;
 
-diag "OpenXPKI::Server::Authentication::Password\n" if $ENV{VERBOSE};
+note "OpenXPKI::Server::Authentication::Password\n";
 
 use OpenXPKI::Debug;
 if ($ENV{DEBUG_LEVEL}) {
@@ -13,7 +13,6 @@ if ($ENV{DEBUG_LEVEL}) {
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
-use OpenXPKI::Server::Session;
 require OpenXPKI::Server::Authentication;
 
 
@@ -24,7 +23,7 @@ OpenXPKI::Server::Init::init(
 	TASKS => [
         'config_test',
         'log',
-        'dbi_backend',
+        'dbi',
     ],
 	SILENT => 1,
     });
@@ -46,7 +45,7 @@ my ($user, $role, $reply) = $auth->login_step({
 });
 
 ok($user eq 'John Doe');
-ok($reply->{'SERVICE_MSG'} eq 'SERVICE_READY');    
+ok($reply->{'SERVICE_MSG'} eq 'SERVICE_READY');
 
 ## perform authentication
 ($user, $role, $reply) = $auth->login_step({
@@ -61,7 +60,7 @@ ok($reply->{'SERVICE_MSG'} eq 'SERVICE_READY');
 });
 
 ok($user eq 'Foo');
-ok($reply->{'SERVICE_MSG'} eq 'SERVICE_READY');    
+ok($reply->{'SERVICE_MSG'} eq 'SERVICE_READY');
 
 
 # Exisiting user - wrong password
@@ -119,7 +118,7 @@ $reply = undef;
 
 
 ok($user eq 'root');
-ok($reply->{'SERVICE_MSG'} eq 'SERVICE_READY');    
+ok($reply->{'SERVICE_MSG'} eq 'SERVICE_READY');
 
 
 

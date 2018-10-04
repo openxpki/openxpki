@@ -2,43 +2,51 @@ use strict;
 use warnings;
 use Test::More;
 use English;
-plan tests => 18;
+plan tests => 5;
 
 use_ok('OpenXPKI::Debug');
 
-diag "Standard debug usage" if $ENV{VERBOSE};
-my $stderr = `$^X -It/08_debug t/08_debug/main.pl TestModule.pm 1 2>&1`;
-ok(! $CHILD_ERROR, 'main.pl execution');
-like($stderr,
-     qr{ ^\d{4}-\d{2}-\d{2}\ \d{2}:\d{2}:\d{2} }xms,
-     'Debug message cotains a date and time'
-);
-like($stderr, qr{ DEBUG:1 }xms, 'Debug contains DEBUG:1 string');
-unlike($stderr, qr{ DEBUG:2 }xms, 'Debug does not contain DEBUG:2 string');
-like($stderr,
-     qr{ TestModule::START }xms,
-     'Debug contains module name and method'
- );
-like($stderr, qr{ loglevel\ 1 }xms, 'Debug contains literal log message');
-like($stderr, qr{ code:\ 2 }xms, 'Debug contains executed log message');
+my $test = sub {
+    my ($module, $loglevel) = @_;
+    # map desired loglevel to a bitmask
+    my $bitmask = { 1 => 0b01, 2 => 0b11, }->{$loglevel};
 
-# debug level 2
-$stderr = `$^X -It/08_debug t/08_debug/main.pl TestModule.pm 2 2>&1`;
-ok(! $CHILD_ERROR, 'main.pl execution');
-like($stderr,
-     qr{ ^\d{4}-\d{2}-\d{2}\ \d{2}:\d{2}:\d{2} }xms,
-     'Debug message cotains a date and time'
-);
-like($stderr, qr{ DEBUG:1 }xms, 'Debug contains DEBUG:1 string');
-like($stderr, qr{ DEBUG:2 }xms, 'Debug contains DEBUG:2 string');
-unlike($stderr, qr{ DEBUG:16 }xms, 'Debug does not contain DEBUG:16 string');
-like($stderr,
-     qr{ TestModule::START }xms,
-     'Debug contains module name and method'
- );
-like($stderr, qr{ loglevel\ 1 }xms, 'Debug contains literal log message');
-like($stderr, qr{ loglevel\ 2 }xms, 'Debug contains literal log message');
-unlike($stderr, qr{ loglevel\ 4 }xms, 'Debug contains literal log message');
-like($stderr, qr{ code:\ 2 }xms, 'Debug contains executed log message');
+    plan tests => 6 + ($loglevel == 1 ? 2 : 4);
+
+    my $stderr = `$^X -It/08_debug t/08_debug/main.pl $module.pm $bitmask 2>&1`;
+    ok(! $CHILD_ERROR, 'main.pl execution');
+    like($stderr,
+         qr{ ^\d{4}-\d{2}-\d{2}\ \d{2}:\d{2}:\d{2} }xms,
+         'date and time'
+    );
+    like($stderr, qr{ DEBUG:1 }xms, '"DEBUG:1" string');
+
+    if ($loglevel == 1) {
+        unlike($stderr, qr{ DEBUG:2 }xms, '"DEBUG:2" string should not be there');
+    }
+    else {
+        like($stderr, qr{ DEBUG:2 }xms, '"DEBUG:2" string');
+        unlike($stderr, qr{ DEBUG:4 }xms, '"DEBUG:4" string should not be there');
+    }
+
+    like($stderr, qr/ ${module}::START /xms, 'module name and method');
+    like($stderr, qr{ loglevel\ 1 }xms, 'literal log message (level 1)');
+
+    if ($loglevel == 1) {
+        unlike($stderr, qr{ loglevel\ 2 }xms, 'literal log message (level 2) should not be there');
+    }
+    else {
+        like($stderr, qr{ loglevel\ 2 }xms, 'literal log message (level 2)');
+        unlike($stderr, qr{ loglevel\ 4 }xms, 'literal log message (level 4) should not be there');
+    }
+
+    like($stderr, qr{ code:\ 2 }xms, 'result of code execution');
+};
+
+subtest 'Standard debug output, log level 1', $test => ("TestModule", 1);
+subtest 'Standard debug output, log level 2', $test => ("TestModule", 2);
+
+subtest 'Standard debug output, no explicit package spec, log level 1', $test => ("TestModuleUseWithout", 1);
+subtest 'Standard debug output, no explicit package spec, log level 2', $test => ("TestModuleUseWithout", 2);
 
 1;

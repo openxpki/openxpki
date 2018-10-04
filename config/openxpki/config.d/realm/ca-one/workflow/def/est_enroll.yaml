@@ -1,0 +1,38 @@
+head:
+    prefix: estenroll
+    persister: Volatile
+
+state:
+    INITIAL:
+        action: initialize parse_request set_profile global_render_subject global_persist_csr global_nice_issue_certificate > SUCCESS
+
+    SUCCESS: ~
+
+action:
+    initialize:
+        class: OpenXPKI::Server::Workflow::Activity::Noop
+        input:
+          - server
+          - interface
+          - pkcs10
+
+    set_profile:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+        param:
+            cert_profile: I18N_OPENXPKI_PROFILE_TLS_SERVER
+            cert_subject_style: enroll
+
+    parse_request:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10
+        param:
+            req_extensions: certificateTemplate certificateTemplateName challengePassword
+
+acl:
+    System:
+        creator: any
+        context: 1
+
+    RA Operator:
+        creator: any
+        context: 1
+

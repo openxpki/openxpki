@@ -18,7 +18,7 @@ sub execute {
     my $workflow = shift;
 
     my $context = $workflow->context();
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
 
     # write report to the context - WARNING: might eat up some memory
     my $target_key = $self->param('target_key');
@@ -196,7 +196,9 @@ sub execute {
     }
 
 
-    my $need_csr;
+    my $need_csr = 0;
+    my $need_attr = 0;
+    my @attr;
 
     # csr field requested in column list
     if (grep { $_->{csr} } @columns) {
@@ -207,6 +209,14 @@ sub execute {
         my $profile = ref $p->{profile} ? $p->{profile} : [ $p->{profile} ];
         $where{'csr.profile'} = $profile;
         $need_csr = 1;
+    }
+
+
+    foreach my $col (@columns) {
+        # If templating is active, we load all attributes
+        if ($col->{template}) { $need_attr = 1; last; }
+        # List all atrributes that are required for joined loading
+        if ($col->{attribute}) { push @attr, $col->{attribute}; }
     }
 
     my $sth;
@@ -224,11 +234,28 @@ sub execute {
         'certificate.authority_key_identifier'
     ];
 
+    my $join = '';
+    # join csr table for profile
     if ($need_csr) {
+        $join = ' req_key=req_key csr ';
+        push @{$cols}, 'csr.profile';
+    }
+
+    # If single attributes are requested, create extra joins
+    if (!$need_attr && @attr) {
+        my $ii=0;
+        foreach my $aa (@attr) {
+            $ii++;
+            $join .= " =>certificate.identifier=ca${ii}.identifier,ca${ii}.attribute_contentkey='$aa' certificate_attributes|ca${ii} ";
+            push @{$cols}, "ca${ii}.attribute_value as $aa";
+        }
+    }
+
+    if ($join) {
         $sth = CTX('dbi')->select(
-            from_join => 'certificate  req_key=req_key  csr',
+            from_join => 'certificate '.$join,
             order_by => [ '-notbefore', '-cert_key' ],
-            columns  => [ @{$cols}, 'csr.profile' ],
+            columns  => $cols,
             where => \%where,
         );
     } else {
@@ -239,23 +266,23 @@ sub execute {
             where => \%where,
         );
     }
-    
+
     my $delim = $p->{delimiter} || '|';
-    
+
     if (!defined $p->{head}) {
-        $p->{head} = "Full Certificate Report, Realm [% pki_realm %], Validity Date: [% valid_at %], Export Date: [% export_date %][% IF report_config %], Report Config [% report_config %][% END %]"; 
+        $p->{head} = "Full Certificate Report, Realm [% pki_realm %], Validity Date: [% valid_at %], Export Date: [% export_date %][% IF report_config %], Report Config [% report_config %][% END %]";
     }
 
-    my $head = $tt->render($p->{head}, { 
-        pki_realm => $pki_realm, 
-        valid_at => $valid_at->iso8601(), 
+    my $head = $tt->render($p->{head}, {
+        pki_realm => $pki_realm,
+        valid_at => $valid_at->iso8601(),
         export_date => DateTime->now()->iso8601,
         report_config => $report_config
-    }); 
+    });
 
     if ($head) { print $fh $head."\n"; }
-    
-    print $fh join("|", "request id", "subject", "serial", "identifier", "notbefore", "notafter", "status", "issuer", @head)."\n";
+
+    print $fh join($delim, "request id", "subject", "serial", "identifier", "notbefore", "notafter", "status", "issuer", @head)."\n";
 
     my $subject_seen = {};
     my $cnt;
@@ -289,9 +316,18 @@ sub execute {
             $item->{issuer_dn}
         );
 
+        my $attrib;
+        if ($need_attr) {
+            $attrib = CTX('api')->get_cert_attributes({ IDENTIFIER => $item->{identifier} });
+        } elsif(@attr) {
+            foreach my $aa (@attr) {
+                # mock result of get_cert_attributes
+                $attrib->{$aa} = [ $item->{$aa} // '' ];
+            }
+        }
+
         # add extra columns
         if (@columns) {
-            my $attrib = CTX('api')->get_cert_attributes({ IDENTIFIER => $item->{identifier} });
             foreach my $col (@columns) {
                 # FIXME Report customization will most likely not work anymore
                 if ($col->{template}) {
@@ -311,7 +347,7 @@ sub execute {
                 }
             }
         }
-        
+
         print $fh join($delim, @line) . "\n";
     }
 
@@ -390,10 +426,10 @@ is a tab (\t), semicolon (;) or hash (#);
 =item head
 
 A string or template toolkit pattern to put into the first line of the report
-file. If not set, a default header is added. Available template vars are 
+file. If not set, a default header is added. Available template vars are
 (both dates are in ISO8601 format):
 
-=over 
+=over
 
 =item export_date
 

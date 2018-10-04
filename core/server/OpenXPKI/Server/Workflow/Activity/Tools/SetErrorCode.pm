@@ -21,11 +21,8 @@ sub execute {
 
     $context->param('error_code' => $error_code);
 
-    CTX('log')->log(
-        MESSAGE => "Set error code $error_code for workflow " . $workflow->id,
-        PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    );         
+    CTX('log')->application()->debug("Set error code $error_code for workflow " . $workflow->id);
+
 
     return 1;
 }

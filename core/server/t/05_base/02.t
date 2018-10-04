@@ -11,7 +11,7 @@ use OpenXPKI;
 
 plan tests => 2;
 
-diag "BASE FUNCTIONS: FILE OPERATIONS\n" if $ENV{VERBOSE};
+note "BASE FUNCTIONS: FILE OPERATIONS\n";
 
 my $tmpfile = File::Temp::mktemp("tmpfileXXXXX");
 

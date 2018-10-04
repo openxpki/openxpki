@@ -23,34 +23,34 @@ sub execute {
     $self->SUPER::execute($workflow);
 
     my $context = $workflow->context();
-    
+
     my $value = $context->param($valparam);
 
     ##! 32: 'token_id: ' . Dumper($context->param('token_id'));
     ##! 32: 'value: ' . Dumper($value);
 
-    CTX('log')->log(
-        MESSAGE => 'SmartCard fetching puk from datapool for ' . $context->param('token_id'),
-        PRIORITY => 'info',
-        FACILITY => ['audit','application']
-    );
+    CTX('log')->application()->info('SmartCard fetching puk from datapool for ' . $context->param('token_id'));
+
+    CTX('log')->audit('application')->info('fetching smartcard puk from datapool', {
+        sctoken_id => $context->param('token_id')
+    });
 
     my $ser = OpenXPKI::Serialization::Simple->new();
     # autodetect serialized arrays
-    if ($value =~ m{ \A ARRAY }xms) {
-	$value = $ser->deserialize($value);
+    if (OpenXPKI::Serialization::Simple::is_serialized($value)) {
+        $value = $ser->deserialize($value);
     } else {
-	# coerce returned value into an array. the parent implementation
-	# does not care about the PUK handling at all, but on this level
-	# we do know that we are dealing with PUKs. hence it is
-	# safe to assume that the caller wants an array...
-	$value = [ $value ];
+    # coerce returned value into an array. the parent implementation
+    # does not care about the PUK handling at all, but on this level
+    # we do know that we are dealing with PUKs. hence it is
+    # safe to assume that the caller wants an array...
+    $value = [ $value ];
     }
 
     $value = $ser->serialize($value);
 
     $context->param($valparam => $value);
-    
+
     return 1;
 }
 
@@ -62,13 +62,13 @@ __END__
 
 =head1 Description
 
-This fetches the currently-known PUKs from the datastore. If one entry is 
-returned, it is the current PUK on the card. If two are returned, it is 
-probable that the first is a new PUK to be written and the second is the 
-current PUK. Note to client: the returned string is probably a serialized 
-array, so the client needs to deserialize it before using it. Suggested 
-behavior of client: if more than one PUK is returned, try to change the PUK 
-to the first in the list using the second. On fail, the first is most likely 
+This fetches the currently-known PUKs from the datastore. If one entry is
+returned, it is the current PUK on the card. If two are returned, it is
+probable that the first is a new PUK to be written and the second is the
+current PUK. Note to client: the returned string is probably a serialized
+array, so the client needs to deserialize it before using it. Suggested
+behavior of client: if more than one PUK is returned, try to change the PUK
+to the first in the list using the second. On fail, the first is most likely
 the correct PUK, on success, the first PUK is now correct.
 
 

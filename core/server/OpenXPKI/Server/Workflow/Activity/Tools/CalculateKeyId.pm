@@ -23,30 +23,30 @@ sub execute {
     # you may wish to use these shortcuts
     my $context      = $workflow->context();
 
-    my $pki_realm   = CTX('session')->get_pki_realm();   
+    my $pki_realm   = CTX('session')->data->pki_realm;
     my $default_token = CTX('api')->get_default_token();
 
-    # The default is to fetch the certificate PEM from the "certificate" 
+    # The default is to fetch the certificate PEM from the "certificate"
     # context value. An alternative context parameter can be set.
     my $certificate;
     if ($self->param('certificate_key')) {
-        $certificate = $context->param($self->param('certificate_key')); 
+        $certificate = $context->param($self->param('certificate_key'));
     } else {
         $certificate = $context->param('certificate');
     }
     ##! 32: 'certificate: ' . $certificate
-      
+
     if (!$certificate) {
       OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CALCULATEKEYID_UNABLE_TO_LOAD_CERTIFICATE'
      );
     }
-        
+
     my $x509 = OpenXPKI::Crypto::X509->new(
         DATA => $certificate,
         TOKEN => $default_token,
     );
-           
+
     my $modulus = $x509->get_parsed('BODY', 'MODULUS');
     ##! 16: 'modulus: ' . $modulus
 
@@ -60,22 +60,19 @@ sub execute {
     # remove leading null bytes for hash computation
     $modulus =~ s/^(?:00)+//g;
     my $key_id = sha1_hex(pack('H*', $modulus));
-    
-    CTX('log')->log(
-        MESSAGE => 'calculated key id is ' . $key_id,
-        PRIORITY => 'debug',
-        FACILITY => [ 'application' ],
-    );
-    
+
+    CTX('log')->application()->debug('calculated key id is ' . $key_id);
+
+
     ##! 16: 'pkcs11 plugin keyid hash: ' . $key_id
-    
+
     my $output_key = $self->param('output_key');
     $output_key = 'key_id' unless($output_key);
-    
+
     $context->param( { $output_key => $key_id } );
-    
+
     return;
-    
+
 }
 
 

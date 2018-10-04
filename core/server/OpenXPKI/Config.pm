@@ -15,27 +15,71 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use Data::Dumper;
+use Log::Log4perl;
 
 # Make sure the underlying connector is recent
 use Connector 1.08;
 
 extends 'Connector::Multi';
 
-has '+BASECONNECTOR' => ( required => 0 );
-
-has '_head_version' => (
+has '+BASECONNECTOR' => (
     is => 'rw',
-    isa => 'Str',
-    required => 0,
-    default => '',
+    isa => 'Connector',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        return $self->backend();
+    },
 );
 
+has backend => (
+    is => 'rw',
+    isa => 'Connector',
+    init_arg => 'backend',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        return OpenXPKI::Config::Backend->new(LOCATION => $self->config_dir);
+    },
+);
 
-around BUILDARGS => sub {
-    my $orig = shift;
-    my $class = shift;
-    return $class->$orig( { BASECONNECTOR => OpenXPKI::Config::Backend->new() } );
-};
+# Here we do the chain loading of a serialized/signed config
+sub BUILD {
+    my $self = shift;
+    my $args = shift;
+
+    # when we are here, the BASECONNECTOR is already initialized which is
+    # usually an instance of O::C::Backend. We now probe if there is a
+    # node called "bootstrap" and if so we replace the current backend
+    if ($self->backend()->exists('bootstrap')) {
+
+        # this is a connector definition
+        my $bootstrap = $self->backend()->get_hash('bootstrap');
+
+        my $class = $bootstrap->{class} || 'OpenXPKI::Config::Loader';
+        if ($class !~ /\A(\w+\:\:)+\w+\z/) {
+            die "Invalid class name $class";
+        }
+        ##! 16: 'Config bootstrap ' . Dumper $bootstrap
+        eval "use $class;1;" or die "Unable to bootstrap config, can not use $class: $@";
+
+        delete $bootstrap->{class};
+
+        my $conn = $class->new( $bootstrap );
+        $self->backend( $conn );
+    }
+
+    # check if the system node is present
+    $self->backend()->exists('system') || die "Loaded config does not contain system node.";
+
+}
+
+has 'config_dir' => (
+    is => 'ro',
+    isa => 'Str',
+    lazy => 1,
+    default => '/etc/openxpki/config.d',
+);
 
 before '_route_call' => sub {
 
@@ -60,7 +104,7 @@ before '_route_call' => sub {
     } else {
         my $session = CTX('session');
         # there is no realm during init - hide tree by setting non existing prefix
-        my $pki_realm = $session->get_pki_realm();
+        my $pki_realm = $session->data->pki_realm;
         if ($pki_realm) {
             ##! 16: "_route_call: realm value, set prefix to " . $pki_realm
             $self->_config()->{''}->PREFIX( [ 'realm', $pki_realm ] );
@@ -72,41 +116,26 @@ before '_route_call' => sub {
     ##! 8: 'Full path: ' . Dumper $path
 };
 
+sub checksum {
+    my $self = shift;
+    $self->BASECONNECTOR()->_config(); # makes sure the backend is initialized
+    return $self->BASECONNECTOR()->checksum();
+}
+
 sub get_version {
     my $self = shift;
+    Log::Log4perl->get_logger('openxpki.deprecated')->error('Call to get_version in config layer');
     return '';
-    ##! 16: 'Config version requested ' . Dumper( $self->BASECONNECTOR()->version() )
-    #return $self->BASECONNECTOR()->version();
 }
 
 sub get_head_version {
-    my $self = shift;
-    return '';
-    #return $self->_head_version();
+    Log::Log4perl->get_logger('openxpki.deprecated')->error('Call to get_head_version in config layer');
 }
 
 sub update_head {
     my $self = shift;
-
+    Log::Log4perl->get_logger('openxpki.deprecated')->error('Call to update_head in config layer');
     return '';
-
-    my $head_id = $self->BASECONNECTOR()->fetch_head_commit();
-
-    # if the head version has evolved, update the session context
-    ##! 32: sprintf 'My head: %s,  Repo head: %s ',  $self->_head_version(), $head_id
-    if ( $self->_head_version() ne $head_id ) {
-        ##! 16: 'Advance to head commit ' . $head_id
-        $self->_head_version( $head_id );
-
-        CTX('log')->log(
-            MESSAGE  => "system config advanced to new head commit: $head_id",
-            PRIORITY => "info",
-            FACILITY => "system",
-        );
-
-        return 1;
-    }
-    return;
 }
 
 sub walkQueryPoints {
@@ -157,11 +186,8 @@ sub get_scalar_as_list {
         my $val = ( $self->get( $path ) );
         @values = ( $val ) if (defined $val);
     } else {
-        CTX('log')->log(
-            MESSAGE  => "get_scalar_as_list got invalid node type",
-            PRIORITY => "error",
-            FACILITY => "system",
-        );
+        CTX('log')->system()->error("get_scalar_as_list got invalid node type");
+
     }
     ##! 16: 'values ' . Dumper @values
     return @values;
@@ -217,15 +243,18 @@ __DATA__
 
 =head1 NAME
 
-OpenXPKI::Config - Connector based configuration layer using Config::Versioned
+OpenXPKI::Config - Connector based configuration layer
 
 =head1 SYNOPSIS
 
- use OpenXPKI::Config;
+    use OpenXPKI::Config;
 
- my $cfg = OpenXPKI::Config->new();
+    my $cfg = OpenXPKI::Config->new(); # defaults to /etc/openxpki/config.d
+    print "Param1=", $cfg->get('subsystem1.group1.param1'), "\n";
 
- print "Param1=", $cfg->get('subsystem1.group1.param1'), "\n";
+You can also specify a different directory holding the configuration:
+
+    my $cfg = OpenXPKI::Config->new(config_dir => "/tmp/openxpki");
 
 =head1 DESCRIPTION
 
@@ -246,24 +275,14 @@ the current head version and the root context.
 
 =head1 Methods
 
-=head2 update_head
+=head2 update_head, get_version, get_head_version
 
-The commit id of the head is determined at startup. Changes to the config
-repository during runtime are not visible to the connector. This method
-updates the internal head pointer to the current head of the underlying
-repository.
+No longer supported
 
-Returns true if the head has changed, false otherwise.
+=head2 checksum
 
-=head2 get_version
-
-Return the sha1 value of the current head of the config tree.
-This is the version which is used, when you dont pass a version or
-when you query a value in the C<system> namespace.
-
-=head2 get_head_version
-
-Return the sha1 value of the latest commit of the config tree.
+Print out the checksum of the current backend, might not be available
+with all backends.
 
 =head2 walkQueryPoints
 

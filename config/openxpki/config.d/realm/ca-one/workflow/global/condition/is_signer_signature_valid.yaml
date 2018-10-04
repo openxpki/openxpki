@@ -1,0 +1,3 @@
+class: Workflow::Condition::Evaluate
+param:
+    test: ($context->{signer_trusted} and $context->{signer_authorized} and $context->{signer_validity_ok})

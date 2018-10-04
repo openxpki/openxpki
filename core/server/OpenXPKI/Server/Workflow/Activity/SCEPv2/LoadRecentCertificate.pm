@@ -17,74 +17,59 @@ use Data::Dumper;
 
 sub execute {
     ##! 1: 'start'
-    my $self       = shift;
-    my $workflow   = shift;
-    my $pki_realm  = CTX('session')->get_pki_realm();
+    my ($self, $workflow) = @_;
+    my $pki_realm  = CTX('session')->data->pki_realm;
     my $serializer = OpenXPKI::Serialization::Simple->new();
     my $context    = $workflow->context();
-    
+
     my $cert_identifier = $self->param('cert_identifier');
-    
-    my $dbi         = CTX('dbi_backend');
+
+    my $dbi = CTX('dbi');
 
     # select current certificate from database
-    my $cert = $dbi->first(
-        TABLE   => 'CERTIFICATE',
-        COLUMNS => [
-            'SUBJECT',
-            'CSR_SERIAL',
-        ],
-        DYNAMIC => {
-            'IDENTIFIER' => $cert_identifier,
-            'STATUS'    => 'ISSUED',
-            #'PKI_REALM' => $pki_realm,
+    my $cert = $dbi->select_one(
+        from => 'certificate',
+        columns => [ 'subject', 'req_key', 'notbefore', 'notafter', 'identifier' ],
+        where => {
+            identifier => $cert_identifier,
+            status    => 'ISSUED',
         },
     );
 
-    $context->param('cert_subject' => $cert->{SUBJECT});
+    $context->param('cert_subject' => $cert->{subject});
 
     # select subject alt names from database
-    my $sans = $dbi->select(
-        TABLE   => 'CERTIFICATE_ATTRIBUTES',
-        COLUMNS => [
-            'ATTRIBUTE_VALUE',
-        ],
-        DYNAMIC => {
-            'ATTRIBUTE_KEY' => 'subject_alt_name',
-            'IDENTIFIER'    => $cert_identifier,
+    my $sth = $dbi->select(
+        from   => 'certificate_attributes',
+        columns => [ 'attribute_value' ],
+        where => {
+            attribute_contentkey => 'subject_alt_name',
+            identifier           => $cert_identifier,
         },
     );
 
-    ##! 64: 'sans: ' . Dumper $sans
     my @subject_alt_names;
-    if (defined $sans) {
-        foreach my $san (@{$sans}) {
-            my @split = split q{:}, $san->{'ATTRIBUTE_VALUE'};
-            push @subject_alt_names, \@split;
-        }
+    while (my $san = $sth->fetchrow_hashref) {
+        my @split = split q{:}, $san->{attribute_value};
+        push @subject_alt_names, \@split;
     }
-#    my @subject_alt_names = $self->_get_san_array_from_csr_obj($csr_obj);
-
-#    ##! 64: 'subject_alt_names: ' . Dumper(\@subject_alt_names)
-
+    ##! 64: 'subject_alt_names: ' . Dumper(\@subject_alt_names)
     $context->param('cert_subject_alt_name' =>
                     $serializer->serialize(\@subject_alt_names));
 
     # look up the certificate profile via the csr table
-    ##! 32: ' Look for old csr: ' . $cert->{CSR_SERIAL}
-    my $old_profile = $dbi->first(
-        TABLE   => 'CSR',
-        COLUMNS => [
-            'PROFILE',
-        ],
-        DYNAMIC => {
-            CSR_SERIAL => $cert->{CSR_SERIAL},
+    ##! 32: ' Look for old csr: ' . $cert->{req_key}
+    my $old_profile = $dbi->select_one(
+        from => 'csr',
+        columns => [ 'profile' ],
+        where => {
+            req_key => $cert->{req_key},
         }
     );
     ##! 64: 'CSR found : ' . Dumper $old_profile
 
     ##! 32: 'Found profile ' . $old_profile->{PROFILE}
-    $context->param( 'cert_profile' =>  $old_profile->{PROFILE} );
+    $context->param( 'cert_profile' =>  $old_profile->{profile} );
 
     my $sources = $serializer->deserialize( $context->param('sources') );
     $sources->{'cert_profile'} = 'SCEP-RENEWAL';
@@ -97,7 +82,7 @@ sub execute {
         # cert hash contains epoch but we need absolute date!
         foreach my $validity_param (qw( notbefore notafter )) {
             my $validity = OpenXPKI::DateTime::convert_date({
-                DATE       => DateTime->from_epoch( 'epoch' => $cert->{uc($validity_param)} ),
+                DATE       => DateTime->from_epoch( 'epoch' => $cert->{$validity_param} ),
                 OUTFORMAT => 'terse',
             });
             $context->param( $validity_param => $validity );
@@ -110,29 +95,19 @@ sub execute {
         # Check if we should revoke the replaced certificate
         my $revoke_on_replace = CTX('config')->get_hash( ['scep', $context->param('server'), 'revoke_on_replace' ] );
         if (ref $revoke_on_replace eq 'HASH') {
-            CTX('log')->log(
-                MESSAGE => "SCEP certificate added for revocation due to replace " . $cert->{IDENTIFIER},
-                PRIORITY => 'info',
-                FACILITY => ['audit','application'],
-            );
+            CTX('log')->application()->info("SCEP certificate added for revocation due to replace " . $cert->{identifier});
             # we use the context settings as in the CRR workflow,
             # so the activity can just pick them up
-            $context->param( 'replace_cert_identifier' => $cert->{IDENTIFIER} );
+            $context->param( 'replace_cert_identifier' => $cert->{identifier} );
             $context->param( 'reason_code' => $revoke_on_replace->{reason_code} );
             $context->param( 'revocation_time' => $revoke_on_replace->{invalidity_time} || 0 );
         }
 
-        CTX('log')->log(
-            MESSAGE => "SCEP replace for old csr " . $cert->{CSR_SERIAL} . " with profile " . $old_profile->{PROFILE},
-            PRIORITY => 'info',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->info("SCEP replace for old csr " . $cert->{req_key} . " with profile " . $old_profile->{profile});
+
     } else {
-        CTX('log')->log(
-            MESSAGE => "SCEP renewal from old csr " . $cert->{CSR_SERIAL} . " with profile " . $old_profile->{PROFILE},
-            PRIORITY => 'info',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->info("SCEP renewal from old csr " . $cert->{req_key} . " with profile " . $old_profile->{profile});
+
         $context->param( 'renewal_mode' => 'renew' );
     }
 

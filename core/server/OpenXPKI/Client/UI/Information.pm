@@ -44,7 +44,7 @@ sub init_issuer {
     my $args = shift;
 
     my $issuers = $self->send_command( 'get_ca_list' );
-    $self->logger()->debug("result: " . Dumper $issuers);
+    $self->logger()->trace("result: " . Dumper $issuers);
 
     $self->_page({
         label => 'Issuing certificates of this Realm',
@@ -63,11 +63,11 @@ sub init_issuer {
         ];
     }
 
-    # I18 Tags for scanner        
+    # I18 Tags for scanner
     # I18N_OPENXPKI_UI_TOKEN_STATUS_EXPIRED
     # I18N_OPENXPKI_UI_TOKEN_STATUS_UPCOMING
     # I18N_OPENXPKI_UI_TOKEN_STATUS_ONLINE
-    # I18N_OPENXPKI_UI_TOKEN_STATUS_OFFLINE 
+    # I18N_OPENXPKI_UI_TOKEN_STATUS_OFFLINE
     # I18N_OPENXPKI_UI_TOKEN_STATUS_UNKNOWN
 
     $self->add_section({
@@ -128,7 +128,7 @@ sub init_process {
 
     my $self = shift;
     my $args = shift;
-    
+
     $self->add_section({
         type => 'text',
         content => {
@@ -139,7 +139,7 @@ sub init_process {
 
 
 sub init_status {
-    
+
     my $self = shift;
     my $args = shift;
 
@@ -148,7 +148,7 @@ sub init_status {
         content => {
             description => 'This was moved to a workflow, please update your uicontrol files to workflow!index!wf_type!status_system',
         }
-    });    
+    });
 }
 
 1;

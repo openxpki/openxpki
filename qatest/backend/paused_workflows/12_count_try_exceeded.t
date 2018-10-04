@@ -27,7 +27,7 @@ use File::Basename;
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($WARN);
 
-use OpenXPKI::Test::More;
+use OpenXPKI::Test::QA::More;
 use TestCfg;
 
 my $dirname = dirname($0);
@@ -40,7 +40,7 @@ $testcfg->read_config_path( 'paused_wf.cfg', \%cfg, @cfgpath );
 
 #------------------------- INIT ----------------------------------
 
-my $test = OpenXPKI::Test::More::Workflow::TestPausedWorkflow->new(
+my $test = OpenXPKI::Test::QA::More::Workflow::TestPausedWorkflow->new(
     {
         socketfile => $cfg{instance}{socketfile},
         realm => $cfg{instance}{realm},

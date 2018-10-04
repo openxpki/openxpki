@@ -1,4 +1,4 @@
-## OpenXPKI::Server::Authentication.pm 
+## OpenXPKI::Server::Authentication.pm
 ##
 ## Written 2003 by Michael Bell
 ## Rewritten 2005 and 2006 by Michael Bell for the OpenXPKI project
@@ -17,14 +17,6 @@ use OpenXPKI::Debug;
 use Data::Dumper;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
-
-use OpenXPKI::Server::Authentication::Anonymous;
-use OpenXPKI::Server::Authentication::External;
-use OpenXPKI::Server::Authentication::Password;
-use OpenXPKI::Server::Authentication::ChallengeX509;
-use OpenXPKI::Server::Authentication::ClientSSO;
-use OpenXPKI::Server::Authentication::ClientX509;
-use OpenXPKI::Server::Authentication::Connector;
 
 ## constructor and destructor stuff
 
@@ -57,12 +49,12 @@ sub __load_config
     my $keys = shift;
 
     ##! 8: "load all PKI realms"
-    
+
     my @realms = CTX('config')->get_keys('system.realms');
 
     foreach my $realm (@realms) {
         $self->__load_pki_realm ({
-            PKI_REALM => $realm,                
+            PKI_REALM => $realm,
         });
     }
 
@@ -78,41 +70,41 @@ sub __load_pki_realm
     my $realm  = $keys->{PKI_REALM};
 
     my $config = CTX('config');
-    my $restore_realm = CTX('session')->get_pki_realm(); 
+    my $restore_realm = CTX('session')->data->pki_realm;
 
     # Fake Session for Config!
-    CTX('session')->set_pki_realm( $realm );
+    CTX('session')->data->pki_realm( $realm );
 
-    my @handlers = $config->get_keys('auth.handler');    
+    my @handlers = $config->get_keys('auth.handler');
     foreach my $handler (@handlers) {
         $self->__load_handler ({
             HANDLER   => $handler
         });
     }
 
-    my @stacks = $config->get_keys('auth.stack');    
+    my @stacks = $config->get_keys('auth.stack');
     foreach my $stack (@stacks) {
 
-        $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{DESCRIPTION} = 
+        $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{DESCRIPTION} =
             $config->get("auth.stack.$stack.description");
-    
-        $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{LABEL} = 
+
+        $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{LABEL} =
             $config->get("auth.stack.$stack.label") || $stack;
-    
+
         ##! 8: "determine all used handlers"
         my @supported_handler = $config->get_scalar_as_list("auth.stack.$stack.handler");
         ##! 32: " supported_handler " . Dumper @supported_handler
-        $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{HANDLER} = \@supported_handler; 
-                    
+        $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{HANDLER} = \@supported_handler;
+
     }
-    
+
     ##! 64: "Realm auth config " . Dumper $self->{PKI_REALM}->{$realm}
-    
-    CTX('session')->set_pki_realm( $restore_realm );
+
+    CTX('session')->data->pki_realm( $restore_realm ) if $restore_realm;
     ##! 4: "end"
     return 1;
 }
- 
+
 sub __load_handler
 {
     ##! 4: "start"
@@ -120,32 +112,27 @@ sub __load_handler
     my $keys  = shift;
     my $handler = $keys->{HANDLER};
 
-    my $realm = CTX('session')->get_pki_realm();
+    my $realm = CTX('session')->data->pki_realm;
     my $config = CTX('config');
 
     ##! 8: "load handler type"
 
     my $type = $config->get("auth.handler.$handler.type");
+    $type =~ s/[^a-zA-Z0-9]//g;
 
     ##! 8: "name ::= $handler"
     ##! 8: "type ::= $type"
     my $class = "OpenXPKI::Server::Authentication::$type";
-    $self->{PKI_REALM}->{$realm}->{HANDLER}->{$handler} = eval {
-        $class->new( "auth.handler.$handler" );
-    };
-    if (my $exc = OpenXPKI::Exception->caught())
-    {
-        ##! 16: "exception from authentication sub module $class detected"
+    eval "use $class;1";
+    if ($EVAL_ERROR) {
         OpenXPKI::Exception->throw (
-            message  => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOAD_HANDLER_FAILED",
-            children => [ $exc ]);
+            message => "Unable to load authentication handler class $type",
+            params  => {ERRVAL => $EVAL_ERROR});
     }
-    elsif ($EVAL_ERROR)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOAD_HANDLER_CRASHED",
-            params  => {ERRVAL => $EVAL_ERROR->message()});
-    }
+
+    $self->{PKI_REALM}->{$realm}->{HANDLER}->{$handler} = $class->new( "auth.handler.$handler" );
+
+    CTX('log')->auth()->info('Loaded auth handler ' . $handler);
 
     ##! 4: "end"
     return 1;
@@ -161,7 +148,7 @@ sub list_authentication_stacks {
     ##! 1: "start"
 
     ##! 2: "get PKI realm"
-    my $realm = CTX('session')->get_pki_realm();
+    my $realm = CTX('session')->data->pki_realm;
 
     ##! 2: "get authentication stack"
     my %stacks = ();
@@ -180,7 +167,7 @@ sub login_step {
 
     my $msg     = $arg_ref->{MESSAGE};
     my $stack   = $arg_ref->{STACK};
-    my $realm   = CTX('session')->get_pki_realm();
+    my $realm   = CTX('session')->data->pki_realm;
 
     ##! 16: 'realm: ' . $realm
     ##! 16: 'stack: ' . $stack
@@ -189,13 +176,12 @@ sub login_step {
         OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_INVALID_STACK",
             params  => {
-		STACK => $stack
-	    },
-	    log     => {
-		logger => CTX('log'),
-		priority => 'warn',
-		facility => 'auth'
-	    },
+        STACK => $stack
+        },
+        log     => {
+        priority => 'warn',
+        facility => 'auth'
+        },
         );
     }
 
@@ -212,15 +198,14 @@ sub login_step {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_INCORRECT_HANDLER",
                 params  => {
-		    PKI_REALM => $realm, 
-		    HANDLER => $handler,
-		},
-		log => {
-		    logger => CTX('log'),
-		    priority => 'error',
-		    facility => 'auth',
-		},
-		);
+            PKI_REALM => $realm,
+            HANDLER => $handler,
+        },
+        log => {
+            priority => 'error',
+            facility => 'auth',
+        },
+        );
         }
         eval {
             ($user, $role, $return_msg) = $ref->login_step({
@@ -245,38 +230,31 @@ sub login_step {
             OpenXPKI::Exception->throw (
                 message  => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED",
                 children => [ $exc ],
-		log => {
-		    logger => CTX('log'),
-		    priority => 'warn',
-		    facility => 'auth',
-		},
-		);
+        log => {
+            priority => 'warn',
+            facility => 'auth',
+        },
+        );
         }
         else {
             OpenXPKI::Exception->throw (
                 message  => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED",
                 children => [ $EVAL_ERROR->message() ],
-		log => {
-		    logger => CTX('log'),
-		    priority => 'warn',
-		    facility => 'auth',
-		},
-		);
+        log => {
+            priority => 'warn',
+            facility => 'auth',
+        },
+        );
         }
     }
 
     if (defined $user && defined $role) {
-	   CTX('log')->log(
-	    MESSAGE  => "Login successful using authentication stack '$stack' (user: '$user', role: '$role')",
-	    PRIORITY => 'info',
-	    FACILITY => 'auth',
-	   );
-    
+        CTX('log')->auth()->info("Login successful using authentication stack '$stack' (user: '$user', role: '$role')");
         return ($user, $role, $return_msg);
-    } 
+    }
 
     return (undef, undef, $return_msg);
-    
+
 };
 
 1;
@@ -307,7 +285,7 @@ fast way.
 
 =head2 login_step
 
-is the function which performs the authentication. 
+is the function which performs the authentication.
 Named parameters are STACK (the authentication stack to use)
 and MESSAGE (the message received by the service).
 It returns a triple (user, role, reply). The authentication

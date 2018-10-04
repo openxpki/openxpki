@@ -30,7 +30,7 @@ sub show_workflow_instance {
     foreach my $action ($workflow->get_current_actions()) {
 	print STDERR "  Action: $action\n";
 	foreach my $field ($workflow->get_action_fields($action)) {
-	    print STDERR "    Field: " . $field->name() . 
+	    print STDERR "    Field: " . $field->name() .
 		" (" . $field->description() . ") Required: " . $field->is_required() . "\n";
 	}
     }
@@ -52,11 +52,11 @@ sub do_step {
     my %args = ( @_ );
 
     show_workflow_instance($workflow) if ($args{DEBUG});
-    
+
     if (defined $args{EXPECTED_STATE}) {
 	### expected state: $args{EXPECTED_STATE}
 	is($workflow->state(), $args{EXPECTED_STATE});
-    } 
+    }
     else
     {
 	ok(1);
@@ -88,7 +88,7 @@ sub do_step {
     if (! $args{PASS_EXCEPTION}) {
 	if (exists $args{EXECUTE_ACTION}) {
 	    my $rc;
-	    
+
 	    eval {
 		### execute: $args{EXECUTE_ACTION}
 		## workflow instance: $workflow
@@ -117,17 +117,16 @@ Log::Log4perl->easy_init($ERROR);
 
 ### initialize context
 ok(OpenXPKI::Server::Init::init(
-       {	   
+       {
 	   TASKS  => [
-            'config_test', 
+            'config_test',
 	       'i18n',
-	       'api', 
+	       'api',
            'dbi_log',
-	       'log',  
-	       'dbi_backend', 
-	       'dbi_workflow',
+	       'log',
+	       'dbi',
 	       'crypto_layer',
-	       'volatile_vault',           
+	       'volatile_vault',
            'authentication',
                ],
 	   SILENT => 1,
@@ -137,17 +136,14 @@ ok(OpenXPKI::Server::Init::init(
 our $log = CTX('log');
 ok($log);
 
-### try to connect to database
-our $dbi = CTX('dbi_workflow');
-ok($dbi->connect());
-
 ## create a valid session
-my $session = OpenXPKI::Server::Session->new ({
-                  DIRECTORY => "t/60_workflow/",
-                  LIFETIME  => 100});
-$session->set_pki_realm ("I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA");
-$session->set_role ("CA Operator");
-$session->make_valid ();
+my $session = OpenXPKI::Server::Session->new(
+    type => "File",
+    config => { directory => "t/60_workflow/" },
+)->create;
+$session->data->pki_realm("I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA");
+$session->data->role("CA Operator");
+$session->is_valid(1);
 ok(OpenXPKI::Server::Context::setcontext ({session => $session}));
 
 1;

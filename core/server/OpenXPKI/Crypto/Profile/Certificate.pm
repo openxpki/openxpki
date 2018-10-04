@@ -47,9 +47,13 @@ Must be set to I<ENDENTITY>
 
 =item CACERTIFICATE
 
-PEM encoded ca certificate to use. This is mainly for testing, in regular
-operation the certificate is determined using the API.
+CA certificate to use.
 
+Must be a I<HashRef> as returned by L<API::Token/get_certificate_for_alias( { ALIAS } )>
+including the PEM encoded certificate.
+
+This is mainly for testing, in regular operation the certificate is determined
+using the API.
 
 =back
 
@@ -78,27 +82,27 @@ sub new {
         OpenXPKI::Exception->throw (
            message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_INCORRECT_TYPE",
            params => {
-        		TYPE      => $keys->{TYPE},
-        		CA        => $keys->{CA},
-        		ID        => $keys->{ID},
-    	    },
+                TYPE      => $keys->{TYPE},
+                CA        => $keys->{CA},
+                ID        => $keys->{ID},
+            },
        );
     }
 
     if (! defined $self->{CA}) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_MISSING_CA",
-	        params => {
-    		TYPE      => $keys->{TYPE},
-    		ID        => $keys->{ID},
-	    });
+            params => {
+            TYPE      => $keys->{TYPE},
+            ID        => $keys->{ID},
+        });
     }
 
-	if (! defined $self->{ID}) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_MISSING_ID"
-		);
-	}
+    if (! defined $self->{ID}) {
+        OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_MISSING_ID"
+        );
+    }
 
 
     ##! 2: "parameters ok"
@@ -146,12 +150,12 @@ sub __load_profile
     ## check if those are overriden in config
     foreach my $key (keys %{$self->{PROFILE}} ) {
         my $value = $config->get("profile.$profile_name.".lc($key));
-        
+
         # Test for realm default
         if (!defined $value) {
-        	$value = $config->get("profile.default.".lc($key));
+            $value = $config->get("profile.default.".lc($key));
         }
-        
+
         if (defined $value) {
             $self->{PROFILE}->{$key} = $value;
             ##! 16: "Override $key from profile with $value"
@@ -161,10 +165,10 @@ sub __load_profile
     ###########################################################################
     # determine certificate validity
 
-	my $validity_path = "profile.$profile_name.validity";
-	if (!$config->exists($validity_path)) {
-		$validity_path = "profile.default.validity";
-	}
+    my $validity_path = "profile.$profile_name.validity";
+    if (!$config->exists($validity_path)) {
+        $validity_path = "profile.default.validity";
+    }
 
     my $notbefore = $config->get("$validity_path.notbefore");
     if ($notbefore) {
@@ -178,9 +182,9 @@ sub __load_profile
 
     my $notafter = $config->get("$validity_path.notafter");
     if (! $notafter) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_LOAD_PROFILE_VALIDITY_NOTAFTER_NOT_DEFINED",
-	    );
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_LOAD_PROFILE_VALIDITY_NOTAFTER_NOT_DEFINED",
+        );
     }
 
     if (OpenXPKI::DateTime::is_relative($notafter)) {
@@ -202,7 +206,7 @@ sub __load_profile
     foreach my $ext ("basic_constraints", "key_usage", "extended_key_usage",
                      "subject_key_identifier", "authority_key_identifier",
                      "issuer_alt_name", "crl_distribution_points", "authority_info_access",
-                     "user_notice", "policy_identifier", "oid",
+                     "policy_identifier", "oid",
                      "netscape.comment", "netscape.certificate_type", "netscape.cdp")
     {
         ##! 16: "Load extension $profile_name, $ext"
@@ -215,7 +219,7 @@ sub __load_profile
     # check for the copy_extension flag
     my $copy = $config->get("profile.$profile_name.extensions.copy");
     if (!$copy) {
-    	$config->get("profile.default.extensions.copy");
+        $config->get("profile.default.extensions.copy");
     }
     $copy = 'none' unless ($copy);
     $self->set_copy_extensions( $copy );

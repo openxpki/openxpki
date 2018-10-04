@@ -91,8 +91,8 @@ You must configure an ENGINE_SECTION which looks like this:
 
  --snip--
  pkcs11 = pkcs11_section
-   
- [pkcs11_section] 
+
+ [pkcs11_section]
  engine_id = pkcs11
  dynamic_path = /usr/lib/engines/engine_pkcs11.so
  MODULE_PATH = /usr/lib/opensc-pkcs11.so

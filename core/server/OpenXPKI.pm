@@ -38,9 +38,9 @@ sub read_file
     my $filename = shift;
 
     if (! defined $filename) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_READ_FILE_MISSING_PARAMETER",
-	    );
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_READ_FILE_MISSING_PARAMETER",
+        );
     }
 
     if (! -e $filename)
@@ -58,20 +58,20 @@ sub read_file
     }
 
     my $result = do {
-	open my $HANDLE, "<", $filename;
-	if (! $HANDLE) {
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_READ_FILE_OPEN_FAILED",
-		params  => {"FILENAME" => $filename});
-	}
+    open my $HANDLE, "<", $filename;
+    if (! $HANDLE) {
+        OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_READ_FILE_OPEN_FAILED",
+        params  => {"FILENAME" => $filename});
+    }
         ## looks like this does not work
         ## "\x82 is no utf8" is the message (10000010) - perhaps an encoding problem?
         ## binmode $HANDLE, ":utf8";
         ## print STDERR "filename: $filename\n";
 
-	# slurp mode
-	local $INPUT_RECORD_SEPARATOR;     # long version of $/
-	<$HANDLE>;
+    # slurp mode
+    local $INPUT_RECORD_SEPARATOR;     # long version of $/
+    <$HANDLE>;
     };
 
     return $result;
@@ -89,14 +89,14 @@ sub write_file
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_WRITE_FILE_NO_FILENAME_SPECIFIED",
-	    );
+        );
     }
 
     if (! defined $content)
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_WRITE_FILE_NO_CONTENT_SPECIFIED",
-	    );
+        );
     }
 
     ## checks on safely created files are senseless
@@ -114,7 +114,7 @@ sub write_file
 
     my $mode = O_WRONLY | O_TRUNC;
     if (! -e $filename) {
-	$mode |= O_EXCL | O_CREAT;
+    $mode |= O_EXCL | O_CREAT;
     }
 
     my $HANDLE;
@@ -155,7 +155,7 @@ sub get_safe_tmpfile
     my $template = File::Spec->catfile($keys->{TMP}, "openxpki${PID}XXXXXXXX");
 
     ##! 2: "build tmp file"
-    my $fh = File::Temp->new( TEMPLATE => $template, UNLINK => 1 );          
+    my $fh = File::Temp->new( TEMPLATE => $template, UNLINK => 1 );
     if (! $fh) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_GET_SAFE_TMPFILE_MAKE_FAILED"

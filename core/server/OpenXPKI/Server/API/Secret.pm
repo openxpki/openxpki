@@ -1,4 +1,4 @@
-## OpenXPKI::Server::API::Secret.pm 
+## OpenXPKI::Server::API::Secret.pm
 ##
 ## Written 2006 by Michael Bell for the OpenXPKI project
 ## Copyright (C) 2006 by The OpenXPKI Project
@@ -45,28 +45,26 @@ sub set_secret_part
     my $self = shift;
     my $args = shift;
 
-    my $result = 
-	CTX('crypto_layer')->set_secret_group_part(
-	    {
-		GROUP => $args->{SECRET},
-		PART  => $args->{PART},
-		VALUE => $args->{VALUE}
-	    });
+    my $result = CTX('crypto_layer')->set_secret_group_part({
+        GROUP => $args->{SECRET},
+        PART  => $args->{PART},
+        VALUE => $args->{VALUE}
+    });
 
     if ($result) {
-	CTX('log')->log(
-	    MESSAGE  => "Secret part $args->{PART} set for group $args->{SECRET}",
-	    PRIORITY => 'info',
-	    FACILITY => 'audit',
-	    );
+
+        CTX('log')->audit('system')->info("set secret part", {
+            group => $args->{SECRET},
+            part  => $args->{PART}
+        });
+
     } else {
-	CTX('log')->log(
-	    MESSAGE  => "Incorrect secret part $args->{PART} entered for group $args->{SECRET}",
-	    PRIORITY => 'warn',
-	    FACILITY => 'audit',
-	    );
+        CTX('log')->audit('system')->warn("incorrect secret given", {
+            group => $args->{SECRET},
+            part  => $args->{PART}
+        });
     }
-    
+
     return $result;
 }
 
@@ -76,11 +74,9 @@ sub clear_secret
     my $self = shift;
     my $args = shift;
 
-    CTX('log')->log(
-	MESSAGE  => "Clearing secret for group $args->{SECRET}",
-	PRIORITY => 'info',
-	FACILITY => 'audit',
-	);
+    CTX('log')->audit('system')->info("clearing secret",{
+        group => $args->{SECRET},
+    });
 
     return CTX('crypto_layer')->clear_secret_group($args->{SECRET});
 }

@@ -16,7 +16,7 @@ sub error_ispresent {
     my $ident = ident $self;
     my $stderr = shift;
 
-    if ($stderr =~ m{ [eE]rror | 
+    if ($stderr =~ m{ [eE]rror |
                        USAGE   |
                        cannot\ decrypt\ request
                     }xms) { # TODO: check more possible error output
@@ -36,7 +36,7 @@ OpenXPKI::Crypto::Tool::SCEP::CLI
 =head1 Desription
 
 This module implements the handling of the openca-scep shell. It is a child
-of OpenXPKI::Crypto::CLI. 
+of OpenXPKI::Crypto::CLI.
 
 =head1 Functions
 

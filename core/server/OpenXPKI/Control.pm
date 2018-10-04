@@ -40,15 +40,20 @@ package OpenXPKI::Control;
 use strict;
 use warnings;
 use English;
-use OpenXPKI::Debug;
-use POSIX ":sys_wait_h";
-use Proc::ProcessTable;
 
+# Core modules
+use POSIX ":sys_wait_h";
+use Data::Dumper;
+use Digest::SHA qw( sha256_base64 );
+
+# CPAN modules
+use Proc::ProcessTable;
 use Log::Log4perl qw( :easy );
 Log::Log4perl->easy_init($ERROR);
 
-#use OpenXPKI::Server::Context qw( CTX );
-use Data::Dumper;
+# Project modules
+use OpenXPKI::Debug;
+
 
 =head2 start {CONFIG, SILENT, PID, FOREGROUND, DEBUG}
 
@@ -67,8 +72,11 @@ Weather to start the daemon in foreground (implies restart)
 =item RESTART (0|1)
 Weather to restart a running server
 
-=item DEBUG
-single scalar as global debug level or hashref of module => level
+=item DEBUG_LEVEL
+hashref: module => level
+
+=item DEBUG_BITMASK
+hashref: module => bitmask
 
 =back
 
@@ -81,28 +89,31 @@ sub start {
     my $pid        = $args->{PID};
     my $foreground = $args->{FOREGROUND};
     my $restart = $args->{RESTART} || $args->{FOREGROUND};
-    my $debug      = $args->{DEBUG} || 0;
+    my $debug_level = $args->{DEBUG_LEVEL} || 0;
+    my $debug_bitmask = $args->{DEBUG_BITMASK} || 0;
 
 
     # We must set the debug options before loading any OXI classes
-    # Parsing any class before the debug level is set, will exlude the class
+    # Parsing any class before the debug level is set will exlude the class
     # from debugging!
     #
-    # Set debug options - DEBUG is hash with the module name (wildcard)
+    # DEBUG_LEVEL is a hash with the module name (or regex)
     # as key and the level as value or just an integer for the global level
-    if (ref $debug eq '') {
-        if ($debug > 0) {
-            $OpenXPKI::Debug::LEVEL{'.*'} = $debug;
-        }
-    } elsif(ref $debug eq 'HASH') {
-        foreach my $module (keys %{$debug}) {
-            my $level = $debug->{$module};
-            print STDERR "Debug level for module '$module': $level\n";
+    if (ref $debug_level eq 'HASH') {
+        foreach my $module (keys %{$debug_level}) {
+            my $level = $debug_level->{$module};
             $OpenXPKI::Debug::LEVEL{$module} = $level;
         }
-        #print Dumper %OpenXPKI::Debug::LEVEL;
     }
 
+    # DEBUG_BITMASK is a hash with the module name (or regex)
+    # as key and the bitmask as value or just an integer for the global bitmask
+    if (ref $debug_bitmask eq 'HASH') {
+        foreach my $module (keys %{$debug_bitmask}) {
+            my $bitmask = $debug_bitmask->{$module};
+            $OpenXPKI::Debug::BITMASK{$module} = $bitmask;
+        }
+    }
 
     # Load the required locations from the config
     my $config = OpenXPKI::Control::__probe_config( $args );
@@ -121,7 +132,7 @@ sub start {
 
     # If a pid is given, we just check if the server is there
     if (defined $pid && kill(0, $pid)) {
-        if (OpenXPKI::Control::status({SOCKETFILE => $socketfile,SILENT => 1,}) == 0) {
+        if (OpenXPKI::Control::status({SOCKETFILE => $socketfile,SILENT => 1}) == 0) {
             if ($restart) {
                 OpenXPKI::Control::stop({SOCKETFILE => $socketfile, PID => $pid, SILENT => $silent});
             } else {
@@ -195,7 +206,7 @@ sub start {
             }
 
             # find out if the server is REALLY running properly
-            if (OpenXPKI::Control::status({ SOCKETFILE => $socketfile })) {
+            if (OpenXPKI::Control::status({ SOCKETFILE => $socketfile, SLEEP => undef })) {
                 print STDERR "Status check failed\n";
                 return 2;
             }
@@ -213,7 +224,8 @@ sub start {
                 ## SILENT is required to work correctly with start-stop-daemons
                 ## during a normal System V init
                 require OpenXPKI::Server;
-                OpenXPKI::Server->new ( "SILENT" => $silent ? 1 : 0 );
+                my $server = OpenXPKI::Server->new ( "SILENT" => $silent ? 1 : 0 , TYPE => $config->{TYPE} );
+                $server->start;
             };
             if ($EVAL_ERROR)
             {
@@ -229,10 +241,11 @@ sub start {
         # foreground requested, do not fork
         eval {
             require OpenXPKI::Server;
-            OpenXPKI::Server->new(
+            my $server = OpenXPKI::Server->new(
                 'SILENT' => $silent ? 1 : 0,
                 'TYPE'   => 'Simple',
             );
+            $server->start;
         };
         if ($EVAL_ERROR) {
             print STDERR $EVAL_ERROR;
@@ -351,7 +364,7 @@ sub status {
     my $args = shift;
     my $silent = $args->{SILENT};
 
-    if (exists $args->{SLEEP} and $args->{SLEEP} > 0)
+    if (defined $args->{SLEEP} and $args->{SLEEP} > 0)
     {
         ## this helps to give the server some reaction time
         sleep $args->{SLEEP};
@@ -368,13 +381,14 @@ sub status {
 
     my $client = OpenXPKI::Control::__connect_openxpki_daemon($socketfile);
     if (!$client) {
-        if (not exists $args->{SLEEP})
+        if (not $args->{SLEEP})
         {
             ## wait for a starting server ...
             return OpenXPKI::Control::status ({SOCKETFILE => $args->{SOCKETFILE}, SLEEP => 5, SILENT => $silent});
         }
         print STDERR "OpenXPKI server is not running or does not accept requests.\n" if (not $silent);
         return 2;
+
     }
     print STDOUT "OpenXPKI Server is running and accepting requests.\n" unless ($silent);
     return 0;
@@ -383,7 +397,7 @@ sub status {
 
 =head2 reload
 
-Reload the server (forwards the config pointer)
+Reload some parts of the config (sends a HUP to the server pid)
 
 Parameters:
 
@@ -434,49 +448,45 @@ Holding the pid of the main server process.
 
 =item watchdog
 
-List of running watchdog process. Usually this is only a single pid but can
-also have more than one. If empty, the watchdog was either disabled or
-terminated due to too many internal errors.
+List of running watchdog process. Usually this is only a single pid but
+can also have more than one. If empty, the watchdog was either disabled
+or terminated due to too many internal errors.
 
 =item worker
 
-List of pids of running session workers (connected to the socket). This might
-also be empty if no process is running.
+List of pids of running session workers (connected to the socket). This
+might also be empty if no process is running.
 
-=item watchdog
+=item workflow
 
-List of pids of all workers executed by the watchdog (not connected to a
-socket). Might also be empty.
+List of pids of all workers currently handling workflows (contains
+watchdog and user initiated requests).
 
 =back
 
 =cut
 
 sub get_pids {
-
-    my $args = shift;
-
-    my $proc = new Proc::ProcessTable;
+    my $proc = Proc::ProcessTable->new;
     my $result = { 'server' => 0, 'watchdog' => [], 'worker' => [], 'workflow' => [] };
     my $pgrp = getpgrp($$); # Process Group of myself
-    foreach my $p ( @{$proc->table} ) {
-
-        if ($pgrp != $p->pgrp) {
-            next;
-        }
+    for my $p ( @{$proc->table} ) {
+        next unless $pgrp == $p->pgrp;
 
         my $cmd = $p->cmndline;
-        if ( $cmd  =~ /server/ ) {
-            $result->{server} = $p->pid;
-        } elsif( $cmd =~ /watchdog/ ) {
-            push @{$result->{watchdog}}, $p->pid;
-        } elsif( $cmd =~ /worker/ ) {
-            push @{$result->{worker}}, $p->pid;
-        } elsif( $cmd =~ /workflow/ ) {
-            push @{$result->{workflow}}, $p->pid;
+        if ($cmd =~ / ^ openxpkid .* server /x) {
+            $result->{server} = $p->pid; next;
+        }
+        if ($cmd =~ / ^ openxpkid .* watchdog /x) {
+            push @{$result->{watchdog}}, $p->pid; next;
+        }
+        if ($cmd =~ / ^ openxpkid .* worker /x) {
+            push @{$result->{worker}}, $p->pid; next;
+        }
+        if ($cmd =~ / ^ openxpkid .* workflow /x) {
+            push @{$result->{workflow}}, $p->pid; next;
         }
     }
-
     return $result;
 }
 
@@ -497,7 +507,7 @@ sub list_process {
             next;
         }
 
-        if (!$p->cmndline) { 
+        if (!$p->cmndline) {
             push @result, { 'pid' => $p->pid, 'time' => $p->start, 'info' => '' };
         } elsif ($p->cmndline =~ m{ ((worker|workflow): .*) \z }x) {
             push @result, { 'pid' => $p->pid, 'time' => $p->start, 'info' => $1 };
@@ -564,6 +574,7 @@ sub __probe_config {
     return {
         PIDFILE  => $config->get('system.server.pid_file'),
         SOCKETFILE => $config->get('system.server.socket_file'),
+        TYPE => $config->get('system.server.type') || 'Fork',
     };
 
 }
@@ -572,14 +583,25 @@ sub __probe_config {
 sub __connect_openxpki_daemon {
 
     my $socketfile = shift;
+
+    # if there is no socket it does not make sense to test the client
+    return unless (-e $socketfile);
+
     my $client;
     eval {
         ## do not make a use statement from this
         ## a use would disturb the server initialization
         require OpenXPKI::Client;
-        $client = OpenXPKI::Client->new({
+        # this only creates the class but does not fire up the socket!
+        my $cc= OpenXPKI::Client->new({
             SOCKETFILE => $socketfile,
         });
+
+        # try to talk to the daemon
+        my $reply = $cc->send_receive_service_msg('PING');
+        if ($reply && $reply->{SERVICE_MSG} eq 'START_SESSION') {
+            $client = $cc;
+        }
     };
     return $client;
 

@@ -18,9 +18,9 @@ sub get_command
 
     my $engine = "";
     my $engine_usage = $self->{ENGINE}->get_engine_usage();
-    if ($self->{ENGINE}->get_engine() and 
-        (($engine_usage =~ m{ NEW_ALG }xms) or 
-         ($engine_usage =~ m{ ALWAYS }xms) or 
+    if ($self->{ENGINE}->get_engine() and
+        (($engine_usage =~ m{ NEW_ALG }xms) or
+         ($engine_usage =~ m{ ALWAYS }xms) or
          ($engine_usage =~ m{ PRIV_KEY_OPS }xms))
        ) {
         $engine = $self->{ENGINE}->get_engine();
@@ -29,7 +29,7 @@ sub get_command
     $self->get_tmpfile ('KEY', 'OUT');
     $self->write_file (FILENAME => $self->{KEYFILE},
                        CONTENT  => $self->{DATA},
-	               FORCE    => 1);
+                   FORCE    => 1);
     if (not exists $self->{PASSWD})
     {
         OpenXPKI::Exception->throw (
@@ -106,7 +106,7 @@ so that the conversion can be done in one step.
 
 =head2 hide_output
 
-returns 1 
+returns 1
 
 =head2 key_usage
 

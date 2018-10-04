@@ -13,28 +13,28 @@ extends 'OpenXPKI::Client::UI::Result';
 sub BUILD {
 
     my $self = shift;
-    $self->_page ({'label' => 'Welcome to your OpenXPKI Trustcenter'});
+    $self->_page ({'label' => 'I18N_OPENXPKI_UI_HOME_WELCOME_HEAD'});
 }
- 
+
 sub init_welcome {
 
     my $self = shift;
     my $args = shift;
 
     # check for redirect
-    my $redirect = $self->_client->session()->param('redirect');
+    my $redirect = $self->_client->session()->param('redirect') || '';
     $self->_client->session()->param('redirect','');
-    if ($redirect eq 'welcome') {
+    if ($redirect =~ /welcome/) {
         # redirect to myself causes the UI to loop
         $redirect = "";
     }
-    
+
     if ($redirect) {
         $self->logger()->debug('Found redirect - redirecting user to ' . $redirect);
         $self->redirect($redirect);
     } else {
         # check if there are custom landmarks for this user
-        my $landmark = $self->_client->session()->param('landmark');    
+        my $landmark = $self->_client->session()->param('landmark');
         if ($landmark && $landmark->{welcome}) {
             $self->logger()->debug('Found welcome landmark - redirecting user to ' . $landmark->{welcome});
             $self->redirect($landmark->{welcome});
@@ -42,10 +42,9 @@ sub init_welcome {
             $self->init_index();
         }
     }
-    
+
     return $self;
 }
-    
 
 sub init_index {
 
@@ -56,13 +55,13 @@ sub init_index {
         type => 'text',
         content => {
             label => '',
-            description => 'This page was left blank.'
+            description => 'I18N_OPENXPKI_UI_WELCOME_PAGE'
         }
     });
 
     return $self;
 }
- 
+
 =head2 init_task
 
 Redirect to workflow!task
@@ -71,7 +70,7 @@ Redirect to workflow!task
 
 sub init_task {
 
-    my $self = shift; 
+    my $self = shift;
     $self->redirect('workflow!task');
 
 }

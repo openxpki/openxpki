@@ -3,15 +3,14 @@ use warnings;
 use English;
 use Test::More;
 use Test::Exception;
-use File::Spec::Functions qw( catdir splitpath rel2abs );
+use FindBin qw( $Bin );
 
 #use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Database.*'} = 100;
 
 #
 # setup
 #
-my $basedir = catdir((splitpath(rel2abs(__FILE__)))[0,1]);
-require "$basedir/DatabaseTest.pm";
+require "$Bin/DatabaseTest.pm";
 
 my $db = DatabaseTest->new(
     columns => [ # yes an ArrayRef to have a defined order!
@@ -24,19 +23,20 @@ my $db = DatabaseTest->new(
         [ 2, "Buergersteig",  1 ],
         [ 3, "Rathaus",       42 ],
         [ 4, "Kindergarten",  3 ],
+        [ 5, "Luft",          undef ],
     ],
 );
 
 #
 # tests
 #
-$db->run("SQL SELECT", 11, sub {
+$db->run("SQL SELECT", 7, sub {
     my $t = shift;
     my $dbi = $t->dbi;
     my $sth;
 
     # simple select
-    lives_ok {
+    lives_and {
         $sth = $dbi->select(
             from => "test",
             columns => [ "text" ],
@@ -48,7 +48,7 @@ $db->run("SQL SELECT", 11, sub {
     } "simple select";
 
     # select with AND
-    lives_ok {
+    lives_and {
         $sth = $dbi->select(
             from => "test",
             columns => [ "text" ],
@@ -60,7 +60,7 @@ $db->run("SQL SELECT", 11, sub {
     } "select with AND";
 
     # select with OR
-    lives_ok {
+    lives_and {
         $sth = $dbi->select(
             from => "test",
             columns => [ "text" ],
@@ -73,8 +73,21 @@ $db->run("SQL SELECT", 11, sub {
         ];
     } "select with OR";
 
+    # select with OR
+    lives_and {
+        $sth = $dbi->select(
+            from => "test",
+            columns => [ "text" ],
+            where => { entropy => [ 42, undef] },
+        );
+        is_deeply $sth->fetchall_arrayref, [
+            [ "Rathaus" ],
+            [ "Luft" ],
+        ];
+    } "select with OR and NULL";
+
     # select with "bigger than"
-    lives_ok {
+    lives_and {
         $sth = $dbi->select(
             from => "test",
             columns => [ "text" ],
@@ -83,11 +96,12 @@ $db->run("SQL SELECT", 11, sub {
         is_deeply $sth->fetchall_arrayref, [
             [ "Rathaus" ],
             [ "Kindergarten" ],
+            [ "Luft" ],
         ];
     } "select with 'bigger than'";
 
     # select without result
-    lives_ok {
+    lives_and {
         $sth = $dbi->select(
             from => "test",
             columns => [ "text" ],

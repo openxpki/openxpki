@@ -65,66 +65,57 @@ sub execute {
 
         ##! 16: 'Lookup at path ' . Dumper @path
         if (@path) {
-            
+
             my $plain_result;
             if ($self->param('pause_on_error')) {
-                
+
                 if (!$self->param('retry_count')) {
                     configuration_error('pause_on_error also requires a non-zero retry_count to be set');
                 }
-                
+
                 # run connector in eval to catch error
                 eval {
                     $plain_result = $config->get( [ @prefix, 'value', @path ] );
                 };
                 if ($EVAL_ERROR) {
-                    CTX('log')->log(
-                        MESSAGE => "SCEP eligibility check chrashed - do pause",
-                        PRIORITY => 'warn',
-                        FACILITY => 'application',
-                    );
+                    CTX('log')->application()->warn("SCEP eligibility check chrashed - do pause");
+
                     ##! 32: 'Doing pause'
                     $self->pause('I18N_OPENXPKI_UI_ELIGIBILITY_CHECK_UNEXPECTED_ERROR');
                 }
             } else {
                 $plain_result = $config->get( [ @prefix, 'value', @path ] );
             }
-            ##! 32: 'result is ' . $plain_result        
-    
-            CTX('log')->log(
-                MESSAGE => "SCEP eligibility check raw result " . $plain_result . ' using path ' . join('|', @path),
-                PRIORITY => 'debug',
-                FACILITY => 'application',
-            );
-            
-            $context->param( 'eligibility_result' => $plain_result );  
-                
-            # If a list of expected values is given, we check the return value 
+            ##! 32: 'result is ' . $plain_result
+
+            CTX('log')->application()->debug("SCEP eligibility check raw result " . $plain_result . ' using path ' . join('|', @path));
+
+
+            $context->param( 'eligibility_result' => $plain_result );
+
+            # If a list of expected values is given, we check the return value
             my @expect= $config->get_scalar_as_list( [ @prefix, 'expect' ] );
             if (defined $plain_result && defined $expect[0]) {
 
                 ##! 32: 'Check against list of expected values'
                 foreach my $valid (@expect) {
-                    ##! 64: 'Probe ' .$valid                     
+                    ##! 64: 'Probe ' .$valid
                     if ($plain_result eq $valid) {
                         $res = 1;
                         ##! 32: 'Match found' .$valid
                         last;
                     }
                 }
-                
-                CTX('log')->log(
-                    MESSAGE => "SCEP eligibility check for expected value " . ($res ? 'succeeded' : 'failed'),
-                    PRIORITY => 'debug',
-                    FACILITY => 'application',
-                );
-                
-            } else {                
-                # Evaluate whatever comes back to a boolean 0/1 f                
-                $res = $plain_result ? 1 : 0;                
-            }            
+
+                CTX('log')->application()->debug("SCEP eligibility check for expected value " . ($res ? 'succeeded' : 'failed'));
+
+
+            } else {
+                # Evaluate whatever comes back to a boolean 0/1 f
+                $res = $plain_result ? 1 : 0;
+            }
         }
-        
+
     } else {
         # No attribs, static case
         my $plain_result = $config->get( [ @prefix, 'value' ] );
@@ -132,23 +123,16 @@ sub execute {
         # check the ref and explicit return to make sure it was not a stupid config
         $res = (ref $plain_result eq '' && $plain_result eq '1');
 
-        CTX('log')->log(
-            MESSAGE => "SCEP eligibility check without path - result " . $plain_result,
-            PRIORITY => 'debug',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->debug("SCEP eligibility check without path - result " . $plain_result);
+
 
     }
 
     $context->param( $flag => $res );
 
-    CTX('log')->log(
-        MESSAGE => "SCEP eligibility for " .
+    CTX('log')->application()->info("SCEP eligibility for " .
             ($is_initial ? 'initial enrollment ' : 'renewal ' ) .
-            ($res ? 'granted' : 'failed'),
-        PRIORITY => 'info',
-        FACILITY => ['audit','application'],
-    );
+            ($res ? 'granted' : 'failed'));
 
     return 1;
 }
@@ -166,7 +150,7 @@ Check the eligability to perform initial enrollment or renewal against the
 connector. The activity detects if we are in initial or renewal mode and
 writes the decission to "request_mode".
 
-=head1 Configuration 
+=head1 Configuration
 
 =head2 Activity Configuration
 
@@ -175,14 +159,14 @@ writes the decission to "request_mode".
 =item pause_on_error
 
 Set this if you have connectors that might cause exceptions. You also
-need to set a useful value for retry_count. Effective only in attribute 
-mode! (see also OpenXPKI::Server::Workflow::Activity). If not set, 
+need to set a useful value for retry_count. Effective only in attribute
+mode! (see also OpenXPKI::Server::Workflow::Activity). If not set,
 connector errors will bubble up as exceptions to the workflow handler.
 
-=back 
+=back
 
 =head2 Data Source Configuration
- 
+
 =head3 Dynamic using a Connector
 
 The data source must be configured in the config of the running scep
@@ -203,13 +187,13 @@ subject and mac address (gathered by url parameter), e.g.:
 
    your.connector.cn=foo,dc=bar.00:01:02:34:56:78
 
-If the connector returns a true value, the enrollment is granted. 
-Renewal is disabled as the path is empty. 
+If the connector returns a true value, the enrollment is granted.
+Renewal is disabled as the path is empty.
 
 =head3 Dynamic with a return-value whitelist
 
-If you need to make the decission based on the return value, you can add 
-a list of expected values to the definition: 
+If you need to make the decission based on the return value, you can add
+a list of expected values to the definition:
 
     initial:
       value@: connector:your.connector
@@ -221,7 +205,7 @@ a list of expected values to the definition:
         - Build
 
 The check will succeed, if the value returned be the connector has a literal
-match in the given list. 
+match in the given list.
 
 =head3 Static
 
@@ -236,5 +220,5 @@ args and set value to a literal 1:
       renewal:
         value: 1
 
-Sidenote: You can use a connector here as well, but in static mode we always 
-test for a literal "1" as return value! 
+Sidenote: You can use a connector here as well, but in static mode we always
+test for a literal "1" as return value!

@@ -1,149 +1,153 @@
-# OpenXPKI::Client::SCEP
-# Written 2006 by Alexander Klink for the OpenXPKI project
-# (C) Copyright 2006 by The OpenXPKI Project
-
 package OpenXPKI::Client::SCEP;
 
-use base qw( OpenXPKI::Client );
-use OpenXPKI::Server::Context qw( CTX );
+use Moose;
+use warnings;
+use strict;
+use Carp;
+use English;
+
+use OpenXPKI::Debug 'OpenXPKI::Client::SCEP';
+use OpenXPKI::Exception;
+
+extends 'OpenXPKI::Client';
 
 use Data::Dumper;
 
-{
-    use warnings;
-    use strict;
-    use Carp;
-    use English;
+has service => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => 'SCEP',
+);
 
-    use Class::Std;
+has server => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => 'Default',
+);
 
-    use OpenXPKI::i18n qw( i18nGettext );
-    use OpenXPKI::Debug 'OpenXPKI::Client::SCEP';
-    use OpenXPKI::Exception;
+has pki_realm => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => '',
+);
 
-    my %operation_of :ATTR( :init_arg<OPERATION> ); # SCEP operation
-    my %message_of   :ATTR( :init_arg<MESSAGE>   ); # SCEP message
-    my %realm_of     :ATTR( :init_arg<REALM>     ); # PKI realm to use
-    my %profile_of   :ATTR( :init_arg<PROFILE>   ); # endentity profile to use
-    my %server_of    :ATTR( :init_arg<SERVER>    ); # server to use
-    my %enc_alg_of   :ATTR( :init_arg<ENCRYPTION_ALGORITHM> );
-    my %hash_alg_of  :ATTR( :init_arg<HASH_ALGORITHM> );
+has encryption_algorithm => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => 'Default',
+);
 
-    my %allowed_op = map { $_ => 1 } qw(
-        GetCACaps
-        GetCACert
-        GetNextCACert
-        GetCACertChain
+has hash_algorithm => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => 'Default',
+);
 
-        PKIOperation
-    );
+around BUILDARGS => sub {
 
-    sub START {
-        my ($self, $ident, $arg_ref) = @_;
+    my $orig = shift;
+    my $class = shift;
 
-        # send configured realm, collect response
-        ##! 4: "before talk"
-        $self->talk('SELECT_PKI_REALM ' . $realm_of{$ident});
-        my $message = $self->collect();
-        if ($message eq 'NOTFOUND') {
-            die("The configured realm (" . $realm_of{$ident} . ") was not found"
-                . " on the server");
+    # old call format using hash
+    if ( @_ == 1 && ref $_[0] eq 'HASH' ) {
+        my %params = %{$_[0]};
+        foreach my $key (qw(SERVER ENCRYPTION_ALGORITHM HASH_ALGORITHM SOCKETFILE TIMEOUT)) {
+            if ($params{$key}) {
+                $params{lc($key)} = $params{$key};
+                delete $params{$key};
+            }
         }
-        $self->talk('SELECT_PROFILE ' . $profile_of{$ident});
-        $message = $self->collect();
-        if ($message eq 'NOTFOUND') {
-            die("The configured profile (" . $profile_of{$ident} . ") was not found on the server");
+        if ($params{REALM}) {
+            $params{pki_realm} = $params{REALM};
+            delete $params{REALM};
         }
-        $self->talk('SELECT_SERVER ' . $server_of{$ident});
-        $message = $self->collect();
-        if ($message eq 'NOTFOUND') {
-            die('The configured server (' . $server_of{$ident} . ') was not found on the server');
-        }
-        $self->talk('SELECT_ENCRYPTION_ALGORITHM ' . $enc_alg_of{$ident});
-        $message = $self->collect();
-        if ($message eq 'NOTFOUND') {
-            die('The configured encryption algorithm (' . $enc_alg_of{$ident}
-                . ') was not found on the server');
-        }
-        $self->talk('SELECT_HASH_ALGORITHM ' . $hash_alg_of{$ident});
-        $message = $self->collect();
-        if ($message eq 'NOTFOUND') {
-            die('The configured hash algorithm (' . $hash_alg_of{$ident}
-                . ') was not found on the server');
-        }
-
-
-        #$self->talk('SET_PARAMETER ' . $serialization{$ident}->serialize($context_of{$ident}));
-        #$message = $self->collect();
-        #if ($message eq 'FAILED') {
-        #    die('The passed parameters (' . Dumper $context_of{$ident} . ') could not be set');
-        #}
-
-
+        return $class->$orig(%params);
+    } else {
+        return $class->$orig(@_);
     }
 
-    sub send_request {
-        my $self = shift;
-        my $ident = ident $self;
-        my $extra_params = shift || {};
-        my $op = $operation_of{$ident};
-        my $message = $message_of{$ident};
+};
 
-        if ($allowed_op{$op}) {
-            # send command message to server
-            $self->send_command_msg(
-                $op,
-                {
-                  MESSAGE => $message,
-                  URLPARAMS => $extra_params
-                }
-            );
-        }
-        else { # OP is invalid, throw corresponding exception
-            OpenXPKI::Exception->throw(
-                message => "I18N_OPENXPKI_CLIENT_SCEP_INVALID_OP",
-            );
-        }
-        # get resulting command message from server
-        my $server_result = $self->collect();
-        return $server_result->{PARAMS};
+sub BUILD {
+
+    my $self = shift;
+    my $msg;
+
+    $msg = $self->talk('SELECT_PKI_REALM ' . $self->pki_realm());
+    if ($msg eq 'NOTFOUND') {
+        die("The configured realm (" .$self->pki_realm(). ") was not found "
+            . " on the server");
+    }
+
+    $msg = $self->talk('SELECT_SERVER ' . $self->server());
+    if ($msg eq 'NOTFOUND') {
+        die("The configured server (" .$self->server(). ") was not found "
+            . " on the server");
+    }
+
+    $msg = $self->talk('SELECT_ENCRYPTION_ALGORITHM ' . $self->encryption_algorithm());
+    if ($msg eq 'NOTFOUND') {
+        die('The configured encryption algorithm (' . $self->encryption_algorithm()
+            . ') was not found on the server');
+    }
+
+    $msg = $self->talk('SELECT_HASH_ALGORITHM ' . $self->hash_algorithm());
+    if ($msg eq 'NOTFOUND') {
+        die('The configured hash algorithm (' . $self->hash_algorithm()
+            . ') was not found on the server');
     }
 }
+
+sub send_request {
+
+    my $self = shift;
+    my $op = shift || '';
+    my $message = shift || '';
+    my $extra_params = shift || {};
+
+    if ($op !~ m{\A(GetCACaps|GetCACert|GetNextCACert|GetCACertChain|PKIOperation)\z}) {
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_CLIENT_SCEP_INVALID_OP",
+        );
+    }
+
+    my $result = $self->send_receive_command_msg($op,{
+          MESSAGE => $message,
+          URLPARAMS => $extra_params
+        }
+    );
+    $self->close_connection();
+    return $result->{PARAMS};
+
+}
+
 1; # Magic true value required at end of module
+
 __END__
 
 =head1 NAME
 
 OpenXPKI::Client::SCEP - OpenXPKI Simple Certificate Enrollment Protocol Client
 
-
-=head1 VERSION
-
-This document describes OpenXPKI::Client::SCEP version $VERSION
-
-
 =head1 SYNOPSIS
 
     use OpenXPKI::Client::SCEP;
-    use CGI;
 
     my $query     = CGI->new();
     my $operation = $query->param('operation');
     my $message   = $query->param('message');
 
-    my $scep_client = OpenXPKI::Client::SCEP->new(
-        {
-        SERVICE    => 'SCEP',
-        REALM      => $realm,
-        SOCKETFILE => $socket,
-        TIMEOUT    => 120, # TODO - make configurable?
-        PROFILE    => $profile,
-        OPERATION  => $operation,
-        MESSAGE    => $message,
-        SERVER     => $server,
-        ENCRYPTION_ALGORITHM => $enc_alg,
+    my $scep_client = OpenXPKI::Client::SCEP->new({
+        service    => 'SCEP',
+        pki_realm  => $realm,
+        socketfile => $socket,
+        timeout    => 120,
+        server     => $server,
+        encryption_algorithm => $enc_alg,
+        hash_algorithm => $hash_alg,
         });
-    my $result = $scep_client->send_request();
+
+    my $result = $scep_client->send_request( $operation, $message );
 
 =head1 DESCRIPTION
 
@@ -151,31 +155,21 @@ OpenXPKI::Client::SCEP acts as a client that sends an SCEP request
 to the OpenXPKI server. It is typically called from within a CGI
 script that acts as the SCEP server.
 
-=head1 INTERFACE
+=head1 Arguments
 
-=head2 START
-
-Constructor, see Class::Std.
-
-Expects the following named parameters:
+=head2 Constructor
 
 =over
 
-=item REALM
+=item pki_realm
 
 PKI Realm to access (must match server configuration).
-
-=item OPERATION
-
-SCEP operation to send. For allowed operations, see the %allowed_op
-hash.
-
-=item MESSAGE
-
-SCEP message to send.
 
 =back
 
 =head2 send_request
 
-Sends SCEP request to OpenXPKI server.
+Sends SCEP request to OpenXPKI server, expects operation and message as
+positional arguments. A third parameter with optional parameters can be
+passed which is handed over to the backend workflow as "URLPARAMS".
+

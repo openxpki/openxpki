@@ -23,9 +23,9 @@ sub execute
 
     ## get needed information
     my $context   = $workflow->context();
-    my $user      = CTX('session')->get_user();
-    my $role      = CTX('session')->get_role();
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $user      = CTX('session')->data->user;
+    my $role      = CTX('session')->data->role;
+    my $pki_realm = CTX('session')->data->pki_realm;
 
     # not supported / used at the moment
     if (defined $context->param('_check_hash')) {
@@ -117,18 +117,14 @@ sub execute
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_APPROVE_COULD_NOT_DETERMINE_SIGNER_CERTIFICATE_IDENTIFIER',
                 log     => {
-                    logger   => CTX('log'),
                     priority => 'info',
                     facility => 'system',
                 },
             );
         }
 
-        CTX('log')->log(
-            MESSAGE => 'Signed approval for workflow ' . $workflow->id() . " by user $user, role $role",
-            PRIORITY => 'info',
-            FACILITY => ['audit', 'application' ],
-        );
+        CTX('log')->application()->info('Signed approval for workflow ' . $workflow->id() . " by user $user, role $role");
+        CTX('log')->audit('approval')->info('Signed approval for workflow ' . $workflow->id() . " by user $user, role $role");
 
         # look for already present approvals by someone with the same
         # certificate and role
@@ -196,11 +192,13 @@ sub execute
                 'session_role'      => $role,
             };
         }
-        CTX('log')->log(
-		    MESSAGE => 'Unsigned approval for workflow ' . $workflow->id() . " by user $user, role $role",
-		    PRIORITY => 'info',
-		    FACILITY => ['audit', 'application' ],
-        );
+        CTX('log')->application()->info('Unsigned approval for workflow ' . $workflow->id() . " by user $user, role $role");
+
+        CTX('log')->audit('approval')->info('operator approval given', {
+            wfid => $workflow->id(),
+            user => $user,
+            role => $role
+        });
     } else {
         configuration_error('Unsuported mode given');
     }
@@ -209,11 +207,8 @@ sub execute
     $approvals = $serializer->serialize(\@approvals);
     ##! 64: 'approvals serialized: ' . Dumper $approvals
 
-    CTX('log')->log(
-        MESSAGE => 'Total number of approvals ' . scalar @approvals,
-        PRIORITY => 'debug',
-        FACILITY => [ 'application' ],
-    );
+    CTX('log')->application()->debug('Total number of approvals ' . scalar @approvals);
+
 
     $context->param ('approvals' => $approvals);
 

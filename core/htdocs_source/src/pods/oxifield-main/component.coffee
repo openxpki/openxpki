@@ -37,11 +37,12 @@ Component = Em.Component.extend
         @sendAction "valueChange", @get "content"
 
     keyPress: (event) ->
-        if event.which is 13
+        if event.keyCode is 9
             if @get "content.clonable"
-                @send "addClone"
-                event.stopPropagation()
-                event.preventDefault()
+                if @get "content.value"
+                    @send "addClone"
+                    event.stopPropagation()
+                    event.preventDefault()
 
     actions:
         addClone: (field) -> @sendAction "addClone", @get "content"

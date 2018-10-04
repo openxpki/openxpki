@@ -9,10 +9,10 @@ SRCNAME=$(PACKAGE)
 OXI_TARBALL = $(shell rpm --eval '%{_topdir}')/SOURCES/$(PACKAGE)-$(OXI_VERSION).tar.gz
 OXI_TARBALL_DIR = $(shell rpm --eval '%{_topdir}')/BUILD/tmp/$(PACKAGE)-$(OXI_VERSION)
 
-# Makefile.inc contains common settings for all packages (checked in)
-include ../Makefile.inc
 # Makefile.local may be used locally to override settings (not checked in)
 -include ../Makefile.local
+# Makefile.inc contains common settings for all packages (checked in)
+include ../Makefile.inc
 
 all: clean package
 

@@ -15,21 +15,18 @@ sub _evaluate
     ##! 1: 'start'
     my ( $self, $workflow ) = @_;
 
-    my $path = $self->param('config_path');    
+    my $path = $self->param('config_path');
     my $delimiter = $self->param('delimiter') || '\.';
-    
+
     if ($delimiter eq '.') { $delimiter = '\.'; }
-    
+
     my @path = split $delimiter, $path;
 
     my $exists = CTX('config')->exists( \@path );
-    
-    CTX('log')->log(
-        MESSAGE => "Condition check for exist: path $path, exist: " . ($exists ? 'yes' : 'no'),
-        PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    );
-        
+
+    CTX('log')->application()->debug("Condition check for exist: path $path, exist: " . ($exists ? 'yes' : 'no'));
+
+
     if (!$exists) {
         condition_error("I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CONNECTOR_EXISTS_FAILED");
     }
@@ -52,7 +49,7 @@ OpenXPKI::Server::Workflow::Condition::Connector::Exists
         class: OpenXPKI::Server::Workflow::Condition::Connector::Exists
         param:
             config_path: path.of.the.node.to.check
-            
+
 
 =head1 DESCRIPTION
 

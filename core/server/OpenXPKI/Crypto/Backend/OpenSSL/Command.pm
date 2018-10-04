@@ -3,7 +3,6 @@
 
 use strict;
 use warnings;
-use utf8;
 
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_random;
 use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkcs10;
@@ -85,7 +84,7 @@ sub set_tmpfile
 
     foreach my $key (keys %{$keys})
     {
-	push @{$self->{CLEANUP}->{FILE}}, $keys->{$key};
+    push @{$self->{CLEANUP}->{FILE}}, $keys->{$key};
 
         $self->{$key."FILE"} = $keys->{$key};
     }
@@ -98,15 +97,15 @@ sub get_tmpfile
 
     if (scalar(@_) == 0) {
         my $filename = $self->get_safe_tmpfile ({TMP => $self->{TMP}});
-	push @{$self->{CLEANUP}->{FILE}}, $filename;
-	return $filename;
+    push @{$self->{CLEANUP}->{FILE}}, $filename;
+    return $filename;
     }
     else
     {
-	while (my $arg = shift) {
+    while (my $arg = shift) {
             my $filename = $self->get_safe_tmpfile ({TMP => $self->{TMP}});
-	    $self->set_tmpfile($arg => $filename);
-	}
+        $self->set_tmpfile($arg => $filename);
+    }
     }
 }
 
@@ -117,7 +116,7 @@ sub set_env
 
     foreach my $key (keys %{$keys})
     {
-	push @{$self->{CLEANUP}->{ENV}}, $key;
+    push @{$self->{CLEANUP}->{ENV}}, $key;
         $ENV{$key} = $keys->{$key};
     }
     return 1;
@@ -132,9 +131,9 @@ sub cleanup
     foreach my $file (@{$self->{CLEANUP}->{FILE}})
     {
         if (-e $file)
-	{
-	    unlink $file;
-	}
+    {
+        unlink $file;
+    }
         if (-e $file)
         {
             OpenXPKI::Exception->throw (
@@ -170,12 +169,8 @@ sub get_openssl_dn
             params   => {"DN" => $dn});
     }
 
-    ## this is necessary because OpenSSL needs the utf8 bytes
-    #pack/unpack is too slow, try to use "use utf8;"
-    #$dn = pack "C*", unpack "C0U*", $dn_obj->get_openssl_dn ();
-    $dn = $dn_obj->get_openssl_dn ();
+    $dn = $dn_obj->get_openssl_dn();
     ##! 2: "OpenSSL X.500: $dn"
-
     return $dn;
 }
 

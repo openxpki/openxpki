@@ -4,8 +4,7 @@ use utf8;
 
 use Test::More;
 use Test::Exception;
-use File::Spec::Functions qw( catfile catdir splitpath rel2abs );
-use MooseX::Params::Validate;
+use OpenXPKI::MooseParams;
 use Log::Log4perl;
 use Moose::Util::TypeConstraints;
 
@@ -57,6 +56,7 @@ has 'test_only' => (
         _test_db => 'first',
     },
 );
+
 # Returns true if the given DB type shall be tested
 sub shall_test {
     my ($self, $dbtype) = @_;
@@ -88,10 +88,12 @@ has 'test_no' => (
 has '_log' => (
     is => 'rw',
     isa => 'Object',
+#    lazy => 1,
+#    default => sub { Log::Log4perl->easy_init($OFF); return Log::Log4perl->get_logger(); }
 );
 
 sub set_dbi {
-    my ($self, %args) = validated_hash(\@_,   # MooseX::args::Validate
+    my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
         params => { isa => 'HashRef' },
     );
 
@@ -111,22 +113,18 @@ sub set_dbi {
 sub BUILD {
     my $self = shift;
     use_ok "OpenXPKI::Server::Database"; $self->count_test;
-    use_ok "OpenXPKI::Server::Log";      $self->count_test;
-    $self->_log( OpenXPKI::Server::Log->new(
-        CONFIG => \"
-# Catch-all root logger
-log4perl.rootLogger = DEBUG, Everything
 
-log4perl.appender.Everything          = Log::Log4perl::Appender::String
-log4perl.appender.Everything.layout   = Log::Log4perl::Layout::PatternLayout
-log4perl.appender.Everything.layout.ConversionPattern = %d %c.%p %m%n
-"
-    ) );
+    Log::Log4perl->init(\"
+        log4perl.rootLogger = DEBUG, Everything
+        log4perl.appender.Everything          = Log::Log4perl::Appender::String
+        log4perl.appender.Everything.layout   = Log::Log4perl::Layout::PatternLayout
+        log4perl.appender.Everything.layout.ConversionPattern = %d %c.%p %m%n
+    ");
+    $self->_log( Log::Log4perl->get_logger() );
 }
 
 sub run {
-    my $self = shift;
-    my ($name, $plan, $tests) = pos_validated_list(\@_,
+    my ($self, $name, $plan, $tests) = positional_args(\@_,
         { isa => 'Str'},
         { isa => 'Int'},
         { isa => 'CodeRef' },
@@ -174,7 +172,8 @@ sub run {
         $self->set_dbi(
             params => {
                 type => "MySQL",
-                host => "127.0.0.1", # if not specified, the driver tries socket connection
+                host => $ENV{OXI_TEST_DB_MYSQL_DBHOST}, # if not specified, the driver tries socket connection
+                port => $ENV{OXI_TEST_DB_MYSQL_DBPORT}, # if not specified, the driver tries socket connection
                 name => $ENV{OXI_TEST_DB_MYSQL_NAME},
                 user => $ENV{OXI_TEST_DB_MYSQL_USER},
                 passwd => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},
@@ -211,7 +210,7 @@ sub clear_data {
 
 sub _create_table {
     my $self = shift;
-    eval { $self->dbi->run("DROP TABLE test") };
+    eval { $self->dbi->drop_table("test") };
     $self->dbi->run("CREATE TABLE test (".join(", ", @{ $self->_col_info->{fulldef} }).")");
     # Create a hash with the column names and the data
     my $col_names = $self->_col_info->{names};
@@ -219,12 +218,17 @@ sub _create_table {
         my %values = map { $col_names->[$_] => $row->[$_] } 0..$#{ $col_names };
         $self->dbi->insert(into => "test", values => \%values);
     }
+
+    eval { $self->dbi->drop_sequence("test") };
+    $self->dbi->create_sequence("test");
+
     $self->dbi->run("COMMIT");
 }
 
 sub _drop_table {
     my $self = shift;
-    $self->dbi->run("DROP TABLE test");
+    $self->dbi->drop_table("test");
+    $self->dbi->drop_sequence("test");
     $self->dbi->run("COMMIT");
 }
 

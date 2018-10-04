@@ -49,6 +49,10 @@ Component = Em.Component.extend
     searchChanged: Em.observer "search", ->
         search = @get "search"
         return if search is @get "searchPrevious"
+        if search.length < 3
+            @$().find(".drowdown").removeClass "open"
+            return
+
         @set "searchPrevious", search
         @set "content.value", search
         searchIndex = @incrementProperty "searchIndex"

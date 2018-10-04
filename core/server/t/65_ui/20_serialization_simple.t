@@ -1,63 +1,40 @@
-
 use strict;
 use warnings;
-use Test::More tests => 35;
+use Test::More tests => 32;
 use English;
 use utf8; # otherwise the utf8 tests does not work
-# use Smart::Comments;
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($ENV{TEST_VERBOSE} ? $ERROR : $OFF);
 
 BEGIN { use_ok( 'OpenXPKI::Serialization::Simple' ); }
 
 print STDERR "OpenXPKI::Serialization::Simple\n" if $ENV{VERBOSE};
 
-# test illegal separators
-eval
-{
-    OpenXPKI::Serialization::Simple->new
-    ({
-        SEPARATOR => "ab"
-    });
-};
-ok($EVAL_ERROR, 'Multiple character separator -> exception');
-eval
-{
-    OpenXPKI::Serialization::Simple->new
-    ({
-        SEPARATOR => "1"
-    });
-};
-ok($EVAL_ERROR, 'Numeric separator -> exception');
-
-# test default separator
 my $ref = OpenXPKI::Serialization::Simple->new ();
 ok($ref, 'Default seperator');
 
-# using "-" to make testing easier
-$ref = OpenXPKI::Serialization::Simple->new
-             ({
-                 SEPARATOR => "-"
-             });
-ok($ref, '- as seperator');
-
-    my $hash = {
-	"HEADER" => ["Testheader"],
-	"UNDEFINED" => undef,
-	"LIST"   => [
-	    {"Name"   => ["John Doe"],
-	     "Serial" => [10, 12],
-	     "Undefined" => undef,
-	    },
-	    {"Name"   => ["Jane Doe"],
-	     "Serial" => [11, 13]
-	    }
-	    ],
-	"FOOTER" => ["OK", "Abort"]
-    };
+my $hash = {
+"HEADER" => ["Testheader"],
+"UNDEFINED" => undef,
+"LIST"   => [
+    {"Name"   => ["John Doe"],
+     "Serial" => [10, 12],
+     "Undefined" => undef,
+    },
+    {"Name"   => ["Jane Doe"],
+     "Serial" => [11, 13]
+    }
+    ],
+"FOOTER" => ["OK", "Abort"]
+};
 
 my $text = $ref->serialize ($hash);
 
-my $expected_serialization = "HASH-328-6-FOOTER-ARRAY-31-0-SCALAR-2-OK-1-SCALAR-5-Abort-6-HEADER-ARRAY-23-0-SCALAR-10-Testheader-4-LIST-ARRAY-203-0-HASH-100-4-Name-ARRAY-20-0-SCALAR-8-John Doe-6-Serial-ARRAY-28-0-SCALAR-2-10-1-SCALAR-2-12-9-Undefined-UNDEF-1-HASH-82-4-Name-ARRAY-20-0-SCALAR-8-Jane Doe-6-Serial-ARRAY-28-0-SCALAR-2-11-1-SCALAR-2-13-9-UNDEFINED-UNDEF-";
-is($text, $expected_serialization, 'Serialization outputs expected serialization');
+# hashes are not sorted, so this will fail if JSON module reorders the hashes on serialization!
+#my $expected_serialization = qq(OXJSF1:{"FOOTER":["OK","Abort"],"HEADER":["Testheader"],"LIST":[{"Undefined":null,"Serial":[10,12],"Name":["John Doe"]},{"Name":["Jane Doe"],"Serial":[11,13]}],"UNDEFINED":null});
+#is($text, $expected_serialization, 'Serialization outputs expected serialization');
+
+like($text, "/OXJSF1:{.*}/" );
 
 my $res = $ref->deserialize($text);
 ok($res, 'Deserialization produced a result');
@@ -72,13 +49,10 @@ ok (! defined $res->{'LIST'}->[0]->{'UNDEFINED'}, 'undefined res/array');
 
 ## testing utf-8 encoding
 
-$hash = {
-	 "uid"   => ["Тестиров"],
-         "cn"    => ["Иван Петров"]
-        };
+$hash = { "cn"    => ["Иван Петров"] };
 $text = $ref->serialize ($hash, 'utf8 serialization');
 
-$expected_serialization = "HASH-73-2-cn-ARRAY-24-0-SCALAR-11-Иван Петров-3-uid-ARRAY-20-0-SCALAR-8-Тестиров-";
+my $expected_serialization = qq(OXJSF1:{"cn":["Иван Петров"]});
 ## downgrade from utf8 to byte level
 #$expected_serialization = pack ("C*", unpack ("U0C*", $expected_serialization));
 is($text, $expected_serialization, 'UTF8 serialization produces expected result');

@@ -16,7 +16,6 @@ use Data::Dumper;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
-use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Authentication;
 
 use File::Spec;
@@ -34,20 +33,20 @@ if( !( -f $semaphore_file) ) {
 diag "OpenXPKI::Server::Authentication::LDAP\n" if $ENV{VERBOSE};
 
 # search prefix
-my $search_prefix        = 'OpenXPKI User '; 
+my $search_prefix        = 'OpenXPKI User ';
 
 # attribute used to map to auth method
-my $role_map_attr       = 'title'; 
+my $role_map_attr       = 'title';
 
 # attribute used to map to auth method
-my $auth_meth_attr       = 'uid'; 
+my $auth_meth_attr       = 'uid';
 
 # attribute value mapped to password authentication
-# (password hash is stored in LDAP database) 
+# (password hash is stored in LDAP database)
 my $auth_meth_pw_value   = 'X1';
 
 # attribute value mapped to simple bind authentication
-# (password is stored in LDAP database and we try to bind using that password) 
+# (password is stored in LDAP database and we try to bind using that password)
 my $auth_meth_bind_value = 'X2';
 
 
@@ -55,7 +54,7 @@ my $auth_meth_bind_value = 'X2';
 
 my @credentials = (
     {
-	   'login'=>'A', 
+	   'login'=>'A',
 	'password'=>'Ox1',
        'role_attr'=>'manager',
 	    'role'=>'User',
@@ -63,7 +62,7 @@ my @credentials = (
 	  'result'=>1,
     },
     {
-	   'login'=>'B', 
+	   'login'=>'B',
 	'password'=>'Ox2',
        'role_attr'=>'manager',
 	    'role'=>'User',
@@ -71,7 +70,7 @@ my @credentials = (
 	  'result'=>1,
     },
     {
-	   'login'=>'C', 
+	   'login'=>'C',
 	'password'=>'Ox3',
        'role_attr'=>'programmer',
 	    'role'=>'RA Operator',
@@ -79,7 +78,7 @@ my @credentials = (
 	  'result'=>1,
     },
     {
-	   'login'=>'D', 
+	   'login'=>'D',
 	'password'=>'Ox4',
        'role_attr'=>'programmer',
 	    'role'=>'RA Operator',
@@ -87,7 +86,7 @@ my @credentials = (
 	  'result'=>1,
     },
     {
-	   'login'=>'E', 
+	   'login'=>'E',
 	'password'=>'Ox5',
        'role_attr'=>'CEO',
 	    'role'=>'CA Operator',
@@ -95,7 +94,7 @@ my @credentials = (
 	  'result'=>1,
     },
     {
-	   'login'=>'F', 
+	   'login'=>'F',
 	'password'=>'Ox6',
        'role_attr'=>'CEO',
 	    'role'=>'CA Operator',
@@ -116,28 +115,28 @@ my $auth_nodes = {};
 
 foreach my $login_set (@credentials){
   my $auth_cn   = $search_prefix .
-	            $login_set->{'login'};       
-  my $auth_dn = 'cn=' . $auth_cn . 
+	            $login_set->{'login'};
+  my $auth_dn = 'cn=' . $auth_cn .
                 ',o=Security,dc=openxpki,dc=org';
   $auth_nodes->{$auth_dn} = [
 			         'cn' => $auth_cn,
 			         'sn' => 'Mister X',
 		       $role_map_attr => $login_set->{'role_attr'},
 		      $auth_meth_attr => $login_set->{'meth'},
-		       'userPassword' => $login_set->{'password'},     
-                        'objectclass' => [ 
+		       'userPassword' => $login_set->{'password'},
+                        'objectclass' => [
 					    'person',
 				    	    'inetOrgPerson',
 					    'organizationalPerson',
 					    'opencaEmailAddress',
 					    'pkiUser',
-					],    
+					],
  	                ];
 };
 
 # test N 1 ->  auth configuration
 my $test_number = 1;
- 
+
     my $number_of_credentials = (scalar (keys %{$auth_nodes}));
     my $number_of_bad_credentials = scalar @bad_credentials;
     $test_number += $number_of_credentials * 3 + $number_of_bad_credentials;
@@ -164,7 +163,7 @@ OpenXPKI::Server::Init::init(
 	TASKS => [
         'current_xml_config',
         'log',
-        'dbi_backend',
+        'dbi',
         'xml_config',
     ],
 	SILENT => 1,
@@ -172,18 +171,18 @@ OpenXPKI::Server::Init::init(
 
 ## load authentication configuration
 my $auth = OpenXPKI::Server::Authentication::LDAP->new({
-        XPATH   => ['pki_realm', 'auth', 'handler' ], 
+        XPATH   => ['pki_realm', 'auth', 'handler' ],
         COUNTER => [ 0         , 0     , 6         ],
 });
 
 ok($auth, 'Auth object creation');
 
     foreach my $login_set (@credentials){
-	my $ldap_login      = $login_set->{'login'};       
-	my $ldap_password   = $login_set->{'password'};       
-	my $expected_role   = $login_set->{'role'};       
-	my $expected_result = $login_set->{'result'};       
-	
+	my $ldap_login      = $login_set->{'login'};
+	my $ldap_password   = $login_set->{'password'};
+	my $expected_role   = $login_set->{'role'};
+	my $expected_result = $login_set->{'result'};
+
 	my ($user, $role, $reply) = $auth->login_step({
 	    STACK   => 'LDAP SSL user',
 	    MESSAGE => {
@@ -197,17 +196,17 @@ ok($auth, 'Auth object creation');
 	is($user, $ldap_login,    'Correct user');
 	is($role, $expected_role, 'Correct role');
 	if($expected_result){
-	    is($reply->{'SERVICE_MSG'}, 'SERVICE_READY', 'Service ready');    
+	    is($reply->{'SERVICE_MSG'}, 'SERVICE_READY', 'Service ready');
 	} else {
-	    ok($reply->{'SERVICE_MSG'} ne 'SERVICE_READY', 'Rejection');    
-	};    
-    };	
+	    ok($reply->{'SERVICE_MSG'} ne 'SERVICE_READY', 'Rejection');
+	};
+    };
 
     foreach my $login_set (@bad_credentials){
-	my $ldap_login      = $login_set->{'login'};       
-	my $ldap_password   = $login_set->{'password'};       
+	my $ldap_login      = $login_set->{'login'};
+	my $ldap_password   = $login_set->{'password'};
 
-        eval {	
+        eval {
 	    my ($user, $role, $reply) = $auth->login_step({
 		STACK   => 'LDAP SSL user',
 		MESSAGE => {
@@ -220,6 +219,6 @@ ok($auth, 'Auth object creation');
 	    });
 	};
 	ok(OpenXPKI::Exception->caught(),'Bad credentials rejected');
-    };	
+    };
 }; # the end of SKIP BLOCK
 1;

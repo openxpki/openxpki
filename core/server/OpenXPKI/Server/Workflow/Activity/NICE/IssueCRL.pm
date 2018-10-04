@@ -20,34 +20,31 @@ sub execute {
     my $self     = shift;
     my $workflow = shift;
     my $context = $workflow->context();
-    
+
     ##! 32: 'context: ' . Dumper( $context  )
 
     my $nice_backend = OpenXPKI::Server::Workflow::NICE::Factory->getHandler( $self );
-    
+
     my $ca_alias = $context->param( 'ca_alias' );
-        
+
     if (!$ca_alias) {
        OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_NICE_CRLISSUANCE_NO_CA_ID",
         );
     }
-       
-    CTX('log')->log(
-        MESSAGE  => "start crl issue for ca $ca_alias, workflow " . $workflow->id,
-        PRIORITY => 'info',
-        FACILITY => 'application',
-    );
-    
+
+    CTX('log')->application()->info("start crl issue for ca $ca_alias, workflow " . $workflow->id);
+
+
     my $set_context = $nice_backend->issueCRL( $ca_alias );
-        
-    ##! 64: 'Setting Context ' . Dumper $set_context       
+
+    ##! 64: 'Setting Context ' . Dumper $set_context
     #while (my ($key, $value) = each(%$set_context)) {
     foreach my $key (keys %{$set_context} ) {
         my $value = $set_context->{$key};
         $context->param( $key, $value );
     }
-    	
+
 }
 
 1;

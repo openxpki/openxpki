@@ -4,92 +4,54 @@ use strict;
 use warnings;
 use base qw( OpenXPKI::Server::Workflow::Validator );
 use Workflow::Exception qw( validation_error );
-use OpenXPKI::Crypto::CSR;
+use Crypt::PKCS10;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug;
 use English;
 
-__PACKAGE__->mk_accessors( 'allow_empty_subject' );
-
-sub _init {
-    my ( $self, $params ) = @_;
-    $self->allow_empty_subject( ref $params->{empty_subject} && $params->{empty_subject} );
-}
-
 sub _validate {
+
     my ( $self, $wf, $pkcs10 ) = @_;
-    
+
     # allow non-defined PKCS10 for server-side key generation
+
     if (not defined $pkcs10) {
-        CTX('log')->log(
-            MESSAGE  => "PKCS#10 validaton: is empty",
-            PRIORITY => 'debug',
-            FACILITY => 'application',
-        );   
+        CTX('log')->application()->debug("PKCS#10 validaton: is empty");
+
         return 1;
     }
 
-    # sanitize input: make sure that multiple newline characters are
-    # reduced to one single newline
-    $pkcs10 =~ s{ [\r\n]+ }{\n}gxms;
+    my $verify_signature = $self->param('verify_signature') ? 1 : 0;
 
-    # sanitize input: some CSPs send a "raw" base64 block without the
-    # OpenSSL header. if this is found, add an artificial header.
-    if ($pkcs10 =~ m{ \A (?:[0-9A-Za-z+\/=]+\s+)+ \z }xms) {
-	##! 128: 'raw pkcs#10 identified, adding certificate request header'
-	$pkcs10 = 
-	    "-----BEGIN CERTIFICATE REQUEST-----\n"
-	    . $pkcs10
-	    . "-----END CERTIFICATE REQUEST-----";
-    }
+    Crypt::PKCS10->setAPIversion(1);
+    my $decoded = Crypt::PKCS10->new($pkcs10,
+        ignoreNonBase64 => 1,
+        verifySignature => $verify_signature );
 
-    ## check that it is clean
-    if ($pkcs10 !~ m{^-----BEGIN \s (NEW)? \s? CERTIFICATE \s REQUEST-----\s+
-                    ([0-9A-Za-z\-_=]+\s+)+
-                     -----END \s (NEW)? \s? CERTIFICATE \s REQUEST-----\s*}xs and ## RFC 3548 URL and filename safe
-        $pkcs10 !~ m{^-----BEGIN \s (NEW)? \s? CERTIFICATE \s REQUEST-----\s+
-                    ([0-9A-Za-z+\/=]+\s+)+
-                     -----END \s (NEW)? \s? CERTIFICATE \s REQUEST-----\s*}xs     ## RFC 1421,2045 and 3548
-       )
-    {
-        
-	    CTX('log')->log(
-	        MESSAGE  => "Invalid PKCS#10 request",
-	        PRIORITY => 'error',
-	        FACILITY => 'application',
-	    );
+    if (!$decoded) {
 
-        validation_error( 'I18N_OPENXPKI_UI_VALIDATOR_PKCS10_DAMAGED' );
-    }
+        my $error = Crypt::PKCS10->error;
+        $error =~ s/\s*$//;
+        # Log the error
+        CTX('log')->application()->error("Invalid PKCS#10 request ($error)");
 
-    # parse PKCS#10 request 
-    my $default_token = CTX('api')->get_default_token();
 
-    if (! defined $default_token) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_TOKEN_UNAVAILABLE",
-        );
-    };
+        # If signature verification was on, check if it only the signature is the problem
+        $decoded = Crypt::PKCS10->new($pkcs10,
+            ignoreNonBase64 => 1,
+            verifySignature => 0 );
 
-    my $csr;
-    eval {
-	    $csr = OpenXPKI::Crypto::CSR->new(
-            TOKEN => $default_token, 
-            DATA => $pkcs10,
-	    );
-    };	
-    if ($EVAL_ERROR) {
+        if ($decoded) {
+              validation_error("I18N_OPENXPKI_UI_VALIDATOR_PKCS10_SIGNATURE_ERROR");
+        }
         validation_error("I18N_OPENXPKI_UI_VALIDATOR_PKCS10_PARSE_ERROR");
     }
 
-    my $subject = $csr->get_parsed('SUBJECT');    
-    if (! defined $subject) {        
-        CTX('log')->log(
-            MESSAGE  => 'PKCS10 has no subject',
-            PRIORITY => $self->allow_empty_subject() ? "info" : "error",
-            FACILITY => "application"
-        );
-        validation_error('PKCS10 has no subject where it is required') unless($self->allow_empty_subject());               
+
+    if (!($decoded->subject() || $self->param('empty_subject'))) {
+        CTX('log')->application()->error('PKCS#10 has no subject');
+
+        validation_error('I18N_OPENXPKI_UI_VALIDATOR_PKCS10_NO_SUBJECT_ERROR');
     }
 
     return 1;
@@ -110,13 +72,41 @@ validator:
       class: OpenXPKI::Server::Workflow::Validator::PKCS10
       param:
          empty_subject: 0|1
-      arg: 
+         verify_signature: 0|1
+      arg:
          - $pkcs10
 
 =head1 DESCRIPTION
- 
-Check the incoming data to be a valid (parseable) pkcs10 request. By default, 
-the request must have a subject set, you can skip the subject check setting
-the parameter empty_subject to a true value. 
 
- 
+Check the incoming data to be a valid (parseable) pkcs10 request. By default,
+the request must have a subject set, you can skip the subject check setting
+the parameter empty_subject to a true value.
+
+=head2 Argument
+
+=over
+
+=item $pkcs10
+
+The PEM formatted PKCS#10 request
+
+=back
+
+=head2 Parameter
+
+=over
+
+=item empty_subject
+
+By default, we expect the CSR to have a subject set. Set this to 0 to allow
+an empty subject (required with some SCEP clients and Microsoft CA services).
+
+=item verify_signature
+
+Cryptographically verify the signature of the request. This is off by
+default as it is it requires additonal modules which are not part of the
+OpenXPKI installation by default (Crypt::OpenSSL::RSA/DSA, Crypt::PK::ECC),
+depending on the type of uploaded key.
+
+=back
+

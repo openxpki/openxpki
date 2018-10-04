@@ -13,27 +13,28 @@ use OpenXPKI::Server::ACL;
 
 ## init XML cache
 OpenXPKI::Server::Init::init(
-    {	
+    {
 	TASKS => [
         'config_test',
         'log',
-        'dbi_backend',
+        'dbi',
     ],
 	SILENT => 1,
     });
 
 ## create new session
-my $session = OpenXPKI::Server::Session->new ({
-                  DIRECTORY => "t/50_auth/",
-                  LIFETIME  => 5});
+my $session = OpenXPKI::Server::Session->new(
+    type => "File",
+    config => { directory => "t/50_auth/", },
+)->create;
 ok($session, 'Session object creation');
 ok(OpenXPKI::Server::Context::setcontext({session => $session}), 'Set session in CTX');
 
 ## configure the session
-$session->set_pki_realm ("Test Root CA");
-$session->set_role ("CA Operator");
-$session->make_valid ();
-ok($session->is_valid(), 'Session made valid');
+$session->data->pki_realm("Test Root CA");
+$session->data->role("CA Operator");
+$session->is_valid(1);
+ok($session->is_valid, 'Session made valid');
 
 ## initialize the ACL
 my $acl = OpenXPKI::Server::ACL->new();

@@ -24,7 +24,7 @@ sub execute {
     my $context    = $workflow->context();
 
     my $params     = {
-	PKI_REALM => CTX('api')->get_pki_realm(),
+    PKI_REALM => CTX('api')->get_pki_realm(),
     };
 
     foreach my $key (qw( namespace key )) {
@@ -32,48 +32,46 @@ sub execute {
         my $val  = $self->param($pkey);
         if ( not defined $val ) {
             OpenXPKI::Exception->throw(
-		message =>
-		'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_MODIFYENTRY_MISSPARAM',
-		params => {
-		    PARAM => $pkey,
-		},
-		);
-	}
+        message =>
+        'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_MODIFYENTRY_MISSPARAM',
+        params => {
+            PARAM => $pkey,
+        },
+        );
+    }
     }
 
     foreach my $key (qw( namespace key newkey expiration_date )) {
-	if (defined $self->param( 'ds_' . $key )) {
-	    $params->{ uc($key) } = $self->param( 'ds_' . $key );
-	}
+    if (defined $self->param( 'ds_' . $key )) {
+        $params->{ uc($key) } = $self->param( 'ds_' . $key );
+    }
     }
 
     foreach my $key (qw( KEY NEWKEY )) {
-	# dereference if necessary
-	if ($params->{$key} =~ m{ \A \$ (.*) }xms) {
-	    $params->{$key} = $context->param($1);
-	}
+    # dereference if necessary
+    if ($params->{$key} =~ m{ \A \$ (.*) }xms) {
+        $params->{$key} = $context->param($1);
+    }
     }
 
 
     if (exists $params->{EXPIRATION_DATE}) {
-	if (defined $params->{EXPIRATION_DATE}
-	    && ($params->{EXPIRATION_DATE} ne '')) {
-	    my $then = OpenXPKI::DateTime::get_validity(
-		{
-		    REFERENCEDATE  => DateTime->now(),
-		    VALIDITY       => $params->{EXPIRATION_DATE},
-		    VALIDITYFORMAT => 'relativedate',
-		});
-	    $params->{EXPIRATION_DATE} = $then->epoch();
-	} else {
-	    $params->{EXPIRATION_DATE} = undef;
-	}
+    if (defined $params->{EXPIRATION_DATE}
+        && ($params->{EXPIRATION_DATE} ne '')) {
+        my $then = OpenXPKI::DateTime::get_validity(
+        {
+            REFERENCEDATE  => DateTime->now(),
+            VALIDITY       => $params->{EXPIRATION_DATE},
+            VALIDITYFORMAT => 'relativedate',
+        });
+        $params->{EXPIRATION_DATE} = $then->epoch();
+    } else {
+        $params->{EXPIRATION_DATE} = undef;
+    }
     }
 
     ##! 16: 'modify_data_pool_entry params: ' . Dumper $params
     CTX('api')->modify_data_pool_entry($params);
-
-    CTX('dbi_backend')->commit();
 
     return 1;
 }

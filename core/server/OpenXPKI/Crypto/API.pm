@@ -3,7 +3,7 @@
 ## (C) Copyright 2006 by The OpenXPKI Project
 
 package OpenXPKI::Crypto::API;
-	
+
 use strict;
 use warnings;
 use English;
@@ -16,12 +16,12 @@ use Data::Dumper;
 
 # The instance of the corresponding Backend/Tool class
 my %instance_of       :ATTR( :get<instance> );
-# a hash of commands and their allowed parameters    
+# a hash of commands and their allowed parameters
 my %command_params_of :ATTR( :get<command_params> :set<command_params> );
 
 sub START {
     ##! 16: 'start'
-    
+
     my ($self, $ident, $arg_ref) = @_;
 
     ##! 32: 'Args ' . Dumper ( $arg_ref )
@@ -42,7 +42,7 @@ sub START {
     delete $arg_ref->{CLASS};
 
     eval "require $class";
-    if ($EVAL_ERROR ne '') {        
+    if ($EVAL_ERROR ne '') {
         ##! 4: "compilation of driver " . $class . " failed\n$EVAL_ERROR"
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_CRYPTO_API_EVAL_ERROR',
@@ -98,8 +98,8 @@ sub __check_command_param : PRIVATE {
     my $ident = ident $self;
 
     if (! defined $arg_ref->{COMMAND}) {
-	OpenXPKI::Exception->throw(
-	    message => 'I18N_OPENXPKI_CRYPTO_API_COMMAND_NO_COMMAND_SPECIFIED',
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_CRYPTO_API_COMMAND_NO_COMMAND_SPECIFIED',
             );
     }
 
@@ -124,8 +124,8 @@ sub __check_command_param : PRIVATE {
 
     my $command_params = $self->get_command_params();
     if (! defined $command_params || ref $command_params ne 'HASH') {
-	OpenXPKI::Exception->throw(
-	    message => 'I18N_OPENXPKI_CRYPTO_API_COMMAND_NO_COMMAND_PARAMS',
+    OpenXPKI::Exception->throw(
+        message => 'I18N_OPENXPKI_CRYPTO_API_COMMAND_NO_COMMAND_PARAMS',
             );
     }
 
@@ -291,7 +291,7 @@ __END__
 
 OpenXPKI::Crypto::API - API for cryptographic functions - abstract superclass.
 
-=head1 Description   
+=head1 Description
 
 This is the ABSTRACT superclass for crypto APIs, such as
 OpenXPKI::Crypto::Backend::API, OpenXPKI::Crypto::Tool::SCEP::API, ...
@@ -300,9 +300,9 @@ more functionality has to be implemented in the specific subclasses.
 Note that it can not be instantiated.
 
 =head1 Functions
-     
+
 =head2 START
- 
+
 This constructor (see Class::Std) tries to create an instance of the class
 passed by the named parameter 'CLASS'. This is supposed to be the corresponding
 Backend or Tool class, e.g. OpenXPKI::Backend::OpenSSL

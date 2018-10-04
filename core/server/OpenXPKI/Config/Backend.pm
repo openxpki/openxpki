@@ -1,50 +1,46 @@
-# OpenXPKI::Config::Backend
-#
-# Reads in the base configuration from the /etc/openxpki/config.d path
-# using Config::Merge, converts the "@" syntax to scalar links (as expected
-# by Connector::Multi and puts anything into a memory based connector
-# The instance is passed as baseconnector to OpenXPKKI::Config as a replacement
-# for Config::Versioned
-#
-# vim: syntax=perl
-
 package OpenXPKI::Config::Backend;
 
+use Storable qw(freeze);
 use Config::Merge;
+use YAML;
 use Data::Dumper;
+use Digest::SHA qw(sha256_hex);
 
 use Moose;
 extends 'Connector::Builtin::Memory';
 
-has '+LOCATION' => (
-    required => 0,
-    default => '/etc/openxpki/config.d'
+has 'checksum' => (
+    is => 'rw',
+    isa => 'Str',
+    lazy => 1,
+    init_arg => undef,
+    default => sub {
+        my $self = shift;
+        return sha256_hex(freeze($self->_config()));
+    },
 );
 
 around BUILDARGS => sub {
-    my $orig = shift;
-    my $class = shift;
+    my ($orig, $class, %params) = @_;
 
-    my $param = {};
     # Environment always wins
-    if ( $ENV{OPENXPKI_CONF_PATH} ) {
-        $param->{LOCATION} = $ENV{OPENXPKI_CONF_PATH};
-    }
-    return $class->$orig( $param );
+    $params{LOCATION} = $ENV{OPENXPKI_CONF_PATH} if $ENV{OPENXPKI_CONF_PATH};
+
+    return $class->$orig(%params);
 };
 
 sub _build_config {
-
     my $self = shift;
 
-    # Skip the workflow directories
-    my $cm    = Config::Merge->new( path => $self->LOCATION(), skip => qr/realm\.\w+\._workflow/ );
-    my $cmref = $cm->();
-
-    my $tree = $self->cm2tree($cmref);
-
-    return $tree;
-
+    my $config;
+    if (-f $self->LOCATION && $self->LOCATION =~ /.yaml$/) {
+        $config = YAML::LoadFile( $self->LOCATION );
+    } else {
+        # Skip the workflow directories (legacy only!)
+        my $cm    = Config::Merge->new( path => $self->LOCATION, skip => qr/realm\.\w+\._workflow/ );
+        $config = $cm->();
+    }
+    return $self->cm2tree($config);
 }
 
 # cm2tree is just a helper routine for recursively traversing the data
@@ -82,7 +78,7 @@ sub cm2tree {
     }
 }
 
-1;    # End of OpenXPKI::Config
+1;
 
 __DATA__
 
@@ -93,22 +89,22 @@ OpenXPKI::Config::Backend - Backend connector holding the system config
 
 =head1 SYNOPSIS
 
- use OpenXPKI::Config::Memory;
+    use OpenXPKI::Config::Backend;
 
- my $cfg = OpenXPKI::Config::Memory->new();
+    my $cfg = OpenXPKI::Config::Backend->new(LOCATION => "/etc/openxpki/config.d");
 
 
 =head1 DESCRIPTION
 
 This connector serves as the backend to provide the initial configuration data
-which is held in the /etc/openxpki/config.d directory. On startup, it reads in
-all files found in the directory and parses them using Config::Merge. The
-result is store using Connector::Builtin::Memory, keys starting/ending with the
-"@" sign are converted to "reference links" as understood by Connector::Multi.
+which is held in the directory given via I<LOCATION> parameter. On startup, it
+reads all files found in the directory and parses them using
+L<Config::Merge>. The result is stored using
+L<Connector::Builtin::Memory>, keys starting/ending with the "@" sign are
+converted to "reference links" as understood by L<Connector::Multi>.
 
 =head1 CONFIGURATION
 
 The class does not require any configuration. You can set the base the path to
-the config root using the environment variable C<OPENXPKI_CONF_PATH>. The class
-will also accept the LOCATION attribute inside the constructor as root.
-
+the config root using the environment variable C<OPENXPKI_CONF_PATH>. This will
+overwrite the I<LOCATION> attribute given to the constructor.

@@ -9,7 +9,7 @@ format: rawlist
 template: >
   [% FOREACH san = value %][% san.0 %]: 
     [% IF san.0 == 'DNS' %]
-      [% USE CheckDNS %][% CheckDNS.valid(san.1, '(FAIL)', '(ok)') %]
+      [% USE CheckDNS %][% CheckDNS.valid(san.1, '(FAIL)', '(ok)','(unknown)') %]
     [% ELSE %][% san.1 %][% END %]
     | 
   [% END %]

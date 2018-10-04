@@ -1,7 +1,7 @@
--- 
+--
 -- Created by SQL::Translator::Producer::SQLite
 -- Created on Wed Nov  9 02:25:41 2016
--- 
+--
 
 BEGIN TRANSACTION;
 
@@ -65,7 +65,10 @@ CREATE TABLE certificate (
   authority_key_identifier varchar(255),
   notbefore integer,
   notafter integer,
-  loa varchar(255),
+  revocation_time decimal(49,0),
+  invalidity_time decimal(49,0),
+  reason_code varchar(50),
+  hold_instruction_code varchar(50),
   req_key bigint,
   public_key text,
   data longtext,
@@ -94,30 +97,13 @@ CREATE TABLE crl (
   pki_realm varchar(255) NOT NULL,
   issuer_identifier varchar(64) NOT NULL,
   crl_key decimal(49,0) NOT NULL,
+  crl_number decimal(49,0),
+  items integer,
   data longtext,
   last_update integer,
   next_update integer,
   publication_date integer,
   PRIMARY KEY (issuer_identifier, crl_key)
-);
-
---
--- Table: crr
---
-DROP TABLE IF EXISTS crr;
-
-CREATE TABLE crr (
-  crr_key bigint NOT NULL,
-  pki_realm varchar(255) NOT NULL,
-  identifier varchar(64) NOT NULL,
-  creator varchar(255),
-  creator_role varchar(255),
-  reason_code varchar(255),
-  invalidity_time integer,
-  crr_comment text,
-  hold_code varchar(255),
-  revocation_time integer,
-  PRIMARY KEY (pki_realm, crr_key)
 );
 
 --
@@ -180,6 +166,34 @@ CREATE TABLE secret (
 );
 
 --
+-- Table: backend_session
+--
+DROP TABLE IF EXISTS backend_session;
+
+CREATE TABLE backend_session (
+  session_id varchar(255) NOT NULL,
+  data longtext,
+  created decimal(49,0) NOT NULL,
+  modified decimal(49,0) NOT NULL,
+  ip_address varchar(45),
+  PRIMARY KEY (session_id)
+);
+
+--
+-- Table: frontend_session
+--
+DROP TABLE IF EXISTS frontend_session;
+
+CREATE TABLE frontend_session (
+  session_id varchar(255) NOT NULL,
+  data longtext,
+  created decimal(49,0) NOT NULL,
+  modified decimal(49,0) NOT NULL,
+  ip_address varchar(45),
+  PRIMARY KEY (session_id)
+);
+
+--
 -- Table: seq_application_log
 --
 DROP TABLE IF EXISTS seq_application_log;
@@ -225,16 +239,6 @@ CREATE TABLE seq_certificate_attributes (
 DROP TABLE IF EXISTS seq_crl;
 
 CREATE TABLE seq_crl (
-  seq_number INTEGER PRIMARY KEY NOT NULL,
-  dummy integer
-);
-
---
--- Table: seq_crr
---
-DROP TABLE IF EXISTS seq_crr;
-
-CREATE TABLE seq_crr (
   seq_number INTEGER PRIMARY KEY NOT NULL,
   dummy integer
 );
@@ -299,7 +303,7 @@ CREATE TABLE workflow (
   pki_realm varchar(255),
   workflow_type varchar(255),
   workflow_state varchar(255),
-  workflow_last_update timestamp NOT NULL DEFAULT current_timestamp,
+  workflow_last_update timestamp NOT NULL,
   workflow_proc_state varchar(32),
   workflow_wakeup_at integer,
   workflow_count_try integer,
@@ -344,7 +348,17 @@ CREATE TABLE workflow_history (
   workflow_description longtext,
   workflow_state varchar(255),
   workflow_user varchar(255),
-  workflow_history_date timestamp NOT NULL DEFAULT current_timestamp
+  workflow_node varchar(64),
+  workflow_history_date timestamp NOT NULL
+);
+
+CREATE TABLE ocsp_responses (
+  identifier               varchar(64),
+  serial_number            blob NOT NULL,
+  authority_key_identifier blob NOT NULL,
+  body                     blob NOT NULL,
+  expiry                   timestamp,
+  PRIMARY KEY(serial_number, authority_key_identifier)
 );
 
 COMMIT;

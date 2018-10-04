@@ -38,10 +38,10 @@ sub evaluate
         configuration_error ($errors->[0]);
     }
 
-    my $session_role = CTX('session')->get_role() || ''; 
+    my $session_role = CTX('session')->data->role || '';
 
     my %roles = map { $_ => 1 } (split /,\s*/, $expected_roles);
-    
+
     ##! 64: 'session role: ' . $session_role
 
     condition_error ("$session_role mismatches $expected_roles") unless ($roles{$session_role});

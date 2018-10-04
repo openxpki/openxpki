@@ -9,13 +9,13 @@ SKIP: {
     skip "Test::Pod::Coverage 1.00 required for testing POD coverage" if $@;
 
     @files = Test::Pod::Coverage::all_modules();
-    diag "Check the POD coverage in ".scalar @files." files\n" if $ENV{VERBOSE};
+    note "Check the POD coverage in ".scalar @files." files\n";
 }
 
 TODO: {
     todo_skip 'We need a lot more code documentation ...';
     foreach my $module (@files) {
-            diag "Testing POD coverage for $module" if $ENV{VERBOSE};
+            note "Testing POD coverage for $module";
             pod_coverage_ok($module, "$module is covered" );
     }
 }

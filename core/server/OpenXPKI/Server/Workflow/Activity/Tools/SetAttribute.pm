@@ -16,29 +16,26 @@ sub execute
     my $workflow   = shift;
     my $context    = $workflow->context();
     my $serializer = OpenXPKI::Serialization::Simple->new();
-    
+
 
     my $params = $self->param();
     my $attrib = {};
-    
+
     ##! 32: 'SetAttrbute action parameters ' . Dumper $params
     foreach my $key (keys %{$params}) {
         my $val = $params->{$key};
         if ($val) {
             ##! 16: 'Set attrib ' . $key
-            $workflow->attrib({ $key => $val });    
+            $workflow->attrib({ $key => $val });
         } else {
-            ##! 16: 'Unset attrib ' . $key            
-            # translation from empty to undef is required as the 
+            ##! 16: 'Unset attrib ' . $key
+            # translation from empty to undef is required as the
             # attribute backend will write empty values
             $workflow->attrib({ $key => undef });
         }
-        CTX('log')->log(
-            MESSAGE  => "Writing workflow attribute $key => $val",
-            PRIORITY => "debug",
-            FACILITY => "workflow"
-        );           
-    }    
+        CTX('log')->workflow()->debug("Writing workflow attribute $key => $val");
+
+    }
 
     return;
 }
@@ -53,5 +50,5 @@ OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
 =head1 Description
 
 Set values in the workflow attribute table. Uses the actions parameter list
-to determine the key/value pairs to be written. Values that result in an 
+to determine the key/value pairs to be written. Values that result in an
 empty string are removed from the attribute table!

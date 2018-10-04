@@ -1,5 +1,7 @@
 <html><body>
 
+<img src="cid:banner" />
+
 <p>
 Dear [% requestor %],</p>
 
@@ -8,5 +10,5 @@ You certificate for <b>[% cert_subject %]</b> has been issued and is available f
 download at <a href="[% meta_baseurl %]#/openxpki/certificate!detail!identifier![% cert_identifier %]">the pki webinterface</a>.
 </p>
 
-<p><i>Regards,<br/>PKI Team</i></p>
+[% INCLUDE _footer.html %]
 </body></html>

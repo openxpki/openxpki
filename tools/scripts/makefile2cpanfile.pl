@@ -3,13 +3,13 @@
 use strict;
 use warnings;
 
-use File::Spec::Functions qw( catdir splitpath rel2abs );
+use FindBin qw( $Bin );
 
 use PPI;
 use PPI::Dumper;
 
-my $basedir = catdir((splitpath(rel2abs(__FILE__)))[0,1]);
-my $doc = PPI::Document->new("$basedir/../../core/server/Makefile.PL") or die "Makefile.PL not found";
+my $makefile = $ARGV[0] // "$Bin/../../core/server/Makefile.PL";
+my $doc = PPI::Document->new($makefile) or die "Makefile.PL not found";
 $doc->prune("PPI::Token::Whitespace");
 $doc->prune("PPI::Token::Comment");
 

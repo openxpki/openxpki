@@ -1,4 +1,4 @@
-## OpenXPKI::Service.pm 
+## OpenXPKI::Service.pm
 ##
 ## Written 2006 by Martin Bartosch for the OpenXPKI project
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
@@ -34,9 +34,7 @@ my %read_timeout           : ATTR( :set<timeout> );
 
 sub BUILD {
     my ($self, $ident, $arg_ref) = @_;
-
     $api{$ident} = OpenXPKI::Server::API->new();
-
     return 1;
 }
 
@@ -51,23 +49,23 @@ sub talk {
     # this may be undefined in the first invocation, accept it this way
     if (! defined $communication_state || ($communication_state eq 'can_send')) {
         ##! 128: 'talk: ' . Dumper $arg
-	    my $rc = $transport{$ident}->write(
-	        $serialization{$ident}->serialize($arg)
-	    );
-	    $self->set_communication_state('can_receive');
+        my $rc = $transport{$ident}->write(
+            $serialization{$ident}->serialize($arg)
+        );
+        $self->set_communication_state('can_receive');
         if ($OpenXPKI::Server::stop_soon) {
             ##! 1: 'stop_soon hit'
             die "We have been asked to stop (SIGTERM)";
         }
-	    return $rc;
+        return $rc;
     }
     else {
-	    OpenXPKI::Exception->throw(
-	        message => "I18N_OPENXPKI_SERVICE_TALK_INCORRECT_COMMUNICATION_STATE",
-	        params => {
-		        status => $self->get_communication_state(),
-	        },
-	    );
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_SERVICE_TALK_INCORRECT_COMMUNICATION_STATE",
+            params => {
+                status => $self->get_communication_state(),
+            },
+        );
     }
 }
 
@@ -84,40 +82,40 @@ sub collect {
     }
 
     my $communication_state = $self->get_communication_state();
+    ##! 2: "communication state: $communication_state"
+
     # this may be undefined in the first invocation, accept it this way
     if (defined $communication_state && ($communication_state ne 'can_receive')) {
-	OpenXPKI::Exception->throw(
-	    message => "I18N_OPENXPKI_SERVICE_COLLECT_INCORRECT_COMMUNICATION_STATE",
-	    params => {
-		status => $self->get_communication_state(),
-	    },
-	    );
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_SERVICE_COLLECT_INCORRECT_COMMUNICATION_STATE",
+            params => { status => $self->get_communication_state() },
+        );
     }
 
     my $result;
     eval {
+        ##! 32: "setting signal handler ALRM"
         my $h = set_sig_handler('ALRM', sub { die "alarm\n"; });
-	if (defined $read_timeout{$ident}) {
-	    alarm $read_timeout{$ident};
-	}
-
- 	$result = $serialization{$ident}->deserialize(
- 	    $transport{$ident}->read()
- 	    );
- 	alarm 0;
+        ##! 32: "scheduling SIGALRM in $read_timeout{$ident} seconds" if defined $read_timeout{$ident};
+        alarm $read_timeout{$ident} if defined $read_timeout{$ident};
+        ##! 2: "reading data from " . ref $transport{$ident}
+        $result = $serialization{$ident}->deserialize(
+            $transport{$ident}->read()
+        );
+        alarm 0;
     };
-    if ($EVAL_ERROR) {
-	alarm 0;
+    if (my $error = $EVAL_ERROR) {
+        alarm 0;
+        ##! 1: "ERROR: " . Dumper($error)
         $self->set_communication_state('can_send');
- 	if ($EVAL_ERROR eq "alarm\n") {
-	    OpenXPKI::Exception->throw(
-	        message => "I18N_OPENXPKI_SERVICE_COLLECT_TIMEOUT",
-		log => undef, # do not log this exception
-	    );
- 	} else {
-	    # FIXME
-	    die $EVAL_ERROR;
-	}
+        if ($error eq "alarm\n") {
+            OpenXPKI::Exception->throw(
+                message => "I18N_OPENXPKI_SERVICE_COLLECT_TIMEOUT",
+                log => undef, # do not log this exception
+            );
+        }
+        # FIXME
+        die $error;
     }
     $self->set_communication_state('can_send');
     ##! 128: 'collect: ' . Dumper $result
@@ -131,40 +129,24 @@ sub __get_error {
     my $arg   = shift;
 
     ##! 128: Dumper $arg
-    
+
     ##! 2: "setup errors array"
     my @errors = ();
-    if ($arg->{ERRORS})
-    {
-        push @errors, @{$arg->{ERRORS}};
-    }
-    if (exists $arg->{ERROR})
-    {
-        push @errors, $arg->{ERROR};
-    }
-    if (exists $arg->{EXCEPTION})
-    {
-        push @errors, $arg->{EXCEPTION};
-    }
-    if (exists $arg->{EXCEPTIONS})
-    {
-        push @errors, @{$arg->{EXCEPTIONS}};
-    }
+    push @errors, @{$arg->{ERRORS}} if $arg->{ERRORS};
+    push @errors, $arg->{ERROR} if exists $arg->{ERROR};
+    push @errors, $arg->{EXCEPTION} if exists $arg->{EXCEPTION};
+    push @errors, @{$arg->{EXCEPTIONS}} if exists $arg->{EXCEPTIONS};
 
     ##! 2: "normalize error list"
     my @list = ();
-    foreach my $error (@errors)
-    {
-        if (not ref $error)
-        {
+    for my $error (@errors) {
+        if (not ref $error) {
             ## this is an error
             push @list, {LABEL => $error};
         }
-        else
-        {
+        else {
             ## this is an exception
-            if (ref($error) eq "OpenXPKI::Exception")
-            {
+            if (ref($error) eq "OpenXPKI::Exception") {
                 ## openxpki exception
                 my %hash = (LABEL => $error->message());
                 $hash{PARAMS} = $error->params()
@@ -172,7 +154,8 @@ sub __get_error {
                 $hash{CHILDREN} = [ $self->__get_error ({EXCEPTIONS => $error->children()}) ]
                     if (defined $error->children());
                 push @list, \%hash;
-            } else {
+            }
+            else {
                 ## other exception or software error
                 push @list, {LABEL => scalar $error};
             }

@@ -35,11 +35,11 @@ ok(1);
 
 ## parameter checks for TokenManager init
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new('IGNORE_CHECK' => 1);
+my $mgmt = OpenXPKI::Crypto::TokenManager->new;
 ok (1);
 
 #------------------------CA-----------------------------------------------
-my $ca_id = "INTERNAL_CA_NCIPH"; 
+my $ca_id = "INTERNAL_CA_NCIPH";
 my $cn = $ca_id;
 $cn =~ s{ INTERNAL_ }{}xms;
 
@@ -51,12 +51,12 @@ $dir =~ s{ _ }{}xms;
 ok(-e "$basedir/$dir/certs/cacert.pem");
 
 my $fu = OpenXPKI::FileUtils->new();
-my $ca_cert = $fu->read_file("$basedir/$dir/certs/cacert.pem"); 
+my $ca_cert = $fu->read_file("$basedir/$dir/certs/cacert.pem");
 
 my $ca_token = $mgmt->get_token (
     {
-        TYPE => "CA", 
-  		ID => $ca_id, 
+        TYPE => "CA",
+  		ID => $ca_id,
 		PKI_REALM => "Test nCipher Root CA",
 		CERTIFICATE => $ca_cert,
     }
@@ -198,7 +198,7 @@ for (my $i=0; $i<$items; $i++)
 ok (1);
 $result = Time::HiRes::tv_interval( $begin, [Time::HiRes::gettimeofday()]);
 $result = $items / $result;
-$result *= 60.0; 
+$result *= 60.0;
 print STDERR " = $result signatures/minute (minimum: 5 per minute)\n" if $ENV{VERBOSE};
 #ok ($result > 17);
 ok ($result);

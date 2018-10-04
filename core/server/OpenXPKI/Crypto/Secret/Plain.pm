@@ -1,4 +1,4 @@
-## OpenXPKI::Crypto::Secret::Plain.pm 
+## OpenXPKI::Crypto::Secret::Plain.pm
 ##
 ## Written 2006 by Martin Bartosch for the OpenXPKI project
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
@@ -33,7 +33,7 @@ use OpenXPKI::Server::Context qw( CTX );
             || $arg_ref->{PARTS} < 1) {
                 OpenXPKI::Exception->throw(
                     message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
-                    params  => 
+                    params  =>
                     {
                         PARTS => $arg_ref->{PARTS},
                     }
@@ -47,7 +47,7 @@ use OpenXPKI::Server::Context qw( CTX );
         my $self = shift;
         my $ident = ident $self;
         my $arg = shift;
-        
+
         if (! defined $arg) {
             OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_MISSING_PARAMETER",
@@ -70,7 +70,7 @@ use OpenXPKI::Server::Context qw( CTX );
             if ($part !~ m{ \A $RE{num}{int} \z }xms) {
             OpenXPKI::Exception->throw(
                 message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
-                params  => 
+                params  =>
                 {
                 PART => $part,
                 });
@@ -79,17 +79,17 @@ use OpenXPKI::Server::Context qw( CTX );
             if ($part < 1 || $part > $totalparts{$ident}) {
             OpenXPKI::Exception->throw(
                 message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
-                params  => 
+                params  =>
                 {
                 PART => $part,
                 });
             }
-            
+
             if (! exists $arg->{SECRET}
             || ref $arg->{SECRET} ne '') {
             OpenXPKI::Exception->throw(
                 message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
-                params  => 
+                params  =>
                 {
                 SECRET => $arg->{SECRET},
                 });
@@ -101,22 +101,22 @@ use OpenXPKI::Server::Context qw( CTX );
         }
 
         OpenXPKI::Exception->throw(
-	        message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
-	    );
+            message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
+        );
     }
 
     sub is_complete {
         ##! 1: 'start'
         my $self = shift;
         my $ident = ident $self;
-        
+
         for (my $ii = 0; $ii < $totalparts{$ident}; $ii++) {
             ##! 16: $ii . ' defined? ' . ( defined $parts{$ident}->[$ii] ? '1' : '0' )
             return 0 unless defined $parts{$ident}->[$ii];
         }
         return 1;
     }
-            
+
     sub get_secret {
         my $self = shift;
         my $ident = ident $self;
@@ -141,7 +141,7 @@ use OpenXPKI::Server::Context qw( CTX );
         my $self  = shift;
         my $ident = ident $self;
         my $dump  = shift;
-	    return if (not defined $dump or not length $dump);
+        return if (not defined $dump or not length $dump);
         return if (not CTX('volatile_vault')->can_decrypt($dump));
         my $obj = OpenXPKI::Serialization::Simple->new();
         $parts{$ident} = $obj->deserialize(CTX('volatile_vault')->decrypt($dump));

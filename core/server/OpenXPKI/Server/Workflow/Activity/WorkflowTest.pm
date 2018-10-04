@@ -15,84 +15,57 @@ use OpenXPKI::DateTime;
 
 use Data::Dumper;
 
-sub init {
-    my ( $self, $workflow, $params ) = @_;
-    $self->SUPER::init($workflow, $params);
-    my $context = $workflow->context();
-    my $reap_at = $context->param('reap_at');
-    if($reap_at){
-        ##! 1: 'set given reap_at interval: ' .$reap_at; 
-        $self->set_reap_at_interval( $reap_at );
-        $context->param('reap_at','');
-    }
-    
-    
-}
-
 sub execute {
+
     my $self     = shift;
     my $workflow = shift;
 
     my $context = $workflow->context();
-    
-    ##! 1: 'Workflow Test entered - Workflow Id: ' .$workflow->id(); 
-    
+
+    ##! 1: 'Workflow Test entered - Workflow Id: ' .$workflow->id();
+
     # parameter ""action" decides, what should happen:
-	my $action = $context->param('action');
-    # Den parameter gleich wieder aus dem Context löschen
-	$context->param({ 'action' => '' });
-	
-	#optional parameter "cause":
-	my $pause_cause = $context->param('cause');
-	$context->param({ 'cause' => '' });
-	$pause_cause ||= 'some terrific cause';
-	
-	my $retry_interval = $context->param('retry_interval');
-    if($retry_interval){
-        ##! 1: 'set given retry_interval: ' .$retry_interval; 
-        $self->set_retry_interval( $retry_interval );
-        $context->param('retry_interval','');
-    }
-	
-	my $reap_at_dyn = $context->param('reap_at_dyn');
-    if($reap_at_dyn){
-        ##! 1: 'set given reap_at interval: ' .$reap_at_dyn; 
-        $self->set_reap_at_interval( $reap_at_dyn );
-        $context->param('reap_at_dyn','');
-    }
-	
-	#when execute runs till end, "test_job_is_done" is set to "1"
-	$context->param({ 'test_job_is_done' => '0' });
-	
-	$context->param('test', time());
-	
-	if ($action eq 'crash') {
-	    ##! 16: 'Crash on request'	    
-	    OpenXPKI::Exception->throw(
-	       message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TEST_CRASHED',	       
+    my $action = $self->param('perform');
+
+    # optional parameter "cause":
+    my $pause_cause = $self->param('cause');
+    $pause_cause ||= 'some terrific cause';
+
+    #when execute runs till end, "test_job_is_done" is set to "1"
+    $context->param({ 'test_job_is_done' => '0' });
+
+    $context->param('test', time());
+
+    if ($action eq 'crash') {
+        ##! 16: 'Crash on request'
+        OpenXPKI::Exception->throw(
+           message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TEST_CRASHED',
        );
-	}
-	
-	if ($action eq 'fatal_err') {
-	    ##! 16: 'fatal error on request'	    
-	    OpenXPKI::Server::Workflow::Pause->throw(
-	       cause => 'a manually triggered pause - this should NEVER happen in real code. throws an exception in OpenXPKI::Server::Workflow::execute_action()',	       
+
+    } elsif ($action eq 'fatal_err') {
+        ##! 16: 'fatal error on request'
+        OpenXPKI::Server::Workflow::Pause->throw(
+           cause => 'a manually triggered pause - this should NEVER happen in real code. throws an exception in OpenXPKI::Server::Workflow::execute_action()',
        );
-	}
-	
-	if ($action eq 'pause') {
-	    ##! 16: 'Pause on request '	
-	    $self->pause($pause_cause);
-	}
-	
-	#if pause or crash is given, we should never reach this part: 
-	##! 1: 'Workflow Test: passed all hurdles ...execute my job'; 
-	$context->param({ 'test_job_is_done' => '1' });
+
+    } elsif ($action eq 'pause') {
+        ##! 16: 'Pause on request '
+        $self->pause($pause_cause);
+
+    } elsif ($action eq 'sleep') {
+        ##! 16: 'Pause on request '
+        sleep(  $self->param('sleep') || 15 );
+    }
+
+    #if pause or crash is given, we should never reach this part:
+    ##! 1: 'Workflow Test: passed all hurdles ...execute my job';
+    $context->param({ 'test_job_is_done' => '1' });
 }
+
 sub resume{
     my $self     = shift;
     my ($workflow,$proc_state_resume_from) = @_;
-    
+
     ##! 1: 'resume from '.$proc_state_resume_from
     my $context = $workflow->context();
     my $i_called = $context->param('resume_was_called');
@@ -104,7 +77,7 @@ sub resume{
 sub wake_up{
     my $self     = shift;
     my ($workflow) = @_;
-    
+
     ##! 1: 'wake up '
     my $context = $workflow->context();
     my $i_called = $context->param('wake_up_was_called');
@@ -124,18 +97,18 @@ OpenXPKI::Server::Workflow::Activity::WorkflowTest;
 
 Test Activity for Workflow Development
 
-=head2 Configuration 
+=head2 Configuration
 
-Retry 5 times with a 15 minute pause interval and terminate workflow with 
+Retry 5 times with a 15 minute pause interval and terminate workflow with
 FAILURE state if the retries are exceeded.
 
   <action name="I18N_OPENXPKI_WF_ACTION_TEST_ACTIVITY"
- 	class="OpenXPKI::Server::Workflow::Activity::WorkflowTest"
- 	retry_count="5" retry_interval="+0000000015" autofail="yes"> 	
-  </action>    
-  
+     class="OpenXPKI::Server::Workflow::Activity::WorkflowTest"
+     retry_count="5" retry_interval="+0000000015" autofail="yes">
+  </action>
+
 Retry Interval is a OpenXPKI::DateTime specification
-only relative dates are allowed.  
+only relative dates are allowed.
 
 The execution of this job can be controlled throgh a bunch of workflow params:
 
@@ -157,12 +130,12 @@ OpenXPKI relative interval, ie. "+0000000012". is  checked in init phase and pas
 
 =item reap_at_dyn
 
-OpenXPKI relative interval, ie. "+0000000012". 
+OpenXPKI relative interval, ie. "+0000000012".
 is  checked in execution phase and passed to $self->set_reap_at_interval($interval).
 
 =item retry_interval
 
-OpenXPKI relative interval, ie. "+0000000012". 
+OpenXPKI relative interval, ie. "+0000000012".
 is  checked in execution phase and passed to $self->set_reap_at_interval($interval).
 
 =back
@@ -172,11 +145,11 @@ is  checked in execution phase and passed to $self->set_reap_at_interval($interv
 after super::init, the param "reap_at" is evaluated. if given, $self->set_reap_at_interval() is called.
 
 =head2 execute
-   
+
 checks param "action": if action = "pause", $self->pause() will be called.
 if action = "crash", an exception I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TEST_CRASHED is thrown.
 
-   
+
 =head2 resume
 
 hook method, will be called from OpenXPKI::Server::Workflow when activity is resumed after an exception.

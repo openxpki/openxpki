@@ -30,15 +30,12 @@ sub execute {
     ##! 8: ' Prepare CSR for cert type ' . $cert_type
 
     # Get profile from certificate type
-    my @cert_profiles = $config->get_list( "smartcard.policy.certs.type.$cert_type.allowed_profiles" ); 
-    my $cert_profile = shift @cert_profiles; 
+    my @cert_profiles = $config->get_list( "smartcard.policy.certs.type.$cert_type.allowed_profiles" );
+    my $cert_profile = shift @cert_profiles;
     my $cert_role = $config->get( "smartcard.policy.certs.type.$cert_type.role" ) || 'User';
     ##! 8: ' Prepare CSR for profile '. $cert_profile .' with role '. $cert_role
-    CTX('log')->log(
-	    MESSAGE => "Preparing CSR for profile '$cert_profile' with role '$cert_role'",
-	    PRIORITY => 'info',
-	    FACILITY => [ 'application' ],
-    );
+    CTX('log')->application()->info("Preparing CSR for profile '$cert_profile' with role '$cert_role'");
+
 
     # cert_issuance_data is an array of hashes, one entry per certificate
 
@@ -49,31 +46,21 @@ sub execute {
     # If max_validity is not in context, check if the current cert_type has the lead_validity flag set
     my $max_validity = $context->param('max_validity');
     if (!$max_validity && $config->get("smartcard.policy.certs.type.$cert_type.lead_validity")) {
-	   CTX('log')->log(
-            MESSAGE => "Certificate of type '$cert_type' is a lead certificate",
-			PRIORITY => 'info',
-			FACILITY => [ 'application' ],
-		);
+       CTX('log')->application()->info("Certificate of type '$cert_type' is a lead certificate");
+
 
         # Check for testing override
         my $validity = $config->get("smartcard.testing.max_validity");
         if ($validity) {
-            CTX('log')->log(
-                MESSAGE => "Certificate validity override for testing: $validity",
-                PRIORITY => 'warn',
-                FACILITY => [ 'audit', 'application', ],
-            );
+            CTX('log')->application()->warn("Certificate validity override for testing: $validity");
         }  else {
             # Fetch validity from profile/default if no testing value is set
             $validity = $config->get("profile.$cert_profile.validity.notafter");
             if (!$validity) {
-                $validity = $config->get("profile.default.validity.notafter");    
+                $validity = $config->get("profile.default.validity.notafter");
             }
-            CTX('log')->log(
-                MESSAGE => "Certificate validity configured for profile '$cert_profile': $validity",
-                PRIORITY => 'info',
-                FACILITY => [ 'application', ],
-            );
+            CTX('log')->application()->info("Certificate validity configured for profile '$cert_profile': $validity");
+
         }
 
         my $notafter = OpenXPKI::DateTime::convert_date({
@@ -84,11 +71,8 @@ sub execute {
             })
         });
         ##! 32: ' Set notafter date due to lead_validity flag to ' .$notafter
-        CTX('log')->log(
-			MESSAGE => "Force notafter date to $notafter",
-			PRIORITY => 'info',
-			FACILITY => [ 'application' ],
-		);
+        CTX('log')->application()->info("Force notafter date to $notafter");
+
         $context->param('notafter' => $notafter);
         $context->param('max_validity' => $notafter);
     }
@@ -100,7 +84,7 @@ sub execute {
             ##! 64: 'adding param ' . $param . ' to userinfo, value: ' . $context->param('userinfo_' . $param)
             $userinfo->{$param} = $context->param('userinfo_' . $param);
             # Some entries are arrays
-            if ($userinfo->{$param} =~ /\A ARRAY/xms) {
+            if ($userinfo->{$param} =~ OpenXPKI::Serialization::Simple::is_serialized($userinfo->{$param})) {
                 $userinfo->{$param} = $serializer->deserialize($userinfo->{$param});
             }
         }
@@ -124,11 +108,8 @@ sub execute {
         ##! 8: ' Certificate needs '. $max_login . ' Login/UPNs. Found: '  . scalar @{$allowed_logins}
         ##! 16: ' Allowed Logins found ' .  join("\n", @{$allowed_logins})
 
-        CTX('log')->log(
-            MESSAGE => ' Certificate needs '. $max_login . ' Login/UPNs. Found: '  . scalar @{$allowed_logins},
-            PRIORITY => 'debug',
-            FACILITY => [ 'application' ],
-        );
+        CTX('log')->application()->debug(' Certificate needs '. $max_login . ' Login/UPNs. Found: '  . scalar @{$allowed_logins});
+
 
         # Check if frontend passed a selection
         if ($context->param( 'login_ids' )) {
@@ -167,11 +148,7 @@ sub execute {
         } elsif (scalar @{$allowed_logins} > $max_login) {
             # More then allowed
             ##! 16: ' Too many logins found - ask frontend '
-            CTX('log')->log(
-                MESSAGE => 'Too many logins, need to ask frontend',
-                PRIORITY => 'info',
-                FACILITY => [ 'application' ],
-            );
+            CTX('log')->application()->info('Too many logins, need to ask frontend');
 
             # Present the available Logins and the max_login count via the context
             # Clean context first
@@ -227,11 +204,8 @@ sub execute {
 
         ##! 16: ' UPNs found ' . Dumper( @{$userinfo->{upn}} )
 
-        CTX('log')->log(
-            MESSAGE => 'SmartCard Logins: '.join(" / ", @use_logins).' UPNs: '.join(" / ", @{$userinfo->{upn}}),
-            PRIORITY => 'debug',
-            FACILITY => [ 'application' ],
-        );
+        CTX('log')->application()->debug('SmartCard Logins: '.join(" / ", @use_logins).' UPNs: '.join(" / ", @{$userinfo->{upn}}));
+
 
         # Add the chosel logins to the userinfo structure
         $userinfo->{chosen_logins} = \@use_logins;

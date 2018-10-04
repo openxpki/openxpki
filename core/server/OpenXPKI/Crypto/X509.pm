@@ -72,7 +72,7 @@ sub __init
     ###############################################
     ##  compute SHA1 hash of DER representation  ##
     ###############################################
-    
+
     my $cert_der = $self->{TOKEN}->command({
                         COMMAND => 'convert_cert',
                         DATA    => $self->get_body(),
@@ -81,7 +81,7 @@ sub __init
     $self->{SHA1} = sha1_base64($cert_der);
     ## RFC 3548 URL and filename safe base64
     $self->{SHA1} =~ tr/+\//-_/;
-    
+
     ##########################
     ##     core parsing     ##
     ##########################
@@ -92,12 +92,12 @@ sub __init
                        "version", "pubkey_hash", "pubkey_algorithm", "signature_algorithm", "exponent",
                        "keysize", "extensions", "openssl_subject" )
     {
-        $self->{PARSED}->{BODY}->{uc($attr)} 
-	= $self->{TOKEN}->get_object_function (
-	    {
-		OBJECT   => $self->{x509},
-		FUNCTION => $attr,
-	    });
+        $self->{PARSED}->{BODY}->{uc($attr)}
+    = $self->{TOKEN}->get_object_function (
+        {
+        OBJECT   => $self->{x509},
+        FUNCTION => $attr,
+        });
         if ($attr eq 'serial') {
             # add serial in hex as well so clients do not have to convert
             # it themselves
@@ -126,29 +126,29 @@ sub __init
     ## FIXME: because it is no special character
     ## FIXME: if there is a problem with a DN parser then this
     ## FIXME: parser has a bug
-    #	## OpenSSL includes a bug in -nameopt RFC2253
-    #	## = signs are not escaped if they are normal values
-    #	my $i = 0;
-    #	my $now = "name";
-    #	while ($i < length ($ret->{DN}))
-    #	{
-    #		if (substr ($ret->{DN}, $i, 1) =~ /\\/)
-    #		{
-    #			$i++;
-    #		} elsif (substr ($ret->{DN}, $i, 1) =~ /=/) {
-    #			if ($now =~ /value/)
-    #			{
-    #				## OpenSSL forgets to escape =
-    #				$ret->{DN} = substr ($ret->{DN}, 0, $i)."\\".substr ($ret->{DN}, $i);
-    #				$i++;
-    #			} else {
-    #				$now = "value";
-    #			}
-    #		} elsif (substr ($ret->{DN}, $i, 1) =~ /[,+]/) {
-    #			$now = "name";
-    #		}
-    #		$i++;
-    #	}
+    #    ## OpenSSL includes a bug in -nameopt RFC2253
+    #    ## = signs are not escaped if they are normal values
+    #    my $i = 0;
+    #    my $now = "name";
+    #    while ($i < length ($ret->{DN}))
+    #    {
+    #        if (substr ($ret->{DN}, $i, 1) =~ /\\/)
+    #        {
+    #            $i++;
+    #        } elsif (substr ($ret->{DN}, $i, 1) =~ /=/) {
+    #            if ($now =~ /value/)
+    #            {
+    #                ## OpenSSL forgets to escape =
+    #                $ret->{DN} = substr ($ret->{DN}, 0, $i)."\\".substr ($ret->{DN}, $i);
+    #                $i++;
+    #            } else {
+    #                $now = "value";
+    #            }
+    #        } elsif (substr ($ret->{DN}, $i, 1) =~ /[,+]/) {
+    #            $now = "name";
+    #        }
+    #        $i++;
+    #    }
 
     ##################################
     ##     parse emailaddresses     ##
@@ -201,15 +201,15 @@ sub __init
                 $val =~ s/\s+$//;
                 $i++;
                 next if $val =~ /^$/;
-		if ($key eq 'X509v3 Subject Alternative Name') {
-		    # when OpenSSL encounters CSR IP Subject Alternative Names
-		    # the parsed output contains "IP Address:d.d.d.d", however
-		    # OpenSSL expects "IP:d.d.d.d" in a config file for
-		    # certificate issuance if you intend to issue a certificate
-		    # we hereby declare that "IP" is the canonical identifier
-		    # for an IP Subject Alternative Name
-		    $val =~ s{ \A IP\ Address: }{IP:}xms;
-		}
+        if ($key eq 'X509v3 Subject Alternative Name') {
+            # when OpenSSL encounters CSR IP Subject Alternative Names
+            # the parsed output contains "IP Address:d.d.d.d", however
+            # OpenSSL expects "IP:d.d.d.d" in a config file for
+            # certificate issuance if you intend to issue a certificate
+            # we hereby declare that "IP" is the canonical identifier
+            # for an IP Subject Alternative Name
+            $val =~ s{ \A IP\ Address: }{IP:}xms;
+        }
                 push(@{$ret->{OPENSSL_EXTENSIONS}->{$key}}, $val);
             }
         } else {
@@ -258,7 +258,7 @@ sub __init
             if ($item =~ /^keyid:/);
         $ret->{EXTENSIONS}->{AUTHORITY_KEY_IDENTIFIER}->{CA_ISSUER_NAME} = $value
             if ($item =~ /^DirName:/);
-            
+
         if ($item =~ /^serial:/)
         {
             $value =~ s/://g;
@@ -344,7 +344,7 @@ sub get_subject {
         );
     }
     return $self->{PARSED}->{BODY}->{SUBJECT};
-    
+
 }
 
 sub get_status {
@@ -373,6 +373,7 @@ sub get_subject_key_id {
     }
 }
 
+# TODO Fix return values (can be Scalar or HashRef!)
 sub get_authority_key_id {
     my $self = shift;
 
@@ -402,14 +403,6 @@ sub to_db_hash {
     $insert_hash{DATA}               = $self->{DATA};
     $insert_hash{SUBJECT}            = $self->{PARSED}->{BODY}->{SUBJECT};
     $insert_hash{ISSUER_DN}          = $self->{PARSED}->{BODY}->{ISSUER};
-    # combine email addresses
-    if (exists $self->{PARSED}->{BODY}->{EMAILADDRESSES}) {
-        $insert_hash{EMAIL} = '';
-        foreach my $email (@{$self->{PARSED}->{BODY}->{EMAILADDRESSES}}) {
-            $insert_hash{EMAIL} .= "," if ($insert_hash{EMAIL} ne '');
-            $insert_hash{EMAIL} .= $email;
-        }
-    }
     $insert_hash{PUBKEY}             = $self->{PARSED}->{BODY}->{PUBKEY};
     # set subject key id and authority key id, if defined.
     if (defined $self->get_subject_key_id()) {
@@ -423,7 +416,7 @@ sub to_db_hash {
             = $self->get_authority_key_id();
     }
 
-    $insert_hash{NOTAFTER}           
+    $insert_hash{NOTAFTER}
         = OpenXPKI::DateTime::convert_date({
             DATE      => $self->{PARSED}->{BODY}->{NOTAFTER},
             OUTFORMAT => 'epoch',

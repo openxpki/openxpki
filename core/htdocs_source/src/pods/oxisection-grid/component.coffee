@@ -180,11 +180,15 @@ Component = Em.Component.extend
         path = action.path
         for col, i in columns
             path = path.replace "{#{col.sTitle}}", data[i]
+            path = path.replace "{col#{i}}", data[i]
 
-        @container.lookup("route:openxpki").sendAjax
-            data:
-                page:path
-                target:action.target
+        if action.target == "_blank"
+            window.location.href = path
+        else
+            @container.lookup("route:openxpki").sendAjax
+                data:
+                    page:path
+                    target:action.target
 
     initializeContextmenu: Em.on "didInsertElement", ->
         @$()?.find(".context")
@@ -211,7 +215,6 @@ Component = Em.Component.extend
 
                 Em.set button, "loading", true
                 @container.lookup("route:openxpki").sendAjax
-                    type: "GET"
                     data: data
                 .then ->
                     Em.set button, "loading", false

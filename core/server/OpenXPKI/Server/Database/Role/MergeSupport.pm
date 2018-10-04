@@ -8,8 +8,6 @@ drivers to indicate native support for MERGE (= REPLACE = INSERT or UPDATE).
 
 =cut
 
-use MooseX::Params::Validate;
-
 ################################################################################
 # Required in drivers classes that consume this role
 #

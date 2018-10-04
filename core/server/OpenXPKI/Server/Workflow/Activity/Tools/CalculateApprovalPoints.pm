@@ -34,19 +34,15 @@ sub execute {
         } elsif(ref $context->param('approvals') eq 'ARRAY') {
             $approvals = scalar ( @{$context->param('approvals')} );
         } else {
-            CTX('log')->log(
-                MESSAGE => 'No approvals or value in invalid format!',
-                PRIORITY => 'debug',
-                FACILITY => 'application'
-            );
+            CTX('log')->application()->debug('No approvals or value in invalid format!');
+
         }
     }
 
-    CTX('log')->log(
-        MESSAGE => sprintf ('Approval points for workflow %01d: %01d', $workflow->id, $approvals),
-        PRIORITY => 'info',
-        FACILITY => 'application'
-    );
+    CTX('log')->application()->info(sprintf ('Approval points for workflow %01d: %01d', $workflow->id, $approvals));
+
+    $context->param({ $target_key => $approvals });
+
 
     return 1;
 

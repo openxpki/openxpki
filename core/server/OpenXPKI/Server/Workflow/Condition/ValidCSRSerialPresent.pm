@@ -16,37 +16,25 @@ use Data::Dumper;
 sub evaluate {
     ##! 16: 'start'
     my ( $self, $workflow ) = @_;
-
     my $context  = $workflow->context();
     ##! 64: 'context: ' . Dumper($context)
-
     my $csr_serial = $context->param('csr_serial');
 
-    if (! defined $csr_serial) {
+    if (not defined $csr_serial) {
         condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_VALIDCSRSERIALPRESENT_NO_CSR_SERIAL_PRESENT');
     }
-    # get a fresh view of the database
-    CTX('dbi_backend')->commit();
-    
-    
-    CTX('log')->log(
-        MESSAGE => "Testing for CSR serial $csr_serial",
-        PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    ); 
-    
 
-    my $csr = CTX('dbi_backend')->first(
-        TABLE   => 'CSR',
-        DYNAMIC => {
-            'CSR_SERIAL' => {VALUE => $csr_serial},
-        },
-    );
-    if (! defined $csr) {
-        condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_VALIDCSRSERIALPRESENT_CSR_SERIAL_FROM_CONTEXT_NOT_IN_DATABASE');
-    }
+    CTX('log')->application()->debug("Testing for CSR serial $csr_serial");
 
-   return 1; 
+
+    CTX('dbi')->select_one(
+        from => 'csr',
+        columns => ['req_key'],
+        where => { req_key => $csr_serial },
+    )
+    or condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_VALIDCSRSERIALPRESENT_CSR_SERIAL_FROM_CONTEXT_NOT_IN_DATABASE');
+
+   return 1;
     ##! 16: 'end'
 }
 

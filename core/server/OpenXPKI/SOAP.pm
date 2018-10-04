@@ -8,7 +8,7 @@ use Data::Dumper;
 use SOAP::Transport::HTTP;
 #use SOAP::Transport::HTTP2; # Please adjust contructor call below, if you switch this!
 
-use Log::Log4perl qw(:easy);
+use OpenXPKI::Log4perl;
 
 my $configfile = $ENV{OPENXPKI_SOAP_CONFIG_FILE} || '/etc/openxpki/soap/default.conf';
 
@@ -27,7 +27,8 @@ if (! $facility) {
     die "Could not get Log4perl logging facility from config file";
 }
 
-Log::Log4perl->init_once($log_config);
+
+OpenXPKI::Log4perl->init_or_fallback( $log_config );
 
 my $log = Log::Log4perl->get_logger($facility);
 
@@ -36,7 +37,7 @@ $log->info("SOAP handler initialized from config file $configfile");
 my @soap_modules;
 foreach my $key (keys %{$config}) {
     if ($key =~ /(OpenXPKI::SOAP::[:\w\d]+)/) {
-        push @soap_modules, $1; 
+        push @soap_modules, $1;
     }
 }
 

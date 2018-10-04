@@ -8,7 +8,7 @@ use English;
 use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use TestCGI;
-  
+
 use Test::More tests => 3;
 
 package main;
@@ -16,7 +16,7 @@ package main;
 my $result;
 my $client = TestCGI::factory();
 
-# create temp dir 
+# create temp dir
 -d "tmp/" || mkdir "tmp/";
 
 $result = $client->mock_request({
@@ -63,37 +63,37 @@ $result = $client->mock_request({
     'wf_token' => undef
 });
 
-
-$result = $client->mock_request({
-    'action' => 'workflow!index',
-    'cert_san_parts{dns}[]' => $result->{main}->[0]->{content}->{fields}->[0]->{value},
-    'wf_token' => undef
-});
-
 $result = $client->mock_request({
     'action' => 'workflow!index',
     'cert_info{requestor_email}' => 'test@openxpki.local',
     'wf_token' => undef
 });
 
+
+# this is either submit or the link to enter a policy violation comment
 $result = $client->mock_request({
-    'action' => 'workflow!select!wf_action!csr_submit!wf_id!' . $wf_id
+    'action' => $result->{main}->[0]->{content}->{buttons}->[0]->{action}
 });
 
-#$result = $client->mock_request({
-#    'action' => 'workflow!index',
-#    'policy_comment' => 'Internal Host',
-#    'wf_token' => undef
-#});
+if ($result->{main}->[0]->{content}->{fields} &&
+    $result->{main}->[0]->{content}->{fields}->[0]->{name} eq 'policy_comment') {
+
+    $result = $client->mock_request({
+        'action' => 'workflow!index',
+        'policy_comment' => 'Testing',
+        'wf_token' => undef
+    });
+};
 
 $result = $client->mock_request({
     'action' => 'workflow!select!wf_action!csr_approve_csr!wf_id!' . $wf_id,
 });
 
+
 is ($result->{status}->{level}, 'success', 'Status is success');
 
 my $cert_identifier = $result->{main}->[0]->{content}->{data}->[0]->{value}->{label};
-$cert_identifier =~ s/\<br.*$//g; 
+$cert_identifier =~ s/\<br.*$//g;
 
 # Download the certificate
 $result = $client->mock_request({

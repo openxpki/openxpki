@@ -14,7 +14,7 @@ use OpenXPKI::Server::Workflow::Pause;
 use Workflow::Exception qw( workflow_error );
 use Data::Dumper;
 
-__PACKAGE__->mk_accessors( qw( resulting_state workflow _map ) );
+__PACKAGE__->mk_accessors( qw( resulting_state workflow _map log ) );
 
 sub init {
     my ( $self, $wf, $params ) = @_;
@@ -29,7 +29,7 @@ sub init {
     $self->resulting_state($wf->{_states}->{$wf->state()}->{_actions}->{$params->{name}}->{resulting_state});
     ##! 16: 'Workflow :'.ref $wf
     ##! 16: 'resulting_state: ' . $self->resulting_state()
-    $self->{PKI_REALM} = CTX('session')->get_pki_realm();
+    $self->{PKI_REALM} = CTX('session')->data->pki_realm;
     ##! 16: 'self->{PKI_REALM} = ' . $self->{PKI_REALM}
 
     $self->workflow( $wf );
@@ -62,15 +62,18 @@ sub init {
     ##! 32: 'merged params ' . Dumper  $params_merged
     ##! 32: 'map ' . Dumper  $_map
 
+
+    $self->log( CTX('log')->application() );
+
     ##! 1: 'end'
     return 1;
 }
 
 
 sub pause {
-    
+
     ##! 1: 'start pause'
-    
+
     my $self = shift;
     my ($cause, $retry_interval) = @_;
 
@@ -84,27 +87,27 @@ sub pause {
 
     ##! 64: 'Check for workflow object'
     if($self->workflow()){
-        
+
         ##! 16: 'calc wakeup - $retry_interval ' . $retry_interval
         # Workflow expects explicit wakeup as epoch
         my $dt_wakeup_at = OpenXPKI::DateTime::get_validity({
             VALIDITY => $retry_interval,
             VALIDITYFORMAT => 'detect',
         });
-        
-        ##! 32: 'Wakeup is ' . Dumper $dt_wakeup_at 
-        
+
+        ##! 32: 'Wakeup is ' . Dumper $dt_wakeup_at
+
         my $wakeup = $dt_wakeup_at->epoch();
-        # Spread the pause interval by a custom random factor        
+        # Spread the pause interval by a custom random factor
         ##! 32: 'check rand offset '
         if (my $rand = $self->param('retry_random')) {
             my $now = time();
             my $delta = $wakeup - $now;
             my $diff = $delta * (rand($rand*2) - $rand) / 100;
-            ##! 16: "Add random $diff, when delta is $delta"   
+            ##! 16: "Add random $diff, when delta is $delta"
             $wakeup += $diff;
         }
-        
+
         ##! 32: 'Dispatch workflow->pause'
         $self->workflow()->pause($cause, $max_retries, $wakeup );
     }
@@ -121,13 +124,13 @@ sub param {
     unless ( defined $name ) {
 
         my $map = $self->_map();
-                
+
         if (wantarray) {
             my @keys = keys %{ $self->{PARAMS} };
             push @keys, (keys %{ $map });
-            return @keys;     
+            return @keys;
         }
-        
+
         my $result = { %{ $self->{PARAMS} } };
         # add mapped params
         foreach my $key (keys %{ $map }) {
@@ -140,12 +143,13 @@ sub param {
     if ( ref $name ne '' || defined $value ) {
         return $self->SUPER::param( $name, $value );
     }
-    
+
     if ( exists $self->{PARAMS}{$name} ) {
         return $self->{PARAMS}{$name};
     } else {
         my $map = $self->_map();
-        return undef unless ($map->{$name});
+        return undef unless ( defined $map->{$name});
+        return unless ($map->{$name});
         ##! 16: 'query for mapped key ' . $name
 
         my $template = $map->{$name};
@@ -153,7 +157,7 @@ sub param {
         if ($template =~ /^\$(\S+)/) {
             my $ctxkey = $1;
             ##! 16: 'load from context ' . $ctxkey
-            my $ctx = $self->workflow()->context()->param( $ctxkey );            
+            my $ctx = $self->workflow()->context()->param( $ctxkey );
             if (OpenXPKI::Serialization::Simple::is_serialized($ctx)) {
                 ##! 32: ' needs deserialize '
                 my $ser  = OpenXPKI::Serialization::Simple->new();
@@ -162,14 +166,21 @@ sub param {
                 return $ctx;
             }
         } else {
-            
-            ##! 16: 'parse using tt ' . $template            
+
+            ##! 16: 'parse using tt ' . $template
             my $oxtt = OpenXPKI::Template->new();
-            my $out = $oxtt->render( $template, {  
-                context => $self->workflow()->context()->param(), 
-                workflow => { id => $self->workflow()->{ID} } 
+            my $out = $oxtt->render( $template, {
+                context => $self->workflow()->context()->param(),
+                workflow => {
+                    id => $self->workflow()->{ID}
+                },
+                session => {
+                    user => CTX('session')->data->user,
+                    role => CTX('session')->data->role,
+                    pki_realm => CTX('session')->data->pki_realm
+                }
             });
-            
+
             ##! 32: 'tt result ' . $out
             return $out;
         }
@@ -178,7 +189,7 @@ sub param {
 }
 
 sub get_max_allowed_retries{
-    
+
     my $self = shift;
 
     #manual set?
@@ -186,7 +197,7 @@ sub get_max_allowed_retries{
         ##! 16: 'manual set: '.$self->{MAX_RETRIES}
         return int($self->{MAX_RETRIES});
     }
-  
+
     if (defined($self->param('retry_count'))) {
         ##! 16: 'defined in activity-xml: '.$self->param('retry_count')
         return $self->param('retry_count');
@@ -210,7 +221,7 @@ sub get_reap_at_interval{
         ##! 16: 'manual set: '.$self->{REAP_AT_INTERVAL}
         return $self->{REAP_AT_INTERVAL};
     }
-    ##! 16: nothing defined, return default'
+    ##! 16: 'nothing defined, return default'
     return "+0000000005";
 }
 
@@ -240,13 +251,13 @@ sub get_retry_interval {
         ##! 16: 'manual set: '.$self->{RETRY_INTERVAL}
         return $self->{RETRY_INTERVAL};
     }
- 
+
     if(defined $self->param('retry_interval' )){
         ##! 16: 'defined in activity-xml: '.$self->param('retry_interval')
         return $self->param('retry_interval');
     }
     # TODO default setting?
-    ##! 16: nothing defined, return default'
+    ##! 16: 'nothing defined, return default'
     return "+0000000005";
 }
 
@@ -286,13 +297,13 @@ sub runtime_exception{
 
 sub setparams {
     my ($self,
-	$workflow,
-	$expected_params) = @_;
+    $workflow,
+    $expected_params) = @_;
 
     # determine caller context
     my ($package, $filename, $line, $subroutine, $hasargs,
-	$wantarray, $evaltext, $is_require, $hints, $bitmask)
-	= $self->_caller();
+    $wantarray, $evaltext, $is_require, $hints, $bitmask)
+    = $self->_caller();
     my $caller_activity = $package;
     $caller_activity =~ s/^OpenXPKI::Server::Workflow::Activity:://;
 
@@ -302,14 +313,14 @@ sub setparams {
 
     # check that we were passed a hash ref
     if (! defined $expected_params ||
-	(ref $expected_params ne "HASH")) {
-	OpenXPKI::Exception->throw (
-	    message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_INVALID_ARGUMENT",
-	    params  => {
-		"CALLERPACKAGE" => $package,
-		"FILENAME"      => $filename,
-		"LINE"          => $line,
-	    });
+    (ref $expected_params ne "HASH")) {
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_INVALID_ARGUMENT",
+        params  => {
+        "CALLERPACKAGE" => $package,
+        "FILENAME"      => $filename,
+        "LINE"          => $line,
+        });
     }
 
     my $context = $workflow->context();
@@ -317,70 +328,70 @@ sub setparams {
 
     # examine context parameters
     foreach my $field (keys %{$expected_params}) {
-	# TODO: sanity check, make sure that we have scalar in $field
+    # TODO: sanity check, make sure that we have scalar in $field
 
-	### field: $field
-	my @sources = qw( config default );
+    ### field: $field
+    my @sources = qw( config default );
 
-	if (exists $expected_params->{$field}->{accept_from}) {
-	    @sources = @{$expected_params->{$field}->{accept_from}};
-	}
+    if (exists $expected_params->{$field}->{accept_from}) {
+        @sources = @{$expected_params->{$field}->{accept_from}};
+    }
 
-	### sources: @sources
+    ### sources: @sources
 
-	my $value;
-	my $found = 0;
+    my $value;
+    my $found = 0;
       CHECKSOURCE:
-	foreach my $source (@sources) {
-	    ### checking source: $source
-	    if ($source eq 'context') {
-		my $tmp = $context->param($field);
-		if (defined $tmp) {
-		    $value = $tmp;
-		    $found = 1;
-		    ### found value: $value
-		    last CHECKSOURCE;
-		}
-	    }
-	    if ($source eq 'config') {
-		my $tmp = $self->param($field);
-		if (defined $tmp) {
-		    $value = $tmp;
-		    $found = 1;
-		    ### found value: $value
-		    last CHECKSOURCE;
-		}
-	    }
-	    if ($source eq 'default') {
-		my $tmp = $expected_params->{$field}->{default};
-		if (defined $tmp) {
-		    $value = $tmp;
-		    $found = 1;
-		    ### found value: $value
-		    last CHECKSOURCE;
-		}
-	    }
-	}
+    foreach my $source (@sources) {
+        ### checking source: $source
+        if ($source eq 'context') {
+        my $tmp = $context->param($field);
+        if (defined $tmp) {
+            $value = $tmp;
+            $found = 1;
+            ### found value: $value
+            last CHECKSOURCE;
+        }
+        }
+        if ($source eq 'config') {
+        my $tmp = $self->param($field);
+        if (defined $tmp) {
+            $value = $tmp;
+            $found = 1;
+            ### found value: $value
+            last CHECKSOURCE;
+        }
+        }
+        if ($source eq 'default') {
+        my $tmp = $expected_params->{$field}->{default};
+        if (defined $tmp) {
+            $value = $tmp;
+            $found = 1;
+            ### found value: $value
+            last CHECKSOURCE;
+        }
+        }
+    }
 
-	### ... check parameters demanded by class implementation
-	if (! $found && $expected_params->{$field}->{required}) {
-	    # throw exception if mandatory parameter is not available
-	    OpenXPKI::Exception->throw (
-		message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_MISSING_CONTEXT_PARAMETER",
-		params  => {
-		    PARAMETER     => $field,
-		    SOURCES       => @sources,
-		    CALLERPACKAGE => $package,
-		    ACTIVITY      => $context->param('activity'),
-		});
-	}
+    ### ... check parameters demanded by class implementation
+    if (! $found && $expected_params->{$field}->{required}) {
+        # throw exception if mandatory parameter is not available
+        OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_MISSING_CONTEXT_PARAMETER",
+        params  => {
+            PARAMETER     => $field,
+            SOURCES       => @sources,
+            CALLERPACKAGE => $package,
+            ACTIVITY      => $context->param('activity'),
+        });
+    }
 
-	# Make parameter available in activity
-	# NOTE: overriding an already existing value is done voluntarily
-	# even if it is undef (see docs).
+    # Make parameter available in activity
+    # NOTE: overriding an already existing value is done voluntarily
+    # even if it is undef (see docs).
         # Work around a bug in Workflow::Base::param() that does not
-	# allow to set reset a single parameter. It works when called
-	# with a hash ref, though.
+    # allow to set reset a single parameter. It works when called
+    # with a hash ref, though.
         $self->param({ $field => $value });
         $log->debug("Value for '$field' : ", $self->param($field));
     }
@@ -395,8 +406,8 @@ sub _caller {
     my @caller = caller($level);
 
     while ($caller[0] eq "OpenXPKI::Server::Workflow::Activity") {
-	$level++;
-	@caller = caller($level);
+    $level++;
+    @caller = caller($level);
     }
     return @caller;
 }
@@ -440,8 +451,8 @@ settings, the actual time can be much greater!
 =item retry_random (optional)
 
 Integer value, interpreted as percentage value (e.g. 25 = 25%), spreads the
-wakeup time by the given percentage. E.g. the retry_interval is 20 Minutes 
-and the random_factor is 25%, the next wakeup is scheduled between 15 and 25 
+wakeup time by the given percentage. E.g. the retry_interval is 20 Minutes
+and the random_factor is 25%, the next wakeup is scheduled between 15 and 25
 minutes.
 
 
@@ -458,7 +469,7 @@ situation!
 =head2 init
 
 Is called during the creation of the activity class.
-Sets $self->{PKI_REALM} to CTX('session')->get_pki_realm()
+Sets $self->{PKI_REALM} to CTX('session')->data->pki_realm
 
 Sets $self->workflow() as a reference to the current workflow.
 
@@ -522,10 +533,10 @@ the value is interpreted as template and filled with the context:
     _map_my_tt_param: my_prefix_[% context.my_context_key %]
 
 If you just need a single context value, the dollar sign is a shortcut:
-  
+
   action_name:
     class: .....
-    _map_my_simple_param: $my_context_key 
+    _map_my_simple_param: $my_context_key
 
 The values are accessible via the $self->param call using the basename.
 
@@ -544,9 +555,9 @@ Is the same as:
     class: .....
     my_simple_param: foo
     my_tt_param: my_prefix_foo
-    
-Note that the square bracket is a special char in YAML, if you place it 
+
+Note that the square bracket is a special char in YAML, if you place it
 at the beginning of the string, you must put double quotes around, e.g.
 
-    _map_my_tt_param: "[% context.my_context_key %]"     
+    _map_my_tt_param: "[% context.my_context_key %]"
 

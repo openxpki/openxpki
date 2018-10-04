@@ -20,7 +20,7 @@ my $client = TestCGI::factory();
 
 my $cert_identifier = do { # slurp
     local $INPUT_RECORD_SEPARATOR;
-    open my $HANDLE, '<tmp/entity2.id';
+    open my $HANDLE, '<tmp/entity3.id';
     <$HANDLE>;
 };
 

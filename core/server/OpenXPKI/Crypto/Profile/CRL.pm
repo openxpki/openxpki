@@ -99,7 +99,7 @@ sub __load_profile
     my $config = CTX('config');
 
     my $ca_profile_name = $self->{CA};
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
 
     my $path;
     my $validity;
@@ -127,9 +127,9 @@ sub __load_profile
     }
 
     if (!$validity || !$validity->{VALIDITY}) {
-	   OpenXPKI::Exception->throw (
-	       message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_LOAD_PROFILE_VALIDITY_NOTAFTER_NOT_DEFINED",
-	   );
+       OpenXPKI::Exception->throw (
+           message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_LOAD_PROFILE_VALIDITY_NOTAFTER_NOT_DEFINED",
+       );
     }
 
     # for error handling
@@ -139,10 +139,10 @@ sub __load_profile
     my $notafter;
     # plain days
     if ($validity->{VALIDITYFORMAT} eq "days") {
-	   $self->{PROFILE}->{DAYS}  = $validity->{VALIDITY};
-	   $self->{PROFILE}->{HOURS} = 0;
+       $self->{PROFILE}->{DAYS}  = $validity->{VALIDITY};
+       $self->{PROFILE}->{HOURS} = 0;
 
-	   $notafter = DateTime->now( time_zone => 'UTC' )->add( days => $validity->{VALIDITY} );
+       $notafter = DateTime->now( time_zone => 'UTC' )->add( days => $validity->{VALIDITY} );
     }
 
     # handle relative date formats ("+0002" for two months)
@@ -150,8 +150,8 @@ sub __load_profile
 
         $notafter = OpenXPKI::DateTime::get_validity($validity);
 
-	    my $hours = sprintf("%d", ($notafter->epoch() - time) / 3600);
-	    my $days = sprintf("%d", $hours / 24);
+        my $hours = sprintf("%d", ($notafter->epoch() - time) / 3600);
+        my $days = sprintf("%d", $hours / 24);
 
         $hours = $hours % 24;
 
@@ -164,9 +164,9 @@ sub __load_profile
     # only relative dates are allowed for CRLs
     if (! exists $self->{PROFILE}->{DAYS}) {
         OpenXPKI::Exception->throw (
-	       message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_LOAD_PROFILE_INVALID_VALIDITY_FORMAT",
-	       params => $validity,
-	    );
+           message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_LOAD_PROFILE_INVALID_VALIDITY_FORMAT",
+           params => $validity,
+        );
     }
 
 
@@ -176,11 +176,7 @@ sub __load_profile
     if ($ca_validity && $notafter > $ca_validity) {
          my $last_crl_validity = $config->get("$path.validity.lastcrl");
          if (!$last_crl_validity) {
-                 CTX('log')->log(
-                    MESSAGE => 'CRL for CA ' . $self->{CA}. ' in realm ' . $pki_realm . ' will be end of life before next update is scheduled!',
-                    PRIORITY => 'warn',
-                    FACILITY => [ 'monitor', 'application' ],
-                );
+                 CTX('log')->application()->warn('CRL for CA ' . $self->{CA}. ' in realm ' . $pki_realm . ' will be end of life before next update is scheduled!');
          } else {
             $notafter = OpenXPKI::DateTime::get_validity({
                 VALIDITYFORMAT => 'detect',
@@ -191,12 +187,8 @@ sub __load_profile
             $hours = $hours % 24;
             $self->{PROFILE}->{DAYS}  = $days;
             $self->{PROFILE}->{HOURS} = $hours;
-            CTX('log')->log(
-                MESSAGE => 'CRL for CA ' . $self->{CA} . ' in realm ' . $pki_realm . ' nearly EOL - will issue with last crl interval!',
-                PRIORITY => 'info',
-                FACILITY => [ 'monitor', 'application' ],
-            );
-         }
+            CTX('log')->application()->info('CRL for CA ' . $self->{CA} . ' in realm ' . $pki_realm . ' nearly EOL - will issue with last crl interval!');
+        }
     }
 
 

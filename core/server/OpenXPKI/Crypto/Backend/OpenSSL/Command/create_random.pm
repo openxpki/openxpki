@@ -28,7 +28,7 @@ sub get_command
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_RANDOM_MISSING_LENGTH");
     }
-    
+
     $self->get_tmpfile ('OUT');
 
     my $engine_usage = $self->{ENGINE}->get_engine_usage();
@@ -63,7 +63,7 @@ sub get_result
     ## remove trailing =
     $random =~ s/\n//gs;
     if (! (exists $self->{INCLUDE_PADDING} && $self->{INCLUDE_PADDING})) {
-	$random =~ s/=*$//gs;
+    $random =~ s/=*$//gs;
     }
 
     if ($self->{RETURN_LENGTH} and not $self->{RANDOM_LENGTH}) {

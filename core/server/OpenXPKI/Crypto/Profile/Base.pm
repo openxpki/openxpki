@@ -1,37 +1,34 @@
-# OpenXPKI::Crypto::Profile::Base.pm
-# Written 2005 by Michael Bell for the OpenXPKI project
-# Copyright (C) 2005-2006 by The OpenXPKI Project
+package OpenXPKI::Crypto::Profile::Base;
+use strict;
+use warnings;
 
-=head1 Name
+=head1 NAME
 
 OpenXPKI::Crypto::Profile::Base - base class for cryptographic profiles
 for certificates and CRLs.
 
-=head1 Description
+=head1 DESCRIPTION
 
 Base class for profiles used in the CA.
 
 =cut
 
-use strict;
-use warnings;
-
-package OpenXPKI::Crypto::Profile::Base;
-
-use OpenXPKI::Exception;
-use OpenXPKI::Debug;
+# Core modules
 use English;
+use Data::Dumper;
+use MIME::Base64;
+
+# CPAN modules
+use DateTime;
 use Template;
 
+# Project modules
+use OpenXPKI::Debug;
+use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
-use DateTime;
-use Data::Dumper;
 
-# use Smart::Comments;
-
-
-=head1 Functions
+=head1 FUNCTIONS
 
 =head2 load_extension
 
@@ -76,15 +73,15 @@ sub load_extension
     ## is the extension used at all?
     if (!$config->exists($path)) {
 
-    	# Test for default settings
-    	$path =~ /(profile|crl)/;
-    	$path = $1.'.default.extensions.'.$ext;
-    	if ($config->exists($path)) {
-    		##! 16: 'Using default value for ' . $ext
-    	} else {
-    	    ##! 16: "Extension $ext is not used"
-    	    return 0;
-    	}
+        # Test for default settings
+        $path =~ /(profile|crl)/;
+        $path = $1.'.default.extensions.'.$ext;
+        if ($config->exists($path)) {
+            ##! 16: 'Using default value for ' . $ext
+        } else {
+            ##! 16: "Extension $ext is not used"
+            return 0;
+        }
     }
 
     ## is this a critical extension?
@@ -95,23 +92,28 @@ sub load_extension
         $critical = 'true';
     } else {
         if (!(defined $critical || $ext eq 'oid' )) {
-            CTX('log')->log(
-                MESSAGE  => "Critical flag is not set for $ext in profile $profile_path!",
-                PRIORITY => 'warn',
-                FACILITY => 'application',
-            );
+            CTX('log')->application()->warn("Critical flag is not set for $ext in profile $profile_path!");
+
         }
         $critical = 'false';
     }
 
     if ($ext eq "basic_constraints")
     {
-        $values[0] = ["CA", ($config->get("$path.ca") || 0) ];
-        my $path_length = $config->get("$path.path_length");
-        if (defined $path_length)
-        {
-            $values[1] = ["PATH_LENGTH", $path_length];
+
+        my $ca = $config->get("$path.ca") || '0';
+        if ($ca !~ /\A(true|1)\z/) {
+            $values[0] = ["CA", 'false'];
+
+        } else {$values[0] = ["CA", 'true'];
+
+            my $path_length = $config->get("$path.path_length");
+            if (defined $path_length)
+            {
+                $values[1] = ["PATH_LENGTH", $path_length];
+            }
         }
+
         $self->set_extension (NAME     => "basic_constraints",
                               CRITICAL => $critical,
                               VALUES   => [@values]);
@@ -134,7 +136,7 @@ sub load_extension
     {
         my $bits_set = $config->get_hash("$path");
         ##! 16: "ext key usage bits: ". Dumper $bits_set
-        my @bits = ( "client_auth", "server_auth","email_protection","code_signing","time_stamping");
+        my @bits = ( "client_auth", "server_auth","email_protection","code_signing","time_stamping", "ocsp_signing");
 
         foreach my $bit (@bits) {
             push @values, $bit if ( $bits_set->{$bit} );
@@ -202,8 +204,6 @@ sub load_extension
     }
     elsif ($ext eq "authority_info_access")
     {
-
-        my @bits = ( "keyid", "issuer" );
         foreach my $bit (qw(ca_issuers ocsp)) {
 
             my @template_list = $config->get_scalar_as_list("$path.$bit");
@@ -213,69 +213,109 @@ sub load_extension
             }
         }
 
-    	if (scalar @values)
-    	{
+        if (scalar @values)
+        {
             $self->set_extension (NAME     => "authority_info_access",
                                   CRITICAL => $critical,
                                   VALUES   => [@values]);
         }
     }
-    elsif ($ext eq "user_notice")
-    {
-
-        @values = $config->get_scalar_as_list("$path");
-
-        if (scalar @values) {
-            $self->set_extension (NAME     => "user_notice",
-                              CRITICAL => $critical,
-                              VALUES   => [@values]);
-        }
-
-    }
     elsif ($ext eq "policy_identifier")
     {
+        # OIDs only
+        my @basepath = split /\./, $path;
+        my @oids = $config->get_scalar_as_list([ @basepath , 'oid' ]);
+        ##! 16: 'short oids ' . Dumper \@oids
+        foreach my $oid (@oids) {
+            next if ($oid !~ /\d+(\.\d+)+/);
+            push @values, $oid;
+        }
 
-        @values = $config->get_scalar_as_list("$path.oid");
-        if (scalar @values)
-        {
+
+        # Support the old config format with one oid and
+        # user_notice in a seperate section
+        if (scalar @values == 1) {
+            pop @basepath;
+            my @user_notice = $config->get_scalar_as_list([ @basepath, "user_notice" ]);
+            if (@user_notice) {
+                $values[0] = {
+                    oid => $values[0],
+                    user_notice => \@user_notice
+                };
+            }
+            push @basepath, "policy_identifier";
+        }
+
+        # check remaining keys for policy with extra sections (CPS + Notice)
+        @oids = $config->get_keys(\@basepath);
+        ##! 16: 'full oid sections ' . Dumper \@oids
+        foreach my $name (@oids) {
+            next if ($name !~/\d+(\.\d+)+/);
+            my $attr = { oid => $name };
+            my @cps = $config->get_scalar_as_list( [ @basepath, $name, 'cps' ] );
+            if (@cps) {
+                $attr->{cps} = \@cps;
+            }
+            my @notice = $config->get_scalar_as_list( [ @basepath, $name, 'user_notice' ] );
+            if (@notice) {
+                $attr->{user_notice} = \@notice;
+            }
+            ##! 32: 'Policy Attribute ' . Dumper $attr
+            push @values, $attr;
+        }
+
+        if (scalar @values) {
             $self->set_extension (NAME     => "policy_identifier",
                                   CRITICAL => $critical,
                                   VALUES   => [@values]);
         }
-    }
-    elsif ($ext eq "cps")
-    {
 
-        @values = $config->get_scalar_as_list("$path.uri");
-        if (scalar @values)
-        {
-            $self->set_extension (NAME     => "cps",
-                                  CRITICAL => $critical,
-                                  VALUES   => [@values]);
-        }
     }
     elsif ($ext eq "oid")
     {
 
-
         my @oids = $config->get_keys("$path");
 
-        # TODO - fix Config::Version and simplify!
-        # we need the array syntax if we want to use the oid directly as key
-        # this is currently not working as Config::Versioned does not handle
-        # the dots in the path correctly, so we offer setting the oid as
-        # attribute as a fallback
         my  @basepath = split /\./, $path;
         foreach my $name (@oids) {
 
             my $attr = $config->get_hash( [ @basepath, $name ] );
             ##! 32: 'oid attributes, name ' . $name. ', attr: ' . Dumper $attr
 
-            # For the moment we just use a single predefined value
-            @values = ( $attr->{value} );
-            $self->set_extension (NAME     => $attr->{oid} ? $attr->{oid} : $name,
-                                  CRITICAL => $attr->{critical} ? 'true' : 'false',
-                                  VALUES   => [@values]);
+            if (!$attr->{value}) {
+                next;
+            }
+
+            # OID can be either the name or given as attribute "oid"
+            if ($attr->{oid}) {
+                $name = $attr->{oid};
+            }
+
+            # Special case, Sequences needs to be written to a new section
+            if ($attr->{encoding} eq 'SEQUENCE') {
+                $self->set_oid_extension_sequence(
+                    NAME => $name,
+                    CRITICAL => $attr->{critical} ? 'true' : 'false',
+                    VALUES   => $attr->{value}
+                );
+            } else {
+
+                my $val = '';
+                # format and encoding can be given as extra parameters but
+                # finally just end up concatenated with the value
+                if ($attr->{format}) {
+                    $val .= $attr->{format}.':';
+                }
+                if ($attr->{encoding}) {
+                    $val .= $attr->{encoding}.':';
+                }
+                $val .= $attr->{value};
+                @values = ( $val );
+
+                $self->set_extension(NAME => $name,
+                    CRITICAL => $attr->{critical} ? 'true' : 'false',
+                    VALUES   => [@values]);
+            }
         }
     }
     elsif ($ext eq "netscape.comment")
@@ -294,7 +334,7 @@ sub load_extension
                      "ssl_client_ca", "smime_client_ca", "object_signing_ca", "ssl_server", "reserved" );
 
         foreach my $bit (@bits) {
-            push @values, $bit if (  $config->get("$path.$bit") );
+            push @values, $bit if ( $config->get("$path.$bit") );
         }
 
         if (scalar @values) {
@@ -339,34 +379,46 @@ sub set_extension
     my $name     = $keys->{NAME};
     my $critical = $keys->{CRITICAL};
     my $value    = $keys->{VALUES};
+    my $force    = $keys->{FORCE};
+
 
     if (! defined $name) {
-	OpenXPKI::Exception->throw(
-	    message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_SET_EXTENSION_NAME_NOT_SPECIFIED",
-	    );
+    OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_SET_EXTENSION_NAME_NOT_SPECIFIED",
+        );
+    }
+
+    if ($self->{PROFILE}->{EXTENSIONS}->{$name}) {
+        if (!$force) {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_SET_EXTENSION_ALREADY_SET",
+                params => { NAME => $name }
+            );
+        }
+        $self->{PROFILE}->{EXTENSIONS}->{$name} = {};
     }
 
     if (! defined $value) {
-	OpenXPKI::Exception->throw (
+        OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_SET_EXTENSION_VALUE_NOT_SPECIFIED",
-	    );
+        );
     }
     if (! defined $critical) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_SET_EXTENSION_CRITICALITY_NOT_SPECIFIED",
-	    params => {
-		NAME => $name,
-		VALUE => $value,
-	    });
+        params => {
+        NAME => $name,
+        VALUE => $value,
+        });
     }
     if ($critical !~ m{ \A (?:true|false) }xms) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_SET_EXTENSION_INVALID_CRITICALITY",
-	    params => {
-		NAME => $name,
-		VALUE => $value,
-		CRITICALITY => $critical,
-	    });
+        params => {
+        NAME => $name,
+        VALUE => $value,
+        CRITICALITY => $critical,
+        });
     }
 
     ##! 16: 'name: ' . $name
@@ -377,14 +429,10 @@ sub set_extension
     $critical = 1 if ($critical eq "true");
     $self->{PROFILE}->{EXTENSIONS}->{$name}->{CRITICAL} = $critical;
 
-    if (ref $value->[0])
-    {
-        ## these are value pairs (e.g. subject alt name)
-        ## WARNING this is no clean copy by value
-        $self->{PROFILE}->{EXTENSIONS}->{$name}->{PAIRS} = [ @{$value} ];
-    }
-    else
-    {
+
+    if (!ref $value) {
+        $self->{PROFILE}->{EXTENSIONS}->{$name}->{VALUE} = [ $value ];
+    } else {
         ## copy by value (normal array)
         $self->{PROFILE}->{EXTENSIONS}->{$name}->{VALUE} = [ @{$value} ];
     }
@@ -392,6 +440,31 @@ sub set_extension
     return 1;
 }
 
+=head2 generate_oid_extension_section
+
+Wrapper around set_extension to prepare oid extensions with sequence
+
+=cut
+
+sub set_oid_extension_sequence {
+
+    my $self = shift;
+    my $keys = { @_ };
+    my $name     = $keys->{NAME};
+    my $critical = $keys->{CRITICAL};
+    my $value    = $keys->{VALUES};
+
+    my $section = 'oid_section_'.$name;
+    $section =~ s/\./_/g;
+    my @values = ( 'ASN1:SEQUENCE:'.$section, "[ $section ]" );
+    my @section = split /\r?\n/, $value;
+    push @values, @section;
+
+    return $self->set_extension(NAME => $name,
+        CRITICAL => $critical ? 'true' : 'false',
+        VALUES   => [@values]);
+
+}
 
 sub is_critical_extension
 {
@@ -422,12 +495,29 @@ sub get_extension
         );
     }
 
-    if (exists $self->{PROFILE}->{EXTENSIONS}->{$ext}->{VALUE})
+    if (not defined $self->{PROFILE}->{EXTENSIONS}->{$ext}->{VALUE})
     {
-        return $self->{PROFILE}->{EXTENSIONS}->{$ext}->{VALUE};
-    } else {
-        return $self->{PROFILE}->{EXTENSIONS}->{$ext}->{PAIRS};
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_GET_EXTENSION_NO_VALUE",
+            params  => {
+                "EXTENSION" => $ext,
+            },
+        );
     }
+
+    return $self->{PROFILE}->{EXTENSIONS}->{$ext}->{VALUE};
+
+}
+
+
+sub has_extension
+{
+    my $self = shift;
+    my $ext  = shift;
+
+    return ((exists $self->{PROFILE}->{EXTENSIONS}->{$ext})
+        && (defined $self->{PROFILE}->{EXTENSIONS}->{$ext}->{VALUE}));
+
 }
 
 sub set_serial
@@ -455,6 +545,50 @@ sub get_named_extensions
     return grep /[^(\d+\.)]/, keys %{$self->{PROFILE}->{EXTENSIONS}};
 }
 
+=head2 create_random_serial
+
+Generate a random serial number (ID) and return it as a L<Math::BigInt> object.
+
+B<Parameters>
+
+=over
+
+=item PREFIX - High order bits to prepend to the generated serial number (optional)
+
+=item RANDOM_LENGTH - The desired byte length of the random part
+
+=back
+
+=cut
+sub create_random_serial {
+    my ($self, %args) = @_;
+
+    OpenXPKI::Exception->throw(message => 'Mandatory parameter RANDOM_LENGTH missing')
+        unless defined $args{'RANDOM_LENGTH'};
+
+    my $serial = Math::BigInt->new( $args{'PREFIX'} // 0);
+    my $rand_length = $args{'RANDOM_LENGTH'};
+    ##! 16: "create_random_serial({ RANDOM_LENGTH => $rand_length, PREFIX => " . $serial->as_hex . " })"
+
+    if ($rand_length > 0) {
+        my $default_token = CTX('api')->get_default_token();
+        my $rand_base64 = $default_token->command({
+            COMMAND       => 'create_random',
+            RANDOM_LENGTH => $rand_length,
+        });
+        my $rand_hex = '0x' . unpack 'H*', decode_base64($rand_base64);
+        ##! 16: 'random part: ' . $rand_hex
+
+        # left shift the existing serial by the size of the random part and
+        # add it to the right
+        $serial->blsft($rand_length * 8);
+        ##! 16: 'bit shifted serial: ' . $serial->as_hex
+        $serial->bior(Math::BigInt->new($rand_hex));
+    }
+    ##! 16: 'returning: ' . $serial->as_hex
+    return $serial->bstr; # return serial as "decimal notation, possibly zero padded"
+}
+
 =head2 process_templates
 
 Helper method to parse profile items through template toolkit.
@@ -474,6 +608,10 @@ The hash also has ISSUER.DN set with the full dn.
 =item CAALIAS Hash holding information about the used ca token.
 
 Offers the keys ALIAS, GROUP, GENERATION as given in the alias table.
+
+=item PKI_REALM
+
+The internal name of the realm (e.g. "ca-one").
 
 =back
 
@@ -518,8 +656,9 @@ sub process_templates {
         'CAALIAS' => {
             'ALIAS' => $self->{CA},
             'GROUP' => $group,
-            'GENERATION' => $generation
-        }
+            'GENERATION' => $generation,
+        },
+        'PKI_REALM' => CTX('api')->get_pki_realm(),
     );
     ##! 32: ' Template Vars ' . Dumper ( %template_vars )
 

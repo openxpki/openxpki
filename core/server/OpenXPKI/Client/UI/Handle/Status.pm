@@ -13,12 +13,12 @@ sub render_process_status {
     my $args = shift;
     my $wf_action = shift;
 
-    $self->logger()->debug( 'render_process_status: ' . Dumper $args );
+    $self->logger()->trace( 'render_process_status: ' . Dumper $args );
 
-    
+
     my $process = $self->send_command( 'list_process' );
 
-    $self->logger()->debug("result: " . Dumper $process );
+    $self->logger()->trace("result: " . Dumper $process );
 
     $self->_page({
         label => 'Running processes (global)',
@@ -39,7 +39,7 @@ sub render_process_status {
 
     $self->add_section({
         type => 'grid',
-        className => 'proc',        
+        className => 'proc',
         content => {
             columns => [
                 { sTitle => "PID" },
@@ -57,24 +57,24 @@ sub render_process_status {
 
 
 sub render_system_status {
-    
+
     my $class = shift; # static call
     my $self = shift; # reference to the wrapping workflow/result
     my $args = shift;
-    
+
     my $wf_info = $args->{WF_INFO};
-    
+
     my $status = $self->send_command("get_ui_system_status");
 
     my @fields;
 
     my $warning = 0;
     my $critical = 0;
-        
+
     $self->_page({
-        label => 'OpenXPKI system status',        
+        label => 'OpenXPKI system status',
     });
-    
+
     if ($status->{secret_offline}) {
         push @fields, {
             label => 'Secret groups',
@@ -105,25 +105,25 @@ sub render_system_status {
             className => 'warning'
         };
         $warning = 1;
-    } else {                    
+    } else {
         push @fields, {
             label  => 'Next CRL update',
             format => 'timestamp',
             value  => $status->{crl_expiry}
-        };        
+        };
     }
 
     if ($status->{dv_expiry} < $now) {
         $critical = 1;
-        push @fields, {            
+        push @fields, {
             label  => 'Encryption token is expired',
             format => 'timestamp',
             value  => $status->{dv_expiry},
             className => 'danger',
         };
-    } elsif ($status->{dv_expiry} < $now + 30*86400) {                
-        $warning = 1;        
-        push @fields, {            
+    } elsif ($status->{dv_expiry} < $now + 30*86400) {
+        $warning = 1;
+        push @fields, {
             label  => 'Encryption token expires',
             format => 'timestamp',
             value  => $status->{dv_expiry},
@@ -139,41 +139,44 @@ sub render_system_status {
         };
         $critical = 1;
     }
-    
+
     push @fields, {
         label  => 'System Version',
-        value  => $status->{version},        
+        value  => $status->{version},
+    }, {
+        label  => 'Hostname',
+        value  => $status->{hostname},
     };
-    
+
     $self->add_section({
         type => 'keyvalue',
-        content => {            
+        content => {
             data => \@fields
         }
     });
-   
+
     # we fetch the list of tokens to display from the context
-    # this allows a user to configure this     
+    # this allows a user to configure this
     my @token = split /\s*,\s*/, $wf_info->{WORKFLOW}->{CONTEXT}->{token};
-    
-    $self->logger()->debug("context: " . Dumper $wf_info->{WORKFLOW}->{CONTEXT} );
-    
-   
+
+    $self->logger()->trace("context: " . Dumper $wf_info->{WORKFLOW}->{CONTEXT} );
+
+
     foreach my $type (@token) {
-        
+
         my $token = $self->send_command( 'list_active_aliases', { TYPE => $type, CHECK_ONLINE => 1 } );
 
-        $self->logger()->debug("result: " . Dumper $token );
-       
+        $self->logger()->trace("result: " . Dumper $token );
+
         my @result;
         foreach my $alias (@{$token}) {
-            
+
             my $className = '';
             if ($alias->{STATUS} ne 'ONLINE') {
                 $className = 'danger';
                 $critical = 1;
             }
-            
+
             push @result, [
                 $alias->{ALIAS},
                 $alias->{IDENTIFIER},
@@ -186,35 +189,35 @@ sub render_system_status {
 
         $self->add_section({
             type => 'grid',
-            className => 'token',        
+            className => 'token',
             content => {
                 label => 'Tokens of type ' . $type,
                 columns => [
-                    { sTitle => "Token Alias" },                    
+                    { sTitle => "Token Alias" },
                     { sTitle => "Identifier" },
-                    { sTitle => "Status" },                    
+                    { sTitle => "Status" },
                     { sTitle => "not Before", format => 'timestamp'},
                     { sTitle => "not After", format => 'timestamp'},
-                    { sTitle => "_className"},                    
+                    { sTitle => "_className"},
                 ],
                 data => \@result,
                 empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
             }
         });
 
-    } 
+    }
 
     if ($critical) {
         $self->set_status('Your system status is critical!','error');
     } elsif($warning) {
         $self->set_status('Your system status requires your attention!','warn');
     } else {
-        $self->set_status('System status is good','success');     
+        $self->set_status('System status is good','success');
     }
-        
+
     return $self;
-    
-} 
+
+}
 
 1;
 

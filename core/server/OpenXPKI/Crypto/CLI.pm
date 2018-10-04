@@ -4,7 +4,7 @@
 ## OpenSSL::CLI by Michael Bell for the OpenXPKI project, 2005-2006
 ## (C) Copyright 2005-2006 by The OpenXPKI Project
 package OpenXPKI::Crypto::CLI;
-	
+
 use strict;
 use warnings;
 use English;
@@ -17,6 +17,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server::Context;
 use Data::Dumper;
 use Proc::SafeExec;
+use Log::Log4perl qw(:easy);
 
 my %tmp_of    :ATTR( :init_arg<TMP>    ); # the tmp directory
 my %shell_of  :ATTR( :init_arg<SHELL>  ); # the shell to be used
@@ -59,9 +60,12 @@ sub START {
             message => "I18N_OPENXPKI_CRYPTO_CLI_MISSING_ENGINE");
     }
 
-    eval {
-	$logger_of{$ident} = OpenXPKI::Server::Context::CTX('log');
-    };
+
+    if(!Log::Log4perl->initialized()) {
+        Log::Log4perl->easy_init($ERROR);
+    }
+    $logger_of{$ident} = Log::Log4perl->get_logger('system.crypto');
+
 
     ##! 2: "create output and stderr files in $arg_ref->{TMP}"
     my $fu = OpenXPKI::FileUtils->new();
@@ -133,12 +137,12 @@ sub execute {
            ) {
             if ($params->[$i]->{TYPE} eq 'STDIN') {
                 ##! 16: 'read data from STDIN'
-                
+
                 my @cmd = split /\s/, $cmd;
                 open my $STDOUT, '>', $stdout_file_of{$ident};
                 open my $STDERR, '>', $stderr_file_of{$ident};
                 ##! 16: 'split command: ' . Dumper \@cmd
-                my ($shell, @wrapper_cmd) = 
+                my ($shell, @wrapper_cmd) =
                     __deal_with_wrapper($shell_of{$ident}, @cmd);
                 my $command = Proc::SafeExec->new({
                     exec   => [ $shell, @wrapper_cmd ],
@@ -152,19 +156,16 @@ sub execute {
                 close $STDERR;
 
                 if ($command->exit_status()) {
-		    $self->get_result(); # discard output but purge temp file
-		    my $stderr = $self->get_stderr();
-		    
-		    $self->log('OpenSSL error: ' . $stderr, 
-			       {
-				   PRIORITY => 'error',
-			       });
+                    $self->get_result(); # discard output but purge temp file
+                    my $stderr = $self->get_stderr();
+
+                    $self->log()->error('OpenSSL error: ' . $stderr);
 
                     OpenXPKI::Exception->throw(
                         message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_PIPED_STDIN_FAILED',
                         params  => {
                             'EXIT_STATUS' => $command->exit_status(),
-#			    'ERROR' => $stderr,
+#                'ERROR' => $stderr,
                         },
                     );
                 }
@@ -174,7 +175,7 @@ sub execute {
                 my @cmd = split /\s/, $cmd;
                 open my $STDOUT, '>', $stdout_file_of{$ident};
                 open my $STDERR, '>', $stderr_file_of{$ident};
-                my ($shell, @wrapper_cmd) = 
+                my ($shell, @wrapper_cmd) =
                     __deal_with_wrapper($shell_of{$ident}, @cmd);
                 my $command = Proc::SafeExec->new({
                     exec   => [ $shell, @wrapper_cmd ],
@@ -193,23 +194,20 @@ sub execute {
                 $params->[$i]->{STDOUT} = $stdout;
                 $return .= $stdout;
                 if ($command->exit_status()) {
-		    $self->get_result();
-		    my $stderr = $self->get_stderr();
+                    $self->get_result();
+                    my $stderr = $self->get_stderr();
 
-		    $self->log('OpenSSL error: ' . $stderr, 
-			       {
-				   PRIORITY => 'error',
-			       });
+                    $self->log()->error('OpenSSL error: ' . $stderr);
 
                     OpenXPKI::Exception->throw(
                         message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_PIPED_STDOUT_FAILED',
                         params  => {
                             'EXIT_STATUS' => $command->exit_status(),
-#			    'ERROR' => $stderr,
+#                'ERROR' => $stderr,
                         },
                     );
                 }
-	        }
+            }
         } else {
             my @cmd;
             if (ref $cmd eq 'ARRAY') {
@@ -222,7 +220,7 @@ sub execute {
 
             open my $STDOUT, '>', $stdout_file_of{$ident};
             open my $STDERR, '>', $stderr_file_of{$ident};
-            my ($shell, @wrapper_cmd) = 
+            my ($shell, @wrapper_cmd) =
                 __deal_with_wrapper($shell_of{$ident}, @cmd);
             my $command = Proc::SafeExec->new({
                 exec   => [ $shell, @wrapper_cmd ],
@@ -236,19 +234,16 @@ sub execute {
             if ($EVAL_ERROR && $EVAL_ERROR ne "Child was already waited on without calling the wait method\n") {
                 # the above may fail if the child has already exited,
                 # we ignore that
-		$self->get_result();
-		my $stderr = $self->get_stderr();
+                $self->get_result();
+                my $stderr = $self->get_stderr();
 
-		$self->log('OpenSSL error: ' . $stderr, 
-			   {
-			       PRIORITY => 'error',
-			   });
+                $self->log()->error('OpenSSL error: ' . $stderr);
 
                 OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_WAIT_FAILED',
                     params  => {
                         EVAL_ERROR => $EVAL_ERROR,
-#			'ERROR' => $stderr,
+#            'ERROR' => $stderr,
                     },
                 );
             }
@@ -257,19 +252,16 @@ sub execute {
             close($STDOUT);
             close($STDERR);
             if ($command->exit_status()) {
-		$self->get_result();
-		my $stderr = $self->get_stderr();
+                $self->get_result();
+                my $stderr = $self->get_stderr();
 
-		$self->log('OpenSSL error: ' . $stderr, 
-			   {
-			       PRIORITY => 'error',
-			   });
+                $self->log()->error('OpenSSL error: ' . $stderr);
 
                 OpenXPKI::Exception->throw(
                     message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_FAILED',
                     params  => {
                         'EXIT_STATUS' => $command->exit_status(),
-#			'ERROR' => $stderr,
+#            'ERROR' => $stderr,
                     },
                 );
             }
@@ -302,9 +294,9 @@ sub __find_error : PRIVATE {
             unlink($stdout_file_of{$ident});
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_CRYPTO_CLI_CANNOT_OPEN_ERRLOG',
-                params  => { 'FILENAME' => $stderr_file_of{$ident},
-                           },
-            );
+                params  => {
+                    'FILENAME' => $stderr_file_of{$ident},
+            });
         }
     }
 
@@ -316,15 +308,11 @@ sub __find_error : PRIVATE {
         ##! 8: "error detected - firing exception"
         unlink ($stdout_file_of{$ident});
 
-	$self->log('OpenSSL error: ' . $ret, 
-		   {
-		       PRIORITY => 'error',
-		   });
-	
+        $self->log()->error('OpenSSL error: ' . $ret);
+
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_CRYPTO_CLI_ERROR',
-            params  => { 'ERRVAL' => $ret,
-                       },
+            params  => { 'ERRVAL' => $ret },
         );
     }
 
@@ -349,7 +337,7 @@ sub __deal_with_wrapper {
 
     ##! 64: 'new_shell: ' . $new_shell
     ##! 64: 'wrapper: ' . Dumper \@wrapper;
-    
+
     return ($new_shell, @wrapper);
 }
 
@@ -418,24 +406,7 @@ sub cleanup {
 sub log {
     my $self = shift;
     my $ident = ident $self;
-    
-    my $message = shift;
-    my $args = shift;
-    
-    my %logger_args = (
-	FACILITY => 'system',
-	PRIORITY => 'info',
-	%{$args},
-	);
-    
-    if (! defined $logger_of{$ident}) {
-	return;
-    }
-    
-    return $logger_of{$ident}->log(
-	%logger_args,
-	MESSAGE => $message,
-	);
+    return $logger_of{$ident};
 }
 
 sub DEMOLISH {
@@ -508,7 +479,7 @@ Example: $cli->prepare ({COMMAND => ["command1 -params ...",
                        {TYPE => "STDOUT"},
                       ];
          my $result = $cli->execute ({PARAMS => $params});
- 
+
 The first command is an example for using STDIN. The specified data
 will be passed via STDIN to the command. The second command passes the
 result via STDOUT directly into the code. This means that $result

@@ -36,7 +36,7 @@ sub validate {
         if ($notbefore && $notafter == $notbefore) {
             push @errors, 'I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_NOTAFTER_EQUAL_TO_NOTBEFORE';
         }
-        
+
         if ($notbefore && $notafter < $notbefore) {
             push @errors, 'I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_NOTAFTER_EARLIER_THAN_NOTBEFORE';
         }
@@ -50,11 +50,8 @@ sub validate {
         # Need to implement this in New UI first
         #$wf->context()->param( '__error' => [ $self->error(), { FIELD => $field, VALUES => \@errors }]);
         ##! 32: 'Regex errors on field ' . $field . ', values '  . Dumper \@errors
-        CTX('log')->log(
-            MESSAGE  => "Validity window validator failed ",
-            PRIORITY => 'error',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->error("Validity window validator failed ");
+
         validation_error( sprintf "%s (%s)", $self->error(), join(" / ", @errors) );
         return 0;
     }

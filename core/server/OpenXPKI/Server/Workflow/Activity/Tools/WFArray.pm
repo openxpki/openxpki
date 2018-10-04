@@ -51,12 +51,9 @@ sub execute {
     my $array = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
         { workflow => $wf, context_key => $self->array_name } );
 
-    CTX('log')->log(
-        MESSAGE => "Mangling wf array ".$self->array_name." with $function",
-        PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    );         
-     
+    CTX('log')->application()->debug("Mangling wf array ".$self->array_name." with $function");
+
+
 
     # read operations that do not take a parameter
     if ( $function =~ m/^(pop|shift|count)$/ ) {
@@ -77,29 +74,29 @@ sub execute {
     }
     # write operations that take a parameter
     elsif ( $function =~ m/^(pusharray|unshiftarray)$/ ) {
-	$function =~ s{ array \z }{}xms;
+    $function =~ s{ array \z }{}xms;
 
-	my $arg = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
-	    { workflow => $wf, context_key => $context_key } );
+    my $arg = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
+        { workflow => $wf, context_key => $context_key } );
 
         $array->$function( @{$arg->value()} );
     }
     # other operations
     elsif ( $function eq 'value' ) {
-	my $index = $self->index;
+    my $index = $self->index;
 
-	if (! defined $index) {
-	    my $index_key = $self->index_key;
-	    $index = $context->param($index_key);
-	}
+    if (! defined $index) {
+        my $index_key = $self->index_key;
+        $index = $context->param($index_key);
+    }
 
-	if (! defined $index) {
-	    OpenXPKI::Exception->throw(
-		message =>
+    if (! defined $index) {
+        OpenXPKI::Exception->throw(
+        message =>
                 'I18N_OPENXPKI_SERVER_WF_ACTIVITY_TOOLS_NSARRAY_MISSING_INDEX',
-		params => { name => $function, },
-		);
-	}
+        params => { name => $function, },
+        );
+    }
 
         $context->param( $context_key, $array->$function($index) );
     }
@@ -155,12 +152,12 @@ The following functions are supported:
 
 =item push
 
-Adds the value of the context parameter named in I<context_key> to the 
+Adds the value of the context parameter named in I<context_key> to the
 end of the array
 
 =item pusharray
 
-Adds the array contents contained in context parameter named in 
+Adds the array contents contained in context parameter named in
 I<context_key> to the end of the array.
 
 =item pop
@@ -170,12 +167,12 @@ context parameter named in I<context_key>.
 
 =item unshift
 
-Adds the value of the context parameter named in I<context_key> to the 
+Adds the value of the context parameter named in I<context_key> to the
 beginning of the array
 
 =item unshiftarray
 
-Adds the array contents contained in context parameter named in 
+Adds the array contents contained in context parameter named in
 I<context_key> to the beginning of the array
 
 =item shift
@@ -185,7 +182,7 @@ to the context parameter named in I<context_key>.
 
 =item value
 
-Returns the value at the position specified in I<array_index> and 
+Returns the value at the position specified in I<array_index> and
 assigns it to the context parameter named in I<context_key>.
 
 If activity configuration explicitly sets I<index> this value is taken,

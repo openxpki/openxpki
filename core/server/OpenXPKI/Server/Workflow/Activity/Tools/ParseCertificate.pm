@@ -1,6 +1,3 @@
-# OpenXPKI::Server::Workflow::Activity::Tools::ParseCertificate
-# Written by Martin Bartosch for the OpenXPKI project 2011
-# Copyright (c) 2011 by The OpenXPKI Project
 
 package OpenXPKI::Server::Workflow::Activity::Tools::ParseCertificate;
 
@@ -10,91 +7,88 @@ use base qw( OpenXPKI::Server::Workflow::Activity );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-
+use English;
+use OpenXPKI::DN;
+use OpenXPKI::Crypt::X509;
+use OpenXPKI::Serialization::Simple;
 use Data::Dumper;
+use Template;
+use Digest::SHA qw(sha1_hex);
 
-my @parameters = qw( 
-    cert_attrmap
-    certificate
-);
-
-__PACKAGE__->mk_accessors(@parameters);
-
-
-sub execute
-{
+sub execute {
+    ##! 1: 'execute'
     my $self       = shift;
     my $workflow   = shift;
-    my $context    = $workflow->context();
-    my $dbi         = CTX('dbi_backend');
-    my $default_token = CTX('api')->get_default_token();
 
-    ##! 16: 'ParseCert'
-    my %contextentry_of = (
-	certificatein => 'certificate',
-	);
-    foreach my $contextkey (keys %contextentry_of) {
-	if (defined $self->param($contextkey . 'contextkey')) {
-	    $contextentry_of{$contextkey} = $self->param($contextkey . 'contextkey');
-	}
+    my $serializer = OpenXPKI::Serialization::Simple->new();
+
+    my $context   = $workflow->context();
+
+    my $param = {}; # hash to receive the context updates
+    my $config = CTX('config');
+
+    my $pem = $self->param('pem');
+
+    OpenXPKI::Exception->throw(
+        message => 'No certificate data received'
+    ) unless ($pem);
+
+    my ($data) = $pem =~ m{(-----BEGIN ([\w\s]*)CERTIFICATE-----.*?-----END \2CERTIFICATE-----)}xms;
+
+    OpenXPKI::Exception->throw(
+        message => 'Data is not a PEM encoded certificate'
+    ) unless ($data);
+
+    my $subject_prefix = $self->param('subject_prefix') || 'cert_';
+
+    # Cleanup any existing values
+    $context->param({
+        'cert_subject' => '',
+        'cert_subject_key_identifier' => '',
+        'cert_identifier' => '',
+        'cert_issuer' => '',
+        $subject_prefix.'subject_parts' => '',
+#        $subject_prefix.'san_parts' => '',
+        $subject_prefix.'subject_alt_name' => '',
+    });
+
+    my $x509 = OpenXPKI::Crypt::X509->new($data);
+
+    my %hashed_dn;
+    my $cert_subject = $x509->get_subject();
+
+    if ($cert_subject) {
+        # TODO - extend Crypt::X509 to return RFC compliant subject
+        my $dn = OpenXPKI::DN->new( $cert_subject );
+
+        %hashed_dn = $dn->get_hashed_content();
+        $param->{$subject_prefix.'subject_parts'} = $serializer->serialize( \%hashed_dn );
+        $param->{cert_subject} = $dn->get_rfc_2253_dn();
+        ##! 32: 'Subject DN ' . Dumper \%hashed_dn
     }
 
-    my %cert_attrmap = map { split(/\s*[=-]>\s*/) }
-        split( /\s*,\s*/, $self->param('cert_attrmap') );
-    
-    
-    my $certificate = $context->param($contextentry_of{'certificatein'});
+    $param->{notbefore} = $x509->get_notbefore('epoch');
+    $param->{notafter} = $x509->get_notafter('epoch');
+    $param->{serial} = $x509->get_serial();
+    $param->{cert_subject_key_identifier} = $x509->get_subject_key_id();
+    $param->{cert_issuer} = $x509->get_issuer();
+    $param->{cert_identifier} = $x509->get_cert_identifier();
 
-    my $x509 = OpenXPKI::Crypto::X509->new(
-	TOKEN => $default_token,
-	DATA  => $certificate,
-	);
+    my $san = $x509->get_subject_alt_name();
+    $param->{$subject_prefix.'subject_alt_name'} = $serializer->serialize( $san ) if ($san);
 
-    my $x509_parsed = $x509->get_parsed_ref();
+    # TODO key params, san/subject parsing based on profile, extenstions
 
-    foreach my $key (keys %cert_attrmap) {
-	if (! exists $x509_parsed->{BODY}->{$key}) {
-	    OpenXPKI::Exception->throw(
-		message =>
-		'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PARSE_CERT_INVALID_ATTRIBUTE',
-		params => {
-		    ATTRIBUTE => $key,
-		},
-		log => {
-		    logger   => CTX('log'),
-		    priority => 'error',
-		    facility => 'system',
-		},
-		);
-	}
-	my $value = $x509_parsed->{BODY}->{$key};
-	
-	if (ref $value ne '') {
-	    OpenXPKI::Exception->throw(
-		message =>
-		'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PARSE_CERT_INVALID_ATTRIBUTE_DATA_TYPE',
-		params => {
-		    ATTRIBUTE => $key,
-		    TYPE      => ref $value,
-		},
-		log => {
-		    logger   => CTX('log'),
-		    priority => 'error',
-		    facility => 'system',
-		},
-		);
-	}
-
-	my $context_key = $cert_attrmap{$key};
-
-	$context->param($context_key => $value);
-    }
+    ##! 64: 'Params to set ' . Dumper $param
+    $context->param( $param );
 
     return 1;
 }
 
 1;
+
 __END__
+
 
 =head1 Name
 
@@ -102,56 +96,72 @@ OpenXPKI::Server::Workflow::Activity::Tools::ParseCertificate
 
 =head1 Description
 
-Parse certificate and populate context entries with parsed information
-from the certificate.
+Take a PEM encoded certificate and extract information to the context.
 
-=head1 Parameters
+=head1 Configuration
 
-=head2 cert_attrmap
+=head2 Activity Parameters
 
-Map parsed certificate attributes to context parameter names, allowing 
-flexible access and assignment of data parsed certificates into the context. 
-Must be defined, otherwise no output is generated in the context. Mapping
-keys must be specified correctly (including case), otherwise an exception
-is thrown.
+=over
 
-List of (useful) mapping keys, the available values are identical to
-the entries in the X.509 class member variable $cert->{PARSED}->{BODY}.
-Some of these entries are not scalar values, but complex types. These
-are currently not available and referencing them cause an exception to
-be thrown.
+=item pem
 
-    SUBJECT
-    SERIAL
-    SERIAL_HEX
-    IS_CA
-    ISSUER
-    EMAILADDRESS
+The PEM formatted certificate. If the input string consists of multiple
+concatenated PEM blocks, the first one is used, the remainder discarded.
 
-Less useful, but still available:
+=item subject_prefix
 
-    PUBKEY_ALGORITHM
-    SIGNATURE_ALGORITHM
-    CA_KEYID
-    EXPONENT           (hexadecimal string)
-    FINGERPRINT
-    KEYID
-    KEYSIZE
-    MODULUS            (hexadecimal string)
-    OPENSSL_SUBJECT
-    PLAIN_EXTENSIONS   (large text blob, unstructured)
-    VERSION
+Prefix for context output keys to write the subject information into
+(cert_subject_parts, cert_san_parts, cert_subject_alt_name).
+Default is I<cert_>.
+
+=back
+
+=head2 Context value to be written
+
+Prefix for the subject parts can be changed by setting I<subject_prefix>.
+
+=over
+
+=item cert_subject
+
+The extracted subject as string (comma seperated)
+
+=item cert_identifier
+
+The OpenXPKI identifier calculated from the certificate.
+
+=item cert_issuer
+
+The issuer dn as string.
+
+=item cert_subject_key_identifier
+
+The key identifier of the used public key, Hex with uppercased letters.
+The format is identical to the return value of the API method
+get_key_identifier_from_data and the format used in the certificates table.
+
+=item notbefore / notafter
+
+Validity dates of the certificate as epoch
+
+=item serial
+
+The serialnumber in integer notation
+
+=item <prefix>_subject_parts
+
+Contains the parsed DN as key-value pairs where the key
+is the shortname of the component (e.g: OU) and the value is an array of
+values found. Note that any component is an array even if it has only one
+item.
+
+=item <prefix>_subject_alt_name
+
+All SAN items as nested array list. Each item of the
+list is a two item array with name and value of one SAN item. The names
+are given as required to build then openssl extension file (otherName,
+email, DNS, dirName, URI, IP, RID).
 
 
-Example for cert_attrmap:
-
-SUBJECT -> cert_subject, ISSUER -> cert_issuer
-
-Writes the certificate subject to the context entry 'cert_subject', the
-certificate issuer to 'cert_issuer'.
-
-
-=head2 certificateincontextkey
-
-Context parameter to use for input certificate (default: certificate)
-
+=back

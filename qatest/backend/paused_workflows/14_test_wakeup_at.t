@@ -27,7 +27,7 @@ use File::Basename;
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($WARN);
 
-use OpenXPKI::Test::More;
+use OpenXPKI::Test::QA::More;
 use OpenXPKI::DateTime;
 use TestCfg;
 
@@ -48,7 +48,7 @@ my $manual_given_diff = '+0000000022';#set via Activity::set_retry_intervall
 
 #------------------------- INIT ----------------------------------
 
-my $test = OpenXPKI::Test::More::Workflow::TestPausedWorkflow->new(
+my $test = OpenXPKI::Test::QA::More::Workflow::TestPausedWorkflow->new(
     {
         socketfile => $cfg{instance}{socketfile},
         realm => $cfg{instance}{realm},

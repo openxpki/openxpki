@@ -20,27 +20,27 @@ sub execute
     my $self       = shift;
     my $workflow   = shift;
     my $context = $workflow->context();
-    
+
     my $prefix = $self->param('prefix');
-    
+
     if (!$prefix) {
         configuration_error('I18N_OPENXPKI_ACTIVITY_TOOLS_INJECTEXTRAPARAM_PREFIX_MISSING');
     }
-    
+
     my $data = $self->param('data');
-    
+
     if (!$data) {
         return 1;
     }
-    
+
     if (!ref $data) {
         $data = OpenXPKI::Serialization::Simple->new()->deserialize( $data );
     }
-    
+
     if (ref $data ne 'HASH') {
         workflow_error('I18N_OPENXPKI_ACTIVITY_TOOLS_INJECTEXTRAPARAM_NOT_A_HASH');
     }
-        
+
     foreach my $param (keys %{$data}) {
         my $val = $data->{$param};
         if (ref $val ne "") { next; } # Scalars only
@@ -70,7 +70,7 @@ prefix is prepended. Non-scalar values are skipped.
 
 =head2 Parameters
 
-=over 
+=over
 
 =item data
 
@@ -89,4 +89,4 @@ This is used in the enrollment workflow to map the extra url parameters::
     class: OpenXPKI::Server::Workflow::Activity::Tools::InjectExtraParam;
     param:
         data: $_url_params
-        prefix: url_ 
+        prefix: url_

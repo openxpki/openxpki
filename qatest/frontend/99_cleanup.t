@@ -20,9 +20,9 @@ my $result;
 my $client = TestCGI::factory(); 
 
 my @cert_identifier;
-for my $cert (('entity','entity2','pkiclient')) {
- 
-    diag('Revoke '  .$cert);       
+for my $cert (('entity','entity2','entity3','entity-rpc','pkiclient')) {
+
+    diag('Revoke '  .$cert);
     # Load cert status page using cert identifier
     my $cert_identifier = do { # slurp
         local $INPUT_RECORD_SEPARATOR;

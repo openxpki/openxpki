@@ -17,38 +17,35 @@ use Data::Dumper;
 
 sub evaluate {
 
-	my ( $self, $workflow ) = @_;
-	my $context = $workflow->context();
+    my ( $self, $workflow ) = @_;
+    my $context = $workflow->context();
 
-	my $auth1 = lc( $context->param('auth1_mail') || '' );
-	my $auth2 = lc( $context->param('auth2_mail') || '' );
-	my $owner = lc( $context->param('owner_mail') || '' );
-	##! 16: 'start'
-	##! 128: 'auth1_mail  = ' . $auth1
-	##! 128: 'auth2_mail  = ' . $auth2
-	##! 128: 'owner_mail  = ' . $owner
+    my $auth1 = lc( $context->param('auth1_mail') || '' );
+    my $auth2 = lc( $context->param('auth2_mail') || '' );
+    my $owner = lc( $context->param('owner_mail') || '' );
+    ##! 16: 'start'
+    ##! 128: 'auth1_mail  = ' . $auth1
+    ##! 128: 'auth2_mail  = ' . $auth2
+    ##! 128: 'owner_mail  = ' . $owner
 
-	if ( ( not $auth1 ) or ( not $auth2 ) ) {
-		condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_AUTH_NOT_SET');
-		return -1;
-	}
-	elsif ( ( $auth1 eq $owner ) or ( $auth2 eq $owner ) ) {
-		condition_error(
-			'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_AUTH_IS_OWNER');
-		return -1;
-	}
-	elsif ( $auth1 eq $auth2 ) {
-		condition_error(
-			'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_AUTHS_NOT_UNIQUE');
-		return -1;
-	}
-	
-	 CTX('log')->log(
-        MESSAGE => "AuthId checked.",
-        PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    ); 
-	return 1;
+    if ( ( not $auth1 ) or ( not $auth2 ) ) {
+        condition_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_AUTH_NOT_SET');
+        return -1;
+    }
+    elsif ( ( $auth1 eq $owner ) or ( $auth2 eq $owner ) ) {
+        condition_error(
+            'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_AUTH_IS_OWNER');
+        return -1;
+    }
+    elsif ( $auth1 eq $auth2 ) {
+        condition_error(
+            'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_AUTHS_NOT_UNIQUE');
+        return -1;
+    }
+
+     CTX('log')->application()->debug("AuthId checked.");
+
+    return 1;
 }
 
 1;

@@ -1,0 +1,4 @@
+Those scripts do tests on a single workflow activity item. To access them
+individually, you must upload the workflow definitions from the subfolder
+to your installation. Please do not leave those definitions on production
+systems as they will expose sensitive functionality without proper controls! 

@@ -20,7 +20,7 @@ sub get_command
     ## normal CSR: engine (optional), passwd, key
 
     my ($engine, $keyform, $passwd, $key) = ("", "", undef);
-    
+
     ## user CSR generation
 
     # check minimum requirements
@@ -65,10 +65,10 @@ sub get_command
     my $subject = $self->get_openssl_dn ($self->{SUBJECT});
 
     ## build the command
-
     my @command = qw( req -new );
     push @command, ('-subj', $subject);
     push @command, '-multivalue-rdn' if ($subject =~ /[^\\](\\\\)*\+/);
+    push @command, ('-nameopt', 'utf8');
     push @command, ('-engine', $engine) if ($engine);
     push @command, ('-keyform', $keyform) if ($keyform);
     push @command, ('-key', $self->{KEYFILE});
@@ -79,11 +79,10 @@ sub get_command
         push @command, ('-passin', 'env:pwd');
         $self->set_env ("pwd" => $passwd);
     }
-
     return [ \@command ];
 }
 
-sub __get_used_engine 
+sub __get_used_engine
 {
     my $self = shift;
     my $engine_usage = $self->{ENGINE}->get_engine_usage();

@@ -33,8 +33,8 @@ sub instance {
 }
 
 sub create_workflow{
-
     my ( $self, $wf_type, $context ) = @_;
+    ##! 1: 'start'
 
     $self->__authorize_workflow({
         ACTION => 'create',
@@ -50,9 +50,17 @@ sub create_workflow{
 
 sub fetch_workflow {
     my ( $self, $wf_type, $wf_id ) = @_;
+    ##! 1: 'start'
 
-
-    my $wf = $self->SUPER::fetch_workflow($wf_type, $wf_id, undef, 'OpenXPKI::Server::Workflow' );
+    ##! 2: 'calling Workflow::Factory::fetch_workflow()'
+    my $wf = $self->SUPER::fetch_workflow($wf_type, $wf_id, undef, 'OpenXPKI::Server::Workflow' )
+        or OpenXPKI::Exception->throw(
+            message => 'Requested workflow not found',
+            params  => {
+                WORKFLOW_TYPE => $wf_type,
+                WORKFLOW_ID => $wf_id,
+            },
+        );
     # the following both checks whether the user is allowed to
     # read the workflow at all and deletes context entries from $wf if
     # the configuration mandates it
@@ -73,7 +81,16 @@ sub fetch_workflow {
 
 sub fetch_unfiltered_workflow {
     my ( $self, $wf_type, $wf_id ) = @_;
-    my $wf = $self->SUPER::fetch_workflow($wf_type, $wf_id, undef, 'OpenXPKI::Server::Workflow' );
+    ##! 1: 'start'
+
+    my $wf = $self->SUPER::fetch_workflow($wf_type, $wf_id, undef, 'OpenXPKI::Server::Workflow' )
+        or OpenXPKI::Exception->throw(
+            message => 'Requested workflow not found',
+            params  => {
+                WORKFLOW_TYPE => $wf_type,
+                WORKFLOW_ID => $wf_id,
+            },
+        );
 
     $self->__authorize_workflow({
         ACTION   => 'access',
@@ -81,19 +98,15 @@ sub fetch_unfiltered_workflow {
         FILTER   => 0,
     });
 
-    CTX('log')->log(
-        MESSAGE  => 'Unfiltered access to workflow ' . $wf->id . ' by ' . CTX('session')->get_user() . ' with role ' . CTX('session')->get_role(),
-        PRIORITY => 'info',
-        FACILITY => 'audit',
-    );
+    CTX('log')->workflow()->info('Unfiltered access to workflow');
 
     return $wf;
 
 }
 
 sub list_workflow_titles {
-
     my $self = shift;
+    ##! 1: 'start'
 
     my $result = {};
     # Nothing initialised
@@ -118,10 +131,11 @@ be useful to merge this into a helper. Might be useful in the API.
 
 =cut
 sub get_action_info {
-
     my $self = shift;
     my $action_name = shift;
     my $wf_name = shift; # this can be replaced after creating a lookup map for prefix -> workflow
+    ##! 1: 'start'
+
     my $conn = CTX('config');
 
     # Check if it is a global or local action
@@ -148,7 +162,7 @@ sub get_action_info {
         ##! 64: 'Field info ' . Dumper $field
 
         my $field = $self->get_field_info( $field_name, $wf_name );
-        
+
         $field->{type} = 'text' unless ($field->{type});
         $field->{clonable} = ($field->{min} || $field->{max}) || 0;
 
@@ -161,13 +175,13 @@ sub get_action_info {
 }
 
 sub get_field_info {
-    
     my $self = shift;
     my $field_name = shift;
     my $wf_name = shift;
-    
+    ##! 1: 'start'
+
     my $conn = CTX('config');
-    
+
     my @field_path;
     # Fields can be defined local or global (only actions inside workflow)
     if ($wf_name) {
@@ -195,38 +209,38 @@ sub get_field_info {
         }
         $field->{option} = \@option;
     }
-    
+
     return $field;
-    
+
 }
 
-=head2 authorize_workflow 
+=head2 authorize_workflow
 
-Public wrapper around __authorize_workflow, boolean return (true if 
+Public wrapper around __authorize_workflow, boolean return (true if
 access it granted).
 
 =cut
- 
-sub authorize_workflow {
 
+sub authorize_workflow {
     my $self     = shift;
     my $arg_ref  = shift;
-    
+    ##! 1: 'start'
+
     eval {
-        $self->__authorize_workflow( $arg_ref );    
+        $self->__authorize_workflow( $arg_ref );
     };
     if ($EVAL_ERROR) {
         return 0;
-    }    
+    }
     return 1;
-    
+
 }
 
 
 sub __authorize_workflow {
-
     my $self     = shift;
     my $arg_ref  = shift;
+    ##! 1: 'start'
 
     my $conn = CTX('config');
 
@@ -241,35 +255,40 @@ sub __authorize_workflow {
     my $filter   = $arg_ref->{ACTION};
     ##! 16: 'filter: ' . $filter
 
-    my $realm    = CTX('session')->get_pki_realm();
+    my $realm    = CTX('session')->data->pki_realm;
     ##! 16: 'realm: ' . $realm
 
-    my $role     = CTX('session')->get_role();
+    my $role     = CTX('session')->data->role;
     $role = 'Anonymous' unless($role);
     ##! 16: 'role: ' . $role
 
-    my $user     = CTX('session')->get_user();
+    my $user     = CTX('session')->data->user;
     ##! 16: 'user: ' . $user
 
 
     if ($action eq 'create') {
         my $type = $arg_ref->{TYPE};
 
-        my $creator = $conn->get([ 'workflow', 'def', $type, 'acl', $role, 'creator' ] );
-        # if creator is set to any value, access is allowed
-        my $is_allowed = defined $creator;
+        $conn->exists([ 'workflow', 'def', $type])
+            or OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE',
+                params  => {
+                    'REALM'   => $realm,
+                    'WF_TYPE' => $type,
+                },
+            );
 
-        ##! 16: 'allowed workflows ' . Dumper \%allowed_workflows
-        if (! $is_allowed ) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_CREATE_PERMISSION_DENIED',
+        # if creator is set then access is allowed
+        $conn->exists([ 'workflow', 'def', $type, 'acl', $role, 'creator' ])
+            or OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_UI_WORKFLOW_CREATE_NOT_ALLOWED',
                 params  => {
                     'REALM'   => $realm,
                     'ROLE'    => $role,
                     'WF_TYPE' => $type,
                 },
             );
-        }
+
         return 1;
     }
     elsif ($action eq 'access') {
@@ -278,50 +297,28 @@ sub __authorize_workflow {
         my $filter   = $arg_ref->{FILTER};
         my $type     = $workflow->type();
 
-        my $allowed_creator_re = $conn->get([ 'workflow', 'def', $type, 'acl', $role, 'creator' ] );
+        my $wf_creator = $workflow->attrib('creator') || '';
 
-        if (! defined $allowed_creator_re) {
+        my $is_allowed = $self->check_acl( $type, $wf_creator, $user, $role );
+
+        if (! defined $is_allowed) {
             OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_NO_ACCESS_TO_TYPE',
+                message => 'I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_ROLE',
                 params  => {
                     'REALM'   => $realm,
                     'ROLE'    => $role,
                     'WF_TYPE' => $type,
                 },
             );
-        }
 
-        # get the workflow creator from the attributes table
-        my $wf_creator = $workflow->attrib('creator') || '';
-
-        # Creator can be self, any, others or a regex
-        my $is_allowed = 0;
-        # Access only to own workflows - check session user against creator
-        if ($allowed_creator_re eq 'self') {
-            $is_allowed = ($wf_creator eq $user);
-
-        # No access to own workflows
-        } elsif ($allowed_creator_re eq 'others') {
-            $is_allowed = ($wf_creator ne $user);
-
-        # access to any workflow
-        } elsif ($allowed_creator_re eq 'any') {
-            $is_allowed = 1;
-
-        # Access by Regex - check
-        } else {
-            $is_allowed = ($wf_creator =~ qr/$allowed_creator_re/);
-        }
-
-        if (!$is_allowed) {
+        } elsif (!$is_allowed) {
             ##! 16: 'workflow creator does not match allowed creator'
             OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_WORKFLOW_CREATOR_NOT_ACCEPTABLE',
+                message => 'I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_USER',
                 params => {
                     'REALM'   => $realm,
                     'ROLE'    => $role,
                     'WF_TYPE' => $type,
-                    'ALLOWED_CREATOR' => $allowed_creator_re,
                     'ACTIVE_USER' => $user,
                     'WF_CREATOR' => $wf_creator,
                 }
@@ -344,6 +341,68 @@ sub __authorize_workflow {
     );
 }
 
+=head2 check_acl (TYPE, WF_CREATOR, USER, ROLE)
+
+Helper method to evaluate the acl given in the workflow config against
+against a concrete instance. Type and creator are mandatory, user and
+role is read from the current session if user not set.
+
+Returns 1 if the user can access the workflow. Return undef if no acl
+is defined for the current role and 0 if an acl was found but does not
+authorize the current user.
+
+=cut
+
+sub check_acl {
+    my ($self, $type, $wf_creator, $user, $role) = @_;
+    ##! 1: 'start'
+
+    if (!$user) {
+        $user = CTX('session')->data->user;
+        $role = CTX('session')->data->has_role ? CTX('session')->data->role : 'Anonymous';
+    }
+
+    my $allowed_creator_re = CTX('config')->get([ 'workflow', 'def', $type, 'acl', $role, 'creator' ]);
+    return unless defined $allowed_creator_re;
+
+    # Creator can be self, any, others or a regex
+    my $is_allowed = 0;
+    # Access only to own workflows - check session user against creator
+    if ($allowed_creator_re eq 'self') {
+        $is_allowed = ($wf_creator eq $user);
+
+    # No access to own workflows
+    } elsif ($allowed_creator_re eq 'others') {
+        $is_allowed = ($wf_creator ne $user);
+
+    # access to any workflow
+    } elsif ($allowed_creator_re eq 'any') {
+        $is_allowed = 1;
+
+    # Access by Regex - check
+    } else {
+        $is_allowed = ($wf_creator =~ qr/$allowed_creator_re/);
+    }
+
+    return $is_allowed;
+
+}
+
+=head2 update_proc_state($wf, $old_state, $new_state)
+
+Tries to update the C<proc_state> in the database to C<$new_state>.
+
+Returns 1 on success and 0 if e.g. another parallel process already changed the
+given C<$old_state>.
+
+=cut
+sub update_proc_state {
+    my ($self, $wf, $old_state, $new_state) = @_;
+
+    my $wf_config = $self->_get_workflow_config( $wf->type );
+    my $persister = $self->get_persister( $wf_config->{persister} );
+    return $persister->update_proc_state($wf->id, $old_state, $new_state);
+}
 
 1;
 __END__

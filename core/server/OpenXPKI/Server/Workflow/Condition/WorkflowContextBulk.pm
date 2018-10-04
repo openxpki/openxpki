@@ -42,7 +42,7 @@ sub evaluate {
     ##! 1: 'start'
     my ( $self, $workflow ) = @_;
     my $context   = $workflow->context();
-    my $pki_realm = CTX('session')->get_pki_realm();
+    my $pki_realm = CTX('session')->data->pki_realm;
     my @keys      = ();
 
     foreach my $arg (@parameters) {
@@ -135,15 +135,15 @@ __END__
 OpenXPKI::Server::Workflow::Condition::WorkflowContextBulk
 
 =head1 SYNOPSIS
-  <condition 
-     name="private_key_not_empty" 
+  <condition
+     name="private_key_not_empty"
      class="OpenXPKI::Server::Workflow::Condition::WorkflowContextBulk">
     <param name="context_keys" value="private_key1,private_key2,..."/>
     <param name="condition" value="exists"/>
   </condition>
 
-  <condition 
-     name="profile_contains_encryption" 
+  <condition
+     name="profile_contains_encryption"
      class="OpenXPKI::Server::Workflow::Condition::WorkflowContextBulk">
     <param name="context_keys" value="cert_profile1,cert_profile2"/>
     <param name="condition" value="regex"/>
@@ -164,6 +164,6 @@ context_value:          comparison value for regex or equals check
 Note: if parameters specified start with a '$', the corresponding workflow
 context parameter is referenced instead of the literal string.
 
-Note: using the condition 'equals' when omitting the 'context_value' will 
+Note: using the condition 'equals' when omitting the 'context_value' will
 cause the values of the context parameters named in 'context_keys' to be
 compared with each other.

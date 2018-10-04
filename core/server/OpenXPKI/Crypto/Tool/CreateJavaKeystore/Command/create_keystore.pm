@@ -26,7 +26,7 @@ sub START {
     # FileUtils and tmp
     $fu_of      {$ident} = OpenXPKI::FileUtils->new();
     $tmp_of     {$ident} = $arg_ref->{TMP};
-    
+
     # the PKCS#12,  encrypted with PASS
     $pkcs12_of   {$ident} = $arg_ref->{PKCS12};
     $password_of{$ident} = $arg_ref->{PASSWD};
@@ -35,45 +35,45 @@ sub START {
     } else {
         $password_out_of{$ident} = $arg_ref->{PASSWD};
     }
- 
+
     if (length $password_out_of{$ident} < 6) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_JAVAKEYSTORE_COMMAND_CREATE_KEYSTORE_PASSWORD_TOO_SHORT",
         );
     }
-    
+
 }
 
 sub get_command {
     ##! 1: 'start'
     my $self  = shift;
-    my $ident = ident $self; 
+    my $ident = ident $self;
 
     $outfile_of{$ident} = $fu_of{$ident}->get_safe_tmpfile({
         'TMP' => $tmp_of{$ident},
     });
-    
+
     my $pkcs12 = $fu_of{$ident}->get_safe_tmpfile({
         'TMP' => $tmp_of{$ident},
-    });    
+    });
     $fu_of{$ident}->write_file({
         FILENAME => $pkcs12,
         CONTENT  => $pkcs12_of{$ident},
         FORCE    => 1,
     });
-    
+
     #$self->set_env ("jkspass" => $self->{PASSWD});
     #$self->set_env ("p12pass" => $self->{PASSWD});
-    
+
     $ENV{jkspass} = $password_out_of{$ident};
     $ENV{p12pass} = $password_of{$ident};
 
     my $command = "-importkeystore ";
     $command .= " -srcstoretype PKCS12 -srcstorepass:env p12pass -srckeystore " . $pkcs12;
-    $command .= " -deststoretype JKS -storepass:env jkspass -destkeystore ". $outfile_of{$ident};  
+    $command .= " -deststoretype JKS -storepass:env jkspass -destkeystore ". $outfile_of{$ident};
 
     return [ $command ];
-    
+
 }
 
 sub hide_output
@@ -87,7 +87,7 @@ sub key_usage
 }
 
 sub cleanup
-{    
+{
     delete $ENV{jkspass};
     delete $ENV{p12pass};
     return 1;

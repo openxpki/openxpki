@@ -31,8 +31,8 @@ sub _init {
             $self->$arg( $params->{$arg} );
         }
     }
-    
-    foreach my $arg (qw(hash_name condition ds_key)) {    
+
+    foreach my $arg (qw(hash_name condition ds_key)) {
         if ( !( defined $self->$arg() ) ) {
         configuration_error
             "Missing parameter '.$arg.' in " .
@@ -48,43 +48,40 @@ sub evaluate {
 
 
     my $hash = OpenXPKI::Server::Workflow::WFObject::WFHash->new(
-    { 
+    {
         workflow => $wf,
         context_key => $self->hash_name(),
     } );
 
     my $key = $self->ds_key();
-    
+
     if ($key =~ m{ \A \$ (.*) }xms) {
         $key = $context->param($1);
     }
-   
+
    my $val = $hash->valueForKey($key);
-   
+
    ##! 16: ' Key: ' . $key . ' - Value ' . Dumper ( $val )
-   
-   CTX('log')->log(
-        MESSAGE => "Testing if WFHash ". $self->hash_name() ." key $key is " . $self->condition(),
-        PRIORITY => 'debug',
-        FACILITY => [ 'application' ]
-    );
-   
-    if ($self->condition() eq 'key_defined') {       
+
+   CTX('log')->application()->debug("Testing if WFHash ". $self->hash_name() ." key $key is " . $self->condition());
+
+
+    if ($self->condition() eq 'key_defined') {
        if (defined $val) {
            ##! 16: ' Entry is defined '
            return 1;
        }
-       ##! 16: ' Entry not defined '        
+       ##! 16: ' Entry not defined '
        condition_error
         'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WFHASH_KEY_NOT_DEFINED';
-    } elsif ($self->condition() eq 'key_nonempty') {             
+    } elsif ($self->condition() eq 'key_nonempty') {
        if (defined $val && $val) {
-           ##! 16: ' Entry not empty '           
+           ##! 16: ' Entry not empty '
            return 1;
        }
-       ##! 16: ' Entry is empty '            
+       ##! 16: ' Entry is empty '
        condition_error
-        'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WFHASH_KEY_IS_EMPTY';   
+        'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WFHASH_KEY_IS_EMPTY';
     } else {
         configuration_error
             "Invalid condition " . $self->condition() . " in " .
@@ -101,8 +98,8 @@ OpenXPKI::Server::Workflow::Condition::WFHash
 
 =head1 SYNOPSIS
 
-  <condition 
-     name="cert_exists" 
+  <condition
+     name="cert_exists"
      class="OpenXPKI::Server::Workflow::Condition::WFHash">
     <param name="hash_name" value="cert_map"/>
     <param name="condition" value="key_defined"/>

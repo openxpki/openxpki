@@ -18,7 +18,7 @@ sub execute {
     my $self          = shift;
     my $workflow      = shift;
     my $context       = $workflow->context();
-    
+
     my $default_token = CTX('api')->get_default_token();
 
     my $password_length = $context->param('_password_length');
@@ -79,11 +79,8 @@ sub execute {
     # truncate password to maximum length
     $password = substr( $password, 0, $password_length );
 
-    CTX('log')->log(
-        MESSAGE => 'Generated random password with length ' . $password_length,  
-        PRIORITY => 'debug',
-        FACILITY => [ 'application' ],
-    );  
+    CTX('log')->application()->debug('Generated random password with length ' . $password_length);
+
 
     # pass on the password
     $context->param( '_password' => $password );
@@ -110,7 +107,7 @@ the password policy to apply to the generated password.
 
 The currently supported policies are:
 
-=over 
+=over
 
 =item alphanum_5min
 

@@ -11,13 +11,12 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Server::Database; # to get AUTO_ID
 use Data::Dumper;
 
 sub execute {
-
     ##! 1: 'start'
-    my $self     = shift;
-    my $workflow = shift;
+    my ($self, $workflow) = @_;
     my $context  = $workflow->context();
     my $params = $self->param();
 
@@ -33,25 +32,20 @@ sub execute {
     if (!$profile) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PERSIST_CERTIFICATE_METADATA_NO_PROFILE',
-            params  => {
-                PROFILE => $profile,
-            }
+            params  => { PROFILE => $profile },
         );
     }
 
     if (!$style) {
-        CTX('log')->log(
-            MESSAGE => "No style defined, skipping metadata",
-            PRIORITY => 'info',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->info("No style defined, skipping metadata");
+
         return 1;
     }
 
     my $cert_info  = $context->param('cert_info');
     my $subject_vars = $cert_info ? $ser->deserialize( $cert_info ) : {};
     my $template_vars = $ser->deserialize(  $context->param('cert_subject_parts') );
-    foreach my $key (keys %{$template_vars}) {              
+    foreach my $key (keys %{$template_vars}) {
         $subject_vars->{$key} = $template_vars->{$key} unless(defined $subject_vars->{$key});
     }
     # Add params from the activity definition
@@ -59,40 +53,28 @@ sub execute {
 
     ##! 32: 'Combined vars hash ' . Dumper $subject_vars
 
-    my $metadata = CTX('api')->render_metadata_from_template({
-        PROFILE => $profile,
-        STYLE   => $style,
-        VARS    => $subject_vars
-    });
+    my $metadata = CTX('api2')->render_metadata_from_template(
+        profile => $profile,
+        style   => $style,
+        vars    => $subject_vars
+    );
 
     if (not defined $metadata) {
-        CTX('log')->log(
-            MESSAGE => "No metadata for $profile / $style ",
-            PRIORITY => 'info',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->info("No metadata for $profile / $style ");
+
         return 1;
     }
 
     ##! 32: 'Metadata is ' . Dumper $metadata
 
     # Add result to the cert_attributes table
-    my $dbi = CTX('dbi_backend');
+    my $dbi = CTX('dbi');
     foreach my $key (keys(%{$metadata})) {
         my $value = $metadata->{$key};
         next if ($value eq '');
         $value = $ser->serialize( $value ) if (ref $value ne '');
-        CTX('log')->log(
-            MESSAGE => sprintf ('cert metadata added, cert %s, attr %s, value %s',
-               $cert_identifier, $key, $value),
-            PRIORITY => 'info',
-            FACILITY => 'audit',
-        );
 
         ##! 32: 'Add new attribute ' . $key . ' value ' . $value
-        my $serial = $dbi->get_new_serial(
-            TABLE => 'CERTIFICATE_ATTRIBUTES',
-        );
 
         ## This is a workaround for an upstream bug in the mysql driver
         # we expand a single dash, dot (or e,+) to the verbose "n/a"
@@ -101,26 +83,21 @@ sub execute {
 
         if ($value =~ m{ \A (-|\.|e|\+) \z }x) {
             $value = 'n/a';
-            CTX('log')->log(
-                MESSAGE => sprintf ('Replace metadata dash/dot by verbose "n/a" on %s / %s',
-                    $cert_identifier, $key),
-                PRIORITY => 'debug',
-                FACILITY => 'application',
-            );
+            CTX('log')->application()->debug(sprintf ('Replace metadata dash/dot by verbose "n/a" on %s / %s',
+                    $cert_identifier, $key));
+
         }
 
         $dbi->insert(
-            TABLE => 'CERTIFICATE_ATTRIBUTES',
-            HASH => {
-                ATTRIBUTE_SERIAL => $serial,
-                IDENTIFIER => $cert_identifier,
-                ATTRIBUTE_KEY => 'meta_'.$key,
-                ATTRIBUTE_VALUE => $value,
+            into => 'certificate_attributes',
+            values => {
+                attribute_key        => AUTO_ID,
+                identifier           => $cert_identifier,
+                attribute_contentkey => 'meta_'.$key,
+                attribute_value      => $value,
             }
         );
     }
-
-    $dbi->commit();
     return 1;
 
 }

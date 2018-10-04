@@ -29,11 +29,11 @@ use OpenXPKI::Server::API::Object;
 use OpenXPKI::Server::API::Profile;
 use OpenXPKI::Server::API::Secret;
 use OpenXPKI::Server::API::Token;
-use OpenXPKI::Server::API::Visualization;
 use OpenXPKI::Server::API::Housekeeping;
 use OpenXPKI::Server::API::Workflow;
 use OpenXPKI::Server::API::Smartcard;
 use OpenXPKI::Server::API::UI;
+use OpenXPKI::Server::API::API2;
 
 my %external_of    :ATTR;
 my %method_info_of :ATTR;
@@ -92,7 +92,7 @@ sub BUILD {
                     regex => $re_cert_string,
                 },
             },
-        },  
+        },
         'get_default_token' => {
             class  => 'Token',
             params => {
@@ -178,11 +178,6 @@ sub BUILD {
                     type  => SCALAR,
                     regex => $re_alpha_string,
                 },
-                'TYPE' => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                    optional => 1
-                },
                 'ENGINE' => {
                     type  => SCALAR,
                     regex => $re_boolean,
@@ -213,7 +208,7 @@ sub BUILD {
             },
             memoize => 1,
         },
-        'get_head_version_id'  => {
+        'get_config_checksum'  => {
             class  => 'Default',
             params => { },
         },
@@ -351,7 +346,7 @@ sub BUILD {
                     optional => 1
                 },
             }
-        },               
+        },
         'get_ca_list' => {
             class  => 'Token',
             params => {
@@ -416,7 +411,7 @@ sub BUILD {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_sql_string,
-                },               
+                },
             }
         },
         'get_cert_actions' => {
@@ -428,7 +423,7 @@ sub BUILD {
                 },
                 ROLE => {
                     type     => SCALAR,
-                    optional => 1 
+                    optional => 1
                 }
             }
         },
@@ -441,9 +436,9 @@ sub BUILD {
                 },
                 USER => {
                     type     => SCALAR,
-                    optional => 1 
+                    optional => 1
                 }
-            }            
+            }
         },
         'get_profile_for_cert' => {
             class  => 'Object',
@@ -583,200 +578,62 @@ sub BUILD {
             },
         },
         'search_cert_count' => {
-            class  => 'Object',
+            class  => 'API2',
             params => {
-                IDENTIFIER => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
-                EMAIL => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_sql_string,
-                },
-                SUBJECT => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_sql_string,
-                },
-                ISSUER_DN => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_sql_string,
-                },
-                ISSUER_IDENTIFIER => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
-                SUBJECT_KEY_IDENTIFIER => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                    optional => 1,
-                },
-                AUTHORITY_KEY_IDENTIFIER => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                    optional => 1,
-                },
-                CSR_SERIAL => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_integer_string,
-                },
-                CERT_SERIAL => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_int_or_hex_string,
-                },
-                'PKI_REALM' => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                    optional => 1,
-                },
-                NOTBEFORE => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_integer_string,
-                },
-                NOTAFTER => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_integer_string,
-                },
-                PROFILE => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                    optional => 1,
-                },
-                CERT_ATTRIBUTES => {
-                    type     => ARRAYREF,
-                    optional => 1,
-                },
-                VALID_AT => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_integer_string,
-                },
-                STATUS => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_sql_string,
-                },
-                ENTITY_ONLY => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_boolean,
-                }
+                IDENTIFIER =>               { optional => 1, type => SCALAR },
+                EMAIL =>                    { optional => 1, type => SCALAR },
+                SUBJECT =>                  { optional => 1, type => SCALAR },
+                ISSUER_DN =>                { optional => 1, type => SCALAR },
+                ISSUER_IDENTIFIER =>        { optional => 1, type => SCALAR },
+                SUBJECT_KEY_IDENTIFIER =>   { optional => 1, type => SCALAR },
+                AUTHORITY_KEY_IDENTIFIER => { optional => 1, type => SCALAR },
+                CSR_SERIAL =>               { optional => 1, type => SCALAR },
+                CERT_SERIAL =>              { optional => 1, type => SCALAR },
+                PKI_REALM =>                { optional => 1, type => SCALAR },
+                NOTBEFORE =>                { optional => 1, type => SCALAR|HASHREF },
+                NOTAFTER =>                 { optional => 1, type => SCALAR|HASHREF },
+                PROFILE =>                  { optional => 1, type => SCALAR },
+                CERT_ATTRIBUTES =>          { optional => 1, type => ARRAYREF },
+                VALID_AT =>                 { optional => 1, type => SCALAR },
+                STATUS =>                   { optional => 1, type => SCALAR },
+                ENTITY_ONLY =>              { optional => 1, type => SCALAR },
             },
         },
         'search_cert' => {
-            class  => 'Object',
+            class  => 'API2',
             params => {
-                IDENTIFIER => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
-                EMAIL => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_sql_string,
-                },
-                SUBJECT => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_sql_string,
-                },
-                ISSUER_DN => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_sql_string,
-                },
-                ISSUER_IDENTIFIER => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_base64_string,
-                },
-                CSR_SERIAL => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_integer_string,
-                },
-                CERT_SERIAL => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_int_or_hex_string,
-                },
-                'PKI_REALM' => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                    optional => 1,
-                },
-                 SUBJECT_KEY_IDENTIFIER => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                    optional => 1,
-                },
-                AUTHORITY_KEY_IDENTIFIER => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                    optional => 1,
-                },
-                NOTBEFORE => {
-                    type     => SCALAR|HASHREF,
-                    optional => 1,
-                },
-                NOTAFTER => {
-                    type     => SCALAR|HASHREF,
-                    optional => 1,
-                },
-                PROFILE => {
-                    type  => SCALAR,
-                    regex => $re_alpha_string,
-                    optional => 1,
-                },
-                CERT_ATTRIBUTES => {
-                    type     => ARRAYREF,
-                    optional => 1,
-                },
-                LIMIT => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_integer_string,
-                },
-                START => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_integer_string,
-                },
-                VALID_AT => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_integer_string,
-                },
-                STATUS => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_sql_string,
-                },
-                ENTITY_ONLY => {
-                    type     => SCALAR,
-                    optional => 1,
-                    regex    => $re_boolean,
-                },
-                ORDER => {
-                    type  => SCALAR,
-                    regex => $re_sql_field_name,
-                    optional => 1,
-                },
-                REVERSE => {
-                    type  => SCALAR,
-                    regex => $re_boolean,
-                    optional => 1,
-                },
+                IDENTIFIER =>               { optional => 1, type => SCALAR },
+                EMAIL =>                    { optional => 1, type => SCALAR },
+                SUBJECT =>                  { optional => 1, type => SCALAR },
+                ISSUER_DN =>                { optional => 1, type => SCALAR },
+                ISSUER_IDENTIFIER =>        { optional => 1, type => SCALAR },
+                SUBJECT_KEY_IDENTIFIER =>   { optional => 1, type => SCALAR },
+                AUTHORITY_KEY_IDENTIFIER => { optional => 1, type => SCALAR },
+                CSR_SERIAL =>               { optional => 1, type => SCALAR },
+                CERT_SERIAL =>              { optional => 1, type => SCALAR },
+                PKI_REALM =>                { optional => 1, type => SCALAR },
+                NOTBEFORE =>                { optional => 1, type => SCALAR|HASHREF },
+                NOTAFTER =>                 { optional => 1, type => SCALAR|HASHREF },
+                PROFILE =>                  { optional => 1, type => SCALAR },
+                CERT_ATTRIBUTES =>          { optional => 1, type => ARRAYREF },
+                VALID_AT =>                 { optional => 1, type => SCALAR },
+                STATUS =>                   { optional => 1, type => SCALAR },
+                ENTITY_ONLY =>              { optional => 1, type => SCALAR },
+                ORDER =>                    { optional => 1, type => SCALAR },
+                REVERSE =>                  { optional => 1, type => SCALAR },
+                LIMIT =>                    { optional => 1, type => SCALAR },
+                START =>                    { optional => 1, type => SCALAR },
             },
+        },
+         'list_issuers' => {
+            class  => 'Default',
+            params => {
+                PKI_REALM => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+            }
         },
         'control_watchdog' => {
             class => 'Object',
@@ -832,7 +689,7 @@ sub BUILD {
             },
         },
 
-        ## Profile API 
+        ## Profile API
         'get_cert_profiles' => {
             class  => 'Profile',
             params => {
@@ -1030,9 +887,9 @@ sub BUILD {
                 },
                 FORMAT => {
                     type    => SCALAR,
-                    regex   => qr{ \A (PKCS10) \z }xms, 
+                    regex   => qr{ \A (PKCS10) \z }xms,
                 }
-                
+
             },
         },
         'set_data_pool_entry' => {
@@ -1144,6 +1001,39 @@ sub BUILD {
                 },
             },
         },
+        'get_report_list' => {
+            class  => 'Object',
+            params => {
+                'NAME' => {
+                    type  => SCALAR,
+                    regex => $re_sql_string,
+                    optional => 1,
+                },
+                'MAXAGE' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                    optional => 1,
+                },
+                'COLUMNS' => {
+                    type  => SCALAR | ARRAYREF,
+                    optional => 1,
+                }
+            }
+        },
+        'get_report' => {
+            class  => 'Object',
+            params => {
+                'NAME' => {
+                    type  => SCALAR,
+                    regex => $re_alpha_string,
+                },
+                'FORMAT' => {
+                    type  => SCALAR,
+                    regex => qr{ ALL|HASH|DATA }xms,
+                    optional => 1,
+                },
+            }
+        },
         'validate_certificate' => {
             class  => 'Object',
             params => {
@@ -1168,45 +1058,32 @@ sub BUILD {
             }
         },
 
-        ### Visualization API
-        'get_workflow_instance_info' => {
-            class  => 'Visualization',
-            params => {
-                ID => {
-                    type  => SCALAR,
-                    regex => $re_integer_string,
-                },
-                FORMAT => {
-                    type  => SCALAR,
-                    regex => $re_image_format,
-                },
-                LANGUAGE => {
-                    type => SCALAR, # TODO: regexp?
-                },
-            },
-        },
-
-        ### Housekeeping API 
+        ### Housekeeping API
         'purge_application_log' => {
             class => 'Housekeeping',
             params => {
-                MAXAGE => { 
+                MAXAGE => {
                     type => SCALAR,
                     regex => $re_integer_string,
+                },
+                LEGACY => {
+                    type  => SCALAR,
+                    regex => $re_boolean,
+                    optional => 1,
                 },
             },
         },
 
-        ### Workflow API 
+        ### Workflow API
         'get_workflow_instance_types' => {
             class  => 'Workflow',
             params => {}
-        }, 
+        },
         'list_workflow_titles' => {
             class  => 'Workflow',
             params => { },
             memoize => 1,
-        }, 
+        },
         'get_workflow_type_for_id' => {
             class  => 'Workflow',
             params => {
@@ -1262,7 +1139,7 @@ sub BUILD {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_boolean,
-                },            
+                },
                 LIMIT => {
                     type  => SCALAR,
                     optional => 1,
@@ -1278,7 +1155,7 @@ sub BUILD {
                     regex => $re_integer_string,
                 },
             }
-        }, 
+        },
         'get_workflow_history' => {
             class  => 'Workflow',
             params => {
@@ -1290,7 +1167,7 @@ sub BUILD {
                     type     => SCALAR,
                     optional => 1,
                     regex    => $re_boolean,
-                },        
+                },
             },
         },
         'execute_workflow_activity' => {
@@ -1319,6 +1196,11 @@ sub BUILD {
                     optional => 1,
                     regex    => $re_boolean,
                 },
+                ASYNC => {
+                    type     => SCALAR,
+                    regex    => qr{ fork|watch }x,
+                    optional => 1,
+                },
             },
         },
         'create_workflow_instance' => {
@@ -1327,7 +1209,7 @@ sub BUILD {
                 WORKFLOW => {
                     type  => SCALAR,
                     regex => $re_alpha_string,
-                }, 
+                },
                 PARAMS => {
                     type     => HASHREF,
                     optional => 1,
@@ -1374,7 +1256,12 @@ sub BUILD {
                 ID => {
                     type     => SCALAR,
                     regex    => $re_integer_string,
-                }
+                },
+                ASYNC => {
+                    type     => SCALAR,
+                    regex    => qr{ fork|watch }x,
+                    optional => 1,
+                },
             },
         },
         'resume_workflow' => {
@@ -1388,7 +1275,12 @@ sub BUILD {
                 ID => {
                     type     => SCALAR,
                     regex    => $re_integer_string,
-                }
+                },
+                ASYNC => {
+                    type     => SCALAR,
+                    regex    => qr{ fork|watch }x,
+                    optional => 1,
+                },
             },
         },
         'get_workflow_activities' => {
@@ -1421,10 +1313,6 @@ sub BUILD {
             class  => 'Workflow',
             params => {
                 SERIAL => {
-                    type     => ARRAYREF | UNDEF,
-                    optional => 1,
-                },
-                CONTEXT => {
                     type     => ARRAYREF | UNDEF,
                     optional => 1,
                 },
@@ -1476,16 +1364,17 @@ sub BUILD {
                     regex => $re_alpha_string,
                     optional => 1,
                 },
+                CHECK_ACL => {
+                    type  => SCALAR,
+                    regex => $re_boolean,
+                    optional => 1,
+                },
             },
         },
         'search_workflow_instances_count' => {
             class  => 'Workflow',
             params => {
                 SERIAL => {
-                    type     => ARRAYREF | UNDEF,
-                    optional => 1,
-                },
-                CONTEXT => {
                     type     => ARRAYREF | UNDEF,
                     optional => 1,
                 },
@@ -1651,7 +1540,7 @@ sub BUILD {
         'get_motd' => {
             class  => 'UI',
             params => {
-                'ROLE' => { 
+                'ROLE' => {
                     type => SCALAR,
                     optional => 1,
                 },
@@ -1661,10 +1550,10 @@ sub BUILD {
         'render_template' => {
             class  => 'UI',
             params => {
-                'TEMPLATE' => { 
+                'TEMPLATE' => {
                     type => SCALAR,
                 },
-                'PARAMS' => { 
+                'PARAMS' => {
                     type => HASHREF,
                     optional => 1,
                 },
@@ -1681,7 +1570,7 @@ sub AUTOMETHOD {
     ##! 16: 'method name: ' . $method_name
     return sub {
         if (!exists $method_info_of{$ident}->{$method_name}) {
-             
+
             ##! 16: 'exception'
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_API_INVALID_METHOD_CALLED',
@@ -1689,7 +1578,6 @@ sub AUTOMETHOD {
                     'METHOD_NAME' => $method_name,
                 },
         log => {
-            logger => CTX('log'),
             priority => 'info',
             facility => 'system',
         },
@@ -1742,20 +1630,12 @@ sub AUTOMETHOD {
                     params  => {
                         'EVAL_ERROR' => $EVAL_ERROR,
                     },
-            log => {
-            logger => CTX('log'),
-            priority => 'error',
-            facility => [ 'system', 'audit' ]
-            },
                 );
             }
         }
 
-        CTX('log')->log(
-        MESSAGE  => "Method '$method_name' called via API",
-        PRIORITY => 'debug',
-        FACILITY => 'system',
-        );
+        CTX('log')->system()->debug("Method '$method_name' called via API");
+
 
         my $memoization_key;
         if (exists $method_info_of{$ident}->{$method_name}->{memoize} &&
@@ -1793,15 +1673,15 @@ sub AUTOMETHOD {
 }
 
 sub can {
-    
+
     ##! 1: 'Start'
-    
-    # WARNING - we just do not support "can" for autoloaded methods for 
+
+    # WARNING - we just do not support "can" for autoloaded methods for
     # now. This is a workaround to fix an interference between Carp
     # and the automethod in this API, see github ticket #415
-    
+
     # TODO: API handling should be improved
-    
+
     return undef;
 }
 

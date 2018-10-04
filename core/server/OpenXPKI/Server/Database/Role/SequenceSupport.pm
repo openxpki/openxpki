@@ -17,6 +17,14 @@ requires 'nextval_query';   # String: SQL query to fetch NEXTVAL from sequence
 # Methods
 #
 
+# Returns a query that removes an SQL sequence
+sub sequence_drop_query {
+    my ($self, $dbi, $seq) = @_;
+    return OpenXPKI::Server::Database::Query->new(
+        string => "DROP SEQUENCE $seq",
+    );
+}
+
 # Fetches the next insert ID for the given table
 sub next_id {
     my ($self, $dbi, $seq) = @_;

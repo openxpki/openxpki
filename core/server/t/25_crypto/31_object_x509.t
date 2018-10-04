@@ -16,6 +16,8 @@ use DateTime;
 use Data::Dumper;
 
 # use Smart::Comments;
+TODO: {
+    todo_skip 'See Issue #188', 24;
 
 our $cache;
 our $cacert;
@@ -30,11 +32,9 @@ SKIP: {
 
 ## parameter checks for TokenManager init
 
-my $mgmt = OpenXPKI::Crypto::TokenManager->new({'IGNORE_CHECK' => 1});
+my $mgmt = OpenXPKI::Crypto::TokenManager->new;
 ok ($mgmt, 'Create OpenXPKI::Crypto::TokenManager instance');
 
-TODO: {
-    todo_skip 'See Issue #188', 22;
 my $token = $mgmt->get_token ({
    TYPE => 'certsign',
    NAME => 'test-ca',
@@ -104,7 +104,7 @@ ok(defined $data);
 
 ### reading CA certificate
 $cert = OpenXPKI::Crypto::X509->new (
-    TOKEN => $token, 
+    TOKEN => $token,
     DATA => $data,
     );
 ok(defined $cert);
@@ -112,7 +112,7 @@ ok(defined $cert);
 $notafter = $cert->get_parsed("BODY", "NOTAFTER");
 $validity_duration = $notafter - $now;
 # 90 days as configured in the profile is always 2 full months plus some days
-$duration_string 
+$duration_string
     = join(',', $validity_duration->in_units('years', 'months', 'days'));
 
 ok($duration_string, "1,0,0");
@@ -124,7 +124,7 @@ $data = OpenXPKI->read_file("$basedir/ca2/cacert.pem");
 ok(defined $data);
 
 $cert = OpenXPKI::Crypto::X509->new (
-    TOKEN => $token, 
+    TOKEN => $token,
     DATA => $data,
     );
 ok(defined $cert);
@@ -132,7 +132,7 @@ ok(defined $cert);
 $notafter = $cert->get_parsed("BODY", "NOTAFTER");
 $validity_duration = $notafter - $now;
 # 90 days as configured in the profile is always 2 full months plus some days
-$duration_string 
+$duration_string
     = join(',', $validity_duration->in_units('years', 'months', 'days'));
 
 ok($duration_string, "2,0,0");

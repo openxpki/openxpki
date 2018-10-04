@@ -12,7 +12,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Workflow::WFObject::WFHash;
-
+use OpenXPKI::Server::Database; # to get AUTO_ID
 use Data::Dumper;
 
 sub execute {
@@ -21,7 +21,7 @@ sub execute {
     my $context    = $workflow->context();
     my $pki_realm  = CTX('api')->get_pki_realm();
     my $serializer = OpenXPKI::Serialization::Simple->new();
-    my $dbi        = CTX('dbi_backend');
+    my $dbi        = CTX('dbi');
     my $cert_iss_data = $context->param('cert_issuance_data');
     ##! 16: 'ref: ' . ref $cert_iss_data
     if (!defined $cert_iss_data) {
@@ -32,7 +32,7 @@ sub execute {
 
     my @cert_iss_data = @{$serializer->deserialize($cert_iss_data)};
 
-    foreach my $csr_data (@cert_iss_data) {
+    for my $csr_data (@cert_iss_data) {
         ##! 64: 'csr_data: ' . Dumper($csr_data)
         my $type    = $csr_data->{'csr_type'};
         my $profile = $csr_data->{'cert_profile'};
@@ -44,87 +44,71 @@ sub execute {
         ##! 16: '$subj_alt_names: ' . Dumper($subj_alt_names)
         ##! 16: '@subj_alt_names: ' . Dumper(\@subj_alt_names)
 
-        my $csr_serial = $dbi->get_new_serial(
-            TABLE => 'CSR',
-        );
+        my $csr_serial = $dbi->next_id('csr');
 
         # TODO: LOA (currently NULL)
         $dbi->insert(
-                TABLE => 'CSR',
-                HASH  => {
-                    'PKI_REALM'  => $pki_realm,
-                    'CSR_SERIAL' => $csr_serial,
-                    'TYPE'       => $type,
-                    'DATA'       => $data,
-                    'PROFILE'    => $profile,
-                    'SUBJECT'    => $subject,
-                },
+            into => 'csr',
+            values => {
+                pki_realm => $pki_realm,
+                req_key   => $csr_serial,
+                format    => $type,
+                data      => $data,
+                profile   => $profile,
+                subject   => $subject,
+            },
         );
 
-        foreach my $san (@subj_alt_names) {
+        for my $san (@subj_alt_names) {
             ##! 64: 'san: ' . $san
-            my $attrib_serial = $dbi->get_new_serial(
-                    TABLE => 'CSR_ATTRIBUTES',
-            );
             $dbi->insert(
-                    TABLE => 'CSR_ATTRIBUTES',
-                    HASH  => {
-                        'ATTRIBUTE_SERIAL' => $attrib_serial,
-                        'PKI_REALM'        => $pki_realm,
-                        'CSR_SERIAL'       => $csr_serial,
-                        'ATTRIBUTE_KEY'    => 'subject_alt_name',
-                        'ATTRIBUTE_VALUE'  => $serializer->serialize($san),
-                        'ATTRIBUTE_SOURCE' => 'EXTERNAL',
-                    },
+                into => 'csr_attributes',
+                values => {
+                    attribute_key        => AUTO_ID,
+                    pki_realm            => $pki_realm,
+                    req_key              => $csr_serial,
+                    attribute_contentkey => 'subject_alt_name',
+                    attribute_value      => $serializer->serialize($san),
+                    attribute_source     => 'EXTERNAL',
+                },
             );
         }
 
-    foreach my $validity_param (qw(notbefore notafter)) {
-        if (defined $context->param($validity_param)) {
-        #my $source = $source_ref->{$validity_param};
-        my $attrib_serial = $dbi->get_new_serial(
-            TABLE => 'CSR_ATTRIBUTES',
-            );
-        $dbi->insert(
-            TABLE => 'CSR_ATTRIBUTES',
-            HASH  => {
-            'ATTRIBUTE_SERIAL' => $attrib_serial,
-            'PKI_REALM'        => $pki_realm,
-            'CSR_SERIAL'       => $csr_serial,
-            'ATTRIBUTE_KEY'    => $validity_param,
-            'ATTRIBUTE_VALUE'  => $context->param($validity_param),
-            'ATTRIBUTE_SOURCE' => 'OPERATOR',
-            },
+        for my $validity_param (qw(notbefore notafter)) {
+            next unless defined $context->param($validity_param);
+            #my $source = $source_ref->{$validity_param};
+            $dbi->insert(
+                into => 'csr_attributes',
+                values => {
+                    attribute_key        => AUTO_ID,
+                    pki_realm            => $pki_realm,
+                    req_key              => $csr_serial,
+                    attribute_contentkey => $validity_param,
+                    attribute_value      => $context->param($validity_param),
+                    attribute_source     => 'OPERATOR',
+                },
             );
         }
-    }
 
-
-        my @csr_serials;
         my $csr_serial_context = $context->param('csr_serial');
-        if (defined $csr_serial_context) {
-            @csr_serials = @{$serializer->deserialize($csr_serial_context)};
-        }
-        $dbi->commit();
+        my @csr_serials = defined $csr_serial_context
+            ? ( @{$serializer->deserialize($csr_serial_context)} )
+            : ();
         push @csr_serials, $csr_serial;
         ##! 16: 'csr_serials: ' . Dumper(\@csr_serials)
-        $context->param(
-            'csr_serial' => $serializer->serialize(\@csr_serials),
-        );
+        $context->param(csr_serial => $serializer->serialize(\@csr_serials));
 
         # Link the escrow key handle to the csr_id
         if ($csr_data->{'escrow_key_handle'}) {
             ##! 16: 'Add escrow key handle ' . $csr_data->{'escrow_key_handle'}
             my $cert_escrow_handle_context = OpenXPKI::Server::Workflow::WFObject::WFHash->new(
-                { workflow => $workflow , context_key => 'cert_escrow_handle' } );
+                { workflow => $workflow , context_key => 'cert_escrow_handle' }
+            );
             $cert_escrow_handle_context->setValueForKey( $csr_serial => $csr_data->{'escrow_key_handle'} );
         }
 
-        CTX('log')->log(
-            MESSAGE => "SmartCard persisted csrs serials " .join(", ",@csr_serials),
-            PRIORITY => 'info',
-            FACILITY => 'application'
-        );
+        CTX('log')->application()->info("SmartCard persisted csrs serials " .join(", ",@csr_serials));
+
     }
 
     return;

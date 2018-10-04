@@ -22,26 +22,26 @@ use Data::Dumper;
 use Moose;
 
 extends 'OpenXPKI::Server::Authentication::X509';
- 
+
 sub login_step {
-	
-    ##! 1: 'start' 
+
+    ##! 1: 'start'
     my $self    = shift;
     my $arg_ref = shift;
- 
+
     my $name    = $arg_ref->{HANDLER};
     my $msg     = $arg_ref->{MESSAGE};
     my $answer  = $msg->{PARAMS};
 
     if (! exists $msg->{PARAMS}->{LOGIN}) {
-        ##! 4: 'no login data received (yet)' 
-        return (undef, undef, 
+        ##! 4: 'no login data received (yet)'
+        return (undef, undef,
             {
-		SERVICE_MSG => "GET_CLIENT_X509_LOGIN",
-		PARAMS      => {
+        SERVICE_MSG => "GET_CLIENT_X509_LOGIN",
+        PARAMS      => {
                     NAME        => $self->{NAME},
                     DESCRIPTION => $self->{DESC},
-	        },
+            },
             },
         );
     }
@@ -53,14 +53,14 @@ sub login_step {
     ##! 2: "credentials ... present"
     ##! 2: "username: $username"
     ##! 2: "certificate: " . Dumper $certificate
-  
+
     my $validate = CTX('api')->validate_certificate({
         PEM => $certificate,
-        ANCHOR => $self->trust_anchors(),                       
+        ANCHOR => $self->trust_anchors(),
     });
- 
+
     return $self->_validation_result( $validate );
- 
+
 }
 
 1;
@@ -76,4 +76,4 @@ Leaves the SSL negotation to the client, requires the certificate chain of the a
 client to be passed.
 
 See OpenXPKI::Server::Authentication::X509 for configuration and options.
- 
+

@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use Encode;
 
 package OpenXPKI::Transport::Simple;
 
@@ -10,7 +11,7 @@ use English;
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 
-# If you encounter problems with corrupted transports, try enabling 
+# If you encounter problems with corrupted transports, try enabling
 # the base64 encode/decode in the read/write methods
 #use MIME::Base64;
 
@@ -51,34 +52,31 @@ sub write
 
     my @list = ();
 
-    # The data string might have the utf8 flag set - to prevent messing with 
-    # wide chars / length issues on the transport, we do a "downgrade" which
-    # will make the string look like a sequence of 8-bit chars. 
-    # We will upgrade on the other side of the transport again
-    utf8::downgrade( $data );
+    # Encode data from perl internal utf8 representation to octets
+    $data = Encode::encode_utf8( $data );
 
 #    $data = encode_base64( $data );
 
-    # while the message is to large for the buffer, we send only chunks 
+    # while the message is to large for the buffer, we send only chunks
     while ( length($data) > $MAX_MSG_LENGTH ) {
-        
-        ##! 4: "sending intermediate message"        
+
+        ##! 4: "sending intermediate message"
         ##! 8: "size of (remaining) message " . length($data)
         $self->__send ( "type::=chunk\n" .
-            sprintf("length::=%08d\n", $MAX_MSG_LENGTH) . 
+            sprintf("length::=%08d\n", $MAX_MSG_LENGTH) .
             substr ($data, 0, $MAX_MSG_LENGTH));
-                            
+
         # await confirmation
         if ($self->__receive (3) ne "OK\n") {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_TRANSPORT_SIMPLE_WRITE_MISSING_OK",
             );
         }
-        
+
         # shift off already send data
         $data = substr ($data, $MAX_MSG_LENGTH);
     }
-    
+
     ##! 4: "sending last message"
     $self->__send ( "type::=final\n" .
         sprintf("length::=%08d\n", length($data)).
@@ -105,16 +103,16 @@ sub read
     my $msg = "";
 
     do {
-        
+
         my $tmp;
 
         ##! 4: "read type line"
         ## type is always 5 chars, + 7 prefix + EOL
         $tmp = $self->__receive(13);
-     
+
         ##! 4: "type line: $tmp"
         $type = substr($tmp, 7, 5);
-        
+
         if ($type !~ /chunk|final/) {
             ##! 8: "illegal type " . $type
             OpenXPKI::Exception->throw (
@@ -122,20 +120,20 @@ sub read
                 params => { TYPE => $type }
             );
         }
-        
+
         ##! 4: "read length line"
         ## length is always 8 digits + prefix + EOL
         $tmp = $self->__receive(18);
-        
+
         my $length = substr($tmp,9,8);
-        
+
         if ((substr($tmp,0,6) ne 'length') || ($length !~ /\d{8}/)) {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_LENGTH_EXPECTED",
                 params => { READ => $tmp }
             );
         }
-        
+
         ##! 4: "length: $length"
 
         my $buffer = "";
@@ -143,7 +141,7 @@ sub read
         while (length ($buffer) < $length) {
             $buffer .= $self->__receive ( $length - length($buffer) );
         }
-        
+
         $msg .= $buffer;
 
         # sender expects an "OK" before the next chunk is send
@@ -152,7 +150,7 @@ sub read
         }
 
     } while ($type ne "final");
-    
+
     ##! 2: "message read successfully - $msg"
 
     if ($self->{STDOUT})
@@ -162,11 +160,10 @@ sub read
         delete $self->{STDIN};
     }
 
-  
+
 #    $msg = decode_base64( $msg );
-    # Transmission is done with plain 8-bit, we make the string "be" utf8
-    # again by calling upgrade. See docs for known issues
-    utf8::upgrade( $msg );
+    # Decode octets in $msg to the perl utf8 string.
+    $msg = Encode::decode_utf8($msg, Encode::LEAVE_SRC | Encode::FB_CROAK);
 
     return $msg;
 }
@@ -175,7 +172,7 @@ sub __send
 {
     my $self = shift;
     my $msg  = shift;
-    
+
     if (exists $self->{OUTFILE})
     {
         ##! 8: "open file for writing"
@@ -221,7 +218,7 @@ sub __receive
     my $self   = shift;
     my $length = shift;
     my $msg    = "";
-    
+
     ##! 4: "start"
 
     if (exists $self->{INFILE})
@@ -249,18 +246,16 @@ sub __receive
         eval {
             $length = CORE::read STDIN, $msg, $length;
         };
-        if ($EVAL_ERROR) {
-	    if ($EVAL_ERROR eq "alarm\n") {
-		# our caller may have set an alarm signal handler, if we
-		# die here, simply propagate this exception
-		die $EVAL_ERROR;
-	    }
+        if (my $eval_err = $EVAL_ERROR) {
+            if ($eval_err eq "alarm\n") {
+                # our caller may have set an alarm signal handler, if we
+                # die here, simply propagate this exception
+                die $eval_err;
+            }
             ##! 16: 'EVAL_ERROR!'
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_FAILED',
-                params  => {
-                    'EVAL_ERROR' => $EVAL_ERROR,
-                },
+                params  => { EVAL_ERROR => $eval_err },
             );
         }
         ##! 8: "read $length bytes - $msg"
@@ -269,9 +264,9 @@ sub __receive
     {
         ##! 8: "connection closed"
         OpenXPKI::Exception->throw(
-	       message => "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_CLOSED_CONNECTION",
-	       log => undef, # do not log exception
-	    );
+           message => "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_READ_CLOSED_CONNECTION",
+           log => undef, # do not log exception
+        );
     }
     ##! 4: "read message - $msg"
     return $msg;
@@ -335,18 +330,18 @@ The header has a fixed format::
 =head2 type
 
 The default type is I<final>, which means this is the last message (most
-times the only one) and all data was transmitted after this package was read. 
+times the only one) and all data was transmitted after this package was read.
 If the data is too large to fit into a single package, it is splitted into
 several parts, each one with the maximum allowed size. Those intermediate
 packages are transmitted wit the type set to I<chunk>.
 
-The maximum allowed size is a fixed value of 1048544 bytes (2^20 - 32). 
-The 32 bytes are sufficient to place the header, so the total size is 
+The maximum allowed size is a fixed value of 1048544 bytes (2^20 - 32).
+The 32 bytes are sufficient to place the header, so the total size is
 always below 1MB.
 
 =head2 length
 
-The length of the raw data portion in bytes, to ease parsing this is 
+The length of the raw data portion in bytes, to ease parsing this is
 always written with 8 digit using decimal notation.
 
 

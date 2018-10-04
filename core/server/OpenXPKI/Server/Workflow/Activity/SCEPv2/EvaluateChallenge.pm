@@ -53,11 +53,8 @@ sub execute {
         push @path, $out if ($out);
     }
 
-    CTX('log')->log(
-        MESSAGE => "SCEP validation path " . join("|", @path),
-        PRIORITY => 'debug',
-        FACILITY => 'application',
-    );
+    CTX('log')->application()->debug("SCEP validation path " . join("|", @path));
+
 
     my $res;
     # bind mode passes the plain password as additional argument
@@ -69,11 +66,8 @@ sub execute {
         # check if its scalar as path building errors might make it always true
         $res =  ((ref $bind eq '') && $bind) ? 1 : 0;
 
-        CTX('log')->log(
-            MESSAGE => "SCEP Challenge using bind " . ($res ? "validated" : "validation FAILED!"),
-            PRIORITY => 'info',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->info("SCEP Challenge using bind " . ($res ? "validated" : "validation FAILED!"));
+
 
     } else {
 
@@ -81,11 +75,8 @@ sub execute {
         my $password = $config->get( [ @prefix, 'value', @path ] ) ;
         ##! 32: 'expected challenge is ' . $password
         $res = ($password eq $challenge_password ? 1 : 0);
-        CTX('log')->log(
-            MESSAGE => "SCEP Challenge using compare " . ($res ? "validated" : "validation FAILED!"),
-            PRIORITY => 'info',
-            FACILITY => 'application',
-        );
+        CTX('log')->application()->info("SCEP Challenge using compare " . ($res ? "validated" : "validation FAILED!"));
+
     }
 
     $context->param('valid_chall_pass' => $res);

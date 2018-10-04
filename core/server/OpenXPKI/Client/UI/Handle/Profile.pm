@@ -14,7 +14,7 @@ sub render_profile_select {
     my $wf_action = shift;
 
 
-    $self->logger()->debug( 'render_profile_select with args: ' . Dumper $args );
+    $self->logger()->trace( 'render_profile_select with args: ' . Dumper $args );
 
     my $wf_info = $args->{WF_INFO};
 
@@ -74,7 +74,7 @@ sub render_profile_select {
         type => 'form',
         action => 'workflow',
         content => {
-            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE',
+            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
             fields => \@fields
         }
     });
@@ -90,6 +90,14 @@ sub render_subject_form {
     my $self = shift; # reference to the wrapping workflow/result
     my $args = shift;
     my $wf_action = shift;
+    my $param = shift;
+
+    my $section;
+    my $mode = 'enroll';
+
+    if ($param) {
+        ($section, $mode) = split /!/, $param;
+    }
 
     my $wf_info = $args->{WF_INFO};
 
@@ -99,18 +107,22 @@ sub render_subject_form {
     my $cert_profile = $context->{'cert_profile'};
     my $cert_subject_style = $context->{'cert_subject_style'};
 
+    my $is_renewal = ($mode eq 'renewal');
+
     # Parse out the field name and type, we assume that there is only one activity with one field
     $wf_action = (keys %{$wf_info->{ACTIVITY}})[0] unless($wf_action);
     my $field_name = $wf_info->{ACTIVITY}->{$wf_action}->{field}[0]->{name};
-    my $field_type = $wf_info->{ACTIVITY}->{$wf_action}->{field}[0]->{type};
 
-    $self->logger()->debug( " Render subject for $field_name with type $field_type in $wf_action " );
+    $section = substr($wf_info->{ACTIVITY}->{$wf_action}->{field}[0]->{type}, 5) unless($section);
+
+    $self->logger()->debug( " Render subject for $field_name, section $section in $wf_action" );
 
     # Allowed types are cert_subject, cert_san, cert_info
-    my $fields = $self->send_command( 'get_field_definition',
-        { PROFILE => $cert_profile, STYLE => $cert_subject_style, 'SECTION' =>  substr($field_type, 5) });
+    my $fields = $self->send_command_v2( 'get_field_definition',
+        { profile => $cert_profile, style => $cert_subject_style, 'section' =>  $section }
+    );
 
-    $self->logger()->debug( 'Profile fields' . Dumper $fields );
+    $self->logger()->trace( 'Profile fields' . Dumper $fields );
 
     # Load preexisiting values from context
     my $values = {};
@@ -118,12 +130,18 @@ sub render_subject_form {
         $values = $self->serializer()->deserialize( $context->{$field_name} );
     }
 
-    $self->logger()->debug( 'Preset ' . Dumper $values );
+
+    my @fielddesc;
+    foreach my $field (@{$fields}) {
+        push @fielddesc, { label => $field->{LABEL}, value => $field->{DESCRIPTION}, format => 'raw' } if ($field->{DESCRIPTION});
+    }
+
+    $self->logger()->trace( 'Preset ' . Dumper $values );
 
     # Map the old notation for the new UI
-    $fields = OpenXPKI::Client::UI::Handle::Profile::__translate_form_def( $fields, $field_name, $values );
+    $fields = OpenXPKI::Client::UI::Handle::Profile::__translate_form_def( $fields, $field_name, $values, $is_renewal );
 
-    $self->logger()->debug( 'Mapped fields' . Dumper $fields );
+    $self->logger()->trace( 'Mapped fields' . Dumper $fields );
 
     # record the workflow info in the session
     push @{$fields}, $self->__register_wf_token($wf_info, {
@@ -135,10 +153,21 @@ sub render_subject_form {
         type => 'form',
         action => 'workflow',
         content => {
-            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE',
-            fields => $fields
+            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
+            fields => $fields,
+            buttons => $self->__get_form_buttons( $wf_info ),
         }
     });
+
+    if (@fielddesc) {
+        $self->add_section({
+            type => 'keyvalue',
+            content => {
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST',
+                description => '',
+                data => \@fielddesc
+        }});
+    }
 
     return $self;
 
@@ -151,7 +180,7 @@ sub render_key_select {
     my $args = shift;
     my $wf_action = shift;
 
-    $self->logger()->debug( 'render_profile_select with args: ' . Dumper $args );
+    $self->logger()->trace( 'render_profile_select with args: ' . Dumper $args );
 
     my $wf_info = $args->{WF_INFO};
     my $context = $wf_info->{WORKFLOW}->{CONTEXT};
@@ -220,11 +249,11 @@ sub render_key_select {
         type => 'form',
         action => 'workflow',
         content => {
-        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE',
+        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
             fields => \@fields
         }
     });
-    
+
     return $self;
 
 }
@@ -236,7 +265,7 @@ sub render_server_password {
     my $args = shift;
     my $wf_action = shift;
 
-    $self->logger()->debug( 'render_server_password with args: ' . Dumper $args );
+    $self->logger()->trace( 'render_server_password with args: ' . Dumper $args );
 
     my $wf_info = $args->{WF_INFO};
     my $context = $wf_info->{WORKFLOW}->{CONTEXT};
@@ -246,18 +275,18 @@ sub render_server_password {
     foreach my $field (@{$wf_info->{ACTIVITY}->{$wf_action}->{field}}) {
         my $value;
         if ($field->{name} eq '_password') {
-            $value = $self->send_command( 'get_random', { LENGTH => 16 });            
+            $value = $self->send_command( 'get_random', { LENGTH => 16 });
             if (!$value) {
                 $self->set_status('I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_ERROR_LABEL','error');
                 $self->add_section({
-                    type => 'text',                    
+                    type => 'text',
                     content => {
-                        label => 'I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_LABEL',                    
+                        label => 'I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_LABEL',
                         description => 'I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_DESC'
-                    }                    
+                    }
                 });
                 return $self;
-            }            
+            }
         } else {
             $value = $context->{$field->{name}};
         }
@@ -276,7 +305,7 @@ sub render_server_password {
         type => 'form',
         action => 'workflow',
         content => {
-        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE',
+        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
             fields => \@fields
         }
     });
@@ -291,25 +320,30 @@ sub __translate_form_def {
     my $fields = shift;
     my $field_name = shift;
     my $values = shift;
+    my $is_renewal = shift || 0;
 
     # TODO - Refactor profile definitions to make this obsolete
     my @fields;
     foreach my $field (@{$fields}) {
+
+        my $renew = $is_renewal ? ($field->{renew} || 'preset') : '';
+
         my $new = {
-            name => $field_name.'{'.$field->{ID}.'}',
-            label => $field->{LABEL},
-            tooltip => $field->{DESCRIPTION},
-            placeholder => $field->{DEFAULT}, # Default is used as placeholder!
-            value => $values->{$field->{ID}}
+            name => $field_name.'{'.$field->{id}.'}',
+            label => $field->{label},
+            tooltip => defined $field->{tooltip} ? $field->{tooltip} : $field->{description},
+             # Placeholder is the new attribute, fallback to old default
+            placeholder => (defined $field->{placeholder} ? $field->{placeholder} : $field->{default}),
+            value => $values->{$field->{id}},
         };
 
-        if ($field->{TYPE} eq 'freetext') {
+        if ($field->{type} eq 'freetext') {
             $new->{type} = 'text';
-        } elsif ($field->{TYPE} eq 'select') {
+        } elsif ($field->{type} eq 'select') {
             $new->{type} = 'select';
 
             my @options;
-            foreach my $item (@{$field->{OPTIONS}}) {
+            foreach my $item (@{$field->{options}}) {
                push @options, { label => $item, value => $item};
             }
             $new->{options} = \@options;
@@ -317,22 +351,22 @@ sub __translate_form_def {
             $new->{type} = 'text';
         }
 
-        if (defined $field->{MIN}) {
-            if ($field->{MIN} == 0) {
+        if (defined $field->{min}) {
+            if ($field->{min} == 0) {
                 $new->{is_optional} = 1;
             } else {
-                $new->{min} = $field->{MIN};
+                $new->{min} = $field->{min};
                 $new->{clonable} = 1;
             }
         }
 
-        if (defined $field->{MAX}) {
-            $new->{max} = $field->{MAX};
+        if (defined $field->{max}) {
+            $new->{max} = $field->{max};
             $new->{clonable} = 1;
         }
 
         # Check for key/value field
-        if ($field->{KEYS}) {
+        if ($field->{keys}) {
             $new->{name} =  $field_name.'{*}';
             my $format = $field_name.'{%s}';
             $format .= '[]' if ($new->{clonable});
@@ -340,7 +374,7 @@ sub __translate_form_def {
             my @keys = map { {
                 value => sprintf ($format, $_->{value}),
                 label => $_->{label}
-            } } @{$field->{KEYS}};
+            } } @{$field->{keys}};
             $new->{keys} = \@keys;
         }
 
@@ -348,8 +382,16 @@ sub __translate_form_def {
             $new->{name} .= '[]';
         }
 
+        if ($renew eq 'clear') {
+            $new->{value} = undef;
+
+        } elsif ($renew eq 'keep') {
+            $new->{type} = 'static';
+
+        }
 
         push @fields, $new;
+
     }
 
     return \@fields;

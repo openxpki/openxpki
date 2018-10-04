@@ -7,7 +7,7 @@ use File::Spec;
 
 #--- top DIRECTORY
 my $test_directory 	 = 't';
-my $test_group           = '50_auth'; 
+my $test_group           = '50_auth';
 
 #------------------PREDEFINED CRITICAL FILE NAMES
 
@@ -18,10 +18,10 @@ my $ldap_pid_file = File::Spec->catfile(
 				    'slapd.pid',
 		    );
 my $ldap_conf_file = File::Spec->catfile(
-			$test_directory, 
+			$test_directory,
         		$test_group,
-			'ldap_conf', 
-			'slapd.conf' 
+			'ldap_conf',
+			'slapd.conf'
 		     );
 my $semaphore_file       = File::Spec->catfile(
 				    $test_directory,
@@ -35,13 +35,13 @@ my @test_tasks = (
 		    '2 check pidfile and stop ldap server',
 		    '3 clean directories',
 		    '4 delete ldap config',
-		);    
+		);
 my $test_number = scalar @test_tasks;
 plan tests =>  $test_number;
 
-diag "Cleaning after LDAP tests\n" if $ENV{VERBOSE};
+note "Cleaning after LDAP tests\n";
 
-#### 1) DELETING SEMAPHORE FILE 
+#### 1) DELETING SEMAPHORE FILE
 
 # ------- indicate that server is running
 my $ldap_server_flag = 1;
@@ -54,12 +54,12 @@ if( -f $semaphore_file){
 	);
         ok(0,"Deleting semaphore file");
     } else {
-	ok(1,"Deleting semaphore file");        	 
-    };    
+	ok(1,"Deleting semaphore file");
+    };
 } else {
     $ldap_server_flag = 0;
-    ok(1,"Deleting semaphore file");        	 
-};    
+    ok(1,"Deleting semaphore file");
+};
 
 
 
@@ -80,8 +80,8 @@ SKIP: {
 if ( ! $ldap_server_flag ) {
     diag("\n No semaphore file found," .
 	 "\n skipping ldap server stopping\n"
-    );
-    skip '',1;  	     
+    ) if $ENV{VERBOSE};
+    skip '',1;
 };
 
 #--- II)  check environment
@@ -89,8 +89,8 @@ if( not exists $ENV{OPENXPKI_LDAP_MODULE_PATH} or
     not exists $ENV{OPENXPKI_LDAP_DAEMON_PATH} ) {
     diag("\n No OPENXPKI_LDAP environment variables found," .
          "\n skipping ldap server stopping\n"
-    );
-    skip '',1;  	     
+    ) if $ENV{VERBOSE};
+    skip '',1;
 };
 
 
@@ -98,13 +98,13 @@ if( not exists $ENV{OPENXPKI_LDAP_MODULE_PATH} or
 if( ! ( -f $ldap_pid_file ) ) {
     diag("\n No ldap server pid file found," .
          "\n skipping ldap server stopping\n"
-    );
-    skip '',1;  	     
+    ) if $ENV{VERBOSE};
+    skip '',1;
 };
 
 #--- IV)  check ps and pid
 open(LDAPPID , "<" ,$ldap_pid_file );
-my $ldap_pid = <LDAPPID>; 
+my $ldap_pid = <LDAPPID>;
 chomp $ldap_pid;
 close(LDAPPID);
 my $daemon_path = $ENV{OPENXPKI_LDAP_DAEMON_PATH};
@@ -115,12 +115,12 @@ my $daemon_path = $ENV{OPENXPKI_LDAP_DAEMON_PATH};
 my $check = system(
 		"ps -p $ldap_pid -o command | grep " .
 		'"' . $daemon_path . '"'
-	    );	
+	    );
 if( $check ) {
     diag("\n No running slapd with the specified pid found," .
          "\n skipping ldap server stopping\n"
-    );
-    skip '',1;  	     
+    ) if $ENV{VERBOSE};
+    skip '',1;
 };
 
 #--- V)  if everything is ok - kill process
@@ -149,9 +149,9 @@ foreach my $dir (
 		 ) {
     my $ldap_dir = File::Spec->catfile(
 				$test_directory,
-    				$test_group, 
+    				$test_group,
 				$dir
-		   );		 
+		   );
     if (-d $ldap_dir) {
 	system("rm -r -d $ldap_dir");
     };

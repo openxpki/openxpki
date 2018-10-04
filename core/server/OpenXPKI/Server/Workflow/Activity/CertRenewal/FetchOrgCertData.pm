@@ -20,44 +20,39 @@ sub execute {
 
     my $context = $workflow->context();
     ##! 32: 'context: ' . Dumper($context)
-    my $dbi       = CTX('dbi_backend');
+    my $dbi       = CTX('dbi');
     my $pki_realm = CTX('api')->get_pki_realm();
 
     my $cert_identifier = $context->param('org_cert_identifier');
 
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
-    my $certificate = $dbi->first(
-        TABLE   => [ 'CERTIFICATE', 'CSR' ],
-        COLUMNS => [
-            'CERTIFICATE.SUBJECT',
-            'CSR.PROFILE'
-        ],
-        JOIN => [
-            [ 'CSR_SERIAL', 'CSR_SERIAL' ],
-        ],
-        DYNAMIC => {
-            'CERTIFICATE.IDENTIFIER' => $cert_identifier,
-            'CERTIFICATE.PKI_REALM'  => $pki_realm,
+    my $certificate = $dbi->select_one(
+        from_join => 'certificate req_key=req_key csr',
+        columns => [ 'certificate.subject', 'csr.profile' ],
+        where => {
+            'certificate.identifier' => $cert_identifier,
+            'certificate.pki_realm'  => $pki_realm,
         }
     );
 
-    $context->param( 'cert_profile' => $certificate->{'CSR.PROFILE'} );
-    $context->param( 'cert_subject' => $certificate->{'CERTIFICATE.SUBJECT'} );
+    $context->param( 'cert_profile' => $certificate->{'profile'} );
+    $context->param( 'cert_subject' => $certificate->{'subject'} );
 
     my @subj_alt_names;
     my $cert_info = {};
 
-    my $certificate_metadata = $dbi->select(
-        TABLE   => 'CERTIFICATE_ATTRIBUTES',
-        DYNAMIC => {
-            'IDENTIFIER' => $cert_identifier,
+    my $sth = $dbi->select(
+        from => 'certificate_attributes',
+        columns => [ 'attribute_key', 'attribute_contentkey' ],
+        where => {
+            'identifier' => $cert_identifier,
         },
     );
 
-    foreach my $metadata ( @{$certificate_metadata} ) {
-        my $key   = $metadata->{ATTRIBUTE_KEY};
-        my $value = $metadata->{ATTRIBUTE_VALUE};
+    while (my $metadata = $sth->fetchrow_hashref) {
+        my $key   = $metadata->{attribute_contentkey};
+        my $value = $metadata->{attribute_value};
         if ( $key eq 'subject_alt_name' ) {
             ##! 16: 'Adding SAN ' . $value
             # Type:Value

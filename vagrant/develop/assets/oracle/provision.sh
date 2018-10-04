@@ -19,10 +19,12 @@ trap '_exit $?' EXIT
 #
 # Config
 #
-echo "OXI_TEST_DB_ORACLE_NAME=XE"           >> /etc/environment
-echo "OXI_TEST_DB_ORACLE_USER=oxitest"      >> /etc/environment
-echo "OXI_TEST_DB_ORACLE_PASSWORD=openxpki" >> /etc/environment
-cat /etc/environment | while read def; do export $def; done
+if ! $(grep -q OXI_TEST_DB_ORACLE_NAME /etc/environment); then
+    echo "OXI_TEST_DB_ORACLE_NAME=XE"           >> /etc/environment
+    echo "OXI_TEST_DB_ORACLE_USER=oxitest"      >> /etc/environment
+    echo "OXI_TEST_DB_ORACLE_PASSWORD=openxpki" >> /etc/environment
+fi
+while read def; do export $def; done < /etc/environment
 
 #
 # Check if installation package exists
@@ -45,11 +47,18 @@ fi
 #
 # Run Docker container
 #
-echo "Oracle: building and starting Docker container - have a break, this will take a while :)"
+if ! $(docker image ls | grep -q '^oracle-image'); then
+    set -e
+    echo "Oracle: building Docker image - have a break, this will take a while :)"
+    docker build $SCRIPT_DIR/docker -t oracle-image                   >$LOG 2>&1
+    set +e
+else
+    echo "Oracle: NOT building Docker image as it already exists"
+fi
 
 docker rm -f oracle >/dev/null 2>&1
 set -e
-docker build $SCRIPT_DIR/docker -t oracle-image                       >$LOG 2>&1
+echo "Oracle: starting Docker container"
 docker run --name oracle -d -p 1521:1521 -p 1080:8080 oracle-image    >$LOG 2>&1
 set +e
 
@@ -82,7 +91,7 @@ fi
 #
 # Wait for database initialization
 #
-echo "Oracle: waiting for DB in Docker container to initialize (max. 60 seconds)"
+echo "Oracle: waiting for DB to initialize (max. 60 seconds)"
 sec=0; error=1
 while [ $error -ne 0 -a $sec -lt 60 ]; do
     error=$(echo "quit;" | sqlplus64 -s system/oracle@XE | grep -c ORA-)

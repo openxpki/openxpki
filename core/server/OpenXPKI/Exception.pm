@@ -11,7 +11,7 @@ use utf8;
 
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context;
-use Log::Log4perl qw( get_logger );
+use Log::Log4perl;
 
 use OpenXPKI::i18n qw( i18nGettext );
 use Exception::Class (
@@ -97,58 +97,31 @@ sub throw {
 
     my $self = $proto->new(%exception_args);
 
-    my %logger_args = (
-        MESSAGE     => 'Exception: ' . $self->full_message(%args),
-        FACILITY    => 'system',
-        PRIORITY    => 'debug',
-        CALLERLEVEL => 1,
-    );
-
-    # exceptions get logged by default if no "log" given
-    unless (exists $args{log}) {
-        __log(%logger_args);
-        die $self;
-    }
     # suppress logging if "log => undef"
-    unless (defined $args{log}) {
+    if (exists $args{log} && !defined $args{log}) {
         die $self;
     }
 
-    $logger_args{MESSAGE}  = $args{log}->{message}  if exists $args{log}->{message};
-    $logger_args{FACILITY} = $args{log}->{facility} if exists $args{log}->{facility};
-    $logger_args{PRIORITY} = $args{log}->{priority} if exists $args{log}->{priority};
+    my $message = $args{log}->{message} || $self->full_message(%args);
+    my $facility = $args{log}->{facility} || 'system';
+    my $priority = $args{log}->{priority} || 'error';
 
-    # logger object was explicitly specified
-    if ( exists $args{log}->{logger}
-        and ( ref $args{log}->{logger} eq 'OpenXPKI::Server::Log' ) ) {
-        $args{log}->{logger}->log(%logger_args);
-        delete $args{log};
-    }
-    # standard logging
-    else {
-        __log(%logger_args);
-    }
-
-    die $self;
-}
-
-sub __log {
-    my %logger_args = ( @_ );
-
-    my $logger;
     eval {
-        $logger = OpenXPKI::Server::Context::CTX('log');
+        # this hides this subroutine from the call stack to get the real
+        # location of the exception
+        local $Log::Log4perl::caller_depth =
+              $Log::Log4perl::caller_depth + 2;
+
+        if (OpenXPKI::Server::Context::hascontext('log')) {
+            my $log = OpenXPKI::Server::Context::CTX('log');
+            $log->$facility()->$priority( $message );
+        } else {
+            my $log = Log::Log4perl->get_logger('openxpki.'. $facility );
+            $log->$priority( $message );
+        }
     };
 
-    if (defined $logger) {
-        # we have an OpenXPKI logger available
-        $logger->log(%logger_args);
-    }
-    else {
-        # no system logger found, falling back to Log4perl
-        $log4perl_logger ||= get_logger('openxpki.system');
-        $log4perl_logger->debug($logger_args{MESSAGE});
-    }
+    die $self;
 }
 
 sub __fake_stacktrace_new {

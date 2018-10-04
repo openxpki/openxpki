@@ -19,10 +19,16 @@ The general configuration block looks like::
         namespace: namespace (to be used with oracle)
         environment:
             db_driver_env_key: value
+        driver:
+            LongReadLen: 10000000
 
-OpenXPKI supports MySQL, PostgreSQL, Oracle and DB2. The *namespace* parameter is used only by the Oracle driver. DB2 uses only the *name* parameter and reads other settings from the environment, which are passed as a key/value list below the *environment* key.
+OpenXPKI supports MySQL, PostgreSQL, Oracle and DB2.
+The *namespace* parameter is used only by the Oracle driver.
+DB2 uses only the *name* parameter and reads other settings from the environment,
+which are passed as a key/value list below the *environment* key.
+Options given to ``driver`` are passed to DBI as extra parameters.
 
-Check perldoc OpenXPKI::Server::DBI::Driver::<type> for more info on the parameters.
+Check perldoc OpenXPKI::Server::Database::Driver::<type> for more info on the parameters.
 
 System
 -----------------------
@@ -91,6 +97,28 @@ The *service* block lists all services to be enabled, the key is the name of the
     data_exchange:
 
 TODO - this is not used yet
+
+Server Type (Fork vs. PreFork)
+------------------------------
+
+The default is ``Fork`` which create a new child on every incoming
+connection, handles the current request and exits. The webui resuses the
+backend connection as long as the CGI wrapper is running but most of the
+other clients don't and there require a new fork on every request.
+
+To reuse existing childs you can set the server type to prefork which
+forkes of child process on server startup and reuses them for multiple
+connections. In server.yaml uncomment this block::
+
+    type: PreFork
+    prefork:
+      min_servers: 5
+      min_spare_servers: 5
+      max_servers: 25
+      max_spare_servers: 10
+
+The option is optional, if not provided the defaults of the Net::Server
+module are used.
 
 Watchdog
 --------

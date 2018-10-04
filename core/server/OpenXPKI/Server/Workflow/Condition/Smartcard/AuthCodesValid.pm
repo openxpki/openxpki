@@ -25,7 +25,7 @@ sub gethashsalt {
     my ($workflow, $a)    = @_;
     my $context = $workflow->context();
     my $hash = $context->param( $a . '_hash' );
-    my $salt = $context->param( '+' . $a . '_salt' );   
+    my $salt = $context->param( '+' . $a . '_salt' );
     return ( $hash, $salt );
 }
 
@@ -43,14 +43,6 @@ sub evaluate {
     my ( $self, $workflow ) = @_;
     my $context = $workflow->context();
     my ( $encrypted_salt, $salt, $hash, $code, $newhash );
-
-    # Keep track of count in num_tries 
-    my ($num_tries) = $context->param('num_tries');
-    $num_tries++;
-    
-    # @todo: manipulation the context is not allowed!
-    # need refactoring of the pin unblock workflow    
-    $context->param( 'num_tries', $num_tries );
 
     my %tmp = ();
     foreach (qw( _auth1_code _auth2_code )) {
@@ -85,11 +77,8 @@ sub evaluate {
         return -1;
     }
 
-    CTX('log')->log(
-        MESSAGE => "Auth codes checked.",
-        PRIORITY => 'debug',
-        FACILITY => [ 'application', ],
-    ); 
+    CTX('log')->application()->debug("Auth codes checked.");
+
 
     return 1
 
@@ -114,4 +103,4 @@ OpenXPKI::Server::Workflow::Condition::Smartcard::AuthCodesValid
 =head1 DESCRIPTION
 
 Check the auth codes presented by the user against the recorded ones.
-Increases the context value "num_tries" on each call.
+

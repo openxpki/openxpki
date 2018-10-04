@@ -453,7 +453,7 @@ action:
           - csr_serial
         param: 
             SetContextParameters: overwritecontext,extendedsyntax
-            tmp_queue: $context->param('csr_serial')
+            _map_tmp_queue: $csr_serial
 
     create_escrow_csr: 
         class: Workflow::Action::Null
@@ -546,7 +546,7 @@ action:
           - certs_to_create
         param: 
             SetContextParameters: overwrite,extendedsyntax
-            tmp_queue: $context->param('certs_to_create')
+            _map_tmp_queue: $certs_to_create
 
     initialize: 
         class: Workflow::Action::Null

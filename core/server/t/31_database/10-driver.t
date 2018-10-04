@@ -3,9 +3,9 @@ use warnings;
 use English;
 use Test::More;
 use Test::Exception;
-use File::Spec::Functions qw( catfile catdir splitpath rel2abs );
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($ENV{TEST_VERBOSE} ? $ERROR : $OFF);
 
-my $basedir = catdir((splitpath(rel2abs(__FILE__)))[0,1]);
 
 use_ok "OpenXPKI::Server::Database::Role::SequenceEmulation";
 use_ok "OpenXPKI::Server::Database::Role::Driver";
@@ -13,9 +13,7 @@ use_ok "OpenXPKI::Server::Database::Role::Driver";
 #
 # setup
 #
-use_ok "OpenXPKI::Server::Log";
-my $log;
-lives_ok { $log = OpenXPKI::Server::Log->new(CONFIG => catfile($basedir, "log4perl.conf")) };
+my $log = Log::Log4perl->get_logger;
 
 #
 # database driver classes
@@ -31,6 +29,8 @@ sub dbi_connect_params { }
 sub dbi_on_connect_do { }
 sub sqlam_params { limit_offset => 'LimitOffset' }
 sub last_auto_id { 1; } # dummy
+sub sql_autoinc_column { return "INTEGER PRIMARY KEY AUTOINCREMENT" }
+sub table_drop_query { }
 __PACKAGE__->meta->make_immutable;
 
 package OpenXPKI::Server::Database::Driver::OxitestdbList;

@@ -6,4 +6,5 @@ param:
     retry_interval: +0000000005
     retry_random: 50
     pause_on_error: 1
+    _map_ca_alias: $ca_alias
     _map_cert_owner: $creator
