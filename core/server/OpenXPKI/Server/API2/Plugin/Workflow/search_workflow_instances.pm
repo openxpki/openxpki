@@ -238,8 +238,6 @@ sub _make_query_params {
             ? @{ $args->type } # if specified, only query given workflow types ('type' param is always an ArrayRef)
             : CTX('config')->get_keys([ 'workflow', 'def' ]); # otherwise: query all types
 
-        my @include_wf_types = ();
-        my %role_acl_by_wftype = ();
         my $add_creator = 0; # only join workflow_attributes table if neccessary
 
         for my $type (@wf_types_to_check) {
@@ -248,7 +246,6 @@ sub _make_query_params {
             # do not query this workflow type if there's no ACL (i.e. no access) for the current user's role
             next unless $creator_acl;
 
-            push @include_wf_types, $type;
 
             # store ACLs:
             # 1. as a cache for the other for-loop below that inserts WHERE clauses
