@@ -210,10 +210,10 @@ sub _make_query_params {
         for my $type (@wf_types_to_check) {
             my $creator_acl = CTX('config')->get([ 'workflow', 'def', $type, 'acl', $role, 'creator' ]);
 
-            # do not query this workflow type if there's no ACL (i.e. no access) for the current user's role
-            next unless $creator_acl;
+            # skip workflow type if there's no ACL (i.e. no access) for the current user's role
+            next if not defined $creator_acl;
 
-            # regex type ACL? Skip workflow type if current user does not match
+            # skip workflow type if current user's role does not match regex type ACL
             if ($creator_acl !~ / ^ ( self | others | any ) $ /msx) {
                 next if $user !~ qr/$creator_acl/;
             }
@@ -222,7 +222,7 @@ sub _make_query_params {
             $self->acl_by_wftype->{$type} = $creator_acl;
 
             # add 'creator' column to be able to filter on it using WHERE later on
-            $add_creator = 1 if $creator_acl ne 'any'; # any = no restriction: user may see all workflows
+            $add_creator = 1 if $creator_acl ne 'any'; # any = no restriction: all users may see this workflow type
         }
 
         ##! 32: 'ACL check - workflow types and ACLs: ' . join(", ", map { sprintf "%s=%s", $_, $self->acl_by_wftype->{$_} } keys %{ $self->acl_by_wftype })
