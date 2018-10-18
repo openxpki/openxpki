@@ -100,7 +100,12 @@ sub certificate_import {
         return 2;
     }
 
-    my ($extracted_certdata) = $certdata =~ m{ \A .* (-----BEGIN\ CERTIFICATE----- .* -----END\ CERTIFICATE-----) .* \z}xms;
+    my ($extracted_certdata) = $certdata =~ m{ \A .* (-----BEGIN\ ([\w\s]*)CERTIFICATE----- [^-]+ -----END\ \2CERTIFICATE-----) .* \z}xms;
+
+    if (!$extracted_certdata) {
+        print STDERR "ERROR: provided file does not contain a PEM encoded certificate\n";
+        return 2;
+    }
 
     my $api_param = { DATA => $extracted_certdata };
 

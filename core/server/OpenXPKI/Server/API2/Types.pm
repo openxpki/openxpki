@@ -73,7 +73,7 @@ A PEM encoded certificate
 =cut
 subtype 'PEMCert',
     as 'PEM',
-    where { $_ =~ m{ \A -----BEGIN\ CERTIFICATE----- [^-]+ -----END\ CERTIFICATE----- \Z }msx },
+    where { $_ =~ m{ \A -----BEGIN\ ([\w\s]*)CERTIFICATE----- [^-]+ -----END\ \1CERTIFICATE----- \Z }msx },
     message { "$_ is not a PEM encoded certificate" };
 
 =head2 PEMCertChain
