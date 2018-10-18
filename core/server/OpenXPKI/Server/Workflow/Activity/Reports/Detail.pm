@@ -254,14 +254,14 @@ sub execute {
     if ($join) {
         $sth = CTX('dbi')->select(
             from_join => 'certificate '.$join,
-            order_by => [ '-notbefore', '-cert_key' ],
+            order_by => [ '-notbefore', '-req_key' ],
             columns  => $cols,
             where => \%where,
         );
     } else {
         $sth = CTX('dbi')->select(
             from => 'certificate',
-            order_by => [ '-notbefore', '-cert_key' ],
+            order_by => [ '-notbefore', '-req_key' ],
             columns  => $cols,
             where => \%where,
         );

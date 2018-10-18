@@ -111,7 +111,7 @@ in attributes (KEY, VALUE, OPERATOR). Operator can be "EQUAL", "LIKE" or
 =item * C<start> I<Int> - result paging: only return entries starting at given
 index (can only be used if C<limit> was specified)
 
-=item * C<order> I<Str> - order results by this table column (descending). Default: "cert_key"
+=item * C<order> I<Str> - order results by this table column (descending). Default: "notbefore" (+req_key to properly work with duplicates)
 
 =item * C<reverse> I<Bool> - order results ascending
 
@@ -249,7 +249,14 @@ sub _make_db_query_additional_params {
     # Custom ordering
     my $desc = "-"; # not set or 0 means: DESCENDING, i.e. "-"
     $desc = "" if $po->has_reverse and $po->reverse == 0;
-    $params->{order_by} = sprintf "%scertificate.%s", $desc, lc($po->has_order ? $po->order : 'cert_key');
+
+    if ($po->has_order) {
+        $params->{order_by} = sprintf "%scertificate.%s", $desc, lc($po->order);
+    } elsif ($desc) {
+        $params->{order_by} = [ '-certificate.notbefore', '-certificate.req_key' ];
+    } else {
+        $params->{order_by} = [ 'certificate.notbefore', 'certificate.req_key' ];
+    }
 
     return $params;
 }

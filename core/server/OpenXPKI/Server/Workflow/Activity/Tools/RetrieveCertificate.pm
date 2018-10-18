@@ -133,7 +133,7 @@ sub execute {
             $self->cert_subject     ? ('certificate.subject' => $self->cert_subject) : (),
             $status_filter ne 'ANY' ? ('certificate.status'  => $status_filter)      : (),
         },
-        order_by => [ '-certificate.cert_key' ],
+        order_by => [ '-certificate.notbefore', '-certificate.req_key' ],
     );
     ##! 16: 'certificate found: ' . Dumper $cert
 

@@ -420,7 +420,7 @@ sub issueCRL {
             issuer_identifier => $ca_identifier,
             status => [ 'REVOKED', 'CRL_ISSUANCE_PENDING' ],
         },
-        order_by => [ 'cert_key' ]
+        order_by => [ 'notbefore', 'req_key' ]
     );
 
     push @cert_timestamps, $self->__prepare_crl_data($certs);
