@@ -528,12 +528,6 @@ CREATE INDEX cert_attributes_key_index ON certificate_attributes USING btree (at
 CREATE INDEX cert_csr_serial_index ON certificate USING btree (req_key);
 
 --
--- Name: cert_csrid_index; Type: INDEX; Schema: public; Tablespace:
---
-
-CREATE INDEX cert_csrid_index ON certificate USING btree (req_key);
-
---
 -- Name: cert_identifier_index; Type: INDEX; Schema: public; Tablespace:
 --
 
