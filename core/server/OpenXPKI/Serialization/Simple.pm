@@ -126,7 +126,7 @@ sub is_serialized {
     my $msg  = shift;
     return (defined $msg &&
         ref $msg eq '' &&
-        $msg =~ /^(SCALAR|BASE64|ARRAY|HASH|UNDEF|OXJSF1|OXB64)/);
+        $msg =~ /^(((SCALAR|ARRAY|HASH|UNDEF|BASE64)(\w|\n|-))|OXJSF1|OXB64)/);
 
 }
 
