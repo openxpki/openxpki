@@ -154,6 +154,30 @@ With a properly prepared workflow, this allows you access an existing
 workflow based on the transaction_id. For now it is only possible to
 read existing workflows, there is no option to interact with them, yet.
 
+Examples
+========
+
+The default.conf configuration file defines an endpoint SearchCertificate::
+
+    [SearchCertificate]
+     workflow = certificate_search
+     param = common_name
+     output = cert_identifier, notbefore, notafter, status
+
+To utilize this endpoint the following curl command may be used::
+
+    $ curl -F "method=SearchCertificate"  -F "common_name=test" http://localhost:8080/rpc
+    {"result":{"id":0,"data":{"notafter":"2019-04-19T05:21:58","notbefore":"2018-10-19T05:21:58", \
+    "status":"ISSUED","cert_identifier":"7Da0qfjirGl7PXlZYf9PFVqMJds"},"state":"SUCCESS","pid":915}}
+    
+The RequestCertificate endpoint (see above) may be used via::
+
+    $ curl -F method=RequestCertificate  -F comment=test -F pkcs10="$(cat certreq.pem)" http://localhost:8080/rpc
+    {"result":{"id":"5119","state":"SUCCESS","data":{"cert_identifier":"60uHCnC3Uv9wZKjcCkmSHuBwuzU"},"pid":915}}
+
+Of course proper authentication and authorization is required for the 
+cerificate to be issued immediately. The required configuration parameters 
+are documented in the scep workflow.
 
 See Also
 ========
