@@ -88,6 +88,12 @@ sub init {
         $self->reap_at( $wf_info->{reap_at} );
     }
 
+    # the condition cache bug also affects the get_action_fields method
+    # which we use prior execute_action to validate the input parameters
+    # so we clear the cache in the current state anytime we init a workflow
+    # see jonasbn/perl-workflow#9
+    $self->_get_workflow_state()->clear_condition_cache();
+
     ##! 16: 'count try: '.$count_try
     $self->count_try( $count_try );
     $self->proc_state( $proc_state );
@@ -465,7 +471,6 @@ sub get_global_actions {
     return \@allowed;
 
 }
-
 
 sub _handle_proc_state{
     my ( $self, $action_name ) = @_;
