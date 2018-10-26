@@ -6,7 +6,7 @@ apt-get update
 
 # Install the deps
 export DEBIAN_FRONTEND=noninteractive
-apt-get install --assume-yes  dh-make-perl mysql-server libdbd-mysql-perl
+apt-get install --assume-yes  dh-make-perl mysql-server libdbd-mysql-perl libapache2-mod-fcgid
 cat /code-repo/package/debian/build-deps.lst | xargs apt-get install --assume-yes
 
 # packages required for testing only
@@ -47,17 +47,16 @@ make clean
 # on Ubuntu 14 we also need CGI and Module::Load
 if [ "`grep "Ubuntu 14" /etc/issue`" ]; then
     make trusty
-    # Module::* is required by the cpan deps already 
-    dpkg -i deb/cpan/*deb 
+    # Module::* is required by the cpan deps already
+    dpkg -i deb/cpan/*deb
 fi
 
 make cpan_dependency cpan_dependency2
 
-# Install remaining deps 
-dpkg -i deb/cpan/*deb 
+# Install remaining deps
+dpkg -i deb/cpan/*deb
 
-make core
-make i18n
+make openxpki
 
 # Install the stuff - this exits with false due to unresolved deps
 dpkg -i deb/core/*deb || /bin/true

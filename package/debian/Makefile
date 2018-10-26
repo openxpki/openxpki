@@ -54,6 +54,8 @@ CORE = \
 
 .PHONY : $(PACKAGES) $(EXTERNAL) $(EXTERNAL2) CGI DateTime__Format__DateParse
 
+openxpki: $(PACKAGES) 
+
 cpan_dependency: $(EXTERNAL) 
 
 cpan_dependency2: $(EXTERNAL2) 
