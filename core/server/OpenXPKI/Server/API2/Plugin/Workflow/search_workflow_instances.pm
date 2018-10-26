@@ -129,7 +129,7 @@ of workflows found.
 
 See L</search_workflow_instances> for available parameters. Note that for
 compatibility with I<search_workflow_instances> the following parameters are
-accepted but ignored: C<attribute>, C<return_attributes>, C<start>, C<limit>,
+accepted but ignored: C<return_attributes>, C<start>, C<limit>,
 C<order>, C<reverse>.
 
 =cut
@@ -152,7 +152,6 @@ command "search_workflow_instances_count" => {
 
     ##! 1: "start"
 
-    $params->attribute([]);
     $params->clear_start;
     $params->clear_limit;
     $params->clear_order;
