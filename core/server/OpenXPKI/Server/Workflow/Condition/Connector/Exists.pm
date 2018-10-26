@@ -16,6 +16,9 @@ sub _evaluate
     my ( $self, $workflow ) = @_;
 
     my $path = $self->param('config_path');
+
+    configuration_error('Path is empty') unless ($path);
+
     my $delimiter = $self->param('delimiter') || '\.';
 
     if ($delimiter eq '.') { $delimiter = '\.'; }
