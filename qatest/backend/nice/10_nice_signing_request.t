@@ -108,7 +108,7 @@ else {
 $wf->state_is($intermediate_state);
 
 # ACL Test - should not be allowed to user
-$wf->execute_fails('csr_put_request_on_hold' => { onhold_comment => 'No Comment'}, qr/csr_acl_can_approve/);
+$wf->execute_fails('csr_put_request_on_hold' => { onhold_comment => 'No Comment'}, qr/No access to action/);
 
 
 # set current user to: operator
