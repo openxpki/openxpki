@@ -14,29 +14,45 @@ not behave correctly or even wont start.
 For a quick overview of config changes, you should always check the
 config repository at https://github.com/openxpki/openxpki-config.
 
-Release vX.XX
+Release v2.x
 -------------
 
-OpenXPKI now supports the Cloudflare OCSP Responder
-https://github.com/cloudflare/cfssl
+Upgrading from v1.x to v2.x requires some manual changes!
 
-The Cloudflare OCSP responder can seamlessly access the OpenXPKI
-database and serve precomputed responses.
+You MUST upgrade your database schema::
 
-In order to upgrade to this version you need to create a new table:
+    ALTER TABLE `certificate`
+      ADD `revocation_time` int(10) unsigned DEFAULT NULL,
+      ADD `invalidity_time` int(10) unsigned DEFAULT NULL,
+      ADD `reason_code` varchar(50) DEFAULT NULL,
+      ADD `hold_instruction_code` varchar(50) DEFAULT NULL;
 
-  CREATE TABLE IF NOT EXISTS `ocsp_responses` (
-    `identifier` varchar(64),
-    `serial_number` varbinary(128) NOT NULL,
-    `authority_key_identifier` varbinary(128) NOT NULL,
-    `body` varbinary(4096) NOT NULL,
-    `expiry` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    UPDATE `crr` crr LEFT JOIN certificate crt USING (identifier)
+    SET crt.reason_code = crr.reason_code,
+        crt.revocation_time = crr.revocation_time,
+        crt.invalidity_time = crr.invalidity_time,
+        crt.hold_instruction_code = crr.hold_code;
 
-  ALTER TABLE `ocsp_responses`
-   ADD PRIMARY KEY (`serial_number`,`authority_key_identifier`), ADD KEY `identifier` (`identifier`);
+    ALTER TABLE `workflow_history`
+    ADD`workflow_node` varchar(64) DEFAULT NULL;
+
+    ALTER TABLE `crl`
+    ADD `crl_number` decimal(49,0) DEFAULT NULL,
+    ADD `items` int(10) DEFAULT 0,
+    ADD KEY `crl_number` (`issuer_identifier`,`crl_number`);
 
 
+You SHOULD copy over the new default workflows, the old default workflows
+SHOULD continue working but some of the workflow classes have changed, so in
+case you made extensions please check the conifguration for deltas!
+
+In case you use SCEP please note that the definition of the workflow to use
+has moved from the "outer" wrapper configuration to the "inner" configuration
+file inside the realm. You should also switch from the old workflow type
+"enrollment" to the new "certificate_enroll" which has basically the same
+functionality but a lot better error handling and extensions. Note that the
+format of the workflow configuration file was also changed! Check the provided
+samples for details.
 
 Release v1.19
 -------------
