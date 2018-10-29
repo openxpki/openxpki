@@ -35,7 +35,7 @@ if [ ! -f $SCRIPT_DIR/docker/setup/packages/oracle-xe-11.2*.rpm.zip ]; then
 ERROR - Missing Oracle XE setup file
 
 Please download the Oracle XE 11.2 setup for Linux from
-http://www.oracle.com/technetwork/database/database-technologies/express-edition/downloads/index.html
+https://www.oracle.com/technetwork/database/database-technologies/express-edition/downloads/xe-prior-releases-5172097.html
 and place it in <vagrant>/assets/oracle/docker/setup/packages/
 
 When you are done, run "vagrant provision" to continue.
