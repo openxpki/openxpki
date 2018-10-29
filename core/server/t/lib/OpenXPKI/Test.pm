@@ -59,10 +59,10 @@ This provides the following OpenXPKI context objects:
     CTX('session')        # in-memory
     CTX('notification')   # mockup
 
+The session PKI realm is set to I<TestRealm> and the user role to I<User>.
+
 At this point, various more complex functions (e.g. crypto operations) will not
 be available, but the test environment can be extended via:
-
-The session PKI realm is set to I<SomeRealm> and the user role to I<SomeRole>.
 
 =over
 
@@ -79,7 +79,7 @@ extensions (constructor parameter C<with>)
 
 For more details, see the L<constructor documentation|/new>.
 
-=head2 Moose roles
+=head2 More complex tests via Moose roles
 
 The existing roles add more complex configuration and initialization to test
 more functions. They can easily be applied by using the L<constructor|/new>
@@ -98,10 +98,6 @@ tests)
 
 PLEASE NOTE: tests currently still use the production database but it is planned
 to use a separate SQLite DB for all tests in the future.
-
-=head2 More complex tests via Moose roles
-
-For details please see L<constructor|/new> parameter C<with>.
 
 B<Examples:>
 
@@ -203,7 +199,7 @@ B<Parameters> (these are Moose attributes and can be accessed as such)
 last part of Moose roles to apply to C<OpenXPKI::Test>. Currently the
 following names might be specified:
 
-For unit tests below I<core/server/t/> or QA tests:
+For unit tests (I<core/server/t/>) or QA tests (I<qatest/>):
 
 =over
 
@@ -215,7 +211,7 @@ I<alpha>, I<beta> and I<gamma> to configuration
 
 =back
 
-Only for QA tests below I<qatest/>:
+Only for QA tests (I<qatest/>):
 
 =over
 
@@ -466,7 +462,7 @@ Just a shortcut to L<OpenXPKI::Test::ConfigWriter/default_realm>.
 
 =head2 session
 
-Returns the session context object (C<CTX('session')> once L</init_server> was
+Returns the session context object C<CTX('session')> once L</init_server> was
 called.
 
 =cut
@@ -623,7 +619,7 @@ sub _build_conf_database {
 
 =head2 init_logging
 
-Basic test setup: logging.
+B<Only called internally:> initialize logging.
 
 =cut
 sub init_logging {
@@ -679,18 +675,19 @@ sub diag_log {
 
 =head2 init_base_config
 
-Basic test setup: pass base config entries to L<OpenXPKI::Test::ConfigWriter>.
+B<Only called internally:> pass base config entries to L<OpenXPKI::Test::ConfigWriter>.
 
-This is the standard hook for roles to add configuration entries:
+This is the standard hook for test class roles to add configuration entries.
+So in a role you can e.g. inject configuration entries as follows:
 
     after 'init_base_config' => sub {
         my $self = shift;
 
-        # do not overwrite existing node (e.g. inserted by OpenXPKI::Test::QA::Role::SampleConfig)
+        # do not overwrite existing node (e.g. inserted by other roles)
         if (not $self->config_writer->get_config_node("a.b.c", 1)) {
             $self->add_config(
                 "a.b.c" => {
-                    key   => "value",
+                    key => "value",
                 },
             );
         }
@@ -708,8 +705,8 @@ sub init_base_config {
 
 =head2 init_user_config
 
-Basic test setup: pass additional config entries (supplied via constructor
-parameter C<add_config>) to L<OpenXPKI::Test::ConfigWriter>.
+B<Only called internally:> pass additional config entries that were supplied via
+constructor parameter C<add_config> to L<OpenXPKI::Test::ConfigWriter>.
 
 =cut
 sub init_user_config {
@@ -730,7 +727,7 @@ sub init_user_config {
 
 =head2 write_config
 
-Write test configuration to disk (temporary directory).
+B<Only called internally:> write test configuration to disk (temporary directory).
 
 =cut
 sub write_config {
@@ -755,7 +752,7 @@ sub write_config {
 
 =head2 init_server
 
-Initializes the basic server context objects:
+B<Only called internally:> initializes the basic server context objects:
 
     C<CTX('config')>
     C<CTX('log')>
@@ -809,8 +806,8 @@ sub init_server {
 
 =head2 init_session_and_context
 
-Basic test setup: create in-memory session (C<CTX('session')>) and (if there
-is no other object already) a mock notification objection (C<CTX('notification')>).
+B<Only called internally:> create in-memory session C<CTX('session')> and (if there
+is no other object already) a mock notification objection C<CTX('notification')>.
 
 This is the standard hook for roles to modify session data, e.g.:
 
@@ -840,7 +837,8 @@ sub init_session_and_context {
 Directly sets the current PKI realm and user in the session without any login
 process.
 
-The user must exist within the L<authentication config|/auth_config>.
+The user must exist within the authentication config path, i.e. as
+I<realm.RRR.auth.handler.HHH.user.USER>.
 
 B<Positional Parameters>
 
@@ -881,7 +879,7 @@ sub set_user {
 
 Executes the given API2 command and returns the result.
 
-Convenience method to prevent usage of CTX('api') in test files.
+Convenience method to prevent usage of C<CTX('api')> in test files.
 
 B<Positional Parameters>
 
@@ -903,7 +901,7 @@ sub api_command {
 
 Executes the given API2 command and returns the result.
 
-Convenience method to prevent usage of CTX('api2') in test files.
+Convenience method to prevent usage of C<CTX('api2')> in test files.
 
 B<Positional Parameters>
 
