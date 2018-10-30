@@ -112,6 +112,16 @@ Please note that the tests currently use the database that is configured in ``/e
      prove -I ../local/lib/perl5 -I ../core/server -r backend/nice backend/api backend/api2 backend/webui client
      cd ..
 
+Automatically via Travis-CI
+---------------------------
+
+Whenever a new commit of the code is pushed onto Github, a Travis-CI test run
+is triggered that runs all of the active tests.
+
+You can find the results at `<https://travis-ci.org/openxpki/openxpki>`_.
+
+For more details see ``.travis.yml`` in the projects' root directory.
+
 Writing tests
 #############
 
