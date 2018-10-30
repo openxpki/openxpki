@@ -2,7 +2,7 @@
 Tests
 =====
 
-The OpenXPKI project contains a large but growing number of tests to ensure
+The OpenXPKI project contains a large and still growing number of tests to ensure
 code quality and ease refactoring.
 
 Historically tests are categorized into two groups:
@@ -38,21 +38,38 @@ VM (i.e. "Vagrant Box").
 
 *Prerequisites: Virtualbox, Vagrant, Oracle XE 11.2 setup*
 
+**Once**
+
 1. Download the Oracle XE 11.2 setup for Linux from
    `<https://www.oracle.com/technetwork/database/database-technologies/express-edition/downloads/xe-prior-releases-5172097.html>`_
    and place it in ``vagrant/develop/assets/oracle/docker/setup/packages/``
    (You need an Oracle login to do that).
 
-2. Build the Vagrant box (=VM) once, which takes a long while, start it and use it.
+2. Build the Vagrant box (=VM) once, which takes a long while, and start it.
    ::
      # assuming you are in the projects' root directory:
      cd vagrant/develop
      vagrant up
-     vagrant ssh
+     # have several cups of tea...
 
-3. Run the tests inside the box
+**After code changes**
+
+1. Start the Vagrant box and log in
    ::
+     # assuming you are in the projects' root directory:
+     cd vagrant/develop
+     vagrant up && vagrant ssh
+
+2. Refresh the code
+
+   To make sure all dependencies inside the VM are in sync with the files on
+   your host (e.g. after code changes), refresh them inside Vagrant::
      sudo su
+     oxi-refresh
+     # maybe start with a clean DB: oxi-initdb
+
+3. Run the tests
+   ::
      docker start mariadb
      docker start oracle
      cd /code-repo
@@ -65,29 +82,28 @@ VM (i.e. "Vagrant Box").
      PERL5LIB=./ prove -r backend/nice backend/api backend/api2 backend/webui client
      cd ..
 
-4. Refresh the box
-
-   To make sure all dependencies inside the VM are in sync with the files on
-   your host (e.g. after code changes), refresh them inside Vagrant::
-     oxi-refresh
-
-
 Using a local dev environment
 -----------------------------
 
-Prerequisites: Database, Linux packages etc. (see :ref:`quickstart`)
+*Prerequisites: Database, Linux packages etc.*
 
-1. Set up a running OpenXPKI instance.
+**Once**
 
-   Please note that the tests currently use the database that is configured in ``/etc/openxpki/config.d``.
+Set up a running OpenXPKI instance as described in :ref:`quickstart`.
+Please note that the tests currently use the database that is configured in ``/etc/openxpki/config.d``.
 
-2. Install required Perl modules:
+**After code changes**
+
+1. Update required Perl according to current Makefile
    ::
-     # Example, assuming you are in the projects' root directory:
+     # assuming you are in the projects' root directory:
      cpanm Carton
      ./tools/scripts/makefile2cpanfile.pl > cpanfile
      carton install
 
+2. Run the tests
+   ::
+     # assuming you are in the projects' root directory:
      cd core/server
      prove -I ../../local/lib/perl5 -r t
      cd ../..
