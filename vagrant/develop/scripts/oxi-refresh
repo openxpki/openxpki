@@ -50,17 +50,17 @@ sed -ri 's/(LOCATION:)\s*\/tmp.*/\1 \/var\/tmp/g' /etc/openxpki/config.d/realm/c
 #
 # Compile OpenXPKI
 #
-echo "Synchronizing source code from host to $OXI_CORE_DIR"
-rsync -a --delete --exclude=.git/ /code-repo/core/ $OXI_CORE_DIR
-
 OXI_VERSION=$(cat /code-repo/.VERSION_MAJOR <(echo .) /code-repo/.VERSION_MINOR <(echo .) /code-repo/.VERSION_RELEASE | tr -d "\n" )
 
-# Set version so Makefile.PL does not need "vergen" (which we did not copy to $OXI_CORE_DIR)
-cat <<__VERSION > $OXI_CORE_DIR/server/OpenXPKI/VERSION.pm
+# Set version so Makefile.PL does not need "vergen" (which we will not copy to $OXI_CORE_DIR)
+cat <<__VERSION > /code-repo/core/server/OpenXPKI/VERSION.pm
 package OpenXPKI::VERSION;
 our \$VERSION = '$OXI_VERSION';
 1;
 __VERSION
+
+echo "Synchronizing source code from host to $OXI_CORE_DIR"
+rsync -a --delete --exclude=.git/ /code-repo/core/ $OXI_CORE_DIR
 
 pushd $OXI_CORE_DIR/server                                            >$LOG 2>&1
 perl Makefile.PL                                                      >$LOG 2>&1
