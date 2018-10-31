@@ -63,7 +63,10 @@ has subject => (
     lazy => 1,
     default => sub {
         my $self = shift;
-        return join(',', reverse @{$self->_cert()->Subject});
+        return join ",", map {
+            # Replace S -> ST and l => L, see #674
+            $_ =~ s{\AS=}{ST=}; $_ =~ s{\Al=}{L=}; $_
+        } reverse @{$self->_cert()->Subject};
     }
 );
 
