@@ -16,12 +16,15 @@ Modification
 ============
 
 To make major modifications, you can edit the source code and recompile it 
-afterwards. Use the "bungle" compiler, which is available using the Node.js
-package manager npm and run "bungle build" inside this directory. This will
-copy all requried files into the dist/ directory.
+afterwards. Use the "bungle" compiler (Version 0.2.0), which is available 
+using the Node.js package manager npm and run "bungle build" inside this 
+directory. This will copy all requried files into the dist/ directory.
 
 Note: Bungle uses inotify, if you get an exception like "Error: watch ENOSPC"
 you need to raise fs.inotify.max_user_watches.
+
+Note2: If you get an error that "vendor/ember" is not found, apply the file 
+"esx-bower.patch", remove the vendor directory and rebuild.
 
 Uglification
 ############

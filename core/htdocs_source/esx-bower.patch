@@ -1,0 +1,11 @@
+--- node_modules/esx-bower/index.js.org	2018-10-31 19:05:22.180306123 +0100
++++ node_modules/esx-bower/index.js	2018-10-31 17:46:10.313072245 +0100
+@@ -122,7 +122,7 @@
+     this.patches = options.patches ||
+         "https://raw.githubusercontent.com/durko/esx-legacy/master/patch.json";
+     this.baseDir = options.baseDir || "src";
+-    this.vendorPrefix = options.vendorPrefix || "";
++    this.vendorPrefix = options.vendorPrefix || "vendor";
+ 
+     this.state = options.state || {};
+     this.state.packages = this.state.packages || {};
