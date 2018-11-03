@@ -176,39 +176,6 @@ sub _search {
     # run SELECT query
     my $result = CTX('dbi')->select(%sql)->fetchall_arrayref({});
 
-    # ACLs part 3: apply ACL checks of type RegEx by filtering 'creator'
-    if ($params->check_acl) {
-        my ($acl, $is_regex);
-
-        # check if there's any regex ACL
-        my $at_least_one_regex_acl = 0;
-
-        # map: workflow_type => is_regex_acl
-        my $acl_by_type = {
-            map {
-                $acl = $self->acl_by_wftype->{$_};
-                # ACL of type regex?
-                $is_regex = $acl !~ /^(any|self|others)$/;
-                $at_least_one_regex_acl |= $is_regex;
-                ( $_ => { acl => $acl, is_regex => $is_regex } )
-            }
-            keys %{ $self->acl_by_wftype }
-        };
-
-        if ($at_least_one_regex_acl) {
-            # apply regex checks
-            my $type;
-            $result = [ grep {
-                $type = $_->{workflow_type};
-                $acl = $acl_by_type->{$type}->{acl};
-                # if it's a regex...
-                $acl_by_type->{$type}->{is_regex}
-                    ? $_->{creator} =~ qr/$acl/  # ...apply it
-                    : 1
-            } @$result ];
-        }
-    }
-
     return $result;
 }
 
@@ -238,25 +205,24 @@ sub _make_query_params {
             ? @{ $args->type } # if specified, only query given workflow types ('type' param is always an ArrayRef)
             : CTX('config')->get_keys([ 'workflow', 'def' ]); # otherwise: query all types
 
-        my @include_wf_types = ();
-        my %role_acl_by_wftype = ();
         my $add_creator = 0; # only join workflow_attributes table if neccessary
 
         for my $type (@wf_types_to_check) {
             my $creator_acl = CTX('config')->get([ 'workflow', 'def', $type, 'acl', $role, 'creator' ]);
 
-            # do not query this workflow type if there's no ACL (i.e. no access) for the current user's role
-            next unless $creator_acl;
+            # skip workflow type if there's no ACL (i.e. no access) for the current user's role
+            next if not defined $creator_acl;
 
-            push @include_wf_types, $type;
+            # skip workflow type if current user's role does not match regex type ACL
+            if ($creator_acl !~ / ^ ( self | others | any ) $ /msx) {
+                next if $user !~ qr/$creator_acl/;
+            }
 
-            # store ACLs:
-            # 1. as a cache for the other for-loop below that inserts WHERE clauses
-            # 2. to remember ACLs of type "RegEx" where checks have to be done after the SQL query
+            # ACLs stored here will be added as WHERE clauses below
             $self->acl_by_wftype->{$type} = $creator_acl;
 
             # add 'creator' column to be able to filter on it using WHERE later on
-            $add_creator = 1 if $creator_acl ne 'any'; # any = no restriction: user may see all workflows
+            $add_creator = 1 if $creator_acl ne 'any'; # any = no restriction: all users may see this workflow type
         }
 
         ##! 32: 'ACL check - workflow types and ACLs: ' . join(", ", map { sprintf "%s=%s", $_, $self->acl_by_wftype->{$_} } keys %{ $self->acl_by_wftype })
@@ -383,7 +349,10 @@ sub _make_query_params {
             elsif ('others' eq $acl) {
                 push @where_additions, { 'workflow_type' => $type, $creator_col => { '!=', $user } };
             }
-            # interpret anything else as a regex pattern: creator is filtered AFTER the SQL query
+            # interpret anything else as a regex pattern
+            # (no further checks needed: the workflow type beeing stored in
+            # $self->acl_by_wftype means that the current session user matches
+            # the ACL, see "ACLs part 1" above)
             else {
                 push @where_additions, { 'workflow_type' => $type };
             }

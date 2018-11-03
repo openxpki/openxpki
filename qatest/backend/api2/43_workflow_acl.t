@@ -99,8 +99,9 @@ my $oxitest = OpenXPKI::Test->new(
         "realm.alpha.workflow.def.wf_type_1_any_$uuid" => workflow_def("wf_type_1", "any"),
         "realm.alpha.workflow.def.wf_type_2_self_$uuid" => workflow_def("wf_type_2", "self"),
         "realm.alpha.workflow.def.wf_type_3_others_$uuid" => workflow_def("wf_type_3", "others"),
-        "realm.alpha.workflow.def.wf_type_4_regex_$uuid" => workflow_def("wf_type_4", "^edel"),
-        "realm.alpha.workflow.def.wf_type_5_noaccess_$uuid" => workflow_def("wf_type_5", undef),
+        "realm.alpha.workflow.def.wf_type_4_regex1_$uuid" => workflow_def("wf_type_4", "^edel"),
+        "realm.alpha.workflow.def.wf_type_5_regex2_$uuid" => workflow_def("wf_type_4", '^.*lma$'),
+        "realm.alpha.workflow.def.wf_type_6_noaccess_$uuid" => workflow_def("wf_type_5", undef),
     },
     enable_workflow_log => 1, # while testing we do not log to database by default
 );
@@ -115,7 +116,8 @@ CTX('session')->data->user('alma');
 my $alma_any = $oxitest->create_workflow("wf_type_1_any_$uuid");
 my $alma_self = $oxitest->create_workflow("wf_type_2_self_$uuid");
 my $alma_others = $oxitest->create_workflow("wf_type_3_others_$uuid");
-my $alma_regex = $oxitest->create_workflow("wf_type_4_regex_$uuid"  );
+my $alma_regex = $oxitest->create_workflow("wf_type_4_regex1_$uuid");
+my $alma_regex2 = $oxitest->create_workflow("wf_type_5_regex2_$uuid");
 
 # "superuser" edeltraut
 CTX('session')->data->role('DieDarf');
@@ -123,19 +125,20 @@ CTX('session')->data->user('edeltraut');
 my $edel_any = $oxitest->create_workflow("wf_type_1_any_$uuid");
 my $edel_self = $oxitest->create_workflow("wf_type_2_self_$uuid");
 my $edel_others = $oxitest->create_workflow("wf_type_3_others_$uuid");
-my $edel_regex = $oxitest->create_workflow("wf_type_4_regex_$uuid");
-my $edel_noaccess = $oxitest->create_workflow("wf_type_5_noaccess_$uuid");
+my $edel_regex = $oxitest->create_workflow("wf_type_4_regex1_$uuid");
+my $edel_noaccess = $oxitest->create_workflow("wf_type_6_noaccess_$uuid");
 
 my $all_ids = [
-    $alma_any->id,
-    $alma_self->id,
-    $alma_others->id,
-    $alma_regex->id,
-    $edel_any->id,
-    $edel_self->id,
-    $edel_others->id,
-    $edel_regex->id,
-    $edel_noaccess->id,
+    $alma_any->id,      # access for all users
+    $alma_self->id,     # access for creator "alma"
+    $alma_others->id,   # access for everybody except the creator "alma"
+    $alma_regex->id,    # access for user ^edel
+    $alma_regex2->id,   # access for user ^.*lma$
+    $edel_any->id,      # access for all users
+    $edel_self->id,     # access for creator "edeltraut"
+    $edel_others->id,   # access by everybody except the creator "edeltraut"
+    $edel_regex->id,    # access by user ^edel
+    $edel_noaccess->id, # no access for anybody
 ];
 
 #
@@ -155,41 +158,42 @@ CTX('session')->data->user('alma');
 # search without any ACL check
 search_result { check_acl => 0, id => $all_ids },
     bag(
-        superhashof({ 'workflow_id' => $alma_any->id }),
-        superhashof({ 'workflow_id' => $alma_self->id }),
-        superhashof({ 'workflow_id' => $alma_others->id }),
-        superhashof({ 'workflow_id' => $alma_regex->id }),
-        superhashof({ 'workflow_id' => $edel_any->id }),
-        superhashof({ 'workflow_id' => $edel_self->id }),
-        superhashof({ 'workflow_id' => $edel_others->id }),
-        superhashof({ 'workflow_id' => $edel_regex->id }),
-        superhashof({ 'workflow_id' => $edel_noaccess->id }),
+        map { superhashof({ 'workflow_id' => $_ }) } @$all_ids
     ),
      "search_workflow_instances() - no ACL check";
 
 # count workflows
 lives_and {
     my $result = $oxitest->api2_command("search_workflow_instances_count" => { id => $all_ids });
-    is $result, 9;
+    is $result, $#{$all_ids} + 1;
 } "search_workflow_instances_count() - no ACL check";
 
 # search with ACL check
 my $query_with_acl_check = { check_acl => 1, id => $all_ids };
 
+my %exclude;
+# these workflows should not be in the result list for "alma":
+my @exclude_list = (
+    $alma_others->id,   # access for everybody except the creator "alma"
+    $alma_regex->id,    # access for user ^edel
+    $edel_self->id,     # access for creator "edeltraut"
+    $edel_regex->id,    # access by user ^edel
+    $edel_noaccess->id, # no access for anybody
+);
+@exclude{@exclude_list} = undef; # use hash slice to populate hash, values don't matter
+
+my @expected = grep { !exists $exclude{$_} } @$all_ids;
+
 search_result $query_with_acl_check,
     bag(
-        superhashof({ 'workflow_id' => $alma_any->id }), # ACL 'any' - workflows by all users
-        superhashof({ 'workflow_id' => $alma_self->id }), # ACL 'self' - own workflows
-        superhashof({ 'workflow_id' => $edel_any->id }), # ACL 'any' - workflows by all users
-        superhashof({ 'workflow_id' => $edel_others->id }), # ACL 'others' - workflow by other users
-        superhashof({ 'workflow_id' => $edel_regex->id }), # ACL with regex - workflow by matching users
+        map { superhashof({ 'workflow_id' => $_ }) } @expected
     ),
      "search_workflow_instances() - with ACL check";
 
 # count workflows
 lives_and {
     my $result = $oxitest->api2_command("search_workflow_instances_count" => $query_with_acl_check);
-    is $result, 5;
+    is $result, $#expected + 1;
 } "search_workflow_instances_count() - with ACL check";
 
 # search with ACL check but no access to ANY workflow

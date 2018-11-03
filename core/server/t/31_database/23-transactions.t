@@ -56,7 +56,7 @@ $db->run("Transactions", 12, sub {
             [ 4, "Schwimmhalle" ],
         ];
     } "insert a row";
-    unlike $t->get_log, qr/start_txn/, "no negative log messages";
+    unlike $t->get_log, qr/transaction start/, "no negative log messages";
 
     #
     # correct transaction with rollback
@@ -75,7 +75,7 @@ $db->run("Transactions", 12, sub {
             [ 4, "Schwimmhalle" ],
         ];
     } "delete a row, but rollback";
-    unlike $t->get_log, qr/start_txn/, "no negative log messages";
+    unlike $t->get_log, qr/transaction start/, "no negative log messages";
 
     #
     # commit without "transaction start"
@@ -92,7 +92,7 @@ $db->run("Transactions", 12, sub {
             [ 3, "Rathaus" ],
         ];
     } "delete a row + commit";
-    like $t->get_log, qr/start_txn/, "warn about missing start_txn()";
+    like $t->get_log, qr/transaction start/, "warn about missing start_txn()";
 
     #
     # rollback without "transaction start"
@@ -109,7 +109,7 @@ $db->run("Transactions", 12, sub {
             [ 3, "Rathaus" ],
         ];
     } "delete a row + rollback";
-    like $t->get_log, qr/start_txn/, "warn about missing start_txn()";
+    like $t->get_log, qr/transaction start/, "warn about missing start_txn()";
 
     #
     # start transaction while other not finished

@@ -228,7 +228,7 @@ sub _execute_activity_async {
     # parent process
     if ($pid > 0) {
         ##! 32: ' Workflow instance succesfully forked with pid ' . $pid
-        $log->trace("Forked workflow instance with PID $pid") if $log->is_trace;
+        $log->trace("Forked process with PID $pid for workflow execution") if $log->is_trace;
         return $pid;
     }
 
@@ -257,6 +257,7 @@ sub _execute_activity_async {
     catch {
         # DB rollback is not needed as this process will terminate now anyway
         local $@ = $_; # makes OpenXPKI::Exception compatible with Try::Tiny
+        # FIXME Only log non-OpenXPKI::Exception errors as O:E has an internal logging (but then log the stack trace there)
         if (my $exc = OpenXPKI::Exception->caught) {
             $exc->show_trace(1);
         }

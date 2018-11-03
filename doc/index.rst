@@ -99,6 +99,7 @@ Developer
    :caption: Developer
 
    developer/index
+   developer/tests
 
 .. toctree::
    glossary
