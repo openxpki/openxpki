@@ -8937,7 +8937,6 @@ div.refresh,
 div.loading {
   opacity: 0;
   visibility: hidden;
-  -webkit-transition: opacity 0.75s;
   transition: opacity 0.75s;
 }
 
@@ -8945,7 +8944,6 @@ div.refresh.in-progress,
 div.loading.in-progress {
   opacity: 1;
   visibility: visible;
-  -webkit-transition: opacity 0.1s;
   transition: opacity 0.1s;
 }
 
