@@ -145,16 +145,16 @@ sub _validation_result {
     my $default_token = CTX('api')->get_default_token();
 
     ##! 32: 'validation result ' . Dumper $validate
-    if ($validate->{STATUS}  ne 'TRUSTED') {
+    if ($validate->{status} ne 'TRUSTED') {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_SIGNER_CERT_NOT_TRUSTED',
             params  => {
-                'STATUS' => $validate->{STATUS}
+                'STATUS' => $validate->{status}
             },
         );
     }
 
-    my $x509_signer = OpenXPKI::Crypto::X509->new( DATA => $validate->{CHAIN}->[0], TOKEN => $default_token );
+    my $x509_signer = OpenXPKI::Crypto::X509->new( DATA => $validate->{chain}->[0], TOKEN => $default_token );
     my $signer_subject = $x509_signer->get_parsed('BODY','SUBJECT');
 
     ##! 16: ' Signer Subject ' . $signer_subject

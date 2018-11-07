@@ -584,6 +584,16 @@ msgstr "Username"
 msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
 msgstr "Login with the given credentials failed!"
 
+msgid "I18N_OPENXPKI_UI_LOGIN_NO_DATA_HEAD"
+msgstr "Required information is missing!"
+
+msgid "I18N_OPENXPKI_UI_LOGIN_NO_DATA_PAGE"
+msgstr ""
+"Your web browser failed to present the required information to log in using "
+"the chosen login method.<br>Please select a different type of "
+"authentication. <a href=\\\"#/openxpki/redirect!login\\\">Go back to login "
+"page</a>."
+
 # Remove?
 msgid "I18N_OPENXPKI_UI_MENU_BULK"
 msgstr "Bulk Approve/Reject"

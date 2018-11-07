@@ -163,14 +163,8 @@ sub handle_request {
     # Do this before connecting the server to have the client in the
     # new session and to recover from backend session failure
     if ($page eq 'logout' || $action eq 'logout') {
-        $self->logout_session();
+        $self->logout_session( $cgi );
         $self->logger()->info('Logout from session');
-
-        # flush the session cookie
-        if ($main::cookie) {
-            $main::cookie->{'-value'} = main::encrypt_cookie($self->session->id);
-            push @main::header, ('-cookie', $cgi->cookie( $main::cookie ));
-        }
     }
 
     my $reply = $self->backend()->send_receive_service_msg('PING');
@@ -523,10 +517,33 @@ sub handle_login {
         if ( $login_type eq 'CLIENT_SSO' ) {
             my $user = $ENV{'REMOTE_USER'} || '';
             $self->logger()->trace('ENV is ' . Dumper \%ENV);
-            $self->logger()->info('Sending SSO Login ( '.$user.' )');
-            $reply =  $self->backend()->send_receive_service_msg( 'GET_CLIENT_SSO_LOGIN',
-                { LOGIN => $user, PSEUDO_ROLE => '' } );
-            $self->logger()->trace('Auth result ' . Dumper $reply);
+
+            if ($user) {
+                $self->logger()->info('Sending SSO Login ( '.$user.' )');
+                $reply =  $self->backend()->send_receive_service_msg( 'GET_CLIENT_SSO_LOGIN',
+                    { LOGIN => $user, PSEUDO_ROLE => '' } );
+                $self->logger()->trace('Auth result ' . Dumper $reply);
+            } else {
+                $self->logger()->error('User missing in ENV for SSO Login');
+                $self->logout_session( $cgi );
+                return $result->init_login_missing_data()->render();
+            }
+
+        } elsif ( $login_type eq 'CLIENT_X509' ) {
+            my $user = $ENV{'SSL_CLIENT_S_DN_CN'} || '';
+            my $cert = $ENV{'SSL_CLIENT_CERT'} || '';
+            $self->logger()->trace('ENV is ' . Dumper \%ENV);
+
+            if ($user && $cert) {
+                $self->logger()->info('Sending X509 Login ( '.$user.' )');
+                $reply =  $self->backend()->send_receive_service_msg( 'GET_CLIENT_X509_LOGIN',
+                    { LOGIN => $user, CERTIFICATE => $cert } );
+                $self->logger()->trace('Auth result ' . Dumper $reply);
+            } else {
+                $self->logger()->error('Certificate missing for X509 Login');
+                $self->logout_session( $cgi );
+                return $result->init_login_missing_data()->render();
+            }
 
         } elsif( $login_type  eq 'PASSWD' ) {
 
@@ -542,6 +559,8 @@ sub handle_login {
                 $self->logger()->debug('No credentials, render form');
                 return $result->init_login_passwd()->render();
             }
+        } else {
+            $self->logger()->warn('Unknown login type ' . $login_type );
         }
     }
 
@@ -648,11 +667,14 @@ Delete and flush the current session and recreate a new one using
 the remaining class object. If the internal session handler is used,
 the session is cleared but not destreoyed.
 
+If you pass a reference to the CGI handler, the session cookie is updated.
 =cut
 
 sub logout_session {
 
     my $self = shift;
+    my $cgi = shift;
+
     $self->logger()->info("session logout");
 
     my $session = $self->session();
@@ -667,6 +689,12 @@ sub logout_session {
         $self->session()->delete();
         $self->session()->flush();
         $self->session( $self->session()->new() );
+    }
+
+    # flush the session cookie
+    if ($cgi && $main::cookie) {
+        $main::cookie->{'-value'} = main::encrypt_cookie($self->session->id);
+        push @main::header, ('-cookie', $cgi->cookie( $main::cookie ));
     }
 
 }

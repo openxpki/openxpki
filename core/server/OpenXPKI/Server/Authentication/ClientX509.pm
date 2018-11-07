@@ -54,10 +54,10 @@ sub login_step {
     ##! 2: "username: $username"
     ##! 2: "certificate: " . Dumper $certificate
 
-    my $validate = CTX('api')->validate_certificate({
-        PEM => $certificate,
-        ANCHOR => $self->trust_anchors(),
-    });
+    my $validate = CTX('api2')->validate_certificate(
+        pem => $certificate,
+        anchor => $self->trust_anchors(),
+    );
 
     return $self->_validation_result( $validate );
 

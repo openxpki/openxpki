@@ -69,6 +69,26 @@ sub init_login_passwd {
 
 }
 
+sub init_login_missing_data {
+
+    my $self = shift;
+    my $args = shift;
+
+    $self->_page ({
+        'label' => 'I18N_OPENXPKI_UI_LOGIN_NO_DATA_HEAD'
+    });
+
+    $self->add_section({
+        type => 'text',
+        content => {
+            label => '',
+            description => 'I18N_OPENXPKI_UI_LOGIN_NO_DATA_PAGE'
+        }
+    });
+
+    return $self;
+}
+
 
 sub init_logout {
 

@@ -111,10 +111,10 @@ sub login_step {
 
         # Looks like firefox adds \r to the p7
         $pkcs7 =~ s/\r//g;
-        my $validate = CTX('api')->validate_certificate({
-            PKCS7 => $pkcs7,
-            ANCHOR => $self->trust_anchors(),
-        });
+        my $validate = CTX('api2')->validate_certificate(
+            pkcs7 => $pkcs7,
+            anchor => $self->trust_anchors(),
+        );
 
         return $self->_validation_result( $validate );
 
@@ -129,6 +129,8 @@ __END__
 OpenXPKI::Server::Authentication::ChallengeX509 - certificate based authentication.
 
 =head1 Description
+
+### TODO: UNTESTED AND UNSUPPORTED
 
 Send the user a challenge to be signed by the browser. Requires a supported browser.
 
