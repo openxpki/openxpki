@@ -6,9 +6,9 @@ head:
 
 state:
     INITIAL:
-        action: parse_pkcs10 check_policy_key_duplicate > SUCCESS
+        action: parse_pkcs10 check_policy_key_duplicate > NOSTATUS
 
-    SUCCESS:
+    NOSTATUS:
         output:
           - csr_subject
           - common_name

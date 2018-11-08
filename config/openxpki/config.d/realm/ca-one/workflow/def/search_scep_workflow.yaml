@@ -27,6 +27,9 @@ state:
     NORESULT:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_DESC
+        status:
+            level: error
+            message: I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES
         output:
           - error_code
           - transaction_id
@@ -39,7 +42,7 @@ action:
             - transaction_id
 #            - endpoint
         param:
-            wf_type: enrollment
+            wf_type: certificate_enroll
             _map_wf_creator: $endpoint
             _map_attr_transaction_id: $transaction_id
 
