@@ -473,7 +473,7 @@ msgstr "Logout Successful"
 
 msgid "I18N_OPENXPKI_UI_HOME_LOGOUT_PAGE"
 msgstr ""
-"You have beend logged out. <a href=\\\"#/openxpki/login\\\">Go back to login "
+"You have been logged out. <a href=\\\"#/openxpki/login\\\">Go back to login "
 "page</a>."
 
 # Remove?
@@ -1414,11 +1414,11 @@ msgstr "Persist CSR"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PROVIDE_SERVER_KEY_PARAMS_DESC"
 msgstr ""
-"The server will generate a key and the request for you, please select the "
+"The PKI server will generate a key and the request for you, please select the "
 "parameters for your key."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PROVIDE_SERVER_KEY_PARAMS_LABEL"
-msgstr "Generate key on server"
+msgstr "Generate key on PKI"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PUT_REQUEST_ON_HOLD_DESC"
 msgstr "Please enter information why this request is on hold."
