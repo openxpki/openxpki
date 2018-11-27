@@ -68,9 +68,10 @@ sub execute {
         ##! 32: 'Subject DN ' . Dumper \%hashed_dn
     }
 
-    my $key_param = $decoded->subjectPublicKeyParams();
-
     if ($self->param('key_params')) {
+
+        my $key_param = $decoded->subjectPublicKeyParams();
+
         if ($key_param->{keytype} eq 'RSA') {
             $param->{csr_key_alg} = 'rsa';
             $param->{csr_key_params} = { key_length =>  $key_param->{keylen} };
@@ -298,9 +299,8 @@ Determines the used profile substyle, has priority over context key.
 =item key_params
 
 If set to a true value, details of the used public key are available
-in the I<key_params> context entry. Note that this requires additional
-
-modules to be installed (Crypt::OpenSSL::RSA/DSA, Crypt::PK::ECC).
+in the I<key_params> context entry. Requires Crypt::PK::ECC if ECC keys
+need to be handled.
 
 =item subject_prefix
 

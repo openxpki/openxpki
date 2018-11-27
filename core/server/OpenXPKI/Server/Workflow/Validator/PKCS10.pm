@@ -105,8 +105,8 @@ an empty subject (required with some SCEP clients and Microsoft CA services).
 
 Cryptographically verify the signature of the request. This is off by
 default as it is it requires additonal modules which are not part of the
-OpenXPKI installation by default (Crypt::OpenSSL::RSA/DSA, Crypt::PK::ECC),
-depending on the type of uploaded key.
+OpenXPKI installation by default depending on the type of uploaded key.
+(Crypt::PK::* / with Crypt::PKCS10 <= v1.10 also Crypt::OpenSSL::RSA/DSA)
 
 =back
 

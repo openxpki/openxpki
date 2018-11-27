@@ -25,6 +25,7 @@ PACKAGES=			\
 # Exception::Class 1.22 Added Exception::Class::Base->caught() 
 
 EXTERNAL=				\
+    CryptX \
 	Crypt__OpenSSL__AES		\
 	Crypt__Cipher__AES \
 	Data__SpreadPagination		\
