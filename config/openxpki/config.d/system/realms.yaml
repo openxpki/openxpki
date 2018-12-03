@@ -3,4 +3,8 @@
 
 ca-one:
     label: Verbose name of this realm
-    baseurl: http://192.168.168.103:80/openxpki/
+    baseurl: https://pki.acme.org/openxpki/
+
+#ca-two:
+#    label: Verbose name of this realm
+#    baseurl: https://pki.acme.org/openxpki/
