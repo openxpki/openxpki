@@ -243,12 +243,14 @@ state:
     REVOKE_CERTS:
         autorun: 1
         action:
-          - global_noop > REVOKE_DONE ? global_is_tmp_queue_empty
+          - cleanup_revocation_context > REVOKE_DONE ? global_is_tmp_queue_empty
           - get_next_cert_to_revoke revoke_cert register_revoke_workflow_id > REVOKE_CERTS ? !global_is_tmp_queue_empty
 
     REVOKE_DONE:
         autorun: 1
-        action: cleanup_revocation_context > SUCCESS
+        action:
+         - export_certificate > SUCCESS ? need_export_certificate
+         - global_noop > SUCCESS ? !need_export_certificate
 
     SUCCESS:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_LABEL
@@ -527,6 +529,12 @@ action:
             _map_transaction_id: $transaction_id
             message: enroll_rejected
 
+    export_certificate:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::CertificateExport
+        param:
+            _map_cert_identifier: $cert_identifier
+            target_key: certificate
+
 condition:
     is_requestor_authorized:
         class: Workflow::Condition::Evaluate
@@ -666,6 +674,11 @@ condition:
         class: OpenXPKI::Server::Workflow::Condition::Connector::Exists
         param:
             _map_config_path: "[% context.interface %].[% context.server %].revoke_on_replace"
+
+    need_export_certificate:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{p_export_certificate}
 
 field:
     _pkcs7:
