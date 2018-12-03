@@ -15,7 +15,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 
 # CPAN modules
-use Crypt::PKCS10 1.8;
+use Crypt::PKCS10 1.10;
 
 
 =head1 COMMANDS

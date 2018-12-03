@@ -32,7 +32,7 @@ use Template::Plugin;
 
 use Data::Dumper;
 use Digest::SHA qw(sha1_hex);
-use Crypt::PKCS10 1.8;
+use Crypt::PKCS10 1.10;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
