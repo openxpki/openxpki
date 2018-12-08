@@ -1121,6 +1121,9 @@ msgstr "You do not have the required privileges to access the workflow log"
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
 msgstr "Unknown error"
 
+msgid "I18N_OPENXPKI_UI_USER_ANONYMOUS"
+msgstr "Gast"
+
 msgid "I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_FAILED"
 msgstr "User is not the certificate owner!"
 

@@ -31,9 +31,16 @@ command "get_session_info" => {
     my ($self, $params) = @_;
 
     my $session = CTX('session');
+
+    my $realname = $session->data->user;
+    if (ref $session->data->userinfo eq 'HASH' &&
+        $session->data->userinfo->{realname}) {
+        $realname = $session->data->userinfo->{realname};
+    }
     return {
         name            => $session->data->user,
         role            => $session->data->role,
+        realname        => $realname,
         role_label      => CTX('config')->get([ 'auth', 'roles', $session->data->role, 'label' ]),
         pki_realm       => $session->data->pki_realm,
         pki_realm_label => CTX('config')->get([ 'system', 'realms', $session->data->pki_realm, 'label' ]),

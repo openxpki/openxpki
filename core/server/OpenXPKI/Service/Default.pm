@@ -546,7 +546,7 @@ sub __handle_GET_AUTHENTICATION_STACK : PRIVATE {
             STATE => 'WAITING_FOR_LOGIN',
         });
         CTX('session')->data->authentication_stack($requested_stack);
-        my ($user, $role, $reply) = CTX('authentication')->login_step({
+        my ($user, $role, $reply, $userinfo) = CTX('authentication')->login_step({
             STACK   => $requested_stack,
             MESSAGE => $message,
         });
@@ -556,6 +556,8 @@ sub __handle_GET_AUTHENTICATION_STACK : PRIVATE {
             # and make the session valid
             CTX('session')->data->user($user);
             CTX('session')->data->role($role);
+            CTX('session')->data->userinfo($userinfo) if ($userinfo);
+
             CTX('session')->is_valid(1); # mark session as "valid"
 
             Log::Log4perl::MDC->put('user', $user);
@@ -596,7 +598,7 @@ sub __handle_GET_PASSWD_LOGIN : PRIVATE {
     }
     }
 
-    my ($user, $role, $reply) = CTX('authentication')->login_step({
+    my ($user, $role, $reply, $userinfo) = CTX('authentication')->login_step({
         STACK   => CTX('session')->data->authentication_stack,
         MESSAGE => $message,
     });
@@ -609,6 +611,8 @@ sub __handle_GET_PASSWD_LOGIN : PRIVATE {
         # successful login, save it in the session and mark session as valid
         CTX('session')->data->user($user);
         CTX('session')->data->role($role);
+        CTX('session')->data->userinfo($userinfo) if ($userinfo);
+
         CTX('session')->is_valid(1);
 
         Log::Log4perl::MDC->put('user', $user);

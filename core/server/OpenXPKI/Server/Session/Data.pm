@@ -40,6 +40,7 @@ my %ATTR_TYPES = (
     modified             => { isa => 'Int', }, # will be set before session is persisted
     user                 => { isa => 'Str', },
     role                 => { isa => 'Str', },
+    userinfo             => { isa => 'HashRef|Undef' },
     pki_realm            => { isa => 'Str', },
     challenge            => { isa => 'Str', },
     authentication_stack => { isa => 'Str', },
@@ -124,6 +125,7 @@ The following methods are available to access the session attributes:
     --------------------------------------------------
     id                      clear_id
     user                    clear_user
+    userinfo                clear_userinfo
     role                    clear_role
     pki_realm               clear_pki_realm
     challenge               clear_challenge

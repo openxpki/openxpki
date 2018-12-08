@@ -19,14 +19,6 @@ msgstr ""
 "X-Generator: Poedit 1.8.7.1\n"
 "X-Poedit-Bookmarks: -1,-1,77,-1,-1,-1,-1,-1,-1,-1\n"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRW_PREPARE_LABEL"
-msgstr "Check Request Information"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRW_PREPARE_DESC"
-msgstr ""
-  "Please check the contents of your request below, press continue "
-  "to proceed or cancel the request to start a new one."
-
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Requested action not found"
 
@@ -227,6 +219,10 @@ msgstr "The certificates status does not match the expected one."
 
 msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_INVALID_ITEM_COUNT"
 msgstr "List has unexpected item count"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_IS_EMPTY"
+msgstr "List is not empty"
 
 msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_NOT_EMPTY"
 msgstr "List is not empty"
@@ -689,9 +685,6 @@ msgstr "My Workflows"
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "No"
 
-msgid "I18N_OPENXPKI_UI_NOT_IN_RENWAL_WINDOW_WARNING"
-msgstr "Request is not in renewal window!"
-
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Requested page not found"
 
@@ -956,9 +949,6 @@ msgstr "3 years"
 msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "Reason code given is not supported"
 
-msgid "I18N_OPENXPKI_UI_RENEWAL_SUBJECT_CHANGED_WARNING"
-msgstr "The new certificates subject will not match the old one!"
-
 # Remove?
 msgid "I18N_OPENXPKI_UI_REPORT_CONFIG"
 msgstr "Report"
@@ -1131,6 +1121,9 @@ msgstr "You do not have the required privileges to access the workflow log"
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
 msgstr "Unknown error"
 
+msgid "I18N_OPENXPKI_UI_USER_ANONYMOUS"
+msgstr "Guest"
+
 msgid "I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_FAILED"
 msgstr "User is not the certificate owner!"
 
@@ -1168,6 +1161,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_CHECK_FAILED"
 msgstr "Unable to check value against given backend"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_ERROR_BOOLEAN"
+msgstr "Validator failed on given expression"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_HAS_ERRORS"
 msgstr "An error occured during input validation"
@@ -1319,20 +1316,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_LABEL"
 msgstr "Start revocation"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRW_DESC"
-msgstr ""
-"This workflow helps you to request a new certificate based on an existing "
-"one. It should be used to renew a certificate that is expiring or if you "
-"need to exchange (replace) the existing certificate because of some details "
-"have changed.<br>If you came here with a certificate already selected, "
-"please check if the given certificate identifier and subject is what you "
-"requested and push the continue button.<br>In case you initialised this "
-"process, please type the certificate identifier or use the autosearch "
-"function to find your certificate."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRW_LABEL"
-msgstr "Certificate Renewal"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CA_DESC"
 msgstr "Publish CA Certificate and CRLs to defined targets."
 
@@ -1414,8 +1397,8 @@ msgstr "Persist CSR"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PROVIDE_SERVER_KEY_PARAMS_DESC"
 msgstr ""
-"The PKI server will generate a key and the request for you, please select the "
-"parameters for your key."
+"The PKI server will generate a key and the request for you, please select "
+"the parameters for your key."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PROVIDE_SERVER_KEY_PARAMS_LABEL"
 msgstr "Generate key on PKI"
@@ -1675,9 +1658,6 @@ msgstr "Successful Workflows"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE"
 msgstr "Bulk handle workflows"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_CONTINUE"
-msgstr "Continue"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ELIGIBILITY_RECHECK_LABEL"
 msgstr "Recheck Eligibility"
@@ -2228,12 +2208,6 @@ msgstr ""
 "the subject and will show them in a drop down list below. Select the needed "
 "certificate from the list by clicking on it."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_SUBJECT_CHANGED_WARNING"
-msgstr "Subject Modified Warning"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENWAL_WINDOW_WARNING"
-msgstr "Renewal Warning"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_DESC"
 msgstr "The certificate to be replaced by this workflow."
 
@@ -2690,12 +2664,6 @@ msgstr "The certificate has been revoked and a revocation list was issued."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_SUCCESS_LABEL"
 msgstr "Certificate Revoked"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRW_INITIAL_DESC"
-msgstr "Request a new certificate based on an existing one."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRW_INITIAL_LABEL"
-msgstr "Certificate Renewal Request"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_DESC"
 msgstr "This workflow was canceled and can not be restarted"
 
@@ -3082,14 +3050,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL"
 msgstr "Publish CA Information"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_DESC"
-msgstr ""
-"Certificate Renewal Request - create a certifcate signing request reusing "
-"the information from an existing certificate."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_LABEL"
-msgstr "Certificate Renewal Request (CRW)"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
 msgstr "Certificate Revocation Request"
 
@@ -3261,6 +3221,9 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_ERROR_NOT_CERTIFICATE_OWNER"
 #~ msgstr "Only the certificate owner is allowed to perform this action"
 
+#~ msgid "I18N_OPENXPKI_UI_NOT_IN_RENWAL_WINDOW_WARNING"
+#~ msgstr "Request is not in renewal window!"
+
 #~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
 #~ msgstr "Filename"
 
@@ -3305,11 +3268,28 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_USER"
 #~ msgstr "User Certificate"
 
+#~ msgid "I18N_OPENXPKI_UI_RENEWAL_SUBJECT_CHANGED_WARNING"
+#~ msgstr "The new certificates subject will not match the old one!"
+
 #~ msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_DAMAGED"
 #~ msgstr "PKCS10 request is not properly formated"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
 #~ msgstr "Approve Request"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRW_DESC"
+#~ msgstr ""
+#~ "This workflow helps you to request a new certificate based on an existing "
+#~ "one. It should be used to renew a certificate that is expiring or if you "
+#~ "need to exchange (replace) the existing certificate because of some "
+#~ "details have changed.<br>If you came here with a certificate already "
+#~ "selected, please check if the given certificate identifier and subject is "
+#~ "what you requested and push the continue button.<br>In case you "
+#~ "initialised this process, please type the certificate identifier or use "
+#~ "the autosearch function to find your certificate."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRW_LABEL"
+#~ msgstr "Certificate Renewal"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDIT_CRR_DESC"
 #~ msgstr "Edit information of the revocation request"
@@ -3874,6 +3854,9 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_USER_ABORT_LABEL"
 #~ msgstr "Persist CRR"
 
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_CONTINUE"
+#~ msgstr "Continue"
+
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_LABEL_CANCEL"
 #~ msgstr "Retries"
@@ -4125,6 +4108,12 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_LOGIN_IDS_TOOLTIP"
 #~ msgstr "Check this box to force issuance."
 
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_SUBJECT_CHANGED_WARNING"
+#~ msgstr "Subject Modified Warning"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENWAL_WINDOW_WARNING"
+#~ msgstr "Renewal Warning"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_DESC"
 #~ msgstr "Transaction Id of this SCEP request"
 
@@ -4281,6 +4270,20 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DETAIL_FIELD_VALID_AT_LABEL"
 #~ msgstr "Reference Date"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRW_INITIAL_DESC"
+#~ msgstr "Request a new certificate based on an existing one."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRW_INITIAL_LABEL"
+#~ msgstr "Certificate Renewal Request"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRW_PREPARE_DESC"
+#~ msgstr ""
+#~ "Please check the contents of your request below, press continue to "
+#~ "proceed or cancel the request to start a new one."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRW_PREPARE_LABEL"
+#~ msgstr "Check Request Information"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_DESC"
@@ -5003,6 +5006,14 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CERTIFICATE_LABEL"
 #~ msgstr "Duplicate Key Error (Certificate)"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_DESC"
+#~ msgstr ""
+#~ "Certificate Renewal Request - create a certifcate signing request reusing "
+#~ "the information from an existing certificate."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_LABEL"
+#~ msgstr "Certificate Renewal Request (CRW)"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_BY_SUBJECT_DESC"

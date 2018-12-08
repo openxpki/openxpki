@@ -190,6 +190,7 @@ sub login_step {
     my $user;
     my $role;
     my $return_msg = {};
+    my $userinfo = {};
   HANDLER:
     foreach my $handler (@{$self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{HANDLER}}) {
         ##! 4: "handler $handler from stack $stack"
@@ -208,7 +209,7 @@ sub login_step {
         );
         }
         eval {
-            ($user, $role, $return_msg) = $ref->login_step({
+            ($user, $role, $return_msg, $userinfo) = $ref->login_step({
                 HANDLER => $handler,
                 MESSAGE => $msg,
             });
@@ -250,7 +251,7 @@ sub login_step {
 
     if (defined $user && defined $role) {
         CTX('log')->auth()->info("Login successful using authentication stack '$stack' (user: '$user', role: '$role')");
-        return ($user, $role, $return_msg);
+        return ($user, $role, $return_msg, $userinfo);
     }
 
     return (undef, undef, $return_msg);

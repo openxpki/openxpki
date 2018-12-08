@@ -28,6 +28,7 @@ sub new {
 
     $self->{ROLE} = CTX('config')->get("$path.role") || 'Anonymous';
     $self->{USER} = CTX('config')->get("$path.user") || 'anonymous';
+    $self->{NAME} = CTX('config')->get("$path.name") || 'I18N_OPENXPKI_UI_USER_ANONYMOUS';
 
     ##! 2: "role: ".$self->{ROLE}
 
@@ -48,6 +49,9 @@ sub login_step {
         {
             SERVICE_MSG => 'SERVICE_READY',
         },
+        {
+            realname => $self->{NAME},
+        }
     );
 }
 

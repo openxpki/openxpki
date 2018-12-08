@@ -567,9 +567,10 @@ sub handle_login {
     if ( $reply->{SERVICE_MSG} eq 'SERVICE_READY' ) {
         $self->logger()->info('Authentication successul - fetch session info');
         # Fetch the user info from the server
-        $reply = $self->backend()->send_receive_command_msg( 'get_session_info' );
-        if ( $reply->{SERVICE_MSG} eq 'COMMAND' ) {
+        $reply = $self->backend()->send_receive_service_msg( 'COMMAND',
+            { COMMAND => 'get_session_info', PARAMS => {}, API => 2 } );
 
+        if ( $reply->{SERVICE_MSG} eq 'COMMAND' ) {
 
             #$self->backend()->rekey_session();
             #my $new_backend_session_id = $self->backend()->get_session_id();

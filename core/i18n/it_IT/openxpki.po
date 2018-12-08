@@ -258,6 +258,15 @@ msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_INVALID_ITEM_COUNT"
 msgstr "Richiesta non valida - nessuna azione"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_IS_EMPTY"
+msgstr ""
+"Modulo per la ricerca dei certificati. Il campo SAN richiede che il tipo SAN "
+"venga separato con i due punti, ad es. DNS:www2.openxpki.org.<br>Gli stati "
+"Valido/Scaduto presuppongono che il certificato sia nello stato Emesso: "
+"viene eseguito un controllo relativo alla finestra di validità "
+"Non_prima_del / Non_dopo_il."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_NOT_EMPTY"
 msgstr ""
 "Modulo per la ricerca dei certificati. Il campo SAN richiede che il tipo SAN "
@@ -708,6 +717,14 @@ msgstr "Nome utente"
 msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
 msgstr "Impossibile effettuare il Login con le credenziali fornite!"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_NO_DATA_HEAD"
+msgstr "Impossibile effettuare il Login con le credenziali fornite!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_NO_DATA_PAGE"
+msgstr "Curva Ellittica"
+
 # Remove?
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_BULK"
@@ -809,10 +826,6 @@ msgstr "Workflow"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "Chiave"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_NOT_IN_RENWAL_WINDOW_WARNING"
-msgstr "Errore sconosciuto"
 
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Pagina richiesta non trovata"
@@ -1085,10 +1098,6 @@ msgstr "3 anni"
 msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "entità / certificato non più attivi"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_RENEWAL_SUBJECT_CHANGED_WARNING"
-msgstr "In attesa"
-
 # Remove?
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_REPORT_CONFIG"
@@ -1305,6 +1314,11 @@ msgstr "Action"
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
 msgstr "Errore sconosciuto"
 
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_USER_ANONYMOUS"
+msgstr "Stato del Certificato"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_FAILED"
 msgstr "Numero di serie del certificato"
@@ -1343,6 +1357,10 @@ msgstr "Fallita convalida dell’espressione data"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_CHECK_FAILED"
+msgstr "Fallita convalida dell’espressione data"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_ERROR_BOOLEAN"
 msgstr "Fallita convalida dell’espressione data"
 
 #, fuzzy
@@ -1518,17 +1536,6 @@ msgstr ""
 "trovare il tuo certificato."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_LABEL"
-msgstr "Inizia la Revoca"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRW_DESC"
-msgstr ""
-"Crea una richiesta di revoca per il tuo certificato. Inserisci "
-"l’identificatore del certificato o usa la funzione di autoricerca per "
-"trovare il tuo certificato."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRW_LABEL"
 msgstr "Inizia la Revoca"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CA_DESC"
@@ -1891,10 +1898,6 @@ msgstr "Workflow completati con successo"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE"
 msgstr "Bulk handle workflows"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_CONTINUE"
-msgstr "continua"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ELIGIBILITY_RECHECK_LABEL"
@@ -2507,14 +2510,6 @@ msgstr ""
 "termini inseriti e li mostrerà in una lista a scorrimento verticale. "
 "Seleziona il certificato cliccando sull’elemento della lista."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_SUBJECT_CHANGED_WARNING"
-msgstr "Soggetto Certificato"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENWAL_WINDOW_WARNING"
-msgstr "Ulteriori Informazioni"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_DESC"
 msgstr "Il certificato che viene sostituito con questo Workflow"
 
@@ -3017,14 +3012,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_SUCCESS_LABEL"
 msgstr "Certificato Revocato"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRW_INITIAL_DESC"
-msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRW_INITIAL_LABEL"
-msgstr "Stato"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_DESC"
 msgstr "Questo Workflow è stato cancellato e non può essere riavviato"
 
@@ -3409,14 +3396,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL"
 msgstr "Pubblica Informazioni CA"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_DESC"
-msgstr "Richiesta Revoca Certificato"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_LABEL"
-msgstr "Richiesta Revoca Certificato (CRR, Certificate Revocation Request)"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
 msgstr "Richiesta Revoca Certificato"
 
@@ -3606,6 +3585,10 @@ msgstr "Chiave"
 #~ msgstr "mostra le liste di revoca precedenti"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_NOT_IN_RENWAL_WINDOW_WARNING"
+#~ msgstr "Errore sconosciuto"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
 #~ msgstr "FALLIMENTO"
 
@@ -3650,11 +3633,26 @@ msgstr "Chiave"
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_USER"
 #~ msgstr "User Certificate"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_RENEWAL_SUBJECT_CHANGED_WARNING"
+#~ msgstr "In attesa"
+
 #~ msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_DAMAGED"
 #~ msgstr "La richiesta di tipo PKCS10 non è impostata correttamente"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
 #~ msgstr "Approva Richiesta"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRW_DESC"
+#~ msgstr ""
+#~ "Crea una richiesta di revoca per il tuo certificato. Inserisci "
+#~ "l’identificatore del certificato o usa la funzione di autoricerca per "
+#~ "trovare il tuo certificato."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRW_LABEL"
+#~ msgstr "Inizia la Revoca"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDIT_CRR_DESC"
 #~ msgstr "Modifica le informazioni relative alla richiesta di revoca"
@@ -4220,6 +4218,10 @@ msgstr "Chiave"
 #~ msgstr "Persist CRR"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_CONTINUE"
+#~ msgstr "continua"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_LABEL_CANCEL"
 #~ msgstr "Retries"
 
@@ -4474,6 +4476,14 @@ msgstr "Chiave"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_LOGIN_IDS_TOOLTIP"
 #~ msgstr "Check this box to force issuance."
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_SUBJECT_CHANGED_WARNING"
+#~ msgstr "Soggetto Certificato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENWAL_WINDOW_WARNING"
+#~ msgstr "Ulteriori Informazioni"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_DESC"
 #~ msgstr "Id Transazione di questa richiesta SCEP"
 
@@ -4645,6 +4655,15 @@ msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_WORKFLOW_ID_LABEL"
 #~ msgstr "ID Workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRW_INITIAL_DESC"
+#~ msgstr ""
+#~ "Questo Workflow è definitivamente fallito e non può essere riavviato."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRW_INITIAL_LABEL"
+#~ msgstr "Stato"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_DESC"
 #~ msgstr ""
@@ -5362,6 +5381,14 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CERTIFICATE_LABEL"
 #~ msgstr "Revoke the certificate"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_DESC"
+#~ msgstr "Richiesta Revoca Certificato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_LABEL"
+#~ msgstr "Richiesta Revoca Certificato (CRR, Certificate Revocation Request)"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_BY_SUBJECT_DESC"
