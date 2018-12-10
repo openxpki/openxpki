@@ -18,9 +18,20 @@ use Moose;
 
 use Data::Dumper;
 
+
+has label => (
+    is => 'rw',
+    isa => 'Str',
+);
+
+has description => (
+    is => 'rw',
+    isa => 'Str',
+);
+
 has path => (
     is => 'ro',
-    isa => 'Str',
+    isa => 'ArrayRef',
 );
 
 has trust_certs => (
@@ -40,6 +51,17 @@ has trust_anchors => (
     lazy => 1
 );
 
+has default_role => (
+    is => 'rw',
+    isa => 'Str',
+    default => ''
+);
+
+has user_arg => (
+    is => 'rw',
+    isa => 'Str',
+    default => 'subject'
+);
 
 ## constructor and destructor stuff
 
@@ -48,9 +70,9 @@ around BUILDARGS => sub {
     my $orig = shift;
     my $class = shift;
 
-    my $path = shift;
+    my @path = split /\./, shift;
 
-    return $class->$orig({ path => $path });
+    return $class->$orig({ path => \@path });
 
 };
 
@@ -59,32 +81,36 @@ sub BUILD {
 
     my $self = shift;
 
-    my $path = $self->path();
+    my @path = @{$self->path()};
+
     ##! 2: "load name and description for handler"
 
     my $config = CTX('config');
 
-    my @trust_certs =  $config->get_scalar_as_list("$path.cacert");
-    my @trust_realms = $config->get_scalar_as_list("$path.realm");
+    my @trust_certs =  $config->get_scalar_as_list( [ @path, 'cacert' ]);
+    my @trust_realms = $config->get_scalar_as_list( [ @path, 'realm' ]);
 
-    ##! 8: 'Config Path: ' . $path
+    ##! 8: 'Config Path: ' . Dumper \@path
     ##! 8: 'Trusted Certs ' . Dumper @trust_certs
     ##! 8: 'Trusted Realm ' . Dumper @trust_realms
 
     $self->trust_certs ( \@trust_certs );
     $self->trust_realms ( \@trust_realms );
 
-    $self->{DESC} = $config->get("$path.description");
-    $self->{NAME} = $config->get("$path.label");
+    $self->description( $config->get( [ @path, 'description'] ) );
+    $self->label( $config->get( [ @path, 'label'] ) );
 
-    $self->{ROLE} = $config->get("$path.role.default");
-    $self->{ROLEARG} = $config->get("$path.role.argument");
-
-    if ($config->get("$path.role.handler")) {
-        my @path = split /\./, "$path.role.handler";
-        $self->{ROLEHANDLER} = \@path;
+    if (my $role = $config->get([ @path, 'role' ])) {
+        $self->default_role( $role );
+    } elsif (!CTX('config')->exists([ @path, 'user' ])) {
+        OpenXPKI::Exception->throw(
+            message => 'x509 authentication requires default role or user handler!',
+        );
     }
 
+    if (my $arg = $config->get([ @path, 'arg' ])) {
+        $self->user_arg($arg);
+    }
 
 }
 
@@ -92,39 +118,8 @@ sub _load_anchors {
 
     my $self = shift;
 
+    return CTX('api2')->get_trust_anchors( path => $self->path() );
 
-    return CTX('api')->get_trust_anchors({ PATH => $self->path() });
-
-    my $trusted_realms = $self->trust_realms();
-    my $trusted_certs = $self->trust_certs();
-
-    ##! 8: 'Trusted Certs ' . Dumper $trusted_certs
-    ##! 8: 'Trusted Realm ' . Dumper $trusted_realms
-
-    my @trust_anchors;
-
-    @trust_anchors = @{$trusted_certs} if ($trusted_certs);
-
-    foreach my $trust_realm (@{$trusted_realms}) {
-        # Look up the group name used for the ca certificates in the given realm
-        ##! 16: 'Load ca signers from realm ' . $trust_realm
-        my $ca_certs = CTX('api')->list_active_aliases({ TYPE => 'certsign', PKI_REALM => $trust_realm });
-        ##! 16: 'ca cert in realm ' . Dumper $ca_certs
-        if (!$ca_certs) { next; }
-        push @trust_anchors, map { $_->{IDENTIFIER} } @{$ca_certs};
-    }
-
-    if (! scalar @trust_anchors ) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_MISSING_TRUST_ANCHOR_CONFIGURATION',
-            params => {
-                PKI_REALM => CTX('session')->data->pki_realm
-            }
-        );
-   }
-
-    ##! 16: 'trust_anchors: ' . Dumper \@trust_anchors
-    return \@trust_anchors;
 
 }
 
@@ -142,8 +137,6 @@ sub _validation_result {
     my $self = shift;
     my $validate = shift;
 
-    my $default_token = CTX('api')->get_default_token();
-
     ##! 32: 'validation result ' . Dumper $validate
     if ($validate->{status} ne 'TRUSTED') {
         OpenXPKI::Exception->throw(
@@ -154,8 +147,10 @@ sub _validation_result {
         );
     }
 
-    my $x509_signer = OpenXPKI::Crypto::X509->new( DATA => $validate->{chain}->[0], TOKEN => $default_token );
-    my $signer_subject = $x509_signer->get_parsed('BODY','SUBJECT');
+    my @path = @{$self->path()};
+
+    my $x509_signer = OpenXPKI::Crypt::X509->new( $validate->{chain}->[0] ) ;
+    my $signer_subject = $x509_signer->get_subject();
 
     ##! 16: ' Signer Subject ' . $signer_subject
     my $dn = OpenXPKI::DN->new( $signer_subject );
@@ -164,52 +159,67 @@ sub _validation_result {
     my %dn_hash = $dn->get_hashed_content();
     ##! 16: 'dn hash ' . Dumper %dn_hash;
 
-    # in the unusual case that there is no dn we use the full subject
-    my $user = $signer_subject;
-    $user = $dn_hash{'CN'}[0] if ($dn_hash{'CN'});
+    my $has_handler = CTX('config')->exists([ @path, 'user' ]);
+    # Argument to use as username
+    my $arg = $self->user_arg();
+    my $username;
 
-    # Assign default role
-    my $role;
-    # Ask connector
-    ##! 16: 'Rolehandler ' . Dumper $self->{ROLEHANDLER}
-    if ($self->{ROLEHANDLER}) {
-        my $handler = $self->{ROLEHANDLER}.".";
-        if ($self->{ROLEARG} eq "cn" || $self->{ROLEARG} eq "username") {
-            $handler .= $user;
-        } elsif ($self->{ROLEARG} eq "subject") {
-            $handler .= $x509_signer->{PARSED}->{BODY}->{SUBJECT};
-        } elsif ($self->{ROLEARG} eq "serial") {
-            $handler .= $x509_signer->{PARSED}->{BODY}->{SERIAL};
-        } else {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_CERT_UNKNOWN_ROLE_HANDLER_ARGUMENT',
-                params  => {
-                    'ARGUMENT' => $self->{ROLEARG},
-                },
-                log => {
-                    priortity => 'fatal',
-                    facility => 'system',
-                }
-            );
-        }
-        $role = CTX('config')->get( $handler );
-        ##! 16: 'role: ' . $role
+    if ($arg eq "subject" || $arg eq "dn") {
+        $username = $x509_signer->get_subject();
+    } elsif ($arg eq "serial") {
+        $username = $x509_signer->get_serial();
+    } elsif ($arg eq "certificate") {
+        OpenXPKI::Exception->throw(
+            message => 'x509 client authentication: certificate as argument without handler!',
+            log => { priortity => 'fatal', facility => 'system' }
+        ) if (!$has_handler);
+        $username = $x509_signer->pem;
+    } else {
+        $arg = uc($arg);
+        OpenXPKI::Exception->throw(
+            message => 'x509 client authentication requires '.$arg.' but certificate has none!',
+            log => { priortity => 'fatal', facility => 'system' }
+        ) if (!$dn_hash{$arg} || !$dn_hash{$arg}[0]);
+        $username = $dn_hash{$arg}[0];
     }
 
-    $role = $self->{ROLE} unless($role);
+    OpenXPKI::Exception->throw(
+        message => 'x509 client unable to set username!',
+        log => { priortity => 'fatal', facility => 'system' }
+    ) if (!$username);
+
+
+    # fetch userinfo from handler
+    my $userinfo;
+    my $role = $self->default_role();
+
+    if ($has_handler) {
+        $userinfo = CTX('config')->get_hash( [ @path,  'user', $username ] );
+
+        OpenXPKI::Exception->throw(
+            message => 'x509 client authentication did not find user!',
+            params => { 'argument' => $arg, username => $username },
+            log => { priortity => 'fatal', facility => 'system' }
+        ) if (!$userinfo || !$userinfo->{username});
+
+        # set role if no default role was set
+        $role = $userinfo->{role} unless ($role);
+        delete $userinfo->{role};
+        $username = $userinfo->{username};
+        delete $userinfo->{username};
+
+    }
 
     ##! 16: 'role: ' . $role
     if (!$role) {
         ##! 16: 'no certificate role found'
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_LOGIN_FAILED",
-            params  => {
-                USER => $signer_subject,
-                REASON => 'no role'
-        });
+            message => 'x509 client authentication did not find role!',
+            params  => { username => $username }
+        );
     }
 
-    return ($user, $role, { SERVICE_MSG => 'SERVICE_READY', } );
+    return ($username, $role, { SERVICE_MSG => 'SERVICE_READY', }, $userinfo );
 
 }
 
@@ -232,7 +242,6 @@ done in ChallengeX509 and ClientX509 class, the later validation performs severa
 
 Any failure results in an exception.
 
-
 =head1 Functions
 
 =head2 _load_anchors
@@ -250,10 +259,12 @@ Signature:
     type: ChallengeX509
     label: Signature
     description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_SIGNATURE
-    role:
-        handler: @auth.roledb
-        argument: dn
-        default: ''
+    role: User
+    user:
+        John Doe:
+            username: jdoe
+            realname: John Doe
+    arg: cn
     # trust anchors
     realm:
     - my_client_auth_realm
@@ -264,18 +275,40 @@ Signature:
 
 =over
 
-=item role.handler
+=item role
 
-A connector that returns a role for a give user
+The role assigned to the user, if not specified a user section that
+returns the role is mandatory!
 
-=item role.argument
+=item user
 
-Argument to use with hander to query for a role. Supported values are I<cn> (common name), I<subject>, I<serial>
+Hash holding additional user information, usually implemented as a
+connector reference, see below.
 
-=item role.default
+=item arg
 
-The default role to assign to a user if no result is found using the handler.
-If you do not specify a handler but a default role, you get a static role assignment for any matching certificate.
+The certificate property used as username. Supported values are:
+
+=over
+
+=item I<subject> / I<dn>
+
+The full subject/dn as string, this is also the default
+
+=item I<serial>
+
+Serial in integer notation - as string
+
+=item I<certificate>
+
+The PEM encoded certificate
+
+=item *
+
+Any part that is set in the DN hash, if an attribute is multivalued the
+first item is used.
+
+=back
 
 =item cacert
 
@@ -286,3 +319,41 @@ A list of certificate identifiers to be used as trust anchors
 A list of realm names to be used as trust anchors (this loads all ca certificates from the given realm into the list of trusted ca certs).
 
 =back
+
+=head2 Examples
+
+=head3 Static
+
+Allow all certiticates issued from the internal realm I<user-ca> and set
+their role to I<User>. Set CN as username (default).
+
+    type: ClientX509
+    label: Client Certificate Auth
+    role: User
+    realm: user-ca
+
+=head3 Static role, extended user information from CN
+
+Querys the given connector with the full DN as argument, expects a hash
+that contains at least the key I<username>, all other keys are made
+available in the C<userinfo> structure (e.g. I<realname> and I<emailaddress>).
+
+    type: ClientX509
+    label: Client Certificate Auth
+    role: User
+    user@: connector:my.user.info.source
+    arg: subject
+    realm: user-ca
+
+=head3 Dynamic role
+
+Similar to above but as I<role> is not set in the config the hash
+returned by the connector must also contain I<role>. As I<arg> is also
+not set the query parameter given to the connector is only the common name.
+
+    type: ClientX509
+    label: Client Certificate Auth
+    user@: connector:my.user.info.source
+    realm: user-ca
+
+

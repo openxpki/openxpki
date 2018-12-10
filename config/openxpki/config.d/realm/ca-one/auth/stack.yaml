@@ -22,8 +22,8 @@ OTP:
 #Certificate Challenge/Response:
 #    handler: Signature
 
-#Certificate via Webserver:
-#    handler: Certificate
+Client Certificate:
+    handler: Certificate
 
 _System:
     handler: System

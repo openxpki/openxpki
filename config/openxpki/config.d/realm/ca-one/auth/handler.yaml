@@ -2,27 +2,8 @@ Certificate:
     type: ClientX509
     label: Certificate
     description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE_WEBSERVER
-    role:
-        default: User
-        handler@: connector:auth.connector.role
-        argument: cn
-    cacert: Piv38gMblvOM5sTYqF0-LVhHag8
-
-Signature:
-    type: ChallengeX509
-    label: Signature
-    description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_SIGNATURE
-    challenge_length: 256
-    role:
-        default: 'User'
-        handler@: connector:auth.connector.role
-        argument: cn
-    # define your trust anchors here
-    # Allows every known user of the realm to login
-    realm:
-        - ca-one
-    cacert:
-        - list of extra cert identifiers
+    role: User
+    realm: ca-one
 
 Anonymous:
     type: Anonymous

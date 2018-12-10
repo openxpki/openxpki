@@ -1,10 +1,3 @@
-## OpenXPKI::Server::Authentication::ClientX509
-##
-## Written in 2007 by Alexander Klink
-## (C) Copyright 2007 by The OpenXPKI Project
-
-#FIXME-MIG: Need testing
-
 package OpenXPKI::Server::Authentication::ClientX509;
 
 use strict;
@@ -29,33 +22,25 @@ sub login_step {
     my $self    = shift;
     my $arg_ref = shift;
 
-    my $name    = $arg_ref->{HANDLER};
     my $msg     = $arg_ref->{MESSAGE};
-    my $answer  = $msg->{PARAMS};
+    my $params = $msg->{PARAMS};
 
-    if (! exists $msg->{PARAMS}->{LOGIN}) {
+    if (! $params->{certificate} ) {
         ##! 4: 'no login data received (yet)'
-        return (undef, undef,
-            {
-        SERVICE_MSG => "GET_CLIENT_X509_LOGIN",
-        PARAMS      => {
-                    NAME        => $self->{NAME},
-                    DESCRIPTION => $self->{DESC},
+        return (undef, undef, {
+            SERVICE_MSG => "GET_CLIENT_X509_LOGIN",
+            PARAMS      => {
+                NAME        => $self->label(),
+                DESCRIPTION => $self->description(),
             },
-            },
-        );
+        });
     }
 
-    ##! 16: 'Service Answer ' . Dumper $answer
-    my $username = $answer->{LOGIN};
-    my $certificate = $answer->{CERTIFICATE};
-
     ##! 2: "credentials ... present"
-    ##! 2: "username: $username"
-    ##! 2: "certificate: " . Dumper $certificate
+    ##! 16: 'Service Answer ' . Dumper $answer
 
     my $validate = CTX('api2')->validate_certificate(
-        pem => $certificate,
+        pem => $params->{certificate},
         anchor => $self->trust_anchors(),
     );
 

@@ -10,6 +10,8 @@ OpenXPKI::Server::API2::Plugin::Token::get_trust_anchors
 =cut
 
 # Project modules
+use Data::Dumper;
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
 =head2 get_trust_anchors
@@ -36,18 +38,24 @@ if extra certificate identifiers):
 
 =cut
 command "get_trust_anchors" => {
-    path => { isa => 'AlphaPunct', required => 1, },
+    path => { isa => 'AlphaPunct|ArrayRef', required => 1, },
 } => sub {
     my ($self, $params) = @_;
 
     my $path = $params->path;
 
-    my $config = CTX('config');
-    my @trust_certs =  $config->get_scalar_as_list("$path.cacert");
-    my @trust_realms = $config->get_scalar_as_list("$path.realm");
+    if (!ref $path) {
+        my @t = split /\./, $path;
+        $path = @t;
+    }
 
-    ##! 8: 'Trusted Certs ' . Dumper @trust_certs
-    ##! 8: 'Trusted Realm ' . Dumper @trust_realms
+    ##! 8: 'Anchor path ' . Dumper $path
+    my $config = CTX('config');
+    my @trust_certs =  $config->get_scalar_as_list([ @$path, 'cacert']);
+    my @trust_realms = $config->get_scalar_as_list([ @$path, 'realm']);
+
+    ##! 8: 'Trusted Certs ' . Dumper \@trust_certs
+    ##! 8: 'Trusted Realm ' . Dumper \@trust_realms
 
     my @trust_anchors;
     @trust_anchors = @trust_certs if (@trust_certs);

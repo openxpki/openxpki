@@ -537,7 +537,7 @@ sub handle_login {
             if ($user && $cert) {
                 $self->logger()->info('Sending X509 Login ( '.$user.' )');
                 $reply =  $self->backend()->send_receive_service_msg( 'GET_CLIENT_X509_LOGIN',
-                    { LOGIN => $user, CERTIFICATE => $cert } );
+                    { certificate => $cert } );
                 $self->logger()->trace('Auth result ' . Dumper $reply);
             } else {
                 $self->logger()->error('Certificate missing for X509 Login');

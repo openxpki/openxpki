@@ -56,6 +56,11 @@ has last_result => (
     default => sub { return { }; }
 );
 
+has ssl_opts => (
+    is => 'rw',
+    isa => 'HashRef|Undef',
+);
+
 sub mock_request {
 
     my $self = shift;
@@ -66,7 +71,14 @@ sub mock_request {
     }
 
     my $ua = LWP::UserAgent->new;
+
     my $server_endpoint = 'http://localhost/cgi-bin/webui.fcgi';
+
+    my $ssl_opts = $self->ssl_opts;
+    if ($ssl_opts) {
+        $server_endpoint = 'https://localhost/cgi-bin/webui.fcgi';
+        $ua->ssl_opts( %{$self->ssl_opts} );
+    }
 
     $ua->default_header( 'Accept'       => 'application/json' );
     $ua->default_header( 'X-OPENXPKI-Client' => 1);
