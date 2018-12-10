@@ -1514,7 +1514,12 @@ if ($cmd eq 'initdb') {
 } elsif ($cmd eq 'version') {
     print "Version (core): " . $OpenXPKI::VERSION::VERSION . "\n";
     $ret = 0;
+
+} elsif ($cmd eq 'man') {
+    pod2usage( -verbose => 1 );
+    $ret = 0;
 }
+
 
 };
 
