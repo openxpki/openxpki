@@ -630,26 +630,37 @@ sub __get_extensions
         {
             my $subj_alt_name = $profile->get_extension("subject_alt_name");
             my @tmp_array;
-            my $sectidx = 0;
+            my $san_idx = {};
             foreach my $entry (@{$subj_alt_name}) {
+
+                # init hash element for san type
+                $san_idx->{$entry->[0]} = 0 unless($san_idx->{$entry->[0]});
+                my $sectidx = ++$san_idx->{$entry->[0]};
 
                 # Handle dirName
                 if ($entry->[0] eq 'dirName') {
                     # split at comma, this has the side effect that we can
                     # not handle DNs with comma in the subparts
-                    my @tt = split(/,/, $entry->[1]);
-                    $sectidx++;
-                    $sections .= "\n[dirname_sect_${sectidx}]\n" . join("\n", @tt). "\n";
-                    push @tmp_array, "dirName:dirname_sect_${sectidx}";
+                    my %idx;
+                    # multi valued components need a prefix in dirName
+                    my @sec = map {
+                        my($k,$v) = split /=/, $_,2;
+                        ($idx{$k}++).'.'.$_;
+                    } reverse split(/,/, $entry->[1]);
+                    unshift @sec, "", "[dirname_sect_${sectidx}]";
+                    $sections .= join("\n", @sec). "\n";
+                    push @tmp_array, "dirName.${sectidx}=dirname_sect_${sectidx}";
                 } else {
-                    push @tmp_array, join(q{:}, @{$entry});
+                    push @tmp_array, sprintf '%s.%01d = "%s"', $entry->[0], $sectidx, $entry->[1];
                 }
+
             }
 
-            my $string = join(q{,}, @tmp_array);
-            if ($string ne '') {
-                $config .= "subjectAltName=" . $string . "\n";
+            if (scalar @tmp_array) {
+                $config .= "subjectAltName=\@san_section\n";
+                $sections .= "\n[san_section]\n" . join("\n", @tmp_array). "\n";
             }
+
         }
         elsif ($name eq "subject_key_identifier")
         {
