@@ -31,7 +31,7 @@ use Data::Dumper;
 
 use Class::Std;
 use Math::BigInt;
-use Crypt::PKCS10 1.10;
+use Crypt::PKCS10 1.8;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );

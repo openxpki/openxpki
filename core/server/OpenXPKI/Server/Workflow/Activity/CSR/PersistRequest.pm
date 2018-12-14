@@ -7,7 +7,7 @@ package OpenXPKI::Server::Workflow::Activity::CSR::PersistRequest;
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
-use Crypt::PKCS10 1.10;
+use Crypt::PKCS10 1.8;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;

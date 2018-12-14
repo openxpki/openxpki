@@ -9,7 +9,6 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use English;
 use OpenXPKI::DN;
-use Crypt::PKCS10;
 use OpenXPKI::Serialization::Simple;
 use Data::Dumper;
 use Template;

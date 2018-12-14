@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw( OpenXPKI::Server::Workflow::Validator );
 use Workflow::Exception qw( validation_error );
-use Crypt::PKCS10;
+use Crypt::PKCS10 2.000;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug;
 use English;
@@ -21,7 +21,7 @@ sub _validate {
         return 1;
     }
 
-    my $verify_signature = $self->param('verify_signature') ? 1 : 0;
+    my $verify_signature = (defined $self->param('verify_signature') && !$self->param('verify_signature'));
 
     Crypt::PKCS10->setAPIversion(1);
     my $decoded = Crypt::PKCS10->new($pkcs10,
@@ -103,10 +103,8 @@ an empty subject (required with some SCEP clients and Microsoft CA services).
 
 =item verify_signature
 
-Cryptographically verify the signature of the request. This is off by
-default as it is it requires additonal modules which are not part of the
-OpenXPKI installation by default depending on the type of uploaded key.
-(Crypt::PK::* / with Crypt::PKCS10 <= v1.10 also Crypt::OpenSSL::RSA/DSA)
+Cryptographically verify the signature of the request - default is ON.
+(was changed in v2.3 as the module deps have been fixed).
 
 =back
 
