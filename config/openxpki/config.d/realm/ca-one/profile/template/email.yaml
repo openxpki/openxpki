@@ -2,6 +2,7 @@ id: email
 label: I18N_OPENXPKI_UI_PROFILE_EMAILADDRESS
 description: I18N_OPENXPKI_UI_PROFILE_EMAILADDRESS_DESC
 type: freetext
+preset: "[% emailAddress.0 || SAN_EMAIL.0 %]"
 match: .+@.+
 width: 30
 placeholder: john.doe@openxpki.org
