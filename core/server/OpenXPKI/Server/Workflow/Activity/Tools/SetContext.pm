@@ -36,11 +36,13 @@ sub execute
 
         ##! 16: 'Value ' . Dumper $value
 
-        if (defined $value) {
-            $context->param($key => $value);
+        if (!defined $value || $value eq '~') {
+            $context->param({ $key => undef });
+            CTX('log')->application()->debug("Removing $key from context");
+        } else {
+            $context->param({ $key => $value });
+            CTX('log')->application()->debug("Setting context $key to $value");
         }
-
-        CTX('log')->application()->debug("Setting context $key to $value");
 
     }
 
@@ -57,6 +59,10 @@ OpenXPKI::Server::Workflow::Activity::Tools::SetContext
 =head1 Description
 
 Set context parameters from the activity definition.
+
+As the empty string is a valid value and passing "undef" via the config is
+not possible the special string C<~> (tilde symbol) will delete the key from
+the context.
 
 =head2 Configuration
 
