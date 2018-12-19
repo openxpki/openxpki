@@ -69,12 +69,12 @@ sub issueCertificate {
             $notbefore = OpenXPKI::DateTime::get_validity({
                 VALIDITYFORMAT => 'detect',
                 VALIDITY        => $val,
-            });
+            }) if ($val);
         } elsif ($key eq 'notafter') {
             $notafter = OpenXPKI::DateTime::get_validity({
                 VALIDITYFORMAT => 'detect',
                 VALIDITY        => $val,
-            });
+            }) if ($val);
         }
 
 
