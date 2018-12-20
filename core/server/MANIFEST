@@ -80,6 +80,7 @@ OpenXPKI/Config/Loader.pm
 # Config Connector
 OpenXPKI/Connector/FakeValidity.pm
 OpenXPKI/Connector/DataPool.pm
+OpenXPKI/Connector/Regex.pm
 OpenXPKI/Connector/Secret.pm
 OpenXPKI/Connector/WorkflowContext.pm
 
