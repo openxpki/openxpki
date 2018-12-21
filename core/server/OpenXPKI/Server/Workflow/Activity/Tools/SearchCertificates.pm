@@ -105,7 +105,9 @@ sub execute
         $query->{expires_before} = $cutoff;
     } elsif($expiry_cutoff) {
         $query->{expires_after} = $expiry_cutoff;
-    } else {
+
+    # catch include_expired "_any"
+    } elsif (!$include_expired) {
         $query->{expires_after} = $epoch - 1;
     }
 
@@ -277,8 +279,9 @@ Limit the size of the result set
 =item include_expired
 
 Parseable OpenXPKI::Datetime value (autodetected), certificates which are
-expired after the given date are included in the report. Default is not to
-include expired certificates.
+expired after the given date are included in the report. Set to I<_any> to
+include all expired certificates. Default is not to include expired
+certificates.
 
 =item include_revoked
 
