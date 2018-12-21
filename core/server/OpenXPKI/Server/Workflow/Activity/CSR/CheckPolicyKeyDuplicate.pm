@@ -15,6 +15,7 @@ use Data::Dumper;
 
 sub execute
 {
+    ##! 1: 'Start'
     my $self       = shift;
     my $workflow   = shift;
     my $context    = $workflow->context();
@@ -34,34 +35,37 @@ sub execute
             message => 'I18N_OPENXPKI_UI_UNABLE_TO_PARSE_PKCS10_REQUEST_DATA');
     }
 
+    ##! 16: 'subject_key_identifier: ' . $key_identifier
     my $query = {
-        ENTITY_ONLY => 1,
-        SUBJECT_KEY_IDENTIFIER => $key_identifier,
+        entity_only => 1,
+        subject_key_identifier => $key_identifier,
     };
 
     if ($self->param('any_realm')) {
         ##! 32: 'Any realm requested'
-        $query->{PKI_REALM} = '_ANY';
+        $query->{pki_realm} = '_any';
     }
 
     ##! 32: 'Search duplicate key with query ' . Dumper $query
 
-    my $result = CTX('api')->search_cert($query);
+    my $result = CTX('api2')->search_cert(%$query);
+
+    my $target_key = $self->param('target_key') || 'check_policy_key_duplicate';
 
     ##! 16: 'Search returned ' . Dumper $result
-    my @identifier = map {  $_->{IDENTIFIER} } @{$result};
+    my @identifier = map {  $_->{identifier} } @{$result};
 
     if (@identifier) {
 
         my $ser = OpenXPKI::Serialization::Simple->new();
-        $context->param('check_policy_key_duplicate', $ser->serialize(\@identifier) );
+        $context->param( $target_key , $ser->serialize(\@identifier) );
 
         CTX('log')->application()->info("Policy key duplicate check failed, found certs " . join(", ", @identifier));
 
 
     } else {
 
-        $context->param( { 'check_policy_key_duplicate' => undef } );
+        $context->param( { $target_key => undef } );
 
     }
 
