@@ -124,11 +124,7 @@ sub key_usage
     return 1;
 }
 
-sub get_result
-{
-    my $self = shift;
-    return $self->read_file ($self->{OUTFILE});
-}
+#get_result moved to base class
 
 1;
 __END__

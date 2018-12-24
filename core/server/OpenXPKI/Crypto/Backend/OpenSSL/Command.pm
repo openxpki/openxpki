@@ -174,6 +174,27 @@ sub get_openssl_dn
     return $dn;
 }
 
+sub get_result
+{
+    my $self = shift;
+
+    if (!defined $self->{OUTFILE}) {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_OUTFILE_NOT_DEFINED",
+        );
+    }
+
+    my $ret = $self->read_file ($self->{OUTFILE});
+
+    if (!defined $ret || $ret eq '') {
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_OUTFILE_IS_EMPTY",
+        );
+    }
+
+    return $ret;
+}
+
 sub DESTROY
 {
     my $self = shift;
@@ -251,3 +272,10 @@ set_tmpfile and environment variables from set_env.
 =head2 get_openssl_dn
 
 expects a RFC2253 compliant DN and returns an OpenSSL DN.
+
+=head2 get_result
+
+The default handler returns the content of OUTFILE. Must be overriden
+in the child class if a different handling is required. Will throw an
+exception if OUTFILE is not set, not readable or zero size.
+

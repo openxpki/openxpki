@@ -90,20 +90,7 @@ sub key_usage
     return 0;
 }
 
-sub get_result
-{
-    my $self = shift;
-    return $self->read_file ($self->{OUTFILE});
-    ## this is the content !!!
-
-    #my $pkcs7 = $self->read_file ($self->{OUTFILE});
-    #if ($pkcs7 eq $self->{CONTENT})
-    #{
-    #    return 1;
-    #} else {
-    #    return undef;
-    #}
-}
+#get_result moved to base class
 
 1;
 __END__
