@@ -15,7 +15,7 @@ use English;
 use Data::Dumper;
 use OpenXPKI::FileUtils;
 use OpenXPKI::DN;
-use OpenXPKI::Crypto::X509;
+use OpenXPKI::Crypt::X509;
 use Encode;
 
 sub get_command
@@ -84,19 +84,12 @@ sub get_result
     {
         $cert .= "-----END CERTIFICATE-----\n";
         $cert    =~ s/^.*\n-----BEGIN/-----BEGIN/s;
-        my ($subject, $issuer);
-        # Load the PEM into the x509 Object to parse it
-        ##! 4: "determine the subject of the end entity cert"
-        eval {
-            my $x509 = $self->{XS}->get_object ({DATA => $cert, TYPE => "X509"});
-            $subject = $self->{XS}->get_object_function ({
-                           OBJECT   => $x509,
-                           FUNCTION => "subject"});
-            $issuer = $self->{XS}->get_object_function ({
-                           OBJECT   => $x509,
-                           FUNCTION => "issuer"});
-            $self->{XS}->free_object ($x509);
-        };
+
+        my $x509 = OpenXPKI::Crypt::X509->new( $cert );
+
+        my $subject = $x509->get_subject();
+        my $issuer = $x509->get_issuer();
+
         ##! 8: 'Subject: ' . $subject
         ##! 8: 'Issuer: ' . $issuer
 
