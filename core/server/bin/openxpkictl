@@ -29,6 +29,7 @@ GetOptions(\%params,
           instance|i=s
           version
           debug=s@
+          keep-temp-files=s
           quiet
           fg|foreground
           )) or pod2usage(-verbose => 0);
@@ -109,6 +110,10 @@ if ($cmd eq 'status') {
         }
     }
 
+    if ($params{'keep-temp-files'} && $params{'keep-temp-files'} eq 'yes') {
+        $args->{KEEP_TEMP} = 1;
+    }
+
     exit OpenXPKI::Control::start( $args );
 
 } elsif ($cmd eq 'stop') {
@@ -160,6 +165,10 @@ openxpkictl [options] COMMAND
         (i.e. "level AND BITMASK == level").
         BITMASK can be specified as a decadic or binary number (e.g. 5 or
         0b101). If not given BITMASK defaults to 1.
+
+   --keep-temp-files yes
+        Do not delete temporary files.
+        B<WARNING>: Files can contain confidential data!
 
    --foreground
         Use a non-forking server: only useful for debugging or profiling.

@@ -45,6 +45,7 @@ use English;
 use POSIX ":sys_wait_h";
 use Data::Dumper;
 use Digest::SHA qw( sha256_base64 );
+use File::Temp;
 
 # CPAN modules
 use Proc::ProcessTable;
@@ -55,7 +56,7 @@ Log::Log4perl->easy_init($ERROR);
 use OpenXPKI::Debug;
 
 
-=head2 start {CONFIG, SILENT, PID, FOREGROUND, DEBUG}
+=head2 start {CONFIG, SILENT, PID, FOREGROUND, DEBUG, KEEP_TEMP}
 
 Start the server.
 
@@ -78,6 +79,12 @@ hashref: module => level
 =item DEBUG_BITMASK
 hashref: module => bitmask
 
+=item KEEP_TEMP (0|1)
+Weather to not delete temp files
+
+B<!!THIS MIGHT BE A SECURITY RISK !!> as files might contain private keys
+or other confidential data!
+
 =back
 
 =cut
@@ -92,6 +99,10 @@ sub start {
     my $debug_level = $args->{DEBUG_LEVEL} || 0;
     my $debug_bitmask = $args->{DEBUG_BITMASK} || 0;
 
+
+    if ($args->{KEEP_TEMP}) {
+        $File::Temp::KEEP_ALL = 1;
+    }
 
     # We must set the debug options before loading any OXI classes
     # Parsing any class before the debug level is set will exlude the class

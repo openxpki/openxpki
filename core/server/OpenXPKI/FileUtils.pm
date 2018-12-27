@@ -20,6 +20,20 @@ use Fcntl qw( :DEFAULT );
 
 my %safe_filename_of :ATTR; # a hash of filenames created with safe_tmpfile
 my %safe_dir_of      :ATTR; # a hash of directories created with safe_tmpdir
+my %temp_handles     :ATTR;
+my %temp_dir         :ATTR;
+
+sub BUILD {
+    my ($self, $ident, $arg_ref ) = @_;
+
+    $temp_handles{$ident} = [];
+
+    if ($arg_ref && $arg_ref->{TMP}) {
+        $temp_dir{$ident} = $arg_ref->{TMP};
+    } else {
+        $temp_dir{$ident} = '/tmp';
+    }
+}
 
 sub read_file {
     my $self = shift;
@@ -155,6 +169,54 @@ sub get_safe_tmpdir {
 
     ##! 1: 'end: $filename'
     return $dir;
+}
+
+=head2 get_tmp_handle
+
+Create a temporary file and return the object handle of it.
+The return value can be used in string context to get the name of the
+directory created. The handle will be held open by the class so it will
+stay in the filesystem until the class is destroyed.
+
+=cut
+
+sub get_tmp_handle {
+
+    my $self = shift;
+    my $ident = ident $self;
+
+    my $fh = File::Temp->new(
+        TEMPLATE => $self->__get_safe_template({ TMP => $temp_dir{$ident} }),
+    );
+    # enforce umask
+    chmod 0600, $fh->filename;
+    push @{$temp_handles{$ident}}, $fh;
+    return $fh;
+
+}
+
+=head2 get_tmp_dir
+
+Create a temporary directory and return the object handle of it.
+The return value can be used in string context to get the name of the
+directory created. The handle will be held open by the class so it will
+stay in the filesystem until the class is destroyed.
+
+=cut
+
+sub get_tmp_dirhandle {
+
+    my $self = shift;
+    my $ident = ident $self;
+
+    my $fh = File::Temp->newdir(
+        TEMPLATE => $self->__get_safe_template({ TMP => $temp_dir{$ident} }),
+    );
+    # enforce umask
+    chmod 0700, $fh->dirname;
+    push @{$temp_handles{$ident}}, $fh;
+    return $fh;
+
 }
 
 sub __get_safe_template
