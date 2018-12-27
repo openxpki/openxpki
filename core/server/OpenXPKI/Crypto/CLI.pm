@@ -11,7 +11,6 @@ use English;
 use Class::Std;
 
 use OpenXPKI::Debug;
-#use OpenXPKI qw (read_file get_safe_tmpfile);
 use OpenXPKI::FileUtils;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context;
@@ -22,11 +21,11 @@ use Log::Log4perl qw(:easy);
 my %tmp_of    :ATTR( :init_arg<TMP>    ); # the tmp directory
 my %shell_of  :ATTR( :init_arg<SHELL>  ); # the shell to be used
 my %engine_of :ATTR( :init_arg<ENGINE> ); # the engine used
-my %stdin_file_of  :ATTR; # STDIN  file (redirected input to command)
 my %stdout_file_of :ATTR; # STDOUT file (redirected output from command)
 my %stderr_file_of :ATTR; # STDERR file (redirected output from command)
 my %command_of     :ATTR; # the command used
 my %logger_of      :ATTR; # OpenXPKI logger
+my %fu_of      :ATTR; # FileUtils
 
 sub START {
     my ($self, $ident, $arg_ref) = @_;
@@ -66,18 +65,11 @@ sub START {
     }
     $logger_of{$ident} = Log::Log4perl->get_logger('system.crypto');
 
+    $fu_of{$ident} = OpenXPKI::FileUtils->new({ TMP => $arg_ref->{TMP} });
 
-    ##! 2: "create output and stderr files in $arg_ref->{TMP}"
-    my $fu = OpenXPKI::FileUtils->new();
-    $stdin_file_of{$ident} = $fu->get_safe_tmpfile({
-        TMP => $arg_ref->{TMP},
-    });
-    $stdout_file_of{$ident} = $fu->get_safe_tmpfile({
-        TMP => $arg_ref->{TMP},
-    });
-    $stderr_file_of{$ident} = $fu->get_safe_tmpfile({
-        TMP => $arg_ref->{TMP},
-    });
+    $stdout_file_of{$ident} = $fu_of{$ident}->get_tmp_handle();
+    $stderr_file_of{$ident} = $fu_of{$ident}->get_tmp_handle();
+
 }
 
 sub prepare {
@@ -142,8 +134,8 @@ sub execute {
         }
         ##! 16: 'split cmd (was backticks): ' . Dumper \@cmd
 
-        open my $STDOUT, '>', $stdout_file_of{$ident};
-        open my $STDERR, '>', $stderr_file_of{$ident};
+        open my $STDOUT, '>', $stdout_file_of{$ident}->filename;
+        open my $STDERR, '>', $stderr_file_of{$ident}->filename;
         my ($shell, @wrapper_cmd) =
             __deal_with_wrapper($shell_of{$ident}, @cmd);
 
@@ -160,7 +152,6 @@ sub execute {
         if ($EVAL_ERROR && $EVAL_ERROR ne "Child was already waited on without calling the wait method\n") {
             # the above may fail if the child has already exited,
             # we ignore that
-            $self->get_result();
             my $stderr = $self->get_stderr();
 
             $self->log()->error('OpenSSL error: ' . $stderr);
@@ -177,7 +168,6 @@ sub execute {
         close($STDOUT);
         close($STDERR);
         if ($command->exit_status()) {
-            $self->get_result();
             my $stderr = $self->get_stderr();
 
             $self->log()->error('OpenSSL error: ' . $stderr);
@@ -190,9 +180,6 @@ sub execute {
             );
         }
     }
-
-    unlink($stderr_file_of{$ident}) if (-e $stderr_file_of{$ident});
-
 
     ##! 1: "end"
     return $return;
@@ -225,16 +212,14 @@ sub get_result {
     ##! 1: "start"
 
     my $ret = 1;
-    if (-e $stdout_file_of{$ident}) {
+    if ($stdout_file_of{$ident}) {
         ## there was an output
-        my $fu = OpenXPKI::FileUtils->new();
-        $ret = $fu->read_file($stdout_file_of{$ident});
+        $ret = $fu_of{$ident}->read_file($stdout_file_of{$ident});
         $ret = $engine_of{$ident}->filter_stdout($ret);
         if ($ret eq '') {
             $ret = 1;
         }
 
-        unlink ($stdout_file_of{$ident});
     }
 
     ## WARNING: DO NOT OUTPUT ANYTHING HERE
@@ -250,15 +235,13 @@ sub get_stderr {
     ##! 1: "start"
 
     my $ret = 1;
-    if (-e $stderr_file_of{$ident}) {
+    if ($stderr_file_of{$ident}) {
         ## there was an output
-        my $fu = OpenXPKI::FileUtils->new();
-        $ret = $fu->read_file($stderr_file_of{$ident});
+        $ret = $fu_of{$ident}->read_file($stderr_file_of{$ident});
         $ret = $engine_of{$ident}->filter_stderr($ret);
         if ($ret eq '') {
             $ret = 1;
         }
-        unlink ($stderr_file_of{$ident});
     }
 
     ##! 1: "end"
@@ -267,32 +250,16 @@ sub get_stderr {
 
 sub cleanup {
     ##! 1: "start"
-    my $self = shift;
-    my $ident = ident $self;
-
-    if (exists $stdin_file_of{$ident}  and -e $stdin_file_of{$ident}) {
-        unlink($stdin_file_of{$ident});
-    }
-    if (exists $stdout_file_of{$ident} and -e $stdout_file_of{$ident}) {
-        unlink ($stdout_file_of{$ident});
-    }
-    if (exists $stderr_file_of{$ident} and -e $stderr_file_of{$ident}) {
-        unlink ($stderr_file_of{$ident});
-    }
-    ##! 1: "end"
+    # no more cleanup here as tmpfiles are removed now by File::Temp
+    # we keep this as O::C::Toolkit calls cleanup on error and other
+    # APIs might still need this
+    return 1;
 }
 
 sub log {
     my $self = shift;
     my $ident = ident $self;
     return $logger_of{$ident};
-}
-
-sub DEMOLISH {
-    ##! 1: "start"
-    my $self = shift;
-    $self->cleanup();
-    ##! 1: "end"
 }
 
 1;
