@@ -18,7 +18,7 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->get_tmpfile ('OUT');
+
 
     my ($engine, $passwd, $keyform);
     my $key_store = $self->{ENGINE}->get_key_store();
@@ -59,7 +59,7 @@ sub get_command
             $engine = $self->__get_used_engine();
 
             $self->{KEYFILE} = $self->write_temp_file( $self->{KEY} );
-            $self->{CERTFILE} = $self->write_temp_file( $self->{CERT}) );
+            $self->{CERTFILE} = $self->write_temp_file( $self->{CERT} );
 
     } else {
             ##! 16: 'external signature '
@@ -101,7 +101,7 @@ sub get_command
     $command .= " -recip ".$self->{CERTFILE} if ($self->{CERTFILE});
     $command .= " -inform PEM";
     $command .= " -in ". $self->write_temp_file( $self->{PKCS7} );
-    $command .= " -out ".$self->{OUTFILE};
+    $command .= " -out ".$self->get_outfile();
 
     if (defined $passwd)
     {

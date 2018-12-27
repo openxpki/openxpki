@@ -14,7 +14,7 @@ sub get_command
 {
     my $self = shift;
 
-    $self->get_tmpfile ('OUT');
+    
 
     ## check parameters
 
@@ -59,7 +59,7 @@ sub get_command
         if ($self->{ENGINE}->get_engine() and
             ($engine_usage =~ m{ NEW_ALG }xms));
 
-    $command .= " -out ".$self->{OUTFILE};
+    $command .= " -out ".$self->get_outfile();
     $command .= " -in " . $self->write_temp_file( $self->{DATA} );
     $command .= " -inform " . $self->{IN};
     if ($self->{OUT} eq "DER") {

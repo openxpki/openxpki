@@ -20,7 +20,7 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->get_tmpfile ('OUT');
+    
 
     my $engine = "";
     my $engine_usage = $self->{ENGINE}->get_engine_usage();
@@ -54,7 +54,7 @@ sub get_command
     $command .= " -engine $engine" if ($engine);
     $command .= " -inform PEM";
     $command .= " -in ".$self->write_temp_file( $self->{PKCS7} );
-    $command .= " -signer ".$self->{OUTFILE};
+    $command .= " -signer ".$self->get_outfile();
 
     # Optional parts
     if ($self->{CONTENT}) {

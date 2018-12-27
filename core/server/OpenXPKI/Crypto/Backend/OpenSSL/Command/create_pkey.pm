@@ -38,12 +38,12 @@ sub get_command
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKEY_REQUIRE_KEY_ALG_OR_PARAM");
     }
 
-    $self->get_tmpfile ('OUT');
+
 
     my @command = qw( genpkey );
     push @command, ('-engine', $engine) if ($engine);
 
-    push @command, ('-out', $self->{OUTFILE});
+    push @command, ('-out', $self->get_outfile());
 
     push @command, ('-algorithm', $key_alg) if ($key_alg); # no algorithm for e.g. DSA from params file
     foreach my $key (keys %{$pkeyopt}) {
@@ -56,7 +56,7 @@ sub get_command
 
     # PARAM holds the parameters blob for DSA, etc!
     if ($self->{PARAM}) {
-        push @command, ('-paramfile', $self->write_temp_file( $self->{PARAM} );
+        push @command, ('-paramfile', $self->write_temp_file( $self->{PARAM} ) );
     }
 
     push @command, ('-'.$enc_alg);

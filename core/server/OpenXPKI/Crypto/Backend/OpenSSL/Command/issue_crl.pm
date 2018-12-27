@@ -11,7 +11,6 @@ package OpenXPKI::Crypto::Backend::OpenSSL::Command::issue_crl;
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
 use OpenXPKI;
-use OpenXPKI::DateTime;
 
 use Math::BigInt;
 use English;
@@ -30,7 +29,7 @@ sub get_command
     }
     $self->{CONFIG}->set_profile($self->{PROFILE});
 
-    $self->get_tmpfile ('OUT');
+
 
     ## ENGINE key's cert: no parameters
     ## normal cert: engine (optional), passwd, key
@@ -82,7 +81,7 @@ sub get_command
         $command .= " -keyfile ".$self->{KEYFILE};
     }
     $command .= " -keyform $keyform" if ($keyform);
-    $command .= " -out ".$self->{OUTFILE};
+    $command .= " -out ".$self->get_outfile();
 
     if (defined $passwd)
     {

@@ -15,12 +15,12 @@ sub get_command
         );
     }
 
-    $self->get_tmpfile ('OUT');
+    
 
     my $command = "asn1parse ";
 
     $command .= "-genconf " . $self->write_temp_file( $self->{DATA} );
-    $command .= " -out ". $self->{OUTFILE};
+    $command .= " -out ". $self->get_outfile();
 
 
     return [ $command ];

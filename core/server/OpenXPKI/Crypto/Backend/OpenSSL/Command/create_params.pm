@@ -28,11 +28,11 @@ sub get_command
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKEY_PKEYOPT_IS_NOT_HASH");
     }
 
-    $self->get_tmpfile ('OUT');
+    
 
     my @command = qw( genpkey );
     push @command, '-genparam';
-    push @command, ('-out', $self->{OUTFILE});
+    push @command, ('-out', $self->get_outfile());
 
     push @command, ('-algorithm', $self->{TYPE});
     foreach my $key (keys %{$pkeyopt}) {

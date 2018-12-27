@@ -27,7 +27,7 @@ sub get_command
     $self->{CONFIG}->set_profile($self->{PROFILE});
     my $profile = $self->{PROFILE};
 
-    $self->get_tmpfile ('OUT');
+    
 
     ## ENGINE key's cert: no parameters
     ## normal cert: engine (optional), passwd, key
@@ -82,7 +82,7 @@ sub get_command
     push @command, '-multivalue-rdn' if ($profile->get_subject() =~ /[^\\](\\\\)*\+/);
     push @command, ('-engine', $engine) if ($engine);
     push @command, ('-keyform', $keyform) if ($keyform);
-    push @command, ('-out', $self->{OUTFILE});
+    push @command, ('-out', $self->get_outfile());
 
     if ($self->{CSR} !~ m{\A -----BEGIN }xms) {
         push @command, ('-spkac', $self->write_temp_file( 'SPKAC=' . $self->{CSR} ) );
@@ -114,7 +114,7 @@ sub key_usage
 sub get_result
 {
     my $self = shift;
-    my $result = $self->read_file ($self->{OUTFILE});
+    my $result = $self->read_file ($self->get_outfile());
     $result =~ s/^.*-----BEGIN/-----BEGIN/s;
     return $result;
 }

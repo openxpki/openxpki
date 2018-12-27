@@ -15,8 +15,6 @@ sub get_command {
 
     ## compensate missing parameters
 
-    $self->get_tmpfile( 'OUT' );
-
     my ( $engine, $passwd, $keyform );
     my $key_store = $self->{ENGINE}->get_key_store();
     if ( $key_store eq 'ENGINE' ) {
@@ -55,7 +53,7 @@ sub get_command {
         $engine = $self->__get_used_engine();
 
         $self->{KEYFILE} = $self->write_temp_file( $self->{KEY} );
-        $self->{CERTFILE} = $self->write_temp_file( $self->{CERT}) );
+        $self->{CERTFILE} = $self->write_temp_file( $self->{CERT} );
 
     } else {
         ## external signature with token key
@@ -90,7 +88,7 @@ sub get_command {
         $command .= " -inkey " . $self->{KEYFILE}   if ( $self->{KEYFILE} );
         $command .= " -signer " . $self->{CERTFILE} if ( $self->{CERTFILE} );
         $command .= " -in " . $self->write_temp_file( $self->{CONTENT} );
-        $command .= " -out " . $self->{OUTFILE};
+        $command .= " -out " . $self->get_outfile();
         $command .= " -outform PEM";
 
     if ( defined $passwd ) {

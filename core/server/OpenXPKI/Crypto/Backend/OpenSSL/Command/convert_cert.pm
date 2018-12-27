@@ -29,7 +29,7 @@ sub get_command
                 message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_MISSING_OUTPUT_FORMAT");
     }
 
-    $self->get_tmpfile ('OUT');
+
 
     if ($container_format eq 'X509') {
         ##! 8: "DER or TXT"
@@ -62,11 +62,12 @@ sub get_command
         ## in a case when engine introduces new crypto algorithms (like GOST ones),
         ## which are not available in a classical OpenSSL library
         my $engine_usage = $self->{ENGINE}->get_engine_usage();
-        $command .= " -engine ".$self->{ENGINE}->get_engine()
-            if ($self->{ENGINE}->get_engine() and
-                    ($engine_usage =~ m{ NEW_ALG }xms));
 
-        $command .= " -out ".$self->{OUTFILE};
+        if ($self->{ENGINE}->get_engine() and ($engine_usage =~ m{ NEW_ALG }xms)) {
+            $command .= " -engine ". $self->{ENGINE}->get_engine();
+        }
+
+        $command .= " -out ".$self->get_outfile();
         $command .= " -in ". $self->write_temp_file( $self->{DATA} );
         $command .= " -inform " . $inform;
 
@@ -103,7 +104,7 @@ sub get_command
             $command .= ' -noout -text -nameopt RFC2253,-esc_msb ';
         }
 
-        $command .= " -out ".$self->{OUTFILE};
+        $command .= " -out ".$self->get_outfile();
 
         ##! 4: "before foreach"
         foreach my $cert (@certs) {
@@ -112,7 +113,7 @@ sub get_command
             # corresponding part to the command
             my $filename = $self->write_temp_file( $cert );
             ##! 8: "filename: $filename"
-            $command .= "-certfile $filename ";
+            $command .= " -certfile $filename ";
         }
         ##! 8: "command: $command"
         return [ $command ];

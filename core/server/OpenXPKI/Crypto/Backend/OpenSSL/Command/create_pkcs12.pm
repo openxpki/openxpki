@@ -18,7 +18,7 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->get_tmpfile ('OUT');
+    
 
     my $engine = "";
     my $engine_usage = $self->{ENGINE}->get_engine_usage();
@@ -93,7 +93,7 @@ sub get_command
     $command .= " -engine $engine" if ($engine);
     $command .= " -inkey ". $self->write_temp_file( $self->{KEY} ) ;
     $command .= " -in ". $self->write_temp_file( $self->{CERT} );
-    $command .= " -out ".$self->{OUTFILE};
+    $command .= " -out ".$self->get_outfile();
 
     $command .= " -keypbe ".$self->{KEY_PBE} if ($self->{KEY_PBE});
     $command .= " -certpbe ".$self->{CERT_PBE} if ($self->{CERT_PBE});

@@ -39,7 +39,7 @@ sub get_command
     $passwd = $self->{PASSWD};
     $engine = $self->__get_used_engine();
 
-    $self->get_tmpfile ('OUT');
+    
 
     ## check parameters
 
@@ -62,7 +62,7 @@ sub get_command
     push @command, ('-engine', $engine) if ($engine);
     push @command, ('-keyform', $keyform) if ($keyform);
     push @command, ('-key', $self->write_temp_file( $self->{KEY} ));
-    push @command, ('-out', $self->{OUTFILE});
+    push @command, ('-out', $self->get_outfile());
 
     if (defined $passwd)
     {

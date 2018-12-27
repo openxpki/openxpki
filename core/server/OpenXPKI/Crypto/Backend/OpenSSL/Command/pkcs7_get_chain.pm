@@ -22,7 +22,7 @@ sub get_command
 {
     my $self = shift;
 
-    $self->get_tmpfile ('OUT');
+    
 
     my $engine = "";
     my $engine_usage = $self->{ENGINE}->get_engine_usage();
@@ -43,7 +43,7 @@ sub get_command
     #$command .= " -text";
     $command .= " -inform PEM";
     $command .= " -in ".$self->write_temp_file( $self->{PKCS7} );
-    $command .= " -out ".$self->{OUTFILE};
+    $command .= " -out ".$self->get_outfile();
 
     return [ $command ];
 }
@@ -65,7 +65,7 @@ sub get_result
     my $self = shift;
 
     my $fu = OpenXPKI::FileUtils->new();
-    my $pkcs7 = $fu->read_file ($self->{OUTFILE});
+    my $pkcs7 = $fu->read_file ($self->get_outfile());
 
     # We want to have the end entity certificate, which we autodetect by looking for
     # the certificate whoes subject is not an issuer in the found list

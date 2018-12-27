@@ -331,7 +331,7 @@ Example: $self->write_file (FILENAME => $filename, CONTENT => $data, FORCE => 1)
 
 =head2 get_safe_tmpfile
 
-Example: my $file = $self->get_tmpfile ({TMP => "/tmp"});
+Example: my $file = $self->get_safe_tmpfile ({TMP => "/tmp"});
 
 This method creates a safe temporary file and returns the filename.
 

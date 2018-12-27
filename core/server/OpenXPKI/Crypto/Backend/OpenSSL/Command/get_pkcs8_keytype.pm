@@ -26,7 +26,7 @@ sub get_command
         $engine = $self->{ENGINE}->get_engine();
     }
 
-    $self->get_tmpfile ('OUT');
+    
 
     if (not exists $self->{PASSWD})
     {
@@ -46,7 +46,7 @@ sub get_command
 
     $command .= " -engine $engine" if ($engine);
     $command .= " -in ". $self->write_temp_file( $self->{DATA}) ;
-    $command .= " -out ".$self->{OUTFILE};
+    $command .= " -out ".$self->get_outfile();
 
     if ($self->{PASSWD})
     {
@@ -70,7 +70,7 @@ sub key_usage
 sub get_result
 {
     my $self = shift;
-    my $result = $self->read_file($self->{OUTFILE});
+    my $result = $self->read_file($self->get_outfile());
     my ($type) = ($result =~ m{ \A -----BEGIN\ ([A-Z]+)\ PRIVATE\ KEY----- }xms);
     ##! 16: 'type: ' . $type
     return $type;

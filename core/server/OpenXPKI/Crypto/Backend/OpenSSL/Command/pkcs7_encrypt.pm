@@ -16,8 +16,6 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->get_tmpfile ('CONTENT', 'OUT');
-
     my $engine = "";
     my $engine_usage = $self->{ENGINE}->get_engine_usage();
     $engine = $self->{ENGINE}->get_engine()
@@ -74,7 +72,7 @@ sub get_command
     my $command  = "smime -encrypt";
     $command .= " -engine $engine" if ($engine);
     $command .= " -in ". $self->write_temp_file( $self->{CONTENT} );
-    $command .= " -out ".$self->{OUTFILE};
+    $command .= " -out ".$self->get_outfile();
     $command .= " -outform " . $self->{OUTFORM};
     $command .= " -".$self->{ENC_ALG};
     $command .= " ".$self->{CERTFILE};

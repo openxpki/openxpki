@@ -30,9 +30,7 @@ package OpenXPKI::Crypto::Backend::OpenSSL::Command;
 use OpenXPKI::Debug;
 use OpenXPKI qw(read_file write_file);
 use OpenXPKI::DN;
-use OpenXPKI::DateTime;
-use OpenXPKI::FileUtils qw(write_temp_file);
-use POSIX qw(strftime);
+use OpenXPKI::FileUtils;
 use OpenXPKI::Exception;
 use English;
 
@@ -85,18 +83,30 @@ sub write_temp_file {
 
 }
 
-sub get_tmpfile
-{
+sub get_outfile {
+
     my $self = shift;
 
-    if (scalar(@_) == 0) {
-        return $self->{FU}->get_tmp_handle()->filename;
+    if (!$self->{OUTFILE}) {
+        $self->{OUTFILE} = $self->get_tmpfile();
     }
 
-    while (my $key = shift) {
-        my $fh = $self->{FU}->get_tmp_handle();
-        $self->{$key."FILE"} = $fh->filename;
+    return $self->{OUTFILE};
+
+}
+
+sub get_tmpfile {
+    my $self = shift;
+
+    if (scalar(@_) != 0) {
+       OpenXPKI::Exception->throw (
+            message => "Call to get_tmpfile with arguments is no longer supported",
+            params  => { ARGS => \@_ }
+        );
     }
+
+    return $self->{FU}->get_tmp_handle()->filename();
+
 }
 
 sub set_env
@@ -162,7 +172,7 @@ sub get_result
         );
     }
 
-    my $ret = $self->{FU}->read_file ($self->{OUTFILE});
+    my $ret = $self->{FU}->read_file($self->get_outfile());
 
     if (!defined $ret || $ret eq '') {
         OpenXPKI::Exception->throw (
@@ -180,6 +190,7 @@ sub DESTROY
 }
 
 1;
+
 __END__
 
 =head1 Name
@@ -203,17 +214,16 @@ by the commands itself.
 
 =head2 get_tmpfile
 
-If called without arguments this method creates a temporary file and
-returns its filename:
+Returns the filename of a temporary file.
 
   my $tmpfile = $self->get_tmpfile();
-
-If called with one or more arguments, the method creates a temporary
-file for each argument and writes the filename to "${key}FILE"
 
 The files are created using File::Temp, handles are held by the command
 base class to ensure the files remain available while the class exists and
 are cleaned up when the command class is destroyed!
+
+B<NOTE>: The synatax with arguments to create one or multiple filename in
+the class namespace is no longer supported!
 
 =head2 set_env
 

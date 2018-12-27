@@ -30,8 +30,6 @@ sub get_command
         $engine = $self->{ENGINE}->get_engine();
     }
 
-    $self->get_tmpfile ( 'OUT' );
-
     ## check parameters
 
     if ($self->{KEYTYPE} !~ /\A(pkey|rsa)\z/) {
@@ -110,7 +108,7 @@ sub get_command
 
     $command .= " -engine $engine" if ($engine);
 
-    $command .= " -out ".$self->{OUTFILE};
+    $command .= " -out ".$self->get_outfile();
 
     return [ $command ];
 

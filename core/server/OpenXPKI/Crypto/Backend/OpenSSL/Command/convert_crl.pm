@@ -12,7 +12,7 @@ sub get_command
 {
     my $self = shift;
 
-    $self->get_tmpfile ('OUT');
+    
     if (! exists $self->{DATA})
     {
         OpenXPKI::Exception->throw (
@@ -41,7 +41,7 @@ sub get_command
     ## build the command
 
     my $command  = "crl";
-    $command .= " -out ".$self->{OUTFILE};
+    $command .= " -out ".$self->get_outfile();
     $command .= " -in " .$self->write_temp_file( $self->{DATA} );
     if (defined $self->{IN} && ($self->{IN} eq 'DER')) {
         $command .= " -inform DER";
