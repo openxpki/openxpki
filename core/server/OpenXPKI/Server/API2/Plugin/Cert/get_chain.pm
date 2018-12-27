@@ -10,8 +10,7 @@ OpenXPKI::Server::API2::Plugin::Cert::get_chain
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
-
-
+use OpenXPKI::Crypt::X509;
 
 =head1 COMMANDS
 
@@ -104,14 +103,7 @@ command "get_chain" => {
                 push @$cert_list, $cert->{data};
             }
             elsif ('DER' eq $temp_format) {
-                $default_token = CTX('api')->get_default_token() unless($default_token);
-                my $utf8fix = $default_token->command({
-                    COMMAND => 'convert_cert',
-                    DATA    => $cert->{data},
-                    IN      => 'PEM',
-                    OUT     => 'DER',
-                });
-                push @$cert_list, $utf8fix;
+                push @$cert_list, OpenXPKI::Crypt::X509->new( $cert->{data} )->data;
             }
             elsif ('DBINFO' eq $temp_format) {
                 # remove data to save some bytes

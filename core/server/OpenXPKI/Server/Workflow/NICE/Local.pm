@@ -14,7 +14,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Crypto::Profile::Certificate;
 use OpenXPKI::Crypto::Profile::CRL;
-use OpenXPKI::Crypto::X509;
+use OpenXPKI::Crypt::X509;
 use OpenXPKI::Crypto::CRL;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Context qw( CTX );
@@ -283,12 +283,7 @@ sub issueCertificate {
     # SPKAC Requests return binary format - so we need to convert that
     if ($certificate !~ m{\A -----BEGIN }xms) {
         ##! 32: 'Certificate seems to be binary - conveting it'
-        $certificate = $default_token->command({
-            COMMAND => "convert_cert",
-            DATA    => $certificate,
-            OUT     => "PEM",
-            IN      => "DER",
-        });
+        $certificate = OpenXPKI::Crypt::X509->new($certificate)->pem;
     }
     ##! 64: 'cert: ' . $certificate
 

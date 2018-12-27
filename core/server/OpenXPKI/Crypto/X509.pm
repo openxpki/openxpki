@@ -10,6 +10,7 @@ package OpenXPKI::Crypto::X509;
 use OpenXPKI::Debug;
 use OpenXPKI::DN;
 use Math::BigInt;
+use MIME::Base64;
 use Digest::SHA qw(sha1_base64);
 use OpenXPKI::DateTime;
 
@@ -73,14 +74,15 @@ sub __init
     ##  compute SHA1 hash of DER representation  ##
     ###############################################
 
-    my $cert_der = $self->{TOKEN}->command({
-                        COMMAND => 'convert_cert',
-                        DATA    => $self->get_body(),
-                        OUT     => 'DER',
-    });
-    $self->{SHA1} = sha1_base64($cert_der);
-    ## RFC 3548 URL and filename safe base64
-    $self->{SHA1} =~ tr/+\//-_/;
+    if ($self->get_body() =~ m{-----BEGIN[^-]*CERTIFICATE-----(.+)-----END[^-]*CERTIFICATE-----}xms) {
+        $self->{SHA1} = sha1_base64(decode_base64($1));
+        ## RFC 3548 URL and filename safe base64
+        $self->{SHA1} =~ tr/+\//-_/;
+    } else {
+        OpenXPKI::Exception->throw (
+            message  => "I18N_OPENXPKI_CRYPTO_X509_CONVERT_TO_DER_FAILED",
+        );
+    }
 
     ##########################
     ##     core parsing     ##
@@ -306,8 +308,19 @@ sub get_converted
     if ($format eq 'PEM' ) {
         return $self->get_body();
     }
+    elsif ($format eq 'DER' )
+    {
+
+       $self->get_body() =~ m{-----BEGIN[^-]*CERTIFICATE-----(.+)-----END[^-]*CERTIFICATE-----}xms;
+       OpenXPKI::Exception->throw (
+            message  => "I18N_OPENXPKI_CRYPTO_X509_CONVERT_TO_DER_FAILED",
+       ) unless($1);
+       return decode_base64($1);
+    }
+    # TXT would be the third one but this is broken so this is useless code for now
     else
     {
+
         my $result = eval {$self->{TOKEN}->command ({COMMAND => "convert_cert",
                                                      DATA    => $self->get_body(),
                                                      OUT     => $format})};

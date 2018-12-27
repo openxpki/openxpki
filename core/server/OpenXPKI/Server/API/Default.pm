@@ -23,6 +23,8 @@ use OpenXPKI::MooseParams;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::i18n qw( set_language );
 use Digest::SHA qw( sha1_base64 );
+use OpenXPKI::Crypt::X509;
+use OpenXPKI::Crypto::X509;
 use DateTime;
 use Workflow;
 
@@ -42,15 +44,11 @@ sub get_cert_identifier {
     my $self      = shift;
     my $arg_ref   = shift;
     my $cert      = $arg_ref->{CERT};
-    my $default_token = CTX('api')->get_default_token();
     ##! 64: 'cert: ' . $cert
 
-    my $x509 = OpenXPKI::Crypto::X509->new(
-        DATA  => $cert,
-        TOKEN => $default_token,
-    );
+    my $x509 = OpenXPKI::Crypt::X509->new( $cert );
 
-    my $identifier = $x509->get_identifier();
+    my $identifier = $x509->get_cert_identifier();
     ##! 4: 'identifier: ' . $identifier
 
     ##! 1: 'end'
@@ -257,14 +255,7 @@ sub get_chain {
                 push @$cert_list, $cert->{data};
             }
             elsif ($inner_format eq 'DER') {
-                $default_token = CTX('api')->get_default_token() unless($default_token);
-                my $utf8fix = $default_token->command({
-                    COMMAND => 'convert_cert',
-                    DATA    => $cert->{data},
-                    IN      => 'PEM',
-                    OUT     => 'DER',
-                });
-                push @$cert_list, $utf8fix;
+                push @$cert_list, OpenXPKI::Crypt::X509->new( $cert->{data} )->data;
             }
             elsif ($inner_format eq 'HASH') {
                 # remove data to save some bytes

@@ -11,6 +11,7 @@ use OpenXPKI::DN;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
+use OpenXPKI::Crypt::X509;
 
 use Data::Dumper;
 
@@ -21,7 +22,6 @@ sub execute {
     my $workflow = shift;
     my $context = $workflow->context();
 
-    my $default_token = CTX('api')->get_default_token();
     my $config        = CTX('config');
 
     my $cert_identifier = $self->param('cert_identifier');
@@ -109,11 +109,7 @@ sub execute {
     $data->{subject} = $cert->{subject};
 
     # Convert to DER
-    $data->{der} = $default_token->command({
-        COMMAND => 'convert_cert',
-        DATA    => $data->{pem},
-        OUT     => 'DER',
-    });
+    $data->{der} = OpenXPKI::Crypt::X509->new( $cert->{data} )->data;
 
     if (!defined $data->{der} || $data->{der} eq '') {
         OpenXPKI::Exception->throw(

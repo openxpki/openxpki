@@ -15,6 +15,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Crypto::X509;
+use OpenXPKI::Crypt::X509;
 use DateTime;
 use OpenXPKI::DateTime;
 use OpenXPKI::i18n;
@@ -1338,13 +1339,8 @@ sub sc_analyze_certificate {
 
     if ($certformat eq 'DER') {
         ##! 16: 'converting DER to PEM'
-        $data = $default_token->command({
-            COMMAND => 'convert_cert',
-            IN      => $certformat,
-            OUT     => 'PEM',
-            DATA    => $data,
-        });
-       $certformat = 'PEM';
+        $data = OpenXPKI::Crypt::X509->new($data)->pem;
+        $certformat = 'PEM';
     }
 
     my $x509;
