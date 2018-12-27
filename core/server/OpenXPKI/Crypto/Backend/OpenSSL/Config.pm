@@ -14,10 +14,11 @@ use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 ##! 0: "FIXME: why do we have no delete_tmpfile operation?"
 ##! 0: "FIXME: a missing delete_tmpfile is a security risk"
-use OpenXPKI qw(write_file get_safe_tmpfile);
+use OpenXPKI qw(write_file);
 use OpenXPKI::DN;
 use OpenXPKI::DateTime;
 use English;
+use OpenXPKI::FileUtils;
 
 use Data::Dumper;
 
@@ -42,7 +43,6 @@ sub new
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_CONFIG_TEMPORARY_DIRECTORY_UNAVAILABLE");
     }
-
 
     return $self;
 }
@@ -225,9 +225,6 @@ sub dump
     my $self = shift;
     my $config = "";
 
-    ##! 2: "cleanup to make sure that we get a fresh config"
-    $self->__cleanup_files();
-
     ##! 2: "dump common part"
 
     $config = "## OpenSSL configuration\n".
@@ -239,6 +236,12 @@ sub dump
     $config .= $self->__get_openssl_common();
     $config .= $self->__get_oids();
     $config .= $self->__get_engine();
+
+
+    $self->{CONFDIR} = OpenXPKI::FileUtils->new({ TMP => $self->{TMP} })->get_tmp_dirhandle();
+
+    my $tmpdir = $self->{CONFDIR}->dirname();
+
     if (exists $self->{PROFILE})
     {
         ##! 4: "write serial file (for CRL and certs)"
@@ -247,9 +250,8 @@ sub dump
         if (defined $serial)
         {
             ##! 8: "get tempfilename for serial"
-            $self->{FILENAME}->{SERIAL}     = $self->get_safe_tmpfile ({TMP => $self->{TMP}});
-            ##! 8: "defined old filename for serial to make later a correct cleanup"
-            $self->{FILENAME}->{SERIAL_OLD} = $self->{FILENAME}->{SERIAL}.".old";
+            $self->{FILENAME}->{SERIAL} = "$tmpdir/serial";
+
             ##! 8: "serial present"
             $serial = Math::BigInt->new ($serial);
             if (not defined $serial)
@@ -263,8 +265,10 @@ sub dump
             ##! 8: "hex serial is $hex"
             $self->write_file (FILENAME => $self->{FILENAME}->{SERIAL},
                                CONTENT  => $hex);
+
             ##! 8: "specify a special filename to remove the new cert from the temp file area (see new_certs_dir)"
-            $self->{FILENAME}->{NEW_CERT} = $self->{TMP}."/$hex.pem";
+            $self->{FILENAME}->{NEW_CERT} = "$tmpdir/$hex.pem";
+
         }
 
         ##! 4: "write database files"
@@ -273,7 +277,7 @@ sub dump
         # ATTRFILE should be databasefile.attr
         # FIXME: we assume this file does not exist
         # FIXME: is this really safe? OpenSSL require it
-        $self->{FILENAME}->{DATABASE} = $self->get_safe_tmpfile ({TMP => $self->{TMP}});
+        $self->{FILENAME}->{DATABASE} = "$tmpdir/index.txt";
         $self->{FILENAME}->{ATTR} = $self->{FILENAME}->{DATABASE}.".attr";
         if (exists $self->{INDEX_TXT})
         {
@@ -289,9 +293,6 @@ sub dump
         }
         $self->write_file (FILENAME => $self->{FILENAME}->{ATTR},
                            CONTENT  => "unique_subject = no\n");
-        ##! 4: "create filenames for a better cleanup"
-        $self->{FILENAME}->{DATABASE_OLD} = $self->{FILENAME}->{DATABASE}.".old";
-        $self->{FILENAME}->{ATTR_OLD}     = $self->{FILENAME}->{ATTR}.".old";
 
         ##! 4: "PROFILE exists => CRL or cert generation"
         $config .= $self->__get_ca();
@@ -301,7 +302,7 @@ sub dump
 
     ##! 2: "write configuration file"
 
-    $self->{FILENAME}->{CONFIG}   = $self->get_safe_tmpfile ({TMP => $self->{TMP}});
+    $self->{FILENAME}->{CONFIG}   = "$tmpdir/openssl.cnf";
     $self->write_file (FILENAME => $self->{FILENAME}->{CONFIG},
                        CONTENT  => $config);
 
@@ -388,7 +389,7 @@ sub __get_ca
 
     my $config = "\n[ ca ]\n";
 
-    $config .= "new_certs_dir     = ".$self->{TMP}."\n";
+    $config .= "new_certs_dir     = ".$self->{CONFDIR}."\n";
     $config .= "certificate       = ".$self->{ENGINE}->get_certfile()."\n";
     $config .= "private_key       = ".$self->{ENGINE}->get_keyfile."\n";
 
@@ -750,9 +751,6 @@ sub cleanup
     ##! 2: "delete index.txt database"
     delete $self->{INDEX_TXT} if (exists $self->{INDEX_TXT});
 
-    ##! 2: "cleanup files"
-    $self->__cleanup_files();
-
     ##! 1: "end"
     return 1;
 }
@@ -762,26 +760,12 @@ sub __cleanup_files
     ##! 1: "start"
     my $self = shift;
 
-    ##! 2: "return if no files must be deleted"
-    return 1 if (not exists $self->{FILENAME} or
-                 not scalar keys %{$self->{FILENAME}});
-
-    ##! 2: "delete all temp files"
-    foreach my $filename (sort keys %{$self->{FILENAME}})
-    {
-        ##! 4: "filename: $filename"
-        unlink($self->{FILENAME}->{$filename});
+    if ($self->{CONFDIR}) {
+        delete $self->{CONFDIR};
     }
-    delete $self->{FILENAME};
 
     ##! 1: "end"
     return 1;
-}
-
-sub DESTROY
-{
-    my $self = shift;
-    $self->__cleanup_files();
 }
 
 1;
