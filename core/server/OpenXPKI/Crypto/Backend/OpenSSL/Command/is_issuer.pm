@@ -16,27 +16,11 @@ sub get_command
 {
     my $self  = shift;
 
-    my $fu = OpenXPKI::FileUtils->new();
-    my $cafile = $fu->get_safe_tmpfile({
-        TMP => $self->{TMP},
-    });
+    my $cafile = $self->write_temp_file( $self->{'POTENTIAL_ISSUER'} );
     ##! 64: 'cafile: ' . $cafile
-    my $certfile = $fu->get_safe_tmpfile({
-        TMP => $self->{TMP},
-    });
+
+    my $certfile = $self->write_temp_file( $self->{'CERT'} );
     ##! 64: 'certfile: ' . $certfile
-
-    $self->write_file(
-        FILENAME => $cafile,
-        CONTENT  => $self->{'POTENTIAL_ISSUER'},
-        FORCE    => 1,
-    );
-
-    $self->write_file(
-        FILENAME => $certfile,
-        CONTENT  => $self->{'CERT'},
-        FORCE    => 1,
-    );
 
     ## build the command
 

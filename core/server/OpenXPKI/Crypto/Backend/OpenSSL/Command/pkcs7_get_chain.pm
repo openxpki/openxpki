@@ -22,7 +22,7 @@ sub get_command
 {
     my $self = shift;
 
-    $self->get_tmpfile ('PKCS7', 'OUT');
+    $self->get_tmpfile ('OUT');
 
     my $engine = "";
     my $engine_usage = $self->{ENGINE}->get_engine_usage();
@@ -37,17 +37,12 @@ sub get_command
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_CHAIN_MISSING_PKCS7");
     }
 
-    ## prepare data
-    $self->write_file (FILENAME => $self->{PKCS7FILE},
-                       CONTENT  => $self->{PKCS7},
-                   FORCE    => 1);
-
     ## build the command
 
     my $command  = "pkcs7 -print_certs";
     #$command .= " -text";
     $command .= " -inform PEM";
-    $command .= " -in ".$self->{PKCS7FILE};
+    $command .= " -in ".$self->write_temp_file( $self->{PKCS7} );
     $command .= " -out ".$self->{OUTFILE};
 
     return [ $command ];

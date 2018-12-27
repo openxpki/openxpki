@@ -38,11 +38,6 @@ sub get_command
     # prepare parameters
     $passwd = $self->{PASSWD};
     $engine = $self->__get_used_engine();
-    $self->get_tmpfile ('KEY');
-    $self->write_file (FILENAME => $self->{KEYFILE},
-                       CONTENT  => $self->{KEY},
-                       FORCE    => 1);
-
 
     $self->get_tmpfile ('OUT');
 
@@ -52,11 +47,6 @@ sub get_command
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_SUBJECT");
-    }
-    if (not $self->{KEYFILE})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_KEYFILE");
     }
 
     ## prepare data
@@ -71,7 +61,7 @@ sub get_command
     push @command, ('-nameopt', 'utf8');
     push @command, ('-engine', $engine) if ($engine);
     push @command, ('-keyform', $keyform) if ($keyform);
-    push @command, ('-key', $self->{KEYFILE});
+    push @command, ('-key', $self->write_temp_file( $self->{KEY} ));
     push @command, ('-out', $self->{OUTFILE});
 
     if (defined $passwd)

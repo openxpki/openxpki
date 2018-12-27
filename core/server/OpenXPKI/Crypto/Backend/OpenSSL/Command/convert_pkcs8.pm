@@ -35,10 +35,7 @@ sub get_command
         $engine = $self->{ENGINE}->get_engine();
     }
 
-    $self->get_tmpfile ('KEY', 'OUT');
-    $self->write_file (FILENAME => $self->{KEYFILE},
-                       CONTENT  => $self->{DATA},
-                       FORCE    => 1);
+    $self->get_tmpfile ('OUT');
 
     ## check parameters
 
@@ -74,7 +71,7 @@ sub get_command
 
     ## build the command
 
-    my $command  = "pkcs8 -in ".$self->{KEYFILE}." ";
+    my $command  = "pkcs8 -in " . $self->write_temp_file( $self->{DATA} );
 
     if ($self->{REVERSE})
     {

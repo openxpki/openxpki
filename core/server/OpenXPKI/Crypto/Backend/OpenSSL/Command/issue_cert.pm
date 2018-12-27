@@ -27,7 +27,7 @@ sub get_command
     $self->{CONFIG}->set_profile($self->{PROFILE});
     my $profile = $self->{PROFILE};
 
-    $self->get_tmpfile ('CSR',      'OUT');
+    $self->get_tmpfile ('OUT');
 
     ## ENGINE key's cert: no parameters
     ## normal cert: engine (optional), passwd, key
@@ -65,21 +65,6 @@ sub get_command
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_ISSUE_CERT_MISSING_CSRFILE");
     }
 
-    ## prepare data
-
-    my $spkac = 0;
-    if ($self->{CSR} !~ m{\A -----BEGIN }xms)
-    {
-        $spkac = 1;
-        $self->{CSR} = 'SPKAC=' . $self->{CSR};
-    }
-    #done by CLI
-    #$self->{CONFIG}->dump();
-    #my $config = $self->{CONFIG}->get_config_filename();
-    $self->write_file (FILENAME => $self->{CSRFILE},
-                       CONTENT  => $self->{CSR},
-                   FORCE    => 1);
-
     ## build the command
 
     my @command = qw( ca -batch );
@@ -98,11 +83,11 @@ sub get_command
     push @command, ('-engine', $engine) if ($engine);
     push @command, ('-keyform', $keyform) if ($keyform);
     push @command, ('-out', $self->{OUTFILE});
-    if ($spkac)
-    {
-        push @command, ('-spkac', $self->{CSRFILE});
+
+    if ($self->{CSR} !~ m{\A -----BEGIN }xms) {
+        push @command, ('-spkac', $self->write_temp_file( 'SPKAC=' . $self->{CSR} ) );
     } else {
-        push @command, ('-in', $self->{CSRFILE});
+        push @command, ('-in', $self->write_temp_file( $self->{CSR}) );
     }
 
     if (defined $passwd)

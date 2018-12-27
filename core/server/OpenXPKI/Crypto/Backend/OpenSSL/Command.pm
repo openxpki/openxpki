@@ -28,11 +28,10 @@ use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_params;
 package OpenXPKI::Crypto::Backend::OpenSSL::Command;
 
 use OpenXPKI::Debug;
-use OpenXPKI qw(read_file write_file get_safe_tmpfile);
+use OpenXPKI qw(read_file write_file);
 use OpenXPKI::DN;
 use OpenXPKI::DateTime;
-use File::Temp;
-use File::Spec;
+use OpenXPKI::FileUtils qw(write_temp_file);
 use POSIX qw(strftime);
 use OpenXPKI::Exception;
 use English;
@@ -73,22 +72,17 @@ sub new
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_TEMPORARY_DIRECTORY_UNAVAILABLE");
     }
 
+    $self->{FU} = OpenXPKI::FileUtils->new({ TMP => $self->{TMP}});
+
     ##! 1: "end"
     return $self;
 }
 
-sub set_tmpfile
-{
+sub write_temp_file {
+
     my $self = shift;
-    my $keys = { @_ };
+    return $self->{FU}->write_temp_file( @_ );
 
-    foreach my $key (keys %{$keys})
-    {
-    push @{$self->{CLEANUP}->{FILE}}, $keys->{$key};
-
-        $self->{$key."FILE"} = $keys->{$key};
-    }
-    return 1;
 }
 
 sub get_tmpfile
@@ -96,16 +90,12 @@ sub get_tmpfile
     my $self = shift;
 
     if (scalar(@_) == 0) {
-        my $filename = $self->get_safe_tmpfile ({TMP => $self->{TMP}});
-    push @{$self->{CLEANUP}->{FILE}}, $filename;
-    return $filename;
+        return $self->{FU}->get_tmp_handle()->filename;
     }
-    else
-    {
-    while (my $arg = shift) {
-            my $filename = $self->get_safe_tmpfile ({TMP => $self->{TMP}});
-        $self->set_tmpfile($arg => $filename);
-    }
+
+    while (my $key = shift) {
+        my $fh = $self->{FU}->get_tmp_handle();
+        $self->{$key."FILE"} = $fh->filename;
     }
 }
 
@@ -128,19 +118,7 @@ sub cleanup
 
     $self->{CONFIG}->cleanup() if ($self->{CONFIG});
 
-    foreach my $file (@{$self->{CLEANUP}->{FILE}})
-    {
-        if (-e $file)
-    {
-        unlink $file;
-    }
-        if (-e $file)
-        {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CLEANUP_FILE_FAILED",
-                params  => {"FILENAME" => $file});
-        }
-    }
+    $self->{FU}->cleanup();
 
     foreach my $variable (@{$self->{CLEANUP}->{ENV}})
     {
@@ -184,7 +162,7 @@ sub get_result
         );
     }
 
-    my $ret = $self->read_file ($self->{OUTFILE});
+    my $ret = $self->{FU}->read_file ($self->{OUTFILE});
 
     if (!defined $ret || $ret eq '') {
         OpenXPKI::Exception->throw (
@@ -223,19 +201,6 @@ present. All other parameters will be passed without any checks to
 the hash of the class instance. The real checks must be implemented
 by the commands itself.
 
-=head2 set_tmpfile
-
-expects a hash with prefix infront of FILE and the filename which is
-a tmpfile. Example:
-
-$self->set_tmpfile ("IN" => "/tmp/example.txt")
-
-mapped to
-
-$self->{INFILE} = "/tmp/example.txt";
-
-All temporary file are cleaned up automatically.
-
 =head2 get_tmpfile
 
 If called without arguments this method creates a temporary file and
@@ -244,19 +209,11 @@ returns its filename:
   my $tmpfile = $self->get_tmpfile();
 
 If called with one or more arguments, the method creates a temporary
-file for each argument specified and calls $self->set_tmpfile() for
-this argument.
+file for each argument and writes the filename to "${key}FILE"
 
-Calling
-
-  $self->get_tmpfile(IN, OUT);
-
-is equivalent to
-
-  $self->set_tmpfile( IN  => $self->get_tmpfile(),
-                      OUT => $self->get_tmpfile() );
-
-All temporary file are set to mode 0600 and are cleaned up automatically.
+The files are created using File::Temp, handles are held by the command
+base class to ensure the files remain available while the class exists and
+are cleaned up when the command class is destroyed!
 
 =head2 set_env
 
@@ -267,7 +224,7 @@ cleaned up automatically.
 =head2 cleanup
 
 performs the cleanup of any temporary stuff like files from
-set_tmpfile and environment variables from set_env.
+get_tmpfile and environment variables from set_env.
 
 =head2 get_openssl_dn
 

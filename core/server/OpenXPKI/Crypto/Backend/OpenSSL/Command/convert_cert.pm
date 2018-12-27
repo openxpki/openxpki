@@ -29,12 +29,10 @@ sub get_command
                 message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_MISSING_OUTPUT_FORMAT");
     }
 
+    $self->get_tmpfile ('OUT');
+
     if ($container_format eq 'X509') {
         ##! 8: "DER or TXT"
-        $self->get_tmpfile ('IN', 'OUT');
-        $self->write_file (FILENAME => $self->{INFILE},
-                CONTENT  => $self->{DATA},
-                FORCE    => 1);
 
         ## check parameters
 
@@ -69,7 +67,7 @@ sub get_command
                     ($engine_usage =~ m{ NEW_ALG }xms));
 
         $command .= " -out ".$self->{OUTFILE};
-        $command .= " -in ".$self->{INFILE};
+        $command .= " -in ". $self->write_temp_file( $self->{DATA} );
         $command .= " -inform " . $inform;
 
         if ($self->{OUT} eq "DER") {
@@ -104,21 +102,17 @@ sub get_command
         else {
             $command .= ' -noout -text -nameopt RFC2253,-esc_msb ';
         }
-        $self->{OUTFILE} = $self->get_tmpfile();
-        $command .= "-out $self->{OUTFILE} ";
+
+        $command .= " -out ".$self->{OUTFILE};
+
         ##! 4: "before foreach"
         foreach my $cert (@certs) {
-            ##! 8: $cert
+            ##! 16: $cert
             ## get each cert, write it to a temporary file and add the
             # corresponding part to the command
-            my $filename = $self->get_tmpfile();
+            my $filename = $self->write_temp_file( $cert );
             ##! 8: "filename: $filename"
             $command .= "-certfile $filename ";
-            $self->write_file(
-                FILENAME => $filename,
-                CONTENT  => $cert,
-                FORCE    => 1,
-            );
         }
         ##! 8: "command: $command"
         return [ $command ];

@@ -29,26 +29,14 @@ sub get_command
         );
     }
 
-    $self->get_tmpfile ('CERTIFICATE', 'CHAIN', 'TRUSTED');
-
-    $self->write_file (FILENAME => $self->{CERTIFICATEFILE},
-            CONTENT  => $self->{CERTIFICATE},
-            FORCE    => 1);
-
-    $self->write_file (FILENAME => $self->{TRUSTEDFILE},
-            CONTENT  => $self->{TRUSTED},
-            FORCE    => 1);
-
-    $self->write_file (FILENAME => $self->{CHAINFILE},
-            CONTENT  => $self->{CHAIN},
-            FORCE    => 1) if ($self->{CHAIN});
-
     ## build the command
 
     my @command = qw( verify );
-    push @command, ('-CAfile', $self->{TRUSTEDFILE});
-    push @command, ('-untrusted', $self->{CHAINFILE}) if ($self->{CHAIN});
-    push @command, ( $self->{CERTIFICATEFILE} );
+    push @command, ('-CAfile', $self->write_temp_file( $self->{TRUSTED} ) );
+
+    push @command, ('-untrusted', $self->write_temp_file( $self->{CHAIN} ) ) if ($self->{CHAIN});
+
+    push @command, ( $self->write_temp_file( $self->{CERTIFICATE} ) );
 
     ##! 32: 'SSL verify command ' . join " ", @command
 

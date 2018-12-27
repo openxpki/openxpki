@@ -14,10 +14,7 @@ sub get_command
 {
     my $self = shift;
 
-    $self->get_tmpfile ('IN', 'OUT');
-    $self->write_file (FILENAME => $self->{INFILE},
-                       CONTENT  => $self->{DATA},
-                   FORCE    => 1);
+    $self->get_tmpfile ('OUT');
 
     ## check parameters
 
@@ -63,7 +60,7 @@ sub get_command
             ($engine_usage =~ m{ NEW_ALG }xms));
 
     $command .= " -out ".$self->{OUTFILE};
-    $command .= " -in ".$self->{INFILE};
+    $command .= " -in " . $self->write_temp_file( $self->{DATA} );
     $command .= " -inform " . $self->{IN};
     if ($self->{OUT} eq "DER") {
         $command .= " -outform DER";

@@ -33,18 +33,13 @@ sub get_command
           # Its possible to have a list of certs
         if (ref $self->{CERT} eq "ARRAY") {
             my $names = '';
-            my $i=0;
             foreach my $cert (@{$self->{CERT}}) {
-                $i++;
-                $self->get_tmpfile('CERT'.$i);
-                $self->write_file (FILENAME => $self->{'CERT'.$i.'FILE'}, CONTENT  => $cert, FORCE    => 1);
-                $names .= ' ' . $self->{'CERT'.$i.'FILE'};
+                $names .= ' ' . $self->write_temp_file( $cert );
             }
             # Set CERTFILE to the list of tmpnames
             $self->{CERTFILE} = $names;
         } else {
-            $self->get_tmpfile ('CERT');
-            $self->write_file (FILENAME => $self->{CERTFILE}, CONTENT  => $self->{CERT}, FORCE    => 1);
+            $self->{CERTFILE} = $self->write_temp_file( $self->{CERT} );
         }
     } else {
         $self->{CERTFILE} = $self->{ENGINE}->get_certfile();
@@ -74,17 +69,11 @@ sub get_command
             params => { ENC_ALG => $self->{ENC_ALG} });
     }
 
-    ## prepare data
-
-    $self->write_file (FILENAME => $self->{CONTENTFILE},
-                       CONTENT  => $self->{CONTENT},
-                   FORCE    => 1);
-
     ## build the command
 
     my $command  = "smime -encrypt";
     $command .= " -engine $engine" if ($engine);
-    $command .= " -in ".$self->{CONTENTFILE};
+    $command .= " -in ". $self->write_temp_file( $self->{CONTENT} );
     $command .= " -out ".$self->{OUTFILE};
     $command .= " -outform " . $self->{OUTFORM};
     $command .= " -".$self->{ENC_ALG};

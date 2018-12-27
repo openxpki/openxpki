@@ -117,6 +117,7 @@ sub write_file {
     }
     print {$HANDLE} $content;
     close $HANDLE;
+
 }
 
 sub get_safe_tmpfile {
@@ -219,6 +220,35 @@ sub get_tmp_dirhandle {
 
 }
 
+=head2 write_temp_file
+
+Expects the content to write as argument. Creates a temporary file handle
+using get_tmp_handle and writes the data to it. The filehandle is closed
+and the name of the file is returned.
+
+=cut
+
+sub write_temp_file {
+
+    my $self = shift;
+    my $ident = ident $self;
+    my $content = shift;
+
+    if (! defined $content) {
+        OpenXPKI::Exception->throw (
+            message => 'I18N_OPENXPKI_FILEUTILS_WRITE_FILE_NO_CONTENT_SPECIFIED',
+        );
+    }
+
+    my $fh = $self->get_tmp_handle();
+    my $filename = $fh->filename;
+    print {$fh} $content;
+    close $fh;
+
+    return $filename ;
+
+}
+
 sub __get_safe_template
 {
     ##! 1: 'start'
@@ -252,6 +282,9 @@ sub cleanup {
             delete $safe_filename_of{$ident}->{$file};
         }
     }
+
+    $temp_handles{$ident} = [];
+
     return 1;
 }
 

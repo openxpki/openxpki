@@ -33,13 +33,7 @@ sub get_command
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKEY_PKEYOPT_IS_NOT_HASH");
     }
 
-    # PARAM holds the parameters blob for DSA, etc!
-    if ($self->{PARAM}) {
-        $self->get_tmpfile ('PARAM');
-        $self->write_file (FILENAME => $self->{PARAMFILE},
-            CONTENT  => $self->{PARAM},
-            FORCE    => 1);
-    } elsif (!$key_alg) {
+    if (!$key_alg && !$self->{PARAM}) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKEY_REQUIRE_KEY_ALG_OR_PARAM");
     }
@@ -60,7 +54,11 @@ sub get_command
         }
     }
 
-    push @command, ('-paramfile', $self->{PARAMFILE}) if ($self->{PARAMFILE});
+    # PARAM holds the parameters blob for DSA, etc!
+    if ($self->{PARAM}) {
+        push @command, ('-paramfile', $self->write_temp_file( $self->{PARAM} );
+    }
+
     push @command, ('-'.$enc_alg);
     push @command, ('-pass', 'env:pwd');
     $self->set_env ("pwd" => $passwd);

@@ -20,7 +20,7 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->get_tmpfile ('CONTENT', 'PKCS7', 'CHAIN', 'OUT');
+    $self->get_tmpfile ('OUT');
 
     my $engine = "";
     my $engine_usage = $self->{ENGINE}->get_engine_usage();
@@ -35,15 +35,11 @@ sub get_command
     }
 
     # Assemble chain
+    my $chainfile;
     if (defined $self->{CHAIN} ) {
-
         ## prepare data
         my $chain = join('', @{$self->{CHAIN}});
-        $self->write_file(
-            FILENAME => $self->{CHAINFILE},
-            CONTENT  => $chain,
-            FORCE    => 1,
-        );
+        $chainfile = $self->write_temp_file( $chain );
 
     # No chain is ok when no verify is given
     } elsif (!$self->{NO_CHAIN}) {
@@ -52,28 +48,23 @@ sub get_command
         );
     }
 
-    # Content is also optional when just verifiy a signature
-    if ($self->{CONTENT}) {
-        $self->write_file (FILENAME => $self->{CONTENTFILE},
-                           CONTENT  => $self->{CONTENT},
-                       FORCE    => 1);
-    }
-
-    $self->write_file (FILENAME => $self->{PKCS7FILE},
-                       CONTENT  => $self->{PKCS7},
-                   FORCE    => 1);
-
     ## build the command
 
     my $command  = "smime -verify";
     $command .= " -engine $engine" if ($engine);
     $command .= " -inform PEM";
-    $command .= " -in ".$self->{PKCS7FILE};
+    $command .= " -in ".$self->write_temp_file( $self->{PKCS7} );
     $command .= " -signer ".$self->{OUTFILE};
+
     # Optional parts
-    $command .= " -content ".$self->{CONTENTFILE} if ($self->{CONTENT});
+    if ($self->{CONTENT}) {
+        $command .= " -content ". $self->write_temp_file( $self->{CONTENT} );
+    }
     $command .= " -noverify" if ($self->{NO_CHAIN});
-    $command .= " -CAfile ".$self->{CHAINFILE} if ($self->{CHAIN});
+
+    if ($chainfile) {
+        $command .= " -CAfile $chainfile ";
+    }
 
     return [ $command ];
 }

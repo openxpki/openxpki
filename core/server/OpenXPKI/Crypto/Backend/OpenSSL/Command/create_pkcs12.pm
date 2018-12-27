@@ -18,7 +18,7 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->get_tmpfile ('KEY', 'CERT', 'CHAIN', 'OUT');
+    $self->get_tmpfile ('OUT');
 
     my $engine = "";
     my $engine_usage = $self->{ENGINE}->get_engine_usage();
@@ -87,31 +87,12 @@ sub get_command
         }
     }
 
-    ## prepare data
-
-    $self->write_file (FILENAME => $self->{KEYFILE},
-                       CONTENT  => $self->{KEY},
-                   FORCE    => 1);
-    $self->write_file (FILENAME => $self->{CERTFILE},
-                       CONTENT  => $self->{CERT},
-                   FORCE    => 1);
-    if (exists $self->{CHAIN} && scalar @{$self->{CHAIN}}) {
-        my $chain = join("\n", @{$self->{CHAIN}});
-        $self->write_file(
-            FILENAME => $self->{CHAINFILE},
-            CONTENT  => $chain,
-            FORCE    => 1
-        );
-    } else {
-        $self->{CHAIN} = undef;
-    }
-
     ## build the command
 
     my $command  = "pkcs12 -export";
     $command .= " -engine $engine" if ($engine);
-    $command .= " -inkey ".$self->{KEYFILE};
-    $command .= " -in ".$self->{CERTFILE};
+    $command .= " -inkey ". $self->write_temp_file( $self->{KEY} ) ;
+    $command .= " -in ". $self->write_temp_file( $self->{CERT} );
     $command .= " -out ".$self->{OUTFILE};
 
     $command .= " -keypbe ".$self->{KEY_PBE} if ($self->{KEY_PBE});
@@ -122,9 +103,10 @@ sub get_command
     if (defined $self->{CSP}) {
         $command .= " -CSP " . q{"} . $self->{CSP} . q{"};
     }
-    if (defined $self->{CHAIN})
-    {
-        $command .= " -certfile ".$self->{CHAINFILE};
+
+    if (exists $self->{CHAIN} && scalar @{$self->{CHAIN}}) {
+        my $chain = join("\n", @{$self->{CHAIN}});
+        $command .= " -certfile ".$self->write_temp_file( $chain );
     }
 
     $command .= " -passin env:pwd";

@@ -15,7 +15,7 @@ sub get_command {
 
     ## compensate missing parameters
 
-    $self->get_tmpfile( 'CONTENT', 'OUT' );
+    $self->get_tmpfile( 'OUT' );
 
     my ( $engine, $passwd, $keyform );
     my $key_store = $self->{ENGINE}->get_key_store();
@@ -54,18 +54,9 @@ sub get_command {
         my $engine_usage = $self->{ENGINE}->get_engine_usage();
         $engine = $self->__get_used_engine();
 
-        $self->get_tmpfile( 'KEY', 'CERT' );
-        $self->write_file(
-            FILENAME => $self->{KEYFILE},
-            CONTENT  => $self->{KEY},
-            FORCE    => 1
-        );
+        $self->{KEYFILE} = $self->write_temp_file( $self->{KEY} );
+        $self->{CERTFILE} = $self->write_temp_file( $self->{CERT}) );
 
-        $self->write_file(
-            FILENAME => $self->{CERTFILE},
-            CONTENT  => $self->{CERT},
-            FORCE    => 1
-        );
     } else {
         ## external signature with token key
         $engine           = $self->__get_used_engine();
@@ -89,13 +80,6 @@ sub get_command {
             "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_KEY" );
     }
 
-    ## prepare data
-
-    $self->write_file(
-      FILENAME => $self->{CONTENTFILE},
-      CONTENT  => $self->{CONTENT},
-      FORCE    => 1
-      );
 
     ## build the command
 
@@ -105,7 +89,7 @@ sub get_command {
         $command .= " -keyform $keyform"            if ($keyform);
         $command .= " -inkey " . $self->{KEYFILE}   if ( $self->{KEYFILE} );
         $command .= " -signer " . $self->{CERTFILE} if ( $self->{CERTFILE} );
-        $command .= " -in " . $self->{CONTENTFILE};
+        $command .= " -in " . $self->write_temp_file( $self->{CONTENT} );
         $command .= " -out " . $self->{OUTFILE};
         $command .= " -outform PEM";
 

@@ -12,7 +12,7 @@ sub get_command
 {
     my $self = shift;
 
-    $self->get_tmpfile ('IN', 'OUT');
+    $self->get_tmpfile ('OUT');
     if (! exists $self->{DATA})
     {
         OpenXPKI::Exception->throw (
@@ -23,9 +23,6 @@ sub get_command
             message => 'I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CRL_DATA_EMPTY'
         );
     }
-    $self->write_file (FILENAME => $self->{INFILE},
-                       CONTENT  => $self->{DATA},
-                   FORCE    => 1);
 
     ## check parameters
 
@@ -45,7 +42,7 @@ sub get_command
 
     my $command  = "crl";
     $command .= " -out ".$self->{OUTFILE};
-    $command .= " -in ".$self->{INFILE};
+    $command .= " -in " .$self->write_temp_file( $self->{DATA} );
     if (defined $self->{IN} && ($self->{IN} eq 'DER')) {
         $command .= " -inform DER";
     }

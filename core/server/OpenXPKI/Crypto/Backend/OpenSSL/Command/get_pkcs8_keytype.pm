@@ -26,10 +26,8 @@ sub get_command
         $engine = $self->{ENGINE}->get_engine();
     }
 
-    $self->get_tmpfile ('KEY', 'OUT');
-    $self->write_file (FILENAME => $self->{KEYFILE},
-                       CONTENT  => $self->{DATA},
-                   FORCE    => 1);
+    $self->get_tmpfile ('OUT');
+
     if (not exists $self->{PASSWD})
     {
         OpenXPKI::Exception->throw (
@@ -47,7 +45,7 @@ sub get_command
     $command .= " -inform PEM";
 
     $command .= " -engine $engine" if ($engine);
-    $command .= " -in ".$self->{KEYFILE};
+    $command .= " -in ". $self->write_temp_file( $self->{DATA}) ;
     $command .= " -out ".$self->{OUTFILE};
 
     if ($self->{PASSWD})

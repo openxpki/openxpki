@@ -18,7 +18,7 @@ sub get_command
 
     ## compensate missing parameters
 
-    $self->get_tmpfile ('PKCS7', 'OUT');
+    $self->get_tmpfile ('OUT');
 
     my ($engine, $passwd, $keyform);
     my $key_store = $self->{ENGINE}->get_key_store();
@@ -58,14 +58,9 @@ sub get_command
             $passwd = $self->{PASSWD};
             $engine = $self->__get_used_engine();
 
-            $self->get_tmpfile ('KEY', 'CERT');
-            $self->write_file (FILENAME => $self->{KEYFILE},
-                               CONTENT  => $self->{KEY},
-                           FORCE    => 1);
+            $self->{KEYFILE} = $self->write_temp_file( $self->{KEY} );
+            $self->{CERTFILE} = $self->write_temp_file( $self->{CERT}) );
 
-            $self->write_file (FILENAME => $self->{CERTFILE},
-                               CONTENT  => $self->{CERT},
-                           FORCE    => 1);
     } else {
             ##! 16: 'external signature '
             ## CA external signature
@@ -97,12 +92,6 @@ sub get_command
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_DECRYPT_MISSING_KEY");
     }
 
-    ## prepare data
-
-    $self->write_file (FILENAME => $self->{PKCS7FILE},
-                       CONTENT  => $self->{PKCS7},
-                   FORCE    => 1);
-
     ## build the command
 
     my $command  = "smime -decrypt";
@@ -111,7 +100,7 @@ sub get_command
     $command .= " -inkey ".$self->{KEYFILE} if ($self->{KEYFILE});
     $command .= " -recip ".$self->{CERTFILE} if ($self->{CERTFILE});
     $command .= " -inform PEM";
-    $command .= " -in ".$self->{PKCS7FILE};
+    $command .= " -in ". $self->write_temp_file( $self->{PKCS7} );
     $command .= " -out ".$self->{OUTFILE};
 
     if (defined $passwd)
