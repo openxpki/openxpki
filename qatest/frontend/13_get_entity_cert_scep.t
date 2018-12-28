@@ -27,7 +27,7 @@ ok((-s "tmp/cacert-0"),'CA certs present') || die;
 `rm -f tmp/entity.*`;
 
 # Create the pkcs10
-`openssl req -new -nodes -keyout tmp/entity.key -out tmp/entity.csr  -config openssl.conf -reqexts req_template_v1 2>/dev/null`;
+`openssl req -new -nodes -keyout tmp/entity.key -out tmp/entity.csr -subj "/CN=entity-san.openxpki.org" -config openssl.conf -reqexts req_template_v1 2>/dev/null`;
 
 ok((-s "tmp/entity.csr"), 'csr present') || die;
 
