@@ -112,12 +112,17 @@ has subject_key_id => (
 has authority_key_id => (
     is => 'rw',
     init_arg => undef,
-    isa => 'Str',
+    isa => 'Str|Undef',
     reader => 'get_authority_key_id',
     lazy => 1,
     default => sub {
         my $self = shift;
-        return uc join ':', ( unpack '(A2)*', ( unpack 'H*', $self->_cert()->key_identifier() ) );
+        my $keyid = $self->_cert()->key_identifier();
+        # Auth-Info can be a hash -> not supported yet
+        if (!$keyid || ref $keyid ne '') {
+            return undef;
+        }
+        return uc join ':', ( unpack '(A2)*', ( unpack 'H*', $keyid ) );
     }
 );
 
