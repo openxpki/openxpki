@@ -9,26 +9,16 @@ use warnings;
 
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_chain;
 
+use Data::Dumper;
 use OpenXPKI::Debug;
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 use English;
-use Data::Dumper;
 use OpenXPKI::FileUtils;
-use OpenXPKI::DN;
 use OpenXPKI::Crypt::X509;
-use Encode;
 
 sub get_command
 {
     my $self = shift;
-
-    
-
-    my $engine = "";
-    my $engine_usage = $self->{ENGINE}->get_engine_usage();
-    $engine = $self->{ENGINE}->get_engine()
-        if ($self->{ENGINE}->get_engine() and
-            ($engine_usage =~ m{ ALWAYS }xms));
 
     ## check parameters
     if (not $self->{PKCS7})
@@ -40,7 +30,6 @@ sub get_command
     ## build the command
 
     my $command  = "pkcs7 -print_certs";
-    #$command .= " -text";
     $command .= " -inform PEM";
     $command .= " -in ".$self->write_temp_file( $self->{PKCS7} );
     $command .= " -out ".$self->get_outfile();
@@ -65,90 +54,76 @@ sub get_result
     my $self = shift;
 
     my $fu = OpenXPKI::FileUtils->new();
-    my $pkcs7 = $fu->read_file ($self->get_outfile());
+    my $result = $fu->read_file ($self->get_outfile());
 
-    # We want to have the end entity certificate, which we autodetect by looking for
-    # the certificate whoes subject is not an issuer in the found list
+    my @extra_certs = ($result =~ m{ ( -----BEGIN\ [\w\s]*CERTIFICATE----- [^-]+ -----END\ [\w\s]*CERTIFICATE----- ) }gmsx);
 
-    ##! 16: 'pkcs7: ' . $pkcs7
-    ##! 2: "split certs"
-    my %certsBySubject = ();
-    my @issuers = ();
-    my @parts = split /-----END CERTIFICATE-----\n\n/, $pkcs7;
-    foreach my $cert (@parts)
-    {
-        $cert .= "-----END CERTIFICATE-----\n";
-        $cert    =~ s/^.*\n-----BEGIN/-----BEGIN/s;
+    my $byIdentifier = {};
+    my $bySubject = {};
+    my $byKeyId = {};
+    my $issuersByKeyId = {};
+    my $issuersBySubject = {};
 
-        my $x509 = OpenXPKI::Crypt::X509->new( $cert );
+    while (my $pem = shift @extra_certs) {
+        ##! 64: 'Next cert ' . $pem
+        my $cert = OpenXPKI::Crypt::X509->new( $pem );
+        my $id = $cert->get_cert_identifier();
+        ##! 32: 'Next cert id ' . $id
+        $byIdentifier->{ $id } = $cert ;
+        $bySubject->{ $cert->get_subject } = $id;
+        $byKeyId->{ $cert->get_subject_key_id } = $id;
 
-        my $subject = $x509->get_subject();
-        my $issuer = $x509->get_issuer();
+        # issuer lists
+        $issuersByKeyId->{ $cert->get_authority_key_id } = 1 if ($cert->get_authority_key_id);
+        $issuersBySubject->{ $cert->get_issuer } = 1;
+    }
 
-        ##! 8: 'Subject: ' . $subject
-        ##! 8: 'Issuer: ' . $issuer
+    my %entity;
+    map { $entity{ $bySubject->{$_} } = 1 unless($issuersBySubject->{$_}); } keys %{$bySubject};
+    map { $entity{ $byKeyId->{$_} } = 1 unless($issuersByKeyId->{$_}); } keys %{$byKeyId};
 
-        if (exists $certsBySubject{$subject} &&
-            $certsBySubject{$subject}->{ISSUER} ne $issuer &&
-            $certsBySubject{$subject}->{CERT} ne $cert) {
-            ##! 64: 'something funny is going on, the same certificate subject with different issuer or data is present'
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_END_ENTITY_MULTIPLE_SAME_SUBJECTS_WITH_DIFFERENT_DATA',
-            );
+    my @entity_id = keys %entity;
+    ##! 32: 'Entity ' . Dumper \%entity
+    if (scalar @entity_id != 1) {
+      OpenXPKI::Exception->throw(
+            message => 'Unable to determine entity in PCSK7 get_chain command'
+        );
+    }
+
+    my $cert_id = shift @entity_id;
+    ##! 16: 'Entity identifier ' . $cert_id
+    my $cert = $byIdentifier->{$cert_id};
+
+    if ($self->{NOCHAIN}) {
+        return $cert->pem;
+    }
+
+    # Start with the entity and try to find the next issuer
+    my $MAX_DEPTH = 16;
+    my @chain;
+    while ($cert && $MAX_DEPTH--) {
+
+        push @chain, $cert->pem;
+
+        if ($cert->is_selfsigned()) {
+            ##! 16: 'Found self-signed'
+            last;
         }
 
-        $certsBySubject{$subject}->{ISSUER} = $issuer;
-        $certsBySubject{$subject}->{CERT}   = $cert;
-
-        push @issuers, $issuer;
+        my $aki = $cert->get_authority_key_id;
+        my $id;
+        if (!$aki || !$byKeyId->{$aki}) {
+            ##! 32: 'Lookup using subject '  . $cert->get_issuer
+            $id = $bySubject->{ $cert->get_issuer } || '';
+        } else {
+            ##! 32: 'Lookup using AKI ' . $aki
+            $id = $byKeyId->{$aki};
+        }
+        $cert = $byIdentifier->{ $id };
 
     }
 
-    ##! 64: 'certs: ' . Dumper \%certsBySubject
 
-    # Find subjects which are not issuers = entities
-
-    my %entity =  map { $_ => 1 } keys %certsBySubject;
-
-    # Now unset all items where the subject is listes in @issuers
-    foreach my $issuer (@issuers) {
-        ##! 16: "Remove issuer " . $issuer
-        delete( $entity{$issuer} ) if ($entity{$issuer});
-    }
-
-    # Hopefully we have only one remaining now
-    my @subjectsRemaining = keys %entity;
-     if ( scalar @subjectsRemaining != 1 ) {
-        ##! 2: "Too many remaining certs " . Dumper ( @subjectsRemaining )
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_GET_END_ENTITY_UNABLE_TOO_DETECT_CORRECT_END_ENTITY_CERTIFICATE',
-        );
-     }
-
-    my $subject = shift @subjectsRemaining;
-
-    # Requestor was just interessted in the entity
-    if ($self->{NOCHAIN}) {
-        ##! 8: 'entity only requested '
-        ##! 32: 'Entity pem ' . $certsBySubject{$subject}->{CERT}
-        return $certsBySubject{$subject}->{CERT};
-    }
-
-    # Start with the entity and build the chain
-    ##! 16: 'entity subject: ' . $subject
-    ##! 2: "create ordered cert list"
-    my @chain;
-    my $iterations = 0;
-    my $MAX_CHAIN_LENGTH = 32;
-    while (exists $certsBySubject{$subject} && $iterations < $MAX_CHAIN_LENGTH)
-    {
-        ##! 16: 'while for subject: ' . $subject
-        push @chain, $certsBySubject{$subject}->{CERT};
-        last if ($subject eq $certsBySubject{$subject}->{ISSUER});
-        $subject = $certsBySubject{$subject}->{ISSUER};
-        $iterations++;
-    }
-    ##! 2: "end"
     ##! 32: 'Chain : ' . Dumper @chain
     if (! scalar @chain ) {
         OpenXPKI::Exception->throw(
@@ -159,25 +134,6 @@ sub get_result
 
 }
 
-sub __convert_subject {
-    ##! 1: 'start'
-    my $subject = shift;
-    $subject =~ s/, /,/g;
-
-    while ($subject =~ /\\x[0-9A-F]{2}/) {
-        ##! 64: 'subject still contains \x-escaped character, replacing'
-        use bytes;
-        $subject =~ s/\\x([0-9A-F]{2})/chr(hex($1))/e;
-        no bytes;
-        ##! 64: 'subject after replacement: ' . $subject
-    }
-
-    my $dn = OpenXPKI::DN->new($subject);
-    $subject = $dn->get_x500_dn();
-
-    ##! 1: 'end'
-    return $subject;
-}
 1;
 
 __END__
@@ -194,6 +150,8 @@ OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_chain
 
 =item * PKCS7 (a signature)
 
+=item * NOCHAIN
+
 =back
 
 =head2 hide_output
@@ -206,6 +164,10 @@ returns false
 
 =head2 get_result
 
-Returns the PEM-encoded certificates in the correct order which are
-contained in the signature. The certificates are seperated by a blank
-line.
+Returns an array ref holding the PEM-encoded certificates where
+the first item is the entity certificate followed by the issuers
+in order.
+
+If NOCHAIN is set, returns only the entity as string.
+
+
