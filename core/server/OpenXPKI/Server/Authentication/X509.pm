@@ -303,7 +303,7 @@ Serial in integer notation - as string
 
 The PEM encoded certificate
 
-=item *
+=item I<*>
 
 Any part that is set in the DN hash, if an attribute is multivalued the
 first item is used.
