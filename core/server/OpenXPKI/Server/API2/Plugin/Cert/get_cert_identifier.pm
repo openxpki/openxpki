@@ -7,6 +7,9 @@ OpenXPKI::Server::API2::Plugin::Cert::get_cert_identifier
 
 =cut
 
+use Digest::SHA qw(sha1_base64);
+use MIME::Base64;
+
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
@@ -36,15 +39,14 @@ command "get_cert_identifier" => {
     my $cert = $params->cert;
     ##! 64: 'cert: ' . $cert
 
-    my $x509 = OpenXPKI::Crypto::X509->new(
-        DATA  => $cert,
-        TOKEN => CTX('api')->get_default_token,
-    );
-
-    my $identifier = $x509->get_identifier;
+    $cert =~ m{-----BEGIN[^-]*CERTIFICATE-----(.+)-----END[^-]*CERTIFICATE-----}xms;
+    my $cert_identifier = sha1_base64(decode_base64($1));
+    ## RFC 3548 URL and filename safe base64
+    $cert_identifier =~ tr/+\//-_/;
     ##! 4: 'identifier: ' . $identifier
 
-    return $identifier;
+    return $cert_identifier;
+
 };
 
 __PACKAGE__->meta->make_immutable;
