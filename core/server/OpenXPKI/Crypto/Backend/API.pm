@@ -123,7 +123,8 @@ sub __init_command_params : PRIVATE {
                           "PKCS7"   => 1},
     "verify_cert"    =>  {"CHAIN"   => 0,
                           "CERTIFICATE" => 1,
-                          "TRUSTED"   => 1},
+                          "TRUSTED"   => 1,
+                          "NOVALIDITY" => 0 },
     "create_pkey"    =>  {"PASSWD"   => 1,
                           "KEY_ALG" => 0, # default RSA
                           "ENC_ALG" => 0, # default aes256

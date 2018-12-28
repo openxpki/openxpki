@@ -5,10 +5,10 @@
 use strict;
 use warnings;
 
-use OpenXPKI::Debug;
-
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::verify_cert;
 
+use Data::Dumper;
+use OpenXPKI::Debug;
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
 sub get_command
@@ -63,6 +63,11 @@ sub get_result
 
     if ($result =~ /: OK/) {
         return 1;
+    } elsif ($self->{NOVALIDITY}) {
+        # can be replaced by no_check_time with openssl 1.1
+        my @res = map { ($_ !~ /(error|OK)/ || $_ =~ /error 10.*expired/)  ? () : $_ } split /\n/, $result;
+        ##! 32: 'no validity ' . Dumper \@res
+        return ($res[0] && $res[0] eq 'OK') ? -1 : 0;
     } else {
         return undef;
     }
@@ -79,7 +84,8 @@ OpenXPKI::Crypto::Backend::OpenSSL::Command::verify_cert
 
 =head2 get_command
 
-Check if the set of entity, chain and ca certificate build a valid signature chain (calls openssl verify).
+Check if the set of entity, chain and ca certificate build a valid signature
+chain (calls openssl verify).
 
 =over
 
@@ -88,6 +94,11 @@ Check if the set of entity, chain and ca certificate build a valid signature cha
 =item CHAIN
 
 =item TRUSTED
+
+=item NOVALIDITY
+
+If set to a true value the verification is also true if ertificates in
+the chain are expired.
 
 =back
 
@@ -102,3 +113,4 @@ returns false
 =head2 get_result
 
 Returns 1 if verify is ok, undef if not.
+If NOVALIDITY is set, -1 is returned for expired certificates.
