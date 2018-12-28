@@ -40,7 +40,7 @@ sub login_step {
     ##! 16: 'Service Answer ' . Dumper $answer
 
     my $validate = CTX('api2')->validate_certificate(
-        chain => [ $params->{certificate} ],
+        pem => $params->{certificate},
         anchor => $self->trust_anchors(),
     );
 
