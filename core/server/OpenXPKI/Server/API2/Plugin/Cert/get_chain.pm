@@ -17,27 +17,36 @@ use OpenXPKI::Crypt::X509;
 =head2 get_chain
 
 Returns the certificate chain starting at a specified certificate.
-Expects a hash ref with the named parameter START_IDENTIFIER (the
+Expects a hash ref with the named parameter start_with (the
 identifier from which to compute the chain) and optionally a parameter
-OUTFORMAT, which can be either 'PEM', 'DER' or 'HASH' (full db result).
+format, which can be either 'PEM', 'DER' or 'DBINFO' (full db result).
 Returns a hash ref with the following entries:
 
-    IDENTIFIERS   the chain of certificate identifiers as an array
-    SUBJECT       list of subjects for the returned certificates
-    CERTIFICATES  the certificates as an array of data in outformat
+    identifiers   the chain of certificate identifiers as an array
+    subject       list of subjects for the returned certificates
+    certificates  the certificates as an array of data in outformat
                   (if requested)
-    COMPLETE      1 if the complete chain was found in the database
+    complete      1 if the complete chain was found in the database
                   0 otherwise
 
-By setting "BUNDLE => 1" you will not get a hash but a PKCS7 encoded bundle
-holding the requested certificate and all intermediates (if found). Add
-"KEEPROOT => 1" to also have the root in PKCS7 container.
+    revoked       1 if a certificate in the chain is revoked
+
+By setting "bundle => 1" you will not get a hash but a PKCS7 encoded bundle
+holding the requested certificate and all intermediates (if found). If the
+certificate is not found, the result is empty. Add "keeproot => 1" to also
+have the root in PKCS7 container.
 
 B<Parameters>
 
 =over
 
-=item * C<XXX> I<Bool> - XXX. Default: XXX
+=item * C<start_with> - certificate identifier to get the chain for
+
+=item * C<format> - one of PEM, DER, DBINFO
+
+=item * C<bundle> - I<Bool>
+
+=item * C<keeproot> - I<Bool>
 
 =back
 
@@ -75,6 +84,7 @@ command "get_chain" => {
     my $id_list = [];
     my $subject_list = [];
     my $complete = 0;
+    my $has_revoked = 0;
     my %already_seen; # hash of identifiers that have already been seen
 
     my $start = $params->start_with;
@@ -97,6 +107,10 @@ command "get_chain" => {
         last unless $cert;
 
         push @$subject_list, $cert->{subject};
+
+        if ($cert->{status} ne 'ISSUED') {
+            $has_revoked = 1;
+        }
 
         if ($temp_format) {
             if ('PEM' eq $temp_format) {
@@ -127,6 +141,10 @@ command "get_chain" => {
     # Return a pkcs7 structure instead of the hash
     if ($params->bundle) {
 
+        if (!scalar @$cert_list) {
+            return '';
+        }
+
         # we do NOT include the root in p7 bundles
         pop @$cert_list if ($complete and !$params->keeproot);
 
@@ -144,6 +162,7 @@ command "get_chain" => {
         subject     => $subject_list,
         identifiers => $id_list,
         complete    => $complete,
+        revoked     => $has_revoked,
         $params->format ? (certificates => $cert_list) : (),
     };
 };
