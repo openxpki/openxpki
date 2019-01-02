@@ -12,8 +12,6 @@ use OpenXPKI::Server::Context qw( CTX );
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-##! 0: "FIXME: why do we have no delete_tmpfile operation?"
-##! 0: "FIXME: a missing delete_tmpfile is a security risk"
 use OpenXPKI qw(write_file);
 use OpenXPKI::DN;
 use OpenXPKI::DateTime;
@@ -43,6 +41,8 @@ sub new
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_CONFIG_TEMPORARY_DIRECTORY_UNAVAILABLE");
     }
+
+    $self->{FU} = OpenXPKI::FileUtils->new({ TMP => $self->{TMP} });
 
     return $self;
 }
@@ -237,13 +237,13 @@ sub dump
     $config .= $self->__get_oids();
     $config .= $self->__get_engine();
 
-
-    $self->{CONFDIR} = OpenXPKI::FileUtils->new({ TMP => $self->{TMP} })->get_tmp_dirhandle();
-
-    my $tmpdir = $self->{CONFDIR}->dirname();
-
     if (exists $self->{PROFILE})
     {
+
+        my $tmpdir = $self->{FU}->get_tmp_dirhandle()->dirname();
+        $self->{CONFDIR} = $tmpdir;
+        $self->{FILENAME}->{CONFIG} = "$tmpdir/openssl.cnf";
+
         ##! 4: "write serial file (for CRL and certs)"
 
         my $serial = $self->{PROFILE}->get_serial();
@@ -298,13 +298,18 @@ sub dump
         $config .= $self->__get_ca();
         $config .= $self->__get_extensions();
 
+        ##! 2: "write configuration file ($tmpdir/openssl.cnf)"
+        # writes a "non-temporary" file in the temporary directory
+        $self->write_file (FILENAME => $self->{FILENAME}->{CONFIG},
+                CONTENT  => $config);
+
+    } else {
+
+        $self->{FILENAME}->{CONFIG} = $self->{FU}->write_temp_file( $config );
+        ##! 2: "write configuration file " . $self->{FILENAME}->{CONFIG}
+
     }
 
-    ##! 2: "write configuration file"
-
-    $self->{FILENAME}->{CONFIG}   = "$tmpdir/openssl.cnf";
-    $self->write_file (FILENAME => $self->{FILENAME}->{CONFIG},
-                       CONTENT  => $config);
 
     ##! 16: 'config: ' . $config
     ##! 2: "set the configuration to the XS library"
@@ -763,6 +768,10 @@ sub __cleanup_files
     if ($self->{CONFDIR}) {
         delete $self->{CONFDIR};
     }
+    if ($self->{FU}) {
+        delete $self->{FU};
+    }
+    delete $self->{FILENAME};
 
     ##! 1: "end"
     return 1;
