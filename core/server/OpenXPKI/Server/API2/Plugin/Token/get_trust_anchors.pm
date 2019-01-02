@@ -46,11 +46,12 @@ command "get_trust_anchors" => {
 
     if (!ref $path) {
         my @t = split /\./, $path;
-        $path = @t;
+        $path = \@t;
     }
 
     ##! 8: 'Anchor path ' . Dumper $path
     my $config = CTX('config');
+
     my @trust_certs =  $config->get_scalar_as_list([ @$path, 'cacert']);
     my @trust_realms = $config->get_scalar_as_list([ @$path, 'realm']);
 
