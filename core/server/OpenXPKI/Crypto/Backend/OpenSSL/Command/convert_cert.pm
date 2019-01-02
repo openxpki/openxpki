@@ -77,6 +77,10 @@ sub get_command
         elsif ($self->{OUT} eq "PEM") {
             $command .= " -outform PEM";
         }
+        elsif ($self->{OUT} eq 'TXTPEM')
+        {
+            $command .= ' -outform PEM -text -nameopt RFC2253,-esc_msb ';
+        }
         else {
             $command .= " -noout -text -nameopt RFC2253,-esc_msb";
         }
@@ -97,11 +101,8 @@ sub get_command
         {
             $command .= ' -outform DER ';
         }
-        elsif ($self->{OUT} eq 'PEM') {
-            $command .= ' -outform PEM ';
-        }
         else {
-            $command .= ' -noout -text -nameopt RFC2253,-esc_msb ';
+            $command .= ' -outform PEM ';
         }
 
         $command .= " -out ".$self->get_outfile();
@@ -138,7 +139,25 @@ sub key_usage
     return 0;
 }
 
-#get_result moved to base class
+
+
+sub get_result
+{
+    my $self = shift;
+
+    my $res = '';
+    if ($self->{OUT} eq "TXT" || $self->{OUT} eq "TXTPEM") {
+        $res = shift;
+        $res .= "\n";
+    }
+
+    if ($self->{OUT} ne "TXT") {
+        $res .= $self->SUPER::get_result();
+    }
+
+    return $res;
+}
+
 
 1;
 __END__
@@ -157,7 +176,7 @@ OpenXPKI::Crypto::Backend::OpenSSL::Command::convert_cert
 
 =item * IN (DER, PEM)
 
-=item * OUT (DER, PEM, TXT)
+=item * OUT (DER, PEM, TXT, TXT+PEM)
 
 =item * CONTAINER_FORMAT (X509, PKCS7)
 

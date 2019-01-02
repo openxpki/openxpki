@@ -44,7 +44,7 @@ sub __init_command_params : PRIVATE {
                           "PARAM"         => 0},
     "convert_cert"    => {"DATA"             => 1,
                           "IN"               => ["DER", "PEM"],
-                          "OUT"              => ["DER","TXT","PEM"],
+                          "OUT"              => ["DER","TXT","PEM","TXTPEM"],
                           "CONTAINER_FORMAT" => 0,
                           },
     "convert_crl"     => {"DATA" => 1,

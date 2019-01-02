@@ -395,7 +395,11 @@ msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_PEM"
 msgstr "Загрузка сертификата в форматах PEM или CRT"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHOW_AS_TEXT"
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHOW_PEM"
+msgstr "Загрузка сертификата в форматах PEM или CRT"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHOW_TEXT"
 msgstr "Загрузка сертификата в текстовом формате"
 
 #, fuzzy

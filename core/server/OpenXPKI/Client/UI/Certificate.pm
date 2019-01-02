@@ -617,13 +617,14 @@ sub init_detail {
 
     push @fields, { label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL', value => [
         sprintf ($pattern, 'pem', 'I18N_OPENXPKI_UI_DOWNLOAD_PEM'),
-        # core bug see #185 sprintf ($pattern, 'txt', 'I18N_OPENXPKI_UI_DOWNLOAD_TXT').
         sprintf ($pattern, 'der', 'I18N_OPENXPKI_UI_DOWNLOAD_DER'),
         sprintf ($pattern, 'pkcs7', 'I18N_OPENXPKI_UI_DOWNLOAD_PKCS7'),
         sprintf ($pattern, 'pkcs7!root!true', 'I18N_OPENXPKI_UI_DOWNLOAD_PKCS7_WITH_ROOT'),
         sprintf ($pattern, 'bundle', 'I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE'),
         sprintf ($pattern, 'install', 'I18N_OPENXPKI_UI_DOWNLOAD_INSTALL'),
-        '<li><a href="#/openxpki/certificate!text!identifier!'.$cert_identifier.'">I18N_OPENXPKI_UI_DOWNLOAD_SHOW_AS_TEXT</a></li>', ],
+        '<li><a href="#/openxpki/certificate!text!identifier!'.$cert_identifier.'">I18N_OPENXPKI_UI_DOWNLOAD_SHOW_PEM</a></li>',
+        '<li><a href="#/openxpki/certificate!text!format!txtpem!identifier!'.$cert_identifier.'">I18N_OPENXPKI_UI_DOWNLOAD_SHOW_TEXT</a></li>',
+        ],
         format => 'rawlist'
     };
 
@@ -678,20 +679,27 @@ sub init_text {
 
     my $cert_identifier = $self->param('identifier');
 
-    my $pem = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'PEM' });
+    my $format = uc($self->param('format') || '');
+
+    if ($format !~ /\A(TXT|PEM|TXTPEM)\z/) {
+        $format = 'PEM';
+    }
+
+    my $pem = $self->send_command_v2 ( "get_cert", {'identifier' => $cert_identifier, 'format' => $format });
 
     $self->logger()->trace("Cert data: " . Dumper $pem);
 
     $self->_page({
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL',
         shortlabel => $cert_identifier,
+        className => ($format ne 'PEM' ? 'modal-lg' : '')
     });
 
     $self->add_section({
         type => 'text',
         content => {
             label => '',
-            description => '<code>'  . $pem . '</code>',
+            description => '<pre>'  . $pem . '</pre>',
         }},
     );
 

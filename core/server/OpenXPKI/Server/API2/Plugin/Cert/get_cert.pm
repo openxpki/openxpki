@@ -35,6 +35,8 @@ B<Parameters>
 
 =item * TXT
 
+=item * TXTPEM
+
 =item * HASH - the default value
 
 =item * DBINFO - information from the certificate and attributes table
@@ -56,7 +58,7 @@ lowercase keys. Additionally the following keys changed:
 =cut
 command "get_cert" => {
     identifier => { isa => 'Base64', required => 1, },
-    format     => { isa => 'AlphaPunct', matching => qr{ \A ( PEM | DER | TXT | HASH | DBINFO ) \Z }x, default => "HASH" },
+    format     => { isa => 'AlphaPunct', matching => qr{ \A ( PEM | DER | TXT | TXTPEM | HASH | DBINFO ) \Z }x, default => "HASH" },
 } => sub {
     my ($self, $params) = @_;
 
@@ -76,6 +78,14 @@ command "get_cert" => {
             message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CERT_CERTIFICATE_NOT_FOUND_IN_DB',
             params => { 'IDENTIFIER' => $identifier, },
         );
+
+    if ($format eq 'PEM') {
+        return $cert->{data};
+    }
+
+    if ($format eq 'DER') {
+        return OpenXPKI::Crypt::X509->new( $cert->{data} )->data;
+    }
 
     #
     # Format: "DBINFO"
@@ -120,6 +130,15 @@ command "get_cert" => {
     ##! 2: "Requesting crypto token via API and creating X509 object"
     my $token = CTX('api')->get_default_token();
 
+    if ($format eq 'TXT' || $format eq 'TXTPEM') {
+        my $result = $token->command ({
+            COMMAND => "convert_cert",
+            DATA    => $cert->{data},
+            OUT     => $format
+        });
+        return $result;
+    };
+
     if ('PKCS7' eq $format) {
         my $result = $token->command({
             COMMAND          => 'convert_cert',
@@ -132,31 +151,21 @@ command "get_cert" => {
 
     my $obj = OpenXPKI::Crypto::X509->new(TOKEN => $token, DATA => $cert->{data});
 
-    #
-    # Format: "HASH"
-    #
-    if ('HASH' eq $format) {
-        ##! 2: "Preparing output for HASH format"
-        my $result = $obj->get_parsed_ref;
+    ##! 2: "Preparing output for HASH format"
+    my $result = $obj->get_parsed_ref;
 
-        # NOTBEFORE and NOTAFTER are DateTime objects, which we do
-        # not want to be serialized, so we just send out the stringified
-        # version ...
-        $result->{BODY}->{NOTBEFORE} = $result->{BODY}->{NOTBEFORE}->epoch();
-        $result->{BODY}->{NOTAFTER}  = $result->{BODY}->{NOTAFTER}->epoch();
-        $result->{STATUS}            = $cert->{status};
-        $result->{IDENTIFIER}        = $cert->{identifier};
-        $result->{ISSUER_IDENTIFIER} = $cert->{issuer_identifier};
-        $result->{CSR_SERIAL}        = $cert->{req_key};
-        $result->{PKI_REALM}         = $cert->{pki_realm};
-        return $result;
-    }
+    # NOTBEFORE and NOTAFTER are DateTime objects, which we do
+    # not want to be serialized, so we just send out the stringified
+    # version ...
+    $result->{BODY}->{NOTBEFORE} = $result->{BODY}->{NOTBEFORE}->epoch();
+    $result->{BODY}->{NOTAFTER}  = $result->{BODY}->{NOTAFTER}->epoch();
+    $result->{STATUS}            = $cert->{status};
+    $result->{IDENTIFIER}        = $cert->{identifier};
+    $result->{ISSUER_IDENTIFIER} = $cert->{issuer_identifier};
+    $result->{CSR_SERIAL}        = $cert->{req_key};
+    $result->{PKI_REALM}         = $cert->{pki_realm};
+    return $result;
 
-    #
-    # Format: "PEM", "DER", "TXT"
-    #
-    ##! 2: "Converting X509 object into target format"
-    return $obj->get_converted($format);
 };
 
 __PACKAGE__->meta->make_immutable;

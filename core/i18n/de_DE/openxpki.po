@@ -312,7 +312,12 @@ msgstr "Install"
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_PEM"
 msgstr "PEM (CRT)"
 
-msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHOW_AS_TEXT"
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHOW_PEM"
+msgstr "PEM (CRT)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHOW_TEXT"
 msgstr "Display certificate on screen (PEM) "
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_TXT"

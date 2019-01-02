@@ -19,7 +19,7 @@ use OpenXPKI::FileUtils;
 use lib "$Bin/../lib";
 use OpenXPKI::Test;
 
-plan tests => 16;
+plan tests => 18;
 
 #
 # Setup env
@@ -183,19 +183,28 @@ lives_and {
     is $pem, $cert;
 } "Convert certificate (DER --> PEM)";
 
-TODO: {
-    todo_skip 'See issue #525', 1;
+lives_and {
+    my $txt = $default_token->command({
+        COMMAND => "convert_cert",
+        DATA    => $cert,
+        IN      => "PEM",
+        OUT     => "TXT",
+    });
+    like $txt, qr/DC=OpenXPKI,DC=org/;
+} "Convert certificate (PEM --> TXT)";
 
-    lives_and {
-        my $txt = $default_token->command({
-            COMMAND => "convert_cert",
-            DATA    => $cert,
-            IN      => "PEM",
-            OUT     => "TXT",
-        });
-        like $txt, qr/DC=OpenXPKI,DC=org/;
-    } "Convert certificate (PEM --> TXT)";
-}
+
+lives_and {
+    my $txt = $default_token->command({
+        COMMAND => "convert_cert",
+        DATA    => $cert,
+        IN      => "PEM",
+        OUT     => "TXTPEM",
+    });
+    like $txt, qr/DC=OpenXPKI,DC=org/;
+    like $txt, qr/-----BEGIN CERTIFICATE-----/;
+} "Convert certificate (PEM --> TXT+PEM)";
+
 
 ### CRL: PEM --> DER
 lives_and {
