@@ -208,6 +208,7 @@ command "validate_certificate" => {
 
             # if the certificate is in the database, we expect that we can
             # resolve the chain using the database
+            my $next_id;
             if ($db_cert) {
                 ##! 32: 'Issuer found in database ' . $db_cert->{identifier}
                 my $db_chain = $self->api->get_chain(
@@ -227,24 +228,25 @@ command "validate_certificate" => {
                 } else {
                     ##! 16: 'Chain in database but incomplete'
                     CTX('log')->application()->warn('Incomplete chain in database during validate certificate');
-                    my $id = pop @{$db_chain->{identifiers}};
-                    if (!$byIdentifier->{ $id }) {
-                        my $cc = OpenXPKI::Crypt::X509->new( pop @{$db_chain->{certificates}} );
-                        $byIdentifier->{ $id } = $cc;
-                        $bySubject->{ $cc->get_subject } = $id;
-                        $byKeyId->{ $cc->get_subject_key_id } = $id;
+                    my $cc = OpenXPKI::Crypt::X509->new( pop @{$db_chain->{certificates}} );
+                    $next_id = $cc->get_cert_identifier();
+                    if (!$byIdentifier->{ $next_id }) {
+                        $byIdentifier->{ $next_id } = $cc;
+                        $bySubject->{ $cc->get_subject } = $next_id;
+                        $byKeyId->{ $cc->get_subject_key_id } = $next_id;
                     }
-                    $cert = $byIdentifier->{ $id };
+                    # remove as the certificate is added at the top of the loop
+                    pop @signer_chain;
                 }
             # issuer is not in the database, check the input lists
             } elsif (!$aki || !$byKeyId->{$aki}) {
                 ##! 32: 'Lookup using subject '  . $cert->get_issuer
-                $cert = $bySubject->{ $cert->get_issuer };
+                $next_id  = $bySubject->{ $cert->get_issuer };
             } else {
                 ##! 32: 'Lookup using AKI ' . $aki
-                $cert = $byKeyId->{$aki};
+                $next_id = $byKeyId->{$aki};
             }
-
+            $cert = $next_id ? $byIdentifier->{ $next_id } : undef;
         }
     }
 
