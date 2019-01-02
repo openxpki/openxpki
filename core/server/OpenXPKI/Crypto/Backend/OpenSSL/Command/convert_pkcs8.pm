@@ -71,7 +71,7 @@ sub get_command
 
     ## build the command
 
-    my $command  = "pkcs8 -in " . $self->write_temp_file( $self->{DATA} );
+    my $command  = "pkcs8 -in " . $self->write_temp_file( $self->{DATA} )." ";
 
     if ($self->{REVERSE})
     {
