@@ -11,7 +11,7 @@ OpenXPKI::Server::API2::Plugin::Cert::get_cert
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 use OpenXPKI::Crypto::X509;
-
+use OpenXPKI::Crypt::X509;
 
 =head1 COMMANDS
 
