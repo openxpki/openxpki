@@ -6,7 +6,6 @@ use base qw( OpenXPKI::Server::Workflow::Validator );
 use Data::Dumper;
 use Crypt::PKCS10;
 use OpenXPKI::Debug;
-use OpenXPKI::Crypto::CSR;
 use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( validation_error configuration_error );
 

@@ -103,7 +103,6 @@ OpenXPKI/Crypto/Header.pm
 OpenXPKI/Crypto/X509.pm
 OpenXPKI/Crypto/CLI.pm
 OpenXPKI/Crypto/CSR.pm
-OpenXPKI/Crypto/CRR.pm
 OpenXPKI/Crypto/CRL.pm
 OpenXPKI/Crypto/Profile/Base.pm
 OpenXPKI/Crypto/Profile/Certificate.pm

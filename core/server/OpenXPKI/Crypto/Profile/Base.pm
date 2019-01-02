@@ -25,6 +25,7 @@ use Template;
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
+use OpenXPKI::Crypto::X509;
 use OpenXPKI::Server::Context qw( CTX );
 
 

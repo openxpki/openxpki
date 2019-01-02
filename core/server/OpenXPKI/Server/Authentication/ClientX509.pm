@@ -7,7 +7,6 @@ use English;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Crypto::X509;
 
 use DateTime;
 use Data::Dumper;

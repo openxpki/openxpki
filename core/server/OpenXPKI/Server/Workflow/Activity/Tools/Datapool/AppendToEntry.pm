@@ -12,7 +12,6 @@ use base qw( OpenXPKI::Server::Workflow::Activity );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Crypto::Profile::Certificate;
-use OpenXPKI::Crypto::X509;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Workflow::WFObject::WFArray;
 use OpenXPKI::Debug;

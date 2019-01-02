@@ -22,7 +22,6 @@ use OpenXPKI::Control;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Crypto::CSR;
 use OpenXPKI::Crypto::VolatileVault;
 use OpenXPKI::FileUtils;
 use OpenXPKI::VERSION;

@@ -7,8 +7,6 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use English;
-use OpenXPKI::Crypto::CSR;
-use OpenXPKI::Crypto::X509;
 use OpenXPKI::Serialization::Simple;
 use Data::Dumper;
 

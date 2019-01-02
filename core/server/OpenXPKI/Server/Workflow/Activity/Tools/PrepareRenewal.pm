@@ -6,7 +6,6 @@ use base qw( OpenXPKI::Server::Workflow::Activity );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use OpenXPKI::Crypto::CSR;
 use OpenXPKI::Serialization::Simple;
 
 use Data::Dumper;

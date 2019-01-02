@@ -11,6 +11,7 @@ use OpenXPKI::DN;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
+use OpenXPKI::Crypto::X509;
 
 use Data::Dumper;
 

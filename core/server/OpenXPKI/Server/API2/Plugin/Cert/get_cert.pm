@@ -10,7 +10,7 @@ OpenXPKI::Server::API2::Plugin::Cert::get_cert
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
-
+use OpenXPKI::Crypto::X509;
 
 
 =head1 COMMANDS

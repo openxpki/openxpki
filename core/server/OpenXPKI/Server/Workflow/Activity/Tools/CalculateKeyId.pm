@@ -11,6 +11,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use Digest::SHA qw( sha1_hex );
+use OpenXPKI::Crypto::X509;
 
 use Data::Dumper;
 

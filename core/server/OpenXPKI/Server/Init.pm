@@ -35,8 +35,6 @@ use OpenXPKI::Workflow::Handler;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Session;
 
-use OpenXPKI::Crypto::X509;
-
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Serialization::Fast;
 

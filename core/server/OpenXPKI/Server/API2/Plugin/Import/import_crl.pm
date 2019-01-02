@@ -10,7 +10,7 @@ OpenXPKI::Server::API2::Plugin::Import::import_crl
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
-
+use OpenXPKI::Crypto::CRL;
 
 
 =head1 COMMANDS
