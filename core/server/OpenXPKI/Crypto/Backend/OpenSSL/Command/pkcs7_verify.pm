@@ -38,7 +38,7 @@ sub get_command
     my $chainfile;
     if (defined $self->{CHAIN} ) {
         ## prepare data
-        my $chain = join('', @{$self->{CHAIN}});
+        my $chain = join("\n", @{$self->{CHAIN}});
         $chainfile = $self->write_temp_file( $chain );
 
     # No chain is ok when no verify is given
