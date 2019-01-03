@@ -17,10 +17,10 @@ state:
     RESULT:
         autorun: 1
         action:
-            - create_redirect > SUCCESS ? has_result
+            - create_redirect > NOSTATUS ? has_result
             - global_set_error_search_has_no_matches > NORESULT ? !has_result
 
-    SUCCESS:
+    NOSTATUS:
         output:
           - redirect_result
 
