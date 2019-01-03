@@ -68,9 +68,10 @@ sub get_command
         $self->{CONFIG}->set_crl_items($self->{CERTLIST});
 
     } elsif ($self->{REVOKED}) {
-        warn 'Deprecated call to issue_crl command using REVOKED';
-        $self->{CONFIG}->set_cert_list($self->{REVOKED});
-    }
+        OpenXPKI::Exception->throw (
+            message => 'Deprecated call to issue_crl command using REVOKED - use CERTLIST'
+        );
+     }
 
     ## build the command
 
