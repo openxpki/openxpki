@@ -65,6 +65,77 @@ sub set_profile
     return 1;
 }
 
+sub set_crl_items {
+
+    my $self = shift;
+    my $list = shift;
+    $self->{INDEX_TXT} = "";
+
+    my @index;
+    foreach my $item (@$list) {
+
+        ##! 64: 'CRL item ' . Dumper $item
+        my $serial = shift @{$item};
+
+        if ($serial !~ /\A0x/) {
+            $serial = Math::BigInt->new ($serial)->as_hex();
+        }
+        # strip of 0x
+        $serial = substr( $serial , 2);
+        # expand to an even number of digits
+        $serial = "0".$serial if (length ($serial) % 2);
+
+        my $timestamp = '700101000000Z';
+        my $reason_code = 'unspecified';
+
+        if (scalar @{$item}) {
+            my $epoch = shift @{$item};
+            $timestamp = OpenXPKI::DateTime::convert_date({
+                DATE      => DateTime->from_epoch(epoch => $epoch),
+                OUTFORMAT => 'openssltime',
+            }) if ($epoch);
+
+            if (scalar @{$item}) {
+                $reason_code = shift @{$item};
+                if ($reason_code !~ m{ \A (?: unspecified | keyCompromise | CACompromise | affiliationChanged | superseded | cessationOfOperation | certificateHold | removeFromCRL ) \z }xms) {
+                    CTX('log')->application()->warn("Invalid reason code '" . $reason_code . "' specified");
+                    $reason_code = 'unspecified';
+                }
+
+                if ($reason_code eq 'keyCompromise' && scalar @{$item}) {
+                    my $invalidity_time = shift @{$item};
+                    eval {
+                        my $invalidity_date = OpenXPKI::DateTime::convert_date({
+                            DATE      => DateTime->from_epoch( epoch => $invalidity_time ),
+                            OUTFORMAT => 'generalizedtime',
+                        });
+                        ##! 16: 'invalidity date is present: ' . $invalidity_date . ' / ' . $invalidity_time
+
+                        # openssl needs a special reason code keyword to pickup
+                        # the invalidity time parameter
+                        $reason_code = 'keyTime,'.$invalidity_date;
+                    };
+                    if ($EVAL_ERROR) {
+                        CTX('log')->application()->warn("Unparsable invalidity_date given: " . $invalidity_time);
+                    }
+                }
+            }
+        }
+
+        my $revocation = "$timestamp,$reason_code";
+
+        push @index, join("\t",('R', '700101000000Z', $revocation, $serial, 'unknown', '/DC=org/DC=openxpki/CN=Dummy'));
+
+    }
+    push @index,"";
+
+    $self->{INDEX_TXT} = join("\n", @index);
+
+    ##! 1: "end"
+    return 1;
+}
+
+# deprecated - remove if we are sure nobody uses it
 sub set_cert_list
 {
     ##! 1: "start"
@@ -820,28 +891,32 @@ different section types:
 
 =item - set_profile
 
-=item - set_cert_list
+=item - set_crl_items
 
 This method prepares the OpenSSL-specific representation of the certificate
 database (index.txt). The method expects an arrayref containing a list
 of all certificates to revoke.
 
-A single entry in this array may be one of the following:
+Each item in the array must be an array with one or more elements:
 
 =over
 
-=item * a single certificate (see below on how to specify a certificate)
+=item * certificate serial number, either binary or as hex prefixed with 0x
 
-=item * an arrayref of the format [ certificate, revocation_timestamp, reason_code, invalidity_timestamp ]
+=item * time of revocation (epoch)
+
+=item * reason_code
+
+=item * time of invalidity (epoch)
 
 =back
 
-With the exception of the certificate all additional parameters
-are optional and can be left out.
+The first argument is mandatory, all other element can be empty or
+even left out.
 
-If a revocation_timestamp is specified, it is used as the revocation
-timestamp in the generated CRL.
-The timestamp is specified in seconds since epoch.
+If a revocation time is specified, it is used as the revocation
+timestamp in the generated CRL. The timestamp is specified in seconds since
+epoch.
 
 The reason code is accepted literally. It should be one of
   'unspecified',
@@ -854,6 +929,7 @@ The reason code is accepted literally. It should be one of
 The reason codes
   'certificateHold',
   'removeFromCRL'.
+
 are currently not handled correctly and should be avoided. However, they
 will currently simply be passed in the CRL which may not have the desired
 result.
@@ -862,35 +938,8 @@ If the reason code is incorrect, a warning is logged and the reason code
 is set to 'unspecified' in order to make sure the certificate gets revoked
 at all.
 
-If a invalidity_timestamp is specified, it is used as the invalidity
-timestamp in the generated CRL.
-The timestamp is specified in seconds since epoch.
-
-A certificate can be specified as
-
-=over
-
-=item * a PEM encoded X.509v3 certificate (scalar)
-
-=item * a reference to an OpenXPKI::Crypto::Backend::OpenSSL::X509 object
-
-=item * a string containing the serial number of the certificate to revoke
-
-=back
-
-Depending on the way the certificate to revoke was specified the method
-has to perform several actions to deduce the correct information for CRL
-issuance.
-If a PEM encoded certificate is passed, the method is forced to parse
-to parse the certificate before it can build the revocation data list.
-This operation introduces a huge overhead which may influence system
-behaviour if many certificates are to be revoked.
-The lowest possible overhead is introduced by the literal specification
-of the serial number to put on the revocation list.
-
-NOTE: No attempt to verify the validity of the specified serial numbers
-is done, in particular in the "raw serial number" case there is even
-no check if such a serial number exists at all.
+Invalidity timestamp is only used in conjunction with a reason code of
+keyCompromise. The timestamp is specified in seconds since epoch.
 
 =item - dump
 

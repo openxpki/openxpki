@@ -220,7 +220,7 @@ my $crl;
 lives_and {
     $crl = $ca_token->command({
         COMMAND => "issue_crl",
-        REVOKED => [$cert],
+        CERTLIST => [ [ 12345 ], [ 123456, time(), 'keyCompromise', time() - 60 ] ],
         PROFILE => $crl_profile,
     });
     like $crl, qr/^-----BEGIN X509 CRL-----/;

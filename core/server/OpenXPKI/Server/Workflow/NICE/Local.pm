@@ -436,7 +436,7 @@ sub issueCRL {
     #
     my $crl = $ca_token->command({
         COMMAND => 'issue_crl',
-        REVOKED => \@cert_timestamps,
+        CERTLIST => \@cert_timestamps,
         PROFILE => $crl_profile,
     });
     #

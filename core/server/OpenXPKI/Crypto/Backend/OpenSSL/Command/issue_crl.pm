@@ -62,8 +62,13 @@ sub get_command
 
     ## prepare data
 
-    if ($self->{REVOKED})
-    {
+    # new format, expect array with serial, reason code and revocation date
+    if ($self->{CERTLIST}) {
+
+        $self->{CONFIG}->set_crl_items($self->{CERTLIST});
+
+    } elsif ($self->{REVOKED}) {
+        warn 'Deprecated call to issue_crl command using REVOKED';
         $self->{CONFIG}->set_cert_list($self->{REVOKED});
     }
 
