@@ -646,7 +646,7 @@ sub alias_list {
         $anon_groups{ $entry->{group_id} } = 1;
     }
     # remove root from the list
-    delete $anon_groups{'root'};
+    delete $anon_groups{'root'} unless($params{group} && $params{group} eq 'root');
 
     print "=== functional token ===\n" if (!$params{group});
     foreach my $type (keys %{$groups}) {
