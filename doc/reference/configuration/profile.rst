@@ -32,7 +32,7 @@ request. You can also add a notbefore date, in this case the notafter
 date is calculated relative to notbefore::
 
     validity:
-        notafter: +000001
+        notbefore: +000001
         notafter: +0006
 
 Above example will create a certificate with a notbefore 24 hours ahead
