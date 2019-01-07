@@ -76,6 +76,8 @@ while (my $cgi = CGI::Fast->new()) {
         $method = $postdata->{method};
     }
 
+    $method = $config->route() unless($method);
+
     # method should be set now
     if ( !$method ) {
         # TODO: Return as "400 Bad Request"?
@@ -175,7 +177,7 @@ while (my $cgi = CGI::Fast->new()) {
         $log->debug("RPC unauthenticated (plain http)");
     }
 
-    $log->trace( "WF parameters: " . Dumper $param );
+    $log->trace( "Calling $method on ".$config->endpoint()." with parameters: " . Dumper $param ) if $log->is_trace;
 
     my $workflow;
     my $client;

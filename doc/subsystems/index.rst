@@ -77,7 +77,7 @@ in most environments with mod_rewrite, symlinks or alias definitions. If you
 use another webserver then apache, you might need to adjust the autodetection
 rules to fit your needs.
 
-**Note** he wrappers run as persistent scripts and are initialized before the
+**Note** The wrappers run as persistent scripts and are initialized before the
 alias path is known. The socket and logger config is therefore *always* read
 from the default.conf!
 

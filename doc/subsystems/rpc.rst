@@ -77,6 +77,11 @@ At minimum, the parameter "method" must be provided. The name of the method
 used must match a section in the configuration file, which must at least
 contain the name of a workflow.
 
+If you have setup config path expansion, you can append the method as third
+parameter to the URL instead::
+
+    http://demo.openxpki.org/rpc/helpdesk/RevokeCertificateByIdentifier
+
 The default is to return JSON formatted data, if you set the I<Accept>
 header of your request to "text/plain", you will get the result as plain
 text with each key/parameter pairs on a new line.
@@ -169,14 +174,14 @@ To utilize this endpoint the following curl command may be used::
     $ curl -F "method=SearchCertificate"  -F "common_name=test" http://localhost:8080/rpc
     {"result":{"id":0,"data":{"notafter":"2019-04-19T05:21:58","notbefore":"2018-10-19T05:21:58", \
     "status":"ISSUED","cert_identifier":"7Da0qfjirGl7PXlZYf9PFVqMJds"},"state":"SUCCESS","pid":915}}
-    
+
 The RequestCertificate endpoint (see above) may be used via::
 
     $ curl -F method=RequestCertificate  -F comment=test -F pkcs10="$(cat certreq.pem)" http://localhost:8080/rpc
     {"result":{"id":"5119","state":"SUCCESS","data":{"cert_identifier":"60uHCnC3Uv9wZKjcCkmSHuBwuzU"},"pid":915}}
 
-Of course proper authentication and authorization is required for the 
-cerificate to be issued immediately. The required configuration parameters 
+Of course proper authentication and authorization is required for the
+cerificate to be issued immediately. The required configuration parameters
 are documented in the scep workflow.
 
 See Also

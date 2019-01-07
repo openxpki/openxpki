@@ -104,6 +104,15 @@ has 'logger' => (
     builder => '__init_logger',
 );
 
+has 'route' => (
+    required => 0,
+    is => 'rw',
+    isa => 'Str',
+    lazy => 1,
+    default => '',
+);
+
+
 # this allows a constructor with the service as scalar
 around BUILDARGS => sub {
 
@@ -211,15 +220,17 @@ sub config() {
     # SCRIPT_URL is only available with mod_rewrite
     my $file;
     if (defined $ENV{SCRIPT_URL}) {
-        $ENV{SCRIPT_URL} =~ qq|${service}/([^/]+)(/[^/]*)?\$|;
+        $ENV{SCRIPT_URL} =~ qq|${service}/([^/]+)(/([\\w\\-\\/]*))?\$|;
         $file = "$1.conf";
         $self->endpoint($1);
+        $self->route($3) if ($3);
 
     # Should always work
     } elsif (defined $ENV{REQUEST_URI}) {
-        $ENV{REQUEST_URI} =~ qq|${service}/([^/\?]+)(/[^/\\?]*)?(\\?.*)?\$|;
+        $ENV{REQUEST_URI} =~ qq|${service}/([^/\?]+)(/([\\w\\-\\/]*))?(\\?.*)?\$|;
         $file = "$1.conf";
         $self->endpoint($1);
+        $self->route($3) if ($3);
 
     # Hopefully never seen
     # TODO no path is fine with e.g. EST
