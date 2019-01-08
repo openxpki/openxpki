@@ -142,7 +142,7 @@ sub __load_profile
 
     # Init defaults
     $self->{PROFILE} = {
-        DIGEST => 'sha1',
+        DIGEST => 'sha256',
         INCREASING_SERIALS => 1,
         RANDOMIZED_SERIAL_BYTES => 8,
     };
