@@ -23,7 +23,7 @@ command "list_supported_san" => {
 } => sub {
     my ($self, $params) = @_;
 
-    my %san_names = map { lc($_) => $_ } ('email','URI','DNS','RID','IP','dirName','otherName','GUID','UPN');
+    my %san_names = map { lc($_) => $_ } ('email','URI','DNS','RID','IP','dirName','otherName');
 
     return \%san_names;
 };
