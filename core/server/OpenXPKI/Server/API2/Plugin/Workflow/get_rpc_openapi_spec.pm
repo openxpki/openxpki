@@ -7,6 +7,9 @@ OpenXPKI::Server::API2::Plugin::Workflow::get_rpc_openapi_spec
 
 =cut
 
+# Core modules
+use List::Util;
+
 # Project modules
 use OpenXPKI::Client::Config;
 use OpenXPKI::Connector::WorkflowContext;
@@ -51,11 +54,17 @@ B<Parameters>
 
 =item * C<workflow> I<Str> - workflow type
 
+=item * C<input> I<ArrayRef> - filter for input parameters (list of allowed parameters)
+
+=item * C<output> I<ArrayRef> - filter for output parameters (list of allowed parameters)
+
 =back
 
 =cut
 command "get_rpc_openapi_spec" => {
     workflow => { isa => 'Str', required => 1, },
+    input => { isa => 'ArrayRef[Str]', required => 0, default => sub { [] } },
+    output => { isa => 'ArrayRef[Str]', required => 0, default => sub { [] } },
 } => sub {
     my ($self, $params) = @_;
 
@@ -67,7 +76,7 @@ command "get_rpc_openapi_spec" => {
     if (not $self->factory->authorize_workflow({ ACTION => 'create', TYPE => $type })) {
         OpenXPKI::Exception->throw(
             message => 'User is not authorized to fetch workflow info',
-            params => { type => $type }
+            params => { workflow => $type }
         );
     }
 
@@ -78,22 +87,38 @@ command "get_rpc_openapi_spec" => {
         description => $head->{description},
     };
 
-    my $fields = $self->_get_fields($type, 'INITIAL');
-
-    # map OpenXPKI to OpenAPI types
-    for my $field (values %$fields) {
-        $field->{type} = $OpenXPKI::Server::API2::Plugin::Workflow::get_rpc_openapi_spec::TYPE_MAP{$field->{type}}
-            or OpenXPKI::Exception->throw(
-                message => 'Field type found that has no mapping to OpenAPI type',
-                params => { field_type => $field->{type} }
-            );
-    }
+    my $fields = $self->_get_openapi_fields($type, $self->_get_input_fields($type, 'INITIAL'), $params->input);
 
     return $fields;
 };
 
+sub _get_openapi_fields {
+    my ($self, $type, $fields, $wanted_field_names) = @_;
+
+    my $wanted_fields = {};
+    for my $wanted ( @$wanted_field_names ) {
+        OpenXPKI::Exception->throw(
+            message => 'Requested input field is not defined in any action of the workflows INITIAL state',
+            params => { workflow => $type, field => $wanted }
+        ) unless $fields->{$wanted};
+
+        $wanted_fields->{$wanted} = $fields->{$wanted};
+    }
+
+    # map OpenXPKI to OpenAPI types
+    for my $field (values %$wanted_fields) {
+        $field->{type} = $OpenXPKI::Server::API2::Plugin::Workflow::get_rpc_openapi_spec::TYPE_MAP{$field->{type}}
+            or OpenXPKI::Exception->throw(
+                message => 'Field type found that has no mapping to OpenAPI type',
+                params => { workflow => $type, field_type => $field->{type} }
+            );
+    }
+
+    return $wanted_fields;
+}
+
 # Returns a HashRef with field names and their definition
-sub _get_fields {
+sub _get_input_fields {
     my ($self, $type, $query_state) = @_;
 
     my $result = {};
@@ -133,8 +158,12 @@ sub _get_fields {
     for my $action (@actions) {
         my $action_info = $self->factory->get_action_info($action, $type);
         my $fields = $action_info->{field};
-        $result->{$_->{name}} = $_ for @$fields;
-        $result->{$_->{name}}->{action} = $action;
+        for my $f (@$fields) {
+            $result->{$f->{name}} = {
+                %$f,
+                action => $action
+            };
+        }
     }
 
     return $result;

@@ -165,6 +165,7 @@ $oxitest->session->data->role("Anonymous");
 lives_ok {
     my $result = $oxitest->api2_command("get_rpc_openapi_spec" => {
         workflow => "certificate_enroll",
+        input => [ qw( pkcs10 comment ) ],
     });
     diag explain $result;
 } 'get_rpc_openapi_spec() - xxx';
