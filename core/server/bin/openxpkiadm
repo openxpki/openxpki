@@ -1507,6 +1507,10 @@ if ($cmd eq 'initdb') {
         print "Config ok\n";
         $ret = 0;
     } else {
+        # this means the yaml was ok but there is no system node
+        if (defined $c) {
+            print "Config was parsed but no system node was found\n";
+        }
         $ret = 2;
     }
 

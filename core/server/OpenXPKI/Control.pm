@@ -423,6 +423,7 @@ Parameters:
 sub reload {
 
     my $args = shift;
+    my $silent = $args->{SILENT};
 
     my $pid;
     if ($args->{PIDFILE}) {
@@ -439,6 +440,8 @@ sub reload {
             die "You must specify either a PID or PIDFILE\n";
         }
     }
+
+    print STDOUT "Sending reload command to OpenXPKI server.\n" unless ($silent);
 
     kill HUP => $pid;
 
