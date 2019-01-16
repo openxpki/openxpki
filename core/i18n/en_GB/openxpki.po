@@ -5068,3 +5068,22 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED"
 #~ msgstr "Workflow information was updated"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_LABEL"
+msgstr "Export Password"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_DESC"
+msgstr ""
+"The password for the exported private key. If not set, the same password "
+"you provided while creating the certificate request will be used."
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_TOOLTIP"
+msgstr "Export Password"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_UNENCRYPTED_LABEL"
+msgstr "Export unencrypted"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_UNENCRYPTED_DESC"
+msgstr ""
+"If checked, the exported private key will not be protected by a password. "
+"The export password will be ignored."
