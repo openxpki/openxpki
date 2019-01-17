@@ -11,6 +11,13 @@ use OpenXPKI::Connector::WorkflowContext;
 use OpenXPKI::MooseParams;
 use OpenXPKI::Debug;
 
+has factory => (
+    is => 'rw',
+    isa => 'OpenXPKI::Workflow::Factory',
+    lazy => 1,
+    default => sub { CTX('workflow_factory')->get_factory },
+);
+
 =head2 validate_input_params
 
 Validates the given parameters against the field spec of the current activity
@@ -444,9 +451,8 @@ sub get_ui_base_info {
 
     # TODO we might use the OpenXPKI::Workflow::Config object for this
     # Note: Using create_workflow shreds a workflow id and creates an orphaned entry in the history table
-    my $factory = CTX('workflow_factory')->get_factory();
 
-    if (not $factory->authorize_workflow({ ACTION => 'create', TYPE => $type })) {
+    if (not $self->factory->authorize_workflow({ ACTION => 'create', TYPE => $type })) {
         OpenXPKI::Exception->throw(
             message => 'User is not authorized to fetch workflow info',
             params => { type => $type }
@@ -466,7 +472,7 @@ sub get_ui_base_info {
     };
 
     # fetch actions in state INITIAL from the config
-    my $wf_config = $factory->_get_workflow_config($type);
+    my $wf_config = $self->factory->_get_workflow_config($type);
     my @actions;
     for my $state (@{$wf_config->{state}}) {
         next unless $state->{name} eq 'INITIAL';
@@ -475,7 +481,7 @@ sub get_ui_base_info {
     }
 
     # additional infos
-    my $add = $self->_get_config_details($factory, $type, $head->{prefix}, $state, \@actions, undef);
+    my $add = $self->_get_config_details($type, $head->{prefix}, $state, \@actions, undef);
     $result->{$_} = $add->{$_} for keys %{ $add };
 
     return $result;
@@ -484,7 +490,7 @@ sub get_ui_base_info {
 # Returns a HashRef with configuration details (actions, states) of the given
 # workflow type and state.
 sub _get_config_details {
-    my ($self, $factory, $type, $prefix, $state, $actions, $context) = @_;
+    my ($self, $type, $prefix, $state, $actions, $context) = @_;
     my $result = {};
     ##! 4: 'start'
 
@@ -493,31 +499,19 @@ sub _get_config_details {
 
     OpenXPKI::Connector::WorkflowContext::set_context($context) if $context;
     for my $action (@{ $actions }) {
-        $result->{activity}->{$action} = $factory->get_action_info($action, $type);
+        $result->{activity}->{$action} = $self->factory->get_action_info($action, $type);
     }
     OpenXPKI::Connector::WorkflowContext::set_context() if $context;
 
     # add state UI info
-    my $ui_state = CTX('config')->get_hash([ 'workflow', 'def', $type, 'state', $state ]);
-    # replace hash key "output" with detailed field informations
-    if ($ui_state->{output}) {
-        my @output_fields = ref $ui_state->{output} eq 'ARRAY'
-            ? @{ $ui_state->{output} }
-            : CTX('config')->get_list([ 'workflow', 'def', $type, 'state', $state, 'output' ]);
-
-        # query detailed field informations
-        $ui_state->{output} = [ map { $factory->get_field_info($_, $type) } @output_fields ];
-    }
-    $result->{state} = $ui_state;
-
-    # delete "action"
-    delete $result->{state}->{action};
+    $result->{state} = $self->get_state_info($type, $state);
 
     # add button info
     my $button = $result->{state}->{button};
     $result->{state}->{button} = {};
 
-    # possible options (=activity names) in the right order
+    # possible actions (options / activity names) in the right order
+    delete $result->{state}->{action};
     my @options = CTX('config')->get_scalar_as_list([ 'workflow', 'def', $type, 'state', $state, 'action' ]);
 
     # check defined actions and only list the possible ones
@@ -543,6 +537,25 @@ sub _get_config_details {
 
     return $result;
 }
+
+sub get_state_info {
+    my ($self, $wf_type, $wf_state) = @_;
+
+    my $state_info = CTX('config')->get_hash([ 'workflow', 'def', $wf_type, 'state', $wf_state ]);
+
+    # replace hash key "output" with detailed field informations
+    if ($state_info->{output}) {
+        my @output_fields = ref $state_info->{output} eq 'ARRAY'
+            ? @{ $state_info->{output} }
+            : CTX('config')->get_list([ 'workflow', 'def', $wf_type, 'state', $wf_state, 'output' ]);
+
+        # query detailed field informations
+        $state_info->{output} = [ map { $self->factory->get_field_info($_, $wf_type) } @output_fields ];
+    }
+
+    return $state_info;
+}
+
 =head2 get_workflow_info
 
 Return a hash with the informations taken from the workflow engine.
@@ -656,8 +669,6 @@ sub fetch_workflow {
     my ($self, $type, $id) = @_;
     ##! 2: 'start'
 
-    my $factory = CTX('workflow_factory')->get_factory;
-
     #
     # Check workflow PKI realm and set type (if not given)
     #
@@ -689,7 +700,7 @@ sub fetch_workflow {
     #
     # Fetch workflow via Workflow engine
     #
-    my $workflow = $factory->fetch_workflow($wf_type, $id);
+    my $workflow = $self->factory->fetch_workflow($wf_type, $id);
 
     OpenXPKI::Server::Context::setcontext({
         workflow_id => $id,
