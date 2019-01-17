@@ -166,6 +166,7 @@ lives_ok {
     my $result = $oxitest->api2_command("get_rpc_openapi_spec" => {
         workflow => "certificate_enroll",
         input => [ qw( pkcs10 comment ) ],
+        output => [ qw( cert_identifier certificate error_code transaction_id ) ]
     });
     diag explain $result;
 } 'get_rpc_openapi_spec() - xxx';

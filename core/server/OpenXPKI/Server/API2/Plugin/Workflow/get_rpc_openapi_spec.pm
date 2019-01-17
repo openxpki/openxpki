@@ -68,38 +68,46 @@ command "get_rpc_openapi_spec" => {
 } => sub {
     my ($self, $params) = @_;
 
-    my $type = $params->workflow;
+    my $workflow = $params->workflow;
     my $rpc_conf = OpenXPKI::Client::Config->new('rpc');
 
-
-
-    if (not $self->factory->authorize_workflow({ ACTION => 'create', TYPE => $type })) {
+    if (not $self->factory->authorize_workflow({ ACTION => 'create', TYPE => $workflow })) {
         OpenXPKI::Exception->throw(
             message => 'User is not authorized to fetch workflow info',
-            params => { workflow => $type }
+            params => { workflow => $workflow }
         );
     }
 
-    my $head = CTX('config')->get_hash([ 'workflow', 'def', $type, 'head' ]);
+    my $head = CTX('config')->get_hash([ 'workflow', 'def', $workflow, 'head' ]);
     my $result = {
-        type        => $type,
+        type        => $workflow,
         label       => $head->{label},
         description => $head->{description},
     };
 
-    my $fields = $self->_get_openapi_fields($type, $self->_get_input_fields($type, 'INITIAL'), $params->input);
+    my $util = OpenXPKI::Server::API2::Plugin::Workflow::Util->new;
+    my $success = $util->get_state_info($workflow, 'SUCCESS')
+        or OpenXPKI::Exception->throw(
+            message => 'State SUCCESS is not defined in given workflow',
+            params => { workflow => $workflow }
+        );
+    my $output = {};
+    $output->{ $_->{name} } = $_ for @{ $success->{output} };
 
-    return $fields;
+    return {
+        input => $self->_map_fieldtypes_to_openapi($workflow, $self->_get_input_fields($workflow, 'INITIAL'), $params->input),
+        output => $self->_map_fieldtypes_to_openapi($workflow, $output, $params->output),
+    };
 };
 
-sub _get_openapi_fields {
-    my ($self, $type, $fields, $wanted_field_names) = @_;
+sub _map_fieldtypes_to_openapi {
+    my ($self, $workflow, $fields, $wanted_field_names) = @_;
 
     my $wanted_fields = {};
     for my $wanted ( @$wanted_field_names ) {
         OpenXPKI::Exception->throw(
-            message => 'Requested input field is not defined in any action of the workflows INITIAL state',
-            params => { workflow => $type, field => $wanted }
+            message => 'Requested parameter is not defined in the workflow',
+            params => { workflow => $workflow, parameter => $wanted }
         ) unless $fields->{$wanted};
 
         $wanted_fields->{$wanted} = $fields->{$wanted};
@@ -109,8 +117,8 @@ sub _get_openapi_fields {
     for my $field (values %$wanted_fields) {
         $field->{type} = $OpenXPKI::Server::API2::Plugin::Workflow::get_rpc_openapi_spec::TYPE_MAP{$field->{type}}
             or OpenXPKI::Exception->throw(
-                message => 'Field type found that has no mapping to OpenAPI type',
-                params => { workflow => $type, field_type => $field->{type} }
+                message => 'Missing OpenAPI type mapping for OpenXPKI parameter type',
+                params => { workflow => $workflow, parameter_type => $field->{type} }
             );
     }
 
@@ -119,10 +127,11 @@ sub _get_openapi_fields {
 
 # Returns a HashRef with field names and their definition
 sub _get_input_fields {
-    my ($self, $type, $query_state) = @_;
+    my ($self, $workflow, $query_state) = @_;
 
     my $result = {};
-    my $wf_config = $self->factory->_get_workflow_config($type);
+    my $wf_config = $self->factory->_get_workflow_config($workflow);
+    my $state_info = $wf_config->{state};
 
     #
     # fetch actions in state $query_state from the config
@@ -131,7 +140,7 @@ sub _get_input_fields {
 
     # get name of first action of $query_state
     my $first_action;
-    for my $state (@{$wf_config->{state}}) {
+    for my $state (@$state_info) {
         if ($state->{name} eq $query_state) {
             $first_action = $state->{action}->[0]->{name} ;
             last;
@@ -139,7 +148,7 @@ sub _get_input_fields {
     }
     OpenXPKI::Exception->throw(
         message => 'State not found in workflow',
-        params => { workflow_type => $type, state => $query_state }
+        params => { workflow_type => $workflow, state => $query_state }
     ) unless $first_action;
 
     push @actions, $first_action;
@@ -148,7 +157,7 @@ sub _get_input_fields {
     # TODO This depends on the internal naming of follow up actions in Workflow.
     #      Alternatively we could parse actions again as in OpenXPKI::Server::API2::Plugin::Workflow::Util->_get_config_details which is also not very elegant
     my $followup_state_re = sprintf '^%s_%s_\d+$', $query_state, uc($first_action);
-    for my $state (@{$wf_config->{state}}) {
+    for my $state (@$state_info) {
         if ($state->{name} =~ qr/$followup_state_re/) {
             push @actions, $state->{action}->[0]->{name} ;
         }
@@ -156,7 +165,7 @@ sub _get_input_fields {
 
     # get field informations
     for my $action (@actions) {
-        my $action_info = $self->factory->get_action_info($action, $type);
+        my $action_info = $self->factory->get_action_info($action, $workflow);
         my $fields = $action_info->{field};
         for my $f (@$fields) {
             $result->{$f->{name}} = {
