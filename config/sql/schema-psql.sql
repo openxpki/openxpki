@@ -171,7 +171,7 @@ CREATE TABLE report (
     created numeric(49,0),
     mime_type text NOT NULL,
     description text NOT NULL,
-    report_value bytea NOT NULL,
+    report_value bytea NOT NULL
 );
 
 --
