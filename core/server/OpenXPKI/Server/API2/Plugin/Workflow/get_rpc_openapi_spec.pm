@@ -13,17 +13,44 @@ use List::Util;
 # Project modules
 use OpenXPKI::Client::Config;
 use OpenXPKI::Connector::WorkflowContext;
+use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 use OpenXPKI::Server::API2::Plugin::Workflow::Util;
 
+# Sources for "type" and "format" (subtype):
+#   OpenXPKI::Client::UI::Workflow->__render_fields()
+#   https://openxpki.readthedocs.io/en/latest/reference/developer/webui.html?highlight=rawlist#formattet-strings-string-format
 
 our %TYPE_MAP = (
-    server => 'string',
-    text => 'string',
-    uploadarea => 'string',
-    cert_identifier => 'string',
+    bool => { type => 'boolean' },
+    text => { type => 'string' },
+    datetime => { type => 'integer', minimum => 0 },
+    uploadarea => { type => 'string', format => 'binary' },
+    select => { type => 'string' },
+    server => { type => 'string' },
+    cert_identifier => { type => 'string' },
+    cert_subject => { type => 'string' },
+    cert_info => { type => 'string' },
+    password => { type => 'string', format => 'password' },
+    passwordverify => { type => 'string', format => 'password' },
 );
+
+our %SUBTYPE_MAP = ( # aka "format"
+    ullist => { type => 'array' },
+    rawlist => { type => 'array' },
+    deflist => { type => 'array' },
+    defhash => { type => 'object' },
+    cert_info => { description => 'The result is likely to be a JSON string prefixed with "OXJSF1:"', },
+    # FIXME: use enum from OpenXPKI::Server::API2::Types
+    certstatus => { type => 'string', enum => [ qw( ISSUED REVOKED CRL_ISSUANCE_PENDING EXPIRED ) ] },
+);
+
+our %KEY_MAP = (
+    pkcs10 => { description => 'The result is likely to be a JSON string prefixed with "OXJSF1:"', },
+    pkcs7 => { description => 'The result is likely to be a JSON string prefixed with "OXJSF1:"', },
+);
+
 
 has factory => (
     is => 'rw',
@@ -105,26 +132,57 @@ command "get_rpc_openapi_spec" => {
 sub _map_fieldtypes_to_openapi {
     my ($self, $workflow, $wf_fields, $rpc_spec_field_names) = @_;
 
-    my $wanted_fields = {};
-    for my $wanted ( @$rpc_spec_field_names ) {
-        if (not $wf_fields->{$wanted}) {
-            CTX('log')->system->error("Requested parameter '$wanted' is not defined in workflow '$workflow'");
+    my $openapi_spec; # HashRef { fieldname => { type => ... }, fieldname => ... }
+
+    # skip fields defined in RPC spec but not available in workflow
+    for my $fieldname ( @$rpc_spec_field_names ) {
+        if (not $wf_fields->{$fieldname}) {
+            CTX('log')->system->error("Requested parameter '$fieldname' is not defined in workflow '$workflow'");
             next;
         }
-        $wanted_fields->{$wanted} = $wf_fields->{$wanted};
+
+        my $openapi_field = {};
+        my $wf_field = $wf_fields->{$fieldname};
+
+        # copy some attributes from workflow field spec
+        $openapi_field->{$_} = $wf_field->{$_} // "" for qw( name required );
+
+        # translate description
+        $openapi_field->{description} = $wf_field->{description} ? i18nGettext($wf_field->{description}) : "";
+
+        # map OpenXPKI to OpenAPI types
+        my $wf_type = $wf_field->{type}; # variable used in exception
+
+        OpenXPKI::Exception->throw(
+            message => 'Missing OpenAPI type mapping for OpenXPKI parameter type',
+            params => { workflow => $workflow, field => $wf_field->{name}, parameter_type => $wf_type }
+        ) unless $TYPE_MAP{$wf_type};
+
+        # add type specific OpenAPI attributes
+        $openapi_field = { %$openapi_field, %{ $TYPE_MAP{$wf_type} } };
+
+        # TODO: Handle select fields (check if options are specified)
+
+        # add subtype specific OpenAPI attributes
+        my $match = $SUBTYPE_MAP{ $wf_field->{format} };
+        if ($match) {
+            my $hint = delete $match->{description};
+            $openapi_field->{description} .= " ($hint)" if $hint;
+            $openapi_field = { %$openapi_field, %$match };
+        }
+
+        # add fieldname specific OpenAPI attributes
+        $match = $KEY_MAP{ $fieldname };
+        if ($match) {
+            my $hint = delete $match->{description};
+            $openapi_field->{description} .= " ($hint)" if $hint;
+            $openapi_field = { %$openapi_field, %$match };
+        }
+
+        $openapi_spec->{$fieldname} = $openapi_field;
     }
 
-    # map OpenXPKI to OpenAPI types
-    for my $field (values %$wanted_fields) {
-        my $old_type = $field->{type}; # variable used in exception
-        $field->{type} = $OpenXPKI::Server::API2::Plugin::Workflow::get_rpc_openapi_spec::TYPE_MAP{$old_type}
-            or OpenXPKI::Exception->throw(
-                message => 'Missing OpenAPI type mapping for OpenXPKI parameter type',
-                params => { workflow => $workflow, field => $field->{name}, parameter_type => $old_type }
-            );
-    }
-
-    return $wanted_fields;
+    return $openapi_spec;
 }
 
 # Returns a HashRef with field names and their definition
