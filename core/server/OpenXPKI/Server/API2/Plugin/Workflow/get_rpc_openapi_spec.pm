@@ -19,9 +19,10 @@ use OpenXPKI::Server::API2::Plugin::Workflow::Util;
 
 
 our %TYPE_MAP = (
-    server      => 'string',
-    text        => 'string',
-    uploadarea  => 'string',
+    server => 'string',
+    text => 'string',
+    uploadarea => 'string',
+    cert_identifier => 'string',
 );
 
 has factory => (
@@ -100,25 +101,26 @@ command "get_rpc_openapi_spec" => {
     };
 };
 
+# ... this also filters out fields that are requested but do not exist in the workflow
 sub _map_fieldtypes_to_openapi {
-    my ($self, $workflow, $fields, $wanted_field_names) = @_;
+    my ($self, $workflow, $wf_fields, $rpc_spec_field_names) = @_;
 
     my $wanted_fields = {};
-    for my $wanted ( @$wanted_field_names ) {
-        OpenXPKI::Exception->throw(
-            message => 'Requested parameter is not defined in the workflow',
-            params => { workflow => $workflow, parameter => $wanted }
-        ) unless $fields->{$wanted};
-
-        $wanted_fields->{$wanted} = $fields->{$wanted};
+    for my $wanted ( @$rpc_spec_field_names ) {
+        if (not $wf_fields->{$wanted}) {
+            CTX('log')->system->error("Requested parameter '$wanted' is not defined in workflow '$workflow'");
+            next;
+        }
+        $wanted_fields->{$wanted} = $wf_fields->{$wanted};
     }
 
     # map OpenXPKI to OpenAPI types
     for my $field (values %$wanted_fields) {
-        $field->{type} = $OpenXPKI::Server::API2::Plugin::Workflow::get_rpc_openapi_spec::TYPE_MAP{$field->{type}}
+        my $old_type = $field->{type}; # variable used in exception
+        $field->{type} = $OpenXPKI::Server::API2::Plugin::Workflow::get_rpc_openapi_spec::TYPE_MAP{$old_type}
             or OpenXPKI::Exception->throw(
                 message => 'Missing OpenAPI type mapping for OpenXPKI parameter type',
-                params => { workflow => $workflow, parameter_type => $field->{type} }
+                params => { workflow => $workflow, field => $field->{name}, parameter_type => $old_type }
             );
     }
 
