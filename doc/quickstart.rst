@@ -3,21 +3,30 @@
 Quickstart guide
 ================
 
+Support
+-------
+
+If you need help, please use the mailing list and do **NOT** open items  
+in the issue tracker on github. For details and additional support options 
+have a look at http://www.openxpki.org/support.html. 
+
 Vagrant
 -------
 
-We have a vagrant setup for debian jessie and ubuntu trusty. If you have vagrant you can just
+We have a vagrant setup for debian jessie. If you have vagrant you can just 
 checkout the git repo, go to vagrant/debian and run "vagrant up test". Provisioning takes some
 minutes and will give you a ready to run OXI install available at http://localhost:8080/openxpki/.
 
-Debian/Ubuntu Builds
-----------------------
+Debian Builds
+-------------
 
-**Note** Due to problems with packaging and outdated perl libs we discontinued support for Ubuntu!
 New users should use the v2 release branch which is available for Debian 8 (Jessie), for
 those running a v1 version we still maintain security and major bug fixes for the old release.
 
-**Packages are for 64bit systems (arch amd64), make sure that the en_US.utf8 locale is installed as the translation stuff will crash otherwise!**
+**Packages are for Debian Jessie 8 / 64bit (arch amd64). The en_US.utf8 locale must be 
+installed as the translation system will crash otherwise! The packages do NOT work 
+on Ubuntu, Debian 9 or 32bit systems. Community packages for Ubuntu have been 
+discontinued due to packaging/dependancy problems.**
 
 Start with a debian minimal install, we recommend to add "SSH Server" and "Web Server" in the package selection menu, as this will speed up the install later::
 
@@ -48,10 +57,6 @@ Note, fastcgi module should be enabled explicitly, otherwise, .fcgi file will be
     a2enmod fcgid
 
 Some people reported that a2enmod is not available on their system, in this case try to install the apache2.2-common package.
-
-*Ubuntu only*: Some of the provided perl packages are too old, you need to install recent versions from our package server by hand! The packages signatures are not working on ubuntu, so you need to confirm that you want to install the "untrusted packages"::
-
-    aptitude install libcgi-perl libmodule-load-perl
 
 Now install the OpenXPKI core package, session driver and the translation package::
 
@@ -85,9 +90,9 @@ Now, create an empty database and assign a database user::
        passwd: openxpki
 
 
-Starting with v1.13, the "initdb" command is deprecated, please create
-the empty database schema from the provided schema file (currently only
-available for mysql).
+Please create the empty database schema from the provided schema file. mysql and postgresql 
+should work out of the box, the oracle schema is goo for testing but needs some extra indices 
+to perform properly.
 
 Example call when debian packages are installed::
 
