@@ -32,5 +32,3 @@ token:
         key_store: OPENXPKI
         shell: /usr/bin/keytool
         randfile: /var/openxpki/rand
-
-

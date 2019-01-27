@@ -31,18 +31,6 @@ workflow:
         _url_params: url_params
         #_pkcs7: pkcs7
 
-
-# allow rsa keys with 1020 to 2048 bit
-# the 1020 is necessary as some implementations can have
-# leading 0 in the modulus which will reduce the bitcount
-key_size:
-    rsaEncryption: 1020-2048
-
-# allowed digest algorithms used for the CSR
-hash_type:
-  - sha1
-  - sha256
-
 authorized_signer:
     rule1:
         # Full DN

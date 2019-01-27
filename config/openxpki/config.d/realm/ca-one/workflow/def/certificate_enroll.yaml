@@ -10,6 +10,7 @@ state:
         action: initialize global_map_url_params set_transaction_id set_workflow_attributes global_load_policy global_set_profile parse_pkcs10 > PARSED
 
     # check for certificateTemplate to override profile
+    # TODO - key check has wrong result if profile from extension has different settings!
     PARSED:
         autorun: 1
         action:
