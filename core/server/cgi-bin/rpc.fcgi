@@ -56,9 +56,9 @@ while (my $cgi = CGI::Fast->new()) {
 
     my $method = $cgi->param('method');
 
-    # if method is not set via param check for full body post
+    # check for request parameters in JSON data (HTTP body)
     my $postdata;
-    if ( !$method && $conf->{input}->{allow_raw_post} && $cgi->param('POSTDATA')) {
+    if ($conf->{input}->{allow_raw_post} && $cgi->param('POSTDATA')) {
         # TODO - evaluate security implications regarding blessed objects
         # and consider to filter out serialized objects for security reasons
         $json->max_depth(  $conf->{input}->{parse_depth} || 5 );
@@ -74,7 +74,8 @@ while (my $cgi = CGI::Fast->new()) {
             }});
             next;
         }
-        $method = $postdata->{method};
+        # read "method" from JSON data if not found in URL before
+        $method = $postdata->{method} unless $method;
     }
 
     # method should be set now
