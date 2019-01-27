@@ -76,7 +76,39 @@ sub _create_client {
 sub _openapi_spec {
     my ($cgi, $conf) = @_;
 
-    my $spec_paths;
+    my $openapi_server_url = sprintf "%s://%s:%s%s", ($cgi->https ? 'https' : 'http'), $cgi->virtual_host, $cgi->virtual_port, $cgi->request_uri;
+
+    my $openapi_spec = {
+        openapi => "3.0.0",
+        info => { title => "OpenXPKI RPC API", version => "0.0.1", description => "Run a defined set of OpenXPKI workflows" },
+        servers => [ { url => $openapi_server_url, description => "OpenXPKI server" } ],
+        components => {
+            schemas => {
+                Error => {
+                    type => 'object',
+                    properties => {
+                        'error' => {
+                            type => 'object',
+                            description => 'Only set if an error occured while executing the command',
+                            required => [qw( code message data )],
+                            properties => {
+                                'code' => { type => 'integer', },
+                                'message' => { type => 'string', },
+                                'data' => {
+                                    type => 'object',
+                                    properties => {
+                                        'pid' => { type => 'integer', },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    };
+
+    my $paths;
     eval {
         my $client = _create_client($cgi, $conf) or die "Could not create OpenXPKI client";
 
@@ -87,7 +119,7 @@ sub _openapi_spec {
                 output => [ split /\s*,\s*/, $conf->{$method}->{output} ]
             });
 
-            $spec_paths->{"/$method"} = {
+            $paths->{"/$method"} = {
                 post => {
                     description => $method_spec->{description},
                     requestBody => {
@@ -111,36 +143,18 @@ sub _openapi_spec {
                                                     'result' => {
                                                         type => 'object',
                                                         description => 'Only set if command was successfully executed',
+                                                        required => [qw( data state pid id )],
                                                         properties => {
                                                             'data' => $method_spec->{output_schema},
                                                             'state' => { type => 'string' },
                                                             'pid' => { type => 'integer', },
                                                             'id' => { type => 'integer', },
                                                         },
-                                                        required => [qw( data state pid id )],
                                                     },
                                                 },
                                             },
-                                            # TODO: only put a reference to the error definition here
                                             {
-                                                type => 'object',
-                                                properties => {
-                                                    'error' => {
-                                                        type => 'object',
-                                                        description => 'Only set if an error occured while executing the command',
-                                                        properties => {
-                                                            'code' => { type => 'integer', },
-                                                            'message' => { type => 'string', },
-                                                            'data' => {
-                                                                type => 'object',
-                                                                properties => {
-                                                                    'pid' => { type => 'integer', },
-                                                                },
-                                                            },
-                                                        },
-                                                        required => [qw( code message data )],
-                                                    },
-                                                },
+                                                '$ref' => '#/components/schemas/Error',
                                             },
                                         ],
                                     },
@@ -161,14 +175,9 @@ sub _openapi_spec {
         return;
     }
 
-    my $openapi_server_url = sprintf "%s://%s:%s%s", ($cgi->https ? 'https' : 'http'), $cgi->virtual_host, $cgi->virtual_port, $cgi->request_uri;
+    $openapi_spec->{paths} = $paths;
 
-    return {
-        openapi => "3.0.0",
-        info => { title => "OpenXPKI RPC API", version => "0.0.1", description => "Run a defined set of OpenXPKI workflows" },
-        servers => [ { url => $openapi_server_url, description => "OpenXPKI server" } ],
-        paths => $spec_paths,
-    };
+    return $openapi_spec;
 }
 
 while (my $cgi = CGI::Fast->new()) {
