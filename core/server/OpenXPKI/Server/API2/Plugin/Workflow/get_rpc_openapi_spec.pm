@@ -10,6 +10,9 @@ OpenXPKI::Server::API2::Plugin::Workflow::get_rpc_openapi_spec
 # Core modules
 use List::Util;
 
+# CPAN modules
+use JSON;
+
 # Project modules
 use OpenXPKI::Client::Config;
 use OpenXPKI::Connector::WorkflowContext;
@@ -97,7 +100,6 @@ command "get_rpc_openapi_spec" => {
     my ($self, $params) = @_;
 
     my $workflow = $params->workflow;
-    my $rpc_conf = OpenXPKI::Client::Config->new('rpc');
 
     if (not $self->factory->authorize_workflow({ ACTION => 'create', TYPE => $workflow })) {
         OpenXPKI::Exception->throw(
@@ -107,11 +109,6 @@ command "get_rpc_openapi_spec" => {
     }
 
     my $head = CTX('config')->get_hash([ 'workflow', 'def', $workflow, 'head' ]);
-    my $result = {
-        type        => $workflow,
-        label       => $head->{label},
-        description => $head->{description},
-    };
 
     my $util = OpenXPKI::Server::API2::Plugin::Workflow::Util->new;
     my $success = $util->get_state_info($workflow, 'SUCCESS')
@@ -123,8 +120,9 @@ command "get_rpc_openapi_spec" => {
     $output->{ $_->{name} } = $_ for @{ $success->{output} };
 
     return {
-        input => $self->_openapi_field_schema($workflow, $self->_get_input_fields($workflow, 'INITIAL'), $params->input),
-        output => $self->_openapi_field_schema($workflow, $output, $params->output),
+        description => $head->{description} ? i18nGettext($head->{description}) : $workflow,
+        input_schema => $self->_openapi_field_schema($workflow, $self->_get_input_fields($workflow, 'INITIAL'), $params->input),
+        output_schema => $self->_openapi_field_schema($workflow, $output, $params->output),
     };
 };
 
@@ -132,23 +130,24 @@ command "get_rpc_openapi_spec" => {
 sub _openapi_field_schema {
     my ($self, $workflow, $wf_fields, $rpc_spec_field_names) = @_;
 
-    my $openapi_spec; # HashRef { fieldname => { type => ... }, fieldname => ... }
+    my $field_specs = {}; # HashRef { fieldname => { type => ... }, fieldname => ... }
+    my @required_fields;
 
     # skip fields defined in RPC spec but not available in workflow
     for my $fieldname ( @$rpc_spec_field_names ) {
         if (not $wf_fields->{$fieldname}) {
-            CTX('log')->system->error("Requested parameter '$fieldname' is not defined in workflow '$workflow'");
+            CTX('log')->system->warn("Parameter '$fieldname' as requested for OpenAPI spec is not defined in workflow '$workflow'");
             next;
         }
 
-        my $openapi_field = {};
+        my $field = {};
         my $wf_field = $wf_fields->{$fieldname};
 
         # copy some attributes from workflow field spec
-        $openapi_field->{$_} = $wf_field->{$_} // "" for qw( name required );
+        push @required_fields, $fieldname if $wf_field->{required};
 
-        # translate description
-        $openapi_field->{description} = $wf_field->{description} ? i18nGettext($wf_field->{description}) : "";
+        # translate description (must be non-empty by OpenAPI spec)
+        $field->{description} = $wf_field->{description} ? i18nGettext($wf_field->{description}) : $fieldname;
 
         # map OpenXPKI to OpenAPI types
         my $wf_type = $wf_field->{type}; # variable used in exception
@@ -159,30 +158,34 @@ sub _openapi_field_schema {
         ) unless $TYPE_MAP{$wf_type};
 
         # add type specific OpenAPI attributes
-        $openapi_field = { %$openapi_field, %{ $TYPE_MAP{$wf_type} } };
+        $field = { %$field, %{ $TYPE_MAP{$wf_type} } };
 
         # TODO: Handle select fields (check if options are specified)
 
         # add subtype specific OpenAPI attributes
-        my $match = $SUBTYPE_MAP{ $wf_field->{format} };
+        my $match = $SUBTYPE_MAP{ $wf_field->{format} // "" };
         if ($match) {
             my $hint = delete $match->{description};
-            $openapi_field->{description} .= " ($hint)" if $hint;
-            $openapi_field = { %$openapi_field, %$match };
+            $field->{description} .= " ($hint)" if $hint;
+            $field = { %$field, %$match };
         }
 
         # add fieldname specific OpenAPI attributes
         $match = $KEY_MAP{ $fieldname };
         if ($match) {
             my $hint = delete $match->{description};
-            $openapi_field->{description} .= " ($hint)" if $hint;
-            $openapi_field = { %$openapi_field, %$match };
+            $field->{description} .= " ($hint)" if $hint;
+            $field = { %$field, %$match };
         }
 
-        $openapi_spec->{$fieldname} = $openapi_field;
+        $field_specs->{$fieldname} = $field;
     }
 
-    return $openapi_spec;
+    return {
+        type => 'object',
+        properties => $field_specs,
+        @required_fields ? (required => \@required_fields) : (),
+    };
 }
 
 # Returns a HashRef with field names and their definition
