@@ -44,6 +44,7 @@ sub send_output {
     } else {
         # prepare response header
         print $cgi->header( -type => 'application/json', charset => 'utf8' );
+        $json->max_depth(20);
         print $json->encode( $result );
     }
 
