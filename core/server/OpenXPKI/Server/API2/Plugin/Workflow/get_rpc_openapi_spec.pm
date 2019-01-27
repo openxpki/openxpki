@@ -147,7 +147,7 @@ sub _openapi_field_schema {
         push @required_fields, $fieldname if $wf_field->{required};
 
         # translate description (must be non-empty by OpenAPI spec)
-        $field->{description} = $wf_field->{description} ? i18nGettext($wf_field->{description}) : $fieldname;
+        $field->{description} = $wf_field->{label} ? i18nGettext($wf_field->{label}) : $fieldname;
 
         # map OpenXPKI to OpenAPI types
         my $wf_type = $wf_field->{type}; # variable used in exception
