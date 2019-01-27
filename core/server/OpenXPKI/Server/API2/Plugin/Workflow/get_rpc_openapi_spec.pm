@@ -123,13 +123,13 @@ command "get_rpc_openapi_spec" => {
     $output->{ $_->{name} } = $_ for @{ $success->{output} };
 
     return {
-        input => $self->_map_fieldtypes_to_openapi($workflow, $self->_get_input_fields($workflow, 'INITIAL'), $params->input),
-        output => $self->_map_fieldtypes_to_openapi($workflow, $output, $params->output),
+        input => $self->_openapi_field_schema($workflow, $self->_get_input_fields($workflow, 'INITIAL'), $params->input),
+        output => $self->_openapi_field_schema($workflow, $output, $params->output),
     };
 };
 
 # ... this also filters out fields that are requested but do not exist in the workflow
-sub _map_fieldtypes_to_openapi {
+sub _openapi_field_schema {
     my ($self, $workflow, $wf_fields, $rpc_spec_field_names) = @_;
 
     my $openapi_spec; # HashRef { fieldname => { type => ... }, fieldname => ... }
