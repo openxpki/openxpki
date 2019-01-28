@@ -1,318 +1,26 @@
-## OpenXPKI::Crypto::LibSCEP
-## Adapted to LibSCEP by Martin Bartosch for the OpenXPKI project
-## Written 2006 by Alexander Klink for the OpenXPKI project
-## based on OpenXPKI::Crypto::Backend::OpenSSL,
-## written by Michael Bell for the OpenXPKI project
-## (C) Copyright 2006-2018 by The OpenXPKI Project
 package OpenXPKI::Crypto::Tool::LibSCEP;
 
+use base qw( OpenXPKI::Crypto::Toolkit );
 
 use strict;
 use warnings;
-use utf8; ## pack/unpack is too slow
+use English;
 
 use Class::Std;
 
-use OpenXPKI::Server::Context qw( CTX );
-
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use OpenXPKI::FileUtils;
-use English;
 use Data::Dumper;
 
-use File::Spec;
-
-# attributes
-my %token_type_of     :ATTR; # the token type
-my %tmp_dir_of        :ATTR( :get<tmp_dir> );  # the temporary directory used
-my %engine_of         :ATTR( :get<engine> :set<engine> ); # the engine used
-my %params_of         :ATTR( :get<params> ); # a hash reference of parameters
-my %command_params_of :ATTR( :get<command_params> ); # params for Command classes
-my %base_class_of     :ATTR; # the current class we are in
-my %shell_of          :ATTR( :get<shell> );
-my %cert_identifier_of :ATTR( :get<cert_identifier> ); # the cert_idenfifier of the attached certificate
-
-sub START {
-    ##! 16: 'Toolkit start'
-    my ($self, $ident, $arg_ref) = @_;
-
-    $base_class_of{$ident} = ref $self;
-
-    $token_type_of{$ident} = $arg_ref->{TOKEN_TYPE};
-
-     my $requestedtmp = $arg_ref->{TMP};
-
-    # determine temporary directory to use:
-    # if a temporary directoy is specified, use it
-    # else try /var/tmp (because potentially large files may be written that
-    # are better left in the /var file system)
-    # if /var/tmp does not exist fallback to /tmp
-
-  CHECKTMPDIRS:
-    for my $path ($requestedtmp,    # user's preference
-          File::Spec->catfile('', 'var', 'tmp'), # suitable for large files
-          File::Spec->catfile('', 'tmp'),        # present on all UNIXes
-    ) {
-
-    # directory must be readable & writable to be usable as tmp
-    if (defined $path &&
-        (-d $path) &&
-        (-r $path) &&
-        (-w $path)) {
-        $tmp_dir_of{$ident} = $path;
-        last CHECKTMPDIRS;
-    }
-    }
-
-    if (! (exists $tmp_dir_of{$ident} && -d $tmp_dir_of{$ident}))
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_TOOLKIT_TEMPORARY_DIRECTORY_UNAVAILABLE");
-    }
-
-    $command_params_of{$ident} = {};
-
-
-    # We have two kinds of tokens with different config style
-    # where system tokens do not have a "name" set.
-    if ($arg_ref->{NAME}){
-        $self->__load_config_realm_token($arg_ref);
-    } else {
-        $self->__load_config_system_token($arg_ref);
-    }
-    $self->__init_engine();
-    $self->__init_command();
-}
-
-
-=head2 __load_config_system_token ()
-
-Initialize system token
-
-=cut
-
-sub __load_config_system_token {
-    ##! 16: 'start'
-    my $self = shift;
-    my $ident = ident $self;
-    my $arg_ref = shift;
-
-    my $type = $token_type_of{$ident};
-
-    my $config = CTX('config');
-
-    ##! 16: "Load system token $type"
-    # FIXME - most of this params are useless for system tokens but creates errors when not set in the Backend::OpenSSL class
-    foreach my $key (qw(backend
-                    engine     shell         wrapper
-                    randfile
-                    engine_section engine_usage
-                    key_store)) {
-
-        $params_of{$ident}->{uc($key)} = $config->get("system.crypto.token.$type.$key") || '';
-    }
-
-}
-
-=head2 __load_config_realm_token ( { NAME, SECRET, CERTIFICATE })
-
-Initialize realm token defined by NAME (full alias as registered in the alias
-table). SECRET can be omitted if the key is not protected by a passphrase.
-CERTIFICATE is usually omitted and resolved internally by calling
-get_certificate_for_alias. For situations where the alias can not be resolved
-(testing), you can provide the result structure of the API call in the
-CERTIFICATE parameter.
-
-=cut
-
-sub __load_config_realm_token {
-    ##! 16: 'start'
-    my $self = shift;
-    my $ident = ident $self;
-    my $arg_ref = shift;
-
-    my $name = $arg_ref->{NAME};
-
-    my $type = $token_type_of{$ident};
-
-    my $config = CTX('config');
-    # Load "real" crypto tokens (those with key material)
-    ##! 16: "Load realm token of type $type, name $name"
-
-    # Add the secret
-    $params_of{$ident}->{SECRET} = $arg_ref->{SECRET} if ($arg_ref->{SECRET});
-
-
-    # Magic inheritance code - see also TokenManager::__add_token
-    # Use backend to test for instance / group
-    my $backend_class = $config->get_inherit("crypto.token.$name.backend");
-
-    my $config_name_group = $name;
-    # Nothing found with the full token name, so try to load from the group name
-    if (!$backend_class) {
-        $config_name_group =~ /^(.+)-(\d+)$/;
-        $config_name_group = $1;
-        ##! 16: 'use group config ' . $config_name_group
-        $backend_class = $config->get_inherit("crypto.token.$config_name_group.backend");
-    }
-
-    if (!$backend_class) {
-         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_CRYPTO_TOOLKIT_INCOMPLETE_CONFIGURATION_NO_BACKEND',
-        );
-    }
-
-    $params_of{$ident}->{BACKEND} = $backend_class;
-
-    my @keylist = (qw(engine shell wrapper randfile
-                    engine_section engine_usage key key_store));
-
-    foreach my $key (@keylist) {
-        my $value = $config->get_inherit("crypto.token.$config_name_group.$key");
-        $params_of{$ident}->{uc($key)} = $value if (defined $value);
-    }
-
-    # FIXME - most of this params are not usefull for all tokens, need a better error checking concept
-    foreach my $key (@keylist) {
-        if (not defined $params_of{$ident}->{uc($key)}) {
-            OpenXPKI::Exception->throw(
-                message  => "I18N_OPENXPKI_CRYPTO_TOOLKIT_INCOMPLETE_CONFIGURATION",
-                params   => {
-                    "NAME" => $name,
-                    "TYPE" => $type,
-                    "ATTRIBUTE" => $key,
-            });
-        }
-    }
-
-    my $certificate = $arg_ref->{CERTIFICATE};
-    $certificate = CTX('api2')->get_certificate_for_alias( 'alias' => $self->{CA} ) unless($certificate);
-
-    my $cert;
-    my $key_identifier;
-    if ($certificate->{data}) {
-        $cert = $certificate->{data};
-        $cert_identifier_of{$ident} = $certificate->{identifier};
-        $key_identifier = $certificate->{key_identifier};
-    # map legacy format
-    } elsif ($certificate->{DATA}) {
-        $cert = $certificate->{DATA};
-        $cert_identifier_of{$ident} = $certificate->{IDENTIFIER};
-        $key_identifier = $certificate->{KEY_IDENTIFIER};
-    }
-
-    if (!$cert) {
-        # Should never show up if the api is not broken
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_CRYPTO_TOOLKIT_CERTIFICATE_NOT_DEFINED',
-        );
-    }
-
-    # Use Template Toolkit to assemble the key name,
-    # we offer the full alias, group and generation as vars (similar to cdp)
-    # Split alias into generation and group name
-    $name =~ /^(.*)-(\d+)$/;
-    my $group = $1;
-    my $generation = $2;
-
-    my $template_vars = {
-        'ALIAS' => $name,
-        'GROUP' => $group,
-        'GENERATION' => $generation,
-        'PKI_REALM' => CTX('api')->get_pki_realm(),
-        'IDENTIFIER' => $cert_identifier_of{$ident},
-        'KEY_IDENTIFIER' => $key_identifier
-    };
-
-    ##! 16: 'Building key name from template ' . $params_of{$ident}->{KEY}
-    ##! 32: 'TT vars  ' . Dumper $template_vars
-
-    my $tt = Template->new();
-    my $output;
-    $tt->process(\$params_of{$ident}->{KEY}, $template_vars, \$output);
-
-    ##! 16: 'Key path ' . $output
-
-    # Check for output
-    OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_CRYPTO_TOOLKIT_CANT_BUILD_KEY_PATH',
-        param => {
-
-        }
-    ) unless ($output);
-
-    $params_of{$ident}->{KEY} = $output;
-
-    my $fu = OpenXPKI::FileUtils->new();
-    my $cert_filename = $fu->get_safe_tmpfile({
-        TMP => $tmp_dir_of{$ident},
-    });
-    $fu->write_file({
-        FILENAME => $cert_filename,
-        CONTENT  => $cert,
-        FORCE    => 1,
-    });
-    chmod 0644, $cert_filename;
-    $params_of{$ident}->{CERT} = $cert_filename;
-
-    ##! 1: 'end'
-}
-
-sub __init_engine
-{
-    ##! 8: "start"
-    my $self = shift;
-    my $ident = ident $self;
-
-    if (!exists $params_of{$ident}->{ENGINE} || $params_of{$ident}->{ENGINE} eq '') {
-        OpenXPKI::Exception->throw (
-            message => 'I18N_OPENXPKI_TOOLKIT_ENGINE_UNDEFINED',
-        );
-    }
-
-    my $engine = $base_class_of{$ident} . '::Engine::' . $params_of{$ident}->{ENGINE};
-    eval "use $engine;";
-    if ($EVAL_ERROR)
-    {
-        OpenXPKI::Exception->throw (
-            message => 'I18N_OPENXPKI_TOOLKIT_INIT_ENGINE_USE_FAILED',
-            params  => { 'ERRVAL' => $EVAL_ERROR,
-                       },
-        );
-    }
-    $self->__instantiate_engine($engine);
-}
-
-# add XS parameters to OpenSSL part, set config in OpenSSL
-sub __instantiate_engine {
-    ##! 8: 'start'
-    my $self = shift;
-    my $ident = ident $self;
-    my $engine = shift;
-
-    delete $engine_of{$ident};
-    $engine_of{$ident} = eval {
-        $engine->new(
-            %{$params_of{$ident}},
-        )
-    };
-    if (my $exc = OpenXPKI::Exception->caught()) {
-        OpenXPKI::Exception->throw (
-            message  => "I18N_OPENXPKI_TOOLKIT_INIT_ENGINE_NEW_FAILED",
-            children => [ $exc ]);
-    } elsif ($EVAL_ERROR) {
-        $EVAL_ERROR->rethrow();
-    }
-    ##! 8: 'end'
-}
+# skip shell init from Toolkit as we dont need it
+sub __init_shell { }
 
 sub __init_command {
     ##! 16: 'start'
     my $self = shift;
-    my $ident = ident $self;
 
     $self->get_command_params()->{ENGINE} = $self->get_engine();
+
     ##! 16: 'end'
 }
 
@@ -320,9 +28,8 @@ sub command {
     ##! 1: "start"
     my $self = shift;
     my $arg_ref = shift;
-    my $ident = ident $self;
 
-    my $cmd  = $base_class_of{$ident} . '::Command::' . $arg_ref->{COMMAND};
+    my $cmd  = 'OpenXPKI::Crypto::Tool::LibSCEP::Command::' . $arg_ref->{COMMAND};
     delete $arg_ref->{COMMAND};
 
     eval "require $cmd";
@@ -336,9 +43,8 @@ sub command {
 
     my $ret = eval {
         my $cmd_ref = $cmd->new({
-            %{$command_params_of{$ident}},
+            %{ $self->get_command_params() },
             %{$arg_ref},
-            TOKEN_TYPE => $token_type_of{$ident},
             });
         my $result = $cmd_ref->get_result();
         return $result;
@@ -365,99 +71,13 @@ sub command {
     }
 }
 
-###############################
-##     BEGIN engine code     ##
-###############################
-
-sub online
-{
-    ##! 1: "start"
-    my $self   = shift;
-    my $ident = ident $self;
-    return $self->get_engine()->online(@_);
-}
-
-sub key_usable
-{
-    ##! 1: "start"
-    my $self   = shift;
-    my $ident = ident $self;
-    return $self->get_engine()->key_usable(@_);
-}
-
-sub login
-{
-    ##! 1: "start"
-    my $self   = shift;
-    my $ident = ident $self;
-    return $self->get_engine()->login(@_);
-}
-
-sub logout
-{
-    ##! 1: "start"
-    my $self   = shift;
-    my $ident = ident $self;
-    return $self->get_engine()->logout(@_);
-}
-
-sub get_certfile
-{
-    ##! 1: "start"
-    my $self   = shift;
-    my $ident = ident $self;
-    return $self->get_engine()->get_certfile(@_);
-}
-
-sub get_chainfile
-{
-    ##! 1: "start"
-    my $self   = shift;
-    my $ident = ident $self;
-    return $self->get_engine()->get_chainfile(@_);
-}
-
-#############################
-##     END engine code     ##
-#############################
-
 1;
 __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Toolkit - an ABSTRACT superclass for Backends and Tools
+OpenXPKI::Crypto::Tool::LibSCEP
 
 =head1 Description
 
-This class provides an abstraction for both Backends and Tools, i.e.
-OpenXPKI::Crypto::Backend::OpenSSL or OpenXPKI::Crypto::Tool::SCEP
-Note that it can not be instantiated.
-
-=head1 Functions
-
-=head2 START
-
-is the constructor (see Class:Std). It requires five basic parameters
-which are described here. The other parameters are engine specific and
-are described in the related engine documentation.
-
-=over
-
-=item * RANDFILE (file to store the random informations)
-
-=item * SHELL (the binary to use)
-
-=item * TMP (the used temporary directory which must be private)
-
-=back
-
-=head2 command
-
-execute a  command. You must specify the name of the command
-as first parameter followed by a hash with parameters.
-
-=head1 See Also
-
-OpenXPKI::Crypto::Backend::OpenSSL
-OpenXPKI::Crypto::Tool::SCEP
+Child class of OpenXPKI::Crypto::Toolkit for LibSCEP
