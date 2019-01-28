@@ -24,10 +24,10 @@ sub execute {
 
     ##! 32: 'ca issuer: ' . Dumper $ca_issuer_alias ;
 
-    my $ca_issuer = CTX('api')->get_certificate_for_alias( { ALIAS => $ca_issuer_alias } );
+    my $ca_issuer = CTX('api2')->get_certificate_for_alias( alias => $ca_issuer_alias );
 
     my $pkcs7_chain = CTX('api')->get_chain({
-        START_IDENTIFIER => $ca_issuer->{IDENTIFIER},
+        START_IDENTIFIER => $ca_issuer->{identifier},
         OUTFORMAT        => 'PEM',
         BUNDLE           => 1,
         KEEPROOT         => 1,

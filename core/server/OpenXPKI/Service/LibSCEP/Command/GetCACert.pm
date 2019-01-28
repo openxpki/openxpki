@@ -59,7 +59,7 @@ sub __get_ca_certificate_chains : PRIVATE {
     }
 
     my $scep_cert_alias = $self->__get_token_alias( $server );
-    my $scep_ca_cert_identifier = CTX('api')->get_certificate_for_alias({ ALIAS => $scep_cert_alias })->{IDENTIFIER};
+    my $scep_ca_cert_identifier = CTX('api2')->get_certificate_for_alias( alias => $scep_cert_alias )->{identifier};
 
     if (! defined $scep_ca_cert_identifier) {
         OpenXPKI::Exception->throw(
@@ -95,10 +95,10 @@ sub __get_ca_certificate_chains : PRIVATE {
     ##! 32: 'ca issuer: ' . Dumper $ca_issuer_alias ;
 
 
-    my $ca_issuer = CTX('api')->get_certificate_for_alias( { ALIAS => $ca_issuer_alias } );
+    my $ca_issuer = CTX('api2')->get_certificate_for_alias( alias => $ca_issuer_alias );
 
     my $ca_chain = $api->get_chain({
-        'START_IDENTIFIER' => $ca_issuer->{IDENTIFIER},
+        'START_IDENTIFIER' => $ca_issuer->{identifier},
         'OUTFORMAT'        => 'PEM',
     });
 

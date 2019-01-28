@@ -52,9 +52,9 @@ sub execute {
 
     # Load issuer info
     # FIXME - this might be improved using some caching
-    my $certificate = CTX('api')->get_certificate_for_alias( { 'ALIAS' => $ca_alias });
+    my $certificate = CTX('api2')->get_certificate_for_alias( 'alias' => $ca_alias );
     my $x509 = OpenXPKI::Crypto::X509->new(
-        DATA  => $certificate->{DATA},
+        DATA  => $certificate->{data},
         TOKEN => $default_token,
     );
 

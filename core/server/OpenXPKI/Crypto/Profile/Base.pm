@@ -633,13 +633,27 @@ sub process_templates {
     ##! 16: 'Tags found - init TT'
     my $tt = Template->new();
 
+
     if (not $self->{CACERTIFICATE}) {
-        $self->{CACERTIFICATE} = CTX('api')->get_certificate_for_alias( { 'ALIAS' => $self->{CA} });
+        $self->{CACERTIFICATE} = CTX('api2')->get_certificate_for_alias( 'alias' => $self->{CA} );
     }
+
+    my $ca_cert;
+    if ($self->{CACERTIFICATE}->{data}) {
+        $ca_cert = $self->{CACERTIFICATE}->{data};
+    # old format
+    } elsif ($self->{CACERTIFICATE}->{DATA}) {
+        $ca_cert = $self->{CACERTIFICATE}->{DATA};
+    } else {
+        OpenXPKI::Exception->throw(
+            message => 'Unable to load CA Certificate',
+        );
+    }
+
     my $default_token = CTX('crypto_layer')->get_system_token({ TYPE => "DEFAULT" });
 
     my $x509 = OpenXPKI::Crypto::X509->new(
-        DATA  => $self->{CACERTIFICATE}->{DATA},
+        DATA  => $ca_cert,
         TOKEN => $default_token,
     );
 

@@ -134,24 +134,24 @@ sub issueCertificate {
             });
         }
 
-        my $cert = CTX('api')->get_certificate_for_alias({ ALIAS => $issuing_ca });
+        my $cert = CTX('api2')->get_certificate_for_alias( alias => $issuing_ca );
 
-        if ($notafter->epoch() > $cert->{NOTAFTER}) {
-            $notafter = DateTime->from_epoch( epoch => $cert->{NOTAFTER} );
+        if ($notafter->epoch() > $cert->{notafter}) {
+            $notafter = DateTime->from_epoch( epoch => $cert->{notafter} );
             CTX('log')->application()->warn("Validity exceeds selected issuing ca - truncating notafter");
 
-        } elsif ($notafter->epoch() < $cert->{NOTBEFORE}) {
+        } elsif ($notafter->epoch() < $cert->{notbefore}) {
             CTX('log')->application()->error("Expected notafter is before CA lifetime!");
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_NICE_LOCAL_CA_NOTAFTER_BEFORE_CA_LIFETIME',
             );
         }
 
-        if ($notbefore->epoch() < $cert->{NOTBEFORE}) {
-            $notbefore = DateTime->from_epoch( epoch => $cert->{NOTBEFORE} );
+        if ($notbefore->epoch() < $cert->{notbefore}) {
+            $notbefore = DateTime->from_epoch( epoch => $cert->{notbefore} );
             CTX('log')->application()->warn("Validity exceeds selected issuing ca - truncating notbefore");
 
-        } elsif ($notbefore->epoch() > $cert->{NOTAFTER}) {
+        } elsif ($notbefore->epoch() > $cert->{notafter}) {
             CTX('log')->application()->error("Expected notbefore is after CA lifetime!");
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_NICE_LOCAL_CA_NOTBEFORE_AFTER_CA_LIFETIME',
@@ -365,10 +365,10 @@ sub issueCRL {
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
     # Load meta data of CA from the database
-    my $ca_info = CTX('api')->get_certificate_for_alias( { ALIAS => $ca_alias } );
+    my $ca_info = CTX('api2')->get_certificate_for_alias( alias => $ca_alias );
 
     # Get the certificate identifier to filter in the database
-    my $ca_identifier = $ca_info->{IDENTIFIER};
+    my $ca_identifier = $ca_info->{identifier};
 
     # Build Profile (from ..Workflow::Activity::CRLIssuance::GetCRLProfile)
     my $crl_profile = OpenXPKI::Crypto::Profile::CRL->new(
@@ -376,7 +376,7 @@ sub issueCRL {
         $crl_validity
          ? (VALIDITY => { VALIDITYFORMAT => 'relativedate', VALIDITY => $crl_validity }) : (),
         # We need the validity to check for the necessity of a "End of Life" CRL
-        CA_VALIDITY => { VALIDITYFORMAT => 'epoch', VALIDITY => $ca_info->{NOTAFTER} }
+        CA_VALIDITY => { VALIDITYFORMAT => 'epoch', VALIDITY => $ca_info->{notafter} }
     );
     ##! 16: 'profile: ' . Dumper( $crl_profile )
 

@@ -641,13 +641,13 @@ sub get_crl {
 
         my $ca_alias = CTX('api')->get_token_alias_by_type({ TYPE => 'certsign' });
         ##! 16: 'Load crl by date, ca alias ' . $ca_alias
-        my $ca_hash = CTX('api')->get_certificate_for_alias({ ALIAS => $ca_alias });
+        my $ca_hash = CTX('api2')->get_certificate_for_alias( alias => $ca_alias );
 
         $db_results = CTX('dbi')->select_one(
             from => 'crl',
             columns => $columns,
             where => {
-                issuer_identifier => $ca_hash->{IDENTIFIER}
+                issuer_identifier => $ca_hash->{identifier}
             },
             order_by => '-last_update'
         );
@@ -2153,7 +2153,7 @@ sub __set_data_pool_entry : PRIVATE {
             my $safe_id = CTX('api')->get_token_alias_by_type({ TYPE => 'datasafe' });
             $encryption_key_id = 'p7:' . $safe_id;
 
-            my $cert = CTX('api')->get_certificate_for_alias({ ALIAS => $safe_id });
+            my $cert = CTX('api')->get_certificate_for_alias( alias => $safe_id );
 
             ##! 16: 'cert: ' . $cert
             if ( !defined $cert ) {
@@ -2172,7 +2172,7 @@ sub __set_data_pool_entry : PRIVATE {
             $value = $token->command(
                 {
                     COMMAND => 'pkcs7_encrypt',
-                    CERT    => $cert->{DATA},
+                    CERT    => $cert->{data},
                     CONTENT => $value,
                 }
             );

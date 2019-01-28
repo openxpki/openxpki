@@ -186,6 +186,28 @@ sub __load_config_realm_token {
         }
     }
 
+    my $certificate = $arg_ref->{CERTIFICATE};
+    $certificate = CTX('api2')->get_certificate_for_alias( 'alias' => $self->{CA} ) unless($certificate);
+
+    my $cert;
+    my $key_identifier;
+    if ($certificate->{data}) {
+        $cert = $certificate->{data};
+        $cert_identifier_of{$ident} = $certificate->{identifier};
+        $key_identifier = $certificate->{key_identifier};
+    # map legacy format
+    } elsif ($certificate->{DATA}) {
+        $cert = $certificate->{DATA};
+        $cert_identifier_of{$ident} = $certificate->{IDENTIFIER};
+        $key_identifier = $certificate->{KEY_IDENTIFIER};
+    }
+
+    if (!$cert) {
+        # Should never show up if the api is not broken
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_CRYPTO_TOOLKIT_CERTIFICATE_NOT_DEFINED',
+        );
+    }
 
     # Use Template Toolkit to assemble the key name,
     # we offer the full alias, group and generation as vars (similar to cdp)
@@ -199,6 +221,8 @@ sub __load_config_realm_token {
         'GROUP' => $group,
         'GENERATION' => $generation,
         'PKI_REALM' => CTX('api')->get_pki_realm(),
+        'IDENTIFIER' => $cert_identifier_of{$ident},
+        'KEY_IDENTIFIER' => $key_identifier
     };
 
     ##! 16: 'Building key name from template ' . $params_of{$ident}->{KEY}
@@ -220,27 +244,13 @@ sub __load_config_realm_token {
 
     $params_of{$ident}->{KEY} = $output;
 
-    my $certificate = $arg_ref->{CERTIFICATE};
-    $certificate = CTX('api')->get_certificate_for_alias({ALIAS => $name}) unless($certificate);
-    if (!defined $certificate || !$certificate->{DATA}) {
-        # Should never show up if the api is not broken
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_CRYPTO_TOOLKIT_CERTIFICATE_NOT_DEFINED',
-        );
-    }
-
-    $cert_identifier_of{$ident} = $certificate->{IDENTIFIER};
-
-    ##! 16: 'certificate subject: ' . $certificate->{SUBJECT}
-    ##! 64: 'certificate pem: ' .$certificate->{DATA}
-
     my $fu = OpenXPKI::FileUtils->new();
     my $cert_filename = $fu->get_safe_tmpfile({
         TMP => $tmp_dir_of{$ident},
     });
     $fu->write_file({
         FILENAME => $cert_filename,
-        CONTENT  => $certificate->{DATA},
+        CONTENT  => $cert,
         FORCE    => 1,
     });
     chmod 0644, $cert_filename;

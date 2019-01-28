@@ -45,13 +45,13 @@ sub execute {
         );
     }
 
-    my $certificate = CTX('api')->get_certificate_for_alias( { 'ALIAS' => $ca_alias });
+    my $certificate = CTX('api2')->get_certificate_for_alias( 'alias' => $ca_alias );
     my $x509_issuer = OpenXPKI::Crypto::X509->new(
-        DATA  => $certificate->{DATA},
+        DATA  => $certificate->{data},
         TOKEN => $default_token,
     );
 
-    my $ca_identifier = $certificate->{IDENTIFIER};
+    my $ca_identifier = $certificate->{identifier};
 
     if (!$crl_serial) {
         OpenXPKI::Exception->throw(

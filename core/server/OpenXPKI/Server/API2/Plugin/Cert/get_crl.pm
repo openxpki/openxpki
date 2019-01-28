@@ -101,13 +101,13 @@ command "get_crl" => {
 
         my $ca_alias = CTX('api')->get_token_alias_by_type({ TYPE => 'certsign' });
         ##! 16: 'Load crl by date, ca alias ' . $ca_alias
-        my $ca_hash = CTX('api')->get_certificate_for_alias({ ALIAS => $ca_alias });
+        my $ca_hash = CTX('api2')->get_certificate_for_alias( alias => $ca_alias );
 
         $db_results = CTX('dbi')->select_one(
             from => 'crl',
             columns => $columns,
             where => {
-                issuer_identifier => $ca_hash->{IDENTIFIER}
+                issuer_identifier => $ca_hash->{identifier}
             },
             order_by => '-last_update'
         );
