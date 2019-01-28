@@ -116,6 +116,7 @@ lives_and {
         subject     => $as1->db->{subject},
         notafter    => $as1->db->{notafter},
         notbefore   => $as1->db->{notbefore},
+        key_identifier => $as1->db->{subject_key_identifier},
     };
 } "get_certificate_for_alias - correct cert data";
 

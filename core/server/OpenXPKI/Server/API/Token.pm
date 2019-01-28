@@ -150,8 +150,9 @@ sub get_token_alias_by_group {
 =head2 get_certificate_for_alias( { ALIAS } )
 
 Find the certificate for the given alias. Returns a hashref with the
-PEM encoded certificate (DATA), Subject (SUBJECT), Identifier (IDENTIFIER)
-and NOTBEFORE/NOTAFTER as epoch. Dates are the real certificate dates!
+PEM encoded certificate (DATA), Subject (SUBJECT), Identifier (IDENTIFIER),
+Subject Key Idenitifer (KEY_IDENTIFIER) and NOTBEFORE/NOTAFTER as epoch.
+Dates are the real certificate dates!
 
 =cut
 
@@ -173,6 +174,7 @@ sub get_certificate_for_alias {
             'certificate.identifier',
             'certificate.notbefore',
             'certificate.notafter',
+            'certificate.subject_key_identifier',
         ],
         where => {
             'aliases.alias'     => $keys->{ALIAS},
@@ -191,6 +193,7 @@ sub get_certificate_for_alias {
         IDENTIFIER  => $certificate->{identifier},
         NOTBEFORE   => $certificate->{notbefore},
         NOTAFTER    => $certificate->{notafter},
+        KEY_IDENTIFIER => $certificate->{subject_key_identifier},
     };
 
 }

@@ -24,6 +24,7 @@ Returns a I<HashRef> the certificate:
         identifier => '...',
         notbefore => '...',  # certificate validity (UNIX epoch timestamp)
         notafter => '...',   # certificate validity (UNIX epoch timestamp)
+        key_identifier => '...', # Subject key identifier (hex uppercase)
     }
 
 Validity dates are the real certificate dates.
@@ -51,6 +52,7 @@ command "get_certificate_for_alias" => {
             'certificate.identifier',
             'certificate.notbefore',
             'certificate.notafter',
+            'certificate.subject_key_identifier',
         ],
         where => {
             'aliases.alias'     => $params->alias,
@@ -69,6 +71,7 @@ command "get_certificate_for_alias" => {
         identifier  => $cert->{identifier},
         notbefore   => $cert->{notbefore},
         notafter    => $cert->{notafter},
+        key_identifier => $cert->{subject_key_identifier},
     };
 };
 
