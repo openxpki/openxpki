@@ -51,7 +51,7 @@ around BUILDARGS => sub {
     # old call format using hash
     if ( @_ == 1 && ref $_[0] eq 'HASH' ) {
         my %params = %{$_[0]};
-        foreach my $key (qw(SERVER ENCRYPTION_ALGORITHM HASH_ALGORITHM SOCKETFILE TIMEOUT)) {
+        foreach my $key (qw(SERVICE SERVER ENCRYPTION_ALGORITHM HASH_ALGORITHM SOCKETFILE TIMEOUT)) {
             if ($params{$key}) {
                 $params{lc($key)} = $params{$key};
                 delete $params{$key};
