@@ -408,7 +408,7 @@ sub get_ui_info {
     my @activities = $args{activity} ? ($args{activity}) : $workflow->get_current_actions();
 
     # additional infos
-    my $add = $self->_get_config_details($workflow->factory, $result->{workflow}->{type}, $head->{prefix}, $state, \@activities, $context);
+    my $add = $self->_get_config_details($result->{workflow}->{type}, $head->{prefix}, $state, \@activities, $context);
     $result->{$_} = $add->{$_} for keys %{ $add };
 
     return $result;
