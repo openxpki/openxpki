@@ -62,10 +62,13 @@ __VERSION
 echo "Synchronizing source code from host to $OXI_CORE_DIR"
 rsync -a --delete --exclude=.git/ /code-repo/core/ $OXI_CORE_DIR
 
+# if --fast is NOT given
 pushd $OXI_CORE_DIR/server                                            >$LOG 2>&1
 perl Makefile.PL                                                      >$LOG 2>&1
-echo "Compiling OpenXPKI $OXI_VERSION"
-make                                                                  >$LOG 2>&1
+if [[ "${@#--fast}" = "$@" ]]; then
+    echo "Compiling OpenXPKI $OXI_VERSION"
+    make                                                                  >$LOG 2>&1
+fi
 echo "Installing OpenXPKI"
 make install                                                          >$LOG 2>&1
 popd                                                                  >$LOG 2>&1

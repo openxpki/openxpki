@@ -44,9 +44,140 @@ sub send_output {
     } else {
         # prepare response header
         print $cgi->header( -type => 'application/json', charset => 'utf8' );
+        $json->max_depth(20);
         print $json->encode( $result );
     }
 
+}
+
+sub _create_client {
+    my ($cgi, $conf) = @_;
+
+    my $client = OpenXPKI::Client::Simple->new({
+        logger => $log,
+        config => $conf->{global}, # realm and locale
+        auth => $conf->{auth}, # auth config
+    });
+
+    if ( !$client ) {
+        # TODO: Return as "500 Internal Server Error"?
+        $log->error("Could not instantiate client object");
+        send_output( $cgi,  { error => {
+            code => 42,
+            message=> "Could not instantiate client object",
+            data => { pid => $$ }
+        }});
+        return;
+    }
+
+    return $client;
+}
+
+sub _openapi_spec {
+    my ($cgi, $conf) = @_;
+
+    my $openapi_server_url = sprintf "%s://%s:%s%s", ($cgi->https ? 'https' : 'http'), $cgi->virtual_host, $cgi->virtual_port, $cgi->request_uri;
+
+    my $openapi_spec = {
+        openapi => "3.0.0",
+        info => { title => "OpenXPKI RPC API", version => "0.0.1", description => "Run a defined set of OpenXPKI workflows" },
+        servers => [ { url => $openapi_server_url, description => "OpenXPKI server" } ],
+        components => {
+            schemas => {
+                Error => {
+                    type => 'object',
+                    properties => {
+                        'error' => {
+                            type => 'object',
+                            description => 'Only set if an error occured while executing the command',
+                            required => [qw( code message data )],
+                            properties => {
+                                'code' => { type => 'integer', },
+                                'message' => { type => 'string', },
+                                'data' => {
+                                    type => 'object',
+                                    properties => {
+                                        'pid' => { type => 'integer', },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    };
+
+    my $paths;
+    eval {
+        my $client = _create_client($cgi, $conf) or die "Could not create OpenXPKI client";
+
+        for my $method (grep { $_ !~ /^ ( global | auth | input ) $/x } keys %$conf) {
+            my $method_spec = $client->run_command('get_rpc_openapi_spec', {
+                workflow => $conf->{$method}->{workflow},
+                input => [ split /\s*,\s*/, $conf->{$method}->{param} ],
+                output => [ split /\s*,\s*/, $conf->{$method}->{output} ]
+            });
+
+            $paths->{"/$method"} = {
+                post => {
+                    description => $method_spec->{description},
+                    requestBody => {
+                        required => JSON::true,
+                        content => {
+                            'application/json' => {
+                                schema => $method_spec->{input_schema},
+                            },
+                        },
+                    },
+                    responses => {
+                        '200' => {
+                            description => "JSON object with details either about the command result or the error",
+                            content => {
+                                'application/json' => {
+                                    schema => {
+                                        oneOf => [
+                                            {
+                                                type => 'object',
+                                                properties => {
+                                                    'result' => {
+                                                        type => 'object',
+                                                        description => 'Only set if command was successfully executed',
+                                                        required => [qw( data state pid id )],
+                                                        properties => {
+                                                            'data' => $method_spec->{output_schema},
+                                                            'state' => { type => 'string' },
+                                                            'pid' => { type => 'integer', },
+                                                            'id' => { type => 'integer', },
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                            {
+                                                '$ref' => '#/components/schemas/Error',
+                                            },
+                                        ],
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            };
+        }
+
+        $client->disconnect();
+    };
+    if (my $eval_err = $EVAL_ERROR) {
+        # TODO: Return as "500 Internal Server Error"?
+        $log->error("Unable to query OpenAPI specification from OpenXPKI server: $eval_err");
+        send_output($cgi, { error => { code => 42, message => $eval_err, data => { pid => $$ } } });
+        return;
+    }
+
+    $openapi_spec->{paths} = $paths;
+
+    return $openapi_spec;
 }
 
 while (my $cgi = CGI::Fast->new()) {
@@ -55,9 +186,9 @@ while (my $cgi = CGI::Fast->new()) {
 
     my $method = $cgi->param('method');
 
-    # if method is not set via param check for full body post
+    # check for request parameters in JSON data (HTTP body)
     my $postdata;
-    if ( !$method && $conf->{input}->{allow_raw_post} && $cgi->param('POSTDATA')) {
+    if ($conf->{input}->{allow_raw_post} && $cgi->param('POSTDATA')) {
         # TODO - evaluate security implications regarding blessed objects
         # and consider to filter out serialized objects for security reasons
         $json->max_depth(  $conf->{input}->{parse_depth} || 5 );
@@ -73,7 +204,8 @@ while (my $cgi = CGI::Fast->new()) {
             }});
             next;
         }
-        $method = $postdata->{method};
+        # read "method" from JSON data if not found in URL before
+        $method = $postdata->{method} unless $method;
     }
 
     $method = $config->route() unless($method);
@@ -87,6 +219,13 @@ while (my $cgi = CGI::Fast->new()) {
             message=> "RPC no method set in request",
             data => { pid => $$ }
         }});
+        next;
+    }
+
+    # special handling for requests for OpenAPI (Swagger) spec?
+    if ($method eq 'openapi-spec') {
+        my $spec = _openapi_spec($cgi, $conf) or next;
+        send_output($cgi, $spec);
         next;
     }
 
@@ -184,22 +323,7 @@ while (my $cgi = CGI::Fast->new()) {
     eval {
 
         # create the client object
-        $client = OpenXPKI::Client::Simple->new({
-            logger => $log,
-            config => $conf->{global}, # realm and locale
-            auth => $conf->{auth}, # auth config
-        });
-
-        if ( !$client ) {
-            # TODO: Return as "500 Internal Server Error"?
-            $log->error("Could not instantiate client object");
-            send_output( $cgi,  { error => {
-                code => 42,
-                message=> "Could not instantiate client object",
-                data => { pid => $$ }
-            }});
-            next;
-        }
+        $client = _create_client($cgi, $conf) or next;
 
         my $wf_id;
         # check for pickup parameter
