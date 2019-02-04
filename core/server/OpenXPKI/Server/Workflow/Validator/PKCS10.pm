@@ -21,7 +21,7 @@ sub _validate {
         return 1;
     }
 
-    my $verify_signature = (defined $self->param('verify_signature') && !$self->param('verify_signature'));
+    my $verify_signature = not (defined $self->param('verify_signature') && !$self->param('verify_signature'));
 
     Crypt::PKCS10->setAPIversion(1);
     my $decoded = Crypt::PKCS10->new($pkcs10,
