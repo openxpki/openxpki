@@ -2478,6 +2478,27 @@ sub __render_fields {
 
                 $self->logger()->trace( 'item ' . Dumper $item);
 
+            # open another workflow - performs ACL check
+            } elsif ($item->{format} eq "workflow_id") {
+
+                my $workflow_id = $item->{value};
+
+                my $can_access = $self->send_command_v2( 'check_workflow_acl',
+                        { id => $workflow_id  });
+
+                if ($can_access) {
+                    $item->{format} = 'link';
+                    $item->{value}  = {
+                        label => $workflow_id,
+                        page => 'workflow!load!wf_id!'.$workflow_id,
+                        target => 'tab'
+                    };
+                } else {
+                    $item->{format} = '';
+                }
+
+                $self->logger()->trace( 'item ' . Dumper $item);
+
             # add a redirect command to the page
             } elsif ($item->{format} eq "redirect") {
 
