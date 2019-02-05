@@ -313,7 +313,9 @@ OpenXPKI/Server/API2/Plugin/UI/send_notification.pm
 OpenXPKI/Server/API2/Plugin/Workflow/Util.pm
 OpenXPKI/Server/API2/Plugin/Workflow/create_workflow_instance.pm
 OpenXPKI/Server/API2/Plugin/Workflow/execute_workflow_activity.pm
+OpenXPKI/Server/API2/Plugin/Workflow/check_workflow_acl.pm
 OpenXPKI/Server/API2/Plugin/Workflow/fail_workflow.pm
+OpenXPKI/Server/API2/Plugin/Workflow/get_rpc_openapi_spec.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_activities.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_activities_params.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_base_info.pm
@@ -327,6 +329,7 @@ OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_type_for_id.pm
 OpenXPKI/Server/API2/Plugin/Workflow/list_workflow_titles.pm
 OpenXPKI/Server/API2/Plugin/Workflow/search_workflow_instances.pm
 OpenXPKI/Server/API2/Plugin/Workflow/wakeup_resume_workflow.pm
+
 OpenXPKI/Server/API2/PluginRole.pm
 OpenXPKI/Server/API2/Types.pm
 OpenXPKI/Server/Context.pm
@@ -413,6 +416,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/AppendCertificateMetadata.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CalculateApprovalPoints.pm
+OpenXPKI/Server/Workflow/Activity/Tools/CopyContextFromWorkflow.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Disconnect.pm
 OpenXPKI/Server/Workflow/Activity/Tools/EvaluateEligibility.pm
 OpenXPKI/Server/Workflow/Activity/Tools/LoadPolicy.pm
@@ -676,7 +680,6 @@ t/25_crypto/24_xs_ecdh.t
 t/25_crypto/30_object_header.t
 t/25_crypto/31_object_x509.t
 t/25_crypto/32_object_csr.t
-t/25_crypto/33_object_crr.t
 t/25_crypto/34_object_crl.t
 t/25_crypto/35_object_pkcs7.t
 t/25_crypto/51_volatile_vault.t
@@ -784,8 +787,6 @@ t/99_cleanup/60_workflow.t
 t/99_cleanup/65_ui.t
 t/99_cleanup/80_client.t
 
-t/cfg.binary.openssl
-
 t/config.d/realm/I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA/auth/handler.yaml
 t/config.d/realm/I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA/auth/roles.yaml
 t/config.d/realm/I18N_OPENXPKI_DEPLOYMENT_TEST_DUMMY_CA/auth/stack.yaml
@@ -851,7 +852,6 @@ bin/openxpkicli
 bin/openxpkicmd
 
 # cgi stuff
-cgi-bin/scep
 cgi-bin/scep.fcgi
 cgi-bin/webui.fcgi
 cgi-bin/sc.fcgi
