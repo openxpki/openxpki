@@ -123,23 +123,15 @@ sub get_workflow {
     return $factory->fetch_workflow( $wf->{'workflow_type'}, $wf_id );
 }
 
-=head2 get_factory( VERSION, FALLBACK )
+=head2 get_factory
 
 Return a workflow factory using the versioned config.
 
-=over
-
-=item VERSION The config version hash to use
-
-=item FALLBACK 0|1 weather to fallback to current if version is not found
-
-=back
-
 =cut
 sub get_factory {
-    my ($self, $args) = @_;
+    my ($self) = @_;
     ##! 1: 'start'
-    ##! 16: Dumper $args
+
 
     my $pki_realm = CTX('session')->data->pki_realm;
 
