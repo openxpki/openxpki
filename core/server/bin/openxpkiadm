@@ -33,7 +33,7 @@ use OpenXPKI::VERSION;
 
 use Data::Dumper;
 
-my %params;
+my %params = ( module => [] );
 my @options_spec = ('config=s','instance|i=s');
 my $cmd = shift || 'help';
 my $ret = 255;
@@ -1488,6 +1488,9 @@ if ($cmd eq 'initdb') {
 
 } elsif ($cmd eq 'lintconfig') {
 
+    push @options_spec, qw(
+      module|m=s
+    );
     __init();
 
     my $conf;
@@ -1514,6 +1517,23 @@ if ($cmd eq 'initdb') {
         $ret = 2;
     }
 
+    foreach my $module (@{$params{module}}) {
+        my $class = "OpenXPKI::Config::Lint::". ucfirst($module);
+        eval "use $class;1";
+        if ($EVAL_ERROR) {
+            print "Unable to load lint module $module\n";
+            print STDERR $EVAL_ERROR;
+        } else {
+            print "Lint $module: ";
+            my $err = $class->lint($c);
+            if ($err) {
+                print "\n$err\n";
+                $ret = 3
+            } else {
+                print "ok\n";
+            }
+        }
+    }
 
 } elsif ($cmd eq 'version') {
     print "Version (core): " . $OpenXPKI::VERSION::VERSION . "\n";
@@ -1914,6 +1934,11 @@ Config::Merge such as YAML ident or quoting errors.
 Path to the config is read from environment I<OPENXPKI_CONF_PATH> or
 I<--config> switch on commandline. If both are not set, the default
 location I</etc/openxpki/config.d> is used.
+
+Command options:
+
+  -- module  Specify extra modules to apply on the config object for
+             additional checks.
 
 =head2 buildconfig
 
