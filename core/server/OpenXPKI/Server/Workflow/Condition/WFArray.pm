@@ -28,23 +28,22 @@ sub _evaluate {
 
         CTX('log')->application()->debug("Testing if WFArray ".$array_name." is empty");
 
-        if ( $array->count() == 0 ) {
-            return 1;
+        if ( $array->count() != 0 ) {
+            condition_error ($self->param('error') || 'I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_NOT_EMPTY');
         }
-        condition_error ($self->param('error') || 'I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_NOT_EMPTY');
 
     }
     elsif ( $condition eq 'is_not_empty' ) {
 
         CTX('log')->application()->debug("Testing if WFArray ".$array_name." is not empty");
 
-        if ( $array->count() > 0 ) {
-            return 1;
+        if ( $array->count() < 1 ) {
+            condition_error ($self->param('error') || 'I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_IS_EMPTY');
         }
-        condition_error ($self->param('error') || 'I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_IS_EMPTY');
 
     }
     elsif ( $condition =~ /count_(is|isnot|lt|lte|gt|gte)\s*$/ ) {
+
         my $op = $1;
         my $cnt = $array->count();
         my $val = $self->param('value') || 0;
@@ -70,6 +69,36 @@ sub _evaluate {
         condition_error ($self->param('error') || 'I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_INVALID_ITEM_COUNT');
 
     }
+    elsif ( $condition eq 'match' || $condition eq 'nomatch' ) {
+
+        my $regex = $self->param('regex');
+        my $modifier = $self->param('modifier') // 'xi';
+        $modifier =~ s/\s//g;
+        if ($modifier =~ /[^alupimsx]/ ) {
+            configuration_error( "Invalid modifier  $modifier" );
+        }
+        $modifier = "(?$modifier)" if ($modifier);
+        $regex = qr/$modifier$regex/;
+
+        ##! 16: 'Regex ' . $regex
+        CTX('log')->application()->debug("Testing if WFArray matches regex $regex ");
+
+        my @errors;
+        foreach my $val (@{$array->values()}) {
+            ##! 16: 'Test ' . $val
+            ##! 8: 'Failed on ' . $val
+            if ($condition eq 'match') {
+                push @errors, $val if ($val !~ $regex);
+            } else {
+                push @errors, $val if ($val =~ $regex);
+            }
+        }
+
+        if (scalar @errors) {
+            condition_error ($self->param('error') || 'I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_DOES_NOT_MATCH_REGEX');
+        }
+
+    }
     else {
 
         CTX('log')->application()->error('Invalid configuration for Condition::WFArray: ' . $condition . ' on ' . $array_name);
@@ -79,6 +108,8 @@ sub _evaluate {
             . "declaration of condition "
             . $array_name;
     }
+
+    return 1;
 }
 
 1;
