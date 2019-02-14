@@ -721,6 +721,11 @@ sub create_workflow_instance {
     $context->param( 'creator'  => $creator );
     $context->param( 'creator_role'  => CTX('session')->data->role );
 
+    # workflow_id is a virtual key that is added by the Context on init so
+    # it does not exist in the fresh context after creation, fixes #442
+    # we set it directly to prevent triggering any "on update" methods
+    $context->{PARAMS}{'workflow_id'} = $wf_id;
+
     # This is crucial and must be done before the first execute as otherwise
     # workflow acl fails when the first non-initial action is autorun
     $workflow->attrib({ creator => $creator });

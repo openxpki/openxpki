@@ -129,6 +129,9 @@ sub __update_workflow_context {
     for my $key (@updated) {
         my $value = $params->{$key};
 
+        # do not persit the virtual workflow_id field
+        next if ( $key eq 'workflow_id' );
+
         # ignore "volatile" context parameters starting with an underscore
         next if ( $key =~ m{ \A _ }xms );
 
