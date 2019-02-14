@@ -172,6 +172,7 @@ sub execute {
     foreach my $target (@target) {
         eval{ $config->set( [ @path, $target, $publish_key ], $data, $param ); };
         if (my $eval_err = $EVAL_ERROR) {
+            CTX('log')->application()->debug("Publishing failed with $eval_err");
             if ($on_error eq 'queue') {
                 push @failed, $target;
                 CTX('log')->application()->info("Entity publication failed for target $target, requeuing");

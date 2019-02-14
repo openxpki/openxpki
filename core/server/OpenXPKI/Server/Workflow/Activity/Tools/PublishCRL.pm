@@ -161,6 +161,7 @@ sub execute {
     foreach my $target (@target) {
         eval{ $config->set( [ @prefix, $target, $data->{issuer}{CN}[0] ], $data ); };
         if (my $eval_err = $EVAL_ERROR) {
+            CTX('log')->application()->debug("Publishing failed with $eval_err");
             if ($on_error eq 'queue') {
                 push @failed, $target;
                 CTX('log')->application()->info("CRL pubication failed for target $target, requeuing");
