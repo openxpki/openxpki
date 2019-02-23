@@ -7,6 +7,6 @@ template: >
     CN / Identifier |
     [% FOREACH identifier = value %]
       <a target="modal" href="#certificate!detail!identifier![% identifier %]">
-        [% Certificate.dn(identifier,'CN') %] / [% identifier %]</a>|
+        [% Certificate.dn(identifier,'CN') %] / [% identifier %] / [% Certificate.status(identifier,'CN') %] </a>|
     [% END %]
   [% END %]

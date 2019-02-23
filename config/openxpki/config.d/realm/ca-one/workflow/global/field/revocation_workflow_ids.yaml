@@ -1,0 +1,10 @@
+name: revocation_workflow_ids
+label: I18N_OPENXPKI_UI_REVOCATION_WORKFLOW_ID
+format: rawlist
+template: >
+  [% IF value %]
+  [% USE Workflow; %]
+  [% FOREACH identifier = value %]
+     [% wfid %] ([% USE Workflow; Workflow.state(wfid) %]) |
+  [% END %]
+  [% END %]
