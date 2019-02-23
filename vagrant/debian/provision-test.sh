@@ -26,13 +26,8 @@ else
 
 fi
 
-if [ "$DIST" == "ubuntu" ]; then
-    wget http://$PKGHOST/ubuntu/Release.key -O - | apt-key add -
-    echo "deb http://$PKGHOST/v2/ubuntu/ dists/trusty/release/binary-amd64/" > /etc/apt/sources.list.d/openxpki.list
-else
-   wget http://$PKGHOST/debian/Release.key -O - | apt-key add -
-   echo "deb http://$PKGHOST/v2/debian/ jessie release" > /etc/apt/sources.list.d/openxpki.list
-fi;
+wget http://$PKGHOST/debian/Release.key -O - | apt-key add -
+echo "deb http://$PKGHOST/v2/debian/ jessie release" > /etc/apt/sources.list.d/openxpki.list
 
 apt-get update
 
@@ -41,15 +36,11 @@ rm -rf /etc/openxpki/
 # Install mysql without password (no prompt)
 DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes mysql-server
 
-if [ "$DIST" == "ubuntu" ]; then
-    apt-get --assume-yes --force-yes install libcgi-perl libmodule-load-perl
-fi;
-
 apt-get install --assume-yes --force-yes libdbd-mysql-perl libapache2-mod-fcgid \
     libopenxpki-perl openxpki-i18n openxpki-cgi-session-driver
 
 # packages required for testing only
-apt-get install --assume-yes libtest-deep-perl
+apt-get install --assume-yes libtest-deep-perl libtest-exception-perl
 
 a2enmod cgid
 a2enmod fcgid
@@ -61,8 +52,8 @@ service apache2 restart
 # Need to wait until server and watchdog are up
 sleep 30;
 
-cd /qatest/backend/nice
-prove .
+#cd /qatest/backend/nice
+#prove .
 
 cd /qatest/backend/webui
 prove .
