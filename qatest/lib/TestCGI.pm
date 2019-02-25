@@ -1,10 +1,36 @@
 package TestCGI;
 use Moose;
 use JSON;
+use YAML;
 use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use URI::Escape;
 use LWP::UserAgent;
+use IO::Socket::SSL qw( SSL_VERIFY_NONE );
+
+has config => (
+    is => 'ro',
+    isa => 'Str',
+    default =>  sub {
+        if ($ENV{OPENXPKI_TEST_CONFIG}) {
+            return $ENV{OPENXPKI_TEST_CONFIG};
+        }
+        if (-e 'test.yaml') {
+            return 'test.yaml';
+        }
+        if (-e '../test.yaml') {
+            return '../test.yaml';
+        }
+        die "Unable to find test configuration file";
+    },
+);
+
+has param => (
+    is => 'ro',
+    isa => 'HashRef',
+    lazy => 1,
+    builder => '__load_config',
+);
 
 has json => (
     is => 'rw',
@@ -26,16 +52,12 @@ has session_id => (
     default => ''
 );
 
-
-sub update_rtoken {
-
-    my $self = shift;
-    my $result = $self->mock_request({'page' => 'bootstrap!structure'});
-    my $rtoken = $result->{rtoken};
-    $self->rtoken( $rtoken );
-    return $rtoken;
-
-}
+has realm => (
+    is => 'rw',
+    isa => 'Str',
+    lazy => 1,
+    default => ''
+);
 
 has rtoken => (
     is => 'rw',
@@ -61,6 +83,33 @@ has ssl_opts => (
     isa => 'HashRef|Undef',
 );
 
+sub __load_config {
+
+    my $self = shift;
+    my $config = YAML::LoadFile( $self->config() );
+
+    if ($config->{ssl_opts} && ref $config->{ssl_opts} eq 'HASH') {
+        $self->ssl_opts( $config->{ssl_opts} );
+    }
+
+    if ($config->{realm}) {
+        $self->realm($config->{realm}),
+    }
+
+    return $config;
+
+}
+
+sub update_rtoken {
+
+    my $self = shift;
+    my $result = $self->mock_request({'page' => 'bootstrap!structure'});
+    my $rtoken = $result->{rtoken};
+    $self->rtoken( $rtoken );
+    return $rtoken;
+
+}
+
 sub mock_request {
 
     my $self = shift;
@@ -72,11 +121,14 @@ sub mock_request {
 
     my $ua = LWP::UserAgent->new;
 
-    my $server_endpoint = 'http://localhost/cgi-bin/webui.fcgi';
+    my $p = $self->param();
+
+    $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "IO::Socket::SSL";
+
+    my $server_endpoint = sprintf $p->{uri}->{webui}, $self->realm();
 
     my $ssl_opts = $self->ssl_opts;
     if ($ssl_opts) {
-        $server_endpoint = 'https://localhost/cgi-bin/webui.fcgi';
         $ua->ssl_opts( %{$self->ssl_opts} );
     }
 
