@@ -14,6 +14,11 @@ not behave correctly or even wont start.
 For a quick overview of config changes, you should always check the
 config repository at https://github.com/openxpki/openxpki-config.
 
+Release v2.3
+-------------
+
+The config parameters for the ClientX509 authentication handler has changed. In case you left the file "handler.yaml" and "stack.yaml" in realm/ca-one/auth/ unchanged you *MUST* remove or change the block for the "ClientX509" handler as the new/fixed handler will not work with the old config and OpenXPKI will not start at all!
+
 Release v2.x
 -------------
 
