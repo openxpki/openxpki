@@ -23,35 +23,44 @@ Supports the following parameters:
 
 =over
 
-=item * IDENTIFIER - the identifier of the certificate
+=item * identifier - the identifier of the certificate
 
-=item * FORMAT - the output format
+=item * format - the output format
 
 One of PKCS8_PEM (PKCS#8 in PEM format), PKCS8_DER
 (PKCS#8 in DER format), PKCS12 (PKCS#12 in DER format), OPENSSL_PRIVKEY
 (OpenSSL native key format in PEM), OPENSSL_RSA (OpenSSL RSA with
 DEK-Info Header), JAVA_KEYSTORE (JKS including chain).
 
-=item * PASSWORD - the private key password
+=item * password - the private key password
 
 Password that was used when the key was generated.
 
-=item * PASSOUT - the password for the exported key, default is PASSWORD
+=item * passout - the password for the exported key, default is PASSWORD
 
 The password to encrypt the exported key with, if empty the input password
 is used.
 
 This option is only supported with format OPENSSL_PRIVKEY, PKCS12 and JKS!
 
-=item * NOPASSWD
+=item * nopasswd
 
 If set to a true value, the B<key is exported without a password!>.
 You must also set PASSOUT to the empty string.
 
-=item * KEEPROOT
+=item * keeproot
 
 Boolean, when set the root certifcate is included in the keystore.
 Obviously only useful with PKCS12 or Java Keystore.
+
+=item * alias
+
+String to set as alias for the key/certificate for JKS or PKCS12.
+
+=item csp
+
+String, write name as a Microsoft CSP name (PKCS12 only)
+
 
 =back
 
@@ -256,12 +265,34 @@ no key is available.
 =cut
 
 sub get_private_key_from_db {
+
     my ($self, $cert_identifier) = @_;
 
     my $datapool = $self->api->get_data_pool_entry(
         namespace =>  'certificate.privatekey',
         key       =>  $cert_identifier
     );
+
+    # we also use the option to store the private key using the key identifier
+    # instead of the certificate identifier. We leave it to the workflows to
+    # take care that the mapping is unique, as the datapool has a unique index
+    # on the relevant colums there is no risk that it breaks at this stage
+
+    if (!$datapool) {
+
+        ##! 2: "Fetching certificate from database"
+        my $cert = CTX('dbi')->select_one(
+            columns => [ 'subject_key_identifier' ],
+            from => 'certificate',
+            where => { 'identifier' => $cert_identifier },
+        );
+
+        $datapool = $self->api->get_data_pool_entry(
+            namespace =>  'certificate.privatekey',
+            key       =>  $cert->{subject_key_identifier}
+        );
+
+    }
 
     if ($datapool) {
         return $datapool->{value};

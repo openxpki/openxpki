@@ -41,27 +41,27 @@ sub execute {
             my $alias = $self->param('alias') || '';
 
             my $p = {
-                IDENTIFIER =>  $cert_identifier,
-                FORMAT => $key_format,
-                PASSWORD => $key_password,
-                ALIAS => $alias,
+                identifier =>  $cert_identifier,
+                format => $key_format,
+                password => $key_password,
+                alias => $alias,
             };
 
             my $export_password = $self->param('export_password');
             if (defined $export_password) {
                 if ($export_password ne '') {
-                    $p->{PASSOUT} = $export_password;
+                    $p->{passout} = $export_password;
                 } elsif ($self->param('unencrypted')) {
-                    $p->{PASSOUT} = '';
-                    $p->{NOPASSWD} = 1;
+                    $p->{passout} = '';
+                    $p->{nopassword} = 1;
                 }
             }
 
             if ( $self->param('include_root_cert') ) {
-                $p->{KEEPROOT} = 1;
+                $p->{keeproot} = 1;
             }
 
-            $privkey = CTX('api')->get_private_key_for_cert($p);
+            $privkey = CTX('api2')->get_private_key_for_cert(%$p);
         };
         if (!$privkey) {
             CTX('log')->application()->error("Export of private key failed for $cert_identifier");
@@ -82,9 +82,9 @@ sub execute {
 
             # If no template is given, we export only the private key
             if (!$template) {
-                $context->param( $target_key  => $privkey->{PRIVATE_KEY} );
+                $context->param( $target_key  => $privkey );
             } else {
-                $key = $privkey->{PRIVATE_KEY};
+                $key = $privkey
             }
         }
     }
@@ -181,7 +181,7 @@ the exported key if export_password is not set.
 
 =item key_format, optional
 
- @see OpenXPKI::Server::API::Object::get_private_key_for_cert
+@see OpenXPKI::Server::API2::Plugin::Cert::private_key
 
 =item export_password, optional
 

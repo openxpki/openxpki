@@ -524,7 +524,7 @@ sub get_cert_actions {
             foreach my $rule (@cond) {
 
                 if ($rule eq 'keyexport') {
-                    next OPTION unless CTX('api')->private_key_exists_for_cert({ IDENTIFIER => $cert_id });
+                    next OPTION unless CTX('api2')->private_key_exists_for_cert( identifier => $cert_id );
 
                 } elsif ($rule eq 'issued') {
                     next OPTION  unless ($cert->{STATUS} eq 'ISSUED' or $cert->{STATUS} eq 'EXPIRED');
@@ -953,39 +953,8 @@ Returns true if there is a private key, false otherwise.
 
 sub private_key_exists_for_cert {
     my ($self, $args) = @_;
-    my $identifier = $args->{IDENTIFIER};
 
-    my $privkey =
-      $self->__get_private_key_from_db( { IDENTIFIER => $identifier, } );
-    return ( defined $privkey );
-}
-
-=head2 __get_private_key_from_db
-
-Gets a private key from the database for a given certificate
-identifier by looking up the CSR serial of the certificate and
-extracting the private_key from the datapool. Returns undef if
-no key is available.
-
-=cut
-
-sub __get_private_key_from_db {
-    my ($self, $args) = @_;
-    my $cert_identifier = $args->{IDENTIFIER};
-
-    ##! 16: 'identifier: $identifier'
-
-    # new workflows
-    my $datapool = CTX('api')->get_data_pool_entry({
-        NAMESPACE   =>  'certificate.privatekey',
-        KEY         =>  $cert_identifier
-    });
-
-    if ($datapool) {
-        return $datapool->{VALUE};
-    }
-
-    return;
+    return CTX('api2')->private_key_exists_for_cert( identifier => $args->{IDENTIFIER} );
 }
 
 =head2 get_private_key_for_cert
@@ -1028,160 +997,27 @@ Obviously only useful with PKCS12 or Java Keystore.
 
 =back
 
-The format can be either
-The password has to match the one used during the generation or nothing
-is returned at all.
-
 =cut
 
 sub get_private_key_for_cert {
     my ($self, $args) = @_;
     ##! 1: 'start'
 
-    my $identifier = $args->{IDENTIFIER};
-    my $format     = $args->{FORMAT};
-    my $password   = $args->{PASSWORD};
-    my $pass_out   = $args->{PASSOUT};
-    my $nopassword = $args->{NOPASSWD};
-
-
-    if ($nopassword and (!defined $pass_out or $pass_out ne '')) {
-        OpenXPKI::Exception->throw(
-            message =>
-              'I18N_OPENXPKI_SERVER_API_OBJECT_PRIVATE_KEY_NOPASSWD_REQUIRES_EMPTY_PASSOUT'
-        );
+    my $p;
+    # different spelling, so add manually and remove from args
+    if ( defined $args->{NOPASSWD} ) {
+        $p->{nopassword} = $args->{NOPASSWD};
+        delete $args->{NOPASSWD};
     }
 
-    if ($nopassword) {
-        CTX('log')->audit('key')->warn("private key export without password", {
-            certid => $identifier,
-        });
-    }
+    map {
+        $p->{lc($_)} = $args->{$_} if defined($args->{$_});
+    } keys %$args;
 
-    my $default_token = CTX('api')->get_default_token();
-    ##! 4: 'identifier: ' . $identifier
-    ##! 4: 'format: ' . $format
+    my $result = CTX('api2')->get_private_key_for_cert( %$p );
 
-    my $private_key = $self->__get_private_key_from_db({ IDENTIFIER => $identifier })
-        or OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_PRIVATE_KEY_NOT_FOUND_IN_DB',
-            params => { 'IDENTIFIER' => $identifier, },
-        );
-    my $result;
+    return { PRIVATE_KEY => $result };
 
-    ##! 16: 'pkey ' . $private_key
-
-    # NB: The key in the database is in native openssl format
-    my $command_hashref;
-
-    if ( $format =~ /PKCS8_(PEM|DER)/ ) {
-        $format = $1;
-        $command_hashref = {
-            PASSWD  => $password,
-            DATA    => $private_key,
-            COMMAND => 'convert_pkcs8',
-            OUT     => $format,
-            REVERSE => 1
-        };
-
-        if ($nopassword) {
-            $command_hashref->{NOPASSWD} = 1;
-        } elsif ($pass_out) {
-            $command_hashref->{OUT_PASSWD} = $pass_out;
-        }
-    }
-    elsif ( $format =~ /OPENSSL_(PRIVKEY|RSA)/ ) {
-
-        # we just need to spit out the blob from the database but we need to check
-        # if the password matches, so we do a 1:1 conversion
-        $command_hashref = {
-            PASSWD  => $password,
-            DATA    => $private_key,
-            COMMAND => 'convert_pkey',
-        };
-
-        if ($format eq 'OPENSSL_RSA') {
-            $command_hashref->{KEYTYPE} = 'rsa';
-        }
-
-        if ($nopassword) {
-            $command_hashref->{NOPASSWD} = 1;
-        } elsif ($pass_out) {
-            $command_hashref->{OUT_PASSWD} = $pass_out;
-        }
-
-    }
-    elsif ( $format eq 'PKCS12' or $format eq 'JAVA_KEYSTORE' ) {
-        ##! 16: 'identifier: ' . $identifier
-
-        my @chain = $self->__get_chain_certificates({
-            'KEEPROOT'   =>  $args->{KEEPROOT},
-            'IDENTIFIER' => $identifier,
-            'FORMAT'     => 'PEM',
-        });
-        ##! 16: 'chain: ' . Dumper \@chain
-
-        # the first one is the entity certificate
-        my $certificate = shift @chain;
-
-        $command_hashref = {
-            COMMAND => 'create_pkcs12',
-            PASSWD  => $password,
-            KEY     => $private_key,
-            CERT    => $certificate,
-            CHAIN   => \@chain,
-        };
-
-        if ($nopassword) {
-            $command_hashref->{NOPASSWD} = 1;
-        } elsif ($pass_out) {
-            $command_hashref->{PKCS12_PASSWD} = $pass_out;
-            # set password for JKS export
-            $password = $pass_out;
-        }
-
-        if ( exists $args->{CSP} ) {
-            $command_hashref->{CSP} = $args->{CSP};
-        }
-
-        if ( $args->{ALIAS} ) {
-            $command_hashref->{ALIAS} = $args->{ALIAS};
-        } elsif ( $format eq 'JAVA_KEYSTORE' ) {
-            # Java Keystore only: if no alias is specified, set to 'key'
-            $command_hashref->{ALIAS} = 'key';
-        }
-
-    }
-
-    eval {
-        $result = $default_token->command($command_hashref);
-    };
-    if (!$result) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_UNABLE_EXPORT_KEY',
-            params => { 'IDENTIFIER' => $identifier, ERROR => $EVAL_ERROR },
-        );
-    }
-
-    if ( $format eq 'JAVA_KEYSTORE' ) {
-        my $token = CTX('crypto_layer')->get_system_token({ TYPE => 'javaks' });
-
-        my $pkcs12 = $result;
-        $result = $token->command(
-            {
-                COMMAND      => 'create_keystore',
-                PKCS12       => $pkcs12,
-                PASSWD       => $password,
-                OUT_PASSWD   => $password,
-            }
-        );
-    }
-
-    CTX('log')->audit('key')->info("private key export", {
-        certid => $identifier,
-    });
-
-    return { PRIVATE_KEY => $result, };
 }
 
 
@@ -2383,30 +2219,6 @@ sub __assert_current_pki_realm_within_workflow : PRIVATE {
             CURRENT_REALM   => $current_pki_realm,
         },
     );
-}
-
-sub __get_chain_certificates {
-    ##! 1: 'start'
-    my ($self, $args) = @_;
-    my $identifier = $args->{IDENTIFIER};
-    my $format     = $args->{FORMAT};
-
-    ##! 4: Dumper $args
-
-    my $chain_ref = CTX('api')->get_chain({
-        'START_IDENTIFIER' => $identifier,
-        'OUTFORMAT'        => $format,
-    });
-
-    my @chain = @{ $chain_ref->{CERTIFICATES} };
-    ##! 16: 'Chain ' . Dumper $chain_ref
-
-    # pop off root certificates
-    if ( $chain_ref->{COMPLETE} and scalar @chain > 1 and !$args->{KEEPROOT} ) {
-        pop @chain;    # we don't need the first element
-    }
-    ##! 1: 'end'
-    return @chain;
 }
 
 1;

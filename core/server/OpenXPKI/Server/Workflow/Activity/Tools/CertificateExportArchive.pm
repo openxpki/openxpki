@@ -38,21 +38,21 @@ sub execute {
     eval {
 
         my $p = {
-            IDENTIFIER =>  $cert_identifier,
-            FORMAT => 'OPENSSL_PRIVKEY',
-            PASSWORD => $key_password,
+            identifier =>  $cert_identifier,
+            format => 'OPENSSL_PRIVKEY',
+            password => $key_password,
         };
 
         my $export_password = $self->param('export_password');
         if (defined $export_password) {
             if ($export_password ne '') {
-                $p->{PASSOUT} = $export_password;
+                $p->{passout} = $export_password;
             } elsif ($self->param('unencrypted')) {
-                $p->{PASSOUT} = '';
-                $p->{NOPASSWD} = 1;
+                $p->{passout} = '';
+                $p->{nopassword} = 1;
             }
         }
-        $privkey = CTX('api')->get_private_key_for_cert($p);
+        $privkey = CTX('api2')->get_private_key_for_cert(%$p);
     };
     if (!$privkey) {
 
@@ -76,7 +76,7 @@ sub execute {
         certid => $cert_identifier
     });
 
-    $zip->addString( $privkey->{PRIVATE_KEY}, $key_file )
+    $zip->addString( $privkey, $key_file )
         ->desiredCompressionMethod( COMPRESSION_DEFLATED );
 
     my $chain = CTX('api')->get_chain({ START_IDENTIFIER => $cert_identifier, OUTFORMAT => 'PEM'});

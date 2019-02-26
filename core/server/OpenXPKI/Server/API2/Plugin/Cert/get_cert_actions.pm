@@ -133,7 +133,7 @@ command "get_cert_actions" => {
             ##! 32: 'Conditions ' . join " + ", @cond
             for my $rule (@cond) {
                 if ($rule eq 'keyexport') {
-                    next OPTION unless CTX('api')->private_key_exists_for_cert({ IDENTIFIER => $cert_id });
+                    next OPTION unless CTX('api2')->private_key_exists_for_cert( identifier => $cert_id );
                 }
                 elsif ($rule eq 'issued') {
                     next OPTION  unless ($cert->{STATUS} eq 'ISSUED' or $cert->{STATUS} eq 'EXPIRED');
