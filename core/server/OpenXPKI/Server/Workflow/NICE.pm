@@ -295,7 +295,23 @@ sub fetchCRL {
     );
 }
 
+sub generateKey {
 
+    OpenXPKI::Exception->throw(
+          message => "I18N_OPENXPKI_SERVER_NICE_NOT_IMPLEMENTED_ERROR",
+          params => { sub => (caller(0))[3] }
+    );
+
+}
+
+sub fetchKey {
+
+    OpenXPKI::Exception->throw(
+          message => "I18N_OPENXPKI_SERVER_NICE_NOT_IMPLEMENTED_ERROR",
+          params => { sub => (caller(0))[3] }
+    );
+
+}
 
 # Speeds up Moose
 __PACKAGE__->meta->make_immutable;
@@ -475,6 +491,48 @@ crl or I<pending>
 Only valid after calling issueCRL, tries to fetch the new CRL.
 See issue/fetchCertificate how to use the pending marker.
 
+=head2 generateKey
+
+Generate and return a private key accoring to the parameters passed. Supported
+modes and parameter sets depend on the backend, some backends might even not
+implement this method.
+
+=head3 Input
+
+=over
+
+=item mode - can be used to switch between different modes, see backend
+
+=item key_alg - name of the algorithm, as used in the profile definitions
+
+=item key_params - key generation parameters, hash with pkey options
+
+=item key_transport - hash with key I<password> and I<algorithm>, determines settings for the used transport encryption
+
+=back
+
+=head3 Output
+
+Return value is a hash, the encrypted key must be returned in the key I<pkey>.
+
+Additional arguments might be returned by the backend.
+
+=head2 fetchKey
+
+Fetch a key created by with generateKey from the backend. Usage of the
+password and key_transport settings might differ between implementations.
+
+=head3 Input
+
+=over
+
+=item key_identifier - the identifier of the key
+
+=item password - password / secret to fetch the key
+
+=item key_transport - hash with key I<password> and I<algorithm>, determines settings for the used transport encryption
+
+=back
 
 =head1 internal helper functions
 

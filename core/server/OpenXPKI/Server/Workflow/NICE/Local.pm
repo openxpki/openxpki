@@ -513,6 +513,36 @@ sub __prepare_crl_data {
     return @cert_timestamps;
 }
 
+sub generateKey {
+
+    my $self = shift;
+
+    my $mode = shift;
+    my $key_alg = shift;
+    my $key_params = shift;
+    my $key_transport = shift;
+
+    my $enc_alg = $key_transport->{algorithm} || 'aes256';
+
+    my $password = $key_transport->{password};
+
+    OpenXPKI::Exception->throw(
+       message => 'Password is required for NICE::generateKey',
+    ) unless $password;
+
+    my $pkcs8 = CTX('api')->generate_key({
+         KEY_ALG    => $key_alg,
+         ENC_ALG    => $enc_alg,
+         PASSWD     => $password,
+         PARAMS     => $key_params,
+    });
+
+    CTX('log')->application()->info("Key ($key_alg) generated via NICE backend");
+
+    return { pkey => $pkcs8 };
+
+}
+
 1;
 __END__
 
@@ -557,3 +587,10 @@ Queries the certifictes status from the local certificate datasbase.
 
 Creates a crl for the given ca and pushes it into the database for publication.
 Incremental CRLs are not supported.
+
+=head2 generatekey
+
+Calls the local API method generate_key and returns the PEM encoded private
+key.
+
+
