@@ -44,14 +44,14 @@ our %SUBTYPE_MAP = ( # aka "format"
     rawlist => { type => 'array' },
     deflist => { type => 'array' },
     defhash => { type => 'object' },
-    cert_info => { description => 'The result is likely to be a JSON string prefixed with "OXJSF1:"', },
+    cert_info => { description => 'if prefixed with "OXJSF1:" it is a JSON string', },
     # FIXME: use enum from OpenXPKI::Server::API2::Types
     certstatus => { type => 'string', enum => [ qw( ISSUED REVOKED CRL_ISSUANCE_PENDING EXPIRED ) ] },
 );
 
 our %KEY_MAP = (
-    pkcs10 => { description => 'The result is likely to be a JSON string prefixed with "OXJSF1:"', },
-    pkcs7 => { description => 'The result is likely to be a JSON string prefixed with "OXJSF1:"', },
+    pkcs10 => { description => 'if prefixed with "OXJSF1:" it is a JSON string', },
+    pkcs7 => { description => 'if prefixed with "OXJSF1:" it is a JSON string', },
 );
 
 
@@ -143,39 +143,47 @@ sub _openapi_field_schema {
         my $field = {};
         my $wf_field = $wf_fields->{$fieldname};
 
-        # copy some attributes from workflow field spec
+        # remember required fields as they have to be listed outside the field specification
         push @required_fields, $fieldname if $wf_field->{required};
 
-        # translate description (must be non-empty by OpenAPI spec)
-        $field->{description} = $wf_field->{label} ? i18nGettext($wf_field->{label}) : $fieldname;
-
-        # map OpenXPKI to OpenAPI types
-        my $wf_type = $wf_field->{type}; # variable used in exception
-
-        OpenXPKI::Exception->throw(
-            message => 'Missing OpenAPI type mapping for OpenXPKI parameter type',
-            params => { workflow => $workflow, field => $wf_field->{name}, parameter_type => $wf_type }
-        ) unless $TYPE_MAP{$wf_type};
-
-        # add type specific OpenAPI attributes
-        $field = { %$field, %{ $TYPE_MAP{$wf_type} } };
-
-        # TODO: Handle select fields (check if options are specified)
-
-        # add subtype specific OpenAPI attributes
-        my $match = $SUBTYPE_MAP{ $wf_field->{format} // "" };
-        if ($match) {
-            my $hint = delete $match->{description};
-            $field->{description} .= " ($hint)" if $hint;
-            $field = { %$field, %$match };
+        # use OpenAPI type spec if possible
+        if ($wf_field->{api_type}) {
+            $field = $self->api->get_openapi_typespec(spec => $wf_field->{api_type});
+            # if not already set, use UI label as description (must be non-empty by OpenAPI spec)
+            $field->{description} //= $wf_field->{label} ? i18nGettext($wf_field->{label}) : $fieldname;
         }
+        else {
+            # translate description (must be non-empty by OpenAPI spec)
+            $field->{description} = $wf_field->{label} ? i18nGettext($wf_field->{label}) : $fieldname;
 
-        # add fieldname specific OpenAPI attributes
-        $match = $KEY_MAP{ $fieldname };
-        if ($match) {
-            my $hint = delete $match->{description};
-            $field->{description} .= " ($hint)" if $hint;
-            $field = { %$field, %$match };
+            # map OpenXPKI to OpenAPI types
+            my $internal_type = $wf_field->{type}; # variable used in exception
+
+            OpenXPKI::Exception->throw(
+                message => 'Missing OpenAPI type mapping for OpenXPKI parameter type',
+                params => { workflow => $workflow, field => $wf_field->{name}, parameter_type => $internal_type }
+            ) unless $TYPE_MAP{$internal_type};
+
+            # add type specific OpenAPI attributes
+            $field = { %$field, %{ $TYPE_MAP{$internal_type} } };
+
+            # TODO: Handle select fields (check if options are specified)
+
+            # add subtype specific OpenAPI attributes
+            my $match = $SUBTYPE_MAP{ $wf_field->{format} // "" };
+            if ($match) {
+                my $hint = delete $match->{description};
+                $field->{description} .= " ($hint)" if $hint;
+                $field = { %$field, %$match };
+            }
+
+            # add fieldname specific OpenAPI attributes
+            $match = $KEY_MAP{ $fieldname };
+            if ($match) {
+                my $hint = delete $match->{description};
+                $field->{description} .= " ($hint)" if $hint;
+                $field = { %$field, %$match };
+            }
         }
 
         $field_specs->{$fieldname} = $field;
