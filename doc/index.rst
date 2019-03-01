@@ -37,6 +37,7 @@ Setup and Configuration
    reference/configuration/server
    reference/configuration/realm
    reference/configuration/workflow
+   reference/configuration/workflow-ui
    reference/configuration/output
    reference/configuration/uicontrol
    reference/configuration/profile
