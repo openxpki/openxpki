@@ -39,12 +39,12 @@ command "get_openapi_typespec" => {
 } => sub {
     my ($self, $params) = @_;
 
-    my $tree = $self->_tokenize($params->spec);
-    return $self->_parse($tree);
+    my $tree = $self->_parse($params->spec);
+    return $self->_translate_to_openapi($tree);
 };
 
-# create an intermediate type spec tree
-sub _tokenize {
+# create an intermediate type spec tree (parse tree)
+sub _parse {
     my ($self, $def) = @_;
 
     # basic checks
@@ -95,8 +95,8 @@ sub _tokenize {
     return $root;
 }
 
-# parse the intermediate type spec tree and create an OpenAPI type definition
-sub _parse {
+# process the intermediate type spec tree and create an OpenAPI type definition tree
+sub _translate_to_openapi {
     my ($self, $tree) = @_;
 
     my $root;
