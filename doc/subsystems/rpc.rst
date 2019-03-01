@@ -185,10 +185,29 @@ Of course proper authentication and authorization is required for the
 cerificate to be issued immediately. The required configuration parameters
 are documented in the scep workflow.
 
+.. _openapi-overview:
+
+OpenAPI (aka Swagger)
+=====================
+
+OpenXPKI can generate an `OpenAPI <https://www.openapis.org/>`_ specification for your current (custom) RPC API configuration: see :ref:`openapi-rpc-method` below.
+
+To be able to do that the data types of all RPC relevant input/output parameters of those workflows exposed via RPC must be defined in the workflow config. For more informations about this see :ref:`openapi-workflow-field-param`.
+
+.. _openapi-rpc-method:
+
+Retrieving the OpenAPI spec
+---------------------------
+
+There is a special RPC method *openapi-spec*::
+
+    $ curl -F "method=openapi-spec" http://localhost:8080/rpc
+
+This will return an OpenAPI 3.0 compatible specification of all possible OpenXPKI RPC method calls in JSON format.
+
 See Also
 ========
 
-See the OpenXPKI documentation for further information.
 See also ``core/server/cgi-bin/rpc.cgi``.
 
 

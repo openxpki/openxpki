@@ -46,14 +46,16 @@ Each workflow is represented by a file or directory structure below ``workflow.d
 
     field:
         field_name: (as used above)
-            name: key used in context
-            label: The fields label
+            name:        key used in context
+            label:       The fields label
             placeholder: Hint text shown in empty form elements
-            tooltip: Text for "tooltip help"
-            type:     Type of form element (default is input)
-            required: 0|1
-            default:  default value
-            more_key: other_value  (depends on form type)
+            tooltip:     Text for "tooltip help"
+            type:        Type of form element (default is input)
+            required:    0|1
+            default:     default value
+            api_type:    Shortcut syntax to specify an OpenAPI type
+            api_label:   Label to use in OpenAPI specification
+            more_key:    other_value  (depends on form type)
 
     validator:
         class: OpenXPKI::Server::Workflow::Validator::CertIdentifierExists
@@ -142,9 +144,65 @@ Select field with options
           - cessationOfOperation
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION
 
-If the label tag is given (below option!), the values in the drop down are
-i18n strings made from label + uppercase(key), e.g
-I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_UNSPECIFIED
+If the ``label`` tag is given (below option!) the values in the drop down are
+i18n strings made from ``label`` + ``uppercase(key)``, e.g
+*I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_UNSPECIFIED*.
+
+.. _openapi-workflow-field-param:
+
+OpenAPI specific field parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+    api_type: Array[Str]
+    api_label: List of surnames
+
+**api_type**
+
+``api_type`` accepts a custom shortcut syntax to define OpenAPI data types. The syntax is close to the syntax you use for `Moose types <https://metacpan.org/pod/distribution/Moose/lib/Moose/Manual/Types.pod>`_. All type names are **case insensitive**.
+
+The following types are supported:
+
+- ``String``, aliases: ``Str``
+- ``Integer``, aliases: ``Int``
+- ``Numeric``, aliases: ``Num``
+- ``Boolean``, aliases: ``Bool``
+- ``Array``, aliases: ``ArrayRef``.
+
+  The type of array items may be specified in square brackets::
+
+      Array[ Str ]
+      Array[ Str | Int ]
+
+- ``Object``, aliases: ``Obj``, ``Hash``, ``HashRef``
+
+  The object properties (i.e. hash items) may be specified in square brackets::
+
+      Object[ age: Integer, name: String ]
+
+OpenAPI data type parameters/modifiers may be passed in brackets. Please note that those parameters are **case sensitive** as they are used as-is in the OpenAPI spec.
+::
+
+    String(format:password)
+    Integer(minimum: 1)
+
+Some more complex examples of nested types::
+
+    Array[ Object[ comment:Str, names:Array[Str] ] ]
+    HashRef[ size:Integer(minimum:5), data:Array, positions:Array[ Integer | Numeric ] ]
+
+Please note:
+
+- types are **case insensitive**
+- you can **insert spaces** wherever you like in a type definition
+- if ``api_type`` is not given then OpenXPKI tries to determine the correct OpenAPI type from the ``field`` parameters ``format`` and ``type`` (and from the field name in some rare cases). See Perl class ``OpenXPKI::Server::API2::Plugin::Workflow::get_openapi_typespec`` for technical details.
+
+**api_label**
+
+``api_label`` is used as a field description in the OpenAPI spec. If not given, ``label`` is used instead.
+
+
+For an OpenAPI overview please see :ref:`openapi-overview`.
 
 UI Rendering
 ------------
