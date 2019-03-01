@@ -52,12 +52,13 @@ sub _tokenize {
     my $closing = () = $def =~ /\]/g;
     die "Unbalanced square brackets in type definition: $def" unless $opening == $closing;
 
+    $def =~ s/\s//gm;
     my $root = [ $def ];
     my @to_parse = ($root); # list of child enumerations to parse
 
     while (my $children = shift @to_parse) {
         for my $child (@$children) {
-            my @parts = ($child =~ m/^ (?: ( [^\[\]:]+ ) : )? ( [^\[\]]+ ) (?: \[ (.*) \] )? $/msxi);
+            my @parts = ($child =~ m/^ (?: ( [^\[\]():]+ ) : )? ( [^\[\]]+ ) (?: \[ (.*) \] )? $/msxi);
             die "Wrong syntax at OpenAPI type specification: $child" unless scalar @parts;
 
             my $inner = $parts[2];
@@ -66,9 +67,9 @@ sub _tokenize {
             if ($inner) {
                 # regex matching
                 @inner_parts = ($parts[2] =~ m/
-                    (?: [,|]?
+                    (?: [,\|]?
                         (
-                            [^\[\],]+  # an item without sub items i.e. no brackets
+                            [^\[\],\|]+  # an item without sub items i.e. no brackets
                             (?: \[     # balanced bracket matching
                                 (?:
                                     [^\[\]] | (?R)
@@ -136,7 +137,7 @@ sub _parse {
             # if object properties were specified
             if ($object_item_types) {
                 my $properties = {};
-                $targetdef = { properties => $properties };
+                $targetdef->{properties} = $properties;
                 push @todo, [ $srcdef, $properties, $_, $_->{key} ] for @$object_item_types;
             }
         }
@@ -155,12 +156,12 @@ sub _parse {
             if ($params) {
                 for my $param (split ",", $params) {
                     my ($k,$v) = split /[:=]/, $param;
-                    die "Invalid parameter syntax (brackets) in ".$srcdef->{raw} unless $k && $v;
+                    die "Invalid parameter syntax in round brackets in '".$srcdef->{raw}."'" unless defined $k && defined $v;
                     $targetdef->{$k} = $v;
                 }
             }
         }
-        die "Unknown type: ".$srcdef->{type} unless $targetdef;
+        die "Unknown type: '".$srcdef->{type}."'" unless $targetdef;
 
         #
         # attach newly created OpenAPI type definition to the tree structure
