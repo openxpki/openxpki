@@ -128,6 +128,7 @@ Field
 ^^^^^
 
 *Select Field with options*
+::
 
     type: select
     option:
@@ -210,7 +211,7 @@ to the state definition (see above).
 Global Entities
 ---------------
 
-You can define entities for action, condition and validator for global use in the corresponding files below ``workflow.global.``. The format is the same as described below, the "global_" prefix is added by the system.
+You can define entities for action, condition and validator for global use in the corresponding files below ``workflow.global.``. The format is the same as described below, the *global_* prefix is added by the system.
 
 Creating Macros (not implemented yet!)
 --------------------------------------

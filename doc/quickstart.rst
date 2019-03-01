@@ -6,14 +6,14 @@ Quickstart guide
 Support
 -------
 
-If you need help, please use the mailing list and do **NOT** open items  
-in the issue tracker on github. For details and additional support options 
-have a look at http://www.openxpki.org/support.html. 
+If you need help, please use the mailing list and do **NOT** open items
+in the issue tracker on github. For details and additional support options
+have a look at http://www.openxpki.org/support.html.
 
 Vagrant
 -------
 
-We have a vagrant setup for debian jessie. If you have vagrant you can just 
+We have a vagrant setup for debian jessie. If you have vagrant you can just
 checkout the git repo, go to vagrant/debian and run "vagrant up test". Provisioning takes some
 minutes and will give you a ready to run OXI install available at http://localhost:8080/openxpki/.
 
@@ -23,12 +23,12 @@ Debian Builds
 New users should use the v2 release branch which is available for Debian 8 (Jessie), for
 those running a v1 version we still maintain security and major bug fixes for the old release.
 
-**Packages are for Debian Jessie 8 / 64bit (arch amd64). The en_US.utf8 locale must be 
-installed as the translation system will crash otherwise! The packages do NOT work 
-on Ubuntu, Debian 9 or 32bit systems. Community packages for Ubuntu have been 
+**Packages are for Debian Jessie 8 / 64bit (arch amd64). The en_US.utf8 locale must be
+installed as the translation system will crash otherwise! The packages do NOT work
+on Ubuntu, Debian 9 or 32bit systems. Community packages for Ubuntu have been
 discontinued due to packaging/dependancy problems.**
 
-Start with a debian minimal install, we recommend to add "SSH Server" and "Web Server" in the package selection menu, as this will speed up the install later::
+Start with a debian minimal install, we recommend to add "SSH Server" and "Web Server" in the package selection menu, as this will speed up the install later.
 
 To avoid an "untrusted package" warning, you should add our package signing key (works only on debian yet)::
 
@@ -90,8 +90,8 @@ Now, create an empty database and assign a database user::
        passwd: openxpki
 
 
-Please create the empty database schema from the provided schema file. mysql and postgresql 
-should work out of the box, the oracle schema is goo for testing but needs some extra indices 
+Please create the empty database schema from the provided schema file. mysql and postgresql
+should work out of the box, the oracle schema is goo for testing but needs some extra indices
 to perform properly.
 
 Example call when debian packages are installed::
@@ -197,13 +197,12 @@ If this is not the case, check */var/log/openxpki/stderr.log*.
 Adding the Webclient
 ^^^^^^^^^^^^^^^^^^^^
 
-The webclient is included in the core packages. Just open your browser and navigate to *http://yourhost/openxpki/*. You should see the main authentication page. If you get an internal server error, make sure you have the en_US.utf8 locale installed (*locale -a | grep en_US*)!
+The webclient is included in the core packages. Just open your browser and navigate to *http://yourhost/openxpki/*. You should see the main authentication page. If you get an internal server error, make sure you have the *en_US.utf8* locale installed (``locale -a | grep en_US``)!
 
 You can log in as user with any username/password combination, the operator login has two preconfigured operator accounts raop and raop2 with password openxpki.
 
-If you only get the "Open Source Trustcenter" banner without a login prompt,
-check that fcgid is enabled as described above with
-(*a2enmod fcgid; service apache2 restart).
+If you only get the "Open Source Trustcenter" banner without a login prompt, check that fcgid is enabled as described above with
+(``a2enmod fcgid; service apache2 restart``).
 
 Testdrive
 ^^^^^^^^^
@@ -225,7 +224,7 @@ Enabling the SCEP service
 our package server in order to use the scep service.**
 
 The SCEP logic is already included in the core distribution. The package installs
-a wrapper script into /usr/lib/cgi-bin/ and creates a suitable alias in the apache
+a wrapper script into */usr/lib/cgi-bin/* and creates a suitable alias in the apache
 config redirecting all requests to ``http://host/scep/<any value>`` to the wrapper.
 A default config is placed at /etc/openxpki/scep/default.conf. For a testdrive,
 there is no need for any configuration, just call ``http://host/scep/scep``.

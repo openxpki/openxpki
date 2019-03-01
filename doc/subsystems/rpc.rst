@@ -102,7 +102,7 @@ the following::
 See ``core/server/cgi-bin/rpc.cgi`` for mapping additional parameters,
 if needed.
 
-Certificates are revoked by specifying the certificate identifier.
+Certificates are revoked by specifying the certificate identifier::
 
     curl \
         --data "method=RevokeCertificateByIdentifier" \
@@ -111,32 +111,31 @@ Certificates are revoked by specifying the certificate identifier.
         http://demo.openxpki.org/cgi-bin/rpc.cgi
 
 The response is in JSON format (http://www.jsonrpc.org/specification#response_object).
-Except for the "id" parameter, the result is identical to the definition of JSON RPC:
+Except for the "id" parameter, the result is identical to the definition of JSON RPC::
 
     { result: { id: workflow_id, pid: process_id, state: workflow_state }}
 
-On error, the content returned is:
+On error, the content returned is::
 
     { error: { code: 1, message: "Verbose error", data: { id, pid, state } } }
-
 
 **We currently always send 200 OK with a JSON error structure**
 
 The following HTTP Response Codes are (to be) supported:
 
-* 200 OK - Request was successful
+* **200 OK** - Request was successful
 
-* 400 Bad Request - Returned when the RPC method or required parameters
+* **400 Bad Request** - Returned when the RPC method or required parameters
   are missing.
 
-* 401 Unauthorized - No or invalid authentication details were provided
+* **401 Unauthorized** - No or invalid authentication details were provided
 
-* 403 Forbidden - Authentication succeeded, but the authenticated user does
+* **403 Forbidden** - Authentication succeeded, but the authenticated user does
   not have access to the resource
 
-* 404 Not Found - A non-existent resource was requested
+* **404 Not Found** - A non-existent resource was requested
 
-* 500 Internal Server Error - Returned when there is an error creating an
+* **500 Internal Server Error** - Returned when there is an error creating an
   instance of the client object or a new workflow, or the workflow terminates
   in an unexpected state.
 
@@ -165,19 +164,21 @@ Examples
 The default.conf configuration file defines an endpoint SearchCertificate::
 
     [SearchCertificate]
-     workflow = certificate_search
-     param = common_name
-     output = cert_identifier, notbefore, notafter, status
+    workflow = certificate_search
+    param = common_name
+    output = cert_identifier, notbefore, notafter, status
 
 To utilize this endpoint the following curl command may be used::
 
     $ curl -F "method=SearchCertificate"  -F "common_name=test" http://localhost:8080/rpc
+
     {"result":{"id":0,"data":{"notafter":"2019-04-19T05:21:58","notbefore":"2018-10-19T05:21:58", \
     "status":"ISSUED","cert_identifier":"7Da0qfjirGl7PXlZYf9PFVqMJds"},"state":"SUCCESS","pid":915}}
 
 The RequestCertificate endpoint (see above) may be used via::
 
     $ curl -F method=RequestCertificate  -F comment=test -F pkcs10="$(cat certreq.pem)" http://localhost:8080/rpc
+
     {"result":{"id":"5119","state":"SUCCESS","data":{"cert_identifier":"60uHCnC3Uv9wZKjcCkmSHuBwuzU"},"pid":915}}
 
 Of course proper authentication and authorization is required for the

@@ -21,9 +21,11 @@ Using Docker
 This method has minimal requirements for your host system.
 
 *Prerequisites: Docker*
+
 ::
-  # assuming you are in the projects' root directory:
-  ./tools/docker-test.pl --all
+
+    # assuming you are in the projects' root directory:
+    ./tools/docker-test.pl --all
 
 The script builds the Docker image locally which takes a while on first run.
 
@@ -47,40 +49,44 @@ VM (i.e. "Vagrant Box").
 
 2. Build the Vagrant box (=VM) once, which takes a long while, and start it.
    ::
-     # assuming you are in the projects' root directory:
-     cd vagrant/develop
-     vagrant up
-     # have several cups of tea...
+
+       # assuming you are in the projects' root directory:
+       cd vagrant/develop
+       vagrant up
+       # have several cups of tea...
 
 **After code changes**
 
 1. Start the Vagrant box and log in
    ::
-     # assuming you are in the projects' root directory:
-     cd vagrant/develop
-     vagrant up && vagrant ssh
+
+       # assuming you are in the projects' root directory:
+       cd vagrant/develop
+       vagrant up && vagrant ssh
 
 2. Refresh the code
 
    To make sure all dependencies inside the VM are in sync with the files on
    your host (e.g. after code changes), refresh them inside Vagrant::
-     sudo su
-     oxi-refresh
-     # maybe start with a clean DB: oxi-initdb
+
+       sudo su
+       oxi-refresh
+       # maybe start with a clean DB: oxi-initdb
 
 3. Run the tests
    ::
-     docker start mariadb
-     docker start oracle
-     cd /code-repo
 
-     cd core/server
-     PERL5LIB=./ prove -r t
-     cd ../..
+       docker start mariadb
+       docker start oracle
+       cd /code-repo
 
-     cd qatest
-     PERL5LIB=./ prove -r backend/nice backend/api backend/api2 backend/webui client
-     cd ..
+       cd core/server
+       PERL5LIB=./ prove -r t
+       cd ../..
+
+       cd qatest
+       PERL5LIB=./ prove -r backend/nice backend/api backend/api2 backend/webui client
+       cd ..
 
 Using a local dev environment
 -----------------------------
@@ -96,21 +102,23 @@ Please note that the tests currently use the database that is configured in ``/e
 
 1. Update required Perl according to current Makefile
    ::
-     # assuming you are in the projects' root directory:
-     cpanm Carton
-     ./tools/scripts/makefile2cpanfile.pl > cpanfile
-     carton install
+
+      # assuming you are in the projects' root directory:
+      cpanm Carton
+      ./tools/scripts/makefile2cpanfile.pl > cpanfile
+      carton install
 
 2. Run the tests
    ::
-     # assuming you are in the projects' root directory:
-     cd core/server
-     prove -I ../../local/lib/perl5 -r t
-     cd ../..
 
-     cd qatest
-     prove -I ../local/lib/perl5 -I ../core/server -r backend/nice backend/api backend/api2 backend/webui client
-     cd ..
+      # assuming you are in the projects' root directory:
+      cd core/server
+      prove -I ../../local/lib/perl5 -r t
+      cd ../..
+
+      cd qatest
+      prove -I ../local/lib/perl5 -I ../core/server -r backend/nice backend/api backend/api2 backend/webui client
+      cd ..
 
 Automatically via Travis-CI
 ---------------------------

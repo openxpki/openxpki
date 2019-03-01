@@ -17,7 +17,7 @@ Column Layout
 #############
 
 Add a section ``cols`` to you definition block::
-.
+
     cols:
       - label: I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL
         field: WORKFLOW_SERIAL
