@@ -8,6 +8,8 @@ OpenXPKI::Server::API2::Plugin::Workflow::get_openapi_typespec
 =cut
 
 # Core modules
+use Scalar::Util;
+
 # CPAN modules
 # Project modules
 
@@ -157,6 +159,7 @@ sub _translate_to_openapi {
                 for my $param (split ",", $params) {
                     my ($k,$v) = split /[:=]/, $param;
                     die "Invalid parameter syntax in round brackets in '".$srcdef->{raw}."'" unless defined $k && defined $v;
+                    $v = $v+0 if Scalar::Util::looks_like_number($v); # OpenAPI complains about numeric parameters in quotes
                     $targetdef->{$k} = $v;
                 }
             }
