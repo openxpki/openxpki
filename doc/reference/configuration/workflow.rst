@@ -152,25 +152,30 @@ OpenAPI specific field parameters
     api_type: Array[Str]
     api_label: List of surnames
 
+To be able to generate the OpenAPI spec the data types of all relevant input/output parameters must be defined. The most precise way to do this is to specify ``api_type`` in a field definition.
+
+If ``api_type`` is not given then OpenXPKI tries to deduce the correct OpenAPI type from the field parameters ``format`` and ``type`` (and from the field name in some rare cases). See Perl class ``OpenXPKI::Server::API2::Plugin::Workflow::get_openapi_typespec`` for technical details.
+
+
 api_type
 ~~~~~~~~
 
-``api_type`` accepts a custom shortcut syntax to define OpenAPI data types. The syntax is close to the syntax you use for `Moose types <https://metacpan.org/pod/distribution/Moose/lib/Moose/Manual/Types.pod>`_. All type names are **case insensitive**.
+``api_type`` accepts a custom shortcut syntax to define OpenAPI data types. The syntax is close to the syntax used in `Moose types <https://metacpan.org/pod/distribution/Moose/lib/Moose/Manual/Types.pod>`_. All type names are **case insensitive**.
 
 **Supported types**
 
-- ``String``, aliases: ``Str``
-- ``Integer``, aliases: ``Int``
-- ``Numeric``, aliases: ``Num``
-- ``Boolean``, aliases: ``Bool``
-- ``Array``, aliases: ``ArrayRef``.
+- ``String`` alias ``Str``
+- ``Integer`` alias ``Int``
+- ``Numeric`` alias ``Num``
+- ``Boolean`` alias ``Bool``
+- ``Array`` alias ``ArrayRef``
 
   The type of array items may be specified in square brackets::
 
       Array[ Str ]
       Array[ Str | Int ]
 
-- ``Object``, aliases: ``Obj``, ``Hash``, ``HashRef``
+- ``Object`` alias ``Obj``, ``Hash``, ``HashRef``
 
   The object properties (i.e. hash items) may be specified in square brackets::
 
@@ -195,7 +200,6 @@ Some more complex examples of nested types::
 
 - types are **case insensitive**
 - you can **insert spaces** wherever you like in a type definition
-- if ``api_type`` is not given then OpenXPKI tries to determine the correct OpenAPI type from the ``field`` parameters ``format`` and ``type`` (and from the field name in some rare cases). See Perl class ``OpenXPKI::Server::API2::Plugin::Workflow::get_openapi_typespec`` for technical details.
 
 api_label
 ~~~~~~~~~

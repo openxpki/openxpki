@@ -64,6 +64,7 @@ Automation / External APIs
 
    subsystems/index
    subsystems/rpc
+   subsystems/rpc-openapi
    subsystems/scep
    subsystems/soap
    subsystems/certep
