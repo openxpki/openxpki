@@ -56,6 +56,8 @@ sub workflow_def {
                 name => 'message',
                 type => 'text',
                 label => 'message label',
+                min => 1,
+                max => 5,
                 required => '1',
             },
             'size' => {
@@ -100,12 +102,13 @@ lives_and {
     });
     cmp_deeply $result, {
         description => "wf_type_1 blah",
-        'input_schema' => {
+        input_schema => {
             type => 'object',
-            'properties' => {
+            properties => {
                 'message' => {
                     description => 'message label',
-                    type => 'string'
+                    type => 'array',
+                    items => { type => 'string', },
                 },
                 'size' => {
                     description => 'size label',
@@ -117,16 +120,18 @@ lives_and {
                     type => 'string'
                 },
             },
-            'required' => [ 'message', 'role' ],
+            required => [ 'message', 'role' ],
         },
-        'output_schema' => {
+        output_schema => {
             type => 'object',
-            'properties' => {
+            properties => {
                 'message' => {
                     description => 'message label',
-                    type => 'string'
+                    type => 'array',
+                    items => { type => 'string', },
                 },
             },
+            required => [ 'message' ],
         }
     } or diag explain $result;
 } 'get_rpc_openapi_spec() - xxx';

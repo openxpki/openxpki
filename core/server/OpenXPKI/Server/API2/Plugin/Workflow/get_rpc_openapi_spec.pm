@@ -191,6 +191,15 @@ sub _openapi_field_schema {
                 params => { workflow => $workflow, field => $wf_field->{name}, openxpki_type => $internal_type }
             ) unless scalar keys %$field;
 
+            # special handling for multivalue fields:
+            # they are represented as Arrays of values of their specified type
+            if ($wf_field->{min} or $wf_field->{max}) {
+                $field = {
+                    type => 'array',
+                    items => $field,
+                }
+            }
+
         }
 
         # if not already set, use UI label as description (must be non-empty by OpenAPI spec)
