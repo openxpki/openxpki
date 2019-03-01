@@ -316,6 +316,7 @@ OpenXPKI/Server/API2/Plugin/Workflow/create_workflow_instance.pm
 OpenXPKI/Server/API2/Plugin/Workflow/execute_workflow_activity.pm
 OpenXPKI/Server/API2/Plugin/Workflow/check_workflow_acl.pm
 OpenXPKI/Server/API2/Plugin/Workflow/fail_workflow.pm
+OpenXPKI/Server/API2/Plugin/Workflow/get_openapi_typespec.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_rpc_openapi_spec.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_activities.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_activities_params.pm
