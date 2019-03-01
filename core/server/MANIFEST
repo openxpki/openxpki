@@ -775,6 +775,7 @@ t/91_api2/10_base.t
 t/91_api2/11_autoloader.t
 t/91_api2/20_acl.t
 t/91_api2/30_plugin_token.t
+t/91_api2/40_get_openapi_typespec.t
 t/91_api2/lib/OpenXPKI/TestCommands/Ignored.pm
 t/91_api2/lib/OpenXPKI/TestCommands/givetheparams.pm
 t/91_api2/lib/OpenXPKI/TestCommands/scream.pm
