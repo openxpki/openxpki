@@ -1,5 +1,5 @@
-Global configuration
-====================================
+Global
+======
 
 This document give a brief overview over the system configuration items. You find those settings in the files in the ``<configfir>/config.d/system`` directory.
 

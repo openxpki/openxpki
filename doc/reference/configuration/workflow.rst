@@ -1,6 +1,6 @@
 
-Configuration of the Workflow Engine with UI
-============================================
+Workflow Engine with UI
+=======================
 
 All files mentioned here are below the node ``workflow`` inside the realm configuration. Filenames are all lowercased.
 
@@ -127,7 +127,8 @@ Action
 Field
 ^^^^^
 
-*Select Field with options*
+Select field with options
+~~~~~~~~~~~~~~~~~~~~~~~~~
 ::
 
     type: select

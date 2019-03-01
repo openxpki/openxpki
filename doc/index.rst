@@ -28,7 +28,6 @@ Setup and Configuration
    admin/installation/building
    admin/installation/packages
    admin/installation/deployment
-   admin/customization/workflow/activity
    admin/configuration/concepts
    admin/configuration/scep
    admin/configuration/smartcard
@@ -99,6 +98,7 @@ Developer
    :caption: Developer
 
    developer/index
+   admin/customization/workflow/activity
    developer/tests
 
 .. toctree::
