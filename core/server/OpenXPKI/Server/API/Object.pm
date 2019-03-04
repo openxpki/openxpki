@@ -2153,7 +2153,7 @@ sub __set_data_pool_entry : PRIVATE {
             my $safe_id = CTX('api')->get_token_alias_by_type({ TYPE => 'datasafe' });
             $encryption_key_id = 'p7:' . $safe_id;
 
-            my $cert = CTX('api')->get_certificate_for_alias( alias => $safe_id );
+            my $cert = CTX('api2')->get_certificate_for_alias( alias => $safe_id );
 
             ##! 16: 'cert: ' . $cert
             if ( !defined $cert ) {
