@@ -26,9 +26,7 @@ $log->info("RPC handler initialized");
 my $json = new JSON();
 
 sub send_output {
-
-    my $cgi = shift;
-    my $result = shift;
+    my ($cgi, $result, $canonical_keys) = @_;
 
     if ($ENV{'HTTP_ACCEPT'} && $ENV{'HTTP_ACCEPT'} eq 'text/plain') {
        print $cgi->header( -type => 'text/plain', charset => 'utf8' );
@@ -45,6 +43,7 @@ sub send_output {
         # prepare response header
         print $cgi->header( -type => 'application/json', charset => 'utf8' );
         $json->max_depth(20);
+        $json->canonical(1) if $canonical_keys;
         print $json->encode( $result );
     }
 
@@ -225,7 +224,7 @@ while (my $cgi = CGI::Fast->new()) {
     # special handling for requests for OpenAPI (Swagger) spec?
     if ($method eq 'openapi-spec') {
         my $spec = _openapi_spec($cgi, $conf) or next;
-        send_output($cgi, $spec);
+        send_output($cgi, $spec, 1);
         next;
     }
 
