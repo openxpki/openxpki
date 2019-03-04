@@ -66,8 +66,8 @@ sub generate_key {
         or OpenXPKI::Exception->throw( message =>
           'I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_REQUIRES_PASSWORD' );
 
-    my $key_alg = lc($args->{KEY_ALG}) || 'rsa';
-    my $enc_alg = lc($args->{ENC_ALG});
+    my $key_alg = $args->{KEY_ALG} ? lc($args->{KEY_ALG}) : 'rsa';
+    my $enc_alg = $args->{ENC_ALG} ? lc($args->{ENC_ALG}) : undef;
 
     my $params = $args->{PARAMS};
 
