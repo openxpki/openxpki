@@ -110,14 +110,14 @@ command "get_rpc_openapi_spec" => {
 
     my $head = CTX('config')->get_hash([ 'workflow', 'def', $workflow, 'head' ]);
 
-    my $util = OpenXPKI::Server::API2::Plugin::Workflow::Util->new;
-    my $success = $util->get_state_info($workflow, 'SUCCESS')
-        or OpenXPKI::Exception->throw(
-            message => 'State SUCCESS is not defined in given workflow',
-            params => { workflow => $workflow }
-        );
-    my $output = {};
-    $output->{ $_->{name} } = $_ for @{ $success->{output} };
+    # get field info for all output fields
+    # (note that currently there is no way to statically check if the output fields
+    # specified in the RPC config will actually exist in the workflow context)
+    my $output = {
+        map { $_->{name} => $_ }                                # field name => info hash
+        map { $self->factory->get_field_info($_, $workflow) }   # info hash about field
+        @{ $params->output }                                    # output field names
+    };
 
     return {
         description => $head->{description} ? i18nGettext($head->{description}) : $workflow,
@@ -139,13 +139,12 @@ sub _openapi_field_schema {
             CTX('log')->system->warn("Parameter '$fieldname' as requested for OpenAPI spec is not defined in workflow '$workflow'");
             next;
         }
-
-        my $field = {};
         my $wf_field = $wf_fields->{$fieldname};
 
         # remember required fields as they have to be listed outside the field specification
         push @required_fields, $fieldname if $wf_field->{required};
 
+        my $field = {};
         my $hint = "";
 
         #
