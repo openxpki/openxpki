@@ -109,11 +109,12 @@ lives_and {
     });
 
     cmp_deeply $data, {
-        DATA        => $as1->db->{data},
-        IDENTIFIER  => $as1->db->{identifier},
-        SUBJECT     => $as1->db->{subject},
-        NOTAFTER    => $as1->db->{notafter},
-        NOTBEFORE   => $as1->db->{notbefore},
+        DATA           => $as1->db->{data},
+        IDENTIFIER     => $as1->db->{identifier},
+        SUBJECT        => $as1->db->{subject},
+        NOTAFTER       => $as1->db->{notafter},
+        NOTBEFORE      => $as1->db->{notbefore},
+        KEY_IDENTIFIER => $as1->db->{subject_key_identifier},
     };
 } "get_certificate_for_alias - correct cert data";
 
