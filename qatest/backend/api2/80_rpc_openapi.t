@@ -130,8 +130,12 @@ lives_and {
                     type => 'array',
                     items => { type => 'string', },
                 },
+                'role' => {
+                    description => 'role label',
+                    type => 'string'
+                },
             },
-            required => [ 'message' ],
+            required => [ 'message', 'role' ],
         }
     } or diag explain $result;
 } 'get_rpc_openapi_spec() - xxx';
