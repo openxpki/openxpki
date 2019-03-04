@@ -2,4 +2,4 @@ label: I18N_OPENXPKI_UI_FIELD_ERROR_CODE
 name: error_code
 format: styled
 template: "[% IF value %]failed:[% value %][% END %]"
-
+api_type: Str
