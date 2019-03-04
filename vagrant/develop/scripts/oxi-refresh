@@ -44,8 +44,13 @@ rsync -a --delete \
   /etc/openxpki/config.d/realm/ca-one/                                >$LOG 2>&1
 chown -R openxpki:root /etc/openxpki/config.d/realm/ca-one            >$LOG 2>&1
 
+echo "Modifying some config entries"
+
 # set /var/tmp instead of /tmp (where only root has write access)
 sed -ri 's/(LOCATION:)\s*\/tmp.*/\1 \/var\/tmp/g' /etc/openxpki/config.d/realm/ca-one/publishing.yaml
+
+# set en_US as default language to get correct I18N translations (e.g. in rpc.fcgi)
+sed -ri 's/^(\s*default_language:).*/\1 en_US/' /etc/openxpki/config.d/system/server.yaml
 
 #
 # Compile OpenXPKI
