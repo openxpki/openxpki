@@ -8,15 +8,28 @@ Image specifications:
 * Standard system Perl v5.18.2
 * MySQL Server 5.5
 
-## Build image
+## Usage
 
-The Docker image has to be built once:
+The easiest way to use this image is by calling `tools/docker-test.pl`.
 
-    # register image as "oxi-test" for easier access
-    docker build docker/test -t oxi-test
+## (Re-)Build image
+
+The Docker image has to be built once (after changes to its configuration):
+
+    # assuming you are in the project's root directory:
+    # (register image as "oxi-test" for easier access)
+    docker build -t oxi-test tools/docker-test
 
 **Attention**: as the Docker image comes preinstalled with a lot of CPAN modules
 it will not reliably detect missing dependency specifications in Makefile.PL!
+
+### Update preinstalled Perl modules
+
+The list of preinstalled Perl modules for the Docker image is managed in `cpanfile`. To update it run this from the project's root directory:
+
+    ./tools/scripts/makefile2cpanfile.pl > tools/docker-test/cpanfile
+
+After that, rebuild the Docker image as shown above.
 
 ## Run tests on "develop" branch
 
