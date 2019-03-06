@@ -28,13 +28,14 @@ use OpenXPKI::Server::Init;
 use OpenXPKI::i18n;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Config::Backend;
+use Log::Log4perl qw (:easy);
 
 use OpenXPKI::VERSION;
 
 use Data::Dumper;
 
 my %params = ( module => [] );
-my @options_spec = ('config=s','instance|i=s');
+my @options_spec = ('config=s','instance|i=s','verbose','debug');
 my $cmd = shift || 'help';
 my $ret = 255;
 
@@ -1200,6 +1201,11 @@ sub __init {
 
     GetOptions( \%params, @options_spec ) or pod2usage( -verbose => 0 );
 
+    Log::Log4perl->easy_init( {
+        level    => $params{debug} ? $DEBUG : ( $params{verbose} ? $INFO : $WARN ),
+        layout   => '[%p] %m%n'
+    });
+
     if ($params{config}) {
         # we set the ENV here to outrule an external ENV setting and to have
         # it ready for the reload action (needed to find the correct pidfile)
@@ -1525,7 +1531,7 @@ if ($cmd eq 'initdb') {
             print STDERR $EVAL_ERROR;
         } else {
             print "Lint $module: ";
-            my $err = $class->lint($c);
+            my $err = $class->new()->lint($c);
             if ($err) {
                 print "\n$err\n";
                 $ret = 3

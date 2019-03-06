@@ -77,6 +77,7 @@ OpenXPKI/Client/SC/Utilities.pm
 OpenXPKI/Config/Backend.pm
 OpenXPKI/Config/Loader.pm
 OpenXPKI/Config/Lint/Dummy.pm
+OpenXPKI/Config/Lint/Role.pm
 
 # Config Connector
 OpenXPKI/Connector/FakeValidity.pm
