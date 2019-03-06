@@ -52,11 +52,6 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_DESC
 
-    FLAG_NOTIFY_SEND:
-        autorun: 1
-        action:
-          - flag_pending_notification_send > PENDING
-
     INITIAL:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC
@@ -72,7 +67,7 @@ state:
         autorun: 1
         action:
           - global_noop > PENDING ? pending_notification_send
-          - send_pending_notification > PENDING ? !pending_notification_send
+          - send_pending_notification flag_pending_notification_send > PENDING ? !pending_notification_send
 
     PENDING:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_PENDING_LABEL
@@ -268,7 +263,7 @@ condition:
         param:
             condition1: crr_is_autoapproval
             condition2: crr_has_approvals
-            condition3: crr_is_requestor_authorized
+            condition3: global_is_signer_authorized
 
     has_approvals:
         class: OpenXPKI::Server::Workflow::Condition::Approved
@@ -279,11 +274,6 @@ condition:
         class: Workflow::Condition::Evaluate
         param:
             test: $context->{flag_auto_approval}
-
-    is_requestor_authorized:
-        class: Workflow::Condition::Evaluate
-        param:
-            test: ($context->{signer_trusted} and $context->{signer_authorized})
 
 
     pending_notification_send:

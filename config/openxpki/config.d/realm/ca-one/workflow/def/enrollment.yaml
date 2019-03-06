@@ -683,7 +683,7 @@ condition:
     signer_cert_active:
         class: Workflow::Condition::LazyOR
         param:
-            condition2: scep_signer_validity_ok
+            condition2: global_is_signer_validity_ok
             condition1: scep_allow_expired_signer
             condition3: scep_self_signed_initial_scep
 

@@ -130,11 +130,6 @@ action:
             force: 1
             expiration_date: "+0000000003"
 
-    set_alias:
-        class: OpenXPKI::Server::Workflow::Activity::Noop
-        input:
-         - alias
-
     setfile_pkcs12:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetContextHash
         param:

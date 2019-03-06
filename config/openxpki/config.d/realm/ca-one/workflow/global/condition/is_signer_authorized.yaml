@@ -1,3 +1,5 @@
+# Note - this does NOT check for validity of the signer cert
+# Use is_signer_signature_valid for the full check
 class: Workflow::Condition::Evaluate
 param:
     test: ($context->{signer_trusted} and $context->{signer_authorized})

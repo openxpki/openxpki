@@ -116,11 +116,6 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_DESC
 
-    FLAG_NOTIFY_SEND:
-        autorun: 1
-        action:
-          - flag_pending_notification_send > CHECK_POLICY_VIOLATION
-
     INITIAL:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_INITIAL_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_INITIAL_DESC
@@ -210,7 +205,7 @@ state:
         autorun: 1
         action:
           - global_noop > CHECK_POLICY_VIOLATION ? pending_notification_send
-          - send_pending_notification > CHECK_POLICY_VIOLATION ?  !pending_notification_send
+          - send_pending_notification flag_pending_notification_send > CHECK_POLICY_VIOLATION ?  !pending_notification_send
 
     NOTIFY_REJECT:
         autorun: 1
@@ -801,6 +796,11 @@ condition:
         param:
             generate: client
 
+    pending_notification_send:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{flag_pending_notification_send}
+
     has_policy_violation:
         class: Workflow::Condition::Evaluate
         param:
@@ -820,11 +820,6 @@ condition:
         class: Workflow::Condition::Evaluate
         param:
             test: $context->{check_policy_key_duplicate_workflow}
-
-    pending_notification_send:
-        class: Workflow::Condition::Evaluate
-        param:
-            test: $context->{flag_pending_notification_send}
 
     server_key_generation:
         class: Workflow::Condition::Evaluate

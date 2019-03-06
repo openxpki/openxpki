@@ -32,7 +32,7 @@ state:
     SIGNED_REQUEST:
         autorun: 1
         action:
-          - set_mode_initial > START_INITIAL ? signer_subject_matches_csr_subject signer_key_matches_subject_key
+          - set_mode_initial > START_INITIAL ? is_self_signed
           - set_mode_onbehalf > START_ONBEHALF ? !signer_subject_matches_csr_subject
           - set_mode_renewal > START_RENEWAL ? signer_subject_matches_csr_subject !signer_key_matches_subject_key
 
@@ -92,9 +92,9 @@ state:
     START_RENEWAL:
         autorun: 1
         action:
-          - global_set_error_signer_revoked > FAILURE ? is_requestor_revoked is_signer_in_current_realm
-          - global_set_error_signer_expired > FAILURE ? !is_requestor_revoked !global_is_signer_validity_ok is_signer_in_current_realm
-          - set_renewal_period prepare_renewal load_recent_metadata > RENEWAL_PREPARED ? !is_requestor_revoked global_is_signer_validity_ok is_signer_in_current_realm
+          - global_set_error_signer_revoked > FAILURE ? global_is_signer_revoked is_signer_in_current_realm
+          - global_set_error_signer_expired > FAILURE ? !global_is_signer_revoked !global_is_signer_validity_ok is_signer_in_current_realm
+          - set_renewal_period prepare_renewal load_recent_metadata > RENEWAL_PREPARED ? !global_is_signer_revoked global_is_signer_validity_ok is_signer_in_current_realm
           - global_set_error_not_in_current_realm > FAILURE ? !is_signer_in_current_realm
 
 
@@ -115,10 +115,10 @@ state:
     START_ONBEHALF:
         autorun: 1
         action:
-          - global_set_error_signer_not_authorized > FAILURE ? !is_requestor_authorized !is_requestor_revoked
-          - global_set_error_signer_expired > FAILURE ? is_requestor_authorized !is_requestor_revoked !global_is_signer_validity_ok
-          - global_set_error_signer_revoked > FAILURE ? is_requestor_revoked global_is_signer_validity_ok
-          - global_noop > AUTHORIZED ? is_requestor_authorized !is_requestor_revoked global_is_signer_validity_ok
+          - global_set_error_signer_not_authorized > FAILURE ? !global_is_signer_authorized !global_is_signer_revoked
+          - global_set_error_signer_expired > FAILURE ? global_is_signer_authorized !global_is_signer_revoked !global_is_signer_validity_ok
+          - global_set_error_signer_revoked > FAILURE ? global_is_signer_revoked global_is_signer_validity_ok
+          - global_noop > AUTHORIZED ? global_is_signer_authorized !global_is_signer_revoked global_is_signer_validity_ok
 
     # common workflow
     AUTHORIZED:
@@ -537,16 +537,6 @@ action:
             target_key: certificate
 
 condition:
-    is_requestor_authorized:
-        class: Workflow::Condition::Evaluate
-        param:
-            test: ($context->{signer_trusted} and $context->{signer_authorized})
-
-    is_requestor_revoked:
-        class: Workflow::Condition::Evaluate
-        param:
-            test: ($context->{signer_revoked})
-
     is_anonymous_enrollment_allowed:
         class: Workflow::Condition::Evaluate
         param:
@@ -588,11 +578,6 @@ condition:
             hash_name: req_extensions
             condition: key_nonempty
             ds_key: certificateTemplateName
-
-    has_policy_violations:
-        class: Workflow::Condition::Evaluate
-        param:
-            test: ($context->{check_policy_dns} || $context->{check_policy_duplicate});
 
     is_eligible:
         class: Workflow::Condition::Evaluate

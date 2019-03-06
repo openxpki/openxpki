@@ -5,19 +5,27 @@ head:
 
 state:
     INITIAL:
-        action: initialize toarray > CHECK_AUTHORIZATION
+        action: initialize toarray > CHECK_BATCHMODE
+
+    CHECK_BATCHMODE:
+        autorun: 1
+        action:
+          - global_noop > PENDING  ? !global_is_automated_request
+          - check_authorized_signer > CHECK_AUTHORIZATION ? global_is_signed_request
 
     CHECK_AUTHORIZATION:
         autorun: 1
-        action: 
-         - queue_certs_to_revoke > HANDLE_REVOCATION_QUEUE ? is_requestor_authorized
-         - global_noop > PENDING ? !is_requestor_authorized
+        action:
+          - global_set_error_signer_not_authorized > FAILURE ? !global_is_signer_authorized !global_is_signer_revoked
+          - global_set_error_signer_expired > FAILURE ? global_is_signer_authorized !global_is_signer_revoked !global_is_signer_validity_ok
+          - global_set_error_signer_revoked > FAILURE ? global_is_signer_revoked global_is_signer_validity_ok
+          - global_noop > APPROVED ? global_is_signer_authorized !global_is_signer_revoked global_is_signer_validity_ok
 
     PENDING:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BULK_PENDING_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BULK_PENDING_DESC
         action:
-          - approve_crr > APPROVED ? acl_can_approve 
+          - approve_crr > APPROVED ? acl_can_approve
           - reject_crr > REJECTED ? acl_can_reject
         output:
           - reason_code
@@ -32,17 +40,17 @@ state:
 
     APPROVED:
         autorun: 1
-        action: queue_certs_to_revoke > HANDLE_REVOCATION_QUEUE 
+        action: queue_certs_to_revoke > HANDLE_REVOCATION_QUEUE
 
     HANDLE_REVOCATION_QUEUE:
         autorun: 1
-        action: 
+        action:
          - fetch_cert_from_queue > CHECK_CERT_STATUS ? !is_queue_empty
          - global_noop > SUCCESS ? is_queue_empty
-         
+
     CHECK_CERT_STATUS:
         autorun: 1
-        action: 
+        action:
           - revoke_certificate > HANDLE_REVOCATION_QUEUE ? is_certificate_issued
           - push_to_failed_queue > HANDLE_REVOCATION_QUEUE ? !is_certificate_issued
 
@@ -73,7 +81,7 @@ state:
           - cert_identifier_ignored
           - comment
 
-action: 
+action:
     initialize:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetSource
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_LABEL
@@ -85,7 +93,7 @@ action:
           - server
           - interface
           - signer_cert
-      
+
         validator:
           - global_reason_code
 
@@ -115,7 +123,7 @@ action:
             _map_comment: $comment
             flag_auto_approval : 1
             flag_batch_mode: 1
-  
+
     fetch_cert_from_queue:
         class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
         param:
@@ -158,11 +166,6 @@ condition:
             condition1: global_is_operator
 #           condition2: "!global_is_creator"
 
-    is_requestor_authorized:
-        class: Workflow::Condition::Evaluate
-        param:
-            test: ($context->{signer_trusted} and $context->{signer_authorized})
-
     is_queue_empty:
         class: OpenXPKI::Server::Workflow::Condition::WFArray
         param:
@@ -172,7 +175,7 @@ condition:
     is_certificate_issued:
         class: OpenXPKI::Server::Workflow::Condition::CertificateHasStatus
         param:
-          expected_status: ISSUED 
+          expected_status: ISSUED
 
 
 field:
@@ -194,7 +197,7 @@ field:
             [% FOREACH identifier = value %]
               [% IF Certificate.status(identifier) %]
                 <a target="modal" href="#certificate!detail!identifier![% identifier %]">
-                  [% Certificate.dn(identifier, 'CN') %] / [% Certificate.status(identifier) %] / [% identifier %]</a>| 
+                  [% Certificate.dn(identifier, 'CN') %] / [% Certificate.status(identifier) %] / [% identifier %]</a>|
               [% ELSE %]
                 Unknown / Unknown / [% identifier %]|
               [% END %]
@@ -212,7 +215,7 @@ field:
             [% FOREACH identifier = value %]
               [% IF Certificate.status(identifier) %]
                 <a target="modal" href="#certificate!detail!identifier![% identifier %]">
-                  [% Certificate.dn(identifier, 'CN') %] / [% Certificate.status(identifier) %] / [% identifier %]</a>| 
+                  [% Certificate.dn(identifier, 'CN') %] / [% Certificate.status(identifier) %] / [% identifier %]</a>|
               [% ELSE %]
                 Unknown / Unknown / [% identifier %]|
               [% END %]
