@@ -599,6 +599,7 @@ OpenXPKI/Server/Workflow/NICE/Local.pm
 
 OpenXPKI/Server/Workflow/Activity/NICE/CheckForRevocation.pm
 OpenXPKI/Server/Workflow/Activity/NICE/FetchCertificate.pm
+OpenXPKI/Server/Workflow/Activity/NICE/GenerateKey.pm
 OpenXPKI/Server/Workflow/Activity/NICE/IssueCRL.pm
 OpenXPKI/Server/Workflow/Activity/NICE/IssueCertificate.pm
 OpenXPKI/Server/Workflow/Activity/NICE/RenewCertificate.pm
