@@ -29,6 +29,14 @@ has '_config' => (
     default => sub { return CTX('config'); }
 );
 
+has 'logger' => (
+    is => 'ro',
+    isa => 'Object',
+    required => 0,
+    lazy => 1,
+    default => sub { return CTX('log')->workflow(); }
+);
+
 sub _build_workflow_config {
 
     my $self = shift;
@@ -163,7 +171,7 @@ sub __process_workflow {
             my @inline_action = split /\s+/, $action_name;
             $action_name = shift @inline_action;
 
-            CTX('log')->workflow()->debug("Adding action: $action_name -> $next_state");
+            $self->logger()->debug("Adding action: $action_name -> $next_state");
 
 
             my $prefix;
@@ -206,7 +214,7 @@ sub __process_workflow {
             # TODO - this is experimental!
             if (scalar @inline_action) {
 
-                CTX('log')->workflow()->debug("Auto append inline actions: " . join (" > ", @inline_action));
+                $self->logger()->debug("Auto append inline actions: " . join (" > ", @inline_action));
 
 
                 my $generator_name = uc($state_name.'_'.$item->{name}).'_%01d';
@@ -254,7 +262,7 @@ sub __process_workflow {
 
     push @{$self->_workflow_config()->{workflow}}, $workflow;
 
-    CTX('log')->workflow()->info("Adding workflow: $wf_name");
+    $self->logger()->info("Adding workflow: $wf_name");
 
 
     return $workflow;
@@ -279,7 +287,7 @@ sub __process_action {
     my $prefix;
     my @path = @{$path};
 
-    CTX('log')->workflow()->debug("Adding action definition: " . join (".", @path));
+    $self->logger()->debug("Adding action definition: " . join (".", @path));
 
 
     my $wf_name;
@@ -330,7 +338,7 @@ sub __process_action {
         my $required = $conn->get( [ @item_path, 'required' ] );
         my $is_required = (defined $required && $required =~ m/(yes|1)/i);
 
-        CTX('log')->workflow()->debug("Adding field $field_name / $context_key");
+        $self->logger()->debug("Adding field $field_name / $context_key");
 
 
         # Push to the field list for the action
@@ -364,7 +372,7 @@ sub __process_action {
         ##! 16: 'Validator path ' . Dumper \@item_path
         ##! 16: 'Validator arguments ' . Dumper @extra_args
 
-        CTX('log')->workflow()->debug("Adding validator $valid_name with args " . (join", ", @extra_args));
+        $self->logger()->debug("Adding validator $valid_name with args " . (join", ", @extra_args));
 
 
         # Push to the field list for the action
@@ -383,7 +391,7 @@ sub __process_action {
     my $param = $conn->get_hash([ @path, 'param' ] );
     map {  $action->{$_} = $param->{$_} } keys %{$param};
 
-    CTX('log')->workflow()->trace("Adding action " . (Dumper $action));
+    $self->logger()->trace("Adding action " . (Dumper $action));
 
 
     push @{$self->_workflow_config()->{action}}, $action;
@@ -409,7 +417,7 @@ sub __process_condition {
     my $prefix;
     my @path = @{$path};
 
-    CTX('log')->workflow()->debug("Adding condition " . join(".", @path));
+    $self->logger()->debug("Adding condition " . join(".", @path));
 
 
     my $wf_name;
@@ -440,7 +448,7 @@ sub __process_condition {
         $condition->{param} = \@param;
     }
 
-    CTX('log')->workflow()->trace("Adding condition " . (Dumper $condition));
+    $self->logger()->trace("Adding condition " . (Dumper $condition));
 
 
     push @{$self->_workflow_config()->{condition}}, $condition;
@@ -467,7 +475,7 @@ sub __process_validator {
     my $prefix;
     my @path = @{$path};
 
-    CTX('log')->workflow()->debug("Adding validator " . join(".", @path));
+    $self->logger()->debug("Adding validator " . join(".", @path));
 
 
     my $wf_name;
@@ -498,7 +506,7 @@ sub __process_validator {
         $validator->{param} = \@param;
     }
 
-    CTX('log')->workflow()->trace("Adding validator " . (Dumper $validator));
+    $self->logger()->trace("Adding validator " . (Dumper $validator));
 
 
     push @{$self->_workflow_config()->{validator}}, $validator;
