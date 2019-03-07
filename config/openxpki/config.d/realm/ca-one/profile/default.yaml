@@ -124,26 +124,6 @@ extensions:
             - http://openxpki.net/cps.html
           user_notice: This is a comment for policy oid 1.2.3.4
 
-    netscape:
-        comment:
-            critical: 0
-            text: This is a generic certificate. Generated with OpenXPKI trustcenter software.
-        certificate_type:
-            critical: 0
-            ssl_client:        0
-            smime_client:      0
-            object_signing:    0
-            ssl_client_ca:     0
-            smime_client_ca:   0
-            object_signing_ca: 0
-
-        cdp:
-            critical: 0
-            uri: http://localhost/cacrl.crt
-            ca_uri: http://localhost/cacrl.crt
-     # end of netscape section
-
-
 # I18N Placeholders for key settings
 # I18N_OPENXPKI_UI_KEY_ALG
 # I18N_OPENXPKI_UI_KEY_ALG_RSA
