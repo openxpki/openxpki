@@ -266,9 +266,16 @@ while (my $cgi = CGI::Fast->new()) {
                     die "Url based realm requested but no realm found for $script_realm!";
                 }
                 $log->debug('detected realm is ' . $config{realm}{$script_realm});
+
+                my ($realm, $stack) = split (/;/,$config{realm}{$script_realm});
+                $session_front->param('pki_realm', $realm);
+                if ($stack) {
+                    $session_front->param('auth_stack', $stack);
+                    $log->debug('Auto-Select stack based on realm path');
+                }
+            } else {
+                $log->warn('Unable to read realm from url path');
             }
-            $session_front->param('pki_realm', $config{realm}{$script_realm});
-            $log->debug('Path to realm: ' .$config{realm}{$script_realm});
         }
     } elsif ($realm_mode eq "fixed") {
         # Fixed realm mode, mode must be defined in the config
