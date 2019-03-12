@@ -1,12 +1,8 @@
-# OpenXPKI::Server::Workflow::Condition::WFHash
-# Written by Oliver Welter for the OpenXPKI project 2012
-# Copyright (c) 2012 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Condition::WFHash;
 
 use strict;
 use warnings;
-use base qw( Workflow::Condition );
+use base qw( OpenXPKI::Server::Workflow::Condition );
 use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Workflow::WFObject::WFHash;
@@ -14,77 +10,53 @@ use OpenXPKI::Debug;
 use Data::Dumper;
 use English;
 
-my @parameters = qw(
-    hash_name
-    condition
-    ds_key
-);
+sub _evaluate {
 
-__PACKAGE__->mk_accessors(@parameters);
-
-sub _init {
-    my ( $self, $params ) = @_;
-
-    # propagate workflow condition parametrisation to our object
-    foreach my $arg (@parameters) {
-        if ( defined $params->{$arg} ) {
-            $self->$arg( $params->{$arg} );
-        }
-    }
-
-    foreach my $arg (qw(hash_name condition ds_key)) {
-        if ( !( defined $self->$arg() ) ) {
-        configuration_error
-            "Missing parameter '.$arg.' in " .
-            "declaration of condition " . $self->name();
-        }
-    }
-}
-
-
-sub evaluate {
     my ( $self, $wf ) = @_;
     my $context = $wf->context();
 
+    my $hash_name = $self->param('hash_name');
 
-    my $hash = OpenXPKI::Server::Workflow::WFObject::WFHash->new(
-    {
+    my $hash = OpenXPKI::Server::Workflow::WFObject::WFHash->new({
         workflow => $wf,
-        context_key => $self->hash_name(),
-    } );
+        context_key => $hash_name,
+    });
 
-    my $key = $self->ds_key();
+    my $key =  $self->param('hash_key');
 
-    if ($key =~ m{ \A \$ (.*) }xms) {
-        $key = $context->param($1);
+    if (!$key) {
+        $key = $self->param('ds_key');
+        if ($key =~ m{ \A \$ (.*) }xms) {
+            $key = $context->param($1);
+        }
     }
 
-   my $val = $hash->valueForKey($key);
+    my $val = $hash->valueForKey($key);
 
-   ##! 16: ' Key: ' . $key . ' - Value ' . Dumper ( $val )
+    ##! 16: ' Key: ' . $key . ' - Value ' . Dumper ( $val )
 
-   CTX('log')->application()->debug("Testing if WFHash ". $self->hash_name() ." key $key is " . $self->condition());
+    my $condition = $self->param('condition');
+
+    CTX('log')->application()->debug("Testing if WFHash ". $hash_name ." key $key is " . $condition);
 
 
-    if ($self->condition() eq 'key_defined') {
+    if ($condition eq 'key_defined') {
        if (defined $val) {
            ##! 16: ' Entry is defined '
            return 1;
        }
        ##! 16: ' Entry not defined '
-       condition_error
-        'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WFHASH_KEY_NOT_DEFINED';
-    } elsif ($self->condition() eq 'key_nonempty') {
+       condition_error 'Condition wfhash key '.$key.' is not defined';
+    } elsif ($condition eq 'key_nonempty') {
        if (defined $val && $val) {
            ##! 16: ' Entry not empty '
            return 1;
        }
        ##! 16: ' Entry is empty '
-       condition_error
-        'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_WFHASH_KEY_IS_EMPTY';
+       condition_error 'Condition wfhash key '.$key.' is empty';
     } else {
         configuration_error
-            "Invalid condition " . $self->condition() . " in " .
+            "Invalid condition " . $condition . " in " .
             "declaration of condition " . $self->name();
     }
 }
@@ -98,13 +70,13 @@ OpenXPKI::Server::Workflow::Condition::WFHash
 
 =head1 SYNOPSIS
 
-  <condition
-     name="cert_exists"
-     class="OpenXPKI::Server::Workflow::Condition::WFHash">
-    <param name="hash_name" value="cert_map"/>
-    <param name="condition" value="key_defined"/>
-    <param name="ds_key" value="key_to_check"/>
-  </condition>
+  cert_exists:
+     class: OpenXPKI::Server::Workflow::Condition::WFHash
+     param:
+        hash_name: cert_map
+        condition: key_defined
+        hash_key: key_to_check
+
 
 =head1 DESCRIPTION
 
@@ -134,6 +106,13 @@ The key must be given with the "key" param.
 
 =back
 
+=head2 hash_key
+
+Name of the key to check
+
 =head2 ds_key
 
+B<Deprecated, please use hash_key instead!>
+
 If key starts with $, the key value is taken from the context parameter.
+
