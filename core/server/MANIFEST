@@ -424,6 +424,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/EvaluateEligibility.pm
 OpenXPKI/Server/Workflow/Activity/Tools/LoadPolicy.pm
 OpenXPKI/Server/Workflow/Activity/Tools/PrepareRenewal.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetAttribute.pm
+OpenXPKI/Server/Workflow/Activity/Tools/SetCreator.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetSource.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetErrorCode.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Notify.pm
