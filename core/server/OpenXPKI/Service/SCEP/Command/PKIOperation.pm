@@ -309,16 +309,13 @@ the workflow.
 
 If there is a workflow, the status of this workflow is looked up and the response
 depends on the status:
-  - if the status is not 'SUCCESS' or 'FAILURE', the request is still
-    pending, and a corresponding message is returned to the SCEP client.
+  - as long as the workflow is not in the "finished" process state, a
+    pending message is send.
   - if the status is 'SUCCESS', the certificate is extracted from the
     workflow and returned to the SCEP client.
-  - if the status is 'FAILURE' and the retry interval has not elapsed,
-    the failure code is extracted from the workflow and returned to
-    the client.
-  - if the status is 'FAILURE' and the retry interval has elapsed,
-    the failed workflow is unlinked from this transaction id and a
-    new one is started
+  - in any other case a FAILURE response is sent. If the context item
+    scep_error is set to a proper SCEP error code it is used, default
+    is to send "badRequest".
 
 =cut
 
@@ -532,9 +529,10 @@ sub __pkcs_req : PRIVATE {
 
     my @extra_header = ( "X-OpenXPKI-WorkflowId: " . $wf_info->{WORKFLOW}->{ID} );
 
-    if ( $wf_state ne 'SUCCESS' && $wf_state ne 'FAILURE' ) {
-        CTX('log')->application()->info("SCEP $workflow_id in state $wf_state, send pending reply");
+    my $proc_state = $wf_info->{WORKFLOW}->{'PROC_STATE'};
+    if ($proc_state ne 'finished') {
 
+        CTX('log')->application()->info("SCEP $workflow_id in state $wf_state, send pending reply");
 
         # we are still pending
         my $pending_msg = $token->command(
@@ -549,9 +547,12 @@ sub __pkcs_req : PRIVATE {
         }
 
         return [ \@extra_header, $pending_msg ];
+
+
     }
 
     if ( $wf_state eq 'SUCCESS' ) {
+
         # the workflow is finished,
         # get the certificate from the workflow
 
@@ -606,6 +607,7 @@ sub __pkcs_req : PRIVATE {
 
 
         return [ '', $certificate_msg ];
+
     }
 
     ##! 32: 'FAILURE'

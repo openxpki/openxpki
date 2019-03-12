@@ -101,9 +101,8 @@ sub execute {
     my $message_type = $token->command(
     {
         COMMAND     => 'get_message_type',
-            SCEP_HANDLE => $scep_handle,
-        }
-    );
+        SCEP_HANDLE => $scep_handle,
+    });
 
     CTX('log')->application()->info("LibSCEP PKIOperation; message type: " . $message_type);
     ##! 32: 'PKI message type ' . $message_type
@@ -112,7 +111,7 @@ sub execute {
         my $resp = $self->__pkcs_req(
             {   TOKEN       => $token,
                 PKCS7       => $pkcs7_base64,
-        SCEP_HANDLE => $scep_handle,
+                SCEP_HANDLE => $scep_handle,
                 PARAMS      => $url_params,
             }
         );
@@ -125,10 +124,10 @@ sub execute {
         # used by sscep after sending first request for polling
         my $resp = $self->__pkcs_req(
             {
-        TOKEN       => $token,
-                PKCS7       => $pkcs7_base64,
-        SCEP_HANDLE => $scep_handle,
-                PARAMS      => $url_params,
+            TOKEN       => $token,
+            PKCS7       => $pkcs7_base64,
+            SCEP_HANDLE => $scep_handle,
+            PARAMS      => $url_params,
             }
         );
         $result = $resp->[1];
@@ -136,27 +135,27 @@ sub execute {
     elsif ( $message_type eq 'GetCert' ) {
         $result = $self->__send_cert(
             {   TOKEN       => $token,
-        SCEP_HANDLE => $scep_handle,
+                SCEP_HANDLE => $scep_handle,
                 PARAMS      => $url_params,
             }
         );
     }
     elsif ( $message_type eq 'GetCRL' ) {
        $result = $self->__send_crl(
-	    {   TOKEN => $token,
-		SCEP_HANDLE => $scep_handle,
-		# FIXME: remove PKCS7 argument once bug in LibSCEP is fixed
-		PKCS7       => $pkcs7_base64,
-		PARAMS => $url_params,
-	    }
-	    );
+        {   TOKEN => $token,
+            SCEP_HANDLE => $scep_handle,
+            # FIXME: remove PKCS7 argument once bug in LibSCEP is fixed
+            PKCS7       => $pkcs7_base64,
+            PARAMS => $url_params,
+        }
+        );
     }
     else {
         $result = $token->command(
             {   COMMAND        => 'create_error_reply',
                 SCEP_HANDLE    => $scep_handle,
                 HASH_ALG       => CTX('session')->data->hash_alg,
-        ENCRYPTION_ALG => CTX('session')->data->enc_alg,
+                ENCRYPTION_ALG => CTX('session')->data->enc_alg,
                 ERROR_CODE     => 'badRequest',
             }
         );
@@ -221,11 +220,11 @@ sub __send_cert : PRIVATE {
 
         return $token->command(
             {
-        COMMAND         => 'create_error_reply',
-        SCEP_HANDLE     => $scep_handle,
-        ENCRYPTION_ALG  => CTX('session')->data->enc_alg,
+                COMMAND         => 'create_error_reply',
+                SCEP_HANDLE     => $scep_handle,
+                ENCRYPTION_ALG  => CTX('session')->data->enc_alg,
                 HASH_ALG        => CTX('session')->data->hash_alg,
-                'ERROR_CODE'    => 'badCertId',
+                ERROR_CODE      => 'badCertId',
             }
         );
     }
@@ -264,7 +263,7 @@ sub __send_crl : PRIVATE {
 
     my $serial = $token->command({
         COMMAND => 'get_getcert_serial',
-	SCEP_HANDLE => $scep_handle,
+    SCEP_HANDLE => $scep_handle,
     });
     ##! 16: 'serial: ' . $serial
 
@@ -296,7 +295,7 @@ sub __send_crl : PRIVATE {
             {   COMMAND      => 'create_error_reply',
                 SCEP_HANDLE  => $scep_handle,
                 HASH_ALG     => CTX('session')->data->hash_alg,
-		ENCRYPTION_ALG  => CTX('session')->data->enc_alg,
+        ENCRYPTION_ALG  => CTX('session')->data->enc_alg,
                 'ERROR_CODE' => 'badCertId',
             }
         );
@@ -315,7 +314,7 @@ sub __send_crl : PRIVATE {
             {   COMMAND      => 'create_error_reply',
                 SCEP_HANDLE  => $scep_handle,
                 HASH_ALG     => CTX('session')->data->hash_alg,
-		ENCRYPTION_ALG  => CTX('session')->data->enc_alg,
+                ENCRYPTION_ALG  => CTX('session')->data->enc_alg,
                 'ERROR_CODE' => 'badCertId',
             }
         );
@@ -354,16 +353,13 @@ the workflow.
 
 If there is a workflow, the status of this workflow is looked up and the response
 depends on the status:
-  - if the status is not 'SUCCESS' or 'FAILURE', the request is still
-    pending, and a corresponding message is returned to the SCEP client.
+  - as long as the workflow is not in the "finished" process state, a
+    pending message is send.
   - if the status is 'SUCCESS', the certificate is extracted from the
     workflow and returned to the SCEP client.
-  - if the status is 'FAILURE' and the retry interval has not elapsed,
-    the failure code is extracted from the workflow and returned to
-    the client.
-  - if the status is 'FAILURE' and the retry interval has elapsed,
-    the failed workflow is unlinked from this transaction id and a
-    new one is started
+  - in any other case a FAILURE response is sent. If the context item
+    scep_error is set to a proper SCEP error code it is used, default
+    is to send "badRequest".
 
 =cut
 
@@ -556,7 +552,9 @@ sub __pkcs_req : PRIVATE {
 
     my @extra_header = ( "X-OpenXPKI-WorkflowId: " . $wf_info->{WORKFLOW}->{ID} );
 
-    if ( $wf_state ne 'SUCCESS' && $wf_state ne 'FAILURE' ) {
+    my $proc_state = $wf_info->{WORKFLOW}->{'PROC_STATE'};
+    if ($proc_state ne 'finished') {
+
         CTX('log')->application()->info("SCEP $workflow_id in state $wf_state, send pending reply");
 
 
