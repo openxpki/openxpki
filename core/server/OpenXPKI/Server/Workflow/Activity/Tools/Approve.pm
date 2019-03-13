@@ -79,16 +79,19 @@ sub execute
 
     my $mode = $self->param('mode') || 'session';
 
+    my $approval = { mode => $mode };
+    if (my $comment = $self->param('comment')) {
+        $approval->{comment} = $comment;
+    }
+    if (my $points = $self->param('points')) {
+        $approval->{points} = $points;
+    }
+
     # read the approval info from the activity parameter
     if ($mode eq 'generated') {
 
-        my $comment = $self->param('comment');
-
-        configuration_error('The comment parameter is mandatory in generated mode') unless ($comment);
-        push @approvals, {
-            'mode'      => 'generated',
-            'comment'   => $comment,
-        };
+        configuration_error('The comment parameter is mandatory in generated mode') unless ($approval->{comment});
+        push @approvals, $approval;
 
     } elsif ($mode eq 'session') {
         # look for already present approval by this user with this role
@@ -97,18 +100,18 @@ sub execute
                    $_->{session_role} eq $role} @approvals)) {
             ##! 64: 'multi role approval enabled and (user, role) pair not found in present approvals'
             push @approvals, {
-                'mode'              => 'session',
-                'session_user'      => $user,
-                'session_role'      => $role,
+                %$approval,
+                'session_user' => $user,
+                'session_role' => $role,
             };
         }
         elsif (! $self->param('multi_role_approval') &&
                ! grep {$_->{session_user} eq $user} @approvals) {
             ##! 64: 'multi role approval disabled and user not found in present approvals'
             push @approvals, {
-                'mode'              => 'session',
-                'session_user'      => $user,
-                'session_role'      => $role,
+                %$approval,
+                'session_user' => $user,
+                'session_role' => $role,
             };
         }
         CTX('log')->application()->info('Unsigned approval for workflow ' . $workflow->id() . " by user $user, role $role");
@@ -127,7 +130,6 @@ sub execute
     ##! 64: 'approvals serialized: ' . Dumper $approvals
 
     CTX('log')->application()->debug('Total number of approvals ' . scalar @approvals);
-
 
     $context->param ('approvals' => $approvals);
 
@@ -189,6 +191,10 @@ Boolean, allow multiple approvals by same user with differen roles
 
 The approval comment to add for generated approvals, mandatory in
 generated mode.
+
+=item points
+
+Number of points that this approval is worth. Default is one point.
 
 =back
 

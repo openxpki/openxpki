@@ -24,22 +24,31 @@ sub execute {
 
     # TODO - might be useful to have options to weight/filter approvals
 
-    my $approvals = 0;
-    if ($context->param('approvals')) {
+    my $approval_points = 0;
+    if (my $approvals = $context->param('approvals')) {
 
-        if ($context->param('approvals') && !ref $context->param('approvals')) {
-            $approvals = scalar ( @{ $serializer->deserialize( $context->param('approvals') ) } );
-        } elsif(ref $context->param('approvals') eq 'ARRAY') {
-            $approvals = scalar ( @{$context->param('approvals')} );
-        } else {
-            CTX('log')->application()->debug('No approvals or value in invalid format!');
+        if (OpenXPKI::Serialization::Simple::is_serialized($approvals)) {
+            $approvals = OpenXPKI::Serialization::Simple->new()->deserialize($approvals);
+        }
 
+        if (ref $approvals eq 'ARRAY') {
+            foreach my $approval (@{$approvals}) {
+                if (defined $approval->{points}) {
+                    $approval_points += $approval->{points};
+                } else {
+                    $approval_points += 1;
+                }
+            }
         }
     }
 
-    CTX('log')->application()->info(sprintf ('Approval points for workflow %01d: %01d', $workflow->id, $approvals));
+    if (!$approval_points) {
+        CTX('log')->application()->debug('No approvals or value in invalid format!');
+    } else {
+        CTX('log')->application()->info(sprintf ('Approval points for workflow %01d: %01d', $workflow->id, $approval_points));
+    }
 
-    $context->param({ $target_key => $approvals });
+    $context->param({ $target_key => $approval_points });
 
 
     return 1;
@@ -57,7 +66,8 @@ OpenXPKI::Server::Workflow::Activity::Tools::CalculateApprovalPoints
 =head1 Description
 
 Generate a numeric value (approval points) from the list of approvals.
-Each approval is worth one point.
+By default each approval is worth one point unless the record contains a
+parameter I<points> inside.
 
 =head1 Configuration
 
