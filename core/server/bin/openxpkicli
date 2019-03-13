@@ -40,14 +40,14 @@ sub debug {
 
 sub print_json {
     my $msg = shift;
-    print JSON->new->pretty(1)->encode($msg);
+    print JSON->new->pretty($params{json} eq 'pretty')->encode($msg);
 }
 
 sub output {
 
     my $msg = shift;
 
-    if ($params{json}) {
+    if (defined $params{json}) {
         print_json($msg);
     } elsif ($msg->{error}) {
         my $err = $msg->{error}->{LIST}->[0];
@@ -78,7 +78,7 @@ GetOptions(\%params,
             timeout|to=i
             session
             debug
-            json
+            json:s
             legacy
          )) or pod2usage(-verbose => 0);
 
@@ -87,7 +87,7 @@ pod2usage(-verbose => 1) if ($params{help});
 
 my %args;
 # command with json data
-if (scalar @ARGV == 2 && $params{json}) {
+if (scalar @ARGV == 2 && defined $params{json}) {
 
     # If it does not start with a { it is a filename
     my $json_data = pop @ARGV;
@@ -227,7 +227,7 @@ while (1) {
 
     if ($status eq 'GET_PKI_REALM') {
         if (! $params{realm}) {
-            if ($params{json}) {
+            if (defined $params{json}) {
                 print_json({ result => { pki_realm => keys %{$reply->{PARAMS}->{PKI_REALMS}} } });
             } else {
                 print "Available PKI realms:\n";
@@ -245,7 +245,7 @@ while (1) {
 
     if ($reply->{SERVICE_MSG} eq 'GET_AUTHENTICATION_STACK') {
         if (!$params{authstack}) {
-            if ($params{json}) {
+            if (defined $params{json}) {
                 print_json({ result => { auth_stack => keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}} } });
             } else {
                 print "Available authentication stacks:\n";
@@ -360,6 +360,7 @@ openxpkicli [options] command
     --debug               enable debug mode
     --timeout             socket timeout in seconds (default 30s)
     --json                activate json output mode
+    --json=pretty         human readble json
     --json {"key":"val"}  parse given string and merge with arguments
     --json FILE           read json string from FILE and merge with arguments
     --session             session mode, see below for details

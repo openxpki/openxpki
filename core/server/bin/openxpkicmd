@@ -46,19 +46,23 @@ sub dump_workflow {
 
     if ($params{context} && $reply->{PARAMS}->{WORKFLOW}->{CONTEXT}) {
 
-        if ($params{json}) {
+        if (defined $params{json}) {
             $json->{context} = $reply->{PARAMS}->{WORKFLOW}->{CONTEXT};
         } else {
             print "\n===Context===\n";
             my $context = $reply->{PARAMS}->{WORKFLOW}->{CONTEXT};
             foreach my $key (sort keys %{$context}) {
-                printf "=%-20s: %s\n", $key, $context->{$key} if (defined $context->{$key});
+                my $val = $context->{$key};
+                if (!defined $val) {
+                    $val = 'undef';
+                }
+                printf "=%-20s: %s\n", $key, $val;
             }
         }
     }
 
     if ($params{attribute} && $reply->{PARAMS}->{WORKFLOW}->{ATTRIBUTE}) {
-        if ($params{json}) {
+        if (defined $params{json}) {
             $json->{attribute} = $reply->{PARAMS}->{WORKFLOW}->{ATTRIBUTE};
         } else {
             print "\n===Attributes===\n";
@@ -69,10 +73,11 @@ sub dump_workflow {
         }
     }
 
-    if ($params{json}) {
+    if (defined $params{json}) {
         $json->{workflow} = { id => $reply->{PARAMS}->{WORKFLOW}->{ID},
             state => $reply->{PARAMS}->{WORKFLOW}->{STATE} };
-        print JSON::to_json($json);
+
+        print JSON->new->pretty($params{json} eq 'pretty')->encode($json);
         print "\n";
     }
 }
@@ -94,7 +99,7 @@ GetOptions(\%params,
             debug
             context
             attribute
-            json
+            json:s
             timeout|to=i
          )) or pod2usage(-verbose => 0);
 
@@ -231,7 +236,7 @@ if ($params{wfid}) {
         );
 
         if ($reply->{SERVICE_MSG} eq 'COMMAND') {
-            printf "New Workflow State: %s\n", $reply->{PARAMS}->{WORKFLOW}->{STATE} unless($params{json});
+            printf "New Workflow State: %s\n", $reply->{PARAMS}->{WORKFLOW}->{STATE} unless(defined $params{json});
             dump_workflow( $reply );
         }
     } else {
@@ -245,7 +250,7 @@ if ($params{wfid}) {
         if ($reply->{SERVICE_MSG} eq 'COMMAND') {
 
             my $json = {};
-            if (!$params{json}) {
+            if (!defined $params{json}) {
                 print "Possible Actions:\n";
                 print join "\n", @{$reply->{PARAMS}};
                 print "\n";
@@ -253,7 +258,7 @@ if ($params{wfid}) {
                 $json = { actions => $reply->{PARAMS} };
             }
 
-            if ($params{context} || $params{attribute} || $params{json}) {
+            if ($params{context} || $params{attribute} || defined $params{json}) {
                 $reply = $client->send_receive_command_msg( 'get_workflow_info',
                     {
                         ID => $params{wfid},
@@ -278,7 +283,7 @@ if ($params{wfid}) {
 
     if ($reply->{SERVICE_MSG} eq 'COMMAND') {
         printf "Workflow created (ID: %d), State: %s\n", $reply->{PARAMS}->{WORKFLOW}->{ID}, $reply->{PARAMS}->{WORKFLOW}->{STATE}
-            unless($params{json});
+            unless(defined $params{json});
         dump_workflow( $reply );
     }
 
@@ -316,7 +321,8 @@ openxpkicmd [options] WORKFLOW_TYPE
     --debug               enable debug mode
     --context             show context data
     --attribute           show attribute data
-    --json                dump data using json (experimental)
+    --json                dump data using json
+    --json=pretty         human readble json
     --timeout             socket timeout in seconds (default 30s)
 
 =head1 INVOCATION
