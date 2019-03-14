@@ -33,6 +33,8 @@ B<Parameters>
 
 =item * DER
 
+=item * PKCS7
+
 =item * TXT
 
 =item * TXTPEM
@@ -58,7 +60,7 @@ lowercase keys. Additionally the following keys changed:
 =cut
 command "get_cert" => {
     identifier => { isa => 'Base64', required => 1, },
-    format     => { isa => 'AlphaPunct', matching => qr{ \A ( PEM | DER | TXT | TXTPEM | HASH | DBINFO ) \Z }x, default => "HASH" },
+    format     => { isa => 'AlphaPunct', matching => qr{ \A ( PEM | DER | TXT | TXTPEM | HASH | DBINFO | PKCS7 ) \Z }x, default => "HASH" },
 } => sub {
     my ($self, $params) = @_;
 

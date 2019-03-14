@@ -160,7 +160,7 @@ The subject of the certificate
 
 =item ca
 
-The PEM encoded ca certificate, might be empty if the chain can not
+The PEM encoded root certificate, might be empty if the chain can not
 be completed.
 
 =item key
