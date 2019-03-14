@@ -1,10 +1,15 @@
 head:
     prefix: estenroll
-    persister: Volatile
+#persister: Volatile
 
 state:
     INITIAL:
-        action: initialize parse_request set_profile global_render_subject global_persist_csr global_nice_issue_certificate > SUCCESS
+        action: initialize parse_request set_profile global_render_subject global_persist_csr set_workflow_attributes > PENDING
+
+    PENDING:
+      autorun: 1
+      action:
+        - global_nice_issue_certificate > SUCCESS
 
     SUCCESS: ~
 
@@ -15,6 +20,7 @@ action:
           - server
           - interface
           - pkcs10
+          - transaction_id
 
     set_profile:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
@@ -27,6 +33,13 @@ action:
         param:
             req_extensions: certificateTemplate certificateTemplateName challengePassword
 
+    set_workflow_attributes:
+         class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
+         param:
+            _map_cert_subject: "[% IF context.cert_subject %][% context.cert_subject %][% ELSE %][% context.csr_subject %][% END %]"
+            _map_transaction_id: $transaction_id
+
+
 acl:
     System:
         creator: any
@@ -34,5 +47,11 @@ acl:
 
     RA Operator:
         creator: any
+        fail: 1
+        resume: 1
+        wakeup: 1
+        history: 1
+        techlog: 1
         context: 1
+
 
