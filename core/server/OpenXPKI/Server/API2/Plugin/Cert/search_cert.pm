@@ -284,7 +284,7 @@ sub _make_db_query {
     }
 
     # only list entities issued by this ca
-    if ($po->has_entity_only) {
+    if ($po->has_entity_only && $po->entity_only) {
         $where->{'certificate.req_key'} = { "!=" => undef };
     }
 
