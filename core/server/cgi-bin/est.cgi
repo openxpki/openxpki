@@ -35,9 +35,9 @@ while (my $cgi = CGI::Fast->new()) {
     # cacerts, simpleenroll, simplereenroll, fullcmc, serverkeygen, csrattrs
 
     $log->debug('Incoming request ' . $ENV{REQUEST_URI});
-    $ENV{REQUEST_URI} =~ m{.well-known/est/(\w+/)?(cacerts|simpleenroll|simplereenroll|csrattrs)};
-    my $label = $1;
-    my $operation = $2;
+    $ENV{REQUEST_URI} =~ m{.well-known/est/((\w+)/)?(cacerts|simpleenroll|simplereenroll|csrattrs)};
+    my $label = $2;
+    my $operation = $3;
 
     if (!$operation) {
 
@@ -49,6 +49,60 @@ while (my $cgi = CGI::Fast->new()) {
     }
 
     my $conf =  $label ? $config->load_config($label) : $config->default();
+
+    my $param = {};
+
+    my $servername = $conf->{$operation}->{env} || $conf->{global}->{servername};
+    # if given, append to the paramter list
+    if ($servername) {
+        $param->{'server'} = $servername;
+        $param->{'interface'} = 'est';
+    }
+
+    my %envkeys;
+    if ($conf->{$operation}->{env}) {
+        %envkeys = map {$_ => 1} (split /\s*,\s*/, $conf->{$operation}->{env});
+    } elsif ($operation =~ /enroll/) {
+        %envkeys = ( signer_cert => 1 );
+    }
+
+    # IP Transport
+    if ($envkeys{'client_ip'}) {
+        $param->{'client_ip'} = $ENV{REMOTE_ADDR};
+    }
+
+    # Gather data from TLS session
+    my $auth_dn = '';
+    my $auth_pem = '';
+    if ( defined $ENV{HTTPS} && lc( $ENV{HTTPS} ) eq 'on' ) {
+
+        $log->debug("calling context is https");
+        $auth_dn = $ENV{SSL_CLIENT_S_DN};
+        $auth_pem = $ENV{SSL_CLIENT_CERT};
+        if ( defined $auth_dn ) {
+            $log->info("EST authenticated client DN: $auth_dn");
+
+            if ($envkeys{'signer_dn'}) {
+                $param->{'signer_cert'} = $auth_dn;
+            }
+            if ($auth_pem && $envkeys{'signer_cert'}) {
+                $param->{'signer_cert'} = $auth_pem;
+            }
+        }
+        else {
+            $log->debug("EST unauthenticated (no cert)");
+        }
+
+    } elsif ($conf->{global}->{insecure}) {
+        # this violates the RFC but it might just be used as a commodity
+        $log->debug("EST unauthenticated (plain http)");
+    } else {
+        print $cgi->header( -status => '403 Forbidden');
+        print 'HTTPS required ';
+        $log->error('Request via insecure connection');
+        next;
+
+    }
 
     # create the client object
     my $client = OpenXPKI::Client::Simple->new({
@@ -62,10 +116,6 @@ while (my $cgi = CGI::Fast->new()) {
         next;
     }
 
-    my $params = {
-        server => 'default',
-        interface => 'est',
-    };
 
     my $out;
     my $mime = "application/pkcs7-mime; smime-type=certs-only";
@@ -74,7 +124,7 @@ while (my $cgi = CGI::Fast->new()) {
 
         my $workflow = $client->handle_workflow({
             TYPE => $conf->{cacerts}->{workflow} || 'est_cacerts',
-            PARAMS =>$params
+            PARAMS => $param
         });
 
         $log->trace( 'Workflow info '  . Dumper $workflow );
@@ -88,7 +138,7 @@ while (my $cgi = CGI::Fast->new()) {
 
         my $workflow = $client->handle_workflow({
             TYPE =>  $conf->{csrattrs}->{workflow} || 'est_csrattrs',
-            PARAMS => $params
+            PARAMS => $param
         });
 
         $out = $workflow->{CONTEXT}->{output};
@@ -106,25 +156,25 @@ while (my $cgi = CGI::Fast->new()) {
         }
 
         if ($pkcs10 =~ /BEGIN CERTIFICATE REQUEST/) {
-            $params->{pkcs10} = $pkcs10;
+            $param->{pkcs10} = $pkcs10;
         } else {
-            $params->{pkcs10} = "-----BEGIN CERTIFICATE REQUEST-----\n$pkcs10\n-----END CERTIFICATE REQUEST-----";
+            $param->{pkcs10} = "-----BEGIN CERTIFICATE REQUEST-----\n$pkcs10\n-----END CERTIFICATE REQUEST-----";
         }
 
         Crypt::PKCS10->setAPIversion(1);
-        my $decoded = Crypt::PKCS10->new($params->{pkcs10}, ignoreNonBase64 => 1, verifySignature => 1);
+        my $decoded = Crypt::PKCS10->new($param->{pkcs10}, ignoreNonBase64 => 1, verifySignature => 1);
         if (!$decoded) {
             $log->error('Unable to parse PKCS10: '. Crypt::PKCS10->error);
-            $log->debug($params->{pkcs10});
+            $log->debug($param->{pkcs10});
             print $cgi->header( -status => '400 Bad Request');
             next;
         }
         my $transaction_id = sha1_hex($decoded->csrRequest);
 
         Log::Log4perl::MDC->put('tid', $transaction_id);
-        $params->{transaction_id} = $transaction_id;
+        $param->{transaction_id} = $transaction_id;
 
-        my $workflow_type = $conf->{enroll}->{workflow} || 'est_enroll';
+        my $workflow_type = $conf->{simpleenroll}->{workflow} || 'certificate_enroll';
 
         my $wfl = $client->run_command('search_workflow_instances', {
             type => $workflow_type,
@@ -150,10 +200,10 @@ while (my $cgi = CGI::Fast->new()) {
         } else {
             $workflow = $client->handle_workflow({
                 TYPE => $workflow_type,
-                PARAMS => $params
+                PARAMS => $param
             });
             $log->info('Started new workflow ' . $workflow->{ID});
-            $log->trace( 'Workflow Params '  . Dumper $params);
+            $log->trace( 'Workflow Params '  . Dumper $param);
         }
 
         if (( $workflow->{'PROC_STATE'} ne 'finished' && !$workflow->{ID} ) || $workflow->{'PROC_STATE'} eq 'exception') {
