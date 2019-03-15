@@ -60,7 +60,8 @@ sub execute {
 
     # Get Issuer Info from selected ca
     $data->{dn} = $x509->{PARSED}->{BODY}->{SUBJECT_HASH};
-    $data->{subject} = $self->{PARSED}->{BODY}->{SUBJECT};
+    $data->{subject} = $x509->{PARSED}->{BODY}->{SUBJECT};
+    $data->{subject_key_identifier} = $x509->{KEYID};
 
     $data->{pem} = $x509->get_converted('PEM');
     $data->{der} = $x509->get_converted('DER');

@@ -140,6 +140,7 @@ sub execute {
     # Get Issuer Info from selected ca
     $data->{issuer} = $x509_issuer->{PARSED}->{BODY}->{SUBJECT_HASH};
     $data->{subject} = $x509_issuer->{PARSED}->{BODY}->{SUBJECT};
+    $data->{subject_key_identifier} = $x509_issuer->{KEYID};
 
     my @target;
     my @prefix = split ( /\./, $prefix );
