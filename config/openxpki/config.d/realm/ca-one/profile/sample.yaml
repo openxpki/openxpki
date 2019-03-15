@@ -24,8 +24,6 @@ style:
     00_basic_style:
         label: I18N_OPENXPKI_PROFILE_TLS_BASIC_STYLE
         description: I18N_OPENXPKI_PROFILE_TLS_BASIC_DESC
-        # Default style in bulk requests
-        bulk: 0
         # Define which input fields you want on the UI
         # Just put their names here and define them at the end
         # in the "template" section.
@@ -81,15 +79,12 @@ style:
         # No SAN definition here!
 
 
-role:
-    - Web Server
-
 # Profile extensions - set 0/1 as needed
 extensions:
     basic_constraints:
         critical: 1
         ca: 0
-        path_length: 0 # FIXME?
+        path_length: 0
 
     key_usage:
         critical: 0
