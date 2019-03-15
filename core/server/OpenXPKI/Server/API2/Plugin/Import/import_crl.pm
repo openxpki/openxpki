@@ -39,6 +39,8 @@ Returns a I<HashRef> with the CRL informations inserted into the database, e.g.:
         next_update => 3098356123,
         pki_realm => 'ca-one',
         publication_date => 0,
+        items =>  42,
+        crl_number  => 1234567,
     }
 
 B<Parameters>
@@ -98,6 +100,7 @@ command "import_crl" => {
 
     my $serial = $dbi->next_id('crl');
     my $ca_identifier = $issuer->{identifier};
+
 
     my %data_crl_obj = $crl_obj->to_db_hash(); # keys: DATA, LAST_UPDATE, NEXT_UPDATE
     my $data = {
