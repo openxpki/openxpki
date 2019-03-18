@@ -36,7 +36,7 @@ while (my $cgi = CGI::Fast->new()) {
 
     $log->debug('Incoming request ' . $ENV{REQUEST_URI});
     $ENV{REQUEST_URI} =~ m{.well-known/est/((\w+)/)?(cacerts|simpleenroll|simplereenroll|csrattrs)};
-    my $label = $2;
+    my $label = $2 || '';
     my $operation = $3;
 
     if (!$operation) {
@@ -48,11 +48,14 @@ while (my $cgi = CGI::Fast->new()) {
 
     }
 
-    my $conf =  $label ? $config->load_config($label) : $config->default();
+    # set label as endpoint
+    $config->endpoint($label);
+
+    my $conf = $config->load_config();
 
     my $param = {};
 
-    my $servername = $conf->{$operation}->{env} || $conf->{global}->{servername};
+    my $servername = $conf->{$operation}->{servername} || $conf->{global}->{servername};
     # if given, append to the paramter list
     if ($servername) {
         $param->{'server'} = $servername;
@@ -69,6 +72,10 @@ while (my $cgi = CGI::Fast->new()) {
     # IP Transport
     if ($envkeys{'client_ip'}) {
         $param->{'client_ip'} = $ENV{REMOTE_ADDR};
+    }
+
+    if ($envkeys{'endpoint'}) {
+        $param->{'endpoint'} = $config->endpoint();
     }
 
     # Gather data from TLS session

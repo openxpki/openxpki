@@ -218,17 +218,14 @@ sub config() {
 
     # Test for specific config file based on script name
     # SCRIPT_URL is only available with mod_rewrite
-    my $file;
     if (defined $ENV{SCRIPT_URL}) {
         $ENV{SCRIPT_URL} =~ qq|${service}/([^/]+)(/([\\w\\-\\/]*))?\$|;
-        $file = "$1.conf";
         $self->endpoint($1);
         $self->route($3) if ($3);
 
     # Should always work
     } elsif (defined $ENV{REQUEST_URI}) {
         $ENV{REQUEST_URI} =~ qq|${service}/([^/\?]+)(/([\\w\\-\\/]*))?(\\?.*)?\$|;
-        $file = "$1.conf";
         $self->endpoint($1);
         $self->route($3) if ($3);
 
@@ -240,7 +237,7 @@ sub config() {
     }
 
     # non existing files and other errors are handled inside loader
-    return $self->load_config($file);
+    return $self->load_config();
 }
 
 sub load_config {
@@ -249,6 +246,11 @@ sub load_config {
     my $file = shift;
 
     my $configfile = '';
+
+    if (!$file && $self->endpoint()) {
+        $file = $self->endpoint().'.conf';
+    }
+
     if ($file) {
         $self->logger()->debug('Autodetect config file for service ' . $self->service() . ': ' . $file );
         $file = File::Spec->catfile( ($self->basepath() ), $file );

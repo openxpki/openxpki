@@ -291,6 +291,10 @@ while (my $cgi = CGI::Fast->new()) {
         $param->{'client_ip'} = $ENV{REMOTE_ADDR};
     }
 
+    if ($envkeys{'endpoint'}) {
+        $param->{'endpoint'} = $config->endpoint();
+    }
+
     # Gather data from TLS session
     my $auth_dn = '';
     my $auth_pem = '';
