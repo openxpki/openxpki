@@ -19,6 +19,7 @@ action:
         input:
           - server
           - interface
+          - endpoint
           - pkcs10
           - transaction_id
 
