@@ -40,6 +40,7 @@ sub new {
     $self->{TYPE}   = $keys->{TYPE} // 'Fork';
     $self->{CONFIG} = $keys->{CONFIG};
     $self->{SILENT} = $keys->{SILENT};
+    $self->{BACKGROUND} = ($keys->{NODETACH} ? 0 : 1);
 
     ## group access is allowed
     $self->{umask} = 0007; # octal
@@ -633,11 +634,11 @@ sub __get_server_config {
     }
     elsif ($self->{TYPE} eq 'Fork') {
         $params{server_type} = 'Fork';
-        $params{background}  = 1;
+        $params{background} = $self->{BACKGROUND};
     }
     elsif ($self->{TYPE} eq 'PreFork') {
         $params{server_type} = 'PreFork';
-        $params{background}  = 1;
+        $params{background} = $self->{BACKGROUND};
 
         foreach my $key (('min_servers','min_spare_servers','max_spare_servers','max_servers','max_requests')) {
             if (my $val = $config->get(['system','server','prefork',$key])) {

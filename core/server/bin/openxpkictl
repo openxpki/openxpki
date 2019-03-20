@@ -32,6 +32,7 @@ GetOptions(\%params,
           keep-temp-files=s
           quiet
           fg|foreground
+          nd|no-detach
           )) or pod2usage(-verbose => 0);
 
 if ($params{version}) {
@@ -78,6 +79,10 @@ if ($cmd eq 'status') {
 
     if (defined $params{fg}) {
         $args->{FOREGROUND} = 1;
+    }
+
+    if (defined $params{nd}) {
+        $args->{NODETACH} = 1;
     }
 
     if (defined $params{debug}) {
@@ -172,6 +177,9 @@ openxpkictl [options] COMMAND
 
    --foreground
         Use a non-forking server: only useful for debugging or profiling.
+
+   --no-detach
+        Do not fork away the control process - useful for docker/systemd
 
  Commands:
    start            Start OpenXPKI daemon

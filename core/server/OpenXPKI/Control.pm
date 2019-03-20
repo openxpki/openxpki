@@ -94,7 +94,7 @@ sub start {
     my $args = shift;
     my $silent = $args->{SILENT};
     my $pid        = $args->{PID};
-    my $foreground = $args->{FOREGROUND};
+    my $foreground = $args->{FOREGROUND} || $args->{NODETACH};
     my $restart = $args->{RESTART} || $args->{FOREGROUND};
     my $debug_level = $args->{DEBUG_LEVEL} || 0;
     my $debug_bitmask = $args->{DEBUG_BITMASK} || 0;
@@ -254,7 +254,8 @@ sub start {
             require OpenXPKI::Server;
             my $server = OpenXPKI::Server->new(
                 'SILENT' => $silent ? 1 : 0,
-                'TYPE'   => 'Simple',
+                'TYPE'   => ($args->{FOREGROUND} ? 'Simple' : $config->{TYPE}),
+                'NODETACH' => $args->{NODETACH}
             );
             $server->start;
         };
