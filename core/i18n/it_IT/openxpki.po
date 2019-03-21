@@ -61,6 +61,10 @@ msgstr "Respingi Richiesta"
 msgid "I18N_OPENXPKI_UI_BULK_REJECT_CSR_LABEL"
 msgstr "Respingi Richiesta"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_ATTRIBUTE_FAILED"
+msgstr "Numero di serie del certificato"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL"
 msgstr ""
 "Mostra i dettagli di un singolo certificato, ricercato per identificatore "
@@ -254,6 +258,15 @@ msgstr ""
 "Non_prima_del / Non_dopo_il."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_DOES_NOT_MATCH_REGEX"
+msgstr ""
+"Modulo per la ricerca dei certificati. Il campo SAN richiede che il tipo SAN "
+"venga separato con i due punti, ad es. DNS:www2.openxpki.org.<br>Gli stati "
+"Valido/Scaduto presuppongono che il certificato sia nello stato Emesso: "
+"viene eseguito un controllo relativo alla finestra di validità "
+"Non_prima_del / Non_dopo_il."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_INVALID_ITEM_COUNT"
 msgstr "Richiesta non valida - nessuna azione"
 
@@ -347,6 +360,25 @@ msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr ""
 "Con la Revoca ritardata, puoi programmare la revoca di un certificato in una "
 "data futura."
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
+msgstr "Mostra Liste Revoche (CRL)"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DNS_CHECK_OK"
+msgstr "Mostra Liste Revoche (CRL)"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DNS_CHECK_SKIPPED"
+msgstr "Mostra Liste Revoche (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DNS_CHECK_TIMEOUT"
+msgstr "Errore timeout di rete nella richiesta di trasferimento scp"
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE"
 msgstr ""
@@ -548,6 +580,18 @@ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_ALIAS_PLACEHOLDER"
 msgstr "Please select the key algorithm"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_DESC"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_LABEL"
+msgstr "Password"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_TOOLTIP"
+msgstr "Password"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_FILENAME_LABEL"
 msgstr "FALLIMENTO"
 
@@ -590,6 +634,14 @@ msgstr " "
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_LABEL"
 msgstr "Password"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_UNENCRYPTED_DESC"
+msgstr "Descrizione del profilo client OpenVPN per gli utenti"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_UNENCRYPTED_LABEL"
+msgstr "FALLIMENTO"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATE_KEY_FAILED"
@@ -939,6 +991,14 @@ msgstr "Nome Organizzazione"
 msgid "I18N_OPENXPKI_UI_PROFILE_NODEID_DESC"
 msgstr "Nome Organizzazione"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_DESC"
+msgstr "Nome Organizzazione"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_SIGNER"
+msgstr "User Certificate"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_OPENVPN_CLIENT_LABEL"
 msgstr "Certificato client OpenVPN"
 
@@ -1139,6 +1199,10 @@ msgstr "Nessun dato disponibile"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID"
 msgstr "Il token di firma della CRL non è online"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REQUEST_WORKFLOW_ID"
+msgstr "Workflow"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_REVOCATION_WORKFLOW_ID"
@@ -3633,9 +3697,6 @@ msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER"
 #~ msgstr "TLS Server profile"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_USER"
-#~ msgstr "User Certificate"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_RENEWAL_SUBJECT_CHANGED_WARNING"

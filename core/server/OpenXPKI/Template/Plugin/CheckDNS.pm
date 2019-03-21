@@ -104,7 +104,11 @@ sub _init_dns {
 =head3 valid
 
 Expects the fqdn to check as argument. Returns the fqdn wrapped into a
-span element with css class I<dns-failed>, I<dns-valid> or I<dns-timeout>.
+span element with css class I<dns-failed>, I<dns-valid>, I<dns-timeout> or
+I<dns-skipped>. Isolated hostnames or strings that do not appear to be a valid
+fqdn are not checked and directly set to I<dns-failed>, domains starting with
+an asterisk (wildcard domains) are set to I<dns-skipped>.
+
 You can pass strings to append to the fqdn for failure, success or timeout
 as second/third/fourth argument. Timeout falls back to the string given for
 failed if it was not given (can be turned off by setting an empty value).
@@ -122,10 +126,14 @@ sub valid {
     my $failed = shift || '';
     my $valid = shift || '';
     my $timeout = shift;
+    my $skipped = shift || '';
 
 
     my $status;
-    if (!$self->__check_fqdn( $fqdn )) {
+    if ($fqdn =~ m{^\*\.}) {
+        $status = 'dns-skipped';
+        $fqdn .= ' '.$skipped;
+    } elsif (!$self->__check_fqdn( $fqdn )) {
         $status = 'dns-failed';
         $fqdn .= ' '.$failed if ($failed);
     } else {
@@ -156,7 +164,7 @@ Expects the fqdn to check as argument. The result of the dns lookup is
 appended to the fqdn using brackets. By default, the first result is
 taken, which might result in a CNAME. Add a true value as second
 argument to do a recursive lookup up to the first A-Record. If the lookup
-failed, "???" is printed instead of the result. The copmbined string is
+failed, "???" is printed instead of the result. The combined string is
 wrapped into a span element with css class I<dns-valid> or I<dns-failed>.
 
   Example: CheckDNS.resolve(fqdn)

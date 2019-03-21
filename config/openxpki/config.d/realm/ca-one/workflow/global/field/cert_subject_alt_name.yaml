@@ -7,10 +7,10 @@ description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_DESC
 type: cert_subject_alt_name
 format: rawlist
 template: >
-  [% FOREACH san = value %][% san.0 %]: 
+  [% FOREACH san = value %][% san.0 %]:
     [% IF san.0 == 'DNS' %]
-      [% USE CheckDNS %][% CheckDNS.valid(san.1, '(FAIL)', '(ok)','(unknown)') %]
+      [% USE CheckDNS %][% CheckDNS.valid(san.1, '(I18N_OPENXPKI_UI_DNS_CHECK_FAIL)', '(I18N_OPENXPKI_UI_DNS_CHECK_OK)','(I18N_OPENXPKI_UI_DNS_CHECK_TIMEOUT)','(I18N_OPENXPKI_UI_DNS_CHECK_SKIPPED)') %]
     [% ELSE %][% san.1 %][% END %]
-    | 
+    |
   [% END %]
 

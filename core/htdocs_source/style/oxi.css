@@ -244,6 +244,7 @@ span.certstatus-revoked {
     color: red;
 }
 
+span.dns-skipped,
 span.styled-attention,
 span.certstatus-crl_issuance_pending {
     color: orange;

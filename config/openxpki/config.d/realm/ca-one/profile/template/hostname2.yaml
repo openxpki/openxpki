@@ -3,7 +3,7 @@ label: I18N_OPENXPKI_UI_PROFILE_EXTRA_HOSTNAME
 description: I18N_OPENXPKI_UI_PROFILE_EXTRA_HOSTNAME_DESC
 type: freetext
 preset: SAN_DNS.X
-match: \A [a-zA-Z0-9] [a-zA-Z0-9-]* (\.[a-zA-Z0-9-]*[a-zA-Z0-9])* \z
+match: \A (\*\.)?[a-zA-Z0-9] [a-zA-Z0-9-]* (\.[a-zA-Z0-9-]*[a-zA-Z0-9])* \z
 width: 60
 placeholder: fully.qualified.example.com
 min: 0

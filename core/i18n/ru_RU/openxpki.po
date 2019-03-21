@@ -67,6 +67,10 @@ msgid "I18N_OPENXPKI_UI_BULK_REJECT_CSR_LABEL"
 msgstr "Отклонить заявку на сертификат"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_ATTRIBUTE_FAILED"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL"
 msgstr "Изменить дополнительную информацию"
 
@@ -271,6 +275,10 @@ msgid "I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_DOES_NOT_MATCH"
 msgstr "SPKAC строка пуста."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_DOES_NOT_MATCH_REGEX"
+msgstr "SPKAC строка пуста."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_INVALID_ITEM_COUNT"
 msgstr "SPKAC-строка пуста."
 
@@ -349,6 +357,22 @@ msgstr "Дочерние технологические процессы"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "Технологические процессы отзыва сертификатов"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DNS_CHECK_OK"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DNS_CHECK_SKIPPED"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DNS_CHECK_TIMEOUT"
+msgstr "Истекло время ожидания ответа при чтении данных с сервера УЦ"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE"
@@ -539,6 +563,28 @@ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_ALIAS_PLACEHOLDER"
 msgstr "Последнее обновление"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_DESC"
+msgstr "TCP-порт, используемый с данным сертификатом"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_LABEL"
+msgstr ""
+"Используйте данный профиль сертификата только если Вы отчетливо "
+"представляете себе необходимую структуру имени субъекта сертификата, хорошо "
+"знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
+"части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
+"также произвольный набор альтернативных имен."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_TOOLTIP"
+msgstr ""
+"Используйте данный профиль сертификата только если Вы отчетливо "
+"представляете себе необходимую структуру имени субъекта сертификата, хорошо "
+"знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
+"части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
+"также произвольный набор альтернативных имен."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_FILENAME_LABEL"
 msgstr "Дочерние технологические процессы"
 
@@ -586,6 +632,14 @@ msgstr ""
 "знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
 "части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
 "также произвольный набор альтернативных имен."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_UNENCRYPTED_DESC"
+msgstr "Экспорт"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_UNENCRYPTED_LABEL"
+msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATE_KEY_FAILED"
@@ -1063,6 +1117,19 @@ msgstr ""
 "также произвольный набор альтернативных имен."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_DESC"
+msgstr ""
+"Используйте данный профиль сертификата только если Вы отчетливо "
+"представляете себе необходимую структуру имени субъекта сертификата, хорошо "
+"знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
+"части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
+"также произвольный набор альтернативных имен."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_SIGNER"
+msgstr "Профиль пользователя"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_OPENVPN_CLIENT_LABEL"
 msgstr "Профиль пользователя"
 
@@ -1373,6 +1440,10 @@ msgid "I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID"
 msgstr ""
 "Выбранный способ построения имени требует наличия, как минимум, одного "
 "названия подразделения и двух компонентов доменного имени."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REQUEST_WORKFLOW_ID"
+msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_REVOCATION_WORKFLOW_ID"
@@ -4306,9 +4377,6 @@ msgstr "Имя учетной записи"
 #~ "При чтении данных с сервера УЦ произошла внутренняя ошибка системы: "
 #~ "__ERROR__"
 
-#~ msgid "I18N_OPENXPKI_CLIENT_COLLECT_TIMEOUT"
-#~ msgstr "Истекло время ожидания ответа при чтении данных с сервера УЦ"
-
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_CLIENT_INCORRECT_COMMUNICATION_STATE"
 #~ msgstr "Истекло время ожидания ответа при чтении данных с сервера УЦ"
@@ -5870,10 +5938,6 @@ msgstr "Имя учетной записи"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_PROFILE_OPENVPN_CLIENT"
-#~ msgstr "Профиль пользователя"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_PROFILE_SCEP_SIGNER"
 #~ msgstr "Профиль пользователя"
 
 #~ msgid "I18N_OPENXPKI_PROFILE_TLS_BASIC_DESC"

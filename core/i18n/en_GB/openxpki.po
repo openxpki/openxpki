@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2018-07-09 08:55+0200\n"
+"PO-Revision-Date: 2019-03-21 09:18+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.7.1\n"
+"X-Generator: Poedit 2.0.6\n"
 "X-Poedit-Bookmarks: -1,-1,77,-1,-1,-1,-1,-1,-1,-1\n"
 
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
@@ -51,6 +51,10 @@ msgstr "Reject Selected"
 
 msgid "I18N_OPENXPKI_UI_BULK_REJECT_CSR_LABEL"
 msgstr "Reject Selected"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_ATTRIBUTE_FAILED"
+msgstr "Profile"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL"
 msgstr ""
@@ -217,6 +221,10 @@ msgstr "Unable to check certificates status as identifier was not found."
 msgid "I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_DOES_NOT_MATCH"
 msgstr "The certificates status does not match the expected one."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_DOES_NOT_MATCH_REGEX"
+msgstr "List is not empty"
+
 msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_INVALID_ITEM_COUNT"
 msgstr "List has unexpected item count"
 
@@ -278,6 +286,18 @@ msgstr "Creator"
 
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "Delayed revocation requested."
+
+msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
+msgstr "FAIL"
+
+msgid "I18N_OPENXPKI_UI_DNS_CHECK_OK"
+msgstr "ok"
+
+msgid "I18N_OPENXPKI_UI_DNS_CHECK_SKIPPED"
+msgstr "n/a"
+
+msgid "I18N_OPENXPKI_UI_DNS_CHECK_TIMEOUT"
+msgstr "timeout"
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE"
 msgstr "Download chain as PEM bundle, including root"
@@ -423,6 +443,17 @@ msgstr "Keystore Alias"
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_ALIAS_PLACEHOLDER"
 msgstr "Alias for the Keystore, can be left empty for standard requests. "
 
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_DESC"
+msgstr ""
+"The password for the exported private key. If not set, the same password you "
+"provided while creating the certificate request will be used."
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_LABEL"
+msgstr "Export Password"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_TOOLTIP"
+msgstr "Export Password"
+
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_FILENAME_LABEL"
 msgstr "Keystore Download"
 
@@ -459,6 +490,14 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_LABEL"
 msgstr "Password"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_UNENCRYPTED_DESC"
+msgstr ""
+"If checked, the exported private key will not be protected by a password. "
+"The export password will be ignored."
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_UNENCRYPTED_LABEL"
+msgstr "Export unencrypted"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATE_KEY_FAILED"
 msgstr "Private key could not be decrypted/loaded."
@@ -790,6 +829,14 @@ msgstr "Node ID"
 msgid "I18N_OPENXPKI_UI_PROFILE_NODEID_DESC"
 msgstr "Organization name"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_DESC"
+msgstr "Organization name"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_SIGNER"
+msgstr "User Certificate"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_OPENVPN_CLIENT_LABEL"
 msgstr "OpenVPN client certificate"
 
@@ -980,6 +1027,10 @@ msgstr "Report Name"
 
 msgid "I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID"
 msgstr "Unable to perform action -  security token was invalid!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REQUEST_WORKFLOW_ID"
+msgstr "Revocation Workflow"
 
 msgid "I18N_OPENXPKI_UI_REVOCATION_WORKFLOW_ID"
 msgstr "Revocation Workflow"
@@ -3268,9 +3319,6 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER"
 #~ msgstr "TLS Server profile"
 
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_USER"
-#~ msgstr "User Certificate"
-
 #~ msgid "I18N_OPENXPKI_UI_RENEWAL_SUBJECT_CHANGED_WARNING"
 #~ msgstr "The new certificates subject will not match the old one!"
 
@@ -5068,22 +5116,3 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED"
 #~ msgstr "Workflow information was updated"
-
-msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_LABEL"
-msgstr "Export Password"
-
-msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_DESC"
-msgstr ""
-"The password for the exported private key. If not set, the same password "
-"you provided while creating the certificate request will be used."
-
-msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_TOOLTIP"
-msgstr "Export Password"
-
-msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_UNENCRYPTED_LABEL"
-msgstr "Export unencrypted"
-
-msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_UNENCRYPTED_DESC"
-msgstr ""
-"If checked, the exported private key will not be protected by a password. "
-"The export password will be ignored."
