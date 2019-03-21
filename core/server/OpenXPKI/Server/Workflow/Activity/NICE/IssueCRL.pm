@@ -21,7 +21,7 @@ sub execute {
     my $workflow = shift;
     my $context = $workflow->context();
 
-    ##! 32: 'context: ' . Dumper( $context  )
+    ##! 64: 'context: ' . Dumper( $context  )
 
     my $nice_backend = OpenXPKI::Server::Workflow::NICE::Factory->getHandler( $self );
 
@@ -32,11 +32,20 @@ sub execute {
             message => "I18N_OPENXPKI_SERVER_NICE_CRLISSUANCE_NO_CA_ID",
         );
     }
+    ##! 16: 'CRL for alias ' . $ca_alias
 
     CTX('log')->application()->info("start crl issue for ca $ca_alias, workflow " . $workflow->id);
 
+    my $param = {};
+    foreach my $key ('remove_expired', 'reason_code', 'crl_validity', 'delta_crl') {
+        my $val = $self->param($key);
+        if (defined $val) {
+            $param->{$key} = $val;
+        }
+    }
+    ##! 32: 'Extra params ' . Dumper $param
 
-    my $set_context = $nice_backend->issueCRL( $ca_alias );
+    my $set_context = $nice_backend->issueCRL( $ca_alias, $param );
 
     ##! 64: 'Setting Context ' . Dumper $set_context
     #while (my ($key, $value) = each(%$set_context)) {
@@ -68,7 +77,17 @@ See OpenXPKI::Server::Workflow::NICE::issueCRL for details
 
 =item crl_validity - DateTime Spec for CRL Validity, optional
 
-=item delta_crl (bool) - Issue a delta CRL (Delta CRL Support is untestet!)
+=item delta_crl (bool) - Issue a delta CRL (Not supported in NICE::Local!)
+
+=item reason_code
+
+List of reason codes to be included in the CRL (CRL Scope), default is to
+include all reason codes.
+
+=item remove_expired
+
+Boolean, if set, only certifcates with a notafter greater than now are
+included in the CRL, by default the CRL also lists expired certificates.
 
 =back
 

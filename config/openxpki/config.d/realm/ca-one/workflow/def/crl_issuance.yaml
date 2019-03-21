@@ -61,6 +61,7 @@ action:
         input:
           - force_issue
           - run_in_background
+          - crl_validity
 
     create_ca_list:
         class: OpenXPKI::Server::Workflow::Activity::CRLIssuance::CreateQueue
@@ -113,6 +114,10 @@ field:
     crl_list:
         label: CRL Lists created
         name: crl_list
+
+    crl_validity:
+        name: crl_validity
+        type: server
 
 acl:
     Anonymous:

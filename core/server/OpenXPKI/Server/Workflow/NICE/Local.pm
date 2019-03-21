@@ -350,13 +350,17 @@ sub issueCRL {
 
     my $self = shift;
     my $ca_alias = shift;
+    my $param = shift || {};
 
     my $pki_realm = CTX('session')->data->pki_realm;
     my $dbi = CTX('dbi');
 
     # FIXME - we want to have a context free api....
-    my $crl_validity = $self->_get_context_param('crl_validity');
-    my $delta_crl = $self->_get_context_param('delta_crl');
+    my $crl_validity = $param->{validity} // $self->_get_context_param('crl_validity');
+    my $delta_crl = $param->{validity} // $self->_get_context_param('delta_crl');
+
+    my $remove_expired = $param->{remove_expired};
+    my $reason_code = $param->{reason_code};
 
     OpenXPKI::Exception->throw(
         message => "I18N_OPENXPKI_SERVER_NICE_LOCAL_CRL_NO_DELTA_CRL_SUPPORT",
@@ -405,6 +409,15 @@ sub issueCRL {
 
     my @cert_timestamps; # array with certificate data and timestamp
 
+    my %extra_where;
+    if ($remove_expired) {
+        $extra_where{notafter} = { '>', time()},
+    }
+
+    if ($reason_code) {
+        $extra_where{reason_code} = $param->{reason_code};
+    }
+
     my $certs = $dbi->select(
         from => 'certificate',
         columns => [ 'cert_key', 'identifier',
@@ -414,6 +427,7 @@ sub issueCRL {
             'certificate.pki_realm' => $pki_realm,
             issuer_identifier => $ca_identifier,
             status => [ 'REVOKED', 'CRL_ISSUANCE_PENDING' ],
+            %extra_where
         },
         order_by => [ 'notbefore', 'req_key' ]
     );
@@ -587,6 +601,31 @@ Queries the certifictes status from the local certificate datasbase.
 
 Creates a crl for the given ca and pushes it into the database for publication.
 Incremental CRLs are not supported.
+
+The first parameter must be the ca-alias, the second parameter is as hash
+with options:
+
+=over
+
+=item crl_validity
+
+OpenXPKI::DateTime relative date, overrides the profile validity.
+
+=item delta_crl
+
+not supported yet.
+
+=item reason_code
+
+List of reason codes to be included in the CRL (CRL Scope), default is to
+include all reason codes.
+
+=item remove_expired
+
+Boolean, if set, only certifcates with a notafter greater than now are
+included in the CRL, by default the CRL also lists expired certificates.
+
+=back
 
 =head2 generatekey
 

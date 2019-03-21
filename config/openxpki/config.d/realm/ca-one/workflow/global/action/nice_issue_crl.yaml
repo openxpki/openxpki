@@ -4,3 +4,6 @@ description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_ISSUE_CRL_DESC
 param:
     retry_count: 10
     retry_interval: +0000000030
+    _map_crl_validity: $crl_validity
+    remove_expired: 0
+
