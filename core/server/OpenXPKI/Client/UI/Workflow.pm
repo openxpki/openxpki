@@ -2378,325 +2378,336 @@ sub __render_fields {
     my $wf_info = shift;
     my $view = shift;
 
-        my @fields;
-        my $context = $wf_info->{WORKFLOW}->{CONTEXT};
+    my @fields;
+    my $context = $wf_info->{WORKFLOW}->{CONTEXT};
 
-        # in case we have output format rules, we just show the defined fields
-        # can be overriden with view = context
-        my $output = $wf_info->{STATE}->{output};
-        my @fields_to_render;
+    # in case we have output format rules, we just show the defined fields
+    # can be overriden with view = context
+    my $output = $wf_info->{STATE}->{output};
+    my @fields_to_render;
 
-        if ($view eq 'context' && (grep /context/, @{$wf_info->{HANDLES}})) {
-            foreach my $field (sort keys %{$context}) {
-                push @fields_to_render, { name => $field };
-            }
-        } elsif ($output) {
-            @fields_to_render = @{$wf_info->{STATE}->{output}};
-            $self->logger()->trace('Render output rules: ' . Dumper  \@fields_to_render  );
+    if ($view eq 'context' && (grep /context/, @{$wf_info->{HANDLES}})) {
+        foreach my $field (sort keys %{$context}) {
+            push @fields_to_render, { name => $field };
+        }
+    } elsif ($output) {
+        @fields_to_render = @{$wf_info->{STATE}->{output}};
+        $self->logger()->trace('Render output rules: ' . Dumper  \@fields_to_render  );
 
-        } else {
-            foreach my $field (sort keys %{$context}) {
+    } else {
+        foreach my $field (sort keys %{$context}) {
 
-                next if ($field =~ m{ \A (wf_|_|workflow_id|sources) }x);
-                push @fields_to_render, { name => $field };
-            }
-            $self->logger()->trace('No output rules, render plain context: ' . Dumper  \@fields_to_render  );
+            next if ($field =~ m{ \A (wf_|_|workflow_id|sources) }x);
+            push @fields_to_render, { name => $field };
+        }
+        $self->logger()->trace('No output rules, render plain context: ' . Dumper  \@fields_to_render  );
+    }
+
+    foreach my $field (@fields_to_render) {
+
+        my $key = $field->{name} || '';
+        my $item = {
+            value => (defined $context->{$key} ? $context->{$key} : ''),
+            format =>  $field->{format} || ''
+        };
+
+        # Always suppress key material
+        if ($item->{value} =~ /-----BEGIN[^-]*PRIVATE KEY-----/) {
+            $item->{value} = 'I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT';
+
         }
 
-        foreach my $field (@fields_to_render) {
+        # Label, Description, Tooltip
+        foreach my $prop (qw(label description tooltip)) {
+            if ($field->{$prop}) {
+                $item->{$prop} = $field->{$prop};
+            }
+        }
 
-            my $key = $field->{name} || '';
-            my $item = {
-                value => (defined $context->{$key} ? $context->{$key} : ''),
-                type => '',
-                format =>  $field->{format} || ''
-            };
+        if (!$item->{label}) {
+            $item->{label} = $key;
+        }
 
-            # Always suppress key material
-            if ($item->{value} =~ /-----BEGIN[^-]*PRIVATE KEY-----/) {
-                $item->{value} = 'I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT';
+        my $field_type = $field->{type} || '';
 
+        # assign autoformat based on some assumptions if no format is set
+        if (!$item->{format}) {
+
+            # create a link on cert_identifier fields
+            if ( $key =~ m{ cert_identifier \z }x ||
+                $field_type eq 'cert_identifier') {
+                $item->{format} = 'cert_identifier';
             }
 
-            # Label, Description, Tooltip
-            foreach my $prop (qw(label description tooltip)) {
-                if ($field->{$prop}) {
-                    $item->{$prop} = $field->{$prop};
-                }
+            # Code format any PEM blocks
+            if ( $key =~ m{ \A (pkcs10|pkcs7) \z }x  ||
+                $item->{value} =~ m{ \A -----BEGIN([A-Z ]+)-----.*-----END([A-Z ]+)---- }xms) {
+                $item->{format} = 'code';
+            } elsif ($field_type eq 'textarea') {
+                $item->{format} = 'nl2br';
             }
 
-            if (!$item->{label}) {
-                $item->{label} = $key;
+            if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
+                $item->{value} = $self->serializer()->deserialize( $item->{value} );
             }
-
-            # assign autoformat based on some assumptions if no format is set
-            if (!$item->{format}) {
-
-                # create a link on cert_identifier fields
-                if ( $key =~ m{ cert_identifier \z }x ||
-                    $item->{type} eq 'cert_identifier') {
-                    $item->{format} = 'cert_identifier';
-                }
-
-                # Code format any PEM blocks
-                if ( $key =~ m{ \A (pkcs10|pkcs7) \z }x  ||
-                    $item->{value} =~ m{ \A -----BEGIN([A-Z ]+)-----.*-----END([A-Z ]+)---- }xms) {
-                    $item->{format} = 'code';
-                } elsif ($field->{type} && $field->{type} eq 'textarea') {
-                    $item->{format} = 'nl2br';
-                }
-
-                if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
-                    $item->{value} = $self->serializer()->deserialize( $item->{value} );
-                }
-                if (ref $item->{value}) {
-                    if (ref $item->{value} eq 'HASH') {
-                        $item->{format} = 'deflist';
-                    } elsif (ref $item->{value} eq 'ARRAY') {
-                        $item->{format} = 'ullist';
-                    }
+            if (ref $item->{value}) {
+                if (ref $item->{value} eq 'HASH') {
+                    $item->{format} = 'deflist';
+                } elsif (ref $item->{value} eq 'ARRAY') {
+                    $item->{format} = 'ullist';
                 }
             }
 
-            # convert format cert_identifier into a link
-            if ($item->{format} eq "cert_identifier") {
-                $item->{format} = 'link';
+        }
 
-                # check for additional template
-                if ($item->{value}) {
-                    my $label = $item->{value};
+        # convert format cert_identifier into a link
+        if ($item->{format} eq "cert_identifier") {
+            $item->{format} = 'link';
 
-                    my $cert_identifier = $item->{value};
+            # check for additional template
+            if ($item->{value}) {
+                my $label = $item->{value};
 
-                    $item->{value}  = {
-                        label => $label,
-                        page => 'certificate!detail!identifier!'.$cert_identifier,
-                        target => 'modal'
-
-                    };
-                }
-
-                $self->logger()->trace( 'item ' . Dumper $item);
-
-            # open another workflow - performs ACL check
-            } elsif ($item->{format} eq "workflow_id") {
-
-                my $workflow_id = $item->{value};
-
-                my $can_access = $self->send_command_v2( 'check_workflow_acl',
-                        { id => $workflow_id  });
-
-                if ($can_access) {
-                    $item->{format} = 'link';
-                    $item->{value}  = {
-                        label => $workflow_id,
-                        page => 'workflow!load!wf_id!'.$workflow_id,
-                        target => 'tab'
-                    };
-                } else {
-                    $item->{format} = '';
-                }
-
-                $self->logger()->trace( 'item ' . Dumper $item);
-
-            # add a redirect command to the page
-            } elsif ($item->{format} eq "redirect") {
-
-                $self->redirect($item->{value});
-
-            # create a link to download the given filename
-            } elsif ($item->{format} =~ m{ \A download(\/([\w_\/-]+))? }xms ) {
-
-                my $mime = $2 || 'application/octect-stream';
-
-                $item->{format} = 'extlink';
-
-                my $label;
-                my $basename;
-                my $source;
-                # value can be a hash with additional properties - likely serialized
-                if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
-                    $item->{value} = $self->serializer()->deserialize( $item->{value} );
-                }
-
-                if (ref $item->{value}) {
-                    my $t = $item->{value};
-                    $label = $t->{label} || 'I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD';
-
-                    # Fallback for legacy config
-                    if (!$t->{source} && $t->{file}) {
-                         $source = "file:".$t->{file};
-                    }
-                    $source = $t->{source};
-                    $basename = $t->{filename} if ($t->{filename});
-                    $mime = $t->{mime} if ($t->{mime});
-                } else {
-                    $label = $item->{value};
-                    $source = "file:".$item->{value};
-                }
-
-                if (!$basename && $source =~ m{ file:.*?([^\/]+(\.\w+)?) \z }xms) {
-                   $basename = $1;
-                }
-
-                my $target = $self->__persist_response({
-                    source => $source,
-                    attachment =>  $basename,
-                    mime => $mime
-                });
+                my $cert_identifier = $item->{value};
 
                 $item->{value}  = {
                     label => $label,
-                    page => $self->_client()->_config()->{'scripturl'} . "?page=".$target
+                    page => 'certificate!detail!identifier!'.$cert_identifier,
+                    target => 'modal'
+
                 };
+            }
 
-            # format for cert_info block
-            } elsif ($item->{format} eq "cert_info") {
-                $item->{format} = 'deflist';
+            $self->logger()->trace( 'item ' . Dumper $item);
 
-                # its likely that we need to deserialize
-                my $raw = $item->{value};
-                if (OpenXPKI::Serialization::Simple::is_serialized( $raw ) ) {
-                    $raw = $self->serializer()->deserialize( $raw );
-                }
+        # open another workflow - performs ACL check
+        } elsif ($item->{format} eq "workflow_id") {
 
-                # this requires that we find the profile and subject in the context
-                my @val;
-                my $cert_profile = $context->{cert_profile};
-                my $cert_subject_style = $context->{cert_subject_style};
-                if ($cert_profile && $cert_subject_style) {
+            my $workflow_id = $item->{value};
 
-                    if (!$raw || ref $raw ne 'HASH') {
-                        $raw = {};
-                    }
+            my $can_access = $self->send_command_v2( 'check_workflow_acl',
+                    { id => $workflow_id  });
 
-                    my $fields = $self->send_command( 'get_field_definition',
-                        { PROFILE => $cert_profile, STYLE => $cert_subject_style, 'SECTION' =>  'info' });
-                    $self->logger()->trace( 'Profile fields' . Dumper $fields );
-
-                    foreach my $field (@$fields) {
-                        # this still uses "old" syntax - adjust after API refactoring
-                        my $key = $field->{ID}; # Name of the context key
-                        if ($raw->{$key}) {
-                            push @val, { label => $field->{LABEL}, value => $raw->{$key}, key => $key };
-                        }
-                    }
-                } else {
-                    # if nothing is found, transform raw values to a deflist
-                    @val = map { { key => $_, label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};
-
-                }
-
-                $item->{value} = \@val;
-
-            } elsif ($item->{format} eq "ullist" || $item->{format} eq "rawlist") {
-
-                if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
-                    $item->{value} = $self->serializer()->deserialize( $item->{value} );
-                }
-
-            } elsif ($item->{format} eq "itemcnt") {
-
-                my $list = $item->{value};
-                if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
-                    $list = $self->serializer()->deserialize( $item->{value} );
-                }
-
-                if (ref $list eq 'ARRAY') {
-                    $item->{value} = scalar @{$list};
-                } elsif (ref $list eq 'HASH') {
-                    $item->{value} = scalar keys %{$list};
-                } else {
-                    $item->{value} = '??';
-                }
+            if ($can_access) {
+                $item->{format} = 'link';
+                $item->{value}  = {
+                    label => $workflow_id,
+                    page => 'workflow!load!wf_id!'.$workflow_id,
+                    target => 'tab'
+                };
+            } else {
                 $item->{format} = '';
-
-            } elsif ($item->{format} eq "deflist") {
-
-                if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
-                    $item->{value} = $self->serializer()->deserialize( $item->{value} );
-                }
-                # Sort by label
-                my @val;
-                if ($item->{value} && (ref $item->{value} eq 'HASH')) {
-                    @val = map { { label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};
-                }
-                $item->{value} = \@val;
-
-            } elsif ($item->{format} eq "grid") {
-
-                my @head;
-                # Create the required header structure
-                if ($field->{header}) {
-                    @head = map { { 'sTitle' => $_ } } @{$field->{header}};
-                } else {
-                    # just create empty headers for the number of columns
-                    @head = map { { 'sTitle' => '' } } @{$field->{value}->[0]};
-                }
-                $item->{header} = \@head;
-                $item->{action} = $field->{action};
-                $item->{target} = $field->{target} ?  $field->{target} : 'tab';
             }
 
-            if ($field->{template}) {
+            $self->logger()->trace( 'item ' . Dumper $item);
 
-                my $param = { value => $item->{value} };
+        # add a redirect command to the page
+        } elsif ($item->{format} eq "redirect") {
 
-                $self->logger()->trace('Render output using template on field '.$key.', '. $field->{template} . ', params:  ' . Dumper $param);
+            $self->redirect($item->{value});
 
-                # Rendering target depends on value format
-                # deflist iterates over each key/label pair and sets the return value into the label
-                if ($item->{format} eq "deflist") {
+        # create a link to download the given filename
+        } elsif ($item->{format} =~ m{ \A download(\/([\w_\/-]+))? }xms ) {
 
-                    foreach (@{$item->{value}}){
-                        $_->{value} = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $_ } );
-                        $_->{format} = 'raw';
-                    }
+            my $mime = $2 || 'application/octect-stream';
 
-                # bullet list, put the full list to tt and split at the | as sep (as used in profile)
-                } elsif ($item->{format} eq "ullist" || $item->{format} eq "rawlist") {
+            $item->{format} = 'extlink';
 
-                    my $out = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $param } );
-                    $self->logger()->debug('Return from template ' . $out );
-                    if ($out) {
-                        my @val = split /\s*\|\s*/, $out;
-                        $self->logger()->trace('Split ' . Dumper \@val);
-                        $item->{value} = \@val;
-                    } else {
-                        $item->{value} = undef; # prevent pusing emtpy lists
-                    }
+            my $label;
+            my $basename;
+            my $source;
+            # value can be a hash with additional properties - likely serialized
+            if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
+                $item->{value} = $self->serializer()->deserialize( $item->{value} );
+            }
 
-                } elsif ($item->{format} eq "raw") {
-                    # try to deserialize
-                    my $param = $item->{value};
-                    if (!ref $param && OpenXPKI::Serialization::Simple::is_serialized( $param ) ) {
-                        $param = $self->serializer()->deserialize( $param );
-                    }
-                    $item->{value} = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => { value => $param } } );
+            if (ref $item->{value}) {
+                my $t = $item->{value};
+                $label = $t->{label} || 'I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD';
 
-                } elsif (ref $item->{value} eq '') {
-                    $item->{value} = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $param } );
-
-                } elsif (ref $item->{value} eq 'HASH' && $item->{value}->{label}) {
-                    $item->{value}->{label} = $self->send_command( 'render_template', { TEMPLATE => $field->{template},
-                        PARAMS => { value => $item->{value}->{label} }} );
-                } else {
-                    $self->logger()->error('Unable to apply template, format: '.$item->{format}.', field: '.$key);
-
+                # Fallback for legacy config
+                if (!$t->{source} && $t->{file}) {
+                     $source = "file:".$t->{file};
                 }
+                $source = $t->{source};
+                $basename = $t->{filename} if ($t->{filename});
+                $mime = $t->{mime} if ($t->{mime});
+            } else {
+                $label = $item->{value};
+                $source = "file:".$item->{value};
+            }
+
+            if (!$basename && $source =~ m{ file:.*?([^\/]+(\.\w+)?) \z }xms) {
+               $basename = $1;
+            }
+
+            my $target = $self->__persist_response({
+                source => $source,
+                attachment =>  $basename,
+                mime => $mime
+            });
+
+            $item->{value}  = {
+                label => $label,
+                page => $self->_client()->_config()->{'scripturl'} . "?page=".$target
+            };
+
+        # format for cert_info block
+        } elsif ($item->{format} eq "cert_info") {
+            $item->{format} = 'deflist';
+
+            # its likely that we need to deserialize
+            my $raw = $item->{value};
+            if (OpenXPKI::Serialization::Simple::is_serialized( $raw ) ) {
+                $raw = $self->serializer()->deserialize( $raw );
+            }
+
+            # this requires that we find the profile and subject in the context
+            my @val;
+            my $cert_profile = $context->{cert_profile};
+            my $cert_subject_style = $context->{cert_subject_style};
+            if ($cert_profile && $cert_subject_style) {
+
+                if (!$raw || ref $raw ne 'HASH') {
+                    $raw = {};
+                }
+
+                my $fields = $self->send_command( 'get_field_definition',
+                    { PROFILE => $cert_profile, STYLE => $cert_subject_style, 'SECTION' =>  'info' });
+                $self->logger()->trace( 'Profile fields' . Dumper $fields );
+
+                foreach my $field (@$fields) {
+                    # this still uses "old" syntax - adjust after API refactoring
+                    my $key = $field->{ID}; # Name of the context key
+                    if ($raw->{$key}) {
+                        push @val, { label => $field->{LABEL}, value => $raw->{$key}, key => $key };
+                    }
+                }
+            } else {
+                # if nothing is found, transform raw values to a deflist
+                @val = map { { key => $_, label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};
 
             }
 
-            # do not push items that are empty
-            if (defined $item->{value} &&
-                ((ref $item->{value} eq 'HASH' && %{$item->{value}}) ||
-                (ref $item->{value} eq 'ARRAY' && @{$item->{value}}) ||
-                (ref $item->{value} eq '' && $item->{value} ne ''))) {
-                push @fields, $item;
+            $item->{value} = \@val;
+
+        } elsif ($item->{format} eq "ullist" || $item->{format} eq "rawlist") {
+
+            if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
+                $item->{value} = $self->serializer()->deserialize( $item->{value} );
+            }
+
+        } elsif ($item->{format} eq "itemcnt") {
+
+            my $list = $item->{value};
+            if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
+                $list = $self->serializer()->deserialize( $item->{value} );
+            }
+
+            if (ref $list eq 'ARRAY') {
+                $item->{value} = scalar @{$list};
+            } elsif (ref $list eq 'HASH') {
+                $item->{value} = scalar keys %{$list};
+            } else {
+                $item->{value} = '??';
+            }
+            $item->{format} = '';
+
+        } elsif ($item->{format} eq "deflist") {
+
+            if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
+                $item->{value} = $self->serializer()->deserialize( $item->{value} );
+            }
+            # Sort by label
+            my @val;
+            if ($item->{value} && (ref $item->{value} eq 'HASH')) {
+                @val = map { { label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};
+            }
+            $item->{value} = \@val;
+
+        } elsif ($item->{format} eq "grid") {
+
+            my @head;
+            # Create the required header structure
+            if ($field->{header}) {
+                @head = map { { 'sTitle' => $_ } } @{$field->{header}};
+            } else {
+                # just create empty headers for the number of columns
+                @head = map { { 'sTitle' => '' } } @{$field->{value}->[0]};
+            }
+            $item->{header} = \@head;
+            $item->{action} = $field->{action};
+            $item->{target} = $field->{target} ?  $field->{target} : 'tab';
+
+        } elsif ($field_type eq 'select' && !$field->{template} && $field->{option} && ref $field->{option} eq 'ARRAY') {
+            foreach my $option (@{$field->{option}}) {
+                if ($item->{value} eq $option->{value}) {
+                    $item->{value} = $option->{label};
+                    last;
+                }
             }
         }
 
-        return \@fields;
+
+        if ($field->{template}) {
+
+            my $param = { value => $item->{value} };
+
+            $self->logger()->trace('Render output using template on field '.$key.', '. $field->{template} . ', params:  ' . Dumper $param);
+
+            # Rendering target depends on value format
+            # deflist iterates over each key/label pair and sets the return value into the label
+            if ($item->{format} eq "deflist") {
+
+                foreach (@{$item->{value}}){
+                    $_->{value} = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $_ } );
+                    $_->{format} = 'raw';
+                }
+
+            # bullet list, put the full list to tt and split at the | as sep (as used in profile)
+            } elsif ($item->{format} eq "ullist" || $item->{format} eq "rawlist") {
+
+                my $out = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $param } );
+                $self->logger()->debug('Return from template ' . $out );
+                if ($out) {
+                    my @val = split /\s*\|\s*/, $out;
+                    $self->logger()->trace('Split ' . Dumper \@val);
+                    $item->{value} = \@val;
+                } else {
+                    $item->{value} = undef; # prevent pusing emtpy lists
+                }
+
+            } elsif ($item->{format} eq "raw") {
+                # try to deserialize
+                my $param = $item->{value};
+                if (!ref $param && OpenXPKI::Serialization::Simple::is_serialized( $param ) ) {
+                    $param = $self->serializer()->deserialize( $param );
+                }
+                $item->{value} = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => { value => $param } } );
+
+            } elsif (ref $item->{value} eq '') {
+                $item->{value} = $self->send_command( 'render_template', { TEMPLATE => $field->{template}, PARAMS => $param } );
+
+            } elsif (ref $item->{value} eq 'HASH' && $item->{value}->{label}) {
+                $item->{value}->{label} = $self->send_command( 'render_template', { TEMPLATE => $field->{template},
+                    PARAMS => { value => $item->{value}->{label} }} );
+            } else {
+                $self->logger()->error('Unable to apply template, format: '.$item->{format}.', field: '.$key);
+
+            }
+
+        }
+
+        # do not push items that are empty
+        if (defined $item->{value} &&
+            ((ref $item->{value} eq 'HASH' && %{$item->{value}}) ||
+            (ref $item->{value} eq 'ARRAY' && @{$item->{value}}) ||
+            (ref $item->{value} eq '' && $item->{value} ne ''))) {
+            push @fields, $item;
+        }
+    }
+
+    return \@fields;
 
 }
 
