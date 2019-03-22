@@ -133,7 +133,10 @@ sub execute {
     foreach my $rule (@rules) {
         ##! 32: 'Testing rule ' . $rule
         my $trustrule = $config->get_hash("$rules_prefix.$rule");
-        $trustrule->{realm} = $current_realm if (!$trustrule->{realm});
+
+        # as we expect the idenifier to be uniq we do not need a realm
+        $trustrule->{realm} = $current_realm
+            if (!$trustrule->{realm} && !$trustrule->{identifier});
 
         $matched = 0;
         foreach my $key (keys %{$trustrule}) {
