@@ -41,6 +41,8 @@ sub __init_command_params : PRIVATE {
         'create_nextca_reply' => {
             'CHAIN' => 1,
             'HASH_ALG' => 1,
+            # ignored by the SCEP Tools but added here to have identical API with LibSCEP
+            'ENCRYPTION_ALG' => 0,
         },
         'create_crl_reply' => {
             'PKCS7'       => 1,

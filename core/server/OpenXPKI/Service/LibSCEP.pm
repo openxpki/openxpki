@@ -44,13 +44,12 @@ sub init {
     return 1;
 }
 
-sub __init_server : PRIVATE {
+sub __init_server : PROTECTED {
     ##! 4: 'start'
     my $self    = shift;
     my $ident   = ident $self;
     my $arg_ref = shift;
 
-    my $realm = CTX('session')->data->pki_realm;
     my $config = CTX('config');
 
     my $message = $self->collect();
@@ -87,13 +86,11 @@ sub __init_server : PRIVATE {
     }
 }
 
-sub __init_hash_alg : PRIVATE {
+sub __init_hash_alg : PROTECTED {
     ##! 4: 'start'
     my $self    = shift;
     my $ident   = ident $self;
     my $arg_ref = shift;
-
-    my $realm = CTX('session')->data->pki_realm;
 
     my $message = $self->collect();
     ##! 16: "message collected: " . Dumper($message)
@@ -126,13 +123,11 @@ sub __init_hash_alg : PRIVATE {
     }
 }
 
-sub __init_encryption_alg : PRIVATE {
+sub __init_encryption_alg : PROTECTED {
     ##! 4: 'start'
     my $self    = shift;
     my $ident   = ident $self;
     my $arg_ref = shift;
-
-    my $realm = CTX('session')->data->pki_realm;
 
     my $message = $self->collect();
     ##! 16: "message collected: " . Dumper($message)
@@ -170,7 +165,7 @@ sub __init_encryption_alg : PRIVATE {
 
 }
 
-sub __init_session : PRIVATE {
+sub __init_session : PROTECTED {
     # memory-only session is sufficient for SCEP
     my $session = OpenXPKI::Server::Session->new(
         type => "Memory",
@@ -180,7 +175,7 @@ sub __init_session : PRIVATE {
     Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
 }
 
-sub __init_pki_realm : PRIVATE {
+sub __init_pki_realm : PROTECTED {
     my $self  = shift;
     my $ident = ident $self;
     my $arg   = shift;
@@ -212,31 +207,6 @@ sub __init_pki_realm : PRIVATE {
         );
     }
 }
-=begin
-sub __init_context_parameter: PRIVATE {
-    my $self  = shift;
-    my $ident = ident $self;
-    my $arg   = shift;
-
-    ##! 1: "start"
-
-    my $message = $self->collect();
-    ##! 16: "message collected: $message"
-    my $serialized_data;
-    if ( $message =~ /^SET_PARAMETER (.*)/ ) {
-        $serialized_data = $1;
-        ##! 16: "serialized data: $serialized_data"
-    }
-    else {
-        OpenXPKI::Exception->throw( message =>
-            "I18N_OPENXPKI_SERVICE_LIBSCEP_NO_SET_PARAMETER_RECEIVED", );
-    }
-    my $serializer = OpenXPKI::Serialization::Simple->new();
-    my $context = $serializer->deserialize($serialized_data));
-
-    return $context;
-}
-=cut
 
 sub run {
     my $self  = shift;
@@ -301,18 +271,10 @@ MESSAGE:
 
                 my $command;
                 eval {
-                    $command = OpenXPKI::Service::LibSCEP::Command->new(
-                        {   COMMAND => $received_command,
-                            PARAMS  => $received_params,
-                        }
-                    );
+                    $command = $self->__get_command( $received_command, $received_params );
                 };
                 if ( my $exc = OpenXPKI::Exception->caught() ) {
-                    if ($exc->message()
-                        =~ m{
-                            I18N_OPENXPKI_SERVICE_LIBSCEP_COMMAND_INVALID_COMMAND
-                        }xms
-                        )
+                    if ($exc->message() =~ m{ INVALID_COMMAND }xms )
                     {
                         ##! 16: "Invalid command $data->{PARAMS}->{COMMAND}"
                         # fall-through intended
@@ -398,6 +360,20 @@ MESSAGE:
     }
 
     return 1;
+}
+
+sub __get_command {
+
+    my $self = shift;
+    my $ident = ident $self;
+    my $command = shift;
+    my $params = shift;
+
+    return OpenXPKI::Service::LibSCEP::Command->new({
+        COMMAND => $command,
+        PARAMS  => $params,
+    });
+
 }
 
 1;

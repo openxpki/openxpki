@@ -5,7 +5,7 @@
 ## (C) Copyright 2006-2013 by The OpenXPKI Project
 ##
 package OpenXPKI::Service::SCEP::Command::PKIOperation;
-use base qw( OpenXPKI::Service::SCEP::Command );
+use base qw( OpenXPKI::Service::LibSCEP::Command );
 
 use strict;
 

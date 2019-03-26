@@ -144,12 +144,19 @@ Here is a complete sample configuration::
         allow_replace: 1
 
     response:
-        # The scep standard is a bit unclear if the root should be in the chain or not
-        # We consider it a security risk (trust should be always set by hand) but
-        # as most clients seem to expect it, we include the root by default
-        # If you are sure your clients do not need the root, set this to 1
-        getcacert_strip_root: 0
-
+        # The scep standard is a bit unclear if the root should be in the chain
+        # or not. We consider it a security risk (trust should be always set
+        # by hand) but as most clients seem to expect it, we include the root
+        # by default.
+        # The getca response contains the certificate of the SCEP server itself
+        # and of the current active issuer (which can but need not to be the same!)
+        # You can define weather to have only the certificate itself (endentity),
+        # the chain without the root (chain)  or the chain including the root
+        # (fullchain).
+        getca:
+            ra:     fullchain
+            issuer: fullchain
+  
     profile:
       cert_profile: I18N_OPENXPKI_PROFILE_TLS_SERVER
       cert_subject_style: enroll

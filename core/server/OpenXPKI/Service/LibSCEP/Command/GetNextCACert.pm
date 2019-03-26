@@ -20,30 +20,11 @@ sub execute {
 
     ##! 1: "start"
 
-    my $pki_realm = CTX('session')->data->pki_realm;
-
-    my $next_ca = CTX('dbi')->select_one(
-        from_join => "certificate identifier=identifier aliases",
-        columns => [
-            'certificate.data',
-            'certificate.subject',
-            'aliases.alias',
-            'aliases.notbefore',
-            'aliases.notafter',
-            'aliases.identifier',
-        ],
-        where => {
-            'aliases.pki_realm' => $pki_realm,
-            'aliases.group_id' => 'root',
-            'aliases.notbefore' => { '>', time() },
-        },
-        order_by => [ 'aliases.notbefore' ],
-    );
+    my $next_ca = $self->get_next_ca_certificate();
 
     if (not $next_ca) {
         ##! 16: 'No cert found'
         CTX('log')->application()->debug("SCEP GetNextCACert nothing found (realm $pki_realm).");
-
 
         # Send a 404 header with a verbose explanation
         return $self->command_response(
@@ -55,17 +36,16 @@ sub execute {
 
     my $scep_token =  $self->__get_token();
 
-    ##! 16: 'Found nextca cert ' .  $next_ca->{alias}
     ##! 32: 'nextca  ' . Dumper $next_ca
 
-    my $result = $scep_token->command({
+    my $result = "Content-Type: application/x-x509-next-ca-cert\n\n";
+    $result .= $scep_token->command({
         COMMAND  => 'create_nextca_reply',
         CHAIN    => $next_ca->{data},
         HASH_ALG => CTX('session')->data->hash_alg,
-        ENC_ALG  => CTX('session')->data->enc_alg,
+        ENCRYPTION_ALG => CTX('session')->data->enc_alg,
     });
 
-    $result = "Content-Type: application/x-x509-next-ca-cert\n\n" . $result;
     ##! 16: "result: $result"
     return $self->command_response($result);
 }

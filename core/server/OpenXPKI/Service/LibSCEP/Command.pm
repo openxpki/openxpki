@@ -1,9 +1,3 @@
-## OpenXPKI::Service::LibSCEP::Command
-##
-## Written 2006 by Alexander Klink for the OpenXPKI project
-## (C) Copyright 2006 by The OpenXPKI Project
-##
-
 use strict;
 use warnings;
 
@@ -51,13 +45,13 @@ sub START {
     # only in Command.pm base class: get implementation
     if (ref $self eq 'OpenXPKI::Service::LibSCEP::Command') {
         ##! 4: Dumper $arg_ref
-    $self->attach_impl($arg_ref);
+        $self->attach_impl($arg_ref);
     }
 }
 
 
 
-sub attach_impl : PRIVATE {
+sub attach_impl : PROTECTED {
     my $self  = shift;
     my $arg   = shift;
     my $ident = ident $self;
@@ -72,42 +66,48 @@ sub attach_impl : PRIVATE {
     # commands starting with an underscore are not allowed (might be a
     # private method in command implementation)
     if ($cmd =~ m{ \A _ }xms) {
-    OpenXPKI::Exception->throw(
-        message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PRIVATE_METHOD_REQUESTED",
-        params  => {
-        COMMAND => $cmd,
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PROTECTED_METHOD_REQUESTED",
+            params  => {
+            COMMAND => $cmd,
         });
     }
 
-    my $base = 'OpenXPKI::Service::LibSCEP::Command';
-
     if (defined $cmd && $allowed_command{$cmd}) {
-    # command was white-listed and explicitly allowed
+        # command was white-listed and explicitly allowed
 
-    my $class = $base . '::' . $cmd;
-    ##! 8: "loading class $class"
-    eval "use $class;";
-    if ($EVAL_ERROR) { # no module available that implements the command
-        ##! 8: "eval error $EVAL_ERROR"
+        my $base = 'OpenXPKI::Service::LibSCEP::Command';
+        # all commands except PKIOperation are consolideated in the LibSCEP
+        # branch even when we run openca-tools
+        if ($cmd eq 'PKIOperation') {
+           $base = ref $self
+        };
+
+        my $class = $base . '::' . $cmd;
+        ##! 8: "loading class $class"
+        eval "use $class;";
+        if ($EVAL_ERROR) { # no module available that implements the command
+            ##! 8: "eval error $EVAL_ERROR"
+            OpenXPKI::Exception->throw(
+                message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_NO_COMMAND_IMPL",
+                params => { EVAL_ERROR => $EVAL_ERROR }
+            );
+        } else {
+            ##! 8: "instantiating class $class"
+            $command_impl{$ident} = eval "$class->new(\$arg)";
+
+            if ($EVAL_ERROR) {
+                OpenXPKI::Exception->throw(
+                    message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_IMPL_INSTANTIATE_FAILED",
+                    params  => {EVAL_ERROR => $EVAL_ERROR,
+                    MODULE     => $class
+                });
+            }
+        }
+    } else {
         OpenXPKI::Exception->throw(
-            message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_NO_COMMAND_IMPL",
-            params => { EVAL_ERROR => $EVAL_ERROR }
+            message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_INVALID_COMMAND",
         );
-    } else {
-        ##! 8: "instantiating class $class"
-        $command_impl{$ident} = eval "$class->new(\$arg)";
-
-        if ($EVAL_ERROR) {
-        OpenXPKI::Exception->throw(
-            message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_IMPL_INSTANTIATE_FAILED",
-                params  => {EVAL_ERROR => $EVAL_ERROR,
-                MODULE     => $class});
-          }
-    }
-    } else {
-    OpenXPKI::Exception->throw(
-        message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_INVALID_COMMAND",
-    );
     }
 
     return 1;
@@ -122,29 +122,28 @@ sub execute {
     ##! 4: "execute: $command{$ident}"
 
     if (! defined $command_impl{$ident}) {
-    my $method = $command{$ident};
-    ##! 8: "automatic API mapping for $method"
+        my $method = $command{$ident};
+        ##! 8: "automatic API mapping for $method"
 
-    return $self->command_response(
-        $self->get_API()->$method($command_params{$ident}),
-        $method, # explicitly provide command name to returned structure
-    );
+        return $self->command_response(
+            $self->get_API()->$method($command_params{$ident}),
+            $method, # explicitly provide command name to returned structure
+        );
     } else {
-    ##! 16: "ref child: " . ref $command_impl{$ident}
-    if (ref $command_impl{$ident}
-        eq 'OpenXPKI::Service::LibSCEP::Command::' . $command{$ident}) {
-        ##! 16: "implementation is present, delegating"
-        return $command_impl{$ident}->execute(
-            {
-            PARAMS => $command_params{$ident},
-        });
-    }
+        ##! 16: "ref child: " . ref $command_impl{$ident}
+        my $cmd = $command{$ident};
+        if ((ref $command_impl{$ident}) =~ qr/::$cmd\z/) {
+            ##! 16: "implementation is present, delegating"
+            return $command_impl{$ident}->execute({
+                PARAMS => $command_params{$ident},
+            });
+        }
     }
 
     OpenXPKI::Exception->throw(
-    message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_INVALID_COMMAND",
-    params  => {
-        COMMAND => $command{$ident},
+        message => "I18N_OPENXPKI_SERVICE_SCEP_COMMAND_INVALID_COMMAND",
+        params  => {
+            COMMAND => $command{$ident},
     });
 
     return;
@@ -161,73 +160,112 @@ sub command_response {
     # autodetect command name (only works if called from a dedicated
     # command implementation, not via automatic API call mapping)
     if (! defined $command_name) {
-    my ($package, $filename, $line, $subroutine, $hasargs,
-        $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(0);
+        my ($package, $filename, $line, $subroutine, $hasargs,
+            $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(0);
 
-    # only leave the last part of the package name
-    ($command_name) = ($package =~ m{ ([^:]+) \z }xms);
+        # only leave the last part of the package name
+        ($command_name) = ($package =~ m{ ([^:]+) \z }xms);
     }
 
     return {
-    SERVICE_MSG => 'COMMAND',
-    COMMAND => $command_name,
-    PARAMS  => $arg,
+        SERVICE_MSG => 'COMMAND',
+        COMMAND => $command_name,
+        PARAMS  => $arg,
     };
 }
 
 
+=head2 __get_token_alias
 
-=head2 __get_token
-
-Get the scep token alias for the current server
+builder for token_alias - get the scep token alias for the current server
 
 =cut
+
 sub __get_token_alias {
 
     my $self = shift;
-    my $server = shift;
-    $server = CTX('session')->data->server unless($server);
 
+    my $server = CTX('session')->data->server;
     my $token = CTX('config')->get(['scep', $server, 'token']);
 
     my $scep_token_alias;
     if ($token) {
         # Special token group requested
-        $scep_token_alias = CTX('api')->get_token_alias_by_group({ 'GROUP' => $token });
+        $scep_token_alias = CTX('api2')->get_token_alias_by_group( 'group' => $token );
         CTX('log')->application()->debug("SCEP command requested special token ($token -> $scep_token_alias)");
 
     } else {
         # Use the default token group
-        $scep_token_alias = CTX('api')->get_token_alias_by_type( { TYPE => 'scep' } );
+        $scep_token_alias = CTX('api2')->get_token_alias_by_type( type => 'scep' );
     }
 
     return $scep_token_alias;
 }
+
 
 =head2 __get_token
 
 Get the scep token from the crypto layer
 
 =cut
+
 sub __get_token {
 
     my $self = shift;
-    my $server = shift;
-    $server = CTX('session')->data->server unless($server);
 
-    my $scep_token_alias = $self->__get_token_alias( $server );
-
-    my $scep_token = CTX('crypto_layer')->get_token( { TYPE => 'scep', NAME => $scep_token_alias } );
+    my $scep_token = CTX('crypto_layer')->get_token( { TYPE => 'scep', NAME => $self->__get_token_alias() } );
 
     if ( !defined $scep_token ) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVICE_SCEP_COMMAND_PKIOPERATION_SCEP_TOKEN_MISSING',
-            params => { ALIAS => $scep_token_alias }
+            message => 'Unable to create SCEP token',
+            params => { ALIAS => $self->token_alias() }
         );
     }
 
     return $scep_token;
 }
+
+=head2 get_next_ca_certificate
+
+Return hash with data, identifier and alias of the next root ca certificate.
+
+Returns undef if no upcoming ca is found.
+
+=cut
+
+sub get_next_ca_certificate {
+
+    my $self = shift;
+
+    my $pki_realm = CTX('session')->data->pki_realm;
+
+    my $next_ca = CTX('dbi')->select_one(
+        from_join => "certificate identifier=identifier aliases",
+        columns => [
+            'certificate.data',
+            'certificate.identifier',
+            'aliases.alias',
+        ],
+        where => {
+            'aliases.pki_realm' => $pki_realm,
+            'aliases.group_id' => 'root',
+            'aliases.notbefore' => { '>', time() },
+        },
+        order_by => [ 'aliases.notbefore' ],
+    );
+
+    if (not $next_ca) {
+        ##! 16: 'No cert found'
+        CTX('log')->application()->debug("SCEP GetNextCACert nothing found (realm $pki_realm).");
+        return;
+    }
+
+    ##! 16: 'Found nextca cert ' .  $next_ca->{alias}
+
+    return $next_ca;
+
+}
+
 
 1;
 __END__
