@@ -278,6 +278,11 @@ sub sc_analyze_smartcard {
         my $retval = $msg->{VALUE};
         $result->{SMARTCARD}->{token_chipid_match} = 'valid';
 
+        # Ignore previously stored default ids from old driver
+        if ($retval =~ m{\A0+\z}  || $retval eq '554e415641494c41424c4500') {
+            $retval = '';
+        }
+
         # Not found - record it
         if (!$retval) {
             ##! 16: "Record card/chip relation Chip: $chipid - Token: $tokenid "
