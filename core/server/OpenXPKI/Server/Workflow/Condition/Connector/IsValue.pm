@@ -35,7 +35,7 @@ sub _evaluate
     CTX('log')->application()->debug("Check IsValue '$value' != '$expected'");
 
 
-    if ($value != $expected ) {
+    if (!defined $value || $value ne $expected ) {
         ##! 16: " Values differ - expected: $expected, found: $value "
         condition_error("I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CONNECTOR_IS_VALUE");
     }
