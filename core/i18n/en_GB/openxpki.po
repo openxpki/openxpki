@@ -333,10 +333,10 @@ msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHORT_PEM"
 msgstr "PEM (CRT)"
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHOW_PEM"
-msgstr "Display certificate on screen (Text + PEM)"
+msgstr "Display certificate on screen (PEM)"
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHOW_TEXT"
-msgstr "Display certificate on screen (PEM)"
+msgstr "Display certificate on screen (Text + PEM)"
 
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_TXT"
 msgstr "Download text (TXT) format"
