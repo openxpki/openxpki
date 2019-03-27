@@ -295,7 +295,7 @@ sub __send_crl : PRIVATE {
             {   COMMAND      => 'create_error_reply',
                 SCEP_HANDLE  => $scep_handle,
                 HASH_ALG     => CTX('session')->data->hash_alg,
-        ENCRYPTION_ALG  => CTX('session')->data->enc_alg,
+                ENCRYPTION_ALG  => CTX('session')->data->enc_alg,
                 'ERROR_CODE' => 'badCertId',
             }
         );
