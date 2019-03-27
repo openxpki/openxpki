@@ -175,11 +175,6 @@ sub command_response {
 }
 
 
-=head2 __get_token_alias
-
-builder for token_alias - get the scep token alias for the current server
-
-=cut
 
 sub __get_token_alias {
 
@@ -203,12 +198,6 @@ sub __get_token_alias {
 }
 
 
-=head2 __get_token
-
-Get the scep token from the crypto layer
-
-=cut
-
 sub __get_token {
 
     my $self = shift;
@@ -225,13 +214,6 @@ sub __get_token {
     return $scep_token;
 }
 
-=head2 get_next_ca_certificate
-
-Return hash with data, identifier and alias of the next root ca certificate.
-
-Returns undef if no upcoming ca is found.
-
-=cut
 
 sub get_next_ca_certificate {
 
@@ -239,12 +221,23 @@ sub get_next_ca_certificate {
 
     my $pki_realm = CTX('session')->data->pki_realm;
 
+    # Cache record is identifier by server name only
+    my $cache_id = CTX('session')->data->server;
+
+    my $cached_certs = CTX('api2')->get_data_pool_entry(
+        namespace => 'scep.cache.getnextca',
+        key => $cache_id,
+    );
+    if ($cached_certs && $cached_certs->{value}) {
+        ##! 16: "Cache id $cache_id found"
+        CTX('log')->application()->trace("SCEP GetNextCACert served from datapool $cache_id");
+        return $cached_certs->{value};
+    }
+
     my $next_ca = CTX('dbi')->select_one(
         from_join => "certificate identifier=identifier aliases",
         columns => [
             'certificate.data',
-            'certificate.identifier',
-            'aliases.alias',
         ],
         where => {
             'aliases.pki_realm' => $pki_realm,
@@ -262,7 +255,7 @@ sub get_next_ca_certificate {
 
     ##! 16: 'Found nextca cert ' .  $next_ca->{alias}
 
-    return $next_ca;
+    return $next_ca->{data};
 
 }
 
@@ -319,3 +312,21 @@ the proper arguments). To be called by command implementations.
 Return the scep token (crypto object), active group token if set in the
 servers configuration or the default token.
 
+=head2 __get_token_alias
+
+get the scep token alias for the current server
+
+=head2 get_next_ca_certificate
+
+Return next ca certificate(s) as (concatenated) PEM encoded certificates.
+
+Default is to fetch the certificate with a notbefore date greater than now
+from the I<root> alias group of the current realm.
+
+You can override this by creating a datapool item with namespace
+I<scep.cache.getnextca> and the servername as key. The value must be a
+single PEM encoded certificate or a string with multiple PEM blocks.
+B<Note>: Multiple certificates are only supported using LibSCEP, the old
+SCEP backend takes the first one and ignores the remainder.
+
+Returns undef if no upcoming ca certificate is found.

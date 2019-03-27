@@ -31,8 +31,8 @@ sub __init_command_params : PRIVATE {
     $self->set_command_params({
         'unwrap' => {
             'PKCS7' => 1,
-	    'ENCRYPTION_ALG' => 0,
-	    'HASH_ALG' => 0,
+        'ENCRYPTION_ALG' => 0,
+        'HASH_ALG' => 0,
         },
         'get_message_type' => {
             'SCEP_HANDLE' => 1,
@@ -48,9 +48,10 @@ sub __init_command_params : PRIVATE {
         'create_nextca_reply' => {
             'CHAIN' => 1,
             'HASH_ALG' => 1,
+            'ENCRYPTION_ALG' => 1,
         },
-	# FIXME: fix command create_crl_reply which currently needs the raw pkcs7 instead of the handle due to a bug in
-	# the Crypt::LibSCEP::create_crl_reply_wop7 library function
+    # FIXME: fix command create_crl_reply which currently needs the raw pkcs7 instead of the handle due to a bug in
+    # the Crypt::LibSCEP::create_crl_reply_wop7 library function
         'create_crl_reply' => {
             'SCEP_HANDLE'   => 1,
             'PKCS7'   => 1,

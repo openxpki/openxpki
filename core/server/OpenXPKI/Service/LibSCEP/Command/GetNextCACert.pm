@@ -41,7 +41,7 @@ sub execute {
     my $result = "Content-Type: application/x-x509-next-ca-cert\n\n";
     $result .= $scep_token->command({
         COMMAND  => 'create_nextca_reply',
-        CHAIN    => $next_ca->{data},
+        CHAIN    => $next_ca,
         HASH_ALG => CTX('session')->data->hash_alg,
         ENCRYPTION_ALG => CTX('session')->data->enc_alg,
     });
