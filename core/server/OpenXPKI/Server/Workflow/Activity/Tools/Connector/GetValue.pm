@@ -97,44 +97,49 @@ sub execute {
             $context->param( $key, $hash->{$key});
         }
 
-    } elsif ($mode eq 'array') {
+    } else {
 
-        ##! : 16 'Array mode'
-        my @retarray = $config->get_list( \@path );
-        my $retval = OpenXPKI::Serialization::Simple->new()->serialize( \@retarray );
-
+        my $retval;
         my $target_key = $self->param('target_key');
 
         OpenXPKI::Exception->throw( message =>
             'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_GET_VALUE_NO_TARGET_KEY'
         ) unless ($target_key);
 
-        $context->param( $target_key, $retval );
+        if ($mode eq 'array') {
 
-    } elsif ($mode eq 'scalar') {
+            ##! : 16 'Array mode'
+            my @retarray = $config->get_list( \@path );
+            $retval = \@retarray;
 
-        my $target_key = $self->param('target_key');
-        my $retval = $config->get( \@path );
+        } elsif ($mode eq 'keys') {
 
-        OpenXPKI::Exception->throw( message =>
-            'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_GET_VALUE_VALUE_NOT_A_SCALAR'
-        ) if (ref $retval);
+            ##! : 16 'Array mode'
+            my @retarray = $config->get_keys( \@path );
+            $retval = \@retarray;
 
-        OpenXPKI::Exception->throw( message =>
-            'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_GET_VALUE_NO_TARGET_KEY'
-        ) unless ($target_key);
+        } elsif ($mode eq 'scalar') {
 
-        # Fall back to default
-        if ( not defined $retval ) {
-            $retval = $self->param('default_value');
+            my $target_key = $self->param('target_key');
+            $retval = $config->get( \@path );
+
+            OpenXPKI::Exception->throw( message =>
+                'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_GET_VALUE_VALUE_NOT_A_SCALAR'
+            ) if (ref $retval);
+
+            # Fall back to default
+            if ( not defined $retval ) {
+                $retval = $self->param('default_value');
+            }
+
+        } else {
+            OpenXPKI::Exception->throw( message =>
+                'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_GET_VALUE_UNKNOWN_MODE'
+            );
         }
 
-        $context->param( $target_key, $retval );
+        $context->param( { $target_key => $retval });
 
-    } else {
-        OpenXPKI::Exception->throw( message =>
-            'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_CONNECTOR_GET_VALUE_UNKNOWN_MODE'
-        );
     }
 
     return 1;
@@ -162,7 +167,8 @@ context.
 =item mode (default: scalar)
 
 * scalar: return a single value, requires target_key
-* array:  return a single item which is a list, requires target_key
+* array: return a single item which is a list, requires target_key
+* keys:  as array, value is holding the keys at the given node
 * map: map multiple values from the result using a map, requires attrmap
 * hash: import the full result of the get_hash call, see note below!
 
