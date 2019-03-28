@@ -48,10 +48,10 @@ service:
         # max_execution_time: 20
 
     SCEP:
-        enabled: 1
+        enabled: 0
 
     LibSCEP:
-        enabled: 0
+        enabled: 1
 
 # settings for i18n
 i18n:
