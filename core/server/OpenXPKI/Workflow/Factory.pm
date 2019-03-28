@@ -197,17 +197,44 @@ sub get_field_info {
 
     # Check for option tag and do explicit calls to ensure recursive resolve
     if ($field->{option}) {
-        # option.item holds the items as list, this is mandatory
-        my @item = $conn->get_list( [ @field_path, 'option', 'item' ] );
-        my @option;
-        # if set, we generate the values from option.label + key
+
+        my $mode = $conn->get( [ @field_path, 'option', 'mode' ] ) || 'list';
+
         my $label = $conn->get( [ @field_path, 'option', 'label' ] );
-        if ($label) {
-            @option = map { { value => $_, label => $label.'_'.uc($_) } } @item;
+
+        my @option;
+        if ($mode eq 'keyvalue') {
+            @option = $conn->get_list( [ @field_path, 'option', 'item' ] );
         } else {
-            @option = map { { value => $_, label => $_  } }  @item;
+            my @item;
+            if ($mode eq 'keys' || $mode eq 'map') {
+                @item = $conn->get_keys( [ @field_path, 'option', 'item' ] );
+            } else {
+                # option.item holds the items as list, this is mandatory
+                @item = $conn->get_list( [ @field_path, 'option', 'item' ] );
+            }
+
+            if ($mode eq 'map') {
+                # expects that item is a link to a deeper hash structure
+                # where the each hash item has a key "label" set
+                # will hide items with an empty label
+                foreach my $key (@item) {
+                    my $label = $conn->get( [ @field_path, 'option', 'item', $key, 'label' ] );
+                    next unless ($label);
+                    push @option, { value => $key, label => $label };
+                }
+
+            } elsif ($label) {
+                # if set, we generate the values from option.label + key
+                @option = map { { value => $_, label => $label.'_'.uc($_) } } @item;
+
+            } else {
+                # the minimum default - use keys as labels
+                @option = map { { value => $_, label => $_  } }  @item;
+            }
         }
         $field->{option} = \@option;
+
     }
 
     return $field;

@@ -98,19 +98,14 @@ field:
         label: I18N_OPENXPKI_UI_REPORT_CONFIG_LABEL
         type: select
         option:
-           item:
-             - default
-             - expiry
-           label: I18N_OPENXPKI_UI_REPORT_CONFIG
+           item@: report
+           mode: map
         required: 1
 
-#I18N_OPENXPKI_UI_REPORT_CONFIG_DEFAULT
-#I18N_OPENXPKI_UI_REPORT_CONFIG_EXPIRY
-        
     download:
         label: I18N_OPENXPKI_UI_REPORT_DOWNLOAD_LABEL
         name: download
-        format: download/text/csv        
+        format: download/text/csv
 
 acl:
     CA Operator:

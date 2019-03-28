@@ -1,3 +1,4 @@
+label: Expiry Report
 head: "Certificate Expiry Report, created at: [% export_date %]"
 delimiter: "\t"
 cutoff_notafter: +000060
