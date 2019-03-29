@@ -250,8 +250,11 @@ state:
     REVOKE_DONE:
         autorun: 1
         action:
-         - export_certificate > SUCCESS ? need_export_certificate
-         - global_noop > SUCCESS ? !need_export_certificate
+         - export_certificate > SUCCESS ? need_export_certificate !need_export_certificate_with_chain !need_export_certificate_with_fullchain
+         - export_chain export_certificate > SUCCESS ? need_export_certificate_with_chain
+         - export_fullchain export_certificate > SUCCESS ? need_export_certificate_with_fullchain
+         - global_noop > SUCCESS ? !need_export_certificate !need_export_certificate_with_chain !need_export_certificate_with_fullchain
+
 
     SUCCESS:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_LABEL
@@ -536,6 +539,21 @@ action:
             _map_cert_identifier: $cert_identifier
             target_key: certificate
 
+    export_chain:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::CertificateExport
+        param:
+            _map_cert_identifier: $cert_identifier
+            target_key: chain
+            template: '[% chain.join("\n") %]'
+
+    export_fullchain:
+        class: OpenXPKI::Server::Workflow::Activity::Tools::CertificateExport
+        param:
+            _map_cert_identifier: $cert_identifier
+            target_key: chain
+            template: '[% chain.join("\n"); "\n"; ca %]'
+
+
 condition:
     is_anonymous_enrollment_allowed:
         class: Workflow::Condition::Evaluate
@@ -665,6 +683,17 @@ condition:
         class: Workflow::Condition::Evaluate
         param:
             test: $context->{p_export_certificate}
+
+    need_export_certificate_with_chain:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: ($context->{p_export_certificate} && $context->{p_export_certificate} eq "chain")
+
+    need_export_certificate_with_fullchain:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: ($context->{p_export_certificate} && $context->{p_export_certificate} eq "fullchain")
+
 
 field:
     _pkcs7:

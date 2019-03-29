@@ -13,7 +13,7 @@ policy:
     allow_man_approv: 0
     auto_revoke_existing_certs: 1
     approval_points: 1
-    export_certificate: 1
+    export_certificate: chain
 
 profile:
     cert_profile: I18N_OPENXPKI_PROFILE_TLS_SERVER
