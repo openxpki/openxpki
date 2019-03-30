@@ -1,4 +1,4 @@
-FROM debian:8.6
+FROM debian:8-slim
 
 #
 # RUN commands are split to be able to change something in the config and still
