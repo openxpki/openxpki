@@ -1,5 +1,5 @@
-Profile Configuration
-======================
+Certificate profiles
+====================
 
 A certificate profile is the blueprint that determines all technical
 aspects of the certificate such as subject pattern, key usages and

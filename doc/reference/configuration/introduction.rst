@@ -1,5 +1,5 @@
-OpenXPKI Configuration
-======================
+Overview
+========
 
 Main configuration
 ------------------

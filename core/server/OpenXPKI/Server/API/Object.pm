@@ -66,8 +66,8 @@ sub generate_key {
         or OpenXPKI::Exception->throw( message =>
           'I18N_OPENXPKI_SERVER_API_OBJECT_GENERATE_KEY_REQUIRES_PASSWORD' );
 
-    my $key_alg = lc($args->{KEY_ALG}) || 'rsa';
-    my $enc_alg = lc($args->{ENC_ALG});
+    my $key_alg = $args->{KEY_ALG} ? lc($args->{KEY_ALG}) : 'rsa';
+    my $enc_alg = $args->{ENC_ALG} ? lc($args->{ENC_ALG}) : undef;
 
     my $params = $args->{PARAMS};
 
@@ -1989,7 +1989,7 @@ sub __set_data_pool_entry : PRIVATE {
             my $safe_id = CTX('api')->get_token_alias_by_type({ TYPE => 'datasafe' });
             $encryption_key_id = 'p7:' . $safe_id;
 
-            my $cert = CTX('api')->get_certificate_for_alias( alias => $safe_id );
+            my $cert = CTX('api2')->get_certificate_for_alias( alias => $safe_id );
 
             ##! 16: 'cert: ' . $cert
             if ( !defined $cert ) {

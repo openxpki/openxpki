@@ -23,7 +23,6 @@ use OpenXPKI::Exception;
 use OpenXPKI::Config;
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::VolatileVault;
-use OpenXPKI::Server;
 use OpenXPKI::Server::Database;
 use OpenXPKI::Server::Log;
 use OpenXPKI::Server::Log::CLI;

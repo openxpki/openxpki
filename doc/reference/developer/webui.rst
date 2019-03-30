@@ -5,7 +5,7 @@ WebUI Page API Reference
 The web pages are created (mainly) on the client from a JSON control stucture delivered by the server. This document describes the structure expected by the rendering engine.
 
 Top-Level Structure
-====================
+===================
 
 This is the root element of any json result::
 
@@ -28,7 +28,7 @@ This is the root element of any json result::
 
 
 Page Head (TOP_LEVEL_INFO):
---------------------------------
+---------------------------
 
 This is rendered as the page main headline and intro text.
 ::
@@ -43,7 +43,7 @@ This is rendered as the page main headline and intro text.
 
 
 Status Notification (STATUS_INFO):
----------------------------------------
+----------------------------------
 
 Show a status bar on top of the page, the level indicates the severity and results in different colors of the status bar.
 ::
@@ -63,7 +63,7 @@ Page Level
 The page sections (``main`` and ``right``) can hold multiple subpage definitions. The main section must always contain at least one section while right can be omitted or empty.
 
 Page Section (PAGE_SECTION)
---------------------------------
+---------------------------
 
 This is the top level container of each page section.
 ::
@@ -261,7 +261,7 @@ By default, a file upload button is shown which loads the selected file into a h
 AllowedFiles can contain a list of allowed file extensions.
 
 Dynamic key value fields
-^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^
 If a field is defined with the property "keys", a pulldown of options is displayed above the actual field. This allows the user to specify, which kind of information he wants to specify.
 The content of the actual field will be submitted to the server with the selected key in the key-pulldown.
 
@@ -274,50 +274,48 @@ Example:
     This feature makes often more sense in combination with "clonable" fields.
 
 Dynamic form rendering
-^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
 If a select field is defined with the property "actionOnChange", each change event of this pulldown will trigger
 an submit of all formvalues (without validity checks etc) to the server with key "action" set to the value of "actionOnChange".
 
 The returned JSON must contain the key "_returnType" which should have the value "partial" or "full".
 This "_returnType" defines the mode of re-definition of the content of the form.
 
-Partial redefinition:
-    Beside the key "_returntype" the key "fields"  is expected in the returned JSON-Structure.
-    "fields" contains an array, which is semantically identic to the key "fields" in the definition of the form.
-    This array "fields" must contain only only the fields (and properties), which should react to the change of the (master-)field (pulldown) .
-    The property "name" is required (otherwise the client can not identify the field).
-    The property "type" can not be subject to changes. With aid of the property "visible" one can dynamically show or hide some fields.
-    Only known fields (which are already defined in the initial "fields"-property of the form-section) can be subject of the "partial" re-rendering.
-    Its not possible to add new fields here.
+**Partial redefinition:**
 
-    You can define more than one (cascading) dependent select.
+Beside the key "_returntype" the key "fields"  is expected in the returned JSON-Structure.
+"fields" contains an array, which is semantically identic to the key "fields" in the definition of the form.
+This array "fields" must contain only only the fields (and properties), which should react to the change of the (master-)field (pulldown) .
+The property "name" is required (otherwise the client can not identify the field).
+The property "type" can not be subject to changes. With aid of the property "visible" one can dynamically show or hide some fields.
+Only known fields (which are already defined in the initial "fields"-property of the form-section) can be subject of the "partial" re-rendering.
+Its not possible to add new fields here.
 
-    *Example*::
+You can define more than one (cascading) dependent select.
 
-    Initial definition of fields:
+*Example*:
+
+Initial definition of fields::
+
     fields => [
-                    { name => 'cert_typ', label => 'Typ',value=> 't2', prompt => 'please select a type',  type => 'select', actionOnChange => 'test_dep_select!change_type', options=>[{value=>'t1',label=>'Typ 1'},{value=>'t2',label=>'Typ 2'},{value=>'t3',label=>'Typ 3'}] },
-                    { name => 'cert_subtyp', label => 'Sub-Type',prompt => 'first select type!', type => 'select',options=>[] },
+        { name => 'cert_typ', label => 'Typ',value=> 't2', prompt => 'please select a type',  type => 'select', actionOnChange => 'test_dep_select!change_type', options=>[{value=>'t1',label=>'Typ 1'},{value=>'t2',label=>'Typ 2'},{value=>'t3',label=>'Typ 3'}] },
+        { name => 'cert_subtyp', label => 'Sub-Type',prompt => 'first select type!', type => 'select',options=>[] },
+        { name => 'special', label => 'Spezial (nur Typ 2',  type => 'checkbox',visible => 0 },
+    ]
 
-                    { name => 'special', label => 'Spezial (nur Typ 2',  type => 'checkbox',visible => 0 },
-
-                    ]
-
-    Action "test_dep_select!change_type" returns a (partially updated) definition of fields
+Action "test_dep_select!change_type" returns a (partially updated) definition of fields::
 
     {
         _returnType => 'partial',
         fields => [
-              { name => 'cert_subtyp', options=> [{value=>'x', label => 'Subtyp X'},...],value=>'x'} ,
-              { name => 'special',visible=> 1 }
-              ]
+            { name => 'cert_subtyp', options=> [{value=>'x', label => 'Subtyp X'},...],value=>'x'} ,
+            { name => 'special',visible=> 1 }
+        ]
+    };
 
-        };
+**Full redefinition:**
 
-
-
-Full redefinition:
-    is not implemented yet.
+Is not implemented yet.
 
 
 Item Level

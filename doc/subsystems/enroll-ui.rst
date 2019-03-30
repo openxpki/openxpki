@@ -10,37 +10,39 @@ to forward the request.
 Architecture
 ============
 
-	+------------------------------+
-	| Apache HTTP Server           |
-	+------------------------------+
-			|
-			| (CGI call of 'enroller' script)
-			|
-			V
-	+------------------------------+
-	| Enroller Web UI              |
-	+------------------------------+
-			|
-			| (enroller calls wrapper script)
-			|
-			V
-	+------------------------------+
-	| sscep Wrapper Script         |
-	+------------------------------+
-			|
-			| (wrapper script calls sscep client)
-			|
-			V
-	+------------------------------+
-	| sscep client                 |
-	+------------------------------+
-			|
-			| (SCEP request sent to server)
-			|
-			V
-	+------------------------------+
-	| SCEP Server                  |
-	+------------------------------+
+::
+
+    +------------------------------+
+    | Apache HTTP Server           |
+    +------------------------------+
+            |
+            | (CGI call of 'enroller' script)
+            |
+            V
+    +------------------------------+
+    | Enroller Web UI              |
+    +------------------------------+
+            |
+            | (enroller calls wrapper script)
+            |
+            V
+    +------------------------------+
+    | sscep Wrapper Script         |
+    +------------------------------+
+            |
+            | (wrapper script calls sscep client)
+            |
+            V
+    +------------------------------+
+    | sscep client                 |
+    +------------------------------+
+            |
+            | (SCEP request sent to server)
+            |
+            V
+    +------------------------------+
+    | SCEP Server                  |
+    +------------------------------+
 
 
 Configuration
@@ -48,27 +50,27 @@ Configuration
 
 The Mojolicious framework is designed to run nicely in a PSGI or CGI
 environment of a webserver. To run a test daemon that is reachable via
-your web browser, run the following:
+your web browser, run the following::
 
     script/enroller daemon
 
-To run the test cases, use the following:
+To run the test cases, use the following::
 
     script/enroller test
 
 Apache HTTP Server
 ------------------
 
-One method of serving the Enrollment UI is via Apache/CGI using the ScriptAlias directive:
+One method of serving the Enrollment UI is via Apache/CGI using the ScriptAlias directive::
 
     <Directory /srv/www/enroller>
-		Options -FollowSymLinks
-		AllowOverride None
-		Order allow,deny
-		Allow from all
-	</Directory>
-	ScriptAlias / /srv/www/enroller/script/enroller/
-    
+        Options -FollowSymLinks
+        AllowOverride None
+        Order allow,deny
+        Allow from all
+    </Directory>
+    ScriptAlias / /srv/www/enroller/script/enroller/
+
 SCEP Client (e.g. sscep)
 ------------------------
 

@@ -1,5 +1,5 @@
-Realm configuration
-====================================
+Realm
+=====
 
 In order to create a new realm the easiest way is to copy the sample directory
 tree ``realm/ca-one`` to a new directoy within the ``realm`` directory. Adjust the

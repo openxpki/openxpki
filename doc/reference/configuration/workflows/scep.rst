@@ -1,5 +1,5 @@
-Configuration of the SCEP Workflow
-====================================
+SCEP Workflow
+=============
 
 Before you can use the SCEP subsystem, you need to enable the SCEP Server
 in the general configuration. This section explains the options for the

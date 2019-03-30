@@ -147,7 +147,7 @@ cmp_deeply $result, superhashof({
 # list_supported_san
 #
 $result = $oxitest->api2_command("list_supported_san");
-cmp_deeply [ values %$result ], superbagof(qw( email URI DNS RID IP dirName otherName GUID UPN )),
+cmp_deeply [ values %$result ], superbagof(qw( email URI DNS RID IP dirName otherName )),
     "list supported certificate SAN fields";
 
 #

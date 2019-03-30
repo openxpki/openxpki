@@ -1,13 +1,7 @@
+Workflow Definition
+===================
 
-Configuration of the Workflow Engine with UI
-============================================
-
-All files mentioned here are below the node ``workflow`` inside the realm configuration. Filenames are all lowercased.
-
-Workflow Definitions
---------------------
-
-Each workflow is represented by a file or directory structure below ``workflow.def.<name>``. The name of the file is equal to the internal name of the workflow. Each such file must have the following structure, not all attributes are mandatory or useful in all situations::
+Each workflow is represented by a file or directory structure below ``workflow.def.<name>`` inside the realm configuration. The name of the file is equal to the internal name of the workflow. Each such file must have the following structure, not all attributes are mandatory or useful in all situations::
 
     head:
         label: The verbose name of the workflow, shown on the UI
@@ -46,14 +40,16 @@ Each workflow is represented by a file or directory structure below ``workflow.d
 
     field:
         field_name: (as used above)
-            name: key used in context
-            label: The fields label
+            name:        key used in context
+            label:       The fields label
             placeholder: Hint text shown in empty form elements
-            tooltip: Text for "tooltip help"
-            type:     Type of form element (default is input)
-            required: 0|1
-            default:  default value
-            more_key: other_value  (depends on form type)
+            tooltip:     Text for "tooltip help"
+            type:        Type of form element (default is input)
+            required:    0|1
+            default:     default value
+            api_type:    Shortcut syntax to specify an OpenAPI type
+            api_label:   Label to use in OpenAPI specification
+            more_key:    other_value  (depends on form type)
 
     validator:
         class: OpenXPKI::Server::Workflow::Validator::CertIdentifierExists
@@ -111,23 +107,26 @@ Below is a simple, but working workflow config (no conditions, no validators, th
 
 
 Workflow Head
-^^^^^^^^^^^^^
+-------------
 
 States
-^^^^^^
+------
 
 The ``action`` attribute is a list (or scalar) holding the action name and the
 follow up state. Put the name of the action and the expected state on success,
 seperated by the ``>`` sign (is greater than).
 
-Action
-^^^^^^
+Actions
+-------
 
+t.b.d.
 
-Field
-^^^^^
+Fields
+------
 
-*Select Field with options*
+SELECT field with options
+^^^^^^^^^^^^^^^^^^^^^^^^^
+::
 
     type: select
     option:
@@ -140,77 +139,80 @@ Field
           - cessationOfOperation
         label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION
 
-If the label tag is given (below option!), the values in the drop down are
-i18n strings made from label + uppercase(key), e.g
-I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_UNSPECIFIED
+If the ``label`` tag is given (below ``option``!) the values in the drop down are
+i18n strings made from ``label`` + ``uppercase(key)``, e.g
+*I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_UNSPECIFIED*.
 
-UI Rendering
-------------
+.. _openapi-workflow-field-param:
 
-The UI uses information from the workflow definition to render display and input pages. There are two different kinds of pages, switches and inputs.
+OpenAPI specific field parameters
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+::
 
-Action Switch Page
-^^^^^^^^^^^^^^^^^^
+    api_type: Array[Str]
+    api_label: List of surnames
 
-Used when the workflow comes to a state with more than one possible action.
+To be able to generate the OpenAPI spec the data types of all relevant input/output parameters must be defined. The most precise way to do this is to specify ``api_type`` in a field definition.
 
-*headline*
+If ``api_type`` is not given then OpenXPKI tries to deduce the correct OpenAPI type from the field parameters ``format`` and ``type`` (and from the field name in some rare cases). See Perl class ``OpenXPKI::Server::API2::Plugin::Workflow::get_openapi_typespec`` for technical details.
 
-Concated string from state.label + workflow.label
 
-*descriptive intro*
+api_type
+~~~~~~~~
 
-String as defined in state.description, can contain HTML tags
+``api_type`` accepts a custom shortcut syntax to define OpenAPI data types. The syntax is close to the syntax used in `Moose types <https://metacpan.org/pod/distribution/Moose/lib/Moose/Manual/Types.pod>`_. All type names are **case insensitive**.
 
-*workflow context*
+**Supported types**
 
-By default a plain dump of the context using key/values, array/hash values are converted to a html list/dd-list. You can define a custom output table with labels, formatted values and even links, etc - see the section "Workflow Output Formatting" fore details.
+- ``String`` alias ``Str``
+- ``Integer`` alias ``Int``
+- ``Numeric`` alias ``Num``
+- ``Boolean`` alias ``Bool``
+- ``Array`` alias ``ArrayRef``
 
-*button bar / simple layout*
+  The type of array items may be specified in square brackets::
 
-One button is created for each available action, the button label is taken from action.label. The value of action.tooltip becomes a mouse-over label.
+      Array[ Str ]
+      Array[ Str | Int ]
 
-*button bar / advanced layout*
+- ``Object`` alias ``Obj``, ``Hash``, ``HashRef``
 
-If you set the state.hint attribute, each button is drawn on its own row with a help text shown aside.
+  The object properties (i.e. hash items) may be specified in square brackets::
 
-Form Input Page
-^^^^^^^^^^^^^^^
+      Object[ age: Integer, name: String ]
 
-Used when the workflow comes to a state where only one action is available or where one action was choosen.
+**Type parameters/modifiers**
 
-*headline*
+Modifiers may be passed in brackets. Please note that those modifiers are **case sensitive** as they are used as-is in the OpenAPI spec.
+::
 
-Concated string from action.label (if none is given: state.label ) + workflow.label
+    String(format:password)
+    Integer(minimum: 1)
 
-*descriptive intro*
+**Examples**
 
-String as defined in action.description, can contain HTML tags
+Some more complex examples of nested types::
 
-*form fields*
+    Array[ Object[ comment:Str, names:Array[Str] ] ]
+    HashRef[ size:Integer(minimum:5), data:Array, positions:Array[ Integer | Numeric ] ]
 
-The field itself is created from label, placeholder and tooltip. If at least one form field has the description attribute set,
-an explanatory block for the fields is added to the bottom of the page.
+**Please note**
 
-Markup of Final States
-^^^^^^^^^^^^^^^^^^^^^^
+- types are **case insensitive**
+- you can **insert spaces** wherever you like in a type definition
 
-If the workflow is in a final state, the default is to render a colored
-status bar on with a message that depends on the name of the state.
-Recognized names are SUCCESS, CANCELED and FAILURE which generate a
-green/yellow/red bar with a corresponding error message. The state name
-NOSTATUS has no status bar at all.
+api_label
+~~~~~~~~~
 
-If the state does not match one of those names, a yellow bar saying
-"The workflow is in final state" is show.
+``api_label`` is used as a field description in the OpenAPI spec. If not given, ``label`` is used instead.
 
-To customize/suppress the status bar you can add level and message
-to the state definition (see above).
+
+For an OpenAPI overview please see :ref:`openapi-overview`.
 
 Global Entities
 ---------------
 
-You can define entities for action, condition and validator for global use in the corresponding files below ``workflow.global.``. The format is the same as described below, the "global_" prefix is added by the system.
+You can define entities for action, condition and validator for global use in the corresponding files below ``workflow.global.``. The format is the same as described below, the *global_* prefix is added by the system.
 
 Creating Macros (not implemented yet!)
 --------------------------------------

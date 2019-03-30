@@ -317,6 +317,7 @@ OpenXPKI/Server/API2/Plugin/Workflow/create_workflow_instance.pm
 OpenXPKI/Server/API2/Plugin/Workflow/execute_workflow_activity.pm
 OpenXPKI/Server/API2/Plugin/Workflow/check_workflow_acl.pm
 OpenXPKI/Server/API2/Plugin/Workflow/fail_workflow.pm
+OpenXPKI/Server/API2/Plugin/Workflow/get_openapi_typespec.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_rpc_openapi_spec.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_activities.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_activities_params.pm
@@ -777,11 +778,13 @@ t/90_api/20_token.t
 t/91_api2/10_base.t
 t/91_api2/11_autoloader.t
 t/91_api2/20_acl.t
-t/91_api2/30_plugin_token.t
 t/91_api2/lib/OpenXPKI/TestCommands/Ignored.pm
 t/91_api2/lib/OpenXPKI/TestCommands/givetheparams.pm
 t/91_api2/lib/OpenXPKI/TestCommands/scream.pm
 t/91_api2/lib/OpenXPKI/Testalienplugin.pm
+
+t/92_api2_plugins/10_token.t
+t/92_api2_plugins/20_get_openapi_typespec.t
 
 t/95_openxpkiadm/10_certificate.t
 t/95_openxpkiadm/CommandlineTest.pm

@@ -28,7 +28,6 @@ Setup and Configuration
    admin/installation/building
    admin/installation/packages
    admin/installation/deployment
-   admin/customization/workflow/activity
    admin/configuration/concepts
    admin/configuration/scep
    admin/configuration/smartcard
@@ -38,6 +37,7 @@ Setup and Configuration
    reference/configuration/server
    reference/configuration/realm
    reference/configuration/workflow
+   reference/configuration/workflow-ui
    reference/configuration/output
    reference/configuration/uicontrol
    reference/configuration/profile
@@ -64,6 +64,7 @@ Automation / External APIs
 
    subsystems/index
    subsystems/rpc
+   subsystems/rpc-openapi
    subsystems/scep
    subsystems/soap
    subsystems/certep
@@ -99,6 +100,7 @@ Developer
    :caption: Developer
 
    developer/index
+   admin/customization/workflow/activity
    developer/tests
 
 .. toctree::

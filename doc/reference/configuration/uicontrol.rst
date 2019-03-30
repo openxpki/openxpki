@@ -1,5 +1,5 @@
-Customization of UI components
-===============================
+WebUI components
+================
 
 Menustructure, search options and some additional items can be configured
 based on the user role using the files located in the uicontrol/ folder.
@@ -17,7 +17,7 @@ Column Layout
 #############
 
 Add a section ``cols`` to you definition block::
-.
+
     cols:
       - label: I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL
         field: WORKFLOW_SERIAL
