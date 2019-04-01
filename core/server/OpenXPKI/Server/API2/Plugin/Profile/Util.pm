@@ -85,7 +85,7 @@ sub get_input_elements {
             $lcinput{keys} = \@keys;
         }
 
-        $lcinput{clonable} = 1 if $lcinput{min} || $lcinput{max};
+        $lcinput{clonable} = 1 if ($lcinput{min} || $lcinput{max});
 
         push @definitions, \%lcinput;
     }

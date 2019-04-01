@@ -164,7 +164,7 @@ sub get_action_info {
         my $field = $self->get_field_info( $field_name, $wf_name );
 
         $field->{type} = 'text' unless ($field->{type});
-        $field->{clonable} = ($field->{min} || $field->{max}) || 0;
+        $field->{clonable} = (defined $field->{min} || $field->{max}) || 0;
 
         push @fields, $field;
     }
