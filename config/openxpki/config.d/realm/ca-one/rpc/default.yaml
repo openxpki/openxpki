@@ -1,3 +1,6 @@
+# used in UI
+label: Default Endpoint
+
 authorized_signer:
     rule1:
         # Full DN
@@ -5,9 +8,9 @@ authorized_signer:
     rule2:
         # Full DN
         subject: CN=.+:pkiclient,.*
- 
+
 # You must set at least one of both options or remove the is_policy_loaded
-# condition in the workflow definition        
+# condition in the workflow definition
 policy:
     profile: I18N_OPENXPKI_PROFILE_TLS_SERVER
 #    subject: "*"

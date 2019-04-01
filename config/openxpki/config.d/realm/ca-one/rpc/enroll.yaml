@@ -1,3 +1,5 @@
+label: Enrollment
+
 authorized_signer:
     rule1:
         # Full DN
