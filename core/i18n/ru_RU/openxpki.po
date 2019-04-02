@@ -263,10 +263,6 @@ msgid "I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD"
 msgstr "Загрузка сертификата в форматах PEM или CRT"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_CLIENT_GETAUTHCODE_USER_NOT_AUTH_PERS"
-msgstr "Профиль пользователя общего назначения"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_CERT_NOT_FOUND"
 msgstr "SPKAC строка пуста."
 
@@ -1404,18 +1400,6 @@ msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_REPORT_CONFIG"
-msgstr "Имя учетной записи"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_DEFAULT"
-msgstr "Загрузка сертификата в форматах PEM или CRT"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_EXPIRY"
-msgstr "Родительский технологический процесс"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_LABEL"
 msgstr "Имя учетной записи"
 
@@ -1448,10 +1432,6 @@ msgstr "Дочерние технологические процессы"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_REVOCATION_WORKFLOW_ID"
 msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
-msgstr "Пауза"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_CERTIFICATES_QUERY_IS_EMPTY"
@@ -1829,6 +1809,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_LABEL"
 msgstr "Запустить технологический процесс LDAP-публикации сертификата"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_AUTH_FORM_DESC"
+msgstr "Сохранить заявку в базе данных и выдать сертификат"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_AUTH_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_DESC"
 msgstr "Пауза"
 
@@ -2185,16 +2173,16 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RUNNING_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_DESC"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEP_SEARCH_INITIALIZE_LABEL"
 msgstr "Прием заявки по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_ESCROWED_KEY_DESC"
-msgstr "Отклонить заявку на отзыв сертификата"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_ESCROWED_KEY_LABEL"
-msgstr "Отклонить заявку на отзыв сертификата"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
@@ -2273,11 +2261,23 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ELIGIBILITY_RECHECK_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_PERSIST_DATA"
+msgstr "Сохранить заявку в базе данных и выдать сертификат"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_PROCEED_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_REJECT"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_SUBMIT"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
@@ -2355,6 +2355,14 @@ msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVALS_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CASIGNER_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CASIGNER_PLACEHOLDER"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
@@ -2718,6 +2726,22 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_LABEL"
 msgstr "Имя учетной записи"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_DESC"
+msgstr ""
+"Для использования данного профиля сертификата достаточно ввести Ваше имя, "
+"имя Вашей учетной записи и адрес электронной почты. Это простейший профиль "
+"пользователя, который следует использовать, если нет особых требований к "
+"сертифкату. В противном случае следует использовать расширенный профиль."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_LABEL"
+msgstr "Адрес электронной почты"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_PLACEHOLDER"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_DESC"
 msgstr ""
 "Для использования данного профиля сертификата достаточно ввести Ваше имя, "
@@ -2735,6 +2759,26 @@ msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_TOOLTIP"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_DESC"
+msgstr "Это поле можно использовать для комментариев."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_PLACEHOLDER"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_META_ARS_GROUP_TOOLTIP"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_META_ENDPOINT_TOOLTIP"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
@@ -2895,6 +2939,23 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_DESC"
+msgstr ""
+"Используйте данный профиль сертификата только если Вы отчетливо "
+"представляете себе необходимую структуру имени субъекта сертификата, хорошо "
+"знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
+"части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
+"также произвольный набор альтернативных имен."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_PLACEHOLDER"
+msgstr "Последнее обновление"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_TOOLTIP"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_CERTIFICATE_KEY_DUPLICATE"
 msgstr "Родительский технологический процесс"
 
@@ -3023,6 +3084,16 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RUN_IN_BACKGROUND_LABEL"
 msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TOKEN_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TOKEN_PLACEHOLDER"
+msgstr ""
+"Начальное состояние технологического процесса публикации сертификатов через "
+"LDAP"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_DESC"
@@ -3480,6 +3551,22 @@ msgstr "Дочерние технологические процессы"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_LABEL"
 msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_FAILURE_DESC"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_FAILURE_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_INITIAL_DESC"
+msgstr "Идет запуск... "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_INITIAL_LABEL"
+msgstr "Идет запуск... "
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_DESC"
@@ -3948,6 +4035,30 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_APPROVAL_DESC"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_APPROVAL_LABEL"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_INITIAL_DESC"
+msgstr "Прием заявки по протоколу SCEP"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_INITIAL_LABEL"
+msgstr "Прием заявки по протоколу SCEP"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_REVIEW_DESC"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_REVIEW_LABEL"
+msgstr "Технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_DESC"
 msgstr "Технологические процессы"
 
@@ -4044,6 +4155,14 @@ msgstr "Создание заявки на сертификат (CSR)"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_LABEL"
 msgstr "Создание заявки на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_DESC"
+msgstr "Экспорт"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_LABEL"
+msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_DESC"
@@ -4148,6 +4267,14 @@ msgstr "Экспорт"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REQUEST_CHECKER_LABEL"
 msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEPGETCA_DESC"
+msgstr "Описания пока нет"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEPGETCA_LABEL"
+msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_DESC"
@@ -8479,6 +8606,10 @@ msgstr "Имя учетной записи"
 #~ msgstr "Идентификатор сертификата"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CLIENT_GETAUTHCODE_USER_NOT_AUTH_PERS"
+#~ msgstr "Профиль пользователя общего назначения"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CRL_LAST_ITEMCNT"
 #~ msgstr "Действителен"
 
@@ -8589,6 +8720,22 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_RENEWAL_SUBJECT_CHANGED_WARNING"
 #~ msgstr "В состоянии ожидания запуска"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_REPORT_CONFIG"
+#~ msgstr "Имя учетной записи"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_DEFAULT"
+#~ msgstr "Загрузка сертификата в форматах PEM или CRT"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_EXPIRY"
+#~ msgstr "Родительский технологический процесс"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
+#~ msgstr "Пауза"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_DAMAGED"
@@ -8768,10 +8915,6 @@ msgstr "Имя учетной записи"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PERSIST_KEY_PASSWORD_LABEL"
-#~ msgstr "Сохранить заявку в базе данных и выдать сертификат"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PERSIST_METADATA_DESC"
 #~ msgstr "Сохранить заявку в базе данных и выдать сертификат"
 
 #, fuzzy
@@ -8981,10 +9124,6 @@ msgstr "Имя учетной записи"
 #~ msgstr "Родительский технологический процесс"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GET_AUTH1_ID_LABEL"
-#~ msgstr "Родительский технологический процесс"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GET_AUTH2_ID_DESC"
 #~ msgstr "Родительский технологический процесс"
 
@@ -9081,10 +9220,6 @@ msgstr "Имя учетной записи"
 #~ msgstr "Утвердить заявку на сертификат (CSR)"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_AUTH_ERR_DESC"
-#~ msgstr "Сохранить заявку в базе данных и выдать сертификат"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_AUTH_ERR_LABEL"
 #~ msgstr "Сохранить заявку в базе данных и выдать сертификат"
 
@@ -9175,6 +9310,14 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_COPY_CSR_SERIALS_LABEL"
 #~ msgstr "Сохранить заявку в базе данных и выдать сертификат"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_ESCROWED_KEY_DESC"
+#~ msgstr "Отклонить заявку на отзыв сертификата"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_ESCROWED_KEY_LABEL"
+#~ msgstr "Отклонить заявку на отзыв сертификата"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_ESCROW_CSR_DESC"
@@ -9549,10 +9692,6 @@ msgstr "Имя учетной записи"
 #~ msgstr "Отменить утверждение заявки на отзыв сертификата (CRR)"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SET_CREATOR_DESC"
-#~ msgstr "Технологические процессы"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SET_CREATOR_LABEL"
 #~ msgstr "Родительский технологический процесс"
 
@@ -9587,10 +9726,6 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_WRITE_PIN_OK_LABEL"
 #~ msgstr "Изменить профиль сертификата "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_CONTINUE"
-#~ msgstr "Родительский технологический процесс"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CERTIFICATE_RENEWAL_DESC"
@@ -9860,10 +9995,6 @@ msgstr "Имя учетной записи"
 #~ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_ID_PLACEHOLDER"
-#~ msgstr "Дочерние технологические процессы"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_ID_TOOLTIP"
 #~ msgstr "Родительский технологический процесс"
 
@@ -10030,10 +10161,6 @@ msgstr "Имя учетной записи"
 #~ "расширенный профиль."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_LABEL"
-#~ msgstr "Родительский технологический процесс"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SC_ERROR_REASON_LABEL"
 #~ msgstr "Родительский технологический процесс"
 
@@ -10072,12 +10199,6 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TMP_QUEUE_TOOLTIP"
 #~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_PLACEHOLDER"
-#~ msgstr ""
-#~ "Начальное состояние технологического процесса публикации сертификатов "
-#~ "через LDAP"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_TOOLTIP"
@@ -10664,14 +10785,6 @@ msgstr "Имя учетной записи"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCEL_APPROVALS_LABEL"
-#~ msgstr "Технологические процессы"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CHECK_APPROVALS_DESC"
-#~ msgstr "Технологические процессы"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CHECK_APPROVALS_LABEL"
 #~ msgstr "Технологические процессы"
 
 #, fuzzy

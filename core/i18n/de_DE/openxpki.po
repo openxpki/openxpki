@@ -211,10 +211,6 @@ msgstr "Valid"
 msgid "I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD"
 msgstr "Click here to download."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CLIENT_GETAUTHCODE_USER_NOT_AUTH_PERS"
-msgstr "Requester is not in authorized signer list. "
-
 msgid "I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_CERT_NOT_FOUND"
 msgstr "Unable to check certificates status as identifier was not found."
 
@@ -1007,16 +1003,6 @@ msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "Reason code given is not supported"
 
 # Remove?
-msgid "I18N_OPENXPKI_UI_REPORT_CONFIG"
-msgstr "Report"
-
-msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_DEFAULT"
-msgstr "Valid Certificates"
-
-msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_EXPIRY"
-msgstr "Expiry Report"
-
-# Remove?
 msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_LABEL"
 msgstr "Report Configuration"
 
@@ -1041,9 +1027,6 @@ msgstr "Revocation Workflow"
 
 msgid "I18N_OPENXPKI_UI_REVOCATION_WORKFLOW_ID"
 msgstr "Revocation Workflow"
-
-msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
-msgstr "Unknown error when analyzing card status"
 
 msgid "I18N_OPENXPKI_UI_SEARCH_CERTIFICATES_QUERY_IS_EMPTY"
 msgstr "Search query is empty!"
@@ -1324,6 +1307,20 @@ msgstr "Initialize"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_LABEL"
 msgstr "Initialize"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_AUTH_FORM_DESC"
+msgstr ""
+"This workflow is to invalidate (revoke) an existing certificate. <br>If you "
+"came here with a certificate already selected, please check if the given "
+"certificate identifier and subject is what you requested and push the "
+"continue button.<br>In case you initialised this process, please type the "
+"certificate identifier or use the autosearch function to find your "
+"certificate."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_AUTH_LABEL"
+msgstr "Finish"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_DESC"
 msgstr ""
@@ -1648,14 +1645,16 @@ msgstr "Revoke Certificate"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RUNNING_LABEL"
 msgstr "Current Activity"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_DESC"
+msgstr "Cleanup the workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_LABEL"
+msgstr "Sleeping"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEP_SEARCH_INITIALIZE_LABEL"
 msgstr "Start Search"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_ESCROWED_KEY_DESC"
-msgstr ""
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_CREATE_ESCROWED_KEY_LABEL"
-msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 msgstr "Generate Code"
@@ -1723,11 +1722,23 @@ msgstr "Bulk handle workflows"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ELIGIBILITY_RECHECK_LABEL"
 msgstr "Recheck Eligibility"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_PERSIST_DATA"
+msgstr "Persist CSR"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_PROCEED_LABEL"
 msgstr "Submit with Policy Exception"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL"
 msgstr "Re-Evaluate Policy"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_REJECT"
+msgstr "The request was finally rejected and can not be restartet."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_SUBMIT"
+msgstr "Go Back"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CANCEL_BUTTON"
 msgstr "Cancel Request"
@@ -1788,6 +1799,14 @@ msgstr "Allowed Certificate Count"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVALS_LABEL"
 msgstr "Approvals"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CASIGNER_LABEL"
+msgstr "Requestor/Signer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CASIGNER_PLACEHOLDER"
+msgstr "my.name@mycompany.com"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_IGNORED_LABEL"
 msgstr "Ignored Certificate Identifiers"
@@ -2063,6 +2082,18 @@ msgstr " "
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_LABEL"
 msgstr "Key Params"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_DESC"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_LABEL"
+msgstr "Requestor/Owner"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_PLACEHOLDER"
+msgstr "Name of the Requestor/Owner"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_DESC"
 msgstr "email address of the responsible person for this certificate."
 
@@ -2073,6 +2104,26 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_PLACEHOLDER"
 msgstr "certificate holders email address"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_TOOLTIP"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_DESC"
+msgstr " The server endpoint used for the request."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_LABEL"
+msgstr "Endpoint"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_PLACEHOLDER"
+msgstr "certificate holders email address"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_META_ARS_GROUP_TOOLTIP"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_META_ENDPOINT_TOOLTIP"
 msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_DESC"
@@ -2187,6 +2238,23 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
 msgstr "Your PKCS10 encoded request"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_DESC"
+msgstr ""
+" Paste your PKCS10 formated request directly into the field or use the "
+"upload button to load a file from your local computer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_PLACEHOLDER"
+msgstr ""
+" Please paste your PEM encoded request here (must look like  -----BEGIN "
+"CERTIFICATE REQUEST-----) or use the browse/upload button below to load a "
+"file from your computer."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_TOOLTIP"
+msgstr "Your PKCS10 encoded request"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_CERTIFICATE_KEY_DUPLICATE"
 msgstr "Duplicated Key Certificates"
 
@@ -2285,6 +2353,14 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RUN_IN_BACKGROUND_LABEL"
 msgstr "run in background"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TOKEN_LABEL"
+msgstr "Comment"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TOKEN_PLACEHOLDER"
+msgstr "additional comments to help us processing the request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_DESC"
 msgstr "Name of the SCEP endpoint receiving this request."
@@ -2614,6 +2690,22 @@ msgstr "This workflow was canceled."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_LABEL"
 msgstr "Canceled by User"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_FAILURE_DESC"
+msgstr "This workflow failed finally."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_FAILURE_LABEL"
+msgstr "FAILURE"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_INITIAL_DESC"
+msgstr "Initial state"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_INITIAL_LABEL"
+msgstr "State"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_DESC"
 msgstr "The certificate was issued and will be send to the client on request."
@@ -3042,6 +3134,30 @@ msgstr "Report Result"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL"
 msgstr "This workflow is currently running on the server."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_APPROVAL_DESC"
+msgstr "Approval pending"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_APPROVAL_LABEL"
+msgstr "Approval pending"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_INITIAL_DESC"
+msgstr "Export initial state"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_INITIAL_LABEL"
+msgstr "State"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_REVIEW_DESC"
+msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_REVIEW_LABEL"
+msgstr "SUCCESS"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_DESC"
 msgstr "No result matching your search criteria could be found."
 
@@ -3122,6 +3238,14 @@ msgstr "Certificate Signing Request (CSR)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_LABEL"
 msgstr "Certificate Signing Request (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_DESC"
+msgstr "Certificate Export"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_LABEL"
+msgstr "Certificate Export"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_DESC"
 msgstr ""
@@ -3207,6 +3331,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REQUEST_CHECKER_LABEL"
 msgstr "Request Checker"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEPGETCA_DESC"
+msgstr "Search for SCEP workflows by  transaction id"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEPGETCA_LABEL"
+msgstr "SCEP Search"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_DESC"
 msgstr "Search for SCEP workflows by  transaction id"
 
@@ -3265,3 +3397,20 @@ msgstr "Wake Up"
 # Remove?
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Yes"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CLIENT_GETAUTHCODE_USER_NOT_AUTH_PERS"
+#~ msgstr "Requester is not in authorized signer list. "
+
+# Remove?
+#~ msgid "I18N_OPENXPKI_UI_REPORT_CONFIG"
+#~ msgstr "Report"
+
+#~ msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_DEFAULT"
+#~ msgstr "Valid Certificates"
+
+#~ msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_EXPIRY"
+#~ msgstr "Expiry Report"
+
+#~ msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
+#~ msgstr "Unknown error when analyzing card status"
