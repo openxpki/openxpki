@@ -27,7 +27,7 @@ Returns a I<HashRef> with informations about critical items of the system:
         workflow        => 1,       # workflow process count
         version         => '...'    # OpenXPKI version string
         hostname        => oxi-test # Name of the host (from sys::hostname)
-
+        config          => { version => .. } # key/values from system.version
     }
 
 B<Changes compared to API v1:> parameter C<ITEMS> was removed as it was unused.
@@ -84,6 +84,8 @@ command "get_ui_system_status" => {
     # Process count
     my $pids = OpenXPKI::Control::get_pids();
 
+    my $config =  CTX('config')->get_hash("system.version");
+
     return {
         secret_offline  => $offline_secrets,
         crl_expiry      => $crl_expiry,
@@ -93,6 +95,7 @@ command "get_ui_system_status" => {
         workflow        => scalar @{$pids->{workflow}},
         version         => $OpenXPKI::VERSION::VERSION,
         hostname        => hostname,
+        config          => $config
     }
 };
 

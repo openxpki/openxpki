@@ -64,7 +64,7 @@ sub render_system_status {
 
     my $wf_info = $args->{WF_INFO};
 
-    my $status = $self->send_command("get_ui_system_status");
+    my $status = $self->send_command_v2("get_ui_system_status");
 
     my @fields;
 
@@ -147,6 +147,12 @@ sub render_system_status {
         label  => 'Hostname',
         value  => $status->{hostname},
     };
+
+    push @fields, {
+        label  => 'Config Version',
+        value  => $status->{config},
+        format => 'defhash',
+    } if ($status->{config});
 
     $self->add_section({
         type => 'keyvalue',

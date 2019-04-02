@@ -255,6 +255,7 @@ OpenXPKI/Server/API2/Plugin/Cert/is_certificate_owner.pm
 OpenXPKI/Server/API2/Plugin/Cert/private_key.pm
 OpenXPKI/Server/API2/Plugin/Cert/search_cert.pm
 OpenXPKI/Server/API2/Plugin/Cert/validate_certificate.pm
+OpenXPKI/Server/API2/Plugin/Control/version.pm
 OpenXPKI/Server/API2/Plugin/Control/control_watchdog.pm
 OpenXPKI/Server/API2/Plugin/Control/purge_application_log.pm
 OpenXPKI/Server/API2/Plugin/Crypto/generate_key.pm
