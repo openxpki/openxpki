@@ -834,6 +834,7 @@ cgi-bin/webui.fcgi
 cgi-bin/soap.fcgi
 cgi-bin/download.fcgi
 cgi-bin/rpc.fcgi
+cgi-bin/est.fcgi
 
 # Client UI
 htdocs/src/main-built.js
