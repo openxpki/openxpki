@@ -58,9 +58,7 @@ sub execute {
     my $cert_subject = $x509->get_subject();
 
     if ($cert_subject) {
-        # TODO - extend Crypt::X509 to return RFC compliant subject
         my $dn = OpenXPKI::DN->new( $cert_subject );
-
         %hashed_dn = $dn->get_hashed_content();
         $param->{$subject_prefix.'subject_parts'} = $serializer->serialize( \%hashed_dn );
         $param->{cert_subject} = $dn->get_rfc_2253_dn();

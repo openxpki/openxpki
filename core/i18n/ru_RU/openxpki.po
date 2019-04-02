@@ -2173,14 +2173,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RUNNING_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_LABEL"
-msgstr "Родительский технологический процесс"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEP_SEARCH_INITIALIZE_LABEL"
 msgstr "Прием заявки по протоколу SCEP"
 
@@ -2375,6 +2367,10 @@ msgstr "Идентификатор сертификата"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_PLACEHOLDER"
+msgstr "Идентификатор сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_LIST_LABEL"
 msgstr "Идентификатор сертификата"
 
 #, fuzzy
@@ -2946,6 +2942,10 @@ msgstr ""
 "знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
 "части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
 "также произвольный набор альтернативных имен."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_LABEL"
+msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_PLACEHOLDER"
@@ -4035,20 +4035,20 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_APPROVAL_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_APPROVAL_LABEL"
-msgstr "Технологические процессы"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_INITIAL_DESC"
 msgstr "Прием заявки по протоколу SCEP"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_INITIAL_LABEL"
 msgstr "Прием заявки по протоколу SCEP"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_PENDING_DESC"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_PENDING_LABEL"
+msgstr "Технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_REVIEW_DESC"
@@ -9180,6 +9180,14 @@ msgstr "Имя учетной записи"
 #~ msgstr "Отклонить заявку на отзыв сертификата"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_LABEL"
+#~ msgstr "Родительский технологический процесс"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_ADD_ESCROW_CERT_TO_PUBLISH_QUEUE_DESC"
 #~ msgstr "Список отзыва доступен"
 
@@ -12211,6 +12219,14 @@ msgstr "Имя учетной записи"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_DESCRIPTION"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_APPROVAL_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_APPROVAL_LABEL"
 #~ msgstr "Технологические процессы"
 
 #, fuzzy

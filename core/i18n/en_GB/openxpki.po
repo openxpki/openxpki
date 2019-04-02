@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2019-04-02 09:29+0200\n"
+"PO-Revision-Date: 2019-04-02 18:18+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -1632,13 +1632,6 @@ msgstr "Revoke Certificate"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RUNNING_LABEL"
 msgstr "Current Activity"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_DESC"
-msgstr ""
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_LABEL"
-msgstr "Sleeping"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEP_SEARCH_INITIALIZE_LABEL"
 msgstr "Start Search"
 
@@ -1797,6 +1790,9 @@ msgstr "Certificate List"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_PLACEHOLDER"
 msgstr "List of certificate identifiers, seperated by space or newline"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_LIST_LABEL"
+msgstr "Certificate List"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTSIGN_TOKEN"
 msgstr "Issuing CA"
@@ -2091,9 +2087,8 @@ msgstr " "
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_DESC"
 msgstr " The server endpoint used for the request."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_LABEL"
-msgstr "Endpoint"
+msgstr "Endpoint / Server"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_PLACEHOLDER"
@@ -2223,6 +2218,9 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_DESC"
 msgstr ""
 " Paste your PKCS7 formated certificate bundle directly into the field or use "
 "the upload button to load a file from your local computer"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_LABEL"
+msgstr "PKCS7"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_PLACEHOLDER"
 msgstr ""
@@ -3110,12 +3108,6 @@ msgstr "Report Result"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL"
 msgstr "This workflow is currently running on the server."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_APPROVAL_DESC"
-msgstr ""
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_APPROVAL_LABEL"
-msgstr "Approval pending"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_INITIAL_DESC"
 msgstr ""
 "Import a custom chain to be served by the SCEP GetCA command. MUST include "
@@ -3124,6 +3116,16 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_INITIAL_LABEL"
 msgstr "Set Chain for GetCA "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_PENDING_DESC"
+msgstr ""
+"Please check the contents of your request below, press continue to proceed "
+"or cancel the request."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_PENDING_LABEL"
+msgstr "Check Request Information"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_REVIEW_DESC"
 msgstr ""
@@ -3494,6 +3496,10 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_LABEL"
 #~ msgstr "Message of the Day"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_LABEL"
+#~ msgstr "Sleeping"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_ADD_ESCROW_CERT_TO_PUBLISH_QUEUE_DESC"
@@ -5138,6 +5144,12 @@ msgstr "Yes"
 #~ "This workflow is running in the background or at the attention of another "
 #~ "user. Use the Recheck button to update the status and see when its "
 #~ "finished."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_APPROVAL_DESC"
+#~ msgstr " "
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_APPROVAL_LABEL"
+#~ msgstr "Approval pending"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CERTIFICATE_DESC"

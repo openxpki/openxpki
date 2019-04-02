@@ -58,6 +58,10 @@ sub get_result
 
     my @extra_certs = ($result =~ m{ ( -----BEGIN\ [\w\s]*CERTIFICATE----- [^-]+ -----END\ [\w\s]*CERTIFICATE----- ) }gmsx);
 
+    if ($self->{NOSORT}) {
+        return \@extra_certs;
+    }
+
     my $byIdentifier = {};
     my $bySubject = {};
     my $byKeyId = {};
@@ -152,6 +156,8 @@ OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_chain
 
 =item * NOCHAIN
 
+=item * NOSORT
+
 =back
 
 =head2 hide_output
@@ -164,10 +170,14 @@ returns false
 
 =head2 get_result
 
-Returns an array ref holding the PEM-encoded certificates where
-the first item is the entity certificate followed by the issuers
-in order.
+Returns an array ref holding the PEM-encoded certificates where the
+first item is the entity certificate followed by the issuers in order.
+Certificates from the bundle that are not required to build the chain are
+not part of the result.
 
 If NOCHAIN is set, returns only the entity as string.
+
+If NOSORT is set, all certificates are returned as extraced from the
+bundle without any additional sorting or filtering applied.
 
 

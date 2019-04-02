@@ -1879,14 +1879,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RUNNING_LABEL"
 msgstr "Invia la richiesta"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_DESC"
-msgstr "Azzera il workflow"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_LABEL"
-msgstr "Termina Workflow"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEP_SEARCH_INITIALIZE_LABEL"
 msgstr "Specifica Opzioni Report"
 
@@ -2066,6 +2058,10 @@ msgstr "Certificato"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_PLACEHOLDER"
+msgstr "Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_LIST_LABEL"
 msgstr "Certificato"
 
 #, fuzzy
@@ -2529,6 +2525,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_DESC"
 msgstr ""
 "Incolla la tua richiesta in formato PKCS10 direttamente nel campo testuale "
 "oppure usa il pulsante upload per caricare un file dal tuo computer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_LABEL"
+msgstr "Richiesta PKCS10"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_PLACEHOLDER"
@@ -3469,20 +3469,20 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL"
 msgstr "Invia la richiesta"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_APPROVAL_DESC"
-msgstr "Approval pending"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_APPROVAL_LABEL"
-msgstr "Approval pending"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_INITIAL_DESC"
 msgstr "Esporta lo stato iniziale"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_INITIAL_LABEL"
 msgstr "Stato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_PENDING_DESC"
+msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_PENDING_LABEL"
+msgstr "SUCCESSO"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_REVIEW_DESC"
@@ -3884,6 +3884,14 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_LABEL"
 #~ msgstr "Messaggio del Giorno (MOTD)"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_DESC"
+#~ msgstr "Azzera il workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_LABEL"
+#~ msgstr "Termina Workflow"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_ADD_ESCROW_CERT_TO_PUBLISH_QUEUE_DESC"
@@ -5550,6 +5558,14 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_DESCRIPTION"
 #~ msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_APPROVAL_DESC"
+#~ msgstr "Approval pending"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_APPROVAL_LABEL"
+#~ msgstr "Approval pending"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CERTIFICATE_DESC"
