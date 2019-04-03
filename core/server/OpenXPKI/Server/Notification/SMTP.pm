@@ -365,6 +365,9 @@ sub notify {
             $cfg->{$key} = $default_envelope->{$key} if (!defined $cfg->{$key});
         }
 
+        # templating for reply-to
+        $cfg->{reply} = $self->_render_template( $cfg->{reply}, \%vars ) if ($cfg->{reply});
+
         ##! 8: 'Process handle ' . $handle
 
         # Look if there is info from previous notifications
