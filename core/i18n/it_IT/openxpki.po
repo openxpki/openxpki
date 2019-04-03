@@ -1879,6 +1879,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RUNNING_LABEL"
 msgstr "Invia la richiesta"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_INITIALIZE_DESC"
+msgstr "Esporta lo stato iniziale"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_INITIALIZE_LABEL"
+msgstr "Specifica Opzioni Report"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEP_SEARCH_INITIALIZE_LABEL"
 msgstr "Specifica Opzioni Report"
 
@@ -1904,6 +1912,10 @@ msgstr "Per favore Aggiorna / Completa le informazioni qui sotto."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Richiesta Aggiornamento"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_AUTH_FAILURE_DESC"
+msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION"
 msgstr ""
@@ -1949,12 +1961,12 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE"
 msgstr "Bulk handle workflows"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ELIGIBILITY_RECHECK_LABEL"
-msgstr "Ri-Valuta la Policy"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_APPROVE"
+msgstr "continua"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_PERSIST_DATA"
-msgstr "Persist CSR"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ELIGIBILITY_RECHECK_LABEL"
+msgstr "Ri-Valuta la Policy"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_PROCEED_LABEL"
 msgstr "Invia con Eccezione alla Policy"
@@ -2677,6 +2689,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_LABEL"
 msgstr "Punto utilizzo SCEP"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_PLACEHOLDER"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_TOOLTIP"
+msgstr " "
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_AUTHORIZED_LABEL"
 msgstr "Richiedente / Firmatario"
 
@@ -3021,9 +3041,6 @@ msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SET_MOTD_SUCCESS_LABEL"
 msgstr "SUCCESSO"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED"
-msgstr "Questo Workflow è stato cancellato da un’azione dell’utente."
-
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_DESC"
 msgstr "Questo Workflow è stato cancellato."
@@ -3358,9 +3375,6 @@ msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_SUCCESS_LABEL"
 msgstr "SUCCESSO"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE"
-msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_DESC"
 msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
 
@@ -3424,9 +3438,13 @@ msgstr "Le modifiche sono state salvate in via definitiva nel database."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
 msgstr "I Metadati sono stati aggiornati"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_MISC_FINAL"
-msgstr ""
-"Questo Workflow ha raggiunto lo stadio finale e non può essere riavviato."
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_DESC"
+msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_LABEL"
+msgstr "In Attesa di Approvazione"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PIN_UNBLOCK_GET_ACT_CODE_DESC"
 msgstr ""
@@ -3465,6 +3483,16 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_SUMMARY_SUCCESS_LABEL"
 msgstr "Risultati Report"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REVIEW_DESC"
+msgstr ""
+"La Richiesta di revoca è stata definitivamente rifiutata e non può essere "
+"riavviata."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REVIEW_LABEL"
+msgstr "Stato"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL"
 msgstr "Invia la richiesta"
 
@@ -3477,31 +3505,12 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_INITIAL_LABEL"
 msgstr "Stato"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_PENDING_DESC"
-msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_PENDING_LABEL"
-msgstr "SUCCESSO"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_REVIEW_DESC"
-msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_REVIEW_LABEL"
-msgstr "SUCCESSO"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_DESC"
 msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_LABEL"
 msgstr "Certificato Emesso"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS"
-msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
 msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
@@ -3556,6 +3565,29 @@ msgstr ""
 "tempo previsto. Il motivo della messa in pausa e l’orario dell’ultima azione "
 "sono mostrati qui sotto, se vuoi che il processo venga continuato, è "
 "necessario che un operatore lo riavvii manualmente."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_CANCELED"
+msgstr "Questo Workflow è stato cancellato da un’azione dell’utente."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_EXCEPTION"
+msgstr ""
+"Questo Workflow è stato interrotto da un evento imprevisto, contatta per "
+"favore il team di supporto!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_FAILURE"
+msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_MISC_FINAL"
+msgstr ""
+"Questo Workflow ha raggiunto lo stadio finale e non può essere riavviato."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_SUCCESS"
+msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON"
@@ -4426,6 +4458,14 @@ msgstr "Chiave"
 #~ msgstr "Persist CRR"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_EDIT"
+#~ msgstr "continua"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_PERSIST_DATA"
+#~ msgstr "Persist CSR"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_LABEL_CANCEL"
 #~ msgstr "Retries"
 
@@ -4776,14 +4816,6 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_ID_DESC"
 #~ msgstr "Transaction Id of this SCEP request"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_ID_PLACEHOLDER"
-#~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_ID_TOOLTIP"
-#~ msgstr " "
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__DEFAULT_PUK_DESC"
@@ -5566,6 +5598,22 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_APPROVAL_LABEL"
 #~ msgstr "Approval pending"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_PENDING_DESC"
+#~ msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_PENDING_LABEL"
+#~ msgstr "SUCCESSO"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_REVIEW_DESC"
+#~ msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_REVIEW_LABEL"
+#~ msgstr "SUCCESSO"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CERTIFICATE_DESC"

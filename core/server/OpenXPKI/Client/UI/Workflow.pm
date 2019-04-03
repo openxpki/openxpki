@@ -1890,7 +1890,7 @@ sub __render_from_workflow {
 
         if ($wf_proc_state eq 'exception') {
 
-            $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION','error');
+            $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_EXCEPTION','error');
 
         } elsif ( $wf_info->{STATE}->{status} && ref $wf_info->{STATE}->{status} eq 'HASH' ) {
 
@@ -1900,14 +1900,14 @@ sub __render_from_workflow {
             # add special colors for success and failure
 
             if ( $wf_info->{WORKFLOW}->{STATE} eq 'SUCCESS') {
-                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS','success');
+                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_SUCCESS','success');
             } elsif ( $wf_info->{WORKFLOW}->{STATE} eq 'FAILURE') {
-                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE','error');
+                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_FAILURE','error');
             } elsif ( $wf_info->{WORKFLOW}->{STATE} eq 'CANCELED') {
-                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED','warn');
+                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_CANCELED','warn');
             } elsif ( $wf_info->{WORKFLOW}->{STATE} ne 'NOSTATUS') {
 
-                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATE_MISC_FINAL','warn');
+                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_MISC_FINAL','warn');
             }
         }
     }

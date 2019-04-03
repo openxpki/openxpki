@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2019-04-02 18:18+0200\n"
+"PO-Revision-Date: 2019-04-03 14:52+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -1632,6 +1632,17 @@ msgstr "Revoke Certificate"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RUNNING_LABEL"
 msgstr "Current Activity"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_INITIALIZE_DESC"
+msgstr ""
+"Import a custom chain to be served by the SCEP GetCA command. This MUST "
+"include the expected SCEP signer certificate as first item and should "
+"include the CA Issuer chain.<br>The token fields  are used to generate the "
+"cache-id and must be set to the exact and full alias names. If you leave "
+"those fields empty, the names of the current active token is used."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_INITIALIZE_LABEL"
+msgstr "Set Parameters"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEP_SEARCH_INITIALIZE_LABEL"
 msgstr "Start Search"
 
@@ -1660,6 +1671,10 @@ msgstr "Please update / complete the information below."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Update Request"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_AUTH_FAILURE_DESC"
+msgstr "This workflow failed finally and can not be restarted"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION"
 msgstr ""
@@ -1698,11 +1713,11 @@ msgstr "Successful Workflows"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE"
 msgstr "Bulk handle workflows"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_APPROVE"
+msgstr "Approve Request"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ELIGIBILITY_RECHECK_LABEL"
 msgstr "Recheck Eligibility"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_PERSIST_DATA"
-msgstr "Persist"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_PROCEED_LABEL"
 msgstr "Submit with Policy Exception"
@@ -1711,10 +1726,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL"
 msgstr "Re-Evaluate Policy"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_REJECT"
-msgstr "Reject"
+msgstr "Reject Request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_SUBMIT"
-msgstr "Continue"
+msgstr "Submit Request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CANCEL_BUTTON"
 msgstr "Cancel Request"
@@ -2083,7 +2098,6 @@ msgstr "certificate holders email address"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_TOOLTIP"
 msgstr " "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_DESC"
 msgstr " The server endpoint used for the request."
 
@@ -2347,6 +2361,12 @@ msgstr "Server Interface"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_LABEL"
 msgstr "SCEP Endpoint"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_PLACEHOLDER"
+msgstr "  "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_TOOLTIP"
+msgstr " The name of the server configuration."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_AUTHORIZED_LABEL"
 msgstr "Signer is Authorized"
@@ -2655,9 +2675,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SET_MOTD_SUCCESS_LABEL"
 msgstr "Message set"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED"
-msgstr "This workflow was canceled by user interaction."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_DESC"
 msgstr "This workflow was canceled."
@@ -2994,9 +3011,6 @@ msgstr "This workflow has finished with success and can not be restarted"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_SUCCESS_LABEL"
 msgstr "SUCCESS"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE"
-msgstr "This workflow failed finally and can not be restarted"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_DESC"
 msgstr "This workflow failed finally and can not be restarted"
 
@@ -3071,8 +3085,11 @@ msgstr "The changes have been persisted to the database."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
 msgstr "Metadata was updated"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_MISC_FINAL"
-msgstr "This workflow is in a final state and can not be restarted."
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_DESC"
+msgstr "The request is waiting for approval of an authorized party."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_LABEL"
+msgstr "Approval Pending"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PIN_UNBLOCK_GET_ACT_CODE_DESC"
 msgstr ""
@@ -3105,6 +3122,14 @@ msgstr "Report Result"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_SUMMARY_SUCCESS_LABEL"
 msgstr "Report Result"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REVIEW_DESC"
+msgstr ""
+"Please review the contents of your request - click on continue to proceed if "
+"the data is correct or use edit or cancel to rework or abort."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REVIEW_LABEL"
+msgstr "Review"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL"
 msgstr "This workflow is currently running on the server."
 
@@ -3117,32 +3142,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_INITIAL_LABEL"
 msgstr "Set Chain for GetCA "
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_PENDING_DESC"
-msgstr ""
-"Please check the contents of your request below, press continue to proceed "
-"or cancel the request."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_PENDING_LABEL"
-msgstr "Check Request Information"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_REVIEW_DESC"
-msgstr ""
-"Please check the contents of your request below, press continue to proceed "
-"or cancel the request."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_REVIEW_LABEL"
-msgstr "Check Request Information"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_DESC"
 msgstr "No result matching your search criteria could be found."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_LABEL"
 msgstr "Empty Result"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS"
-msgstr "This workflow has finished with success and can not be restarted"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
 msgstr "This workflow has finished with success and can not be restarted"
@@ -3193,6 +3197,23 @@ msgstr ""
 "the expected period of time. The reason for this pause and the time of the "
 "last execution is shown below, if you want this process to be continued, an "
 "operator needs to manually wake it up."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_CANCELED"
+msgstr "This workflow was canceled by user interaction"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_EXCEPTION"
+msgstr ""
+"This workflow was interrupted by an unexpected event, please contact the "
+"support team"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_FAILURE"
+msgstr "This workflow failed finally and can not be restarted"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_MISC_FINAL"
+msgstr "This workflow is in a final state and can not be restarted"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_SUCCESS"
+msgstr "This workflow has finished with success and can not be restarted"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON"
 msgstr "Continue"
@@ -4033,6 +4054,12 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_USER_ABORT_LABEL"
 #~ msgstr "Persist CRR"
 
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_EDIT"
+#~ msgstr "Rework Request"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_PERSIST_DATA"
+#~ msgstr "Persist Data"
+
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_LABEL_CANCEL"
 #~ msgstr "Retries"
@@ -4373,14 +4400,6 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_ID_DESC"
 #~ msgstr "Transaction Id of this SCEP request"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_ID_PLACEHOLDER"
-#~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_ID_TOOLTIP"
-#~ msgstr " "
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__DEFAULT_PUK_DESC"
@@ -5150,6 +5169,24 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_APPROVAL_LABEL"
 #~ msgstr "Approval pending"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_PENDING_DESC"
+#~ msgstr ""
+#~ "Please check the contents of your request below, press continue to "
+#~ "proceed or cancel the request."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_PENDING_LABEL"
+#~ msgstr "Check Request Information"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_REVIEW_DESC"
+#~ msgstr ""
+#~ "Please check the contents of your request below, press continue to "
+#~ "proceed or cancel the request."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_REVIEW_LABEL"
+#~ msgstr "Check Request Information"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CERTIFICATE_DESC"
