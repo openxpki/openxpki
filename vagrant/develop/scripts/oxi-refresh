@@ -1,5 +1,5 @@
 #!/bin/bash
-## <info> Copy latest code from /code-repo, compile, install dependencies, restart OpenXPKI
+## <info> Copy code from host, configure, compile, install dependencies, restart OpenXPKI
 test $(whoami) != "root" && echo "Please run this as root: sudo $0" && exit 1
 set -o pipefail
 
@@ -9,14 +9,55 @@ set -o pipefail
 LOG=$(mktemp)
 function _exit () {
     if [ $1 -ne 0 -a $1 -ne 333 ]; then
-        echo "$0: ERROR - last command exited with code $1, output:" && cat $LOG
+        echo "================================================================================"
+        echo "$0: ERROR - last command exited with code $1, output:"
+        echo "================================================================================"
+        cat $LOG
     fi
     rm -f $LOG
     exit $1
 }
-trap '_exit $?' EXIT
 
+[[ "${@#--help}" != "$@" ]] && cat <<__HELP && exit 1
+SYNOPSIS
+    $(basename "$0") [OPTIONS]
+
+DESCRIPTION
+    $(cat "$0" | grep "[[:blank:]]#*[[:blank:]]*<info>" | cut -d ">" -f2 | sed s/'^[[:blank:]]*'//)
+
+OPTIONS
+    --no-restart
+        Skip restarting OpenXPKI and Apache.
+
+    --no-i18n
+        Skip updating internationalization files.
+
+    --no-compile
+        Skip compiling XS code parts.
+
+    --fast
+        Shortcut for "--no-i18n --no-compile"
+
+    --full
+        Overwrite /etc/openxpki with slightly adjusted sample config
+__HELP
+
+trap '_exit $?' EXIT
 set -e
+
+#
+# Command line options
+#
+IS_I18N=1
+IS_RESTART=1
+IS_COMPILE=1
+IS_FULLCONFIG=0
+# Bash string manipulation: use # to strip text off $@ and see if string still equals original $@
+[[ "${@#--no-i18n}" != "$@" ]]    && IS_I18N=0
+[[ "${@#--no-restart}" != "$@" ]] && IS_RESTART=0
+[[ "${@#--no-compile}" != "$@" ]] && IS_COMPILE=0
+[[ "${@#--fast}" != "$@" ]]       && IS_COMPILE=0 && IS_I18N=0
+[[ "${@#--full}" != "$@" ]]       && IS_FULLCONFIG=1
 
 #
 # Grab and install Perl module dependencies from Makefile.PL using PPI
@@ -25,7 +66,7 @@ set -e
 rm -f /usr/lib/x86_64-linux-gnu/perl5/5.20/Net/DNS.pm
 cpanm --notest Net::DNS                                               >$LOG 2>&1
 
-echo "Checking for new Perl dependencies in latest code"
+echo "Checking and installing Perl module dependencies"
 cpanm --notest PPI                                                    >$LOG 2>&1
 /code-repo/tools/scripts/makefile2cpanfile.pl > /cpanfile
 cpanm --quiet --notest --installdeps /
@@ -33,18 +74,37 @@ cpanm --quiet --notest --installdeps /
 #
 # Copy current code and realm CA-ONE config
 #
-echo "Copying current code and binaries from repo"
+echo ""
 
-rsync -a --delete /code-repo/core/server/cgi-bin/* /usr/lib/cgi-bin/           >$LOG 2>&1
-rsync -a --delete /code-repo/core/server/htdocs/*  /var/www/openxpki/          >$LOG 2>&1
-test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/index.html
+# fully overwrite existing config
+if [[ $IS_FULLCONFIG -eq 1 ]]; then
+    echo "Writing complete OpenXPKI config into /etc/openxpki"
+    rsync -a --delete /code-repo/config/openxpki/* /etc/openxpki/     >$LOG 2>&1
+    chmod 750              /etc/openxpki/config.d
+    chown -R root:openxpki /etc/openxpki/config.d
 
-rsync -a --delete \
-  /code-repo/config/openxpki/config.d/realm/ca-one/* \
-  /etc/openxpki/config.d/realm/ca-one/                                >$LOG 2>&1
-chown -R openxpki:root /etc/openxpki/config.d/realm/ca-one            >$LOG 2>&1
+    # database setup
+    echo "- configuring MySQL as database"
+    cat <<__DB > /etc/openxpki/config.d/system/database.yaml
+    main:
+        debug: 0
+        type: MySQL
+        host: $OXI_TEST_DB_MYSQL_DBHOST
+        port: $OXI_TEST_DB_MYSQL_DBPORT
+        name: $OXI_TEST_DB_MYSQL_NAME
+        user: $OXI_TEST_DB_MYSQL_USER
+        passwd: $OXI_TEST_DB_MYSQL_PASSWORD
+__DB
+# only partial config update (only realm ca-one)
+else
+    echo "Updating realm CA-ONE in /etc/openxpki/config.d/realm/ca-one"
+    rsync -a --delete \
+      /code-repo/config/openxpki/config.d/realm/ca-one/* \
+      /etc/openxpki/config.d/realm/ca-one/                            >$LOG 2>&1
+    chown -R root:openxpki /etc/openxpki/config.d/realm/ca-one        >$LOG 2>&1
+fi
 
-echo "Modifying some config entries"
+echo "- modifying some config entries"
 
 # set /var/tmp instead of /tmp (where only root has write access)
 sed -ri 's/(LOCATION:)\s*\/tmp.*/\1 \/var\/tmp/g' /etc/openxpki/config.d/realm/ca-one/publishing.yaml
@@ -55,48 +115,57 @@ sed -ri 's/^(\s*default_language:).*/\1 en_US/' /etc/openxpki/config.d/system/se
 #
 # Compile OpenXPKI
 #
-OXI_VERSION=$(cat /code-repo/.VERSION_MAJOR <(echo .) /code-repo/.VERSION_MINOR <(echo .) /code-repo/.VERSION_RELEASE | tr -d "\n" )
+echo -e "\nCompilation and installation"
+echo -e "- synchronizing source code from host to $OXI_CORE_DIR"
+rsync -a --delete --exclude=.git/ /code-repo/core/                 $OXI_CORE_DIR      >$LOG 2>&1
+rsync -a --delete --exclude=.git/ /code-repo/core/server/cgi-bin/* /usr/lib/cgi-bin/  >$LOG 2>&1
+rsync -a --delete --exclude=.git/ /code-repo/core/server/htdocs/*  /var/www/openxpki/ >$LOG 2>&1
+test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/index.html
 
 # Set version so Makefile.PL does not need "vergen" (which we will not copy to $OXI_CORE_DIR)
-cat <<__VERSION > /code-repo/core/server/OpenXPKI/VERSION.pm
+OXI_VERSION=$(cat /code-repo/.VERSION_MAJOR <(echo .) /code-repo/.VERSION_MINOR <(echo .) /code-repo/.VERSION_RELEASE | tr -d "\n" )
+cat <<__VERSION > $OXI_CORE_DIR/server/OpenXPKI/VERSION.pm
 package OpenXPKI::VERSION;
 our \$VERSION = '$OXI_VERSION';
 1;
 __VERSION
 
-echo "Synchronizing source code from host to $OXI_CORE_DIR"
-rsync -a --delete --exclude=.git/ /code-repo/core/ $OXI_CORE_DIR
-
-# if --fast is NOT given
 pushd $OXI_CORE_DIR/server                                            >$LOG 2>&1
 perl Makefile.PL                                                      >$LOG 2>&1
-if [[ "${@#--fast}" = "$@" ]]; then
-    echo "Compiling OpenXPKI $OXI_VERSION"
-    make                                                                  >$LOG 2>&1
+if [[ $IS_COMPILE -eq 1 ]]; then
+    echo "- compiling OpenXPKI $OXI_VERSION"
+    make                                                              >$LOG 2>&1
 fi
-echo "Installing OpenXPKI"
+echo "- installing OpenXPKI"
 make install                                                          >$LOG 2>&1
 popd                                                                  >$LOG 2>&1
 
-echo "Copying CGI::Session::Driver::openxpki"
+echo "- installing CGI::Session::Driver::openxpki"
 mkdir -p /usr/share/perl5/CGI/Session/Driver
 cp $OXI_CORE_DIR/server/CGI_Session_Driver/openxpki.pm /usr/share/perl5/CGI/Session/Driver/
 
-# if --no-i18n and --fast are NOT given
-# (use # to strip text off $@ and see if string still equals original $@)
-if [[ "${@#--no-i18n}" = "$@" && "${@#--fast}" = "$@" ]]; then
-    echo "Compiling and installing I18N files"
+if [[ $IS_I18N -eq 1 ]]; then
+    echo "- compiling and installing I18N files"
     echo "$OXI_VERSION" > $OXI_CORE_DIR/i18n/VERSION
-    pushd $OXI_CORE_DIR/i18n                                              >$LOG 2>&1
+    pushd $OXI_CORE_DIR/i18n                                          >$LOG 2>&1
     langs=$(grep '^LANGS\s*=' Makefile | cut -d= -f2)
     for lang in $langs; do msgfmt -o $lang/openxpki.mo $lang/openxpki.po; done
-    make install                                                          >$LOG 2>&1
-    popd                                                                  >$LOG 2>&1
+    make install                                                      >$LOG 2>&1
+    popd                                                              >$LOG 2>&1
 fi
 
-# if --no-restart and --fast are NOT given
-if [[ "${@#--no-restart}" = "$@" && "${@#--fast}" = "$@" ]]; then
-    echo "Restarting OpenXPKI"
+# create SSL keys and certificates and import them into OpenXPKI
+if [[ $IS_FULLCONFIG -eq 1 ]]; then
+    echo -e "\nCreating and importing sample certificates"
+    rm -rf /etc/openxpki/ssl/
+    /code-repo/config/sampleconfig.sh                                 >$LOG 2>&1
+    chmod 750              /etc/openxpki/ssl
+    chown -R root:openxpki /etc/openxpki/ssl
+fi
+
+if [[ $IS_RESTART -eq 1 ]]; then
+    echo -e "\nRestart"
+    echo "- OpenXPKI"
     openxpkictl restart                                               >$LOG 2>&1
 
     if [[ $(openxpkictl status 2>&1) == *"not running"* ]]; then
@@ -104,6 +173,8 @@ if [[ "${@#--no-restart}" = "$@" && "${@#--fast}" = "$@" ]]; then
         exit 333
     fi
 
-    echo "Restarting Apache"
+    echo "- Apache"
     systemctl restart apache2                                         >$LOG 2>&1
 fi
+
+echo -e "\nDone."
