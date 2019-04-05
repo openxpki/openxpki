@@ -1,0 +1,46 @@
+version: "3"
+
+services:
+  db:
+    restart: always
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - openxpkidb:/var/lib/mysql
+      - ./openxpki-config/sql/schema-mysql.sql:/docker-entrypoint-initdb.d/schema-mysql.sql
+    environment:
+      MYSQL_DATABASE: openxpki
+      MYSQL_USER: openxpki
+      MYSQL_PASSWORD: openxpki 
+      MYSQL_ROOT_PASSWORD: topsecret
+
+  openxpki-server:
+    restart: always
+    image: whiterabbitsecurity/openxpki
+    command: /usr/bin/openxpkictl start --no-detach
+    volumes:
+      - ./openxpki-config:/etc/openxpki
+      - openxpkilog:/var/log/openxpki
+      - openxpkisocket:/var/openxpki/
+    depends_on:
+        - db
+
+  openxpki-client:
+    restart: always
+    image: whiterabbitsecurity/openxpki
+    command: "/usr/sbin/apache2ctl -D FOREGROUND"
+    ports:
+      - "8080:80/tcp"
+      - "8443:443/tcp"
+    volumes:
+      - ./openxpki-config:/etc/openxpki
+      - openxpkilog:/var/log/openxpki
+      - openxpkisocket:/var/openxpki/
+    depends_on:
+        - openxpki-server
+
+volumes:
+  openxpkidb:
+  openxpkisocket:
+  openxpkilog:
+
