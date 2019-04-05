@@ -61,7 +61,11 @@ sub __init_server {
 
         # from now on we can assume that we have CTX('log') available
         # perform the rest of the initialization
-        OpenXPKI::Server::Init::init({ SILENT => $self->{SILENT} });
+        my %p = ( SILENT => $self->{SILENT} );
+        if (!$self->{BACKGROUND}) {
+            $p{SKIP} = [ 'redirect_stderr' ];
+        }
+        OpenXPKI::Server::Init::init( \%p );
         OpenXPKI::Server::Watchdog->start_or_reload;
     };
     $self->__log_and_die($EVAL_ERROR, 'server initialization') if $EVAL_ERROR;

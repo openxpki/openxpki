@@ -84,6 +84,10 @@ sub init {
 
     if (defined $keys->{TASKS} && (ref $keys->{TASKS} eq 'ARRAY')) {
         @tasks = @{$keys->{TASKS}};
+    } elsif ($keys->{SKIP}) {
+        my %skip = map {$_=>1} @{$keys->{SKIP}};
+        @tasks =  grep { !$skip{$_} } @init_tasks;
+        delete $keys->{SKIP};
     } else {
         @tasks = @init_tasks;
     }
