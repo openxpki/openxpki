@@ -48,10 +48,10 @@ my @init_tasks = qw(
   config_versioned
   i18n
   log
-  dbi_log
   redirect_stderr
   prepare_daemon
   dbi
+  dbi_log
   crypto_layer
   api2
   api
@@ -433,6 +433,12 @@ sub get_database {
     $section = 'main' unless $config->exists(['system','database',$section]);
     my $db_config = $config->get_hash(['system','database',$section]);
 
+    my $wait_on_init = {};
+    if ($db_config->{wait_on_init} && ref $db_config->{wait_on_init} eq 'HASH') {
+        $wait_on_init = $db_config->{wait_on_init};
+        delete $db_config->{wait_on_init};
+    }
+
     # Set environment variables
     my $db_env = $config->get_hash(['system','database','environment']);
 
@@ -461,8 +467,28 @@ sub get_database {
         },
         $autocommit ? (autocommit => 1) : (),
     );
+
+    my $retry = $wait_on_init->{retry_count} // 0;
+    my $sleep = $wait_on_init->{retry_interval} || 30;
+
     # do a database ping to ensure the DB is connected
-    $db->ping();
+    # sleep / retry if configured
+    ##! 32: "database retry setting: ${retry}x / ${sleep}s"
+
+    do {
+        eval{
+            $db->ping();
+            $retry = 0;
+        };
+        if ($EVAL_ERROR) {
+            if ($retry) {
+                print STDERR "Database not ready - retries left $retry - sleep for $sleep\n";
+                sleep $sleep;
+            } else {
+                OpenXPKI::Exception->throw (message => "Database not connected");
+            }
+        }
+    } while ($retry--);
     return $db;
 }
 
