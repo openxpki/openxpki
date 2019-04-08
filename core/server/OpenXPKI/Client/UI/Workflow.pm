@@ -2641,6 +2641,7 @@ sub __render_fields {
 
         } elsif ($field_type eq 'select' && !$field->{template} && $field->{option} && ref $field->{option} eq 'ARRAY') {
             foreach my $option (@{$field->{option}}) {
+                next unless (defined $option->{value});
                 if ($item->{value} eq $option->{value}) {
                     $item->{value} = $option->{label};
                     last;
