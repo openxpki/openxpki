@@ -56,20 +56,9 @@ Vagrant.configure("2") do |config|
   end
 
   # Build for Jessie / OS Perl
-  config.vm.define "build-jessie" do |build|
+  config.vm.define "build" do |build|
       config.vm.box = "debian/jessie64"
       config.vm.hostname = "oxi-build-jessie"
-      config.vm.provision :shell, :path => "provision-build.sh"
-      config.vm.synced_folder "../..", "/code-repo"
-      if File.exists?(File.expand_path('../../../packages.openxpki.org'))
-          config.vm.synced_folder "../../../packages.openxpki.org", "/packages.openxpki.org"
-      end
-  end
-
-  # Build for Squeeze / OS Perl
-  config.vm.define "build-stretch" do |build|
-      config.vm.box = "debian/stretch64"
-      config.vm.hostname = "oxi-build-stretch"
       config.vm.provision :shell, :path => "provision-build.sh"
       config.vm.synced_folder "../..", "/code-repo"
       if File.exists?(File.expand_path('../../../packages.openxpki.org'))
@@ -105,50 +94,11 @@ Vagrant.configure("2") do |config|
       testmyperl.vm.network :forwarded_port, guest: 80, host: 8080
       testmyperl.vm.network :forwarded_port, guest: 443, host: 8443
   end
-
-  # Testing on Ubuntu Trusty 
-  config.vm.define "test-trusty", primary:true do |test|
-      config.vm.box = "ubuntu/trusty64"
-      config.vm.hostname = "oxi-test-trusty"
-      config.vm.provision :shell, :path => "provision-test.sh", :args => "ubuntu"
-      config.vm.network :forwarded_port, guest: 80, host: 8080
-      config.vm.network :forwarded_port, guest: 443, host: 8443
-      config.vm.synced_folder "../../qatest", "/qatest"
-      config.vm.synced_folder "../../package/debian/deb", "/packages"
-      if File.exists?(File.expand_path('../../../packages.openxpki.org'))
-          config.vm.synced_folder "../../../packages.openxpki.org", "/packages.openxpki.org"
-      end
-  end
-
-  # Build on Ubuntu Trusty
-  config.vm.define "build-trusty" do |build|
-      config.vm.box = "ubuntu/trusty64"
-      config.vm.hostname = "oxi-build-trusty"
-      config.vm.provision :shell, :path => "provision-build.sh"
-      config.vm.synced_folder "../..", "/code-repo"
-      if File.exists?(File.expand_path('../../../packages.openxpki.org'))
-          config.vm.synced_folder "../../../packages.openxpki.org", "/packages.openxpki.org"
-      end
-  end
-
-  # Testing on Ubuntu Xenial 
-  config.vm.define "test-xenial", primary:true do |test|
-      config.vm.box = "ubuntu/xenial64"
-      config.vm.hostname = "oxi-test-xenial"
-      config.vm.provision :shell, :path => "provision-test.sh", :args => "ubuntu"
-      config.vm.network :forwarded_port, guest: 80, host: 8080
-      config.vm.network :forwarded_port, guest: 443, host: 8443
-      config.vm.synced_folder "../../qatest", "/qatest"
-      config.vm.synced_folder "../../package/debian/deb", "/packages"
-      if File.exists?(File.expand_path('../../../packages.openxpki.org'))
-          config.vm.synced_folder "../../../packages.openxpki.org", "/packages.openxpki.org"
-      end
-  end
-
-  # Build on Ubuntu Xenial 
-  config.vm.define "build-xenial" do |build|
-      config.vm.box = "ubuntu/xenial64"
-      config.vm.hostname = "oxi-build-xenial"
+  
+  # Build for Buster / OS Perl
+  config.vm.define "build-buster" do |build|
+      config.vm.box = "debian/buster64"
+      config.vm.hostname = "oxi-build-buster"
       config.vm.provision :shell, :path => "provision-build.sh"
       config.vm.synced_folder "../..", "/code-repo"
       if File.exists?(File.expand_path('../../../packages.openxpki.org'))
