@@ -357,13 +357,13 @@ while (my $cgi = CGI::Fast->new()) {
 
         if ($wf_id) {
             $workflow = $client->handle_workflow({
-                TYPE => $workflow_type,
-                ID => $wf_id
+                type => $workflow_type,
+                id => $wf_id
             });
         } else {
             $workflow = $client->handle_workflow({
-                TYPE => $workflow_type,
-                PARAMS => $param
+                type => $workflow_type,
+                params => $param
             });
         }
 
@@ -390,14 +390,15 @@ while (my $cgi = CGI::Fast->new()) {
             $error = 'uncaught error';
         }
         $res = { error => { code => 42, message => $error, data => { pid => $$ } } };
-    } elsif (( $workflow->{'PROC_STATE'} ne 'finished' && !$workflow->{ID} ) || $workflow->{'PROC_STATE'} eq 'exception') {
+    } elsif (( $workflow->{'proc_state'} ne 'finished' && !$workflow->{id} ) || $workflow->{'proc_state'} eq 'exception') {
         # TODO: Return as "500 Internal Server Error"?
         $log->error("workflow terminated in unexpected state" );
-        $res = { error => { code => 42, message => 'workflow terminated in unexpected state', data => { pid => $$, id => $workflow->{ID}, 'state' => $workflow->{'STATE'} } } };
+        $res = { error => { code => 42, message => 'workflow terminated in unexpected state',
+            data => { pid => $$, id => $workflow->{id}, 'state' => $workflow->{'state'} } } };
     } else {
         $log->info(sprintf("RPC request was processed properly (Workflow: %01d, State: %s",
-            $workflow->{ID}, $workflow->{STATE}) );
-        $res = { result => { id => $workflow->{ID}, 'state' => $workflow->{'STATE'},  pid => $$ }};
+            $workflow->{id}, $workflow->{state}) );
+        $res = { result => { id => $workflow->{id}, 'state' => $workflow->{'state'},  pid => $$ }};
 
         # Map context parameters to the response if requested
         if ($conf->{$method}->{output}) {
@@ -405,9 +406,9 @@ while (my $cgi = CGI::Fast->new()) {
             my @keys;
             @keys = split /\s*,\s*/, $conf->{$method}->{output};
             $log->debug("Keys " . join(", ", @keys));
-            $log->trace("Raw context: ". Dumper $workflow->{CONTEXT});
+            $log->trace("Raw context: ". Dumper $workflow->{context});
             foreach my $key (@keys) {
-                my $val = $workflow->{CONTEXT}->{$key};
+                my $val = $workflow->{context}->{$key};
                 next unless (defined $val);
                 next unless ($val ne '' || ref $val);
                 if (OpenXPKI::Serialization::Simple::is_serialized($val)) {

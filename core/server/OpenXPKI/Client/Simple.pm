@@ -215,28 +215,33 @@ sub run_command {
 Combined method to interact with workflows. Action depends on the parameters
 given. Return value is always the workflow info structure.
 
+Legacy Mode: If arguments are passed with uppercase keys (ID, TYPE, ACTIVITY),
+the return structure also contains uppercase keys. This is provided for
+backward compatibility and will be removed with the next major release!
+
 =over
 
-=item ID
+=item id
 
 Returns the workflow info for the existing workflow with given id.
 
-=item ACTIVITY
+=item activity
 
 Only in combination with ID, executes the given action and returns the
 workflow info after processing was done. Will die if execute fails.
 
-=item TYPE
+=item type
 
 Create a new workflow of given type, only effective if ID is not given.
 
-=item PARAMS
+=item params
 
 Parameter hash to be passed to create/execute method as input values.
 
 =back
 
 =cut
+
 
 sub handle_workflow {
 
@@ -246,59 +251,73 @@ sub handle_workflow {
     my $reply;
     # execute exisiting workflow
 
+    my $wf_id = $params->{id};
+    my $wf_action = $params->{activity};
+    my $wf_type = $params->{type};
+    my $wf_params = $params->{params};
+
+    my $return_uppercase = 0;
+    # legacy mode - uppercase arguments
+    if ($params->{ID} || $params->{TYPE}) {
+        $return_uppercase = 1;
+        $wf_id = $params->{ID} || 0;
+        $wf_action = $params->{ACTIVITY} || '';
+        $wf_type = $params->{TYPE} || '';
+    }
+
     # Auto serialize workflow params
     my $serializer = OpenXPKI::Serialization::Simple->new();
-    foreach my $key (keys %{$params->{PARAMS}}) {
-        if (ref $params->{PARAMS}->{$key}) {
-            $params->{PARAMS}->{$key} = $serializer->serialize($params->{PARAMS}->{$key});
+    foreach my $key (keys %{$wf_params}) {
+        if (ref $wf_params->{$key}) {
+            $wf_params->{$key} = $serializer->serialize($wf_params->{$key});
         }
     }
 
-    if ($params->{ACTIVITY} && $params->{ID}) {
+    if ($wf_action && $wf_id) {
 
-        $self->logger()->info(sprintf('execute workflow action %s on %01d', $params->{ACTIVITY}, $params->{ID}));
-        $self->logger()->trace('workflow params:  '. Dumper $params->{PARAMS});
-        $reply = $self->run_legacy_command('execute_workflow_activity',{
-            ID => $params->{ID},
-            ACTIVITY => $params->{ACTIVITY},
-            PARAMS => $params->{PARAMS},
+        $self->logger()->info(sprintf('execute workflow action %s on %01d', $wf_action, $wf_id));
+        $self->logger()->trace('workflow params:  '. Dumper $wf_params);
+        $reply = $self->run_command('execute_workflow_activity',{
+            id => $wf_id,
+            activity => $wf_action,
+            params => $wf_params,
         });
 
-        if (!$reply || !$reply->{WORKFLOW}) {
+        if (!$reply || !$reply->{workflow}) {
             $self->logger()->fatal("No workflow object received after execute!");
             die "No workflow object received!";
         }
 
-        $self->logger()->debug('new Workflow State: ' . $reply->{WORKFLOW}->{STATE});
+        $self->logger()->debug('new Workflow State: ' . $reply->{workflow}->{state});
 
-    } elsif ($params->{ID}) {
+    } elsif ($wf_id) {
 
-        $self->logger()->debug(sprintf('request for workflow info on %01d', $params->{ID}));
+        $self->logger()->debug(sprintf('request for workflow info on %01d', $wf_id));
 
-        $reply = $self->run_legacy_command('get_workflow_info',{
-            ID => $params->{ID},
+        $reply = $self->run_command('get_workflow_info',{
+            id => $wf_id,
         });
 
-        if (!$reply || !$reply->{WORKFLOW}) {
+        if (!$reply || !$reply->{workflow}) {
             $self->logger()->fatal("No workflow object received after execute!");
             die "No workflow object received!";
         }
 
-        $self->logger()->trace($reply->{WORKFLOW});
+        $self->logger()->trace($reply->{workflow});
 
-    } elsif ($params->{TYPE}) {
-        $reply = $self->run_legacy_command('create_workflow_instance',{
-            WORKFLOW => $params->{TYPE},
-            PARAMS => $params->{PARAMS},
+    } elsif ($wf_type) {
+        $reply = $self->run_command('create_workflow_instance',{
+            workflow => $wf_type,
+            params => $wf_params,
         });
 
-        if (!$reply || !$reply->{WORKFLOW}) {
+        if (!$reply || !$reply->{workflow}) {
             $self->logger()->fatal("No workflow object received after create!");
             die "No workflow object received!";
         }
 
         $self->logger()->debug(sprintf('Workflow created (ID: %d), State: %s',
-            $reply->{WORKFLOW}->{ID}, $reply->{WORKFLOW}->{STATE}));
+            $reply->{workflow}->{id}, $reply->{workflow}->{state}));
 
     } else {
         $self->logger()->fatal("Neither workflow id nor type given");
@@ -307,7 +326,13 @@ sub handle_workflow {
 
     $self->logger()->trace('Result of workflow action: ' . Dumper $reply);
 
-    return $reply->{WORKFLOW};
+    my $ret = $reply->{workflow};
+    if ($return_uppercase) {
+        my %ret = map { uc ($_) =>  $reply->{workflow}->{$_} } keys %{$reply->{workflow}};
+        $ret = \%ret;
+    }
+
+    return $ret;
 }
 
 

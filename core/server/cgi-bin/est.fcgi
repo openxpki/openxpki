@@ -130,13 +130,13 @@ while (my $cgi = CGI::Fast->new()) {
     if ($operation eq 'cacerts') {
 
         my $workflow = $client->handle_workflow({
-            TYPE => $conf->{cacerts}->{workflow} || 'est_cacerts',
-            PARAMS => $param
+            type => $conf->{cacerts}->{workflow} || 'est_cacerts',
+            params => $param
         });
 
         $log->trace( 'Workflow info '  . Dumper $workflow );
 
-        $out = $workflow->{CONTEXT}->{output};
+        $out = $workflow->{context}->{output};
 
         $out =~ s{-----(BEGIN|END) PKCS7-----}{}g;
         $out =~ s{\s}{}gxms;
@@ -144,11 +144,11 @@ while (my $cgi = CGI::Fast->new()) {
     } elsif($operation eq 'csrattrs') {
 
         my $workflow = $client->handle_workflow({
-            TYPE =>  $conf->{csrattrs}->{workflow} || 'est_csrattrs',
-            PARAMS => $param
+            type =>  $conf->{csrattrs}->{workflow} || 'est_csrattrs',
+            params => $param
         });
 
-        $out = $workflow->{CONTEXT}->{output};
+        $out = $workflow->{context}->{output};
         $mime = "application/csrattrs";
 
     } elsif($operation eq 'simpleenroll') {
@@ -200,20 +200,20 @@ while (my $cgi = CGI::Fast->new()) {
         } elsif (@$wfl == 1) {
             my $wf_id = $wfl->[0]->{workflow_id};
             $workflow = $client->handle_workflow({
-                TYPE => $workflow_type,
-                ID => $wf_id
+                type => $workflow_type,
+                id => $wf_id
             });
             $log->info('Found workflow - reload ' .$wf_id );
         } else {
             $workflow = $client->handle_workflow({
-                TYPE => $workflow_type,
-                PARAMS => $param
+                type => $workflow_type,
+                params => $param
             });
-            $log->info('Started new workflow ' . $workflow->{ID});
+            $log->info('Started new workflow ' . $workflow->{id});
             $log->trace( 'Workflow Params '  . Dumper $param);
         }
 
-        if (( $workflow->{'PROC_STATE'} ne 'finished' && !$workflow->{ID} ) || $workflow->{'PROC_STATE'} eq 'exception') {
+        if (( $workflow->{'proc_state'} ne 'finished' && !$workflow->{id} ) || $workflow->{'proc_state'} eq 'exception') {
             print $cgi->header( -status => '500 Internal Server Error');
             print 'Internal Server Error';
             $log->error('Internal Server Error');
@@ -221,17 +221,17 @@ while (my $cgi = CGI::Fast->new()) {
             next;
         }
 
-        if ($workflow->{'PROC_STATE'} ne 'finished') {
+        if ($workflow->{'proc_state'} ne 'finished') {
             print $cgi->header( -status => '503 Request Pending - Retry Later ($transaction_id)', "-retry-after" => 300 );
             print "503 Request Pending - Retry Later ($transaction_id)";
-            $log->info('Request Pending - ' . $workflow->{'STATE'});
+            $log->info('Request Pending - ' . $workflow->{'state'});
             $client->disconnect();
             next;
         }
 
-        $log->trace(Dumper $workflow->{CONTEXT}) if ($log->is_trace);
+        $log->trace(Dumper $workflow->{context}) if ($log->is_trace);
 
-        my $cert_identifier = $workflow->{CONTEXT}->{cert_identifier};
+        my $cert_identifier = $workflow->{context}->{cert_identifier};
         $out = $client->run_command('get_cert',{
             format => 'PKCS7',
             identifier => $cert_identifier,

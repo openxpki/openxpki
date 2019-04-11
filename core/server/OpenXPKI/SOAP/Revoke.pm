@@ -130,8 +130,8 @@ sub __dispatch_revoke {
         $log->trace( "WF parameters: " . Dumper \%param );
 
         $workflow = $client->handle_workflow({
-            TYPE => $workflow_type,
-            PARAMS => \%param
+            type => $workflow_type,
+            params => \%param
         });
 
         $log->trace( 'Workflow info '  . Dumper $workflow );
@@ -149,13 +149,13 @@ sub __dispatch_revoke {
         } else {
             $res = { error => 'Uncaught error while processing request', pid => $$ };
         }
-    } elsif (!$workflow->{ID} || $workflow->{'PROC_STATE'} eq 'exception' || $workflow->{'STATE'} eq 'FAILURE') {
+    } elsif (!$workflow->{id} || $workflow->{'proc_state'} eq 'exception' || $workflow->{'state'} eq 'FAILURE') {
         $log->error("Workflow terminated in unexpected state" );
-        $res = { error => 'workflow terminated in unexpected state', pid => $$, id => $workflow->{id}, 'state' => $workflow->{'STATE'} };
+        $res = { error => 'workflow terminated in unexpected state', pid => $$, id => $workflow->{id}, 'state' => $workflow->{'state'} };
     } else {
         $log->info(sprintf("Revocation request was processed properly (Workflow: %01d, State: %s",
-            $workflow->{ID}, $workflow->{STATE}) );
-        $res = { error => '', id => $workflow->{ID}, 'state' => $workflow->{'STATE'} };
+            $workflow->{id}, $workflow->{state}) );
+        $res = { error => '', id => $workflow->{id}, 'state' => $workflow->{'state'} };
     }
 
     $client->disconnect() if($client);
