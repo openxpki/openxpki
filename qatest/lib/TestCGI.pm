@@ -88,11 +88,11 @@ sub __load_config {
     my $self = shift;
     my $config = YAML::LoadFile( $self->config() );
 
-    if ($config->{ssl_opts} && ref $config->{ssl_opts} eq 'HASH') {
+    if ($config->{ssl_opts} && ref $config->{ssl_opts} eq 'HASH' && !$self->ssl_opts()) {
         $self->ssl_opts( $config->{ssl_opts} );
     }
 
-    if ($config->{realm}) {
+    if ($config->{realm} && !$self->realm()) {
         $self->realm($config->{realm}),
     }
 
@@ -129,7 +129,8 @@ sub mock_request {
 
     my $ssl_opts = $self->ssl_opts;
     if ($ssl_opts) {
-        $ua->ssl_opts( %{$self->ssl_opts} );
+        $ua->ssl_opts( %{$ssl_opts} );
+        $self->logger()->trace( 'Adding SSL Opts ' . Dumper $ssl_opts );
     }
 
     $ua->default_header( 'Accept'       => 'application/json' );

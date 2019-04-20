@@ -351,6 +351,7 @@ while (my $cgi = CGI::Fast->new()) {
                     die "Unable to pickup workflow - ambigous search result";
                 } elsif (@$wfl == 1) {
                     $wf_id = $wfl->[0]->{workflow_id};
+                    $log->debug("Pickup $wf_id by $pickup_key = $pickup_value");
                 }
             }
         }
@@ -361,6 +362,7 @@ while (my $cgi = CGI::Fast->new()) {
                 id => $wf_id
             });
         } else {
+            $log->debug("Initialize with params " . join(", ", keys %{$param}));
             $workflow = $client->handle_workflow({
                 type => $workflow_type,
                 params => $param

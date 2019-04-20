@@ -24,7 +24,7 @@ my $ssl_opts = {
     SSL_cert_file => 'tmp/pkiclient.crt',
     SSL_ca_file => 'tmp/chain.pem',
 };
-my $client = TestCGI->new({ ssl_opts => $ssl_opts });
+my $client = TestCGI->new( ssl_opts => $ssl_opts );
 
 my $result = $client->mock_request({});
 
