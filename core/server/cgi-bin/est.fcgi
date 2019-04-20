@@ -162,14 +162,12 @@ while (my $cgi = CGI::Fast->new()) {
             next;
         }
 
-        if ($pkcs10 =~ /BEGIN CERTIFICATE REQUEST/) {
-            $param->{pkcs10} = $pkcs10;
-        } else {
-            $param->{pkcs10} = "-----BEGIN CERTIFICATE REQUEST-----\n$pkcs10\n-----END CERTIFICATE REQUEST-----";
+        if ($pkcs10 !~ /BEGIN CERTIFICATE REQUEST/) {
+            $pkcs10 = decode_base64($pkcs10);
         }
 
         Crypt::PKCS10->setAPIversion(1);
-        my $decoded = Crypt::PKCS10->new($param->{pkcs10}, ignoreNonBase64 => 1, verifySignature => 1);
+        my $decoded = Crypt::PKCS10->new($pkcs10, ignoreNonBase64 => 1, verifySignature => 1);
         if (!$decoded) {
             $log->error('Unable to parse PKCS10: '. Crypt::PKCS10->error);
             $log->debug($param->{pkcs10});
@@ -177,6 +175,7 @@ while (my $cgi = CGI::Fast->new()) {
             next;
         }
         my $transaction_id = sha1_hex($decoded->csrRequest);
+        $param->{pkcs10} = $decoded->csrRequest(1);
 
         Log::Log4perl::MDC->put('tid', $transaction_id);
         $param->{transaction_id} = $transaction_id;
