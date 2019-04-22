@@ -231,7 +231,7 @@ sub __send_cert : PRIVATE {
 
     my $cert_identifier  = $cert_result->[0]->{'IDENTIFIER'};
     ##! 16: 'Load Cert Identifier ' . $cert_identifier
-    my $cert_pem = CTX('api')->get_cert({ 'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'PEM' });
+    my $cert_pem = CTX('api2')->get_cert( 'identifier' => $cert_identifier, 'format' => 'PEM' );
 
     ##! 16: 'cert data ' . Dumper $cert_pem
     my $result = $token->command(
@@ -366,7 +366,7 @@ depends on the status:
 sub __pkcs_req : PRIVATE {
     my $self      = shift;
     my $arg_ref   = shift;
-    my $api       = CTX('api');
+    my $api       = CTX('api2');
     my $pki_realm = CTX('session')->data->pki_realm;
     my $profile   = CTX('session')->data->profile;
     my $server    = CTX('session')->data->server;
@@ -417,11 +417,11 @@ sub __pkcs_req : PRIVATE {
     if ( $workflow_id ) {
 
         # Fetch the workflow
-        $wf_info = $api->get_workflow_info({
-            ID       => $workflow_id,
-        });
+        $wf_info = $api->get_workflow_info(
+            id       => $workflow_id,
+        );
 
-        CTX('log')->application()->info("SCEP incoming request, found workflow $workflow_id, state " . $wf_info->{WORKFLOW}->{STATE});
+        CTX('log')->application()->info("SCEP incoming request, found workflow $workflow_id, state " . $wf_info->{workflow}->{state});
 
 
     } else {
@@ -470,12 +470,12 @@ sub __pkcs_req : PRIVATE {
         eval {
             # prepare the registration record - this will fail if the
             # request ran into a race condition
-            CTX('api')->set_data_pool_entry({
-                NAMESPACE => 'scep.transaction_id',
-                KEY => "$server:$transaction_id",
-                VALUE => 'creating',
-                EXPIRATION_DATE => time() + 300, # Creating the workflow should never take any longer
-            });
+            $api->set_data_pool_entry(
+                namespace => 'scep.transaction_id',
+                key => "$server:$transaction_id",
+                value => 'creating',
+                expiration_date => time() + 300, # Creating the workflow should never take any longer
+            );
             # As the API does NOT commit to the datapool, we need an explicit commit now
             CTX('dbi')->commit();
         };
@@ -517,25 +517,24 @@ sub __pkcs_req : PRIVATE {
         # map the required params to the workflow context object
         map { $wf_context->{$_} = $values->{ $params->{$_} } // ''; } keys %{$params};
 
-        $wf_info = $api->create_workflow_instance({
-                WORKFLOW => $workflow_type,
-                PARAMS   => $wf_context,
-            }
+        $wf_info = $api->create_workflow_instance(
+            workflow => $workflow_type,
+            params   => $wf_context,
         );
 
         ##! 16: 'wf_info: ' . Dumper $wf_info
-        $workflow_id = $wf_info->{WORKFLOW}->{ID};
+        $workflow_id = $wf_info->{workflow}->{id};
         ##! 16: 'workflow_id: ' . $workflow_id
 
-        CTX('log')->application()->info("SCEP started new workflow with id $workflow_id, state " . $wf_info->{WORKFLOW}->{STATE});
+        CTX('log')->application()->info("SCEP started new workflow with id $workflow_id, state " . $wf_info->{workflow}->{state});
 
 
         # Record the scep tid and the workflow in the datapool
-        CTX('api')->set_data_pool_entry({
-            NAMESPACE => 'scep.transaction_id',
-            KEY => "$server:$transaction_id",
-            VALUE => $workflow_id,
-            FORCE => 1,
+        $api2->set_data_pool_entry({
+            namespace => 'scep.transaction_id',
+            key => "$server:$transaction_id",
+            value => $workflow_id,
+            force => 1,
          });
          # commit required
          CTX('dbi')->commit();
@@ -546,13 +545,13 @@ sub __pkcs_req : PRIVATE {
 
     ##! 64: 'wf_info ' . Dumper $wf_info
 
-    my $wf_state = $wf_info->{WORKFLOW}->{STATE};
+    my $wf_state = $wf_info->{workflow}->{state};
 
     ##! 16: 'Workflow state ' . $wf_state
 
-    my @extra_header = ( "X-OpenXPKI-WorkflowId: " . $wf_info->{WORKFLOW}->{ID} );
+    my @extra_header = ( "X-OpenXPKI-WorkflowId: " . $wf_info->{workflow}->{id} );
 
-    my $proc_state = $wf_info->{WORKFLOW}->{'PROC_STATE'};
+    my $proc_state = $wf_info->{workflow}->{'proc_state'};
     if ($proc_state ne 'finished') {
 
         CTX('log')->application()->info("SCEP $workflow_id in state $wf_state, send pending reply");
@@ -567,8 +566,8 @@ sub __pkcs_req : PRIVATE {
             }
         );
 
-        if ($wf_info->{WORKFLOW}->{CONTEXT}->{'error_code'}) {
-            push @extra_header, "X-OpenXPKI-Error: " . $wf_info->{WORKFLOW}->{CONTEXT}->{'error_code'};
+        if ($wf_info->{workflow}->{context}->{'error_code'}) {
+            push @extra_header, "X-OpenXPKI-Error: " . $wf_info->{workflow}->{context}->{'error_code'};
         }
 
         return [ \@extra_header, $pending_msg ];
@@ -578,20 +577,20 @@ sub __pkcs_req : PRIVATE {
         # the workflow is finished,
         # get the certificate from the workflow
 
-        my $cert_identifier = $wf_info->{WORKFLOW}->{CONTEXT}->{'cert_identifier'};
+        my $cert_identifier = $wf_info->{workflow}->{context}->{'cert_identifier'};
         ##! 32: 'cert_identifier: ' . $cert_identifier
 
         if (!$cert_identifier) {
             # Fallback for old workflows
-            my $csr_serial = $wf_info->{WORKFLOW}->{CONTEXT}->{'csr_serial'};
+            my $csr_serial = $wf_info->{workflow}->{context}->{'csr_serial'};
             ##! 32: 'csr serial ' . $csr_serial
 
-            my $csr_result = $api->search_cert({ CSR_SERIAL => $csr_serial });
+            my $csr_result = $api->search_cert( csr_serial => $csr_serial, return_columns => 'identifier' );
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVICE_LIBSCEP_COMMAND_PKIOPERATION_CSR_SERIAL_FALLBACK_FAILED'
             ) if (ref $csr_result ne 'ARRAY' || scalar @{ $csr_result } != 1);
 
-            $cert_identifier = $csr_result->[0]->{IDENTIFIER};
+            $cert_identifier = $csr_result->[0]->{identifier};
 
         }
 
@@ -602,9 +601,8 @@ sub __pkcs_req : PRIVATE {
         }
 
         my $certificate = $api->get_cert(
-            {   IDENTIFIER => $cert_identifier,
-                FORMAT     => 'PEM',
-            }
+            identifier => $cert_identifier,
+            format     => 'PEM',
         );
         ##! 16: 'certificate: ' . $certificate
 
@@ -633,7 +631,7 @@ sub __pkcs_req : PRIVATE {
 
     ##! 32: 'FAILURE'
     # must be one of the error codes defined in the SCEP protocol
-    my $scep_error_code = $wf_info->{WORKFLOW}->{CONTEXT}->{'scep_error'};
+    my $scep_error_code = $wf_info->{workflow}->{context}->{'scep_error'};
 
     if ( !defined $scep_error_code || ($scep_error_code !~ m{ badAlg | badMessageCheck | badTime | badCertId }xms)) {
         CTX('log')->application()->error("SCEP Request failed without error code set - default to badRequest");
@@ -652,8 +650,8 @@ sub __pkcs_req : PRIVATE {
         }
     );
 
-    if ($wf_info->{WORKFLOW}->{CONTEXT}->{'error_code'}) {
-        push @extra_header, "X-OpenXPKI-Error: " . $wf_info->{WORKFLOW}->{CONTEXT}->{'error_code'};
+    if ($wf_info->{workflow}->{context}->{'error_code'}) {
+        push @extra_header, "X-OpenXPKI-Error: " . $wf_info->{workflow}->{context}->{'error_code'};
     }
 
 

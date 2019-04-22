@@ -70,6 +70,26 @@ has subject => (
     }
 );
 
+has subject_hash => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'HashRef',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        my $hash = {};
+        foreach my $comp (reverse @{$self->_cert()->Subject}) {
+            my ($k,$v) = split("=", $comp);
+            # Replace S -> ST and l => L, see #674
+            $k =~ s{\AS=}{ST=};
+            $k =~ s{\Al=}{L=};
+            $hash->{$k} = [] unless($hash->{$k});
+            push @{$hash->{$k}}, $v;
+        }
+        return $hash;
+    }
+);
+
 has subject_alt_name => (
     is => 'ro',
     init_arg => undef,

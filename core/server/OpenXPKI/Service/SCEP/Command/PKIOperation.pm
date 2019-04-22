@@ -193,7 +193,7 @@ sub __send_cert : PRIVATE {
 
     my $cert_identifier  = $cert_result->[0]->{'IDENTIFIER'};
     ##! 16: 'Load Cert Identifier ' . $cert_identifier
-    my $cert_pem = CTX('api')->get_cert({ 'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'PEM' });
+    my $cert_pem = CTX('api2')->get_cert( 'identifier' => $cert_identifier, 'format' => 'PEM' );
 
     ##! 16: 'cert data ' . Dumper $cert_pem
     my $result = $token->command(

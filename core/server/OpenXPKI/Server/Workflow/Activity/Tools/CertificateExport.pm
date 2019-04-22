@@ -30,7 +30,7 @@ sub execute {
     # no template, no key, just export the plain certificate
     if (!$template && !defined $key_password) {
 
-        my $cert = CTX('api')->get_cert({ IDENTIFIER => $cert_identifier, FORMAT => 'PEM'});
+        my $cert = CTX('api2')->get_cert( identifier => $cert_identifier, format => 'PEM' );
         $context->param( $target_key  => $cert );
 
     } elsif (defined $key_password) {

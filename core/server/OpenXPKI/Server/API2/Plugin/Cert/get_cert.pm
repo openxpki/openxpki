@@ -12,6 +12,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 use OpenXPKI::Crypto::X509;
 use OpenXPKI::Crypt::X509;
+use MIME::Base64;
 
 =head1 COMMANDS
 
@@ -45,9 +46,15 @@ B<Parameters>
 
 =back
 
+=item attribute - expression for attributes to add, see get_cert_attributes
+
 =back
 
 B<Changes compared to API v1:>
+
+The output of HASH has changed dramatically! The full content of BODY is no
+longer part of the output, keys are all lowercased and relevant data from the
+body was moved to keys on the first level.
 
 When called with C<format =E<gt> "DBINFO"> the returned I<HashRef> contains
 lowercase keys. Additionally the following keys changed:
@@ -57,10 +64,14 @@ lowercase keys. Additionally the following keys changed:
     PUBKEY                  --> public_key
     CSR_SERIAL              --> req_key
 
+To get attributes for the certificate back with DBINFO you MUST pass the name
+or "LIKE" "expression for the attributes keys as defined in get_cert_attributes.
+
 =cut
 command "get_cert" => {
     identifier => { isa => 'Base64', required => 1, },
     format     => { isa => 'AlphaPunct', matching => qr{ \A ( PEM | DER | TXT | TXTPEM | HASH | DBINFO | PKCS7 ) \Z }x, default => "HASH" },
+    attribute  => { isa => 'Str', },
 } => sub {
     my ($self, $params) = @_;
 
@@ -86,54 +97,13 @@ command "get_cert" => {
     }
 
     if ($format eq 'DER') {
-        return OpenXPKI::Crypt::X509->new( $cert->{data} )->data;
+        $cert->{data} =~ m{-----BEGIN[^-]*CERTIFICATE-----(.+)-----END[^-]*CERTIFICATE-----}xms;
+        $cert->{data} =~ s{\s}{}xms;
+        return decode_base64($1);
     }
-
-    #
-    # Format: "DBINFO"
-    #
-    if ('DBINFO' eq $format) {
-        ##! 2: "Preparing output for DBINFO format"
-        delete $cert->{data};
-        my $extended_info = {};
-
-        # Hex Serial
-        my $serial = Math::BigInt->new($cert->{cert_key});
-        $extended_info->{cert_key_hex} = $serial->as_hex;
-        $extended_info->{cert_key_hex} =~ s{\A 0x}{}xms;
-
-        # Expired Status
-        $cert->{status} = 'EXPIRED' if $cert->{status} eq 'ISSUED' and $cert->{notafter} < time();
-
-        # Fetch certificate attributes
-        $extended_info->{cert_attributes} = {};
-        my $cert_attr = $dbi->select(
-            columns => [ qw(
-                attribute_contentkey
-                attribute_value
-            ) ],
-            from => 'certificate_attributes',
-            where => { identifier => $identifier },
-        );
-        while (my $attr = $cert_attr->fetchrow_hashref) {
-            my $key = $attr->{attribute_contentkey};
-            my $val = $attr->{attribute_value};
-            $extended_info->{cert_attributes}->{$key} //= [];
-            push @{$extended_info->{cert_attributes}->{$key}}, $val;
-        }
-
-        return {
-            %{ $cert },
-            'cert_attributes' => $extended_info->{cert_attributes},
-            'cert_key_hex'    => $extended_info->{cert_key_hex},
-        };
-    }
-
-    ##! 2: "Requesting crypto token via API and creating X509 object"
-    my $token = CTX('api')->get_default_token();
 
     if ($format eq 'TXT' || $format eq 'TXTPEM') {
-        my $result = $token->command ({
+        my $result = CTX('api')->get_default_token()->command ({
             COMMAND => "convert_cert",
             DATA    => $cert->{data},
             OUT     => $format
@@ -142,7 +112,7 @@ command "get_cert" => {
     };
 
     if ('PKCS7' eq $format) {
-        my $result = $token->command({
+        my $result = CTX('api')->get_default_token()->command({
             COMMAND          => 'convert_cert',
             DATA             => [ $cert->{data} ],
             OUT              => 'PEM',
@@ -151,21 +121,42 @@ command "get_cert" => {
         return $result;
     }
 
-    my $obj = OpenXPKI::Crypto::X509->new(TOKEN => $token, DATA => $cert->{data});
+    # Hex Serial
+    my $serial = Math::BigInt->new($cert->{cert_key});
+    $cert->{cert_key_hex} = $serial->as_hex;
+    $cert->{cert_key_hex} =~ s{\A 0x}{}xms;
+
+    # Expired Status
+    $cert->{status} = 'EXPIRED' if $cert->{status} eq 'ISSUED' and $cert->{notafter} < time();
+
+    # Format: "DBINFO"
+    if ($format eq 'DBINFO') {
+        ##! 2: "Preparing output for DBINFO format"
+        delete $cert->{data};
+
+        if ($params->has_attribute) {
+            $cert->{cert_attributes} = $self->api->get_cert_attributes( identifier => $identifier, attribute => $params->attribute );
+        }
+
+        return $cert;
+    }
+
+    my $x509 = OpenXPKI::Crypt::X509->new( $cert->{data} );
 
     ##! 2: "Preparing output for HASH format"
-    my $result = $obj->get_parsed_ref;
-
-    # NOTBEFORE and NOTAFTER are DateTime objects, which we do
-    # not want to be serialized, so we just send out the stringified
-    # version ...
-    $result->{BODY}->{NOTBEFORE} = $result->{BODY}->{NOTBEFORE}->epoch();
-    $result->{BODY}->{NOTAFTER}  = $result->{BODY}->{NOTAFTER}->epoch();
-    $result->{STATUS}            = $cert->{status};
-    $result->{IDENTIFIER}        = $cert->{identifier};
-    $result->{ISSUER_IDENTIFIER} = $cert->{issuer_identifier};
-    $result->{CSR_SERIAL}        = $cert->{req_key};
-    $result->{PKI_REALM}         = $cert->{pki_realm};
+    my $result = {};
+    $result->{serial_hex} = $cert->{cert_key_hex};
+    $result->{serial} = $cert->{cert_key};
+    $result->{subject} = $cert->{subject};
+    $result->{subject_hash} = $x509->subject_hash();
+    $result->{notbefore} = $cert->{notbefore};
+    $result->{notafter}  = $cert->{notafter};
+    $result->{status}            = $cert->{status};
+    $result->{identifier}        = $cert->{identifier};
+    $result->{issuer_identifier} = $cert->{issuer_identifier};
+    $result->{issuer} = $cert->{issuer_dn};
+    $result->{csr_serial}        = $cert->{req_key};
+    $result->{pki_realm}         = $cert->{pki_realm};
     return $result;
 
 };

@@ -25,7 +25,7 @@ use Template;
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use OpenXPKI::Crypto::X509;
+use OpenXPKI::Crypt::X509;
 use OpenXPKI::Server::Context qw( CTX );
 
 
@@ -652,14 +652,11 @@ sub process_templates {
 
     my $default_token = CTX('crypto_layer')->get_system_token({ TYPE => "DEFAULT" });
 
-    my $x509 = OpenXPKI::Crypto::X509->new(
-        DATA  => $ca_cert,
-        TOKEN => $default_token,
-    );
+    my $x509 = OpenXPKI::Crypt::X509->new( $ca_cert );
 
     # Get Issuer Info from selected ca
-    my $issuer_info = $x509->{PARSED}->{BODY}->{SUBJECT_HASH};
-    $issuer_info->{DN} = $x509->{PARSED}->{BODY}->{SUBJECT};
+    my $issuer_info = $x509->subject_hash();
+    $issuer_info->{DN} = $x509->get_subject();
 
    # Split alias into generation and group name
    $self->{CA} =~ /^(.*)-(\d+)$/;

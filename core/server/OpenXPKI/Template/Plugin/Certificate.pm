@@ -69,15 +69,44 @@ sub get_hash {
     # To prevent loading the same item again and again, we always cache
     # the last hash and reuse it
 
-    if ($self->{_hash} && ($self->{_hash}->{IDENTIFIER} eq $cert_id)) {
+    if ($self->{_hash} && ($self->{_hash}->{identifier} eq $cert_id)) {
         return $self->{_hash};
     }
 
     $self->{_hash} = undef;
     eval {
-        $self->{_hash} = CTX('api')->get_cert({ IDENTIFIER => $cert_id });
+        $self->{_hash} = CTX('api2')->get_cert( identifier => $cert_id );
     };
     return $self->{_hash};
+
+}
+
+=head2 get_hash_legacy(cert_identifier)
+
+Return the certificates database hash or undef if the identifier is
+not found.
+
+=cut
+
+sub get_hash_legacy {
+
+    my $self = shift;
+    my $cert_id = shift;
+
+    return unless ($cert_id);
+
+    # To prevent loading the same item again and again, we always cache
+    # the last hash and reuse it
+
+    if ($self->{_hash_old} && ($self->{_hash_old}->{IDENTIFIER} eq $cert_id)) {
+        return $self->{_hash_old};
+    }
+
+    $self->{_hash_old} = undef;
+    eval {
+        $self->{_hash_old} = CTX('api')->get_cert({ IDENTIFIER => $cert_id });
+    };
+    return $self->{_hash_old};
 
 }
 
@@ -95,7 +124,18 @@ sub body {
     my $cert_id = shift;
     my $property = shift;
 
+
+    # items that can be constructed from the new format
     my $hash = $self->get_hash( $cert_id );
+    return unless($hash);
+
+    if (defined $hash->{lc($property)}) {
+        return $hash->{lc($property)};
+    }
+
+    Log::Log4perl->get_logger('openxpki.deprecated')->error("Template Plugin Certificate.body reading legacy property ($property)!");
+
+    my $hash = $self->get_hash_legacy( $cert_id );
     return $hash ? $hash->{BODY}->{uc($property)} : undef;
 
 }
@@ -110,7 +150,7 @@ sub csr_serial {
     my $cert_id = shift;
 
     my $hash = $self->get_hash( $cert_id );
-    return $hash ? $hash->{CSR_SERIAL} : '';
+    return $hash ? $hash->{csr_serial} : '';
 }
 
 =head2 serial
@@ -124,7 +164,7 @@ sub serial {
     my $cert_id = shift;
 
     my $hash = $self->get_hash( $cert_id );
-    return $hash ? $hash->{BODY}->{SERIAL} : '';
+    return $hash ? $hash->{serial} : '';
 }
 
 
@@ -139,7 +179,7 @@ sub serial_hex {
     my $cert_id = shift;
 
     my $hash = $self->get_hash( $cert_id );
-    return $hash ? $hash->{BODY}->{SERIAL_HEX} : '';
+    return $hash ? $hash->{serial_hex} : '';
 }
 
 =head2 status
@@ -152,7 +192,7 @@ sub status {
     my $cert_id = shift;
 
     my $hash = $self->get_hash( $cert_id );
-    return $hash ? $hash->{STATUS} : '';
+    return $hash ? $hash->{status} : '';
 }
 
 =head2 issuer
@@ -165,7 +205,7 @@ sub issuer {
     my $cert_id = shift;
 
     my $hash = $self->get_hash( $cert_id );
-    return $hash ? $hash->{ISSUER_IDENTIFIER} : '';
+    return $hash ? $hash->{issuer_identifier} : '';
 }
 
 
@@ -187,7 +227,7 @@ sub dn {
         return;
     }
 
-    my $dn = $hash->{BODY}->{SUBJECT_HASH};
+    my $dn = $hash->{subject_hash};
 
     if (!$component) {
         return $dn;
@@ -219,7 +259,7 @@ sub notbefore {
     return '' unless ($hash);
 
     return OpenXPKI::DateTime::convert_date({
-        DATE      => DateTime->from_epoch( epoch => $hash->{BODY}->{NOTBEFORE} ),
+        DATE      => DateTime->from_epoch( epoch => $hash->{notbefore} ),
         OUTFORMAT => $format
     });
 
@@ -243,7 +283,7 @@ sub notafter {
     return '' unless ($hash);
 
     return OpenXPKI::DateTime::convert_date({
-        DATE      => DateTime->from_epoch( epoch => $hash->{BODY}->{NOTAFTER} ),
+        DATE      => DateTime->from_epoch( epoch => $hash->{notafter} ),
         OUTFORMAT => $format
     });
 
@@ -263,7 +303,7 @@ sub realm {
     my $hash = $self->get_hash( $cert_id );
     return '' unless ($hash);
 
-    return CTX('config')->get(['system','realms',$hash->{'PKI_REALM'},'label']);
+    return CTX('config')->get(['system','realms',$hash->{'pki_realm'},'label']);
 
 }
 
@@ -279,8 +319,8 @@ sub chain {
     my $self = shift;
     my $cert_id = shift;
 
-    my $chain = CTX('api')->get_chain({ START_IDENTIFIER => $cert_id, OUTFORMAT => 'PEM'});
-    my @certs = @{$chain->{CERTIFICATES}};
+    my $chain = CTX('api2')->get_chain( start_with => $cert_id, format => 'PEM' );
+    my @certs = @{$chain->{certificates}};
 
     # strip the end entity
     shift @certs;
@@ -302,9 +342,9 @@ sub attr {
     my $cert_id = shift;
     my $attr = shift;
 
-    my $hash = CTX('api')->get_cert_attributes({
-        IDENTIFIER => $cert_id, ATTRIBUTE => $attr
-    });
+    my $hash = CTX('api2')->get_cert_attributes(
+        identifier => $cert_id, attribute => $attr
+    );
 
     if ($hash->{$attr}) {
         return $hash->{$attr};
@@ -326,7 +366,7 @@ sub pem {
 
     my $pem;
     eval {
-        $pem = CTX('api')->get_cert({ IDENTIFIER => $cert_id, 'FORMAT' => 'PEM' });
+        $pem = CTX('api2')->get_cert( identifier => $cert_id, 'format' => 'PEM' );
     };
     return $pem;
 

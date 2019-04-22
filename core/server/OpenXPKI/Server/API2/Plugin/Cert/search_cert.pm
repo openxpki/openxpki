@@ -137,7 +137,8 @@ of C<[valid|expires]_[before|after]>:
 command "search_cert" => {
     authority_key_identifier => {isa => 'Value',         matching => $re_alpha_string,      },
     cert_attributes          => {isa => 'ArrayRef|HashRef',      },
-    return_attributes        => {isa => 'ArrayRef', },
+    return_attributes        => {isa => 'ArrayRefOrStr', coerce => 1, },
+    return_columns           => {isa => 'ArrayRefOrStr', coerce => 1, },
     cert_serial              => {isa => 'Value',         matching => $re_int_or_hex_string, },
     csr_serial               => {isa => 'Value',         matching => $re_integer_string,    },
     entity_only              => {isa => 'Value',         matching => $re_boolean,           },
@@ -203,7 +204,8 @@ of C<[valid|expires]_[before|after]>:
 command "search_cert_count" => {
     authority_key_identifier => {isa => 'Value',    matching => $re_alpha_string,      },
     cert_attributes          => {isa => 'ArrayRef|HashRef', },
-    return_attributes        => {isa => 'ArrayRef', },
+    return_attributes        => {isa => 'ArrayRefOrStr', coerce => 1, },
+    return_columns           => {isa => 'ArrayRefOrStr', coerce => 1, },
     cert_serial              => {isa => 'Value',    matching => $re_int_or_hex_string, },
     csr_serial               => {isa => 'Value',    matching => $re_integer_string,    },
     entity_only              => {isa => 'Value',    matching => $re_boolean,           },
@@ -244,6 +246,12 @@ sub _make_db_query_additional_params {
     if ( $po->has_limit ) {
         $params->{limit} = $po->limit;
         $params->{offset} = $po->start if $po->has_start;
+    }
+
+    if ( $po->has_return_columns ) {
+        # to avoid ambiguties when we merge with CSR or attributes
+        my @col = map { 'certificate.'.$_ } @{$po->return_columns};
+        $params->{columns} = \@col;
     }
 
     # Custom ordering

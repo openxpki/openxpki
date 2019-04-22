@@ -78,11 +78,11 @@ command "get_cert_actions" => {
 
     my $role    = $params->has_role ? $params->role : CTX('session')->data->role;
     my $cert_id = $params->identifier;
-    my $cert    = CTX('api')->get_cert({IDENTIFIER => $cert_id, FORMAT => 'DBINFO'});
+    my $cert    = CTX('api2')->get_cert( identifier => $cert_id, format => 'DBINFO' );
     ##! 2: "cert $cert_id, role $role"
 
     # check if this is a entity certificate from the current realm
-    return {} unless $cert->{CSR_SERIAL} and $cert->{PKI_REALM} eq CTX('session')->data->pki_realm;
+    return {} unless $cert->{req_key} and $cert->{pki_realm} eq CTX('session')->data->pki_realm;
 
     my @actions;
     my @options;
@@ -136,10 +136,10 @@ command "get_cert_actions" => {
                     next OPTION unless CTX('api2')->private_key_exists_for_cert( identifier => $cert_id );
                 }
                 elsif ($rule eq 'issued') {
-                    next OPTION  unless ($cert->{STATUS} eq 'ISSUED' or $cert->{STATUS} eq 'EXPIRED');
+                    next OPTION  unless ($cert->{status} eq 'ISSUED' or $cert->{status} eq 'EXPIRED');
                 }
                 elsif ($rule eq 'valid') {
-                    next OPTION  unless $cert->{STATUS} eq 'ISSUED';
+                    next OPTION  unless $cert->{status} eq 'ISSUED';
                 }
                 elsif ($rule eq 'owner') {
                     next OPTION  unless $self->api->is_certificate_owner(identifier => $cert_id);

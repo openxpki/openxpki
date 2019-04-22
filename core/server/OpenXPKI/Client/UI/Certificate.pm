@@ -543,7 +543,7 @@ sub init_detail {
         return;
     }
 
-    my $cert = $self->send_command( 'get_cert', {  IDENTIFIER => $cert_identifier, FORMAT => 'DBINFO' }, 1);
+    my $cert = $self->send_command_v2( 'get_cert', {  identifier => $cert_identifier, format => 'DBINFO',  attribute => 'subject_%' }, 1);
 
     if (!$cert) {
         $self->_page({
@@ -568,10 +568,10 @@ sub init_detail {
 
     $self->logger()->trace("result: " . Dumper $cert);
 
-    my $cert_attribute = $self->send_command( 'get_cert_attributes', {  IDENTIFIER => $cert_identifier, ATTRIBUTE => 'subject_%' });
+    my $cert_attribute = $cert->{cert_attribute};
     $self->logger()->trace("result: " . Dumper $cert_attribute);
 
-    my %dn = OpenXPKI::DN->new( $cert->{SUBJECT} )->get_hashed_content();
+    my %dn = OpenXPKI::DN->new( $cert->{subject} )->get_hashed_content();
 
     $self->_page({
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL',
@@ -579,7 +579,7 @@ sub init_detail {
     });
 
 
-    my @fields = ( { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', value => $cert->{SUBJECT} } );
+    my @fields = ( { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', value => $cert->{subject} } );
 
     if ($cert_attribute && $cert_attribute->{subject_alt_name}) {
         #my $cert_attribute->{subject_alt_name};
@@ -588,25 +588,25 @@ sub init_detail {
 
     # check if this is a entity certificate from the current realm
     my $is_local_entity = 0;
-    if ($cert->{CSR_SERIAL} && $cert->{PKI_REALM} eq $self->_session->param('pki_realm')) {
+    if ($cert->{csr_serial} && $cert->{pki_realm} eq $self->_session->param('pki_realm')) {
         $self->logger()->debug("cert is local entity");
         $is_local_entity = 1;
     }
 
     if ($is_local_entity) {
-        my $cert_profile  = $self->send_command( 'get_profile_for_cert', {  IDENTIFIER => $cert_identifier }, 1);
+        my $cert_profile  = $self->send_command_v2( 'get_profile_for_cert', { identifier => $cert_identifier }, 1);
         if ($cert_profile) {
             push @fields, { label => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE', value => $cert_profile };
         }
     }
 
     push @fields, (
-        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SERIAL', value => '0x'.$cert->{CERTIFICATE_SERIAL_HEX} },
+        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SERIAL', value => '0x'.$cert->{cert_key_hex} },
         { label => 'I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER', value => $cert_identifier },
-        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE', value => $cert->{NOTBEFORE}, format => 'timestamp'  },
-        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER', value => $cert->{NOTAFTER}, format => 'timestamp' },
-        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_STATUS', value => { label => 'I18N_OPENXPKI_UI_CERT_STATUS_'.$cert->{STATUS} , value => $cert->{STATUS} }, format => 'certstatus' },
-        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER', format => 'link', value => { label => $cert->{ISSUER_DN}, page => 'certificate!chain!identifier!'. $cert_identifier } },
+        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE', value => $cert->{notbefore}, format => 'timestamp'  },
+        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER', value => $cert->{notafter}, format => 'timestamp' },
+        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_STATUS', value => { label => 'I18N_OPENXPKI_UI_CERT_STATUS_'.$cert->{status} , value => $cert->{status} }, format => 'certstatus' },
+        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER', format => 'link', value => { label => $cert->{issuer_dn}, page => 'certificate!chain!identifier!'. $cert_identifier } },
     );
 
     # for i18n parser I18N_OPENXPKI_CERT_ISSUED CRL_ISSUANCE_PENDING I18N_OPENXPKI_CERT_REVOKED I18N_OPENXPKI_CERT_EXPIRED
@@ -775,10 +775,10 @@ sub init_related {
 
     my $cert_identifier = $self->param('identifier');
 
-    my $cert = $self->send_command( 'get_cert', {  IDENTIFIER => $cert_identifier, FORMAT => 'DBINFO' });
+    my $cert = $self->send_command_v2( 'get_cert', {  identifier => $cert_identifier, format => 'DBINFO', attribute => 'system_workflow%' });
     $self->logger()->trace("result: " . Dumper $cert);
 
-    my %dn = OpenXPKI::DN->new( $cert->{SUBJECT} )->get_hashed_content();
+    my %dn = OpenXPKI::DN->new( $cert->{subject} )->get_hashed_content();
 
     $self->_page({
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_RELATIONS_LABEL',
@@ -786,31 +786,26 @@ sub init_related {
     });
 
     # run a workflow search using the given ids from the cert attributes
-    my @wfid = ( 0 );
-    foreach my $key (keys %{$cert->{CERT_ATTRIBUTES}}) {
-        if ($key !~ m{ \A system_workflow }xs ) {
-            next;
-        }
-        push @wfid, @{$cert->{CERT_ATTRIBUTES}->{$key}};
-    }
+    my @wfid = values %{$cert->{cert_attributes}};
 
     $self->logger()->trace("related workflows " . Dumper \@wfid) if($self->logger()->is_trace());
 
-    my $cert_workflows = $self->send_command( 'search_workflow_instances', {  SERIAL => \@wfid, CHECK_ACL => 1 });
-
-    $self->logger()->trace("workflow results" . Dumper $cert_workflows) if ($self->logger()->is_trace());;
-
-    my $workflow_labels = $self->send_command( 'get_workflow_instance_types');
-
     my @result;
-    foreach my $line (@{$cert_workflows}) {
-        my $label = $workflow_labels->{$line->{'WORKFLOW.WORKFLOW_TYPE'}}->{label};
-        push @result, [
-            $line->{'WORKFLOW.WORKFLOW_SERIAL'},
-            $label || $line->{'WORKFLOW.WORKFLOW_TYPE'},
-            $line->{'WORKFLOW.WORKFLOW_STATE'},
-            $line->{'WORKFLOW.WORKFLOW_SERIAL'},
-        ];
+    if (scalar @wfid) {
+        my $cert_workflows = $self->send_command_v2( 'search_workflow_instances', {  id => \@wfid, check_acl => 1 });
+        $self->logger()->trace("workflow results" . Dumper $cert_workflows) if ($self->logger()->is_trace());;
+
+        my $workflow_labels = $self->send_command_v2( 'get_workflow_instance_types');
+
+        foreach my $line (@{$cert_workflows}) {
+            my $label = $workflow_labels->{$line->{'workflow_type'}}->{label};
+            push @result, [
+                $line->{'workflow_id'},
+                $label || $line->{'workflow_type'},
+                $line->{'workflow_state'},
+                $line->{'workflow_id'},
+            ];
+        }
     }
 
     $self->add_section({
@@ -855,46 +850,42 @@ sub init_download {
 
     # No format, call detail
     if (!$format) {
-
         return $self->init_detail();
+    }
 
-    } elsif ($format eq 'pkcs7') {
+    my $cert_info = $self->send_command_v2 ( "get_cert", {'identifier' => $cert_identifier, 'format' => 'DBINFO' });
+    if (!$cert_info) {
+        $self->redirect('certificate!search');
+        return;
+    }
+
+    $self->logger()->trace("cert info " . Dumper $cert_info );
+    my %dn = OpenXPKI::DN->new( $cert_info->{subject} )->get_hashed_content();
+    my $filename = $dn{CN}[0] || $dn{emailAddress}[0] || $cert_info->{identifier};
+
+    my $content_type = 'application/octet-string';
+    my $output = '';
+
+    if ($format eq 'pkcs7') {
 
         my $keeproot = $self->param('root') ? 1 : 0;
-        my $pkcs7  = $self->send_command ( "get_chain", { START_IDENTIFIER => $cert_identifier, BUNDLE => 1, KEEPROOT => $keeproot });
+        $output = $self->send_command_v2 ( "get_chain", { start_with => $cert_identifier, bundle => 1, keeproot => $keeproot });
 
-        my $cert_info  = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'HASH' });
-        my $filename = $cert_info->{BODY}->{SUBJECT_HASH}->{CN}->[0] || $cert_info->{BODY}->{IDENTIFIER};
-
-        print $self->cgi()->header( -type => 'application/pkcs7-mime', -expires => "1m", -attachment => "$filename.p7c" );
-        print $pkcs7;
-        exit;
+        $filename .= ".p7c";
+        $content_type = 'application/pkcs7-mime';
 
     } elsif ($format eq 'bundle') {
 
-        my $chain = $self->send_command ( "get_chain", { START_IDENTIFIER => $cert_identifier, OUTFORMAT => 'PEM', 'KEEPROOT' => 1 });
+        my $chain = $self->send_command_v2 ( "get_chain", { start_with => $cert_identifier, format => 'PEM', 'keeproot' => 1 });
         $self->logger()->trace("chain info " . Dumper $chain );
 
-        my $cert_info  = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'HASH' });
-        my $filename = $cert_info->{BODY}->{SUBJECT_HASH}->{CN}->[0] || $cert_info->{BODY}->{IDENTIFIER};
-
-        my $output = '';
-        for (my $i=0;$i<@{$chain->{CERTIFICATES}};$i++) {
-            $output .= $chain->{SUBJECT}->[$i]. "\n". $chain->{CERTIFICATES}->[$i]."\n\n";
+        for (my $i=0;$i<@{$chain->{certificates}};$i++) {
+            $output .= $chain->{subject}->[$i]. "\n". $chain->{certificates}->[$i]."\n\n";
         }
 
-        print $self->cgi()->header( -type => 'application/octet-string', -expires => "1m", -attachment => "$filename.bundle" );
-        print $output;
-        exit;
-
+        $filename .= ".bundle";
 
     } else {
-
-        my $cert_info = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => 'HASH' });
-        $self->logger()->trace("cert info " . Dumper $cert_info );
-
-        my $content_type = 'application/octet-string';
-        my $filename = $cert_info->{BODY}->{SUBJECT_HASH}->{CN}->[0] || $cert_info->{BODY}->{IDENTIFIER};
 
         my $cert_format = 'DER';
 
@@ -910,22 +901,21 @@ sub init_download {
         } else {
             # Default is to send the certifcate for install in binary / der form
             $filename .= '.cer';
-            if ($cert_info->{ISSUER_IDENTIFIER} eq $cert_info->{IDENTIFIER}) {
+            if ($cert_info->{issuer_identifier} eq $cert_info->{identifier}) {
                 $content_type = 'application/x-x509-ca-cert';
             } else {
                 $content_type = 'application/x-x509-user-cert';
             }
         }
 
-        my $cert = $self->send_command ( "get_cert", {'IDENTIFIER' => $cert_identifier, 'FORMAT' => $cert_format});
-
-        print $self->cgi()->header( -type => $content_type, -expires => "1m", -attachment => $filename );
-        print $cert;
-        exit;
+        $output = $self->send_command_v2 ( "get_cert", {'identifier' => $cert_identifier, 'format' => $cert_format});
 
     }
 
-    return $self;
+    print $self->cgi()->header( -type => $content_type, -expires => "1m", -attachment => $filename );
+    print $output;
+    exit;
+
 }
 
 =head2 init_parse
@@ -986,17 +976,17 @@ sub action_autocomplete {
     # Note - we replace + and / by - and _ in our base64 strings!
     if ($term =~ /[a-zA-Z0-9-_]{25,27}/) {
         $self->logger()->debug( "search for identifier: $term ");
-        my $search_result = $self->send_command( 'get_cert', {
-            IDENTIFIER => $term,
-            FORMAT => 'DBINFO',
+        my $search_result = $self->send_command_v2( 'get_cert', {
+            identifier => $term,
+            format => 'DBINFO',
         });
 
         if ($search_result) {
             push @result, {
-                value => $search_result->{IDENTIFIER},
-                label => $self->_escape($search_result->{SUBJECT}),
-                notbefore => $search_result->{NOTBEFORE},
-                notafter => $search_result->{NOTAFTER}
+                value => $search_result->{identifier},
+                label => $self->_escape($search_result->{subject}),
+                notbefore => $search_result->{notbefore},
+                notafter => $search_result->{notafter}
             };
         }
     }
@@ -1044,7 +1034,7 @@ sub action_find {
 
     my $cert_identifier = $self->param('cert_identifier');
     if ($cert_identifier) {
-        my $cert = $self->send_command( 'get_cert', {  IDENTIFIER => $cert_identifier, FORMAT => 'DBINFO' });
+        my $cert = $self->send_command_v2( 'get_cert', {  identifier => $cert_identifier, format => 'DBINFO' });
         if (!$cert) {
             $self->set_status('Unable to find a certificate with this identifier.','error');
             return $self->init_search();

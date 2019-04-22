@@ -67,7 +67,7 @@ sub execute {
 
     if ($enc_cert_ids) {
         foreach my $ident (@{$enc_cert_ids}) {
-            my $cert = CTX('api')->get_cert  ({ IDENTIFIER => $ident, FORMAT => 'PEM'});
+            my $cert = CTX('api2')->get_cert ( identifier => $ident, format => 'PEM' );
             push @enc_certs, $cert;
         }
     } else {
@@ -86,7 +86,7 @@ sub execute {
         ##! 16: ' Exporting cert ' . $cert_identifier
 
         # Step 3a - fetch PEM
-        my $cert_pem = CTX('api')->get_cert  ({ IDENTIFIER => $cert_identifier, FORMAT => 'PEM'});
+        my $cert_pem = CTX('api2')->get_cert ( identifier => $cert_identifier, format => 'PEM' );
 
         my $cert_xml = { id => $cert_identifier };
         # Attributes for the certificate tag are taken from the datapool
