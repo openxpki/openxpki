@@ -197,13 +197,14 @@ chdir "$clone_dir/core/server";
 #
 if ($mode eq "coverage") {
     print "\n====[ Testing the code coverage (this will take a while) ]====\n";
-    my $code = execute code => "cover -test";
-    print "Please note that some unit tests did not pass\n" if $code != 0;
+    execute show => "cover -test";
     use DateTime;
-    my $dirname = "code-coverage-".DateTime->new->strftime('%Y%m%d-%H%M%S');
+    my $dirname = "code-coverage-".(DateTime->now->strftime('%Y%m%d-%H%M%S'));
     move "./cover_db", "/repo/$dirname";
-    `chmod -R g+w,o+w "/repo/$dirname`;
-    print "\nCode coverage results available in project root dir:\n$dirname\n";
+    if (-d "/repo/$dirname") {
+        `chmod -R g+w,o+w "/repo/$dirname`;
+        print "\nCode coverage results available in project root dir:\n$dirname\n";
+    }
     exit;
 }
 
