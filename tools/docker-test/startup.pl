@@ -76,11 +76,12 @@ sub execute {
 }
 
 my $clone_dir = "/opt/openxpki";
-my @test_only = split ",", $ENV{OXI_TEST_ONLY};
 
-my $mode = $ENV{OXI_TEST_ALL} ? "all" : (
-    $ENV{OXI_TEST_COVERAGE} ? "coverage" : "selected"
-);
+my $mode = "all"; # default mode
+$mode = "all" if $ENV{OXI_TEST_ALL};
+$mode = "coverage" if $ENV{OXI_TEST_COVERAGE};
+my @test_only = split ",", $ENV{OXI_TEST_ONLY};
+$mode = "selected" if scalar @test_only;
 
 my @tests_unit;
 my @tests_qa;
@@ -90,9 +91,8 @@ if ($mode eq "all") {
     @tests_qa   = qw( qatest/backend/nice qatest/backend/api qatest/backend/api2 qatest/backend/webui qatest/client );
 }
 elsif ($mode eq "selected") {
-    my @tests = split /,/, $ENV{OXI_TEST_ONLY};
-    @tests_unit = grep { /^t\// } map { $_ =~ s/ ^ core\/server\/ //x; $_ } @tests;
-    @tests_qa   = grep { /^qatest\// } @tests;
+    @tests_unit = grep { /^t\// } map { my $t = $_; $t =~ s/ ^ core\/server\/ //x; $t } @test_only;
+    @tests_qa   = grep { /^qatest\// } @test_only;
 }
 
 #
@@ -103,14 +103,14 @@ my $is_local_repo = 0;
 # remote repo as specified
 if ($ENV{OXI_TEST_GITREPO}) {
     $repo = $ENV{OXI_TEST_GITREPO};
-    _stop 100, "Sorry, local repositories specified by file:// are not supported:\n$repo"
+    _stop 100, "Sorry, local repositories specified by file:// are not supported.\nUse this instead:\ndocker run -v /my/host/path:/repo ..."
         if $repo =~ / \A file /msx;
 }
 # local repo from host (if Docker volume is mounted)
 else {
-    # check if /repo is a mountpoint (= dev number differs from parent dir)
-    _stop 101, "I need either a remote or local Git repo:\ndocker run -e OXI_TEST_GITREPO=https://...\ndocker run -v /my/path:/repo"
-        unless ((stat "/repo")[0]) != ((stat "/")[0]);
+    # only continue if /repo is a mountpoint (= device number differs from parent dir)
+    _stop 101, "Please specify either a remote or local Git repo:\ndocker run -e OXI_TEST_GITREPO=https://...\ndocker run -v /my/host/path:/repo"
+        if (not -d "/repo" or (stat "/repo")[0] == (stat "/")[0]);
     $repo = "file:///repo";
     $is_local_repo = 1;
 }
@@ -147,7 +147,7 @@ $logmsg =~ s/\R$//gm;            # remove trailing newline
 ($logmsg) = split /\R/, $logmsg; # only print first line
 printf "|         » %s «\n", $logmsg;
 
-my $msg = $ENV{OXI_TEST_ALL} ? " all tests" : ($ENV{OXI_TEST_COVERAGE} ? " code coverage" : " selected tests:");
+my $msg = $mode eq "all" ? " all tests" : ($mode eq "coverage" ? " code coverage" : " selected tests:");
 my $big_msg = `figlet '$msg'`; $big_msg =~ s/^/| /msg;
 print $big_msg;
 printf "|      - $_\n" for @test_only;
@@ -195,13 +195,24 @@ chdir "$clone_dir/core/server";
 #
 if ($mode eq "coverage") {
     print "\n====[ Testing the code coverage (this will take a while) ]====\n";
-    my $code = execute code => "cover -test";
-    print "Please note that some unit tests did not pass\n" if $code != 0;
+    execute show => "cover -test";
     use DateTime;
-    my $dirname = "code-coverage-".DateTime->new->strftime('%Y%m%d-%H%M%S');
-    move "./cover_db", "/repo/$dirname";
-    `chmod -R g+w,o+w "/repo/$dirname`;
-    print "\nCode coverage results available in project root dir:\n$dirname\n";
+    my $dirname = "code-coverage-".(DateTime->now->strftime('%Y%m%d-%H%M%S'));
+    my $cover_src = "$clone_dir/core/server/cover_db";
+    my $cover_target = "/repo/$dirname";
+    if (-d $cover_src) {
+        system "mv", $cover_src, $cover_target;
+        if (-d $cover_target) {
+            `chmod -R g+w,o+w "$cover_target"`;
+            print "\nCode coverage results available in project root dir:\n$dirname\n";
+        }
+        else {
+            print "\nError: code coverage results could not be moved to host dir $cover_target:\n$!\n"
+        }
+    }
+    else {
+        print "\nError: code coverage results where not found\n($cover_src does not exist)\n"
+    }
     exit;
 }
 
@@ -254,5 +265,5 @@ execute show => "/usr/local/bin/openxpkictl start";
 #
 print "\n====[ Testing: QA tests ]====\n";
 chdir "$clone_dir/qatest";
-my @t = map { $_ =~ s/ ^ qatest\/ //x; $_ } @tests_qa;
+my @t = map { my $t = $_; $t =~ s/ ^ qatest\/ //x; $t } @tests_qa;
 execute show => "prove -l -r -q $_" for @t;
