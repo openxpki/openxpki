@@ -198,10 +198,20 @@ if ($mode eq "coverage") {
     execute show => "cover -test";
     use DateTime;
     my $dirname = "code-coverage-".(DateTime->now->strftime('%Y%m%d-%H%M%S'));
-    move "./cover_db", "/repo/$dirname";
-    if (-d "/repo/$dirname") {
-        `chmod -R g+w,o+w "/repo/$dirname`;
-        print "\nCode coverage results available in project root dir:\n$dirname\n";
+    my $cover_src = "$clone_dir/core/server/cover_db";
+    my $cover_target = "/repo/$dirname";
+    if (-d $cover_src) {
+        system "mv", $cover_src, $cover_target;
+        if (-d $cover_target) {
+            `chmod -R g+w,o+w "$cover_target"`;
+            print "\nCode coverage results available in project root dir:\n$dirname\n";
+        }
+        else {
+            print "\nError: code coverage results could not be moved to host dir $cover_target:\n$!\n"
+        }
+    }
+    else {
+        print "\nError: code coverage results where not found\n($cover_src does not exist)\n"
     }
     exit;
 }
