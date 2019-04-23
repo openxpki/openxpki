@@ -76,11 +76,12 @@ sub execute {
 }
 
 my $clone_dir = "/opt/openxpki";
-my @test_only = split ",", $ENV{OXI_TEST_ONLY};
 
-my $mode = $ENV{OXI_TEST_ALL} ? "all" : (
-    $ENV{OXI_TEST_COVERAGE} ? "coverage" : "selected"
-);
+my $mode = "all"; # default mode
+$mode = "all" if $ENV{OXI_TEST_ALL};
+$mode = "coverage" if $ENV{OXI_TEST_COVERAGE};
+my @test_only = split ",", $ENV{OXI_TEST_ONLY};
+$mode = "selected" if scalar @test_only;
 
 my @tests_unit;
 my @tests_qa;
@@ -90,11 +91,8 @@ if ($mode eq "all") {
     @tests_qa   = qw( qatest/backend/nice qatest/backend/api qatest/backend/api2 qatest/backend/webui qatest/client );
 }
 elsif ($mode eq "selected") {
-    my @tests = split /,/, $ENV{OXI_TEST_ONLY};
-    _stop 105, "Please specify one of the following variables:\ndocker run -e OXI_TEST_ALL=1 ...\ndocker run -e OXI_TEST_ONLY=relpath/to/test1.t,relpath/dir ...\ndocker run -e OXI_TEST_COVERAGE=1 ..."
-        unless scalar @tests;
-    @tests_unit = grep { /^t\// } map { my $t = $_; $t =~ s/ ^ core\/server\/ //x; $t } @tests;
-    @tests_qa   = grep { /^qatest\// } @tests;
+    @tests_unit = grep { /^t\// } map { my $t = $_; $t =~ s/ ^ core\/server\/ //x; $t } @test_only;
+    @tests_qa   = grep { /^qatest\// } @test_only;
 }
 
 #
@@ -149,7 +147,7 @@ $logmsg =~ s/\R$//gm;            # remove trailing newline
 ($logmsg) = split /\R/, $logmsg; # only print first line
 printf "|         » %s «\n", $logmsg;
 
-my $msg = $ENV{OXI_TEST_ALL} ? " all tests" : ($ENV{OXI_TEST_COVERAGE} ? " code coverage" : " selected tests:");
+my $msg = $mode eq "all" ? " all tests" : ($mode eq "coverage" ? " code coverage" : " selected tests:");
 my $big_msg = `figlet '$msg'`; $big_msg =~ s/^/| /msg;
 print $big_msg;
 printf "|      - $_\n" for @test_only;
