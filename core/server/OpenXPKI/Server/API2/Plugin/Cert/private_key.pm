@@ -57,7 +57,7 @@ Obviously only useful with PKCS12 or Java Keystore.
 
 String to set as alias for the key/certificate for JKS or PKCS12.
 
-=item csp
+=item * csp
 
 String, write name as a Microsoft CSP name (PKCS12 only)
 
