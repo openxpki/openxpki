@@ -64,6 +64,4 @@ ENV OXI_TEST_DB_MYSQL_NAME=openxpki \
 
 COPY startup.pl /
 RUN chmod 0755 startup.pl
-ENTRYPOINT ["/startup.pl"]
-# Defaults for "user+repo" and "branch" to test:
-#CMD ["develop", "openxpki/openxpki"]
+CMD ["/startup.pl"]

@@ -91,6 +91,8 @@ if ($mode eq "all") {
 }
 elsif ($mode eq "selected") {
     my @tests = split /,/, $ENV{OXI_TEST_ONLY};
+    _stop 105, "Please specify one of the following variables:\ndocker run -e OXI_TEST_ALL=1 ...\ndocker run -e OXI_TEST_ONLY=relpath/to/test1.t,relpath/dir ...\ndocker run -e OXI_TEST_COVERAGE=1 ..."
+        unless scalar @tests;
     @tests_unit = grep { /^t\// } map { $_ =~ s/ ^ core\/server\/ //x; $_ } @tests;
     @tests_qa   = grep { /^qatest\// } @tests;
 }
@@ -103,14 +105,14 @@ my $is_local_repo = 0;
 # remote repo as specified
 if ($ENV{OXI_TEST_GITREPO}) {
     $repo = $ENV{OXI_TEST_GITREPO};
-    _stop 100, "Sorry, local repositories specified by file:// are not supported:\n$repo"
+    _stop 100, "Sorry, local repositories specified by file:// are not supported.\nUse this instead:\ndocker run -v /my/host/path:/repo ..."
         if $repo =~ / \A file /msx;
 }
 # local repo from host (if Docker volume is mounted)
 else {
-    # check if /repo is a mountpoint (= dev number differs from parent dir)
-    _stop 101, "I need either a remote or local Git repo:\ndocker run -e OXI_TEST_GITREPO=https://...\ndocker run -v /my/path:/repo"
-        unless ((stat "/repo")[0]) != ((stat "/")[0]);
+    # only continue if /repo is a mountpoint (= device number differs from parent dir)
+    _stop 101, "Please specify either a remote or local Git repo:\ndocker run -e OXI_TEST_GITREPO=https://...\ndocker run -v /my/host/path:/repo"
+        if (not -d "/repo" or (stat "/repo")[0] == (stat "/")[0]);
     $repo = "file:///repo";
     $is_local_repo = 1;
 }
