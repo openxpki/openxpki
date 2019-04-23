@@ -93,7 +93,7 @@ elsif ($mode eq "selected") {
     my @tests = split /,/, $ENV{OXI_TEST_ONLY};
     _stop 105, "Please specify one of the following variables:\ndocker run -e OXI_TEST_ALL=1 ...\ndocker run -e OXI_TEST_ONLY=relpath/to/test1.t,relpath/dir ...\ndocker run -e OXI_TEST_COVERAGE=1 ..."
         unless scalar @tests;
-    @tests_unit = grep { /^t\// } map { $_ =~ s/ ^ core\/server\/ //x; $_ } @tests;
+    @tests_unit = grep { /^t\// } map { my $t = $_; $t =~ s/ ^ core\/server\/ //x; $t } @tests;
     @tests_qa   = grep { /^qatest\// } @tests;
 }
 
@@ -256,5 +256,5 @@ execute show => "/usr/local/bin/openxpkictl start";
 #
 print "\n====[ Testing: QA tests ]====\n";
 chdir "$clone_dir/qatest";
-my @t = map { $_ =~ s/ ^ qatest\/ //x; $_ } @tests_qa;
+my @t = map { my $t = $_; $t =~ s/ ^ qatest\/ //x; $t } @tests_qa;
 execute show => "prove -l -r -q $_" for @t;
