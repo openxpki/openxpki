@@ -367,7 +367,63 @@ data-vault token this way as it is neede to decrypt the datapool items!
 
 Tip: Use "
 
-secret groups
+
+**HSM via PKCS#11**
+
+Tokens may be maintained by HSMs as well. For HSMs a standardized interface called PKCS#11 is defined.
+OpenSSL supports this interface as well through its *pkcs11* engine.
+This OpenSSL engine is supplied by the OpenSC and has to be configured in OpenXPKI.
+
+To use PKCS#11 token in OpenXPKI the following settings has to be made:
+
+* The engine has to be set to *PKCS11*. This causes OpenXPKI to use OpenSSL's PKCS#11 engine.
+* The key has to correspond to the key's identification of the HSM.
+  For example when the YubiHSM2 is used, the string *slot_0-label_issuer_key* would correspond to a stored key with the label *issuer_key*.
+* As *engine_section* one can define how OpenSSL accesses the HSM.
+  OpenXPKI always generates OpenSSL configurations on the fly when needed and if this token is accessed, the contents of OpenSSL's ``[engine_section]`` are pasted in this configuration file.
+  To define which passphrase is used to unlock the HSM, the configuration
+  parameter *PIN* should be set as shown in the example.
+  OpenXPKI ensures to replace any occurrence of the string *__PIN__* with the
+  corresponding secret.
+* The value of *engine_usage* defines when the engine should be used.
+  Often *ALWAYS* is the preferred setting.
+
+To use PKCS#11 tokens in OpenXPKI, the backend of the token has to be set to *PKCS11*.::
+
+   token:
+     signer:
+       backend: OpenXPKI::Crypto::Backend::OpenSSL
+       key: "slot_0-label_issuer_key"
+       engine: PKCS11
+       engine_section: |
+         engine_id              = pkcs11
+         dynamic_path           = /usr/lib/engines/engine_pkcs11.so
+         MODULE_PATH            = /usr/lib/x86_64-linux-gnu/pkcs11/yubihsm_pkcs11.so
+         PIN                    = __PIN__
+         init                   = 0
+       engine_usage: 'ALWAYS'
+       key_store: ENGINE
+       shell: /usr/bin/openssl
+       randfile: /var/openxpki/rand
+       secret: signer
+
+The linked secret is only used to get access to the HSM.
+The secret used to unlock the HSM can be configured normally.
+For the YubiHSM2 for example a secret group that uses the authentication key
+*0x0001* with the password *password* would be the following::
+
+     secret:
+       signer:
+         label: YubiHSM password
+         method: literal
+         value: 0001password
+         cache: daemon
+
+**Note:** To be able to use the YubiHSM2 with OpenSSL, two environment variables has to be set (``YUBIHSM_PKCS11_CONF`` and ``YUBIHSM_PKCS11_MODULE``).
+If those environment variables are set when the server is started, the OpenXPKI
+process inherits these values.
+
+Secret Groups
 ^^^^^^^^^^^^^
 
 A secret group maintains the password cache for your keys and PINs.
