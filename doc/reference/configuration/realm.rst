@@ -405,6 +405,7 @@ To use PKCS#11 tokens in OpenXPKI, the backend of the token has to be set to *PK
        key_store: ENGINE
        shell: /usr/bin/openssl
        randfile: /var/openxpki/rand
+       wrapper: ''
        secret: signer
 
 The linked secret is only used to get access to the HSM.
