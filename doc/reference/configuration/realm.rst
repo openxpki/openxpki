@@ -122,7 +122,7 @@ The password database handler allows to specify user/password/role pairs directl
 
 The passwords are hashed, the used hash algorithm is given as prefix inside the curly brackets. You should use only *SSHA* which is "salted sha1". For compatibility we support plain sha (sha1), md5, smd5 (salted md5) and crypt. You can created the salted passwords using the openxpkiadm CLI tool (``openxpkiadm hashpwd``). Alternatively, for batch processing, a *salted sha1* password could be generated using openssl::
 
-   salt="$(openssl rand -base64 3 | openssl enc -base64)"
+   salt="$(openssl rand -base64 3)"
    password="secretpassword"
    echo -n $(echo -n "$password$salt" | openssl sha1 -binary)$salt | openssl enc -base64
 
