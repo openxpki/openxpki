@@ -103,6 +103,10 @@ sub execute {
 
         CTX('log')->application()->info("Trusted Signer chain validated - trusted root is $signer_root");
 
+    } elsif ($x509->is_selfsigned()) {
+
+        CTX('log')->application()->info("Trusted Signer chain - certificate is self signed");
+
     } else {
         CTX('log')->application()->warn("Trusted Signer chain validation FAILED");
 
