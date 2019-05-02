@@ -30,16 +30,17 @@ B<Parameters>
 
 =cut
 command "get_workflow_activities" => {
-    workflow => { isa => 'AlphaPunct', required => 1, },
+    workflow => { isa => 'AlphaPunct', },
     id       => { isa => 'Int', required => 1, },
 } => sub {
     my ($self, $params) = @_;
 
-    my $wf_type = $params->workflow;
+    CTX('log')->system()->warn('Passing the attribute *type* to get_workflow_activities is deprecated.') if ($params->has_workflow);
+
     my $wf_id = $params->id;
 
     my $util = OpenXPKI::Server::API2::Plugin::Workflow::Util->new;
-    my $workflow = $util->fetch_workflow($wf_type, $wf_id);
+    my $workflow = $util->fetch_workflow($wf_id);
 
     my @list = $workflow->get_current_actions();
     return \@list;

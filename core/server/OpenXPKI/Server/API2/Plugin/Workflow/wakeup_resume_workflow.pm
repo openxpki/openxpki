@@ -78,7 +78,10 @@ command "wakeup_workflow" => {
     wait  => { isa => 'Bool', },
 } => sub {
     my ($self, $params) = @_;
-    return $self->_wakeup_or_resume_workflow(1, $params->id, $params->type, $params->async, $params->wait);
+
+    CTX('log')->system()->warn('Passing the attribute *type* to wakeup_workflow is deprecated.') if ($params->type);
+
+    return $self->_wakeup_or_resume_workflow(1, $params->id, $params->async, $params->wait);
 };
 
 =head2 resume_workflow
@@ -111,7 +114,7 @@ command "resume_workflow" => {
     wait  => { isa => 'Bool', },
 } => sub {
     my ($self, $params) = @_;
-    return $self->_wakeup_or_resume_workflow(0, $params->id, undef, $params->async, $params->wait);
+    return $self->_wakeup_or_resume_workflow(0, $params->id, $params->async, $params->wait);
 };
 
 =head2 _wakeup_or_resume_workflow
@@ -127,8 +130,6 @@ B<Parameters>
 
 =item * C<$id> I<Int> - workflow ID. Required.
 
-=item * C<$type> I<Str> - workflow type. Optional, defaults to a DB lookup via ID.
-
 =item * C<$async> I<Bool> - execute the workflow asynchronously, i.e. in a new
 process.
 
@@ -139,13 +140,11 @@ status changes in the background (monitors the database).
 
 =cut
 sub _wakeup_or_resume_workflow {
-    my ($self, $wakeup_mode, $id, $type, $async, $wait) = @_; # mode: resume or wakeup
+    my ($self, $wakeup_mode, $id, $async, $wait) = @_; # mode: resume or wakeup
     my $util = OpenXPKI::Server::API2::Plugin::Workflow::Util->new;
 
-    $type //= $self->api->get_workflow_type_for_id(id => $id);
-
     ##! 2: "load workflow"
-    my $workflow = $util->fetch_workflow($type, $id);
+    my $workflow = $util->fetch_workflow($id);
 
     ##! 64: 'Got workflow ' . Dumper $workflow
 
@@ -157,7 +156,7 @@ sub _wakeup_or_resume_workflow {
         if ($proc_state ne 'pause' and $proc_state ne 'retry_exceeded') {
             OpenXPKI::Exception->throw(
                 message => 'Attempt to wake up a workflow that is not in PAUSE state',
-                params => { id => $id, proc_state => $workflow->proc_state }
+                params => { id => $id, proc_state => $proc_state }
             );
         }
     }
@@ -166,7 +165,7 @@ sub _wakeup_or_resume_workflow {
         if ($proc_state ne 'exception') {
             OpenXPKI::Exception->throw(
                 message => 'Attempt to resume a workflow that is not in EXCEPTION state',
-                params => { id => $id, proc_state => $workflow->proc_state }
+                params => { id => $id, proc_state => $proc_state }
             );
         }
     }
@@ -181,7 +180,7 @@ sub _wakeup_or_resume_workflow {
         "%s%s workflow %s (type '%s') with activity %s",
         $wakeup_mode ? "Wakeup" : "Resume",
         $async ? ($wait ? " (async & waiting)" : " (async)") : "",
-        $id, $type, $activity
+        $id, workflow->type(), $activity
     ));
 
     my $updated_workflow = $util->execute_activity($workflow, $activity, $async, $wait);

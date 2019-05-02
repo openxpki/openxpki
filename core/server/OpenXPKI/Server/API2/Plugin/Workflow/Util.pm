@@ -666,7 +666,15 @@ sub watch {
 
 # Returns an instance of OpenXPKI::Server::Workflow
 sub fetch_workflow {
-    my ($self, $type, $id) = @_;
+    my ($self, $id, $legacy_id) = @_;
+    # the old aruments was type / id, type is not required
+    # but we accept this still as fallback
+
+    if ($legacy_id) {
+        $id = $legacy_id;
+        CTX('log')->system()->warn('Passing the attribute *type* to fetch_workflow is deprecated.');
+    }
+
     ##! 2: 'start'
 
     #
@@ -681,8 +689,6 @@ sub fetch_workflow {
         message => 'Requested workflow not found',
         params  => { workflow_id => $id },
     );
-
-    my $wf_type = $type // $dbresult->{workflow_type};
 
     # We can not load workflows from other realms as this will break config and security
     # The watchdog switches the session realm before instantiating a new factory
@@ -700,7 +706,7 @@ sub fetch_workflow {
     #
     # Fetch workflow via Workflow engine
     #
-    my $workflow = $self->factory->fetch_workflow($wf_type, $id);
+    my $workflow = $self->factory->fetch_workflow($dbresult->{workflow_type}, $id);
 
     OpenXPKI::Server::Context::setcontext({
         workflow_id => $id,

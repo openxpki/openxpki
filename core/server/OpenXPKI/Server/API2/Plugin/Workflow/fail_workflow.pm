@@ -42,21 +42,22 @@ command "fail_workflow" => {
     my ($self, $params) = @_;
 
     my $wf_id   = $params->id;
-    my $wf_type = $params->has_workflow ? $params->workflow : $self->api->get_workflow_type_for_id(id => $wf_id);
     my $reason  = $params->reason;
     my $error   = $params->error;
 
     my $util = OpenXPKI::Server::API2::Plugin::Workflow::Util->new;
 
+    CTX('log')->system()->warn('Passing the attribute *type* to fail_workflow is deprecated.') if ($params->has_workflow);
+
     ##! 2: "load workflow"
-    my $workflow = $util->fetch_workflow($wf_type, $wf_id);
+    my $workflow = $util->fetch_workflow($wf_id);
 
     if (!$error) { $error = 'Failed by user'; }
     if (!$reason) { $reason = 'userfail'; }
 
     $workflow->set_failed( $error, $reason );
 
-    CTX('log')->workflow()->info("Failed workflow $wf_id (type '$wf_type') with error $error");
+    CTX('log')->workflow()->info(sprintf('Failed workflow %s (type '%s')  with error', $wf_id, $workflow->type(), $error));
 
     return $util->get_ui_info(workflow => $workflow);
 };

@@ -79,16 +79,19 @@ command "execute_workflow_activity" => {
     ##! 1: "execute_workflow_activity"
 
     my $wf_id       = $params->id;
-    my $wf_type     = $params->has_workflow ? $params->workflow : $self->api->get_workflow_type_for_id(id => $wf_id);
     my $wf_activity = $params->activity;
 
-    Log::Log4perl::MDC->put('wfid',   $wf_id);
-    Log::Log4perl::MDC->put('wftype', $wf_type);
+    CTX('log')->system()->warn('Passing the attribute *type* to execute_workflow_activity is deprecated.') if ($params->has_workflow);
 
     my $util = OpenXPKI::Server::API2::Plugin::Workflow::Util->new;
 
+    Log::Log4perl::MDC->put('wfid',   $wf_id);
+
     ##! 2: "load workflow"
-    my $workflow = $util->fetch_workflow($wf_type, $wf_id);
+    my $workflow = $util->fetch_workflow($wf_id);
+
+    my $wf_type = $workflow->type();
+    Log::Log4perl::MDC->put('wftype', $wf_type);
 
     # Make sure workflow is in state "manual".
     # A proc_state other than "manual" should be prevented by the UI but may
