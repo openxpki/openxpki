@@ -263,6 +263,7 @@ sub handle_workflow {
         $wf_id = $params->{ID} || 0;
         $wf_action = $params->{ACTIVITY} || '';
         $wf_type = $params->{TYPE} || '';
+        $wf_params = $params->{PARAMS};
     }
 
     # Auto serialize workflow params
