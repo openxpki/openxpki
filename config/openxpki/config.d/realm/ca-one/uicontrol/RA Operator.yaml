@@ -97,11 +97,11 @@ tasklist:
     ifempty: hide
     query:
       type:
-        - enrollment
+        - certificate_enroll
       state:
-        - PENDING_APPROVAL
-        - PENDING_MANUAL_AUTHENTICATION
-        - PENDING_POLICY
+        - PENDING
+        - PENDING_POLICY_VIOLATION
+        - MANUAL_AUTHORIZATION
     cols:
       - label: I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL
         field: WORKFLOW_SERIAL
