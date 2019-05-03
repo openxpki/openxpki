@@ -247,7 +247,7 @@ state:
           - edit_validity > CHECK_VALIDITY  ? acl_can_approve
           - global_noop > RUN_POLICY_CHECKS ? acl_can_approve
           - approve_csr > CHECK_APPROVALS ? acl_can_approve
-          - load_issuer_list > SET_ISSUER ? acl_can_approve allow_isuer_override
+          - load_issuer_list > SET_ISSUER ? acl_can_approve allow_issuer_override
           - put_request_on_hold > ONHOLD ? acl_can_approve
           - reject_request > NOTIFY_REJECT ? acl_can_reject
         output:
@@ -303,7 +303,7 @@ state:
           - edit_validity > CHECK_VALIDITY  ? acl_can_approve
           - global_noop > RUN_POLICY_CHECKS ? has_policy_violation acl_can_approve
           - approve_csr > CHECK_APPROVALS ? acl_can_approve
-          - load_issuer_list > SET_ISSUER ? acl_can_approve allow_isuer_override
+          - load_issuer_list > SET_ISSUER ? acl_can_approve allow_issuer_override
           - put_request_on_hold > ONHOLD ? acl_can_approve
           - reject_request > NOTIFY_REJECT ? acl_can_reject
         output:
@@ -775,7 +775,7 @@ condition:
     # give the Ra Operator the option to select a special CA Token for
     # signing, set this to AlwaysTrue. Note that this works only with the
     # default "NICE::Local" implementation and has some limitations.
-    allow_isuer_override:
+    allow_issuer_override:
         class: OpenXPKI::Server::Workflow::Condition::AlwaysFalse
 
     # If you want a 4-eyes approval, just add a second "RA Operator"
