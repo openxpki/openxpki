@@ -8,6 +8,51 @@ given auth info on each new instance (subsequent commands within one call
 are run on the same session). If you pass (and maintain) a session object to
 the constructor, it is used to persist the backend session during requests.
 
+=head2 Construction
+
+The client is constructed calling the new method, the required configuration
+can be set via one of three options:
+
+=head3 Explicit Config
+
+Pass the configuration as hash to the new method, must set at least
+I<config.socket> and I<config.realm> (omit if server has only one realm).
+
+The default authentication is anonymous but can be overidden by setting
+I<auth.stack> and appropriate keys for the chosen login methog.
+
+A intance of Log4perl can be passed via I<logger>, default is to log to
+STDERR with loglevel error.
+
+=head3 Explicit Config from File
+
+Pass the name of the config file to use as string to the new method, the
+file must be in the standard config ini format and have at least a section
+I<global> providing I<socket> and I<realm>.
+
+If an I<auth> section exists, it is mapped as is to the I<auth> parameter.
+
+You can set a loglevel and logfile location using I<log.file> and
+I<log.level> or provide the filename of a log4perl config via I<log.conf>.
+
+=head3 Implicit Config from File
+
+If you do not pass a I<config> argument to the new method, the class tries
+to find a config file at
+
+=over
+
+=item string set in the environment OPENXPKI_CLIENT_CONF
+
+=item $HOME/.openxpki.conf
+
+=item /etc/openxpki/client.conf
+
+=back
+
+The same rules as above apply, in case you pass auth or logger as explicit
+arguments the settings in the file are ignored.
+
 =cut
 
 package OpenXPKI::Client::Simple;
@@ -19,6 +64,8 @@ use POSIX qw( strftime );
 use Getopt::Long;
 use Pod::Usage;
 use Data::Dumper;
+use Config::Std;
+use File::Spec;
 use OpenXPKI::Client;
 use OpenXPKI::Serialization::Simple;
 use Log::Log4perl qw(:easy);
@@ -44,10 +91,10 @@ has 'session' => (
 );
 
 has '_config' => (
-    required => 1,
     is => 'ro',
     isa => 'HashRef',
     init_arg => 'config',
+    required => 1,
 );
 
 has client => (
@@ -83,6 +130,73 @@ sub _build_logger {
         Log::Log4perl->easy_init($ERROR);
     }
     return Log::Log4perl->get_logger();
+};
+
+
+around BUILDARGS => sub {
+
+    my $orig = shift;
+    my $class = shift;
+    my $args = shift;
+
+    # Called with a scalar = use as config file name
+    my $file;
+    if ($args && !ref $args) {
+        die "Given config file does not exist or is not readable!" unless (-e $args && -r $args);
+        $file = $args;
+        $args = {};
+
+    } elsif (!$args || !$args->{config}) {
+        $file = '/etc/openxpki/client.conf';
+        if ($ENV{OPENXPKI_CLIENT_CONF}) {
+            $file = $ENV{OPENXPKI_CLIENT_CONF};
+            die "OPENXPKI_CLIENT_CONF is set but files does not exist or is not readable!" unless (-e $file && -r $file);
+
+        } elsif ($ENV{HOME} && -d $ENV{HOME} && -r $ENV{HOME}) {
+
+            my $path = File::Spec->canonpath( $ENV{HOME} );
+            my $cand = File::Spec->catdir( ( $path, '.openxpki.conf' ) );
+            $file = $cand if (-e $cand && -r $cand);
+
+        }
+
+        if (!-r $file ) {
+            OpenXPKI::Client::Simple::_build_logger()->fatal("Unable to open configuration file $file");
+            die "Unable to open configuration file $file";
+        }
+    }
+
+    if ($file) {
+        my $conf;
+        if (!read_config( $file => $conf )) {
+            OpenXPKI::Client::Simple::_build_logger()->fatal("Unable to read configuration file $file");
+            die "Unable to read configuration file $file";
+        }
+
+        $args->{config} = $conf->{global};
+
+        if ($conf->{auth} && !$args->{auth}) {
+            $args->{auth} = $conf->{auth};
+        }
+
+        if ($conf->{log} && !$args->{logger}) {
+            my $level = $conf->{log}->{level} || 'ERROR';
+            if ($conf->{log}->{file}) {
+                Log::Log4perl->easy_init( { level   => $$level,
+                    file  => ">>" . $conf->{log}->{file} } );
+            } else {
+                Log::Log4perl->easy_init($$level);
+            }
+            $args->{logger} = Log::Log4perl->get_logger();
+        }
+
+        return $class->$orig($args);
+
+    } else {
+
+        return $class->$orig(@_);
+    }
+
 };
 
 sub _build_client {
@@ -336,6 +450,11 @@ sub handle_workflow {
     return $ret;
 }
 
+=head2 disconnect
+
+Close the connection and detach from the communication socket.
+
+=cut
 
 sub disconnect {
 
