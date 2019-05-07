@@ -10,20 +10,19 @@ state:
         action: initialize global_map_url_params set_transaction_id set_workflow_attributes global_load_policy global_set_profile parse_pkcs10 > PARSED
 
     # check for certificateTemplate to override profile
-    # TODO - key check has wrong result if profile from extension has different settings!
     PARSED:
         autorun: 1
         action:
-          - global_set_error_policy_invalid_key_param > FAILURE ? !global_is_valid_key
-          - set_profile_from_extension render_subject set_workflow_attributes > READY_TO_PROCESS ? global_is_valid_key has_certificate_template
-          - render_subject set_workflow_attributes > READY_TO_PROCESS ? global_is_valid_key !has_certificate_template
+          - set_profile_from_extension render_subject set_workflow_attributes > READY_TO_PROCESS ? has_certificate_template
+          - render_subject set_workflow_attributes > READY_TO_PROCESS ? !has_certificate_template
 
     # shortcut to inital if no signer cert is set
     READY_TO_PROCESS:
         autorun: 1
         action:
-          - set_mode_initial > START_INITIAL ? !global_is_signed_request
-          - global_check_authorized_signer > SIGNED_REQUEST ? global_is_signed_request
+          - global_set_error_policy_invalid_key_param > FAILURE ? !global_is_valid_key
+          - set_mode_initial > START_INITIAL ? !global_is_signed_request global_is_valid_key
+          - global_check_authorized_signer > SIGNED_REQUEST ? global_is_signed_request global_is_valid_key
 
     # Determine the type of request
     # inital anonymous = self signed (key and subject)
@@ -55,14 +54,14 @@ state:
         action:
           - global_validate_challenge_password > VALIDATE_CHALLENGE_PASSWORD ? need_challenge_password
           - global_noop > MANUAL_AUTHORIZATION ? !need_challenge_password is_manual_authentication_allowed
-          - global_set_error_signer_not_authorized > FAILURE ? !need_challenge_password !is_manual_authentication_allowed
+          - global_set_error_request_not_authorized > FAILURE ? !need_challenge_password !is_manual_authentication_allowed
 
     VALIDATE_CHALLENGE_PASSWORD:
         autorun: 1
         action:
           - global_noop > AUTHORIZED ? is_valid_challenge_password
           - global_noop2 > MANUAL_AUTHORIZATION ? !is_valid_challenge_password is_manual_authentication_allowed
-          - global_set_error_signer_not_authorized > FAILURE ? !is_valid_challenge_password !is_manual_authentication_allowed
+          - global_set_error_request_not_authorized > FAILURE ? !is_valid_challenge_password !is_manual_authentication_allowed
 
     MANUAL_AUTHORIZATION:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_LABEL
@@ -123,7 +122,9 @@ state:
     # common workflow
     AUTHORIZED:
         autorun: 1
-        action: search_subject_duplicate > CHECK_FOR_DUPLICATES
+        action:
+          - search_subject_duplicate > CHECK_FOR_DUPLICATES ? need_subject_duplicate_check
+          - global_noop > START_APPROVAL ? !need_subject_duplicate_check
 
     CHECK_FOR_DUPLICATES:
         autorun: 1
@@ -659,6 +660,11 @@ condition:
         class: Workflow::Condition::Evaluate
         param:
              test: ($context->{check_policy_subject_duplicate})
+
+    need_subject_duplicate_check:
+        class: Workflow::Condition::Evaluate
+        param:
+             test: ($context->{p_max_active_certs})
 
     is_cert_count_ok_for_initial:
         class: OpenXPKI::Server::Workflow::Condition::WFArray

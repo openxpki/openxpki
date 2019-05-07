@@ -66,6 +66,7 @@ policy:
 
     # The number of active certs with the same subject that are allowed
     # to exist at the same time, deducted by one if a renewal is seen
+    # set to 0 if you dont want to check for duplicates at all
     max_active_certs: 1
 
     # option will be removed
@@ -82,15 +83,20 @@ policy:
     allow_replace: 1
 
 response:
-    # The scep standard is a bit unclear if the root should be in the chain 
-    # or not. We consider it a security risk (trust should be always set 
-    # by hand) but as most clients seem to expect it, we include the root 
+    # The scep standard is a bit unclear if the root should be in the chain
+    # or not. We consider it a security risk (trust should be always set
+    # by hand) but as most clients seem to expect it, we include the root
     # by default.
     # The getca response contains the certificate of the SCEP server itself
     # and of the current active issuer (which can but need not to be the same!)
-    # You can define weather to have only the certificate itself (endentity), 
-    # the chain without the root (chain)  or the chain including the root 
+    # You can define weather to have only the certificate itself (endentity),
+    # the chain without the root (chain)  or the chain including the root
     # (fullchain).
+    # Note: The response is cached internally in the datapool so changes
+    # will not show up immediately - to list the cached items use
+    # openxpkicli list_data_pool_entries  --arg namespace=scep.cache.getca
+    # You can delete by setting the empty string as value with
+    # set_data_pool_entry (value="" force=1)
     getca:
         ra:     fullchain
         issuer: fullchain
