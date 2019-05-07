@@ -233,7 +233,19 @@ ALTER TABLE `audittrail`
  ADD PRIMARY KEY (`audittrail_key`);
 
 ALTER TABLE `certificate`
- ADD PRIMARY KEY (`issuer_identifier`,`cert_key`), ADD KEY `pki_realm` (`pki_realm`), ADD UNIQUE `identifier` (`identifier`), ADD KEY `issuer_identifier` (`issuer_identifier`), ADD KEY `subject` (`subject`(255)), ADD KEY `status` (`status`), ADD KEY `pki_realm_2` (`pki_realm`,`req_key`), ADD KEY `notbefore` (`notbefore`), ADD KEY `notafter` (`notafter`), ADD KEY `revocation_time` (`revocation_time`), ADD KEY `invalidity_time` (`invalidity_time`), ADD KEY `reason_code` (`reason_code`), ADD KEY `hold_instruction_code` (`hold_instruction_code`);
+ ADD PRIMARY KEY (`issuer_identifier`,`cert_key`),
+ ADD KEY `pki_realm` (`pki_realm`),
+ ADD UNIQUE `identifier` (`identifier`),
+ ADD KEY `issuer_identifier` (`issuer_identifier`),
+ ADD KEY `subject` (`subject`(255)),
+ ADD KEY `status` (`status`),
+ ADD KEY `pki_realm_2` (`pki_realm`,`req_key`),
+ ADD KEY `notbefore` (`notbefore`),
+ ADD KEY `notafter` (`notafter`),
+ ADD KEY `revocation_time` (`revocation_time`),
+ ADD KEY `invalidity_time` (`invalidity_time`),
+ ADD KEY `reason_code` (`reason_code`),
+ ADD KEY `hold_instruction_code` (`hold_instruction_code`);
 
 ALTER TABLE `certificate_attributes`
  ADD PRIMARY KEY (`attribute_key`,`identifier`), ADD KEY `attribute_contentkey` (`attribute_contentkey`), ADD KEY `attribute_value` (`attribute_value`(255)), ADD KEY `identifier` (`identifier`), ADD KEY `identifier_2` (`identifier`,`attribute_contentkey`), ADD KEY `attribute_contentkey_2` (`attribute_contentkey`,`attribute_value`(255));
@@ -242,7 +254,7 @@ ALTER TABLE `crl`
  ADD PRIMARY KEY (`issuer_identifier`,`crl_key`), ADD KEY `issuer_identifier` (`issuer_identifier`), ADD KEY `pki_realm` (`pki_realm`), ADD KEY `issuer_identifier_2` (`issuer_identifier`,`last_update`), ADD KEY `crl_number` (`issuer_identifier`,`crl_number`);
 
 ALTER TABLE `csr`
- ADD PRIMARY KEY (`pki_realm`,`req_key`), ADD KEY `pki_realm` (`pki_realm`), ADD KEY `profile` (`profile`), ADD KEY `subject` (`subject`(255));
+ ADD PRIMARY KEY (`pki_realm`,`req_key`), ADD KEY `pki_realm` (`pki_realm`), ADD KEY `profile` (`pki_realm`,`profile`), ADD KEY `subject` (`subject`(255));
 
 ALTER TABLE `csr_attributes`
  ADD PRIMARY KEY (`attribute_key`,`pki_realm`,`req_key`), ADD KEY `attribute_contentkey` (`attribute_contentkey`), ADD KEY `req_key` (`req_key`), ADD KEY `attribute_contentkey_2` (`attribute_contentkey`,`req_key`), ADD KEY `pki_realm` (`pki_realm`);

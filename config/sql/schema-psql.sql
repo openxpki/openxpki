@@ -569,6 +569,10 @@ CREATE INDEX csr_profile_index ON csr USING btree (profile);
 
 CREATE INDEX csr_subject_index ON csr USING btree (subject);
 
+CREATE INDEX csr_realm_index ON csr USING btree (pki_realm);
+
+CREATE INDEX csr_realm_profile_index ON csr USING btree (pki_realm, profile);
+
 --
 -- Name: backend_session_modified_index; Type: INDEX; Schema: public; Tablespace:
 --
