@@ -11,12 +11,11 @@ related API methods
 =cut
 
 # Project modules
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
 # CPAN modules
-use Try::Tiny;
-
-
+use English;
 
 =head2 is_token_usable
 
@@ -28,21 +27,25 @@ Returns 1 if everything went fine, undef otherwise.
 sub is_token_usable {
     my ($self, $token) = @_;
 
-    try {
+    ##! 1: 'start'
+    eval {
         CTX('log')->application()->debug('Check if token is usable using crypto operation');
 
         my $base = 'OpenXPKI Encryption Test';
+        ##! 64: 'Entering test'
         my $encrypted = $token->command({ COMMAND => 'pkcs7_encrypt', CONTENT => $base });
         my $decrypted = $token->command({ COMMAND => 'pkcs7_decrypt', PKCS7 => $encrypted });
 
+        ##! 16: "pkcs7 roundtrip done"
         if ($decrypted ne $base) {
             OpenXPKI::Exception->throw (
                 message => 'Mismatch after encrypt/decrypt roundtrip during token test',
                 params => { token_backend_class => ref $token->get_instance }
             );
         }
-    }
-    catch {
+    };
+    if ($EVAL_ERROR) {
+        ##! 8: 'pkcs7 roundtrip failed'
         return;
     }
 

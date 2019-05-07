@@ -10,12 +10,13 @@ OpenXPKI::Server::API2::Plugin::Token::get_ca_list
 =cut
 
 # Project modules
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Plugin::Token::Util;
 
 # CPAN modules
+use Data::Dumper;
 use Try::Tiny;
-
 
 
 =head2 get_ca_list
@@ -119,10 +120,9 @@ command "get_ca_list" => {
             }
 
         }
-
         push @token, $item;
     }
-    ##! 32: "Found tokens " . Dumper @token
+    ##! 32: "Found tokens " . Dumper \@token
     return \@token;
 
 };
