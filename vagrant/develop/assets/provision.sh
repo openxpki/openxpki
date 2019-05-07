@@ -156,33 +156,8 @@ if [ -e /etc/logrotate.d/ ]; then
     cp /code-repo/config/logrotate.conf /etc/logrotate.d/openxpki
 fi
 
-# CONFIGURATION
-
-rsync -a /code-repo/config/openxpki/* /etc/openxpki/                  >$LOG 2>&1
-chmod 750              /etc/openxpki/config.d
-chmod 750              /etc/openxpki/ssl/
-chown -R openxpki:root /etc/openxpki/config.d
-chown -R openxpki:root /etc/openxpki/ssl/
-
-# DATABASE SETUP
-
-cat <<__DB > /etc/openxpki/config.d/system/database.yaml
-main:
-    debug: 0
-    type: MySQL
-    host: $OXI_TEST_DB_MYSQL_DBHOST
-    port: $OXI_TEST_DB_MYSQL_DBPORT
-    name: $OXI_TEST_DB_MYSQL_NAME
-    user: $OXI_TEST_DB_MYSQL_USER
-    passwd: $OXI_TEST_DB_MYSQL_PASSWORD
-__DB
-
-/bin/bash /vagrant/scripts/oxi-refresh --no-restart              2>&1 | tee $LOG
-
-rm -rf /etc/openxpki/ssl/
-/code-repo/config/sampleconfig.sh                                     >$LOG 2>&1
-
-openxpkictl start                                                     >$LOG 2>&1
+# CONFIGURATION and DATABASE SETUP
+/bin/bash /vagrant/scripts/oxi-refresh --full                    2>&1 | tee $LOG
 
 #
 # Apache configuration

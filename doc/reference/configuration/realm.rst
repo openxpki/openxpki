@@ -36,15 +36,17 @@ Authentication is done via authentication handlers, multiple handlers are combin
 Stack
 ^^^^^
 
-The authentication stacks are set below ``auth.stack``::
+The realm's authentication combines the configured authentication handlers to offer different authentication stacks. On the login page, the entries of the stack are shown and a user can choose between them. The stacks are configured in the file located in ``<realm-basedir>/auth/stack.yaml``. If, for example, one would like to enable only anonymous logins and password based logins, this file's contents could be as follows::
 
-    User:
-        description: I18N_OPENXPKI_CONFIG_AUTH_STACK_DESCRIPTION_USER
-        handler:
-        - User Password
-        - Operator Password
+   Anonymous:
+      handler: Anonymous
 
-The code above defines a stack *User* which internally uses two handlers for authentication. You can define any number of stacks and reuse the same handlers inside. You must define at least one stack.
+   User:
+      handler:
+          - Operator Password
+          - User Password
+
+In this configuration, the realm offers two login stacks, namely *Anonymous* and *Operator*. The stack *Anonymous*  uses the Handler_ ``Anonymous`` and the logins using the stack *User* may be performed by both handlers ``Operator Password`` and ``User Password``. Therefore, when selecting this variant, both logins with credentials configured for  ``Operator Password`` and for ``User Password`` are supported. You can define any number of stacks and reuse the same handlers inside. You must define at least one stack.
 
 
 Handler
@@ -54,7 +56,7 @@ A handler consists of a perl module, that provides the authentication mechanism.
 
 Here is a list of the default handlers and their configuration sets.
 
-**anonymous user**
+**Anonymous user**
 
 If you just need an anonymous connection, you can use the *Anonymous* handler. ::
 
@@ -99,7 +101,7 @@ Both lists can be combined and accept any number of items.
 
 **Note**: OpenXPKI uses a third party tool named openca-sv to check the x509 signature. You need to build that by your own and put it into /usr/bin. The source is available at http://www.openca.org/projects/openca/tools-sources.shtml.
 
-**password database handler**
+**Password database handler**
 
 The password database handler allows to specify user/password/role pairs directly inside the configuration. ::
 
@@ -118,7 +120,11 @@ The password database handler allows to specify user/password/role pairs directl
                 digest: "{SSHA}ejZpY22dFwjVI48z14y2jYuToPRjOXRP"
                 role: RA Operator
 
-The passwords are hashed, the used hash algorithm is given as prefix inside the curly brackets. You should use only *SSHA* which is "salted sha1". For compatibility we support plain sha (sha1), md5, smd5 (salted md5) and crypt. You can created the salted passwords using the openxpkiadm CLI tool.
+The passwords are hashed, the used hash algorithm is given as prefix inside the curly brackets. You should use only *SSHA* which is "salted sha1". For compatibility we support plain sha (sha1), md5, smd5 (salted md5) and crypt. You can created the salted passwords using the openxpkiadm CLI tool (``openxpkiadm hashpwd``). Alternatively, for batch processing, a *salted sha1* password could be generated using openssl::
+
+   salt="$(openssl rand -base64 3)"
+   password="secretpassword"
+   echo -n $(echo -n "$password$salt" | openssl sha1 -binary)$salt | openssl enc -base64
 
 If you plan to use static passwords for a larger amount of users, you should consider to use a connector instead::
 
@@ -145,7 +151,7 @@ The user file has the same structure as the *user* section above, the user names
 
 You can share a user database file within realms.
 
-**authentication connectors**
+**Authentication connectors**
 
 There is a family of authentication connectors. The main difference against
 other connector is, that the password is passed as a parameter and is not
@@ -171,7 +177,7 @@ An example config to authenticate RA Operators against ActiveDirectory using the
         filter: "(&(mail=[% LOGIN %])(memberOf=CN=RA Operator,OU=SecurityGroups,DC=company,DC=loc))"
 
 
-**external authentication**
+**External authentication**
 
 If you have a proxy or sso system in front of your OpenXPKI server that authenticates your users, the external handler can be used to set the user information::
 
@@ -361,7 +367,64 @@ data-vault token this way as it is neede to decrypt the datapool items!
 
 Tip: Use "
 
-secret groups
+
+**HSM via PKCS#11**
+
+Tokens may be maintained by HSMs as well. For HSMs a standardized interface called PKCS#11 is defined.
+OpenSSL supports this interface as well through its *pkcs11* engine.
+This OpenSSL engine is supplied by the OpenSC and has to be configured in OpenXPKI.
+
+To use PKCS#11 token in OpenXPKI the following settings has to be made:
+
+* The engine has to be set to *PKCS11*. This causes OpenXPKI to use OpenSSL's PKCS#11 engine.
+* The key has to correspond to the key's identification of the HSM.
+  For example when the YubiHSM2 is used, the string *slot_0-label_issuer_key* would correspond to a stored key with the label *issuer_key*.
+* As *engine_section* one can define how OpenSSL accesses the HSM.
+  OpenXPKI always generates OpenSSL configurations on the fly when needed and if this token is accessed, the contents of OpenSSL's ``[engine_section]`` are pasted in this configuration file.
+  To define which passphrase is used to unlock the HSM, the configuration
+  parameter *PIN* should be set as shown in the example.
+  OpenXPKI ensures to replace any occurrence of the string *__PIN__* with the
+  corresponding secret.
+* The value of *engine_usage* defines when the engine should be used.
+  Often *ALWAYS* is the preferred setting.
+
+To use PKCS#11 tokens in OpenXPKI, the backend of the token has to be set to *PKCS11*.::
+
+   token:
+     signer:
+       backend: OpenXPKI::Crypto::Backend::OpenSSL
+       key: "slot_0-label_issuer_key"
+       engine: PKCS11
+       engine_section: |
+         engine_id              = pkcs11
+         dynamic_path           = /usr/lib/engines/engine_pkcs11.so
+         MODULE_PATH            = /usr/lib/x86_64-linux-gnu/pkcs11/yubihsm_pkcs11.so
+         PIN                    = __PIN__
+         init                   = 0
+       engine_usage: 'ALWAYS'
+       key_store: ENGINE
+       shell: /usr/bin/openssl
+       randfile: /var/openxpki/rand
+       wrapper: ''
+       secret: signer
+
+The linked secret is only used to get access to the HSM.
+The secret used to unlock the HSM can be configured normally.
+For the YubiHSM2 for example a secret group that uses the authentication key
+*0x0001* with the password *password* would be the following::
+
+     secret:
+       signer:
+         label: YubiHSM password
+         method: literal
+         value: 0001password
+         cache: daemon
+
+**Note:** To be able to use the YubiHSM2 with OpenSSL, two environment variables has to be set (``YUBIHSM_PKCS11_CONF`` and ``YUBIHSM_PKCS11_MODULE``).
+If those environment variables are set when the server is started, the OpenXPKI
+process inherits these values.
+
+Secret Groups
 ^^^^^^^^^^^^^
 
 A secret group maintains the password cache for your keys and PINs.

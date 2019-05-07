@@ -8,9 +8,9 @@ Image specifications:
 * Standard system Perl v5.18.2
 * MySQL Server 5.5
 
-## Usage
+Please note that there is a wrapper that builds and executes this Docker image automatically:
 
-The easiest way to use this image is by calling `tools/docker-test.pl`.
+    tools/docker-test.pl
 
 ## (Re-)Build image
 
@@ -31,35 +31,57 @@ The list of preinstalled Perl modules for the Docker image is managed in `cpanfi
 
 After that, rebuild the Docker image as shown above.
 
-## Run tests on "develop" branch
+## Running tests
 
-Without any arguments the Docker container will fetch the "develop" branch from
-the official OpenXPKI Github repository and run the test suite:
+Mandatory and optional parameters for the Docker container must be given as environment variables. (They are processed by `startup.pl`):
 
-    # https://github.com/openxpki/openxpki.git, branch "develop"
-    docker run -t -i --rm oxi-test
+    OXI_TEST_ALL       - Bool: 1 = run all tests (this is the default)
+    OXI_TEST_COVERAGE  - Bool: 1 = run coverage tests
+    OXI_TEST_ONLY      - Str: comma separated list of relative paths to test dirs/files
+    OXI_TEST_GITREPO   - Str: Git repository
+    OXI_TEST_GITBRANCH - Str: Git branch, default branch if not specified
+
+If errors occur while executing tests a Bash shell will be opened. This allows you to figure out what went wrong.
+
+### Local repository
+
+To run tests on the local HEAD commit (not your working directory!) you have to mount your project root into the Docker directory `/repo` via `-v`:
+
+    docker run -ti --rm \
+      -v ~/prj/openxpki:/repo \
+      oxi-test
+
+You might choose another commit:
+
+    docker run -ti --rm \
+      -v ~/prj/openxpki:/repo \
+      -e OXI_TEST_GITBRANCH=feature \
+      oxi-test
+
+To only execute a particular test:
+
+    docker run -ti --rm \
+      -v ~/prj/openxpki:/repo \
+      -e OXI_TEST_ONLY=qatest/backend/api2/50_profiles.t \
+      oxi-test
+
+To only execute tests in two directories:
+
+    docker run -ti --rm \
+      -v ~/prj/openxpki:/repo \
+      -e OXI_TEST_ONLY=core/server/t/91_api2,qatest/backend/api2 \
+      oxi-test
+
+
+### Git repository, default branch
+
+    docker run -ti --rm \
+      -e OXI_TEST_GITREPO=https://github.com/openxpki/openxpki.git \
+      oxi-test
 
 ### Other Git branch
 
-To choose another branch than "develop", give it as first argument:
-
-    # https://github.com/openxpki/openxpki.git, branch "newfeature"
-    docker run -t -i --rm oxi-test newfeature
-
-### Other Github repository
-
-To choose another repository, give it as second argument:
-
-    # https://github.com/maxhq/openxpki.git, branch "fixes"
-    docker run -t -i --rm oxi-test fixes maxhq/openxpki
-
-### Use local repository
-
-To run the tests on a local HEAD commit (not your working directory!) you have
-to mount your host repository root into the Docker directory `/repo` via `-v`:
-
-    # /home/tux/oxi-dev, branch "develop"
-    docker run -t -i --rm -v /home/tux/oxi-dev:/repo oxi-test
-
-    # /home/tux/oxi-dev, branch "fixes"
-    docker run -t -i --rm -v /home/tux/oxi-dev:/repo oxi-test fixes
+    docker run -ti --rm \
+      -e OXI_TEST_GITREPO=https://github.com/openxpki/openxpki.git \
+      -e OXI_TEST_GITBRANCH=master \
+      oxi-test
