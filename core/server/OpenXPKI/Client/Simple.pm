@@ -33,7 +33,8 @@ I<global> providing I<socket> and I<realm>.
 If an I<auth> section exists, it is mapped as is to the I<auth> parameter.
 
 You can set a loglevel and logfile location using I<log.file> and
-I<log.level> or provide the filename of a log4perl config via I<log.conf>.
+I<log.level>. Loglevel must be a Log4perl Level name without the leading
+dollar sign (e.g. level=DEBUG).
 
 =head3 Implicit Config from File
 
@@ -68,7 +69,8 @@ use Config::Std;
 use File::Spec;
 use OpenXPKI::Client;
 use OpenXPKI::Serialization::Simple;
-use Log::Log4perl qw(:easy);
+use Log::Log4perl qw(:easy :levels);
+use Log::Log4perl::Level;
 
 
 use Moose;
@@ -95,6 +97,21 @@ has '_config' => (
     isa => 'HashRef',
     init_arg => 'config',
     required => 1,
+);
+
+
+has 'realm' => (
+    is => 'ro',
+    isa => 'Str',
+    lazy => 1,
+    default  => sub { my $self = shift; return $self->_config()->{'realm'} }
+);
+
+has 'socket' => (
+    is => 'ro',
+    isa => 'Str',
+    lazy => 1,
+    default  => sub { my $self = shift; return $self->_config()->{'socket'} }
 );
 
 has client => (
@@ -180,18 +197,21 @@ around BUILDARGS => sub {
         }
 
         if ($conf->{log} && !$args->{logger}) {
-            my $level = $conf->{log}->{level} || 'ERROR';
+            my $level = Log::Log4perl::Level::to_priority( uc( $conf->{log}->{level} || 'ERROR' ));
             if ($conf->{log}->{file}) {
-                Log::Log4perl->easy_init( { level   => $$level,
+                Log::Log4perl->easy_init( { level   => $level,
                     file  => ">>" . $conf->{log}->{file} } );
             } else {
-                Log::Log4perl->easy_init($$level);
+                Log::Log4perl->easy_init($level);
             }
             $args->{logger} = Log::Log4perl->get_logger();
         }
 
-        return $class->$orig($args);
+        if ($args->{logger}) {
+            $args->{logger}->trace('Config read from file ' . $file);
+        }
 
+        return $class->$orig($args);
     } else {
 
         return $class->$orig(@_);
@@ -204,7 +224,7 @@ sub _build_client {
     my $self = shift;
 
     my $client = OpenXPKI::Client->new({
-        SOCKETFILE => $self->_config()->{'socket'},
+        SOCKETFILE => $self->socket(),
     });
 
     if (! defined $client) {
@@ -233,7 +253,7 @@ sub _build_client {
 
     my $status = $reply->{SERVICE_MSG};
     if ($status eq 'GET_PKI_REALM') {
-        my $realm = $self->_config()->{'realm'};
+        my $realm = $self->realm();
         if (! $realm ) {
             $log->fatal("Found more than one realm but no realm is specified");
             $log->trace("Realms found:" . Dumper (keys %{$reply->{PARAMS}->{PKI_REALMS}}));
