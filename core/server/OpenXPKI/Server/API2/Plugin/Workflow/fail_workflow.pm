@@ -57,7 +57,7 @@ command "fail_workflow" => {
 
     $workflow->set_failed( $error, $reason );
 
-    CTX('log')->workflow()->info(sprintf('Failed workflow %s (type '%s')  with error', $wf_id, $workflow->type(), $error));
+    CTX('log')->workflow()->info(sprintf('Failed workflow %s (type %s)  with error', $wf_id, $workflow->type(), $error));
 
     return $util->get_ui_info(workflow => $workflow);
 };
