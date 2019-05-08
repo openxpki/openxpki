@@ -75,7 +75,7 @@ CTX('session')->data->user('wilhelm');
 my $wf = $oxitest->create_workflow("wf_with_a_rest_$uuid");
 $wf->state_is("RESTING");
 
-my $info = $oxitest->api2_command("wakeup_workflow" => { id => $wf->id, type => "wf_with_a_rest_$uuid" });
+my $info = $oxitest->api2_command("wakeup_workflow" => { id => $wf->id });
 is $info->{workflow}->{state}, "SUCCESS", "synchronous wakeup successful";
 
 #
