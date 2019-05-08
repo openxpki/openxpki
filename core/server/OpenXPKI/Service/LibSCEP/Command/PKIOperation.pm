@@ -530,12 +530,12 @@ sub __pkcs_req : PRIVATE {
 
 
         # Record the scep tid and the workflow in the datapool
-        $api2->set_data_pool_entry({
+        $api->set_data_pool_entry(
             namespace => 'scep.transaction_id',
             key => "$server:$transaction_id",
             value => $workflow_id,
             force => 1,
-         });
+         );
          # commit required
          CTX('dbi')->commit();
     }
