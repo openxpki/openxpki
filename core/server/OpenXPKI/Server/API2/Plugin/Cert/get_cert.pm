@@ -104,7 +104,7 @@ command "get_cert" => {
     }
 
     if ($format eq 'TXT' || $format eq 'TXTPEM') {
-        my $result = CTX('api')->get_default_token()->command ({
+        my $result = CTX('api2')->get_default_token->command ({
             COMMAND => "convert_cert",
             DATA    => $cert->{data},
             OUT     => $format
@@ -113,7 +113,7 @@ command "get_cert" => {
     };
 
     if ('PKCS7' eq $format) {
-        my $result = CTX('api')->get_default_token()->command({
+        my $result = CTX('api2')->get_default_token->command({
             COMMAND          => 'convert_cert',
             DATA             => [ $cert->{data} ],
             OUT              => 'PEM',
