@@ -87,8 +87,8 @@ my $oxitest = OpenXPKI::Test->new(
     #log_level => 'trace',
 );
 my $dbdata = $oxitest->certhelper_database;
-my $cert1_pem = $dbdata->cert("alpha_root_2")->data;
-my $cert2_pem = $dbdata->cert("alpha_signer_2")->data;
+my $cert1_pem = $dbdata->cert("alpha-root-2")->data;
+my $cert2_pem = $dbdata->cert("alpha-signer-2")->data;
 
 #
 # Tests
@@ -103,7 +103,7 @@ lives_and {
 use_ok "OpenXPKI::Crypt::X509";
 
 lives_and {
-    my $cert_id = $dbdata->cert("alpha_root_2")->id;
+    my $cert_id = $dbdata->cert("alpha-root-2")->id;
     my $result = $oxitest->api2_command("get_cert" => { identifier => $cert_id, format => 'PEM' });
     my $cert = OpenXPKI::Crypt::X509->new($result); # initialize with PEM data
     is $cert->cert_identifier, $cert_id;
@@ -130,23 +130,23 @@ lives_and {
 $oxitest->delete_testcerts;
 
 # unknown issuer
-import_failsok($oxitest, $dbdata->cert("gamma_bob_1"), qr/issuer/i);
+import_failsok($oxitest, $dbdata->cert("gamma-bob-1"), qr/issuer/i);
 # unknown issuer with forced import
-import_ok     ($oxitest, $dbdata->cert("gamma_bob_1"), force_nochain => 1);
+import_ok     ($oxitest, $dbdata->cert("gamma-bob-1"), force_nochain => 1);
 # root certificate
-import_ok     ($oxitest, $dbdata->cert("alpha_root_2"));
+import_ok     ($oxitest, $dbdata->cert("alpha-root-2"));
 # cert signed by previously imported root certificate
-import_ok     ($oxitest, $dbdata->cert("alpha_signer_2"));
+import_ok     ($oxitest, $dbdata->cert("alpha-signer-2"));
 # expired root certificate
-import_ok     ($oxitest, $dbdata->cert("alpha_root_1"));
+import_ok     ($oxitest, $dbdata->cert("alpha-root-1"));
 # cert signed with invalid (expired) issuer, i.e. failing chain verification
-import_failsok($oxitest, $dbdata->cert("alpha_signer_1"), qr/chain/i);
+import_failsok($oxitest, $dbdata->cert("alpha-signer-1"), qr/chain/i);
 # cert signed by expired issuer with forced acceptance of failed issuer check
-import_ok     ($oxitest, $dbdata->cert("alpha_signer_1"), force_issuer=>1);
+import_ok     ($oxitest, $dbdata->cert("alpha-signer-1"), force_issuer=>1);
 # cert signed by expired issuer with disabled issuer check
-import_ok     ($oxitest, $dbdata->cert("alpha_alice_1"),  force_noverify=>1);
+import_ok     ($oxitest, $dbdata->cert("alpha-alice-1"),  force_noverify=>1);
 # known issuer that is not root and triggers chain lookup
-import_ok     ($oxitest, $dbdata->cert("alpha_bob_2"));
+import_ok     ($oxitest, $dbdata->cert("alpha-bob-2"));
 
 # Cleanup database
 $oxitest->delete_testcerts;

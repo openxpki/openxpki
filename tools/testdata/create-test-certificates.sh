@@ -3,8 +3,9 @@
 # Create test certificates and import them into OpenXPKI database for later
 # use in test code / environment.
 #
-# The MySQL database should be freshly created, i.e. without any data in it.
-# (e.g. using tools/testenv/mysql-create-db.sh && tools/testenv/mysql-create-schema.sh)
+# The MySQL database should be freshly created, i.e. without any data in it:
+#   openxpkictl stop
+#   tools/testenv/mysql-create-db.sh && tools/testenv/mysql-create-schema.sh
 #
 # The resulting certificates are available in two forms below ./certificates/:
 # 1. Perl code to be inserted into OpenXPKI::Test::CertHelper::Database
@@ -28,8 +29,7 @@ $BASEDIR/_create-config.pl $TEMPDIR
 $BASEDIR/_create-certs.sh  $TEMPDIR/etc/openxpki
 
 # 4. Create Perl code for OpenXPKI::Test::CertHelper::Database
-$BASEDIR/_pem-to-certhelper.pl $TEMPDIR/etc/openxpki/ssl > $BASEDIR/certificates/certhelper-code.pl
-$BASEDIR/_db-to-certhelper.pl                           >> $BASEDIR/certificates/certhelper-code.pl
+$BASEDIR/_write-certhelper.pl $TEMPDIR/etc/openxpki/ssl > $BASEDIR/certificates/certhelper-code.pl
 echo ""
 echo "Code for OpenXPKI::Test::CertHelper::Database is available in:"
 echo "    $BASEDIR/certificates/certhelper-code.pl"

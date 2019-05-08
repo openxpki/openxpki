@@ -28,8 +28,8 @@ my $oxitest = OpenXPKI::Test->new(
 );
 my $dbdata = $oxitest->certhelper_database;
 
-my @alpha_list = qw( alpha_alice_2  alpha_signer_2  alpha_root_2 );
-my @beta_list =  qw( beta_alice_1   beta_signer_1   beta_root_1 );
+my @alpha_list = qw( alpha-alice-2  alpha-signer-2  alpha-root-2 );
+my @beta_list =  qw( beta-alice-1   beta-signer-1   beta-root-1 );
 my $alpha_pem = [ map { $dbdata->cert($_)->data }  @alpha_list ];
 my $alpha_ids = [ map { $dbdata->cert($_)->subject_key_id }    @alpha_list ];
 my $alpha_pem_string = join "\n", @$alpha_pem;
@@ -68,12 +68,12 @@ lives_and {
 $oxitest->delete_testcerts;
 
 # Array import: partly existing chain
-$oxitest->insert_testcerts(only => [ "beta_root_1" ]);
+$oxitest->insert_testcerts(only => [ "beta-root-1" ]);
 lives_and {
     my $result = $oxitest->api2_command("import_chain" => { chain => $beta_pem, import_root => 1 });
     cmp_deeply $result, superhashof({
-        existed =>  bag( map { superhashof({ subject_key_identifier => $_ }) } $dbdata->cert("beta_root_1")->subject_key_id),
-        imported => bag( map { superhashof({ subject_key_identifier => $_ }) } ($dbdata->cert("beta_signer_1")->subject_key_id, $dbdata->cert("beta_alice_1")->subject_key_id) ),
+        existed =>  bag( map { superhashof({ subject_key_identifier => $_ }) } $dbdata->cert("beta-root-1")->subject_key_id),
+        imported => bag( map { superhashof({ subject_key_identifier => $_ }) } ($dbdata->cert("beta-signer-1")->subject_key_id, $dbdata->cert("beta-alice-1")->subject_key_id) ),
     });
 } "Array import: chain whose root cert is already in PKI";
 

@@ -41,12 +41,12 @@ CTX('session')->data->pki_realm('alpha');
 #
 # Tests
 #
-my $as1 = $oxitest->certhelper_database->cert("alpha_signer_1");
-my $as2 = $oxitest->certhelper_database->cert("alpha_signer_2");
-my $as3 = $oxitest->certhelper_database->cert("alpha_signer_3");
-my $av1 = $oxitest->certhelper_database->cert("alpha_datavault_1");
-my $av2 = $oxitest->certhelper_database->cert("alpha_datavault_2");
-my $bs1 = $oxitest->certhelper_database->cert("beta_signer_1");
+my $as1 = $oxitest->certhelper_database->cert("alpha-signer-1");
+my $as2 = $oxitest->certhelper_database->cert("alpha-signer-2");
+my $as3 = $oxitest->certhelper_database->cert("alpha-signer-3");
+my $av1 = $oxitest->certhelper_database->cert("alpha-datavault-1");
+my $av2 = $oxitest->certhelper_database->cert("alpha-datavault-2");
+my $bs1 = $oxitest->certhelper_database->cert("beta-signer-1");
 
 my $api = CTX('api2');
 my $result;
@@ -157,8 +157,8 @@ lives_and {
 } "get_token_alias_by_group - currently valid token/cert alias ('validity' with undef values)";
 
 lives_and {
-    # 'validity' specifies a period shortly before alpha_signer_2 expires and
-    # alpha_signer_2 is already valid, so _3 should be returned
+    # 'validity' specifies a period shortly before alpha-signer-2 expires and
+    # alpha-signer-2 is already valid, so _3 should be returned
     my $data = $api->get_token_alias_by_group(
         group    => $as2->db_alias->{group_id},
         validity => {

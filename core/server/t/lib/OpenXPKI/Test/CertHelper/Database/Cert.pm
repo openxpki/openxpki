@@ -8,7 +8,7 @@ OpenXPKI::Test::CertHelper::Database::Cert - represents a test certificate (PEM 
 
 =head1 SYNOPSIS
 
-    my $pem = OpenXPKI::Test::CertHelper::Database::Cert->new(
+    my $cert = OpenXPKI::Test::CertHelper::Database::Cert->new(
         label => "ACME Root CA",
         db => {
             authority_key_identifier => 'C6:17:6E:AC:2E:7F:3C:9B:B0:AB:83:B6:5A:C2:F0:14:6C:A9:A4:4A',
@@ -17,17 +17,30 @@ OpenXPKI::Test::CertHelper::Database::Cert - represents a test certificate (PEM 
         },
     );
 
-    diag $pem->label;
+    diag $cert->label;
 
     # shortscuts to some DB fields:
-    diag $pem->id;               # identifier
-    diag $pem->subject_key_id;   # subject_key_identifier
-    diag $pem->data;             # PEM encoded data
+    diag $cert->id;               # identifier
+    diag $cert->subject_key_id;   # subject_key_identifier
+    diag $cert->data;             # PEM encoded data
 
     # access to all DB fields:
-    diag $pem->db->{authority_key_identifier};
+    diag $cert->db->{authority_key_identifier};
 
 =cut
+
+has label => (
+    is => "rw",
+    isa => "Str",
+    required => 1,
+);
+
+# internal name that corresponds to the name of the private key file
+has name => (
+    is => "rw",
+    isa => "Str",
+    required => 1,
+);
 
 # HashRef containing all fields from table "certificate"
 has db => (
@@ -43,11 +56,13 @@ has db_alias => (
     required => 1,
 );
 
-has label => (
+# private key data
+has private_key => (
     is => "rw",
     isa => "Str",
     required => 1,
 );
+
 
 sub id {
     my $self = shift;
