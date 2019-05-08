@@ -9,7 +9,7 @@ certificate data to be inserted into the database.
 
 =head1 DESCRIPTION
 
-    # instance of OpenXPKI::Test::CertHelper::Database::PEM
+    # instance of OpenXPKI::Test::CertHelper::Database::Cert
     my $cert = $db->cert("alpha_alice_1");
 
     print $cert->id, "\n";     # certificate identifier
@@ -70,13 +70,13 @@ The following predefined test certificates are available:
 =cut
 
 # Project modules
-use OpenXPKI::Test::CertHelper::Database::PEM;
+use OpenXPKI::Test::CertHelper::Database::Cert;
 
 ################################################################################
 # Other attributes
 has _certs => (
     is => 'rw',
-    isa => 'HashRef[OpenXPKI::Test::CertHelper::Database::PEM]',
+    isa => 'HashRef[OpenXPKI::Test::CertHelper::Database::Cert]',
     lazy => 1,
     builder => '_build_certs',
 );
@@ -124,7 +124,7 @@ has pkcs7 => (
 
 =head2 cert
 
-Returns an instance of L<OpenXPKI::Test::CertHelper::Database::PEM> with the
+Returns an instance of L<OpenXPKI::Test::CertHelper::Database::Cert> with the
 requested test certificate data.
 
     print $db->cert("beta_alice_1")->id, "\n";
@@ -255,7 +255,7 @@ sub _build_private_keys {
 }
 sub _build_certs {
     return {
-        'alpha_alice_1' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'alpha_alice_1' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'ALPHA Client Alice 1',
             db => {
                 authority_key_identifier => '3D:6C:86:0C:00:F1:8D:E0:5E:0F:84:8B:82:DE:9B:BE:4E:C4:DD:43',
@@ -284,7 +284,7 @@ sub _build_certs {
             },
         ),
 
-        'alpha_alice_2' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'alpha_alice_2' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'ALPHA Client Alice 2',
             db => {
                 authority_key_identifier => 'A8:BE:4B:1B:52:18:61:F7:DF:06:5A:5E:BD:C5:6B:E8:18:28:3F:ED',
@@ -313,7 +313,7 @@ sub _build_certs {
             },
         ),
 
-        'alpha_alice_3' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'alpha_alice_3' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'ALPHA Client Alice 3',
             db => {
                 authority_key_identifier => '62:35:CE:53:91:C7:F4:21:AC:5B:8B:A1:11:60:DE:20:97:97:F0:56',
@@ -342,7 +342,7 @@ sub _build_certs {
             },
         ),
 
-        'alpha_bob_1' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'alpha_bob_1' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'ALPHA Client Bob 1',
             db => {
                 authority_key_identifier => '3D:6C:86:0C:00:F1:8D:E0:5E:0F:84:8B:82:DE:9B:BE:4E:C4:DD:43',
@@ -371,7 +371,7 @@ sub _build_certs {
             },
         ),
 
-        'alpha_bob_2' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'alpha_bob_2' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'ALPHA Client Bob 2',
             db => {
                 authority_key_identifier => 'A8:BE:4B:1B:52:18:61:F7:DF:06:5A:5E:BD:C5:6B:E8:18:28:3F:ED',
@@ -400,7 +400,7 @@ sub _build_certs {
             },
         ),
 
-        'alpha_bob_3' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'alpha_bob_3' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'ALPHA Client Bob 3',
             db => {
                 authority_key_identifier => '62:35:CE:53:91:C7:F4:21:AC:5B:8B:A1:11:60:DE:20:97:97:F0:56',
@@ -429,7 +429,7 @@ sub _build_certs {
             },
         ),
 
-        'alpha_christine_2' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'alpha_christine_2' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'ALPHA Client Christine 2',
             db => {
                 authority_key_identifier => 'A8:BE:4B:1B:52:18:61:F7:DF:06:5A:5E:BD:C5:6B:E8:18:28:3F:ED',
@@ -458,7 +458,7 @@ sub _build_certs {
             },
         ),
 
-        'alpha_datavault_1' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'alpha_datavault_1' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'ALPHA DataVault 1',
             db => {
                 authority_key_identifier => 'D7:95:E4:E9:E4:36:9F:28:AB:54:85:DE:E0:1A:32:3D:33:62:09:F8',
@@ -487,7 +487,7 @@ sub _build_certs {
             },
         ),
 
-        'alpha_datavault_2' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'alpha_datavault_2' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'ALPHA DataVault 2',
             db => {
                 authority_key_identifier => 'DB:EB:92:11:24:C1:D5:A9:D6:2C:54:58:57:4D:E4:E3:45:48:1E:4D',
@@ -516,7 +516,7 @@ sub _build_certs {
             },
         ),
 
-        'alpha_datavault_3' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'alpha_datavault_3' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'ALPHA DataVault 3',
             db => {
                 authority_key_identifier => 'A5:8D:66:13:C9:2D:01:CF:95:DE:94:84:AB:C3:83:89:F5:DB:F8:3F',
@@ -545,7 +545,7 @@ sub _build_certs {
             },
         ),
 
-        'alpha_don_2' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'alpha_don_2' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'ALPHA Client Don 2',
             db => {
                 authority_key_identifier => 'A8:BE:4B:1B:52:18:61:F7:DF:06:5A:5E:BD:C5:6B:E8:18:28:3F:ED',
@@ -574,7 +574,7 @@ sub _build_certs {
             },
         ),
 
-        'alpha_scep_1' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'alpha_scep_1' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'ALPHA SCEP 1',
             db => {
                 authority_key_identifier => '7B:8F:B0:2C:F9:51:1D:25:CD:51:1F:DF:6D:93:8C:A9:4F:D9:00:74',
@@ -603,7 +603,7 @@ sub _build_certs {
             },
         ),
 
-        'alpha_scep_2' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'alpha_scep_2' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'ALPHA SCEP 2',
             db => {
                 authority_key_identifier => '11:C2:BA:08:26:F9:EC:BE:0D:9E:EB:66:44:0A:9B:83:7B:D9:0B:C9',
@@ -632,7 +632,7 @@ sub _build_certs {
             },
         ),
 
-        'alpha_scep_3' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'alpha_scep_3' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'ALPHA SCEP 3',
             db => {
                 authority_key_identifier => 'B2:0B:FF:E9:DD:EF:91:58:57:13:A4:C5:84:36:D0:F5:F6:C5:54:2A',
@@ -661,7 +661,7 @@ sub _build_certs {
             },
         ),
 
-        'alpha_signer_1' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'alpha_signer_1' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'ALPHA Signing CA 1',
             db => {
                 authority_key_identifier => '7B:8F:B0:2C:F9:51:1D:25:CD:51:1F:DF:6D:93:8C:A9:4F:D9:00:74',
@@ -690,7 +690,7 @@ sub _build_certs {
             },
         ),
 
-        'alpha_signer_2' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'alpha_signer_2' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'ALPHA Signing CA 2',
             db => {
                 authority_key_identifier => '11:C2:BA:08:26:F9:EC:BE:0D:9E:EB:66:44:0A:9B:83:7B:D9:0B:C9',
@@ -719,7 +719,7 @@ sub _build_certs {
             },
         ),
 
-        'alpha_signer_3' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'alpha_signer_3' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'ALPHA Signing CA 3',
             db => {
                 authority_key_identifier => 'B2:0B:FF:E9:DD:EF:91:58:57:13:A4:C5:84:36:D0:F5:F6:C5:54:2A',
@@ -748,7 +748,7 @@ sub _build_certs {
             },
         ),
 
-        'alpha_root_1' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'alpha_root_1' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'ALPHA Root CA 1',
             db => {
                 authority_key_identifier => '7B:8F:B0:2C:F9:51:1D:25:CD:51:1F:DF:6D:93:8C:A9:4F:D9:00:74',
@@ -777,7 +777,7 @@ sub _build_certs {
             },
         ),
 
-        'alpha_root_2' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'alpha_root_2' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'ALPHA Root CA 2',
             db => {
                 authority_key_identifier => '11:C2:BA:08:26:F9:EC:BE:0D:9E:EB:66:44:0A:9B:83:7B:D9:0B:C9',
@@ -806,7 +806,7 @@ sub _build_certs {
             },
         ),
 
-        'alpha_root_3' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'alpha_root_3' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'ALPHA Root CA 3',
             db => {
                 authority_key_identifier => 'B2:0B:FF:E9:DD:EF:91:58:57:13:A4:C5:84:36:D0:F5:F6:C5:54:2A',
@@ -835,7 +835,7 @@ sub _build_certs {
             },
         ),
 
-        'beta_alice_1' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'beta_alice_1' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'BETA Client Alice 1',
             db => {
                 authority_key_identifier => 'DA:FB:5E:2F:91:C4:4E:9E:F6:46:7B:16:DD:1E:C2:4E:66:9B:2B:48',
@@ -864,7 +864,7 @@ sub _build_certs {
             },
         ),
 
-        'beta_bob_1' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'beta_bob_1' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'BETA Client Bob 1',
             db => {
                 authority_key_identifier => 'DA:FB:5E:2F:91:C4:4E:9E:F6:46:7B:16:DD:1E:C2:4E:66:9B:2B:48',
@@ -893,7 +893,7 @@ sub _build_certs {
             },
         ),
 
-        'beta_datavault_1' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'beta_datavault_1' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'BETA DataVault 1',
             db => {
                 authority_key_identifier => '37:E0:50:4B:7B:DC:B5:ED:70:F0:6E:DA:3A:F7:86:7B:5E:26:77:E9',
@@ -922,7 +922,7 @@ sub _build_certs {
             },
         ),
 
-        'beta_scep_1' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'beta_scep_1' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'BETA SCEP 1',
             db => {
                 authority_key_identifier => '53:50:B0:41:55:82:2D:CA:4C:84:09:5C:D4:78:0F:2D:D8:0A:D0:AE',
@@ -951,7 +951,7 @@ sub _build_certs {
             },
         ),
 
-        'beta_signer_1' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'beta_signer_1' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'BETA Signing CA 1',
             db => {
                 authority_key_identifier => '53:50:B0:41:55:82:2D:CA:4C:84:09:5C:D4:78:0F:2D:D8:0A:D0:AE',
@@ -980,7 +980,7 @@ sub _build_certs {
             },
         ),
 
-        'beta_root_1' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'beta_root_1' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'BETA Root CA 1',
             db => {
                 authority_key_identifier => '53:50:B0:41:55:82:2D:CA:4C:84:09:5C:D4:78:0F:2D:D8:0A:D0:AE',
@@ -1009,7 +1009,7 @@ sub _build_certs {
             },
         ),
 
-        'gamma_bob_1' => OpenXPKI::Test::CertHelper::Database::PEM->new(
+        'gamma_bob_1' => OpenXPKI::Test::CertHelper::Database::Cert->new(
             label => 'GAMMA Client Bob 1',
             db => {
                 authority_key_identifier => '65:81:A5:F1:F9:78:C3:D5:18:D9:9F:DF:5E:61:92:64:1E:FC:27:10',

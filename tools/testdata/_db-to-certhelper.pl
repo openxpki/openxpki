@@ -46,7 +46,7 @@ while (my $data = $dbh->fetchrow_hashref) {
     my $label = (split("=", (split(",", $data->{subject}))[0]))[1];
     my $internal_id = ($data->{group_id}//"") eq "root" ? $data->{pki_realm}."-".$data->{alias} : $data->{alias};
     $internal_id =~ s/-/_/g;
-    print "        '$internal_id' => OpenXPKI::Test::CertHelper::Database::PEM->new(\n";
+    print "        '$internal_id' => OpenXPKI::Test::CertHelper::Database::Cert->new(\n";
     print "            label => '$label',\n";
     print '            db => {'."\n                ";
     print join "\n                ",

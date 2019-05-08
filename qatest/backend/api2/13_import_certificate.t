@@ -30,7 +30,7 @@ Positional parameters:
 
 =over
 
-=item * B<$test_cert> - Container with certificate data (I<OpenXPKI::Test::CertHelper::Database::PEM>, required)
+=item * B<$test_cert> - Container with certificate data (I<OpenXPKI::Test::CertHelper::Database::Cert>, required)
 
 =item * B<%args> - Arguments to pass to "import_certificate" (I<Hash>, optional)
 
@@ -59,7 +59,7 @@ Positional parameters:
 
 =over
 
-=item * B<$test_cert> - Container with certificate data (I<OpenXPKI::Test::CertHelper::Database::PEM>, required)
+=item * B<$test_cert> - Container with certificate data (I<OpenXPKI::Test::CertHelper::Database::Cert>, required)
 
 =item * B<$error> - Expected error string returned by API (I<Str>, required)
 
