@@ -588,7 +588,7 @@ sub init_detail {
 
     # check if this is a entity certificate from the current realm
     my $is_local_entity = 0;
-    if ($cert->{csr_serial} && $cert->{pki_realm} eq $self->_session->param('pki_realm')) {
+    if ($cert->{req_key} && $cert->{pki_realm} eq $self->_session->param('pki_realm')) {
         $self->logger()->debug("cert is local entity");
         $is_local_entity = 1;
     }
