@@ -156,24 +156,25 @@ fi
 
 # create SSL keys and certificates and import them into OpenXPKI
 if [[ $IS_FULLCONFIG -eq 1 ]]; then
-    echo -e "\nCreating and importing sample certificates"
-    rm -rf /etc/openxpki/ssl/
-    /code-repo/config/sampleconfig.sh                                 >$LOG 2>&1
-    chmod 750              /etc/openxpki/ssl
-    chown -R root:openxpki /etc/openxpki/ssl
+    echo ""
+    /vagrant/scripts/oxi-initdb
 fi
 
 if [[ $IS_RESTART -eq 1 ]]; then
-    echo -e "\nRestart"
-    echo "- OpenXPKI"
-    openxpkictl restart                                               >$LOG 2>&1
+    echo ""
 
-    if [[ $(openxpkictl status 2>&1) == *"not running"* ]]; then
-        echo "Error starting OpenXPKI"
-        exit 333
+    # oxi-initdb (above) already restarts OpenXPKI
+    if [[ $IS_FULLCONFIG -ne 1 ]]; then
+        echo "Restarting OpenXPKI"
+        openxpkictl restart                                           >$LOG 2>&1
+
+        if [[ $(openxpkictl status 2>&1) != *"is running"* ]]; then
+            echo -e "\nERROR: Could not start OpenXPKI. Please see logs in /var/log/openxpki"
+            exit 333
+        fi
     fi
 
-    echo "- Apache"
+    echo "Restarting Apache"
     systemctl restart apache2                                         >$LOG 2>&1
 fi
 
