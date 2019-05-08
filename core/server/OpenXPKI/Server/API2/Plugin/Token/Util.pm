@@ -13,26 +13,31 @@ related API methods
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::MooseParams;
 
 # CPAN modules
-use English;
+use Try::Tiny;
+
+
 
 =head2 is_token_usable
 
-Checks if the given token is usable by doing an encryption/decryption roundtrip.
+Checks if the given token (I<OpenXPKI::Crypto::API>) is usable by doing an encryption/decryption roundtrip.
 
-Returns 1 if everything went fine, undef otherwise.
+Returns C<1> if everything went fine, C<undef> otherwise.
 
 =cut
 sub is_token_usable {
-    my ($self, $token) = @_;
+    my ($self, $token) = positional_args(\@_, # OpenXPKI::MooseParams
+        { isa => 'OpenXPKI::Crypto::API' },
+    );
 
     ##! 1: 'start'
-    eval {
+    my $result = try {
         CTX('log')->application()->debug('Check if token is usable using crypto operation');
 
-        my $base = 'OpenXPKI Encryption Test';
         ##! 64: 'Entering test'
+        my $base = 'OpenXPKI Encryption Test';
         my $encrypted = $token->command({ COMMAND => 'pkcs7_encrypt', CONTENT => $base });
         my $decrypted = $token->command({ COMMAND => 'pkcs7_decrypt', PKCS7 => $encrypted });
 
@@ -43,13 +48,15 @@ sub is_token_usable {
                 params => { token_backend_class => ref $token->get_instance }
             );
         }
-    };
-    if ($EVAL_ERROR) {
+
+        return 1;
+    }
+    catch {
         ##! 8: 'pkcs7 roundtrip failed'
         return;
-    }
+    };
 
-    return 1;
+    return $result;
 }
 
 =head2 validity_to_epoch
