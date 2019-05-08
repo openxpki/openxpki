@@ -46,7 +46,7 @@ B<Parameters>
 
 =back
 
-=item attribute - expression for attributes to add, see get_cert_attributes
+=item * attribute - expression for attributes to add, see get_cert_attributes
 
 =back
 

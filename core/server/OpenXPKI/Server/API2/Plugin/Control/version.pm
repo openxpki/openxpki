@@ -17,21 +17,19 @@ use OpenXPKI::Control;
 
 =head2 version
 
-Return the code and config version
+Return the versions of code and config.
 
-Return value is a hash
+Returns a I<HashRef>:
 
-   {
-       server => {
-           version => 2.4,
+    {
+        server => {
+            version => '2.4',
             api => 2,
-       },
-       config => {
-           values from system.version
-       }
-   }
-
-=back
+        },
+        config => {
+            # values from system.version
+        }
+    }
 
 =cut
 command "version" => {
