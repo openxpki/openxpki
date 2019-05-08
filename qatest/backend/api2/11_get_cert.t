@@ -45,45 +45,24 @@ my ($serial, $serial_f);
 lives_and {
     my $result = $oxitest->api2_command("get_cert" => { identifier => $cert_id, format => 'HASH' });
     cmp_deeply($result, superhashof({
-        'BODY' => superhashof({
-            'ALIAS'               => ignore(),              # might be undef
-            'CA_ISSUER_NAME'      => re(qr/^.+$/),          # 'CN=Root CA,OU=Test CA,DC=OpenXPKI,DC=ORG',
-            'CA_ISSUER_SERIAL'    => re(qr/^(0|1)$/),       # '1',
-            'CA_KEYID'            => re(qr/^.+$/),          # '9A:1D:9E:0A:03:95:91:26:5C:42:5F:90:0C:2E:02:C1:6B:29:14:5C',
-            'EMAILADDRESS'        => ignore(),              # might be undef
-            'EXPONENT'            => re(qr/\d+$/),          # '10001',
-            'EXTENSIONS'          => superhashof({}),       # HashRef
-            'FINGERPRINT'         => re(qr/^.+$/),          # 'SHA1:94:28:74:12:AA:3E:01:A6:DB:C2:BD:78:A4:95:12:2C:FA:33:EA:38'
-            'IS_CA'               => re(qr/^(0|1)$/),       # '0',
-            'ISSUER'              => re(qr/^.+$/),          # 'CN=CA ONE,OU=Test CA,DC=OpenXPKI,DC=ORG',
-            'KEYID'               => re(qr/^.+$/),          # '94:FA:0B:95:AA:46:3B:7E:1B:F2:AB:67:3A:2D:ED:7B:85:6B:C8:27',
-            'KEYSIZE'             => re(qr/\d+$/),          # '2048',
-            'MODULUS'             => re(qr/^.+$/),
-            'NOTAFTER'            => re(qr/\d+$/),          # '1496085427',
-            'NOTBEFORE'           => re(qr/\d+$/),          # '1480447027',
-            'PLAIN_EXTENSIONS'    => re(qr/^.+$/m),         # multiline
-            'PUBKEY_ALGORITHM'    => re(qr/^.+$/),          # 'rsaEncryption',
-            'PUBKEY_HASH'         => re(qr/^.+$/),          # 'SHA1:94:FA:0B:95:AA:46:3B:7E:1B:F2:AB:67:3A:2D:ED:7B:85:6B:C8:27',
-            'PUBKEY'              => re(qr/^.+$/m),         # multiline
-            'SERIAL_HEX'          => re(qr/^[a-f0-9]+$/i),  # '8c9e25459b3ebfb5daff',
-            'SERIAL'              => re(qr/\d+$/),          # '664048578888843042085631',
-            'SIGNATURE_ALGORITHM' => re(qr/^.+$/),          # 'sha256WithRSAEncryption',
-            'SUBJECT_HASH'        => {
-                'CN' => array_each(re(qr/^.+$/)),
-                'DC' => array_each(re(qr/^.+$/)),
-            },
-            'SUBJECT'             => re(qr/^.+$/),          # 'CN=nicetest-917e91.openxpki.test:8080,DC=Test Deployment,DC=OpenXPKI,DC=org',
-            'VERSION'             => re(qr/^.+$/),          # '3 (0x2)',
-        }),
-        'CSR_SERIAL'        => re(qr/\d+$/),                # '36095'
-        'HEADER'            => superhashof({}),             # HashRef,
-        'IDENTIFIER'        => re(qr/^.+$/),                # 'lCh0Eqo-Aabbwr14pJUSLPoz6jg'
-        'ISSUER_IDENTIFIER' => re(qr/^.+$/),                # 'k1izCpwZwEu6jFJZbwul-fVoQFY',
-        'PKI_REALM'         => re(qr/^.+$/),                # 'ca-one',
-        'STATUS'            => re(qr/^\w+$/),               # 'ISSUED'
-    }), "HASH contains relevant elements");
+        serial_hex              => re(qr/^[a-f0-9]+$/i),  # '8c9e25459b3ebfb5daff',
+        serial                  => re(qr/\d+$/),          # '664048578888843042085631',
+        subject                 => re(qr/^.+$/),          # 'CN=nicetest-917e91.openxpki.test:8080,DC=Test Deployment,DC=OpenXPKI,DC=org',
+        subject_hash => {
+            'CN' => array_each(re(qr/^.+$/)),
+            'DC' => array_each(re(qr/^.+$/)),
+        },
+        notbefore               => re(qr/\d+$/),          # '1496085427',
+        notafter                => re(qr/\d+$/),          # '1496085427',
+        status                  => "ISSUED",              # 'ISSUED'
+        identifier              => re(qr/^.+$/),          # 'lCh0Eqo-Aabbwr14pJUSLPoz6jg'
+        issuer_identifier       => re(qr/^.+$/),          # 'k1izCpwZwEu6jFJZbwul-fVoQFY',
+        issuer                  => re(qr/^.+$/),          # 'CN=CA ONE,OU=Test CA,DC=OpenXPKI,DC=ORG',
+        csr_serial              => re(qr/\d+$/),          # '36095'
+        pki_realm               => re(qr/^.+$/),          # 'ca-one',
+    }), "HASH contains relevant elements") or diag explain $result;
 
-    $serial = uc($result->{BODY}->{SERIAL_HEX});
+    $serial = uc($result->{serial_hex});
     $serial = "0$serial" if length($serial) % 2 == 1; # prepend 0 if uneven amount of hex digits
     $serial_f = join ":", unpack("(A2)*", $serial);
     note "Certificate serial: $serial_f";
@@ -118,19 +97,15 @@ my $pem2 = `openssl x509 -in "$tempdir/cert.der" -inform DER`;
 is $pem_short, $pem2, 'DER matches PEM';
 
 # Fetch certificate - TXT Format
-TODO: {
-    local $TODO = "TXT does not work (issue #185)";
-
-    lives_and {
-        my $result = $oxitest->api2_command("get_cert" => { identifier => $cert_id, format => 'TXT' });
-        like $result, qr/$serial_f/i;
-    } "Fetch certificate (TXT)";
-}
+lives_and {
+    my $result = $oxitest->api2_command("get_cert" => { identifier => $cert_id, format => 'TXT' });
+    like $result, qr/$serial_f/i;
+} "Fetch certificate (TXT)";
 
 # Fetch certificate - DBINFO Format
 my $dbinfo_serial;
 lives_and {
-    my $result = $oxitest->api2_command("get_cert" => { identifier => $cert_id, format => 'DBINFO' });
+    my $result = $oxitest->api2_command("get_cert" => { identifier => $cert_id, format => 'DBINFO', attribute => '%' });
     cmp_deeply $result, superhashof({
         'authority_key_identifier'  => re(qr/^([[:alnum:]]{2}:)+[[:alnum:]]{2}$/), # '9A:1D:9E:0A:03:95:91:26:5C:42:5F:90:0C:2E:02:C1:6B:29:14:5C',
         'cert_attributes' => {
@@ -154,7 +129,7 @@ lives_and {
         'status'                    => re(qr/^\w+$/),           # 'ISSUED',
         'subject'                   => re(qr/^.+$/),            # 'CN=nicetest-63a0ee.openxpki.test:8080,DC=Test Deployment,DC=OpenXPKI,DC=org',
         'subject_key_identifier'    => re(qr/^.+$/),            # 'BD:B1:9B:63:70:40:A3:3D:48:2C:0C:7A:0D:33:90:2E:C0:D2:23:89',
-    }), "DBINFO contains relevant elements";
+    }), "DBINFO contains relevant elements" or diag explain $result;
     $dbinfo_serial = uc($result->{cert_key_hex});
     $dbinfo_serial = "0$dbinfo_serial" if length($dbinfo_serial) % 2 == 1; # prepend 0 if uneven amount of hex digits
     is $dbinfo_serial, $serial;
