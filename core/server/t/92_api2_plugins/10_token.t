@@ -18,7 +18,7 @@ use lib "$Bin/../lib";
 use OpenXPKI::Test;
 use OpenXPKI::Test::CertHelper::Database;
 
-plan tests => 16;
+plan tests => 17;
 
 #
 # Setup test context
@@ -207,6 +207,20 @@ lives_and {
     is $data, 1;
 } "is_token_usable - using 'alias'";
 
+# "hide" private key that belongs to the cert - token should then not be usable anymore
+my $key_path = $oxitest->config_writer->get_private_key_path($as2->db->{pki_realm}, $as2->db_alias->{alias});
+rename $key_path, "${key_path}.hide" or BAIL_OUT("Could not rename private key file ${key_path}");
+
+lives_and {
+    my $data = $api->is_token_usable(
+        alias => $as2->db_alias->{alias},
+    );
+    isnt $data, 1;
+} "is_token_usable - using 'alias' with private key inaccessible";
+
+rename "${key_path}.hide", $key_path or BAIL_OUT("Could not rename private key file ${key_path}.hide");
+
+# is_token_usable using "engine"
 lives_and {
     my $data = $api->is_token_usable(
         alias => $as2->db_alias->{alias},
