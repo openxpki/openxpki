@@ -98,8 +98,9 @@ command "get_cert" => {
 
     if ($format eq 'DER') {
         $cert->{data} =~ m{-----BEGIN[^-]*CERTIFICATE-----(.+)-----END[^-]*CERTIFICATE-----}xms;
-        $cert->{data} =~ s{\s}{}xms;
-        return decode_base64($1);
+        my $tmp = $1;
+        $tmp =~ s{\s}{}xms;
+        return decode_base64($tmp);
     }
 
     if ($format eq 'TXT' || $format eq 'TXTPEM') {
