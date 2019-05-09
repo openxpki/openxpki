@@ -17,6 +17,19 @@ sub init {
     return;
 }
 
+
+sub wake_up {
+
+    my $self     = shift;
+    my $workflow = shift;
+    ##! 1: 'wake up!'
+
+    if (my $role = $self->param('change_role')) {
+        CTX('log')->workflow()->info('Change session role to '. $role );
+        CTX('session')->data->role( $role );
+    }
+
+}
 sub execute {
     my $self     = shift;
     my $workflow = shift;
@@ -60,5 +73,14 @@ gets picked up by the watchdog and is resumed.
 
 A string that is set as initial "pause reason". This is visible to the user
 until the watchdog picks up the process and continues.
+
+=item change_role
+
+Usually the workflow is continued with the permissions of the role that was
+active when it was put to sleep. Setting this to a role name will change the
+session role to this value when the workflow is woke up.
+
+B<SECURITY RISK> Changing the role in a workflow affects the access privileges
+of all all activities until the next interactive step!
 
 =back
