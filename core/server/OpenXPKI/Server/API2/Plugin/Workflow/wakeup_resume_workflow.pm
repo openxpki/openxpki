@@ -180,7 +180,7 @@ sub _wakeup_or_resume_workflow {
         "%s%s workflow %s (type '%s') with activity %s",
         $wakeup_mode ? "Wakeup" : "Resume",
         $async ? ($wait ? " (async & waiting)" : " (async)") : "",
-        $id, workflow->type(), $activity
+        $id, $workflow->type(), $activity
     ));
 
     my $updated_workflow = $util->execute_activity($workflow, $activity, $async, $wait);

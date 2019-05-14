@@ -214,7 +214,7 @@ around BUILDARGS => sub {
         return $class->$orig($args);
     } else {
 
-        return $class->$orig(@_);
+        return $class->$orig($args);
     }
 
 };
