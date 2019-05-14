@@ -409,6 +409,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/AppendCertificateMetadata.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CalculateApprovalPoints.pm
+OpenXPKI/Server/Workflow/Activity/Tools/CopyCertificateMetadata.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CopyContextFromWorkflow.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Disconnect.pm
 OpenXPKI/Server/Workflow/Activity/Tools/EvaluateEligibility.pm
