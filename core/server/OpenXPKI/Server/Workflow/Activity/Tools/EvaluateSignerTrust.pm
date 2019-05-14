@@ -50,14 +50,16 @@ sub execute {
     # Check the chain
     my $signer_identifier = $x509->get_cert_identifier();
 
-    $context->param('signer_cert_identifier' => $signer_identifier);
-
     # Get realm and issuer for signer certificate
     my $cert_hash = CTX('dbi')->select_one(
         from    => 'certificate',
         columns => ['pki_realm', 'issuer_identifier', 'req_key', 'status' ],
         where   => { identifier => $signer_identifier },
     );
+
+    if ($cert_hash) {
+        $context->param('signer_cert_identifier' => $signer_identifier);
+    }
 
     my $signer_realm = $cert_hash->{pki_realm} || 'global';
     my $signer_issuer = $cert_hash->{issuer_identifier};
@@ -104,6 +106,8 @@ sub execute {
         CTX('log')->application()->info("Trusted Signer chain validated - trusted root is $signer_root");
 
     } elsif ($x509->is_selfsigned()) {
+
+        $context->param('signer_cert_identifier' => '');
 
         CTX('log')->application()->info("Trusted Signer chain - certificate is self signed");
 
