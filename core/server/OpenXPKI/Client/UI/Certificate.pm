@@ -633,7 +633,7 @@ sub init_detail {
         my $baseurl = 'workflow!index!cert_identifier!'.$cert_identifier.'!wf_type!';
 
         my @actions;
-        my $reply = $self->send_command ( "get_cert_actions", { IDENTIFIER => $cert_identifier });
+        my $reply = $self->send_command_v2 ( "get_cert_actions", { identifier => $cert_identifier });
 
         $self->logger()->trace("available actions for cert " . Dumper $reply);
 
