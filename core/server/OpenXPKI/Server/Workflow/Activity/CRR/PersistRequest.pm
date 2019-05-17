@@ -65,7 +65,7 @@ sub execute
         table => 'certificate',
         set => {
             status => 'CRL_ISSUANCE_PENDING',
-            reason_code     => $context->param('reason_code'),
+            reason_code     => $context->param('reason_code') || 'unspecified',
             revocation_time => $dt->epoch(),
             invalidity_time => $context->param('invalidity_time') || undef,
             hold_instruction_code => $context->param('hold_code') || undef,

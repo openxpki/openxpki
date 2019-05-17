@@ -42,7 +42,7 @@ sub execute {
 
     if (!$cert->{reason_code}) {
         OpenXPKI::Exception->throw(
-            message => 'nice certificate to revoked has no reason code set',
+            message => 'nice certificate to be revoked has no reason code set',
             params => { identifier => $cert_identifier }
         );
     }
