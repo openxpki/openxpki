@@ -32,33 +32,33 @@ my $dbdata = $oxitest->certhelper_database;
 #
 # Tests for IMPORT
 #
-cert_import_failsok($dbdata->cert("gamma_bob_1"), qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER/);
-cert_import_ok     ($dbdata->cert("gamma_bob_1"),    '--force-no-chain');
+cert_import_failsok($dbdata->cert("gamma-bob-1"), qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER/);
+cert_import_ok     ($dbdata->cert("gamma-bob-1"),    '--force-no-chain');
 
-cert_import_ok     ($dbdata->cert("alpha_root_2"),      qw(--realm alpha));
-cert_import_failsok($dbdata->cert("alpha_root_2"), qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_CERTIFICATE_ALREADY_EXISTS/);
-cert_import_ok     ($dbdata->cert("alpha_root_2"),      qw(--realm alpha), '--force-certificate-already-exists');
+cert_import_ok     ($dbdata->cert("alpha-root-2"),      qw(--realm alpha));
+cert_import_failsok($dbdata->cert("alpha-root-2"), qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_CERTIFICATE_ALREADY_EXISTS/);
+cert_import_ok     ($dbdata->cert("alpha-root-2"),      qw(--realm alpha), '--force-certificate-already-exists');
 
-cert_import_ok     ($dbdata->cert("alpha_signer_2"),    qw(--realm alpha), '--group' => 'alpha-signer', '--gen' => 2);
-cert_import_ok     ($dbdata->cert("alpha_datavault_2"), qw(--realm alpha), '--token' => 'datasafe',     '--gen' => 2);
-cert_import_ok     ($dbdata->cert("alpha_scep_2"),      qw(--realm alpha), '--token' => 'scep',         '--gen' => 2);
-cert_import_ok     ($dbdata->cert("alpha_alice_2"),     qw(--realm alpha --revoked --alias MelaleucaAlternifolia));
+cert_import_ok     ($dbdata->cert("alpha-signer-2"),    qw(--realm alpha), '--group' => 'alpha-signer', '--gen' => 2);
+cert_import_ok     ($dbdata->cert("alpha-datavault-2"), qw(--realm alpha), '--token' => 'datasafe',     '--gen' => 2);
+cert_import_ok     ($dbdata->cert("alpha-scep-2"),      qw(--realm alpha), '--token' => 'scep',         '--gen' => 2);
+cert_import_ok     ($dbdata->cert("alpha-alice-2"),     qw(--realm alpha --revoked --alias MelaleucaAlternifolia));
 
-cert_import_ok     ($dbdata->cert("alpha_root_1"),      qw(--realm alpha));
+cert_import_ok     ($dbdata->cert("alpha-root-1"),      qw(--realm alpha));
 # Alpha gen 1 is expired, so we expect ...UNABLE_TO_BUILD_CHAIN
-cert_import_failsok($dbdata->cert("alpha_signer_1"), qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN/);
-my $issuer = $dbdata->cert("alpha_signer_1")->db->{issuer_identifier};
-cert_import_ok     ($dbdata->cert("alpha_signer_1"),    qw(--realm alpha), '--force-issuer', '--issuer', $issuer );
-cert_import_ok     ($dbdata->cert("alpha_alice_1"),     qw(--realm alpha), '--force-no-verify');
+cert_import_failsok($dbdata->cert("alpha-signer-1"), qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN/);
+my $issuer = $dbdata->cert("alpha-signer-1")->db->{issuer_identifier};
+cert_import_ok     ($dbdata->cert("alpha-signer-1"),    qw(--realm alpha), '--force-issuer', '--issuer', $issuer );
+cert_import_ok     ($dbdata->cert("alpha-alice-1"),     qw(--realm alpha), '--force-no-verify');
 
 my @ids = map { $dbdata->cert($_)->db->{identifier} }
     qw(
-        alpha_root_1 alpha_signer_1 alpha_alice_1
-        alpha_root_2 alpha_signer_2 alpha_datavault_2 alpha_scep_2 alpha_alice_2
+        alpha-root-1 alpha-signer-1 alpha-alice-1
+        alpha-root-2 alpha-signer-2 alpha-datavault-2 alpha-scep-2 alpha-alice-2
     );
-my $a_alice_2_id    = $dbdata->cert("alpha_alice_2")->db->{identifier};
-my $a_signer_2_id   = $dbdata->cert("alpha_signer_2")->db->{identifier};
-my $a_root_2_id     = $dbdata->cert("alpha_root_2")->db->{identifier};
+my $a_alice_2_id    = $dbdata->cert("alpha-alice-2")->db->{identifier};
+my $a_signer_2_id   = $dbdata->cert("alpha-signer-2")->db->{identifier};
+my $a_root_2_id     = $dbdata->cert("alpha-root-2")->db->{identifier};
 
 #
 # Tests for LIST
@@ -80,10 +80,10 @@ cert_list_ok
 
 # verbose
 my @verbose1 = (
-    $dbdata->cert("alpha_alice_2")->db->{identifier},
+    $dbdata->cert("alpha-alice-2")->db->{identifier},
     "MelaleucaAlternifolia", # alias
-    $dbdata->cert("alpha_alice_2")->db->{subject},
-    $dbdata->cert("alpha_alice_2")->db->{issuer_dn},
+    $dbdata->cert("alpha-alice-2")->db->{subject},
+    $dbdata->cert("alpha-alice-2")->db->{issuer_dn},
 );
 my @verbose2 = (
     @verbose1,
@@ -91,12 +91,12 @@ my @verbose2 = (
 );
 my @verbose3 = (
     @verbose2,
-    $dbdata->cert("alpha_alice_2")->db->{subject_key_identifier},
-    $dbdata->cert("alpha_alice_2")->db->{authority_key_identifier},
-    $dbdata->cert("alpha_alice_2")->db->{issuer_identifier},
+    $dbdata->cert("alpha-alice-2")->db->{subject_key_identifier},
+    $dbdata->cert("alpha-alice-2")->db->{authority_key_identifier},
+    $dbdata->cert("alpha-alice-2")->db->{issuer_identifier},
     qr/ revoked /msxi,
-    $dbdata->cert("alpha_alice_2")->db->{notbefore},
-    $dbdata->cert("alpha_alice_2")->db->{notafter},
+    $dbdata->cert("alpha-alice-2")->db->{notbefore},
+    $dbdata->cert("alpha-alice-2")->db->{notafter},
 );
 my @verbose4 = (
     @verbose3,

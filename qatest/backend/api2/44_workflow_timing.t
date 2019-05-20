@@ -106,7 +106,7 @@ for (1..3) {
     }
     catch {
         note $_;
-    }
+    };
 };
 
 # wait for the delayed background processes to finish

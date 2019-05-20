@@ -28,7 +28,7 @@ our @EXPORT = qw(
 # Test "openxpkiadm certificate import".
 #
 # Positional parameters:
-# * $test_cert - Container with certificate data (OpenXPKI::Test::CertHelper::Database::PEM)
+# * $test_cert - Container with certificate data (OpenXPKI::Test::CertHelper::Database::Cert)
 # * @args - Additional arguments to pass on the command line
 #
 sub cert_import_ok {
@@ -43,7 +43,7 @@ sub cert_import_ok {
 # error message.
 #
 # Positional parameters:
-# * $test_cert - Container with certificate data (OpenXPKI::Test::CertHelper::Database::PEM)
+# * $test_cert - Container with certificate data (OpenXPKI::Test::CertHelper::Database::Cert)
 # * $error_re - Expected error string (regex or string)
 # * @args - Additional arguments to pass on the command line
 #

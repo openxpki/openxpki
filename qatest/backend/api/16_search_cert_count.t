@@ -53,9 +53,9 @@ my $dbdata = $oxitest->certhelper_database;
 $oxitest->insert_testcerts;
 
 # By PROFILE
-my $realm = $dbdata->cert("beta_root_1")->db->{pki_realm};
+my $realm = $dbdata->cert("beta-root-1")->db->{pki_realm};
 $test->runcmd_ok('search_cert_count', {
-    PKI_REALM => $dbdata->cert("beta_root_1")->db->{pki_realm},
+    PKI_REALM => $dbdata->cert("beta-root-1")->db->{pki_realm},
 }, "Search and count certificates") or diag Dumper($test->get_msg);
 
 is $test->get_msg->{PARAMS}, scalar($dbdata->cert_names_where(pki_realm => $realm)), "Correct number";

@@ -19,13 +19,25 @@ trap '_exit $?' EXIT
 #
 # Recreate certificates and DB
 #
-openxpkictl stop
+echo -e "Recreating database and certificates"
 
-set -e
-/code-repo/tools/testenv/mysql-create-db.sh
-/code-repo/tools/testenv/mysql-create-schema.sh
+echo -e "- stopping OpenXPKI"
+openxpkictl stop                                                  >$LOG 2>&1
 
+echo -e "- re-creating database and tables"
+/code-repo/tools/testenv/mysql-create-db.sh                       >$LOG 2>&1
+/code-repo/tools/testenv/mysql-create-schema.sh                   >$LOG 2>&1
+
+echo -e "- creating and importing sample certificates"
 rm -rf /etc/openxpki/ssl/
-/code-repo/tools/testenv/insert-certificates.sh
+/code-repo/config/sampleconfig.sh                                 >$LOG 2>&1
+chmod 750              /etc/openxpki/ssl
+chown -R root:openxpki /etc/openxpki/ssl
 
-openxpkictl start
+echo -e "- starting OpenXPKI"
+openxpkictl start                                                 >$LOG 2>&1
+
+if [[ $(openxpkictl status 2>&1) != *"is running"* ]]; then
+    echo -e "\nERROR: Could not start OpenXPKI. Please see logs in /var/log/openxpki"
+    exit 333
+fi

@@ -42,12 +42,12 @@ CTX('session')->data->pki_realm('alpha');
 #
 # Tests
 #
-my $as1 = $oxitest->certhelper_database->cert("alpha_signer_1");
-my $as2 = $oxitest->certhelper_database->cert("alpha_signer_2");
-my $as3 = $oxitest->certhelper_database->cert("alpha_signer_3");
-my $av1 = $oxitest->certhelper_database->cert("alpha_datavault_1");
-my $av2 = $oxitest->certhelper_database->cert("alpha_datavault_2");
-my $bs1 = $oxitest->certhelper_database->cert("beta_signer_1");
+my $as1 = $oxitest->certhelper_database->cert("alpha-signer-1");
+my $as2 = $oxitest->certhelper_database->cert("alpha-signer-2");
+my $as3 = $oxitest->certhelper_database->cert("alpha-signer-3");
+my $av1 = $oxitest->certhelper_database->cert("alpha-datavault-1");
+my $av2 = $oxitest->certhelper_database->cert("alpha-datavault-2");
+my $bs1 = $oxitest->certhelper_database->cert("beta-signer-1");
 
 #
 # get_ca_list
@@ -155,8 +155,8 @@ lives_and {
 } "get_token_alias_by_group - currently valid token/cert alias (VALIDITY with undef values)";
 
 lives_and {
-    # VALIDITY specifies a period shortly before alpha_signer_2 expires and
-    # alpha_signer_2 is already valid, so _3 should be returned
+    # VALIDITY specifies a period shortly before alpha-signer-2 expires and
+    # alpha-signer-2 is already valid, so _3 should be returned
     my $data = CTX('api')->get_token_alias_by_group({
         GROUP    => $as2->db_alias->{group_id},
         VALIDITY => {
@@ -191,7 +191,7 @@ lives_and {
 # get_trust_anchors
 #
 lives_and {
-    my $a2 = $oxitest->certhelper_database->cert("alpha_signer_2");
+    my $a2 = $oxitest->certhelper_database->cert("alpha-signer-2");
 
     my $data = CTX('api')->get_trust_anchors({ PATH => "realm.alpha.auth.handler.Signature" });
     cmp_deeply $data, bag("MyCertId", $a2->db->{identifier});

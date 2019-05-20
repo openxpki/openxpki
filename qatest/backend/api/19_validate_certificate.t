@@ -24,19 +24,19 @@ my $oxitest = OpenXPKI::Test->new(
     with => qw( CryptoLayer ),
 );
 my $dbdata = $oxitest->certhelper_database;
-$oxitest->insert_testcerts(exclude => ['alpha_root_2']);
+$oxitest->insert_testcerts(exclude => ['alpha-root-2']);
 
 my $alpha_1_chain = [
-    $dbdata->cert("alpha_alice_1")->data,
-    $dbdata->cert("alpha_signer_1")->data,
-    $dbdata->cert("alpha_root_1")->data,
+    $dbdata->cert("alpha-alice-1")->data,
+    $dbdata->cert("alpha-signer-1")->data,
+    $dbdata->cert("alpha-root-1")->data,
 ];
 
 my $strip_newline = sub { (my $pem = shift) =~ s/\R//gm; return $pem };
 
-my $a2_alice =  $strip_newline->($dbdata->cert("alpha_alice_2")->data);
-my $a2_signer = $strip_newline->($dbdata->cert("alpha_signer_2")->data);
-my $a2_root =   $strip_newline->($dbdata->cert("alpha_root_2")->data);
+my $a2_alice =  $strip_newline->($dbdata->cert("alpha-alice-2")->data);
+my $a2_signer = $strip_newline->($dbdata->cert("alpha-signer-2")->data);
+my $a2_root =   $strip_newline->($dbdata->cert("alpha-root-2")->data);
 my $alpha_2_chain = [
     $a2_alice,
     $a2_signer,
@@ -50,13 +50,13 @@ my $alpha_2_chain = [
 # single certificate (PEM)
 lives_and {
     my $result = $oxitest->api_command("validate_certificate" => {
-        PEM => $dbdata->cert("alpha_alice_2")->data,
+        PEM => $dbdata->cert("alpha-alice-2")->data,
     });
     cmp_deeply $result, {
         STATUS => 'NOROOT',
         CHAIN  => [
-            $dbdata->cert("alpha_alice_2")->data,
-            $dbdata->cert("alpha_signer_2")->data,
+            $dbdata->cert("alpha-alice-2")->data,
+            $dbdata->cert("alpha-signer-2")->data,
         ],
     };
 } "certificate with missing root certificate (NOROOT)";
@@ -65,9 +65,9 @@ lives_and {
 lives_and {
     my $result = $oxitest->api_command("validate_certificate" => {
         PEM => [
-            $dbdata->cert("alpha_alice_2")->data,
-            $dbdata->cert("alpha_signer_2")->data,
-            $dbdata->cert("alpha_root_2")->data,
+            $dbdata->cert("alpha-alice-2")->data,
+            $dbdata->cert("alpha-signer-2")->data,
+            $dbdata->cert("alpha-root-2")->data,
         ],
     });
     $result->{CHAIN} = [ map { $strip_newline->($_) } @{ $result->{CHAIN} } ];
@@ -78,13 +78,13 @@ lives_and {
 } "PEM ArrayRef certificate chain with unknown root cert (UNTRUSTED)";
 
 
-$oxitest->insert_testcerts(only => ['alpha_root_2']);
+$oxitest->insert_testcerts(only => ['alpha-root-2']);
 
 
 # expired certificate
 lives_and {
     my $result = $oxitest->api_command("validate_certificate" => {
-        PEM => $dbdata->cert("alpha_alice_1")->data,
+        PEM => $dbdata->cert("alpha-alice-1")->data,
     });
     cmp_deeply $result, {
         STATUS => 'BROKEN',
@@ -95,7 +95,7 @@ lives_and {
 # valid certificate
 lives_and {
     my $result = $oxitest->api_command("validate_certificate" => {
-        PEM => $dbdata->cert("alpha_alice_2")->data,
+        PEM => $dbdata->cert("alpha-alice-2")->data,
     });
     $result->{CHAIN} = [ map { $strip_newline->($_) } @{ $result->{CHAIN} } ];
     cmp_deeply $result, {
@@ -107,8 +107,8 @@ lives_and {
 # valid certificate - specify trust anchors
 lives_and {
     my $result = $oxitest->api_command("validate_certificate" => {
-        PEM => $dbdata->cert("alpha_alice_2")->data,
-        ANCHOR => [ $dbdata->cert("alpha_root_2")->db->{issuer_identifier} ],
+        PEM => $dbdata->cert("alpha-alice-2")->data,
+        ANCHOR => [ $dbdata->cert("alpha-root-2")->db->{issuer_identifier} ],
     });
     $result->{CHAIN} = [ map { $strip_newline->($_) } @{ $result->{CHAIN} } ];
     cmp_deeply $result, {
@@ -120,8 +120,8 @@ lives_and {
 # valid certificate - specify wrong trust anchors
 lives_and {
     my $result = $oxitest->api_command("validate_certificate" => {
-        PEM => $dbdata->cert("alpha_alice_2")->data,
-        ANCHOR => [ $dbdata->cert("alpha_root_1")->db->{issuer_identifier} ],
+        PEM => $dbdata->cert("alpha-alice-2")->data,
+        ANCHOR => [ $dbdata->cert("alpha-root-1")->db->{issuer_identifier} ],
     });
     $result->{CHAIN} = [ map { $strip_newline->($_) } @{ $result->{CHAIN} } ];
     cmp_deeply $result, {
@@ -137,9 +137,9 @@ lives_and {
 lives_and {
     my $result = $oxitest->api_command("validate_certificate" => {
         PEM => [
-            $dbdata->cert("alpha_alice_2")->data,
-            $dbdata->cert("alpha_signer_2")->data,
-            $dbdata->cert("alpha_root_2")->data,
+            $dbdata->cert("alpha-alice-2")->data,
+            $dbdata->cert("alpha-signer-2")->data,
+            $dbdata->cert("alpha-root-2")->data,
         ],
     });
     $result->{CHAIN} = [ map { $strip_newline->($_) } @{ $result->{CHAIN} } ];
@@ -152,8 +152,8 @@ lives_and {
 lives_and {
     my $result = $oxitest->api_command("validate_certificate" => {
         PEM => [
-            $dbdata->cert("alpha_alice_2")->data,
-            $dbdata->cert("alpha_signer_2")->data,
+            $dbdata->cert("alpha-alice-2")->data,
+            $dbdata->cert("alpha-signer-2")->data,
         ],
     });
     $result->{CHAIN} = [ map { $strip_newline->($_) } @{ $result->{CHAIN} } ];

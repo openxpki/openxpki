@@ -44,7 +44,7 @@ lives_and {
        TYPE => 'certsign',
        NAME => 'alpha-signer-2',
        CERTIFICATE => {
-            DATA => $oxitest->certhelper_database->cert("alpha_signer_2")->data,
+            DATA => $oxitest->certhelper_database->cert("alpha-signer-2")->data,
             IDENTIFIER => 'ignored',
        }
     });
@@ -156,7 +156,7 @@ lives_and {
 my $cert_profile;
 use_ok "OpenXPKI::Crypto::Profile::Certificate";
 lives_and {
-    my $cert = $oxitest->certhelper_database->cert("alpha_signer_2");
+    my $cert = $oxitest->certhelper_database->cert("alpha-signer-2");
     $cert_profile = OpenXPKI::Crypto::Profile::Certificate->new(
         TYPE  => "ENDENTITY",
         ID    => "I18N_OPENXPKI_PROFILE_USER",
@@ -207,7 +207,7 @@ lives_and {
             VALIDITYFORMAT => 'relativedate',
             VALIDITY => "+000014",
         },
-        CACERTIFICATE => $oxitest->certhelper_database->cert("alpha_signer_2")->data,
+        CACERTIFICATE => $oxitest->certhelper_database->cert("alpha-signer-2")->data,
     );
     is $crl_profile->{PROFILE}->{DAYS}, 14;
 } "Create CRL profile";

@@ -135,7 +135,7 @@ sub body {
 
     Log::Log4perl->get_logger('openxpki.deprecated')->error("Template Plugin Certificate.body reading legacy property ($property)!");
 
-    my $hash = $self->get_hash_legacy( $cert_id );
+    $hash = $self->get_hash_legacy( $cert_id );
     return $hash ? $hash->{BODY}->{uc($property)} : undef;
 
 }

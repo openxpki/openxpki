@@ -46,7 +46,7 @@ B<Parameters>
 
 =back
 
-=item attribute - expression for attributes to add, see get_cert_attributes
+=item * attribute - expression for attributes to add, see get_cert_attributes
 
 =back
 
@@ -98,12 +98,13 @@ command "get_cert" => {
 
     if ($format eq 'DER') {
         $cert->{data} =~ m{-----BEGIN[^-]*CERTIFICATE-----(.+)-----END[^-]*CERTIFICATE-----}xms;
-        $cert->{data} =~ s{\s}{}xms;
-        return decode_base64($1);
+        my $base64_cert = $1;
+        $base64_cert =~ s{\s}{}xms;
+        return decode_base64($base64_cert);
     }
 
     if ($format eq 'TXT' || $format eq 'TXTPEM') {
-        my $result = CTX('api')->get_default_token()->command ({
+        my $result = CTX('api2')->get_default_token->command ({
             COMMAND => "convert_cert",
             DATA    => $cert->{data},
             OUT     => $format
@@ -112,7 +113,7 @@ command "get_cert" => {
     };
 
     if ('PKCS7' eq $format) {
-        my $result = CTX('api')->get_default_token()->command({
+        my $result = CTX('api2')->get_default_token->command({
             COMMAND          => 'convert_cert',
             DATA             => [ $cert->{data} ],
             OUT              => 'PEM',
