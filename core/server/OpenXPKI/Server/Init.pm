@@ -480,7 +480,7 @@ sub get_database {
                 print STDERR "Database not ready - retries left $retry - sleep for $sleep\n";
                 sleep $sleep;
             } else {
-                OpenXPKI::Exception->throw (message => "Database not connected");
+                OpenXPKI::Exception->throw ( message => "Database not connected", params => { error => $EVAL_ERROR } );
             }
         }
     } while ($retry--);
