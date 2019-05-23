@@ -9,7 +9,7 @@ my $vergen = '../../tools/vergen';
 
 ###########################################################################
 # determine OpenSSL version
-## first we have to find a working OpenSSL 0.9.8
+## first we have to find a working OpenSSL
 
 # OPENSSL_LIB
 # OPENSSL_INC
@@ -120,10 +120,10 @@ if ($openssl_version_major == 0 &&
 } elsif (not 
     ($openssl_version_flavour =~ m/OpenSSL/i &&
      $openssl_version_major == 1 &&
-     $openssl_version_minor == 0 )) {
+     (($openssl_version_minor == 0) || ($openssl_version_minor == 1) ))) {
          
     print STDERR "\n";
-    print STDERR "ERROR: OpenSSL 0.9.8  or 1.0 is required.\n";
+    print STDERR "ERROR: OpenSSL 0.9.8, 1.0 or 1.1 is required.\n";
     print STDERR "Consider setting OPENSSL_PREFIX correctly.\n\n";
     exit 1;
 }

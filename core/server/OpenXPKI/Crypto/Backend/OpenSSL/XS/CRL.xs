@@ -1,5 +1,5 @@
 MODULE = OpenXPKI		PACKAGE = OpenXPKI::Crypto::Backend::OpenSSL::CRL
-
+  
 OpenXPKI_Crypto_Backend_OpenSSL_CRL
 _new_from_der(sv)
 	SV * sv
@@ -108,7 +108,11 @@ last_update(crl)
 	BIO *out;
     CODE:
 	out = BIO_new(BIO_s_mem());
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 	ASN1_TIME_print(out, X509_CRL_get_lastUpdate(crl));
+#else
+	ASN1_TIME_print(out, X509_CRL_get0_lastUpdate(crl));
+#endif
 	n = BIO_get_mem_data(out, &not);
 	RETVAL = newSVpvn(not, n);
 	BIO_free(out);
@@ -124,7 +128,11 @@ next_update(crl)
 	BIO *out;
     CODE:
 	out = BIO_new(BIO_s_mem());
-	ASN1_TIME_print(out, X509_CRL_get_nextUpdate(crl));
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+        ASN1_TIME_print(out, X509_CRL_get_nextUpdate(crl));
+#else
+	ASN1_TIME_print(out, X509_CRL_get0_nextUpdate(crl));
+#endif
 	n = BIO_get_mem_data(out, &not);
 	RETVAL = newSVpvn(not, n);
 	BIO_free(out);
@@ -167,12 +175,19 @@ SV *
 signature_algorithm(crl)
 	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     PREINIT:
-	BIO *out;
+        BIO *out;
+        const X509_ALGOR *sig_alg;
+        const ASN1_BIT_STRING *signature;
 	char *sig;
 	int n;
     CODE:
 	out = BIO_new(BIO_s_mem());
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 	i2a_ASN1_OBJECT(out, crl->sig_alg->algorithm);
+#else
+        X509_CRL_get0_signature(crl, &signature, &sig_alg);
+	i2a_ASN1_OBJECT(out, sig_alg->algorithm);
+#endif
 	n = BIO_get_mem_data(out, &sig);
 	RETVAL = newSVpvn(sig, n);
 	BIO_free(out);
@@ -184,13 +199,21 @@ signature(crl)
 	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     PREINIT:
 	BIO *out;
+        const X509_ALGOR *sig_alg;
+        const ASN1_BIT_STRING *signature;
 	char *sig;
 	int n,i;
 	unsigned char *s;
     CODE:
 	out = BIO_new(BIO_s_mem());
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 	n=crl->signature->length;
 	s=crl->signature->data;
+#else
+        X509_CRL_get0_signature(crl, &signature, &sig_alg);
+	n=signature->length;
+        s=signature->data;
+#endif
 	for (i=0; i<n; i++)
 	{
 		if ( ((i%18) == 0) && (i!=0) ) BIO_printf(out,"\n");
@@ -207,13 +230,19 @@ extensions(crl)
 	OpenXPKI_Crypto_Backend_OpenSSL_CRL crl
     PREINIT:
 	BIO *out;
+        const STACK_OF(X509_EXTENSION) *exts;
 	char *ext;
 	int n;
     CODE:
 	out = BIO_new(BIO_s_mem());
 	// there is a bug in X509V3_extensions_print
 	// the causes the function to fail if title == NULL and indent == 0
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 	X509V3_extensions_print(out, NULL, crl->crl->extensions, 0, 4);
+#else
+        exts = X509_CRL_get0_extensions(crl);
+	X509V3_extensions_print(out, NULL, exts, 0, 4);
+#endif
 	n = BIO_get_mem_data(out, &ext);
 	RETVAL = newSVpvn(ext, n);
 	BIO_free(out);
@@ -254,12 +283,25 @@ revoked(crl)
 
 	for(i = 0; i < sk_X509_REVOKED_num(rev); i++) {
 		r = sk_X509_REVOKED_value(rev, i);
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 		i2a_ASN1_INTEGER(out,r->serialNumber);
+#else
+		i2a_ASN1_INTEGER(out,X509_REVOKED_get0_serialNumber(r));
+#endif		
 		BIO_printf(out,"\n        ");
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 		ASN1_TIME_print(out,r->revocationDate);
+#else
+		ASN1_TIME_print(out,X509_REVOKED_get0_revocationDate(r));
+#endif
 		BIO_printf(out,"\n");
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 		X509V3_extensions_print(out, NULL,
 			r->extensions, 0, 8);
+#else
+		X509V3_extensions_print(out, NULL,
+			X509_REVOKED_get0_extensions(r), 0, 8);
+#endif
 	}
 	n = BIO_get_mem_data(out, &ext);
 	RETVAL = newSVpvn(ext, n);

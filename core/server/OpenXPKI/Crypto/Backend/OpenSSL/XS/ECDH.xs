@@ -107,7 +107,7 @@ CODE:
     long r=0, len=0;
     unsigned char outkey[keySize] ;
     unsigned char *outbuf=NULL;
-    EC_GROUP *group = NULL;
+    const EC_GROUP *group = NULL;
     EC_KEY 	*ec_pubkey = NULL , * eckey = NULL , *testkey =NULL ;
     char *c_ec_pub_key =NULL;
     char *c_ec_key =NULL;
@@ -184,7 +184,8 @@ CODE:
         sv_setpvn(out_ec_key,c_ec_key,len);
 
 	out_pub=BIO_new(BIO_s_mem());
-	r = PEM_write_bio_EC_PUBKEY(out_pub, eckey,NULL,NULL, 0,NULL, NULL);
+// r = PEM_write_bio_EC_PUBKEY(out_pub, eckey,NULL,NULL, 0,NULL, NULL);
+	r = PEM_write_bio_EC_PUBKEY(out_pub, eckey);
 	len = BIO_get_mem_data(out_pub,NULL);
 	c_ec_pub_key = (char *) malloc (len+1);
 	r = BIO_read(out_pub, c_ec_pub_key, len);
