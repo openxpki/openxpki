@@ -21,8 +21,11 @@ state:
         autorun: 1
         action:
           - global_set_error_policy_invalid_key_param > FAILURE ? !global_is_valid_key
-          - set_mode_initial > START_INITIAL ? !global_is_signed_request global_is_valid_key
-          - global_check_authorized_signer > SIGNED_REQUEST ? global_is_signed_request global_is_valid_key
+          - global_set_error_invalid_subject > FAILURE ? global_is_valid_key !global_is_subject_valid
+          - set_mode_initial > START_INITIAL ? !global_is_signed_request global_is_valid_key global_is_subject_valid
+          - global_check_authorized_signer > SIGNED_REQUEST ? global_is_signed_request global_is_valid_key global_is_subject_valid
+
+
 
     # Determine the type of request
     # inital anonymous = self signed (key and subject)

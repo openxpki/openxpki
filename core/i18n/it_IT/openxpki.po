@@ -530,6 +530,10 @@ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_REVOKED"
 msgstr "Errore sconosciuto"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SUBJECT_INVALID"
+msgstr "Errore sconosciuto"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION"
 msgstr "Nome Applicazione"
 
@@ -1445,7 +1449,11 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_NOT_DEFINED"
 msgstr "Questo campo non è definito nelle impostazioni del profilo."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_VALIDATOR_COMMON_NAME_TO_LONG"
+msgid "I18N_OPENXPKI_UI_VALIDATOR_COMMON_NAME_EMPTY"
+msgstr "Fallita convalida dell’espressione data"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_COMMON_NAME_TOO_LONG"
 msgstr "Fallita convalida dell’espressione data"
 
 #, fuzzy

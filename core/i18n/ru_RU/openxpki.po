@@ -519,6 +519,10 @@ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_REVOKED"
 msgstr "Отменить утверждение заявки на отзыв сертификата (CRR)"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SUBJECT_INVALID"
+msgstr "Отменить утверждение заявки на отзыв сертификата (CRR)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION"
 msgstr "Имя"
 
@@ -1717,7 +1721,11 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_NOT_DEFINED"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_VALIDATOR_COMMON_NAME_TO_LONG"
+msgid "I18N_OPENXPKI_UI_VALIDATOR_COMMON_NAME_EMPTY"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_COMMON_NAME_TOO_LONG"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy

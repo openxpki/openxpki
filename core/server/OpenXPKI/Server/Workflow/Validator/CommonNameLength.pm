@@ -44,8 +44,17 @@ sub _validate {
     my $dn = new OpenXPKI::DN( $cert_subject );
     my %hash = $dn->get_hashed_content();
 
+    if (!defined $hash{CN}) {
+        ##! 16: 'No CN in return structure!'
+        return 1;
+    }
+
     if (length($hash{CN}[0]) > 64) {
-        validation_error("I18N_OPENXPKI_UI_VALIDATOR_COMMON_NAME_TO_LONG");
+        validation_error("I18N_OPENXPKI_UI_VALIDATOR_COMMON_NAME_TOO_LONG");
+    }
+
+    if (!$hash{CN}[0]) {
+        validation_error("I18N_OPENXPKI_UI_VALIDATOR_COMMON_NAME_EMPTY");
     }
 
     return 1;
@@ -61,9 +70,9 @@ OpenXPKI::Server::Workflow::Validator::CommonNameLength
 
 =head1 Description
 
-Check if the common name would be longer than 64 chars based on the given
-profile and subject information. Internally renders the subject from the
-information available and checks the length of the CN element.
+Check if the common name would be empty or longer than 64 chars based on
+the given profile and subject information. Internally renders the subject
+from the information available and checks the length of the CN element.
 
 =head1 Configuration
 
