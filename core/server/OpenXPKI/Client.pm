@@ -64,6 +64,12 @@ has session_id => (
     default => '',
 );
 
+has api_version => (
+    is      => 'ro',
+    isa     => 'Int',
+    default => 1
+);
+
 has _channel => (
     is       => 'rw',
     lazy     => 1,
@@ -100,7 +106,7 @@ around BUILDARGS => sub {
     # old call format using hash
     if ( @_ == 1 && ref $_[0] eq 'HASH' ) {
         my %params = %{$_[0]};
-        foreach my $key (qw(TIMEOUT SOCKETFILE TRANSPORT SERIALIZATION SERVICE)) {
+        foreach my $key (qw(TIMEOUT SOCKETFILE TRANSPORT SERIALIZATION SERVICE  API_VERSION)) {
             #warn $params->{$key};
             if ($params{$key}) {
                 $params{lc($key)} = $params{$key};
@@ -257,6 +263,10 @@ sub send_receive_service_msg {
     my $cmd   = shift;
     my $arg   = shift;
 
+    if (!$arg->{API}) {
+        $arg->{API} = $self->api_version();
+    }
+
     ##! 1: "send_receive_service_msg"
     ##! 2: $cmd
     ##! 4: Dumper $arg
@@ -279,7 +289,6 @@ sub send_receive_command_msg {
         {
             COMMAND     => $cmd,
             PARAMS      => $arg,
-            API => 1
         }
     );
 
