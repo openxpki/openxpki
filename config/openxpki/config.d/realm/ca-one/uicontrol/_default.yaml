@@ -38,6 +38,7 @@ certsearch:
          - label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENTITY_LABEL
            key: meta_entity
            operator: inlike
+           description: I18N_OPENXPKI_UI_SEARCH_ENTITY_HINT
 
 certaction:
    - label: I18N_OPENXPKI_UI_DOWNLOAD_PRIVATE_KEY

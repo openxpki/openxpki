@@ -93,6 +93,10 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_ISSUER"
 msgstr "Numero di serie del certificato"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_ISSUER_HINT"
+msgstr "Numero di serie del certificato"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_METADATA"
 msgstr "non dopo il"
 
@@ -112,6 +116,10 @@ msgstr "non prima del"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE"
 msgstr "Numero di serie del certificato"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_HINT"
+msgstr "Numero di serie del certificato"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_RELATED_WORKFLOW_LABEL"
 msgstr "Workflow correlati"
 
@@ -122,6 +130,10 @@ msgstr "Relazioni del certificato"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SAN"
 msgstr "Numero di serie del certificato"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SAN_HINT"
+msgstr "Numero di serie del certificato"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_DESC"
 msgstr ""
 "Modulo per la ricerca dei certificati. Il campo SAN richiede che il tipo SAN "
@@ -129,6 +141,12 @@ msgstr ""
 "Valido/Scaduto presuppongono che il certificato sia nello stato Emesso: "
 "viene eseguito un controllo relativo alla finestra di validità "
 "Non_prima_del / Non_dopo_il."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_FIELD_HINT_LIST"
+msgstr ""
+"Certificati corrispondenti alla tua ricerca, clicca su una riga per "
+"visualizzare informazioni dettagliate sul certificato corrispondente."
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_LABEL"
 msgstr "Ricerca Certificato"
@@ -148,12 +166,24 @@ msgstr "Numero di serie del certificato"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_STATUS"
 msgstr "non dopo il"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_STATUS_HINT"
+msgstr "non dopo il"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
+msgstr "Soggetto"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT_HINT"
 msgstr "Soggetto"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY"
 msgstr "Numero di serie del certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_HINT"
+msgstr "Identificatore del certificato"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_GT"
@@ -1204,6 +1234,10 @@ msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
 msgstr "Soggetto Certificato"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_ENTITY_HINT"
+msgstr "Richiesta"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_EXPORT_RESULT"
 msgstr "Richiesta"
 
@@ -1227,8 +1261,16 @@ msgid "I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM"
 msgstr "Stato del Certificato"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_HINT"
+msgstr "Descrizione Indirizzo Email"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_LABEL"
 msgstr "Descrizione Indirizzo Email"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_HINT"
+msgstr "Creatore"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL"
@@ -3801,10 +3843,6 @@ msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_LABEL"
 #~ msgstr "Scarica la chiave privata del certificato"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INTRO"
-#~ msgstr "Identificatore del certificato"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CLIENT_GETAUTHCODE_USER_NOT_AUTH_PERS"

@@ -279,14 +279,17 @@ certsearch:
            key: meta_requestor
            pattern: '*%s*'
            operator: inlike
+           description: I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_HINT
 
          - label: I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_LABEL
            key: meta_email
            operator: in
+           description: I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_HINT
 
          - label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENTITY_LABEL
            key: meta_entity
            operator: inlike
+           description: I18N_OPENXPKI_UI_SEARCH_ENTITY_HINT
 
 
 certaction:

@@ -99,6 +99,10 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_ISSUER"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_ISSUER_HINT"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_METADATA"
 msgstr "Идентификатор сертификата"
 
@@ -123,6 +127,10 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_HINT"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_RELATED_WORKFLOW_LABEL"
 msgstr "Родительский технологический процесс"
 
@@ -135,7 +143,15 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_SAN"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SAN_HINT"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_DESC"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_FIELD_HINT_LIST"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
 #, fuzzy
@@ -159,12 +175,24 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_STATUS"
 msgstr "Идентификатор сертификата"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_STATUS_HINT"
+msgstr "Идентификатор сертификата"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT_HINT"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_HINT"
+msgstr "Идентификатор сертификата"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_GT"
@@ -1446,6 +1474,10 @@ msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
 msgstr "Субъект"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_ENTITY_HINT"
+msgstr "Комментарий"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_EXPORT_RESULT"
 msgstr "Комментарий"
 
@@ -1466,12 +1498,24 @@ msgid "I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM"
 msgstr "Статус"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_HINT"
+msgstr ""
+"Для использования данного профиля сертификата достаточно ввести Ваше имя, "
+"имя Вашей учетной записи и адрес электронной почты. Это простейший профиль "
+"пользователя, который следует использовать, если нет особых требований к "
+"сертифкату. В противном случае следует использовать расширенный профиль."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_LABEL"
 msgstr ""
 "Для использования данного профиля сертификата достаточно ввести Ваше имя, "
 "имя Вашей учетной записи и адрес электронной почты. Это простейший профиль "
 "пользователя, который следует использовать, если нет особых требований к "
 "сертифкату. В противном случае следует использовать расширенный профиль."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_HINT"
+msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL"
@@ -8630,10 +8674,6 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_LABEL"
 #~ msgstr "Загрузка сертификата в форматах PEM или CRT"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INTRO"
-#~ msgstr "Идентификатор сертификата"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CLIENT_GETAUTHCODE_USER_NOT_AUTH_PERS"

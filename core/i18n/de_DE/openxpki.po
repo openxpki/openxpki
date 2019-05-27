@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2019-05-07 09:28+0200\n"
+"PO-Revision-Date: 2019-05-27 10:29+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -80,6 +80,9 @@ msgstr "Certificate Identifier"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_ISSUER"
 msgstr "Issuer"
 
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_ISSUER_HINT"
+msgstr "Zertifikate die mit diesem Aussteller-Zertifikat unterschrieben wurden"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_METADATA"
 msgstr "Metadata"
 
@@ -98,6 +101,9 @@ msgstr "not before"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE"
 msgstr "Profile"
 
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_HINT"
+msgstr "Zertifikate die basierend auf diesem Profil erstellt wurden"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_RELATED_WORKFLOW_LABEL"
 msgstr "Related Workflows"
 
@@ -107,11 +113,19 @@ msgstr "Certificate Relations"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SAN"
 msgstr "Subject Alt. Name"
 
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SAN_HINT"
+msgstr ""
+"Findet SAN Einträge die dem kompletten Suchbegriff entsprechen, zur "
+"Teilsuche kann  '*' kann als Platzhalter verwendet werden. Um bestimmte SAN-"
+"Typen zu finden kann dieser als Präfix angegeben werden, z.B. IP:%"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_DESC"
 msgstr ""
-"Search for certificates here. The SAN requires the type of san to be "
-"prefixed with a colon, e.g. DNS:www2.openxpki.org.  The states VALID/EXPIRED "
-"are ISSUED plus a check if inside/outside their validity window."
+"Nutzen Sie diese Suchmaske um Zertifikate die von dieser CA ausgestellt "
+"wurden mit bestimmten Eigenschaften zu finden."
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_FIELD_HINT_LIST"
+msgstr "Erläuterungen zu den Suchfiltern:"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_LABEL"
 msgstr "Certificate Search"
@@ -130,11 +144,25 @@ msgstr "Certificate Serial"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_STATUS"
 msgstr "Status"
 
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_STATUS_HINT"
+msgstr ""
+"Kombiniert den Revozierungsstatus mit dem Gültigkeitsdatum, gültig/"
+"abgelaufen entsprechen dem Status Ausgestellt mit einer zusätzlichen Prüfung "
+"des Gültigkeitszeitraumes."
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
 msgstr "Subject"
 
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT_HINT"
+msgstr "Sucht den gegebenen Begriff im 'Distinguished Name' des Zertifikates."
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY"
 msgstr "Validity"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_HINT"
+msgstr ""
+"Wird auf den Feldern gültig ab/bis bzw. revoziert um angewandt. Mehrere "
+"Bedingungen müssen gemeinsam erfüllt sein."
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_GT"
 msgstr "invalid after"
@@ -1035,6 +1063,11 @@ msgstr "Search query is empty!"
 msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
 msgstr "Certificate Subject"
 
+msgid "I18N_OPENXPKI_UI_SEARCH_ENTITY_HINT"
+msgstr ""
+"Suche nach Entity, üblicherweise der im common Name verwendete FQDN. Exakter "
+"Treffer, Platzhalter sind erlaubt."
+
 msgid "I18N_OPENXPKI_UI_SEARCH_EXPORT_RESULT"
 msgstr "Export Result"
 
@@ -1050,8 +1083,16 @@ msgstr "Refresh Result"
 msgid "I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM"
 msgstr "Reload Search Form"
 
+msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_HINT"
+msgstr ""
+"Suche nach der Mailadresse des Antragstellers. Exakter Treffer, Platzhalter "
+"sind erlaubt."
+
 msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_LABEL"
 msgstr "Requestor Email"
+
+msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_HINT"
+msgstr "Suche nach dem Namen des Antragstellers."
 
 msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL"
 msgstr "Requestor"

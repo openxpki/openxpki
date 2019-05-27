@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 0.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2019-05-07 09:27+0200\n"
+"PO-Revision-Date: 2019-05-27 10:50+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -80,6 +80,9 @@ msgstr "Certificate Identifier"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_ISSUER"
 msgstr "Issuer"
 
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_ISSUER_HINT"
+msgstr "Show only certificates signed by this issuer certificate"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_METADATA"
 msgstr "Metadata"
 
@@ -98,6 +101,9 @@ msgstr "not before"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE"
 msgstr "Profile"
 
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_HINT"
+msgstr "Show only certificates based on this profile"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_RELATED_WORKFLOW_LABEL"
 msgstr "Related Workflows"
 
@@ -107,11 +113,20 @@ msgstr "Certificate Relations"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SAN"
 msgstr "Subject Alt. Name"
 
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SAN_HINT"
+msgstr ""
+"Searches on all SAN items for an <b>EXACT</b> match. Substring match can be "
+"executed by adding '*' or '_' as wildcard. To look for particular SAN Types, "
+"set the expected type as prefix with a colon, e.g. 'IP:10.%' to find all SAN "
+"items that are IP addresses in the 10.x subnet."
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_DESC"
 msgstr ""
-"Search for certificates here. The SAN requires the type of san to be "
-"prefixed with a colon, e.g. DNS:www2.openxpki.org.  The states VALID/EXPIRED "
-"are ISSUED plus a check if inside/outside their validity window."
+"Search for certificates issued by this CA based on different filters, see "
+"below for a detailed description."
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_FIELD_HINT_LIST"
+msgstr "Explanation on the search filters:"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_LABEL"
 msgstr "Certificate Search"
@@ -130,11 +145,27 @@ msgstr "Certificate Serial"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_STATUS"
 msgstr "Status"
 
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_STATUS_HINT"
+msgstr ""
+"This combines revocation and validity information, 'valid' and 'expired' is "
+"the same as 'issued' plus validity based on current timestamp."
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
 msgstr "Subject"
 
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT_HINT"
+msgstr ""
+"Given string must match as a substring on the full distinguished name. To "
+"look for an exact match just provide the full component with the trailing "
+"separator, e.g. 'CN=www.openxpki.org,'."
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY"
 msgstr "Validity"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_HINT"
+msgstr ""
+"Filter is applied on the  notbefore/notafter and revoked_at columns, if "
+"multiple filters are given all must match."
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INVALID_GT"
 msgstr "invalid after"
@@ -1030,6 +1061,11 @@ msgstr "Search query is empty!"
 msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
 msgstr "Certificate Subject"
 
+msgid "I18N_OPENXPKI_UI_SEARCH_ENTITY_HINT"
+msgstr ""
+"Filter on the name of the entity (usually the FQDN used in the common name). "
+"Exact match, wildcards are allowed."
+
 msgid "I18N_OPENXPKI_UI_SEARCH_EXPORT_RESULT"
 msgstr "Export Result"
 
@@ -1045,8 +1081,16 @@ msgstr "Refresh Result"
 msgid "I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM"
 msgstr "Reload Search Form"
 
+msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_HINT"
+msgstr ""
+"Filter on the email address used in the request. Exact match, wildcards are "
+"allowed."
+
 msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_LABEL"
 msgstr "Requestor Email"
+
+msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_HINT"
+msgstr "Filter on the name of the requestor. Query is used as substring."
 
 msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL"
 msgstr "Requestor"
@@ -3403,9 +3447,6 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_LABEL"
 #~ msgstr "Download private key for certificate"
-
-#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_INTRO"
-#~ msgstr "Please select property and date"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CLIENT_GETAUTHCODE_USER_NOT_AUTH_PERS"

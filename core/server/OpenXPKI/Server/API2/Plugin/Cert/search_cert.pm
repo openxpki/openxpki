@@ -102,6 +102,9 @@ L<OpenXPKI::Server::API2::Types/CertStatus>)
 =item * C<cert_attributes> I<HashRef> - key is attribute name, value is passed
 "as is" as where statement on value, see documentation of SQL::Abstract.
 
+Note: If an attribute causes multiple matches on a single certificate only
+a single item is returned unless the multivalued columns is in return_attributes.
+
 Legacy: I<ArrayRef> - list of condition I<HashRefs> to search
 in attributes (KEY, VALUE, OPERATOR). Operator can be "EQUAL", "LIKE" or
 "BETWEEN".
@@ -111,7 +114,8 @@ in attributes (KEY, VALUE, OPERATOR). Operator can be "EQUAL", "LIKE" or
 =item * C<start> I<Int> - result paging: only return entries starting at given
 index (can only be used if C<limit> was specified)
 
-=item * C<order> I<Str> - order results by this table column (descending). Default: "notbefore" (+req_key to properly work with duplicates)
+=item * C<order> I<Str> - order results by this table column (descending).
+Default: "notbefore" (+req_key to properly work with duplicates)
 
 =item * C<reverse> I<Bool> - order results ascending
 
@@ -121,7 +125,7 @@ using the attribute name as key.
 
 Note: If the attribute is multivalued or you use an attribute query that
 causes multiple result lines for a single certificate you will get more
-than one line for the same certificate!
+than one line for the same certificate for all returned attributes.
 
 =back
 
@@ -371,6 +375,8 @@ sub _make_db_query {
     }
 
     my $ii = 0;
+    # Hide columns that are not returned, see #700
+    my $need_group = 0;
     # handle certificate attributes (such as SANs)
     if ( $po->has_cert_attributes ) {
         # we need to join over the certificate_attributes table
@@ -415,14 +421,21 @@ sub _make_db_query {
                 $where->{ "$table_alias.attribute_value" } = $po->cert_attributes->{$key};
 
                 # if the attribute should be returned we add the table name used
-                $return_attrib->{$key} = $table_alias if (defined $return_attrib->{$key});
+                if (defined $return_attrib->{$key}) {
+                    $return_attrib->{$key} = $table_alias;
+                # if not, we need to add a group statement to suppress
+                # as simple scalar query can never be multivalued we skip it
+                } elsif (ref $po->cert_attributes->{$key}) {
+                    ##! 32: 'Need group on ' .$key
+                    $need_group = 1;
+                }
                 $ii++;
-
             }
         }
     }
 
     ##! 64: 'return_attrib ' . Dumper $return_attrib
+    my @group_by = ('certificate.identifier');
     foreach my $key (keys %{$return_attrib}) {
 
         # if the attribute was used in the query, it is already joined
@@ -435,8 +448,12 @@ sub _make_db_query {
             $ii++;
         }
         push @{$params->{columns}}, "$table_alias.attribute_value as $key";
+        push @group_by, $key if ($need_group);
     }
 
+    if ($need_group) {
+        $params->{group_by} = \@group_by;
+    }
 
     if ( $po->has_profile ) {
         push @join_spec, qw( certificate.req_key=req_key csr );

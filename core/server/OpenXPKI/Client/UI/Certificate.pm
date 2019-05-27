@@ -123,10 +123,14 @@ sub init_search {
    );
 
     my $attributes = $self->_client->session()->param('certsearch')->{default}->{attributes};
+    my @meta_description;
     if (defined $attributes && (ref $attributes eq 'ARRAY')) {
         my @attrib;
         foreach my $item (@{$attributes}) {
             push @attrib, { value => $item->{key}, label=> $item->{label} };
+            if ($item->{description}) {
+                push @meta_description, { label=> $item->{label}, value => $item->{description}, format => 'raw' };
+            }
         }
         push @fields, {
             name => 'attributes',
@@ -163,6 +167,23 @@ sub init_search {
            ]
         }},
     );
+
+    $self->add_section({
+        type => 'keyvalue',
+        content => {
+            label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_FIELD_HINT_LIST',
+            description => '',
+            data => [
+              { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', value => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT_HINT', format => 'raw' },
+              { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SAN', value => 'I18N_OPENXPKI_UI_CERTIFICATE_SAN_HINT', format => 'raw' },
+              { label => 'I18N_OPENXPKI_UI_CERTIFICATE_STATUS', value => 'I18N_OPENXPKI_UI_CERTIFICATE_STATUS_HINT', format => 'raw' },
+              { label => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE', value => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_HINT', format => 'raw' },
+              { label => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER',  value => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER_HINT', format => 'raw' },
+              { label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY', value => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_HINT', format => 'raw' },
+              @meta_description
+            ]
+        }
+    });
 
     return $self;
 }
@@ -1167,7 +1188,10 @@ sub action_search {
     # Add san search to attributes
     if (my $val = $self->param('san')) {
         $input->{'san'} = $val;
-        $attr->{subject_alt_name} = { -like => '%'.$val.'%' };
+        # SAN type is prefixed with a ":", do not expand query if a
+        # user already added the prefix
+        $val = "%:$val" unless ($val =~ m{:});
+        $attr->{subject_alt_name} = { -like => $val };
     }
 
     if ($attr) {
