@@ -18,6 +18,8 @@ The config uses plain ini format, a default is deployed by the package::
   log_config = /etc/openxpki/rpc/log.conf
   log_facility = client.rpc
   socket = /var/openxpki/openxpki.socket
+  locale_directory: /usr/share/locale
+  default_language: en_US
 
   [auth]
   stack = _System
@@ -25,6 +27,9 @@ The config uses plain ini format, a default is deployed by the package::
   [input]
   allow_raw_post = 1
   parse_depth = 5
+
+  [output]
+  use_http_status_codes=0
 
 The global/auth parameters are described in the common wrapper documentation
 (:ref:`subsystem-wrapper`). Config path extension and TLS Authentication is
@@ -119,25 +124,30 @@ On error, the content returned is::
 
     { error: { code: 1, message: "Verbose error", data: { id, pid, state } } }
 
-**We currently always send 200 OK with a JSON error structure**
+Verbose error might be a readable error message or a I18N... translatable tag.
+If you set default_language in the wrapper configuration the I18N tags are
+translated.
 
-The following HTTP Response Codes are (to be) supported:
+Response
+========
 
-* **200 OK** - Request was successful
+By default, the HTTP Status code is always "200 ok" with a numeric error
+code set in the return structure. The error codes consist of five digits,
+the first three digits are derived from the HTTP status codes followed by
+two digits for unambiguousness.
 
-* **400 Bad Request** - Returned when the RPC method or required parameters
-  are missing.
+To let the wrapper send the error code on HTTP layer, you need to set
 
-* **401 Unauthorized** - No or invalid authentication details were provided
+  [output]
+  use_http_status_codes=1
 
-* **403 Forbidden** - Authentication succeeded, but the authenticated user does
-  not have access to the resource
+in the wrapper configuration. This will return 4xx and 5xx status codes
+together with the above mentioned error structures as body.
 
-* **404 Not Found** - A non-existent resource was requested
+For details on the supported error codes see the documentation of the
+rpc.fcgi wrapper script.
 
-* **500 Internal Server Error** - Returned when there is an error creating an
-  instance of the client object or a new workflow, or the workflow terminates
-  in an unexpected state.
+Note: The OpenAPI Spec does not yet return the HTTP status codes.
 
 Workflow Pickup
 ===============

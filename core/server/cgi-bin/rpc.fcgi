@@ -14,6 +14,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Client::Simple;
 use OpenXPKI::Client::Config;
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::i18n qw( i18nGettext );
 
 use Log::Log4perl;
 use Log::Log4perl::MDC;
@@ -24,12 +25,21 @@ my $log = $config->logger();
 $log->info("RPC handler initialized");
 
 my $json = new JSON();
+my $use_status_codes = 0;
 
 sub send_output {
     my ($cgi, $result, $canonical_keys) = @_;
 
+    my $status = '200 OK';
+
+    $result->{error}->{message} = i18nGettext($result->{error}->{message}) if ($result->{error}->{message});
+    if ($result->{error} && $use_status_codes) {
+        my ($error) = split(/[:\n]/, $result->{error}->{message});
+        $status = sprintf ("%03d %s", ($result->{error}->{code}/100), $error);
+    }
+
     if ($ENV{'HTTP_ACCEPT'} && $ENV{'HTTP_ACCEPT'} eq 'text/plain') {
-       print $cgi->header( -type => 'text/plain', charset => 'utf8' );
+       print $cgi->header( -type => 'text/plain', charset => 'utf8', -status => $status );
        if ($result->{error}) {
            print 'error.code=' . $result->{error}->{code}."\n";
            print 'error.message=' . $result->{error}->{message}."\n";
@@ -41,7 +51,7 @@ sub send_output {
 
     } else {
         # prepare response header
-        print $cgi->header( -type => 'application/json', charset => 'utf8' );
+        print $cgi->header( -type => 'application/json', charset => 'utf8', -status => $status );
         $json->max_depth(20);
         $json->canonical(1) if $canonical_keys;
         print $json->encode( $result );
@@ -62,7 +72,7 @@ sub _create_client {
         # TODO: Return as "500 Internal Server Error"?
         $log->error("Could not instantiate client object");
         send_output( $cgi,  { error => {
-            code => 42,
+            code => 50001,
             message=> "Could not instantiate client object",
             data => { pid => $$ }
         }});
@@ -170,7 +180,7 @@ sub _openapi_spec {
     if (my $eval_err = $EVAL_ERROR) {
         # TODO: Return as "500 Internal Server Error"?
         $log->error("Unable to query OpenAPI specification from OpenXPKI server: $eval_err");
-        send_output($cgi, { error => { code => 42, message => $eval_err, data => { pid => $$ } } });
+        send_output($cgi, { error => { code => 50004, message => $eval_err, data => { pid => $$ } } });
         return;
     }
 
@@ -185,6 +195,8 @@ while (my $cgi = CGI::Fast->new()) {
 
     my $method = $cgi->param('method');
 
+    $use_status_codes = $conf->{output} && $conf->{output}->{use_http_status_codes};
+
     # check for request parameters in JSON data (HTTP body)
     my $postdata;
     if ($conf->{input}->{allow_raw_post} && $cgi->param('POSTDATA')) {
@@ -197,7 +209,7 @@ while (my $cgi = CGI::Fast->new()) {
         if (!$postdata || $EVAL_ERROR) {
             $log->error("RPC decoding postdata failed: " . $EVAL_ERROR);
             send_output( $cgi,  { error => {
-                code => 42,
+                code => 40002,
                 message=> "RPC decoding postdata failed",
                 data => { pid => $$ }
             }});
@@ -214,7 +226,7 @@ while (my $cgi = CGI::Fast->new()) {
         # TODO: Return as "400 Bad Request"?
         $log->error("RPC no method set in request");
         send_output( $cgi,  { error => {
-            code => 42,
+            code => 40001,
             message=> "RPC no method set in request",
             data => { pid => $$ }
         }});
@@ -241,8 +253,8 @@ while (my $cgi = CGI::Fast->new()) {
         # TODO: Return as "400 Bad Request"?
         $log->error("RPC no workflow_type set for requested method $method");
         send_output( $cgi,  { error => {
-            code => 42,
-            message=> "RPC no workflow_type set for requested method $method",
+            code => 40401,
+            message=> "RPC method $method not found or no workflow_type set",
             data => { pid => $$ }
         }});
         next;
@@ -374,33 +386,52 @@ while (my $cgi = CGI::Fast->new()) {
 
     my $res;
     if ( my $exc = OpenXPKI::Exception->caught() ) {
+
         # TODO: Return as "500 Internal Server Error"?
         $log->error("Unable to instantiate workflow: ". $exc->message );
-        $res = { error => { code => 42, message => $exc->message, data => { pid => $$ } } };
+        $res = { error => { code => 50002, message => $exc->message, data => { pid => $$ } } };
     }
     elsif (my $eval_err = $EVAL_ERROR) {
 
         # TODO: Return as "500 Internal Server Error"?
-        my $error = $client->last_error();
-        if ($error) {
+
+        my $reply = $client->last_reply();
+        $log->error(Dumper $reply);
+
+        # Validation error
+        my $error = $client->last_error() || $eval_err;
+
+        # TODO this needs to be reworked
+        if ($reply->{LIST}->[0]->{LABEL}
+            eq 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATION_FAILED_ON_EXECUTE' &&
+            $reply->{LIST}->[0]->{PARAMS}->{__FIELDS__}) {
+            $res = { error => {
+                code => 40003,
+                message => $error,
+                fields => $reply->{LIST}->[0]->{PARAMS}->{__FIELDS__},
+                data => { pid => $$ }
+            } };
+
+        } else {
             $log->error("Unable to create workflow: ". $error );
-            if ($error !~ /I18N_OPENXPKI_UI_/) {
+            if (!$error || $error !~ /I18N_OPENXPKI_UI_/) {
                 $error = 'uncaught error';
             }
-        } else {
-            $log->error("Unable to create workflow: ". $eval_err );
-            $error = 'uncaught error';
+            $res = { error => { code => 50002, message => $error, data => { pid => $$ } } };
         }
-        $res = { error => { code => 42, message => $error, data => { pid => $$ } } };
+
     } elsif (( $workflow->{'proc_state'} ne 'finished' && !$workflow->{id} ) || $workflow->{'proc_state'} eq 'exception') {
+
         # TODO: Return as "500 Internal Server Error"?
         $log->error("workflow terminated in unexpected state" );
-        $res = { error => { code => 42, message => 'workflow terminated in unexpected state',
+        $res = { error => { code => 50003, message => 'workflow terminated in unexpected state',
             data => { pid => $$, id => $workflow->{id}, 'state' => $workflow->{'state'} } } };
+
     } else {
-        $log->info(sprintf("RPC request was processed properly (Workflow: %01d, State: %s",
-            $workflow->{id}, $workflow->{state}) );
-        $res = { result => { id => $workflow->{id}, 'state' => $workflow->{'state'},  pid => $$ }};
+
+        $log->info(sprintf("RPC request was processed properly (Workflow: %01d, State: %s (%s)",
+            $workflow->{id}, $workflow->{state}, $workflow->{'proc_state'}) );
+        $res = { result => { id => $workflow->{id}, 'state' => $workflow->{'state'}, 'proc_state' => $workflow->{'proc_state'}, pid => $$ }};
 
         # Map context parameters to the response if requested
         if ($conf->{$method}->{output}) {
@@ -534,8 +565,50 @@ error, the return structure looks different:
      "message":"I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_CREATE_PERMISSION_DENIED"
  }}
 
- The message gives a verbose description on what happend, the data node will
- contain the workflow id only in case it was started.
+The message gives a verbose description on what happend, the data node will
+contain the workflow id only in case it was started.
+
+Error code in the range 4xx indicate a client error, 5xx a problem on the
+server (which might also be related to on inappropriate input data).
+
+=over
+
+=item 40001 - no method in request
+
+No method name could be found in the request.
+
+=item 40002 - decoding of POST data failed
+
+Data send as JSON POST could not be parsed. The reason is either malformed
+JSON structure or the data has nested structures exceeding the parse_depth.
+
+=item 40003 - wrong input values
+
+The given parameters do not pass the input validation rules of the workflow.
+You will find the verbose error in I<message> and the list of affected fields
+in the I<fields> key.
+
+=item 40401 - Invalid method / setup incomplete
+
+The method name given is either not defined or has no workflow defined
+
+=item 50001 - Error creating RPC client
+
+The webserver was unable to setup the RPC client side. Details can be found
+in the error message. Common reason is that the server is too busy or not
+running and unable to handle the request at all.
+
+=item 50002 - server exception
+
+The server ran into an exception while handling the request, details might
+be found in the error message.
+
+=item 50003 - workflow error
+
+The request was handled by the server properly but the workflow has
+encountered an unexpected state.
+
+=back
 
 =head2 TLS Authentication
 

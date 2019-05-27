@@ -64,6 +64,7 @@ use File::Spec;
 use OpenXPKI::Log4perl;
 use Data::Dumper;
 use Config::Std;
+use OpenXPKI::i18n qw( i18nGettext set_language set_locale_prefix);
 
 has 'service' => (
     required => 1,
@@ -205,6 +206,14 @@ sub __init_default {
 
     # cast to an unblessed hash
     my %config = %{$config};
+
+    if ($config{global}{locale_directory}) {
+        set_locale_prefix($config{global}{locale_directory});
+    }
+    if ($config{global}{default_language}) {
+        set_language($config{global}{default_language});
+    }
+
     return \%config;
 
 }
