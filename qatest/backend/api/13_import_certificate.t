@@ -31,7 +31,7 @@ Positional parameters:
 
 =over
 
-=item * B<$test_cert> - Container with certificate data (I<OpenXPKI::Test::CertHelper::Database::PEM>, required)
+=item * B<$test_cert> - Container with certificate data (I<OpenXPKI::Test::CertHelper::Database::Cert>, required)
 
 =item * B<%args> - Arguments to pass to "import_certificate" (I<Hash>, optional)
 
@@ -60,7 +60,7 @@ Positional parameters:
 
 =over
 
-=item * B<$test_cert> - Container with certificate data (I<OpenXPKI::Test::CertHelper::Database::PEM>, required)
+=item * B<$test_cert> - Container with certificate data (I<OpenXPKI::Test::CertHelper::Database::Cert>, required)
 
 =item * B<$error> - Expected error string returned by API (I<Str>, required)
 
@@ -88,8 +88,8 @@ my $oxitest = OpenXPKI::Test->new(
     #log_level => 'trace',
 );
 my $dbdata = $oxitest->certhelper_database;
-my $cert1_pem = $dbdata->cert("alpha_root_2")->data;
-my $cert2_pem = $dbdata->cert("alpha_signer_2")->data;
+my $cert1_pem = $dbdata->cert("alpha-root-2")->data;
+my $cert2_pem = $dbdata->cert("alpha-signer-2")->data;
 
 #
 # Tests
@@ -121,15 +121,15 @@ lives_and {
 
 $oxitest->delete_testcerts;
 
-import_failsok($oxitest, $dbdata->cert("gamma_bob_1"), qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER/);
-import_ok     ($oxitest, $dbdata->cert("gamma_bob_1"), FORCE_NOCHAIN => 1);
+import_failsok($oxitest, $dbdata->cert("gamma-bob-1"), qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER/);
+import_ok     ($oxitest, $dbdata->cert("gamma-bob-1"), FORCE_NOCHAIN => 1);
 
-import_ok     ($oxitest, $dbdata->cert("alpha_root_2"));
-import_ok     ($oxitest, $dbdata->cert("alpha_signer_2"));
-import_ok     ($oxitest, $dbdata->cert("alpha_root_1"));
-import_failsok($oxitest, $dbdata->cert("alpha_signer_1"), qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN/);
-import_ok     ($oxitest, $dbdata->cert("alpha_signer_1"), FORCE_ISSUER=>1);
-import_ok     ($oxitest, $dbdata->cert("alpha_alice_1"),  FORCE_NOVERIFY=>1);
+import_ok     ($oxitest, $dbdata->cert("alpha-root-2"));
+import_ok     ($oxitest, $dbdata->cert("alpha-signer-2"));
+import_ok     ($oxitest, $dbdata->cert("alpha-root-1"));
+import_failsok($oxitest, $dbdata->cert("alpha-signer-1"), qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN/);
+import_ok     ($oxitest, $dbdata->cert("alpha-signer-1"), FORCE_ISSUER=>1);
+import_ok     ($oxitest, $dbdata->cert("alpha-alice-1"),  FORCE_NOVERIFY=>1);
 
 # Cleanup database
 $oxitest->delete_testcerts;

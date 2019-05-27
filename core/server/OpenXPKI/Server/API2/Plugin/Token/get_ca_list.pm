@@ -117,7 +117,7 @@ command "get_ca_list" => {
             }
             catch {
                 CTX('log')->application()->error("Eval error testing CA token ".$row->{alias}." (API command 'get_ca_list'): $_");
-            }
+            };
 
         }
         push @token, $item;

@@ -740,10 +740,8 @@ sub write_config {
     $self->config_writer->write_str($self->path_log4perl_conf, $self->conf_log4perl);
 
     # store private key files in temp env/dir
-    # TODO This is hackish, OpenXPKI::Test::CertHelper::Database needs to store infos about realms as well (be authoritative source about realms/certs for tests)
-    for my $alias (keys %{ $self->certhelper_database->private_keys }) {
-        my $realm = (split("-", $alias))[0]; die "Could not extract realm from alias $alias" unless $realm;
-        $self->config_writer->write_private_key($realm, $alias, $self->certhelper_database->private_keys->{$alias});
+    for my $cert ($self->certhelper_database->all_certs) {
+        $self->config_writer->write_private_key($cert->db->{pki_realm}, $cert->name, $cert->private_key);
     }
 
     # set test config dir in ENV so OpenXPKI::Config will access it from now on
@@ -928,7 +926,7 @@ B<Parameters>
 
 =over
 
-=item * C<only> I<ArrayRef> - only add the given certificates (expects names like I<alpha_root_1>)
+=item * C<only> I<ArrayRef> - only add the given certificates (expects names like I<alpha-root-1>)
 
 =item * C<exclude> I<ArrayRef> - exclude the given certificates
 
@@ -950,10 +948,10 @@ sub insert_testcerts {
     }
     elsif ($args{exclude}) {
         my $exclude = { map { $_ => 1 } @{ $args{exclude} } };
-        $certnames = [ grep { not $exclude->{$_} } @{ $certhelper->all_cert_names } ];
+        $certnames = [ grep { not $exclude->{$_} } $certhelper->all_cert_names ];
     }
     else {
-        $certnames = $certhelper->all_cert_names;
+        $certnames = [ $certhelper->all_cert_names ];
     }
 
     $self->dbi->start_txn;
@@ -994,8 +992,8 @@ sub delete_testcerts {
 
     $self->dbi->start_txn;
     $self->dbi->delete(from => 'certificate', where => { identifier => $certhelper->all_cert_ids } );
-    $self->dbi->delete(from => 'aliases',     where => { identifier => [ map { $_->db->{identifier} } values %{$certhelper->_certs} ] } );
-    $self->dbi->delete(from => 'crl',         where => { issuer_identifier => [ map { $_->id } values %{$certhelper->_certs} ] } );
+    $self->dbi->delete(from => 'aliases',     where => { identifier => [ map { $_->db->{identifier} } $certhelper->all_certs ] } );
+    $self->dbi->delete(from => 'crl',         where => { issuer_identifier => [ map { $_->id } $certhelper->all_certs ] } );
     $self->dbi->commit;
 }
 

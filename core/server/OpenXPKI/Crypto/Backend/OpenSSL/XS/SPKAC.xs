@@ -17,11 +17,26 @@ pubkey_algorithm(spkac)
 	OpenXPKI_Crypto_Backend_OpenSSL_SPKAC spkac
     PREINIT:
 	BIO *out;
+        EVP_PKEY *public_key;
 	char *pubkey;
+//	X509_PUBKEY *xpkey;
+//        ASN1_OBJECT *xpoid;
+        const EVP_PKEY_ASN1_METHOD *ameth;
+        const char *anam = NULL;
 	int n;
     CODE:
 	out = BIO_new(BIO_s_mem());
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 	i2a_ASN1_OBJECT(out, spkac->spkac->pubkey->algor->algorithm);
+#else
+        public_key = X509_PUBKEY_get(spkac->spkac->pubkey);
+        ameth = EVP_PKEY_get0_asn1(public_key);
+        if (ameth) {
+	  EVP_PKEY_asn1_get0_info(NULL, NULL,
+				  NULL, NULL, &anam, ameth);
+          BIO_get_mem_data(out, &anam);
+	}
+#endif
 	n = BIO_get_mem_data(out, &pubkey);
 	RETVAL = newSVpvn(pubkey, n);
 	BIO_free(out);
@@ -35,16 +50,29 @@ pubkey(spkac)
 	BIO *out;
 	EVP_PKEY *pkey;
 	char *pubkey;
+        RSA *rsa = NULL;
+        DSA *dsa = NULL;
 	int n;
     CODE:
 	out = BIO_new(BIO_s_mem());
 	pkey=X509_PUBKEY_get(spkac->spkac->pubkey);
 	if (pkey != NULL)
 	{
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 	    if (pkey->type == EVP_PKEY_RSA)
 		RSA_print(out,pkey->pkey.rsa,0);
             if (pkey->type == EVP_PKEY_DSA)
 		DSA_print(out,pkey->pkey.dsa,0);
+#else
+            if (EVP_PKEY_id(pkey) == EVP_PKEY_RSA) {
+                rsa = EVP_PKEY_get1_RSA(pkey);
+		RSA_print(out,rsa,0);
+	    }
+            if (EVP_PKEY_id(pkey) == EVP_PKEY_DSA) {
+	        dsa = EVP_PKEY_get1_DSA(pkey);
+		DSA_print(out,dsa,0);
+	    }
+#endif	    
 	    EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &pubkey);
@@ -105,6 +133,7 @@ keysize (spkac)
     PREINIT:
 	BIO *out;
 	EVP_PKEY *pkey;
+        RSA *rsa = NULL;
 	char * pubkey;
 	int n;
     CODE:
@@ -112,8 +141,15 @@ keysize (spkac)
 	pkey=X509_PUBKEY_get(spkac->spkac->pubkey);
 	if (pkey != NULL)
 	{
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 		if (pkey->type == EVP_PKEY_RSA)
 			BIO_printf(out,"%d", BN_num_bits(pkey->pkey.rsa->n));
+#else
+		if (EVP_PKEY_id(pkey) == EVP_PKEY_RSA) {
+		        rsa = EVP_PKEY_get1_RSA(pkey);
+			BIO_printf(out,"%d", RSA_size(rsa));
+		}
+#endif		
 		EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &pubkey);
@@ -129,16 +165,32 @@ modulus (spkac)
 	char * modulus;
 	BIO *out;
 	EVP_PKEY *pkey;
+        RSA *rsa = NULL;
+        DSA *dsa = NULL;
+        const BIGNUM *n_bignum;
 	int n;
     CODE:
 	out = BIO_new(BIO_s_mem());
 	pkey=X509_PUBKEY_get(spkac->spkac->pubkey);
 	if (pkey != NULL)
 	{
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 	    if (pkey->type == EVP_PKEY_RSA)
 		BN_print(out,pkey->pkey.rsa->n);
 	    if (pkey->type == EVP_PKEY_DSA)
 		BN_print(out,pkey->pkey.dsa->pub_key);
+#else
+	    if (EVP_PKEY_id(pkey) == EVP_PKEY_RSA) {
+                rsa = EVP_PKEY_get1_RSA(pkey);
+		RSA_get0_key(rsa, &n_bignum, NULL, NULL);
+		BN_print(out,n_bignum);
+	    }
+	    if (EVP_PKEY_id(pkey) == EVP_PKEY_DSA) {
+	        dsa = EVP_PKEY_get1_DSA(pkey);
+	        DSA_get0_key(dsa, &n_bignum, NULL);
+		BN_print(out,n_bignum);
+	    }
+#endif	    
 	    EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &modulus);
@@ -153,6 +205,9 @@ exponent (spkac)
     PREINIT:
 	BIO *out;
 	EVP_PKEY *pkey;
+        RSA *rsa = NULL;
+        DSA *dsa = NULL;
+        const BIGNUM *e_bignum;
 	char *exponent;
 	int n;
     CODE:
@@ -160,10 +215,23 @@ exponent (spkac)
 	pkey=X509_PUBKEY_get(spkac->spkac->pubkey);
 	if (pkey != NULL)
 	{
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 	    if (pkey->type == EVP_PKEY_RSA)
 		BN_print(out,pkey->pkey.rsa->e);
 	    if (pkey->type == EVP_PKEY_DSA)
 		BN_print(out,pkey->pkey.dsa->pub_key);
+#else
+	    if (EVP_PKEY_id(pkey) == EVP_PKEY_RSA) {
+                rsa = EVP_PKEY_get1_RSA(pkey);
+		RSA_get0_key(rsa, NULL, &e_bignum, NULL);
+		BN_print(out,e_bignum);
+	    }
+	    if (EVP_PKEY_id(pkey) == EVP_PKEY_DSA) {
+	        dsa = EVP_PKEY_get1_DSA(pkey);
+	        DSA_get0_key(dsa, &e_bignum, NULL);
+		BN_print(out,e_bignum);
+	    }
+#endif	    
 	    EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &exponent);
@@ -181,7 +249,10 @@ signature_algorithm(spkac)
 	int n;
     CODE:
 	out = BIO_new(BIO_s_mem());
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 	i2a_ASN1_OBJECT(out, spkac->sig_algor->algorithm);
+#else
+#endif
 	n = BIO_get_mem_data(out, &sig);
 	RETVAL = newSVpvn(sig, n);
 	BIO_free(out);

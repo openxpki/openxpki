@@ -31,13 +31,13 @@ my $dbdata = $oxitest->certhelper_database;
 # Fetch chain - HASH Format
 my $result;
 lives_ok {
-    $result = $oxitest->api_command("get_chain" => { START_IDENTIFIER => $dbdata->cert("alpha_alice_2")->id, OUTFORMAT => 'HASH' });
+    $result = $oxitest->api_command("get_chain" => { START_IDENTIFIER => $dbdata->cert("alpha-alice-2")->id, OUTFORMAT => 'HASH' });
 } "Fetch certificate chain";
 
 is scalar @{$result->{CERTIFICATES}}, 3, "Chain contains 3 certificates";
 
 is $result->{CERTIFICATES}->[0]->{IDENTIFIER},
-    $dbdata->cert("alpha_alice_2")->id,
+    $dbdata->cert("alpha-alice-2")->id,
     "First cert in chain equals requested start cert";
 
 is $result->{CERTIFICATES}->[0]->{AUTHORITY_KEY_IDENTIFIER},

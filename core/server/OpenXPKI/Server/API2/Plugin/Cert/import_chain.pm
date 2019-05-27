@@ -151,7 +151,7 @@ command "import_chain" => {
             $err = $_->message if ref $_ eq 'OpenXPKI::Exception';
             CTX('log')->system->error("Import of certificate $cert_identifier failed with $err");
             push @failed, { cert_identifier => $cert_identifier, error => $err };
-        }
+        };
 
     }
 

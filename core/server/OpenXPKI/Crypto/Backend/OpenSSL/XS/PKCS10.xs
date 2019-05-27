@@ -55,11 +55,12 @@ version(csr)
     PREINIT:
 	BIO *out;
 	char *version;
-	long l, i;
+        long l, i;
+        long v;
 	const char *neg;
     CODE:
 	out = BIO_new(BIO_s_mem());
-
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 	neg=(csr->req_info->version->type == V_ASN1_NEG_INTEGER)?"-":"";
 	l=0;
 	for (i=0; i<csr->req_info->version->length; i++)
@@ -67,6 +68,11 @@ version(csr)
 	/* why we use l and not l+1 like for all other versions? */
 	BIO_printf(out,"%s%lu (%s0x%lx)",neg,l,neg,l);
 	l = BIO_get_mem_data(out, &version);
+#else
+        v = X509_REQ_get_version(csr);
+	BIO_printf(out,"%l (0x%lx)",l,l);
+	l = BIO_get_mem_data(out, &version);
+#endif
 	RETVAL = newSVpvn(version, l);
 	BIO_free(out);
     OUTPUT:
@@ -87,7 +93,11 @@ subject(csr)
 	int n;
     CODE:
 	out = BIO_new(BIO_s_mem());
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 	X509_NAME_print_ex(out, csr->req_info->subject, 0, OPENXPKI_FLAG_RFC2253);
+#else
+	X509_NAME_print_ex(out, X509_REQ_get_subject_name(csr), 0, OPENXPKI_FLAG_RFC2253);
+#endif
 	n = BIO_get_mem_data(out, &subject);
 	RETVAL = newSVpvn(subject, n);
 	BIO_free(out);
@@ -99,7 +109,11 @@ subject_hash(csr)
 	OpenXPKI_Crypto_Backend_OpenSSL_PKCS10 csr
     PREINIT:
     CODE:
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 	RETVAL = X509_NAME_hash(csr->req_info->subject);
+#else
+	RETVAL = X509_NAME_hash(X509_REQ_get_subject_name(csr));
+#endif
     OUTPUT:
 	RETVAL
 
@@ -180,11 +194,19 @@ pubkey_algorithm(csr)
 	BIO *out;
 	char *alg;
 	X509_REQ_INFO *ri;
+	X509_PUBKEY *xpkey;
+        ASN1_OBJECT *xpoid;
 	int n;
     CODE:
 	out = BIO_new(BIO_s_mem());
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 	ri = csr->req_info;
 	i2a_ASN1_OBJECT(out, ri->pubkey->algor->algorithm);
+#else
+	xpkey = X509_REQ_get_X509_PUBKEY(csr);
+        X509_PUBKEY_get0_param(&xpoid, NULL, NULL, NULL, xpkey);
+	i2a_ASN1_OBJECT(out, xpoid);
+#endif
 	n = BIO_get_mem_data(out, &alg);
 	RETVAL = newSVpvn(alg, n);
 	BIO_free(out);
@@ -197,6 +219,9 @@ pubkey(csr)
     PREINIT:
 	BIO *out;
 	EVP_PKEY *pkey;
+        RSA *rsa = NULL;
+        DSA *dsa = NULL;
+	EC_KEY *ec = NULL;
 	char *pubkey;
 	int n;
     CODE:
@@ -204,12 +229,27 @@ pubkey(csr)
 	pkey=X509_REQ_get_pubkey(csr);
 	if (pkey != NULL)
 	{
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 		if (pkey->type == EVP_PKEY_RSA)
 			RSA_print(out,pkey->pkey.rsa,0);
 		else if (pkey->type == EVP_PKEY_DSA)
 			DSA_print(out,pkey->pkey.dsa,0);
                 else if (pkey->type == EVP_PKEY_EC)
                         EC_KEY_print(out,pkey->pkey.ec,0);
+#else
+		if (EVP_PKEY_id(pkey) == EVP_PKEY_RSA) {
+		  rsa = EVP_PKEY_get1_RSA(pkey);
+		  RSA_print(out,rsa,0);
+		}
+		else if (EVP_PKEY_id(pkey) == EVP_PKEY_DSA) {
+		  dsa = EVP_PKEY_get1_DSA(pkey);
+		  DSA_print(out,dsa,0);
+		}
+                else if (EVP_PKEY_id(pkey) == EVP_PKEY_EC) {
+		  ec = EVP_PKEY_get1_EC_KEY(pkey);
+		  EC_KEY_print(out,ec,0);
+		}
+#endif		
 		EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &pubkey);
@@ -292,16 +332,32 @@ modulus (csr)
 	char * modulus;
 	BIO *out;
 	EVP_PKEY *pkey;
+        RSA *rsa = NULL;
+        DSA *dsa = NULL;
+	const BIGNUM *n_bignum;
 	int n;
     CODE:
 	out = BIO_new(BIO_s_mem());
 	pkey=X509_REQ_get_pubkey(csr);
 	if (pkey != NULL)
 	{
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 	    if (pkey->type == EVP_PKEY_RSA)
 		BN_print(out,pkey->pkey.rsa->n);
             if (pkey->type == EVP_PKEY_DSA)
 		BN_print(out,pkey->pkey.dsa->pub_key);
+#else
+	    if (EVP_PKEY_id(pkey) == EVP_PKEY_RSA) {
+	        rsa = EVP_PKEY_get1_RSA(pkey);
+		RSA_get0_key(rsa, &n_bignum, NULL, NULL);
+		BN_print(out,n_bignum);
+	    }
+            if (EVP_PKEY_id(pkey) == EVP_PKEY_DSA) {
+	        dsa = EVP_PKEY_get1_DSA(pkey);
+	        DSA_get0_key(dsa, &n_bignum, NULL);
+		BN_print(out,n_bignum);
+	    }
+#endif	    
 	    EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &modulus);
@@ -316,6 +372,9 @@ exponent (csr)
     PREINIT:
 	BIO *out;
 	EVP_PKEY *pkey;
+        RSA *rsa = NULL;
+        DSA *dsa = NULL;
+        const BIGNUM *e_bignum;
 	char *exponent;
 	int n;
     CODE:
@@ -323,10 +382,23 @@ exponent (csr)
 	pkey=X509_REQ_get_pubkey(csr);
 	if (pkey != NULL)
 	{
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 	    if (pkey->type == EVP_PKEY_RSA)
 		BN_print(out,pkey->pkey.rsa->e);
 	    if (pkey->type == EVP_PKEY_DSA)
 		BN_print(out,pkey->pkey.dsa->pub_key);
+#else
+	    if (EVP_PKEY_id(pkey) == EVP_PKEY_RSA) {
+                rsa = EVP_PKEY_get1_RSA(pkey);
+		RSA_get0_key(rsa, NULL, &e_bignum, NULL);
+		BN_print(out,e_bignum);
+	    }
+	    if (EVP_PKEY_id(pkey) == EVP_PKEY_DSA) {
+	        dsa = EVP_PKEY_get1_DSA(pkey);
+	        DSA_get0_key(dsa, &e_bignum, NULL);
+		BN_print(out,e_bignum);
+	    }
+#endif	    
 	    EVP_PKEY_free(pkey);
 	}
 	n = BIO_get_mem_data(out, &exponent);
@@ -363,15 +435,20 @@ attributes(csr)
 	int n,i;
     CODE:
 	out = BIO_new(BIO_s_mem());
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 	sk=csr->req_info->attributes;
 	for (i=0; i<sk_X509_ATTRIBUTE_num(sk); i++)
+#else
+	for (i=0; i<X509_REQ_get_attr_count(csr); i++)
+#endif
 	{
 		ASN1_TYPE *at;
 		X509_ATTRIBUTE *a;
 		ASN1_BIT_STRING *bs=NULL;
 		ASN1_TYPE *t;
+		ASN1_OBJECT *aobj;
 		int j,type=0,count=1,ii=0;
-	
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 		a=sk_X509_ATTRIBUTE_value(sk,i);
 		if(X509_REQ_extension_nid(OBJ_obj2nid(a->object)))
 			continue;
@@ -393,11 +470,27 @@ get_next:
 				bs=at->value.asn1_string;
 			}
 		}
+#else
+		a = X509_REQ_get_attr(csr, i);
+		aobj = X509_ATTRIBUTE_get0_object(a);
+		if(X509_REQ_extension_nid(OBJ_obj2nid(aobj)))
+			continue;
+		if ((j=i2a_ASN1_OBJECT(out,aobj)) > 0)
+		{
+		  ii = 0;
+		  count = X509_ATTRIBUTE_count(a);
+get_next:
+		  at = X509_ATTRIBUTE_get0_type(a, ii);
+                  type = at->type;
+                  bs = at->value.asn1_string;
+		}
+#endif
 		for (j=25-j; j>0; j--)
 			BIO_write(out," ",1);
 		BIO_puts(out,":");
 		if (    (type == V_ASN1_PRINTABLESTRING) ||
 			(type == V_ASN1_T61STRING) ||
+			(type == V_ASN1_UTF8STRING) ||
 			(type == V_ASN1_IA5STRING))
 		{
 			BIO_write(out,(char *)bs->data,bs->length);
@@ -419,10 +512,17 @@ signature_algorithm(csr)
     PREINIT:
 	BIO *out;
 	char *sig;
+	const X509_ALGOR *sig_alg;
+	const ASN1_BIT_STRING *signature;
 	int n;
     CODE:
 	out = BIO_new(BIO_s_mem());
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 	i2a_ASN1_OBJECT(out, csr->sig_alg->algorithm);
+#else
+	X509_REQ_get0_signature(csr, &signature, &sig_alg);
+	i2a_ASN1_OBJECT(out, sig_alg->algorithm);
+#endif
 	n = BIO_get_mem_data(out, &sig);
 	RETVAL = newSVpvn(sig, n);
 	BIO_free(out);
@@ -435,12 +535,20 @@ signature(csr)
     PREINIT:
 	BIO *out;
 	char *sig;
+	const ASN1_BIT_STRING *signature;
+	const X509_ALGOR *sig_alg;
 	int n,i;
 	unsigned char *s;
     CODE:
 	out = BIO_new(BIO_s_mem());
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 	n=csr->signature->length;
 	s=csr->signature->data;
+#else
+        X509_REQ_get0_signature(csr, &signature, &sig_alg);
+	n=signature->length;
+	s=signature->data;
+#endif	
 	for (i=0; i<n; i++)
 	{
 		if ( ((i%18) == 0) && (i!=0) ) BIO_printf(out,"\n");

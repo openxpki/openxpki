@@ -76,6 +76,11 @@ lives_and {
 lives_and {
     my $data = $oxitest->api2_command('get_ui_system_status');
     cmp_deeply $data, {
+        config => {
+            commit => re(qr/^\w+$/), # git commit id
+            config => re(qr/^[0-9\.]+$/),
+            package => re(qr/^debian-[0-9\.]+$/),
+        },
         crl_expiry =>       re(qr/^\d+$/),
         dv_expiry =>        re(qr/^\d+$/),
         secret_offline =>   re(qr/^[01]$/),
@@ -84,7 +89,7 @@ lives_and {
         worker =>           re(qr/^\d+$/),
         workflow =>         re(qr/^\d+$/),
         hostname =>         ignore(),
-    };
+    } or diag explain $data;
 } "get_ui_system_status";
 
 ## list_process

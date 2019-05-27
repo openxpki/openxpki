@@ -115,24 +115,24 @@ sub search_cert_ok {
 }
 
 $test->runcmd_ok('search_cert', {
-    CERT_SERIAL => $dbdata->cert("alpha_root_2")->db->{cert_key}
+    CERT_SERIAL => $dbdata->cert("alpha-root-2")->db->{cert_key}
 }, "Search cert without giving PKI realm");
 is scalar(@{ $test->get_msg->{PARAMS} }), 0, "Should not return any results";
 
 search_cert_ok "by serial (decimal) and PKI realm _ANY", {
-    CERT_SERIAL => $dbdata->cert("alpha_root_2")->db->{cert_key},
-    PKI_REALM => $dbdata->cert("alpha_root_2")->db->{pki_realm}
-}, qw( alpha_root_2 );
+    CERT_SERIAL => $dbdata->cert("alpha-root-2")->db->{cert_key},
+    PKI_REALM => $dbdata->cert("alpha-root-2")->db->{pki_realm}
+}, qw( alpha-root-2 );
 
 search_cert_ok "by serial (decimal) and PKI realm", {
-    CERT_SERIAL => $dbdata->cert("alpha_root_2")->db->{cert_key},
+    CERT_SERIAL => $dbdata->cert("alpha-root-2")->db->{cert_key},
     PKI_REALM => "_ANY"
-}, qw( alpha_root_2 );
+}, qw( alpha-root-2 );
 
 search_cert_ok "by serial (hex) and specific PKI realm", {
-    CERT_SERIAL => Math::BigInt->new($dbdata->cert("alpha_root_2")->db->{cert_key})->as_hex,
-    PKI_REALM => $dbdata->cert("alpha_root_2")->db->{pki_realm}
-}, qw( alpha_root_2 );
+    CERT_SERIAL => Math::BigInt->new($dbdata->cert("alpha-root-2")->db->{cert_key})->as_hex,
+    PKI_REALM => $dbdata->cert("alpha-root-2")->db->{pki_realm}
+}, qw( alpha-root-2 );
 
 # Custom ORDER
 $test->runcmd_ok('search_cert', { ORDER => "CERTIFICATE.NOTBEFORE" }, "Search and order by NOTBEFORE descending (default)");
@@ -155,55 +155,55 @@ ok($sort_ok, "Certificates are sorted correctly");
 
 search_cert_ok "by expired status", {
     STATUS => "EXPIRED",
-    PKI_REALM => $dbdata->cert("alpha_root_1")->db->{pki_realm}
+    PKI_REALM => $dbdata->cert("alpha-root-1")->db->{pki_realm}
 }, $dbdata->cert_names_by_realm_gen(alpha => 1);
 
 search_cert_ok "by identifier", {
-    IDENTIFIER => $dbdata->cert("beta_alice_1")->db->{identifier},
+    IDENTIFIER => $dbdata->cert("beta-alice-1")->db->{identifier},
     PKI_REALM => "_ANY"
-}, qw( beta_alice_1 );
+}, qw( beta-alice-1 );
 
-my $test_identifier = $dbdata->cert("alpha_root_2")->db->{identifier};
+my $test_identifier = $dbdata->cert("alpha-root-2")->db->{identifier};
 search_cert_ok "by issuer", {
     ISSUER_IDENTIFIER => $test_identifier,
     PKI_REALM => "_ANY"
 }, $dbdata->cert_names_where(issuer_identifier => $test_identifier);
 
 search_cert_ok "by subject key id", {
-    SUBJECT_KEY_IDENTIFIER => $dbdata->cert("alpha_root_2")->db->{subject_key_identifier},
+    SUBJECT_KEY_IDENTIFIER => $dbdata->cert("alpha-root-2")->db->{subject_key_identifier},
     PKI_REALM => "_ANY"
-}, qw( alpha_root_2 );
+}, qw( alpha-root-2 );
 
-my $test_authority_key_identifier = $dbdata->cert("beta_root_1")->db->{authority_key_identifier};
+my $test_authority_key_identifier = $dbdata->cert("beta-root-1")->db->{authority_key_identifier};
 search_cert_ok "by authority key id", {
     AUTHORITY_KEY_IDENTIFIER => $test_authority_key_identifier,
     PKI_REALM => "_ANY"
 }, $dbdata->cert_names_where(authority_key_identifier => $test_authority_key_identifier);
 
 search_cert_ok "by subject (exact match)", {
-    SUBJECT => $dbdata->cert("beta_alice_1")->db->{subject},
+    SUBJECT => $dbdata->cert("beta-alice-1")->db->{subject},
     PKI_REALM => "_ANY"
-}, qw( beta_alice_1 );
+}, qw( beta-alice-1 );
 
-my $subject_part = join(",", (split(",", $dbdata->cert("beta_root_1")->db->{subject}))[1,2]);
+my $subject_part = join(",", (split(",", $dbdata->cert("beta-root-1")->db->{subject}))[1,2]);
 search_cert_ok "by subject (with wildcards)", {
     SUBJECT => "*$subject_part*", # will be similar to *OU=ACME,DC=OpenXPKI*
-    PKI_REALM => $dbdata->cert("beta_root_1")->db->{pki_realm},
+    PKI_REALM => $dbdata->cert("beta-root-1")->db->{pki_realm},
 }, $dbdata->cert_names_by_realm_gen(beta => 1);
 
 search_cert_ok "by issuer DN (exact match)", {
-    ISSUER_DN => $dbdata->cert("gamma_bob_1")->db->{issuer_dn},
+    ISSUER_DN => $dbdata->cert("gamma-bob-1")->db->{issuer_dn},
     PKI_REALM => "_ANY"
-}, qw( gamma_bob_1 );
+}, qw( gamma-bob-1 );
 
-my $issuer_dn_part = (split("=", (split(",", $dbdata->cert("gamma_bob_1")->db->{issuer_dn}))[0]))[1];
+my $issuer_dn_part = (split("=", (split(",", $dbdata->cert("gamma-bob-1")->db->{issuer_dn}))[0]))[1];
 search_cert_ok "by issuer DN (with wildcards)", {
     ISSUER_DN => "*$issuer_dn_part*", # will be similar to *GAMMA Signing CA*
     PKI_REALM => "_ANY"
-}, qw( gamma_bob_1 );
+}, qw( gamma-bob-1 );
 
 search_cert_ok "by validity date", {
-    VALID_AT => $dbdata->cert("alpha_root_1")->db->{notbefore} + 100,
+    VALID_AT => $dbdata->cert("alpha-root-1")->db->{notbefore} + 100,
     PKI_REALM => "_ANY"
 }, $dbdata->cert_names_by_realm_gen(alpha => 1);
 
@@ -211,8 +211,8 @@ search_cert_ok "and limit results", {
     ORDER => "CERTIFICATE.SUBJECT",
     REVERSE => 0,
     LIMIT => 1,
-    PKI_REALM => $dbdata->cert("beta_root_1")->db->{pki_realm},
-}, qw( beta_alice_1 );
+    PKI_REALM => $dbdata->cert("beta-root-1")->db->{pki_realm},
+}, qw( beta-alice-1 );
 
 # LIMIT and START
 search_cert_ok "limit results and use offset", {
@@ -220,8 +220,8 @@ search_cert_ok "limit results and use offset", {
     REVERSE => 0,
     LIMIT => 2,
     START => 1,
-    PKI_REALM => $dbdata->cert("beta_root_1")->db->{pki_realm},
-}, qw( beta_bob_1 beta_datavault_1 ), "ORDERED";
+    PKI_REALM => $dbdata->cert("beta-root-1")->db->{pki_realm},
+}, qw( beta-bob-1 beta-datavault-1 ), "ORDERED";
 
 # By CSR serial
 my $uuid = Data::UUID->new->create_str;
@@ -255,27 +255,27 @@ cmp_bag $test->get_msg->{PARAMS}, [
 
 # By NOTBEFORE/NOTAFTER (Int: searches "other side" of validity)
 search_cert_ok "whose validity period started before given date (NOTBEFORE < x)", {
-    NOTBEFORE => $dbdata->cert("alpha_root_1")->db->{notbefore} + 100,
+    NOTBEFORE => $dbdata->cert("alpha-root-1")->db->{notbefore} + 100,
     PKI_REALM => "_ANY"
 }, $dbdata->cert_names_by_realm_gen(alpha => 1); # chain #1 are expired certificates
 
-my $ar3nb = $dbdata->cert("alpha_root_3")->db->{notbefore};
+my $ar3nb = $dbdata->cert("alpha-root-3")->db->{notbefore};
 
 search_cert_ok "that is not yet valid at given date (NOTBEFORE > x)", {
     # TODO #legacydb Using old DB layer syntax in "search_cert"
     NOTBEFORE => { OPERATOR => "GREATER_THAN", VALUE => $ar3nb - 100 },
-    PKI_REALM => $dbdata->cert("alpha_root_3")->db->{pki_realm}
+    PKI_REALM => $dbdata->cert("alpha-root-3")->db->{pki_realm}
 }, $dbdata->cert_names_by_realm_gen(alpha => 3); # chain #3 are future certificates
 
 search_cert_ok "whose validity starts between two given dates", {
     # TODO #legacydb Using old DB layer syntax in "search_cert"
     NOTBEFORE => { OPERATOR => "BETWEEN", VALUE => [ $ar3nb - 100, $ar3nb + 100 ] },
-    PKI_REALM => $dbdata->cert("alpha_root_3")->db->{pki_realm}
+    PKI_REALM => $dbdata->cert("alpha-root-3")->db->{pki_realm}
 }, $dbdata->cert_names_by_realm_gen(alpha => 3); # chain #3 are future certificates
 
 search_cert_ok "whose validity period ends after given date (NOTAFTER > x)", {
-    NOTAFTER => $dbdata->cert("alpha_root_2")->db->{notafter} - 100,
-    PKI_REALM => $dbdata->cert("alpha_root_2")->db->{pki_realm}
+    NOTAFTER => $dbdata->cert("alpha-root-2")->db->{notafter} - 100,
+    PKI_REALM => $dbdata->cert("alpha-root-2")->db->{pki_realm}
 }, $dbdata->cert_names_by_realm_gen(alpha => 2), $dbdata->cert_names_by_realm_gen(alpha => 3);
 
 # By CERT_ATTRIBUTES list of conditions to search in attributes (KEY, VALUE, OPERATOR)

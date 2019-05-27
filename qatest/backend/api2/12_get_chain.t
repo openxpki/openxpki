@@ -32,13 +32,13 @@ my $dbdata = $oxitest->certhelper_database;
 # Fetch chain - HASH Format
 my $result;
 lives_ok {
-    $result = $oxitest->api2_command("get_chain" => { start_with => $dbdata->cert("alpha_alice_2")->id, format => 'DBINFO' });
+    $result = $oxitest->api2_command("get_chain" => { start_with => $dbdata->cert("alpha-alice-2")->id, format => 'DBINFO' });
 } "Fetch certificate chain (as HashRef)";
 
 is scalar @{$result->{certificates}}, 3, "Chain contains 3 certificates";
 
 is $result->{certificates}->[0]->{identifier},
-    $dbdata->cert("alpha_alice_2")->id,
+    $dbdata->cert("alpha-alice-2")->id,
     "First cert in chain equals requested start cert";
 
 is $result->{certificates}->[0]->{authority_key_identifier},
@@ -54,12 +54,12 @@ is $result->{certificates}->[1]->{authority_key_identifier},
 #
 lives_and {
     my $result = $oxitest->api2_command("get_chain" => {
-        start_with => $dbdata->cert("alpha_alice_2")->id,
+        start_with => $dbdata->cert("alpha-alice-2")->id,
         format => 'PEM',
     });
     cmp_deeply $result, superhashof({
         certificates => [
-            map { $dbdata->cert($_)->data } qw( alpha_alice_2 alpha_signer_2 alpha_root_2 )
+            map { $dbdata->cert($_)->data } qw( alpha-alice-2 alpha-signer-2 alpha-root-2 )
         ],
     });
 } "Fetch certificate chain (PEM)";
@@ -67,13 +67,13 @@ lives_and {
 #
 # DER format
 #
-my $alice  = $dbdata->cert("alpha_alice_2")->data;
-my $signer = $dbdata->cert("alpha_signer_2")->data;
-my $root   = $dbdata->cert("alpha_root_2")->data;
+my $alice  = $dbdata->cert("alpha-alice-2")->data;
+my $signer = $dbdata->cert("alpha-signer-2")->data;
+my $root   = $dbdata->cert("alpha-root-2")->data;
 
 lives_and {
     my $result = $oxitest->api2_command("get_chain" => {
-        start_with => $dbdata->cert("alpha_alice_2")->id,
+        start_with => $dbdata->cert("alpha-alice-2")->id,
         format => "DER",
     });
     my ($tmp, $tmp_name) = tempfile(UNLINK => 1);
@@ -90,7 +90,7 @@ lives_and {
 #
 lives_and {
     my $result = $oxitest->api2_command("get_chain" => {
-        start_with => $dbdata->cert("alpha_alice_2")->id,
+        start_with => $dbdata->cert("alpha-alice-2")->id,
         bundle => 1,
     });
     my ($tmp, $tmp_name) = tempfile(UNLINK => 1);
@@ -104,7 +104,7 @@ lives_and {
 
 lives_and {
     my $result = $oxitest->api2_command("get_chain" => {
-        start_with => $dbdata->cert("alpha_alice_2")->id,
+        start_with => $dbdata->cert("alpha-alice-2")->id,
         bundle => 1,
         keeproot => 1,
     });

@@ -109,6 +109,7 @@ before 'init_base_config' => sub { # happens before init_user_config() so we do 
     # NO $self->_load_default_config("system.database") -- it's completely customized for tests
     $self->_load_default_config("system/realms.yaml");
     $self->_load_default_config("system/server.yaml",   $self->can('_customize_system_server'));   # can() returns a CodeRef
+    $self->_load_default_config("system/version.yaml");
     $self->_load_default_config("system/watchdog.yaml", $self->can('_customize_system_watchdog')); # can() returns a CodeRef
 };
 

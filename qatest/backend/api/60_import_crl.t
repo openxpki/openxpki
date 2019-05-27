@@ -28,7 +28,7 @@ my $dbdata = $oxitest->certhelper_database;
 
 use_ok "OpenXPKI::Crypto::CRL"; # this is missing in OpenXPKI::Server::API::Object
 
-$oxitest->insert_testcerts(exclude => ["alpha_signer_2"]);
+$oxitest->insert_testcerts(exclude => ["alpha-signer-2"]);
 
 # unkown issuer
 throws_ok {
@@ -37,7 +37,7 @@ throws_ok {
     });
 } qr/I18N_OPENXPKI_UI_IMPORT_CRL_ISSUER_NOT_FOUND/, "import_crl - fails to import CRL with unknown issuer";
 
-$oxitest->insert_testcerts(only => ["alpha_signer_2"]);
+$oxitest->insert_testcerts(only => ["alpha-signer-2"]);
 
 # correct import
 lives_and {
@@ -46,7 +46,7 @@ lives_and {
     });
     cmp_deeply $result, {
         'crl_key' => ignore(),
-        'issuer_identifier' => $dbdata->cert("alpha_signer_2")->id,
+        'issuer_identifier' => $dbdata->cert("alpha-signer-2")->id,
         'last_update' => ignore(),
         'next_update' => ignore(),
         'pki_realm' => 'alpha',
