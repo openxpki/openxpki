@@ -8,7 +8,7 @@ use English;
 use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use TestCGI;
-  
+
 use Test::More tests => 5;
 
 package main;
@@ -24,7 +24,7 @@ is($result->{main}->[0]->{content}->{fields}->[2]->{name}, 'wf_token');
 $result = $client->mock_request({
     'action' => 'workflow!index',
     'wf_token' => undef,
-    'report_config' => '',
+    'report_config' => 'expiry',
     'valid_at' => time(),
 });
 
@@ -41,5 +41,5 @@ $result = $client->mock_request({
     'page' => $page
 });
 
-like( $result, "/^Full Certificate Report, Realm ca-one/", 'Report header ok' );
+like( $result, "/^Certificate Expiry Report/", 'Report header ok' );
 

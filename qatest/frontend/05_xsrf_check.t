@@ -90,7 +90,7 @@ my $rtoken = $client->update_rtoken();
 $result = $client->mock_request({
     'action' => 'workflow!index',
     'wf_token' => undef,
-    'report_config' => '',
+    'report_config' => 'valid',
     'valid_at' => time(),
     '_rtoken' => $rtoken
 });

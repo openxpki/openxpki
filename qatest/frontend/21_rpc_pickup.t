@@ -83,4 +83,4 @@ $response = $ua->post('https://localhost/rpc/request', [
 );
 ok($response->is_success);
 like($response->decoded_content,qr/id=$wf_id/);
-like($response->decoded_content,qr/data.error_code=I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_NOT_AUTHORIZED/);
+like($response->decoded_content,qr/data.error_code=I18N_OPENXPKI_UI_ENROLLMENT_ERROR_REQUEST_NOT_AUTHORIZED/);
