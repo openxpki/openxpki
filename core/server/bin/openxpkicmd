@@ -44,13 +44,13 @@ sub dump_workflow {
     my $reply = shift;
     my $json = shift || {};
 
-    if ($params{context} && $reply->{PARAMS}->{WORKFLOW}->{CONTEXT}) {
+    if ($params{context} && $reply->{PARAMS}->{workflow}->{context}) {
 
         if (defined $params{json}) {
-            $json->{context} = $reply->{PARAMS}->{WORKFLOW}->{CONTEXT};
+            $json->{context} = $reply->{PARAMS}->{workflow}->{context};
         } else {
             print "\n===Context===\n";
-            my $context = $reply->{PARAMS}->{WORKFLOW}->{CONTEXT};
+            my $context = $reply->{PARAMS}->{workflow}->{context};
             foreach my $key (sort keys %{$context}) {
                 my $val = $context->{$key};
                 if (!defined $val) {
@@ -61,12 +61,12 @@ sub dump_workflow {
         }
     }
 
-    if ($params{attribute} && $reply->{PARAMS}->{WORKFLOW}->{ATTRIBUTE}) {
+    if ($params{attribute} && $reply->{PARAMS}->{workflow}->{attribute}) {
         if (defined $params{json}) {
-            $json->{attribute} = $reply->{PARAMS}->{WORKFLOW}->{ATTRIBUTE};
+            $json->{attribute} = $reply->{PARAMS}->{workflow}->{attribute};
         } else {
             print "\n===Attributes===\n";
-            my $attr = $reply->{PARAMS}->{WORKFLOW}->{ATTRIBUTE};
+            my $attr = $reply->{PARAMS}->{workflow}->{attribute};
             foreach my $key (keys %{$attr}) {
                 printf "=%-20s: %s\n", $key, $attr->{$key};
             }
@@ -74,8 +74,8 @@ sub dump_workflow {
     }
 
     if (defined $params{json}) {
-        $json->{workflow} = { id => $reply->{PARAMS}->{WORKFLOW}->{ID},
-            state => $reply->{PARAMS}->{WORKFLOW}->{STATE} };
+        $json->{workflow} = { id => $reply->{PARAMS}->{workflow}->{id},
+            state => $reply->{PARAMS}->{workflow}->{state} };
 
         print JSON->new->pretty($params{json} eq 'pretty')->encode($json);
         print "\n";
@@ -105,8 +105,9 @@ GetOptions(\%params,
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
 pod2usage(-verbose => 1) if ($params{help});
-if (scalar @ARGV != 1) {
-    print STDERR "Usage: openxpkicmd [OPTIONS] WF_TYPE\n";
+
+if (scalar @ARGV != 1 && !$params{wfid}) {
+    print STDERR "Usage: openxpkicmd [OPTIONS] WF_TYPE or openxpkicmd --wfid 1234\n";
     exit 0;
 }
 
@@ -129,12 +130,6 @@ foreach my $entry (@wf_parameters) {
     $wf_parameters{$key} = $value;
 }
 
-if (! defined $wf_type) {
-    die "No workflow type specified. Stopped";
-}
-
-
-
 if($params{instance}){
     $params{socketfile} = sprintf '/var/openxpki/%s/openxpki.socket', $params{instance};
 } elsif(!$params{socketfile}){
@@ -144,11 +139,11 @@ if($params{instance}){
 debug(sprintf("Socketfile: %s", $params{socketfile}));
 
 my $reply;
-my $client = OpenXPKI::Client->new(
-    {
+my $client = OpenXPKI::Client->new({
     SOCKETFILE => $params{socketfile},
     TIMEOUT  => $params{timeout},
-    });
+    API_VERSION => 2,
+});
 
 
 if (! defined $client) {
@@ -228,22 +223,20 @@ if ($params{wfid}) {
         $reply = $client->send_receive_command_msg(
             'execute_workflow_activity',
             {
-                ID => $params{wfid},
-                WORKFLOW => $wf_type,
-                ACTIVITY => $params{wfaction},
-                PARAMS => \%wf_parameters,
+                id => $params{wfid},
+                activity => $params{wfaction},
+                params => \%wf_parameters,
             }
         );
 
         if ($reply->{SERVICE_MSG} eq 'COMMAND') {
-            printf "New Workflow State: %s\n", $reply->{PARAMS}->{WORKFLOW}->{STATE} unless(defined $params{json});
+            printf "New Workflow State: %s\n", $reply->{PARAMS}->{workflow}->{state} unless(defined $params{json});
             dump_workflow( $reply );
         }
     } else {
         $reply = $client->send_receive_command_msg( 'get_workflow_activities',
             {
-                ID => $params{wfid},
-                WORKFLOW => $wf_type,
+                id => $params{wfid},
             }
         );
 
@@ -261,7 +254,7 @@ if ($params{wfid}) {
             if ($params{context} || $params{attribute} || defined $params{json}) {
                 $reply = $client->send_receive_command_msg( 'get_workflow_info',
                     {
-                        ID => $params{wfid},
+                        id => $params{wfid},
                     }
                 );
                 dump_workflow( $reply, $json );
@@ -271,18 +264,17 @@ if ($params{wfid}) {
     }
 } else {
 
-    $reply = $client->send_receive_service_msg('COMMAND',
-                       {
-                           COMMAND => 'create_workflow_instance',
-                           PARAMS => {
-                           WORKFLOW => $wf_type,
-                           PARAMS => \%wf_parameters,
-                           },
-                           API    => 1
-                       });
+    $reply = $client->send_receive_service_msg('COMMAND',{
+        COMMAND => 'create_workflow_instance',
+        PARAMS => {
+            workflow => $wf_type,
+            params => \%wf_parameters,
+        },
+        API => 2
+    });
 
     if ($reply->{SERVICE_MSG} eq 'COMMAND') {
-        printf "Workflow created (ID: %d), State: %s\n", $reply->{PARAMS}->{WORKFLOW}->{ID}, $reply->{PARAMS}->{WORKFLOW}->{STATE}
+        printf "Workflow created (ID: %d), State: %s\n", $reply->{PARAMS}->{workflow}->{id}, $reply->{PARAMS}->{workflow}->{state}
             unless(defined $params{json});
         dump_workflow( $reply );
     }
