@@ -551,6 +551,7 @@ OpenXPKI/Server/Workflow/Condition/SCEPv2/ValidSCEPTID.pm
 OpenXPKI/Server/Workflow/Validator.pm
 #OpenXPKI/Server/Workflow/Validator/CertSubject.pm
 #OpenXPKI/Server/Workflow/Validator/CertSubjectAltName.pm
+OpenXPKI/Server/Workflow/Validator/BasicFieldType.pm
 OpenXPKI/Server/Workflow/Validator/BooleanHasFields.pm
 OpenXPKI/Server/Workflow/Validator/CommonNameLength.pm
 OpenXPKI/Server/Workflow/Validator/KeyLength.pm

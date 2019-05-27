@@ -110,6 +110,12 @@ sub _build_workflow_config {
         $self->__process_validator(['workflow','global', 'validator', $validator_name ]);
     }
 
+    push @{$self->_workflow_config()->{validator}}, {
+        name => '_internal_basic_field_type',
+        class => 'OpenXPKI::Server::Workflow::Validator::BasicFieldType'
+    };
+
+
     return $self->_workflow_config
 
 }
@@ -308,6 +314,8 @@ sub __process_action {
     # Get input fields
     my @input = $conn->get_scalar_as_list( [ @path, 'input' ] );
     my @fields = ();
+
+    my @required_fields = ('required'); # first argument of validator is the type!
     foreach my $field_name (@input) {
 
         my @item_path;
@@ -333,20 +341,24 @@ sub __process_action {
             );
         }
 
-        # We just need the name and the required flag for the workflow engine
-        # anything else is UI control only and pulled from the connector at runtime
+        # As the upstream "required" validator accepts the empty string as
+        # true which we want to be "false" we do not set the required flag
+        # but use our own field type validator
         my $required = $conn->get( [ @item_path, 'required' ] );
-        my $is_required = (defined $required && $required =~ m/(yes|1)/i);
+        push @required_fields, $field_name if (defined $required && $required =~ m/(yes|1)/i);
 
         $self->logger()->debug("Adding field $field_name / $context_key");
 
-
         # Push to the field list for the action
-        push @fields, { name => $context_key, is_required => $is_required ? 'yes' : 'no' };
+        push @fields, { name => $context_key, is_required => 'no' };
 
     }
 
     my @validators = ();
+
+    # add basic validator - if required
+    push @validators, { name => '_internal_basic_field_type', arg => \@required_fields } if (scalar @required_fields > 1);
+
     # Attach validators - name => $name, arg  => [ $value ]
     my @valid = $conn->get_scalar_as_list( [ @path, 'validator' ] );
     foreach my $valid_name (@valid) {

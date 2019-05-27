@@ -1733,6 +1733,14 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_HAS_ERRORS"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_REQUIRED"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_INVALID_ALGORITHM_OR_LENGTH"
 msgstr "SPKAC-строка пуста."
 

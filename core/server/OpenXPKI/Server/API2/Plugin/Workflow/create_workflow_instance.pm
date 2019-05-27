@@ -135,7 +135,14 @@ command "create_workflow_instance" => {
         # Safety net: bubble up unknown exceptions.
         # We assume that all OpenXPKI::Exception that may occur have already
         # been handled properly further down the execution chain
-        die $_ unless blessed $_ && $_->isa('OpenXPKI::Exception');
+        die $_ unless (blessed $_);
+
+        # bubble up input validation error or non OXI Exceptions
+        # TODO: this needs to be reworked
+        if (!$_->isa('OpenXPKI::Exception') ||
+            $_->{message} eq 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATION_FAILED_ON_EXECUTE') {
+            $_->rethrow();
+        }
     };
 
     Log::Log4perl::MDC->put('wfid',   undef);
