@@ -32,10 +32,14 @@ sub send_output {
 
     my $status = '200 OK';
 
-    $result->{error}->{message} = i18nGettext($result->{error}->{message}) if ($result->{error}->{message});
-    if ($result->{error} && $use_status_codes) {
-        my ($error) = split(/[:\n]/, $result->{error}->{message});
-        $status = sprintf ("%03d %s", ($result->{error}->{code}/100), $error);
+    if (defined $result->{error}) {
+        if ($result->{error}->{message} && $result->{error}->{message} =~ m{I18N_OPENXPKI_UI}) {
+            $result->{error}->{message} = i18nGettext($result->{error}->{message});
+        }
+        if ($use_status_codes) {
+            my ($error) = split(/[:\n]/, $result->{error}->{message});
+            $status = sprintf ("%03d %s", ($result->{error}->{code}/100), $error);
+        }
     }
 
     if ($ENV{'HTTP_ACCEPT'} && $ENV{'HTTP_ACCEPT'} eq 'text/plain') {
