@@ -345,7 +345,7 @@ sub __process_action {
         # true which we want to be "false" we do not set the required flag
         # but use our own field type validator
         my $required = $conn->get( [ @item_path, 'required' ] );
-        push @required_fields, $field_name if (defined $required && $required =~ m/(yes|1)/i);
+        push @required_fields, $context_key if (defined $required && $required =~ m/(yes|1)/i);
 
         $self->logger()->debug("Adding field $field_name / $context_key");
 
