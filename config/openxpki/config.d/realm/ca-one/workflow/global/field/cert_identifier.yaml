@@ -6,3 +6,4 @@ tooltip: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_TOOLTIP
 type: cert_identifier
 required: 1
 template: "[% USE Certificate %][% value %]<br/>[% Certificate.body(value, 'subject') %]"
+api_type: Str

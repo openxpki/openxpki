@@ -1,0 +1,9 @@
+# Store _private_key in datapool using the subject key identifier from pkcs10
+class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
+param:
+    namespace: certificate.privatekey
+    _map_key: "[% USE PKCS10; PKCS10.subject_key_identifier(context.pkcs10); %]"
+    _map_value: $_private_key
+    encrypt: 1
+    force: 0
+

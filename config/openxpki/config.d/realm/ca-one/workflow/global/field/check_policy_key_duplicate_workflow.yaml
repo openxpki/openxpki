@@ -1,0 +1,12 @@
+label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_WORKFLOW_ID_KEY_DUPLICATE_ID
+name: check_policy_key_duplicate_workflow
+format: rawlist
+template: >
+  [% USE Workflow %]
+  [% IF value %]
+    I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL / I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL / I18N_OPENXPKI_UI_PKI_REALM_LABEL |
+    [% FOREACH wf_id = value %]
+        [% wf_id %] / [% Workflow.creator(wf_id) %] / [% Workflow.realm(wf_id) %] |
+    [% END %]
+  [% END %]
+

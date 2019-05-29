@@ -1,0 +1,4 @@
+class: Workflow::Condition::Evaluate
+param:
+    test: $context->{check_policy_key_duplicate_certificate}
+

@@ -4,7 +4,7 @@ format: rawlist
 template: >
   [% IF value %]
   [% USE Workflow; %]
-  [% FOREACH identifier = value %]
+  [% FOREACH wfid = value %]
      [% wfid %] ([% USE Workflow; Workflow.state(wfid) %]) |
   [% END %]
   [% END %]

@@ -1,6 +1,7 @@
 name: ca_alias
 label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTSIGN_TOKEN
 type: select
+api_type: Str
 option:
       item@: connector:workflow.global.field.certsign_token_select.connector
 

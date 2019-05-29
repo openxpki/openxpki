@@ -3,3 +3,4 @@ name: transaction_id
 description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_DESC
 required: 0
 type: text
+api_type: Str

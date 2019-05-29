@@ -1,0 +1,4 @@
+name: entity_id
+label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENTITY_LABEL 
+type: text
+required: 1

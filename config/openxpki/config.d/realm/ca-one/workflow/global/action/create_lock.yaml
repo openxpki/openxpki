@@ -1,0 +1,8 @@
+class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
+param:
+    namespace: transaction_id
+    _map_key: $transaction_id
+    _map_value: $workflow_id
+    encrypt: 0
+    force: 0
+

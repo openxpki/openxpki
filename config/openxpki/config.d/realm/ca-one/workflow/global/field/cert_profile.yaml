@@ -7,4 +7,4 @@ type: select
 # The options are provided by the uihandle class!
 required: 1
 template: "[% USE Profile %][% Profile.name(value) %]"
-
+api_type: Str
