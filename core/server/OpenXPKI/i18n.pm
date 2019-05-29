@@ -83,16 +83,7 @@ sub i18nGettext {
             }
             $i18n_string =~ s/$parameter/$arg_ref->{$key}/g;
         }
-    } elsif ($text) {
-        ## no translation found, output original string followed
-        ## by all parameters (and values) passed to the function
-
-        ## append arguments passed to the function
-        $i18n_string = join ("; ", $text,
-            map { $_ . " => " . (defined $arg_ref->{$_} ? $arg_ref->{$_} : '')  }
-            keys %{$arg_ref});
-
-    } else {
+    } elsif (not $text) {
         $i18n_string = '';
     }
 
