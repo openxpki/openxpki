@@ -83,6 +83,7 @@ sub select {
         order_by  => { isa => 'Str | ArrayRef', optional => 1 },
         limit     => { isa => 'Int', optional => 1 },
         offset    => { isa => 'Int', optional => 1 },
+        distinct  => { isa => 'Bool', optional => 1 },
     );
 
     # FIXME order_by: if ArrayRef then check for "asc" and "desc" as they are reserved words (https://metacpan.org/pod/SQL::Abstract::More#select)
@@ -95,6 +96,11 @@ sub select {
 
     # Add namespace to table name
     $params{'from'} = $self->_add_namespace_to($params{'from'}) if $params{'from'};
+
+    if ($params{'distinct'}) {
+        delete $params{'distinct'};
+        $params{'columns'} = [ -distinct => @{$params{'columns'}} ];
+    }
 
     # Provide nicer syntax for joins than SQL::Abstract::More
     # TODO Test JOIN syntax (especially ON conditions, see https://metacpan.org/pod/SQL::Abstract::More#join)

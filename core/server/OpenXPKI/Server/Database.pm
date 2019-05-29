@@ -360,6 +360,21 @@ sub select_one {
     return $sth->fetchrow_hashref;
 }
 
+sub count {
+    my $self = shift;
+    my %query_param = @_;
+
+    foreach (qw(order_by limit offset)) {
+        delete $query_param{$_} if (defined $query_param{$_});
+    }
+
+    my $query = $self->query_builder->select(%query_param);
+    $query->string(sprintf "SELECT COUNT(*) as amount FROM (%s) as tmp", $query->string);
+
+    my $sth = $self->run($query);
+    return $sth->fetchrow_hashref->{amount};
+}
+
 # INSERT
 # Returns: DBI statement handle
 sub insert {
@@ -685,6 +700,12 @@ For parameters see L<OpenXPKI::Server::Database::QueryBuilder/select>.
 Returns C<undef> if the query had no results.
 
 Please note that C<NULL> values will be converted to Perl C<undef>.
+
+=head2 count
+
+Takes the same arguments as a select query, wraps it into a subquery and
+return the number of rows the select would return. In case a limit is set
+it is ignored.
 
 =head2 insert
 

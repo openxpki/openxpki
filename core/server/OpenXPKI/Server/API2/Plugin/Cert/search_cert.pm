@@ -102,9 +102,6 @@ L<OpenXPKI::Server::API2::Types/CertStatus>)
 =item * C<cert_attributes> I<HashRef> - key is attribute name, value is passed
 "as is" as where statement on value, see documentation of SQL::Abstract.
 
-Note: If an attribute causes multiple matches on a single certificate only
-a single item is returned unless the multivalued columns is in return_attributes.
-
 Legacy: I<ArrayRef> - list of condition I<HashRefs> to search
 in attributes (KEY, VALUE, OPERATOR). Operator can be "EQUAL", "LIKE" or
 "BETWEEN".
@@ -114,8 +111,7 @@ in attributes (KEY, VALUE, OPERATOR). Operator can be "EQUAL", "LIKE" or
 =item * C<start> I<Int> - result paging: only return entries starting at given
 index (can only be used if C<limit> was specified)
 
-=item * C<order> I<Str> - order results by this table column (descending).
-Default: "notbefore" (+req_key to properly work with duplicates)
+=item * C<order> I<Str> - order results by this table column (descending). Default: "notbefore" (+req_key to properly work with duplicates)
 
 =item * C<reverse> I<Bool> - order results ascending
 
@@ -125,7 +121,7 @@ using the attribute name as key.
 
 Note: If the attribute is multivalued or you use an attribute query that
 causes multiple result lines for a single certificate you will get more
-than one line for the same certificate for all returned attributes.
+than one line for the same certificate!
 
 =back
 
@@ -169,16 +165,12 @@ command "search_cert" => {
 } => sub {
     my ($self, $params) = @_;
 
-    my $sql_params = {
-        %{ $self->_make_db_query($params) },
-        %{ $self->_make_db_query_additional_params($params) },
-    };
+    my $sql_params = $self->_make_db_query($params);
 
-    ##! 32: 'Result ' . Dumper $sql_params
-
+    ##! 32: 'Query ' . Dumper $sql_params
 
     my $result = CTX('dbi')->select(
-        %{$sql_params},
+        %{$sql_params}
     )->fetchall_arrayref({});
 
     ##! 128: 'Result ' . Dumper $result
@@ -209,7 +201,6 @@ command "search_cert_count" => {
     authority_key_identifier => {isa => 'Value',    matching => $re_alpha_string,      },
     cert_attributes          => {isa => 'ArrayRef|HashRef', },
     return_attributes        => {isa => 'ArrayRefOrStr', coerce => 1, },
-    return_columns           => {isa => 'ArrayRefOrStr', coerce => 1, },
     cert_serial              => {isa => 'Value',    matching => $re_int_or_hex_string, },
     csr_serial               => {isa => 'Value',    matching => $re_integer_string,    },
     entity_only              => {isa => 'Value',    matching => $re_boolean,           },
@@ -234,44 +225,12 @@ command "search_cert_count" => {
 
     my $sql_params = $self->_make_db_query($params);
 
-    my $result = CTX('dbi')->select_one(
-        %{$sql_params},
-        columns => [ 'COUNT(certificate.identifier)|amount' ],
+    ##! 32: 'Query ' . Dumper $sql_params
+    return CTX('dbi')->count(
+        %{$sql_params}
     );
-    return $result->{amount};
+
 };
-
-# handle additional parameters only for search_cert: limit, order, reverse, start
-sub _make_db_query_additional_params {
-    my ($self, $po) = @_;
-
-    my $params = {};
-
-    if ( $po->has_limit ) {
-        $params->{limit} = $po->limit;
-        $params->{offset} = $po->start if $po->has_start;
-    }
-
-    if ( $po->has_return_columns ) {
-        # to avoid ambiguties when we merge with CSR or attributes
-        my @col = map { 'certificate.'.$_ } @{$po->return_columns};
-        $params->{columns} = \@col;
-    }
-
-    # Custom ordering
-    my $desc = "-"; # not set or 0 means: DESCENDING, i.e. "-"
-    $desc = "" if $po->has_reverse and $po->reverse == 0;
-
-    if ($po->has_order) {
-        $params->{order_by} = sprintf "%scertificate.%s", $desc, lc($po->order);
-    } elsif ($desc) {
-        $params->{order_by} = [ '-certificate.notbefore', '-certificate.req_key' ];
-    } else {
-        $params->{order_by} = [ 'certificate.notbefore', 'certificate.req_key' ];
-    }
-
-    return $params;
-}
 
 sub _make_db_query {
     my ($self, $po) = @_;
@@ -281,6 +240,35 @@ sub _make_db_query {
         columns => [ 'certificate.*' ],
         where => $where,
     };
+
+    # do not use limit and return columns for count calls as the attributes
+    # do not exist and it is useless to count the rows anyway
+    if (ref $po ne 'OpenXPKI::Server::API2::Plugin::Cert::search_cert::search_cert_count_ParamObject') {
+
+        if ( $po->has_return_columns ) {
+            # to avoid ambiguties when we merge with CSR or attributes
+            my @col = map { 'certificate.'.$_ } @{$po->return_columns};
+            $params->{columns} = \@col;
+        }
+
+        if ( $po->has_limit ) {
+            $params->{limit} = $po->limit;
+            $params->{offset} = $po->start if $po->has_start;
+        }
+
+        # Custom ordering
+        my $desc = "-"; # not set or 0 means: DESCENDING, i.e. "-"
+        $desc = "" if $po->has_reverse and $po->reverse == 0;
+
+        if ($po->has_order) {
+            $params->{order_by} = sprintf "%scertificate.%s", $desc, lc($po->order);
+        } elsif ($desc) {
+            $params->{order_by} = [ '-certificate.notbefore', '-certificate.req_key' ];
+        } else {
+            $params->{order_by} = [ 'certificate.notbefore', 'certificate.req_key' ];
+        }
+
+    }
 
     ##! 2: "initialize arguments"
     ##! 32: 'Arguments ' . Dumper $po
@@ -375,8 +363,6 @@ sub _make_db_query {
     }
 
     my $ii = 0;
-    # Hide columns that are not returned, see #700
-    my $need_group = 0;
     # handle certificate attributes (such as SANs)
     if ( $po->has_cert_attributes ) {
         # we need to join over the certificate_attributes table
@@ -427,15 +413,16 @@ sub _make_db_query {
                 # as simple scalar query can never be multivalued we skip it
                 } elsif (ref $po->cert_attributes->{$key}) {
                     ##! 32: 'Need group on ' .$key
-                    $need_group = 1;
+                    $params->{distinct} = 1;
                 }
+
                 $ii++;
+
             }
         }
     }
 
     ##! 64: 'return_attrib ' . Dumper $return_attrib
-    my @group_by = ('certificate.identifier');
     foreach my $key (keys %{$return_attrib}) {
 
         # if the attribute was used in the query, it is already joined
@@ -448,11 +435,6 @@ sub _make_db_query {
             $ii++;
         }
         push @{$params->{columns}}, "$table_alias.attribute_value as $key";
-        push @group_by, $key if ($need_group);
-    }
-
-    if ($need_group) {
-        $params->{group_by} = \@group_by;
     }
 
     if ( $po->has_profile ) {
