@@ -160,6 +160,7 @@ sub _openapi_spec {
                                                         properties => {
                                                             'data' => $method_spec->{output_schema},
                                                             'state' => { type => 'string' },
+                                                            'proc_state' => { type => 'string' },
                                                             'pid' => { type => 'integer', },
                                                             'id' => { type => 'integer', },
                                                         },

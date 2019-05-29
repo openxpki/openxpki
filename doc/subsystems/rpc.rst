@@ -118,7 +118,9 @@ Certificates are revoked by specifying the certificate identifier::
 The response is in JSON format (http://www.jsonrpc.org/specification#response_object).
 Except for the "id" parameter, the result is identical to the definition of JSON RPC::
 
-    { result: { id: workflow_id, pid: process_id, state: workflow_state }}
+    { result: {
+        id: workflow_id, pid: process_id, state: workflow_state, proc_state: proc_state
+    }}
 
 On error, the content returned is::
 
