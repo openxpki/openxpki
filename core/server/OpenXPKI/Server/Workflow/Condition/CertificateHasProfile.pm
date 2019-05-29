@@ -19,7 +19,7 @@ sub _evaluate {
 
     my $identifier = $self->param('cert_identifier') // $context->param('cert_identifier');
 
-    configuration_error('No identifier passed to CertificateHasProfile');
+    configuration_error('No identifier passed to CertificateHasProfile') unless($identifier);
 
     my $expected_profile = $self->param('expected_profile');
     configuration_error('You must set expected_profile') unless($expected_profile);
