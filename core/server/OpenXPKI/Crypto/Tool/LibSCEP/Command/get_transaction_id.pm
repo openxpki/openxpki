@@ -26,7 +26,7 @@ sub get_result
 
     my $transid;
     eval {
-        $transid =  Crypt::LibSCEP::get_transaction_id($scep_handle_of{$ident});
+        $transid =  $scep_handle_of{$ident}->get_transaction_id;
     };
     if ($EVAL_ERROR) {
         OpenXPKI::Exception->throw(

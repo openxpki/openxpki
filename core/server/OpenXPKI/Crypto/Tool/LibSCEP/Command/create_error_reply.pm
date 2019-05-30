@@ -76,7 +76,7 @@ sub get_result
     my $senderNonce;
     my $error_reply;
     eval {
-        $transid = Crypt::LibSCEP::get_transaction_id($scep_handle_of{$ident});
+        $transid = $scep_handle_of{$ident}->get_transaction_id;
     };
     if ($EVAL_ERROR) {
         OpenXPKI::Exception->throw(
@@ -84,7 +84,7 @@ sub get_result
         );
     }
     eval {
-        $senderNonce = Crypt::LibSCEP::get_senderNonce($scep_handle_of{$ident});
+        $senderNonce = $scep_handle_of{$ident}->get_senderNonce;
     };
     if ($EVAL_ERROR) {
         OpenXPKI::Exception->throw(

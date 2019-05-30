@@ -27,14 +27,14 @@ sub get_result
     my $ident = ident $self;
     my $issuer_openssl;
     eval {
-        $issuer_openssl = Crypt::LibSCEP::get_issuer($scep_handle_of{$ident});
+        $issuer_openssl = $scep_handle_of{$ident}->get_issuer;
     };
     if ($EVAL_ERROR) {
         OpenXPKI::Exception->throw(
             message => $EVAL_ERROR,
         );
     }
-    
+
     ##! 64: 'issuer_openssl: ' . $issuer_openssl
 
     # LibSCEP returns the issuer name in OpenSSL format, we need to convert it to RFC 2253 notation
