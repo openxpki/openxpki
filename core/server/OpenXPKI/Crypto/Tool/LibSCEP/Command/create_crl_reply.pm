@@ -77,7 +77,7 @@ sub get_result
 
     my $transid;
     eval {
-        $transid = Crypt::LibSCEP::get_transaction_id($scep_handle_of{$ident});
+        $transid = $scep_handle_of{$ident}->get_transaction_id;
     };
     if($EVAL_ERROR) {
         OpenXPKI::Exception->throw(
@@ -87,7 +87,7 @@ sub get_result
 
     my $senderNonce;
     eval {
-        $senderNonce = Crypt::LibSCEP::get_senderNonce($scep_handle_of{$ident});
+        $senderNonce = $scep_handle_of{$ident}->get_senderNonce;
     };
     if($EVAL_ERROR) {
         OpenXPKI::Exception->throw(
@@ -97,7 +97,7 @@ sub get_result
 
     my $enc_cert;
     eval {
-        $enc_cert = Crypt::LibSCEP::get_signer_cert($scep_handle_of{$ident});
+        $enc_cert = $scep_handle_of{$ident}->get_signer_cert;
     };
     if($EVAL_ERROR) {
         OpenXPKI::Exception->throw(

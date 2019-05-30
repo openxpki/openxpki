@@ -27,7 +27,7 @@ sub get_result
     my $csr;
     eval {
       ##! 16: 'pre get csr'
-        $csr = Crypt::LibSCEP::get_pkcs10($scep_handle_of{$ident});
+        $csr = $scep_handle_of{$ident}->get_pkcs10;
       ##! 16: 'post get csr'
     };
     if ($EVAL_ERROR) {

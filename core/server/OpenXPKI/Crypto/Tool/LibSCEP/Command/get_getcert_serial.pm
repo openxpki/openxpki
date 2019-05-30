@@ -25,7 +25,7 @@ sub get_result
     my $ident = ident $self;
     my $serial;
     eval {
-        $serial = Crypt::LibSCEP::get_getcert_serial($scep_handle_of{$ident});
+        $serial = $scep_handle_of{$ident}->get_getcert_serial;
     };
     if ($EVAL_ERROR) {
         OpenXPKI::Exception->throw(

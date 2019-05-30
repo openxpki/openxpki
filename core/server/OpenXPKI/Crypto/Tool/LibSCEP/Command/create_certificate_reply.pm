@@ -74,7 +74,7 @@ sub get_result
     my $pending_reply;
 
     eval {
-        $transid = Crypt::LibSCEP::get_transaction_id($scep_handle_of{$ident});
+        $transid = $scep_handle_of{$ident}->get_transaction_id;
     };
     if($EVAL_ERROR) {
         OpenXPKI::Exception->throw(
@@ -82,7 +82,7 @@ sub get_result
         );
     }
     eval {
-        $senderNonce = Crypt::LibSCEP::get_senderNonce($scep_handle_of{$ident});
+        $senderNonce = $scep_handle_of{$ident}->get_senderNonce;
     };
     if($EVAL_ERROR) {
         OpenXPKI::Exception->throw(
@@ -91,7 +91,7 @@ sub get_result
     }
     eval{
         #yes, we use the signer cert for encryption
-        $enc_cert = Crypt::LibSCEP::get_signer_cert($scep_handle_of{$ident});
+        $enc_cert = $scep_handle_of{$ident}->get_signer_cert;
     };
     if($EVAL_ERROR) {
         OpenXPKI::Exception->throw(

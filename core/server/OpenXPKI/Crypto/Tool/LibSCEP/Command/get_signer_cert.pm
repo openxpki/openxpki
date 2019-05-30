@@ -25,7 +25,7 @@ sub get_result
     my $ident = ident $self;
     my $signerCert;
     eval {
-        $signerCert = Crypt::LibSCEP::get_signer_cert($scep_handle_of{$ident});
+        $signerCert = $scep_handle_of{$ident}->get_signer_cert;
     };
     if ($EVAL_ERROR) {
         OpenXPKI::Exception->throw(
