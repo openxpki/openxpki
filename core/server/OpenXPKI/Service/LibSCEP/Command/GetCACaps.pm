@@ -26,12 +26,9 @@ sub execute {
 
     ##! 8: 'start'
 
-    # we silently asume that all digests are supported and the server can handle post requests
+    # we silently asume that all digests are supported
     # which is true on current systems using the suggested toolchain
-    # post seems to be a bit more than just post (binary p7) - needs to be fixed
-    # my @caps = qw(GetNextCACert POSTPKIOperation Renewal SHA-512 SHA-256 SHA-1 DES3);
-
-    my @caps = qw( Renewal SHA-512 SHA-384 SHA-256 SHA-224 SHA-1 DES3);
+    my @caps = qw( Renewal POSTPKIOperation SHA-512 SHA-384 SHA-256 SHA-224 SHA-1 DES3);
     my $next_ca = $self->get_next_ca_certificate();
     if ($next_ca) {
         push @caps, 'GetNextCACert';

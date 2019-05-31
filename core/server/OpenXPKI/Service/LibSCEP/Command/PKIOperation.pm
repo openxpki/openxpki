@@ -62,7 +62,7 @@ sub execute {
     $pkcs7_raw =~ s{ \s }{}xmsg;
 
     # binary/der
-    my $pkcs7_decoded = decode_base64($pkcs7_raw);
+    # my $pkcs7_decoded = decode_base64($pkcs7_raw);
 
     # sanitize base64 input
     my $pkcs7_base64 = $pkcs7_raw;

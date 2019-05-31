@@ -66,14 +66,38 @@ while (my $cgi = CGI::Fast->new()) {
 
     # Fetch SCEP message from CGI (cf. Section 3.1 of the SCEP draft)
     # http://www.ietf.org/internet-drafts/draft-nourse-scep-13.txt
-    my $operation = $cgi->param('operation') || '';
-    my $message   = $cgi->param('message') || '';
 
-    # Get additional parameters from the url
-    my @extra_params = $cgi->param();
+    my $operation = $cgi->url_param('operation') || '';
+    my $message = $cgi->url_param('message') || '';
+
+    if ($cgi->request_method() eq 'POST') {
+        if ($operation eq 'PKIOperation') {
+            my $data = $cgi->param('POSTDATA');
+            if (!$data) {
+                $log->error("POSTDATA is empty - check documentation on required setup for Content-Type headers!");
+                $log->debug("Content-Type is " . ($ENV{'CONTENT_TYPE'} || 'undefined'));
+                next;
+            }
+            $message = encode_base64($data);
+        } else {
+            $log->error("Post request but operation is $operation");
+            $message = '';
+        }
+
+        if (!$message) {
+            print $cgi->header(
+               -type => 'text/plain',
+               -status => '400 Bad Request'
+            );
+            next;
+        }
+        $log->debug("Got PKIOperation via POST ");
+        $log->debug("Decoded SCEP message " . $message);
+    }
 
     # TODO - Whitelist, Url-Decode?
     my $params = {};
+    my @extra_params = $cgi->url_param();
     foreach my $param (@extra_params) {
         if ($param eq "operation" || $param eq "message") { next; }
         $params->{$param} = $cgi->param($param);
