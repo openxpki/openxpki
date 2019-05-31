@@ -167,6 +167,33 @@ command "search_cert" => {
 
     my $sql_params = $self->_make_db_query($params);
 
+    # Note: columns might be already set if return attributes is used
+    if ( $params->has_return_columns ) {
+        # to avoid ambiguties when we merge with CSR or attributes
+        my @col = map { 'certificate.'.$_ } @{$params->return_columns};
+        push @{$sql_params->{columns}}, @col;
+    } else {
+        push @{$sql_params->{columns}}, 'certificate.*';
+    }
+
+    if ( $params->has_limit ) {
+        $sql_params->{limit} = $params->limit;
+        $sql_params->{offset} = $params->start if $params->has_start;
+    }
+
+    # Custom ordering
+    my $desc = "-"; # not set or 0 means: DESCENDING, i.e. "-"
+    $desc = "" if $params->has_reverse and $params->reverse == 0;
+
+    if ($params->has_order) {
+        $sql_params->{order_by} = sprintf "%scertificate.%s", $desc, lc($params->order);
+    } elsif ($desc) {
+        $sql_params->{order_by} = [ '-certificate.notbefore', '-certificate.req_key' ];
+    } else {
+        $sql_params->{order_by} = [ 'certificate.notbefore', 'certificate.req_key' ];
+    }
+
+
     ##! 32: 'Query ' . Dumper $sql_params
 
     my $result = CTX('dbi')->select(
@@ -225,6 +252,9 @@ command "search_cert_count" => {
 
     my $sql_params = $self->_make_db_query($params);
 
+    # for counting the rows the return columns are irrelevant
+    push @{$sql_params->{columns}}, 'certificate.identifier';
+
     ##! 32: 'Query ' . Dumper $sql_params
     return CTX('dbi')->count(
         %{$sql_params}
@@ -237,38 +267,9 @@ sub _make_db_query {
 
     my $where = {};
     my $params = {
-        columns => [ 'certificate.*' ],
+        columns => [],
         where => $where,
     };
-
-    # do not use limit and return columns for count calls as the attributes
-    # do not exist and it is useless to count the rows anyway
-    if (ref $po ne 'OpenXPKI::Server::API2::Plugin::Cert::search_cert::search_cert_count_ParamObject') {
-
-        if ( $po->has_return_columns ) {
-            # to avoid ambiguties when we merge with CSR or attributes
-            my @col = map { 'certificate.'.$_ } @{$po->return_columns};
-            $params->{columns} = \@col;
-        }
-
-        if ( $po->has_limit ) {
-            $params->{limit} = $po->limit;
-            $params->{offset} = $po->start if $po->has_start;
-        }
-
-        # Custom ordering
-        my $desc = "-"; # not set or 0 means: DESCENDING, i.e. "-"
-        $desc = "" if $po->has_reverse and $po->reverse == 0;
-
-        if ($po->has_order) {
-            $params->{order_by} = sprintf "%scertificate.%s", $desc, lc($po->order);
-        } elsif ($desc) {
-            $params->{order_by} = [ '-certificate.notbefore', '-certificate.req_key' ];
-        } else {
-            $params->{order_by} = [ 'certificate.notbefore', 'certificate.req_key' ];
-        }
-
-    }
 
     ##! 2: "initialize arguments"
     ##! 32: 'Arguments ' . Dumper $po
