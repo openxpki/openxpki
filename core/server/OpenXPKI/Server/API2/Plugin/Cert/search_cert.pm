@@ -41,13 +41,56 @@ my $re_approval_lang     = qr{ \A (de_DE|en_US|ru_RU) \z }xms;
 my $re_csr_format        = qr{ \A (PEM|DER|TXT) \z }xms;
 my $re_pkcs10            = qr{ \A [A-za-z0-9\+/=_\-\r\n\ ]+ \z}xms;
 
+has 'return_columns_default' => (
+    isa => 'ArrayRef',
+    is => 'rw',
+    default => sub { return [qw(
+        identifier
+        issuer_dn
+        issuer_identifier
+        cert_key
+        subject
+        status
+        notbefore
+        notafter
+    )]}
+);
+
+
 =head2 search_cert
 
 Search certificates by various attributes.
 
-Returns an I<ArrayRef> of I<HashRefs>. The I<HashRefs> do not contain the data
-field of the database to reduce the transport costs an avoid parser
-implementations on the client.
+Returns an I<ArrayRef> of I<HashRefs>. To save transport and
+parsing cost, the I<HashRefs> only contain a subset of fields:
+
+    identifier
+    issuer_dn
+    issuer_identifier
+    cert_key
+    subject
+    status
+    notbefore
+    notafter
+    pki_realm*
+
+The field pki_realm is added if the query contains realm=_any and
+I<return_column> is not set. If you want to receive another
+fieldset, set the field names via I<return_column>.
+Extra columns available with the default schema are:
+
+    subject_key_identifier
+    authority_key_identifier
+    revocation_time
+    reason_code
+    invalidity_time
+    reason_code
+    req_key
+    data
+
+B<Note:> In some RDBMS data might be a BLOB column that prevents
+grouping of duplicate rows when I<cert_attributes> are used to search
+without returning all of them via I<return_attributes>.
 
 B<Parameters>
 
@@ -123,6 +166,13 @@ Note: If the attribute is multivalued or you use an attribute query that
 causes multiple result lines for a single certificate you will get more
 than one line for the same certificate!
 
+=item * C<return_columns> I<ArrayRef> - set the columns from the base
+table that should be included in the returned hashref. By default this
+replaces the default columns, if you want the columns to extend the default
+set put the plus sign '+' as first column name.
+
+  return_columns => [ '+', 'subject_key_identifier, .... ]
+
 =back
 
 B<Changes compared to API v1:> The following parameters where removed in favor
@@ -171,9 +221,16 @@ command "search_cert" => {
     if ( $params->has_return_columns ) {
         # to avoid ambiguties when we merge with CSR or attributes
         my @col = map { 'certificate.'.$_ } @{$params->return_columns};
+        if ($params->return_columns->[0] eq '+') {
+            shift @col;
+            map { push @{$sql_params->{columns}}, 'certificate.'.$_ } @{$self->return_columns_default()};
+        }
         push @{$sql_params->{columns}}, @col;
     } else {
-        push @{$sql_params->{columns}}, 'certificate.*';
+        map { push @{$sql_params->{columns}}, 'certificate.'.$_ } @{$self->return_columns_default()};
+        if ($params->has_pki_realm && $params->pki_realm =~ /_any/i) {
+            push @{$sql_params->{columns}}, 'certificate.pki_realm';
+        }
     }
 
     if ( $params->has_limit ) {
