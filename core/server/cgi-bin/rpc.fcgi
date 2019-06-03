@@ -125,11 +125,14 @@ sub _openapi_spec {
     eval {
         my $client = _create_client($cgi, $conf) or die "Could not create OpenXPKI client";
 
-        for my $method (grep { $_ !~ /^ ( global | auth | input ) $/x } keys %$conf) {
+        for my $method (sort keys %$conf) {
+            next unless ($conf->{$method}->{workflow});
+            my $in = $conf->{$method}->{param} || '';
+            my $out = $conf->{$method}->{output} || '';
             my $method_spec = $client->run_command('get_rpc_openapi_spec', {
                 workflow => $conf->{$method}->{workflow},
-                input => [ split /\s*,\s*/, $conf->{$method}->{param} ],
-                output => [ split /\s*,\s*/, $conf->{$method}->{output} ]
+                input => [ split /\s*,\s*/, $in ],
+                output => [ split /\s*,\s*/, $out ]
             });
 
             $paths->{"/$method"} = {
