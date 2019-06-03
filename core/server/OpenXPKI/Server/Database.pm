@@ -368,11 +368,8 @@ sub count {
         delete $query_param{$_} if (defined $query_param{$_});
     }
 
-    my $query = $self->query_builder->select(%query_param);
-    $query->string(sprintf "SELECT COUNT(*) as amount FROM (%s) as tmp", $query->string);
+    return $self->driver->count_rows( $self, $self->query_builder->select(%query_param) );
 
-    my $sth = $self->run($query);
-    return $sth->fetchrow_hashref->{amount};
 }
 
 # INSERT

@@ -64,6 +64,18 @@ sub table_drop_query {
     );
 }
 
+sub count_rows {
+
+    my ($self, $dbi, $query) = @_;
+
+    # there is no "as tmp" for the table as in the default method!
+    $query->string(sprintf "SELECT COUNT(*) as amount FROM (%s)", $query->string);
+
+    my $sth = $dbi->run($query);
+    return $sth->fetchrow_hashref->{amount};
+
+}
+
 ################################################################################
 # required by OpenXPKI::Server::Database::Role::SequenceSupport
 #
@@ -72,6 +84,7 @@ sub nextval_query {
     my ($self, $seq) = @_;
     return "SELECT $seq.NEXTVAL FROM DUAL";
 }
+
 
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #

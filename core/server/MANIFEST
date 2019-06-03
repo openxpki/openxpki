@@ -208,6 +208,7 @@ OpenXPKI/Server/Database/Driver/PostgreSQL.pm
 OpenXPKI/Server/Database/Driver/DB2.pm
 OpenXPKI/Server/Database/Driver/SQLite.pm
 OpenXPKI/Server/Database/Role/Driver.pm
+OpenXPKI/Server/Database/Role/CountEmulation.pm
 OpenXPKI/Server/Database/Role/MergeEmulation.pm
 OpenXPKI/Server/Database/Role/MergeSupport.pm
 OpenXPKI/Server/Database/Role/SequenceEmulation.pm

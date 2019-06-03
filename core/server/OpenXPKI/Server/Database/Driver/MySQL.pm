@@ -4,6 +4,7 @@ use utf8;
 with qw(
     OpenXPKI::Server::Database::Role::SequenceEmulation
     OpenXPKI::Server::Database::Role::MergeSupport
+    OpenXPKI::Server::Database::Role::CountEmulation
     OpenXPKI::Server::Database::Role::Driver
 );
 

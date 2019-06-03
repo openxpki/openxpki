@@ -49,6 +49,9 @@ requires 'sequence_create_query';
 # Returns OpenXPKI::Server::Database::Query: MERGE query (="REPLACE" = "UPSERT" = UPDATE or INSERT)
 requires 'merge_query';
 
+# Returns OpenXPKI::Server::Database::Query: to count the rows of a given SELECT statement
+requires 'count_rows';
+
 1;
 
 =head1 SYNOPSIS
