@@ -1188,9 +1188,11 @@ sub action_search {
     # Add san search to attributes
     if (my $val = $self->param('san')) {
         $input->{'san'} = $val;
+        $val =~ s{\*}{%}g;
+        $val =~ s{\?}{_}g;
         # SAN type is prefixed with a ":", do not expand query if a
         # user already added the prefix
-        $val = "%:$val" unless ($val =~ m{:});
+        $val = "%:$val" unless ($val =~ m{\A\w+:});
         $attr->{subject_alt_name} = { -like => $val };
     }
 
