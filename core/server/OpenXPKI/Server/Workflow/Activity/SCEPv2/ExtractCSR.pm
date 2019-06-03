@@ -348,12 +348,14 @@ sub execute {
 
     # We search here on the preprocessed subject - otherwise the max_count
     # condition is useless.
-    my $certs = CTX('api')->search_cert({
-        VALID_AT => time(),
-        STATUS => 'ISSUED',
-        ORDER => 'CERTIFICATE.NOTBEFORE',
-        SUBJECT => $cert_subject
-    });
+    my $certs = CTX('api2')->search_cert(
+        valid_before => time(),
+        expires_after => time(),
+        status => 'ISSUED',
+        order => 'notbefore',
+        subject => $cert_subject,
+        return_columns => [ 'identifier','notafter' ]
+    );
 
     # number of active certs
     ##! 64: 'certs found ' . Dumper $certs
@@ -378,8 +380,8 @@ sub execute {
         # check renewal on most recent active certificate
         my $recent_cert = shift @{$certs};
         ##! 32: 'recent cert ' . Dumper $recent_cert
-        $renewal_cert_notafter = $recent_cert->{NOTAFTER};
-        $renewal_cert_identifier = $recent_cert->{IDENTIFIER};
+        $renewal_cert_notafter = $recent_cert->{notafter};
+        $renewal_cert_identifier = $recent_cert->{identifier};
 
         CTX('log')->application()->info("SCEP initial enrollment for existing subject $signer_subject / $renewal_cert_identifier");
     }

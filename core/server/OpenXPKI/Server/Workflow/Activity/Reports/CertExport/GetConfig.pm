@@ -70,9 +70,15 @@ sub execute {
     # Realm might be empty
     $enc_target->{realm} = CTX('session')->data->pki_realm unless($enc_target->{realm});
 
-    my $enc_cert = CTX('api')->search_cert({ SUBJECT => $enc_target->{subject}, PKI_REALM => $enc_target->{realm}, VALID_AT => time() });
+    my $enc_cert = CTX('api2')->search_cert(
+        subject => $enc_target->{subject},
+        pki_realm => $enc_target->{realm},
+        valid_before => time(),
+        expires_after => time(),
+        return_columns => 'identifier',
+    );
 
-    my $enc_cert_ids = [ map  $_->{IDENTIFIER} , @{$enc_cert} ];
+    my $enc_cert_ids = [ map  $_->{identifier} , @{$enc_cert} ];
 
     ##! 8: 'Enc Target ' . Dumper $enc_cert_ids
 

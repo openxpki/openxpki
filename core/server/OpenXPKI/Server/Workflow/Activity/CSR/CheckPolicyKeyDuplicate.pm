@@ -39,6 +39,7 @@ sub execute
     my $query = {
         entity_only => 1,
         subject_key_identifier => $key_identifier,
+        return_columns => 'identifier',
     };
 
     if ($self->param('any_realm')) {

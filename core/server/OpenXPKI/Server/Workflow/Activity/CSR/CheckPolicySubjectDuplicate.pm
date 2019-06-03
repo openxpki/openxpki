@@ -35,6 +35,7 @@ sub execute
     my $query = {
         status => 'ISSUED',
         entity_only => 1,
+        return_columns => 'identifier',
     };
 
     if ($self->param('any_realm')) {

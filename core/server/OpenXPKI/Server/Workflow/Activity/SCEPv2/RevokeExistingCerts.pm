@@ -39,11 +39,12 @@ sub execute
     my $csr_subject = $context->param('cert_subject');
     ##! 16: ' Revoking all active certs with subject ' . $csr_subject
 
-    my $certs = CTX('api')->search_cert({
-        VALID_AT => time(),
-        STATUS => 'ISSUED',
-        SUBJECT => $csr_subject
-    });
+    my $certs = CTX('api2')->search_cert(
+        expires_after => time(),
+        status => 'ISSUED',
+        subject => $csr_subject,
+        return_columns => 'identifier',
+    );
 
     if (scalar(@{$certs})) {
         my $certs_to_revoke_wf = OpenXPKI::Server::Workflow::WFObject::WFArray->new(
@@ -53,9 +54,9 @@ sub execute
             } );
 
         foreach my $cert (@{$certs}) {
-            ##! 32: 'Add cert to revoke ' . $cert->{IDENTIFIER}
-           CTX('log')->application()->info("SCEP certificate added for automated revocation " . $cert->{IDENTIFIER});
-            $certs_to_revoke_wf->push( $cert->{IDENTIFIER} );
+            ##! 32: 'Add cert to revoke ' . $cert->{identifier}
+           CTX('log')->application()->info("SCEP certificate added for automated revocation " . $cert->{identifier});
+            $certs_to_revoke_wf->push( $cert->{identifier} );
         }
     } else {
         ##! 32: 'Unset queue - no certs to revoke'

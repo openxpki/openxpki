@@ -156,7 +156,7 @@ sub __send_cert : PRIVATE {
 
     ##! 16: 'Found serial - hex: ' . $requested_serial_hex . ' - dec: ' . $requested_serial_dec
 
-    my $cert_result = CTX('api')->search_cert({ 'CERT_SERIAL' => $requested_serial_dec });
+    my $cert_result = CTX('api2')->search_cert( 'cert_key' => $requested_serial_dec, return_columns => 'identifier' );
 
     ##! 32: 'Search result ' . Dumper $cert_result
     my $cert_count = scalar @{$cert_result};
@@ -191,7 +191,7 @@ sub __send_cert : PRIVATE {
         );
     }
 
-    my $cert_identifier  = $cert_result->[0]->{'IDENTIFIER'};
+    my $cert_identifier  = $cert_result->[0]->{'identifier'};
     ##! 16: 'Load Cert Identifier ' . $cert_identifier
     my $cert_pem = CTX('api2')->get_cert( 'identifier' => $cert_identifier, 'format' => 'PEM' );
 
@@ -241,11 +241,12 @@ sub __send_crl : PRIVATE {
     # certificate table, this will also catch situations where the Issuer DN
     # is reused over generations as the serial inside OXI is unique
 
-    my $res = CTX('api')->search_cert({
-        PKI_REALM => '_ANY',
-        ISSUER_DN => $requested_issuer_serial->{ISSUER},
-        CERT_SERIAL => $issuer_serial,
-    });
+    my $res = CTX('api2')->search_cert(
+        pki_realm => '_any',
+        issuer_dn => $requested_issuer_serial->{ISSUER},
+        cert_key => $issuer_serial,
+        return_columns => 'issuer_identifier',
+    );
 
     if (!$res || scalar @{$res} != 1) {
           CTX('log')->application()->error("SCEP getcrl - no issuer found for serial $issuer_serial and issuer " . $requested_issuer_serial->{ISSUER});
@@ -263,7 +264,7 @@ sub __send_crl : PRIVATE {
     ##! 32: 'Issuer Info ' . Dumper $res
 
     my $crl_res = CTX('api')->get_crl_list({
-        ISSUER => $res->[0]->{ISSUER_IDENTIFIER},
+        ISSUER => $res->[0]->{issuer_identifier},
         FORMAT => 'PEM',
         LIMIT => 1
     });

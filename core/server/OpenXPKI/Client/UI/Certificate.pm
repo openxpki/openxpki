@@ -1222,6 +1222,17 @@ sub action_search {
         $query->{return_attributes} = $cols;
     }
 
+    my %rcols;
+    foreach my $ff (@{$body}) {
+        next unless ($ff->{source} eq 'certificate');
+        if ($ff->{field} eq 'statusclass') {
+            $rcols{'status'} = 1;
+        } else {
+            $rcols{ $ff->{field} } = 1;
+        }
+    }
+    $query->{return_columns} = [ keys %rcols ];
+
     my @criteria;
     foreach my $item ((
         { name => 'subject', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT' },

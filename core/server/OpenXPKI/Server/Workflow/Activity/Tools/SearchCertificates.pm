@@ -38,7 +38,8 @@ sub execute
 
     my $query = {
         entity_only => 0,
-        cert_attributes => {}
+        cert_attributes => {},
+        return_columns => 'identifier',
     };
 
     if (!$include_revoked) {
