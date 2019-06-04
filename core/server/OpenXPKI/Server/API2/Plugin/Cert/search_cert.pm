@@ -88,9 +88,16 @@ Extra columns available with the default schema are:
     req_key
     data
 
-B<Note:> In some RDBMS data might be a BLOB column that prevents
-grouping of duplicate rows when I<cert_attributes> are used to search
-without returning all of them via I<return_attributes>.
+B<Note:> When I<cert_attributes> are used to search for attributes that are
+not part of the I<return_attributes> list, possible duplicate matches are
+eliminated using the "DISTINCT" keyword in the query. This requires that
+columns used to order the result set are included in the list of columns.
+This case is handled internally by the method but be aware that your result
+set can contain those columns even if not explicitly specified.
+
+There is also a limitation for some RDBMS that BLOB columns such as I<data>
+can not be used with distinct. Requesting a BLOB columns while DISTINTCT is
+used and will result in a server side exception.
 
 B<Parameters>
 
@@ -154,7 +161,9 @@ in attributes (KEY, VALUE, OPERATOR). Operator can be "EQUAL", "LIKE" or
 =item * C<start> I<Int> - result paging: only return entries starting at given
 index (can only be used if C<limit> was specified)
 
-=item * C<order> I<Str> - order results by this table column (descending). Default: "notbefore" (+req_key to properly work with duplicates)
+=item * C<order> I<Str> - order results by this table column (descending).
+Default: "notbefore" (+req_key to properly work with duplicates).
+Set to the empty string to return the result unsorted.
 
 =item * C<reverse> I<Bool> - order results ascending
 
@@ -220,7 +229,7 @@ command "search_cert" => {
     # Note: columns might be already set if return attributes is used
     if ( $params->has_return_columns ) {
         # to avoid ambiguties when we merge with CSR or attributes
-        my @col = map { 'certificate.'.$_ } @{$params->return_columns};
+        my @col = map { 'certificate.'.lc($_) } @{$params->return_columns};
         if ($params->return_columns->[0] eq '+') {
             shift @col;
             map { push @{$sql_params->{columns}}, 'certificate.'.$_ } @{$self->return_columns_default()};
@@ -242,12 +251,26 @@ command "search_cert" => {
     my $desc = "-"; # not set or 0 means: DESCENDING, i.e. "-"
     $desc = "" if $params->has_reverse and $params->reverse == 0;
 
+    # if the query uses distinct the order column must be in the selected columns
+    my %columns = map { $_ => 1 } @{$sql_params->{columns}};
     if ($params->has_order) {
-        $sql_params->{order_by} = sprintf "%scertificate.%s", $desc, lc($params->order);
-    } elsif ($desc) {
-        $sql_params->{order_by} = [ '-certificate.notbefore', '-certificate.req_key' ];
+        if ($params->order) {
+            my $col = "certificate." . lc($params->order);
+            $sql_params->{order_by} =  $desc.$col;
+            if ($sql_params->{distinct} && !$columns{ $col }) {
+                push @{$sql_params->{columns}}, $col;
+            }
+        }
     } else {
-        $sql_params->{order_by} = [ 'certificate.notbefore', 'certificate.req_key' ];
+        if ($sql_params->{distinct}) {
+            if (!$columns{'certificate.notbefore'}) { push @{$sql_params->{columns}}, 'certificate.notbefore'; }
+            if (!$columns{'certificate.req_key'}) { push @{$sql_params->{columns}}, 'certificate.req_key'; }
+        }
+        if ($desc) {
+            $sql_params->{order_by} = [ '-certificate.notbefore', '-certificate.req_key' ];
+        } else {
+            $sql_params->{order_by} = [ 'certificate.notbefore', 'certificate.req_key' ];
+        }
     }
 
 
