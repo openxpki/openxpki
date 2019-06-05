@@ -89,7 +89,7 @@ sub _init_dns {
     my $rr = Net::DNS::Resolver->new();
     $rr->udp_timeout($self->timeout());
     $rr->tcp_timeout($self->timeout());
-    $rr->retry(0);
+    $rr->retry(1);
     # the resolver waits for retrans even if a timeout occured
     $rr->retrans($self->timeout());
 
