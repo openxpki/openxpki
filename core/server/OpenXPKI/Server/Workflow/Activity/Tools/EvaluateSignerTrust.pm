@@ -136,6 +136,7 @@ sub execute {
 
     CTX('log')->application()->debug("Trusted Signer Authorization $signer_profile / $signer_realm / $signer_subject / $signer_identifier");
 
+    my $meta;
 
     TRUST_RULE:
     foreach my $rule (@rules) {
@@ -161,6 +162,22 @@ sub execute {
 
             } elsif ($key eq 'profile') {
                 $matched = ($signer_profile eq $match);
+
+            } elsif ($key =~ m{meta_}) {
+
+                if (!defined $meta->{$key}) {
+                    my $attr = CTX('api2')->get_cert_attributes(
+                        identifier => $signer_identifier,
+                        attribute => $key
+                    );
+                    $meta->{$key} = $attr->{$key} || [];
+                }
+                foreach my $aa (@{$meta->{$key}}) {
+                    ##! 64: "Attr $aa"
+                    next unless ($aa eq $match);
+                    $matched = 1;
+                    last;
+                }
 
             } else {
                 CTX('log')->system()->error("Trusted Signer Authorization unknown ruleset $key/$match");
@@ -204,7 +221,9 @@ OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust
 =head1 DESCRIPTION
 
 Evaluate if the signer certificate can be trusted. Populates the result
-into several context items, all values are boolean.
+into several context items, all values are boolean. Checks are based on
+the contents of the certificate database, so if you want to use external
+certificates with this class you need to import them first.
 
 =over
 
@@ -262,11 +281,39 @@ matching rules. The name of the rule is just used for logging purpose:
     profile: I18N_OPENXPKI_PROFILE_SCEP_SIGNER
     realm: ca-one
 
-The subject is evaluated as a regexp, therefore any characters with a
-special meaning in perl regexp need to be escaped! Identifier, profile and
-realm are matched as is, realm is always the session realm if not set.
-The rules in one entry are ANDed together. If you want to provide
-alternatives, add multiple list items.
+=head2 Rules
+
+The rules in one entry are ANDed together, values are full string match,
+except the subject rule. If you want to provide alternatives, add multiple
+list items.
+
+=over
+
+=item subject
+
+Evaluated as a regexp against the signers full subject, therefore any
+characters with a special meaning in perl regexp need to be escaped!
+
+=item profile
+
+Matches the name of the internal OpenXPKI profile assigned to this
+certificate. This implies that the certificate was issued by us.
+
+=item realm
+
+The name of the realm where the certificate originates from. Works
+also for imported certificates. The default is the current realm
+if not set, except when the rules matches on "identifier".
+
+=item identifier
+
+The identifier of the certificate. This works also with external issued or
+self signed certificates.
+
+=item meta_*
+
+Load the metadata attributes assigned to the certificate and match against
+the given value.
 
 =head2 Parameters
 
