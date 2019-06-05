@@ -26,7 +26,7 @@ sub get_result {
 
     my $message_type;
     eval {
-        $message_type = Crypt::LibSCEP::get_message_type($scep_handle_of{$ident});
+        $message_type = $scep_handle_of{$ident}->get_message_type;
     };
     if ($EVAL_ERROR) {
         OpenXPKI::Exception->throw(

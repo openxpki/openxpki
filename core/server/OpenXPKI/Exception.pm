@@ -50,15 +50,36 @@ sub full_message {
 
     ## put together and translate message
     my $msg = OpenXPKI::i18n::i18nGettext ($self->{message}, %{$self->{params}});
-    if ($msg eq $self->{message}) {
-        # the message was not translated
-        if (scalar keys %{$self->{params}}) {
-            # normalize the output => sort keys
-            # otherwise the output is not predictable
-            foreach my $key (sort keys %{$self->{params}}) {
-                $msg = $msg.", ".$key." => ".$self->{params}->{$key};
+
+    # append all parameters if message was not translated
+    if ($msg eq $self->{message} and scalar keys %{$self->{params}}) {
+        my $max_item_length = 50;
+        my $params_formatted =
+            join ", ",
+            map {
+                my $val = $self->{params}->{$_};
+                my $formatted;
+                if (not defined $val) {
+                    $formatted = "EMPTY";
+                }
+                elsif (ref $val eq 'ARRAY') {
+                    my $items = join(",", @$val);
+                    $items = substr($items, 0, $max_item_length-3) . "..." if length $items > $max_item_length;
+                    $formatted = "Array($items)";
+                }
+                elsif (ref $val eq 'HASH') {
+                    my $items = join ",", map { "$_=".($val->{$_} // '') } sort keys %$val;
+                    $items = substr($items, 0, $max_item_length-3) . "..." if length $items > $max_item_length;
+                    $formatted = "Hash($items)";
+                }
+                else {
+                    $formatted = $val;
+                }
+                sprintf "%s => %s", $_, $formatted;
             }
-        }
+            sort keys %{$self->{params}};
+
+        $msg = "$msg; $params_formatted";
     }
     ## this is only for debugging of OpenXPKI::Exception
     ## and creates a lot of noise
