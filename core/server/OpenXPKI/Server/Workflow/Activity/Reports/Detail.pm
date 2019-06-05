@@ -318,7 +318,7 @@ sub execute {
 
         my $attrib;
         if ($need_attr) {
-            $attrib = CTX('api')->get_cert_attributes({ IDENTIFIER => $item->{identifier} });
+            $attrib = CTX('api2')->get_cert_attributes( identifier => $item->{identifier} );
         } elsif(@attr) {
             foreach my $aa (@attr) {
                 # mock result of get_cert_attributes
