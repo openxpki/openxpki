@@ -25,7 +25,7 @@ sub execute {
     # one of error, overwrite, merge, skip
     my $mode = $self->param('mode') || 'error';
 
-    if ($mode !~ /(error|overwrite|skip)/) {
+    if ($mode !~ /(error|overwrite|skip|merge)/) {
         configuration_error('Invalid mode ' . $mode);
     }
 
@@ -49,15 +49,11 @@ sub execute {
             next KEY;
         }
 
-         my $dbi_cert_metadata = $dbi->select(
-            from => 'certificate_attributes',
-            columns => ['*'],
-            where => {
-                identifier => $cert_identifier,
-                attribute_contentkey => $key,
-            },
+        my $attr = CTX('api2')->get_cert_attributes(
+            identifier => $cert_identifier,
+            attribute => $key
         );
-        my $item = $dbi_cert_metadata->fetchrow_hashref;
+        my $item = $attr->{$key};
 
         if (!$item) {
             $dbi->insert(
@@ -69,12 +65,20 @@ sub execute {
                     attribute_value      => $value,
                 }
             );
-            CTX('log')->application()->info("Append certificate metadata $key with $value");
+            CTX('log')->application()->info("Append (set) certificate metadata $key with $value");
 
         } elsif ($mode eq 'skip') {
             CTX('log')->application()->info("Key already exists, skip certificate metadata with $key with $value");
 
         } elsif ($mode eq 'overwrite') {
+
+            if (scalar @{$item} > 1) {
+                OpenXPKI::Exception->throw (
+                    message => "Append Certificate Metadata item is not scalar but overwrite expected",
+                    params => { KEY => $key }
+                );
+            }
+
             $dbi->update(
                 table => 'certificate_attributes',
                 set => {
@@ -85,6 +89,25 @@ sub execute {
                 }
             );
             CTX('log')->application()->info("Overwrite certificate metadata $key with $value");
+
+        } elsif ($mode eq 'merge') {
+
+            my @t = grep { $_ eq $value } @{$item};
+            if (!scalar @t) {
+                $dbi->insert(
+                    into => 'certificate_attributes',
+                    values => {
+                        attribute_key        => AUTO_ID,
+                        identifier           => $cert_identifier,
+                        attribute_contentkey => $key,
+                        attribute_value      => $value,
+                    }
+                );
+                CTX('log')->application()->info("Append (merge) certificate metadata $key with $value");
+            } else {
+
+                CTX('log')->application()->info("Value already exists, skip certificate metadata with $key with $value");
+            }
 
         } else {
             OpenXPKI::Exception->throw (
@@ -123,17 +146,13 @@ This will attach a new metadata item with the key meta_new_attribute and
 value my_value for the given identifier. This information does not depend
 on any metadata settings in the certificates profile!
 
-Metadata is assumed to have a scalar value and each key only exists once
-per certificate. The behaviour if the key already exists is controlled by
-the I<mode> parameter.
-
 =head2 Mode
 
 =over
 
 =item error
 
-If the used key is already present, an exception is thrown.
+If the used key is already present, an exception is thrown. This is the default.
 
 =item skip
 
@@ -141,7 +160,13 @@ The new value is discarded, the old one will remain in the table.
 
 =item overwrite
 
-The old value is replaced by the new one.
+The old value is replaced by the new one, expects that only one value exists.
+If multiple values have been found, an exception is thrown.
+
+=item merge
+
+Add the new value if it does not already exists, will also work if the key
+is defined more than once.
 
 =back
 
