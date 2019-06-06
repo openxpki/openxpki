@@ -523,6 +523,11 @@ sub __handle_GET_PKI_REALM : PRIVATE {
         $self->__change_state({
             STATE => 'WAITING_FOR_AUTHENTICATION_STACK',
         });
+        # proceed if stack is already set
+        if (defined $message->{PARAMS}->{'AUTHENTICATION_STACK'}) {
+            delete $message->{PARAMS}->{'PKI_REALM'};
+            return $self->__handle_GET_AUTHENTICATION_STACK($message);
+        }
         return $self->__list_authentication_stacks();
     }
     # check for next step, change state and prepare response

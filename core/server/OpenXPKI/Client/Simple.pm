@@ -235,24 +235,25 @@ sub _build_client {
 
     $log->debug("Initialize client");
 
+    my $reply;
     # if we have a frontend session object, we also create a backend session
     if ($self->session()) {
-        $self->__reinit_session( $client );
+        $reply = $self->__reinit_session( $client );
 
     # Init a fresh backend session
     } else {
 
-        if (! $client->init_session()) {
+        $reply = $client->init_session();
+        if (!$reply) {
             die "Could not initiate OpenXPKI server session. Stopped";
         }
         $log->debug("Started volatile session with id: " . $client->get_session_id() );
     }
 
-    # check if we need a login and iterate the necessary steps
-    my $reply = $client->send_receive_service_msg('PING');
+    # this should not happen
+    $reply = $client->send_receive_service_msg('PING') unless($reply);
 
-    my $status = $reply->{SERVICE_MSG};
-    if ($status eq 'GET_PKI_REALM') {
+    if ($reply->{SERVICE_MSG} eq 'GET_PKI_REALM') {
         my $realm = $self->realm();
         if (! $realm ) {
             $log->fatal("Found more than one realm but no realm is specified");
@@ -260,8 +261,12 @@ sub _build_client {
             die "No realm specified";
         }
         $log->debug("Selecting realm $realm");
-        $reply = $client->send_receive_service_msg('GET_PKI_REALM',
-            { PKI_REALM => $realm });
+        $reply = $client->send_receive_service_msg('GET_PKI_REALM',{
+            PKI_REALM => $realm,
+            AUTHENTICATION_STACK => $auth->{stack},
+            LOGIN => $auth->{user},
+            PASSWD => $auth->{pass},
+        });
     }
 
     if ($reply->{SERVICE_MSG} eq 'GET_AUTHENTICATION_STACK') {
@@ -272,9 +277,11 @@ sub _build_client {
             die "No auth stack specified";
         }
         $log->debug("Selecting auth stack ". $auth->{stack});
-        $reply = $client->send_receive_service_msg('GET_AUTHENTICATION_STACK',
-            { AUTHENTICATION_STACK => $auth->{stack} });
-
+        $reply = $client->send_receive_service_msg('GET_AUTHENTICATION_STACK',{
+            AUTHENTICATION_STACK => $auth->{stack},
+            LOGIN => $auth->{user},
+            PASSWD => $auth->{pass}
+        });
     }
 
     if ($reply->{SERVICE_MSG} =~ /GET_(.*)_LOGIN/) {
@@ -496,6 +503,13 @@ sub disconnect {
     return $self;
 }
 
+=head2 __reinit_session
+
+Try to reconnect an existing session. Returns the result of init_session
+from the underlying client.
+
+=cut
+
 sub __reinit_session {
 
     my $self = shift;
@@ -509,15 +523,16 @@ sub __reinit_session {
     my $old_session =  $session->param('backend_session_id') || undef;
     $self->logger()->info('old backend session ' . $old_session) if ($old_session);
 
+    my $reply;
     # Fetch errors on session init
     eval {
-        $client->init_session({ SESSION_ID => $old_session });
+        $reply = $client->init_session({ SESSION_ID => $old_session });
     };
     if (my $eval_err = $EVAL_ERROR) {
         my $exc = OpenXPKI::Exception->caught();
         if ($exc && $exc->message() eq 'I18N_OPENXPKI_CLIENT_INIT_SESSION_FAILED') {
             # The session has gone - start a new one - might happen if the client was idle too long
-            $client->init_session({ SESSION_ID => undef });
+            $reply = $client->init_session({ SESSION_ID => undef });
             $self->logger()->info('Backend session was gone - start a new one');
         } else {
             $self->logger()->error('Error creating backend session: ' . $eval_err->{message});
@@ -538,7 +553,7 @@ sub __reinit_session {
     $session->param('backend_session_id', $client_session);
     $self->logger()->trace( Dumper $session );
 
-    return $self;
+    return $reply;
 
 }
 

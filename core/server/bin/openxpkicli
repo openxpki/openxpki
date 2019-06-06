@@ -239,6 +239,7 @@ while (1) {
         }
         $reply = $client->send_receive_service_msg('GET_PKI_REALM',{
             PKI_REALM => $params{realm},
+            AUTHENTICATION_STACK => $params{authstack},
         });
       next SERVICE_MESSAGE;
     }
@@ -256,7 +257,7 @@ while (1) {
             die "No --authstack specified. Stopped";
         }
         $reply = $client->send_receive_service_msg('GET_AUTHENTICATION_STACK', {
-               AUTHENTICATION_STACK => $params{authstack},
+            AUTHENTICATION_STACK => $params{authstack},
         });
         next SERVICE_MESSAGE;
     }
