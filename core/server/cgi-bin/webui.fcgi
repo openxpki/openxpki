@@ -83,6 +83,12 @@ if ($config{session}{ip_match}) {
    $CGI::Session::IP_MATCH = 1;
 }
 
+if ($config{session}{driver} && $config{session}{driver} eq 'openxpki') {
+    warn "Builtin session driver is deprecated and will be removed with next release!";
+    $log->warn("Builtin session driver is deprecated and will be removed with next release!");
+}
+
+
 $log->info('Start fcgi loop ' . $$. ', config: ' . $configfile);
 
 # We persist the client in the CGI *per session*
