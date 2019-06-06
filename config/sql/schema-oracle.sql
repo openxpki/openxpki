@@ -125,7 +125,6 @@ CREATE TABLE csr (
   pki_realm varchar2(255) NOT NULL,
   format varchar2(25),
   profile varchar2(255),
-  loa varchar2(255),
   subject varchar2(1000),
   data clob,
   PRIMARY KEY (pki_realm, req_key)

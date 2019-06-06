@@ -72,7 +72,6 @@ CREATE TABLE IF NOT EXISTS `csr` (
   `pki_realm` varchar(255) NOT NULL,
   `format` varchar(25) DEFAULT NULL,
   `profile` varchar(255) DEFAULT NULL,
-  `loa` varchar(255) DEFAULT NULL,
   `subject` varchar(1000) DEFAULT NULL,
   `data` longtext
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

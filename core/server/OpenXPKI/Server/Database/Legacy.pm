@@ -21,7 +21,6 @@ my $certificate_map = {
     identifier                => 'IDENTIFIER',
     issuer_dn                 => 'ISSUER_DN',
     issuer_identifier         => 'ISSUER_IDENTIFIER',
-    loa                       => 'LOA',
     notafter                  => 'NOTAFTER',
     notbefore                 => 'NOTBEFORE',
     pki_realm                 => 'PKI_REALM',
@@ -50,7 +49,6 @@ our $csr_map = {
     pki_realm   => 'PKI_REALM',
     format      => 'TYPE',
     profile     => 'PROFILE',
-    loa         => 'LOA',
     subject     => 'SUBJECT',
     data        => 'DATA',
 };

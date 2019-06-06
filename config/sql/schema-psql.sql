@@ -129,7 +129,6 @@ CREATE TABLE csr (
     format text,
     data text,
     profile text,
-    loa text,
     subject text
 );
 
