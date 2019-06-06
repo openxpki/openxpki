@@ -64,7 +64,7 @@ lowercase keys. Additionally the following keys changed:
 
     CERTIFICATE_SERIAL      --> cert_key
     CERTIFICATE_SERIAL_HEX  --> cert_key_hex
-    PUBKEY                  --> public_key
+    PUBKEY                  --> removed in v2.5
     CSR_SERIAL              --> req_key
 
 =cut

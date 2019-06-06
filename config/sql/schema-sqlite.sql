@@ -70,7 +70,6 @@ CREATE TABLE certificate (
   reason_code varchar(50),
   hold_instruction_code varchar(50),
   req_key bigint,
-  public_key text,
   data longtext,
   PRIMARY KEY (issuer_identifier, cert_key)
 );

@@ -45,7 +45,6 @@ CREATE TABLE IF NOT EXISTS `certificate` (
   `reason_code` varchar(50) DEFAULT NULL,
   `hold_instruction_code` varchar(50) DEFAULT NULL,
   `req_key` bigint(20) unsigned DEFAULT NULL,
-  `public_key` text,
   `data` longtext
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

@@ -87,7 +87,6 @@ CREATE TABLE certificate (
     reason_code text,
     hold_instruction_code text,
     req_key numeric(49,0),
-    public_key text,
     data text,
     role text
 );

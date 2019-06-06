@@ -77,7 +77,6 @@ CREATE TABLE certificate (
   reason_code varchar2(64),
   hold_instruction_code varchar2(64),
   req_key number,
-  public_key clob,
   data clob,
   PRIMARY KEY (issuer_identifier, cert_key)
 );

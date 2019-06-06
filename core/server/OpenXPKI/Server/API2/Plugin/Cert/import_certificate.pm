@@ -98,7 +98,6 @@ command "import_certificate" => {
         status => 'ISSUED',
         identifier => $cert_identifier,
         data => $x509->pem,
-        # FIXME public_key is missing !
         issuer_dn => $x509->get_issuer,
         cert_key => $x509->get_serial,
         subject => $x509->get_subject,

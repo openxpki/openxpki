@@ -25,7 +25,6 @@ my $certificate_map = {
     notafter                  => 'NOTAFTER',
     notbefore                 => 'NOTBEFORE',
     pki_realm                 => 'PKI_REALM',
-    public_key                => 'PUBKEY',
     req_key                   => 'CSR_SERIAL',
     status                    => 'STATUS',
     subject                   => 'SUBJECT',

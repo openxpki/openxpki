@@ -416,7 +416,7 @@ sub to_db_hash {
     $insert_hash{DATA}               = $self->{DATA};
     $insert_hash{SUBJECT}            = $self->{PARSED}->{BODY}->{SUBJECT};
     $insert_hash{ISSUER_DN}          = $self->{PARSED}->{BODY}->{ISSUER};
-    $insert_hash{PUBKEY}             = $self->{PARSED}->{BODY}->{PUBKEY};
+
     # set subject key id and authority key id, if defined.
     if (defined $self->get_subject_key_id()) {
         $insert_hash{SUBJECT_KEY_IDENTIFIER} = $self->get_subject_key_id();
