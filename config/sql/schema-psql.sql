@@ -512,131 +512,66 @@ ALTER TABLE ONLY workflow_history
 ALTER TABLE ONLY workflow
     ADD CONSTRAINT workflow_pkey PRIMARY KEY (workflow_id);
 
---
--- Name: cert_attributes_key_index; Type: INDEX; Schema: public; Tablespace:
---
 
+CREATE INDEX aliases_realm_group ON aliases USING btree (pki_realm, group_id);
 
-CREATE INDEX cert_attributes_key_index ON certificate_attributes USING btree (attribute_contentkey);
-
---
--- Name: cert_csr_serial_index; Type: INDEX; Schema: public; Tablespace:
---
+CREATE INDEX application_log_id ON application_log USING btree (workflow_id);
+CREATE INDEX application_log_filter ON application_log USING btree (workflow_id,category,priority);
 
 CREATE INDEX cert_csr_serial_index ON certificate USING btree (req_key);
-
---
--- Name: cert_identifier_index; Type: INDEX; Schema: public; Tablespace:
---
-
-CREATE INDEX cert_identifier_index ON certificate USING btree (identifier);
-
---
--- Name: cert_pki_realm_index; Type: INDEX; Schema: public; Tablespace:
---
-
-CREATE INDEX cert_pki_realm_index ON certificate USING btree (pki_realm);
-
---
--- Name: cert_realm_index; Type: INDEX; Schema: public; Tablespace:
---
-
+CREATE UNIQUE INDEX cert_identifier_index ON certificate USING btree (identifier);
+CREATE INDEX cert_issuer_identifier_index ON certificate USING btree (issuer_identifier);
+CREATE INDEX cert_realm_req_index ON certificate USING btree (pki_realm, req_key);
 CREATE INDEX cert_realm_index ON certificate USING btree (pki_realm);
-
---
--- Name: cert_status_index; Type: INDEX; Schema: public; Tablespace:
---
-
 CREATE INDEX cert_status_index ON certificate USING btree (status);
-
---
--- Name: cert_subject_index; Type: INDEX; Schema: public; Tablespace:
---
-
 CREATE INDEX cert_subject_index ON certificate USING btree (subject);
+CREATE INDEX cert_notbefore_index ON certificate USING btree (notbefore);
+CREATE INDEX cert_notafter_index ON certificate USING btree (notafter);
+CREATE INDEX cert_revocation_time_index ON certificate USING btree (revocation_time);
+CREATE INDEX cert_invalidity_time_index ON certificate USING btree (invalidity_time);
+CREATE INDEX cert_reason_code_index ON certificate USING btree (reason_code);
+CREATE INDEX cert_hold_index ON certificate USING btree (hold_instruction_code);
 
---
--- Name: csr_profile_index; Type: INDEX; Schema: public; Tablespace:
---
+CREATE INDEX cert_attributes_key_index ON certificate_attributes USING btree (attribute_contentkey);
+CREATE INDEX cert_attributes_value_index ON certificate_attributes USING btree (attribute_value);
+CREATE INDEX cert_attributes_identifier_index ON certificate_attributes USING btree (identifier);
+CREATE INDEX cert_attributes_keyid_index ON certificate_attributes USING btree (identifier,attribute_contentkey);
+CREATE INDEX cert_attributes_keyvalue_index ON certificate_attributes USING btree (attribute_contentkey,attribute_value);
 
-CREATE INDEX csr_profile_index ON csr USING btree (profile);
 
---
--- Name: csr_subject_index; Type: INDEX; Schema: public; Tablespace:
---
+CREATE INDEX crl_issuer_index ON crl USING btree (issuer_identifier);
+CREATE INDEX crl_realm_index ON crl USING btree (pki_realm);
+CREATE INDEX crl_issuer_update_index ON crl USING btree (issuer_identifier, last_update);
+CREATE INDEX crl_issuer_number_index ON crl USING btree (issuer_identifier, crl_number);
 
 CREATE INDEX csr_subject_index ON csr USING btree (subject);
-
 CREATE INDEX csr_realm_index ON csr USING btree (pki_realm);
-
 CREATE INDEX csr_realm_profile_index ON csr USING btree (pki_realm, profile);
 
---
--- Name: backend_session_modified_index; Type: INDEX; Schema: public; Tablespace:
---
+CREATE INDEX csr_attributes_req_key_index ON csr_attributes USING btree (req_key);
+
+CREATE INDEX datapool_namespace_index ON datapool USING btree (pki_realm, namespace);
+CREATE INDEX datapool_notafter_index ON datapool USING btree (notafter);
 
 CREATE INDEX backend_session_modified_index ON backend_session USING btree (modified);
 
---
--- Name: frontend_session_modified_index; Type: INDEX; Schema: public; Tablespace:
---
-
 CREATE INDEX frontend_session_modified_index ON frontend_session USING btree (modified);
 
---
--- Name: wf_attributes_key_index; Type: INDEX; Schema: public; Tablespace:
---
+CREATE INDEX workflow_pki_realm_index ON workflow USING btree (pki_realm);
+CREATE INDEX workflow_realm_type_index ON workflow USING btree (pki_realm, workflow_type);
+CREATE INDEX workflow_state_index ON workflow USING btree (pki_realm, workflow_state);
+CREATE INDEX workflow_state_index ON workflow USING btree (pki_realm, workflow_proc_state);
+CREATE INDEX workflow_wakeup_index ON workflow USING btree (workflow_proc_state, watchdog_key, workflow_wakeup_at);
+CREATE INDEX workflow_reapat_index ON workflow USING btree (workflow_proc_state, watchdog_key, workflow_reap_at);
 
-CREATE INDEX wf_attributes_key_index ON workflow_attributes USING btree (workflow_id);
-
---
--- Name: wf_context_key_index; Type: INDEX; Schema: public; Tablespace:
---
-
-CREATE INDEX wf_context_key_index ON workflow_context USING btree (workflow_context_key);
-
---
--- Name: wf_hist_wfserial_index; Type: INDEX; Schema: public; Tablespace:
---
+CREATE INDEX wfl_attributes_id_index ON workflow_attributes USING btree (workflow_id);
+CREATE INDEX wfl_attributes_key_index ON workflow_attributes USING btree (attribute_contentkey);
+CREATE INDEX wfl_attributes_value_index ON workflow_attributes USING btree (attribute_value);
+CREATE INDEX wfl_attributes_keyvalue_index ON workflow_attributes USING btree (attribute_contentkey,attribute_value);
 
 CREATE INDEX wf_hist_wfserial_index ON workflow_history USING btree (workflow_id);
 
---
--- Name: wf_realm_index; Type: INDEX; Schema: public; Tablespace:
---
-
-CREATE INDEX wf_realm_index ON workflow USING btree (pki_realm);
-
---
--- Name: workflow_history_workflow_serial_index; Type: INDEX; Schema: public; Tablespace:
---
-
-CREATE INDEX workflow_history_workflow_serial_index ON workflow_history USING btree (workflow_id);
-
---
--- Name: workflow_pki_realm_index; Type: INDEX; Schema: public; Tablespace:
---
-
-CREATE INDEX workflow_pki_realm_index ON workflow USING btree (pki_realm);
-
---
--- Name: workflow_state_index; Type: INDEX; Schema: public; Tablespace:
---
-
-CREATE INDEX workflow_state_index ON workflow USING btree (workflow_state);
-
---
--- Name: workflow_type_index; Type: INDEX; Schema: public; Tablespace:
---
-
-CREATE INDEX workflow_type_index ON workflow USING btree (workflow_type);
-
---
--- Name: cert_identifier_index; Type: INDEX; Schema: public; Tablespace:
---
-
 CREATE INDEX ocsp_responses_index ON ocsp_responses USING btree (identifier);
-
 
 --
 -- PostgreSQL database dump complete
