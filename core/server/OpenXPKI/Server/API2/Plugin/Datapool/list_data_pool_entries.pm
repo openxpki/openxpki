@@ -42,6 +42,8 @@ of the currently active session is accepted.
 
 =item * C<limit> I<Int> - max. number of entries returned. Optional.
 
+=item * C<metadata> I<Bool> - add mtime and expiration date to the result (epoch)
+
 =back
 
 =cut
@@ -49,6 +51,7 @@ command "list_data_pool_entries" => {
     namespace => { isa => 'AlphaPunct', },
     pki_realm => { isa => 'AlphaPunct', default => sub { CTX('session')->data->pki_realm } },
     limit     => { isa => 'Int', },
+    metadata  => { isa => 'Bool', },
 } => sub {
     my ($self, $params) = @_;
 
@@ -59,9 +62,15 @@ command "list_data_pool_entries" => {
     # chain we assume it's ok.
     $self->assert_current_pki_realm_within_workflow($requested_pki_realm);
 
+
+    my @colums = qw( namespace datapool_key );
+    if ($params->has_metadata && $params->metadata) {
+        push @colums, "last_update", "notafter";
+    }
+
     my $result = CTX('dbi')->select(
         from   => 'datapool',
-        columns => [ qw( namespace datapool_key ) ],
+        columns => \@colums,
         where => {
             pki_realm => $requested_pki_realm,
             $params->has_namespace ? (namespace => $params->namespace) : (),
@@ -70,12 +79,22 @@ command "list_data_pool_entries" => {
         $params->has_limit ? ( limit => $params->limit ) : (),
     )->fetchall_arrayref({});
 
-    return [
-        map { {
+    my @res;
+    if ($params->has_metadata && $params->metadata) {
+        @res = map { {
+            namespace => $_->{namespace},
+            key       => $_->{datapool_key},
+            mtime     => $_->{last_update},
+            expiration_date => $_->{notafter} // '',
+        } } @$result
+    } else {
+        @res = map { {
             namespace => $_->{namespace},
             key       => $_->{datapool_key},
         } } @$result
-    ];
+    }
+    return \@res;
+
 };
 
 __PACKAGE__->meta->make_immutable;
