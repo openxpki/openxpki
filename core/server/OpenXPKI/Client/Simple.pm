@@ -261,6 +261,7 @@ sub _build_client {
             die "No realm specified";
         }
         $log->debug("Selecting realm $realm");
+        my $auth = $self->auth();
         $reply = $client->send_receive_service_msg('GET_PKI_REALM',{
             PKI_REALM => $realm,
             AUTHENTICATION_STACK => $auth->{stack},
