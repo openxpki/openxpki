@@ -3,9 +3,18 @@ Description=OpenXPKI Trustcenter Backend
 After=network.target apache2.service
 
 [Service]
-ExecStart=/usr/bin/openxpkictl start
-ExecStop=/usr/bin/openxpkictl stop
-ExecReload=/usr/bin/openxpkictl reload
-Type=forking
-KillMode=process
+Type=exec
+PIDFile=/var/run/openxpkid.pid
+ExecStart=/opt/myperl/bin/openxpkictl start --nd
+ExecStop=/opt/myperl/bin/openxpkictl stop
+# We want systemd to give the daemon some time to finish gracefully, but still want
+# it to kill httpd after TimeoutStopSec if something went wrong during the
+# graceful stop. Normally, Systemd sends SIGTERM signal right after the
+# ExecStop, which would kill the daemon. We are sending useless SIGCONT here to give
+# the daemon time to finish.
 Restart=on-failure
+KillSignal=SIGCONT
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
