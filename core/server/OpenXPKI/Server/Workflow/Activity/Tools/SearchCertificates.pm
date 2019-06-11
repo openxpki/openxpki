@@ -148,7 +148,7 @@ sub execute
         ##! 16: 'Checking key ' . $key
         if ($key =~ /^(meta_|system_|subject_alt_name)/) {
             my $value = $self->param($key);
-            next unless $value ne '';
+            next unless (defined $value && $value ne '');
             ##! 16: 'Add key with value ' . $value
             $query->{cert_attributes}->{$key} = { '=', $value };
         }

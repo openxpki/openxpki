@@ -548,7 +548,7 @@ sub handle_login {
         } elsif( $login_type  eq 'PASSWD' ) {
 
             # Credentials are passed!
-            if ($cgi->param('action') eq 'login!password') {
+            if ($cgi->param('action') && $cgi->param('action') eq 'login!password') {
                 $self->logger()->debug('Seems to be an auth try - validating');
                 ##FIXME - Input validation, dynamic config (alternate logins)!
                 $reply = $self->backend()->send_receive_service_msg( $status,

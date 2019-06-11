@@ -102,7 +102,7 @@ sub set_crl_items {
                     $reason_code = 'unspecified';
                 }
 
-                if ($reason_code eq 'keyCompromise' && scalar @{$item}) {
+                if ($reason_code eq 'keyCompromise' && scalar @{$item} && $item->[0]) {
                     my $invalidity_time = shift @{$item};
                     eval {
                         my $invalidity_date = OpenXPKI::DateTime::convert_date({
