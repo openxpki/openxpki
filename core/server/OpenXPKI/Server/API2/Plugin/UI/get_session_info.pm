@@ -47,6 +47,7 @@ command "get_session_info" => {
         lang            => 'en',
         checksum        => CTX('config')->checksum(),
         sid             => substr($session->id,0,4),
+        userinfo        => $session->data->userinfo,
     }
 };
 
