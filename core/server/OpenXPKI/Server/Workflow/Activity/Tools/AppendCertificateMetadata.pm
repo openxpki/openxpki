@@ -85,15 +85,14 @@ sub execute {
                     attribute_value  => $value,
                 },
                 where => {
-                    attribute_key    => $item->{attribute_key},
+                    attribute_contentkey => $key,
                 }
             );
             CTX('log')->application()->info("Overwrite certificate metadata $key with $value");
 
         } elsif ($mode eq 'merge') {
 
-            my @t = grep { $_ eq $value } @{$item};
-            if (!scalar @t) {
+            if ((grep { $_ eq $value } @{$item}) == 0) {
                 $dbi->insert(
                     into => 'certificate_attributes',
                     values => {
