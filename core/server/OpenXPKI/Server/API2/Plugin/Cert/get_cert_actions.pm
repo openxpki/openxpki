@@ -7,7 +7,9 @@ OpenXPKI::Server::API2::Plugin::Cert::get_cert_actions
 
 =cut
 
+use Data::Dumper;
 # Project modules
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 
@@ -17,7 +19,7 @@ use OpenXPKI::Server::API2::Types;
 
 =head2 get_cert_actions
 
-Requires a certificate identifier (IDENTIFIER) and optional ROLE.
+Requires a certificate identifier and optional role.
 Returns a list of actions that the given role (defaults to current
 session role) can do with the given certificate. The return value is a
 nested hash with options available for lifecyle actions. The list of
@@ -35,6 +37,16 @@ Example:
    - label: I18N_OPENXPKI_UI_CERT_ACTION_RENEW
      workflow: certificate_renewal_request
      condition: issued
+
+   - label: I18N_OPENXPKI_UI_CERT_ACTION_AUTHORIZE
+     workflow: certificate_authorize
+     condition: issued profile
+     profile: tls-client tls-client-server
+
+The return value is a list with label and workflow set for each element
+that meets the condition(s) given in the I<condition> keyword. Conditions
+are optional, if multiple conditions are given (separated by a whitespace)
+all conditions must be met.
 
 Valid conditions are:
 
@@ -55,6 +67,12 @@ The certificate is not revoked and within the validity interval
 =item owner
 
 current user is the certificate owner (see is_certificate_owner)
+
+=item profile
+
+Certificate must be of a certain profile, the list of allowed profiles
+must be given with the I<profile> key, multiple profiles can be given,
+separated by whitespace.
 
 =back
 
@@ -143,6 +161,11 @@ command "get_cert_actions" => {
                 }
                 elsif ($rule eq 'owner') {
                     next OPTION  unless $self->api->is_certificate_owner(identifier => $cert_id);
+                }
+                elsif ($rule eq 'profile') {
+                    my $profile = $self->api->get_profile_for_cert( identifier => $cert_id );
+                    my @profiles = split /[\s]/, $item->{profile};
+                    next OPTION unless ((grep { $_ eq $profile } @profiles) != 0);
                 }
             }
         }
