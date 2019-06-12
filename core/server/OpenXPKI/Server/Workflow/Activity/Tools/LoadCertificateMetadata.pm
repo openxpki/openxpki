@@ -45,6 +45,7 @@ sub execute {
         ##! 32: 'Examine Key ' . $metadata->{ATTRIBUTE_KEY}
         my $key = $metadata->{attribute_contentkey};
         my $value = $metadata->{attribute_value};
+        # this should never happen - might be removed in next release
         if (OpenXPKI::Serialization::Simple::is_serialized($value)) {
             ##! 32: 'Deserialize '
             $value = $ser->deserialize( $value );
@@ -64,7 +65,7 @@ sub execute {
         }
     }
 
-    # write to the context, serialize non-scalars and add []
+    # write to the context, serialization and brackets are no longer required, #695
     foreach my $key (keys %{$context_data}) {
         my $val = $context_data->{$key};
         my $tkey = $key;
@@ -72,13 +73,9 @@ sub execute {
             $tkey =~ s/^meta/$prefix/;
         }
 
-        if (ref $context_data->{$key}) {
-            ##! 64: 'Set key ' . $tkey . ' to array ' . Dumper $val
-            $context->param( $tkey.'[]' => $ser->serialize( $val  ) );
-        } else {
-            ##! 64: 'Set key ' . $key . ' to ' . $val
-            $context->param( $tkey => $val  );
-        }
+        ##! 64: 'Set key ' . $key . ' to ' . $val
+        $context->param( $tkey => $val  );
+
     }
 
     CTX('log')->application()->debug('Found metadata keys '. join(", ", keys %{$context_data}) .' for ' . $cert_identifier);
@@ -101,7 +98,6 @@ Load the metadata assigned to a given certificate into the context.
 Set the expected prefix for the keys using the parameter I<prefix>. If
 no prefix value is given, the default I<meta> is used. Note: the prefix
 must not end with the underscore, it is appended by the class.
-
 
 =head1 Configuration
 

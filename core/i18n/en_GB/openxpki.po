@@ -117,7 +117,7 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_SAN_HINT"
 msgstr ""
 "Searches on all SAN items for an <b>EXACT</b> match. Substring match can be "
 "executed by adding '*' or '_' as wildcard. To look for particular SAN Types, "
-"set the expected type as prefix with a colon, e.g. 'IP:10.%' to find all SAN "
+"set the expected type as prefix with a colon, e.g. 'IP:10.*' to find all SAN "
 "items that are IP addresses in the 10.x subnet."
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_DESC"

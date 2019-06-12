@@ -12,6 +12,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Database; # to get AUTO_ID
+use Log::Log4perl;
 use Data::Dumper;
 
 sub execute {
@@ -44,26 +45,29 @@ sub execute {
     my $param = $context->param();
     ##! 32: 'Update request: ' . Dumper $param
 
-    for my $rawkey (keys %{$param}) {
-        next if ($rawkey !~ m{ \A meta_ }xms);
+    for my $key (keys %{$param}) {
+        next if ($key !~ m{ \A meta_ }xms);
 
-        my $key;
         my @new_values;
-        my $is_scalar;
+        my $is_scalar = 0;
         # non scalar items - in context we have the square brackets!
-        if ($rawkey =~ m{ \A (\w+)\[\] }xms) {
+
+        # deprecated - context key with extra brackets
+        if ($key =~ m{ \A (\w+)\[\] }xms) {
             $key = $1;
-            ##! 32: "attribute $rawkey treated as ARRAY"
-            @new_values = ref $param->{$rawkey} # context might already be deserialized
-                ? @{$param->{$rawkey}}         # if we jump into a live workflow
-                : @{$ser->deserialize( $param->{$rawkey} )};
-            $is_scalar = 0;
+            Log::Log4perl->get_logger('openxpki.deprecated')->error("Deprecated usage of square brackets in field name ($key)");
         }
-        else {
-            ##! 32: "attribute $rawkey treated as SCALAR"
-            $key = $rawkey;
-            @new_values = ($param->{$rawkey});
+
+        if (ref $param->{$key} eq 'ARRAY') {
+            ##! 32: "attribute $key treated as ARRAY"
+            @new_values = @{ $param->{$key} };
+        } elsif (OpenXPKI::Serialization::Simple::is_serialized($param->{$key})) {
+            ##! 32: "attribute $key treated as ARRAY (serialized)"
+            @new_values = @{$ser->deserialize( $param->{$key} )};
+        } else {
+            ##! 32: "attribute $key treated as SCALAR"
             $is_scalar = 1;
+            @new_values = ($param->{$key});
         }
 
         my $old_to_delete = $old_meta->{$key} // [];
