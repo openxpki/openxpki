@@ -315,7 +315,7 @@ sub __process_action {
     my @input = $conn->get_scalar_as_list( [ @path, 'input' ] );
     my @fields = ();
 
-    my @required_fields = ('required'); # first argument of validator is the type!
+    my @basic_validator = ();
     foreach my $field_name (@input) {
 
         my @item_path;
@@ -341,11 +341,16 @@ sub __process_action {
             );
         }
 
+        my $is_array = ($conn->exists( [ @item_path, 'min' ] ) || $conn->exists( [ @item_path, 'max' ] ));
+
         # As the upstream "required" validator accepts the empty string as
         # true which we want to be "false" we do not set the required flag
         # but use our own field type validator
         my $required = $conn->get( [ @item_path, 'required' ] );
-        push @required_fields, $context_key if (defined $required && $required =~ m/(yes|1)/i);
+        my $is_required = (defined $required && $required =~ m/(yes|1)/i);
+        if ($is_array || $is_required) {
+            push @basic_validator, sprintf ("%s::%01d:%01d", $context_key, $is_array, $is_required);
+        }
 
         $self->logger()->debug("Adding field $field_name / $context_key");
 
@@ -356,8 +361,10 @@ sub __process_action {
 
     my @validators = ();
 
+    ##! 32: 'Basic validator ' . Dumper \@basic_validator
+
     # add basic validator - if required
-    push @validators, { name => '_internal_basic_field_type', arg => \@required_fields } if (scalar @required_fields > 1);
+    push @validators, { name => '_internal_basic_field_type', arg => \@basic_validator } if (scalar @basic_validator > 1);
 
     # Attach validators - name => $name, arg  => [ $value ]
     my @valid = $conn->get_scalar_as_list( [ @path, 'validator' ] );

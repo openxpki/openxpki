@@ -194,6 +194,10 @@ msgstr "revoked before"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_VALID_AT"
 msgstr "valid at"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_AUTHORIZE"
+msgstr "Action"
+
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_LABEL"
 msgstr "Action"
 
@@ -398,6 +402,10 @@ msgstr "Policy failed (key reuse detected)"
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_NOT_FOUND"
 msgstr "Policy definition not found/loaded."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_SUBJECT_DUPLICATE"
+msgstr "Policy failed (key reuse detected)"
+
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_VIOLATED"
 msgstr "Policy failed (too many valid certificates)"
 
@@ -418,6 +426,10 @@ msgstr "Signer certificate is revoked."
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SUBJECT_INVALID"
 msgstr "Subject is invalid"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_RENEWAL_NOT_ALLOWED"
+msgstr "Request was not approved"
 
 msgid "I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION"
 msgstr "Backend error during publishing "
@@ -557,6 +569,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_IMPORT_CRL_ISSUER_NOT_FOUND"
 msgstr "Unable to find issuer certificate for CRL!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_INVALID_PROFILE"
+msgstr "Profile"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_KEY"
@@ -1259,12 +1275,8 @@ msgstr "Validator failed on given expression"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_HAS_ERRORS"
 msgstr "An error occured during input validation"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE"
-msgstr "The following fields require a non-empty value"
-
-msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_REQUIRED"
-msgstr "The marked fields require a non-empty value"
+msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_INVALID"
+msgstr "The following fields do not match the expected type of value"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_INVALID_ALGORITHM_OR_LENGTH"
 msgstr "KeySize configuration contains invalid key specification"
@@ -3455,6 +3467,14 @@ msgstr "Wake Up"
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Yes"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOES_NOT_EXIST"
+#~ msgstr ""
+#~ "Searches on all SAN items for an <b>EXACT</b> match. Substring match can "
+#~ "be executed by adding '*' or '_' as wildcard. To look for particular SAN "
+#~ "Types, set the expected type as prefix with a colon, e.g. 'IP:10.*' to "
+#~ "find all SAN items that are IP addresses in the 10.x subnet."
+
 #~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_DESC"
 #~ msgstr "Please enter the key passphrase you set during certificate request."
 
@@ -3531,6 +3551,9 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
 #~ msgstr "Unknown error when analyzing card status"
+
+#~ msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_REQUIRED"
+#~ msgstr "The marked fields require a non-empty value"
 
 #~ msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_DAMAGED"
 #~ msgstr "PKCS10 request is not properly formated"

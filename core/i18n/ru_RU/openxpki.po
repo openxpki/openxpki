@@ -231,6 +231,10 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_VALID_AT"
 msgstr "Идентификатор сертификата"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_AUTHORIZE"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_LABEL"
 msgstr "Родительский технологический процесс"
 
@@ -495,6 +499,10 @@ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_NOT_FOUND"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_SUBJECT_DUPLICATE"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_VIOLATED"
 msgstr "Дочерние технологические процессы"
 
@@ -520,6 +528,10 @@ msgstr "Отменить утверждение заявки на отзыв с�
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SUBJECT_INVALID"
+msgstr "Отменить утверждение заявки на отзыв сертификата (CRR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_RENEWAL_NOT_ALLOWED"
 msgstr "Отменить утверждение заявки на отзыв сертификата (CRR)"
 
 #, fuzzy
@@ -700,6 +712,10 @@ msgstr "Действителен"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_IMPORT_CRL_ISSUER_NOT_FOUND"
 msgstr "Тестировщик"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_INVALID_PROFILE"
+msgstr "Изменить профиль сертификата "
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_KEY"
@@ -1741,11 +1757,7 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_HAS_ERRORS"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE"
-msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_REQUIRED"
+msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_INVALID"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
@@ -8684,6 +8696,10 @@ msgstr "Имя учетной записи"
 #~ msgstr "ОШИБКА! Соединение закрыто."
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOES_NOT_EXIST"
+#~ msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_DESC"
 #~ msgstr "Идентификатор сертификата"
 
@@ -8822,6 +8838,10 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
 #~ msgstr "Пауза"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_REQUIRED"
+#~ msgstr "SPKAC-строка пуста."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_DAMAGED"
@@ -13557,10 +13577,6 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_VAL_BULK"
 #~ msgstr "Пауза"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_WF_VAL_CERTPROFILE"
-#~ msgstr "Изменить профиль сертификата "
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_WF_VAL_CERTROLE"

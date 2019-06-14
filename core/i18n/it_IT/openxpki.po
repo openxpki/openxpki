@@ -221,6 +221,10 @@ msgstr "non prima del"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_VALID_AT"
 msgstr "non dopo il"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_AUTHORIZE"
+msgstr "Azione"
+
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_LABEL"
 msgstr "Azione"
 
@@ -503,6 +507,13 @@ msgstr ""
 "risultati qui sotto."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_SUBJECT_DUPLICATE"
+msgstr ""
+"Questa richiesta non soddisfa uno o più criteri della policy, tuttavia il "
+"proprietario ha richiesto lo stesso un’approvazione. Vedi i commenti e i "
+"risultati qui sotto."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_VIOLATED"
 msgstr ""
 "Questa richiesta non soddisfa uno o più criteri della policy, tuttavia il "
@@ -531,6 +542,10 @@ msgstr "Errore sconosciuto"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SUBJECT_INVALID"
+msgstr "Errore sconosciuto"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_RENEWAL_NOT_ALLOWED"
 msgstr "Errore sconosciuto"
 
 #, fuzzy
@@ -706,6 +721,10 @@ msgstr "mostra le liste di revoca precedenti"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_IMPORT_CRL_ISSUER_NOT_FOUND"
 msgstr "Pagina richiesta non trovata"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_INVALID_PROFILE"
+msgstr "Numero di serie del certificato"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_KEY"
@@ -1469,11 +1488,7 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_HAS_ERRORS"
 msgstr "Uno o più campi Soggetto contengono errori."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE"
-msgstr "Uno o più campi Soggetto contengono errori."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_REQUIRED"
+msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_INVALID"
 msgstr "Uno o più campi Soggetto contengono errori."
 
 #, fuzzy
@@ -3853,6 +3868,10 @@ msgstr "Riavvia"
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Chiave"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOES_NOT_EXIST"
+#~ msgstr "Numero di serie del certificato"
+
 #~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_DESC"
 #~ msgstr ""
 #~ "Inserisci la passphrase impostata durante la creazione del certificato."
@@ -3934,6 +3953,10 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
 #~ msgstr "Errore sconosciuto"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_REQUIRED"
+#~ msgstr "Uno o più campi Soggetto contengono errori."
 
 #~ msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_DAMAGED"
 #~ msgstr "La richiesta di tipo PKCS10 non è impostata correttamente"

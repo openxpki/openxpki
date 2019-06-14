@@ -12,22 +12,29 @@ extends 'OpenXPKI::Server::Workflow::Validator';
 
 sub _validate {
 
-    my ( $self, $wf, $type, @fields ) = @_;
-
-    $type ||= 'required';
+    my ( $self, $wf, @fields ) = @_;
 
     ##! 1: 'start - type ' .$type
 
     ##! 16: 'Fields ' . Dumper \@fields
     my $context  = $wf->context;
     my @no_value = ();
-    foreach my $field (@fields) {
+    foreach my $key (@fields) {
 
-        unless ( defined $context->param($field) ) {
+        my ($field, $type, $is_array, $is_required) = split /:/, $key;
+
+        if ($is_required && !defined $context->param($field) ) {
             ##! 32: 'undefined ' . $field
             push @no_value, $field;
             next;
         }
+
+        if ($is_array && ref $context->param($field) ne 'ARRAY') {
+            ##! 32: 'not array ' . $field
+            push @no_value, $field;
+            next;
+        }
+
         # ignore deep checks on refs for now
         if ( ref $context->param($field) ) {
             ##! 32: 'found ref - skipping ' . $field
@@ -45,8 +52,7 @@ sub _validate {
 
     if ( scalar @no_value ) {
         ##! 16: 'Found ' . Dumper \@no_value
-        # I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_REQUIRED
-        validation_error ('I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_'.uc($type), { invalid_fields => \@no_value });
+        validation_error ('I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_INVALID', { invalid_fields => \@no_value });
     }
 }
 
