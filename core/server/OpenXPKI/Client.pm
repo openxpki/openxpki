@@ -452,7 +452,7 @@ sub is_connected
             return undef;
         }
     } elsif ($EVAL_ERROR) {
-        # completely unkown die => -1
+        # completely unknown die => -1
         return -1;
     }
     return 1;

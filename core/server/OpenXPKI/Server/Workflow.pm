@@ -524,7 +524,7 @@ sub _handle_proc_state{
     }else{
         OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_WORKFLOW_UNKNOWN_PROC_STATE_ACTION",
-                params  => {DESCRIPTION => sprintf('unkown action "%s" for proc-state: %s',$action_needed, $self->proc_state)}
+                params  => {DESCRIPTION => sprintf('unknown action "%s" for proc-state: %s',$action_needed, $self->proc_state)}
             );
     }
 

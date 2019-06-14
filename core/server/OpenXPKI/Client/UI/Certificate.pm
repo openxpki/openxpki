@@ -94,7 +94,7 @@ sub init_search {
 
     my @profile_list = sort { $a->{label} cmp $b->{label} } @{$profile};
 
-    my $issuer = $self->send_command( 'list_issuers' );
+    my $issuer = $self->send_command_v2( 'list_used_issuers', { format => 'label' } );
     my @issuer_list = sort { $a->{label} cmp $b->{label} } @{$issuer};
 
     my @states = (

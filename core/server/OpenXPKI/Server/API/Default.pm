@@ -326,7 +326,7 @@ sub list_issuers {
         columns => [ -distinct => 'issuer_identifier', 'issuer_dn' ],
         where => {
             pki_realm => $requested_pki_realm,
-            issuer_identifier => { '!=' => 'unkown' },
+            issuer_identifier => { '!=' => 'unknown' },
             req_key => { '!=' => undef },
         },
     )->fetchall_arrayref({});
