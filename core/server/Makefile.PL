@@ -330,7 +330,7 @@ WriteMakefile(
         'Connector'                     => '1.08',
         'Crypt::CBC'                    => '2.29',
         'Crypt::OpenSSL::AES'           => '0.02',      # for e.g. OpenXPKI::Crypto::VolatileVault
-        'CryptX' =>             => 0,        
+        'CryptX' =>             => '0.1.2',        
         'Crypt::Cipher::AES'               => 0,           # replacement to support keysize > 128
         'Crypt::PKCS10'                 => '2.000',
         'Crypt::X509'                   => 0,

@@ -19,13 +19,29 @@ PACKAGES=			\
 	i18n 			\
 	cgi-session-driver
 
+DEBIAN_CODENAME = $(shell lsb_release -sc)
+
 # Data::Password Data::Serializer DateTime::Format::DateParse IPC::ShareLite 
 # Locale::TextDomain Proc::ProcessTable Sys::SigAction Workflow 
 # XML::Filter::XInclude XML::SAX::PurePerl XML::Validator::Schema
 # Exception::Class 1.22 Added Exception::Class::Base->caught() 
 
+ifeq "$(DEBIAN_CODENAME)" "buster"
 EXTERNAL=				\
-    CryptX \
+	Crypt__OpenSSL__AES		\
+	Crypt__Cipher__AES \
+	Data__SpreadPagination		\
+	Class__Observable 		\
+	Config__Versioned \
+	Proc__SafeExec \
+	XML__Filter__XInclude \
+	Crypt__PKCS10 \
+	Crypt__X509__CRL \
+	DBIx__Handler \
+    DBIx__TransactionManager \
+    Log__Log4perl__Layout__JSON
+else
+EXTERNAL=				\
 	Crypt__OpenSSL__AES		\
 	Crypt__Cipher__AES \
 	Data__SpreadPagination		\
@@ -43,6 +59,7 @@ EXTERNAL=				\
     Log__Log4perl__Layout__JSON \
     JSON__MaybeXS \
     YAML__Tiny
+endif
     
 EXTERNAL2= \
 	Connector \
@@ -52,6 +69,9 @@ CORE = \
     CGI \
     Module__Build__Tiny \
     Module__Load
+
+
+Data__SpreadPagination_BUILDOPTS = --version 0.1.2
 
 .PHONY : $(PACKAGES) $(EXTERNAL) $(EXTERNAL2) CGI DateTime__Format__DateParse
 
@@ -74,7 +94,7 @@ default:	clean
 $(EXTERNAL):
 	test -d deb || mkdir deb
 	test -d deb/cpan || mkdir deb/cpan/
-	cd deb/cpan/ && DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl --build --cpan $(subst __,::,$@)
+	cd deb/cpan/ && DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl --build $($@_BUILDOPTS) --cpan $(subst __,::,$@)
 
 $(EXTERNAL2):
 	test -d deb || mkdir deb

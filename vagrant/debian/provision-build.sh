@@ -11,6 +11,8 @@ apt-get update
 export DEBIAN_FRONTEND=noninteractive
 apt-get install --assume-yes  dh-make-perl libapache2-mod-fcgid
 
+
+
 # Debian Buster has renamed the mysql server package
 case $DEBIAN_CODENAME in
     jessie)
@@ -27,10 +29,20 @@ esac
 	
 apt-get install --assume-yes $PACKAGES libdbd-mysql-perl
 
-cat /code-repo/package/debian/build-deps.lst | xargs apt-get install --assume-yes
+if [ -e /code-repo/package/debian/build-deps-$DEBIAN_CODENAME.lst ]; then
+    cat /code-repo/package/debian/build-deps-$DEBIAN_CODENAME.lst \
+        | xargs apt-get install --assume-yes
+else
+    cat /code-repo/package/debian/build-deps.lst \
+        | xargs apt-get install --assume-yes
+fi
 
 # packages required for testing only
 apt-get install --assume-yes libtest-deep-perl
+
+# make sure libcryptx-perl is found by dh-make-perl and package versions are found
+apt-file update
+apt-cache dumpavail | dpkg --merge-avail
 
 # openca-tools is now only used for scep which we do not test for now
 # so there is no need to install it
