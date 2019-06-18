@@ -1057,7 +1057,7 @@ sub action_find {
     if ($cert_identifier) {
         my $cert = $self->send_command_v2( 'get_cert', {  identifier => $cert_identifier, format => 'DBINFO' });
         if (!$cert) {
-            $self->set_status('Unable to find a certificate with this identifier.','error');
+            $self->set_status('I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_NO_SUCH_IDENTIFIER','error');
             return $self->init_search();
         }
     } elsif (my $serial = $self->param('cert_serial')) {
@@ -1073,21 +1073,38 @@ sub action_find {
             $serial = $sn->bstr();
         }
         my $search_result = $self->send_command_v2( 'search_cert', {
+            return_columns => 'identifier',
             cert_serial => $serial,
             entity_only => 1
         });
-        if (!$search_result) {
-            $self->set_status('Unable to find a certificate with this serial number.','error');
+        if (!$search_result || @{$search_result} == 0) {
+            $self->set_status('I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_NO_SUCH_SERIAL','error');
             return $self->init_search();
-        } elsif (scalar @{$search_result} != 1) {
-            # this should not happen
-            $self->set_status('Query ambigous - got more than one result on this serial number?!.','error');
-            return $self->init_search();
-        } else {
+
+        } elsif (scalar @{$search_result} == 1) {
             $cert_identifier = $search_result->[0]->{"identifier"};
+
+        } else {
+            # found more than one item with serial
+            # this is a legal use case when using external CAs
+            my $queryid = $self->__generate_uid();
+            my $spec = $self->_client->session()->param('certsearch')->{default};
+            $self->_client->session()->param('query_cert_'.$queryid, {
+                'id' => $queryid,
+                'type' => 'certificate',
+                'count' => scalar @{$search_result},
+                'query' => { cert_serial => $serial, entity_only => 1 },
+                'input' => { cert_serial => $self->param('cert_serial') },
+                'header' =>  $self->__default_grid_head,
+                'column' => $self->__default_grid_row,
+                'pager'  => {},
+                'criteria' => [ sprintf '<nobr><b>I18N_OPENXPKI_UI_CERTIFICATE_SERIAL:</b> <i>%s</i></nobr>', $self->param('cert_serial') ]
+            });
+
+            return $self->redirect( 'certificate!result!id!'.$queryid  );
         }
     } else {
-        $self->set_status('Please enter either certificate identifier or certificate serial number.','error');
+        $self->set_status('I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_MUST_PROIVDE_IDENTIFIER_OR_SERIAL','error');
         return $self->init_search();
     }
 

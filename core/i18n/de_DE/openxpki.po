@@ -19,6 +19,15 @@ msgstr ""
 "X-Generator: Poedit 2.0.6\n"
 "X-Poedit-Bookmarks: -1,-1,77,-1,-1,-1,-1,-1,-1,-1\n"
 
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_NO_SUCH_IDENTIFIER"
+msgstr "Es wurde kein Zertifikat mit diesem Identifier gefunden!"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_NO_SUCH_SERIAL"
+msgstr "Es wurde kein Zertifikat mit dieser Seriennummer gefunden!"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_MUST_PROIVDE_IDENTIFIER_OR_SERIAL"
+msgstr "Bitte geben Sie den Identifier oder die Seriennummer an!"
+
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Requested action not found"
 
