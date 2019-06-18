@@ -139,8 +139,12 @@ sub execute
         $query->{reverse} = ($reverse eq 'desc') ? 1 : 0;
     }
 
-    if ($limit && ($limit =~ /\A\d+\z/)) {
-        $query->{limit} = $limit;
+    if ($limit) {
+        if ($limit =~ /\A\d+\z/) {
+            $query->{limit} = $limit;
+        } elsif ($limit eq 'single') {
+            $query->{limit} = 1;
+        }
     }
 
 
@@ -173,18 +177,21 @@ sub execute
 
     ##! 32: 'Full query ' . Dumper $query;
     my $result = CTX('api2')->search_cert(%$query);
-
     ##! 64: 'Search returned ' . Dumper $result
-    my @identifier = map {  $_->{identifier} } @{$result};
 
     my $target_key = $self->param('target_key') || 'cert_identifier_list';
 
-    if (@identifier) {
+    if (@{$result}) {
 
-        my $ser = OpenXPKI::Serialization::Simple->new();
-        $context->param( $target_key , $ser->serialize(\@identifier) );
-
-        CTX('log')->application()->trace("SearchCertificates result " . Dumper \@identifier);
+        if ($limit && $limit eq 'single') {
+            $target_key = $self->param('target_key') || 'cert_identifier';
+            $context->param( $target_key => $result->[0]->{identifier} );
+            CTX('log')->application()->trace("SearchCertificates result (single)" . $result->[0]->{identifier});
+        } else {
+            my @identifier = map {  $_->{identifier} } @{$result};
+            $context->param( $target_key => \@identifier );
+            CTX('log')->application()->trace("SearchCertificates result " . Dumper \@identifier);
+        }
 
     } else {
 
@@ -266,7 +273,8 @@ Lets you search for any certificate attribute having a listed prefix.
 =item target_key
 
 Name of the context value to write the result to, the default is
-I<cert_identifier_list>.
+I<cert_identifier_list> resp. I<cert_identifier> when C<limit: single>
+is used.
 
 =item order
 
@@ -275,7 +283,9 @@ prefixed by "asc" (default) or "desc" (reversed sorting)
 
 =item limit
 
-Limit the size of the result set
+Limit the size of the result set. If you pass the special word I<single>
+the result is a scalar with the first identifier matching the query.
+In case I<target_key> is not set, the value is written to I<cert_identifier>.
 
 =item include_expired
 

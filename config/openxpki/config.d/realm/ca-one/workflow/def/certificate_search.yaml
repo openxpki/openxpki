@@ -5,7 +5,7 @@ head:
 state:
     INITIAL:
         action:
-          - initialize pop_identifier > RESULT
+          - initialize > RESULT
 
     RESULT:
         autorun: 1
@@ -21,26 +21,18 @@ action:
     initialize:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SearchCertificates
         param:
-            _map_cert_subject: "CN=[% context.common_name %],*" 
+            _map_cert_subject: "CN=[% context.common_name %],*"
             order: notbefore desc
             include_revoked: 1
             include_expired: 1
-            limit: 1
+            limit: single
 
-            
         input:
           - common_name
-          
+
         validator:
           - common_name
-          
-    pop_identifier:
-        class: OpenXPKI::Server::Workflow::Activity::Tools::WFArray
-        param:
-            array_name: cert_identifier_list
-            context_key: cert_identifier
-            function: shift
-          
+
     get_certificate_data:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
         param:
@@ -57,19 +49,19 @@ condition:
 validator:
     common_name:
         class: OpenXPKI::Server::Workflow::Validator::Regex
-        arg: 
+        arg:
           - $common_name
         param:
             regex: "\\A [a-zA-Z0-9-\\.\\:]+"
             modifier: xi
-            
+
 field:
     common_name:
         name: common_name
         required: 1
         type: server
-                    
-                    
+
+
 acl:
     System:
         creator: any
