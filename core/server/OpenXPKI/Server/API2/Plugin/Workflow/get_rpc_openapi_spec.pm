@@ -192,7 +192,7 @@ sub _openapi_field_schema {
 
             # special handling for multivalue fields:
             # they are represented as Arrays of values of their specified type
-            if ($wf_field->{min} or $wf_field->{max}) {
+            if (defined $wf_field->{min} or $wf_field->{max}) {
                 $field = {
                     type => 'array',
                     items => $field,
