@@ -364,7 +364,7 @@ sub __process_action {
     ##! 32: 'Basic validator ' . Dumper \@basic_validator
 
     # add basic validator - if required
-    push @validators, { name => '_internal_basic_field_type', arg => \@basic_validator } if (scalar @basic_validator > 1);
+    push @validators, { name => '_internal_basic_field_type', arg => \@basic_validator } if (scalar @basic_validator > 0);
 
     # Attach validators - name => $name, arg  => [ $value ]
     my @valid = $conn->get_scalar_as_list( [ @path, 'validator' ] );
