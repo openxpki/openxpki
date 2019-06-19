@@ -842,7 +842,7 @@ sub __build_attribute_subquery {
     my $attributes = shift;
 
     if (!$attributes || ref $attributes ne 'ARRAY') {
-        return [];
+        return {};
     }
 
     my $attr;
