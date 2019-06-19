@@ -8,6 +8,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Crypt::X509;
+use Data::Dumper;
 use English;
 
 sub execute {
@@ -81,6 +82,7 @@ sub execute {
         }
     }
 
+    ##! 32: 'Signer identifier ' .$signer_identifier
     ##! 32: 'Signer profile ' .$signer_profile
     ##! 32: 'Signer realm ' .  $signer_realm
     ##! 32: 'Signer issuer ' . $signer_issuer
@@ -164,13 +166,15 @@ sub execute {
                 $matched = ($signer_profile eq $match);
 
             } elsif ($key =~ m{meta_}) {
-
+                # reset the matched state!
+                $matched = 0;
                 if (!defined $meta->{$key}) {
                     my $attr = CTX('api2')->get_cert_attributes(
                         identifier => $signer_identifier,
                         attribute => $key
                     );
                     $meta->{$key} = $attr->{$key} || [];
+                    ##! 64: 'Loaded attr ' . Dumper $meta->{$key}
                 }
                 foreach my $aa (@{$meta->{$key}}) {
                     ##! 64: "Attr $aa"
