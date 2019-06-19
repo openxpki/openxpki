@@ -408,14 +408,6 @@ sub handle_workflow {
         $wf_params = $params->{PARAMS};
     }
 
-    # Auto serialize workflow params
-    my $serializer = OpenXPKI::Serialization::Simple->new();
-    foreach my $key (keys %{$wf_params}) {
-        if (ref $wf_params->{$key}) {
-            $wf_params->{$key} = $serializer->serialize($wf_params->{$key});
-        }
-    }
-
     if ($wf_action && $wf_id) {
 
         $self->logger()->info(sprintf('execute workflow action %s on %01d', $wf_action, $wf_id));
