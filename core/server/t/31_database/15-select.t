@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use English;
 use Test::More;
+use Test::Deep;
 use Test::Exception;
 use FindBin qw( $Bin );
 
@@ -30,7 +31,7 @@ my $db = DatabaseTest->new(
 #
 # tests
 #
-$db->run("SQL SELECT", 7, sub {
+$db->run("SQL SELECT", 8, sub {
     my $t = shift;
     my $dbi = $t->dbi;
     my $sth;
@@ -118,6 +119,24 @@ $db->run("SQL SELECT", 7, sub {
             where => { entropy => 33 },
         );
     } "select from non existing table";
+
+    lives_and {
+        $sth = $dbi->select(
+            from => "test",
+            columns => [ "text" ],
+            where => {
+                id => $dbi->subselect(IN => {
+                    from => "test",
+                    columns => [ "id" ],
+                    where => { text => [ "Rathaus", "Kindergarten" ] },
+                }),
+            },
+        );
+        is_deeply $sth->fetchall_arrayref, [
+            [ "Rathaus" ],
+            [ "Kindergarten" ],
+        ];
+    } "select with sub query"
 });
 
 done_testing($db->test_no);
