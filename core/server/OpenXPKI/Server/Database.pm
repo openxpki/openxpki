@@ -360,6 +360,13 @@ sub select_one {
     return $sth->fetchrow_hashref;
 }
 
+# SUB SELECT
+# Returns: reference (!) to an ArrayRef that has to be included into the query
+sub subselect {
+    my $self = shift;
+    return $self->query_builder->subselect(@_);
+}
+
 sub count {
     my $self = shift;
     my %query_param = @_;

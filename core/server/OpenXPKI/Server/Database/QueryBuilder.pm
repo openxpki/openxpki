@@ -134,6 +134,22 @@ sub select {
     );
 }
 
+# This will take sth. like this:
+#   subselect('IN' => { from => 'nature', columns => [ 'id', 'fruit' ], where => { type => 'forbidden' } } )
+# and turn it into:
+#   \[ "IN ($query)" => @bind ]
+sub subselect {
+    my ($self, $operator, $query) = positional_args(\@_, # OpenXPKI::MooseParams
+        { isa => 'Str' },
+        { isa => 'HashRef' },
+    );
+
+    my $subquery = $self->select(%$query);
+    my $subquery_and_op = sprintf "%s (%s)", $operator, $subquery->string;
+
+    return \[ $subquery_and_op => @{ $subquery->params }]
+}
+
 sub insert {
     my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
         into     => { isa => 'Str' },
