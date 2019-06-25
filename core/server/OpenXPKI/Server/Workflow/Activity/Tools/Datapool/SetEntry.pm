@@ -19,7 +19,6 @@ sub execute {
     my $self       = shift;
     my $workflow   = shift;
     my $context    = $workflow->context();
-    my $serializer = OpenXPKI::Serialization::Simple->new();
     my $params     = {};
 
     # fallback to old parameter format
@@ -85,6 +84,12 @@ sub execute {
         } elsif($self->param('pki_realm') ne CTX('session')->data->pki_realm) {
             workflow_error( 'Access to foreign realm is not allowed' );
         }
+    }
+
+    # Datapool handles only scalar values so we need to serialize
+    # any non scalar items
+    if ($self->param('serialize') && ref $params->{ value }) {
+        $params->{ value } = OpenXPKI::Serialization::Simple->new()->serialize( $params->{ value } );
     }
 
     CTX('api2')->set_data_pool_entry(%$params);
@@ -164,6 +169,11 @@ The realm of the datapool item to load, default is the current realm.
 B<Note:> For security reasons it is not allowed to load items from other
 realms except from special I<system> realms. The only system realm
 defined for now is I<_global> which is available from all other realms.
+
+=item serialize
+
+Boolean, if set the value is serialized so it is possible to store
+non-scalar items in the datapool.
 
 =item ds_key_param, deprecated
 
