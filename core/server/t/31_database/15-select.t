@@ -136,7 +136,7 @@ $db->run("SQL SELECT", 8, sub {
             [ "Rathaus" ],
             [ "Kindergarten" ],
         ];
-    } "select with sub query"
+    } "select with sub query";
 });
 
 done_testing($db->test_no);
