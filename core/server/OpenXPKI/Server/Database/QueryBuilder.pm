@@ -235,33 +235,7 @@ Named parameters: see L<attributes section above|/"Constructor parameters">.
 Builds a SELECT query and returns a L<OpenXPKI::Server::Database::Query> object
 which contains SQL string and bind parameters.
 
-Named parameters:
-
-=over
-
-=item * B<columns> - List of column names (I<ArrayRef[Str]>, required)
-
-=item * B<from> - Table name (or list of) (I<Str | ArrayRef[Str]>, required)
-
-=item * B<from_join> - A B<string> to describe table relations for FROM .. JOIN following the spec in L<SQL::Abstract::More/join> (I<Str>)
-
-    from_join => "certificate  req_key=req_key  csr"
-
-Please note that you cannot specify C<from> and C<from_join> at the same time.
-
-=item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
-
-=item * B<group_by> - GROUP BY column (or list of) (I<Str | ArrayRef>)
-
-=item * B<having> - HAVING clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
-
-=item * B<order_by> - Plain ORDER BY string or list of columns. Each column name can be preceded by a "-" for descending sort (I<Str | ArrayRef>)
-
-=item * B<limit> - (I<Int>)
-
-=item * B<offset> - (I<Int>)
-
-=back
+The method parameters are documented in L<OpenXPKI::Server::Database/select>.
 
 
 
@@ -281,15 +255,7 @@ and turn it into:
 
     \[ "IN ($query)" => @bind ]
 
-Positional parameters:
-
-=over
-
-=item * B<$operator> - SQL operator between column and subquery (I<Str>, required)
-
-=item * B<$query> - The query parameters in a I<HashRef> as they would be given to L</select> (I<HashRef>, required)
-
-=back
+The method parameters are documented in L<OpenXPKI::Server::Database/subselect>.
 
 
 
@@ -317,17 +283,7 @@ which contains SQL string and bind parameters.
 
 A WHERE clause is required to prevent accidential updates of all rows in a table.
 
-Named parameters:
-
-=over
-
-=item * B<table> - Table name (I<Str>, required)
-
-=item * B<set> - Hash with column name / value pairs. Please note that C<undef> is interpreted as C<NULL> (I<HashRef>, required)
-
-=item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
-
-=back
+The method parameters are documented in L<OpenXPKI::Server::Database/update>.
 
 
 
@@ -344,16 +300,6 @@ parameter C<all> if you want to do that:
         all => 1,
     );
 
-Named parameters:
-
-=over
-
-=item * B<from> - Table name (I<Str>, required)
-
-=item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
-
-=item * B<all> - Set this to 1 instead of specifying C<where> to delete all rows (I<Bool>)
-
-=back
+The method parameters are documented in L<OpenXPKI::Server::Database/delete>.
 
 =cut
