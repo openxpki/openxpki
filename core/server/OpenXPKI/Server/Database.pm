@@ -690,9 +690,29 @@ Named parameters: see L<attributes section above|/"Constructor parameters">.
 Selects rows from the database and returns the results as a I<DBI::st> statement
 handle.
 
+For parameters see L<OpenXPKI::Server::Database::QueryBuilder/select>.
+
 Please note that C<NULL> values will be converted to Perl C<undef>.
 
-For parameters see L<OpenXPKI::Server::Database::QueryBuilder/select>.
+B<Subqueries> can be realized using L</subselect>, e.g.:
+
+    CTX('dbi')->select(
+        from => "books",
+        columns => [ "title" ],
+        where => {
+            author_id => CTX('dbi')->subselect("IN" => {
+                from => "authors",
+                columns => [ "id" ],
+                where => { legs => { '>' => 2 } },
+            }),
+        },
+    );
+
+=head2 subselect
+
+Builds a subselect to be used within another query and returns a reference to an I<ArrayRef>.
+
+For parameters see L<OpenXPKI::Server::Database::QueryBuilder/subselect>.
 
 =head2 select_one
 

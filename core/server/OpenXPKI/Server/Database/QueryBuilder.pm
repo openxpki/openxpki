@@ -134,10 +134,6 @@ sub select {
     );
 }
 
-# This will take sth. like this:
-#   subselect('IN' => { from => 'nature', columns => [ 'id', 'fruit' ], where => { type => 'forbidden' } } )
-# and turn it into:
-#   \[ "IN ($query)" => @bind ]
 sub subselect {
     my ($self, $operator, $query) = positional_args(\@_, # OpenXPKI::MooseParams
         { isa => 'Str' },
@@ -232,6 +228,8 @@ Constructor.
 
 Named parameters: see L<attributes section above|/"Constructor parameters">.
 
+
+
 =head2 select
 
 Builds a SELECT query and returns a L<OpenXPKI::Server::Database::Query> object
@@ -265,6 +263,36 @@ Please note that you cannot specify C<from> and C<from_join> at the same time.
 
 =back
 
+
+
+=head2 subselect
+
+Builds a subselect to be used within another query and returns a reference to an I<ArrayRef>.
+
+This will take something like this:
+
+    CTX('dbi')->subselect('IN' => {
+        from => 'nature',
+        columns => [ 'id', 'fruit' ],
+        where => { type => 'forbidden' }
+    })
+
+and turn it into:
+
+    \[ "IN ($query)" => @bind ]
+
+Positional parameters:
+
+=over
+
+=item * B<$operator> - SQL operator between column and subquery (I<Str>, required)
+
+=item * B<$query> - The query parameters in a I<HashRef> as they would be given to L</select> (I<HashRef>, required)
+
+=back
+
+
+
 =head2 insert
 
 Builds an INSERT query and returns a L<OpenXPKI::Server::Database::Query> object
@@ -279,6 +307,8 @@ Named parameters:
 =item * B<values> - Hash with column name / value pairs. Please note that C<undef> is interpreted as C<NULL> (I<HashRef>, required)
 
 =back
+
+
 
 =head2 update
 
@@ -298,6 +328,8 @@ Named parameters:
 =item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
 
 =back
+
+
 
 =head2 delete
 
