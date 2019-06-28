@@ -18,7 +18,7 @@ sub evaluate {
     my ( $self, $workflow ) = @_;
     my $context     = $workflow->context();
     my $identifier  = $context->param('cert_identifier');
-    my $reason_code = $context->param('reason_code');
+    my $reason_code = $context->param('reason_code') || '';
     my $pki_realm   = CTX('session')->data->pki_realm;
 
     OpenXPKI::Exception->throw(
