@@ -39,22 +39,22 @@ command "list_used_issuers" => {
     my $dbi = CTX('dbi');
     if ($params->format eq 'label') {
 
-        my $squery = $dbi->query_builder->select(
+        my $certs = $dbi->select(
             from   => 'certificate',
-            columns => [ -distinct => 'issuer_identifier' ],
+            columns => [ 'identifier', 'subject' ],
             where => {
-                pki_realm => $pki_realm,
-                req_key => { '!=' => undef },
-            }
+                identifier => $dbi->subselect(IN => {
+                    from   => 'certificate',
+                    columns => [ -distinct => 'issuer_identifier' ],
+                    where => {
+                        pki_realm => $pki_realm,
+                        req_key => { '!=' => undef },
+                    },
+                }),
+            },
         );
 
-        my $bquery = $dbi->query_builder->select(
-            from   => 'certificate',
-            columns => [ 'identifier', 'subject' ]
-        );
-
-        $squery->string( $bquery->string .' WHERE identifier in ('. $squery->string.')' );
-        my $result = $dbi->run($squery)->fetchall_arrayref({});
+        my $result = $certs->fetchall_arrayref({});
 
         @res = map {{
             value => $_->{identifier},
