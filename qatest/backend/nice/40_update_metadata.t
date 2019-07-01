@@ -58,6 +58,6 @@ $wf->state_is('SUCCESS');
 
 my $info = $oxitest->api_command('get_cert_attributes' => { IDENTIFIER => $cert_id });
 cmp_deeply $info, superhashof({
-    meta_email     => [ $serializer->serialize( ['uli.update@openxpki.de' ]) ],
+    meta_email     => [ 'uli.update@openxpki.de' ],
     meta_requestor => [ "Uli Update" ],
 }), "confirm changed metadata via API";
