@@ -22,14 +22,8 @@ sub execute
     my $pki_realm  = CTX('api')->get_pki_realm();
     my $serializer = OpenXPKI::Serialization::Simple->new();
     my $dbi        = CTX('dbi');
-    my $identifier = $context->param('cert_identifier');
 
-    my $source_ref = $serializer->deserialize($context->param('sources'));
-    if (! defined $source_ref) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WF_ACTIVITY_CRR_PERSISTREQUEST_SOURCES_UNDEFINED',
-        );
-    }
+    my $identifier = $self->param('cert_identifier') // $context->param('cert_identifier');
 
     my $cert = $dbi->select_one(
         from => 'certificate',
@@ -60,15 +54,19 @@ sub execute
         );
     }
 
+    my $reason_code = $context->param('reason_code') // $context->param('reason_code');
+    my $invalidity_time = $self->param('invalidity_time') // $context->param('invalidity_time');
+    my $hold_code = $self->param('hold_code') // $context->param('hold_code');
+
     my $dt = DateTime->now();
     $dbi->update(
         table => 'certificate',
         set => {
             status => 'CRL_ISSUANCE_PENDING',
-            reason_code     => $context->param('reason_code') || 'unspecified',
+            reason_code     => $reason_code || 'unspecified',
             revocation_time => $dt->epoch(),
-            invalidity_time => $context->param('invalidity_time') || undef,
-            hold_instruction_code => $context->param('hold_code') || undef,
+            invalidity_time => $invalidity_time || undef,
+            hold_instruction_code => $hold_code || undef,
         },
         where => {
             pki_realm  => $pki_realm,
@@ -91,3 +89,29 @@ OpenXPKI::Server::Workflow::Activity::CRR::PersistRequest
 
 persists the Certificate Revocation Request into the database, so that
 it can then be used by the CRL issuance workflow.
+
+=head2 Activity Parameters
+
+By default, those values are read from the context items with the same name.
+It a key with this name exists in the activity definition, it has precedence
+over the context value. If a given key has an empty value, the context is
+B<not> used as fallback.
+
+=over
+
+=item cert_identifier
+
+=item reason_code
+
+Must be one of the supported openssl reason codes, default is unspecified
+
+=item invalidity_time
+
+Epoch to be set as "key compromise time", the default backend uses this only
+when reason_code is set to keyCompromise.
+
+=item hold_code
+
+Hold code for revocation reason "onHold" (not supported by the default backend).
+
+=back
