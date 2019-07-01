@@ -15,6 +15,7 @@ use MockUI;
 #Log::Log4perl->easy_init($DEBUG);
 Log::Log4perl->easy_init($ERROR);
 
+use Test::Deep;
 use Test::More tests => 6;
 
 package main;
@@ -67,7 +68,7 @@ $result = $client->mock_request({
 $result = $client->mock_request({
     'action' => 'workflow!index',
     'wf_token' => undef,
-    'meta_email' =>  'mail1@openxpki.org',
+    'meta_email[]' =>  [ 'mail1@openxpki.org' ],
 });
 
 $result = $client->mock_request({
@@ -76,5 +77,17 @@ $result = $client->mock_request({
 
 
 is ($result->{status}->{level}, 'success', 'Status is success');
-is( $result->{main}->[0]->{content}->{data}->[3]->{value}, 'mail1@openxpki.org', 'data validated');
-
+cmp_deeply $result, superhashof({
+    main => superbagof(
+        superhashof({
+            content => superhashof({
+                data => superbagof(
+                    superhashof({
+                        label => 'meta_email',
+                        value => [ 'mail1@openxpki.org' ],
+                    }),
+                ),
+            }),
+        }),
+    ),
+});
