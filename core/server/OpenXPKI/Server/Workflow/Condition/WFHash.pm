@@ -54,6 +54,14 @@ sub _evaluate {
        }
        ##! 16: ' Entry is empty '
        condition_error 'Condition wfhash key '.$key.' is empty';
+    } elsif ($condition eq 'is_value') {
+        my $value = $self->param('value') // '';
+        if (defined $val && $val eq $value) {
+            ##! 16: ' Entry matches value ' . $value
+            return 1;
+        }
+         ##! 16: ' Entry does not match value ' . $value
+        condition_error 'Condition wfhash key '.$key.' does not match expected value ';
     } else {
         configuration_error
             "Invalid condition " . $condition . " in " .
@@ -104,11 +112,20 @@ The key must be given with the "key" param.
 Condition is true if the key has a non-empty value
 The key must be given with the "key" param.
 
+=item is_value
+
+Condition is true if the key has a non-empty value
+The key must be given with the "key" param.
+
 =back
 
 =head2 hash_key
 
 Name of the key to check
+
+=head2 value
+
+value to check against when condition is set to I<is_value>.
 
 =head2 ds_key
 
