@@ -269,6 +269,7 @@ OpenXPKI/Server/API2/Plugin/Datapool/get_data_pool_entry.pm
 OpenXPKI/Server/API2/Plugin/Datapool/list_data_pool_entries.pm
 OpenXPKI/Server/API2/Plugin/Datapool/modify_data_pool_entry.pm
 OpenXPKI/Server/API2/Plugin/Datapool/set_data_pool_entry.pm
+OpenXPKI/Server/API2/Plugin/Datapool/delete_data_pool_entry.pm
 OpenXPKI/Server/API2/Plugin/Datapool/Util.pm
 OpenXPKI/Server/API2/Plugin/Import/import_crl.pm
 OpenXPKI/Server/API2/Plugin/Profile/Util.pm

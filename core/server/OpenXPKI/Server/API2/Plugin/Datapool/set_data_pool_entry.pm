@@ -90,6 +90,10 @@ command "set_data_pool_entry" => {
     my ($self, $params) = @_;
     ##! 8: "Writing datapool entry: realm=".$params->pki_realm.", namespace=".$params->namespace.", key=".$params->key
 
+    if ($params->value eq '') {
+        CTX('log')->system()->warn("Implicit delete via set_data_pool_entry with empty value is deprecated - use delete_data_pool_entry instead!");
+    }
+
     my $requested_pki_realm = $params->pki_realm;
 
     # check for illegal characters - not neccesary if we encrypt the value
