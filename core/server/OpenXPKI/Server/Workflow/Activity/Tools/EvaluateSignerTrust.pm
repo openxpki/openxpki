@@ -319,6 +319,8 @@ self signed certificates.
 Load the metadata attributes assigned to the certificate and match against
 the given value.
 
+=back
+
 =head2 Parameters
 
 =over
