@@ -19,68 +19,13 @@ use OpenXPKI::Server::API2::Types;
 
 returns an ecrypted private key for a certificate if the private
 key was generated on the CA during the certificate request process.
-Supports the following parameters:
 
-=over
-
-=item * identifier - the identifier of the certificate
-
-=item * format - the output format
-
-One of PKCS8_PEM (PKCS#8 in PEM format), PKCS8_DER
-(PKCS#8 in DER format), PKCS12 (PKCS#12 in DER format), OPENSSL_PRIVKEY
-(OpenSSL native key format in PEM), OPENSSL_RSA (OpenSSL RSA with
-DEK-Info Header), JAVA_KEYSTORE (JKS including chain).
-
-=item * password - the private key password
-
-Password that was used when the key was generated.
-
-=item * passout - the password for the exported key, default is PASSWORD
-
-The password to encrypt the exported key with, if empty the input password
-is used.
-
-This option is only supported with format OPENSSL_PRIVKEY, PKCS12 and JKS!
-
-=item * nopasswd
-
-If set to a true value, the B<key is exported without a password!>.
-You must also set PASSOUT to the empty string.
-
-=item * keeproot
-
-Boolean, when set the root certifcate is included in the keystore.
-Obviously only useful with PKCS12 or Java Keystore.
-
-=item * alias
-
-String to set as alias for the key/certificate for JKS or PKCS12.
-
-=item * csp
-
-String, write name as a Microsoft CSP name (PKCS12 only)
-
-
-=back
-
-The format can be either
-The password has to match the one used during the generation or nothing
-is returned at all.
-
-B<Parameters>
-
-=over
-
-=item * C<XXX> I<Bool> - XXX. Default: XXX
-
-=back
-
-B<Changes compared to API v1:>
-
-Parameter C<NOPASSWD> was renamed to C<nopassword>.
+Parameters are the same as for I<convert_private_key> except that
+I<private_key> must not be passed but is read from the datapool and
+I<cert_identifier> is mandatory.
 
 =cut
+
 command "get_private_key_for_cert" => {
     identifier => { isa => 'Base64', required => 1, },
     format     => { isa => 'Str', matching => qr{ \A ( PKCS8_(PEM|DER) | OPENSSL_(PRIVKEY|RSA) | PKCS12 | JAVA_KEYSTORE ) \z }xms, required => 1, },
@@ -99,6 +44,110 @@ command "get_private_key_for_cert" => {
     my $pass_out   = $params->passout;
     my $nopassword = $params->nopassword;
 
+    if ($nopassword) {
+        CTX('log')->audit('key')->warn("private key export without password", { certid => $identifier });
+    }
+
+    my $private_key = $self->get_private_key_from_db($identifier)
+        or OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_PRIVATE_KEY_NOT_FOUND_IN_DB',
+            params => { 'IDENTIFIER' => $identifier, },
+        );
+
+    $params->{private_key} = $private_key;
+
+    my $result = $self->api->convert_private_key(%$params);
+
+    CTX('log')->audit('key')->info("private key export", { certid => $identifier });
+
+    return $result;
+};
+
+
+=head2 convert_private_key
+
+expects a private key and converts it into another format. If a bundle
+with certificates is requested, the certificate identifier to use as the
+end entity certificate must be given.
+
+=over
+
+=item * identifier - the identifier of the certificate
+
+=item * format - the output format
+
+=over
+
+=item PKCS8_PEM (PKCS#8 in PEM format)
+
+=item PKCS8_DER (PKCS#8 in DER format)
+
+=item PKCS12 (PKCS#12 in DER format)
+
+=item OPENSSL_PRIVKEY (OpenSSL native key format in PEM)
+
+=item OPENSSL_RSA (OpenSSL RSA with DEK-Info Header)
+
+=item JAVA_KEYSTORE (JKS including chain).
+
+=back
+
+=item * password - the private key password
+
+Password that was used when the key was generated.
+
+=item * passout - the password for the exported key, default is PASSWORD
+
+The password to encrypt the exported key with, if empty the input password
+is used.
+
+This option is only supported with format OPENSSL_PRIVKEY, PKCS12 and JKS!
+
+=item * nopasswd
+
+If set to a true value, the B<key is exported without a password!>.
+You must also set passout to the empty string.
+
+=item * keeproot
+
+Boolean, when set the root certifcate is included in the keystore.
+Obviously only useful with PKCS12 or Java Keystore.
+
+=item * alias
+
+String to set as alias for the key/certificate for JKS or PKCS12.
+
+=item * csp
+
+String, write name as a Microsoft CSP name (PKCS12 only)
+
+
+=back
+
+If the input password does not decrypt the private key, an exception is thrown.
+
+=cut
+
+command "convert_private_key" => {
+    identifier => { isa => 'Base64', default => '' },
+    private_key => { isa => 'PEMPKey', required => 1 },
+    format     => { isa => 'Str', matching => qr{ \A ( PKCS8_(PEM|DER) | OPENSSL_(PRIVKEY|RSA) | PKCS12 | JAVA_KEYSTORE ) \z }xms, required => 1, },
+    password   => { isa => 'Str', required => 1, },
+    passout    => { isa => 'Str', },
+    nopassword => { isa => 'Bool', default => 0, },
+    keeproot   => { isa => 'Bool', default => 0, },
+    alias      => { isa => 'AlphaPunct', },
+    csp        => { isa => 'AlphaPunct', },
+} => sub {
+    my ($self, $params) = @_;
+
+    my $identifier = $params->identifier;
+    my $format     = $params->format;
+    my $password   = $params->password;
+    my $pass_out   = $params->passout;
+    my $nopassword = $params->nopassword;
+    my $private_key = $params->private_key;
+
     if ($nopassword and (!defined $pass_out or $pass_out ne '')) {
         OpenXPKI::Exception->throw(
             message => "Parameter 'passout' must be set to empty string if 'nopassword' is given"
@@ -106,20 +155,11 @@ command "get_private_key_for_cert" => {
     }
 
     if ($nopassword) {
-        CTX('log')->audit('key')->warn("private key export without password", { certid => $identifier });
+        CTX('log')->audit('key')->warn("private key export without password");
     }
 
-    my $default_token = $self->api->get_default_token;
     ##! 4: 'identifier: ' . $identifier
     ##! 4: 'format: ' . $format
-
-    my $private_key = $self->get_private_key_from_db($identifier)
-        or OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_PRIVATE_KEY_NOT_FOUND_IN_DB',
-            params => { 'IDENTIFIER' => $identifier, },
-        );
-    my $result;
-
     ##! 16: 'pkey ' . $private_key
 
     # NB: The key in the database is in native openssl format
@@ -167,6 +207,13 @@ command "get_private_key_for_cert" => {
     elsif ( $format eq 'PKCS12' or $format eq 'JAVA_KEYSTORE' ) {
         ##! 16: 'identifier: ' . $identifier
 
+        if (!$identifier) {
+            OpenXPKI::Exception->throw(
+                message => 'private key export missing certificates',
+                params => { 'FORMAT' =>  $format },
+            );
+        }
+
         my @chain = $self->get_chain_certificates({
             'KEEPROOT'   => $params->keeproot,
             'IDENTIFIER' => $identifier,
@@ -208,8 +255,9 @@ command "get_private_key_for_cert" => {
 
     }
 
+    my $result;
     eval {
-        $result = $default_token->command($command_hashref);
+        $result = $self->api->get_default_token()->command($command_hashref);
     };
     if (!$result) {
         OpenXPKI::Exception->throw(
@@ -229,8 +277,6 @@ command "get_private_key_for_cert" => {
             OUT_PASSWD   => $password,
         });
     }
-
-    CTX('log')->audit('key')->info("private key export", { certid => $identifier });
 
     return $result;
 };

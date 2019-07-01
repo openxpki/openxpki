@@ -86,7 +86,7 @@ subtype 'PEMCertChain',
     where { $_ =~ m{ \A ( -----BEGIN\ ([\w\s]*)CERTIFICATE----- [^-]+ -----END\ \2CERTIFICATE----- \s* )+ \Z }msx },
     message { "$_ is not a PEM encoded certificate chain" };
 
-=head2 PEMCert
+=head2 PEMPKCS7
 
 A PEM encoded PKCS7 container
 
@@ -95,6 +95,16 @@ subtype 'PEMPKCS7',
     as 'PEM',
     where { $_ =~ m{ \A -----BEGIN\ PKCS7----- [^-]+ -----END\ PKCS7----- \Z }msx },
     message { "$_ is not a PEM encoded PKCS7 container" };
+
+=head2 PEMPKey
+
+A PEM encoded private key container
+
+=cut
+subtype 'PEMPKey',
+    as 'PEM',
+    where { $_ =~ m{ \A -----BEGIN\ ([\w\s]*)PRIVATE\ KEY----- [^-]+ -----END\ \1PRIVATE\ KEY----- \Z }msx },
+    message { "$_ is not a PEM encoded private key container" };
 
 =head2 ArrayRefOrPEMCertChain
 
