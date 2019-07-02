@@ -100,7 +100,7 @@ while (my $cgi = CGI::Fast->new()) {
     my @extra_params = $cgi->url_param();
     foreach my $param (@extra_params) {
         if ($param eq "operation" || $param eq "message") { next; }
-        $params->{$param} = $cgi->param($param);
+        $params->{$param} = $cgi->url_param($param);
     }
 
     # Append the remote address to the params hash
