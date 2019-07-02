@@ -64,10 +64,10 @@ command "get_trust_anchors" => {
     for my $realm (@trust_realms) {
         ##! 16: 'Load ca signers from realm ' . $realm
         next unless $realm;
-        my $ca_certs = CTX('api')->list_active_aliases({ TYPE => 'certsign', PKI_REALM => $realm });
+        my $ca_certs = $self->api->list_active_aliases( type => 'certsign', pki_realm => $realm );
         ##! 16: 'ca cert in realm ' . Dumper $ca_certs
         if (!$ca_certs) { next; }
-        push @trust_anchors, map { $_->{IDENTIFIER} } @{$ca_certs};
+        push @trust_anchors, map { $_->{identifier} } @{$ca_certs};
     }
 
    return \@trust_anchors;

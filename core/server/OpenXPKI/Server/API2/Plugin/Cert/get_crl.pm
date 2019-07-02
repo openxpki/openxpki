@@ -99,9 +99,9 @@ command "get_crl" => {
 
     } else {
 
-        my $ca_alias = CTX('api')->get_token_alias_by_type({ TYPE => 'certsign' });
+        my $ca_alias = $self->api->get_token_alias_by_type( type => 'certsign' );
         ##! 16: 'Load crl by date, ca alias ' . $ca_alias
-        my $ca_hash = CTX('api2')->get_certificate_for_alias( alias => $ca_alias );
+        my $ca_hash = $self->api->get_certificate_for_alias( alias => $ca_alias );
 
         $db_results = CTX('dbi')->select_one(
             from => 'crl',
@@ -140,7 +140,7 @@ command "get_crl" => {
     elsif ( $format eq 'TXT' ) {
 
         # convert the CRL
-        my $default_token = CTX('api')->get_default_token();
+        my $default_token = $self->api->get_default_token();
         $output = $default_token->command({
             COMMAND => 'convert_crl',
             OUT     => $format,
@@ -156,7 +156,7 @@ command "get_crl" => {
     elsif ( $format eq 'HASH' or $format eq 'FULLHASH' ) {
 
         # parse CRL using OpenXPKI::Crypto::CRL
-        my $default_token = CTX('api')->get_default_token();
+        my $default_token = $self->api->get_default_token();
         my $crl_obj = OpenXPKI::Crypto::CRL->new(
             TOKEN => $default_token,
             DATA  => $pem_crl,

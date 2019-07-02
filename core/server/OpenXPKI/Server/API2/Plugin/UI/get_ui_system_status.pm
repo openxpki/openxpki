@@ -38,7 +38,7 @@ command "get_ui_system_status" => {
     my ($self, $params) = @_;
 
     my $crypto = CTX('crypto_layer');
-    my $pki_realm = CTX('api')->get_pki_realm;
+    my $pki_realm = $self->api->get_pki_realm;
 
     # Offline Secrets
     my $offline_secrets = 0;

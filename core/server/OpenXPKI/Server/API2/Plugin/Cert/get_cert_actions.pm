@@ -96,7 +96,7 @@ command "get_cert_actions" => {
 
     my $role    = $params->has_role ? $params->role : CTX('session')->data->role;
     my $cert_id = $params->identifier;
-    my $cert    = CTX('api2')->get_cert( identifier => $cert_id, format => 'DBINFO' );
+    my $cert    = $self->api->get_cert( identifier => $cert_id, format => 'DBINFO' );
     ##! 2: "cert $cert_id, role $role"
 
     # check if this is a entity certificate from the current realm
@@ -151,7 +151,7 @@ command "get_cert_actions" => {
             ##! 32: 'Conditions ' . join " + ", @cond
             for my $rule (@cond) {
                 if ($rule eq 'keyexport') {
-                    next OPTION unless CTX('api2')->private_key_exists_for_cert( identifier => $cert_id );
+                    next OPTION unless $self->api->private_key_exists_for_cert( identifier => $cert_id );
                 }
                 elsif ($rule eq 'issued') {
                     next OPTION  unless ($cert->{status} eq 'ISSUED' or $cert->{status} eq 'EXPIRED');

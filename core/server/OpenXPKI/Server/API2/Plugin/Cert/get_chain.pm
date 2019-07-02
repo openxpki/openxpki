@@ -148,7 +148,7 @@ command "get_chain" => {
         # we do NOT include the root in p7 bundles
         pop @$cert_list if ($complete and !$params->keeproot);
 
-        $default_token = CTX('api')->get_default_token unless($default_token);
+        $default_token = $self->api->get_default_token unless($default_token);
         my $result = $default_token->command({
             COMMAND          => 'convert_cert',
             DATA             => $cert_list,

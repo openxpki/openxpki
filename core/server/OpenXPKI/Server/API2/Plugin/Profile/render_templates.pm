@@ -141,7 +141,7 @@ command "render_san_from_template" => {
     return undef unless scalar @san_template_keys;
 
     # Fix CamelCasing on items
-    my $san_names = CTX('api2')->list_supported_san();
+    my $san_names = $self->api->list_supported_san();
     for my $key (keys %{$items}) {
         my $cckey = $san_names->{lc($key)};
         if ($key ne $cckey) {

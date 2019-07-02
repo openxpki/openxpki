@@ -59,7 +59,7 @@ command "preset_subject_parts_from_profile" => {
     $args{fields} = $params->fields if ($params->has_fields);
 
     # Load the field spec for the subject
-    my $fields = CTX('api2')->get_field_definition(%args);
+    my $fields = $self->api->get_field_definition(%args);
 
     my $tt = Template->new();
     my $cert_subject_parts;

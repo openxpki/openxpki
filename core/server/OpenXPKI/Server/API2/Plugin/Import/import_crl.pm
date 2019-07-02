@@ -65,7 +65,7 @@ command "import_crl" => {
     my $dbi = CTX('dbi');
 
     my $crl_obj = OpenXPKI::Crypto::CRL->new(
-        TOKEN => CTX('api')->get_default_token,
+        TOKEN => $self->api->get_default_token,
         DATA  => $params->data,
         EXTENSIONS => 1,
     );

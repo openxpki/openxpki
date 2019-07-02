@@ -135,7 +135,7 @@ sub _decrypt_symmetric {
         ALGORITHM => $keyinfo->{alg},
         KEY       => $keyinfo->{key},
         IV        => $keyinfo->{iv},
-        TOKEN     => CTX('api')->get_default_token,
+        TOKEN     => $self->api->get_default_token,
     });
 
     return $vault->decrypt($enc_value);

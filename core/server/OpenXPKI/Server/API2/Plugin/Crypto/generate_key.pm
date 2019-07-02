@@ -79,7 +79,7 @@ command "generate_key" => {
     my $key_alg = lc($params->key_alg);
     my $paramset = $params->paramset;
 
-    my $token = CTX('api')->get_default_token();
+    my $token = $self->api->get_default_token();
 
     # prepare command definition
     my $command = {

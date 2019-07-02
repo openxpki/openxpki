@@ -327,7 +327,7 @@ sub _is_issuer_valid  {
         issuer_cert    => { isa => 'HashRef' },
         force_nochain  => { isa => 'Maybe[Bool]' },
     );
-    my $default_token   = CTX('api')->get_default_token();
+    my $default_token   = $self->api->get_default_token();
     my $cert            = $args{cert};
     my $cert_identifier = $cert->get_cert_identifier;
     my $issuer_cert     = $args{issuer_cert};
@@ -351,7 +351,7 @@ sub _is_issuer_valid  {
     #
 
     # validate_certificate
-    my $chain = CTX('api')->get_chain({ START_IDENTIFIER => $issuer_cert->{identifier}, OUTFORMAT => 'PEM' });
+    my $chain = $self->api->get_chain( start_with => $issuer_cert->{identifier}, format => 'PEM' );
 
     # verify a complete chain
     ##! 64: 'Validate chain ' . Dumper $chain

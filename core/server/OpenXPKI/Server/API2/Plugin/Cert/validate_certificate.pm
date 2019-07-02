@@ -87,7 +87,7 @@ The new parameter C<chain> is used to specify a chain (instead of passing an
 I<ArrayRef> to C<PEM>):
 
     CTX('api')->validate_certificate(PEM   => [ .. ]); # old
-    CTX('api')->validate_certificate(chain => [ .. ]); # new
+    CTX('api2')->validate_certificate(chain => [ .. ]); # new
 
 The previously unused parameter C<NOCRL> was removed.
 
@@ -101,7 +101,7 @@ command "validate_certificate" => {
 } => sub {
     my ($self, $params) = @_;
 
-    my $default_token = CTX('api')->get_default_token();
+    my $default_token = $self->api->get_default_token();
 
     my $chain_status = 'NOROOT';
     my @extra_certs;
@@ -137,7 +137,7 @@ command "validate_certificate" => {
 
     ##! 16: 'cert_identifier ' . $cert_identifier
     # this will only return data if the entity itself is in the database
-    my $chain = CTX('api2')->get_chain(
+    my $chain = $self->api->get_chain(
         'start_with' => $cert_identifier,
         'format'     => 'PEM',
         'keeproot'   => 1,

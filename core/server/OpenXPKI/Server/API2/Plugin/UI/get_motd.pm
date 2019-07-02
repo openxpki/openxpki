@@ -40,24 +40,24 @@ command "get_motd" => {
     my $role = $params->has_role ? $params->role : CTX('session')->data->role;
 
     # role is used as DP Key, can also be "_any"
-    my $datapool = CTX('api')->get_data_pool_entry({
-        NAMESPACE => 'webui.motd',
-        KEY       => $role,
-    });
+    my $datapool = $self->api->get_data_pool_entry(
+        namespace => 'webui.motd',
+        key       => $role,
+    );
     ##! 16: 'Item for role ' . $role .': ' . Dumper $datapool
 
     # nothing found for given role, so try _any
     if (not $datapool) {
-        $datapool = CTX('api')->get_data_pool_entry({
-            NAMESPACE => 'webui.motd',
-            KEY       => '_any'
-        });
+        $datapool = $self->api->get_data_pool_entry(
+            namespace => 'webui.motd',
+            key       => '_any'
+        );
         ##! 16: 'Item for _any: ' . Dumper $datapool
     }
 
     return unless $datapool;
 
-    return OpenXPKI::Serialization::Simple->new->deserialize($datapool->{VALUE});
+    return OpenXPKI::Serialization::Simple->new->deserialize($datapool->{value});
 };
 
 __PACKAGE__->meta->make_immutable;

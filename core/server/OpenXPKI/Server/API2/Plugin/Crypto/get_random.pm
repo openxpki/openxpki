@@ -37,7 +37,7 @@ command "get_random" => {
     my $length  = $params->length;
     ##! 4: 'length: ' . $length
 
-    my $random = CTX('api')->get_default_token->command({
+    my $random = $self->api->get_default_token->command({
         COMMAND => 'create_random',
         RETURN_LENGTH => $length,
         RANDOM_LENGTH => $length,
