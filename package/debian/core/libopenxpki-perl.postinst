@@ -50,10 +50,14 @@ case "$1" in
                    cp /usr/share/doc/libopenxpki-perl/examples/openxpki.conf /etc/apache2/conf-available/openxpki.conf
                    # Activate module, this creates the symlink in conf-available
                    /usr/sbin/a2enconf openxpki
+                   /usr/sbin/a2enmod headers
                fi;
            else
                test -e /etc/apache2/conf.d/openxpki.conf || cp /usr/share/doc/libopenxpki-perl/examples/openxpki.conf /etc/apache2/conf.d/openxpki.conf
            fi;
+
+
+
         fi;
 
         # Apply chown to main folder
