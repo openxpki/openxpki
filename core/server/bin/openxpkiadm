@@ -925,7 +925,6 @@ sub certificate_list {
                     'certificate.issuer_identifier',
                     'certificate.data',
                     'certificate.status',
-                    'certificate.public_key',
                     'certificate.subject_key_identifier',
                     'certificate.authority_key_identifier',
                     'certificate.notafter',
@@ -1012,7 +1011,7 @@ sub certificate_list {
                 );
 
                 if ( $params{v} > 3 ) {
-                    push @fields, qw(public_key data);
+                    push @fields, qw(data);
                 }
 
                 foreach my $field (@fields) {

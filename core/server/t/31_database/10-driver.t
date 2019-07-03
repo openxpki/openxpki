@@ -22,6 +22,7 @@ package OpenXPKI::Server::Database::Driver::Oxitestdb;
 use Moose;
 with 'OpenXPKI::Server::Database::Role::MergeEmulation';
 with 'OpenXPKI::Server::Database::Role::SequenceEmulation';
+with 'OpenXPKI::Server::Database::Role::CountEmulation';
 with 'OpenXPKI::Server::Database::Role::Driver';
 sub dbi_driver { 'SQLite' }
 sub dbi_dsn { my $self = shift; sprintf("dbi:%s:dbname=%s", $self->dbi_driver, $self->name) }

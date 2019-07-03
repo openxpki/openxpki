@@ -360,6 +360,13 @@ sub select_one {
     return $sth->fetchrow_hashref;
 }
 
+# SUB SELECT
+# Returns: reference (!) to an ArrayRef that has to be included into the query
+sub subselect {
+    my $self = shift;
+    return $self->query_builder->subselect(@_);
+}
+
 sub count {
     my $self = shift;
     my %query_param = @_;
@@ -657,12 +664,12 @@ Required keys in this hash:
 
 Usage:
 
+    # returns an OpenXPKI::Server::Database::Query object
     my $query = $db->query_builder->select(
         from => 'certificate',
         columns  => [ 'identifier' ],
         where => { pki_realm => 'ca-one' },
     );
-    # returns an OpenXPKI::Server::Database::Query object
 
 =item * B<db_version> - database version, equals the result of C<$dbh-E<gt>get_version(...)> (I<Str>)
 
@@ -672,11 +679,15 @@ Usage:
 
 =head1 Methods
 
+Note: all methods might throw an L<OpenXPKI::Exception> if there are errors in the query or during it's execution.
+
 =head2 new
 
 Constructor.
 
 Named parameters: see L<attributes section above|/"Constructor parameters">.
+
+
 
 =head2 select
 
@@ -685,24 +696,102 @@ handle.
 
 Please note that C<NULL> values will be converted to Perl C<undef>.
 
-For parameters see L<OpenXPKI::Server::Database::QueryBuilder/select>.
+Subqueries can be realized using L</subselect>.
+
+Named parameters:
+
+=over
+
+=item * B<columns> - List of column names (I<ArrayRef[Str]>, required)
+
+=item * B<from> - Table name (or list of) (I<Str | ArrayRef[Str]>, required)
+
+=item * B<from_join> - A B<string> to describe table relations for FROM .. JOIN following the spec in L<SQL::Abstract::More/join> (I<Str>)
+
+    from_join => "certificate  req_key=req_key  csr"
+
+Please note that you cannot specify C<from> and C<from_join> at the same time.
+
+=item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
+
+=item * B<group_by> - GROUP BY column (or list of) (I<Str | ArrayRef>)
+
+=item * B<having> - HAVING clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
+
+=item * B<order_by> - Plain ORDER BY string or list of columns. Each column name can be preceded by a "-" for descending sort (I<Str | ArrayRef>)
+
+=item * B<limit> - (I<Int>)
+
+=item * B<offset> - (I<Int>)
+
+=back
+
+
+
+=head2 subselect
+
+Builds a subquery to be used within another query and returns a reference to an I<ArrayRef>.
+
+The returned structure is understood by L<SQL::Abstract|SQL::Abstract/Literal_SQL_with_placeholders_and_bind_values_(subqueries)> which is used internally.
+
+E.g. to create the following query:
+
+    SELECT title FROM books
+    WHERE (
+        author_id IN (
+            SELECT id FROM authors
+            WHERE ( legs > 2 )
+        )
+    )
+
+you can use C<subselect()> as follows:
+
+    CTX('dbi')->select(
+        from => "books",
+        columns => [ "title" ],
+        where => {
+            author_id => CTX('dbi')->subselect("IN" => {
+                from => "authors",
+                columns => [ "id" ],
+                where => { legs => { '>' => 2 } },
+            }),
+        },
+    );
+
+Positional parameters:
+
+=over
+
+=item * B<$operator> - SQL operator between column and subquery (I<Str>, required).
+
+Operators can be e.g. C<'IN'>, C<'NOT IN'>, C<'E<gt> MAX'> or C<'E<lt> ALL'>.
+
+=item * B<$query> - The query parameters in a I<HashRef> as they would be given to L</select> (I<HashRef>, required)
+
+=back
+
+
 
 =head2 select_one
 
 Selects one row from the database and returns the results as a I<HashRef>
 (column name => value) by calling C<$sth-E<gt>fetchrow_hashref>.
 
-For parameters see L<OpenXPKI::Server::Database::QueryBuilder/select>.
+For parameters see L</select>.
 
 Returns C<undef> if the query had no results.
 
 Please note that C<NULL> values will be converted to Perl C<undef>.
 
+
+
 =head2 count
 
-Takes the same arguments as a select query, wraps it into a subquery and
-return the number of rows the select would return. In case a limit is set
-it is ignored.
+Takes the same arguments as L</select>, wraps them into a subquery and
+return the number of rows the select would return. The parameters
+C<order_by>, C<limit> and C<offset> are ignored.
+
+
 
 =head2 insert
 
@@ -718,11 +807,8 @@ Inserts rows into the database and returns the number of affected rows.
     );
 
 To automatically set a primary key to the next serial number (i.e. sequence
-associated with this table) set it to C<AUTO_ID>. C<AUTO_ID> is a function that
-is exported by C<OpenXPKI::Server::Database>.
-
-Throws an L<OpenXPKI::Exception> if there are errors in the query or during
-it's execution.
+associated with this table) set it to C<AUTO_ID>. You need to C<use OpenXPKI::Server::Database;>
+to be able to use C<AUTO_ID>.
 
 Named parameters:
 
@@ -735,13 +821,29 @@ C<undef> is interpreted as C<NULL> (I<HashRef>, required).
 
 =back
 
+
+
 =head2 update
 
 Updates rows in the database and returns the number of affected rows.
 
+A WHERE clause is required to prevent accidential updates of all rows in a table.
+
 Please note that C<NULL> values will be converted to Perl C<undef>.
 
-For parameters see L<OpenXPKI::Server::Database::QueryBuilder/update>.
+Named parameters:
+
+=over
+
+=item * B<table> - Table name (I<Str>, required)
+
+=item * B<set> - Hash with column name / value pairs. Please note that C<undef> is interpreted as C<NULL> (I<HashRef>, required)
+
+=item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
+
+=back
+
+
 
 =head2 merge
 
@@ -776,12 +878,34 @@ The values from the WHERE clause are also inserted if the row does not exist
 
 =back
 
+
+
 =head2 delete
 
 Deletes rows in the database and returns the results as a I<DBI::st> statement
 handle.
 
-For parameters see L<OpenXPKI::Server::Database::QueryBuilder/delete>.
+To prevent accidential deletion of all rows of a table you must specify
+parameter C<all> if you want to do that:
+
+    CTX('dbi')->delete(
+        from => "mytab",
+        all => 1,
+    );
+
+Named parameters:
+
+=over
+
+=item * B<from> - Table name (I<Str>, required)
+
+=item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
+
+=item * B<all> - Set this to 1 instead of specifying C<where> to delete all rows (I<Bool>)
+
+=back
+
+
 
 =head2 start_txn
 
