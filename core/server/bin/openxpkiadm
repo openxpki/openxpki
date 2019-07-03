@@ -108,59 +108,64 @@ sub certificate_import {
         return 2;
     }
 
-    my $api_param = { DATA => $extracted_certdata };
+    my $api_param = { data => $extracted_certdata };
 
     if ($params{issuer}) {
-        $api_param->{ISSUER} = $params{issuer};
+        $api_param->{issuer} = $params{issuer};
     }
 
     if ($params{realm}) {
-        $api_param->{PKI_REALM} = $params{realm};
+        $api_param->{pki_realm} = $params{realm};
     }
 
     if ($params{"force-no-chain"}) {
-        $api_param->{FORCE_NOCHAIN} = 1;
+        $api_param->{force_nochain} = 1;
     }
 
     if ($params{"force-no-verify"}) {
-        $api_param->{FORCE_NOVERIFY} = 1;
+        $api_param->{force_noverify} = 1;
     }
 
     if ($params{"force-issuer"}) {
         if (!$params{issuer}) {
             die "You need to specify the issuer with --issuer when using --force-issuer\n"
         }
-        $api_param->{FORCE_ISSUER} = 1;
+        $api_param->{force_issuer} = 1;
     }
 
     if ($params{"force-certificate-already-exists"}) {
-        $api_param->{UPDATE} = 1;
+        $api_param->{update} = 1;
     }
 
     if ($params{revoked}) {
-        $api_param->{REVOKED} = 1;
+        $api_param->{revoked} = 1;
     }
 
-    my $res = CTX('api')->import_certificate( $api_param );
+    if ($params{profile}) {
+        $api_param->{profile} = $params{profile};
+    }
+
+
+    my $res = CTX('api2')->import_certificate( %$api_param );
 
     print "Successfully imported certificate into database:\n";
-    print "  Subject:    " . $res->{SUBJECT} . "\n";
-    print "  Issuer:     " . $res->{ISSUER_DN} . "\n";
-    print "  Identifier: " . $res->{IDENTIFIER} . "\n";
-    print "  Realm:      " . ($res->{PKI_REALM} || 'none'). "\n";
+    print "  Subject:    " . $res->{subject} . "\n";
+    print "  Issuer:     " . $res->{issuer_dn} . "\n";
+    print "  Identifier: " . $res->{identifier} . "\n";
+    print "  Realm:      " . ($res->{pki_realm} || 'none'). "\n";
 
     my $return = 0;
 
     # directly register alias
     if ($params{alias} || $params{gen} || $params{token}) {
         if (!$params{realm}) {
-            if (!$res->{PKI_REALM}) {
+            if (!$res->{pki_realm}) {
                 print "*Unable to register alias without realm!*\n";
             } else {
-                $params{realm} = $res->{PKI_REALM};
+                $params{realm} = $res->{pki_realm};
             }
         }
-        $params{identifier} = $res->{IDENTIFIER};
+        $params{identifier} = $res->{identifier};
         print "\n";
         if ($params{realm}) {
             $return = alias_add();
@@ -1271,6 +1276,8 @@ if ($cmd eq 'initdb') {
             token=s
             notbefore=s
             notafter=s
+
+            profile=s
         );
 
         # alias, gen, group, token are for alias shortcut

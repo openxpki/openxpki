@@ -48,6 +48,14 @@ I<REVOKED>. Default: 0
 =item * C<update> I<Bool> - do not throw an exception if certificate already
 exists, update it instead. Default: 0
 
+=item C<profile> I<Str> - set the profile for this certificate as it was
+issued by this realm. This requires that the issuer is registered as certsign
+alias in the realm and creates a "fake" entry in the CSR table. This should
+only be used to import certificates in "dummy realms" or for migration
+purposes. B<Note> that the CSR attributes table are NOT filled and not all
+workflows might be fully operational with such certificates! The profile
+must exist but its settings are not checked against the imported certificate.
+
 =back
 
 =cut
@@ -61,6 +69,7 @@ command "import_certificate" => {
     revoked        => { isa => 'Bool|HashRef', default => 0, },
     update         => { isa => 'Bool', default => 0, },
     attributes     => { isa => 'HashRef'},
+    profile        => { isa => 'Str'},
 } => sub {
     my ($self, $params) = @_;
 
@@ -80,7 +89,7 @@ command "import_certificate" => {
     # Check if the certificate is already in the PKI
     my $existing_cert = $dbi->select_one(
         from => 'certificate',
-        columns => [ qw( identifier pki_realm status ) ],
+        columns => [ qw( identifier pki_realm status req_key ) ],
         where => { identifier => $cert_identifier },
     );
 
@@ -108,6 +117,10 @@ command "import_certificate" => {
     };
 
     $cert_hash->{pki_realm} = $params->pki_realm if $params->has_pki_realm;
+
+    if ($existing_cert && $existing_cert->{req_key}) {
+        $cert_hash->{req_key} = $existing_cert->{req_key};
+    }
 
     # attach revocation information if provided
     if ($params->has_revoked) {
@@ -160,6 +173,8 @@ command "import_certificate" => {
         force_nochain   => $params->force_nochain,
     );
 
+    my $csr_hash;
+
     # cert is self signed
     if ($issuer_cert and $issuer_cert eq "SELF") {
         $cert_hash->{issuer_identifier} = $cert_identifier;
@@ -203,8 +218,63 @@ command "import_certificate" => {
         }
 
         $cert_hash->{issuer_identifier} = $issuer_cert->{identifier};
-        # if the issuer is in a realm, it forces the entity into the same one
-        $cert_hash->{pki_realm} = $issuer_cert->{pki_realm} if $issuer_cert->{pki_realm};
+        # inherit realm if not set explicitly
+        if (!$cert_hash->{pki_realm} && $issuer_cert->{pki_realm}) {
+            $cert_hash->{pki_realm} = $issuer_cert->{pki_realm};
+        }
+
+        if ($params->has_profile) {
+
+            if (!$cert_hash->{pki_realm}) {
+                OpenXPKI::Exception->throw(
+                    message => 'Realm must be set when importing with profile',
+                );
+            }
+
+            if (!CTX('config')->exists([ 'realm', $cert_hash->{pki_realm}, 'profile', $params->profile] )) {
+                OpenXPKI::Exception->throw(
+                    message => 'Profile does not exist',
+                    params  => { profile => $params->profile, pki_realm => $cert_hash->{pki_realm} },
+                );
+            }
+
+            my $cs_group = CTX('config')->get(['realm', $cert_hash->{pki_realm}, 'crypto', 'type', 'certsign']);
+            my $issuer_alias = $dbi->select_one(
+                from   => 'aliases',
+                columns => ['alias'],
+                where => {
+                    identifier => $cert_hash->{issuer_identifier},
+                    pki_realm => $cert_hash->{pki_realm},
+                    group_id => $cs_group
+                },
+            );
+
+            if (!$issuer_alias) {
+                OpenXPKI::Exception->throw(
+                    message => 'Import with profile requires issuer to be registered as certsign token',
+                    params  => { issuer_identifier => $cert_hash->{issuer_identifier}, pki_realm => $cert_hash->{pki_realm}, group_id => $cs_group},
+                );
+            }
+
+            if (!$cert_hash->{req_key}) {
+                $cert_hash->{req_key} = CTX('dbi')->next_id('csr');
+                CTX('log')->system()->info("Importing certificate with profile / creating dummy csr");
+            }
+
+            $dbi->merge(
+                into => 'csr',
+                set => {
+                    pki_realm => $cert_hash->{pki_realm},
+                    format => 'import',
+                    profile => $params->profile,
+                    subject => $cert_hash->{subject},
+                    req_key => $cert_hash->{req_key},
+                },
+                where => { req_key => $cert_hash->{req_key} },
+            );
+
+        }
+
     }
 
     $dbi->merge(
@@ -245,6 +315,8 @@ command "import_certificate" => {
             }
         }
     }
+
+    CTX('log')->system()->info("Certificate ".$cert_hash->{subject}."/$cert_identifier was imported");
 
     return $cert_hash;
 };
@@ -355,8 +427,8 @@ sub _is_issuer_valid  {
 
     # verify a complete chain
     ##! 64: 'Validate chain ' . Dumper $chain
-    if ($chain->{COMPLETE}) {
-        my @work_chain = @{$chain->{CERTIFICATES}};
+    if ($chain->{complete}) {
+        my @work_chain = @{$chain->{certificates}};
         my $root = pop @work_chain;
 
         my $res = $default_token->command({
