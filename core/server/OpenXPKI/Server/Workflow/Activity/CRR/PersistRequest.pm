@@ -54,7 +54,7 @@ sub execute
         );
     }
 
-    my $reason_code = $context->param('reason_code') // $context->param('reason_code');
+    my $reason_code = $self->param('reason_code') // $context->param('reason_code');
     my $invalidity_time = $self->param('invalidity_time') // $context->param('invalidity_time');
     my $hold_code = $self->param('hold_code') // $context->param('hold_code');
 
