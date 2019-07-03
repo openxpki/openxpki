@@ -24,6 +24,7 @@ OpenXPKI/Template.pm
 OpenXPKI/Template/Plugin/Certificate.pm
 OpenXPKI/Template/Plugin/PKCS10.pm
 OpenXPKI/Template/Plugin/CheckDNS.pm
+OpenXPKI/Template/Plugin/DateTime.pm
 OpenXPKI/Template/Plugin/Metadata.pm
 OpenXPKI/Template/Plugin/Profile.pm
 OpenXPKI/Template/Plugin/RandomPassword.pm
