@@ -64,7 +64,6 @@ lives_and {
             'PLAIN_EXTENSIONS'    => re(qr/^.+$/m),         # multiline
             'PUBKEY_ALGORITHM'    => re(qr/^.+$/),          # 'rsaEncryption',
             'PUBKEY_HASH'         => re(qr/^.+$/),          # 'SHA1:94:FA:0B:95:AA:46:3B:7E:1B:F2:AB:67:3A:2D:ED:7B:85:6B:C8:27',
-            'PUBKEY'              => re(qr/^.+$/m),         # multiline
             'SERIAL_HEX'          => re(qr/^[a-f0-9]+$/i),  # '8c9e25459b3ebfb5daff',
             'SERIAL'              => re(qr/\d+$/),          # '664048578888843042085631',
             'SIGNATURE_ALGORITHM' => re(qr/^.+$/),          # 'sha256WithRSAEncryption',
@@ -150,7 +149,6 @@ lives_and {
         'NOTAFTER'                  => re(qr/\d+$/),            # '1496094413',
         'NOTBEFORE'                 => re(qr/\d+$/),            # '1480456013',
         'PKI_REALM'                 => re(qr/^.+$/),            # 'ca-one',
-        'PUBKEY'                    => re(qr/^.+$/m),           # multiline
         'STATUS'                    => re(qr/^\w+$/),           # 'ISSUED',
         'SUBJECT'                   => re(qr/^.+$/),            # 'CN=nicetest-63a0ee.openxpki.test:8080,DC=Test Deployment,DC=OpenXPKI,DC=org',
         'SUBJECT_KEY_IDENTIFIER'    => re(qr/^.+$/),            # 'BD:B1:9B:63:70:40:A3:3D:48:2C:0C:7A:0D:33:90:2E:C0:D2:23:89',

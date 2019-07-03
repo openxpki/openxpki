@@ -134,6 +134,18 @@ sub select {
     );
 }
 
+sub subselect {
+    my ($self, $operator, $query) = positional_args(\@_, # OpenXPKI::MooseParams
+        { isa => 'Str' },
+        { isa => 'HashRef' },
+    );
+
+    my $subquery = $self->select(%$query);
+    my $subquery_and_op = sprintf "%s (%s)", $operator, $subquery->string;
+
+    return \[ $subquery_and_op => @{ $subquery->params }]
+}
+
 sub insert {
     my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
         into     => { isa => 'Str' },
@@ -216,38 +228,36 @@ Constructor.
 
 Named parameters: see L<attributes section above|/"Constructor parameters">.
 
+
+
 =head2 select
 
 Builds a SELECT query and returns a L<OpenXPKI::Server::Database::Query> object
 which contains SQL string and bind parameters.
 
-Named parameters:
+The method parameters are documented in L<OpenXPKI::Server::Database/select>.
 
-=over
 
-=item * B<columns> - List of column names (I<ArrayRef[Str]>, required)
 
-=item * B<from> - Table name (or list of) (I<Str | ArrayRef[Str]>, required)
+=head2 subselect
 
-=item * B<from_join> - A B<string> to describe table relations for FROM .. JOIN following the spec in L<SQL::Abstract::More/join> (I<Str>)
+Builds a subselect to be used within another query and returns a reference to an I<ArrayRef>.
 
-    from_join => "certificate  req_key=req_key  csr"
+This will take something like this:
 
-Please note that you cannot specify C<from> and C<from_join> at the same time.
+    CTX('dbi')->subselect('IN' => {
+        from => 'nature',
+        columns => [ 'id', 'fruit' ],
+        where => { type => 'forbidden' }
+    })
 
-=item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
+and turn it into:
 
-=item * B<group_by> - GROUP BY column (or list of) (I<Str | ArrayRef>)
+    \[ "IN ($query)" => @bind ]
 
-=item * B<having> - HAVING clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
+The method parameters are documented in L<OpenXPKI::Server::Database/subselect>.
 
-=item * B<order_by> - Plain ORDER BY string or list of columns. Each column name can be preceded by a "-" for descending sort (I<Str | ArrayRef>)
 
-=item * B<limit> - (I<Int>)
-
-=item * B<offset> - (I<Int>)
-
-=back
 
 =head2 insert
 
@@ -264,6 +274,8 @@ Named parameters:
 
 =back
 
+
+
 =head2 update
 
 Builds an UPDATE query and returns a L<OpenXPKI::Server::Database::Query> object
@@ -271,17 +283,9 @@ which contains SQL string and bind parameters.
 
 A WHERE clause is required to prevent accidential updates of all rows in a table.
 
-Named parameters:
+The method parameters are documented in L<OpenXPKI::Server::Database/update>.
 
-=over
 
-=item * B<table> - Table name (I<Str>, required)
-
-=item * B<set> - Hash with column name / value pairs. Please note that C<undef> is interpreted as C<NULL> (I<HashRef>, required)
-
-=item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
-
-=back
 
 =head2 delete
 
@@ -296,16 +300,6 @@ parameter C<all> if you want to do that:
         all => 1,
     );
 
-Named parameters:
-
-=over
-
-=item * B<from> - Table name (I<Str>, required)
-
-=item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
-
-=item * B<all> - Set this to 1 instead of specifying C<where> to delete all rows (I<Bool>)
-
-=back
+The method parameters are documented in L<OpenXPKI::Server::Database/delete>.
 
 =cut

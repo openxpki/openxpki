@@ -107,11 +107,12 @@ sub search_cert_ok {
     my $val;
     # Only extract last element if it equals "ORDERED" (otherwise put it back and make term return 0)
     my $respect_order = (($val = pop @expected_names) eq "ORDERED") ? 1 : push(@expected_names, $val) && 0;
-    my @hashes = map { superhashof({ SUBJECT_KEY_IDENTIFIER => $dbdata->cert($_)->subject_key_id }) } @expected_names;
+    my @hashes = map { +{ SUBJECT_KEY_IDENTIFIER => $dbdata->cert($_)->subject_key_id } } @expected_names;
 
-    $test->runcmd_ok('search_cert', $conditions, "Search cert $message")
+    $test->runcmd_ok('search_cert', { %$conditions, RETURN_COLUMNS => "SUBJECT_KEY_IDENTIFIER" }, "Search cert $message")
         or die Dumper($test->get_msg);
-    cmp_deeply $test->get_msg->{PARAMS}, ($respect_order ? \@hashes : bag(@hashes)), "Correct result";
+    cmp_deeply $test->get_msg->{PARAMS}, ($respect_order ? \@hashes : bag(@hashes)), "Correct result"
+        or diag explain [ $test->get_msg->{PARAMS}, \@hashes ];
 }
 
 $test->runcmd_ok('search_cert', {
@@ -311,10 +312,11 @@ cmp_deeply $test->get_msg->{PARAMS}, array_each(
 $test->runcmd_ok('search_cert', {
     ENTITY_ONLY => 1,
     PKI_REALM => "_ANY",
+    RETURN_COLUMNS => "CSR_SERIAL",
 }, "Search cert only from this CA entity");
 
 cmp_deeply $test->get_msg->{PARAMS}, array_each(
-    superhashof({ CSR_SERIAL => re(qr/^\d+$/) })
+    { CSR_SERIAL => re(qr/^\d+$/) }
 ), "Correct result";
 
 # Github issue #501 - SQL JOIN statement breaks when searching for attributes AND profile

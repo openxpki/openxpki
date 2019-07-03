@@ -125,7 +125,6 @@ lives_and {
         'notafter'                  => re(qr/\d+$/),            # '1496094413',
         'notbefore'                 => re(qr/\d+$/),            # '1480456013',
         'pki_realm'                 => re(qr/^.+$/),            # 'ca-one',
-        'public_key'                => re(qr/^.+$/m),           # multiline
         'status'                    => re(qr/^\w+$/),           # 'ISSUED',
         'subject'                   => re(qr/^.+$/),            # 'CN=nicetest-63a0ee.openxpki.test:8080,DC=Test Deployment,DC=OpenXPKI,DC=org',
         'subject_key_identifier'    => re(qr/^.+$/),            # 'BD:B1:9B:63:70:40:A3:3D:48:2C:0C:7A:0D:33:90:2E:C0:D2:23:89',

@@ -623,6 +623,7 @@ sub BUILD {
                 REVERSE =>                  { optional => 1, type => SCALAR },
                 LIMIT =>                    { optional => 1, type => SCALAR },
                 START =>                    { optional => 1, type => SCALAR },
+                RETURN_COLUMNS =>           { optional => 1, type => SCALAR|ARRAYREF },
             },
         },
          'list_issuers' => {

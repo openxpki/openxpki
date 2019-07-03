@@ -89,7 +89,7 @@ while (my $data = $dbh->fetchrow_hashref) {
             my $val = $data->{$_};
             my $qc = "'";
             # Multiline attributes
-            if (m/^(data|public_key)$/) {
+            if (m/^(data)$/) {
                 $val =~ s/\r?\n/\\n/g if $val;  # Convert newlines to "\n"
                 $qc = '"';                      # Double quotes
             }

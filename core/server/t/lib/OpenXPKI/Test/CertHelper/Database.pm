@@ -224,7 +224,6 @@ sub _build_certs {
                 notafter => '1170287999', # 2007-01-31T23:59:59
                 notbefore => '1136073600', # 2006-01-01T00:00:00
                 pki_realm => 'alpha',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:aa:6e:32:b7:de:70:1f:6c:a3:4c:e9:a5:59:90:\n    f5:7f:d1:1f:bc:9c:20:27:26:00:86:5b:79:85:d7:\n    51:d1:83:98:c5:66:02:72:7a:b9:69:5b:f6:42:93:\n    ca:15:d6:8c:6e:3f:67:f7:63:15:94:8f:73:e9:ed:\n    ec:50:15:35:c1:e3:5c:a5:92:4f:ab:9b:59:8f:1b:\n    ec:75:f8:ce:ed:1b:32:9f:7a:cb:8a:54:cf:db:dc:\n    9d:ea:29:16:81:88:fc:49:8c:93:99:2e:f7:6f:6f:\n    b9:c7:cc:74:29:5e:b9:ee:cf:c8:04:a1:63:94:ad:\n    20:fa:16:6b:27:66:72:5a:57:1d:51:82:47:5f:d9:\n    0e:a3:a0:b0:08:5c:e4:e3:00:92:e3:d0:8f:b0:36:\n    a1:a1:ed:b3:09:69:97:07:45:f3:d4:e6:71:d9:26:\n    86:76:c9:9f:62:9f:c6:b3:4f:1b:0c:ff:22:5c:55:\n    82:59:27:0b:e1:b9:ac:a4:31:7a:d4:49:71:54:c5:\n    d9:d4:6f:5d:87:d7:26:d8:b9:ee:61:a1:ae:67:5a:\n    28:93:d2:6f:77:b6:69:8f:26:74:89:fc:f6:3b:9c:\n    47:84:cf:cd:60:15:55:a2:79:86:d1:c3:89:9f:a7:\n    c5:91:d3:b0:67:b1:db:02:ae:19:c3:50:3e:d0:76:\n    7f:07\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -255,7 +254,6 @@ sub _build_certs {
                 notafter => '4105123199', # 2100-01-31T23:59:59
                 notbefore => '1167609600', # 2007-01-01T00:00:00
                 pki_realm => 'alpha',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:b1:5b:00:37:ce:07:15:40:67:5d:ba:c8:9f:b8:\n    a6:d3:b4:72:fe:a8:02:c9:f5:5b:cc:a6:d3:04:ec:\n    2b:d5:70:cf:eb:7c:64:12:48:01:56:eb:8e:56:d0:\n    e0:04:da:dd:93:17:fd:c1:b6:2a:dc:20:1a:61:d3:\n    8e:f5:8c:23:c5:fc:ac:4c:ea:fc:62:93:90:8f:8c:\n    49:49:3a:ec:a0:6d:1d:f9:81:93:cd:c9:d1:ff:ee:\n    2d:24:7a:af:6b:c8:61:5c:d2:0f:df:2b:1b:eb:ca:\n    e9:00:35:c2:24:7f:9d:96:16:e7:ec:d4:da:1b:cc:\n    0d:fb:6b:96:26:75:22:7d:e5:23:3b:ab:42:2b:c6:\n    60:a8:fb:11:94:1d:8f:7d:3c:60:58:68:dc:76:8b:\n    4d:3b:7b:d0:2b:67:ac:5d:bb:82:28:62:0b:de:9c:\n    ba:ec:06:16:14:6c:bb:16:44:e3:09:0d:f7:77:be:\n    56:bc:be:9a:1a:ba:bd:2e:0d:cc:08:42:13:d4:5f:\n    48:86:8b:72:7a:7e:8e:c7:c0:f8:b1:68:f1:ca:74:\n    40:66:8a:2e:e7:e3:23:58:8b:5e:7c:c0:c4:37:07:\n    ea:55:42:af:54:08:b1:db:bb:e6:65:f3:b0:72:72:\n    df:c1:cb:e6:32:90:03:44:48:a5:16:17:62:80:c0:\n    60:63\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -286,7 +284,6 @@ sub _build_certs {
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '4102444800', # 2100-01-01T00:00:00
                 pki_realm => 'alpha',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:de:41:f0:9c:4a:67:b2:58:47:d8:aa:15:c6:e2:\n    34:ff:19:35:76:1d:3d:55:83:be:45:b7:e4:9b:bc:\n    91:b7:62:14:8f:3c:cf:f2:ec:c4:47:d3:1d:47:25:\n    6f:53:e4:fa:1c:05:89:1c:c4:62:7e:ee:c3:4a:77:\n    2c:af:50:c4:27:60:b8:87:fb:c9:57:68:2c:eb:6b:\n    93:f2:da:03:45:d3:da:3b:13:5b:b0:f6:70:e3:d9:\n    65:ff:47:72:b0:bc:cd:2a:03:be:2b:85:b3:83:51:\n    4f:8d:90:4b:e4:87:c4:7f:cc:2a:c9:f2:ec:be:2f:\n    c3:bd:e8:d2:96:77:aa:11:97:a7:05:18:c3:e0:ea:\n    81:c5:79:5f:48:de:6f:90:18:03:17:d8:fa:90:29:\n    15:b5:c8:cf:2c:62:ef:2b:bc:e3:3c:ca:38:75:d1:\n    8f:38:41:6d:b6:e5:86:aa:e9:7d:50:ea:fa:56:7b:\n    96:31:e9:89:39:e5:3b:fd:71:5b:d4:e8:a2:fd:ff:\n    6c:42:22:0d:36:88:ef:23:e8:24:d9:8e:92:f8:09:\n    15:4b:1c:86:de:3f:38:ec:cb:6d:28:8b:5e:1f:e5:\n    9a:63:75:aa:49:50:48:46:81:0c:40:8b:e2:fc:dc:\n    fa:96:5c:d4:7d:fb:c4:89:bf:fb:e8:5e:f7:d4:63:\n    06:6d\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -317,7 +314,6 @@ sub _build_certs {
                 notafter => '1170287999', # 2007-01-31T23:59:59
                 notbefore => '1136073600', # 2006-01-01T00:00:00
                 pki_realm => 'alpha',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:d7:fb:23:2a:09:02:b8:35:92:3b:6f:78:cb:9a:\n    63:ca:7e:e9:1f:45:4f:3e:d9:58:35:60:95:0b:dc:\n    08:22:80:63:c9:3a:6e:2f:7a:0e:df:8e:77:19:a6:\n    98:92:0a:70:fe:8b:d1:ab:f4:53:c4:2e:ba:e0:6a:\n    71:f0:0f:1c:5b:0f:f7:17:41:15:a3:6d:12:96:2a:\n    c4:07:cc:54:26:66:be:3a:52:8e:c9:de:a0:b8:71:\n    41:a4:48:5d:6b:f9:fd:99:da:fb:92:a9:05:da:0e:\n    a8:50:5e:57:5c:f3:9f:eb:93:fa:0d:e8:b0:e9:06:\n    14:4b:ef:68:af:dd:8d:ea:3d:f4:d3:06:d9:cf:43:\n    d2:b5:67:3c:b4:fe:22:eb:c9:5e:64:d2:78:51:47:\n    31:8a:90:e1:5d:2a:62:da:0b:29:60:72:dd:49:9e:\n    1b:90:12:8b:40:d5:8b:2e:dc:e9:06:a8:55:b3:6c:\n    f8:4d:72:85:0f:09:a8:3d:44:d6:ca:e1:d1:0e:f2:\n    ce:40:2f:cf:99:ed:00:23:cb:e7:f3:f4:11:44:29:\n    f8:64:60:8e:1c:18:63:1e:76:50:bd:af:e7:f5:fe:\n    14:73:c9:27:8c:2d:1a:e0:84:a2:33:84:ef:31:a8:\n    15:15:dd:e3:59:34:54:14:a3:2c:27:ef:37:1e:75:\n    94:d5\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -348,7 +344,6 @@ sub _build_certs {
                 notafter => '4105123199', # 2100-01-31T23:59:59
                 notbefore => '1167609600', # 2007-01-01T00:00:00
                 pki_realm => 'alpha',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:d9:5c:61:e0:86:64:b3:d2:6e:a7:71:29:65:05:\n    80:f5:46:52:08:c0:6d:28:c0:05:7a:52:6e:71:c8:\n    03:22:0d:ac:6f:59:92:db:9f:7f:3b:84:f6:fa:0f:\n    3b:e7:42:1c:2a:1f:5c:e8:e8:da:ad:eb:42:46:a5:\n    ff:68:de:3c:cb:5c:b4:fd:63:95:d8:2c:68:4f:8a:\n    ec:79:f6:07:50:3e:fb:ff:b3:c4:65:19:e0:fc:4d:\n    59:76:53:c7:c9:0c:80:96:97:48:dd:ea:52:d2:e0:\n    ea:d9:36:8f:1c:b0:32:c7:d3:5c:e1:9f:d7:0b:64:\n    77:0e:9e:74:c4:ca:37:21:bc:a1:df:5b:ae:0a:c1:\n    aa:37:ec:0b:8a:58:c9:01:9b:a9:64:7f:58:af:65:\n    c1:41:f8:e4:30:bc:2c:78:23:78:a6:3a:27:21:54:\n    90:91:a0:64:ed:3a:5b:fa:fb:c8:d1:3c:0c:bd:fb:\n    13:ad:b4:a9:33:bd:c1:5f:4d:f2:8d:17:d2:3e:e0:\n    f2:14:9a:3e:e6:12:fa:bb:7d:53:ef:e5:39:fb:e1:\n    d5:cf:86:9e:ee:6e:69:c3:5c:db:91:48:7b:ce:73:\n    00:f0:cb:d9:69:93:c2:a2:7a:f9:99:7d:82:1d:d5:\n    46:8a:4f:be:33:36:00:1d:e7:57:7e:11:b8:0a:b7:\n    3a:0d\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -379,7 +374,6 @@ sub _build_certs {
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '4102444800', # 2100-01-01T00:00:00
                 pki_realm => 'alpha',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:d2:90:b1:5a:2f:b8:12:a5:46:54:fd:43:38:3a:\n    ac:26:8c:0a:6e:39:0f:fe:0d:c2:d6:4f:d9:5a:a7:\n    59:9f:58:e6:6f:bf:86:8f:e2:ab:75:3f:4d:65:74:\n    26:ca:9c:58:f1:4b:cf:76:f3:41:fe:de:d7:c9:57:\n    aa:ee:75:46:c9:c4:ff:11:23:f2:dd:b1:f6:1c:fc:\n    5f:b3:00:01:8d:8b:39:3c:fb:cc:ac:86:fe:71:4c:\n    f7:23:c3:65:ef:7a:69:3d:a8:ba:5c:7e:54:ab:9e:\n    66:b5:b1:8e:f6:a8:c5:8f:52:33:40:4d:ed:f8:12:\n    7f:ba:13:c6:c7:69:6a:ec:a5:b3:05:6b:9a:db:4f:\n    95:e6:e5:b2:ca:1b:d5:ee:4a:57:23:24:e4:b8:0e:\n    fb:aa:4b:b3:5a:d6:74:2a:6c:15:e5:8c:c8:06:1a:\n    c0:0b:5c:4a:54:ed:2e:f6:fa:08:4c:ad:2c:0b:e9:\n    3f:ee:78:e3:de:5b:d8:21:97:d9:94:08:00:c6:fa:\n    57:73:71:3a:b4:5d:9d:fb:3a:7d:2b:11:ee:77:37:\n    7d:7f:73:30:24:cb:fb:ec:95:a8:35:b0:59:60:38:\n    0a:6d:1d:c2:75:79:47:ff:21:d4:33:01:6c:87:ed:\n    48:66:95:6b:1a:b8:ea:22:93:8f:41:ff:67:63:a6:\n    23:a3\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -410,7 +404,6 @@ sub _build_certs {
                 notafter => '4105123199', # 2100-01-31T23:59:59
                 notbefore => '1167609600', # 2007-01-01T00:00:00
                 pki_realm => 'alpha',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:e3:f1:d9:fe:c4:18:ce:c8:4b:50:3b:8c:90:bd:\n    95:1f:e8:4a:bf:f3:76:ba:e0:66:3b:43:60:39:d3:\n    11:7f:c4:3f:94:05:db:cb:da:51:10:2f:fb:c3:5d:\n    83:44:56:3f:a4:e5:ab:46:f9:9f:e1:af:88:e1:65:\n    45:94:a9:de:8f:90:56:f9:22:b6:dd:1c:e2:aa:f2:\n    d0:16:2b:c0:63:1b:f6:db:a5:88:c5:a6:8b:73:10:\n    3d:06:74:8b:65:d3:bd:46:f2:b8:1d:c6:9c:97:1a:\n    d4:93:45:6e:68:0e:86:22:18:b0:34:8b:f2:57:b2:\n    3a:e3:e1:41:7d:19:59:9a:f5:9a:c9:b4:c4:f2:fb:\n    0e:4b:b9:33:45:33:35:59:26:91:16:5b:a4:ff:d2:\n    37:64:6b:a6:8c:69:d8:13:4f:19:68:7e:a2:de:51:\n    0b:ba:44:94:42:f0:b4:94:89:44:1a:d7:f9:3a:cd:\n    be:e3:28:07:de:3c:88:9f:7e:ce:ad:f2:bf:73:d4:\n    42:d9:cd:0e:e5:df:a9:7a:60:76:14:e9:b3:31:c8:\n    05:5d:89:b4:55:b6:2b:87:6c:fa:ae:34:81:fa:b0:\n    5f:6a:4f:d0:97:5e:26:6c:85:b3:eb:50:bc:bb:ce:\n    33:ac:85:5b:07:12:01:ab:7a:8c:f8:d1:47:05:78:\n    46:5f\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -441,7 +434,6 @@ sub _build_certs {
                 notafter => '1170287999', # 2007-01-31T23:59:59
                 notbefore => '1136073600', # 2006-01-01T00:00:00
                 pki_realm => 'alpha',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:cd:26:25:0d:37:d3:a7:ea:c9:2c:7f:fa:3a:ad:\n    f2:04:56:06:55:1a:0b:a9:f8:da:2e:35:59:0c:92:\n    68:d4:0c:d8:ae:8d:12:c2:e3:e4:f8:fe:a4:f7:05:\n    d3:e8:ce:52:de:2e:27:65:86:1a:62:d1:38:72:c2:\n    85:1b:2f:69:1b:0e:d4:1e:4c:c7:2e:65:3b:b6:fc:\n    1f:74:4b:3d:d8:cb:f7:2b:86:fb:87:64:5c:a2:f9:\n    01:c3:84:d0:0a:de:64:74:9a:11:bf:48:ff:63:bd:\n    28:52:6b:7b:b9:5b:a3:a6:20:62:3c:e9:81:75:2c:\n    73:8a:0e:09:d9:af:c5:f4:5c:44:75:91:6c:4f:2a:\n    ac:a0:fc:6b:d4:fb:e1:77:9d:d1:83:0b:9b:06:02:\n    db:f2:1f:0c:e4:df:3b:c7:4e:a8:cf:29:c8:12:36:\n    e9:ce:ef:7a:dd:09:ba:aa:eb:40:0a:8e:2a:39:7b:\n    65:5a:4d:4b:2c:8e:57:72:41:f9:9a:89:1d:29:97:\n    f7:0b:72:75:24:fb:db:96:f3:8d:db:ba:7a:5f:8f:\n    29:7c:40:23:4f:a2:71:7c:c0:c3:f3:36:a2:96:05:\n    bc:d4:96:96:ea:74:87:1b:b2:69:9f:16:0f:cd:c1:\n    e6:a0:b6:82:40:b7:61:54:6f:93:ef:a6:d2:5f:4c:\n    a6:67\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -472,7 +464,6 @@ sub _build_certs {
                 notafter => '4105123199', # 2100-01-31T23:59:59
                 notbefore => '1167609600', # 2007-01-01T00:00:00
                 pki_realm => 'alpha',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:b0:dc:53:c2:29:b2:27:5e:b3:2f:14:a0:c1:18:\n    27:99:a7:ac:13:30:13:69:11:0c:48:11:64:52:49:\n    db:3b:99:28:e0:46:43:5d:b8:c9:a3:20:96:fc:3f:\n    2a:6c:56:9f:fb:e2:54:12:00:99:3b:07:00:d3:0e:\n    f1:b4:04:a1:07:93:a0:b9:d2:28:04:3f:a4:59:75:\n    ba:55:80:e3:21:61:88:b6:a5:76:9b:2a:28:a2:7d:\n    87:d7:9f:f1:92:10:35:8d:4e:b7:c2:cf:e8:fb:b6:\n    1e:32:f6:13:5f:33:9f:3a:72:93:dd:25:96:b5:88:\n    d6:62:c9:1b:e7:26:4f:e6:39:8d:f6:ba:4e:01:e1:\n    24:d0:a0:b5:7a:86:24:69:ff:09:79:2b:82:4c:af:\n    2a:4c:e3:67:c5:e7:ff:ce:d6:ed:67:6f:8e:ad:0a:\n    5c:3c:f6:4e:51:19:d3:00:42:28:18:e8:fd:62:69:\n    72:2a:d8:d8:2e:a8:f7:ae:bc:53:46:03:c5:a7:6d:\n    f3:27:dd:41:27:b9:95:5c:a4:28:9e:76:03:15:d3:\n    ea:7b:d5:00:08:0b:e4:2e:05:cd:81:97:11:51:1c:\n    4f:70:e8:94:df:aa:db:42:be:9b:9d:f6:1c:50:68:\n    4b:22:0a:f9:8d:c1:31:ec:25:9a:e0:80:a4:02:eb:\n    9e:bb\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -503,7 +494,6 @@ sub _build_certs {
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '4102444800', # 2100-01-01T00:00:00
                 pki_realm => 'alpha',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:d3:1a:48:16:f7:6e:03:dc:d2:58:a6:99:79:65:\n    f8:24:e5:69:a3:78:e0:4a:68:db:37:92:68:67:36:\n    71:d5:ab:8d:3e:06:6b:2f:1c:26:93:1e:59:c0:4c:\n    bc:26:a8:e4:59:71:d3:e6:53:74:9a:c3:e7:6f:56:\n    1b:37:0c:88:f0:b7:06:56:e0:8a:32:63:0f:f7:5e:\n    eb:b9:40:06:f5:c2:5e:bc:91:3d:f1:89:f3:12:d6:\n    d4:72:4a:d7:88:04:78:26:5f:c9:4e:df:05:1d:57:\n    b4:57:9f:48:cf:e8:4d:10:2d:e7:1b:de:5a:dc:93:\n    2c:3b:8c:0b:12:0a:80:b4:ff:51:12:bb:2e:db:01:\n    9d:f8:40:0c:24:1c:39:e4:95:d5:d5:f7:4e:f4:48:\n    69:be:3b:d4:fe:bf:14:81:ad:34:26:92:4f:31:da:\n    38:a6:7c:1d:f3:62:5a:f4:f1:8b:c4:06:46:20:3c:\n    31:67:ad:36:26:7e:71:ef:72:33:75:cf:59:23:38:\n    bf:6f:25:46:54:8c:75:8a:5a:01:8f:40:e0:4b:67:\n    0b:7e:20:04:f6:65:5b:73:5a:88:35:9e:05:6a:36:\n    10:9f:d5:c5:5e:a3:ae:57:4a:57:38:02:52:cc:b5:\n    9d:43:81:5b:58:ec:95:78:24:54:5e:f2:55:4f:34:\n    00:6d\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -534,7 +524,6 @@ sub _build_certs {
                 notafter => '4105123199', # 2100-01-31T23:59:59
                 notbefore => '1167609600', # 2007-01-01T00:00:00
                 pki_realm => 'alpha',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:c2:1b:63:71:0e:c6:00:27:1b:d0:c8:4e:33:ff:\n    38:ec:44:eb:b4:05:60:59:43:4b:ff:89:2f:60:c8:\n    02:22:e6:e3:e4:7a:a7:4e:0e:12:c8:6d:0f:a8:33:\n    e2:f3:5b:74:8f:56:64:99:11:6b:3f:d6:30:50:3e:\n    b5:06:35:ea:79:f9:a0:2d:d8:cd:b6:4b:9f:f7:e9:\n    9f:f6:c2:28:06:34:25:ed:82:4f:c0:1c:82:ec:71:\n    92:31:58:1c:be:c9:93:44:65:5e:d1:dc:76:78:dc:\n    14:90:6f:53:9d:55:ee:87:bd:2e:29:4a:76:e1:9e:\n    d8:60:b0:b2:b4:ce:03:9d:60:a9:ad:eb:73:5a:26:\n    71:ed:32:57:0f:e3:4a:01:7c:e8:17:15:00:11:c3:\n    70:01:b5:63:26:c0:09:4d:39:51:1b:3f:a6:6e:9a:\n    7a:ac:46:bf:99:79:01:5d:55:11:91:e0:0a:d2:62:\n    43:4c:83:9f:2c:0d:76:6a:96:e4:43:c2:e9:2b:d6:\n    80:75:ff:39:4c:57:56:1f:3e:d5:8f:b5:01:d2:4f:\n    97:ed:f1:78:72:96:f1:4c:b1:39:9e:c3:bb:1c:24:\n    6a:96:99:30:30:85:4f:3c:70:83:c6:37:f1:2f:77:\n    29:01:ec:9e:3a:be:15:3d:96:bf:88:72:00:c0:c9:\n    aa:4d\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -565,7 +554,6 @@ sub _build_certs {
                 notafter => '1170287999', # 2007-01-31T23:59:59
                 notbefore => '1136073600', # 2006-01-01T00:00:00
                 pki_realm => 'alpha',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:e9:06:7a:8a:40:d2:92:90:17:99:48:cb:ea:02:\n    b2:6f:8d:4d:b4:47:1b:21:81:ed:5d:f5:7c:87:17:\n    14:53:81:83:f4:de:48:48:1e:5e:e5:e2:45:b0:56:\n    e4:fb:bd:26:ca:0a:84:43:35:3b:53:81:74:74:a1:\n    79:36:96:7a:ca:f6:30:84:3c:7d:54:b7:4d:af:e8:\n    10:ba:3c:b5:22:76:b8:8e:49:bb:7f:11:c2:3b:80:\n    23:01:ad:c4:c2:37:94:94:a4:f2:65:08:bb:b7:b6:\n    21:90:8d:38:24:a8:e3:75:99:fc:5e:52:9f:71:6c:\n    f5:5f:15:88:30:fb:18:02:d8:8e:45:2e:60:67:c6:\n    1b:26:6b:c0:53:04:11:1c:d8:6a:08:bc:89:fa:91:\n    1e:d5:23:78:7e:2e:ef:6b:8f:ee:dc:8f:bc:43:e5:\n    e0:4b:b4:33:5e:61:e0:4d:df:02:05:49:90:66:48:\n    07:90:63:94:f5:2e:cd:52:5e:bb:e3:5e:66:e7:61:\n    c2:dc:5b:e1:5b:4d:df:00:00:8b:cb:6a:85:14:a5:\n    d9:37:79:24:ee:0c:88:e6:63:9b:b2:57:31:b1:18:\n    f9:88:f4:62:c4:d4:3e:04:43:57:ea:7c:8e:27:0b:\n    67:7f:bd:d9:a2:c0:69:04:2d:9f:db:a7:02:dd:2d:\n    34:df\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -596,7 +584,6 @@ sub _build_certs {
                 notafter => '4105123199', # 2100-01-31T23:59:59
                 notbefore => '1167609600', # 2007-01-01T00:00:00
                 pki_realm => 'alpha',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:c0:0d:8b:71:d0:cd:b2:bc:c1:17:11:cb:d1:5d:\n    89:aa:e0:04:60:39:4d:0c:17:c6:9c:86:15:b3:f2:\n    9f:6d:c1:0e:77:52:b5:b4:8e:77:6f:2e:35:50:53:\n    93:c8:15:ec:33:19:72:a5:46:e4:ef:7c:bc:58:f9:\n    b4:db:d4:13:27:1f:f5:5d:3d:ad:16:85:64:04:c6:\n    7a:e9:91:89:87:90:a6:b9:86:38:d0:d9:44:be:71:\n    4b:85:67:ca:b4:aa:51:eb:7e:09:05:44:68:7c:08:\n    53:9d:98:18:2b:8e:f8:95:68:77:6e:58:68:ce:c3:\n    01:64:8e:7d:e3:f3:e1:13:92:f9:70:01:87:bc:b5:\n    e7:59:31:f7:1c:46:b4:26:2a:a1:c1:5b:35:db:76:\n    7c:cd:09:9b:fd:08:81:44:f6:c5:dc:dc:78:47:23:\n    42:f6:59:53:33:d1:3d:d0:3c:f2:aa:08:6f:71:4a:\n    29:be:02:97:6c:45:4c:97:17:09:3a:ec:44:a5:5b:\n    71:22:5d:02:da:2e:83:ec:ff:ae:d0:da:64:56:fc:\n    d0:8a:0f:3a:bf:cf:90:bb:81:ca:54:26:1e:c4:ad:\n    9e:3c:14:35:64:ec:d2:c2:14:e3:0a:5f:67:f8:b3:\n    5a:14:dd:60:b4:0c:5e:f2:43:ef:5f:7f:80:7e:1f:\n    48:97\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -627,7 +614,6 @@ sub _build_certs {
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '4102444800', # 2100-01-01T00:00:00
                 pki_realm => 'alpha',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:9e:20:5e:76:a3:44:e4:24:76:8d:c4:bb:0e:a0:\n    36:54:f1:e8:c6:c5:81:4b:d6:1a:45:88:53:2a:e7:\n    2c:8d:64:d3:da:a6:af:5e:02:35:ad:ea:96:3a:33:\n    51:ad:0b:a5:c6:0d:90:0e:c2:b2:a5:95:8f:4f:c7:\n    2a:2e:b5:05:ec:22:03:e2:c8:ec:2b:ec:1e:d0:b0:\n    87:ba:f2:70:28:a4:89:2e:a9:51:ce:99:fc:e0:18:\n    ec:95:23:c8:c0:18:68:ab:13:bc:90:8b:a8:a2:56:\n    c9:a0:15:be:66:d3:eb:1b:93:dc:0d:c0:bf:63:85:\n    5a:e0:19:c1:09:3a:dd:5c:ab:f7:67:90:37:8d:57:\n    9f:50:ce:28:14:72:b2:cd:f6:58:c0:65:b1:e2:1a:\n    3f:99:5e:35:6c:bc:fd:c5:c8:c2:d4:ec:7f:e6:5d:\n    dd:0d:84:ff:d4:25:97:8f:c7:6c:59:37:8f:6a:ba:\n    24:6d:d5:66:81:ea:74:31:f5:eb:0a:6d:8c:68:3d:\n    a2:23:5b:a3:d9:36:72:19:e4:c3:e5:95:58:7d:b7:\n    c0:f7:49:5c:05:54:49:f9:62:79:2f:34:06:0c:de:\n    a1:fa:2c:ad:b7:19:fd:b6:25:ac:49:75:40:53:72:\n    5b:9d:50:15:d9:c9:e9:61:a5:d8:ce:24:f7:67:22:\n    3f:59\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -658,7 +644,6 @@ sub _build_certs {
                 notafter => '1170287999', # 2007-01-31T23:59:59
                 notbefore => '1136073600', # 2006-01-01T00:00:00
                 pki_realm => 'alpha',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:98:24:05:e9:4e:69:48:59:07:17:25:4d:08:0a:\n    af:ee:45:20:f2:38:dd:d0:e5:d0:4b:fb:7f:f1:3a:\n    14:ea:ae:51:f0:c7:7e:df:76:bb:2e:37:d7:ba:6d:\n    60:29:3e:b9:5e:b3:49:9c:94:38:3e:a7:0d:45:a7:\n    c8:ed:dd:f4:95:e9:5d:02:4b:9c:08:2b:21:02:e5:\n    f3:45:0f:d6:a4:84:88:2f:8d:20:98:f4:4a:e2:4c:\n    eb:9e:39:4f:9f:eb:0d:57:55:24:45:02:b9:8b:6c:\n    a7:39:46:01:c4:ab:7f:db:9a:4e:12:bc:af:08:a0:\n    52:9e:52:58:a3:67:66:be:ca:64:4f:1f:4f:17:df:\n    2d:32:26:37:1e:17:82:18:fc:db:4a:1c:40:67:46:\n    7c:73:ac:88:18:79:a6:7b:68:f5:45:6e:a4:68:7d:\n    94:96:90:ca:94:c9:07:41:4c:d5:7a:bf:ce:bc:5a:\n    02:78:2e:95:36:61:a8:95:c2:13:32:6f:49:85:92:\n    02:8a:96:e2:cb:d3:3a:00:06:f6:6f:a4:8a:98:1b:\n    0a:15:03:3f:21:30:5f:a6:42:d0:26:f6:af:87:a6:\n    d1:3f:a3:f6:b4:3b:45:22:ac:b8:79:21:1b:de:cf:\n    2c:8b:8d:88:67:c4:2d:50:02:8c:d1:25:75:10:a8:\n    56:69\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -689,7 +674,6 @@ sub _build_certs {
                 notafter => '4105123199', # 2100-01-31T23:59:59
                 notbefore => '1167609600', # 2007-01-01T00:00:00
                 pki_realm => 'alpha',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:c8:a8:be:7f:3e:76:38:48:38:00:d4:52:d1:3b:\n    9a:04:97:95:82:68:3e:38:d1:8a:71:b3:09:1b:47:\n    cb:c6:1d:33:eb:b3:80:a5:e2:c9:83:83:12:92:bc:\n    62:94:51:3a:cb:81:a4:43:ce:ea:79:1d:8a:52:3a:\n    38:d7:73:d8:89:30:1c:72:52:c7:d7:7c:48:fb:d6:\n    fe:92:92:b2:10:50:db:bc:25:e5:b1:ea:8a:16:37:\n    d8:07:6a:76:45:07:f1:81:42:0a:17:83:48:15:7d:\n    21:f1:91:77:84:55:34:84:cd:12:65:cf:20:33:76:\n    2c:31:e6:37:04:54:45:bc:c4:8c:ce:eb:67:09:08:\n    c0:9c:b7:92:c8:96:e8:f0:97:46:6c:02:b7:b1:7e:\n    1c:08:fc:69:f9:f8:9e:24:f2:9e:2d:c1:53:84:90:\n    1a:eb:33:ce:83:ba:8f:3b:eb:99:3c:48:85:9e:8f:\n    18:9d:2e:cf:11:f2:4b:7b:ba:d6:59:00:10:5d:9a:\n    fa:99:d5:56:e5:27:55:0f:50:b1:69:5e:55:b6:96:\n    22:cc:5b:70:5f:41:44:d3:1c:d4:e6:81:9c:92:86:\n    94:6c:dc:a9:64:61:27:1e:9f:ce:ec:b3:71:c9:49:\n    06:07:2c:9e:24:ca:e6:39:78:dc:12:e1:44:00:b8:\n    a6:29\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -720,7 +704,6 @@ sub _build_certs {
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '4102444800', # 2100-01-01T00:00:00
                 pki_realm => 'alpha',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:cb:cb:31:bf:e0:a5:96:8d:b1:7f:b7:fa:72:7e:\n    d7:2a:02:b6:bb:03:83:54:2d:a1:f3:65:b5:9e:30:\n    44:a6:10:a9:c6:ab:43:1e:69:5e:81:8d:c2:21:cc:\n    82:80:23:18:7f:39:11:5c:37:0a:09:6f:d8:7e:f1:\n    ce:81:c0:57:6a:25:4b:39:af:92:e2:2f:3f:88:da:\n    76:b5:64:f1:70:a7:f4:5b:8a:6d:ae:5c:df:2a:81:\n    4c:3c:1b:72:70:35:c0:88:6b:98:64:59:d2:6d:06:\n    96:b4:82:53:99:c3:70:31:3a:4d:fd:9c:9b:1b:ab:\n    9d:9f:a2:d4:f7:1e:39:cb:6b:b8:f8:79:4b:8e:e2:\n    de:92:b0:dc:94:78:15:56:bf:95:2e:06:9c:a7:8d:\n    2b:22:d0:47:0b:9f:cf:1f:44:89:e3:e9:47:2f:0e:\n    d4:a6:67:0b:67:70:0b:7c:98:60:23:c6:89:f0:51:\n    55:5d:5f:d8:3a:26:45:2f:f3:4e:eb:9d:09:ec:28:\n    b0:f4:60:81:8b:bd:b4:f4:45:4c:df:16:ab:1b:82:\n    10:78:35:3e:3b:5e:75:2c:23:61:21:6a:f2:9b:1b:\n    af:a9:24:e4:ef:39:c1:95:68:2f:0f:32:d1:d6:52:\n    79:3e:9f:0e:ce:44:a6:53:a7:74:03:d4:00:59:67:\n    2b:07\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -751,7 +734,6 @@ sub _build_certs {
                 notafter => '1170287999', # 2007-01-31T23:59:59
                 notbefore => '1136073600', # 2006-01-01T00:00:00
                 pki_realm => 'alpha',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:a5:0d:0a:7e:7a:92:c1:b7:c4:9b:33:1c:93:43:\n    1f:d6:62:60:1f:6a:d5:fb:64:85:ba:a1:4f:8f:b4:\n    9a:54:3d:23:13:0b:09:f8:b0:33:fd:a7:89:83:c1:\n    88:cf:b0:87:03:bc:d7:f0:15:79:42:3b:06:0d:0a:\n    03:da:a1:f6:bd:36:a3:46:39:32:ba:eb:3e:aa:b6:\n    56:61:55:7f:da:3c:4d:d4:d3:79:08:77:26:68:d6:\n    16:40:22:3c:5a:1e:12:68:15:54:60:41:d0:c9:0e:\n    46:16:d5:f6:36:81:99:d3:35:91:92:07:98:4e:c3:\n    e6:53:7b:76:fd:cb:4b:ae:03:2e:09:ec:c4:67:54:\n    2d:ef:17:5f:56:d1:32:08:21:e5:7e:fb:7d:16:83:\n    26:2a:25:a1:5a:c3:b2:94:20:c4:cf:59:69:08:4d:\n    6f:83:93:af:99:99:37:db:d1:45:ab:07:3b:82:ee:\n    48:59:89:d4:c2:f5:dd:ac:dd:5e:40:32:ae:23:af:\n    62:e2:8c:d8:f8:07:7a:97:25:bd:d5:a5:4d:6f:13:\n    27:b7:81:7b:99:7e:4c:a0:b7:e1:06:77:1b:56:f3:\n    03:69:09:86:7f:54:b5:a2:9e:14:d5:23:2b:7c:6a:\n    5d:a8:fc:4e:03:09:62:a4:f4:c6:7e:4f:87:58:46:\n    91:43\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -782,7 +764,6 @@ sub _build_certs {
                 notafter => '4105123199', # 2100-01-31T23:59:59
                 notbefore => '1167609600', # 2007-01-01T00:00:00
                 pki_realm => 'alpha',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:dc:e2:06:3e:f6:a2:ea:76:5f:74:0d:16:16:44:\n    41:6e:5a:66:ab:ff:e1:0d:23:a7:c6:c0:ea:67:4d:\n    60:2d:19:15:51:f2:13:73:8f:d0:4d:e6:c9:ce:c8:\n    25:f1:96:d6:62:47:da:88:ed:27:59:ac:80:1d:19:\n    dc:39:40:81:e7:3b:ea:4c:28:d1:0d:fa:30:b3:66:\n    b8:1f:c3:00:de:7e:e0:fd:f0:62:15:b7:78:24:60:\n    7c:b5:9c:77:39:18:4d:16:31:00:bf:0e:ed:7b:8a:\n    05:53:8f:56:dd:f8:09:19:d8:72:df:69:3e:88:e9:\n    2c:bf:e0:a2:2e:f4:6f:14:35:e7:7f:99:80:ed:f3:\n    24:f7:66:4f:bb:cf:30:d5:3b:a5:30:45:45:85:08:\n    a4:74:45:8f:0a:3a:a9:ea:c2:57:60:2f:bd:e5:e9:\n    e2:48:c9:7b:60:07:bd:b2:f4:24:23:7e:a5:d9:b4:\n    94:51:bb:59:8d:2c:40:dd:8f:2d:e8:be:aa:99:51:\n    5a:43:3c:78:e8:c7:ac:f3:2f:fc:2d:3f:49:aa:a5:\n    cb:7e:d0:6a:9c:88:aa:af:fb:8e:fc:73:ea:3b:f4:\n    17:4b:81:6d:ce:6d:42:64:f8:3a:27:65:fc:a3:67:\n    05:90:1d:36:92:b1:e3:1a:01:de:cc:23:60:f3:18:\n    3f:2b\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -813,7 +794,6 @@ sub _build_certs {
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '4102444800', # 2100-01-01T00:00:00
                 pki_realm => 'alpha',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:cf:e7:24:b5:2b:9a:a5:19:e5:78:73:06:ed:70:\n    ec:61:98:27:2d:68:8d:9d:2a:36:75:6e:9c:f1:74:\n    bd:97:22:8f:73:7f:6a:8f:73:c5:37:45:b7:0f:32:\n    e1:fa:e0:b8:c9:3e:7d:45:e9:c1:29:d0:31:da:57:\n    f1:89:70:90:80:0a:d3:0b:5d:54:95:b1:83:24:32:\n    af:19:cb:14:35:92:e1:d6:f8:9a:59:52:1d:0d:e8:\n    f9:30:81:9a:d4:b3:37:31:c4:d3:22:39:23:d2:52:\n    48:f6:ac:51:2b:0d:7e:76:fe:1f:79:5c:ce:ff:3b:\n    1a:b5:dd:1c:5d:20:58:72:4b:4a:37:da:b4:c9:7b:\n    e7:b3:3e:b1:31:ab:94:04:6d:3d:65:c7:4c:c7:1d:\n    0d:3c:cc:41:de:8d:f3:e6:69:56:22:21:38:1d:6c:\n    de:d4:a5:37:a2:9e:1c:12:e5:d8:f0:8b:8d:3e:50:\n    9e:24:c1:04:3e:80:cb:18:9a:79:50:fc:51:c4:87:\n    d2:f8:1c:e8:cc:ac:6c:17:85:98:7c:47:83:43:71:\n    a7:02:e0:7e:53:d0:ca:9f:9f:e6:56:3f:6c:7d:70:\n    33:0a:e0:d0:3f:1a:86:0d:83:6a:f6:96:fa:30:32:\n    a9:d2:8a:95:16:cb:9b:71:b7:0d:a6:5d:f2:75:0d:\n    b3:6d\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -844,7 +824,6 @@ sub _build_certs {
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '1483228800', # 2017-01-01T00:00:00
                 pki_realm => 'beta',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:df:fc:f1:5f:e2:9e:2e:61:fa:56:cb:a5:63:b6:\n    04:27:5c:ad:7b:39:78:5a:1a:94:5a:a8:8c:8d:ac:\n    a5:94:91:e7:e4:43:5e:06:2d:48:bf:f2:02:07:7b:\n    fb:e7:6e:f6:ce:ce:d2:83:19:d8:6d:8b:ae:3b:0d:\n    10:b1:34:2f:ba:e9:6b:01:8e:13:85:c9:f1:2a:39:\n    be:de:b7:c4:70:37:ed:3d:b7:8f:eb:b6:6a:eb:b6:\n    84:b0:04:2a:a8:3f:9c:12:41:93:6f:f3:76:b5:fa:\n    28:20:1d:be:27:27:46:e0:c5:a1:33:56:ff:17:82:\n    d8:a8:4f:4f:3a:4f:d5:99:01:76:18:81:bb:2c:2e:\n    54:83:17:4c:1e:7e:80:c5:eb:a9:4d:35:0a:13:90:\n    a2:21:fa:88:b5:63:66:27:33:81:00:fe:9b:4f:48:\n    ae:24:9b:43:dc:34:eb:3d:5b:d3:0d:7c:20:45:bf:\n    6a:bb:2b:0f:77:3d:dc:38:cf:3f:c6:ff:ff:16:04:\n    04:54:dd:e2:f4:d1:a3:57:d3:7f:f9:79:3e:70:80:\n    ed:f0:d1:14:63:0f:75:17:1c:8c:8f:f9:1e:77:80:\n    ae:20:93:6a:50:17:21:7f:63:61:0d:ad:bb:82:a7:\n    37:0d:af:54:3e:1a:1c:53:33:49:5a:7b:29:46:00:\n    9a:47\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -875,7 +854,6 @@ sub _build_certs {
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '1483228800', # 2017-01-01T00:00:00
                 pki_realm => 'beta',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:ce:9d:dd:20:98:28:1f:4b:96:da:a5:57:07:77:\n    61:d8:43:73:a0:16:f8:a1:39:54:d0:cd:4e:d1:45:\n    75:08:f5:d5:e5:1b:66:8d:bc:88:dc:06:15:98:09:\n    b0:06:7a:2d:5d:56:52:42:78:c7:01:f7:21:a4:6c:\n    41:65:bf:96:01:f6:35:2c:7f:6f:0c:3a:d6:c8:34:\n    b2:6b:aa:d5:0d:df:db:d2:5a:81:14:a4:de:dc:e7:\n    cf:fc:3e:2e:09:e0:c9:97:83:8e:3a:3b:62:c4:79:\n    ee:0f:f8:2a:4e:9d:00:52:09:3d:f8:ac:ec:68:d6:\n    94:1a:1e:e8:51:c8:4b:5b:4b:d4:f1:08:87:ee:9e:\n    e6:dd:55:cf:e5:bb:45:21:5a:8b:ca:de:89:4b:46:\n    cf:34:51:5e:41:83:29:1d:27:6b:3b:d1:69:cd:01:\n    dd:eb:48:4b:f1:6a:bf:5c:b6:df:3a:f8:7c:3e:74:\n    9f:7c:60:0d:20:76:47:ee:d8:73:a3:04:cb:c8:a7:\n    f6:63:fe:b0:69:74:33:dc:75:2f:50:e8:b3:ff:ea:\n    b1:bf:fb:3a:b3:c3:a6:d8:ac:23:90:38:ef:42:92:\n    79:5e:52:89:25:7c:c7:5e:05:c9:70:5e:c2:39:18:\n    9e:15:b6:2c:fa:c7:ff:24:ab:39:84:00:55:bc:62:\n    28:51\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -906,7 +884,6 @@ sub _build_certs {
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '1483228800', # 2017-01-01T00:00:00
                 pki_realm => 'beta',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:e6:93:8b:1d:a4:10:c9:64:ce:38:4a:87:bf:13:\n    db:24:16:d4:b7:41:a8:f2:ff:58:43:76:72:09:d7:\n    7f:f0:2c:04:64:ea:db:59:26:bf:14:77:fe:ff:70:\n    ea:05:f5:fd:46:3c:81:ae:cd:b3:36:30:b3:6d:50:\n    bd:6a:a1:b1:f2:fd:d1:78:e6:ad:18:91:6c:ec:c1:\n    63:66:c9:0b:90:04:d1:91:00:d4:e3:67:b9:51:80:\n    5b:1c:ce:10:ba:94:e3:b1:c6:79:3a:12:c1:a2:5b:\n    e9:55:b4:6b:72:d4:96:fe:9a:d3:9d:7a:5c:26:9e:\n    96:71:cc:fd:ba:80:bd:17:6d:c5:89:02:20:91:63:\n    32:4a:73:df:2f:f7:36:97:fe:4f:5c:b7:79:5f:27:\n    c3:7e:5b:b9:62:ba:54:06:70:f8:2d:cf:7f:27:ad:\n    da:d6:6d:b1:91:69:6a:78:25:47:11:85:86:29:65:\n    93:81:c2:58:71:6f:b9:56:2a:e6:89:f4:e5:11:e2:\n    57:e2:e5:a2:9a:5f:85:b7:73:67:9a:45:e6:10:3e:\n    ee:55:c9:c3:08:db:bd:e6:41:1c:55:3b:eb:9b:82:\n    c3:5f:2c:7d:fe:6f:20:b3:87:84:da:ff:93:fb:1e:\n    e4:db:bb:e1:c6:25:6b:f7:3e:ca:c2:f7:3c:05:61:\n    c6:13\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -937,7 +914,6 @@ sub _build_certs {
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '1483228800', # 2017-01-01T00:00:00
                 pki_realm => 'beta',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:9e:ea:42:01:a3:50:df:6e:28:21:d8:46:10:d1:\n    23:9e:16:5f:1d:3d:ef:9f:fc:cc:2e:ea:d6:14:31:\n    30:d4:89:c5:10:a4:ef:54:6b:ce:5f:93:b0:ea:28:\n    6c:af:d8:0d:4f:f9:2a:5b:f2:c6:29:7d:ad:6f:83:\n    3f:1d:03:75:5e:ca:9d:75:cc:9d:48:da:2a:fe:26:\n    d5:96:2f:f3:34:51:20:68:32:90:19:70:e2:66:31:\n    46:29:29:52:a4:b8:4c:3c:4a:22:16:e9:95:78:c1:\n    4a:33:b6:c0:47:96:6b:9f:9d:0e:40:9a:31:8d:f9:\n    a1:be:6d:7f:d4:f9:bf:0f:67:9f:da:21:a0:06:59:\n    55:59:e1:01:45:9d:b3:ba:ba:90:01:bb:d3:d0:42:\n    a5:60:87:ae:3a:9b:be:24:35:7c:ac:0c:c2:89:42:\n    74:39:53:44:d1:50:ac:98:31:06:77:0c:51:d6:ea:\n    97:3e:6e:09:ea:e3:c7:8f:86:2e:16:65:a4:d1:1d:\n    a1:cb:77:8d:0c:a5:f1:05:77:a5:56:84:b7:94:c0:\n    8e:8f:b1:64:fa:99:f6:e4:19:8c:96:b1:36:30:b9:\n    90:9c:68:59:94:5f:1a:ca:e7:46:2b:a3:23:94:f1:\n    72:e0:d7:55:1d:82:06:3f:37:d5:ee:e0:41:03:b3:\n    4e:0b\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -968,7 +944,6 @@ sub _build_certs {
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '1483228800', # 2017-01-01T00:00:00
                 pki_realm => 'beta',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:eb:10:c3:b1:a3:5d:86:4d:71:a5:5f:b4:34:b9:\n    6f:23:9c:73:56:8c:aa:0b:9e:86:37:d7:f5:60:ef:\n    78:3a:13:7d:f1:a4:cd:c7:90:55:f9:b9:6a:14:88:\n    39:7c:6f:f6:03:be:f4:50:a0:e7:93:91:0d:1f:67:\n    48:18:7e:c0:c2:cf:2c:6b:54:81:57:7e:51:7a:1b:\n    20:8f:0f:cd:62:e8:c4:9a:bb:cd:08:bc:82:b6:ce:\n    f0:f9:e7:d4:45:46:a9:64:04:51:e2:93:0c:f5:6b:\n    46:73:14:6d:37:40:94:75:fb:1e:1c:0d:3d:61:ba:\n    25:4c:00:dd:d9:2a:03:ab:c9:00:e8:4c:6c:44:65:\n    de:48:2e:80:7e:ae:09:9d:a1:c9:26:da:65:fe:07:\n    49:22:6a:fa:0b:6d:55:2b:8c:06:21:83:fd:af:f6:\n    a3:97:2d:e6:e1:72:b3:99:87:fb:7f:d8:cb:b8:3a:\n    8a:6d:2a:ac:10:4a:97:9e:65:e6:93:e9:dd:35:f3:\n    38:6f:48:c8:e4:13:a4:56:c8:5b:85:f3:88:93:51:\n    6b:e8:cf:85:6a:77:b3:f8:ed:1f:2a:92:d0:ad:15:\n    b9:2a:3d:30:9e:ed:82:23:0e:ed:73:36:0d:63:73:\n    22:e0:51:83:9e:a3:7e:ea:33:a6:65:ba:6b:5a:fb:\n    14:19\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -999,7 +974,6 @@ sub _build_certs {
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '1483228800', # 2017-01-01T00:00:00
                 pki_realm => 'beta',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:b2:bb:7b:59:ff:0e:58:90:e5:9f:e8:04:15:0f:\n    f4:bf:c0:75:56:ba:9d:2b:ae:90:17:50:c0:86:28:\n    e8:11:57:a9:d0:9e:4d:6f:20:fb:37:1e:82:93:31:\n    23:f7:00:c2:c6:62:6e:98:19:5c:38:70:44:80:6a:\n    36:64:ab:ad:31:b4:f8:48:10:15:0b:bc:ff:5a:9f:\n    6f:a8:10:8d:3d:29:3a:b1:4d:9a:c9:51:2c:ae:c9:\n    21:63:39:ff:db:0d:f9:16:a9:d7:62:da:f9:92:6e:\n    d0:98:7b:51:f9:a7:2f:b6:98:35:7a:81:2d:81:f3:\n    99:f0:20:b4:a0:0d:68:5c:d2:0b:e6:1b:2f:5e:d1:\n    db:f1:fd:c2:83:58:c6:9f:41:21:97:ba:c5:93:55:\n    28:59:fc:94:53:b3:4e:aa:32:0b:8e:02:01:21:0e:\n    f3:34:16:b3:e3:7b:ac:b0:d8:7e:55:56:e3:a0:cd:\n    a8:ba:19:87:94:9b:11:64:c3:81:48:c5:3d:90:77:\n    d3:4a:ab:e4:8c:c8:cf:a1:fc:9a:a8:92:f5:5a:7f:\n    d8:9a:6f:89:91:3d:a1:56:25:b9:03:a0:50:4b:7d:\n    85:38:5e:dc:fa:1c:e9:d1:42:d1:61:96:15:38:1c:\n    4e:a7:63:bb:80:5c:59:23:c3:d5:ec:f8:71:d1:9c:\n    7d:bd\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,
@@ -1030,7 +1004,6 @@ sub _build_certs {
                 notafter => '4262889599', # 2105-01-31T23:59:59
                 notbefore => '1483228800', # 2017-01-01T00:00:00
                 pki_realm => 'gamma',
-                public_key => "Public-Key: (2048 bit)\nModulus:\n    00:ed:49:be:c7:96:1a:5f:0e:d9:e0:d6:98:72:5e:\n    9f:30:6d:0c:4c:0b:c8:23:fb:43:36:ab:7e:a9:30:\n    8c:ee:e5:5b:02:ea:77:62:e6:b3:2f:82:67:9c:5b:\n    a6:03:4a:57:5d:68:12:a4:fd:d4:82:d5:78:05:5c:\n    97:fd:9b:d7:6c:2c:9e:61:01:6f:47:d8:fd:de:69:\n    03:96:83:5b:2e:d6:75:fe:b4:66:a4:18:24:23:41:\n    3f:20:f3:54:88:aa:2b:02:3b:86:c5:09:49:9d:49:\n    c1:2c:ce:3b:4a:49:ce:c9:66:8d:3d:ab:3e:28:26:\n    95:b8:d2:96:63:9a:97:98:9e:f8:b5:c0:d2:09:15:\n    f6:c2:31:cd:c0:d8:30:da:50:35:7d:6d:e5:c7:fb:\n    c1:14:4f:f3:70:d6:1e:0d:f1:13:e3:3f:b1:bb:49:\n    d4:28:ba:fd:d9:5c:b1:45:09:d2:4f:d4:0c:61:f3:\n    f7:cb:b4:3a:90:84:37:b4:de:b2:91:89:d4:22:20:\n    c8:91:d5:dc:87:50:5e:9d:36:09:ac:da:93:90:05:\n    80:c5:31:74:39:38:1b:7b:86:17:bb:2e:bc:40:7f:\n    0c:04:b9:25:4a:ac:13:88:c0:4d:cc:00:bf:2f:ed:\n    90:dc:87:dd:89:5e:3c:d7:e1:ea:0b:67:be:50:e6:\n    e9:2b\nExponent: 65537 (0x10001)\n",
                 reason_code => undef,
                 req_key => undef,
                 revocation_time => undef,

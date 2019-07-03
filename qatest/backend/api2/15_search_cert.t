@@ -101,11 +101,11 @@ sub search_cert_ok {
     my $respect_order = scalar(@expected_names)
         ? (($val = pop @expected_names) eq "ORDERED") ? 1 : push(@expected_names, $val) && 0
         : 0;
-    my @hashes = map { superhashof({ subject_key_identifier => $dbdata->cert($_)->subject_key_id }) } @expected_names;
+    my @hashes = map { +{ subject_key_identifier => $dbdata->cert($_)->subject_key_id } } @expected_names;
 
     my $result;
     lives_and {
-        $result = $oxitest->api2_command(search_cert => $conditions);
+        $result = $oxitest->api2_command(search_cert => { %$conditions, return_columns => "subject_key_identifier" } );
         cmp_deeply $result, ($respect_order ? \@hashes : bag(@hashes));
     } "Search cert $message";
 }
@@ -315,10 +315,11 @@ cmp_deeply $result, array_each(
 $result = search_cert_ok "only from this CA entity" => {
     entity_only => 1,
     pki_realm => "_ANY",
+    return_columns => "req_key",
 }, "NO_CHECK";
 
 cmp_deeply $result, array_each(
-    superhashof({ req_key => re(qr/^\d+$/) })
+    { req_key => re(qr/^\d+$/) }
 ), "Correct result";
 
 # Github issue #501 - SQL JOIN statement breaks when searching for attributes AND profile

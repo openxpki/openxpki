@@ -64,13 +64,13 @@ my $wf = OpenXPKI::Test::WorkflowMock->new;
 $wf->context->param(cert_identifier   => $cert_id);
 $wf->context->param(meta_color        => 'red');
 $wf->context->param({ meta_hairstyle  => undef }); # setting to "undef" only works when passing a HashRef
-$wf->context->param('meta_cars[]'     => ['horch', 'tesla']);
-$wf->context->param('meta_birds[]'    => []);
+$wf->context->param('meta_cars'       => ['horch', 'tesla']);
+$wf->context->param('meta_birds'      => []);
 $wf->context->param(meta_morphosis    => 'butterfly');
-$wf->context->param('meta_physics[]'  => [ 'transcendency', 'ontology' ]);
-$wf->context->param('meta_equal[]'    => [ 'same', 'same' ]);
-$wf->context->param('meta_equal2[]'   => [ 'yo' ]);
-$wf->context->param('meta_equal_nu[]' => [ 'this', 'this' ]);
+$wf->context->param('meta_physics'    => [ 'transcendency', 'ontology' ]);
+$wf->context->param('meta_equal'      => [ 'same', 'same' ]);
+$wf->context->param('meta_equal2'     => [ 'yo' ]);
+$wf->context->param('meta_equal_nu'   => [ 'this', 'this' ]);
 
 #
 # Tests

@@ -52,8 +52,22 @@ sub search_cert_count {
 
 sub _clean_args {
     my ($self, $args) = @_;
+
     my $cleaned_args = { map { lc($_) => $args->{$_} } keys %$args };
     ($cleaned_args->{order} = lc $cleaned_args->{order}) =~ s/ ^ certificate\. //msxi if $cleaned_args->{order};
+
+    # translate column names given in RETURN_COLUMNS
+    if ($cleaned_args->{return_columns}) {
+        my $rc = $cleaned_args->{return_columns};
+        if (ref $rc eq 'ARRAY') {
+            my $tmp = { map { $_ => 1 } @$rc };
+            $cleaned_args->{return_columns} = [ keys %{ OpenXPKI::Server::Database::Legacy->certificate_from_legacy($tmp) } ];
+        }
+        else {
+            ($cleaned_args->{return_columns}) = keys %{ OpenXPKI::Server::Database::Legacy->certificate_from_legacy({ $rc => 1 }) };
+        }
+    }
+
     return $cleaned_args;
 }
 
