@@ -119,7 +119,7 @@ Here is what you need to do if you *dont* use the sampleconfig script.
 #. Create a key/certificate for the internal datavault (ca = false, can be below the ca but can also be self-signed).
 #. Create a key/certificate for the scep service (ca = false, can be below the ca but can also be self-signed or from other ca).
 
-Move the key files to /etc/openxpki/ssl/ca-one/ and name them ca-one-signer-1.pem, ca-one-vault-1.pem, ca-one-scep-1.pem.
+Move the key files to /etc/openxpki/ca/ca-one/ and name them ca-signer-1.pem, vault-1.pem, scep-1.pem.
 The key files must be readable by the openxpki user, so we recommend to make them owned by the openxpki user with mode 0400.
 
 Now import the certificates to the database. The signer token is used exclusive in the current realm,
@@ -129,20 +129,20 @@ so we can use a shortcut and import and reference it with one command.
 
     openxpkiadm certificate import  --file ca-root-1.crt
 
-    openxpkiadm certificate import  --file ca-one-signer-1.crt \
+    openxpkiadm certificate import  --file ca-signer-1.crt \
         --realm ca-one --token certsign
 
 As we might want to reuse SCEP and Vault token across the realms, we import them in to the global
 namespace and just create an alias in the current realm::
 
-    openxpkiadm certificate import  --file ca-one-vault-1.crt
-    openxpkiadm certificate import  --file ca-one-scep-1.crt
+    openxpkiadm certificate import  --file vault-1.crt
+    openxpkiadm certificate import  --file scep-1.crt
 
     openxpkiadm alias --realm ca-one --token datasafe \
-        --identifier `openxpkiadm certificate id --file ca-one-vault-1.crt`
+        --identifier `openxpkiadm certificate id --file vault-1.crt`
 
     openxpkiadm alias --realm ca-one --token scep \
-        --identifier `openxpkiadm certificate id --file ca-one-scep-1.crt`
+        --identifier `openxpkiadm certificate id --file scep-1.crt`
 
 
 If the import went smooth, you should see something like this (ids and times will vary)::
@@ -150,20 +150,20 @@ If the import went smooth, you should see something like this (ids and times wil
     $ openxpkiadm alias --realm ca-one
 
     === functional token ===
-    ca-one-scep (scep):
-    Alias     : ca-one-scep-1
+    scep (scep):
+    Alias     : scep-1
     Identifier: YsBNZ7JYTbx89F_-Z4jn_RPFFWo
     NotBefore : 2015-01-30 20:44:40
     NotAfter  : 2016-01-30 20:44:40
 
-    ca-one-vault (datasafe):
-    Alias     : ca-one-vault-1
+    vault (datasafe):
+    Alias     : vault-1
     Identifier: lZILS1l6Km5aIGS6pA7P7azAJic
     NotBefore : 2015-01-30 20:44:40
     NotAfter  : 2016-01-30 20:44:40
 
-    ca-one-signer (certsign):
-    Alias     : ca-one-signer-1
+    ca-signer (certsign):
+    Alias     : ca-signer-1
     Identifier: Sw_IY7AdoGUp28F_cFEdhbtI9pE
     NotBefore : 2015-01-30 20:44:40
     NotAfter  : 2018-01-29 20:44:40

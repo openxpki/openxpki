@@ -83,7 +83,7 @@ sub _crypto {
                 backend => "OpenXPKI::Crypto::Backend::OpenSSL",
 
                 # Template to create key, available vars are
-                # ALIAS (ca-one-signer-1), GROUP (ca-one-signer), GENERATION (1)
+                # ALIAS (ca-signer-1), GROUP (ca-signer), GENERATION (1)
                 key => $self->config_writer->get_private_key_path($realm, "[% ALIAS %]"),
 
                 # possible values are OpenSSL, nCipher, LunaCA

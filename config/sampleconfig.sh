@@ -22,7 +22,7 @@ REALM='ca-one'
 # For automated testing we want to have this set to root
 # unset this to get random passwords (put into the .pass files)
 KEY_PASSWORD="root"
-SSL_REALM="${BASE}/ssl/${REALM}"
+SSL_REALM="${BASE}/ca/${REALM}"
 
 make_password() {
 
@@ -355,9 +355,9 @@ openxpkiadm certificate import --file "${SCEP_CERTIFICATE}" --realm "${REALM}" -
 openxpkiadm certificate import --file "${DATAVAULT_CERTIFICATE}" --realm "${REALM}" --token datasafe
 
 # Create symlinks for the aliases used by the default config
-ln -s "${ISSUING_CA_KEY}" "${SSL_REALM}/ca-one-signer-1.pem"
-ln -s "${SCEP_KEY}" "${SSL_REALM}/ca-one-scep-1.pem"
-ln -s "${DATAVAULT_KEY}" "${SSL_REALM}/ca-one-vault-1.pem"
+ln -s "${ISSUING_CA_KEY}" "${SSL_REALM}/ca-signer-1.pem"
+ln -s "${SCEP_KEY}" "${SSL_REALM}/scep-1.pem"
+ln -s "${DATAVAULT_KEY}" "${SSL_REALM}/vault-1.pem"
 
 echo "Place web certificate, private key, ... in web server configuration to enable ssl on openxpki web pages!"
 echo ""

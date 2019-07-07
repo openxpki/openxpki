@@ -213,7 +213,7 @@ B<Parameters>
 
 =item * C<$realm> (I<Str>) - PKI realm
 
-=item * C<$alias> (I<Str>) - Token alias incl. generation (i.e. "ca-one-signer-1")
+=item * C<$alias> (I<Str>) - Token alias incl. generation (i.e. "ca-signer-1")
 
 =back
 

@@ -342,7 +342,7 @@ Fetch a single value from a block using inheritance (like the crypto config).
 
 The query
 
-    $conn->get_inherit('token.ca-one-signer.backend')
+    $conn->get_inherit('token.ca-signer.backend')
 
 will lookup the C<inherit> key and use the value to replace the next-to-last
 path component with it to look up the value again. It will finally return
@@ -359,7 +359,7 @@ need to set the empty string to blank an entry.
       key: /etc/openxpki/ssl/default.pem
 
 
-    ca-one-signer:
+    ca-signer:
       inherit: default
       key: key: /etc/openxpki/ssl/mykey.pem
 

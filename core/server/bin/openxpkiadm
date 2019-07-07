@@ -1902,7 +1902,7 @@ Update notebefore/notafter date of an existing alias.
 Example:
 
      openxpkiadm alias --update --realm ca-one \
-         --alias ca-one-signer-1
+         --alias ca-signer-1
          --notbefore "2014-01-01:00:00:00"
 
 This updates notbefore, notafter is not changed.

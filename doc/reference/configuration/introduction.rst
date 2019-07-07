@@ -75,9 +75,9 @@ and place a file called bootstrap.yaml here::
 
     # if you want to use signed configs, set ONE of the ca* options
     # Path holding the certificates as files (filemame = hash)
-    # ca_certificate_path: /etc/openxpki/ssl/config.certs/
+    # ca_certificate_path: /etc/openxpki/ca/config.certs/
     # All certificates in one file
-    # ca_certificate_file: /etc/openxpki/ssl/config.pem
+    # ca_certificate_file: /etc/openxpki/ca/config.pem
 
     # temp dir, required to create files to perform signature verification
     # tmpdir: /tmp

@@ -73,33 +73,18 @@ If no role is provided, you get the anonymous role. **Do never set any other rol
 
 **x509 based authentication**
 
-There are two handlers using x509 certificates for authentication. *X509Client* uses the SSL client authentication feature of apache/mod_ssl while *X509Challenge* sends a challenge to be signed by the browser. Both handlers pass the signer certificate to a validation function that cryptographically checks the chain and tests the chain against a list of trusted anchors.
+*X509Client* uses the SSL client authentication feature of apache/mod_ssl. It passes the signer certificate to a validation function that cryptographically checks the chain and tests the chain against a list of trusted anchors.
 
 The configuration is the same for both handlers (apart from the class name)::
 
     Certificate:
-        type: ClientX509/ChallengeX509
+        type: ClientX509
         label: Certificate
         description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE_WEBSERVER
-        role:
-            default: User
-            handler@: connector:auth.connector.role
-            argument: cn
-        realm:
-        - ca-one
-        cacert:
-        - cert_identifier of external ca cert
+        role: User
+        realm: ca-one
 
-The role assignment is done by querying the connector specified by *handler* using the certificates component *argument*. Possible arguments are "cn", "subject" and "serial". The value given by *default* is assigned if no match is found by the handler. If you do not specify a handler but a default role, you get a static role assignment for any matching certificate.
-
-For the trust anchor you have consider two different situations:
-
-#. If the certificates originate from the OpenXPKI instance itself, list the realms which issue them below *realm*.
-#. If you have certificates from an external ca, import the ca certificate with the ``openxpkiadm`` utility and put its certificate identifier below *cacert*.
-
-Both lists can be combined and accept any number of items.
-
-**Note**: OpenXPKI uses a third party tool named openca-sv to check the x509 signature. You need to build that by your own and put it into /usr/bin. The source is available at http://www.openca.org/projects/openca/tools-sources.shtml.
+Please check `perldoc OpenXPKI::Server::Authentication::X509` for details. The *ChallengeX509* handler is no longer supported due to missing APIs in modern browsers.
 
 **Password database handler**
 
@@ -259,9 +244,9 @@ group assignment
 You must provide a list of token group names at ``crypto.type`` to tell the system which token group it should use for a certain task. The keys are the same as used in ``system.crypto.tokenapi`` (see Crypto layer (global)). See TODO for a detailed view how the token assignment works. ::
 
     type:
-      certsign: ca-one-certsign
-      datasafe: ca-one-vault
-      scep: ca-one-scep
+      certsign: ca-certsign
+      datasafe: vault
+      scep: scep
 
 token setup
 ^^^^^^^^^^^
@@ -272,7 +257,7 @@ Any token used within OpenXKI needs a corresponding entry in the realm's token c
       ca-one-certsign:
         backend: OpenXPKI::Crypto::Backend::OpenSSL
 
-        key: /etc/openxpki/ssl/ca-one/ca-one-certsign-1.pem
+        key: /etc/openxpki/ca/ca-one/ca-certsign-1.pem
 
         # possible values are OpenSSL, nCipher, LunaCA
         engine:         OpenSSL
@@ -306,12 +291,12 @@ Usually the tokens in a system share a lot of properties. To simplify the config
 
         server-ca-1:
             inherit: default
-            key: /etc/openxpki/ssl/ca-one/ca-one-certsign-1.pem
+            key: /etc/openxpki/ca/ca-one/ca-certsign-1.pem
             secret: gen1pass
 
         server-ca-2:
             inherit: default
-            key: /etc/openxpki/ssl/ca-one/ca-one-certsign-2.pem
+            key: /etc/openxpki/ca/ca-one/ca-certsign-2.pem
 
 
 Inheritance can daisy chain profiles. Note that inheritance works top-down and each step replaces all values that have not been defined earlier but are defined on the current level. Therefore you should not use undef values but the empty string to declare an empty setting.
@@ -323,7 +308,7 @@ The example above will then look like::
     token:
         default:
             backend: OpenXPKI::Crypto::Backend::OpenSSL
-            key: /etc/openxpki/ssl/ca-one/[% ALIAS %].pem
+            key: /etc/openxpki/ca/ca-one/[% ALIAS %].pem
             ......
             secret: default
 
@@ -334,7 +319,7 @@ The example above will then look like::
         server-ca-2:
             inherit: default
 
-If you need to name your keys according to a custom scheme, you also have GROUP (ca-one-certsign) and
+If you need to name your keys according to a custom scheme, you also have GROUP (ca-signer) and
 GENERATION (1) available for substitution. The certificate identifier is also available via IDENTIFIER.
 
 **token in datapool**
@@ -347,7 +332,7 @@ with access to the database or the openxpki socket!
 You must set the attribute ``key_store`` to ``DATAPOOL`` and provide the
 name of the used datapool key using the ``key`` attribute::
 
-    ca-one-scep:
+    scep:
         inherit: default
         key_store: DATAPOOL
         key: "[% ALIAS %]"
@@ -356,7 +341,7 @@ This will read the SCEP key from the datapool, the used namespace is
 ``sys.crypto.keys``. You must import the key yourself, e.g. from the CLI::
 
     openxpkicli set_data_pool_entry --arg namespace=sys.crypto.keys \
-        --arg key=ca-one-scep-1 \
+        --arg key=scep-1 \
         --arg encrypt=1 \
         --filearg value=file_with_key.pem
 

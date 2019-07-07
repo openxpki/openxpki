@@ -2,9 +2,9 @@
 # The left side are fixed aliases used in the code, the right side
 # are aribtrary chosen names, referencing the tokens below.
 type:
-  certsign: ca-one-signer
-  datasafe: ca-one-vault
-  scep: ca-one-scep
+  certsign: ca-signer
+  datasafe: vault
+  scep: scep
 
 # The actual token setup, based on current token.xml
 token:
@@ -12,8 +12,8 @@ token:
     backend: OpenXPKI::Crypto::Backend::OpenSSL
 
     # Template to create key, available vars are
-    # ALIAS (ca-one-signer-1), GROUP (ca-one-signer), GENERATION (1)
-    key: /etc/openxpki/ssl/[% PKI_REALM %]/[% ALIAS %].pem
+    # ALIAS (ca-signer-1), GROUP (ca-signer), GENERATION (1)
+    key: /etc/openxpki/ca/[% PKI_REALM %]/[% ALIAS %].pem
 
     # possible values are OpenSSL, nCipher, LunaCA
     engine: OpenSSL
@@ -33,21 +33,21 @@ token:
     # Default value for import, recorded in database, can be overriden
     secret: default
 
-  ca-one-signer:
+  ca-signer:
     inherit: default
 
-  ca-one-vault:
+  vault:
     inherit: default
 
-  ca-one-scep:
+  scep:
     inherit: default
     backend: OpenXPKI::Crypto::Tool::SCEP
     shell: /usr/bin/openca-scep
     #backend: OpenXPKI::Crypto::Tool::LibSCEP
 
   # A different scep token for another scep server, served from datapool
-  #ca-one-special-scep:
-  #  inherit: ca-one-scep
+  #ca-special-scep:
+  #  inherit: ca-scep
   #  key_store: DATAPOOL
   #  key: "[% ALIAS %]"
 

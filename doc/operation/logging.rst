@@ -65,7 +65,7 @@ log analysis programm like logstash.
 * certid: certificate identifier
 * wfid: id of the workflow
 * action: name of a workflow action or called API method
-* token: alias name of the token/key, e.g. "ca-one-signer-1"
+* token: alias name of the token/key, e.g. "ca-signer-1"
 * pki_realm: name of the pki realm
 
 Example (line breaks are for verbosity, logfile is one line)::
