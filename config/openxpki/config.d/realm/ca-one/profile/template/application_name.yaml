@@ -7,4 +7,5 @@ option:
   - scep
   - soap
   - generic
+  - pkiclient
 width: 20
