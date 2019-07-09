@@ -7,12 +7,12 @@ validity:
 
 style:
     00_basic_style:
-        label: I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_BASIC_LABEL
-        description: I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_BASIC_DESC
+        label: I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_LABEL
+        description: I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_DESC
         ui:
             subject:
                 - hostname
-            san: 
+            san:
                 - san_free
             info:
                 - requestor_gname
@@ -21,10 +21,10 @@ style:
                 - requestor_affiliation
                 - comment
 
-        subject: 
+        subject:
             dn: CN=[% hostname %]:scepclient,DC=Test Deployment,DC=OpenXPKI,DC=org
-            san: 
-              DNS: 
+            san:
+              DNS:
                   - "[% hostname %]"
 
         metadata:
@@ -33,7 +33,7 @@ style:
 
 
 # Profile extensions - set 0/1 as needed
-extensions: 
+extensions:
     key_usage:
         critical:          1
         digital_signature: 1
@@ -47,7 +47,7 @@ extensions:
         decipher_only:     0
 
     extended_key_usage:
-        critical:         1 	   
+        critical:         1
         client_auth:      1
         server_auth:      0
         email_protection: 0

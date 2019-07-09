@@ -29,7 +29,7 @@ sub _evaluate {
         CTX('log')->application()->debug("Testing if WFArray ".$array_name." is empty");
 
         if ( $array->count() != 0 ) {
-            condition_error ($self->param('error') || 'I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_NOT_EMPTY');
+            condition_error ($self->param('error') || 'array not empty');
         }
 
     }
@@ -38,7 +38,7 @@ sub _evaluate {
         CTX('log')->application()->debug("Testing if WFArray ".$array_name." is not empty");
 
         if ( $array->count() < 1 ) {
-            condition_error ($self->param('error') || 'I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_IS_EMPTY');
+            condition_error ($self->param('error') || 'array is empty');
         }
 
     }
@@ -66,7 +66,7 @@ sub _evaluate {
             return 1 if ($cnt >= $val);
         }
         ##! 16: 'Condition failed'
-        condition_error ($self->param('error') || 'I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_INVALID_ITEM_COUNT');
+        condition_error ($self->param('error') || 'array has invalid item count');
 
     }
     elsif ( $condition eq 'match' || $condition eq 'nomatch' ) {
@@ -95,7 +95,7 @@ sub _evaluate {
         }
 
         if (scalar @errors) {
-            condition_error ($self->param('error') || 'I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_DOES_NOT_MATCH_REGEX');
+            condition_error ($self->param('error') || 'array does not match regex');
         }
 
     }

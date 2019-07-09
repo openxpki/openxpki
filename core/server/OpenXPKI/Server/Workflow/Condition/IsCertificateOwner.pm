@@ -32,14 +32,14 @@ sub evaluate {
         ##! 16: 'owner is not defined'
         CTX('log')->application()->warn("IsCertificateOwner condition failed - no owner found");
 
-        condition_error('I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_NO_OWNER_FOUND');
+        condition_error('user is certificate owner no owner found');
     }
 
     if (!$res) {
         ##! 16: 'owner does not match'
         CTX('log')->application()->debug("IsCertificateOwner condition failed - owner not matches");
 
-        condition_error('I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_FAILED');
+        condition_error('user is certificate owner failed');
     }
 
     return 1;

@@ -275,8 +275,8 @@ state:
           - signer_cert_identifier
 
     FAILURE:
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_DESC
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_DESC
         output:
           - error_code
           - check_policy_subject_duplicate

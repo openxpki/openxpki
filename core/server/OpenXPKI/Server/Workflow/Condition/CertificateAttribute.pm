@@ -36,7 +36,7 @@ sub _evaluate {
     if (!defined $res) {
         ##! 16: 'not defined'
         CTX('log')->application()->info("CertificateAttribute condition failed - no values found");
-        condition_error('I18N_OPENXPKI_UI_CERTIFICATE_ATTRIBUTE_FAILED');
+        condition_error('CertificateAttribute condition failed');
     }
 
     CTX('log')->application()->debug("CertificateAttribute condition passed:" . Dumper $res);

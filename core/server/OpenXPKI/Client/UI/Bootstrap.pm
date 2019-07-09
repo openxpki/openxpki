@@ -92,7 +92,7 @@ sub init_structure {
         $self->_result()->{structure} =
         [{
             key => 'logout',
-            label =>  'Clear Login',
+            label =>  'I18N_OPENXPKI_UI_CLEAR_LOGIN',
             entries =>  []
         }]
     }
@@ -110,8 +110,8 @@ sub init_error {
     $self->_result()->{main} = [{
         type => 'text',
         content => {
-            headline => 'Ooops - something went wrong',
-            paragraphs => [{text=>'Something is wrong here'}]
+            headline => 'I18N_OPENXPKI_UI_OOPS',
+            paragraphs => [{text=>'I18N_OPENXPKI_UI_OOPS'}]
         }
     }];
 

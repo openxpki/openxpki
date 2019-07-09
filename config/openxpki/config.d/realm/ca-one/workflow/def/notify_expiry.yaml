@@ -28,7 +28,8 @@ state:
          - log_renewed > LOOP ? is_renewed
 
     SUCCESS:
-        label: ""
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC
         output:
          - cert_notified_list
          - cert_renewed_list

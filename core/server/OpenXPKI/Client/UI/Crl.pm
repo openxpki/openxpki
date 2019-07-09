@@ -22,7 +22,7 @@ sub init_index {
     my $args = shift;
 
     $self->_page({
-        label => 'Current Revocation Lists',
+        label => 'I18N_OPENXPKI_UI_CRL_CURRENT_LISTS',
     });
 
     my $issuers = $self->send_command_v2( 'get_ca_list' );

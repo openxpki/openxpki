@@ -23,13 +23,13 @@ sub _evaluate {
     my $identifier = $self->param('cert_identifier') // $context->param('cert_identifier');
 
     OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_HAS_STATUS_IDENTIFIER_MISSING',
+        message => 'certificate has status identifier missing',
     ) unless $identifier;
 
     my $expected_status = $self->param('expected_status');
     ##! 16: "Expected status " . $expected_status
     if ($expected_status !~ /\A(ISSUED|REVOKED|CRL_ISSUANCE_PENDING)\z/) {
-        configuration_error('I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_HAS_STATUS_EXPECTED_STATUS_MISSING_OR_INVALID');
+        configuration_error('certificate has status expected status missing or invalid');
     }
 
     my $cert = CTX('dbi')->select_one(
@@ -45,7 +45,7 @@ sub _evaluate {
         ##! 16: 'cert not found '
         CTX('log')->application()->debug("Cert status check failed, certificate not found " . $identifier);
 
-        condition_error 'I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_CERT_NOT_FOUND';
+        condition_error 'certificate has status cert not found';
 
     }
 
@@ -53,7 +53,7 @@ sub _evaluate {
     if ($cert->{status} ne $expected_status) {
         CTX('log')->application()->debug("Cert status check failed: ".$cert->{status}. " != ".$expected_status);
 
-        condition_error 'I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_DOES_NOT_MATCH';
+        condition_error 'certificate has status does not match';
     }
 
     return 1;

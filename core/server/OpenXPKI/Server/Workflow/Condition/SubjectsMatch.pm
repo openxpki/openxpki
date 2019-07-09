@@ -22,7 +22,7 @@ sub _evaluate {
     my $subject2 = $self->param('subject2') || '';
 
     if (!$subject1 || !$subject2) {
-        condition_error('I18N_OPENXPKI_UI_SUBJECT_MATCH_SUBJECT_IS_EMPTY');
+        condition_error('subject match subject is empty');
     }
 
     if ($self->param('ignore_case')) {
@@ -39,7 +39,7 @@ sub _evaluate {
     }
 
     if (!$subject1 || $subject1 ne $subject2) {
-        condition_error('I18N_OPENXPKI_UI_SUBJECT_MATCH_DONT_MATCH');
+        condition_error('subject match subjects dont match');
     }
     return 1;
     ##! 16: 'end'

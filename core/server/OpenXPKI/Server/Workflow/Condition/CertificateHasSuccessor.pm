@@ -37,7 +37,7 @@ sub _evaluate {
     if (!defined $res) {
         ##! 16: 'owner is not defined'
         CTX('log')->application()->info("CertificateHasSuccessor condition failed - no successor found");
-        condition_error('I18N_OPENXPKI_UI_CERTIFICATE_HAS_SUCCESSOR_FAILED');
+        condition_error('certificate has successor failed');
     }
 
     CTX('log')->application()->debug("CertificateHasSuccessor condition passed:" . $res->{attribute_value});

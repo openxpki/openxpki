@@ -7,8 +7,8 @@ validity:
 
 style:
     00_basic_style:
-        label: I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_BASIC_LABEL
-        description: I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_BASIC_DESC
+        label: I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_LABEL
+        description: I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_DESC
         ui:
             subject:
                 - hostname

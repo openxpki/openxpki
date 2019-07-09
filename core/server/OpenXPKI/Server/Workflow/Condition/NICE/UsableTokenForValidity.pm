@@ -41,7 +41,7 @@ sub _evaluate {
     }
 
     if (not $notafter) {
-        configuration_error('I18N_OPENXPKI_UI_CONDITION_NICE_UNABLE_TO_DETERMINE_NOTAFTER_DATE');
+        configuration_error('unable to determine notafter date');
     }
 
     $notafter = OpenXPKI::DateTime::get_validity({
@@ -64,7 +64,7 @@ sub _evaluate {
     };
 
     if (!$issuing_ca) {
-        condition_error('I18N_OPENXPKI_UI_CONDITION_NICE_NO_USEABLE_CA_TOKEN_FOUND');
+        condition_error('nice no useable ca token found');
     }
 
 }

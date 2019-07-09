@@ -12,7 +12,7 @@ extends 'OpenXPKI::Client::UI::Result';
 sub BUILD {
 
     my $self = shift;
-    $self->_page ({'label' => 'Welcome to your OpenXPKI Trustcenter'});
+    $self->_page ({'label' => 'I18N_OPENXPKI_UI_HOME_WELCOME_HEAD'});
 }
 
 
@@ -47,7 +47,7 @@ sub init_issuer {
     $self->logger()->trace("result: " . Dumper $issuers);
 
     $self->_page({
-        label => 'Issuing certificates of this Realm',
+        label => 'I18N_OPENXPKI_UI_ISSUERS_LIST',
     });
 
 

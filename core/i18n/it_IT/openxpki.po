@@ -61,10 +61,6 @@ msgstr "Respingi Richiesta"
 msgid "I18N_OPENXPKI_UI_BULK_REJECT_CSR_LABEL"
 msgstr "Respingi Richiesta"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CERTIFICATE_ATTRIBUTE_FAILED"
-msgstr "Numero di serie del certificato"
-
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL"
 msgstr ""
 "Mostra i dettagli di un singolo certificato, ricercato per identificatore "
@@ -80,10 +76,6 @@ msgstr "I miei certificati"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
 msgstr "Informazioni Certificato"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CERTIFICATE_HAS_SUCCESSOR_FAILED"
-msgstr "Numero di serie del certificato"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
 msgstr "Identificatore del certificato"
@@ -150,6 +142,26 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_LABEL"
 msgstr "Ricerca Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_MUST_PROIVDE_IDENTIFIER_OR_SERIAL"
+msgstr ""
+"Mostra i dettagli di un singolo certificato, ricercato per identificatore "
+"<b>oppure</b> tramite il numero di serie. Puoi specificare il numero di "
+"serie sia in formato esadecimale che in notazione decimale."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_NO_SUCH_IDENTIFIER"
+msgstr "Identificatore del certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_NO_SUCH_SERIAL"
+msgstr ""
+"Modulo per la ricerca dei certificati. Il campo SAN richiede che il tipo SAN "
+"venga separato con i due punti, ad es. DNS:www2.openxpki.org.<br>Gli stati "
+"Valido/Scaduto presuppongono che il certificato sia nello stato Emesso: "
+"viene eseguito un controllo relativo alla finestra di validità "
+"Non_prima_del / Non_dopo_il."
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_DESC"
 msgstr ""
@@ -271,68 +283,19 @@ msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
 msgstr "Valido"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CLEAR_LOGIN"
+msgstr "Algoritmo della Chiave"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD"
 msgstr "Scarica in formato DER (CER)"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_CERT_NOT_FOUND"
-msgstr "non prima del"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_DOES_NOT_MATCH"
-msgstr ""
-"Modulo per la ricerca dei certificati. Il campo SAN richiede che il tipo SAN "
-"venga separato con i due punti, ad es. DNS:www2.openxpki.org.<br>Gli stati "
-"Valido/Scaduto presuppongono che il certificato sia nello stato Emesso: "
-"viene eseguito un controllo relativo alla finestra di validità "
-"Non_prima_del / Non_dopo_il."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_DOES_NOT_MATCH_REGEX"
-msgstr ""
-"Modulo per la ricerca dei certificati. Il campo SAN richiede che il tipo SAN "
-"venga separato con i due punti, ad es. DNS:www2.openxpki.org.<br>Gli stati "
-"Valido/Scaduto presuppongono che il certificato sia nello stato Emesso: "
-"viene eseguito un controllo relativo alla finestra di validità "
-"Non_prima_del / Non_dopo_il."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_INVALID_ITEM_COUNT"
-msgstr "Richiesta non valida - nessuna azione"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_IS_EMPTY"
-msgstr ""
-"Modulo per la ricerca dei certificati. Il campo SAN richiede che il tipo SAN "
-"venga separato con i due punti, ad es. DNS:www2.openxpki.org.<br>Gli stati "
-"Valido/Scaduto presuppongono che il certificato sia nello stato Emesso: "
-"viene eseguito un controllo relativo alla finestra di validità "
-"Non_prima_del / Non_dopo_il."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_NOT_EMPTY"
-msgstr ""
-"Modulo per la ricerca dei certificati. Il campo SAN richiede che il tipo SAN "
-"venga separato con i due punti, ad es. DNS:www2.openxpki.org.<br>Gli stati "
-"Valido/Scaduto presuppongono che il certificato sia nello stato Emesso: "
-"viene eseguito un controllo relativo alla finestra di validità "
-"Non_prima_del / Non_dopo_il."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CONDITION_NICE_NO_USEABLE_CA_TOKEN_FOUND"
-msgstr "non prima del"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CONDITION_NICE_UNABLE_TO_DETERMINE_NOTAFTER_DATE"
-msgstr ""
-"Modulo per la ricerca dei certificati. Il campo SAN richiede che il tipo SAN "
-"venga separato con i due punti, ad es. DNS:www2.openxpki.org.<br>Gli stati "
-"Valido/Scaduto presuppongono che il certificato sia nello stato Emesso: "
-"viene eseguito un controllo relativo alla finestra di validità "
-"Non_prima_del / Non_dopo_il."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CRL_BACK_TO_LIST"
+msgstr "mostra le liste di revoca precedenti"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRL_CURRENT_LISTS"
 msgstr "mostra le liste di revoca precedenti"
 
 #, fuzzy
@@ -726,6 +689,10 @@ msgstr "Pagina richiesta non trovata"
 msgid "I18N_OPENXPKI_UI_INVALID_PROFILE"
 msgstr "Numero di serie del certificato"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ISSUERS_LIST"
+msgstr "Emissione Lista Revoche (CRL)"
+
 # Remove?
 msgid "I18N_OPENXPKI_UI_KEY"
 msgstr "Chiave"
@@ -834,6 +801,22 @@ msgstr "Impossibile effettuare il Login con le credenziali fornite!"
 msgid "I18N_OPENXPKI_UI_LOGIN_NO_DATA_PAGE"
 msgstr "Curva Ellittica"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_PASSWORD"
+msgstr "Password della Chiave"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN"
+msgstr "Algoritmo della Chiave"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_SUBMIT"
+msgstr "Impossibile effettuare il Login con le credenziali fornite!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_USERNAME"
+msgstr "Nome utente"
+
 # Remove?
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_BULK"
@@ -934,6 +917,11 @@ msgstr "Workflow"
 # Remove?
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NO"
+msgstr "Chiave"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OOPS"
 msgstr "Chiave"
 
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
@@ -1151,12 +1139,6 @@ msgstr "URI"
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
 msgstr "URI"
 
-msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_BASIC_DESC"
-msgstr "Descrizione Label Client SCEP"
-
-msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_BASIC_LABEL"
-msgstr "Label Client SCEP"
-
 msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_LABEL"
 msgstr "Certificato per l’Autenticazione dell’adesione a SCEP"
 
@@ -1366,16 +1348,6 @@ msgstr "Incompleto"
 msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
 msgstr "Scarica"
 
-# Remove?
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_SUBJECT_MATCH_DONT_MATCH"
-msgstr "Stato del Certificato"
-
-# Remove?
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_SUBJECT_MATCH_SUBJECT_IS_EMPTY"
-msgstr "Stato del Certificato"
-
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
 msgstr "Workflow Adesione SCEP in attesa di approvazione."
 
@@ -1434,14 +1406,6 @@ msgstr "Errore sconosciuto"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_USER_ANONYMOUS"
 msgstr "Stato del Certificato"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_FAILED"
-msgstr "Numero di serie del certificato"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_NO_OWNER_FOUND"
-msgstr "non prima del"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NOT_AN_ENTITY"
 msgstr "Certificato non è di tipo entity."
@@ -1989,10 +1953,6 @@ msgstr "Per favore Aggiorna / Completa le informazioni qui sotto."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Richiesta Aggiornamento"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_AUTH_FAILURE_DESC"
-msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION"
 msgstr ""
@@ -3127,14 +3087,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_LABEL"
 msgstr "CANCELLATO"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_FAILURE_DESC"
-msgstr "Questo Workflow è definitivamente fallito."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_FAILURE_LABEL"
-msgstr "FALLIMENTO"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_INITIAL_DESC"
 msgstr "Stato iniziale"
 
@@ -3156,12 +3108,6 @@ msgstr "Stato iniziale"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_INITIAL_LABEL"
 msgstr "Stato"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_SUCCESS_DESC"
-msgstr "Questo Workflow è terminato con successo."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_SUCCESS_LABEL"
-msgstr "SUCCESSO"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_BACKGROUND_DESC"
@@ -3290,14 +3236,6 @@ msgstr "This workflow has finished with success and can not be restarted"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SUBJECT_LABEL"
 msgstr "Stato"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_DESC"
-msgstr ""
-"Questo Workflow è definitivamente fallito e non può essere riavviato. Non è "
-"stato emesso alcun certificato."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_LABEL"
-msgstr "Richiesta Rifiutata"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_INITIAL_DESC"
 msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato."
@@ -3446,12 +3384,6 @@ msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_LABEL"
 msgstr "SUCCESSO"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_SUCCESS_DESC"
-msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_SUCCESS_LABEL"
-msgstr "SUCCESSO"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_DESC"
 msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
 
@@ -3493,12 +3425,6 @@ msgstr "Questo Workflow è sospeso e verrà fatto proseguire dal Watchdog."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_LABEL"
 msgstr "Aggiorna"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_FAILURE_DESC"
-msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_FAILURE_LABEL"
-msgstr "FALLIMENTO"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_INITIAL_DESC"
 msgstr ""
@@ -3869,6 +3795,10 @@ msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Chiave"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_ATTRIBUTE_FAILED"
+#~ msgstr "Numero di serie del certificato"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOES_NOT_EXIST"
 #~ msgstr "Numero di serie del certificato"
 
@@ -3880,8 +3810,69 @@ msgstr "Chiave"
 #~ msgstr "Scarica la chiave privata del certificato"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_HAS_SUCCESSOR_FAILED"
+#~ msgstr "Numero di serie del certificato"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CLIENT_GETAUTHCODE_USER_NOT_AUTH_PERS"
 #~ msgstr "Revoca Certificato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_CERT_NOT_FOUND"
+#~ msgstr "non prima del"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CONDITION_CERTIFICATE_HAS_STATUS_DOES_NOT_MATCH"
+#~ msgstr ""
+#~ "Modulo per la ricerca dei certificati. Il campo SAN richiede che il tipo "
+#~ "SAN venga separato con i due punti, ad es. DNS:www2.openxpki.org.<br>Gli "
+#~ "stati Valido/Scaduto presuppongono che il certificato sia nello stato "
+#~ "Emesso: viene eseguito un controllo relativo alla finestra di validità "
+#~ "Non_prima_del / Non_dopo_il."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_DOES_NOT_MATCH_REGEX"
+#~ msgstr ""
+#~ "Modulo per la ricerca dei certificati. Il campo SAN richiede che il tipo "
+#~ "SAN venga separato con i due punti, ad es. DNS:www2.openxpki.org.<br>Gli "
+#~ "stati Valido/Scaduto presuppongono che il certificato sia nello stato "
+#~ "Emesso: viene eseguito un controllo relativo alla finestra di validità "
+#~ "Non_prima_del / Non_dopo_il."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_INVALID_ITEM_COUNT"
+#~ msgstr "Richiesta non valida - nessuna azione"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_IS_EMPTY"
+#~ msgstr ""
+#~ "Modulo per la ricerca dei certificati. Il campo SAN richiede che il tipo "
+#~ "SAN venga separato con i due punti, ad es. DNS:www2.openxpki.org.<br>Gli "
+#~ "stati Valido/Scaduto presuppongono che il certificato sia nello stato "
+#~ "Emesso: viene eseguito un controllo relativo alla finestra di validità "
+#~ "Non_prima_del / Non_dopo_il."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CONDITION_ERROR_ARRAY_NOT_EMPTY"
+#~ msgstr ""
+#~ "Modulo per la ricerca dei certificati. Il campo SAN richiede che il tipo "
+#~ "SAN venga separato con i due punti, ad es. DNS:www2.openxpki.org.<br>Gli "
+#~ "stati Valido/Scaduto presuppongono che il certificato sia nello stato "
+#~ "Emesso: viene eseguito un controllo relativo alla finestra di validità "
+#~ "Non_prima_del / Non_dopo_il."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CONDITION_NICE_NO_USEABLE_CA_TOKEN_FOUND"
+#~ msgstr "non prima del"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CONDITION_NICE_UNABLE_TO_DETERMINE_NOTAFTER_DATE"
+#~ msgstr ""
+#~ "Modulo per la ricerca dei certificati. Il campo SAN richiede che il tipo "
+#~ "SAN venga separato con i due punti, ad es. DNS:www2.openxpki.org.<br>Gli "
+#~ "stati Valido/Scaduto presuppongono che il certificato sia nello stato "
+#~ "Emesso: viene eseguito un controllo relativo alla finestra di validità "
+#~ "Non_prima_del / Non_dopo_il."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CRL_LAST_ITEMCNT"
@@ -3926,6 +3917,12 @@ msgstr "Chiave"
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
 #~ msgstr "Token Datasafe"
 
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_BASIC_DESC"
+#~ msgstr "Descrizione Label Client SCEP"
+
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_BASIC_LABEL"
+#~ msgstr "Label Client SCEP"
+
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_NETWORK_LABEL"
 #~ msgstr "Client TLS"
@@ -3953,6 +3950,24 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
 #~ msgstr "Errore sconosciuto"
+
+# Remove?
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_SUBJECT_MATCH_DONT_MATCH"
+#~ msgstr "Stato del Certificato"
+
+# Remove?
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_SUBJECT_MATCH_SUBJECT_IS_EMPTY"
+#~ msgstr "Stato del Certificato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_FAILED"
+#~ msgstr "Numero di serie del certificato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_NO_OWNER_FOUND"
+#~ msgstr "non prima del"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_REQUIRED"
@@ -4539,6 +4554,11 @@ msgstr "Chiave"
 #~ msgstr "Persist CRR"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_AUTH_FAILURE_DESC"
+#~ msgstr ""
+#~ "Questo Workflow è definitivamente fallito e non può essere riavviato"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_EDIT"
 #~ msgstr "continua"
 
@@ -4963,6 +4983,20 @@ msgstr "Chiave"
 #~ msgstr "ID Workflow"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_FAILURE_DESC"
+#~ msgstr "Questo Workflow è definitivamente fallito."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_FAILURE_LABEL"
+#~ msgstr "FALLIMENTO"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_SUCCESS_DESC"
+#~ msgstr "Questo Workflow è terminato con successo."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_SUCCESS_LABEL"
+#~ msgstr "SUCCESSO"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRW_INITIAL_DESC"
 #~ msgstr ""
 #~ "Questo Workflow è definitivamente fallito e non può essere riavviato."
@@ -4970,6 +5004,14 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRW_INITIAL_LABEL"
 #~ msgstr "Stato"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_DESC"
+#~ msgstr ""
+#~ "Questo Workflow è definitivamente fallito e non può essere riavviato. Non "
+#~ "è stato emesso alcun certificato."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_LABEL"
+#~ msgstr "Richiesta Rifiutata"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_USER_DESC"
 #~ msgstr ""
@@ -4980,6 +5022,12 @@ msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CA_KEY_NOT_USABLE_LABEL"
 #~ msgstr "Chiave CA inutilizzabile"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_SUCCESS_DESC"
+#~ msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_SUCCESS_LABEL"
+#~ msgstr "SUCCESSO"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_BEGIN_LOOP_NEED_CSR_DESC"
@@ -5659,6 +5707,13 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_X509_PREPARED_LABEL"
 #~ msgstr "FAILURE"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_FAILURE_DESC"
+#~ msgstr ""
+#~ "Questo Workflow è definitivamente fallito e non può essere riavviato"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_FAILURE_LABEL"
+#~ msgstr "FALLIMENTO"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_DESC"

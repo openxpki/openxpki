@@ -4,45 +4,45 @@ head:
     description: I18N_OPENXPKI_WF_TYPE_CERTIFICATE_PUBLISHING_DESC
 
 state:
-    INITIAL: 
+    INITIAL:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_INITIAL_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_INITIAL_DESC
-        action: 
+        action:
           - initialize > WAITING_FOR_START
 
-    PUBLISH: 
+    PUBLISH:
         autorun: 1
-        action: 
+        action:
           - publish_prefix > SUCCESS ? has_prefix
           - publish_profile > SUCCESS ? !has_prefix
 
-    SUCCESS: 
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_SUCCESS_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_SUCCESS_DESC
+    SUCCESS:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC
 
-    WAITING_FOR_START: 
+    WAITING_FOR_START:
         autorun: 1
-        action: 
+        action:
           - global_disconnect > PUBLISH ? !run_sync
           - global_noop > PUBLISH ? run_sync
 
 
 action:
-    initialize: 
+    initialize:
         class: Workflow::Action::Null
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_DESC
-        input: 
+        input:
           - cert_identifier
           - prefix
           - sync
           - publish_key
 
-    publish_prefix: 
+    publish_prefix:
         class: OpenXPKI::Server::Workflow::Activity::Tools::PublishCertificate
-        input: 
+        input:
           - cert_identifier
-        param: 
+        param:
             _map_prefix: $prefix
             export_context: 1
             retry_count: 3
@@ -50,9 +50,9 @@ action:
             on_error: queue
 
 
-    publish_profile: 
+    publish_profile:
         class: OpenXPKI::Server::Workflow::Activity::Tools::PublishCertificate
-        input: 
+        input:
           - cert_identifier
         param:
             export_context: 1
@@ -90,10 +90,10 @@ field:
 
 acl:
 
-    CA Operator: 
+    CA Operator:
         creator: any
 
-    RA Operator: 
+    RA Operator:
         creator: any
         fail: 1
         resume: 1
@@ -106,12 +106,12 @@ acl:
     SmartCard:
         creator: self
 
-    System: 
+    System:
         creator: self
 
-    User: 
+    User:
         creator: self
 
-    Anonymous: 
+    Anonymous:
         creator: self
 

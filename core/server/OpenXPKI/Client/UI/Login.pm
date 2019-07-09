@@ -24,10 +24,10 @@ sub init_realm_select {
 
     my @realms = sort { lc($a->{label}) cmp lc($b->{label}) } @{$realms};
 
-    $self->_page ({'label' => 'Please log in'});
+    $self->_page ({'label' => 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN'});
     $self->_result()->{main} = [{ 'type' => 'form', 'action' => 'login!realm',  content => {
         fields => [
-            { 'name' => 'pki_realm', 'label' => 'Realm', 'type' => 'select', 'options' => \@realms },
+            { 'name' => 'pki_realm', 'label' => 'I18N_OPENXPKI_UI_PKI_REALM_LABEL', 'type' => 'select', 'options' => \@realms },
         ]}
     }];
     return $self;
@@ -40,10 +40,10 @@ sub init_auth_stack {
 
     my @stacks = sort { lc($a->{label}) cmp lc($b->{label}) } @{$stacks};
 
-    $self->_page ({'label' => 'Please log in'});
+    $self->_page ({'label' => 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN'});
     $self->_result()->{main} = [
         { 'type' => 'form', 'action' => 'login!stack', content => {
-            title => '', submit_label => 'do login',
+            title => '', submit_label => 'I18N_OPENXPKI_UI_LOGIN_SUBMIT',
             fields => [
                 { 'name' => 'auth_stack', 'label' => 'Handler', 'type' => 'select', 'options' => \@stacks },
             ]
@@ -60,8 +60,8 @@ sub init_login_passwd {
     $self->_page ({'label' => 'Please log in'});
     $self->_result()->{main} = [{ 'type' => 'form', 'action' => 'login!password', content => {
         fields => [
-            { 'name' => 'username', 'label' => 'Username', 'type' => 'text' },
-            { 'name' => 'password', 'label' => 'Password', 'type' => 'password' },
+            { 'name' => 'username', 'label' => 'I18N_OPENXPKI_UI_LOGIN_USERNAME', 'type' => 'text' },
+            { 'name' => 'password', 'label' => 'I18N_OPENXPKI_UI_LOGIN_PASSWORD', 'type' => 'password' },
         ]}
     }];
 
