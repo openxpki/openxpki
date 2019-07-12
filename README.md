@@ -1,4 +1,6 @@
 # OpenXPKI Trustcenter Software
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fopenxpki%2Fopenxpki.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fopenxpki%2Fopenxpki?ref=badge_shield)
+
 
 A software stack based on perl and openssl to run a PKI/trustcenter with an enterprise-grade feature set. 
 
@@ -34,3 +36,6 @@ Contributions are always welcome. Please fork and make a pull request against th
 Apache License 2.0, also see LICENSE
 
 
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fopenxpki%2Fopenxpki.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fopenxpki%2Fopenxpki?ref=badge_large)
