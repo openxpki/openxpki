@@ -156,7 +156,7 @@ sub __send_cert : PRIVATE {
 
     ##! 16: 'Found serial - hex: ' . $requested_serial_hex . ' - dec: ' . $requested_serial_dec
 
-    my $cert_result = CTX('api2')->search_cert( 'cert_key' => $requested_serial_dec, return_columns => 'identifier' );
+    my $cert_result = CTX('api2')->search_cert( 'cert_serial' => $requested_serial_dec, return_columns => 'identifier' );
 
     ##! 32: 'Search result ' . Dumper $cert_result
     my $cert_count = scalar @{$cert_result};
@@ -244,7 +244,7 @@ sub __send_crl : PRIVATE {
     my $res = CTX('api2')->search_cert(
         pki_realm => '_any',
         issuer_dn => $requested_issuer_serial->{ISSUER},
-        cert_key => $issuer_serial,
+        cert_serial => $issuer_serial,
         return_columns => 'issuer_identifier',
     );
 
