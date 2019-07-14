@@ -758,22 +758,22 @@ sub __alias_print {
         return;
     }
 
-    my $cert = CTX('api')->get_cert({ IDENTIFIER => $alias->{identifier}, FORMAT => 'DBINFO' });
+    my $cert = CTX('api2')->get_cert( identifier => $alias->{identifier}, format => 'DBINFO' );
 
     print "  Alias     : $alias->{alias}\n";
     print "  Identifier: $alias->{identifier}\n";
 
-    print "  Subject   : $cert->{SUBJECT}\n" if ($subject);
+    print "  Subject   : $cert->{subject}\n" if ($subject);
 
     print "  NotBefore : " . DateTime->from_epoch( epoch => $alias->{notbefore} )->strftime("%F %T");
-    print DateTime->from_epoch( epoch => $cert->{NOTBEFORE} )->strftime(" (%F %T)")
-        if ($cert && $cert->{NOTBEFORE} != $alias->{notbefore});
+    print DateTime->from_epoch( epoch => $cert->{notbefore} )->strftime(" (%F %T)")
+        if ($cert && $cert->{notbefore} != $alias->{notbefore});
 
     print "\n";
     print "  NotAfter  : " . DateTime->from_epoch( epoch => $alias->{notafter} )->strftime("%F %T");
 
-    print DateTime->from_epoch( epoch => $cert->{NOTAFTER} )->strftime(" (%F %T)")
-        if ($cert && $cert->{NOTAFTER} != $alias->{notafter});
+    print DateTime->from_epoch( epoch => $cert->{notafter} )->strftime(" (%F %T)")
+        if ($cert && $cert->{notafter} != $alias->{notafter});
 
     print "\n\n";
 

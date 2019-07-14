@@ -286,7 +286,7 @@ sub __send_crl : PRIVATE {
     my $res = CTX('api2')->search_cert(
         pki_realm => '_ANY',
 #        ISSUER_DN => $issuer,
-        cert_key => $serial,
+        cert_serial => $serial,
         return_columns => 'issuer_identifier',
     );
 

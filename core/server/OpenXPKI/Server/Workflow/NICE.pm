@@ -16,7 +16,7 @@ use Data::Dumper;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use OpenXPKI::Crypto::X509;
+use OpenXPKI::Crypt::X509;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Database::Legacy;
 use OpenXPKI::Server::Database; # to get AUTO_ID
@@ -103,13 +103,9 @@ sub __persistCertificateInformation {
     my $pki_realm = CTX('api')->get_pki_realm();
     my $default_token = CTX('api')->get_default_token();
 
-    my $x509 = OpenXPKI::Crypto::X509->new(
-        TOKEN => $default_token,
-        DATA  => $cert_info->{certificate},
-    );
+    my $x509 = OpenXPKI::Crypt::X509->new( $cert_info->{certificate} );
 
-    # FIXME #legacydb Migrate OpenXPKI::Crypto::X509->to_db_hash() later on
-    my $cert_data = OpenXPKI::Server::Database::Legacy->certificate_from_legacy({ $x509->to_db_hash });
+    my $cert_data = $x509 ->db_hash();
     my $identifier = $cert_data->{identifier};
 
     my $serializer = OpenXPKI::Serialization::Simple->new();
@@ -179,7 +175,7 @@ sub __persistCertificateInformation {
     );
 
 
-    my @parsed_subject_alt_names = $x509->get_subject_alt_names();
+    my @parsed_subject_alt_names = @{$x509->get_subject_alt_name()};
     ##! 32: 'sans (parsed): ' . Dumper \@parsed_subject_alt_names
     for my $san (@parsed_subject_alt_names) {
         CTX('dbi')->insert(

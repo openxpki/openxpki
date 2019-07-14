@@ -34,6 +34,13 @@ has pem => (
     },
 );
 
+has db_hash => (
+    is => 'ro',
+    isa => 'HashRef',
+    lazy => 1,
+    builder => '_to_db_hash',
+);
+
 has _cert => (
     is => 'ro',
     required => 1,
@@ -107,7 +114,10 @@ has issuer => (
     lazy => 1,
     default => sub {
         my $self = shift;
-        return join(',', reverse @{$self->_cert()->Issuer});
+        return join ",", map {
+            # Replace S -> ST and l => L, see #674
+            $_ =~ s{\AS=}{ST=}; $_ =~ s{\Al=}{L=}; $_
+        } reverse @{$self->_cert()->Issuer};
     }
 );
 
@@ -276,6 +286,25 @@ sub _get_validity {
         DATE      => $date,
         OUTFORMAT => $format,
     });
+}
+
+sub _to_db_hash {
+
+    my $self = shift;
+
+    my $hash = {
+        cert_key => $self->get_serial(),
+        identifier      => $self->get_cert_identifier(),
+        data            => $self->pem(),
+        subject         => $self->get_subject(),
+        issuer_dn       => $self->get_issuer(),
+        subject_key_identifier => $self->get_subject_key_id(),
+        authority_key_identifier => $self->get_authority_key_id(),
+        notafter        => $self->notafter(),
+        notbefore       => $self->notbefore(),
+    };
+    return $hash;
+
 }
 
 1;

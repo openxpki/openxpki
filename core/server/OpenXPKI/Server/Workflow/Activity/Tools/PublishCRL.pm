@@ -13,7 +13,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::Crypto::X509;
+use OpenXPKI::Crypt::X509;
 
 use Data::Dumper;
 
@@ -46,10 +46,7 @@ sub execute {
     }
 
     my $certificate = CTX('api2')->get_certificate_for_alias( 'alias' => $ca_alias );
-    my $x509_issuer = OpenXPKI::Crypto::X509->new(
-        DATA  => $certificate->{data},
-        TOKEN => $default_token,
-    );
+    my $x509_issuer = OpenXPKI::Crypt::X509->new( $certificate->{data} );
 
     my $ca_identifier = $certificate->{identifier};
 
@@ -136,11 +133,11 @@ sub execute {
         );
     }
 
-
     # Get Issuer Info from selected ca
-    $data->{issuer} = $x509_issuer->{PARSED}->{BODY}->{SUBJECT_HASH};
-    $data->{subject} = $x509_issuer->{PARSED}->{BODY}->{SUBJECT};
-    $data->{subject_key_identifier} = $x509_issuer->{KEYID};
+    $data->{issuer} = $x509_issuer->subject_hash();
+    $data->{subject} = $x509_issuer->get_subject();
+    $data->{subject_key_identifier} = $x509_issuer->get_subject_key_id();
+
 
     my @target;
     my @prefix = split ( /\./, $prefix );

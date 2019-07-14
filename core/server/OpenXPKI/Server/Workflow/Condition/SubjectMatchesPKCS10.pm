@@ -7,9 +7,9 @@ package OpenXPKI::Server::Workflow::Condition::SubjectMatchesPKCS10;
 
 use strict;
 use warnings;
-use base qw( Workflow::Validator );
-use Workflow::Exception qw( validation_error );
-use OpenXPKI::Crypto::CSR;
+use base qw( Workflow::Condition);
+use Workflow::Exception qw( workflow_error );
+use OpenXPKI::Crypt::PKCS10;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug;
 use English;
@@ -34,30 +34,19 @@ sub evaluate {
     # parse PKCS#10 request
     my $default_token = CTX('api')->get_default_token();
 
-    my $csr;
-    eval {
-    $csr = OpenXPKI::Crypto::CSR->new(
-        TOKEN => $default_token,
-        DATA => $pkcs10,
-        );
-    };
-    if ($EVAL_ERROR) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_PARSE_ERROR",
-            );
+    my $csr = OpenXPKI::Crypt::PKCS10->new( $pkcs10 );
+    if (!$csr) {
+        workflow_error("Unable to parse PKCS10");
     }
 
-    my $parsed_subject = $csr->get_parsed('SUBJECT');
+    my $parsed_subject = $csr->get_subject();
     if (! defined $parsed_subject) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_PKCS10_PARSE_ERROR",
-            );
+        workflow_error("Unable to get subkect from PKCS10");
     }
 
     CTX('log')->application()->debug("Subject mismatch $subject != $parsed_subject");
 
-
-    condition_error( "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATOR_SUBJECT_MISMATCH_PKCS10" )
+    condition_error( "subject mismatch pkcs10" )
         if ( $subject != $parsed_subject );
 
     return 1;

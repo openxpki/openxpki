@@ -11,7 +11,7 @@ use OpenXPKI::DN;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use OpenXPKI::Crypto::X509;
+use OpenXPKI::Crypt::X509;
 
 use Data::Dumper;
 
@@ -53,18 +53,15 @@ sub execute {
     # Load issuer info
     # FIXME - this might be improved using some caching
     my $certificate = CTX('api2')->get_certificate_for_alias( 'alias' => $ca_alias );
-    my $x509 = OpenXPKI::Crypto::X509->new(
-        DATA  => $certificate->{data},
-        TOKEN => $default_token,
-    );
+    my $x509 = OpenXPKI::Crypt::X509->new( $certificate->{data} );
 
     # Get Issuer Info from selected ca
-    $data->{dn} = $x509->{PARSED}->{BODY}->{SUBJECT_HASH};
-    $data->{subject} = $x509->{PARSED}->{BODY}->{SUBJECT};
-    $data->{subject_key_identifier} = $x509->{KEYID};
+    $data->{dn} = $x509->subject_hash();
+    $data->{subject} = $x509->get_subject();
+    $data->{subject_key_identifier} = $x509->get_subject_key_id();
 
-    $data->{pem} = $x509->get_converted('PEM');
-    $data->{der} = $x509->get_converted('DER');
+    $data->{pem} = $x509->pem();
+    $data->{der} = $x509->data();
 
     if (!defined $data->{der} || $data->{der} eq '') {
         OpenXPKI::Exception->throw(
