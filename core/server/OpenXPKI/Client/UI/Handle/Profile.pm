@@ -5,6 +5,7 @@ use Moose;
 use Data::Dumper;
 use English;
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::i18n qw( i18nGettext );
 
 sub render_profile_select {
 
@@ -19,12 +20,14 @@ sub render_profile_select {
     my $wf_info = $args->{WF_INFO};
 
     # Get the list of profiles from the backend - return is a hash with id => hash
-    my $profiles = $self->send_command( 'get_cert_profiles', {});
+    my $profiles = $self->send_command_v2( 'get_cert_profiles', {});
     # Transform hash into value/label list and sort it
-    # Apply translation
-    map { $profiles->{$_}->{label} = $profiles->{$_}->{label} } keys %{$profiles};
+    # Apply translation to sort on translated strings
+    map { $profiles->{$_}->{label} = i18nGettext($profiles->{$_}->{label}) } keys %{$profiles};
     # Sort
     my @profiles = sort { lc($a->{label}) cmp lc($b->{label}) } values %{$profiles};
+
+    my @profiledesc = map { $_->{description} ? { value => $_->{description}, label => $_->{label} } : () } @profiles;
 
     my $context = $wf_info->{WORKFLOW}->{CONTEXT};
 
@@ -33,11 +36,8 @@ sub render_profile_select {
     # If the profile is preselected, we need to fetch the options
     my @styles;
     if ($cert_profile) {
-        my $styles = $self->send_command( 'get_cert_subject_profiles', { PROFILE => $cert_profile });
-        # TODO clean up API after Mason decomissioning
-        # Transform hash into value/label list and sort it
-        @styles = map { { value => $_, label => $styles->{$_}->{LABEL}, description => $styles->{$_}->{DESCRIPTION} } } keys %{$styles};
-        @styles = sort { lc($a->{label}) cmp lc($b->{label}) } @styles;
+        my $styles = $self->send_command_v2( 'get_cert_subject_profiles', { profile => $cert_profile });
+        my @styles = sort { lc($a->{label}) cmp lc($b->{label}) } values %{$styles};
     }
 
     my @fields;
@@ -78,6 +78,16 @@ sub render_profile_select {
             fields => \@fields
         }
     });
+
+    if (@profiledesc > 0) {
+        $self->add_section({
+            type => 'keyvalue',
+            content => {
+                label => 'I18N_OPENXPKI_UI_PROFILE_HINT_LIST',
+                description => '',
+                data => \@profiledesc
+        }});
+    }
 
     return $self;
 

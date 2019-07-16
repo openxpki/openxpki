@@ -1148,6 +1148,10 @@ msgid "I18N_OPENXPKI_UI_PROFILE_EXTRA_HOSTNAME_DESC"
 msgstr "Это полное сетевое имя компьютера"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_HINT_LIST"
+msgstr "Профиль пользователя"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME"
 msgstr "Профиль пользователя"
 

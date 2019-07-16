@@ -42,6 +42,7 @@ command "get_cert_profiles" => {
         next if ($profile =~ /^(template|default|sample)$/);
 
         my $label = $config->get([ 'profile', $profile, 'label' ]) || $profile;
+        my $desc = $config->get([ 'profile', $profile, 'description' ]) || '';
         my $do_list = 1;
         # only list profiles where at least one style has a config entry "ui"
         if (not $params->showall) {
@@ -57,7 +58,7 @@ command "get_cert_profiles" => {
             }
             ##! 32: 'No UI styles found'
         }
-        $profiles->{$profile} = { value => $profile, label => $label };
+        $profiles->{$profile} = { value => $profile, label => $label, description => $desc } if ($do_list);
     }
     ##! 16: 'Profiles ' .Dumper $profiles
     return $profiles;

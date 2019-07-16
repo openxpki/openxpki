@@ -1016,6 +1016,10 @@ msgstr "Nomi host addizionali"
 msgid "I18N_OPENXPKI_UI_PROFILE_EXTRA_HOSTNAME_DESC"
 msgstr "Puoi inserire nomi host addizionali per il certificato"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_HINT_LIST"
+msgstr "Indirizzo IP"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME"
 msgstr "Nome host"
 

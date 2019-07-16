@@ -45,9 +45,11 @@ command "get_cert_subject_profiles" => {
     for my $id ($config->get_keys("profile.$profile.style")) {
         # hide non-UI styles unless "showall" is specified
         next unless ($params->showall or $config->exists(['profile', $profile, 'style', $id, 'ui' ]));
-
-        $styles->{$id}->{label}       = $config->get(['profile', $profile, 'style', $id, 'label']);
-        $styles->{$id}->{description} = $config->get(['profile', $profile, 'style', $id, 'description']);
+        $styles->{$id} = {
+            value => $id,
+            label => $config->get(['profile', $profile, 'style', $id, 'label']),
+            description => $config->get(['profile', $profile, 'style', $id, 'description']),
+        }
     }
 
     return $styles;
