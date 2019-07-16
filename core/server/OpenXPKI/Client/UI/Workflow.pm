@@ -2403,6 +2403,7 @@ sub __render_fields {
         $self->logger()->trace('No output rules, render plain context: ' . Dumper  \@fields_to_render  );
     }
 
+    FIELD:
     foreach my $field (@fields_to_render) {
 
         my $key = $field->{name} || '';
@@ -2410,6 +2411,11 @@ sub __render_fields {
             value => (defined $context->{$key} ? $context->{$key} : ''),
             format =>  $field->{format} || ''
         };
+
+        if ($item->{format} eq 'spacer') {
+            push @fields, { format => 'head', className => 'spacer' };
+            next FIELD;
+        }
 
         # Always suppress key material
         if ($item->{value} =~ /-----BEGIN[^-]*PRIVATE KEY-----/) {
@@ -2639,6 +2645,13 @@ sub __render_fields {
             $item->{action} = $field->{action};
             $item->{target} = $field->{target} ?  $field->{target} : 'tab';
 
+        } elsif ($item->{format} eq 'head') {
+            # head can either show a value from context or a fixed label
+            if ($item->{value} eq '') {
+                $item->{value} = $item->{label};
+            }
+            $item->{className} //= 'spacer';
+
         } elsif ($field_type eq 'select' && !$field->{template} && $field->{option} && ref $field->{option} eq 'ARRAY') {
             foreach my $option (@{$field->{option}}) {
                 next unless (defined $option->{value});
@@ -2706,6 +2719,7 @@ sub __render_fields {
             (ref $item->{value} eq '' && $item->{value} ne ''))) {
             push @fields, $item;
         }
+
     }
 
     return \@fields;

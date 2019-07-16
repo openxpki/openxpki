@@ -265,3 +265,9 @@ span.styled-failed {
 }
 /* keep line wraps in code */
 code { white-space: pre; }
+
+
+table.table-bordered tr.spacer th {
+    padding-top:15px;
+    background-color: #eee;
+}

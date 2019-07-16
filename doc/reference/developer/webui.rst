@@ -318,6 +318,24 @@ Action "test_dep_select!change_type" returns a (partially updated) definition of
 Is not implemented yet.
 
 
+SECTION-TYPE "key-value"
+-------------------------
+
+Render a list of key/value items in a two column grid. The left column shows
+the text given by "label", the right column is formated based on value and
+format (see Formatted Strings).
+
+There is a special format type "head" which renders a table head tag spanning
+both columns. If a context item is referenced, the value is used as headline,
+it might be decorated using a template. As an alternative, a fixed value can
+be given using the key label.
+
+Add an item with format set to spacer to create an empty separator line
+(there is a global field names spacer in the default config so you can just
+say '- spacer' in the output section).
+
+An option className can be set which is put into the rows tr tag.
+
 Item Level
 ==========
 
