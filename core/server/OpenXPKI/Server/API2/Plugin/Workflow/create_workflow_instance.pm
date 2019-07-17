@@ -28,14 +28,13 @@ Create a new workflow instance of the given type.
 Limitations and requirements:
 
 Each workflow MUST start with a state called I<INITIAL> and MUST have exactly
-one action. The factory presets the context value for I<creator> with the
-current session user, the inital action SHOULD set the context value I<creator>
-to the ID of the (associated) user of this workflow if this differs from the
-system user. Note that the creator is afterwards attached as a workflow
-attribute and will not be updated if you change the context value later on.
+one action. I<workflow_id> and I<creator> are added to the context as virtual
+values - those can not be changed. I<creator> is set to the username of the
+current session user, to change this use the SetCreator activity or change
+the workflow B<attribute> I<creator> directly!
 
-Workflows that fail to complete the I<INITIAL> action are not saved and can not
-be continued.
+Workflows that fail to complete the I<INITIAL> action are not saved and can
+not be continued.
 
 B<Parameters>
 
@@ -68,7 +67,6 @@ command "create_workflow_instance" => {
         );
     $workflow->reload_observer;
 
-    ## init creator
     my $id = $workflow->id;
     ##! 2: "New workflow's ID: $id"
 
@@ -77,13 +75,14 @@ command "create_workflow_instance" => {
 
     my $context = $workflow->context;
     my $creator = CTX('session')->data->user;
-    $context->param('creator'      => $creator);
-    $context->param('creator_role' => CTX('session')->data->role);
 
     # workflow_id is a virtual key that is added by the Context on init so
     # it does not exist in the fresh context after creation, fixes #442
     # we set it directly to prevent triggering any "on update" methods
     $context->{PARAMS}{'workflow_id'} = $id;
+
+    # same for creator
+    $context->{PARAMS}{'creator'} = $creator;
 
     # This is crucial and must be done before the first execute as otherwise
     # workflow ACLs fails when the first non-initial action is autorun
@@ -126,10 +125,6 @@ command "create_workflow_instance" => {
         # the first workflow step asynchronously: execute_activity(..., async => 1, wait => 1)
         $updated_workflow = $util->execute_activity($workflow, $initial_action);
 
-        # check back for the creator in the context and copy it to the attribute table
-        # doh - somebody deleted the creator from the context
-        $context->param('creator' => $creator) unless $context->param('creator');
-        $workflow->attrib({ creator => $context->param('creator') });
     }
     catch {
         # Safety net: bubble up unknown exceptions.

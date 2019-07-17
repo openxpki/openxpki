@@ -126,14 +126,12 @@ sub __update_workflow_context {
         ##! 32: "WF #$id: Only update internals " . join(":", @updated )
     }
 
+    # do not persit the virtual workflow_id/creator field
+    # ignore "volatile" context parameters starting with an underscore
+    @updated = grep { $_ !~ /\A(_.+|creator|workflow_id)\z/ } @updated;
+
     for my $key (@updated) {
         my $value = $params->{$key};
-
-        # do not persit the virtual workflow_id field
-        next if ( $key eq 'workflow_id' );
-
-        # ignore "volatile" context parameters starting with an underscore
-        next if ( $key =~ m{ \A _ }xms );
 
         # parameters with undefined values are not stored / deleted
         if (not defined $value ) {
@@ -282,9 +280,7 @@ sub fetch_extra_workflow_data {
     my $id  = $workflow->id();
     my $dbi = CTX('dbi');
 
-    #
     # Context
-    #
     my $sth = $dbi->select(
         from => "workflow_context",
         columns => [ "workflow_context_key", "workflow_context_value" ],
@@ -296,12 +292,8 @@ sub fetch_extra_workflow_data {
         ##! 32: "Setting context param: ".$row->[0]." => ".$row->[1]
         $context->param($row->[0] => $row->[1]);
     }
-    # clear the updated flag
-    $context->reset_updated();
 
-    #
     # Attributes
-    #
     $sth = $dbi->select(
         from => 'workflow_attributes',
         columns => [ 'attribute_contentkey', 'attribute_value' ],
@@ -313,6 +305,13 @@ sub fetch_extra_workflow_data {
         $attrs->{$row->[0]} = $row->[1];
     }
     $workflow->attrib($attrs);
+
+    # add "virtual" creator
+    $context->param( 'creator' => $attrs->{creator} );
+
+    # clear the updated flag
+    $context->reset_updated();
+
 }
 
 sub create_history {
