@@ -126,6 +126,7 @@ acl:
         context: 1
         history: 1
         techlog: 1
+        attribute: 1
         fail: 1
         resume: 1
         wakeup: 1

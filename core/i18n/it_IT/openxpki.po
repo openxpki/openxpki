@@ -1958,6 +1958,10 @@ msgstr "Per favore Aggiorna / Completa le informazioni qui sotto."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Richiesta Aggiornamento"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
+msgstr "Stato"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION"
 msgstr ""
 "Inserisci i criteri di ricerca per selezionare i Workflow da includere nella "

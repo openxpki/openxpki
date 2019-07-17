@@ -473,7 +473,7 @@ sub get_global_actions {
     }
 
     # always possible
-    push @possible_action, ('history', 'techlog', 'context');
+    push @possible_action, ('history', 'techlog', 'context', 'attribute');
 
     my @allowed;
     foreach my $action (@possible_action) {

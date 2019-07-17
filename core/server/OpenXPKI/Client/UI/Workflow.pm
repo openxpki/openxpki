@@ -237,6 +237,46 @@ sub init_context {
 }
 
 
+=head2 init_attribute
+
+Requires parameter I<wf_id> which is the id of an existing workflow.
+Shows the assigned attributes as plain key/value pairs - usually called in a modal.
+
+=cut
+
+sub init_attribute {
+
+    my $self = shift;
+
+    # re-instance existing workflow
+    my $id = $self->param('wf_id');
+
+    my $wf_info = $self->send_command_v2( 'get_workflow_info', {
+        id => $id,
+        with_attributes => 1,
+    });
+
+    if (!$wf_info) {
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error') unless($self->_status());
+        return $self;
+    }
+
+    $self->_page({
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL #' . $wf_info->{workflow}->{id},
+        className => 'modal-lg'
+    });
+
+    $self->add_section({
+        type => 'keyvalue',
+        content => {
+            label => '',
+            data => $self->__render_fields( $wf_info, 'attribute'),
+    }});
+
+    return $self;
+
+}
+
 =head2
 
 Render form for the workflow search.
@@ -1948,6 +1988,13 @@ sub __render_from_workflow {
                 };
             }
 
+            if (grep /attribute/, @handles) {
+                push @extra_links, {
+                    'page' => 'workflow!attribute!wf_id!'.$wf_info->{workflow}->{id},
+                    'label' => 'I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL',
+                };
+            }
+
             if (grep /history/, @handles) {
                 push @extra_links, {
                     'page' => 'workflow!history!wf_id!'.$wf_info->{workflow}->{id},
@@ -2388,6 +2435,11 @@ sub __render_fields {
         foreach my $field (sort keys %{$context}) {
             push @fields_to_render, { name => $field };
         }
+    } elsif ($view eq 'attribute' && (grep /attribute/, @{$wf_info->{handles}})) {
+        my $attr = $wf_info->{workflow}->{attribute};
+        foreach my $field (sort keys %{$attr }) {
+            push @fields_to_render, { name => $field, value => $attr->{$field}  };
+        }
     } elsif ($output) {
         @fields_to_render = @{$wf_info->{state}->{output}};
         $self->logger()->trace('Render output rules: ' . Dumper  \@fields_to_render  );
@@ -2406,7 +2458,7 @@ sub __render_fields {
 
         my $key = $field->{name} || '';
         my $item = {
-            value => (defined $context->{$key} ? $context->{$key} : ''),
+            value => $field->{value} // (defined $context->{$key} ? $context->{$key} : ''),
             format =>  $field->{format} || ''
         };
 
