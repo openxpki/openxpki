@@ -17,7 +17,7 @@ sub render_profile_select {
 
     $self->logger()->trace( 'render_profile_select with args: ' . Dumper $args );
 
-    my $wf_info = $args->{WF_INFO};
+    my $wf_info = $args->{wf_info};
 
     # Get the list of profiles from the backend - return is a hash with id => hash
     my $profiles = $self->send_command_v2( 'get_cert_profiles', {});
@@ -29,7 +29,7 @@ sub render_profile_select {
 
     my @profiledesc = map { $_->{description} ? { value => $_->{description}, label => $_->{label} } : () } @profiles;
 
-    my $context = $wf_info->{WORKFLOW}->{CONTEXT};
+    my $context = $wf_info->{workflow}->{context};
 
     my $cert_profile = $context->{cert_profile} || '';
 
@@ -41,7 +41,7 @@ sub render_profile_select {
     }
 
     my @fields;
-    foreach my $field (@{$wf_info->{ACTIVITY}->{$wf_action}->{field}}) {
+    foreach my $field (@{$wf_info->{activity}->{$wf_action}->{field}}) {
         my $name = $field->{name};
         my $item = $self->__render_input_field( $field, $context->{$name} );
 
@@ -109,9 +109,9 @@ sub render_subject_form {
         ($section, $mode) = split /!/, $param;
     }
 
-    my $wf_info = $args->{WF_INFO};
+    my $wf_info = $args->{wf_info};
 
-    my $context = $wf_info->{WORKFLOW}->{CONTEXT};
+    my $context = $wf_info->{workflow}->{context};
 
     # get profile and style from the context
     my $cert_profile = $context->{'cert_profile'};
@@ -120,10 +120,10 @@ sub render_subject_form {
     my $is_renewal = ($mode eq 'renewal');
 
     # Parse out the field name and type, we assume that there is only one activity with one field
-    $wf_action = (keys %{$wf_info->{ACTIVITY}})[0] unless($wf_action);
-    my $field_name = $wf_info->{ACTIVITY}->{$wf_action}->{field}[0]->{name};
+    $wf_action = (keys %{$wf_info->{activity}})[0] unless($wf_action);
+    my $field_name = $wf_info->{activity}->{$wf_action}->{field}[0]->{name};
 
-    $section = substr($wf_info->{ACTIVITY}->{$wf_action}->{field}[0]->{type}, 5) unless($section);
+    $section = substr($wf_info->{activity}->{$wf_action}->{field}[0]->{type}, 5) unless($section);
 
     $self->logger()->debug( " Render subject for $field_name, section $section in $wf_action" );
 
@@ -192,28 +192,28 @@ sub render_key_select {
 
     $self->logger()->trace( 'render_profile_select with args: ' . Dumper $args );
 
-    my $wf_info = $args->{WF_INFO};
-    my $context = $wf_info->{WORKFLOW}->{CONTEXT};
+    my $wf_info = $args->{wf_info};
+    my $context = $wf_info->{workflow}->{context};
 
     # Get the list of allowed algorithms
-    my $key_alg = $self->send_command( 'get_key_algs', { PROFILE => $context->{cert_profile} });
+    my $key_alg = $self->send_command_v2( 'get_key_algs', { profile => $context->{cert_profile} });
     my @key_type;
     foreach my $alg (@{$key_alg}) {
        push @key_type, { label => 'I18N_OPENXPKI_UI_KEY_ALG_'.uc($alg) , value => $alg };
     }
 
-    my $key_gen_param_names = $self->send_command( 'get_key_params', { PROFILE => $context->{cert_profile} });
+    my $key_gen_param_names = $self->send_command_v2( 'get_key_params', { profile => $context->{cert_profile} });
 
     # current values from context when changing values!
     my $key_gen_param_values = $context->{key_gen_params} ? $self->serializer()->deserialize( $context->{key_gen_params} ) : {};
 
     # Encryption
-    my $key_enc = $self->send_command( 'get_key_enc', { PROFILE => $context->{cert_profile} });
+    my $key_enc = $self->send_command_v2( 'get_key_enc', { profile => $context->{cert_profile} });
     my @enc = map { { value => $_, label => 'I18N_OPENXPKI_UI_KEY_ENC_'.uc($_)  }  } @{$key_enc};
 
     my @fields;
     FIELDS:
-    foreach my $field (@{$wf_info->{ACTIVITY}->{$wf_action}->{field}}) {
+    foreach my $field (@{$wf_info->{activity}->{$wf_action}->{field}}) {
         my $name = $field->{name};
 
         if ($name eq 'key_gen_params') {
@@ -277,15 +277,15 @@ sub render_server_password {
 
     $self->logger()->trace( 'render_server_password with args: ' . Dumper $args );
 
-    my $wf_info = $args->{WF_INFO};
-    my $context = $wf_info->{WORKFLOW}->{CONTEXT};
+    my $wf_info = $args->{wf_info};
+    my $context = $wf_info->{workflow}->{context};
 
     my @fields;
     my $pwdfailed = 0;
-    foreach my $field (@{$wf_info->{ACTIVITY}->{$wf_action}->{field}}) {
+    foreach my $field (@{$wf_info->{activity}->{$wf_action}->{field}}) {
         my $value;
         if ($field->{name} eq '_password') {
-            $value = $self->send_command( 'get_random', { LENGTH => 16 });
+            $value = $self->send_command_v2( 'get_random', { length => 16 });
             if (!$value) {
                 $self->set_status('I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_ERROR_LABEL','error');
                 $self->add_section({
@@ -306,7 +306,7 @@ sub render_server_password {
 
     # record the workflow info in the session
     push @fields, $self->__register_wf_token($wf_info, {
-        wf_action =>  (keys %{$wf_info->{ACTIVITY}})[0],
+        wf_action =>  (keys %{$wf_info->{activity}})[0],
         wf_fields => \@fields,
         cert_profile => $context->{cert_profile}
     });

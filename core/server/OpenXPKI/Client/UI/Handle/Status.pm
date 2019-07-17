@@ -16,7 +16,7 @@ sub render_process_status {
     $self->logger()->trace( 'render_process_status: ' . Dumper $args );
 
 
-    my $process = $self->send_command( 'list_process' );
+    my $process = $self->send_command_v2( 'list_process' );
 
     $self->logger()->trace("result: " . Dumper $process );
 
@@ -62,7 +62,7 @@ sub render_system_status {
     my $self = shift; # reference to the wrapping workflow/result
     my $args = shift;
 
-    my $wf_info = $args->{WF_INFO};
+    my $wf_info = $args->{wf_info};
 
     my $status = $self->send_command_v2("get_ui_system_status");
 
@@ -163,14 +163,14 @@ sub render_system_status {
 
     # we fetch the list of tokens to display from the context
     # this allows a user to configure this
-    my @token = split /\s*,\s*/, $wf_info->{WORKFLOW}->{CONTEXT}->{token};
+    my @token = split /\s*,\s*/, $wf_info->{workflow}->{context}->{token};
 
-    $self->logger()->trace("context: " . Dumper $wf_info->{WORKFLOW}->{CONTEXT} );
+    $self->logger()->trace("context: " . Dumper $wf_info->{workflow}->{context} );
 
 
     foreach my $type (@token) {
 
-        my $token = $self->send_command( 'list_active_aliases', { TYPE => $type, CHECK_ONLINE => 1 } );
+        my $token = $self->send_command_v2( 'list_active_aliases', { type => $type, check_online => 1 } );
 
         $self->logger()->trace("result: " . Dumper $token );
 

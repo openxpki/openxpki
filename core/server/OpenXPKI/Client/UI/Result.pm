@@ -605,9 +605,9 @@ sub __register_wf_token {
     my $wf_info = shift;
     my $token = shift;
 
-    $token->{wf_id} = $wf_info->{WORKFLOW}->{ID};
-    $token->{wf_type} = $wf_info->{WORKFLOW}->{TYPE};
-    $token->{wf_last_update} = $wf_info->{WORKFLOW}->{LAST_UPDATE};
+    $token->{wf_id} = $wf_info->{workflow}->{id};
+    $token->{wf_type} = $wf_info->{workflow}->{type};
+    $token->{wf_last_update} = $wf_info->{workflow}->{last_update};
 
     my $id = $self->__generate_uid();
     $self->logger()->debug('wf token id ' . $id);

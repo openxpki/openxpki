@@ -10,7 +10,7 @@ sub render_report_list {
     my $self = shift; # reference to the wrapping workflow/result
     my $args = shift;
 
-    my $wf_info = $args->{WF_INFO}->{WORKFLOW};
+    my $wf_info = $args->{wf_info}->{workflow};
 
     $self->logger()->trace( 'render_report_list: ' . Dumper $wf_info );
 
@@ -19,7 +19,7 @@ sub render_report_list {
         description => $wf_info->{description},
     });
 
-    my @data = @{$wf_info->{CONTEXT}->{report_list}};
+    my @data = @{$wf_info->{context}->{report_list}};
     my @source;
     my $i=0;
     # use a multivalued fetchid to prevent unauthorized download
