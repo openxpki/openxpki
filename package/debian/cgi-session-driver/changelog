@@ -1,5 +1,5 @@
-openxpki-cgi-session-driver (2.2.0-ef4b9b8) unstable; urgency=low
+openxpki-cgi-session-driver (2.5.4-0) unstable; urgency=low
 
-  * Development build 
+  * Release build v2.5.4 
 
- -- OpenXPKI Foundation <debian@openxpki.org>  Wed, 05 Sep 2018 13:50:15 +0000
+ -- OpenXPKI Foundation <debian@openxpki.org>  Thu, 18 Jul 2019 11:51:03 +0000

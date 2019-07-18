@@ -15,8 +15,8 @@ Description: CGI Session Driver for OpenXPKI
  This package contains a session database handler based on CGI::Session
  .
  Packaging information:
- OpenXPKI version       2.2.0
- Git commit hash:       ef4b9b861117478110296bbb68b38ca17e6b556b
- Git description:       v2.1.2-89-gef4b9b8
- Git tags:               <no tag set>
+ OpenXPKI version       2.5.4
+ Git commit hash:       77c36920ba44701cf24f0dcec695badb2f219f0b
+ Git description:       v2.5.4
+ Git tags:              v2.5.4
 
