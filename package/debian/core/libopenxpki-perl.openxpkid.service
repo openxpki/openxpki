@@ -5,8 +5,8 @@ After=network.target apache2.service
 [Service]
 Type=exec
 PIDFile=/var/run/openxpkid.pid
-ExecStart=/opt/myperl/bin/openxpkictl start --nd
-ExecStop=/opt/myperl/bin/openxpkictl stop
+ExecStart=/usr/bin/openxpkictl start --nd
+ExecStop=/usr/bin/openxpkictl stop
 # We want systemd to give the daemon some time to finish gracefully, but still want
 # it to kill httpd after TimeoutStopSec if something went wrong during the
 # graceful stop. Normally, Systemd sends SIGTERM signal right after the
