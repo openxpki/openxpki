@@ -574,6 +574,7 @@ OpenXPKI/Server/Workflow/Validator/RelativeDate.pm
 OpenXPKI/Server/Workflow/Validator/CertIdentifierExists.pm
 OpenXPKI/Server/Workflow/Validator/ValidityWindow.pm
 OpenXPKI/Server/Workflow/Validator/ValidCertificate.pm
+OpenXPKI/Server/Workflow/Validator/WFHash.pm
 OpenXPKI/Server/Workflow/Validator/Connector.pm
 OpenXPKI/Server/Workflow/Validator/Regex.pm
 
