@@ -178,17 +178,17 @@ sub render_system_status {
         foreach my $alias (@{$token}) {
 
             my $className = '';
-            if ($alias->{STATUS} ne 'ONLINE') {
+            if ($alias->{status} ne 'ONLINE') {
                 $className = 'danger';
                 $critical = 1;
             }
 
             push @result, [
-                $alias->{ALIAS},
-                $alias->{IDENTIFIER},
-                $alias->{STATUS},
-                $alias->{NOTBEFORE} + 0,
-                $alias->{NOTAFTER} + 0,
+                $alias->{alias},
+                $alias->{identifier},
+                $alias->{status},
+                $alias->{notbefore} + 0,
+                $alias->{notafter} + 0,
                 $className
             ];
         }
