@@ -70,9 +70,7 @@ digest: sha256
 increasing_serials: 1
 randomized_serial_bytes: 8
 
-
 publish:
-  - queue
   - disk
 
 # Profile extensions - set 0/1 as needed

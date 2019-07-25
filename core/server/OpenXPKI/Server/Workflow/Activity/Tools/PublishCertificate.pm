@@ -7,7 +7,6 @@ use strict;
 use English;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
-use OpenXPKI::DN;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
@@ -40,6 +39,9 @@ sub execute {
     my @path;
     # Detect if we are in profile or prefix mode
     my $prefix = $self->param('prefix');
+
+    my $unpublish = $self->param('unpublish') || 0;
+
     if (defined $prefix) {
         if (!$prefix || !$config->exists( $prefix )) {
             CTX('log')->application()->debug('Publication in prefix mode but prefix not set or empty');
@@ -66,11 +68,11 @@ sub execute {
         }
 
         # Check if the node exists inside the profile
-
-        if ($config->exists([ 'profile', $profile, 'publish'])) {
-            @target = $config->get_scalar_as_list( [ 'profile', $profile, 'publish'] );
+        my $config_key = $unpublish ? 'unpublish' : 'publish';
+        if ($config->exists([ 'profile', $profile, ])) {
+            @target = $config->get_scalar_as_list( [ 'profile', $profile, $config_key ] );
         } else {
-            @target = $config->get_scalar_as_list( [ 'profile', 'default', 'publish'] );
+            @target = $config->get_scalar_as_list( [ 'profile', 'default', $config_key ] );
         }
 
         # Reuse the prefix value to build the full path
@@ -84,38 +86,38 @@ sub execute {
 
     ##! 16: 'Start publishing - load certificate for identifier ' . $cert_identifier
 
+
+    my @cols = (not $unpublish) ? ('data', 'subject')
+        : ('data', 'subject', 'reason_code', 'revocation_time', 'invalidity_time');
+
     # Load and convert the certificate
-    my $cert = CTX('dbi')->select_one(
+    my $data = CTX('dbi')->select_one(
         from => 'certificate',
-        columns => [ 'data', 'subject' ],
+        columns => \@cols,
         where => {
            identifier => $cert_identifier,
         },
     );
 
-    if (!$cert || !$cert->{data}) {
+    if (!$data || !$data->{data}) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CERTIFICATE_UNABLE_TO_LOAD_CERTIFICATE',
+            message => 'Unable to load given certificate in PublishCertificate',
             params => { 'CERT_IDENTIFIER' => $cert_identifier },
         );
     }
 
-    CTX('log')->application()->debug('Publication for ' . $cert->{subject} . ', targets ' . join(",", @target));
+    CTX('log')->application()->debug('Publication for ' . $data->{subject} . ', targets ' . join(",", @target));
 
 
     # Prepare the data
-    my $data = {};
-    $data->{pem} = $cert->{data};
-    $data->{subject} = $cert->{subject};
-
-    # Convert to DER
-    $data->{der} = OpenXPKI::Crypt::X509->new( $cert->{data} )->data;
-
-    if (!defined $data->{der} || $data->{der} eq '') {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CERTIFICATES_COULD_NOT_CONVERT_CERT_TO_DER',
-        );
+    my $x509 = OpenXPKI::Crypt::X509->new( $data->{data} );
+    if (!$x509) {
+        OpenXPKI::Exception->throw( message => 'Unable to parse certificate in PublishCertificate' );
     }
+
+    delete $data->{data};
+    $data->{pem} = $x509->pem;
+    $data->{der} = $x509->data;
 
     # Check for publication key
     my $publish_key = $self->param('publish_key');
@@ -129,17 +131,16 @@ sub execute {
 
     # No publication key set, parse out CN
     if (!$publish_key) {
-        # Strip the common name to be used as publishing key
-        my $dn_parser = OpenXPKI::DN->new( $data->{subject} );
-        my %rdn_hash = $dn_parser->get_hashed_content();
+        my $rdn_hash = $x509->subject_hash();
 
+        $publish_key = $rdn_hash->{CN}->[0];
         # something went wrong - no CN set?
-        if (!$rdn_hash{CN}[0]) {
+        if (!$publish_key) {
             OpenXPKI::Exception->throw(
                 message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CERTIFICATES_UNABLE_TO_PARSE_SUBJECT',
             );
         }
-        $publish_key = $rdn_hash{CN}[0];
+
     }
 
 
@@ -221,6 +222,8 @@ associated with the certificate profile or a given prefix. The certificate is
 identified by the parameter cert_identifier which can be set in the action
 definition. If unset, the class falls back to the context value of cert_identifier.
 
+=head2 Publication by Profile
+
 The publishing information is read from the connector at profile.<profile name>.publish
 which must be a list of names (scalar is also ok). If the node does not exists,
 profile.default.publish is used. Each name is expanded to the path
@@ -228,11 +231,28 @@ publishing.entity.<name> which must be a connector reference. The publication
 target is taken from the parameter I<publish_key> or defaults to the certificates
 common name (CN attribute parsed from the final subject). The data portion
 contains a hash ref with the keys I<pem>, I<der> and I<subject> (full dn of the cert).
+
 Note: if the evaluation of I<publish_key> is empty but defined, the publication
 is stopped.
 
-To use profile independant publication, specify the parameter I<prefix> which must
-point to a scalar/list of connector references.
+=head2 Un-Publish
+
+If you set I<unpublish> to a true value, the list of connectors is read from
+the configuration at profile.<profile name>.unpublish (or
+profile.default.unpublish).
+
+The data portion is extended by the fields I<revocation_time>, I<reason_code>
+and I<invalidity_time>. Fields are present even for non-revoked certificates.
+
+=head2 Publication without Profile
+
+Instead of reading the publication targets from the profile you can point
+the activity directly to a list of connectors setting I<prefix> to the base
+path of a hash. Each key is the internal name of the target, the value must
+be a connector reference.
+
+If I<unpublish> is set, the extra fields in data hash are present but the
+list of targets remains the same.
 
 =head1 Configuration
 
@@ -272,6 +292,10 @@ of the context key cert_identifier.
 The value to be used as key for the publication call, optional.
 E.g. to publish using the context value with key "user_email" set
 this to "$user_email".
+
+=item unpublish
+
+Boolean, adds revocation information and changes config node to read targets.
 
 =item export_context
 

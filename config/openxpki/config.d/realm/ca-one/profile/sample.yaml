@@ -17,8 +17,16 @@ digest: sha256
 increasing_serials: 1
 randomized_serial_bytes: 8
 
-# weather to publish the certificate
-publish: 1
+# publish certificates to this connector (as defined at publishing.entity)
+publish:
+  - ldap
+
+# used when OpenXPKI::Server::Workflow::Activity::Tools::PublishCertificate
+# is called in unpublish mode, can be used e.g. to update OCSP on revocation
+# or remove certificate from LDAP after expiration.
+# It is NOT used by the default workflows today
+unpublish:
+  - ocsp
 
 style:
     00_basic_style:

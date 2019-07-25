@@ -1,9 +1,8 @@
 # Where to publish entity certificates
 entity:
-    queue@: connector:publishing.connectors.queue
     ldap@: connector:publishing.connectors.ldap-ext
     disk@: connector:publishing.connectors.local
-    
+
 crl:
     crl@: connector:publishing.connectors.cdp
 
@@ -22,12 +21,12 @@ connectors:
             der: usercertificate;binary
 
         create:
-            basedn: ou=people,dc=mycompany,dc=com            
+            basedn: ou=people,dc=mycompany,dc=com
             rdnkey: cn
-            
+
         schema:
-            cn: 
-                objectclass: inetOrgPerson    
+            cn:
+                objectclass: inetOrgPerson
                 values:
                     sn: copy:self
                     ou: IT Department
@@ -37,17 +36,6 @@ connectors:
         LOCATION: /tmp/
         file: "[% ARGS.0 %].crt"
         content: "[% pem %]"
-
-
-    queue:
-        class: OpenXPKI::Connector::DataPool
-        LOCATION: export.smartcard.transfer
-        key: "[% EXTRA.cert_identifier %]"
-        value: 
-            EmployeeID: "[% EXTRA.userinfo_employee_id %]"
-            certType: enc
-            email: "[% EXTRA.userinfo_mail %]"
-            creator: "[% EXTRA.creator %]"
 
     cdp:
         class: Connector::Builtin::File::Path
