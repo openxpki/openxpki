@@ -63,7 +63,7 @@ sub START {
     if(!Log::Log4perl->initialized()) {
         Log::Log4perl->easy_init($ERROR);
     }
-    $logger_of{$ident} = Log::Log4perl->get_logger('system.crypto');
+    $logger_of{$ident} = Log::Log4perl->get_logger('openxpki.system');
 
     $fu_of{$ident} = OpenXPKI::FileUtils->new({ TMP => $arg_ref->{TMP} });
 
