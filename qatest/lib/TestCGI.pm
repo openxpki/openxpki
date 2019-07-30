@@ -196,6 +196,31 @@ sub get_field_from_result {
     return undef;
 }
 
+
+sub prefill_from_result {
+
+    my $self = shift;
+    my $use_placeholder = shift || 0;
+    my $json = $self->last_result();
+    if (!(ref $json->{main} && $json->{main}->[0]->{content}->{fields})) {
+        return {};
+    }
+
+    my $data = {};
+    foreach my $key (@{ $json->{main}->[0]->{content}->{fields} }) {
+        my $t = $json->{main}->[0]->{content}->{fields}->{$key};
+        my $k = $t->{name};
+        next if ($k eq 'wf_token' || $k eq 'action');
+        my $v = $t->{value};
+        if ($use_placeholder && (!defined $v || $v eq '') && $t->{placeholder}) {
+            $v = $t->{placeholder};
+        }
+        $data->{$k} = $v if (defined $v); 
+    }
+    return $data;
+}
+
+
 sub fail_workflow {
 
     my $self = shift;
@@ -217,7 +242,12 @@ sub fail_workflow {
 # Static call that generates a ready-to-use client
 sub factory {
 
-    my $client = TestCGI->new();
+    my $p = { realm =>  shift };
+    my $user = shift || 'raop1';
+
+    my $client = TestCGI->new( %$p );
+
+    $client->mock_request({});
 
     $client->update_rtoken();
 
@@ -230,7 +260,7 @@ sub factory {
 
     $client ->mock_request({
         'action' => 'login!password',
-        'username' => 'raop',
+        'username' => $user,
         'password' => 'openxpki'
     });
 
