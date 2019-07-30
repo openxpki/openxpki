@@ -58,7 +58,7 @@ sub execute {
         # Profile mode
 
         ##! 16: 'Lookup profile for identifier ' . $cert_identifier
-        my $profile = CTX('api')->get_profile_for_cert({ IDENTIFIER => $cert_identifier });
+        my $profile = CTX('api2')->get_profile_for_cert( identifier => $cert_identifier );
 
         if (!$profile) {
             OpenXPKI::Exception->throw(

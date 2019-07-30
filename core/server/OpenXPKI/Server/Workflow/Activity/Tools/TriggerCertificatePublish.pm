@@ -39,8 +39,9 @@ sub execute {
     if (!$params->{prefix}) {
         # Profile based publication, check for publication options
         my $cert_profile = $context->param('cert_profile');
-        if (!CTX('config')->get_scalar_as_list(['profile', $cert_profile, 'publish' ] ) &&
-            !CTX('config')->get_scalar_as_list(['profile', 'default', 'publish' ] )) {
+        my $config_key = $params->{unpublish} ? 'unpublish' : 'publish';
+        if (!CTX('config')->get_scalar_as_list(['profile', $cert_profile, $config_key ] ) &&
+            !CTX('config')->get_scalar_as_list(['profile', 'default', $config_key ] )) {
 
             ##! 32: 'Publishing not enabled for profile ' . $cert_profile
             CTX('log')->application()->debug('Publishing not enabled for profile ' . $cert_profile);
@@ -102,6 +103,11 @@ Name of the workflow that should be created, default is certificate_publishing
 =item prefix
 
 Prefix to list of publishing connectors, default is profile based publishing.
+
+=item unpublish
+
+If set and profile mode is active, the attribute I<unpublish> will be checked
+instead of I<publish>.
 
 =back
 
