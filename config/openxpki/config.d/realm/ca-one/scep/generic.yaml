@@ -119,7 +119,7 @@ challenge:
 
 eligible:
     initial:
-       value@: connector:scep.scep-server-1.connector.initial
+       value@: connector:scep.generic.connector.initial
        args: '[% context.cert_subject_parts.CN.0 %]'
        expect:
          - Build
