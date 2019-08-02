@@ -14,7 +14,7 @@ use Test::More tests => 3;
 package main;
 
 my $result;
-my $client = TestCGI::factory();
+my $client = TestCGI::factory('ca-one');
 
 # create temp dir
 -d "tmp/" || mkdir "tmp/";

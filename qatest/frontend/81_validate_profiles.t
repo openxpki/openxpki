@@ -16,7 +16,7 @@ use Test::More;
 package main;
 
 my $result;
-my $client = TestCGI::factory();
+my $client = TestCGI::factory('ca-one');
 
 -d "samples" || die "Please put your certificate samples into the samples/ directory";
 

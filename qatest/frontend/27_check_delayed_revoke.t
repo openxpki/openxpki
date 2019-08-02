@@ -14,7 +14,7 @@ use Test::More tests => 3;
 package main;
 
 my $result;
-my $client = TestCGI::factory();
+my $client = TestCGI::factory('ca-one');
 
 my $cert_identifier = do { # slurp
     local $INPUT_RECORD_SEPARATOR;

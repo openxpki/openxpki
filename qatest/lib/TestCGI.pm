@@ -215,7 +215,7 @@ sub prefill_from_result {
         if ($use_placeholder && (!defined $v || $v eq '') && $t->{placeholder}) {
             $v = $t->{placeholder};
         }
-        $data->{$k} = $v if (defined $v); 
+        $data->{$k} = $v if (defined $v);
     }
     return $data;
 }
@@ -243,7 +243,7 @@ sub fail_workflow {
 sub factory {
 
     my $p = { realm =>  shift };
-    my $user = shift || 'raop1';
+    my $user = shift || 'raop';
 
     my $client = TestCGI->new( %$p );
 
