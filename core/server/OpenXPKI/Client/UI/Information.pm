@@ -43,7 +43,7 @@ sub init_issuer {
     my $self = shift;
     my $args = shift;
 
-    my $issuers = $self->send_command( 'get_ca_list' );
+    my $issuers = $self->send_command_v2( 'get_ca_list' );
     $self->logger()->trace("result: " . Dumper $issuers);
 
     $self->_page({
@@ -54,12 +54,12 @@ sub init_issuer {
     my @result;
     foreach my $cert (@{$issuers}) {
         push @result, [
-            $self->_escape($cert->{SUBJECT}),
-            $cert->{NOTBEFORE},
-            $cert->{NOTAFTER},
-            'I18N_OPENXPKI_UI_TOKEN_STATUS_'.$cert->{STATUS},
-            $cert->{IDENTIFIER},
-            lc($cert->{STATUS})
+            $self->_escape($cert->{subject}),
+            $cert->{notbefore},
+            $cert->{notafter},
+            'I18N_OPENXPKI_UI_TOKEN_STATUS_'.$cert->{status},
+            $cert->{identifier},
+            lc($cert->{status})
         ];
     }
 

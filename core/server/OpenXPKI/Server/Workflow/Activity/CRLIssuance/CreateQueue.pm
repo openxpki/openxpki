@@ -35,15 +35,15 @@ sub execute {
 
     # Determine the name of the key group for cert signing
     my $group_name = $config->get("crypto.type.certsign");
-    my $active_ca_token = CTX('api')->list_active_aliases( { GROUP => $group_name } );
+    my $active_ca_token = CTX('api2')->list_active_aliases( group => $group_name );
 
     ##! 32: "Active tokens found " . Dumper $active_ca_token
 
-    # Force is, schedule all cas
+    # Force is set, schedule all cas
     if ($context->param('force_issue')) {
         #! 8: 'Force update on all cas'
         foreach my $ca (@{$active_ca_token}) {
-            $ca_alias_list->push($ca->{ALIAS});
+            $ca_alias_list->push($ca->{alias});
         }
         CTX('log')->application()->info("Forced CRL update requested on realm $pki_realm");
         return 1;
@@ -87,16 +87,16 @@ sub execute {
     # Check latest crl for each issuer
     foreach my $ca (@{$active_ca_token}) {
 
-        ##! 16: ' Probing '. $ca->{IDENTIFIER}
-        if ($ca_identifier{ $ca->{IDENTIFIER} }) {
-            ##! 32: ' ca '. $ca->{IDENTIFIER} .' already scheduled - skip checks '
-            $ca_alias_list->push($ca->{ALIAS});
+        ##! 16: ' Probing '. $ca->{identifier}
+        if ($ca_identifier{ $ca->{identifier} }) {
+            ##! 32: ' ca '. $ca->{identifier} .' already scheduled - skip checks '
+            $ca_alias_list->push($ca->{alias});
             next;
         }
 
         my $renewal;
         # Check if there is a named profile
-        my $profile_renewal = $config->get("crl.".$ca->{ALIAS}.".validity.renewal");
+        my $profile_renewal = $config->get("crl.".$ca->{alias}.".validity.renewal");
         if ($profile_renewal) {
             $renewal = OpenXPKI::DateTime::get_validity({
                 VALIDITY => $profile_renewal,
@@ -111,20 +111,20 @@ sub execute {
             columns => [ 'issuer_identifier', 'next_update' ],
             where => {
                 pki_realm => $pki_realm,
-                issuer_identifier => $ca->{IDENTIFIER},
+                issuer_identifier => $ca->{identifier},
                 next_update => { '>' => $renewal->epoch() },
             },
         );
 
         if ($crl) {
-            ##! 32: ' ca '. $ca->{IDENTIFIER} .' has crl beyond next renewal date '
-            CTX('log')->application()->debug(' ca '. $ca->{IDENTIFIER} .' has crl beyond next renewal date ');
+            ##! 32: ' ca '. $ca->{identifier} .' has crl beyond next renewal date '
+            CTX('log')->application()->debug(' ca '. $ca->{identifier} .' has crl beyond next renewal date ');
 
             next;
         }
 
-        ##! 16: ' ca '. $ca->{IDENTIFIER} .' near expiry - updating'
-        $ca_alias_list->push($ca->{ALIAS});
+        ##! 16: ' ca '. $ca->{identifier} .' near expiry - updating'
+        $ca_alias_list->push($ca->{alias});
 
     }
 

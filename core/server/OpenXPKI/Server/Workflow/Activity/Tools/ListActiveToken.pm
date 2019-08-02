@@ -44,7 +44,7 @@ sub execute {
         configuration_error( 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_LIST_ACTIVE_TOKEN_NO_GROUP_OR_TYPE_GIVEN' );
     }
 
-    my $token_list = CTX('api')->list_active_aliases( { GROUP => $group_name } );
+    my $token_list = CTX('api2')->list_active_aliases( group => $group_name );
 
     if (!@{$token_list} && !$self->param('empty_ok')) {
         workflow_error(
@@ -54,7 +54,7 @@ sub execute {
     }
 
     ##! 32: "Active tokens found " . Dumper $token_list
-    my @token_alias_list = map { $_->{ALIAS} } @{$token_list};
+    my @token_alias_list = map { $_->{alias} } @{$token_list};
 
     $context->param( $target_key  => \@token_alias_list );
 
