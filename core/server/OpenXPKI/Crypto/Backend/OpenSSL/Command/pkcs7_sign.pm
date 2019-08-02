@@ -69,7 +69,7 @@ sub get_command {
       OpenXPKI::Exception->throw( message =>
             "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_CONTENT" );
     }
-    if ( not $self->{CERT} ) {
+    if ( not $self->{CERTFILE} ) {
       OpenXPKI::Exception->throw( message =>
             "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_CERT" );
     }

@@ -28,32 +28,55 @@ Returns C<1> if everything went fine, C<undef> otherwise.
 
 =cut
 sub is_token_usable {
-    my ($self, $token) = positional_args(\@_, # OpenXPKI::MooseParams
+    my ($self, $token, $check) = positional_args(\@_, # OpenXPKI::MooseParams
         { isa => 'OpenXPKI::Crypto::API' },
+        { isa => 'Str', default => 'sign' },
     );
 
     ##! 1: 'start'
     my $result = try {
-        CTX('log')->application()->debug('Check if token is usable using crypto operation');
+
+        CTX('log')->application()->debug("Check if token is usable using $check operation");
 
         ##! 64: 'Entering test'
-        my $base = 'OpenXPKI Encryption Test';
-        my $encrypted = $token->command({ COMMAND => 'pkcs7_encrypt', CONTENT => $base });
-        my $decrypted = $token->command({ COMMAND => 'pkcs7_decrypt', PKCS7 => $encrypted });
+        my $base = 'OpenXPKI Token Online Test';
 
-        ##! 16: "pkcs7 roundtrip done"
-        if ($decrypted ne $base) {
+        if ($check eq 'sign') {
+
+            my $pkcs7 = $token->command({ COMMAND => 'pkcs7_sign', CONTENT =>$base });
+            my $verified = $token->command({ COMMAND => 'pkcs7_verify', PKCS7   => $pkcs7, NO_CHAIN => 1 });
+
+            if (!$verified) {
+                OpenXPKI::Exception->throw (
+                    message => 'token usable test failed (sign)',
+                    params => { token_backend_class => ref $token->get_instance }
+                );
+            }
+
+        } elsif ($check eq 'encrypt') {
+
+            my $encrypted = $token->command({ COMMAND => 'pkcs7_encrypt', CONTENT => $base });
+            my $decrypted = $token->command({ COMMAND => 'pkcs7_decrypt', PKCS7 => $encrypted });
+
+            ##! 16: "pkcs7 roundtrip done"
+            if ($decrypted ne $base) {
+                OpenXPKI::Exception->throw (
+                    message => 'Mismatch after encrypt/decrypt roundtrip during token test',
+                    params => { token_backend_class => ref $token->get_instance }
+                );
+            }
+
+        } else {
             OpenXPKI::Exception->throw (
-                message => 'Mismatch after encrypt/decrypt roundtrip during token test',
-                params => { token_backend_class => ref $token->get_instance }
+                message => 'Invalid check type for is_token_usable',
+                params => { check => $check }
             );
         }
-
         return 1;
     }
     catch {
         ##! 8: 'pkcs7 roundtrip failed'
-        return;
+        return 0;
     };
 
     return $result;
