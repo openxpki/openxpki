@@ -282,7 +282,9 @@ sub render_server_password {
 
     my @fields;
     my $pwdfailed = 0;
-    foreach my $field (@{$wf_info->{activity}->{$wf_action}->{field}}) {
+
+    my $wf_action_info = $wf_info->{activity}->{$wf_action};
+    foreach my $field (@{$wf_action_info->{field}}) {
         my $value;
         if ($field->{name} eq '_password') {
             $value = $self->send_command_v2( 'get_random', { length => 16 });
@@ -315,7 +317,7 @@ sub render_server_password {
         type => 'form',
         action => 'workflow',
         content => {
-        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
+        submit_label => $wf_action_info->{button} || 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
             fields => \@fields
         }
     });

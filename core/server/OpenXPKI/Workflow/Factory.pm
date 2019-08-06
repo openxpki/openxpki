@@ -149,7 +149,7 @@ sub get_action_info {
     }
 
     my $action = { name => $action_name, label => $action_name };
-    foreach my $key (qw(label tooltip description abort resume uihandle)) {
+    foreach my $key (qw(label tooltip description abort resume uihandle button)) {
         my $val = $conn->get([ @path, $key]);
         if (defined $val) {
             $action->{$key} = $val;

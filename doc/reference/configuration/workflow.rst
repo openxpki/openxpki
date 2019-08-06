@@ -21,6 +21,16 @@ Each workflow is represented by a file or directory structure below ``workflow.d
             hint:
                 name_of_action: A verbose text shown aside of the button
                 name_of_other_action: A verbose text shown aside of the button
+            button:
+                name_of_action:
+                    label: Label to put on the button (default is label from action)
+                    format: layout of the button = assigned stylesheet
+                    # add a confirmation popup when button is pressed
+                    confirm:
+                        label: Headline of the popup dialog
+                        description: Text inside the popup
+                        confirm: label of the proceed button
+                        cancel: label of the abort button
 
     action:
         name_of_action: (as used above)
@@ -28,6 +38,7 @@ Each workflow is represented by a file or directory structure below ``workflow.d
             tooltip: Hint to show as tooltip on the button
             description: Verbose description, show on UI page
             class: Name of the implementation class
+            button: Label for the submit button (default is "continue")
             abort: state to jump to on abort (UI button, optional) # not implemented yet
             resume: state to jump to on resume (after exception, optional) # not implemented yet
             validator:
