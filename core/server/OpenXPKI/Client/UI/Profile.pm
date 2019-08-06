@@ -18,11 +18,8 @@ sub action_get_styles_for_profile {
     $self->logger()->trace( 'get_styles_for_profile with args: ' . Dumper $args );
 
     my $cert_profile = $self->param('cert_profile');
-    my $styles = $self->send_command( 'get_cert_subject_profiles', { PROFILE => $cert_profile });
-
-    # TODO clean up API after Mason decomissioning
-    # Transform hash into value/label list and sort it
-    my @styles = map { { value => $_, label => $styles->{$_}->{LABEL}, description => $styles->{$_}->{DESCRIPTION} } } keys %{$styles};
+    my $styles = $self->send_command_v2( 'get_cert_subject_profiles', { profile => $cert_profile });
+    my @styles = sort { lc($a->{value}) cmp lc($b->{value}) } values %{$styles};
 
     if (scalar @styles == 0) {
         @styles = ({ value => '', label => 'I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST'});

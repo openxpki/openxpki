@@ -37,7 +37,7 @@ sub render_profile_select {
     my @styles;
     if ($cert_profile) {
         my $styles = $self->send_command_v2( 'get_cert_subject_profiles', { profile => $cert_profile });
-        my @styles = sort { lc($a->{label}) cmp lc($b->{label}) } values %{$styles};
+        @styles = sort { lc($a->{value}) cmp lc($b->{value}) } values %{$styles};
     }
 
     my @fields;
@@ -143,7 +143,7 @@ sub render_subject_form {
 
     my @fielddesc;
     foreach my $field (@{$fields}) {
-        push @fielddesc, { label => $field->{LABEL}, value => $field->{DESCRIPTION}, format => 'raw' } if ($field->{DESCRIPTION});
+        push @fielddesc, { label => $field->{label}, value => $field->{description}, format => 'raw' } if ($field->{description});
     }
 
     $self->logger()->trace( 'Preset ' . Dumper $values );
