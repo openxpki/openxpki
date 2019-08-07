@@ -4,17 +4,10 @@ head:
     description: I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_DESC
 
 state:
-    APPROVED:
-        autorun: 1
-        action:
-          - load_key_password > KEY_PASSWORD_LOADED ? server_key_generation
-          - global_noop > REQUEST_COMPLETE ?  !server_key_generation
-
     BUILD_SUBJECT:
         autorun: 1
         action:
           - global_render_subject set_workflow_attributes check_policy_dns check_policy_subject_duplicate check_policy_key_duplicate > SUBJECT_COMPLETE
-
 
     CHECK_VALIDITY:
         autorun: 1
@@ -42,7 +35,6 @@ state:
                 label: I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CONFIRM_LABEL
                 description: I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CONFIRM_DESC
 
-
     UPDATE_REQUEST:
         autorun: 1
         action:
@@ -59,11 +51,6 @@ state:
         action:
           - global_noop > PENDING ? !has_policy_violation
           - global_noop2 > PENDING_POLICY_VIOLATION ? has_policy_violation
-
-    CLEANUP_KEY_PASSWORD:
-        autorun: 1
-        action:
-          - cleanup_key_password > NICE_SEND_NOTIFICATION
 
     CLEANUP_BEFORE_CANCEL:
         autorun: 1
@@ -86,13 +73,6 @@ state:
         action:
           - edit_cert_info > BUILD_SUBJECT ? profile_has_info_section
           - global_skip  > BUILD_SUBJECT ? !profile_has_info_section
-
-    ENTER_KEY_PASSWORD:
-        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_LABEL
-        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_DESC
-        action:
-          - retype_server_password > PERSIST_KEY_PASSWORD ? key_password_server
-          - ask_client_password > PERSIST_KEY_PASSWORD ? !key_password_server
 
     ENTER_SAN:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_LABEL
@@ -154,16 +134,6 @@ state:
           global_cancel:
             format: failure
 
-    KEY_GENERATED:
-        autorun: 1
-        action:
-          - generate_pkcs10 > PKCS10_GENERATED
-
-    KEY_PASSWORD_LOADED:
-        autorun: 1
-        action:
-          - generate_key > KEY_GENERATED ? server_key_generation
-
     NICE_CERTIFICATE_ISSUED:
         autorun: 1
         action:
@@ -177,8 +147,7 @@ state:
     NICE_METADATA_PERSISTED:
         autorun: 1
         action:
-          - rename_private_key > CLEANUP_KEY_PASSWORD ? server_key_generation
-          - global_noop > NICE_SEND_NOTIFICATION ?  !server_key_generation
+          - global_noop > NICE_SEND_NOTIFICATION
 
     NICE_PICKUP_CERTIFICATE:
         autorun: 1
@@ -210,7 +179,7 @@ state:
     NOTIFY_REJECT:
         autorun: 1
         action:
-          - notify_rejected > REJECTED
+          - notify_rejected global_remove_pkey_from_datapool > REJECTED
 
     ONHOLD:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ONHOLD_LABEL
@@ -286,13 +255,6 @@ state:
           put_request_on_hold:
             format: alternative
 
-    PERSIST_KEY_PASSWORD:
-        autorun: 1
-        action:
-          - persist_key_password > ENTER_SUBJECT ? has_password_in_context
-          - global_noop > ENTER_KEY_PASSWORD ? !has_password_in_context
-          # the condition catches interrupted workflows when the vault was not avail
-
     PENDING_POLICY_VIOLATION:
         label:  I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_DESC
@@ -346,11 +308,6 @@ state:
     SET_ISSUER:
         action: set_issuer > RUN_POLICY_CHECKS
 
-    PKCS10_GENERATED:
-        autorun: 1
-        action:
-          - move_key_to_dp > REQUEST_COMPLETE
-
     REJECTED:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_REJECTED_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_REJECTED_DESC
@@ -360,7 +317,7 @@ state:
           - cert_info
           - reject_comment
 
-    REQUEST_COMPLETE:
+    APPROVED:
         autorun: 1
         action:
           - global_persist_csr > NICE_ISSUE_CERTIFICATE
@@ -369,7 +326,7 @@ state:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SETUP_REQUEST_TYPE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SETUP_REQUEST_TYPE_DESC
         action:
-          - provide_server_key_params > ENTER_KEY_PASSWORD ? can_use_server_key
+          - provide_server_key_params > ENTER_SUBJECT ? can_use_server_key
           - upload_pkcs10 > CHECK_FOR_DUPLICATE_KEY ? can_use_client_key
           - select_profile > SETUP_REQUEST_TYPE
         output:
@@ -388,13 +345,12 @@ state:
             description: I18N_OPENXPKI_UI_WORKFLOW_HINT_CHANGE_PROFILE
             format: optional
 
-
     SUBJECT_COMPLETE:
         label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_DESC
         action:
-          - submit > EVAL_ELIGIBILITY ? !has_policy_violation
-          - enter_policy_violation_comment send_pending_notification > PENDING_POLICY_VIOLATION ? has_policy_violation
+          - submit eval_eligibility > CHECK_FOR_SERVER_KEYGEN ? !has_policy_violation
+          - enter_policy_violation_comment > CHECK_FOR_SERVER_KEYGEN ? has_policy_violation
           - global_noop > BUILD_SUBJECT ? has_policy_violation
           - edit_subject > BUILD_SUBJECT
           - edit_san > BUILD_SUBJECT ? profile_has_san_section
@@ -452,6 +408,31 @@ state:
           - cert_profile
           - cert_info
 
+    CHECK_FOR_SERVER_KEYGEN:
+        autorun: 1
+        action:
+          - global_noop > ENTER_KEY_PASSWORD ? server_key_generation
+          - global_noop2 > CHECK_POLICY_VIOLATION ? !server_key_generation
+
+    ENTER_KEY_PASSWORD:
+        label: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_LABEL
+        description: I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_DESC
+        action:
+          - retype_server_password > HAS_KEY_PASSWORD ? key_password_server
+          - ask_client_password > HAS_KEY_PASSWORD ? !key_password_server
+
+    HAS_KEY_PASSWORD:
+        autorun: 1
+        action:
+          - generate_key > KEY_GENERATED ? has_password_in_context
+          - global_noop > ENTER_KEY_PASSWORD ? !has_password_in_context
+
+    KEY_GENERATED:
+        autorun: 1
+        action:
+          - generate_pkcs10 global_store_pkey_in_datapool > CHECK_POLICY_VIOLATION ? has_privkey_and_password_in_context
+          - global_noop > ENTER_KEY_PASSWORD ? !has_privkey_and_password_in_context
+
 action:
     approve_csr:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Approve
@@ -486,12 +467,6 @@ action:
 
     check_policy_key_duplicate:
         class: OpenXPKI::Server::Workflow::Activity::CSR::CheckPolicyKeyDuplicate
-
-    cleanup_key_password:
-        class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::DeleteEntry
-        param:
-            ds_key_param: workflow_id
-            ds_namespace: workflow.csr.keygen_password
 
     edit_cert_info:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetSource
@@ -567,31 +542,17 @@ action:
             _map_key_alg: $key_alg
             _map_key_gen_params: $key_gen_params
             _map_password: $_password
+            target_key: _private_key
 
     generate_pkcs10:
         class: OpenXPKI::Server::Workflow::Activity::CSR::GeneratePKCS10
-
-    load_key_password:
-        class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::GetEntry
         param:
-            _map_key: $workflow_id
-            namespace: workflow.csr.keygen_password
-            target_key: _password
+            _map_private_key: $_private_key
 
     load_issuer_list:
         class: OpenXPKI::Server::Workflow::Activity::Tools::ListActiveToken
         param:
             token: certsign
-
-    move_key_to_dp:
-        class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
-        param:
-            ds_encrypt: 1
-            ds_force: 1
-            ds_key_param: workflow_id
-            ds_namespace: certificate.privatekey
-            ds_unset_context_value: 1
-            ds_value_param: private_key
 
     notify_approval:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
@@ -607,16 +568,6 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::Tools::Notify
         param:
             message: csr_rejected
-
-    persist_key_password:
-        class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
-        param:
-            ds_encrypt: 1
-            ds_force: 1
-            ds_key_param: workflow_id
-            ds_namespace: workflow.csr.keygen_password
-            ds_unset_context_value: 1
-            ds_value_param: _password
 
     persist_metadata:
         class: OpenXPKI::Server::Workflow::Activity::Tools::PersistCertificateMetadata
@@ -658,13 +609,6 @@ action:
         class: OpenXPKI::Server::Workflow::Activity::Noop
         label: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RELEASE_ON_HOLD_LABEL
         description: I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RELEASE_ON_HOLD_DESC
-
-    rename_private_key:
-        class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::ModifyEntry
-        param:
-            ds_key: $workflow_id
-            ds_namespace: certificate.privatekey
-            ds_newkey: $cert_identifier
 
     retype_server_password:
         class: OpenXPKI::Server::Workflow::Activity::Noop
@@ -810,6 +754,11 @@ condition:
         class: Workflow::Condition::Evaluate
         param:
             test: $context->{_password}
+
+    has_privkey_and_password_in_context:
+        class: Workflow::Condition::Evaluate
+        param:
+            test: $context->{_password} && $context->{_private_key}
 
     has_duplicate_key_certificate:
         class: Workflow::Condition::Evaluate
