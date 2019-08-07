@@ -43,9 +43,18 @@ Component = Em.Component.extend
     actions:
         confirmFocusIn: ->
             @set "confirmFocus", true
+            if @get("password") isnt @get("confirm")
+                @set "confirm", ""
+        hintRetype: ->
+            if @get("password") and not @get("confirm")
+                @set "content.error", "Please retype password"
         confirmFocusOut: ->
             @set "confirmFocus", false
             if @get("password") isnt @get("confirm")
-                @set "content.error", "Passwords do not match"
+                if @get("confirm")
+                    @set "content.error", "Passwords do not match"
+                    @set "confirm", ""
+                else
+                    @set "content.error", "Please retype password"
 
 `export default Component`

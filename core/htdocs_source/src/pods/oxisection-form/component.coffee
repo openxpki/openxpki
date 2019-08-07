@@ -27,7 +27,7 @@ Component = Em.Component.extend
         for name in names
             clones = (f for f in fields when f.name is name)
             Em.set clone, "isLast", false for clone in clones
-            Em.set clone, "canDelete", true for clone in clones            
+            Em.set clone, "canDelete", true for clone in clones
             Em.set clones[clones.length-1], "isLast", true
             if clones.length == 1
                 Em.set clones[0], "canDelete", false
@@ -50,7 +50,7 @@ Component = Em.Component.extend
             index = fields.indexOf field
             copy = Em.copy(field)
             copy.value = ""
-            fields.insertAt index+1, copy 
+            fields.insertAt index+1, copy
         delClone: (field) ->
             fields = @get "content.content.fields"
             index = fields.indexOf field
@@ -98,7 +98,10 @@ Component = Em.Component.extend
                     isError = true
                     Em.set field, "error", "Please specify a value"
                 else
-                    delete field.error
+                    if field.error
+                        isError = true
+                    else
+                        delete field.error
                 names.push field.name if field.name not in names
 
             if isError
