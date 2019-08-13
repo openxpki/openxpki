@@ -77,9 +77,9 @@ sub execute {
 
     $context->param( 'in_renewal_window' => 0 );
 
-    my $renewal_notbefore = $self->param('renewal_notbefore') || '000060';
+    my $renewal_notbefore = $self->param('renewal_period') || '000060';
     # TODO - implement
-    #my $renewal_notafter = $self->param('renewal_notbefore') || '00';
+    #my $renewal_notafter = $self->param('renewal_notafter') || '00';
 
     # Reverse calculation - the date wich must not be exceeded by notafter
     my $renewal_time = OpenXPKI::DateTime::get_validity({

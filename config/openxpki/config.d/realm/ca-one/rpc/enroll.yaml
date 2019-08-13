@@ -8,11 +8,14 @@ authorized_signer:
         # Full DN
         subject: CN=.+:pkiclient,.*
 
+renewal_period: 03
+
 # You must set at least one of both options or remove the is_policy_loaded
 # condition in the workflow definition
 policy:
     allow_man_authen: 0
     allow_man_approv: 0
+    max_active_certs: 0
     auto_revoke_existing_certs: 1
     approval_points: 1
     export_certificate: chain
@@ -22,7 +25,9 @@ profile:
     cert_subject_style: enroll
 
 
-
 eligible:
     initial:
+        value: 1
+
+    renewal:
         value: 1

@@ -5,12 +5,7 @@
 
 # A renewal request is only accpeted if the used certificate will
 # expire within this period of time.
-renewal:
-    # allow renewal 14 days before the certificate expires
-    notbefore: 000014
-    # allow renewal with already expired certificate (usually not set)
-    # replaces "allow_expired_signer", not implemented yet!
-    notafter: 0
+renewal_period: 03
 
 # If the request was a replacement, optionally revoke the replaced
 # certificate after a grace period
