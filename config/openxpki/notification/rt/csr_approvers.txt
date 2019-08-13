@@ -1,4 +1,0 @@
-Approvers:
-[% FOREACH approver = approvals  -%]
-- [% approver.session_user %] ([% approver.session_role %])
-[% END -%]

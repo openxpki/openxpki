@@ -1,3 +1,0 @@
-class: Workflow::Condition::Evaluate
-param:
-    test: $context->{pkcs10}

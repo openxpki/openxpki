@@ -1,5 +1,0 @@
-label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_TRUSTED_LABEL
-name: signer_trusted
-template: "[% IF value %]I18N_OPENXPKI_UI_YES[% ELSIF value == '0' %]failed:I18N_OPENXPKI_UI_NO[% END %]"
-format: styled
-

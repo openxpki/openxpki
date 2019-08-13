@@ -1,5 +1,0 @@
-# writes a random uuid into the context key uuid
-class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
-param:
-    _map_uuid:  "[% USE Utils %][% Utils.uuid() %]"
-

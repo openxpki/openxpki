@@ -1,9 +1,0 @@
-# This file holds the configuration for the soap revocation interface
-# How to define the rules, see the documentaion of 
-# OpenXPKI::Server::Workflow::Activity::Tools::EvaluateSignerTrust
-
-authorized_signer:
-    rule1:
-        subject: CN=.+:soapclient,.*
-    rule2:    
-        subject: CN=.+:pkiclient,.*

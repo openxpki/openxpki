@@ -1,8 +1,0 @@
-id: port
-label: I18N_OPENXPKI_UI_PROFILE_PORT
-description: I18N_OPENXPKI_UI_PROFILE_PORT_DESC
-preset: "[% CN.0.replace('^[^:]+(:([0-9]+))?','$2').replace('[^0-9]+','') %]"
-type: freetext
-match: \A \d+ \z
-width: 5
-min: 0

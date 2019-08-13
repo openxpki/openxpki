@@ -1,6 +1,0 @@
-# Deprecated - use transaction_id instead
-name: scep_tid
-label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_LABEL
-description: I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_DESC
-required: 1
-type: text

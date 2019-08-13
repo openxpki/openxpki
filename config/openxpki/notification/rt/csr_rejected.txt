@@ -1,6 +1,0 @@
-Dear [% requestor %],
-
-We have to inform you, that your request for [% cert_subject %] has been rejected.
-
-Regards,
-  PKI Team

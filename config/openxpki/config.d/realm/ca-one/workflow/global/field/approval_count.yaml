@@ -1,6 +1,0 @@
-name: approvals
-label: I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVALS_LABEL
-required: 0
-type: server
-format: itemcnt
-

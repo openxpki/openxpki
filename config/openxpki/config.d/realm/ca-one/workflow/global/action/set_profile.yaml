@@ -1,4 +1,0 @@
-class: OpenXPKI::Server::Workflow::Activity::Tools::Connector::GetValue
-param:
-    mode: hash
-    _map_config_path: "[% context.interface %].[% context.server %].profile"

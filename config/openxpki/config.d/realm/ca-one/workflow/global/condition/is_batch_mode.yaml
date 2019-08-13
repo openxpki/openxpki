@@ -1,4 +1,0 @@
-class: Workflow::Condition::Evaluate
-param:
-    test: $context->{flag_batch_mode}
-

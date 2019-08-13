@@ -1,4 +1,0 @@
-class: Workflow::Condition::Evaluate
-param:
-    test: $context->{signer_cert}
-

@@ -1,3 +1,0 @@
-class: Workflow::Condition::Evaluate
-param:
-    test: $context->{signer_validity_ok}
