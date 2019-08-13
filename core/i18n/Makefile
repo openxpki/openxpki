@@ -34,9 +34,6 @@ $(PO_SOURCES)::
 		msgmerge -s --update $@ openxpki.pot; \
 	fi
 	@rm -f $@~
-	@perl convert.pl $@ > $@_utf8 2>/dev/null
-	@if (test ! -z "`diff $@ $@_utf8`"); then echo no utf8; exit 1; fi
-	@rm -f $@_utf8
 
 ## do not depend on openxpki.pot or some directories - this does not work
 scan:
