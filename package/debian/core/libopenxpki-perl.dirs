@@ -1,8 +1,3 @@
 var/openxpki
-var/openxpki/session
-var/log/openxpki 
+var/log/openxpki
 etc/openxpki
-etc/openxpki/ssl/ca-one
-etc/openxpki/scep
-etc/openxpki/soap
-etc/openxpki/webui

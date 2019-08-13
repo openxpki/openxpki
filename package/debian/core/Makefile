@@ -15,13 +15,10 @@ include ../Makefile.inc
 
 examples:
 	cd $(EXAMPLE); \
-	tar -czf /tmp/openxpki-examples.tar.gz .; \
+	tar -czf /tmp/openxpki-examples.tar.gz *; \
 	cd /tmp/$(PERLNAME)-*; \
 	mkdir -p examples; \
-	tar -xzf /tmp/openxpki-examples.tar.gz  -C examples; \
+	tar -xzf /tmp/openxpki-examples.tar.gz -C examples; \
 	cd examples; \
-	tar -zcf openxpki-etc.tgz openxpki; \
-	tar -zcf profiles.tgz profiles; \
-	cd feature; \
-	tar -zcf ../openxpki-feature.tgz *; \
+	tar -zcf openxpki-etc.tgz --exclude=contrib *; \
 	cd ..
