@@ -1,0 +1,4 @@
+class: OpenXPKI::Server::Workflow::Activity::Tools::Datapool::DeleteEntry
+param:
+    namespace: certificate.privatekey
+    _map_key: "[% USE PKCS10; PKCS10.subject_key_identifier(context.pkcs10); %]"
