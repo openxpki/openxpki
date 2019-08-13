@@ -123,6 +123,11 @@ sub __init_command_params : PRIVATE {
                           "NO_CHAIN" => 0,
                           "CONTENT" => 0,
                           "PKCS7"   => 1},
+
+    "pkcs7_get_payload" => {"PKCS7" => 1,
+                            "NOSIGS" => 1,
+                            },
+
     "verify_cert"    =>  {"CHAIN"   => 0,
                           "CERTIFICATE" => 1,
                           "TRUSTED"   => 1,

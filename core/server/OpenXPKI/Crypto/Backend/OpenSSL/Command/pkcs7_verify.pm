@@ -20,8 +20,6 @@ sub get_command
 
     ## compensate missing parameters
 
-    
-
     my $engine = "";
     my $engine_usage = $self->{ENGINE}->get_engine_usage();
     $engine = $self->{ENGINE}->get_engine()
@@ -50,23 +48,23 @@ sub get_command
 
     ## build the command
 
-    my $command  = "smime -verify";
-    $command .= " -engine $engine" if ($engine);
-    $command .= " -inform PEM";
-    $command .= " -in ".$self->write_temp_file( $self->{PKCS7} );
-    $command .= " -signer ".$self->get_outfile();
+    my @command = qw( cms -verify -binary -inform PEM );
+    push @command, ("-engine", $engine) if ($engine);
+    push @command, ("-in", $self->write_temp_file( $self->{PKCS7} ));
+    push @command, ("-signer", $self->get_outfile());
 
     # Optional parts
     if ($self->{CONTENT}) {
-        $command .= " -content ". $self->write_temp_file( $self->{CONTENT} );
+        push @command, ("-content", $self->write_temp_file( $self->{CONTENT} ));
     }
-    $command .= " -noverify" if ($self->{NO_CHAIN});
+
+    push @command, ("-noverify") if ($self->{NO_CHAIN});
 
     if ($chainfile) {
-        $command .= " -CAfile $chainfile ";
+        push @command, ("-CAfile",$chainfile);
     }
 
-    return [ $command ];
+    return [ \@command ];
 }
 
 sub hide_output

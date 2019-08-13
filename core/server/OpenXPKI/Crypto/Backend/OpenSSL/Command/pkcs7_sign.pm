@@ -81,22 +81,23 @@ sub get_command {
 
     ## build the command
 
-    my $command = "smime -sign";
-        $command .= " -nodetach"                    if ( not $self->{DETACH} );
-        $command .= " -engine $engine"              if ($engine);
-        $command .= " -keyform $keyform"            if ($keyform);
-        $command .= " -inkey " . $self->{KEYFILE}   if ( $self->{KEYFILE} );
-        $command .= " -signer " . $self->{CERTFILE} if ( $self->{CERTFILE} );
-        $command .= " -in " . $self->write_temp_file( $self->{CONTENT} );
-        $command .= " -out " . $self->get_outfile();
-        $command .= " -outform PEM";
+    my @command = qw( cms -sign -binary -outform PEM );
+    push @command, ("-nodetach") if ( not $self->{DETACH} );
+    push @command, ("-engine", $engine) if ($engine);
+    push @command, ("-keyform", $keyform) if ($keyform);
+
+    push @command, ("-in", $self->write_temp_file( $self->{CONTENT} ));
+    push @command, ("-inkey", $self->{KEYFILE}) if ( $self->{KEYFILE} );
+    push @command, ("-signer",$self->{CERTFILE}) if ( $self->{CERTFILE} );
+
+    push @command, ("-out", $self->get_outfile());
 
     if ( defined $passwd ) {
-      $command .= " -passin env:pwd";
-      $self->set_env( "pwd" => $passwd );
+        push @command, ("-passin","env:pwd");
+        $self->set_env( "pwd" => $passwd );
     }
 
-    return [$command];
+    return [ \@command ];
 }
 
 sub __get_used_engine {

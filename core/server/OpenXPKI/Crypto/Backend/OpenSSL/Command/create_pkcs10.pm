@@ -39,7 +39,7 @@ sub get_command
     $passwd = $self->{PASSWD};
     $engine = $self->__get_used_engine();
 
-    
+
 
     ## check parameters
 

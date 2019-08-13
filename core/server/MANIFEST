@@ -179,6 +179,7 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_encrypt.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_decrypt.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_verify.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_get_chain.pm
+OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_get_payload.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/verify_cert.pm
 
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_params.pm
