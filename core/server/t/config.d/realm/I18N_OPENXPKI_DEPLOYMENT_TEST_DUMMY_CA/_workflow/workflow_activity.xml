@@ -15,7 +15,7 @@
  	class="OpenXPKI::Server::Workflow::Activity::Tools::RetrieveCertificate"
  	certificateoutcontextkey="certificate"
 	certidentifieroutcontextkey="cert_identifier"		
-	cert_profile="I18N_OPENXPKI_PROFILE_TLS_SERVER"
+	cert_profile="tls_server"
 	cert_subject="$cert_subject">
   </action>
   

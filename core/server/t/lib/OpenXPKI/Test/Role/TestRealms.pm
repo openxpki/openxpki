@@ -49,9 +49,9 @@ before 'init_user_config' => sub { # ... so we do not overwrite user supplied co
                 "profile" => {
                     "default"                           => $self->_profile_default,
                     "template"                          => $self->_cert_profile_template,
-                    "I18N_OPENXPKI_PROFILE_TLS_CLIENT"  => $self->_cert_profile_client,
-                    "I18N_OPENXPKI_PROFILE_TLS_SERVER"  => $self->_cert_profile_server,
-                    "I18N_OPENXPKI_PROFILE_USER"        => $self->_cert_profile_user,
+                    "tls_client"  => $self->_cert_profile_client,
+                    "tls_server"  => $self->_cert_profile_server,
+                    "user_auth_enc"        => $self->_cert_profile_user,
                 },
                 # CRL
                 "crl" => { "default" => $self->_crl_default },

@@ -73,8 +73,8 @@ sub create_cert {
 
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
-    my $is_server_profile = $params->profile eq "I18N_OPENXPKI_PROFILE_TLS_SERVER";
-    my $is_client_profile = $params->profile eq "I18N_OPENXPKI_PROFILE_TLS_CLIENT";
+    my $is_server_profile = $params->profile eq "tls_server";
+    my $is_client_profile = $params->profile eq "tls_client";
 
     my %cert_subject_parts = (
         # IP addresses instead of host names will make DNS lookups fail quicker

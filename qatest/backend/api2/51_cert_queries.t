@@ -27,7 +27,7 @@ my $oxitest = OpenXPKI::Test->new(
     #log_level => 'trace',
 );
 my $cert = $oxitest->create_cert(
-    profile => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    profile => "tls_server",
     hostname => "fun",
     requestor_gname => 'Sarah',
     requestor_name => 'Dessert',
@@ -42,7 +42,7 @@ my $cert_id = $cert->{identifier};
 # certificate profile
 lives_and {
     my $result = $oxitest->api2_command('get_profile_for_cert' => { identifier => $cert_id });
-    is $result, "I18N_OPENXPKI_PROFILE_TLS_SERVER";
+    is $result, "tls_server";
 } "query certificate profile";
 
 # possible certificate actions

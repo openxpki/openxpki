@@ -159,7 +159,7 @@ lives_and {
     my $cert = $oxitest->certhelper_database->cert("alpha-signer-2");
     $cert_profile = OpenXPKI::Crypto::Profile::Certificate->new(
         TYPE  => "ENDENTITY",
-        ID    => "I18N_OPENXPKI_PROFILE_USER",
+        ID    => "user_auth_enc",
         CA    => "alpha",
         CACERTIFICATE => {
             DATA        => $cert->data,

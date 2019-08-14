@@ -282,7 +282,7 @@ matching rules. The name of the rule is just used for logging purpose:
   rule1:
     subject: CN=scep-signer.*,dc=OpenXPKI,dc=org
     identifier: AhElV5GzgFhKalmF_yQq-b1TnWg
-    profile: I18N_OPENXPKI_PROFILE_SCEP_SIGNER
+    profile: client_scep
     realm: democa
 
 =head2 Rules

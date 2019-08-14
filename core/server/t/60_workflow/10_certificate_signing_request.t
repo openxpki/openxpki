@@ -37,7 +37,7 @@ my $msg = $client->send_receive_command_msg(
         WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
         PARAMS   => {
             'cert_info' => "HASH\n0\n",
-            'cert_profile' => 'I18N_OPENXPKI_PROFILE_TLS_SERVER',
+            'cert_profile' => 'tls_server',
             'cert_subject_alt_name_parts' => "HASH\n0\n",
             'cert_subject_parts' => "HASH\n94\n21\ncert_subject_hostname\nSCALAR\n27\nfully.qualified.example.com\n17\ncert_subject_port\nSCALAR\n0\n\n",
             'cert_subject_style' => '00_tls_basic_style',
@@ -55,7 +55,7 @@ $msg = $client->send_receive_command_msg(
         WORKFLOW => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
         PARAMS   => {
             'cert_info' => "HASH\n0\n",
-            'cert_profile' => 'I18N_OPENXPKI_PROFILE_TLS_SERVER',
+            'cert_profile' => 'tls_server',
             'cert_role' => 'Web Server',
             'cert_subject_alt_name_parts' => "HASH\n0\n",
             'cert_subject_parts' => "HASH\n94\n21\ncert_subject_hostname\nSCALAR\n27\nfully.qualified.example.com\n17\ncert_subject_port\nSCALAR\n0\n\n",
@@ -138,14 +138,14 @@ $msg = $client->send_receive_command_msg(
           'ACTIVITY' => 'I18N_OPENXPKI_WF_ACTION_CHANGE_CSR_PROFILE',
           'ID' => $wf_id,
           'PARAMS' => {
-                        'cert_profile' => 'I18N_OPENXPKI_PROFILE_USER',
+                        'cert_profile' => 'user_auth_enc',
                       },
           'WORKFLOW' => 'I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST',
     },
 ); 
 
 ok(! is_error_response($msg), 'Successfully changed profile') or diag Dumper $msg;
-is($msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{cert_profile}, 'I18N_OPENXPKI_PROFILE_USER', 'Changed profile in context');
+is($msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{cert_profile}, 'user_auth_enc', 'Changed profile in context');
 
 $sources = OpenXPKI::Serialization::Simple->new()->deserialize(
     $msg->{PARAMS}->{WORKFLOW}->{CONTEXT}->{sources},

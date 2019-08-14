@@ -23,7 +23,7 @@ plan tests => 43;
 my $oxitest = OpenXPKI::Test->new(
     with => [ qw( TestRealms SampleConfig Server Workflows WorkflowCreateCert ) ],
     add_config => {
-        "realm.democa.profile.I18N_OPENXPKI_PROFILE_USER_HIDDEN" => {
+        "realm.democa.profile.user_auth_enc_hidden" => {
             label => "Blah",
             style => {
                 "00_user_basic_style" => {
@@ -52,9 +52,9 @@ cmp_deeply $result, superhashof({
         $_ => { label => ignore(), value => ignore() }
     }
     qw(
-        I18N_OPENXPKI_PROFILE_TLS_CLIENT
-        I18N_OPENXPKI_PROFILE_TLS_SERVER
-        I18N_OPENXPKI_PROFILE_USER
+        tls_client
+        tls_server
+        user_auth_enc
     )
 }), "list profiles";
 
@@ -64,10 +64,10 @@ cmp_deeply $result, superhashof({
         $_ => { label => ignore(), value => ignore() }
     }
     qw(
-        I18N_OPENXPKI_PROFILE_TLS_CLIENT
-        I18N_OPENXPKI_PROFILE_TLS_SERVER
-        I18N_OPENXPKI_PROFILE_USER
-        I18N_OPENXPKI_PROFILE_USER_HIDDEN
+        tls_client
+        tls_server
+        user_auth_enc
+        user_auth_enc_hidden
     )
 }), "list profiles incl. hidden ones (without any UI definition)";
 
@@ -75,11 +75,11 @@ cmp_deeply $result, superhashof({
 # list_used_profiles
 #
 $oxitest->create_cert(
-    profile => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    profile => "tls_server",
     hostname => "127.0.0.1",
 );
 $oxitest->create_cert(
-    profile => "I18N_OPENXPKI_PROFILE_TLS_CLIENT",
+    profile => "tls_client",
     hostname => "127.0.0.1",
     application_name => "Joust",
 );
@@ -89,8 +89,8 @@ cmp_deeply $result, superbagof(
         superhashof( { value => $_ } )
     }
     qw(
-        I18N_OPENXPKI_PROFILE_TLS_SERVER
-        I18N_OPENXPKI_PROFILE_TLS_CLIENT
+        tls_server
+        tls_client
     )
 ), "Show expected profiles";
 
@@ -98,7 +98,7 @@ cmp_deeply $result, superbagof(
 # get_cert_subject_profiles
 #
 $result = $client->send_command_ok('get_cert_subject_profiles' => {
-    PROFILE => 'I18N_OPENXPKI_PROFILE_TLS_SERVER'
+    PROFILE => 'tls_server'
 });
 cmp_deeply $result, superhashof({
     map {
@@ -111,7 +111,7 @@ cmp_deeply $result, superhashof({
 }), "list profile styles";
 
 $result = $client->send_command_ok('get_cert_subject_profiles' => {
-    PROFILE => 'I18N_OPENXPKI_PROFILE_TLS_SERVER',
+    PROFILE => 'tls_server',
     NOHIDE => 1,
 });
 cmp_deeply $result, superhashof({
@@ -129,7 +129,7 @@ cmp_deeply $result, superhashof({
 # get_cert_subject_styles
 #
 $result = $client->send_command_ok('get_cert_subject_styles' => {
-    PROFILE => 'I18N_OPENXPKI_PROFILE_TLS_SERVER'
+    PROFILE => 'tls_server'
 });
 cmp_deeply $result, superhashof({
     map {
@@ -157,7 +157,7 @@ cmp_deeply [ values %$result ], superbagof(qw( email URI DNS RID IP dirName othe
 # get_field_definition
 #
 $result = $client->send_command_ok('get_field_definition' => {
-    PROFILE => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    PROFILE => "tls_server",
     STYLE => "00_basic_style",
     # default SECTION = "subject"
 });
@@ -173,10 +173,10 @@ cmp_deeply $result, superbagof(
         hostname2
         port
     )
-), "list field definitions (I18N_OPENXPKI_PROFILE_TLS_SERVER.style.00_basic_style.ui.subject)";
+), "list field definitions (tls_server.style.00_basic_style.ui.subject)";
 
 $result = $client->send_command_ok('get_field_definition' => {
-    PROFILE => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    PROFILE => "tls_server",
     STYLE => "00_basic_style",
     SECTION => "info",
 });
@@ -194,7 +194,7 @@ cmp_deeply $result, superbagof(
         requestor_affiliation
         comment
     )
-), "list field definitions (I18N_OPENXPKI_PROFILE_TLS_SERVER.style.00_basic_style.ui.info)";
+), "list field definitions (tls_server.style.00_basic_style.ui.info)";
 
 #
 # get_additional_information_fields
@@ -217,7 +217,7 @@ cmp_deeply $result, { ALL => {
 # get_key_algs
 #
 $result = $client->send_command_ok('get_key_algs' => {
-    PROFILE => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    PROFILE => "tls_server",
 });
 cmp_deeply $result, bag( qw( dsa rsa ec ) ), "list key algorithms";
 
@@ -225,12 +225,12 @@ cmp_deeply $result, bag( qw( dsa rsa ec ) ), "list key algorithms";
 # get_key_algs
 #
 $result = $client->send_command_ok('get_key_enc' => {
-    PROFILE => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    PROFILE => "tls_server",
 });
 cmp_deeply $result, bag( qw( aes256 idea ) ), "list key encryption algorithms";
 
 $result = $client->send_command_ok('get_key_enc' => {
-    PROFILE => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    PROFILE => "tls_server",
     NOHIDE => 1,
 });
 cmp_deeply $result, bag( qw( aes256 idea 3des ) ), "list key encryption algorithms (including hidden)";
@@ -239,12 +239,12 @@ cmp_deeply $result, bag( qw( aes256 idea 3des ) ), "list key encryption algorith
 # get_key_params
 #
 $result = $client->send_command_ok('get_key_params' => {
-    PROFILE => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    PROFILE => "tls_server",
 });
 cmp_deeply $result, bag( qw( key_length curve_name ) ), "list key parameters (all)";
 
 $result = $client->send_command_ok('get_key_params' => {
-    PROFILE => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    PROFILE => "tls_server",
     ALG => 'rsa',
 });
 cmp_deeply $result, {
@@ -252,7 +252,7 @@ cmp_deeply $result, {
 }, "list key parameters for RSA";
 
 $result = $client->send_command_ok('get_key_params' => {
-    PROFILE => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    PROFILE => "tls_server",
     ALG => 'rsa',
     NOHIDE => 1,
 });
@@ -272,7 +272,7 @@ my $vars = {
     requestor_email => 'my@self.me',
 };
 $result = $client->send_command_ok('render_subject_from_template' => {
-    PROFILE => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    PROFILE => "tls_server",
     VARS => $vars,
 });
 like $result, qr/ CN=james:333 /msxi, "render cert subject";
@@ -281,7 +281,7 @@ like $result, qr/ CN=james:333 /msxi, "render cert subject";
 # render_san_from_template
 #
 $result = $client->send_command_ok('render_san_from_template' => {
-    PROFILE => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    PROFILE => "tls_server",
     VARS => $vars,
     ADDITIONAL => { dNs => [ "george" ] }, # dNs should be converted to DNS
 });
@@ -296,7 +296,7 @@ cmp_deeply $result, bag(
 # render_metadata_from_template
 #
 $result = $client->send_command_ok('render_metadata_from_template' => {
-    PROFILE => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    PROFILE => "tls_server",
     VARS => $vars,
 });
 cmp_deeply $result, {

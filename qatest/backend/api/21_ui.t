@@ -40,7 +40,7 @@ my $oxitest = OpenXPKI::Test->new(
 my $cert_info = $oxitest->create_cert(
     hostname        => "127.0.0.1",
     hostname2       => [ "127.0.0.2", "127.0.0.3" ],
-    profile => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    profile => "tls_server",
 );
 
 # set user role to be allowed to create workflows etc.

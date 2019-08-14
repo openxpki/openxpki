@@ -156,15 +156,15 @@ Here is a complete sample configuration::
         getca:
             ra:     fullchain
             issuer: fullchain
-  
+
     profile:
-      cert_profile: I18N_OPENXPKI_PROFILE_TLS_SERVER
+      cert_profile: tls_server
       cert_subject_style: enroll
 
     # Mapping of names to OpenXPKI profiles to be used with the
     # Microsoft Certificate Template Name Ext. (1.3.6.1.4.1.311.20.2)
     profile_map:
-        pc-client: I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION
+        pc-client: tls_client
 
     # HMAC based authentication
     hmac: verysecret
@@ -234,7 +234,7 @@ In OpenXPKI 1.0 the default profile was set in the CGI wrapper configuration.
 This has been moved to a seperate node in the endpoint configuration::
 
     profile:
-        cert_profile: I18N_OPENXPKI_PROFILE_TLS_SERVER
+        cert_profile: tls_server
         cert_subject_style: enroll
 
 
@@ -440,8 +440,8 @@ server configuration is used.
 The map is a hash list::
 
     profile_map:
-        tlsv2: I18N_OPENXPKI_PROFILE_TLS_SERVER_v2
-        client: I18N_OPENXPKI_PROFILE_TLS_CLIENT
+        tlsv2: tls_server_v2
+        client: tls_client
 
 
 Subject Rendering
@@ -451,7 +451,7 @@ Subject rendering is based on the profile and subject information given
 in the config::
 
     profile:
-        cert_profile: I18N_OPENXPKI_PROFILE_TLS_SERVER
+        cert_profile: tls_server
         cert_subject_style: enroll
 
 The subject will be created using Template Toolkit with the parsed subject hash

@@ -200,7 +200,7 @@ action class for this which grabs the ruleset from
       subject: CN=.+:pkiclient,.*
 
     rule2:
-      profile: I18N_OPENXPKI_PROFILE_VPN_CLIENT
+      profile: vpn_client
       realm: vpn-ca
 
     rule3:

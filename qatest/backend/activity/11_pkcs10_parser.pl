@@ -89,7 +89,7 @@ $test->ok($context->{req_attributes}->{challengePassword}, 'SecretChallenge');
 
 # Test with profile
 %wfparam = (
-    cert_profile => 'I18N_OPENXPKI_PROFILE_TLS_SERVER',
+    cert_profile => 'tls_server',
     cert_subject_style => '00_basic_style',
     pkcs10 => $pkcs10,
 );
@@ -117,7 +117,7 @@ $test->is($san->{email}, undef);
 $pkcs10 = `openssl req -new -nodes -keyout /dev/null -config openssl.conf -reqexts req_template_v1  2>/dev/null`;
 
 %wfparam = (
-    cert_profile => 'I18N_OPENXPKI_PROFILE_TLS_SERVER',
+    cert_profile => 'tls_server',
     cert_subject_style => '00_basic_style',
     pkcs10 => $pkcs10,
 );
@@ -137,7 +137,7 @@ $test->is($context->{req_extensions}->{certificateTemplate}, undef);
 $pkcs10 = `openssl req -new -nodes -keyout /dev/null -config openssl.conf -reqexts req_template_v2  2>/dev/null`;
 
 %wfparam = (
-    cert_profile => 'I18N_OPENXPKI_PROFILE_TLS_SERVER',
+    cert_profile => 'tls_server',
     cert_subject_style => '00_basic_style',
     pkcs10 => $pkcs10,
 );

@@ -27,7 +27,7 @@ Named parameters:
 
 =item * B<hostname2> - List of additional hostnames for the certificate (I<ArrayRef[Str]>, optional for server profile)
 
-=item * B<profile> - Certificate profile (I<Str>, optional, default: I18N_OPENXPKI_PROFILE_TLS_SERVER)
+=item * B<profile> - Certificate profile (I<Str>, optional, default: tls_server)
 
 =item * B<requestor_gname> - Surname of person requesting cert (I<Str>, optional)
 
@@ -61,7 +61,7 @@ has hostname2 => (
 has profile => (
     is => 'rw',
     isa => 'Str',
-    default => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    default => "tls_server",
 );
 has requestor_gname => (
     is => 'rw',

@@ -45,7 +45,7 @@ is($result->{main}->[0]->{content}->{fields}->[2]->{name}, 'wf_token');
 $result = $client->mock_request({
     'action' => 'workflow!index',
     'wf_token' => undef,
-    'cert_profile' => 'I18N_OPENXPKI_PROFILE_USER',
+    'cert_profile' => 'user_auth_enc',
     'cert_subject_style' => '00_user_basic_style'
 });
 

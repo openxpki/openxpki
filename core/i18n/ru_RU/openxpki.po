@@ -5917,11 +5917,11 @@ msgstr "Имя учетной записи"
 #~ msgid "I18N_OPENXPKI_PROFILE_TLS_BASIC_STYLE"
 #~ msgstr "Профиль TLS сервера общего назначения"
 
-#~ msgid "I18N_OPENXPKI_PROFILE_TLS_SERVER"
+#~ msgid "tls_server"
 #~ msgstr "Профиль TLS сервера "
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_PROFILE_USER"
+#~ msgid "user_auth_enc"
 #~ msgstr "Профиль пользователя"
 
 #, fuzzy

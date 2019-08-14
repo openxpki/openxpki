@@ -23,7 +23,7 @@ plan tests => 22;
 my $oxitest = OpenXPKI::Test->new(
     with => [ qw( SampleConfig Workflows WorkflowCreateCert ) ],
     add_config => {
-        "realm.democa.profile.I18N_OPENXPKI_PROFILE_USER_HIDDEN" => {
+        "realm.democa.profile.user_auth_enc_hidden" => {
             label => "Blah",
             style => {
                 "00_user_basic_style" => {
@@ -46,9 +46,9 @@ cmp_deeply $result, superhashof({
         $_ => { label => ignore(), value => ignore() }
     }
     qw(
-        I18N_OPENXPKI_PROFILE_TLS_CLIENT
-        I18N_OPENXPKI_PROFILE_TLS_SERVER
-        I18N_OPENXPKI_PROFILE_USER
+        tls_client
+        tls_server
+        user_auth_enc
     )
 }), "list profiles";
 
@@ -58,10 +58,10 @@ cmp_deeply $result, superhashof({
         $_ => { label => ignore(), value => ignore() }
     }
     qw(
-        I18N_OPENXPKI_PROFILE_TLS_CLIENT
-        I18N_OPENXPKI_PROFILE_TLS_SERVER
-        I18N_OPENXPKI_PROFILE_USER
-        I18N_OPENXPKI_PROFILE_USER_HIDDEN
+        tls_client
+        tls_server
+        user_auth_enc
+        user_auth_enc_hidden
     )
 }), "list profiles incl. hidden ones (without any UI definition)";
 
@@ -69,11 +69,11 @@ cmp_deeply $result, superhashof({
 # list_used_profiles
 #
 $oxitest->create_cert(
-    profile => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    profile => "tls_server",
     hostname => "127.0.0.1",
 );
 $oxitest->create_cert(
-    profile => "I18N_OPENXPKI_PROFILE_TLS_CLIENT",
+    profile => "tls_client",
     hostname => "127.0.0.1",
     application_name => "Joust",
 );
@@ -83,8 +83,8 @@ cmp_deeply $result, superbagof(
         superhashof( { value => $_ } )
     }
     qw(
-        I18N_OPENXPKI_PROFILE_TLS_SERVER
-        I18N_OPENXPKI_PROFILE_TLS_CLIENT
+        tls_server
+        tls_client
     )
 ), "Show expected profiles";
 
@@ -92,7 +92,7 @@ cmp_deeply $result, superbagof(
 # get_cert_subject_profiles
 #
 $result = $oxitest->api2_command("get_cert_subject_profiles" => {
-    profile => 'I18N_OPENXPKI_PROFILE_TLS_SERVER'
+    profile => 'tls_server'
 });
 cmp_deeply $result, superhashof({
     map {
@@ -105,7 +105,7 @@ cmp_deeply $result, superhashof({
 }), "list profile styles";
 
 $result = $oxitest->api2_command("get_cert_subject_profiles" => {
-    profile => 'I18N_OPENXPKI_PROFILE_TLS_SERVER',
+    profile => 'tls_server',
     showall => 1,
 });
 cmp_deeply $result, superhashof({
@@ -123,7 +123,7 @@ cmp_deeply $result, superhashof({
 # get_cert_subject_styles
 #
 $result = $oxitest->api2_command("get_cert_subject_styles" => {
-    profile => 'I18N_OPENXPKI_PROFILE_TLS_SERVER'
+    profile => 'tls_server'
 });
 cmp_deeply $result, superhashof({
     map {
@@ -154,7 +154,7 @@ cmp_deeply [ values %$result ], superbagof(qw( email URI DNS RID IP dirName othe
 # get_field_definition
 #
 $result = $oxitest->api2_command("get_field_definition" => {
-    profile => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    profile => "tls_server",
     style => "00_basic_style",
     # default section = "subject"
 });
@@ -170,10 +170,10 @@ cmp_deeply $result, superbagof(
         hostname2
         port
     )
-), "list field definitions (I18N_OPENXPKI_PROFILE_TLS_SERVER.style.00_basic_style.ui.subject)";
+), "list field definitions (tls_server.style.00_basic_style.ui.subject)";
 
 $result = $oxitest->api2_command("get_field_definition" => {
-    profile => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    profile => "tls_server",
     style => "00_basic_style",
     section => "info",
 });
@@ -191,7 +191,7 @@ cmp_deeply $result, superbagof(
         requestor_affiliation
         comment
     )
-), "list field definitions (I18N_OPENXPKI_PROFILE_TLS_SERVER.style.00_basic_style.ui.info)";
+), "list field definitions (tls_server.style.00_basic_style.ui.info)";
 
 #
 # get_additional_information_fields
@@ -214,7 +214,7 @@ cmp_deeply $result, {
 # get_key_algs
 #
 $result = $oxitest->api2_command("get_key_algs" => {
-    profile => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    profile => "tls_server",
 });
 cmp_deeply $result, bag( qw( dsa rsa ec ) ), "list key algorithms";
 
@@ -222,12 +222,12 @@ cmp_deeply $result, bag( qw( dsa rsa ec ) ), "list key algorithms";
 # get_key_enc
 #
 $result = $oxitest->api2_command("get_key_enc" => {
-    profile => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    profile => "tls_server",
 });
 cmp_deeply $result, bag( qw( aes256 idea ) ), "list key encryption algorithms";
 
 $result = $oxitest->api2_command("get_key_enc" => {
-    profile => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    profile => "tls_server",
     showall => 1,
 });
 cmp_deeply $result, bag( qw( aes256 idea 3des ) ), "list key encryption algorithms (including hidden)";
@@ -236,12 +236,12 @@ cmp_deeply $result, bag( qw( aes256 idea 3des ) ), "list key encryption algorith
 # get_key_params
 #
 $result = $oxitest->api2_command("get_key_params" => {
-    profile => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    profile => "tls_server",
 });
 cmp_deeply $result, bag( qw( key_length curve_name ) ), "list key parameters (all)";
 
 $result = $oxitest->api2_command("get_key_params" => {
-    profile => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    profile => "tls_server",
     alg => 'rsa',
 });
 cmp_deeply $result, {
@@ -249,7 +249,7 @@ cmp_deeply $result, {
 }, "list key parameters for RSA";
 
 $result = $oxitest->api2_command("get_key_params" => {
-    profile => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    profile => "tls_server",
     alg => 'rsa',
     showall => 1,
 });
@@ -273,13 +273,13 @@ my $vars = {
     DC => [ qw( example org ) ],
 };
 $result = $oxitest->api2_command("render_subject_from_template" => {
-    profile => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    profile => "tls_server",
     vars => $vars,
 });
 like $result, qr/ CN=james:333 /msxi, "render cert subject (default style)";
 
 $result = $oxitest->api2_command("render_subject_from_template" => {
-    profile => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    profile => "tls_server",
     style => "05_advanced_style",
     vars => $vars,
 });
@@ -289,7 +289,7 @@ like $result, qr/ CN=ACME .* OU=Goonies .* DC=example .* DC=org /msxi, "render c
 # render_san_from_template
 #
 $result = $oxitest->api2_command("render_san_from_template" => {
-    profile => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    profile => "tls_server",
     vars => $vars,
     additional => { dNs => [ "george" ] }, # dNs should be converted to DNS
 });
@@ -304,7 +304,7 @@ cmp_deeply $result, bag(
 # render_metadata_from_template
 #
 $result = $oxitest->api2_command("render_metadata_from_template" => {
-    profile => "I18N_OPENXPKI_PROFILE_TLS_SERVER",
+    profile => "tls_server",
     vars => $vars,
 });
 cmp_deeply $result, {

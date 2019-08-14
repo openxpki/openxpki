@@ -222,7 +222,7 @@ See the parameter section for available filters.
 
  class: OpenXPKI::Server::Workflow::Activity::Tools::SearchCertificates
     param:
-        profile: I18N_OPENXPKI_PROFILE_TLS_SERVER
+        profile: tls_server
         realm: democa
         issuer: YHkkLxEKtqbopNbcFwdBcHqKWPE
         target_key: other_key

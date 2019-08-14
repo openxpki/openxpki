@@ -28,7 +28,7 @@ is($result->{main}->[0]->{content}->{fields}->[2]->{name}, 'wf_token');
 $result = $client->mock_request({
     'action' => 'workflow!index',
     'wf_token' => undef,
-    'cert_profile' => 'I18N_OPENXPKI_PROFILE_TLS_CLIENT',
+    'cert_profile' => 'tls_client',
     'cert_subject_style' => '00_basic_style'
 });
 
@@ -104,7 +104,7 @@ for my $curve (qw(secp256r1 prime256v1)) {
     $result = $client->mock_request({
         'action' => 'workflow!index',
         'wf_token' => undef,
-        'cert_profile' => 'I18N_OPENXPKI_PROFILE_TLS_CLIENT',
+        'cert_profile' => 'tls_client',
         'cert_subject_style' => '00_basic_style'
     });
 

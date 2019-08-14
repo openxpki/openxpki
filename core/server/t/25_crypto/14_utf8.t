@@ -85,7 +85,7 @@ for (my $i=0; $i < scalar @example; $i++)
     ## create profile
     my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
             TYPE  => "ENDENTITY",
-            ID    => "I18N_OPENXPKI_PROFILE_USER",
+            ID    => "user_auth_enc",
             CA    => "test-ca",
             CACERTIFICATE => $cacert);
     $profile->set_serial  (1);
