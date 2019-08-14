@@ -118,10 +118,6 @@ sub create_cert {
                 },
             );
 
-            $wftest->state_is('ENTER_KEY_PASSWORD');
-            $wftest->execute(
-                csr_ask_client_password => { _password => "m4#bDf7m3abd" },
-            );
             $wftest->state_is('ENTER_SUBJECT');
             $wftest->execute(
                 csr_edit_subject => {
@@ -173,6 +169,12 @@ sub create_cert {
                 );
                 $intermediate_state = 'PENDING';
             }
+
+
+            $wftest->state_is('ENTER_KEY_PASSWORD');
+            $wftest->execute(
+                csr_ask_client_password => { _password => "m4#bDf7m3abd" },
+            );
 
     #        if ($self->notbefore) {
     #            $test->execute_ok('csr_edit_validity', {

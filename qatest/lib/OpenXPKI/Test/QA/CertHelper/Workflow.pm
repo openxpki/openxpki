@@ -171,11 +171,6 @@ sub create_cert {
             csr_type => 'pkcs10'
         }) or die(explain($test->get_msg));
 
-        $test->state_is('ENTER_KEY_PASSWORD') or die(explain($test->get_msg));
-        $test->execute_ok('csr_ask_client_password', {
-            _password => "m4#bDf7m3abd",
-        }) or die(explain($test->get_msg));
-
         $test->state_is('ENTER_SUBJECT') or die(explain($test->get_msg));
         $test->execute_ok('csr_edit_subject', {
             cert_subject_parts => $serializer->serialize( \%cert_subject_parts )
@@ -216,6 +211,11 @@ sub create_cert {
             $intermediate_state ='PENDING';
         }
         $test->state_is($intermediate_state) or die(explain($test->get_msg));
+
+        $test->state_is('ENTER_KEY_PASSWORD') or die(explain($test->get_msg));
+        $test->execute_ok('csr_ask_client_password', {
+            _password => "m4#bDf7m3abd",
+        }) or die(explain($test->get_msg));
 
 #        if ($self->notbefore) {
 #            $test->execute_ok('csr_edit_validity', {
