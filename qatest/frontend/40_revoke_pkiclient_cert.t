@@ -71,5 +71,4 @@ $result = $client->mock_request({
     'action' => 'workflow!select!wf_action!crr_approve_crr!wf_id!'.$wf_id,
 });
 
-is ($result->{status}->{level}, 'info', 'Status is paused (waiting for revocation)');
-
+is ($result->{status}->{level}, 'success', 'Status is success');

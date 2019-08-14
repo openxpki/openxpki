@@ -9,7 +9,7 @@ use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use TestCGI;
 
-use Test::More tests => 3;
+use Test::More;
 
 package main;
 
@@ -57,3 +57,5 @@ while (my $line = shift @certlist) {
         last CERTLIST;
     }
 }
+
+done_testing();

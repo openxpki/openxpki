@@ -1,4 +1,4 @@
-#!/usr/bin/perl 
+#!/usr/bin/perl
 
 use lib qw(../lib);
 use strict;
@@ -29,8 +29,8 @@ my $ua = LWP::UserAgent->new;
 $ua->timeout(10);
 
 $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "IO::Socket::SSL";
-        
-my $ssl_opts = { 
+
+my $ssl_opts = {
     verify_hostname => 0,
     SSL_key_file => 'tmp/pkiclient.key',
     SSL_cert_file => 'tmp/pkiclient.crt',
@@ -46,4 +46,4 @@ my $json = JSON->new->decode($response->decoded_content);
 
 diag('Workflow Id ' . $json->{result}->{id} );
 
-is($json->{result}->{state}, 'CHECK_FOR_REVOCATION');
+is($json->{result}->{state}, 'SUCCESS');

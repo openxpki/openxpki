@@ -24,7 +24,7 @@ is($result->{main}->[0]->{content}->{fields}->[2]->{name}, 'wf_token');
 $result = $client->mock_request({
     'action' => 'workflow!index',
     'wf_token' => undef,
-    'report_config' => 'expiry',
+    'report_config' => 'valid',
     'valid_at' => time(),
 });
 
@@ -41,5 +41,5 @@ $result = $client->mock_request({
     'page' => $page
 });
 
-like( $result, "/^Certificate Expiry Report/", 'Report header ok' );
+like( $result, "/^Certificate Status Report/", 'Report header ok' );
 

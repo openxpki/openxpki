@@ -75,13 +75,6 @@ $result = $client->mock_request({
 
 $result = $client->mock_request({
     'action' => 'workflow!index',
-    '_password' => 'Rg89T2ekApsV',
-    'wf_token' => undef
-});
-
-
-$result = $client->mock_request({
-    'action' => 'workflow!index',
     'cert_subject_parts{username}' => 'openxpki',
     'cert_subject_parts{realname}' => 'Thomas Tester',
     'cert_subject_parts{email}' => 'test@openxpki.org',
@@ -101,6 +94,12 @@ $result = $client->mock_request({
 
 $result = $client->mock_request({
     'action' => 'workflow!select!wf_action!csr_submit!wf_id!' . $wf_id,
+});
+
+$result = $client->mock_request({
+    'action' => 'workflow!index',
+    '_password' => 'Rg89T2ekApsV',
+    'wf_token' => undef
 });
 
 $result = $client->mock_request({
