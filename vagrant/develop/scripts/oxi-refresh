@@ -79,7 +79,7 @@ echo ""
 # fully overwrite existing config
 if [[ $IS_FULLCONFIG -eq 1 ]]; then
     echo "Writing complete OpenXPKI config into /etc/openxpki"
-    rsync -a --delete /code-repo/config/openxpki/* /etc/openxpki/     >$LOG 2>&1
+    rsync -a --delete /code-repo/config/* /etc/openxpki/     >$LOG 2>&1
     chmod 750              /etc/openxpki/config.d
     chown -R root:openxpki /etc/openxpki/config.d
 
@@ -95,19 +95,19 @@ if [[ $IS_FULLCONFIG -eq 1 ]]; then
         user: $OXI_TEST_DB_MYSQL_USER
         passwd: $OXI_TEST_DB_MYSQL_PASSWORD
 __DB
-# only partial config update (only realm ca-one)
+# only partial config update (only realm democa)
 else
-    echo "Updating realm CA-ONE in /etc/openxpki/config.d/realm/ca-one"
+    echo "Updating realm CA-ONE in /etc/openxpki/config.d/realm/democa"
     rsync -a --delete \
-      /code-repo/config/openxpki/config.d/realm/ca-one/* \
-      /etc/openxpki/config.d/realm/ca-one/                            >$LOG 2>&1
-    chown -R root:openxpki /etc/openxpki/config.d/realm/ca-one        >$LOG 2>&1
+      /code-repo/config/config.d/realm/democa/* \
+      /etc/openxpki/config.d/realm/democa/                            >$LOG 2>&1
+    chown -R root:openxpki /etc/openxpki/config.d/realm/democa/        >$LOG 2>&1
 fi
 
 echo "- modifying some config entries"
 
 # set /var/tmp instead of /tmp (where only root has write access)
-sed -ri 's/(LOCATION:)\s*\/tmp.*/\1 \/var\/tmp/g' /etc/openxpki/config.d/realm/ca-one/publishing.yaml
+sed -ri 's/(LOCATION:)\s*\/tmp.*/\1 \/var\/tmp/g' /etc/openxpki/config.d/realm/democa/publishing.yaml
 
 # set en_US as default language to get correct I18N translations (e.g. in rpc.fcgi)
 sed -ri 's/^(\s*default_language:).*/\1 en_US/' /etc/openxpki/config.d/system/server.yaml

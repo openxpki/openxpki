@@ -19,7 +19,7 @@ The config uses plain ini format, a default is deployed by the package::
     log_config = /etc/openxpki/scep/log.conf
     log_facility = client.scep
     socket=/var/openxpki/openxpki.socket
-    realm=ca-one
+    realm=democa
 
     iprange=0.0.0.0/0
     servername=scep-server-1
@@ -76,7 +76,7 @@ If not done already, import your new root certificate into the database::
 Now create a new alias in the ``root`` group to point to this certificate.
 Replace the XXXX with the identifier shown by the import command::
 
-    openxpki alias --realm ca-one --token root \
+    openxpki alias --realm democa --token root \
        --identifier XXXX   --notbefore "2020-01-01 00:00:00"
 
 The actual value of the notbefore date is irrelevant, it just must be in
@@ -84,7 +84,7 @@ the future.
 
 Check the result by listing your aliases::
 
-    openxpki alias --realm ca-one
+    openxpki alias --realm democa
 
     === root ca ===
     current root ca:

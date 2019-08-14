@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Helper to run inside the "develop" vagrant image to copy files from the
-# shared /code-repo tree to the actual locations inside the machine 
+# shared /code-repo tree to the actual locations inside the machine
 
 OLDPWD=`pwd`
 DIR=`dirname $0`;
@@ -11,7 +11,7 @@ rsync -c -P -a  /code-repo/core/server/bin/*  /usr/bin/
 
 rsync -c -P -a  /code-repo/core/server/OpenXPKI/*  /usr/lib/x86_64-linux-gnu/perl5/5.20/OpenXPKI/
 
-rsync -a /code-repo/config/openxpki/* /etc/openxpki/
+rsync -a /code-repo/config/* /etc/openxpki/
 
 rsync -a /code-repo/core/server/cgi-bin/*  /usr/lib/cgi-bin/
 
@@ -25,7 +25,7 @@ echo -n "Restart OpenXPKI (y/n)? "
 
 read P
 
-if [ "$P" == "y" ]; then  
+if [ "$P" == "y" ]; then
     openxpkictl restart
 fi
 

@@ -48,7 +48,7 @@ my %cert_info = (
 note "CSR Subject: $subject\n";
 
 my $user = 'user';
-$oxitest->set_user('ca-one' => $user);
+$oxitest->set_user('democa' => $user);
 
 my $wf;
 lives_ok {
@@ -112,7 +112,7 @@ $wf->execute_fails('csr_put_request_on_hold' => { onhold_comment => 'No Comment'
 
 
 # set current user to: operator
-$oxitest->set_user('ca-one' => 'raop');
+$oxitest->set_user('democa' => 'raop');
 
 
 $wf->execute('csr_put_request_on_hold' => { onhold_comment => 'No Comment'} );
@@ -133,7 +133,7 @@ like $info->{workflow}->{context}->{cert_subject}, "/^CN=$subject:8080,.*/", 'co
 
 
 # set current user to: normal user
-$oxitest->set_user('ca-one' => 'user');
+$oxitest->set_user('democa' => 'user');
 
 
 #
@@ -182,7 +182,7 @@ lives_and {
 lives_and {
     my $result = $oxitest->api2_command('get_cert_actions' => { identifier => $cert_id, role => "User" });
     cmp_deeply $result, superhashof({
-        # actions are defined in config/openxpki/config.d/realm/ca-one/uicontrol/_default.yaml,
+        # actions are defined in config/config.d/realm/democa/uicontrol/_default.yaml,
         # they must exist and "User" must be defined in their "acl" section as creator
         workflow => superbagof(
             {

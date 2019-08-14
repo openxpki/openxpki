@@ -17,7 +17,7 @@ config repository at https://github.com/openxpki/openxpki-config.
 Release v2.3
 -------------
 
-The config parameters for the ClientX509 authentication handler has changed. In case you left the file "handler.yaml" and "stack.yaml" in realm/ca-one/auth/ unchanged you *MUST* remove or change the block for the "ClientX509" handler as the new/fixed handler will not work with the old config and OpenXPKI will not start at all!
+The config parameters for the ClientX509 authentication handler has changed. In case you left the file "handler.yaml" and "stack.yaml" in realm/democa/auth/ unchanged you *MUST* remove or change the block for the "ClientX509" handler as the new/fixed handler will not work with the old config and OpenXPKI will not start at all!
 
 Release v2.x
 -------------
@@ -143,9 +143,9 @@ the new acl items to your workflow definitions::
 If you are using the SOAP revocation interface or want to use the new RPC
 revocation interface, you MUST add a new field to the inital action.
 
-Add the file config.d/realm/ca-one/workflow/global/field/interface.yaml to
+Add the file config.d/realm/democa/workflow/global/field/interface.yaml to
 your config tree.
-In config.d/realm/ca-one/workflow/def/certificate_revocation_request_v2.yaml
+In config.d/realm/democa/workflow/def/certificate_revocation_request_v2.yaml
 add the field "interface" to the list of "input" fields of "create_crr".
 
 

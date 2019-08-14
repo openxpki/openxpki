@@ -74,5 +74,5 @@ Example (line breaks are for verbosity, logfile is one line)::
      cakey=28:B9:6D:51:EC:EB:6D:C9:4A:71:7C:B4:C0:67:F7:E9:C1:BD:63:7A|
      certid=FW2Hq52uTcthhyhrrvTjRub66M0|
      key=D6:14:BB:E2:90:12:F4:FF:64:B4:0F:F3:F6:3A:FD:17:02:C9:06:C8|
-     pki_realm=ca-one
+     pki_realm=democa
 

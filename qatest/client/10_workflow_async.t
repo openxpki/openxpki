@@ -85,12 +85,12 @@ my $oxitest = OpenXPKI::Test->new(
     also_init => "crypto_layer",
     start_watchdog => 1,
     add_config => {
-        "realm.ca-one.workflow.def.wf_type_1" => workflow_def("wf_type_1"),
+        "realm.democa.workflow.def.wf_type_1" => workflow_def("wf_type_1"),
     },
 );
 
 my $tester = $oxitest->new_client_tester;
-$tester->login("ca-one" => "caop");
+$tester->login("democa" => "caop");
 
 sub wait_for_proc_state {
     my ($wfid, $state_regex) = @_;

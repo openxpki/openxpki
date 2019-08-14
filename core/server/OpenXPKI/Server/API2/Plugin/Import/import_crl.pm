@@ -37,7 +37,7 @@ Returns a I<HashRef> with the CRL informations inserted into the database, e.g.:
         issuer_identifier => 'RE35XR3XIBXiIbAu8P5aGMCmH7o',
         last_update => 1521556123,
         next_update => 3098356123,
-        pki_realm => 'ca-one',
+        pki_realm => 'democa',
         publication_date => 0,
         items =>  42,
         crl_number  => 1234567,

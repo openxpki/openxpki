@@ -49,7 +49,7 @@ lives_and {
 lives_and {
     my $result = $oxitest->api2_command('get_cert_actions' => { identifier => $cert_id, role => "User" });
     cmp_deeply $result, superhashof({
-        # actions are defined in config/openxpki/config.d/realm/ca-one/uicontrol/_default.yaml,
+        # actions are defined in config/config.d/realm/democa/uicontrol/_default.yaml,
         # they must exist and "User" must be defined in their "acl" section as creator
         workflow => superbagof(
             {

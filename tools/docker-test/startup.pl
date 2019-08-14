@@ -237,7 +237,7 @@ print "Copying files\n";
 make_path "/var/openxpki/session", "/var/log/openxpki";
 
 # copy config
-`cp -R $clone_dir/config/openxpki /etc`;
+`mkdir -p /etc/openxpki && cp -R $clone_dir/config/* /etc/openxpki`;
 
 # customize config
 use File::Slurp qw( edit_file );

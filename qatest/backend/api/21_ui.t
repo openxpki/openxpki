@@ -44,7 +44,7 @@ my $cert_info = $oxitest->create_cert(
 );
 
 # set user role to be allowed to create workflows etc.
-$oxitest->set_user("ca-one" => "caop");
+$oxitest->set_user("democa" => "caop");
 
 #
 # Tests
@@ -104,7 +104,7 @@ lives_and {
 # get_menu
 
 lives_and {
-    my $refdata = $oxitest->get_config("realm.ca-one.uicontrol.CA Operator");
+    my $refdata = $oxitest->get_config("realm.democa.uicontrol.CA Operator");
     my $data = $oxitest->api_command('get_menu', {});
     cmp_deeply $data, $refdata;
 } "get_menu";

@@ -43,7 +43,8 @@ cd $TRAVIS_BUILD_DIR
 # Copy config and create directories
 export TRAVIS_USER=$(whoami)
 export TRAVIS_USERGROUP=$(getent group $TRAVIS_USER | cut -d: -f1)
-sudo cp -R ./config/openxpki /etc
+sudo mkdir -p              /etc/openxpki
+sudo cp -R ./config/* /etc/openxpki
 sudo chown -R $TRAVIS_USER /etc/openxpki
 sudo mkdir -p              /var/openxpki/session
 sudo chown -R $TRAVIS_USER /var/openxpki

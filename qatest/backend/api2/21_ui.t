@@ -43,7 +43,7 @@ my $cert_info = $oxitest->create_cert(
 );
 
 # set user role to be allowed to create workflows etc.
-$oxitest->set_user("ca-one" => "caop");
+$oxitest->set_user("democa" => "caop");
 
 #
 # Tests
@@ -96,7 +96,7 @@ lives_and {
 
 # we use the client to get real server process names
 my $client = $oxitest->new_client_tester;
-$client->login("ca-one" => "caop");
+$client->login("democa" => "caop");
 lives_and {
     my $data = $client->send_command_api2_ok("list_process");
     cmp_deeply $data, superbagof(
@@ -116,7 +116,7 @@ lives_and {
 # get_menu
 
 lives_and {
-    my $refdata = $oxitest->get_config("realm.ca-one.uicontrol.CA Operator");
+    my $refdata = $oxitest->get_config("realm.democa.uicontrol.CA Operator");
     my $data = $oxitest->api2_command('get_menu');
     cmp_deeply $data, $refdata;
 } "get_menu";

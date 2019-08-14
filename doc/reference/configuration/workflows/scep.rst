@@ -51,7 +51,7 @@ Here is a complete sample configuration::
     # By default, all scep endpoints wll use the default token defined
     # by the scep token group, if you pass a name here, it is considered
     # a group name from the alias table
-    #token: ca-one-special-scep
+    #token: democa-special-scep
 
     # A renewal request is only accpeted if the used certificate will
     # expire within this period of time.
@@ -187,7 +187,7 @@ Here is a complete sample configuration::
     connector:
         initial:
             class: Connector::Proxy::YAML
-            LOCATION: /home/pkiadm/ca-one/enroll.yaml
+            LOCATION: /home/pkiadm/democa/enroll.yaml
 
 *The renewal period values are interpreted as OpenXPKI::DateTime relative date but given without sign.*
 
@@ -293,10 +293,10 @@ possible to use request parameters to lookup a password using connectors::
     connectors:
         challenge:
             class: Connector::Builtin::Authentication::Password
-            LOCATION: /home/pkiadm/ca-one/passwd.txt
+            LOCATION: /home/pkiadm/democa/passwd.txt
 
 This will use the cert_subject to validate the given password against a list
-found in the file /home/pkiadm/ca-one/passwd.txt. For more details, check the
+found in the file /home/pkiadm/democa/passwd.txt. For more details, check the
 man page of OpenXPKI::Server::Workflow::Activity::Tools::ValidateChallengePassword
 
 Renewal/Replace
@@ -411,16 +411,16 @@ token groups and reference them from the config using the *token* key.
 The value must be the name of a token group, which needs to be registered
 as an anonymous alias::
 
-    openxpkiadm alias --realm ca-one --identifier <identifier> --group ca-one-special-scep --gen 1
+    openxpkiadm alias --realm democa --identifier <identifier> --group democa-special-scep --gen 1
 
 Note that you need to care yourself about the generation index. The token will
 then be listed as anonymous group item::
 
-    openxpkiadm alias --realm ca-one
+    openxpkiadm alias --realm democa
 
     === anonymous groups ===
-    ca-one-special-scep:
-      Alias     : ca-one-special-scep-1
+    democa-special-scep:
+      Alias     : democa-special-scep-1
       Identifier: O9vtjge0wHpYhDpfko2O6xYtCWw
       NotBefore : 2014-03-25 15:26:18
       NotAfter  : 2015-03-25 15:26:18

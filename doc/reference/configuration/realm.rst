@@ -2,7 +2,7 @@ Realm
 =====
 
 In order to create a new realm the easiest way is to copy the sample directory
-tree ``realm/ca-one`` to a new directoy within the ``realm`` directory. Adjust the
+tree ``realm/democa`` to a new directoy within the ``realm`` directory. Adjust the
 realm configuration file contents accordingly (see below).
 
 Then add a new section in the file ``system/realms.yaml`` where the new section key is
@@ -82,7 +82,7 @@ The configuration is the same for both handlers (apart from the class name)::
         label: Certificate
         description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE_WEBSERVER
         role: User
-        realm: ca-one
+        realm: democa
 
 Please check `perldoc OpenXPKI::Server::Authentication::X509` for details. The *ChallengeX509* handler is no longer supported due to missing APIs in modern browsers.
 
@@ -123,7 +123,7 @@ Define the user database file inside auth.connector.yaml::
 
     userdb:
         class: Connector::Proxy::YAML
-        LOCATION: /home/pkiadm/ca-one-userdb.yaml
+        LOCATION: /home/pkiadm/democa-userdb.yaml
 
 The user file has the same structure as the *user* section above, the user names are the on the top level::
 
@@ -254,10 +254,10 @@ token setup
 Any token used within OpenXKI needs a corresponding entry in the realm's token configuration at ``crypto.token``. The name of the token is the alias name you used while registering the correspondig certificate. ::
 
     token:
-      ca-one-certsign:
+      democa-certsign:
         backend: OpenXPKI::Crypto::Backend::OpenSSL
 
-        key: /etc/openxpki/ca/ca-one/ca-certsign-1.pem
+        key: /etc/openxpki/ca/democa/ca-certsign-1.pem
 
         # possible values are OpenSSL, nCipher, LunaCA
         engine:         OpenSSL
@@ -291,12 +291,12 @@ Usually the tokens in a system share a lot of properties. To simplify the config
 
         server-ca-1:
             inherit: default
-            key: /etc/openxpki/ca/ca-one/ca-certsign-1.pem
+            key: /etc/openxpki/ca/democa/ca-certsign-1.pem
             secret: gen1pass
 
         server-ca-2:
             inherit: default
-            key: /etc/openxpki/ca/ca-one/ca-certsign-2.pem
+            key: /etc/openxpki/ca/democa/ca-certsign-2.pem
 
 
 Inheritance can daisy chain profiles. Note that inheritance works top-down and each step replaces all values that have not been defined earlier but are defined on the current level. Therefore you should not use undef values but the empty string to declare an empty setting.
@@ -308,7 +308,7 @@ The example above will then look like::
     token:
         default:
             backend: OpenXPKI::Crypto::Backend::OpenSSL
-            key: /etc/openxpki/ca/ca-one/[% ALIAS %].pem
+            key: /etc/openxpki/ca/democa/[% ALIAS %].pem
             ......
             secret: default
 
@@ -651,7 +651,7 @@ The handler will fall back to plain text if MIME::Lite can not be loaded.
 The mail templates are read from disk from, you need to set a base directory::
 
     template:
-        dir:   /home/pkiadm/ca-one/email/
+        dir:   /home/pkiadm/democa/email/
 
 Below is the complete message configuration as shipped with the default
 issuance workflow::
@@ -726,7 +726,7 @@ The subject is parsed using TT. If you have specified a prefix, it is automatica
 
 The body of a message is read from the filename specified by *template*, where the
 suffix '.txt' is always apppended. So the full path for the message at
-``messages.csr_created.user`` is */home/pkiadm/ca-one/email/csr_created_user.txt*.
+``messages.csr_created.user`` is */home/pkiadm/democa/email/csr_created_user.txt*.
 
 **html messages**
 
@@ -757,7 +757,7 @@ You need to reference the image in the html template like this::
     </body>
 
 The images are pulled from the folder *images* below the template directory,
-e.g. */home/pkiadm/ca-one/email/images/head.png*. The files must end on
+e.g. */home/pkiadm/democa/email/images/head.png*. The files must end on
 gif/png/jpg as the suffix is used to detect the correct image type.
 
 To test your notification config, you can trigger a test message via the
@@ -785,7 +785,7 @@ As the SMTP backend, it uses templates on disk to build the ticket contents, so
 we also need to set the template directory::
 
     template:
-        dir:   /home/pkiadm/ca-one/rt/
+        dir:   /home/pkiadm/democa/rt/
 
 You can share the templates for SMTP and RT handler and reuse most parts of your configuration,
 but note that the syntax is slightly different from SMTP. Here is the complete

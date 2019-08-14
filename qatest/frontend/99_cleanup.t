@@ -17,7 +17,7 @@ use Test::More tests => 2;
 package main;
 
 my $result;
-my $client = TestCGI::factory('ca-one'); 
+my $client = TestCGI::factory('democa'); 
 
 my @cert_identifier;
 for my $cert (('entity','entity2','entity3','entity-rpc','pkiclient')) {

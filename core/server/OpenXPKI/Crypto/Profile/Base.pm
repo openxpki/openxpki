@@ -612,7 +612,7 @@ Offers the keys ALIAS, GROUP, GENERATION as given in the alias table.
 
 =item PKI_REALM
 
-The internal name of the realm (e.g. "ca-one").
+The internal name of the realm (e.g. "democa").
 
 =back
 

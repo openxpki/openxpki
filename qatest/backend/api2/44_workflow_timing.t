@@ -33,10 +33,10 @@ my $uuid = Data::UUID->new->create_str; # so we don't see workflows from previou
 my $oxitest = OpenXPKI::Test->new(
     with => [ qw( SampleConfig Workflows WorkflowCreateCert Server ) ],
     add_config => {
-        'realm.ca-one.workflow.persister.Delayed' => {
+        'realm.democa.workflow.persister.Delayed' => {
             'class' => 'TestWorkflowTimingDelayedPersister',
         },
-        "realm.ca-one.workflow.def.mywf_$uuid" => {
+        "realm.democa.workflow.def.mywf_$uuid" => {
             'head' => {
                 'label' => 'mywf',
                 'persister' => 'OpenXPKI',
@@ -70,7 +70,7 @@ my $oxitest = OpenXPKI::Test->new(
 );
 
 # set user role to be allowed to create the workflow above
-$oxitest->set_user("ca-one" => "user");
+$oxitest->set_user("democa" => "user");
 
 #
 # Tests

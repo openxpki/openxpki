@@ -493,7 +493,7 @@ The basic configuration in default.conf must contain log and auth info:
 
   [auth]
   stack = _System
-  pki_realm = ca-one
+  pki_realm = democa
 
 =head2 Method Invocation
 

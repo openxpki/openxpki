@@ -26,7 +26,7 @@ print Dumper $result;
    
 my $soap = SOAP::Lite 
     ->uri('http://my.own.site.com/OpenXPKI/SOAP/Revoke')
-    ->proxy('http://localhost/soap/ca-one')
+    ->proxy('http://localhost/soap/democa')
     ->RevokeCertificateByIdentifier('totallyrandomstring')
     ->result;
 

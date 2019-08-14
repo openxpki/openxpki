@@ -14,7 +14,7 @@ use Test::More tests => 12;
 package main;
 
 my $result;
-my $client = TestCGI::factory('ca-one');
+my $client = TestCGI::factory('democa');
 
 my $sscep = -e "./sscep" ? './sscep' : 'sscep';
 

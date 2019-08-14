@@ -17,13 +17,13 @@ L<OpenXPKI::Test::QA::Role::Server/new_client_tester>, ie:
 
 To automatically connect and start a new session just call L</login>:
 
-    $client->login("ca-one" => "caop");
+    $client->login("democa" => "caop");
 
 This is equivalent to:
 
     $client->connect;
     $client->init_session;
-    $client->login("ca-one" => "caop");
+    $client->login("democa" => "caop");
 
 Alternatively to continue an existing session:
 

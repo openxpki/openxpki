@@ -119,7 +119,7 @@ Here is what you need to do if you *dont* use the sampleconfig script.
 #. Create a key/certificate for the internal datavault (ca = false, can be below the ca but can also be self-signed).
 #. Create a key/certificate for the scep service (ca = false, can be below the ca but can also be self-signed or from other ca).
 
-Move the key files to /etc/openxpki/ca/ca-one/ and name them ca-signer-1.pem, vault-1.pem, scep-1.pem.
+Move the key files to /etc/openxpki/ca/democa/ and name them ca-signer-1.pem, vault-1.pem, scep-1.pem.
 The key files must be readable by the openxpki user, so we recommend to make them owned by the openxpki user with mode 0400.
 
 Now import the certificates to the database. The signer token is used exclusive in the current realm,
@@ -130,7 +130,7 @@ so we can use a shortcut and import and reference it with one command.
     openxpkiadm certificate import  --file ca-root-1.crt
 
     openxpkiadm certificate import  --file ca-signer-1.crt \
-        --realm ca-one --token certsign
+        --realm democa --token certsign
 
 As we might want to reuse SCEP and Vault token across the realms, we import them in to the global
 namespace and just create an alias in the current realm::
@@ -138,16 +138,16 @@ namespace and just create an alias in the current realm::
     openxpkiadm certificate import  --file vault-1.crt
     openxpkiadm certificate import  --file scep-1.crt
 
-    openxpkiadm alias --realm ca-one --token datasafe \
+    openxpkiadm alias --realm democa --token datasafe \
         --identifier `openxpkiadm certificate id --file vault-1.crt`
 
-    openxpkiadm alias --realm ca-one --token scep \
+    openxpkiadm alias --realm democa --token scep \
         --identifier `openxpkiadm certificate id --file scep-1.crt`
 
 
 If the import went smooth, you should see something like this (ids and times will vary)::
 
-    $ openxpkiadm alias --realm ca-one
+    $ openxpkiadm alias --realm democa
 
     === functional token ===
     scep (scep):

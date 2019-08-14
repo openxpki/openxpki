@@ -60,7 +60,7 @@ $wf->execute_fails('crr_approve_crr' => {}, qr/no access.*crr_approve_crr/i);
 
 
 # set current user to: operator
-$oxitest->set_user('ca-one' => 'raop');
+$oxitest->set_user('democa' => 'raop');
 
 $wf->execute('crr_update_crr', { reason_code => 'keyCompromise' });
 $wf->state_is('PENDING');

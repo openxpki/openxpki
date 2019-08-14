@@ -38,7 +38,7 @@ my $r1_base = {
 my $r1_base_data = [ map { $r1_base->{$_} } qw(report_name created description mime_type) ];
 my $r1 =  {
     %{$r1_base},
-    pki_realm => 'ca-one',
+    pki_realm => 'democa',
     report_value => 'report data'
 };
 my $r2_base = {
@@ -50,7 +50,7 @@ my $r2_base = {
 my $r2_base_data = [ map { $r2_base->{$_} } qw(report_name created description mime_type) ];
 my $r2 = {
     %{$r2_base},
-    pki_realm => 'ca-one',
+    pki_realm => 'democa',
     report_value => 'report other data'
 };
 

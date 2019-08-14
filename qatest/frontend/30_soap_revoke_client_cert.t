@@ -16,7 +16,7 @@ use Test::More tests => 7;
 package main;
 
 my $result;
-my $client = TestCGI::factory('ca-one');
+my $client = TestCGI::factory('democa');
 
 my $cert_identifier = do { # slurp
     local $INPUT_RECORD_SEPARATOR;
@@ -29,7 +29,7 @@ diag('Revocation test - cert identifier '  . $cert_identifier);
 # Unauthenticated call - stops in PENDING state
 my $soap = SOAP::Lite 
     ->uri('http://schema.openxpki.org/OpenXPKI/SOAP/Revoke')
-    ->proxy('http://localhost/soap/ca-one')
+    ->proxy('http://localhost/soap/democa')
     ->RevokeCertificateByIdentifier($cert_identifier);
 
 ok($soap, 'SOAP Client no Auth');
@@ -38,7 +38,7 @@ is($soap->result->{state}, 'PENDING','State pending without auth, Workflow ' . $
 
 # Now try with SSL Auth - should be autoapproved
 my $oSoap =  Connector::Proxy::SOAP::Lite->new({
-    LOCATION => 'https://localhost/soap/ca-one',
+    LOCATION => 'https://localhost/soap/democa',
     uri => 'http://schema.openxpki.org/OpenXPKI/SOAP/Revoke',
     method => 'RevokeCertificateByIdentifier',
     certificate_file => 'tmp/pkiclient.crt',

@@ -45,11 +45,11 @@ After importing the root, or if you do not have a dedicated root, you
 can now import the issuing certificate::
 
     openxpkiadm certificate import  --file ca-signer-1.crt \
-        --realm ca-one --token certsign
+        --realm democa --token certsign
 
 This will import the certificate and also create a so called alias to
 mark this certificate as issuing token. With the default config, the key
-file is expected to be at /etc/openxpki/ca/ca-one/ca-signer-1.pem.
+file is expected to be at /etc/openxpki/ca/democa/ca-signer-1.pem.
 
 
 Datasafe Token
@@ -60,7 +60,7 @@ exposed to the public so it is acceptable to use a self-signed
 certificate here::
 
     openxpkiadm certificate import  --file vault-1.crt \
-        --realm ca-one --token datasafe
+        --realm democa --token datasafe
 
 The token is used for encrypting new items only as long as the certificate
 is valid. Expired tokens are still needed to decrypt existing items so

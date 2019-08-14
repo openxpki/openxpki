@@ -13,7 +13,7 @@ Original output of "openxpkiadm certificate import ..."
       Realm:      ca-one
 
     Successfully created alias in realm ca-one:
-      Alias     : ca-one-signer-1
+      Alias     : ca-signer-1
       Identifier: mIqp8XGxjquD0MtxsiFhv7JFfGk
       NotBefore : 2017-01-26 22:29:06
       NotAfter  : 2106-02-07 06:28:15

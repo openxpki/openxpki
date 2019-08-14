@@ -811,7 +811,7 @@ This is the standard hook for roles to modify session data, e.g.:
 
     after 'init_session_and_context' => sub {
         my $self = shift;
-        $self->session->data->pki_realm("ca-one") if $self->has_session;
+        $self->session->data->pki_realm("democa") if $self->has_session;
     };
 
 =cut

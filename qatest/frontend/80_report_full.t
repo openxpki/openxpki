@@ -14,7 +14,7 @@ use Test::More tests => 5;
 package main;
 
 my $result;
-my $client = TestCGI::factory('ca-one');
+my $client = TestCGI::factory('democa');
 
 $result = $client->mock_request({
     'page' => 'workflow!index!wf_type!report_full',

@@ -159,7 +159,7 @@ The config file is parsed using Config::Std, all params are mandatory.
 
     [global]
     socket=/var/openxpki/openxpki.socket
-    realm=ca-one
+    realm=democa
     iprange=0.0.0.0/0
     servername=tls-scep-1
     encryption_algorithm=3DES

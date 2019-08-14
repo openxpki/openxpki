@@ -30,7 +30,7 @@ if extra certificate identifiers):
 
     path:
         realm:
-         - ca-one
+         - democa
         cacert:
          - list of extra cert identifiers
 

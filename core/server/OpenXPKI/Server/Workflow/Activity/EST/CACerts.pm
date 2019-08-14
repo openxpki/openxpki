@@ -53,7 +53,7 @@ Generate PKCS7 block holding the current issuer with all chain certificates
 
 =item ca_alias
 
-Optional, full alias of the issuer certificate (e.g. ca-one-signer-1).
+Optional, full alias of the issuer certificate (e.g. ca-signer-1).
 Default is to get the active certsign token.
 
 =item target_key

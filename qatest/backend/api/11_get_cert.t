@@ -78,7 +78,7 @@ lives_and {
         'HEADER'            => superhashof({}),             # HashRef,
         'IDENTIFIER'        => re(qr/^.+$/),                # 'lCh0Eqo-Aabbwr14pJUSLPoz6jg'
         'ISSUER_IDENTIFIER' => re(qr/^.+$/),                # 'k1izCpwZwEu6jFJZbwul-fVoQFY',
-        'PKI_REALM'         => re(qr/^.+$/),                # 'ca-one',
+        'PKI_REALM'         => re(qr/^.+$/),                # 'democa',
         'STATUS'            => re(qr/^\w+$/),               # 'ISSUED'
     }), "HASH contains relevant elements");
 
@@ -148,7 +148,7 @@ lives_and {
         'ISSUER_IDENTIFIER'         => re(qr/^.+$/),            # 'k1izCpwZwEu6jFJZbwul-fVoQFY',
         'NOTAFTER'                  => re(qr/\d+$/),            # '1496094413',
         'NOTBEFORE'                 => re(qr/\d+$/),            # '1480456013',
-        'PKI_REALM'                 => re(qr/^.+$/),            # 'ca-one',
+        'PKI_REALM'                 => re(qr/^.+$/),            # 'democa',
         'STATUS'                    => re(qr/^\w+$/),           # 'ISSUED',
         'SUBJECT'                   => re(qr/^.+$/),            # 'CN=nicetest-63a0ee.openxpki.test:8080,DC=Test Deployment,DC=OpenXPKI,DC=org',
         'SUBJECT_KEY_IDENTIFIER'    => re(qr/^.+$/),            # 'BD:B1:9B:63:70:40:A3:3D:48:2C:0C:7A:0D:33:90:2E:C0:D2:23:89',

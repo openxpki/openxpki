@@ -4,7 +4,7 @@ use Moose::Role;
 =head1 NAME
 
 OpenXPKI::Test::QA::Role::SampleConfig - Moose role that extends L<OpenXPKI::Test>
-to include the complete sample configuration from `config/openxpki/config.d`
+to include the complete sample configuration from `config/config.d`
 
 =cut
 
@@ -40,7 +40,7 @@ Modifications made:
 
 =over
 
-=item * C<realm.ca-one.auth>: replace stacks, handler and roles with L<OpenXPKI::Test/auth_config>
+=item * C<realm.democa.auth>: replace stacks, handler and roles with L<OpenXPKI::Test/auth_config>
 
 =item * C<system.server>: replace process user/group and file locations
 
@@ -50,7 +50,7 @@ C<OpenXPKI::Test>.
 
 =back
 
-=item * set C<CTX('session')->data->pki_realm> to I<ca-one>
+=item * set C<CTX('session')->data->pki_realm> to I<democa>
 
 =back
 
@@ -77,7 +77,7 @@ has start_watchdog => (
 
 =cut
 
-has src_config_dir   => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { my(undef, $mydir, undef) = fileparse(__FILE__); abs_path($mydir."../../../../../../config/openxpki/config.d"); } );
+has src_config_dir   => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { my(undef, $mydir, undef) = fileparse(__FILE__); abs_path($mydir."../../../../../../config/config.d"); } );
 has path_temp_dir    => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/tmp" } );
 has path_export_dir  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/openxpki/dataexchange/export" } );
 has path_import_dir  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/openxpki/dataexchange/import" } );
@@ -90,7 +90,7 @@ before 'init_base_config' => sub { # happens before init_user_config() so we do 
     my $self = shift;
 
     my(undef, $mydir, undef) = fileparse(__FILE__);
-    my $config_dir = abs_path($mydir."/../../../../../../config/openxpki/config.d");
+    my $config_dir = abs_path($mydir."/../../../../../../config/config.d");
     die "Could not find OpenXPKI sample config dir" unless -d $config_dir;
 
     my $config = $self->config_writer;
@@ -104,7 +104,7 @@ before 'init_base_config' => sub { # happens before init_user_config() so we do 
     $config->_make_parent_dir($self->path_stderr_file);
 
     # add default configs
-    $self->_load_default_config("realm/ca-one",         $self->can('_customize_ca_one'));          # can() returns a CodeRef
+    $self->_load_default_config("realm/democa",         $self->can('_customize_democa'));          # can() returns a CodeRef
     $self->_load_default_config("system/crypto.yaml");
     # NO $self->_load_default_config("system.database") -- it's completely customized for tests
     $self->_load_default_config("system/realms.yaml");
@@ -116,7 +116,7 @@ before 'init_base_config' => sub { # happens before init_user_config() so we do 
 after 'init_session_and_context' => sub {
     my $self = shift;
     # set PKI realm after init() as various init procedures overwrite the realm
-    $self->session->data->pki_realm("ca-one") if $self->has_session;
+    $self->session->data->pki_realm("democa") if $self->has_session;
 };
 
 # Loads the given default config YAML and adds it to the test environment,

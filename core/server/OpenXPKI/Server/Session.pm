@@ -22,7 +22,7 @@ OpenXPKI::Server::Session - Factory to create, persist and resume sessions
 To start a new session:
 
     my $session = OpenXPKI::Server::Session->new(load_config => 1)->create;
-    $session->data->pki_realm("ca-one");
+    $session->data->pki_realm("democa");
     ...
     $session->persist;
 

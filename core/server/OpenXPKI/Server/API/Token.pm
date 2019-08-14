@@ -372,7 +372,7 @@ Expects the config path to point to a structure like:
 
     path:
         realm:
-        - ca-one
+        - democa
         cacert:
         - list of extra cert identifiers
 

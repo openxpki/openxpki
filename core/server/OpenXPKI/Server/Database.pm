@@ -668,7 +668,7 @@ Usage:
     my $query = $db->query_builder->select(
         from => 'certificate',
         columns  => [ 'identifier' ],
-        where => { pki_realm => 'ca-one' },
+        where => { pki_realm => 'democa' },
     );
 
 =item * B<db_version> - database version, equals the result of C<$dbh-E<gt>get_version(...)> (I<Str>)

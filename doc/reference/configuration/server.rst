@@ -194,7 +194,7 @@ PKI Realms
 ----------
 The detailed settings of each realm are given in the specific realm configuration. To use a realm you need to specify and enable it at ``system.realms``. ::
 
-    ca-one:
+    democa:
         label: This is just a verbose label for your CA
 
 You should use only 7bit word characters and no spaces as name for the realm.

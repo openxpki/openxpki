@@ -37,7 +37,7 @@ my $r1_base = {
 };
 my $r1 =  {
     %{$r1_base},
-    pki_realm => 'ca-one',
+    pki_realm => 'democa',
     report_value => 'report data'
 };
 my $r2_base = {
@@ -48,7 +48,7 @@ my $r2_base = {
 };
 my $r2 = {
     %{$r2_base},
-    pki_realm => 'ca-one',
+    pki_realm => 'democa',
     report_value => 'report other data'
 };
 

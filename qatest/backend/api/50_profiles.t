@@ -23,7 +23,7 @@ plan tests => 43;
 my $oxitest = OpenXPKI::Test->new(
     with => [ qw( TestRealms SampleConfig Server Workflows WorkflowCreateCert ) ],
     add_config => {
-        "realm.ca-one.profile.I18N_OPENXPKI_PROFILE_USER_HIDDEN" => {
+        "realm.democa.profile.I18N_OPENXPKI_PROFILE_USER_HIDDEN" => {
             label => "Blah",
             style => {
                 "00_user_basic_style" => {
@@ -39,7 +39,7 @@ my $oxitest = OpenXPKI::Test->new(
 my $client = $oxitest->new_client_tester;
 $client->connect;
 $client->init_session;
-$client->login("ca-one" => "caop");
+$client->login("democa" => "caop");
 
 my $result;
 

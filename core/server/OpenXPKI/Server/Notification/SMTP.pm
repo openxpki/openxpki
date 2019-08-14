@@ -26,7 +26,7 @@ are read from the filesystem.
         prefix: PKI-Request [% meta_wf_id %]
 
     template:
-        dir:   /home/pkiadm/ca-one/mails/
+        dir:   /home/pkiadm/democa/mails/
 
     message:
         csr_created:

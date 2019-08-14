@@ -14,7 +14,7 @@ use Test::More tests => 9;
 package main;
 
 my $result;
-my $client = TestCGI::factory('ca-one');
+my $client = TestCGI::factory('democa');
 
 my $crl= do { # slurp
     local $INPUT_RECORD_SEPARATOR;

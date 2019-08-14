@@ -92,7 +92,7 @@ Name of the token type to look up, e.g. certsign
 
 =item group
 
-Name of the group to look up, e.g. ca-one-signer
+Name of the group to look up, e.g. ca-signer
 
 token and group are mutually exclusive, token has precedence.
 
