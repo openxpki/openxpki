@@ -128,6 +128,10 @@ sub __process_workflow {
     my $workflow = {
         type => $wf_name,
         persister => 'OpenXPKI',
+        observer => [
+            { class => 'OpenXPKI::Server::Workflow::Observer::AddExecuteHistory' },
+            { class => 'OpenXPKI::Server::Workflow::Observer::Log' },
+        ],
         state => []
     };
 

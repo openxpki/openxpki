@@ -65,7 +65,6 @@ command "create_workflow_instance" => {
             message => "Could not start workflow (type might be unknown)",
             params => { type => $type }
         );
-    $workflow->reload_observer;
 
     my $id = $workflow->id;
     ##! 2: "New workflow's ID: $id"

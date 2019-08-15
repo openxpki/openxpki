@@ -313,20 +313,6 @@ sub set_failed {
 
 }
 
-# migrated from api - i have no idea what this is good for
-sub reload_observer {
-
-    ##! 1: 'start'
-    my $self = shift;
-
-    $self->delete_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
-    $self->add_observer ('OpenXPKI::Server::Workflow::Observer::AddExecuteHistory');
-    $self->delete_observer ('OpenXPKI::Server::Workflow::Observer::Log');
-    $self->add_observer ('OpenXPKI::Server::Workflow::Observer::Log');
-
-    return $self;
-}
-
 sub attrib {
     my ($self, $arg) = @_;
     ##! 1: 'start'

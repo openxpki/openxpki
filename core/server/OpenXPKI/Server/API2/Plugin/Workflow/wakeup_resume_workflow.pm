@@ -170,8 +170,6 @@ sub _wakeup_or_resume_workflow {
         }
     }
 
-    $workflow->reload_observer();
-
     # get the last action from the context
     my $activity = $workflow->context->param('wf_current_action');
 

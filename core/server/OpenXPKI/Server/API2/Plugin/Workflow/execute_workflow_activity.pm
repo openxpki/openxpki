@@ -104,7 +104,6 @@ command "execute_workflow_activity" => {
             params => { wf_id => $wf_id, activity => $wf_activity, proc_state => $proc_state }
         );
     }
-    $workflow->reload_observer;
 
     # check the input params
     my $wf_params = $util->validate_input_params($workflow, $wf_activity, $params->params);
