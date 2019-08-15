@@ -24,7 +24,7 @@ sub _validate {
     ## prepare the environment
     my $context   = $wf->context();
 
-    my $default_token = CTX('api')->get_default_token();
+    my $default_token = CTX('api2')->get_default_token();
 
     # if nothing is there to validate yet, we can return
     return if (! defined $pkcs10 );

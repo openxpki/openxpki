@@ -165,9 +165,14 @@ sub send_command {
     my $params = shift || {};
     my $nostatus = shift || 0;
 
+    $self->logger()->warn("APIv1 command - try to autoconvert");
+
+    my $newparam;
+    map { $newparam->{lc($_)} => $params->{$_} } keys %$params;
+
     my $backend = $self->_client()->backend();
     my $reply = $backend->send_receive_service_msg(
-        'COMMAND', { COMMAND => $command, PARAMS => $params, API => 1 }
+        'COMMAND', { COMMAND => $command, PARAMS => $newparam, API => 2 }
     );
     $self->_last_reply( $reply );
 
@@ -544,21 +549,21 @@ sub init_fetch {
         close $fh;
     } elsif ($type eq 'datapool') {
         # todo - catch exceptions/not found
-        my $dp = $self->send_command( 'get_data_pool_entry', {
-            NAMESPACE => 'workflow.download',
-            KEY => $source,
+        my $dp = $self->send_command_v2( 'get_data_pool_entry', {
+            namespace => 'workflow.download',
+            key => $source,
         });
-        if (!$dp->{VALUE}) {
+        if (!$dp->{value}) {
             die "Requested data not found/expired";
         }
         print $cgi->header( @main::header, -type => $data->{mime}, -attachment => $data->{attachment} );
-        print $dp->{VALUE};
+        print $dp->{value};
 
     } elsif ($type eq 'report') {
         # todo - catch exceptions/not found
-        my $report = $self->send_command( 'get_report', {
-            NAME => $source,
-            FORMAT => 'ALL',
+        my $report = $self->send_command_v2( 'get_report', {
+            name => $source,
+            format => 'ALL',
         });
         if (!$report) {
             die "Requested data not found/expired";

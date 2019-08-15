@@ -19,15 +19,15 @@ $ENV{OPENXPKI_CONF_DB} = 't/config.git/';
 ## init Context
 ok(OpenXPKI::Server::Init::init(
        {
-	   TASKS  => [
-                'api',
+       TASKS  => [
+                'api2',
                'config_versioned',
-		       'i18n',
+               'i18n',
                'dbi_log',
-		       'log',
-		       'dbi',
-		       'crypto_layer',
-		       'volatile_vault',
+               'log',
+               'dbi',
+               'crypto_layer',
+               'volatile_vault',
 #               'acl',
                'authentication',
                ],
@@ -50,8 +50,8 @@ is(ref CTX('dbi'),
    'OpenXPKI::Server::Database', "CTX('dbi')"
 );
 
-is(ref CTX('api'),
-   'OpenXPKI::Server::API', "CTX('api')"
+is(ref CTX('api2'),
+   'OpenXPKI::Server::API2', "CTX('api2')"
 );
 
 is(ref CTX('authentication'),

@@ -62,14 +62,14 @@ sub _load {
 
     return unless ($wf_id);
 
-    if ($self->{_workflow} && $self->{_workflow}->{'WORKFLOW.WORKFLOW_SERIAL'} == $wf_id) {
+    if ($self->{_workflow} && $self->{_workflow}->{'workflow_id'} == $wf_id) {
         return $self->{_workflow};
     }
 
     $self->{_workflow} = undef;
 
     eval {
-        my $result = CTX('api')->search_workflow_instances({ SERIAL => [ $wf_id ]});
+        my $result = CTX('api2')->search_workflow_instances( id => [ $wf_id ] );
         if ($result->[0]) {
             $self->{_workflow} = $result->[0];
         }
@@ -89,7 +89,7 @@ sub creator {
 
     my $self = shift;
     my $wf_id = shift;
-    return CTX('api')->get_workflow_creator({ ID => $wf_id });
+    return CTX('api2')->get_workflow_creator( id => $wf_id );
 
 }
 
@@ -106,7 +106,7 @@ sub state {
 
     my $wf = $self->_load($wf_id);
     if (!$wf) { return; }
-    return $wf->{'WORKFLOW.WORKFLOW_STATE'};
+    return $wf->{'workflow_state'};
 
 }
 
@@ -123,7 +123,7 @@ sub realm {
 
     my $wf = $self->_load($wf_id);
     if (!$wf) { return; }
-    CTX('config')->get(['system','realms',$wf->{'WORKFLOW.PKI_REALM'},'label']);
+    CTX('config')->get(['system','realms', $wf->{'pki_realm'}, 'label']);
 
 }
 

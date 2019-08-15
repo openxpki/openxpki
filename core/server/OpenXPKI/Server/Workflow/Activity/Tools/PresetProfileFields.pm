@@ -106,7 +106,7 @@ sub execute {
     # Evaluate: Replace with data from hashed_dn and preset?
 
     if ($san_hash) {
-        my $san_names = CTX('api')->list_supported_san();
+        my $san_names = CTX('api2')->list_supported_san();
         my $fields = CTX('api2')->get_field_definition(
             profile => $cert_profile,
             style => $cert_subject_style,

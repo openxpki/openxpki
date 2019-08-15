@@ -22,7 +22,7 @@ sub execute {
 
     my $target_key = $self->param('target_key') || 'eligibility_result';
 
-    my @prefix = $self->_get_service_config_path('eligible');
+    my @prefix = @{$self->_get_service_config_path('eligible')};
     my $config_path = join ".", @prefix;
 
     # Reset the context

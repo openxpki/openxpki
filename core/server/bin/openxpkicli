@@ -28,7 +28,6 @@ my %params = (
     timeout => 30,
     json => undef,
     session  => undef,
-    legacy => undef,
     );
 
 sub debug {
@@ -79,7 +78,6 @@ GetOptions(\%params,
             session
             debug
             json:s
-            legacy
          )) or pod2usage(-verbose => 0);
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
@@ -139,11 +137,6 @@ foreach my $entry (@args) {
         $value = 1;
     }
 
-    # uppercase all keys when legacy api is used
-    if ($params{legacy} || $ENV{OPENXPKI_LEGACY_API}) {
-        $key = uc($key);
-    }
-
     $args{$key} = $value;
 
 }
@@ -153,11 +146,6 @@ foreach my $entry (@{$params{filearg}}) {
 
     if (!defined $key) {
         die "filearg must be given as key=filename ($entry)\n";
-    }
-
-    # uppercase all keys when legacy api is used
-    if ($params{legacy} || $ENV{OPENXPKI_LEGACY_API}) {
-        $key = uc($key);
     }
 
     -e $value || die "filearg input file not found ($value)\n";
@@ -301,11 +289,8 @@ if (%parameters) {
         $p = \%parameters;
     }
 
-    if ($params{legacy}) {
-        $args{PARAMS} = $p;
-    } else {
-        $args{params} = $p;
-    }
+    $args{params} = $p;
+
 }
 
 
@@ -313,7 +298,7 @@ if ($command ne 'logout') {
     $reply = $client->send_receive_service_msg('COMMAND', {
         COMMAND => $command,
         PARAMS => \%args,
-        API => ($params{legacy} || $ENV{OPENXPKI_LEGACY_API}) ? 1 : 2
+        API => 2
     });
 
     # terminate the login session if we are not in "session reuse" mode
@@ -365,10 +350,6 @@ openxpkicli [options] command
     --json {"key":"val"}  parse given string and merge with arguments
     --json FILE           read json string from FILE and merge with arguments
     --session             session mode, see below for details
-    --legacy              if set the old OpenXPKI 1.x API calls will be
-                          used. This will be removed in future versions
-                          and is only provided to assist script migration!
-                          Also active when OPENXPKI_LEGACY_API=1 is set
 
 =head1 INVOCATION
 

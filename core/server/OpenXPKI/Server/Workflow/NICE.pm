@@ -100,8 +100,8 @@ sub __persistCertificateInformation {
     my ($self, $cert_info, $persist_data) = @_;
     ##! 64: 'certificate information: ' . Dumper ( $cert_info )
 
-    my $pki_realm = CTX('api')->get_pki_realm();
-    my $default_token = CTX('api')->get_default_token();
+    my $pki_realm = CTX('api2')->get_pki_realm();
+    my $default_token = CTX('api2')->get_default_token();
 
     my $x509 = OpenXPKI::Crypt::X509->new( $cert_info->{certificate} );
 
@@ -114,14 +114,14 @@ sub __persistCertificateInformation {
         my $serialized_data = $serializer->serialize( $persist_data );
         ##! 16: 'Persist certificate: ' . $identifier
         ##! 32: 'persisted data: ' . Dumper( $persist_data )
-        CTX('api')->set_data_pool_entry({
-            PKI_REALM => $pki_realm,
-            NAMESPACE => 'nice.certificate.information',
-            KEY       => $identifier,
-            VALUE     => $serialized_data,
-            ENCRYPT   => 0,
-            FORCE     => 1,
-        });
+        CTX('api2')->set_data_pool_entry(
+            pki_realm => $pki_realm,
+            namespace => 'nice.certificate.information',
+            key       => $identifier,
+            value     => $serialized_data,
+            encrypt   => 0,
+            force     => 1,
+        );
     }
 
     # Try to autodetected the ca_identifier ....
@@ -209,17 +209,17 @@ sub __fetchPersistedCertificateInformation {
     my $self = shift;
     my $certificate_identifier = shift;
 
-    my $pki_realm = CTX('api')->get_pki_realm();
+    my $pki_realm = CTX('api2')->get_pki_realm();
 
-    my $serialized_data = CTX('api')->get_data_pool_entry({
-        PKI_REALM => $pki_realm,
-        NAMESPACE => 'nice.certificate.information',
-        KEY => $certificate_identifier,
-      });
+    my $serialized_data = CTX('api2')->get_data_pool_entry(
+        pki_realm => $pki_realm,
+        namespace => 'nice.certificate.information',
+        key => $certificate_identifier,
+    );
 
-      my $serializer = OpenXPKI::Serialization::Simple->new();
+    my $serializer = OpenXPKI::Serialization::Simple->new();
 
-    return $serializer->deserialize( $serialized_data->{VALUE} );
+    return $serializer->deserialize( $serialized_data->{value} );
 
 }
 

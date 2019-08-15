@@ -30,7 +30,7 @@ sub execute {
 
     ##! 32: 'ASN1 conf ' . $source
 
-    my $token = CTX('api')->get_default_token();
+    my $token = CTX('api2')->get_default_token();
     my $asn1 = $token->command({
         COMMAND => 'asn1_genconf',
         DATA => $source });

@@ -22,20 +22,20 @@ sub execute
     my $workflow   = shift;
     my $context    = $workflow->context();
 
-    my $key_alg = $self->param('key_alg');
-    ##! 16: 'key_type: ' . $key_type
+    my $params = {
+        key_alg  => $self->param('key_alg'),
+        enc_alg  => $self->param('enc_alg'),
+        password => $self->param('password'),
+    };
 
-    if (! defined $key_alg) {
+    if (!$params->{key_alg}) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_MISSING_PARAMETERS',
         );
     }
 
-    my $enc_alg = $self->param('enc_alg');
-
-    my $password = $self->param('password');
     # password check
-    if (! defined $password || $password eq '') {
+    if (!$params->{password}) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_MISSING_OR_EMPTY_PASSWORD',
         );
@@ -49,31 +49,29 @@ sub execute
         );
     }
 
-    # TODO - we need to find a suitable way to validate parameters against the
-    # implementation without hardcoding it in the perl code.
-    # For now, we just expect that the workflow has only valid items
+    # TODO - we need to find a suitable way to map and validate parameters
+    # for the moment we just support key_length and curve_name and map those
+    # to the API method
 
-    # Run thru the params and uppercase the key name and remove empty sets
     my $param;
     foreach my $key (keys %{$parameters}) {
         my $value = $parameters->{$key};
         if ( defined $value && $value ne '' ) {
-            $param->{uc($key)} = $value;
+            if ($key =~ /curve_name/i) {
+                $params->{curve} = $value;
+            } elsif ($key =~ /KEY_LENGTH/i) {
+                $params->{key_length} = $value;
+            } else {
+                $self->log()->warn('Unknown key parameter ' . $key);
+            }
         }
     }
 
     # command definition
-    my $pkcs8 = CTX('api')->generate_key({
-         KEY_ALG    => $key_alg,
-         ENC_ALG    => $enc_alg,
-         PASSWD     => $password,
-         PARAMS     => $param,
-    });
-
+    my $pkcs8 = CTX('api2')->generate_key(%$params);
 
     CTX('log')->audit('key')->info("generating private key", {
-        'key_alg' => $key_alg,
-        %{$param}
+        %{$params}
     });
 
     my $target_key = $self->param('target_key') || 'private_key';

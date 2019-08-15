@@ -19,7 +19,7 @@ sub execute
     my $self       = shift;
     my $workflow   = shift;
     my $context    = $workflow->context();
-    my $pki_realm  = CTX('api')->get_pki_realm();
+    my $pki_realm  = CTX('api2')->get_pki_realm();
     my $serializer = OpenXPKI::Serialization::Simple->new();
     my $dbi        = CTX('dbi');
 

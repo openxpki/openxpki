@@ -54,13 +54,13 @@ sub _evaluate {
     # Load token, will throw an exception if none is found!
     my $issuing_ca;
     eval {
-        $issuing_ca = CTX('api')->get_token_alias_by_type( {
-            TYPE => $token,
-            VALIDITY => {
-                NOTBEFORE => $notbefore,
-                NOTAFTER => $notafter,
+        $issuing_ca = CTX('api2')->get_token_alias_by_type(
+            type => $token,
+            validity => {
+                notbefore => $notbefore,
+                notafter => $notafter,
             },
-        });
+        );
     };
 
     if (!$issuing_ca) {

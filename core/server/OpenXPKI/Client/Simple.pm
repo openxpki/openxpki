@@ -314,7 +314,8 @@ sub _build_client {
 
 sub run_legacy_command {
     my $self = shift;
-    return $self->run_command( shift, shift, 1 );
+    my $command = shift;
+    die "run_legacy_command is no longer supported (command $command)";
 }
 
 sub run_command {
@@ -323,6 +324,8 @@ sub run_command {
     my $command = shift;
     my $params = shift || {};
     my $api = shift || 2;
+
+    die "run_command must be called with API version 2 ($command / $api)" if ($api != 2);
 
     my $reply = $self->client()->send_receive_service_msg('COMMAND', {
         COMMAND => $command,

@@ -88,10 +88,10 @@ sub __dispatch_revoke {
 
         # if revoke by serial is requested, use API to resolve the identifier
         if (!$arg->{cert_identifier}) {
-            my $res = $client->run_legacy_command( 'search_cert', {
-                CERT_SERIAL => $arg->{serial},
-                ISSUER_DN   => $arg->{issuer_dn},
-                ENTITY_ONLY => 1
+            my $res = $client->run_command( 'search_cert', {
+                cert_serial => $arg->{serial},
+                issuer_dn   => $arg->{issuer_dn},
+                entity_only => 1
             });
             if (ref $res ne 'ARRAY' || scalar @{$res} != 1) {
                 $log->error("SOAP: RevokeCertificateByIssuerSerial - no certificate found: " .
@@ -107,7 +107,7 @@ sub __dispatch_revoke {
             $crr_info->{serial} = $arg->{serial};
             $crr_info->{issuer_dn} = $arg->{issuer_dn};
 
-            $arg->{cert_identifier} = $res->[0]->{IDENTIFIER};
+            $arg->{cert_identifier} = $res->[0]->{identifier};
             $log->debug('Found certificate ' . $arg->{cert_identifier});
         }
 

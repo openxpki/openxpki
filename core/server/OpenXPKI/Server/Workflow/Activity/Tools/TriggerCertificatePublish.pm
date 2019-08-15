@@ -51,17 +51,17 @@ sub execute {
     }
 
     # Create publishing workflow
-    my $wf_info = CTX('api')->create_workflow_instance({
-        WORKFLOW      => $workflow_type,
-        PARAMS        => $params
-    });
+    my $wf_info = CTX('api2')->create_workflow_instance(
+        workflow      => $workflow_type,
+        params        => $params
+    );
 
-    CTX('log')->application()->info('Publishing workflow created with id ' . $wf_info->{WORKFLOW}->{ID});
+    CTX('log')->application()->info('Publishing workflow created with id ' . $wf_info->{workflow}->{id});
 
 
-    ##! 16: 'Publishing Workflow created with id ' . $wf_info->{WORKFLOW}->{ID}
+    ##! 16: 'Publishing Workflow created with id ' . $wf_info->{workflow}->{id}
 
-    $context->param('workflow_publish_id', $wf_info->{WORKFLOW}->{ID} );
+    $context->param('workflow_publish_id', $wf_info->{workflow}->{id} );
 
     return 1;
 

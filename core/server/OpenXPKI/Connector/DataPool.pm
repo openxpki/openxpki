@@ -53,16 +53,16 @@ sub get {
     my $parsed_key;
     $template->process(\$key, $ttarg, \$parsed_key) || die "Error processing argument template.";
 
-    my $result = CTX('api')->get_data_pool_entry({
-        'NAMESPACE' => $self->LOCATION(),
-        'KEY' => $parsed_key,
-    });
+    my $result = CTX('api2')->get_data_pool_entry(
+        'namespace' => $self->LOCATION(),
+        'key' => $parsed_key,
+    );
 
     if (!defined $result) {
         return $self->_node_not_exists();
     }
 
-    return $result->{VALUE};
+    return $result->{value};
 
 }
 
@@ -179,13 +179,13 @@ sub set {
 
     $self->log()->debug('Namespace key is' . $parsed_key . ', values ' . $dpval);
 
-    CTX('api')->set_data_pool_entry({
-        'NAMESPACE' => $self->LOCATION(),
-        'KEY' => $parsed_key,
-        'VALUE' => $dpval,
-        'ENCRYPT' => $self->encrypt(),
-        'FORCE' => 1
-    });
+    CTX('api2')->set_data_pool_entry(
+        'namespace' => $self->LOCATION(),
+        'key' => $parsed_key,
+        'value' => $dpval,
+        'encrypt' => $self->encrypt(),
+        'force' => 1
+    );
 
     return 1;
 

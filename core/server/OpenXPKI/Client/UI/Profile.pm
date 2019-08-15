@@ -57,7 +57,7 @@ sub action_get_key_param {
     my $token = $self->__fetch_wf_token( $self->param('wf_token') );
 
     # Get the possible parameters for this algo
-    my $key_gen_param_supported = $key_alg ? $self->send_command( 'get_key_params', { PROFILE => $token->{cert_profile}, ALG => $key_alg }) : {};
+    my $key_gen_param_supported = $key_alg ? $self->send_command_v2( 'get_key_params', { profile => $token->{cert_profile}, alg => $key_alg }) : {};
 
     $self->logger()->trace( '$key_gen_param_supported: ' . Dumper $key_gen_param_supported );
 

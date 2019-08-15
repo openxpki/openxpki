@@ -24,54 +24,37 @@ sub execute {
     my $context    = $workflow->context();
 
     my $params     = {
-    PKI_REALM => CTX('api')->get_pki_realm(),
+        pki_realm => CTX('api2')->get_pki_realm(),
+        namespace => $self->param('namespace'),
+        key => $self->param('key'),
     };
 
-    foreach my $key (qw( namespace key )) {
-        my $pkey = 'ds_' . $key;
-        my $val  = $self->param($pkey);
-        if ( not defined $val ) {
-            OpenXPKI::Exception->throw(
-        message =>
-        'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_MODIFYENTRY_MISSPARAM',
-        params => {
-            PARAM => $pkey,
-        },
-        );
+    if (!$params->{namespace}) {
+        configuration_error('Datapool::GetEntry requires the namespace parameter');
     }
+    if (!$params->{key}) {
+        configuration_error('Datapool::GetEntry requires the key parameter');
     }
 
-    foreach my $key (qw( namespace key newkey expiration_date )) {
-    if (defined $self->param( 'ds_' . $key )) {
-        $params->{ uc($key) } = $self->param( 'ds_' . $key );
-    }
+    if (my $newkey = $self->param('newkey')) {
+        $params->{newkey} = $newkey;
     }
 
-    foreach my $key (qw( KEY NEWKEY )) {
-    # dereference if necessary
-    if ($params->{$key} =~ m{ \A \$ (.*) }xms) {
-        $params->{$key} = $context->param($1);
-    }
-    }
-
-
-    if (exists $params->{EXPIRATION_DATE}) {
-    if (defined $params->{EXPIRATION_DATE}
-        && ($params->{EXPIRATION_DATE} ne '')) {
-        my $then = OpenXPKI::DateTime::get_validity(
-        {
+    my $expiration_date = $self->param('expiration_date');
+    if ($expiration_date) {
+        my $then = OpenXPKI::DateTime::get_validity({
             REFERENCEDATE  => DateTime->now(),
-            VALIDITY       => $params->{EXPIRATION_DATE},
+            VALIDITY       => $expiration_date,
             VALIDITYFORMAT => 'relativedate',
         });
-        $params->{EXPIRATION_DATE} = $then->epoch();
-    } else {
-        $params->{EXPIRATION_DATE} = undef;
-    }
+        $params->{expiration_date} = $then->epoch();
+    } elsif (defined $expiration_date) {
+        $params->{expiration_date} = undef;
     }
 
+
     ##! 16: 'modify_data_pool_entry params: ' . Dumper $params
-    CTX('api')->modify_data_pool_entry($params);
+    CTX('api2')->modify_data_pool_entry($params);
 
     return 1;
 }
@@ -97,24 +80,23 @@ See the example that follows.
 
 =over 8
 
-=item ds_namespace
+=item namespace
 
 The namespace to use.
 
-=item ds_key
+=item key
 
-Key within the namespace to access. If it starts with a $, the context
-value with the specified name is dereferenced.
+Key within the namespace to access.
 
-=item ds_newkey
+=item newkey
 
 New key for the entry.
 
-=item ds_force
+=item force
 
 Causes the set action to overwrite an existing entry.
 
-=item ds_expiration_date
+=item expiration_date
 
 Sets expiration date of the datapool entry to the specified value.
 The value should be a relative time specification (such as '+000001',
@@ -125,8 +107,4 @@ If the expiration date is an emptry string, the expiration date is interpreted
 as NULL.
 
 =back
-
-=head2 Arguments
-
-=head2 Example
 

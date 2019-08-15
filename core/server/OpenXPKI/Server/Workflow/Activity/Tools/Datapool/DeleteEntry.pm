@@ -24,41 +24,17 @@ sub execute {
     my $workflow   = shift;
     my $context    = $workflow->context();
     my $serializer = OpenXPKI::Serialization::Simple->new();
-    my $params     = { PKI_REALM => CTX('api')->get_pki_realm(), };
+    my $params     = { PKI_REALM => CTX('api2')->get_pki_realm(), };
 
-    # New format
-    if ($self->param('namespace')) {
-        $params->{NAMESPACE} = $self->param('namespace');
-        $params->{KEY} = $self->param('key');
-    } else {
+    CTX('api2')->delete_data_pool_entry(
+        namespace => $self->param('namespace'),
+        key => $self->param('key')
+    );
 
-        if (!$self->param('ds_namespace')) {
-            OpenXPKI::Exception->throw( message =>
-                        'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_MISSPARAM_NAMESPACE');
-        };
-
-        $params->{NAMESPACE} = $self->param('ds_namespace');
-
-        if (!$self->param('ds_key_name') && !$self->param('ds_key_param')) {
-            OpenXPKI::Exception->throw( message =>
-                        'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_MISSPARAM_KEY');
-        };
-
-        if ($self->param('ds_key_param')) {
-            $params->{KEY} = $context->param( $self->param('ds_key_param') );
-        } else {
-            $params->{KEY} = $self->param('ds_key_name');
-        }
-
-    }
-
-    $params->{VALUE} = undef;
+    CTX('log')->application()->info('Remove datapool entry for key '.$self->param('key').' in namespace '.$self->param('namespace'));
 
 
-    CTX('log')->application()->info('Remove datapool entry for key '.$params->{KEY}.' in namespace '.$params->{NAMESPACE});
 
-
-    CTX('api')->set_data_pool_entry($params);
     return 1;
 }
 
@@ -82,29 +58,5 @@ This class deletes an entry from the Datapool, defined by namespace and key.
 =item namespace
 
 =item key
-
-=back
-
-=head2 Activity Parameters (old format, deprecated)
-
-In the activity definition, ds_namespace and one of the ds_key* parameters must be set.
-See the example that follows.
-
-=over 8
-
-=item ds_namespace
-
-The namespace to use for storing the key-value pair. Generally speaking,
-there are no rigid naming conventions. The namespace I<sys>, however,
-is reserved for internal server and system related data.
-
-=item ds_key_param
-
-The name of the context parameter that contains the key for this
-datastore entry.
-
-=item ds_key_name
-
-The name of the key for the datastore entry.
 
 =back

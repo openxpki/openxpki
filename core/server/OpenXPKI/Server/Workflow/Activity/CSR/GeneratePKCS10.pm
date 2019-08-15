@@ -19,7 +19,7 @@ sub execute
     my $self       = shift;
     my $workflow   = shift;
     my $context    = $workflow->context();
-    my $default_token = CTX('api')->get_default_token();
+    my $default_token = CTX('api2')->get_default_token();
 
     my $private_key = $self->param('private_key');
     my $password    = $self->param('password');

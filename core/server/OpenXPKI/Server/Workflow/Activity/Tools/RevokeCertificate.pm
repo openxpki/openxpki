@@ -115,21 +115,20 @@ sub execute {
     }
 
     # Create a new workflow
-    my $wf_info = CTX('api')->create_workflow_instance({
-        WORKFLOW      => $workflow_type,
-        PARAMS        => $param
-    });
+    my $wf_info = CTX('api2')->create_workflow_instance(
+        workflow  => $workflow_type,
+        params    => $param
+    );
 
-    ##! 16: 'Revocation Workflow created with id ' . $wf_info->{WORKFLOW}->{ID}
+    ##! 16: 'Revocation Workflow created with id ' . $wf_info->{workflow}->{id}
 
     # put together the log statement
     my $msg = join (",", map {  $_ . ' => ' . $param->{$_} } keys(%{$param}));
 
-    CTX('log')->application()->info('Revocation workflow #'. $wf_info->{WORKFLOW}->{ID}.' '. $msg);
-
+    CTX('log')->application()->info('Revocation workflow #'. $wf_info->{workflow}->{id}.' '. $msg);
 
     if ($self->param('target_key')) {
-        $context->param( $self->param('target_key') => $wf_info->{WORKFLOW}->{ID} );
+        $context->param( $self->param('target_key') => $wf_info->{workflow}->{id} );
     }
 
 

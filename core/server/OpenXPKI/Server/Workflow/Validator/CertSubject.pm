@@ -14,7 +14,6 @@ sub validate {
 
     ## prepare the environment
     my $context = $wf->context();
-    my $api     = CTX('api');
 
     return if (not defined $profile);
     return if (not defined $style);

@@ -2638,15 +2638,15 @@ sub __render_fields {
                     $raw = {};
                 }
 
-                my $fields = $self->send_command( 'get_field_definition',
-                    { PROFILE => $cert_profile, STYLE => $cert_subject_style, 'SECTION' =>  'info' });
+                my $fields = $self->send_command_v2( 'get_field_definition',
+                    { profile => $cert_profile, style => $cert_subject_style, 'section' =>  'info' });
                 $self->logger()->trace( 'Profile fields' . Dumper $fields );
 
                 foreach my $field (@$fields) {
                     # this still uses "old" syntax - adjust after API refactoring
-                    my $key = $field->{ID}; # Name of the context key
+                    my $key = $field->{id}; # Name of the context key
                     if ($raw->{$key}) {
-                        push @val, { label => $field->{LABEL}, value => $raw->{$key}, key => $key };
+                        push @val, { label => $field->{label}, value => $raw->{$key}, key => $key };
                     }
                 }
             } else {

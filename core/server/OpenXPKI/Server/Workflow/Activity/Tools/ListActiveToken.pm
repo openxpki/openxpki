@@ -18,7 +18,7 @@ sub execute {
     my $self       = shift;
     my $workflow   = shift;
     my $serializer = OpenXPKI::Serialization::Simple->new();
-    my $pki_realm  = CTX('api')->get_pki_realm();
+    my $pki_realm  = CTX('api2')->get_pki_realm();
     my $context   = $workflow->context();
     my $target_key = $self->param('target_key') || 'token_alias_list';
 

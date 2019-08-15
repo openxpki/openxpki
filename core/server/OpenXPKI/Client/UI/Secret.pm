@@ -14,16 +14,16 @@ sub init_index {
     my $self = shift;
     my $args = shift;
 
-    my $secrets  = $self->send_command("get_secrets");
+    my $secrets  = $self->send_command_v2("get_secrets");
 
     my @result;
     foreach my $secret (keys %{$secrets}) {
-        my $status = $self->send_command("is_secret_complete", {SECRET => $secret}) || 0;
+        my $status = $self->send_command_v2("is_secret_complete", {secret => $secret}) || 0;
         push @result, [
-            $secrets->{$secret}->{LABEL},
-            $secrets->{$secret}->{TYPE},
+            $secrets->{$secret}->{label},
+            $secrets->{$secret}->{type},
             $status ? 'I18N_OPENXPKI_UI_SECRET_COMPLETE' : 'I18N_OPENXPKI_UI_SECRET_INCOMPLETE',
-            $secrets->{$secret}->{TYPE} ne 'literal' ? $secret : '',
+            $secrets->{$secret}->{type} ne 'literal' ? $secret : '',
         ];
     }
 
@@ -72,7 +72,7 @@ sub init_manage {
         });
     } else {
 
-        my $status = $self->send_command("is_secret_complete", {SECRET => $secret}) || 0;
+        my $status = $self->send_command_v2("is_secret_complete", { secret => $secret }) || 0;
 
         if ($status) {
             $self->_page ({ shortlabel => 'I18N_OPENXPKI_UI_SECRET_CLEAR_SECRET_LABEL' });
@@ -109,7 +109,7 @@ sub init_clear {
     my $args = shift;
 
     my $secret = $self->param('id');
-    my $status = $self->send_command("clear_secret", {SECRET => $secret});
+    my $status = $self->send_command_v2("clear_secret", {secret => $secret});
 
     if ($status) {
         $self->set_status('I18N_OPENXPKI_UI_SECRET_STATUS_CLEARED','success');
@@ -129,8 +129,8 @@ sub action_unlock {
 
     my $phrase = $self->param('phrase');
     my $secret = $self->param('id');
-    my $msg = $self->send_command ( "set_secret_part",
-        { SECRET => $secret, VALUE => $phrase });
+    my $msg = $self->send_command_v2( "set_secret_part",
+        { secret => $secret, value => $phrase });
 
    $self->logger()->info('Secret was send');
    $self->logger()->trace('Return ' . Dumper $msg);

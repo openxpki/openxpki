@@ -572,7 +572,7 @@ sub create_random_serial {
     ##! 16: "create_random_serial({ RANDOM_LENGTH => $rand_length, PREFIX => " . $serial->as_hex . " })"
 
     if ($rand_length > 0) {
-        my $default_token = CTX('api')->get_default_token();
+        my $default_token = CTX('api2')->get_default_token();
         my $rand_base64 = $default_token->command({
             COMMAND       => 'create_random',
             RANDOM_LENGTH => $rand_length,
@@ -670,7 +670,7 @@ sub process_templates {
             'GROUP' => $group,
             'GENERATION' => $generation,
         },
-        'PKI_REALM' => CTX('api')->get_pki_realm(),
+        'PKI_REALM' => CTX('api2')->get_pki_realm(),
     );
     ##! 32: ' Template Vars ' . Dumper ( %template_vars )
 

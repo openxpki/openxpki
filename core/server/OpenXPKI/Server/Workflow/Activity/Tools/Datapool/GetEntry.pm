@@ -18,64 +18,25 @@ sub execute {
     my $workflow   = shift;
     my $context    = $workflow->context();
     my $serializer = OpenXPKI::Serialization::Simple->new();
-    my $params     = {};
 
     my $target_key;
     my $default_value;
 
-    # Legacy mode
-    if ($self->param('ds_namespace')) {
-        ##! 16: 'Doing Legacy mode'
-        foreach my $key (qw( namespace key_param value_param )) {
-            my $pkey = 'ds_' . $key;
-            my $val  = $self->param($pkey);
-            if ( not defined $val ) {
-                OpenXPKI::Exception->throw( message =>
-                        'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_'
-                      . 'MISSPARAM_'
-                      . uc($key) );
-            }
-        }
+    my $params = {
+        namespace => $self->param('namespace'),
+        key => $self->param('key'),
+    };
 
-        foreach my $key (qw( namespace )) {
-            $params->{ $key } = $self->param( 'ds_' . $key );
-        }
-
-        my $keyparam = $self->param('ds_key_param');
-        if ( not defined $keyparam ) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_'
-                  . 'MISSPARAM_KEY_PARAM' );
-        }
-
-        $params->{key} = $context->param($keyparam);
-
-        $target_key = $self->param('ds_value_param');
-        if ( not $target_key ) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_DATAPOOL_'
-                . 'MISSPARAM_VALUE_PARAM' );
-        }
-
-        $default_value = $self->param('ds_default_value');
-
-    } else {
-
-        $params->{namespace} = $self->param('namespace');
-        if (!$params->{namespace}) {
-            configuration_error('Datapool::GetEntry requires the namespace parameter');
-        }
-
-        $params->{key} = $self->param('key');
-        if (!$params->{key}) {
-            configuration_error('Datapool::GetEntry requires the key parameter');
-        }
-
-        $target_key = $self->param('target_key') || '_tmp';
-
-        $default_value = $self->param('default_value');
+    if (!$params->{namespace}) {
+        configuration_error('Datapool::GetEntry requires the namespace parameter');
+    }
+    if (!$params->{key}) {
+        configuration_error('Datapool::GetEntry requires the key parameter');
     }
 
+    $target_key = $self->param('target_key') || '_tmp';
+
+    $default_value = $self->param('default_value');
 
     if ($self->param('pki_realm')) {
         if ($self->param('pki_realm') eq '_global') {
@@ -124,14 +85,11 @@ This class sets an entry in the Datapool.
 
 =head2 Parameters
 
-In the activity definition, the following parameters must be set. The syntax
-using the I<ds_> prefix is deprecated, use the I<_map> syntax to load key and
-value from the context. It is not allowed to mix prefixed and non-prefixed
-parameters!
+In the activity definition, the following parameters must be set.
 
 =over 8
 
-=item namespace / ds_namespace
+=item namespace
 
 The namespace to use for storing the key-value pair. Generally speaking,
 there are no rigid naming conventions. The namespace I<sys>, however,
@@ -155,26 +113,6 @@ The realm of the datapool item to load, default is the current realm.
 B<Note:> For security reasons it is not allowed to load items from other
 realms except from special I<system> realms. The only system realm
 defined for now is I<_global> which is available from all other realms.
-
-=item ds_key_param, deprecated
-
-The name of the context parameter that contains the key for this
-datastore entry.
-
-=item ds_value_param, deprecated
-
-The name of the context parameter that contains the value for this
-datastore entry.
-
-
-B<Note:> If the retrieved value was encrypted in the datapool, the
-target parameter must start with an underscore (=volatile parameter).
-
-=item ds_default_value
-
-The default value to be returned if no record in the datapool is
-found. If preceeded with a dollar symbol '$', then the workflow
-context variable with the given name will be used.
 
 =back
 

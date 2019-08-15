@@ -37,7 +37,12 @@ sub execute {
 
     ##! 16: 'Mapping attributes: ' . Dumper $export
 
-    CTX('api')->set_data_pool_entry({'NAMESPACE' => $namespace, 'KEY' => $context->param( 'cert_identifier' ), 'VALUE' => $ser->serialize( $export ), 'FORCE' => 1 });
+    CTX('api2')->set_data_pool_entry(
+        'namespace' => $namespace,
+        'key' => $context->param( 'cert_identifier' ),
+        'value' => $ser->serialize( $export ),
+        'force' => 1
+    );
 
     return 1;
 

@@ -29,7 +29,10 @@ sub execute {
     foreach my $cert_identifier (@{ $ser->deserialize( $exported_cert_ids ) }) {
         CTX('log')->application()->info('remove '.$cert_identifier.' from export queue');
         # set without value deletes the entry
-        CTX('api')->set_data_pool_entry({'NAMESPACE' => $context->param( 'queue_namespace' ) , 'KEY' => $cert_identifier, 'VALUE' => undef  });
+        CTX('api2')->delete_data_pool_entry(
+            'namespace' => $context->param( 'queue_namespace' ),
+            'key' => $cert_identifier
+        );
     }
 
     $context->param( 'exported_cert_ids', '' );

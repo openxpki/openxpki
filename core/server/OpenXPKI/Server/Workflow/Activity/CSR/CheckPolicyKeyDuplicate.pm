@@ -10,7 +10,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::DN;
 use OpenXPKI::DateTime;
 use OpenXPKI::Serialization::Simple;
-
 use Data::Dumper;
 
 sub execute
@@ -25,10 +24,7 @@ sub execute
 
     return unless ($pkcs10);
 
-    my $key_identifier = CTX('api')->get_key_identifier_from_data({
-        DATA => $pkcs10,
-        FORMAT => 'PKCS10'
-    });
+    my $key_identifier = CTX('api2')->get_key_identifier_from_data( data => $pkcs10, format => 'PKCS10' );
 
     if (!$key_identifier) {
         OpenXPKI::Exception->throw(

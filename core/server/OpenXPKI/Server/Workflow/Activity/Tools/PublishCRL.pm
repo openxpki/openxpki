@@ -33,7 +33,7 @@ sub execute {
         );
     }
 
-    my $default_token = CTX('api')->get_default_token();
+    my $default_token = CTX('api2')->get_default_token();
     my $prefix = $self->param('prefix');
     my $ca_alias = $context->param('ca_alias');
     my $crl_serial = $context->param('crl_serial');

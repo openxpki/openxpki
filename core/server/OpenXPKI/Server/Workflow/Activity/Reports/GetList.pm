@@ -22,7 +22,7 @@ sub execute {
     # where to write the output
     my $target_key = $self->param('target_key') || 'report_list';
 
-    my $items = CTX('api')->get_report_list({ COLUMNS => [ 'report_name', 'created', 'description' ] });
+    my $items = CTX('api2')->get_report_list( columns => [ 'report_name', 'created', 'description' ] );
 
     $context->param({ $target_key => $items });
 

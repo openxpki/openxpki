@@ -19,19 +19,19 @@ sub execute {
 
     my $ca_issuer_alias = $self->param('ca_alias');
     if (!$ca_issuer_alias) {
-        $ca_issuer_alias = CTX('api')->get_token_alias_by_type( { TYPE => 'certsign' });
+        $ca_issuer_alias = CTX('api2')->get_token_alias_by_type( type => 'certsign' );
     }
 
     ##! 32: 'ca issuer: ' . Dumper $ca_issuer_alias ;
 
     my $ca_issuer = CTX('api2')->get_certificate_for_alias( alias => $ca_issuer_alias );
 
-    my $pkcs7_chain = CTX('api')->get_chain({
-        START_IDENTIFIER => $ca_issuer->{identifier},
-        OUTFORMAT        => 'PEM',
-        BUNDLE           => 1,
-        KEEPROOT         => 1,
-    });
+    my $pkcs7_chain = CTX('api2')->get_chain(
+        start_with => $ca_issuer->{identifier},
+        format        => 'PEM',
+        bundle           => 1,
+        keeproot         => 1,
+    );
 
     $context->param( $target_key => $pkcs7_chain );
 }

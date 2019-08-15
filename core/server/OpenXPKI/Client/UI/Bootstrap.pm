@@ -25,7 +25,7 @@ sub init_structure {
 
     if ($session->param('is_logged_in') && $user) {
         $self->_result()->{user} = $user;
-        my $menu = $self->send_command( 'get_menu' );
+        my $menu = $self->send_command_v2( 'get_menu' );
         $self->logger()->trace('Menu ' . Dumper $menu);
 
         $self->_result()->{structure} = $menu->{main};

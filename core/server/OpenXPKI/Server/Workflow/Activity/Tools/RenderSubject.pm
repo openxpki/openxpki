@@ -110,7 +110,7 @@ sub execute {
     # No SAN template exists - if we have extra san just map them to the
     # array ref structure required by the csr persister
     if (!$san_list && $extra_san) {
-        my $san_names = CTX('api')->list_supported_san();
+        my $san_names = CTX('api2')->list_supported_san();
 
         # create a nested has to remove duplicates
         my $san_items = {};

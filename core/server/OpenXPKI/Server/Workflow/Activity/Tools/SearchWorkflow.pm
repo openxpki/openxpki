@@ -22,38 +22,38 @@ sub execute {
 
     my $query;
     if ($self->param('wf_type')) {
-        $query->{TYPE} = $self->param('wf_type');
+        $query->{type} = $self->param('wf_type');
     }
 
     if ($self->param('wf_state')) {
-        $query->{STATE} = $self->param('wf_state');
+        $query->{state} = $self->param('wf_state');
     }
 
     if ($self->param('realm')) {
         ##! 16: 'Adding realm ' . $self->param('realm')
-        $query->{PKI_REALM} = $self->param('realm');
+        $query->{pki_realm} = $self->param('realm');
     }
 
-    my @attr;
+    my $attr;
     if ($self->param('wf_creator')) {
-        push @attr, { KEY => 'creator', VALUE => ~~ $self->param('wf_creator') };
+        $attr->{'creator'} = ~~ $self->param('wf_creator');
     }
 
     foreach my $key ($self->param()) {
         ##! 16: 'Param key ' . $key
         next unless $key =~ /attr_(\w+)/;
-        push @attr, { KEY => $1, VALUE => ~~ $self->param($key) };
+        $attr->{$1} = ~~ $self->param($key);
     }
 
-    $query->{ATTRIBUTE} = \@attr;
+    $query->{attribute} = $attr;
 
     ##! 16: 'Query ' . Dumper $query
 
-    my $result = CTX('api')->search_workflow_instances( $query );
+    my $result = CTX('api2')->search_workflow_instances( %$query );
 
     ##! 64: 'Result ' . Dumper $result
 
-    my @ids = map { ($_->{'WORKFLOW.WORKFLOW_SERIAL'} != $workflow->id()) ? ($_->{'WORKFLOW.WORKFLOW_SERIAL'}) : () } @{$result};
+    my @ids = map { ($_->{'workflow_id'} != $workflow->id()) ? ($_->{'workflow_id'}) : () } @{$result};
 
     ##! 32: 'Ids ' . Dumper \@ids
 

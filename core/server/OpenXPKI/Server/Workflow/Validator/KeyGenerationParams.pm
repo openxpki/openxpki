@@ -44,7 +44,7 @@ sub _validate {
     ##! 16: 'Params ' . Dumper $key_params
 
     # get the list of allowed algorithms from the config
-    my $algs = CTX('api')->get_key_algs({ PROFILE => $cert_profile, NOHIDE => 1 });
+    my $algs = CTX('api2')->get_key_algs( profile => $cert_profile, showall => 1 );
 
     ##! 32: 'Alg expected ' . Dumper $algs
 
@@ -55,7 +55,7 @@ sub _validate {
         validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_ALGO_NOT_ALLOWED');
     }
 
-    my $params = CTX('api')->get_key_params({ PROFILE => $cert_profile, ALG => $key_alg, NOHIDE => 1 });
+    my $params = CTX('api2')->get_key_params( profile => $cert_profile, alg => $key_alg, showall => 1 );
 
     ##! 32: 'Params expected ' . Dumper $params
 
@@ -74,7 +74,7 @@ sub _validate {
         }
     }
 
-    my $enc_algs = CTX('api')->get_key_enc({ PROFILE => $cert_profile, NOHIDE => 1 });
+    my $enc_algs = CTX('api2')->get_key_enc( profile => $cert_profile, showall => 1 );
     if ($enc_alg && !grep(/\A$enc_alg\z/, @{$enc_algs})) {
         ##! 32: 'Failed on ' . $enc_alg
         CTX('log')->application()->error("KeyParam validation failed on enc_alg with value $enc_alg");

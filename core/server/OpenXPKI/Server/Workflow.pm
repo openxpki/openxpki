@@ -269,7 +269,7 @@ sub execute_action {
 
         # Something unexpected went wrong inside the action, throw exception
         # with original error attached
-        # TODO this exception will kill the main process e.g. when invoked via CTX('api')->create_workflow or CTX('api')->execute_workflow_activity
+        # TODO this exception will kill the main process e.g. when invoked via CTX('api2')->create_workflow or CTX('api2')->execute_workflow_activity
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_WORKFLOW_ERROR_ON_EXECUTE",
             params => {

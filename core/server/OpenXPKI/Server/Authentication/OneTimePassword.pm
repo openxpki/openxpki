@@ -86,24 +86,24 @@ sub login_step {
 
     CTX('log')->auth()->debug('OTP login - hashed token - ' . $hashed_key );
 
-    my $val = CTX('api')->get_data_pool_entry({
-        NAMESPACE => $self->namespace(),
-        KEY => $hashed_key,
-    });
+    my $val = CTX('api2')->get_data_pool_entry(
+        namespace => $self->namespace(),
+        key => $hashed_key,
+    );
 
-    if (!$val->{VALUE}) {
+    if (!$val->{value}) {
         OpenXPKI::Exception->throw (
             message => "OTP Login failed - token not found",
         );
     }
 
-    if ($val->{EXPIRATION_DATE} && $val->{EXPIRATION_DATE} < time()) {
+    if ($val->{expiration_date} && $val->{expiration_date} < time()) {
         OpenXPKI::Exception->throw (
             message => "OTP Login failed - token expired",
         );
     }
 
-    my $data = OpenXPKI::Serialization::Simple->new()->deserialize($val->{VALUE});
+    my $data = OpenXPKI::Serialization::Simple->new()->deserialize($val->{value});
     if (!$data->{user}) {
         OpenXPKI::Exception->throw (
             message => "OTP Login failed - no username set",
@@ -119,11 +119,10 @@ sub login_step {
 
     # do not expire on first use
     if (!$self->permanent()) {
-        CTX('api')->set_data_pool_entry({
-            NAMESPACE => $self->namespace(),
-            KEY => $hashed_key,
-            VALUE => '',
-        });
+        CTX('api2')->delete_data_pool_entry(
+            namespace => $self->namespace(),
+            key => $hashed_key,
+        );
     }
 
     return ( $data->{user}, $role, {

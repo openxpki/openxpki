@@ -89,11 +89,9 @@ sub execute {
 
     my $signer_root = '';
     if ($signer_issuer) {
-        my $signer_chain = CTX('api')->get_chain({
-            'START_IDENTIFIER' => $signer_issuer,
-        });
-        if ($signer_chain->{COMPLETE}) {
-            $signer_root = pop @{$signer_chain->{IDENTIFIERS}};
+        my $signer_chain = CTX('api2')->get_chain( start_with => $signer_identifier );
+        if ($signer_chain->{complete}) {
+            $signer_root = pop @{$signer_chain->{identifiers}};
         }
     }
 

@@ -234,7 +234,7 @@ sub __load_config_realm_token {
         'ALIAS' => $name,
         'GROUP' => $group,
         'GENERATION' => $generation,
-        'PKI_REALM' => CTX('api')->get_pki_realm(),
+        'PKI_REALM' => CTX('api2')->get_pki_realm(),
         'IDENTIFIER' => $cert_identifier_of{$ident},
         'KEY_IDENTIFIER' => $key_identifier
     };

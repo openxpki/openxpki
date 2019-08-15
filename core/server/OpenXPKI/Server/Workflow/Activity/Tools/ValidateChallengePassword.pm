@@ -26,7 +26,7 @@ sub execute {
         return 1;
     }
 
-    my @prefix = $self->_get_service_config_path('challenge');
+    my @prefix = @{$self->_get_service_config_path('challenge')};
 
     # Reset the context
     $context->param( $target_key => undef );

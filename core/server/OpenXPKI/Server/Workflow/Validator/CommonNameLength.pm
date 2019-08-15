@@ -22,8 +22,6 @@ sub _validate {
 
     my ( $self, $workflow, $profile, $style, $subject_parts ) = @_;
 
-    my $api     = CTX('api');
-
     return if (not defined $profile);
     return if (not defined $style);
     return if (not defined $subject_parts);

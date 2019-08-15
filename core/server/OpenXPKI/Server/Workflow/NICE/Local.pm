@@ -161,13 +161,13 @@ sub issueCertificate {
 
     } else {
         # Determine issuing ca
-        $issuing_ca = CTX('api')->get_token_alias_by_type( {
-            TYPE => 'certsign',
-            VALIDITY => {
-                NOTBEFORE => $notbefore,
-                NOTAFTER => $notafter,
+        $issuing_ca = CTX('api2')->get_token_alias_by_type(
+            type => 'certsign',
+            validity => {
+                notbefore => $notbefore,
+                notafter => $notafter,
             },
-        });
+        );
 
         CTX('log')->application()->debug("Found $issuing_ca to issue $csr_serial");
 
@@ -176,7 +176,7 @@ sub issueCertificate {
     ##! 32: 'issuing ca: ' . $issuing_ca
 
 
-    my $default_token = CTX('api')->get_default_token();
+    my $default_token = CTX('api2')->get_default_token();
     my $ca_token = CTX('crypto_layer')->get_token({
         TYPE => 'certsign',
         NAME => $issuing_ca
@@ -455,7 +455,7 @@ sub issueCRL {
     });
     #
     my $crl_obj = OpenXPKI::Crypto::CRL->new(
-            TOKEN => CTX('api')->get_default_token(),
+            TOKEN => CTX('api2')->get_default_token(),
             DATA  => $crl,
     );
     ##! 128: 'crl: ' . Dumper($crl)
@@ -544,11 +544,11 @@ sub generateKey {
        message => 'Password is required for NICE::generateKey',
     ) unless $password;
 
-    my $pkcs8 = CTX('api')->generate_key({
-         KEY_ALG    => $key_alg,
-         ENC_ALG    => $enc_alg,
-         PASSWD     => $password,
-         PARAMS     => $key_params,
+    my $pkcs8 = CTX('api2')->generate_key({
+         key_alg    => $key_alg,
+         enc_alg    => $enc_alg,
+         password   => $password,
+         pkeyopt    => $key_params,
     });
 
     CTX('log')->application()->info("Key ($key_alg) generated via NICE backend");

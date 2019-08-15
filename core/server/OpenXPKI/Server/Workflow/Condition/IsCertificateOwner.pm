@@ -26,7 +26,10 @@ sub evaluate {
 
     my $user = $self->param('cert_owner') || '';
 
-    my $res = CTX('api')->is_certificate_owner({ IDENTIFIER => $cert_identifier , USER => $user });
+    my $res = CTX('api2')->is_certificate_owner(
+        identifier => $cert_identifier,
+        user => $user
+    );
 
     if (!defined $res) {
         ##! 16: 'owner is not defined'

@@ -49,7 +49,6 @@ sub execute {
     my $result;
     my @extra_header;
 
-    my $api       = CTX('api');
     my $pki_realm = CTX('session')->data->pki_realm;
     my $server    = CTX('session')->data->server;
 
@@ -307,11 +306,11 @@ sub __send_crl : PRIVATE {
 
     ##! 32: 'Issuer Info ' . Dumper $res
 
-    my $crl_res = CTX('api')->get_crl_list({
-        ISSUER => $res->[0]->{issuer_identifier},
-        FORMAT => 'PEM',
-        LIMIT => 1
-    });
+    my $crl_res = CTX('api2')->get_crl_list(
+        issuer_identifier => $res->[0]->{issuer_identifier},
+        format => 'PEM',
+        limit => 1
+    );
 
     if (!scalar $crl_res) {
         return $token->command(
@@ -397,23 +396,23 @@ sub __pkcs_req : PRIVATE {
     my $wf_info; # filled in either one of the branches
 
     # Search transaction id in datapool
-    my $res = CTX('api')->get_data_pool_entry({
-        NAMESPACE => 'scep.transaction_id',
-        KEY => "$server:$transaction_id",
-    });
+    my $res = $api->get_data_pool_entry(
+        namespace => 'scep.transaction_id',
+        key => "$server:$transaction_id",
+    );
     if ($res) {
         # Congrats - we got a race condition
-        if ($res->{VALUE} !~ m{ \A \d+ \z }x) {
+        if ($res->{value} !~ m{ \A \d+ \z }x) {
             OpenXPKI::Exception->throw(
                 message => "I18N_OPENXPKI_SERVICE_LIBSCEP_COMMAND_PKIOPERATION_PARALLEL_REQUESTS_DETECTED",
                 params => {
                     SERVER => $server,
                     TRANSACTION_ID => $transaction_id,
-                    DPSTATE => $res->{VALUE}
+                    DPSTATE => $res->{value}
                 }
             );
         }
-        $workflow_id = $res->{VALUE};
+        $workflow_id = $res->{value};
     }
 
     ##! 16: "transaction ID: $transaction_id - workflow id: $workflow_id"

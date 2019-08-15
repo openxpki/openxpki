@@ -743,7 +743,7 @@ sub init_chain {
 
     my $cert_identifier = $self->param('identifier');
 
-    my $chain = $self->send_command ( "get_chain", { START_IDENTIFIER => $cert_identifier, OUTFORMAT => 'HASH', 'KEEPROOT' => 1 });
+    my $chain = $self->send_command_v2 ( "get_chain", { start_with => $cert_identifier, format => 'HASH', 'keeproot' => 1 });
 
     $self->_page({
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_CHAIN_LABEL',
@@ -754,12 +754,12 @@ sub init_chain {
     my $base =  $self->_client()->_config()->{'scripturl'} . "?page=certificate!download!identifier!%s!format!%s";
     my $pattern = '<li><a href="'.$base.'" target="_blank">%s</a></li>';
 
-    foreach my $cert (@{$chain->{CERTIFICATES}}) {
+    foreach my $cert (@{$chain->{certificates}}) {
 
         my $dl = '<ul class="list-inline">'.
-            sprintf ($pattern, $cert->{IDENTIFIER}, 'pem', 'I18N_OPENXPKI_UI_DOWNLOAD_SHORT_PEM').
-            sprintf ($pattern, $cert->{IDENTIFIER}, 'der', 'I18N_OPENXPKI_UI_DOWNLOAD_SHORT_DER').
-            sprintf ($pattern, $cert->{IDENTIFIER}, 'install', 'I18N_OPENXPKI_UI_DOWNLOAD_SHORT_INSTALL').
+            sprintf ($pattern, $cert->{identifier}, 'pem', 'I18N_OPENXPKI_UI_DOWNLOAD_SHORT_PEM').
+            sprintf ($pattern, $cert->{identifier}, 'der', 'I18N_OPENXPKI_UI_DOWNLOAD_SHORT_DER').
+            sprintf ($pattern, $cert->{identifier}, 'install', 'I18N_OPENXPKI_UI_DOWNLOAD_SHORT_INSTALL').
             '</ul>';
 
         $self->add_section({
@@ -769,9 +769,9 @@ sub init_chain {
                 description => '',
                 data => [
                     { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', format => 'link', 'value' => {
-                       label => $cert->{SUBJECT}, page => 'certificate!detail!identifier!'.$cert->{IDENTIFIER} } },
-                    { label => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE', value => $cert->{NOTBEFORE}, format => 'timestamp' },
-                    { label => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER', value => $cert->{NOTAFTER}, format => 'timestamp' },
+                       label => $cert->{subject}, page => 'certificate!detail!identifier!'.$cert->{identifier} } },
+                    { label => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE', value => $cert->{notbefore}, format => 'timestamp' },
+                    { label => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER', value => $cert->{notafter}, format => 'timestamp' },
                     { label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL', value => $dl, format => 'raw' },
                 ],
             }},
@@ -1145,12 +1145,12 @@ sub action_search {
             $input->{$key} = $val;
             $query->{$key} = $val;
             if ($key eq 'profile') {
-                $verbose->{$key} = $self->send_command( 'render_template', {
-                    TEMPLATE => '[% USE Profile %][% Profile.name(value) %]', PARAMS => { value => $val }
+                $verbose->{$key} = $self->send_command_v2( 'render_template', {
+                    template => '[% USE Profile %][% Profile.name(value) %]', params => { value => $val }
                 });
             } elsif ($key eq 'issuer_identifier') {
-                $verbose->{$key} = $self->send_command( 'render_template', {
-                    TEMPLATE => '[% USE Certificate %][% Certificate.body(value, "subject") %]', PARAMS => { value => $val }
+                $verbose->{$key} = $self->send_command_v2( 'render_template', {
+                    template => '[% USE Certificate %][% Certificate.body(value, "subject") %]', params => { value => $val }
                 });
             }
         }

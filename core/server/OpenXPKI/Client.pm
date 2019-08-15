@@ -67,7 +67,7 @@ has session_id => (
 has api_version => (
     is      => 'ro',
     isa     => 'Int',
-    default => 1
+    default => 2
 );
 
 has _channel => (
@@ -263,7 +263,7 @@ sub send_receive_service_msg {
     my $cmd   = shift;
     my $arg   = shift;
 
-    if (!$arg->{API}) {
+    if ($cmd eq 'COMMAND' && !$arg->{API}) {
         $arg->{API} = $self->api_version();
     }
 
@@ -282,7 +282,7 @@ sub send_receive_service_msg {
 sub send_receive_command_msg {
     my $self  = shift;
     my $cmd   = shift;
-    my $arg   = shift;
+    my $arg   = shift || {};
 
     return $self->send_receive_service_msg(
         'COMMAND',

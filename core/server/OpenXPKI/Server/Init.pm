@@ -279,7 +279,7 @@ sub __do_init_redirect_stderr {
 sub __do_init_volatile_vault {
     ##! 1: "init volatile vault"
 
-    my $token = CTX('api')->get_default_token();
+    my $token = CTX('api2')->get_default_token();
 
     OpenXPKI::Server::Context::setcontext(
     {

@@ -81,34 +81,6 @@ sub get_hash {
 
 }
 
-=head2 get_hash_legacy(cert_identifier)
-
-Return the certificates database hash or undef if the identifier is
-not found.
-
-=cut
-
-sub get_hash_legacy {
-
-    my $self = shift;
-    my $cert_id = shift;
-
-    return unless ($cert_id);
-
-    # To prevent loading the same item again and again, we always cache
-    # the last hash and reuse it
-
-    if ($self->{_hash_old} && ($self->{_hash_old}->{IDENTIFIER} eq $cert_id)) {
-        return $self->{_hash_old};
-    }
-
-    $self->{_hash_old} = undef;
-    eval {
-        $self->{_hash_old} = CTX('api')->get_cert({ IDENTIFIER => $cert_id });
-    };
-    return $self->{_hash_old};
-
-}
 
 =head2 body(cert_identifier, property)
 
@@ -129,14 +101,12 @@ sub body {
     my $hash = $self->get_hash( $cert_id );
     return unless($hash);
 
-    if (defined $hash->{lc($property)}) {
-        return $hash->{lc($property)};
+    if (!defined $hash->{lc($property)}) {
+        Log::Log4perl->get_logger('openxpki.deprecated')->error("Template Plugin Certificate.body called with legacy property ($property)!");
+        return;
     }
 
-    Log::Log4perl->get_logger('openxpki.deprecated')->error("Template Plugin Certificate.body reading legacy property ($property)!");
-
-    $hash = $self->get_hash_legacy( $cert_id );
-    return $hash ? $hash->{BODY}->{uc($property)} : undef;
+    return $hash->{lc($property)};
 
 }
 

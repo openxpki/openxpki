@@ -221,13 +221,13 @@ sub execute {
         # Evaluate: Replace with data from hashed_dn and preset?
 
         if ($csr_san) {
-            my $san_names = CTX('api')->list_supported_san();
-            my $fields = CTX('api')->get_field_definition( { PROFILE => $cert_profile, STYLE => $cert_subject_style, SECTION => 'san' });
+            my $san_names = CTX('api2')->list_supported_san();
+            my $fields = CTX('api2')->get_field_definition( profile => $cert_profile, style => $cert_subject_style, section => 'san' );
             ##! 16: 'san ui definition:' . Dumper $fields
             my $cert_san_parts;
             # Get all allowed san types
             foreach my $field (@{$fields}) {
-                my $keys = ref $field->{KEYS} ? $field->{KEYS} : [ $field->{ID} ];
+                my $keys = ref $field->{keys} ? $field->{keys} : [ $field->{id} ];
                 ##! 16: 'testing keys:' . join "-", @{$keys}
                 foreach my $key (@{$keys}) {
                     # hash items are mixed case
@@ -237,7 +237,7 @@ sub execute {
                     my $case_key = $san_names->{$key};
                     if ($csr_san->{$case_key}) {
                         # check if it is a clonable field
-                        if ($field->{CLONABLE}) {
+                        if ($field->{clonable}) {
                             $cert_san_parts->{$key} = $csr_san->{$case_key};
                         } else {
                             $cert_san_parts->{$key} = $csr_san->{$case_key}->[0];

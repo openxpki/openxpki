@@ -92,18 +92,18 @@ sub execute {
     # the "no template" case was already handled above
     if ($template) {
 
-        my $chain = CTX('api')->get_chain({ START_IDENTIFIER => $cert_identifier, OUTFORMAT => 'PEM'});
-        my @certs = @{$chain->{CERTIFICATES}};
+        my $chain = CTX('api2')->get_chain( start_with => $cert_identifier, format => 'PEM' );
+        my @certs = @{$chain->{certificates}};
 
         ##! 64: 'chain ' . Dumper $chain
         ##! 64: 'key' . $key
 
         my $tt = OpenXPKI::Template->new();
 
-        my $ca = pop @certs if ($chain->{COMPLETE});
+        my $ca = pop @certs if ($chain->{complete});
 
         my $ttargs = {
-            subject => ($chain->{SUBJECT}->[0]),
+            subject => ($chain->{subject}->[0]),
             certificate => shift @certs,
             ca => $ca,
             chain => \@certs,

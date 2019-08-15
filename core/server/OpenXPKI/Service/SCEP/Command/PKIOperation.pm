@@ -57,7 +57,6 @@ sub execute {
     ##! 64: 'pkcs7_base64: ' . $pkcs7_base64
     my $pkcs7_decoded = decode_base64($pkcs7_base64);
 
-    my $api       = CTX('api');
     my $pki_realm = CTX('session')->data->pki_realm;
     my $server    = CTX('session')->data->server;
 
@@ -263,11 +262,11 @@ sub __send_crl : PRIVATE {
 
     ##! 32: 'Issuer Info ' . Dumper $res
 
-    my $crl_res = CTX('api')->get_crl_list({
-        ISSUER => $res->[0]->{issuer_identifier},
-        FORMAT => 'PEM',
-        LIMIT => 1
-    });
+    my $crl_res = CTX('api2')->get_crl_list(
+        issuer_identifier => $res->[0]->{issuer_identifier},
+        format => 'PEM',
+        limit => 1
+    );
 
     if (!scalar $crl_res) {
         return $token->command(
@@ -506,12 +505,12 @@ sub __pkcs_req : PRIVATE {
 
 
         # Record the scep tid and the workflow in the datapool
-        CTX('api')->set_data_pool_entry({
-            NAMESPACE => 'scep.transaction_id',
-            KEY => "$server:$transaction_id",
-            VALUE => $workflow_id,
-            FORCE => 1,
-         });
+        CTX('api2')->set_data_pool_entry(
+            namespace => 'scep.transaction_id',
+            key => "$server:$transaction_id",
+            value => $workflow_id,
+            force => 1,
+         );
          # commit required
          CTX('dbi')->commit();
     }

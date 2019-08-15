@@ -40,10 +40,10 @@ sub execute {
     # Step 1 - find exportable certificates
     # We load the list of certificates from the datapool
 
-    my $dp_cert_to_export = CTX('api')->list_data_pool_entries({
-        'NAMESPACE' => $context->param ( 'queue_namespace' ) ,
-        'LIMIT' => $context->param ( 'max_records' )
-    });
+    my $dp_cert_to_export = CTX('api2')->list_data_pool_entries(
+        'namespace' => $context->param ( 'queue_namespace' ) ,
+        'limit' => $context->param ( 'max_records' )
+    );
 
 
     # Nothing to do
@@ -62,7 +62,7 @@ sub execute {
     }
     ##! 16: 'enc_cert_ids ' . Dumper $enc_cert_ids
 
-    my $token = CTX('api')->get_default_token();
+    my $token = CTX('api2')->get_default_token();
     my @enc_certs;
 
     if ($enc_cert_ids) {
@@ -90,9 +90,9 @@ sub execute {
 
         my $cert_xml = { id => $cert_identifier };
         # Attributes for the certificate tag are taken from the datapool
-        my $attributes = CTX('api')->get_data_pool_entry( $cert );
-        if ($attributes && $attributes->{VALUE}) {
-            $attributes = $ser->deserialize( $attributes->{VALUE} );
+        my $attributes = CTX('api2')->get_data_pool_entry( $cert );
+        if ($attributes && $attributes->{value}) {
+            $attributes = $ser->deserialize( $attributes->{value} );
             if (ref $attributes eq "HASH") {
                  $cert_xml = $attributes;
             }
@@ -104,10 +104,10 @@ sub execute {
         # if no export targets are avail we do not export the p12
         if (@enc_certs) {
             # Step 3b - look for key
-            my $msg = CTX('api')->get_data_pool_entry({
-                NAMESPACE => $key_namespace,
-                KEY       => $cert_identifier
-            });
+            my $msg = CTX('api2')->get_data_pool_entry(
+                namespace => $key_namespace,
+                key       => $cert_identifier
+            );
 
             # Block for escrow certs
             if ($msg && $msg->{VALUE}) {

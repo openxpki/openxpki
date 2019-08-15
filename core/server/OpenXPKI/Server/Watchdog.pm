@@ -618,11 +618,12 @@ sub __wake_up_workflow {
     $self->{dbi}->start_txn;
 
     ##! 1: 'call wakeup'
-    my $wf_info = CTX('api')->wakeup_workflow({
-        WORKFLOW => $args->{workflow_type},
-        ID => $args->{workflow_id},
-        ASYNC => 'fork',
-    });
+    my $wf_info = CTX('api2')->wakeup_workflow(
+        type => $args->{workflow_type},
+        id => $args->{workflow_id},
+        async => 1,
+        wait => 0,
+    );
     ##! 32: 'wakeup returned ' . Dumper $wf_info
 
     # commit/rollback is done inside workflow engine

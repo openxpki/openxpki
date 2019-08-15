@@ -22,8 +22,6 @@ sub _validate {
 
     my ( $self, $workflow, $profile, $style, $subject_parts ) = @_;
 
-    my $api     = CTX('api');
-
     return if (not defined $profile);
     return if (not defined $style);
     return if (not defined $subject_parts);
@@ -35,11 +33,11 @@ sub _validate {
 
     ##! 16: 'wf->id(): ' . $wf->id()
 
-    my $fields = $api->get_field_definition({
-        PROFILE => $profile,
-        STYLE   => $style,
-        SECTION => $self->param('section'),
-    });
+    my $fields = CTX('api2')->get_field_definition(
+        profile => $profile,
+        style   => $style,
+        section => $self->param('section'),
+    );
 
     ##! 64: 'fields: ' . Dumper $fields
 
@@ -55,11 +53,11 @@ sub _validate {
     FIELD:
     foreach my $field (@$fields) {
 
-        my $name = $field->{ID};
-        my $min = $field->{MIN} || 0;
-        my $max = $field->{MAX} || 0;
-        my $match = $field->{MATCH} || '';
-        my $clonable =  $field->{CLONABLE} || 0;
+        my $name = $field->{id};
+        my $min = $field->{min} || 0;
+        my $max = $field->{max} || 0;
+        my $match = $field->{match} || '';
+        my $clonable =  $field->{clonable} || 0;
 
         my @value;
         if ( !defined $subject_parts->{ $name } ) {
