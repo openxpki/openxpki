@@ -8,7 +8,6 @@ use Class::Std;
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use OpenXPKI::Server::API;
 use OpenXPKI::Server::Context qw( CTX );
 use Data::Dumper;
 
@@ -16,7 +15,6 @@ my %command        : ATTR;
 my %command_params : ATTR( :get<PARAMS> );
 
 my %command_impl   : ATTR;
-my %api            : ATTR( :get<API> );
 
 
 # command registry
@@ -34,8 +32,8 @@ sub BUILD {
 
     $command{$ident}        = $arg_ref->{COMMAND};
     $command_params{$ident} = $arg_ref->{PARAMS};
-    $api{$ident}            = OpenXPKI::Server::API->new();
     ##! 16: $command{$ident}
+
 }
 
 sub START {

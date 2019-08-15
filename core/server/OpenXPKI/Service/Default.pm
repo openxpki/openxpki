@@ -29,7 +29,6 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Service::Default::Command;
 use OpenXPKI::Service::Default::CommandApi2;
 use Log::Log4perl::MDC;
 
@@ -745,26 +744,18 @@ sub __handle_COMMAND : PRIVATE {
 
     my $command;
     my $api = $data->{PARAMS}->{API} || 2;
-    if ($api !~ /[12]/) {
+    if ($api !~ /[2]/) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_UNKNWON_COMMAND_API_VERSION",
-            params  => { API => $api },
+            params  => $data->{PARAMS},
         );
     }
 
     eval {
-        if ($api != 1) {
-            $command = OpenXPKI::Service::Default::CommandApi2->new(
-                command => $data->{PARAMS}->{COMMAND},
-                params  => $data->{PARAMS}->{PARAMS},
-            );
-        } else {
-            ##! 4: 'Call to old command api ' . $data->{PARAMS}->{COMMAND}
-            $command = OpenXPKI::Service::Default::Command->new({
-                COMMAND => $data->{PARAMS}->{COMMAND},
-                PARAMS  => $data->{PARAMS}->{PARAMS},
-            });
-        }
+        $command = OpenXPKI::Service::Default::CommandApi2->new(
+            command => $data->{PARAMS}->{COMMAND},
+            params  => $data->{PARAMS}->{PARAMS},
+        );
     };
     if (my $exc = OpenXPKI::Exception->caught()) {
         if ($exc->message() =~ m{ I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_INVALID_COMMAND }xms) {

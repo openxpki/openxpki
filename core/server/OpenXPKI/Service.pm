@@ -20,21 +20,18 @@ use Data::Dumper;
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use OpenXPKI::Server::API;
 use OpenXPKI::i18n qw( i18nGettext );
 
 my %transport              : ATTR( :init_arg<TRANSPORT> );
 my %serialization          : ATTR( :init_arg<SERIALIZATION> );
 
 my %communication_state    : ATTR( :get<communication_state> :set<communication_state> );
-my %api                    : ATTR( :get<API> );
 
 my %read_timeout           : ATTR( :set<timeout> );
 
 
 sub BUILD {
     my ($self, $ident, $arg_ref) = @_;
-    $api{$ident} = OpenXPKI::Server::API->new();
     return 1;
 }
 
@@ -181,8 +178,7 @@ is left to the derived classes.
 
 =head3 BUILD
 
-is the constructor (called via new()). Fills the api attribute with
-a newly created API object.
+noop
 
 =head3 talk
 
@@ -199,11 +195,6 @@ the corresponding data structure.
 Sets read timeout (seconds) for the collect() call. If no message is
 read within the specified timout collect() terminates with an exception.
 Default is undef which means no timeout (wait forever).
-
-=head3 get_API
-
-Gets OpenXPKI::Server::API object.
-
 
 =head3 __get_error
 

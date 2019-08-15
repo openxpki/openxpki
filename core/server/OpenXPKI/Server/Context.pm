@@ -218,7 +218,7 @@ via setcontext().
 
 =over
 
-=item *    api
+=item * api2
 
 =item * server
 
@@ -274,7 +274,7 @@ Usage:
   # attach this server object and the API to the global context
   OpenXPKI::Server::Context::setcontext({
     server => $self,
-    api    => OpenXPKI::Server::API->new(),
+    api2   => OpenXPKI::Server::API2->new(),
   });
 
 =head2 hascontext

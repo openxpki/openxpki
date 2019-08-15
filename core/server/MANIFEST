@@ -35,7 +35,6 @@ openxpki.xsd
 
 ## Client
 OpenXPKI/Client.pm
-OpenXPKI/Client/API.pm
 OpenXPKI/Client/Config.pm
 OpenXPKI/Client/SCEP.pm
 OpenXPKI/Client/Simple.pm
@@ -225,17 +224,6 @@ OpenXPKI/Server/Log/Layout/Audit.pm
 ## common server stuff
 
 OpenXPKI/Server.pm
-OpenXPKI/Server/API.pm
-OpenXPKI/Server/API/API2.pm
-OpenXPKI/Server/API/Default.pm
-OpenXPKI/Server/API/Housekeeping.pm
-OpenXPKI/Server/API/Object.pm
-OpenXPKI/Server/API/Profile.pm
-OpenXPKI/Server/API/Secret.pm
-OpenXPKI/Server/API/Smartcard.pm
-OpenXPKI/Server/API/Token.pm
-OpenXPKI/Server/API/UI.pm
-OpenXPKI/Server/API/Workflow.pm
 OpenXPKI/Server/API2.pm
 OpenXPKI/Server/API2/Autoloader.pm
 OpenXPKI/Server/API2/EasyPlugin.pm
@@ -540,7 +528,6 @@ OpenXPKI/Serialization/JSON.pm
 OpenXPKI/Serialization/Legacy.pm
 OpenXPKI/Service.pm
 OpenXPKI/Service/Default.pm
-OpenXPKI/Service/Default/Command.pm
 OpenXPKI/Service/Default/CommandApi2.pm
 
 OpenXPKI/Service/LibSCEP.pm

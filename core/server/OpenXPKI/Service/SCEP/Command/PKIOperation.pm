@@ -15,7 +15,6 @@ use Class::Std;
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use OpenXPKI::Server::API;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::DateTime;

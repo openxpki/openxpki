@@ -10,7 +10,6 @@ use base qw( OpenXPKI::Service::LibSCEP::Command );
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use OpenXPKI::Server::API;
 use OpenXPKI::Server::Context qw( CTX );
 
 use Data::Dumper;

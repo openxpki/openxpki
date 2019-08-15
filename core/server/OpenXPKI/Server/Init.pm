@@ -26,7 +26,6 @@ use OpenXPKI::Crypto::VolatileVault;
 use OpenXPKI::Server::Database;
 use OpenXPKI::Server::Log;
 use OpenXPKI::Server::Log::CLI;
-use OpenXPKI::Server::API;
 use OpenXPKI::Server::API2;
 use OpenXPKI::Server::Authentication;
 use OpenXPKI::Server::Notification::Handler;
@@ -54,7 +53,6 @@ my @init_tasks = qw(
   dbi_log
   crypto_layer
   api2
-  api
   workflow_factory
   volatile_vault
   authentication
@@ -313,10 +311,7 @@ sub __do_init_acl {
 
 sub __do_init_api {
     ### init api...
-    OpenXPKI::Server::Context::setcontext(
-    {
-        api => OpenXPKI::Server::API->new(),
-    });
+    warn "v1 api does no longer exist"
 }
 
 sub __do_init_api2 {
