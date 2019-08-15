@@ -230,7 +230,6 @@ subjectAltName=" . join ",", @san;
             if ( join(',', sort @srccrl) ne join(',', sort @newcrl)) {
                 push @errors, 'CDP';
             }
-            print Dumper \@newcrl;
         } elsif (%new || %src) {
             push @errors, 'CDP (missing)';
         }
