@@ -26,22 +26,7 @@ sub execute {
         return 1;
     }
 
-    my @prefix;
-    my $config_path = $self->param('config_path');
-    # auto create from interface and server in context
-    if ($config_path) {
-        @prefix = split /\./, $config_path;
-    } else {
-        my $interface = $context->param('interface');
-        my $server = $context->param('server');
-
-        if (!$server || !$interface) {
-            configuration_error('Neither config_path nor interface/server is set!');
-        }
-        @prefix = ( $interface, $server, 'challenge' );
-        $config_path = join ".", @prefix;
-    }
-
+    my @prefix = $self->_get_service_config_path('challenge');
 
     # Reset the context
     $context->param( $target_key => undef );

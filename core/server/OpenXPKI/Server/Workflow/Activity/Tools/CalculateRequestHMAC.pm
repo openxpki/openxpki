@@ -1,4 +1,4 @@
-package OpenXPKI::Server::Workflow::Activity::SCEPv2::CalculateRequestHMAC;
+package OpenXPKI::Server::Workflow::Activity::Tools::CalculateRequestHMAC;
 
 use warnings;
 use strict;
@@ -20,8 +20,9 @@ sub execute {
     my $target_key = $self->param('target_key') || 'csr_hmac';
     my $secret = $self->param('secret');
 
-    if (!$secret) {
-        $secret = CTX('config')->get([ 'scep', $context->param('server') , 'hmac' ]);
+    if (!defined $secret) {
+        ##! 32: 'No secret in context - looking via service'
+        $secret = CTX('config')->get( $self->_get_service_config_path('hmac') );
     }
 
     if (!$secret) {
@@ -41,7 +42,7 @@ sub execute {
 __END__;
 
 
-=head1 OpenXPKI::Server::Workflow::Activity::SCEPv2::CalculateRequestHMAC
+=head1 OpenXPKI::Server::Workflow::Activity::Tools::CalculateRequestHMAC
 
 Calculate the SHA256 HMAC for a PEM encoded CSR
 
@@ -53,7 +54,12 @@ Calculate the SHA256 HMAC for a PEM encoded CSR
 
 =item secret
 
-The secret key of the HMAC, if not given it is read from scep.<servername>.hmac
+The secret key of the HMAC
+
+=item config_path
+
+If secert is not set explicit, defines a config path to read the secret from.
+Default is to look up <interface>.<servername>.hmac
 
 =item target_key
 

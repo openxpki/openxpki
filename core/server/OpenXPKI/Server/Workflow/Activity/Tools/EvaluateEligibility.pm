@@ -22,22 +22,8 @@ sub execute {
 
     my $target_key = $self->param('target_key') || 'eligibility_result';
 
-    my @prefix;
-    my $config_path = $self->param('config_path');
-    # auto create from interface and server in context
-    if ($config_path) {
-        @prefix = split /\./, $config_path;
-    } else {
-        my $interface = $context->param('interface');
-        my $server = $context->param('server');
-
-        if (!$server || !$interface) {
-            configuration_error('Neither config_path nor interface/server is set!');
-        }
-        @prefix = ( $interface, $server, 'eligible' );
-        $config_path = join ".", @prefix;
-    }
-
+    my @prefix = $self->_get_service_config_path('eligible');
+    my $config_path = join ".", @prefix;
 
     # Reset the context
     $context->param( $target_key => undef );

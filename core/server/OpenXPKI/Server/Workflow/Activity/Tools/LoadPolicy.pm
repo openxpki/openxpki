@@ -15,27 +15,13 @@ sub execute {
     my $context   = $workflow->context();
     my $config = CTX('config');
 
-    my $policy_params;
-    my $config_path = $self->param('config_path');
-    if ($config_path) {
-        ##! 8: 'Load by path ' . $config_path
-        $policy_params = $config->get_hash($config_path);
-    } else {
-        my $server = $context->param('server');
-        my $interface = $context->param('interface');
-        if ($server && $interface) {
-            ##! 8: 'Load for server ' . $interface .  ' / ' .  $server
-            $policy_params = $config->get_hash([ $interface, $server, 'policy' ]);
-        } else {
-            CTX('log')->application()->warn("Server or interface not set in LoadPolicy");
-
-        }
-    }
+    my $policy_params = $config->get_hash(  $self->_get_service_config_path('policy') );
 
     if (!$policy_params) {
         CTX('log')->application()->warn("No policy params set in LoadPolicy");
 
     } else {
+
         foreach my $key (keys (%{$policy_params})) {
             $context->param( "p_$key" => $policy_params->{$key} );
         }

@@ -188,6 +188,39 @@ sub param {
     return undef;
 }
 
+sub _get_service_config_path {
+
+    my $self = shift;
+    my $default_path = shift;
+
+    my @prefix;
+
+    if (my $config_path = $self->param('config_path')) {
+        ##! 32: 'Explicit config path is set ' . $config_path
+        @prefix = split /\./, $config_path;
+    # auto create from interface and server in context if not set
+    } else {
+        my $context = $self->workflow()->context();
+        my $interface = $context->param('interface');
+        my $server = $context->param('server');
+
+        if (!$server || !$interface) {
+            configuration_error('Neither config_path nor interface/server is set!');
+        }
+
+        @prefix = ( $interface, $server );
+        if (ref $default_path) {
+            push @prefix, @{$default_path};
+        } else {
+            push @prefix, $default_path;
+        }
+        ##! 32: 'Autobuild config_path from interface ' . join ".", @prefix
+    }
+
+    return \@prefix;
+
+}
+
 sub get_max_allowed_retries{
 
     my $self = shift;
@@ -518,6 +551,13 @@ The current workflow is given as first argument, the process state to recover fr
 =head2 runtime_exception
 
 Hook method. Will be called if Workflow::execute_action() is called with an proc-state which is not appropriate (e.g. "finished" or "running")  The current workflow is given as argument.
+
+=head2 _get_service_config_path
+
+Helper to retrieve a config path from the parameter or autocreate from
+interface/server. Expects the name of the node inside the server config
+that should be used as fallback (single item as string or nested path as
+arrayref), if config_path is not explicitly set in the action parameters.
 
 =head1 Parameter mapping
 
