@@ -2,9 +2,48 @@ SCEP Workflow
 =============
 
 Before you can use the SCEP subsystem, you need to enable the SCEP Server
-in the general configuration. This section explains the options for the
-scep enrollment workflow.
+in the general configuration. This section explains the business logic and
+options for the enrollment workflow.
 
+Operational Modes
+-----------------
+
+It is important to understand that the default workflow has three operational
+modes which are autodetected based on parameters of the request. It is a common
+problem that the workflow does not behave as excepted because you got into the
+wrong operational mode due to a non-compliant client (e.g Cisco ASA).
+
+Initial Enrollment
+++++++++++++++++++
+
+Anonymously request a certificate for the first time - requires that the SCEP
+request is self-signed, which means the certificate used for the outer
+signature must match the key of the CSR *and* the subject of the request must
+match the subject of the signer certificate (which is a self-signed
+certificate in this case). Especially Ciso ASA fails here as the certificate
+subject does not match the request subject.
+
+Renewal
++++++++
+
+Request renewal by sending a new request signed with the existing certificate.
+This requires that the **full subject** of request and signer certificate
+matches! With the default profiles the PKI will enforce the DC/O parts of
+the entity certificates so this is a common problem when new certificates
+are created using the old configuration. Best strategy is to create the new
+request from the old certificate to ensure the subjects match. Please note
+that reuse of keys is not supported, you must generate a new key for each new
+request.
+
+Enrollment On Behalf
+++++++++++++++++++++
+
+Request a certificate with the help of a Trusted Third Party - the request
+is signed using a certificate issued from the PKI which is qualified as
+"Authorized Signer (see below)" for the given endpoint. This branch is
+always choosen if the subject of request and signer do not match, so it is
+often hit by accident when Renewal or Initial Enrollment are made with
+"wrong" subjects.
 
 Workflow Logic
 --------------
@@ -46,28 +85,22 @@ Sample Configuration
 
 The workflow fetches all information from the configuration system at ``scep.<servername>`` where the servername is taken from the scep wrapper configuration.
 
-Here is a complete sample configuration::
+Here is a complete sample configuration (found in `scep/generic.yaml`)::
 
     # By default, all scep endpoints wll use the default token defined
     # by the scep token group, if you pass a name here, it is considered
     # a group name from the alias table
-    #token: democa-special-scep
+    #token: ca-one-special-scep
 
     # A renewal request is only accpeted if the used certificate will
     # expire within this period of time.
-    renewal:
-        # allow renewal 14 days before the certificate expires
-        notbefore: 000014
-        # allow renewal with already expired certificate (usually not set)
-        # replaces "allow_expired_signer", not implemented yet!
-        notafter: 0
+    renewal_period: 000060
 
     # If the request was a replacement, optionally revoke the replaced
     # certificate after a grace period
     revoke_on_replace:
         reason_code: keyCompromise
         delay_revocation_time: +000014
-
 
     workflow:
         type: certificate_enroll
@@ -81,25 +114,13 @@ Here is a complete sample configuration::
             _url_params: url_params
             #_pkcs7: pkcs7
 
-
-    # allow rsa keys with 1020 to 2048 bit
-    # the 1020 is necessary as some implementations can have
-    # leading 0 in the modulus which will reduce the bitcount
-    key_size:
-        rsaEncryption: 1020-2048
-
-    # allowed digest algorithms used for the CSR
-    hash_type:
-      - sha1
-      - sha256
-
     authorized_signer:
         rule1:
             # Full DN
-            subject: CN=.+:scepclient,.*
+            subject: CN=.+:pkiclient,.*
         rule2:
             # Full DN
-            subject: CN=.+:pkiclient,.*
+                subject: CN=my.scep.enroller.com:generic,.*
 
     policy:
         # Authentication Options
@@ -128,6 +149,7 @@ Here is a complete sample configuration::
 
         # The number of active certs with the same subject that are allowed
         # to exist at the same time, deducted by one if a renewal is seen
+        # set to 0 if you dont want to check for duplicates at all
         max_active_certs: 1
 
         # option will be removed
@@ -153,9 +175,15 @@ Here is a complete sample configuration::
         # You can define weather to have only the certificate itself (endentity),
         # the chain without the root (chain)  or the chain including the root
         # (fullchain).
+        # Note: The response is cached internally in the datapool so changes
+        # will not show up immediately - to list the cached items use
+        # openxpkicli list_data_pool_entries  --arg namespace=scep.cache.getca
+        # You can delete by setting the empty string as value with
+        # set_data_pool_entry (value="" force=1)
         getca:
             ra:     fullchain
             issuer: fullchain
+
 
     profile:
       cert_profile: tls_server
@@ -169,12 +197,13 @@ Here is a complete sample configuration::
     # HMAC based authentication
     hmac: verysecret
 
+    # see below how to get a per-request password
     challenge:
         value: SecretChallenge
 
     eligible:
         initial:
-           value@: connector:scep.scep-server-1.connector.initial
+           value@: connector:scep.generic.connector.initial
            args: '[% context.cert_subject_parts.CN.0 %]'
            expect:
              - Build
@@ -187,7 +216,10 @@ Here is a complete sample configuration::
     connector:
         initial:
             class: Connector::Proxy::YAML
-            LOCATION: /home/pkiadm/democa/enroll.yaml
+            # this file must have a key/value list with the key being
+            # the subject and the value being a true value
+            # e.g. "pc1234.example.org: 1"
+            LOCATION: /home/pkiadm/cmdb.yaml
 
 *The renewal period values are interpreted as OpenXPKI::DateTime relative date but given without sign.*
 
@@ -199,16 +231,15 @@ you must adjust several parameters in the scep server configuration.
 
 *renewal/replace period*
 
-The syntax for the renewal period has changed, the replace_period was
-substituted by a boolean flag as a window did not make much sense::
+The logic for replace has changed, replace is now always assumed when you are
+outside the renewal period::
 
     # old syntax
     renewal_period: 000014
     replace_period: 05
 
     # new syntax
-    renewal:
-        notbefore: 000014
+    renewal_period: 000014
 
     # note that the policy node already exists!
     policy:
@@ -237,27 +268,14 @@ This has been moved to a seperate node in the endpoint configuration::
         cert_profile: tls_server
         cert_subject_style: enroll
 
+*key_checks*
+
+Are now read from the profiles, so there is no longer an extra definition
+in the workflow.
+
 
 Workflow Configuration
 ----------------------
-
-technical validation
-++++++++++++++++++++
-
-Configure the list of allowed key and hash algorithms.
-
-**key_size**
-
-A hash item list for allowed key sizes and algorithms. The name of the option must be
-the key algorithm as given by openssl, the required byte count is given as a range in
-bytes. There must not be any space between the dash and the numbers. Hint: Some
-implementations do not set the highest bit to 1 which will result in a nominal key
-size which is one bit smaller than the requested one. So stating a small offset here
-will reduce the propability to reject such a key.
-
-**hash_type**
-
-List (or single scalar) of accepted hash algorithms used to sign the request.
 
 Authentication
 ++++++++++++++
@@ -325,8 +343,9 @@ Subject Checking
 The policy setting *max_active_certs* gives the maximum allowed number
 of valid certificates sharing the same subject. If the certificate count
 after issuance of the current request will exceed this number, the
-workflow stops in the PENDING_POLICY_VIOLATION state. There are several
-settings that influence this check, based on the operation mode:
+workflow stops in the PENDING_POLICY_VIOLATION state. If this parameter is
+not set, no checks are done. There are several settings that influence this
+check, based on the operation mode:
 
 Initial Enrollment
 ##################
@@ -491,86 +510,4 @@ Note: Without any other measures, this will obviously enable an attacker
 who has access to a leaked key to obtain a new certificate. We used this
 to replace certificates after the Heartbleed bug with the scep systems
 seperated from the public network.
-
-Misc
-----
-
-**workflow.type**
-
-The name of the workflow that is used by this server instance.
-
-**response.getcacert_strip_root**
-
-The scep standard is a bit unclear if the root should be in the chain or not.
-We consider it a security risk (trust should be always set by hand) but as
-most clients seem to expect it, we include the root by default. If you are
-sure your clients do not need the root and have it deployed, set this flag
-to 1 to strip the root certificate from the getcacert response.
-
-The workflow context
---------------------
-
-*outdated - needs adjustment for new workflow*
-
-The workflow uses status flags in the context to take decissions. Flags are boolean if not stated otherwise. This is intended to be a debugging aid.
-
-**csr_key_size_ok**
-
-Weather the keysize of the csr matches the given array. If the key_size definition is missing, the flag is not set.
-
-**have_all_approvals**
-
-Result of the approval check done in CalcApproval.
-
-**in_renew_window**
-
-The request is within the configured renewal period.
-
-**num_manual_authen**
-
-The number of given manual authentications. Can override missing authentication on initial enrollment.
-
-**scep_uniq_id_ok**
-
-The internal request id is really unique across the whole system.
-
-**signer_is_self_signed**
-
-The signer and the csr have the same public key. Note: If you allow key renewal this might also be a renewal!
-
-**signer_authorized**
-
-The signer certificate is recognized as an authorized signer on behalf. See *authorized_signer_on_behalf* in the configuration section.
-
-**signer_signature_valid**
-
-The signature on the PKCS#7 container is valid.
-
-**signer_sn_matches_csr**
-
-The request subject matches the signer subject. This can be either a self-signed initial enrollment or a renewal!
-
-**signer_status_revoked**
-
-The signer certificate is marked revoked in the database.
-
-**signer_trusted**
-
-The PKI can build the complete chain from the signer certificate to a trusted root. It might be revoked or expired!
-
-**signer_validity_ok**
-
-The notbefore/notafter dates were valid at the time of validation. In case you have a grace_period set, a certificate is also valid if it has expired within the grace period.
-
-**valid_chall_pass**
-
-The provided challenge password has been approved.
-
-**valid_kerb_authen**
-
-Request was authenticated using kerberos (not implemented yet)
-
-**csr_profile_oid**
-
-The profile name as extracted from the Certificate Type Extension (Microsoft specific)
 

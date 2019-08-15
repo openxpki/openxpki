@@ -182,59 +182,6 @@ If you have a proxy or sso system in front of your OpenXPKI server that authenti
 
 TODO: This needs some useful example code.
 
-Workflow ACL
-^^^^^^^^^^^^
-
-The Workflow-ACL set is located at ``auth.wfacl`` and controls which workflows a user can access. The rules are based on the role of the user and distinguish between creating a new and accessing an exisiting workflow.
-
-**workflow creation**
-
-To determine what workflows a user can create, just list the names of the workflows under the create key. ::
-
-    User:
-        create:
-        - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST
-        - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_REVOCATION_REQUEST
-        - I18N_OPENXPKI_WF_TYPE_CERTIFICATE_SIGNING_REQUEST
-        - I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE
-
-
-**unconditional workflow access**
-
-The access privileg takes the workflow creator into account. To get access to all existing workflows regardless of the creator, use a wildcard pattern::
-
-    User:
-        access:
-            I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST:
-                creator: .*
-
-
-**conditional workflow access**
-
-To show a user only his own workflows, use the special word *self*::
-
-    User:
-        access:
-            I18N_OPENXPKI_WF_TYPE_CERTIFICATE_RENEWAL_REQUEST:
-                creator: self
-
-
-**workflow context filter**
-
-Sometimes the workflow context contains items, you don't want to show to the user. You can specify a regular expression to show or hide certain entries. The regex is applied to the context key::
-
-    User:
-        access:
-            I18N_OPENXPKI_WF_TYPE_PASSWORD_SAFE:
-                creator: self
-                context:
-                    show: .*
-                    hide: encrypted_.*
-
-
-The given example shows everything but any context items that begin with "encrypted\_". The filters are additive, so a key must match the show expression but must not match the hide expression to show up. *Note*: No setting or an empty string for *show* results in no filtering! To hide the whole context set a wildcard ".*" for *hide*.
-
-
 Crypto layer
 ------------
 

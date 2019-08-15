@@ -1,4 +1,0 @@
-.. _developer:
-
-Extending OpenXPKI
-===================
