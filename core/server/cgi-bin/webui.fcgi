@@ -25,8 +25,6 @@ use Crypt::CBC;
 use OpenXPKI::i18n qw( i18nGettext set_language set_locale_prefix);
 use OpenXPKI::Client::UI;
 use OpenXPKI::Client;
-use OpenXPKI::Client::Session;
-
 
 my $configfile = '/etc/openxpki/webui/default.conf';
 
@@ -195,31 +193,6 @@ while (my $cgi = CGI::Fast->new()) {
             $backend_client = OpenXPKI::Client->new({
                 SOCKETFILE => $config{'global'}{'socket'}
             });
-        }
-
-        # if we use the openxpki internal session handler, we must initialize
-        # the backend before we can load the frontend session data
-        # If default CGI::Session is used, this is done internally by the UI Client
-        if ($config{session}{driver} && $config{session}{driver} eq 'openxpki') {
-
-            $backend_client->init_session({ SESSION_ID => $sess_id, NEW_ON_FAIL => 1 });
-            $session_front = OpenXPKI::Client::Session::factory( $backend_client, $log );
-
-            # if a frontend timeout smaller than the backend timeout is set
-            # we get the problem that the frontend session gets deleted when
-            # reloaded. In this case we generate a new backend session
-            if (!$session_front || $session_front->is_expired()) {
-                $backend_client->logout();
-                $backend_client->init_session();
-                $log->debug('frontend session expired - logout backend');
-                $session_front = OpenXPKI::Client::Session::factory( $backend_client, $log );
-            }
-
-            $sess_id = $backend_client->get_session_id();
-            $log->debug('Backend client session id ' . $sess_id );
-
-            Log::Log4perl::MDC->put('sid', substr($sess_id,0,4));
-            Log::Log4perl::MDC->put('ssid', substr($sess_id,0,4));
         }
     };
 

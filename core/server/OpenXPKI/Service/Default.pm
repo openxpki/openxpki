@@ -110,7 +110,6 @@ sub __is_valid_message : PRIVATE {
             'CONTINUE_SESSION',
             'NEW_SESSION',
             'DETACH_SESSION',
-            'FRONTEND_SESSION'
         ],
         'SESSION_ID_SENT' => [
             'PING',
@@ -137,7 +136,6 @@ sub __is_valid_message : PRIVATE {
             'NEW_SESSION',
             'CONTINUE_SESSION',
             'DETACH_SESSION',
-            'FRONTEND_SESSION',
         ],
         'WAITING_FOR_AUTHENTICATION_STACK' => [
             'PING',
@@ -146,7 +144,6 @@ sub __is_valid_message : PRIVATE {
             'NEW_SESSION',
             'CONTINUE_SESSION',
             'DETACH_SESSION',
-            'FRONTEND_SESSION',
         ],
         'WAITING_FOR_LOGIN' => [
             'PING',
@@ -158,7 +155,6 @@ sub __is_valid_message : PRIVATE {
             'NEW_SESSION',
             'CONTINUE_SESSION',
             'DETACH_SESSION',
-            'FRONTEND_SESSION',
         ],
         'MAIN_LOOP' => [
             'PING',
@@ -168,7 +164,6 @@ sub __is_valid_message : PRIVATE {
             'NEW_SESSION',
             'CONTINUE_SESSION',
             'DETACH_SESSION',
-            'FRONTEND_SESSION',
             'RESET_SESSIONID',
         ],
     };
@@ -283,51 +278,6 @@ sub __handle_CONTINUE_SESSION {
     return {
         SESSION_ID => $session->data->id,
     };
-}
-
-sub __handle_FRONTEND_SESSION {
-
-    ##! 1: 'start'
-    my $self    = shift;
-    my $ident   = ident $self;
-    my $msg     = shift;
-
-    ##! 16: 'Frontend Data ' . Dumper $msg
-
-    if (!OpenXPKI::Server::Context::hascontext('session')) {
-        my $mode = (exists $msg->{PARAMS}->{SESSION_DATA} ? (defined $msg->{PARAMS}->{SESSION_DATA} ? 'update' : 'clear') : 'retrieve');
-        CTX('log')->system->error('Error handling frontend session (mode '.$mode.')');
-
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVICE_ATTACH_DATA_FAILED_NO_SESSION',
-            params =>  { MODE => $mode }
-        );
-    }
-
-    my $data_str;
-    my $sess = CTX('session');
-    if (exists $msg->{PARAMS}->{SESSION_DATA}) {
-        if (defined $msg->{PARAMS}->{SESSION_DATA}) {
-            $data_str = $msg->{PARAMS}->{SESSION_DATA};
-            ##! 16: 'Setting ui session data ' . $data_str
-            CTX('log')->system->debug('Updating frontend session data');
-            $sess->data->ui_session($data_str);
-        } else {
-            ##! 16: 'Clear ui session data '
-            CTX('log')->system->debug('Clearing frontend session data');
-            $sess->data->clear_ui_session;
-        }
-        $sess->persist;
-    } else {
-        CTX('log')->system->debug('Frontend session data requested by client');
-        $data_str = $sess->data->ui_session;
-        ##! 32: 'Read ui session data ' . $data_str
-    }
-
-    return {
-        SESSION_DATA => $data_str,
-    };
-
 }
 
 sub __handle_RESET_SESSIONID: PRIVATE {

@@ -9,7 +9,6 @@ use Moose;
 use English;
 use CGI::Session;
 use OpenXPKI::Client;
-use OpenXPKI::Client::Session;
 use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Client::UI::Bootstrap;
 use OpenXPKI::Client::UI::Login;
@@ -575,46 +574,31 @@ sub handle_login {
             #$self->backend()->rekey_session();
             #my $new_backend_session_id = $self->backend()->get_session_id();
 
-            # extra handling for OpenXPKI session handler
-            if (ref $session eq 'OpenXPKI::Client::Session') {
+            # Generate a new frontend session to prevent session fixation
+            # The backend session remains the same but can not be used by an
+            # adversary as the id is never exposed and we destroy the old frontend
+            # session so access to the old session is not possible
 
-                $session->renew_session_id();
-                # this is not strictly necessary but gives some extra
-                # security if the session renegotation breaks
-                $session->param('rtoken' => undef );
+            # fetch redirect from old session before deleting it!
+            my $redirect = $session->param('redirect');
 
-                $self->logger()->debug('Regenerated backend session id: '. $session->id );
-                Log::Log4perl::MDC->put('ssid', substr($session->id,0,4));
+            # delete the old instance data
+            $session->delete();
+            $session->flush();
+            # call new on the existing session object to reuse settings
+            $session = $session->new();
 
-            } else {
+            $self->logger()->debug('New frontend session id : '. $session->id );
 
-                # Generate a new frontend session to prevent session fixation
-                # The backend session remains the same but can not be used by an
-                # adversary as the id is never exposed and we destroy the old frontend
-                # session so access to the old session is not possible
-
-                # fetch redirect from old session before deleting it!
-                my $redirect = $session->param('redirect');
-
-                # delete the old instance data
-                $session->delete();
-                $session->flush();
-                # call new on the existing session object to reuse settings
-                $session = $session->new();
-
-                $self->logger()->debug('New frontend session id : '. $session->id );
-
-                if ($redirect) {
-                    $self->logger()->trace('Carry over redirect target ' . $redirect);
-                    $session->param('redirect', $redirect);
-                }
-
-                # set some data
-                $session->param('backend_session_id', $self->backend()->get_session_id() );
-                Log::Log4perl::MDC->put('sid', substr($session->id,0,4));
+            if ($redirect) {
+                $self->logger()->trace('Carry over redirect target ' . $redirect);
+                $session->param('redirect', $redirect);
             }
 
-            # this is valid in both cases
+            # set some data
+            $session->param('backend_session_id', $self->backend()->get_session_id() );
+            Log::Log4perl::MDC->put('sid', substr($session->id,0,4));
+
             $session->param('user', $reply->{PARAMS});
             $session->param('pki_realm', $reply->{PARAMS}->{pki_realm});
             $session->param('is_logged_in', 1);
@@ -679,18 +663,10 @@ sub logout_session {
     $self->logger()->info("session logout");
 
     my $session = $self->session();
-    if (ref $session eq 'OpenXPKI::Client::Session') {
-        # this clears the local cache
-        $session->clear();
-        # this deletes the session from the backend
-        $session->delete();
-        $session->renew_session_id();
-    } else {
-        $self->backend()->logout();
-        $self->session()->delete();
-        $self->session()->flush();
-        $self->session( $self->session()->new() );
-    }
+    $self->backend()->logout();
+    $self->session()->delete();
+    $self->session()->flush();
+    $self->session( $self->session()->new() );
 
     # flush the session cookie
     if ($cgi && $main::cookie) {

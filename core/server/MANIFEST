@@ -39,11 +39,6 @@ OpenXPKI/Client/Config.pm
 OpenXPKI/Client/SCEP.pm
 OpenXPKI/Client/Simple.pm
 
-# Client session
-OpenXPKI/Client/Session.pm
-OpenXPKI/Client/Session/Driver.pm
-
-
 # New UI Client
 OpenXPKI/Client/UI.pm
 OpenXPKI/Client/UI/Bootstrap.pm
