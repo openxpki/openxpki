@@ -5,7 +5,7 @@ INSTALL      = install
 LANGS         = en_US en_GB de_DE ru_RU it_IT
 PO_SOURCES   = $(LANGS:%=%/openxpki.po)
 MO_TRANSLATIONS = $(LANGS:%=%/$(MO_FILE))
-POT_SOURCES  = ../server ../../config 
+POT_SOURCES  = ../server ../../../openxpki-config 
 VERSION_FILE    = ./VERSION
 PACKAGE      ?= openxpki-i18n
 
