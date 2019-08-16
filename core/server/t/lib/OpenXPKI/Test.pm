@@ -767,7 +767,7 @@ sub init_server {
     OpenXPKI::Server::Context::setcontext({ log => OpenXPKI::Server::Log->new(CONFIG => undef) });
 
     # init basic CTX objects
-    my @tasks = qw( config_versioned dbi_log api2 api authentication );
+    my @tasks = qw( config_versioned dbi_log api2 authentication );
     # init notification object if needed
     my $cfg_notification = "realm.".$self->default_realm.".notification";
     if ($self->get_config($cfg_notification, 1)) {
