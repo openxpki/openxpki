@@ -121,7 +121,7 @@ QUIT;
 __SQL
 
 sqlplus64 $OXI_TEST_DB_ORACLE_USER/$OXI_TEST_DB_ORACLE_PASSWORD@XE \
- @/code-repo/config/sql/schema-oracle.sql                             >$LOG 2>&1
+ @/code-repo/config/contrib/sql/schema-oracle.sql                   >$LOG 2>&1
 set +e
 
 #

@@ -9,7 +9,7 @@ set -o pipefail
 LOG=$(mktemp)
 function _exit () {
     if [ $1 -ne 0 -a $1 -ne 333 ]; then
-        echo "$0: ERROR - last command exited with code $1, output:" && cat $LOG
+        echo -e "\nERROR ($0) Last command exited with code $1, output:" && cat $LOG
     fi
     rm -f $LOG
     exit $1
@@ -24,13 +24,15 @@ echo -e "Recreating database and certificates"
 echo -e "- stopping OpenXPKI"
 openxpkictl stop                                                  >$LOG 2>&1
 
+set -e
+
 echo -e "- re-creating database and tables"
 /code-repo/tools/testenv/mysql-create-db.sh                       >$LOG 2>&1
 /code-repo/tools/testenv/mysql-create-schema.sh                   >$LOG 2>&1
 
 echo -e "- creating and importing sample certificates"
 rm -rf /etc/openxpki/ca/
-/code-repo/config/sampleconfig.sh                                 >$LOG 2>&1
+/code-repo/config/contrib/sampleconfig.sh                         >$LOG 2>&1
 chmod 750              /etc/openxpki/ca
 chown -R root:openxpki /etc/openxpki/ca
 

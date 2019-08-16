@@ -99,8 +99,8 @@ Example call when debian packages are installed::
     zcat /usr/share/doc/libopenxpki-perl/examples/schema-mysql.sql.gz | \
          mysql -u root --password --database  openxpki
 
-If you do not use debian packages, you can get a copy from the config/sql/
-folder of the repository.
+If you do not use debian packages, you can get a copy from ``contrib/sql/`` in the
+config repository https://github.com/openxpki/openxpki-config.
 
 
 Setup base certificates

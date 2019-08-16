@@ -35,7 +35,7 @@ installed=$(/usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' 'sql
 if [ $installed -eq 0 ]; then
     echo "SQLite: installing client"
     DEBIAN_FRONTEND=noninteractive \
-     apt-get -q=2 install sqlite3 libdbd-sqlite3-perl     >$LOG 2>&1 || _exit $?
+     apt-get -q=2 install sqlite3 libdbd-sqlite3-perl >$LOG 2>&1 || _exit $?
 fi
 
 #
@@ -43,5 +43,5 @@ fi
 #
 set -e
 echo "SQLite: setting up database (schema)"
-sqlite3 $SQLITE_PATH < /code-repo/config/sql/schema-sqlite.sql        >$LOG 2>&1
+sqlite3 $SQLITE_PATH < /code-repo/config/contrib/sql/schema-sqlite.sql >$LOG 2>&1
 set +e
