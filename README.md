@@ -3,10 +3,11 @@
 A software stack based on perl and openssl to run a PKI/trustcenter with an enterprise-grade feature set. 
 
 **core features**
+
 - WebUI compatible with all major browsers
-- Ready-to-run example config included
+- Ready-to-run example config as public git repo ([openxpki/openxpki-config](https://github.com/openxpki/openxpki-config))
 - File-based configuration (eases versioning, staged deployment and change control)
-- Support for SCEP (Simple Certificate Enrollment Protocol)
+- Support for SCEP (Simple Certificate Enrollment Protocol) and EST
 - Easy adjustment of workflows to personal needs
 - Run multiple separate CAs with a single installation
 - automated rollover of CA generations
@@ -17,19 +18,29 @@ A software stack based on perl and openssl to run a PKI/trustcenter with an ente
 
 ## Release
 
-There is no planned release schedule, we make new releases after fixing relevant bugs or adding new features. You can download packages for Debian, Ubuntu and SuSE from the [package mirror](http://packages.openxpki.org). 
+There is no planned release schedule, we make new releases after fixing relevant bugs or adding new features. 
 
-# Support / Issue Tracker
+Packages for Debian are provided via our [package mirror](http://packages.openxpki.org), prebuild docker images are available via Dockerhub ([whiterabbitsecurity/openxpki](https://hub.docker.com/r/whiterabbitsecurity/openxpki)). 
+
+Packages for SLES, RHEL, Ubuntu are available via subscription plans.
+
+## Getting Started
+
+A public demo is available at http://demo.openxpki.org/.
+
+To run OpenXPKI yourself get a Debian box (**Jessie** for v2, Buster for v3 (planned for fall 2019) ready and download the packages from the [package mirror](http://packages.openxpki.org). The packages come with a full-featured sample config and a sample setup script - this gets your PKI up in less than 5 minutes! Just follow our [Quickstart Instructions](https://openxpki.readthedocs.io/en/latest/quickstart.html). 
+
+## Support / Issue Tracker
 
 Check out the documentation on [readthedocs](http://openxpki.readthedocs.org/). There is also a [complete quickstart manual](http://openxpki.readthedocs.org/en/latest/quickstart.html).
 
 Please use the [projects mailing lists](https://lists.sourceforge.net/lists/listinfo/openxpki-users) to get support. Please do **NOT** use the github issue tracker for general support and ask on the list before filing an issue. If you file an issue, add sufficient information to reproduce the problem.
-  
-# Contributing
+
+## Contributing
 
 Contributions are always welcome. Please fork and make a pull request against the development branch. Please also add you name to the AUTHORS file (which implies that you agree with the contributors license agreement).
 
-# License
+## License
 
 Apache License 2.0, also see LICENSE
 
