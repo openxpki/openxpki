@@ -20,6 +20,15 @@ msgstr ""
 "X-Poedit-Bookmarks: -1,-1,77,-1,-1,-1,-1,-1,-1,-1\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+
+msgid "I18N_OPENXPKI_UI_SUPPORT_TRAILER"
+msgstr ""
+"Thank you for using OpenXPKI - for support and announcements please "
+"subscribe to our <a href=\\\"https://lists.sourceforge.net/lists/listinfo/"
+"openxpki-users\\\">mailinglist</a>.<br> If you need help with your setup or "
+"commercial support, please contact <a href=\\\"mailto:"
+"openxpki@whiterabbitsecurity.com\\\">openxpki@whiterabbitsecurity.com.</a>"
+
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Azione richiesta non trovata"
 

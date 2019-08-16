@@ -213,6 +213,15 @@ sub render_system_status {
 
     }
 
+    $self->add_section({
+        type => 'text',
+        content => {
+            label => '',
+            description => 'I18N_OPENXPKI_UI_SUPPORT_TRAILER'
+        }
+    });
+
+
     if ($critical) {
         $self->set_status('Your system status is critical!','error');
     } elsif($warning) {
