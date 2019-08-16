@@ -97,7 +97,7 @@ if [[ $IS_FULLCONFIG -eq 1 ]]; then
 __DB
 # only partial config update (only realm democa)
 else
-    echo "Updating realm CA-ONE in /etc/openxpki/config.d/realm/democa"
+    echo "Updating demo realm in /etc/openxpki/config.d/realm/democa"
     rsync -a --delete \
       /code-repo/config/config.d/realm/democa/* \
       /etc/openxpki/config.d/realm/democa/                            >$LOG 2>&1

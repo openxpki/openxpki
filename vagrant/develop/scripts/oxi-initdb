@@ -29,10 +29,10 @@ echo -e "- re-creating database and tables"
 /code-repo/tools/testenv/mysql-create-schema.sh                   >$LOG 2>&1
 
 echo -e "- creating and importing sample certificates"
-rm -rf /etc/openxpki/ssl/
+rm -rf /etc/openxpki/ca/
 /code-repo/config/sampleconfig.sh                                 >$LOG 2>&1
-chmod 750              /etc/openxpki/ssl
-chown -R root:openxpki /etc/openxpki/ssl
+chmod 750              /etc/openxpki/ca
+chown -R root:openxpki /etc/openxpki/ca
 
 echo -e "- starting OpenXPKI"
 openxpkictl start                                                 >$LOG 2>&1

@@ -220,7 +220,7 @@ B<Parameters>
 =cut
 sub get_private_key_path {
     my ($self, $realm, $alias) = @_;
-    return sprintf "%s/etc/openxpki/ssl/%s/%s.pem", $self->basedir, $realm, $alias;
+    return sprintf "%s/etc/openxpki/ca/%s/%s.pem", $self->basedir, $realm, $alias;
 }
 
 =head2 get_realms

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Create certificates and store them in $OXI_CONF/etc/openxpki/ssl/xxx/
+# Create certificates and store them in $OXI_CONF/etc/openxpki/ca/xxx/
 # Import the certificates into MySQL using "openxpkiadm".
 #
 # This script assumes that there is a valid OpenXPKI configuration below

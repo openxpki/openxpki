@@ -137,7 +137,7 @@ sub _load_default_config {
     return $config_hash;
 }
 
-sub _customize_ca_one {
+sub _customize_democa {
     my ($self, $conf) = @_;
     $conf->{auth} = $self->auth_config;
 }

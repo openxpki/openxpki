@@ -56,8 +56,8 @@ case "$1" in
 
        # Fix directory permissions
        chown -R openxpki:openxpki /var/openxpki
-       chown -R openxpki:root /etc/openxpki/ssl/
-       chmod -R 750 /etc/openxpki/ssl/
+       chown -R openxpki:root /etc/openxpki/ca/
+       chmod -R 750 /etc/openxpki/ca/
 
        # add apache user to openxpki group (to allow connecting the socket)
        usermod -a -G openxpki www-data
