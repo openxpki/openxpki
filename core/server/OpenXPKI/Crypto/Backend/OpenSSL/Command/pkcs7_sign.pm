@@ -126,7 +126,15 @@ sub key_usage {
     return 1;
 }
 
-#get_result moved to base class
+sub get_result
+{
+    my $self = shift;
+    my $result = $self->SUPER::get_result();
+
+    $result =~ s/ (-----BEGIN\ [\w\s]*) CMS (----- [^-]+ -----END\ [\w\s]*) CMS (-----) /${1}PKCS7${2}PKCS7${3}/gmsx;
+
+    return $result;
+}
 
 1;
 __END__
