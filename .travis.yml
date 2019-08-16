@@ -17,7 +17,6 @@ env:
         - OXI_TEST_DB_MYSQL_DBPASSWORD=
     matrix:
         - OXI_TEST_RUN=unit_coverage
-        - OXI_TEST_RUN=nice
         - OXI_TEST_RUN=api2
         - OXI_TEST_RUN=webui
         - OXI_TEST_RUN=client

@@ -70,7 +70,6 @@ openxpkictl start || cat /var/log/openxpki/*
 #
 
 declare -A testmodes=(
-    ["nice"]="qatest/backend/nice/"
     ["api2"]="qatest/backend/api2/"
     ["webui"]="qatest/backend/webui/"
     ["client"]="qatest/client/"

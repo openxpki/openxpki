@@ -87,8 +87,7 @@ my @tests_unit;
 my @tests_qa;
 if ($mode eq "all") {
     @tests_unit = "t/";
-    # testing api/ before nice/ leads to errors!
-    @tests_qa   = qw( qatest/backend/nice qatest/backend/api2 qatest/backend/webui qatest/client );
+    @tests_qa   = qw( qatest/backend/api2 qatest/backend/webui qatest/client );
 }
 elsif ($mode eq "selected") {
     @tests_unit = grep { /^t\// } map { my $t = $_; $t =~ s/ ^ core\/server\/ //x; $t } @test_only;
