@@ -11,6 +11,29 @@ if [ -z "$TRAVIS_BUILD_ID" ]; then
 fi
 
 #
+# Check out config repository
+#
+
+# get commit id of branch "develop" in official repo
+git clone --quiet --depth=1 --branch=develop https://github.com/openxpki/openxpki.git ./temp-orig-dev
+pushd ./temp-orig-dev
+COMMIT_ID_DEVELOP=$(git rev-parse HEAD)
+popd
+rm -rf ./temp-orig-dev
+
+# use config "develop" branch if code branch is based on "develop"
+echo "======================================="
+if git merge-base --is-ancestor $COMMIT_ID_DEVELOP HEAD; then
+    echo "Using config branch 'develop'!"
+    pushd ./config
+    git checkout develop
+    popd
+else
+    echo "Using default config branch"
+fi
+echo "======================================="
+
+#
 # Compilation
 #
 cd $TRAVIS_BUILD_DIR/core/server
