@@ -243,13 +243,13 @@ Tests can be specified either by directory:
 
     core/server/t/31_database
     # same as:  t/31_database
-    qatest/backend/api/
+    qatest/backend/api2/
 
 or file name:
 
     core/server/t/31_database/01-base.t
     # same as:  t/31_database/01-base.t
-    qatest/backend/api/10_list_profiles.t
+    qatest/backend/api2/10_list_profiles.t
 
 =head1 EXAMPLES
 

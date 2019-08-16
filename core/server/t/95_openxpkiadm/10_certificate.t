@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #
-# PLEASE KEEP this test in sync with qatest/backend/api/13_import_certificate.t
+# PLEASE KEEP this test in sync with qatest/backend/api2/13_import_certificate.t
 #
 
 use strict;

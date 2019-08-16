@@ -18,7 +18,6 @@ env:
     matrix:
         - OXI_TEST_RUN=unit_coverage
         - OXI_TEST_RUN=nice
-        - OXI_TEST_RUN=api
         - OXI_TEST_RUN=api2
         - OXI_TEST_RUN=webui
         - OXI_TEST_RUN=client
