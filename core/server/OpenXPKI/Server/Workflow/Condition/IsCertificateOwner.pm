@@ -1,4 +1,3 @@
-
 package OpenXPKI::Server::Workflow::Condition::IsCertificateOwner;
 
 use strict;
@@ -25,7 +24,7 @@ sub evaluate {
     }
 
     my $user = $self->param('cert_owner') || '';
-
+    ##! 16: "identifier: $cert_identifier, user $user"
     my $res = CTX('api2')->is_certificate_owner(
         identifier => $cert_identifier,
         user => $user

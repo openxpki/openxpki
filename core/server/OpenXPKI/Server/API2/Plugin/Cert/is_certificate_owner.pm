@@ -8,6 +8,7 @@ OpenXPKI::Server::API2::Plugin::Cert::is_certificate_owner
 =cut
 
 # Project modules
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 
@@ -40,7 +41,7 @@ command "is_certificate_owner" => {
 } => sub {
     my ($self, $params) = @_;
 
-    my $user = $params->has_user ? $params->user : CTX('session')->data->user;
+    my $user = ($params->has_user && $params->user) ? $params->user : CTX('session')->data->user;
 
     my $result = CTX('dbi')->select_one(
         from => 'certificate_attributes',
@@ -50,6 +51,8 @@ command "is_certificate_owner" => {
             attribute_contentkey => 'system_cert_owner',
         },
     );
+
+    ##! 32: "result " . Dumper $result
 
     return undef unless $result;
 
