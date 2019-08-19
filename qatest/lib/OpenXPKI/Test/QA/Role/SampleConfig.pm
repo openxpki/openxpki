@@ -73,25 +73,59 @@ has start_watchdog => (
     default => 0,
 );
 
+=item * I<src_config_dir> (optional) - Path to the sample configuration
+shipped with the project. Default: path is read from environment variable
+C<OXI_TEST_SAMPLECONFIG_DIR> or (if the former is not defined) set to
+I</etc/openxpki>
+
 =back
 
 =cut
 
-has src_config_dir   => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { my(undef, $mydir, undef) = fileparse(__FILE__); abs_path($mydir."../../../../../../config/config.d"); } );
-has path_temp_dir    => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/tmp" } );
-has path_export_dir  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/openxpki/dataexchange/export" } );
-has path_import_dir  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/openxpki/dataexchange/import" } );
-has path_socket_file => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/openxpki/openxpki.socket" } );
-has path_pid_file    => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/run/openxpkid.pid" } );
-has path_stderr_file => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/log/openxpki/stderr.log" } );
+has src_config_dir   => (
+    is => 'rw', isa => 'Str', lazy => 1,
+    default => sub {
+        return $ENV{'OXI_TEST_SAMPLECONFIG_DIR'} || '/etc/openxpki'
+    }
+);
+
+has path_temp_dir    => (
+    is => 'rw', isa => 'Str', lazy => 1,
+    default => sub { shift->testenv_root."/var/tmp" },
+);
+
+has path_export_dir  => (
+    is => 'rw', isa => 'Str', lazy => 1,
+    default => sub { shift->testenv_root."/var/openxpki/dataexchange/export" },
+);
+
+has path_import_dir  => (
+    is => 'rw', isa => 'Str', lazy => 1,
+    default => sub { shift->testenv_root."/var/openxpki/dataexchange/import" },
+);
+
+has path_socket_file => (
+    is => 'rw', isa => 'Str', lazy => 1,
+    default => sub { shift->testenv_root."/var/openxpki/openxpki.socket" },
+);
+
+has path_pid_file    => (
+    is => 'rw', isa => 'Str', lazy => 1,
+    default => sub { shift->testenv_root."/var/run/openxpkid.pid" },
+);
+
+has path_stderr_file => (
+    is => 'rw', isa => 'Str', lazy => 1,
+    default => sub { shift->testenv_root."/var/log/openxpki/stderr.log" },
+);
 
 # BEFORE ... so OpenXPKI::Test->init_base_config wins with it's few base settings
 before 'init_base_config' => sub { # happens before init_user_config() so we do not overwrite more specific configs of other roles
     my $self = shift;
 
-    my(undef, $mydir, undef) = fileparse(__FILE__);
-    my $config_dir = abs_path($mydir."/../../../../../../config/config.d");
-    die "Could not find OpenXPKI sample config dir" unless -d $config_dir;
+    die "Could not find OpenXPKI sample config in " . $self->src_config_dir
+        unless -f $self->src_config_dir . '/config.d/system/server.yaml';
+    note "Using sample config in " . $self->src_config_dir;
 
     my $config = $self->config_writer;
 
@@ -127,7 +161,7 @@ sub _load_default_config {
     $parts[-1] =~ s/\.yaml$//; # strip ".yaml" if it's a file
 
     # read original sample confog
-    my $config_hash = $self->_yaml2perl($self->src_config_dir, $node);
+    my $config_hash = $self->_yaml2perl($self->src_config_dir . '/config.d', $node);
     # descent into config hash down to $node
     for (@parts) { $config_hash = $config_hash->{$_} };
     # customize config (call supplied method)
@@ -179,7 +213,7 @@ sub _customize_system_watchdog {
 sub _yaml2perl {
     my ($self, $basedir, $path) = @_;
     $path =~ s/\/*$//; # strip trailing slash
-    my $fullpath = $basedir."/".$path;
+    my $fullpath = "$basedir/$path";
     my $filemap = {};
 
     my @basedir_parts = File::Spec->splitdir($basedir);

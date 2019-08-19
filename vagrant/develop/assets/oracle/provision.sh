@@ -110,7 +110,7 @@ fi
 set -e
 echo "Oracle: setting up database (user + schema)"
 
-cat <<__SQL | sqlplus64 -s system/oracle@XE                           >$LOG 2>&1
+cat <<__SQL | sqlplus64 -s system/oracle@XE >$LOG 2>&1
 DROP USER $OXI_TEST_DB_ORACLE_USER;
 CREATE USER $OXI_TEST_DB_ORACLE_USER IDENTIFIED BY "$OXI_TEST_DB_ORACLE_PASSWORD"
   DEFAULT TABLESPACE users
@@ -121,7 +121,7 @@ QUIT;
 __SQL
 
 sqlplus64 $OXI_TEST_DB_ORACLE_USER/$OXI_TEST_DB_ORACLE_PASSWORD@XE \
- @/code-repo/config/contrib/sql/schema-oracle.sql                   >$LOG 2>&1
+ @${OXI_TEST_SAMPLECONFIG_DIR}/contrib/sql/schema-oracle.sql >$LOG 2>&1
 set +e
 
 #

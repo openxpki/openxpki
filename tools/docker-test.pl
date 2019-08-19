@@ -11,14 +11,15 @@ use warnings;
 
 # Core modules
 use Cwd qw( realpath getcwd );
+use File::Copy;
+use File::Temp qw( tempdir );
 use FindBin qw( $Bin );
 use Getopt::Long;
+use IPC::Open3 qw( open3 );
 use List::Util qw( sum );
 use Pod::Usage;
-use Symbol qw( gensym );
-use IPC::Open3 qw( open3 );
 use POSIX ":sys_wait_h";
-use File::Copy;
+use Symbol qw( gensym );
 
 # $interactive
 #   1 = STDIN can be used for input
@@ -59,7 +60,7 @@ my $project_root = realpath("$Bin/../");
 #
 # Parse command line arguments
 #
-my ($help, $commit, $branch, $repo, $test_all, @_only, $test_coverage, $batch);
+my ($help, $repo, $branch, $commit, $conf_repo, $conf_branch, $conf_commit, $test_all, @_only, $test_coverage, $batch);
 my $parseok = GetOptions(
     'all'            => \$test_all,
     'only=s'         => \@_only,
@@ -67,6 +68,9 @@ my $parseok = GetOptions(
     'c|commit=s'     => \$commit,
     'b|branch=s'     => \$branch,
     'r|repo=s'       => \$repo,
+    'confrepo=s'     => \$conf_repo,
+    'confbranch=s'   => \$conf_branch,
+    'confcommit=s'   => \$conf_commit,
     'batch'          => \$batch,
     'help'           => \$help,
 );
@@ -85,12 +89,15 @@ die "ERROR: Please specify only one of: --all | --only | --cover\n" if $mode_swi
 # Construct Docker arguments
 #
 my %docker_env = (
-    OXI_TEST_ONLY           => undef,
-    OXI_TEST_ALL            => undef,
-    OXI_TEST_COVERAGE       => undef,
-    OXI_TEST_GITCOMMIT      => undef,
-    OXI_TEST_GITREPO        => undef,
-    OXI_TEST_GITBRANCH      => undef,
+    OXI_TEST_ONLY => undef,
+    OXI_TEST_ALL => undef,
+    OXI_TEST_COVERAGE => undef,
+    OXI_TEST_GITREPO => undef,
+    OXI_TEST_GITBRANCH => undef,
+    OXI_TEST_GITCOMMIT => undef,
+    OXI_TEST_CONFIG_GITREPO => undef,
+    OXI_TEST_CONFIG_GITBRANCH => undef,
+    OXI_TEST_CONFIG_GITCOMMIT => undef,
     OXI_TEST_NONINTERACTIVE => undef,
 );
 my @docker_args = ();
@@ -101,13 +108,19 @@ $docker_env{OXI_TEST_ALL}      = $test_all if $test_all;
 $docker_env{OXI_TEST_COVERAGE} = $test_coverage if $test_coverage;
 $docker_env{OXI_TEST_NONINTERACTIVE} = 1 if $batch;
 
-if ($repo) {
-    $docker_env{OXI_TEST_GITREPO} = $repo =~ / \A [[:word:]-]+ \/ [[:word:]-]+ \Z /msx
-        ? "https://dummy:nope\@github.com/$repo.git"
+sub normalize_repo {
+    my ($repo) = @_;
+    return $repo =~ / \A [[:word:]-]+ \/ [[:word:]-]+ \Z /msx
+        ? "https://github.com/$repo.git"
         : $repo;
 }
-# default to current branch in case of local repo
-else {
+
+sub get_branch_commit {
+    my ($dir) = @_;
+    my ($branch, $commit);
+
+    chdir($dir);
+
     $branch ||= `git rev-parse --abbrev-ref HEAD`;
     chomp $branch;
     # if we are currently in a detached head (i.e. no branch name)
@@ -116,11 +129,49 @@ else {
         chomp $commit;
         $branch = undef;
     }
+    return ($branch, $commit);
+}
+
+#
+# Code repository
+#
+my $is_local_repo = 0;
+if ($repo) {
+    $docker_env{OXI_TEST_GITREPO} = normalize_repo($repo);
+}
+# default to current branch in case of local repo
+else {
+    ($branch, $commit) = get_branch_commit($project_root);
     push @docker_args, "-v", "$project_root:/repo";
+    $is_local_repo = 1;
 }
 
 $docker_env{OXI_TEST_GITBRANCH} = $branch if $branch;
 $docker_env{OXI_TEST_GITCOMMIT} = $commit if $commit;
+
+#
+# Configuration repository
+#
+if ($conf_repo) {
+    $docker_env{OXI_TEST_CONFIG_GITREPO} = normalize_repo($conf_repo);
+}
+# default to current branch in case of local repo
+else {
+    $docker_env{OXI_TEST_CONFIG_GITREPO} = normalize_repo('openxpki/openxpki-config');
+
+    # use local config commit only if also local code repo is used
+    my $conf_dir = "$project_root/config";
+    if ($is_local_repo and -e "$conf_dir/config.d/system/server.yaml") {
+        ($conf_branch, $conf_commit) = get_branch_commit($conf_dir);
+        # Pleas note:
+        # config/ is most probably only a Git sub-module and thus could not be accessed
+        # from within the container if we pass "-v $conf_dir:/config" to Docker
+    }
+}
+
+$docker_env{OXI_TEST_CONFIG_GITBRANCH} = $conf_branch if $conf_branch;
+$docker_env{OXI_TEST_CONFIG_GITCOMMIT} = $conf_commit if $conf_commit;
+
 
 push @docker_args,
     map {

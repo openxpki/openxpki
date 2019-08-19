@@ -14,6 +14,7 @@ use warnings;
 use Cwd qw( realpath );
 use File::Copy;
 use File::Path qw( make_path );
+use File::Temp qw( tempdir );
 use FindBin qw( $Bin );
 use Getopt::Long;
 use IPC::Open3 qw( open3 );
@@ -21,6 +22,12 @@ use List::Util qw( sum );
 use Pod::Usage;
 use POSIX ":sys_wait_h";
 use Symbol qw( gensym );
+
+#
+# Configuration
+#
+my $clone_dir = "/opt/openxpki";
+my $config_dir = $ENV{'OXI_TEST_SAMPLECONFIG_DIR'} || die "OXI_TEST_SAMPLECONFIG_DIR is not set";
 
 # Exit handler - run bash on errors to allow inspection of log files
 #
@@ -75,7 +82,61 @@ sub execute {
     return 0;
 }
 
-my $clone_dir = "/opt/openxpki";
+sub git_checkout {
+    my ($env_repo, $dir_repo, $branch, $commit, $target) = @_;
+
+    my $repo;
+    my $is_local = 0;
+    # remote repo as specified
+    if ($ENV{$env_repo}) {
+        $repo = $ENV{$env_repo};
+        _stop 100, "Sorry, local repositories specified by file:// are not supported.\nUse this instead:\ndocker run -v /my/host/path:$dir_repo ..."
+            if $repo =~ / \A file /msx;
+    }
+    # local repo from host (if Docker volume is mounted)
+    else {
+        # only continue if $dir_repo is a mountpoint (= device number differs from parent dir)
+        _stop 101, "Please specify either a remote or local Git repo:\ndocker run -e $env_repo=https://...\ndocker run -v /my/host/path:$dir_repo"
+            unless (-d $dir_repo and (stat $dir_repo)[0] != (stat "/")[0]);
+        $repo = "file://$dir_repo";
+        $is_local = 1;
+    }
+
+    my $code = execute code => [ "git", "ls-remote", "-h", $repo ];
+    _stop 104, "Repo $repo either does not exist or is not readable" if $code;
+
+    #
+    # Clone repository
+    #
+    print "- Cloning repo into $target ... ";
+    my @branch_spec = $branch ? "--branch=$branch" : ();
+    my @restrict_depth = $commit ? () : ("--depth=1");
+    execute capture => [ "git", "clone", @restrict_depth, @branch_spec, $repo, $target ];
+    if ($commit) {
+        print "Checking out given commit... ";
+        chdir $target;
+        execute capture => [ "git", "checkout", $commit ];
+    }
+    print "\n";
+
+    #
+    # Informations
+    #
+    printf "  Repo:   %s\n", $is_local ? "local" : $ENV{$env_repo};
+    printf "  Branch: %s\n", $branch // "(default)";
+    printf "  Commit: %s\n", $commit // "HEAD";
+
+    # last commit's message
+    chdir $target;
+    my $logmsg = execute capture => [ "git", "log", "--format=%B", "-n" => 1, $commit // "HEAD", ];
+    $logmsg =~ s/\R$//gm;            # remove trailing newline
+    ($logmsg) = split /\R/, $logmsg; # only print first line
+    printf "          » %s «\n", $logmsg;
+
+    return $is_local;
+}
+
+
 
 my $mode = "all"; # default mode
 $mode = "all" if $ENV{OXI_TEST_ALL};
@@ -97,61 +158,45 @@ elsif ($mode eq "selected") {
 #
 # Test arguments and repository
 #
-my $repo;
-my $is_local_repo = 0;
-# remote repo as specified
-if ($ENV{OXI_TEST_GITREPO}) {
-    $repo = $ENV{OXI_TEST_GITREPO};
-    _stop 100, "Sorry, local repositories specified by file:// are not supported.\nUse this instead:\ndocker run -v /my/host/path:/repo ..."
-        if $repo =~ / \A file /msx;
-}
-# local repo from host (if Docker volume is mounted)
-else {
-    # only continue if /repo is a mountpoint (= device number differs from parent dir)
-    _stop 101, "Please specify either a remote or local Git repo:\ndocker run -e OXI_TEST_GITREPO=https://...\ndocker run -v /my/host/path:/repo"
-        if (not -d "/repo" or (stat "/repo")[0] == (stat "/")[0]);
-    $repo = "file:///repo";
-    $is_local_repo = 1;
-}
-
-_stop 103, "Code coverage tests only work with local repo" if ($mode eq "coverage" and not $is_local_repo);
-
-my $code = execute code => [ "git", "ls-remote", "-h", $repo ];
-_stop 104, "Remote repo either does not exist or is not readable" if $code;
+print "\n####[ Run tests in Docker container ]####\n";
 
 #
-# Clone repository
+# Code repository
 #
-print "\n.--==##[ Run tests in Docker container ]##==\n";
-print "| Cloning repo... ";
-my @branch_spec = $ENV{OXI_TEST_GITBRANCH} ? "--branch=".$ENV{OXI_TEST_GITBRANCH} : ();
-my @restrict_depth = $ENV{OXI_TEST_GITCOMMIT} ? () : ("--depth=1");
-execute capture => [ "git", "clone", @restrict_depth, @branch_spec, $repo, $clone_dir ];
-if ($ENV{OXI_TEST_GITCOMMIT}) {
-    print "Checking out given commit... ";
+print "\nCode source:\n";
+my $local_repo = git_checkout('OXI_TEST_GITREPO', '/repo', $ENV{OXI_TEST_GITBRANCH}, $ENV{OXI_TEST_GITCOMMIT}, $clone_dir);
+_stop 103, "Code coverage tests only work with local repo" if ($mode eq "coverage" and not $local_repo);
+
+#
+# Config repository
+#
+print "\nConfiguration source:\n";
+my $config_gitbranch = $ENV{OXI_TEST_CONFIG_GITBRANCH};
+# auto-set config branch to develop if code is based on develop
+if (not $config_gitbranch) {
+    print "- no Git branch specified, auto-detecting if code is based on 'develop': ";
+    my $temp_coderepo = tempdir( CLEANUP => 1 );
+    # get commit id of branch "develop" in official repo
+    `git clone --quiet --depth=1 --branch=develop https://github.com/openxpki/openxpki.git $temp_coderepo`;
+    chdir $temp_coderepo;
+    my $commit_id_develop=`git rev-parse HEAD`;
+
     chdir $clone_dir;
-    execute capture => [ "git", "checkout", $ENV{OXI_TEST_GITCOMMIT} ];
+    my $exit_code = execute code => [ 'git', 'merge-base', '--is-ancestor', $commit_id_develop, 'HEAD' ];
+
+    # exit codes: 1 = develop is no ancestor of HEAD, 128 = commit ID not found
+    $config_gitbranch = $exit_code == 0 ? 'develop' : 'master';
+    print $exit_code == 0 ? "yes\n" : "no\n";
 }
+git_checkout('OXI_TEST_CONFIG_GITREPO', '/config', $config_gitbranch, $ENV{OXI_TEST_CONFIG_GITCOMMIT}, $config_dir);
+
+#
+# List selected tests
+#
 print "\n";
-
-#
-# Info
-#
-printf "| Repo:   %s\n", $ENV{OXI_TEST_GITREPO} ? $ENV{OXI_TEST_GITREPO} : "local";
-printf "| Branch: %s\n", $ENV{OXI_TEST_GITBRANCH} // "(default)";
-printf "| Commit: %s\n", $ENV{OXI_TEST_GITCOMMIT} // "HEAD";
-chdir $clone_dir;
-my $logmsg = execute capture => [ "git", "log", "--format=%B", "-n" => 1, $ENV{OXI_TEST_GITCOMMIT} // "HEAD", ];
-$logmsg =~ s/\R$//gm;            # remove trailing newline
-($logmsg) = split /\R/, $logmsg; # only print first line
-printf "|         » %s «\n", $logmsg;
-
 my $msg = $mode eq "all" ? " all tests" : ($mode eq "coverage" ? " code coverage" : " selected tests:");
-my $big_msg = `figlet '$msg'`; $big_msg =~ s/^/| /msg;
-print $big_msg;
-printf "|      - $_\n" for @test_only;
-print  "|\n";
-print  ".--==#####################################==\n";
+print `figlet '$msg'`;
+printf " - $_\n" for @test_only;
 
 #
 # Grab and install Perl module dependencies from Makefile.PL using PPI
@@ -236,7 +281,7 @@ print "Copying files\n";
 make_path "/var/openxpki/session", "/var/log/openxpki";
 
 # copy config
-`mkdir -p /etc/openxpki && cp -R $clone_dir/config/* /etc/openxpki`;
+`mkdir -p /etc/openxpki && cp -R $config_dir/* /etc/openxpki`;
 
 # customize config
 use File::Slurp qw( edit_file );
@@ -247,7 +292,7 @@ execute show => "/tools-copy/testenv/mysql-oxi-config.sh";
 # Database (re-)creation
 #
 execute show => "/tools-copy/testenv/mysql-create-db.sh";
-execute show => "/tools-copy/testenv/mysql-create-schema.sh $clone_dir/config/contrib/sql/schema-mysql.sql";
+execute show => "/tools-copy/testenv/mysql-create-schema.sh $config_dir/contrib/sql/schema-mysql.sql";
 
 #
 # Sample config (CA certificates etc.)

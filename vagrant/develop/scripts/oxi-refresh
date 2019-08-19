@@ -79,7 +79,7 @@ echo ""
 # fully overwrite existing config
 if [[ $IS_FULLCONFIG -eq 1 ]]; then
     echo "Writing complete OpenXPKI config into /etc/openxpki"
-    rsync -a --delete /code-repo/config/* /etc/openxpki/     >$LOG 2>&1
+    rsync -a --delete $OXI_TEST_SAMPLECONFIG_DIR/* /etc/openxpki/     >$LOG 2>&1
     chmod 750              /etc/openxpki/config.d
     chown -R root:openxpki /etc/openxpki/config.d
 
@@ -99,8 +99,8 @@ __DB
 else
     echo "Updating demo realm in /etc/openxpki/config.d/realm/democa"
     rsync -a --delete \
-      /code-repo/config/config.d/realm/democa/* \
-      /etc/openxpki/config.d/realm/democa/                            >$LOG 2>&1
+      $OXI_TEST_SAMPLECONFIG_DIR/config.d/realm/democa/* \
+      /etc/openxpki/config.d/realm/democa/                             >$LOG 2>&1
     chown -R root:openxpki /etc/openxpki/config.d/realm/democa/        >$LOG 2>&1
 fi
 

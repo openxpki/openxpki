@@ -53,7 +53,8 @@ ENV LANG en_US.UTF-8
 #
 # Configuration
 #
-ENV OXI_TEST_DB_MYSQL_NAME=openxpki \
+ENV OXI_TEST_SAMPLECONFIG_DIR=/opt/openxpki-config \
+    OXI_TEST_DB_MYSQL_NAME=openxpki \
     OXI_TEST_DB_MYSQL_USER=openxpki \
     OXI_TEST_DB_MYSQL_PASSWORD=openxpki \
     OXI_TEST_DB_MYSQL_DBHOST=127.0.0.1 \

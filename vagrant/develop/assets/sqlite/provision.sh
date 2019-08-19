@@ -43,5 +43,5 @@ fi
 #
 set -e
 echo "SQLite: setting up database (schema)"
-sqlite3 $SQLITE_PATH < /code-repo/config/contrib/sql/schema-sqlite.sql >$LOG 2>&1
+sqlite3 $SQLITE_PATH < $OXI_TEST_SAMPLECONFIG_DIR/contrib/sql/schema-sqlite.sql >$LOG 2>&1
 set +e

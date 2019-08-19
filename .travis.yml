@@ -8,6 +8,7 @@ sudo: required
 
 env:
     global:
+        - OXI_TEST_SAMPLECONFIG_DIR=$HOME/config
         - OXI_TEST_DB_MYSQL_NAME=openxpki
         - OXI_TEST_DB_MYSQL_USER=openxpki
         - OXI_TEST_DB_MYSQL_PASSWORD=openxpki

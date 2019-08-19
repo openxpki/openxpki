@@ -32,7 +32,7 @@ echo -e "- re-creating database and tables"
 
 echo -e "- creating and importing sample certificates"
 rm -rf /etc/openxpki/ca/
-/code-repo/config/contrib/sampleconfig.sh                         >$LOG 2>&1
+$OXI_TEST_SAMPLECONFIG_DIR/contrib/sampleconfig.sh                >$LOG 2>&1
 chmod 750              /etc/openxpki/ca
 chown -R root:openxpki /etc/openxpki/ca
 
