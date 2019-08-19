@@ -24,13 +24,6 @@ sub _evaluate {
 
     my $key =  $self->param('hash_key');
 
-    if (!$key) {
-        $key = $self->param('ds_key');
-        if ($key =~ m{ \A \$ (.*) }xms) {
-            $key = $context->param($1);
-        }
-    }
-
     my $val = $hash->valueForKey($key);
 
     ##! 16: ' Key: ' . $key . ' - Value ' . Dumper ( $val )
@@ -90,13 +83,15 @@ OpenXPKI::Server::Workflow::Condition::WFHash
 
 Allows for checks on a hash stored as a workflow context parameter.
 
-=head1 PARAMETERS
+=head2 Configuration
 
-=head2 hash_name
+=over
+
+=item hash_name
 
 The name of the workflow context parameter containing the hash to be used
 
-=head2 condition
+=item condition
 
 The following conditions are supported:
 
@@ -119,17 +114,12 @@ The key must be given with the "key" param.
 
 =back
 
-=head2 hash_key
+=item hash_key
 
 Name of the key to check
 
-=head2 value
+=item value
 
 value to check against when condition is set to I<is_value>.
 
-=head2 ds_key
-
-B<Deprecated, please use hash_key instead!>
-
-If key starts with $, the key value is taken from the context parameter.
-
+=back

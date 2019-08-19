@@ -5,7 +5,7 @@ package OpenXPKI::Server::Workflow::Condition::DatapoolEntry;
 
 use strict;
 use warnings;
-use base qw( Workflow::Condition );
+use base qw( OpenXPKI::Server::Workflow::Condition );
 use DateTime;
 use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
@@ -19,7 +19,7 @@ sub _evaluate
     my ( $self, $workflow ) = @_;
     my $context     = $workflow->context();
 
-    my $condition = $params->{condition};
+    my $condition = $self->param('condition');
 
     my $params = {
         namespace => $self->param('namespace'),
@@ -43,7 +43,7 @@ sub _evaluate
 
     ##! 32: 'Query params ' . Dumper $ds_params
 
-    my $msg = CTX('api2')->get_data_pool_entry($params);
+    my $msg = CTX('api2')->get_data_pool_entry(%$params);
 
     ##! 32: 'api returned ' . Dumper $msg
 

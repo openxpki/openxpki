@@ -54,7 +54,7 @@ sub execute {
 
 
     ##! 16: 'modify_data_pool_entry params: ' . Dumper $params
-    CTX('api2')->modify_data_pool_entry($params);
+    CTX('api2')->modify_data_pool_entry(%$params);
 
     return 1;
 }
