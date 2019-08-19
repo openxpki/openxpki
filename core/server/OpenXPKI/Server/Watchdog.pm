@@ -619,7 +619,6 @@ sub __wake_up_workflow {
 
     ##! 1: 'call wakeup'
     my $wf_info = CTX('api2')->wakeup_workflow(
-        type => $args->{workflow_type},
         id => $args->{workflow_id},
         async => 1,
         wait => 0,
