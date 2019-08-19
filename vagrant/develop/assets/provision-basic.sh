@@ -1,18 +1,7 @@
 #!/bin/bash
 # Basic Vagrant Box setup
 
-#
-# Exit handler
-#
-LOG=$(mktemp)
-function _exit () {
-    if [ $1 -ne 0 -a $1 -ne 333 ]; then
-        echo "$0: ERROR - last command exited with code $1, output:" >&2 && cat $LOG >&2
-    fi
-    rm -f $LOG
-    exit $1
-}
-trap '_exit $?' EXIT
+. /vagrant/assets/functions.sh
 
 VBOX="$1"
 
@@ -43,8 +32,9 @@ else
     install_vbox=1
 fi
 if [ $install_vbox -eq 1 ]; then
-    echo "Installing VBoxGuestAdditions $VBOX"
-    apt-get -q=2 -y remove virtualbox-guest-utils || echo             >$LOG 2>&1
+    echo "Removing old VBoxGuestAdditions"
+    apt-get -q=2 remove virtualbox-guest-utils >$LOG 2>&1 || echo
+    echo "Installing VBoxGuestAdditions"
     set -e
     cd /tmp
     wget -q http://download.virtualbox.org/virtualbox/$VBOX/VBoxGuestAdditions_$VBOX.iso >$LOG 2>&1
@@ -58,24 +48,8 @@ fi
 #
 # Install some requirements
 #
-set -e
-echo "Installing rsync"
-apt-get update                                                        >$LOG 2>&1
-DEBIAN_FRONTEND=noninteractive \
- apt-get -q=2 install rsync                                           >$LOG 2>&1
-set +e
-
-#
-# Install package dependencies
-#
-installed=$(/usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' 'libapache2-mod-fcgid' 2>&1 | grep -ci installed)
-if [ $installed -eq 0 ]; then
-    set -e
-    echo "Installing OpenXPKI package dependencies"
-    DEBIAN_FRONTEND=noninteractive \
-     apt-get -q=2 install apache2 libapache2-mod-fcgid libssl-dev     >$LOG 2>&1
-    set +e
-fi
+apt-get update >$LOG 2>&1
+install_packages rsync gettext apache2 libapache2-mod-fcgid libssl-dev
 
 #
 # Install CPANminus

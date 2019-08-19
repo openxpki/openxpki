@@ -1,8 +1,12 @@
 #!/bin/bash
 # Cleanup
 
-set +e
+. /vagrant/assets/functions.sh
 
+#
+# Cleanup
+#
+set +e
 
 echo "Cleaning up Docker"
 # Remove orphaned volumes - whose container does not exist (anymore)
