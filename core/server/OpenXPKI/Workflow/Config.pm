@@ -116,6 +116,18 @@ sub _build_workflow_config {
     };
 
 
+    foreach my $class (('action','condition','validator')) {
+        my %defined;
+        foreach my $item (@{$self->_workflow_config()->{$class}}) {
+            my $name = $item->{name};
+            OpenXPKI::Exception->throw(
+                message => 'Item name defined twice - unable to load workflow configuration',
+                params => { name => $name, class => $class }
+            ) if (defined $defined{$name});
+            $defined{$name} = 1;
+        }
+    }
+
     return $self->_workflow_config
 
 }
