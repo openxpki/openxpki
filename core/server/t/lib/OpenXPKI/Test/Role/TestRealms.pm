@@ -14,7 +14,7 @@ Applying this role performs the following actions:
 
 =item * inject test configuration for the three PKI realms
 
-=item * set C<CTX('session')->data->pki_realm> to I<alpha>
+=item * set C<CTX('session')-E<gt>data-E<gt>pki_realm> to I<alpha>
 
 =back
 
