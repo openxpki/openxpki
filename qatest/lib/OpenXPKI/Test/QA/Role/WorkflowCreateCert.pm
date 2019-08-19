@@ -149,8 +149,8 @@ sub create_cert {
 
             # Test FQDNs should not validate so we need a policy exception request
             # (on rare cases the responsible router might return a valid address, so we check)
-            my $msg = $self->api_command(
-                get_workflow_info => { ID => $wftest->id }
+            my $msg = $self->api2_command(
+                get_workflow_info => { id => $wftest->id }
             );
 
             my $actions = $msg->{STATE}->{option};
@@ -190,13 +190,13 @@ sub create_cert {
             );
             $wftest->state_is('SUCCESS') or BAIL_OUT;
 
-            my $temp = $self->api_command(
-                get_workflow_info => { ID => $wftest->id }
+            my $temp = $self->api2_command(
+                get_workflow_info => { id => $wftest->id }
             );
             $cert_info = {
-                req_key    => $temp->{WORKFLOW}->{CONTEXT}->{csr_serial},
-                identifier => $temp->{WORKFLOW}->{CONTEXT}->{cert_identifier},
-                profile    => $temp->{WORKFLOW}->{CONTEXT}->{cert_profile},
+                req_key    => $temp->{workflow}->{context}->{csr_serial},
+                identifier => $temp->{workflow}->{context}->{cert_identifier},
+                profile    => $temp->{workflow}->{context}->{cert_profile},
             };
         } "successfully run workflow";
         $sess_data->user($old_user);

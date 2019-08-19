@@ -124,10 +124,10 @@ lives_and {
 # get_motd
 
 lives_and {
-    $oxitest->api_command(set_data_pool_entry => {
-        NAMESPACE   => 'webui.motd',
-        KEY         => '_any',
-        VALUE       => OpenXPKI::Serialization::Simple->new->serialize('rotflbtc'),
+    $oxitest->api2_command(set_data_pool_entry => {
+        namespace   => 'webui.motd',
+        key         => '_any',
+        value       => OpenXPKI::Serialization::Simple->new->serialize('rotflbtc'),
     });
 
     my $data = $oxitest->api2_command('get_motd');
