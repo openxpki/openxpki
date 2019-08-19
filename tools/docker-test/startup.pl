@@ -74,8 +74,8 @@ sub execute {
     my $die_on_error = not ($mode eq "code" or $tolerate_errors);
     my $output_str = ref $output eq "GLOB" ? do { local $/; <$output> } : "";
     return _failure($die_on_error, -1) if $? == -1; # execute failed: error message was already shown by system()
-    return _failure($die_on_error, $? & 127, sprintf( "'%s' died with signal %d: %s", $args->[0], ($? & 127), $output_str )) if ($? & 127);
-    return _failure($die_on_error, $? >> 8,  sprintf( "'%s' exited with code %d: %s", $args->[0], $? >> 8,    $output_str )) if ($? >> 8);
+    return _failure(!$tolerate_errors, $? & 127, sprintf( "'%s' died with signal %d: %s", $args->[0], ($? & 127), $output_str )) if ($? & 127);
+    return _failure($die_on_error, $? >> 8,  sprintf( "'%s' exited with code %d: %s", $args->[0], $? >> 8, $output_str )) if ($? >> 8);
 
     return if $mode eq "show";
     return $output_str if $mode eq "capture";
