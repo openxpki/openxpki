@@ -806,7 +806,7 @@ sub __log_and_die {
     my $log_message;
     if (ref $error eq 'OpenXPKI::Exception') {
         ##! 16: 'error is exception'
-        $error->show_trace(1);
+        $error->show_trace(0);
         my $msg = $error->full_message();
         $log_message = "Exception during $when: $msg ($error)";
     }
