@@ -172,7 +172,7 @@ sub _customize_system_watchdog {
     $conf->{disabled} = $self->start_watchdog ? 0 : 1;
 }
 
-# Reads the given single YAML file or directory with YAML files an parses
+# Reads the given single YAML file or directory with YAML files and parses
 # them into a single huge configuration hash.
 # Besides the config nodes in the YAML each subdirectory and file name also
 # form one node in the hierarchy.
@@ -222,6 +222,7 @@ sub _yaml2perl {
             {
                 wanted => sub { $processor->($File::Find::name) },
                 no_chdir => 1,
+                follow => 1,
             },
             $fullpath
         );
