@@ -23,14 +23,18 @@ rm -rf ./temp-orig-dev
 
 # use config "develop" branch if code branch is based on "develop"
 echo "======================================="
-if git merge-base --is-ancestor $COMMIT_ID_DEVELOP HEAD; then
-    echo "Using config branch 'develop'!"
-    pushd ./config
-    git checkout develop
-    popd
+based_on_develop=0
+git merge-base --is-ancestor $COMMIT_ID_DEVELOP HEAD && based_on_develop=1
+pushd ./config >/dev/null
+if [ $based_on_develop -eq 1]; then
+    echo "Using config branch 'develop':"
+    git checkout -q develop
 else
-    echo "Using default config branch"
+    echo "Using default config branch:"
 fi
+msg=$(git log -1 --pretty="%h %B")
+echo "» $msg «"
+popd >/dev/null
 echo "======================================="
 
 #
