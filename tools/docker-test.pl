@@ -201,7 +201,9 @@ else {
     if (-f $tarfile) {
         # create a temp TAR file and compare checksums
         `tar --create -f "$tarfile.new" scripts testenv`;
-        if (`sha256sum "$tarfile.new"` eq `sha256sum "$tarfile"`) {
+        (my $checksum_old = `sha256sum "$tarfile"`) =~ s/^(\S+)\s+.*/$1/s;
+        (my $checksum_new = `sha256sum "$tarfile.new"`) =~ s/^(\S+)\s+.*/$1/s;
+        if ($checksum_new ne $checksum_old) {
             move("$tarfile.new", $tarfile);
         }
         else {
