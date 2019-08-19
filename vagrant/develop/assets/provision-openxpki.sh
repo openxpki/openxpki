@@ -103,7 +103,9 @@ if [ -e /etc/init.d/apache2 ]; then
 
     # Specify hostname to force MySQL connection via TCP, not socket
     echo "Configuration OpenXPKI WebUI"
-    sed -r 's/^(DataSource\s*=).*/\1 dbi:mysql:dbname=openxpki;host=127.0.0.1/' /etc/openxpki/webui/default.conf
+    sed -ri 's/^(#\s*)?(DataSource\s*=).*/\2 dbi:mysql:dbname=openxpki;host=127.0.0.1/' /etc/openxpki/webui/default.conf
+    sed -ri 's/^(#\s*)?(User\s*=).*/\2 openxpki_session/' /etc/openxpki/webui/default.conf
+    sed -ri 's/^(#\s*)?(Password\s*=).*/\2 mysecret/' /etc/openxpki/webui/default.conf
 fi
 
 set +e
