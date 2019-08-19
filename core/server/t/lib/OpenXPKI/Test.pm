@@ -86,12 +86,28 @@ parameter C<with>.
 
 Available Moose roles can be found at these two locations:
 
+1. C<core/server/t/lib/OpenXPKI/Test/Role> (roles for unit tests and QA
+tests):
+
 =over
 
-=item * C<core/server/t/lib/OpenXPKI/Test/Role> (roles for unit tests and QA
-tests)
+=item * L<CryptoLayer|OpenXPKI::Test::Role::CryptoLayer>
 
-=item * C<qatest/lib/OpenXPKI/Test/QA/Role/> (roles exclusively for QA tests)
+=item * L<TestRealms|OpenXPKI::Test::Role::TestRealms>
+
+=back
+
+2. C<qatest/lib/OpenXPKI/Test/QA/Role/> (roles exclusively for QA tests):
+
+=over
+
+=item * L<SampleConfig|OpenXPKI::Test::QA::Role::SampleConfig>
+
+=item * L<Server|OpenXPKI::Test::QA::Role::Server>
+
+=item * L<WorkflowCreateCert|OpenXPKI::Test::QA::Role::WorkflowCreateCert>
+
+=item * L<Workflows|OpenXPKI::Test::QA::Role::Workflows>
 
 =back
 
