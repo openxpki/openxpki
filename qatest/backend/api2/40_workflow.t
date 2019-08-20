@@ -314,7 +314,6 @@ lives_and {
                 workflow_id => $wf_t2->id,
                 role => 'User',
                 creator => 'wilhelm',
-                creator_role => 'User',
                 link => 'http://www.denic.de',
                 message => 'Lucy in the sky with diamonds',
                 wf_current_action => 'wftype2_initialize',
