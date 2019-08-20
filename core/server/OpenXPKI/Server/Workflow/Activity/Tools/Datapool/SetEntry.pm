@@ -142,8 +142,8 @@ non-scalar items in the datapool.
 =head2 Arguments
 
 The workflow action requires two parameters that are passed via the
-workflow context. The names are set above with the I<ds_key_param> and
-I<ds_value_param> parameters.
+workflow context. The names are set above with the I<key> and
+I<value> parameters.
 
 =head2 Example
 

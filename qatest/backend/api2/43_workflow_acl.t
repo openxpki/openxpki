@@ -60,11 +60,11 @@ sub workflow_def {
             'set_motd' => {
                 'class' => 'OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry',
                 'param' => {
-                    'ds_key_param' => 'role',
-                    'ds_value_param' => 'motd',
-                    'ds_force' => '1',
-                    'ds_namespace' => 'webui.motd',
-                    'ds_encrypt' => '0',
+                    'key' => 'role',
+                    'value' => 'motd',
+                    'force' => '1',
+                    'namespace' => 'webui.motd',
+                    'encrypt' => '0',
                 },
             },
         },

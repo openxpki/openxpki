@@ -62,11 +62,11 @@ sub workflow_def {
             'set_motd' => {
                 'class' => 'OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry',
                 'param' => {
-                    'ds_key_param' => 'role',
-                    'ds_value_param' => 'motd',
-                    'ds_force' => '1',
-                    'ds_namespace' => 'webui.motd',
-                    'ds_encrypt' => '0',
+                    'key' => 'role',
+                    'value' => 'motd',
+                    'force' => '1',
+                    'namespace' => 'webui.motd',
+                    'encrypt' => '0',
                 },
             },
             add_message => {
@@ -204,16 +204,16 @@ lives_and {
     cmp_deeply $result, superhashof({
         $wf_t1_sync->type => superhashof({ label => "wf_type_1" }),
         $wf_t2->type      => superhashof({ label => "wf_type_2" }),
-    }), "get_workflow_instance_types()";
-}
+    });
+} "get_workflow_instance_types()";
 
 #
 # get_workflow_type_for_id
 #
 lives_and {
     my $result = $oxitest->api2_command("get_workflow_type_for_id" => { id => $wf_t1_sync->id });
-    is $result, $wf_t1_sync->type, "get_workflow_type_for_id()";
-}
+    is $result, $wf_t1_sync->type;
+} "get_workflow_type_for_id()";
 
 dies_ok {
     my $result = $oxitest->api2_command("get_workflow_type_for_id" => { id => -1 });
