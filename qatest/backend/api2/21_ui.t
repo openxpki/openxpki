@@ -64,14 +64,14 @@ lives_and {
     );
 
     # Go to pending
-    $wftest->state_is('CHECK_FOR_REVOCATION');
-
-    $wftest = $oxitest->create_workflow(
-        "crl_issuance" => { force_issue => 1 }
-    );
-
     $wftest->state_is('SUCCESS');
 } 'Create workflow: auto-revoke certificate' or die "Creating workflow failed";
+
+lives_ok {
+    my $wftest = $oxitest->create_workflow(
+        "crl_issuance" => { force_issue => 1 }
+    );
+} 'Issue CRL';
 
 lives_and {
     my $data = $oxitest->api2_command('get_ui_system_status');
