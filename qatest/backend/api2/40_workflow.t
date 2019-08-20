@@ -473,7 +473,6 @@ lives_and {
 #
 lives_and {
     my $result = $oxitest->api2_command("get_workflow_activities" => {
-        workflow => $wf_t2->type,
         id => $wf_t2->id,
     });
     cmp_deeply $result, [
@@ -486,7 +485,6 @@ lives_and {
 #
 lives_and {
     my $result = $oxitest->api2_command("get_workflow_activities_params" => {
-        workflow => $wf_t2->type,
         id => $wf_t2->id,
     });
     cmp_deeply $result, [

@@ -37,7 +37,7 @@ command "get_workflow_activities_params" => {
 
     my $wf_id = $params->id;
 
-    CTX('log')->system()->warn('Passing the attribute *type* to get_workflow_activities_params is deprecated.') if ($params->has_workflow);
+    CTX('log')->system()->warn('Passing the attribute *workflow* to get_workflow_activities_params is deprecated.') if ($params->has_workflow);
 
     my $util = OpenXPKI::Server::API2::Plugin::Workflow::Util->new;
     my $workflow = $util->fetch_workflow($wf_id);
