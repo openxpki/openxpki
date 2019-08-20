@@ -18,7 +18,7 @@ use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 use OpenXPKI::Test::CertHelper::Database;
 
-plan tests => 35;
+plan tests => 34;
 
 #
 # Setup test context
@@ -413,11 +413,22 @@ throws_ok { $oxitest->api2_command("get_workflow_log" => { id => $wf_t1_sync->id
     "get_workflow_log() - throw exception on unauthorized user";
 
 CTX('session')->data->role('Guard');
-lives_and {
-    my $result = $oxitest->api2_command("get_workflow_log" => { id => $wf_t1_sync->id });
+
+subtest "get_workflow_log()" => sub {
+    plan tests => 4;
+
+    my $result;
+    lives_ok {
+        $result = $oxitest->api2_command("get_workflow_log" => { id => $wf_t1_sync->id });
+    } 'get_workflow_log() - testing workflow #' . $wf_t1_sync->id;
+
+    isnt scalar @$result, 0, "log has at least one entry";
+
+    # check first message
     my $i = -1;
     $i = -2 if $result->[$i]->[2] =~ / during .* startup /msxi;
-    like $result->[$i]->[2], qr/ execute .* initialize /msxi or diag explain $result;
+    like $result->[$i]->[2], qr/ execute .* initialize /msxi, "'initialize' is the first (second) message"
+        or diag explain $result;
 
     # Check sorting
     my $prev_ts = 4294967295; # 2106-02-07T06:28:15
@@ -427,8 +438,9 @@ lives_and {
         $sorting_ok = 0 if $timestamp > $prev_ts; # messages should get older down the list
         $prev_ts = $timestamp;
     }
-    is $sorting_ok, 1;
-} "get_workflow_log() - return 'save' as first message and sort correctly";
+    is $sorting_ok, 1, "log is sorted correctly";
+};
+
 CTX('session')->data->role('User');
 
 #
