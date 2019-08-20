@@ -744,7 +744,7 @@ sub __handle_COMMAND : PRIVATE {
 
     my $command;
     my $api = $data->{PARAMS}->{API} || 2;
-    if ($api !~ /[2]/) {
+    if ($api !~ /^2$/) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_UNKNWON_COMMAND_API_VERSION",
             params  => $data->{PARAMS},
