@@ -158,7 +158,7 @@ sub _load_default_config {
     my @parts = split /\//, $node;
     $parts[-1] =~ s/\.yaml$//; # strip ".yaml" if it's a file
 
-    # read original sample confog
+    # read original sample config
     my $config_hash = $self->_yaml2perl($self->src_config_dir . '/config.d', $node);
     # descent into config hash down to $node
     for (@parts) { $config_hash = $config_hash->{$_} };
