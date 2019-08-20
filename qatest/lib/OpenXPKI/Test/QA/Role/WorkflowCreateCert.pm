@@ -153,7 +153,7 @@ sub create_cert {
                 get_workflow_info => { id => $wftest->id }
             );
 
-            my $actions = $msg->{STATE}->{option};
+            my $actions = $msg->{state}->{option};
             my $intermediate_state;
             if (grep { /^csr_enter_policy_violation_comment$/ } @$actions) {
                 diag "Test FQDNs do not resolve - handling policy violation" if $ENV{TEST_VERBOSE};
