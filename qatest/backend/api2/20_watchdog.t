@@ -40,7 +40,7 @@ sub is_run_status {
     my $tick = 0;
 
     while (1) {
-        my $result = $client->send_command_api2_ok("control_watchdog" => { action => "status" });
+        my $result = $client->send_command_ok("control_watchdog" => { action => "status" });
         my $is_running = (scalar @{ $result->{pid} } > 0);
         if ($expected ? ($is_running) : (not $is_running)) { pass $msg and last };
         last if ++$tick == $MAX_WAIT;
@@ -52,17 +52,17 @@ sub is_run_status {
 is_run_status 1, "status of running watchdog";
 
 lives_and {
-    $client->send_command_api2_ok("control_watchdog" => { action => "stop" });
+    $client->send_command_ok("control_watchdog" => { action => "stop" });
     is_run_status 0;
 } "stop watchdog";
 
 lives_and {
-    $client->send_command_api2_ok("control_watchdog" => { action => "start" });
+    $client->send_command_ok("control_watchdog" => { action => "start" });
     is_run_status 1;
 } "start watchdog again";
 
 lives_and {
-    my $result = $client->send_command_api2_ok("control_watchdog" => { action => "status" });
+    my $result = $client->send_command_ok("control_watchdog" => { action => "status" });
     cmp_deeply $result, { pid => [ re(qr/^\d+$/) ], children => 0 }
 } "watchdog status info";
 

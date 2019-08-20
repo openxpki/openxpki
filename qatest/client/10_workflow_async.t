@@ -98,7 +98,7 @@ sub wait_for_proc_state {
     my $result;
     my $count = 0;
     while ($count++ < 20) {
-        $result = $tester->send_command_api2_ok("search_workflow_instances" => { id => [ $wfid ] });
+        $result = $tester->send_command_ok("search_workflow_instances" => { id => [ $wfid ] });
         # no workflow found?
         if (not scalar @$result or $result->[0]->{'workflow_id'} != $wfid) {
             BAIL_OUT("Workflow with ID $wfid not found");
@@ -117,7 +117,7 @@ sub wait_for_proc_state {
 my $result;
 
 lives_and {
-    $result = $tester->send_command_api2_ok("create_workflow_instance" => {
+    $result = $tester->send_command_ok("create_workflow_instance" => {
         workflow => "wf_type_1",
     });
 } "create_workflow_instance()";
@@ -144,7 +144,7 @@ cmp_deeply $result, [ superhashof({
 # get_workflow_info - check action results
 #
 lives_and {
-    $result = $tester->send_command_api2_ok("get_workflow_info" => { id => $wf_id });
+    $result = $tester->send_command_ok("get_workflow_info" => { id => $wf_id });
     cmp_deeply $result->{workflow}->{context}->{is_13_prime}, 1;
 } "Workflow action returns correct result";
 
@@ -152,7 +152,7 @@ lives_and {
 # get_workflow_history - check correct execution history
 #
 lives_and {
-    $result = $tester->send_command_api2_ok("get_workflow_history" => { id => $wf_id });
+    $result = $tester->send_command_ok("get_workflow_history" => { id => $wf_id });
     cmp_deeply $result, [
         superhashof({ workflow_state => "INITIAL", workflow_action => re(qr/create/i) }),
         superhashof({ workflow_state => "INITIAL", workflow_action => re(qr/initialize/i) }),

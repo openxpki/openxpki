@@ -98,7 +98,7 @@ lives_and {
 my $client = $oxitest->new_client_tester;
 $client->login("democa" => "caop");
 lives_and {
-    my $data = $client->send_command_api2_ok("list_process");
+    my $data = $client->send_command_ok("list_process");
     cmp_deeply $data, superbagof(
         {
             info => re(qr/openxpki.*main/),
