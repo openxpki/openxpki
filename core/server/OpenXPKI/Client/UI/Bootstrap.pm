@@ -66,6 +66,37 @@ sub init_structure {
             $self->logger->trace("Got $key: " . Dumper $menu->{$key});
         }
 
+        # Check syntax of "certdetails".
+        # (a sub{} allows using return instead of nested if-structures)
+        my $certdetails = sub {
+            my $certdetails;
+            unless ($certdetails = $menu->{certdetails}) {
+                $self->logger->warn('Config entry "certdetails" is empty') unless $menu->{certdetails};
+                return {};
+            }
+            unless (ref $certdetails eq 'HASH') {
+                $self->logger->warn('Config entry "certdetails" is not a hash');
+                return {};
+            }
+            if ($certdetails->{metadata}) {
+                if (ref $certdetails->{metadata} eq 'ARRAY') {
+                    for my $md (@{ $certdetails->{metadata} }) {
+                        if (not ref $md eq 'HASH') {
+                            $self->logger->warn('Config entry "certdetails.metadata" contains an item that is not a hash');
+                            $certdetails->{metadata} = [];
+                            last;
+                        }
+                    }
+                }
+                else {
+                    $self->logger->warn('Config entry "certdetails.metadata" is not an array');
+                    $certdetails->{metadata} = [];
+                }
+            }
+            return $certdetails;
+        }->();
+        $session->param('certdetails', $certdetails);
+
         if ($menu->{ping}) {
             my $ping;
             if (ref $menu->{ping} eq 'HASH') {

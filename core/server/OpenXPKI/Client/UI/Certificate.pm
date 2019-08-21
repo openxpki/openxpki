@@ -630,6 +630,31 @@ sub init_detail {
         { label => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER', format => 'link', value => { label => $cert->{issuer_dn}, page => 'certificate!chain!identifier!'. $cert_identifier } },
     );
 
+    # certificate metadata
+    my $metadata_config = $self->_client->session()->param('certdetails')->{metadata};
+    if ($metadata_config) {
+        my $cert_attrs = $self->send_command_v2( get_cert_attributes => { identifier => $cert_identifier, attribute => 'meta_%' }, 1);
+
+        my @metadata_lines;
+        for my $cfg (@$metadata_config) {
+            my $line;
+            if ($cfg->{template}) {
+                $line = $self->send_command_v2( render_template => {
+                    template => $cfg->{template},
+                    params => $cert_attrs,
+                });
+            }
+            else {
+                $line = sprintf '%s: %s', $cfg->{label}, join(',', @{ $cert_attrs->{ $cfg->{value} } }) // '-';
+            }
+            push @metadata_lines, $line;
+        }
+
+        push @fields, (
+            { label => 'I18N_OPENXPKI_UI_CERTIFICATE_METADATA', value => \@metadata_lines, format => "rawlist" },
+        );
+    }
+
     # for i18n parser I18N_OPENXPKI_CERT_ISSUED CRL_ISSUANCE_PENDING I18N_OPENXPKI_CERT_REVOKED I18N_OPENXPKI_CERT_EXPIRED
 
     # was in info, bullet list for downloads
