@@ -26,7 +26,7 @@ sub set_context {
 sub BUILD {
 
     my $self = shift;
-    $self->log()->trace('context is '. Dumper $CONTEXT );
+    $self->log()->trace('context is '. Dumper $CONTEXT ) if $self->log->is_trace;
 
 }
 
@@ -104,7 +104,7 @@ sub _get_node {
         $val = $ser->deserialize( $val );
     }
 
-    $self->log()->debug('value is '. Dumper $val );
+    $self->log()->debug('value is '. Dumper $val ) if $self->log->is_debug;
 
     return $val;
 }

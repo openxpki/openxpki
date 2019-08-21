@@ -45,7 +45,7 @@ sub get {
         $ttarg->{EXTRA} = $params->{extra};
     }
 
-    $self->log()->trace('Template args ' . Dumper $ttarg );
+    $self->log()->trace('Template args ' . Dumper $ttarg ) if $self->log->is_trace;
 
     # Process the key using template if necessary
     my $key = $self->key();
@@ -144,7 +144,7 @@ sub set {
 
     my @args = $self->_build_path( $args );
 
-    $self->log()->trace('Set called on ' . Dumper \@args );
+    $self->log()->trace('Set called on ' . Dumper \@args ) if $self->log->is_trace;
 
     my $template = Template->new({});
 
@@ -156,7 +156,7 @@ sub set {
         $ttarg->{EXTRA} = $params->{extra};
     }
 
-    $self->log()->trace('Template args ' . Dumper $ttarg );
+    $self->log()->trace('Template args ' . Dumper $ttarg ) if $self->log->is_trace;
     # Process the key using template
     my $key = $self->key();
     my $parsed_key;

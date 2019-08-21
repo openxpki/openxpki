@@ -118,7 +118,7 @@ sub _init_backend {
 
     Log::Log4perl::MDC->put('ssid', substr($client_id,0,4));
 
-    $self->logger()->trace( Dumper $session );
+    $self->logger()->trace( Dumper $session ) if $self->logger->is_trace;
     return $client;
 }
 
@@ -169,13 +169,13 @@ sub handle_request {
 
     my $reply = $self->backend()->send_receive_service_msg('PING');
     my $status = $reply->{SERVICE_MSG};
-    $self->logger()->trace('Ping replied ' . Dumper $reply);
+    $self->logger()->trace('Ping replied ' . Dumper $reply) if $self->logger->is_trace;
     $self->logger()->debug('current session status ' . $status);
 
     if ( $reply->{SERVICE_MSG} eq 'START_SESSION' ) {
         $reply = $self->backend()->init_session();
         $self->logger()->debug('Init new session');
-        $self->logger()->trace('Init replied ' . Dumper $reply);
+        $self->logger()->trace('Init replied ' . Dumper $reply) if $self->logger->is_trace;
     }
 
     if ( $reply->{SERVICE_MSG} eq 'ERROR' ) {
@@ -233,7 +233,7 @@ sub __load_class {
     my %extra;
     if ($param) {
         %extra = split /!/, $param;
-        $self->logger()->trace("Found extra params " . Dumper \%extra );
+        $self->logger()->trace("Found extra params " . Dumper \%extra ) if $self->logger->is_trace;
     }
 
     $self->logger()->debug("Loading handler class $class");
@@ -465,7 +465,7 @@ sub handle_login {
         } else {
             my $realms = $reply->{'PARAMS'}->{'PKI_REALMS'};
             my @realm_list = map { $_ = {'value' => $realms->{$_}->{NAME}, 'label' => i18nGettext($realms->{$_}->{DESCRIPTION})} } keys %{$realms};
-            $self->logger()->trace("Offering realms: " . Dumper \@realm_list );
+            $self->logger()->trace("Offering realms: " . Dumper \@realm_list ) if $self->logger->is_trace;
             return $result->init_realm_select( \@realm_list  )->render();
         }
     }
@@ -496,14 +496,14 @@ sub handle_login {
                 } );
                 $status = $reply->{SERVICE_MSG};
             } else {
-                $self->logger()->trace("Offering stacks: " . Dumper \@stack_list );
+                $self->logger()->trace("Offering stacks: " . Dumper \@stack_list ) if $self->logger->is_trace;
                 return $result->init_auth_stack( \@stack_list )->render();
             }
         }
     }
 
     $self->logger()->debug("Selected realm $pki_realm, new status " . $status);
-    $self->logger()->trace(Dumper $reply);
+    $self->logger()->trace(Dumper $reply) if $self->logger->is_trace;
 
     # we have more than one login handler and leave it to the login
     # class to render it right.
@@ -516,13 +516,13 @@ sub handle_login {
         # SSO Login uses data from the ENV, so no need to render anything
         if ( $login_type eq 'CLIENT_SSO' ) {
             my $user = $ENV{'REMOTE_USER'} || '';
-            $self->logger()->trace('ENV is ' . Dumper \%ENV);
+            $self->logger()->trace('ENV is ' . Dumper \%ENV) if $self->logger->is_trace;
 
             if ($user) {
                 $self->logger()->info('Sending SSO Login ( '.$user.' )');
                 $reply =  $self->backend()->send_receive_service_msg( 'GET_CLIENT_SSO_LOGIN',
                     { LOGIN => $user, PSEUDO_ROLE => '' } );
-                $self->logger()->trace('Auth result ' . Dumper $reply);
+                $self->logger()->trace('Auth result ' . Dumper $reply) if $self->logger->is_trace;
             } else {
                 $self->logger()->error('User missing in ENV for SSO Login');
                 $self->logout_session( $cgi );
@@ -532,13 +532,13 @@ sub handle_login {
         } elsif ( $login_type eq 'CLIENT_X509' ) {
             my $user = $ENV{'SSL_CLIENT_S_DN_CN'} || '';
             my $cert = $ENV{'SSL_CLIENT_CERT'} || '';
-            $self->logger()->trace('ENV is ' . Dumper \%ENV);
+            $self->logger()->trace('ENV is ' . Dumper \%ENV) if $self->logger->is_trace;
 
             if ($user && $cert) {
                 $self->logger()->info('Sending X509 Login ( '.$user.' )');
                 $reply =  $self->backend()->send_receive_service_msg( 'GET_CLIENT_X509_LOGIN',
                     { certificate => $cert } );
-                $self->logger()->trace('Auth result ' . Dumper $reply);
+                $self->logger()->trace('Auth result ' . Dumper $reply) if $self->logger->is_trace;
             } else {
                 $self->logger()->error('Certificate missing for X509 Login');
                 $self->logout_session( $cgi );
@@ -553,7 +553,7 @@ sub handle_login {
                 ##FIXME - Input validation, dynamic config (alternate logins)!
                 $reply = $self->backend()->send_receive_service_msg( $status,
                     { LOGIN => scalar $cgi->param('username'), PASSWD =>  scalar $cgi->param('password') } );
-                $self->logger()->trace('Auth result ' . Dumper $reply);
+                $self->logger()->trace('Auth result ' . Dumper $reply) if $self->logger->is_trace;
 
             } else {
                 $self->logger()->debug('No credentials, render form');
@@ -625,7 +625,7 @@ sub handle_login {
             # Check for MOTD
             my $motd = $self->backend()->send_receive_command_msg( 'get_motd' );
             if (ref $motd->{PARAMS} eq 'HASH') {
-                $self->logger()->trace('Got MOTD: '. Dumper $motd->{PARAMS} );
+                $self->logger()->trace('Got MOTD: '. Dumper $motd->{PARAMS} ) if $self->logger->is_trace;
                 $self->session()->param('motd', $motd->{PARAMS} );
             }
 
@@ -634,8 +634,8 @@ sub handle_login {
                 push @main::header, ('-cookie', $cgi->cookie( $main::cookie ));
             }
 
-            $self->logger()->trace('Got session info: '. Dumper $reply->{PARAMS});
-            $self->logger()->trace('CGI Header ' . Dumper \@main::header );
+            $self->logger()->trace('Got session info: '. Dumper $reply->{PARAMS}) if $self->logger->is_trace;
+            $self->logger()->trace('CGI Header ' . Dumper \@main::header ) if $self->logger->is_trace;
 
             $session->flush();
 
@@ -646,7 +646,7 @@ sub handle_login {
 
     if ( $reply->{SERVICE_MSG} eq 'ERROR') {
 
-        $self->logger()->trace('Server Error Msg: '. Dumper $reply);
+        $self->logger()->trace('Server Error Msg: '. Dumper $reply) if $self->logger->is_trace;
 
         # Failure here is likely a wrong password
         if ($reply->{'LIST'} && $reply->{'LIST'}->[0]->{LABEL} eq 'I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED') {

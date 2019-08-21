@@ -15,7 +15,7 @@ sub action_get_styles_for_profile {
     my $self = shift;
     my $args = shift;
 
-    $self->logger()->trace( 'get_styles_for_profile with args: ' . Dumper $args );
+    $self->logger()->trace( 'get_styles_for_profile with args: ' . Dumper $args ) if $self->logger->is_trace;
 
     my $cert_profile = $self->param('cert_profile');
     my $styles = $self->send_command_v2( 'get_cert_subject_profiles', { profile => $cert_profile });
@@ -59,7 +59,7 @@ sub action_get_key_param {
     # Get the possible parameters for this algo
     my $key_gen_param_supported = $key_alg ? $self->send_command_v2( 'get_key_params', { profile => $token->{cert_profile}, alg => $key_alg }) : {};
 
-    $self->logger()->trace( '$key_gen_param_supported: ' . Dumper $key_gen_param_supported );
+    $self->logger()->trace( '$key_gen_param_supported: ' . Dumper $key_gen_param_supported ) if $self->logger->is_trace;
 
     # The field names used in the ui are in the request
     my $in = $self->param();
@@ -74,7 +74,7 @@ sub action_get_key_param {
 
             my $preset = $key_gen_params->{$pn};
 
-            $self->logger()->trace( 'Preset '.$preset. ' Values ' . Dumper $key_gen_param_supported->{$param_name});
+            $self->logger()->trace( 'Preset '.$preset. ' Values ' . Dumper $key_gen_param_supported->{$param_name}) if $self->logger->is_trace;
 
             if (!(grep $preset,  @{$key_gen_param_supported->{$param_name}})) {
                 $preset = $param[0]->{value};

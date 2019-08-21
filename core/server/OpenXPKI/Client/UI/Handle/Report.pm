@@ -12,7 +12,7 @@ sub render_report_list {
 
     my $wf_info = $args->{wf_info}->{workflow};
 
-    $self->logger()->trace( 'render_report_list: ' . Dumper $wf_info );
+    $self->logger()->trace( 'render_report_list: ' . Dumper $wf_info ) if $self->logger->is_trace;
 
     $self->_page({
         label => $wf_info->{label},

@@ -13,12 +13,12 @@ sub render_process_status {
     my $args = shift;
     my $wf_action = shift;
 
-    $self->logger()->trace( 'render_process_status: ' . Dumper $args );
+    $self->logger()->trace( 'render_process_status: ' . Dumper $args ) if $self->logger->is_trace;
 
 
     my $process = $self->send_command_v2( 'list_process' );
 
-    $self->logger()->trace("result: " . Dumper $process );
+    $self->logger()->trace("result: " . Dumper $process ) if $self->logger->is_trace;
 
     $self->_page({
         label => 'Running processes (global)',
@@ -165,14 +165,14 @@ sub render_system_status {
     # this allows a user to configure this
     my @token = split /\s*,\s*/, $wf_info->{workflow}->{context}->{token};
 
-    $self->logger()->trace("context: " . Dumper $wf_info->{workflow}->{context} );
+    $self->logger()->trace("context: " . Dumper $wf_info->{workflow}->{context} ) if $self->logger->is_trace;
 
 
     foreach my $type (@token) {
 
         my $token = $self->send_command_v2( 'list_active_aliases', { type => $type, check_online => 1 } );
 
-        $self->logger()->trace("result: " . Dumper $token );
+        $self->logger()->trace("result: " . Dumper $token ) if $self->logger->is_trace;
 
         my @result;
         foreach my $alias (@{$token}) {

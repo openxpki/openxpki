@@ -347,7 +347,7 @@ sub run_command {
             $message = 'unknown error';
         }
         $self->logger()->error($message);
-        $self->logger()->trace(Dumper $reply);
+        $self->logger()->trace(Dumper $reply) if $self->logger->is_trace;
         $self->last_error($message);
         die "Error running command: $message";
     }
@@ -414,7 +414,7 @@ sub handle_workflow {
     if ($wf_action && $wf_id) {
 
         $self->logger()->info(sprintf('execute workflow action %s on %01d', $wf_action, $wf_id));
-        $self->logger()->trace('workflow params:  '. Dumper $wf_params);
+        $self->logger()->trace('workflow params:  '. Dumper $wf_params) if $self->logger->is_trace;
         $reply = $self->run_command('execute_workflow_activity',{
             id => $wf_id,
             activity => $wf_action,
@@ -462,7 +462,7 @@ sub handle_workflow {
         die "Neither workflow id nor type given";
     }
 
-    $self->logger()->trace('Result of workflow action: ' . Dumper $reply);
+    $self->logger()->trace('Result of workflow action: ' . Dumper $reply) if $self->logger->is_trace;
 
     my $ret = $reply->{workflow};
     if ($return_uppercase) {
@@ -547,7 +547,7 @@ sub __reinit_session {
         $self->logger()->info('New backend session with id ' . $client_session);
     }
     $session->param('backend_session_id', $client_session);
-    $self->logger()->trace( Dumper $session );
+    $self->logger()->trace( Dumper $session ) if $self->logger->is_trace;
 
     return $reply;
 

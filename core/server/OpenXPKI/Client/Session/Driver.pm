@@ -49,7 +49,7 @@ sub store {
             SESSION_DATA => encode_base64($datastr),
         });
 
-        $self->logger()->trace('Session store result ' . Dumper $res);
+        $self->logger()->trace('Session store result ' . Dumper $res) if $self->logger->is_trace;
     }
 
 }
@@ -61,7 +61,7 @@ sub retrieve {
     $res = $res->{SESSION_DATA} || '';
     # TODO Remove "unless..." somewhen: it's only to restore old unencoded sessions
     $res = decode_base64($res) if ($res and $res !~ /\{/);
-    $self->logger()->trace('Session retrieve ' . Dumper $res);
+    $self->logger()->trace('Session retrieve ' . Dumper $res) if $self->logger->is_trace;
     return $res;
 };
 

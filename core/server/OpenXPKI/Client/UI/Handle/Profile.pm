@@ -15,7 +15,7 @@ sub render_profile_select {
     my $wf_action = shift;
 
 
-    $self->logger()->trace( 'render_profile_select with args: ' . Dumper $args );
+    $self->logger()->trace( 'render_profile_select with args: ' . Dumper $args ) if $self->logger->is_trace;
 
     my $wf_info = $args->{wf_info};
 
@@ -132,7 +132,7 @@ sub render_subject_form {
         { profile => $cert_profile, style => $cert_subject_style, 'section' =>  $section }
     );
 
-    $self->logger()->trace( 'Profile fields' . Dumper $fields );
+    $self->logger()->trace( 'Profile fields' . Dumper $fields ) if $self->logger->is_trace;
 
     # Load preexisiting values from context
     my $values = {};
@@ -146,12 +146,12 @@ sub render_subject_form {
         push @fielddesc, { label => $field->{label}, value => $field->{description}, format => 'raw' } if ($field->{description});
     }
 
-    $self->logger()->trace( 'Preset ' . Dumper $values );
+    $self->logger()->trace( 'Preset ' . Dumper $values ) if $self->logger->is_trace;
 
     # Map the old notation for the new UI
     $fields = OpenXPKI::Client::UI::Handle::Profile::__translate_form_def( $fields, $field_name, $values, $is_renewal );
 
-    $self->logger()->trace( 'Mapped fields' . Dumper $fields );
+    $self->logger()->trace( 'Mapped fields' . Dumper $fields ) if $self->logger->is_trace;
 
     # record the workflow info in the session
     push @{$fields}, $self->__register_wf_token($wf_info, {
@@ -190,7 +190,7 @@ sub render_key_select {
     my $args = shift;
     my $wf_action = shift;
 
-    $self->logger()->trace( 'render_profile_select with args: ' . Dumper $args );
+    $self->logger()->trace( 'render_profile_select with args: ' . Dumper $args ) if $self->logger->is_trace;
 
     my $wf_info = $args->{wf_info};
     my $context = $wf_info->{workflow}->{context};
@@ -275,7 +275,7 @@ sub render_server_password {
     my $args = shift;
     my $wf_action = shift;
 
-    $self->logger()->trace( 'render_server_password with args: ' . Dumper $args );
+    $self->logger()->trace( 'render_server_password with args: ' . Dumper $args ) if $self->logger->is_trace;
 
     my $wf_info = $args->{wf_info};
     my $context = $wf_info->{workflow}->{context};

@@ -139,7 +139,7 @@ sub action_result {
         $query->{return_attributes} = $rattrib;
     }
 
-    $self->logger()->trace("query : " . Dumper $query);
+    $self->logger()->trace("query : " . Dumper $query) if $self->logger->is_trace;
 
     my $result_count = $self->send_command_v2( 'search_workflow_instances_count',  $query );
 

@@ -145,7 +145,7 @@ sub BUILD {
     my $config = $self->default();
 
     $self->logger()->debug(sprintf('Config for service %s loaded', $self->service()));
-    $self->logger()->trace('Global config: ' . Dumper $config );
+    $self->logger()->trace('Global config: ' . Dumper $config ) if $self->logger->is_trace;
 
 }
 
@@ -242,7 +242,7 @@ sub config() {
     # TODO no path is fine with e.g. EST
     } else {
         $self->logger()->warn("Unable to detect script name - please check the docs");
-        $self->logger()->debug(Dumper \%ENV);
+        $self->logger()->debug(Dumper \%ENV) if $self->logger->is_debug;
     }
 
     # non existing files and other errors are handled inside loader
@@ -284,7 +284,7 @@ sub load_config {
     # cast to an unblessed hash
     my %config = %{$config};
 
-    $self->logger()->trace('Script config: ' . Dumper \%config );
+    $self->logger()->trace('Script config: ' . Dumper \%config ) if $self->logger->is_trace;
 
     return \%config;
 }
