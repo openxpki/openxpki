@@ -630,6 +630,13 @@ sub init_detail {
         { label => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER', format => 'link', value => { label => $cert->{issuer_dn}, page => 'certificate!chain!identifier!'. $cert_identifier } },
     );
 
+    # certificate metadata
+    my $cert_attrs = $self->send_command_v2( get_cert_attributes => { identifier => $cert_identifier, attribute => 'meta_%' }, 1);
+    my $metadata = [ map { sprintf "%s: %s", $_=~s/^meta_//r, join(', ', @{ $cert_attrs->{$_} }) } sort keys %$cert_attrs ];
+    push @fields, (
+        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_METADATA', value => $metadata, format => "rawlist" },
+    );
+
     # for i18n parser I18N_OPENXPKI_CERT_ISSUED CRL_ISSUANCE_PENDING I18N_OPENXPKI_CERT_REVOKED I18N_OPENXPKI_CERT_EXPIRED
 
     # was in info, bullet list for downloads
