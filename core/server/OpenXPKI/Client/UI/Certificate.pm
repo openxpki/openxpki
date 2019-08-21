@@ -645,14 +645,16 @@ sub init_detail {
                 });
             }
             else {
-                $line = sprintf '%s: %s', $cfg->{label}, join(',', @{ $cert_attrs->{ $cfg->{value} } }) // '-';
+                if (defined $cert_attrs->{ $cfg->{field} }) {
+                    $line = sprintf '%s: %s', $cfg->{label}, join(',', @{ $cert_attrs->{ $cfg->{field} } }) // '-';
+                }
             }
-            push @metadata_lines, $line;
+            push @metadata_lines, $line if ($line);
         }
 
         push @fields, (
             { label => 'I18N_OPENXPKI_UI_CERTIFICATE_METADATA', value => \@metadata_lines, format => "rawlist" },
-        );
+        ) if (scalar @metadata_lines);
     }
 
     # for i18n parser I18N_OPENXPKI_CERT_ISSUED CRL_ISSUANCE_PENDING I18N_OPENXPKI_CERT_REVOKED I18N_OPENXPKI_CERT_EXPIRED
