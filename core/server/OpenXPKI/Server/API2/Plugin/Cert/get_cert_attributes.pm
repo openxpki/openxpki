@@ -17,7 +17,15 @@ use OpenXPKI::Server::API2::Types;
 
 =head2 get_cert_attributes
 
-Returns a I<HashRef> with the attributes of the certificate.
+Get a list of (selected) certificate attributes.
+
+Returns a I<HashRef> with the attribute names and the lists of values (muliple
+attributes of the same name are allowed):
+
+    {
+        meta_email => [ 'nn@example.org', 'nicer@example.org' ],
+        meta_requestor => [ 'Nice Nephew' ],
+    }
 
 B<Parameters>
 
