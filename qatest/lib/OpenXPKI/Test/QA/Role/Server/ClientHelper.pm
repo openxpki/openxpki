@@ -265,29 +265,6 @@ sub send_ok {
 
 =head2 send_command_ok
 
-Sends the given command (ie. message "COMMAND") to the server using and wraps
-that in a test.
-
-Returns the server response (I<HashRef>).
-
-B<Positional parameters>
-
-=over
-
-=item * I<$command> (Str) - command to send to the server
-
-=item * I<$params> (HashRef) - command parameters. Optional, defult: {}
-
-=back
-
-=cut
-sub send_command_ok {
-    my ($self, $command, $params) = @_;
-    return $self->send_ok('COMMAND', { COMMAND => $command, PARAMS => $params ? $params : {}, API => 1 });
-}
-
-=head2 send_command_api2_ok
-
 Sends the given command (ie. message "COMMAND") to the server for execution via
 the new API (API2) and wraps that in a test.
 
@@ -304,7 +281,7 @@ B<Positional parameters>
 =back
 
 =cut
-sub send_command_api2_ok {
+sub send_command_ok {
     my ($self, $command, $params) = @_;
     return $self->send_ok('COMMAND', { COMMAND => $command, PARAMS => $params ? $params : {}, API => 2 });
 }

@@ -53,7 +53,6 @@ This provides the following OpenXPKI context objects:
     CTX('config')
     CTX('log')
     CTX('dbi')
-    CTX('api')
     CTX('api2')
     CTX('authentication')
     CTX('session')        # in-memory
@@ -87,12 +86,28 @@ parameter C<with>.
 
 Available Moose roles can be found at these two locations:
 
+1. C<core/server/t/lib/OpenXPKI/Test/Role> (roles for unit tests and QA
+tests):
+
 =over
 
-=item * C<core/server/t/lib/OpenXPKI/Test/Role> (roles for unit tests and QA
-tests)
+=item * L<CryptoLayer|OpenXPKI::Test::Role::CryptoLayer>
 
-=item * C<qatest/lib/OpenXPKI/Test/QA/Role/> (roles exclusively for QA tests)
+=item * L<TestRealms|OpenXPKI::Test::Role::TestRealms>
+
+=back
+
+2. C<qatest/lib/OpenXPKI/Test/QA/Role/> (roles exclusively for QA tests):
+
+=over
+
+=item * L<SampleConfig|OpenXPKI::Test::QA::Role::SampleConfig>
+
+=item * L<Server|OpenXPKI::Test::QA::Role::Server>
+
+=item * L<WorkflowCreateCert|OpenXPKI::Test::QA::Role::WorkflowCreateCert>
+
+=item * L<Workflows|OpenXPKI::Test::QA::Role::Workflows>
 
 =back
 
@@ -755,7 +770,6 @@ B<Only called internally:> initializes the basic server context objects:
     C<CTX('config')>
     C<CTX('log')>
     C<CTX('dbi')>
-    C<CTX('api')>
     C<CTX('api2')>
     C<CTX('authentication')>
 
@@ -767,7 +781,7 @@ sub init_server {
     OpenXPKI::Server::Context::setcontext({ log => OpenXPKI::Server::Log->new(CONFIG => undef) });
 
     # init basic CTX objects
-    my @tasks = qw( config_versioned dbi_log api2 api authentication );
+    my @tasks = qw( config_versioned dbi_log api2 authentication );
     # init notification object if needed
     my $cfg_notification = "realm.".$self->default_realm.".notification";
     if ($self->get_config($cfg_notification, 1)) {
@@ -871,28 +885,6 @@ sub set_user {
     Log::Log4perl::MDC->put('role', $role);
 
     note "Set session to realm $realm: user '$user' ($role)";
-}
-
-=head2 api_command
-
-Executes the given API2 command and returns the result.
-
-Convenience method to prevent usage of C<CTX('api')> in test files.
-
-B<Positional Parameters>
-
-=over
-
-=item * C<$command> I<Str> - command name
-
-=item * C<$params> I<HashRef> - parameters
-
-=back
-
-=cut
-sub api_command {
-    my ($self, $command, $params) = @_;
-    return OpenXPKI::Server::Context::CTX('api')->$command($params);
 }
 
 =head2 api2_command

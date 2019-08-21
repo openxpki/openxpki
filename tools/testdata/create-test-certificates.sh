@@ -24,12 +24,12 @@ set -e
 #    (MySQL config will be read from env vars $OXI_TEST_DB_MYSQL_xxx)
 $BASEDIR/_create-config.pl $TEMPDIR
 
-# 2. Create certificates and store them in $TEMPDIR/etc/openxpki/ssl/xxx/
+# 2. Create certificates and store them in $TEMPDIR/etc/openxpki/ca/xxx/
 # 3. Import cert. into MySQL using test config above
 $BASEDIR/_create-certs.sh  $TEMPDIR/etc/openxpki
 
 # 4. Create Perl code for OpenXPKI::Test::CertHelper::Database
-$BASEDIR/_write-certhelper.pl $TEMPDIR/etc/openxpki/ssl > $BASEDIR/certificates/certhelper-code.pl
+$BASEDIR/_write-certhelper.pl $TEMPDIR/etc/openxpki/ca > $BASEDIR/certificates/certhelper-code.pl
 echo ""
 echo "Code for OpenXPKI::Test::CertHelper::Database is available in:"
 echo "    $BASEDIR/certificates/certhelper-code.pl"

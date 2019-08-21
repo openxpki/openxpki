@@ -2,18 +2,7 @@
 # Provision a Vagrant box (VirtualBox VM) for testing and development:
 # Install MySQL client and set up database
 
-#
-# Exit handler
-#
-LOG=$(mktemp)
-function _exit () {
-    if [ $1 -ne 0 -a $1 -ne 333 ]; then
-        echo "$0: ERROR - last command exited with code $1, output:" >&2 && cat $LOG >&2
-    fi
-    rm -f $LOG
-    exit $1
-}
-trap '_exit $?' EXIT
+. /vagrant/assets/functions.sh
 
 #
 # Config
@@ -35,17 +24,12 @@ while read def; do export $def; done < /etc/environment
 echo "MySQL: downloading and starting Docker container with database"
 docker rm -f mariadb >/dev/null 2>&1
 docker run -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root \
-           --name mariadb mariadb:10.1                    >$LOG 2>&1 || _exit $?
+           --name mariadb mariadb:10.1 >$LOG 2>&1 || _exit $?
 
 #
 # Install MySQL client
 #
-installed=$(/usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' 'mariadb-client' 2>&1 | grep -ci installed)
-if [ $installed -eq 0 ]; then
-    echo "MySQL: installing client"
-    DEBIAN_FRONTEND=noninteractive \
-     apt-get -q=2 install mariadb-client libdbd-mysql-perl >$LOG 2>&1 || _exit $?
-fi
+install_packages mariadb-client libdbd-mysql-perl
 
 #
 # Database setup

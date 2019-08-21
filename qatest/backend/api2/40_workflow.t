@@ -18,7 +18,7 @@ use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 use OpenXPKI::Test::CertHelper::Database;
 
-plan tests => 35;
+plan tests => 34;
 
 #
 # Setup test context
@@ -62,11 +62,11 @@ sub workflow_def {
             'set_motd' => {
                 'class' => 'OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry',
                 'param' => {
-                    'ds_key_param' => 'role',
-                    'ds_value_param' => 'motd',
-                    'ds_force' => '1',
-                    'ds_namespace' => 'webui.motd',
-                    'ds_encrypt' => '0',
+                    'key' => 'role',
+                    'value' => 'motd',
+                    'force' => '1',
+                    'namespace' => 'webui.motd',
+                    'encrypt' => '0',
                 },
             },
             add_message => {
@@ -204,16 +204,16 @@ lives_and {
     cmp_deeply $result, superhashof({
         $wf_t1_sync->type => superhashof({ label => "wf_type_1" }),
         $wf_t2->type      => superhashof({ label => "wf_type_2" }),
-    }), "get_workflow_instance_types()";
-}
+    });
+} "get_workflow_instance_types()";
 
 #
 # get_workflow_type_for_id
 #
 lives_and {
     my $result = $oxitest->api2_command("get_workflow_type_for_id" => { id => $wf_t1_sync->id });
-    is $result, $wf_t1_sync->type, "get_workflow_type_for_id()";
-}
+    is $result, $wf_t1_sync->type;
+} "get_workflow_type_for_id()";
 
 dies_ok {
     my $result = $oxitest->api2_command("get_workflow_type_for_id" => { id => -1 });
@@ -314,7 +314,6 @@ lives_and {
                 workflow_id => $wf_t2->id,
                 role => 'User',
                 creator => 'wilhelm',
-                creator_role => 'User',
                 link => 'http://www.denic.de',
                 message => 'Lucy in the sky with diamonds',
                 wf_current_action => 'wftype2_initialize',
@@ -414,11 +413,22 @@ throws_ok { $oxitest->api2_command("get_workflow_log" => { id => $wf_t1_sync->id
     "get_workflow_log() - throw exception on unauthorized user";
 
 CTX('session')->data->role('Guard');
-lives_and {
-    my $result = $oxitest->api2_command("get_workflow_log" => { id => $wf_t1_sync->id });
+
+subtest "get_workflow_log()" => sub {
+    plan tests => 4;
+
+    my $result;
+    lives_ok {
+        $result = $oxitest->api2_command("get_workflow_log" => { id => $wf_t1_sync->id });
+    } 'get_workflow_log() - testing workflow #' . $wf_t1_sync->id;
+
+    isnt scalar @$result, 0, "log has at least one entry";
+
+    # check first message
     my $i = -1;
     $i = -2 if $result->[$i]->[2] =~ / during .* startup /msxi;
-    like $result->[$i]->[2], qr/ execute .* initialize /msxi or diag explain $result;
+    like $result->[$i]->[2], qr/ execute .* initialize /msxi, "'initialize' is the first (second) message"
+        or diag explain $result;
 
     # Check sorting
     my $prev_ts = 4294967295; # 2106-02-07T06:28:15
@@ -428,8 +438,9 @@ lives_and {
         $sorting_ok = 0 if $timestamp > $prev_ts; # messages should get older down the list
         $prev_ts = $timestamp;
     }
-    is $sorting_ok, 1;
-} "get_workflow_log() - return 'save' as first message and sort correctly";
+    is $sorting_ok, 1, "log is sorted correctly";
+};
+
 CTX('session')->data->role('User');
 
 #
@@ -462,7 +473,6 @@ lives_and {
 #
 lives_and {
     my $result = $oxitest->api2_command("get_workflow_activities" => {
-        workflow => $wf_t2->type,
         id => $wf_t2->id,
     });
     cmp_deeply $result, [
@@ -475,7 +485,6 @@ lives_and {
 #
 lives_and {
     my $result = $oxitest->api2_command("get_workflow_activities_params" => {
-        workflow => $wf_t2->type,
         id => $wf_t2->id,
     });
     cmp_deeply $result, [
@@ -593,14 +602,14 @@ lives_and {
 
 # Check custom order by TYPE
 lives_and {
-    my $result = $oxitest->api2_command("search_workflow_instances" => { pki_realm => "alpha", order => "workflow_proc_state" });
+    my $result = $oxitest->api2_command("search_workflow_instances" => { pki_realm => "alpha", order => "workflow_last_update" });
     my $prev_val;
     my $sorting_ok = 1;
     for (@{$result}) {
-        $sorting_ok = 0 if $prev_val and ($_->{'workflow_proc_state'} cmp $prev_val) > 0;
-        $prev_val = $_->{'workflow_proc_state'};
+        $sorting_ok = 0 if $prev_val and ($_->{'workflow_last_update'} cmp $prev_val) > 0;
+        $prev_val = $_->{'workflow_last_update'};
     }
-    is $sorting_ok, 1;
+    is $sorting_ok, 1 or diag explain $result;
 } "search_workflow_instances() - result ordering by custom column";
 
 search_result

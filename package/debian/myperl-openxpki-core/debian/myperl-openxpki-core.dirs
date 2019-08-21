@@ -1,7 +1,7 @@
 var/openxpki
-var/openxpki/session 
+var/openxpki/session
 etc/openxpki
-etc/openxpki/ssl/ca-one
+etc/openxpki/ca/democa
 etc/openxpki/scep
 etc/openxpki/soap
 etc/openxpki/webui

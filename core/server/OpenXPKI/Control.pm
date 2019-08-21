@@ -49,8 +49,6 @@ use File::Temp;
 
 # CPAN modules
 use Proc::ProcessTable;
-use Log::Log4perl qw( :easy );
-Log::Log4perl->easy_init($ERROR);
 
 # Project modules
 use OpenXPKI::Debug;

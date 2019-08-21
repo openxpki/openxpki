@@ -48,7 +48,7 @@ I<REVOKED>. Default: 0
 =item * C<update> I<Bool> - do not throw an exception if certificate already
 exists, update it instead. Default: 0
 
-=item C<profile> I<Str> - set the profile for this certificate as it was
+=item * C<profile> I<Str> - set the profile for this certificate as it was
 issued by this realm. This requires that the issuer is registered as certsign
 alias in the realm and creates a "fake" entry in the CSR table. This should
 only be used to import certificates in "dummy realms" or for migration

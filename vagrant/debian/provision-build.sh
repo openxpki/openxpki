@@ -26,7 +26,7 @@ case $DEBIAN_CODENAME in
 	exit 1
 	;;
 esac
-	
+
 apt-get install --assume-yes $PACKAGES libdbd-mysql-perl
 
 if [ -e /code-repo/package/debian/build-deps-$DEBIAN_CODENAME.lst ]; then
@@ -103,8 +103,8 @@ apt-get  install --fix-broken --yes
 sleep 30;
 
 # Kick off prove
-cd /code-repo/qatest/backend/nice
-prove .
+#cd /code-repo/qatest/backend/nice
+#prove .
 
 cd /code-repo/qatest/backend/webui
 prove .

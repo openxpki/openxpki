@@ -10,6 +10,7 @@ use Pod::Usage;
 use POSIX ":sys_wait_h";
 use Errno;
 use File::Spec;
+use Log::Log4perl qw( :easy );
 
 use OpenXPKI::VERSION;
 
@@ -61,6 +62,8 @@ if (defined $params{cfg}) {
 } elsif (defined $params{instance}) {
     $args->{CONFIG} = sprintf '/etc/openxpki/%s/config.d/', $params{instance};
 }
+
+Log::Log4perl->easy_init($ERROR);
 
 my $cmd = shift;
 

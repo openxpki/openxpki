@@ -43,19 +43,19 @@ my $result;
 $result = $oxitest->api2_command("get_cert_profiles");
 cmp_deeply $result, superhashof({
     map {
-        $_ => { label => ignore(), value => ignore() }
+        $_ => { label => ignore(), value => ignore(), description => ignore() }
     }
     qw(
         tls_client
         tls_server
         user_auth_enc
     )
-}), "list profiles";
+}), "list profiles" or diag explain $result;
 
 $result = $oxitest->api2_command("get_cert_profiles" => { showall => 1 });
 cmp_deeply $result, superhashof({
     map {
-        $_ => { label => ignore(), value => ignore() }
+        $_ => { label => ignore(), value => ignore(), description => ignore() }
     }
     qw(
         tls_client
@@ -63,7 +63,7 @@ cmp_deeply $result, superhashof({
         user_auth_enc
         user_auth_enc_hidden
     )
-}), "list profiles incl. hidden ones (without any UI definition)";
+}), "list profiles incl. hidden ones (without any UI definition)" or diag explain $result;
 
 #
 # list_used_profiles

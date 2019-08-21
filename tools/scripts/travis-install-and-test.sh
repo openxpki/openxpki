@@ -11,6 +11,33 @@ if [ -z "$TRAVIS_BUILD_ID" ]; then
 fi
 
 #
+# Check out config repository
+#
+
+# get commit id of branch "develop" in official repo
+git clone --quiet --depth=1 --branch=develop https://github.com/openxpki/openxpki.git ./temp-orig-dev
+pushd ./temp-orig-dev
+COMMIT_ID_DEVELOP=$(git rev-parse HEAD)
+popd
+rm -rf ./temp-orig-dev
+
+# use config "develop" branch if code branch is based on "develop"
+echo "======================================="
+based_on_develop=0
+git merge-base --is-ancestor $COMMIT_ID_DEVELOP HEAD && based_on_develop=1
+pushd ./config >/dev/null
+if [ $based_on_develop -eq 1]; then
+    echo "Using config branch 'develop':"
+    git checkout -q develop
+else
+    echo "Using default config branch:"
+fi
+msg=$(git log -1 --pretty="%h %B")
+echo "» $msg «"
+popd >/dev/null
+echo "======================================="
+
+#
 # Compilation
 #
 cd $TRAVIS_BUILD_DIR/core/server
@@ -70,8 +97,6 @@ openxpkictl start || cat /var/log/openxpki/*
 #
 
 declare -A testmodes=(
-    ["nice"]="qatest/backend/nice/"
-    ["api"]="qatest/backend/api/"
     ["api2"]="qatest/backend/api2/"
     ["webui"]="qatest/backend/webui/"
     ["client"]="qatest/client/"

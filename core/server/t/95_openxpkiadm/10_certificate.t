@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #
-# PLEASE KEEP this test in sync with qatest/backend/api/13_import_certificate.t
+# PLEASE KEEP this test in sync with qatest/backend/api2/13_import_certificate.t
 #
 
 use strict;
@@ -32,11 +32,11 @@ my $dbdata = $oxitest->certhelper_database;
 #
 # Tests for IMPORT
 #
-cert_import_failsok($dbdata->cert("gamma-bob-1"), qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_FIND_ISSUER/);
+cert_import_failsok($dbdata->cert("gamma-bob-1"), qr/ unable .* find .* issuer /msxi);
 cert_import_ok     ($dbdata->cert("gamma-bob-1"),    '--force-no-chain');
 
 cert_import_ok     ($dbdata->cert("alpha-root-2"),      qw(--realm alpha));
-cert_import_failsok($dbdata->cert("alpha-root-2"), qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_CERTIFICATE_ALREADY_EXISTS/);
+cert_import_failsok($dbdata->cert("alpha-root-2"), qr/ certificate .* already .* exists /msxi);
 cert_import_ok     ($dbdata->cert("alpha-root-2"),      qw(--realm alpha), '--force-certificate-already-exists');
 
 cert_import_ok     ($dbdata->cert("alpha-signer-2"),    qw(--realm alpha), '--group' => 'alpha-signer', '--gen' => 2);
@@ -46,7 +46,7 @@ cert_import_ok     ($dbdata->cert("alpha-alice-2"),     qw(--realm alpha --revok
 
 cert_import_ok     ($dbdata->cert("alpha-root-1"),      qw(--realm alpha));
 # Alpha gen 1 is expired, so we expect ...UNABLE_TO_BUILD_CHAIN
-cert_import_failsok($dbdata->cert("alpha-signer-1"), qr/I18N_OPENXPKI_SERVER_API_DEFAULT_IMPORT_CERTIFICATE_UNABLE_TO_BUILD_CHAIN/);
+cert_import_failsok($dbdata->cert("alpha-signer-1"), qr/ unable .* build .* chain /msxi);
 my $issuer = $dbdata->cert("alpha-signer-1")->db->{issuer_identifier};
 cert_import_ok     ($dbdata->cert("alpha-signer-1"),    qw(--realm alpha), '--force-issuer', '--issuer', $issuer );
 cert_import_ok     ($dbdata->cert("alpha-alice-1"),     qw(--realm alpha), '--force-no-verify');

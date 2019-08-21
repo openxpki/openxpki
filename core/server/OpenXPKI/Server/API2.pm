@@ -107,7 +107,7 @@ has log => (
     is => 'rw',
     isa => 'Log::Log4perl::Logger',
     lazy => 1,
-    default => sub { OpenXPKI::Server::Log->new(CONFIG => undef)->system },
+    default => sub { OpenXPKI::Server::Log->new(CONFIG => undef)->system }, # CONFIG => undef: reuse existing Log4Perl config
 );
 
 =head2 autoloader
@@ -260,6 +260,8 @@ sub _load_plugins {
     my ($self, $pkg_map) = @_;
 
     my $cmd_package_map = {};
+
+    $self->log->info("Loading ".(scalar keys %{ $pkg_map })." API plugins");
 
     for my $pkg (keys %{ $pkg_map }) {
         my $file = $pkg_map->{$pkg};

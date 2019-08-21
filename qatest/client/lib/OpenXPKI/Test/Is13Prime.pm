@@ -12,7 +12,7 @@ sub execute {
 
     CTX('log')->system->info("Calling OpenXPKI::Crypto::Backend::API command 'is_prime'");
 
-    my $result = CTX('api')->get_default_token->command({
+    my $result = CTX('api2')->get_default_token->command({
         COMMAND => 'is_prime',
         PRIME   => substr(Math::BigInt->new(13)->as_hex, 2),
     });

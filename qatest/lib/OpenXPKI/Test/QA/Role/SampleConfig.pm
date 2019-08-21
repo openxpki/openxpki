@@ -63,8 +63,6 @@ This role add the following parameters to L<OpenXPKI::Test>s constructor:
 =item * I<start_watchdog> (optional) - Set to 1 to start the watchdog when the
 test server starts up and allow later starts via API. Default: 0
 
-=back
-
 =cut
 has start_watchdog => (
     is => 'rw',
@@ -73,25 +71,59 @@ has start_watchdog => (
     default => 0,
 );
 
+=item * I<src_config_dir> (optional) - Path to the sample configuration
+shipped with the project. Default: path is read from environment variable
+C<OXI_TEST_SAMPLECONFIG_DIR> or (if the former is not defined) set to
+I</etc/openxpki>
+
 =back
 
 =cut
 
-has src_config_dir   => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { my(undef, $mydir, undef) = fileparse(__FILE__); abs_path($mydir."../../../../../../config/config.d"); } );
-has path_temp_dir    => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/tmp" } );
-has path_export_dir  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/openxpki/dataexchange/export" } );
-has path_import_dir  => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/openxpki/dataexchange/import" } );
-has path_socket_file => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/openxpki/openxpki.socket" } );
-has path_pid_file    => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/run/openxpkid.pid" } );
-has path_stderr_file => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { shift->testenv_root."/var/log/openxpki/stderr.log" } );
+has src_config_dir   => (
+    is => 'rw', isa => 'Str', lazy => 1,
+    default => sub {
+        return $ENV{'OXI_TEST_SAMPLECONFIG_DIR'} || '/etc/openxpki'
+    }
+);
+
+has path_temp_dir    => (
+    is => 'rw', isa => 'Str', lazy => 1,
+    default => sub { shift->testenv_root."/var/tmp" },
+);
+
+has path_export_dir  => (
+    is => 'rw', isa => 'Str', lazy => 1,
+    default => sub { shift->testenv_root."/var/openxpki/dataexchange/export" },
+);
+
+has path_import_dir  => (
+    is => 'rw', isa => 'Str', lazy => 1,
+    default => sub { shift->testenv_root."/var/openxpki/dataexchange/import" },
+);
+
+has path_socket_file => (
+    is => 'rw', isa => 'Str', lazy => 1,
+    default => sub { shift->testenv_root."/var/openxpki/openxpki.socket" },
+);
+
+has path_pid_file    => (
+    is => 'rw', isa => 'Str', lazy => 1,
+    default => sub { shift->testenv_root."/var/run/openxpkid.pid" },
+);
+
+has path_stderr_file => (
+    is => 'rw', isa => 'Str', lazy => 1,
+    default => sub { shift->testenv_root."/var/log/openxpki/stderr.log" },
+);
 
 # BEFORE ... so OpenXPKI::Test->init_base_config wins with it's few base settings
 before 'init_base_config' => sub { # happens before init_user_config() so we do not overwrite more specific configs of other roles
     my $self = shift;
 
-    my(undef, $mydir, undef) = fileparse(__FILE__);
-    my $config_dir = abs_path($mydir."/../../../../../../config/config.d");
-    die "Could not find OpenXPKI sample config dir" unless -d $config_dir;
+    die "Could not find OpenXPKI sample config in " . $self->src_config_dir
+        unless -f $self->src_config_dir . '/config.d/system/server.yaml';
+    note "Using sample config in " . $self->src_config_dir;
 
     my $config = $self->config_writer;
 
@@ -126,8 +158,8 @@ sub _load_default_config {
     my @parts = split /\//, $node;
     $parts[-1] =~ s/\.yaml$//; # strip ".yaml" if it's a file
 
-    # read original sample confog
-    my $config_hash = $self->_yaml2perl($self->src_config_dir, $node);
+    # read original sample config
+    my $config_hash = $self->_yaml2perl($self->src_config_dir . '/config.d', $node);
     # descent into config hash down to $node
     for (@parts) { $config_hash = $config_hash->{$_} };
     # customize config (call supplied method)
@@ -137,7 +169,7 @@ sub _load_default_config {
     return $config_hash;
 }
 
-sub _customize_ca_one {
+sub _customize_democa {
     my ($self, $conf) = @_;
     $conf->{auth} = $self->auth_config;
 }
@@ -172,14 +204,14 @@ sub _customize_system_watchdog {
     $conf->{disabled} = $self->start_watchdog ? 0 : 1;
 }
 
-# Reads the given single YAML file or directory with YAML files an parses
+# Reads the given single YAML file or directory with YAML files and parses
 # them into a single huge configuration hash.
 # Besides the config nodes in the YAML each subdirectory and file name also
 # form one node in the hierarchy.
 sub _yaml2perl {
     my ($self, $basedir, $path) = @_;
     $path =~ s/\/*$//; # strip trailing slash
-    my $fullpath = $basedir."/".$path;
+    my $fullpath = "$basedir/$path";
     my $filemap = {};
 
     my @basedir_parts = File::Spec->splitdir($basedir);
@@ -222,6 +254,7 @@ sub _yaml2perl {
             {
                 wanted => sub { $processor->($File::Find::name) },
                 no_chdir => 1,
+                follow => 1,
             },
             $fullpath
         );

@@ -35,7 +35,7 @@ command "get_workflow_activities" => {
 } => sub {
     my ($self, $params) = @_;
 
-    CTX('log')->system()->warn('Passing the attribute *type* to get_workflow_activities is deprecated.') if ($params->has_workflow);
+    CTX('log')->system()->warn('Passing the attribute *workflow* to get_workflow_activities is deprecated.') if ($params->has_workflow);
 
     my $wf_id = $params->id;
 

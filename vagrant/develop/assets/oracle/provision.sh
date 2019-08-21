@@ -1,24 +1,14 @@
 #!/bin/bash
 # Provision a Vagrant box (VirtualBox VM) for testing and development:
 # Install Oracle XE client and set up database
-SCRIPT_DIR=/vagrant/assets/oracle
 
-#
-# Exit handler
-#
-LOG=$(mktemp)
-function _exit () {
-    if [ $1 -ne 0 -a $1 -ne 333 ]; then
-        echo "$0: ERROR - last command exited with code $1, output:" >&2 && cat $LOG >&2
-    fi
-    rm -f $LOG
-    exit $1
-}
-trap '_exit $?' EXIT
+. /vagrant/assets/functions.sh
 
 #
 # Config
 #
+SCRIPT_DIR=/vagrant/assets/oracle
+
 if ! $(grep -q OXI_TEST_DB_ORACLE_NAME /etc/environment); then
     echo "OXI_TEST_DB_ORACLE_NAME=XE"           >> /etc/environment
     echo "OXI_TEST_DB_ORACLE_USER=oxitest"      >> /etc/environment
@@ -110,7 +100,7 @@ fi
 set -e
 echo "Oracle: setting up database (user + schema)"
 
-cat <<__SQL | sqlplus64 -s system/oracle@XE                           >$LOG 2>&1
+cat <<__SQL | sqlplus64 -s system/oracle@XE >$LOG 2>&1
 DROP USER $OXI_TEST_DB_ORACLE_USER;
 CREATE USER $OXI_TEST_DB_ORACLE_USER IDENTIFIED BY "$OXI_TEST_DB_ORACLE_PASSWORD"
   DEFAULT TABLESPACE users
@@ -121,7 +111,7 @@ QUIT;
 __SQL
 
 sqlplus64 $OXI_TEST_DB_ORACLE_USER/$OXI_TEST_DB_ORACLE_PASSWORD@XE \
- @/code-repo/config/sql/schema-oracle.sql                             >$LOG 2>&1
+ @${OXI_TEST_SAMPLECONFIG_DIR}/contrib/sql/schema-oracle.sql >$LOG 2>&1
 set +e
 
 #

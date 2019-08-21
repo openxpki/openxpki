@@ -85,7 +85,7 @@ VM (i.e. "Vagrant Box").
        cd ../..
 
        cd qatest
-       PERL5LIB=./ prove -r backend/nice backend/api backend/api2 backend/webui client
+       PERL5LIB=./ prove -r backend/api2 backend/webui client
        cd ..
 
 Using a local dev environment
@@ -117,7 +117,7 @@ Please note that the tests currently use the database that is configured in ``/e
       cd ../..
 
       cd qatest
-      prove -I ../local/lib/perl5 -I ../core/server -r backend/nice backend/api backend/api2 backend/webui client
+      prove -I ../local/lib/perl5 -I ../core/server -r backend/api2 backend/webui client
       cd ..
 
 Automatically via Travis-CI

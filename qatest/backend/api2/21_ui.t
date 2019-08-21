@@ -64,14 +64,14 @@ lives_and {
     );
 
     # Go to pending
-    $wftest->state_is('CHECK_FOR_REVOCATION');
-
-    $wftest = $oxitest->create_workflow(
-        "crl_issuance" => { force_issue => 1 }
-    );
-
     $wftest->state_is('SUCCESS');
 } 'Create workflow: auto-revoke certificate' or die "Creating workflow failed";
+
+lives_ok {
+    my $wftest = $oxitest->create_workflow(
+        "crl_issuance" => { force_issue => 1 }
+    );
+} 'Issue CRL';
 
 lives_and {
     my $data = $oxitest->api2_command('get_ui_system_status');
@@ -98,7 +98,7 @@ lives_and {
 my $client = $oxitest->new_client_tester;
 $client->login("democa" => "caop");
 lives_and {
-    my $data = $client->send_command_api2_ok("list_process");
+    my $data = $client->send_command_ok("list_process");
     cmp_deeply $data, superbagof(
         {
             info => re(qr/openxpki.*main/),
@@ -124,10 +124,10 @@ lives_and {
 # get_motd
 
 lives_and {
-    $oxitest->api_command(set_data_pool_entry => {
-        NAMESPACE   => 'webui.motd',
-        KEY         => '_any',
-        VALUE       => OpenXPKI::Serialization::Simple->new->serialize('rotflbtc'),
+    $oxitest->api2_command(set_data_pool_entry => {
+        namespace   => 'webui.motd',
+        key         => '_any',
+        value       => OpenXPKI::Serialization::Simple->new->serialize('rotflbtc'),
     });
 
     my $data = $oxitest->api2_command('get_motd');

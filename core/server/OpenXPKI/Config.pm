@@ -356,11 +356,11 @@ need to set the empty string to blank an entry.
   token:
     default:
       backend: OpenXPKI::Crypto::Backend::OpenSSL
-      key: /etc/openxpki/ssl/default.pem
+      key: /etc/openxpki/ca/default.pem
 
 
     ca-signer:
       inherit: default
-      key: key: /etc/openxpki/ssl/mykey.pem
+      key: key: /etc/openxpki/ca/mykey.pem
 
 
