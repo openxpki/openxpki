@@ -602,14 +602,14 @@ lives_and {
 
 # Check custom order by TYPE
 lives_and {
-    my $result = $oxitest->api2_command("search_workflow_instances" => { pki_realm => "alpha", order => "workflow_proc_state" });
+    my $result = $oxitest->api2_command("search_workflow_instances" => { pki_realm => "alpha", order => "workflow_last_update" });
     my $prev_val;
     my $sorting_ok = 1;
     for (@{$result}) {
-        $sorting_ok = 0 if $prev_val and ($_->{'workflow_proc_state'} cmp $prev_val) > 0;
-        $prev_val = $_->{'workflow_proc_state'};
+        $sorting_ok = 0 if $prev_val and ($_->{'workflow_last_update'} cmp $prev_val) > 0;
+        $prev_val = $_->{'workflow_last_update'};
     }
-    is $sorting_ok, 1;
+    is $sorting_ok, 1 or diag explain $result;
 } "search_workflow_instances() - result ordering by custom column";
 
 search_result
