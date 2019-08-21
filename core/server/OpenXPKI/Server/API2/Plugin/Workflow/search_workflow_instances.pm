@@ -56,6 +56,10 @@ of I<HashRefs>:
         'workflow_wakeup_at' => '0'
     }
 
+The default sort order is by workflow id with the highest workflow_id as
+first element (order = >workflow_id, reverse => 1).
+If I<order> is set, I<reverse> is 0.
+
 B<Parameters>
 
 =over
@@ -81,9 +85,9 @@ Legacy: I<ArrayRef> - attribute values (legacy search syntax)
 
 =item * C<start> I<Int> - offset results by this (allows for paging)
 
-=item * C<order> I<Str> - column name to order by. Default: I<workflow_id>
+=item * C<order> I<Str> - column name to order by.
 
-=item * C<reverse> I<Bool> - set to 1 for reverse ordering (ascending). Default: descending
+=item * C<reverse> I<Bool> - 0 for ascending order, 1 for descending
 
 =item * C<return_attributes> I<ArrayRef> - add the given attributes as
 columns to the result set. Each attribute is added as extra column
@@ -102,7 +106,7 @@ command "search_workflow_instances" => {
     start      => { isa => 'Int', },
     limit      => { isa => 'Int', },
     order      => { isa => 'Str', },
-    reverse    => { isa => 'Bool', },
+    reverse    => { isa => 'Bool', default => 0 },
     check_acl  => { isa => 'Bool', default => 0 },
     return_attributes => {isa => 'ArrayRef', default => sub { [] } },
 } => sub {
@@ -387,10 +391,11 @@ sub _make_query_params {
         }
 
         # Custom ordering
-        my $desc = "-"; # not set or 0 means: DESCENDING, i.e. "-"
-        $desc = "" if $args->has_reverse and $args->reverse == 0;
-        my $order = $args->has_order ? $args->order : 'workflow_id';
-        $params->{order_by} = sprintf "%s%s", $desc, $order;
+        if (!$args->has_order || $args->order eq '') {
+            $params->{order_by} = '-workflow_id';
+        } else {
+            $params->{order_by} = sprintf "%s%s", ($args->reverse ? '-' : ''), $args->order;
+        }
     }
 
     ##! 32: 'generated parameters: ' . Dumper $params
