@@ -26,13 +26,13 @@ sub init_structure {
     if ($session->param('is_logged_in') && $user) {
         $self->_result()->{user} = $user;
         my $menu = $self->send_command_v2( 'get_menu' );
-        $self->logger()->trace('Menu ' . Dumper $menu);
+        $self->logger()->trace('Menu ' . Dumper $menu) if $self->logger->is_trace;
 
         $self->_result()->{structure} = $menu->{main};
 
         # persist the optional parts of the menu hash (landmark, tasklist, search attribs)
         $session->param('landmark', $menu->{landmark} || {});
-        $self->logger->trace('Got landmarks: ' . Dumper $menu->{landmark});
+        $self->logger->trace('Got landmarks: ' . Dumper $menu->{landmark}) if $self->logger->is_trace;
 
         # tasklist, wfsearch, certsearch and bulk can have multiple branches
         # using named keys. We try to autodetect legacy formats and map
@@ -48,7 +48,7 @@ sub init_structure {
             } else {
                 $session->param($key, { 'default' => [] });
             }
-            $self->logger->trace("Got $key: " . Dumper $menu->{$key});
+            $self->logger->trace("Got $key: " . Dumper $menu->{$key}) if $self->logger->is_trace;
         }
 
         # top level is a hash that must have a "attributes" node
@@ -63,7 +63,7 @@ sub init_structure {
             } else {
                 $session->param($key, { 'default' => {} });
             }
-            $self->logger->trace("Got $key: " . Dumper $menu->{$key});
+            $self->logger->trace("Got $key: " . Dumper $menu->{$key}) if $self->logger->is_trace;
         }
 
         # Check syntax of "certdetails".

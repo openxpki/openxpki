@@ -227,11 +227,11 @@ sub init_result {
         }
     }
 
-    $self->logger()->debug( "persisted query: " . Dumper $result);
+    $self->logger()->debug( "persisted query: " . Dumper $result) if $self->logger->is_debug;
 
     my $search_result = $self->send_command_v2( 'search_cert', $query );
 
-    $self->logger()->debug( "search result: " . Dumper $search_result);
+    $self->logger()->debug( "search result: " . Dumper $search_result) if $self->logger->is_debug;
 
     my $criteria = '<br>' . (join ", ", @{$result->{criteria}});
 
@@ -250,7 +250,7 @@ sub init_result {
 
     my @result = $self->__render_result_list( $search_result, $body );
 
-    $self->logger()->trace( "dumper result: " . Dumper @result);
+    $self->logger()->trace( "dumper result: " . Dumper @result) if $self->logger->is_trace;
 
     $self->add_section({
         type => 'grid',
@@ -331,11 +331,11 @@ sub init_export {
         }
     }
 
-    $self->logger()->trace( "persisted query: " . Dumper $result);
+    $self->logger()->trace( "persisted query: " . Dumper $result) if $self->logger->is_trace;
 
     my $search_result = $self->send_command_v2( 'search_cert', $query );
 
-    $self->logger()->trace( "search result: " . Dumper $search_result);
+    $self->logger()->trace( "search result: " . Dumper $search_result) if $self->logger->is_trace;
 
     my $header = $result->{header};
     $header = $self->__default_grid_head() if(!$header);
@@ -439,19 +439,19 @@ sub init_pager {
         $query->{reverse} = $self->param('reverse');
     }
 
-    $self->logger()->trace( "persisted query: " . Dumper $result);
-    $self->logger()->trace( "executed query: " . Dumper $query);
+    $self->logger()->trace( "persisted query: " . Dumper $result) if $self->logger->is_trace;
+    $self->logger()->trace( "executed query: " . Dumper $query) if $self->logger->is_trace;
 
     my $search_result = $self->send_command_v2( 'search_cert', $query );
 
-    $self->logger()->trace( "search result: " . Dumper $search_result);
+    $self->logger()->trace( "search result: " . Dumper $search_result) if $self->logger->is_trace;
 
     my $body = $result->{column};
     $body = $self->__default_grid_row() if(!$body);
 
     my @result = $self->__render_result_list( $search_result, $body );
 
-    $self->logger()->trace( "dumper result: " . Dumper @result);
+    $self->logger()->trace( "dumper result: " . Dumper @result) if $self->logger->is_trace;
 
     $self->_result()->{_raw} = {
         _returnType => 'partial',
@@ -486,7 +486,7 @@ sub init_mine {
         reverse => 1,
     };
 
-    $self->logger()->trace( "search query: " . Dumper $query);
+    $self->logger()->trace( "search query: " . Dumper $query) if $self->logger->is_trace;
 
     my $search_result = $self->send_command_v2( 'search_cert', { %$query, ( limit => $limit, start => $startat ) } );
 
@@ -511,7 +511,7 @@ sub init_mine {
 
     }
 
-    $self->logger()->trace( "search result: " . Dumper $search_result);
+    $self->logger()->trace( "search result: " . Dumper $search_result) if $self->logger->is_trace;
 
     $self->_page({
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_MINE_LABEL',
@@ -520,7 +520,7 @@ sub init_mine {
 
     my @result = $self->__render_result_list( $search_result, $self->__default_grid_row() );
 
-    $self->logger()->trace( "dumper result: " . Dumper @result);
+    $self->logger()->trace( "dumper result: " . Dumper @result) if $self->logger->is_trace;
 
     $self->add_section({
         type => 'grid',
@@ -587,10 +587,10 @@ sub init_detail {
         return;
     }
 
-    $self->logger()->trace("result: " . Dumper $cert);
+    $self->logger()->trace("result: " . Dumper $cert) if $self->logger->is_trace;
 
     my $cert_attribute = $cert->{cert_attribute};
-    $self->logger()->trace("result: " . Dumper $cert_attribute);
+    $self->logger()->trace("result: " . Dumper $cert_attribute) if $self->logger->is_trace;
 
     my %dn = OpenXPKI::DN->new( $cert->{subject} )->get_hashed_content();
 
@@ -681,7 +681,7 @@ sub init_detail {
         my @actions;
         my $reply = $self->send_command_v2 ( "get_cert_actions", { identifier => $cert_identifier });
 
-        $self->logger()->trace("available actions for cert " . Dumper $reply);
+        $self->logger()->trace("available actions for cert " . Dumper $reply) if $self->logger->is_trace;
 
         if (defined $reply->{workflow} && ref $reply->{workflow} eq 'ARRAY') {
             foreach my $item (@{$reply->{workflow}}) {
@@ -733,7 +733,7 @@ sub init_text {
 
     my $pem = $self->send_command_v2 ( "get_cert", {'identifier' => $cert_identifier, 'format' => $format });
 
-    $self->logger()->trace("Cert data: " . Dumper $pem);
+    $self->logger()->trace("Cert data: " . Dumper $pem) if $self->logger->is_trace;
 
     $self->_page({
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL',
@@ -822,7 +822,7 @@ sub init_related {
     my $cert_identifier = $self->param('identifier');
 
     my $cert = $self->send_command_v2( 'get_cert', {  identifier => $cert_identifier, format => 'DBINFO', attribute => 'system_workflow%' });
-    $self->logger()->trace("result: " . Dumper $cert);
+    $self->logger()->trace("result: " . Dumper $cert) if $self->logger->is_trace;
 
     my %dn = OpenXPKI::DN->new( $cert->{subject} )->get_hashed_content();
 
@@ -834,7 +834,7 @@ sub init_related {
     # run a workflow search using the given ids from the cert attributes
     my @wfid = values %{$cert->{cert_attributes}};
 
-    $self->logger()->trace("related workflows " . Dumper \@wfid) if($self->logger()->is_trace());
+    $self->logger()->trace("related workflows " . Dumper \@wfid) if $self->logger->is_trace;
 
     my @result;
     if (scalar @wfid) {
@@ -905,7 +905,7 @@ sub init_download {
         return;
     }
 
-    $self->logger()->trace("cert info " . Dumper $cert_info );
+    $self->logger()->trace("cert info " . Dumper $cert_info ) if $self->logger->is_trace;
     my %dn = OpenXPKI::DN->new( $cert_info->{subject} )->get_hashed_content();
     my $filename = $dn{CN}[0] || $dn{emailAddress}[0] || $cert_info->{identifier};
 
@@ -923,7 +923,7 @@ sub init_download {
     } elsif ($format eq 'bundle') {
 
         my $chain = $self->send_command_v2 ( "get_chain", { start_with => $cert_identifier, format => 'PEM', 'keeproot' => 1 });
-        $self->logger()->trace("chain info " . Dumper $chain );
+        $self->logger()->trace("chain info " . Dumper $chain ) if $self->logger->is_trace;
 
         for (my $i=0;$i<@{$chain->{certificates}};$i++) {
             $output .= $chain->{subject}->[$i]. "\n". $chain->{certificates}->[$i]."\n\n";
@@ -1014,7 +1014,7 @@ sub action_autocomplete {
 
     my $term = $self->param('query') || '';
 
-    $self->logger()->trace( "autocomplete term: " . Dumper $term);
+    $self->logger()->trace( "autocomplete term: " . Dumper $term) if $self->logger->is_trace;
 
     my @result;
     # If we see a string with length of 25 to 27 with only base64 chars
@@ -1047,7 +1047,7 @@ sub action_autocomplete {
             entity_only => 1
         });
 
-        $self->logger()->trace( "search result: " . Dumper $search_result);
+        $self->logger()->trace( "search result: " . Dumper $search_result) if $self->logger->is_trace;
 
         foreach my $item (@{$search_result}) {
             push @result, {
@@ -1059,7 +1059,7 @@ sub action_autocomplete {
         }
     }
 
-    $self->logger()->trace( "search result: " . Dumper \@result);
+    $self->logger()->trace( "search result: " . Dumper \@result) if $self->logger->is_trace;
 
     $self->_result()->{_raw} = \@result;
 
@@ -1150,7 +1150,7 @@ sub action_search {
     my $args = shift;
 
 
-    $self->logger()->trace("input params: " . Dumper $self->cgi()->param());
+    $self->logger()->trace("input params: " . Dumper $self->cgi()->param()) if $self->logger->is_trace;
 
     my $query = { entity_only => 1 };
     my $input = {}; # store the input data the reopen the form later
@@ -1242,7 +1242,7 @@ sub action_search {
         $query->{cert_attributes} = $attr;
     }
 
-    $self->logger()->debug("query : " . Dumper $query);
+    $self->logger()->debug("query : " . Dumper $query) if $self->logger->is_debug;
 
 
     my $result_count = $self->send_command_v2( 'search_cert_count', $query  );

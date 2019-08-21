@@ -127,7 +127,7 @@ sub init_start {
         return $self;
     }
 
-    $self->logger()->trace("wf info on create: " . Dumper $wf_info );
+    $self->logger()->trace("wf info on create: " . Dumper $wf_info ) if $self->logger->is_trace;
 
     $self->logger()->info(sprintf "Create new workflow %s, got id %01d",  $wf_info->{workflow}->{type}, $wf_info->{workflow}->{id} );
 
@@ -297,7 +297,7 @@ sub init_search {
     my $workflows = $self->send_command_v2( 'get_workflow_instance_types' );
     return $self unless(defined $workflows);
 
-    $self->logger()->trace('Workflows ' . Dumper $workflows);
+    $self->logger()->trace('Workflows ' . Dumper $workflows) if $self->logger->is_trace;
 
     my $preset = {};
     if ($args->{preset}) {
@@ -308,7 +308,7 @@ sub init_search {
         $preset = $result->{input};
     }
 
-    $self->logger()->trace('Preset ' . Dumper $preset);
+    $self->logger()->trace('Preset ' . Dumper $preset) if $self->logger->is_trace;
 
     # TODO Sorting / I18
     my @wf_names = keys %{$workflows};
@@ -443,11 +443,11 @@ sub init_result {
         }
     }
 
-    $self->logger()->trace( "persisted query: " . Dumper $result);
+    $self->logger()->trace( "persisted query: " . Dumper $result) if $self->logger->is_trace;
 
     my $search_result = $self->send_command_v2( 'search_workflow_instances', $query );
 
-    $self->logger()->trace( "search result: " . Dumper $search_result);
+    $self->logger()->trace( "search result: " . Dumper $search_result) if $self->logger->is_trace;
 
     # Add page header from result - optional
     if ($result->{page} && ref $result->{page} ne 'HASH') {
@@ -469,7 +469,7 @@ sub init_result {
 
     my @lines = $self->__render_result_list( $search_result, $body );
 
-    $self->logger()->trace( "dumper result: " . Dumper \@lines);
+    $self->logger()->trace( "dumper result: " . Dumper \@lines) if $self->logger->is_trace;
 
     my $header = $result->{header};
     $header = $self->__default_grid_head() if(!$header);
@@ -562,12 +562,12 @@ sub init_pager {
         $query->{reverse} = $self->param('reverse');
     }
 
-    $self->logger()->trace( "persisted query: " . Dumper $result);
-    $self->logger()->trace( "executed query: " . Dumper $query);
+    $self->logger()->trace( "persisted query: " . Dumper $result) if $self->logger->is_trace;
+    $self->logger()->trace( "executed query: " . Dumper $query) if $self->logger->is_trace;
 
     my $search_result = $self->send_command_v2( 'search_workflow_instances', $query );
 
-    $self->logger()->trace( "search result: " . Dumper $search_result);
+    $self->logger()->trace( "search result: " . Dumper $search_result) if $self->logger->is_trace;
 
 
     my $body = $result->{column};
@@ -575,7 +575,7 @@ sub init_pager {
 
     my @result = $self->__render_result_list( $search_result, $body );
 
-    $self->logger()->trace( "dumper result: " . Dumper @result);
+    $self->logger()->trace( "dumper result: " . Dumper @result) if $self->logger->is_trace;
 
     $self->_result()->{_raw} = {
         _returnType => 'partial',
@@ -605,7 +605,7 @@ sub init_history {
 
     my $workflow_history = $self->send_command_v2( 'get_workflow_history', { id => $id } );
 
-    $self->logger()->trace( "dumper result: " . Dumper $workflow_history);
+    $self->logger()->trace( "dumper result: " . Dumper $workflow_history) if $self->logger->is_trace;
 
     my $i = 1;
     my @result;
@@ -620,7 +620,7 @@ sub init_history {
         ]
     }
 
-    $self->logger()->trace( "dumper result: " . Dumper $workflow_history);
+    $self->logger()->trace( "dumper result: " . Dumper $workflow_history) if $self->logger->is_trace;
 
     $self->add_section({
         type => 'grid',
@@ -679,7 +679,7 @@ sub init_mine {
         $result_count = $self->send_command_v2( 'search_workflow_instances_count', \%count_query );
     }
 
-    $self->logger()->trace( "search result: " . Dumper $search_result);
+    $self->logger()->trace( "search result: " . Dumper $search_result) if $self->logger->is_trace;
 
     $self->_page({
         label => 'I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE',
@@ -705,7 +705,7 @@ sub init_mine {
 
     my @result = $self->__render_result_list( $search_result, \@column );
 
-    $self->logger()->trace( "dumper result: " . Dumper @result);
+    $self->logger()->trace( "dumper result: " . Dumper @result) if $self->logger->is_trace;
 
     $self->add_section({
         type => 'grid',
@@ -750,7 +750,7 @@ sub init_task {
         return $self->redirect('home');
     }
 
-    $self->logger()->trace( "got tasklist: " . Dumper $tasklist);
+    $self->logger()->trace( "got tasklist: " . Dumper $tasklist) if $self->logger->is_trace;
 
     TASKLIST:
     foreach my $item (@$tasklist) {
@@ -794,7 +794,7 @@ sub init_task {
             $query->{return_attributes} = $rattrib;
         }
 
-        $self->logger()->trace( "columns : " . Dumper $column);
+        $self->logger()->trace( "columns : " . Dumper $column) if $self->logger->is_trace;
 
         my $search_result = $self->send_command_v2( 'search_workflow_instances', { (limit => $limit), %$query } );
 
@@ -814,7 +814,7 @@ sub init_task {
 
             @data = $self->__render_result_list( $search_result, $column );
 
-            $self->logger()->trace( "dumper result: " . Dumper @data);
+            $self->logger()->trace( "dumper result: " . Dumper @data) if $self->logger->is_trace;
 
             if ($limit == scalar @$search_result) {
                 my %count_query = %{$query};
@@ -882,7 +882,7 @@ sub init_log {
     my $result = $self->send_command_v2( 'get_workflow_log', { id => $wf_id } );
     $result = [] unless($result);
 
-    $self->logger()->trace( "dumper result: " . Dumper $result);
+    $self->logger()->trace( "dumper result: " . Dumper $result) if $self->logger->is_trace;
 
     $self->add_section({
         type => 'grid',
@@ -966,7 +966,7 @@ sub action_index {
 
     my $wf_args = $self->__fetch_wf_token( $wf_token );
 
-    $self->logger()->trace( "wf args: " . Dumper $wf_args);
+    $self->logger()->trace( "wf args: " . Dumper $wf_args) if $self->logger->is_trace;
 
     # check for delegation
     if ($wf_args->{wf_handler}) {
@@ -979,7 +979,7 @@ sub action_index {
         my @fields = map { $_->{name} } @{$wf_args->{wf_fields}};
         my $fields = $self->param( \@fields );
         %wf_param = %{ $fields } if ($fields);
-        $self->logger()->trace( "wf fields: " . Dumper $fields );
+        $self->logger()->trace( "wf fields: " . Dumper $fields ) if $self->logger->is_trace;
     }
 
     # take over params from token, if any
@@ -992,7 +992,7 @@ sub action_index {
         $wf_param{$key} = $self->serializer()->serialize($wf_param{$key}) if (ref $wf_param{$key});
     }
 
-    $self->logger()->trace( "wf params: " . Dumper \%wf_param );
+    $self->logger()->trace( "wf params: " . Dumper \%wf_param ) if $self->logger->is_trace;
 
     if ($wf_args->{wf_id}) {
 
@@ -1023,7 +1023,7 @@ sub action_index {
             return $self;
         }
 
-        $self->logger()->trace("wf info after execute: " . Dumper $wf_info );
+        $self->logger()->trace("wf info after execute: " . Dumper $wf_info ) if $self->logger->is_trace;
         # purge the workflow token
         $self->__purge_wf_token( $wf_token );
 
@@ -1045,7 +1045,7 @@ sub action_index {
             $self->init_index();
             return $self;
         }
-        $self->logger()->trace("wf info on create: " . Dumper $wf_info );
+        $self->logger()->trace("wf info on create: " . Dumper $wf_info ) if $self->logger->is_trace;
 
         $self->logger()->info(sprintf "Create new workflow %s, got id %01d",  $wf_args->{wf_type}, $wf_info->{workflow}->{id} );
 
@@ -1200,7 +1200,7 @@ sub action_select {
     my $wf_info = $self->send_command_v2( 'get_workflow_info', {
         id => $wf_id
     });
-    $self->logger()->trace('wf_info ' . Dumper  $wf_info);
+    $self->logger()->trace('wf_info ' . Dumper  $wf_info) if $self->logger->is_trace;
 
     if (!$wf_info) {
         $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error');
@@ -1210,7 +1210,7 @@ sub action_select {
     # If the activity has no fields and no ui class we proceed immediately
     # FIXME - really a good idea - intentional stop items without fields?
     my $wf_action_info = $wf_info->{activity}->{$wf_action};
-    $self->logger()->trace('wf_action_info ' . Dumper  $wf_action_info);
+    $self->logger()->trace('wf_action_info ' . Dumper  $wf_action_info) if $self->logger->is_trace;
     if ((!$wf_action_info->{field} || (scalar @{$wf_action_info->{field}}) == 0) &&
         !$wf_action_info->{uihandle}) {
 
@@ -1300,7 +1300,7 @@ sub action_search {
 
     $query->{return_attributes} = $rattrib if ($rattrib);
 
-    $self->logger()->trace("query : " . Dumper $query);
+    $self->logger()->trace("query : " . Dumper $query) if $self->logger->is_trace;
 
     my $result_count = $self->send_command_v2( 'search_workflow_instances_count', $query );
 
@@ -1378,7 +1378,7 @@ sub action_bulk {
             $errors->{$id} = $self->_status()->{message} || 'I18N_OPENXPKI_UI_APPLICATION_ERROR';
         } else {
             push @success, $wf_info;
-            $self->logger()->trace('Result on '.$id.': '. Dumper $wf_info);
+            $self->logger()->trace('Result on '.$id.': '. Dumper $wf_info) if $self->logger->is_trace;
         }
 
     }
@@ -1405,7 +1405,7 @@ sub action_bulk {
             $_->[ $pos_state ] = $errors->{$serial};
         } @result_failed;
 
-        $self->logger()->trace('Mangled failed result: '. Dumper \@result_failed);
+        $self->logger()->trace('Mangled failed result: '. Dumper \@result_failed) if $self->logger->is_trace;
 
         my @fault_head = @{$self->__default_grid_head};
         $fault_head[$pos_state] = { sTitle => 'Error' };
@@ -1526,7 +1526,7 @@ sub __render_from_workflow {
     my $self = shift;
     my $args = shift;
 
-    $self->logger()->trace( "render args: " . Dumper $args);
+    $self->logger()->trace( "render args: " . Dumper $args) if $self->logger->is_trace;
 
     my $wf_info = $args->{wf_info} || undef;
     my $view = $args->{view} || '';
@@ -1538,7 +1538,7 @@ sub __render_from_workflow {
         $args->{wf_info} = $wf_info;
     }
 
-    $self->logger()->trace( "wf_info: " . Dumper $wf_info);
+    $self->logger()->trace( "wf_info: " . Dumper $wf_info) if $self->logger->is_trace;
     if (!$wf_info) {
         $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error');
         return $self;
@@ -1788,7 +1788,7 @@ sub __render_from_workflow {
             return $self->__delegate_call($wf_action_info->{uihandle}, $args, $wf_action);
         }
 
-        $self->logger()->trace('activity info ' . Dumper $wf_action_info );
+        $self->logger()->trace('activity info ' . Dumper $wf_action_info ) if $self->logger->is_trace;
 
         # we allow prefill of the form if the workflow is started
         my $do_prefill = $wf_info->{workflow}->{state} eq 'INITIAL';
@@ -1887,7 +1887,7 @@ sub __render_from_workflow {
 
         my $fields = $self->__render_fields( $wf_info, $view );
 
-        $self->logger()->trace('Field data ' . Dumper $fields);
+        $self->logger()->trace('Field data ' . Dumper $fields) if $self->logger->is_trace;
 
         # Add action buttons
         my $buttons = $self->__get_action_buttons( $wf_info ) ;
@@ -2100,7 +2100,7 @@ sub __get_action_buttons {
 
     }
 
-    $self->logger()->trace('Buttons are ' . Dumper \@buttons);
+    $self->logger()->trace('Buttons are ' . Dumper \@buttons) if $self->logger->is_trace;
 
     return \@buttons;
 }
@@ -2272,7 +2272,7 @@ sub __render_result_list {
     my $search_result = shift;
     my $colums = shift;
 
-    $self->logger()->trace("search result " . Dumper $search_result);
+    $self->logger()->trace("search result " . Dumper $search_result) if $self->logger->is_trace;
 
     my @result;
 
@@ -2305,7 +2305,7 @@ sub __render_result_list {
             # we need to load the wf info
             if (!$wf_info && ($col->{template} || $col->{source} eq 'context')) {
                 $wf_info = $self->send_command_v2( 'get_workflow_data', { id => $wf_item->{'workflow_id'}  });
-                $self->logger()->trace( "fetch wf info : " . Dumper $wf_info);
+                $self->logger()->trace( "fetch wf info : " . Dumper $wf_info) if $self->logger->is_trace;
                 $context = $wf_info->{workflow}->{context};
                 $attrib = $wf_info->{workflow}->{attribute};
             }
@@ -2452,7 +2452,7 @@ sub __render_fields {
         }
     } elsif ($output) {
         @fields_to_render = @{$wf_info->{state}->{output}};
-        $self->logger()->trace('Render output rules: ' . Dumper  \@fields_to_render  );
+        $self->logger()->trace('Render output rules: ' . Dumper  \@fields_to_render  ) if $self->logger->is_trace;
 
     } else {
         foreach my $field (sort keys %{$context}) {
@@ -2460,7 +2460,7 @@ sub __render_fields {
             next if ($field =~ m{ \A (wf_|_|workflow_id|sources) }x);
             push @fields_to_render, { name => $field };
         }
-        $self->logger()->trace('No output rules, render plain context: ' . Dumper  \@fields_to_render  );
+        $self->logger()->trace('No output rules, render plain context: ' . Dumper  \@fields_to_render  ) if $self->logger->is_trace;
     }
 
     FIELD:
@@ -2544,7 +2544,7 @@ sub __render_fields {
                 };
             }
 
-            $self->logger()->trace( 'item ' . Dumper $item);
+            $self->logger()->trace( 'item ' . Dumper $item) if $self->logger->is_trace;
 
         # open another workflow - performs ACL check
         } elsif ($item->{format} eq "workflow_id") {
@@ -2565,7 +2565,7 @@ sub __render_fields {
                 $item->{format} = '';
             }
 
-            $self->logger()->trace( 'item ' . Dumper $item);
+            $self->logger()->trace( 'item ' . Dumper $item) if $self->logger->is_trace;
 
         # add a redirect command to the page
         } elsif ($item->{format} eq "redirect") {
@@ -2640,7 +2640,7 @@ sub __render_fields {
 
                 my $fields = $self->send_command_v2( 'get_field_definition',
                     { profile => $cert_profile, style => $cert_subject_style, 'section' =>  'info' });
-                $self->logger()->trace( 'Profile fields' . Dumper $fields );
+                $self->logger()->trace( 'Profile fields' . Dumper $fields ) if $self->logger->is_trace;
 
                 foreach my $field (@$fields) {
                     # this still uses "old" syntax - adjust after API refactoring
@@ -2727,7 +2727,7 @@ sub __render_fields {
 
             my $param = { value => $item->{value} };
 
-            $self->logger()->trace('Render output using template on field '.$key.', '. $field->{template} . ', params:  ' . Dumper $param);
+            $self->logger()->trace('Render output using template on field '.$key.', '. $field->{template} . ', params:  ' . Dumper $param) if $self->logger->is_trace;
 
             # Rendering target depends on value format
             # deflist iterates over each key/label pair and sets the return value into the label
@@ -2745,7 +2745,7 @@ sub __render_fields {
                 $self->logger()->debug('Return from template ' . $out );
                 if ($out) {
                     my @val = split /\s*\|\s*/, $out;
-                    $self->logger()->trace('Split ' . Dumper \@val);
+                    $self->logger()->trace('Split ' . Dumper \@val) if $self->logger->is_trace;
                     $item->{value} = \@val;
                 } else {
                     $item->{value} = undef; # prevent pusing emtpy lists
@@ -2806,7 +2806,7 @@ sub __check_for_validation_error {
         my @fields = (ref $field_errors eq 'ARRAY') ? map { $_->{name} } @$field_errors : ();
         $self->_status({ level => 'error', message => $validator_msg, field_errors => $field_errors });
         $self->logger()->error("Input validation error on fields ". join ",", @fields);
-        $self->logger()->trace('validation details' . Dumper $field_errors );
+        $self->logger()->trace('validation details' . Dumper $field_errors ) if $self->logger->is_trace;
         return $field_errors;
     }
     return;

@@ -130,7 +130,7 @@ sub mock_request {
     my $ssl_opts = $self->ssl_opts;
     if ($ssl_opts) {
         $ua->ssl_opts( %{$ssl_opts} );
-        $self->logger()->trace( 'Adding SSL Opts ' . Dumper $ssl_opts );
+        $self->logger()->trace( 'Adding SSL Opts ' . Dumper $ssl_opts ) if $self->logger->is_trace;
     }
 
     $ua->default_header( 'Accept'       => 'application/json' );
@@ -148,7 +148,7 @@ sub mock_request {
             $data->{_rtoken} = $self->rtoken();
         }
 
-        $self->logger()->is_trace() && $self->logger()->trace( Dumper $data );
+        $self->logger()->trace( Dumper $data ) if $self->logger->is_trace;
 
         $ua->default_header( 'content-type' => 'application/x-www-form-urlencoded');
         $res = $ua->post($server_endpoint, $data);
@@ -189,7 +189,7 @@ sub get_field_from_result {
 
     my @data = @{$self->last_result()->{main}->[0]->{content}->{data}};
     while (my $line = shift @data ) {
-        $self->logger()->trace( Dumper $line );
+        $self->logger()->trace( Dumper $line ) if $self->logger->is_trace;
         return $line->{value} if ($line->{label} eq $field);
     }
     $self->logger()->debug( 'No result for field ' . $field );

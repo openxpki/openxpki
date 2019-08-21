@@ -30,7 +30,7 @@ sub init_index {
     my $empty = 1;
     foreach my $issuer (@$issuers) {
 
-        $self->logger()->trace("Issuer: " . Dumper $issuer);
+        $self->logger()->trace("Issuer: " . Dumper $issuer) if $self->logger->is_trace;
 
         my $crl_list = $self->send_command_v2( 'get_crl_list' , {
             format => 'DBINFO',
@@ -40,7 +40,7 @@ sub init_index {
         });
 
         my $crl_hash = $crl_list->[0];
-        $self->logger()->trace("result: " . Dumper $crl_list);
+        $self->logger()->trace("result: " . Dumper $crl_list) if $self->logger->is_trace;
 
         if (!@$crl_list) {
 
@@ -94,7 +94,7 @@ sub init_list {
         identifier => $self->param('issuer')
     });
 
-    $self->logger()->trace("result: " . Dumper $crl_list);
+    $self->logger()->trace("result: " . Dumper $crl_list) if $self->logger->is_trace;
 
     $self->_page({
         label => 'I18N_OPENXPKI_UI_CRL_LIST_FOR_ISSUER ',
@@ -152,7 +152,7 @@ sub init_detail {
         format => 'DBINFO',
         crl_serial => $crl_key,
     });
-    $self->logger()->trace("result: " . Dumper $crl_hash);
+    $self->logger()->trace("result: " . Dumper $crl_hash) if $self->logger->is_trace;
 
     $self->_page({
         label => 'I18N_OPENXPKI_UI_CRL_LIST_VIEW_DETAIL #' . $crl_hash->{crl_number},

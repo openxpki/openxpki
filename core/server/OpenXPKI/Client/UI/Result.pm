@@ -176,12 +176,12 @@ sub send_command {
     );
     $self->_last_reply( $reply );
 
-    $self->logger()->trace('send command raw reply: '. Dumper $reply);
+    $self->logger()->trace('send command raw reply: '. Dumper $reply) if $self->logger()->is_trace;
 
     if ( $reply->{SERVICE_MSG} ne 'COMMAND' ) {
         if (!$nostatus) {
             $self->logger()->error("command $command failed ($reply->{SERVICE_MSG})");
-            $self->logger()->trace("command reply ". Dumper $reply);
+            $self->logger()->trace("command reply ". Dumper $reply) if $self->logger()->is_trace;
             $self->set_status_from_error_reply( $reply );
         }
         return undef;
@@ -210,12 +210,12 @@ sub send_command_v2 {
     );
     $self->_last_reply( $reply );
 
-    $self->logger()->trace('send command raw reply: '. Dumper $reply);
+    $self->logger()->trace('send command raw reply: '. Dumper $reply) if $self->logger->is_trace;
 
     if ( $reply->{SERVICE_MSG} ne 'COMMAND' ) {
         if (!$nostatus) {
             $self->logger()->error("command $command failed ($reply->{SERVICE_MSG})");
-            $self->logger()->trace("command reply ". Dumper $reply);
+            $self->logger()->trace("command reply ". Dumper $reply) if $self->logger()->is_trace;
             $self->set_status_from_error_reply( $reply );
         }
         return undef;
@@ -253,7 +253,7 @@ sub set_status_from_error_reply {
         }
 
     } else {
-        $self->logger()->trace(Dumper $reply);
+        $self->logger()->trace(Dumper $reply) if $self->logger()->is_trace;
     }
     $self->_status({ level => 'error', message => $message });
 
@@ -350,7 +350,7 @@ sub param {
     } else {
         $result = $self->extra();
         @keys = $cgi->param if ($cgi);
-        $self->logger()->trace('Param request for full set - cgi keys ' . Dumper \@keys );
+        $self->logger()->trace('Param request for full set - cgi keys ' . Dumper \@keys ) if $self->logger()->is_trace;
     }
 
     if (!(@keys && $cgi)) {
@@ -510,7 +510,7 @@ sub init_fetch {
         return $self;
     }
 
-    $self->logger()->trace('Got response ' . Dumper $data);
+    $self->logger()->trace('Got response ' . Dumper $data) if $self->logger()->is_trace;
 
     # support multi-valued responses (persisted as array ref)
     if (ref $data eq 'ARRAY') {
@@ -616,7 +616,7 @@ sub __register_wf_token {
 
     my $id = $self->__generate_uid();
     $self->logger()->debug('wf token id ' . $id);
-    $self->logger()->trace('token info ' . Dumper  $token);
+    $self->logger()->trace('token info ' . Dumper  $token) if $self->logger()->is_trace;
     $self->_client->session()->param($id, $token);
     return { name => 'wf_token', type => 'hidden', value => $id };
 }
@@ -793,7 +793,7 @@ sub __render_pager {
         $args->{pagersize} = 20;
     }
 
-    $self->logger()->trace('pager query' . Dumper $args);
+    $self->logger()->trace('pager query' . Dumper $args) if $self->logger()->is_trace;
 
     return {
         startat => $startat,
@@ -897,7 +897,7 @@ sub __build_attribute_subquery {
         }
     }
 
-    $self->logger()->trace('Attribute subquery ' . Dumper $attr);
+    $self->logger()->trace('Attribute subquery ' . Dumper $attr) if $self->logger()->is_trace;
 
     return $attr;
 

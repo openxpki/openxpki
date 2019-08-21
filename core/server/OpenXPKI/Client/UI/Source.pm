@@ -99,7 +99,7 @@ sub _init_path {
 
     my $config = $self->_client()->_config();
 
-    $self->logger()->trace('Got config ' . Dumper $config);
+    $self->logger()->trace('Got config ' . Dumper $config) if $self->logger->is_trace;
 
     if ($config->{staticdir}) {
         if (! -d $config->{staticdir}) {

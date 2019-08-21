@@ -133,7 +133,7 @@ sub action_unlock {
         { secret => $secret, value => $phrase });
 
    $self->logger()->info('Secret was send');
-   $self->logger()->trace('Return ' . Dumper $msg);
+   $self->logger()->trace('Return ' . Dumper $msg) if $self->logger->is_trace;
 
     if ($msg) {
         $self->set_status('I18N_OPENXPKI_UI_SECRET_STATUS_ACCEPTED','success');

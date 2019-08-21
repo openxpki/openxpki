@@ -426,7 +426,7 @@ sub __process_action {
     my $param = $conn->get_hash([ @path, 'param' ] );
     map {  $action->{$_} = $param->{$_} } keys %{$param};
 
-    $self->logger()->trace("Adding action " . (Dumper $action));
+    $self->logger()->trace("Adding action " . (Dumper $action)) if $self->logger->is_trace;
 
 
     push @{$self->_workflow_config()->{action}}, $action;
@@ -483,7 +483,7 @@ sub __process_condition {
         $condition->{param} = \@param;
     }
 
-    $self->logger()->trace("Adding condition " . (Dumper $condition));
+    $self->logger()->trace("Adding condition " . (Dumper $condition)) if $self->logger->is_trace;
 
 
     push @{$self->_workflow_config()->{condition}}, $condition;
@@ -541,7 +541,7 @@ sub __process_validator {
         $validator->{param} = \@param;
     }
 
-    $self->logger()->trace("Adding validator " . (Dumper $validator));
+    $self->logger()->trace("Adding validator " . (Dumper $validator)) if $self->logger->is_trace;
 
 
     push @{$self->_workflow_config()->{validator}}, $validator;
