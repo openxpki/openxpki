@@ -809,7 +809,7 @@ sub init_related {
     # run a workflow search using the given ids from the cert attributes
     my @wfid = values %{$cert->{cert_attributes}};
 
-    $self->logger()->trace("related workflows " . Dumper \@wfid) if($self->logger()->is_trace()) if $self->logger->is_trace;
+    $self->logger()->trace("related workflows " . Dumper \@wfid) if $self->logger->is_trace;
 
     my @result;
     if (scalar @wfid) {

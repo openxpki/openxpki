@@ -148,7 +148,7 @@ sub mock_request {
             $data->{_rtoken} = $self->rtoken();
         }
 
-        $self->logger()->is_trace() && $self->logger()->trace( Dumper $data ) if $self->logger->is_trace;
+        $self->logger()->trace( Dumper $data ) if $self->logger->is_trace;
 
         $ua->default_header( 'content-type' => 'application/x-www-form-urlencoded');
         $res = $ua->post($server_endpoint, $data);
