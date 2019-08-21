@@ -36,6 +36,7 @@ openxpki.xsd
 ## Client
 OpenXPKI/Client.pm
 OpenXPKI/Client/Config.pm
+OpenXPKI/Client/RPC.pm
 OpenXPKI/Client/SCEP.pm
 OpenXPKI/Client/Simple.pm
 

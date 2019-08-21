@@ -13,6 +13,7 @@ use MIME::Base64;
 use OpenXPKI::Exception;
 use OpenXPKI::Client::Simple;
 use OpenXPKI::Client::Config;
+use OpenXPKI::Client::RPC;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::i18n qw( i18nGettext );
 
@@ -57,161 +58,76 @@ sub send_output {
         # prepare response header
         print $cgi->header( -type => 'application/json', charset => 'utf8', -status => $status );
         $json->max_depth(20);
-        $json->canonical(1) if $canonical_keys;
+        $json->canonical( $canonical_keys ? 1 : 0 );
         print $json->encode( $result );
     }
 
 }
 
-sub _create_client {
-    my ($cgi, $conf) = @_;
-
-    my $client = OpenXPKI::Client::Simple->new({
-        logger => $log,
-        config => $conf->{global}, # realm and locale
-        auth => $conf->{auth}, # auth config
-    });
-
-    if ( !$client ) {
-        # TODO: Return as "500 Internal Server Error"?
-        $log->error("Could not instantiate client object");
-        send_output( $cgi,  { error => {
-            code => 50001,
-            message=> "Could not instantiate client object",
-            data => { pid => $$ }
-        }});
-        return;
-    }
-
-    return $client;
-}
-
-sub _openapi_spec {
-    my ($cgi, $conf) = @_;
-
-    my $openapi_server_url = sprintf "%s://%s:%s%s", ($cgi->https ? 'https' : 'http'), $cgi->virtual_host, $cgi->virtual_port, $cgi->request_uri;
-
-    my $openapi_spec = {
-        openapi => "3.0.0",
-        info => { title => "OpenXPKI RPC API", version => "0.0.1", description => "Run a defined set of OpenXPKI workflows" },
-        servers => [ { url => $openapi_server_url, description => "OpenXPKI server" } ],
-        components => {
-            schemas => {
-                Error => {
-                    type => 'object',
-                    properties => {
-                        'error' => {
-                            type => 'object',
-                            description => 'Only set if an error occured while executing the command',
-                            required => [qw( code message data )],
-                            properties => {
-                                'code' => { type => 'integer', },
-                                'message' => { type => 'string', },
-                                'data' => {
-                                    type => 'object',
-                                    properties => {
-                                        'pid' => { type => 'integer', },
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-        },
-    };
-
-    my $paths;
-    eval {
-        my $client = _create_client($cgi, $conf) or die "Could not create OpenXPKI client";
-
-        for my $method (sort keys %$conf) {
-            next unless ($conf->{$method}->{workflow});
-            my $in = $conf->{$method}->{param} || '';
-            my $out = $conf->{$method}->{output} || '';
-            my $method_spec = $client->run_command('get_rpc_openapi_spec', {
-                workflow => $conf->{$method}->{workflow},
-                input => [ split /\s*,\s*/, $in ],
-                output => [ split /\s*,\s*/, $out ]
-            });
-
-            $paths->{"/$method"} = {
-                post => {
-                    description => $method_spec->{description},
-                    requestBody => {
-                        required => JSON::true,
-                        content => {
-                            'application/json' => {
-                                schema => $method_spec->{input_schema},
-                            },
-                        },
-                    },
-                    responses => {
-                        '200' => {
-                            description => "JSON object with details either about the command result or the error",
-                            content => {
-                                'application/json' => {
-                                    schema => {
-                                        oneOf => [
-                                            {
-                                                type => 'object',
-                                                properties => {
-                                                    'result' => {
-                                                        type => 'object',
-                                                        description => 'Only set if command was successfully executed',
-                                                        required => [qw( data state pid id )],
-                                                        properties => {
-                                                            'data' => $method_spec->{output_schema},
-                                                            'state' => { type => 'string' },
-                                                            'proc_state' => { type => 'string' },
-                                                            'pid' => { type => 'integer', },
-                                                            'id' => { type => 'integer', },
-                                                        },
-                                                    },
-                                                },
-                                            },
-                                            {
-                                                '$ref' => '#/components/schemas/Error',
-                                            },
-                                        ],
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-            };
-        }
-
-        $client->disconnect();
-    };
-    if (my $eval_err = $EVAL_ERROR) {
-        # TODO: Return as "500 Internal Server Error"?
-        $log->error("Unable to query OpenAPI specification from OpenXPKI server: $eval_err");
-        send_output($cgi, { error => { code => 50004, message => $eval_err, data => { pid => $$ } } });
-        return;
-    }
-
-    $openapi_spec->{paths} = $paths;
-
-    return $openapi_spec;
-}
-
 while (my $cgi = CGI::Fast->new()) {
+
+    my $client;
 
     my $conf = $config->config();
 
+    my $rpc = OpenXPKI::Client::RPC->new( config => $config );
+
     my $method = $cgi->param('method');
+
+    my $input_method = $ENV{'REQUEST_METHOD'};
 
     $use_status_codes = $conf->{output} && $conf->{output}->{use_http_status_codes};
 
     # check for request parameters in JSON data (HTTP body)
     my $postdata;
-    if ($conf->{input}->{allow_raw_post} && $cgi->param('POSTDATA')) {
+    my $pkcs7_content;
+    my $pkcs7;
+    if (my $raw = $cgi->param('POSTDATA')) {
+
+        if (!$conf->{input}->{allow_raw_post}) {
+            $log->error("RPC no method set in request");
+            send_output( $cgi,  { error => {
+                code => 40004,
+                message=> "RAW post not allowed",
+            }});
+            next;
+        }
+
+        my $content_type = $ENV{'CONTENT_TYPE'} || '';
+        if (!$content_type) {
+            $content_type =~ 'application/json';
+            $log->warn("RPC POSTDATA request without content-type header");
+        }
+
+        $log->debug("RPC postdata with Content-Type: $content_type");
+
+        if ($content_type =~ m{\Aapplication/pkcs7}) {
+            $input_method = 'PKCS7';
+            $pkcs7 = $raw;
+            $pkcs7_content = $rpc->backend()->run_command('unwrap_pkcs7_signed_data', {
+               pkcs7 => $pkcs7,
+            });
+            $raw = $pkcs7_content->{value};
+            $log->trace("PKCS7 content: " . Dumper  $pkcs7_content) if ($log->is_trace());
+
+        } elsif ($content_type =~ m{\Aapplication/json}) {
+            $input_method = 'JSON';
+
+        } else {
+
+            $log->error("Unsupported content type with RPC POSTDATA");
+            send_output( $cgi,  { error => {
+                code => 40005,
+                message=> "Unsupported content type with RPC POSTDATA",
+                type => $content_type
+            }});
+            next;
+        }
+
         # TODO - evaluate security implications regarding blessed objects
         # and consider to filter out serialized objects for security reasons
         $json->max_depth(  $conf->{input}->{parse_depth} || 5 );
-        my $raw = $cgi->param('POSTDATA');
+
         $log->trace("RPC raw postdata : " . $raw) if ($log->is_trace());
         eval{$postdata = $json->decode($raw);};
         if (!$postdata || $EVAL_ERROR) {
@@ -231,7 +147,6 @@ while (my $cgi = CGI::Fast->new()) {
 
     # method should be set now
     if ( !$method ) {
-        # TODO: Return as "400 Bad Request"?
         $log->error("RPC no method set in request");
         send_output( $cgi,  { error => {
             code => 40001,
@@ -243,8 +158,13 @@ while (my $cgi = CGI::Fast->new()) {
 
     # special handling for requests for OpenAPI (Swagger) spec?
     if ($method eq 'openapi-spec') {
-        my $spec = _openapi_spec($cgi, $conf) or next;
-        send_output($cgi, $spec, 1);
+        my $baseurl = sprintf "%s://%s:%s%s", ($cgi->https ? 'https' : 'http'), $cgi->virtual_host, $cgi->virtual_port, $cgi->request_uri;
+        my $spec = $rpc->openapi_spec($baseurl);
+        if (!$spec) {
+            send_output($cgi, { error => { code => 50004, message => "Unable to query OpenAPI specification from OpenXPKI server", data => { pid => $$ } } });
+        } else {
+            send_output($cgi, $spec, 1);
+        }
         next;
     }
 
@@ -255,10 +175,8 @@ while (my $cgi = CGI::Fast->new()) {
 
     my $error = '';
 
-
     my $workflow_type = $conf->{$method}->{workflow};
     if ( !defined $workflow_type ) {
-        # TODO: Return as "400 Bad Request"?
         $log->error("RPC no workflow_type set for requested method $method");
         send_output( $cgi,  { error => {
             code => 40401,
@@ -326,10 +244,16 @@ while (my $cgi = CGI::Fast->new()) {
             $log->info("RPC authenticated client DN: $auth_dn");
 
             if ($envkeys{'signer_dn'}) {
-                $param->{'signer_cert'} = $auth_dn;
+                $param->{'signer_dn'} = $auth_dn;
             }
-            if ($auth_pem && $envkeys{'signer_cert'}) {
-                $param->{'signer_cert'} = $auth_pem;
+
+            if ($envkeys{'tls_client_dn'}) {
+                $param->{'tls_client_dn'} = $auth_dn;
+            }
+
+            if ($auth_pem) {
+                $param->{'signer_cert'} = $auth_pem if ($envkeys{'signer_cert'});
+                $param->{'tls_client_cert'} = $auth_pem if ($envkeys{'tls_client_cert'});
             }
         }
         else {
@@ -339,14 +263,21 @@ while (my $cgi = CGI::Fast->new()) {
         $log->debug("RPC unauthenticated (plain http)");
     }
 
+    if ($pkcs7_content && $envkeys{'pkcs7'}) {
+        $param->{'_pkcs7'} = $pkcs7;
+    }
+
+    if ($pkcs7_content && $envkeys{'signer_cert'}) {
+        $param->{'signer_cert'} = $pkcs7_content->{signer};
+    }
+
     $log->trace( "Calling $method on ".$config->endpoint()." with parameters: " . Dumper $param ) if $log->is_trace;
 
     my $workflow;
-    my $client;
     eval {
 
         # create the client object
-        $client = _create_client($cgi, $conf) or next;
+        $client = $rpc->backend() or next;
 
         my $wf_id;
         # check for pickup parameter
@@ -394,14 +325,10 @@ while (my $cgi = CGI::Fast->new()) {
 
     my $res;
     if ( my $exc = OpenXPKI::Exception->caught() ) {
-
-        # TODO: Return as "500 Internal Server Error"?
         $log->error("Unable to instantiate workflow: ". $exc->message );
         $res = { error => { code => 50002, message => $exc->message, data => { pid => $$ } } };
     }
     elsif (my $eval_err = $EVAL_ERROR) {
-
-        # TODO: Return as "500 Internal Server Error"?
 
         my $reply = $client->last_reply();
         $log->error(Dumper $reply);
@@ -430,7 +357,6 @@ while (my $cgi = CGI::Fast->new()) {
 
     } elsif (( $workflow->{'proc_state'} ne 'finished' && !$workflow->{id} ) || $workflow->{'proc_state'} eq 'exception') {
 
-        # TODO: Return as "500 Internal Server Error"?
         $log->error("workflow terminated in unexpected state" );
         $res = { error => { code => 50003, message => 'workflow terminated in unexpected state',
             data => { pid => $$, id => $workflow->{id}, 'state' => $workflow->{'state'} } } };
@@ -595,6 +521,15 @@ JSON structure or the data has nested structures exceeding the parse_depth.
 The given parameters do not pass the input validation rules of the workflow.
 You will find the verbose error in I<message> and the list of affected fields
 in the I<fields> key.
+
+=item 40004 - RAW Post not allowed
+
+RAW post was detected but is not allowed by configuration.
+
+=item 40005 - RAW Post with unknown Content-Type
+
+The Content-Type set with a RAW post request is not known.
+Supported types are application/json and application/pkcs7.
 
 =item 40401 - Invalid method / setup incomplete
 
