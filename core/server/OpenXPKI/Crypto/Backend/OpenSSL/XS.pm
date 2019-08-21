@@ -47,46 +47,8 @@ sub get_object
     my $data   = $keys->{DATA};
     my $type   = $keys->{TYPE};
 
-    if ($format)
-    {
-        ##! 2: "format: $format"
-    }
-    ##! 2: "data:   $data"
-    ##! 2: "type:   $type"
-
     my $object = undef;
-    if ($type eq "X509")
-    {
-        ##! 16: 'X509'
-        if ($format eq "DER")
-        {
-            ##! 16: 'DER'
-            $object = OpenXPKI::Crypto::Backend::OpenSSL::X509::_new_from_der ($data);
-        } else {
-            ##! 16: 'PEM'
-            $object = OpenXPKI::Crypto::Backend::OpenSSL::X509::_new_from_pem ($data);
-        }
-    } elsif ($type eq "CSR")
-    {
-        ##! 16: 'CSR'
-        if ($format eq "DER")
-        {
-            ##! 16: 'DER'
-            $object = OpenXPKI::Crypto::Backend::OpenSSL::PKCS10::_new_from_der ($data);
-        }
-        elsif ($format eq "SPKAC")
-        {
-            ##! 16: 'SPKAC'
-            #$data =~ s/.*SPKAC\s*=\s*([^\s\n]*).*/$1/s;
-            ###! 8: "spkac is ".$data
-            ###! 8: "length of spkac is ".length($data)
-            ###! 8: "data is ".$data
-            $object = OpenXPKI::Crypto::Backend::OpenSSL::SPKAC::_new ($data);
-        } else {
-            ##! 16: 'PEM'
-            $object = OpenXPKI::Crypto::Backend::OpenSSL::PKCS10::_new_from_pem ($data);
-        }
-    } elsif ($type eq "CRL")
+    if ($type eq "CRL")
     {
         if ($format eq "DER")
         {
@@ -103,7 +65,7 @@ sub get_object
 
     OpenXPKI::Exception->throw (
         message => "I18N_OPENXPKI_CRYPTO_OPENSSL_GET_OBJECT_NO_REF",
-        params  => { FORMAT => $format, TYPE => $type },
+        params  => { TYPE => $type },
     ) unless $object;
 
     ##! 2: "returning object"
@@ -217,12 +179,6 @@ is used to get access to a cryptographic object. The following objects
 are supported today:
 
 =over
-
-=item * SPKAC
-
-=item * PKCS10
-
-=item * X509
 
 =item * CRL
 

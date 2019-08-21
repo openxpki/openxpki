@@ -339,8 +339,8 @@ entry from the database is passed in as hashref.
 
 Note that it highly depends on the implementation what properties are taken from
 the pkcs10 container and what can be overridden by other means.
-PKCS10 is the default format which should be supported by any backend, the
-default local backend also supports SPKAC. You might implement any own format.
+PKCS10 is the default format which should be supported by any backend.
+You might implement any own format.
 See documentation of the used backend for details.
 
 =head3 Input

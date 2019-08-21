@@ -27,7 +27,7 @@ sub get_command
     $self->{CONFIG}->set_profile($self->{PROFILE});
     my $profile = $self->{PROFILE};
 
-    
+
 
     ## ENGINE key's cert: no parameters
     ## normal cert: engine (optional), passwd, key
@@ -83,12 +83,7 @@ sub get_command
     push @command, ('-engine', $engine) if ($engine);
     push @command, ('-keyform', $keyform) if ($keyform);
     push @command, ('-out', $self->get_outfile());
-
-    if ($self->{CSR} !~ m{\A -----BEGIN }xms) {
-        push @command, ('-spkac', $self->write_temp_file( 'SPKAC=' . $self->{CSR} ) );
-    } else {
-        push @command, ('-in', $self->write_temp_file( $self->{CSR}) );
-    }
+    push @command, ('-in', $self->write_temp_file( $self->{CSR}) );
 
     if (defined $passwd)
     {

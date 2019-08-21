@@ -280,11 +280,6 @@ sub issueCertificate {
         CSR     => $csr->{data},
     });
 
-    # SPKAC Requests return binary format - so we need to convert that
-    if ($certificate !~ m{\A -----BEGIN }xms) {
-        ##! 32: 'Certificate seems to be binary - conveting it'
-        $certificate = OpenXPKI::Crypt::X509->new($certificate)->pem;
-    }
     ##! 64: 'cert: ' . $certificate
 
     my $msg = sprintf("Certificate %s (%s) issued by %s", $profile->get_subject(), $serial, $issuing_ca);
@@ -582,7 +577,7 @@ parameter, the certificates validity will be tailored to fit into the CA
 validity window.
 
 Takes only the key information from the pkcs10 and requires subject, SAN and
-validity to be given as context parameters. Also supports SPKAC request format.
+validity to be given as context parameters.
 
 =head2 renewCertificate
 

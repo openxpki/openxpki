@@ -591,66 +591,6 @@ of OpenXPKI::XML::Config in the parameter CONFIG.
 Return an instance of the TokenManager class which handles all
 configured cryptographic tokens.
 
-=head3 get_pki_realms
-
-Prepares a hash which has the following structure.
-
-$hash{PKI_REALM_NAME}->{"crypto"}->{"default"}
-
-Requires 'config', 'log' and 'crypto_layer' in the Server Context.
-
-The hash also includes validity information as defined in the configuration
-in the following sample format:
-
-  $hash{PKI_REALM_NAME} = {
-      endentity => {
-          id => {
-              'User' => {
-                  validity => {
-                      notafter => {
-                          format => 'relativedate',
-                          validity => '+0006',
-                      },
-                  },
-              },
-          },
-      },
-      crl => {
-          id => {
-              'default' => {
-                  validity => {
-                      notafter => {
-                          format => 'relativedate',
-                          validity => '+000014',
-                      },
-                  },
-              },
-          },
-      },
-      ca => {
-          id => {
-              CA1 => {
-                  status = 1,    # (0: unavailable, 1: available)
-                  identifier => 'ABCDEFGHIJK',
-                  crypto => OpenXPKI::Crypto::TokenManager->new(...),
-                  cacert => OpenXPKI::Crypto::X509->new(...),
-                  notbefore => DateTime->new(),
-                  notafter => DateTime->new(),
-              },
-          },
-      },
-  };
-
-See OpenXPKI::DateTime for more information about the various time formats
-used here.
-Undefined 'notbefore' dates are interpreted as 'now' during issuance.
-Relative notafter dates relate to the corresponding notbefore date.
-
-Two sections are contained in the hash: 'endentity' and 'crl'
-The ID of endentity validities is the corresponding role (profile).
-The ID of CRL validities is the internal CA name.
-
-
 =head2 Non-Cryptographic Object Initialization
 
 =head3 get_log

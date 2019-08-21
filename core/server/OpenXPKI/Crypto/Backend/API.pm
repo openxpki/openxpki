@@ -221,35 +221,15 @@ sub get_object {
             message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_MISSING_DATA");
     }
 
-    if ($keys->{TYPE} ne "X509" and
-        $keys->{TYPE} ne "CSR" and
-        $keys->{TYPE} ne "CRL")
+    if ($keys->{TYPE} ne "CRL")
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_ILLEGAL_TYPE",
             params  => {TYPE => $keys->{TYPE}});
     }
 
-    $keys->{FORMAT} = "PEM" if (not $keys->{FORMAT});
-    $keys->{FORMAT} = "PEM" if ($keys->{TYPE} eq "CSR" and $keys->{FORMAT} eq "PKCS10");
-
-    if ($keys->{FORMAT} ne "PEM" and
-        $keys->{FORMAT} ne "DER" and
-        ($keys->{TYPE} ne "CSR" or $keys->{FORMAT} ne "SPKAC")
-       )
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_ILLEGAL_FORMAT",
-            params  => {TYPE => $keys->{TYPE}, FORMAT => $keys->{FORMAT}});
-    }
-
     my $ref = $self->get_instance()->get_object($keys);
-    if ($keys->{TYPE} eq "CSR" and $keys->{FORMAT} eq "SPKAC")
-    {
-        $object_cache_of{$ident}->{$ref} = "SPKAC";
-    } else {
-        $object_cache_of{$ident}->{$ref} = $keys->{TYPE};
-    }
+    $object_cache_of{$ident}->{$ref} = $keys->{TYPE};
     return $ref;
 }
 
@@ -285,26 +265,7 @@ sub get_object_function {
     my $type = $object_cache_of{$ident}->{$keys->{OBJECT}};
 
     my @functions = ();
-    if ($type eq "X509")
-    {
-        @functions = ("serial", "subject", "issuer", "notbefore", "notafter",
-                      "alias", "modulus", "pubkey", "pubkey_hash", "fingerprint", "emailaddress",
-                      "version", "pubkey_algorithm", "signature_algorithm", "exponent",
-                      "keysize", "extensions", "openssl_subject"
-                     );
-    }
-    elsif ($type eq "CSR")
-    {
-        @functions = ("subject", "version", "signature_algorithm",
-                      "pubkey", "pubkey_hash", "keysize", "pubkey_algorithm",
-                      "exponent", "modulus", "extensions","attributes");
-    }
-    elsif ($type eq "SPKAC")
-    {
-        @functions = ("pubkey", "keysize", "pubkey_algorithm", "exponent", "modulus",
-                      "pubkey_hash", "signature_algorithm");
-    }
-    else ## CRL
+    if ($type eq "CRL")
     {
         @functions = ("version", "issuer", "next_update", "last_update",
                       "signature_algorithm", "revoked", "serial", "itemcnt", "extensions");

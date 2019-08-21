@@ -97,7 +97,6 @@ OpenXPKI/Crypto/Secret/Split.pm
 OpenXPKI/Crypto/TokenManager.pm
 OpenXPKI/Crypto/Toolkit.pm
 OpenXPKI/Crypto/VolatileVault.pm
-OpenXPKI/Crypto/X509.pm
 
 OpenXPKI/Crypto/Tool/CreateJavaKeystore.pm
 OpenXPKI/Crypto/Tool/CreateJavaKeystore/API.pm
