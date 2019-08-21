@@ -743,7 +743,7 @@ sub init_chain {
 
     my $cert_identifier = $self->param('identifier');
 
-    my $chain = $self->send_command_v2 ( "get_chain", { start_with => $cert_identifier, format => 'HASH', 'keeproot' => 1 });
+    my $chain = $self->send_command_v2 ( "get_chain", { start_with => $cert_identifier, format => 'DBINFO', 'keeproot' => 1 });
 
     $self->_page({
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_CHAIN_LABEL',
