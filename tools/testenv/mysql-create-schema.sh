@@ -2,7 +2,7 @@
 
 echo "MySQL: creating schema"
 
-SCHEMA="$(readlink -e $(dirname $0)/../../config/contrib/sql/schema-mysql.sql)"
+SCHEMA="$OXI_TEST_SAMPLECONFIG_DIR/contrib/sql/schema-mysql.sql"
 test ! -z "$1" && SCHEMA="$1"
 
 DBPASS=""
