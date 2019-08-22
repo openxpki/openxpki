@@ -2,9 +2,12 @@
 
 echo "MySQL: creating schema"
 
-SCHEMA="$OXI_TEST_SAMPLECONFIG_DIR/contrib/sql/schema-mysql.sql"
-test ! -z "$1" && SCHEMA="$1"
+if [ -z $OXI_TEST_SAMPLECONFIG_DIR ]; then
+    echo "ERROR: variables OXI_TEST_SAMPLECONFIG_DIR is not set"
+    exit 1
+fi
 
+SCHEMA="$OXI_TEST_SAMPLECONFIG_DIR/contrib/sql/schema-mysql.sql"
 DBPASS=""
 test ! -z "$OXI_TEST_DB_MYSQL_DBPASSWORD" && DBPASS="-p$OXI_TEST_DB_MYSQL_DBPASSWORD" || true
 
