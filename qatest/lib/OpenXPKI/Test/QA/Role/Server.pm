@@ -87,8 +87,8 @@ has semaphore => (
 Fork off a child process (via L<Proc::Daemon>) which then starts the OpenXPKI
 test server in background mode (i.e. initialization, forking and main loop).
 
-Waits max. 5 seconds for the background forking and another 5 seconds for the
-socket file to appear.
+Waits max. 10 seconds for the background forking, 10 seconds for the PID file
+to appear and 10 for the socket file to appear.
 
 Returns the PID of the OpenXPKI server.
 
@@ -137,7 +137,7 @@ around 'init_server' => sub {
             # init_server() must be called after Proc::Daemon->Init() because the latter
             # closes all file handles which would cause problems with Log4perl
             $self->$orig();                  # OpenXPKI::Test->init_server
-            $self->init_session_and_context; # this step from OpenXPKI::Test->BUILD would otherwise not be executed as this method never returns
+            $self->init_session_and_context; # this step from OpenXPKI::Test->BUILD would otherwise not be executed as we never return
             $self->_start_openxpki_server($orig);
         }
         catch {
@@ -151,17 +151,16 @@ around 'init_server' => sub {
 
     # wait till child process unlocks semaphore
     # (# semaphore #0, operation 0)
-    for (my $tick = 0; $tick < 5 and not $sem->op(0, 0, IPC_NOWAIT); $tick++) {
-        sleep 1;
-    }
-    if (not $sem->op(0, 0, IPC_NOWAIT)) { $self->diag_log; $self->stop_server; die "Server init seems to have failed" }
+    my $tick = 0;
+    while ($tick++ < 10 and not $sem->op(0, 0, IPC_NOWAIT)) { sleep 1 }
+    if (not $sem->op(0, 0, IPC_NOWAIT)) { $self->diag_log; $self->stop_server; die "Server init seems to have failed (after $tick seconds)" }
 
     # wait for Net::Server->run() to initialize (includes forking)
     note "Waiting for OpenXPKI to initialize";
-    my $count = 0;
+    $tick = 0;
     my $pidfile = $self->path_pid_file;
-    while ($count++ < 5 and not -f $pidfile) { sleep 1 }
-    if (not -f $pidfile) { $self->diag_log; $self->stop_server; die "Server forking seems to have failed" }
+    while ($tick++ < 10 and not -f $pidfile) { sleep 1 }
+    if (not -f $pidfile) { $self->diag_log; $self->stop_server; die "Server forking seems to have failed (after $tick seconds)" }
 
     # read PID
     my $pid = do { local $/; open my $fh, '<', $pidfile; <$fh> }; # slurp
@@ -170,10 +169,10 @@ around 'init_server' => sub {
 
     # wait for OpenXPKI to start up
     note "Waiting for OpenXPKI to create socket file";
-    $count = 0;
+    $tick = 0;
     my $socket = $self->path_socket_file;
-    while ($count++ < 5 and not -e $socket) { sleep 1 }
-    if (not -e $socket) { $self->diag_log; $self->stop_server; die "Server startup seems to have failed" }
+    while ($tick++ < 10 and not -e $socket) { sleep 1 }
+    if (not -e $socket) { $self->diag_log; $self->stop_server; die "Server startup seems to have failed (after $tick seconds)" }
 
     note "Main test process: server startup completed";
     $self->$orig(); # to make context etc. also available to main test process
