@@ -24,6 +24,6 @@ sub load {
 
 sub delete { 1 }
 
-sub delete_all_before { 1 }
+sub delete_all_before { 0 }
 
 __PACKAGE__->meta->make_immutable;

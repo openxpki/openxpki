@@ -172,13 +172,12 @@ sub delete {
 
 sub delete_all_before {
     my ($self, $epoch) = @_;
-
+    my $count = 0;
     ##! 8: "deleting all sessions where modified < $epoch"
 
     # There is a problem with deadlocks on (at least) mysql if we use a
     # table wide delete query so we first load all to-be-expired sessions
     # and delete them one by one
-
     my $sth = $self->dbi->select(
         from => $self->table,
         columns => ['session_id'],
@@ -188,13 +187,13 @@ sub delete_all_before {
     );
     $self->dbi->start_txn();
     while (my $row = $sth->fetchrow_arrayref) {
-        $self->dbi->delete(
+        $count+= $self->dbi->delete(
             from => $self->table,
             where => { session_id => $row->[0] }
         );
     }
     $self->dbi->commit();
-    return 1;
+    return $count;
 }
 
 __PACKAGE__->meta->make_immutable;
