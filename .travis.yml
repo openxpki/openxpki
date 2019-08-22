@@ -8,7 +8,8 @@ sudo: required
 
 env:
     global:
-        - OXI_TEST_SAMPLECONFIG_DIR=/etc/openxpki
+        # assume the Git submodule is cloned into config/ according to .gitmodules
+        - OXI_TEST_SAMPLECONFIG_DIR=$TRAVIS_BUILD_DIR/config
         - OXI_TEST_DB_MYSQL_NAME=openxpki
         - OXI_TEST_DB_MYSQL_USER=openxpki
         - OXI_TEST_DB_MYSQL_PASSWORD=openxpki
