@@ -47,7 +47,7 @@ sub init_html {
     my $file = $self->_build_path('html');
 
     # slurp the file
-    open (FH, "$file");
+    open (FH, "<:encoding(UTF-8)", "$file");
     my @content = <FH>;
     close (FH);
 
@@ -80,7 +80,7 @@ sub init_json {
      my $file = $self->_build_path('json');
 
     # slurp the file
-    open (FH, "$file");
+    open (FH, "<:encoding(UTF-8)", "$file");
     my @content = <FH>;
     close (FH);
 
