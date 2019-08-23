@@ -44,16 +44,16 @@ case "$1" in
 
            fi
 
-           # Ubuntu/Jessie names it conf-enabled while wheezy has conf.d
-           if [ -d /etc/apache2/conf-enabled/ ]; then
+           if [ -d /etc/apache2/conf-available/ ]; then
                if [ ! -e /etc/apache2/conf-available/openxpki.conf ]; then
                    cp /usr/share/doc/libopenxpki-perl/examples/apache2-openxpki.conf /etc/apache2/conf-available/openxpki.conf
                    # Activate module, this creates the symlink in conf-available
                    /usr/sbin/a2enconf openxpki
                    /usr/sbin/a2enmod headers
                fi;
-           else
-               test -e /etc/apache2/conf.d/openxpki.conf || cp /usr/share/doc/libopenxpki-perl/examples/apache2-openxpki.conf /etc/apache2/conf.d/openxpki.conf
+               if [ ! -e /etc/apache2/sites-available/openxpki.conf ]; then
+                   cp /usr/share/doc/libopenxpki-perl/examples/apache2-openxpki-site.conf /etc/apache2/sites-available/openxpki.conf
+               fi;
            fi;
 
         fi;
@@ -73,6 +73,12 @@ case "$1" in
 
         # create index.html as symlink to default.html
         test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/index.html
+
+        # default download directory for CRLs
+        if [ ! -d /var/www/download ]; then
+            mkdir -p -m755 /var/www/download
+            chown openxpki:www-data /var/www/download
+        fi;
 
         # UI logfiles
         for f in scep.log soap.log webui.log rpc.log; do
