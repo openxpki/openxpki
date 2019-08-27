@@ -306,8 +306,17 @@ sub renewCertificate {
 
 sub revokeCertificate {
 
-    my $self       = shift;
-    # nothing to do here
+    my $self = shift;
+    my $crr  = shift;
+
+    CTX('dbi')->update(
+        table => 'certificate',
+        set => { status => 'CRL_ISSUANCE_PENDING' },
+        where => {
+           identifier => $crr->{cert_identifier},
+        },
+    );
+
     return;
 
 }
@@ -585,8 +594,7 @@ Currently only an alias for issueCertificate
 
 =head2 revokeCertificate
 
-This sub will just put cert_identifier and reason_code from the CRR to the
-context, so it is quickly available in the checkForRevocation step.
+Set the status field of the certificate table to "CRL_ISSUANCE_PENDING".
 
 =head2 checkForRevocation
 

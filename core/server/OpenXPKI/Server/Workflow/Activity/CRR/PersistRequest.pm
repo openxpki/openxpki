@@ -62,7 +62,6 @@ sub execute
     $dbi->update(
         table => 'certificate',
         set => {
-            status => 'CRL_ISSUANCE_PENDING',
             reason_code     => $reason_code || 'unspecified',
             revocation_time => $dt->epoch(),
             invalidity_time => $invalidity_time || undef,
