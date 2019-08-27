@@ -29,7 +29,7 @@ sub execute {
     ##! 16: 'start revocation for cert identifier' . $cert_identifier
     my $cert = $dbi->select_one(
         from => 'certificate',
-        columns => [ 'identifier', 'reason_code', 'invalidity_time' ],
+        columns => [ 'identifier', 'reason_code', 'invalidity_time', 'status' ],
         where => { identifier => $cert_identifier },
     );
 
@@ -38,6 +38,13 @@ sub execute {
            message => 'nice certificate to revoked not found in database',
            params => { identifier => $cert_identifier }
        );
+    }
+
+    if ($cert->{status} ne 'ISSUED') {
+        OpenXPKI::Exception->throw(
+            message => 'certificate to be revoked is not in issued state',
+            params => { identifier => $cert_identifier, status => $cert->{status} }
+        );
     }
 
     if (!$cert->{reason_code}) {
@@ -50,9 +57,9 @@ sub execute {
     CTX('log')->application()->info("start cert revocation for identifier $cert_identifier, workflow " . $workflow->id);
 
     $nice_backend->revokeCertificate( {
-        IDENTIFIER => $cert->{identifier},
-        REASON_CODE => $cert->{reason_code},
-        INVALIDITY_TIME => $cert->{invalidity_time},
+        cert_identifier => $cert->{identifier},
+        reason_code => $cert->{reason_code},
+        invalidity_time => $cert->{invalidity_time},
     } );
 
     ##! 32: 'Add workflow id ' . $workflow->id.' to cert_attributes ' for cert ' . $set_context->{cert_identifier}
