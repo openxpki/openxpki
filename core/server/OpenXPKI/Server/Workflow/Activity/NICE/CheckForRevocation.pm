@@ -12,7 +12,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 
-use OpenXPKI::Server::Workflow::NICE::Factory;
+use OpenXPKI::Server::NICE::Factory;
 
 use Data::Dumper;
 
@@ -22,7 +22,7 @@ sub execute {
 
     ##! 32: 'context: ' . Dumper( $workflow->context() )
 
-    my $nice_backend = OpenXPKI::Server::Workflow::NICE::Factory->getHandler( $self );
+    my $nice_backend = OpenXPKI::Server::NICE::Factory->getHandler( $self );
 
     # We do not need an attribute map here
     $nice_backend->checkForRevocation();
@@ -40,4 +40,4 @@ OpenXPKI::Server::Workflow::Activity::NICE::CheckForRevocation;
 
 Activity to check if a former revocation request was processed by the NICE backend.
 
-See OpenXPKI::Server::Workflow::NICE::checkForRevocation for details
+See OpenXPKI::Server::NICE::checkForRevocation for details

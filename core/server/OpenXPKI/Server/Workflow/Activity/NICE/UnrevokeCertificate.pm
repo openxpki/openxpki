@@ -12,7 +12,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 
-use OpenXPKI::Server::Workflow::NICE::Factory;
+use OpenXPKI::Server::NICE::Factory;
 
 use Data::Dumper;
 
@@ -22,7 +22,7 @@ sub execute {
 
     ##! 32: 'context: ' . Dumper(  $workflow->context() )
 
-    my $nice_backend = OpenXPKI::Server::Workflow::NICE::Factory->getHandler( $self );
+    my $nice_backend = OpenXPKI::Server::NICE::Factory->getHandler( $self );
 
      CTX('log')->application()->info("start cert unrevoke for cert ".$self->_get_context_param( 'cert_identifier' ).", workflow " . $workflow->id);
 
@@ -43,7 +43,7 @@ OpenXPKI::Server::Workflow::Activity::NICE::unrevokeCertificate;
 
 Activity to unrevoke a certificate using the configured NICE backend.
 
-See OpenXPKI::Server::Workflow::NICE::unrevokeCertificate for details
+See OpenXPKI::Server::NICE::unrevokeCertificate for details
 
 =head1 Parameters
 

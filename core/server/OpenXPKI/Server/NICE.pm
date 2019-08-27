@@ -1,11 +1,4 @@
-## OpenXPKI::Server::Workflow::NICE.pm
-## Base Class for NICE Backends
-##
-## Written 2011 by Oliver Welter <openxpki@oliwel.de>
-## for the OpenXPKI project
-## (C) Copyright 2011 by The OpenXPKI Project
-
-package OpenXPKI::Server::Workflow::NICE;
+package OpenXPKI::Server::NICE;
 
 use strict;
 use warnings;
@@ -317,7 +310,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::NICE
+OpenXPKI::Server::NICE
 
 =head1 Description
 

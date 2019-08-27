@@ -1,15 +1,6 @@
-## OpenXPKI::Server::Workflow::NICE::Null.pm
-## NICE Backend for Realms without any issuance of certificates
-## (e. g. CA only realms where CA certificates and CRLs are imported from outside)
-##
-## Written 2016 by Martin Bartosch <m.bartosch@cynops.de>
-## for the OpenXPKI project
-## (C) Copyright 2016 by The OpenXPKI Project
-
-package OpenXPKI::Server::Workflow::NICE::Null;
+package OpenXPKI::Server::NICE::Null;
 
 use English;
-use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
@@ -17,7 +8,7 @@ use Moose;
 #use namespace::autoclean; # Conflicts with Debugger
 
 
-extends 'OpenXPKI::Server::Workflow::NICE';
+extends 'OpenXPKI::Server::NICE';
 
 
 1;
@@ -25,7 +16,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::NICE::Null
+OpenXPKI::Server::NICE::Null
 
 =head1 Description
 

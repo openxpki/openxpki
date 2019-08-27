@@ -1,11 +1,4 @@
-## OpenXPKI::Server::Workflow::NICE.pm
-## Factory for NICE Backends
-##
-## Written 2011 by Oliver Welter <openxpki@oliwel.de>
-## for the OpenXPKI project
-## (C) Copyright 2011 by The OpenXPKI Project
-
-package OpenXPKI::Server::Workflow::NICE::Factory;
+package OpenXPKI::Server::NICE::Factory;
 
 use strict;
 use warnings;
@@ -18,7 +11,7 @@ use OpenXPKI::Exception;
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::Server::Workflow::NICE;
+use OpenXPKI::Server::NICE;
 
 sub getHandler {
 
@@ -29,10 +22,8 @@ sub getHandler {
 
     $backend = 'Local' unless( $backend );
 
-    my $BackendClass = 'OpenXPKI::Server::Workflow::NICE::'.$backend;
+    my $BackendClass = 'OpenXPKI::Server::NICE::'.$backend;
     ##! 16: 'Load Backend: '.$backend
-
-    use OpenXPKI::Server::Workflow::NICE::Local;
 
     if(!eval("require $BackendClass")){
         OpenXPKI::Exception->throw(
@@ -55,16 +46,16 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::NICE::Factory
+OpenXPKI::Server::NICE::Factory
 
 =head1 Description
 
 Provides a factory interface to get a subclass of
-OpenXPKI::Server::Workflow::NICE to access the configured backend.
+OpenXPKI::Server::NICE to access the configured backend.
 
 =head1 Functions
 
 =head2 getHandler
 
 The static factory handler, expects the workflow activity object as parameter
-e.g. OpenXPKI::Server::Workflow::NICE::Factory->getHandler( $self )
+e.g. OpenXPKI::Server::NICE::Factory->getHandler( $self )

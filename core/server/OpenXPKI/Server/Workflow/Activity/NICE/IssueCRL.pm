@@ -12,7 +12,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 
-use OpenXPKI::Server::Workflow::NICE::Factory;
+use OpenXPKI::Server::NICE::Factory;
 
 use Data::Dumper;
 
@@ -23,7 +23,7 @@ sub execute {
 
     ##! 64: 'context: ' . Dumper( $context  )
 
-    my $nice_backend = OpenXPKI::Server::Workflow::NICE::Factory->getHandler( $self );
+    my $nice_backend = OpenXPKI::Server::NICE::Factory->getHandler( $self );
 
     my $ca_alias = $context->param( 'ca_alias' );
 
@@ -67,7 +67,7 @@ OpenXPKI::Server::Workflow::Activity::NICE::IssueCRL;
 
 Activity to initate CRL issuance using the configured NICE backend.
 
-See OpenXPKI::Server::Workflow::NICE::issueCRL for details
+See OpenXPKI::Server::NICE::issueCRL for details
 
 =head1 Parameters
 

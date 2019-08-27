@@ -499,10 +499,10 @@ OpenXPKI/Server/Workflow/Validator/ValidityWindow.pm
 OpenXPKI/Server/Workflow/Validator/WFHash.pm
 
 ## Packages for new NICE API
-OpenXPKI/Server/Workflow/NICE.pm
-OpenXPKI/Server/Workflow/NICE/Null.pm
-OpenXPKI/Server/Workflow/NICE/Factory.pm
-OpenXPKI/Server/Workflow/NICE/Local.pm
+OpenXPKI/Server/NICE.pm
+OpenXPKI/Server/NICE/Null.pm
+OpenXPKI/Server/NICE/Factory.pm
+OpenXPKI/Server/NICE/Local.pm
 
 OpenXPKI/Server/Workflow/Activity/NICE/CheckForRevocation.pm
 OpenXPKI/Server/Workflow/Activity/NICE/FetchCertificate.pm

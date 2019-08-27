@@ -13,7 +13,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Database; # to get AUTO_ID
 
-use OpenXPKI::Server::Workflow::NICE::Factory;
+use OpenXPKI::Server::NICE::Factory;
 
 use Data::Dumper;
 
@@ -22,7 +22,7 @@ sub execute {
     my $context  = $workflow->context();
     ##! 32: 'context: ' . Dumper( $context )
 
-    my $nice_backend = OpenXPKI::Server::Workflow::NICE::Factory->getHandler( $self );
+    my $nice_backend = OpenXPKI::Server::NICE::Factory->getHandler( $self );
     my $cert_identifier = $self->param('cert_identifier') || $context->param('cert_identifier');
     my $dbi = CTX('dbi');
 
@@ -85,4 +85,4 @@ OpenXPKI::Server::Workflow::Activity::NICE::RevokeCertificate;
 
 Activity to start certificate revocation using the configured NICE backend.
 
-See OpenXPKI::Server::Workflow::NICE::revokeCertificate for details
+See OpenXPKI::Server::NICE::revokeCertificate for details

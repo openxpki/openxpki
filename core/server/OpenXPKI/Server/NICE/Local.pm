@@ -1,11 +1,4 @@
-## OpenXPKI::Server::Workflow::NICE::Local.pm
-## NICE Backends using the local crypto backend
-##
-## Written 2012 by Oliver Welter <openxpki@oliwel.de>
-## for the OpenXPKI project
-## (C) Copyright 2012 by The OpenXPKI Project
-
-package OpenXPKI::Server::Workflow::NICE::Local;
+package OpenXPKI::Server::NICE::Local;
 
 use Data::Dumper;
 
@@ -22,7 +15,7 @@ use OpenXPKI::Server::Workflow::WFObject::WFArray;
 
 use Moose;
 #use namespace::autoclean; # Conflicts with Debugger
-extends 'OpenXPKI::Server::Workflow::NICE';
+extends 'OpenXPKI::Server::NICE';
 
 sub issueCertificate {
 
@@ -566,7 +559,7 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::NICE::Local
+OpenXPKI::Server::NICE::Local
 
 =head1 Description
 

@@ -13,7 +13,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Database::Legacy;
 
-use OpenXPKI::Server::Workflow::NICE::Factory;
+use OpenXPKI::Server::NICE::Factory;
 
 use Data::Dumper;
 

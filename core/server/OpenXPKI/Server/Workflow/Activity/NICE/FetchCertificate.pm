@@ -12,7 +12,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 
-use OpenXPKI::Server::Workflow::NICE::Factory;
+use OpenXPKI::Server::NICE::Factory;
 
 use Data::Dumper;
 
@@ -23,7 +23,7 @@ sub execute {
 
     ##! 32: 'context: ' . Dumper( $context )
 
-    my $nice_backend = OpenXPKI::Server::Workflow::NICE::Factory->getHandler( $self );
+    my $nice_backend = OpenXPKI::Server::NICE::Factory->getHandler( $self );
 
     my $set_context = $nice_backend->fetchCertificate();
 
@@ -47,7 +47,7 @@ OpenXPKI::Server::Workflow::Activity::NICE::IssueCertificate;
 
 Fetch a certificate for a pending certificate signing request.
 
-See OpenXPKI::Server::Workflow::NICE::fetchCertificate for details
+See OpenXPKI::Server::NICE::fetchCertificate for details
 
 =head1 Parameters
 
