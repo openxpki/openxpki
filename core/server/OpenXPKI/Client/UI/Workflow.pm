@@ -7,6 +7,7 @@ package OpenXPKI::Client::UI::Workflow;
 use Moose;
 use Data::Dumper;
 use Date::Parse;
+use Log::Log4perl::MDC;
 
 has __default_grid_head => (
     is => 'rw',
@@ -154,7 +155,9 @@ sub init_start {
 
 Requires parameter I<wf_id> which is the id of an existing workflow.
 It loads the workflow at the current state and tries to render it
-using the __render_from_workflow method.
+using the __render_from_workflow method. In states with multiple actions
+I<wf_action> can be set to select one of them. If those arguments are not
+set from the CGI environment, they can be passed as method arguments.
 
 =cut
 
@@ -164,10 +167,10 @@ sub init_load {
     my $args = shift;
 
     # re-instance existing workflow
-    my $id = $self->param('wf_id') || 0;
+    my $id = $self->param('wf_id') || $args->{wf_id} || 0;
     $id =~ s/[^\d]//g;
 
-    my $wf_action = $self->param('wf_action') || '';
+    my $wf_action = $self->param('wf_action') || $args->{wf_action} || '';
     my $view = $self->param('view') || '';
 
     my $wf_info = $self->send_command_v2( 'get_workflow_info', {
@@ -1000,7 +1003,7 @@ sub action_index {
             $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION!','error');
             return $self;
         }
-
+        Log::Log4perl::MDC->put('wfid', $wf_args->{wf_id});
         $self->logger()->info(sprintf "Run %s on workflow #%01d", $wf_args->{wf_action}, $wf_args->{wf_id} );
 
         # send input data to workflow
@@ -1019,7 +1022,7 @@ sub action_index {
 
             $self->logger()->error("workflow acton failed!");
             my $extra = { wf_id => $wf_args->{wf_id}, wf_action => $wf_args->{wf_action} };
-            $self->init_load();
+            $self->init_load($extra);
             return $self;
         }
 
@@ -1042,7 +1045,7 @@ sub action_index {
             # pass required arguments via extra and reload init page
 
             my $extra = { wf_type => $wf_args->{wf_type} };
-            $self->init_index();
+            $self->init_index($extra);
             return $self;
         }
         $self->logger()->trace("wf info on create: " . Dumper $wf_info ) if $self->logger->is_trace;
@@ -1128,6 +1131,9 @@ sub action_handle {
         return $self;
     }
 
+    Log::Log4perl::MDC->put('wfid', $wf_args->{wf_id});
+
+
     if ($wf_args->{wf_handle} eq 'fail') {
         $self->logger()->info(sprintf "Workflow %01d set to failure by operator", $wf_args->{wf_id} );
 
@@ -1196,6 +1202,8 @@ sub action_select {
         my $wf_args = $self->__fetch_wf_token( $wf_token );
         $wf_id = $wf_args->{wf_id};
     }
+
+    Log::Log4perl::MDC->put('wfid', $wf_id);
 
     my $wf_info = $self->send_command_v2( 'get_workflow_info', {
         id => $wf_id

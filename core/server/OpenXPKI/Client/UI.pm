@@ -349,6 +349,8 @@ sub handle_page {
         }
     }
 
+    Log::Log4perl::MDC->put('wfid', undef);
+
     return $result->render();
 
 }
