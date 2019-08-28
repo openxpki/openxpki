@@ -10,7 +10,7 @@ use Digest::SHA qw(sha1_base64 sha1_hex);
 use OpenXPKI::DateTime;
 use MIME::Base64;
 use Moose;
-use Crypt::PKCS10;
+use Crypt::PKCS10 1.8;
 
 has data => (
     is => 'ro',
@@ -62,6 +62,33 @@ has subject_key_id => (
         my $self = shift;
         return uc join ':', ( unpack '(A2)*', sha1_hex( $self->_pkcs10()->{certificationRequestInfo}{subjectPKInfo}{subjectPublicKey}[0] ) );
     }
+);
+
+has csr_identifier => (
+    is => 'rw',
+    init_arg => undef,
+    isa => 'Str',
+    reader => 'get_csr_identifier',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        my $csr_identifier = sha1_base64($self->data);
+        ## RFC 3548 URL and filename safe base64
+        $csr_identifier =~ tr/+\//-_/;
+        return $csr_identifier;
+    },
+);
+
+has transaction_id => (
+    is => 'rw',
+    init_arg => undef,
+    isa => 'Str',
+    reader => 'get_transaction_id',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        return sha1_hex($self->data);
+    },
 );
 
 around BUILDARGS => sub {

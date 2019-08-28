@@ -31,8 +31,8 @@ use base qw( Template::Plugin );
 use Template::Plugin;
 
 use Data::Dumper;
-use Digest::SHA qw(sha1_hex);
-use Crypt::PKCS10 1.8;
+use Digest::SHA qw(sha1_hex sha1_base64);
+use OpenXPKI::Crypt::PKCS10;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
@@ -64,8 +64,7 @@ sub _load {
 
     # To prevent loading the same item again and again, we always cache
     # the last hash and reuse it
-
-    if ($self->{_pkcs10} && ($self->{_hash} eq sha1_hex($pkcs10))) {
+    if ($self->{_pkcs10} && ($self->{_hash} eq sha1($pkcs10))) {
         return $self->{_pkcs10};
     }
 
@@ -73,11 +72,11 @@ sub _load {
     $self->{_hash} = undef;
 
     eval {
-        Crypt::PKCS10->setAPIversion(1);
-        my $decoded = Crypt::PKCS10->new($pkcs10, ignoreNonBase64 => 1, verifySignature => 0);
-        if ($decoded) {
-            $self->{_pkcs10} = $decoded;
-            $self->{_hash} = sha1_hex($decoded->csrRequest);
+        if (my $csr = OpenXPKI::Crypt::PKCS10->new( $pkcs10 )) {
+            $self->{_pkcs10} = $csr;
+            # this is the hash on the "unnormalized" PEM block and must not
+            # be used for anything else than cache control
+            $self->{_hash} = sha1($pkcs10);
         }
     };
     return $self->{_pkcs10};
@@ -96,16 +95,11 @@ sub subject_key_identifier {
     my $self = shift;
     my $pkcs10 = shift;
 
-    my $decoded = $self->_load($pkcs10);
-    if (!$decoded) { return; }
+    my $csr = $self->_load($pkcs10);
+    if (!$csr) { return; }
 
-    return uc(
-        join ':', (
-            unpack '(A2)*', sha1_hex(
-                $decoded->{certificationRequestInfo}{subjectPKInfo}{subjectPublicKey}[0]
-            )
-        )
-    );
+    return $csr->get_subject_key_id();
+
 }
 
 =head2 transaction_id
@@ -120,10 +114,9 @@ sub transaction_id {
     my $self = shift;
     my $pkcs10 = shift;
 
-    my $decoded = $self->_load($pkcs10);
-
-    if (!$decoded) { return; }
-    return $self->{_hash};
+    my $csr = $self->_load($pkcs10);
+    if (!$csr) { return; }
+    return $csr->get_transaction_id();
 
 }
 
@@ -140,10 +133,10 @@ sub dn {
     my $pkcs10 = shift;
     my $component = shift;
 
-    my $decoded = $self->_load($pkcs10);
-    if (!$decoded) { return; }
+    my $csr = $self->_load($pkcs10);
+    if (!$csr) { return; }
 
-    my $dn= OpenXPKI::DN->new($decoded->subject())->get_hashed_content();
+    my $dn= OpenXPKI::DN->new($csr->get_subject())->get_hashed_content();
 
     if (!$component) {
         return $dn;
