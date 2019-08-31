@@ -37,6 +37,14 @@ has __default_grid_row => (
     ]; }
 );
 
+has __default_wfdetails => (
+    is => 'rw',
+    isa => 'HashRef',
+    lazy => 1,
+    default => sub { return {
+
+    } },
+);
 
 has __proc_states  => (
     is => 'rw',
@@ -1967,8 +1975,6 @@ sub __render_from_workflow {
     # Right block
     if ($wf_info->{workflow}->{id} ) {
 
-        my @buttons;
-
         if ($view eq 'result' && $wf_info->{workflow}->{proc_state} !~ /(finished|failed)/) {
             push @buttons_handle, {
                 'action' => 'redirect!workflow!load!wf_id!'.$wf_info->{workflow}->{id},
@@ -1976,17 +1982,57 @@ sub __render_from_workflow {
             };
         }
 
-        my @data = (
-            { label => 'I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL', 'format' => 'link', value => {
-                'label' => $wf_info->{workflow}->{id},
-                'page' => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id},
-                'target' => '_blank',
-            }},
-            { label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', value => $wf_info->{workflow}->{type} },
-            { label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', value => $wf_info->{workflow}->{state} },
-            { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL', value => $wf_info->{workflow}->{proc_state} },
-            { label => 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL', value => $wf_info->{workflow}->{context}->{creator} }
-        );
+        # Build info according to config "uicontrol.wfdetails"
+        my $wfdetails_config = $self->_client->session()->param('wfdetails');
+        if (not $wfdetails_config) {
+            #load default config
+            $wfdetails_config = $self->__default_wfdetails;
+        }
+
+        # translate $wfdetails_info->{context}->{creator} to $wfdetails_info->{"context.creator"}
+        my $wfdetails_info = $wf_info->{workflow};
+        for my $subname (qw(context attribute)) {
+            my $subhash;
+            next unless $subhash = $wfdetails_info->{ $subname };
+            for my $key ( keys %$subhash ) {
+                $wfdetails_info->{"$subname.$key"} = $subhash->{ $key };
+            }
+            delete $wfdetails_info->{ $subname };
+        }
+
+        # assemble infos
+        my @data;
+        for my $cfg (@$wfdetails_config) {
+            my $value;
+
+            if ($cfg->{template}) {
+                $value = $self->send_command_v2( render_template => {
+                    template => $cfg->{template},
+                    params => $wfdetails_info,
+                });
+            }
+            elsif ($cfg->{field}) {
+                $value = $wfdetails_info->{ $cfg->{field} } // '-';
+            }
+
+            push @data, {
+                label => $cfg->{label},
+                value => $value,
+                format => $cfg->{link} ? 'link' : ($cfg->{format} || 'text'),
+            };
+        }
+
+        # my @data = (
+        #     { label => 'I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL', 'format' => 'link', value => {
+        #         'label' => $wf_info->{workflow}->{id},
+        #         'page' => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id},
+        #         'target' => '_blank',
+        #     }},
+        #     { label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', value => $wf_info->{workflow}->{type} },
+        #     { label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', value => $wf_info->{workflow}->{state} },
+        #     { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL', value => $wf_info->{workflow}->{proc_state} },
+        #     { label => 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL', value => $wf_info->{workflow}->{context}->{creator} }
+        # );
 
 
         # The workflow info contains info about all control actions that
