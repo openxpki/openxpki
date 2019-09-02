@@ -31,7 +31,6 @@ OpenXPKI/Template/Plugin/RandomPassword.pm
 OpenXPKI/Template/Plugin/Utils.pm
 OpenXPKI/Template/Plugin/Workflow.pm
 OpenXPKI/VERSION.pm
-openxpki.xsd
 
 ## Client
 OpenXPKI/Client.pm
@@ -185,9 +184,6 @@ OpenXPKI.xs
 OpenXPKI/Crypto/Backend/OpenSSL.xs
 OpenXPKI/Crypto/Backend/OpenSSL/XS/CRL.xs
 OpenXPKI/Crypto/Backend/OpenSSL/XS/ECDH.xs
-OpenXPKI/Crypto/Backend/OpenSSL/XS/PKCS10.xs
-OpenXPKI/Crypto/Backend/OpenSSL/XS/SPKAC.xs
-OpenXPKI/Crypto/Backend/OpenSSL/XS/X509.xs
 
 ## database interface of the server
 
