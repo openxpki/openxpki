@@ -21,18 +21,34 @@ use OpenXPKI::Server::API2::Types;
 
 =head2 get_crl
 
-returns a CRL. The possible parameters are crl_serial, format and pki_realm.
-crl_serial is the serial of the database table, the realm defaults to the
-current realm and the default format is PEM.
+returns a CRL.
 
-If no serial is given, the most current CRL of the active signer token
-in the current realm is returned.
+If no parameter is set at all, the newest CRL of the active signer token
+in the current realm is selected. To get the latest CRL of another issuer,
+set I<issuer_identifier>, to select a particular CRL set I<crl_serial>.
+Both works across realms.
 
-Possible values for format are:
+The default is to return the PEM encoded CRL, other formats can be
+selected setting I<format>.
+
+B<Parameters>
 
 =over
 
-=item * PEM
+=item crl_serial
+
+the serial (crl_key) of the database table
+
+=item issuer_identifier
+
+certificate identifier of the issuer, if set the latest crl of this
+issuer is returned.
+
+=item format
+
+=over
+
+=item * PEM (default)
 
 =item * DER
 
@@ -46,12 +62,6 @@ Possible values for format are:
 =item * DBINFO - unmodified result from the database
 
 =back
-
-B<Parameters>
-
-=over
-
-=item * C<XXX> I<Bool> - XXX. Default: XXX
 
 =back
 
@@ -68,6 +78,7 @@ command "get_crl" => {
     crl_serial => { isa => 'Int', },
     format     => { isa => 'AlphaPunct', matching => qr{ \A ( PEM | DER | TXT | HASH | FULLHASH | DBINFO ) \Z }x, default => "PEM" },
     pki_realm  => { isa => 'AlphaPunct', },
+    issuer_identifier => { isa => 'Value', },
 } => sub {
 
     my ($self, $params) = @_;
@@ -77,6 +88,7 @@ command "get_crl" => {
     my $crl_key    = $params->crl_serial;
     my $format     = $params->format;
     my $pki_realm  = $params->pki_realm;
+    my $issuer_identifier = $params->issuer_identifier;
 
     $pki_realm =  CTX('session')->data->pki_realm unless $pki_realm;
 
@@ -99,15 +111,18 @@ command "get_crl" => {
 
     } else {
 
-        my $ca_alias = $self->api->get_token_alias_by_type( type => 'certsign' );
-        ##! 16: 'Load crl by date, ca alias ' . $ca_alias
-        my $ca_hash = $self->api->get_certificate_for_alias( alias => $ca_alias );
+        if (!$issuer_identifier) {
+            my $ca_alias = $self->api->get_token_alias_by_type( type => 'certsign' );
+            ##! 16: 'Load crl by date, ca alias ' . $ca_alias
+            my $ca_hash = $self->api->get_certificate_for_alias( alias => $ca_alias );
+            $issuer_identifier = $ca_hash->{identifier};
+        }
 
         $db_results = CTX('dbi')->select_one(
             from => 'crl',
             columns => $columns,
             where => {
-                issuer_identifier => $ca_hash->{identifier}
+                issuer_identifier => $issuer_identifier
             },
             order_by => '-last_update'
         );
@@ -118,11 +133,6 @@ command "get_crl" => {
     if ( not $db_results ) {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_FOUND', );
-    }
-
-    if ($pki_realm ne $db_results->{pki_realm}) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_IN_REALM', );
     }
 
     my $pem_crl = $db_results->{data};
