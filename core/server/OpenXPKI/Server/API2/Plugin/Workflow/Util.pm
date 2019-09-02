@@ -593,25 +593,6 @@ sub get_workflow_info {
         },
     };
 
-    # FIXME - this stuff seems to be unused and does not reflect the attributes
-    # invented for the new ui stuff
-    for my $activity ($workflow->get_current_actions()) {
-        ##! 2: $activity
-
-        # FIXME - bug in Workflow::Action (v0.17)?: if no fields are defined the
-        # method tries to return an arrayref on an undef'd value
-        my @fields;
-        eval { @fields = $workflow->get_action_fields($activity) };
-
-        for my $field (@fields) {
-            ##! 4: $field->name()
-            $result->{activity}->{$activity}->{field}->{$field->name()} = {
-                description => $field->description(),
-                required    => $field->is_required(),
-            };
-        }
-    }
-
     return $result;
 }
 
