@@ -8,7 +8,6 @@ use English;
 use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use TestCGI;
-use Crypt::X509;
 use MIME::Base64;
 
 use Test::More tests => 8;
