@@ -2009,14 +2009,15 @@ sub __render_from_workflow {
             $wfdetails_info = $wf_info->{workflow};
         }
 
-        # translate $wfdetails_info->{context}->{creator} to $wfdetails_info->{"context.creator"}
+        # translate $wfdetails_info->{context}->{creator} to $wfdetails_info_flat->{"context.creator"}
+        my $wfdetails_info_flat = { %{ $wfdetails_info } }; # make a copy
         for my $subname (qw(context attribute)) {
             my $subhash;
-            next unless $subhash = $wfdetails_info->{ $subname };
+            next unless $subhash = $wfdetails_info_flat->{ $subname };
             for my $key ( keys %$subhash ) {
-                $wfdetails_info->{"$subname.$key"} = $subhash->{ $key };
+                $wfdetails_info_flat->{"$subname.$key"} = $subhash->{ $key };
             }
-            delete $wfdetails_info->{ $subname };
+            delete $wfdetails_info_flat->{ $subname };
         }
 
         # assemble infos
@@ -2031,7 +2032,7 @@ sub __render_from_workflow {
                 });
             }
             elsif ($cfg->{field}) {
-                $value = $wfdetails_info->{ $cfg->{field} } // '-';
+                $value = $wfdetails_info_flat->{ $cfg->{field} } // '-';
             }
 
             # if it's a link: render URL template ("page")
