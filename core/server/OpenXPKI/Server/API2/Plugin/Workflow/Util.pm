@@ -334,8 +334,10 @@ as a I<HashRef>:
             context     => { ... },
             attribute   => { ... },   # only if "with_attributes => 1"
         },
-        handles  => [ ... ],
-        activity => { ... },
+
+        # only if "with_ui_info => 1":
+        handles  => [ ... ],          # global actions currently allowed: "wakeup", "resume" and/or "fail"
+        activity => { ... },          # currently available actions
         state => {
             button => { ... },
             option => [ ... ],
@@ -362,6 +364,9 @@ underscore.
 
 =item * C<with_attributes> I<Bool> - set to 1 to get the extra attribute informations
 
+=item * C<with_ui_info> I<Bool> - set to 1 to get the extra UI informations about
+workflow actions and state
+
 =back
 
 =cut
@@ -369,8 +374,9 @@ sub get_wf_info {
     my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
         id        => { isa => 'Int',  optional => 1 },
         workflow  => { isa => 'OpenXPKI::Server::Workflow', optional => 1 },
-        with_attributes => { isa => 'Bool', optional => 1, default => 0 },
         activity  => { isa => 'Str',  optional => 1, },
+        with_attributes => { isa => 'Bool', optional => 1, default => 0 },
+        with_ui_info => { isa => 'Bool', optional => 1, default => 0 },
     );
     ##! 2: 'start'
 
@@ -385,6 +391,8 @@ sub get_wf_info {
     my $basic_wf_info = $self->get_basic_wf_info(workflow => $workflow, skip_attributes => not($args{with_attributes}));
     $basic_wf_info->{workflow}->{label} = $head->{label};
     $basic_wf_info->{workflow}->{description} = $head->{description};
+
+    return $basic_wf_info unless $args{with_ui_info};
 
     my $activity_state_info = $self->get_activity_and_state_info(
         $workflow->type,
