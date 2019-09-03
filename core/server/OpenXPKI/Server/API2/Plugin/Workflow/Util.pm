@@ -444,7 +444,7 @@ sub get_activity_and_state_info {
         { isa => 'Str', },
         { isa => 'Str', },
         { isa => 'ArrayRef', },
-        { isa => 'HashRef', optional => 1, default => sub { {} } },
+        { isa => 'HashRef|Undef', optional => 1, default => sub { {} } },
     );
     ##! 4: 'start'
 
