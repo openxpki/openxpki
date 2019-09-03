@@ -2047,24 +2047,12 @@ sub __render_from_workflow {
             }
 
             push @data, {
-                label => $cfg->{label},
+                label => $cfg->{label} // '',
                 value => $value,
                 format => $cfg->{link} ? 'link' : ($cfg->{format} || 'text'),
+                $cfg->{tooltip} ? ( tooltip => $cfg->{tooltip} ) : (),
             };
         }
-
-        # my @data = (
-        #     { label => 'I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL', 'format' => 'link', value => {
-        #         'label' => $wf_info->{workflow}->{id},
-        #         'page' => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id},
-        #         'target' => '_blank',
-        #     }},
-        #     { label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', value => $wf_info->{workflow}->{type} },
-        #     { label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', value => $wf_info->{workflow}->{state} },
-        #     { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL', value => $wf_info->{workflow}->{proc_state} },
-        #     { label => 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL', value => $wf_info->{workflow}->{context}->{creator} }
-        # );
-
 
         # The workflow info contains info about all control actions that
         # can done on the workflow -> render appropriate buttons.
