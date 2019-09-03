@@ -1982,15 +1982,34 @@ sub __render_from_workflow {
             };
         }
 
+        #
         # Build info according to config "uicontrol.wfdetails"
+        #
         my $wfdetails_config = $self->_client->session()->param('wfdetails');
         if (not $wfdetails_config) {
             #load default config
             $wfdetails_config = $self->__default_wfdetails;
         }
 
+        my $wfdetails_info;
+        # if needed, fetch enhanced info incl. workflow attributes
+        if (
+            not($wf_info->{workflow}->{attribute}) and (
+                   grep { ($_->{field}//'') =~              / attribute\. /msx } @$wfdetails_config
+                or grep { ($_->{template}//'') =~           / attribute\. /msx } @$wfdetails_config
+                or grep { (($_->{link}//{})->{page}//'') =~ / attribute\. /msx } @$wfdetails_config
+            )
+        ) {
+            $wfdetails_info = $self->send_command_v2( get_workflow_info => {
+                id => $wf_info->{workflow}->{id},
+                with_attributes => 1,
+            })->{workflow};
+        }
+        else {
+            $wfdetails_info = $wf_info->{workflow};
+        }
+
         # translate $wfdetails_info->{context}->{creator} to $wfdetails_info->{"context.creator"}
-        my $wfdetails_info = $wf_info->{workflow};
         for my $subname (qw(context attribute)) {
             my $subhash;
             next unless $subhash = $wfdetails_info->{ $subname };
