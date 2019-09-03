@@ -20,19 +20,19 @@ minutes and will give you a ready to run OXI install available at http://localho
 Debian Builds
 -------------
 
-New users should use the v2 release branch which is available for Debian 8 (Jessie), for
-those running a v1 version we still maintain security and major bug fixes for the old release.
+New users should use the v3 release branch which is available for Debian 10 (Buster), for
+those running a v2 version we still maintain security and major bug fixes for the old release.
 
-**Packages are for Debian Jessie 8 / 64bit (arch amd64). The en_US.utf8 locale must be
+**Packages are for Debian Jessie 10 / 64bit (arch amd64). The en_US.utf8 locale must be
 installed as the translation system will crash otherwise! The packages do NOT work
-on Ubuntu, Debian 9 or 32bit systems. Community packages for Ubuntu have been
+on Ubuntu or 32bit systems. Community packages for Ubuntu have been
 discontinued due to packaging/dependancy problems.**
 
 Start with a debian minimal install, we recommend to add "SSH Server" and "Web Server" in the package selection menu, as this will speed up the install later.
 
 To avoid an "untrusted package" warning, you should add our package signing key (works only on debian yet)::
 
-    wget https://packages.openxpki.org/v2/debian/Release.key -O - | apt-key add -
+    wget https://packages.openxpki.org/v3/debian/Release.key -O - | apt-key add -
 
 The https connection is protected by a Let's Encrypt certificate but if you want to validate the key on your own, the fingerprint is::
 
@@ -41,16 +41,16 @@ The https connection is protected by a Let's Encrypt certificate but if you want
 
 Add the repository to your source list (jessie)::
 
-    echo "deb http://packages.openxpki.org/v2/debian/ jessie release" > /etc/apt/sources.list.d/openxpki.list
-    aptitude update
+    echo "deb http://packages.openxpki.org/v3/debian/ jessie release" > /etc/apt/sources.list.d/openxpki.list
+    apt update
 
 As the init script uses mysql as default, but does not force it as a dependency, it is crucial that you have the mysql server and the perl mysql binding installed before you pull the OpenXPKI package::
 
-    aptitude install mysql-server libdbd-mysql-perl
+    apt install default-mysql-server libdbd-mysql-perl
 
 We strongly recommend to use a fastcgi module as it speeds up the UI, we recommend mod_fcgid as it is in the official main repository (mod_fastcgi will also work but is only available in the non-free repo)::
 
-    aptitude install libapache2-mod-fcgid
+    apt install apache2 libapache2-mod-fcgid
 
 Note, fastcgi module should be enabled explicitly, otherwise, .fcgi file will be treated as plain text (this is usually done by the installer already)::
 
@@ -60,7 +60,7 @@ Some people reported that a2enmod is not available on their system, in this case
 
 Now install the OpenXPKI core package, session driver and the translation package::
 
-    aptitude install libopenxpki-perl openxpki-cgi-session-driver openxpki-i18n
+    apt install libopenxpki-perl openxpki-cgi-session-driver openxpki-i18n
 
 You should now restart the apache server to activate the new config::
 
@@ -69,7 +69,7 @@ You should now restart the apache server to activate the new config::
 use the openxpkiadm command to verify if the system was installed correctly::
 
     openxpkiadm version
-    Version (core): 2.1.0
+    Version (core): 3.0.0
 
 Now, create an empty database and assign a database user::
 
