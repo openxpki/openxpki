@@ -49,22 +49,8 @@ command "get_workflow_data" => {
 } => sub {
     my ($self, $params) = @_;
 
-    my $workflow = CTX('workflow_factory')->get_workflow({ ID => $params->id });
-
-    return {
-        workflow => {
-            type        => $workflow->type,
-            id          => $workflow->id,
-            state       => $workflow->state,
-            last_update => $workflow->last_update->iso8601,
-            proc_state  => $workflow->proc_state,
-            count_try   => $workflow->count_try,
-            wake_up_at  => $workflow->wakeup_at,
-            reap_at     => $workflow->reap_at,
-            context     => { %{$workflow->context->param } },
-            attribute   => $workflow->attrib
-        }
-    };
+    my $util = OpenXPKI::Server::API2::Plugin::Workflow::Util->new;
+    return $util->get_basic_wf_info(id => $params->id);
 
 };
 

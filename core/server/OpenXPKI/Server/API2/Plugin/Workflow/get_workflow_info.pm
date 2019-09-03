@@ -88,9 +88,10 @@ command "get_workflow_info" => {
     my ($self, $params) = @_;
 
     my $util = OpenXPKI::Server::API2::Plugin::Workflow::Util->new;
+
     return $util->get_ui_info(
-        id        => $params->id,
-        attribute => $params->with_attributes,
+        id => $params->id,
+        with_attributes => $params->with_attributes,
         $params->has_activity ? (activity => $params->activity) : (),
     );
 };

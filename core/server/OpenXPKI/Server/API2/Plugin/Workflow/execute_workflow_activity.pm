@@ -122,7 +122,7 @@ command "execute_workflow_activity" => {
 
     return ($params->ui_info
         ? $util->get_ui_info(workflow => $updated_workflow)
-        : $util->get_workflow_info($updated_workflow)
+        : $util->get_basic_wf_info(workflow => $updated_workflow),
     );
 };
 
