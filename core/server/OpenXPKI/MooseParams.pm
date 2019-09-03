@@ -80,6 +80,13 @@ modified behaviour:
 
 =back
 
+Usage:
+
+    my ($self, $query, $return_rownum) = positional_args(\@_,
+        { isa => 'OpenXPKI::Server::Database::Query|Str' },
+        { isa => 'Bool', optional => 1, default => 0 },
+    );
+
 =cut
 sub positional_args {
     my $object = shift @{$_[0]}; # argument 0 is an ArrayRef of the calling method's parameters
