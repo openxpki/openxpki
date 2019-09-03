@@ -388,9 +388,22 @@ sub get_wf_info {
 
     my $head = CTX('config')->get_hash([ 'workflow', 'def', $workflow->type, 'head' ]);
 
-    my $basic_wf_info = $self->get_basic_wf_info(workflow => $workflow, skip_attributes => not($args{with_attributes}));
-    $basic_wf_info->{workflow}->{label} = $head->{label};
-    $basic_wf_info->{workflow}->{description} = $head->{description};
+    my $basic_wf_info = {
+        workflow => {
+            type        => $workflow->type,
+            id          => $workflow->id,
+            state       => $workflow->state,
+            description => $head->{description},
+            label       => $head->{label},
+            last_update => $workflow->last_update->iso8601,
+            proc_state  => $workflow->proc_state,
+            count_try   => $workflow->count_try,
+            wake_up_at  => $workflow->wakeup_at,
+            reap_at     => $workflow->reap_at,
+            context     => { %{$workflow->context->param } }, # make a copy
+            $args{with_attributes} ? ( attribute => $workflow->attrib ) : (),
+        }
+    };
 
     return $basic_wf_info unless $args{with_ui_info};
 
@@ -411,36 +424,6 @@ sub get_wf_info {
         %{ $activity_state_info },
         # handles => [ ... ]
         handles => $workflow->get_global_actions(),
-    };
-}
-
-# Fills a hash with informations from the workflow object
-sub get_basic_wf_info {
-    my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
-        id => { isa => 'Int',  optional => 1 },
-        workflow  => { isa => 'OpenXPKI::Server::Workflow', optional => 1 },
-        skip_attributes => { isa => 'Bool', optional => 1, default => 0 },
-    );
-
-    die "Please specify either 'id' or 'workflow'" unless ($args{id} or $args{workflow});
-    my $workflow = $args{workflow}
-        ? $args{workflow}
-        : CTX('workflow_factory')->get_workflow({ ID => $args{id} });
-
-    return {
-        workflow => {
-            type        => $workflow->type,
-            id          => $workflow->id,
-            state       => $workflow->state,
-            description => $workflow->description,
-            last_update => $workflow->last_update->iso8601,
-            proc_state  => $workflow->proc_state,
-            count_try   => $workflow->count_try,
-            wake_up_at  => $workflow->wakeup_at,
-            reap_at     => $workflow->reap_at,
-            context     => { %{$workflow->context->param } }, # make a copy
-            $args{skip_attributes} ? () : ( attribute => $workflow->attrib ),
-        }
     };
 }
 
