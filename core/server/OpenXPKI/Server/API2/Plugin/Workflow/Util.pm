@@ -314,7 +314,7 @@ sub _run_activity {
     } while($ac);
 }
 
-=head2 get_ui_info
+=head2 get_wf_info
 
 Returns informations about a workflow from the workflow engine and the config
 as a I<HashRef>:
@@ -365,7 +365,7 @@ underscore.
 =back
 
 =cut
-sub get_ui_info {
+sub get_wf_info {
     my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
         id        => { isa => 'Int',  optional => 1 },
         workflow  => { isa => 'OpenXPKI::Server::Workflow', optional => 1 },

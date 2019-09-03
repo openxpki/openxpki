@@ -182,7 +182,7 @@ sub _wakeup_or_resume_workflow {
     ));
 
     my $updated_workflow = $util->execute_activity($workflow, $activity, $async, $wait);
-    return $util->get_ui_info(id => $id);
+    return $util->get_wf_info(id => $id);
 }
 
 __PACKAGE__->meta->make_immutable;

@@ -143,7 +143,7 @@ command "create_workflow_instance" => {
     Log::Log4perl::MDC->put('wftype', undef);
 
     return ($params->ui_info
-        ? $util->get_ui_info(workflow => $updated_workflow)
+        ? $util->get_wf_info(workflow => $updated_workflow)
         : $util->get_basic_wf_info(workflow => $updated_workflow),
     );
 };

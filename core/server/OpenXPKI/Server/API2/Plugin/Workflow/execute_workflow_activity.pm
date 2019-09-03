@@ -121,7 +121,7 @@ command "execute_workflow_activity" => {
     my $updated_workflow = $util->execute_activity($workflow, $wf_activity, $params->async, $params->wait);
 
     return ($params->ui_info
-        ? $util->get_ui_info(workflow => $updated_workflow)
+        ? $util->get_wf_info(workflow => $updated_workflow)
         : $util->get_basic_wf_info(workflow => $updated_workflow),
     );
 };
