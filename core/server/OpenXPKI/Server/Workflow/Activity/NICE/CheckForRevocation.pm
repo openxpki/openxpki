@@ -25,7 +25,7 @@ sub execute {
     my $nice_backend = OpenXPKI::Server::NICE::Factory->getHandler( $self );
 
     # We do not need an attribute map here
-    $nice_backend->checkForRevocation();
+    $nice_backend->checkForRevocation( $workflow->context()->param('cert_identifier') );
 
 }
 

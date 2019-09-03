@@ -315,20 +315,21 @@ sub revokeCertificate {
 }
 
 sub checkForRevocation {
+
     my $self = shift;
+    my $cert_identifier  = shift;
 
     # As the local crl issuance process will set the state in the certificate
     # table directly, we get the certificate status from the local table
 
     ##! 16: 'Checking revocation status'
-    my $id = $self->_get_context_param('cert_identifier');
     my $cert = CTX('dbi')->select_one(
         from => 'certificate',
         columns => ['status'],
-        where => { identifier => $id },
+        where => { identifier => $cert_identifier },
     );
 
-    CTX('log')->application()->debug("Check for revocation of $id, result: " . $cert->{status});
+    CTX('log')->application()->debug("Check for revocation of $cert_identifier, result: " . $cert->{status});
 
     if ($cert->{status} eq 'REVOKED') {
        ##! 32: 'certificate revoked'
@@ -459,26 +460,22 @@ sub issueCRL {
     #
     CTX('log')->application()->info('CRL issued for CA ' . $ca_alias . ' in realm ' . $pki_realm);
 
-    #
-    # publish_crl can then publish all those with a PUBLICATION_DATE of 0
-    # and set it accordingly
-    my $data = { $crl_obj->to_db_hash() };
-
     CTX('log')->audit('cakey')->info('crl issued', {
         cakey     => $ca_identifier,
         token     => $ca_alias,
         pki_realm => $pki_realm,
     });
 
-    $data = {
-        # FIXME #legacydb Change upper to lower case in OpenXPKI::Crypto::CRL->to_db_hash(), not here
-        ( map { lc($_) => $data->{$_} } keys %$data ),
+    my $data = {
         pki_realm         => $pki_realm,
         issuer_identifier => $ca_identifier,
         crl_key           => $serial,
         crl_number        => $serial,
         items             => scalar @cert_timestamps,
+        last_update       => $crl_obj->{PARSED}->{BODY}->{LAST_UPDATE},
+        next_update       => $crl_obj->{PARSED}->{BODY}->{NEXT_UPDATE},
         publication_date  => 0,
+        data              => $crl_obj->get_body(),
     };
     $dbi->insert( into => 'crl', values => $data );
 
@@ -515,6 +512,9 @@ sub __prepare_crl_data {
         $status = 'HOLD'   if $reason_code eq 'certificateHold';
         $status = 'ISSUED' if $reason_code eq 'removeFromCRL';
 
+        # as this is done inside the same database transaction as the
+        # final insert of the generated CRL it is safe to set the status
+        # before the CRL is actually created
         $dbi->update(
             table => 'certificate',
             set   => { status => $status },
