@@ -41,7 +41,32 @@ has __default_wfdetails => (
     is => 'rw',
     isa => 'ArrayRef',
     lazy => 1,
-    default => sub { return [] },
+    default => sub { return [
+        {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL',
+            field => 'id',
+            link => {
+                page => 'workflow!load!wf_id![% id %]',
+                target => '_blank',
+            },
+        },
+        {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL',
+            field => 'type',
+        },
+        {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL',
+            field => 'state'
+        },
+        {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL',
+            field => 'proc_state',
+        },
+        {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL',
+            field => 'context.creator',
+        },
+    ] },
 );
 
 has __proc_states  => (
