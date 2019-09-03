@@ -2043,7 +2043,7 @@ sub __render_from_workflow {
                         template => $cfg->{link}->{page},
                         params => $wfdetails_info,
                     }),
-                    target => $cfg->{target} || 'modal',
+                    target => $cfg->{link}->{target} || 'modal',
                 }
             }
 
