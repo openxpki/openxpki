@@ -26,7 +26,7 @@ echo "======================================="
 based_on_develop=0
 git merge-base --is-ancestor $COMMIT_ID_DEVELOP HEAD && based_on_develop=1
 pushd ./config >/dev/null
-if [ $based_on_develop -eq 1]; then
+if [ $based_on_develop -eq 1 ]; then
     echo "Using config branch 'develop':"
     git checkout -q develop
 else
