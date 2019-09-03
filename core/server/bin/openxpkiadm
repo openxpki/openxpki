@@ -1225,10 +1225,13 @@ sub __check_realm {
     my $realm = $params{realm};
 
     if (!$realm) {
-         die "You must specify a realm using --realm\n";
-    }
-
-    if (!CTX('config')->exists(['system','realms',$params{realm}])) {
+         my @realms = CTX('config')->get_keys(['system','realms']);
+         if (scalar @realms == 1) {
+            $params{realm} = shift @realms;
+         } else {
+            die "You must specify a realm using --realm\n";
+        }
+    } elsif (!CTX('config')->exists(['system','realms',$params{realm}])) {
         die  "The realm $realm does not exist!\n";
     }
 
