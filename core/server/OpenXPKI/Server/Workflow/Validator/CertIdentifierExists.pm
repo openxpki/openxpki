@@ -33,13 +33,32 @@ sub _validate {
 
     my $pki_realm = $self->param('pki_realm') || CTX('session')->data->pki_realm;
 
-    if (($cert->{pki_realm} ne $pki_realm) && ($pki_realm ne '_any')) {
-        validation_error("I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NOT_IN_REALM");
-    }
-
     if ($self->param('entity_only') && !$cert->{req_key}) {
         validation_error("I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NOT_AN_ENTITY");
     }
+
+    my $group = $self->param('in_alias_group');
+    if ($self->param('is_token')) {
+        $group = CTX('config')->get(['crypto','type', $self->param('is_token')]);
+    }
+
+    if ($group) {
+        my $alias = CTX('dbi')->select_one(
+            from => 'aliases',
+            columns => [ 'alias' ],
+            where => {
+                identifier => $cert_identifier,
+                group_id => $group,
+                pki_realm => CTX('session')->data->pki_realm,
+            },
+        );
+        validation_error("I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_IS_NOT_IN_GROUP") unless($alias);
+        CTX('log')->application()->trace("Found alias " . $alias->{alias} );
+
+    } elsif (($cert->{pki_realm} ne $pki_realm) && ($pki_realm ne '_any')) {
+        validation_error("I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NOT_IN_REALM");
+    }
+
 
     CTX('log')->application()->trace("Found certificate, hash is " . Dumper $cert);
 
@@ -70,6 +89,12 @@ on the parameters it can check weather the certificate is in a given realm
 and if it is an entity certificate. Both parameters are optional. Note that
 there is no check on the validity of the certificate.
 
+To check if the certificate identifier is an register alias, you can set
+I<is_token> or I<in_alias_group>. This requires that an entry in the alias
+table exists with the given properties. Note that those flags expect the
+alias to be registered in the current session realm and do not check the
+realm of the certificate itself, any value given to I<pki_realm> is ignored.
+
 =head2 Argument
 
 =over
@@ -92,5 +117,16 @@ ist to check in the session realm only!
 =item entity_only
 
 If set, the certificate must be an entity certificate.
+
+=item is_token
+
+Expects the name of a token type as defined in crypto.type and checks if
+the certificate has an registered alias matching this token type in the
+current realm.
+
+=item in_alias_group
+
+Expects the name of an alias group and checks if the certificate has an
+registered alias in this group.
 
 =back
