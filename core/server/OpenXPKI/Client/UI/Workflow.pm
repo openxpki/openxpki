@@ -39,11 +39,9 @@ has __default_grid_row => (
 
 has __default_wfdetails => (
     is => 'rw',
-    isa => 'HashRef',
+    isa => 'ArrayRef',
     lazy => 1,
-    default => sub { return {
-
-    } },
+    default => sub { return [] },
 );
 
 has __proc_states  => (
