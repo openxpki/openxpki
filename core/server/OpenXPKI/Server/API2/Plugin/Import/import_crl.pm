@@ -18,14 +18,19 @@ use OpenXPKI::Crypto::CRL;
 =head2 import_crl
 
 Import a CRL into the current realm. This should be used only within realms that
-work as a proxy to external CA systems or use external CRL
-signer tokens.
+work as a proxy to external CA systems or use external CRL signer tokens.
 
 The issuer is extracted from the CRL. Note that the issuer must be defined as
 alias in the C<certsign> group.
 
-A check for duplicate CRLs is done based on C<issuer>, C<last_update> and
-C<next_update> fields.
+A check for duplicate CRLs is done based on C<issuer> and C<crl_number>, in
+case the given CRL has no CRL Number extension, it is considered as
+duplicate if an existing CRL without number and the same value for
+C<last_update> and C<next_update> exists.
+
+By default, the method throws an exception if the given CRL exists already,
+you can set I<skip_duplicate> to silently ignore duplicates in which case no
+new record will be created and the existing one will be returned.
 
 The content of the CRL is NOT parsed, therefore the certificate status of
 revoked certificates is NOT changed in the database!
@@ -49,6 +54,7 @@ B<Parameters>
 
 =item * C<data> I<Str> - PEM formated CRL. Required.
 
+=item * C<skip_duplicate> I<Bool>
 =back
 
 B<Changes compared to API v1:>
@@ -58,6 +64,7 @@ The previously unused parameter C<ISSUER> was removed.
 =cut
 command "import_crl" => {
     data   => { isa => 'PEM', required => 1, },
+    skip_duplicate => { isa => 'Bool', default=> 0, },
 } => sub {
     my ($self, $params) = @_;
 
@@ -101,31 +108,46 @@ command "import_crl" => {
     my $serial = $dbi->next_id('crl');
     my $ca_identifier = $issuer->{identifier};
 
-
-    my %data_crl_obj = $crl_obj->to_db_hash(); # keys: DATA, LAST_UPDATE, NEXT_UPDATE
     my $data = {
-        # FIXME #legacydb Change upper to lower case in OpenXPKI::Crypto::CRL->to_db_hash(), not here
-        ( map { lc($_) => $data_crl_obj{$_} } keys %data_crl_obj ),
         pki_realm         => $pki_realm,
         issuer_identifier => $ca_identifier,
         crl_key           => $serial,
+        crl_number        => $crl_obj->get_serial() // '',
+        last_update       => $crl_obj->{PARSED}->{BODY}->{LAST_UPDATE},
+        next_update       => $crl_obj->{PARSED}->{BODY}->{NEXT_UPDATE},
         publication_date  => 0,
-        items             =>  $crl_obj->{PARSED}->{BODY}->{ITEMCNT},
-        crl_number        =>  $crl_obj->{PARSED}->{BODY}->{SERIAL},
+        items             => $crl_obj->{PARSED}->{BODY}->{ITEMCNT},
+        data              => $crl_obj->get_body(),
     };
+
+
+    my $where_duplicate = {
+        pki_realm         => $pki_realm,
+        issuer_identifier => $ca_identifier,
+        crl_number => $data->{crl_number},
+    };
+
+    if (!$data->{crl_number}) {
+        $where_duplicate->{last_update} = $data->{last_update};
+        $where_duplicate->{next_update} = $data->{next_update};
+    }
 
     my $duplicate = $dbi->select_one(
         from => 'crl',
-        columns => [ 'crl_key' ],
-        where => {
-            'pki_realm' => $pki_realm,
-            'issuer_identifier' => $ca_identifier,
-            'last_update' => $data->{last_update},
-            'next_update' => $data->{next_update},
-        },
+        columns => $params->skip_duplicate ?
+            [ 'pki_realm', 'issuer_identifier', 'crl_key', 'crl_number', 'items', 'last_update', 'next_update', 'publication_date' ] :
+            [ 'crl_key' ],
+        where => $where_duplicate,
     );
 
-    if ($duplicate) {
+    if (!$duplicate) {
+        $dbi->insert( into => 'crl', values => $data );
+        delete $data->{data};
+        CTX('log')->application()->info("Imported CRL for issuer $issuer_dn");
+    } elsif ($params->skip_duplicate) {
+        CTX('log')->application()->info("CRL is alredy in database and skip_duplicate is set");
+        $data = $duplicate;
+    } else {
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_UI_IMPORT_CRL_DUPLICATE',
             params => {
@@ -137,12 +159,8 @@ command "import_crl" => {
         );
     }
 
+
     ##! 32: 'CRL Data ' . Dumper $data
-
-    $dbi->insert( into => 'crl', values => $data );
-    CTX('log')->application()->info("Imported CRL for issuer $issuer_dn");
-
-    delete $data->{data};
     return $data;
 };
 
