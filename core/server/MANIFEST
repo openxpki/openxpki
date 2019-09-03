@@ -390,6 +390,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/CertificateExportArchive.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Connector/GetValue.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CopyCertificateMetadata.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CopyContextFromWorkflow.pm
+OpenXPKI/Server/Workflow/Activity/Tools/CRLExport.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/DeleteEntry.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/GetEntry.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/ModifyEntry.pm
