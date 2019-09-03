@@ -645,7 +645,7 @@ sub init_detail {
                 });
             }
             else {
-                $line = sprintf '%s: %s', $cfg->{label}, join(',', @{ $cert_attrs->{ $cfg->{value} } }) // '-';
+                $line = sprintf '%s: %s', $cfg->{label}, join(',', @{ $cert_attrs->{ $cfg->{field} } }) // '-';
             }
             push @metadata_lines, $line;
         }
