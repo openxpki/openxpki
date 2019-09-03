@@ -381,28 +381,28 @@ sub get_ui_info {
         : CTX('workflow_factory')->get_workflow({ ID => $args{id} });
 
     my $head = CTX('config')->get_hash([ 'workflow', 'def', $workflow->type, 'head' ]);
-    my $context = { %{$workflow->context->param } }; # make a copy
-
 
     my $basic_wf_info = $self->get_basic_wf_info(workflow => $workflow, skip_attributes => not($args{with_attributes}));
     $basic_wf_info->{workflow}->{label} = $head->{label};
     $basic_wf_info->{workflow}->{description} = $head->{description};
 
+    my $activity_state_info = $self->get_activity_and_state_info(
+        $workflow->type,
+        $head->{prefix},
+        $workflow->state,
+        # fetch actions of current state (or use given action):
+        [ $args{activity} ? $args{activity} : $workflow->get_current_actions() ],
+        { %{$workflow->context->param } }, # make a copy
+    );
+
     return {
         # workflow => { ... }
-        $basic_wf_info,
-        # handles => [ ... ]
-        handles => $workflow->get_global_actions(),
+        %{ $basic_wf_info },
         # activity => { ... }
         # state => { ... }
-        %{ $self->get_activity_and_state_info(
-            $workflow->type,
-            $head->{prefix},
-            $workflow->state,
-            # fetch actions of current state (or use given action):
-            $args{activity} ? [ $args{activity} ] : $workflow->get_current_actions(),
-            $context,
-        ) },
+        %{ $activity_state_info },
+        # handles => [ ... ]
+        handles => $workflow->get_global_actions(),
     };
 }
 
