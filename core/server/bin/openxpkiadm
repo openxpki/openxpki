@@ -11,6 +11,7 @@ use Proc::SafeExec;
 use POSIX ":sys_wait_h";
 use Errno;
 use File::Spec;
+use YAML;
 
 # For the password hasher
 use IO::Prompt;
@@ -1532,6 +1533,10 @@ if ($cmd eq 'initdb') {
         $ret = 2;
     }
 
+    if ($params{debug}) {
+        print Dump $c->get_hash('');
+    }
+
     foreach my $module (@{$params{module}}) {
         my $class = "OpenXPKI::Config::Lint::". ucfirst($module);
         eval "use $class;1";
@@ -1954,6 +1959,8 @@ Command options:
 
   -- module  Specify extra modules to apply on the config object for
              additional checks.
+
+  --debug    Dump the full config tree as YAML structure
 
 =head2 buildconfig
 

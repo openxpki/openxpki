@@ -36,8 +36,8 @@ sub _build_config {
     if (-f $self->LOCATION && $self->LOCATION =~ /.yaml$/) {
         $config = YAML::LoadFile( $self->LOCATION );
     } else {
-        # Skip the workflow directories (legacy only!)
-        my $cm    = Config::Merge->new( path => $self->LOCATION, skip => qr/realm\.\w+\._workflow/ );
+        # Skip the realm.tpl directory
+        my $cm    = Config::Merge->new( path => $self->LOCATION, skip => qr/realm\.tpl/ );
         $config = $cm->();
     }
     return $self->cm2tree($config);
