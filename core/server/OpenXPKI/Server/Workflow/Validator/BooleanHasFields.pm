@@ -29,7 +29,7 @@ sub _validate {
             unless ($arg1 xor $arg2);
     } elsif ($op eq 'and') {
         validation_error($error)
-            unless ($arg1 and $arg2);
+            unless (($arg1 and $arg2) or (not $arg1 and not $arg2));
     }
 
     return 1;
@@ -58,6 +58,10 @@ OpenXPKI::Server::Workflow::Validator::BooleanHasFields
 This validator checks whether the number of arguments set matches the
 boolean operator. Set in this validator means not empty or undef, the
 literal value I<0> is therefore treated as "true" in the equotation!
+
+Note: The check for I<and> is also true if both values are B<NOT> set, so
+this option is used to check if two values exist together. To check for
+their general presence simply use the I<required> attribute.
 
 =head2 Argument
 
