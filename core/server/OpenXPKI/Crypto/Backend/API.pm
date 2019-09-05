@@ -59,6 +59,12 @@ sub __init_command_params : PRIVATE {
                           "OUT"        => ["PEM","DER"],
                           "DATA"       => 1,
                          },
+    "get_pubkey"     => {"PASSWD"     => 1,
+                          "KEYTYPE"    => ["pkey","rsa"],
+                          "IN"         => ["PEM","DER"],
+                          "OUT"        => ["PEM","DER"],
+                          "DATA"       => 1,
+                         },
     "convert_pkcs8"   => {
                           "PASSWD"     => 1,
                           "OUT_PASSWD" => 0,

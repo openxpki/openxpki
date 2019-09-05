@@ -76,6 +76,7 @@ OpenXPKI/Connector/WorkflowContext.pm
 # Wrappers around Crypt::* modules
 OpenXPKI/Crypt/CRL.pm
 OpenXPKI/Crypt/PKCS10.pm
+OpenXPKI/Crypt/PubKey.pm
 OpenXPKI/Crypt/X509.pm
 
 ## Crypto layer
@@ -164,6 +165,7 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/create_pkcs12.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_pkey.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_random.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/get_pkcs8_keytype.pm
+OpenXPKI/Crypto/Backend/OpenSSL/Command/get_pubkey.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/is_issuer.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/is_prime.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/issue_cert.pm
