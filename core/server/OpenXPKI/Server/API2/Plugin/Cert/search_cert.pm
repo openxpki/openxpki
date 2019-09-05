@@ -19,28 +19,6 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Database::Legacy;
 
-my $re_all               = qr{ \A .* \z }xms;
-my $re_alpha_string      = qr{ \A [ \w \- \. : \s ]* \z }xms;
-my $re_integer_string    = qr{ \A $RE{num}{int} \z }xms;
-my $re_int_or_hex_string = qr{ \A ([0-9]+|0x[0-9a-fA-F]+) \z }xms;
-my $re_boolean           = qr{ \A [01] \z }xms;
-
-my $re_cert_string       = qr{ \A [A-Za-z0-9\+/=_\-\ \n]+ \z }xms;
-my $re_filename_string   = qr{ \A [A-Za-z0-9\+/=_\-\.]* \z }xms;
-my $re_image_format      = qr{ \A (ps|png|jpg|gif|cmapx|imap|svg|svgz|mif|fig|hpgl|pcl|NULL) \z }xms;
-my $re_cert_format       = qr{ \A (PEM|DER|TXT|PKCS7|HASH) \z }xms;
-my $re_crl_format        = qr{ \A (PEM|DER|TXT|HASH|RAW|FULLHASH|DBINFO) \z }xms;
-my $re_privkey_format    = qr{ \A (PKCS8_PEM|PKCS8_DER|OPENSSL_(PRIVKEY|RSA)|PKCS12|JAVA_KEYSTORE) \z }xms;
-# TODO - consider opening up re_sql_string even more, currently this means
-# that we can not search for unicode characters in certificate subjects,
-# for example ...
-my $re_sql_string        = qr{ \A [a-zA-Z0-9\@\-_\.\s\%\*\+\=\,\:\ ]* \z }xms;
-my $re_sql_field_name    = qr{ \A [a-zA-Z0-9_\.]+ \z }xms;
-my $re_approval_msg_type = qr{ \A (CSR|CRR) \z }xms;
-my $re_approval_lang     = qr{ \A (de_DE|en_US|ru_RU) \z }xms;
-my $re_csr_format        = qr{ \A (PEM|DER|TXT) \z }xms;
-my $re_pkcs10            = qr{ \A [A-za-z0-9\+/=_\-\r\n\ ]+ \z}xms;
-
 has 'return_columns_default' => (
     isa => 'ArrayRef',
     is => 'rw',
@@ -55,7 +33,6 @@ has 'return_columns_default' => (
         notafter
     )]}
 );
-
 
 =head2 search_cert
 
@@ -105,7 +82,7 @@ All parameters are optional and can be used to filter the result list:
 
 =over
 
-=item * C<pki_realm> I<Str> - certificate realm. Specify "_any"
+=item * C<pki_realm> L<AlphaPunct|OpenXPKI::Server::API2::Types/AlphaPunct> - certificate realm. Specify "_any"
 for a global search. Default: current session's realm
 
 =item * C<entity_only> I<Bool> - certificate CA
@@ -116,19 +93,19 @@ so you can use asterisk (*) as placeholder)
 =item * C<issuer_dn> I<Str> - issuer pattern (does an SQL LIKE search
 so you can use asterisk (*) as placeholder)
 
-=item * C<cert_serial> I<Str> - serial number of certificate
+=item * C<cert_serial> L<IntOrHex|OpenXPKI::Server::API2::Types/IntOrHex> - serial number of certificate
 
-=item * C<csr_serial> I<Str> - serial number of certificate request
+=item * C<csr_serial> I<Int> - serial number of certificate request
 
 =item * C<subject_key_identifier> I<Str> - X.509 certificate subject identifier
 
-=item * C<issuer_identifier> I<Str> - issuer identifier
+=item * C<issuer_identifier> L<Base64|OpenXPKI::Server::API2::Types/Base64> - issuer identifier
 
-=item * C<authority_key_identifier> I<Str> - CA identifier
+=item * C<authority_key_identifier> L<AlphaPunct|OpenXPKI::Server::API2::Types/AlphaPunct> - CA identifier
 
-=item * C<identifier> I<Str> - internal certificate identifier (hash of PEM)
+=item * C<identifier> L<Base64|OpenXPKI::Server::API2::Types/Base64> - internal certificate identifier (hash of PEM)
 
-=item * C<profile> I<Str> - certificate profile name
+=item * C<profile> L<AlphaPunct|OpenXPKI::Server::API2::Types/AlphaPunct> - certificate profile name
 
 =item * C<valid_before> I<Int> - certificate validity must start before this UNIX epoch timestamp
 
@@ -146,8 +123,7 @@ so you can use asterisk (*) as placeholder)
 
 =item * C<invalid_after> I<Int> - certificate invalidity  date is after this UNIX epoch timestamp
 
-=item * C<status> I<Str> - certificate status (for possible values see
-L<OpenXPKI::Server::API2::Types/CertStatus>)
+=item * C<status> L<CertStatus|OpenXPKI::Server::API2::Types/CertStatus> - certificate status
 
 =item * C<cert_attributes> I<HashRef> - key is attribute name, value is passed
 "as is" as where statement on value, see documentation of SQL::Abstract.
@@ -167,7 +143,7 @@ Set to the empty string to return the result unsorted.
 
 =item * C<reverse> I<Bool> - order results ascending
 
-=item * C<return_attributes> I<ArrayRef> - add the given attributes as
+=item * C<return_attributes> L<ArrayRefOrStr|OpenXPKI::Server::API2::Types/ArrayRefOrStr> - add the given attributes as
 columns to the result set. Each attribute is added as extra column
 using the attribute name as key.
 
@@ -175,7 +151,7 @@ Note: If the attribute is multivalued or you use an attribute query that
 causes multiple result lines for a single certificate you will get more
 than one line for the same certificate!
 
-=item * C<return_columns> I<ArrayRef> - set the columns from the base
+=item * C<return_columns> L<ArrayRefOrStr|OpenXPKI::Server::API2::Types/ArrayRefOrStr> - set the columns from the base
 table that should be included in the returned hashref. By default this
 replaces the default columns, if you want the columns to extend the default
 set put the plus sign '+' as first column name.
@@ -194,33 +170,33 @@ of C<[valid|expires]_[before|after]>:
 =cut
 
 command "search_cert" => {
-    authority_key_identifier => {isa => 'Value',         matching => $re_alpha_string,      },
-    cert_attributes          => {isa => 'ArrayRef|HashRef',      },
-    return_attributes        => {isa => 'ArrayRefOrStr', coerce => 1, },
-    return_columns           => {isa => 'ArrayRefOrStr', coerce => 1, },
-    cert_serial              => {isa => 'Value',         matching => $re_int_or_hex_string, },
-    csr_serial               => {isa => 'Value',         matching => $re_integer_string,    },
-    entity_only              => {isa => 'Value',         matching => $re_boolean,           },
-    expires_after            => {isa => 'Int', },
-    expires_before           => {isa => 'Int', },
-    identifier               => {isa => 'Base64', },
-    issuer_dn                => {isa => 'Value' },
-    issuer_identifier        => {isa => 'Base64', },
-    limit                    => {isa => 'Value',         matching => $re_integer_string,    },
-    order                    => {isa => 'Value' },
-    pki_realm                => {isa => 'Value',         matching => $re_alpha_string,      },
-    profile                  => {isa => 'Value',         matching => $re_alpha_string,      },
-    reverse                  => {isa => 'Value',         matching => $re_boolean,           },
-    start                    => {isa => 'Value',         matching => $re_integer_string,    },
-    status                   => {isa => 'CertStatus' },
-    subject                  => {isa => 'Value' },
-    subject_key_identifier   => {isa => 'Value' },
-    valid_after              => {isa => 'Int', },
-    valid_before             => {isa => 'Int', },
-    revoked_before           => {isa => 'Int', },
-    revoked_after            => {isa => 'Int', },
-    invalid_before           => {isa => 'Int', },
-    invalid_after            => {isa => 'Int', },
+    authority_key_identifier => { isa => 'AlphaPunct' },
+    cert_attributes          => { isa => 'ArrayRef|HashRef' },
+    return_attributes        => { isa => 'ArrayRefOrStr', coerce => 1 },
+    return_columns           => { isa => 'ArrayRefOrStr', coerce => 1 },
+    cert_serial              => { isa => 'IntOrHex', coerce => 1 },
+    csr_serial               => { isa => 'Int' },
+    entity_only              => { isa => 'Bool' },
+    expires_after            => { isa => 'Int' },
+    expires_before           => { isa => 'Int' },
+    identifier               => { isa => 'Base64' },
+    issuer_dn                => { isa => 'Str' },
+    issuer_identifier        => { isa => 'Base64' },
+    limit                    => { isa => 'Int' },
+    order                    => { isa => 'Str' },
+    pki_realm                => { isa => 'AlphaPunct' },
+    profile                  => { isa => 'AlphaPunct' },
+    reverse                  => { isa => 'Bool' },
+    start                    => { isa => 'Int' },
+    status                   => { isa => 'CertStatus' },
+    subject                  => { isa => 'Str' },
+    subject_key_identifier   => { isa => 'Str' },
+    valid_after              => { isa => 'Int' },
+    valid_before             => { isa => 'Int' },
+    revoked_before           => { isa => 'Int' },
+    revoked_after            => { isa => 'Int' },
+    invalid_before           => { isa => 'Int' },
+    invalid_after            => { isa => 'Int' },
 } => sub {
     my ($self, $params) = @_;
 
@@ -305,28 +281,28 @@ of C<[valid|expires]_[before|after]>:
 
 =cut
 command "search_cert_count" => {
-    authority_key_identifier => {isa => 'Value',    matching => $re_alpha_string,      },
-    cert_attributes          => {isa => 'ArrayRef|HashRef', },
-    return_attributes        => {isa => 'ArrayRefOrStr', coerce => 1, },
-    cert_serial              => {isa => 'Value',    matching => $re_int_or_hex_string, },
-    csr_serial               => {isa => 'Value',    matching => $re_integer_string,    },
-    entity_only              => {isa => 'Value',    matching => $re_boolean,           },
-    expires_after            => {isa => 'Int', },
-    expires_before           => {isa => 'Int', },
-    identifier               => {isa => 'Base64',},
-    issuer_dn                => {isa => 'Value' },
-    issuer_identifier        => {isa => 'Base64',},
-    pki_realm                => {isa => 'Value',    matching => $re_alpha_string,      },
-    profile                  => {isa => 'Value',    matching => $re_alpha_string,      },
-    status                   => {isa => 'CertStatus' },
-    subject                  => {isa => 'Value' },
-    subject_key_identifier   => {isa => 'Value' },
-    valid_after              => {isa => 'Int', },
-    valid_before             => {isa => 'Int', },
-    revoked_before           => {isa => 'Int', },
-    revoked_after            => {isa => 'Int', },
-    invalid_before           => {isa => 'Int', },
-    invalid_after            => {isa => 'Int', },
+    authority_key_identifier => { isa => 'AlphaPunct' },
+    cert_attributes          => { isa => 'ArrayRef|HashRef' },
+    return_attributes        => { isa => 'ArrayRefOrStr', coerce => 1 },
+    cert_serial              => { isa => 'IntOrHex', coerce => 1 },
+    csr_serial               => { isa => 'Int' },
+    entity_only              => { isa => 'Bool' },
+    expires_after            => { isa => 'Int' },
+    expires_before           => { isa => 'Int' },
+    identifier               => { isa => 'Base64' },
+    issuer_dn                => { isa => 'Str' },
+    issuer_identifier        => { isa => 'Base64' },
+    pki_realm                => { isa => 'AlphaPunct' },
+    profile                  => { isa => 'AlphaPunct' },
+    status                   => { isa => 'CertStatus' },
+    subject                  => { isa => 'Str' },
+    subject_key_identifier   => { isa => 'Str' },
+    valid_after              => { isa => 'Int' },
+    valid_before             => { isa => 'Int' },
+    revoked_before           => { isa => 'Int' },
+    revoked_after            => { isa => 'Int' },
+    invalid_before           => { isa => 'Int' },
+    invalid_after            => { isa => 'Int' },
 } => sub {
     my ($self, $params) = @_;
 
@@ -355,13 +331,7 @@ sub _make_db_query {
     ##! 32: 'Arguments ' . Dumper $po
 
     if ( $po->has_cert_serial ) {
-        my $serial = $po->cert_serial;
-        # autoconvert hexadecimal serial, needs to have 0x as prefix!
-        if ($serial =~ /^0x/i) {
-            my $sn = Math::BigInt->new( $serial );
-            $serial = $sn->bstr();
-        }
-        $where->{'certificate.cert_key'} = $serial;
+        $where->{'certificate.cert_key'} = $po->cert_serial;
     }
 
     # only list entities issued by this ca
