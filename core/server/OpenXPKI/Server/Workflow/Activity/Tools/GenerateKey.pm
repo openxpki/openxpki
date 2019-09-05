@@ -1,10 +1,3 @@
-
-# This is the NEW Activity which is used by the V2 CSR Workflows
-# After decomissioning of the old CSR Workflows, the CSR::GenerateKey
-# Activity should be deleted.
-# This class does NOT validate the key parameters as this should be done
-# in the workflow and uses the new universal create_pkey command
-
 package OpenXPKI::Server::Workflow::Activity::Tools::GenerateKey;
 
 use strict;
@@ -23,46 +16,39 @@ sub execute
     my $context    = $workflow->context();
 
     my $params = {
-        key_alg  => $self->param('key_alg'),
-        enc_alg  => $self->param('enc_alg'),
+        key_alg  => $self->param('key_alg') || 'rsa',
+        enc_alg  => $self->param('enc_alg') || 'aes256',
         password => $self->param('password'),
     };
 
     if (!$params->{key_alg}) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_MISSING_PARAMETERS',
-        );
+        configuration_error('No key algorithm set for generate key');
     }
 
     # password check
-    if (!$params->{password}) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_MISSING_OR_EMPTY_PASSWORD',
-        );
+    if (not $params->{password}) {
+        configuration_error('No password set for key encryption');
     }
 
     my $parameters = $self->param('key_gen_params');
 
-    if (! defined $parameters) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CSR_GENERATEKEY_MISSING_PARAMETERS',
-        );
-    }
+    if (defined $parameters && not $parameters) {
+        configuration_error('Parameter set is empty for generate key');
+    } elsif (ref $parameters eq 'HASH') {
 
-    # TODO - we need to find a suitable way to map and validate parameters
-    # for the moment we just support key_length and curve_name and map those
-    # to the API method
-
-    my $param;
-    foreach my $key (keys %{$parameters}) {
-        my $value = $parameters->{$key};
-        if ( defined $value && $value ne '' ) {
-            if ($key =~ /curve_name/i) {
-                $params->{curve} = $value;
-            } elsif ($key =~ /KEY_LENGTH/i) {
-                $params->{key_length} = $value;
-            } else {
-                $self->log()->warn('Unknown key parameter ' . $key);
+        # TODO - we need to find a suitable way to map and validate parameters
+        # for the moment we just support key_length and curve_name and map those
+        # to the API method
+        foreach my $key (keys %{$parameters}) {
+            my $value = $parameters->{$key};
+            if ( defined $value && $value ne '' ) {
+                if ($key =~ /curve_name/i) {
+                    $params->{curve} = $value;
+                } elsif ($key =~ /key_length/i) {
+                    $params->{key_length} = $value;
+                } else {
+                    $self->log()->warn('Unknown key parameter ' . $key);
+                }
             }
         }
     }
@@ -70,6 +56,7 @@ sub execute
     # command definition
     my $pkcs8 = CTX('api2')->generate_key(%$params);
 
+    delete $params->{password};
     CTX('log')->audit('key')->info("generating private key", {
         %{$params}
     });
@@ -90,10 +77,12 @@ OpenXPKI::Server::Workflow::Activity::Tools::GenerateKey
 
 =head1 Description
 
-Creates a new (encrypted) private key with the given parameters key_type and
-password. key_type is a symbolic name for a given key configuration, the
-details of which are defined in key_gen_params. The encrypted private key is
-written to the context parameter private_key.
+Creates a new (encrypted) private key with the parameters given. The only
+mandatory parameter is the password, the others default to a rsa 2048 bit
+key encrypted with aes256.
+
+For details on the parameters please see the documentation of the
+generate_key API method.
 
 =head1 Configuration
 
@@ -106,11 +95,22 @@ generate_key method of the crypto token.
 
 =item key_alg
 
+Mapped unmodified to key_alg of the api method, set to 'rsa' of not set.
+
 =item enc_alg
+
+Mapped unmodified to key_alg of the api method, set to 'aes256' of not set.
+
+=item password
+
+Password to encrypt the key with, mandatory.
 
 =item key_gen_params
 
-=item password
+If parameter is given, it must be a hash. The values given in the key
+I<curve_name> and I<key_length> are mapped to the api method as is. Other
+keys are silently ignored, no defaults are applied (default key lenght for
+RSA/DSA is set in the API method).
 
 =item target_key
 
