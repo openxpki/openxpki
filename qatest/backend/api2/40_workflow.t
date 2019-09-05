@@ -305,7 +305,7 @@ lives_and {
 # get_workflow_info
 #
 lives_and {
-    my $result = $oxitest->api2_command("get_workflow_info" => { id => $wf_t2->id });
+    my $result = $oxitest->api2_command("get_workflow_info" => { id => $wf_t2->id, with_ui_info => 1 });
     cmp_deeply $result, {
         workflow => superhashof({
             id => re(qr/^\d+$/),
@@ -357,7 +357,7 @@ lives_and {
 } "get_workflow_info() - via ID";
 
 lives_and {
-    my $result = $oxitest->api2_command("get_workflow_info" => { id => $wf_t2->id, activity => 'wftype2_add_link' });
+    my $result = $oxitest->api2_command("get_workflow_info" => { id => $wf_t2->id, with_ui_info => 1, activity => 'wftype2_add_link' });
     cmp_deeply $result, superhashof({
         activity => {
             wftype2_add_link => {

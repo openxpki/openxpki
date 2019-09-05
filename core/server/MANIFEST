@@ -294,7 +294,6 @@ OpenXPKI/Server/API2/Plugin/Workflow/get_rpc_openapi_spec.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_activities.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_activities_params.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_base_info.pm
-OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_data.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_creator.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_history.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_info.pm

@@ -23,27 +23,28 @@ I<HashRef> with informations:
 
     {
         workflow => {
-                type        => ...,
-                id          => ...,
-                state       => ...,
-                label       => ...,
-                description => ...,
-                last_update => ...,
-                proc_state  => ...,
-                count_try   => ...,
-                wake_up_at  => ...,
-                reap_at     => ...,
-                context     => { ... },
-                attribute   => { ... },   # only if "with_attributes => 1"
-            },
-            handles  => [ ... ],
-            activity => { ... },
-            state => {
-                button => { ... },
-                option => [ ... ],
-                output => [ ... ],
-            },
-        }
+            type        => ...,
+            id          => ...,
+            state       => ...,
+            label       => ...,
+            description => ...,
+            last_update => ...,
+            proc_state  => ...,
+            count_try   => ...,
+            wake_up_at  => ...,
+            reap_at     => ...,
+            context     => { ... },
+            attribute   => { ... },   # only if "with_attributes => 1"
+        },
+
+        # only if "with_ui_info => 1":
+        handles  => [ ... ],
+        activity => { ... },
+        state => {
+            button => { ... },
+            option => [ ... ],
+            output => [ ... ],
+        },
     }
 
 B<Parameters>
@@ -60,6 +61,9 @@ Default: all actions available in the current state.
 
 Note: you have to prepend the workflow prefix to the action separated by an
 underscore.
+
+=item * C<with_ui_info> I<Bool> - set to 1 to get the extra UI informations about
+workflow actions and state
 
 =back
 
@@ -84,14 +88,17 @@ command "get_workflow_info" => {
     id        => { isa => 'Int', required => 1, },
     activity  => { isa => 'AlphaPunct', },
     with_attributes => { isa => 'Bool', default => 0, },
+    with_ui_info => { isa => 'Bool', default => 0, },
 } => sub {
     my ($self, $params) = @_;
 
     my $util = OpenXPKI::Server::API2::Plugin::Workflow::Util->new;
-    return $util->get_ui_info(
-        id        => $params->id,
-        attribute => $params->with_attributes,
+
+    return $util->get_wf_info(
+        id => $params->id,
         $params->has_activity ? (activity => $params->activity) : (),
+        with_attributes => $params->with_attributes,
+        with_ui_info => $params->with_ui_info,
     );
 };
 
