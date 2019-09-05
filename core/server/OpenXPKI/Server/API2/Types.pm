@@ -43,8 +43,6 @@ subtype 'AlphaPunct', # named $re_alpha_string in old API
     where { $_ =~ qr{ \A [ \w \- \. : \s ]* \z }xms },
     message { "$_ is not an alphanumeric string plus punctuation chars" };
 
-my $re_base64_string     = qr{ \A [A-Za-z0-9\+/=_\-]* \z }xms;
-
 =head2 Base64
 
 A string containing only characters allowed in Base64 and Base64 filename/URL

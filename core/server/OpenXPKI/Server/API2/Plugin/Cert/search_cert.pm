@@ -24,7 +24,7 @@ my $re_alpha_string      = qr{ \A [ \w \- \. : \s ]* \z }xms;
 my $re_integer_string    = qr{ \A $RE{num}{int} \z }xms;
 my $re_int_or_hex_string = qr{ \A ([0-9]+|0x[0-9a-fA-F]+) \z }xms;
 my $re_boolean           = qr{ \A [01] \z }xms;
-my $re_base64_string     = qr{ \A [A-Za-z0-9\+/=_\-]* \z }xms;
+
 my $re_cert_string       = qr{ \A [A-Za-z0-9\+/=_\-\ \n]+ \z }xms;
 my $re_filename_string   = qr{ \A [A-Za-z0-9\+/=_\-\.]* \z }xms;
 my $re_image_format      = qr{ \A (ps|png|jpg|gif|cmapx|imap|svg|svgz|mif|fig|hpgl|pcl|NULL) \z }xms;
@@ -203,9 +203,9 @@ command "search_cert" => {
     entity_only              => {isa => 'Value',         matching => $re_boolean,           },
     expires_after            => {isa => 'Int', },
     expires_before           => {isa => 'Int', },
-    identifier               => {isa => 'Value',         matching => $re_base64_string,     },
+    identifier               => {isa => 'Base64', },
     issuer_dn                => {isa => 'Value' },
-    issuer_identifier        => {isa => 'Value',         matching => $re_base64_string,     },
+    issuer_identifier        => {isa => 'Base64', },
     limit                    => {isa => 'Value',         matching => $re_integer_string,    },
     order                    => {isa => 'Value' },
     pki_realm                => {isa => 'Value',         matching => $re_alpha_string,      },
@@ -313,9 +313,9 @@ command "search_cert_count" => {
     entity_only              => {isa => 'Value',    matching => $re_boolean,           },
     expires_after            => {isa => 'Int', },
     expires_before           => {isa => 'Int', },
-    identifier               => {isa => 'Value',    matching => $re_base64_string,     },
+    identifier               => {isa => 'Base64',},
     issuer_dn                => {isa => 'Value' },
-    issuer_identifier        => {isa => 'Value',    matching => $re_base64_string,     },
+    issuer_identifier        => {isa => 'Base64',},
     pki_realm                => {isa => 'Value',    matching => $re_alpha_string,      },
     profile                  => {isa => 'Value',    matching => $re_alpha_string,      },
     status                   => {isa => 'CertStatus' },
