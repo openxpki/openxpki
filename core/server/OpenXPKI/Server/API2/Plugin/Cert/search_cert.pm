@@ -169,11 +169,11 @@ of C<[valid|expires]_[before|after]>:
 
 =cut
 
-command "search_cert" => {
+# parameters common for search_cert and search_cert_count
+my %common_params = (
     authority_key_identifier => { isa => 'AlphaPunct' },
     cert_attributes          => { isa => 'ArrayRef|HashRef' },
     return_attributes        => { isa => 'ArrayRefOrStr', coerce => 1 },
-    return_columns           => { isa => 'ArrayRefOrStr', coerce => 1 },
     cert_serial              => { isa => 'IntOrHex', coerce => 1 },
     csr_serial               => { isa => 'Int' },
     entity_only              => { isa => 'Bool' },
@@ -182,12 +182,8 @@ command "search_cert" => {
     identifier               => { isa => 'Base64' },
     issuer_dn                => { isa => 'Str' },
     issuer_identifier        => { isa => 'Base64' },
-    limit                    => { isa => 'Int' },
-    order                    => { isa => 'Str' },
     pki_realm                => { isa => 'AlphaPunct' },
     profile                  => { isa => 'AlphaPunct' },
-    reverse                  => { isa => 'Bool' },
-    start                    => { isa => 'Int' },
     status                   => { isa => 'CertStatus' },
     subject                  => { isa => 'Str' },
     subject_key_identifier   => { isa => 'Str' },
@@ -197,6 +193,15 @@ command "search_cert" => {
     revoked_after            => { isa => 'Int' },
     invalid_before           => { isa => 'Int' },
     invalid_after            => { isa => 'Int' },
+);
+
+command "search_cert" => {
+    %common_params,
+    return_columns           => { isa => 'ArrayRefOrStr', coerce => 1 },
+    limit                    => { isa => 'Int' },
+    order                    => { isa => 'Str' },
+    reverse                  => { isa => 'Bool' },
+    start                    => { isa => 'Int' },
 } => sub {
     my ($self, $params) = @_;
 
@@ -281,28 +286,7 @@ of C<[valid|expires]_[before|after]>:
 
 =cut
 command "search_cert_count" => {
-    authority_key_identifier => { isa => 'AlphaPunct' },
-    cert_attributes          => { isa => 'ArrayRef|HashRef' },
-    return_attributes        => { isa => 'ArrayRefOrStr', coerce => 1 },
-    cert_serial              => { isa => 'IntOrHex', coerce => 1 },
-    csr_serial               => { isa => 'Int' },
-    entity_only              => { isa => 'Bool' },
-    expires_after            => { isa => 'Int' },
-    expires_before           => { isa => 'Int' },
-    identifier               => { isa => 'Base64' },
-    issuer_dn                => { isa => 'Str' },
-    issuer_identifier        => { isa => 'Base64' },
-    pki_realm                => { isa => 'AlphaPunct' },
-    profile                  => { isa => 'AlphaPunct' },
-    status                   => { isa => 'CertStatus' },
-    subject                  => { isa => 'Str' },
-    subject_key_identifier   => { isa => 'Str' },
-    valid_after              => { isa => 'Int' },
-    valid_before             => { isa => 'Int' },
-    revoked_before           => { isa => 'Int' },
-    revoked_after            => { isa => 'Int' },
-    invalid_before           => { isa => 'Int' },
-    invalid_after            => { isa => 'Int' },
+    %common_params
 } => sub {
     my ($self, $params) = @_;
 
