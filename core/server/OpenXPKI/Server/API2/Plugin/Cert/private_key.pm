@@ -129,7 +129,7 @@ If the input password does not decrypt the private key, an exception is thrown.
 =cut
 
 command "convert_private_key" => {
-    identifier => { isa => 'Base64', default => '' },
+    identifier => { isa => 'Base64' },
     private_key => { isa => 'PEMPKey', required => 1 },
     format     => { isa => 'Str', matching => qr{ \A ( PKCS8_(PEM|DER) | OPENSSL_(PRIVKEY|RSA) | PKCS12 | JAVA_KEYSTORE ) \z }xms, required => 1, },
     password   => { isa => 'Str', required => 1, },
@@ -141,7 +141,7 @@ command "convert_private_key" => {
 } => sub {
     my ($self, $params) = @_;
 
-    my $identifier = $params->identifier;
+    my $identifier = $params->identifier || '';
     my $format     = $params->format;
     my $password   = $params->password;
     my $pass_out   = $params->passout;
@@ -205,7 +205,6 @@ command "convert_private_key" => {
 
     }
     elsif ( $format eq 'PKCS12' or $format eq 'JAVA_KEYSTORE' ) {
-        ##! 16: 'identifier: ' . $identifier
 
         if (!$identifier) {
             OpenXPKI::Exception->throw(
@@ -213,6 +212,7 @@ command "convert_private_key" => {
                 params => { 'FORMAT' =>  $format },
             );
         }
+        ##! 16: 'identifier: ' . $identifier
 
         my @chain = $self->get_chain_certificates({
             'KEEPROOT'   => $params->keeproot,
