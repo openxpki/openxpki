@@ -94,14 +94,27 @@ sub param {
 
         my $template = $map->{$name};
         # shortcut for single context value
-        if ($template =~ /^\$(\S+)/) {
+        if ($template =~ m{\A\$(\S+?)(\.(\S+))?\z}) {
             my $ctxkey = $1;
-            ##! 16: 'load from context ' . $ctxkey
+            my $subkey = $3 || '';
+            ##! 16: 'load from context ' . $ctxkey . ' subkey: ' .$subkey
             my $ctx = $self->workflow()->context()->param( $ctxkey );
+            if (!defined $ctx || $ctx eq '') {
+                return $ctx;
+            }
             if (OpenXPKI::Serialization::Simple::is_serialized($ctx)) {
                 ##! 32: ' needs deserialize '
                 my $ser  = OpenXPKI::Serialization::Simple->new();
-                return $ser->deserialize( $ctx );
+                $ctx = $ser->deserialize( $ctx );
+            }
+            if ($subkey) {
+                if (ref $ctx eq 'HASH') {
+                    return $ctx->{$subkey};
+                } elsif (ref $ctx eq 'ARRAY' && $subkey =~ /\A\d+\z/) {
+                    return $ctx->[$subkey];
+                } else {
+                    configuration_error("Subkey requested from _map but value is of wrong data type");
+                }
             } else {
                 return $ctx;
             }
