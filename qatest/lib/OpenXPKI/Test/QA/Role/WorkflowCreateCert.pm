@@ -150,7 +150,7 @@ sub create_cert {
             # Test FQDNs should not validate so we need a policy exception request
             # (on rare cases the responsible router might return a valid address, so we check)
             my $msg = $self->api2_command(
-                get_workflow_info => { id => $wftest->id }
+                get_workflow_info => { id => $wftest->id, with_ui_info => 1 }
             );
 
             my $actions = $msg->{state}->{option};

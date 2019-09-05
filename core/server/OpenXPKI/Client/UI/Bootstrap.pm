@@ -69,31 +69,31 @@ sub init_structure {
         # Check syntax of "certdetails".
         # (a sub{} allows using return instead of nested if-structures)
         my $certdetails = sub {
-            my $certdetails;
-            unless ($certdetails = $menu->{certdetails}) {
-                $self->logger->warn('Config entry "certdetails" is empty') unless $menu->{certdetails};
+            my $result;
+            unless ($result = $menu->{certdetails}) {
+                $self->logger->warn('Config entry "certdetails" is empty');
                 return {};
             }
-            unless (ref $certdetails eq 'HASH') {
+            unless (ref $result eq 'HASH') {
                 $self->logger->warn('Config entry "certdetails" is not a hash');
                 return {};
             }
-            if ($certdetails->{metadata}) {
-                if (ref $certdetails->{metadata} eq 'ARRAY') {
-                    for my $md (@{ $certdetails->{metadata} }) {
+            if ($result->{metadata}) {
+                if (ref $result->{metadata} eq 'ARRAY') {
+                    for my $md (@{ $result->{metadata} }) {
                         if (not ref $md eq 'HASH') {
                             $self->logger->warn('Config entry "certdetails.metadata" contains an item that is not a hash');
-                            $certdetails->{metadata} = [];
+                            $result->{metadata} = [];
                             last;
                         }
                     }
                 }
                 else {
                     $self->logger->warn('Config entry "certdetails.metadata" is not an array');
-                    $certdetails->{metadata} = [];
+                    $result->{metadata} = [];
                 }
             }
-            return $certdetails;
+            return $result;
         }->();
         $session->param('certdetails', $certdetails);
 

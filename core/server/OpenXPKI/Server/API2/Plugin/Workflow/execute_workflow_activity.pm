@@ -71,9 +71,9 @@ command "execute_workflow_activity" => {
     workflow => { isa => 'AlphaPunct', },
     activity => { isa => 'AlphaPunct', required => 1, },
     params   => { isa => 'HashRef', },
-    ui_info  => { isa => 'Bool', },
-    async    => { isa => 'Bool', },
-    wait     => { isa => 'Bool', },
+    ui_info  => { isa => 'Bool', default => 0 },
+    async    => { isa => 'Bool', default => 0 },
+    wait     => { isa => 'Bool', default => 0 },
 } => sub {
     my ($self, $params) = @_;
     ##! 1: "execute_workflow_activity"
@@ -85,7 +85,7 @@ command "execute_workflow_activity" => {
 
     my $util = OpenXPKI::Server::API2::Plugin::Workflow::Util->new;
 
-    Log::Log4perl::MDC->put('wfid',   $wf_id);
+    Log::Log4perl::MDC->put('wfid', $wf_id);
 
     ##! 2: "load workflow"
     my $workflow = $util->fetch_workflow($wf_id);
@@ -120,10 +120,7 @@ command "execute_workflow_activity" => {
     ));
     my $updated_workflow = $util->execute_activity($workflow, $wf_activity, $params->async, $params->wait);
 
-    return ($params->ui_info
-        ? $util->get_ui_info(workflow => $updated_workflow)
-        : $util->get_workflow_info($updated_workflow)
-    );
+    return $util->get_wf_info(workflow => $updated_workflow, with_ui_info => $params->ui_info);
 };
 
 __PACKAGE__->meta->make_immutable;

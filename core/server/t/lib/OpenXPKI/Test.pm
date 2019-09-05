@@ -765,8 +765,12 @@ sub write_config {
         $self->config_writer->write_private_key($cert->db->{pki_realm}, $cert->name, $cert->private_key);
     }
 
-    # set test config dir in ENV so OpenXPKI::Config will access it from now on
+    # point server to the test config dir (evaluated by OpenXPKI::Config)
     $ENV{OPENXPKI_CONF_PATH} = $self->testenv_root."/etc/openxpki/config.d";
+
+    # point clients to the test config dir (evaluated by OpenXPKI::Client::Config)
+    # -> CURRENTLY UNUSED as this affects only (est|rpc|scep|soap).fcgi which are not tested
+    $ENV{OPENXPKI_CLIENT_CONF_DIR} = $self->testenv_root."/etc/openxpki";
 }
 
 =head2 init_server

@@ -10,6 +10,9 @@ if [ -z "$TRAVIS_BUILD_ID" ]; then
     exit 1
 fi
 
+# stop on errors
+set -e
+
 #
 # Check out config repository
 #
@@ -26,7 +29,7 @@ echo "======================================="
 based_on_develop=0
 git merge-base --is-ancestor $COMMIT_ID_DEVELOP HEAD && based_on_develop=1
 pushd ./config >/dev/null
-if [ $based_on_develop -eq 1]; then
+if [ $based_on_develop -eq 1 ]; then
     echo "Using config branch 'develop':"
     git checkout -q develop
 else
@@ -53,8 +56,10 @@ make
 # Unit tests + code coverage (submitted to coveralls.io)
 if [ "unit_coverage" == "$OXI_TEST_RUN" -o -z "$OXI_TEST_RUN" ]; then
     figlet 'unit tests'
+    set +e
     ~/perl5/bin/cover -test -report coveralls
-    exit $?
+    test -n "$OXI_TEST_RUN" && exit $?
+    set -e
 fi
 
 #### make test    (already done via "cover -test")
@@ -90,7 +95,7 @@ sed -ri 's/^(pid_file:\s+)\S+/\1\/var\/openxpki\/openxpkid.pid/' /etc/openxpki/c
 ./tools/testenv/insert-certificates.sh
 
 # Start OpenXPKI (it's in the PATH)
-openxpkictl start || cat /var/log/openxpki/*
+openxpkictl start || (cat /var/log/openxpki/*; exit 1)
 
 #
 # QA tests
@@ -105,7 +110,9 @@ declare -A testmodes=(
 for mode in "${!testmodes[@]}"; do
     if [ "$mode" == "$OXI_TEST_RUN" -o -z "$OXI_TEST_RUN" ]; then
         figlet "$mode tests"
+        set +e
         cd $TRAVIS_BUILD_DIR/${testmodes[$mode]} && prove -q .
-        exit $?
+        test -n "$OXI_TEST_RUN" && exit $?
+        set -e
     fi
 done

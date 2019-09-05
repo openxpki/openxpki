@@ -173,8 +173,9 @@ sub init_load {
     my $wf_action = $self->param('wf_action') || $args->{wf_action} || '';
     my $view = $self->param('view') || '';
 
-    my $wf_info = $self->send_command_v2( 'get_workflow_info', {
-        id => $id
+    my $wf_info = $self->send_command_v2( get_workflow_info => {
+        id => $id,
+        with_ui_info => 1,
     });
 
     if (!$wf_info) {
@@ -214,8 +215,9 @@ sub init_context {
     # re-instance existing workflow
     my $id = $self->param('wf_id');
 
-    my $wf_info = $self->send_command_v2( 'get_workflow_info', {
+    my $wf_info = $self->send_command_v2( get_workflow_info => {
         id => $id,
+        with_ui_info => 1,
     });
 
     if (!$wf_info) {
@@ -254,9 +256,10 @@ sub init_attribute {
     # re-instance existing workflow
     my $id = $self->param('wf_id');
 
-    my $wf_info = $self->send_command_v2( 'get_workflow_info', {
+    my $wf_info = $self->send_command_v2( get_workflow_info => {
         id => $id,
         with_attributes => 1,
+        with_ui_info => 1,
     });
 
     if (!$wf_info) {
@@ -1204,9 +1207,9 @@ sub action_select {
     }
 
     Log::Log4perl::MDC->put('wfid', $wf_id);
-
     my $wf_info = $self->send_command_v2( 'get_workflow_info', {
-        id => $wf_id
+        id => $wf_id,
+        with_ui_info => 1,
     });
     $self->logger()->trace('wf_info ' . Dumper  $wf_info) if $self->logger->is_trace;
 
@@ -1540,8 +1543,9 @@ sub __render_from_workflow {
     my $view = $args->{view} || '';
 
     if (!$wf_info && $args->{id}) {
-        $wf_info = $self->send_command_v2( 'get_workflow_info', {
-            id => $args->{id}
+        $wf_info = $self->send_command_v2( get_workflow_info => {
+            id => $args->{id},
+            with_ui_info => 1,
         });
         $args->{wf_info} = $wf_info;
     }
@@ -2312,7 +2316,10 @@ sub __render_result_list {
 
             # we need to load the wf info
             if (!$wf_info && ($col->{template} || $col->{source} eq 'context')) {
-                $wf_info = $self->send_command_v2( 'get_workflow_data', { id => $wf_item->{'workflow_id'}  });
+                $wf_info = $self->send_command_v2( get_workflow_info => {
+                    id => $wf_item->{'workflow_id'},
+                    with_attributes => 1,
+                });
                 $self->logger()->trace( "fetch wf info : " . Dumper $wf_info) if $self->logger->is_trace;
                 $context = $wf_info->{workflow}->{context};
                 $attrib = $wf_info->{workflow}->{attribute};
