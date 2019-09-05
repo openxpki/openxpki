@@ -83,7 +83,7 @@ I</etc/openxpki>
 has src_config_dir   => (
     is => 'rw', isa => 'Str', lazy => 1,
     default => sub {
-        return $ENV{'OXI_TEST_SAMPLECONFIG_DIR'} || '/etc/openxpki'
+        return $ENV{'OXI_TEST_SAMPLECONFIG_DIR'} || die "OXI_TEST_SAMPLECONFIG_DIR is not set";
     }
 );
 

@@ -220,7 +220,7 @@ execute show => "/tools-copy/testenv/mysql-create-user.sh";
 # if there are only qatests, we create the database later on
 if ($mode eq "coverage" or scalar @tests_unit) {
     execute show => "/tools-copy/testenv/mysql-create-db.sh";
-    execute show => "/tools-copy/testenv/mysql-create-schema.sh $clone_dir/config/contrib/sql/schema-mysql.sql";
+    execute show => "/tools-copy/testenv/mysql-create-schema.sh";
 }
 
 #
@@ -292,7 +292,7 @@ execute show => "/tools-copy/testenv/mysql-oxi-config.sh";
 # Database (re-)creation
 #
 execute show => "/tools-copy/testenv/mysql-create-db.sh";
-execute show => "/tools-copy/testenv/mysql-create-schema.sh $config_dir/contrib/sql/schema-mysql.sql";
+execute show => "/tools-copy/testenv/mysql-create-schema.sh";
 
 #
 # Sample config (CA certificates etc.)

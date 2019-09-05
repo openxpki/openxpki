@@ -100,8 +100,8 @@ my $oxitest = OpenXPKI::Test->new(
         "realm.alpha.workflow.def.wf_type_2_self_$uuid" => workflow_def("wf_type_2", "self"),
         "realm.alpha.workflow.def.wf_type_3_others_$uuid" => workflow_def("wf_type_3", "others"),
         "realm.alpha.workflow.def.wf_type_4_regex1_$uuid" => workflow_def("wf_type_4", "^edel"),
-        "realm.alpha.workflow.def.wf_type_5_regex2_$uuid" => workflow_def("wf_type_4", '^.*lma$'),
-        "realm.alpha.workflow.def.wf_type_6_noaccess_$uuid" => workflow_def("wf_type_5", undef),
+        "realm.alpha.workflow.def.wf_type_5_regex2_$uuid" => workflow_def("wf_type_5", '^.*lma$'),
+        "realm.alpha.workflow.def.wf_type_6_noaccess_$uuid" => workflow_def("wf_type_6", undef),
     },
     enable_workflow_log => 1, # while testing we do not log to database by default
 );

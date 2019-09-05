@@ -550,6 +550,12 @@ sub BUILD {
     $self->init_user_config;
     $self->write_config;
     $self->init_server;
+    #
+    # Please note: if you change the following lines, add every call
+    # after $self->init_server also to
+    # OpenXPKI::Test::QA::Role::Server, modifier "around 'init_server'", the
+    # child code after $self->$orig()
+    #
     $self->init_session_and_context;
 }
 

@@ -126,6 +126,7 @@ sub delete {
 
 sub delete_all_before {
     my ($self, $epoch) = @_;
+    my $count = 0;
     ##! 8: "deleting all sessions where modified < $epoch"
     find(
         sub {
@@ -139,10 +140,12 @@ sub delete_all_before {
                         message => 'Could not delete old session data file',
                         params  => { file => $filepath, error => $! }
                     );
+                $count++;
             }
         },
         $self->directory
     );
+    return $count;
 }
 
 __PACKAGE__->meta->make_immutable;
