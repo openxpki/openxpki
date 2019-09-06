@@ -16,6 +16,9 @@ It will be applied when you say C<use OpenXPKI::Server::API2::EasyPlugin>.
 
 =cut
 
+# Core Modules
+use Data::Dumper;
+
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
@@ -83,11 +86,11 @@ sub add_param_specs {
     # Add API command parameters to the newly created class as Moose attributes
     for my $param_name (sort keys %{ $params_specs }) {
         # the parameter specs like "isa => ..., required => ..."
-        my $spec = $params_specs->{$param_name};
+        my $spec = { %{ $params_specs->{$param_name} } }; # copy param to prevent modifying it via delete() below
 
         OpenXPKI::Exception->throw(
             message => "'isa' must specified when defining an API command parameter",
-            params => { command => $command, parameter => $param_name }
+            params => { command => $command, parameter => $param_name, spec => Dumper($spec) }
         ) unless $spec->{isa};
 
         my $isa = delete $spec->{isa};
