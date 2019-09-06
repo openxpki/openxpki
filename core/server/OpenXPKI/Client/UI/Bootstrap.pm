@@ -97,6 +97,27 @@ sub init_structure {
         }->();
         $session->param('certdetails', $certdetails);
 
+        # Check syntax of "wfdetails".
+        # (a sub{} allows using return instead of nested if-structures)
+        my $wfdetails = sub {
+            if (not exists $menu->{wfdetails}) {
+                $self->logger->warn('Config entry "wfdetails" is not defined, using defaults');
+                return;
+            }
+            my $result;
+            unless ($result = $menu->{wfdetails}) {
+                $self->logger->info('Config entry "wfdetails" is set to "undef" to trigger defaults');
+                return
+            }
+            unless (ref $result eq 'ARRAY') {
+                $self->logger->warn('Config entry "wfdetails" is not an array');
+                return
+            }
+            return $result;
+        }->();
+        $session->param('wfdetails', $wfdetails);
+
+        # Ping endpoint
         if ($menu->{ping}) {
             my $ping;
             if (ref $menu->{ping} eq 'HASH') {

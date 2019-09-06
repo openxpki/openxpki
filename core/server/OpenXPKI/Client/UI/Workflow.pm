@@ -37,6 +37,37 @@ has __default_grid_row => (
     ]; }
 );
 
+has __default_wfdetails => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    lazy => 1,
+    default => sub { return [
+        {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL',
+            field => 'id',
+            link => {
+                page => 'workflow!load!wf_id![% id %]',
+                target => '_blank',
+            },
+        },
+        {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL',
+            field => 'type',
+        },
+        {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL',
+            field => 'state'
+        },
+        {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL',
+            field => 'proc_state',
+        },
+        {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL',
+            field => 'context.creator',
+        },
+    ] },
+);
 
 has __proc_states  => (
     is => 'rw',
@@ -1964,10 +1995,10 @@ sub __render_from_workflow {
         }
     }
 
+    #
     # Right block
+    #
     if ($wf_info->{workflow}->{id} ) {
-
-        my @buttons;
 
         if ($view eq 'result' && $wf_info->{workflow}->{proc_state} !~ /(finished|failed)/) {
             push @buttons_handle, {
@@ -1976,18 +2007,78 @@ sub __render_from_workflow {
             };
         }
 
-        my @data = (
-            { label => 'I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL', 'format' => 'link', value => {
-                'label' => $wf_info->{workflow}->{id},
-                'page' => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id},
-                'target' => '_blank',
-            }},
-            { label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', value => $wf_info->{workflow}->{type} },
-            { label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', value => $wf_info->{workflow}->{state} },
-            { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL', value => $wf_info->{workflow}->{proc_state} },
-            { label => 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL', value => $wf_info->{workflow}->{context}->{creator} }
-        );
+        #
+        # Build info according to config "uicontrol.wfdetails"
+        #
+        my $wfdetails_config = $self->_client->session()->param('wfdetails');
+        if (not $wfdetails_config) {
+            #load default config
+            $wfdetails_config = $self->__default_wfdetails;
+        }
 
+        my $wfdetails_info;
+        # if needed, fetch enhanced info incl. workflow attributes
+        if (
+            not($wf_info->{workflow}->{attribute}) and (
+                   grep { ($_->{field}//'') =~              / attribute\. /msx } @$wfdetails_config
+                or grep { ($_->{template}//'') =~           / attribute\. /msx } @$wfdetails_config
+                or grep { (($_->{link}//{})->{page}//'') =~ / attribute\. /msx } @$wfdetails_config
+            )
+        ) {
+            $wfdetails_info = $self->send_command_v2( get_workflow_info => {
+                id => $wf_info->{workflow}->{id},
+                with_attributes => 1,
+            })->{workflow};
+        }
+        else {
+            $wfdetails_info = $wf_info->{workflow};
+        }
+
+        # translate $wfdetails_info->{context}->{creator} to $wfdetails_info_flat->{"context.creator"}
+        my $wfdetails_info_flat = { %{ $wfdetails_info } }; # make a copy
+        for my $subname (qw(context attribute)) {
+            my $subhash;
+            next unless $subhash = $wfdetails_info_flat->{ $subname };
+            for my $key ( keys %$subhash ) {
+                $wfdetails_info_flat->{"$subname.$key"} = $subhash->{ $key };
+            }
+            delete $wfdetails_info_flat->{ $subname };
+        }
+
+        # assemble infos
+        my @data;
+        for my $cfg (@$wfdetails_config) {
+            my $value;
+
+            if ($cfg->{template}) {
+                $value = $self->send_command_v2( render_template => {
+                    template => $cfg->{template},
+                    params => $wfdetails_info,
+                });
+            }
+            elsif ($cfg->{field}) {
+                $value = $wfdetails_info_flat->{ $cfg->{field} } // '-';
+            }
+
+            # if it's a link: render URL template ("page")
+            if ($cfg->{link}) {
+                $value = {
+                    label => $value,
+                    page => $self->send_command_v2( render_template => {
+                        template => $cfg->{link}->{page},
+                        params => $wfdetails_info,
+                    }),
+                    target => $cfg->{link}->{target} || 'modal',
+                }
+            }
+
+            push @data, {
+                label => $cfg->{label} // '',
+                value => $value,
+                format => $cfg->{link} ? 'link' : ($cfg->{format} || 'text'),
+                $cfg->{tooltip} ? ( tooltip => $cfg->{tooltip} ) : (),
+            };
+        }
 
         # The workflow info contains info about all control actions that
         # can done on the workflow -> render appropriate buttons.
