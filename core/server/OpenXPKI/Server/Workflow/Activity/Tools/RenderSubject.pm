@@ -86,8 +86,6 @@ sub execute {
 
     CTX('log')->application()->info("Rendering subject: $cert_subject");
 
-
-
     my $cert_san_parts  = $context->param('cert_san_parts');
     my $extra_san = {};
     if ($cert_san_parts) {
@@ -106,30 +104,6 @@ sub execute {
         vars    => $subject_vars,
         additional => $extra_san || {},
     );
-
-    # No SAN template exists - if we have extra san just map them to the
-    # array ref structure required by the csr persister
-    if (!$san_list && $extra_san) {
-        my $san_names = CTX('api2')->list_supported_san();
-
-        # create a nested has to remove duplicates
-        my $san_items = {};
-        foreach my $type (keys %{$extra_san}) {
-            foreach my $value (@{$extra_san->{$type}}) {
-                $san_items->{$type}->{$value} = 1 if($value);
-            }
-        }
-
-        # Map the items hash to san_array structure used by our crypto engine
-        foreach my $type (keys %{$san_items}) {
-            foreach my $value (keys %{$san_items->{$type}}) {
-                push @{$san_list}, [ $type, $value ] if ($value);
-            }
-        }
-
-        CTX('log')->application()->debug("San template empty but extra_san present");
-
-    }
 
     ##! 64: "Entries in san_list \n" .  Dumper $san_list;
 

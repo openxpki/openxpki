@@ -11,7 +11,8 @@ OpenXPKI::Server::API2::Plugin::Workflow::execute_workflow_activity
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 use OpenXPKI::Server::API2::Plugin::Workflow::Util;
-
+use OpenXPKI::Debug;
+use Data::Dumper;
 
 
 =head1 COMMANDS
@@ -104,10 +105,11 @@ command "execute_workflow_activity" => {
             params => { wf_id => $wf_id, activity => $wf_activity, proc_state => $proc_state }
         );
     }
+    ##! 16: "run activity $wf_activity with params " . Dumper $params->params
 
     # check the input params
     my $wf_params = $util->validate_input_params($workflow, $wf_activity, $params->params);
-    ##! 16: 'activity params ' . $wf_params
+    ##! 16: 'validated params ' . Dumper $wf_params
 
     my $context = $workflow->context();
     $context->param($wf_params) if $wf_params;

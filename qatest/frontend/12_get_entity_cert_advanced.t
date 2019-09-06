@@ -31,7 +31,7 @@ $result = $client->mock_request({
     'action' => 'workflow!index',
     'wf_token' => undef,
     'cert_profile' => 'tls_server',
-    'cert_subject_style' => '00_basic_style'
+    'cert_subject_style' => '05_advanced_style'
 });
 
 like($result->{goto}, qr/workflow!load!wf_id!\d+/, 'Got redirect');
@@ -59,19 +59,18 @@ $result = $client->mock_request({
 
 $result = $client->mock_request({
     'action' => 'workflow!index',
-    'cert_subject_parts{hostname}' => 'testbox.openxpki.org',
-    'cert_subject_parts{hostname2}[]' => ['testbox.openxpki.net'],
+    'cert_subject_parts{CN}' => 'testbox.openxpki.org',
+    'cert_subject_parts{OU}[]' => ['PKI','OpenXPKI'],
+    'cert_subject_parts{C}' => 'DE',
     'wf_token' => undef
 });
 
-=cut
 $result = $client->mock_request({
     'action' => 'workflow!index',
     'cert_san_parts{ip}[]' => [ '127.0.0.1' ],
-    'cert_san_parts{dns}[]' => [ 'host.from.extra.san','testbox.openxpki.net' ],
+    'cert_san_parts{dns}[]' => [ 'testbox.openxpki.com','testbox.openxpki.net' ],
     'wf_token' => undef
 });
-=cut
 
 $result = $client->mock_request({
     'action' => 'workflow!index',
@@ -110,16 +109,16 @@ $result = $client->mock_request({
      'page' => 'certificate!download!format!pem!identifier!'.$cert_identifier
 });
 
-open(CERT, ">tmp/entity12.id");
+open(CERT, ">tmp/entity12a.id");
 print CERT $cert_identifier;
 close CERT;
 
-open(CERT, ">tmp/entity12.crt");
+open(CERT, ">tmp/entity12a.crt");
 print CERT $result ;
 close CERT;
 
 if ($result =~ m{-----BEGIN[^-]*CERTIFICATE-----(.+)-----END[^-]*CERTIFICATE-----}xms) {
     my $x509 = new Crypt::X509( cert => decode_base64($1) );
     # ipaddress is a binary value and stringified in the crypt::x509 class so we can not check this easily
-    like(join(',', sort @{$x509->SubjectAltName()}),'/dNSName=testbox.openxpki.net,dNSName=testbox.openxpki.org/');
+    like(join(',', sort @{$x509->SubjectAltName()}),'/dNSName=testbox.openxpki.com,dNSName=testbox.openxpki.net,iPAddress=/');
 }

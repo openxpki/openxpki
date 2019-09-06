@@ -135,12 +135,8 @@ command "render_san_from_template" => {
     }
 
     my $profile_path = "profile.$profile.style.$style.subject";
-    # Check for SAN Template
-    my @san_template_keys = $config->get_keys("$profile_path.san");
 
-    return undef unless scalar @san_template_keys;
-
-    # Fix CamelCasing on items
+    # Fix CamelCasing on preset items
     my $san_names = $self->api->list_supported_san();
     for my $key (keys %{$items}) {
         my $cckey = $san_names->{lc($key)};
@@ -150,6 +146,8 @@ command "render_san_from_template" => {
         }
     }
 
+    # Render SAN Template from input vars
+    my @san_template_keys = $config->get_keys("$profile_path.san");
     for my $type (@san_template_keys) {
         my @entries;
         ##! 32: 'SAN Type ' . $type
@@ -169,7 +167,7 @@ command "render_san_from_template" => {
             push @entries, (split (/\|/, $result)) if $result;
         }
 
-        # merge into the present hash
+        # merge into the preset hash
         $items->{$cctype} //= [];
         push @{$items->{$cctype}}, @entries;
     }
