@@ -8,6 +8,8 @@ OpenXPKI::Server::API2::PluginRole - Base role for API plugins
 
 use Moose::Role;
 
+use OpenXPKI::Server::API2::Types;
+
 =head1 ATTRIBUTES
 
 =head2 api
