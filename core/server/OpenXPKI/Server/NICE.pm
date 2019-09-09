@@ -482,9 +482,9 @@ See issue/fetchCertificate how to use the pending marker.
 
 =head2 generateKey
 
-Generate and return a private key accoring to the parameters passed. Supported
-modes and parameter sets depend on the backend, some backends might even not
-implement this method.
+Generate and return a private key according to the parameters passed.
+Supported modes and parameter sets depend on the backend, some backends
+might even not implement this method.
 
 =head3 Input
 
@@ -496,7 +496,8 @@ implement this method.
 
 =item key_params - key generation parameters, hash with pkey options
 
-=item key_transport - hash with key I<password> and I<algorithm>, determines settings for the used transport encryption
+=item key_transport - hash with key I<password> and I<algorithm>, determines
+settings for the used transport encryption
 
 =back
 
