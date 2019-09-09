@@ -52,7 +52,7 @@ while (my $line = shift @certlist) {
         diag('Found workflow for ' . $cert_identifier . ': ' .$line->[0]);
         ok (1, "Found workflow ");
 
-        is($result->{right}->[0]->{content}->{data}->[2]->{value}, "CHECK_FOR_DELAYED_REVOKE", "State is delayed revoke");
+        is($result->{right}->[0]->{content}->{data}->[3]->{value}, "CHECK_FOR_DELAYED_REVOKE", "State is delayed revoke");
 
         last CERTLIST;
     }

@@ -61,7 +61,7 @@ $result = $client->mock_request({
     'wf_token' => undef,
 });
 
-is($result->{right}->[0]->{content}->{data}->[2]->{value},'PENDING');
+is($result->{right}->[0]->{content}->{data}->[3]->{value},'PENDING');
 
 $result = $client->mock_request({
     'action' => 'workflow!select!wf_action!enroll_approve_csr!wf_id!' . $workflow_id,

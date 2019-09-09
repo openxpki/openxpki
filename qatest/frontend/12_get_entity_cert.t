@@ -64,23 +64,12 @@ $result = $client->mock_request({
     'wf_token' => undef
 });
 
-=cut
-$result = $client->mock_request({
-    'action' => 'workflow!index',
-    'cert_san_parts{ip}[]' => [ '127.0.0.1' ],
-    'cert_san_parts{dns}[]' => [ 'host.from.extra.san','testbox.openxpki.net' ],
-    'wf_token' => undef
-});
-=cut
-
 $result = $client->mock_request({
     'action' => 'workflow!index',
     'cert_info{requestor_email}' => 'test@openxpki.local',
     'wf_token' => undef
 });
 
-
-# this is either submit or the link to enter a policy violation comment
 $result = $client->mock_request({
     'action' => $result->{main}->[0]->{content}->{buttons}->[0]->{action}
 });
@@ -93,7 +82,7 @@ if ($result->{main}->[0]->{content}->{fields} &&
         'policy_comment' => 'Testing',
         'wf_token' => undef
     });
-};
+}
 
 $result = $client->mock_request({
     'action' => 'workflow!select!wf_action!csr_approve_csr!wf_id!' . $wf_id,

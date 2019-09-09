@@ -76,4 +76,8 @@ $result = $client->mock_request({
 is($client->get_field_from_result('url_hmac'), $hmac);
 ok($client->get_field_from_result('is_valid_hmac'));
 
-is ($client->fail_workflow($workflow_id), 'FAILURE');
+$result = $client->mock_request({
+    'action' => 'workflow!select!wf_action!enroll_reject_request!wf_id!' . $workflow_id,
+});
+
+is ($result->{right}->[0]->{content}->{data}->[3]->{value}, 'FAILURE', 'Status is FAILURE');

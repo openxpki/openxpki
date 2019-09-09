@@ -1,4 +1,4 @@
-#!/usr/bin/perl 
+#!/usr/bin/perl
 
 use lib qw(../lib);
 use strict;
@@ -17,19 +17,21 @@ use Test::More tests => 2;
 package main;
 
 my $result;
-my $client = TestCGI::factory('democa'); 
+my $client = TestCGI::factory('democa');
 
 my @cert_identifier;
-for my $cert (('entity','entity2','entity3','entity-rpc','pkiclient')) {
 
-    diag('Revoke '  .$cert);
+my @files = <tmp/*.id>;
+foreach my $file (@files) {
+
+    diag('Revoke '  .$file);
     # Load cert status page using cert identifier
     my $cert_identifier = do { # slurp
         local $INPUT_RECORD_SEPARATOR;
-        open my $HANDLE, "<tmp/$cert.id";
+        open my $HANDLE, "<$file";
         <$HANDLE>;
     };
-    
+
     push @cert_identifier, $cert_identifier;
 
 }
@@ -59,5 +61,5 @@ $result = $client->mock_request({
 $result = $client->mock_request({
     'action' => 'workflow!select!wf_action!crrbulk_approve_crr!wf_id!'.$wf_id,
 });
-  
+
 is ($result->{status}->{level}, 'success', 'Status is success');
