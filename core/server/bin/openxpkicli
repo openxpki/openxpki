@@ -28,6 +28,7 @@ my %params = (
     timeout => 30,
     json => undef,
     session  => undef,
+    out => '',
     );
 
 sub debug {
@@ -37,26 +38,47 @@ sub debug {
     }
 }
 
-sub print_json {
+sub format_json {
     my $msg = shift;
-    print JSON->new->pretty($params{json} eq 'pretty')->encode($msg);
+    return JSON->new->pretty($params{json} eq 'pretty')->encode($msg);
 }
 
 sub output {
 
     my $msg = shift;
 
+    my $output;
+
     if (defined $params{json}) {
-        print_json($msg);
+        $output = format_json($msg);
     } elsif ($msg->{error}) {
         my $err = $msg->{error}->{LIST}->[0];
         print STDERR "Error: " . $err->{LABEL} . "\n";
         if ($err->{PARAMS} && $err->{PARAMS}->{__error__}) {
             print STDERR "    " . $err->{PARAMS}->{__error__} . "\n";
         }
+    } elsif ($msg->{result} && !ref $msg->{result}) {
+        $output = $msg->{result};
     } else {
         print Dumper $msg;
-        print "\ndone\n";
+        print "\n";
+    }
+
+    return unless($output);
+
+    if ($params{out}) {
+        if (open (OUT, ">", $params{out})) {
+            print OUT $output;
+            close OUT;
+            print "Wrote result to " .$params{out}."\n";
+        } else {
+            warn "Unable to open output file!";
+            print $output;
+            print "\n";
+        }
+    } else {
+        print $output;
+        print "\n";
     }
 }
 
@@ -78,6 +100,7 @@ GetOptions(\%params,
             session
             debug
             json:s
+            out=s
          )) or pod2usage(-verbose => 0);
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
@@ -216,7 +239,7 @@ while (1) {
     if ($status eq 'GET_PKI_REALM') {
         if (! $params{realm}) {
             if (defined $params{json}) {
-                print_json({ result => { pki_realm => keys %{$reply->{PARAMS}->{PKI_REALMS}} } });
+                print format_json({ result => { pki_realm => keys %{$reply->{PARAMS}->{PKI_REALMS}} } });
             } else {
                 print "Available PKI realms:\n";
                 foreach my $entry (keys %{$reply->{PARAMS}->{PKI_REALMS}}) {
@@ -235,7 +258,7 @@ while (1) {
     if ($reply->{SERVICE_MSG} eq 'GET_AUTHENTICATION_STACK') {
         if (!$params{authstack}) {
             if (defined $params{json}) {
-                print_json({ result => { auth_stack => keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}} } });
+                print format_json({ result => { auth_stack => keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}} } });
             } else {
                 print "Available authentication stacks:\n";
                 foreach my $entry (keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}}) {
