@@ -22,6 +22,7 @@ sub execute {
     my $cert_identifier = $self->param('cert_identifier');
     my $key_password = $self->param('key_password');
     my $template = $self->param('template');
+    my $private_key = $self->param('private_key') || '';
 
     my $target_key = $self->param('target_key') || 'certificate_export';
 
@@ -61,7 +62,17 @@ sub execute {
                 $p->{keeproot} = 1;
             }
 
-            $privkey = CTX('api2')->get_private_key_for_cert(%$p);
+            # In case the private key is not stored in the default location e.g. using a
+            # remote backend or other secure storage we get the private key from the activity
+            if (!$private_key) {
+                ##! 64: 'Do export from local datapool'
+                $privkey = CTX('api2')->get_private_key_for_cert(%$p);
+            } else {
+                ##! 64: 'Do export with key from context'
+                $p->{private_key} = $private_key;
+                $privkey = CTX('api2')->convert_private_key(%$p);
+            }
+
         };
         if (!$privkey) {
             CTX('log')->application()->error("Export of private key failed for $cert_identifier");
@@ -141,6 +152,11 @@ can contain the chain and private key.
 =item cert_identifier
 
 The cert to be exported.
+
+=item private_key
+
+The PEM encoded private key, protected by the given key_password.
+Mandatory if the private key can not be found in the datapool.
 
 =item template
 
