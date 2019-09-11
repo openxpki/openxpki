@@ -39,13 +39,12 @@ command "get_private_key_for_cert" => {
     my ($self, $params) = @_;
 
     my $identifier = $params->identifier;
-    my $format     = $params->format;
-    my $password   = $params->password;
-    my $pass_out   = $params->passout;
     my $nopassword = $params->nopassword;
 
     if ($nopassword) {
         CTX('log')->audit('key')->warn("private key export without password", { certid => $identifier });
+    } else {
+        CTX('log')->audit('key')->info("private key export", { certid => $identifier });
     }
 
     my $private_key = $self->get_private_key_from_db($identifier)
@@ -56,23 +55,19 @@ command "get_private_key_for_cert" => {
 
     $params->{private_key} = $private_key;
 
-    my $result = $self->api->convert_private_key(%$params);
+    return $self->api->convert_private_key(%$params);
 
-    CTX('log')->audit('key')->info("private key export", { certid => $identifier });
-
-    return $result;
 };
 
 
 =head2 convert_private_key
 
 expects a private key and converts it into another format. If a bundle
-with certificates is requested, the certificate identifier to use as the
-end entity certificate must be given.
+with certificates is requested (PKCS12, JKS), the certificate to use as the
+end entity certificate must be given via I<identifier> or as first element of
+I<chain>.
 
 =over
-
-=item * identifier - the identifier of the certificate
 
 =item * format - the output format
 
@@ -108,10 +103,26 @@ This option is only supported with format OPENSSL_PRIVKEY, PKCS12 and JKS!
 If set to a true value, the B<key is exported without a password!>.
 You must also set passout to the empty string.
 
+=item * identifier
+
+the identifier of the certificate to merge into the export file.
+The output file will contain also certificates of the chain, with or
+without root weather I<keeproot> is set.
+Only used with JKS or PKCS12 export format.
+
 =item * keeproot
 
 Boolean, when set the root certifcate is included in the keystore.
-Obviously only useful with PKCS12 or Java Keystore.
+Only used when identifier is set to export PKCS12 or Java Keystore.
+
+=item * chain
+
+A PEM encoded list of certificates to be merged into the output file.
+Only used with JKS or PKCS12 export format, content is used "as is" and
+concatenated to the chain retrieved from I<identifier>/I<keeproot>.
+
+If I<identifier> is not set, the first certificate of the chain must match
+the private key.
 
 =item * alias
 
@@ -129,12 +140,14 @@ If the input password does not decrypt the private key, an exception is thrown.
 =cut
 
 command "convert_private_key" => {
-    identifier => { isa => 'Base64' },
+
     private_key => { isa => 'PEMPKey', required => 1 },
     format     => { isa => 'Str', matching => qr{ \A ( PKCS8_(PEM|DER) | OPENSSL_(PRIVKEY|RSA) | PKCS12 | JAVA_KEYSTORE ) \z }xms, required => 1, },
     password   => { isa => 'Str', required => 1, },
     passout    => { isa => 'Str', },
     nopassword => { isa => 'Bool', default => 0, },
+    identifier => { isa => 'Base64' },
+    chain      => { isa => 'ArrayRefOrPEMCertChain', coerce => 1, },
     keeproot   => { isa => 'Bool', default => 0, },
     alias      => { isa => 'AlphaPunct', },
     csp        => { isa => 'AlphaPunct', },
@@ -206,20 +219,26 @@ command "convert_private_key" => {
     }
     elsif ( $format eq 'PKCS12' or $format eq 'JAVA_KEYSTORE' ) {
 
-        if (!$identifier) {
-            OpenXPKI::Exception->throw(
-                message => 'private key export missing certificates',
-                params => { 'FORMAT' =>  $format },
-            );
-        }
-        ##! 16: 'identifier: ' . $identifier
+        my @chain;
 
-        my @chain = $self->get_chain_certificates({
-            'KEEPROOT'   => $params->keeproot,
-            'IDENTIFIER' => $identifier,
-            'FORMAT'     => 'PEM',
-        });
+        if ($identifier) {
+            ##! 16: 'identifier: ' . $identifier
+            @chain = $self->get_chain_certificates({
+                'KEEPROOT'   => $params->keeproot,
+                'IDENTIFIER' => $identifier,
+                'FORMAT'     => 'PEM',
+            });
+        }
+
+        if ($params->has_chain) {
+            push @chain, @{$params->chain};
+        }
+
         ##! 16: 'chain: ' . Dumper \@chain
+        OpenXPKI::Exception->throw(
+            message => 'private key export missing certificates',
+            params => { 'FORMAT' =>  $format },
+        ) unless (scalar @chain);
 
         # the first one is the entity certificate
         my $certificate = shift @chain;
