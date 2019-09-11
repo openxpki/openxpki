@@ -178,6 +178,18 @@ sub issuer {
     return $hash ? $hash->{issuer_identifier} : '';
 }
 
+=head2 key_id
+
+Returns the subject key identifier of the certifcate.
+
+=cut
+sub key_id {
+    my $self = shift;
+    my $cert_id = shift;
+
+    my $hash = $self->get_hash( $cert_id );
+    return $hash ? $hash->{subject_key_identifier} : '';
+}
 
 =head2 dn
 

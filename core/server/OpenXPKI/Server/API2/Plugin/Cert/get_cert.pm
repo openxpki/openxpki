@@ -157,6 +157,7 @@ command "get_cert" => {
     $result->{issuer} = $cert->{issuer_dn};
     $result->{csr_serial}        = $cert->{req_key};
     $result->{pki_realm}         = $cert->{pki_realm};
+    $result->{subject_key_identifier} = $x509->get_subject_key_id();
     return $result;
 
 };
