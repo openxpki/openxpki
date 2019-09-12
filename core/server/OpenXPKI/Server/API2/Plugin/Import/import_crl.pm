@@ -10,7 +10,7 @@ OpenXPKI::Server::API2::Plugin::Import::import_crl
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
-use OpenXPKI::Crypto::CRL;
+use OpenXPKI::Crypt::CRL;
 
 
 =head1 COMMANDS
@@ -71,15 +71,11 @@ command "import_crl" => {
     my $pki_realm = CTX('session')->data->pki_realm;
     my $dbi = CTX('dbi');
 
-    my $crl_obj = OpenXPKI::Crypto::CRL->new(
-        TOKEN => $self->api->get_default_token,
-        DATA  => $params->data,
-        EXTENSIONS => 1,
-    );
+    my $crl = OpenXPKI::Crypt::CRL->new( $params->data );
 
     # Find the issuer certificate
-    my $issuer_aik = $crl_obj->{PARSED}->{BODY}->{EXTENSIONS}->{AUTHORITY_KEY_IDENTIFIER};
-    my $issuer_dn = $crl_obj->{PARSED}->{BODY}->{ISSUER};
+    my $issuer_aik = $crl->get_authority_key_id();
+    my $issuer_dn = $crl->get_issuer();
 
     # We need the group name for the alias group
     my $group = CTX('config')->get(['crypto', 'type', 'certsign']);
@@ -112,14 +108,13 @@ command "import_crl" => {
         pki_realm         => $pki_realm,
         issuer_identifier => $ca_identifier,
         crl_key           => $serial,
-        crl_number        => $crl_obj->get_serial() // '',
-        last_update       => $crl_obj->{PARSED}->{BODY}->{LAST_UPDATE},
-        next_update       => $crl_obj->{PARSED}->{BODY}->{NEXT_UPDATE},
+        crl_number        => $crl->crl_number() || '',
+        last_update       => $crl->last_update(),
+        next_update       => $crl->next_update(),
         publication_date  => 0,
-        items             => $crl_obj->{PARSED}->{BODY}->{ITEMCNT},
-        data              => $crl_obj->get_body(),
+        items             => $crl->itemcnt(),
+        data              => $crl->pem(),
     };
-
 
     my $where_duplicate = {
         pki_realm         => $pki_realm,

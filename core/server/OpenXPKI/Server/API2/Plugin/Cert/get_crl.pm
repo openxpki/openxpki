@@ -12,7 +12,6 @@ use Data::Dumper;
 use MIME::Base64;
 use OpenXPKI::Debug;
 use OpenXPKI::Crypt::CRL;
-use OpenXPKI::Crypto::CRL;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 
@@ -165,25 +164,13 @@ command "get_crl" => {
     }
     elsif ( $format eq 'HASH' or $format eq 'FULLHASH' ) {
 
-        # parse CRL using OpenXPKI::Crypto::CRL
-        my $default_token = $self->api->get_default_token();
-        my $crl_obj = OpenXPKI::Crypto::CRL->new(
-            TOKEN => $default_token,
-            DATA  => $pem_crl,
-            REVOKED => 0,
-        );
-        my $ref =  $crl_obj->get_parsed_ref();
-        ##! 16: 'object: ' . Dumper $ref
-
-        $output = {};
-        map { $output->{lc($_)} = $ref->{BODY}->{$_};  }
-            ('ISSUER', 'SIGNATURE_ALGORITHM', 'NEXT_UPDATE', 'LAST_UPDATE', 'VERSION', 'ITEMCNT', 'SERIAL');
-
+        my $crl = OpenXPKI::Crypt::CRL->new($pem_crl);
+        $output = $crl->to_hash();
         $output->{issuer_identifier} = $db_results->{issuer_identifier};
         $output->{crl_key} = $db_results->{crl_key};
 
+        # this can be VERY expensive in large CRLs
         if ($format eq 'FULLHASH') {
-            my $crl = OpenXPKI::Crypt::CRL->new( $pem_crl);
             $output->{items} = $crl->items();
         }
 

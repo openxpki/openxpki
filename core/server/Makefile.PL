@@ -334,7 +334,6 @@ WriteMakefile(
         'Crypt::Cipher::AES'               => 0,           # replacement to support keysize > 128
         'Crypt::PKCS10'                 => '2.000',
         'Crypt::X509'                   => 0,
-        'Crypt::X509::CRL'              => 0,
         'Data::Password'                => '1.07',
         'Data::Serializer'              => '0.44',
         'Data::UUID'                    => 0,           # for OpenXPKI::Template::Plugin::Utils and CPAN

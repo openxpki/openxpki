@@ -9,7 +9,7 @@ use OpenXPKI::Crypto::Profile::Certificate;
 use OpenXPKI::Crypto::Profile::CRL;
 use OpenXPKI::Crypt::X509;
 use OpenXPKI::Crypt::PubKey;
-use OpenXPKI::Crypto::CRL;
+use OpenXPKI::Crypt::CRL;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow::WFObject::WFArray;
@@ -452,10 +452,7 @@ sub issueCRL {
         PROFILE => $crl_profile,
     });
     #
-    my $crl_obj = OpenXPKI::Crypto::CRL->new(
-            TOKEN => CTX('api2')->get_default_token(),
-            DATA  => $crl,
-    );
+    my $crl_obj = OpenXPKI::Crypt::CRL->new( $crl );
     ##! 128: 'crl: ' . Dumper($crl)
     #
     CTX('log')->application()->info('CRL issued for CA ' . $ca_alias . ' in realm ' . $pki_realm);
@@ -472,10 +469,10 @@ sub issueCRL {
         crl_key           => $serial,
         crl_number        => $serial,
         items             => scalar @cert_timestamps,
-        last_update       => $crl_obj->{PARSED}->{BODY}->{LAST_UPDATE},
-        next_update       => $crl_obj->{PARSED}->{BODY}->{NEXT_UPDATE},
+        last_update       => $crl_obj->last_update,
+        next_update       => $crl_obj->next_update,
         publication_date  => 0,
-        data              => $crl_obj->get_body(),
+        data              => $crl_obj->pem(),
     };
     $dbi->insert( into => 'crl', values => $data );
 
