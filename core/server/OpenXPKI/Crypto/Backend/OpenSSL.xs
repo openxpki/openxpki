@@ -1,5 +1,4 @@
 
-INCLUDE: OpenXPKI/Crypto/Backend/OpenSSL/XS/CRL.xs
 INCLUDE: OpenXPKI/Crypto/Backend/OpenSSL/XS/ECDH.xs
 
 MODULE = OpenXPKI		PACKAGE = OpenXPKI::Crypto::Backend::OpenSSL
