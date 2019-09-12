@@ -589,7 +589,7 @@ sub init_detail {
 
     $self->logger()->trace("result: " . Dumper $cert) if $self->logger->is_trace;
 
-    my $cert_attribute = $cert->{cert_attribute};
+    my $cert_attribute = $cert->{cert_attributes};
     $self->logger()->trace("result: " . Dumper $cert_attribute) if $self->logger->is_trace;
 
     my %dn = OpenXPKI::DN->new( $cert->{subject} )->get_hashed_content();
