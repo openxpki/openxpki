@@ -1,9 +1,3 @@
-## OpenXPKI::Service::LibSCEP::Command::PKIOperation
-## Adapted to LibSCEP 2018 by Martin Bartosch
-## Rewrite 2013 by Oliver Welter
-## Written 2006 by Alexander Klink for the OpenXPKI project
-## (C) Copyright 2006-2018 by The OpenXPKI Project
-##
 package OpenXPKI::Service::LibSCEP::Command::PKIOperation;
 use base qw( OpenXPKI::Service::LibSCEP::Command );
 
@@ -90,8 +84,8 @@ sub execute {
     my $scep_handle = $token->command({
         COMMAND        => 'unwrap',
         PKCS7          => $pkcs7_base64,
-    ENCRYPTION_ALG => CTX('session')->data->enc_alg,
-    HASH_ALG       => CTX('session')->data->hash_alg,
+        ENCRYPTION_ALG => CTX('session')->data->enc_alg,
+        HASH_ALG       => CTX('session')->data->hash_alg,
     });
 
     ##! 32: 'unwrapped data ' . Dumper $scep_handle
@@ -105,7 +99,7 @@ sub execute {
     CTX('log')->application()->info("LibSCEP PKIOperation; message type: " . $message_type);
     ##! 32: 'PKI message type ' . $message_type
 
-    if ( $message_type eq 'PKCSReq' ) {
+    if ( $message_type eq 'PKCSReq' || $message_type eq 'GetCertInitial' ) {
         my $resp = $self->__pkcs_req(
             {   TOKEN       => $token,
                 PKCS7       => $pkcs7_base64,
@@ -118,19 +112,8 @@ sub execute {
             @extra_header = @{$resp->[0]};
         }
     }
-    elsif ( $message_type eq 'GetCertInitial' ) {
-        # used by sscep after sending first request for polling
-        my $resp = $self->__pkcs_req(
-            {
-            TOKEN       => $token,
-            PKCS7       => $pkcs7_base64,
-            SCEP_HANDLE => $scep_handle,
-            PARAMS      => $url_params,
-            }
-        );
-        $result = $resp->[1];
-    }
     elsif ( $message_type eq 'GetCert' ) {
+
         $result = $self->__send_cert(
             {   TOKEN       => $token,
                 SCEP_HANDLE => $scep_handle,
@@ -138,6 +121,7 @@ sub execute {
             }
         );
     }
+
     elsif ( $message_type eq 'GetCRL' ) {
        $result = $self->__send_crl(
         {   TOKEN => $token,
@@ -165,48 +149,44 @@ sub execute {
 }
 
 
-=head2 __send_cert
+sub __find_cert_issuer_serial : PRIVATE {
 
-Create the response for the GetCert request by extracting the serial number
-from the request, find the certificate and return it.
-
-=cut
-
-sub __send_cert : PRIVATE {
     my $self      = shift;
     my $arg_ref   = shift;
 
     my $token        = $arg_ref->{TOKEN};
     my $scep_handle  = $arg_ref->{SCEP_HANDLE};
 
-    my $requested_serial_hex = $token->command({
+    my $requested_serial_dec = $token->command({
         COMMAND => 'get_getcert_serial',
         SCEP_HANDLE   => $scep_handle,
     });
 
-    # Serial is in Hex Format - we need decimal!
-    my $mbi = Math::BigInt->from_hex( "0x$requested_serial_hex" );
-    my $requested_serial_dec = scalar $mbi->bstr();
+    my $issuer_dn = $token->command({
+        COMMAND => 'get_issuer',
+        SCEP_HANDLE => $scep_handle,
+    });
 
-    ##! 16: 'Found serial - hex: ' . $requested_serial_hex . ' - dec: ' . $requested_serial_dec
+    ##! 16: 'Requested serial: ' . $requested_serial_dec . ' for issuer ' .$issuer_dn
 
     my $cert_result = CTX('api2')->search_cert(
         'cert_serial' => $requested_serial_dec,
-        'return_columns' => 'identifier',
+        'issuer_dn' => $issuer_dn,
+        'return_columns' => [ 'identifier', 'issuer_identifier' ],
     );
 
     ##! 32: 'Search result ' . Dumper $cert_result
     my $cert_count = scalar @{$cert_result};
 
-    # more than one - no usable result
+    # this can only happen if someone reuses the issuer dn with the same serials
     if ($cert_count > 1) {
         OpenXPKI::Exception->throw(
             message =>
                 "I18N_OPENXPKI_SERVICE_LIBSCEP_COMMAND_GETCERT_MORE_THAN_ONE_CERTIFICATE_FOUND",
             params => {
                 COUNT => $cert_count,
-                SERIAL_HEX => $requested_serial_hex,
                 SERIAL_DEC => $requested_serial_dec,
+                ISSUER_DN  => $issuer_dn,
             },
             log => {
                 priority => 'error',
@@ -215,127 +195,112 @@ sub __send_cert : PRIVATE {
         );
     }
 
-    if ($cert_count == 0) {
-         CTX('log')->application()->info("SCEP getcert - no certificate found for serial $requested_serial_hex");
+    return unless ($cert_count);
 
+    return $cert_result->[0];
 
-        return $token->command(
-            {
-                COMMAND         => 'create_error_reply',
-                SCEP_HANDLE     => $scep_handle,
-                ENCRYPTION_ALG  => CTX('session')->data->enc_alg,
-                HASH_ALG        => CTX('session')->data->hash_alg,
-                ERROR_CODE      => 'badCertId',
-            }
-        );
-    }
+}
 
-    my $cert_identifier  = $cert_result->[0]->{'identifier'};
-    ##! 16: 'Load Cert Identifier ' . $cert_identifier
-    my $cert_pem = CTX('api2')->get_cert( 'identifier' => $cert_identifier, 'format' => 'PEM' );
+=head2 __send_cert
+
+Create the response for the GetCert request by extracting serial number
+and issuer from the request, find the certificate and return it.
+
+=cut
+
+sub __send_cert : PRIVATE {
+
+    my $self      = shift;
+    my $arg_ref   = shift;
+    my $scep_handle  = $arg_ref->{SCEP_HANDLE};
+    my $token        = $arg_ref->{TOKEN};
+
+    my $cert_result = $self->__find_cert_issuer_serial( $arg_ref );
+
+    return $token->command({
+        COMMAND      => 'create_error_reply',
+        SCEP_HANDLE  => $scep_handle,
+        HASH_ALG     => CTX('session')->data->hash_alg,
+        ENCRYPTION_ALG  => CTX('session')->data->enc_alg,
+        ERROR_CODE => 'badCertId',
+    }) if (!$cert_result);
+
+    ##! 16: 'Load Cert Identifier ' . $cert_result->{'identifier'}
+    my $cert_pem = CTX('api2')->get_cert( 'identifier' => $cert_result->{'identifier'}, 'format' => 'PEM' );
 
     ##! 16: 'cert data ' . Dumper $cert_pem
-    my $result = $token->command(
-        {   COMMAND        => 'create_certificate_reply',
-            SCEP_HANDLE    => $scep_handle,
-            CERTIFICATE    => $cert_pem,
-            HASH_ALG       => CTX('session')->data->hash_alg,
-            ENCRYPTION_ALG => CTX('session')->data->enc_alg,
-        }
-    );
-    return $result;
+    return $token->command({
+        COMMAND        => 'create_certificate_reply',
+        SCEP_HANDLE    => $scep_handle,
+        CERTIFICATE    => $cert_pem,
+        HASH_ALG       => CTX('session')->data->hash_alg,
+        ENCRYPTION_ALG => CTX('session')->data->enc_alg,
+    });
+
 }
 
 
 =head2 __send_crl
 
-Create the response for the GetCRL request by extracting the used CA certificate
-from the request and returning its crl.
+Create the response for the GetCRL request by extracting the issuer and
+serial from the request. As we do not support scoped CRLs yet it is
+sufficient to check the issuer dn but to catch situations where the issuer dn
+is used over multiple generations we search for both.
 
 =cut
 
 sub __send_crl : PRIVATE {
+
     my $self      = shift;
     my $arg_ref   = shift;
+    my $scep_handle  = $arg_ref->{SCEP_HANDLE};
+    my $token        = $arg_ref->{TOKEN};
+
+    my $cert_result = $self->__find_cert_issuer_serial( $arg_ref );
+
+    ##! 32: 'send crl for certificate ' . Dumper $cert_result
+
+    return $token->command({
+        COMMAND      => 'create_error_reply',
+        SCEP_HANDLE  => $scep_handle,
+        HASH_ALG     => CTX('session')->data->hash_alg,
+        ENCRYPTION_ALG  => CTX('session')->data->enc_alg,
+        ERROR_CODE => 'badCertId',
+    }) if (!$cert_result);
 
     my $token = $arg_ref->{TOKEN};
-    my $scep_handle  = $arg_ref->{SCEP_HANDLE};
+
     my $pkcs7_base64 = $arg_ref->{PKCS7};
 
-    my $serial = $token->command({
-        COMMAND => 'get_getcert_serial',
-    SCEP_HANDLE => $scep_handle,
-    });
-    ##! 16: 'serial: ' . $serial
-
-#    my $issuer = $token->command({
-#        COMMAND => 'get_issuer',
-#	SCEP_HANDLE => $scep_handle,
-#    });
-#    ##! 16: 'issuer: ' . $issuer
-
-    # from scep draft (as of March 2015)
-    # ..containing the issuer name and serial number of
-    # the certificate whose revocation status is being checked.
-    # -> we search for this entity certificate and grab the issuer from the
-    # certificate table, this will also catch situations where the Issuer DN
-    # is reused over generations as the serial inside OXI is unique
-
-    my $res = CTX('api2')->search_cert(
-        pki_realm => '_ANY',
-#        ISSUER_DN => $issuer,
-        cert_serial => $serial,
-        return_columns => 'issuer_identifier',
-    );
-
-    if (!$res || scalar @{$res} != 1) {
-#          CTX('log')->application()->error("SCEP getcrl - no issuer found for serial $serial and issuer $issuer);
-          CTX('log')->application()->error("SCEP getcrl - no issuer found for serial $serial");
-
-
-        return $token->command(
-            {   COMMAND      => 'create_error_reply',
-                SCEP_HANDLE  => $scep_handle,
-                HASH_ALG     => CTX('session')->data->hash_alg,
-                ENCRYPTION_ALG  => CTX('session')->data->enc_alg,
-                'ERROR_CODE' => 'badCertId',
-            }
-        );
-    }
-
-    ##! 32: 'Issuer Info ' . Dumper $res
-
-    my $crl_res = CTX('api2')->get_crl_list(
-        issuer_identifier => $res->[0]->{issuer_identifier},
+    my $crl_pem = CTX('api2')->get_crl(
+        issuer_identifier => $cert_result->{issuer_identifier},
         format => 'PEM',
-        limit => 1
     );
 
-    if (!scalar $crl_res) {
-        return $token->command(
-            {   COMMAND      => 'create_error_reply',
-                SCEP_HANDLE  => $scep_handle,
-                HASH_ALG     => CTX('session')->data->hash_alg,
-                ENCRYPTION_ALG  => CTX('session')->data->enc_alg,
-                'ERROR_CODE' => 'badCertId',
-            }
-        );
+    if (!$crl_pem ) {
+        CTX('log')->application()->warn("SCEP getcrl request but no CRL found for issuer " . $cert_result->{issuer_identifier});
+
+        return $token->command({
+            COMMAND      => 'create_error_reply',
+            SCEP_HANDLE  => $scep_handle,
+            HASH_ALG     => CTX('session')->data->hash_alg,
+            ENCRYPTION_ALG  => CTX('session')->data->enc_alg,
+            'ERROR_CODE' => 'badCertId',
+        });
     }
 
-    ##! 32: 'CRL Result ' . Dumper $crl_res
-    my $crl_pem = $crl_res->[0];
+    ##! 64: 'CRL Result ' . Dumper $crl_pem
+    return $token->command({
+        COMMAND        => 'create_crl_reply',
+        SCEP_HANDLE    => $scep_handle,
+        PKCS7          => $pkcs7_base64,
+        CRL            => $crl_pem,
+        HASH_ALG       => CTX('session')->data->hash_alg,
+        ENCRYPTION_ALG => CTX('session')->data->enc_alg,
+    });
 
-    my $result = $token->command(
-        {   COMMAND        => 'create_crl_reply',
-            SCEP_HANDLE    => $scep_handle,
-            PKCS7          => $pkcs7_base64,
-            CRL            => $crl_pem,
-            HASH_ALG       => CTX('session')->data->hash_alg,
-            ENCRYPTION_ALG => CTX('session')->data->enc_alg,
-        }
-    );
-    return $result;
 }
+
 =head2 __pkcs_req
 
 Called by execute if the message type is 'PKCSReq' (19). This is the
@@ -370,7 +335,6 @@ sub __pkcs_req : PRIVATE {
     my $arg_ref   = shift;
     my $api       = CTX('api2');
     my $pki_realm = CTX('session')->data->pki_realm;
-    my $profile   = CTX('session')->data->profile;
     my $server    = CTX('session')->data->server;
 
     my $url_params =  $arg_ref->{PARAMS};
@@ -380,12 +344,10 @@ sub __pkcs_req : PRIVATE {
 
     my $token         = $arg_ref->{TOKEN};
 
-    my $transaction_id = $token->command(
-        {
+    my $transaction_id = $token->command({
         COMMAND     => 'get_transaction_id',
-            SCEP_HANDLE => $scep_handle,
-        }
-    );
+        SCEP_HANDLE => $scep_handle,
+    });
 
     Log::Log4perl::MDC->put('sceptid', $transaction_id);
 
@@ -420,11 +382,10 @@ sub __pkcs_req : PRIVATE {
 
         # Fetch the workflow
         $wf_info = $api->get_workflow_info(
-            id       => $workflow_id,
+            id  => $workflow_id,
         );
 
         CTX('log')->application()->info("SCEP incoming request, found workflow $workflow_id, state " . $wf_info->{workflow}->{state});
-
 
     } else {
 
@@ -441,10 +402,7 @@ sub __pkcs_req : PRIVATE {
             }
         ) unless($workflow_type);
 
-
-
         CTX('log')->application()->info("SCEP try to start new workflow for $transaction_id");
-
 
         my $pkcs10 = $token->command(
             {   COMMAND     => 'get_pkcs10',
@@ -491,7 +449,6 @@ sub __pkcs_req : PRIVATE {
             );
         }
 
-
         my $params = CTX('config')->get_hash(['scep', $server, 'workflow', 'param']);
 
         $params = {
@@ -530,7 +487,6 @@ sub __pkcs_req : PRIVATE {
 
         CTX('log')->application()->info("SCEP started new workflow with id $workflow_id, state " . $wf_info->{workflow}->{state});
 
-
         # Record the scep tid and the workflow in the datapool
         $api->set_data_pool_entry(
             namespace => 'scep.transaction_id',
@@ -557,7 +513,6 @@ sub __pkcs_req : PRIVATE {
     if ($proc_state ne 'finished') {
 
         CTX('log')->application()->info("SCEP $workflow_id in state $wf_state, send pending reply");
-
 
         # we are still pending
         my $pending_msg = $token->command(
@@ -627,7 +582,6 @@ sub __pkcs_req : PRIVATE {
 
         CTX('log')->application()->info("Delivered certificate via SCEP ($cert_identifier)");
 
-
         return [ '', $certificate_msg ];
     }
 
@@ -655,7 +609,6 @@ sub __pkcs_req : PRIVATE {
     if ($wf_info->{workflow}->{context}->{'error_code'}) {
         push @extra_header, "X-OpenXPKI-Error: " . $wf_info->{workflow}->{context}->{'error_code'};
     }
-
 
     return [ \@extra_header, $error_msg ];
 }
