@@ -649,7 +649,10 @@ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH"
 msgstr "Schlüssellänge"
 
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_2048"
-msgstr "2048 bit (Standard)"
+msgstr "2048 bit"
+
+msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
+msgstr "3072 bit"
 
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_4096"
 msgstr "4096 bit"

@@ -654,10 +654,13 @@ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH"
 msgstr "Key length"
 
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_2048"
-msgstr "2048 bits (default)"
+msgstr "2048 bit"
+
+msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
+msgstr "3072 bit"
 
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_4096"
-msgstr "4096 (very strong)"
+msgstr "4096 bit"
 
 msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
 msgstr "Username"
