@@ -454,7 +454,7 @@ sub get_database {
 
     my $db = OpenXPKI::Server::Database->new(
         # if this DB object should be used for logging: we prevent recursive
-        # calls to log functions in OpenXPKI::Server::Log::Appender::DBI
+        # calls to log functions in OpenXPKI::Server::Log::Appender::Database
         log => CTX('log')->system(),
         db_params => {
             db_type => 'MySQL', # default

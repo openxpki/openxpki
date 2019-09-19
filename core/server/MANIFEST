@@ -206,7 +206,6 @@ OpenXPKI/Server/Log.pm
 OpenXPKI/Server/Log/CLI.pm
 OpenXPKI/Server/Log/Appender/Audit.pm
 OpenXPKI/Server/Log/Appender/Database.pm
-OpenXPKI/Server/Log/Appender/DBI.pm
 OpenXPKI/Server/Log/Layout/Audit.pm
 
 

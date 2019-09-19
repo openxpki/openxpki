@@ -40,6 +40,12 @@ sub new {
         $self->{microseconds} = 1;
     }
 
+    if ($p{inside_transaction}) {
+        $self->{dbi_handle} = 'dbi';
+    } else {
+        $self->{dbi_handle} = 'dbi_log';
+    }
+
     return $self;
 }
 
@@ -85,7 +91,7 @@ sub log {
 
     eval {
         my $wf_id = Log::Log4perl::MDC->get('wfid') || 0;
-        CTX('dbi')->insert(
+        CTX($self->{dbi_handle})->insert(
             into => $self->{table},
             values  => {
                 $self->{table}.'_id' => AUTO_ID,
@@ -157,6 +163,13 @@ of the primary key column as "<table>_id" and the name of the sequence
 
 Weather to have microseconds in the timestamp, default is yes.
 This option requries the Time::HiRes module to be installed.
+
+=item log4perl.appender.Application.inside_transaction = 1
+
+By default the dbi_log handle is used which writes to the database
+immediately. If set to true, the DBI handle of the application layer
+is used which is rolled back in case of any exception which lets the log
+lines disappear.
 
 =back
 
