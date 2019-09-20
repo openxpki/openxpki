@@ -30,6 +30,7 @@ ifeq "$(DEBIAN_CODENAME)" "buster"
 EXTERNAL=				\
 	Crypt__OpenSSL__AES		\
 	Crypt__Cipher__AES \
+	Crypt__Argon2 \
 	Data__SpreadPagination		\
 	Class__Observable 		\
 	Config__Versioned \

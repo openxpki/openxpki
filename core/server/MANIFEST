@@ -379,6 +379,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/AddCertExtension.pm
 OpenXPKI/Server/Workflow/Activity/Tools/AppendCertificateMetadata.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CalculateApprovalPoints.pm
+OpenXPKI/Server/Workflow/Activity/Tools/CalculateArgon2Key.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CalculateRequestHMAC.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CancelApprovals.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CertificateExport.pm

@@ -114,11 +114,12 @@ sub param {
             my $out = $oxtt->render( $template, {
                 context => $self->workflow()->context()->param(),
                 workflow => {
-                    id => $self->workflow()->{ID}
+                    id => $self->workflow()->{id}
                 },
                 session => {
                     user => CTX('session')->data->user,
                     role => CTX('session')->data->role,
+                    userinfo => CTX('session')->data->userinfo,
                     pki_realm => CTX('session')->data->pki_realm
                 }
             });

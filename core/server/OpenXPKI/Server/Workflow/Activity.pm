@@ -185,11 +185,12 @@ sub param {
             my $out = $oxtt->render( $template, {
                 context => $self->workflow()->context()->param(),
                 workflow => {
-                    id => $self->workflow()->{ID}
+                    id => $self->workflow()->{id}
                 },
                 session => {
                     user => CTX('session')->data->user,
                     role => CTX('session')->data->role,
+                    userinfo => CTX('session')->data->userinfo,
                     pki_realm => CTX('session')->data->pki_realm
                 }
             });
@@ -501,7 +502,6 @@ wakeup time by the given percentage. E.g. the retry_interval is 20 Minutes
 and the random_factor is 25%, the next wakeup is scheduled between 15 and 25
 minutes.
 
-
 =item autofail
 
 If set to "yes", the workflow is moved directly to the FAILURE state and
@@ -555,6 +555,8 @@ Return the value of the retry counter.
 =head2 wake_up
 
 Hook method. Will be called if Workflow::execute_action() is called after proc-state "pause". The current workflow is given as argument.
+
+B<NOTE> The hook methods are executed on a dedicated instance of the action class so you can NOT share data with the execute method via $self, use the workflow context object to share data if needed.
 
 =head2 resume
 
