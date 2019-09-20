@@ -26,6 +26,9 @@ sub execute {
     my $serializer = OpenXPKI::Serialization::Simple->new();
     my $params     = { PKI_REALM => CTX('api2')->get_pki_realm(), };
 
+    configuration_error('Mandatory parameter key missing or empty') unless($self->param('key'));
+    configuration_error('Mandatory parameter namespace missing or empty') unless($self->param('namespace'));
+
     CTX('api2')->delete_data_pool_entry(
         namespace => $self->param('namespace'),
         key => $self->param('key')
