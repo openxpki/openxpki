@@ -183,9 +183,8 @@ use OpenXPKI::Server::Context qw( CTX );
 
         my $random = $token_of{$ident}->command({
             COMMAND       => 'create_random',
-            RETURN_LENGTH => $byte_length,
             RANDOM_LENGTH => $byte_length,
-        INCLUDE_PADDING => 1,
+            INCLUDE_PADDING => 1,
         });
 
         my $secret_data = decode_base64($random);

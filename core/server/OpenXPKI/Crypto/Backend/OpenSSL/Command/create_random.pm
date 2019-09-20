@@ -29,19 +29,21 @@ sub get_command
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_RANDOM_MISSING_LENGTH");
     }
 
-    
-
     my $engine_usage = $self->{ENGINE}->get_engine_usage();
-    my $command = "";
-    $command .= "rand -base64";
-    $command .= " -engine ".$self->{ENGINE}->get_engine()
-        if ($self->{ENGINE}->get_engine() and
-            (($engine_usage =~ m{ ALWAYS }xms) or
-             ($engine_usage =~ m{ RANDOM }xms)));
-    $command .= " -out " . $self->get_outfile();
-    $command .= " $length";
+    my @command = ('rand');
+    if (not $self->{BINARY}) {
+        push @command, '-base64';
+    }
 
-    return [ $command ];
+    if ($self->{ENGINE}->get_engine() and
+        (($engine_usage =~ m{ ALWAYS }xms) or
+         ($engine_usage =~ m{ RANDOM }xms))) {
+        push @command, "-engine", $self->{ENGINE}->get_engine();
+    }
+    push @command, "-out", $self->get_outfile();
+    push @command, $length;
+
+    return [ \@command ];
 }
 
 sub hide_output
@@ -61,21 +63,21 @@ sub get_result
 
     ## remove trailing newline
     ## remove trailing =
-    $random =~ s/\n//gs;
-    if (! (exists $self->{INCLUDE_PADDING} && $self->{INCLUDE_PADDING})) {
-    $random =~ s/=*$//gs;
-    }
 
-    if ($self->{RETURN_LENGTH} and not $self->{RANDOM_LENGTH}) {
-        $random = substr ($random, 0, $self->{RETURN_LENGTH});
+    if (not $self->{BINARY}) {
+        $random =~ s/\n//gs;
+        if (!(exists $self->{INCLUDE_PADDING} && $self->{INCLUDE_PADDING})) {
+            $random =~ s/=*$//gs;
+        }
+        if ($self->{RETURN_LENGTH} and not $self->{RANDOM_LENGTH}) {
+            $random = substr ($random, 0, $self->{RETURN_LENGTH});
+        }
     }
-
     if (not defined $random or not length($random))
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_RANDOM_EMPTY");
     }
-
     return $random;
 }
 
@@ -108,6 +110,10 @@ return length.
 
 If set to a true value trailing '=' characters are not removed from
 the output.
+
+=item * BINARY
+
+If set to a true value the return value is NOT base64 encoded
 
 =back
 

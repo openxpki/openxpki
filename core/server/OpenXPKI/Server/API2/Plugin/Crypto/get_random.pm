@@ -27,11 +27,16 @@ B<Parameters>
 
 Please note that the returned string is Base64 encoded an thus longer.
 
+=item * C<binary> I<Bool>
+
+If set the raw binary value is returned
+
 =back
 
 =cut
 command "get_random" => {
     length => { isa => 'Int', required => 1, },
+    binary => { isa => 'Bool', default => 0, },
 } => sub {
     my ($self, $params) = @_;
     my $length  = $params->length;
@@ -39,8 +44,8 @@ command "get_random" => {
 
     my $random = $self->api->get_default_token->command({
         COMMAND => 'create_random',
-        RETURN_LENGTH => $length,
         RANDOM_LENGTH => $length,
+        BINARY => $params->binary,
     });
     ## DO NOT debug print $random here as it will possibly be used as a password!
     return $random;

@@ -31,7 +31,6 @@ sub execute {
     my $password  = $default_token->command({
         COMMAND       => 'create_random',
         RETURN_LENGTH => $password_length,
-        RANDOM_LENGTH => $password_length,
     });
 
     CTX('log')->application()->debug('Generated random password with length ' . $password_length);
