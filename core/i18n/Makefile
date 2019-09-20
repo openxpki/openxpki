@@ -95,6 +95,7 @@ dist: readversion
 		rm -rf $(PACKAGE)-$(VERSION)/ ; \
 	fi
 	mkdir $(PACKAGE)-$(VERSION)
+	if [ -L "en_US" ]; then rm en_US; fi			# Work around bug in buster build
 	tar -c -p -f - \
 		--exclude "*.svn" \
 		--exclude "$(PACKAGE)-*" \
@@ -102,6 +103,7 @@ dist: readversion
 		--exclude "*~" \
 		. | \
 		tar -C $(PACKAGE)-$(VERSION)/ -x -f -
+	if [ ! -e en_US ]; then cp -a en_GB en_US; fi	 # Work around bug in buster build
 	tar cf $(PACKAGE)-$(VERSION).tar $(PACKAGE)-$(VERSION)
 	gzip --best --force $(PACKAGE)-$(VERSION).tar
 	rm -rf $(PACKAGE)-$(VERSION)/

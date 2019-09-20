@@ -19,14 +19,14 @@ PACKAGES=			\
 	i18n 			\
 	cgi-session-driver
 
-DEBIAN_CODENAME = $(shell lsb_release -sc)
+DEBIAN_VERSION = $(shell cat /etc/debian_version)
 
 # Data::Password Data::Serializer DateTime::Format::DateParse IPC::ShareLite 
 # Locale::TextDomain Proc::ProcessTable Sys::SigAction Workflow 
 # XML::Filter::XInclude XML::SAX::PurePerl XML::Validator::Schema
 # Exception::Class 1.22 Added Exception::Class::Base->caught() 
 
-ifeq "$(DEBIAN_CODENAME)" "buster"
+ifeq "$(DEBIAN_VERSION)" "buster/sid"
 EXTERNAL=				\
 	Crypt__OpenSSL__AES		\
 	Crypt__Cipher__AES \

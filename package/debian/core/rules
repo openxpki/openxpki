@@ -1,6 +1,7 @@
 #!/usr/bin/make -f
 
 PERL ?= /usr/bin/perl
+VERSION := $(shell perl -MOpenXPKI::VERSION -I. -e 'print "$$OpenXPKI::VERSION::VERSION"')
 
 arrange: arrange-stamp
 arrange-stamp: install
@@ -38,7 +39,7 @@ binary-indep-stamp: arrange
 build: build-stamp
 build-stamp: config
 	dh_testdir
-	OPENSSL_PREFIX=/usr $(PERL) Makefile.PL INSTALLDIRS=vendor
+	OPENSSL_PREFIX=/usr $(PERL) Makefile.PL INSTALLDIRS=vendor DESTDIR=/tmp/OpenXPKI-$(VERSION)/debian/libopenxpki-perl
 	$(MAKE) OPTIMIZE="-O2 -g -Wall"
 	# $(MAKE) test
 	touch build-stamp
