@@ -174,6 +174,7 @@ sub execute_action {
     }
     # catch exceptions during initialization to do database rollback
     catch {
+        ##! 8: 'Error during startup ' . $_
         # make sure the cleanup code does not die as this would escape this method
         eval { CTX('dbi')->rollback() unless $autorun };
         # $autorun = 1 means nested workflow action, rollback will then be
@@ -200,7 +201,7 @@ sub execute_action {
         # calls update_workflow and commit on the persister after each action)
     };
 
-    ##! 16: 'super::execute_action returned'
+    ##! 16: "super::execute_action $action_name returned"
 
     # As pause comes up with an exception we can never have pause + an extra exception
     # so we just ignore any expcetions here
@@ -348,7 +349,7 @@ sub pause {
     $count_try++;
 
 
-    ##! 16: sprintf('pause because of %s, max retries %d, retry interval %d, count try: %d ',$cause_description, $max_retries, $retry_interval, $wakeup_at)
+    ##! 16: sprintf('pause because of %s, max retries %d, count try: %d ', $cause_description, $max_retries, $wakeup_at)
 
     # maximum exceeded?
     if($count_try > $max_retries) {
