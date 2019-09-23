@@ -14,6 +14,7 @@ use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow::WFObject::WFArray;
 use MIME::Base64;
+
 use Moose;
 #use namespace::autoclean; # Conflicts with Debugger
 extends 'OpenXPKI::Server::NICE';
@@ -169,8 +170,6 @@ sub issueCertificate {
 
     ##! 32: 'issuing ca: ' . $issuing_ca
 
-
-    my $default_token = CTX('api2')->get_default_token();
     my $ca_token = CTX('crypto_layer')->get_token({
         TYPE => 'certsign',
         NAME => $issuing_ca
@@ -185,7 +184,6 @@ sub issueCertificate {
     my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
         CA        => $issuing_ca,
         ID        => $cert_profile,
-        TYPE      => 'ENDENTITY', # FIXME - should be useless
     );
 
     ##! 64: 'propagating cert subject: ' . $csr->{subject}
@@ -259,11 +257,11 @@ sub issueCertificate {
     }
 
     ##! 16: 'performing key online test'
-    if (! $ca_token->key_usable()) {
+    if (!$ca_token->key_usable()) {
         CTX('log')->application()->warn("Token for $issuing_ca not usable");
-        $self->_get_activity()->pause('I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_NOT_USABLE');
+        $self->last_error('I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_NOT_USABLE');
+        return undef;
     }
-
 
     ##! 32: 'issuing certificate'
     ##! 64: 'certificate profile '. Dumper( $profile )
@@ -300,17 +298,17 @@ sub renewCertificate {
 sub revokeCertificate {
 
     my $self = shift;
-    my $crr  = shift;
+    my $cert_identifier = shift;
 
     CTX('dbi')->update(
         table => 'certificate',
         set => { status => 'CRL_ISSUANCE_PENDING' },
         where => {
-           identifier => $crr->{cert_identifier},
+           identifier => $cert_identifier,
         },
     );
 
-    return;
+    return 1;
 
 }
 
@@ -331,16 +329,9 @@ sub checkForRevocation {
 
     CTX('log')->application()->debug("Check for revocation of $cert_identifier, result: " . $cert->{status});
 
-    if ($cert->{status} eq 'REVOKED') {
-       ##! 32: 'certificate revoked'
-       return 1;
-    }
+    ##! 32: 'certificate status ' . $cert->{status}
+    return ($cert->{status} eq 'REVOKED');
 
-    # If the certificate is not revoked, trigger pause
-    ##! 32: 'Revocation is pending - going to pause'
-    $self->_get_activity()->pause('I18N_OPENXPKI_UI_PAUSED_LOCAL_REVOCATION_PENDING');
-
-    return;
 }
 
 
@@ -353,9 +344,8 @@ sub issueCRL {
     my $pki_realm = CTX('session')->data->pki_realm;
     my $dbi = CTX('dbi');
 
-    # FIXME - we want to have a context free api....
-    my $crl_validity = $param->{validity} // $self->_get_context_param('crl_validity');
-    my $delta_crl = $param->{validity} // $self->_get_context_param('delta_crl');
+    my $crl_validity = $param->{validity};
+    my $delta_crl = $param->{validity};
 
     my $remove_expired = $param->{remove_expired};
     my $reason_code = $param->{reason_code};
@@ -388,7 +378,7 @@ sub issueCRL {
     });
 
     OpenXPKI::Exception->throw(
-       message => 'I18N_OPENXPKI_SERVER_NICE_LOCAL_CA_TOKEN_UNAVAILABLE',
+        message => 'I18N_OPENXPKI_SERVER_NICE_LOCAL_CA_TOKEN_UNAVAILABLE',
     ) unless defined $ca_token;
 
     # we want all identifiers and data for certificates that are
@@ -439,22 +429,23 @@ sub issueCRL {
     ##! 2: "id: $serial"
 
     $crl_profile->set_serial($serial);
-    #
+
     ##! 16: 'performing key online test'
-    if (! $ca_token->key_usable()) {
-        CTX('log')->application()->warn("Token for $ca_identifier not usable");
-        $self->_get_activity()->pause('I18N_OPENXPKI_UI_PAUSED_CRL_TOKEN_NOT_USABLE');
+    if (!$ca_token->key_usable()) {
+        CTX('log')->application()->warn("Token for $ca_alias not usable");
+        $self->last_error('I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_NOT_USABLE');
+        return undef;
     }
-    #
+
     my $crl = $ca_token->command({
         COMMAND => 'issue_crl',
         CERTLIST => \@cert_timestamps,
         PROFILE => $crl_profile,
     });
-    #
+
     my $crl_obj = OpenXPKI::Crypt::CRL->new( $crl );
     ##! 128: 'crl: ' . Dumper($crl)
-    #
+
     CTX('log')->application()->info('CRL issued for CA ' . $ca_alias . ' in realm ' . $pki_realm);
 
     CTX('log')->audit('cakey')->info('crl issued', {
@@ -529,6 +520,7 @@ sub generateKey {
     my $key_alg = shift;
     my $key_params = shift;
     my $key_transport = shift;
+    my $extra = shift || {};
 
     my $params = {
         key_alg => $key_alg,
@@ -538,9 +530,8 @@ sub generateKey {
 
     # password check
     if (not $params->{password}) {
-        OpenXPKI::Exception->throw(
-            message => 'No password set for key encryption'
-        );
+        $self->last_error('I18N_OPENXPKI_UI_NICE_GENERATE_KEY_NO_PASSWORD');
+        return;
     }
 
     foreach my $key (keys %{$key_params}) {
@@ -555,23 +546,30 @@ sub generateKey {
     }
 
     # command definition
-    my $pkcs8 = CTX('api2')->generate_key(%$params);
-
+    my $res;
     CTX('log')->audit('key')->info("generating private key via NICE");
 
-    my $pubkey = CTX('api2')->get_default_token()->command({
-        COMMAND => "get_pubkey",
-        DATA => $pkcs8,
-        PASSWD => $params->{password},
-    });
+    eval {
+        my $pkcs8 = CTX('api2')->generate_key(%$params);
 
-    my $pub = OpenXPKI::Crypt::PubKey->new($pubkey);
+        my $pubkey = CTX('api2')->get_default_token()->command({
+            COMMAND => "get_pubkey",
+            DATA => $pkcs8,
+            PASSWD => $params->{password},
+        });
 
-    return {
-        pkey => $pkcs8,
-        pubkey => encode_base64($pub->data),
-        key_id => $pub->get_subject_key_id,
+        my $pub = OpenXPKI::Crypt::PubKey->new($pubkey);
+
+        $res = {
+            pkey => $pkcs8,
+            pubkey => encode_base64($pub->data),
+            key_id => $pub->get_subject_key_id,
+        };
     };
+    if ($EVAL_ERROR) {
+        CTX('log')->application()->error('Error generating private key: ' . $EVAL_ERROR);
+    }
+    return $res;
 
 }
 
@@ -596,18 +594,18 @@ sub fetchKey {
     }
 
     my $pkey;
+    my $datapool = CTX('api2')->get_data_pool_entry(
+        namespace =>  'certificate.privatekey',
+        key       =>  $key_identifier
+    );
+
+    if (!$datapool) {
+        $self->last_error('I18N_OPENXPKI_UI_NICE_FETCH_KEY_NO_SUCH_KEY');
+        CTX('log')->application()->error('No key found for this key_id');
+        return;
+    }
+
     eval {
-        my $datapool = CTX('api2')->get_data_pool_entry(
-            namespace =>  'certificate.privatekey',
-            key       =>  $key_identifier
-        );
-
-        if (!$datapool) {
-            OpenXPKI::Exception->throw(
-                message => 'No key found for this key_id'
-            );
-        }
-
         $pkey = CTX('api2')->convert_private_key(
             private_key => $datapool->{value},
             format     => 'OPENSSL_PRIVKEY',
@@ -617,6 +615,7 @@ sub fetchKey {
         );
     };
     if ($EVAL_ERROR || !$pkey) {
+        $self->last_error('I18N_OPENXPKI_UI_NICE_FETCH_KEY_DECRYPT_FAILED');
         CTX('log')->application()->error('Unable to export private key: ' . ($EVAL_ERROR || 'unknown error'));
     }
 

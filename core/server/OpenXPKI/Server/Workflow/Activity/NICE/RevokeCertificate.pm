@@ -5,6 +5,7 @@
 package OpenXPKI::Server::Workflow::Activity::NICE::RevokeCertificate;
 
 use strict;
+use English;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use OpenXPKI::Server::Context qw( CTX );
@@ -18,6 +19,7 @@ use OpenXPKI::Server::NICE::Factory;
 use Data::Dumper;
 
 sub execute {
+
     my ($self, $workflow) = @_;
     my $context  = $workflow->context();
     ##! 32: 'context: ' . Dumper( $context )
@@ -56,11 +58,14 @@ sub execute {
 
     CTX('log')->application()->info("start cert revocation for identifier $cert_identifier, workflow " . $workflow->id);
 
-    $nice_backend->revokeCertificate( {
-        cert_identifier => $cert->{identifier},
-        reason_code => $cert->{reason_code},
-        invalidity_time => $cert->{invalidity_time},
-    } );
+    my $res = $nice_backend->revokeCertificate(
+        $cert->{identifier},
+        $cert->{reason_code},
+        $cert->{invalidity_time},
+    );
+    if (!$res) {
+        $self->pause('I18N_OPENXPKI_UI_NICE_BACKEND_ERROR');
+    }
 
     ##! 32: 'Add workflow id ' . $workflow->id.' to cert_attributes ' for cert ' . $set_context->{cert_identifier}
     CTX('dbi')->insert(

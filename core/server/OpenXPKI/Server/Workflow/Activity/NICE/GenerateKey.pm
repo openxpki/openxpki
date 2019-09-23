@@ -10,6 +10,7 @@ use Data::Dumper;
 use OpenXPKI::Server::NICE::Factory;
 
 sub execute {
+
     my $self       = shift;
     my $workflow   = shift;
     my $context    = $workflow->context();
@@ -37,10 +38,14 @@ sub execute {
     my $private_key = $nice_backend->generateKey( '', $key_alg, $key_gen_params, $transport, $params );
 
     ##! 32: 'NICE key result ' . Dumper $private_key
-
     my $target_key = $self->param('target_key') || 'private_key';
-
     $context->param($target_key => $private_key);
+
+    if (!$private_key) {
+        my $error = $nice_backend->get_last_error() || 'I18N_OPENXPKI_UI_UNABLE_TO_GENERATE_PRIVATE_KEY';
+        CTX('log')->application()->error($error);
+        $context->param( 'error_code' =>  $error );
+    }
 
     return 1;
 }
@@ -60,6 +65,9 @@ to the backend class.
 
 The result of the call is written to target key, depending on the
 implementation this can be the key itself or any other data structure.
+
+If the backend does not return a key, the error message is written to
+I<error_code> and the target_key is empty.
 
 =head1 Configuration
 

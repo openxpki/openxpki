@@ -41,6 +41,14 @@ has 'context' => (
     lazy => 1,
 );
 
+has 'last_error' => (
+    is => 'rw',
+    isa => 'Str',
+    reader => 'get_last_error',
+    lazy => 1,
+    default => '',
+);
+
 # Moose pre-constuctor to map single argument activity into expected hashref
 
 around BUILDARGS => sub {
@@ -103,7 +111,7 @@ sub __persistCertificateInformation {
 
     my $serializer = OpenXPKI::Serialization::Simple->new();
 
-    if ($persist_data) {
+    if ($persist_data && (scalar keys %{$persist_data})) {
         my $serialized_data = $serializer->serialize( $persist_data );
         ##! 16: 'Persist certificate: ' . $identifier
         ##! 32: 'persisted data: ' . Dumper( $persist_data )
@@ -323,6 +331,15 @@ and are written to the context by the surrounding activity functions.
 The implementations are free to access the context to transport internal
 parameters.
 
+If the expected operation could not be completed, the method MUST return
+undef, it is recommended to set a verbose error in the I<last_error> class
+attribute (this might also show up on the UI).
+
+The methods should NOT use workflow controls as pause or retry, this should
+be left to the activity classes. Methods should throw exceptions only on
+final errors (such that will not succeed when called again with the same
+input data).
+
 =head1 API Functions
 
 =head2 issueCertificate
@@ -330,25 +347,33 @@ parameters.
 Submit a certificate request for a new certificate. The certificate request
 entry from the database is passed in as hashref.
 
-Note that it highly depends on the implementation what properties are taken from
-the pkcs10 container and what can be overridden by other means.
+Note that it highly depends on the implementation what properties are taken
+from the pkcs10 container and what can be overridden by other means.
 PKCS10 is the default format which should be supported by any backend.
 You might implement any own format.
 See documentation of the used backend for details.
 
-=head3 Input
+In case the backend has processed the request but needs extra time to
+process it, the response should be a hash with cert_identifier set to
+undef. The backend should support pickup of the certificate by fetch
+certificate in this case and keep information in the context to process
+this call.
+
+=head3 Parameters
 
 =over
 
 =item csr - hashref containing the database entry from the csr table
 
+=item ca_alias - name of the ca-token to use
+
 =back
 
-=head3 Output
+=head3 Return values
 
 =over
 
-=item cert_identifier - the identifier of the issued certificate or I<pending>
+=item cert_identifier - the identifier of the issued certificate
 
 =back
 
@@ -375,24 +400,6 @@ Submit a certificate renewal request. Same as issueCertificate but
 receives the certificate identifier of the originating certificate as
 second parameter.
 
-=head3 Input
-
-=over
-
-=item csr - hashref containing the database entry from the csr table
-
-=item cert_identifier - identifier of the originating certificate
-
-=back
-
-=head3 Output
-
-=over
-
-=item cert_identifier - the identifier of the issued certificate or I<pending>
-
-=back
-
 =head2 fetchCertificate
 
 This is only valid if issueCertificate or renewCertificate returned with a
@@ -412,32 +419,46 @@ If the fetch finally failed, it should unset the cert_identifier.
 =head2 revokeCertificate
 
 Request the ca to add this certificate to its revocation list. Expects the
-serial of the certificate revocation request.  If the given reason is not
+serial of the certificate revocation request. If the given reason is not
 supported by the backend, "unspecified" should be used.
 
-=head3 Input
+=head3 Parameters
 
 =over
 
 =item cert_identifier - the certificate identifier of the cert to revoke
 
+=item reason_code
+
+=item invalidity_time
+
 =back
+
+=head3 Return Values
+
+Boolean, true if the request was processed. Should throw an exception if
+revocation is not possible.
 
 =head2 checkForRevocation
 
-Only valid after calling revokeCertificate.
+Might only valid after calling revokeCertificate.
+
 Check if the certificate revocation request was processed and set the status
 field in the certificate table to REVOKED/HOLD. The special state HOLD must
 be used only if the certificate is marked as "certificateHold" on the issued
 CRL or OCSP.
 
-=head3 Input
+=head3 Parameters
 
 =over
 
 =item cert_identifier
 
 =back
+
+=head3 Return Values
+
+true if the certificate is revoked, false if not.
 
 =head2 unrevokeCertificate
 
@@ -458,7 +479,12 @@ status field of the certificate status table back to ISSUED immediately.
 Trigger issue of the crl and write it into the "crl" parameter.
 The parameter ca_alias contains the alias name of the ca token.
 
-=head3 Input
+In case the backend has processed the request but needs extra time to
+process it, the response should be a hash with csr_serial set to
+undef. The backend should support pickup of the certificate by fetchCrl
+in this case and keep information in the context to process this call.
+
+=head3 Parameters
 
 =over
 
@@ -466,12 +492,11 @@ The parameter ca_alias contains the alias name of the ca token.
 
 =back
 
-=head3 Output
+=head3 Return values
 
 =over
 
-=item crl_serial - the serial number (key of the crl database) of the created
-crl or I<pending>
+=item crl_serial - the serial number (key of the crl database)
 
 =back
 

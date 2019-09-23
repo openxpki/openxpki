@@ -47,11 +47,30 @@ sub execute {
 
     my $set_context = $nice_backend->issueCRL( $ca_alias, $param );
 
+    if(!$set_context) {
+
+        my $error = $nice_backend->get_last_error() || 'I18N_OPENXPKI_UI_NICE_BACKEND_ERROR';
+
+        # Catch exception as "pause" if configured
+        if ($self->param('pause_on_error')) {
+            CTX('log')->application()->warn("NICE IssueCRL failed but pause_on_error is requested ");
+            CTX('log')->application()->debug("Original error: " . $error);
+            $self->pause('I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_SIGNING_FAILED');
+        }
+
+        if (my $exc = OpenXPKI::Exception->caught()) {
+            $exc->rethrow();
+        } else {
+            OpenXPKI::Exception->throw( message => $error );
+        }
+    }
+
+
     ##! 64: 'Setting Context ' . Dumper $set_context
     #while (my ($key, $value) = each(%$set_context)) {
     foreach my $key (keys %{$set_context} ) {
         my $value = $set_context->{$key};
-        $context->param( $key, $value );
+        $context->param( { $key => $value } );
     }
 
 }

@@ -20,6 +20,7 @@ use OpenXPKI::Server::Database; # to get AUTO_ID
 use Data::Dumper;
 
 sub execute {
+
     my ($self, $workflow) = @_;
     my $context = $workflow->context();
     ##! 32: 'context: ' . Dumper( $context )
@@ -66,20 +67,25 @@ sub execute {
         }
     };
 
-    if (my $eval_err = $EVAL_ERROR) {
+    my $error;
+    if ($EVAL_ERROR) {
+        $error = 'I18N_OPENXPKI_UI_NICE_BACKEND_ERROR';
+        CTX('log')->application()->error("NICE backend error: $error");
+    } elsif(!$set_context) {
+        $error = $nice_backend->get_last_error() || 'I18N_OPENXPKI_UI_NICE_BACKEND_ERROR';
+    }
+
+    if ($error) {
         # Catch exception as "pause" if configured
         if ($self->param('pause_on_error')) {
             CTX('log')->application()->warn("NICE issueCertificate failed but pause_on_error is requested ");
-
-            CTX('log')->application()->error("Original error: " . $eval_err);
-
-            $self->pause('I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_SIGNING_FAILED');
+            $self->pause($error);
         }
 
         if (my $exc = OpenXPKI::Exception->caught()) {
             $exc->rethrow();
         } else {
-            OpenXPKI::Exception->throw( message => $eval_err  );
+            OpenXPKI::Exception->throw( message => $error );
         }
     }
 
@@ -87,7 +93,7 @@ sub execute {
     for my $key (keys %{$set_context} ) {
         my $value = $set_context->{$key};
         ##! 64: "Set key: $key to value $value";
-        $context->param( $key, $value );
+        $context->param( { $key => $value } );
     }
 
     ##! 64: 'Context after issue ' .  Dumper $context
