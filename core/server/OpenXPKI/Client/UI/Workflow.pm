@@ -1320,15 +1320,15 @@ sub action_search {
     my $spec = $self->_session->param('wfsearch')->{default};
     my $attr = $self->__build_attribute_subquery( $spec->{attributes} );
 
-    if ($attr) {
-        $input->{attributes} = $self->__build_attribute_preset(  $spec->{attributes} );
-        $query->{attribute} = $attr;
-    }
-
     if ($self->param('wf_creator')) {
         $input->{wf_creator} = $self->param('wf_creator');
         $attr->{'creator'} = ~~$self->param('wf_creator');
         $verbose->{wf_creator} = $self->param('wf_creator');
+    }
+
+    if ($attr) {
+        $input->{attributes} = $self->__build_attribute_preset(  $spec->{attributes} );
+        $query->{attribute} = $attr;
     }
 
     # check if there is a custom column set defined
