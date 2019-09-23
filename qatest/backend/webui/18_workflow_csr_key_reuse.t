@@ -102,7 +102,7 @@ $result = $client->mock_request({
     'wf_token' => undef
 });
 
-is($result->{right}->[0]->{content}->{data}->[2]->{value}, 'KEY_DUPLICATE_ERROR_WORKFLOW', 'Duplicate key (workflow)');
+is($result->{right}->[0]->{content}->{data}->[3]->{value}, 'KEY_DUPLICATE_ERROR_WORKFLOW', 'Duplicate key (workflow)');
 
 # load the old workflow
 $result = $client->mock_request({
@@ -113,13 +113,6 @@ $result = $client->mock_request({
     'action' => 'workflow!index',
     'cert_subject_parts{hostname}' => 'www.example.de',
     'cert_subject_parts{hostname2}[]' => ['www.example.com'],
-    'wf_token' => undef
-});
-
-
-$result = $client->mock_request({
-    'action' => 'workflow!index',
-    'cert_san_parts{dns}[]' => $result->{main}->[0]->{content}->{fields}->[0]->{value},
     'wf_token' => undef
 });
 
@@ -170,7 +163,7 @@ $result = $client->mock_request({
     'action' => 'workflow!select!wf_action!global_noop!wf_id!'.$wf_id_resubmit,
 });
 
-is($result->{right}->[0]->{content}->{data}->[2]->{value}, 'KEY_DUPLICATE_ERROR_CERTIFICATE', 'Duplicate key (certificate)');
+is($result->{right}->[0]->{content}->{data}->[3]->{value}, 'KEY_DUPLICATE_ERROR_CERTIFICATE', 'Duplicate key (certificate)');
 
 # be ignorant, upload the request again
 $result = $client->mock_request({
@@ -184,7 +177,7 @@ $result = $client->mock_request({
     'wf_token' => undef
 });
 
-is($result->{right}->[0]->{content}->{data}->[2]->{value}, 'KEY_DUPLICATE_ERROR_CERTIFICATE');
+is($result->{right}->[0]->{content}->{data}->[3]->{value}, 'KEY_DUPLICATE_ERROR_CERTIFICATE');
 
 # Lesson learned, build new CSR
 $result = $client->mock_request({
@@ -207,12 +200,6 @@ $result = $client->mock_request({
     'action' => 'workflow!index',
     'cert_subject_parts{hostname}' => 'www.example.de',
     'cert_subject_parts{hostname2}[]' => ['www.example.com'],
-    'wf_token' => undef
-});
-
-$result = $client->mock_request({
-    'action' => 'workflow!index',
-    'cert_san_parts{dns}[]' => $result->{main}->[0]->{content}->{fields}->[0]->{value},
     'wf_token' => undef
 });
 
@@ -298,7 +285,7 @@ $result = $client->mock_request({
     'wf_token' => undef
 });
 
-is($result->{right}->[0]->{content}->{data}->[2]->{value}, 'KEY_DUPLICATE_ERROR_WORKFLOW', 'Duplicate key (workflow)');
+is($result->{right}->[0]->{content}->{data}->[3]->{value}, 'KEY_DUPLICATE_ERROR_WORKFLOW', 'Duplicate key (workflow)');
 
 # load the old workflow
 $result = $client->mock_request({
@@ -310,12 +297,6 @@ $result = $client->mock_request({
     'action' => 'workflow!index',
     'cert_subject_parts{hostname}' => 'www.example.de',
     'cert_subject_parts{hostname2}[]' => ['www.example.com'],
-    'wf_token' => undef
-});
-
-$result = $client->mock_request({
-    'action' => 'workflow!index',
-    'cert_san_parts{dns}[]' => $result->{main}->[0]->{content}->{fields}->[0]->{value},
     'wf_token' => undef
 });
 
@@ -347,12 +328,6 @@ $result = $client->mock_request({
     'action' => 'workflow!index',
     'cert_subject_parts{hostname}' => 'www.example.de',
     'cert_subject_parts{hostname2}[]' => ['www.example.com'],
-    'wf_token' => undef
-});
-
-$result = $client->mock_request({
-    'action' => 'workflow!index',
-    'cert_san_parts{dns}[]' => $result->{main}->[0]->{content}->{fields}->[0]->{value},
     'wf_token' => undef
 });
 

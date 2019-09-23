@@ -76,13 +76,6 @@ $result = $client->mock_request({
     'wf_token' => undef
 });
 
-
-$result = $client->mock_request({
-    'action' => 'workflow!index',
-    'cert_san_parts{dns}[]' => $result->{main}->[0]->{content}->{fields}->[0]->{value},
-    'wf_token' => undef
-});
-
 $result = $client->mock_request({
     'action' => 'workflow!index',
     'cert_info{requestor_email}' => 'mail@oliwel.de',
