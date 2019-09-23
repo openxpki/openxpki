@@ -44,6 +44,7 @@ else
 EXTERNAL=				\
 	Crypt__OpenSSL__AES		\
 	Crypt__Cipher__AES \
+	Crypt__Argon2 \
 	Data__SpreadPagination		\
 	Class__Observable 		\
 	Git__PurePerl \
