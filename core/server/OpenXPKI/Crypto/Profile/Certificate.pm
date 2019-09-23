@@ -27,7 +27,7 @@ use Data::Dumper;
 # use Smart::Comments;
 
 
-=head2 new ( { CA, ID, TYPE, [CACERTIFICATE] } )
+=head2 new ( { CA, ID, [CACERTIFICATE] } )
 
 Create a new profile instance, all parameters are required.
 
@@ -40,10 +40,6 @@ The alias of the ca token to be used (from the alias table)
 =item ID
 
 The name of the profile (as given in the realm.profile configuration)
-
-=item TYPE
-
-Must be set to I<ENDENTITY>
 
 =item CACERTIFICATE
 
@@ -68,7 +64,6 @@ sub new {
     bless $self, $class;
 
     my $keys = { @_ };
-    $self->{TYPE}      = $keys->{TYPE}      if ($keys->{TYPE});
     $self->{CA}        = $keys->{CA}        if ($keys->{CA});
     $self->{ID}        = $keys->{ID}        if ($keys->{ID});
 
@@ -78,22 +73,10 @@ sub new {
     # certificates unknown to the alias system
     $self->{CACERTIFICATE} = $keys->{CACERTIFICATE} if ($keys->{CACERTIFICATE});
 
-    if ($self->{TYPE} ne 'ENDENTITY') {
-        OpenXPKI::Exception->throw (
-           message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_INCORRECT_TYPE",
-           params => {
-                TYPE      => $keys->{TYPE},
-                CA        => $keys->{CA},
-                ID        => $keys->{ID},
-            },
-       );
-    }
-
     if (! defined $self->{CA}) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_NEW_MISSING_CA",
             params => {
-            TYPE      => $keys->{TYPE},
             ID        => $keys->{ID},
         });
     }
@@ -126,14 +109,6 @@ sub __load_profile
     my $config = CTX('config');
 
     my $profile_name = $self->{ID};
-
-    if ($self->{TYPE} eq "SELFSIGNEDCA")
-    {
-        # FIXME - check if required and implement if necessary
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_MIGRATION_FEATURE_INCOMPLETE"
-        );
-    }
 
     if (!$config->exists("profile.$profile_name")) {
         OpenXPKI::Exception->throw (
