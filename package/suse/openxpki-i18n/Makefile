@@ -22,7 +22,6 @@ dist-clean:
 
 dist: dist-clean
 	( cd $(SRCBASE)/ && \
-		make scan && \
 		make dist && \
 		mv *.tar.gz $(RPMBASE)/SOURCES \
 	)

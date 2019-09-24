@@ -13,7 +13,6 @@ include ../Makefile.inc
 
 openxpki-archive:
 	cd $(SRCBASE); \
-	make scan; \
 	make dist; \
 	mv $(PACKAGE)-*.tar.gz /tmp
 
