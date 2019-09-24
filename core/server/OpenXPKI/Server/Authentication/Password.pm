@@ -79,10 +79,13 @@ sub login_step {
     # check account - the handler config has a connector at .user
     # that returns password or password and role for a requested username
 
+    my $userinfo;
     if (!$self->{ROLE}) {
-        my $user_info = CTX('config')->get_hash( [ @{$self->{PREFIX}}, $account ] );
-        $digest = $user_info->{digest} || '';
-        $role = $user_info->{role} || '';
+        $userinfo = CTX('config')->get_hash( [ @{$self->{PREFIX}}, $account ] );
+        $digest = $userinfo->{digest} || '';
+        delete $userinfo->{digest};
+        $role = $userinfo->{role} || '';
+        delete $userinfo->{role};
     } else {
         $digest = CTX('config')->get( [ @{$self->{PREFIX}}, $account ] );
         $role =  $self->{ROLE};
@@ -191,6 +194,7 @@ sub login_step {
             {
                 SERVICE_MSG => 'SERVICE_READY',
             },
+            $userinfo
         );
 
     }
@@ -218,7 +222,8 @@ is the constructor. It requires the config prefix as single argument.
 This is the minimum parameter set for any authentication class.
 
 When no I<role> is set in the configuration, the configuration must return
-a hash for each user holding I<digest> and I<role>.
+a hash for each user holding I<digest> and I<role>, any additonal fields of
+the hash are returned as I<userinfo>.
 
 The digest must have the format: C<{SCHEME}encrypted_string>
 

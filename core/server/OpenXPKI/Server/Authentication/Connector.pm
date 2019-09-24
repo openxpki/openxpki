@@ -15,8 +15,7 @@ use OpenXPKI::Server::Context qw( CTX );
 
 use Moose;
 
-
-has source => (
+has prefix => (
     is => 'ro',
     isa => 'ArrayRef',
 );
@@ -48,15 +47,14 @@ around BUILDARGS => sub {
     my $path = shift;
     my $config = CTX('config');
 
-    my @source = split /\./, $path;
-    push @source, 'source';
+    my @prefix = split /\./, $path;
 
     ##! 2: "load name and description for handler"
     return $class->$orig({
         description => $config->get("$path.description"),
         name => $config->get("$path.label"),
         role => $config->get("$path.role"),
-        source => \@source,
+        prefix => \@prefix,
     });
 
 };
@@ -94,7 +92,7 @@ sub login_step {
     # check account - password checking is done using an authentication
     # connector with password binding.
 
-    my $result = CTX('config')->get( [ @{$self->source()}, $account ], { password =>  $passwd } );
+    my $result = CTX('config')->get( [ @{$self->prefix()}, 'source', $account ], { password =>  $passwd } );
 
     if (defined $result && ref $result ne '') {
         # this usually means a wrong connector definition
@@ -111,7 +109,10 @@ sub login_step {
         # result ok - return user, role, service ready message
         CTX('log')->auth()->info("Login successful for user $account with role " . $self->role());
 
-        return ($account, $self->role(), { SERVICE_MSG => 'SERVICE_READY', });
+        # fetch userinfo from handler- will be undef if not set
+        my $userinfo = CTX('config')->get_hash( [ @{$self->prefix()}, 'user', $account ] );
+
+        return ($account, $self->role(), { SERVICE_MSG => 'SERVICE_READY', }, $userinfo);
     }
 
     ##! 4: "Login failed for $account with result $result"
@@ -152,8 +153,9 @@ Suited connectors are e.g. Connector::Builtin::Authentication::*
         description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD
         role: User
         source@: connector:auth.connector.localuser
-
+        user@: connector:auth.connector.userinfo
 
 returns a pair of (user, role, response_message) for a given login
 step. If user and role are undefined, the login is not yet finished.
 
+If the user parameter is set, it is queried to fetch I<userinfo>.
