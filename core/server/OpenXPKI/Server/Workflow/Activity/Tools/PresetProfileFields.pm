@@ -33,11 +33,6 @@ sub execute {
         'cert_san_parts' => '',
     });
 
-    my $cert_subject = $self->param('cert_subject') || $context->param('cert_subject');
-    if (!$cert_subject) {
-        return;
-    }
-
     # Source hash
     my $source_ref = {};
     my $ctx_source = $context->param('sources');
@@ -45,14 +40,17 @@ sub execute {
         $source_ref = $serializer->deserialize( $ctx_source );
     }
 
-
-    my $dn = OpenXPKI::DN->new( $cert_subject );
-    my %hashed_dn = $dn->get_hashed_content();
-
     # Get the profile name and style - required for templating
     my $cert_profile = $self->param('cert_profile') || $context->param('cert_profile');
     my $cert_subject_style = $self->param('cert_subject_style') || $context->param('cert_subject_style');
+    my $cert_subject = $self->param('cert_subject') || $context->param('cert_subject');
     my $subject_alt_name = $self->param('cert_subject_alt_name') || $context->param('cert_subject_alt_name');
+
+    my %hashed_dn;
+    if ($cert_subject) {
+        my $dn = OpenXPKI::DN->new( $cert_subject );
+        %hashed_dn = $dn->get_hashed_content();
+    }
 
     ##! 32: 'Raw SAN ' . Dumper $subject_alt_name
 
@@ -139,6 +137,19 @@ sub execute {
             $param->{'cert_san_parts'} = $serializer->serialize( $cert_san_parts );
             $source_ref->{'cert_san_parts'} = 'Parser';
         }
+    }
+
+    # call preset on cert_info block with, add userinfo from session if set
+    my $userinfo = CTX('session')->data->userinfo || {};
+    my $cert_info = CTX('api2')->preset_subject_parts_from_profile(
+        profile => $cert_profile,
+        style => $cert_subject_style,
+        section => 'info',
+        preset => { userinfo => $userinfo },
+    );
+    if ($cert_info) {
+        $param->{'cert_info'} = $cert_info;
+        $source_ref->{'cert_info'} = 'Parser';
     }
 
     ##! 64: 'Params to set ' . Dumper $param

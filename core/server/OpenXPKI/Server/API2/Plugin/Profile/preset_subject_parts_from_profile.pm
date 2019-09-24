@@ -42,7 +42,7 @@ command "preset_subject_parts_from_profile" => {
     profile => { isa => 'AlphaPunct', required => 1, },
     fields  => { isa => 'ArrayRef', },
     style   => { isa => 'Str', },
-    section => { isa => 'Str', },
+    section => { isa => 'Str', default => 'subject' },
     preset =>  { isa => 'HashRef', },
 } => sub {
     my ($self, $params) = @_;
@@ -52,7 +52,7 @@ command "preset_subject_parts_from_profile" => {
 
     my %args = (
         profile => $params->profile,
-        section => $params->has_section ? $params->section : 'subject',
+        section => $params->section,
     );
 
     $args{style} = $params->style if ($params->has_style);
@@ -80,8 +80,7 @@ command "preset_subject_parts_from_profile" => {
             }
 
         # Fast path, copy from DN
-
-        } elsif ($preset =~ m{ \A \s* (\w+)(\.(\d+))? \s* \z }xs) {
+        } elsif ($preset =~ m{ \A \s* (C|ST|O|OU|CN|DC|L|UID|SN|GN)(\.(\d+))? \s* \z }xs) {
             my $comp = $1;
             my $pos = $3 || 0;
             my $val = $params->preset->{$comp}->[$pos];
@@ -89,7 +88,7 @@ command "preset_subject_parts_from_profile" => {
             if (defined $val && $val ne '') {
                 @val = ($val);
             }
-        # Should be a TT string
+        # Should be a TT or fixed string
         } else {
             my $val;
             $tt->process(\$preset, $params->preset, \$val) || OpenXPKI::Exception->throw(

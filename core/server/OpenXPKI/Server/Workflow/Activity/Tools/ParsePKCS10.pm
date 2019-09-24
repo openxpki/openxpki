@@ -42,7 +42,7 @@ sub execute {
         $subject_prefix.'subject_parts' => '',
         $subject_prefix.'san_parts' => '',
         $subject_prefix.'subject_alt_name' => '',
-
+        $subject_prefix.'info' => '',
     });
 
     # Source hash
@@ -251,6 +251,19 @@ sub execute {
                 $source_ref->{$subject_prefix.'san_parts'} = 'Parser';
             }
         }
+    }
+
+    # call preset on cert_info block with, add userinfo from session if set
+    my $userinfo = CTX('session')->data->userinfo || {};
+    my $cert_info = CTX('api2')->preset_subject_parts_from_profile(
+        profile => $cert_profile,
+        style => $cert_subject_style,
+        section => 'info',
+        preset => { userinfo => $userinfo },
+    );
+    if ($cert_info) {
+        $param->{$subject_prefix.'info'} = $cert_info;
+        $source_ref->{$subject_prefix.'info'} = 'Parser';
     }
 
     ##! 64: 'Params to set ' . Dumper $param
