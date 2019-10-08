@@ -41,7 +41,7 @@ is($result->{main}->[0]->{action}, 'login!stack');
 
 $result = $client->mock_request({
     'action' => 'login!stack',
-    'auth_stack' => "Client Certificate",
+    'auth_stack' => "Certificate",
 });
 
 like($result->{goto}, "/(redirect\!)?welcome/", 'Logged in - Welcome');

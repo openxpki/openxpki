@@ -36,11 +36,13 @@ sub login_step {
     }
 
     ##! 2: "credentials ... present"
-    ##! 16: 'Service Answer ' . Dumper $answer
+
+    my $trust_anchors = $self->trust_anchors();
+    ##! 32: 'trust anchors ' . Dumper $trust_anchors
 
     my $validate = CTX('api2')->validate_certificate(
         pem => $params->{certificate},
-        anchor => $self->trust_anchors(),
+        anchor => $trust_anchors,
     );
 
     return $self->_validation_result( $validate );

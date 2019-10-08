@@ -1,7 +1,3 @@
-## OpenXPKI::Server::Authentication::X509.pm
-##
-## Rewritten 2013 by Oliver Welter for the OpenXPKI Project
-## (C) Copyright 2013 by The OpenXPKI Project
 package OpenXPKI::Server::Authentication::X509;
 
 use strict;
@@ -31,16 +27,6 @@ has description => (
 
 has path => (
     is => 'ro',
-    isa => 'ArrayRef',
-);
-
-has trust_certs => (
-    is => 'rw',
-    isa => 'ArrayRef',
-);
-
-has trust_realms => (
-    is => 'rw',
     isa => 'ArrayRef',
 );
 
@@ -87,15 +73,7 @@ sub BUILD {
 
     my $config = CTX('config');
 
-    my @trust_certs =  $config->get_scalar_as_list( [ @path, 'cacert' ]);
-    my @trust_realms = $config->get_scalar_as_list( [ @path, 'realm' ]);
-
     ##! 8: 'Config Path: ' . Dumper \@path
-    ##! 8: 'Trusted Certs ' . Dumper @trust_certs
-    ##! 8: 'Trusted Realm ' . Dumper @trust_realms
-
-    $self->trust_certs ( \@trust_certs );
-    $self->trust_realms ( \@trust_realms );
 
     $self->description( $config->get( [ @path, 'description'] ) );
     $self->label( $config->get( [ @path, 'label'] ) );
@@ -117,9 +95,7 @@ sub BUILD {
 sub _load_anchors {
 
     my $self = shift;
-
-    return CTX('api2')->get_trust_anchors( path => $self->path() );
-
+    return CTX('api2')->get_trust_anchors( path => [ @{$self->path()}, 'trust_anchor' ] );
 
 }
 
@@ -233,7 +209,7 @@ OpenXPKI::Server::Authentication::X509 - certificate based authentication.
 =head1 Description
 
 Use a certificate chain passed by the authenticator to authenticate the user.
-This is an abstract base class, the actual challenge and extractin of the chain is
+This is an abstract base class, the actual challenge and extraction of the chain is
 done in ChallengeX509 and ClientX509 class, the later validation performs several steps:
 
 * look up a suitable root certificate, either in the received chain or in the database.
@@ -246,7 +222,8 @@ Any failure results in an exception.
 
 =head2 _load_anchors
 
-Create a list of trust anchor identifiers from the configuration.
+Create a list of trust anchor identifiers by calling I<get_trust_anchors>
+passing the config node I<trust_anchor> as path argument.
 
 =head2 login_step
 
@@ -265,11 +242,14 @@ Signature:
             username: jdoe
             realname: John Doe
     arg: cn
-    # trust anchors
-    realm:
-    - my_client_auth_realm
-    cacert:
-    - cert_identifier of external ca cert
+    # trust anchors (see also get_trust_anchors API method)
+    trust_anchor:
+        realm:
+         - my_client_auth_realm
+        cacert:
+         - cert_identifier of external ca cert
+        alias:
+         - name of alias groups
 
 =head2 parameters
 
@@ -310,13 +290,11 @@ first item is used.
 
 =back
 
-=item cacert
+=item trust_anchor
 
-A list of certificate identifiers to be used as trust anchors
-
-=item realm
-
-A list of realm names to be used as trust anchors (this loads all ca certificates from the given realm into the list of trusted ca certs).
+Definition of trust anchors used when validating the certificate, this
+node is mandatory and must have at least one keywords supported by the
+I<get_trust_anchors> API method.
 
 =back
 
@@ -330,7 +308,8 @@ their role to I<User>. Set CN as username (default).
     type: ClientX509
     label: Client Certificate Auth
     role: User
-    realm: user-ca
+    trust_anchor:
+        realm: user-ca
 
 =head3 Static role, extended user information from CN
 
@@ -343,7 +322,8 @@ available in the C<userinfo> structure (e.g. I<realname> and I<emailaddress>).
     role: User
     user@: connector:my.user.info.source
     arg: subject
-    realm: user-ca
+    trust_anchor:
+        realm: user-ca
 
 =head3 Dynamic role
 
@@ -354,6 +334,5 @@ not set the query parameter given to the connector is only the common name.
     type: ClientX509
     label: Client Certificate Auth
     user@: connector:my.user.info.source
-    realm: user-ca
-
-
+    trust_anchor:
+        realm: user-ca
