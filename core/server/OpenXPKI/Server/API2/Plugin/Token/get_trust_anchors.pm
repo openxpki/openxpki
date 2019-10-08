@@ -18,6 +18,30 @@ use OpenXPKI::Server::Context qw( CTX );
 
 Get the trust anchors as defined at the given config path.
 
+The config path must have at least one of this keys defined, where the
+value is either a single item or a list of items of the defined type.
+
+=over
+
+=item realm
+
+Adds all active issuing ca certificates from the given realm as trust
+anchors, so all certificates issued from this realm will be accepted.
+
+=item cacert
+
+A certificate identifier to use as trusted issuer. The certificate must
+exist in the database but do not need to be in any particular realm or
+referenced in a token configuration.
+
+=item alias
+
+Name of an alias B<group> from the aliases table, the alias items are
+read from the current realm or, if no items are found, from the global
+realm. Validity dates of the alias table are used.
+
+=back
+
 Result is an I<ArrayRef> of certificate identifiers.
 
 B<Parameters>
@@ -25,14 +49,15 @@ B<Parameters>
 =over
 
 =item * C<path> I<Str> - configuration path, must point to a config node which
-has at least these two child nodes: C<realm> (list of realms), C<cacert> (list
-if extra certificate identifiers):
+has at least one of the defining child nodes:
 
     path:
         realm:
          - democa
         cacert:
          - list of extra cert identifiers
+        alias:
+         - names of alias groups
 
 =back
 
@@ -54,9 +79,11 @@ command "get_trust_anchors" => {
 
     my @trust_certs =  $config->get_scalar_as_list([ @$path, 'cacert']);
     my @trust_realms = $config->get_scalar_as_list([ @$path, 'realm']);
+    my @trust_groups = $config->get_scalar_as_list([ @$path, 'alias']);
 
     ##! 8: 'Trusted Certs ' . Dumper \@trust_certs
     ##! 8: 'Trusted Realm ' . Dumper \@trust_realms
+    ##! 8: 'Trusted Groups ' . Dumper \@trust_groups
 
     my @trust_anchors;
     @trust_anchors = @trust_certs if (@trust_certs);
@@ -66,9 +93,24 @@ command "get_trust_anchors" => {
         next unless $realm;
         my $ca_certs = $self->api->list_active_aliases( type => 'certsign', pki_realm => $realm );
         ##! 16: 'ca cert in realm ' . Dumper $ca_certs
-        if (!$ca_certs) { next; }
         push @trust_anchors, map { $_->{identifier} } @{$ca_certs};
     }
+
+    my $pki_realm = $self->api->get_pki_realm;
+    for my $alias (@trust_groups) {
+        ##! 16: 'Load trust group '.$alias
+        next unless $alias;
+        my $ca_certs = $self->api->list_active_aliases( group => $alias, pki_realm => $pki_realm );
+        # look in global realm
+        if (!scalar @{$ca_certs}) {
+            ##! 32: 'Alias group not found in realm - lookup global'
+            $ca_certs = $self->api->list_active_aliases( group => $alias, pki_realm => '_global' );
+        }
+        ##! 16: 'ca cert in realm ' . Dumper $ca_certs
+        push @trust_anchors, map { $_->{identifier} } @{$ca_certs};
+    }
+
+
 
    return \@trust_anchors;
 };

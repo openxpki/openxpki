@@ -419,7 +419,7 @@ sub alias_add {
 
     # Check if the alias is for an issuing ca cert -> create root ca alias
     my $cs_group = CTX('config')->get(['realm', $params{realm}, 'crypto', 'type', 'certsign']);
-    if ( $insert_hash{alias} =~ /^$cs_group-(\d+)/ ) {
+    if ( $cs_group && ($insert_hash{alias} =~ /^$cs_group-(\d+)/ )) {
         print "\nToken is certsign, looking for root...\n";
         my $gen = $1;
 
@@ -655,7 +655,7 @@ sub alias_list {
     # remove root from the list
     delete $anon_groups{'root'} unless($params{group} && $params{group} eq 'root');
 
-    print "=== functional token ===\n" if (!$params{group});
+    print "=== functional token ===\n" if (!$params{group} && $groups);
     foreach my $type (keys %{$groups}) {
 
         my $group = $groups->{$type};
@@ -709,8 +709,8 @@ sub alias_list {
 
     }
 
-    # do not proceed in group mode
-    return 0 if ($params{group});
+    # do not proceed in group mode or in global realm
+    return 0 if ($params{group} || $params{realm} eq '_global');
 
     # Check for root ca
     $alias = $dbi->select_one(
@@ -1375,7 +1375,7 @@ if ($cmd eq 'initdb') {
 
     OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','api2','api2','dbi'], SILENT => 1, CLI => 1});
 
-    __check_realm();
+    __check_realm() unless($params{realm} eq '_global');
 
     my $subcmd = shift || '';
 
