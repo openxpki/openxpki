@@ -17,7 +17,6 @@ sub execute {
 
     my $context = $workflow->context();
     my $config = CTX('config');
-    #my $server = $context->param('server');
 
     # reset the context flags
     $context->param('signer_trusted' => 0);
@@ -31,6 +30,7 @@ sub execute {
     my $signer_cert = $context->param('signer_cert');
 
     if (!$signer_cert) {
+        ##! 16: 'No signer certificate in context'
         CTX('log')->application()->debug("Trusted Signer validation skipped, no certificate found");
         return 1;
     }
@@ -50,6 +50,12 @@ sub execute {
 
     # Check the chain
     my $signer_identifier = $x509->get_cert_identifier();
+    ##! 32: 'Signer identifier ' .$signer_identifier
+
+    # set from either db query or from chain validation
+    my ($signer_issuer, $signer_req_key, $signer_root, $signer_revoked, @signer_chain);
+    my $signer_realm = 'unknown';
+    my $signer_profile = 'unknown';
 
     # Get realm and issuer for signer certificate
     my $cert_hash = CTX('dbi')->select_one(
@@ -59,43 +65,71 @@ sub execute {
     );
 
     if ($cert_hash) {
+        ##! 16: 'certificate found in database'
+        # certificate was found in local database
         $context->param('signer_cert_identifier' => $signer_identifier);
-    }
+        $signer_realm = $cert_hash->{pki_realm} || '_global';
+        $signer_issuer = $cert_hash->{issuer_identifier};
+        $signer_req_key = $cert_hash->{req_key};
+        $signer_revoked = ($cert_hash->{status} ne 'ISSUED');
 
-    my $signer_realm = $cert_hash->{pki_realm} || 'global';
-    my $signer_issuer = $cert_hash->{issuer_identifier};
+        # Get the profile of the certificate, if it was issued from this CA
 
-    my $signer_req_key = $cert_hash->{req_key};
+        if ($signer_req_key) {
+            my $csr_hash = CTX('dbi')->select_one(
+                from    => 'csr',
+                columns => [ 'profile' ],
+                where   => { req_key => $signer_req_key },
+            );
+            $signer_profile = $csr_hash->{profile} if $csr_hash->{profile};
 
-    # Get the profile of the certificate, if it was issued from this CA
-    my $signer_profile = 'unknown';
-    if ($signer_req_key) {
-        my $csr_hash = CTX('dbi')->select_one(
-            from    => 'csr',
-            columns => [ 'profile' ],
-            where   => { req_key => $signer_req_key },
+            if ( $current_realm eq $signer_realm ) {
+                $context->param('signer_in_current_realm' => 1 );
+            }
+        }
+
+        if ($signer_issuer) {
+            my $signer_chain = CTX('api2')->get_chain( start_with => $signer_identifier );
+            @signer_chain = @{$signer_chain->{identifiers}};
+            if ($signer_chain->{complete}) {
+                $signer_root = pop @{$signer_chain->{identifiers}};
+            }
+        }
+    } elsif (!$x509->is_selfsigned() && $self->param('allow_external_signer')) {
+        ##! 16: 'external certificate - try to validate'
+        # use validate to build the chain
+        $signer_realm = 'external';
+
+        my $chain_validate = CTX('api2')->validate_certificate(
+            pem => $signer_cert,
         );
-        $signer_profile = $csr_hash->{profile} if $csr_hash->{profile};
 
-        if ( $current_realm eq $signer_realm ) {
-            $context->param('signer_in_current_realm' => 1 );
+        my $cert_status = $chain_validate->{status} || '';
+        if (!$cert_status ) {
+            ##! 32: 'chain validation died'
+            CTX('log')->application()->warn("Unable to build chain for external certificate");
+        } else {
+            ##! 32: 'chain validation status ' . $chain_validate->{status}
+            @signer_chain = @{$chain_validate->{chain}};
+            if ($signer_chain[1]) {
+                $signer_issuer = CTX('api2')->get_cert_identifier( cert => $signer_chain[1] );
+            }
+
+            if ($cert_status ne 'NOROOT') {
+                $signer_root = pop @{$chain_validate->{chain}};
+            }
+            # not implemented for remote certificates yet!
+            $signer_revoked = ($cert_status eq 'REVOKED');
+
+            CTX('log')->application()->debug("Chain validation result is $cert_status");
         }
     }
 
-    ##! 32: 'Signer identifier ' .$signer_identifier
     ##! 32: 'Signer profile ' .$signer_profile
     ##! 32: 'Signer realm ' .  $signer_realm
-    ##! 32: 'Signer issuer ' . $signer_issuer
+    ##! 32: 'Signer issuer ' . ($signer_issuer || 'unknown')
 
-    my $signer_root = '';
-    if ($signer_issuer) {
-        my $signer_chain = CTX('api2')->get_chain( start_with => $signer_identifier );
-        if ($signer_chain->{complete}) {
-            $signer_root = pop @{$signer_chain->{identifiers}};
-        }
-    }
-
-    if ($cert_hash->{status} && ($cert_hash->{status} ne 'ISSUED')) {
+    if ($signer_revoked) {
         CTX('log')->application()->warn("Trusted Signer certificate is revoked");
         $context->param('signer_revoked' => 1);
 
@@ -158,10 +192,28 @@ sub execute {
                 $matched = ($signer_identifier eq $match);
 
             } elsif ($key eq 'realm') {
-                $matched = ($signer_realm eq $match);
+                # if issuer_alias is used the realm check is done on the alias
+                $matched = ($trustrule->{issuer_alias}) ? 1 :
+                    ($signer_realm eq $match);
 
             } elsif ($key eq 'profile') {
-                $matched = ($signer_profile eq $match);
+                $matched = ($signer_profile eq $match || $match eq '_any');
+
+            } elsif ($key eq 'issuer_alias') {
+
+                my $alias = CTX('dbi')->select_one(
+                    from    => 'aliases',
+                    columns => [ 'alias' ],
+                    where   => {
+                        group_id => $match,
+                        identifier => $signer_issuer,
+                        notbefore => { '<' => time },
+                        notafter  => { '>' => time },
+                        pki_realm => [ $trustrule->{realm}, '_global' ],
+                    },
+                );
+                ##! 64: "Result for issuer_alias $match: " . ($alias->{alias} || 'no result')
+                $matched = (defined $alias->{alias});
 
             } elsif ($key =~ m{meta_}) {
                 # reset the matched state!
@@ -303,14 +355,30 @@ certificate. This implies that the certificate was issued by us.
 
 =item realm
 
-The name of the realm where the certificate originates from. Works
-also for imported certificates. The default is the current realm
-if not set, except when the rules matches on "identifier".
+The name of the realm where the certificate originates from, works also
+for certificates imported into a realm. If not set, the default is the
+current realm. Pass the special value I<_any> to ignore the realm during
+rule evaluation.
+
+Special rules apply when matching on "identifier" or "issuer_alias".
 
 =item identifier
 
 The identifier of the certificate. This works also with external issued or
-self signed certificates.
+self signed certificates. I<realm> is only matched if set explicit, so
+I<realm: _any> is the default.
+
+=item issuer_alias
+
+The name of an alias group as registered in the I<aliases> table. Matches
+if the certificate issuer has an active alias in the given group. The alias
+item is searched in the given realm and the global realm, setting
+I<realm: _any> is ignored (search is done in the global realm only).
+
+Note: The query is done at once for the given and global realm, this might
+cause unexepcted behaviour when the same alias exists in both with different
+validity dates (there will be a positive match if either the local or the
+global realm lists the item as valid).
 
 =item meta_*
 
@@ -330,5 +398,11 @@ Boolean, if set the signer_subject is exported to the context.
 =item export_key_identifier
 
 Boolean, if set the signer_subject_key_identifier is exported to the context.
+
+=item allow_external_signer
+
+Boolean, if set and the signer is not found in the local database the activity
+tries to verify the certificate chain using the validate_certificate API
+method.
 
 =back
