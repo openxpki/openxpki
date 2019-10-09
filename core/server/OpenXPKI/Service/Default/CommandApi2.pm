@@ -10,6 +10,7 @@ OpenXPKI::Service::Default::CommandApi2 - Execute commands via new API
 # Project modules
 use OpenXPKI::Exception;
 use OpenXPKI::Server::API2;
+use OpenXPKI::Server::Context qw( CTX );
 
 =head1 DESCRIPTION
 
@@ -21,7 +22,10 @@ has api => (
     is => 'rw',
     isa => 'OpenXPKI::Server::API2',
     lazy => 1,
-    default => sub { OpenXPKI::Server::API2->new(enable_acls => 0) },
+    default => sub { OpenXPKI::Server::API2->new(
+        enable_acls => (not CTX('config')->get(['api','acl','disabled'])),
+        acl_rule_accessor => sub { CTX('config')->get_hash(['api','acl', CTX('session')->data->role ] ) },
+    ) },
 );
 
 has command => (

@@ -314,6 +314,7 @@ B<Parameters>
 =back
 
 =cut
+
 sub register_plugin {
     my ($self, $packages) = @_;
     # convert string to arrayref
@@ -341,6 +342,7 @@ B<Named parameters>
 =back
 
 =cut
+
 sub dispatch {
     my ($self, %p) = named_args(\@_,   # OpenXPKI::MooseParams
         command => { isa => 'Str' },
@@ -424,6 +426,7 @@ B<Parameters>
 =back
 
 =cut
+
 sub my_caller {
     my ($self, $skip) = @_;
     my $start_stackframe = 1 + ($skip // 0); # 1 = skip the code that called us
@@ -440,29 +443,30 @@ sub my_caller {
     return @caller;
 }
 
-#=head2 _apply_acl_rules
-#
-#Enforces the given ACL rules on the given API command parameters (e.g. applies
-#defaults or checks ACL constraints).
-#
-#Returns a I<HashRef> containing the resulting parameters.
-#
-#Throws an exception if the current user role is not permitted to access the
-#given command.
-#
-#B<Parameters>
-#
-#=over
-#
-#=item * C<$command> - API command name
-#
-#=item * C<$rules> - I<HashRef> containing the parameter rules
-#
-#=item * C<$params> - I<HashRef> of API command parameters as received by the caller
-#
-#=back
-#
-#=cut
+=head2 _apply_acl_rules
+
+Enforces the given ACL rules on the given API command parameters (e.g. applies
+defaults or checks ACL constraints).
+
+Returns a I<HashRef> containing the resulting parameters.
+
+Throws an exception if the current user role is not permitted to access the
+given command.
+
+B<Parameters>
+
+=over
+
+=item * C<$command> - API command name
+
+=item * C<$rules> - I<HashRef> containing the parameter rules
+
+=item * C<$params> - I<HashRef> of API command parameters as received by the caller
+
+=back
+
+=cut
+
 sub _apply_acl_rules {
     my ($self, $command, $rules, $params) = @_;
 
@@ -512,35 +516,36 @@ sub _apply_acl_rules {
     return $result;
 }
 
-#=head2 _get_acl_rules
-#
-#Checks if the given current OpenXPKI user's role is allowed to execute the
-#given command.
-#
-#On success it returns the command configuration (might be an empty I<HashRef>),
-#e.g.:
-#
-#    {
-#        param_a => {
-#            default => "lawn",
-#            match => "^la",
-#        }
-#        param_b => {
-#            force => "green",
-#        }
-#    }
-#
-#On failure (if user role has no access) returns I<undef>.
-#
-#B<Parameters>
-#
-#=over
-#
-#=item * C<$command> - API command name
-#
-#=back
-#
-#=cut
+=head2 _get_acl_rules
+
+Checks if the given current OpenXPKI user's role is allowed to execute the
+given command.
+
+On success it returns the command configuration (might be an empty I<HashRef>),
+e.g.:
+
+    {
+        param_a => {
+            default => "lawn",
+            match => "^la",
+        }
+        param_b => {
+            force => "green",
+        }
+    }
+
+On failure (if user role has no access) returns I<undef>.
+
+B<Parameters>
+
+=over
+
+=item * C<$command> - API command name
+
+=back
+
+=cut
+
 sub _get_acl_rules {
     my ($self, $command) = @_;
 
@@ -551,48 +556,66 @@ sub _get_acl_rules {
         return;
     }
 
-    $self->log->debug("ACL config: all API commands allowed")
-      if ($conf->{allow_all_commands} and $self->log->is_debug);
+    my $default_allow = ($conf->{policy} && $conf->{policy} eq 'allow');
+
+    $self->log->debug("ACL default policy: " . ($default_allow ? 'allow' : 'deny'))
+      if ($self->log->is_debug);
 
     my $all_cmd_configs = $conf->{commands};
     # no command config hash
     if (not $all_cmd_configs) {
-        return {} if $conf->{allow_all_commands};
-        $self->log->debug("ACL config: no allowed commands specified") if $self->log->is_debug;
+        return {} if $default_allow;
+        $self->log->debug("ACL config: no allowed commands specified when default policy is deny") if $self->log->is_debug;
         return;
     }
 
     my $cmd_config = $all_cmd_configs->{$command};
     # command not specified (or not a TRUE value)
-    if (not $cmd_config) {
-        return {} if $conf->{allow_all_commands};
-        $self->log->debug("ACL config: command '$command' not allowed") if $self->log->is_debug;
+    if ($cmd_config) {
+
+        # filter definition
+        if (ref $cmd_config eq 'HASH') {
+            return $cmd_config;
+        # allow full access
+        } else {
+            return {};
+        }
+
+
+    }
+    # defined but false value => deny
+    if (defined $cmd_config) {
+        $self->log->debug("ACL config: command '$command' explicit deny") if $self->log->is_debug;
         return;
+
     }
 
-    # TODO check ACL config structure
+    # allowed by default policy
+    if ($default_allow) {
+        $self->log->debug("ACL config: command '$command' allowed by default policy") if $self->log->is_debug;
+        return {};
+    }
 
-    # non-hashref TRUE values are allowed as command config value
-    return {} unless ref $cmd_config eq 'HASH';
+    $self->log->debug("ACL config: command '$command' not allowed") if $self->log->is_debug;
+    return;
 
-    # command config details
-    return $cmd_config;
 }
 
-#=head2 _list_modules
-#
-#Lists all modules below the given namespace.
-#
-#B<Parameters>
-#
-#=over
-#
-#=item * C<$namespace> - Perl namespace (e.g. C<OpenXPKI::Server::API2::Plugin>)
-#
-#=back
-#
-#=cut
+=head2 _list_modules
+
+Lists all modules below the given namespace.
+
+B<Parameters>
+
+=over
+
+=item * C<$namespace> - Perl namespace (e.g. C<OpenXPKI::Server::API2::Plugin>)
+
+=back
+
+=cut
 # Taken from Module::List
+
 sub _list_modules {
     my ($prefix) = @_;
 
@@ -666,31 +689,41 @@ commands. Allowed commands have to be specified per role in the realm.
 The structure of the configuration subtree (below the realm) is as follows:
 
     acl:
-        rules:
-            <role name>:
-                allow_all_commands: 1
-                commands:
-                    <command>:
-                        <parameter>:
-                            default: <string>
-                            force:   <string>
-                            match:   <regex>
-                            block:   1
+        <role name>:
+            # "allow" or "deny"
+            policy: allow
+            commands:
+                # deny access to this command
+                <command1>: 0
 
-                    <command>:
-                        ...
+                # allow unfiltered access to this command
+                <command2>: 1
 
-            <role name>:
-                ...
+                # allow access and preprocess arguments
+                <command3>:
+                    <parameter>:
+                        default: <string>
+                        force:   <string>
+                        match:   <regex>
+                        block:   1
 
-B<allow_all_commands> is a shortcut that quickly grants access to all commands:
+                <command4>:
+                    ...
 
-    acl:
-        rules:
-            CA Operator:
-                allow_all_commands: 1
+        <role name>:
+            ...
 
-For command parameters the following options are available:
+The ACL processor first looks if the command name has a key in the
+I<commands> tree, if no key is found the action given by I<policy> is
+taken. If no policy is set, the default is deny.
+
+To allow unfiltered access to a command, set a true scalar value.
+
+To fully deny access to the command, set a false scalar value.
+
+To grant access with some control over the parameters given, use a hash
+where the attribute names are the keys and the value is a hash with the
+rules to be applied on the parameter:
 
 =over
 
@@ -699,31 +732,30 @@ For command parameters the following options are available:
 Enforce parameter to the given value (overwrites a given value).
 
     acl:
-        rules:
-            CA Operator:
-                search_cert:
-                    status:
-                        force: ISSUED
+        CA Operator:
+            search_cert:
+                status:
+                    force: ISSUED
 
 =item * B<default>
 
 Default value if none was given.
 
-                        default: ISSUED
+                    default: ISSUED
 
 =item * B<match>
 
 Match parameter against regular expression. The Regex is executed using the
 modifiers C</msx>, so please escape spaces.
 
-                        match: \A (ISSUED|REVOKED) \z
+                    match: \A (ISSUED|REVOKED) \z
 
 =item * B<block>
 
 Block parameter so that an exception will be thrown if the caller tries to set
 it.
 
-                        block: 1
+                    block: 1
 
 =back
 
