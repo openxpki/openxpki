@@ -225,6 +225,9 @@ sub config() {
     # generate name of the environemnt values from the service name
     my $service = $self->service();
 
+    $self->endpoint('');
+    $self->route('');
+
     # Test for specific config file based on script name
     # SCRIPT_URL is only available with mod_rewrite
     if (defined $ENV{SCRIPT_URL}) {

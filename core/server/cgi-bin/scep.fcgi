@@ -39,6 +39,14 @@ while (my $cgi = CGI::Fast->new()) {
     my $enc_alg = $conf->{global}->{encryption_algorithm};
     my $hash_alg = $conf->{global}->{hash_algorithm};
 
+    if (!$server) {
+        print $cgi->header(
+           -type => 'text/plain',
+           -status => '404 Not Found (no such server)'
+        );
+        $log->error('server not set - unknwown endpoint and no default set');
+        next;
+    }
 
     my $log = $config->logger();
     Log::Log4perl::MDC->put('endpoint', $config->endpoint());
