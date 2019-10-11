@@ -267,7 +267,8 @@ command "validate_certificate" => {
 
     my $valid = $default_token->command({
         COMMAND => 'verify_cert',
-        NOVALIDITY => $params->novalidity ? 1 : 0,
+        # TODO - replace with NOVALIDITY once we have openssl 1.1 - see #446
+        ATTIME => $params->novalidity ? ($x509->notafter - 1) : 0,
         CERTIFICATE => $entity,
         TRUSTED => $root,
         CHAIN => join "\n", @work_chain,

@@ -415,6 +415,8 @@ sub _is_issuer_valid  {
             COMMAND => 'verify_cert',
             CERTIFICATE => $cert->pem,
             TRUSTED => $issuer_cert->{data},
+            # TODO - replace with NOVALIDITY once we have openssl 1.1 - see #446
+            ATTIME => $cert->notafter -1,
         });
     }
 
@@ -434,6 +436,8 @@ sub _is_issuer_valid  {
         my $res = $default_token->command({
             COMMAND => 'verify_cert',
             CERTIFICATE => $cert->pem,
+            # TODO - replace with NOVALIDITY once we have openssl 1.1 - see #446
+            ATTIME => $cert->notafter - 1,
             TRUSTED => $root,
             CHAIN => join "\n", @work_chain
         });
