@@ -138,6 +138,7 @@ sub __init_command_params : PRIVATE {
     "verify_cert"    =>  {"CHAIN"   => 0,
                           "CERTIFICATE" => 1,
                           "TRUSTED"   => 1,
+                          "ATTIME" => 0,
                           "NOVALIDITY" => 0 },
     "create_pkey"    =>  {"PASSWD"   => 1,
                           "KEY_ALG" => 0, # default RSA

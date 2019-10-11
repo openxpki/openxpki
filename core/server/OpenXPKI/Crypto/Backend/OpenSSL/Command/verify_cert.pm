@@ -36,6 +36,10 @@ sub get_command
 
     push @command, ('-untrusted', $self->write_temp_file( $self->{CHAIN} ) ) if ($self->{CHAIN});
 
+    if ($self->{ATTIME} && $self->{ATTIME} =~ /\A\d+\z/) {
+        push @command, "-attime", $self->{ATTIME};
+    }
+
     push @command, ( $self->write_temp_file( $self->{CERTIFICATE} ) );
 
     ##! 32: 'SSL verify command ' . join " ", @command
