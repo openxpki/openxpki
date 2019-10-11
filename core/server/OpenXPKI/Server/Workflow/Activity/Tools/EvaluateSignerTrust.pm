@@ -89,7 +89,7 @@ sub execute {
         }
 
         if ($signer_issuer) {
-            my $signer_chain = CTX('api2')->get_chain( start_with => $signer_identifier );
+            my $signer_chain = CTX('api2')->get_chain( start_with => $signer_issuer );
             @signer_chain = @{$signer_chain->{identifiers}};
             if ($signer_chain->{complete}) {
                 $signer_root = pop @{$signer_chain->{identifiers}};
@@ -111,12 +111,15 @@ sub execute {
         } else {
             ##! 32: 'chain validation status ' . $chain_validate->{status}
             @signer_chain = @{$chain_validate->{chain}};
-            if ($signer_chain[1]) {
-                $signer_issuer = CTX('api2')->get_cert_identifier( cert => $signer_chain[1] );
+            # remove the entity from the chain
+            shift @signer_chain;
+            if ($signer_chain[0]) {
+                $signer_issuer = CTX('api2')->get_cert_identifier( cert => $signer_chain[0] );
             }
 
             if ($cert_status ne 'NOROOT') {
-                $signer_root = pop @{$chain_validate->{chain}};
+                my $signer_root_pem = pop @{$chain_validate->{chain}};
+                $signer_root = CTX('api2')->get_cert_identifier( cert => $signer_root_pem );
             }
             # not implemented for remote certificates yet!
             $signer_revoked = ($cert_status eq 'REVOKED');
@@ -128,6 +131,7 @@ sub execute {
     ##! 32: 'Signer profile ' .$signer_profile
     ##! 32: 'Signer realm ' .  $signer_realm
     ##! 32: 'Signer issuer ' . ($signer_issuer || 'unknown')
+    ##! 32: 'Signer root ' . ($signer_root || 'unknown')
 
     if ($signer_revoked) {
         CTX('log')->application()->warn("Trusted Signer certificate is revoked");
@@ -199,20 +203,21 @@ sub execute {
             } elsif ($key eq 'profile') {
                 $matched = ($signer_profile eq $match || $match eq '_any');
 
-            } elsif ($key eq 'issuer_alias') {
+            } elsif ($key eq 'issuer_alias' || $key eq 'root_alias') {
 
+                my $identifier = ($key eq 'issuer_alias') ? $signer_issuer : $signer_root;
                 my $alias = CTX('dbi')->select_one(
                     from    => 'aliases',
                     columns => [ 'alias' ],
                     where   => {
                         group_id => $match,
-                        identifier => $signer_issuer,
+                        identifier => $identifier,
                         notbefore => { '<' => time },
                         notafter  => { '>' => time },
                         pki_realm => [ $trustrule->{realm}, '_global' ],
                     },
                 );
-                ##! 64: "Result for issuer_alias $match: " . ($alias->{alias} || 'no result')
+                ##! 64: "Result for $key ($identifier) in $match: " . ($alias->{alias} || 'no result')
                 $matched = (defined $alias->{alias});
 
             } elsif ($key =~ m{meta_}) {
@@ -379,6 +384,10 @@ Note: The query is done at once for the given and global realm, this might
 cause unexepcted behaviour when the same alias exists in both with different
 validity dates (there will be a positive match if either the local or the
 global realm lists the item as valid).
+
+=item root_alias
+
+Same as issuer_alias but queries for the root certificate
 
 =item meta_*
 
