@@ -42,19 +42,24 @@ case "$1" in
                 # do NOT chmod the top folder as e.g. apache needs access
                 chmod 750 /etc/openxpki/config.d
 
-           fi
+            fi
 
-           if [ -d /etc/apache2/conf-available/ ]; then
-               if [ ! -e /etc/apache2/conf-available/openxpki.conf ]; then
-                   cp /usr/share/doc/libopenxpki-perl/examples/apache2-openxpki.conf /etc/apache2/conf-available/openxpki.conf
-                   # Activate module, this creates the symlink in conf-available
-                   /usr/sbin/a2enconf openxpki
-                   /usr/sbin/a2enmod headers
-               fi;
-               if [ ! -e /etc/apache2/sites-available/openxpki.conf ]; then
-                   cp /usr/share/doc/libopenxpki-perl/examples/apache2-openxpki-site.conf /etc/apache2/sites-available/openxpki.conf
-               fi;
-           fi;
+            if [ -d /etc/openxpki/ca/ ]; then
+                chown -R openxpki:root /etc/openxpki/ca/
+                chmod -R 750 /etc/openxpki/ca/
+            fi
+
+            if [ -d /etc/apache2/conf-available/ ]; then
+                if [ ! -e /etc/apache2/conf-available/openxpki.conf ]; then
+                    cp /usr/share/doc/libopenxpki-perl/examples/apache2-openxpki.conf /etc/apache2/conf-available/openxpki.conf
+                    # Activate module, this creates the symlink in conf-available
+                    /usr/sbin/a2enconf openxpki
+                    /usr/sbin/a2enmod headers
+                fi;
+                if [ ! -e /etc/apache2/sites-available/openxpki.conf ]; then
+                    cp /usr/share/doc/libopenxpki-perl/examples/apache2-openxpki-site.conf /etc/apache2/sites-available/openxpki.conf
+                fi;
+            fi;
 
         fi;
 
@@ -63,10 +68,7 @@ case "$1" in
 
         # Fix directory permissions
         chown openxpki:openxpki /var/openxpki
-
         chown -R openxpki:openxpki /var/log/openxpki
-        chown -R openxpki:root /etc/openxpki/ca/
-        chmod -R 750 /etc/openxpki/ca/
 
         # add apache user to openxpki group (to allow connecting the socket)
         usermod -a -G openxpki www-data
