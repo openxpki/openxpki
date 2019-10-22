@@ -27,14 +27,14 @@ else
 fi
 
 wget http://$PKGHOST/debian/Release.key -O - | apt-key add -
-echo "deb http://$PKGHOST/v2/debian/ jessie release" > /etc/apt/sources.list.d/openxpki.list
+echo "deb http://$PKGHOST/v3/debian/ buster release" > /etc/apt/sources.list.d/openxpki.list
 
 apt-get update
 
 rm -rf /etc/openxpki/
 
 # Install mysql without password (no prompt)
-DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes mysql-server
+DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes default-mysql-server
 
 apt-get install --assume-yes --force-yes libdbd-mysql-perl libapache2-mod-fcgid \
     libopenxpki-perl openxpki-i18n openxpki-cgi-session-driver

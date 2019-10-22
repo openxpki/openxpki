@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -x
 # Helper to load the gpg signing key from "outside" into the vagrant machine 
 # called from prepare.sh - do not call directly
 
@@ -12,5 +12,5 @@ mkdir -p /dev/shm/.gnupg;
 ln -s /dev/shm/.gnupg ~/.gnupg;
 
 # Import the KEY from stdin
-echo "$KEY" | gpg --import
+echo "$KEY" | gpg --import --batch
 

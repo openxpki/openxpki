@@ -11,7 +11,7 @@ machines.
 Vagrant Machines
 ################
 test: 
-  The default test machine using debian jessie 
+  The default test machine using debian buster 
   Grabs the current deb files from the package server/local mirror, 
   installs them using aptitude and runs the sample-setup and some of the 
   qatest.
@@ -22,7 +22,7 @@ develop:
   machine and use scripts/deploy.sh inside the guest to copy it over to 
   the actual code base.
 
-build-jessie: 
+build: 
   build cpan deps, core and i18 from the current tree.
   Installs those packages, runs sample-setup and qatests.
   If you want to create a copy of the public mirror, you need to create
@@ -35,5 +35,3 @@ build-jessie:
   package/debian/reprepro-debian/distributions and must be available
   on your hosts gpg keyring.  
 
-test-trusty/build-trusty:
-  Same as test/build-jessie but for Ubuntu trusty (14.04 LTS)

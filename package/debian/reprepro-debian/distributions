@@ -1,6 +1,6 @@
 Origin: The OpenXPKI Project 
 Label: The OpenXPKI Project 
-Codename: jessie
+Codename: buster 
 Architectures: amd64
 Components: release 
 Description: Repository for the OpenXPKI core software and its dependencies.
