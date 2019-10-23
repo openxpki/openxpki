@@ -101,6 +101,7 @@ use OpenXPKI::FileUtils;
 use OpenXPKI::Serialization::Simple;
 
 use Net::SMTP;
+use Net::Domain;
 
 use Moose;
 use Encode;
@@ -171,6 +172,7 @@ sub _cfg_to_smtp_new_args {
     my $cfg = shift;
     my %smtp = (
         Host => $cfg->{host} || 'localhost',
+        Hello => $cfg->{helo} || Net::Domain::hostfqdn,
     );
     $smtp{'Port'} = $cfg->{port} if ($cfg->{port});
     $smtp{'User'} = $cfg->{username} if ($cfg->{username});
