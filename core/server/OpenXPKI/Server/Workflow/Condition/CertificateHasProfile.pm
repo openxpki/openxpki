@@ -17,9 +17,15 @@ sub _evaluate {
     my $context     = $workflow->context();
     my $pki_realm   = CTX('session')->data->pki_realm;
 
-    my $identifier = $self->param('cert_identifier') // $context->param('cert_identifier');
+    my $identifier = defined $self->param('cert_identifier') ? $self->param('cert_identifier') : $context->param('cert_identifier');
 
-    configuration_error('No identifier passed to CertificateHasProfile') unless($identifier);
+    if (!$identifier) {
+        if ($self->param('empty_ok')) {
+            condition_error('No identifier passed to CertificateHasProfile') ;
+        } else {
+            configuration_error('No identifier passed to CertificateHasProfile');
+        }
+    }
 
     my $expected_profile = $self->param('expected_profile');
     configuration_error('You must set expected_profile') unless($expected_profile);
@@ -67,6 +73,12 @@ checked over all realms.
 
 The certificate to check, if not present as explicit parameter the context
 value with same key will be used.
+
+=item empty_ok
+
+Boolean, if true the condition will silently be false if cert_identifier
+is not set. If not set, a configuration_error is thrown (which is also
+false but creates a log message).
 
 =back
 
