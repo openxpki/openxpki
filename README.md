@@ -1,6 +1,6 @@
 # OpenXPKI Trustcenter Software
 
-A software stack based on perl and openssl to run a PKI/trustcenter with an enterprise-grade feature set. 
+A software stack based on perl and openssl to run a PKI/trustcenter with an enterprise-grade feature set.
 
 **core features**
 
@@ -18,9 +18,9 @@ A software stack based on perl and openssl to run a PKI/trustcenter with an ente
 
 ## Release
 
-There is no planned release schedule, we make new releases after fixing relevant bugs or adding new features. 
+There is no planned release schedule, we make new releases after fixing relevant bugs or adding new features.
 
-Packages for Debian are provided via our [package mirror](http://packages.openxpki.org), prebuild docker images are available via Dockerhub ([whiterabbitsecurity/openxpki](https://hub.docker.com/r/whiterabbitsecurity/openxpki)). 
+Packages for Debian are provided via our [package mirror](http://packages.openxpki.org), prebuild docker images are available via Dockerhub ([whiterabbitsecurity/openxpki](https://hub.docker.com/r/whiterabbitsecurity/openxpki)).
 
 Packages for SLES, RHEL, Ubuntu are available via subscription plans.
 
@@ -28,7 +28,9 @@ Packages for SLES, RHEL, Ubuntu are available via subscription plans.
 
 A public demo is available at http://demo.openxpki.org/.
 
-To run OpenXPKI yourself get a Debian box (**Jessie** for v2, Buster for v3 (planned for fall 2019) ready and download the packages from the [package mirror](http://packages.openxpki.org). The packages come with a full-featured sample config and a sample setup script - this gets your PKI up in less than 5 minutes! Just follow our [Quickstart Instructions](https://openxpki.readthedocs.io/en/latest/quickstart.html). 
+To run OpenXPKI yourself get a Debian box (Current release is v3 for Buster) ready and download the packages from the [package mirror](http://packages.openxpki.org). The packages come with a full-featured sample config and a sample setup script - this gets your PKI up in less than 5 minutes! Just follow our [Quickstart Instructions](https://openxpki.readthedocs.io/en/latest/quickstart.html).
+
+There is also a ready-to-use docker image *whiterabbitsecurity/openxpki3*, see https://github.com/openxpki/openxpki-docker.
 
 ## Support / Issue Tracker
 
