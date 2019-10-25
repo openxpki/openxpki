@@ -37,7 +37,8 @@ rm -rf /etc/openxpki/
 DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes default-mysql-server
 
 apt-get install --assume-yes --force-yes libdbd-mysql-perl libapache2-mod-fcgid \
-    libopenxpki-perl openxpki-i18n openxpki-cgi-session-driver
+    libopenxpki-perl openxpki-i18n openxpki-cgi-session-driver \
+    libcrypt-libscep-perl libscep
 
 # packages required for testing only
 apt-get install --assume-yes libtest-deep-perl libtest-exception-perl

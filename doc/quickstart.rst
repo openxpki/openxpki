@@ -13,7 +13,7 @@ have a look at http://www.openxpki.org/support.html.
 Vagrant
 -------
 
-We have a vagrant setup for debian jessie. If you have vagrant you can just
+We have a vagrant setup for debian buster. If you have vagrant you can just
 checkout the git repo, go to vagrant/debian and run "vagrant up test". Provisioning takes some
 minutes and will give you a ready to run OXI install available at http://localhost:8080/openxpki/.
 
@@ -220,8 +220,10 @@ Testdrive
 Enabling the SCEP service
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**Note: You need to manually install the openca-tools package which is available from
-our package server in order to use the scep service.**
+SCEP was moved to a new tool called *LibSCEP*, you need to install the library
+and perl bindings yourself::
+
+    apt install libcrypt-libscep-perl libscep
 
 The SCEP logic is already included in the core distribution. The package installs
 a wrapper script into */usr/lib/cgi-bin/* and creates a suitable alias in the apache
