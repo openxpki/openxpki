@@ -27,13 +27,15 @@ sub execute
         if ($val) {
             ##! 16: 'Set attrib ' . $key
             $workflow->attrib({ $key => $val });
+            CTX('log')->workflow()->debug("Writing workflow attribute $key => $val");
         } else {
             ##! 16: 'Unset attrib ' . $key
             # translation from empty to undef is required as the
             # attribute backend will write empty values
             $workflow->attrib({ $key => undef });
+            CTX('log')->workflow()->debug("Deleting workflow attribute $key");
         }
-        CTX('log')->workflow()->debug("Writing workflow attribute $key => $val");
+
 
     }
 
