@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use English;
 
+use Convert::ASN1;
 use Digest::SHA qw(sha1_base64 sha1_hex);
 use MIME::Base64;
 use Moose;
@@ -111,8 +112,8 @@ has itemcnt => (
     default => sub {
         my $self = shift;
         my $items = $self->parsed()->{'tbsCertList'}->{'revokedCertificates'};
-        my $list = $self->_asn1()->find('RevokedCertificatesCount')->decode( $items );
-        return scalar @{$list};
+        # items is undef if no certificates are on the CRL
+        return $items ? scalar @{$items} : 0;
     },
 );
 
@@ -217,16 +218,16 @@ around BUILDARGS => sub {
         thisUpdate              Time,
         nextUpdate              Time OPTIONAL,
 
-        revokedCertificates     ANY,
+        revokedCertificates     RevokedCertificatesCount OPTIONAL,
         crlExtensions           [0]  EXPLICIT Extensions OPTIONAL
         }
 
   -- create a sequence to count the items without parsing them
    RevokedCertificatesCount ::= SEQUENCE OF ANY
 
-   RevokedCertificates ::= SEQUENCE OF RevokedCerts
+   RevokedCertificates ::= SEQUENCE OF RevokedCert
 
-   RevokedCerts ::= SEQUENCE  {
+   RevokedCert ::= SEQUENCE  {
         userCertificate         CertificateSerialNumber,
         revocationDate          Time,
         crlEntryExtensions      Extensions OPTIONAL
@@ -431,10 +432,11 @@ sub __revoked_certs_list {
     my $self = shift;
     my $crl = {};
     my $items = $self->parsed()->{'tbsCertList'}->{'revokedCertificates'};
-    my $list = $self->_asn1()->find('RevokedCertificates')->decode( $items );
+    return {} unless ($items);
     my $parser = $self->_asn1()->find('CRLReason');
     my $crl_reason = $self->crl_reason();
-    foreach my $cert (@{$list}) {
+    foreach my $crl_item (@{$items}) {
+        my $cert = $self->_asn1()->find('RevokedCert')->decode( $crl_item );
         my @v = ($cert->{'revocationDate'}->{'generalTime'} // $cert->{'revocationDate'}->{'utcTime'} // 0, undef);
         foreach my $ext (@{$cert->{crlEntryExtensions}}) {
             if ( $ext->{'extnID'} eq '2.5.29.21' ) { # OID for crlReason
