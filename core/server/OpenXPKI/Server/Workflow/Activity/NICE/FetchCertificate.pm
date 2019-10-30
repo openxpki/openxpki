@@ -25,7 +25,14 @@ sub execute {
 
     my $nice_backend = OpenXPKI::Server::NICE::Factory->getHandler( $self );
 
-    my $set_context = $nice_backend->fetchCertificate();
+    my $param;
+    foreach my $key ('transaction_id') {
+        my $val = $self->param($key);
+        if (defined $val) {
+            $param->{$key} = $val;
+        }
+    }
+    my $set_context = $nice_backend->fetchCertificate($param);
 
     ##! 64: 'Setting Context ' . Dumper $set_context
     #while (my ($key, $value) = each(%$set_context)) {
@@ -50,6 +57,17 @@ Fetch a certificate for a pending certificate signing request.
 See OpenXPKI::Server::NICE::fetchCertificate for details
 
 =head1 Parameters
+
+=head2 Input
+
+=over
+
+=item transaction_id
+
+Transaction id of the request, not required for the Local backend but
+might be required by some remote backends to handle polling/retry.
+
+=back
 
 =head2 Output
 
