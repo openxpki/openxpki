@@ -476,10 +476,28 @@ sub __pkcs_req : PRIVATE {
         # map the required params to the workflow context object
         map { $wf_context->{$_} = $values->{ $params->{$_} } // ''; } keys %{$params};
 
-        $wf_info = $api->create_workflow_instance(
-            workflow => $workflow_type,
-            params   => $wf_context,
-        );
+        my $auth_stack = CTX('config')->get(['scep', $server, 'workflow', 'auth_stack']);
+
+        if ($auth_stack) {
+            my $remote_api = OpenXPKI::Client::Simple->new({ config => {
+                socket => CTX('config')->get(['system','server','socket_file']),
+                realm => CTX('api2')->get_pki_realm
+                },
+                auth => { stack => $auth_stack },
+                logger => CTX('log')->application()
+            });
+
+            my $res = $remote_api->handle_workflow({
+                type => $workflow_type,
+                params   => $wf_context,
+            });
+            $wf_info = { workflow => $res };
+        } else {
+            $wf_info = $api->create_workflow_instance(
+                workflow => $workflow_type,
+                params   => $wf_context,
+            );
+        }
 
         ##! 16: 'wf_info: ' . Dumper $wf_info
         $workflow_id = $wf_info->{workflow}->{id};
