@@ -14,6 +14,11 @@ not behave correctly or even wont start.
 For a quick overview of config changes, you should always check the
 config repository at https://github.com/openxpki/openxpki-config.
 
+Release v3.x
+------------
+
+To upgrade from v2 or an earlier v3 installation to v3 please see the Upgrade document in the openxpki-config repository.
+
 Release v2.3
 -------------
 
