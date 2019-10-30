@@ -19,9 +19,9 @@ Pass the configuration as hash to the new method, must set at least
 I<config.socket> and I<config.realm> (omit if server has only one realm).
 
 The default authentication is anonymous but can be overidden by setting
-I<auth.stack> and appropriate keys for the chosen login methog.
+I<auth.stack> and appropriate keys for the chosen login method.
 
-A intance of Log4perl can be passed via I<logger>, default is to log to
+An instance of Log4perl can be passed via I<logger>, default is to log to
 STDERR with loglevel error.
 
 =head3 Explicit Config from File

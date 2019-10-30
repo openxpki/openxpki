@@ -7,7 +7,10 @@ OpenXPKI::Server::API2::Plugin::Import::import_crl
 
 =cut
 
+use Data::Dumper;
+
 # Project modules
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 use OpenXPKI::Crypt::CRL;
@@ -127,6 +130,7 @@ command "import_crl" => {
         $where_duplicate->{next_update} = $data->{next_update};
     }
 
+    ##! 64: 'Duplicate query ' . Dumper $where_duplicate
     my $duplicate = $dbi->select_one(
         from => 'crl',
         columns => $params->skip_duplicate ?
@@ -140,7 +144,7 @@ command "import_crl" => {
         delete $data->{data};
         CTX('log')->application()->info("Imported CRL for issuer $issuer_dn");
     } elsif ($params->skip_duplicate) {
-        CTX('log')->application()->info("CRL is alredy in database and skip_duplicate is set");
+        CTX('log')->application()->info("CRL is already in database and skip_duplicate is set");
         $data = $duplicate;
     } else {
         OpenXPKI::Exception->throw(
