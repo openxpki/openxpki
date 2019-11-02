@@ -36,13 +36,8 @@ sub execute {
 
     CTX('log')->application()->info("start crl issue for ca $ca_alias, workflow " . $workflow->id);
 
-    my $param = {};
-    foreach my $key ('remove_expired', 'reason_code', 'crl_validity', 'delta_crl') {
-        my $val = $self->param($key);
-        if (defined $val) {
-            $param->{$key} = $val;
-        }
-    }
+    my $param = $self->param();
+    delete $param->{'ca_alias'};
     ##! 32: 'Extra params ' . Dumper $param
 
     my $set_context = $nice_backend->issueCRL( $ca_alias, $param );

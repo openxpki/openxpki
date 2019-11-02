@@ -58,10 +58,14 @@ sub execute {
 
     CTX('log')->application()->info("start cert revocation for identifier $cert_identifier, workflow " . $workflow->id);
 
+    my $param = $self->param();
+    delete $param->{'cert_identifier'};
+
     my $res = $nice_backend->revokeCertificate(
         $cert->{identifier},
         $cert->{reason_code},
         $cert->{invalidity_time},
+        $param
     );
     if (!$res) {
         $self->pause('I18N_OPENXPKI_UI_NICE_BACKEND_ERROR');

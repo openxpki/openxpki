@@ -56,13 +56,9 @@ sub execute {
 
     CTX('log')->application()->info("start cert issue for serial $csr_serial, workflow " . $workflow->id);
 
-    my $param;
-    foreach my $key ('renewal_cert_identifier', 'transaction_id') {
-        my $val = $self->param($key);
-        if (defined $val) {
-            $param->{$key} = $val;
-        }
-    }
+    my $param = $self->param();
+    delete $param->{'csr_serial'};
+    delete $param->{'ca_alias'};
 
     my $set_context;
     eval {

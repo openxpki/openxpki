@@ -23,12 +23,13 @@ sub execute {
     ##! 32: 'context: ' . Dumper(  $workflow->context() )
 
     my $nice_backend = OpenXPKI::Server::NICE::Factory->getHandler( $self );
+    my $cert_identifier = $self->param('cert_identifier') || $context->param('cert_identifier');
 
-     CTX('log')->application()->info("start cert unrevoke for cert ".$self->_get_context_param( 'cert_identifier' ).", workflow " . $workflow->id);
+    CTX('log')->application()->info("start cert unrevoke for cert $cert_identifier, workflow " . $workflow->id);
 
-
-    # We do not need an attribute map here
-    $nice_backend->unrevokeCertificate( $self->_get_context_param( 'cert_identifier' )  );
+    my $param = $self->param();
+    delete $param->{'cert_identifier'};
+    $nice_backend->unrevokeCertificate( $cert_identifier, $param );
 
 }
 

@@ -25,13 +25,8 @@ sub execute {
 
     my $nice_backend = OpenXPKI::Server::NICE::Factory->getHandler( $self );
 
-    my $param;
-    foreach my $key ('transaction_id') {
-        my $val = $self->param($key);
-        if (defined $val) {
-            $param->{$key} = $val;
-        }
-    }
+    my $param = $self->param();
+
     my $set_context = $nice_backend->fetchCertificate($param);
 
     ##! 64: 'Setting Context ' . Dumper $set_context
