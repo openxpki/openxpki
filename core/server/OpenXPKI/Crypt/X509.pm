@@ -201,7 +201,7 @@ around BUILDARGS => sub {
     my $class = shift;
     my $data = shift;
 
-    if ($data =~ m{-----BEGIN[^-]*CERTIFICATE-----(.+)-----END[^-]*CERTIFICATE-----}xms ) {
+    if ($data =~ m{-----BEGIN[^-]*CERTIFICATE-----(.+?)-----END[^-]*CERTIFICATE-----}xms ) {
         $data = decode_base64($1);
     }
 

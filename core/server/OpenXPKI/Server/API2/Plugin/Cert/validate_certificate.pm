@@ -94,7 +94,7 @@ The previously unused parameter C<NOCRL> was removed.
 =cut
 command "validate_certificate" => {
     pem    => { isa => 'PEM', },
-    chain  => { isa => 'ArrayRef[PEM]', },
+    chain  => { isa => 'ArrayRefOrPEMCertChain', coerce => 1, },
     pkcs7  => { isa => 'PEM', },
     anchor => { isa => 'ArrayRef[Str]', },
     novalidity => { isa => 'Bool', default => 0 },
