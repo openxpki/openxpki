@@ -72,7 +72,8 @@ sub __get_used_engine
     my $engine_usage = $self->{ENGINE}->get_engine_usage();
 
     if ($self->{ENGINE}->get_engine() and
-        ($engine_usage =~ m{ ALWAYS }xms)) {
+        (($engine_usage =~ m{ ALWAYS }xms) or
+        ($engine_usage =~ m{ RANDOM }xms))) {
         return $self->{ENGINE}->get_engine();
     }
     else {
