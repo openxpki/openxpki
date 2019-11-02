@@ -185,7 +185,7 @@ Operation mode, possible values are I<session> or I<generated>
 
 =item mutli_role_approval
 
-Boolean, allow multiple approvals by same user with differen roles
+Boolean, allow multiple approvals by same user with different roles.
 
 =item comment
 

@@ -15,7 +15,7 @@ export the methods, you need to address them with the plugin name, e.g.
 
     [% USE PKCS10 %]
 
-    Your request with the key [% PKCS10.subject_key_identifier(pcsk10) %]...
+    Your request with the key [% PKCS10.subject_key_identifier(context.pkcs10) %]...
 
 Will result in
 
