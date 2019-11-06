@@ -1273,6 +1273,8 @@ sub action_search {
         next unless ($ff->{source} eq 'certificate');
         if ($ff->{field} eq 'statusclass') {
             $rcols{'status'} = 1;
+        } elsif ($ff->{field} eq 'cert_key_hex') {
+            $rcols{'cert_key'} = 1;
         } else {
             $rcols{ $ff->{field} } = 1;
         }
@@ -1342,6 +1344,8 @@ sub __render_result_list {
                 push @line, { label => 'I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{status} , value => $item->{status} };
             } elsif ($col->{field} eq 'statusclass') {
                 push @line, lc($item->{status});
+            } elsif ($col->{field} eq 'cert_key_hex') {
+                push @line, Math::BigInt->new( $item->{cert_key} )->as_hex;
             } else {
                 push @line, $item->{  $col->{field} };
             }
