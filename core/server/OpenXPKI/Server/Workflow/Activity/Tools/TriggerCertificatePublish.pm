@@ -38,7 +38,14 @@ sub execute {
     # Check profile based publishing if no prefix is set in the action definition
     if (!$params->{prefix}) {
         # Profile based publication, check for publication options
-        my $cert_profile = $context->param('cert_profile');
+        my $cert_profile = $params->{'cert_profile'} || $context->param('cert_profile');
+        $cert_profile = CTX('api2')->get_profile_for_cert( identifier => $params->{cert_identifier} ) unless($cert_profile);
+
+        if (!$cert_profile) {
+            $cert_profile = 'default';
+            CTX('log')->application()->debug('no profile found for publishing rules - using default');
+        }
+
         my $config_key = $params->{unpublish} ? 'unpublish' : 'publish';
         if (!CTX('config')->get_scalar_as_list(['profile', $cert_profile, $config_key ] ) &&
             !CTX('config')->get_scalar_as_list(['profile', 'default', $config_key ] )) {
@@ -95,6 +102,16 @@ option set.
 =head2 Activity parameters
 
 =over
+
+=item cert_identifier
+
+Certificate to publish, mandatory - if not set tries to read it directly
+from the context.
+
+=item cert_profile
+
+If not set the class reads it from the context. If not set in context the
+class tries to determine the profile from the database.
 
 =item workflow_type
 
