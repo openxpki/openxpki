@@ -313,7 +313,7 @@ while (my $cgi = CGI::Fast->new()) {
                 id => $wf_id
             });
         } else {
-            $log->debug("Initialize with params " . join(", ", keys %{$param}));
+            $log->debug("Initialize $workflow_type with params " . join(", ", keys %{$param}));
             $workflow = $client->handle_workflow({
                 type => $workflow_type,
                 params => $param
