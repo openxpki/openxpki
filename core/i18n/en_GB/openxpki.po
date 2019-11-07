@@ -19,14 +19,6 @@ msgstr ""
 "X-Generator: Poedit 2.0.6\n"
 "X-Poedit-Bookmarks: -1,-1,77,-1,-1,-1,-1,-1,-1,-1\n"
 
-msgid "I18N_OPENXPKI_UI_SUPPORT_TRAILER"
-msgstr ""
-"Thank you for using OpenXPKI - for support and announcements please "
-"subscribe to our <a href=\\\"https://lists.sourceforge.net/lists/listinfo/"
-"openxpki-users\\\">mailinglist</a>.<br> If you need help with your setup or "
-"commercial support, please contact <a href=\\\"mailto:"
-"openxpki@whiterabbitsecurity.com\\\">openxpki@whiterabbitsecurity.com.</a>"
-
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Requested action not found"
 
@@ -71,6 +63,10 @@ msgstr "Certificate Chain"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_COMMON_NAME"
 msgstr "Common Name"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_ISSUER_LINK"
+msgstr "Show only certificates signed by this issuer certificate"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
 msgstr "Certificate Information"
@@ -149,6 +145,14 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL"
 msgstr "Certificate Search Result"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SAN"
+msgstr "Certificate Search"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SUBJECT"
+msgstr "Certificate Search"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SERIAL"
 msgstr "Certificate Serial"
@@ -308,8 +312,9 @@ msgstr "Creator"
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "Delayed revocation requested."
 
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
-msgstr "FAIL"
+msgstr "ok"
 
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_OK"
 msgstr "ok"
@@ -635,8 +640,9 @@ msgstr "AES 256bit"
 msgid "I18N_OPENXPKI_UI_KEY_ENC_IDEA"
 msgstr "IDEA"
 
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"
-msgstr "Key password"
+msgstr "Choose password yourself"
 
 msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_CLIENT"
 msgstr "Choose password yourself"
@@ -655,9 +661,6 @@ msgstr "Key length"
 
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_2048"
 msgstr "2048 bit"
-
-msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
-msgstr "3072 bit"
 
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_4096"
 msgstr "4096 bit"
@@ -780,6 +783,22 @@ msgstr "This page shows a list of all workflows started by you."
 
 msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
 msgstr "My Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_BACKEND_ERROR"
+msgstr "Unknown error"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_FETCH_KEY_DECRYPT_FAILED"
+msgstr "FAIL"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_FETCH_KEY_NO_SUCH_KEY"
+msgstr "Unable to find a certificate with this serial number!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_GENERATE_KEY_NO_PASSWORD"
+msgstr "Key password"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_NO"
@@ -1181,6 +1200,14 @@ msgstr "Unlock"
 msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
 msgstr "Unlock"
 
+msgid "I18N_OPENXPKI_UI_SUPPORT_TRAILER"
+msgstr ""
+"Thank you for using OpenXPKI - for support and announcements please "
+"subscribe to our <a href=\\\"https://lists.sourceforge.net/lists/listinfo/"
+"openxpki-users\\\">mailinglist</a>.<br> If you need help with your setup or "
+"commercial support, please contact <a href=\\\"mailto:"
+"openxpki@whiterabbitsecurity.com\\\">openxpki@whiterabbitsecurity.com.</a>"
+
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
 msgstr "SCEP Enrollment workflows awaiting approval."
 
@@ -1220,6 +1247,14 @@ msgstr "unknown"
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_UPCOMING"
 msgstr "upcoming"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_UNABLE_TO_GENERATE_PRIVATE_KEY"
+msgstr "Download private key/keystore (PKCS12/PKCS8/Java)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_UNABLE_TO_LOAD_PRIVATE_KEY"
+msgstr "Download private key/keystore (PKCS12/PKCS8/Java)"
+
 msgid "I18N_OPENXPKI_UI_UNABLE_TO_PARSE_PKCS10_REQUEST_DATA"
 msgstr "Unable to parse PKCS10 request"
 
@@ -1243,6 +1278,10 @@ msgstr "Certificate was found but is not in allowed realm."
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NO_SUCH_ID"
 msgstr "No certificate with this id exists."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_IS_NOT_IN_GROUP"
+msgstr "Certificate was found but is not in allowed realm."
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_FAILED_REGEX"
 msgstr "Value failed allowed expression."
@@ -1336,6 +1375,10 @@ msgstr "The entered date/time could not be validated."
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_AUTHORITY_KEY_ID_MISMATCH_ERROR"
 msgstr "Authority Key IDs do not match"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_CHAIN_VALIDATION_FAILED"
+msgstr "The entered date/time could not be validated."
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_PARSE_ERROR"
 msgstr "Certificate can not be read"
@@ -2350,9 +2393,9 @@ msgstr "The reason code indicates the reason why the certificate was revoked."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_LABEL"
 msgstr "Reason Code"
 
-# This is just a prefix
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION"
-msgstr ""
+msgstr "Specify the reason why you want the certificate being revoked."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_AFFILIATIONCHANGED"
 msgstr "affiliation has changed"
@@ -2450,8 +2493,9 @@ msgstr " The name of the server configuration."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_AUTHORIZED_LABEL"
 msgstr "Signer is Authorized"
 
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_DESC"
-msgstr ""
+msgstr "Requestor/Signer"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_IDENTIFIER_LABEL"
 msgstr "Signer Certificate"
@@ -2845,11 +2889,13 @@ msgstr "This workflow failed finally."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_LABEL"
 msgstr "FAILURE"
 
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
-msgstr ""
+msgstr "This workflow failed finally and can not be restarted"
 
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_LABEL"
-msgstr ""
+msgstr "State"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_PENDING_DESC"
 msgstr "This revocation request requires approval."
@@ -3334,8 +3380,9 @@ msgstr "This workflow revokes all certificates that belong to a certain entity"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BY_ENTITY_LABEL"
 msgstr "Revoke by Entity"
 
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_DESC"
-msgstr ""
+msgstr "Private Key Download"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_LABEL"
 msgstr "Private Key Download"
@@ -3443,3 +3490,6 @@ msgstr "Wake Up"
 # Remove?
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Yes"
+
+#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
+#~ msgstr "3072 bit"

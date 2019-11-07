@@ -20,15 +20,6 @@ msgstr ""
 "X-Poedit-Bookmarks: -1,-1,77,-1,-1,-1,-1,-1,-1,-1\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-
-msgid "I18N_OPENXPKI_UI_SUPPORT_TRAILER"
-msgstr ""
-"Thank you for using OpenXPKI - for support and announcements please "
-"subscribe to our <a href=\\\"https://lists.sourceforge.net/lists/listinfo/"
-"openxpki-users\\\">mailinglist</a>.<br> If you need help with your setup or "
-"commercial support, please contact <a href=\\\"mailto:"
-"openxpki@whiterabbitsecurity.com\\\">openxpki@whiterabbitsecurity.com.</a>"
-
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Azione richiesta non trovata"
 
@@ -82,6 +73,10 @@ msgstr "Catena di certificazione"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_COMMON_NAME"
 msgstr "I miei certificati"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_ISSUER_LINK"
+msgstr "Numero di serie del certificato"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
 msgstr "Informazioni Certificato"
@@ -179,6 +174,14 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL"
 msgstr "Risultati Ricerca Certificati"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SAN"
+msgstr "Ricerca Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SUBJECT"
+msgstr "Ricerca Certificato"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SERIAL"
 msgstr "Numero di serie del certificato"
@@ -774,8 +777,9 @@ msgstr "AES 256bit"
 msgid "I18N_OPENXPKI_UI_KEY_ENC_IDEA"
 msgstr "IDEA"
 
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"
-msgstr "Password della Chiave"
+msgstr "Scegli tu stesso la password"
 
 msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_CLIENT"
 msgstr "Scegli tu stesso la password"
@@ -926,6 +930,28 @@ msgstr "Questa pagina mostra una lista di tutti i workflow iniziati da te."
 
 msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
 msgstr "Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_BACKEND_ERROR"
+msgstr "Errore sconosciuto"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_FETCH_KEY_DECRYPT_FAILED"
+msgstr "Mostra Liste Revoche (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_FETCH_KEY_NO_SUCH_KEY"
+msgstr ""
+"Modulo per la ricerca dei certificati. Il campo SAN richiede che il tipo SAN "
+"venga separato con i due punti, ad es. DNS:www2.openxpki.org.<br>Gli stati "
+"Valido/Scaduto presuppongono che il certificato sia nello stato Emesso: "
+"viene eseguito un controllo relativo alla finestra di validità "
+"Non_prima_del / Non_dopo_il."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_GENERATE_KEY_NO_PASSWORD"
+msgstr "Password della Chiave"
 
 # Remove?
 #, fuzzy
@@ -1371,6 +1397,14 @@ msgstr "Incompleto"
 msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
 msgstr "Scarica"
 
+msgid "I18N_OPENXPKI_UI_SUPPORT_TRAILER"
+msgstr ""
+"Thank you for using OpenXPKI - for support and announcements please "
+"subscribe to our <a href=\\\"https://lists.sourceforge.net/lists/listinfo/"
+"openxpki-users\\\">mailinglist</a>.<br> If you need help with your setup or "
+"commercial support, please contact <a href=\\\"mailto:"
+"openxpki@whiterabbitsecurity.com\\\">openxpki@whiterabbitsecurity.com.</a>"
+
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
 msgstr "Workflow Adesione SCEP in attesa di approvazione."
 
@@ -1411,6 +1445,14 @@ msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_UPCOMING"
 msgstr "in arrivo"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_UNABLE_TO_GENERATE_PRIVATE_KEY"
+msgstr "Scarica la chiave privata/keystore (PKCS12/PKCS8/Java)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_UNABLE_TO_LOAD_PRIVATE_KEY"
+msgstr "Scarica la chiave privata/keystore (PKCS12/PKCS8/Java)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_UNABLE_TO_PARSE_PKCS10_REQUEST_DATA"
 msgstr "La richiesta di tipo PKCS10 non è impostata correttamente"
 
@@ -1438,6 +1480,10 @@ msgstr "Il Certificato è stato trovato, ma non è ammesso nel tuo Realm."
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NO_SUCH_ID"
 msgstr "Non esiste alcun certificato con questo ID."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_IS_NOT_IN_GROUP"
+msgstr "Il Certificato è stato trovato, ma non è ammesso nel tuo Realm."
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_FAILED_REGEX"
 msgstr "Valore non consentito."
@@ -1554,6 +1600,10 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_AUTHORITY_KEY_ID_MISMATCH_ERROR"
 msgstr "Uno o più campi Soggetto contengono errori."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_CHAIN_VALIDATION_FAILED"
+msgstr "Il valore date/time inserito non è stato convalidato."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_PARSE_ERROR"
 msgstr "La richiesta PKCS10 non può essere letta"
 
@@ -1589,8 +1639,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_LABEL"
 msgstr "Approva Revoca"
 
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_DESC"
 msgstr ""
+"Per favore convalida le informazioni fornite e approva la Revoca solo se sei "
+"sicuro che queste informazioni siano corrette."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_DESC"
 msgstr "Inizializza"
@@ -2772,8 +2825,9 @@ msgstr " "
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_AUTHORIZED_LABEL"
 msgstr "Richiedente / Firmatario"
 
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_DESC"
-msgstr ""
+msgstr "Richiedente / Firmatario"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_IDENTIFIER_LABEL"

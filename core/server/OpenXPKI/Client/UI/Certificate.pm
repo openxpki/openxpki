@@ -8,6 +8,7 @@ use Moose;
 use Data::Dumper;
 use OpenXPKI::DN;
 use Math::BigInt;
+use URI::Escape;
 use DateTime;
 use Digest::SHA qw(sha1_base64);
 use OpenXPKI::i18n qw( i18nGettext );
@@ -111,6 +112,11 @@ sub init_search {
     } elsif (my $queryid = $self->param('query')) {
         my $result = $self->_client->session()->param('query_cert_'.$queryid);
         $preset = $result->{input};
+    } else {
+        foreach my $key (('subject','san')) {
+            my $val = $self->param($key);
+            $preset->{$key} = uri_unescape($val) if ($val);
+        }
     }
 
     my @fields = (
@@ -599,12 +605,15 @@ sub init_detail {
         shortlabel => $dn{CN}[0]
     });
 
-
-    my @fields = ( { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', value => $cert->{subject} } );
+    my @fields = ( { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', format => 'link',  value =>
+        { page => 'certificate!search!subject!'.uri_escape($cert->{subject}), label => $cert->{subject},
+          target => '_top', tooltip => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SUBJECT' }});
 
     if ($cert_attribute && $cert_attribute->{subject_alt_name}) {
-        #my $cert_attribute->{subject_alt_name};
-        push @fields, { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SAN', value => $cert_attribute->{subject_alt_name}, 'format' => 'ullist' };
+        my @sanlist = map {
+            { page => 'certificate!search!san!'.uri_escape($_), label => $_, target => '_top', tooltip => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SAN' }
+        } @{$cert_attribute->{subject_alt_name}};
+        push @fields, { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SAN', value => \@sanlist, 'format' => 'linklist' };
     }
 
     # check if this is a entity certificate from the current realm
@@ -627,7 +636,8 @@ sub init_detail {
         { label => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE', value => $cert->{notbefore}, format => 'timestamp'  },
         { label => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER', value => $cert->{notafter}, format => 'timestamp' },
         { label => 'I18N_OPENXPKI_UI_CERTIFICATE_STATUS', value => { label => 'I18N_OPENXPKI_UI_CERT_STATUS_'.$cert->{status} , value => $cert->{status} }, format => 'certstatus' },
-        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER', format => 'link', value => { label => $cert->{issuer_dn}, page => 'certificate!chain!identifier!'. $cert_identifier } },
+        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER', format => 'link', tooltip => 'I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_ISSUER_LINK',
+            value => { label => $cert->{issuer_dn}, page => 'certificate!chain!identifier!'. $cert_identifier } },
     );
 
     # certificate metadata

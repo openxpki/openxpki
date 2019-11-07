@@ -383,6 +383,7 @@ WriteMakefile(
         'Text::CSV_XS'                  => '0.23',
         'Time::HiRes'                   => '1',
         'Try::Tiny'                     => '0.28',
+        'URI::Escape'                   => 0, # should be part of the core modules but who knows
         'Workflow'                      => '0.27',
         'XML::Simple'                   => '1',
         'YAML::Tiny'                    => '1.69',

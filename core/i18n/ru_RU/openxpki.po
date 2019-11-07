@@ -17,15 +17,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.5.4\n"
 
-msgid "I18N_OPENXPKI_UI_SUPPORT_TRAILER"
-msgstr ""
-"Thank you for using OpenXPKI - for support and announcements please "
-"subscribe to our <a href=\\\"https://lists.sourceforge.net/lists/listinfo/"
-"openxpki-users\\\">mailinglist</a>.<br> If you need help with your setup or "
-"commercial support, please contact <a href=\\\"mailto:"
-"openxpki@whiterabbitsecurity.com\\\">openxpki@whiterabbitsecurity.com.</a>"
-
-
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Тестировщик"
@@ -86,6 +77,10 @@ msgstr "Родительский технологический процесс"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_COMMON_NAME"
 msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_ISSUER_LINK"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
@@ -177,6 +172,14 @@ msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SAN"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SUBJECT"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
 #, fuzzy
@@ -1006,6 +1009,27 @@ msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_BACKEND_ERROR"
+msgstr "Пауза"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_FETCH_KEY_DECRYPT_FAILED"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_FETCH_KEY_NO_SUCH_KEY"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_GENERATE_KEY_NO_PASSWORD"
+msgstr ""
+"Используйте данный профиль сертификата только если Вы отчетливо "
+"представляете себе необходимую структуру имени субъекта сертификата, хорошо "
+"знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
+"части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
+"также произвольный набор альтернативных имен."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "Имя учетной записи"
 
@@ -1635,6 +1659,14 @@ msgstr "Не завершено"
 msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
 msgstr "Загрузка сертификата в форматах PEM или CRT"
 
+msgid "I18N_OPENXPKI_UI_SUPPORT_TRAILER"
+msgstr ""
+"Thank you for using OpenXPKI - for support and announcements please "
+"subscribe to our <a href=\\\"https://lists.sourceforge.net/lists/listinfo/"
+"openxpki-users\\\">mailinglist</a>.<br> If you need help with your setup or "
+"commercial support, please contact <a href=\\\"mailto:"
+"openxpki@whiterabbitsecurity.com\\\">openxpki@whiterabbitsecurity.com.</a>"
+
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
 msgstr "Прием заявок на сертификаты по протоколу SCEP"
@@ -1693,6 +1725,14 @@ msgid "I18N_OPENXPKI_UI_TOKEN_STATUS_UPCOMING"
 msgstr "Статус сертификата УЦ"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_UNABLE_TO_GENERATE_PRIVATE_KEY"
+msgstr "Загрузка сертификата в форматах PEM или CRT"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_UNABLE_TO_LOAD_PRIVATE_KEY"
+msgstr "Загрузка сертификата в форматах PEM или CRT"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_UNABLE_TO_PARSE_PKCS10_REQUEST_DATA"
 msgstr "SPKAC-строка пуста."
 
@@ -1723,6 +1763,10 @@ msgstr "Отклонить заявку на сертификат"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NO_SUCH_ID"
 msgstr "SPKAC строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_IS_NOT_IN_GROUP"
+msgstr "Отклонить заявку на сертификат"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_FAILED_REGEX"
@@ -1844,6 +1888,10 @@ msgstr "SPKAC-строка пуста."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_AUTHORITY_KEY_ID_MISMATCH_ERROR"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_CHAIN_VALIDATION_FAILED"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
