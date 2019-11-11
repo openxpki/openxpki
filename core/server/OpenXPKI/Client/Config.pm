@@ -64,7 +64,7 @@ use File::Spec;
 use OpenXPKI::Log4perl;
 use Data::Dumper;
 use Config::Std;
-use OpenXPKI::i18n qw( i18nGettext set_language set_locale_prefix);
+use OpenXPKI::i18n qw( set_language set_locale_prefix);
 
 has 'service' => (
     required => 1,

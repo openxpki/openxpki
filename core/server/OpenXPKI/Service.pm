@@ -20,7 +20,6 @@ use Data::Dumper;
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use OpenXPKI::i18n qw( i18nGettext );
 
 my %transport              : ATTR( :init_arg<TRANSPORT> );
 my %serialization          : ATTR( :init_arg<SERIALIZATION> );
