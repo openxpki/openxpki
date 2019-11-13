@@ -23,7 +23,7 @@ Debian Builds
 New users should use the v3 release branch which is available for Debian 10 (Buster), for
 those running a v2 version we still maintain security and major bug fixes for the old release.
 
-**Packages are for Debian Jessie 10 / 64bit (arch amd64). The en_US.utf8 locale must be
+**Packages are for Debian 10 (Buster) / 64bit (arch amd64). The en_US.utf8 locale must be
 installed as the translation system will crash otherwise! The packages do NOT work
 on Ubuntu or 32bit systems. Community packages for Ubuntu have been
 discontinued due to packaging/dependancy problems.**
