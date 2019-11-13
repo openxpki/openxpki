@@ -17,6 +17,12 @@ We have a vagrant setup for debian buster. If you have vagrant you can just
 checkout the git repo, go to vagrant/debian and run "vagrant up test". Provisioning takes some
 minutes and will give you a ready to run OXI install available at http://localhost:8080/openxpki/.
 
+Docker
+------
+
+We also provide a docker image based on the debian packages as well as a docker-compose file, see 
+https://github.com/openxpki/openxpki-docker.
+
 Debian Builds
 -------------
 

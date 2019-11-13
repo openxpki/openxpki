@@ -19,6 +19,8 @@ Release v3.x
 
 To upgrade from v2 or an earlier v3 installation to v3 please see the Upgrade document in the openxpki-config repository.
 
+In case you have written your own code or used the command line tools please note that the old API was removed and some output formats have changed! You can find the API documentation as "perldoc" the implementation classes (located in OpenXPKI::Server::API2::Plugin).
+
 Release v2.3
 -------------
 
