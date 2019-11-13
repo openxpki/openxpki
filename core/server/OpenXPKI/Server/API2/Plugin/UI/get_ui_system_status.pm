@@ -32,6 +32,13 @@ Returns a I<HashRef> with informations about critical items of the system:
 
 B<Changes compared to API v1:> parameter C<ITEMS> was removed as it was unused.
 
+crl_expiry only queries CRLs for active certsign tokens. It returns a literal
+'0' if no crl is found for any active token (or no token is active). The value
+is not set in the result if no group name is defined in I<crypto.type.certsign>.
+
+dv_expiry is zero if no vault token is found at all, it is unset if no group
+name is defined in I<crypto.type.datasafe>.
+
 =cut
 command "get_ui_system_status" => {
 } => sub {
@@ -50,53 +57,59 @@ command "get_ui_system_status" => {
         $offline_secrets++ unless eval { $crypto->is_secret_group_complete( $secret ) || 0 };
     }
 
-    # Next expiring CRL
-    # - query active tokens
-    # - get last expiring CRL for each token (identifier)
-    # - within these get the CRL which expires first
-    my $now = time;
-    my $db_crl = CTX('dbi')->select_one(
-        columns => [ "MAX(next_update) AS latest_update" ],
-        from_join => "aliases identifier=issuer_identifier,pki_realm=pki_realm crl",
-        where => {
-            'aliases.pki_realm' => $pki_realm,
-            group_id => CTX('config')->get("realm.$pki_realm.crypto.type.certsign"),
-            notbefore => { '<', $now },
-            notafter => { '>', $now },
-        },
-        group_by => "identifier",
-        order_by => "latest_update",
-    );
-    my $crl_expiry = $db_crl ? $db_crl->{latest_update} : 0;
-
-    # Vault Token
-    my $db_datavault = CTX('dbi')->select_one(
-        columns => [ 'notafter' ],
-        from  => 'aliases',
-        where => {
-            pki_realm => $pki_realm,
-            group_id => CTX('config')->get("crypto.type.datasafe"),
-        },
-        order_by => '-notafter',
-    );
-    my $dv_expiry = $db_datavault->{notafter};
-
     # Process count
     my $pids = OpenXPKI::Control::get_pids();
 
     my $config =  CTX('config')->get_hash("system.version");
 
-    return {
+    my $result = {
         secret_offline  => $offline_secrets,
-        crl_expiry      => $crl_expiry,
-        dv_expiry       => $dv_expiry,
         watchdog        => scalar @{$pids->{watchdog}},
         worker          => scalar @{$pids->{worker}},
         workflow        => scalar @{$pids->{workflow}},
         version         => $OpenXPKI::VERSION::VERSION,
         hostname        => hostname,
         config          => $config
+    };
+
+    my $groups = CTX('config')->get_hash(['crypto','type']);
+    # Next expiring CRL
+    # - query active tokens
+    # - get last expiring CRL for each token (identifier)
+    # - within these get the CRL which expires first
+    my $crl_expiry;
+    if ($groups->{certsign}) {
+        my $now = time;
+        my $db_crl = CTX('dbi')->select_one(
+            columns => [ "MAX(next_update) AS latest_update" ],
+            from_join => "aliases identifier=issuer_identifier,pki_realm=pki_realm crl",
+            where => {
+                'aliases.pki_realm' => $pki_realm,
+                group_id => $groups->{certsign},
+                notbefore => { '<', $now },
+                notafter => { '>', $now },
+            },
+            group_by => "identifier",
+            order_by => "latest_update",
+        );
+        $result->{crl_expiry} = $db_crl ? $db_crl->{latest_update} : 0;
     }
+
+    # Vault Token
+    if ($groups->{datasafe}) {
+        my $db_datavault = CTX('dbi')->select_one(
+            columns => [ 'notafter' ],
+            from  => 'aliases',
+            where => {
+                pki_realm => $pki_realm,
+                group_id => $groups->{datasafe},
+            },
+            order_by => '-notafter',
+        );
+        $result->{dv_expiry} = $db_datavault ? $db_datavault->{notafter} : 0;
+    };
+
+    return $result;
 };
 
 __PACKAGE__->meta->make_immutable;

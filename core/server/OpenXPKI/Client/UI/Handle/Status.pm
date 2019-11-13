@@ -89,7 +89,17 @@ sub render_system_status {
     }
 
     my $now = time();
-    if ($status->{crl_expiry} < $now) {
+    if (!defined $status->{crl_expiry}) {
+        # no token defined, so no crl to show
+        $self->logger()->debug('Skipping crl status - not defined');
+    } elsif (!$status->{crl_expiry}) {
+        push @fields, {
+            label  => 'No CRL found!',
+            value  => '---',
+            className => 'warning'
+        };
+        $warning = 1;
+    } elsif ($status->{crl_expiry} < $now) {
         push @fields, {
             label  => 'CRL expired - update required!',
             format => 'timestamp',
@@ -113,7 +123,17 @@ sub render_system_status {
         };
     }
 
-    if ($status->{dv_expiry} < $now) {
+    if (!defined $status->{dv_expiry}) {
+        # no datavault token in realm defined
+        $self->logger()->debug('Skipping datavault token status - not defined');
+    } elsif (!$status->{dv_expiry}) {
+        $warning = 1;
+        push @fields, {
+            label  => 'No encryption token set!',
+            value => '---',
+            className => 'warning',
+        };
+    } elsif ($status->{dv_expiry} < $now) {
         $critical = 1;
         push @fields, {
             label  => 'Encryption token is expired',
