@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm -rf /etc/openxpki/keys/
+rm -rf /etc/openxpki/ca/
 
 if [ -x /opt/myperl/bin/openxpkiadm ]; then
     export PATH=/opt/myperl/bin:$PATH
