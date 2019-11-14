@@ -109,7 +109,7 @@ sub key_usage
 sub get_result
 {
     my $self = shift;
-    my $result = $self->read_file ($self->get_outfile());
+    my $result = $self->{FU}->read_file ($self->get_outfile());
     $result =~ s/^.*-----BEGIN/-----BEGIN/s;
     return $result;
 }

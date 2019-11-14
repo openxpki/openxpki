@@ -59,7 +59,7 @@ sub key_usage
 sub get_result
 {
     my $self   = shift;
-    my $random = $self->read_file($self->get_outfile());
+    my $random = $self->{FU}->read_file($self->get_outfile());
 
     ## remove trailing newline
     ## remove trailing =

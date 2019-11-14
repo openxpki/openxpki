@@ -7,7 +7,7 @@ use Test::More;
 
 use File::Temp;
 
-use OpenXPKI;
+use OpenXPKI::FileUtils;
 
 plan tests => 2;
 
@@ -19,11 +19,12 @@ my $tmpfile = File::Temp::mktemp("tmpfileXXXXX");
 my $kbytes = 1 * 1024;
 my $data = pack "C*", (0 .. 255) x ($kbytes * 4);
 
-ok(OpenXPKI->write_file( FILENAME => $tmpfile,
-			 CONTENT  => $data ),
+my $fu = OpenXPKI::FileUtils->new();
+ok($fu->write_file({FILENAME => $tmpfile,
+             CONTENT  => $data}),
    "Could not write temporary file");
 
-is(OpenXPKI->read_file($tmpfile),
+is($fu->read_file($tmpfile),
    $data,
    "Data read from file does not match original data");
 

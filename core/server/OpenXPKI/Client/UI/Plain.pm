@@ -100,7 +100,7 @@ sub action_upload {
     my $result;
     if ($mode eq 'ref' || !$buffer) {
         my $tmpname = tmpnam();
-        open(UPL, ">$tmpname") or die "Unable to open tempfile ($!)";
+        open(UPL, ">", $tmpname) or die "Unable to open tempfile ($!)";
         binmode UPL;
         while(<$file>) { print UPL $_; }
         close(UPL);

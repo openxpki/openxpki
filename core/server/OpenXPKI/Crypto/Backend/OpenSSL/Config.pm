@@ -12,7 +12,6 @@ use OpenXPKI::Server::Context qw( CTX );
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use OpenXPKI qw(write_file);
 use OpenXPKI::DN;
 use OpenXPKI::DateTime;
 use English;
@@ -184,8 +183,8 @@ sub dump
             my $hex = substr ($serial->as_hex(), 2);
             $hex = "0".$hex if (length ($hex) % 2);
             ##! 8: "hex serial is $hex"
-            $self->write_file (FILENAME => $self->{FILENAME}->{SERIAL},
-                               CONTENT  => $hex);
+            $self->{FU}->write_file ({FILENAME => $self->{FILENAME}->{SERIAL},
+                               CONTENT  => $hex});
 
             ##! 8: "specify a special filename to remove the new cert from the temp file area (see new_certs_dir)"
             $self->{FILENAME}->{NEW_CERT} = "$tmpdir/$hex.pem";
@@ -203,17 +202,17 @@ sub dump
         if (exists $self->{INDEX_TXT})
         {
             ##! 8: "INDEX_TXT present => this is a CRL"
-            $self->write_file (FILENAME => $self->{FILENAME}->{DATABASE},
-                               CONTENT  => $self->{INDEX_TXT});
+            $self->{FU}->write_file ({FILENAME => $self->{FILENAME}->{DATABASE},
+                               CONTENT  => $self->{INDEX_TXT}});
         }
         else
         {
             ##! 8: "no INDEX_TXT => this is a certificate"
-            $self->write_file (FILENAME => $self->{FILENAME}->{DATABASE},
-                               CONTENT  => "");
+            $self->{FU}->write_file ({FILENAME => $self->{FILENAME}->{DATABASE},
+                               CONTENT  => ""});
         }
-        $self->write_file (FILENAME => $self->{FILENAME}->{ATTR},
-                           CONTENT  => "unique_subject = no\n");
+        $self->{FU}->write_file ({FILENAME => $self->{FILENAME}->{ATTR},
+                           CONTENT  => "unique_subject = no\n"});
 
         ##! 4: "PROFILE exists => CRL or cert generation"
         $config .= $self->__get_ca();
@@ -221,8 +220,8 @@ sub dump
 
         ##! 2: "write configuration file ($tmpdir/openssl.cnf)"
         # writes a "non-temporary" file in the temporary directory
-        $self->write_file (FILENAME => $self->{FILENAME}->{CONFIG},
-                CONTENT  => $config);
+        $self->{FU}->write_file ({FILENAME => $self->{FILENAME}->{CONFIG},
+                CONTENT  => $config});
 
     } else {
 

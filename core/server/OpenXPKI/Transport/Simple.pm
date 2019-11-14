@@ -177,7 +177,7 @@ sub __send
     {
         ##! 8: "open file for writing"
         if (not exists $self->{STDOUT} and
-            not open $self->{STDOUT}, ">".$self->{OUTFILE})
+            not open $self->{STDOUT}, ">", $self->{OUTFILE})
         {
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_TRANSPORT_SIMPLE_CLIENT_NEW_OPEN_OUTFILE_FAILED",

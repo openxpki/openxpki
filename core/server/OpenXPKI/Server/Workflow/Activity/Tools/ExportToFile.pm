@@ -58,7 +58,7 @@ sub execute {
                 params => { FILENAME => $target_name }
             );
         }
-        open $fh, ">$target_name";
+        open $fh, ">", $target_name";
     }
 
     if (!$fh || !$target_name) {

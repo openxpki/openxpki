@@ -26,7 +26,7 @@ sub get_command
         $engine = $self->{ENGINE}->get_engine();
     }
 
-    
+
 
     if (not exists $self->{PASSWD})
     {
@@ -70,7 +70,7 @@ sub key_usage
 sub get_result
 {
     my $self = shift;
-    my $result = $self->read_file($self->get_outfile());
+    my $result = $self->{FU}->read_file($self->get_outfile());
     my ($type) = ($result =~ m{ \A -----BEGIN\ ([A-Z]+)\ PRIVATE\ KEY----- }xms);
     ##! 16: 'type: ' . $type
     return $type;

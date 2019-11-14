@@ -43,7 +43,7 @@ my $cfg_data = {
 my $lines = [];
 TAP::Parser::YAMLish::Writer->new->write($cfg_data, $lines);
 pop @$lines; shift @$lines; # remove --- and ... from beginning/end
-OpenXPKI->write_file(FILENAME => $config_file, CONTENT => join("\n", @$lines) );
+OpenXPKI::FileUtils->write_file({FILENAME => $config_file, CONTENT => CONF join("\n", @$lines) });
 
 #
 # Tests

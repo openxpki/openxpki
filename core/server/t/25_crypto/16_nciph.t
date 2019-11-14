@@ -19,7 +19,6 @@ else
     print STDERR "OpenXPKI::Crypto::Command: Create CA and user certs and issue a CRL with nCipher\n" if $ENV{VERBOSE};
 }
 
-use OpenXPKI qw( read_file write_file );
 use OpenXPKI::Crypto::TokenManager;
 use OpenXPKI::Crypto::Profile::Certificate;
 use OpenXPKI::Crypto::Profile::CRL;
@@ -56,9 +55,9 @@ my $ca_cert = $fu->read_file("$basedir/$dir/certs/cacert.pem");
 my $ca_token = $mgmt->get_token (
     {
         TYPE => "CA",
-  		ID => $ca_id,
-		PKI_REALM => "Test nCipher Root CA",
-		CERTIFICATE => $ca_cert,
+          ID => $ca_id,
+        PKI_REALM => "Test nCipher Root CA",
+        CERTIFICATE => $ca_cert,
     }
 );
 ok (1);
@@ -80,18 +79,18 @@ my $passwd = $token->command ({COMMAND       => "create_random",
                                RANDOM_LENGTH => 16});
 ok (1);
 print STDERR "passwd: $passwd\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/$dir/passwd.txt", CONTENT => $passwd);
+$fu->write_file ({FILENAME => "$basedir/$dir/passwd.txt", CONTENT => $passwd});
 
 ## create RSA key
 my $key = $token->command ({COMMAND    => "create_key",
                             TYPE       => "RSA",
                             PASSWD     => $passwd,
                             PARAMETERS => {
-			            KEY_LENGTH => 1024,
+                        KEY_LENGTH => 1024,
                                     ENC_ALG    => "aes256"}});
 ok (1);
 print STDERR "RSA: $key\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/$dir/key.pem", CONTENT => $key);
+$fu->write_file ({FILENAME => "$basedir/$dir/key.pem", CONTENT => $key});
 
 ## create profile
 my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
@@ -100,7 +99,7 @@ my $profile = OpenXPKI::Crypto::Profile::Certificate->new (
                   TYPE      => "ENDENTITY",
                   CA        => "INTERNAL_CA_NCIPH",
                   ID        => "User",
-	      );
+          );
 
 ## create CSR
 my $subject = "cn=John Doe,dc=OpenXPKI,dc=org";
@@ -110,7 +109,7 @@ my $csr = $token->command ({COMMAND => "create_pkcs10",
                             SUBJECT => $subject});
 ok (1);
 print STDERR "CSR: $csr\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/$dir/pkcs10.pem", CONTENT => $csr);
+$fu->write_file ({FILENAME => "$basedir/$dir/pkcs10.pem", CONTENT => $csr});
 
 $profile->set_serial  (1);
 $profile->set_subject ($subject);
@@ -122,7 +121,7 @@ my $cert = $ca_token->command ({COMMAND => "issue_cert",
                                 PROFILE => $profile});
 ok (1);
 print STDERR "cert: $cert\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/$dir/cert.pem", CONTENT => $cert);
+$fu->write_file ({FILENAME => "$basedir/$dir/cert.pem", CONTENT => $cert});
 
 ## build the PKCS#12 file
  my $pkcs12 = $token->command ({COMMAND => "create_pkcs12",
@@ -143,7 +142,7 @@ my $crl = $ca_token->command ({COMMAND => "issue_crl",
                                REVOKED => [$cert],
                                PROFILE => $profile});
 print STDERR "CRL: $crl\n" if ($ENV{DEBUG});
-OpenXPKI->write_file (FILENAME => "$basedir/$dir/crl.pem", CONTENT => $crl);
+$fu->write_file ({FILENAME => "$basedir/$dir/crl.pem", CONTENT => $crl});
 ok (1);
 
 1;

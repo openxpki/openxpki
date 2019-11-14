@@ -28,7 +28,6 @@ use OpenXPKI::Crypto::Backend::OpenSSL::Command::create_params;
 package OpenXPKI::Crypto::Backend::OpenSSL::Command;
 
 use OpenXPKI::Debug;
-use OpenXPKI qw(read_file write_file);
 use OpenXPKI::DN;
 use OpenXPKI::FileUtils;
 use OpenXPKI::Exception;

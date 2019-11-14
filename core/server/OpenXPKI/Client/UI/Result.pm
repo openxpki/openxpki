@@ -541,7 +541,7 @@ sub init_fetch {
     $self->logger()->debug('Fetch source: '.$type.', Key: '.$source );
 
     if ($type eq 'file') {
-        open (my $fh, $source) || die 'Unable to open file';
+        open (my $fh, "<", $source) || die 'Unable to open file';
         print $cgi->header( @main::header, -type => $data->{mime}, -attachment => $data->{attachment} );
         while (my $line = <$fh>) {
             print $line;

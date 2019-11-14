@@ -39,6 +39,7 @@ sub read_file {
     my $self = shift;
     my $ident = ident $self;
     my $filename = shift;
+    my $encoding = shift || '';
 
     if (! defined $filename) {
     OpenXPKI::Exception->throw (
@@ -58,16 +59,21 @@ sub read_file {
             params  => {'FILENAME' => $filename});
     }
 
-    my $result = do {
-    open my $HANDLE, '<', $filename;
-    if (! $HANDLE) {
-        OpenXPKI::Exception->throw (
-        message => 'I18N_OPENXPKI_FILEUTILS_READ_FILE_OPEN_FAILED',
-        params  => {'FILENAME' => $filename});
+    my $enc = '';
+    if ($encoding eq 'utf8') {
+        $enc = ':encoding(UTF-8)';
     }
-    # slurp mode
-    local $INPUT_RECORD_SEPARATOR;     # long version of $/
-    <$HANDLE>;
+
+    my $result = do {
+        open my $HANDLE, "<$enc", $filename;
+        if (! $HANDLE) {
+            OpenXPKI::Exception->throw (
+            message => 'I18N_OPENXPKI_FILEUTILS_READ_FILE_OPEN_FAILED',
+            params  => {'FILENAME' => $filename});
+        }
+        # slurp mode
+        local $INPUT_RECORD_SEPARATOR;     # long version of $/
+        <$HANDLE>;
     };
 
     return $result;
