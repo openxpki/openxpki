@@ -104,7 +104,7 @@ sub _render_template_file {
         return undef;
     }
 
-    my $template = OpenXPKI::FileUtils->read_file( $filename );
+    my $template = OpenXPKI::FileUtils->read_file( $filename, 'utf8' );
     # Parse using TT
     my $output;
 
