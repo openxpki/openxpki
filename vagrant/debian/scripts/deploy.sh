@@ -9,7 +9,7 @@ cd $DIR;
 
 rsync -c -P -a  /code-repo/core/server/bin/*  /usr/bin/
 
-rsync -c -P -a  /code-repo/core/server/OpenXPKI/*  /usr/lib/x86_64-linux-gnu/perl5/5.20/OpenXPKI/
+rsync -c -P -a  /code-repo/core/server/OpenXPKI/*  /usr/lib/x86_64-linux-gnu/perl5/5.28/OpenXPKI/
 
 rsync -a /code-repo/config/* /etc/openxpki/
 

@@ -51,10 +51,11 @@ Vagrant.configure("2") do |config|
       config.vm.provision :shell, :path => "provision-develop.sh"
       config.vm.network :forwarded_port, guest: 80, host: 8080
       config.vm.network :forwarded_port, guest: 443, host: 8443
-      config.vm.synced_folder "../../core/server/", "/usr/local/lib/x86_64-linux-gnu/perl/5.28.1/"
-      config.vm.synced_folder "../../core/server/cgi-bin/", "/usr/lib/cgi-bin/"
-      config.vm.synced_folder "../../config/", "/etc/openxpki/"
-      config.vm.synced_folder "../../qatest/", "/qatest/"
+      config.vm.synced_folder "../../", "/code-repo"
+#      config.vm.synced_folder "../../core/server/", "/usr/local/lib/x86_64-linux-gnu/perl/5.28.1/"
+#      config.vm.synced_folder "../../core/server/cgi-bin/", "/usr/lib/cgi-bin/"
+#      config.vm.synced_folder "../../config/", "/etc/openxpki/"
+#      config.vm.synced_folder "../../qatest/", "/qatest/"
   end
 
   # Build for Jessie / OS Perl
