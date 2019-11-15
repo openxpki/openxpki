@@ -34,7 +34,7 @@ sub _evaluate
         condition_error("I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CONNECTOR_EXISTS_FAILED");
     }
 
-    ##! 32: sprintf 'Path found - $path'
+    ##! 32: sprintf 'Path found - ' .$path
     return 1;
 }
 
