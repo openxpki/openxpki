@@ -128,7 +128,7 @@ check:
 	lintian *.deb
 
 clean:
-	cd deb/cpan/ && rm -f *.dsc *.dsc.asc *.tar.gz *.deb *.changes
+	mkdir -p deb/cpan/ && cd deb/cpan/ && rm -f *.dsc *.dsc.asc *.tar.gz *.deb *.changes
 	$(MAKE) $(PACKAGES) SUBTARGET=clean
 	cd deb/cpan/ && for DIR in $(subst __,-,$(EXTERNAL)); do \
 		rm -rf $$DIR-*; \

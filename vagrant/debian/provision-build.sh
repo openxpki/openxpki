@@ -47,6 +47,11 @@ apt-cache dumpavail | dpkg --merge-avail
 # This inits the cpan module for dh-make-perl
 (echo y;echo o conf prerequisites_policy follow;echo o conf commit)|cpan
 
+git -C /code-repo submodule init
+git -C /code-repo submodule update --checkout
+HEAD=`git -C /code-repo/config rev-parse HEAD | cut -c1-6`
+sed -i -r "s/^commit:.*/commit: $HEAD/" /code-repo/config/config.d/system/version.yaml
+
 # Now chdir to the debian package dir
 cd /code-repo/package/debian
 
