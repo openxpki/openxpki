@@ -18,11 +18,19 @@ A software stack based on perl and openssl to run a PKI/trustcenter with an ente
 
 ## Release
 
-There is no planned release schedule, we make new releases after fixing relevant bugs or adding new features.
+There is no planned release schedule, we make new releases after fixing relevant bugs or adding new features. 
 
-Packages for Debian are provided via our [package mirror](http://packages.openxpki.org), prebuild docker images are available via Dockerhub ([whiterabbitsecurity/openxpki](https://hub.docker.com/r/whiterabbitsecurity/openxpki)).
+### Stable Releases
+
+With release 3.2/3.3 we started to have two active release lines: A new stable release, which is fully tested and will upgrade seamlessly within the same major version (see https://semver.org/), gets a minor version with even number (3.2.0). Updates to this release will be done only for critical bugs, such releases will be announced on the openxpki-users mailing lists.
+
+Packages for Debian are provided via our [package mirror](http://packages.openxpki.org), prebuild docker images are available via Dockerhub ([whiterabbitsecurity/openxpki3](https://hub.docker.com/r/whiterabbitsecurity/openxpki3)).
 
 Packages for SLES, RHEL, Ubuntu are available via subscription plans.
+
+### Development Releases
+
+Development releases will be tagged with an odd number (3.3.x), those releases should not be used in production. Packages might be published for such releases, the corresponding docker image is named ([whiterabbitsecurity/openxpki3dev](https://hub.docker.com/r/whiterabbitsecurity/openxpki3dev)). 
 
 ## Getting Started
 
