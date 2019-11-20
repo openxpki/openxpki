@@ -38,6 +38,11 @@ sub param {
     } elsif ( exists $arg[0] ) {
         ##! 16: 'Mark updated values from scalar: ' . $name
         $self->{_updated}->{$name} = 1;
+
+        # the superclass does not handle key => undef but does handle
+        # { key => undef } so we translate this here to have the short
+        # syntax available in our application
+        return $self->SUPER::param({ $name => undef }) unless(defined $arg[0]);
     } else {
         ##! 16: 'Call without value'
     }
