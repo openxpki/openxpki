@@ -8417,6 +8417,14 @@ label {
 
 
 
+.oxi-pagehead ol.breadcrumb {
+  margin-bottom: 10px;
+}
+
+.oxi-pagehead ol.breadcrumb + h2 {
+  margin-top: 0px;
+}
+
 .navbar {
   margin-bottom: 10px;
 }

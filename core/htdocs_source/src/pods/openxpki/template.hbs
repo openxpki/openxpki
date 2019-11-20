@@ -51,8 +51,8 @@
     </div>
 </div>
 
-<div class="container-fluid">
-    <div class="oxi-message">       
+<div class="container-fluid  {{model.tabs.firstObject.page.className}}">
+    <div class="oxi-message">
         {{#if model.status.href}}
             <a href="{{model.status.href}}" target="_blank">
                 <div class="alert {{statusClass}}" style="cursor:pointer;">
@@ -66,7 +66,17 @@
         {{/if}}
     </div>
 
-    <h2>{{model.tabs.firstObject.page.label}}</h2>
+    <div class="oxi-pagehead">
+        {{#if model.tabs.firstObject.page.breadcrumb.length}}
+            <ol class="breadcrumb">
+                {{#each model.tabs.firstObject.page.breadcrumb as |entry|}}
+                    <li>{{entry}}</li>
+                {{/each}}
+            </ol>
+        {{/if}}
+        <h2>{{model.tabs.firstObject.page.label}}</h2>
+    </div>
+
     {{#if model.tabs.firstObject.page.description}}
         <div class="description">
             {{{model.tabs.firstObject.page.description}}}
