@@ -269,8 +269,6 @@ sub __send_crl : PRIVATE {
         ERROR_CODE => 'badCertId',
     }) if (!$cert_result);
 
-    my $token = $arg_ref->{TOKEN};
-
     my $pkcs7_base64 = $arg_ref->{PKCS7};
 
     my $crl_pem = CTX('api2')->get_crl(
