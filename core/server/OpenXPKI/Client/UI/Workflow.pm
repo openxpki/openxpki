@@ -1648,6 +1648,14 @@ sub __render_from_workflow {
         }
     }
 
+    # we set the breadcrumb only if the workflow has a title set
+    # fallback to label if title is not DEFINED is done in the API
+    # setting title to the empty string will suppress breadcrumbs
+    my @breadcrumb;
+    if ($wf_info->{workflow}->{title} && $wf_info->{workflow}->{id}) {
+        push @breadcrumb, sprintf("%s (#%01d)", $wf_info->{workflow}->{title}, $wf_info->{workflow}->{id});
+    }
+
     # check if the workflow is in a "non-regular" state
     if (grep /$wf_proc_state/, ('pause','retry_exceeded','exception', 'running')) {
 
@@ -1655,17 +1663,15 @@ sub __render_from_workflow {
         my $wf_action = $wf_info->{workflow}->{context}->{wf_current_action};
         my $wf_action_info = $wf_info->{activity}->{ $wf_action };
 
-        my $label =  $wf_action_info->{label} || $wf_info->{state}->{label} ;
-        if ($label) {
-            $label .= ' / ' .  $wf_info->{workflow}->{label};
-        } else {
-            $label =  $wf_info->{workflow}->{label} ;
+        if (@breadcrumb && $wf_info->{state}->{label}) {
+            push @breadcrumb, $wf_info->{state}->{label};
         }
-
         $self->_page({
-            label => $label,
+            label => $wf_action_info->{label} || $wf_info->{state}->{label},
+            breadcrumb => \@breadcrumb,
             shortlabel => $wf_info->{workflow}->{id},
-            description =>  $wf_action_info->{description} ,
+            description =>  $wf_action_info->{description},
+            className => 'workflow workflow-proc-state workflow-proc-'.$wf_proc_state,
         });
 
         my $desc;
@@ -1724,22 +1730,6 @@ sub __render_from_workflow {
         } elsif ($wf_proc_state eq 'running') {
 
             $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL','info');
-
-            my $wf_action = $wf_info->{workflow}->{context}->{wf_current_action};
-            my $wf_action_info = $wf_info->{activity}->{ $wf_action };
-
-            my $label =  $wf_action_info->{label} || $wf_info->{state}->{label} ;
-            if ($label) {
-                $label .= ' / ' .  $wf_info->{workflow}->{label};
-            } else {
-                $label =  $wf_info->{workflow}->{label} ;
-            }
-
-            $self->_page({
-                label => $label,
-                shortlabel => $wf_info->{workflow}->{id},
-                description =>  $wf_action_info->{description} ,
-            });
 
             @fields = ({
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL',
@@ -1811,19 +1801,15 @@ sub __render_from_workflow {
     } elsif ($wf_action) {
 
         my $wf_action_info = $wf_info->{activity}->{$wf_action};
-
-        # Headline from action or state + Workflow Label, description from action if set
-        my $label =  $wf_action_info->{label} || $wf_info->{state}->{label} ;
-        if ($label) {
-            $label .= ' / ' .  $wf_info->{workflow}->{label} ;
-        } else {
-            $label =  $wf_info->{workflow}->{label} ;
+        if (@breadcrumb && $wf_info->{state}->{label}) {
+            push @breadcrumb, $wf_info->{state}->{label};
         }
-
         $self->_page({
-            label => $label,
+            label => $wf_action_info->{label} || $wf_info->{state}->{label},
+            breadcrumb => \@breadcrumb,
             shortlabel => $wf_info->{workflow}->{id},
-            description =>  $wf_action_info->{description} ,
+            description =>  $wf_action_info->{description},
+            className => 'workflow workflow-action',
         });
 
         # delegation based on activity
@@ -1911,21 +1897,12 @@ sub __render_from_workflow {
 
     } else {
 
-        # more than one action available, so we offer some buttons to choose how to continue
-
-        # Headline from state + workflow
-        my $label =  $wf_info->{state}->{label};
-        if ($label) {
-            $label .= ' / ' .  $wf_info->{workflow}->{label};
-        } else {
-            $label =  $wf_info->{workflow}->{label};
-        }
-
         $self->_page({
-            label => $label,
+            label => $wf_info->{state}->{label} || $wf_info->{workflow}->{title} || $wf_info->{workflow}->{label},
+            breadcrumb => \@breadcrumb,
             shortlabel => $wf_info->{workflow}->{id},
             description =>  $wf_info->{state}->{description},
-            className => 'modal-lg'
+            className => 'workflow workflow-page',
         });
 
         my $fields = $self->__render_fields( $wf_info, $view );

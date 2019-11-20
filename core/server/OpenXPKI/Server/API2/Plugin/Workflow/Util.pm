@@ -395,6 +395,7 @@ sub get_wf_info {
             state       => $workflow->state,
             description => $head->{description},
             label       => $head->{label},
+            title       => $head->{title} // $head->{label},
             last_update => $workflow->last_update->iso8601,
             proc_state  => $workflow->proc_state,
             count_try   => $workflow->count_try,

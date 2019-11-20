@@ -84,6 +84,7 @@ command "get_workflow_base_info" => {
             id          => 0,
             state       => $state,
             label       => $head->{label},
+            title       => $head->{title} // $head->{label},
             description => $head->{description},
         },
         # activity =>
