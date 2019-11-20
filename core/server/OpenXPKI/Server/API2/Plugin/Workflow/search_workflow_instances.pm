@@ -101,7 +101,7 @@ command "search_workflow_instances" => {
     id         => { isa => 'ArrayRef', },
     type       => { isa => 'ArrayOrAlphaPunct', coerce => 1, },
     state      => { isa => 'ArrayOrAlphaPunct', coerce => 1, },
-    proc_state => { isa => 'AlphaPunct', },
+    proc_state => { isa => 'ArrayOrAlphaPunct', coerce => 1, },
     attribute  => { isa => 'ArrayRef|HashRef', default => sub { {} } },
     start      => { isa => 'Int', },
     limit      => { isa => 'Int', },
@@ -142,7 +142,7 @@ command "search_workflow_instances_count" => {
     id         => { isa => 'ArrayRef', },
     type       => { isa => 'ArrayOrAlphaPunct', coerce => 1, },
     state      => { isa => 'ArrayOrAlphaPunct', coerce => 1, },
-    proc_state => { isa => 'AlphaPunct', },
+    proc_state => { isa => 'ArrayOrAlphaPunct', coerce => 1, },
     check_acl  => { isa => 'Bool', default => 0 },
     # these are ignored, but included to be compatible to "search_workflow_instances":
     attribute  => { isa => 'ArrayRef|HashRef', },

@@ -6,7 +6,6 @@ use base qw( OpenXPKI::Server::Workflow::Activity );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use OpenXPKI::Serialization::Simple;
 use Data::Dumper;
 use Workflow::Exception qw(configuration_error);
 
@@ -19,6 +18,7 @@ sub execute {
     my $context = $workflow->context();
 
     my $target_key = $self->param('target_key') || 'search_result';
+    my $mode = $self->param('mode') || 'id';
 
     my $query;
     if ($self->param('wf_type')) {
@@ -29,9 +29,23 @@ sub execute {
         $query->{state} = $self->param('wf_state');
     }
 
+    if ($self->param('wf_proc_state')) {
+        $query->{proc_state} = $self->param('wf_proc_state');
+    }
+
     if ($self->param('realm')) {
         ##! 16: 'Adding realm ' . $self->param('realm')
         $query->{pki_realm} = $self->param('realm');
+    }
+
+    if ($self->param('order')) {
+        ##! 16: 'Adding order clause ' . $self->param('order')
+        $query->{order} = $self->param('order');
+    }
+
+    if ($self->param('limit')) {
+        ##! 16: 'Adding limit ' . $self->param('limit')
+        $query->{limit} = $self->param('limit');
     }
 
     my $attr;
@@ -59,10 +73,13 @@ sub execute {
 
     # check if self was the only match so its empty now
     if (!scalar @ids) {
-        $context->param( $target_key => undef );
-    } elsif ($self->param('mode') eq 'list') {
 
-        $context->param( $target_key => OpenXPKI::Serialization::Simple->new()->serialize(\@ids) );
+        ##! 16: 'No result in id mode - unset ' .$target_key
+        $context->param( $target_key => undef );
+
+    } elsif ($mode eq 'list') {
+
+        $context->param( $target_key => \@ids );
 
     } else {
 
@@ -124,11 +141,19 @@ One of I<id, list>, see description.
 The realm to search in, the default is the current realm. You can use the
 special word I<_any> to search in all realms. Use this with caution!
 
+=item order
+
+Order the result set by this column
+
+=item limit
+
+Integer, limit the size of the result set to max items
+
 =item target_key
 
 Context key to write the search result to, default is search_result.
 
-=item wf_type, wf_state, wf_creator
+=item wf_type, wf_state, wf_creator, wf_proc_state
 
 Values are passed as arguments for the respective workflow properties.
 
