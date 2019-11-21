@@ -476,17 +476,28 @@ sub get_activity_and_state_info {
 
     # check defined actions and only list the possible ones
     # (non global actions are prefixed)
+    ##! 64: 'Available actions ' . Dumper keys %{ $action_info->{$action} }
     $state_info->{option} = [];
+    if ($state_info->{autoselect} && $state_info->{autoselect} !~ m{\Aglobal_}) {
+        $state_info->{autoselect} = $prefix.'_'.$state_info->{autoselect};
+    }
     for my $option (@options) {
-        $option =~ m{ \A (((global_)?)([^\s>]+))}xs;
-        $option = $1;
+        $option =~ m{ \A (\W?)((global_)?([^\s>]+))}xs;
+        $option = $2;
+
+        my $auto = $1;
+        my $full = $2;
         my $global = $3;
         my $option_base = $4;
 
         my $action = sprintf("%s_%s", $global ? "global" : $prefix, $option_base);
         ##! 16: 'Activity ' . $action
-        ##! 64: 'Available actions ' . Dumper keys %{ $action_info->{$action} }
-        push @{$state_info->{option}}, $action if $action_info->{$action};
+        next unless($action_info->{$action});
+
+        push @{$state_info->{option}}, $action;
+        if ($auto && !$state_info->{autoselect}) {
+            $state_info->{autoselect} = $action;
+        }
 
         # Add button config if available
         $state_info->{button}->{$action} = $button->{$option} if $button->{$option};

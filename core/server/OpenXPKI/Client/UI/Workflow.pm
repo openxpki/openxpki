@@ -1101,13 +1101,17 @@ sub action_index {
 
     # Check if we can auto-load the next available action
     my $wf_action;
-    if (ref $wf_info->{state}->{output} ne 'ARRAY' || scalar(@{$wf_info->{state}->{output}}) == 0) {
+    if ($wf_info->{state}->{autoselect}) {
+        $wf_action = $wf_info->{state}->{autoselect};
+        $self->logger()->debug("Autoselect set: $wf_action");
+    } elsif (ref $wf_info->{state}->{output} ne 'ARRAY' || scalar(@{$wf_info->{state}->{output}}) == 0) {
         my @activities = keys %{$wf_info->{activity}};
         if (scalar @activities == 1) {
             $wf_action = $activities[0];
         } elsif (scalar @activities == 2 && (grep /global_cancel/, @activities)) {
             $wf_action = ($activities[1] eq 'global_cancel') ? $activities[0] : $activities[1];
         }
+        $self->logger()->debug("Implicit select: $wf_action");
     }
 
     # If we call the token action from within a result list we want
@@ -2174,6 +2178,7 @@ sub __get_action_buttons {
                 confirm_label => 'I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_DIALOG_CONFIRM_BUTTON',
                 cancel_label => 'I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_DIALOG_CANCEL_BUTTON',
             };
+            $button{className} = 'failure';
         }
 
         if ($btnhint->{$wf_action}) {

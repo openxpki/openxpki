@@ -186,8 +186,8 @@ sub __process_workflow {
 
         foreach my $action_item (@action_items) {
 
-            my ($global, $action_name, $next_state, $nn, $conditions) =
-                ($action_item =~ m{ \A (global_)?([\w\s]+\w)\s*>\s*(\w+)(\s*\?\s*([!\w\s]+))? }xs);
+            my ($auto, $global, $action_name, $next_state, $nn, $conditions) =
+                ($action_item =~ m{ \A (\W?)(global_)?([\w\s]+\w)\s*>\s*(\w+)(\s*\?\s*([!\w\s]+))? }xs);
 
             # Support for internal chaining of actions, sep. by space
             my @inline_action = split /\s+/, $action_name;
