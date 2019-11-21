@@ -244,7 +244,7 @@ around BUILDARGS => sub {
 
    AlgorithmIdentifier ::= SEQUENCE {
         algorithm               OBJECT IDENTIFIER,
-        parameters              ANY
+        parameters              ANY OPTIONAL
         }
 
 
