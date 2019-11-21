@@ -5,26 +5,24 @@ set -x
 
 DEBIAN_CODENAME=`lsb_release -sc`
 
-apt-get update
+apt-get update && apt-get upgrade --assume-yes
 
 # Install the deps
 export DEBIAN_FRONTEND=noninteractive
 apt-get install --assume-yes  dh-make-perl libapache2-mod-fcgid
 
-
-
 # Debian Buster has renamed the mysql server package
 case $DEBIAN_CODENAME in
     jessie)
-	PACKAGES="mysql-server"
-	;;
+    PACKAGES="mysql-server"
+    ;;
     stretch|buster)
-	PACKAGES="default-mysql-server"
-	;;
+    PACKAGES="default-mysql-server"
+    ;;
     *)
-	echo "Unsupported Debian release $DEBIAN_CODENAME"
-	exit 1
-	;;
+    echo "Unsupported Debian release $DEBIAN_CODENAME"
+    exit 1
+    ;;
 esac
 
 apt-get install --assume-yes $PACKAGES libdbd-mysql-perl
