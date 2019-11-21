@@ -40,11 +40,35 @@ label {
 }
 
 .oxi-pagehead ol.breadcrumb {
-    margin-bottom:10px;
+    margin:10px 0 0 0;
+    padding: 0;
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    list-style: none inside;
+    color: #a0a0a0;
+}
+
+ol.breadcrumb > li + li:before {
+    color: #a0a0a0;
 }
 
 .oxi-pagehead ol.breadcrumb + h2 {
-    margin-top:0px;
+    margin-top:10px;
+}
+
+ol.breadcrumb li.workflow-type:before {
+    padding-right: 5px;
+    font-family: "Glyphicons Halflings";
+    content: "\e136";
+    color: #a0a0a0;
+}
+
+ol.breadcrumb li.workflow-state:before {
+    padding-right: 5px;
+    font-family: "Glyphicons Halflings";
+    content: "\e062";
+    color: #a0a0a0;
 }
 
 .navbar{

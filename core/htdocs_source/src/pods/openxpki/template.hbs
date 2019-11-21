@@ -70,7 +70,7 @@
         {{#if model.tabs.firstObject.page.breadcrumb.length}}
             <ol class="breadcrumb">
                 {{#each model.tabs.firstObject.page.breadcrumb as |entry|}}
-                    <li>{{entry}}</li>
+                    {{#if entry.label}}<li class="{{entry.className}}">{{entry.label}}</li>{{/if}}
                 {{/each}}
             </ol>
         {{/if}}

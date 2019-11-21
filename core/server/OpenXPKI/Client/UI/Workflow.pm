@@ -1652,8 +1652,18 @@ sub __render_from_workflow {
     # fallback to label if title is not DEFINED is done in the API
     # setting title to the empty string will suppress breadcrumbs
     my @breadcrumb;
-    if ($wf_info->{workflow}->{title} && $wf_info->{workflow}->{id}) {
-        push @breadcrumb, sprintf("%s (#%01d)", $wf_info->{workflow}->{title}, $wf_info->{workflow}->{id});
+    if ($wf_info->{workflow}->{title}) {
+        if ($wf_info->{workflow}->{id}) {
+            push @breadcrumb, {
+                className => 'workflow-type' ,
+                label => sprintf("%s (#%01d)", $wf_info->{workflow}->{title}, $wf_info->{workflow}->{id})
+            };
+        } elsif ($wf_info->{workflow}->{state} eq 'INITIAL') {
+            push @breadcrumb, {
+                className => 'workflow-type',
+                label => sprintf("%s", $wf_info->{workflow}->{title})
+            };
+        }
     }
 
     # check if the workflow is in a "non-regular" state
@@ -1663,11 +1673,18 @@ sub __render_from_workflow {
         my $wf_action = $wf_info->{workflow}->{context}->{wf_current_action};
         my $wf_action_info = $wf_info->{activity}->{ $wf_action };
 
-        if (@breadcrumb && $wf_info->{state}->{label}) {
-            push @breadcrumb, $wf_info->{state}->{label};
+        # if we fallback to the state label we dont want it in the 1
+        my $label = $wf_action_info->{label};
+        if ($label) {
+            if (@breadcrumb && $wf_info->{state}->{label}) {
+                push @breadcrumb, { className => 'workflow-state', label => $wf_info->{state}->{label} };
+            }
+        } else {
+            $label = $wf_info->{state}->{label};
         }
+
         $self->_page({
-            label => $wf_action_info->{label} || $wf_info->{state}->{label},
+            label => $label,
             breadcrumb => \@breadcrumb,
             shortlabel => $wf_info->{workflow}->{id},
             description =>  $wf_action_info->{description},
@@ -1801,11 +1818,18 @@ sub __render_from_workflow {
     } elsif ($wf_action) {
 
         my $wf_action_info = $wf_info->{activity}->{$wf_action};
-        if (@breadcrumb && $wf_info->{state}->{label}) {
-            push @breadcrumb, $wf_info->{state}->{label};
+        # if we fallback to the state label we dont want it in the 1
+        my $label = $wf_action_info->{label};
+        if ($label) {
+            if (@breadcrumb && $wf_info->{state}->{label}) {
+                push @breadcrumb, { className => 'workflow-state', label => $wf_info->{state}->{label} };
+            }
+        } else {
+            $label = $wf_info->{state}->{label};
         }
+
         $self->_page({
-            label => $wf_action_info->{label} || $wf_info->{state}->{label},
+            label => $label,
             breadcrumb => \@breadcrumb,
             shortlabel => $wf_info->{workflow}->{id},
             description =>  $wf_action_info->{description},

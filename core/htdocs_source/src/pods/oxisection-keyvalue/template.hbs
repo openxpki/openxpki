@@ -1,16 +1,17 @@
-<table class="table table-bordered">
-    <tbody>
-        {{#each items as |item|}}
-            <tr class="{{item.className}}">
-            {{#if item.isHead}}
-                <th colspan="2">{{item.value}}</th>
-            {{else}}
-                <td>{{item.label}}</td>
-                <td>{{oxivalue-format content=item}}</td>
-            {{/if}}
-            </tr>
-        {{/each}}
-    </tbody>
-</table>
-
-{{oxi-button-container buttons=content.content.buttons buttonClick="buttonClick"}}
+{{#if items.length}}
+    <table class="table table-bordered">
+        <tbody>
+            {{#each items as |item|}}
+                <tr class="{{item.className}}">
+                {{#if item.isHead}}
+                    <th colspan="2">{{item.value}}</th>
+                {{else}}
+                    <td>{{item.label}}</td>
+                    <td>{{oxivalue-format content=item}}</td>
+                {{/if}}
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    {{oxi-button-container buttons=content.content.buttons buttonClick="buttonClick"}}
+{{/if}}
