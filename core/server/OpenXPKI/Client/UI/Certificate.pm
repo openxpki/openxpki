@@ -641,10 +641,9 @@ sub init_detail {
     );
 
     # certificate metadata
-    my $metadata_config = $self->_client->session()->param('certdetails')->{metadata};
-    if ($metadata_config) {
-        my $cert_attrs = $self->send_command_v2( get_cert_attributes => { identifier => $cert_identifier, attribute => 'meta_%' }, 1);
 
+    if ((my $metadata_config = $self->_client->session()->param('certdetails')->{metadata}) &&
+        (my $cert_attrs = $self->send_command_v2( get_cert_attributes => { identifier => $cert_identifier, attribute => 'meta_%' }, 1))) {
         my @metadata_lines;
         for my $cfg (@$metadata_config) {
             my $line;
