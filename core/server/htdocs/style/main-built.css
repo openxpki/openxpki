@@ -8520,6 +8520,13 @@ div.section {
   background-color: #79d1f3;
 }
 
+.oxi-button-container a.btn:before {
+  padding-right: 5px;
+  font-family: "Glyphicons Halflings";
+  content: "\e144";
+  color: #a0a0a0;
+}
+
 .oxi-button-container div.spacer {
   margin: 5px;
 }
