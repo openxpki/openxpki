@@ -286,6 +286,7 @@ sub init_result {
                 },
                 { label => 'I18N_OPENXPKI_UI_SEARCH_EXPORT_RESULT',
                   href => $self->_client()->_config()->{'scripturl'} . '?page=certificate!export!id!'.$queryid,
+                  target => '_blank',
                   className => 'optional'
                 },
             ]
