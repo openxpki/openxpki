@@ -284,6 +284,9 @@ sub execute_action {
         #reset "count_try"
         $self->count_try(0);
 
+        # we need this only for pause or exceptions so we can safely delete it here
+        $self->context->param( wf_current_action => undef );
+
         #determine proc_state: do we still hace actions to do?
         ##! 32: 'Workflow action ' . Dumper $self->_get_workflow_state()->{_actions}
 
