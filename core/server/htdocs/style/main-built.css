@@ -8449,6 +8449,22 @@ ol.breadcrumb li.workflow-state:before {
   color: #a0a0a0;
 }
 
+ol.breadcrumb li.workflow-search:before,
+ol.breadcrumb li.cert-search:before {
+  padding-right: 5px;
+  font-family: "Glyphicons Halflings";
+  content: "\e003";
+  color: #a0a0a0;
+}
+
+ol.breadcrumb li.workflow-search-result:before,
+ol.breadcrumb li.cert-search-result:before {
+  padding-right: 5px;
+  font-family: "Glyphicons Halflings";
+  content: "\e056";
+  color: #a0a0a0;
+}
+
 div.modal-header + div.modal-body h3 {
   margin-top: 5px;
 }

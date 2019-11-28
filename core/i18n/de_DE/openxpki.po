@@ -138,6 +138,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL"
 msgstr "Ergebnis der Zertifikatssuche"
 
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_TITLE"
+msgstr "Suchergebnis"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SAN"
 msgstr "Finde Zertifikate mit diesem SAN"
 
@@ -2862,8 +2865,11 @@ msgstr "Suche nach Workflows"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION"
 msgstr "Ergebnisse zu ihrer Suchanfrage:"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_LABEL"
 msgstr "Ergebnisse der Workflow Suche"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE"
+msgstr "Suchergebnis"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_BY_ID_TITLE"
 msgstr "Suche nach ID"
@@ -3448,6 +3454,12 @@ msgstr "Certificate Export"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_LABEL"
 msgstr "Certificate Export"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"
+msgstr "Veröffentlicht das Zertifikat zu definierten Zielen."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_LABEL"
+msgstr "Zertifikatsinformationen veröffentlichen"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_DESC"
 msgstr "Change a certificates metadata."
 
@@ -3585,9 +3597,3 @@ msgstr "Wake Up"
 # Remove?
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Yes"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"
-#~ msgstr "Veröffentlicht das Zertifikat zu definierten Zielen."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_LABEL"
-#~ msgstr "Zertifikatsinformationen veröffentlichen"

@@ -147,6 +147,10 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL"
 msgstr "Certificate Search Result"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_TITLE"
+msgstr "Certificate Search Result"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SAN"
 msgstr "Certificate Search"
 
@@ -2837,6 +2841,10 @@ msgstr "Search for Workflows"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION"
 msgstr "Results of your search:"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_LABEL"
+msgstr "Workflow Search - Results"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE"
 msgstr "Workflow Search - Results"
 
@@ -3417,6 +3425,15 @@ msgstr "Certificate Export"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_LABEL"
 msgstr "Certificate Export"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"
+msgstr ""
+"Publish CA information (CA certificates and CRLs) to defined repositories."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_LABEL"
+msgstr "Publish CA Information"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_DESC"
 msgstr "Change a certificates metadata."

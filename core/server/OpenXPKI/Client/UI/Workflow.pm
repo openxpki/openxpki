@@ -622,8 +622,13 @@ sub init_result {
     } else {
         my $criteria = $result->{criteria} ? '<br>' . (join ", ", @{$result->{criteria}}) : '';
         $self->_page({
-            label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE',
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_LABEL',
             description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION' . $criteria ,
+            breadcrumb => [
+                { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_LABEL', className => 'workflow-search',
+ },
+                { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE', className => 'workflow-search-result' }
+            ],
         });
     }
 

@@ -175,6 +175,10 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_TITLE"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SAN"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
@@ -3741,6 +3745,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION"
 msgstr "Имя субъекта - владельца сертификата."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE"
 msgstr "Дочерние технологические процессы"
 
@@ -4387,6 +4395,14 @@ msgstr "Экспорт"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_LABEL"
 msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_LABEL"
+msgstr "Технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_DESC"
