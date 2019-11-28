@@ -801,6 +801,10 @@ msgstr "Lunghezza della Chiave"
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_2048"
 msgstr "2048 bit (default)"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
+msgstr "Lunghezza della Chiave"
+
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_4096"
 msgstr "4096 bit (massima sicurezza)"
 
@@ -2034,6 +2038,10 @@ msgstr "Richiesta Aggiornamento"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Stato"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL"
+msgstr "Ulteriori Informazioni"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION"
 msgstr ""
 "Inserisci i criteri di ricerca per selezionare i Workflow da includere nella "
@@ -2972,6 +2980,62 @@ msgstr "Utente"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL"
 msgstr "Workflow Id"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO"
+msgstr "Action"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_DESC"
+msgstr "Id Transazione di questa richiesta SCEP"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_LABEL"
+msgstr "Azione"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_DESC"
+msgstr ""
+"Attiva questo flag per forzare la creazione di una nuova Lista Revoche "
+"(CRL). Di default, una nuova Lista Revoche viene generata solo se ci sono "
+"nuove revoche di certificati, o se la validità della Lista Revoche attuale è "
+"prossima alla scadenza (proprietà prossimo aggiornamento)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_LABEL"
+msgstr "Workflow Id"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_MANUAL_DESC"
+msgstr "Email"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_MANUAL_LABEL"
+msgstr "Email"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_PAUSE_DESC"
+msgstr "Transaction Id of this SCEP request"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_PAUSE_LABEL"
+msgstr "Utente"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_RETRY_EXCEEDED_DESC"
+msgstr "superato il limite dei retry"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_RETRY_EXCEEDED_LABEL"
+msgstr "superato il limite dei retry"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_DESC"
+msgstr "Invia la richiesta"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_LABEL"
+msgstr "Invia la richiesta"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN"
 msgstr "Richiesta non valida - azione senza token"
@@ -4914,9 +4978,6 @@ msgstr "Chiave"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENWAL_WINDOW_WARNING"
 #~ msgstr "Ulteriori Informazioni"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_DESC"
-#~ msgstr "Id Transazione di questa richiesta SCEP"
-
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SC_ERROR_REASON_LABEL"
 #~ msgstr "Subject Alternative Name"
@@ -5002,10 +5063,6 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USERINFO_EMPLOYEE_ID_TOOLTIP"
 #~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_ID_DESC"
-#~ msgstr "Transaction Id of this SCEP request"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__DEFAULT_PUK_DESC"

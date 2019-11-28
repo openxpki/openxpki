@@ -204,7 +204,7 @@ sub init_load {
     my $wf_action = $self->param('wf_action') || $args->{wf_action} || '';
     my $view = $self->param('view') || '';
 
-    my $wf_info = $self->send_command_v2( get_workflow_info => {
+    my $wf_info = $self->send_command_v2( 'get_workflow_info',  {
         id => $id,
         with_ui_info => 1,
     });
@@ -245,8 +245,10 @@ sub init_context {
 
     # re-instance existing workflow
     my $id = $self->param('wf_id');
+    my $view = $self->param('view') || '';
 
-    my $wf_info = $self->send_command_v2( get_workflow_info => {
+
+    my $wf_info = $self->send_command_v2( 'get_workflow_info',  {
         id => $id,
         with_ui_info => 1,
     });
@@ -258,14 +260,22 @@ sub init_context {
 
     $self->_page({
         label => 'I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL #' . $wf_info->{workflow}->{id},
-        className => 'modal-lg'
+        className => 'modal-lg',
     });
+
+    my %buttons;
+    %buttons = ( buttons => [{
+        page => 'workflow!info!wf_id!'.$wf_info->{workflow}->{id},
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL',
+        className => 'btn-primary',
+    }]) if ($view eq 'result');
 
     $self->add_section({
         type => 'keyvalue',
         content => {
             label => '',
             data => $self->__render_fields( $wf_info, 'context'),
+            %buttons
     }});
 
     return $self;
@@ -286,8 +296,9 @@ sub init_attribute {
 
     # re-instance existing workflow
     my $id = $self->param('wf_id');
+    my $view = $self->param('view') || '';
 
-    my $wf_info = $self->send_command_v2( get_workflow_info => {
+    my $wf_info = $self->send_command_v2( 'get_workflow_info',  {
         id => $id,
         with_attributes => 1,
         with_ui_info => 1,
@@ -300,19 +311,138 @@ sub init_attribute {
 
     $self->_page({
         label => 'I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL #' . $wf_info->{workflow}->{id},
-        className => 'modal-lg'
+        className => 'modal-lg',
     });
+
+    my %buttons;
+    %buttons = ( buttons => [{
+        page => 'workflow!info!wf_id!'.$wf_info->{workflow}->{id},
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL',
+        className => 'btn-primary',
+    }]) if ($view eq 'result');
 
     $self->add_section({
         type => 'keyvalue',
         content => {
             label => '',
             data => $self->__render_fields( $wf_info, 'attribute'),
+            %buttons
     }});
 
     return $self;
 
 }
+
+=head2 init_info
+
+Requires parameter I<wf_id> which is the id of an existing workflow.
+It loads the process information to be displayed in a modal box, used
+mainly from the workflow search / result lists.
+
+=cut
+
+sub init_info {
+
+    my $self = shift;
+    my $args = shift;
+
+    # re-instance existing workflow
+    my $id = $self->param('wf_id') || $args->{wf_id} || 0;
+    $id =~ s/[^\d]//g;
+
+    my $wf_info = $self->send_command_v2( 'get_workflow_info',  {
+        id => $id,
+        with_ui_info => 1,
+    });
+
+    if (!$wf_info) {
+        $self->_page({
+            label => '',
+            shortlabel => '',
+            description => 'I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION',
+        });
+        $self->logger()->warn('Unable to load workflow info for id ' . $id);
+        return $self;
+    }
+
+    my $fields = $self->__render_workflow_info( $wf_info, $self->_client->session()->param('wfdetails') );
+
+    # The workflow info contains info about all control actions that
+    # can be done on the workflow -> render appropriate buttons.
+    my @buttons_handle = ({
+        href => '#/openxpki/redirect!workflow!load!wf_id!'.$wf_info->{workflow}->{id},
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
+        className => 'btn-primary',
+    });
+
+    # The workflow info contains info about all control actions that
+    # can be done on the workflow -> render appropriate buttons.
+    if ($wf_info->{handles} && ref $wf_info->{handles} eq 'ARRAY') {
+        my @handles = @{$wf_info->{handles}};
+        if (grep /context/, @handles) {
+            push @buttons_handle, {
+                'page' => 'workflow!context!view!result!wf_id!'.$wf_info->{workflow}->{id},
+                'label' => 'I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL',
+            };
+        }
+
+        if (grep /attribute/, @handles) {
+            push @buttons_handle, {
+                'page' => 'workflow!attribute!view!result!wf_id!'.$wf_info->{workflow}->{id},
+                'label' => 'I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL',
+            };
+        }
+
+        if (grep /history/, @handles) {
+            push @buttons_handle, {
+                'page' => 'workflow!history!view!result!wf_id!'.$wf_info->{workflow}->{id},
+                'label' => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_LABEL',
+            };
+        }
+
+        if (grep /techlog/, @handles) {
+            push @buttons_handle, {
+                'page' => 'workflow!log!view!result!wf_id!'.$wf_info->{workflow}->{id},
+                'label' => 'I18N_OPENXPKI_UI_WORKFLOW_LOG_LABEL',
+            };
+        }
+    }
+
+    my $label = sprintf("%s (#%01d)", ($wf_info->{workflow}->{title} || $wf_info->{workflow}->{label} || $wf_info->{workflow}->{type}), $wf_info->{workflow}->{id});
+    $self->_page({
+        label => $label,
+        shortlabel => $label,
+        description => '',
+        className => 'modal-lg',
+    });
+
+    #I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_LABEL
+    #I18N_OPENXPKI_UI_WORKFLOW_INFO_MANUAL_LABEL
+    #I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_LABEL
+    #I18N_OPENXPKI_UI_WORKFLOW_INFO_PAUSE_LABEL
+    #I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_LABEL
+    #I18N_OPENXPKI_UI_WORKFLOW_INFO_RETRY_EXCEEDED_LABEL
+    #I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_DESC
+    #I18N_OPENXPKI_UI_WORKFLOW_INFO_MANUAL_DESC
+    #I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_DESC
+    #I18N_OPENXPKI_UI_WORKFLOW_INFO_PAUSE_DESC
+    #I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_DESC
+    #I18N_OPENXPKI_UI_WORKFLOW_INFO_RETRY_EXCEEDED_DESC
+
+    $self->add_section({
+        type => 'keyvalue',
+        content => {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_'.uc( $wf_info->{workflow}->{proc_state} ).'_LABEL',
+            description => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_'.uc( $wf_info->{workflow}->{proc_state} ).'_DESC',
+            data => $fields,
+            buttons => \@buttons_handle,
+    }});
+
+
+    return $self;
+
+}
+
 
 =head2
 
@@ -537,10 +667,10 @@ sub init_result {
         className => 'workflow',
         content => {
             actions => [{
-                path => 'workflow!load!wf_id!{serial}!view!result',
+                path => 'workflow!info!wf_id!{serial}',
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
                 icon => 'view',
-                target => 'tab',
+                target => 'modal',
             }],
             columns => $header,
             data => \@lines,
@@ -627,12 +757,14 @@ sub init_pager {
 Render the history as grid view (state/action/user/time)
 
 =cut
+
 sub init_history {
 
     my $self = shift;
     my $args = shift;
 
     my $id = $self->param('wf_id');
+    my $view = $self->param('view') || '';
 
     $self->_page({
         label => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_TITLE',
@@ -641,6 +773,13 @@ sub init_history {
     });
 
     my $workflow_history = $self->send_command_v2( 'get_workflow_history', { id => $id } );
+
+    my %buttons;
+    %buttons = ( buttons => [{
+        page => 'workflow!info!wf_id!'.$id,
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL',
+        className => 'btn-primary',
+    }]) if ($view eq 'result');
 
     $self->logger()->trace( "dumper result: " . Dumper $workflow_history) if $self->logger->is_trace;
 
@@ -672,6 +811,7 @@ sub init_history {
                 { sTitle => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_NODE_LABEL' },
             ],
             data => \@result,
+            %buttons,
         },
     });
 
@@ -685,6 +825,7 @@ Filter workflows where the current user is the creator, similar to workflow
 search.
 
 =cut
+
 sub init_mine {
 
     my $self = shift;
@@ -749,10 +890,10 @@ sub init_mine {
         className => 'workflow',
         content => {
             actions => [{
-                path => 'workflow!load!wf_id!{serial}!view!result',
+                path => 'workflow!info!wf_id!{serial}',
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
                 icon => 'view',
-                target => 'tab',
+                target => 'modal',
             }],
             columns => $self->__default_grid_head(),
             data => \@result,
@@ -909,14 +1050,23 @@ sub init_log {
     my $self = shift;
     my $args = shift;
 
-    my $wf_id = $self->param('wf_id');
+    my $id = $self->param('wf_id');
+    my $view = $self->param('view') || '';
 
     $self->_page({
         label => 'I18N_OPENXPKI_UI_WORKFLOW_LOG',
         className => 'modal-lg'
     });
 
-    my $result = $self->send_command_v2( 'get_workflow_log', { id => $wf_id } );
+    my $result = $self->send_command_v2( 'get_workflow_log', { id => $id } );
+
+    my %buttons;
+    %buttons = ( buttons => [{
+        page => 'workflow!info!wf_id!'.$id,
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL',
+        className => 'btn-primary',
+    }]) if ($view eq 'result');
+
     $result = [] unless($result);
 
     $self->logger()->trace( "dumper result: " . Dumper $result) if $self->logger->is_trace;
@@ -932,6 +1082,7 @@ sub init_log {
             ],
             data => $result,
             empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
+            %buttons,
         }
     });
 
@@ -1463,10 +1614,10 @@ sub action_bulk {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_FAILED_ITEMS_LABEL',
                 description => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_FAILED_ITEMS_DESC',
                 actions => [{
-                    path => 'workflow!load!wf_id!{serial}!view!result',
+                    path => 'workflow!info!wf_id!{serial}',
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
                     icon => 'view',
-                    target => 'tab',
+                    target => 'modal',
                 }],
                 columns => \@fault_head,
                 data => \@result_failed,
@@ -1488,10 +1639,10 @@ sub action_bulk {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_SUCCESS_ITEMS_LABEL',
                 description => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_SUCCESS_ITEMS_DESC',
                 actions => [{
-                    path => 'workflow!load!wf_id!{serial}!view!result',
+                    path => 'workflow!info!wf_id!{serial}',
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
                     icon => 'view',
-                    target => 'tab',
+                    target => 'modal',
                 }],
                 columns => $self->__default_grid_head,
                 data => \@result_done,
@@ -1578,7 +1729,7 @@ sub __render_from_workflow {
     my $view = $args->{view} || '';
 
     if (!$wf_info && $args->{id}) {
-        $wf_info = $self->send_command_v2( get_workflow_info => {
+        $wf_info = $self->send_command_v2( 'get_workflow_info', {
             id => $args->{id},
             with_ui_info => 1,
         });
@@ -1837,7 +1988,7 @@ sub __render_from_workflow {
             breadcrumb => \@breadcrumb,
             shortlabel => $wf_info->{workflow}->{id},
             description =>  $wf_action_info->{description},
-            className => 'workflow workflow-action',
+            className => 'workflow workflow-action ' . ($wf_action_info->{uiclass} || ''),
         });
 
         # delegation based on activity
@@ -1930,7 +2081,7 @@ sub __render_from_workflow {
             breadcrumb => \@breadcrumb,
             shortlabel => $wf_info->{workflow}->{id},
             description =>  $wf_info->{state}->{description},
-            className => 'workflow workflow-page',
+            className => 'workflow workflow-page ' . ($wf_info->{state}->{uiclass} || ''),
         });
 
         my $fields = $self->__render_fields( $wf_info, $view );
@@ -2003,138 +2154,74 @@ sub __render_from_workflow {
     #
     # Right block
     #
-    if ($wf_info->{workflow}->{id} ) {
+    if ($wf_info->{workflow}->{id}) {
 
-        if ($view eq 'result' && $wf_info->{workflow}->{proc_state} !~ /(finished|failed)/) {
-            push @buttons_handle, {
-                'action' => 'redirect!workflow!load!wf_id!'.$wf_info->{workflow}->{id},
-                'label' => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL', #'open workflow',
-            };
-        }
-
-        #
-        # Build info according to config "uicontrol.wfdetails"
-        #
         my $wfdetails_config = $self->_client->session()->param('wfdetails');
-        if (not $wfdetails_config) {
-            #load default config
-            $wfdetails_config = $self->__default_wfdetails;
-        }
+        # undef = no right box
+        if (defined $wfdetails_config) {
 
-        my $wfdetails_info;
-        # if needed, fetch enhanced info incl. workflow attributes
-        if (
-            not($wf_info->{workflow}->{attribute}) and (
-                   grep { ($_->{field}//'') =~              / attribute\. /msx } @$wfdetails_config
-                or grep { ($_->{template}//'') =~           / attribute\. /msx } @$wfdetails_config
-                or grep { (($_->{link}//{})->{page}//'') =~ / attribute\. /msx } @$wfdetails_config
-            )
-        ) {
-            $wfdetails_info = $self->send_command_v2( get_workflow_info => {
-                id => $wf_info->{workflow}->{id},
-                with_attributes => 1,
-            })->{workflow};
-        }
-        else {
-            $wfdetails_info = $wf_info->{workflow};
-        }
-
-        # translate $wfdetails_info->{context}->{creator} to $wfdetails_info_flat->{"context.creator"}
-        my $wfdetails_info_flat = { %{ $wfdetails_info } }; # make a copy
-        for my $subname (qw(context attribute)) {
-            my $subhash;
-            next unless $subhash = $wfdetails_info_flat->{ $subname };
-            for my $key ( keys %$subhash ) {
-                $wfdetails_info_flat->{"$subname.$key"} = $subhash->{ $key };
-            }
-            delete $wfdetails_info_flat->{ $subname };
-        }
-
-        # assemble infos
-        my @data;
-        for my $cfg (@$wfdetails_config) {
-            my $value;
-
-            if ($cfg->{template}) {
-                $value = $self->send_command_v2( render_template => {
-                    template => $cfg->{template},
-                    params => $wfdetails_info,
-                });
-            }
-            elsif ($cfg->{field}) {
-                $value = $wfdetails_info_flat->{ $cfg->{field} } // '-';
+            if ($view eq 'result' && $wf_info->{workflow}->{proc_state} !~ /(finished|failed)/) {
+                push @buttons_handle, {
+                    href => '#/openxpki/redirect!workflow!load!wf_id!'.$wf_info->{workflow}->{id},
+                    label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
+                    className => 'btn-primary',
+                };
             }
 
-            # if it's a link: render URL template ("page")
-            if ($cfg->{link}) {
-                $value = {
-                    label => $value,
-                    page => $self->send_command_v2( render_template => {
-                        template => $cfg->{link}->{page},
-                        params => $wfdetails_info,
-                    }),
-                    target => $cfg->{link}->{target} || 'modal',
+            # assemble infos
+            my $data = $self->__render_workflow_info( $wf_info, $wfdetails_config );
+
+            # The workflow info contains info about all control actions that
+            # can done on the workflow -> render appropriate buttons.
+            my $extra_handles;
+            if (@handles) {
+
+                my @extra_links;
+                if (grep /context/, @handles) {
+                    push @extra_links, {
+                        'page' => 'workflow!context!wf_id!'.$wf_info->{workflow}->{id},
+                        'label' => 'I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL',
+                    };
                 }
+
+                if (grep /attribute/, @handles) {
+                    push @extra_links, {
+                        'page' => 'workflow!attribute!wf_id!'.$wf_info->{workflow}->{id},
+                        'label' => 'I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL',
+                    };
+                }
+
+                if (grep /history/, @handles) {
+                    push @extra_links, {
+                        'page' => 'workflow!history!wf_id!'.$wf_info->{workflow}->{id},
+                        'label' => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_LABEL',
+                    };
+                }
+
+                if (grep /techlog/, @handles) {
+                    push @extra_links, {
+                        'page' => 'workflow!log!wf_id!'.$wf_info->{workflow}->{id},
+                        'label' => 'I18N_OPENXPKI_UI_WORKFLOW_LOG_LABEL',
+                    };
+                }
+
+                push @{$data}, {
+                    label => 'I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL',
+                    format => 'linklist',
+                    value => \@extra_links
+                } if (scalar @extra_links);
+
             }
 
-            push @data, {
-                label => $cfg->{label} // '',
-                value => $value,
-                format => $cfg->{link} ? 'link' : ($cfg->{format} || 'text'),
-                $cfg->{tooltip} ? ( tooltip => $cfg->{tooltip} ) : (),
-            };
+            $self->_result()->{right} = [{
+                type => 'keyvalue',
+                content => {
+                    label => '',
+                    description => '',
+                    data => $data,
+                    buttons => \@buttons_handle,
+            }}];
         }
-
-        # The workflow info contains info about all control actions that
-        # can done on the workflow -> render appropriate buttons.
-        my $extra_handles;
-        if (@handles) {
-
-            my @extra_links;
-            if (grep /context/, @handles) {
-                push @extra_links, {
-                    'page' => 'workflow!context!wf_id!'.$wf_info->{workflow}->{id},
-                    'label' => 'I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL',
-                };
-            }
-
-            if (grep /attribute/, @handles) {
-                push @extra_links, {
-                    'page' => 'workflow!attribute!wf_id!'.$wf_info->{workflow}->{id},
-                    'label' => 'I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL',
-                };
-            }
-
-            if (grep /history/, @handles) {
-                push @extra_links, {
-                    'page' => 'workflow!history!wf_id!'.$wf_info->{workflow}->{id},
-                    'label' => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_LABEL',
-                };
-            }
-
-            if (grep /techlog/, @handles) {
-                push @extra_links, {
-                    'page' => 'workflow!log!wf_id!'.$wf_info->{workflow}->{id},
-                    'label' => 'I18N_OPENXPKI_UI_WORKFLOW_LOG_LABEL',
-                };
-            }
-
-            push @data, {
-                label => 'I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL',
-                format => 'linklist',
-                value => \@extra_links
-            } if (scalar @extra_links);
-
-        }
-
-        $self->_result()->{right} = [{
-            type => 'keyvalue',
-            content => {
-                label => '',
-                description => '',
-                data => \@data,
-                buttons => \@buttons_handle,
-        }}];
     }
 
     return $self;
@@ -2413,7 +2500,7 @@ sub __render_result_list {
 
             # we need to load the wf info
             if (!$wf_info && ($col->{template} || $col->{source} eq 'context')) {
-                $wf_info = $self->send_command_v2( get_workflow_info => {
+                $wf_info = $self->send_command_v2( 'get_workflow_info',  {
                     id => $wf_item->{'workflow_id'},
                     with_attributes => 1,
                 });
@@ -2897,6 +2984,93 @@ sub __render_fields {
     return \@fields;
 
 }
+
+=head2 __render_workflow_info
+
+Render the technical info of a workflow (state, proc_state, etc). Expects a
+wf_info structure and optional a wfdetail_config, will fallback to the
+default display if this is not given.
+
+=cut
+
+sub __render_workflow_info {
+
+    my $self = shift;
+    my $wf_info = shift;
+    my $wfdetails_config = shift;
+
+    if (!$wfdetails_config) {
+        $wfdetails_config = $self->__default_wfdetails;
+    }
+
+    my $wfdetails_info;
+    # if needed, fetch enhanced info incl. workflow attributes
+    if (
+        not($wf_info->{workflow}->{attribute}) and (
+               grep { ($_->{field}//'') =~              / attribute\. /msx } @$wfdetails_config
+            or grep { ($_->{template}//'') =~           / attribute\. /msx } @$wfdetails_config
+            or grep { (($_->{link}//{})->{page}//'') =~ / attribute\. /msx } @$wfdetails_config
+        )
+    ) {
+        $wfdetails_info = $self->send_command_v2( 'get_workflow_info',  {
+            id => $wf_info->{workflow}->{id},
+            with_attributes => 1,
+        })->{workflow};
+    }
+    else {
+        $wfdetails_info = $wf_info->{workflow};
+    }
+
+    # translate $wfdetails_info->{context}->{creator} to $wfdetails_info_flat->{"context.creator"}
+    my $wfdetails_info_flat = { %{ $wfdetails_info } }; # make a copy
+    for my $subname (qw(context attribute)) {
+        my $subhash;
+        next unless $subhash = $wfdetails_info_flat->{ $subname };
+        for my $key ( keys %$subhash ) {
+            $wfdetails_info_flat->{"$subname.$key"} = $subhash->{ $key };
+        }
+        delete $wfdetails_info_flat->{ $subname };
+    }
+
+    # assemble infos
+    my @data;
+    for my $cfg (@$wfdetails_config) {
+        my $value;
+
+        if ($cfg->{template}) {
+            $value = $self->send_command_v2( render_template => {
+                template => $cfg->{template},
+                params => $wfdetails_info,
+            });
+        }
+        elsif ($cfg->{field}) {
+            $value = $wfdetails_info_flat->{ $cfg->{field} } // '-';
+        }
+
+        # if it's a link: render URL template ("page")
+        if ($cfg->{link}) {
+            $value = {
+                label => $value,
+                page => $self->send_command_v2( render_template => {
+                    template => $cfg->{link}->{page},
+                    params => $wfdetails_info,
+                }),
+                target => $cfg->{link}->{target} || 'modal',
+            }
+        }
+
+        push @data, {
+            label => $cfg->{label} // '',
+            value => $value,
+            format => $cfg->{link} ? 'link' : ($cfg->{format} || 'text'),
+            $cfg->{tooltip} ? ( tooltip => $cfg->{tooltip} ) : (),
+        };
+    }
+
+    return \@data;
+
+}
+
 
 =head2 __check_for_validation_error
 

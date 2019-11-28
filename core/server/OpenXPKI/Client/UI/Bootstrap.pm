@@ -102,16 +102,16 @@ sub init_structure {
         my $wfdetails = sub {
             if (not exists $menu->{wfdetails}) {
                 $self->logger->warn('Config entry "wfdetails" is not defined, using defaults');
-                return;
+                return '';
             }
             my $result;
             unless ($result = $menu->{wfdetails}) {
                 $self->logger->info('Config entry "wfdetails" is set to "undef" to trigger defaults');
-                return
+                return;
             }
             unless (ref $result eq 'ARRAY') {
                 $self->logger->warn('Config entry "wfdetails" is not an array');
-                return
+                return;
             }
             return $result;
         }->();

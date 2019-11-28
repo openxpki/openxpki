@@ -662,6 +662,9 @@ msgstr "Key length"
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_2048"
 msgstr "2048 bit"
 
+msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
+msgstr "3072 bit"
+
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_4096"
 msgstr "4096 bit"
 
@@ -1791,6 +1794,10 @@ msgstr "Update Request"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Workflow Attributes"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL"
+msgstr "Technical Information"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION"
 msgstr ""
 "Please enter search criteria for the workflows to be included in your bulk "
@@ -2622,6 +2629,63 @@ msgstr "User"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL"
 msgstr "Workflow Id"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO"
+msgstr "Technical Log"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_DESC"
+msgstr ""
+"This workflow was interrupted by an unexpected event, please contact the "
+"support team!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_LABEL"
+msgstr "Action"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_DESC"
+msgstr ""
+"Check this box to force the creation of new revocation lists. By default, a "
+"new list will only be generated if there are new revocations or if the lists "
+"validity is near expiration (next update property)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_LABEL"
+msgstr "Workflow Id"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_MANUAL_DESC"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_MANUAL_LABEL"
+msgstr "eMail"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_PAUSE_DESC"
+msgstr "Search for workflows using the filters below."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_PAUSE_LABEL"
+msgstr "User"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_RETRY_EXCEEDED_DESC"
+msgstr "retry exceeded"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_RETRY_EXCEEDED_LABEL"
+msgstr "retry exceeded"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_DESC"
+msgstr "Current Activity"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_LABEL"
+msgstr "Current Activity"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN"
 msgstr "Request invalid - action without token"
@@ -3490,6 +3554,3 @@ msgstr "Wake Up"
 # Remove?
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Yes"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
-#~ msgstr "3072 bit"

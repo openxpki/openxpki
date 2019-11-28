@@ -1,11 +1,6 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) 2005-2006 The OpenXPKI Project
-# This file is distributed under the same license as the OpenXPKI package.
-# Michael Bell <michael.bell@web.de>, 2006.
-#
 msgid ""
 msgstr ""
-"Project-Id-Version: OpenXPKI 2.0\n"
+"Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
 "PO-Revision-Date: 2019-08-16 09:13+0200\n"
@@ -63,7 +58,6 @@ msgstr "Zertifikatskette"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_COMMON_NAME"
 msgstr "Common Name"
-
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_ISSUER_LINK"
 msgstr "Zeige Zertifikatskette"
@@ -654,6 +648,9 @@ msgstr "Schlüssellänge"
 
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_2048"
 msgstr "2048 bit"
+
+msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
+msgstr "3072 bit"
 
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_4096"
 msgstr "4096 bit"
@@ -1793,6 +1790,9 @@ msgstr "Update Request"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Workflow Schlüsselworte"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL"
+msgstr "Zurück zur Übersicht"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION"
 msgstr ""
 "Please enter search criteria for the workflows to be included in your bulk "
@@ -2649,6 +2649,66 @@ msgstr "User"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL"
 msgstr "Workflow Id"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO"
+msgstr "Technical Log"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_DESC"
+msgstr ""
+"Dieser Workflow wurde aufgrund eines unerwarteten Fehlers angehalten. Der "
+"Workflow wird ohne manuelle Interaktion nicht weitergeführt. Mit 'Workflow "
+"öffnen' gelangen Sie zur Detailanischt des aktuellen Status und können den "
+"Workflow dort weiterführen (entsprechende Berechetigung erforderlich)."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_LABEL"
+msgstr "Unerwarteter Fehler"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_DESC"
+msgstr ""
+"Dieser Workflow wurde beendet. Mit 'Workflow öffnen' gelangen Sie zur "
+"Detailanischt des aktuellen Status."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_LABEL"
+msgstr "Workflow beendet"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_MANUAL_DESC"
+msgstr ""
+"Dieser Workflow wurde angehalten und wartet auf eine manuelle Eingabe. Mit "
+"'Workflow öffnen' gelangen Sie zur Detailanischt des aktuellen Status und "
+"den möglichen nächsten Aktionen."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_MANUAL_LABEL"
+msgstr "Workflow in Bearbeitung"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_PAUSE_DESC"
+msgstr ""
+"Dieser Workflow wurde angehalten und wird zu einem späteren Zeitpunkt vom "
+"Server weitergeführt. Mit 'Workflow öffnen' gelangen Sie zur Detailanischt "
+"des aktuellen Status und können den Workflow vorzeitig weiterführen "
+"(entsprechende Berechetigung erforderlich)."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_PAUSE_LABEL"
+msgstr "Workflow pausiert"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_RETRY_EXCEEDED_DESC"
+msgstr ""
+"Dieser Workflow wurde angehalten da die maximalen Anzahl an erlaubten "
+"Versuchen für die aktuelle Aktion überschritten wurde. Der Workflow wird "
+"ohne manuelle Interaktion nicht weitergeführt. Mit 'Workflow öffnen' "
+"gelangen Sie zur Detailanischt des aktuellen Status und können den Workflow "
+"dort weiterführen (entsprechende Berechetigung erforderlich)."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_RETRY_EXCEEDED_LABEL"
+msgstr "Max. Wiederholung überschritten"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_DESC"
+msgstr ""
+"Dieser Workflow wird aktuell auf dem Server ausgeführt. Mit 'Workflow "
+"öffnen' gelangen Sie zur Detailanischt des aktuellen Status."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_LABEL"
+msgstr "Workflow wird ausgeführt"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN"
 msgstr "Request invalid - action without token"
 
@@ -2924,9 +2984,8 @@ msgstr "FAILURE"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
 msgstr "This workflow failed finally and can not be restarted"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_LABEL"
-msgstr "State"
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_PENDING_DESC"
 msgstr "This revocation request requires approval."
@@ -2974,9 +3033,8 @@ msgstr "State"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_DESC"
 msgstr "This workflow has finished with success and can not be restarted"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_LABEL"
-msgstr "Creator"
+msgstr "Schlüsselpasswort"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_DESC"
@@ -3350,22 +3408,23 @@ msgstr "Continue"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_DESC"
 msgstr ""
-"Publish CA information (CA certificates and CRLs) to defined repositories."
+"Veröffentlicht CA Informationen (CA Zertifikate and CRLs) zu definierten "
+"Zielen."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL"
-msgstr "Publish CA Information"
+msgstr "CA Informationen veröffentlichen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
-msgstr "Certificate Revocation Request"
+msgstr "Antrag zur Sperrung eines Zertifikates"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_LABEL"
-msgstr "Certificate Revocation Request (CRR)"
+msgstr "Sperrantrag (CRR)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_DESC"
-msgstr "Certificate Signing Request (CSR)"
+msgstr "Antrag zur Ausstellung eines Zertifikates"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_LABEL"
-msgstr "Certificate Signing Request (CSR)"
+msgstr "Zertifikatsantrag (CSR)"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_DESC"
@@ -3527,5 +3586,8 @@ msgstr "Wake Up"
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Yes"
 
-#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
-#~ msgstr "3072 bit"
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"
+#~ msgstr "Veröffentlicht das Zertifikat zu definierten Zielen."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_LABEL"
+#~ msgstr "Zertifikatsinformationen veröffentlichen"

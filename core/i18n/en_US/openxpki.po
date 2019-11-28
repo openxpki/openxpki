@@ -1,14 +1,9 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) 2005-2006 The OpenXPKI Project
-# This file is distributed under the same license as the OpenXPKI package.
-# Michael Bell <michael.bell@web.de>, 2006.
-#
 msgid ""
 msgstr ""
-"Project-Id-Version: OpenXPKI 0.9\n"
+"Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2019-11-21 08:38+0100\n"
+"PO-Revision-Date: 2019-11-28 08:30+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -658,6 +653,9 @@ msgstr "Key length"
 
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_2048"
 msgstr "2048 bit"
+
+msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
+msgstr "3072 bit"
 
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_4096"
 msgstr "4096 bit"
@@ -1788,6 +1786,9 @@ msgstr "Update Request"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Workflow Attributes"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL"
+msgstr "Back to Info"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION"
 msgstr ""
 "Please enter search criteria for the workflows to be included in your bulk "
@@ -2620,6 +2621,65 @@ msgstr "User"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL"
 msgstr "Workflow Id"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO"
+msgstr "Technical Log"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_DESC"
+msgstr ""
+"This workflow has stopped due to an unexpected error and will not be handled "
+"by the server without manual interaction. Use the 'Open Workflow' button to "
+"show the details of the current state and to handle the exception "
+"(additional authorization might be required)."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_LABEL"
+msgstr "Unexpected error"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_DESC"
+msgstr ""
+"This workflow is in a final state. Use the 'Open Workflow' button to show "
+"the details of the workflow."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_LABEL"
+msgstr "Workflow finished"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_MANUAL_DESC"
+msgstr ""
+"This workflow has stopped and waits for interaction. Use the 'Open Workflow' "
+"button to show the details of the current state and to see the next "
+"available actions."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_MANUAL_LABEL"
+msgstr "Action pending"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_PAUSE_DESC"
+msgstr ""
+"This workflow has been paused and will be continued by the server based on "
+"the configured wakeup schedule. Use the 'Open Workflow' button to show the "
+"details of the current state or to enforce wakeup of the workflow now "
+"(additional authorization might be required)."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_PAUSE_LABEL"
+msgstr "Workflow paused"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_RETRY_EXCEEDED_DESC"
+msgstr ""
+"This workflow has stopped as it looped to many times, it will not be handled "
+"by the server without manual interaction. Use the 'Open Workflow' button to "
+"show the details of the current state and to handle the exception "
+"(additional authorization might be required)."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_RETRY_EXCEEDED_LABEL"
+msgstr "Loop retries exceeded"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_DESC"
+msgstr ""
+"This workflow is currently executed by the server. Use the 'Open Workflow' "
+"button to show the details of the workflow."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_LABEL"
+msgstr "Workflow running"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN"
 msgstr "Request invalid - action without token"
 
@@ -2890,9 +2950,8 @@ msgstr "FAILURE"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
 msgstr "This workflow failed finally and can not be restarted"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_LABEL"
-msgstr "State"
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_PENDING_DESC"
 msgstr "This revocation request requires approval."
@@ -2939,9 +2998,8 @@ msgstr "Additional Request Information"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_DESC"
 msgstr "This workflow has finished with success and can not be restarted"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_LABEL"
-msgstr "Creator"
+msgstr "Private Key Password"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_DESC"
@@ -2960,7 +3018,6 @@ msgstr "Certificate Subject"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_INITIAL_DESC"
 msgstr "This workflow failed finally and can not be restarted"
-
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_INITIAL_LABEL"
 msgstr " "
@@ -3485,5 +3542,8 @@ msgstr "Wake Up"
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Yes"
 
-#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
-#~ msgstr "3072 bit"
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"
+#~ msgstr "Publish certificate information to defined repositories."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_LABEL"
+#~ msgstr "Publish certificate"
