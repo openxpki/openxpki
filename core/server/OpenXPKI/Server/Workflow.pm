@@ -23,7 +23,7 @@ use OpenXPKI::Serialization::Simple;
 use OpenXPKI::DateTime;
 
 
-__PACKAGE__->mk_accessors( qw( proc_state count_try wakeup_at reap_at session_info persist_context ) );
+__PACKAGE__->mk_accessors( qw( proc_state count_try wakeup_at reap_at session_info persist_context is_startup ) );
 
 
 my $default_reap_at_interval = '+0000000005';
@@ -91,6 +91,8 @@ sub init {
 
         $self->wakeup_at( $wf_info->{wakeup_at} );
         $self->reap_at( $wf_info->{reap_at} );
+    } else {
+        $self->is_startup(1);
     }
 
     # the condition cache bug also affects the get_action_fields method
@@ -195,7 +197,7 @@ sub execute_action {
     ##! 16: 'Run super::execute_action'
     eval{
         $state = $self->SUPER::execute_action( $action_name, $autorun );
-
+        $self->is_startup(0);
         # if we are here, anything should have been persisted and commited
         # by the workflow internals (execute_action in the upstream class
         # calls update_workflow and commit on the persister after each action)
@@ -207,7 +209,6 @@ sub execute_action {
     # so we just ignore any expcetions here
     if ($self->_has_paused()) {
         ##! 16: 'action paused'
-        # noop
     } elsif( $EVAL_ERROR ) {
 
         my $error = $EVAL_ERROR;
@@ -619,8 +620,26 @@ sub _set_proc_state {
         );
     }
 
+    my $old_state = $self->proc_state();
     $self->proc_state($proc_state);
-    $self->_save();
+
+    # do not persist during initial startup
+    if ($self->is_startup()) {
+        if ($old_state eq 'init') {
+            # init -> running = startup phase - ignore
+            ##! 32: 'from init - skipping'
+        } elsif ($proc_state eq 'manual') {
+            # reset workflow during initial action on failed validator
+            ##! 32: 'running -> manual during startup - skipping'
+        } else {
+            # initial action was properly executed
+            $self->is_startup(0);
+            $self->_save();
+        }
+    } else {
+        $self->_save();
+    }
+
 }
 
 sub _check_and_set_proc_state {

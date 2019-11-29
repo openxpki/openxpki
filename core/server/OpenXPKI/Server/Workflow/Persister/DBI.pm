@@ -319,14 +319,17 @@ sub create_history {
     my $workflow = shift;
     my @history  = @_;
 
+    return if ($workflow->proc_state eq 'init');
+
     ##! 1: "create_history"
     my $dbi       = CTX('dbi');
 
     foreach my $entry (@history) {
+        ##! 64: 'Persisting history ' . Dumper $entry
         next if $entry->is_saved;
 
         my $id = $dbi->next_id(lc($self->history_table // 'workflow_history'));
-        ##! 2: "workflow history id: $id"
+        ##! 8: "workflow history id: $id"
 
         ##! 2: "inserting data into workflow history table"
         $dbi->insert(
@@ -404,7 +407,9 @@ sub fetch_history {
 }
 
 sub update_proc_state {
+
     my ($self, $wf_id, $old_state, $new_state) = @_;
+    ##! 32: "Save proc_state $wf_id: $old_state => $new_state"
 
     my $row_count;
     eval {
