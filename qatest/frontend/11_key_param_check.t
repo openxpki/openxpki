@@ -125,7 +125,7 @@ for my $curve (qw(secp256r1 prime256v1)) {
         'wf_token' => undef
     });
 
-    is($result->{page}->{label}, 'Edit Subject / Certificate Signing Request (CSR)');
+    is($result->{page}->{label}, 'Edit Subject');
 
     # force failure
     $result = $client->mock_request({

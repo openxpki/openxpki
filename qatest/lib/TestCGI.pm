@@ -7,6 +7,7 @@ use Log::Log4perl qw(:easy);
 use URI::Escape;
 use LWP::UserAgent;
 use IO::Socket::SSL qw( SSL_VERIFY_NONE );
+no warnings qw( redundant );
 
 has config => (
     is => 'ro',

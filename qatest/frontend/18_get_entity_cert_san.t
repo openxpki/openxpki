@@ -33,7 +33,7 @@ ok((-s "tmp/cacert-0"),'CA certs present') || die;
 ok((-s "tmp/entity-san.csr"), 'csr present') || die;
 
 # do on behalf request with pkiclient certificate
-my $scep = `$sscep enroll -v -u http://localhost/scep/scep?custid=12345 -K tmp/pkiclient.key -O tmp/pkiclient.crt -r tmp/entity-san.csr -k tmp/entity-san.key -c tmp/cacert-0 -l tmp/entity-san.crt  -t 1 -n 1 |  grep "Read request with transaction id"`;
+my $scep = `$sscep enroll -v -u http://localhost/scep/scep -M custid=12345 -K tmp/pkiclient.key -O tmp/pkiclient.crt -r tmp/entity-san.csr -k tmp/entity-san.key -c tmp/cacert-0 -l tmp/entity-san.crt  -t 1 -n 1 |  grep "Read request with transaction id"`;
 
 my @t = split(/:\s+/, $scep);
 my $sceptid = $t[2];

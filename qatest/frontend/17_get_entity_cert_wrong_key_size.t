@@ -40,7 +40,7 @@ $pem =~ s/\s//xmsg;
 my $hmac = hmac_sha256_hex(decode_base64($pem), 'verysecret');
 
 # do on with hmac attached certificate
-my $scep = `$sscep enroll -v -u http://localhost/scep/scep?hmac=$hmac -r tmp/entity-hmac.csr -k tmp/entity-hmac.key -c tmp/cacert-0 -l tmp/entity-hmac.crt  -t 1 -n 1 -v |  grep "Read request with transaction id"
+my $scep = `$sscep enroll -v -u http://localhost/scep/scep -M hmac=$hmac -r tmp/entity-hmac.csr -k tmp/entity-hmac.key -c tmp/cacert-0 -l tmp/entity-hmac.crt  -t 1 -n 1 -v |  grep "Read request with transaction id"
 `;
 my @t = split(/:\s+/, $scep);
 my $sceptid = $t[2];

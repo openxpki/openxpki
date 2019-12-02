@@ -95,5 +95,5 @@ $result = $client->mock_request({
     '_rtoken' => $rtoken
 });
 
-is($result->{page}->{label}, 'Report Result / Certificate Detail Report ');
+is($result->{page}->{label}, 'Report Result');
 

@@ -9,7 +9,7 @@ use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use TestCGI;
 
-use Test::More;
+use Test::More tests => 3;
 
 package main;
 
@@ -36,6 +36,7 @@ $result = $client->mock_request({
     page => $result->{goto},
 });
 
+
 my @certlist = @{$result->{main}->[0]->{content}->{data}};
 ok(scalar @certlist);
 CERTLIST:
@@ -57,5 +58,3 @@ while (my $line = shift @certlist) {
         last CERTLIST;
     }
 }
-
-done_testing();

@@ -27,17 +27,26 @@ my $cert_identifier = do { # slurp
 diag('Revocation test - cert identifier '  . $cert_identifier);
 
 # Unauthenticated call - stops in PENDING state
-my $soap = SOAP::Lite
-    ->uri('http://schema.openxpki.org/OpenXPKI/SOAP/Revoke')
-    ->proxy('http://localhost/soap/democa')
-    ->RevokeCertificateByIdentifier($cert_identifier);
+my $oSoap =  Connector::Proxy::SOAP::Lite->new({
+    LOCATION => 'https://localhost/soap/democa',
+    uri => 'http://schema.openxpki.org/OpenXPKI/SOAP/Revoke',
+    method => 'RevokeCertificateByIdentifier',
+    ca_certificate_file => 'tmp/chain.pem',
+    ssl_ignore_hostname => 1, # makes it easier
+});
 
-ok($soap, 'SOAP Client no Auth');
-is($soap->result->{error},'','No error');
-is($soap->result->{state}, 'PENDING','State pending without auth, Workflow ' . $soap->result->{id});
+my $res = $oSoap->get_hash($cert_identifier);
+ok($oSoap, 'SOAP Client with Auth');
+is($res->{error},'','No error');
+is($res->{state}, 'PENDING','State pending without auth, Workflow ' . $res->{id});
+
+# Cleanup first workflow
+$result = $client->mock_request({
+    'action' => 'workflow!select!wf_action!crr_cleanup!wf_id!'.$res->{id}
+});
 
 # Now try with SSL Auth - should be autoapproved
-my $oSoap =  Connector::Proxy::SOAP::Lite->new({
+$oSoap =  Connector::Proxy::SOAP::Lite->new({
     LOCATION => 'https://localhost/soap/democa',
     uri => 'http://schema.openxpki.org/OpenXPKI/SOAP/Revoke',
     method => 'RevokeCertificateByIdentifier',
@@ -47,7 +56,7 @@ my $oSoap =  Connector::Proxy::SOAP::Lite->new({
     ssl_ignore_hostname => 1, # makes it easier
 });
 
-my $res = $oSoap->get_hash($cert_identifier);
+$res = $oSoap->get_hash($cert_identifier);
 
 ok($oSoap, 'SOAP Client with Auth');
 is($res->{error},'','No error');
@@ -61,8 +70,3 @@ $result = $client->mock_request({
 while (my $line = shift @{$result->{main}->[0]->{content}->{data}}) {
     is( $line->{value}->{value} , 'CRL_ISSUANCE_PENDING', 'certificate status is CRL Pending') if ($line->{format} && $line->{format} eq 'certstatus');
 }
-
-# Cleanup first workflow
-$result = $client->mock_request({
-    'action' => 'workflow!select!wf_action!crr_cleanup!wf_id!'.$soap->result->{id}
-});

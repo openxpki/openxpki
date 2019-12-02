@@ -29,7 +29,7 @@ my $ssl_opts = {
 };
 $ua->ssl_opts( %{$ssl_opts} );
 
-my $req = HTTP::Request->new('POST', 'https://localhost/rpc/request/RevokeCertificateByEntity',
+my $req = HTTP::Request->new('POST', 'https://localhost/rpc/default/RevokeCertificateByEntity',
     HTTP::Headers->new( Content_Type => 'application/json'),
     encode_json({ entity => 'entity.openxpki.org', reason_code => 'unspecified' })
 );
