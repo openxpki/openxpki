@@ -117,7 +117,7 @@ sub render_system_status {
         $warning = 1;
     } else {
         push @fields, {
-            label  => 'Next CRL update',
+            label  => 'I18N_OPENXPKI_UI_CRL_STATUS_LABEL',
             format => 'timestamp',
             value  => $status->{crl_expiry}
         };
@@ -153,23 +153,23 @@ sub render_system_status {
 
     if ($status->{watchdog} < 1) {
         push @fields, {
-            label  => 'Watchdog',
-            value  => 'Not running!',
+            label  => 'I18N_OPENXPKI_UI_WATCHDOG_STATUS_LABEL',
+            value  => 'I18N_OPENXPKI_UI_WATCHDOG_NOT_RUNNING',
             className => 'danger',
         };
         $critical = 1;
     }
 
     push @fields, {
-        label  => 'System Version',
+        label  => 'I18N_OPENXPKI_UI_SYSTEM_VERSION_STATUS_LABEL',
         value  => $status->{version},
     }, {
-        label  => 'Hostname',
+        label  => 'I18N_OPENXPKI_UI_HOSTNAME_STATUS_LABEL',
         value  => $status->{hostname},
     };
 
     push @fields, {
-        label  => 'Config Version',
+        label  => 'I18N_OPENXPKI_UI_CONFIG_STATUS_LABEL',
         value  => $status->{config},
         format => 'defhash',
     } if ($status->{config});
@@ -219,11 +219,11 @@ sub render_system_status {
             content => {
                 label => 'Tokens of type ' . $type,
                 columns => [
-                    { sTitle => "Token Alias" },
-                    { sTitle => "Identifier" },
-                    { sTitle => "Status" },
-                    { sTitle => "not Before", format => 'timestamp'},
-                    { sTitle => "not After", format => 'timestamp'},
+                    { sTitle => "I18N_OPENXPKI_UI_TOKEN_ALIAS" },
+                    { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER" },
+                    { sTitle => "I18N_OPENXPKI_UI_TOKEN_STATUS" },
+                    { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE", format => 'timestamp'},
+                    { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER", format => 'timestamp'},
                     { sTitle => "_className"},
                 ],
                 data => \@result,
@@ -254,6 +254,78 @@ sub render_system_status {
 
 }
 
+sub render_token_status {
+
+    my $class = shift; # static call
+    my $self = shift; # reference to the wrapping workflow/result
+    my $args = shift;
+
+    my $wf_info = $args->{wf_info};
+
+    delete $wf_info->{state}->{uihandle};
+
+    $self->__render_from_workflow({ wf_info => $wf_info });
+
+    # we fetch the list of tokens to display from the context
+    # this allows a user to configure this
+    my @token = split /\W+/, $wf_info->{workflow}->{context}->{token};
+
+    my $critical = 0;
+    foreach my $type (@token) {
+
+        my $token = $self->send_command_v2( 'list_active_aliases', { type => $type, check_online => 1 } );
+
+        $self->logger()->trace("result: " . Dumper $token ) if $self->logger->is_trace;
+
+        my @result;
+        foreach my $alias (@{$token}) {
+
+            my $className = '';
+            if ($alias->{status} ne 'ONLINE') {
+                $className = 'danger';
+            }
+
+            push @result, [
+                $alias->{alias},
+                $alias->{identifier},
+                $alias->{status},
+                $alias->{notbefore} + 0,
+                $alias->{notafter} + 0,
+                $className
+            ];
+        }
+
+        $self->add_section({
+            type => 'grid',
+            className => 'token',
+            content => {
+                label => 'Tokens of type ' . $type,
+                columns => [
+                    { sTitle => "I18N_OPENXPKI_UI_TOKEN_ALIAS" },
+                    { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER" },
+                    { sTitle => "I18N_OPENXPKI_UI_TOKEN_STATUS" },
+                    { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE", format => 'timestamp'},
+                    { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER", format => 'timestamp'},
+                    { sTitle => "_className"},
+                ],
+                data => \@result,
+                empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
+            }
+        });
+
+    }
+
+    $self->add_section({
+        type => 'text',
+        content => {
+            label => '',
+            description => 'I18N_OPENXPKI_UI_SUPPORT_TRAILER'
+        }
+    });
+
+    return $self;
+
+}
 1;
 
 __END__

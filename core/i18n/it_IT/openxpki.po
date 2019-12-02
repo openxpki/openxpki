@@ -307,6 +307,10 @@ msgid "I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD"
 msgstr "Scarica in formato DER (CER)"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CONFIG_STATUS_LABEL"
+msgstr "Stato"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CRL_BACK_TO_LIST"
 msgstr "mostra le liste di revoca precedenti"
 
@@ -696,6 +700,10 @@ msgstr "Curva Ellittica"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_HOME_WELCOME_HEAD"
 msgstr "Home"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_HOSTNAME_STATUS_LABEL"
+msgstr "Scaduto"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_IMPORT_CRL_DUPLICATE"
@@ -1413,6 +1421,11 @@ msgstr ""
 "commercial support, please contact <a href=\\\"mailto:"
 "openxpki@whiterabbitsecurity.com\\\">openxpki@whiterabbitsecurity.com.</a>"
 
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SYSTEM_VERSION_STATUS_LABEL"
+msgstr "Stato del Sistema"
+
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
 msgstr "Workflow Adesione SCEP in attesa di approvazione."
 
@@ -1433,6 +1446,10 @@ msgstr "Richiesta di Revoca"
 
 msgid "I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL"
 msgstr "Nessun dato disponibile"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TOKEN_ALIAS"
+msgstr "Stato del Token"
 
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS"
 msgstr "Stato del Token"
@@ -1622,6 +1639,14 @@ msgstr "Uno o più campi Soggetto contengono errori."
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_SUBJECT_MISMATCH_ERROR"
 msgstr "La richiesta PKCS10 non può essere letta"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WATCHDOG_NOT_RUNNING"
+msgstr "Azione richiesta non trovata"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WATCHDOG_STATUS_LABEL"
+msgstr "Stato"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WELCOME_PAGE"

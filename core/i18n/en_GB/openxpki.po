@@ -267,6 +267,10 @@ msgstr "Reset Login"
 msgid "I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD"
 msgstr "Click here to download."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CONFIG_STATUS_LABEL"
+msgstr "State"
+
 msgid "I18N_OPENXPKI_UI_CRL_BACK_TO_LIST"
 msgstr "back to overview"
 
@@ -563,6 +567,10 @@ msgstr ""
 # Remove?
 msgid "I18N_OPENXPKI_UI_HOME_WELCOME_HEAD"
 msgstr "Welcome to your OpenXPKI Trustcenter"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_HOSTNAME_STATUS_LABEL"
+msgstr "Secret Cleared"
 
 msgid "I18N_OPENXPKI_UI_IMPORT_CRL_DUPLICATE"
 msgstr ""
@@ -1215,6 +1223,11 @@ msgstr ""
 "commercial support, please contact <a href=\\\"mailto:"
 "openxpki@whiterabbitsecurity.com\\\">openxpki@whiterabbitsecurity.com.</a>"
 
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_SYSTEM_VERSION_STATUS_LABEL"
+msgstr "System Status"
+
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
 msgstr "SCEP Enrollment workflows awaiting approval."
 
@@ -1235,6 +1248,10 @@ msgstr "Revocation Requests"
 
 msgid "I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL"
 msgstr "No data available"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_TOKEN_ALIAS"
+msgstr "Token Status"
 
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS"
 msgstr "Token Status"
@@ -1395,6 +1412,14 @@ msgstr "Subject Key IDs do not match"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_SUBJECT_MISMATCH_ERROR"
 msgstr "Subjects do not match"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WATCHDOG_NOT_RUNNING"
+msgstr "Requested action not found"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WATCHDOG_STATUS_LABEL"
+msgstr "State"
 
 msgid "I18N_OPENXPKI_UI_WELCOME_PAGE"
 msgstr "Welcome to your OpenXPKI Trustcenter"

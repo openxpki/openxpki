@@ -138,6 +138,7 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL"
 msgstr "Ergebnis der Zertifikatssuche"
 
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_TITLE"
 msgstr "Suchergebnis"
 
@@ -253,6 +254,9 @@ msgstr "Anmeldung zurücksetzen"
 
 msgid "I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD"
 msgstr "Zum Download hier klicken."
+
+msgid "I18N_OPENXPKI_UI_CONFIG_STATUS_LABEL"
+msgstr "Konfiguration"
 
 msgid "I18N_OPENXPKI_UI_CRL_BACK_TO_LIST"
 msgstr "zurück zur Listenansicht"
@@ -547,6 +551,9 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_HOME_WELCOME_HEAD"
 msgstr "Willkommen bei ihrem OpenXPKI Trustcenter"
+
+msgid "I18N_OPENXPKI_UI_HOSTNAME_STATUS_LABEL"
+msgstr "Hostname"
 
 msgid "I18N_OPENXPKI_UI_IMPORT_CRL_DUPLICATE"
 msgstr ""
@@ -1198,6 +1205,9 @@ msgstr ""
 "commercial support, please contact <a href=\\\"mailto:"
 "openxpki@whiterabbitsecurity.com\\\">openxpki@whiterabbitsecurity.com.</a>"
 
+msgid "I18N_OPENXPKI_UI_SYSTEM_VERSION_STATUS_LABEL"
+msgstr "System Status"
+
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
 msgstr "Automatische Enrollments auf Genehmigung wartend"
 
@@ -1218,6 +1228,9 @@ msgstr "Sperranträge"
 
 msgid "I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL"
 msgstr "Keine Daten verfügbar"
+
+msgid "I18N_OPENXPKI_UI_TOKEN_ALIAS"
+msgstr "Token Alias"
 
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS"
 msgstr "Token Status"
@@ -1383,6 +1396,12 @@ msgstr "Die Subject Key Identifier passen nicht zusammen!"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_SUBJECT_MISMATCH_ERROR"
 msgstr "Die Subject Einträge sind nicht identisch"
+
+msgid "I18N_OPENXPKI_UI_WATCHDOG_NOT_RUNNING"
+msgstr "Angehalten!"
+
+msgid "I18N_OPENXPKI_UI_WATCHDOG_STATUS_LABEL"
+msgstr "Watchdog"
 
 msgid "I18N_OPENXPKI_UI_WELCOME_PAGE"
 msgstr "Willkommen zu ihrem OpenXPKI Trustcenter"
@@ -1791,6 +1810,7 @@ msgstr "Update Request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Workflow Schlüsselworte"
+
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL"
 msgstr "Zurück zur Übersicht"
@@ -2678,6 +2698,7 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_LABEL"
 msgstr "Workflow wird ausgeführt"
+
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN"
 msgstr "Request invalid - action without token"

@@ -141,7 +141,7 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL"
 msgstr "Result of your search query"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_TITLE"
-msgstr "Results"
+msgstr "Certificate Search Result"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SAN"
 msgstr "Search for certificates with this SAN"
@@ -1206,6 +1206,9 @@ msgstr ""
 "commercial support, please contact <a href=\\\"mailto:"
 "openxpki@whiterabbitsecurity.com\\\">openxpki@whiterabbitsecurity.com.</a>"
 
+msgid "I18N_OPENXPKI_UI_SYSTEM_VERSION_STATUS_LABEL"
+msgstr "System Version"
+
 msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
 msgstr "SCEP Enrollment workflows awaiting approval."
 
@@ -1226,6 +1229,9 @@ msgstr "Revocation Requests"
 
 msgid "I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL"
 msgstr "No data available"
+
+msgid "I18N_OPENXPKI_UI_TOKEN_ALIAS"
+msgstr "Token Alias"
 
 msgid "I18N_OPENXPKI_UI_TOKEN_STATUS"
 msgstr "Token Status"
@@ -1386,6 +1392,12 @@ msgstr "Subject Key IDs do not match"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_X509_SUBJECT_MISMATCH_ERROR"
 msgstr "Subjects do not match"
+
+msgid "I18N_OPENXPKI_UI_WATCHDOG_NOT_RUNNING"
+msgstr "Not running!"
+
+msgid "I18N_OPENXPKI_UI_WATCHDOG_STATUS_LABEL"
+msgstr "Watchdog"
 
 msgid "I18N_OPENXPKI_UI_WELCOME_PAGE"
 msgstr "Welcome to your OpenXPKI Trustcenter"
@@ -1788,6 +1800,7 @@ msgstr "Update Request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Workflow Attributes"
+
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL"
 msgstr "Back to Info"
@@ -3553,3 +3566,4 @@ msgstr "Wake Up"
 # Remove?
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Yes"
+
