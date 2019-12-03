@@ -22,6 +22,18 @@ subtype 'AlphaPunct', # named $re_alpha_string in old API
     where { $_ =~ qr{ \A [ \w \- \. : \s ]* \z }xms },
     message { "$_ is not an alphanumeric string plus punctuation chars" };
 
+=head2 ArrayOrAlphaPunct
+
+Array of AlphaPunct strings.
+
+=cut
+subtype 'ArrayOrAlphaPunct',
+    as 'ArrayRef[AlphaPunct]';
+
+coerce 'ArrayOrAlphaPunct',
+    from 'AlphaPunct',
+    via { [ $_ ] };
+
 =head2 Hex
 
 A string containing a number in hexadecimal notation

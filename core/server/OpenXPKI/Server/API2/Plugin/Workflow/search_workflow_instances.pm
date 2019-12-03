@@ -16,12 +16,17 @@ use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 
+subtype 'StateName',
+    as 'Str',
+    where { $_ =~ qr{ \A \!? \w* \z }xms },
+    message { "$_ is not avalid state name string" };
 
-subtype 'ArrayOrAlphaPunct',
-    as 'ArrayRef[AlphaPunct]';
 
-coerce 'ArrayOrAlphaPunct',
-    from 'AlphaPunct',
+subtype 'ArrayOrStateName',
+    as 'ArrayRef[StateName]';
+
+coerce 'ArrayOrStateName',
+    from 'StateName',
     via { [ $_ ] };
 
 has 'count_only' => (
@@ -72,9 +77,12 @@ B<Parameters>
 
 =item * C<type> I<ArrayRef|Str> - type
 
-=item * C<state> I<ArrayRef|Str> - state
+=item * C<state> I<ArrayRef|Str> - filter workflows by state, can be a single
+state or a list of states given as array. Each item can be negatated by
+adding an exclamation mark as prefix, e.g. "state = !PENDING".
 
-=item * C<proc_state> I<Str> - processing state
+=item * C<proc_state> I<ArrayRef|Str> - filter workflows by processing state,
+accepts the same syntax as I<state>.
 
 =item * C<attribute> I<HashRef> - key is attribute name, value is passed
 "as is" as where statement on value, see documentation of SQL::Abstract.
@@ -100,8 +108,8 @@ command "search_workflow_instances" => {
     pki_realm  => { isa => 'AlphaPunct', },
     id         => { isa => 'ArrayRef', },
     type       => { isa => 'ArrayOrAlphaPunct', coerce => 1, },
-    state      => { isa => 'ArrayOrAlphaPunct', coerce => 1, },
-    proc_state => { isa => 'ArrayOrAlphaPunct', coerce => 1, },
+    state      => { isa => 'ArrayOrStateName', coerce => 1, },
+    proc_state => { isa => 'ArrayOrStateName', coerce => 1, },
     attribute  => { isa => 'ArrayRef|HashRef', default => sub { {} } },
     start      => { isa => 'Int', },
     limit      => { isa => 'Int', },
@@ -141,8 +149,8 @@ command "search_workflow_instances_count" => {
     pki_realm  => { isa => 'AlphaPunct', },
     id         => { isa => 'ArrayRef', },
     type       => { isa => 'ArrayOrAlphaPunct', coerce => 1, },
-    state      => { isa => 'ArrayOrAlphaPunct', coerce => 1, },
-    proc_state => { isa => 'ArrayOrAlphaPunct', coerce => 1, },
+    state      => { isa => 'ArrayOrStateName', coerce => 1, },
+    proc_state => { isa => 'ArrayOrStateName', coerce => 1, },
     check_acl  => { isa => 'Bool', default => 0 },
     # these are ignored, but included to be compatible to "search_workflow_instances":
     attribute  => { isa => 'ArrayRef|HashRef', },
@@ -380,8 +388,17 @@ sub _make_query_params {
         $where->{pki_realm} = $args->pki_realm // CTX('session')->data->pki_realm;
     }
 
-    $where->{workflow_state} = $args->state if $args->has_state;
-    $where->{workflow_proc_state} = $args->proc_state if $args->has_proc_state;
+    if ($args->has_state) {
+        $where->{workflow_state} = [ map {
+            substr($_,0,1) eq '!' ? { '!=', substr($_,1) } : $_;
+        } @{$args->state} ];
+    }
+
+    if ($args->has_proc_state) {
+        $where->{workflow_proc_state} = [ map {
+            substr($_,0,1) eq '!' ? { '!=', substr($_,1) } : $_;
+        } @{$args->proc_state} ];
+    }
 
     # process special API command parameters for non-counting search
     if (not $self->count_only) {
