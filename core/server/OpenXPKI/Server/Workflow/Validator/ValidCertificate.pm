@@ -21,12 +21,11 @@ sub _validate {
         return 1;
     }
 
-    my $entity;
     if ($pem !~ m{(-----BEGIN[^-]*CERTIFICATE-----(.+?)-----END[^-]*CERTIFICATE-----)}xms ) {
         validation_error("I18N_OPENXPKI_UI_VALIDATOR_X509_PARSE_ERROR");
     }
 
-    ##! 64: 'Certificate ' . $entity
+    ##! 64: 'Input ' . $pem
     ##! 32: 'Params ' . Dumper $self->param();
 
     my $x509;
