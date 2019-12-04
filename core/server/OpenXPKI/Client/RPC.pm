@@ -34,6 +34,58 @@ sub _init_backend {
 
 }
 
+sub pickup_workflow {
+
+    my $self = shift;
+    # the hash from the config section of this method
+    my $config = shift;
+    my $pickup_value = shift;
+
+    my $workflow_type = $config->{workflow};
+
+    my $wf_id;
+    if ($config->{pickup_namespace}) {
+
+        die "The parameters pickup_attribute and pickup_namespace are mutually exclusive" if ($config->{pickup_attribute});
+
+        $self->backend()->logger()->debug("Pickup via datapool with $config->{pickup_namespace} => $pickup_value" );
+        my $wfl = $self->backend()->run_command('get_data_pool_entry', {
+            namespace => $config->{pickup_namespace},
+            key => $pickup_value,
+        });
+        if ($wfl->{value}) {
+            $wf_id = $wfl->{value};
+        }
+
+    } else {
+        # pickup from workflow with explicit attribute name or key name
+        my $pickup_key = $config->{pickup_attribute} || $config->{pickup};
+
+        $self->backend()->logger()->debug("Pickup via workflow with $pickup_key => $pickup_value" );
+        my $wfl = $self->backend()->run_command('search_workflow_instances', {
+            type => $workflow_type,
+            attribute => { $pickup_key => $pickup_value },
+            limit => 2
+        });
+
+        if (@$wfl > 1) {
+            die "Unable to pickup workflow - ambigous search result";
+        } elsif (@$wfl == 1) {
+            $wf_id = $wfl->[0]->{workflow_id};
+        }
+    }
+
+    $self->backend()->logger()->trace("No pickup as no result found");
+
+    return unless ($wf_id);
+
+    $self->backend()->logger()->debug("Pickup $wf_id for $pickup_value");
+
+    return $self->backend()->handle_workflow({
+        id => $wf_id,
+    });
+
+}
 
 sub openapi_spec {
 
@@ -136,7 +188,7 @@ sub openapi_spec {
         $client->disconnect();
     };
     if (my $eval_err = $EVAL_ERROR) {
-        $self->logger()->error("Unable to query OpenAPI specification from OpenXPKI server: $eval_err");
+        $self->backend()->logger()->error("Unable to query OpenAPI specification from OpenXPKI server: $eval_err");
         return;
     }
 

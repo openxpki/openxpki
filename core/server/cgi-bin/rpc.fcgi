@@ -279,40 +279,23 @@ while (my $cgi = CGI::Fast->new()) {
         # create the client object
         $client = $rpc->backend() or next;
 
-        my $wf_id;
         # check for pickup parameter
-        if ($conf->{$method}->{pickup}) {
-            my $pickup_key = $conf->{$method}->{pickup};
+        if (my $pickup_key = $conf->{$method}->{pickup}) {
             my $pickup_value;
             if ($postdata) {
                 $pickup_value = $postdata->{$pickup_key};
             } else {
                 $pickup_value = $cgi->param($pickup_key);
             }
-
             if ($pickup_value) {
-                $log->debug("Pickup workflow with $pickup_key => $pickup_value" );
-                my $wfl = $client->run_command('search_workflow_instances', {
-                    type => $workflow_type,
-                    attribute => { $pickup_key => $pickup_value },
-                    limit => 2
-                });
-
-                if (@$wfl > 1) {
-                    die "Unable to pickup workflow - ambigous search result";
-                } elsif (@$wfl == 1) {
-                    $wf_id = $wfl->[0]->{workflow_id};
-                    $log->debug("Pickup $wf_id by $pickup_key = $pickup_value");
-                }
+                $workflow = $rpc->pickup_workflow($conf->{$method}, $pickup_value);
+            } else {
+                $log->trace( "No pickup because $pickup_key has not a value" ) if $log->is_trace;
             }
         }
 
-        if ($wf_id) {
-            $workflow = $client->handle_workflow({
-                type => $workflow_type,
-                id => $wf_id
-            });
-        } else {
+        # pickup return undef if no workflow was found
+        if (!$workflow) {
             $log->debug("Initialize $workflow_type with params " . join(", ", keys %{$param}));
             $workflow = $client->handle_workflow({
                 type => $workflow_type,
