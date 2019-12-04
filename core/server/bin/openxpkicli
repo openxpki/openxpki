@@ -40,7 +40,7 @@ sub debug {
 
 sub format_json {
     my $msg = shift;
-    return JSON->new->pretty($params{json} eq 'pretty')->encode($msg);
+    return JSON->new->pretty(defined $params{'json-pretty'})->encode($msg);
 }
 
 sub output {
@@ -99,16 +99,22 @@ GetOptions(\%params,
             timeout|to=i
             session
             debug
-            json:s
+            json
+            json-pretty
             out=s
          )) or pod2usage(-verbose => 0);
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
 pod2usage(-verbose => 1) if ($params{help});
 
+# json pretty implies json
+if (defined $params{'json-pretty'}) {
+    $params{'json'} = 1;
+}
+
 my %args;
 # command with json data
-if (scalar @ARGV == 2 && defined $params{json}) {
+if (scalar @ARGV == 2 && $params{json}) {
 
     # If it does not start with a { it is a filename
     my $json_data = pop @ARGV;
@@ -368,10 +374,12 @@ openxpkicli [options] command
     --param KEY=VALUE     set VALUE in methods PARAMS hash using KEY
     --debug               enable debug mode
     --timeout             socket timeout in seconds (default 30s)
-    --json                activate json output mode
-    --json=pretty         human readble json
-    --json {"key":"val"}  parse given string and merge with arguments
-    --json FILE           read json string from FILE and merge with arguments
+    --json                activate json mode
+                          If active you can pass either a JSON string or
+                          a filename to read a json string from as second
+                          argument AFTER the command name. The parameters
+                          are merged with the other arguments.
+    --json-pretty         human readble json
     --session             session mode, see below for details
 
 =head1 INVOCATION
@@ -424,6 +432,10 @@ B<Example>
     openxpkicli --session logout
 
 Pass I<--session> as parameter and pass the ID of an existings session in
+
+=head2 JSON Mode
+
+    openxpkicli --json search_workflow_instances_count '{"proc_state":["exception","retry_exceeded"]}'
 
 =head2 Interactive
 

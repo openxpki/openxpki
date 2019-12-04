@@ -77,7 +77,7 @@ sub dump_workflow {
         $json->{workflow} = { id => $reply->{PARAMS}->{workflow}->{id},
             state => $reply->{PARAMS}->{workflow}->{state} };
 
-        print JSON->new->pretty($params{json} eq 'pretty')->encode($json);
+        print JSON->new->pretty(defined $params{'json-pretty'})->encode($json);
         print "\n";
     }
 }
@@ -99,12 +99,19 @@ GetOptions(\%params,
             debug
             context
             attribute
-            json:s
+            json
+            json-pretty
             timeout|to=i
          )) or pod2usage(-verbose => 0);
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
 pod2usage(-verbose => 1) if ($params{help});
+
+
+# json pretty implies json
+if ($params{'json-pretty'}) {
+    $params{'json'} = 1;
+}
 
 if (scalar @ARGV != 1 && !$params{wfid}) {
     print STDERR "Usage: openxpkicmd [OPTIONS] WF_TYPE or openxpkicmd --wfid 1234\n";
@@ -314,7 +321,7 @@ openxpkicmd [options] WORKFLOW_TYPE
     --context             show context data
     --attribute           show attribute data
     --json                dump data using json
-    --json=pretty         human readble json
+    --json-pretty         human readble json
     --timeout             socket timeout in seconds (default 30s)
 
 =head1 INVOCATION
