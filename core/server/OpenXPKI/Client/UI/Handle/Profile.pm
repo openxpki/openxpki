@@ -353,12 +353,7 @@ sub __translate_form_def {
             $new->{type} = 'text';
         } elsif ($field->{type} eq 'select') {
             $new->{type} = 'select';
-
-            my @options;
-            foreach my $item (@{$field->{options}}) {
-               push @options, { label => $item, value => $item};
-            }
-            $new->{options} = \@options;
+            $new->{options} = $field->{options};
         } else {
             $new->{type} = 'text';
         }

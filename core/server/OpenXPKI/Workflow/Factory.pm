@@ -196,15 +196,17 @@ sub get_field_info {
     my $field = $conn->get_hash( \@field_path );
 
     # Check for option tag and do explicit calls to ensure recursive resolve
+    # this code is duplicated in OpenXPKI::Server::API2::Plugin::Profile::Util
+    # as we need the same syntax in the profiles - TODO move to common API
     if ($field->{option}) {
 
         my $mode = $conn->get( [ @field_path, 'option', 'mode' ] ) || 'list';
-
-        my $label = $conn->get( [ @field_path, 'option', 'label' ] );
-
         my @option;
         if ($mode eq 'keyvalue') {
             @option = $conn->get_list( [ @field_path, 'option', 'item' ] );
+            if (my $label = $conn->get( [ @field_path, 'option', 'label' ] )) {
+                @option = map { { label => sprintf($label, $_->{label}, $_->{value}), value => $_->{value} } } @option;
+            }
         } else {
             my @item;
             if ($mode eq 'keys' || $mode eq 'map') {
@@ -224,7 +226,7 @@ sub get_field_info {
                     push @option, { value => $key, label => $label };
                 }
 
-            } elsif ($label) {
+            } elsif (my $label = $conn->get( [ @field_path, 'option', 'label' ] )) {
                 # if set, we generate the values from option.label + key
                 @option = map { { value => $_, label => $label.'_'.uc($_) } } @item;
 

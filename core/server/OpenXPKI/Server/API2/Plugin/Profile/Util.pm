@@ -2,6 +2,8 @@ package OpenXPKI::Server::API2::Plugin::Profile::Util;
 use Moose;
 
 # Project modules
+use Data::Dumper;
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
 
@@ -69,7 +71,61 @@ sub get_input_elements {
         # if type is select, add options array ref
         if ($lcinput{type} eq 'select') {
             ##! 32: 'type is select'
-            $lcinput{options} = [ $config->get_list([ @$input_path, 'option' ]) ];
+
+            # up to v3.1 the select fields in form elements only had a
+            # list directly at option but we now want to support the
+            # same syntax as in the regular workflows where option is
+            # a config node. For most config layouts the data is already
+            # in the lcinput hash
+
+            my $options = $lcinput{option};
+            delete $lcinput{option};
+            if (!ref $options) {
+                $options->{mode} = $config->get( [ @$input_path, 'option', 'mode' ] );
+            }
+
+            ##! 64: 'Options is ' . Dumper $options
+            if (ref $options eq 'ARRAY') {
+                # WARNING - this changes the return value for an API function!
+                $lcinput{options} = [ map {{ label => $_, value => $_ }} @{$options} ];
+            } else {
+                my $mode = $config->get( [ @$input_path, 'option', 'mode' ] ) || 'list';
+                my @option;
+                if ($mode eq 'keyvalue') {
+                    @option = $config->get_list( [ @$input_path, 'option', 'item' ] );
+                    if (my $label = $config->get( [ @$input_path, 'option', 'label' ] )) {
+                        @option = map { { label => sprintf($label, $_->{label}, $_->{value}), value => $_->{value} } } @option;
+                    }
+                } else {
+                    my @item;
+                    if ($mode eq 'keys' || $mode eq 'map') {
+                        @item = $config->get_keys( [ @$input_path, 'option', 'item' ] );
+                    } else {
+                        # option.item holds the items as list, this is mandatory
+                        @item = $config->get_list( [ @$input_path, 'option', 'item' ] );
+                    }
+
+                    if ($mode eq 'map') {
+                        # expects that item is a link to a deeper hash structure
+                        # where the each hash item has a key "label" set
+                        # will hide items with an empty label
+                        foreach my $key (@item) {
+                            my $label = $config->get( [ @$input_path, 'option', 'item', $key, 'label' ] );
+                            next unless ($label);
+                            push @option, { value => $key, label => $label };
+                        }
+
+                    } elsif (my $label = $config->get( [ @$input_path, 'option', 'label' ] )) {
+                        # if set, we generate the values from option.label + key
+                        @option = map { { value => $_, label => $label.'_'.uc($_) } } @item;
+
+                    } else {
+                        # the minimum default - use keys as labels
+                        @option = map { { value => $_, label => $_  } }  @item;
+                    }
+                }
+                $lcinput{options} = \@option;
+            }
         }
 
         # SAN use fields with dynamic key/value assignment
