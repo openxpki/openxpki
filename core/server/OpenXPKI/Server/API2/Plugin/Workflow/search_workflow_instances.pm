@@ -21,14 +21,6 @@ subtype 'StateName',
     where { $_ =~ qr{ \A \!? \w* \z }xms },
     message { "$_ is not avalid state name string" };
 
-
-subtype 'ArrayOrStateName',
-    as 'ArrayRef[StateName]';
-
-coerce 'ArrayOrStateName',
-    from 'StateName',
-    via { [ $_ ] };
-
 has 'count_only' => (
     isa => 'Bool',
     is => 'rw',
@@ -77,15 +69,18 @@ B<Parameters>
 
 =item * C<type> I<ArrayRef|Str> - type
 
-=item * C<state> I<ArrayRef|Str> - filter workflows by state, can be a single
-state or a list of states given as array. Each item can be negatated by
-adding an exclamation mark as prefix, e.g. "state = !PENDING".
+=item * C<state> I<ArrayRef|HashRef|Str> - filter workflows by state.
+To filter on a single state pass its name as string, you can prefix the
+string with an exclamation mark to search for "is not $state". Mutliple
+state names can be passed as array of strings.
+The command will also accept a hash or array of hashes with complex
+SQL statements as defined by L<SQL::Abstract>.
 
-=item * C<proc_state> I<ArrayRef|Str> - filter workflows by processing state,
-accepts the same syntax as I<state>.
+=item * C<proc_state> I<ArrayRef|HashRef|Str> - filter workflows by processing
+state, accepts the same syntax as I<state>.
 
 =item * C<attribute> I<HashRef> - key is attribute name, value is passed
-"as is" as where statement on value, see documentation of SQL::Abstract.
+"as is" as where statement on value, see documentation of L<SQL::Abstract>.
 
 Legacy: I<ArrayRef> - attribute values (legacy search syntax)
 
@@ -108,8 +103,8 @@ command "search_workflow_instances" => {
     pki_realm  => { isa => 'AlphaPunct', },
     id         => { isa => 'ArrayRef', },
     type       => { isa => 'ArrayOrAlphaPunct', coerce => 1, },
-    state      => { isa => 'ArrayOrStateName', coerce => 1, },
-    proc_state => { isa => 'ArrayOrStateName', coerce => 1, },
+    state      => { isa => 'ArrayRef|HashRef|StateName' },
+    proc_state => { isa => 'ArrayRef|HashRef|StateName', },
     attribute  => { isa => 'ArrayRef|HashRef', default => sub { {} } },
     start      => { isa => 'Int', },
     limit      => { isa => 'Int', },
@@ -129,7 +124,7 @@ command "search_workflow_instances" => {
         workflow_proc_state
         workflow_wakeup_at
         pki_realm
-    ) ];
+    )];
 
     return $self->_search($params, $columns);
 };
@@ -149,8 +144,8 @@ command "search_workflow_instances_count" => {
     pki_realm  => { isa => 'AlphaPunct', },
     id         => { isa => 'ArrayRef', },
     type       => { isa => 'ArrayOrAlphaPunct', coerce => 1, },
-    state      => { isa => 'ArrayOrStateName', coerce => 1, },
-    proc_state => { isa => 'ArrayOrStateName', coerce => 1, },
+    state      => { isa => 'ArrayRef|HashRef|StateName', },
+    proc_state => { isa => 'ArrayRef|HashRef|StateName', },
     check_acl  => { isa => 'Bool', default => 0 },
     # these are ignored, but included to be compatible to "search_workflow_instances":
     attribute  => { isa => 'ArrayRef|HashRef', },
@@ -158,7 +153,7 @@ command "search_workflow_instances_count" => {
     limit      => { isa => 'Int', },
     order      => { isa => 'Str', },
     reverse    => { isa => 'Bool', },
-    return_attributes => {isa => 'ArrayRef', },
+    return_attributes => {isa => 'ArrayRef', default => sub { [] } },
 } => sub {
     my ($self, $params) = @_;
 
@@ -171,9 +166,8 @@ command "search_workflow_instances_count" => {
 
     $self->count_only(1);
 
-    # 'workflow_type' and 'creator' needed to apply regex ACLs later on
-    $params->return_attributes([ 'creator' ]);
-    my $columns = [ qw( workflow_type ) ];
+    # 'workflow_type' is needed to apply regex ACLs later on
+    my $columns = [ ($params->check_acl ? 'workflow.workflow_type' : 'workflow.workflow_id') ];
     my $result = $self->_search($params, $columns);
 
     return scalar @$result;
@@ -389,15 +383,19 @@ sub _make_query_params {
     }
 
     if ($args->has_state) {
-        $where->{workflow_state} = [ map {
-            substr($_,0,1) eq '!' ? { '!=', substr($_,1) } : $_;
-        } @{$args->state} ];
+        my $arg = $args->state;
+        if (!ref $arg && substr($arg,0,1) eq '!') {
+            $arg = { '!=', substr($arg,1) };
+        }
+        $where->{workflow_state} = $arg;
     }
 
     if ($args->has_proc_state) {
-        $where->{workflow_proc_state} = [ map {
-            substr($_,0,1) eq '!' ? { '!=', substr($_,1) } : $_;
-        } @{$args->proc_state} ];
+        my $arg = $args->proc_state;
+        if (!ref $arg && substr($arg,0,1) eq '!') {
+            $arg = { '!=', substr($arg,1) };
+        }
+        $where->{workflow_proc_state} = $arg;
     }
 
     # process special API command parameters for non-counting search
