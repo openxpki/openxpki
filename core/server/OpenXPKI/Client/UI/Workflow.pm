@@ -2930,6 +2930,10 @@ sub __render_fields {
         if ($field->{template}) {
 
             my $param = { value => $item->{value} };
+            # try to deserialize if required
+            if (!ref $item->{value} && OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
+                $param = { value => $self->serializer()->deserialize( $item->{value} ) };
+            }
 
             $self->logger()->trace('Render output using template on field '.$key.', '. $field->{template} . ', params:  ' . Dumper $param) if $self->logger->is_trace;
 
@@ -2937,7 +2941,7 @@ sub __render_fields {
             # deflist iterates over each key/label pair and sets the return value into the label
             if ($item->{format} eq "deflist") {
 
-                foreach (@{$item->{value}}){
+                foreach (@{$param->{value}}){
                     $_->{value} = $self->send_command_v2( 'render_template', { template => $field->{template}, params => $_ } );
                     $_->{format} = 'raw';
                 }
@@ -2956,19 +2960,15 @@ sub __render_fields {
                 }
 
             } elsif ($item->{format} eq "raw") {
-                # try to deserialize
-                my $param = $item->{value};
-                if (!ref $param && OpenXPKI::Serialization::Simple::is_serialized( $param ) ) {
-                    $param = $self->serializer()->deserialize( $param );
-                }
-                $item->{value} = $self->send_command_v2( 'render_template', { template => $field->{template}, params => { value => $param } } );
+
+                $item->{value} = $self->send_command_v2( 'render_template', { template => $field->{template}, params => $param } );
 
             } elsif (ref $item->{value} eq '') {
                 $item->{value} = $self->send_command_v2( 'render_template', { template => $field->{template}, params => $param } );
 
             } elsif (ref $item->{value} eq 'HASH' && $item->{value}->{label}) {
                 $item->{value}->{label} = $self->send_command_v2( 'render_template', { template => $field->{template},
-                    params => { value => $item->{value}->{label} }} );
+                    params => { value => $param->{value}->{label} }} );
             } else {
                 $self->logger()->error('Unable to apply template, format: '.$item->{format}.', field: '.$key);
 
