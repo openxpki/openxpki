@@ -59,6 +59,33 @@ sub get {
 
 }
 
+
+=head2 get(prefix, value)
+
+Calls get_hash from the config layer at "metadata.prefix.value".
+
+If prefix contain dots it is considered to be a connector path. Value is
+taken as single path item which can contain dots and can also be empty.
+
+=cut
+
+sub get_hash {
+
+    my $self = shift;
+    my $prefix = shift;
+    my $value = shift;
+    my $suffix = shift || '';
+
+    my @path = split /\./, $prefix;
+    push @path, $value if (defined $value);
+    unshift @path, 'metadata';
+
+    my $data = CTX('config')->get_hash(\@path);
+    return unless ($data && ref $data eq 'HASH');
+    return $data;
+
+}
+
 1;
 
 __END__;
