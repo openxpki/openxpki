@@ -9,7 +9,10 @@ OpenXPKI::Server::API2::Plugin::Crypto::validate_key_params
 
 =cut
 
+use Data::Dumper;
+
 # Project modules
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
 =head2 validate_key_params
@@ -18,6 +21,13 @@ Check if all given key params match the defined rules.
 
 Expects a hash with the current key params and a hash with the key
 definition as defined in the profile section.
+
+The leafes of the rules can be either a list or a single item. The
+special term I<_any> matches any value (even if the key is not set!)
+
+For I<key_length> you can give a discret number or a range min:max,
+borders are included. You can leave out the upper side (e.g. 1024:)
+which will match any size above, to avoid a lower limit set it to "0"
 
 Return is a list with all parameter names that failed validation.
 
@@ -28,7 +38,7 @@ B<Parameters>
 =item * C<key_params> I<Hash> - the hash with the keys properties
 
 =item * C<key_rules> I<Hash>  - the hash with the rules for all as defined in the
-                               profile (algorithm is the key of the first level)
+                                profile (algorithm is the key of the first level)
 
 =back
 
@@ -59,6 +69,9 @@ command "validate_key_params" => {
     my $key_params = $params->key_params;
     my $key_rules = $params->key_rules;
 
+    ##! 16: 'Params ' . Dumper $key_params
+    ##! 16: 'Rules ' . Dumper $key_rules
+
     my @error;
 
     ATTR:
@@ -66,7 +79,7 @@ command "validate_key_params" => {
 
         my $val = $key_params->{$attr} || '';
 
-        my @expect = @{$key_rules->{$attr}};
+        my @expect = (!ref $key_rules->{$attr}) ? ($key_rules->{$attr}) : @{$key_rules->{$attr}};
 
         if (grep(/\A_any\z/, @expect)) {
             next ATTR;
@@ -84,15 +97,15 @@ command "validate_key_params" => {
 
         # handle ranges for key_length
         if ($attr eq 'key_length') {
-            my @ranges = grep /\A_?(\d+):(\d+)\z/, @expect;
-            ##! 32: 'Got ranges : . Dumper \@ranges
-            map {
-                $_ =~ m{\A_?(\d+):(\d+)\z};
-                if ($val > $1 && $val < $2) {
-                    ##! 16: 'Valid match found in range $val / $_'
+            my @ranges = grep /\A_?(\d+):(\d*)\z/, @expect;
+            ##! 32: 'Got ranges : ' . Dumper \@ranges
+            foreach my $range (@ranges) {
+                $range =~ m{\A_?(\d+):(\d*)\z};
+                if ($val >= $1 && (!$2 || $val <= $2)) {
+                    ##! 16: "Valid match found in range $val / $range"
                     next ATTR;
                 }
-            } @ranges;
+            }
         }
 
         ##! 32: "Validate param $attr, $val, " . Dumper \@expect

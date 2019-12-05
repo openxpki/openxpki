@@ -7,6 +7,7 @@ use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::DateTime;
 use OpenXPKI::Debug;
+use Data::Dumper;
 use English;
 
 sub _evaluate
