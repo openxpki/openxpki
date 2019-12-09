@@ -1267,7 +1267,7 @@ sub action_index {
         } elsif (scalar @activities == 2 && (grep /global_cancel/, @activities)) {
             $wf_action = ($activities[1] eq 'global_cancel') ? $activities[0] : $activities[1];
         }
-        $self->logger()->debug("Implicit select: $wf_action");
+        $self->logger()->debug("Implicit select: $wf_action") if ($wf_action);
     }
 
     # If we call the token action from within a result list we want
