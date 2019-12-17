@@ -115,6 +115,7 @@ sub body {
 Returns the csr_serial.
 
 =cut
+
 sub csr_serial {
     my $self = shift;
     my $cert_id = shift;
@@ -129,6 +130,7 @@ Returns the certificate serial number in decimal notation.
 This is a shortcut for body(cert_id, 'serial');
 
 =cut
+
 sub serial {
     my $self = shift;
     my $cert_id = shift;
@@ -150,6 +152,21 @@ sub serial_hex {
 
     my $hash = $self->get_hash( $cert_id );
     return $hash ? $hash->{serial_hex} : '';
+}
+
+=head2 subject
+
+Returns the certificate subject as string
+This is a shortcut for body(cert_id, 'subject');
+
+=cut
+
+sub subject {
+    my $self = shift;
+    my $cert_id = shift;
+
+    my $hash = $self->get_hash( $cert_id );
+    return $hash ? $hash->{subject} : '';
 }
 
 =head2 status
