@@ -69,6 +69,8 @@ case "$1" in
         # Fix directory permissions
         chown openxpki:openxpki /var/openxpki
         chown -R openxpki:openxpki /var/log/openxpki
+        # As apache is in the openxpki group this allows writing the UI logs
+        chmod 4775 /var/log/openxpki
 
         # add apache user to openxpki group (to allow connecting the socket)
         usermod -a -G openxpki www-data
@@ -81,14 +83,7 @@ case "$1" in
             mkdir -p -m755 /var/www/download
             chown openxpki:www-data /var/www/download
         fi;
-
-        # UI logfiles
-        for f in scep.log soap.log webui.log rpc.log; do
-            touch /var/log/openxpki/$f
-            chown www-data:openxpki /var/log/openxpki/$f
-            chmod 640 /var/log/openxpki/$f
-        done;
-
+        
         # Setup logrotate
         if [ -e /etc/logrotate.d/ ] &&  [ ! -e /etc/logrotate.d/openxpki ]; then
             cp /usr/share/doc/libopenxpki-perl/examples/logrotate.conf /etc/logrotate.d/openxpki
