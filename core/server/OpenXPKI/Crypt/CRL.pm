@@ -25,6 +25,7 @@ has pem => (
         my $pem = encode_base64($self->data());
         $pem =~ s{\s}{}g;
         $pem =~ s{ (.{64}) }{$1\n}xmsg;
+        chomp $pem;
         return "-----BEGIN X509 CRL-----\n$pem\n-----END X509 CRL-----";
     },
 );

@@ -28,6 +28,7 @@ has pem => (
         my $pem = encode_base64($self->data());
         $pem =~ s{\s}{}g;
         $pem =~ s{ (.{64}) }{$1\n}xmsg;
+        chomp $pem;
         return "-----BEGIN CERTIFICATE REQUEST-----\n$pem\n-----END CERTIFICATE REQUEST-----";
     },
 );
