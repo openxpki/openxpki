@@ -67,17 +67,16 @@ sub load_extension
     my $config = CTX('config');
 
     ##! 4: "Profile: $profile_path, Extension: $ext"
-    my $path = "$profile_path.extensions.$ext";
+    my @basepath = split /\./, $profile_path;
+    push @basepath, 'extensions', $ext;
 
-    ##! 16: 'path: ' . $path
+    ##! 16: 'path: ' . join (".", @basepath)
 
     ## is the extension used at all?
-    if (!$config->exists($path)) {
-
+    if (!$config->exists(\@basepath)) {
         # Test for default settings
-        $path =~ /(profile|crl)/;
-        $path = $1.'.default.extensions.'.$ext;
-        if ($config->exists($path)) {
+        $basepath[1] = 'default';
+        if ($config->exists(\@basepath)) {
             ##! 16: 'Using default value for ' . $ext
         } else {
             ##! 16: "Extension $ext is not used"
@@ -87,7 +86,7 @@ sub load_extension
 
     ## is this a critical extension?
 
-    my $critical = $config->get("$path.critical");
+    my $critical = $config->get([ @basepath, 'critical' ]);
 
     if ($critical) {
         $critical = 'true';
@@ -102,13 +101,13 @@ sub load_extension
     if ($ext eq "basic_constraints")
     {
 
-        my $ca = $config->get("$path.ca") || '0';
+        my $ca = $config->get([ @basepath, 'ca' ]) || '0';
         if ($ca !~ /\A(true|1)\z/) {
             $values[0] = ["CA", 'false'];
+        } else {
+            $values[0] = ["CA", 'true'];
 
-        } else {$values[0] = ["CA", 'true'];
-
-            my $path_length = $config->get("$path.path_length");
+            my $path_length = $config->get([ @basepath, 'path_length']);
             if (defined $path_length)
             {
                 $values[1] = ["PATH_LENGTH", $path_length];
@@ -126,7 +125,7 @@ sub load_extension
                      "crl_sign", "encipher_only", "decipher_only" );
 
         foreach my $bit (@bits) {
-            push @values, $bit if ($config->get("$path.$bit"));
+            push @values, $bit if ($config->get([ @basepath, $bit ]));
         }
 
         $self->set_extension (NAME     => "key_usage",
@@ -135,7 +134,7 @@ sub load_extension
     }
     elsif ($ext eq "extended_key_usage")
     {
-        my $bits_set = $config->get_hash("$path");
+        my $bits_set = $config->get_hash(\@basepath);
         ##! 16: "ext key usage bits: ". Dumper $bits_set
         my @bits = ( "client_auth", "server_auth","email_protection","code_signing","time_stamping", "ocsp_signing");
 
@@ -159,7 +158,7 @@ sub load_extension
     }
     elsif ($ext eq "subject_key_identifier")
     {
-        if ($config->get("$path.hash"))
+        if ($config->get([ @basepath, 'hash']))
         {
             $self->set_extension (NAME     => "subject_key_identifier",
                                   CRITICAL => $critical,
@@ -171,7 +170,7 @@ sub load_extension
 
         my @bits = ( "keyid", "issuer" );
         foreach my $bit (@bits) {
-            push @values, $bit if (  $config->get("$path.$bit") );
+            push @values, $bit if ( $config->get([ @basepath, $bit ]) );
         }
         if (scalar @values)
         {
@@ -182,7 +181,7 @@ sub load_extension
     }
     elsif ($ext eq "issuer_alt_name")
     {
-        if ($config->get("$path.copy") )
+        if ($config->get([ @basepath, 'copy' ]) )
         {
             $self->set_extension (NAME     => "issuer_alt_name",
                                   CRITICAL => $critical,
@@ -192,7 +191,7 @@ sub load_extension
     elsif ($ext eq "crl_distribution_points")
     {
 
-        my @uri = $config->get_scalar_as_list("$path.uri");
+        my @uri = $config->get_scalar_as_list([ @basepath, 'uri' ]);
         # Parse using Template Toolkit
         @values = @{ $self->process_templates(\@uri) };
 
@@ -207,7 +206,7 @@ sub load_extension
     {
         foreach my $bit (qw(ca_issuers ocsp)) {
 
-            my @template_list = $config->get_scalar_as_list("$path.$bit");
+            my @template_list = $config->get_scalar_as_list([ @basepath, $bit ]);
             # Parse using Template Toolkit and push result
             if (scalar @template_list) {
                 push @values, [uc($bit), $self->process_templates( \@template_list ) ];
@@ -224,7 +223,6 @@ sub load_extension
     elsif ($ext eq "policy_identifier")
     {
         # OIDs only
-        my @basepath = split /\./, $path;
         my @oids = $config->get_scalar_as_list([ @basepath , 'oid' ]);
         ##! 16: 'short oids ' . Dumper \@oids
         foreach my $oid (@oids) {
@@ -275,9 +273,7 @@ sub load_extension
     elsif ($ext eq "oid")
     {
 
-        my @oids = $config->get_keys("$path");
-
-        my  @basepath = split /\./, $path;
+        my @oids = $config->get_keys(\@basepath);        
         foreach my $name (@oids) {
 
             my $attr = $config->get_hash( [ @basepath, $name ] );
@@ -321,7 +317,7 @@ sub load_extension
     }
     elsif ($ext eq "netscape.comment")
     {
-        my $comment = $config->get("$path.text");
+        my $comment = $config->get([ @basepath , 'text' ]);
         if ($comment)
         {
             $self->set_extension (NAME     => "netscape.comment",
@@ -335,7 +331,7 @@ sub load_extension
                      "ssl_client_ca", "smime_client_ca", "object_signing_ca", "ssl_server", "reserved" );
 
         foreach my $bit (@bits) {
-            push @values, $bit if ( $config->get("$path.$bit") );
+            push @values, $bit if ( $config->get([ @basepath , $bit ]) );
         }
 
         if (scalar @values) {
@@ -348,14 +344,14 @@ sub load_extension
     elsif ($ext eq "netscape.cdp")
     {
 
-        my $cdp = $config->get("$path.uri");
+        my $cdp = $config->get([ @basepath , 'uri' ]);
         if ($cdp) {
             $self->set_extension (NAME     => "netscape.cdp",
                   CRITICAL => $critical,
                   VALUES   => [$cdp]);
         }
 
-        my $ca_cdp = $config->get("$path.ca_uri");
+        my $ca_cdp = $config->get([ @basepath , 'ca_uri' ]);
         if ($ca_cdp) {
             $self->set_extension (NAME     => "netscape.ca_cdp",
                               CRITICAL => $critical,
@@ -366,7 +362,8 @@ sub load_extension
     {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_LOAD_EXTENSION_UNKNOWN_NAME",
-            params  => {NAME => $ext, PATH => $path});
+            params  => {NAME => $ext, PATH =>  join(".", @basepath) }
+        );
     }
 
     return 1;
@@ -650,18 +647,16 @@ sub process_templates {
         );
     }
 
-    my $default_token = CTX('crypto_layer')->get_system_token({ TYPE => "DEFAULT" });
-
     my $x509 = OpenXPKI::Crypt::X509->new( $ca_cert );
 
     # Get Issuer Info from selected ca
     my $issuer_info = $x509->subject_hash();
     $issuer_info->{DN} = $x509->get_subject();
 
-   # Split alias into generation and group name
-   $self->{CA} =~ /^(.*)-(\d+)$/;
-   my $group = $1;
-   my $generation = $2;
+    # Split alias into generation and group name
+    $self->{CA} =~ /^(.*)-(\d+)$/;
+    my $group = $1;
+    my $generation = $2;
 
     my %template_vars = (
         'ISSUER' => $issuer_info,

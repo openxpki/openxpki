@@ -1,7 +1,3 @@
-# OpenXPKI::Crypto::Profile::CRL.pm
-# Written 2005 by Michael Bell for the OpenXPKI project
-# Copyright (C) 2005-2006 by The OpenXPKI Project
-
 =head1 Name
 
 OpenXPKI::Crypto::Profile::CRL - cryptographic profile for CRLs.
@@ -26,15 +22,28 @@ use Data::Dumper;
 #use Smart::Comments;
 
 
-=head2 new ( { CA, [VALIDITY, CA_VALIDITY, CACERTIFICATE] } )
+=head2 new ( { CA, [ID, VALIDITY, CA_VALIDITY, CACERTIFICATE] } )
 
-Create a new profile instance.
+Create a new profile instance. Profile definitions are loaded from
+the config layer. The profile name can be given explicit via <ID>,
+in this case the node I<crl.<profile>> must exist.
+
+If no profile is given, the config layer is checked for a profile
+matching the name of the ca alias name. If no such profile is found,
+all values are loaded from I<crl.default>.
+
+A profile must define validity and digest, extension values are inherited 
+from the default profile in case they are not set in the special profile.
 
 =over
 
 =item CA
 
 The alias of the ca token to be used (from the alias table)
+
+=item ID
+
+The name of the profile (as given in realm.crl)
 
 =item VALIDITY
 
@@ -67,15 +76,15 @@ sub new {
     bless $self, $class;
 
     my $keys = { @_ };
-    $self->{CA}        = $keys->{CA}        if ($keys->{CA});
+    
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_NEW_MISSING_CA"
+    ) if (not $keys->{CA});
+    
+    $self->{CA} = $keys->{CA};    
+    $self->{ID} = $keys->{ID} if ($keys->{ID});
     $self->{VALIDITY} =  $keys->{VALIDITY} if ($keys->{VALIDITY});
     $self->{CA_VALIDITY} =  $keys->{CA_VALIDITY} if ($keys->{CA_VALIDITY});
-
-    if (not $self->{CA})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_PROFILE_CRL_NEW_MISSING_CA");
-    }
 
     ##! 2: "parameters ok"
 
@@ -96,33 +105,36 @@ sub __load_profile
 {
     my $self = shift;
 
-    my $config = CTX('config');
-
-    my $ca_profile_name = $self->{CA};
+    my $config = CTX('config');  
     my $pki_realm = CTX('session')->data->pki_realm;
-
-    my $path;
+    my @basepath = ("crl");    
     my $validity;
 
-    # Check if there is a named profile, otherwise use default
-    if (!$config->exists("crl.$ca_profile_name")) {
-        $ca_profile_name = 'default';
+    if ($self->{ID}) {
+        OpenXPKI::Exception->throw (
+            message => "Given CRL Profile not defined",
+        ) if (not $config->exists(['crl', $self->{ID} ]));
+
+        push @basepath, $self->{ID};
+    } elsif ($config->exists(['crl', $self->{CA} ])) {
+        push @basepath, $self->{CA};
+    } else {
+        push @basepath, 'default';
     }
 
-    $path = "crl." . $ca_profile_name;
-
-    ##! 16: "Using config at $path";
-
-    $self->{PROFILE}->{DIGEST} = $config->get("$path.digest");
+    ##! 16: 'Using config at ' . $basepath[1];
+    $self->{PROFILE}->{DIGEST} = $config->get([ @basepath, 'digest' ]);
 
     # use local setting for validity
     if ($self->{VALIDITY}) {
         ##! 16: "Override validity: " . $self->{VALIDITY}
         $validity = $self->{VALIDITY};
     } else {
+        my $nextupdate = $config->get([ @basepath, 'validity', 'nextupdate' ]);
+        ##! 16: 'Validity from profile ' . $nextupdate
         $validity = {
             VALIDITYFORMAT => 'relativedate',
-            VALIDITY       => $config->get("$path.validity.nextupdate"),
+            VALIDITY       => $nextupdate,
         };
     }
 
@@ -174,9 +186,9 @@ sub __load_profile
     my $ca_validity;
     $ca_validity = OpenXPKI::DateTime::get_validity($self->{CA_VALIDITY}) if ($self->{CA_VALIDITY});
     if ($ca_validity && $notafter > $ca_validity) {
-         my $last_crl_validity = $config->get("$path.validity.lastcrl");
+         my $last_crl_validity = $config->get([ @basepath, 'validity', 'lastcrl' ]);
          if (!$last_crl_validity) {
-                 CTX('log')->application()->warn('CRL for CA ' . $self->{CA}. ' in realm ' . $pki_realm . ' will be end of life before next update is scheduled!');
+            CTX('log')->application()->warn('CRL for CA ' . $self->{CA}. ' in realm ' . $pki_realm . ' will be end of life before next update is scheduled!');
          } else {
             $notafter = OpenXPKI::DateTime::get_validity({
                 VALIDITYFORMAT => 'detect',
@@ -191,12 +203,12 @@ sub __load_profile
         }
     }
 
-
     # TODO - implement crl_number (but not here ...)
     # possibly:
     # RFC 3280, 5.2.5 - issuing_distributing_point (if someone really
     # needs it ...)
-    foreach my $ext (qw( authority_info_access authority_key_identifier issuer_alt_name )) {
+    my $path = join(".", @basepath);
+    foreach my $ext (qw( authority_info_access authority_key_identifier issuer_alt_name oid)) {
         ##! 16: 'load extension ' . $ext
         $self->load_extension({
             PATH => $path,
@@ -227,16 +239,7 @@ sub get_digest
     return $self->{PROFILE}->{DIGEST};
 }
 
-
-# FIXME: this is not really needed, in fact it can damage the initial
-# validity computation
-# sub set_days
-# {
-#     my $self = shift;
-#     $self->{PROFILE}->{DAYS} = shift;
-#     return 1;
-# }
-
 1;
+
 __END__
 

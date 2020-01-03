@@ -110,7 +110,7 @@ sub __load_profile
 
     my $profile_name = $self->{ID};
 
-    if (!$config->exists("profile.$profile_name")) {
+    if (!$config->exists(['profile', $profile_name])) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_LOAD_PROFILE_UNDEFINED_PROFILE");
     }
@@ -124,11 +124,11 @@ sub __load_profile
 
     ## check if those are overriden in config
     foreach my $key (keys %{$self->{PROFILE}} ) {
-        my $value = $config->get("profile.$profile_name.".lc($key));
+        my $value = $config->get(['profile', $profile_name, lc($key)]);
 
         # Test for realm default
         if (!defined $value) {
-            $value = $config->get("profile.default.".lc($key));
+            $value = $config->get(['profile', 'default', lc($key)]);
         }
 
         if (defined $value) {
@@ -140,12 +140,12 @@ sub __load_profile
     ###########################################################################
     # determine certificate validity
 
-    my $validity_path = "profile.$profile_name.validity";
-    if (!$config->exists($validity_path)) {
-        $validity_path = "profile.default.validity";
+    my @validity_path = ('profile', $profile_name, 'validity');
+    if (!$config->exists(\@validity_path)) {
+        $validity_path[1] = 'default';
     }
 
-    my $notbefore = $config->get("$validity_path.notbefore");
+    my $notbefore = $config->get([ @validity_path, 'notbefore' ]);
     if ($notbefore) {
         $self->{PROFILE}->{NOTBEFORE} = OpenXPKI::DateTime::get_validity({
             VALIDITYFORMAT => 'detect',
@@ -155,10 +155,10 @@ sub __load_profile
         $self->{PROFILE}->{NOTBEFORE} = DateTime->now( time_zone => 'UTC' );
     }
 
-    my $notafter = $config->get("$validity_path.notafter");
+    my $notafter = $config->get([ @validity_path, 'notafter' ]);
     if (! $notafter) {
-    OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_LOAD_PROFILE_VALIDITY_NOTAFTER_NOT_DEFINED",
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_LOAD_PROFILE_VALIDITY_NOTAFTER_NOT_DEFINED",
         );
     }
 
@@ -191,11 +191,8 @@ sub __load_profile
         });
     }
 
-    # check for the copy_extension flag
-    my $copy = $config->get("profile.$profile_name.extensions.copy");
-    if (!$copy) {
-        $config->get("profile.default.extensions.copy");
-    }
+    # check for the copy_extension flag - only explicit
+    my $copy = $config->get(['profile', $profile_name, 'extensions', 'copy']);
     $copy = 'none' unless ($copy);
     $self->set_copy_extensions( $copy );
 
@@ -214,7 +211,7 @@ sub set_copy_extensions
 {
     my $self = shift;
     my $copy = shift;
-    if ($copy !~ /(none|copy|copyall)/) {
+    if ($copy !~ /\A(none|copy|copyall)\z/) {
         OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_CRYPTO_PROFILE_CERTIFICATE_COPY_EXTENSION_INVALID_VALUE",
             params => { VALUE => $copy }
