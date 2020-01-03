@@ -33,6 +33,8 @@ $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "IO::Socket::SSL";
 my $ssl_opts = {
     verify_hostname => 0,
     SSL_ca_file => 'tmp/chain.pem',
+    SSL_key_file => 'tmp/pkiclient.key',
+    SSL_cert_file => 'tmp/pkiclient.crt',    
 };
 $ua->ssl_opts( %{$ssl_opts} );
 
@@ -65,7 +67,7 @@ ok($length);
 is($length, length($body));
 like($body, "/^MCYGBysGAQEBARYGCSqGSIb3DQEJAQYFK4EEACIGCWCGSAFlAwQCAg==\\s*/");
 
-my $pkcs10 = `openssl req -new -subj "/CN=est-test.openxpki.org" -nodes -newkey rsa:1024 -keyout tmp/estcert.key -outform der | openssl base64 -e 2>/dev/null`;
+my $pkcs10 = `openssl req -new -subj "/CN=est-test.openxpki.org" -nodes -newkey rsa:2048 -keyout tmp/estcert.key -outform der | openssl base64 -e 2>/dev/null`;
 
 $response = $ua->post("https://$host/.well-known/est/simpleenroll",
     Content_Type => 'application/pkcs10', Content => $pkcs10 );
