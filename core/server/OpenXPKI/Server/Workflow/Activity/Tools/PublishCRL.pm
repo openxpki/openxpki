@@ -34,7 +34,7 @@ sub execute {
     }
 
     my $default_token = CTX('api2')->get_default_token();
-    my $prefix = $self->param('prefix');
+    my $prefix = $self->param('prefix') || '';
     my $ca_alias = $context->param('ca_alias');
     my $crl_serial = $context->param('crl_serial');
     $crl_serial = $self->param('crl_serial') unless($crl_serial);
@@ -148,11 +148,25 @@ sub execute {
             $queue  = OpenXPKI::Serialization::Simple->new()->deserialize( $queue );
         }
         @target = @{$queue};
+
+    } elsif (!$prefix) {
+
+        my $profile = $crl->{profile} || 'default';
+
+        # CRL has profile - read publication from there
+        @target = $config->get_scalar_as_list( [ 'crl', $profile, 'publish' ] );
+        @prefix = ('publishing', 'crl');
+                
     } else {
+
         ##! 16: 'Load all targets'
         @target = $config->get_keys( \@prefix );
+
     }
 
+    # If the data point does not exist, we get a one item undef array
+    return unless (@target && $target[0]);
+        
     my $on_error = $self->param('on_error') || '';
     my @failed;
     ##! 32: 'Targets ' . Dumper \@target
@@ -219,15 +233,34 @@ This activity publishes a single crl. The context must hold the crl_serial
 and the ca_alias parameters. I<crl_serial> can have the value "latest" which
 will resolve to the crl with the highest last_update date for the issuer.
 
-The data point you specify at prefix must contain a list of connectors.
-Each connector is called with the CN of the issuing ca as location.
+The list of targets can be defined by profile or globally. In either case
+each connector is called with the CN of the issuing ca as location.
 The data portion contains a hash ref with the keys I<pem>, I<der>
 and I<subject> (issuer subject) holding the appropriate strings and
 I<issuer> which is the issuer subject parsed into a hash as used in the
 template processing when issuing the certificates.
-
+  
 There are severeal options to handle errors when the connectors fail,
 details are given below (see I<on_error> parameter).
+
+=head2 Publication by Profile
+
+The publishing information is read from the connector at crl.<profile>.publish
+which must be a list of names (scalar is also ok). If the CRL to publish has
+no profile set (which is the default), crl.default.publish is used. Each 
+name is expanded to the path publishing.crl.<name> which must be a  
+connector reference. 
+
+B<Note>: Contrary to certificate publication I<crl.default.publish> is only
+used if the crl has no profile but it is not used as a global fallback if
+there is no publication defined for the profile!
+
+=head2 Publication without Profile
+
+Instead of reading the publication targets from the profile you can point
+the activity directly to a list of connectors setting I<prefix> to the base
+path of a hash. Each key is the internal name of the target, the value must
+be a connector reference.  
 
 =head1 Configuration
 
@@ -274,6 +307,10 @@ to be set.
 The serial of the crl to publish or the keyword "latest" which pulls the
 CRL with the latest last_update date for the given issuer. Only effective
 if B<NOT> set in the context.
+
+B<Note>: latest and prefix based publication might cause unexpected 
+behaviour when used with CRL profiles as latest does not filter on the 
+profile!
 
 =item empty_ok
 

@@ -42,6 +42,7 @@ Returns a I<HashRef> with the CRL informations inserted into the database, e.g.:
 
     {
         crl_key => '6655',
+        profile => undef, 
         issuer_identifier => 'RE35XR3XIBXiIbAu8P5aGMCmH7o',
         last_update => 1521556123,
         next_update => 3098356123,
@@ -57,7 +58,10 @@ B<Parameters>
 
 =item * C<data> I<Str> - PEM formated CRL. Required.
 
+=item * C<profile> I<Str> - sets the profile field for the CRL, optional.
+
 =item * C<skip_duplicate> I<Bool>
+
 =back
 
 B<Changes compared to API v1:>
@@ -67,6 +71,7 @@ The previously unused parameter C<ISSUER> was removed.
 =cut
 command "import_crl" => {
     data   => { isa => 'PEM', required => 1, },
+    profile  => { isa => 'Ident' },
     skip_duplicate => { isa => 'Bool', default=> 0, },
 } => sub {
     my ($self, $params) = @_;
@@ -118,6 +123,10 @@ command "import_crl" => {
         items             => $crl->itemcnt(),
         data              => $crl->pem(),
     };
+
+    if ( $params->profile ) {
+        $data->{profile} = $params->profile;
+    }
 
     my $where_duplicate = {
         pki_realm         => $pki_realm,

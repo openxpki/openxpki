@@ -69,7 +69,7 @@ command "import_certificate" => {
     revoked        => { isa => 'Bool|HashRef', default => 0, },
     update         => { isa => 'Bool', default => 0, },
     attributes     => { isa => 'HashRef'},
-    profile        => { isa => 'Str'},
+    profile        => { isa => 'Ident'},
 } => sub {
     my ($self, $params) = @_;
 

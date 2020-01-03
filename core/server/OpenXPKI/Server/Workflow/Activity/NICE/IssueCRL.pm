@@ -87,21 +87,15 @@ See OpenXPKI::Server::NICE::issueCRL for details
 
 =head2 Input
 
+All parameters except ca_alias, are mapped to the backend as is. Please
+check the documentation of the used backend for available parameters. 
+
 =over
 
-=item crl_validity - DateTime Spec for CRL Validity, optional
+=item ca_alias (optional)
 
-=item delta_crl (bool) - Issue a delta CRL (Not supported in NICE::Local!)
-
-=item reason_code
-
-List of reason codes to be included in the CRL (CRL Scope), default is to
-include all reason codes.
-
-=item remove_expired
-
-Boolean, if set, only certifcates with a notafter greater than now are
-included in the CRL, by default the CRL also lists expired certificates.
+the ca alias to genrate the CRL for, if not given the context value for
+I<ca_alias> is used.
 
 =back
 

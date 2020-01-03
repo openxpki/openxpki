@@ -54,6 +54,10 @@ Possible values for format are:
 Get only the CRLs for the provided issuer. If not set CRLs for all issuers
 in the current realm are returned.
 
+=item * C<profile>
+
+CRL profile, only used when crl_serial is not set.  
+
 =item * C<limit>
 
 =item * C<pki_realm>
@@ -78,15 +82,16 @@ I<valid_at> was replaced by the more detailed time filters.
 =cut
 
 command "get_crl_list" => {
-    format     => { isa => 'AlphaPunct', matching => qr{ \A ( PEM | DER | DBINFO ) \Z }x, default => "DBINFO" },
-    pki_realm  => { isa => 'AlphaPunct', },
-    valid_after              => {isa => 'Int', },
-    valid_before             => {isa => 'Int', },
-    expires_after            => {isa => 'Int', },
-    expires_before           => {isa => 'Int', },
-#    issuer_dn                => {isa => 'Value' },
-    issuer_identifier        => {isa => 'Value',},
-    limit                    => {isa => 'Int', default => 25 },
+    format              => { isa => 'AlphaPunct', matching => qr{ \A ( PEM | DER | DBINFO ) \Z }x, default => "DBINFO" },
+    pki_realm           => { isa => 'AlphaPunct', },
+    valid_after         => {isa => 'Int', },
+    valid_before        => {isa => 'Int', },
+    expires_after       => {isa => 'Int', },
+    expires_before      => {isa => 'Int', },
+#    issuer_dn          => {isa => 'Value' },
+    issuer_identifier   => {isa => 'Value',},
+    profile             => { isa => 'Ident' },    
+    limit               => {isa => 'Int', default => 25 },
 } => sub {
 
     my ($self, $params) = @_;
@@ -99,7 +104,9 @@ command "get_crl_list" => {
 
     $pki_realm =  CTX('session')->data->pki_realm unless $pki_realm;
 
-    my $where = {};
+    my $where = {
+        profile => $params->profile ? $params->profile : undef,                        
+    };
     if ($params->has_valid_before && $params->has_valid_after) {
         $where->{'last_update'} = { -between => [ $params->valid_after, $params->valid_before ] };
     } elsif ($params->has_valid_before) {

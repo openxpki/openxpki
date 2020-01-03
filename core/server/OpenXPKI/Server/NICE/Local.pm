@@ -341,11 +341,16 @@ sub issueCRL {
     my $ca_alias = shift;
     my $param = shift || {};
 
+    ##! 8: "ca_alias $ca_alias"
+    ##! 64: 'Params ' . Dumper $param
+
     my $pki_realm = CTX('session')->data->pki_realm;
     my $dbi = CTX('dbi');
 
     my $crl_validity = $param->{validity};
     my $delta_crl = $param->{validity};
+
+    my $profile = $param->{crl_profile}; 
 
     my $remove_expired = $param->{remove_expired};
     my $reason_code = $param->{reason_code};
@@ -365,6 +370,7 @@ sub issueCRL {
     # Build Profile (from ..Workflow::Activity::CRLIssuance::GetCRLProfile)
     my $crl_profile = OpenXPKI::Crypto::Profile::CRL->new(
         CA  => $ca_alias,
+        ID => $profile,
         $crl_validity
          ? (VALIDITY => { VALIDITYFORMAT => 'relativedate', VALIDITY => $crl_validity }) : (),
         # We need the validity to check for the necessity of a "End of Life" CRL
@@ -465,6 +471,11 @@ sub issueCRL {
         publication_date  => 0,
         data              => $crl_obj->pem(),
     };
+    
+    if ($profile) {
+        $data->{profile} = $profile;
+    }
+    
     $dbi->insert( into => 'crl', values => $data );
 
     return { crl_serial => $serial };
@@ -671,6 +682,10 @@ The first parameter must be the ca-alias, the second parameter is as hash
 with options:
 
 =over
+
+=item crl_profile (optional)
+
+the profile definition to use 
 
 =item crl_validity
 

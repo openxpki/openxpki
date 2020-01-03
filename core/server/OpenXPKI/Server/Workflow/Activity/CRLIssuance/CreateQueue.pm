@@ -67,7 +67,7 @@ sub execute {
         $ca_identifier{$entry->{issuer_identifier}} = 1;
     }
 
-    my $default_renew = $config->get("crl.default.validity.renewal");
+    my $default_renew = $config->get(['crl','default','validity','renewal']);
     if (!$default_renew || !OpenXPKI::DateTime::is_relative($default_renew)) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_CRLISSUANCE_CREATEQUEUE_RENEWAL_NOT_GIVEN_OR_NOT_RELATIVE",
@@ -77,12 +77,10 @@ sub execute {
 
     # We trick a bit here - we set now + renewal and compare that against nextupdate
     # (its the same as nextupdate - renew > now )
-    my $default_renewal = OpenXPKI::DateTime::get_validity(
-        {
+    my $default_renewal = OpenXPKI::DateTime::get_validity({
         VALIDITY => $default_renew,
         VALIDITYFORMAT => 'relativedate',
-        },
-    );
+    });
 
     # Check latest crl for each issuer
     foreach my $ca (@{$active_ca_token}) {
@@ -96,7 +94,7 @@ sub execute {
 
         my $renewal;
         # Check if there is a named profile
-        my $profile_renewal = $config->get("crl.".$ca->{alias}.".validity.renewal");
+        my $profile_renewal = $config->get(['crl',$ca->{alias},'validity','renewal']);
         if ($profile_renewal) {
             $renewal = OpenXPKI::DateTime::get_validity({
                 VALIDITY => $profile_renewal,
@@ -111,6 +109,7 @@ sub execute {
             columns => [ 'issuer_identifier', 'next_update' ],
             where => {
                 pki_realm => $pki_realm,
+                profile => undef,
                 issuer_identifier => $ca->{identifier},
                 next_update => { '>' => $renewal->epoch() },
             },
@@ -144,7 +143,7 @@ Iterate over all CAs in the current realm and check if they need to issue a
 new CRL. A list of the ca token alias names is written to the context as
 I<ca_alias_list>. A ca is added to the list if there are certificates in
 status CRL_ISSUANCE_PENDING or if the validty date of the latest crl is in
-the configured renewal interval (I<realm.crl.validity.renewal>).
+the configured renewal interval (I<realm.crl.default.validity.renewal>).
 
 If the I<force_issue> flag is present in the context, each ca which is
 currently valid, will issue a new crl.

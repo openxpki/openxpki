@@ -43,6 +43,11 @@ the serial (crl_key) of the database table
 certificate identifier of the issuer, if set the latest crl of this
 issuer is returned.
 
+=item profile
+
+CRL profile. For security reasons you must set this also when requesting a 
+non-default CRL by its serial number!
+
 =item format
 
 =over
@@ -75,6 +80,7 @@ lowercase keys. Additionally the following keys changed:
 
 command "get_crl" => {
     crl_serial => { isa => 'Int', },
+    profile  => { isa => 'Ident' },
     format     => { isa => 'AlphaPunct', matching => qr{ \A ( PEM | DER | TXT | HASH | FULLHASH | DBINFO ) \Z }x, default => "PEM" },
     pki_realm  => { isa => 'AlphaPunct', },
     issuer_identifier => { isa => 'Value', },
@@ -93,20 +99,29 @@ command "get_crl" => {
 
     my $db_results;
 
-    my $columns = ($format eq 'DBINFO') ?
-        [ 'pki_realm', 'last_update', 'next_update', 'crl_key', 'publication_date', 'issuer_identifier', 'items', 'crl_number' ] :
-        [ 'pki_realm', 'data', 'crl_key' ];
+    my @columns = ($format eq 'DBINFO') ?
+        ( 'pki_realm', 'last_update', 'next_update', 'crl_key', 'publication_date', 'issuer_identifier', 'items', 'crl_number' ) :
+        ( 'pki_realm', 'data', 'crl_key' );
 
 
     if ($crl_key) {
         ##! 16: 'Load crl by db serial ' . $crl_key
         $db_results = CTX('dbi')->select_one(
             from => 'crl',
-            columns => $columns,
+            columns => [ @columns, 'profile' ],
             where => {
-                'crl_key' => $crl_key,
+                crl_key => $crl_key,                
             },
         );
+        
+        my $profile = $params->profile || '';
+        my $crl_profile = $db_results->{profile} || '';
+        if ($crl_profile ne $profile) {
+            OpenXPKI::Exception->throw(
+                message => 'CRLs profile does not match requested profile',
+                params => { crl_profile => $crl_profile, requested => $profile } 
+            );
+        }
 
     } else {
 
@@ -119,9 +134,10 @@ command "get_crl" => {
 
         $db_results = CTX('dbi')->select_one(
             from => 'crl',
-            columns => $columns,
+            columns => \@columns,
             where => {
-                issuer_identifier => $issuer_identifier
+                issuer_identifier => $issuer_identifier,
+                profile => $params->profile ? $params->profile : undef,                
             },
             order_by => '-last_update'
         );
