@@ -32,7 +32,7 @@ sub send_output {
     my ($cgi, $result, $canonical_keys) = @_;
 
     my $status = '200 OK';
-
+    my %retry_head;
     if (defined $result->{error}) {
         if ($result->{error}->{message} && $result->{error}->{message} =~ m{I18N_OPENXPKI_UI}) {
             $result->{error}->{message} = i18nGettext($result->{error}->{message});
@@ -41,22 +41,25 @@ sub send_output {
             my ($error) = split(/[:\n]/, $result->{error}->{message});
             $status = sprintf ("%03d %s", ($result->{error}->{code}/100), $error);
         }
+    } elsif ($use_status_codes && $result->{result}->{retry_after}) {
+        $status = '202 Request Pending - Retry Later';
+        %retry_head = ("-retry-after" => $result->{result}->{retry_after} );
     }
 
     if ($ENV{'HTTP_ACCEPT'} && $ENV{'HTTP_ACCEPT'} eq 'text/plain') {
-       print $cgi->header( -type => 'text/plain', charset => 'utf8', -status => $status );
+       print $cgi->header( -type => 'text/plain', charset => 'utf8', -status => $status, %retry_head );
        if ($result->{error}) {
            print 'error.code=' . $result->{error}->{code}."\n";
            print 'error.message=' . $result->{error}->{message}."\n";
        } else {
            print 'id=' . $result->{result}->{id}."\n";
            print 'state=' . $result->{result}->{state}."\n";
+           print 'retry_after=' . $result->{result}->{retry_after} ."\n" if ($result->{result}->{retry_after});
            map { printf "data.%s=%s\n", $_, $result->{result}->{data}->{$_} } keys %{$result->{result}->{data}} if ($result->{result}->{data});
        }
 
     } else {
-        # prepare response header
-        print $cgi->header( -type => 'application/json', charset => 'utf8', -status => $status );
+        print $cgi->header( -type => 'application/json', charset => 'utf8', -status => $status, %retry_head );
         $json->max_depth(20);
         $json->canonical( $canonical_keys ? 1 : 0 );
         print $json->encode( $result );
@@ -104,12 +107,20 @@ while (my $cgi = CGI::Fast->new()) {
         if ($content_type =~ m{\Aapplication/pkcs7}) {
             $input_method = 'PKCS7';
             $pkcs7 = $raw;
-            $pkcs7_content = $rpc->backend()->run_command('unwrap_pkcs7_signed_data', {
-               pkcs7 => $pkcs7,
-            });
-            $raw = $pkcs7_content->{value};
-            $log->trace("PKCS7 content: " . Dumper  $pkcs7_content) if ($log->is_trace());
-
+            eval {
+                $client = $rpc->backend();
+                $pkcs7_content = $client->run_command('unwrap_pkcs7_signed_data', {
+                   pkcs7 => $pkcs7,
+                });
+                $raw = $pkcs7_content->{value};
+                $log->trace("PKCS7 content: " . Dumper  $pkcs7_content) if ($log->is_trace());
+            };
+            if ($EVAL_ERROR || !$raw) {
+                send_output( $cgi,  { error => { code => 50001, message => $EVAL_ERROR, data => { pid => $$ } } } );
+                $client->disconnect() if ($client);
+                next;
+            }
+        
         } elsif ($content_type =~ m{\Aapplication/json}) {
             $input_method = 'JSON';
 
@@ -277,7 +288,7 @@ while (my $cgi = CGI::Fast->new()) {
     eval {
 
         # create the client object
-        $client = $rpc->backend() or next;
+        $client = $rpc->backend() or die "Unable to create client";
 
         # check for pickup parameter
         if (my $pickup_key = $conf->{$method}->{pickup}) {
@@ -310,6 +321,9 @@ while (my $cgi = CGI::Fast->new()) {
     if ( my $exc = OpenXPKI::Exception->caught() ) {
         $log->error("Unable to instantiate workflow: ". $exc->message );
         $res = { error => { code => 50002, message => $exc->message, data => { pid => $$ } } };
+    }
+    elsif (!$client) {
+        $res = { error => { code => 50001, message => $EVAL_ERROR, data => { pid => $$ } } };
     }
     elsif (my $eval_err = $EVAL_ERROR) {
 
@@ -349,6 +363,18 @@ while (my $cgi = CGI::Fast->new()) {
         $log->info(sprintf("RPC request was processed properly (Workflow: %01d, State: %s (%s)",
             $workflow->{id}, $workflow->{state}, $workflow->{'proc_state'}) );
         $res = { result => { id => $workflow->{id}, 'state' => $workflow->{'state'}, 'proc_state' => $workflow->{'proc_state'}, pid => $$ }};
+
+        # if pickup is set and workflow is not in a final state we send a 202
+        if ($conf->{$method}->{pickup}) {
+            if ($workflow->{'proc_state'} eq 'pause') {
+                my $delay = $workflow->{'wake_up_at'} - time();
+                $res->{result}->{retry_after} = ($delay > 30) ? $delay : 30;
+                $log->debug("Need retry - workflow is paused - delay $delay");
+            } elsif ($workflow->{'proc_state'} ne 'finished') {
+                $res->{result}->{retry_after} = 300;
+                $log->debug("Need retry - workflow is " . $workflow->{'proc_state'});
+            }
+        }
 
         # Map context parameters to the response if requested
         if ($conf->{$method}->{output}) {
