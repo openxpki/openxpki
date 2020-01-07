@@ -1,5 +1,5 @@
 
-=head1
+=head1 OpenXPKI::Client::Simple
 
 An easy to use class to connect to the openxpki daemon and run commands
 Designed as a kind of CLI interface for inline use within scripts. By

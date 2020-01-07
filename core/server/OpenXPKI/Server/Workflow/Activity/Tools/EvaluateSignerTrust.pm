@@ -37,6 +37,41 @@ sub execute {
 
     my $x509 = OpenXPKI::Crypt::X509->new( $signer_cert );
 
+    my $signer_identifier = $x509->get_cert_identifier();
+    ##! 32: 'Signer identifier ' .$signer_identifier
+
+    # Get realm and issuer for signer certificate
+    my $cert_hash = CTX('dbi')->select_one(
+        from    => 'certificate',
+        columns => ['pki_realm', 'issuer_identifier', 'req_key', 'status' ],
+        where   => { identifier => $signer_identifier },
+    );
+
+    if (not $cert_hash && $x509->is_selfsigned() && $self->param('allow_surrogate_certificate')) {
+        my $db_results = CTX('dbi')->select(
+            from    => 'certificate',
+            columns => ['pki_realm', 'identifier', 'issuer_identifier', 'req_key', 'status', 'data' ],
+            where   => {
+                subject_key_identifier => $x509->get_subject_key_id(),
+                req_key => { "!=" => undef }
+            },
+            limit => 2,
+        )->fetchall_arrayref({});
+
+        if ($db_results && scalar @{$db_results}) {
+            if (scalar @{$db_results} > 1) {
+                CTX('log')->application()->warn("Use of surrogate requested but result is not unique!");
+            } else {
+                $cert_hash = $db_results->[0];
+                $signer_identifier = $cert_hash->{identifier};
+                ##! 32: 'Got surrogate ' . $signer_identifier
+            }
+        }
+
+        $x509 = OpenXPKI::Crypt::X509->new( $cert_hash->{data} );
+
+    }
+
     # Check if the certificate is valid
     my $now = DateTime->now();
     my $notbefore = $x509->get_notbefore();
@@ -49,20 +84,11 @@ sub execute {
     }
 
     # Check the chain
-    my $signer_identifier = $x509->get_cert_identifier();
-    ##! 32: 'Signer identifier ' .$signer_identifier
-
     # set from either db query or from chain validation
     my ($signer_issuer, $signer_req_key, $signer_root, $signer_revoked, @signer_chain);
     my $signer_realm = 'unknown';
     my $signer_profile = 'unknown';
 
-    # Get realm and issuer for signer certificate
-    my $cert_hash = CTX('dbi')->select_one(
-        from    => 'certificate',
-        columns => ['pki_realm', 'issuer_identifier', 'req_key', 'status' ],
-        where   => { identifier => $signer_identifier },
-    );
 
     if ($cert_hash) {
         ##! 16: 'certificate found in database'
@@ -413,5 +439,11 @@ Boolean, if set the signer_subject_key_identifier is exported to the context.
 Boolean, if set and the signer is not found in the local database the activity
 tries to verify the certificate chain using the validate_certificate API
 method.
+
+=item allow_surrogate_certificate
+
+Boolean, if set and the signer is not found in the local database B<and> is
+self-signed the database is searched for an entity certificate with the same
+subject key id. This is used e.g. in the PoP renewal via EST/RPC.
 
 =back
