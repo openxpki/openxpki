@@ -38,6 +38,7 @@ sub new {
                         ENGINE_USAGE
                         KEY_STORE
                         TMP
+			WRAPPER
                        }) {
 
     if (exists $keys->{$key}) {
@@ -260,7 +261,11 @@ sub get_keyform
 
 sub get_wrapper
 {
-    return "";
+    my $self = shift;
+    if (defined $self->{WRAPPER}){
+        return $self->{WRAPPER};
+    }
+    return '';
 }
 
 sub get_engine_params
