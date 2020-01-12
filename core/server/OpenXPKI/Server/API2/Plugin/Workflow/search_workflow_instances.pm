@@ -84,6 +84,10 @@ state, accepts the same syntax as I<state>.
 
 Legacy: I<ArrayRef> - attribute values (legacy search syntax)
 
+=item * C<last_update_after> I<Int> - filter workflows by last_update, only worflows young enough are returned
+
+=item * C<last_update_before> I<Int> - filter workflows by last_update, only worflows old enough are returned
+
 =item * C<limit> I<Int> - limit results
 
 =item * C<start> I<Int> - offset results by this (allows for paging)
@@ -106,6 +110,8 @@ command "search_workflow_instances" => {
     state      => { isa => 'ArrayRef|HashRef|StateName' },
     proc_state => { isa => 'ArrayRef|HashRef|StateName', },
     attribute  => { isa => 'ArrayRef|HashRef', default => sub { {} } },
+    last_update_after  => {isa=> 'Str', required=>0 },
+    last_update_before => {isa=>'Str', required=>0 },
     start      => { isa => 'Int', },
     limit      => { isa => 'Int', },
     order      => { isa => 'Str', },
@@ -148,6 +154,8 @@ command "search_workflow_instances_count" => {
     proc_state => { isa => 'ArrayRef|HashRef|StateName', },
     check_acl  => { isa => 'Bool', default => 0 },
     # these are ignored, but included to be compatible to "search_workflow_instances":
+    last_update_after  => {isa=> 'Str', required=>0},
+    last_update_before => {isa=>'Str', required=>0},
     attribute  => { isa => 'ArrayRef|HashRef', },
     start      => { isa => 'Int', },
     limit      => { isa => 'Int', },
@@ -242,6 +250,12 @@ sub _make_query_params {
         $where->{workflow_type} = $args->type if $args->has_type;
     }
 
+    if($args->has_last_update_after){
+        $where->{workflow_last_update}={'>',$args->last_update_after};
+    }
+    if($args->has_last_update_before){
+        $where->{workflow_last_update}={'<',$args->last_update_before};
+    }
     #
     # helper to make sure an SQL JOIN is added for each attribute
     #
