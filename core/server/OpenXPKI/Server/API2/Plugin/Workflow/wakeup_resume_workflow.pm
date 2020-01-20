@@ -90,6 +90,10 @@ Resumes a workflow that is in exception state.
 
 For details see similar command L</wakeup_workflow>
 
+Addtional parameter I<force> can be used to resume a workflow from I<running>
+state. Do so only after doublechecking that the workflow is really not running
+on any node of your cluster. YOU HAVE BEEN WARNED!
+
 B<Changes compared to API v1:>
 
 =over
@@ -112,9 +116,10 @@ command "resume_workflow" => {
     id    => { isa => 'Int', required => 1, },
     async => { isa => 'Bool', },
     wait  => { isa => 'Bool', },
+    force => { isa => 'Bool', },
 } => sub {
     my ($self, $params) = @_;
-    return $self->_wakeup_or_resume_workflow(0, $params->id, $params->async, $params->wait);
+    return $self->_wakeup_or_resume_workflow(0, $params->id, $params->async, $params->wait, $params->force);
 };
 
 =head2 _wakeup_or_resume_workflow
@@ -140,7 +145,7 @@ status changes in the background (monitors the database).
 
 =cut
 sub _wakeup_or_resume_workflow {
-    my ($self, $wakeup_mode, $id, $async, $wait) = @_; # mode: resume or wakeup
+    my ($self, $wakeup_mode, $id, $async, $wait, $force) = @_; # mode: resume or wakeup
     my $util = OpenXPKI::Server::API2::Plugin::Workflow::Util->new;
 
     ##! 2: "load workflow"
@@ -163,10 +168,14 @@ sub _wakeup_or_resume_workflow {
     # 'resume' mode
     else {
         if ($proc_state ne 'exception') {
-            OpenXPKI::Exception->throw(
-                message => 'Attempt to resume a workflow that is not in EXCEPTION state',
-                params => { id => $id, proc_state => $proc_state }
-            );
+            if ($force && $proc_state eq 'running') {
+                CTX('log')->system()->warn('Resume workflow from running state');   
+            } else {
+                OpenXPKI::Exception->throw(
+                    message => 'Attempt to resume a workflow that is not in EXCEPTION state',
+                    params => { id => $id, proc_state => $proc_state }
+                );
+            }
         }
     }
 
