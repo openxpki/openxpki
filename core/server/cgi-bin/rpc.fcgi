@@ -31,6 +31,9 @@ my $use_status_codes = 0;
 sub send_output {
     my ($cgi, $result, $canonical_keys) = @_;
 
+
+    $log->trace("Raw result: ". Dumper $result) if ($log->is_trace());
+
     my $status = '200 OK';
     my %retry_head;
     if (defined $result->{error}) {
@@ -314,7 +317,7 @@ while (my $cgi = CGI::Fast->new()) {
             });
         }
 
-        $log->trace( 'Workflow info '  . Dumper $workflow );
+        $log->trace( 'Workflow info '  . Dumper $workflow ) if ($log->is_trace());
     };
 
     my $res;
@@ -382,7 +385,7 @@ while (my $cgi = CGI::Fast->new()) {
             my @keys;
             @keys = split /\s*,\s*/, $conf->{$method}->{output};
             $log->debug("Keys " . join(", ", @keys));
-            $log->trace("Raw context: ". Dumper $workflow->{context});
+            $log->trace("Raw context: ". Dumper $workflow->{context}) if ($log->is_trace());
             foreach my $key (@keys) {
                 my $val = $workflow->{context}->{$key};
                 next unless (defined $val);

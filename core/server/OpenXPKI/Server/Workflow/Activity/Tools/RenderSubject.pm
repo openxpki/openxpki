@@ -65,7 +65,7 @@ sub execute {
     } keys %{$subject_vars};
 
 
-    ##! 16: 'Cleaned subject_vars' . Dumper $subject_vars
+    ##! 16: 'Cleaned subject_vars' . join "", map {  "$_: ".$subject_vars->{$_} } keys %$subject_vars
     CTX('log')->application()->trace("Subject render input vars " . Dumper $subject_vars);
 
     my $cert_subject = CTX('api2')->render_subject_from_template(
@@ -83,6 +83,7 @@ sub execute {
             }
         );
     }
+    ##! 32: 'Subject is ' . $cert_subject
 
     CTX('log')->application()->info("Rendering subject: $cert_subject");
 
