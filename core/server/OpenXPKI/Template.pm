@@ -18,6 +18,9 @@ sub new {
 
     $args->{PLUGIN_BASE} = 'OpenXPKI::Template::Plugin';
 
+    if (!defined $args->{ENCODING}) {
+        $args->{ENCODING} =  'UTF-8';
+    }
     my $self = $class->SUPER::new($args);
 
     return $self;

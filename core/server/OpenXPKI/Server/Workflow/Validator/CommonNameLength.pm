@@ -14,7 +14,6 @@ use English;
 use Template;
 
 use Data::Dumper;
-use Encode;
 
 extends 'OpenXPKI::Server::Workflow::Validator';
 

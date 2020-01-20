@@ -79,10 +79,10 @@ sub get_command
         }
         elsif ($self->{OUT} eq 'TXTPEM')
         {
-            $command .= ' -outform PEM -text -nameopt RFC2253,-esc_msb ';
+            $command .= ' -outform PEM -text -nameopt RFC2253,-esc_msb,utf8 ';
         }
         else {
-            $command .= " -noout -text -nameopt RFC2253,-esc_msb";
+            $command .= " -noout -text -nameopt RFC2253,-esc_msb,utf8 ";
         }
         ##! 8: "command: $command"
         return [ $command ];
@@ -148,11 +148,16 @@ sub get_result
     my $res = '';
     if ($self->{OUT} eq "TXT" || $self->{OUT} eq "TXTPEM") {
         $res = shift;
-        $res .= "\n";
+        # openss 1.0 writes text to stdout, openssl 1.1 does not
+        if ($res eq '1') {
+            $res = "";
+        } else {
+            $res .= "\n";
+        }
     }
 
     if ($self->{OUT} ne "TXT") {
-        $res .= $self->SUPER::get_result();
+        $res .= $self->SUPER::get_result('utf8');
     }
 
     return $res;

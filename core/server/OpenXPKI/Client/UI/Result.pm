@@ -317,7 +317,8 @@ sub param {
 
         my $str = $cgi->param($key);
         $str =~ s/^\s+|\s+$//g if (defined $str);
-        return $str;
+        $self->logger()->trace("Value for $key after trim: $str");
+        return Encode::encode("UTF-8", $str);
 
     }
 

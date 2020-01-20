@@ -7,7 +7,6 @@ package OpenXPKI::Server::Init;
 
 use strict;
 use warnings;
-use utf8;
 
 ## used modules
 

@@ -611,12 +611,12 @@ sub init_detail {
     });
 
     my @fields = ( { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', format => 'link',  value =>
-        { page => 'certificate!search!subject!'.uri_escape($cert->{subject}), label => $cert->{subject},
+        { page => 'certificate!search!subject!'.uri_escape_utf8($cert->{subject}), label => $cert->{subject},
           target => '_top', tooltip => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SUBJECT' }});
 
     if ($cert_attribute && $cert_attribute->{subject_alt_name}) {
         my @sanlist = map {
-            { page => 'certificate!search!san!'.uri_escape($_), label => $_, target => '_top', tooltip => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SAN' }
+            { page => 'certificate!search!san!'.uri_escape_utf8($_), label => $_, target => '_top', tooltip => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SAN' }
         } @{$cert_attribute->{subject_alt_name}};
         push @fields, { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SAN', value => \@sanlist, 'format' => 'linklist' };
     }

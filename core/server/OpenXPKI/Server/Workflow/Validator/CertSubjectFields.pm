@@ -14,7 +14,6 @@ use English;
 use Template;
 
 use Data::Dumper;
-use Encode;
 
 extends 'OpenXPKI::Server::Workflow::Validator';
 
@@ -41,7 +40,6 @@ sub _validate {
 
     ##! 64: 'fields: ' . Dumper $fields
 
-    Encode::_utf8_off ($subject_parts);
     my $ser = OpenXPKI::Serialization::Simple->new();
     $subject_parts = $ser->deserialize( $subject_parts );
 

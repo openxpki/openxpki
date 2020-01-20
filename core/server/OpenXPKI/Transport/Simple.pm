@@ -53,7 +53,7 @@ sub write
     my @list = ();
 
     # Encode data from perl internal utf8 representation to octets
-    $data = Encode::encode_utf8( $data );
+    $data = Encode::encode('UTF-8', $data );
 
 #    $data = encode_base64( $data );
 
@@ -163,7 +163,7 @@ sub read
 
 #    $msg = decode_base64( $msg );
     # Decode octets in $msg to the perl utf8 string.
-    $msg = Encode::decode_utf8($msg, Encode::LEAVE_SRC | Encode::FB_CROAK);
+    $msg = Encode::decode('UTF-8', $msg, Encode::LEAVE_SRC | Encode::FB_CROAK);
 
     return $msg;
 }

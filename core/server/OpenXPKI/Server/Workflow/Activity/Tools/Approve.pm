@@ -13,8 +13,6 @@ use English;
 use Data::Dumper;
 use Digest::SHA qw( sha1_hex );
 
-use Encode qw(encode decode);
-
 sub execute
 {
     my $self       = shift;

@@ -18,6 +18,9 @@ use Data::Dumper;
 use OpenXPKI::Client;
 #use OpenXPKI::Serialization::Simple;
 
+# we want utf8
+binmode(STDOUT, ":utf8");
+
 my %params = (
     authstack => '_System',
     authuser => undef,

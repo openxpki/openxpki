@@ -164,6 +164,7 @@ sub get_openssl_dn
 sub get_result
 {
     my $self = shift;
+    my $encoding = shift || '';
 
     if (!defined $self->{OUTFILE}) {
         OpenXPKI::Exception->throw (
@@ -171,7 +172,7 @@ sub get_result
         );
     }
 
-    my $ret = $self->{FU}->read_file($self->get_outfile());
+    my $ret = $self->{FU}->read_file($self->get_outfile(), $encoding );
 
     if (!defined $ret || $ret eq '') {
         OpenXPKI::Exception->throw (

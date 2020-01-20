@@ -12,10 +12,14 @@ use POSIX qw( strftime );
 use Getopt::Long;
 use Pod::Usage;
 use Data::Dumper;
+use Encode;
 use JSON;
 
 use OpenXPKI::Client;
 use OpenXPKI::Log4perl;
+
+# we want utf8
+binmode(STDOUT, ":utf8");
 
 my %params = (
     authstack => '_System',

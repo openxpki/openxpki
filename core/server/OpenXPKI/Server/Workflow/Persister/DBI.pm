@@ -4,6 +4,7 @@ use strict;
 use base qw( Workflow::Persister );
 use utf8;
 use English;
+use Encode;
 
 use Sys::Hostname;
 use OpenXPKI::Debug;
@@ -146,13 +147,26 @@ sub __update_workflow_context {
             next;
         }
 
-        ##! 2: "  saving context key: $key => $value"
-
         # automatic serialization
         if ( ref $value eq 'ARRAY' or ref $value eq 'HASH' ) {
             $value = OpenXPKI::Serialization::Simple->new->serialize($value);
         }
 
+        ##! 16: "  saving context key: $key => $value"
+        # for whatever reason the items loose their utf8 flag and are
+        # not properly encoded in the database so we upgrade them here 
+        eval {
+            $value = Encode::decode("UTF-8", $value, Encode::LEAVE_SRC | Encode::FB_CROAK);
+            ##! 32: "  value after utf8 upgrade: $value"
+        };
+        if ($EVAL_ERROR) {
+            ##! 16: 'Decode error on ' . $value
+            CTX('log')->workflow()->debug("Unable to decode value for $key / $value");
+        }
+
+        # write back to fix utf8 encoding
+        #$context->param( $key => $value );
+        
         # check for illegal characters
         if ( $value =~ m{ (?:\p{Unassigned}|\x00) }xms ) {
             ##! 4: "parameter contains illegal characters"

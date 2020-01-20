@@ -35,6 +35,8 @@ use OpenXPKI::VERSION;
 
 use Data::Dumper;
 
+binmode(STDOUT, ":utf8");
+
 my %params = ( module => [] );
 my @options_spec = ('config=s','instance|i=s','verbose','debug');
 my $cmd = shift || 'help';

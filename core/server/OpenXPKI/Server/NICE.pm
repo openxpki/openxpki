@@ -6,6 +6,7 @@ use English;
 
 use Data::Dumper;
 
+use Encode;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
