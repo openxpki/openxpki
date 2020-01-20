@@ -66,6 +66,16 @@ subtype 'Ident', # names $re_int_or_hex_string in old API
     where { $_ =~ qr{ \A [\w\-]+ \z }xmsi },
     message { "$_ contains characters not allowed in an ident string" };
 
+=head2 Empty
+
+The empty string
+
+=cut
+subtype 'Empty',
+    as 'Str',
+    where { $_ =~ qr{ \A \z }xmsi },
+    message { "$_ is not the empty string" };
+
 =head2 Base64
 
 A string containing only characters allowed in Base64 and Base64 filename/URL
