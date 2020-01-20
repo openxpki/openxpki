@@ -24,6 +24,7 @@ sub execute {
     $context->param('signer_revoked' => 0);
     $context->param('signer_validity_ok' => 0);
     $context->param('signer_in_current_realm' => 0);
+    $context->param('signer_cert_identifier' => undef );
 
     my $current_realm = CTX('session')->data->pki_realm;
 
@@ -47,7 +48,7 @@ sub execute {
         where   => { identifier => $signer_identifier },
     );
 
-    if (not $cert_hash && $x509->is_selfsigned() && $self->param('allow_surrogate_certificate')) {
+    if (!$cert_hash && $x509->is_selfsigned() && $self->param('allow_surrogate_certificate')) {
         my $db_results = CTX('dbi')->select(
             from    => 'certificate',
             columns => ['pki_realm', 'identifier', 'issuer_identifier', 'req_key', 'status', 'data' ],
@@ -64,11 +65,11 @@ sub execute {
             } else {
                 $cert_hash = $db_results->[0];
                 $signer_identifier = $cert_hash->{identifier};
+                CTX('log')->application()->info("Using surrogate certificate");
                 ##! 32: 'Got surrogate ' . $signer_identifier
+                $x509 = OpenXPKI::Crypt::X509->new( $cert_hash->{data} );
             }
         }
-
-        $x509 = OpenXPKI::Crypt::X509->new( $cert_hash->{data} );
 
     }
 
