@@ -37,7 +37,7 @@ has __default_grid_row => (
     isa => 'ArrayRef',
     lazy => 1,
     default => sub { return [
-        { source => 'certificate', field => 'cert_key' },
+        { source => 'certificate', field => 'cert_key_hex' },
         { source => 'certificate', field => 'subject' },
         { source => 'certificate', field => 'status' },
         { source => 'certificate', field => 'notbefore' },
@@ -637,7 +637,10 @@ sub init_detail {
     }
 
     push @fields, (
-        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SERIAL', value => '0x'.$cert->{cert_key_hex} },
+        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SERIAL', format => 'tooltip', value => {
+            value => '0x'.$cert->{cert_key_hex},
+            tooltip => $cert->{cert_key}
+        }},
         { label => 'I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER', value => $cert_identifier },
         { label => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE', value => $cert->{notbefore}, format => 'timestamp'  },
         { label => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER', value => $cert->{notafter}, format => 'timestamp' },
