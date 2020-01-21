@@ -26,6 +26,7 @@ use Data::Dumper;
 our %LEVEL;
 our %BITMASK;
 our $USE_COLOR = 0;
+our $NOCENSOR = 0;
 
 sub import {
     my($self,$module) = @_ ;
@@ -73,7 +74,7 @@ sub import {
     ## debug messages no longer influence the performance now
     return unless $BITMASK{$module}; # not defined or 0
 
-    printf STDERR "Debugging module '%s' with bitmask %b.\n", $module, $BITMASK{$module};
+    printf STDERR "Debugging module '%s' with bitmask %b%s\n", $module, $BITMASK{$module}, ($NOCENSOR ? ' - censor off!' : '.');
 
     #print STDERR "Add Debug in $module\n";
     ## activate debugging for this module
@@ -100,6 +101,7 @@ sub filter {
                 ## higher levels mean more noise
                 my $level = $1;
                 my $color = $2;
+                my $nocensor = $NOCENSOR;
                 if ($1 & $BITMASK{$self->{MODULE}}) {
                     $msg =~ s/\n//s;
                     ##--------------------------------------------------##
@@ -139,7 +141,8 @@ sub filter {
             LINE       => \$line,
             SUBROUTINE => \$subroutine,
             BITMASK    => q{$level},
-            COLOR      => q{$color}
+            COLOR      => q{$color},
+            NOCENSOR   => q{$nocensor}
         });
     };
     if (\$\@) {
@@ -184,12 +187,19 @@ sub debug {
     my $subroutine = $arg_ref->{SUBROUTINE};
     my $bitmask    = $arg_ref->{BITMASK} || "0";
     my $color      = $arg_ref->{COLOR};
-
-    $msg = OpenXPKI::Debug::__censor_msg($msg);
+    my $nocensor   = $arg_ref->{NOCENSOR};
 
     if (! defined $msg) {
         $msg = 'undef';
+    } elsif (ref $msg eq 'HASH') {
+        $msg = "\t".join "\n\t", (map { my $v = $msg->{$_}; "$_: " . (ref $v ? Dumper $v : $v // 'undef') } keys %{$msg});
+    } elsif (ref $msg eq 'ARRAY') {
+        my $i=0;
+        $msg = "\t".join "\n\t", (map { $i++ . ": " . (ref $_ ? Dumper $_ : $_ // 'undef') } @{$msg});
     }
+
+    $msg = OpenXPKI::Debug::__censor_msg($msg) unless($nocensor);
+
     $msg = "(line $line): $msg";
 
     $msg = "$subroutine $msg\n";

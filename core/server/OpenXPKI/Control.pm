@@ -77,6 +77,9 @@ hashref: module => level
 =item DEBUG_BITMASK
 hashref: module => bitmask
 
+=item DEBUG_NOCENSOR (0|1)
+turn of censoring of debug messages
+
 =item KEEP_TEMP (0|1)
 Weather to not delete temp files
 
@@ -96,6 +99,7 @@ sub start {
     my $restart = $args->{RESTART} || $args->{FOREGROUND};
     my $debug_level = $args->{DEBUG_LEVEL} || 0;
     my $debug_bitmask = $args->{DEBUG_BITMASK} || 0;
+    my $debug_nocensor = $args->{DEBUG_NOCENSOR} || 0;
 
 
     if ($args->{KEEP_TEMP}) {
@@ -122,6 +126,10 @@ sub start {
             my $bitmask = $debug_bitmask->{$module};
             $OpenXPKI::Debug::BITMASK{$module} = $bitmask;
         }
+    }
+
+    if ($debug_nocensor) {
+        $OpenXPKI::Debug::NOCENSOR = 1;
     }
 
     # Load the required locations from the config

@@ -34,6 +34,7 @@ GetOptions(\%params,
           quiet
           fg|foreground
           nd|no-detach
+          nocensor
           )) or pod2usage(-verbose => 0);
 
 if ($params{version}) {
@@ -92,6 +93,7 @@ if ($cmd eq 'status') {
         @{$params{debug}} = split(m{,}, join(',', @{$params{debug}}));
         $args->{DEBUG_LEVEL} = {};
         $args->{DEBUG_BITMASK} = {};
+        $args->{DEBUG_NOCENSOR} = 1 if (defined $params{nocensor});
 
         for my $param (@{ $params{debug} }) {
             my ($module, $op, $level) = ($param =~ m{ \A ((?!\d).+?)?([:=])?((0b)?\d+)? \z }xms);
