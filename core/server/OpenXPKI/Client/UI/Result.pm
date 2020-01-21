@@ -4,14 +4,13 @@
 
 package OpenXPKI::Client::UI::Result;
 
+use CGI 4.08 qw( -utf8 );
+use Data::Dumper;
 use HTML::Entities;
 use Digest::SHA qw(sha1_base64);
+
 use OpenXPKI::i18n qw( i18nTokenizer );
 use OpenXPKI::Serialization::Simple;
-use Encode;
-use CGI 4.08 qw( -utf8 );
-
-use Data::Dumper;
 
 use Moose;
 
@@ -318,7 +317,7 @@ sub param {
         my $str = $cgi->param($key);
         $str =~ s/^\s+|\s+$//g if (defined $str);
         $self->logger()->trace("Value for $key after trim: $str");
-        return Encode::encode("UTF-8", $str);
+        return $str;
 
     }
 

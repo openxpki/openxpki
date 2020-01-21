@@ -7,13 +7,16 @@ package OpenXPKI::Client::UI;
 use Moose;
 
 use English;
+use Encode;
 use CGI::Session;
+use URI::Escape;
+use Log::Log4perl::MDC;
+use Data::Dumper;
+
 use OpenXPKI::Client;
 use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Client::UI::Bootstrap;
 use OpenXPKI::Client::UI::Login;
-use Log::Log4perl::MDC;
-use Data::Dumper;
 
 # ref to the cgi frontend session
 has 'session' => (
@@ -231,7 +234,11 @@ sub __load_class {
 
     my %extra;
     if ($param) {
-        %extra = split /!/, $param;
+        my @extra = split /!/, $param;
+        while (my $key = shift @extra) {
+            my $val = shift @extra // '';
+            $extra{$key} = Encode::decode("UTF-8", uri_unescape($val));
+        }
         $self->logger()->trace("Found extra params " . Dumper \%extra ) if $self->logger->is_trace;
     }
 
