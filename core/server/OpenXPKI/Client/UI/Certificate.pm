@@ -576,7 +576,10 @@ sub init_detail {
         return;
     }
 
-    my $cert = $self->send_command_v2( 'get_cert', {  identifier => $cert_identifier, format => 'DBINFO',  attribute => 'subject_%' }, 1);
+    my $cert = $self->send_command_v2( 'get_cert', {  
+        identifier => $cert_identifier, 
+        format => 'DBINFO',  
+        attribute => 'subject_%' }, 1);
 
     if (!$cert) {
         $self->_page({
@@ -636,6 +639,25 @@ sub init_detail {
         }
     }
 
+    my $status_label = 'I18N_OPENXPKI_UI_CERT_STATUS_'.$cert->{status};
+    my $status_tooltip = '';
+    if ($cert->{status} ne 'ISSUED') {
+        $status_tooltip = 'Revoked: ' . DateTime->from_epoch( epoch => $cert->{revocation_time} )->iso8601();
+        if ($cert->{revocation_id}) {
+            $status_tooltip .= sprintf(' (#0x%02x)',$cert->{revocation_id} );
+        }
+        if ($cert->{reason_code} && $cert->{reason_code} ne 'unspecified') {
+            $status_label .= sprintf(' (I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE_%s)', uc($cert->{reason_code}));
+        }
+    }
+
+    #I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE_UNSPECIFIED
+    #I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE_KEYCOMPROMISE
+    #I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE_CACOMPROMISE
+    #I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE_AFFILIATIONCHANGED
+    #I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE_SUPERSEDED
+    #I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE_CESSATIONOFOPERATION
+
     push @fields, (
         { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SERIAL', format => 'tooltip', value => {
             value => '0x'.$cert->{cert_key_hex},
@@ -644,7 +666,11 @@ sub init_detail {
         { label => 'I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER', value => $cert_identifier },
         { label => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE', value => $cert->{notbefore}, format => 'timestamp'  },
         { label => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER', value => $cert->{notafter}, format => 'timestamp' },
-        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_STATUS', value => { label => 'I18N_OPENXPKI_UI_CERT_STATUS_'.$cert->{status} , value => $cert->{status} }, format => 'certstatus' },
+        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_STATUS', format => 'certstatus', value => {
+            label => $status_label,
+            value => $cert->{status},
+            tooltip => $status_tooltip,
+        }},
         { label => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER', format => 'link', tooltip => 'I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_ISSUER_LINK',
             value => { label => $cert->{issuer_dn}, page => 'certificate!chain!identifier!'. $cert_identifier } },
     );

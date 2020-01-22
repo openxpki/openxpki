@@ -2,7 +2,7 @@
 `import moment from "vendor/moment"`
 
 types =
-        certstatus: (v) -> "<span class='certstatus-#{(v.value||v.label).toLowerCase()}'>#{v.label}</span>"
+        certstatus: (v) -> "<span class='certstatus-#{(v.value||v.label).toLowerCase()}' title='#{v.tooltip||""}'>#{v.label}</span>"
         link: (v) -> "<a href='#/openxpki/#{v.page}' target='#{v.target||"modal"}' title='#{v.tooltip||""}'>#{v.label}</a>"
         extlink: (v) -> "<a href='#{v.page}' target='#{v.target||"_blank"}' title='#{v.tooltip||""}'>#{v.label}</a>"
         timestamp: (v) ->

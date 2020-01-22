@@ -64,11 +64,19 @@ sub execute {
     my $res = $nice_backend->revokeCertificate(
         $cert->{identifier},
         $cert->{reason_code},
+        $cert->{revocation_time},
         $cert->{invalidity_time},
         $param
     );
     if (!$res) {
         $self->pause('I18N_OPENXPKI_UI_NICE_BACKEND_ERROR');
+    } elsif (ref $res eq 'HASH') {
+        ##! 64: 'Setting Context ' . Dumper $res
+        for my $key (keys %{$res} ) {
+            my $value = $res->{$key};
+            ##! 64: "Set key: $key to value $value";
+            $context->param( $key => $value );
+        }
     }
 
     ##! 32: 'Add workflow id ' . $workflow->id.' to cert_attributes ' for cert ' . $set_context->{cert_identifier}

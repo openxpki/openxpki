@@ -19,6 +19,24 @@ use Moose;
 #use namespace::autoclean; # Conflicts with Debugger
 extends 'OpenXPKI::Server::NICE';
 
+has use_revocation_id => (
+    is => 'rw',
+    isa => 'Bool',
+    default => 0,
+);
+
+sub BUILD {
+
+    my $self = shift;
+    my $config = CTX('config');
+
+    foreach my $key (qw(use_revocation_id)) {
+        my $val = $config->get(['nice', 'api', $key]);
+        $self->$key( $val ) if (defined $val);
+    }
+
+}
+
 sub issueCertificate {
 
     my $self = shift;
@@ -300,15 +318,40 @@ sub revokeCertificate {
     my $self = shift;
     my $cert_identifier = shift;
 
+    # default mode - do not use revocation_id
+    if (!$self->use_revocation_id()) {
+        CTX('dbi')->update(
+            table => 'certificate',
+            set => { status => 'CRL_ISSUANCE_PENDING' },
+            where => {
+               identifier => $cert_identifier,
+            },
+        );
+        return 1;
+    }
+
+    ##! 16: 'Start database query to write revocation_id'
     CTX('dbi')->update(
         table => 'certificate',
-        set => { status => 'CRL_ISSUANCE_PENDING' },
+        set => {
+            status => 'CRL_ISSUANCE_PENDING',
+            revocation_id => \[ '(SELECT coalesce(max(revocation_id)+1, 1) FROM certificate) '],
+        },
         where => {
            identifier => $cert_identifier,
-        },
+           revocation_id => undef,
+        }
     );
 
-    return 1;
+    ##! 32: 'Query to set revocation_id was accepted by dbi'
+    my $cert = CTX('dbi')->select_one(
+        from => 'certificate',
+        columns => ['revocation_id'],
+        where => { identifier => $cert_identifier },
+    );
+    ##! 32: 'Got revocation id back from database ' . $cert->{'revocation_id'}
+
+    return { revocation_id => $cert->{'revocation_id'} };
 
 }
 
@@ -320,17 +363,22 @@ sub checkForRevocation {
     # As the local crl issuance process will set the state in the certificate
     # table directly, we get the certificate status from the local table
 
+    my @cols = ('status');
+    if ($self->use_revocation_id()) {
+        push @cols, 'revocation_id';
+    }
+
     ##! 16: 'Checking revocation status'
     my $cert = CTX('dbi')->select_one(
         from => 'certificate',
-        columns => ['status'],
+        columns => \@cols,
         where => { identifier => $cert_identifier },
     );
 
     CTX('log')->application()->debug("Check for revocation of $cert_identifier, result: " . $cert->{status});
 
     ##! 32: 'certificate status ' . $cert->{status}
-    return ($cert->{status} eq 'REVOKED');
+    return ($cert->{status} eq 'REVOKED') ? ($cert->{revocation_id} || 1) : 0;
 
 }
 
@@ -350,7 +398,7 @@ sub issueCRL {
     my $crl_validity = $param->{validity};
     my $delta_crl = $param->{validity};
 
-    my $profile = $param->{crl_profile}; 
+    my $profile = $param->{crl_profile};
 
     my $remove_expired = $param->{remove_expired};
     my $reason_code = $param->{reason_code};
@@ -412,6 +460,24 @@ sub issueCRL {
         $extra_where{reason_code} = $param->{reason_code};
     }
 
+    my $max_revocation_id;
+    if ($self->use_revocation_id()) {
+        my $cert = CTX('dbi')->select_one(
+            from => 'certificate',
+            columns => ['MAX(revocation_id) as max_revocation_id'],
+        );
+        $max_revocation_id = $cert->{max_revocation_id} || 0;
+        if (defined $param->{max_revocation_id} && $param->{max_revocation_id} =~ m{\d+}) {
+            OpenXPKI::Exception->throw(
+                message => 'Requested max_revocation_id is larger as local sequence!',
+                params { requested => $param->{max_revocation_id}, max => $max_revocation_id }
+            ) if ($param->{max_revocation_id} > $max_revocation_id);
+            ##! 64: 'set max_revocation_id from activity'
+            $max_revocation_id = $param->{max_revocation_id};
+        }
+        $extra_where{revocation_id} = { '<=', $max_revocation_id };
+    }
+
     my $certs = $dbi->select(
         from => 'certificate',
         columns => [ 'cert_key', 'identifier',
@@ -471,14 +537,18 @@ sub issueCRL {
         publication_date  => 0,
         data              => $crl_obj->pem(),
     };
-    
+
     if ($profile) {
         $data->{profile} = $profile;
     }
-    
+
+    if ($max_revocation_id) {
+        $data->{max_revocation_id} = $max_revocation_id;
+    }
+
     $dbi->insert( into => 'crl', values => $data );
 
-    return { crl_serial => $serial };
+    return { crl_serial => $serial, max_revocation_id => $max_revocation_id };
 }
 
 sub __prepare_crl_data {
@@ -647,7 +717,20 @@ This module implements the OpenXPKI NICE Interface using the local crypto backen
 
 =head1 Configuration
 
-The module does not require nor accept any configuration options.
+The module does not require any configuration options but some
+advanced features can be enabled via the I<nice> config item.
+
+=head2 Nice Parameters
+
+=over
+
+=item auth.use_revocation_id
+
+Boolean, assign a monotonic sequence id to each revocation request and
+use it to issue CRLs. This is required for synchronisation when using
+RA/CA split and enables reproducible CRL builds.
+
+=back
 
 =head1 API Functions
 
@@ -668,10 +751,16 @@ Currently only an alias for issueCertificate
 =head2 revokeCertificate
 
 Set the status field of the certificate table to "CRL_ISSUANCE_PENDING".
+If use_revocation_id is on, also sets the revocation_id to the next
+available serial. In case two revocations are processed at the same time
+the query will either wait for a database lock or the transaction will fail
+on commit depending on your database isolation level.
 
 =head2 checkForRevocation
 
 Queries the certifictes status from the local certificate datasbase.
+Returns 0 if the certificate is not revoked, for revoked certificates
+returns the value of revocation_id or 1 if use_revocation_id is off.
 
 =head2 issueCRL
 
@@ -685,7 +774,7 @@ with options:
 
 =item crl_profile (optional)
 
-the profile definition to use 
+the profile definition to use
 
 =item crl_validity
 

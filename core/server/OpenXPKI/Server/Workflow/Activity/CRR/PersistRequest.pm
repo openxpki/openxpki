@@ -57,13 +57,13 @@ sub execute
     my $reason_code = $self->param('reason_code') // $context->param('reason_code');
     my $invalidity_time = $self->param('invalidity_time') // $context->param('invalidity_time');
     my $hold_code = $self->param('hold_code') // $context->param('hold_code');
-
-    my $dt = DateTime->now();
+    my $revocation_time = $self->param('revocation_time') || time();
+    
     $dbi->update(
         table => 'certificate',
         set => {
             reason_code     => $reason_code || 'unspecified',
-            revocation_time => $dt->epoch(),
+            revocation_time => $revocation_time,
             invalidity_time => $invalidity_time || undef,
             hold_instruction_code => $hold_code || undef,
         },
@@ -112,5 +112,10 @@ when reason_code is set to keyCompromise.
 =item hold_code
 
 Hold code for revocation reason "onHold" (not supported by the default backend).
+
+=item revocation_time
+
+Set revocation_time, default is "now". This parameter must be passed as
+activity param and has no fallback to the context. 
 
 =back
