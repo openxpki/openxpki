@@ -584,6 +584,7 @@ You first need to configure the SMTP backend parameters::
         class: OpenXPKI::Server::Notification::SMTP
         host: localhost
         port: 25
+        starttls: 0
         username: smtpuser
         password: smtpsecret
         debug: 0
