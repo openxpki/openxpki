@@ -84,6 +84,7 @@ smtp:
         class: OpenXPKI::Server::Notification::SMTP
         host: localhost
         port: 25
+        starttls: 0
         username: ~
         password: ~
         debug: 0

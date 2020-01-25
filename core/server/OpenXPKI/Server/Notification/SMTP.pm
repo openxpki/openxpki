@@ -15,6 +15,7 @@ are read from the filesystem.
         host: localhost
         helo: my.own.fqdn
         port: 25
+        starttls: 0
         username: smtpuser
         password: smtppass
         debug: 0
@@ -196,6 +197,10 @@ sub _init_transport {
     if (!$transport || !ref $transport) {
         CTX('log')->system()->fatal(sprintf("Failed creating smtp transport (host: %s, user: %s)", $smtp{Host}, $smtp{User}));
         return undef;
+    }
+
+    if($cfg->{starttls}) {
+        $transport->starttls;
     }
 
     if($cfg->{username}) {
