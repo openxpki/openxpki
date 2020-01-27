@@ -75,7 +75,7 @@ sub get_hash {
 
     $self->{_hash} = undef;
     eval {
-        $self->{_hash} = CTX('api2')->get_cert( identifier => $cert_id );
+        $self->{_hash} = CTX('api2')->get_cert( identifier => $cert_id, format => 'DBINFO' );
     };
     return $self->{_hash};
 
@@ -101,12 +101,21 @@ sub body {
     my $hash = $self->get_hash( $cert_id );
     return unless($hash);
 
-    if (!defined $hash->{lc($property)}) {
+    my $legacy = {
+        serial_hex => 'cert_key_hex',
+        serial => 'cert_key',
+        issuer => 'issuer_dn',
+        csr_serial => 'req_key'
+    };
+    $property = lc($property);
+    $property = $legacy->{$property} if ($legacy->{$property});
+
+    if (!defined $hash->{$property}) {
         Log::Log4perl->get_logger('openxpki.deprecated')->error("Template Plugin Certificate.body called with legacy property ($property)!");
         return;
     }
 
-    return $hash->{lc($property)};
+    return $hash->{$property};
 
 }
 
@@ -121,7 +130,7 @@ sub csr_serial {
     my $cert_id = shift;
 
     my $hash = $self->get_hash( $cert_id );
-    return $hash ? $hash->{csr_serial} : '';
+    return $hash ? $hash->{req_key} : '';
 }
 
 =head2 serial
@@ -136,7 +145,7 @@ sub serial {
     my $cert_id = shift;
 
     my $hash = $self->get_hash( $cert_id );
-    return $hash ? $hash->{serial} : '';
+    return $hash ? $hash->{cert_key} : '';
 }
 
 
@@ -151,7 +160,7 @@ sub serial_hex {
     my $cert_id = shift;
 
     my $hash = $self->get_hash( $cert_id );
-    return $hash ? $hash->{serial_hex} : '';
+    return $hash ? $hash->{cert_key_hex} : '';
 }
 
 =head2 subject
@@ -224,6 +233,13 @@ sub dn {
     my $hash = $self->get_hash( $cert_id );
     if (!$hash) {
         return;
+    }
+
+    # subject hash is not returned by the get_cert call so we add it to
+    # the internal structure on first call to reuse the caching approach
+    if (!$hash->{subject_hash}) {
+        my $info = CTX('api2')->get_cert( identifier => $cert_id, format => 'HASH' );
+        $hash->{subject_hash} = $self->{_hash}->{subject_hash} = $info->{subject_hash};
     }
 
     my $dn = $hash->{subject_hash};
