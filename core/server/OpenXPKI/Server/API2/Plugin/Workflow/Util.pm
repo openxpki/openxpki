@@ -104,6 +104,9 @@ sub execute_activity {
     my ($self, $wf, $activity, $async, $wait) = @_;
     ##! 2: 'execute activity ' . $activity
 
+    Log::Log4perl::MDC->put('wfid', $wf->id());
+    Log::Log4perl::MDC->put('wftype', $wf->type());
+
     # ASYNCHRONOUS - fork
     if ($async) {
         $self->_execute_activity_async($wf, $activity); # returns the background process PID
