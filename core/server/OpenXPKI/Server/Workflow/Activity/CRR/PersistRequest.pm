@@ -1,8 +1,3 @@
-# OpenXPKI::Server::Workflow::Activity::CRR::PersistRequest
-# Written by Alexander Klink for the OpenXPKI project 2006
-# Adopted for CRRs by Michael Bell for the OpenXPKI project 2006
-# Copyright (c) 2006 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::CRR::PersistRequest;
 
 use strict;
@@ -16,6 +11,8 @@ use DateTime;
 
 sub execute
 {
+
+    ##! 1: 'start'
     my $self       = shift;
     my $workflow   = shift;
     my $context    = $workflow->context();
@@ -27,12 +24,13 @@ sub execute
 
     my $cert = $dbi->select_one(
         from => 'certificate',
-        columns => [ '*' ],
+        columns => [ 'status', 'reason_code', 'revocation_time', 'invalidity_time', 'hold_instruction_code' ],
         where => {
             pki_realm  => $pki_realm,
             identifier => $identifier,
         },
     );
+    ##! 64: $cert
 
     if (!$cert) {
         OpenXPKI::Exception->throw(
@@ -44,40 +42,70 @@ sub execute
         );
     }
 
-    if ($cert->{status} ne 'ISSUED') {
+    my $reason_code = $self->param('reason_code') // $context->param('reason_code') || '';
+    my $invalidity_time = $self->param('invalidity_time') // $context->param('invalidity_time') || 0;
+    my $hold_code = $self->param('hold_code') // $context->param('hold_code');
+    my $revocation_time = $self->param('revocation_time');
+
+    my $enforce = $self->param('enforce') || ($revocation_time ? 'all' : ($reason_code ? 'reason_code' : 'none'));
+    $reason_code ||= 'unspecified';
+    $revocation_time ||= time();
+
+    # certificate already has CRR data - try to be graceful
+    if ($cert->{status} ne 'ISSUED' || $cert->{reason_code}) {
+
+        my $error;
+        ##! 16: 'Already revoked and enforce set to ' . $enforce
+        ##! 32: $cert
+        if ($enforce eq 'all' && ($revocation_time != $cert->{revocation_time})) {
+            ##! 16: 'revocation time mismatch'
+            $error = 'Unable to persist CRR - already revoked and revocation time mismatches';
+        }
+        elsif ($enforce ne 'none' && $reason_code ne $cert->{reason_code}) {
+            ##! 16: 'reason code mismatch'
+            $error = 'Unable to persist CRR - already revoked and reason code mismatches';
+
+        # if keyCompromise timestamp is given this must match
+        } elsif ($enforce ne 'none' && $reason_code eq 'keyCompromise' && $invalidity_time && $invalidity_time ne $cert->{invalidity_time}) {
+            ##! 16: 'keyCompromise time mismatch ' - $invalidity_time
+            $error = 'Unable to persist CRR - already revoked and invalidity time mismatches';
+
+        }
+
         OpenXPKI::Exception->throw(
-            message => 'Can not persist CRR, certificate is not in issued state',
+            message => $error,
             params => {
                 identifier => $identifier,
                 status => $cert->{status},
             }
+        ) if ($error);
+        ##! 8: 'Ignore revocation request as certificate is already revoke'
+        CTX('log')->application()->warn("revocation request for $identifier ignored as certificate is already revoked");
+
+    } else {
+
+        ##! 8: 'Updating revocation data'
+        $dbi->update(
+            table => 'certificate',
+            set => {
+                reason_code     => $reason_code,
+                revocation_time => $revocation_time,
+                invalidity_time => $invalidity_time || undef,
+                hold_instruction_code => $hold_code || undef,
+            },
+            where => {
+                pki_realm  => $pki_realm,
+                identifier => $identifier,
+            },
         );
+
+        CTX('log')->application()->debug("revocation request for $identifier written to database");
     }
-
-    my $reason_code = $self->param('reason_code') // $context->param('reason_code');
-    my $invalidity_time = $self->param('invalidity_time') // $context->param('invalidity_time');
-    my $hold_code = $self->param('hold_code') // $context->param('hold_code');
-    my $revocation_time = $self->param('revocation_time') || time();
-    
-    $dbi->update(
-        table => 'certificate',
-        set => {
-            reason_code     => $reason_code || 'unspecified',
-            revocation_time => $revocation_time,
-            invalidity_time => $invalidity_time || undef,
-            hold_instruction_code => $hold_code || undef,
-        },
-        where => {
-            pki_realm  => $pki_realm,
-            identifier => $identifier,
-        },
-    );
-
-    CTX('log')->application()->debug("revocation request for $identifier written to database");
 
 }
 
 1;
+
 __END__
 
 =head1 Name
@@ -87,7 +115,10 @@ OpenXPKI::Server::Workflow::Activity::CRR::PersistRequest
 =head1 Description
 
 persists the Certificate Revocation Request into the database, so that
-it can then be used by the CRL issuance workflow.
+it can then be used by the CRL issuance workflow. If the certificate is
+not in ISSUED state or has already revocation details set, the activity
+will throw an exception if the requested details do not match the already
+present data. This can be relaxed by the I<enforce> parameter
 
 =head2 Activity Parameters
 
@@ -116,6 +147,20 @@ Hold code for revocation reason "onHold" (not supported by the default backend).
 =item revocation_time
 
 Set revocation_time, default is "now". This parameter must be passed as
-activity param and has no fallback to the context. 
+activity param and has no fallback to the context.
+
+=item enforce (all|reason_code|none)
+
+The default mode depends on the parameters present in context or as action
+parameters. If revocation_time is set, time and reason_code must match. If
+no time but reason_code is set, then only the reson_code must match. If
+neither one is set, the request is always accepted. In case the reason_code
+is keyCompromise and the invalidity_time is set, it must also match as long
+as you do not set enforce to I<none>.
+
+If you do not set revocation_time/reason_code but want to stop if revocation
+data is present, you can enforce the same check level by explicitly setting
+I<all> or I<reason_code>. In this case the checks are done against the
+default values.
 
 =back
