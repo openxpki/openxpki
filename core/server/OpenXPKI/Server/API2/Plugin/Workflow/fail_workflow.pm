@@ -49,6 +49,16 @@ command "fail_workflow" => {
 
     CTX('log')->system()->warn('Passing the attribute *type* to fail_workflow is deprecated.') if ($params->has_workflow);
 
+    # in case the workflow is in a state where the factory can not load
+    # it, e.g. as the workflow graph has changed we update the database
+    # here and try to reload. As this is in a DBI transaction it won't
+    # be persisted if it does not work
+    CTX('dbi')->update(
+        table => 'workflow',
+        set => { workflow_state => 'FAILURE' },
+        where => { workflow_id => $wf_id },
+    );
+
     ##! 2: "load workflow"
     my $workflow = $util->fetch_workflow($wf_id);
 
