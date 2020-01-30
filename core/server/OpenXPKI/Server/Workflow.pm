@@ -120,12 +120,13 @@ sub context {
 
 
 sub execute_action {
+
     my ( $self, $action_name, $autorun ) = @_;
     ##! 1: 'execute_action '.$action_name
 
-    # if we are in a recursive run or in an initial create the dbi
-    # transaction is already open and the autorun flag is set
-    CTX('dbi')->start_txn unless $autorun;
+    # note - transaction is already open as it was started either in
+    # the service layer or the watchdog. For autorun with DBI persister
+    # the persister will do a commit/start when required
 
     try {
         $self->persist_context(1);

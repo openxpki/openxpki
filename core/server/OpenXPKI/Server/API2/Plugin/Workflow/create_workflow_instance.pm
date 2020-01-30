@@ -155,6 +155,12 @@ command "create_workflow_instance" => {
             if (!$EVAL_ERROR->isa('OpenXPKI::Exception')) {
                 $EVAL_ERROR->rethrow();
             }
+
+            # bubble up Validator Exception
+            # TODO: create a dedicated exception type for this
+            if ($EVAL_ERROR->message eq 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATION_FAILED_ON_EXECUTE') {
+                $EVAL_ERROR->rethrow();
+            }
         }
     }
 

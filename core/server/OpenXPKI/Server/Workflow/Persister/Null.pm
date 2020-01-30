@@ -61,7 +61,6 @@ sub fetch_history {
     return ();
 }
 
-
 1;
 __END__
 
