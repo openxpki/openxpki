@@ -43,7 +43,7 @@ for my $cert (('entity','entity2','pkiclient')) {
     foreach my $item (@{$result->{main}->[0]->{content}->{data}}) {
         # check database status
         $status = $item->{value}->{value} if ($item->{label} eq 'Status');
-        $serial = $item->{value} if ($item->{label} eq 'Certificate Serial');
+        $serial = $item->{value}->{value} if ($item->{label} eq 'Certificate Serial');
     }
     
     is($status, 'REVOKED');
