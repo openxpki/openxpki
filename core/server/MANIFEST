@@ -299,6 +299,7 @@ OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_log.pm
 OpenXPKI/Server/API2/Plugin/Workflow/get_workflow_type_for_id.pm
 OpenXPKI/Server/API2/Plugin/Workflow/list_workflow_titles.pm
 OpenXPKI/Server/API2/Plugin/Workflow/search_workflow_instances.pm
+OpenXPKI/Server/API2/Plugin/Workflow/start_workflow.pm
 OpenXPKI/Server/API2/Plugin/Workflow/wakeup_resume_workflow.pm
 
 OpenXPKI/Server/API2/PluginRole.pm

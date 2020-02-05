@@ -402,32 +402,37 @@ sub pause {
 
 }
 
+
+sub validate_context_before_action {
+
+    my ( $self, $action_name ) = @_;
+    my $action = $self->_get_action($action_name);
+    $action->validate($self);
+    return 1;
+}
+
 sub save_initial {
 
     ##! 1: 'start'
-    my ( $self, $action_name ) = @_;
+    my ( $self, $action_name, $delay ) = @_;
 
     OpenXPKI::Exception->throw (
         message => "save_initial is only valid on a fresh workflow"
     ) if ($self->proc_state() ne 'init' || $self->state() ne 'INITIAL');
 
-    # if no action is given we assume no input data was
-    # validated and we dont persist the context!
-    if (!$action_name) {
-        ##! 16: 'save_initial without action - dropping context'
-        $self->proc_state('manual');
-        $self->persist_context(1);
-    } else {
-        ##! 16: 'save_initial with action ' . $action_name
-        $self->persist_context(2);
-        $self->context->param( wf_current_action => $action_name );
+    ##! 16: 'save_initial with action ' . $action_name
+    # no delay = assume the user will handle the workflow themselves
+    if (defined $delay) {
+        ##! 32: 'Send to watchdog with a delay of ' . $delay
         $self->proc_state('pause');
-        $self->wakeup_at( time() );
+        $self->wakeup_at( time() + $delay );
         $self->session_info(
             CTX('session')->data->freeze(only => [ "user", "role" ])
         );
     }
 
+    $self->context->param( wf_current_action => $action_name );
+    $self->persist_context(2);
     $self->_save();
 
     return $self;

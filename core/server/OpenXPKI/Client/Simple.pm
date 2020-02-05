@@ -447,6 +447,7 @@ sub handle_workflow {
         $reply = $self->run_command('create_workflow_instance',{
             workflow => $wf_type,
             params => $wf_params,
+            ($params->{use_lock} ? (use_lock => $params->{use_lock}) : ()),
         });
 
         if (!$reply || !$reply->{workflow}) {

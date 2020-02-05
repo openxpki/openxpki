@@ -34,6 +34,16 @@ coerce 'ArrayOrAlphaPunct',
     from 'AlphaPunct',
     via { [ $_ ] };
 
+=head2 PosInt
+
+A postive integer value (excluding zero)
+
+=cut
+subtype 'PosInt',
+    as 'Int',
+    where { $_ > 0 },
+    message { "$_ is not a positive integer" };
+
 =head2 Hex
 
 A string containing a number in hexadecimal notation

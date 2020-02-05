@@ -51,6 +51,40 @@ context is persisted but the initial action is not run. If set to
 detach, the initial workflow including its id is returned and the
 initial action is executed in the background.
 
+=item * C<use_lock> I<HashRef|Str>. Optional, default is {}
+
+Create a datapool item as lock using the given I<namespace> and I<key>
+with the workflow id as value. The workflow is not created and an exception
+is thrown if a lock with the same key already exists in the namespace.
+
+The lock is commited to the database as soon as the initial action was
+executed or if I<norun> is set when the next commit occurs. In the meantime
+the database driver holds a row lock which might have a performance impact.
+If the workflow crashes during the inital action, the lock will disappear,
+if the crash happens after the initial action, the lock will remain and
+point to a broken workflow.
+
+You can define the error handling by setting I<on_error> to:
+
+=over
+
+=item die - the default, throw an exception
+
+=item skip - return undef
+
+=item workflow - return the existing workflow, input is discarded
+
+=item force - ignore the lock, create new workflow and overwrite lock
+
+=back
+
+Note that I<force> will not stop or modifiy the existing workflow, so the old
+workflow will loose its relation to the lock id!
+
+The namespace has a default of I<workflow.lock>, so if you dont need to
+modify neither namespace or error handling you can directly pass the locks
+key as String instead of using a HashRef.
+
 =back
 
 =cut
@@ -59,7 +93,7 @@ command "create_workflow_instance" => {
     params   => { isa => 'HashRef', default => sub { {} } },
     ui_info  => { isa => 'Bool', default => 0, },
     norun    => { isa => 'Str', matching => qr{ \A(persist|detach|)\z }xms, default => '' },
-
+    use_lock    => { isa => 'HashRef|Str' },
 } => sub {
     my ($self, $params) = @_;
     my $type = $params->workflow;
@@ -79,6 +113,14 @@ command "create_workflow_instance" => {
     my $id = $workflow->id;
     ##! 2: "New workflow's ID: $id"
 
+    if (my $lock = $params->use_lock) {
+        my $lock_id = $self->_handle_lock($id, $lock);
+        # skip was used
+        return unless (defined $lock_id);
+
+        # there is already a workflow
+        return $util->get_wf_info( id => $lock_id, with_ui_info => $params->ui_info ) if ($lock_id);
+    }
 
     my $last_id = Log::Log4perl::MDC->get('wfid') || undef;
     my $last_type = Log::Log4perl::MDC->get('wftype') || undef;
@@ -130,13 +172,16 @@ command "create_workflow_instance" => {
     ##! 64: Dumper $workflow
 
     # if save_initial crashes we want to see this
-    if ($norun eq 'persist') {
-        ##! 16: 'Persist only'
-        $workflow->save_initial();
-
-    } elsif ($norun eq 'detach') {
-        ##! 16: 'Create detached'
-        $workflow->save_initial($initial_action);
+    if ($norun) {
+        # this runs the workflow validators using the current context
+        $workflow->validate_context_before_action($initial_action);
+        if ($norun eq 'detach') {
+            ##! 16: 'Create detached'
+            $workflow->save_initial($initial_action, 0);
+        } else {
+            ##! 16: 'Persist only'
+            $workflow->save_initial($initial_action);
+        }
     } else {
         ##! 16: 'execute initial ' . $initial_action
         # catch exceptions during execution - this might happen after
@@ -170,5 +215,79 @@ command "create_workflow_instance" => {
     return $util->get_wf_info(workflow => $workflow, with_ui_info => $params->ui_info);
 
 };
+
+sub _handle_lock {
+
+    my $self = shift;
+    my $id = shift;
+    my $lock = shift;
+
+    my $namespace = 'workflow.lock';
+    my $on_error = 'die';
+    my $key;
+
+    ##! 32: $lock
+    if (!ref $lock) {
+       $key = $lock;
+    } else {
+        $key = $lock->{key};
+        $namespace = $lock->{namespace} if ($lock->{namespace});
+        if ($lock->{on_error}) {
+            if ($lock->{on_error} =~ m{\A(die|skip|workflow|force)\z}) {
+                $on_error = $lock->{on_error};
+            } else {
+                CTX('log')->system->warn(sprintf "Invalid error policy %s - ignored", $lock->{on_error});
+            }
+        }
+    }
+
+    OpenXPKI::Exception->throw (
+        message => 'Lock requested but key is empty',
+        params => { namespace => $namespace }
+    ) unless($key);
+
+    ##! 32: "Use lock $namespace / $lock - $on_error"
+
+    # we set the lock now as the related UPDATE query will create
+    # an implicit lock/wait so another call with the same lock key will
+    # wait here and not proceed with creating another workflow
+    # it will die immediately if the lock already exists
+    # if something goes wrong with the workflow later the transaction will
+    # not be commited so the lock will disappear
+    eval {
+        CTX('api2')->set_data_pool_entry(
+            namespace => $namespace,
+            key => $key,
+            value => $id,
+            encrypt => 0,
+            force => ($on_error eq 'force'),
+        );
+        ##! 32: 'Lock was created'
+        CTX('log')->workflow->info(sprintf "Lock for workflow #%01d was created with %s/%s", $id, $namespace, $key);
+    };
+    if ($EVAL_ERROR) {
+        ##! 8: 'Error creating lock ' . $EVAL_ERROR
+        return if ($on_error eq 'skip');
+
+        my $has_lock = CTX('api2')->get_data_pool_entry(
+            namespace => $namespace,
+            key => $key,
+        );
+        if ($has_lock) {
+            return $has_lock->{value} if ($on_error eq 'workflow');
+            OpenXPKI::Exception->throw (
+                message => 'Workflow lock already exists',
+                params => { key => $key, namespace => $namespace, value => $has_lock->{value} }
+            );
+        }
+
+        OpenXPKI::Exception->throw (
+            message => 'Unable to obtain lock',
+            params => { key => $key, namespace => $namespace, error => "$EVAL_ERROR" }
+        );
+    }
+    return 0;
+
+}
 
 __PACKAGE__->meta->make_immutable;
