@@ -10,21 +10,15 @@ Top-Level Structure
 This is the root element of any json result::
 
     %structure = (
-
-        page => { TOP_LEVEL_INFO},
-
+        page => { TOP_LEVEL_INFO },
         right => [ PAGE_SECTION, PAGE_SECTION,...] , # optional, information which will be displayed in additional right pane
-
         main => [ PAGE_SECTION, PAGE_SECTION,...] , # information which will be displayed in the main section
-
         reloadTree => BOOL (1/0), # optional, the browser will perform a complete reload. If an additional "goto" is set, the page-url will change to this target
-
         goto => STRING PAGE, # optional, will be evaluated as url-hashtag target
-
         status => { STATUS_INFO } # optional
     );
 
-    Example { reloadTree => 1, goto => 'login/login'}
+    Example { reloadTree => 1, goto => 'login/login' }
 
 
 Page Head (TOP_LEVEL_INFO):
@@ -39,7 +33,9 @@ This is rendered as the page main headline and intro text.
         description => STRING, # additional text (opt.)
     }
 
-    Example: page => {label => 'OpenXPKI Login', description => 'Please log in!'}
+*Example*::
+
+    page => { label => 'OpenXPKI Login', description => 'Please log in!' }
 
 
 Status Notification (STATUS_INFO):
@@ -54,8 +50,9 @@ Show a status bar on top of the page, the level indicates the severity and resul
         message => STRING # status message shown
     }
 
-    Example:   status => { level => 'error', message => 'Login credentials are wrong!' }
+*Example*::
 
+    status => { level => 'error', message => 'Login credentials are wrong!' }
 
 Page Level
 ==========
@@ -70,18 +67,13 @@ This is the top level container of each page section.
 
     PAGE_SECTION:
     {
-        type => STRING # determines type of section, can be one of: text|grid|form|keyvalue
-
+        type => STRING # see SECTION-TYPE below for supported types
         content => {
             label => STRING # optional, section headline
-
             description => STRING , # optional, additional text (html is allowed)
-
-            buttons => [BUTTON_DEF, BUTTON_DEF, BUTTON_DEF] , #optional, defines the buttons/links for this section
-
+            buttons => [ BUTTON_DEF, BUTTON_DEF, ... ] , # optional, defines the buttons/links for this section
             # additional content-params depending on type (see below)
         },
-
         # additional section-params depending on type:
     }
 
@@ -98,7 +90,9 @@ Grids are rendered using the `jquery datatable plugin (http://datatables.net) <h
 ::
 
     content => {
-        label => .., description => .., buttons => ..,
+        label => ..,
+        description => ..,
+        buttons => [ BUTTON_DEF, BUTTON_DEF, ... ] , # optional, defines the buttons/links for this grid
         columns => [ GRID_COL_DEF, GRID_COL_DEF , GRID_COL_DEF... ],
         data => [ GRID_ROW, GRID_ROW, GRID_ROW, ... ],
         actions => [ GRID_ACTION_DEF, GRID_ACTION_DEF, GRID_ACTION_DEF... ], # defines available actions, displayed as context menu
@@ -127,7 +121,7 @@ Grids are rendered using the `jquery datatable plugin (http://datatables.net) <h
 Columns, whose sTitle begin with an underscore will not be displayed but used as internal information (e.g. as path in GRID_ACTION_DEF). A column with the special title ``_status`` is used as css class for the row. Also a pulldown menu to filter by status will be displayed.
 The rows hold the data in form of a positional array.
 
-Action target ``modal`` creates a modal popup, ``tab`` inits or extends a tabbed window view in the current section.
+Action *target* ``modal`` creates a modal popup, ``tab`` inits or extends a tabbed window view in the current section.
 
 *Example*::
 
@@ -165,9 +159,10 @@ Render a form to submit data to the server
 ::
 
     content => {
-        label => .., description => ..,
-        buttons => [ ... ], # a form must contain at least one button to be useful
-        fields => [ FORM_FIELD_DEF,FORM_FIELD_DEF,FORM_FIELD_DEF ],
+        label => STRING,
+        description => STRING,
+        buttons => [ BUTTON_DEF, BUTTON_DEF, ... ], # a form must contain at least one button to be useful
+        fields => [ FORM_FIELD_DEF, FORM_FIELD_DEF, ... ],
     }
 
     FORM_FIELD_DEF:
@@ -175,34 +170,32 @@ Render a form to submit data to the server
         name => STRING # internal key - will be transmitted to server
         value => MIXED, # value of the field, scalar or array (depending on type)
         label => STRING, # displayed label
-        type => STRING_FIELD_TYPE, # see below for supported field types
+        type => STRING_FIELD_TYPE, # see FIELD-TYPE below for supported types
         is_optional => BOOL, # if false (or not given at all) the field is required
-        clonable => BOOL,  creates fields that can be added more than once
-        visible => BOOL, #if set to "false" ("0" in perl) this field will be not displayed (initial)
-        keys => ARRAY ,#optional, activates the special feature of "dynamic key value fields", see below.
+        clonable => BOOL, # creates fields that can be added more than once
+        visible => BOOL, # if set to "false" ("0" in perl) this field will be not displayed (initial)
+        keys => ARRAY, # optional, activates the special feature of "dynamic key value fields", see below.
         # + additional keys depending for some types
     }
 
-
-Field-Type "text", "hidden", "password", "textarea"
+FIELD-TYPE "text", "hidden", "password", "textarea"
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 No additional parameters, create a simple html form element without any extras.
 
-Field-Type "static"
+FIELD-TYPE "static"
 ^^^^^^^^^^^^^^^^^^^
 
 No additional parameters, creates a simple "readonly" text element with the
 value treated as a "hidden" form element. If you want to display a formatted
-version of the value, you can pass this using the ``verbose`` key.
+version of the value instead, you can pass it using the *verbose* key.
 
-
-Field-Type "checkbox/bool"
+FIELD-TYPE "checkbox/bool"
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A html checkbox, ``value`` and ``is_optional`` are without effect, as always 0 or 1 is send to the server.
+A html checkbox; *value* and *is_optional* are without effect, as always 0 or 1 is send to the server.
 
-Field-Type "date"
+FIELD-TYPE "date"
 ^^^^^^^^^^^^^^^^^^
 
 A text field with a jquery datapicker attached. Additional (all optional) params are:
@@ -215,7 +208,7 @@ A text field with a jquery datapicker attached. Additional (all optional) params
         return_format => STRING # one of terse|printable|iso8601|epoch, see OpenXPKI::Datetime
     }
 
-Field-Type "select"
+FIELD-TYPE "select"
 ^^^^^^^^^^^^^^^^^^^^
 
 A html select element, the options parameter is required, others are optional::
@@ -232,7 +225,7 @@ The ``options`` parameter can be fetched via an ajax call. If you set ``options 
 
 Setting the editable flag to a true value enables the users to enter any value into the select box (created with `Bootstrap Combobox <https://github.com/danielfarrell/bootstrap-combobox>`_).
 
-Field-Type "radio"
+FIELD-TYPE "radio"
 ^^^^^^^^^^^^^^^^^^
 
 The radio type is the little brother of the select field, but renders the items as a list of items using html radio-buttons. It shares the syntax of the ``options`` field with the select element::
@@ -244,7 +237,7 @@ The radio type is the little brother of the select field, but renders the items 
     }
 
 
-Field-Type "upload"
+FIELD-TYPE "upload"
 ^^^^^^^^^^^^^^^^^^^
 
 Renders a field to upload files with some additional benefits::
@@ -265,8 +258,11 @@ Dynamic key value fields
 If a field is defined with the property "keys", a pulldown of options is displayed above the actual field. This allows the user to specify, which kind of information he wants to specify.
 The content of the actual field will be submitted to the server with the selected key in the key-pulldown.
 
-Example:
+*Example*::
+
     { name => '...', label => 'Dyn Key-Value', 'keys' => [{value=>"key_x",label=>"Typ X"},{value=>"key_y",label=>"Typ Y"}], type => 'text' },
+
+..
 
     This example definition will render a Textfield with label "Dyn Key-Value". Above the textfield a select is displayed with three options ("Typ x","Typ y" and "Typ z").
     If the user chooses "Typ Z", the entered value in the textfield will be posted to server with key "key_z".
@@ -295,7 +291,9 @@ You can define more than one (cascading) dependent select.
 
 *Example*:
 
-Initial definition of fields::
+    Initial definition of fields:
+
+::
 
     fields => [
         { name => 'cert_typ', label => 'Typ',value=> 't2', prompt => 'please select a type',  type => 'select', actionOnChange => 'test_dep_select!change_type', options=>[{value=>'t1',label=>'Typ 1'},{value=>'t2',label=>'Typ 2'},{value=>'t3',label=>'Typ 3'}] },
@@ -303,7 +301,11 @@ Initial definition of fields::
         { name => 'special', label => 'Spezial (nur Typ 2',  type => 'checkbox',visible => 0 },
     ]
 
-Action "test_dep_select!change_type" returns a (partially updated) definition of fields::
+..
+
+    Action "test_dep_select!change_type" returns a (partially updated) definition of fields:
+
+::
 
     {
         _returnType => 'partial',
@@ -322,19 +324,19 @@ SECTION-TYPE "key-value"
 -------------------------
 
 Render a list of key/value items in a two column grid. The left column shows
-the text given by "label", the right column is formated based on value and
-format (see Formatted Strings).
+the text given by *label*, the right column is formated based on *value* and
+*format* (see Formatted Strings).
 
-There is a special format type "head" which renders a table head tag spanning
-both columns. If a context item is referenced, the value is used as headline,
+There is a special *format* type ``head`` which renders a table head tag spanning
+both columns. If a context item is referenced, *value* is used as headline,
 it might be decorated using a template. As an alternative, a fixed value can
-be given using the key label.
+be given using the key *label*.
 
-Add an item with format set to spacer to create an empty separator line
-(there is a global field names spacer in the default config so you can just
-say '- spacer' in the output section).
+Add an item with *format* set to ``spacer`` to create an empty separator line
+(there is a global workflow field named *spacer* in the default *ca-one* config
+so you can just say ``- spacer`` in the workflow ``output`` section).
 
-An option className can be set which is put into the rows tr tag.
+An option *className* can be set which is put into the rows' ``<tr>`` tag.
 
 Item Level
 ==========
@@ -384,17 +386,17 @@ Create an internal framework link to a page or action, expects a hash with ``lab
 extlink
 ^^^^^^^
 
-Similar to link but expects href to be an external target, default target is blank.
+Similar to *link* but: expects *href* to be an external target, default *target* is ``_blank``.
 
 text
 ^^^^
 
-Readable text without html markup (will be escaped)
+Readable text without html markup (special characters will be escaped)
 
 nl2br
 ^^^^^
 
-Like text with line breaks (\n) converted to "<br>"
+Like text but with line breaks ``\n`` converted to ``<br>``
 
 raw
 ^^^
@@ -426,7 +428,7 @@ Like ullist but displays the items "as is" (can contain HTML markup)
 linklist
 ^^^^^^^^
 
-Array, where each item is a hash describing a link
+Array, where each item is a hash describing a _`link`
 
 styled
 ^^^^^^
