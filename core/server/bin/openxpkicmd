@@ -29,6 +29,7 @@ my %params = (
     wfaction => undef,
     param => [],
     nosplit => undef,
+    dosplit => undef,
     context => undef,
     attribute => undef,
     json => undef,
@@ -99,6 +100,7 @@ GetOptions(\%params,
             wfaction=s
             param|set=s@
             nosplit
+            dosplit
             debug
             context
             attribute
@@ -125,19 +127,28 @@ my $wf_type = shift;
 
 # expect foo=bar or foo:bar in @param, split at assignment and
 # build hash
-my @wf_parameters;
+my @wf_parameters = @{$params{param}};
 if ( $params{nosplit} ) {
-    @wf_parameters = @{$params{param}};
-} else {
+    print STDERR "The --nosplit option was removed as it is the default now";
+} elsif ($params{dosplit}) {
     @wf_parameters = split(/,/, join(',', @{$params{param}}));
 }
+
 my %wf_parameters;
 foreach my $entry (@wf_parameters) {
     my ($key, $value) = ($entry =~ m{ \A (.*?) [=:] (.*) }xms);
     if (! defined $key) {
-    $key = $entry;
+        $key = $entry;
     }
-    $wf_parameters{$key} = $value;
+    # parameter given more than once = make array
+    if (defined $wf_parameters{$key}) {
+        if (!ref $wf_parameters{$key}) {
+            $wf_parameters{$key} = [ $wf_parameters{$key} ];
+        }
+        push @{$wf_parameters{$key}}, $value;
+    } else {
+        $wf_parameters{$key} = $value;
+    }
 }
 
 if($params{instance}){
@@ -317,7 +328,10 @@ openxpkicmd [options] WORKFLOW_TYPE
     --authuser USER       authentication user (optional)
     --authpass PASS       password for authentication user (optional)
     --param KEY=VALUE     pass VALUE to WF parameter KEY (optional)
-    --nosplit             Supress splitting of given WF param on comma
+                          Giving the same KEY more than once creates an array
+    --dosplit             Re-enable legacy behaviour to map mulitple params
+                          using --param KEY1=VAL1,KEY2=VAL2.
+                          Deprecared, please pass multiple --params instead.
     --wfid                Pickup WF with this id at its current state
     --wfaction            Execute action on exisiting workflow
     --debug               enable debug mode
