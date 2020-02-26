@@ -79,7 +79,7 @@ if [ -e /etc/logrotate.d/ ]; then
 fi
 
 # CONFIGURATION and DATABASE SETUP
-/bin/bash /vagrant/scripts/oxi-refresh --full                    2>&1 | tee $LOG
+/vagrant/scripts/oxi-refresh --full 2>&1 | tee $LOG
 
 #
 # Apache configuration
