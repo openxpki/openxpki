@@ -1,7 +1,3 @@
-# OpenXPKI::Server::Workflow::Activity::Tools::PublishCRL
-# Written by Oliver Welter for the OpenXPKI project 2012
-# Copyright (c) 2012 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::Tools::PublishCRL;
 
 use strict;
@@ -14,47 +10,37 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Crypt::X509;
+use Workflow::Exception qw(configuration_error workflow_error);
 
 use Data::Dumper;
 
 sub execute {
+
     ##! 1: 'start'
     my $self     = shift;
     my $workflow = shift;
     my $context  = $workflow->context();
-    my $config        = CTX('config');
+    my $config   = CTX('config');
     my $pki_realm = CTX('session')->data->pki_realm;
 
     my $dbi = CTX('dbi');
 
-    if (!$self->param('prefix')) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPI_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CRL_NO_PREFIX'
-        );
-    }
-
     my $default_token = CTX('api2')->get_default_token();
     my $prefix = $self->param('prefix') || '';
-    my $ca_alias = $context->param('ca_alias');
-    my $crl_serial = $context->param('crl_serial');
-    $crl_serial = $self->param('crl_serial') unless($crl_serial);
+    my $ca_alias = $self->param('ca_alias') // $context->param('ca_alias');
+    my $crl_serial = $self->param('crl_serial') // $context->param('crl_serial');
+
+    if (!$crl_serial) {
+        configuration_error('You must set crl_serial to an existing serial number or the special value *latest*');
+    }
 
     if (!$ca_alias) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPI_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CRL_NO_CA_ALIAS'
-        );
+        configuration_error('You must pass ca_alias');
     }
 
     my $certificate = CTX('api2')->get_certificate_for_alias( 'alias' => $ca_alias );
     my $x509_issuer = OpenXPKI::Crypt::X509->new( $certificate->{data} );
-
     my $ca_identifier = $certificate->{identifier};
-
-    if (!$crl_serial) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPI_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CRL_NO_CRL_SERIAL'
-        );
-    }
 
     my $crl;
     # auto detect the latest one
@@ -66,7 +52,8 @@ sub execute {
             columns => [ '*' ],
             where => {
                 pki_realm => $pki_realm,
-                issuer_identifier => $ca_identifier
+                issuer_identifier => $ca_identifier,
+                profile => undef,
             },
             order_by => '-last_update',
         );
@@ -74,11 +61,10 @@ sub execute {
         # can happen for external CAs or if new tokens did not create a crl yet
         if (!$crl && $self->param('empty_ok')) {
             CTX('log')->system()->info("CRL publication skipped for $ca_identifier - no crl found");
-
             return;
         }
 
-        $crl_serial = $crl->{crk_key};
+        $crl_serial = $crl->{crl_key};
 
     } else {
 
@@ -87,7 +73,7 @@ sub execute {
             from => 'crl',
             columns => [ '*' ],
             where => {
-                crl_key => $crl_serial
+                crl_key => $crl_serial,
             }
         );
 
@@ -100,6 +86,7 @@ sub execute {
         }
 
     }
+
 
     ##! 16: "Start publishing - CRL Serial $crl_serial , ca alias $ca_alias"
 
@@ -140,39 +127,40 @@ sub execute {
 
 
     my @target;
-    my @prefix = split ( /\./, $prefix );
+    my @prefix = ('publishing', 'crl');
+
+    if ($prefix) {
+        @prefix = split ( /\./, $prefix );
+        ##! 16: 'Load targets using prefix '. $prefix
+        @target = $config->get_keys( \@prefix );
+    } else {
+        my $profile = $crl->{profile} || 'default';
+        ##! 16: 'Load targets from profile '. $profile
+        @target = $config->get_scalar_as_list( [ 'crl', $profile, 'publish' ] );
+    }
+
     if ( $context->param( 'tmp_publish_queue' ) ) {
         my $queue =  $context->param( 'tmp_publish_queue' );
-        ##! 16: 'Load targets from context queue'
+        ##! 16: 'Overwrite targets from context queue'
         if (!ref $queue) {
             $queue  = OpenXPKI::Serialization::Simple->new()->deserialize( $queue );
         }
         @target = @{$queue};
-
-    } elsif (!$prefix) {
-
-        my $profile = $crl->{profile} || 'default';
-
-        # CRL has profile - read publication from there
-        @target = $config->get_scalar_as_list( [ 'crl', $profile, 'publish' ] );
-        @prefix = ('publishing', 'crl');
-                
-    } else {
-
-        ##! 16: 'Load all targets'
-        @target = $config->get_keys( \@prefix );
-
     }
 
-    # If the data point does not exist, we get a one item undef array
+
+    # Some connectors return a one item array with an empty element
+    ##! 32: 'Targets ' . Dumper \@target
     return unless (@target && $target[0]);
-        
+
     my $on_error = $self->param('on_error') || '';
     my @failed;
-    ##! 32: 'Targets ' . Dumper \@target
+
     foreach my $target (@target) {
+        ##! 16: 'Start publishing to ' . $target
         eval{ $config->set( [ @prefix, $target, $data->{issuer}{CN}[0] ], $data ); };
         if (my $eval_err = $EVAL_ERROR) {
+            ##! 16: 'failed with error ' . $eval_err
             CTX('log')->application()->debug("Publishing failed with $eval_err");
             if ($on_error eq 'queue') {
                 push @failed, $target;
@@ -229,27 +217,29 @@ OpenXPKI::Server::Workflow::Activity::Tools::PublishCRLs
 
 =head1 Description
 
-This activity publishes a single crl. The context must hold the crl_serial
-and the ca_alias parameters. I<crl_serial> can have the value "latest" which
-will resolve to the crl with the highest last_update date for the issuer.
+This activity publishes a single crl. The parameters crl_serial and ca_alias
+must be set either via activity parameters or exist in the context.
+I<crl_serial> can have the value "latest" which will resolve to the crl with
+the highest last_update date for the issuer created by the default profile.
 
-The list of targets can be defined by profile or globally. In either case
-each connector is called with the CN of the issuing ca as location.
-The data portion contains a hash ref with the keys I<pem>, I<der>
-and I<subject> (issuer subject) holding the appropriate strings and
-I<issuer> which is the issuer subject parsed into a hash as used in the
-template processing when issuing the certificates.
-  
-There are severeal options to handle errors when the connectors fail,
+The list of targets can be defined via an activity parameter or is read from
+the CRl profile definition (see below). In either case each connector is
+called with the CN of the issuing ca as location. The data portion contains
+a hash ref with the keys I<pem>, I<der> and I<subject> (issuer subject)
+holding the appropriate strings and I<issuer> which is the issuer subject
+parsed into a hash as used in the template processing when issuing the
+certificates.
+
+There are several options to handle errors when the connectors fail,
 details are given below (see I<on_error> parameter).
 
-=head2 Publication by Profile
+=head2 Publication by Profile (default)
 
 The publishing information is read from the connector at crl.<profile>.publish
 which must be a list of names (scalar is also ok). If the CRL to publish has
-no profile set (which is the default), crl.default.publish is used. Each 
-name is expanded to the path publishing.crl.<name> which must be a  
-connector reference. 
+no profile set (which is the default), crl.default.publish is used. Each
+name is expanded to the path publishing.crl.<name> which must be a
+connector reference.
 
 B<Note>: Contrary to certificate publication I<crl.default.publish> is only
 used if the crl has no profile but it is not used as a global fallback if
@@ -260,7 +250,7 @@ there is no publication defined for the profile!
 Instead of reading the publication targets from the profile you can point
 the activity directly to a list of connectors setting I<prefix> to the base
 path of a hash. Each key is the internal name of the target, the value must
-be a connector reference.  
+be a connector reference.
 
 =head1 Configuration
 
@@ -305,12 +295,12 @@ to be set.
 =item crl_serial
 
 The serial of the crl to publish or the keyword "latest" which pulls the
-CRL with the latest last_update date for the given issuer. Only effective
-if B<NOT> set in the context.
+CRL with the latest last_update date for the given issuer which was
+created with the default profile. Has precedence over the context item.
 
-B<Note>: latest and prefix based publication might cause unexpected 
-behaviour when used with CRL profiles as latest does not filter on the 
-profile!
+=item ca_alias
+
+The alias name of the CA. Has precedence over the context item.
 
 =item empty_ok
 
@@ -325,12 +315,13 @@ skip publication of no CRL is found for the given issuer.
 
 =item ca_alias
 
-The alias name of the CA
+The alias name of the CA. Activity parameter has precedence!
 
 =item crl_serial
 
 The serial of the crl to publish or the keyword "latest" which pulls the
 CRL with the latest last_update date for the given issuer.
+Activity parameter has precedence!
 
 =item tmp_publish_queue
 
