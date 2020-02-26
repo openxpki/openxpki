@@ -344,22 +344,59 @@ Item Level
 Buttons (BUTTON_DEF)
 --------------------
 
-Defines a button.::
+Defines a button. There are three modes, depending on which one of these parameters is specified:
+*page*, *action*, *href*.
+
+**Common parameters** for *page* and *action*::
 
     {
-        page => STRING_PAGE,
-        action => STRING_ACTION, # parameters "page" and "action" will be transmitted to server. if an "action" is given, POST will be used instead of GET
+        target => [main|modal|tab|active], # (optional, default is "main")
         label => STRING, # The label of the button
-        target => STRING_TARGET, # one of main|modal|right|tab (optional, default is main)
-        css_class => STRING, # optional, css class for the button element
-        do_submit => BOOL, # optional, if true, the button submits the contents of the form to the given page/action target, only available with form-section
+        tooltip => STRING, # (optional)
+        className => STRING, # CSS class (optional)
+        confirm => {
+            label => STRING, #
+            description => STRING, #
+            confirm_label => STRING,  # (optional, defaults to "Confirm")
+            cancel_label => STRING,  # (optional, defaults to "Abort")
+        },
     }
 
+*target*: determines where the contents returned by the server shall be displayed:
 
-Formattet Strings (STRING_FORMAT)
+- ``main`` - as main tab (close all other tabs)
+- ``modal`` - as a modal dialog
+- ``tab`` - in a new tab
+- ``active`` - in the active tab
+
+**page**: load a page - calls an ``init_*`` method in the specified class::
+
+    {
+        page => STRING, # page to render (GET request with parameter "page")
+        # + Common parameters (see above)
+    }
+
+**action**: execute action via AJAX - calls an ``action_*`` method in the specified class::
+
+    {
+        action => STRING, # action to execute (POST request with parameter "action")
+        # + Common parameters (see above)
+    }
+
+**href**: open a custom URL::
+
+    {
+        href => STRING, # URL to call
+        target => STRING, # any HTML link target, e.g. '_blank'
+        label => STRING, # The label of the button
+        tooltip => STRING, # (optional)
+        className => STRING, # CSS class (optional)
+    }
+
+Formatted Strings (STRING_FORMAT)
 ---------------------------------
 
-Tells the ui to process the data before rendering with a special formatter. Available methods are:
+Tells the UI to process the data with a special formatter before rendering. Available methods are:
 
 timestamp
 ^^^^^^^^^
@@ -381,7 +418,14 @@ Colorizes the given status word using css tags, e.g. ``issued`` becomes::
 link
 ^^^^
 
-Create an internal framework link to a page or action, expects a hash with ``label`` and ``page`` and optional ``target``, default is to open the link in a modal.
+Create an internal framework link to a page or action, expects a hash like::
+
+    {
+        label => STRING, #
+        page => STRING, #
+        target => [_blank|main|modal|tab|active], # (optional, defaults to "modal")
+        tooltip => STRING, # optional
+    }
 
 extlink
 ^^^^^^^
