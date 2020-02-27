@@ -30,7 +30,7 @@ copy_us2gb:
 	mkdir -p en_GB
 	sed -r 's/^("Language:) en_US/\1en_GB/' en_US/openxpki.po > en_GB/openxpki.po
 
-$(PO_SOURCES)::
+$(PO_SOURCES):
 	@if (test ! -d $(@:openxpki.po=)); then echo creating directory for $(@:openxpki.po=); mkdir $(@:openxpki.po=); fi
 	@if (test ! -f $@); then echo creating po file $@; cp openxpki.pot $@; fi
 	@if (test `uname` = "SunOS"); then \
@@ -43,7 +43,7 @@ $(PO_SOURCES)::
 ## do not depend on openxpki.pot or some directories - this does not work
 scan:
 	perl build-pot.pl $(POT_SOURCES) > openxpki.pot
-	$(MAKE) $(PO_SOURCES)
+	$(MAKE) MAKEFLAGS=-B $(PO_SOURCES)
 
 install::	$(LANGS)
 	$(MAKE) install_dir DIR=$(LOCALE_DIR)
