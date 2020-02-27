@@ -411,7 +411,16 @@ Expects a parseable date, outputs a full UTC timestamp.
 certstatus
 ^^^^^^^^^^
 
-Colorizes the given status word using css tags, e.g. ``issued`` becomes::
+Colorizes the given status word using css tags::
+
+    {
+        label => STRING, # text to show
+        value => STRING, # used alternatively to assemble CSS class (optional)
+        tooltip => STRING, # (optional)
+    }
+
+The CSS class is assembled as follows: ``certstatus-`` + *value*. If no value is given: ``certstatus-`` + *label*.
+E.g. ``label => "issued"`` becomes::
 
     <span class="certstatus-issued">issued</span>
 
@@ -424,7 +433,7 @@ Create an internal framework link to a page or action, expects a hash like::
         label => STRING, #
         page => STRING, #
         target => [_blank|main|modal|tab|active], # (optional, defaults to "modal")
-        tooltip => STRING, # optional
+        tooltip => STRING, # (optional)
     }
 
 extlink
