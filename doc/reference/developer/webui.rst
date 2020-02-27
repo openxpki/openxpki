@@ -369,19 +369,25 @@ Defines a button. There are three modes, depending on which one of these paramet
 - ``tab`` - in a new tab
 - ``active`` - in the active tab
 
-**page**: load a page - calls an ``init_*`` method in the specified class::
+**page**: load a page (GET request, no client-side parameters)
 
+::
     {
         page => STRING, # page to render (GET request with parameter "page")
         # + Common parameters (see above)
     }
 
-**action**: execute action via AJAX - calls an ``action_*`` method in the specified class::
+This calls an ``init_*`` method in the specified class.
 
+**action**: execute action via AJAX (POST request with client-side parameters)
+
+::
     {
         action => STRING, # action to execute (POST request with parameter "action")
         # + Common parameters (see above)
     }
+
+This calls an ``action_*`` method in the specified class.
 
 **href**: open a custom URL::
 
