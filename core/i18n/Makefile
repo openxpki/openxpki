@@ -17,13 +17,18 @@ TOPDIR := ../..
 #---- variable settings above, rules below ----
 
 
-.PHONY:	default test install clean clean.local distclean openxpki.pot
+.PHONY:	default test install clean distclean copy_us2gb
 
 # do not run parallel make on the target files (does not work properly, at least on FreeBSD)
 .NOTPARALLEL: $(MO_TRANSLATIONS)
 
-default::	$(MO_TRANSLATIONS)
+default::	copy_us2gb $(MO_TRANSLATIONS)
 	@echo Languages: $(LANGS)
+
+# create en_GB by copying en_US
+copy_us2gb:
+	mkdir -p en_GB
+	sed -r 's/^("Language:) en_US/\1en_GB/' en_US/openxpki.po > en_GB/openxpki.po
 
 $(PO_SOURCES)::
 	@if (test ! -d $(@:openxpki.po=)); then echo creating directory for $(@:openxpki.po=); mkdir $(@:openxpki.po=); fi
@@ -95,7 +100,6 @@ dist: readversion
 		rm -rf $(PACKAGE)-$(VERSION)/ ; \
 	fi
 	mkdir $(PACKAGE)-$(VERSION)
-	if [ -L "en_US" ]; then rm en_US; fi			# Work around bug in buster build
 	tar -c -p -f - \
 		--exclude "*.svn" \
 		--exclude "$(PACKAGE)-*" \
@@ -103,7 +107,6 @@ dist: readversion
 		--exclude "*~" \
 		. | \
 		tar -C $(PACKAGE)-$(VERSION)/ -x -f -
-	if [ ! -e en_US ]; then cp -a en_GB en_US; fi	 # Work around bug in buster build
 	tar cf $(PACKAGE)-$(VERSION).tar $(PACKAGE)-$(VERSION)
 	gzip --best --force $(PACKAGE)-$(VERSION).tar
 	rm -rf $(PACKAGE)-$(VERSION)/
