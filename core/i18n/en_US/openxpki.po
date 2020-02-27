@@ -116,10 +116,6 @@ msgstr "superseded"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE_UNSPECIFIED"
 msgstr "unspecified"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE_UNSPECIFIED"
-msgstr "Certificate Identifier"
-
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_RELATED_WORKFLOW_LABEL"
 msgstr "Related Workflows"
 
