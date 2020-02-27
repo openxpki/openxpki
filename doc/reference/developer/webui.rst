@@ -445,7 +445,7 @@ Like text but with line breaks ``\n`` converted to ``<br>``
 raw
 ^^^
 
-Displayed as is.
+Displays the given text as is (i.e. HTML formatting allowed).
 
 code
 ^^^^
@@ -482,6 +482,14 @@ of the colon is extracted and the text at the right is wrapped with span
 with style class "styled-``stylename``. Predefined stylenames are
 ``valid``, ``failed`` and ``attention``
 
+tooltip
+^^^^^^^
+Shows the given text as is (i.e. HTML formatting allowed) and adds a tooltip to it::
+
+    {
+        value => STRING, # text to be shown
+        tooltip => STRING, # text of the tooltip
+    }
 
 Customization
 =============
