@@ -34,6 +34,11 @@ default: 10
 The number of seconds to sleep after the watchdog ran into an exception.
 default: 60
 
+=item interval_sleep_overload
+
+The number of seconds to sleep after the watchdog ran into an exception.
+default: 15
+
 =item max_tries_hanging_workflows
 
 Try to restarted stale workflows this often before failing them.
@@ -47,10 +52,18 @@ not wise).
 
 default: 1
 
+=item max_worker_count
+
+Maximum number of workers that the watchdog can run in parallel. No new
+workflows are woke up if this limit is reached and the watchdog will
+sleep for I<interval_sleep_overload> seconds.
+
+default: 50
+
 =item interval_wait_initial
 
 Seconds to wait after server start before the watchdog starts scanning.
-default: 30;
+default: 10;
 
 =item interval_loop_idle
 
@@ -113,6 +126,12 @@ has interval_sleep_exception => (
     default =>  60
 );
 
+has interval_sleep_overload => (
+    is => 'rw',
+    isa => 'Int',
+    default =>  15
+);
+
 has max_tries_hanging_workflows => (
     is => 'rw',
     isa => 'Int',
@@ -125,11 +144,16 @@ has max_instance_count => (
     default =>  1
 );
 
+has max_worker_count => (
+    is => 'rw',
+    isa => 'Int',
+    default =>  50
+);
 # All timers in seconds
 has interval_wait_initial => (
     is => 'rw',
     isa => 'Int',
-    default =>  30
+    default =>  10
 );
 
 has interval_loop_idle => (
@@ -345,7 +369,7 @@ sub run {
         $self->{original_pid}             = $PID;
 
         # set process name
-        OpenXPKI::Server::__set_process_name("watchdog");
+        OpenXPKI::Server::__set_process_name("watchdog: init");
 
         CTX('log')->system()->info(sprintf( 'Watchdog initialized, delays are: initial: %01d, idle: %01d, run: %01d"',
                 $self->interval_wait_initial(), $self->interval_loop_idle(), $self->interval_loop_run() ));
@@ -389,19 +413,50 @@ Runs until the package scope variable C<$TERMINATE> is set to C<1>.
 sub __main_loop {
     my $self = shift;
 
+    my $slots_avail_count = $self->max_worker_count();
     while (not $TERMINATE) {
         ##! 64: 'watchdog: do loop'
         try {
             $self->__reload if $RELOAD;
             $self->__purge_expired_sessions;
-            my $wf_id = $self->__scan_for_paused_workflows();
+
+            # if slots_avail_count is zero, do a recalc
+            if (!$slots_avail_count) {
+                ##! 8: 'slots avail count reached zero - do recalc'
+                $slots_avail_count = $self->max_worker_count();
+                my $pt = new Proc::ProcessTable;
+                foreach my $ps (@{$pt->table}) {
+                    if ($ps->ppid == $$) {
+                        ##! 32: 'Found watchdog child '.$ps->pid.' - remaining process count: ' . $slots_avail_count
+                        last unless ($slots_avail_count--);
+                    }
+                }
+            }
+
+            ##! 32: 'slots avail counter is ' . $slots_avail_count
 
             # duration of pause depends on whether a workflow was found or not
-            my $sec = $wf_id ? $self->interval_loop_run : $self->interval_loop_idle;
-            ##! 64: sprintf('watchdog sleeps %d secs (%s)', $sec, $wf_id ? 'busy' : 'idle')
+            my $sec = $self->interval_loop_idle;
+            if (!$slots_avail_count) {
+                ##! 16: 'watchdog paused - too much load'
+                $sec = $self->interval_sleep_overload;
+                OpenXPKI::Server::__set_process_name("watchdog (OVERLOAD)");
+                CTX('log')->system->warn(sprintf "Watchdog process limit (%01d) reached, will sleep for %01d seconds", $self->max_worker_count(), $sec );
+            } elsif (my $wf_id = $self->__scan_for_paused_workflows()) {
+                ##! 32: 'watchdog busy - forked child ' . $wf_id
+                $sec = $self->interval_loop_run;
+                $slots_avail_count--;
+                OpenXPKI::Server::__set_process_name("watchdog (busy)");
+            } else {
+                ##! 32: 'watchdog idle'
+                OpenXPKI::Server::__set_process_name("watchdog (idle)");
+            }
+            ##! 64: sprintf('watchdog sleeps %d secs', $sec)
+
             sleep($sec);
             # Reset the exception counter after every successfull loop
             $self->_exception_count(0);
+
         }
         catch {
             $self->_exception_count($self->_exception_count + 1);
