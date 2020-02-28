@@ -38,7 +38,7 @@ use Data::Dumper;
 binmode(STDOUT, ":utf8");
 
 my %params = ( module => [] );
-my @options_spec = ('config=s','instance|i=s','verbose','debug');
+my @options_spec = ('config=s','instance|i=s','verbose','debug|:s');
 my $cmd = shift || 'help';
 my $ret = 255;
 
@@ -1210,7 +1210,7 @@ sub __init {
     GetOptions( \%params, @options_spec ) or pod2usage( -verbose => 0 );
 
     Log::Log4perl->easy_init( {
-        level    => $params{debug} ? $DEBUG : ( $params{verbose} ? $INFO : $WARN ),
+        level    => defined $params{debug} ? $DEBUG : ( $params{verbose} ? $INFO : $WARN ),
         layout   => '[%p] %m%n'
     });
 
@@ -1536,8 +1536,21 @@ if ($cmd eq 'initdb') {
         $ret = 2;
     }
 
-    if ($params{debug}) {
-        print Dump $c->get_hash('');
+    if (defined $params{debug}) {
+        my $hash = $c->get_hash('');
+        if ($params{debug}) {
+            printf "system config at %s:\n", $params{debug};
+            my @path = split /\./, $params{debug};
+            foreach my $item (@path) {
+                if (!defined $hash->{$item}) {
+                    print STDERR "No such component ($item)";
+                    $hash = {};
+                    last;
+                }
+                $hash = $hash->{$item};
+            }
+        }
+        print Dump $hash;
     }
 
     foreach my $module (@{$params{module}}) {
@@ -1963,7 +1976,8 @@ Command options:
   -- module  Specify extra modules to apply on the config object for
              additional checks.
 
-  --debug    Dump the full config tree as YAML structure
+  --debug               Dump the full config tree as YAML structure
+  --debug path.to.node  Dump the tree below this node as YAML structure
 
 =head2 buildconfig
 
