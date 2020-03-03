@@ -2672,6 +2672,7 @@ sub __render_fields {
 
         my $key = $field->{name} || '';
         my $item = {
+            name => $key,
             value => $field->{value} // (defined $context->{$key} ? $context->{$key} : ''),
             format =>  $field->{format} || ''
         };
