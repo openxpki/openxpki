@@ -166,6 +166,11 @@ sub execute_action {
         # skip auto-persist as this will happen on next call anyway
         $self->set_reap_at_interval($reap_at_interval, 1);
 
+
+        # see #739 - retry_count should never be set when we are in a
+        # recursive autorun loop so we clear it here
+        $self->count_try(0) if ($autorun);
+
         # if proc_state is "manual" then make sure no other process modified it
         # meanwhile (i.e. is executing the same action in parallel)
         if ($self->proc_state eq 'manual') {
