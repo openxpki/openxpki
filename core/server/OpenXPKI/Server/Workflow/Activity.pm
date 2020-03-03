@@ -1,7 +1,3 @@
-# OpenXPKI::Server::Workflow::Activity
-# Written by Martin Bartosch for the OpenXPKI project 2005
-# Rewritten by Alexander Klink for the OpenXPKI project 2007
-# Copyright (c) 2005-2007 by The OpenXPKI Project
 package OpenXPKI::Server::Workflow::Activity;
 
 use strict;
@@ -11,7 +7,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Workflow::Pause;
-use Workflow::Exception qw( workflow_error );
+use Workflow::Exception qw( workflow_error configuration_error );
 use Data::Dumper;
 
 __PACKAGE__->mk_accessors( qw( resulting_state workflow _map log ) );
@@ -88,18 +84,41 @@ sub pause {
     ##! 64: 'Check for workflow object'
     if($self->workflow()){
 
-        ##! 16: 'calc wakeup - $retry_interval ' . $retry_interval
-        # Workflow expects explicit wakeup as epoch
-        my $dt_wakeup_at = OpenXPKI::DateTime::get_validity({
-            VALIDITY => $retry_interval,
-            VALIDITYFORMAT => 'detect',
-        });
+        my $wakeup;
+        # retry interval can be given as a list of comma separated values
+        # each item is considered to be a number of minutes, fractions are allowed
+        if ($retry_interval =~ m{,}) {
 
-        ##! 32: 'Wakeup is ' . Dumper $dt_wakeup_at
+            my @times = split /\s*,\s*/, $retry_interval;
+            my $cnt = $self->get_retry_count();
+            if ($cnt < @times) {
+                ##! 32: "retry_count is $cnt - picking interval"
+                $retry_interval = $times[$cnt];
+            } else {
+                ##! 32: "retry_count is $cnt which is larger than number of intervals - picking last"
+                $retry_interval = $times[-1];
+            }
 
-        my $wakeup = $dt_wakeup_at->epoch();
+            ##! 16: 'retry interval from list:  ' . $retry_interval
+            configuration_error('Retry interval found is not a valid number ('.$retry_interval.')')
+                unless ($retry_interval =~ m{\A \d+(\.\d+)? \z}x);
+
+            # no need for datetime stuff here as we just need epoch
+            $wakeup = time() + $retry_interval * 60;
+
+        } else {
+            ##! 16: 'calc wakeup - $retry_interval ' . $retry_interval
+            # Workflow expects explicit wakeup as epoch
+            my $dt_wakeup_at = OpenXPKI::DateTime::get_validity({
+                VALIDITY => $retry_interval,
+                VALIDITYFORMAT => 'detect',
+            });
+            $wakeup = $dt_wakeup_at->epoch();
+
+        }
+        ##! 32: 'Wakeup is ' . $wakeup
+
         # Spread the pause interval by a custom random factor
-        ##! 32: 'check rand offset '
         if (my $rand = $self->param('retry_random')) {
             my $now = time();
             my $delta = $wakeup - $now;
@@ -246,7 +265,7 @@ sub get_max_allowed_retries{
     }
 
     if (defined($self->param('retry_count'))) {
-        ##! 16: 'defined in activity-xml: '.$self->param('retry_count')
+        ##! 16: 'defined as activity param: '.$self->param('retry_count')
         return $self->param('retry_count');
     }
     # TODO default setting?
@@ -300,7 +319,7 @@ sub get_retry_interval {
     }
 
     if(defined $self->param('retry_interval' )){
-        ##! 16: 'defined in activity-xml: '.$self->param('retry_interval')
+        ##! 16: 'defined as activity param: '.$self->param('retry_interval')
         return $self->param('retry_interval');
     }
     # TODO default setting?
@@ -495,6 +514,12 @@ Note that this is a minimum amount of time that needs to elapse, after which
 the watchdog is allowed to pick up the job. Depending on your load and watchdog
 settings, the actual time can be much greater!
 
+If you want different delays for the retries you can give a comma seperated list
+of numbers. When the action is retried e.g. the third time, the third item of the
+list is used as delay. Each item is interpreted as a number of minutes, integer
+or decimals are allowed. If the list has to fewer items than max_retires, the
+last value from the list is used for the remaining retries.
+
 =item retry_random (optional)
 
 Integer value, interpreted as percentage value (e.g. 25 = 25%), spreads the
@@ -526,7 +551,7 @@ before that, $self->workflow()->pause() will be called, which stores away all ne
 
 =head2 get_max_allowed_retries
 
-returns the number of max allowed retries (normally defined in xml-config). default: 0
+returns the number of max allowed retries (normally defined in config). default: 0
 
 =head2 set_max_allowed_retries($int)
 
@@ -534,7 +559,7 @@ sets the number of max allowed retries
 
 =head2 get_retry_interval
 
-returns the retry interval (relative OpenXPKI DateTime String, normally defined in xml-config). default: "+0000000005"
+returns the retry interval (relative OpenXPKI DateTime String, normally defined in config). default: "+0000000005"
 
 =head2 set_retry_interval($string)
 
