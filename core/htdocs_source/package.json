@@ -31,6 +31,7 @@
     "ember-cli": "~3.16.0",
     "ember-cli-app-version": "^3.2.0",
     "ember-cli-babel": "^7.17.2",
+    "ember-cli-coffeescript": "^1.16.1",
     "ember-cli-dependency-checker": "^3.2.0",
     "ember-cli-eslint": "^5.1.0",
     "ember-cli-htmlbars": "^4.2.2",
