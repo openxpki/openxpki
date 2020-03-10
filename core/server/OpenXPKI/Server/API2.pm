@@ -272,7 +272,7 @@ sub _load_plugins {
         next if not $ok; # continue on errors
 
         if (not $pkg->DOES($self->command_role)) {
-            $self->log->debug("API - ignore   $pkg: does not have role ".$self->command_role." ($file)");
+            $self->log->debug("API - ignore $pkg: does not have role ".$self->command_role." ($file)");
             next;
         }
 

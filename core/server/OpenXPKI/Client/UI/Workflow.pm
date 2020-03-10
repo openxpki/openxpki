@@ -1395,6 +1395,11 @@ sub action_select {
         my $wf_token = $self->param('wf_token');
         my $wf_args = $self->__fetch_wf_token( $wf_token );
         $wf_id = $wf_args->{wf_id};
+        if (!$wf_id) {
+            $self->logger()->error('No workflow id given');
+            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error');
+            return $self;
+        }
     }
 
     Log::Log4perl::MDC->put('wfid', $wf_id);

@@ -316,7 +316,7 @@ sub param {
 
         my $str = $cgi->param($key);
         $str =~ s/^\s+|\s+$//g if (defined $str);
-        $self->logger()->trace("Value for $key after trim: $str");
+        $self->logger()->trace("Value for $key after trim: " . ($str // '<undef>')) if ($self->logger()->is_trace);
         return $str;
 
     }
