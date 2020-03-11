@@ -56,6 +56,8 @@ of the currently active session is accepted.
 
 =item * C<key> I<Str> - entry key
 
+=item * C<decrypt> I<Bool> - set to 0 to skip decryption of encrypted items
+
 =back
 
 =cut
@@ -64,6 +66,7 @@ command "get_data_pool_entry" => {
     namespace => { isa => 'AlphaPunct', required => 1, },
     # TODO Change type of "key" back to "AlphaPunct" once we have a private method to get encrypted data pool entries (where keys have more characters)
     key       => { isa => 'Str', required => 1, },
+    decrypt   => { isa => 'Bool', default => 1 },
 } => sub {
     my ($self, $params) = @_;
     ##! 8: "Reading datapool entry: realm=".$params->pki_realm.", namespace=".$params->namespace.", key=".$params->key
@@ -87,11 +90,9 @@ command "get_data_pool_entry" => {
     }
 
     my $value;
-    my $encrypted = 0;
 
     # encrypted value
-    if (my $encryption_key = $result->{encryption_key}) {
-        $encrypted = 1;
+    if (($params->decrypt) && (my $encryption_key = $result->{encryption_key})) {
         # asymmetric decryption of password safe entry
         if (my ($safe_id) = $encryption_key =~ m{ \A p7:(.*) }xms ) {
             ##! 16: "Asymmetric decryption (safe_id = $safe_id)"
@@ -116,8 +117,8 @@ command "get_data_pool_entry" => {
         key       => $result->{datapool_key},
         mtime     => $result->{last_update},
         value     => $value,
-        encrypted => $encrypted,
-        $encrypted
+        encrypted => ($result->{encryption_key} ? 1 : 0),
+        $result->{encryption_key}
             ? ( encryption_key => $result->{encryption_key} ) : (),
         $result->{notafter}
             ? ( expiration_date => $result->{notafter} ) : (),

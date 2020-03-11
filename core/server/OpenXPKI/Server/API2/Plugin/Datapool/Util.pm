@@ -74,7 +74,7 @@ sub assert_current_pki_realm_within_workflow {
 
 =head2 get_entry
 
-Fetches a value from the datapool DB table
+Fetches a value from the datapool DB table - hides expired items
 
 =cut
 sub get_entry {
@@ -90,6 +90,7 @@ sub get_entry {
             pki_realm    => $realm,
             namespace    => $namespace,
             datapool_key => $key,
+            notafter => [ { '>' => time }, undef ],
         },
     );
 }
@@ -151,6 +152,8 @@ sub set_entry {
         last_update     => time,
         notafter        => $expiry // undef,
     };
+
+    ##! 64: $data_values
 
     if ($force) {
         # force = allow overwriting entries
@@ -246,38 +249,63 @@ sub get_realm_encryption_key {
     # Create new key
     #
     ##! 16: 'first use of this password safe, generate a new symmetric vault key'
+
+    return $self->create_realm_encryption_key({ pki_realm => $realm, safe_id => $safe_id });
+}
+
+sub create_realm_encryption_key {
+    my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
+        safe_id         => { isa => 'Str', optional => 1 },
+        pki_realm       => { isa => 'Str', optional => 1, default => CTX('session')->data->pki_realm },
+        dynamic_iv      => { isa => 'Bool', default => 0 },
+        expiration_date => { isa => 'Int', optional => 1 },
+    );
+
+    my $safe_id = $args{safe_id} ||  $self->api->get_token_alias_by_type(type => 'datasafe');
+    ##! 16: 'generate a new symmetric vault key'
     my $associated_vault = OpenXPKI::Crypto::VolatileVault->new( {
         TOKEN      => $self->api->get_default_token,
+        ($args{dynamic_iv} ? (IV => undef) : ()),
         EXPORTABLE => 1,
     } );
 
-    $result = $associated_vault->export_key;
+    my $result = $associated_vault->export_key;
     my $key_id = $associated_vault->get_key_id({ LONG => 1 });
 
-    # save password safe -> key id mapping
-    $self->set_entry(
-        pki_realm => $realm,
-        namespace => 'sys.datapool.pwsafe',
-        key       => 'p7:' . $safe_id, # 'p7' = PKCS#7 encryption,
-        value     => $key_id,
-    );
-
     # save this key for future use
-    my $enc_value = $self->encrypt_passwordsafe($safe_id, join(':', $result->{ALGORITHM}, $result->{IV}, $result->{KEY}));
+    my $enc_value = $self->encrypt_passwordsafe($safe_id, join(':', $result->{ALGORITHM}, ($result->{IV} || ''), $result->{KEY}));
     ##! 16: "Storing vault key for password safe $safe_id to datapool"
     $self->set_entry(
-        pki_realm  => $realm,
+        pki_realm  => $args{pki_realm},
         namespace  => 'sys.datapool.keys',
         key        => $key_id,
         value      => $enc_value,
         enc_key_id => 'p7:' . $safe_id, # 'p7' = PKCS#7 encryption,
     );
 
+    # save password safe -> key id mapping
+    $self->set_entry(
+        pki_realm => $args{pki_realm},
+        namespace => 'sys.datapool.pwsafe',
+        key       => 'p7:' . $safe_id, # 'p7' = PKCS#7 encryption,
+        value     => $key_id,
+        $args{expiration_date} ? (expiration_date => $args{expiration_date}) : (),
+        force => 1,
+    );
+
+    CTX('log')->system()->info(sprintf 'New datapool encryption token was created (Token: %s, Key: %s)', $safe_id, $key_id);
+    CTX('log')->audit('system')->info('New datapool encryption token was created', {
+        token  => $safe_id,
+        keyid  => $key_id,
+    });
+
     # add key ID
     $result->{KEY_ID} = $key_id;
 
     return $result;
+
 }
+
 
 # Asymmetric encryption using the given token
 # Note: encryption does not need any key an can be done using
@@ -398,7 +426,7 @@ sub fetch_symmetric_key {
     my ( $algorithm, $iv, $key ) = split( /:/, $key_str );
     return {
         alg => $algorithm,
-        iv  => $iv,
+        iv  => $iv || undef, # undef for dynamic generation
         key => $key,
     };
 }

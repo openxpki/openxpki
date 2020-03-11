@@ -74,6 +74,7 @@ command "list_data_pool_entries" => {
         where => {
             pki_realm => $requested_pki_realm,
             $params->has_namespace ? (namespace => $params->namespace) : (),
+            notafter => [ { '>' => time }, undef ],
         },
         order_by => [ 'datapool_key', 'namespace' ],
         $params->has_limit ? ( limit => $params->limit ) : (),
