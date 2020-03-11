@@ -12,6 +12,16 @@ You will need the following things properly installed on your computer.
 * [Ember CLI](https://ember-cli.com/)
 * [Google Chrome](https://google.com/chrome/)
 
+### Node.js
+
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+    cd core/htdocs_source
+    nvm install
+
+### Ember CLI
+
+     npm install -g ember-cli
+
 ## Installation
 
 * `git clone <repository-url>` this repository
@@ -20,7 +30,7 @@ You will need the following things properly installed on your computer.
 
 ## Running / Development
 
-* `ember serve`
+* `ember serve --proxy=http://localhost:8080`
 * Visit your app at [http://localhost:4200](http://localhost:4200).
 * Visit your tests at [http://localhost:4200/tests](http://localhost:4200/tests).
 
