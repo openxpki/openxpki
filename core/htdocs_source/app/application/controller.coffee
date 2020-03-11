@@ -1,7 +1,6 @@
-import Em from "components-ember"
+import Controller, { inject as injectCtrl } from '@ember/controller'
+import { alias } from '@ember/object/computed'
 
-Controller = Em.ArrayController.extend
-    needs: ["openxpki"]
-    user: Em.computed.alias "controllers.openxpki.model.user"
-
-export default Controller
+export default Controller.extend
+    openxpki: injectCtrl()      # injects OpenxpkiController
+    user: alias "openxpki.model.user"
