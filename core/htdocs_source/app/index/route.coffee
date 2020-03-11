@@ -1,6 +1,4 @@
-import Em from "components-ember"
+import Route from '@ember/routing/route'
 
-Route = Em.Route.extend
+export default Route.extend
     redirect: (req) -> @transitionTo "openxpki", "welcome"
-
-export default Route
