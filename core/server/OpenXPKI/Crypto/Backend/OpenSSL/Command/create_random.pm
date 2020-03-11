@@ -35,7 +35,8 @@ sub get_command
         push @command, '-base64';
     }
 
-    if ($self->{ENGINE}->get_engine() and
+    if ((not $self->{NOENGINE}) and
+        $self->{ENGINE}->get_engine() and
         (($engine_usage =~ m{ ALWAYS }xms) or
          ($engine_usage =~ m{ RANDOM }xms))) {
         push @command, "-engine", $self->{ENGINE}->get_engine();

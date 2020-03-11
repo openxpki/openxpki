@@ -72,8 +72,7 @@ sub __get_used_engine
     my $engine_usage = $self->{ENGINE}->get_engine_usage();
 
     if ($self->{ENGINE}->get_engine() and
-        (($engine_usage =~ m{ ALWAYS }xms) or
-        ($engine_usage =~ m{ RANDOM }xms))) {
+        (($engine_usage =~ m{ (ALWAYS|RANDOM|PRIV_KEY_GEN) }xms))) {
         return $self->{ENGINE}->get_engine();
     }
     else {
@@ -106,6 +105,9 @@ OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkey
 
 This is a wrapper for the openssl genpkey command, most of the parameters
 are passed as is to openssl. See the openssl manpage of genpkey for options.
+
+If you want to use the engine then you must set
+ENGINE_USAGE ::= ALWAYS||RANDOM||PRIV_KEY_GEN
 
 =over
 
