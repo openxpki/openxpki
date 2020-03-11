@@ -158,7 +158,6 @@ export default Route.extend
                 resolve doc
             , (err) =>
                 $(".loading").removeClass "in-progress"
-                @controllerFor("openxpki").set("model", source)
                 scheduleOnce "afterRender", ->
                     $ ".modal.oxi-error-modal"
                     .modal "show"
