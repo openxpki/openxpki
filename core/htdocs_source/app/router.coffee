@@ -1,7 +1,10 @@
-import Em from "components-ember"
+import EmberRouter from '@ember/routing/router'
+import config from './config/environment'
 
-Router = Em.Router.extend()
+Router = EmberRouter.extend
+    location: config.locationType
+    rootURL: config.rootURL
 
-Router.map -> @resource "openxpki", { path:"openxpki/:model_id"}
+Router.map -> @route "openxpki", { path:"openxpki/:model_id"}
 
 export default Router
