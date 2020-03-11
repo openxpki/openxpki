@@ -1,8 +1,6 @@
-import Em from "components-ember"
+import Controller from '@ember/controller'
 
-Controller = Em.Controller.extend
+export default Controller.extend
     baseUrl: "#{window.location.protocol}//#{window.location.host}"
     url: Em.computed "baseUrl", ->
         "#{@get "baseUrl"}/cgi-bin/webui.fcgi"
-
-export default Controller
