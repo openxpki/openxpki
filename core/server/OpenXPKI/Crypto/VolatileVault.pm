@@ -48,7 +48,8 @@ use Digest::SHA qw( sha1_base64 );
     if ($exportable{$ident} !~ m{ \A -?\d+ \z }xms) {
         OpenXPKI::Exception->throw (
         message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INVALID_EXPORTABLE_SETTING");
-        }
+    }
+
     if ($exportable{$ident} < -1) {
         OpenXPKI::Exception->throw (
         message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INVALID_EXPORTABLE_SETTING");
@@ -58,6 +59,11 @@ use Digest::SHA qw( sha1_base64 );
         if (! exists $token{$ident}) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_MISSING_TOKEN");
+        }
+
+        if (defined $session_iv{$ident} && $session_iv{$ident} ne 'unspecified') {
+            OpenXPKI::Exception->throw (
+                message => "If you set an IV you must also set a KEY");
         }
 
         my $key = $token{$ident}->command(
@@ -70,33 +76,14 @@ use Digest::SHA qw( sha1_base64 );
         # convert base64 to binary and get hex representation of this data
         $session_key{$ident} = uc(unpack('H*',
                          MIME::Base64::decode_base64($key)));
-    } else {
-        # specifying key without iv is at least stupid...
-        if (! defined $session_iv{$ident}) {
+
+    # if a key was given the IV must be set to a value or undef (dynamic)
+    } elsif (defined $session_iv{$ident} && $session_iv{$ident} eq 'unspecified') {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_USER_SPECIFIED_KEY_WITHOUT_IV");
-        }
+            message => "You must provide an IV when setting a KEY or set IV = undef for dymnamic IV generation");
     }
 
-    if ($session_iv{$ident} eq 'unspecified') {
-        if (! exists $token{$ident}) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_MISSING_TOKEN");
-        }
-
-        my $iv = $token{$ident}->command(
-        {
-            COMMAND => 'create_random',
-            RANDOM_LENGTH => 16,
-            INCLUDE_PADDING => 1,
-        });
-
-        # convert base64 to binary and get hex representation of this data
-        $session_iv{$ident} = uc(unpack('H*',
-                        MIME::Base64::decode_base64($iv)));
-    }
-
-    if (! length($session_key{$ident}) || ! length ($session_iv{$ident})) {
+    if (! length($session_key{$ident})) {
         OpenXPKI::Exception->throw (
         message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INITIALIZATION_ERROR");
     }
@@ -106,7 +93,19 @@ use Digest::SHA qw( sha1_base64 );
         message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INVALID_KEY");
     }
 
-    if ($session_iv{$ident} !~ m{ \A [0-9A-F]+ \z }xms) {
+    # iv was not set in constructor => auto generate
+    if (defined $session_iv{$ident} && $session_iv{$ident} eq 'unspecified') {
+
+        $session_iv{$ident} = $self->_generate_iv();
+
+        if (! length($session_iv{$ident})) {
+            OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INITIALIZATION_ERROR");
+        }
+    }
+
+    # iv can be undef (=dynamic) or needs to have a length
+    if (defined $session_iv{$ident} && ($session_iv{$ident} !~ m{ \A [0-9A-F]+ \z }xms)) {
         OpenXPKI::Exception->throw (
         message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INVALID_IV");
     }
@@ -139,10 +138,12 @@ use Digest::SHA qw( sha1_base64 );
         message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_ENCRYPT_INVALID_PARAMETER");
     }
 
+    my $iv = $session_iv{$ident} || $self->_generate_iv();
+
     my $cipher = Crypt::CBC->new(
         -cipher => 'Crypt::OpenSSL::AES',
         -key    => pack('H*', $session_key{$ident}),
-        -iv     => pack('H*', $session_iv{$ident}),
+        -iv     => pack('H*', $iv),
         -literal_key => 1,
         -header => 'none',
     );
@@ -172,6 +173,7 @@ use Digest::SHA qw( sha1_base64 );
     return join(';',
             $self->get_key_id(),
             $encoding,
+            ($session_iv{$ident} ? '' : $iv), # session iv is not persisted
             $blob);
     }
 
@@ -205,8 +207,17 @@ use Digest::SHA qw( sha1_base64 );
     my $ident = ident $self;
     my $arg = shift;
 
-    my ($creator_ident, $encoding, $encrypted_data) =
-        ($arg =~ m{ (.*?) ; ([\w\-]+) ; (.*) }xms);
+    # iv was added with v3.4 - items writen before have only three items
+    my ($creator_ident, $encoding, $nn, $iv, $encrypted_data) =
+        ($arg =~ m{ (.*?) ; ([\w\-]+) ; (([0-9A-F]+);)? (.*) }xms);
+
+    # if iv is set in the session, it was persisted as an empty string
+    # this also catched legacy items with old storage format
+    $iv ||= $session_iv{$ident};
+    if (! defined $encrypted_data) {
+        OpenXPKI::Exception->throw (
+        message => "Unable to determine IV to decrypt Volatile Vault");
+    }
 
     if (! defined $encrypted_data) {
         OpenXPKI::Exception->throw (
@@ -226,7 +237,7 @@ use Digest::SHA qw( sha1_base64 );
     my $cipher = Crypt::CBC->new(
         -cipher => 'Crypt::OpenSSL::AES',
         -key    => pack('H*', $session_key{$ident}),
-        -iv     => pack('H*', $session_iv{$ident}),
+        -iv     => pack('H*', $iv),
         -literal_key => 1,
         -header => 'none',
     );
@@ -281,7 +292,7 @@ use Digest::SHA qw( sha1_base64 );
     return $self->_compute_key_id(
         {
         KEY => $session_key{$ident},
-        IV  => $session_iv{$ident},
+        IV  => ($session_iv{$ident} || ''),
         ALGORITHM => $algorithm{$ident},
         %args,
         });
@@ -306,6 +317,30 @@ use Digest::SHA qw( sha1_base64 );
         return (substr($digest, 0, 8));
     }
     }
+
+    sub _generate_iv : PRIVATE {
+    my $self = shift;
+    my $ident = ident $self;
+    my $bytes = shift || 16;
+
+    if (! exists $token{$ident}) {
+        OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_MISSING_TOKEN");
+    }
+
+    my $iv = $token{$ident}->command(
+    {
+        COMMAND => 'create_random',
+        RANDOM_LENGTH => $bytes,
+        INCLUDE_PADDING => 1,
+        NOENGINE => 1,
+    });
+
+    # convert base64 to binary and get hex representation of this data
+    return uc(unpack('H*',
+        MIME::Base64::decode_base64($iv)));
+    }
+
 }
 
 1;
@@ -354,13 +389,19 @@ encoding for the encrypted data string. ENCODING may be one of
 (Base64 without any whitespace or newlines). Default is 'base64-oneline'.
 
 =head3 Specifying keys
+
 It is possible to specify a symmetric key and IV to use by passing
 KEY and IV values to the constructor. KEY and IV must be specified
 using upper case hexadecimal digits (no whitespace allowed). The
 caller must make sure that KEY and IV do make sense (are long enough
 etc.). Specifying a KEY without IV yields an exception.
 
+If you set the IV to I<undef>, a new IV will be created for each
+encryption call and the IV is persisted in the header data of the
+ciphertext.
+
 =head3 Exporting keys
+
 It is also possible to mark the internally used key and iv as
 exportable. This can be forced by explicity setting the EXPORTABLE
 variable. EXPORTABLE is interpreted as an integer
@@ -432,6 +473,8 @@ exception.
 The returned key is returned in a hash reference with KEY, IV and
 ALGORITHM keys. The values for KEY and IV are hexadecimal (uppercase)
 numbers specifying the key and initialization vector.
+
+IV is set to I<undef> if dynamic IV generation is used.
 
 =head2 lock_vault()
 
