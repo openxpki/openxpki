@@ -4,11 +4,9 @@ import { tracked } from '@glimmer/tracking'
 import { A } from '@ember/array'
 import { later, scheduleOnce, cancel } from '@ember/runloop'
 import { inject as injectCtrl } from '@ember/controller'
-import Promise from 'rsvp'
+import { Promise } from 'rsvp'
 
 export default Route.extend
-    config: injectCtrl()        # injects ConfigController
-
     queryParams:
         # refreshModel==true causes an "in-place" transition, so the model
         # hooks for this route (and any child routes) will re-fire
@@ -19,57 +17,54 @@ export default Route.extend
         force:
             refreshModel: true
 
-    setupAjax: @on "init", ->
-        $.ajaxSetup
-            beforeSend: (xhr) ->
-                xhr.setRequestHeader "X-OPENXPKI-Client", "1"
-
     needReboot: [ "login", "logout", "login!logout", "welcome" ]
 
-    source: EmberObject.extend
-        page: tracked()
-        ping: tracked()
-        refresh: tracked()
-        structure: tracked()
-        rtoken: tracked()
-        status: tracked()
-        modal: tracked()
-        tabs: A []          # Ember Arrays are automatically tracked
-        navEntries: A []    # Ember Arrays are automatically tracked
+    source: tracked
+        value:
+            page: null
+            ping: null
+            refresh: null
+            structure: null
+            rtoken: null
+            status: null
+            modal: null
+            tabs: []
+            navEntries: []
 
-    beforeModel: (req) ->
-        if req.queryParams.force
-            delete req.queryParams.force
+    beforeModel: (transition) ->
+        # "force" is only evaluated above using "refreshModel: true"
+        if transition.to.queryParams.force
+            delete transition.to.queryParams.force
 
-        model_id = req.params.openxpki.model_id
+        model_id = transition.to.params.model_id
 
-        if not this.source.navEntries.length or model_id in @needReboot
+        if not @source.navEntries.length or model_id in @needReboot
             @sendAjax data:
                 page: "bootstrap!structure"
                 baseurl: window.location.pathname
 
-    model: (req) ->
-        data = page: req.model_id
-        data.limit = req.limit if req.limit
-        data.startat = req.startat if req.startat
+    model: (params, transition) ->
+        data = page: params.model_id
+        data.limit = params.limit if params.limit
+        data.startat = params.startat if params.startat
 
-        entries = this.source.navEntries.reduce (p, n) ->
+        entries = @source.navEntries.reduce (p, n) ->
             p.concat(n, n.entries||[])
         , []
 
-        if entries.findBy "key", req.model_id
+        if entries.findBy "key", params.model_id
             data.target = "top"
-        else if req.model_id in @needReboot
+        else if params.model_id in @needReboot
             data.target = "top"
 
-        this.source.page = req.model_id
+        @source.page = params.model_id
         @sendAjax
             data: data
-        .then (doc) ->
-            this.source
+        .then (doc) =>
+            @source
 
     doPing: (cfg) ->
-        this.source.ping = later @, =>
+        @source.ping = later @, =>
             $.ajax
                 url: cfg.href
             @doPing cfg
@@ -79,44 +74,45 @@ export default Route.extend
     sendAjax: (req) ->
         req.dataType = "json"
         req.type ?= if req?.data?.action then "POST" else "GET"
-        req.url ?= @config.url
+        req.url ?= Ember.getOwner(this).lookup("controller:config").url
         req.data._ = new Date().getTime()
         $(".loading").addClass "in-progress"
 
         if req.type is "POST"
-            req.data._rtoken = this.source.rtoken
+            req.data._rtoken = @source.rtoken
 
         target = req.data.target or "self"
         if target is "self"
-            if this.source.modal
+            if @source.modal
                 target = "modal"
-            else if this.source.tabs.length > 1
+            else if @source.tabs.length > 1
                 target = "active"
             else
                 target = "top"
 
-        if this.source.refresh
-            cancel this.source.refresh
-            this.source.refresh = null
+        if @source.refresh
+            cancel @source.refresh
+            @source.refresh = null
             $(".refresh").removeClass "in-progress"
 
         new Promise (resolve, reject) =>
             $.ajax(req).then (doc) =>
-                this.source.beginPropertyChanges()
-
-                this.source.status = doc.status
-                this.source.modal = null
+                # work with a copy of @source
+                newSource = Object.assign {
+                    status: doc.status
+                    modal: null
+                }, @source
 
                 if doc.ping
-                    cancel this.source.ping if this.source.ping
+                    cancel @source.ping if @source.ping
                     @doPing doc.ping
 
                 if doc.refresh
-                    this.source.refresh = later(@, ->
+                    newSource.refresh = later(@, ->
                         @sendAjax data:
                             page: doc.refresh.href
                     , doc.refresh.timeout)
-                    scheduleOnce "afterRender", =>
+                    scheduleOnce "afterRender", ->
                         $(".refresh").addClass "in-progress"
 
                 if doc.goto
@@ -126,12 +122,14 @@ export default Route.extend
                         @transitionTo "openxpki", doc.goto
 
                 else if doc.structure
-                    this.source.navEntries = doc.structure
-                    this.source.user =doc.user
-                    this.source.rtoken = doc.rtoken
+                    newSource.navEntries = doc.structure
+                    newSource.user =doc.user
+                    newSource.rtoken = doc.rtoken
 
                 else
                     if doc.page and doc.main
+                        newSource.tabs = [ @source.tabs... ] # copy tabs to not trigger change observers for now
+
                         tab =
                             active: true
                             page: doc.page
@@ -139,31 +137,32 @@ export default Route.extend
                             right: doc.right
 
                         if target is "modal"
-                            this.source.modal = tab
+                            newSource.modal = tab
                         else if target is "tab"
-                            tabs = this.source.tabs
+                            tabs = newSource.tabs
                             tabs.setEach "active", false
-                            this.source.tabs.pushObject tab
+                            tabs.pushObject tab
                         else if target is "active"
-                            tabs = this.source.tabs
+                            tabs = newSource.tabs
                             index = tabs.indexOf tabs.findBy "active"
                             tabs.replace index, 1, [tab]
                         else # top
-                            this.source.tabs
+                            newSource.tabs
                                 .clear()
                                 .pushObject tab
 
                     scheduleOnce "afterRender", ->
                         $(".loading").removeClass "in-progress"
 
-                this.source.endPropertyChanges()
+                @source = newSource # trigger observers
+
                 resolve doc
             , (err) =>
                 $(".loading").removeClass "in-progress"
                 scheduleOnce "afterRender", ->
                     $ ".modal.oxi-error-modal"
                     .modal "show"
-                this.source.error =
+                @source.error =
                     message: "The server did not return JSON data as
                     expected.\nMaybe your authentication session has expired."
                 resolve {}
