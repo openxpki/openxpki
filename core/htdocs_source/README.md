@@ -20,7 +20,7 @@ You will need the following things properly installed on your computer.
 
 ### Ember CLI
 
-     npm install -g ember-cli
+    npm install -g ember-cli
 
 ## Installation
 
