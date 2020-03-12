@@ -10,6 +10,8 @@ export default Route.extend
     config: injectCtrl()        # injects ConfigController
 
     queryParams:
+        # refreshModel==true causes an "in-place" transition, so the model
+        # hooks for this route (and any child routes) will re-fire
         startat:
             refreshModel: true
         limit:

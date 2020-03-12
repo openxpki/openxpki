@@ -3,7 +3,11 @@ import { computed, observer } from '@ember/object'
 import { set as emSet } from '@ember/object'
 
 export default Controller.extend
-    queryParams: [ "count", "limit", "startat", "force" ]
+    # Reserved Ember properties
+    # https://api.emberjs.com/ember/release/classes/Controller
+    queryParams: [ "count", "limit", "startat", "force" ] # supported query parameters, available as this.count etc.
+
+    # FIXME Remove those three?! (auto-injected by Ember, see queryParams above)
     count: null
     startat: null
     limit: null
