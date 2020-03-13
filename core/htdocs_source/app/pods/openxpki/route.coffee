@@ -30,6 +30,7 @@ export default Route.extend
             modal: null
             tabs: []
             navEntries: []
+            error: null
 
     beforeModel: (transition) ->
         # "force" is only evaluated above using "refreshModel: true"
@@ -159,9 +160,6 @@ export default Route.extend
                 resolve doc
             , (err) =>
                 $(".loading").removeClass "in-progress"
-                scheduleOnce "afterRender", ->
-                    $ ".modal.oxi-error-modal"
-                    .modal "show"
                 @source.error =
                     message: "The server did not return JSON data as
                     expected.\nMaybe your authentication session has expired."

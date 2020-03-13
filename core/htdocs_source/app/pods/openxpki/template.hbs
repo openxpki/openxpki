@@ -118,47 +118,46 @@
     </div>
 </div>
 
-<div class="modal fade oxi-main-modal" tabindex=-1>
-    <div class="modal-dialog {{model.modal.page.className}}">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">
-                    {{if model.modal.page.shortlabel model.modal.page.shortlabel model.modal.page.label}}
-                </h4>
-            </div>
-            <div class="modal-body">
-                {{#each model.modal.main as |mainEntry|}}
-                    {{oxisection-main content=mainEntry}}
-                {{/each}}
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
+<BsModal as |Modal|>
+    class="{{modal.page.className}}"
+    @open={{modal}}
+    @closeButton={{true}}
+    @fade={{true}}
+    @backdrop={{true}}
+    @backdropClose={{false}}
+    @onHidden={{action "clearPopupData"}}
+    <Modal.header>
+        <h4 class="modal-title">
+            {{if modal.page.shortlabel modal.page.shortlabel modal.page.label}}
+        </h4>
+    </Modal.header>
+    <Modal.body>
+        {{#each modal.main as |mainEntry|}}
+            <OxisectionMain @content={{mainEntry}}/>
+        {{/each}}
+    </Modal.body>
+    <Modal.footer>
+        <BsButton @onClick={{action Modal.close}}>Close</BsButton>
+    </Modal.footer>
+</BsModal>
 
-<div class="modal fade oxi-error-modal" tabindex=-1>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">
-                    Application Error
-                </h4>
-            </div>
-            <div class="modal-body">
-                {{{model.error.message}}}
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" {{action "reload"}}>Reload application</button>
-                <button class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
+<BsModal as |Modal|>
+    @open={{error}}
+    @closeButton={{true}}
+    @fade={{true}}
+    @backdrop={{true}}
+    @backdropClose={{false}}
+    <Modal.header>
+        <h4 class="modal-title">Application Error</h4>
+    </Modal.header>
+    <Modal.body>
+        {{{error.message}}}
+    </Modal.body>
+    <Modal.footer>
+        <BsButton @onClick={{action "reload"}} @type="primary">Reload application</BsButton>
+        <BsButton @onClick={{action Modal.close}}>Close</BsButton>
+    </Modal.footer>
+</BsModal>
 
 <div class="refresh">
     <div class="progress progress-striped active">

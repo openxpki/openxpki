@@ -33,16 +33,6 @@ export default Controller.extend
         return "alert-warning" if level is "warn"
         return "alert-info"
 
-    autoshowModal: observer "model.modal", ->
-        $ ".modal.oxi-main-modal"
-        .modal if @get "model.modal" then "show" else "hide"
-        .one "hidden.bs.modal", =>
-            @set "model.modal"
-
-    autoshowErrorModal: observer "model.error", ->
-        $ ".modal.oxi-error-modal"
-        .modal if @get "model.error" then "show" else "hide"
-
     showTabs: computed.gt "model.tabs.length", 1
 
     actions:
@@ -60,3 +50,5 @@ export default Controller.extend
             false
 
         reload: -> window.location.reload()
+
+        clearPopupData: -> @set "model.modal", null
