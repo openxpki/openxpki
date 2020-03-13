@@ -1,6 +1,6 @@
-import Em from "components-ember"
+import Component from '@ember/component'
 
-Component = Em.Component.extend
+OxisectionMainComponent = Component.extend
     classNameBindings: ["type"]
 
     type: Em.computed "content.type", -> "oxisection-" + @get "content.type"
@@ -20,4 +20,4 @@ Component = Em.Component.extend
                 @container.lookup("route:openxpki").transitionTo "openxpki",
                     button.page
 
-export default Component
+export default OxisectionMainComponent

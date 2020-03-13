@@ -1,7 +1,7 @@
-import Em from "components-ember"
+import Component from '@ember/component'
 
-Component = Em.Component.extend
+OxisectionTextComponent = Component.extend
     actions:
         buttonClick: (button) -> @sendAction "buttonClick", button
 
-export default Component
+export default OxisectionTextComponent

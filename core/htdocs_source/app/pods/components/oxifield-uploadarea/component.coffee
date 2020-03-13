@@ -1,6 +1,6 @@
-import Em from "components-ember"
+import Component from '@ember/component'
 
-Component = Em.Component.extend
+OxifieldUploadComponent = Component.extend
     textTypes: [
         "application/pkcs8"
         "application/pkcs10"
@@ -64,4 +64,4 @@ Component = Em.Component.extend
             fence.remove()
             form.remove()
 
-export default Component
+export default OxifieldUploadComponent

@@ -1,7 +1,7 @@
-import Em from "components-ember"
+import Component from '@ember/component'
 import BootstrapContextmenu from "bootstrap-contextmenu"
 
-Component = Em.Component.extend
+OxisectionGridComponent = Component.extend
     visibleColumns: Em.computed "content.content.columns", ->
         @get "content.content.columns"
         .map (col, index) ->
@@ -263,4 +263,4 @@ Component = Em.Component.extend
                     @$("tbody tr:nth-child(#{index+1})").contextmenu "show",
                         { currentTarget, clientX, clientY }
 
-export default Component
+export default OxisectionGridComponent

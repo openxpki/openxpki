@@ -1,7 +1,7 @@
-import Em from "components-ember"
+import Component from '@ember/component'
 import moment from "moment"
 
-Component = Em.Component.extend
+OxifieldDatetimeComponent = Component.extend
     format: "DD.MM.YYYY HH:mm"
 
     options: {}
@@ -27,4 +27,4 @@ Component = Em.Component.extend
             datetime = ""
         @set "content.value", datetime
 
-export default Component
+export default OxifieldDatetimeComponent

@@ -1,6 +1,6 @@
-import Em from "components-ember"
+import Component from '@ember/component'
 
-Component = Em.Component.extend
+OxifieldCertIdentifierComponent = Component.extend
     search: Em.computed -> @get "content.value"
 
     focusOut: (evt) ->
@@ -75,4 +75,4 @@ Component = Em.Component.extend
             @$().find(".drowdown").removeClass "open"
             @set "searchResults", []
 
-export default Component
+export default OxifieldCertIdentifierComponent

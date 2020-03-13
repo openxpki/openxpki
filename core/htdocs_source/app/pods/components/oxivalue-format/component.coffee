@@ -1,5 +1,5 @@
 import $ from "jquery"
-import Em from "components-ember"
+import Component from '@ember/component'
 import types from "./types"
 
 jQuery.extend jQuery.expr[':'],
@@ -12,7 +12,7 @@ jQuery.extend jQuery.expr[':'],
             el.removeAttribute name
         true
 
-Component = Em.Component.extend
+OxivalueFormatComponent = Component.extend
     onAnchorClick: Em.on "click", (evt) ->
         target = evt.target
 
@@ -35,4 +35,4 @@ Component = Em.Component.extend
         $el.find('script').remove()
         return $el.html()
 
-export default Component
+export default OxivalueFormatComponent

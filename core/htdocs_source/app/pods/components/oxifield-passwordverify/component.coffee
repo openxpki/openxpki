@@ -1,6 +1,6 @@
-import Em from "components-ember"
+import Component from '@ember/component'
 
-Component = Em.Component.extend
+OxifieldPasswordverifyComponent = Component.extend
     password: ""
     confirm: ""
 
@@ -57,4 +57,4 @@ Component = Em.Component.extend
                 else
                     @set "content.error", "Please retype password"
 
-export default Component
+export default OxifieldPasswordverifyComponent

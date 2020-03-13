@@ -1,7 +1,7 @@
-import Em from "components-ember"
+import Component from '@ember/component'
 import types from "../oxivalue-format/types"
 
-Component = Em.Component.extend
+OxisectionKeyvalueComponent = Component.extend
     items: Em.computed "content.content.data", ->
         items = @get "content.content.data"
         for i in items
@@ -12,4 +12,4 @@ Component = Em.Component.extend
     actions:
         buttonClick: (button) -> @sendAction "buttonClick", button
 
-export default Component
+export default OxisectionKeyvalueComponent

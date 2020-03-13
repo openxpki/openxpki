@@ -1,6 +1,6 @@
-import Em from "components-ember"
+import Component from '@ember/component'
 
-Component = Em.Component.extend
+OxisectionFormComponent = Component.extend
     submitLabel: Em.computed "content.content.submit_label", ->
         @get("content.content.submit_label") or "send"
 
@@ -130,4 +130,4 @@ Component = Em.Component.extend
                         else
                             Em.set clones[error.index], "error", error.error
 
-export default Component
+export default OxisectionFormComponent

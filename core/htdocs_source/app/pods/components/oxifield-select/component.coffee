@@ -1,6 +1,6 @@
-import Em from "components-ember"
+import Component from '@ember/component'
 
-Component = Em.Component.extend
+OxifieldSelectComponent = Component.extend
     sanitizeValue: Em.on "init", ->
         value = @get "content.value"
         if typeof value isnt "string"
@@ -43,4 +43,4 @@ Component = Em.Component.extend
                     @set "content.value", @get("options")[0].value
             Em.run.next => @$("input,select")[0].focus()
 
-export default Component
+export default OxifieldSelectComponent

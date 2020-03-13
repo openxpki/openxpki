@@ -1,6 +1,6 @@
-import Em from "components-ember"
+import Component from '@ember/component'
 
-Component = Em.Component.extend
+OxifieldMainComponent = Component.extend
     classNameBindings: [
         "content.is_optional:optional:required"
         "content.class"
@@ -48,4 +48,4 @@ Component = Em.Component.extend
         addClone: (field) -> @sendAction "addClone", @get "content"
         delClone: (field) -> @sendAction "delClone", @get "content"
 
-export default Component
+export default OxifieldMainComponent

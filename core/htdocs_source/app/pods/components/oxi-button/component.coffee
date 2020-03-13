@@ -1,6 +1,6 @@
-import Em from "components-ember"
+import Component from '@ember/component'
 
-Component = Em.Component.extend
+OxiButtonComponent = Component.extend
     tagName: "span"
 
     actions:
@@ -20,4 +20,4 @@ Component = Em.Component.extend
         cancel: ->
             Em.set @get("button"), "loading", false
 
-export default Component
+export default OxiButtonComponent
