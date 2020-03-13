@@ -1,5 +1,5 @@
-<div id="application" {{did-insert (action this.removeLoader)}}>
-    {{partial "applicationHeader"}}
+<div id="application" {{did-insert (action "removeLoader")}}>
+    <ApplicationHeader/>
     {{outlet}}
 </div>
-{{partial "applicationFooter"}}
+<ApplicationFooter/>
