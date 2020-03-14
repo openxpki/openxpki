@@ -5,12 +5,12 @@
         {{#if customize}}
             {{input class="form-control" placeholder=content.placeholder value=content.value}}
         {{else}}
-            {{view "select" class="form-control" content=options optionValuePath="content.value" optionLabelPath="content.label" value=content.value}}
+            <OxiSelect @list={{options}} @selected={{content.value}} @onChange={{optionSelected}} />
         {{/if}}
         <span class="input-group-btn">
             <button class="btn btn-default {{if customize "active"}}" {{action "customize"}}>Custom</button>
         </span>
     </div>
 {{else}}
-    {{view "select" class="form-control" content=options optionValuePath="content.value" optionLabelPath="content.label" value=content.value}}
+    <OxiSelect @list={{options}} @selected={{content.value}} @onChange={{optionSelected}} />
 {{/if}}

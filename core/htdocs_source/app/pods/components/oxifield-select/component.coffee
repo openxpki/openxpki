@@ -43,4 +43,7 @@ OxifieldSelectComponent = Component.extend
                     @set "content.value", @get("options")[0].value
             Em.run.next => @$("input,select")[0].focus()
 
+        optionSelected: (value, label) ->
+            @set "content.value", value
+
 export default OxifieldSelectComponent

@@ -47,5 +47,7 @@ OxifieldMainComponent = Component.extend
     actions:
         addClone: (field) -> @sendAction "addClone", @get "content"
         delClone: (field) -> @sendAction "delClone", @get "content"
+        optionSelected: (value, label) ->
+            @set "content.value", value
 
 export default OxifieldMainComponent
