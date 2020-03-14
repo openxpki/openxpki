@@ -118,7 +118,7 @@
     </div>
 </div>
 
-<BsModal as |Modal|>
+<BsModal
     class="{{modal.page.className}}"
     @open={{modal}}
     @closeButton={{true}}
@@ -126,6 +126,8 @@
     @backdrop={{true}}
     @backdropClose={{false}}
     @onHidden={{action "clearPopupData"}}
+    as |Modal|
+>
     <Modal.header>
         <h4 class="modal-title">
             {{if modal.page.shortlabel modal.page.shortlabel modal.page.label}}
@@ -141,12 +143,14 @@
     </Modal.footer>
 </BsModal>
 
-<BsModal as |Modal|>
+<BsModal
     @open={{error}}
     @closeButton={{true}}
     @fade={{true}}
     @backdrop={{true}}
     @backdropClose={{false}}
+    as |Modal|
+>
     <Modal.header>
         <h4 class="modal-title">Application Error</h4>
     </Modal.header>
