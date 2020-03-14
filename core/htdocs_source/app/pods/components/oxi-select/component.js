@@ -16,7 +16,7 @@ import { action, computed } from "@ember/object";
         label: "..."    // option label to show
     }
 
-The @onChange function is called with two arguments: label, value
+The @onChange function is called with two arguments: value, label
 
 */
 export default class OxiSelectComponent extends Component {
@@ -28,6 +28,6 @@ export default class OxiSelectComponent extends Component {
         }
         const index = event.target.selectedIndex;
         const item = this.args.list[index];
-        this.args.onChange(item.label, item.value);
+        this.args.onChange(item.value, item.label);
     }
 }
