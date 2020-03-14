@@ -2,15 +2,15 @@
     <div class="oxi-no-input">{{content.options.firstObject.label}}</div>
 {{else if content.editable}}
     <div class="input-group">
-        {{#if customize}}
+        {{#if customMode}}
             {{input class="form-control" placeholder=content.placeholder value=content.value}}
         {{else}}
-            <OxiSelect @list={{options}} @selected={{content.value}} @onChange={{optionSelected}} />
+            <OxiSelect @list={{options}} @selected={{sanitizedValue}} @onChange={{optionSelected}} />
         {{/if}}
         <span class="input-group-btn">
-            <button class="btn btn-default {{if customize "active"}}" {{action "customize"}}>Custom</button>
+            <button class="btn btn-default {{if customMode "active"}}" {{action "toggleCustomMode"}}>Custom</button>
         </span>
     </div>
 {{else}}
-    <OxiSelect @list={{options}} @selected={{content.value}} @onChange={{optionSelected}} />
+    <OxiSelect @list={{options}} @selected={{sanitizedValue}} @onChange={{optionSelected}} />
 {{/if}}
