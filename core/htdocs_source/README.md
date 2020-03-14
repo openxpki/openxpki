@@ -30,9 +30,13 @@ You will need the following things properly installed on your computer.
 
 ## Running / Development
 
-* `ember serve --proxy=http://localhost:8080`
-* Visit your app at [http://localhost:4200](http://localhost:4200).
-* Visit your tests at [http://localhost:4200/tests](http://localhost:4200/tests).
+To run the web UI locally you have to:
+
+1. Start an OpenXPKI backend via Docker or Vagrant. It's expected to listen on localhost:8080
+2. Now run the Ember based web UI with live reload (on code changes) via:
+   `npm run serve` (this calls "ember serve ..." and proxies AJAX requests to localhost:8080)
+3. Visit the web UI at [http://localhost:4200](http://localhost:4200).
+4. Visit tests at [http://localhost:4200/tests](http://localhost:4200/tests).
 
 ### Code Generators
 
