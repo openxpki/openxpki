@@ -24,10 +24,6 @@ OxifieldMainComponent = Component.extend
 
         'col-md-' + size
 
-    sKeyFieldSize: Em.computed "content.keysize", ->
-        keysize = @get("content.keysize") || "2"
-        'col-md-' + keysize
-
     hasError: Em.computed.bool "content.error"
 
     resetError: Em.observer "content.value", ->
