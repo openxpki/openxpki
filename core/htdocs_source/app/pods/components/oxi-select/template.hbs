@@ -1,0 +1,7 @@
+<select class="form-control" ...attributes {{on "change" this.listChanged}}>
+    {{#each this.args.list as |item|}}
+        <option value="{{item.value}}" selected={{eq item.label args.selected}}>
+            {{item.label}}
+        </option>
+    {{/each}}
+</select>
