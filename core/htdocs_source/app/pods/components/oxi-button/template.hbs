@@ -1,20 +1,20 @@
 {{#if @button.href}}
     <a
+        ...attributes
         class="{{@button.className}}"
         href="{{@button.href}}"
         target="{{@button.target}}"
         title="{{@button.tooltip}}"
-        ...attributes
     >
         {{@button.label}}
     </a>
 {{else}}
     <button
+        ...attributes
         class="{{if @button.loading "btn-loading"}} {{@button.className}}"
         {{action "click"}}
         title="{{@button.tooltip}}"
         disabled={{@button.disabled}}
-        ...attributes
     >
         {{@button.label}}
     </button>
