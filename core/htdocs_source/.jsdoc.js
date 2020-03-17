@@ -13,5 +13,6 @@ module.exports = {
     plugins: ['plugins/markdown'],
     markdown: {
         hardwrap: true,
+        idInHeadings: true,
     }
 };
