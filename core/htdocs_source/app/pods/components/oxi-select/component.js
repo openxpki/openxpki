@@ -1,23 +1,25 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action, computed } from "@ember/object";
-/*
-<OxiSelect
-    @list={{data.keys}}
-    @selected={{data.name}}
-    @onChange={{mySpecialAction}}
-    class="myFormat"
-/>
+/**
+Shows a drop-down list of options.
 
-@list is expected to be an array of hashes with these keys:
+```html
+<OxiSelect @list={{data.keys}} @selected={{data.name}} @onChange={{myFunc}}/>
+```
 
-    {
-        value: "..."    // option value
-        label: "..."    // option label to show
-    }
-
-The @onChange function is called with two arguments: value, label
-
+@module oxi-select
+@param list { array } - List of hashes defining the options.
+Each hash is expected to have these keys:
+```javascript
+[
+    { value: 1, label: "Major" },
+    { value: 2, label: "Tom" },
+]
+```
+@param onChange { callback} - called if a selection was made.
+It gets passed two arguments: *value* and *label* of the selected item.
+The callback is also called initially to set the value of the first list item.
 */
 export default class OxiSelectComponent extends Component {
     @action
