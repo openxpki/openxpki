@@ -1,30 +1,49 @@
-{{#if button.href}}
-    <a class="{{klass}} {{button.className}}" href="{{button.href}}" target="{{button.target}}" title="{{button.tooltip}}">{{button.label}}</a>
+{{#if @button.href}}
+    <a
+        class="{{@button.className}}"
+        href="{{@button.href}}"
+        target="{{@button.target}}"
+        title="{{@button.tooltip}}"
+        ...attributes
+    >
+        {{@button.label}}
+    </a>
 {{else}}
-    <button class="{{klass}} {{if button.loading "btn-loading"}} {{button.className}}" {{action "click"}} title="{{button.tooltip}}" disabled={{button.disabled}}>{{button.label}}</button>
-    {{#if button.confirm}}
-        <div class="modal fade">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 class="modal-title">
-                            {{button.confirm.label}}
-                        </h4>
-                    </div>
-                    <div class="modal-body">
-                        {{{button.confirm.description}}}
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-primary" {{action "confirm"}}>
-                            {{if button.confirm.confirm_label button.confirm.confirm_label "Confirm"}}
-                        </button>
-                        <button class="btn btn-default" {{action "cancel"}} data-dismiss="modal">
-                            {{if button.confirm.cancel_label button.confirm.cancel_label "Abort"}}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <button
+        class="{{if @button.loading "btn-loading"}} {{@button.className}}"
+        {{action "click"}}
+        title="{{@button.tooltip}}"
+        disabled={{@button.disabled}}
+        ...attributes
+    >
+        {{@button.label}}
+    </button>
+    {{#if @button.confirm}}
+        <BsModal
+            @open={{showConfirmDialog}}
+            @closeButton={{true}}
+            @fade={{true}}
+            @backdrop={{true}}
+            @backdropClose={{false}}
+            @onHidden={{action "resetConfirmState"}}
+            as |Modal|
+        >
+            <Modal.header>
+                <h4 class="modal-title">
+                    {{@button.confirm.label}}
+                </h4>
+            </Modal.header>
+            <Modal.body>
+                {{{@button.confirm.description}}}
+            </Modal.body>
+            <Modal.footer>
+                <BsButton @onClick={{action "executeAction"}} @type="primary">
+                    {{if @button.confirm.confirm_label @button.confirm.confirm_label "Confirm"}}
+                </BsButton>
+                <BsButton @onClick={{action Modal.close}}>
+                    {{if @button.confirm.cancel_label @button.confirm.cancel_label "Abort"}}
+                </BsButton>
+            </Modal.footer>
+        </BsModal>
     {{/if}}
 {{/if}}
