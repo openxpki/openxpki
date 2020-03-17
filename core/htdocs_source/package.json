@@ -15,7 +15,8 @@
     "lint:hbs": "ember-template-lint .",
     "lint:js": "eslint .",
     "serve": "ember serve --proxy=http://localhost:8080 --output-path=dist-dev",
-    "test": "ember test"
+    "test": "ember test",
+    "docs": "jsdoc -c .jsdoc.js --verbose app"
   },
   "devDependencies": {
     "@ember/jquery": "^1.1.0",
