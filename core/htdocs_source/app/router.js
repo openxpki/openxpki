@@ -8,4 +8,5 @@ export default class Router extends EmberRouter {
 
 Router.map(function() {
     this.route("openxpki", { path: "openxpki/:model_id" });
+    this.route("test");
 });
