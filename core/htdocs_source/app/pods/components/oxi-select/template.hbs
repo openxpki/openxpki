@@ -1,4 +1,4 @@
-<select class="form-control" ...attributes {{on "change" this.listChanged}}>
+<select ...attributes class="form-control" {{on "change" this.listChanged}} {{did-insert (action "startup")}}>
     {{#each this.args.list as |item|}}
         <option value="{{item.value}}" selected={{eq item.value args.selected}}>
             {{item.label}}
