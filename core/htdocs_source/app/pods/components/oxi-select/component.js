@@ -1,6 +1,5 @@
 import Component from '@glimmer/component';
-import { tracked } from '@glimmer/tracking';
-import { action, computed } from "@ember/object";
+import { action } from "@ember/object";
 /**
 Shows a drop-down list of options.
 
