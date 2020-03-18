@@ -5,7 +5,6 @@ import types from "./types";
 // see e524296ba39db2606d3cdb7f5bb83985ea51ec1d
 jQuery.extend(jQuery.expr[':'], {
     cleanup: function(el) {
-        let ret = false;
         let names = el.attributes
             .filter(attr => (/^on/.test(attr.nodeName) || /javascript/.test(attr.value)))
             .map(attr => attr.nodeName);

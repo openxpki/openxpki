@@ -3,7 +3,6 @@ import moment from "moment";
 
 const OxifieldDatetimeComponent = Component.extend({
     format: "DD.MM.YYYY HH:mm",
-    options: {},
     setup: Em.on("didInsertElement", function() {
         let value = this.get("content.value");
         if (value === "now") {

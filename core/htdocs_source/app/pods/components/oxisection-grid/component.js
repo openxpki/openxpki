@@ -1,5 +1,4 @@
 import Component from '@ember/component';
-import BootstrapContextmenu from "bootstrap-contextmenu";
 
 const OxisectionGridComponent = Component.extend({
     visibleColumns: Em.computed("content.content.columns", function() {
@@ -9,7 +8,6 @@ const OxisectionGridComponent = Component.extend({
     }),
     pager: Em.computed("content.content.pager", "visibleColumns", function() {
         let pager = this.get("content.content.pager") || {};
-        let columns = this.get("visibleColumns");
         if (pager.count == null) { pager.count = 0 }
         if (pager.startat == null) { pager.startat = 0 }
         if (pager.limit == null) { pager.limit = Number.MAX_VALUE }
@@ -117,8 +115,9 @@ const OxisectionGridComponent = Component.extend({
             classIndex = titles.indexOf("_className");
         }
         let results = [];
+        let y, j, len;
         for (y = j = 0, len = data.length; j < len; y = ++j) {
-            row = data[y];
+            let row = data[y];
             results.push({
                 className: `gridrow-${row[classIndex]}`,
                 originalData: row,

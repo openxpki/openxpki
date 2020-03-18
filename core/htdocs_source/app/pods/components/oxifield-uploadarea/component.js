@@ -1,7 +1,16 @@
 import Component from '@ember/component';
 
+let TEXT_TYPES = [
+    "application/pkcs8",
+    "application/pkcs10",
+    "application/x-x509-ca-cert",
+    "application/x-x509-user-cert",
+    "application/x-pkcs7-crl",
+    "application/x-pem-file",
+    "application/x-pkcs12",
+];
+
 const OxifieldUploadComponent = Component.extend({
-    textTypes: ["application/pkcs8", "application/pkcs10", "application/x-x509-ca-cert", "application/x-x509-user-cert", "application/x-pkcs7-crl", "application/x-pem-file", "application/x-pkcs12"],
     cols: Em.computed("content.textAreaSize.width", function() {
         return this.get("content.textAreaSize.width") || 150;
     }),
@@ -22,7 +31,7 @@ const OxifieldUploadComponent = Component.extend({
                 return this.$().find("textarea").val(reader.result);
             };
             let type = evt.target.files[0].type;
-            if (/text\//.test(type) || this.textTypes.indexOf(type) >= 0) {
+            if (/text\//.test(type) || TEXT_TYPES.indexOf(type) >= 0) {
                 return reader.readAsText(evt.target.files[0]);
             } else {
                 return reader.readAsDataURL(evt.target.files[0]);
