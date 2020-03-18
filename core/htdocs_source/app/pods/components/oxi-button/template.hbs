@@ -12,7 +12,7 @@
     <button
         ...attributes
         class="{{if @button.loading "btn-loading"}} {{@button.className}}"
-        {{action "click"}}
+        {{on "click" this.click}}
         title="{{@button.tooltip}}"
         disabled={{@button.disabled}}
     >
@@ -37,7 +37,7 @@
                 {{{@button.confirm.description}}}
             </Modal.body>
             <Modal.footer>
-                <BsButton @onClick={{action "executeAction"}} @type="primary">
+                <BsButton @onClick={{this.executeAction}} @type="primary">
                     {{if @button.confirm.confirm_label @button.confirm.confirm_label "Confirm"}}
                 </BsButton>
                 <BsButton @onClick={{action Modal.close}}>

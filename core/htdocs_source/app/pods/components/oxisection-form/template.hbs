@@ -18,7 +18,7 @@
                     </button>
                 {{/if}}
                 {{#each this.content.content.buttons as |btn|}}
-                    {{oxi-button button=btn class="btn btn-default" onClick=(action "buttonClick")}}
+                    <OxiButton class="btn btn-default" @button=btn @onClick={{this.buttonClick}}/>
                 {{/each}}
 
             </div>

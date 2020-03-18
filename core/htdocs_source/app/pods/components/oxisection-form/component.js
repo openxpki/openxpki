@@ -8,12 +8,10 @@ import { isArray } from '@ember/array';
 export default class OxisectionFormComponent extends Component {
     @tracked loading = false;
 
-    @computed("content.content.submit_label")
     get submitLabel() {
         return this.args.content.content.submit_label || "send";
     }
 
-    @computed("content.content.fields.@each.name")
     get fields() {
         let fields = this.args.content.content.fields;
         for (const f of fields) {
@@ -58,7 +56,6 @@ export default class OxisectionFormComponent extends Component {
         return fields;
     }
 
-    @computed("fields")
     get visibleFields() {
         let results = [];
         for (const f of this.fields) {
@@ -71,7 +68,7 @@ export default class OxisectionFormComponent extends Component {
 
     @action
     buttonClick(button) {
-        return this.sendAction("buttonClick", button);
+        this.args.buttonClick(button);
     }
 
     @action
@@ -167,7 +164,8 @@ export default class OxisectionFormComponent extends Component {
         this.loading = true;
         return getOwner(this).lookup("route:openxpki").sendAjax({
             data: data
-        }).then((res) => {
+        })
+        .then((res) => {
             this.loading = false;
             var ref1;
             let errors = (ref1 = res.status) != null ? ref1.field_errors : void 0;
