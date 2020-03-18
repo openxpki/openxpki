@@ -1,35 +1,37 @@
 import Route from '@ember/routing/route';
-import EmberObject, { computed } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
-import { A } from '@ember/array';
 import { later, scheduleOnce, cancel } from '@ember/runloop';
-import { inject as injectCtrl } from '@ember/controller';
+import { getOwner } from '@ember/application';
 import { Promise } from 'rsvp';
 
-export default Route.extend({
-    queryParams: {
+export default class OpenXpkiRoute extends Route {
+    // Reserved Ember property "queryParams"
+    // https://api.emberjs.com/ember/3.17/classes/Route/properties/queryParams?anchor=queryParams
+    queryParams = {
         // refreshModel==true causes an "in-place" transition, so the model
         // hooks for this route (and any child routes) will re-fire
-        startat: { refreshModel: true },
-        limit: { refreshModel: true },
-        force: { refreshModel: true }
-    },
-    needReboot: ["login", "logout", "login!logout", "welcome"],
-    source: tracked({
-        value: {
-            page: null,
-            ping: null,
-            refresh: null,
-            structure: null,
-            rtoken: null,
-            status: null,
-            modal: null,
-            tabs: [],
-            navEntries: [],
-            error: null
-        }
-    }),
-    beforeModel: function(transition) {
+        startat:  { refreshModel: true },
+        limit:    { refreshModel: true },
+        force:    { refreshModel: true },
+    };
+    needReboot = ["login", "logout", "login!logout", "welcome"];
+
+    @tracked
+    source = {
+        page: null,
+        ping: null,
+        refresh: null,
+        structure: null,
+        rtoken: null,
+        status: null,
+        modal: null,
+        tabs: [],
+        navEntries: [],
+        error: null
+    };
+
+    // Reserved Ember function "beforeModel"
+    beforeModel(transition) {
         var model_id;
         // "force" is only evaluated above using "refreshModel: true"
         if (transition.to.queryParams.force) {
@@ -44,8 +46,10 @@ export default Route.extend({
                 }
             });
         }
-    },
-    model: function(params, transition) {
+    }
+
+    // Reserved Ember function "model"
+    model(params, transition) {
         let data = {
             page: params.model_id
         };
@@ -66,23 +70,25 @@ export default Route.extend({
         }).then((doc) => {
             return this.source;
         });
-    },
-    doPing: function(cfg) {
+    }
+
+    doPing(cfg) {
         return this.source.ping = later(this, () => {
             $.ajax({
                 url: cfg.href
             });
             return this.doPing(cfg);
         }, cfg.timeout);
-    },
-    sendAjax: function(req) {
+    }
+
+    sendAjax(req) {
         req.dataType = "json";
         var ref;
         if (req.type == null) {
             req.type = (req != null ? (ref = req.data) != null ? ref.action : void 0 : void 0) ? "POST" : "GET";
         }
         if (req.url == null) {
-            req.url = Ember.getOwner(this).lookup("controller:config").url;
+            req.url = getOwner(this).lookup("controller:config").url;
         }
         req.data._ = new Date().getTime();
         $(".loading").addClass("in-progress");
@@ -106,9 +112,8 @@ export default Route.extend({
         }
         return new Promise((resolve, reject) => {
             return $.ajax(req).then((doc) => {
-                var index, newSource, tab, tabs;
                 // work with a copy of @source
-                newSource = Object.assign({
+                let newSource = Object.assign({
                     status: doc.status,
                     modal: null
                 }, this.source);
@@ -143,24 +148,24 @@ export default Route.extend({
                 } else {
                     if (doc.page && doc.main) {
                         newSource.tabs = [...this.source.tabs]; // copy tabs to not trigger change observers for now
-                        tab = {
+                        let newTab = {
                             active: true,
                             page: doc.page,
                             main: doc.main,
                             right: doc.right
                         };
                         if (target === "modal") {
-                            newSource.modal = tab;
+                            newSource.modal = newTab;
                         } else if (target === "tab") {
-                            tabs = newSource.tabs;
+                            let tabs = newSource.tabs;
                             tabs.setEach("active", false);
-                            tabs.pushObject(tab);
+                            tabs.pushObject(newTab);
                         } else if (target === "active") {
-                            tabs = newSource.tabs;
-                            index = tabs.indexOf(tabs.findBy("active"));
-                            tabs.replace(index, 1, [tab]); // top
+                            let tabs = newSource.tabs;
+                            let index = tabs.indexOf(tabs.findBy("active"));
+                            tabs.replace(index, 1, [newTab]); // top
                         } else {
-                            newSource.tabs.clear().pushObject(tab);
+                            newSource.tabs.clear().pushObject(newTab);
                         }
                     }
                     scheduleOnce("afterRender", function() {
@@ -178,4 +183,4 @@ export default Route.extend({
             });
         });
     }
-});
+}
