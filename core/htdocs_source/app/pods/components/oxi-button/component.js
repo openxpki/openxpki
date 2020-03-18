@@ -47,8 +47,6 @@ Mode 2 `<button>`:
 The `button` hash will be passed on to the handler as single parameter.
 */
 export default class OxiButtonComponent extends Component {
-    tagName = "span";
-
     @tracked showConfirmDialog = false;
 
     @action
