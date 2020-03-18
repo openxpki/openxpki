@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action, computed, observer } from "@ember/object";
+import { action, computed } from "@ember/object";
 import { next } from '@ember/runloop'
 
 export default class OxifieldSelectComponent extends Component {
@@ -42,31 +42,12 @@ export default class OxifieldSelectComponent extends Component {
 
     @computed("options", "content.value")
     get isCustomValue() {
-        var o, value, values;
-        values = (function() {
-            var i, len, ref, results;
-            ref = this.options;
-            results = [];
-            for (i = 0, len = ref.length; i < len; i++) {
-                o = ref[i];
-                results.push(o.value);
-            }
-            return results;
-        }).call(this);
-        value = this.args.content.value;
-        var isCustom = values.indexOf[value] < 0;
+        let values = this.options.map(o => o.value);
+        let isCustom = values.indexOf[this.args.content.value] < 0;
         this.customMode = isCustom;
         return isCustom;
     }
 
-
-/*
-change, not in list: custom
-click: toggle
-    to NOT customized: reset value
-
-
-*/
     @computed("content.value")
     get sanitizedValue() {
         var value = this.args.content.value;
