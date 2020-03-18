@@ -179,6 +179,7 @@ export default class OxisectionFormComponent extends Component {
                     }
                 }
             }
-        });
+        })
+        .finally(() => this.loading = false);
     }
 }
