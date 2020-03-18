@@ -101,13 +101,13 @@
                     <div class="row">
                         <div class="{{if entry.right "col-md-8" "col-md-12"}}">
                             {{#each entry.main as |mainEntry|}}
-                                {{oxisection-main content=mainEntry}}
+                                <OxisectionMain @content={{mainEntry}}/>
                             {{/each}}
                         </div>
                         <div class="{{if entry.right "col-md-4" "hide"}}">
                             {{#each entry.right as |rightEntry|}}
                                 <div class="well">
-                                    {{oxisection-main content=rightEntry}}
+                                    <OxisectionMain @content={{rightEntry}}/>
                                 </div>
                             {{/each}}
                         </div>
