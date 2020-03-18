@@ -138,7 +138,6 @@ var OxisectionFormComponent = Component.extend({
                 }
             }
             if (isError) {
-                this.$().find(".btn-loading").removeClass("btn-loading");
                 return;
             }
             for (const name of names) {
