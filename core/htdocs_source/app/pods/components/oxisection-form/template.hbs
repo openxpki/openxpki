@@ -9,16 +9,16 @@
         {{/each}}
         <div class="form-group">
             <div class="col-md-offset-2 col-sm-7 oxi-form-button">
-                <button class="btn btn-default {{if this.loading "btn-loading"}} submit" {{action "submit"}}>
+                <BsButton @type="default" class="{{if this.loading "btn-loading"}} submit" @onClick={{this.submit}}>
                     {{this.submitLabel}}
-                </button>
+                </BsButton>
                 {{#if this.content.content.reset_label}}
-                    <button class="btn btn-default reset" {{action "reset"}}>
+                    <BsButton @type="default" class="reset" @onClick={{this.reset}}>
                         {{this.content.content.reset_label}}
-                    </button>
+                    </BsButton>
                 {{/if}}
                 {{#each this.content.content.buttons as |btn|}}
-                    <OxiButton class="btn btn-default" @button=btn @onClick={{this.buttonClick}}/>
+                    <OxiButton class="btn btn-default" @button={{btn}} @onClick={{this.buttonClick}}/>
                 {{/each}}
 
             </div>
