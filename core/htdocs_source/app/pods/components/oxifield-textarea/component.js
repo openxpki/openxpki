@@ -1,10 +1,12 @@
-import Component from '@ember/component'
+import Component from '@ember/component';
 
-OxifieldTextareaComponent = Component.extend
-    cols: Em.computed "content.textAreaSize.width", ->
-        @get("content.textAreaSize.width") || 150
+const OxifieldTextareaComponent = Component.extend({
+    cols: Em.computed("content.textAreaSize.width", function() {
+        return this.get("content.textAreaSize.width") || 150;
+    }),
+    rows: Em.computed("content.textAreaSize.height", function() {
+        return this.get("content.textAreaSize.height") || 10;
+    })
+});
 
-    rows: Em.computed "content.textAreaSize.height", ->
-        @get("content.textAreaSize.height") || 10
-
-export default OxifieldTextareaComponent
+export default OxifieldTextareaComponent;

@@ -1,7 +1,11 @@
-import Component from '@ember/component'
+import Component from '@ember/component';
 
-OxisectionTextComponent = Component.extend
-    actions:
-        buttonClick: (button) -> @sendAction "buttonClick", button
+const OxisectionTextComponent = Component.extend({
+    actions: {
+        buttonClick: function(button) {
+            return this.sendAction("buttonClick", button);
+        }
+    }
+});
 
-export default OxisectionTextComponent
+export default OxisectionTextComponent;

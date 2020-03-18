@@ -1,12 +1,16 @@
-import Component from '@ember/component'
+import Component from '@ember/component';
 
-OxiButtonContainerComponent = Component.extend
-    classNameBindings: ["buttons:oxi-button-container"]
+const OxiButtonContainerComponent = Component.extend({
+    classNameBindings: ["buttons:oxi-button-container"],
+    hasDescription: Em.computed("buttons.@each.description", function() {
+        var ref;
+        return (ref = this.get("buttons")) != null ? ref.isAny("description") : void 0;
+    }),
+    actions: {
+        click: function(button) {
+            return this.sendAction("buttonClick", button);
+        }
+    }
+});
 
-    hasDescription: Em.computed "buttons.@each.description", ->
-        @get("buttons")?.isAny "description"
-
-    actions:
-        click: (button) -> @sendAction "buttonClick", button
-
-export default OxiButtonContainerComponent
+export default OxiButtonContainerComponent;

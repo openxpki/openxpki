@@ -1,60 +1,70 @@
-import Component from '@ember/component'
+import Component from '@ember/component';
 
-OxifieldPasswordverifyComponent = Component.extend
-    password: ""
-    confirm: ""
+const OxifieldPasswordverifyComponent = Component.extend({
+    password: "",
+    confirm: "",
+    confirmFocus: false,
+    isFixed: false,
+    setMode: Em.on("init", function() {
+        if (this.get("content.value")) {
+            this.set("password", this.get("content.value"));
+            this.set("isFixed", true);
+            return this.set("content.value", "");
+        }
+    }),
+    showConfirm: Em.computed("password", "confirm", "confirmFocus", function() {
+        return this.get("password") !== this.get("confirm") || this.get("confirmFocus");
+    }),
+    valueSetter: Em.observer("password", "confirm", function() {
+        let password = this.get("password");
+        let confirm = this.get("confirm");
+        if (password === confirm) {
+            return this.set("content.value", password);
+        } else {
+            return this.set("content.value", null);
+        }
+    }),
+    placeholder: Em.computed("content.placeholder", function() {
+        return this.get("content.placeholder") || "Retype password";
+    }),
+    label: "",
+    updateValue: Em.observer("label", function() {
+        let label = this.get("label");
+        let values = this.get("content.options").filter(o => o.label === label).map(o => o.value);
+        if (values.length === 1) {
+            return this.set("content.value", values[0]);
+        } else {
+            return this.set("content.value", label);
+        }
+    }),
+    passwordChange: Em.observer("password", function() {
+        this.set("confirm", "");
+        return this.set("content.error", null);
+    }),
+    actions: {
+        confirmFocusIn: function() {
+            this.set("confirmFocus", true);
+            if (this.get("password") !== this.get("confirm")) {
+                return this.set("confirm", "");
+            }
+        },
+        hintRetype: function() {
+            if (this.get("password") && !this.get("confirm")) {
+                return this.set("content.error", "Please retype password");
+            }
+        },
+        confirmFocusOut: function() {
+            this.set("confirmFocus", false);
+            if (this.get("password") !== this.get("confirm")) {
+                if (this.get("confirm")) {
+                    this.set("content.error", "Passwords do not match");
+                    return this.set("confirm", "");
+                } else {
+                    return this.set("content.error", "Please retype password");
+                }
+            }
+        }
+    }
+});
 
-    confirmFocus: false
-
-    isFixed: false
-    setMode: Em.on "init", ->
-        if @get "content.value"
-            @set "password", @get "content.value"
-            @set "isFixed", true
-            @set "content.value", ""
-
-    showConfirm: Em.computed "password", "confirm", "confirmFocus", ->
-        @get("password") isnt @get("confirm") or @get "confirmFocus"
-
-    valueSetter: Em.observer "password", "confirm", ->
-        password = @get "password"
-        confirm = @get "confirm"
-        if password is confirm
-            @set "content.value", password
-        else
-            @set "content.value", null
-
-    placeholder: Em.computed "content.placeholder", ->
-        @get("content.placeholder") or "Retype password"
-
-    label: ""
-    updateValue: Em.observer "label", ->
-        label = @get "label"
-        values = (i.value for i in @get("content.options") when i.label is label)
-        if values.length is 1
-            @set "content.value", values[0]
-        else
-            @set "content.value", label
-
-    passwordChange: Em.observer "password", ->
-        @set "confirm", ""
-        @set "content.error", null
-
-    actions:
-        confirmFocusIn: ->
-            @set "confirmFocus", true
-            if @get("password") isnt @get("confirm")
-                @set "confirm", ""
-        hintRetype: ->
-            if @get("password") and not @get("confirm")
-                @set "content.error", "Please retype password"
-        confirmFocusOut: ->
-            @set "confirmFocus", false
-            if @get("password") isnt @get("confirm")
-                if @get("confirm")
-                    @set "content.error", "Passwords do not match"
-                    @set "confirm", ""
-                else
-                    @set "content.error", "Please retype password"
-
-export default OxifieldPasswordverifyComponent
+export default OxifieldPasswordverifyComponent;
