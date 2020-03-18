@@ -1,4 +1,4 @@
-import Controller, { inject as injectCtrl } from '@ember/controller';
+import Controller from '@ember/controller';
 import { tracked } from '@glimmer/tracking';
 import { action, set } from "@ember/object";
 
