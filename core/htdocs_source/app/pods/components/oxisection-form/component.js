@@ -92,40 +92,40 @@ export default class OxisectionFormComponent extends Component {
 
     @action
     valueChange(field) {
-        if (field.actionOnChange) {
-            let fields = this.args.content.content.fields;
-            let data = {
-                action: field.actionOnChange,
-                _sourceField: field.name
-            };
-            let names = [];
-            for (const field of fields) {
-                if (names.indexOf(field.name) < 0) {
-                    names.push(field.name);
-                }
+        if (!field.actionOnChange) { return }
+
+        let fields = this.args.content.content.fields;
+        let data = {
+            action: field.actionOnChange,
+            _sourceField: field.name
+        };
+        let names = [];
+        for (const field of fields) {
+            if (names.indexOf(field.name) < 0) {
+                names.push(field.name);
             }
-            for (const name of names) {
-                let clones = fields.filter(f => f.name === name);
-                if (clones.length > 1) {
-                    data[name] = clones.map(c => c.value);
-                } else {
-                    data[name] = clones[0].value;
-                }
+        }
+        for (const name of names) {
+            let clones = fields.filter(f => f.name === name);
+            if (clones.length > 1) {
+                data[name] = clones.map(c => c.value);
+            } else {
+                data[name] = clones[0].value;
             }
-            return getOwner(this).lookup("route:openxpki").sendAjax({
-                data: data
-            }).then((doc) => {
-                for (const newField of doc.fields) {
-                    for (const oldField of fields) {
-                        if (oldField.name === newField.name) {
-                            let idx = fields.indexOf(oldField);
-                            fields.replace(idx, 1, [copy(newField)]);
-                        }
+        }
+        return getOwner(this).lookup("route:openxpki").sendAjax({
+            data: data
+        }).then((doc) => {
+            for (const newField of doc.fields) {
+                for (const oldField of fields) {
+                    if (oldField.name === newField.name) {
+                        let idx = fields.indexOf(oldField);
+                        fields.replace(idx, 1, [copy(newField)]);
                     }
                 }
-                return null;
-            });
-        }
+            }
+            return null;
+        });
     }
 
     @action
@@ -159,9 +159,7 @@ export default class OxisectionFormComponent extends Component {
                 names.push(field.name);
             }
         }
-        if (isError) {
-            return;
-        }
+        if (isError) { return }
         for (const name of names) {
             let clones = fields.filter(f => f.name === name);
             data[name] = clones[0].clonable ? clones.map(c => c.value) : clones[0].value;
