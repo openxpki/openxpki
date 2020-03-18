@@ -20,6 +20,7 @@ OpenXPKI/FileUtils.pm
 OpenXPKI/i18n.pm
 OpenXPKI/Log4perl.pm
 OpenXPKI/MooseParams.pm
+OpenXPKI/Random.pm
 OpenXPKI/Template.pm
 OpenXPKI/Template/Plugin/Certificate.pm
 OpenXPKI/Template/Plugin/CheckDNS.pm
