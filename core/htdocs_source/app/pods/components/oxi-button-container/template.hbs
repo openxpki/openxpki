@@ -1,6 +1,6 @@
-{{#if buttons}}
-    {{#if hasDescription}}
-        {{#each buttons as |btn|}}
+{{#if this.buttons}}
+    {{#if this.hasDescription}}
+        {{#each this.buttons as |btn|}}
             <div class="row stacked-buttons">
                 {{#if btn.section}}
                     <div class="col-xs-12">
@@ -18,7 +18,7 @@
         {{/each}}
     {{else}}
         <div class="btn-group">
-            {{#each buttons as |btn|}}
+            {{#each this.buttons as |btn|}}
 
                 {{#if btn.break_before}}
                     <div class="spacer"></div>

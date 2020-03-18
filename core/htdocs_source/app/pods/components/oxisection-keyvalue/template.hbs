@@ -1,7 +1,7 @@
-{{#if items.length}}
+{{#if this.items.length}}
     <table class="table table-bordered">
         <tbody>
-            {{#each items as |item|}}
+            {{#each this.items as |item|}}
                 <tr class="{{item.className}}">
                 {{#if item.isHead}}
                     <th colspan="2">{{item.value}}</th>
@@ -13,5 +13,5 @@
             {{/each}}
         </tbody>
     </table>
-    {{oxi-button-container buttons=content.content.buttons buttonClick="buttonClick"}}
+    {{oxi-button-container buttons=this.content.content.buttons buttonClick="buttonClick"}}
 {{/if}}

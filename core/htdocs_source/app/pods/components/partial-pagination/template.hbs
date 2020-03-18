@@ -1,30 +1,30 @@
-{{#if content.content.pager}}
+{{#if this.content.content.pager}}
     <nav class="text-right">
         <ul class="pagination">
             <li class="disabled pagination-label"><a>Items per page</a></li>
-            {{#each pagesizes as |pagesize|}}
+            {{#each this.pagesizes as |pagesize|}}
                 <li class="{{if pagesize.active "active"}}"><a {{action "page" pagesize}}>{{pagesize.limit}}</a></li>
             {{/each}}
         </ul>
-        {{#if pages.length}}
+        {{#if this.pages.length}}
             <ul class="pagination">
-                <li class="{{if pages.prev.disabled "disabled"}}">
-                    <a aria-label="Previous" {{action "page" pages.prev}}>
+                <li class="{{if this.pages.prev.disabled "disabled"}}">
+                    <a aria-label="Previous" {{action "page" this.pages.prev}}>
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
-                {{#each pages as |page|}}
+                {{#each this.pages as |page|}}
                     <li class="{{if page.active "active"}}"><a {{action "page" page}}>{{page.num}}</a></li>
                 {{/each}}
-                <li class="{{if pages.next.disabled "disabled"}}">
-                    <a aria-label="Next" {{action "page" pages.next}}>
+                <li class="{{if this.pages.next.disabled "disabled"}}">
+                    <a aria-label="Next" {{action "page" this.pages.next}}>
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>
             </ul>
         {{/if}}
         <ul class="pagination">
-            <li class="disabled total"><a>{{content.content.pager.count}} Items</a></li>
+            <li class="disabled total"><a>{{this.content.content.pager.count}} Items</a></li>
         </ul>
     </nav>
 {{/if}}

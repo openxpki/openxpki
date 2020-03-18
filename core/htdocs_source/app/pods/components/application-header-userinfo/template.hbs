@@ -1,13 +1,13 @@
-{{#if user}}
+{{#if this.user}}
     <div class="userinfo">
         <ul class="nav">
             <li class="text-right">
                 Signed in as:
-                <strong>{{user.realname}} <span class="user_role">({{user.role}})</span></strong>
+                <strong>{{this.user.realname}} <span class="user_role">({{this.user.role}})</span></strong>
             </li>
             <li class="text-right">
                 Realm:
-                <strong>{{user.pki_realm_label}} <span class="pki_realm">({{user.pki_realm}})</span></strong>
+                <strong>{{this.user.pki_realm_label}} <span class="pki_realm">({{this.user.pki_realm}})</span></strong>
             </li>
         </ul>
     </div>

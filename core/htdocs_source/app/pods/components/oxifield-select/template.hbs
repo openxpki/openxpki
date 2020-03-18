@@ -1,16 +1,16 @@
-{{#if isStatic}}
-    <div class="oxi-no-input">{{content.options.firstObject.label}}</div>
-{{else if content.editable}}
+{{#if this.isStatic}}
+    <div class="oxi-no-input">{{this.content.options.firstObject.label}}</div>
+{{else if this.content.editable}}
     <div class="input-group">
-        {{#if customMode}}
-            {{input class="form-control" placeholder=content.placeholder value=content.value}}
+        {{#if this.customMode}}
+            {{input class="form-control" placeholder=this.content.placeholder value=this.content.value}}
         {{else}}
-            <OxiSelect @list={{options}} @selected={{sanitizedValue}} @onChange={{optionSelected}} />
+            <OxiSelect @list={{this.options}} @selected={{this.sanitizedValue}} @onChange={{this.optionSelected}} />
         {{/if}}
         <span class="input-group-btn">
-            <button class="btn btn-default {{if customMode "active"}}" {{action "toggleCustomMode"}}>Custom</button>
+            <button class="btn btn-default {{if this.customMode "active"}}" {{action "toggleCustomMode"}}>Custom</button>
         </span>
     </div>
 {{else}}
-    <OxiSelect @list={{options}} @selected={{sanitizedValue}} @onChange={{optionSelected}} />
+    <OxiSelect @list={{this.options}} @selected={{this.sanitizedValue}} @onChange={{this.optionSelected}} />
 {{/if}}

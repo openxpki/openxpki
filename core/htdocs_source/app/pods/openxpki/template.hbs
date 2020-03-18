@@ -11,7 +11,7 @@
 
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                {{#each model.navEntries as |navEntry|}}
+                {{#each this.model.navEntries as |navEntry|}}
                     {{#if navEntry.entries.length}}
                         <li class="dropdown {{if navEntry.active "active"}}">
                             <a class="dropdown-toggle" href="#" data-toggle="dropdown">
@@ -39,7 +39,7 @@
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                {{#if model.user}}
+                {{#if this.model.user}}
                     <li>
                         {{#link-to "openxpki" "logout"}}
                             Log out
@@ -51,40 +51,40 @@
     </div>
 </div>
 
-<div class="container-fluid  {{model.tabs.firstObject.page.className}}">
+<div class="container-fluid  {{this.model.tabs.firstObject.page.className}}">
     <div class="oxi-message">
-        {{#if model.status.href}}
-            <a href="{{model.status.href}}" target="_blank">
-                <div class="alert {{statusClass}}" style="cursor:pointer;">
-                    {{model.status.message}}
+        {{#if this.model.status.href}}
+            <a href="{{this.model.status.href}}" target="_blank">
+                <div class="alert {{this.statusClass}}" style="cursor:pointer;">
+                    {{this.model.status.message}}
                 </div>
             </a>
         {{else}}
-            <div class="alert {{statusClass}}">
-                {{model.status.message}}
+            <div class="alert {{this.statusClass}}">
+                {{this.model.status.message}}
             </div>
         {{/if}}
     </div>
 
     <div class="oxi-pagehead">
-        {{#if model.tabs.firstObject.page.breadcrumb.length}}
+        {{#if this.model.tabs.firstObject.page.breadcrumb.length}}
             <ol class="breadcrumb">
-                {{#each model.tabs.firstObject.page.breadcrumb as |entry|}}
+                {{#each this.model.tabs.firstObject.page.breadcrumb as |entry|}}
                     {{#if entry.label}}<li class="{{entry.className}}">{{entry.label}}</li>{{/if}}
                 {{/each}}
             </ol>
         {{/if}}
-        <h2>{{model.tabs.firstObject.page.label}}</h2>
+        <h2>{{this.model.tabs.firstObject.page.label}}</h2>
     </div>
 
-    {{#if model.tabs.firstObject.page.description}}
+    {{#if this.model.tabs.firstObject.page.description}}
         <div class="description">
-            {{{model.tabs.firstObject.page.description}}}
+            {{{this.model.tabs.firstObject.page.description}}}
         </div>
     {{/if}}
-    {{#if showTabs}}
+    {{#if this.showTabs}}
         <ul class="nav nav-tabs">
-            {{#each model.tabs as |entry|}}
+            {{#each this.model.tabs as |entry|}}
                 <li class="{{if entry.active "active"}}">
                     <a {{action "activateTab" entry}}>
                         {{if entry.page.shortlabel entry.page.shortlabel entry.page.label}}
@@ -95,7 +95,7 @@
         </ul>
     {{/if}}
     <div class="tab-content">
-        {{#each model.tabs as |entry|}}
+        {{#each this.model.tabs as |entry|}}
             <div class="tab-pane {{if entry.active "active"}}">
                 <div class="Xcontainer sections">
                     <div class="row">
@@ -119,8 +119,8 @@
 </div>
 
 <BsModal
-    class="{{modal.page.className}}"
-    @open={{modal}}
+    class="{{this.modal.page.className}}"
+    @open={{this.modal}}
     @closeButton={{true}}
     @fade={{true}}
     @backdrop={{true}}
@@ -130,11 +130,11 @@
 >
     <Modal.header>
         <h4 class="modal-title">
-            {{if modal.page.shortlabel modal.page.shortlabel modal.page.label}}
+            {{if this.modal.page.shortlabel this.modal.page.shortlabel this.modal.page.label}}
         </h4>
     </Modal.header>
     <Modal.body>
-        {{#each modal.main as |mainEntry|}}
+        {{#each this.modal.main as |mainEntry|}}
             <OxisectionMain @content={{mainEntry}}/>
         {{/each}}
     </Modal.body>
@@ -144,7 +144,7 @@
 </BsModal>
 
 <BsModal
-    @open={{error}}
+    @open={{this.error}}
     @closeButton={{true}}
     @fade={{true}}
     @backdrop={{true}}
@@ -155,7 +155,7 @@
         <h4 class="modal-title">Application Error</h4>
     </Modal.header>
     <Modal.body>
-        {{{error.message}}}
+        {{{this.error.message}}}
     </Modal.body>
     <Modal.footer>
         <BsButton @onClick={{action "reload"}} @type="primary">Reload application</BsButton>

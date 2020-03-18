@@ -1,24 +1,24 @@
-<div class="form-group {{if hasError "has-error"}}">
-    {{#if isBool}}
+<div class="form-group {{if this.hasError "has-error"}}">
+    {{#if this.isBool}}
         <div class="col-md-2"></div>
     {{else}}
-        <label class="col-md-2 control-label">{{content.label}}</label>
+        <label class="col-md-2 control-label">{{this.content.label}}</label>
     {{/if}}
-    {{#if content.keys}}
+    {{#if this.content.keys}}
         <div class="col-md-2">
-            <OxiSelect @list={{content.keys}} @selected={{content.name}} @onChange={{optionSelected}} />
+            <OxiSelect @list={{this.content.keys}} @selected={{this.content.name}} @onChange={{this.optionSelected}} />
         </div>
     {{/if}}
-    <div class="{{sFieldSize}}" title="{{content.tooltip}}">
-        {{component type content=content}}
-        {{#if content.error}}
-            <span class="help-block">{{content.error}}</span>
+    <div class="{{this.sFieldSize}}" title="{{this.content.tooltip}}">
+        {{component this.type content=this.content}}
+        {{#if this.content.error}}
+            <span class="help-block">{{this.content.error}}</span>
         {{/if}}
     </div>
-    {{#if content.clonable}}
+    {{#if this.content.clonable}}
         <div class="col-md-1 clonable-btn-group">
 
-            {{#if content.canDelete}}
+            {{#if this.content.canDelete}}
             <button class="btn btn-danger clone" type="button" {{action "delClone"}}>
                 <span class="glyphicon glyphicon-minus"></span>
             </button>
