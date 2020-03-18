@@ -42,15 +42,7 @@ sub execute {
     my $charset = $self->param('charset') || 'base64';
     configuration_error('Unsupported charset') if ( $charset !~ m{ \A (base64|hex) \z }xms );
 
-    my $password = CTX('api2')->get_default_token()->command({
-        COMMAND => 'create_random',
-        BINARY => ($charset ne 'base64'),
-        RANDOM_LENGTH => $random_bytes || $password_length
-    });
-
-    if ($charset eq 'hex') {
-        $password = unpack("H*", $password);
-    }
+    my $password = CTX('api2')->get_random( length => $random_bytes || $password_length, format => $charset );
 
     if ($password_length) {
         $password = substr($password, 0, $password_length);

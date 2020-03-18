@@ -13,6 +13,7 @@ use English;
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
+use OpenXPKI::Random;
 
 use MIME::Base64;
 use Crypt::CBC;
@@ -41,136 +42,131 @@ use Digest::SHA qw( sha1_base64 );
     my %encoding      : ATTR( :init_arg<ENCODING> :default('base64-oneline') );
 
     my %exportable    : ATTR( :init_arg<EXPORTABLE> :default(0) );
+    my %random;
 
     sub START {
-    my ($self, $ident, $arg_ref) = @_;
+        my ($self, $ident, $arg_ref) = @_;
 
-    if ($exportable{$ident} !~ m{ \A -?\d+ \z }xms) {
-        OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INVALID_EXPORTABLE_SETTING");
-    }
-
-    if ($exportable{$ident} < -1) {
-        OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INVALID_EXPORTABLE_SETTING");
-    }
-
-    if ($session_key{$ident} eq 'unspecified') {
-        if (! exists $token{$ident}) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_MISSING_TOKEN");
-        }
-
-        if (defined $session_iv{$ident} && $session_iv{$ident} ne 'unspecified') {
+        if ($exportable{$ident} !~ m{ \A -?\d+ \z }xms) {
             OpenXPKI::Exception->throw (
-                message => "If you set an IV you must also set a KEY");
+            message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INVALID_EXPORTABLE_SETTING");
         }
 
-        my $key = $token{$ident}->command(
-        {
-            COMMAND => 'create_random',
-            RANDOM_LENGTH => 32,
-            INCLUDE_PADDING => 1,
-        });
+        if ($exportable{$ident} < -1) {
+            OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INVALID_EXPORTABLE_SETTING");
+        }
 
-        # convert base64 to binary and get hex representation of this data
-        $session_key{$ident} = uc(unpack('H*',
-                         MIME::Base64::decode_base64($key)));
+        if ($session_key{$ident} eq 'unspecified') {
+            if (! exists $token{$ident}) {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_MISSING_TOKEN");
+            }
 
-    # if a key was given the IV must be set to a value or undef (dynamic)
-    } elsif (defined $session_iv{$ident} && $session_iv{$ident} eq 'unspecified') {
-        OpenXPKI::Exception->throw (
-            message => "You must provide an IV when setting a KEY or set IV = undef for dymnamic IV generation");
-    }
+            if (defined $session_iv{$ident} && $session_iv{$ident} ne 'unspecified') {
+                OpenXPKI::Exception->throw (
+                    message => "If you set an IV you must also set a KEY");
+            }
 
-    if (! length($session_key{$ident})) {
-        OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INITIALIZATION_ERROR");
-    }
+            $random{$ident} = OpenXPKI::Random->new( token => $token{$ident} );
+            $session_key{$ident} = uc($random{$ident}->get_random( 32, 'hex' ));
 
-    if ($session_key{$ident} !~ m{ \A [0-9A-F]+ \z }xms) {
-        OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INVALID_KEY");
-    }
+        # if a key was given the IV must be set to a value or undef (dynamic)
+        } elsif (defined $session_iv{$ident} && $session_iv{$ident} eq 'unspecified') {
+            OpenXPKI::Exception->throw (
+                message => "You must provide an IV when setting a KEY or set IV = undef for dymnamic IV generation");
+        }
 
-    # iv was not set in constructor => auto generate
-    if (defined $session_iv{$ident} && $session_iv{$ident} eq 'unspecified') {
-
-        $session_iv{$ident} = $self->_generate_iv();
-
-        if (! length($session_iv{$ident})) {
+        if (! length($session_key{$ident})) {
             OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INITIALIZATION_ERROR");
         }
-    }
 
-    # iv can be undef (=dynamic) or needs to have a length
-    if (defined $session_iv{$ident} && ($session_iv{$ident} !~ m{ \A [0-9A-F]+ \z }xms)) {
-        OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INVALID_IV");
-    }
+        if ($session_key{$ident} !~ m{ \A [0-9A-F]+ \z }xms) {
+            OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INVALID_KEY");
+        }
 
-    if ($algorithm{$ident} ne 'aes-256-cbc') {
-        OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_UNSUPPORTED_ALGORITHM");
-    }
+        # iv was not set in constructor => auto generate
+        if (defined $session_iv{$ident} && $session_iv{$ident} eq 'unspecified') {
+
+            $session_iv{$ident} = $self->_generate_iv();
+
+            if (! length($session_iv{$ident})) {
+                OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INITIALIZATION_ERROR");
+            }
+        }
+
+        # iv can be undef (=dynamic) or needs to have a length
+        if (defined $session_iv{$ident} && ($session_iv{$ident} !~ m{ \A [0-9A-F]+ \z }xms)) {
+            OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_INVALID_IV",
+            params => { iv => $session_iv{$ident}  }
+            );
+        }
+
+        if ($algorithm{$ident} ne 'aes-256-cbc') {
+            OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_UNSUPPORTED_ALGORITHM");
+        }
 
     }
 
 
     sub encrypt {
-    my $self = shift;
-    my $ident = ident $self;
-    my $args = shift;
+        my $self = shift;
+        my $ident = ident $self;
+        my $args = shift;
 
-    my $data;
-    my $encoding = $encoding{$ident};
+        my $data;
+        my $encoding = $encoding{$ident};
 
-    if (defined $args && (ref $args eq 'HASH')) {
-        $data     = $args->{DATA};
-        $encoding = $args->{ENCODING};
-    } elsif (defined $args && (ref $args eq '')) {
-        $data     = $args;
-    }
+        if (defined $args && (ref $args eq 'HASH')) {
+            $data     = $args->{DATA};
+            $encoding = $args->{ENCODING};
+        } elsif (defined $args && (ref $args eq '')) {
+            $data     = $args;
+        }
 
-    if (! defined $data || ! defined $encoding) {
-        OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_ENCRYPT_INVALID_PARAMETER");
-    }
+        if (! defined $data || ! defined $encoding) {
+            OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_ENCRYPT_INVALID_PARAMETER");
+        }
 
-    my $iv = $session_iv{$ident} || $self->_generate_iv();
+        my $iv = $session_iv{$ident} || $self->_generate_iv();
 
-    my $cipher = Crypt::CBC->new(
-        -cipher => 'Crypt::OpenSSL::AES',
-        -key    => pack('H*', $session_key{$ident}),
-        -iv     => pack('H*', $iv),
-        -literal_key => 1,
-        -header => 'none',
-    );
-    my $encrypted = $cipher->encrypt($data);
-    my $blob;
+        my $cipher = Crypt::CBC->new(
+            -cipher => 'Crypt::OpenSSL::AES',
+            -key    => pack('H*', $session_key{$ident}),
+            -iv     => pack('H*', $iv),
+            -literal_key => 1,
+            -header => 'none',
+        );
+        my $encrypted = $cipher->encrypt($data);
+        my $blob;
 
-    if ($encoding eq 'base64') {
-        $blob = MIME::Base64::encode_base64($encrypted);
-    }
+        if ($encoding eq 'base64') {
+            $blob = MIME::Base64::encode_base64($encrypted);
+        }
 
-    if ($encoding eq 'base64-oneline') {
-        $blob = MIME::Base64::encode_base64($encrypted, '');
-    }
+        if ($encoding eq 'base64-oneline') {
+            $blob = MIME::Base64::encode_base64($encrypted, '');
+        }
 
-    if ($encoding eq 'raw') {
-        $blob = $encrypted;
-    }
+        if ($encoding eq 'raw') {
+            $blob = $encrypted;
+        }
 
-    if (! defined $blob) {
-        OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_ENCRYPT_INVALID_ENCODING",
-        params => {
-            ENCODING => $encoding,
-        });
-    }
+        if (! defined $blob) {
+            OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_ENCRYPT_INVALID_ENCODING",
+            params => {
+                ENCODING => $encoding,
+            });
+        }
 
-    return join(';',
+        return join(';',
             $self->get_key_id(),
             $encoding,
             ($session_iv{$ident} ? '' : $iv), # session iv is not persisted
@@ -178,119 +174,118 @@ use Digest::SHA qw( sha1_base64 );
     }
 
     sub can_decrypt {
-    my $self = shift;
-    my $ident = ident $self;
-    my $arg = shift;
+        my $self = shift;
+        my $ident = ident $self;
+        my $arg = shift;
 
-        if (! defined $arg || $arg eq '') {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_CAN_DECRYPT_MISSING_ARGUMENT',
-            );
+            if (! defined $arg || $arg eq '') {
+                OpenXPKI::Exception->throw(
+                    message => 'I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_CAN_DECRYPT_MISSING_ARGUMENT',
+                );
+            }
+        my ($creator_ident, $encoding, $encrypted_data) =
+            ($arg =~ m{ (.*?) ; ([\w\-]+) ; (.*) }xms);
+
+        if (! defined $encrypted_data) {
+            OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_DECRYPT_INVALID_ENCRYPTED_DATA");
         }
-    my ($creator_ident, $encoding, $encrypted_data) =
-        ($arg =~ m{ (.*?) ; ([\w\-]+) ; (.*) }xms);
 
-    if (! defined $encrypted_data) {
-        OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_DECRYPT_INVALID_ENCRYPTED_DATA");
-    }
-
-    # check if we created this cookie
-    if ($self->get_key_id() eq $creator_ident) {
-        return 1;
-    }
-    return;
+        # check if we created this cookie
+        if ($self->get_key_id() eq $creator_ident) {
+            return 1;
+        }
+        return;
     }
 
     sub decrypt {
-    my $self = shift;
-    my $ident = ident $self;
-    my $arg = shift;
+        my $self = shift;
+        my $ident = ident $self;
+        my $arg = shift;
 
-    # iv was added with v3.4 - items writen before have only three items
-    my ($creator_ident, $encoding, $nn, $iv, $encrypted_data) =
-        ($arg =~ m{ (.*?) ; ([\w\-]+) ; (([0-9A-F]+);)? (.*) }xms);
+        # iv was added with v3.4 - items writen before have only three items
+        my ($creator_ident, $encoding, $nn, $iv, $encrypted_data) =
+            ($arg =~ m{ (.*?) ; ([\w\-]+) ; (([0-9A-F]+);)? (.*) }xms);
 
-    # if iv is set in the session, it was persisted as an empty string
-    # this also catched legacy items with old storage format
-    $iv ||= $session_iv{$ident};
-    if (! defined $encrypted_data) {
-        OpenXPKI::Exception->throw (
-        message => "Unable to determine IV to decrypt Volatile Vault");
-    }
+        # if iv is set in the session, it was persisted as an empty string
+        # this also catched legacy items with old storage format
+        $iv ||= $session_iv{$ident};
+        if (! defined $encrypted_data) {
+            OpenXPKI::Exception->throw (
+            message => "Unable to determine IV to decrypt Volatile Vault");
+        }
 
-    if (! defined $encrypted_data) {
-        OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_DECRYPT_INVALID_ENCRYPTED_DATA");
-    }
+        if (! defined $encrypted_data) {
+            OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_DECRYPT_INVALID_ENCRYPTED_DATA");
+        }
 
-    # check if we created this cookie
-    if ($self->get_key_id() ne $creator_ident) {
-        OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_DECRYPT_INVALID_VAULT_INSTANCE");
-    }
+        # check if we created this cookie
+        if ($self->get_key_id() ne $creator_ident) {
+            OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_DECRYPT_INVALID_VAULT_INSTANCE");
+        }
 
-    if (($encoding eq 'base64') || ($encoding eq 'base64-oneline')) {
-        $encrypted_data = MIME::Base64::decode_base64($encrypted_data);
-    }
+        if (($encoding eq 'base64') || ($encoding eq 'base64-oneline')) {
+            $encrypted_data = MIME::Base64::decode_base64($encrypted_data);
+        }
 
-    my $cipher = Crypt::CBC->new(
-        -cipher => 'Crypt::OpenSSL::AES',
-        -key    => pack('H*', $session_key{$ident}),
-        -iv     => pack('H*', $iv),
-        -literal_key => 1,
-        -header => 'none',
-    );
-    return $cipher->decrypt($encrypted_data);
+        my $cipher = Crypt::CBC->new(
+            -cipher => 'Crypt::OpenSSL::AES',
+            -key    => pack('H*', $session_key{$ident}),
+            -iv     => pack('H*', $iv),
+            -literal_key => 1,
+            -header => 'none',
+        );
+        return $cipher->decrypt($encrypted_data);
     }
 
 
     sub export_key {
-    my $self = shift;
-    my $ident = ident $self;
-    my $arg = shift;
+        my $self = shift;
+        my $ident = ident $self;
+        my $arg = shift;
 
-    # check if we are allowed to export the key
-    if ($exportable{$ident} == 0) {
-        OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_EXPORT_KEY_DENIED",
-        params => {
-        });
-    }
+        # check if we are allowed to export the key
+        if ($exportable{$ident} == 0) {
+            OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_EXPORT_KEY_DENIED",
+            params => {
+            });
+        }
 
-    if ($exportable{$ident} > 0) {
-        # decrement export counter
-        $exportable{$ident}--;
-    }
+        if ($exportable{$ident} > 0) {
+            # decrement export counter
+            $exportable{$ident}--;
+        }
 
-    return {
-        KEY => $session_key{$ident},
-        IV  => $session_iv{$ident},
-        ALGORITHM => $algorithm{$ident},
-    }
+        return {
+            KEY => $session_key{$ident},
+            IV  => $session_iv{$ident},
+            ALGORITHM => $algorithm{$ident},
+        }
     }
 
 
     sub lock_vault {
-    my $self = shift;
-    my $ident = ident $self;
-    my $arg = shift;
+        my $self = shift;
+        my $ident = ident $self;
+        my $arg = shift;
 
-    $exportable{$ident} = 0;
+        $exportable{$ident} = 0;
     }
 
     sub get_key_id {
-    my $self = shift;
-    my $ident = ident $self;
-    my $arg = shift;
+        my $self = shift;
+        my $ident = ident $self;
+        my $arg = shift;
 
-    my %args;
-    if ($arg->{LONG}) {
-        $args{LONG} = 1,
-    }
+        my %args;
+        if ($arg->{LONG}) {
+            $args{LONG} = 1,
+        }
 
-    return $self->_compute_key_id(
-        {
+        return $self->_compute_key_id({
         KEY => $session_key{$ident},
         IV  => ($session_iv{$ident} || ''),
         ALGORITHM => $algorithm{$ident},
@@ -300,50 +295,40 @@ use Digest::SHA qw( sha1_base64 );
 
     # expects named arguments KEY and IV. returns truncated base64 encoded SHA1 hash of concatenated KEY and IV.
     sub _compute_key_id : PRIVATE {
-    my $self = shift;
-    my $ident = ident $self;
-    my $arg = shift;
+        my $self = shift;
+        my $ident = ident $self;
+        my $arg = shift;
 
-    if (! ((defined $arg->{IV}) && (defined $arg->{KEY}) && (defined $arg->{ALGORITHM}))) {
-        OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_COMPUTE_KEY_ID_MISSING_PARAMETERS");
-    }
+        if (! ((defined $arg->{IV}) && (defined $arg->{KEY}) && (defined $arg->{ALGORITHM}))) {
+            OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_COMPUTE_KEY_ID_MISSING_PARAMETERS");
+        }
 
-    my $digest = sha1_base64(join(':', $arg->{ALGORITHM}, $arg->{IV}, $arg->{KEY}));
+        my $digest = sha1_base64(join(':', $arg->{ALGORITHM}, $arg->{IV}, $arg->{KEY}));
 
-    if ($arg->{LONG}) {
-        return $digest;
-    } else {
-        return (substr($digest, 0, 8));
-    }
+        if ($arg->{LONG}) {
+            return $digest;
+        } else {
+            return (substr($digest, 0, 8));
+        }
     }
 
     sub _generate_iv : PRIVATE {
-    my $self = shift;
-    my $ident = ident $self;
-    my $bytes = shift || 16;
+        my $self = shift;
+        my $ident = ident $self;
+        my $bytes = shift || 16;
 
-    if (! exists $token{$ident}) {
-        OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_VOLATILEVAULT_MISSING_TOKEN");
-    }
+        if (!exists $random{$ident}) {
+            $random{$ident} = OpenXPKI::Random->new( token => $token{$ident} );
+        }
 
-    my $iv = $token{$ident}->command(
-    {
-        COMMAND => 'create_random',
-        RANDOM_LENGTH => $bytes,
-        INCLUDE_PADDING => 1,
-        NOENGINE => 1,
-    });
-
-    # convert base64 to binary and get hex representation of this data
-    return uc(unpack('H*',
-        MIME::Base64::decode_base64($iv)));
+        return uc($random{$ident}->get_random($bytes,'hex'));
     }
 
 }
 
 1;
+
 __END__
 
 =head1 Name

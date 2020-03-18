@@ -181,20 +181,12 @@ use OpenXPKI::Server::Context qw( CTX );
         }
         my $byte_length = $bit_length_next / 8;
 
-        my $random = $token_of{$ident}->command({
-            COMMAND       => 'create_random',
-            RANDOM_LENGTH => $byte_length,
-            INCLUDE_PADDING => 1,
-        });
+        my $random_hex = CTX('api2')->get_random(
+            length => $byte_length,
+            format => 'hex',
+        );
 
-        my $secret_data = decode_base64($random);
-        #open my $OPENSSL, "openssl rand $byte_length|";
-        #my $secret_data = <$OPENSSL>;
-        #close($OPENSSL);
-
-        my $hex_length = $byte_length * 2;
-        my $secret_hex = '0x' . unpack "H$hex_length", $secret_data;
-        my $secret     = Math::BigInt->new($secret_hex);
+        my $secret     = Math::BigInt->new('0x'.$random_hex);
 
         # and with 11...1 to get back correct bitwidth
         my $bitmask = Math::BigInt->new("2");

@@ -114,10 +114,7 @@ sub execute {
                 ##! 8: 'Escrow key found'
 
                 # Step 3c - create p12 using random challenge
-                my $p12_key = $token->command({
-                    COMMAND       => 'create_random',
-                    RANDOM_LENGTH => 32,
-                });
+                my $p12_key = CTX('api2')->get_random( length => 32 );
 
                 my $escrow_key = $msg->{VALUE};
                 my $p12 = $token->command({

@@ -273,7 +273,7 @@ sub load_extension
     elsif ($ext eq "oid")
     {
 
-        my @oids = $config->get_keys(\@basepath);        
+        my @oids = $config->get_keys(\@basepath);
         foreach my $name (@oids) {
 
             my $attr = $config->get_hash( [ @basepath, $name ] );
@@ -569,19 +569,17 @@ sub create_random_serial {
     ##! 16: "create_random_serial({ RANDOM_LENGTH => $rand_length, PREFIX => " . $serial->as_hex . " })"
 
     if ($rand_length > 0) {
-        my $default_token = CTX('api2')->get_default_token();
-        my $rand_base64 = $default_token->command({
-            COMMAND       => 'create_random',
-            RANDOM_LENGTH => $rand_length,
-        });
-        my $rand_hex = '0x' . unpack 'H*', decode_base64($rand_base64);
-        ##! 16: 'random part: ' . $rand_hex
+        my $rand_hex = CTX('api2')->get_random(
+            length => $rand_length,
+            format => 'hex',
+        );
 
+        ##! 16: 'random part: ' . $rand_hex
         # left shift the existing serial by the size of the random part and
         # add it to the right
         $serial->blsft($rand_length * 8);
         ##! 16: 'bit shifted serial: ' . $serial->as_hex
-        $serial->bior(Math::BigInt->new($rand_hex));
+        $serial->bior(Math::BigInt->new('0x' . $rand_hex));
     }
     ##! 16: 'returning: ' . $serial->as_hex
     return $serial->bstr; # return serial as "decimal notation, possibly zero padded"

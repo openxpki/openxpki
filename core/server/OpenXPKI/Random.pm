@@ -140,8 +140,6 @@ sub _get_strong_random {
         BINARY => 1,
     });
 
-    return $rand;
-
 }
 
 sub _get_regular_random {

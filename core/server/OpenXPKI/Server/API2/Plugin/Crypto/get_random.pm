@@ -10,16 +10,17 @@ OpenXPKI::Server::API2::Plugin::Crypto::get_random
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
-
+use OpenXPKI::Random;
 
 
 =head1 COMMANDS
 
 =head2 get_random
 
-Generates and returns Base64 encoded (pseudo-)random bytes by calling the
-system token I<create_random> method (equal to `openssl rand` when using
-the default modules).
+Generates and returns Base64 encoded (pseudo-)random bytes which are
+considered cryptographically secure unless mode=fast is set.
+
+See OpenXPKI::Random for details.
 
 B<Parameters>
 
@@ -29,16 +30,19 @@ B<Parameters>
 
 Please note that the returned string is Base64 encoded an thus longer.
 
+=item * C<format> I<Str>
+
+The default is to return the random data with Base64 encoding (I<base64>).
+Set to I<hex> for lowercase hex. Note, the binary flag is superior
+to the format flag.
+
 =item * C<binary> I<Bool>
 
-If set the raw binary value is returned
+Return the random as raw binary, overwrites any value given to format.
 
-=item * C<fast> I<Bool>
+=item * C<mode> I<String>
 
-Pass I<NOENGINE> to ignore the ENGINE usage settings of the crypto backend.
-This will make calls faster but reduces the entropy to the internal openssl
-mechanisms. This flag has no effect if engine_usage does not include the
-I<RANDOM> flag.
+One of I<fast|regular|strong>, default is regular.
 
 =back
 
@@ -47,20 +51,20 @@ I<RANDOM> flag.
 command "get_random" => {
     length => { isa => 'Int', required => 1, },
     binary => { isa => 'Bool', default => 0, },
-    fast => { isa => 'Bool', default => 0, },
+    format => { isa => 'Str', matching => qr{ \A ( bin | base64 | hex ) \Z }x,, default => 'base64' },
+    mode => { isa => 'Str',  matching => qr{ \A ( fast | regular | strong ) \Z }x, default => 'regular' },
 } => sub {
+
     my ($self, $params) = @_;
     my $length  = $params->length;
     ##! 4: 'length: ' . $length
 
-    my $random = $self->api->get_default_token->command({
-        COMMAND => 'create_random',
-        RANDOM_LENGTH => $length,
-        BINARY => $params->binary,
-        NOENGINE => $params->fast,
-    });
-    ## DO NOT debug print $random here as it will possibly be used as a password!
-    return $random;
+    return OpenXPKI::Random->new()->get_random(
+        $length,
+        $params->binary ? 'bin' : $params->format,
+        $params->mode,
+    );
+
 };
 
 __PACKAGE__->meta->make_immutable;
