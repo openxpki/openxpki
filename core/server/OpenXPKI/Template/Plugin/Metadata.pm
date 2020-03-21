@@ -43,7 +43,7 @@ sub get {
     my $self = shift;
     my $prefix = shift;
     my $value = shift;
-    my $suffix = shift || '';
+    my $suffix = shift || undef;
 
     my @path = split /\./, $prefix;
     push @path, $value if (defined $value);

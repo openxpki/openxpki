@@ -139,26 +139,26 @@ sub login_step {
 
     my ($computed_secret, $salt);
     if ($scheme eq 'sha') {
-         my $ctx = Digest::SHA->new();
-         $ctx->add($passwd);
+        my $ctx = Digest::SHA->new();
+        $ctx->add($passwd);
         $computed_secret = $ctx->b64digest();
     }
     if ($scheme eq 'ssha') {
         $salt = substr(decode_base64($encrypted), 20);
-         my $ctx = Digest::SHA->new();
-         $ctx->add($passwd);
+        my $ctx = Digest::SHA->new();
+        $ctx->add($passwd);
         $ctx->add($salt);
         $computed_secret = encode_base64($ctx->digest() . $salt, '');
     }
     if ($scheme eq 'md5') {
-         my $ctx = Digest::MD5->new();
-         $ctx->add($passwd);
+        my $ctx = Digest::MD5->new();
+        $ctx->add($passwd);
         $computed_secret = $ctx->b64digest();
     }
     if ($scheme eq 'smd5') {
         $salt = substr(decode_base64($encrypted), 16);
-         my $ctx = Digest::MD5->new();
-         $ctx->add($passwd);
+        my $ctx = Digest::MD5->new();
+        $ctx->add($passwd);
         $ctx->add($salt);
         $computed_secret = encode_base64($ctx->digest() . $salt, '');
     }
