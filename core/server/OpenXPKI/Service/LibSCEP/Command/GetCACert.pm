@@ -12,8 +12,10 @@ use Class::Std;
 use base qw( OpenXPKI::Service::LibSCEP::Command );
 
 use MIME::Base64;
-use OpenXPKI::Debug;
 use Log::Log4perl;
+use Data::Dumper;
+use OpenXPKI::Debug;
+
 use OpenXPKI::Server::Context qw( CTX );
 
 

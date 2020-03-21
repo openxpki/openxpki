@@ -66,7 +66,7 @@ $result = $client->mock_request({
     'page' => 'workflow!history!wf_id!' . $workflow_id
 });
 
-is($result->{main}->[0]->{content}->{data}->[9]->[2], 'global_set_error_invalid_subject', 'broken subject');
+is($result->{main}->[0]->{content}->{data}->[-1]->[2], 'global_set_error_invalid_subject', 'broken subject');
 
 # Create the pkcs10
 `openssl req -new -nodes -keyout tmp/entity.key -out tmp/entity.csr -subj "/CN=entity.openxpki.org" -config openssl.conf -reqexts req_template_v1 2>/dev/null`;

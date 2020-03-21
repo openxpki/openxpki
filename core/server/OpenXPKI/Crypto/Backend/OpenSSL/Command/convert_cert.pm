@@ -147,6 +147,7 @@ sub get_result
 
     my $res = '';
     if ($self->{OUT} eq "TXT" || $self->{OUT} eq "TXTPEM") {
+        # contains result from STDOUT
         $res = shift;
         # openss 1.0 writes text to stdout, openssl 1.1 does not
         if ($res eq '1') {
@@ -156,7 +157,9 @@ sub get_result
         }
     }
 
-    if ($self->{OUT} ne "TXT") {
+    if ($self->{OUT} eq "DER") {
+        $res .= $self->SUPER::get_result();
+    } else {
         $res .= $self->SUPER::get_result('utf8');
     }
 

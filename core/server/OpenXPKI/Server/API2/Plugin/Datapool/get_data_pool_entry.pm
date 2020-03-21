@@ -61,6 +61,7 @@ of the currently active session is accepted.
 =back
 
 =cut
+
 command "get_data_pool_entry" => {
     pki_realm => { isa => 'AlphaPunct', default => sub { CTX('session')->data->pki_realm } },
     namespace => { isa => 'AlphaPunct', required => 1, },
