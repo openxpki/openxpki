@@ -1176,6 +1176,9 @@ msgstr "Entsperrung fehlgeschlagen"
 msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_BUTTON"
 msgstr "Entsperren"
 
+msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_KCV_MISMATCH"
+msgstr "Passwort entspricht nicht der hinterlegten Prüfsumme"
+
 msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
 msgstr "Entsperren"
 

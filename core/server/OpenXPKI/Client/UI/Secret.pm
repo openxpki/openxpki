@@ -14,15 +14,15 @@ sub init_index {
     my $self = shift;
     my $args = shift;
 
-    my $secrets  = $self->send_command_v2("get_secrets");
+    my $secrets  = $self->send_command_v2("get_secrets", { status => 1 });
 
     my @result;
     foreach my $secret (keys %{$secrets}) {
-        my $status = $self->send_command_v2("is_secret_complete", {secret => $secret}) || 0;
+
         push @result, [
             $secrets->{$secret}->{label},
             $secrets->{$secret}->{type},
-            $status ? 'I18N_OPENXPKI_UI_SECRET_COMPLETE' : 'I18N_OPENXPKI_UI_SECRET_INCOMPLETE',
+            $secrets->{$secret}->{complete} ? 'I18N_OPENXPKI_UI_SECRET_COMPLETE' : 'I18N_OPENXPKI_UI_SECRET_INCOMPLETE',
             $secrets->{$secret}->{type} ne 'literal' ? $secret : '',
         ];
     }

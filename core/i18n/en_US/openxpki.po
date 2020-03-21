@@ -1177,6 +1177,9 @@ msgstr "Unlock Failed"
 msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_BUTTON"
 msgstr "Unlock"
 
+msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_KCV_MISMATCH"
+msgstr "Key Check Value does not match secret"
+
 msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
 msgstr "Unlock"
 

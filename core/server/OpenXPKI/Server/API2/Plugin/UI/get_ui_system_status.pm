@@ -49,8 +49,8 @@ command "get_ui_system_status" => {
 
     # Offline Secrets
     my $offline_secrets = 0;
-    my %secrets = $crypto->get_secret_groups();
-    for my $secret (keys %secrets) {
+    my $secrets = $crypto->get_secret_groups();
+    for my $secret (keys %{$secrets}) {
         # Secret groups tend to have exceptions in unusual situations
         # To not crash the whole method, we put an eval around until this is
         # resolved, see #255

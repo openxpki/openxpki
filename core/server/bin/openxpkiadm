@@ -19,6 +19,7 @@ use Digest::SHA;
 use Digest::MD5;
 use Proc::SafeExec;
 use MIME::Base64;
+use Crypt::Argon2;
 
 
 # Config Builder
@@ -1131,56 +1132,72 @@ sub key_list {
 sub hash_password {
 
     print 'Please type your password, end with return: ';
-    my $passwd = prompt -echo => '*';
 
-    print "Please re-type your password: ";
-    my $retype = prompt -echo => '*';
+    my $passwd;
+    if ($params{plain}) {
+        $passwd = prompt;
+        chomp $passwd;
 
-    chomp $passwd;
-    chomp $retype;
+    } else {
+
+        $passwd = prompt -echo => '*';
+
+        print "Please re-type your password: ";
+        my $retype = prompt -echo => '*';
+
+        chomp $passwd;
+        chomp $retype;
+
+        if ($passwd ne $retype) {
+            print "Sorry, the passwords do not match\n";
+            return 0;
+        }
+    }
 
     if (!$passwd) {
         return 0;
     }
 
-    if ($passwd ne $retype) {
-        print "Sorry, the passwords do not match\n";
-        return 0;
-    }
 
-    # Use openssl to create the salt
-    my @exec = ('openssl','rand','-base64','3');
-    my ($salt, undef) = Proc::SafeExec::backtick(@exec);
-    chomp $salt;
-
+    my $prefix = sprintf '{%s}', $params{scheme};
     my $computed_secret;
     if ($params{scheme} eq 'sha') {
         my $ctx = Digest::SHA->new();
         $ctx->add($passwd);
         $computed_secret = $ctx->b64digest();
-    } elsif ($params{scheme} eq 'ssha') {
-        my $ctx = Digest::SHA->new();
-        $ctx->add($passwd);
-        $ctx->add($salt);
-        $computed_secret = encode_base64( $ctx->digest() . $salt, '');
+
     } elsif ($params{scheme} eq 'md5') {
         my $ctx = Digest::MD5->new();
         $ctx->add($passwd);
         $computed_secret = $ctx->b64digest();
+
+    } elsif ($params{scheme} eq 'ssha') {
+        my $ctx = Digest::SHA->new();
+        my $salt = __create_salt(3);
+        $ctx->add($passwd);
+        $ctx->add($salt);
+        $computed_secret = encode_base64( $ctx->digest() . $salt, '');
+
     } elsif ($params{scheme} eq 'smd5') {
         my $ctx = Digest::MD5->new();
+        my $salt = __create_salt(3);
         $ctx->add($passwd);
         $ctx->add($salt);
         $computed_secret = encode_base64($ctx->digest() . $salt, '');
+
     } elsif ($params{scheme} eq 'crypt') {
-        $computed_secret = crypt($passwd, $salt);
+        $computed_secret = crypt($passwd, __create_salt(3));
+
+    } elsif ($params{scheme} eq 'argon2') {
+        $computed_secret = Crypt::Argon2::argon2id_pass($passwd, __create_salt(16), 3, '32M', 1, 16);
+        $prefix = '';
     }
 
     if (!$computed_secret) {
         die "Unable to compute hash\n";
     }
 
-    printf "Your hashed password is: {%s}%s\n", $params{scheme}, $computed_secret;
+    printf "Your hashed password is:\n%s%s\n", $prefix, $computed_secret;
 
     return 0;
 }
@@ -1240,6 +1257,14 @@ sub __check_realm {
     }
 
     return 1;
+}
+
+sub __create_salt {
+    my $bytes = shift;
+    my @exec = ('openssl', 'rand', '-base64', $bytes);
+    my ($salt, undef) = Proc::SafeExec::backtick(@exec);
+    chomp $salt;
+    return $salt;
 }
 
 eval {
@@ -1413,13 +1438,14 @@ if ($cmd eq 'initdb') {
 
     push @options_spec, qw(
           scheme|s=s
+          plain
     );
     __init();
 
     if (!$params{scheme}) {
         $params{scheme} = 'ssha';
-    } elsif ($params{scheme} !~ /^(sha|ssha|md5|smd5|crypt)$/) {
-        die "Unsupported scheme - supported values: sha|ssha|md5|smd5|crypt\n";
+    } elsif ($params{scheme} !~ /^(sha|ssha|md5|smd5|crypt|argon2)$/) {
+        die "Unsupported scheme - supported values: sha|ssha|md5|smd5|crypt|argon2\n";
     }
 
     $ret = hash_password();
@@ -1624,7 +1650,7 @@ openxpkiadm COMMAND [SUBCOMMAND] [OPTIONS]
    version            print program version and exit
    key                Manage keys
    certificate        Manage certificates
-   hashpwd            Create the salted hash for a password
+   hashpwd            Create the (salted) hash / argon2 kcv for a password
    alias              Manage the token alias table
    lintconfig         Parse config and shows errors from Config::Merge
    buildconfig        Create (signed) config blob from config tree
@@ -1956,11 +1982,16 @@ Create the hash of a given password to be used with the internal user database.
 Command options:
 
   --scheme   The hashing scheme to use, allowed values are
-             ssha|sha|smd5|md5|crypt, default is ssha
+             ssha|sha|smd5|md5|crypt|argon2, default is ssha
              see also OpenXPKI::Server::Authentication::Password
 
+  --plain    do not hide the password on enter, no retype required
+             should work with passwords piped to STDIN
+
 Prompts for the password and prints the hashed value including the used
- scheme as defined in RFC2307.
+scheme as defined in RFC2307.
+
+Also offers calculation of a token based on the Argon2 KDF.
 
 =head2 lintconfig
 

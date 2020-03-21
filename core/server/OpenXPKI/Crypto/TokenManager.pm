@@ -12,6 +12,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use Data::Dumper;
 use English;
+use Crypt::Argon2;
 use OpenXPKI::Crypto::Backend::API;
 use OpenXPKI::Crypto::Tool::SCEP::API;
 use OpenXPKI::Crypto::Tool::LibSCEP::API;
@@ -82,7 +83,7 @@ sub __load_secret_groups
 
     my $config = CTX('config');
 
-    my @groups = $config->get_keys('crypto.secret');
+    my @groups = $config->get_keys(['crypto','secret']);
 
     foreach my $group (@groups) {
         ##! 16: 'group: ' . $group
@@ -127,56 +128,98 @@ sub __load_secret
 
     my $config = CTX('config');
 
+    my $is_global = $config->get(['crypto', 'secret', $group, 'import']);
+    my $secret;
+    if ($is_global) {
+        if (exists $self->{SECRET}->{global}->{$group}) {
+            # create a reference to the global object
+            $self->{SECRET}->{$realm}->{$group} = $self->{SECRET}->{global}->{$group};
+            ##! 4: '__load_secret called even though secret is already loaded (global) '
+            return 1;
+        }
+        $secret = $config->get_hash(['system', 'crypto', 'secret', $group ]);
+    } else {
+        $secret = $config->get_hash(['crypto', 'secret', $group ]);
+    }
+
     ##! 2: "initialize secret object"
-    my $method = $config->get(['crypto','secret',$group,'method']);
-    my $label = $config->get(['crypto','secret',$group,'label']);
-    my $export = $config->get(['crypto','secret',$group,'export']) || 0;
-
-    $self->{SECRET}->{$realm}->{$group}->{TYPE}  = $method;
-    $self->{SECRET}->{$realm}->{$group}->{LABEL} = ($label ? $label : $method);
-    $self->{SECRET}->{$realm}->{$group}->{EXPORT}  = ($export ? 1 : 0);
-
-    if ($method eq "literal") {
-        my $value = $config->get(['crypto','secret',$group,'value']);
-        $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({TYPE => "Plain", PARTS => 1});
-        $self->{SECRET}->{$realm}->{$group}->{REF}->set_secret ($value);
+    if ($is_global) {
+        $secret->{realm} = 'global';
+        $secret->{export} &&= $config->get(['crypto', 'secret', $group, 'export' ]);
+    } else {
+        $secret->{realm} = $realm;
     }
-    elsif ($method eq "plain") {
-        my $total_shares = $config->get(['crypto','secret',$group,'total_shares']);
-        $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({
-            TYPE => "Plain", PARTS => $total_shares
-        });
-    }
-    elsif ($method eq "split") {
 
-        my $total_shares = $config->get("crypto.secret.$group.total_shares");
-        my $required_shares = $config->get("crypto.secret.$group.required_shares");
-        $self->{SECRET}->{$realm}->{$group}->{REF} = OpenXPKI::Crypto::Secret->new ({
-                TYPE => "Split",
-                QUORUM => {
-                    K => $required_shares,
-                    N => $total_shares,
-                },
-                TOKEN  => $self->get_system_token({ TYPE => 'default'}),
-        });
-    }
-    else {
-      OpenXPKI::Exception->throw (
-          message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_WRONG_METHOD",
-          params  => {
-              REALM => $realm,
-              GROUP => $group,
-              METHOD => $method
-          });
+    ##! 32: $secret_config
+    $self->__init_secret( $secret );
+
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_WRONG_METHOD",
+        params  => {
+            REALM =>  $realm,
+            METHOD => $secret->{method},
+            GROUP => $group,
+        }
+    ) if (!$secret->{ref});
+
+    if ($is_global) {
+        $self->{SECRET}->{global}->{$group} = $secret;
+        $self->{SECRET}->{$realm}->{$group} = $self->{SECRET}->{global}->{$group};
+        $realm = 'global';
+    } else {
+        $self->{SECRET}->{$realm}->{$group} = $secret;
     }
 
     $self->__set_secret_from_cache({
-        GROUP     => $group,
+        GROUP => $group,
     });
 
     ##! 1: "finish"
     return 1;
 }
+
+=head2 __init_secret
+
+Excpects a hash reference with the config data, creates an object of
+OpenXPKI::Crypto::Secret with these params in $hash->{ref} and adds
+missing config data (e.g. cache for literal tokens).
+
+=cut
+
+sub __init_secret {
+
+    my $self = shift;
+    my $secret = shift;
+
+    my $ref;
+
+    my $method = $secret->{method};
+    if ($method eq "literal") {
+        $secret->{ref} = OpenXPKI::Crypto::Secret->new ({
+            TYPE => "Plain", PARTS => 1,
+        });
+        $secret->{ref}->set_secret($secret->{value});
+        $secret->{cache} = "none";
+    }
+    elsif ($method eq "plain") {
+        $secret->{ref} = OpenXPKI::Crypto::Secret->new ({
+            TYPE => "Plain", PARTS => ($secret->{total_shares} || 1)
+        });
+    }
+    elsif ($method eq "split") {
+        $secret->{ref} = OpenXPKI::Crypto::Secret->new ({
+            TYPE => "Split",
+            QUORUM => {
+                K => $secret->{required_shares},
+                N => $secret->{total_shares},
+            },
+            TOKEN  => $self->get_system_token({ TYPE => 'default'}),
+        });
+    }
+
+    return 1;
+}
+
 
 =head2 __set_secret_from_cache ()
 
@@ -185,54 +228,54 @@ Load all secrets in the current realm from the cache
 =cut
 
 sub __set_secret_from_cache {
+
     my $self    = shift;
     my $arg_ref = shift;
 
     my $group  = $arg_ref->{'GROUP'};
     my $realm = CTX('session')->data->pki_realm;
 
-    my $config = CTX('config');
-    my $cache_config = $config->get("crypto.secret.$group.cache");
+    ##! 8: "load cache configuration"
+    my $cache_config = $self->{SECRET}->{$realm}->{$group}->{cache};
 
-    ##! 2: "load cache configuration"
-    if ($cache_config ne "session" and $cache_config ne "daemon")
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_LOAD_SECRET_WRONG_CACHE_TYPE",
-                  params  => {
-                      TYPE => $cache_config,
-                      GROUP => $group
-                  });
-    }
-
-    $self->{SECRET}->{$realm}->{$group}->{CACHE} = $cache_config;
-
-    ##! 2: "check for the cache"
+    ##! 2: "check for the cache ($cache_config)"
     my $secret = "";
-    if ($self->{SECRET}->{$realm}->{$group}->{CACHE} eq "session")
-    {
+
+    if ($cache_config eq "none") {
+        # literal never has/needs a cache
+    } elsif ($cache_config eq "session") {
         ## session mode
-        ##! 4: "let's load the serialized secret in the session"
+        ##! 4: "let's load the serialized secret from the session"
         $secret = CTX('session')->data->secret(group => $group);
-        ##! 16: 'secret: ' . $secret
-    } else {
+
+    } elsif ($cache_config eq "daemon") {
         ## daemon mode
         ##! 4: "let's get the serialized secret from the database"
         my $row = CTX('dbi')->select_one(
             from    => "secret",
             columns => [ 'data' ],
             where => {
-                pki_realm => $realm,
+                pki_realm => $self->{SECRET}->{$realm}->{$group}->{realm},
                 group_id  => $group,
             }
         );
         $secret = $row->{data};
-        ##! 16: 'secret: ' . $secret
+
+    } else {
+        OpenXPKI::Exception->throw (
+            message => "Unsupported cache type",
+            params  => {
+                TYPE => $cache_config,
+                GROUP => $group,
+                REALM => $realm,
+        });
     }
+
+    ##! 16: 'secret: ' . $secret
     if (defined $secret and length $secret)
     {
         ##! 16: 'setting serialized secret'
-        $self->{SECRET}->{$realm}->{$group}->{REF}->set_serialized ($secret);
+        $self->{SECRET}->{$realm}->{$group}->{ref}->set_serialized ($secret);
     }
     return 1;
 }
@@ -254,42 +297,17 @@ sub get_secret_groups
         if (not exists $self->{SECRET_COUNT});
 
     ##! 2: "build list"
-    my %result = ();
+    my $result;
     foreach my $group (keys %{$self->{SECRET}->{$realm}})
     {
-        $result{$group}->{LABEL} = $self->{SECRET}->{$realm}->{$group}->{LABEL};
-        $result{$group}->{TYPE}  = $self->{SECRET}->{$realm}->{$group}->{TYPE};
+        $result->{$group} = {
+            label => $self->{SECRET}->{$realm}->{$group}->{label},
+            type  => $self->{SECRET}->{$realm}->{$group}->{method},
+        };
     }
 
     ##! 1: "finished"
-    return %result;
-}
-
-=head2 reload_all_secret_groups_from_cache
-
-Reload the secrets for all realms.
-
-FIXME: I think this is unnecessary or put in the wrong place (server init).
-See #333
-
-=cut
-
-sub reload_all_secret_groups_from_cache {
-    ##! 1: 'start'
-    my $self = shift;
-
-    my @realms = CTX('config')->get_keys('system.realms');
-    foreach my $realm (@realms) {
-        foreach my $group (keys %{$self->{SECRET}->{$realm}}) {
-            ##! 16: 'group: ' . $group
-            $self->__set_secret_from_cache({
-                GROUP     => $group,
-            });
-        }
-    }
-
-    ##! 1: 'end'
-    return 1;
+    return $result;
 }
 
 =head2 is_secret_group_complete( group )
@@ -306,17 +324,14 @@ sub is_secret_group_complete
 
     ##! 2: "init"
     my $realm = CTX('session')->data->pki_realm;
-    $self->__load_secret({ GROUP => $group})
-        if (not exists $self->{SECRET} or
-            not exists $self->{SECRET}->{$realm} or
-            not exists $self->{SECRET}->{$realm}->{$group});
+    $self->__load_secret({ GROUP => $group});
 
     $self->__set_secret_from_cache({
-        GROUP     => $group,
+        GROUP => $group,
     });
 
     ##! 1: "finished"
-    return $self->{SECRET}->{$realm}->{$group}->{REF}->is_complete() ? 1 : 0;
+    return $self->{SECRET}->{$realm}->{$group}->{ref}->is_complete() ? 1 : 0;
 }
 
 =head2 get_secret( group )
@@ -339,12 +354,12 @@ sub get_secret
 
     my $realm = CTX('session')->data->pki_realm;
 
-    if (!$self->{SECRET}->{$realm}->{$group}->{EXPORT}) {
+    if (!$self->{SECRET}->{$realm}->{$group}->{export}) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_GET_SECRET_GROUP_NOT_EXPORTABLE");
     }
 
-    return $self->{SECRET}->{$realm}->{$group}->{REF}->get_secret();
+    return $self->{SECRET}->{$realm}->{$group}->{ref}->get_secret();
 
 }
 
@@ -365,22 +380,36 @@ sub set_secret_group_part
 
     ##! 2: "init"
     my $realm = CTX('session')->data->pki_realm;
-    $self->__load_secret({  GROUP => $group})
-        if (not exists $self->{SECRET} or
-            not exists $self->{SECRET}->{$realm} or
-            not exists $self->{SECRET}->{$realm}->{$group});
+    $self->__load_secret({GROUP => $group});
+
+
+    my $obj = $self->{SECRET}->{$realm}->{$group};
+
+    # store in case we need to restore on failure
+    my $old_secret = $obj->{ref}->get_serialized();
 
     ##! 2: "set secret"
-    if (defined $part)
-    {
-        $self->{SECRET}->{$realm}->{$group}->{REF}->set_secret({SECRET => $value, PART => $part});
+    if (defined $part) {
+        $obj->{ref}->set_secret({SECRET => $value, PART => $part});
     } else {
-        $self->{SECRET}->{$realm}->{$group}->{REF}->set_secret($value);
+        $obj->{ref}->set_secret($value);
     }
 
+    if ($obj->{kcv} &&
+        $obj->{ref}->is_complete()) {
+
+        my $password = $obj->{ref}->get_secret();
+        if (!Crypt::Argon2::argon2id_verify($obj->{kcv}, $password)) {
+            $obj->{ref}->set_serialized ($old_secret);
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_UI_SECRET_UNLOCK_KCV_MISMATCH",
+            );
+        }
+    }
+
+    my $secret = $obj->{ref}->get_serialized();
     ##! 2: "store the secrets"
-    my $secret = $self->{SECRET}->{$realm}->{$group}->{REF}->get_serialized();
-    if ($self->{SECRET}->{$realm}->{$group}->{CACHE} eq "session") {
+    if ($obj->{cache} eq "session") {
         ##! 4: "store secret in session"
         CTX('session')->data->secret(group  => $group, value => $secret);
         CTX('session')->persist;
@@ -390,7 +419,7 @@ sub set_secret_group_part
             into => "secret",
             set  => { data => $secret },
             where => {
-                pki_realm => $realm,
+                pki_realm => $obj->{realm},
                 group_id  => $group,
             },
         );
@@ -414,31 +443,28 @@ sub clear_secret_group
 
     ##! 2: "init"
     my $realm = CTX('session')->data->pki_realm;
-    $self->__load_secret({ GROUP => $group})
-        if (not exists $self->{SECRET} or
-            not exists $self->{SECRET}->{$realm} or
-            not exists $self->{SECRET}->{$realm}->{$group});
+    $self->__load_secret({ GROUP => $group});
 
     ##! 2: "check for the cache"
-    if ($self->{SECRET}->{$realm}->{$group}->{CACHE} eq "session") {
+    if ($self->{SECRET}->{$realm}->{$group}->{cache} eq "session") {
         ##! 4: "delete secret in session"
-        CTX('session')->data->clear_secret($group);
+        CTX('session')->data->clear_secret( group => $group );
     }
     else {
         ##! 4: "delete secret in database"
         my $result = CTX('dbi')->delete(
             from => "secret",
             where => {
-                pki_realm => $realm,
+                pki_realm => $self->{SECRET}->{$realm}->{$group}->{realm},
                 group_id  => $group,
             }
         );
+        # TODO - we need to reload the watchdog and kill all active workers
     }
-    delete $self->{SECRET}->{$realm}->{$group};
-    $self->__load_secret({
-        PKI_REALM => $realm,
-        GROUP     => $group,
-    });
+
+    # reinitialize the reference object
+    # uses the data from the hash itself as arguments for init
+    $self->__init_secret( $self->{SECRET}->{$realm}->{$group} );
 
     ##! 1: "finished"
     return 1;
@@ -607,11 +633,8 @@ sub __add_token {
     ##! 2: "determine secret group"
     if ($secret) {
         ##! 4: "secret is configured"
-        $self->__load_secret({ GROUP => $secret })
-            if (not exists $self->{SECRET} or
-                not exists $self->{SECRET}->{$realm} or
-                not exists $self->{SECRET}->{$realm}->{$secret});
-        $secret = $self->{SECRET}->{$realm}->{$secret}->{REF};
+        $self->__load_secret({ GROUP => $secret });
+        $secret = $self->{SECRET}->{$realm}->{$secret}->{ref};
     } else {
         ##! 4: "the secret is not configured"
         $secret = undef;

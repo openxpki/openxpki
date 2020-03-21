@@ -38,16 +38,17 @@ The returned I<HashRef> now contains lowercase keys.
 
 =cut
 command "get_secrets" => {
+    status => { isa => 'Bool', default => 0, },
 } => sub {
     my ($self, $params) = @_;
-    my %secrets = CTX('crypto_layer')->get_secret_groups;
-    # convert key case
-    return { map {
-        $_ => {
-            label => $secrets{$_}->{LABEL},
-            type =>  $secrets{$_}->{TYPE},
+
+    my $secrets = CTX('crypto_layer')->get_secret_groups;
+    if ($params->status) {
+        foreach my $key (keys %{$secrets}) {
+            $secrets->{$key}->{complete} = CTX('crypto_layer')->is_secret_group_complete($key);
         }
-    } keys %secrets };
+    }
+    return $secrets;
 };
 
 __PACKAGE__->meta->make_immutable;

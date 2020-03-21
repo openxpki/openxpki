@@ -491,9 +491,6 @@ sub do_process_request {
     ##! 16: 'calling OpenXPKI::Service::*->init()'
     $service->init();
 
-    ##! 16: 'reloading secret groups in crypto layer'
-    CTX('crypto_layer')->reload_all_secret_groups_from_cache();
-
     ## use user interface
     ##! 16: 'calling OpenXPKI::Service::*->run()'
     $service->run();
