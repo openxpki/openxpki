@@ -144,7 +144,7 @@ sub __load_secret
 
     ##! 2: "initialize secret object"
     if ($is_global) {
-        $secret->{realm} = 'global';
+        $secret->{realm} = '_global';
         $secret->{export} &&= $config->get(['crypto', 'secret', $group, 'export' ]);
     } else {
         $secret->{realm} = $realm;
@@ -165,7 +165,6 @@ sub __load_secret
     if ($is_global) {
         $self->{SECRET}->{global}->{$group} = $secret;
         $self->{SECRET}->{$realm}->{$group} = $self->{SECRET}->{global}->{$group};
-        $realm = 'global';
     } else {
         $self->{SECRET}->{$realm}->{$group} = $secret;
     }
