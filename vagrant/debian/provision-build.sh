@@ -13,10 +13,7 @@ apt-get install --assume-yes  dh-make-perl libapache2-mod-fcgid
 
 # Debian Buster has renamed the mysql server package
 case $DEBIAN_CODENAME in
-    jessie)
-    PACKAGES="mysql-server"
-    ;;
-    stretch|buster)
+    buster)
     PACKAGES="default-mysql-server"
     ;;
     *)
