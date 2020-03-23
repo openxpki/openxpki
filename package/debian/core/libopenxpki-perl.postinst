@@ -30,7 +30,7 @@ case "$1" in
         #if [ $? -gt 0 -a $? -eq 100 ]; then exit $?; fi
 
         # when installed on a "slim" distro the examples are not installed
-        if [ -z "$OPENXPKI_NOCONFIG" ] || [ ! -e "/usr/share/doc/libopenxpki-perl/examples/openxpki-etc.tgz" ]; then
+        if [ -z "$OPENXPKI_NOCONFIG" ] && [ -e "/usr/share/doc/libopenxpki-perl/examples/openxpki-etc.tgz" ]; then
 
             # No config - load sample config - also includes/overwrites other
             # files in /etc/openxpki/ !
