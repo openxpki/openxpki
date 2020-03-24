@@ -68,10 +68,8 @@ const OxifieldCertIdentifierComponent = Component.extend({
         this.set("content.value", search);
         let searchIndex = this.incrementProperty("searchIndex");
         return this.container.lookup("route:openxpki").sendAjax({
-            data: {
-                action: "certificate!autocomplete",
-                query: search
-            }
+            action: "certificate!autocomplete",
+            query: search
         }).then((doc) => {
             if (searchIndex !== this.get("searchIndex")) {
                 return;

@@ -12,11 +12,7 @@ export default class OxisectionMainComponent extends Component {
         Em.set(button, "loading", true);
         if (button.action) {
             return this.container.lookup("route:openxpki")
-            .sendAjax({
-                data: {
-                    action: button.action
-                }
-            })
+            .sendAjax({ action: button.action })
             .then(
                 () => Em.set(button, "loading", false),
                 () => Em.set(button, "loading", false)

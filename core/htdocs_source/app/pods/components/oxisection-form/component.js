@@ -110,9 +110,8 @@ export default class OxisectionFormComponent extends Component {
                 data[name] = clones[0].value;
             }
         }
-        return getOwner(this).lookup("route:openxpki").sendAjax({
-            data: data
-        }).then((doc) => {
+        return getOwner(this).lookup("route:openxpki").sendAjax(data)
+        .then((doc) => {
             for (const newField of doc.fields) {
                 for (const oldField of fields) {
                     if (oldField.name === newField.name) {
@@ -162,9 +161,7 @@ export default class OxisectionFormComponent extends Component {
             data[name] = clones[0].clonable ? clones.map(c => c.value) : clones[0].value;
         }
         this.loading = true;
-        return getOwner(this).lookup("route:openxpki").sendAjax({
-            data: data
-        })
+        return getOwner(this).lookup("route:openxpki").sendAjax(data)
         .then((res) => {
             this.loading = false;
             var ref1;

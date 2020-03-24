@@ -20,10 +20,8 @@ const OxivalueFormatComponent = Component.extend({
             evt.stopPropagation();
             evt.preventDefault();
             return this.container.lookup("route:openxpki").sendAjax({
-                data: {
-                    page: target.href.split("#")[1].replace(/\/openxpki\//, ""),
-                    target: target.target
-                }
+                page: target.href.split("#")[1].replace(/\/openxpki\//, ""),
+                target: target.target,
             });
         }
     }),

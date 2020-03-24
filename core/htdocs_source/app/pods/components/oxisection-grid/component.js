@@ -201,10 +201,8 @@ const OxisectionGridComponent = Component.extend({
             return window.location.href = path;
         } else {
             return this.container.lookup("route:openxpki").sendAjax({
-                data: {
-                    page: path,
-                    target: action.target
-                }
+                page: path,
+                target: action.target
             });
         }
     },
@@ -230,9 +228,8 @@ const OxisectionGridComponent = Component.extend({
                 };
                 data[button.selection] = this.get("sortedData").filterBy("checked").getEach("originalData").getEach("" + index);
                 Em.set(button, "loading", true);
-                return this.container.lookup("route:openxpki").sendAjax({
-                    data: data
-                }).then(function() {
+                return this.container.lookup("route:openxpki").sendAjax(data)
+                .then(function() {
                     return Em.set(button, "loading", false);
                 });
             } else {
@@ -253,13 +250,11 @@ const OxisectionGridComponent = Component.extend({
             let pager = this.get("pager");
             return this.container.lookup("route:openxpki")
             .sendAjax({
-                data: {
-                    page: pager.pagerurl,
-                    limit: page.limit,
-                    startat: page.startat,
-                    order: page.order,
-                    reverse: page.reverse
-                }
+                page: pager.pagerurl,
+                limit: page.limit,
+                startat: page.startat,
+                order: page.order,
+                reverse: page.reverse,
             })
             .then((res) => {
                 this.set("content.content.data", res.data);

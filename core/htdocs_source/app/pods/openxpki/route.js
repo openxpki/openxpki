@@ -40,10 +40,8 @@ export default class OpenXpkiRoute extends Route {
         model_id = transition.to.params.model_id;
         if (!this.source.navEntries.length || this.needReboot.indexOf(model_id) >= 0) {
             return this.sendAjax({
-                data: {
-                    page: "bootstrap!structure",
-                    baseurl: window.location.pathname
-                }
+                page: "bootstrap!structure",
+                baseurl: window.location.pathname,
             });
         }
     }
@@ -66,7 +64,7 @@ export default class OpenXpkiRoute extends Route {
         }
         this.source.page = params.model_id;
 
-        return this.sendAjax({ data: data }).then(() => this.source);
+        return this.sendAjax(data).then(() => this.source);
     }
 
     doPing(cfg) {
@@ -76,10 +74,13 @@ export default class OpenXpkiRoute extends Route {
         }, cfg.timeout);
     }
 
-    sendAjax(req) {
-        req.dataType = "json";
-        var ref;
+    sendAjax(data) {
+        let req = {
+            data: data,
+            dataType: "json",
+        };
         if (req.type == null) {
+            let ref;
             req.type = (req != null ? (ref = req.data) != null ? ref.action : void 0 : void 0) ? "POST" : "GET";
         }
         if (req.url == null) {
