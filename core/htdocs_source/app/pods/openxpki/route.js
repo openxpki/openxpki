@@ -3,6 +3,7 @@ import { tracked } from '@glimmer/tracking';
 import { later, scheduleOnce, cancel } from '@ember/runloop';
 import { getOwner } from '@ember/application';
 import { Promise } from 'rsvp';
+import { set as emSet } from '@ember/object';
 
 export default class OpenXpkiRoute extends Route {
     // Reserved Ember property "queryParams"
@@ -64,7 +65,9 @@ export default class OpenXpkiRoute extends Route {
         } else if (this.needReboot.indexOf(params.model_id) >= 0) {
             data.target = "top";
         }
+
         this.source.page = params.model_id;
+        this.updateNavEntryActiveState(this.source);
 
         return this.sendAjax(data).then(() => this.source);
     }
@@ -138,6 +141,7 @@ export default class OpenXpkiRoute extends Route {
                 }
                 else if (doc.structure) {
                     newSource.navEntries = doc.structure;
+                    this.updateNavEntryActiveState(newSource);
                     newSource.user = doc.user;
                     newSource.rtoken = doc.rtoken;
                 }
@@ -181,5 +185,20 @@ export default class OpenXpkiRoute extends Route {
                 return resolve({});
             });
         });
+    }
+
+    updateNavEntryActiveState(model) {
+        let page = model.page;
+        for (const entry of model.navEntries) {
+            emSet(entry, "active", entry.key === page);
+            if (entry.entries) {
+                entry.entries.setEach("active", false);
+                let subEntry = entry.entries.findBy("key", page);
+                if (subEntry) {
+                    subEntry.active = true;
+                    entry.active = true;
+                }
+            }
+        }
     }
 }
