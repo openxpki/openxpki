@@ -32,12 +32,7 @@ export default class OpenXpkiRoute extends Route {
 
     // Reserved Ember function "beforeModel"
     beforeModel(transition) {
-        var model_id;
-        // "force" is only evaluated above using "refreshModel: true"
-        if (transition.to.queryParams.force) {
-            delete transition.to.queryParams.force;
-        }
-        model_id = transition.to.params.model_id;
+        let model_id = transition.to.params.model_id;
         if (!this.source.navEntries.length || this.needReboot.indexOf(model_id) >= 0) {
             return this.sendAjax({
                 page: "bootstrap!structure",
@@ -48,6 +43,13 @@ export default class OpenXpkiRoute extends Route {
 
     // Reserved Ember function "model"
     model(params, transition) {
+        // "force" is only evaluated above using "refreshModel: true"
+        let force = false;
+        if (transition.to.queryParams.force) {
+            force = true;
+            delete transition.to.queryParams.force;
+        }
+
         let data = {
             page: params.model_id
         };
