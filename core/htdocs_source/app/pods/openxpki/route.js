@@ -75,33 +75,37 @@ export default class OpenXpkiRoute extends Route {
     }
 
     sendAjax(data) {
+        // assemble request parameters
         let req = {
-            data: data,
+            data: {
+                ...data,
+                "_": new Date().getTime(),
+            },
             dataType: "json",
+            type: data.action ? "POST" : "GET",
+            url: getOwner(this).lookup("controller:config").url,
         };
-        if (req.type == null) {
-            let ref;
-            req.type = (req != null ? (ref = req.data) != null ? ref.action : void 0 : void 0) ? "POST" : "GET";
-        }
-        if (req.url == null) {
-            req.url = getOwner(this).lookup("controller:config").url;
-        }
-        req.data._ = new Date().getTime();
-        $(".loading").addClass("in-progress");
         if (req.type === "POST") {
             req.data._rtoken = this.source.rtoken;
         }
-        let target = req.data.target || "self";
-        if (target === "self") {
-            if (this.source.modal) { target = "modal" }
-            else if (this.source.tabs.length > 1) { target = "active" }
-            else { target = "top" }
+
+        // Fetch "targetElement" parameter for use in AJAX response handler later on.
+        // Pseudo-target "self" is transformed so new content will be shown in the
+        // currently active place: a modal, an active tab or on top (i.e. single hidden tab)
+        let targetElement = req.data.target || "self";
+        if (targetElement === "self") {
+            if (this.source.modal) { targetElement = "modal" }
+            else if (this.source.tabs.length > 1) { targetElement = "active" }
+            else { targetElement = "top" }
         }
+
         if (this.source.refresh) {
             cancel(this.source.refresh);
             this.source.refresh = null;
             $(".refresh").removeClass("in-progress");
         }
+
+        $(".loading").addClass("in-progress");
         return new Promise((resolve, reject) => {
             return $.ajax(req).then(doc => {
                 // work with a copy of this.source
@@ -144,15 +148,15 @@ export default class OpenXpkiRoute extends Route {
                             main: doc.main,
                             right: doc.right
                         };
-                        if (target === "modal") {
+                        if (targetElement === "modal") {
                             newSource.modal = newTab;
                         }
-                        else if (target === "tab") {
+                        else if (targetElement === "tab") {
                             let tabs = newSource.tabs;
                             tabs.setEach("active", false);
                             tabs.pushObject(newTab);
                         }
-                        else if (target === "active") {
+                        else if (targetElement === "active") {
                             let tabs = newSource.tabs;
                             let index = tabs.indexOf(tabs.findBy("active"));
                             tabs.replace(index, 1, [newTab]); // top
