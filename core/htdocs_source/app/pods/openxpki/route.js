@@ -35,37 +35,55 @@ export default class OpenXpkiRoute extends Route {
 
     // Reserved Ember function "beforeModel"
     beforeModel(transition) {
+        let queryParams = transition.to.queryParams;
+        let modelId = transition.to.params.model_id;
+
         // "force" is only evaluated above using "refreshModel: true"
-        if (transition.to.queryParams.force) {
-            delete transition.to.queryParams.force;
+        if (queryParams.force) {
+            delete queryParams.force;
         }
 
-        // load page structure first first time or for special pages ("needReboot")
-        let model_id = transition.to.params.model_id;
+        let ajaxCalls; // chain of ajax calls via Promises
+
+        /*
+         * load base page structure first first time or for special pages ("needReboot")
+         */
+        let model_id = queryParams.model_id;
         if (!this.content.navEntries.length || this.needReboot.indexOf(model_id) >= 0) {
-            return this.sendAjax({
+            ajaxCalls = this.sendAjax({
                 page: "bootstrap!structure",
                 baseurl: window.location.pathname,
             });
         }
+        else {
+            ajaxCalls = Promise.resolve();
+        }
+
+        /*
+         * load requested page part
+         */
+        let request = {
+            page: modelId
+        };
+        if (queryParams.limit) { request.limit = queryParams.limit }
+        if (queryParams.startat) { request.startat = queryParams.startat }
+
+        // load as top content if 'model_id' is part of navigation or in 'needReboot' list
+        let flatList = this.content.navEntries.reduce((p, n) => p.concat(n, n.entries || []), []);
+        if (flatList.findBy("key", modelId) || this.needReboot.indexOf(modelId) >= 0) {
+            request.target = "top";
+        }
+        ajaxCalls = ajaxCalls.then(() => {
+            return this.sendAjax(request);
+        })
+
+        return ajaxCalls;
     }
 
     // Reserved Ember function "model"
     model(params, transition) {
-        let data = {
-            page: params.model_id
-        };
-        if (params.limit) { data.limit = params.limit }
-        if (params.startat) { data.startat = params.startat }
-
-        let flatList = this.content.navEntries.reduce((p, n) => p.concat(n, n.entries || []), []);
-        if (flatList.findBy("key", params.model_id) || this.needReboot.indexOf(params.model_id) >= 0) {
-            data.target = "top";
-        }
-
         this.content.page = params.model_id; this.updateNavEntryActiveState(this.content);
-
-        return this.sendAjax(data).then(() => this.content);
+        return this.content;
     }
 
     doPing(cfg) {
