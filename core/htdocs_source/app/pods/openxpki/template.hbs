@@ -163,18 +163,14 @@
     </Modal.footer>
 </BsModal>
 
-<div class="refresh">
-    <div class="progress progress-striped active">
-        <div class="progress-bar progress-bar-success" role="progressbar">
-            <p class="text-center">Autorefresh</p>
-        </div>
+<div class="progress progress-striped active {{if this.model.refresh "in-progress"}}">
+    <div class="progress-bar progress-bar-success" role="progressbar">
+        <p class="text-center">Autorefresh</p>
     </div>
 </div>
 
-<div class="loading">
-    <div class="progress progress-striped active">
-        <div class="progress-bar" role="progressbar">
-            <p class="text-center">Loading ...</p>
-        </div>
+<div class="progress progress-striped active {{if this.loading "in-progress"}}">
+    <div class="progress-bar" role="progressbar">
+        <p class="text-center">Loading ...</p>
     </div>
 </div>

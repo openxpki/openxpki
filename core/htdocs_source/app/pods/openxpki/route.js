@@ -31,6 +31,7 @@ export default class OpenXpkiRoute extends Route {
     needReboot = ["login", "logout", "login!logout", "welcome"];
 
     @tracked content = new Content();
+    @tracked loading = false;
 
     // Reserved Ember function "beforeModel"
     beforeModel(transition) {
@@ -75,6 +76,8 @@ export default class OpenXpkiRoute extends Route {
     }
 
     sendAjax(data) {
+        this.loading = true;
+
         // assemble request parameters
         let req = {
             data: {
@@ -102,10 +105,8 @@ export default class OpenXpkiRoute extends Route {
         if (this.content.refresh) {
             cancel(this.content.refresh);
             this.content.refresh = null;
-            $(".refresh").removeClass("in-progress");
         }
 
-        $(".loading").addClass("in-progress");
         return new Promise((resolve, reject) => {
             return $.ajax(req).then(doc => {
                 // work with a copy of this.content
@@ -120,9 +121,6 @@ export default class OpenXpkiRoute extends Route {
                     this.content.refresh = later(this, function() {
                         return this.sendAjax({ data: { page: doc.refresh.href } });
                     }, doc.refresh.timeout);
-                    scheduleOnce("afterRender", function() {
-                        return $(".refresh").addClass("in-progress");
-                    });
                 }
                 if (doc.goto) {
                     if (doc.target === '_blank' || /^(http|\/)/.test(doc.goto)) {
@@ -163,13 +161,11 @@ export default class OpenXpkiRoute extends Route {
                             this.content.tabs = [newTab];
                         }
                     }
-                    scheduleOnce("afterRender", function() {
-                        return $(".loading").removeClass("in-progress");
-                    });
+                    this.loading = false;
                 }
                 return resolve(doc);
             }, (err) => {
-                $(".loading").removeClass("in-progress");
+                this.loading = false;
                 this.content.error = {
                     message: "The server did not return JSON data as expected.\nMaybe your authentication session has expired."
                 };
