@@ -9,23 +9,24 @@
             <OxiSelect @list={{this.content.keys}} @selected={{this.content.name}} @onChange={{this.optionSelected}} />
         </div>
     {{/if}}
-    <div class="{{this.sFieldSize}}" title="{{this.content.tooltip}}">
         {{component this.type content=this.content}}
         {{#if this.content.error}}
             <span class="help-block">{{this.content.error}}</span>
+    <div class="{{this.sFieldSize}}">
+        <BsTooltip @title="{{@field.tooltip}}"/>
         {{/if}}
     </div>
     {{#if this.content.clonable}}
         <div class="col-md-1 clonable-btn-group">
 
             {{#if this.content.canDelete}}
-            <button class="btn btn-danger clone" type="button" {{action "delClone"}}>
+            <BsButton @type="danger" @onClick={{this.delClone}}>
                 <span class="glyphicon glyphicon-minus"></span>
-            </button>
+            </BsButton>
             {{/if}}
-            <button class="btn btn-primary clone" type="button" {{action "addClone"}}>
+            <BsButton @type="primary" @onClick={{this.addClone}}>
                 <span class="glyphicon glyphicon-plus"></span>
-            </button>
+            </BsButton>
         </div>
     {{/if}}
 </div>

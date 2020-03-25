@@ -4,20 +4,22 @@
         class="{{@button.className}}"
         href="{{@button.href}}"
         target="{{@button.target}}"
-        title="{{@button.tooltip}}"
     >
+        <BsTooltip @title={{@button.tooltip}}/>
         {{@button.label}}
     </a>
 {{else}}
-    <button
+
+    <BsButton
         ...attributes
         class="{{if @button.loading "btn-loading"}} {{@button.className}}"
-        {{on "click" this.click}}
-        title="{{@button.tooltip}}"
+        @onClick={{this.click}}
         disabled={{@button.disabled}}
     >
+        <BsTooltip @title={{@button.tooltip}}/>
         {{@button.label}}
-    </button>
+    </BsButton>
+
     {{#if @button.confirm}}
         <BsModal
             @open={{this.showConfirmDialog}}
