@@ -1,1 +1,7 @@
-{{input class="form-control" value=this.content.value placeholder=this.content.placeholder}}
+<Input
+    class="form-control"
+    @type="text"
+    @value={{@content.value}}
+    placeholder={{@content.placeholder}}
+    {{on "change" @onChange}}
+/>
