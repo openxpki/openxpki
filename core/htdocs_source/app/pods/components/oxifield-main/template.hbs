@@ -10,7 +10,9 @@
         </div>
     {{/if}}
     <div class="{{this.sFieldSize}}">
-        <BsTooltip @title="{{@field.tooltip}}"/>
+        {{#if @field.tooltip}}
+            <BsTooltip @title="{{@field.tooltip}}"/>
+        {{/if}}
         {{component this.type content=@field onChange=this.onChange}}
         {{#if this.hasError}}
             <span class="help-block">{{@field.error}}</span>
