@@ -118,33 +118,35 @@
     </div>
 </div>
 
-<BsModal
-    class="{{this.modal.page.className}}"
-    @open={{this.modal}}
-    @closeButton={{true}}
-    @fade={{true}}
-    @backdrop={{true}}
-    @backdropClose={{false}}
-    @onHidden={{action "clearPopupData"}}
-    as |Modal|
->
-    <Modal.header>
-        <h4 class="modal-title">
-            {{if this.modal.page.shortlabel this.modal.page.shortlabel this.modal.page.label}}
-        </h4>
-    </Modal.header>
-    <Modal.body>
-        {{#each this.modal.main as |mainEntry|}}
-            <OxisectionMain @content={{mainEntry}}/>
-        {{/each}}
-    </Modal.body>
-    <Modal.footer>
-        <BsButton @onClick={{action Modal.close}}>Close</BsButton>
-    </Modal.footer>
-</BsModal>
+{{#let this.model.modal as |popup|}}
+    <BsModal
+        class="{{popup.page.className}}"
+        @open={{popup}}
+        @closeButton={{true}}
+        @fade={{true}}
+        @backdrop={{true}}
+        @backdropClose={{false}}
+        @onHidden={{action "clearPopupData"}}
+        as |Modal|
+    >
+        <Modal.header>
+            <h4 class="modal-title">
+                {{if popup.page.shortlabel popup.page.shortlabel popup.page.label}}
+            </h4>
+        </Modal.header>
+        <Modal.body>
+            {{#each popup.main as |mainEntry|}}
+                <OxisectionMain @content={{mainEntry}}/>
+            {{/each}}
+        </Modal.body>
+        <Modal.footer>
+            <BsButton @onClick={{action Modal.close}}>Close</BsButton>
+        </Modal.footer>
+    </BsModal>
+{{/let}}
 
 <BsModal
-    @open={{this.error}}
+    @open={{this.model.error}}
     @closeButton={{true}}
     @fade={{true}}
     @backdrop={{true}}
@@ -155,7 +157,7 @@
         <h4 class="modal-title">Application Error</h4>
     </Modal.header>
     <Modal.body>
-        {{{this.error.message}}}
+        {{{this.model.error.message}}}
     </Modal.body>
     <Modal.footer>
         <BsButton @onClick={{action "reload"}} @type="primary">Reload application</BsButton>
