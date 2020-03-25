@@ -195,13 +195,13 @@ export default class OpenXpkiRoute extends Route {
     updateNavEntryActiveState() {
         let page = this.content.page;
         for (const entry of this.content.navEntries) {
-            entry.active = (entry.key === page);
+            emSet(entry, "active", (entry.key === page));
             if (entry.entries) {
                 entry.entries.setEach("active", false);
                 let subEntry = entry.entries.findBy("key", page);
                 if (subEntry) {
-                    subEntry.active = true;
-                    entry.active = true;
+                    emSet(subEntry, "active", true);
+                    emSet(entry, "active", true);
                 }
             }
         }
