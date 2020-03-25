@@ -1,16 +1,23 @@
-import Component from '@ember/component';
+import Component from '@glimmer/component';
+import { tracked } from '@glimmer/tracking';
+import { computed, action, set as emSet } from "@ember/object";
+import { equal, bool } from "@ember/object/computed";
 
-const OxifieldMainComponent = Component.extend({
-    classNameBindings: ["content.is_optional:optional:required", "content.class"],
-    type: Em.computed("content.type", function() {
-        return "oxifield-" + this.get("content.type");
-    }),
-    isBool: Em.computed.equal("content.type", "bool"),
-    sFieldSize: Em.computed("content.size", "content.keysize", function() {
+export default class OxifieldMainComponent extends Component {
+    @equal("args.field.type", "bool") isBool;
+    @bool("args.field.error") hasError;
+
+    @computed("args.field.type")
+    get type() {
+        return "oxifield-" + this.args.field.type;
+    }
+
+    @computed("args.field.size", "args.field.keysize")
+    get sFieldSize() {
         var keys, keysize, size;
-        keys = this.get("content.keys");
-        size = this.get("content.size");
-        keysize = this.get("content.keysize");
+        keys = this.args.field.keys;
+        size = this.args.field.size;
+        keysize = this.args.field.keysize;
         if (!size) {
             if (keys) {
                 if (!keysize) { keysize = 2 }
@@ -20,36 +27,42 @@ const OxifieldMainComponent = Component.extend({
             }
         }
         return 'col-md-' + size;
-    }),
-    hasError: Em.computed.bool("content.error"),
-    resetError: Em.observer("content.value", function() {
-        return this.set("content.error");
-    }),
-    handleActionOnChange: Em.observer("content.value", function() {
-        return this.sendAction("valueChange", this.get("content"));
-    }),
+    }
+
+    /*
     keyPress: function(event) {
         if (event.keyCode === 9) {
-            if (this.get("content.clonable")) {
-                if (this.get("content.value")) {
-                    this.send("addClone");
+            if (this.args.field.clonable) {
+                if (this.args.field.value) {
+                    this.addClone(this.args.field);
                     event.stopPropagation();
                     return event.preventDefault();
                 }
             }
         }
     },
-    actions: {
-        addClone: function(field) {
-            return this.sendAction("addClone", this.get("content"));
-        },
-        delClone: function(field) {
-            return this.sendAction("delClone", this.get("content"));
-        },
-        optionSelected: function(value, label) {
-            return this.set("content.value", value);
-        }
-    }
-});
+    */
 
-export default OxifieldMainComponent;
+    @action
+    addClone(field) {
+        this.addClone(this.args.field);
+    }
+
+    @action
+    delClone(field) {
+        this.delClone(this.args.field);
+    }
+
+    @action
+    optionSelected(value, label) {
+        emSet(this.args.field, "value", value);
+        emSet(this.args.field, "error", null);
+        this.onChange()
+    }
+
+    @action
+    onChange() {
+        console.warn("oxifield-main: onChange");
+        this.args.fieldChanged(this.args.field);
+    }
+}

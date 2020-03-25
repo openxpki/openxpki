@@ -1,25 +1,25 @@
-<div class="form-group {{if this.hasError "has-error"}}">
+<div class="form-group {{if this.hasError "has-error"}} {{if @field.is_optional "optional" "required"}} {{@field.class}}">
     {{#if this.isBool}}
         <div class="col-md-2"></div>
     {{else}}
-        <label class="col-md-2 control-label">{{this.content.label}}</label>
+        <label class="col-md-2 control-label">{{@field.label}}</label>
     {{/if}}
-    {{#if this.content.keys}}
+    {{#if @field.keys}}
         <div class="col-md-2">
-            <OxiSelect @list={{this.content.keys}} @selected={{this.content.name}} @onChange={{this.optionSelected}} />
+            <OxiSelect @list={{@field.keys}} @selected={{@field.name}} @onChange={{this.optionSelected}} />
         </div>
     {{/if}}
-        {{component this.type content=this.content}}
-        {{#if this.content.error}}
-            <span class="help-block">{{this.content.error}}</span>
     <div class="{{this.sFieldSize}}">
         <BsTooltip @title="{{@field.tooltip}}"/>
+        {{component this.type content=@field onChange=this.onChange}}
+        {{#if this.hasError}}
+            <span class="help-block">{{@field.error}}</span>
         {{/if}}
     </div>
-    {{#if this.content.clonable}}
+    {{#if @field.clonable}}
         <div class="col-md-1 clonable-btn-group">
 
-            {{#if this.content.canDelete}}
+            {{#if @field.canDelete}}
             <BsButton @type="danger" @onClick={{this.delClone}}>
                 <span class="glyphicon glyphicon-minus"></span>
             </BsButton>
