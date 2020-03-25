@@ -5,6 +5,19 @@ import { getOwner } from '@ember/application';
 import { Promise } from 'rsvp';
 import { set as emSet } from '@ember/object';
 
+class Content {
+    @tracked page = null;
+    @tracked ping = null;
+    @tracked refresh = null;
+    @tracked structure = null;
+    @tracked rtoken = null;
+    @tracked status = null;
+    @tracked modal = null;
+    @tracked tabs = [];
+    @tracked navEntries = [];
+    @tracked error = null;
+}
+
 export default class OpenXpkiRoute extends Route {
     // Reserved Ember property "queryParams"
     // https://api.emberjs.com/ember/3.17/classes/Route/properties/queryParams?anchor=queryParams
@@ -17,29 +30,18 @@ export default class OpenXpkiRoute extends Route {
     };
     needReboot = ["login", "logout", "login!logout", "welcome"];
 
-    @tracked
-    source = {
-        page: null,
-        ping: null,
-        refresh: null,
-        structure: null,
-        rtoken: null,
-        status: null,
-        modal: null,
-        tabs: [],
-        navEntries: [],
-        error: null
-    };
+    @tracked content = new Content();
 
     // Reserved Ember function "beforeModel"
     beforeModel(transition) {
-        var model_id;
         // "force" is only evaluated above using "refreshModel: true"
         if (transition.to.queryParams.force) {
             delete transition.to.queryParams.force;
         }
-        model_id = transition.to.params.model_id;
-        if (!this.source.navEntries.length || this.needReboot.indexOf(model_id) >= 0) {
+
+        // load page structure first first time or for special pages ("needReboot")
+        let model_id = transition.to.params.model_id;
+        if (!this.content.navEntries.length || this.needReboot.indexOf(model_id) >= 0) {
             return this.sendAjax({
                 page: "bootstrap!structure",
                 baseurl: window.location.pathname,
@@ -55,23 +57,18 @@ export default class OpenXpkiRoute extends Route {
         if (params.limit) { data.limit = params.limit }
         if (params.startat) { data.startat = params.startat }
 
-        let entries = this.source.navEntries.reduce(function(p, n) {
-            return p.concat(n, n.entries || []);
-        }, []);
-        if (entries.findBy("key", params.model_id)) {
-            data.target = "top";
-        } else if (this.needReboot.indexOf(params.model_id) >= 0) {
+        let flatList = this.content.navEntries.reduce((p, n) => p.concat(n, n.entries || []), []);
+        if (flatList.findBy("key", params.model_id) || this.needReboot.indexOf(params.model_id) >= 0) {
             data.target = "top";
         }
 
-        this.source.page = params.model_id;
-        this.updateNavEntryActiveState(this.source);
+        this.content.page = params.model_id; this.updateNavEntryActiveState(this.content);
 
-        return this.sendAjax(data).then(() => this.source);
+        return this.sendAjax(data).then(() => this.content);
     }
 
     doPing(cfg) {
-        return this.source.ping = later(this, () => {
+        return this.content.ping = later(this, () => {
             $.ajax({ url: cfg.href });
             return this.doPing(cfg);
         }, cfg.timeout);
@@ -89,7 +86,7 @@ export default class OpenXpkiRoute extends Route {
             url: getOwner(this).lookup("controller:config").url,
         };
         if (req.type === "POST") {
-            req.data._rtoken = this.source.rtoken;
+            req.data._rtoken = this.content.rtoken;
         }
 
         // Fetch "targetElement" parameter for use in AJAX response handler later on.
@@ -97,32 +94,30 @@ export default class OpenXpkiRoute extends Route {
         // currently active place: a modal, an active tab or on top (i.e. single hidden tab)
         let targetElement = req.data.target || "self";
         if (targetElement === "self") {
-            if (this.source.modal) { targetElement = "modal" }
-            else if (this.source.tabs.length > 1) { targetElement = "active" }
+            if (this.content.modal) { targetElement = "modal" }
+            else if (this.content.tabs.length > 1) { targetElement = "active" }
             else { targetElement = "top" }
         }
 
-        if (this.source.refresh) {
-            cancel(this.source.refresh);
-            this.source.refresh = null;
+        if (this.content.refresh) {
+            cancel(this.content.refresh);
+            this.content.refresh = null;
             $(".refresh").removeClass("in-progress");
         }
 
         $(".loading").addClass("in-progress");
         return new Promise((resolve, reject) => {
             return $.ajax(req).then(doc => {
-                // work with a copy of this.source
-                let newSource = Object.assign({
-                    status: doc.status,
-                    modal: null
-                }, this.source);
+                // work with a copy of this.content
+                this.content.status = doc.status;
+                this.content.modal = null;
 
                 if (doc.ping) {
-                    if (this.source.ping) { cancel(this.source.ping) }
+                    if (this.content.ping) { cancel(this.content.ping) }
                     this.doPing(doc.ping);
                 }
                 if (doc.refresh) {
-                    newSource.refresh = later(this, function() {
+                    this.content.refresh = later(this, function() {
                         return this.sendAjax({ data: { page: doc.refresh.href } });
                     }, doc.refresh.timeout);
                     scheduleOnce("afterRender", function() {
@@ -138,14 +133,13 @@ export default class OpenXpkiRoute extends Route {
                     }
                 }
                 else if (doc.structure) {
-                    newSource.navEntries = doc.structure;
-                    this.updateNavEntryActiveState(newSource);
-                    newSource.user = doc.user;
-                    newSource.rtoken = doc.rtoken;
+                    this.content.navEntries = doc.structure; this.updateNavEntryActiveState();
+                    this.content.user = doc.user;
+                    this.content.rtoken = doc.rtoken;
                 }
                 else {
                     if (doc.page && doc.main) {
-                        newSource.tabs = [...this.source.tabs]; // copy tabs to not trigger change observers for now
+                        this.content.tabs = [...this.content.tabs]; // copy tabs to not trigger change observers for now
                         let newTab = {
                             active: true,
                             page: doc.page,
@@ -153,31 +147,30 @@ export default class OpenXpkiRoute extends Route {
                             right: doc.right
                         };
                         if (targetElement === "modal") {
-                            newSource.modal = newTab;
+                            this.content.modal = newTab;
                         }
                         else if (targetElement === "tab") {
-                            let tabs = newSource.tabs;
+                            let tabs = this.content.tabs;
                             tabs.setEach("active", false);
                             tabs.pushObject(newTab);
                         }
                         else if (targetElement === "active") {
-                            let tabs = newSource.tabs;
+                            let tabs = this.content.tabs;
                             let index = tabs.indexOf(tabs.findBy("active"));
                             tabs.replace(index, 1, [newTab]); // top
                         }
                         else {
-                            newSource.tabs = [newTab];
+                            this.content.tabs = [newTab];
                         }
                     }
                     scheduleOnce("afterRender", function() {
                         return $(".loading").removeClass("in-progress");
                     });
                 }
-                this.source = newSource; // trigger observers
                 return resolve(doc);
             }, (err) => {
                 $(".loading").removeClass("in-progress");
-                this.source.error = {
+                this.content.error = {
                     message: "The server did not return JSON data as expected.\nMaybe your authentication session has expired."
                 };
                 return resolve({});
@@ -185,10 +178,10 @@ export default class OpenXpkiRoute extends Route {
         });
     }
 
-    updateNavEntryActiveState(model) {
-        let page = model.page;
-        for (const entry of model.navEntries) {
-            emSet(entry, "active", entry.key === page);
+    updateNavEntryActiveState() {
+        let page = this.content.page;
+        for (const entry of this.content.navEntries) {
+            entry.active = (entry.key === page);
             if (entry.entries) {
                 entry.entries.setEach("active", false);
                 let subEntry = entry.entries.findBy("key", page);
@@ -198,5 +191,6 @@ export default class OpenXpkiRoute extends Route {
                 }
             }
         }
+        this.content.navEntries = this.content.navEntries; // trigger updates
     }
 }
