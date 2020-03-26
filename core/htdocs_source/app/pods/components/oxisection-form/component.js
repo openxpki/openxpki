@@ -89,6 +89,7 @@ export default class OxisectionFormComponent extends Component {
 
     @action
     fireActionOnChange(field) {
+        console.warn("oxisection-form: fireActionOnChange()", field);
         if (!field.actionOnChange) { return }
 
         let fields = this.args.content.content.fields;
@@ -133,6 +134,7 @@ export default class OxisectionFormComponent extends Component {
 
     @action
     submit() {
+        console.warn("oxisection-form: submit", this.args.content);
         let fields = this.args.content.content.fields;
         let data = {
             action: this.args.content.action
@@ -155,6 +157,7 @@ export default class OxisectionFormComponent extends Component {
                 names.push(field.name);
             }
         }
+        console.warn("oxisection-form: isError = true");
         if (isError) { return }
         for (const name of names) {
             let clones = fields.filter(f => f.name === name);

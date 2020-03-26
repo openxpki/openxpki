@@ -51,6 +51,7 @@ export default class OxiButtonComponent extends Component {
 
     @action
     click() {
+        console.warn("oxi-button: click");
         if (this.args.button.confirm) {
             set(this.args.button, "loading", true);
             this.showConfirmDialog = true;
