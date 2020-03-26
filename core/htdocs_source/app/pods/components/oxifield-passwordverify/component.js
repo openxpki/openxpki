@@ -1,70 +1,58 @@
-import Component from '@ember/component';
+import Component from '@glimmer/component';
+import { tracked } from '@glimmer/tracking';
+import { action, computed, set } from '@ember/object';
 
-const OxifieldPasswordverifyComponent = Component.extend({
-    password: "",
-    confirm: "",
-    confirmFocus: false,
-    isFixed: false,
-    setMode: Em.on("init", function() {
-        if (this.get("content.value")) {
-            this.set("password", this.get("content.value"));
-            this.set("isFixed", true);
-            return this.set("content.value", "");
-        }
-    }),
-    showConfirm: Em.computed("password", "confirm", "confirmFocus", function() {
-        return this.get("password") !== this.get("confirm") || this.get("confirmFocus");
-    }),
-    valueSetter: Em.observer("password", "confirm", function() {
-        let password = this.get("password");
-        let confirm = this.get("confirm");
-        if (password === confirm) {
-            return this.set("content.value", password);
-        } else {
-            return this.set("content.value", null);
-        }
-    }),
-    placeholder: Em.computed("content.placeholder", function() {
-        return this.get("content.placeholder") || "Retype password";
-    }),
-    label: "",
-    updateValue: Em.observer("label", function() {
-        let label = this.get("label");
-        let values = this.get("content.options").filter(o => o.label === label).map(o => o.value);
-        if (values.length === 1) {
-            return this.set("content.value", values[0]);
-        } else {
-            return this.set("content.value", label);
-        }
-    }),
-    passwordChange: Em.observer("password", function() {
-        this.set("confirm", "");
-        return this.set("content.error", null);
-    }),
-    actions: {
-        confirmFocusIn: function() {
-            this.set("confirmFocus", true);
-            if (this.get("password") !== this.get("confirm")) {
-                return this.set("confirm", "");
-            }
-        },
-        hintRetype: function() {
-            if (this.get("password") && !this.get("confirm")) {
-                return this.set("content.error", "Please retype password");
-            }
-        },
-        confirmFocusOut: function() {
-            this.set("confirmFocus", false);
-            if (this.get("password") !== this.get("confirm")) {
-                if (this.get("confirm")) {
-                    this.set("content.error", "Passwords do not match");
-                    return this.set("confirm", "");
-                } else {
-                    return this.set("content.error", "Please retype password");
-                }
-            }
+export default class OxifieldPasswordverifyComponent extends Component {
+    @tracked password = "";
+    @tracked confirm = "";
+    @tracked isFixed = false;
+
+    @computed("args.content.placeholder")
+    get placeholder() {
+        return this.args.content.placeholder || "Retype password";
+    }
+
+    @action
+    setMode() {
+        if (this.args.content.value) {
+            this.password = this.args.content.value;
+            this.isFixed = true;
+            set(this.args.content, "value", "");
         }
     }
-});
 
-export default OxifieldPasswordverifyComponent;
+    @action
+    setValues() {
+        console.log(this.password, this.confirm);
+        // do passwords match?
+        set(this.args.content, "value", this.password === this.confirm ? this.password : null);
+        if (this.password !== this.confirm) {
+            set(this.args.content, "error", this.confirm ? "Passwords do not match" : "Please retype password");
+        }
+    }
+
+    @action
+    passwordChange(event) {
+        this.password = event.target.value;
+        this.confirm = "";
+        this.setValues();
+    }
+
+    @action
+    confirmPasswordChange(event) {
+        this.confirm = event.target.value;
+        this.setValues();
+    }
+
+    @action
+    confirmFocusIn() {
+        if (this.password !== this.confirm) {
+            this.confirm = "";
+        }
+    }
+
+    @action
+    confirmFocusOut() {
+        this.args.onChange();
+    }
+}

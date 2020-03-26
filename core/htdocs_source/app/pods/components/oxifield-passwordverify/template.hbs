@@ -1,7 +1,20 @@
+<div {{did-insert this.setMode}}>
 {{#if this.isFixed}}
-    {{input class="form-control in-form-group" type="text" readonly="readonly" value=this.password}}
-    {{input class="form-control in-form-group" type="text" value=this.confirm placeholder=this.placeholder}}
+    <input type="text" class="form-control in-form-group"
+        value={{this.password}}
+        readonly="readonly"
+    />
 {{else}}
-    {{input class="form-control in-form-group" type="password" value=this.password focus-out="hintRetype"}}
-    {{input class="form-control in-form-group" type="password" value=this.confirm focus-in="confirmFocusIn" focus-out="confirmFocusOut" placeholder=this.placeholder}}
+    <input type="password" class="form-control in-form-group"
+        value={{this.password}}
+        {{on "input" this.passwordChange}}
+    />
 {{/if}}
+    <input type={{if this.isFixed "text" "password"}} class="form-control in-form-group"
+        value={{this.confirm}}
+        placeholder={{this.placeholder}}
+        {{on "focus" this.confirmFocusIn}}
+        {{on "input" this.confirmPasswordChange}}
+        {{on "blur" this.confirmFocusOut}}
+    />
+</div>
