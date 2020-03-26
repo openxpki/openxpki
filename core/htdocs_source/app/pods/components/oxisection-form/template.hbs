@@ -5,19 +5,24 @@
 <div class="container-fluid">
     <form class="form-horizontal" role="form">
         {{#each this.visibleFields as |field|}}
-            {{oxifield-main content=field addClone="addClone" delClone="delClone" valueChange="valueChange"}}
+            <OxifieldMain
+                @field={{field}}
+                @addClone={{this.addClone}}
+                @delClone={{this.delClone}}
+                @fieldChanged={{this.fireActionOnChange}}
+            />
         {{/each}}
         <div class="form-group">
             <div class="col-md-offset-2 col-sm-7 oxi-form-button">
                 <BsButton @type="default" class="{{if this.loading "btn-loading"}} submit" @onClick={{this.submit}}>
                     {{this.submitLabel}}
                 </BsButton>
-                {{#if this.content.content.reset_label}}
+                {{#if @content.content.reset_label}}
                     <BsButton @type="default" class="reset" @onClick={{this.reset}}>
-                        {{this.content.content.reset_label}}
+                        {{@content.content.reset_label}}
                     </BsButton>
                 {{/if}}
-                {{#each this.content.content.buttons as |btn|}}
+                {{#each @content.content.buttons as |btn|}}
                     <OxiButton class="btn btn-default" @button={{btn}} @onClick={{this.buttonClick}}/>
                 {{/each}}
 
@@ -25,5 +30,3 @@
         </div>
     </form>
 </div>
-
-

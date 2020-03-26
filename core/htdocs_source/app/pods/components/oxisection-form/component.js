@@ -88,7 +88,7 @@ export default class OxisectionFormComponent extends Component {
     }
 
     @action
-    valueChange(field) {
+    fireActionOnChange(field) {
         if (!field.actionOnChange) { return }
 
         let fields = this.args.content.content.fields;
