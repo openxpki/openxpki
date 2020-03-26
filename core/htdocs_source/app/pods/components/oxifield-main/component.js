@@ -63,6 +63,7 @@ export default class OxifieldMainComponent extends Component {
     @action
     onChange() {
         console.warn("oxifield-main: onChange");
+        emSet(this.args.field, "error", null);
         this.args.fieldChanged(this.args.field);
     }
 }
