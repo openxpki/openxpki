@@ -1,6 +1,6 @@
-@import "../../node_modules/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css";
-@import "oxi.css";
-@import "oxi-grid.css";
+@import "ember-bootstrap/bootstrap";
+@import "./oxi.css";
+@import "./oxi-grid.css";
 
 iframe.oxifield-upload {
   width: 0;

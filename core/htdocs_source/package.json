@@ -25,9 +25,9 @@
     "@glimmer/component": "^1.0.0",
     "@glimmer/tracking": "^1.0.0",
     "babel-eslint": "^10.0.3",
-    "bootstrap": "^3.4.1",
     "bootstrap-3-typeahead": "github:maxhq/Bootstrap-3-Typeahead",
     "bootstrap-contextmenu": "1.0.0",
+    "bootstrap-sass": "^3.4.1",
     "broccoli-asset-rev": "^3.0.0",
     "ember-auto-import": "^1.5.3",
     "ember-bootstrap": "^3.1.2",
@@ -38,6 +38,7 @@
     "ember-cli-eslint": "^5.1.0",
     "ember-cli-htmlbars": "^4.2.2",
     "ember-cli-inject-live-reload": "^2.0.2",
+    "ember-cli-sass": "^10.0.1",
     "ember-cli-sri": "^2.1.1",
     "ember-cli-template-lint": "^1.0.0-beta.3",
     "ember-cli-uglify": "^3.0.0",
@@ -55,7 +56,8 @@
     "jquery": "^3.4.1",
     "loader.js": "^4.7.0",
     "moment": "2.9.0",
-    "qunit-dom": "^1.0.0"
+    "qunit-dom": "^1.0.0",
+    "sass": "^1.26.3"
   },
   "engines": {
     "node": "10.* || >= 12"
