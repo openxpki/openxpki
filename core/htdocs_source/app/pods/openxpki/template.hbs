@@ -1,55 +1,52 @@
-<div class="navbar navbar-default" role="navigation">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#"></a>
-        </div>
-
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                {{#each this.model.navEntries as |navEntry|}}
-                    {{#if navEntry.entries.length}}
-                        <li class="dropdown {{if navEntry.active "active"}}">
-                            <a class="dropdown-toggle" href="#" data-toggle="dropdown">
-                                {{navEntry.label}}
-                                <b class="caret"></b>
-                            </a>
-                            <ul class="dropdown-menu">
-                                {{#each navEntry.entries as |entry|}}
-                                    <li>
-                                        {{#link-to "openxpki" entry.key (query-params force=navEntry.active)}}
-                                            {{entry.label}}
-                                        {{/link-to}}
-                                    </li>
-                                {{/each}}
-                            </ul>
-                        </li>
-                    {{else}}
-                        <li class="{{if navEntry.active "active"}}">
-                            {{#link-to "openxpki" navEntry.key (query-params force=navEntry.active)}}
-                                {{navEntry.label}}
-                            {{/link-to}}
-                        </li>
-                    {{/if}}
-                {{/each}}
-            </ul>
-
-            <ul class="nav navbar-nav navbar-right">
-                {{#if this.model.user}}
-                    <li>
-                        {{#link-to "openxpki" "logout"}}
-                            Log out
-                        {{/link-to}}
-                    </li>
-                {{/if}}
-            </ul>
-        </div>
+<BsNavbar
+    @type="default"
+    @backgroundColor="light"
+    @collapsed={{true}}
+    @onCollapse={{action (mut collapsed) true}}
+    @onExpand={{action (mut collapsed) false}} as |navbar|
+>
+    <div class="navbar-header">
+        {{navbar.toggle}}
     </div>
-</div>
+    <navbar.content>
+        <navbar.nav as |nav|>
+            {{#each this.model.navEntries as |navEntry|}}
+                {{#if navEntry.entries.length}}
+                    <nav.dropdown as |dd|>
+                        <dd.toggle>
+                            {{navEntry.label}}
+                            <span class="caret"></span>
+                        </dd.toggle>
+                        <dd.menu as |ddm|>
+                            {{#each navEntry.entries as |entry|}}
+                                <ddm.item>
+                                    <ddm.linkTo @route="openxpki" @model={{entry.key}} @query={{hash force=navEntry.active}}>
+                                        {{entry.label}}
+                                    </ddm.linkTo>
+                                </ddm.item>
+                            {{/each}}
+                        </dd.menu>
+                    </nav.dropdown>
+                {{else}}
+                    <nav.item>
+                        <nav.linkTo @route="openxpki" @model={{navEntry.key}} @query={{hash force=navEntry.active}}>
+                            {{navEntry.label}}
+                        </nav.linkTo>
+                    </nav.item>
+                {{/if}}
+            {{/each}}
+        </navbar.nav>
+        <navbar.nav class="navbar-right" as |nav|>
+            {{#if this.model.user}}
+                <nav.item>
+                    <nav.linkTo @route="openxpki" @model="logout">
+                        Log out
+                    </nav.linkTo>
+                </nav.item>
+            {{/if}}
+        </navbar.nav>
+    </navbar.content>
+</BsNavbar>
 
 <div class="container-fluid  {{this.model.tabs.firstObject.page.className}}">
     <div class="oxi-message">
