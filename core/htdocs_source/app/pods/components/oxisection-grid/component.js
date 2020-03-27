@@ -1,6 +1,16 @@
 import Component from '@ember/component';
 import $ from "jquery";
 
+/**
+Shows a button with an optional confirm dialog.
+
+@module oxisection-grid
+@param { hash } content - Hash containing the grid contents
+```javascript
+{
+}
+```
+*/
 const OxisectionGridComponent = Component.extend({
     visibleColumns: Em.computed("content.content.columns", function() {
         return (this.get("content.content.columns") || [])
