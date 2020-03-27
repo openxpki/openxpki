@@ -86,29 +86,32 @@ export default class OxisectionFormComponent extends Component {
 
     @action
     fireActionOnChange(field) {
-        debug("oxisection-form: fireActionOnChange()");
         if (!field.actionOnChange) { return }
+        debug("oxisection-form: fireActionOnChange (field=" + field.name + ", action=" + field.actionOnChange + ") ");
 
-        let fields = this.args.content.content.fields;
-        let data = {
+        let request = {
             action: field.actionOnChange,
             _sourceField: field.name
         };
+
+        let fields = this.args.content.content.fields;
+        // build list of unique field names
         let names = [];
-        for (const field of fields) {
-            if (names.indexOf(field.name) < 0) {
-                names.push(field.name);
-            }
+        for (const fld of fields) {
+            if (names.indexOf(fld.name) < 0) { names.push(fld.name) }
         }
+        // add field values to request:
+        // either as plain value (1 field of that name)
+        // or as array (>1 field with that name)
         for (const name of names) {
             let clones = fields.filter(f => f.name === name);
             if (clones.length > 1) {
-                data[name] = clones.map(c => c.value);
+                request[name] = clones.map(c => c.value);
             } else {
-                data[name] = clones[0].value;
+                request[name] = clones[0].value;
             }
         }
-        return getOwner(this).lookup("route:openxpki").sendAjax(data)
+        return getOwner(this).lookup("route:openxpki").sendAjax(request)
         .then((doc) => {
             for (const newField of doc.fields) {
                 for (const oldField of fields) {
