@@ -1,4 +1,4 @@
-<h3>{{this.content.label}}</h3>
-<div>{{{this.content.description}}}</div>
+<h3>{{@content.content.label}}</h3>
+<div>{{{@content.content.description}}}</div>
 
-{{oxi-button-container buttons=this.content.content.buttons buttonClick="buttonClick"}}
+<OxiButtonContainer @buttons={{@content.content.buttons}} @buttonClick={{@buttonClick}}/>
