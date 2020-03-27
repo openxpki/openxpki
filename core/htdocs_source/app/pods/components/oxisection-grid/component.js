@@ -3,7 +3,7 @@ import $ from "jquery";
 
 const OxisectionGridComponent = Component.extend({
     visibleColumns: Em.computed("content.content.columns", function() {
-        return this.get("content.content.columns")
+        return (this.get("content.content.columns") || [])
         .map( (col, index) => { col.index = index; return col })
         .filter(col => col.sTitle[0] !== "_" && col.bVisible !== 0);
     }),
@@ -70,6 +70,7 @@ const OxisectionGridComponent = Component.extend({
     }),
     pagesizes: Em.computed("pager.{pagesizes,limit,startat,order,reverse}", function() {
         let pager = this.get("pager");
+        if (!pager.pagesizes) { return [] }
         let greater = pager.pagesizes.filter(function(pagesize) {
             return pagesize >= pager.count;
         });
@@ -122,10 +123,12 @@ const OxisectionGridComponent = Component.extend({
             results.push({
                 className: `gridrow-${row[classIndex]}`,
                 originalData: row,
-                data: columns.map(col => { return {
-                    format: col.format,
-                    value: row[col.index],
-                }}),
+                data: columns.map(col => {
+                    return {
+                        format: col.format,
+                        value: row[col.index],
+                    }
+                }),
                 checked: false,
                 originalIndex: y
             });
@@ -136,7 +139,7 @@ const OxisectionGridComponent = Component.extend({
         let pager = this.get("pager");
         let data = this.get("data");
         if (pager.pagerurl) {
-            return data;
+            return (data || []);
         } else {
             data = data.toArray();
             let columns = this.get("columns");
@@ -182,7 +185,7 @@ const OxisectionGridComponent = Component.extend({
     contextIndex: null,
     onItem: function(context, e) {
         let action;
-        let actions = this.get("content.content.actions");
+        let actions = (this.get("content.content.actions") || []);
         if (actions.length === 1) {
             action = actions[0];
         } else {

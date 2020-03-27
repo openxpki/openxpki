@@ -3,7 +3,7 @@ import types from "../oxivalue-format/types";
 
 const OxisectionKeyvalueComponent = Component.extend({
     items: Em.computed("content.content.data", function() {
-        let items = this.get("content.content.data");
+        let items = this.get("content.content.data") || [];
         for (const i of items) {
             if (i.format === 'head') { i.isHead = 1 }
         }

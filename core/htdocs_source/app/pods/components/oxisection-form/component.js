@@ -136,7 +136,7 @@ export default class OxisectionFormComponent extends Component {
     @action
     submit() {
         debug("oxisection-form: submit");
-        let fields = this.args.content.content.fields;
+        let fields = (this.args.content.content.fields || []);
         let data = {
             action: this.args.content.action
         };

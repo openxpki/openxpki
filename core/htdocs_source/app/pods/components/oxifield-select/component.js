@@ -15,7 +15,7 @@ export default class OxifieldSelectComponent extends Component {
         if (!prompt && this.args.content.is_optional) {
             prompt = "";
         }
-        options = this.args.content.options;
+        options = (this.args.content.options || []);
         if (typeof prompt === "string" && prompt !== ((ref = options[0]) != null ? ref.label : void 0)) {
             return [ { label: prompt, value: "" } ].concat(options);
         } else {
