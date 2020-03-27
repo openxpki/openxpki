@@ -46,20 +46,19 @@ export default class OpenXpkiRoute extends Route {
             delete queryParams.force;
         }
 
-        let ajaxCalls; // chain of ajax calls via Promises
+        let structureIfNeeded; // chain of ajax calls via Promises
 
         /*
          * load base page structure first first time or for special pages ("needReboot")
          */
-        let model_id = queryParams.model_id;
-        if (!this.content.navEntries.length || this.needReboot.indexOf(model_id) >= 0) {
-            ajaxCalls = this.sendAjax({
+        if (!this.content.navEntries.length || this.needReboot.indexOf(modelId) >= 0) {
+            structureIfNeeded = this.sendAjax({
                 page: "bootstrap!structure",
                 baseurl: window.location.pathname,
             });
         }
         else {
-            ajaxCalls = Promise.resolve();
+            structureIfNeeded = Promise.resolve();
         }
 
         /*
@@ -71,16 +70,14 @@ export default class OpenXpkiRoute extends Route {
         if (queryParams.limit) { request.limit = queryParams.limit }
         if (queryParams.startat) { request.startat = queryParams.startat }
 
-        // load as top content if 'model_id' is part of navigation or in 'needReboot' list
+        // load as top content if 'modelId' is part of navigation or in 'needReboot' list
         let flatList = this.content.navEntries.reduce((p, n) => p.concat(n, n.entries || []), []);
         if (flatList.findBy("key", modelId) || this.needReboot.indexOf(modelId) >= 0) {
             request.target = "top";
         }
-        ajaxCalls = ajaxCalls.then(() => {
+        return structureIfNeeded.then(() => {
             return this.sendAjax(request);
-        })
-
-        return ajaxCalls;
+        });
     }
 
     // Reserved Ember function "model"
@@ -90,7 +87,7 @@ export default class OpenXpkiRoute extends Route {
     }
 
     doPing(cfg) {
-        return this.content.ping = later(this, () => {
+        this.content.ping = later(this, () => {
             $.ajax({ url: cfg.href });
             return this.doPing(cfg);
         }, cfg.timeout);
@@ -129,69 +126,79 @@ export default class OpenXpkiRoute extends Route {
         }
 
         return new Promise((resolve, reject) => {
-            return $.ajax(req).then(doc => {
-                // work with a copy of this.content
-                this.content.status = doc.status;
-                this.content.modal = null;
+            $.ajax(req).then(
+                // SUCCESS
+                doc => {
+                    // work with a copy of this.content
+                    this.content.status = doc.status;
+                    this.content.modal = null;
 
-                if (doc.ping) {
-                    if (this.content.ping) { cancel(this.content.ping) }
-                    this.doPing(doc.ping);
-                }
-                if (doc.refresh) {
-                    this.content.refresh = later(this, function() {
-                        return this.sendAjax({ data: { page: doc.refresh.href } });
-                    }, doc.refresh.timeout);
-                }
-                if (doc.goto) {
-                    if (doc.target === '_blank' || /^(http|\/)/.test(doc.goto)) {
-                        window.location.href = doc.goto;
+                    if (doc.ping) {
+                        debug("openxpki/route - sendAjax response: \"ping\" " + doc.ping);
+                        if (this.content.ping) { cancel(this.content.ping) }
+                        this.doPing(doc.ping);
                     }
-                    else {
-                        this.transitionTo("openxpki", doc.goto);
+                    if (doc.refresh) {
+                        debug("openxpki/route - sendAjax response: \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout);
+                        this.content.refresh = later(this, function() {
+                            this.sendAjax({ data: { page: doc.refresh.href } });
+                        }, doc.refresh.timeout);
                     }
-                }
-                else if (doc.structure) {
-                    this.content.navEntries = doc.structure; this.updateNavEntryActiveState();
-                    this.content.user = doc.user;
-                    this.content.rtoken = doc.rtoken;
-                }
-                else {
-                    if (doc.page && doc.main) {
-                        this.content.tabs = [...this.content.tabs]; // copy tabs to not trigger change observers for now
-                        let newTab = {
-                            active: true,
-                            page: doc.page,
-                            main: doc.main,
-                            right: doc.right
-                        };
-                        if (targetElement === "modal") {
-                            this.content.modal = newTab;
-                        }
-                        else if (targetElement === "tab") {
-                            let tabs = this.content.tabs;
-                            tabs.setEach("active", false);
-                            tabs.pushObject(newTab);
-                        }
-                        else if (targetElement === "active") {
-                            let tabs = this.content.tabs;
-                            let index = tabs.indexOf(tabs.findBy("active"));
-                            tabs.replace(index, 1, [newTab]); // top
+                    if (doc.goto) {
+                        debug("openxpki/route - sendAjax response: \"goto\" " + doc.goto);
+                        if (doc.target === '_blank' || /^(http|\/)/.test(doc.goto)) {
+                            window.location.href = doc.goto;
                         }
                         else {
-                            this.content.tabs = [newTab];
+                            this.transitionTo("openxpki", doc.goto);
                         }
                     }
+                    else if (doc.structure) {
+                        debug("openxpki/route - sendAjax response: \"structure\"");
+                        this.content.navEntries = doc.structure; this.updateNavEntryActiveState();
+                        this.content.user = doc.user;
+                        this.content.rtoken = doc.rtoken;
+                    }
+                    else {
+                        if (doc.page && doc.main) {
+                            debug("openxpki/route - sendAjax response: \"page\" and \"main\"");
+                            this.content.tabs = [...this.content.tabs]; // copy tabs to not trigger change observers for now
+                            let newTab = {
+                                active: true,
+                                page: doc.page,
+                                main: doc.main,
+                                right: doc.right
+                            };
+                            if (targetElement === "modal") {
+                                this.content.modal = newTab;
+                            }
+                            else if (targetElement === "tab") {
+                                let tabs = this.content.tabs;
+                                tabs.setEach("active", false);
+                                tabs.pushObject(newTab);
+                            }
+                            else if (targetElement === "active") {
+                                let tabs = this.content.tabs;
+                                let index = tabs.indexOf(tabs.findBy("active"));
+                                tabs.replace(index, 1, [newTab]); // top
+                            }
+                            else {
+                                this.content.tabs = [newTab];
+                            }
+                        }
+                        this.loading = false;
+                    }
+                    return resolve(doc);
+                },
+                // FAILURE
+                () => {
                     this.loading = false;
+                    this.content.error = {
+                        message: "The server did not return JSON data as expected.\nMaybe your authentication session has expired."
+                    };
+                    return resolve({});
                 }
-                return resolve(doc);
-            }, (err) => {
-                this.loading = false;
-                this.content.error = {
-                    message: "The server did not return JSON data as expected.\nMaybe your authentication session has expired."
-                };
-                return resolve({});
-            });
+            );
         });
     }
 
