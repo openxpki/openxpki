@@ -2,6 +2,7 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { computed, action, set as emSet } from "@ember/object";
 import { equal, bool } from "@ember/object/computed";
+import { debug } from '@ember/debug';
 
 export default class OxifieldMainComponent extends Component {
     @equal("args.field.type", "bool") isBool;
@@ -62,7 +63,7 @@ export default class OxifieldMainComponent extends Component {
 
     @action
     onChange() {
-        console.warn("oxifield-main: onChange");
+        debug("oxifield-main: onChange");
         emSet(this.args.field, "error", null);
         this.args.fieldChanged(this.args.field);
     }

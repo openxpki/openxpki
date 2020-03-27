@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action, set } from "@ember/object";
+import { debug } from '@ember/debug';
 
 /**
 Shows a button with an optional confirm dialog.
@@ -51,7 +52,7 @@ export default class OxiButtonComponent extends Component {
 
     @action
     click() {
-        console.warn("oxi-button: click");
+        debug("oxi-button: click");
         if (this.args.button.confirm) {
             set(this.args.button, "loading", true);
             this.showConfirmDialog = true;

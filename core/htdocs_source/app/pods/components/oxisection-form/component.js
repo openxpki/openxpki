@@ -4,6 +4,7 @@ import { tracked } from '@glimmer/tracking';
 import { getOwner } from '@ember/application';
 import { copy } from '@ember/object/internals';
 import { isArray } from '@ember/array';
+import { debug } from '@ember/debug';
 
 export default class OxisectionFormComponent extends Component {
     @tracked loading = false;
@@ -89,7 +90,7 @@ export default class OxisectionFormComponent extends Component {
 
     @action
     fireActionOnChange(field) {
-        console.warn("oxisection-form: fireActionOnChange()", field);
+        debug("oxisection-form: fireActionOnChange()");
         if (!field.actionOnChange) { return }
 
         let fields = this.args.content.content.fields;
@@ -134,7 +135,7 @@ export default class OxisectionFormComponent extends Component {
 
     @action
     submit() {
-        console.warn("oxisection-form: submit", this.args.content);
+        debug("oxisection-form: submit");
         let fields = this.args.content.content.fields;
         let data = {
             action: this.args.content.action
@@ -157,7 +158,7 @@ export default class OxisectionFormComponent extends Component {
                 names.push(field.name);
             }
         }
-        console.warn("oxisection-form: isError = true");
+        debug("oxisection-form: isError = true");
         if (isError) { return }
         for (const name of names) {
             let clones = fields.filter(f => f.name === name);

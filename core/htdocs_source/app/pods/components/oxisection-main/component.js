@@ -1,5 +1,6 @@
 import Component from '@glimmer/component';
 import { action, set } from "@ember/object";
+import { debug } from '@ember/debug';
 
 export default class OxisectionMainComponent extends Component {
     get type() {
@@ -8,7 +9,7 @@ export default class OxisectionMainComponent extends Component {
 
     @action
     buttonClick(button) {
-        console.error("oxisection-main: buttonClick");
+        debug("oxisection-main: buttonClick");
         set(button, "loading", true);
         if (button.action) {
             return this.container.lookup("route:openxpki")

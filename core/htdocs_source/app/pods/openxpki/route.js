@@ -4,6 +4,7 @@ import { later, scheduleOnce, cancel } from '@ember/runloop';
 import { getOwner } from '@ember/application';
 import { Promise } from 'rsvp';
 import { set as emSet } from '@ember/object';
+import { debug } from '@ember/debug';
 
 class Content {
     @tracked page = null;
@@ -37,6 +38,7 @@ export default class OpenXpkiRoute extends Route {
     beforeModel(transition) {
         let queryParams = transition.to.queryParams;
         let modelId = transition.to.params.model_id;
+        debug("openxpki/route - beforeModel: model_id = " + modelId);
 
         // "force" is only evaluated above using "refreshModel: true"
         if (queryParams.force) {
@@ -95,7 +97,7 @@ export default class OpenXpkiRoute extends Route {
 
     sendAjax(data) {
         this.loading = true;
-
+        debug("openxpki/route - sendAjax: page = " + data.page);
         // assemble request parameters
         let req = {
             data: {

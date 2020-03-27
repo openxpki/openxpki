@@ -23,7 +23,6 @@ export default class OxifieldPasswordverifyComponent extends Component {
 
     @action
     setValues() {
-        console.log(this.password, this.confirm);
         // do passwords match?
         set(this.args.content, "value", this.password === this.confirm ? this.password : null);
         if (this.password !== this.confirm) {

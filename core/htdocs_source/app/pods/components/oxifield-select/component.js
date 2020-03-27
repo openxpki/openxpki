@@ -2,6 +2,7 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action, computed, set } from "@ember/object";
 import { next } from '@ember/runloop'
+import { debug } from '@ember/debug';
 
 export default class OxifieldSelectComponent extends Component {
     @tracked customMode = false;
@@ -69,7 +70,7 @@ export default class OxifieldSelectComponent extends Component {
 
     @action
     optionSelected(value, label) {
-        console.warn("oxifield-select: optionSelected", value);
+        debug("oxifield-select: optionSelected(" + value + ")");
         set(this.args.content, "value", value);
         this.args.onChange();
     }
