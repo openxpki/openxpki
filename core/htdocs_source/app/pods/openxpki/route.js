@@ -7,6 +7,7 @@ import { set as emSet } from '@ember/object';
 import { debug } from '@ember/debug';
 
 class Content {
+    @tracked user = null;
     @tracked page = null;
     @tracked ping = null;
     @tracked refresh = null;
