@@ -1,5 +1,6 @@
 import Component from '@ember/component';
 import moment from "moment";
+import $ from "jquery";
 
 const OxifieldDatetimeComponent = Component.extend({
     format: "DD.MM.YYYY HH:mm",
@@ -11,7 +12,7 @@ const OxifieldDatetimeComponent = Component.extend({
             this.set("content.pickvalue", moment.unix(value).utc().format(this.get("format")));
         }
         return Em.run.next(() => {
-            return this.$().find(".date").datetimepicker({
+            return $().find(".date").datetimepicker({
                 format: this.get("format")
             });
         });
@@ -19,7 +20,7 @@ const OxifieldDatetimeComponent = Component.extend({
     propagate: Em.observer("content.pickvalue", function() {
         if (this.get("content.pickvalue") && !this.get("content.value")) {
             this.set("content.pickvalue", moment().utc().format(this.get("format")));
-            this.$().find(".date").data("DateTimePicker").setDate(this.get("content.pickvalue"));
+            $().find(".date").data("DateTimePicker").setDate(this.get("content.pickvalue"));
         }
         let datetime;
         if (this.get("content.pickvalue") && this.get("content.pickvalue") !== "0") {

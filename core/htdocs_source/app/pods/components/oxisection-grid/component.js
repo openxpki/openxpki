@@ -1,4 +1,5 @@
 import Component from '@ember/component';
+import $ from "jquery";
 
 const OxisectionGridComponent = Component.extend({
     visibleColumns: Em.computed("content.content.columns", function() {
@@ -208,8 +209,8 @@ const OxisectionGridComponent = Component.extend({
     },
     initializeContextmenu: Em.on("didInsertElement", function() {
         var ref;
-        return (ref = this.$()) != null ? ref.find(".context").contextmenu({
-            target: this.$().find(".dropdown"),
+        return (ref = $()) != null ? ref.find(".context").contextmenu({
+            target: $().find(".dropdown"),
             onItem: () => {
                 return this.onItem.apply(this, arguments);
             }
@@ -283,7 +284,7 @@ const OxisectionGridComponent = Component.extend({
                 let clientX = event.clientX;
                 let clientY = event.clientY;
                 return Em.run.next(() => {
-                    return this.$(`tbody tr:nth-child(${index + 1})`).contextmenu("show", {currentTarget, clientX, clientY});
+                    return $(`tbody tr:nth-child(${index + 1})`).contextmenu("show", {currentTarget, clientX, clientY});
                 });
             }
         }

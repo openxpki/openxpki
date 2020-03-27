@@ -3,6 +3,7 @@ import { tracked } from '@glimmer/tracking';
 import { action, computed, set } from "@ember/object";
 import { next } from '@ember/runloop'
 import { debug } from '@ember/debug';
+import $ from "jquery";
 
 export default class OxifieldSelectComponent extends Component {
     @tracked customMode = false;
@@ -64,7 +65,7 @@ export default class OxifieldSelectComponent extends Component {
             }
         }
         next(this, () => {
-            this.$("input,select")[0].focus();
+            $("input,select")[0].focus();
         });
     }
 

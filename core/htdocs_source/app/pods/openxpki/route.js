@@ -5,6 +5,7 @@ import { getOwner } from '@ember/application';
 import { Promise } from 'rsvp';
 import { set as emSet } from '@ember/object';
 import { debug } from '@ember/debug';
+import $ from "jquery";
 
 class Content {
     @tracked user = null;

@@ -1,15 +1,16 @@
 import Component from '@ember/component';
+import $ from "jquery";
 
 const OxifieldCertIdentifierComponent = Component.extend({
     search: Em.computed(function() {
         return this.get("content.value");
     }),
     focusOut: function(evt) {
-        return this.$().find(".drowdown").removeClass("open");
+        return $().find(".drowdown").removeClass("open");
     },
     focusIn: function(evt) {
         if (this.get("searchResults.length")) {
-            return this.$().find(".drowdown").addClass("open");
+            return $().find(".drowdown").addClass("open");
         }
     },
     searchResults: Em.computed(function() {
@@ -61,7 +62,7 @@ const OxifieldCertIdentifierComponent = Component.extend({
             return;
         }
         if (search.length < 3) {
-            this.$().find(".drowdown").removeClass("open");
+            $().find(".drowdown").removeClass("open");
             return;
         }
         this.set("searchPrevious", search);
@@ -82,7 +83,7 @@ const OxifieldCertIdentifierComponent = Component.extend({
             if ((ref = doc[0]) != null) {
                 ref.active = true;
             }
-            return this.$().find(".drowdown").addClass("open");
+            return $().find(".drowdown").addClass("open");
         });
     }),
     actions: {
@@ -90,7 +91,7 @@ const OxifieldCertIdentifierComponent = Component.extend({
             this.set("content.value", res.value);
             this.set("searchPrevious", res.label);
             this.set("search", res.label);
-            this.$().find(".drowdown").removeClass("open");
+            $().find(".drowdown").removeClass("open");
             return this.set("searchResults", []);
         }
     }

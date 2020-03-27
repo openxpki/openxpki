@@ -1,4 +1,5 @@
 import Component from '@ember/component';
+import $ from "jquery";
 
 let TEXT_TYPES = [
     "application/pkcs8",
@@ -28,7 +29,7 @@ const OxifieldUploadComponent = Component.extend({
         if (this.get("canReadFile")) {
             let reader = new FileReader();
             reader.onload = (e) => {
-                return this.$().find("textarea").val(reader.result);
+                return $().find("textarea").val(reader.result);
             };
             let type = evt.target.files[0].type;
             if (/text\//.test(type) || TEXT_TYPES.indexOf(type) >= 0) {
@@ -42,7 +43,7 @@ const OxifieldUploadComponent = Component.extend({
                 let resultStr = body.textContent || body.innerText;
                 return this.set("content.value", JSON.parse(resultStr).result);
             };
-            let file = this.$().find("input[type=file]");
+            let file = $().find("input[type=file]");
             let fence = $("<div></div>");
             fence.insertAfter(file);
             let url = this.container.lookup("controller:config").get("url");

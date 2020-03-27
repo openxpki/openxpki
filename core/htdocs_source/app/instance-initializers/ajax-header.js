@@ -1,3 +1,5 @@
+import $ from "jquery";
+
 export const initialize = function(appInstance) {
     // appInstance.inject('route', 'foo', 'service:foo');
     return $.ajaxSetup({
