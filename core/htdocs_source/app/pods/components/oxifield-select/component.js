@@ -8,8 +8,9 @@ import $ from "jquery";
 export default class OxifieldSelectComponent extends Component {
     @tracked customMode = false;
 
-    @computed("content.{options,prompt,is_optional}")
+    @computed("args.content.{options,prompt,is_optional}")
     get options() {
+        debug("oxifield-select (" + this.args.content.name + "): options");
         var options, prompt, ref;
         prompt = this.args.content.prompt;
         if (!prompt && this.args.content.is_optional) {
@@ -23,12 +24,11 @@ export default class OxifieldSelectComponent extends Component {
         }
     }
 
-    @computed("content.{options,editable,is_optional}")
+    @computed("args.content.{options,editable,is_optional}")
     get isStatic() {
-        var isEditable, isOptional, options;
-        options = this.args.content.options;
-        isEditable = this.args.content.editable;
-        isOptional = this.args.content.is_optional;
+        let options = this.args.content.options;
+        let isEditable = this.args.content.editable;
+        let isOptional = this.args.content.is_optional;
         if (options.length === 1 && !isEditable && !isOptional) {
             // FIXME side effect of setting value - move somewhere else
             set(this.args.content, "value", this.options[0].value);
@@ -38,7 +38,7 @@ export default class OxifieldSelectComponent extends Component {
         }
     }
 
-    @computed("options", "content.value")
+    @computed("options", "args.content.value")
     get isCustomValue() {
         let values = this.options.map(o => o.value);
         let isCustom = values.indexOf[this.args.content.value] < 0;
@@ -46,8 +46,10 @@ export default class OxifieldSelectComponent extends Component {
         return isCustom;
     }
 
-    @computed("content.value")
+    // no computed value - no need to refresh later on
+    // (and making it computed causes strange side effects when optionSelected() is triggered)
     get sanitizedValue() {
+        debug("oxifield-select (" + this.args.content.name + "): sanitizedValue(" + this.args.content.value + ")");
         var value = this.args.content.value;
         if (typeof value === "string") return value;
 
@@ -71,7 +73,7 @@ export default class OxifieldSelectComponent extends Component {
 
     @action
     optionSelected(value, label) {
-        debug("oxifield-select: optionSelected(" + value + ")");
+        debug("oxifield-select (" + this.args.content.name + "): optionSelected(" + value + ")");
         set(this.args.content, "value", value);
         this.args.onChange();
     }
