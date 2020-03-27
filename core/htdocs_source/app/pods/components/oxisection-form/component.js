@@ -8,14 +8,18 @@ import { debug } from '@ember/debug';
 
 export default class OxisectionFormComponent extends Component {
     @tracked loading = false;
+    @tracked _fields = [];
+
+    constructor() {
+        super(...arguments);
+        this.fields = this.args.content.content.fields;
+    }
 
     get submitLabel() {
         return this.args.content.content.submit_label || "send";
     }
 
-    @computed("args.content.content.fields")
-    get fields() {
-        let fields = this.args.content.content.fields;
+    set fields(fields) {
         for (const f of fields) {
             if (typeof f.placeholder === "undefined") {
                 f.placeholder = "";
@@ -55,10 +59,14 @@ export default class OxisectionFormComponent extends Component {
                 field.value = field.value.value;
             }
         }
-        return fields;
+        this._fields = fields;
     }
 
-    @computed("fields")
+    get fields() {
+        return this._fields;
+    }
+
+    @computed("_fields")
     get visibleFields() {
         return this.fields.filter(f => f.type !== "hidden");
     }
@@ -70,7 +78,7 @@ export default class OxisectionFormComponent extends Component {
 
     @action
     addClone(field) {
-        let fields = this.args.content.content.fields;
+        let fields = this.fields;
         let index = fields.indexOf(field);
         let copy = copy(field);
         copy.value = "";
@@ -79,7 +87,7 @@ export default class OxisectionFormComponent extends Component {
 
     @action
     delClone(field) {
-        let fields = this.args.content.content.fields;
+        let fields = this.fields;
         let index = fields.indexOf(field);
         return fields.removeAt(index);
     }
@@ -94,7 +102,7 @@ export default class OxisectionFormComponent extends Component {
             _sourceField: field.name
         };
 
-        let fields = this.args.content.content.fields;
+        let fields = this.fields;
         // build list of unique field names
         let names = [];
         for (const fld of fields) {
@@ -117,7 +125,8 @@ export default class OxisectionFormComponent extends Component {
                 for (const oldField of fields) {
                     if (oldField.name === newField.name) {
                         let idx = fields.indexOf(oldField);
-                        fields.replace(idx, 1, [copy(newField)]);
+                        fields[idx] = newField;
+                        this.fields = fields;
                     }
                 }
             }
@@ -135,7 +144,7 @@ export default class OxisectionFormComponent extends Component {
     @action
     submit() {
         debug("oxisection-form: submit");
-        let fields = (this.args.content.content.fields || []);
+        let fields = (this.fields || []);
         let data = {
             action: this.args.content.action
         };
