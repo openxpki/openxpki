@@ -27,6 +27,15 @@ export default class TestController extends Controller {
                     ],
                 },
                 {
+                    type: "select",
+                    name: "test_select_2",
+                    label: "Only one choice",
+                    options: [
+                        { value: "", label: "The Void" },
+                    ],
+                    value: "",
+                },
+                {
                     type: "password",
                     name: "pwd",
                     label: "Password",
