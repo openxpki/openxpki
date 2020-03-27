@@ -1,5 +1,6 @@
 import Component from '@glimmer/component';
 import { action } from "@ember/object";
+import { debug } from '@ember/debug';
 /**
 Shows a drop-down list of options.
 
@@ -23,17 +24,19 @@ The callback is also called initially to set the value of the first list item.
 export default class OxiSelectComponent extends Component {
     @action
     listChanged(event) {
-        this.notifyOnChange(this.args.list[event.target.selectedIndex]);
+        this.notifyOnChange(event.target.selectedIndex);
     }
 
     // initially trigger the onChange event to handle the case
     // when the calling code has no "current selection" defined.
     @action
     startup(element) {
-        this.notifyOnChange(this.args.list[element.selectedIndex]);
+        this.notifyOnChange(element.selectedIndex);
     }
 
-    notifyOnChange(item) {
+    notifyOnChange(index) {
+        let item = this.args.list[index];
+        debug("oxi-select: notifyOnChange(" + item.value + ")");
         if (typeof this.args.onChange !== "function") {
             console.error("<OxiSelect>: Wrong type parameter type for @onChange. Expected: function, given: " + (typeof this.args.onChange));
             return;
