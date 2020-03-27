@@ -115,6 +115,7 @@ sub mock_request {
 
     my $self = shift;
     my $data = shift;
+    my $follow = shift || 0;
 
     if (exists $data->{wf_token} && !$data->{wf_token}) {
         $data->{wf_token} = $self->wf_token();
@@ -169,15 +170,21 @@ sub mock_request {
         return $res->content;
     }
 
-    my $json = $self->json()->decode( $res->content );
-    if (ref $json->{main} && $json->{main}->[0]->{content}->{fields}) {
-        map {  $self->wf_token($_->{value}) if ($_->{name} eq 'wf_token') } @{$json->{main}->[0]->{content}->{fields}};
-    }
-
     if (my $cookie = $res->header('Set-Cookie')) {
         if ($cookie =~ /oxisess-webui=([^;]+);/) {
             $self->session_id($1);
         }
+    }
+
+    my $json = $self->json()->decode( $res->content );
+
+    if ($json->{goto} && $follow) {
+        $self->logger()->debug( 'Got redirect and follow is set: ' . $json->{goto} );
+        return $self->mock_request({ page => $json->{goto} });
+    }
+
+    if (ref $json->{main} && $json->{main}->[0]->{content}->{fields}) {
+        map {  $self->wf_token($_->{value}) if ($_->{name} eq 'wf_token') } @{$json->{main}->[0]->{content}->{fields}};
     }
 
     $self->last_result($json);
