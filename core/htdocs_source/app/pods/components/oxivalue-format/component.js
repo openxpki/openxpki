@@ -2,17 +2,6 @@ import $ from "jquery";
 import Component from '@ember/component';
 import types from "./types";
 
-// see e524296ba39db2606d3cdb7f5bb83985ea51ec1d
-jQuery.extend(jQuery.expr[':'], {
-    cleanup: function(el) {
-        let names = el.attributes
-            .filter(attr => (/^on/.test(attr.nodeName) || /javascript/.test(attr.value)))
-            .map(attr => attr.nodeName);
-        for (const name of names) { el.removeAttribute(name) }
-        return true;
-    }
-});
-
 const OxivalueFormatComponent = Component.extend({
     onAnchorClick: Em.on("click", function(evt) {
         let target = evt.target;
@@ -27,11 +16,18 @@ const OxivalueFormatComponent = Component.extend({
     }),
     types: types,
     formatedValue: Em.computed("content.format", "content.value", function() {
-        let e = this.get("types")[this.get("content.format") || "text"](this.get("content.value"));
-        let $el = $('<div/>');
-        $el.html(e).find(':cleanup');
-        $el.find('script').remove();
-        return $el.html();
+        let htmlStr = this.get("types")[this.get("content.format") || "text"](this.get("content.value"));
+        let el = $('<div/>');
+        // cleanup: remove all 'onXXX=' and 'javascript=' attributes and <script> elements
+        el.html(htmlStr).find('*').each(function() {
+            if (!$(this).attributes) return;
+            let toStrip = $(this).attributes
+                .filter(attr => (/^on/.test(attr.nodeName) || /javascript/.test(attr.value)))
+                .map(attr => attr.nodeName);
+            for (const name of toStrip) { $(this).removeAttribute(name) }
+        });
+        el.find('script').remove();
+        return el.html();
     })
 });
 
