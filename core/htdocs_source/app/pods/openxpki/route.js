@@ -18,6 +18,7 @@ class Content {
     @tracked tabs = [];
     @tracked navEntries = [];
     @tracked error = null;
+    @tracked isLoading = false;
 }
 
 export default class OpenXpkiRoute extends Route {
@@ -33,7 +34,6 @@ export default class OpenXpkiRoute extends Route {
     needReboot = ["login", "logout", "login!logout", "welcome"];
 
     @tracked content = new Content();
-    @tracked loading = false;
 
     // Reserved Ember function "beforeModel"
     beforeModel(transition) {
@@ -94,7 +94,7 @@ export default class OpenXpkiRoute extends Route {
     }
 
     sendAjax(data) {
-        this.loading = true;
+        this.content.isLoading = true;
         debug("openxpki/route - sendAjax: page = " + data.page);
         // assemble request parameters
         let req = {
@@ -186,13 +186,13 @@ export default class OpenXpkiRoute extends Route {
                                 this.content.tabs = [newTab];
                             }
                         }
-                        this.loading = false;
+                        this.content.isLoading = false;
                     }
                     return resolve(doc);
                 },
                 // FAILURE
                 () => {
-                    this.loading = false;
+                    this.content.isLoading = false;
                     this.content.error = {
                         message: "The server did not return JSON data as expected.\nMaybe your authentication session has expired."
                     };

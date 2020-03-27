@@ -1,4 +1,5 @@
 import Controller from '@ember/controller';
+import { tracked } from '@glimmer/tracking';
 import { computed, observer, action } from '@ember/object';
 import { gt } from '@ember/object/computed';
 
@@ -16,6 +17,8 @@ export default class OpenXpkiController extends Controller {
     count = null;
     startat = null;
     limit = null;
+
+    @tracked loading = false;
 
     @computed("model.status.{level,message}")
     get statusClass() {

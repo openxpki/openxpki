@@ -125,27 +125,14 @@ div.header {
   }
 }
 
-div.refresh,
-div.loading {
-  opacity: 0;
-  visibility: hidden;
-
-  transition: opacity 0.75s;
-
-  &.in-progress {
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.1s;
-  }
-
-  div.progress {
-    position: fixed;
-    top: 30px;
-    right: 20px;
-    width: 100px;
-    div.progress-bar {
-      width: 100%;
-    }
+.refresh.progress,
+.loading.progress {
+  position: fixed;
+  top: 30px;
+  right: 20px;
+  width: 100px;
+  .progress-bar {
+    width: 100%;
   }
 }
 
