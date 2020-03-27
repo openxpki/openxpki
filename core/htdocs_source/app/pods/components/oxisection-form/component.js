@@ -13,6 +13,7 @@ export default class OxisectionFormComponent extends Component {
         return this.args.content.content.submit_label || "send";
     }
 
+    @computed("args.content.content.fields")
     get fields() {
         let fields = this.args.content.content.fields;
         for (const f of fields) {
@@ -57,14 +58,9 @@ export default class OxisectionFormComponent extends Component {
         return fields;
     }
 
+    @computed("fields")
     get visibleFields() {
-        let results = [];
-        for (const f of this.fields) {
-            if (f.type !== "hidden") {
-                results.push(f);
-            }
-        }
-        return results;
+        return this.fields.filter(f => f.type !== "hidden");
     }
 
     @action
