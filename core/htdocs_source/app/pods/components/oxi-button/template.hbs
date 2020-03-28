@@ -5,7 +5,9 @@
         href="{{@button.href}}"
         target="{{@button.target}}"
     >
-        <BsTooltip @title={{@button.tooltip}}/>
+        {{#if @button.tooltip}}
+            <BsTooltip @title={{@button.tooltip}}/>
+        {{/if}}
         {{@button.label}}
     </a>
 {{else}}
@@ -16,7 +18,9 @@
         @onClick={{this.click}}
         disabled={{@button.disabled}}
     >
-        <BsTooltip @title={{@button.tooltip}}/>
+        {{#if @button.tooltip}}
+            <BsTooltip @title={{@button.tooltip}}/>
+        {{/if}}
         {{@button.label}}
     </BsButton>
 
