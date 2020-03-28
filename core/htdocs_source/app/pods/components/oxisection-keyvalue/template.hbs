@@ -7,11 +7,11 @@
                     <th colspan="2">{{item.value}}</th>
                 {{else}}
                     <td>{{item.label}}</td>
-                    <td>{{oxivalue-format content=item}}</td>
+                    <td><OxivalueFormat @content={{item}}/></td>
                 {{/if}}
                 </tr>
             {{/each}}
         </tbody>
     </table>
-    {{oxi-button-container buttons=this.content.content.buttons buttonClick="buttonClick"}}
+    <OxiButtonContainer @buttons={{@content.content.buttons}} @buttonClick={{@buttonClick}}/>
 {{/if}}
