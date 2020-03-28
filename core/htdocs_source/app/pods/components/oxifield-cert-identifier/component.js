@@ -1,100 +1,110 @@
-import Component from '@ember/component';
-import $ from "jquery";
+import Component from '@glimmer/component';
+import { tracked  } from '@glimmer/tracking';
+import { action, computed, set } from '@ember/object';
+import { getOwner } from '@ember/application';
 
-const OxifieldCertIdentifierComponent = Component.extend({
-    search: Em.computed(function() {
-        return this.get("content.value");
-    }),
-    focusOut: function(evt) {
-        return $().find(".drowdown").removeClass("open");
-    },
-    focusIn: function(evt) {
-        if (this.get("searchResults.length")) {
-            return $().find(".drowdown").addClass("open");
-        }
-    },
-    searchResults: Em.computed(function() {
-        return [];
-    }),
-    selectNeighbor: function(diff) {
-        let results = this.get("searchResults");
-        if (!results.length) {
-            return;
-        }
+export default class OxifieldCertIdentifierComponent extends Component {
+    /*
+     * Note: the search input field is two-fold:
+     * If a cert identifier is entered manually, it's value equals the
+     * value that is submitted.
+     * If an entry from the drop-down list is chosen, then it shows
+     * the certificate subject but not the true form value to be submitted.
+     */
+    @tracked search = null;
+    @tracked isDropdownOpen = false;
+    @tracked searchResults = [];
+    searchIndex = 0;
+    searchPrevious = null;
+
+    constructor() {
+        super(...arguments);
+        // do not turn "search" into a @computed property as we want the search field
+        // to show the cert subject in case of a selection from the auto-suggest dropdown
+        this.search = this.args.content.value;
+    }
+
+    selectNeighbor(diff) {
+        let results = this.searchResults;
+        if (!results.length) { return }
         let a = results.findBy("active", true);
-        Em.set(a, "active", false);
+        set(a, "active", false);
         let index = (results.indexOf(a) + diff + results.length) % results.length;
         a = results[index];
-        return Em.set(a, "active", true);
-    },
-    keyboardNavigation: Em.on("keyDown", function(e) {
-        if (e.keyCode === 13) {
-            let results = this.get("searchResults");
+        return set(a, "active", true);
+    }
+
+    @action
+    onKeydown(evt) {
+        if (evt.keyCode === 13) {
+            let results = this.searchResults;
             let a = results.findBy("active", true);
             if (a) {
-                this.send("selectResult", a);
+                this.selectResult(a);
             }
-            e.stopPropagation();
-            return e.preventDefault();
-        } else if (e.keyCode === 9) {
-            return this.set("seatchResults", []);
-        } else if (e.keyCode === 38) {
+            evt.stopPropagation(); evt.preventDefault();
+        }
+        else if (evt.keyCode === 38) {
             this.selectNeighbor(-1);
-            e.stopPropagation();
-            return e.preventDefault();
-        } else if (e.keyCode === 40) {
+            evt.stopPropagation(); evt.preventDefault();
+        }
+        else if (evt.keyCode === 40) {
             this.selectNeighbor(1);
-            e.stopPropagation();
-            return e.preventDefault();
-        }
-    }),
-    mouseDown: function(evt) {
-        if (evt.target.tagName === "INPUT") {
-            return;
-        }
-        evt.stopPropagation();
-        return evt.preventDefault();
-    },
-    searchIndex: 0,
-    searchChanged: Em.observer("search", function() {
-        let search = this.get("search");
-        if (search === this.get("searchPrevious")) {
-            return;
-        }
-        if (search.length < 3) {
-            $().find(".drowdown").removeClass("open");
-            return;
-        }
-        this.set("searchPrevious", search);
-        this.set("content.value", search);
-        let searchIndex = this.incrementProperty("searchIndex");
-        return this.container.lookup("route:openxpki").sendAjax({
-            action: "certificate!autocomplete",
-            query: search
-        }).then((doc) => {
-            if (searchIndex !== this.get("searchIndex")) {
-                return;
-            }
-            if (doc.error) {
-                doc = [];
-            }
-            this.set("searchResults", doc);
-            let ref;
-            if ((ref = doc[0]) != null) {
-                ref.active = true;
-            }
-            return $().find(".drowdown").addClass("open");
-        });
-    }),
-    actions: {
-        selectResult: function(res) {
-            this.set("content.value", res.value);
-            this.set("searchPrevious", res.label);
-            this.set("search", res.label);
-            $().find(".drowdown").removeClass("open");
-            return this.set("searchResults", []);
+            evt.stopPropagation(); evt.preventDefault();
         }
     }
-});
 
-export default OxifieldCertIdentifierComponent;
+    @action
+    onFocus(evt) {
+        if (this.searchResults.length) { this.isDropdownOpen = true }
+    }
+
+    @action
+    onBlur(evt) {
+        this.isDropdownOpen = false;
+    }
+
+    @action
+    onMouseDown(evt) {
+        if (evt.target.tagName === "INPUT") { return }
+        evt.stopPropagation(); evt.preventDefault();
+    }
+
+    @action
+    onInput(evt) {
+        console.log(evt.target);
+        this.search = evt.target.value;
+
+        if (this.search === this.searchPrevious) { return }
+        if (this.search.length < 3) { this.isDropdownOpen = false; return }
+        this.searchPrevious = this.search;
+
+        set(this.args.content, "value", this.search);
+        this.args.onChange();
+
+        let searchIndex = ++this.searchIndex;
+        return getOwner(this).lookup("route:openxpki").sendAjax({
+            action: "certificate!autocomplete",
+            query: this.search
+        }).then((doc) => {
+            // only show results of most recent search
+            if (searchIndex !== this.searchIndex) { return }
+            if (doc.error) { doc = [] }
+            this.searchResults = doc;
+            if (doc[0] != null) {
+                doc[0].active = true;
+            }
+            this.isDropdownOpen = true;
+        });
+    }
+
+    @action
+    selectResult(res) {
+        set(this.args.content, "value", res.value);
+        this.args.onChange();
+        this.search = res.label;
+        this.searchPrevious = this.search;
+        this.isDropdownOpen = false;
+        this.searchResults = [];
+    }
+}

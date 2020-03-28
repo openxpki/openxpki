@@ -1,5 +1,17 @@
-<div class="drowdown">
-    {{input class="form-control" value=this.search placeholder=this.content.placeholder}}
+<div
+    {{on "keydown" this.onKeydown}}
+    {{on "mousedown" this.onMouseDown}}
+    class={{if this.isDropdownOpen "open"}}
+>
+    <input
+        type="text"
+        class="form-control"
+        value={{this.search}}
+        placeholder={{@content.placeholder}}
+        {{on "input" this.onInput}}
+        {{on "focus" this.onFocus}}
+        {{on "blur" this.onBlur}}
+    />
     <ul class="dropdown-menu" role="menu">
         {{#each this.searchResults as |result|}}
             <li class="{{if result.active "active"}}">
