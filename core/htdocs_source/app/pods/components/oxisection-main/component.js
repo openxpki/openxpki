@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
 import { action, set } from "@ember/object";
 import { debug } from '@ember/debug';
+import { getOwner } from '@ember/application';
 
 export default class OxisectionMainComponent extends Component {
     get type() {
@@ -12,12 +13,12 @@ export default class OxisectionMainComponent extends Component {
         debug("oxisection-main: buttonClick");
         set(button, "loading", true);
         if (button.action) {
-            return this.container.lookup("route:openxpki")
+            getOwner(this).lookup("route:openxpki")
             .sendAjax({ action: button.action })
             .finally(() => set(button, "loading", false));
         }
         else {
-            return this.container.lookup("route:openxpki").transitionTo("openxpki", button.page);
+            getOwner(this).lookup("route:openxpki").transitionTo("openxpki", button.page);
         }
     }
 }

@@ -1,5 +1,6 @@
-import $ from "jquery";
 import Component from '@ember/component';
+import { getOwner } from '@ember/application';
+import $ from "jquery";
 import types from "./types";
 
 const OxivalueFormatComponent = Component.extend({
@@ -8,7 +9,7 @@ const OxivalueFormatComponent = Component.extend({
         if (target.tagName === "A" && target.target !== "_blank") {
             evt.stopPropagation();
             evt.preventDefault();
-            return this.container.lookup("route:openxpki").sendAjax({
+            getOwner(this).lookup("route:openxpki").sendAjax({
                 page: target.href.split("#")[1].replace(/\/openxpki\//, ""),
                 target: target.target,
             });

@@ -1,4 +1,5 @@
 import Component from '@ember/component';
+import { getOwner } from '@ember/application';
 import $ from "jquery";
 
 let TEXT_TYPES = [
@@ -46,8 +47,8 @@ const OxifieldUploadComponent = Component.extend({
             let file = $().find("input[type=file]");
             let fence = $("<div></div>");
             fence.insertAfter(file);
-            let url = this.container.lookup("controller:config").get("url");
-            let rtoken = this.container.lookup("route:openxpki").get("source.rtoken");
+            let url = getOwner(this).lookup("controller:config").get("url");
+            let rtoken = getOwner(this).lookup("route:openxpki").get("source.rtoken");
             let form = $(`<form method='post'
                 enctype='multipart/form-data'
                 action='${url}'

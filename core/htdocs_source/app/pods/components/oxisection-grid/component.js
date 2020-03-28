@@ -1,4 +1,5 @@
 import Component from '@ember/component';
+import { getOwner } from '@ember/application';
 import $ from "jquery";
 
 /**
@@ -214,7 +215,7 @@ const OxisectionGridComponent = Component.extend({
         if (action.target === "_blank") {
             return window.location.href = path;
         } else {
-            return this.container.lookup("route:openxpki").sendAjax({
+            return getOwner(this).lookup("route:openxpki").sendAjax({
                 page: path,
                 target: action.target
             });
@@ -242,7 +243,7 @@ const OxisectionGridComponent = Component.extend({
                 };
                 data[button.selection] = this.get("sortedData").filterBy("checked").getEach("originalData").getEach("" + index);
                 Em.set(button, "loading", true);
-                return this.container.lookup("route:openxpki").sendAjax(data)
+                return getOwner(this).lookup("route:openxpki").sendAjax(data)
                 .then(function() {
                     return Em.set(button, "loading", false);
                 });
@@ -262,7 +263,7 @@ const OxisectionGridComponent = Component.extend({
                 return;
             }
             let pager = this.get("pager");
-            return this.container.lookup("route:openxpki")
+            return getOwner(this).lookup("route:openxpki")
             .sendAjax({
                 page: pager.pagerurl,
                 limit: page.limit,

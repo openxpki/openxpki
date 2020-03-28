@@ -3,4 +3,4 @@
     <div class="description">{{{this.content.content.description}}}</div>
 {{/if}}
 
-{{component this.type content=@content buttonClick=(action "buttonClick")}}
+{{component this.type content=@content buttonClick=this.buttonClick}}
