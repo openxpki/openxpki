@@ -60,7 +60,7 @@ export default class OxifieldSelectComponent extends Component {
 
     @action
     toggleCustomMode() {
-        this.toggleProperty("customMode");
+        this.customMode = !this.customMode;
         if (!this.customMode) {
             if (this.isCustomValue) {
                 set(this.args.content, "value", this.options[0].value);
