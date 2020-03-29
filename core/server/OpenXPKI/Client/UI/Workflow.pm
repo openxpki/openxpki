@@ -260,14 +260,14 @@ sub init_context {
 
     $self->_page({
         label => 'I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL #' . $wf_info->{workflow}->{id},
-        className => 'modal-lg',
+        isLarge => 1,
     });
 
     my %buttons;
     %buttons = ( buttons => [{
         page => 'workflow!info!wf_id!'.$wf_info->{workflow}->{id},
         label => 'I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL',
-        className => 'btn-primary',
+        isPrimary => 1,
     }]) if ($view eq 'result');
 
     $self->add_section({
@@ -311,14 +311,14 @@ sub init_attribute {
 
     $self->_page({
         label => 'I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL #' . $wf_info->{workflow}->{id},
-        className => 'modal-lg',
+        isLarge => 1,
     });
 
     my %buttons;
     %buttons = ( buttons => [{
         page => 'workflow!info!wf_id!'.$wf_info->{workflow}->{id},
         label => 'I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL',
-        className => 'btn-primary',
+        isPrimary => 1,
     }]) if ($view eq 'result');
 
     $self->add_section({
@@ -372,7 +372,7 @@ sub init_info {
     my @buttons_handle = ({
         href => '#/openxpki/redirect!workflow!load!wf_id!'.$wf_info->{workflow}->{id},
         label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
-        className => 'btn-primary',
+        isPrimary => 1,
     });
 
     # The workflow info contains info about all control actions that
@@ -413,7 +413,7 @@ sub init_info {
         label => $label,
         shortlabel => $label,
         description => '',
-        className => 'modal-lg',
+        isLarge => 1,
     });
 
     #I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_LABEL
@@ -774,7 +774,7 @@ sub init_history {
     $self->_page({
         label => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_TITLE',
         description => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_DESCRIPTION',
-        className => 'modal-lg'
+        isLarge => 1,
     });
 
     my $workflow_history = $self->send_command_v2( 'get_workflow_history', { id => $id } );
@@ -783,7 +783,7 @@ sub init_history {
     %buttons = ( buttons => [{
         page => 'workflow!info!wf_id!'.$id,
         label => 'I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL',
-        className => 'btn-primary',
+        isPrimary => 1,
     }]) if ($view eq 'result');
 
     $self->logger()->trace( "dumper result: " . Dumper $workflow_history) if $self->logger->is_trace;
@@ -1060,7 +1060,7 @@ sub init_log {
 
     $self->_page({
         label => 'I18N_OPENXPKI_UI_WORKFLOW_LOG',
-        className => 'modal-lg'
+        isLarge => 1,
     });
 
     my $result = $self->send_command_v2( 'get_workflow_log', { id => $id } );
@@ -1069,7 +1069,7 @@ sub init_log {
     %buttons = ( buttons => [{
         page => 'workflow!info!wf_id!'.$id,
         label => 'I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL',
-        className => 'btn-primary',
+        isPrimary => 1,
     }]) if ($view eq 'result');
 
     $result = [] unless($result);
@@ -2174,7 +2174,7 @@ sub __render_from_workflow {
                 push @buttons_handle, {
                     href => '#/openxpki/redirect!workflow!load!wf_id!'.$wf_info->{workflow}->{id},
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
-                    className => 'btn-primary',
+                    isPrimary => 1,
                 };
             }
 

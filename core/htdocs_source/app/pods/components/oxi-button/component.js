@@ -22,7 +22,7 @@ The component has two modes:
 Mode 1 `<a href>`:
 ```javascript
 {
-    className: "btn-info",
+    isPrimary: 1,
     label: "Learn",                     // mandatory
     tooltip: "Just fyi",
     href: "https://www.openxpki.org",   // mandatory
@@ -32,7 +32,7 @@ Mode 1 `<a href>`:
 Mode 2 `<button>`:
 ```javascript
 {
-    className: "btn-info",
+    isPrimary: 0,
     label: "Move",                      // mandatory
     tooltip: "This should move it",
     disabled: false,

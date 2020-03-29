@@ -5,7 +5,7 @@ import { action, set } from "@ember/object";
 export default class TestController extends Controller {
     testButton = {
         label: "Button",
-        className: "btn-info",
+        isPrimary: 1,
         tooltip: "This should do it",
         disabled: false,
     };
@@ -49,7 +49,7 @@ export default class TestController extends Controller {
             buttons: [
                 {
                     label: "Link to external",
-                    className: "btn-info",
+                    isPrimary: 0,
                     tooltip: "Just fyi",
                     href: "https://www.openxpki.org",
                     target: "_blank",

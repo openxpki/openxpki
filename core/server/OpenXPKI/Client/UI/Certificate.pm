@@ -114,7 +114,7 @@ sub init_search {
         $preset = $result->{input};
     } else {
         foreach my $key (('subject','san')) {
-            if (my $val = $self->param($key)) { 
+            if (my $val = $self->param($key)) {
                 $preset->{$key} = $val;
             }
         }
@@ -576,9 +576,9 @@ sub init_detail {
         return;
     }
 
-    my $cert = $self->send_command_v2( 'get_cert', {  
-        identifier => $cert_identifier, 
-        format => 'DBINFO',  
+    my $cert = $self->send_command_v2( 'get_cert', {
+        identifier => $cert_identifier,
+        format => 'DBINFO',
         attribute => 'subject_%' }, 1);
 
     if (!$cert) {
@@ -784,7 +784,7 @@ sub init_text {
     $self->_page({
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL',
         shortlabel => $cert_identifier,
-        className => ($format ne 'PEM' ? 'modal-lg' : '')
+        isLarge => ($format ne 'PEM') ? 1 : 0,
     });
 
     $self->add_section({
@@ -1203,7 +1203,7 @@ sub action_search {
     my $verbose = {};
     foreach my $key (qw(subject issuer_dn)) {
         my $val = $self->param($key);
-        $self->logger()->trace("$key: $val"); 
+        $self->logger()->trace("$key: $val");
         if (defined $val && $val ne '') {
             $query->{$key} = '%'.$val.'%';
             $input->{$key} = $val;

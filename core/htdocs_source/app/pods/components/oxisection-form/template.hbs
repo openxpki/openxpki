@@ -23,7 +23,7 @@
                     </BsButton>
                 {{/if}}
                 {{#each @content.content.buttons as |btn|}}
-                    <OxiButton class="btn btn-default" @button={{btn}} @onClick={{this.buttonClick}}/>
+                    <OxiButton @button={{btn}} @onClick={{this.buttonClick}}/>
                 {{/each}}
 
             </div>

@@ -117,13 +117,13 @@
 
 {{#let this.model.modal as |popup|}}
     <BsModal
-        class="{{popup.page.className}}"
         @open={{popup}}
         @closeButton={{true}}
         @fade={{true}}
         @backdrop={{true}}
         @backdropClose={{false}}
         @onHidden={{action "clearPopupData"}}
+        @size={{if popup.page.isLarge "lg"}}
         as |Modal|
     >
         <Modal.header>
