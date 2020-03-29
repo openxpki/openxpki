@@ -8,7 +8,7 @@
             <OxiSelect @list={{this.options}} @selected={{this.sanitizedValue}} @onChange={{this.optionSelected}} />
         {{/if}}
         <span class="input-group-btn">
-            <BsButton @type="default" class="{{if this.customMode "active"}}" @onClick={{this.toggleCustomMode}}>
+            <BsButton @type="default" @active={{this.customMode}} @onClick={{this.toggleCustomMode}}>
                 Custom
             </BsButton>
         </span>
