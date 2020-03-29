@@ -1,4 +1,3 @@
-@import "ember-bootstrap/bootstrap";
 @import "./oxi.css";
 @import "./oxi-grid.css";
 
@@ -96,14 +95,13 @@ input.oxi-file-input:active::before {
 button.btn-loading {
   color: #fff;
   background-color: #428bca;
-  border-color: #357ebd;&:hover,
-  &:focus,
-  &:active,
-  &.active {
-    color: #fff;
-    background-color: #3276b1;
-    border-color: #285e8e;
-  }
+  border-color: #357ebd;
+}
+
+button.btn-loading:hover, button.btn-loading:focus, button.btn-loading:active, button.btn-loading.active {
+  color: #fff;
+  background-color: #3276b1;
+  border-color: #285e8e;
 }
 
 tr.has-action {
@@ -117,23 +115,23 @@ input.in-form-group {
 div.header {
   margin-top: 0;
   margin-bottom: 0;
-
-  div.userinfo {
-    font-size: small;
-    color: #aaa;
-    margin-top: 20px;
-  }
 }
 
-.refresh.progress,
-.loading.progress {
+div.header div.userinfo {
+  font-size: small;
+  color: #aaa;
+  margin-top: 20px;
+}
+
+.refresh.progress, .loading.progress {
   position: fixed;
   top: 30px;
   right: 20px;
   width: 100px;
-  .progress-bar {
-    width: 100%;
-  }
+}
+
+.refresh.progress .progress-bar, .loading.progress .progress-bar {
+  width: 100%;
 }
 
 div.waiting-for-ember {
@@ -143,22 +141,20 @@ div.waiting-for-ember {
 div.stacked-buttons {
   margin-top: 4px;
   margin-bottom: 4px;
+}
 
-  div.btn-bt-margin {
-    margin-top: 6px;
-    margin-bottom: 6px;
-  }
+div.stacked-buttons div.btn-bt-margin {
+  margin-top: 6px;
+  margin-bottom: 6px;
 }
 
 div.description {
   margin-bottom: 12px;
 }
 
-div.oxisection-grid {
-  th.sortable {
-    cursor: pointer;
-    -webkit-user-select: none;
-  }
+div.oxisection-grid th.sortable {
+  cursor: pointer;
+  -webkit-user-select: none;
 }
 
 span.pagination-label {
@@ -173,12 +169,11 @@ span.pagination-label {
   color: #000;
   text-shadow: 0 1px 0 #fff;
   opacity: 0.2;
+}
 
-  &:hover,
-  &:focus {
-    color: #000;
-    text-decoration: none;
-    cursor: pointer;
-    opacity: 0.5;
-  }
+.tab-close:hover, .tab-close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+  opacity: 0.5;
 }
