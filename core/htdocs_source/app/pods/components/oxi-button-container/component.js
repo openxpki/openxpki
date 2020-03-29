@@ -1,16 +1,10 @@
-import Component from '@ember/component';
+import Component from '@glimmer/component';
+import { computed } from '@ember/object';
 
-const OxiButtonContainerComponent = Component.extend({
-    classNameBindings: ["buttons:oxi-button-container"],
-    hasDescription: Em.computed("buttons.@each.description", function() {
-        var ref;
-        return (ref = this.get("buttons")) != null ? ref.isAny("description") : void 0;
-    }),
-    actions: {
-        click: function(button) {
-            return this.sendAction("buttonClick", button);
-        }
+export default class OxiButtonContainerComponent extends Component {
+    @computed("args.buttons.@each.description")
+    get hasDescription() {
+        let ref;
+        return (ref = this.args.buttons) != null ? ref.isAny("description") : void 0;
     }
-});
-
-export default OxiButtonContainerComponent;
+}

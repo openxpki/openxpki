@@ -1,40 +1,40 @@
-{{#if this.buttons}}
-    {{#if this.hasDescription}}
-        {{#each this.buttons as |btn|}}
-            <div class="row stacked-buttons">
-                {{#if btn.section}}
-                    <div class="col-xs-12">
-                        <strong>{{btn.section}}</strong>
-                    </div>
-                {{else}}
-                    <div class="col-xs-4">
-                        {{oxi-button button=btn class="btn btn-block btn-default" onClick=(action "click")}}
-                    </div>
-                    <div class="col-xs-8 btn-bt-margin">
-                        {{btn.description}}
-                    </div>
-                {{/if}}
-            </div>
-        {{/each}}
-    {{else}}
-        <div class="btn-group">
-            {{#each this.buttons as |btn|}}
-
-                {{#if btn.break_before}}
-                    <div class="spacer"></div>
-                {{/if}}
-
-                {{#if btn.section}}
-                    <!-- Section are not supported yet -->
-                {{else}}
-                    {{oxi-button button=btn class="btn btn-default" onClick=(action "click")}}
-                {{/if}}
-
-                {{#if btn.break_after}}
-                    <div class="spacer"></div>
-                {{/if}}
-
+{{#if @buttons}}
+    <div class="oxi-button-container">
+        {{#if this.hasDescription}}
+            {{#each @buttons as |btn|}}
+                <div class="row stacked-buttons">
+                    {{#if btn.section}}
+                        <div class="col-xs-12">
+                            <strong>{{btn.section}}</strong>
+                        </div>
+                    {{else}}
+                        <div class="col-xs-4">
+                            <OxiButton @button={{btn}} class="btn-block" @onClick={{@buttonClick}}/>
+                        </div>
+                        <div class="col-xs-8 btn-bt-margin">
+                            {{btn.description}}
+                        </div>
+                    {{/if}}
+                </div>
             {{/each}}
-        </div>
-    {{/if}}
+        {{else}}
+            <div class="btn-group">
+                {{#each @buttons as |btn|}}
+                    {{#if btn.break_before}}
+                        <div class="spacer"></div>
+                    {{/if}}
+
+                    {{#if btn.section}}
+                        <!-- Section are not supported yet -->
+                    {{else}}
+                        <OxiButton @button={{btn}} @onClick={{@buttonClick}}/>
+                    {{/if}}
+
+                    {{#if btn.break_after}}
+                        <div class="spacer"></div>
+                    {{/if}}
+                {{/each}}
+            </div>
+        {{/if}}
+    </div>
 {{/if}}

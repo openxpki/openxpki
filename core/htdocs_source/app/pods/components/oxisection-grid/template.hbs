@@ -67,4 +67,4 @@
 
 <PartialPagination @pager={{@content.content.pager}} @pages={{this.pages}} @pagesized={{this.pagesizes}}/>
 
-{{oxi-button-container buttons=this.content.content.buttons buttonClick="buttonClick"}}
+<OxiButtonContainer @buttons={{@content.content.buttons}} @buttonClick={{action "buttonClick"}}/>
