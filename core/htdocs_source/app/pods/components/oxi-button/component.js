@@ -22,7 +22,7 @@ The component has two modes:
 Mode 1 `<a href>`:
 ```javascript
 {
-    isPrimary: 1,
+    format: "primary",
     label: "Learn",                     // mandatory
     tooltip: "Just fyi",
     href: "https://www.openxpki.org",   // mandatory
@@ -32,7 +32,7 @@ Mode 1 `<a href>`:
 Mode 2 `<button>`:
 ```javascript
 {
-    isPrimary: 0,
+    format: "expected",
     label: "Move",                      // mandatory
     tooltip: "This should move it",
     disabled: false,
@@ -50,13 +50,12 @@ The `button` hash will be passed on to the handler as single parameter.
 
 // mapping of format codes to CSS classes applied to the button
 let format2css = {
+    primary:        "btn-primary",
     expected:       "oxi-btn-expected",
     failure:        "oxi-btn-failure",
     optional:       "oxi-btn-optional",
     alternative:    "oxi-btn-alternative",
     exceptional:    "oxi-btn-exceptional",
-    cancel:         "oxi-btn-cancel",
-    reset:          "oxi-btn-reset",
 };
 
 export default class OxiButtonComponent extends Component {
@@ -64,7 +63,17 @@ export default class OxiButtonComponent extends Component {
 
     @computed("args.button.format")
     get additionalCssClass() {
-        return format2css[this.args.button.format] ?? "";
+        if (!this.args.button.format) { return "" }
+        let cssClass = format2css[this.args.button.format];
+        if (cssClass === undefined) {
+            console.error(`oxi-button: button "${this.args.button.label}" has unknown format: "${this.args.button.format}"`);
+        }
+        return cssClass ?? "";
+    }
+
+    @computed("args.button.format")
+    get buttonType() {
+        return (this.args.button.format === "primary" ? "primary" : "default");
     }
 
     @action

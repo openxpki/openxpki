@@ -267,7 +267,7 @@ sub init_context {
     %buttons = ( buttons => [{
         page => 'workflow!info!wf_id!'.$wf_info->{workflow}->{id},
         label => 'I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL',
-        isPrimary => 1,
+        format => "primary",
     }]) if ($view eq 'result');
 
     $self->add_section({
@@ -318,7 +318,7 @@ sub init_attribute {
     %buttons = ( buttons => [{
         page => 'workflow!info!wf_id!'.$wf_info->{workflow}->{id},
         label => 'I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL',
-        isPrimary => 1,
+        format => "primary",
     }]) if ($view eq 'result');
 
     $self->add_section({
@@ -372,7 +372,7 @@ sub init_info {
     my @buttons_handle = ({
         href => '#/openxpki/redirect!workflow!load!wf_id!'.$wf_info->{workflow}->{id},
         label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
-        isPrimary => 1,
+        format => "primary",
     });
 
     # The workflow info contains info about all control actions that
@@ -783,7 +783,7 @@ sub init_history {
     %buttons = ( buttons => [{
         page => 'workflow!info!wf_id!'.$id,
         label => 'I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL',
-        isPrimary => 1,
+        format => "primary",
     }]) if ($view eq 'result');
 
     $self->logger()->trace( "dumper result: " . Dumper $workflow_history) if $self->logger->is_trace;
@@ -1069,7 +1069,7 @@ sub init_log {
     %buttons = ( buttons => [{
         page => 'workflow!info!wf_id!'.$id,
         label => 'I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL',
-        isPrimary => 1,
+        format => "primary",
     }]) if ($view eq 'result');
 
     $result = [] unless($result);
@@ -2174,7 +2174,7 @@ sub __render_from_workflow {
                 push @buttons_handle, {
                     href => '#/openxpki/redirect!workflow!load!wf_id!'.$wf_info->{workflow}->{id},
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
-                    isPrimary => 1,
+                    format => "primary",
                 };
             }
 
