@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action, set } from "@ember/object";
+import { action, computed, set } from "@ember/object";
 import { debug } from '@ember/debug';
 
 /**
@@ -47,8 +47,25 @@ Mode 2 `<button>`:
 @param { callback } onClick - Action handler to be called.
 The `button` hash will be passed on to the handler as single parameter.
 */
+
+// mapping of format codes to CSS classes applied to the button
+let format2css = {
+    expected:       "oxi-btn-expected",
+    failure:        "oxi-btn-failure",
+    optional:       "oxi-btn-optional",
+    alternative:    "oxi-btn-alternative",
+    exceptional:    "oxi-btn-exceptional",
+    cancel:         "oxi-btn-cancel",
+    reset:          "oxi-btn-reset",
+};
+
 export default class OxiButtonComponent extends Component {
     @tracked showConfirmDialog = false;
+
+    @computed("args.button.format")
+    get additionalCssClass() {
+        return format2css[this.args.button.format] ?? "";
+    }
 
     @action
     click() {

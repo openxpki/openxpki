@@ -1,7 +1,7 @@
 {{#if @button.href}}
     <a
         ...attributes
-        class="btn {{if @button.isPrimary "btn-primary" "btn-default"}}"
+        class="btn {{if @button.isPrimary "btn-primary" "btn-default"}} {{this.additionalCssClass}}"
         href="{{@button.href}}"
         target="{{@button.target}}"
     >
@@ -14,8 +14,8 @@
 
     <BsButton
         ...attributes
-        @type={{if @button.isPrimary "primary" "default"}}
-        class="{{if @button.loading "btn-loading"}}"
+        @type={{this.buttonType}}
+        class="{{if @button.loading "oxi-btn-loading"}} {{this.additionalCssClass}}"
         @onClick={{this.click}}
         disabled={{@button.disabled}}
     >

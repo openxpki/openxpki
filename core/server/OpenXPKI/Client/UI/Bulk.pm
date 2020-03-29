@@ -153,10 +153,6 @@ sub action_result {
     foreach my $btn (@{$spec->{buttons}}) {
         # Copy required to not change the data in the session!
         my %btn = %{$btn};
-        if ($btn{format}) {
-            $btn{className} = $btn{format};
-            delete $btn{format};
-        }
         push @buttons, \%btn;
     }
 

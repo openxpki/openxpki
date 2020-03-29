@@ -280,19 +280,20 @@ sub init_result {
             buttons => [
                 { label => 'I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM',
                   page => 'certificate!search!query!' .$queryid,
-                  className => 'expected'
+                  format => 'expected'
                 },
                 { label => 'I18N_OPENXPKI_UI_SEARCH_REFRESH',
                   page => 'redirect!certificate!result!id!' .$queryid,
-                  className => 'alternative' },
+                  format => 'alternative'
+                },
                 { label => 'I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH',
                   page => 'certificate!search',
-                  className => 'failure'
+                  format => 'failure'
                 },
                 { label => 'I18N_OPENXPKI_UI_SEARCH_EXPORT_RESULT',
                   href => $self->_client()->_config()->{'scripturl'} . '?page=certificate!export!id!'.$queryid,
                   target => '_blank',
-                  className => 'optional'
+                  format => 'optional'
                 },
             ]
         }

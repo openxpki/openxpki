@@ -90,6 +90,11 @@ label {
   padding:0px !important;
 }
 
+.table-bordered tr.spacer th {
+  padding-top:15px;
+  background-color: #eee;
+}
+
 /* Fix pointer on bootstrap navbars */
 ul.pagination li:not(.disabled) > a {
   cursor: pointer;
@@ -100,9 +105,9 @@ span.pagination-label {
   padding: 6px 0;
 }
 
-.table-bordered tr.spacer th {
-  padding-top:15px;
-  background-color: #eee;
+/* bootstrap-3-typeahead */
+.input-group .twitter-typeahead {
+  display: table-cell !important;
 }
 
 /******************************************************************************
@@ -278,10 +283,6 @@ input.in-form-group {
   margin-bottom: 15px;
 }
 
-.input-group .twitter-typeahead {
-  display: table-cell !important;
-}
-
 .oxi-no-input {
   padding-top: 6px;
 }
@@ -417,13 +418,13 @@ input.oxi-file-input:active::before {
   margin-bottom: 6px;
 }
 
-.btn-loading {
+.oxi-btn-loading {
   color: #fff;
   background-color: #428bca;
   border-color: #357ebd;
 }
 
-.btn-loading:hover, .btn-loading:focus, .btn-loading:active, .btn-loading.active {
+.oxi-btn-loading:hover, .oxi-btn-loading:focus, .oxi-btn-loading:active, .oxi-btn-loading.active {
   color: #fff;
   background-color: #3276b1;
   border-color: #285e8e;
@@ -446,26 +447,41 @@ input.oxi-file-input:active::before {
 }
 
 /* Button format from workflow defs */
-.oxi-button-container .btn.expected,
-.oxi-form-button button.btn.submit {
-  background-color: #c9e2b3;
+.oxi-btn-expected,
+.oxi-btn-expected:hover,
+.oxi-btn-expected:focus,
+.oxi-btn-submit,
+.oxi-btn-submit:hover,
+.oxi-btn-submit:focus {
+    background-color: #c9e2b3;
 }
 
-.oxi-button-container .btn.optional {
-  background-color: #e4e4da;
+.oxi-btn-optional,
+.oxi-btn-optional:hover,
+.oxi-btn-optional:focus {
+    background-color: #e4e4da;
 }
 
-.oxi-button-container .btn.failure,
-.oxi-form-button .btn.failure,
-.oxi-form-button .btn.cancel {
-  background-color: #e39f9f;
+.oxi-btn-failure,
+.oxi-btn-failure:hover,
+.oxi-btn-failure:focus,
+.oxi-btn-cancel,
+.oxi-btn-cancel:hover,
+.oxi-btn-cancel:focus {
+    background-color: #e39f9f;
 }
 
-.oxi-form-button .btn.reset,
-.oxi-button-container .btn.alternative {
-  background-color: #ffd78c;
+.oxi-btn-reset,
+.oxi-btn-reset:hover,
+.oxi-btn-reset:focus,
+.oxi-btn-alternative,
+.oxi-btn-alternative:hover,
+.oxi-btn-alternative:focus {
+    background-color: #ffd78c;
 }
 
-.oxi-button-container .btn.exceptional {
-  background-color: #79d1f3;
+.oxi-btn-exceptional,
+.oxi-btn-exceptional:hover,
+.oxi-btn-exceptional:focus {
+    background-color: #79d1f3;
 }

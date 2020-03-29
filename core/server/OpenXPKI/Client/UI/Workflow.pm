@@ -654,17 +654,17 @@ sub init_result {
 
         push @buttons, { label => 'I18N_OPENXPKI_UI_SEARCH_REFRESH',
             page => 'redirect!workflow!result!id!' .$queryid,
-            className => 'expected' };
+            format => 'expected' };
 
         push @buttons, {
             label => 'I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM',
             page => 'workflow!search!query!' .$queryid,
-            className => 'alternative',
+            format => 'alternative',
         } if ($result->{input});
 
         push @buttons,{ label => 'I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH',
             page => 'workflow!search',
-            className => 'failure'};
+            format => 'failure'};
     }
 
     $self->add_section({
@@ -1676,7 +1676,7 @@ sub action_bulk {
             buttons => [{
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RECHECK_BUTTON',
                 page => 'redirect!workflow!result!id!' .$queryid,
-                className => 'expected',
+                format => 'expected',
             }]
         }
     });
@@ -1784,7 +1784,7 @@ sub __render_from_workflow {
             push @buttons_handle, {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON',
                 action => 'workflow!handle!wf_token!'.$token->{value},
-                className => 'exceptional'
+                format => 'exceptional'
             }
         }
 
@@ -1793,7 +1793,7 @@ sub __render_from_workflow {
             push @buttons_handle, {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESUME_BUTTON',
                 action => 'workflow!handle!wf_token!'.$token->{value},
-                'className' => 'exceptional'
+                format => 'exceptional'
             };
         }
 
@@ -1802,7 +1802,7 @@ sub __render_from_workflow {
             push @buttons_handle, {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON',
                 action => 'workflow!handle!wf_token!'.$token->{value},
-                className => 'failure',
+                format => 'failure',
                 confirm => {
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_LABEL',
                     description => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_TEXT',
@@ -1899,9 +1899,9 @@ sub __render_from_workflow {
                 $desc = 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_DESCRIPTION';
 
                 @buttons = ({
-                    'page' => 'redirect!workflow!load!wf_id!'.$wf_info->{workflow}->{id},
-                    'label' => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_RECHECK_BUTTON',
-                    'className' => 'alternative'
+                    page => 'redirect!workflow!load!wf_id!'.$wf_info->{workflow}->{id},
+                    label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_RECHECK_BUTTON',
+                    format => 'alternative'
                 });
             } else {
                 $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED','error');
@@ -1916,16 +1916,16 @@ sub __render_from_workflow {
             @fields = ({
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL',
                     value => str2time($wf_info->{workflow}->{last_update}.' GMT'),
-                    'format' => 'timestamp'
+                    format => 'timestamp'
                 }, {
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_ACTION_RUNNING_LABEL',
                     value => ($wf_info->{activity}->{$wf_action}->{label} || $wf_action)
             });
 
             @buttons = ({
-                'page' => 'redirect!workflow!load!wf_id!'.$wf_info->{workflow}->{id},
-                'label' => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RECHECK_BUTTON',
-                'className' => 'alternative'
+                page => 'redirect!workflow!load!wf_id!'.$wf_info->{workflow}->{id},
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RECHECK_BUTTON',
+                format => 'alternative'
             });
 
             # we use the time elapsed to calculate the next update
@@ -2275,7 +2275,7 @@ sub __get_action_buttons {
                 confirm_label => 'I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_DIALOG_CONFIRM_BUTTON',
                 cancel_label => 'I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_DIALOG_CANCEL_BUTTON',
             };
-            $button{className} = 'failure';
+            $button{format} = 'failure';
         }
 
         if ($btnhint->{$wf_action}) {
@@ -2287,7 +2287,7 @@ sub __get_action_buttons {
                 }
             }
             if ($hint->{format}) {
-                $button{className} = $hint->{format};
+                $button{format} = $hint->{format};
             }
             if ($hint->{confirm}) {
                 $button{confirm} = {
@@ -2322,7 +2322,7 @@ sub __get_form_buttons {
         push @buttons, {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_CANCEL_BUTTON',
             action => 'workflow!select!wf_action!global_cancel!wf_id!'. $wf_info->{workflow}->{id},
-            className => 'cancel',
+            format => 'cancel',
             confirm => {
                 description => 'I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_CANCEL_DESCRIPTION',
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_CANCEL_LABEL',
@@ -2337,7 +2337,7 @@ sub __get_form_buttons {
         unshift @buttons, {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_RESET_BUTTON',
             page => 'redirect!workflow!load!wf_id!'.$wf_info->{workflow}->{id},
-            className => 'reset',
+            format => 'reset',
         };
     }
 
@@ -2346,7 +2346,7 @@ sub __get_form_buttons {
         push @buttons, {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON',
             action => 'workflow!handle!wf_token!'.$token->{value},
-            className => 'failure',
+            format => 'failure',
             confirm => {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_LABEL Fail Workflow',
                 description => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_TEXT',

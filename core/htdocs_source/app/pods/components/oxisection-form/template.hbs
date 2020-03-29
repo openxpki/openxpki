@@ -14,11 +14,11 @@
         {{/each}}
         <div class="form-group">
             <div class="col-md-offset-2 col-sm-7 oxi-form-button">
-                <BsButton @type="default" class="{{if this.loading "btn-loading"}} submit" @onClick={{this.submit}}>
+                <BsButton @type="default" class="{{if this.loading "oxi-btn-loading"}} oxi-btn-submit" @onClick={{this.submit}}>
                     {{this.submitLabel}}
                 </BsButton>
                 {{#if @content.content.reset_label}}
-                    <BsButton @type="default" class="reset" @onClick={{this.reset}}>
+                    <BsButton @type="default" class="oxi-btn-reset" @onClick={{this.reset}}>
                         {{@content.content.reset_label}}
                     </BsButton>
                 {{/if}}
