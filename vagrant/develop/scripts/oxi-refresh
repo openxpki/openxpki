@@ -117,9 +117,9 @@ sed -ri 's/^(\s*default_language:).*/\1 en_US/' /etc/openxpki/config.d/system/se
 #
 echo -e "\nCompilation and installation"
 echo -e "- synchronizing source code from host to $OXI_CORE_DIR"
-rsync -a --delete --exclude=.git/ /code-repo/core/                 $OXI_CORE_DIR      >$LOG 2>&1
-rsync -a --delete --exclude=.git/ /code-repo/core/server/cgi-bin/* /usr/lib/cgi-bin/  >$LOG 2>&1
-rsync -a --delete --exclude=.git/ /code-repo/core/server/htdocs/*  /var/www/openxpki/ >$LOG 2>&1
+rsync -a --delete --exclude=.git/ --exclude=node_modules/ /code-repo/core/                 $OXI_CORE_DIR      >$LOG 2>&1
+rsync -a --delete --exclude=.git/ --exclude=node_modules/ /code-repo/core/server/htdocs/*  /var/www/openxpki/ >$LOG 2>&1
+rsync -a --delete --exclude=.git/ /code-repo/core/server/cgi-bin/* /usr/lib/cgi-bin/                          >$LOG 2>&1
 test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/index.html
 
 # Set version so Makefile.PL does not need "vergen" (which we will not copy to $OXI_CORE_DIR)
