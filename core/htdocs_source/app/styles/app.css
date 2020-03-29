@@ -1,6 +1,325 @@
-@import "./oxi.css";
-@import "./oxi-grid.css";
+/******************************************************************************
+ * Header, page structure, basic elements
+ */
+html,
+body {
+  height: 100%;
+  /* The html and body elements cannot have any padding or margin. */
+}
 
+/* Wrapper for page content to push down footer */
+body > .ember-view {
+  height: 100%;
+}
+
+#application {
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  /* Negative indent footer by its height */
+  margin: 0 auto -60px;
+  /* Pad bottom by footer height */
+  padding: 0 0 60px;
+}
+
+/* Set the fixed height of the footer here */
+#footer {
+  height: 60px;
+  padding-top: 20px;
+  background-color: #f5f5f5;
+}
+
+.header {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.toplogo {
+  padding-top:6px;
+  padding-right:12px;
+}
+
+.header .userinfo {
+  font-size: small;
+  color: #aaa;
+  margin-top: 20px;
+}
+
+label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.description {
+  margin-bottom: 12px;
+}
+
+.tab-close {
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1;
+  color: #000;
+  text-shadow: 0 1px 0 #fff;
+  opacity: 0.2;
+}
+
+.tab-close:hover, .tab-close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+.modal-header + .modal-body h3 {
+  margin-top:5px;
+}
+
+.navbar {
+  margin-bottom:10px;
+}
+
+.maincontent {
+  margin-bottom:300px;
+}
+
+.container.sections {
+  padding-top:20px;
+}
+
+.section {
+  padding:0px !important;
+}
+
+/* Fix pointer on bootstrap navbars */
+ul.pagination li:not(.disabled) > a {
+  cursor: pointer;
+}
+
+span.pagination-label {
+  float: left;
+  padding: 6px 0;
+}
+
+.table-bordered tr.spacer th {
+  padding-top:15px;
+  background-color: #eee;
+}
+
+/******************************************************************************
+ * Loading indicators
+ */
+.refresh.progress, .loading.progress {
+  position: fixed;
+  top: 30px;
+  right: 20px;
+  width: 100px;
+}
+
+.refresh.progress .progress-bar, .loading.progress .progress-bar {
+  width: 100%;
+}
+
+.waiting-for-ember {
+  margin-top: 80px;
+}
+
+/******************************************************************************
+ * Breadcrumbs
+ */
+.oxi-pagehead ol.breadcrumb {
+  margin:10px 0 0 0;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  list-style: none inside;
+  color: #a0a0a0;
+}
+
+ol.breadcrumb > li + li:before {
+  color: #a0a0a0;
+}
+
+.oxi-pagehead ol.breadcrumb + h2 {
+  margin-top:10px;
+}
+
+ol.breadcrumb .workflow-type:before {
+  padding-right: 5px;
+  font-family: "Glyphicons Halflings";
+  content: "\e136";
+  color: #a0a0a0;
+}
+
+ol.breadcrumb .workflow-state:before {
+  padding-right: 5px;
+  font-family: "Glyphicons Halflings";
+  content: "\e062";
+  color: #a0a0a0;
+}
+
+ol.breadcrumb .workflow-search:before,
+ol.breadcrumb .cert-search:before {
+  padding-right: 5px;
+  font-family: "Glyphicons Halflings";
+  content: "\e003";
+  color: #a0a0a0;
+}
+
+ol.breadcrumb .workflow-search-result:before,
+ol.breadcrumb .cert-search-result:before {
+  padding-right: 5px;
+  font-family: "Glyphicons Halflings";
+  content: "\e056";
+  color: #a0a0a0;
+}
+
+/******************************************************************************
+ * Grid
+ */
+
+.oxi-grid-container {
+  padding-bottom:40px;
+}
+
+div.oxisection-grid th.sortable {
+  cursor: pointer;
+  -webkit-user-select: none;
+}
+
+tr.has-action {
+  cursor: pointer;
+}
+
+/* plain grid-row without status */
+tr.gridrow > td {}
+tr.gridrow:hover > td {background-color: #E7E7E7 !important;}
+
+/* certificate specific classes: issued, expired, revoked */
+tr.gridrow-issued > td {}
+tr.gridrow-issued:hover > td {background-color: #E7E7E7 !important;}
+tr.gridrow-expired > td {background-color:#fcf8e3 !important;}
+tr.gridrow-expired:hover > td {background-color: #E7E7E7 !important;}
+tr.gridrow-revoked > td {background-color: #f2dede !important;}
+tr.gridrow-revoked:hover > td {background-color: #e6c1c7 !important;}
+
+/* ca certificat/token specific classes: online, offline, upcomging */
+tr.gridrow-online > td {background-color:#dff0d8 !important;}
+tr.gridrow-online:hover > td {background-color: #E7E7E7 !important;}
+tr.gridrow-offline > td {background-color:#f2dede !important;}
+tr.gridrow-offline:hover > td {background-color: #E7E7E7 !important;}
+tr.gridrow-upcoming > td {background-color:#d9edf7 !important;}
+tr.gridrow-upcoming:hover > td {background-color: #E7E7E7 !important;}
+
+/* workflow specific classes: finished, exception, manual, pause, failed */
+tr.gridrow-finished > td {background-color: #e8f0e4!important;}
+tr.gridrow-finished:hover > td {background-color: #c9e2b3 !important;}
+tr.gridrow-failed > td {background-color: #f3d3d3!important;}
+tr.gridrow-failed:hover > td {background-color: #e6a1ac!important;}
+tr.gridrow-manual > td { background-color: #fcfcca!important; }
+tr.gridrow-manual:hover > td {background-color: #f3f330!important;}
+tr.gridrow-paused > td {background-color: silver !important;}
+tr.gridrow-paused:hover > td {background-color: #e7e7e7 !important;}
+tr.gridrow-retry_exceeded > td {background-color: #ffc04d!important;}
+tr.gridrow-retry_exceeded:hover > td {background-color: #ffe4b3!important;}
+tr.gridrow-exception > td {background-color: #ffc04d!important;}
+tr.gridrow-exception:hover > td {background-color: #ffe4b3!important;}
+
+/* general classes...*/
+tr.gridrow-ok > td {background-color: #dff0d8 !important;}
+tr.gridrow-ok:hover > td {background-color: #c9e2b3 !important;}
+tr.gridrow-warning > td {background-color: #fbeed5 !important;}
+tr.gridrow-warning:hover > td {background-color: #faf2cc !important;}
+tr.gridrow-danger > td {background-color: #ebcccc !important;}
+tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
+
+/******************************************************************************
+ * Status labels inside key/value lists
+ */
+.styled-valid,
+.dns-valid,
+.certstatus-issued {
+  color: green;
+}
+
+.styled-failed,
+.dns-failed,
+.certstatus-revoked {
+  color: red;
+}
+
+.dns-skipped,
+.styled-attention,
+.certstatus-crl_issuance_pending {
+  color: orange;
+}
+
+.certstatus-expired {
+  color: #444;
+}
+
+.dns-timeout,
+.certstatus-unknown {
+  color: #79d1f3;
+}
+
+.styled-attention,
+.styled-failed {
+  font-weight: bold;
+}
+/* keep line wraps in code */
+code { white-space: pre; }
+
+/******************************************************************************
+ * Form fields
+ */
+
+input.in-form-group {
+  margin-bottom: 15px;
+}
+
+.input-group .twitter-typeahead {
+  display: table-cell !important;
+}
+
+.oxi-no-input {
+  padding-top: 6px;
+}
+
+/* Input fields */
+div.required input, div.required select, div.required textarea {
+  background-color:#fff3c2;
+  border:1px solid #444;
+}
+
+div.optional input, div.optional select, div.optional textarea {
+  border:1px #888 dashed;
+}
+
+.oxi-checkbox {
+  position: relative;
+  top: 4px;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid;
+  border-radius: 2px;
+  border-color: rgba(0, 0, 0, 0.54);
+}
+
+.oxi-checkbox.checked:after {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  opacity: 0.54;
+  background-color: #000;
+  content: ' ';
+}
+
+/* oxifield-uploadarea */
 iframe.oxifield-upload {
   width: 0;
   height: 0;
@@ -61,119 +380,92 @@ input.oxi-file-input:active::before {
   background-image: none;
 }
 
-.input-group .twitter-typeahead {
-  display: table-cell !important;
+/* Clonable fields */
+.clonable-margin-right{
+  margin-right: 0px;
 }
 
-.oxi-no-input {
-  padding-top: 6px;
+.clonable-margin-normal{
+  margin-right: 0px;
 }
 
-.oxi-checkbox {
-  position: relative;
-  top: 4px;
-  display: inline-block;
-  width: 18px;
-  height: 18px;
-  border: 2px solid;
-  border-radius: 2px;
-  border-color: rgba(0, 0, 0, 0.54);
+.clonable-icon{
+  text-indent: 6px;
+}
+.clonable-icon.clonable-add{
+  background: url("../img/add.png") no-repeat scroll left center;
+}
+.clonable-icon.clonable-remove{
+  background: url("../img/remove.png") no-repeat scroll left center;
 }
 
-.oxi-checkbox.checked:after {
-  position: absolute;
-  left: 2px;
-  top: 2px;
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
-  opacity: 0.54;
-  background-color: #000;
-  content: ' ';
+/* Class attached to the column holding the clonable buttons */
+.clonable-btn-group {
+  white-space: nowrap;
 }
 
-button.btn-loading {
+/******************************************************************************
+ * Buttons
+ */
+.stacked-buttons {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.stacked-buttons .btn-bt-margin {
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+.btn-loading {
   color: #fff;
   background-color: #428bca;
   border-color: #357ebd;
 }
 
-button.btn-loading:hover, button.btn-loading:focus, button.btn-loading:active, button.btn-loading.active {
+.btn-loading:hover, .btn-loading:focus, .btn-loading:active, .btn-loading.active {
   color: #fff;
   background-color: #3276b1;
   border-color: #285e8e;
 }
 
-tr.has-action {
-  cursor: pointer;
+.oxi-button-container {
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
-input.in-form-group {
-  margin-bottom: 15px;
+.oxi-button-container div.spacer {
+  margin:5px;
 }
 
-div.header {
-  margin-top: 0;
-  margin-bottom: 0;
+.oxi-button-container a.btn:before {
+  padding-right: 5px;
+  font-family: "Glyphicons Halflings";
+  content: "\e144";
+  color: #a0a0a0;
 }
 
-div.header div.userinfo {
-  font-size: small;
-  color: #aaa;
-  margin-top: 20px;
+/* Button format from workflow defs */
+.oxi-button-container .btn.expected,
+.oxi-form-button button.btn.submit {
+  background-color: #c9e2b3;
 }
 
-.refresh.progress, .loading.progress {
-  position: fixed;
-  top: 30px;
-  right: 20px;
-  width: 100px;
+.oxi-button-container .btn.optional {
+  background-color: #e4e4da;
 }
 
-.refresh.progress .progress-bar, .loading.progress .progress-bar {
-  width: 100%;
+.oxi-button-container .btn.failure,
+.oxi-form-button .btn.failure,
+.oxi-form-button .btn.cancel {
+  background-color: #e39f9f;
 }
 
-div.waiting-for-ember {
-  margin-top: 80px;
+.oxi-form-button .btn.reset,
+.oxi-button-container .btn.alternative {
+  background-color: #ffd78c;
 }
 
-div.stacked-buttons {
-  margin-top: 4px;
-  margin-bottom: 4px;
-}
-
-div.stacked-buttons div.btn-bt-margin {
-  margin-top: 6px;
-  margin-bottom: 6px;
-}
-
-div.description {
-  margin-bottom: 12px;
-}
-
-div.oxisection-grid th.sortable {
-  cursor: pointer;
-  -webkit-user-select: none;
-}
-
-span.pagination-label {
-  float: left;
-  padding: 6px 0;
-}
-
-.tab-close {
-  font-size: 18px;
-  font-weight: bold;
-  line-height: 1;
-  color: #000;
-  text-shadow: 0 1px 0 #fff;
-  opacity: 0.2;
-}
-
-.tab-close:hover, .tab-close:focus {
-  color: #000;
-  text-decoration: none;
-  cursor: pointer;
-  opacity: 0.5;
+.oxi-button-container .btn.exceptional {
+  background-color: #79d1f3;
 }
