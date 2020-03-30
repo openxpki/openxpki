@@ -75,6 +75,14 @@ export default class OxisectionFormComponent extends Component {
         return this._fields;
     }
 
+    get uniqueFieldNames() {
+        let result = [];
+        for (const field of this._fields) {
+            if (result.indexOf(field.name) < 0) { result.push(field.name) }
+        }
+        return result;
+    }
+
     @computed("_fields")
     get visibleFields() {
         return this.fields.filter(f => f.type !== "hidden");
@@ -101,6 +109,19 @@ export default class OxisectionFormComponent extends Component {
         return fields.removeAt(index);
     }
 
+    // Turns all fields into request parameters
+    _fields2request() {
+        let result = [];
+        // send clonables as list (even if there's only one field) and other fields as plain values
+        for (const name of this.uniqueFieldNames) {
+            let potentialClones = this.fields.filter(f => f.name === name);
+            result[name] = potentialClones[0].clonable
+                ? potentialClones.map(c => c.value)
+                : potentialClones[0].value;
+        }
+        return result;
+    }
+
     @action
     fireActionOnChange(field) {
         if (!field.actionOnChange) { return }
@@ -108,26 +129,12 @@ export default class OxisectionFormComponent extends Component {
 
         let request = {
             action: field.actionOnChange,
-            _sourceField: field.name
+            _sourceField: field.name,
+            ...this._fields2request(),
         };
 
         let fields = this.fields;
-        // build list of unique field names
-        let names = [];
-        for (const fld of fields) {
-            if (names.indexOf(fld.name) < 0) { names.push(fld.name) }
-        }
-        // add field values to request:
-        // either as plain value (1 field of that name)
-        // or as array (>1 field with that name)
-        for (const name of names) {
-            let clones = fields.filter(f => f.name === name);
-            if (clones.length > 1) {
-                request[name] = clones.map(c => c.value);
-            } else {
-                request[name] = clones[0].value;
-            }
-        }
+
         return getOwner(this).lookup("route:openxpki").sendAjax(request)
         .then((doc) => {
             for (const newField of doc.fields) {
@@ -135,7 +142,7 @@ export default class OxisectionFormComponent extends Component {
                     if (oldField.name === newField.name) {
                         let idx = fields.indexOf(oldField);
                         fields[idx] = newField;
-                        this.fields = fields;
+                        this.fields = fields; // trigger refresh FIXME remove as Array changes are auto-tracked?! (Ember enhances JS array as https://api.emberjs.com/ember/3.17/classes/Ember.NativeArray)
                     }
                 }
             }
@@ -153,14 +160,10 @@ export default class OxisectionFormComponent extends Component {
     @action
     submit() {
         debug("oxisection-form: submit");
-        let fields = (this.fields || []);
-        let data = {
-            action: this.args.content.action
-        };
+
         // check validity and gather form data
         let isError = false;
-        let names = [];
-        for (const field of fields) {
+        for (const field of this.fields) {
             if (!field.is_optional && !field.value) {
                 isError = true;
                 set(field, "error", "Please specify a value");
@@ -171,22 +174,19 @@ export default class OxisectionFormComponent extends Component {
                     delete field.error;
                 }
             }
-            if (names.indexOf(field.name) < 0) {
-                names.push(field.name);
-            }
         }
-        debug("oxisection-form: isError = true");
         if (isError) { return }
-        for (const name of names) {
-            let clones = fields.filter(f => f.name === name);
-            data[name] = clones[0].clonable ? clones.map(c => c.value) : clones[0].value;
-        }
+
+        let data = {
+            action: this.args.content.action,
+            ...this._fields2request(),
+        };
+
         this.loading = true;
         return getOwner(this).lookup("route:openxpki").sendAjax(data)
         .then((res) => {
             this.loading = false;
-            var ref1;
-            let errors = (ref1 = res.status) != null ? ref1.field_errors : void 0;
+            let errors = res.status != null ? res.status.field_errors : null;
             if (errors) {
                 for (const error of errors) {
                     let clones = this.fields.filter(f => f.name === error.name);
