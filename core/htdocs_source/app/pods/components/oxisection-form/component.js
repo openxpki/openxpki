@@ -20,45 +20,54 @@ export default class OxisectionFormComponent extends Component {
     }
 
     set fields(fields) {
-        for (const f of fields) {
-            if (typeof f.placeholder === "undefined") {
-                f.placeholder = "";
+        for (const field of fields) {
+            // dynamic input fields will change the form field name depending on the
+            // selected option, so we need an internal reference to the original name ("refName")
+            field.refName = field.name;
+            // set placeholder
+            if (typeof field.placeholder === "undefined") {
+                field.placeholder = "";
             }
         }
-        let clonables = fields.filter(f => f.clonable);
-        let names = [];
-        for (const clonable of clonables) {
+
+        // process clonable field presets
+        // NOTE: this does NOT support dynamic input fields
+        let clonableRefNames = [];
+        for (const clonable of fields.filter(f => f.clonable)) {
+            // if there are already key/value pairs given for a clonable field:
+            // remove the original (empty) field and replace it by cloned and filled fields
             if (isArray(clonable.value)) {
                 let index = fields.indexOf(clonable);
                 fields.removeAt(index);
                 let values = clonable.value.length ? clonable.value : [""];
-                values.forEach((value, i) => {
+                // insert clones into field list
+                values.forEach((v, i) => {
                     var clone = copy(clonable);
-                    clone.value = value;
+                    // dynamic input fields: presets of clones are key/value hashes.
+                    // we need to convert `value: { key: NAME, value: VALUE }` to `name: NAME, value: VALUE`
+                    if (v && typeof v === "object") {
+                        clone.name = v.key;
+                        clone.value = v.value;
+                    }
+                    // standard fields: presets of clones are plain values
+                    else {
+                        clone.value = v;
+                    }
                     fields.insertAt(index + i, clone);
                 });
             }
-            if (names.indexOf(clonable.name) < 0) {
-                names.push(clonable.name);
+            if (clonableRefNames.indexOf(clonable.refName) < 0) {
+                clonableRefNames.push(clonable.refName);
             }
         }
-        for (const name of names) {
-            let clones = fields.filter(f => f.name === name);
-            for (const clone of clones) {
-                set(clone, "isLast", false);
-                set(clone, "canDelete", true);
-                set(clones[clones.length - 1], "isLast", true);
-                if (clones.length === 1) {
-                    set(clones[0], "canDelete", false);
-                }
+        for (const name of clonableRefNames) {
+            let clones = fields.filter(f => f.refName === name);
+            for (const clone of clones) { set(clone, "canDelete", true) }
+            if (clones.length === 1) {
+                set(clones[0], "canDelete", false);
             }
         }
-        for (const field of fields) {
-            if (field.value && typeof field.value === "object") {
-                field.name = field.value.key;
-                field.value = field.value.value;
-            }
-        }
+
         this._fields = fields;
     }
 
