@@ -6,7 +6,6 @@ import { debug } from '@ember/debug';
 
 export default class OxifieldMainComponent extends Component {
     @equal("args.field.type", "bool") isBool;
-    @bool("args.field.error") hasError;
 
     @computed("args.field.type")
     get type() {
@@ -46,12 +45,12 @@ export default class OxifieldMainComponent extends Component {
 
     @action
     addClone(field) {
-        this.addClone(this.args.field);
+        this.args.addClone(this.args.field);
     }
 
     @action
     delClone(field) {
-        this.delClone(this.args.field);
+        this.args.delClone(this.args.field);
     }
 
     @action
