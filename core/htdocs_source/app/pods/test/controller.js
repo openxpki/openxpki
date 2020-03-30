@@ -18,6 +18,12 @@ export default class TestController extends Controller {
             submit_label: "Perform",
             fields: [
                 {
+                    type: "bool",
+                    name: "ready_or_not",
+                    label: "Ready?",
+                    value: 1,
+                },
+                {
                     type: "select",
                     name: "test_select",
                     label: "Your choice:",
