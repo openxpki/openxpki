@@ -18,13 +18,16 @@ export default class OxifieldPasswordverifyComponent extends Component {
             this.password = this.args.content.value;
             this.isFixed = true;
             set(this.args.content, "value", "");
+            this.args.onChange("");
         }
     }
 
     @action
     setValues() {
         // do passwords match?
-        set(this.args.content, "value", this.password === this.confirm ? this.password : null);
+        let value = this.password === this.confirm ? this.password : null;
+        set(this.args.content, "value", value);
+        this.args.onChange(value);
         if (this.password !== this.confirm) {
             set(this.args.content, "error", this.confirm ? "Passwords do not match" : "Please retype password");
         }
@@ -48,10 +51,5 @@ export default class OxifieldPasswordverifyComponent extends Component {
         if (this.password !== this.confirm) {
             this.confirm = "";
         }
-    }
-
-    @action
-    confirmFocusOut() {
-        this.args.onChange();
     }
 }

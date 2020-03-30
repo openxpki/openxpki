@@ -74,6 +74,6 @@ export default class OxifieldSelectComponent extends Component {
     optionSelected(value, label) {
         debug("oxifield-select (" + this.args.content.name + "): optionSelected(" + value + ")");
         set(this.args.content, "value", value);
-        this.args.onChange();
+        this.args.onChange(value);
     }
 }

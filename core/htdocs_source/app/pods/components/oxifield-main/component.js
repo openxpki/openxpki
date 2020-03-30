@@ -58,11 +58,11 @@ export default class OxifieldMainComponent extends Component {
     optionSelected(value, label) {
         emSet(this.args.field, "name", value);
         emSet(this.args.field, "error", null);
-        this.onChange()
+        this.args.fieldChanged(this.args.field);
     }
 
     @action
-    onChange() {
+    onChange(value) {
         debug("oxifield-main: onChange");
         emSet(this.args.field, "error", null);
         this.args.fieldChanged(this.args.field);

@@ -80,7 +80,7 @@ export default class OxifieldCertIdentifierComponent extends Component {
         this.searchPrevious = this.search;
 
         set(this.args.content, "value", this.search);
-        this.args.onChange();
+        this.args.onChange(this.search);
 
         let searchIndex = ++this.searchIndex;
         return getOwner(this).lookup("route:openxpki").sendAjax({
@@ -101,7 +101,7 @@ export default class OxifieldCertIdentifierComponent extends Component {
     @action
     selectResult(res) {
         set(this.args.content, "value", res.value);
-        this.args.onChange();
+        this.args.onChange(res.value);
         this.search = res.label;
         this.searchPrevious = this.search;
         this.isDropdownOpen = false;

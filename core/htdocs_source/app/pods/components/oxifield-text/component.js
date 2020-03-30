@@ -7,5 +7,6 @@ export default class OxifieldTextComponent extends Component {
     onInput(event) {
         // we need to update using set() because this.args.content.value is not a @tracked property
         set(this.args.content, "value", event.target.value);
+        this.args.onChange(event.target.value);
     }
 }
