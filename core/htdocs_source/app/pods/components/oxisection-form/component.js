@@ -97,16 +97,16 @@ export default class OxisectionFormComponent extends Component {
     addClone(field) {
         let fields = this.fields;
         let index = fields.indexOf(field);
-        let copy = copy(field);
-        copy.value = "";
-        return fields.insertAt(index + 1, copy);
+        let fieldCopy = copy(field);
+        fieldCopy.value = "";
+        fields.insertAt(index + 1, fieldCopy);
     }
 
     @action
     delClone(field) {
         let fields = this.fields;
         let index = fields.indexOf(field);
-        return fields.removeAt(index);
+        fields.removeAt(index);
     }
 
     // Turns all fields into request parameters
