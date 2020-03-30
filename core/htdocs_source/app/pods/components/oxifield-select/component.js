@@ -10,7 +10,6 @@ export default class OxifieldSelectComponent extends Component {
 
     @computed("args.content.{options,prompt,is_optional}")
     get options() {
-        debug("oxifield-select (" + this.args.content.name + "): options");
         var options, prompt, ref;
         prompt = this.args.content.prompt;
         if (!prompt && this.args.content.is_optional) {
@@ -49,13 +48,13 @@ export default class OxifieldSelectComponent extends Component {
     // no computed value - no need to refresh later on
     // (and making it computed causes strange side effects when optionSelected() is triggered)
     get sanitizedValue() {
-        debug("oxifield-select (" + this.args.content.name + "): sanitizedValue(" + this.args.content.value + ")");
         var value = this.args.content.value;
         if (typeof value === "string") return value;
 
         var options = this.options;
-        var ref;
-        return ((ref = options[0]) != null ? ref.value : void 0) || "";
+        let result = options[0] ? (options[0].value || "") : "";
+        debug(`oxifield-select (${this.args.content.name}): sanitizedValue ("${this.args.content.value}" -> "${result}")`);
+        return result;
     }
 
     @action
