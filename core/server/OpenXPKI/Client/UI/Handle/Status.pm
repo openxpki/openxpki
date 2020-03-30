@@ -133,22 +133,50 @@ sub render_system_status {
             value => '---',
             className => 'warning',
         };
-    } elsif ($status->{dv_expiry} < $now) {
-        $critical = 1;
-        push @fields, {
-            label  => 'Encryption token is expired',
-            format => 'timestamp',
-            value  => $status->{dv_expiry},
-            className => 'danger',
-        };
-    } elsif ($status->{dv_expiry} < $now + 30*86400) {
-        $warning = 1;
-        push @fields, {
-            label  => 'Encryption token expires',
-            format => 'timestamp',
-            value  => $status->{dv_expiry},
-            className => 'warning',
-        };
+    } else {
+
+        my $dp_status = $self->send_command_v2("get_datavault_status", { check_online => 1 });
+        if (!$dp_status->{alias}) {
+            push @fields, {
+                label  => 'Active Encryption Token',
+                value  => 'No token found',
+                className => 'danger',
+            };
+            $critical = 1;
+        } elsif ($dp_status->{online}) {
+            push @fields, {
+                label  => 'Active Encryption Token',
+                value  => $dp_status->{alias},
+                className => '',
+            };
+        } else {
+            push @fields, {
+                label  => 'Active Encryption Token',
+                value  => sprintf('not available (%s)', $dp_status->{alias}),
+                className => 'danger',
+            };
+            $critical = 1;
+        }
+
+        if ($status->{dv_expiry} < 0) {
+            # validity is ignored by config item
+        } elsif ($status->{dv_expiry} < $now) {
+            $critical = 1;
+            push @fields, {
+                label  => 'Encryption token is expired',
+                format => 'timestamp',
+                value  => $status->{dv_expiry},
+                className => 'danger',
+            };
+        } elsif ($status->{dv_expiry} < $now + 30*86400) {
+            $warning = 1;
+            push @fields, {
+                label  => 'Encryption token expires',
+                format => 'timestamp',
+                value  => $status->{dv_expiry},
+                className => 'warning',
+            };
+        }
     }
 
     if ($status->{watchdog} < 1) {

@@ -213,7 +213,7 @@ sub get_realm_encryption_key {
     my $token = $self->api->get_default_token();
 
     # get symbolic name of current password safe (e.g. 'passwordsafe1')
-    my $safe_id = $self->api->get_token_alias_by_type(type => 'datasafe');
+    my $safe_id = $self->get_active_safe_id();
 
     ##! 16: 'current password safe id: ' . $safe_id
 
@@ -250,9 +250,29 @@ sub get_realm_encryption_key {
     #
     ##! 16: 'first use of this password safe, generate a new symmetric vault key'
 
-    return $self->create_realm_encryption_key({ pki_realm => $realm, safe_id => $safe_id });
+    my $key_config = CTX('config')->get_hash(["system","datavault","enc_key"]);
+    my $expiry_date = 0;
+
+    if ($key_config->{expiration_date}) {
+        $expiry_date = OpenXPKI::DateTime::get_validity({
+            VALIDITY => $key_config->{expiration_date},
+            VALIDITYFORMAT => 'detect',
+        })->epoch();
+    }
+
+    return $self->create_realm_encryption_key(
+        pki_realm => $realm,
+        safe_id => $safe_id,
+        dynamic_iv => $key_config->{dynamic_iv} ? 1 : 0,
+        expiration_date => $expiry_date,
+    );
 }
 
+=head2 create_realm_encryption_key
+
+Generate a new encryption key
+
+=cut
 sub create_realm_encryption_key {
     my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
         safe_id         => { isa => 'Str', optional => 1 },
@@ -261,7 +281,7 @@ sub create_realm_encryption_key {
         expiration_date => { isa => 'Int', optional => 1 },
     );
 
-    my $safe_id = $args{safe_id} ||  $self->api->get_token_alias_by_type(type => 'datasafe');
+    my $safe_id = $args{safe_id} || $self->get_active_safe_id();
     ##! 16: 'generate a new symmetric vault key'
     my $associated_vault = OpenXPKI::Crypto::VolatileVault->new( {
         TOKEN      => $self->api->get_default_token,
@@ -293,7 +313,7 @@ sub create_realm_encryption_key {
         force => 1,
     );
 
-    CTX('log')->system()->info(sprintf 'New datapool encryption token was created (Token: %s, Key: %s)', $safe_id, $key_id);
+    CTX('log')->system()->info(sprintf('New datapool encryption token was created (Token: %s, Key: %s)', $safe_id, $key_id));
     CTX('log')->audit('system')->info('New datapool encryption token was created', {
         token  => $safe_id,
         keyid  => $key_id,
@@ -429,6 +449,23 @@ sub fetch_symmetric_key {
         iv  => $iv || undef, # undef for dynamic generation
         key => $key,
     };
+}
+
+sub get_active_safe_id {
+    my $self = shift;
+
+    # if ignore_validity is set we accept expired tokens, see #744
+    my %validity;
+    if (CTX('config')->get(["system","datavault","ignore_validity"])) {
+        %validity = ( validity => {
+            notbefore => undef,
+            notafter => DateTime->from_epoch( epoch => 0 ),
+        });
+    }
+
+    return $self->api->get_token_alias_by_type(
+        type => 'datasafe', %validity
+    );
 }
 
 # Read encryption from volatile vault and decrypt it.

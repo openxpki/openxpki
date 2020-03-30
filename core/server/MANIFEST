@@ -242,6 +242,7 @@ OpenXPKI/Server/API2/Plugin/Crypto/get_random.pm
 OpenXPKI/Server/API2/Plugin/Crypto/validate_key_params.pm
 OpenXPKI/Server/API2/Plugin/Datapool/create_datapool_encryption_key.pm
 OpenXPKI/Server/API2/Plugin/Datapool/get_data_pool_entry.pm
+OpenXPKI/Server/API2/Plugin/Datapool/get_datavault_status.pm
 OpenXPKI/Server/API2/Plugin/Datapool/list_data_pool_entries.pm
 OpenXPKI/Server/API2/Plugin/Datapool/modify_data_pool_entry.pm
 OpenXPKI/Server/API2/Plugin/Datapool/set_data_pool_entry.pm
