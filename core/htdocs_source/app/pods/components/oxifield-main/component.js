@@ -56,7 +56,7 @@ export default class OxifieldMainComponent extends Component {
 
     @action
     optionSelected(value, label) {
-        emSet(this.args.field, "value", value);
+        emSet(this.args.field, "name", value);
         emSet(this.args.field, "error", null);
         this.onChange()
     }
