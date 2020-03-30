@@ -774,7 +774,7 @@ sub init_history {
     $self->_page({
         label => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_TITLE',
         description => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_DESCRIPTION',
-        className => 'modal-lg'
+        className => 'modal-lg',
     });
 
     my $workflow_history = $self->send_command_v2( 'get_workflow_history', { id => $id } );
@@ -1060,7 +1060,7 @@ sub init_log {
 
     $self->_page({
         label => 'I18N_OPENXPKI_UI_WORKFLOW_LOG',
-        className => 'modal-lg'
+        className => 'modal-lg',
     });
 
     my $result = $self->send_command_v2( 'get_workflow_log', { id => $id } );
@@ -1759,15 +1759,14 @@ sub __render_from_workflow {
 
     my $wf_action;
     if($args->{wf_action}) {
-        $wf_action = $args->{wf_action};
-        if (!$wf_info->{activity}->{$wf_action}) {
-            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE','error');
-            return $self;
+        if (!$wf_info->{activity}->{$args->{wf_action}}) {
+            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE','warn');
+        } else {
+            $wf_action = $args->{wf_action};
         }
     }
 
     my $wf_proc_state = $wf_info->{workflow}->{proc_state} || 'init';
-
 
     # add buttons for manipulative handles (wakeup, fail, resume)
     # to be added to the default button list
@@ -1854,6 +1853,7 @@ sub __render_from_workflow {
             shortlabel => $wf_info->{workflow}->{id},
             description =>  $wf_action_info->{description},
             className => 'workflow workflow-proc-state workflow-proc-'.$wf_proc_state,
+            ($wf_info->{workflow}->{id} ? (canonical_uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}) : ()),
         });
 
         my $desc;
@@ -1999,6 +1999,7 @@ sub __render_from_workflow {
             shortlabel => $wf_info->{workflow}->{id},
             description =>  $wf_action_info->{description},
             className => 'workflow workflow-action ' . ($wf_action_info->{uiclass} || ''),
+            canonical_uri => sprintf('workflow!load!wf_id!%01d!wf_action!%s', $wf_info->{workflow}->{id}, $wf_action),
         });
 
         # delegation based on activity
@@ -2092,6 +2093,7 @@ sub __render_from_workflow {
             shortlabel => $wf_info->{workflow}->{id},
             description =>  $wf_info->{state}->{description},
             className => 'workflow workflow-page ' . ($wf_info->{state}->{uiclass} || ''),
+            ($wf_info->{workflow}->{id} ? (canonical_uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}) : ()),
         });
 
         my $fields = $self->__render_fields( $wf_info, $view );
@@ -2740,17 +2742,18 @@ sub __render_fields {
         if ($item->{format} eq "cert_identifier") {
             $item->{format} = 'link';
 
-            # check for additional template
+            # do not create if the field is empty
             if ($item->{value}) {
                 my $label = $item->{value};
 
                 my $cert_identifier = $item->{value};
-
                 $item->{value}  = {
                     label => $label,
                     page => 'certificate!detail!identifier!'.$cert_identifier,
-                    target => 'modal'
-
+                    target => 'modal',
+                    # label is usually formated to a human readable string
+                    # but we sometimes need the raw value in the UI for extras
+                    value => $cert_identifier,
                 };
             }
 
@@ -2769,7 +2772,8 @@ sub __render_fields {
                 $item->{value}  = {
                     label => $workflow_id,
                     page => 'workflow!load!wf_id!'.$workflow_id,
-                    target => 'tab'
+                    target => 'tab',
+                    value => $workflow_id,
                 };
             } else {
                 $item->{format} = '';
