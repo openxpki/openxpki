@@ -1,12 +1,19 @@
-import Component from '@ember/component';
+import Component from '@glimmer/component';
+import { action, set } from '@ember/object';
 
-const OxifieldTextareaComponent = Component.extend({
-    cols: Em.computed("content.textAreaSize.width", function() {
-        return this.get("content.textAreaSize.width") || 150;
-    }),
-    rows: Em.computed("content.textAreaSize.height", function() {
-        return this.get("content.textAreaSize.height") || 10;
-    })
-});
+export default class OxifieldTextareaComponent extends Component {
+    get cols() {
+        return this.args.content.textAreaSize.width ?? 150;
+    }
 
-export default OxifieldTextareaComponent;
+    get rows() {
+        return this.args.content.textAreaSize.height ?? 10;
+    }
+
+    @action
+    onInput(event) {
+        // we need to update using set() because this.args.content.value is not a @tracked property
+        set(this.args.content, "value", event.target.value);
+        this.args.onChange(event.target.value);
+    }
+}
