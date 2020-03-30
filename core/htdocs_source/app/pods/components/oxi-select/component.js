@@ -17,7 +17,8 @@ Each hash is expected to have these keys:
     { value: 2, label: "Tom" },
 ]
 ```
-@param onChange { callback} - called if a selection was made.
+@param selected { string } - currently selected value
+@param onChange { callback } - called if a selection was made.
 It gets passed two arguments: *value* and *label* of the selected item.
 The callback is also called initially to set the value of the first list item.
 */
@@ -35,8 +36,9 @@ export default class OxiSelectComponent extends Component {
     }
 
     notifyOnChange(index) {
+        if (index === -1) { return } // there might be no options on page initialization, before field is hidden by a "partial" request
         let item = this.args.list[index];
-        debug("oxi-select: notifyOnChange(" + item.value + ")");
+        debug(`oxi-select: notifyOnChange (value="${item.value}", label="${item.label}")`);
         if (typeof this.args.onChange !== "function") {
             console.error("<OxiSelect>: Wrong type parameter type for @onChange. Expected: function, given: " + (typeof this.args.onChange));
             return;
