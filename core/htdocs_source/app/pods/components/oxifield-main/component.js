@@ -1,30 +1,24 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { computed, action, set as emSet } from "@ember/object";
+import { computed, action } from "@ember/object";
 import { equal, bool } from "@ember/object/computed";
 import { debug } from '@ember/debug';
 
 export default class OxifieldMainComponent extends Component {
     @equal("args.field.type", "bool") isBool;
 
-    @computed("args.field.type")
     get type() {
         return "oxifield-" + this.args.field.type;
     }
 
-    @computed("args.field.size", "args.field.keysize")
     get sFieldSize() {
-        var keys, keysize, size;
-        keys = this.args.field.keys;
-        size = this.args.field.size;
-        keysize = this.args.field.keysize;
-        if (!size) {
-            if (keys) {
-                if (!keysize) { keysize = 2 }
-                size = 7 - keysize;
-            } else {
-                size = 7;
-            }
+        let size;
+        let keys = this.args.field.keys;
+        if (keys) {
+            let keysize = 2;
+            size = 7 - keysize;
+        } else {
+            size = 7;
         }
         return 'col-md-' + size;
     }
@@ -54,16 +48,21 @@ export default class OxifieldMainComponent extends Component {
     }
 
     @action
-    optionSelected(value, label) {
-        emSet(this.args.field, "name", value);
-        emSet(this.args.field, "error", null);
-        this.args.fieldChanged(this.args.field);
+    selectFieldType(value, label) {
+        this.args.setName(value);
+        this.args.setError(null);
     }
 
     @action
     onChange(value) {
         debug("oxifield-main: onChange");
-        emSet(this.args.field, "error", null);
-        this.args.fieldChanged(this.args.field);
+        this.args.setValue(value);
+        this.args.setError(null);
+    }
+
+    @action
+    onError(message) {
+        debug("oxifield-main: onError");
+        this.args.setError(message);
     }
 }

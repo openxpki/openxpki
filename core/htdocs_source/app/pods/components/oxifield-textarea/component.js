@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { action, set } from '@ember/object';
+import { action } from '@ember/object';
 
 export default class OxifieldTextareaComponent extends Component {
     get cols() {
@@ -12,8 +12,6 @@ export default class OxifieldTextareaComponent extends Component {
 
     @action
     onInput(event) {
-        // we need to update using set() because this.args.content.value is not a @tracked property
-        set(this.args.content, "value", event.target.value);
         this.args.onChange(event.target.value);
     }
 }

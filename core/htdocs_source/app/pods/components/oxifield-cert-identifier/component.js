@@ -79,7 +79,6 @@ export default class OxifieldCertIdentifierComponent extends Component {
         if (this.search.length < 3) { this.isDropdownOpen = false; return }
         this.searchPrevious = this.search;
 
-        set(this.args.content, "value", this.search);
         this.args.onChange(this.search);
 
         let searchIndex = ++this.searchIndex;
@@ -100,7 +99,6 @@ export default class OxifieldCertIdentifierComponent extends Component {
 
     @action
     selectResult(res) {
-        set(this.args.content, "value", res.value);
         this.args.onChange(res.value);
         this.search = res.label;
         this.searchPrevious = this.search;

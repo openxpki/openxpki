@@ -9,7 +9,9 @@
                 @field={{field}}
                 @addClone={{this.addClone}}
                 @delClone={{this.delClone}}
-                @fieldChanged={{this.fireActionOnChange}}
+                @setValue={{fn this.setFieldValue field}}
+                @setName={{fn this.setFieldName field}}
+                @setError={{fn this.setFieldError field}}
             />
         {{/each}}
         <div class="form-group">

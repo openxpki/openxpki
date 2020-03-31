@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action, computed, set } from '@ember/object';
+import { action, computed } from '@ember/object';
 
 export default class OxifieldPasswordverifyComponent extends Component {
     @tracked password = "";
@@ -17,7 +17,6 @@ export default class OxifieldPasswordverifyComponent extends Component {
         if (this.args.content.value) {
             this.password = this.args.content.value;
             this.isFixed = true;
-            set(this.args.content, "value", "");
             this.args.onChange("");
         }
     }
@@ -26,10 +25,10 @@ export default class OxifieldPasswordverifyComponent extends Component {
     setValues() {
         // do passwords match?
         let value = this.password === this.confirm ? this.password : null;
-        set(this.args.content, "value", value);
         this.args.onChange(value);
         if (this.password !== this.confirm) {
-            set(this.args.content, "error", this.confirm ? "Passwords do not match" : "Please retype password");
+            let msg = this.confirm ? "Passwords do not match" : "Please retype password";
+            this.args.onError(msg);
         }
     }
 

@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action, computed, set } from "@ember/object";
+import { action, computed } from "@ember/object";
 import { next } from '@ember/runloop'
 import { debug } from '@ember/debug';
 import $ from "jquery";
@@ -30,7 +30,7 @@ export default class OxifieldSelectComponent extends Component {
         let isOptional = this.args.content.is_optional;
         if (options.length === 1 && !isEditable && !isOptional) {
             // FIXME side effect of setting value - move somewhere else
-            set(this.args.content, "value", this.options[0].value);
+            this.args.onChange(this.options[0].value);
             return true;
         } else {
             return false;
@@ -62,7 +62,7 @@ export default class OxifieldSelectComponent extends Component {
         this.customMode = !this.customMode;
         if (!this.customMode) {
             if (this.isCustomValue) {
-                set(this.args.content, "value", this.options[0].value);
+                this.args.onChange(this.options[0].value);
             }
         }
         next(this, () => {
@@ -73,7 +73,6 @@ export default class OxifieldSelectComponent extends Component {
     @action
     optionSelected(value, label) {
         debug("oxifield-select (" + this.args.content.name + "): optionSelected(" + value + ")");
-        set(this.args.content, "value", value);
         this.args.onChange(value);
     }
 }

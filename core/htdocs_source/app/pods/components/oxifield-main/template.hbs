@@ -7,7 +7,7 @@
 
     {{#if @field.keys}}
         <div class="col-md-2">
-            <OxiSelect @list={{@field.keys}} @selected={{@field.name}} @onChange={{this.optionSelected}} />
+            <OxiSelect @list={{@field.keys}} @selected={{@field.name}} @onChange={{this.selectFieldType}} />
         </div>
     {{/if}}
 
@@ -15,7 +15,7 @@
         {{#if @field.tooltip}}
             <BsTooltip @title="{{@field.tooltip}}"/>
         {{/if}}
-        {{component this.type content=@field onChange=this.onChange}}
+        {{component this.type content=@field onChange=this.onChange onError=this.onError}}
         {{#if @field.error}}
             <span class="help-block">{{@field.error}}</span>
         {{/if}}
