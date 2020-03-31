@@ -1,7 +1,7 @@
 <PartialPagination @pager={{@content.content.pager}} @pages={{this.pages}} @pagesized={{this.pagesizes}}/>
 
 <div class="table-responsive oxisection-grid">
-    <table class="table table-striped table-bordered table-hover {{this.content.className}}">
+    <table class="table table-striped table-bordered table-hover {{@content.className}}">
         <thead>
             <tr>
                 {{#if this.isBulkable}}
@@ -45,18 +45,18 @@
                     {{/each}}
                 </tr>
            {{else}}
-                <tr><td colspan="{{this.columns.length}}">{{if this.content.content.empty this.content.content.empty "&nbsp;"}}</td></tr>
+                <tr><td colspan="{{this.columns.length}}">{{if @content.content.empty @content.content.empty "&nbsp;"}}</td></tr>
            {{/each}}
         </tbody>
-        {{#if this.content.content.footer}}
+        {{#if @content.content.footer}}
             <tfoot>
-                <tr><td colspan="{{this.columns.length}}">{{this.content.content.footer}}</td></tr>
+                <tr><td colspan="{{this.columns.length}}">{{@content.content.footer}}</td></tr>
             </tfoot>
         {{/if}}
     </table>
     <div class="dropdown">
         <ul class="dropdown-menu" role="menu">
-            {{#each this.content.content.actions as |action|}}
+            {{#each @content.content.actions as |action|}}
                 <li>
                     <a tabindex="-1" href="#">{{action.label}}</a>
                 </li>
