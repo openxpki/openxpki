@@ -1,5 +1,8 @@
-import Component from '@ember/component';
+import Component from '@glimmer/component';
 import { getOwner } from '@ember/application';
+import { action, computed, set, setProperties } from '@ember/object';
+import { bool } from '@ember/object/computed';
+import { tracked } from '@glimmer/tracking';
 import $ from "jquery";
 
 /**
@@ -12,22 +15,31 @@ Shows a button with an optional confirm dialog.
 }
 ```
 */
-const OxisectionGridComponent = Component.extend({
-    visibleColumns: Em.computed("content.content.columns", function() {
-        return (this.get("content.content.columns") || [])
+export default class OxisectionGridComponent extends Component {
+
+    @tracked
+    rawData = this.args.content.content.data;
+
+    @computed("args.content.content.columns")
+    get visibleColumns() {
+        return (this.args.content.content.columns || [])
         .map( (col, index) => { col.index = index; return col })
         .filter(col => col.sTitle[0] !== "_" && col.bVisible !== 0);
-    }),
-    pager: Em.computed("content.content.pager", "visibleColumns", function() {
-        let pager = this.get("content.content.pager") || {};
+    }
+
+    @computed("args.content.content.pager", "visibleColumns")
+    get pager() {
+        let pager = this.args.content.content.pager || {};
         if (pager.count == null) { pager.count = 0 }
         if (pager.startat == null) { pager.startat = 0 }
         if (pager.limit == null) { pager.limit = Number.MAX_VALUE }
         if (pager.reverse == null) { pager.reverse = 0 }
         return pager;
-    }),
-    pages: Em.computed("pager.{startat,limit,order,reverse}", function() {
-        let pager = this.get("pager");
+    }
+
+    @computed("pager.{startat,limit,order,reverse}")
+    get pages() {
+        let pager = this.pager;
         if (!pager) { return [] }
         if (pager.count <= pager.limit) { return [] }
         let pages = Math.ceil(pager.count / pager.limit);
@@ -78,29 +90,31 @@ const OxisectionGridComponent = Component.extend({
             reverse: pager.reverse
         };
         return o;
-    }),
-    pagesizes: Em.computed("pager.{pagesizes,limit,startat,order,reverse}", function() {
-        let pager = this.get("pager");
+    }
+
+    @computed("pager.{pagesizes,limit,startat,order,reverse}")
+    get pagesizes() {
+        let pager = this.pager;
         if (!pager.pagesizes) { return [] }
-        let greater = pager.pagesizes.filter(function(pagesize) {
-            return pagesize >= pager.count;
-        });
+        let greater = pager.pagesizes.filter(size => (size >= pager.count));
         let limit = Math.min.apply(null, greater);
         return pager.pagesizes
-        .filter( pagesize => pagesize <= limit)
-        .map( pagesize => {
+        .filter( size => (size <= limit))
+        .map( size => {
             return {
-                active: pagesize === pager.limit,
-                limit: pagesize,
-                startat: (pager.startat / pagesize >> 0) * pagesize,
+                active: size === pager.limit,
+                limit: size,
+                startat: (pager.startat / size >> 0) * size,
                 order: pager.order,
                 reverse: pager.reverse
             };
         });
-    }),
-    columns: Em.computed("visibleColumns", "pager.{limit,startat,order,reverse}", function() {
-        let columns = this.get("visibleColumns");
-        let pager = this.get("pager");
+    }
+
+    @computed("visibleColumns", "pager.{limit,startat,order,reverse}")
+    get columns() {
+        let columns = this.visibleColumns;
+        let pager = this.pager;
         let results = [];
         for (const column of columns) {
             let order = pager.pagerurl ? column.sortkey : column.sTitle;
@@ -118,11 +132,13 @@ const OxisectionGridComponent = Component.extend({
             });
         }
         return results;
-    }),
-    data: Em.computed("content.content.data", function() {
-        let data = this.get("content.content.data");
-        let columns = this.get("columns");
-        let titles = this.get("content.content.columns").getEach("sTitle");
+    }
+
+    @computed("rawData")
+    get data() {
+        let data = this.rawData;
+        let columns = this.columns;
+        let titles = this.args.content.content.columns.getEach("sTitle");
         let classIndex = titles.indexOf("_status");
         if (classIndex === -1) {
             classIndex = titles.indexOf("_className");
@@ -145,15 +161,17 @@ const OxisectionGridComponent = Component.extend({
             });
         }
         return results;
-    }),
-    sortedData: Em.computed("data", "columns", "pager.reverse", function() {
-        let pager = this.get("pager");
-        let data = this.get("data");
+    }
+
+    @computed("data", "columns", "pager.reverse")
+    get sortedData() {
+        let pager = this.pager;
+        let data = this.data;
         if (pager.pagerurl) {
             return (data || []);
         } else {
             data = data.toArray();
-            let columns = this.get("columns");
+            let columns = this.columns;
             let column = columns.findBy("isSorted");
             let sortNum = columns.indexOf(column);
             if (sortNum >= 0) {
@@ -171,40 +189,36 @@ const OxisectionGridComponent = Component.extend({
                     data.reverseObjects();
                 }
             }
-            Em.run.scheduleOnce("afterRender", () => {
-                return this.initializeContextmenu();
-            });
             return data;
         }
-    }),
-    allChecked: Em.computed("sortedData.@each.checked", function() {
-        return this.get("sortedData").isEvery("checked", true);
-    }),
-    manageBulkButtons: Em.on("init", Em.observer("sortedData.@each.checked", function() {
-        let data = this.get("sortedData").filterBy("checked");
-        let buttons = this.get("content.content.buttons");
-        if (!buttons) { return }
-        for (const button of buttons.filterBy("select")) {
-            Em.set(button, "disabled", !data.length);
+    }
+
+    @computed("sortedData.@each.checked")
+    get allChecked() {
+        return this.sortedData.isEvery("checked", true);
+    }
+
+    @computed("sortedData.@each.checked", "args.content.content.buttons")
+    get dummyMethodToSetButtonState() {
+        let noneChecked = this.sortedData.isEvery("checked", false);
+        for (const button of this.args.content.content.buttons.filterBy("select")) {
+            set(button, "disabled", noneChecked);
         }
-    })),
-    isBulkable: Em.computed("content.content.buttons.@each.select", function() {
-        var ref;
-        return (ref = this.get("content.content.buttons")) != null ? ref.isAny("select") : void 0;
-    }),
-    hasAction: Em.computed.bool("content.content.actions"),
-    contextIndex: null,
-    onItem: function(context, e) {
-        let action;
-        let actions = (this.get("content.content.actions") || []);
-        if (actions.length === 1) {
-            action = actions[0];
-        } else {
-            action = actions.filter(ac => ac.label === $(e.target).text())[0];
-        }
-        let columns = this.get("content.content.columns");
-        let index = this.get("sortedData")[this.get("contextIndex")].originalIndex;
-        let data = this.get("content.content.data")[index];
+    }
+
+    @computed("args.content.content.buttons.@each.select")
+    get isBulkable() {
+        return this.args.content.content.buttons.isAny("select");
+    }
+
+    @bool ("content.content.actions") hasAction
+
+    contextIndex = null;
+
+    onItem(action) {
+        let columns = this.args.content.content.columns;
+        let index = this.sortedData[this.contextIndex].originalIndex;
+        let data = this.rawData[index];
         let path = action.path;
         let i, j, len;
         for (i = j = 0, len = columns.length; j < len; i = ++j) {
@@ -212,97 +226,115 @@ const OxisectionGridComponent = Component.extend({
             path = path.replace(`{${col.sTitle}}`, data[i]);
             path = path.replace(`{col${i}}`, data[i]);
         }
+
         if (action.target === "_blank") {
-            return window.location.href = path;
-        } else {
+            window.location.href = path;
+        }
+        else {
             return getOwner(this).lookup("route:openxpki").sendAjax({
                 page: path,
                 target: action.target
             });
         }
-    },
-    initializeContextmenu: Em.on("didInsertElement", function() {
-        var ref;
-        return (ref = $()) != null ? ref.find(".context").contextmenu({
+    }
+
+    @action
+    initializeContextmenu() {
+        let actions = this.args.content.content.actions;
+        if (!actions || actions.length === 1) { return }
+
+        $().find(".context").contextmenu({
             target: $().find(".dropdown"),
-            onItem: () => {
-                return this.onItem.apply(this, arguments);
+            onItem: (e) => {
+                let actions = this.args.content.content.actions;
+                let ac = actions.filter(ac => ac.label === $(e.target).text())[0];
+                return this.onItem(ac);
             }
-        }).off("contextmenu") : void 0;
-    }),
-    actions: {
-        buttonClick: function(button) {
-            if (button.select) {
-                let columns = this.get("content.content.columns").getEach("sTitle");
-                let index = columns.indexOf(button.select);
-                if (index === -1) {
-                    throw new Error(`There is not column matching ${button.select}`);
-                }
-                let data = {
-                    action: button.action
-                };
-                data[button.selection] = this.get("sortedData").filterBy("checked").getEach("originalData").getEach("" + index);
-                Em.set(button, "loading", true);
-                return getOwner(this).lookup("route:openxpki").sendAjax(data)
-                .then(function() {
-                    return Em.set(button, "loading", false);
-                });
-            } else {
-                return this.sendAction("buttonClick", button);
+        }).off("contextmenu");
+    }
+
+    @action
+    buttonClick(button) {
+        if (button.select) {
+            let columns = this.args.content.content.columns.getEach("sTitle");
+            let index = columns.indexOf(button.select);
+            if (index === -1) {
+                throw new Error(`There is no column matching "${button.select}"`);
             }
-        },
-        select: function(row) {
-            if (row) {
-                return Em.set(row, "checked", !row.checked);
-            } else {
-                return this.get("sortedData").setEach("checked", !this.get("allChecked"));
-            }
-        },
-        page: function(page) {
-            if (page.disabled || page.active) {
-                return;
-            }
-            let pager = this.get("pager");
-            return getOwner(this).lookup("route:openxpki")
-            .sendAjax({
-                page: pager.pagerurl,
-                limit: page.limit,
-                startat: page.startat,
-                order: page.order,
-                reverse: page.reverse,
-            })
-            .then((res) => {
-                this.set("content.content.data", res.data);
-                return Em.setProperties(pager, page);
-            });
-        },
-        sort: function(page) {
-            let pager = this.get("pager");
-            if (pager.pagerurl) {
-                if (page.order) {
-                    return this.send("page", page);
-                }
-            } else {
-                pager = this.get("pager");
-                return Em.setProperties(pager, page);
-            }
-        },
-        rowClick: function(index) {
-            this.set("contextIndex", index);
-            let actions = this.get("content.content.actions");
-            if (!actions) { return }
-            if (actions.length === 1) {
-                return this.onItem();
-            } else {
-                let currentTarget = event.currentTarget;
-                let clientX = event.clientX;
-                let clientY = event.clientY;
-                return Em.run.next(() => {
-                    return $(`tbody tr:nth-child(${index + 1})`).contextmenu("show", {currentTarget, clientX, clientY});
-                });
-            }
+            let data = {
+                action: button.action
+            };
+            data[button.selection] = this.sortedData.filterBy("checked").getEach("originalData").getEach("" + index);
+            set(button, "loading", true);
+
+            getOwner(this).lookup("route:openxpki")
+            .sendAjax(data)
+            .then(() => set(button, "loading", false));
+        }
+        else {
+            this.args.buttonClick(button);
         }
     }
-});
 
-export default OxisectionGridComponent;
+    @action
+    select(row) {
+        if (row) {
+            set(row, "checked", !row.checked);
+        }
+        else {
+            this.sortedData.setEach("checked", !this.allChecked);
+        }
+    }
+
+    @action
+    page(page) {
+        if (page.disabled || page.active) {
+            return;
+        }
+        let pager = this.pager;
+        return getOwner(this).lookup("route:openxpki")
+        .sendAjax({
+            page: pager.pagerurl,
+            limit: page.limit,
+            startat: page.startat,
+            order: page.order,
+            reverse: page.reverse,
+        })
+        .then((res) => {
+            this.rawData = res.data;
+            setProperties(pager, page);
+        });
+    }
+
+    @action
+    sort(page) {
+        let pager = this.pager;
+        if (pager.pagerurl) {
+            if (page.order) { this.page(page) }
+        }
+        else {
+            setProperties(pager, page);
+        }
+    }
+
+    @action
+    rowClick(index) {
+        this.contextIndex = index;
+        let actions = this.args.content.content.actions;
+        if (!actions) { return }
+        if (actions.length === 1) {
+            return this.onItem(actions[0]);
+        }
+        else {
+            // FIXME: does not work, event is not defined
+            /*
+            let currentTarget = event.currentTarget;
+            let clientX = event.clientX;
+            let clientY = event.clientY;
+            return Em.run.next(() => {
+                return $(`tbody tr:nth-child(${index + 1})`).contextmenu("show", {currentTarget, clientX, clientY});
+            });
+            */
+        }
+    }
+}
