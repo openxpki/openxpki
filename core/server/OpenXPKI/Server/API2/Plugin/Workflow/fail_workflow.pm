@@ -62,6 +62,16 @@ command "fail_workflow" => {
     ##! 2: "load workflow"
     my $workflow = $util->fetch_workflow($wf_id);
 
+    $util->factory->authorize_workflow({
+        ACTION => 'fail',
+        WORKFLOW => $workflow,
+    })
+    or OpenXPKI::Exception->throw (
+        message => "No permission to execute fail_workflow on this workflow type",
+        params => { type => $workflow->type() }
+    );
+
+
     if (!$error) { $error = 'Failed by user'; }
     if (!$reason) { $reason = 'userfail'; }
 

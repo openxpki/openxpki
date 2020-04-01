@@ -151,6 +151,15 @@ sub _wakeup_or_resume_workflow {
     ##! 2: "load workflow"
     my $workflow = $util->fetch_workflow($id);
 
+    $util->factory->authorize_workflow({
+        ACTION => $wakeup_mode ? 'wakeup' : 'resume',
+        WORKFLOW => $workflow,
+    })
+    or OpenXPKI::Exception->throw (
+        message => "No permission to ".($wakeup_mode ? 'wakeup' : 'resume')." this type of workflow",
+        params => { type => $workflow->type() }
+    );
+
     ##! 64: 'Got workflow ' . Dumper $workflow
 
     my $proc_state = $workflow->proc_state;
