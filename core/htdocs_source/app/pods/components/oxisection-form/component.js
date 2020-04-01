@@ -37,6 +37,7 @@ export default class OxisectionFormComponent extends Component {
         this.fields = this._prepareFields(this.args.content.content.fields);
     }
 
+    @computed("args.content.content.submit_label")
     get submitLabel() {
         return this.args.content.content.submit_label || "send";
     }
