@@ -1563,19 +1563,44 @@ sub action_bulk {
 
     my $self = shift;
 
-    my @serials = $self->param('wf_id[]');
-    my $action = $self->param('wf_action');
+    my $wf_token = $self->param('wf_token') || '';
+    if (!$wf_token) {
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN!','error');
+        return $self;
+    }
+
+    # token contains the name of the action to do and extra params
+    my $wf_args = $self->__fetch_wf_token( $wf_token );
+    if (!$wf_args->{wf_action}) {
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_HANDLE_WITHOUT_ACTION!','error');
+        return $self;
+    }
+
+    $self->logger()->trace('Doing bulk with arguments: '. Dumper $wf_args) if $self->logger->is_trace;
+
+    # wf_token is also used as name of the form field
+    my @serials = $self->param($wf_token.'[]');
 
     $self->logger()->debug('Selected workflows : ' . join(", ", @serials));
 
     my @success; # list of wf_info results
     my $errors; # hash with wf_id => error
+
+    my ($command, %params);
+    if ($wf_args->{wf_action} =~ m{(fail|wakeup|resume)}) {
+        $command = $wf_args->{wf_action}.'_workflow';
+        %params = %{$wf_args->{params}} if ($wf_args->{params});
+    } elsif ($wf_args->{wf_action} =~ m{\w+_\w+}) {
+        $command = 'execute_workflow_activity';
+        $params{action} = $wf_args->{wf_action};
+        $params{params} = %{$wf_args->{params}} if ($wf_args->{params});
+    }
+
     foreach my $id (@serials) {
 
         my $wf_info;
         eval {
-            $wf_info = $self->send_command_v2( 'execute_workflow_activity',
-              { id => $id, activity => $action } );
+            $wf_info = $self->send_command_v2( $command , { id => $id, %params } );
         };
 
         # send_command returns undef if there is an error which usually means
@@ -1587,7 +1612,6 @@ sub action_bulk {
             push @success, $wf_info;
             $self->logger()->trace('Result on '.$id.': '. Dumper $wf_info) if $self->logger->is_trace;
         }
-
     }
 
     $self->_page({

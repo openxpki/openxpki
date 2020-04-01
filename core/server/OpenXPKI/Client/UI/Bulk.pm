@@ -153,6 +153,25 @@ sub action_result {
     foreach my $btn (@{$spec->{buttons}}) {
         # Copy required to not change the data in the session!
         my %btn = %{$btn};
+        # default to workflow serial
+        $btn{select} = 'serial' unless($btn{select});
+
+        # convert action link into a token to prevent injection of data
+        my $action;
+        if (substr($btn{action},0,23) eq 'workflow!bulk!wf_action') {
+            $action = substr($btn{action},23);
+        } else {
+            $action = $btn{action};
+        }
+        my $token = $self->__register_wf_token( undef, {
+            wf_action => $action,
+            ($btn{params} ? (params => $btn{params}) :())
+        });
+        delete $btn{params};
+        # also use the id of the token as name for the input field
+        $btn{action} = 'workflow!bulk!wf_token!'.$token->{value};
+        $btn{selection} = $token->{value};
+
         if ($btn{format}) {
             $btn{className} = $btn{format};
             delete $btn{format};
