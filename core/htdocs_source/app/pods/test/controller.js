@@ -51,6 +51,22 @@ export default class TestController extends Controller {
                     name: "pwd_verified",
                     label: "Verified password",
                 },
+                {
+                    type: "datetime",
+                    name: "dt_empty",
+                    label: "Date, no preset",
+                },
+                {
+                    type: "datetime",
+                    name: "dt_now",
+                    label: "Date, now",
+                },
+                {
+                    type: "datetime",
+                    name: "dt_some",
+                    label: "Date, 02.01.2020 02:05",
+                    value: "1577927100",
+                },
             ],
             buttons: [
                 {

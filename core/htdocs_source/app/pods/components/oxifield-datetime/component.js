@@ -1,35 +1,27 @@
-import Component from '@ember/component';
+import Component from '@glimmer/component';
+import { action } from '@ember/object';
 import moment from "moment";
-import $ from "jquery";
 
-const OxifieldDatetimeComponent = Component.extend({
-    format: "DD.MM.YYYY HH:mm",
-    setup: Em.on("didInsertElement", function() {
-        let value = this.get("content.value");
-        if (value === "now") {
-            this.set("content.pickvalue", moment().utc().format(this.get("format")));
-        } else if (value) {
-            this.set("content.pickvalue", moment.unix(value).utc().format(this.get("format")));
-        }
-        return Em.run.next(() => {
-            return $().find(".date").datetimepicker({
-                format: this.get("format")
-            });
-        });
-    }),
-    propagate: Em.observer("content.pickvalue", function() {
-        if (this.get("content.pickvalue") && !this.get("content.value")) {
-            this.set("content.pickvalue", moment().utc().format(this.get("format")));
-            $().find(".date").data("DateTimePicker").setDate(this.get("content.pickvalue"));
-        }
+export default class OxifieldDatetimeComponent extends Component {
+    format = "DD.MM.YYYY HH:mm";
+    value;
+
+    constructor() {
+        super(...arguments);
+        let val = this.args.content.value;
+        this.value = (!val || val === "now")
+            ? null // in the template this will be used as a flag
+            : moment.unix(val).local();
+    }
+
+    @action
+    datePicked(value) {
         let datetime;
-        if (this.get("content.pickvalue") && this.get("content.pickvalue") !== "0") {
-            datetime = moment.utc(this.get("content.pickvalue"), this.get("format")).unix();
+        if (value && value !== "0") {
+            datetime = moment(value, this.format).unix();
         } else {
             datetime = "";
         }
-        return this.set("content.value", datetime);
-    })
-});
-
-export default OxifieldDatetimeComponent;
+        this.args.onChange(datetime);
+    }
+}
