@@ -323,7 +323,7 @@ sub param {
                 $result->{$p} = $extra->{$p};
 
             # Queue key to get it from cgi later
-            } elsif ($p !~ m{ \A wf_ }xms) {
+            } else {
                 push @keys, $p;
             }
         }
@@ -334,16 +334,14 @@ sub param {
         $self->logger()->trace('Param request for full set - cgi keys ' . Dumper \@keys ) if $self->logger()->is_trace;
     }
 
-    if (!(@keys && $cgi)) {
-        return $result;
-    }
+    return $result unless $cgi;
 
     foreach my $name (@keys) {
         # check for broken CGI implementations
         die "Got reference where name was expected" if ref $name;
 
         # for workflows - strip internal fields starting with "wf_"
-        next if ($name =~ m{ \A wf_ }xms);
+        next if $name =~ m{ \A wf_ }xms;
 
         # autodetection of array and hashes
         if ($name =~ m{ \A (\w+)\[\] \z }xms) {
