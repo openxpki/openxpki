@@ -370,7 +370,7 @@ sub param {
 sub _single_param {
     my ($self, $key) = @_;
 
-    $self->logger()->trace('Param request for scalar ' . $key );
+    $self->logger->trace("Param request for scalar '$key'");
 
     my $extra = $self->extra()->{$key};
     return $extra if defined $extra;
@@ -378,17 +378,16 @@ sub _single_param {
     my $cgi = $self->cgi();
     return undef unless $cgi;
 
-    # We need to fetch from cgi as array for multivalues
-    if (wantarray) {
-        my @raw = $cgi->multi_param($key);
-        @raw = map { $_ =~ s/^\s+|\s+$//g; $_ } @raw if(defined $raw[0]);
-        return @raw;
-    }
+    my @raw = wantarray
+        ? $cgi->multi_param($key) # for multivalues, fetch from cgi in list context
+        : ( $cgi->param($key) );
 
-    my $str = $cgi->param($key);
-    $str =~ s/^\s+|\s+$//g if defined $str;
-    $self->logger()->trace("Value for $key after trim: " . ($str // '<undef>')) if ($self->logger()->is_trace);
-    return $str;
+    @raw = map { my $v = $_; $v =~ s/^\s+|\s+$//g; $v } @raw if defined $raw[0];
+    $self->logger()->trace("Value(s) after trim: " . join(", ", map { $_ // '<undef>' } @raw)) if $self->logger->is_trace;
+
+    return wantarray
+        ? @raw
+        : $raw[0];
 }
 
 =head2 logger
