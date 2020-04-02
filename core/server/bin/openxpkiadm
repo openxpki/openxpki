@@ -1453,9 +1453,9 @@ if ($cmd eq 'initdb') {
     } elsif ($params{alias}) {
         $ret = alias_show();
     } elsif ($params{identifier}) {
-        $ret = alias_list();
+        $ret = alias_add();
     } else {
-
+        $ret = alias_list();
     }
 } elsif ($cmd eq 'key') {
 
