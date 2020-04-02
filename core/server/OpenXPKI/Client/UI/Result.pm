@@ -346,20 +346,21 @@ sub param {
         # autodetection of array and hashes
         if ($name =~ m{ \A (\w+)\[\] \z }xms) {
             my @val = $self->_single_param($name);
-            $result->{$1} = \@val;
+            $result->{$1} = defined $val[0] ? \@val : [];
         } elsif ($name =~ m{ \A (\w+)\{(\w+)\}(\[\])? \z }xms) {
+            $result->{$1} = {} unless $result->{$1};
             # if $3 is set we have an array element of a named parameter
             # (e.g. multivalued subject_parts)
-            $result->{$1} = {} unless $result->{$1};
             if ($3) {
                 my @val = $self->_single_param($name);
-                $result->{$1}->{$2} = \@val;
+                $result->{$1}->{$2} = defined $val[0] ? \@val : [];
             } else {
-                $result->{$1}->{$2} = $self->_single_param($name);
+                my $val = $self->_single_param($name);
+                $result->{$1}->{$2} = $val if defined $val;
             }
         } else {
             my $val = $self->_single_param($name);
-            $result->{$name} = $val;
+            $result->{$name} = $val if defined $val;
         }
     }
     return $result;
