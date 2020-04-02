@@ -14,6 +14,7 @@ use OpenXPKI::Serialization::Simple;
 
 use Moose;
 
+# Attributes set via constructor by OpenXPKI::Client::UI->__load_class()
 has cgi => (
     is => 'ro',
     isa => 'Object',
@@ -31,6 +32,7 @@ has _client => (
     init_arg => 'client'
 );
 
+# Internal attributes
 has _error => (
     is => 'rw',
     isa => 'HashRef|Undef',
@@ -292,39 +294,16 @@ to hashref/arrayref.
 =cut
 
 sub param {
+    my ($self, $key) = @_;
 
-    my $self = shift;
-    my $key = shift;
-
-    # Scalar requested, just return what we find
-    if (defined $key && ref $key eq '') {
-
-        $self->logger()->trace('Param request for scalar ' . $key );
-
-        my $extra = $self->extra()->{$key};
-        return $extra if (defined $extra);
-
-        my $cgi = $self->cgi();
-        return undef unless($cgi);
-
-        # We need to fetch from cgi as array for multivalues
-        if (wantarray) {
-            my @raw = $cgi->multi_param($key);
-            @raw = map { $_ =~ s/^\s+|\s+$//g; $_ } @raw if(defined $raw[0]);
-            return @raw;
-        }
-
-        my $str = $cgi->param($key);
-        $str =~ s/^\s+|\s+$//g if (defined $str);
-        $self->logger()->trace("Value for $key after trim: " . ($str // '<undef>')) if ($self->logger()->is_trace);
-        return $str;
-
-    }
+    # Single param key given, just return what we find
+    return $self->_single_param($key) if (defined $key && ref $key eq '');
 
     my $result;
     my $cgi = $self->cgi();
     my @keys;
 
+    # List of keys given
     if (ref $key eq 'ARRAY') {
         $self->logger()->trace('Param request for keylist ' . join ":", @{$key} );
         my $extra = $self->extra();
@@ -338,15 +317,17 @@ sub param {
                     push @keys, $wc if ($wc =~ /$pattern/);
                 }
                 $self->logger()->debug('Wildcard pattern found, keys ' . join ",", @keys);
-            # Paramater is in extra attributes
+
+            # Parameter is in extra attributes
             } elsif (defined $extra->{$p}) {
                 $result->{$p} = $extra->{$p};
 
-            # queue the key to get it from cgi later
+            # Queue key to get it from cgi later
             } elsif ($p !~ m{ \A wf_ }xms) {
                 push @keys, $p;
             }
         }
+    # All params requested
     } else {
         $result = $self->extra();
         @keys = $cgi->param if ($cgi);
@@ -358,36 +339,57 @@ sub param {
     }
 
     foreach my $name (@keys) {
+        # check for broken CGI implementations
+        die "Got reference where name was expected" if ref $name;
 
-        if (ref $name) {
-            # This happens only with broken CGI implementations
-            die "Got reference where name was expected";
-        }
-
-        # for workflows - strip internal fields (start with wf_)
+        # for workflows - strip internal fields starting with "wf_"
         next if ($name =~ m{ \A wf_ }xms);
 
         # autodetection of array and hashes
         if ($name =~ m{ \A (\w+)\[\] \z }xms) {
-            my @val = $self->param($name);
+            my @val = $self->_single_param($name);
             $result->{$1} = \@val;
         } elsif ($name =~ m{ \A (\w+)\{(\w+)\}(\[\])? \z }xms) {
             # if $3 is set we have an array element of a named parameter
             # (e.g. multivalued subject_parts)
-            $result->{$1} = {} unless( $result->{$1} );
+            $result->{$1} = {} unless $result->{$1};
             if ($3) {
-                my @val = $self->param($name);
+                my @val = $self->_single_param($name);
                 $result->{$1}->{$2} = \@val;
             } else {
-                $result->{$1}->{$2} = $self->param($name);
+                $result->{$1}->{$2} = $self->_single_param($name);
             }
         } else {
-            my $val = $self->param($name);
+            my $val = $self->_single_param($name);
             $result->{$name} = $val;
         }
     }
     return $result;
 
+}
+
+sub _single_param {
+    my ($self, $key) = @_;
+
+    $self->logger()->trace('Param request for scalar ' . $key );
+
+    my $extra = $self->extra()->{$key};
+    return $extra if defined $extra;
+
+    my $cgi = $self->cgi();
+    return undef unless $cgi;
+
+    # We need to fetch from cgi as array for multivalues
+    if (wantarray) {
+        my @raw = $cgi->multi_param($key);
+        @raw = map { $_ =~ s/^\s+|\s+$//g; $_ } @raw if(defined $raw[0]);
+        return @raw;
+    }
+
+    my $str = $cgi->param($key);
+    $str =~ s/^\s+|\s+$//g if defined $str;
+    $self->logger()->trace("Value for $key after trim: " . ($str // '<undef>')) if ($self->logger()->is_trace);
+    return $str;
 }
 
 =head2 logger
