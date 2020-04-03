@@ -1,6 +1,9 @@
-import Component from '@ember/component';
+import Component from '@glimmer/component';
+import { action, computed } from '@ember/object';
+import { tracked } from '@glimmer/tracking';
 import { getOwner } from '@ember/application';
-import $ from "jquery";
+import { guidFor } from '@ember/object/internals';
+import { debug } from '@ember/debug';
 
 let TEXT_TYPES = [
     "application/pkcs8",
@@ -12,58 +15,82 @@ let TEXT_TYPES = [
     "application/x-pkcs12",
 ];
 
-const OxifieldUploadComponent = Component.extend({
-    cols: Em.computed("content.textAreaSize.width", function() {
-        return this.get("content.textAreaSize.width") || 150;
-    }),
-    rows: Em.computed("content.textAreaSize.height", function() {
-        return this.get("content.textAreaSize.height") || 10;
-    }),
-    canReadFile: Em.computed(function() {
-        !!window.FileReader;
-        return false;
-    }),
-    change: function(evt) {
-        if (evt.target.type !== "file") {
-            return;
+export default class OxifieldUploadComponent extends Component {
+    fileUploadElementId = 'oxi-fileupload-' + guidFor(this);
+
+    @tracked data;
+    @tracked textOutput = "";
+    @tracked filename = "";
+    @tracked lockTextInput = false;
+
+    get cols() { return (this.args.content.textAreaSize || {}).width || 150 }
+    get rows() { return (this.args.content.textAreaSize || {}).height || 10 }
+
+    @action
+    setTextInput(evt) {
+        this.data = evt.target.value;
+    }
+
+    @action
+    openFileUpload(evt) {
+        document.getElementById(this.fileUploadElementId).click();
+    }
+
+    @action
+    fileSelected(evt) {
+        console.log(this.getElementById);
+        if (evt.target.type !== "file") { return }
+        this.setFile(evt.target.files[0]);
+    }
+
+    @action
+    fileDropped(evt) {
+        evt.stopPropagation();
+        evt.preventDefault();
+        this.setFile(evt.dataTransfer.files[0]);
+    }
+
+    @action
+    showCopyEffect(evt) {
+        evt.stopPropagation();
+        evt.preventDefault();
+        evt.dataTransfer.dropEffect = 'copy'; // show as "copy" action
+    }
+
+    @action
+    resetInput() {
+        this.data = null;
+        this.textOutput = "";
+        this.filename = "";
+        this.lockTextInput = false;
+    }
+
+    // expects a File object
+    setFile(file) {
+        console.log("setFile", file);
+        this.lockTextInput = true;
+        this.filename = file.name;
+
+        let reader = new FileReader();
+        reader.onload = (e) => this.setFileData(e.target.result);
+
+        debug(`oxifield-uploadarea: setFile() - loading contents of ${file.name}`);
+        reader.readAsArrayBuffer(file);
+    }
+
+    setFileData(arrayBuffer) {
+        this.data = arrayBuffer;
+
+        // show contents if it's a text block
+        const textStart = "-----BEGIN";
+        let start = String.fromCharCode.apply(null, new Uint8Array(arrayBuffer.slice(0, textStart.length)));
+        let isText = (start === textStart);
+        let isSmall = (arrayBuffer.byteLength < 10*1024);
+        if (isText && isSmall) {
+            this.textOutput = String.fromCharCode.apply(null, new Uint8Array(arrayBuffer));
         }
-        if (this.get("canReadFile")) {
-            let reader = new FileReader();
-            reader.onload = (e) => {
-                return $().find("textarea").val(reader.result);
-            };
-            let type = evt.target.files[0].type;
-            if (/text\//.test(type) || TEXT_TYPES.indexOf(type) >= 0) {
-                return reader.readAsText(evt.target.files[0]);
-            } else {
-                return reader.readAsDataURL(evt.target.files[0]);
-            }
-        } else {
-            window.legacyUploadDone = () => {
-                let body = frames['upload_target'].document.body;
-                let resultStr = body.textContent || body.innerText;
-                return this.set("content.value", JSON.parse(resultStr).result);
-            };
-            let file = $().find("input[type=file]");
-            let fence = $("<div></div>");
-            fence.insertAfter(file);
-            let url = getOwner(this).lookup("controller:config").get("url");
-            let rtoken = getOwner(this).lookup("route:openxpki").get("source.rtoken");
-            let form = $(`<form method='post'
-                enctype='multipart/form-data'
-                action='${url}'
-                target='upload_target'>
-                    <input type="hidden" name="action" value="plain!upload">
-                    <input type="hidden" name="_rtoken" value="${rtoken}">
-                </form>`);
-            form.append(file);
-            form.appendTo("body");
-            form.submit();
-            file.insertAfter(fence);
-            fence.remove();
-            return form.remove();
+        else {
+            this.textOutput = !isSmall ? "<large file chosen>" : "<binary file>";
         }
     }
-});
-
-export default OxifieldUploadComponent;
+}

@@ -321,24 +321,32 @@ div.optional input, div.optional select, div.optional textarea {
 }
 
 /* oxifield-uploadarea */
-iframe.oxifield-upload {
-  width: 0;
-  height: 0;
-  border: 0px solid #fff;
-}
-
 div.oxifield-upload {
   position: relative;
   padding-bottom: 34px;
 }
 
 input.oxi-file-input {
+/*
   width: 100px;
   position: absolute;
   right: 15px;
-  visibility: hidden;
+*/
 }
 
+.oxi-fileupload-dropzone {
+  border: 2px dashed #bbb;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  padding: 25px;
+  text-align: center;
+  font-size: 20pt;
+  font-weight: bold;
+  color: #bbb;
+}
+
+/*
 input.oxi-file-input::before {
   visibility: visible;
   position: absolute;
@@ -380,7 +388,7 @@ input.oxi-file-input:active::before {
   border-color: #adadad;
   background-image: none;
 }
-
+*/
 /* Clonable fields */
 .clonable-margin-right{
   margin-right: 0px;
