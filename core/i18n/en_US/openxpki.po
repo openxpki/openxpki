@@ -327,6 +327,9 @@ msgstr "Certificate Template"
 msgid "I18N_OPENXPKI_UI_CSR_EXT_CHALLENGE_PASSWORD"
 msgstr "Challenge password"
 
+msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
+msgstr "Key generation failed"
+
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "Delayed revocation requested."
 
@@ -387,6 +390,10 @@ msgstr "Download text (TXT) format"
 msgid "I18N_OPENXPKI_UI_ELIGIBILITY_CHECK_UNEXPECTED_ERROR"
 msgstr "Eligibility check did not return properly (backend error)"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_CLEANUP"
+msgstr "Request was rejected by an operator."
+
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_APPROVED"
 msgstr "Request was not approved"
 
@@ -416,6 +423,10 @@ msgstr "Policy failed (too many valid certificates)"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_REJECTED"
 msgstr "Request was rejected by an operator."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_REQUEST_DUPLICATE"
+msgstr "Policy failed (subject duplicate)"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_REQUEST_NOT_AUTHORIZED"
 msgstr "Request was not properly authorized. "
@@ -815,34 +826,6 @@ msgstr "No"
 msgid "I18N_OPENXPKI_UI_OOPS"
 msgstr "Oops, something went wrong"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
-msgstr "Keystore Download"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT"
-msgstr "Download Format"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_DESC"
-msgstr ""
-"The format of the keystore, most applications will work with PKCS12 "
-"containers."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_LABEL"
-msgstr "Download Format"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_DESC"
-msgstr ""
-"The password for the exported private key. If not set, the same password you "
-"provided while creating the certificate request will be used."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_LABEL"
-msgstr "Export Password"
-
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Requested page not found"
 
@@ -1080,9 +1063,8 @@ msgstr "Unable to perform action -  security token was invalid!"
 msgid "I18N_OPENXPKI_UI_REQUEST_WORKFLOW_ID"
 msgstr "Request Workflow ID"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_REVOCATION_ID"
-msgstr "Revocation Workflow"
+msgstr "Revocation ID"
 
 msgid "I18N_OPENXPKI_UI_REVOCATION_WORKFLOW_ID"
 msgstr "Revocation Workflow"
@@ -1244,12 +1226,6 @@ msgstr "Unable to load private key"
 
 msgid "I18N_OPENXPKI_UI_UNABLE_TO_PARSE_PKCS10_REQUEST_DATA"
 msgstr "Unable to parse PKCS10 request"
-
-msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_HISTORY"
-msgstr "You do not have the required privileges to access the workflow history"
-
-msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_LOG"
-msgstr "You do not have the required privileges to access the workflow log"
 
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
 msgstr "Unknown error"
@@ -1662,19 +1638,6 @@ msgstr "Issue certificate"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_ISSUE_CERTIFICATE_LABEL"
 msgstr "Issue"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_DESC"
-msgstr ""
-"Import a custom chain to be served by the SCEP GetCA command. This MUST "
-"include the expected SCEP signer certificate as first item and should "
-"include the CA Issuer chain.<br>The token fields  are used to generate the "
-"cache-id and must be set to the exact and full alias names. If you leave "
-"those fields empty, the names of the current active token is used."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_LABEL"
-msgstr "Set Information"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_POLICY_VIOLATION_COMMENT_DESC"
 msgstr ""
@@ -2203,6 +2166,15 @@ msgstr "OnHold Reason, e.g. authorisation unclear, etc."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_TOOLTIP"
 msgstr " "
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_OPERATOR_COMMENT_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_OPERATOR_COMMENT_LABEL"
+msgstr "Comment (Operator)"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_OPERATOR_COMMENT_PLACEHOLDER"
+msgstr "Information/justifcation for this action"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_DESC"
 msgstr " "
 
@@ -2480,7 +2452,6 @@ msgstr "User"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL"
 msgstr "Workflow Id"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO"
 msgstr "Technical Log"
 
@@ -2635,6 +2606,9 @@ msgstr "paused"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
 msgstr "retry exceeded"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE"
+msgstr "Access to this workflow property is forbidden for your current role"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_NEAR_EXPIRY"
 msgstr "Certificates near Expiration"
@@ -2868,6 +2842,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SUBJECT_LABEL"
 msgstr "Certificate Subject"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_DESC"
+msgstr "This workflow failed finally."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_LABEL"
+msgstr "FAILURE"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_INITIAL_DESC"
 msgstr "This workflow failed finally and can not be restarted"
 
@@ -3044,15 +3026,6 @@ msgstr "The changes have been persisted to the database."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
 msgstr "Metadata was updated"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_DESC"
-msgstr ""
-"The certificate was issued and will be send to the SCEP client on request."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_LABEL"
-msgstr "SUCCESS"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_DESC"
 msgstr ""
@@ -3239,14 +3212,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 msgstr "Certificate Expiry Notification"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_DESC"
-msgstr "Certificate Export"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_LABEL"
-msgstr "Certificate Export"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_DESC"
 msgstr ""
 "Generate a detailed report about certificates in this realm for download."
@@ -3311,6 +3276,34 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
 #~ msgstr "3072 bit"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
+#~ msgstr "Keystore Download"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT"
+#~ msgstr "Download Format"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_DESC"
+#~ msgstr ""
+#~ "The format of the keystore, most applications will work with PKCS12 "
+#~ "containers."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_LABEL"
+#~ msgstr "Download Format"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_DESC"
+#~ msgstr ""
+#~ "The password for the exported private key. If not set, the same password "
+#~ "you provided while creating the certificate request will be used."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_LABEL"
+#~ msgstr "Export Password"
+
 #~ msgid "I18N_OPENXPKI_UI_PAUSED_CRL_TOKEN_NOT_USABLE"
 #~ msgstr "CRL signing token is not online"
 
@@ -3370,6 +3363,13 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_BASIC_LABEL"
 #~ msgstr "TLS Client / Default Naming"
 
+#~ msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_HISTORY"
+#~ msgstr ""
+#~ "You do not have the required privileges to access the workflow history"
+
+#~ msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_LOG"
+#~ msgstr "You do not have the required privileges to access the workflow log"
+
 #~ msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_INVALID_ALGORITHM_OR_LENGTH"
 #~ msgstr "KeySize configuration contains invalid key specification"
 
@@ -3418,6 +3418,19 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FAIL_LABEL"
 #~ msgstr "Fail"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_DESC"
+#~ msgstr ""
+#~ "Import a custom chain to be served by the SCEP GetCA command. This MUST "
+#~ "include the expected SCEP signer certificate as first item and should "
+#~ "include the CA Issuer chain.<br>The token fields  are used to generate "
+#~ "the cache-id and must be set to the exact and full alias names. If you "
+#~ "leave those fields empty, the names of the current active token is used."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_LABEL"
+#~ msgstr "Set Information"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_INITIALIZE_LABEL"
 #~ msgstr "Set Parameters"
@@ -3570,6 +3583,15 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_POLICY_LABEL"
 #~ msgstr "Approval pending"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_DESC"
+#~ msgstr ""
+#~ "The certificate was issued and will be send to the SCEP client on request."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_LABEL"
+#~ msgstr "SUCCESS"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_DESC"
 #~ msgstr "The request is waiting for approval of an authorized party."
 
@@ -3607,6 +3629,14 @@ msgstr "Yes"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_LABEL"
+#~ msgstr "Certificate Export"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_DESC"
+#~ msgstr "Certificate Export"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_LABEL"
 #~ msgstr "Certificate Export"
 
 #, fuzzy

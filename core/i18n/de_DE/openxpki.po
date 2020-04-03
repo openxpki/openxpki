@@ -323,6 +323,9 @@ msgstr "Certificate Template"
 msgid "I18N_OPENXPKI_UI_CSR_EXT_CHALLENGE_PASSWORD"
 msgstr "Challenge Password"
 
+msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
+msgstr "Schlüsselerzeugung fehlgeschlagen"
+
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "verzögerte Sperrung beantragt"
 
@@ -383,6 +386,9 @@ msgstr "Download als PEM + Text"
 msgid "I18N_OPENXPKI_UI_ELIGIBILITY_CHECK_UNEXPECTED_ERROR"
 msgstr "Berechtigungsprüfung nicht möglich (Backend nicht erreichbar)"
 
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_CLEANUP"
+msgstr "Antrag wurde aufgrund Inaktivität beenden."
+
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_APPROVED"
 msgstr "Antrag wurde nicht genehmigt"
 
@@ -412,6 +418,9 @@ msgstr "Policy Verletzung: Der Antrag entspricht nicht den Vorgaben"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_REJECTED"
 msgstr "Antrag wurde abgelehnt."
+
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_REQUEST_DUPLICATE"
+msgstr "Es ist bereits ein anderer Workflow mit dieser Transaktions-ID aktiv."
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_REQUEST_NOT_AUTHORIZED"
 msgstr "Antrag ist nicht autorisiert"
@@ -815,32 +824,6 @@ msgstr "Nein"
 msgid "I18N_OPENXPKI_UI_OOPS"
 msgstr "Oops, hier ist etwas schief gegangen"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
-msgstr "Keystore Download"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT"
-msgstr "Download Format"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_DESC"
-msgstr ""
-"Format des Downloads, die meisten Anwendungen benötigen einen PKCS12 "
-"Container."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_LABEL"
-msgstr "Download Format"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_DESC"
-msgstr "Das Passwort für die Verschlüsselung der Exportdatei."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_LABEL"
-msgstr "Passwort"
-
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Die angeforderte Seite wurde nicht gefunden"
 
@@ -1079,9 +1062,8 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_REQUEST_WORKFLOW_ID"
 msgstr "Antrags-Workflow"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_REVOCATION_ID"
-msgstr "Sperr-Workflow"
+msgstr "Sperr-Id"
 
 msgid "I18N_OPENXPKI_UI_REVOCATION_WORKFLOW_ID"
 msgstr "Sperr-Workflow"
@@ -1243,15 +1225,6 @@ msgstr "Laden des privaten Schlüssels fehlgeschlagen"
 
 msgid "I18N_OPENXPKI_UI_UNABLE_TO_PARSE_PKCS10_REQUEST_DATA"
 msgstr "PKCS10 Container kann nicht gelesen werden"
-
-msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_HISTORY"
-msgstr ""
-"Sie haben nicht die notwendigen Rechte um die Workflow-Historie zu betrachten"
-
-msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_LOG"
-msgstr ""
-"Sie haben nicht die notwendigen Rechte um das Workflow-Protokoll zu "
-"betrachten"
 
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
 msgstr "Unbekannter Fehler"
@@ -1669,14 +1642,6 @@ msgstr "Issue certificate"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_ISSUE_CERTIFICATE_LABEL"
 msgstr "Issue"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_DESC"
-msgstr "Export initial state"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_LABEL"
-msgstr "Set Information"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_POLICY_VIOLATION_COMMENT_DESC"
 msgstr ""
 "Please provide a justification why you need to submit a certificate request "
@@ -1831,9 +1796,8 @@ msgstr "Technical Information"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVALS_LABEL"
 msgstr "Approvals"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_DESC"
-msgstr "Information about the Request."
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_IGNORED_LABEL"
 msgstr "Ignored Certificate Identifiers"
@@ -1847,7 +1811,6 @@ msgstr "List of certificate identifiers, seperated by space or newline"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_LABEL"
 msgstr "Zertifikat"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_PLACEHOLDER"
 msgstr " "
 
@@ -1970,7 +1933,6 @@ msgstr " "
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_TOOLTIP"
 msgstr " "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_DESC"
 msgstr " "
 
@@ -2204,6 +2166,15 @@ msgstr "OnHold Reason, e.g. authorisation unclear, etc."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_TOOLTIP"
 msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_OPERATOR_COMMENT_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_OPERATOR_COMMENT_LABEL"
+msgstr "Kommentar (Operator)"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_OPERATOR_COMMENT_PLACEHOLDER"
+msgstr "Information/Begründung für diese Aktion"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_DESC"
 msgstr " "
@@ -2484,9 +2455,8 @@ msgstr "User"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL"
 msgstr "Workflow Id"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO"
-msgstr "Technical Log"
+msgstr "Technische Informationen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_DESC"
 msgstr ""
@@ -2641,6 +2611,11 @@ msgstr "paused"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
 msgstr "retry exceeded"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE"
+msgstr ""
+"Der Zugriff auf diese Workfloweigenschaft ist für ihre Benutzerrolle nicht "
+"gestattet"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_NEAR_EXPIRY"
 msgstr "Certificates near Expiration"
@@ -2877,6 +2852,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SUBJECT_LABEL"
 msgstr "Zertifikatsinhalte festlegen"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_DESC"
+msgstr "This workflow failed finally."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_LABEL"
+msgstr "FAILURE"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_INITIAL_DESC"
 msgstr "This workflow failed finally and can not be restarted"
 
@@ -3054,15 +3037,6 @@ msgstr "The changes have been persisted to the database."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
 msgstr "Metadata was updated"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_DESC"
-msgstr ""
-"The certificate was issued and will be send to the SCEP client on request."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_LABEL"
-msgstr "SUCCESS"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_DESC"
 msgstr ""
@@ -3251,14 +3225,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 msgstr "Certificate Expiry Notification"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_DESC"
-msgstr "Certificate Export"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_LABEL"
-msgstr "Certificate Export"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_DESC"
 msgstr ""
 "Generate a detailed report about certificates in this realm for download."
@@ -3292,13 +3258,11 @@ msgstr "Search for SCEP workflows by  transaction id"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_LABEL"
 msgstr "SCEP Search"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_DESC"
-msgstr "Change a certificates metadata."
+msgstr "Ändert die Metadaten eines Zertifikates."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_LABEL"
-msgstr "Change Metadata"
+msgstr "Metadaten ändern"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
 msgstr "Unable to load workflow information."
@@ -3321,6 +3285,32 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
 #~ msgstr "3072 bit"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
+#~ msgstr "Keystore Download"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT"
+#~ msgstr "Download Format"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_DESC"
+#~ msgstr ""
+#~ "Format des Downloads, die meisten Anwendungen benötigen einen PKCS12 "
+#~ "Container."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_LABEL"
+#~ msgstr "Download Format"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_DESC"
+#~ msgstr "Das Passwort für die Verschlüsselung der Exportdatei."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_LABEL"
+#~ msgstr "Passwort"
 
 #~ msgid "I18N_OPENXPKI_UI_PAUSED_CRL_TOKEN_NOT_USABLE"
 #~ msgstr "CA Schlüssel ist nicht verfügbar"
@@ -3379,6 +3369,16 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_BASIC_LABEL"
 #~ msgstr "TLS Client / Default Naming"
 
+#~ msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_HISTORY"
+#~ msgstr ""
+#~ "Sie haben nicht die notwendigen Rechte um die Workflow-Historie zu "
+#~ "betrachten"
+
+#~ msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_LOG"
+#~ msgstr ""
+#~ "Sie haben nicht die notwendigen Rechte um das Workflow-Protokoll zu "
+#~ "betrachten"
+
 #~ msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_INVALID_ALGORITHM_OR_LENGTH"
 #~ msgstr "Die Angabe der Schlüsselparameter ist ungültig"
 
@@ -3434,6 +3434,14 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FAIL_LABEL"
 #~ msgstr "Fail"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_DESC"
+#~ msgstr "Export initial state"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_LABEL"
+#~ msgstr "Set Information"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_INITIALIZE_LABEL"
@@ -3594,6 +3602,15 @@ msgstr "Yes"
 #~ msgstr "Approval pending"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_DESC"
+#~ msgstr ""
+#~ "The certificate was issued and will be send to the SCEP client on request."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_LABEL"
+#~ msgstr "SUCCESS"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_DESC"
 #~ msgstr "This revocation request requires approval."
 
@@ -3631,6 +3648,14 @@ msgstr "Yes"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_LABEL"
+#~ msgstr "Certificate Export"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_DESC"
+#~ msgstr "Certificate Export"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_LABEL"
 #~ msgstr "Certificate Export"
 
 #, fuzzy
