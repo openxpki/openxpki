@@ -8,6 +8,7 @@ OpenXPKI::Server::API2::Plugin::Workflow::wakeup_resume_workflow
 =cut
 
 # Project modules
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 use OpenXPKI::Server::API2::Plugin::Workflow::Util;
@@ -151,7 +152,10 @@ sub _wakeup_or_resume_workflow {
     ##! 2: "load workflow"
     my $workflow = $util->fetch_workflow($id);
 
-    $util->factory->authorize_workflow({
+    # wakeup from watchdog is always ok
+    my @caller = $self->rawapi->my_caller(1);
+    ($caller[0] eq 'OpenXPKI::Server::Watchdog')
+    or $util->factory->authorize_workflow({
         ACTION => $wakeup_mode ? 'wakeup' : 'resume',
         WORKFLOW => $workflow,
     })
@@ -178,7 +182,7 @@ sub _wakeup_or_resume_workflow {
     else {
         if ($proc_state ne 'exception') {
             if ($force && $proc_state eq 'running') {
-                CTX('log')->system()->warn('Resume workflow from running state');   
+                CTX('log')->system()->warn('Resume workflow from running state');
             } else {
                 OpenXPKI::Exception->throw(
                     message => 'Attempt to resume a workflow that is not in EXCEPTION state',
@@ -191,7 +195,7 @@ sub _wakeup_or_resume_workflow {
     # get the last action from the context
     my $activity = $workflow->context->param('wf_current_action');
 
-    ##! 16: 'execute activity ' . $wf_activity
+    ##! 16: 'execute activity ' . $activity
     CTX('log')->workflow->info(sprintf(
         "%s%s workflow %s (type '%s') with activity %s",
         $wakeup_mode ? "Wakeup" : "Resume",
