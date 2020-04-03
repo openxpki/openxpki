@@ -8,6 +8,7 @@ use CGI 4.08 qw( -utf8 );
 use Data::Dumper;
 use HTML::Entities;
 use Digest::SHA qw(sha1_base64);
+use MIME::Base64;
 
 use OpenXPKI::i18n qw( i18nTokenizer );
 use OpenXPKI::Serialization::Simple;
@@ -379,8 +380,13 @@ sub _single_param {
         # 2. Try CGI parameters
         my $cgi = $self->cgi();
         if ($cgi) {
-            @values = $cgi->multi_param($key);
-            @values = map { my $v = $_; $v =~ s/^\s+|\s+$//g; $v } @values if defined $values[0];
+            # query parameters and strip whitespaces
+            @values = map { my $v = $_; $v =~ s/^\s+|\s+$//g; $v } ($cgi->multi_param($key));
+
+            # 3. Try Base64 encoded CGI parameters
+            if (! defined $values[0]) {
+                @values = map { decode_base64($_) } ($cgi->multi_param("_encoded_base64_$key"));
+            }
         }
     }
 

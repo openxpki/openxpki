@@ -143,12 +143,28 @@ export default class OxisectionFormComponent extends Component {
     // Turns all fields into request parameters
     _fields2request() {
         let result = [];
-        // send clonables as list (even if there's only one field) and other fields as plain values
+
         for (const name of this.uniqueFieldNames) {
+            var newName = name;
+
+            // encode ArrayBuffer as Base64 and change field name as a flag
+            let encodeValue = (val) => {
+                if (val instanceof ArrayBuffer) {
+                    newName = `_encoded_base64_${name}`;
+                    return btoa(String.fromCharCode(...new Uint8Array(val)));
+                }
+                else {
+                    return val;
+                }
+            };
+
+            // send clonables as list (even if there's only one field) and other fields as plain values
             let potentialClones = this.fields.filter(f => f.name === name);
-            result[name] = potentialClones[0].clonable
-                ? potentialClones.map(c => c.value)
-                : potentialClones[0].value;
+            let value = potentialClones[0].clonable
+                ? potentialClones.map(c => encodeValue(c.value))
+                : encodeValue(potentialClones[0].value);
+
+            result[newName] = value;
         }
         return result;
     }
