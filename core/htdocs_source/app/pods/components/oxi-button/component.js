@@ -51,6 +51,8 @@ The `button` hash will be passed on to the handler as single parameter.
 // mapping of format codes to CSS classes applied to the button
 let format2css = {
     primary:        "btn-primary",
+    cancel:         "oxi-btn-cancel",
+    reset:          "oxi-btn-reset",
     expected:       "oxi-btn-expected",
     failure:        "oxi-btn-failure",
     optional:       "oxi-btn-optional",
