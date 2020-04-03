@@ -1,10 +1,14 @@
-import Component from '@ember/component';
+import Component from '@glimmer/component';
+import { action, computed } from '@ember/object';
 import { getOwner } from '@ember/application';
-import $ from "jquery";
-import types from "./types";
+import $ from 'jquery';
+import types from './types';
 
-const OxivalueFormatComponent = Component.extend({
-    onAnchorClick: Em.on("click", function(evt) {
+export default class OxivalueFormatComponent extends Component {
+    types = types;
+
+    @action
+    click(evt) {
         let target = evt.target;
         if (target.tagName === "A" && target.target !== "_blank") {
             evt.stopPropagation();
@@ -14,10 +18,11 @@ const OxivalueFormatComponent = Component.extend({
                 target: target.target,
             });
         }
-    }),
-    types: types,
-    formatedValue: Em.computed("content.format", "content.value", function() {
-        let htmlStr = this.get("types")[this.get("content.format") || "text"](this.get("content.value"));
+    }
+
+    @computed("args.content.format", "args.content.value")
+    get formattedValue() {
+        let htmlStr = this.types[this.args.content.format || "text"](this.args.content.value);
         let el = $('<div/>');
         // cleanup: remove all 'onXXX=' and 'javascript=' attributes and <script> elements
         el.html(htmlStr).find('*').each(function() {
@@ -29,7 +34,5 @@ const OxivalueFormatComponent = Component.extend({
         });
         el.find('script').remove();
         return el.html();
-    })
-});
-
-export default OxivalueFormatComponent;
+    }
+}
