@@ -17,12 +17,21 @@ Shows a button with an optional confirm dialog.
 */
 export default class OxisectionGridComponent extends Component {
 
-    @tracked
-    rawData = this.args.content.content.data;
+    @computed("args.content.content.data")
+    get rawData() { return (this.args.content.content.data || []) }
 
     @computed("args.content.content.columns")
+    get rawColumns() { return (this.args.content.content.columns || []) }
+
+    @computed("args.content.content.buttons")
+    get rawButtons() { return (this.args.content.content.buttons || []) }
+
+    @computed("args.content.content.actions")
+    get rawActions() { return (this.args.content.content.actions || []) }
+
+    @computed("rawColumns")
     get visibleColumns() {
-        return (this.args.content.content.columns || [])
+        return this.rawColumns
         .map( (col, index) => { col.index = index; return col })
         .filter(col => col.sTitle[0] !== "_" && col.bVisible !== 0);
     }
@@ -112,7 +121,7 @@ export default class OxisectionGridComponent extends Component {
     }
 
     @computed("visibleColumns", "pager.{limit,startat,order,reverse}")
-    get columns() {
+    get formattedColumns() {
         let columns = this.visibleColumns;
         let pager = this.pager;
         let results = [];
@@ -137,8 +146,8 @@ export default class OxisectionGridComponent extends Component {
     @computed("rawData")
     get data() {
         let data = this.rawData;
-        let columns = this.columns;
-        let titles = this.args.content.content.columns.getEach("sTitle");
+        let columns = this.formattedColumns;
+        let titles = this.rawColumns.getEach("sTitle");
         let classIndex = titles.indexOf("_status");
         if (classIndex === -1) {
             classIndex = titles.indexOf("_className");
@@ -163,7 +172,7 @@ export default class OxisectionGridComponent extends Component {
         return results;
     }
 
-    @computed("data", "columns", "pager.reverse")
+    @computed("data", "formattedColumns", "pager.reverse")
     get sortedData() {
         let pager = this.pager;
         let data = this.data;
@@ -171,7 +180,7 @@ export default class OxisectionGridComponent extends Component {
             return (data || []);
         } else {
             data = data.toArray();
-            let columns = this.columns;
+            let columns = this.formattedColumns;
             let column = columns.findBy("isSorted");
             let sortNum = columns.indexOf(column);
             if (sortNum >= 0) {
@@ -198,31 +207,35 @@ export default class OxisectionGridComponent extends Component {
         return this.sortedData.isEvery("checked", true);
     }
 
-    @computed("sortedData.@each.checked", "args.content.content.buttons")
+    @computed("sortedData.@each.checked", "rawButtons")
     get dummyMethodToSetButtonState() {
         let noneChecked = this.sortedData.isEvery("checked", false);
-        for (const button of this.args.content.content.buttons.filterBy("select")) {
+        for (const button of this.rawButtons.filterBy("select")) {
             set(button, "disabled", noneChecked);
         }
     }
 
-    @computed("args.content.content.buttons.@each.select")
+    @computed("rawButtons.@each.select")
     get isBulkable() {
-        return this.args.content.content.buttons.isAny("select");
+        return this.rawButtons.isAny("select");
     }
 
-    @bool ("content.content.actions") hasAction
+    @computed("rawActions")
+    get hasAction() {
+        return this.rawActions.length > 0;
+    }
 
     contextIndex = null;
 
     onItem(action) {
-        let columns = this.args.content.content.columns;
+        let columns = this.rawColumns;
         let index = this.sortedData[this.contextIndex].originalIndex;
         let data = this.rawData[index];
         let path = action.path;
         let i, j, len;
         for (i = j = 0, len = columns.length; j < len; i = ++j) {
             let col = columns[i];
+            // replace e.g. "wf_id!{serial}" with "wf_id!342"
             path = path.replace(`{${col.sTitle}}`, data[i]);
             path = path.replace(`{col${i}}`, data[i]);
         }
@@ -240,13 +253,13 @@ export default class OxisectionGridComponent extends Component {
 
     @action
     initializeContextmenu() {
-        let actions = this.args.content.content.actions;
+        let actions = this.rawActions;
         if (!actions || actions.length === 1) { return }
 
         $().find(".context").contextmenu({
             target: $().find(".dropdown"),
             onItem: (e) => {
-                let actions = this.args.content.content.actions;
+                let actions = this.rawActions;
                 let ac = actions.filter(ac => ac.label === $(e.target).text())[0];
                 return this.onItem(ac);
             }
@@ -256,7 +269,7 @@ export default class OxisectionGridComponent extends Component {
     @action
     buttonClick(button) {
         if (button.select) {
-            let columns = this.args.content.content.columns.getEach("sTitle");
+            let columns = this.rawColumns.getEach("sTitle");
             let index = columns.indexOf(button.select);
             if (index === -1) {
                 throw new Error(`There is no column matching "${button.select}"`);
@@ -320,7 +333,7 @@ export default class OxisectionGridComponent extends Component {
     @action
     rowClick(index) {
         this.contextIndex = index;
-        let actions = this.args.content.content.actions;
+        let actions = this.rawActions;
         if (!actions) { return }
         if (actions.length === 1) {
             return this.onItem(actions[0]);

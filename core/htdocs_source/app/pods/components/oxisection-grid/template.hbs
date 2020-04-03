@@ -10,7 +10,7 @@
                         all
                     </th>
                 {{/if}}
-                {{#each this.columns as |column|}}
+                {{#each this.formattedColumns as |column|}}
                     {{#if column.sortable}}
                         <th {{action "sort" column}} class="sortable">
                             <span>{{column.sTitle}}</span>
@@ -71,4 +71,4 @@
 
 <PartialPagination @pager={{@content.content.pager}} @pages={{this.pages}} @pagesizes={{this.pagesizes}}/>
 
-<OxiButtonContainer @buttons={{@content.content.buttons}} @buttonClick={{action "buttonClick"}}/>
+<OxiButtonContainer @buttons={{this.rawButtons}} @buttonClick={{action "buttonClick"}}/>
