@@ -41,7 +41,9 @@
                         </td>
                     {{/if}}
                     {{#each row.data as |value|}}
-                        <td {{action "rowClick" index}}>{{oxivalue-format content=value}}</td>
+                        <td {{action "rowClick" index}}>
+                            <OxivalueFormat @content={{value}}/>
+                        </td>
                     {{/each}}
                 </tr>
            {{else}}
