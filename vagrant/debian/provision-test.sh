@@ -2,6 +2,8 @@
 
 DIST=$1
 
+export DEBIAN_FRONTEND=noninteractive
+
 # if there is a local repository tree, we use localhost for apt
 if [ -d /packages.openxpki.org ]; then
 
@@ -34,11 +36,21 @@ apt-get update
 rm -rf /etc/openxpki/
 
 # Install mysql without password (no prompt)
-DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes default-mysql-server
-
-apt-get install --assume-yes --force-yes libdbd-mysql-perl libapache2-mod-fcgid \
-    libopenxpki-perl openxpki-i18n openxpki-cgi-session-driver \
+apt-get install --assume-yes default-mysql-server \
+    libdbd-mysql-perl libapache2-mod-fcgid \
     libcrypt-libscep-perl libscep
+
+if [ -e "/packages/cpan" ]; then
+    dpkg -i /packages/cpan/*.deb
+fi
+
+if [ -e "/packages/core" ]; then
+    dpkg -i /packages/core/*.deb
+    apt --assume-yes --fix-broken install
+else
+    apt install --assume-yes --force-yes \
+        libopenxpki-perl openxpki-i18n openxpki-cgi-session-driver
+fi
 
 # packages required for testing only
 apt-get install --assume-yes libtest-deep-perl libtest-exception-perl
