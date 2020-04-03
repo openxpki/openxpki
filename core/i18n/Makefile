@@ -2,7 +2,7 @@ PREFIX?=	/usr
 LOCALE_DIR   = $(DESTDIR)$(PREFIX)/share/locale
 MO_FILE      = openxpki.mo
 INSTALL      = install
-LANGS         = en_US en_GB de_DE ru_RU it_IT
+LANGS         = en_US en_GB de_DE ru_RU it_IT ja_JP
 PO_SOURCES   = $(LANGS:%=%/openxpki.po)
 MO_TRANSLATIONS = $(LANGS:%=%/$(MO_FILE))
 POT_SOURCES  = ../server ../../config
