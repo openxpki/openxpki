@@ -373,21 +373,20 @@ sub _single_param {
 
     $self->logger->trace("Param request for scalar '$key'") if $self->logger->is_trace;
 
-    # 1. Try 'extra' parameters
-    my @values = $self->extra()->{$key};
+    my $cgi = $self->cgi;
+    my @queries = (
+        # Try 'extra' parameters
+        sub { return $self->extra->{$key} },
+        # Try CGI parameters (and strip whitespaces)
+        sub { return unless $cgi; return map { my $v = $_; $v =~ s/^\s+|\s+$//g; $v } ($cgi->multi_param($key)) },
+        # Try Base64 encoded CGI parameters
+        sub { return unless $cgi; return map { decode_base64($_) } ($cgi->multi_param("_encoded_base64_$key")) },
+    );
 
-    if (! defined $values[0]) {
-        # 2. Try CGI parameters
-        my $cgi = $self->cgi();
-        if ($cgi) {
-            # query parameters and strip whitespaces
-            @values = map { my $v = $_; $v =~ s/^\s+|\s+$//g; $v } ($cgi->multi_param($key));
-
-            # 3. Try Base64 encoded CGI parameters
-            if (! defined $values[0]) {
-                @values = map { decode_base64($_) } ($cgi->multi_param("_encoded_base64_$key"));
-            }
-        }
+    my @values;
+    for my $query (@queries) {
+        @values = $query->();
+        last if defined $values[0];
     }
 
     $self->logger->trace("Value(s): " . join(", ", map { $_ // '<undef>' } @values)) if $self->logger->is_trace;
