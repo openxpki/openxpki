@@ -9,6 +9,7 @@ export default class OxisectionKeyvalueComponent extends Component {
         for (const i of items) {
             if (i.format === 'head') { i.isHead = 1 }
         }
+        // hide items where value (after formatting) is empty
         return items.filter(item => types[item.format || 'text'](item.value) !== '');
     }
 }
