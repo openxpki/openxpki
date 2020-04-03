@@ -37,7 +37,6 @@ export default class OxifieldUploadComponent extends Component {
 
     @action
     fileSelected(evt) {
-        console.log(this.getElementById);
         if (evt.target.type !== "file") { return }
         this.setFile(evt.target.files[0]);
     }
@@ -66,7 +65,6 @@ export default class OxifieldUploadComponent extends Component {
 
     // expects a File object
     setFile(file) {
-        console.log("setFile", file);
         this.lockTextInput = true;
         this.filename = file.name;
 

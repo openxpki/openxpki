@@ -72,7 +72,6 @@ export default class OxifieldCertIdentifierComponent extends Component {
 
     @action
     onInput(evt) {
-        console.log(evt.target);
         this.search = evt.target.value;
 
         if (this.search === this.searchPrevious) { return }
