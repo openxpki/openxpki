@@ -305,18 +305,18 @@ sub param {
 
     # List of keys given
     if (ref $key eq 'ARRAY') {
-        $self->logger()->trace('Param request for keylist ' . join ":", @{$key} );
+        $self->logger->trace('Param request for keylist: ' . join ",", @{$key} ) if $self->logger->is_trace;
         my $extra = $self->extra();
         foreach my $p (@{$key}) {
-            $self->logger()->trace('Fetch ' . $p );
+            $self->logger->trace("Fetching $p");
             # Resolve wildcard keys used in dynamic key fields
             if ($p =~ m{ \A (\w+)\{\*\}(\[\])? \z }xs) {
                 my $pattern = '^'.$1.'{\w+}';
-                $self->logger()->debug('Wildcard pattern found ' . $p . ' - search : ' . $pattern);
+                $self->logger->debug("Wildcard pattern found in '$p' - searching for: $pattern");
                 foreach my $wc ($cgi->param) {
                     push @keys, $wc if ($wc =~ /$pattern/);
                 }
-                $self->logger()->debug('Wildcard pattern found, keys ' . join ",", @keys);
+                $self->logger->debug('Wildcard pattern - resulting keys: ' . join ",", @keys) if self->logger->is_debug;
 
             # Parameter is in extra attributes
             } elsif (defined $extra->{$p}) {
@@ -331,7 +331,7 @@ sub param {
     } else {
         $result = $self->extra();
         @keys = $cgi->param if ($cgi);
-        $self->logger()->trace('Param request for full set - cgi keys ' . Dumper \@keys ) if $self->logger()->is_trace;
+        $self->logger->trace('Param request for full set - cgi keys ' . Dumper \@keys ) if $self->logger->is_trace;
     }
 
     return $result unless $cgi;
@@ -370,24 +370,25 @@ sub param {
 sub _single_param {
     my ($self, $key) = @_;
 
-    $self->logger->trace("Param request for scalar '$key'");
+    $self->logger->trace("Param request for scalar '$key'") if $self->logger->is_trace;
 
-    my $extra = $self->extra()->{$key};
-    return $extra if defined $extra;
+    # 1. Try 'extra' parameters
+    my @values = $self->extra()->{$key};
 
-    my $cgi = $self->cgi();
-    return undef unless $cgi;
+    if (! defined $values[0]) {
+        # 2. Try CGI parameters
+        my $cgi = $self->cgi();
+        if ($cgi) {
+            @values = $cgi->multi_param($key);
+            @values = map { my $v = $_; $v =~ s/^\s+|\s+$//g; $v } @values if defined $values[0];
+        }
+    }
 
-    my @raw = wantarray
-        ? $cgi->multi_param($key) # for multivalues, fetch from cgi in list context
-        : ( $cgi->param($key) );
-
-    @raw = map { my $v = $_; $v =~ s/^\s+|\s+$//g; $v } @raw if defined $raw[0];
-    $self->logger()->trace("Value(s) after trim: " . join(", ", map { $_ // '<undef>' } @raw)) if $self->logger->is_trace;
+    $self->logger->trace("Value(s): " . join(", ", map { $_ // '<undef>' } @values)) if $self->logger->is_trace;
 
     return wantarray
-        ? @raw
-        : $raw[0];
+        ? @values
+        : $values[0];
 }
 
 =head2 logger
