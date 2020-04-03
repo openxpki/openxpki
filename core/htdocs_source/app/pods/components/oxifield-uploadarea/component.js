@@ -5,16 +5,15 @@ import { getOwner } from '@ember/application';
 import { guidFor } from '@ember/object/internals';
 import { debug } from '@ember/debug';
 
-let TEXT_TYPES = [
-    "application/pkcs8",
-    "application/pkcs10",
-    "application/x-x509-ca-cert",
-    "application/x-x509-user-cert",
-    "application/x-pkcs7-crl",
-    "application/x-pem-file",
-    "application/x-pkcs12",
-];
-
+/*
+ * NOTE: this component differs from others in that it does not
+ * react to parent content changes. Two reasons:
+ * 1. it makes no sense to have presets for an upload area, or modified
+ *    values from a parent component
+ * 2. the logic for disabling buttons etc. would not work as we would
+ *    not know if a value set somewhere else was a manual input or came
+ *    from a file.
+ */
 export default class OxifieldUploadComponent extends Component {
     fileUploadElementId = 'oxi-fileupload-' + guidFor(this);
 
@@ -28,7 +27,7 @@ export default class OxifieldUploadComponent extends Component {
 
     @action
     setTextInput(evt) {
-        this.data = evt.target.value;
+        this.setData(evt.target.value);
     }
 
     @action
@@ -59,7 +58,7 @@ export default class OxifieldUploadComponent extends Component {
 
     @action
     resetInput() {
-        this.data = null;
+        this.setData(null);
         this.textOutput = "";
         this.filename = "";
         this.lockTextInput = false;
@@ -79,18 +78,23 @@ export default class OxifieldUploadComponent extends Component {
     }
 
     setFileData(arrayBuffer) {
-        this.data = arrayBuffer;
+        this.setData(arrayBuffer);
 
         // show contents if it's a text block
         const textStart = "-----BEGIN";
-        let start = String.fromCharCode.apply(null, new Uint8Array(arrayBuffer.slice(0, textStart.length)));
+        let start = String.fromCharCode(...new Uint8Array(arrayBuffer.slice(0, textStart.length)));
         let isText = (start === textStart);
         let isSmall = (arrayBuffer.byteLength < 10*1024);
         if (isText && isSmall) {
-            this.textOutput = String.fromCharCode.apply(null, new Uint8Array(arrayBuffer));
+            this.textOutput = String.fromCharCode(...new Uint8Array(arrayBuffer));
         }
         else {
             this.textOutput = !isSmall ? "<large file chosen>" : "<binary file>";
         }
+    }
+
+    setData(data) {
+        this.data = data;
+        this.args.onChange(data);
     }
 }
