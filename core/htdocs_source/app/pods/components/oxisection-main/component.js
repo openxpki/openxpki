@@ -4,8 +4,16 @@ import { debug } from '@ember/debug';
 import { getOwner } from '@ember/application';
 
 export default class OxisectionMainComponent extends Component {
-    get type() {
-        return "oxisection-" + this.args.content.type;
+    get type() { return "oxisection-" + this.args.content.type }
+
+    get sectionData() {
+        return {
+            ...this.args.content.content,
+            // map some inconsistently placed properties into the section data
+            action:     this.args.content.action,       // used by oxisection-form
+            reset:      this.args.content.reset,        // used by oxisection-form
+            className:  this.args.content.className,    // used by oxisection-grid
+        }
     }
 
     @action

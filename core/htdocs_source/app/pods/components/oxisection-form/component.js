@@ -45,13 +45,13 @@ export default class OxisectionFormComponent extends Component {
 
     constructor() {
         super(...arguments);
-        this.fields = this._prepareFields(this.args.content.content.fields);
+        this.fields = this._prepareFields(this.args.def.fields);
         this._updateCloneFields();
     }
 
-    @computed("args.content.content.submit_label")
+    @computed("args.def.submit_label")
     get submitLabel() {
-        return this.args.content.content.submit_label || "send";
+        return this.args.def.submit_label || "send";
     }
 
     _prepareFields(fields) {
@@ -250,7 +250,7 @@ export default class OxisectionFormComponent extends Component {
 
     @action
     reset() {
-        this.args.buttonClick({ page: this.args.content.reset });
+        this.args.buttonClick({ page: this.args.def.reset });
     }
 
     @action
@@ -274,7 +274,7 @@ export default class OxisectionFormComponent extends Component {
         if (isError) { return }
 
         let data = {
-            action: this.args.content.action,
+            action: this.args.def.action,
             ...this._fields2request(),
         };
 

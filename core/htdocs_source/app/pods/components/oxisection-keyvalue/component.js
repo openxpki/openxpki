@@ -3,9 +3,9 @@ import { computed } from '@ember/object';
 import types from "../oxivalue-format/types";
 
 export default class OxisectionKeyvalueComponent extends Component {
-    @computed("args.content.content.data")
+    @computed("args.def.data")
     get items() {
-        let items = this.args.content.content.data || [];
+        let items = this.args.def.data || [];
         for (const i of items) {
             if (i.format === 'head') { i.isHead = 1 }
         }

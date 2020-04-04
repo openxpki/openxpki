@@ -20,12 +20,12 @@ export default class OxisectionGridComponent extends Component {
 
     constructor() {
         super(...arguments);
-        this.rawData = this.args.content.content.data || [];
+        this.rawData = this.args.def.data || [];
     }
 
-    get rawColumns() { return (this.args.content.content.columns || []) }
-    get rawButtons() { return (this.args.content.content.buttons || []) }
-    get rawActions() { return (this.args.content.content.actions || []) }
+    get rawColumns() { return (this.args.def.columns || []) }
+    get rawButtons() { return (this.args.def.buttons || []) }
+    get rawActions() { return (this.args.def.actions || []) }
 
     get hasAction() { return this.rawActions.length > 0 }
     get multipleActions() { return this.rawActions.length > 1 }
@@ -38,9 +38,9 @@ export default class OxisectionGridComponent extends Component {
         .filter(col => col.sTitle[0] !== "_" && col.bVisible !== 0);
     }
 
-    @computed("args.content.content.pager", "visibleColumns")
+    @computed("args.def.pager", "visibleColumns")
     get pager() {
-        let pager = this.args.content.content.pager || {};
+        let pager = this.args.def.pager || {};
         if (pager.count == null) { pager.count = 0 }
         if (pager.startat == null) { pager.startat = 0 }
         if (pager.limit == null) { pager.limit = Number.MAX_VALUE }
