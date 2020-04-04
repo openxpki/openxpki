@@ -288,12 +288,22 @@ input.in-form-group {
 }
 
 /* Input fields */
-div.required input, div.required select, div.required textarea {
+div.required input,
+div.required select,
+div.required textarea {
   background-color:#fff3c2;
   border:1px solid #444;
 }
 
-div.optional input, div.optional select, div.optional textarea {
+div.required input.form-control[disabled] ,
+div.required select.form-control[disabled],
+div.required textarea.form-control[disabled] {
+  border:1px solid #ccc;
+}
+
+div.optional input,
+div.optional select,
+div.optional textarea {
   border:1px #888 dashed;
 }
 
