@@ -29,6 +29,10 @@ export default class OxisectionGridComponent extends Component {
     @computed("args.content.content.actions")
     get rawActions() { return (this.args.content.content.actions || []) }
 
+    get hasAction() { return this.rawActions.length > 0 }
+    get multipleActions() { return this.rawActions.length > 1 }
+    get firstAction() { return this.rawActions[0] }
+
     @computed("rawColumns")
     get visibleColumns() {
         return this.rawColumns
@@ -220,18 +224,11 @@ export default class OxisectionGridComponent extends Component {
         return this.rawButtons.isAny("select");
     }
 
-    @computed("rawActions")
-    get hasAction() {
-        return this.rawActions.length > 0;
-    }
-
-    contextIndex = null;
-
-    onItem(action) {
+    @action
+    executeAction(row, act, event) {
         let columns = this.rawColumns;
-        let index = this.sortedData[this.contextIndex].originalIndex;
-        let data = this.rawData[index];
-        let path = action.path;
+        let data = this.rawData[row.originalIndex];
+        let path = act.path;
         let i, j, len;
         for (i = j = 0, len = columns.length; j < len; i = ++j) {
             let col = columns[i];
@@ -240,30 +237,15 @@ export default class OxisectionGridComponent extends Component {
             path = path.replace(`{col${i}}`, data[i]);
         }
 
-        if (action.target === "_blank") {
+        if (act.target === "_blank") {
             window.location.href = path;
         }
         else {
             return getOwner(this).lookup("route:openxpki").sendAjax({
                 page: path,
-                target: action.target
+                target: act.target
             });
         }
-    }
-
-    @action
-    initializeContextmenu() {
-        let actions = this.rawActions;
-        if (!actions || actions.length === 1) { return }
-
-        $().find(".context").contextmenu({
-            target: $().find(".dropdown"),
-            onItem: (e) => {
-                let actions = this.rawActions;
-                let ac = actions.filter(ac => ac.label === $(e.target).text())[0];
-                return this.onItem(ac);
-            }
-        }).off("contextmenu");
     }
 
     @action
@@ -327,27 +309,6 @@ export default class OxisectionGridComponent extends Component {
         }
         else {
             setProperties(pager, page);
-        }
-    }
-
-    @action
-    rowClick(index) {
-        this.contextIndex = index;
-        let actions = this.rawActions;
-        if (!actions) { return }
-        if (actions.length === 1) {
-            return this.onItem(actions[0]);
-        }
-        else {
-            // FIXME: does not work, event is not defined
-            /*
-            let currentTarget = event.currentTarget;
-            let clientX = event.clientX;
-            let clientY = event.clientY;
-            return Em.run.next(() => {
-                return $(`tbody tr:nth-child(${index + 1})`).contextmenu("show", {currentTarget, clientX, clientY});
-            });
-            */
         }
     }
 }

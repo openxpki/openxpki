@@ -1,6 +1,6 @@
 <PartialPagination @pager={{@content.content.pager}} @pages={{this.pages}} @pagesizes={{this.pagesizes}}/>
 
-<div class="table-responsive oxisection-grid" {{did-insert this.initializeContextmenu}}>
+<div class="table-responsive oxisection-grid">
     <table class="table table-striped table-bordered table-hover {{@content.className}}">
         <thead>
             <tr>
@@ -9,6 +9,9 @@
                         <span class="oxi-checkbox {{if this.allChecked "checked"}}"></span>
                         all
                     </th>
+                {{/if}}
+                {{#if this.multipleActions}}
+                    <th>&nbsp;</th>
                 {{/if}}
                 {{#each this.formattedColumns as |column|}}
                     {{#if column.sortable}}
@@ -40,8 +43,22 @@
                             <span class="oxi-checkbox {{if row.checked "checked"}}"></span>
                         </td>
                     {{/if}}
+                    {{#if this.multipleActions}}
+                        <td>
+                            <BsDropdown as |dd|>
+                                <dd.toggle><span class="glyphicon glyphicon-cog"></span></dd.toggle>
+                                <dd.menu @renderInPlace={{false}} as |ddm|>
+                                    {{#each @content.content.actions as |action|}}
+                                        <ddm.item>
+                                            <a {{on "click" (fn this.executeAction row action)}}>{{action.label}}</a>
+                                        </ddm.item>
+                                    {{/each}}
+                                </dd.menu>
+                            </BsDropdown>
+                        </td>
+                    {{/if}}
                     {{#each row.data as |value|}}
-                        <td {{action "rowClick" index}}>
+                        <td {{on "click" (fn this.executeAction row this.firstAction)}}>
                             <OxivalueFormat @content={{value}}/>
                         </td>
                     {{/each}}
