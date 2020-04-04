@@ -50,7 +50,7 @@ export default class OxisectionFormComponent extends Component {
             let field = new Field();
             for (const attr of Object.keys(fieldHash)) {
                 if (! Field.prototype.hasOwnProperty(attr)) {
-                    console.error(`oxisection-form: unknown field property "${attr}" (field.name = "${fieldHash.name}")`);
+                    console.error(`oxisection-form: unknown field property "${attr}" (field "${fieldHash.name}")`);
                 }
                 else {
                     field[attr] = fieldHash[attr];
@@ -90,6 +90,12 @@ export default class OxisectionFormComponent extends Component {
                         }
                         return clone;
                     }));
+                }
+                else if (typeof field.value === 'undefined') {
+                    console.error(`oxisection-form: field "${field._refName}" - no "value" array specified for clonable field. It will not be displayed`);
+                }
+                else {
+                    console.error(`oxisection-form: field "${field._refName}", property "value" - expected type: array, given type: ${typeof field.value}`);
                 }
                 if (clonableRefNames.indexOf(field._refName) < 0) {
                     clonableRefNames.push(field._refName);

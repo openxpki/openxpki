@@ -67,6 +67,13 @@ export default class TestController extends Controller {
                     label: "Date, 02.01.2020 02:05",
                     value: "1577927100",
                 },
+                {
+                    type: "text",
+                    name: "plaintext",
+                    label: "Dolly",
+                    value: ["Please enter..."],
+                    clonable: 1,
+                },
             ],
             buttons: [
                 {
