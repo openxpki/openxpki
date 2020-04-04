@@ -92,25 +92,22 @@ export default class OxisectionFormComponent extends Component {
                     // add clones to field list
                     result.push(...values.map(v => {
                         let clone = field.clone();
-                        // dynamic input fields: presets of clones are key/value hashes.
-                        // we need to convert `value: { key: NAME, value: VALUE }` to `name: NAME, value: VALUE`
-                        if (v && typeof v === "object") {
-                            clone.name = v.key;
-                            clone.value = v.value;
-                        }
-                        // standard fields: presets of clones are plain values
-                        else {
-                            clone.value = v;
-                        }
+                        clone.value = v;
                         return clone;
                     }));
                 }
-                else if (typeof field.value === 'undefined') {
-                    console.error(`oxisection-form: field "${field._refName}" - no "value" array specified for clonable field. It will not be displayed`);
-                }
                 else {
-                    console.error(`oxisection-form: field "${field._refName}", property "value" - expected type: array, given type: ${typeof field.value}`);
+                    result.push(field.clone());
                 }
+            }
+        }
+
+        for (let field of result) {
+            // dynamic input fields: presets are key/value hashes.
+            // we need to convert `value: { key: NAME, value: VALUE }` to `name: NAME, value: VALUE`
+            if (field.value && typeof field.value === "object") {
+                field.name = field.value.key;
+                field.value = field.value.value;
             }
         }
 

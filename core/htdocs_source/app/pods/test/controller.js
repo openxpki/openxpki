@@ -20,13 +20,13 @@ export default class TestController extends Controller {
                 {
                     type: "bool",
                     name: "ready_or_not",
-                    label: "Ready?",
+                    label: "Bool, selected",
                     value: 1,
                 },
                 {
                     type: "select",
                     name: "select_it",
-                    label: "Your choice:",
+                    label: "Select, no preset",
                     options: [
                         { value: 1, label: "Major" },
                         { value: 2, label: "Tom" },
@@ -35,7 +35,7 @@ export default class TestController extends Controller {
                 {
                     type: "select",
                     name: "select_editable",
-                    label: "Your choice:",
+                    label: "Select, editable",
                     editable: 1,
                     options: [
                         { value: 1, label: "Tusen" },
@@ -45,7 +45,7 @@ export default class TestController extends Controller {
                 {
                     type: "select",
                     name: "test_select_2",
-                    label: "Only one choice",
+                    label: "Select, one choice",
                     options: [
                         { value: "11", label: "Ocean" },
                     ],
@@ -59,7 +59,7 @@ export default class TestController extends Controller {
                 {
                     type: "passwordverify",
                     name: "pwd_verified",
-                    label: "Verified password",
+                    label: "Password, verifiable",
                 },
                 {
                     type: "datetime",
@@ -89,9 +89,34 @@ export default class TestController extends Controller {
                 {
                     type: "text",
                     name: "plaintext",
-                    label: "Dolly",
-                    value: ["Please enter..."],
+                    label: "Clone field with 2 presets",
+                    value: ["sheep #1", "sheep #2"],
                     clonable: 1,
+                },
+                {
+                    type: "text",
+                    name: "attributes",
+                    label: "Dynamic, clonable, 2 presets",
+                    clonable: 1,
+                    is_optional: 1,
+                    keys: [
+                        {
+                            value: "cert_subject",
+                            label: "Certificate Subject",
+                        },
+                        {
+                            value: "requestor",
+                            label: "Requestor",
+                        },
+                        {
+                            value: "transaction_id",
+                            label: "Transaction Id",
+                        },
+                    ],
+                    value: [
+                        { key: "cert_subject", value: "Subject" },
+                        { key: "transaction_id", value: "TransId" },
+                    ],
                 },
                 {
                     type: "static",
