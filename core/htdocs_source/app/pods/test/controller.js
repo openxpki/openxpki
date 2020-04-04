@@ -63,19 +63,28 @@ export default class TestController extends Controller {
                 },
                 {
                     type: "datetime",
-                    name: "dt_empty",
-                    label: "Date, no preset",
-                },
-                {
-                    type: "datetime",
                     name: "dt_now",
                     label: "Date, now",
                 },
                 {
                     type: "datetime",
+                    name: "dt_some_local",
+                    label: "Date, 2020-03-03 03:33",
+                    timezone: "local",
+                    value: "1583206380",
+                },
+                {
+                    type: "datetime",
                     name: "dt_some",
-                    label: "Date, 02.01.2020 02:05",
-                    value: "1577927100",
+                    label: "Date, 2020-03-03 03:33",
+                    value: "1583206380",
+                },
+                {
+                    type: "datetime",
+                    name: "dt_some_local",
+                    label: "Date, 2020-03-03 03:33",
+                    value: "1583206380",
+                    timezone: "Pacific/Pitcairn",
                 },
                 {
                     type: "text",

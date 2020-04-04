@@ -20,6 +20,8 @@ class Field {
     @tracked canDelete;
     // dynamic input fields:
     @tracked keys;
+    // oxifield-datetime:
+    @tracked timezone;
     // oxifield-select:
     @tracked options;
     @tracked prompt;
@@ -59,7 +61,7 @@ export default class OxisectionFormComponent extends Component {
             let field = new Field();
             for (const attr of Object.keys(fieldHash)) {
                 if (! Field.prototype.hasOwnProperty(attr)) {
-                    console.error(`oxisection-form: unknown field property "${attr}" (field "${fieldHash.name}")`);
+                    console.error(`oxisection-form: unknown field property "${attr}" (field "${fieldHash.name}"). If it's a new property, please add it to the 'Field' class defined in oxisection-form.js.`);
                 }
                 else {
                     field[attr] = fieldHash[attr];

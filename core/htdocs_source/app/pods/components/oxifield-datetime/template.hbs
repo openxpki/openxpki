@@ -1,8 +1,16 @@
-<BsDatetimepicker
-    @date={{this.value}}
-    @useCurrent={{if this.value false true}}
-    @format={{this.format}}
-    @change={{this.datePicked}}
-    @openOnFocus={{true}}
-    @placeholder={{@content.placeholder}}
-/>
+<div class="row">
+    <div class="col-md-8">
+        <BsDatetimepicker
+            @date={{this.value}}
+            @useCurrent={{if this.value false true}}
+            @format={{this.format}}
+            @change={{this.datePicked}}
+            @openOnFocus={{true}}
+            @placeholder={{@content.placeholder}}
+            @timeZone={{if (eq this.timezone "local") "" this.timezone}}
+        />
+    </div>
+    <div class="col-md-4">
+        <input class="form-control" type="text" placeholder="Timezone: {{this.timezone}}" disabled/>
+    </div>
+</div>

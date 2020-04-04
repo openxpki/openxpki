@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
-import moment from "moment";
+import { action, computed } from '@ember/object';
+import moment from "moment-timezone";
 
 export default class OxifieldDatetimeComponent extends Component {
     format = "DD.MM.YYYY HH:mm";
@@ -9,19 +9,40 @@ export default class OxifieldDatetimeComponent extends Component {
     constructor() {
         super(...arguments);
         let val = this.args.content.value;
+        let tz = this.args.content.timezone;
         this.value = (!val || val === "now")
             ? null // in the template this will be used as a flag
-            : moment.unix(val).local();
+            : this.resolveTimezone(
+                v => moment.unix(val).utc(),
+                v => moment.unix(val).local(),
+                v => moment.unix(val).tz(v),
+                tz
+            );
+    }
+
+    resolveTimezone(ifEmpty, ifLocal, otherwise, param) {
+        let tz = this.args.content.timezone;
+        let result = tz
+            ? (tz === "local" ? ifLocal : otherwise)
+            : ifEmpty;
+        return result(param);
+    }
+
+    @computed("args.content.timezone")
+    get timezone() {
+        return this.resolveTimezone(
+            v => "UTC",
+            v => "local",
+            v => this.args.content.timezone,
+        );
     }
 
     @action
-    datePicked(value) {
-        let datetime;
-        if (value && value !== "0") {
-            datetime = moment(value, this.format).unix();
-        } else {
-            datetime = "";
-        }
+    datePicked(dateObj) {
+        // the dateObj will have the correct timezone set (as we gave it to BsDatetimepicker)
+        let datetime = (dateObj && dateObj !== "0")
+            ? Math.floor(dateObj / 1000)
+            : "";
         this.args.onChange(datetime);
     }
 }
