@@ -16,17 +16,15 @@ Shows a button with an optional confirm dialog.
 ```
 */
 export default class OxisectionGridComponent extends Component {
+    @tracked rawData = [];
 
-    @computed("args.content.content.data")
-    get rawData() { return (this.args.content.content.data || []) }
+    constructor() {
+        super(...arguments);
+        this.rawData = this.args.content.content.data || [];
+    }
 
-    @computed("args.content.content.columns")
     get rawColumns() { return (this.args.content.content.columns || []) }
-
-    @computed("args.content.content.buttons")
     get rawButtons() { return (this.args.content.content.buttons || []) }
-
-    @computed("args.content.content.actions")
     get rawActions() { return (this.args.content.content.actions || []) }
 
     get hasAction() { return this.rawActions.length > 0 }
@@ -282,7 +280,7 @@ export default class OxisectionGridComponent extends Component {
     }
 
     @action
-    page(page) {
+    setPage(page) {
         if (page.disabled || page.active) {
             return;
         }

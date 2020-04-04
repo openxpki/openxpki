@@ -1,4 +1,9 @@
-<PartialPagination @pager={{@content.content.pager}} @pages={{this.pages}} @pagesizes={{this.pagesizes}}/>
+<PartialPagination
+    @pager={{@content.content.pager}}
+    @pages={{this.pages}}
+    @pagesizes={{this.pagesizes}}
+    @setPage={{this.setPage}}
+/>
 
 <div class="table-responsive oxisection-grid">
     <table class="table table-striped table-bordered table-hover {{@content.className}}">
@@ -88,6 +93,11 @@
     </div>
 </div>
 
-<PartialPagination @pager={{@content.content.pager}} @pages={{this.pages}} @pagesizes={{this.pagesizes}}/>
+<PartialPagination
+    @pager={{@content.content.pager}}
+    @pages={{this.pages}}
+    @pagesizes={{this.pagesizes}}
+    @setPage={{this.setPage}}
+/>
 
 <OxiButtonContainer @buttons={{this.rawButtons}} @buttonClick={{action "buttonClick"}}/>
