@@ -8,7 +8,7 @@ import { debug } from '@ember/debug';
 class Field {
     @tracked type;
     @tracked name;
-    @tracked _refName;
+    @tracked _refName; // original name, needed for dynamic input fields where 'name' can change
     @tracked value;
     @tracked label;
     @tracked tooltip;
@@ -29,12 +29,15 @@ class Field {
 }
 
 export default class OxisectionFormComponent extends Component {
+    clonableRefNames = [];
+
     @tracked loading = false;
     @tracked fields = [];
 
     constructor() {
         super(...arguments);
         this.fields = this._prepareFields(this.args.content.content.fields);
+        this._updateCloneFields();
     }
 
     @computed("args.content.content.submit_label")
@@ -44,7 +47,6 @@ export default class OxisectionFormComponent extends Component {
 
     _prepareFields(fields) {
         let result = [];
-        let clonableRefNames = [];
         for (const fieldHash of fields) {
             // convert hash into field
             let field = new Field();
@@ -71,6 +73,9 @@ export default class OxisectionFormComponent extends Component {
             }
             // clonable field
             else {
+                if (this.clonableRefNames.indexOf(field._refName) < 0) {
+                    this.clonableRefNames.push(field._refName);
+                }
                 // process presets (array of key/value pairs): insert clones
                 // NOTE: this does NOT support dynamic input fields
                 if (isArray(field.value)) {
@@ -97,20 +102,23 @@ export default class OxisectionFormComponent extends Component {
                 else {
                     console.error(`oxisection-form: field "${field._refName}", property "value" - expected type: array, given type: ${typeof field.value}`);
                 }
-                if (clonableRefNames.indexOf(field._refName) < 0) {
-                    clonableRefNames.push(field._refName);
-                }
             }
         }
-        for (const name of clonableRefNames) {
-            let clones = result.filter(f => f._refName === name);
+
+        return result;
+    }
+
+    _updateCloneFields() {
+        for (const name of this.clonableRefNames) {
+            let clones = this.fields.filter(f => f._refName === name);
             for (const clone of clones) { clone.canDelete = true; }
             if (clones.length === 1) {
                 clones[0].canDelete = false;
             }
         }
-
-        return result;
+        // for unknown reasons we need to trigger an update since this._updateCloneFields()
+        // was inserted into addClone() and delClone()
+        this.fields = this.fields;
     }
 
     get uniqueFieldNames() {
@@ -137,6 +145,7 @@ export default class OxisectionFormComponent extends Component {
         let fieldCopy = field.clone();
         fieldCopy.value = "";
         fields.insertAt(index + 1, fieldCopy);
+        this._updateCloneFields();
     }
 
     @action
@@ -144,6 +153,7 @@ export default class OxisectionFormComponent extends Component {
         let fields = this.fields;
         let index = fields.indexOf(field);
         fields.removeAt(index);
+        this._updateCloneFields();
     }
 
     // Turns all fields into request parameters
