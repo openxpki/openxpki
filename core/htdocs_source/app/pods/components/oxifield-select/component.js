@@ -49,7 +49,7 @@ export default class OxifieldSelectComponent extends Component {
     // (and making it computed causes strange side effects when optionSelected() is triggered)
     get sanitizedValue() {
         var value = this.args.content.value;
-        if (typeof value === "string") return value;
+        if (typeof value === "string" || typeof value === "number") return value;
 
         var options = this.options;
         let result = options[0] ? (options[0].value || "") : "";
