@@ -40,9 +40,7 @@ export default class OxifieldDatetimeComponent extends Component {
     @action
     datePicked(dateObj) {
         // the dateObj will have the correct timezone set (as we gave it to BsDatetimepicker)
-        let datetime = (dateObj && dateObj !== "0")
-            ? Math.floor(dateObj / 1000)
-            : "";
+        let datetime = dateObj ? Math.floor(dateObj / 1000) : "";
         this.args.onChange(datetime);
     }
 }
