@@ -55,7 +55,12 @@
                                 <dd.menu @renderInPlace={{false}} as |ddm|>
                                     {{#each @content.content.actions as |action|}}
                                         <ddm.item>
-                                            <a {{on "click" (fn this.executeAction row action)}}>{{action.label}}</a>
+                                            <a {{on "click" (fn this.executeAction row action)}}>
+                                                {{action.label}}
+                                                {{#if action.icon}}
+                                                    <span class="pull-right glyphicon glyphicon-{{action.icon}}"></span>
+                                                {{/if}}
+                                            </a>
                                         </ddm.item>
                                     {{/each}}
                                 </dd.menu>
