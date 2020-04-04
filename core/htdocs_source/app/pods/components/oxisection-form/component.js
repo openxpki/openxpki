@@ -12,16 +12,19 @@ class Field {
     @tracked value;
     @tracked label;
     @tracked tooltip;
-    @tracked prompt;
     @tracked placeholder;
-    @tracked clonable;
-    @tracked options;
-    @tracked keys;
-    @tracked is_optional;
-    @tracked editable;
-    @tracked canDelete;
     @tracked actionOnChange;
     @tracked error;
+    // clonable fields:
+    @tracked clonable;
+    @tracked canDelete;
+    // dynamic input fields:
+    @tracked keys;
+    // oxifield-select:
+    @tracked options;
+    @tracked prompt;
+    @tracked is_optional;
+    @tracked editable;
 
     clone() {
         let field = new Field();
