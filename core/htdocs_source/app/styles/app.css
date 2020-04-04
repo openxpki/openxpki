@@ -326,89 +326,9 @@ div.oxifield-upload {
   padding-bottom: 34px;
 }
 
-input.oxi-file-input {
-/*
-  width: 100px;
-  position: absolute;
-  right: 15px;
-*/
-}
-
-.oxi-fileupload-dropzone {
-  border: 2px dashed #bbb;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  border-radius: 5px;
-  padding: 25px;
-  text-align: center;
-  font-size: 20pt;
-  font-weight: bold;
-  color: #bbb;
-}
-
-/*
-input.oxi-file-input::before {
-  visibility: visible;
-  position: absolute;
-  width: 100px;
-  height: 34px;
-  content: 'Select a file';
-  display: inline-block;
-  padding: 6px 12px;
-  margin-bottom: 0;
-  font-size: 14px;
-  font-weight: normal;
-  line-height: 1.42857143;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: middle;
-  cursor: pointer;
-  user-select: none;
-  background-image: none;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  color: #333;
-  background-color: #fff;
-  border-color: #ccc;
-}
-
-input.oxi-file-input:hover::before {
-  color: #333;
-  text-decoration: none;
-  background-color: #ebebeb;
-  border-color: #adadad;
-}
-
-input.oxi-file-input:active::before {
-  outline: thin dotted;
-  outline: 5px auto -webkit-focus-ring-color;
-  outline-offset: -2px;
-  color: #333;
-  background-color: #ebebeb;
-  border-color: #adadad;
-  background-image: none;
-}
-*/
 /* Clonable fields */
-.clonable-margin-right{
-  margin-right: 0px;
-}
 
-.clonable-margin-normal{
-  margin-right: 0px;
-}
-
-.clonable-icon{
-  text-indent: 6px;
-}
-.clonable-icon.clonable-add{
-  background: url("../img/add.png") no-repeat scroll left center;
-}
-.clonable-icon.clonable-remove{
-  background: url("../img/remove.png") no-repeat scroll left center;
-}
-
-/* Class attached to the column holding the clonable buttons */
+/* column holding the clonable buttons */
 .clonable-btn-group {
   white-space: nowrap;
 }
