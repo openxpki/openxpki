@@ -25,6 +25,8 @@ class Field {
     @tracked prompt;
     @tracked is_optional;
     @tracked editable;
+    // oxifield-static
+    @tracked verbose;
 
     clone() {
         let field = new Field();

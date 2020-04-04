@@ -84,6 +84,19 @@ export default class TestController extends Controller {
                     value: ["Please enter..."],
                     clonable: 1,
                 },
+                {
+                    type: "static",
+                    name: "label1",
+                    label: "Label",
+                    value: "on my shirt",
+                },
+                {
+                    type: "static",
+                    name: "label2",
+                    label: "Label",
+                    value: "on my shirt",
+                    verbose: "is sewed onto my shirt"
+                },
             ],
             buttons: [
                 {
