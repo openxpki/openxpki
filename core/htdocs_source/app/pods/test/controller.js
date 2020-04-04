@@ -132,4 +132,158 @@ export default class TestController extends Controller {
             ],
         }
     };
+
+    @tracked gridDef = {
+        "content": {
+            "pager": {
+                "startat": 0,
+                "reverse": 1,
+                "count": 3,
+                "pagersize": 20,
+                "pagesizes": [
+                    25,
+                    50,
+                    100,
+                    250,
+                    500
+                ],
+                "pagerurl": "certificate!pager!id!rJdrIbg1P6xsE6b9RtQCXp291SE",
+                "limit": 25,
+                "order": "notbefore"
+            },
+            "empty": "No data available",
+            "buttons": [
+                {
+                    "format": "expected",
+                    "page": "certificate!search!query!rJdrIbg1P6xsE6b9RtQCXp291SE",
+                    "label": "Reload Search Form"
+                },
+                {
+                    "format": "alternative",
+                    "page": "redirect!certificate!result!id!rJdrIbg1P6xsE6b9RtQCXp291SE",
+                    "label": "Refresh Result"
+                },
+                {
+                    "label": "New Search",
+                    "format": "failure",
+                    "page": "certificate!search"
+                },
+                {
+                    "label": "Export Result",
+                    "format": "optional",
+                    "target": "_blank",
+                    "href": "/cgi-bin/webui.fcgi?page=certificate!export!id!rJdrIbg1P6xsE6b9RtQCXp291SE"
+                }
+            ],
+            "actions": [
+                {
+                    "label": "Download",
+                    "icon": "download",
+                    "path": "certificate!detail!identifier!{identifier}",
+                    "target": "modal"
+                },
+                {
+                    "label": "Check",
+                    "icon": "download",
+                    "path": "certificate!detail!identifier!{identifier}",
+                    "target": "modal"
+                }
+            ],
+            "columns": [
+                {
+                    "sTitle": "Certificate Serial",
+                    "sortkey": "cert_key"
+                },
+                {
+                    "sTitle": "Subject",
+                    "sortkey": "subject"
+                },
+                {
+                    "format": "certstatus",
+                    "sortkey": "status",
+                    "sTitle": "Status"
+                },
+                {
+                    "sTitle": "not before",
+                    "sortkey": "notbefore",
+                    "format": "timestamp"
+                },
+                {
+                    "format": "timestamp",
+                    "sortkey": "notafter",
+                    "sTitle": "not after"
+                },
+                {
+                    "sTitle": "Issuer",
+                    "sortkey": "issuer_dn"
+                },
+                {
+                    "sortkey": "identifier",
+                    "sTitle": "Certificate Identifier"
+                },
+                {
+                    "sTitle": "identifier",
+                    "bVisible": 0
+                },
+                {
+                    "sTitle": "_className"
+                }
+            ],
+            "data": [
+                [
+                    "0x3ff536fff8da93943aa",
+                    "CN=e.d.c:pkiclient,DC=Test Deployment,DC=OpenXPKI,DC=org",
+                    {
+                        "value": "ISSUED",
+                        "label": "Issued"
+                    },
+                    "1585959633",
+                    1617495633,
+                    "CN=OpenXPKI Demo Issuing CA 1,OU=PKI,O=OpenXPKI,C=DE",
+                    "0qLkfCTwwj-8SoSOTtlRQLqS20o",
+                    "0qLkfCTwwj-8SoSOTtlRQLqS20o",
+                    {
+                        "label": "Issued",
+                        "value": "ISSUED"
+                    }
+                ],
+                [
+                    "0x2ff8fa8ee5590e2553a",
+                    "CN=sista.example.org:pkiclient,DC=Test Deployment,DC=OpenXPKI,DC=org",
+                    {
+                        "label": "Issued",
+                        "value": "ISSUED"
+                    },
+                    "1585434533",
+                    1616970533,
+                    "CN=OpenXPKI Demo Issuing CA 1,OU=PKI,O=OpenXPKI,C=DE",
+                    "fPF_JVAco7Eg0d3kANRFLYRPu5o",
+                    "fPF_JVAco7Eg0d3kANRFLYRPu5o",
+                    {
+                        "label": "Issued",
+                        "value": "ISSUED"
+                    }
+                ],
+                [
+                    "0x1ff22413f4fb6124ba6",
+                    "CN=jens.example.org:pkiclient,DC=Test Deployment,DC=OpenXPKI,DC=org",
+                    {
+                        "value": "ISSUED",
+                        "label": "Issued"
+                    },
+                    "1585434283",
+                    1616970283,
+                    "CN=OpenXPKI Demo Issuing CA 1,OU=PKI,O=OpenXPKI,C=DE",
+                    "1pEuBwPhwelApMgbnZr12gZB5us",
+                    "1pEuBwPhwelApMgbnZr12gZB5us",
+                    {
+                        "value": "ISSUED",
+                        "label": "Issued"
+                    }
+                ]
+            ]
+        },
+        "type": "grid",
+        "className": "certificate"
+    };
 }
