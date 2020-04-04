@@ -50,19 +50,15 @@ export default class OxifieldMainComponent extends Component {
     @action
     selectFieldType(value, label) {
         this.args.setName(value);
-        this.args.setError(null);
     }
 
     @action
     onChange(value) {
-        debug("oxifield-main: onChange");
         this.args.setValue(value);
-        this.args.setError(null);
     }
 
     @action
     onError(message) {
-        debug("oxifield-main: onError");
         this.args.setError(message);
     }
 }

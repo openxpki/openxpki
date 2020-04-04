@@ -21,6 +21,7 @@ class Field {
     @tracked editable;
     @tracked canDelete;
     @tracked actionOnChange;
+    @tracked error;
 
     clone() {
         let field = new Field();
@@ -193,6 +194,7 @@ export default class OxisectionFormComponent extends Component {
     setFieldValue(field, value) {
         debug(`oxisection-form: setFieldValue (${field.name} = "${value}")`);
         field.value = value;
+        field.error = null;
 
         // action on change?
         if (!field.actionOnChange) { return }
@@ -235,7 +237,7 @@ export default class OxisectionFormComponent extends Component {
      */
     @action
     setFieldError(field, message) {
-        debug(`oxisection-form: setFieldError (${field.name})`);
+        debug(`oxisection-form: setFieldError (${field.name} = ${message})`);
         field.error = message;
     }
 
@@ -251,14 +253,14 @@ export default class OxisectionFormComponent extends Component {
         // check validity and gather form data
         let isError = false;
         for (const field of this.fields) {
+            debug(`${field.name} = "${field.value}"`);
+
             if (!field.is_optional && !field.value) {
                 isError = true;
-                set(field, "error", "Please specify a value");
+                field.error = "Please specify a value";
             } else {
                 if (field.error) {
                     isError = true;
-                } else {
-                    delete field.error;
                 }
             }
         }
