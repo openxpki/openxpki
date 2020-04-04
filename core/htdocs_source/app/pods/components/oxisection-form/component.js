@@ -273,14 +273,13 @@ export default class OxisectionFormComponent extends Component {
         return getOwner(this).lookup("route:openxpki").sendAjax(data)
         .then((res) => {
             this.loading = false;
-            let errors = res.status != null ? res.status.field_errors : null;
-            if (errors) {
-                for (const error of errors) {
-                    let clones = this.fields.filter(f => f.name === error.name);
-                    if (typeof error.index === "undefined") {
-                        clones.setEach("error", error.error);
+            if (res.status != null) {
+                for (const faultyField of res.status.field_errors) {
+                    let clones = this.fields.filter(f => f.name === faultyField.name);
+                    if (typeof faultyField.index === "undefined") {
+                        clones.setEach("error", faultyField.error);
                     } else {
-                        set(clones[error.index], "error", error.error);
+                        clones[faultyField.index].error = faultyField.error;
                     }
                 }
             }
