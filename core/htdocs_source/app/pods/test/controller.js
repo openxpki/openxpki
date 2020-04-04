@@ -25,7 +25,7 @@ export default class TestController extends Controller {
                 },
                 {
                     type: "select",
-                    name: "test_select",
+                    name: "select_it",
                     label: "Your choice:",
                     options: [
                         { value: 1, label: "Major" },
@@ -34,10 +34,20 @@ export default class TestController extends Controller {
                 },
                 {
                     type: "select",
+                    name: "select_editable",
+                    label: "Your choice:",
+                    editable: 1,
+                    options: [
+                        { value: 1, label: "Tusen" },
+                        { value: 2, label: "Takk" },
+                    ],
+                },
+                {
+                    type: "select",
                     name: "test_select_2",
                     label: "Only one choice",
                     options: [
-                        { value: "", label: "The Void" },
+                        { value: "11", label: "Ocean" },
                     ],
                     value: "",
                 },

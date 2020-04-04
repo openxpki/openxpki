@@ -29,8 +29,6 @@ export default class OxifieldSelectComponent extends Component {
         let isEditable = this.args.content.editable;
         let isOptional = this.args.content.is_optional;
         if (options.length === 1 && !isEditable && !isOptional) {
-            // FIXME side effect of setting value - move somewhere else
-            this.args.onChange(this.options[0].value);
             return true;
         } else {
             return false;
@@ -58,6 +56,18 @@ export default class OxifieldSelectComponent extends Component {
     }
 
     @action
+    setStaticValue() {
+        this.args.onChange(this.options[0].value);
+    }
+
+    @action
+    optionSelected(value, label) {
+        debug("oxifield-select (" + this.args.content.name + "): optionSelected(" + value + ")");
+        this.args.onChange(value);
+    }
+
+
+    @action
     toggleCustomMode() {
         this.customMode = !this.customMode;
         if (!this.customMode) {
@@ -71,8 +81,7 @@ export default class OxifieldSelectComponent extends Component {
     }
 
     @action
-    optionSelected(value, label) {
-        debug("oxifield-select (" + this.args.content.name + "): optionSelected(" + value + ")");
-        this.args.onChange(value);
+    customInput(event) {
+        this.args.onChange(event.target.value);
     }
 }

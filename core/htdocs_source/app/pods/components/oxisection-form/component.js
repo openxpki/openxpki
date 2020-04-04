@@ -18,6 +18,7 @@ class Field {
     @tracked options;
     @tracked keys;
     @tracked is_optional;
+    @tracked editable;
     @tracked canDelete;
     @tracked actionOnChange;
 

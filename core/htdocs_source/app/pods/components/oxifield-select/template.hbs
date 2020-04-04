@@ -1,9 +1,15 @@
 {{#if this.isStatic}}
-    <div class="oxi-no-input">{{@content.options.0.label}}</div>
-{{else if this.content.editable}}
+    <div class="oxi-no-input" {{did-insert this.setStaticValue}}>{{@content.options.0.label}}</div>
+{{else if @content.editable}}
     <div class="input-group">
         {{#if this.customMode}}
-            {{input class="form-control" placeholder=this.content.placeholder value=this.content.value}}
+            <input
+                type="text"
+                class="form-control"
+                value={{@content.value}}
+                placeholder={{@content.placeholder}}
+                {{on "input" this.customInput}}
+            />
         {{else}}
             <OxiSelect @list={{this.options}} @selected={{this.sanitizedValue}} @onChange={{this.optionSelected}} />
         {{/if}}
