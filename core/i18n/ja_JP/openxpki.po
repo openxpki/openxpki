@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.1.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2019-12-07 10:00+0900\n"
+"PO-Revision-Date: 2020-04-06 09:27+0900\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -67,33 +67,26 @@ msgstr "プロファイル"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_HINT"
 msgstr "このプロファイルに基づく証明書のみ表示します。"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE"
-msgstr "別名"
+msgstr "失効理由"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE_AFFILIATIONCHANGED"
-msgstr "所属が変更されました"
+msgstr "所属変更"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE_CACOMPROMISE"
-msgstr "CAキーが侵害されました"
+msgstr "CAキー漏洩"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE_CESSATIONOFOPERATION"
-msgstr "操作の停止"
+msgstr "運用停止"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE_KEYCOMPROMISE"
-msgstr "証明書の鍵が侵害されました"
+msgstr "証明書キー漏洩"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE_SUPERSEDED"
-msgstr "発行者"
+msgstr "証明書破棄"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE_UNSPECIFIED"
-msgstr "証明書識別名"
+msgstr "未指定"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_RELATED_WORKFLOW_LABEL"
 msgstr "関連するワークフロー"
@@ -539,7 +532,6 @@ msgstr "レポート名"
 msgid "I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID"
 msgstr "Unable to perform action -  security token was invalid!"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_REVOCATION_ID"
 msgstr "ワークフローの取り消し"
 
@@ -608,9 +600,8 @@ msgstr "ロック解除が失敗しました。"
 msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_BUTTON"
 msgstr "ロック解除"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_KCV_MISMATCH"
-msgstr "ロック解除"
+msgstr "キーチェック値が秘密鍵とあっていません"
 
 msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
 msgstr "ロック解除"
@@ -658,12 +649,6 @@ msgstr "秘密鍵を読み込めません。"
 
 msgid "I18N_OPENXPKI_UI_UNABLE_TO_PARSE_PKCS10_REQUEST_DATA"
 msgstr "PKCS10リクエストを解析できません"
-
-msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_HISTORY"
-msgstr "ワークフロー履歴にアクセスするために必要な権利がありません。"
-
-msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_LOG"
-msgstr "ワークフローログにアクセスするために必要な権利がありません。"
 
 msgid "I18N_OPENXPKI_UI_UNKNOWN_ERROR"
 msgstr "不明なエラー"
@@ -1060,6 +1045,9 @@ msgstr "一時停止"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
 msgstr "再試行の回数が最大数を超えています"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE"
+msgstr "現在の権限ではこのワークフロープロパティーへのアクセスは禁止されています"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"
 msgstr "リクエストされたアクションは利用できません"
@@ -1867,6 +1855,12 @@ msgstr "実行"
 
 #~ msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_LABEL"
 #~ msgstr "失効リクエスト"
+
+#~ msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_HISTORY"
+#~ msgstr "ワークフロー履歴にアクセスするために必要な権利がありません。"
+
+#~ msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_LOG"
+#~ msgstr "ワークフローログにアクセスするために必要な権利がありません。"
 
 #~ msgid "I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_FAILED"
 #~ msgstr "ユーザーは証明書の所有者ではありません。"
