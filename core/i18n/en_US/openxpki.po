@@ -3071,7 +3071,6 @@ msgstr ""
 "issue the certificate with the requested dates! You need to add a new CA "
 "token before this request can be finalized!"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CONFIRM_LABEL"
 msgstr "CA lifetime missmatch"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_DESC"
@@ -3680,3 +3679,12 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_REVOKE_LABEL"
 #~ msgstr "Publish CA Information"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RELEASE_LOCK_LABEL"
+msgstr "Unlock a transaction id"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RELEASE_LOCK_DESC"
+msgstr "Deletes the link between a transaction id and a (broken) workflow so a new workflow can be created using the same transaction id"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RELEASE_LOCK_LABEL"
+msgstr "Transaktion entsperren"
