@@ -215,8 +215,7 @@ sub prefill_from_result {
     }
 
     my $data = {};
-    foreach my $key (@{ $json->{main}->[0]->{content}->{fields} }) {
-        my $t = $json->{main}->[0]->{content}->{fields}->{$key};
+    foreach my $t (@{ $json->{main}->[0]->{content}->{fields} }) {
         my $k = $t->{name};
         next if ($k eq 'wf_token' || $k eq 'action');
         my $v = $t->{value};
