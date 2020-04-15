@@ -1,6 +1,6 @@
 import Controller from '@ember/controller';
 import { tracked } from '@glimmer/tracking';
-import { computed, observer, action } from '@ember/object';
+import { action, computed, set } from '@ember/object';
 import { gt } from '@ember/object/computed';
 
 export default class OpenXpkiController extends Controller {
@@ -37,7 +37,7 @@ export default class OpenXpkiController extends Controller {
     activateTab(entry) {
         let tabs = this.get("model.tabs");
         tabs.setEach("active", false);
-        emSet(entry, "active", true);
+        set(entry, "active", true);
         return false;
     }
 
