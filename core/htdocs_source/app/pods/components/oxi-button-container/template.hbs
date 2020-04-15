@@ -18,23 +18,22 @@
                 </div>
             {{/each}}
         {{else}}
-            <div class="btn-group">
-                {{#each @buttons as |btn|}}
-                    {{#if btn.break_before}}
-                        <div class="spacer"></div>
-                    {{/if}}
-
-                    {{#if btn.section}}
-                        <!-- Section are not supported yet -->
-                    {{else}}
-                        <OxiButton @button={{btn}} @onClick={{@buttonClick}}/>
-                    {{/if}}
-
-                    {{#if btn.break_after}}
-                        <div class="spacer"></div>
-                    {{/if}}
-                {{/each}}
-            </div>
+            {{#each this.buttonGroups as |btnGroup|}}
+                <div class="btn-group btn-group-justified">
+                    {{#each btnGroup as |btn|}}
+                        {{!-- Additional wrapping needed to properly display justified buttons.
+                             See https://getbootstrap.com/docs/3.3/components/#btn-groups-justified --}}
+                        <div class="btn-group" role="group">
+                            {{#if btn.section}}
+                                <!-- Section are not supported yet -->
+                            {{else}}
+                                <OxiButton @button={{btn}} @onClick={{@buttonClick}}/>
+                            {{/if}}
+                        </div>
+                    {{/each}}
+                </div>
+                <div class="spacer"></div>
+            {{/each}}
         {{/if}}
     </div>
 {{/if}}
