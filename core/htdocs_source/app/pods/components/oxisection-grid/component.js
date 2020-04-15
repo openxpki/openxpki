@@ -303,7 +303,7 @@ export default class OxisectionGridComponent extends Component {
     sort(page) {
         let pager = this.pager;
         if (pager.pagerurl) {
-            if (page.order) { this.page(page) }
+            if (page.order) { this.setPage(page) }
         }
         else {
             setProperties(pager, page);
