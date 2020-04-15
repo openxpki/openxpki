@@ -32,11 +32,10 @@ sub _evaluate
 
     my $expected = $self->param('value');
 
-    CTX('log')->application()->debug("Check IsValue '$value' != '$expected'");
-
-
     if (!defined $value || $value ne $expected ) {
+        $expected //= 'undef';
         ##! 16: " Values differ - expected: $expected, found: $value "
+        CTX('log')->application()->debug("Check IsValue '$value' != '$expected'");
         condition_error("I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CONNECTOR_IS_VALUE");
     }
     ##! 32: sprintf ' Values match - expected: %s, found: %s ', $expected , $value

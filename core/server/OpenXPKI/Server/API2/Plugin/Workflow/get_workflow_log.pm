@@ -46,24 +46,20 @@ command "get_workflow_log" => {
 } => sub {
     my ($self, $params) = @_;
 
+    my $util = OpenXPKI::Server::API2::Plugin::Workflow::Util->new;
+
     ##! 1: "get_workflow_log"
     my $wf_id = $params->id;
 
     # ACL check
-    my $wf_type = $self->api->get_workflow_type_for_id(id => $wf_id);
-
-    my $role = CTX('session')->data->role || 'Anonymous';
-    my $allowed = CTX('config')->get([ 'workflow', 'def', $wf_type, 'acl', $role, 'techlog' ] );
-
-    OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_LOG',
-        params  => {
-            'ID' => $wf_id,
-            'TYPE' => $wf_type,
-            'USER' => CTX('session')->data->user,
-            'ROLE' => $role
-        },
-    ) unless $allowed;
+    $util->factory->authorize_workflow({
+        ACTION => 'techlog',
+        ID => $wf_id,
+    })
+    or OpenXPKI::Exception->throw (
+        message => "No permission to access the log this type of workflow",
+        params => { type => CTX('api2')->get_workflow_type_for_id(id => $wf_id) }
+    );
 
     # Reverse is inverted as we want to have reversed order by default
     my $order = $params->reverse ? 'ASC' : 'DESC';

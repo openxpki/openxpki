@@ -254,11 +254,12 @@ sub authorize_workflow {
     my $self     = shift;
     my $arg_ref  = shift;
     ##! 1: 'start'
-
+    ##! 32: $arg_ref
     eval {
         $self->__authorize_workflow( $arg_ref );
     };
     if ($EVAL_ERROR) {
+        CTX('log')->system()->warn($EVAL_ERROR);
         return 0;
     }
     return 1;
@@ -287,8 +288,7 @@ sub __authorize_workflow {
     my $realm    = CTX('session')->data->pki_realm;
     ##! 16: 'realm: ' . $realm
 
-    my $role     = CTX('session')->data->role;
-    $role = 'Anonymous' unless($role);
+    my $role     = CTX('session')->data->role || 'Anonymous';
     ##! 16: 'role: ' . $role
 
     my $user     = CTX('session')->data->user;
@@ -355,8 +355,28 @@ sub __authorize_workflow {
         }
 
         return 1;
+
+    } elsif ($action =~ m{\A(fail|resume|wakeup|history|techlog|attribute|context)\z}) {
+
+        my $type = $arg_ref->{TYPE};
+        $type = $arg_ref->{WORKFLOW}->type() unless ($type || !$arg_ref->{WORKFLOW});
+        $type = CTX('api2')->get_workflow_type_for_id(id => $arg_ref->{ID}) unless($type);
+
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE',
+            params  => {
+                'REALM'   => $realm,
+                'ROLE'    => $role,
+                'WF_TYPE' => $type,
+                'PROPERTY' => $action,
+            }
+        ) unless ($type && $conn->get([ 'workflow', 'def', $type, 'acl', $role, $action ]));
+
+        return 1;
+
     }
     else {
+        ##! 16: "Invalid action $action"
         OpenXPKI::Exception->throw(
             message => 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_UNKNOWN_ACTION',
             params  => {

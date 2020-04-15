@@ -5,6 +5,7 @@ use warnings;
 use strict;
 use Carp;
 use English;
+use Data::Dumper;
 use OpenXPKI::Client::Simple;
 
 has config => (
@@ -42,14 +43,27 @@ sub pickup_workflow {
     my $pickup_value = shift;
 
     my $workflow_type = $config->{workflow};
-
+    my $client = $self->backend();
     my $wf_id;
-    if ($config->{pickup_namespace}) {
+    if (my $wf_type = $config->{pickup_workflow}) {
+
+        $client->logger()->debug("Pickup via workflow $wf_type with keys " . join(",", keys %{$pickup_value}));
+        my $result = $client->handle_workflow({
+            type => $wf_type,
+            params => $pickup_value,
+        });
+
+        die "No result from pickup workflow" unless($result->{context});
+        $client->logger()->trace("Pickup workflow result: " . Dumper $result) if ($client->logger()->is_trace);
+
+        $wf_id = $result->{context}->{workflow_id};
+
+    } elsif ($config->{pickup_namespace}) {
 
         die "The parameters pickup_attribute and pickup_namespace are mutually exclusive" if ($config->{pickup_attribute});
 
-        $self->backend()->logger()->debug("Pickup via datapool with $config->{pickup_namespace} => $pickup_value" );
-        my $wfl = $self->backend()->run_command('get_data_pool_entry', {
+        $client->logger()->debug("Pickup via datapool with $config->{pickup_namespace} => $pickup_value" );
+        my $wfl = $client->run_command('get_data_pool_entry', {
             namespace => $config->{pickup_namespace},
             key => $pickup_value,
         });
@@ -61,8 +75,8 @@ sub pickup_workflow {
         # pickup from workflow with explicit attribute name or key name
         my $pickup_key = $config->{pickup_attribute} || $config->{pickup};
 
-        $self->backend()->logger()->debug("Pickup via workflow with $pickup_key => $pickup_value" );
-        my $wfl = $self->backend()->run_command('search_workflow_instances', {
+        $client->logger()->debug("Pickup via attribute with $pickup_key => $pickup_value" );
+        my $wfl = $client->run_command('search_workflow_instances', {
             type => $workflow_type,
             attribute => { $pickup_key => $pickup_value },
             limit => 2
@@ -75,13 +89,13 @@ sub pickup_workflow {
         }
     }
 
-    $self->backend()->logger()->trace("No pickup as no result found");
+    $client->logger()->trace("No pickup as no result found");
 
     return unless ($wf_id);
 
-    $self->backend()->logger()->debug("Pickup $wf_id for $pickup_value");
+    $client->logger()->debug("Pickup $wf_id for $pickup_value");
 
-    return $self->backend()->handle_workflow({
+    return $client->handle_workflow({
         id => $wf_id,
     });
 

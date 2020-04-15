@@ -18,7 +18,7 @@ def virtualbox_version()
 end
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "debian/contrib-jessie64"
+  config.vm.box = "debian/contrib-buster64"
 
   # Do not try to update VirtualBox Guest Additions (which fails anyway).
   # Instead we do that manually in assets/provision-basic.sh

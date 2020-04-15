@@ -24,6 +24,8 @@ sub _evaluate {
 
     my $key =  $self->param('hash_key');
 
+    configuration_error('No key defined') unless($key);
+
     my $val = $hash->valueForKey($key);
 
     ##! 16: ' Key: ' . $key . ' - Value ' . Dumper ( $val )

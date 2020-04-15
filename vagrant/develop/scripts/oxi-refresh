@@ -63,8 +63,8 @@ IS_FULLCONFIG=0
 # Grab and install Perl module dependencies from Makefile.PL using PPI
 #
 # fix problems with newer Net::DNS:
-rm -f /usr/lib/x86_64-linux-gnu/perl5/5.20/Net/DNS.pm
-cpanm --notest Net::DNS                                               >$LOG 2>&1
+#rm -f /usr/lib/x86_64-linux-gnu/perl5/5.20/Net/DNS.pm
+#cpanm --notest Net::DNS                                               >$LOG 2>&1
 
 echo "Checking and installing Perl module dependencies"
 cpanm --notest PPI                                                    >$LOG 2>&1

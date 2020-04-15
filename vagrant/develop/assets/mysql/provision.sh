@@ -21,7 +21,7 @@ while read def; do export $def; done < /etc/environment
 #
 # Run Docker container
 #
-echo "MySQL: downloading and starting Docker container with database"
+echo "MySQL: downloading and starting Docker container (mariadb) with database"
 docker rm -f mariadb >/dev/null 2>&1
 docker run -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root \
            --name mariadb mariadb:10.1 >$LOG 2>&1 || _exit $?

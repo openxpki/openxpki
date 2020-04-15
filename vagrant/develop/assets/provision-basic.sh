@@ -49,7 +49,10 @@ fi
 # Install some requirements
 #
 apt-get update >$LOG 2>&1
-install_packages rsync gettext apache2 libapache2-mod-fcgid libssl-dev
+apt-get upgrade --assume-yes
+# libzip-dev for Net::SSLeay
+# libexpat1-dev for XML::Parser
+install_packages mc rsync gettext apache2 libapache2-mod-fcgid libssl-dev libzip-dev libexpat1-dev libtest-deep-perl libtest-exception-perl
 
 #
 # Install CPANminus

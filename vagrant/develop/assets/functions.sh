@@ -26,5 +26,7 @@ function install_packages {
         # quiet mode -q=2 implies -y
         DEBIAN_FRONTEND=noninteractive apt-get -q=2 install "${to_install[@]}" >$LOG 2>&1
         set +e
+    else
+        echo "All needed OS packages already installed ($@)"
     fi
 }

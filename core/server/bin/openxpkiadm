@@ -594,7 +594,7 @@ sub alias_update {
 
 sub alias_list {
 
-    my $realm = $params{realm} || '';
+    my $realm = $params{realm} || '_global';
     # get names of groups
     my $groups = CTX('config')->get_hash(['realm',$realm,'crypto','type']);
 
@@ -608,6 +608,7 @@ sub alias_list {
     # Prepare template for where part based on filter
     my $where = { 'pki_realm' => { value => $realm } };
     my $limit = 999;
+
     if ($filter ne 'all') {
         # not all => active or current
         my $now = time();
@@ -747,9 +748,46 @@ sub alias_list {
     print "upcoming root ca:\n";
     __alias_print( $alias, $show_subject );
 
-
     return 0;
 
+
+}
+
+sub alias_show {
+
+    my $alias = CTX('dbi')->select_one(
+        from   => 'aliases',
+        columns => ['*'],
+        where => {
+            alias =>  $params{alias},
+            pki_realm => $params{realm} || '_global',
+        },
+        limit => 1,
+    );
+
+   __alias_print($alias, $params{subject});
+
+    if ($params{export}) {
+        my $pem = CTX('api2')->get_cert( identifier => $alias->{identifier}, format => 'PEM' );
+        my $file = $params{export};
+        if (-d $file) {
+            $file .= sprintf('/%s.pem', $alias->{alias});
+        }
+        if (-e $file) {
+            print "Export location $file exists - override (y/N)?";
+            chomp(my $input = <STDIN>);
+            if ($input !~ /y/i) {
+                print "Aborted!\n";
+                return;
+            }
+        }
+        open(my $fh, ">", $file) || die "Unable to write to $file";
+        print $fh $pem;
+        close ($fh);
+        print "Certificate was written to $file\n";
+    }
+
+   return 0;
 
 }
 
@@ -1398,6 +1436,7 @@ if ($cmd eq 'initdb') {
       identifier=s
       subject
       nogroup
+      export|o=s
     );
     __init();
 
@@ -1411,10 +1450,12 @@ if ($cmd eq 'initdb') {
         $ret = alias_del();
     } elsif ($params{update}  || $subcmd eq 'update') {
         $ret = alias_update();
-    } elsif (!$params{identifier}) {
-        $ret = alias_list();
-    } else {
+    } elsif ($params{alias}) {
+        $ret = alias_show();
+    } elsif ($params{identifier}) {
         $ret = alias_add();
+    } else {
+        $ret = alias_list();
     }
 } elsif ($cmd eq 'key') {
 
@@ -1880,11 +1921,20 @@ To show the certificates subject besides the identifier, add --subject.
 
 To show a list of all or all active tokens, you can add the filter parameter:
 
-   --filter all or --filter active
+  --filter all or --filter active
 
 You can also filter by a certain group name with --group <groupname>.
 
 Specify --nogroup to list tokens that do not belong to a group.
+
+=item B<show/export a single alias>
+
+Show the details of a single alias and export the linked certificate to a file.
+
+  --alias    The full alias (e.g. ca-signer-1)
+  --subject  Print the subject of the certificate
+  --export   Write PEM encoded certificate to <target>. If target is a
+             directory the alias is used as filename.
 
 =item B<add functional token with automatic group discovery>
 

@@ -123,7 +123,7 @@ while (my $cgi = CGI::Fast->new()) {
                 $client->disconnect() if ($client);
                 next;
             }
-        
+
         } elsif ($content_type =~ m{\Aapplication/json}) {
             $input_method = 'JSON';
 
@@ -296,10 +296,15 @@ while (my $cgi = CGI::Fast->new()) {
         # check for pickup parameter
         if (my $pickup_key = $conf->{$method}->{pickup}) {
             my $pickup_value;
-            if ($postdata) {
-                $pickup_value = $postdata->{$pickup_key};
+            # namespace needs a single value
+            if ($config->{pickup_workflow}) {
+                my @keys = split /\s*,\s*/, $pickup_key;
+                foreach my $key (@keys) {
+                    my $val = $postdata ? $postdata->{$key} : $cgi->param($key);
+                    $pickup_value->{$key} = $val if (defined $val);
+                }
             } else {
-                $pickup_value = $cgi->param($pickup_key);
+                $pickup_value = $postdata ? $postdata->{$pickup_key} : $cgi->param($pickup_key);
             }
             if ($pickup_value) {
                 $workflow = $rpc->pickup_workflow($conf->{$method}, $pickup_value);

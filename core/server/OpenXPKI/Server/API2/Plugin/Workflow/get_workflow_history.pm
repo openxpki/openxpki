@@ -40,36 +40,25 @@ B<Parameters>
 
 =item * C<id> I<Int> - workflow ID
 
-=item * C<noacl> I<Bool> -
-
 =back
 
 =cut
 command "get_workflow_history" => {
     id    => { isa => 'Int', required => 1, },
-    noacl => { isa => 'Bool', default => 0 },
 } => sub {
     my ($self, $params) = @_;
 
     my $wf_id = $params->id;
 
-    if (not $params->noacl) {
-        my $role = CTX('session')->data->role || 'Anonymous';
-        my $wf_type = $self->api->get_workflow_type_for_id(id => $wf_id);
-        my $allowed = CTX('config')->get([ 'workflow', 'def', $wf_type, 'acl', $role, 'history' ] );
-
-        if (not $allowed) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_HISTORY',
-                params  => {
-                    id => $wf_id,
-                    type => $wf_type,
-                    user => CTX('session')->data->user,
-                    role => $role
-                },
-            );
-        }
-    }
+    my $util = OpenXPKI::Server::API2::Plugin::Workflow::Util->new;
+    $util->factory->authorize_workflow({
+        ACTION => 'fail',
+        ID => $wf_id,
+    })
+    or OpenXPKI::Exception->throw (
+        message => "No permission to execute get_workflow_history on this workflow type",
+        params => { type => CTX('api2')->get_workflow_type_for_id(id => $wf_id) }
+    );
 
     my $history = CTX('dbi')->select(
         from => 'workflow_history',

@@ -37,7 +37,8 @@ crl_expiry only queries CRLs for active certsign tokens. It returns a literal
 is not set in the result if no group name is defined in I<crypto.type.certsign>.
 
 dv_expiry is zero if no vault token is found at all, it is unset if no group
-name is defined in I<crypto.type.datasafe>.
+name is defined in I<crypto.type.datasafe>. If ignore_validity is set and a
+token ist found it is -1.
 
 =cut
 command "get_ui_system_status" => {
@@ -106,7 +107,13 @@ command "get_ui_system_status" => {
             },
             order_by => '-notafter',
         );
-        $result->{dv_expiry} = $db_datavault ? $db_datavault->{notafter} : 0;
+        if (!$db_datavault) {
+            $result->{dv_expiry} = 0;
+        } elsif (CTX('config')->get(["system","datavault","ignore_validity"])) {
+            $result->{dv_expiry} = -1;
+        } else {
+            $result->{dv_expiry} = $db_datavault->{notafter};
+        }
     };
 
     return $result;

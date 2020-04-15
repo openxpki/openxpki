@@ -606,7 +606,7 @@ sub _escape {
 Generates a new random id and stores the passed workflow info, expects
 a wf_info and the token info to store as parameter, returns a hashref
 with the definiton of a hidden field which can be directly
-pushed onto the field list.
+pushed onto the field list. wf_info can be undef / empty string.
 
 =cut
 
@@ -616,10 +616,11 @@ sub __register_wf_token {
     my $wf_info = shift;
     my $token = shift;
 
-    $token->{wf_id} = $wf_info->{workflow}->{id};
-    $token->{wf_type} = $wf_info->{workflow}->{type};
-    $token->{wf_last_update} = $wf_info->{workflow}->{last_update};
-
+    if (ref $wf_info) {
+        $token->{wf_id} = $wf_info->{workflow}->{id};
+        $token->{wf_type} = $wf_info->{workflow}->{type};
+        $token->{wf_last_update} = $wf_info->{workflow}->{last_update};
+    }
     my $id = $self->__generate_uid();
     $self->logger()->debug('wf token id ' . $id);
     $self->logger()->trace('token info ' . Dumper  $token) if $self->logger()->is_trace;
