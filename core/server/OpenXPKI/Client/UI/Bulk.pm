@@ -171,11 +171,6 @@ sub action_result {
         # also use the id of the token as name for the input field
         $btn{action} = 'workflow!bulk!wf_token!'.$token->{value};
         $btn{selection} = $token->{value};
-
-        if ($btn{format}) {
-            $btn{className} = $btn{format};
-            delete $btn{format};
-        }
         push @buttons, \%btn;
     }
 
