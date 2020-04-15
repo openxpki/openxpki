@@ -220,7 +220,7 @@ export default class OxisectionFormComponent extends Component {
 
         return getOwner(this).lookup("route:openxpki").sendAjax(request)
         .then((doc) => {
-            for (const newField of doc.fields) {
+            for (const newField of this._prepareFields(doc.fields)) {
                 for (const oldField of fields) {
                     if (oldField.name === newField.name) {
                         let idx = fields.indexOf(oldField);
