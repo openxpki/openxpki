@@ -9,6 +9,8 @@ export default class OxifieldMainComponent extends Component {
 
     get field() {
         let field = this.args.field.toPlainHash();
+        // strip trailing newlines
+        if (typeof field.value === 'string') field.value = field.value.replace(/\n*$/, "");
         return field;
     }
 

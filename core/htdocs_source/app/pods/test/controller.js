@@ -62,6 +62,12 @@ export default class TestController extends Controller {
                     label: "Password, verifiable",
                 },
                 {
+                    type: "passwordverify",
+                    name: "pwd_verified",
+                    label: "Password, verifiable, preset",
+                    value: "123\n",
+                },
+                {
                     type: "datetime",
                     name: "dt_now",
                     label: "Date, now",
