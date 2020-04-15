@@ -168,12 +168,19 @@ export default class OxisectionFormComponent extends Component {
         this._updateCloneFields();
     }
 
-    // Turns all fields into request parameters
+    // Turns all (non-empty) fields into request parameters
     _fields2request() {
         let result = [];
 
         for (const name of this.uniqueFieldNames) {
             var newName = name;
+
+            // send clonables as list (even if there's only one field) and other fields as plain values
+            let potentialClones = this.fields.filter(f =>
+                f.name === name && (typeof f.value !== 'undefined') && f.value !== ""
+            );
+
+            if (potentialClones.length === 0) continue;
 
             // encode ArrayBuffer as Base64 and change field name as a flag
             let encodeValue = (val) => {
@@ -186,13 +193,11 @@ export default class OxisectionFormComponent extends Component {
                 }
             };
 
-            // send clonables as list (even if there's only one field) and other fields as plain values
-            let potentialClones = this.fields.filter(f => f.name === name);
-            let value = potentialClones[0].clonable
-                ? potentialClones.map(c => encodeValue(c.value))
-                : encodeValue(potentialClones[0].value);
+            result[newName] = potentialClones[0].clonable
+                ? potentialClones.map(c => encodeValue(c.value))    // array for clonable fields
+                : encodeValue(potentialClones[0].value)             // or plain value otherwise
 
-            result[newName] = value;
+            debug(`${name} = ${ potentialClones[0].clonable ? `[${result[newName]}]` : `"${result[newName]}"` }`);
         }
         return result;
     }
@@ -263,8 +268,6 @@ export default class OxisectionFormComponent extends Component {
         // check validity and gather form data
         let isError = false;
         for (const field of this.fields) {
-            debug(`${field.name} = "${field.value}"`);
-
             if (!field.is_optional && !field.value) {
                 isError = true;
                 field.error = "Please specify a value";

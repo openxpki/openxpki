@@ -12,7 +12,7 @@ export default class TestController extends Controller {
 
     @tracked formDef = {
         type: "form",
-        action: "dummy",
+        action: "login!password",
         content: {
             title: "Test input",
             submit_label: "Perform",
