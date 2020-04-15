@@ -45,12 +45,12 @@ export default class OxifieldMainComponent extends Component {
     */
 
     @action
-    addClone(field) {
+    addClone() {
         this.args.addClone(this.args.field);
     }
 
     @action
-    delClone(field) {
+    delClone() {
         this.args.delClone(this.args.field);
     }
 
