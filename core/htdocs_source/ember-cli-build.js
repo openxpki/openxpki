@@ -12,8 +12,15 @@ module.exports = function(defaults) {
             bootstrapVersion: 3,
             importBootstrapCSS: true,
             importBootstrapFont: true,
+            // only include used components into compiled JS
             whitelist: ['bs-button', 'bs-modal', 'bs-dropdown', 'bs-tooltip', 'bs-navbar', 'bs-collapse'],
-        }
+        },
+
+        // disable fingerprinting of assets in production build
+        // (i.e. "openxpki.js" instead of "openxpki-1312d860591f9801798c1ef46052a7ea.js")
+        fingerprint: {
+            enabled: false,
+        },
     });
 
     // Use `app.import` to add additional libraries to the generated
