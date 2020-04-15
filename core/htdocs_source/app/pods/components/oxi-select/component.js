@@ -40,6 +40,7 @@ export default class OxiSelectComponent extends Component {
         let item = this.args.list[index];
         debug(`oxi-select: notifyOnChange (value="${item.value}", label="${item.label}")`);
         if (typeof this.args.onChange !== "function") {
+            /* eslint-disable-next-line no-console */
             console.error("<OxiSelect>: Wrong type parameter type for @onChange. Expected: function, given: " + (typeof this.args.onChange));
             return;
         }

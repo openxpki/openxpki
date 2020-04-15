@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { action, computed, set } from "@ember/object";
+import { action, computed } from "@ember/object";
 import { tracked } from '@glimmer/tracking';
 import { getOwner } from '@ember/application';
 import { isArray } from '@ember/array';
@@ -67,6 +67,7 @@ export default class OxisectionFormComponent extends Component {
             let field = new Field();
             for (const attr of Object.keys(fieldHash)) {
                 if (! Field.prototype.hasOwnProperty(attr)) {
+                    /* eslint-disable-next-line no-console */
                     console.error(`oxisection-form: unknown field property "${attr}" (field "${fieldHash.name}"). If it's a new property, please add it to the 'Field' class defined in oxisection-form.js.`);
                 }
                 else {

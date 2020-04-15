@@ -68,6 +68,7 @@ export default class OxiButtonComponent extends Component {
         if (!this.args.button.format) { return "" }
         let cssClass = format2css[this.args.button.format];
         if (cssClass === undefined) {
+            /* eslint-disable-next-line no-console */
             console.error(`oxi-button: button "${this.args.button.label}" has unknown format: "${this.args.button.format}"`);
         }
         return cssClass ?? "";

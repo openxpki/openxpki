@@ -18,7 +18,7 @@ const types = {
     linklist: v => `<ul class="list-unstyled">${Object.values(v).map(w => `<li><a href='#/openxpki/${w.page}' target='${w.target || "modal"}' title='${w.tooltip || ""}'>${w.label}</a></li>`).join("")}</ul>`,
     styled: v => $('<span/>').text(v).html().replace(/(([a-z]+):)?(.*)/gm, '<span class="styled-$2">$3</span>'),
     tooltip: v => `<span title='${v.tooltip || ""}'>${v.value}</span>`,
-    head: v => "1",
+    head: () => "1",
 };
 
 export default types;

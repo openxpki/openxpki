@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { tracked  } from '@glimmer/tracking';
-import { action, computed, set } from '@ember/object';
+import { action, set } from '@ember/object';
 import { getOwner } from '@ember/application';
 
 export default class OxifieldCertIdentifierComponent extends Component {
@@ -55,12 +55,12 @@ export default class OxifieldCertIdentifierComponent extends Component {
     }
 
     @action
-    onFocus(evt) {
+    onFocus() {
         if (this.searchResults.length) { this.isDropdownOpen = true }
     }
 
     @action
-    onBlur(evt) {
+    onBlur() {
         this.isDropdownOpen = false;
     }
 

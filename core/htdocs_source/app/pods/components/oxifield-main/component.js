@@ -1,7 +1,5 @@
 import Component from '@glimmer/component';
-import { tracked } from '@glimmer/tracking';
-import { computed, action } from "@ember/object";
-import { debug } from '@ember/debug';
+import { action } from "@ember/object";
 
 export default class OxifieldMainComponent extends Component {
     get isBool() {
@@ -42,7 +40,7 @@ export default class OxifieldMainComponent extends Component {
     }
 
     @action
-    selectFieldType(value, label) {
+    selectFieldType(value) {
         this.args.setName(value);
     }
 

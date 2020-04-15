@@ -1,6 +1,6 @@
 import Route from '@ember/routing/route';
 import { tracked } from '@glimmer/tracking';
-import { later, scheduleOnce, cancel } from '@ember/runloop';
+import { later, cancel } from '@ember/runloop';
 import { getOwner } from '@ember/application';
 import { Promise } from 'rsvp';
 import { set as emSet } from '@ember/object';
@@ -82,6 +82,7 @@ export default class OpenXpkiRoute extends Route {
     }
 
     // Reserved Ember function "model"
+    /* eslint-disable-next-line no-unused-vars */
     model(params, transition) {
         this.content.page = params.model_id; this.updateNavEntryActiveState(this.content);
         return this.content;
@@ -126,6 +127,7 @@ export default class OpenXpkiRoute extends Route {
             this.content.refresh = null;
         }
 
+        /* eslint-disable-next-line no-unused-vars */
         return new Promise((resolve, reject) => {
             $.ajax(req).then(
                 // SUCCESS

@@ -1,7 +1,6 @@
 import Component from '@glimmer/component';
-import { action, computed } from '@ember/object';
+import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
-import { getOwner } from '@ember/application';
 import { guidFor } from '@ember/object/internals';
 import { debug } from '@ember/debug';
 
@@ -31,7 +30,7 @@ export default class OxifieldUploadComponent extends Component {
     }
 
     @action
-    openFileUpload(evt) {
+    openFileUpload() {
         document.getElementById(this.fileUploadElementId).click();
     }
 

@@ -1,9 +1,7 @@
 import Component from '@glimmer/component';
 import { getOwner } from '@ember/application';
 import { action, computed, set, setProperties } from '@ember/object';
-import { bool } from '@ember/object/computed';
 import { tracked } from '@glimmer/tracking';
-import $ from "jquery";
 
 /**
 Shows a button with an optional confirm dialog.
@@ -223,7 +221,7 @@ export default class OxisectionGridComponent extends Component {
     }
 
     @action
-    executeAction(row, act, event) {
+    executeAction(row, act) {
         let columns = this.rawColumns;
         let data = this.rawData[row.originalIndex];
         let path = act.path;

@@ -1,6 +1,5 @@
 import Controller from '@ember/controller';
 import { tracked } from '@glimmer/tracking';
-import { action, set } from "@ember/object";
 
 export default class TestController extends Controller {
     testButton = {

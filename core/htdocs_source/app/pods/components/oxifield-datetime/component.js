@@ -13,8 +13,8 @@ export default class OxifieldDatetimeComponent extends Component {
         this.value = (!val || val === "now")
             ? null // in the template this will be used as a flag
             : this.resolveTimezone(
-                v => moment.unix(val).utc(),
-                v => moment.unix(val).local(),
+                () => moment.unix(val).utc(),
+                () => moment.unix(val).local(),
                 v => moment.unix(val).tz(v),
                 tz
             );
@@ -31,9 +31,9 @@ export default class OxifieldDatetimeComponent extends Component {
     @computed("args.content.timezone")
     get timezone() {
         return this.resolveTimezone(
-            v => "UTC",
-            v => "local",
-            v => this.args.content.timezone,
+            () => "UTC",
+            () => "local",
+            () => this.args.content.timezone,
         );
     }
 

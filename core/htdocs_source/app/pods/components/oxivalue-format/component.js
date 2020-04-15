@@ -20,7 +20,7 @@ export default class OxivalueFormatComponent extends Component {
         }
     }
 
-    @computed("args.content.format", "args.content.value")
+    @computed("args.content.{format,value}")
     get formattedValue() {
         let htmlStr = this.types[this.args.content.format || "text"](this.args.content.value);
         let el = $('<div/>');
