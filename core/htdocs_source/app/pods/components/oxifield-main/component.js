@@ -1,11 +1,12 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { computed, action } from "@ember/object";
-import { equal, bool } from "@ember/object/computed";
 import { debug } from '@ember/debug';
 
 export default class OxifieldMainComponent extends Component {
-    @equal("args.field.type", "bool") isBool;
+    get isBool() {
+        return this.args.field.type === "bool";
+    }
 
     get field() {
         let field = this.args.field.toPlainHash();
@@ -30,20 +31,6 @@ export default class OxifieldMainComponent extends Component {
         return 'col-md-' + size;
     }
 
-    /*
-    keyPress: function(event) {
-        if (event.keyCode === 9) {
-            if (this.args.field.clonable) {
-                if (this.args.field.value) {
-                    this.addClone(this.args.field);
-                    event.stopPropagation();
-                    return event.preventDefault();
-                }
-            }
-        }
-    },
-    */
-
     @action
     addClone() {
         this.args.addClone(this.args.field);
@@ -67,5 +54,15 @@ export default class OxifieldMainComponent extends Component {
     @action
     onError(message) {
         this.args.setError(message);
+    }
+
+    @action
+    onKeypress(event) {
+        // ENTER --> submit form
+        if (event.keyCode === 13 && this.field.type !== "textarea") {
+            event.stopPropagation();
+            event.preventDefault();
+            this.args.submit();
+        }
     }
 }
