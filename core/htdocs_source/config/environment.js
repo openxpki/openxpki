@@ -3,8 +3,7 @@
 module.exports = function(environment) {
     let ENV = {
         modulePrefix: 'openxpki',
-        // namespaced directory where resolver will look for your resource files
-        podModulePrefix: 'openxpki/pods',
+        podModulePrefix: 'openxpki/pods',   // namespaced directory where resolver will look for resource files
         environment,
         rootURL: '/openxpki/',  // https://guides.emberjs.com/release/configuring-ember/embedding-applications/#toc_specifying-a-root-url
         locationType: 'hash',   // https://guides.emberjs.com/release/configuring-ember/specifying-url-type/
@@ -32,6 +31,11 @@ module.exports = function(environment) {
             // 'none' - no data, just timezone API
             includeTimezone: 'all',
         },
+
+        /*
+         * Custom global constants
+         */
+        buildYear: (new Date()).getFullYear(),
     };
 
     if (environment === 'development') {
