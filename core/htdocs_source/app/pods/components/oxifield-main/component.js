@@ -7,6 +7,11 @@ import { debug } from '@ember/debug';
 export default class OxifieldMainComponent extends Component {
     @equal("args.field.type", "bool") isBool;
 
+    get field() {
+        let field = this.args.field.toPlainHash();
+        return field;
+    }
+
     get type() {
         return "oxifield-" + this.args.field.type;
     }

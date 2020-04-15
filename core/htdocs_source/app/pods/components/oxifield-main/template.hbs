@@ -15,7 +15,9 @@
         {{#if @field.tooltip}}
             <BsTooltip @title="{{@field.tooltip}}"/>
         {{/if}}
-        {{component this.type content=@field onChange=this.onChange onError=this.onError}}
+
+        {{component this.type content=this.field onChange=this.onChange onError=this.onError}}
+
         {{#if @field.error}}
             <span class="help-block">{{@field.error}}</span>
         {{/if}}

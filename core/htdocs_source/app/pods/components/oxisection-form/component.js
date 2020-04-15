@@ -35,6 +35,12 @@ class Field {
         Object.keys(Object.getPrototypeOf(this)).forEach(k => field[k] = this[k]);
         return field;
     }
+
+    toPlainHash() {
+        let hash = {};
+        Object.keys(Object.getPrototypeOf(this)).forEach(k => hash[k] = this[k]);
+        return hash;
+    }
 }
 
 export default class OxisectionFormComponent extends Component {
