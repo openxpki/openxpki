@@ -137,6 +137,12 @@ export default class TestController extends Controller {
                     value: "on my shirt",
                     verbose: "is sewed onto my shirt"
                 },
+                {
+                    type: "textarea",
+                    name: "prosa",
+                    label: "Textarea",
+                    value: "Hi there!\nHow are you?",
+                },
             ],
             buttons: [
                 {
