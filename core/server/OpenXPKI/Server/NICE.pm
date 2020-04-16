@@ -177,16 +177,16 @@ sub __persistCertificateInformation {
     );
 
 
-    my @parsed_subject_alt_names = @{$x509->get_subject_alt_name()};
-    ##! 32: 'sans (parsed): ' . Dumper \@parsed_subject_alt_names
-    for my $san (@parsed_subject_alt_names) {
+    my @structured_subject_alt_names = @{$x509->get_structured_subject_alt_name()};
+    ##! 32: 'sans (structured): ' . Dumper \@structured_subject_alt_names
+    for my $san (@structured_subject_alt_names) {
         CTX('dbi')->insert(
             into => 'certificate_attributes',
             values => {
                 attribute_key        => AUTO_ID,
                 identifier           => $identifier,
                 attribute_contentkey => 'subject_alt_name',
-                attribute_value      => join(":", @$san),
+                attribute_value      => $serializer->serialize($san),
             },
         );
     }
