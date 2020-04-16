@@ -194,9 +194,11 @@ export default class OxisectionFormComponent extends Component {
                 }
             };
 
-            result[newName] = potentialClones[0].clonable
+            let value = potentialClones[0].clonable
                 ? potentialClones.map(c => encodeValue(c.value))    // array for clonable fields
                 : encodeValue(potentialClones[0].value)             // or plain value otherwise
+            // setting 'result' must be separate step as encodeValue() modifies 'newName'
+            result[newName] = value;
 
             debug(`${name} = ${ potentialClones[0].clonable ? `[${result[newName]}]` : `"${result[newName]}"` }`);
         }
