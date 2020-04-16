@@ -1,7 +1,6 @@
 import Route from '@ember/routing/route';
 import { tracked } from '@glimmer/tracking';
 import { later, cancel } from '@ember/runloop';
-import { getOwner } from '@ember/application';
 import { Promise } from 'rsvp';
 import { set as emSet } from '@ember/object';
 import { debug } from '@ember/debug';
@@ -35,6 +34,11 @@ export default class OpenXpkiRoute extends Route {
     needReboot = ["login", "logout", "login!logout", "welcome"];
 
     @tracked content = new Content();
+
+    get backendUrl() {
+        let baseUrl = `${window.location.protocol}//${window.location.host}`;
+        return `${baseUrl}/cgi-bin/webui.fcgi`;
+    }
 
     // Reserved Ember function "beforeModel"
     beforeModel(transition) {
@@ -106,7 +110,7 @@ export default class OpenXpkiRoute extends Route {
             },
             dataType: "json",
             type: data.action ? "POST" : "GET",
-            url: getOwner(this).lookup("controller:config").url,
+            url: this.backendUrl,
         };
         if (req.type === "POST") {
             req.data._rtoken = this.content.rtoken;
