@@ -106,6 +106,30 @@ has subject_alt_name => (
     builder => '_build_san'
 );
 
+=head2
+
+Returns a pointer to a list of SANs. Each SAN is represented as a pointer to a list
+containing two items - the SAN type (IP, DNS, dirName, etc.) and its value. The value
+is represented in its decoded ASN.1 form.
+
+Example return value:
+
+  [
+    [ "DNS", "example.com" ],
+    [ "email", "foo@example.com" ]
+  ]
+
+=cut
+
+has structured_subject_alt_name => (
+	is => 'ro',
+	init_arg => undef,
+	isa => 'ArrayRef',
+	reader => 'get_structured_subject_alt_name',
+	lazy => 1,
+	builder => '_build_structured_san'
+);
+
 has issuer => (
     is => 'ro',
     init_arg => undef,
@@ -262,6 +286,41 @@ sub _build_san {
         my $san_type = $san_map->{$type};
         next unless($san_type);
         push @san_list, [ $san_type, $value ];
+    }
+
+    return \@san_list;
+}
+
+sub _build_structured_san {
+
+    my $self = shift;
+
+    my $san_map = {
+        otherName => 'otherName',
+        rfc822Name => 'email',
+        dNSName => 'DNS',
+        x400Address => '', # not supported by openssl
+        directoryName => 'dirName',
+        ediPartyName => '', # not supported by openssl
+        uniformResourceIdentifier => 'URI',
+        iPAddress  => 'IP',
+        registeredID => 'RID',
+    };
+
+    my @san_list;
+    my $san_exts = $self->_cert->DecodedSubjectAltNames();
+
+	# Walk through all the extensions (though there really should be only)
+    foreach my $san_ext (@$san_exts) {
+        # Walk through all the names in the extension
+        foreach my $name (@$san_ext) {
+            # Walk through the keys of the name (there should only be one)
+            foreach my $type (keys %{$name}) {
+                my $san_type = $san_map->{$type};
+                next unless($san_type);
+                push @san_list, [ $san_type, $name->{$type} ];
+            }
+        }
     }
 
     return \@san_list;
