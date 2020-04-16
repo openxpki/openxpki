@@ -231,21 +231,18 @@ sub login_step {
             OpenXPKI::Exception->throw (
                 message  => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED",
                 children => [ $exc ],
-        log => {
-            priority => 'warn',
-            facility => 'auth',
-        },
-        );
-        }
-        else {
+            log => {
+                priority => 'warn',
+                facility => 'auth',
+            });
+        } else {
             OpenXPKI::Exception->throw (
                 message  => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED",
-                children => [ $EVAL_ERROR->message() ],
-        log => {
-            priority => 'warn',
-            facility => 'auth',
-        },
-        );
+                params => { error => scalar $EVAL_ERROR },
+            log => {
+                priority => 'warn',
+                facility => 'auth',
+            });
         }
     }
 
