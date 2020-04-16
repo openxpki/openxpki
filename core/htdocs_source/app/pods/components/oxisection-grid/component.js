@@ -22,7 +22,6 @@ export default class OxisectionGridComponent extends Component {
     }
 
     get rawColumns() { return (this.args.def.columns || []) }
-    get rawButtons() { return (this.args.def.buttons || []) }
     get rawActions() { return (this.args.def.actions || []) }
 
     get hasAction() { return this.rawActions.length > 0 }
@@ -207,17 +206,25 @@ export default class OxisectionGridComponent extends Component {
         return this.sortedData.isEvery("checked", true);
     }
 
-    @computed("sortedData.@each.checked", "rawButtons")
-    get dummyMethodToSetButtonState() {
-        let noneChecked = this.sortedData.isEvery("checked", false);
-        for (const button of this.rawButtons.filterBy("select")) {
-            set(button, "disabled", noneChecked);
-        }
+    @computed("sortedData.@each.checked")
+    get noneChecked() {
+        return this.sortedData.isEvery("checked", false);
     }
 
-    @computed("rawButtons.@each.select")
+    @computed("buttons.@each.select")
     get isBulkable() {
-        return this.rawButtons.isAny("select");
+        return this.buttons.isAny("select");
+    }
+
+    @computed("args.def.buttons", "noneChecked")
+    get buttons() {
+        let buttons = this.args.def.buttons || [];
+        return buttons.map(b => {
+            if (b.select) {
+                set(b, "disabled", this.noneChecked);
+            }
+            return b;
+        })
     }
 
     @action
