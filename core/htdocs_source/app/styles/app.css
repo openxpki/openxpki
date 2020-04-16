@@ -105,11 +105,6 @@ span.pagination-label {
   padding: 6px 0;
 }
 
-/* bootstrap-3-typeahead */
-.input-group .twitter-typeahead {
-  display: table-cell !important;
-}
-
 /******************************************************************************
  * Loading indicators
  */
