@@ -1,9 +1,7 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action, computed } from "@ember/object";
-import { next } from '@ember/runloop'
 import { debug } from '@ember/debug';
-import $ from "jquery";
 
 export default class OxifieldSelectComponent extends Component {
     @tracked customMode = false;
@@ -75,9 +73,11 @@ export default class OxifieldSelectComponent extends Component {
                 this.args.onChange(this.options[0].value);
             }
         }
-        next(this, () => {
-            $("input,select")[0].focus();
-        });
+    }
+
+    @action
+    focusCustomInput(element) {
+        element.focus();
     }
 
     @action

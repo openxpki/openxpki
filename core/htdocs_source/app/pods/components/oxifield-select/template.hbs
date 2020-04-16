@@ -9,6 +9,7 @@
                 value={{@content.value}}
                 placeholder={{@content.placeholder}}
                 {{on "input" this.customInput}}
+                {{did-insert this.focusCustomInput}}
             />
         {{else}}
             <OxiSelect @list={{this.options}} @selected={{this.sanitizedValue}} @onChange={{this.optionSelected}} />
