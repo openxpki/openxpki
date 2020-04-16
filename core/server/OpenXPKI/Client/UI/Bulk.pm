@@ -165,7 +165,8 @@ sub action_result {
         }
         my $token = $self->__register_wf_token( undef, {
             wf_action => $action,
-            ($btn{params} ? (params => $btn{params}) :())
+            ($btn{params} ? (params => $btn{params}) :()),
+            ($btn{async} ? (async => 1) :()),
         });
         delete $btn{params};
         # also use the id of the token as name for the input field

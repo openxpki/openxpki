@@ -1581,8 +1581,6 @@ sub action_bulk {
     # wf_token is also used as name of the form field
     my @serials = $self->param($wf_token.'[]');
 
-    $self->logger()->debug('Selected workflows : ' . join(", ", @serials));
-
     my @success; # list of wf_info results
     my $errors; # hash with wf_id => error
 
@@ -1592,9 +1590,21 @@ sub action_bulk {
         %params = %{$wf_args->{params}} if ($wf_args->{params});
     } elsif ($wf_args->{wf_action} =~ m{\w+_\w+}) {
         $command = 'execute_workflow_activity';
-        $params{action} = $wf_args->{wf_action};
+        $params{activity} = $wf_args->{wf_action};
         $params{params} = %{$wf_args->{params}} if ($wf_args->{params});
     }
+    # run in background
+    $params{async} = 1 if ($wf_args->{async});
+
+
+    if (!$command) {
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_HANDLE_WITHOUT_ACTION!','error');
+        return $self;
+    }
+
+    $self->logger()->debug("Run command $command on workflows " . join(", ", @serials));
+
+    $self->logger()->trace('Execute parameters ' . Dumper \%params) if ($self->logger()->is_trace);
 
     foreach my $id (@serials) {
 
@@ -1671,7 +1681,9 @@ sub action_bulk {
             className => 'workflow',
             content => {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_SUCCESS_ITEMS_LABEL',
-                description => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_SUCCESS_ITEMS_DESC',
+                description => $params{async} ?
+                    'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_ASYNC_ITEMS_DESC' :
+                    'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_SUCCESS_ITEMS_DESC',
                 actions => [{
                     path => 'workflow!info!wf_id!{serial}',
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
