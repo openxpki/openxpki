@@ -1,7 +1,7 @@
 import Route from '@ember/routing/route';
 
-export default Route.extend({
-    redirect: function(/*model, transition*/) {
+export default class IndexRoute extends Route {
+    redirect(/*model, transition*/) {
         return this.transitionTo("openxpki", "welcome");
     }
-});
+}
