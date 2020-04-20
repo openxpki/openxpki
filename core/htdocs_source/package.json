@@ -2,9 +2,9 @@
   "name": "openxpki",
   "version": "0.0.0",
   "private": true,
-  "description": "Small description for myapp goes here",
+  "description": "",
   "repository": "",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": "",
   "directories": {
     "doc": "doc",
