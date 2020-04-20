@@ -1,11 +1,82 @@
 import Component from '@glimmer/component';
-import { action, computed } from '@ember/object';
+import { action } from '@ember/object';
 import { getOwner } from '@ember/application';
-import $ from 'jquery';
-import types from './types';
 
 export default class OxivalueFormatComponent extends Component {
-    types = types;
+
+/*
+
+TODO: @action defuseValue(val) ...
+--> an allen Stellen verwenden , wo im Template {{{value}}} steht
+
+*/
+
+    get format() {
+        return (this.args.content.format || "text");
+    }
+
+    @action
+    isType(type) {
+        console.warn(`TEST ${this.format} == ${type}`);
+        return this.format === type;
+    }
+
+    get valueStr() {
+        return (new String(this.args.content.value || "")).replace(/\r/gm, "");
+    }
+
+    get valueSplitByNewline() {
+        return this.valueStr.split(/\n/);
+    }
+
+    get tooltip() {
+        return (this.args.content.tooltip || "");
+    }
+
+    get label() {
+        return (this.args.content.label || "");
+    }
+
+    get timestamp() {
+        return (this.args.content.value > 0
+            ? moment.unix(this.args.content.value).utc().format("YYYY-MM-DD HH:mm:ss UTC")
+            : "---");
+    }
+
+    get datetime() {
+        return moment().utc(this.args.content.value).format("YYYY-MM-DD HH:mm:ss UTC");
+    }
+
+    get styledValue() {
+        let m = this.args.content.value.match(/(([a-z]+):)?(.*)/gm);
+        return {
+            style: m[1],
+            label: m[2],
+        };
+    }
+
+    get defusedRawValue() {
+        return this.defuseHtml(this.valueStr);
+    }
+
+    defuseHtml(html) {
+        let parser = new DOMParser();
+        let body = parser.parseFromString(html, "text/html").body;
+
+        for (let script of body.querySelectorAll("script")) {
+            script.remove();
+        }
+        for (let element of body.querySelectorAll("*")) {
+            let attrs = element.attributes; // a NamedNodeMap, not an Array
+            for (let i = attrs.length - 1; i >= 0; i--) {
+                if (attrs[i].name.match(/^on/) || attrs[i].value.match(/javascript/)) {
+                    element.removeAttribute(attrs[i].name);
+                }
+            }
+        }
+
+        return body.innerHTML;
+    }
 
     @action
     click(evt) {
@@ -18,21 +89,5 @@ export default class OxivalueFormatComponent extends Component {
                 target: target.target,
             });
         }
-    }
-
-    @computed("args.content.{format,value}")
-    get formattedValue() {
-        let htmlStr = this.types[this.args.content.format || "text"](this.args.content.value);
-        let el = $('<div/>');
-        // cleanup: remove all 'onXXX=' and 'javascript=' attributes and <script> elements
-        el.html(htmlStr).find('*').each(function() {
-            if (!$(this).attributes) return;
-            let toStrip = $(this).attributes
-                .filter(attr => (/^on/.test(attr.nodeName) || /javascript/.test(attr.value)))
-                .map(attr => attr.nodeName);
-            for (const name of toStrip) { $(this).removeAttribute(name) }
-        });
-        el.find('script').remove();
-        return el.html();
     }
 }

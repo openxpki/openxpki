@@ -245,9 +245,9 @@ export default class TestController extends Controller {
                     "format": "timestamp"
                 },
                 {
-                    "format": "timestamp",
+                    "format": "raw",
                     "sortkey": "notafter",
-                    "sTitle": "not after"
+                    "sTitle": "raw"
                 },
                 {
                     "sTitle": "Issuer",
@@ -291,7 +291,7 @@ export default class TestController extends Controller {
                         "value": "ISSUED"
                     },
                     "1585434533",
-                    1616970533,
+                    "<a href=\"test\" onclick=\"alert('huh')\">test</a>",
                     "CN=OpenXPKI Demo Issuing CA 1,OU=PKI,O=OpenXPKI,C=DE",
                     "fPF_JVAco7Eg0d3kANRFLYRPu5o",
                     "fPF_JVAco7Eg0d3kANRFLYRPu5o",
@@ -300,23 +300,6 @@ export default class TestController extends Controller {
                         "value": "ISSUED"
                     }
                 ],
-                [
-                    "0x1ff22413f4fb6124ba6",
-                    "CN=jens.example.org:pkiclient,DC=Test Deployment,DC=OpenXPKI,DC=org",
-                    {
-                        "value": "ISSUED",
-                        "label": "Issued"
-                    },
-                    "1585434283",
-                    1616970283,
-                    "CN=OpenXPKI Demo Issuing CA 1,OU=PKI,O=OpenXPKI,C=DE",
-                    "1pEuBwPhwelApMgbnZr12gZB5us",
-                    "1pEuBwPhwelApMgbnZr12gZB5us",
-                    {
-                        "value": "ISSUED",
-                        "label": "Issued"
-                    }
-                ]
             ]
         },
         "type": "grid",
