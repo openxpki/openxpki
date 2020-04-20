@@ -1,5 +1,5 @@
-<div id="application" {{did-insert (action "removeLoader")}}>
-    <ApplicationHeader @user={{this.user}}/>
+<div id="application" {{did-insert this.removeLoader}}>
+    <ApplicationHeader/>
     {{outlet}}
 </div>
 <ApplicationFooter/>
