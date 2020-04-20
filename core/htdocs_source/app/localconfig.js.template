@@ -1,0 +1,8 @@
+/*
+ * CUSTOM CONFIGURATIONS
+ * Copy this file to "localconfig.js" and adjust the options to your needs.
+ */
+
+export default {
+    backendPath: 'cgi-bin/webui.fcgi',  // Protocol + host are prepended automatically
+};

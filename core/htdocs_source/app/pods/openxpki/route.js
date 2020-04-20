@@ -3,6 +3,7 @@ import { tracked } from '@glimmer/tracking';
 import { later, cancel } from '@ember/runloop';
 import { Promise } from 'rsvp';
 import { set as emSet } from '@ember/object';
+import { inject as service } from '@ember/service';
 import { debug } from '@ember/debug';
 import $ from "jquery";
 
@@ -22,6 +23,8 @@ class Content {
 }
 
 export default class OpenXpkiRoute extends Route {
+    @service('oxi-config') config;
+
     // Reserved Ember property "queryParams"
     // https://api.emberjs.com/ember/3.17/classes/Route/properties/queryParams?anchor=queryParams
     queryParams = {
@@ -37,7 +40,7 @@ export default class OpenXpkiRoute extends Route {
 
     get backendUrl() {
         let baseUrl = `${window.location.protocol}//${window.location.host}`;
-        return `${baseUrl}/cgi-bin/webui.fcgi`;
+        return `${baseUrl}/${this.config.backendPath}`;
     }
 
     // Reserved Ember function "beforeModel"
