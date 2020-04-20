@@ -25,6 +25,9 @@ module.exports = function(defaults) {
         fingerprint: {
             enabled: false,
         },
+
+        // store app config in compiled JS file instead of <meta> tag
+        storeConfigInMeta: false,
     });
 
     // Use `app.import` to add additional libraries to the generated
