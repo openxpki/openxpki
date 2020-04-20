@@ -89,12 +89,18 @@ sub pickup_workflow {
         }
     }
 
-    $client->logger()->trace("No pickup as no result found");
+    if (!$wf_id) {
+        $client->logger()->trace("No pickup as no result found");
+        return unless ($wf_id);
+    }
 
-    return unless ($wf_id);
+    if (ref $wf_id || $wf_id !~ m{\A\d+\z}) {
+        $client->logger()->error("Pickup result is not an integer number!");
+        $client->logger()->trace(Dumper $wf_id) if ($client->logger()->is_trace());
+        return;
+    }
 
-    $client->logger()->debug("Pickup $wf_id for $pickup_value");
-
+    $client->logger()->debug("Pickup $wf_id for " . (ref $pickup_value ? (join " ,", values %{$pickup_value}) : $pickup_value));
     return $client->handle_workflow({
         id => $wf_id,
     });

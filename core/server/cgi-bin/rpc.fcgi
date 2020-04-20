@@ -297,10 +297,12 @@ while (my $cgi = CGI::Fast->new()) {
         if (my $pickup_key = $conf->{$method}->{pickup}) {
             my $pickup_value;
             # namespace needs a single value
-            if ($config->{pickup_workflow}) {
+            if ($conf->{$method}->{pickup_workflow}) {
                 my @keys = split /\s*,\s*/, $pickup_key;
                 foreach my $key (@keys) {
-                    my $val = $postdata ? $postdata->{$key} : $cgi->param($key);
+                    # take value from param hash if defined, this makes data
+                    # from the environment avail to the pickup workflow
+                    my $val = $param->{$key} // ($postdata ? $postdata->{$key} : $cgi->param($key));
                     $pickup_value->{$key} = $val if (defined $val);
                 }
             } else {
@@ -360,15 +362,23 @@ while (my $cgi = CGI::Fast->new()) {
             $res = { error => { code => 50002, message => $error, data => { pid => $$ } } };
         }
 
+    # no ID and not not finished is an unrecoverable startup error
     } elsif (( $workflow->{'proc_state'} ne 'finished' && !$workflow->{id} ) || $workflow->{'proc_state'} eq 'exception') {
 
         $log->error("workflow terminated in unexpected state" );
         $res = { error => { code => 50003, message => 'workflow terminated in unexpected state',
             data => { pid => $$, id => $workflow->{id}, 'state' => $workflow->{'state'} } } };
 
+    # if the workflow is running, we do not expose any data of the workflows
+    } elsif ( $workflow->{'proc_state'} eq 'running' ) {
+
+        $log->info(sprintf("RPC request was processed properly (Workflow: %01d is currently running)",
+            $workflow->{id} ));
+        $res = { result => { id => $workflow->{id}, 'state' => '--', 'proc_state' => $workflow->{'proc_state'}, pid => $$ }};
+
     } else {
 
-        $log->info(sprintf("RPC request was processed properly (Workflow: %01d, State: %s (%s)",
+        $log->info(sprintf("RPC request was processed properly (Workflow: %01d, State: %s (%s))",
             $workflow->{id}, $workflow->{state}, $workflow->{'proc_state'}) );
         $res = { result => { id => $workflow->{id}, 'state' => $workflow->{'state'}, 'proc_state' => $workflow->{'proc_state'}, pid => $$ }};
 
