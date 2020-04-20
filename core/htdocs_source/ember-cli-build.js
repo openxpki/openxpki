@@ -5,7 +5,11 @@ const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 module.exports = function(defaults) {
     let app = new EmberApp(defaults, {
         minifyCSS: {
-            options: { processImport: true }
+            // for available options see https://github.com/jakubpawlowicz/clean-css/tree/v3.4.28
+            options: {
+                processImport: true,
+                keepBreaks: true,
+            }
         },
 
         'ember-bootstrap': {
