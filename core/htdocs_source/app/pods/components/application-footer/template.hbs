@@ -1,7 +1,11 @@
 <div id="footer">
     <div class="container-fluid">
-        <p class="text-center text-muted credit">
-            &copy; Copyright {{this.envBuildYear}} &ndash; <a href="http://www.openxpki.org/">The OpenXPKI Project</a>
-        </p>
+        {{#if this.config.footer}}
+            {{{this.config.footer}}}
+        {{else}}
+            <p class="text-center text-muted credit">
+                &copy; Copyright {{this.config.copyrightYear}} &ndash; <a href="http://www.openxpki.org/">The OpenXPKI Project</a>
+            </p>
+        {{/if}}
     </div>
 </div>

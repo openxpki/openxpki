@@ -1,8 +1,34 @@
 /*
  * CUSTOM CONFIGURATIONS
- * Copy this file to "localconfig.js" and adjust the options to your needs.
+ * Copy this file to "localconfig.js" and adjust the options you need
  */
-
 const OXI_LOCALCONFIG = {
-    backendPath: 'cgi-bin/webui.fcgi',  // Protocol + host are prepended automatically
+    /*
+     * URL path to Perl backend (protocol + host are prepended automatically)
+     */
+    //backendPath: 'cgi-bin/webui.fcgi',
+
+    /*
+     * Website header
+     */
+    /*
+    header: `
+        <h2>
+            <a href="./#/"><img src="img/logo.png" class="toplogo"></a>
+            &nbsp;
+            <small>Open Source Trustcenter</small>
+        </h2>
+    `,
+    */
+
+    /*
+     * Website footer
+     */
+    /*
+    footer: `
+        <p class="text-center text-muted credit">
+            &copy; Copyright 2020 &ndash; <a href="http://www.openxpki.org/">The OpenXPKI Project</a>
+        </p>
+    `,
+    */
 };

@@ -1,11 +1,15 @@
 <div class="container-fluid">
     <div class="header row">
         <div class="col-xs-6">
-            <h2>
-                <a href="./#/"><img src="{{this.rootURL}}img/logo.png" class="toplogo"></a>
-                &nbsp;
-                <small>Open Source Trustcenter</small>
-            </h2>
+            {{#if this.config.header}}
+                {{{this.config.header}}}
+            {{else}}
+                <h2>
+                    <a href="./#/"><img src="{{this.rootURL}}img/logo.png" class="toplogo"></a>
+                    &nbsp;
+                    <small>Open Source Trustcenter</small>
+                </h2>
+            {{/if}}
         </div>
         <div class="col-xs-6">
             <ApplicationHeaderUserinfo/>
