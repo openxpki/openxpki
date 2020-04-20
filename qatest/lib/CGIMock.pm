@@ -1,6 +1,7 @@
 package CGIMock;
 
 use Moose;
+use Data::Dumper;
 
 has data => (
     is => 'rw',
@@ -22,36 +23,36 @@ sub param {
     if ($name) {
         my $val = $self->data()->{$name};
         if (ref $val eq 'ARRAY') {
+            warn "param in array context is deprecated - use multi_param";
             return @{$val};
         }
         return $val;
     }
     if (wantarray) {
-        warn "param in array context is deprecated - use multi_param";
-        return keys %{$self->data()};    
+        return keys %{$self->data()};
     }
     return $self->data();
 
 }
 
 sub multi_param {
-    
+
     my $self = shift;
     my $name = shift;
-    
+
     if (!wantarray) {
-        die "multi_param must not be used outside array context";    
-    }    
-     
+        die "multi_param must not be used outside array context";
+    }
+
     if ($name) {
         my $val = $self->data()->{$name};
         if (!$val) { return (); }
         if (ref $val ne 'ARRAY') {
-            die "Requested value is not an array!"
+            return ($val);
         }
         return @{$val};
-    }   
-    return keys %{$self->data()};   
+    }
+    return keys %{$self->data()};
 }
 
 sub url_param {
@@ -67,17 +68,17 @@ sub url_param {
         return $val;
     }
     if (wantarray) {
-        return keys %{$self->data()};    
+        return keys %{$self->data()};
     }
     return $self->url_data();
 
 }
 
 sub request_method {
-    
+
     # always return POST to allow retrival of the action parameter
     return 'POST';
-    
+
 }
 
 sub header {}
