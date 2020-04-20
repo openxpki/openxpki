@@ -3,11 +3,11 @@
 {{#let @content.value as |v|}}
 
     {{#if (eq this.format "certstatus")}}
-        <span class="certstatus-{{lc (try v.value v.label)}}" title={{v.tooltip}}>{{{v.label}}}</span>
+        <span class="certstatus-{{lc (try v.value v.label)}}" title={{v.tooltip}}>{{{defuse v.label}}}</span>
     {{else if (eq this.format "link")}}
-        <a href="#/openxpki/{{v.page}}" target={{try v.target "modal"}} title={{v.tooltip}}>{{{v.label}}}</a>
+        <a href="#/openxpki/{{v.page}}" target={{try v.target "modal"}} title={{v.tooltip}}>{{{defuse v.label}}}</a>
     {{else if (eq this.format "extlink")}}
-        <a href={{v.page}} target={{try v.target "_blank"}} title={{v.tooltip}}>{{{v.label}}}</a>
+        <a href={{v.page}} target={{try v.target "_blank"}} title={{v.tooltip}}>{{{defuse v.label}}}</a>
     {{else if (eq this.format "timestamp")}}
         {{this.timestamp}}
     {{else if (eq this.format "datetime")}}
@@ -19,7 +19,7 @@
     {{else if (eq this.format "code")}}
         <code>{{this.valueStr}}</code>
     {{else if (eq this.format "raw")}}
-        {{{this.defusedRawValue}}}
+        {{{defuse this.valueStr}}}
     {{else if (eq this.format "defhash")}}
         <dl>
             {{#each-in v as |key val|}}
@@ -40,14 +40,14 @@
         </ul>
     {{else if (eq this.format "rawlist")}}
         <ul class="list-unstyled">
-            {{#each-in v as |key val|}} <li>{{{val}}}</li> {{/each-in}}
+            {{#each-in v as |key val|}} <li>{{{defuse val}}}</li> {{/each-in}}
         </ul>
     {{else if (eq this.format "linklist")}}
         <ul class="list-unstyled">
             {{#each-in v as |key val|}}
                 <li>
                     <a href="#/openxpki/{{val.page}}" target={{try val.target "modal"}} title={{val.tooltip}}>
-                        {{{val.label}}}
+                        {{{defuse val.label}}}
                     </a>
                 </li>
                 {{/each-in}}

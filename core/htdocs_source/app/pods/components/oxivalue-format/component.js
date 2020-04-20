@@ -41,29 +41,6 @@ TODO: @action defuseValue(val) ...
         };
     }
 
-    get defusedRawValue() {
-        return this.defuseHtml(this.valueStr);
-    }
-
-    defuseHtml(html) {
-        let parser = new DOMParser();
-        let body = parser.parseFromString(html, "text/html").body;
-
-        for (let script of body.querySelectorAll("script")) {
-            script.remove();
-        }
-        for (let element of body.querySelectorAll("*")) {
-            let attrs = element.attributes; // a NamedNodeMap, not an Array
-            for (let i = attrs.length - 1; i >= 0; i--) {
-                if (attrs[i].name.match(/^on/) || attrs[i].value.match(/javascript/)) {
-                    element.removeAttribute(attrs[i].name);
-                }
-            }
-        }
-
-        return body.innerHTML;
-    }
-
     @action
     click(evt) {
         let target = evt.target;
