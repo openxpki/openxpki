@@ -5,16 +5,12 @@ export default class OxiConfigService extends Service {
 
     constructor() {
         super(...arguments);
-        try {
-            this.localConfig = require('../../localconfig');
+        if (typeof OXI_LOCALCONFIG !== 'undefined') {
+            this.localConfig = OXI_LOCALCONFIG;
+            console.log("Using custom configuration in localconfig.js");
         }
-        catch (e) {
-            if (e.message.match(/Could not find module/)) {
-                console.log("No localconfig.js found - using defaults")
-            }
-            else {
-                throw e
-            };
+        else {
+            console.log("No localconfig.js found - using defaults");
         }
     }
 
