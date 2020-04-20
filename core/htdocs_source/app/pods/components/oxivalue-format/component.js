@@ -15,26 +15,12 @@ TODO: @action defuseValue(val) ...
         return (this.args.content.format || "text");
     }
 
-    @action
-    isType(type) {
-        console.warn(`TEST ${this.format} == ${type}`);
-        return this.format === type;
-    }
-
     get valueStr() {
         return (new String(this.args.content.value || "")).replace(/\r/gm, "");
     }
 
     get valueSplitByNewline() {
         return this.valueStr.split(/\n/);
-    }
-
-    get tooltip() {
-        return (this.args.content.tooltip || "");
-    }
-
-    get label() {
-        return (this.args.content.label || "");
     }
 
     get timestamp() {

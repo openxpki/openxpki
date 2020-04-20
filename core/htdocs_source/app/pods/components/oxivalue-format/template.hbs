@@ -7,7 +7,7 @@
     {{else if (eq this.format "link")}}
         <a href="#/openxpki/{{v.page}}" target={{try v.target "modal"}} title={{v.tooltip}}>{{{v.label}}}</a>
     {{else if (eq this.format "extlink")}}
-        <a href={{v.page}} target={{try v.target "_blank"}} title={{this.tooltip}}>{{{v.label}}}</a>
+        <a href={{v.page}} target={{try v.target "_blank"}} title={{v.tooltip}}>{{{v.label}}}</a>
     {{else if (eq this.format "timestamp")}}
         {{this.timestamp}}
     {{else if (eq this.format "datetime")}}
@@ -22,29 +22,29 @@
         {{{this.defusedRawValue}}}
     {{else if (eq this.format "defhash")}}
         <dl>
-            {{#each-in @content.value as |key val|}}
+            {{#each-in v as |key val|}}
                 <dt>{{key}}</dt>
                 <dd>{{val}}</dd>
             {{/each-in}}
         </dl>
     {{else if (eq this.format "deflist")}}
         <dl>
-            {{#each-in @content.value as |key val|}}
+            {{#each-in v as |key val|}}
                 <dt>{{val.label}}</dt>
                 <dd>{{#if (eq val.format "raw")}} {{{val.value}}} {{else}} {{val.value}} {{/if}}</dd>
             {{/each-in}}
         </dl>
     {{else if (eq this.format "ullist")}}
         <ul class="list-unstyled">
-            {{#each-in @content.value as |key val|}} <li>{{val}}</li>   {{/each-in}}
+            {{#each-in v as |key val|}} <li>{{val}}</li>   {{/each-in}}
         </ul>
     {{else if (eq this.format "rawlist")}}
         <ul class="list-unstyled">
-            {{#each-in @content.value as |key val|}} <li>{{{val}}}</li> {{/each-in}}
+            {{#each-in v as |key val|}} <li>{{{val}}}</li> {{/each-in}}
         </ul>
     {{else if (eq this.format "linklist")}}
         <ul class="list-unstyled">
-            {{#each-in @content.value as |key val|}}
+            {{#each-in v as |key val|}}
                 <li>
                     <a href="#/openxpki/{{val.page}}" target={{try val.target "modal"}} title={{val.tooltip}}>
                         {{{val.label}}}
@@ -55,7 +55,7 @@
     {{else if (eq this.format "styled")}}
         <span class="styled-{{this.styledValue.style}}">{{this.styledValue.label}}</span>
     {{else if (eq this.format "tooltip")}}
-        <span title={{@content.value.tooltip}}>{{@content.value.value}}</span>
+        <span title={{v.tooltip}}>{{v.value}}</span>
     {{else if (eq this.format "head")}}
         1
     {{/if}}
