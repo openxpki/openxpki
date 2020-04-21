@@ -28,6 +28,11 @@ module.exports = function(defaults) {
 
         // store app config in compiled JS file instead of <meta> tag
         storeConfigInMeta: false,
+
+        // support e.g. IE11
+        'ember-cli-babel': {
+            includePolyfill: true,
+        },
     });
 
     // Use `app.import` to add additional libraries to the generated
