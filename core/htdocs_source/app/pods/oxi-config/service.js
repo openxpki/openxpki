@@ -16,7 +16,7 @@ export default class OxiConfigService extends Service {
     }
 
     get backendPath() {
-        return this.localConfig.backendPath || 'cgi-bin/webui.fcgi'; // Protocol + host are prepended automatically
+        return this.localConfig.backendPath || '/cgi-bin/webui.fcgi'; // Protocol + host/port are prepended automatically
     }
 
     get copyrightYear() {

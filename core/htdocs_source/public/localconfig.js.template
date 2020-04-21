@@ -4,9 +4,14 @@
  */
 const OXI_LOCALCONFIG = {
     /*
-     * URL path to Perl backend (protocol + host are prepended automatically)
+     * URL path to Perl backend (protocol + host are prepended automatically).
+     * Without leading slash the path is interpreted relative to index.html's path,
+     * e.g.:
+     *   Website: https://example.org/oxi/realm_1/index.html
+     *   backendPath: '/cgi-bin/webui.fcgi' --> https://example.org/cgi-bin/webui.fcgi
+     *   backendPath: 'cgi-bin/webui.fcgi'  --> https://example.org/oxi/realm_1/cgi-bin/webui.fcgi
      */
-    //backendPath: 'cgi-bin/webui.fcgi',
+    //backendPath: '/cgi-bin/webui.fcgi',
 
     /*
      * Website header
