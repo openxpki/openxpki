@@ -4,6 +4,7 @@ import { action } from '@ember/object';
 export default class ApplicationController extends Controller {
     @action
     removeLoader() {
-        document.getElementById("waiting-for-ember").remove();
+        let el = document.getElementById("waiting-for-ember");
+        el.parentNode.removeChild(el);
     }
 }
