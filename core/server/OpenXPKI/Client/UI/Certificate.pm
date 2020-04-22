@@ -642,14 +642,14 @@ sub init_detail {
 
     my $status_label = 'I18N_OPENXPKI_UI_CERT_STATUS_'.$cert->{status};
     my $status_tooltip = '';
-    if ($cert->{status} ne 'ISSUED') {
-        $status_tooltip = 'Revoked: ' . DateTime->from_epoch( epoch => $cert->{revocation_time} )->iso8601();
+    if ($cert->{revocation_time}) {
+        $status_tooltip = 'I18N_OPENXPKI_UI_CERT_STATUS_REVOKED_AT: '.DateTime->from_epoch( epoch => $cert->{revocation_time} )->iso8601();
         if ($cert->{revocation_id}) {
             $status_tooltip .= sprintf(' (#0x%02x)',$cert->{revocation_id} );
         }
-        if ($cert->{reason_code} && $cert->{reason_code} ne 'unspecified') {
-            $status_label .= sprintf(' (I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE_%s)', uc($cert->{reason_code}));
-        }
+    }
+    if ($cert->{reason_code} && $cert->{reason_code} ne 'unspecified') {
+        $status_label .= sprintf(' (I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE_%s)', uc($cert->{reason_code}));
     }
 
     #I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE_UNSPECIFIED
