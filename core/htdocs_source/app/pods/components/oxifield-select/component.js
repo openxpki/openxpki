@@ -6,6 +6,16 @@ import { debug } from '@ember/debug';
 export default class OxifieldSelectComponent extends Component {
     @tracked customMode = false;
 
+    constructor() {
+        super(...arguments);
+        this.customMode = this.isCustomValue(this.args.content.value);
+    }
+
+    // returns true if the given value is part of the SELECT's option list
+    isCustomValue(val) {
+        return (this.options.map(o => o.value).indexOf[val] < 0);
+    }
+
     @computed("args.content.{options,prompt,is_optional}")
     get options() {
         var options, prompt, ref;
@@ -31,14 +41,6 @@ export default class OxifieldSelectComponent extends Component {
         } else {
             return false;
         }
-    }
-
-    @computed("options", "args.content.value")
-    get isCustomValue() {
-        let values = this.options.map(o => o.value);
-        let isCustom = values.indexOf[this.args.content.value] < 0;
-        this.customMode = isCustom;
-        return isCustom;
     }
 
     // no computed value - no need to refresh later on
@@ -68,10 +70,10 @@ export default class OxifieldSelectComponent extends Component {
     @action
     toggleCustomMode() {
         this.customMode = !this.customMode;
-        if (!this.customMode) {
-            if (this.isCustomValue) {
-                this.args.onChange(this.options[0].value);
-            }
+        // only set default value if the current custom value is not included in SELECT's options
+        // (prevents value change if custom mode is just toggled on and off)
+        if (!this.customMode && this.isCustomValue(this.args.content.value)) {
+            this.args.onChange(this.options[0].value);
         }
     }
 
