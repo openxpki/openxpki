@@ -410,7 +410,7 @@ sub __pkcs_req : PRIVATE {
         );
 
         ##! 64: "pkcs10 is " . $pkcs10;
-        if ( not defined $pkcs10 || $pkcs10 eq '' ) {
+        if ( not defined $pkcs10 or $pkcs10 eq '' ) {
             OpenXPKI::Exception->throw( message =>
                     "I18N_OPENXPKI_SERVICE_LIBSCEP_COMMAND_PKIOPERATION_PKCS10_UNDEFINED",
             );

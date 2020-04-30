@@ -31,8 +31,10 @@ sub execute {
     }
 
     # check for mandatory fields
-    foreach my $key (qw( namespace key encrypt force )) {
-        if ( not defined $params->{ $key } || $params->{ $key } eq '' ) {
+    foreach my $key (qw( namespace key encrypt force value )) {
+        ##! 32: 'Check for mandatory field ' . $key
+        ##! 64: $params->{ $key }
+        if ( not defined $params->{ $key }  or $params->{ $key } eq '' ) {
             configuration_error('Mandatory parameter missing or empty: '.$key);
         }
     }
