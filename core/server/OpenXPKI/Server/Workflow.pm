@@ -722,7 +722,7 @@ sub _proc_state_exception {
         ##! 128: sprintf('next proc-state defined in exception: %s',$next_proc_state)
         ##! 128: Dumper($params)
     }else{
-        $error_code = $error_msg = $error;
+        $error_code = $error_msg = "$error";
     }
 
     # next_proc_state defaults to "exception"

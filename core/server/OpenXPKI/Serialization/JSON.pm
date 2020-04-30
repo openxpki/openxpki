@@ -1,17 +1,11 @@
-# OpenXPKI::Serialization::Simple.pm
-# Written 2006 by Martin Bartosch for the OpenXPKI project
-# (C) Copyright 2006 by The OpenXPKI Project
+package OpenXPKI::Serialization::JSON;
 
 use strict;
 use warnings;
 
-package OpenXPKI::Serialization::JSON;
-
-use OpenXPKI::VERSION;
-our $VERSION = $OpenXPKI::VERSION::VERSION;
-
 use JSON -convert_blessed_universally;
 use OpenXPKI::Exception;
+use OpenXPKI::Debug;
 use English;
 use Log::Log4perl;
 use Data::Dumper;
@@ -40,6 +34,7 @@ sub serialize
     my $args = shift;
 
     if (!defined $args) {
+        ##! 32: 'No args defined'
         return undef;
     }
 
@@ -52,13 +47,17 @@ sub serialize
             $args = "$args";
             Log::Log4perl->get_logger('openxpki.deprecated')->error('Stringification in serializer! ' . substr($args, 0, 50));
         } else {
+            ##! 64: $args
             Log::Log4perl->get_logger('openxpki.system')->fatal('Found non-stringifiable object ' . ref $args);
+            OpenXPKI::Exception->throw( message => 'Unable to serialize non-stringifiable object' );
         }
     }
 
     my $json;
     eval { $json = $self->{JSON}->encode( $args ); };
     if (!$json) {
+        ##! 16: 'Unable to encode to json'
+        ##! 64: $args
         Log::Log4perl->get_logger('openxpki.system')->fatal('Unable to serialize ' . ref $args);
         Log::Log4perl->get_logger('openxpki.system')->debug( Dumper $args );
         OpenXPKI::Exception->throw( message => 'Unable to serialize' );
