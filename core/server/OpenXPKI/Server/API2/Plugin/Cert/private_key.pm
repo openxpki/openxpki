@@ -312,7 +312,7 @@ command "private_key_exists_for_cert" => {
 } => sub {
     my ($self, $params) = @_;
 
-    my $privkey = $self->get_private_key_from_db($params->identifier);
+    my $privkey = $self->get_private_key_from_db($params->identifier, 1);
     return ( defined $privkey );
 };
 
@@ -331,11 +331,12 @@ no key is available.
 
 sub get_private_key_from_db {
 
-    my ($self, $cert_identifier) = @_;
+    my ($self, $cert_identifier, $check_only) = @_;
 
     my $datapool = $self->api->get_data_pool_entry(
         namespace =>  'certificate.privatekey',
-        key       =>  $cert_identifier
+        key       =>  $cert_identifier,
+        decrypt   =>  not $check_only,
     );
 
     # we also use the option to store the private key using the key identifier
@@ -354,7 +355,8 @@ sub get_private_key_from_db {
 
         $datapool = $self->api->get_data_pool_entry(
             namespace =>  'certificate.privatekey',
-            key       =>  $cert->{subject_key_identifier}
+            key       =>  $cert->{subject_key_identifier},
+            decrypt   =>  not $check_only,
         );
 
     }
