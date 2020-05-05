@@ -105,7 +105,7 @@ so you can use asterisk (*) as placeholder)
 
 =item * C<identifier> L<Base64|OpenXPKI::Server::API2::Types/Base64> - internal certificate identifier (hash of PEM)
 
-=item * C<profile> L<AlphaPunct|OpenXPKI::Server::API2::Types/AlphaPunct> - certificate profile name
+=item * C<profile> L<ArrayOrAlphaPunct|OpenXPKI::Server::API2::Types/ArrayOrAlphaPunct> - certificate profile name
 
 =item * C<valid_before> I<Int> - certificate validity must start before this UNIX epoch timestamp
 
@@ -183,7 +183,7 @@ my %common_params = (
     issuer_dn                => { isa => 'Str' },
     issuer_identifier        => { isa => 'Base64' },
     pki_realm                => { isa => 'AlphaPunct' },
-    profile                  => { isa => 'AlphaPunct' },
+    profile                  => { isa => 'ArrayOrAlphaPunct' },
     status                   => { isa => 'CertStatus' },
     subject                  => { isa => 'Str' },
     subject_key_identifier   => { isa => 'Str' },
