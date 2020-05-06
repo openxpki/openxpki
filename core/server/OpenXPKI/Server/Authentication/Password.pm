@@ -91,15 +91,19 @@ sub login_step {
         $role =  $self->{ROLE};
     }
 
-    if (!$digest) {
-        ##! 4: "No such user: $account"
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED",
-            params  => {
-              USER => $account,
-            },
-        );
-    }
+    OpenXPKI::Exception->throw (
+        message => "User not found",
+        params  => {
+          USER => $account,
+        },
+    ) unless($digest);
+
+    OpenXPKI::Exception->throw (
+        message => "No role returned for user",
+        params  => {
+          USER => $account,
+        }
+    ) unless($role);
 
     my $encrypted;
     my $scheme;
@@ -111,9 +115,9 @@ sub login_step {
         $encrypted = $2;
     }
 
-    if (! defined $scheme) {
+    if (!defined $scheme) {
         OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_NEW_MISSING_SCHEME_SPECIFICATION",
+        message => "Given digest is without scheme",
         params  => {
             USER => $account,
         },
@@ -126,9 +130,9 @@ sub login_step {
 
     if ($scheme !~ /^(sha|ssha|md5|smd5|crypt)$/) {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_UNSUPPORTED_SCHEME",
+            message => "Given scheme is not supported",
             params  => {
-                USER => $name,
+                USER => $account,
                 SCHEME => $scheme,
             },
             log => {
@@ -168,9 +172,10 @@ sub login_step {
 
     if (! defined $computed_secret) {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_UNSUPPORTED_SCHEME",
+            message => "Unable to compute secret",
             params  => {
               USER => $account,
+              SCHEME => $scheme,
             },
         );
     }
@@ -183,7 +188,7 @@ sub login_step {
     if ($computed_secret ne $encrypted) {
         ##! 4: "mismatch with digest in database ($encrypted, $salt)"
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED",
+            message => "Provided password does not match",
             params  => {
               USER => $account,
             },
