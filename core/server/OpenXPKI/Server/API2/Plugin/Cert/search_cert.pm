@@ -183,7 +183,7 @@ my %common_params = (
     issuer_dn                => { isa => 'Str' },
     issuer_identifier        => { isa => 'Base64' },
     pki_realm                => { isa => 'AlphaPunct' },
-    profile                  => { isa => 'ArrayOrAlphaPunct' },
+    profile                  => { isa => 'AlphaPunct|ArrayOrAlphaPunct' },
     status                   => { isa => 'CertStatus' },
     subject                  => { isa => 'Str' },
     subject_key_identifier   => { isa => 'Str' },
