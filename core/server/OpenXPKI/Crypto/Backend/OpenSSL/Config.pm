@@ -565,16 +565,35 @@ sub __get_extensions
 
                 # Handle dirName
                 if ($entry->[0] eq 'dirName') {
-                    # split at comma, this has the side effect that we can
-                    # not handle DNs with comma in the subparts
-                    my %idx;
-                    # multi valued components need a prefix in dirName
-                    my @sec = map {
-                        my($k,$v) = split /=/, $_,2;
-                        ($idx{$k}++).'.'.$_;
-                    } reverse split(/,/, $entry->[1]);
-                    unshift @sec, "", "[dirname_sect_${sectidx}]";
-                    $sections .= join("\n", @sec). "\n";
+                    # If the value is a scalar, we assume that it is a formatted string.
+                    if (ref $entry->[1] eq '') {
+                        # split at comma, this has the side effect that we can
+                        # not handle DNs with comma in the subparts
+                        my %idx;
+                        # multi valued components need a prefix in dirName
+                        my @sec = map {
+                            my($k,$v) = split /=/, $_,2;
+                            ($idx{$k}++).'.'.$_;
+                        } reverse split(/,/, $entry->[1]);
+                        unshift @sec, "", "[dirname_sect_${sectidx}]";
+                        $sections .= join("\n", @sec). "\n";
+                    } else {
+                        # ...otherwise we assume that it is a decoded ASN.1 representation
+                        # of the DN.
+                        my $idx = 0;
+                        my @sec;
+                        # walk through each rdn
+                        foreach my $rdn (@{$entry->[1]{'rdnSequence'}}) {
+                            my $attr_prefix = '';
+                            # walk through each attribute of the rnd
+                            foreach my $attr (@{$rdn}) {
+                                push @sec, ($idx++).'.'.$attr_prefix.$attr->{'type'}.'='.(%{$attr->{'value'}})[1];
+                                $attr_prefix = '+'; # the subsequent attributes start with a + prefix
+                            }
+                            unshift @sec, "", "[dirname_sect_${sectidx}]";
+                            $sections .= join("\n", @sec). "\n";
+                        }
+                    }
                     push @tmp_array, "dirName.${sectidx}=dirname_sect_${sectidx}";
                 } else {
                     push @tmp_array, sprintf '%s.%01d = "%s"', $entry->[0], $sectidx, $entry->[1];

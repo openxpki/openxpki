@@ -55,8 +55,15 @@ sub execute {
 
     my @subject_alt_names;
     while (my $san = $sth->fetchrow_hashref) {
-        my @split = split q{:}, $san->{attribute_value};
-        push @subject_alt_names, \@split;
+        # If the value is serialized, deserialize it. If it's not, assume
+        # that it is stored in the old colon-separated form and parse
+        # it manually.
+        if (OpenXPKI::Serialization::Simple::is_serialized($san->{attribute_value})) {
+            push @subject_alt_names, $serializer->deserialize($san->{attribute_value});
+        } else {
+            my @split = split q{:}, $san->{attribute_value};
+            push @subject_alt_names, \@split;
+        }
     }
     ##! 64: 'subject_alt_names: ' . Dumper(\@subject_alt_names)
     $context->param(  $prefix.'cert_subject_alt_name' =>
