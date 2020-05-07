@@ -176,17 +176,18 @@ sub __persistCertificateInformation {
         },
     );
 
-
-    my @structured_subject_alt_names = @{$x509->get_structured_subject_alt_name()};
+    my @structured_subject_alt_names = @{$x509->get_subject_alt_name()};
     ##! 32: 'sans (structured): ' . Dumper \@structured_subject_alt_names
     for my $san (@structured_subject_alt_names) {
+        # keep the old format for scalars as we need this to search in SAN
+        my $val = ((ref $san->[1]) ? $serializer->serialize($san) : join(":", @$san));
         CTX('dbi')->insert(
             into => 'certificate_attributes',
             values => {
                 attribute_key        => AUTO_ID,
                 identifier           => $identifier,
                 attribute_contentkey => 'subject_alt_name',
-                attribute_value      => $serializer->serialize($san),
+                attribute_value      => $val,
             },
         );
     }

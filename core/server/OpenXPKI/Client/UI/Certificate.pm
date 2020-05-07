@@ -12,6 +12,7 @@ use URI::Escape;
 use DateTime;
 use Digest::SHA qw(sha1_base64);
 use OpenXPKI::i18n qw( i18nGettext );
+use OpenXPKI::Serialization::Simple;
 
 
 has __default_grid_head => (
@@ -1278,12 +1279,18 @@ sub action_search {
     # Add san search to attributes
     if (my $val = $self->param('san')) {
         $input->{'san'} = $val;
+        # The serialization format was extended in v3.5 from a simple join
+        # to use OXI::Serialize - currently this is used only for dirName
+        # search needs to be fixed to find dirName items, see #755
+        # if the san type was given by the user, strip it
+        my $type = '%';
+        if ($val =~ m{\A(\w+):(.*)}) {
+            $type = $1;
+            $val = $2;
+        }
         $val =~ s{\*}{%}g;
         $val =~ s{\?}{_}g;
-        # SAN type is prefixed with a ":", do not expand query if a
-        # user already added the prefix
-        $val = "%:$val" unless ($val =~ m{\A\w+:});
-        $attr->{subject_alt_name} = { -like => $val };
+        $attr->{subject_alt_name} = { -like => "$type:$val" };
     }
 
     if ($attr) {

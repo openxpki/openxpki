@@ -27,7 +27,7 @@ ok(1, 'certificate parsed');
 
 is($x509->pem, $example_certificate, 'certificate has not been mangled in any way');
 is($x509->get_subject, 'CN=Example certificate', 'subject is as expected');
-is_deeply($x509->get_structured_subject_alt_name,
+is_deeply($x509->get_subject_alt_name,
     [
         [ 
             'dirName',

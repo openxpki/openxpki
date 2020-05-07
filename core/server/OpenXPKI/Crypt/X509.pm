@@ -10,7 +10,7 @@ use Digest::SHA qw(sha1_base64 sha1_hex);
 use OpenXPKI::DateTime;
 use MIME::Base64;
 use Moose;
-use Crypt::X509;
+use Crypt::X509 0.53;
 
 has data => (
     is => 'ro',
@@ -97,15 +97,6 @@ has subject_hash => (
     }
 );
 
-has subject_alt_name => (
-    is => 'ro',
-    init_arg => undef,
-    isa => 'ArrayRef',
-    reader => 'get_subject_alt_name',
-    lazy => 1,
-    builder => '_build_san'
-);
-
 =head2
 
 Returns a pointer to a list of SANs. Each SAN is represented as a pointer to a list
@@ -121,13 +112,13 @@ Example return value:
 
 =cut
 
-has structured_subject_alt_name => (
-	is => 'ro',
-	init_arg => undef,
-	isa => 'ArrayRef',
-	reader => 'get_structured_subject_alt_name',
-	lazy => 1,
-	builder => '_build_structured_san'
+has subject_alt_name => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'ArrayRef',
+    reader => 'get_subject_alt_name',
+    lazy => 1,
+    builder => '_build_san'
 );
 
 has issuer => (
@@ -260,38 +251,6 @@ sub is_selfsigned {
 }
 
 sub _build_san {
-
-    my $self = shift;
-
-    my $san_map = {
-        otherName => 'otherName',
-        rfc822Name => 'email',
-        dNSName => 'DNS',
-        x400Address => '', # not supported by openssl
-        directoryName => 'dirName',
-        ediPartyName => '', # not supported by openssl
-        uniformResourceIdentifier => 'URI',
-        iPAddress  => 'IP',
-        registeredID => 'RID',
-    };
-
-    my @san_list;
-
-    # List where eacht item is a string with "type=value"
-    my $san_names = $self->_cert->SubjectAltName();
-
-    # Walk all san lines
-    foreach my $san (@$san_names) {
-        my ($type, $value) = $san =~ m{\A(\w+)=(.+)\z};
-        my $san_type = $san_map->{$type};
-        next unless($san_type);
-        push @san_list, [ $san_type, $value ];
-    }
-
-    return \@san_list;
-}
-
-sub _build_structured_san {
 
     my $self = shift;
 
