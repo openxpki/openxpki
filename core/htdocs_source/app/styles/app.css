@@ -109,6 +109,11 @@ span.pagination-label {
   padding: 6px 0;
 }
 
+/* Remove padding below UL and DL */
+dl, ul {
+  margin-bottom: 0;
+}
+
 /******************************************************************************
  * Loading indicators
  */
