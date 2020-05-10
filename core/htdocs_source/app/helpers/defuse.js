@@ -15,7 +15,12 @@ Example:
 */
 export default class Defuse extends Helper {
     compute([html]) {
-        if (html === null || typeof html !== 'string') return "";
+        if (html === null) return "";
+        if (typeof html !== 'string' && typeof html !== 'number') {
+            /* eslint-disable-next-line no-console */
+            if (html !== null) console.warn("Helper 'defuse': attempt to process object of type " + (typeof html));
+            return "";
+        }
 
         let parser = new DOMParser();
         let body = parser.parseFromString(html, "text/html").body;

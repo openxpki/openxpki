@@ -34,10 +34,10 @@ TODO: @action defuseValue(val) ...
     }
 
     get styledValue() {
-        let m = this.args.content.value.match(/(([a-z]+):)?(.*)/gm);
+        let m = this.args.content.value.match(/^(([a-z]+):)?(.*)$/m);
         return {
-            style: m[1],
-            label: m[2],
+            style: m[2],
+            label: m[3],
         };
     }
 

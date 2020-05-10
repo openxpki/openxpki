@@ -250,10 +250,6 @@ export default class TestController extends Controller {
                     "sTitle": "raw"
                 },
                 {
-                    "sTitle": "Issuer",
-                    "sortkey": "issuer_dn"
-                },
-                {
                     "sortkey": "identifier",
                     "sTitle": "Certificate Identifier"
                 },
@@ -263,7 +259,7 @@ export default class TestController extends Controller {
                 },
                 {
                     "sTitle": "_className"
-                }
+                },
             ],
             "data": [
                 [
@@ -275,7 +271,6 @@ export default class TestController extends Controller {
                     },
                     "1585959633",
                     1617495633,
-                    "CN=OpenXPKI Demo Issuing CA 1,OU=PKI,O=OpenXPKI,C=DE",
                     "0qLkfCTwwj-8SoSOTtlRQLqS20o",
                     "0qLkfCTwwj-8SoSOTtlRQLqS20o",
                     {
@@ -292,7 +287,6 @@ export default class TestController extends Controller {
                     },
                     "1585434533",
                     "<a href=\"test\" onclick=\"alert('huh')\">test</a>",
-                    "CN=OpenXPKI Demo Issuing CA 1,OU=PKI,O=OpenXPKI,C=DE",
                     "fPF_JVAco7Eg0d3kANRFLYRPu5o",
                     "fPF_JVAco7Eg0d3kANRFLYRPu5o",
                     {
@@ -304,5 +298,130 @@ export default class TestController extends Controller {
         },
         "type": "grid",
         "className": "certificate"
+    };
+
+
+    @tracked keyvalueDef = {
+        "type": "keyvalue",
+        "content": {
+            "label": "oxisection-keyvalue",
+            "description": "",
+            "data": [
+                {
+                    "format": "certstatus",
+                    "label": "certstatus",
+                    "value": {
+                        "value": "issued",
+                        "label": "Issued",
+                        "tooltip": "It's issued",
+                    },
+                },
+                {
+                    "format": "link",
+                    "label": "link",
+                    "value": {
+                        "page": "workflow!load!wf_id!13567",
+                        "label": 13567,
+                        "target": "_blank",
+                    },
+                },
+                {
+                    "format": "extlink",
+                    "label": "extlink",
+                    "value": {
+                        "page": "https://www.openxpki.org",
+                        "label": "OpenXPKI",
+                        "target": "_blank",
+                    },
+                },
+                {
+                    "format": "timestamp",
+                    "label": "timestamp",
+                    "value": 1617495633,
+                },
+                {
+                    "format": "datetime",
+                    "label": "datetime",
+                    "value": 1617495633,
+                },
+                {
+                    "format": "text",
+                    "label": "text",
+                    "value": "Link to <a href=\"should be escaped\">OpenXPKI</a>",
+                },
+                {
+                    "format": "nl2br",
+                    "label": "nl2br",
+                    "value": "Link to <a href=\"should be escaped\">OpenXPKI</a>\nand a comment",
+                },
+                {
+                    "format": "code",
+                    "label": "code",
+                    "value": "console.log('Hello world');",
+                },
+                {
+                    "format": "raw",
+                    "label": "raw",
+                    "value": "Link to <a href=\"https://www.openxpki.org\">OpenXPKI</a>",
+                },
+                {
+                    "format": "defhash",
+                    "label": "defhash",
+                    "value": {
+                        "first": "PKI",
+                        "second": "OpenXPKI",
+                    },
+                },
+                {
+                    "format": "deflist",
+                    "label": "deflist",
+                    "value": [
+                        { "label": "first", "value": "PKI" },
+                        { "label": "second", "value": "<a href=\"https://www.openxpki.org\">OpenXPKI</a>", "format": "raw" },
+                    ],
+                },
+                {
+                    "format": "ullist",
+                    "label": "ullist",
+                    "value": [ "PKI", "OpenXPKI" ],
+                },
+                {
+                    "format": "rawlist",
+                    "label": "rawlist",
+                    "value": [ "PKI", "<a href=\"https://www.openxpki.org\">OpenXPKI</a>" ],
+                },
+                {
+                    "format": "linklist",
+                    "label": "linklist",
+                    "value": [
+                        {
+                            "label": "Workflow History",
+                            "page": "workflow!history!wf_id!13567",
+                        },
+                        {
+                            "label": "Technical Log",
+                            "page": "workflow!log!wf_id!13567",
+                        }
+                    ],
+                },
+                {
+                    "format": "styled",
+                    "label": "styled",
+                    "value": "attention:hear my words",
+                },
+                {
+                    "format": "tooltip",
+                    "label": "tooltip",
+                    "value": {
+                        "value": "Hover me",
+                        "tooltip": "...to see more",
+                    },
+                },
+                {
+                    "format": "head",
+                    "label": "head",
+                },
+            ],
+        }
     };
 }

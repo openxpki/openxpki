@@ -29,28 +29,28 @@
         </dl>
     {{else if (eq this.format "deflist")}}
         <dl>
-            {{#each-in v as |key val|}}
+            {{#each v as |val|}}
                 <dt>{{val.label}}</dt>
                 <dd>{{#if (eq val.format "raw")}} {{{val.value}}} {{else}} {{val.value}} {{/if}}</dd>
-            {{/each-in}}
+            {{/each}}
         </dl>
     {{else if (eq this.format "ullist")}}
         <ul class="list-unstyled">
-            {{#each-in v as |key val|}} <li>{{val}}</li>   {{/each-in}}
+            {{#each v as |val|}} <li>{{val}}</li> {{/each}}
         </ul>
     {{else if (eq this.format "rawlist")}}
         <ul class="list-unstyled">
-            {{#each-in v as |key val|}} <li>{{{defuse val}}}</li> {{/each-in}}
+            {{#each v as |val|}} <li>{{{defuse val}}}</li> {{/each}}
         </ul>
     {{else if (eq this.format "linklist")}}
         <ul class="list-unstyled">
-            {{#each-in v as |key val|}}
+            {{#each v as |val|}}
                 <li>
                     <a href="#/openxpki/{{val.page}}" target={{try val.target "modal"}} title={{val.tooltip}}>
                         {{{defuse val.label}}}
                     </a>
                 </li>
-                {{/each-in}}
+            {{/each}}
         </ul>
     {{else if (eq this.format "styled")}}
         <span class="styled-{{this.styledValue.style}}">{{this.styledValue.label}}</span>

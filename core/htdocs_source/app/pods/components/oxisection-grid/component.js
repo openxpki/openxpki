@@ -229,6 +229,7 @@ export default class OxisectionGridComponent extends Component {
 
     @action
     executeAction(row, act) {
+        if (!act) return;
         let columns = this.rawColumns;
         let data = this.rawData[row.originalIndex];
         let path = act.path;
