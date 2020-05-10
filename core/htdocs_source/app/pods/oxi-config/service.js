@@ -7,10 +7,9 @@ export default class OxiConfigService extends Service {
     constructor() {
         super(...arguments);
         /* eslint-disable-next-line no-undef */
-        let conf = OXI_LOCALCONFIG;
-        if (typeof conf !== 'undefined') {
+        if (typeof OXI_LOCALCONFIG !== 'undefined') {
             /* eslint-disable-next-line no-undef */
-            this.localConfig = conf;
+            this.localConfig = OXI_LOCALCONFIG;
             /* eslint-disable-next-line no-console */
             console.log("Using custom configuration in localconfig.js");
         }
