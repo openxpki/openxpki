@@ -156,10 +156,9 @@ sub __process_workflow {
 
     my $wf_prefix = $conn->get( [ 'workflow', 'def', $wf_name , 'head', 'prefix' ] );
 
-
-    if ($wf_prefix =~ /[^a-z0-9]/) {
+    if (!$wf_prefix || ($wf_prefix =~ /[^a-z0-9]/)) {
         OpenXPKI::Exception->throw(
-            message => 'Workflow prefix must not contain other chars as a-z and 0-9',
+            message => 'Workflow prefix must be set and contain no other chars as a-z and 0-9',
             params => {
                 name => $wf_name,
                 prefix => $wf_prefix
