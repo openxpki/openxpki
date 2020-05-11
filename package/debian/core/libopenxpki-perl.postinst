@@ -68,7 +68,7 @@ case "$1" in
 
         # Fix directory permissions
         chown openxpki:openxpki /var/openxpki
-        chown -R openxpki:openxpki /var/log/openxpki
+        chown openxpki:openxpki /var/log/openxpki
         # As apache is in the openxpki group this allows writing the UI logs
         chmod 4775 /var/log/openxpki
 

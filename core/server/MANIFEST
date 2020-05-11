@@ -563,16 +563,19 @@ cgi-bin/rpc.fcgi
 cgi-bin/est.fcgi
 
 # Client UI
-htdocs/src/main-built.js
-htdocs/style/main-built.css
-htdocs/vendor/ember/ember-template-compiler.js
-htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.eot
-htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.woff
-htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2
-htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf
-htdocs/vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.svg
-htdocs/style/img/logo.png
+htdocs/img/logo.png
+htdocs/ember-fetch/fetch-fastboot.js
+htdocs/localconfig.js.template
+htdocs/fonts/glyphicons-halflings-regular.eot
+htdocs/fonts/glyphicons-halflings-regular.woff
+htdocs/fonts/glyphicons-halflings-regular.ttf
+htdocs/fonts/glyphicons-halflings-regular.svg
+htdocs/fonts/glyphicons-halflings-regular.woff2
+htdocs/assets/openxpki.js
+htdocs/assets/openxpki.css
+htdocs/assets/vendor.js
+htdocs/assets/auto-import-fastboot.js
+htdocs/assets/vendor.css
+htdocs/localconfig.css.template
 htdocs/default.html
-htdocs/themed.html
-htdocs/localconfig.js
 htdocs/favicon.png
