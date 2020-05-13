@@ -282,13 +282,13 @@ export default class OxisectionFormComponent extends Component {
         }
         if (isError) { return }
 
-        let data = {
+        let request = {
             action: this.args.def.action,
             ...this._fields2request(),
         };
 
         this.loading = true;
-        return getOwner(this).lookup("route:openxpki").sendAjax(data)
+        return getOwner(this).lookup("route:openxpki").sendAjax(request)
         .then((res) => {
             this.loading = false;
             if (res.status != null) {
