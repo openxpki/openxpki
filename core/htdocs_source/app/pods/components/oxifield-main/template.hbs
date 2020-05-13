@@ -25,15 +25,16 @@
 
     {{#if @field.clonable}}
         <div class="col-md-1 clonable-btn-group">
-
             {{#if @field.canDelete}}
-            <BsButton @type="danger" @onClick={{this.delClone}}>
-                <span class="glyphicon glyphicon-minus"></span>
-            </BsButton>
+                <BsButton @type="danger" @onClick={{this.delClone}}>
+                    <span class="glyphicon glyphicon-minus"></span>
+                </BsButton>
             {{/if}}
-            <BsButton @type="primary" @onClick={{this.addClone}}>
-                <span class="glyphicon glyphicon-plus"></span>
-            </BsButton>
+            {{#if @field.canAdd}}
+                <BsButton @type="primary" @onClick={{this.addClone}}>
+                    <span class="glyphicon glyphicon-plus"></span>
+                </BsButton>
+            {{/if}}
         </div>
     {{/if}}
 </div>

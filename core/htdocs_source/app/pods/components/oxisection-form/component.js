@@ -17,7 +17,9 @@ class Field {
     @tracked error;
     // clonable fields:
     @tracked clonable;
+    @tracked max;
     @tracked canDelete;
+    @tracked canAdd;
     // dynamic input fields:
     @tracked keys;
     // oxifield-datetime:
@@ -68,7 +70,7 @@ export default class OxisectionFormComponent extends Component {
             for (const attr of Object.keys(fieldHash)) {
                 if (! Field.prototype.hasOwnProperty(attr)) {
                     /* eslint-disable-next-line no-console */
-                    console.error(`oxisection-form: unknown field property "${attr}" (field "${fieldHash.name}"). If it's a new property, please add it to the 'Field' class defined in oxisection-form.js.`);
+                    console.error(`oxisection-form: unknown field property "${attr}" (field "${fieldHash.name}"). If it's a new property, please add it to the 'Field' class defined in oxisection-form/component.js.`);
                 }
                 else {
                     field[attr] = fieldHash[attr];
@@ -124,7 +126,10 @@ export default class OxisectionFormComponent extends Component {
     _updateCloneFields() {
         for (const name of this.clonableRefNames) {
             let clones = this.fields.filter(f => f._refName === name);
-            for (const clone of clones) { clone.canDelete = true; }
+            for (const clone of clones) {
+                clone.canDelete = true;
+                clone.canAdd = clones.length < clones[0].max;
+            }
             if (clones.length === 1) {
                 clones[0].canDelete = false;
             }
