@@ -153,7 +153,7 @@ export default class OpenXpkiRoute extends Route {
                     if (doc.refresh) {
                         debug("openxpki/route - sendAjax response: \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout);
                         this.content.refresh = later(this, function() {
-                            this.sendAjax({ data: { page: doc.refresh.href } });
+                            this.sendAjax({ page: doc.refresh.href });
                         }, doc.refresh.timeout);
                     }
                     if (doc.goto) {
