@@ -20,6 +20,7 @@ class Field {
     @tracked max;
     @tracked canDelete;
     @tracked canAdd;
+    @tracked focusClone = false; // initially focus clone (after adding)
     // dynamic input fields:
     @tracked keys;
     // oxifield-datetime:
@@ -158,10 +159,12 @@ export default class OxisectionFormComponent extends Component {
 
     @action
     addClone(field) {
+        if (field.canAdd === false) return;
         let fields = this.fields;
         let index = fields.indexOf(field);
         let fieldCopy = field.clone();
         fieldCopy.value = "";
+        fieldCopy.focusClone = true;
         fields.insertAt(index + 1, fieldCopy);
         this._updateCloneFields();
     }

@@ -10,6 +10,7 @@
             {{on "input" this.setTextInput}}
             {{on "drop" this.fileDropped}}
             {{on "dragover" this.showCopyEffect}}
+            {{did-insert @onInsert}}
         />
     </div>
 </div>

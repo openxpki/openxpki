@@ -69,4 +69,9 @@ export default class OxifieldMainComponent extends Component {
             this.args.addClone(this.args.field);
         }
     }
+
+    @action
+    onInsert(element) {
+        if (this.field.focusClone) element.focus();
+    }
 }
