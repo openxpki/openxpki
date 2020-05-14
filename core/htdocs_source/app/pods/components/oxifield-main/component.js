@@ -55,12 +55,23 @@ export default class OxifieldMainComponent extends Component {
     }
 
     @action
-    onKeypress(event) {
+    onKeydown(event) {
         // ENTER --> submit form
         if (event.keyCode === 13 && this.field.type !== "textarea") {
             event.stopPropagation();
             event.preventDefault();
             this.args.submit();
         }
+        // TAB --> clonable fields: add another clone
+        if (event.keyCode === 9 && this.field.clonable && this.field.value !== null && this.field.value !== "") {
+            event.stopPropagation();
+            event.preventDefault();
+            this.args.addClone(this.args.field);
+        }
+    }
+
+    @action
+    onInsert(element) {
+        if (this.field.focusClone) element.focus();
     }
 }

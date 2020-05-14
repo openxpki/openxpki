@@ -11,12 +11,12 @@
         </div>
     {{/if}}
 
-    <div class="{{this.sFieldSize}}" {{on "keypress" this.onKeypress}}>
+    <div class="{{this.sFieldSize}}" {{on "keydown" this.onKeydown}}>
         {{#if @field.tooltip}}
             <BsTooltip @title="{{@field.tooltip}}"/>
         {{/if}}
 
-        {{component this.type content=this.field onChange=this.onChange onError=this.onError}}
+        {{component this.type content=this.field onChange=this.onChange onError=this.onError onInsert=this.onInsert}}
 
         {{#if @field.error}}
             <span class="help-block">{{@field.error}}</span>
@@ -25,15 +25,16 @@
 
     {{#if @field.clonable}}
         <div class="col-md-1 clonable-btn-group">
-
             {{#if @field.canDelete}}
-            <BsButton @type="danger" @onClick={{this.delClone}}>
-                <span class="glyphicon glyphicon-minus"></span>
-            </BsButton>
+                <BsButton @type="danger" @onClick={{this.delClone}}>
+                    <span class="glyphicon glyphicon-minus"></span>
+                </BsButton>
             {{/if}}
-            <BsButton @type="primary" @onClick={{this.addClone}}>
-                <span class="glyphicon glyphicon-plus"></span>
-            </BsButton>
+            {{#if @field.canAdd}}
+                <BsButton @type="primary" @onClick={{this.addClone}}>
+                    <span class="glyphicon glyphicon-plus"></span>
+                </BsButton>
+            {{/if}}
         </div>
     {{/if}}
 </div>

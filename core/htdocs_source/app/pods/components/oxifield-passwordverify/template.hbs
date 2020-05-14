@@ -3,11 +3,13 @@
     <input type="text" class="form-control in-form-group"
         value={{this.password}}
         readonly="readonly"
+        {{did-insert @onInsert}}
     />
 {{else}}
     <input type="password" class="form-control in-form-group"
         value={{this.password}}
         {{on "input" this.passwordChange}}
+        {{did-insert @onInsert}}
     />
 {{/if}}
     <input type={{if this.isFixed "text" "password"}} class="form-control in-form-group"

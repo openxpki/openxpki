@@ -260,14 +260,14 @@ export default class OxisectionGridComponent extends Component {
             if (index === -1) {
                 throw new Error(`There is no column matching "${button.select}"`);
             }
-            let data = {
+            let request = {
                 action: button.action
             };
-            data[button.selection] = this.sortedData.filterBy("checked").getEach("originalData").getEach("" + index);
+            request[button.selection] = this.sortedData.filterBy("checked").getEach("originalData").getEach("" + index);
             set(button, "loading", true);
 
             getOwner(this).lookup("route:openxpki")
-            .sendAjax(data)
+            .sendAjax(request)
             .then(() => set(button, "loading", false));
         }
         else {

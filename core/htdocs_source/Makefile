@@ -1,9 +1,15 @@
 IMAGE=oxiuibuild
 -include Makefile.local
 
-.DEFAULT_GOAL := compile
+.DEFAULT_GOAL := cache
 
-# Docker image is build using the internal Docker cache, the last image
+# main target: compile Ember code using (cached) Docker image
+cache: build compile
+
+# compile Ember code using Docker image (force re-installation of node_modules)
+nocache: build-nocache compile
+
+# Docker image is built using the internal Docker cache, the last image
 # layer holding the copy of the source code is invalidated on code changes
 build:
 	docker build -t $(IMAGE) .
@@ -12,9 +18,8 @@ build:
 build-nocache:
 	docker build --no-cache -t $(IMAGE) .
 
-# main target, compile the ember code using the docker image
-compile: build
-	docker run -v $(abspath ../server/htdocs):/source/dist -ti $(IMAGE)
+compile:
+	docker run -v $(abspath ./):/source:ro -v $(abspath ../server/htdocs):/source/dist -ti $(IMAGE)
 
 # remove the build container
 prune:

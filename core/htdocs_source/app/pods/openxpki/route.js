@@ -104,17 +104,17 @@ export default class OpenXpkiRoute extends Route {
         }, cfg.timeout);
     }
 
-    sendAjax(data) {
+    sendAjax(request) {
         this.content.isLoading = true;
-        debug("openxpki/route - sendAjax: page = " + data.page);
+        debug("openxpki/route - sendAjax: page = " + request.page);
         // assemble request parameters
         let req = {
             data: {
-                ...data,
+                ...request,
                 "_": new Date().getTime(),
             },
             dataType: "json",
-            type: data.action ? "POST" : "GET",
+            type: request.action ? "POST" : "GET",
             url: this.backendUrl,
         };
         if (req.type === "POST") {
@@ -153,7 +153,7 @@ export default class OpenXpkiRoute extends Route {
                     if (doc.refresh) {
                         debug("openxpki/route - sendAjax response: \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout);
                         this.content.refresh = later(this, function() {
-                            this.sendAjax({ data: { page: doc.refresh.href } });
+                            this.sendAjax({ page: doc.refresh.href });
                         }, doc.refresh.timeout);
                     }
                     if (doc.goto) {

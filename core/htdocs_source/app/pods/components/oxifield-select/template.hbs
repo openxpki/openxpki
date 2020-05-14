@@ -12,7 +12,12 @@
                 {{did-insert this.focusCustomInput}}
             />
         {{else}}
-            <OxiSelect @list={{this.options}} @selected={{this.sanitizedValue}} @onChange={{this.optionSelected}} />
+            <OxiSelect
+                @list={{this.options}}
+                @selected={{this.sanitizedValue}}
+                @onChange={{this.optionSelected}}
+                {{did-insert @onInsert}}
+            />
         {{/if}}
         <span class="input-group-btn">
             <BsButton @type="default" @active={{this.customMode}} @onClick={{this.toggleCustomMode}}>

@@ -78,8 +78,9 @@ export default class OxifieldSelectComponent extends Component {
     }
 
     @action
-    focusCustomInput(element) {
+    onInsert(element) {
         element.focus();
+        this.args.onInsert(element);
     }
 
     @action
