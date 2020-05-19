@@ -57,7 +57,7 @@ export default class OxifieldSelectComponent extends Component {
 
     @action
     setStaticValue() {
-        this.args.onChange(this.options[0].value);
+        this.args.onChange(this.args.content.options[0].value);
     }
 
     @action
