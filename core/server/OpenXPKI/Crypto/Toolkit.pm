@@ -15,6 +15,7 @@ use OpenXPKI::Crypto::CLI;
 use OpenXPKI::Server::Context qw( CTX );
 
 use OpenXPKI::Debug;
+use Template;
 use OpenXPKI::Exception;
 use OpenXPKI::FileUtils;
 use English;
@@ -242,7 +243,13 @@ sub __load_config_realm_token {
     ##! 16: 'Building key name from template ' . $params_of{$ident}->{KEY}
     ##! 32: 'TT vars  ' . Dumper $template_vars
 
-    my $tt = Template->new();
+    # Standard TT is ok as we dont need any magic from OXI::TT but we need
+    # some of the plugins e.g for AWS Key Names
+    my $tt = Template->new({
+        PLUGIN_BASE => 'OpenXPKI::Template::Plugin',
+        ENCODING => 'UTF-8',
+    });
+
     my $output;
     $tt->process(\$params_of{$ident}->{KEY}, $template_vars, \$output);
 
@@ -250,9 +257,11 @@ sub __load_config_realm_token {
 
     # Check for output
     OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_CRYPTO_TOOLKIT_CANT_BUILD_KEY_PATH',
-        param => {
-
+        message => 'I18N_OPENXPKI_CRYPTO_TOOLKIT_KEY_PATH_IS_EMPTY',
+        params => {
+            ERROR => $tt->error(),
+            TEMPLATE => $params_of{$ident}->{KEY},
+            VARS => $template_vars,
         }
     ) unless ($output);
 
