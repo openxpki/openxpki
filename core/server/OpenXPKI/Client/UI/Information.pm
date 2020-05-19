@@ -79,10 +79,10 @@ sub init_issuer {
                 target => 'modal',
             }],
             columns => [
-                { sTitle => "subject" },
-                { sTitle => "notbefore", format => 'timestamp'},
-                { sTitle => "notafter", format => 'timestamp'},
-                { sTitle => "state"},
+                { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT" },
+                { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE", format => 'timestamp'},
+                { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER", format => 'timestamp'},
+                { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_STATUS"},
                 { sTitle => "identifier", bVisible => 0 },
                 { sTitle => "_className" },
             ],
@@ -93,7 +93,6 @@ sub init_issuer {
 
     return $self;
 }
-
 
 =head2 init_policy
 

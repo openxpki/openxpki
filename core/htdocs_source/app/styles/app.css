@@ -427,3 +427,9 @@ div.oxifield-upload {
 .oxi-btn-exceptional:focus {
     background-color: #79d1f3;
 }
+
+.oxi-btn-terminate,
+.oxi-btn-terminate:hover,
+.oxi-btn-terminate:focus {
+    background-color: #ad7fa8;
+}
