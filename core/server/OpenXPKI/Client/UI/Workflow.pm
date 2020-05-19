@@ -3002,24 +3002,18 @@ sub __render_fields {
                     $self->logger()->trace('Split ' . Dumper \@val) if $self->logger->is_trace;
                     $item->{value} = \@val;
                 } else {
-                    $item->{value} = undef; # prevent pusing emtpy lists
+                    $item->{value} = undef; # prevent pushing emtpy lists
                 }
-
-            } elsif ($item->{format} eq "raw") {
-
-                $item->{value} = $self->send_command_v2( 'render_template', { template => $field->{template}, params => $param } );
-
-            } elsif (ref $item->{value} eq '') {
-                $item->{value} = $self->send_command_v2( 'render_template', { template => $field->{template}, params => $param } );
 
             } elsif (ref $item->{value} eq 'HASH' && $item->{value}->{label}) {
                 $item->{value}->{label} = $self->send_command_v2( 'render_template', { template => $field->{template},
                     params => { value => $param->{value}->{label} }} );
+
             } else {
-                $self->logger()->error('Unable to apply template, format: '.$item->{format}.', field: '.$key);
+
+                $item->{value} = $self->send_command_v2( 'render_template', { template => $field->{template}, params => $param } );
 
             }
-
         }
 
         # do not push items that are empty
