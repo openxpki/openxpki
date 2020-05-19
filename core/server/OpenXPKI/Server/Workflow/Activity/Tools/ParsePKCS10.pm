@@ -70,20 +70,26 @@ sub execute {
 
     if ($self->param('key_params')) {
 
-        my $key_param = $decoded->subjectPublicKeyParams();
-
-        if ($key_param->{keytype} eq 'RSA') {
-            $param->{csr_key_alg} = 'rsa';
-            $param->{csr_key_params} = { key_length =>  $key_param->{keylen} };
-        } elsif ($key_param->{keytype} eq 'DSA') {
-            $param->{csr_key_alg} = 'dsa';
-            $param->{csr_key_params} = { key_length =>  $key_param->{keylen} };
-        } elsif ($key_param->{keytype} eq 'ECC') {
-            $param->{csr_key_alg} = 'ec';
-            $param->{csr_key_params} = { key_length =>  $key_param->{keylen}, curve_name => $key_param->{curve} };
-        } else {
-            $param->{csr_key_alg} = 'unsupported';
+        $param->{csr_key_alg} = 'unsupported';
+        $param->{csr_key_params} = {};
+        eval {
+            my $key_param = $decoded->subjectPublicKeyParams();
+            if ($key_param->{keytype} eq 'RSA') {
+                $param->{csr_key_alg} = 'rsa';
+                $param->{csr_key_params} = { key_length =>  $key_param->{keylen} };
+            } elsif ($key_param->{keytype} eq 'DSA') {
+                $param->{csr_key_alg} = 'dsa';
+                $param->{csr_key_params} = { key_length =>  $key_param->{keylen} };
+            } elsif ($key_param->{keytype} eq 'ECC') {
+                $param->{csr_key_alg} = 'ec';
+                $param->{csr_key_params} = { key_length =>  $key_param->{keylen}, curve_name => $key_param->{curve} };
+            }
+        };
+        if ($EVAL_ERROR) {
+            CTX('log')->application()->warn("Unable to handle public key");
+            CTX('log')->application()->debug($EVAL_ERROR);
         }
+
     } else {
         my $key_alg = $decoded->pkAlgorithm || '';
         if( $key_alg eq 'rsaEncryption' ) {

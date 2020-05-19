@@ -25,7 +25,7 @@ sub _validate {
         return 1;
     }
 
-    my $key_alg;
+    my $key_alg = 'unknown';
     my $key_params = {};
 
     Crypt::PKCS10->setAPIversion(1);
@@ -34,9 +34,15 @@ sub _validate {
         validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_CAN_NOT_PARSE_PKCS10');
     }
 
-    my $key_param = $decoded->subjectPublicKeyParams();
+    my $key_param;
+    eval {
+        $key_param = $decoded->subjectPublicKeyParams();
+    };
 
-    if ($key_param->{keytype} eq 'RSA') {
+    if (!$key_param || !$key_param->{keytype}) {
+        CTX('log')->application()->warn("Unable to get key parameters from PKCS10");
+        validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_ALGO_NOT_SUPPORTED');
+    } elsif ($key_param->{keytype} eq 'RSA') {
         $key_alg = 'rsa';
         $key_params = { key_length =>  $key_param->{keylen} };
     } elsif ($key_param->{keytype} eq 'DSA') {
@@ -49,7 +55,6 @@ sub _validate {
         validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_ALGO_NOT_SUPPORTED');
     }
 
-
     ##! 16: "Alg: $key_alg"
     ##! 16: 'Params ' . Dumper $key_params
 
@@ -61,7 +66,6 @@ sub _validate {
     if (!grep(/\A$key_alg\z/, @{$algs})) {
         ##! 8: "KeyParam validation failed on algo $key_alg"
         CTX('log')->application()->error("KeyParam validation failed on algo $key_alg");
-
         validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_ALGO_NOT_ALLOWED');
     }
 
