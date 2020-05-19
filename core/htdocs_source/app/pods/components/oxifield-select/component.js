@@ -84,7 +84,7 @@ export default class OxifieldSelectComponent extends Component {
     }
 
     @action
-    customInput(event) {
+    onCustomInputInsert(event) {
         this.args.onChange(event.target.value);
     }
 }

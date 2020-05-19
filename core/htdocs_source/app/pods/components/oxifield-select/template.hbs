@@ -8,7 +8,7 @@
                 class="form-control"
                 value={{@content.value}}
                 placeholder={{@content.placeholder}}
-                {{on "input" this.customInput}}
+                {{on "input" this.onCustomInputInsert}}
                 {{did-insert this.onInsert}}
             />
         {{else}}
