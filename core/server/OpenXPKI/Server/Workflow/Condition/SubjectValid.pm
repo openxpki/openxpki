@@ -17,8 +17,7 @@ sub _evaluate {
     my $context  = $workflow->context();
     ##! 64: 'context: ' . Dumper($context)
 
-    my $subject  = $context->param('cert_subject') || '';
-
+    my $subject  = $self->param('cert_subject') // $context->param('cert_subject');
 
     if (!$subject) {
         condition_error('Subject is empty!');
@@ -26,15 +25,25 @@ sub _evaluate {
 
     my %dn = OpenXPKI::DN->new( $subject )->get_hashed_content();
 
-    if (length($dn{CN}[0]) > 64) {
-        condition_error('Common Name exceeds 64 character limit');
-    }
+    my $max_length = {
+        CN => 64,
+        OU => 64,
+        O => 64,
+        L => 128,
+        ST => 128,
+        C => 2,
+        %{$self->param()}
+    };
 
+    ##! 64: $max_length
     foreach my $rdn (keys %dn) {
-        ##! 16: 'Testing rdn ' . $rdn
+        # we use the upper bound ub-name as absolute max
+        my $maxlen = (0 + $max_length->{$rdn}) || 32768;
+        ##! 16: 'Testing rdn ' . $rdn . ' with maxlen of ' . $maxlen
         ##! 32: 'Component ' . Dumper $dn{$rdn}
         foreach my $comp (@{$dn{$rdn}}) {
             condition_error('Subject has empty components') if ($comp eq '');
+            condition_error('RDN $rdn exceeds $maxlen character limit') if (length($comp) > $maxlen);
         }
     }
 
@@ -53,5 +62,16 @@ OpenXPKI::Server::Workflow::Condition::SubjectValid
 
 =head1 DESCRIPTION
 
-Check if the subject has no empty RDNs and if the Common Name does not
-exceed the 64 charater limit. Expects the subject to be in I<cert_subject>.
+Subject can be set via param I<cert_subject>, if unset its read from
+the context value I<cert_subject>.
+
+Check if the subject has no empty RDNs and if the RDN components do not
+exceed the the length limits. Length check is done on CN/OU/O (64),
+L/ST (128), C (2). You can add extra checks by adding a parameter with
+the RDN name as key, e.g.
+
+  class: OpenXPKI::Server::Workflow::Condition::SubjectValid
+  param:
+      DC=256
+
+To check any rdn for "DC" to be no larger than 256 chars.
