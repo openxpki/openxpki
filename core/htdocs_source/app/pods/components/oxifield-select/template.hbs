@@ -9,7 +9,7 @@
                 value={{@content.value}}
                 placeholder={{@content.placeholder}}
                 {{on "input" this.customInput}}
-                {{did-insert this.focusCustomInput}}
+                {{did-insert this.onInsert}}
             />
         {{else}}
             <OxiSelect
