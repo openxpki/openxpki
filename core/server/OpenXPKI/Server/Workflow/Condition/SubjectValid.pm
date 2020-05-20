@@ -38,7 +38,7 @@ sub _evaluate {
     ##! 64: $max_length
     foreach my $rdn (keys %dn) {
         # we use the upper bound ub-name as absolute max
-        my $maxlen = (0 + $max_length->{$rdn}) || 32768;
+        my $maxlen = $max_length->{$rdn} || 32768;
         ##! 16: 'Testing rdn ' . $rdn . ' with maxlen of ' . $maxlen
         ##! 32: 'Component ' . Dumper $dn{$rdn}
         foreach my $comp (@{$dn{$rdn}}) {
