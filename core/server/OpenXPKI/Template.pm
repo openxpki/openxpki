@@ -21,6 +21,9 @@ sub new {
     if (!defined $args->{ENCODING}) {
         $args->{ENCODING} =  'UTF-8';
     }
+
+    $Template::Stash::PRIVATE = undef;
+
     my $self = $class->SUPER::new($args);
 
     return $self;
