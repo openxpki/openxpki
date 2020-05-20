@@ -13,11 +13,9 @@ sub _validate {
 
     my ( $self, $wf, $pkcs10 ) = @_;
 
-    # allow non-defined PKCS10 for server-side key generation
-
-    if (not defined $pkcs10) {
+    # allow empty PKCS10 for server-side key generation
+    if (not $pkcs10) {
         CTX('log')->application()->debug("PKCS#10 validaton: is empty");
-
         return 1;
     }
 
