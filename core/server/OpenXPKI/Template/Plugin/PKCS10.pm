@@ -83,6 +83,44 @@ sub _load {
 
 }
 
+
+=head2 pem
+
+Print the PEM encoded PKCS10 container
+
+=cut
+
+sub pem {
+
+    my $self = shift;
+    my $pkcs10 = shift;
+
+    my $csr = $self->_load($pkcs10);
+    if (!$csr) { return; }
+
+    return $csr->pem();
+
+}
+
+=head2 binary
+
+Print the raw binary data of the container
+
+=cut
+
+sub binary {
+
+    my $self = shift;
+    my $pkcs10 = shift;
+
+    my $csr = $self->_load($pkcs10);
+    if (!$csr) { return; }
+
+    return $csr->data();
+
+}
+
+
 =head2 subject_key_identifier
 
 Return the public key identifier as defined in RFC 5280 (hash of DER
