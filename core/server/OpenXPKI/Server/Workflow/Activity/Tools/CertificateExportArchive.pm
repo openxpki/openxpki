@@ -25,8 +25,6 @@ sub execute {
 
     my $target_key = $self->param('target_key') || 'certificate_export';
 
-    my $chain = CTX('api2')->get_cert( identifier => $cert_identifier, format => 'PEM' );
-    my @certs = @{$chain->{certificates}};
 
     my $zip = Archive::Zip->new();
 
@@ -79,7 +77,7 @@ sub execute {
     $zip->addString( $privkey, $key_file )
         ->desiredCompressionMethod( COMPRESSION_DEFLATED );
 
-    my $chain = CTX('api2')->get_cert( identifier => $cert_identifier, format => 'PEM' );
+    my $chain = CTX('api2')->get_chain( identifier => $cert_identifier, format => 'PEM' );
     my @certs = @{$chain->{certificates}};
 
     $zip->addString( shift @certs, $crt_file )
