@@ -320,6 +320,10 @@ msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED"
 msgstr "Revocato"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED_AT"
+msgstr "Revocato"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_UNKNOWN"
 msgstr "sconosciuto"
 
@@ -808,6 +812,18 @@ msgstr "Curva prime192v1"
 
 msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_PRIME239V1"
 msgstr "Curva prime239v1"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_PRIME256V1"
+msgstr "Curva prime239v1"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_SECP384R1"
+msgstr "Curva sect571r1"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_SECP521R1"
+msgstr "Curva sect571r1"
 
 msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_SECT571R1"
 msgstr "Curva sect571r1"
@@ -1991,6 +2007,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_ACTION_SUCCESS_STATUS"
 msgstr ""
 "L’azione selezionata è stata eseguita con successo su tutti i Workflow."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_ASYNC_ITEMS_DESC"
+msgstr "Questi Workflow hanno completato l’esecuzione dell’azione selezionata."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_DESC"
 msgstr "Guarda il risultato della tua azione di massa qui sotto."

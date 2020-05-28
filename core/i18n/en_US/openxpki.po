@@ -14,9 +14,6 @@ msgstr ""
 "X-Generator: Poedit 2.0.6\n"
 "X-Poedit-Bookmarks: -1,-1,77,-1,-1,-1,-1,-1,-1,-1\n"
 
-msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED_AT"
-msgstr "Revoked at"
-
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Requested action not found"
 
@@ -269,6 +266,9 @@ msgstr "Issued"
 
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED"
 msgstr "Revoked"
+
+msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED_AT"
+msgstr "Revoked at"
 
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_UNKNOWN"
 msgstr "unknown"
@@ -651,6 +651,18 @@ msgstr "Curve prime192v1"
 
 msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_PRIME239V1"
 msgstr "Curve prime239v1"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_PRIME256V1"
+msgstr "Curve prime239v1"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_SECP384R1"
+msgstr "Curve sect571r1"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_SECP521R1"
+msgstr "Curve sect571r1"
 
 msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_SECT571R1"
 msgstr "Curve sect571r1"
@@ -3275,17 +3287,6 @@ msgstr "Wake Up"
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Yes"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RELEASE_LOCK_LABEL"
-msgstr "Unlock a transaction id"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RELEASE_LOCK_DESC"
-msgstr ""
-"Deletes the link between a transaction id and a (broken) workflow so a new "
-"workflow can be created using the same transaction id"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RELEASE_LOCK_LABEL"
-msgstr "Unlock transaction"
-
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
 #~ msgstr "Creator"
@@ -3454,6 +3455,9 @@ msgstr "Unlock transaction"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_LABEL"
 #~ msgstr "Set Information"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RELEASE_LOCK_LABEL"
+#~ msgstr "Unlock transaction"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_INITIALIZE_LABEL"
 #~ msgstr "Set Parameters"
@@ -3661,6 +3665,14 @@ msgstr "Unlock transaction"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_LABEL"
 #~ msgstr "Certificate Export"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RELEASE_LOCK_DESC"
+#~ msgstr ""
+#~ "Deletes the link between a transaction id and a (broken) workflow so a "
+#~ "new workflow can be created using the same transaction id"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RELEASE_LOCK_LABEL"
+#~ msgstr "Unlock a transaction id"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEPGETCA_DESC"

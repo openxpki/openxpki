@@ -23,6 +23,30 @@ msgstr "Application error"
 msgid "I18N_OPENXPKI_UI_BACKEND_SESSION_GONE"
 msgstr "再ログインしてください"
 
+msgid "I18N_OPENXPKI_UI_BULK_APPROVE_CRR_LABEL"
+msgstr "失効の承認"
+
+msgid "I18N_OPENXPKI_UI_BULK_APPROVE_CSR_LABEL"
+msgstr "リクエストの承認"
+
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_DESCRIPTION"
+msgstr "証明書発行リクエストは一括での承認/否認をします。"
+
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_LABEL"
+msgstr "証明書リクエスト"
+
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_REVOCATION_DESCRIPTION"
+msgstr "証明書失効リクエストは一括での承認/否認をします。"
+
+msgid "I18N_OPENXPKI_UI_BULK_PENDING_REVOCATION_LABEL"
+msgstr "証明書失効リクエスト"
+
+msgid "I18N_OPENXPKI_UI_BULK_REJECT_CRR_LABEL"
+msgstr "選択拒否"
+
+msgid "I18N_OPENXPKI_UI_BULK_REJECT_CSR_LABEL"
+msgstr "選択拒否"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL"
 msgstr ""
 "証明書識別子またはシリアル番号の単一証明書の詳細を読み込みます。10進数または"
@@ -30,6 +54,9 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_CHAIN_LABEL"
 msgstr "証明書チェイン"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_COMMON_NAME"
+msgstr "一般名称（CN）"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_ISSUER_LINK"
 msgstr "証明書チェイン参照"
@@ -233,6 +260,10 @@ msgstr "発行済み"
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED"
 msgstr "失効済み"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED_AT"
+msgstr "失効済み"
+
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_UNKNOWN"
 msgstr "不明"
 
@@ -287,6 +318,31 @@ msgstr "CRLの状態"
 msgid "I18N_OPENXPKI_UI_CRL_VIEW_IN_BROWSER"
 msgstr "ブラウザ上で詳細を確認する"
 
+msgid "I18N_OPENXPKI_UI_CSR_EXT_CERTIFICATE_TEMPLATE"
+msgstr "証明書テンプレート"
+
+msgid "I18N_OPENXPKI_UI_CSR_EXT_CHALLENGE_PASSWORD"
+msgstr "チャレンジパスワード"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
+msgstr "キー識別子"
+
+msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
+msgstr "遅延失効がリクエストされました。"
+
+msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
+msgstr "失敗"
+
+msgid "I18N_OPENXPKI_UI_DNS_CHECK_OK"
+msgstr "ok"
+
+msgid "I18N_OPENXPKI_UI_DNS_CHECK_SKIPPED"
+msgstr "n/a"
+
+msgid "I18N_OPENXPKI_UI_DNS_CHECK_TIMEOUT"
+msgstr "タイムアウト"
+
 msgid "I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE"
 msgstr "PEM形式でダウンロード（ルート証明書を含む）"
 
@@ -331,6 +387,65 @@ msgstr "テキスト形式でダウンロード"
 
 msgid "I18N_OPENXPKI_UI_ELIGIBILITY_CHECK_UNEXPECTED_ERROR"
 msgstr "適性チェックが正しく返されませんでした（内部エラー）"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_CLEANUP"
+msgstr "リクエストはオペレータによって拒否されました。"
+
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_APPROVED"
+msgstr "リクエストが承認されませんでした"
+
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_AUTHENTICATED"
+msgstr "リクエストは認証されませんでした"
+
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_IN_CURRENT_REALM"
+msgstr "他のレルムの証明書に対する更新リクエストです。"
+
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_IN_RENEWAL_WINDOW"
+msgstr "更新ウィンドウのリクエストではありません。"
+
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_INVALID_KEY_PARAM"
+msgstr "ポリシー失敗 (提供された気ーが要件に一致しません。)"
+
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_KEY_DUPLICATE"
+msgstr "ポリシー失敗 (キーの再利用が検出されました。)"
+
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_NOT_FOUND"
+msgstr "ポリシー定義が見つかりませんでした。"
+
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_SUBJECT_DUPLICATE"
+msgstr "ポリシー失敗 (件名が重複しています。)"
+
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_VIOLATED"
+msgstr "ポリシー違反です（有効な証明書が多すぎます）"
+
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_REJECTED"
+msgstr "リクエストはオペレータによって拒否されました。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_REQUEST_DUPLICATE"
+msgstr "ポリシー失敗 (件名が重複しています。)"
+
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_REQUEST_NOT_AUTHORIZED"
+msgstr "リクエストは適切に承認されませんでした。"
+
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_EXPIRED"
+msgstr "署名者証明書の有効期限が切れています。"
+
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_NOT_AUTHORIZED"
+msgstr "依頼者は承認された署名者リストにありません。"
+
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_REVOKED"
+msgstr "署名者証明書が失効されました。"
+
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_UNKNOWN"
+msgstr "署名者証明書のエラーが発生しました。"
+
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SUBJECT_INVALID"
+msgstr "件名が正しくありません。"
+
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_RENEWAL_NOT_ALLOWED"
+msgstr "更新が許可されていません。"
 
 msgid "I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION"
 msgstr "公開処理中に内部エラーが発生しました。"
@@ -379,6 +494,81 @@ msgstr ""
 "秘密鍵のエクスポートに失敗しました（パスワードが間違っている可能性がありま"
 "す）。"
 
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_ALIAS_DESC"
+msgstr ""
+"ダウンロード用のPKCS12またはJavaキーストアを要求するときは、ここでオプション"
+"のエイリアスを設定できます。 許可される文字はA-Z0-9です。空白は許可されませ"
+"ん。"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_ALIAS_LABEL"
+msgstr "キーストアエイリアス"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_ALIAS_PLACEHOLDER"
+msgstr ""
+"キーストアのエイリアスは、標準のリクエストに対して空のままにすることができま"
+"す。"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_DESC"
+msgstr ""
+"エクスポートする私有鍵にパスワードを設定します。設定しない場合、証明書要求時"
+"に設定したパスワードが使用されます。"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_LABEL"
+msgstr "パスワード設定"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_TOOLTIP"
+msgstr "エクスポートする私有鍵にパスワードを設定します。"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_FILENAME_LABEL"
+msgstr "キーストアのダウンロード"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
+msgstr "ダウンロードフォーマット"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_DESC"
+msgstr ""
+"キーストアの形式は、ほとんどのアプリケーションがPKCS12形式で動作します。"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_JAVA_KEYSTORE"
+msgstr "Javaキーストア"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_LABEL"
+msgstr "ダウンロードフォーマット"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_OPENSSL_PRIVKEY"
+msgstr "OpenSSL形式"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS12"
+msgstr "PKCS12"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS8_DER"
+msgstr "PKCS8 (DER)"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS8_PEM"
+msgstr "PKCS8 (PEM)"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_DESC"
+msgstr ""
+"CSR作成中に入力したパスワードは、鍵ファイルをダウンロードする場合にもリクエス"
+"トされます。"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_LABEL"
+msgstr "パスワード"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_UNENCRYPTED_DESC"
+msgstr ""
+"チェックした場合、エクスポートされる私有鍵はパスワードで保護されません。パス"
+"ワードは無視されます。"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_UNENCRYPTED_LABEL"
+msgstr "暗号化なし"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATE_KEY_FAILED"
+msgstr "秘密鍵は復号化/読み込みできませんでした。"
+
+msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
+msgstr "エラーコード"
+
 msgid "I18N_OPENXPKI_UI_HOME_LOGOUT_HEAD"
 msgstr "ログアウト"
 
@@ -397,6 +587,9 @@ msgstr "同じ最終/最新更新情報である発行者のCRLが存在しま�
 
 msgid "I18N_OPENXPKI_UI_IMPORT_CRL_ISSUER_NOT_FOUND"
 msgstr "CRLの発行者証明書を見つけることができません"
+
+msgid "I18N_OPENXPKI_UI_INVALID_PROFILE"
+msgstr "無効なプロファイル"
 
 msgid "I18N_OPENXPKI_UI_ISSUERS_LIST"
 msgstr " このレルムの証明書を発行"
@@ -420,11 +613,92 @@ msgstr "キーの長さ"
 msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_PARAMSET"
 msgstr "パラメーター"
 
+msgid "I18N_OPENXPKI_UI_KEYSTORE_ALIAS_CONTAINS_INVALID_CHARACTERS"
+msgstr "エイリアスには、a-z A-Z 0-9 - _以外の文字が含まれています。"
+
 msgid "I18N_OPENXPKI_UI_KEY_ALG"
 msgstr "キーアルゴリズム"
 
+msgid "I18N_OPENXPKI_UI_KEY_ALG_DSA"
+msgstr "DSA （署名のみ）"
+
+msgid "I18N_OPENXPKI_UI_KEY_ALG_EC"
+msgstr "楕円曲線暗号"
+
+msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST2001"
+msgstr "GOST 2001"
+
+msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST94"
+msgstr "GOST 94"
+
+msgid "I18N_OPENXPKI_UI_KEY_ALG_RSA"
+msgstr "RSA"
+
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME"
+msgstr "種別"
+
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_C2TNB191V1"
+msgstr "Curve c2tnb191v1"
+
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_PRIME192V1"
+msgstr "Curve prime192v1"
+
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_PRIME239V1"
+msgstr "Curve prime239v1"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_PRIME256V1"
+msgstr "Curve prime239v1"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_SECP384R1"
+msgstr "Curve sect571r1"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_SECP521R1"
+msgstr "Curve sect571r1"
+
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_SECT571R1"
+msgstr "Curve sect571r1"
+
 msgid "I18N_OPENXPKI_UI_KEY_ENC"
 msgstr "暗号化"
+
+msgid "I18N_OPENXPKI_UI_KEY_ENC_3DES"
+msgstr "3DES"
+
+msgid "I18N_OPENXPKI_UI_KEY_ENC_AES256"
+msgstr "AES 256bit"
+
+msgid "I18N_OPENXPKI_UI_KEY_ENC_IDEA"
+msgstr "IDEA"
+
+msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"
+msgstr "キーパスワード"
+
+msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_CLIENT"
+msgstr "自分でパスワードを選択する"
+
+msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_SERVER"
+msgstr "パスワードを自動的に作成する"
+
+msgid "I18N_OPENXPKI_UI_KEY_IDENTIFIER"
+msgstr "キー識別子"
+
+msgid "I18N_OPENXPKI_UI_KEY_KEY_ALG"
+msgstr "キーアルゴリズム"
+
+msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH"
+msgstr "キーの長さ"
+
+msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_2048"
+msgstr "2048 bits"
+
+msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_4096"
+msgstr "4096 bit"
+
+msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
+msgstr "ユーザー名"
 
 msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
 msgstr "Login failed"
@@ -450,6 +724,91 @@ msgstr "送信"
 msgid "I18N_OPENXPKI_UI_LOGIN_USERNAME"
 msgstr "ユーザ名"
 
+# Remove?
+msgid "I18N_OPENXPKI_UI_MENU_BULK"
+msgstr "一括承認/拒否"
+
+msgid "I18N_OPENXPKI_UI_MENU_BULK_REVOKE_CERTIFICATE"
+msgstr "一括失効"
+
+msgid "I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES"
+msgstr "CA証明書"
+
+msgid "I18N_OPENXPKI_UI_MENU_CERTIFICATE_SEARCH"
+msgstr "証明書検索"
+
+msgid "I18N_OPENXPKI_UI_MENU_CHANGE_METADATA"
+msgstr "証明書メタデータの変更"
+
+# Remove?
+msgid "I18N_OPENXPKI_UI_MENU_CRL"
+msgstr "証明書失効リスト（CRL）を表示する"
+
+msgid "I18N_OPENXPKI_UI_MENU_CRL_ISSUE"
+msgstr "証明書失効リスト（CRL）を発行する"
+
+msgid "I18N_OPENXPKI_UI_MENU_CSR_CHECK"
+msgstr "リクエストチェック"
+
+# Remove?
+msgid "I18N_OPENXPKI_UI_MENU_HOME"
+msgstr "ホーム"
+
+msgid "I18N_OPENXPKI_UI_MENU_INFORMATION"
+msgstr "情報"
+
+msgid "I18N_OPENXPKI_UI_MENU_MANAGE_SECRET"
+msgstr "秘密鍵を管理する"
+
+msgid "I18N_OPENXPKI_UI_MENU_MY_CERTIFICATE"
+msgstr "自分の証明書"
+
+# Remove?
+msgid "I18N_OPENXPKI_UI_MENU_MY_TASK"
+msgstr "自分のタスク"
+
+msgid "I18N_OPENXPKI_UI_MENU_MY_WORKFLOW"
+msgstr "自分のワークフロー"
+
+msgid "I18N_OPENXPKI_UI_MENU_PKI_OPERATION"
+msgstr "PKIオペレーション"
+
+msgid "I18N_OPENXPKI_UI_MENU_PROCESS_INFORMATION"
+msgstr "プロセス情報"
+
+msgid "I18N_OPENXPKI_UI_MENU_PUBLISH_CA_CRL"
+msgstr "CA / CRLの発行"
+
+# Remove?
+msgid "I18N_OPENXPKI_UI_MENU_REPORT_FULL"
+msgstr "全ての証明書ステータスレポート"
+
+msgid "I18N_OPENXPKI_UI_MENU_REPORT_SUMMARY"
+msgstr "証明書の概要"
+
+msgid "I18N_OPENXPKI_UI_MENU_REQUEST"
+msgstr "リクエスト"
+
+msgid "I18N_OPENXPKI_UI_MENU_REQUEST_CERTIFICATE"
+msgstr "証明書申請"
+
+msgid "I18N_OPENXPKI_UI_MENU_REVOKE_CERTIFICATE"
+msgstr "証明書を失効する"
+
+msgid "I18N_OPENXPKI_UI_MENU_SCEP_SEARCH"
+msgstr "SCEPワークフロー検索"
+
+# Remove?
+msgid "I18N_OPENXPKI_UI_MENU_SET_MOTD"
+msgstr "今日のメッセージを設定する"
+
+# Remove?
+msgid "I18N_OPENXPKI_UI_MENU_SYSTEM_STATUS"
+msgstr "システムステータス"
+
+msgid "I18N_OPENXPKI_UI_MENU_WORKFLOW_SEARCH"
+msgstr "ワークフロー検索"
+
 msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_DESCRIPTION"
 msgstr ""
 "このページには、あなたが開始したすべてのワークフローのリストが表示されます。"
@@ -468,6 +827,10 @@ msgstr "キーがないため、取得できませんでした。"
 
 msgid "I18N_OPENXPKI_UI_NICE_GENERATE_KEY_NO_PASSWORD"
 msgstr "パスワード無しでキーを生成しました。"
+
+# Remove?
+msgid "I18N_OPENXPKI_UI_NO"
+msgstr "いいえ"
 
 msgid "I18N_OPENXPKI_UI_OOPS"
 msgstr "おっと、何か間違っています。"
@@ -502,11 +865,146 @@ msgstr "本当にこのアクションを実行していることを確認して
 msgid "I18N_OPENXPKI_UI_PLEASE_CONFIRM_TITLE"
 msgstr "アクションを確認する"
 
+msgid "I18N_OPENXPKI_UI_PROFILE_ADVANCED_STYLE_DESC"
+msgstr "高度な入力スタイル"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_ADVANCED_STYLE_LABEL"
+msgstr "拡張プロファイル（エキスパート）"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME"
+msgstr "アプリケーション名"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME_DESC"
+msgstr "クライアントとして機能するアプリケーションの名前。"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_DESC"
+msgstr "特別な要件がない場合は、通常はデフォルトスタイルが最適です。"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_LABEL"
+msgstr "デフォルトのプロファイルスタイル"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST"
 msgstr "最初にプロファイルを選択してください"
 
+msgid "I18N_OPENXPKI_UI_PROFILE_CN_DESC"
+msgstr "一般名称(CN)"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_COMMENT"
+msgstr "コメント"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_COMMENT_DESC"
+msgstr "コメント"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_C_DESC"
+msgstr "国"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_DC_DESC"
+msgstr "ドメインコンポーネント"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_DEPARTMENT"
+msgstr "部門"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_DEPARTMENT_DESC"
+msgstr "部門"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_EMAILADDRESS"
+msgstr "Eメール:"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_EMAILADDRESS_DESC"
+msgstr "Eメールアドレス"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_EXTRA_HOSTNAME"
+msgstr "追加のホスト名"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_EXTRA_HOSTNAME_DESC"
+msgstr "証明書に追加のホスト名を入力することができます"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_HINT_LIST"
 msgstr "利用可能なプロファイルの情報"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME"
+msgstr "ホスト名"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC"
+msgstr "システムに最も適したホスト名（ドメイン名）を入力します。"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_OU_DESC"
+msgstr "組織単位"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_O_DESC"
+msgstr "組織名"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_PHONE"
+msgstr "電話"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_PHONE_DESC"
+msgstr "電話番号"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_PORT"
+msgstr "ポート"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_PORT_DESC"
+msgstr "ポート番号"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_REALNAME"
+msgstr "本名"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_REALNAME_DESC"
+msgstr "本名"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_AFFILIATION"
+msgstr "所属"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_AFFILIATION_DESC"
+msgstr "依頼者の所属"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_EMAIL"
+msgstr "Eメールアドレス"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_EMAIL_DESC"
+msgstr "依頼者のEメール"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_FIRSTNAME"
+msgstr "名"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_FIRSTNAME_DESC"
+msgstr "依頼者の名"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_LASTNAME"
+msgstr "姓"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_LASTNAME_DESC"
+msgstr "依頼者の姓"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_SAN_DNS"
+msgstr "DNS"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_SAN_DNS_DESCRIPTION"
+msgstr "DNSサーバ"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_SAN_IP"
+msgstr "IPアドレス"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_SAN_IP_DESCRIPTION"
+msgstr "IPアドレス"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_SAN_RID"
+msgstr "RID"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_SAN_RID_DESCRIPTION"
+msgstr "IRID"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI"
+msgstr "URI"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
+msgstr "URI"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL"
+msgstr "TLS Client Profile"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
+msgstr "TLS/Web Server Profile"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_DESC"
 msgstr ""
@@ -520,6 +1018,43 @@ msgstr "パスワードの作成中にエラーが発生しました。"
 msgid "I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_LABEL"
 msgstr "何か問題が発生したようです。続行できません。"
 
+msgid "I18N_OPENXPKI_UI_PROFILE_USERID"
+msgstr "ユーザID"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_USERID_DESC"
+msgstr "ユーザID"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_USERNAME"
+msgstr "ユーザ名"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_USERNAME_DESC"
+msgstr "ユーザ名"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_USER_LABEL"
+msgstr "User Profile"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY"
+msgstr "有効"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY_1Y"
+msgstr "1年"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY_2Y"
+msgstr "2年"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY_3Y"
+msgstr "3年"
+
+msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
+msgstr "指定された理由コードはサポートされていません"
+
+# Remove?
+msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_LABEL"
+msgstr "レポート構成"
+
+msgid "I18N_OPENXPKI_UI_REPORT_DOWNLOAD_LABEL"
+msgstr "ダウンロード"
+
 msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_CREATED"
 msgstr "最終更新"
 
@@ -532,11 +1067,26 @@ msgstr "レポート名"
 msgid "I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID"
 msgstr "Unable to perform action -  security token was invalid!"
 
+msgid "I18N_OPENXPKI_UI_REQUEST_WORKFLOW_ID"
+msgstr "ワークフローIDのリクエスト"
+
 msgid "I18N_OPENXPKI_UI_REVOCATION_ID"
+msgstr "ワークフローの取り消し"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REVOCATION_WORKFLOW_ID"
 msgstr "ワークフローの取り消し"
 
 msgid "I18N_OPENXPKI_UI_SEARCH_CERTIFICATES_QUERY_IS_EMPTY"
 msgstr "検索条件が空です。"
+
+msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
+msgstr "証明書の件名"
+
+msgid "I18N_OPENXPKI_UI_SEARCH_ENTITY_HINT"
+msgstr ""
+"エンティティの名前（通常は共通名で使用されるFQDN）でフィルターします。完全一"
+"致、ワイルドカードが許可されます。"
 
 msgid "I18N_OPENXPKI_UI_SEARCH_EXPORT_RESULT"
 msgstr "結果のエクスポート"
@@ -553,8 +1103,25 @@ msgstr "結果を再読み込みする"
 msgid "I18N_OPENXPKI_UI_SEARCH_RELOAD_FORM"
 msgstr "検索フォームを再読込する"
 
+msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_HINT"
+msgstr ""
+"リクエストで使用されるメールアドレスでフィルタリングします。 完全一致、ワイル"
+"ドカードが許可されます。"
+
+msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_LABEL"
+msgstr "依頼者Eメール"
+
+msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_HINT"
+msgstr "この依頼者によりリクエストされた証明書のみ表示します。(部分一致)"
+
+msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL"
+msgstr "依頼者"
+
 msgid "I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY"
 msgstr "検索結果が期限切れまたは空です。"
+
+msgid "I18N_OPENXPKI_UI_SEARCH_TRANSACTION_ID_LABEL"
+msgstr "トランザクションId"
 
 msgid "I18N_OPENXPKI_UI_SECRET_CLEAR_SECRET_LABEL"
 msgstr "秘密鍵クリア"
@@ -616,6 +1183,24 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_SYSTEM_VERSION_STATUS_LABEL"
 msgstr "システムバージョン"
+
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
+msgstr "SCEP登録ワークフローは承認待ちです。"
+
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_LABEL"
+msgstr "登録"
+
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REQUEST_DESCRIPTION"
+msgstr "承認待ちの証明書リクエスト。"
+
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REQUEST_LABEL"
+msgstr "認証リクエスト"
+
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_DESCRIPTION"
+msgstr "承認待ちのワークフローが失効されます。"
+
+msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_LABEL"
+msgstr "失効リクエスト"
 
 msgid "I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL"
 msgstr "データなし"
@@ -763,11 +1348,79 @@ msgstr "ウォッチドッグ"
 msgid "I18N_OPENXPKI_UI_WELCOME_PAGE"
 msgstr "OpenXPKI Trustcenter へようこそ"
 
+msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
+msgstr "今日のメッセージ"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_ROLE"
 msgstr "現在の権限ではこのワークフローへのアクセスは禁止されています"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_USER"
 msgstr "現在のユーザーはこのワークフローへのアクセスを禁止しています"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_DESC"
+msgstr ""
+"この情報が正確である場合のみ、所定の情報を検証し、失効リクエストを承認してく"
+"ださい。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_LABEL"
+msgstr "失効の承認"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_DESC"
+msgstr "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_DESC"
+msgstr "初期化する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_LABEL"
+msgstr "初期化する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_DESC"
+msgstr ""
+"証明書の識別子を入力するか、autosearch関数を使用して、メタデータを変更する証"
+"明書を探します。証明書が見つからない/識別できない場合は、メインメニューから証"
+"明書検索を選択してください。結果のリストには、メタデータを変更するためのリン"
+"クが含まれます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_LABEL"
+msgstr "証明書を選択"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_FORM_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_FORM_LABEL"
+msgstr "データの編集"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_PERSIST_DESC"
+msgstr "変更されたデータをデータベースに保存する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_PERSIST_LABEL"
+msgstr "データを保持する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_TERMINATE_DESC"
+msgstr "このワークフローを中止します。メタデータは変更されません。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_TERMINATE_LABEL"
+msgstr "変更を中止する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_CONTEXT_DESC"
+msgstr "以下のフォームを使用して情報を更新してください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_CONTEXT_LABEL"
+msgstr "更新情報"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CLEANUP_DESC"
+msgstr "ワークフローをクリーンアップする"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CLEANUP_LABEL"
+msgstr "終了"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_DESC"
+msgstr ""
+"証明書の失効リクエストを作成します。証明書の識別子を入力するか、autosearch関"
+"数を使用して証明書を探してください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_LABEL"
+msgstr "失効を開始する"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CA_DESC"
 msgstr "CA証明書とCRLを定義された対象に公開する。"
@@ -775,8 +1428,270 @@ msgstr "CA証明書とCRLを定義された対象に公開する。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRL_ISSUANCE_PUBLISH_CA_LABEL"
 msgstr "CA証明書を公開する"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_SUBMIT_DESC"
+msgstr "失効申請を認証局に提出してください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_SUBMIT_LABEL"
+msgstr "リクエストを送信する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_APPROVE_CSR_DESC"
+msgstr ""
+"この証明書リクエストを承認します。すべての情報を検証し、このリクエストが認可"
+"されている場合のみ、リクエストを行ってください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_APPROVE_CSR_LABEL"
+msgstr "リクエストの承認"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_ASK_CLIENT_PASSWORD_DESC"
+msgstr ""
+"あなたの鍵を保護するためにパスワードを入力してください。このパスワードは後で"
+"鍵をダウンロードするために必要です。覚えておいてください。パスワードは、2文字"
+"のグループ（小文字/大文字/数字/特殊文字）から少なくとも8文字を含む必要があり"
+"ます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_ASK_CLIENT_PASSWORD_LABEL"
+msgstr "パスワードを入力します"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_CERT_INFO_DESC"
+msgstr ""
+"この情報は証明書には載っていませんが、あなたのリクエストを検証する際には登録"
+"担当者を支援します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_CERT_INFO_LABEL"
+msgstr "証明書情報の編集"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_ON_HOLD_LABEL"
+msgstr "保留理由の編集"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_SAN_DESC"
+msgstr "証明書リクエストの別名セクションの項目を編集します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_SAN_LABEL"
+msgstr "別名の編集"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_SUBJECT_DESC"
+msgstr ""
+"認証リクエストの主な件名の項目を編集します。最終的な件名は、選択したプロファ"
+"イルとPKIポリシーに基づいて入力され作成されます。最終的な提出の前に、再確認と"
+"編集ができます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_SUBJECT_LABEL"
+msgstr "件名を編集する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_VALIDITY_DESC"
+msgstr ""
+"証明書の有効性を変更したい場合は、フィールドに発行日/有効期限のカスタムを入力"
+"します。すべての日付はUTCの時間帯で処理されます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_VALIDITY_LABEL"
+msgstr "有効性の編集"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_GENERATE_KEY_DESC"
+msgstr "このリクエストの鍵を作成する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_GENERATE_KEY_LABEL"
+msgstr "鍵を作成する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PERSIST_CSR_DESC"
+msgstr "CSRを継続する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PERSIST_CSR_LABEL"
+msgstr "CSRを継続する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PROVIDE_SERVER_KEY_PARAMS_DESC"
+msgstr ""
+"鍵とあなたのリクエストを自動的に作成します。鍵のパラメータを選択してくださ"
+"い。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PROVIDE_SERVER_KEY_PARAMS_LABEL"
+msgstr "鍵を自動的に作成する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PUT_REQUEST_ON_HOLD_DESC"
+msgstr "このリクエストが保留されている理由を入力してください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PUT_REQUEST_ON_HOLD_LABEL"
+msgstr "リクエストを保留にする"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_REJECT_REQUEST_DESC"
+msgstr "リクエスト拒否"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_REJECT_REQUEST_LABEL"
+msgstr "リクエスト拒否"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RELEASE_ON_HOLD_DESC"
+msgstr ""
+"このリクエストは以下の理由で保留になりました。続行ボタンをクリックしてロック"
+"を解除し、リクエストを続行します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RELEASE_ON_HOLD_LABEL"
+msgstr "リリース中"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RETYPE_SERVER_PASSWORD_DESC"
+msgstr ""
+"自動的にパスワードが作成されました。必要に応じてこのパスワードを書き留めて、"
+"秘密鍵をダウンロードしてインストールしてください。パスワードの入力を確認する"
+"には、指定したフィールドにパスワードを再入力してください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RETYPE_SERVER_PASSWORD_LABEL"
+msgstr "あなたのキーパスワード"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_PROFILE_DESC"
+msgstr ""
+"証明書のプロファイルとサブプロファイルを選択します。選択したプロファイルが"
+"ユースケースに一致することを確認します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_PROFILE_LABEL"
+msgstr "プロファイルを選択"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_ISSUER_LABEL"
+msgstr "発行者の設定"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SUBMIT_DESC"
+msgstr "リクエストを送信する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SUBMIT_LABEL"
+msgstr "リクエストを送信する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_UPLOAD_PKCS10_DESC"
+msgstr ""
+"PKCS10形式でご要望を提供してください。ブロックをテキストエリアに投稿するか、"
+"アップロードボタンを使用してローカルコンピュータのファイルを使用することがで"
+"きます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_UPLOAD_PKCS10_LABEL"
+msgstr "CSR(PKCS10)のアップロード"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ACCEPT_REQUEST_DESC"
+msgstr "リクエストを受け付けました。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ACCEPT_REQUEST_LABEL"
+msgstr "リクエスト受付"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_DESC"
+msgstr "自動ポリシーの決定を無効にして、登録を続行します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_LABEL"
+msgstr "ポリシーを無効にする"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_INITIALIZE_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_INITIALIZE_LABEL"
+msgstr "必須フォーマットの指定"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_RETRY_PASSWORD_LABEL"
+msgstr "パスワード再入力"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_CANCEL_DESC"
+msgstr "このワークフローをキャンセルします。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_CANCEL_LABEL"
+msgstr "リクエストのキャンセル"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_DESC"
+msgstr ""
+"このプロセスによって、現在のレルム内のすべての有効なCAの新しい失効リストが作"
+"成されます。失効リストは、新しい失効リストが存在する場合、または現在のリスト"
+"が期限切れに近い場合に作成されます。下のチェックボックスをオンにすると、常に"
+"新しいリストを作成することができます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_LABEL"
+msgstr "CRLトリガーの問題"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ISSUE_CRL_DESC"
+msgstr "失効リストを発行する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ISSUE_CRL_LABEL"
+msgstr "CRLを発行する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_MOTD_INITIALIZE_DESCRIPTION"
+msgstr ""
+"ユーザーがログインするたびにメインページの上部にステータスバーとして表示され"
+"る今日のメッセージを設定することができます。ユーザごとの権限またはすべての"
+"ユーザに対してメッセージを作成できます。一般的なメッセージと権限固有のメッ"
+"セージが定義されている場合は、権限のメッセージのみが表示されます。リンクURLを"
+"指定すると、ユーザーがメッセージボックスをクリックした時、指定されたURLで新し"
+"いブラウザウィンドウが開きます。既存のメッセージを削除するには、失効日を今す"
+"ぐに設定して新しいメッセージを定義するだけです。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_MOTD_INITIALIZE_LABEL"
+msgstr "情報を設定する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_CHECK_FOR_REVOCATION_DESC"
+msgstr ""
+"失効リクエストが受け入れられた場合、証明書は次の失効リストに含まれます。この"
+"ワークフローは、CRLが発行された後、自動的に閉じられます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_CHECK_FOR_REVOCATION_LABEL"
+msgstr "失効保留中"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_FETCH_CERTIFICATE_DESC"
+msgstr "証明書の失効"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_FETCH_CERTIFICATE_LABEL"
+msgstr "証明書の失効"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_ISSUE_CERTIFICATE_DESC"
+msgstr "証明書の発行"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_ISSUE_CERTIFICATE_LABEL"
+msgstr "発行"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_POLICY_VIOLATION_COMMENT_DESC"
+msgstr ""
+"ポリシーなしで遵守しない証明書リクエストを提出する必要がある理由を正当な理由"
+"として提出してください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_POLICY_VIOLATION_COMMENT_LABEL"
+msgstr "正当性を提供する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_DESC"
+msgstr "この失効リクエストを拒否します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_LABEL"
+msgstr "リクエスト拒否"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_DETAIL_INITIALIZE_LABEL"
+msgstr "レポートオプションの定義"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_SUMMARY_INITIALIZE_LABEL"
+msgstr "レポートオプションの定義"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REVOKE_CERTIFICATE_DESC"
+msgstr "証明書の失効スケジュール"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REVOKE_CERTIFICATE_LABEL"
+msgstr "証明書の失効"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RUNNING_LABEL"
 msgstr "最近のアクティビティ"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEP_SEARCH_INITIALIZE_LABEL"
+msgstr "検索を開始する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SET_ISSUER_DESC"
+msgstr ""
+"通常、必要な有効期間に一致する最新の発行CAが証明書の署名に使用されます。この"
+"ダイアログでは、使用する専用の発行者証明書を設定できます。発行された証明書の"
+"期限前/後の日付は、使用されるCA証明書の有効期間に合わせて調整されることに注意"
+"してください。これは、有効性が重複する場合にのみ機能します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SLEEP_LABEL"
+msgstr "スリープ状態"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_TOOLS_DISCONNECT_DESC"
+msgstr ""
+"フロントエンドからワークフローを切り離し、バックグラウンドで続行します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_TOOLS_DISCONNECT_LABEL"
+msgstr "切り離す"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_DESC"
+msgstr "以下の情報を更新してください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
+msgstr "リクエストの更新"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "ワークフロー属性"
@@ -794,6 +1709,10 @@ msgstr "ワークフローステータスの再確認"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_ACTION_SUCCESS_STATUS"
 msgstr "選択したアクションは、すべてのワークフローで成功しました。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_ASYNC_ITEMS_DESC"
+msgstr "これらのワークフローは、選択したアクションの実行を終了しました。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_DESC"
 msgstr "下記の一括処理の結果をご覧ください。"
@@ -820,6 +1739,15 @@ msgstr "成功したワークフロー"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE"
 msgstr "ワークフローの一括処理"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ELIGIBILITY_RECHECK_LABEL"
+msgstr "適正の再確認"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_PROCEED_LABEL"
+msgstr "例外のポリシーで送信"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL"
+msgstr "ポリシーの再評価"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CANCEL_BUTTON"
 msgstr "リクエストのキャンセル"
@@ -855,17 +1783,613 @@ msgstr "ワークフローを開始できません：原因不明"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL"
 msgstr "作成者"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ERROR_DELAY_REVOCATION_TIME_NOT_IN_FUTURE"
+msgstr "失効日を遅延する場合、現在の失効日より未来の日付を指定してください。"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXCEPTION_FAILED_ACTION_LABEL"
 msgstr "失敗したアクション"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_EXPORT_PRIVATEKEY_RETRY_PASSWORD_BUTTON_LABEL"
+msgstr "パスワード再入力"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXTRA_INFO_LABEL"
 msgstr "追加情報"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVALS_LABEL"
+msgstr "承認"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_DESC"
+msgstr "リクエストに関する情報。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_IGNORED_LABEL"
+msgstr "無効な証明書識別子"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_LABEL"
+msgstr "証明書リスト"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_PLACEHOLDER"
+msgstr "証明書識別子のリストはスペースまたは改行で区切られています。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_LABEL"
+msgstr "証明書リスト"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_PLACEHOLDER"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_TOOLTIP"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTSIGN_TOKEN"
+msgstr "CAの発行"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC"
+msgstr ""
+"既知の場合は、証明書の英数字の識別子を入力するか、証明書の件名を入力するだけ"
+"で検索を開始できます。結果はフィールドの下に表示され、マウスの右ボタンを使用"
+"して結果を選択します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_LABEL"
+msgstr "証明書"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_PLACEHOLDER"
+msgstr "証明書の識別子を入力するか、件名を入力して自動検索を開始してください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_TOOLTIP"
+msgstr ""
+"自動検索では、件名に特定の単語が含まれている証明書が検索され、下のドロップダ"
+"ウンリストに表示されます。リストから必要な証明書をクリックして選択します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_DESC"
+msgstr "リクエストに関する情報。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_LABEL"
+msgstr "依頼者の情報"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_PLACEHOLDER"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_TOOLTIP"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_NOTIFIED_LIST_LABEL"
+msgstr "通知の送信"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_DESC"
+msgstr "証明書プロファイルの名前。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_LABEL"
+msgstr "証明書プロファイル"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_PLACEHOLDER"
+msgstr "証明書プロファイルを選択してください"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_TOOLTIP"
+msgstr "予想される使用状況に基づいて適切なプロファイルを選択します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_RENEWED_LIST_LABEL"
+msgstr "既に更新された証明書"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_DESC"
+msgstr "証明書の別名"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_LABEL"
+msgstr "別名"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_DESC"
+msgstr "証明書を構成する構成要素は別名を使用します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_LABEL"
+msgstr "別名の一部"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_PLACEHOLDER"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_TOOLTIP"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PLACEHOLDER"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_TOOLTIP"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_DESC"
+msgstr "証明書の件名。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_LABEL"
+msgstr "証明書の件名"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_LABEL"
+msgstr "別名の構成要素"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_PLACEHOLDER"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_TOOLTIP"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PLACEHOLDER"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_DESC"
+msgstr " "
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_LABEL"
 msgstr "件名スタイル"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_PLACEHOLDER"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_TOOLTIP"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_TOOLTIP"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_DESC"
+msgstr "Transaction Id of this SCEP request"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_LABEL"
+msgstr "CA署名者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_PLACEHOLDER"
+msgstr "CA署名者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_TOOLTIP"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_LABEL"
+msgstr "コメント"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_PLACEHOLDER"
+msgstr "リクエスト処理のための追加コメント"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_TOOLTIP"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_LABEL"
+msgstr "追加情報"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SUBJECT_DESC"
+msgstr "証明書の件名"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SUBJECT_LABEL"
+msgstr "証明書の件名"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_DESC"
+msgstr "CSRのタイプ（PCKS10、サーバー作成、SPKAC"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_LABEL"
+msgstr "CSRのタイプ"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_PLACEHOLDER"
+msgstr "CSRのタイプ"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_TOOLTIP"
+msgstr "CSRのタイプ。通常はPKCS10です。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_DESC"
+msgstr "失効日の遅延をすれば、失効日は未来の日付になります。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_LABEL"
+msgstr "失効の遅延"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_PLACEHOLDER"
+msgstr ""
+"通常は必須ではありません。右のセレクタを使用するか、日付、時間を入力してくだ"
+"さい"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_TOOLTIP"
+msgstr "所定の日時に失効が予定されている"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_LABEL"
+msgstr "Eメール"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_PLACEHOLDER"
+msgstr "my.name@mycompany.com"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_TOOLTIP"
+msgstr "有効なメールアドレスを入力してください"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_DESC"
+msgstr "ダウンロードした秘密鍵を暗号化するために使用されるアルゴリズム。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_LABEL"
+msgstr "鍵暗号化方式"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENDPOINT_DESC"
+msgstr "リクエストに使用されたサーバーのエンドポイント。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENDPOINT_LABEL"
+msgstr "エンドポイント"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENTITY_LABEL"
+msgstr "エンティティ名"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_DESC"
+msgstr ""
+"このフラグは、ワークフローが一括処理であることを示し、自動で実行する必要があ"
+"ります。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_LABEL"
+msgstr "一括モード"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_PLACEHOLDER"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_TOOLTIP"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_CRR_AUTO_APPROVAL_DESC"
+msgstr "設定されている場合、ワークフローは手動承認を必要としません"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_CRR_AUTO_APPROVAL_LABEL"
+msgstr "自動承認"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_DESC"
+msgstr ""
+"新しい失効リストを強制的に作成するには、このチェックボックスをオンにします。"
+"デフォルトでは、新しいリストが作成されるのは、新しいリストがある場合、または"
+"リストの有効性が満期に近い場合（次の更新プロパティ）のみです。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_LABEL"
+msgstr "強制的に失効リストを作成する。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_TOOLTIP"
+msgstr "強制発行するには、このチェックボックスをオンにします。"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST"
 msgstr "フォームフィールドを記入するためのヒント"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_DESC"
+msgstr ""
+"この値は秘密鍵の漏洩の理由コードと一緒に設定し、漏洩の実際の日付がわかってい"
+"る場合に設定する必要があります。それ以外の場合は空欄にします。ヒント：この"
+"フィールドを使用して、今後失効日をリクエストすることはできません。日付はUTCの"
+"時間帯で処理されます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_LABEL"
+msgstr "失効日"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_PLACEHOLDER"
+msgstr ""
+"通常は必須ではありません。右のセレクタを使用するか、日付、日時を入力してくだ"
+"さい"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_TOOLTIP"
+msgstr "あなたがその意味を知っている場合のみこれを設定してください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_REPLACE_LABEL"
+msgstr "更新"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_LABEL"
+msgstr "キーアルゴリズム"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_LABEL"
+msgstr "キーパラメータ"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_DESC"
+msgstr "この証明書の担当者のメールアドレス"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_LABEL"
+msgstr "メールアドレス"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_PLACEHOLDER"
+msgstr "証明書所有者のメールアドレス"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_TOOLTIP"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_LABEL"
+msgstr "依頼者/所有者"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_PLACEHOLDER"
+msgstr "依頼者/所有者の名前"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_TOOLTIP"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_DESC"
+msgstr "システム識別子"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_LABEL"
+msgstr "システム識別子"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_PLACEHOLDER"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_TOOLTIP"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTAFTER_DESC"
+msgstr ""
+"カレンダーを使用するか、または有効期限を<tt>DD.MM.YYYY HH：MM</tt>の形式で入"
+"力してください日中の時間帯を省略すると夜の時間帯が仮定されます。日付を自動的"
+"にリセットするには、フィールドを削除するか、0を入力します。すべての日付はUTC"
+"の時間帯で処理されます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTAFTER_LABEL"
+msgstr "有効期限"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTAFTER_PLACEHOLDER"
+msgstr "有効期限を入力してください、デフォルトの場合は空にする"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTAFTER_TOOLTIP"
+msgstr ""
+"カレンダーアイコンを使用するか、MM.DD.YYYY形式で日付を入力し、デフォルトを使"
+"用するには0を入力します"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_DESC"
+msgstr ""
+"カレンダーを使用するか、または発行日を<tt>DD.MM.YYYY HH：MM</tt>の形式で入力"
+"します。日中の時間地帯を省略すると、夜の時間帯が仮定されます。日付を自動的に"
+"リセットするには、フィールドを削除するか、0を入力します。すべての日付はUTCの"
+"時間帯で処理されます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_LABEL"
+msgstr "発行日"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_PLACEHOLDER"
+msgstr "発行日を入力してください、デフォルトの場合は空にする"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_TOOLTIP"
+msgstr ""
+"カレンダーアイコンを使用するか、MM.DD.YYYY形式で日付を入力し、デフォルトを使"
+"用するには0を入力します。日付けはUTCの時間帯です。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_DESC"
+msgstr "リクエストを保留にする理由を説明する。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_LABEL"
+msgstr "保留中の理由"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_PLACEHOLDER"
+msgstr "保留中の理由、例:承認不明など。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_TOOLTIP"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_OPERATOR_COMMENT_DESC"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_OPERATOR_COMMENT_LABEL"
+msgstr "コメント"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_OPERATOR_COMMENT_PLACEHOLDER"
+msgstr "リクエスト処理のための追加コメント"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_LABEL"
+msgstr "パスワード"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_PLACEHOLDER"
+msgstr "パスワードを再入力してください"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TOOLTIP"
+msgstr "パスワードを再入力"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TYPE_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TYPE_LABEL"
+msgstr "パスワードの形式"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TYPE_PLACEHOLDER"
+msgstr "キー保護パスワードの形式を選択してください"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TYPE_TOOLTIP"
+msgstr ""
+"あなた自身でパスワードを設定することも、自動的にパスワードを作成することもで"
+"きます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_DESC"
+msgstr ""
+"PKCS10形式のリクエストを直接フィールドに貼り付けるか、アップロードボタンを使"
+"用してローカルコンピュータからファイルを読み込みます"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_LABEL"
+msgstr "PKCS10のリクエスト"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_PLACEHOLDER"
+msgstr ""
+"PEMでエンコードされたリクエストをここに貼り付けてください（----- BEGIN "
+"CERTIFICATE REQUEST -----のように表示する必要があります）。または、下のブラウ"
+"ズ/アップロードボタンを使用してコンピュータからファイルを読み込みます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
+msgstr "PKCS10でエンコードされたリクエスト"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_CERTIFICATE_KEY_DUPLICATE"
+msgstr "重複した鍵証明書"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_DESC"
+msgstr ""
+"このサービスのポリシーに違反したとしても、リクエストを処理する理由を簡単に説"
+"明してください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_LABEL"
+msgstr "ポリシー違反の説明"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_PLACEHOLDER"
+msgstr "例:セットアップ中のDNS、証明書の交換など"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_SUBJECT_DUPLICATE_LABEL"
+msgstr "サブジェクト重複のポリシーチェックに失敗しました。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_WORKFLOW_ID_KEY_DUPLICATE_ID"
+msgstr "重複したキーワークフローID"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_DESC"
+msgstr "理由コードは、証明書が失効された理由を示します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_LABEL"
+msgstr "理由コード"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION"
+msgstr "証明書を失効する理由を指定します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_AFFILIATIONCHANGED"
+msgstr "詳細不明/その他の理由"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_CACOMPROMISE"
+msgstr "エンティティ証明書が置き換えられました"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_CESSATIONOFOPERATION"
+msgstr "エンティティ証明書が置き換えられました"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_KEYCOMPROMISE"
+msgstr "エンティティ証明書が置き換えられました"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_SUPERSEDED"
+msgstr "エンティティ証明書が置き換えられました"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_UNSPECIFIED"
+msgstr "詳細不明/その他の理由"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_PLACEHOLDER"
+msgstr "失効の理由を設定してください"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_TOOLTIP"
+msgstr "証明書を失効する理由を指定します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REJECT_COMMENT_DESC"
+msgstr "このリクエストを拒否する理由。 このコメントはユーザに表示されます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REJECT_COMMENT_LABEL"
+msgstr "拒否の理由"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REJECT_COMMENT_PLACEHOLDER"
+msgstr "拒絶の理由、例:承認、重複などがありません"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REJECT_COMMENT_TOOLTIP"
+msgstr "コメントはワークフローとともに保存され、ユーザーに送信されます"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_DESC"
+msgstr "このワークフローによって更新される証明書。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_LABEL"
+msgstr "更新された証明書"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_PLACEHOLDER"
+msgstr "証明書の識別子を入力するか、件名を入力して自動検索を開始してください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_TOOLTIP"
+msgstr ""
+"自動検索では、件名に含まれている単語を含む証明書が検索され、下のドロップダウ"
+"ンリストに表示されます。リストから必要な証明書をクリックして選択します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REQUEST_MODE_LABEL"
+msgstr "リクエストモード"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RUN_IN_BACKGROUND_DESC"
+msgstr ""
+"このボックスをチェックすると、ワークフローがUIから切り離され、バックグラウン"
+"ドで実行されます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RUN_IN_BACKGROUND_LABEL"
+msgstr "バックグラウンド実行"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_DESC"
+msgstr "このリクエストを受信したSCEPエンドポイントの名前。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_INTERFACE_DESC"
+msgstr "このリクエストを送信するために使用されたインターフェイスのタイプ。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_INTERFACE_LABEL"
+msgstr "サーバインターフェース"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_LABEL"
+msgstr "サーバ"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_AUTHORIZED_LABEL"
+msgstr "署名者が承認されました"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_DESC"
+msgstr "依頼者/署名者"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_IDENTIFIER_LABEL"
+msgstr "署名者証明書"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_LABEL"
+msgstr "依頼者/署名者"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_REVOKED_LABEL"
+msgstr "署名者が失効されました"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_SIGNATURE_VALID_LABEL"
+msgstr "署名者の署名が有効です"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_TRUSTED_LABEL"
+msgstr "署名者は信頼されています"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_OK_LABEL"
+msgstr "署名者の有効性を承諾しました。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_DESC"
+msgstr "このリクエストのトランザクションID"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_LABEL"
+msgstr "トランザクションID"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_CHALLENGE_PASSWORD_LABEL"
+msgstr "有効なパスワードがあります"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_HMAC_LABEL"
+msgstr "有効なHMAC"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_DESC"
+msgstr ""
+"PEM形式の証明書をフィールドに直接貼り付けるか、アップロードボタンを使用して"
+"ローカルコンピュータからファイルを読み込みます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_LABEL"
+msgstr "証明書 (PEM)"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_PLACEHOLDER"
+msgstr ""
+"PEMでエンコードされた証明書をここに貼り付けてください。(----- BEGIN "
+"CERTIFICATE -----のように指定する必要があります。)または下の参照/アップロード"
+"ボタンを使用してコンピュータからファイルをロードしてください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_TOOLTIP"
+msgstr "PEMは証明書で暗号化されました。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON"
 msgstr "強制的に失敗させる"
@@ -897,6 +2421,21 @@ msgstr "指定されたワークフローIDが見つかりませんでした"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_HANDLER_NOT_IN_CURRENT_REALM"
 msgstr "リクエストされたワークフローはこのレルムでは使用できません"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_CHANGE_PROFILE"
+msgstr "このリクエストの選択したプロファイルを変更する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_CHANGE_PROFILE_LABEL"
+msgstr "プロファイル選択に戻る"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_PKCS10_UPLOAD"
+msgstr "作成した証明書リクエストをPKCS10形式でアップロードする"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_SELECT_TO_PROCEED"
+msgstr "続行するには1つのアクションを選択してください"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_SERVER_KEY_PARAMS"
+msgstr "サーバから鍵を作成する"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_HISTORY_ACTION_LABEL"
 msgstr "アクション"
@@ -1016,6 +2555,42 @@ msgstr "優先順位"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_LOG_TIMESTAMP_LABEL"
 msgstr "タイムスタンプ"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_LEVEL_DESCRIPTION"
+msgstr ""
+"あなたへのメッセージの注意レベル。これは、メッセージボックスの種類に反映され"
+"ます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_LEVEL_LABEL"
+msgstr "重要度"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_MESSAGE_DESCRIPTION"
+msgstr "表示されるメッセージ。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_MESSAGE_LABEL"
+msgstr "今日のメッセージ"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_ROLE_DESCRIPTION"
+msgstr ""
+"このメッセージが表示されるユーザーの権限は、すべてのユーザーに表示されます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_ROLE_LABEL"
+msgstr "ユーザの権限"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_LINK_MESSAGE_DESCRIPTION"
+msgstr "追加情報のリンクは、http：//を含む適切なURLでなければなりません。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_LINK_MESSAGE_LABEL"
+msgstr "リンク"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_VALIDATOR_EXPIRATION_DATE_FAILED"
+msgstr "満期日が誤っています。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_VALIDATOR_LINK_FAILED"
+msgstr "http（s）://で始まる正しい形式のURLを入力してください"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_MOVE_TO_BACKGROUND"
+msgstr "プロセスは内部プロセスに移行しました。"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL"
 msgstr "ワークフローを開く"
 
@@ -1047,7 +2622,41 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
 msgstr "再試行の回数が最大数を超えています"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE"
-msgstr "現在の権限ではこのワークフロープロパティーへのアクセスは禁止されています"
+msgstr ""
+"現在の権限ではこのワークフロープロパティーへのアクセスは禁止されています"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_NEAR_EXPIRY"
+msgstr "有効期限間近の証明書"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_RECENT_EXPIRY"
+msgstr "最近の有効期限切れの証明書"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_COUNT"
+msgstr "証明書の全体数"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_DISTINCT"
+msgstr "全体の個別の件名"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_EXPIRED"
+msgstr "有効期限切れの証明書"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_REVOKED"
+msgstr "全体の失効した証明書"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_AT_DESCRIPTION"
+msgstr "デフォルトで有効期限/期限切れステータスを統計するための参照日。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_AT_LABEL"
+msgstr "参照日"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_COUNT"
+msgstr "有効な証明書"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_DISTINTCT"
+msgstr "有効な個別の件名"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_REVOKED"
+msgstr "有効性はあるが失効した証明書"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"
 msgstr "リクエストされたアクションは利用できません"
@@ -1097,17 +2706,370 @@ msgstr "更新日"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT"
 msgstr "このコンテンツは機密と見なされたので表示されません。"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SET_MOTD_SUCCESS_DESCRIPTION"
+msgstr ""
+"下記のメッセージは、指定されているユーザグループに設定されており、次のログイ"
+"ン時に表示されます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SET_MOTD_SUCCESS_LABEL"
+msgstr "メッセージを設定する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_DESC"
+msgstr "このワークフローはキャンセルされました。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_LABEL"
+msgstr "ユーザによってキャンセルされました"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_DESC"
+msgstr "証明書が発行され、リクエストに応じてクライアントに送信されます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_LABEL"
+msgstr "成功"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_INITIAL_DESC"
+msgstr "初期状態"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_INITIAL_LABEL"
+msgstr "初期状態"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_BACKGROUND_DESC"
+msgstr ""
+"証明書失効リストの作成は、内部プロセスに移行されました。失効した証明書の数に"
+"よっては、このプロセスに数分かかる場合があります。下のステータス再確認ボタン"
+"を押すと、発行プロセスにリダイレクトされます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_BACKGROUND_LABEL"
+msgstr "証明書の収集"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_BACKGROUND_REASON"
+msgstr "CRLは内部で作成されます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_DESC"
+msgstr "初期化中..."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_LABEL"
+msgstr "初期化中"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_DESC"
+msgstr "このワークフローは正常に終了しました。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_LABEL"
+msgstr "発行されたCRL"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BULK_PENDING_DESC"
+msgstr "この失効リクエストには承認が必要です。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BULK_PENDING_LABEL"
+msgstr "承認待ち"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BY_ENTITY_PENDING_DESC"
+msgstr "This revocation request requires approval."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BY_ENTITY_PENDING_LABEL"
+msgstr "この失効リクエストには承認が必要です。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_CANCELED_DESC"
+msgstr "このワークフローはキャンセルされました。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_CANCELED_LABEL"
+msgstr "キャンセル"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_DESC"
+msgstr "このワークフローは失敗しました。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_LABEL"
+msgstr "失敗"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
+msgstr "このワークフローは正常に終了しました。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_LABEL"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_PENDING_DESC"
+msgstr "この失効リクエストには承認が必要です。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_PENDING_LABEL"
+msgstr "承認待ち"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REJECTED_DESC"
+msgstr "最終的に失効リクエストが拒否されました。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REJECTED_LABEL"
+msgstr "失効拒否"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REQUEST_COMPLETE_DESC"
+msgstr ""
+"以下の失効申請の要約を見ることができます。情報の正当性をチェックし、送信ボタ"
+"ンを押してこの証明書の失効リクエストを送信してください。編集ボタンを使用して"
+"情報を変更し、キャンセルボタンを使用してリクエストを削除します"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REQUEST_COMPLETE_LABEL"
+msgstr "リクエストを確認する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_SUCCESS_DESC"
+msgstr "証明書が失効され、失効リストが発行されました。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_SUCCESS_LABEL"
+msgstr "失効した証明書"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_DESC"
+msgstr "このワークフローはキャンセルされました。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_LABEL"
+msgstr "キャンセル"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_DESC"
+msgstr "このワークフローは成功しました。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_LABEL"
+msgstr "状態"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_DESC"
+msgstr "このワークフローは正常に終了しました。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_LABEL"
+msgstr "秘密鍵のパスワード入力"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_DESC"
+msgstr "このワークフローは正常に終了しました。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_LABEL"
+msgstr "状態"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SUBJECT_DESC"
+msgstr "このワークフローは正常に終了しました。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SUBJECT_LABEL"
+msgstr "状態"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_DESC"
+msgstr "このワークフローは失敗し、証明書は発行されませんでした。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_LABEL"
+msgstr "リクエストが拒否されました"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_INITIAL_DESC"
+msgstr "このワークフローは正常に終了しました。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_INITIAL_LABEL"
+msgstr "状態"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ONHOLD_DESC"
+msgstr ""
+"このリクエストはオペレータによって保留にされました。以下の理由/コメントを探し"
+"てください。下のボタンを使用してコメントを編集するか、保留状態を解除すること"
+"ができます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ONHOLD_LABEL"
+msgstr "保留中のリクエスト"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_DESC"
+msgstr "このリクエストは、登録担当者の承認待ちです。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_LABEL"
+msgstr "リクエストは承認待ちです"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_REJECTED_DESC"
+msgstr ""
+"あなたのリクエストは登録証明書で拒否されました。下のコメント欄に拒否理由があ"
+"ります。この決定は最終的なもので、ワークフローを再開することはできません。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_REJECTED_LABEL"
+msgstr "リクエスト拒否"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SETUP_REQUEST_TYPE_DESC"
+msgstr ""
+"秘密鍵の提供方法を選択するか、戻って別のプロファイルを選択してください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SETUP_REQUEST_TYPE_LABEL"
+msgstr "リクエストタイプを選択"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_DESC"
+msgstr ""
+"あなたのリクエストはすぐに送信されます。表示された情報が正しいかどうかを確認"
+"してください。以下のボタンを使用して情報を更新することができます。<b>情報が完"
+"全な場合は、送信ボタンを使用して追加処理のリクエストを送信してください</b>"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_LABEL"
+msgstr "リクエスト請求"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUCCESS_DESC"
+msgstr "このワークフローは成功して終了し、再実行はできません"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUCCESS_LABEL"
+msgstr "発行済みの証明書"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_DESC"
+msgstr "手動による認証が保留中です。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_LABEL"
+msgstr "手動認証が保留中"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION"
 msgstr "予期しない中断"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESCRIPTION"
 msgstr "このワークフローは予期しない結果によって中断されました。"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_DESC"
+msgstr "このワークフローは失敗しました。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_LABEL"
+msgstr "失敗"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_DESC"
+msgstr "初期状態のエクスポート"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_LABEL"
+msgstr "初期状態をエクスポートします。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_FAILURE_DESC"
+msgstr ""
+"権限がないため、秘密鍵のエクスポートが失敗しました。 証明書の所有者のみが鍵に"
+"アクセスできます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_FAILURE_LABEL"
+msgstr "エクスポートに失敗しました"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_RETRY_PASSWORD_DESC"
+msgstr ""
+"秘密鍵の読み込みができなかったため、エクスポートファイルを作成できませんでし"
+"た。これは通常、間違ったパスワードを指定したことを意味します。再入力をクリッ"
+"クし、再度パスワードを入力するか、リクエストをキャンセルします。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_RETRY_PASSWORD_LABEL"
+msgstr "キーを読み込めません"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_DESC"
+msgstr ""
+"下のリンクをクリックして、証明書/キー形式でダウンロードしてください。このリン"
+"クはこのブラウザウィンドウ内でのみ機能し、60秒後に無効になります。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_LABEL"
+msgstr "成功"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_DESC"
+msgstr "このワークフローは失敗し、再実行はできません"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_LABEL"
+msgstr "失敗"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_CERTIFICATE_DESC"
+msgstr ""
+"アップロードされた鍵は、すでに許可されていない別の証明書によって使用されてい"
+"ることが判明しました。下のボタンを使用して新しい証明書リクエストをアップロー"
+"ドするか、ワークフローをキャンセルしてください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_CERTIFICATE_LABEL"
+msgstr "重複キーエラー（証明書）"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_WORKFLOW_DESC"
+msgstr ""
+"アップロードされた鍵は、すでに別の証明書リクエストによって使用されていること"
+"が判明しましたが、同じ鍵を2回認証することはできません。次のボタンを使用して、"
+"リクエストに新しいキーをアップロードするか、プロセスをキャンセルします。下に"
+"リストされているブロッキングワークフローについて管理している場合は、他のワー"
+"クフローをキャンセルして下の再チェックボタンを使用して先に進むこともできま"
+"す。ブロッキングワークフローを管理できるかどうかを判断できないため、このオプ"
+"ションは利用できない可能性があります。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_WORKFLOW_LABEL"
+msgstr "重複キーエラー(リクエスト）"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL"
 msgstr "ステータス"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_DESC"
+msgstr ""
+"下に、この証明書の新しいメタデータが表示されます。以下の操作から進んでくださ"
+"い。アボートはメタデータをデータベースに書き戻さずにワークフローを終了し、更"
+"新はフォームを再び表示し、セーブはデータを保存してワークフローを終了します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_LABEL"
+msgstr "データの確認"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_DESC"
+msgstr "このワークフローは一時停止され、ウォッチドッグによって継続されます"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_LABEL"
+msgstr "更新"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_INITIAL_DESC"
+msgstr ""
+"証明書に関連付けられたメタデータ情報を変更するには、証明書の識別子を入力して"
+"ください。<br/>識別子がわからない場合は、証明書検索を使用して見つけてくださ"
+"い。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_INITIAL_LABEL"
+msgstr "メタデータの初期化"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_DESC"
+msgstr "メタデータが更新されました。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
+msgstr "メタデータ更新"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_DESC"
+msgstr ""
+"このリクエストは1つ以上のポリシーチェックに失敗しましたが、所有者は承認をリク"
+"エストしました。詳細は以下のコメントと結果の項目を参照してください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL"
+msgstr "保留中のポリシー違反"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_DESC"
+msgstr "リクエストは拒否され、再実効はできません。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_LABEL"
+msgstr "リクエスト拒否"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_DETAIL_SUCCESS_DESC"
+msgstr ""
+"レポートが準備完了です。ファイル名をクリックしてダウンロードしてください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_DETAIL_SUCCESS_LABEL"
+msgstr "レポート結果"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_SUMMARY_SUCCESS_LABEL"
+msgstr "レポート結果"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL"
 msgstr "このワークフローは現在サーバー上で実行されています。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_DESC"
+msgstr "検索条件に一致する結果は見つかりませんでした。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_LABEL"
+msgstr "検索結果がありません。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
+msgstr "このワークフローは成功して終了し、再実行はできません"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL"
+msgstr "成功"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CONFIRM_DESC"
+msgstr ""
+"リクエストを続行できますが、リクエストされた日付の証明書を発行するための有効"
+"なトークンがありません！このリクエストを完了するには、新しいCAトークンを追加"
+"する必要があります！"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CONFIRM_LABEL"
+msgstr "CAライフタイムの不一致"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_DESC"
+msgstr ""
+"要求された証明書の有効期間は、構成されたCAトークンの有効性のいずれとも一致し"
+"ません。適切なCAトークンがアクティブ化されない限り、要求された日付の証明書を"
+"取得することはできません。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_LABEL"
+msgstr "CAライフタイムの不一致"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_PROCEED_BUTTON_LABEL"
+msgstr "リクエストに進む"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED"
 msgstr "このワークフローは一時停止され、ウォッチドッグによって継続されます"
@@ -1147,8 +3109,123 @@ msgstr "ワークフローは正常終了しました。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON"
 msgstr "続ける"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_DESC"
+msgstr "定義されたリポジトリにCA情報（CA証明書およびCRL）を発行します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL"
+msgstr "CA情報を公開する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
+msgstr "証明書失効リクエスト"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_LABEL"
+msgstr "証明書失効リクエスト(CRR)"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_DESC"
+msgstr "証明書署名リクエスト(CSR)"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_LABEL"
+msgstr "証明書署名リクエスト(CSR)"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_DESC"
+msgstr "証明書を登録します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_LABEL"
+msgstr "証明書の登録"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_DESC"
+msgstr "証明書をエクスポートします。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_LABEL"
+msgstr "証明書のエクスポート"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"
+msgstr "定義されたリポジトリに証明書情報を公開します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_LABEL"
+msgstr "証明書の公開"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_DESC"
+msgstr "証明書のメタデータを変更します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_LABEL"
+msgstr "メタデータの変更"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_DESC"
+msgstr "CRLを発行します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_LABEL"
+msgstr "CRL発行"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BULK_DESC"
+msgstr ""
+"このワークフローでは、複数の証明書を一度に失効させることができます。有効な証"
+"明書識別子のリストを提供する必要があります。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BULK_LABEL"
+msgstr "一括失効リクエスト"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BY_ENTITY_DESC"
+msgstr ""
+"このワークフローは、特定のエンティティに属するすべての証明書を失効します"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BY_ENTITY_LABEL"
+msgstr "エンティティによる失効"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_DESC"
+msgstr "私有鍵のダウンロード"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_LABEL"
+msgstr "私有鍵のダウンロード"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "タイプ"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_DESC"
+msgstr ""
+"期限切れになる証明書について、メールで期限切れの通知を送信してください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
+msgstr "証明書失効通知"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_DESC"
+msgstr "このレルムの証明書に関する詳細なレポートをダウンロード用に作成します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_LABEL"
+msgstr "証明書の詳細レポート"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_LIST_DESC"
+msgstr "レポートをダウンロードするには、1行をクリックしてください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_LIST_LABEL"
+msgstr "利用可能なレポート"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_DESC"
+msgstr "いくつかの状態における証明書の数を示すレポート。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_LABEL"
+msgstr "証明書ステータスレポート"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REQUEST_CHECKER_DESC"
+msgstr ""
+"このワークフローでは、PKCS10リクエストをアップロードして、エンコードされた詳"
+"細を表示できます。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REQUEST_CHECKER_LABEL"
+msgstr "リクエストチェッカー"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_DESC"
+msgstr "トランザクションIDでSCEPワークフローを検索する"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_LABEL"
+msgstr "SCEP検索"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_DESC"
+msgstr "証明書のメタデータを参照します。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_LABEL"
+msgstr "メタデータの参照"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
 msgstr "ワークフロー情報を読み込めません。"
@@ -1156,32 +3233,8 @@ msgstr "ワークフロー情報を読み込めません。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKEUP_AT_LABEL"
 msgstr "実行"
 
-#~ msgid "I18N_OPENXPKI_UI_BULK_APPROVE_CRR_LABEL"
-#~ msgstr "失効の承認"
-
-#~ msgid "I18N_OPENXPKI_UI_BULK_APPROVE_CSR_LABEL"
-#~ msgstr "リクエストの承認"
-
-#~ msgid "I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_DESCRIPTION"
-#~ msgstr "証明書発行リクエストは一括での承認/否認をします。"
-
-#~ msgid "I18N_OPENXPKI_UI_BULK_PENDING_REQUEST_LABEL"
-#~ msgstr "証明書リクエスト"
-
-#~ msgid "I18N_OPENXPKI_UI_BULK_PENDING_REVOCATION_DESCRIPTION"
-#~ msgstr "証明書失効リクエストは一括での承認/否認をします。"
-
-#~ msgid "I18N_OPENXPKI_UI_BULK_PENDING_REVOCATION_LABEL"
-#~ msgstr "証明書失効リクエスト"
-
-#~ msgid "I18N_OPENXPKI_UI_BULK_REJECT_CRR_LABEL"
-#~ msgstr "選択拒否"
-
-#~ msgid "I18N_OPENXPKI_UI_BULK_REJECT_CSR_LABEL"
-#~ msgstr "選択拒否"
-
-#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_COMMON_NAME"
-#~ msgstr "一般名称（CN）"
+msgid "I18N_OPENXPKI_UI_YES"
+msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_DESC"
 #~ msgstr "証明書リクエスト中に設定した鍵のパスフレーズを入力してください。"
@@ -1199,29 +3252,8 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_CRL_LAST_ITEMCNT"
 #~ msgstr "古い失効リストを表示する"
 
-#~ msgid "I18N_OPENXPKI_UI_CSR_EXT_CERTIFICATE_TEMPLATE"
-#~ msgstr "証明書テンプレート"
-
-#~ msgid "I18N_OPENXPKI_UI_CSR_EXT_CHALLENGE_PASSWORD"
-#~ msgstr "チャレンジパスワード"
-
 #~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
 #~ msgstr "作成者"
-
-#~ msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
-#~ msgstr "遅延失効がリクエストされました。"
-
-#~ msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
-#~ msgstr "失敗"
-
-#~ msgid "I18N_OPENXPKI_UI_DNS_CHECK_OK"
-#~ msgstr "ok"
-
-#~ msgid "I18N_OPENXPKI_UI_DNS_CHECK_SKIPPED"
-#~ msgstr "n/a"
-
-#~ msgid "I18N_OPENXPKI_UI_DNS_CHECK_TIMEOUT"
-#~ msgstr "タイムアウト"
 
 #~ msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHOW_AS_TEXT"
 #~ msgstr "証明書を画面に表示する（PEM）"
@@ -1232,298 +3264,11 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_KEY_POLICY_FAILED"
 #~ msgstr "鍵作成ポリシー違反です（サイズ/アルゴリズムに問題があります）"
 
-#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_APPROVED"
-#~ msgstr "リクエストが承認されませんでした"
-
-#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_AUTHENTICATED"
-#~ msgstr "リクエストは認証されませんでした"
-
-#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_IN_CURRENT_REALM"
-#~ msgstr "他のレルムの証明書に対する更新リクエストです。"
-
-#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_IN_RENEWAL_WINDOW"
-#~ msgstr "更新ウィンドウのリクエストではありません。"
-
-#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_INVALID_KEY_PARAM"
-#~ msgstr "ポリシー失敗 (提供された気ーが要件に一致しません。)"
-
-#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_KEY_DUPLICATE"
-#~ msgstr "ポリシー失敗 (キーの再利用が検出されました。)"
-
-#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_NOT_FOUND"
-#~ msgstr "ポリシー定義が見つかりませんでした。"
-
-#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_SUBJECT_DUPLICATE"
-#~ msgstr "ポリシー失敗 (件名が重複しています。)"
-
-#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_POLICY_VIOLATED"
-#~ msgstr "ポリシー違反です（有効な証明書が多すぎます）"
-
-#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_REJECTED"
-#~ msgstr "リクエストはオペレータによって拒否されました。"
-
-#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_REQUEST_NOT_AUTHORIZED"
-#~ msgstr "リクエストは適切に承認されませんでした。"
-
-#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_EXPIRED"
-#~ msgstr "署名者証明書の有効期限が切れています。"
-
-#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_NOT_AUTHORIZED"
-#~ msgstr "依頼者は承認された署名者リストにありません。"
-
-#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_REVOKED"
-#~ msgstr "署名者証明書が失効されました。"
-
-#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_UNKNOWN"
-#~ msgstr "署名者証明書のエラーが発生しました。"
-
-#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SUBJECT_INVALID"
-#~ msgstr "件名が正しくありません。"
-
-#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_RENEWAL_NOT_ALLOWED"
-#~ msgstr "更新が許可されていません。"
-
 #~ msgid "I18N_OPENXPKI_UI_ERROR_NOT_CERTIFICATE_OWNER"
 #~ msgstr "証明書所有者のみがこの操作を実行できます"
 
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_ALIAS_DESC"
-#~ msgstr ""
-#~ "ダウンロード用のPKCS12またはJavaキーストアを要求するときは、ここでオプショ"
-#~ "ンのエイリアスを設定できます。 許可される文字はA-Z0-9です。空白は許可され"
-#~ "ません。"
-
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_ALIAS_LABEL"
-#~ msgstr "キーストアエイリアス"
-
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_ALIAS_PLACEHOLDER"
-#~ msgstr ""
-#~ "キーストアのエイリアスは、標準のリクエストに対して空のままにすることができ"
-#~ "ます。"
-
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_DESC"
-#~ msgstr ""
-#~ "エクスポートする私有鍵にパスワードを設定します。設定しない場合、証明書要求"
-#~ "時に設定したパスワードが使用されます。"
-
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_LABEL"
-#~ msgstr "パスワード設定"
-
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_TOOLTIP"
-#~ msgstr "エクスポートする私有鍵にパスワードを設定します。"
-
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_FILENAME_LABEL"
-#~ msgstr "キーストアのダウンロード"
-
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT"
-#~ msgstr "ダウンロードフォーマット"
-
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_DESC"
-#~ msgstr ""
-#~ "キーストアの形式は、ほとんどのアプリケーションがPKCS12形式で動作します。"
-
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_JAVA_KEYSTORE"
-#~ msgstr "Javaキーストア"
-
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_LABEL"
-#~ msgstr "ダウンロードフォーマット"
-
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_OPENSSL_PRIVKEY"
-#~ msgstr "OpenSSL形式"
-
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS12"
-#~ msgstr "PKCS12"
-
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS8_DER"
-#~ msgstr "PKCS8 (DER)"
-
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS8_PEM"
-#~ msgstr "PKCS8 (PEM)"
-
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_DESC"
-#~ msgstr ""
-#~ "CSR作成中に入力したパスワードは、鍵ファイルをダウンロードする場合にもリク"
-#~ "エストされます。"
-
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_LABEL"
-#~ msgstr "パスワード"
-
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_UNENCRYPTED_DESC"
-#~ msgstr ""
-#~ "チェックした場合、エクスポートされる私有鍵はパスワードで保護されません。パ"
-#~ "スワードは無視されます。"
-
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_UNENCRYPTED_LABEL"
-#~ msgstr "暗号化なし"
-
-#~ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATE_KEY_FAILED"
-#~ msgstr "秘密鍵は復号化/読み込みできませんでした。"
-
-#~ msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
-#~ msgstr "エラーコード"
-
-#~ msgid "I18N_OPENXPKI_UI_INVALID_PROFILE"
-#~ msgstr "無効なプロファイル"
-
-#~ msgid "I18N_OPENXPKI_UI_KEYSTORE_ALIAS_CONTAINS_INVALID_CHARACTERS"
-#~ msgstr "エイリアスには、a-z A-Z 0-9 - _以外の文字が含まれています。"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_ALG_DSA"
-#~ msgstr "DSA （署名のみ）"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_ALG_EC"
-#~ msgstr "楕円曲線暗号"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST2001"
-#~ msgstr "GOST 2001"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST94"
-#~ msgstr "GOST 94"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_ALG_RSA"
-#~ msgstr "RSA"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME"
-#~ msgstr "種別"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_C2TNB191V1"
-#~ msgstr "Curve c2tnb191v1"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_PRIME192V1"
-#~ msgstr "Curve prime192v1"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_PRIME239V1"
-#~ msgstr "Curve prime239v1"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_SECT571R1"
-#~ msgstr "Curve sect571r1"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_ENC_3DES"
-#~ msgstr "3DES"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_ENC_AES256"
-#~ msgstr "AES 256bit"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_ENC_IDEA"
-#~ msgstr "IDEA"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD"
-#~ msgstr "キーパスワード"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_CLIENT"
-#~ msgstr "自分でパスワードを選択する"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_ENC_PASSWORD_SERVER"
-#~ msgstr "パスワードを自動的に作成する"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_IDENTIFIER"
-#~ msgstr "キー識別子"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_ALG"
-#~ msgstr "キーアルゴリズム"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH"
-#~ msgstr "キーの長さ"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_2048"
-#~ msgstr "2048 bits"
-
 #~ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
 #~ msgstr "3072 bit"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_4096"
-#~ msgstr "4096 bit"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
-#~ msgstr "ユーザー名"
-
-# Remove?
-#~ msgid "I18N_OPENXPKI_UI_MENU_BULK"
-#~ msgstr "一括承認/拒否"
-
-#~ msgid "I18N_OPENXPKI_UI_MENU_BULK_REVOKE_CERTIFICATE"
-#~ msgstr "一括失効"
-
-#~ msgid "I18N_OPENXPKI_UI_MENU_CA_CERTIFICATES"
-#~ msgstr "CA証明書"
-
-#~ msgid "I18N_OPENXPKI_UI_MENU_CERTIFICATE_SEARCH"
-#~ msgstr "証明書検索"
-
-#~ msgid "I18N_OPENXPKI_UI_MENU_CHANGE_METADATA"
-#~ msgstr "証明書メタデータの変更"
-
-# Remove?
-#~ msgid "I18N_OPENXPKI_UI_MENU_CRL"
-#~ msgstr "証明書失効リスト（CRL）を表示する"
-
-#~ msgid "I18N_OPENXPKI_UI_MENU_CRL_ISSUE"
-#~ msgstr "証明書失効リスト（CRL）を発行する"
-
-#~ msgid "I18N_OPENXPKI_UI_MENU_CSR_CHECK"
-#~ msgstr "リクエストチェック"
-
-# Remove?
-#~ msgid "I18N_OPENXPKI_UI_MENU_HOME"
-#~ msgstr "ホーム"
-
-#~ msgid "I18N_OPENXPKI_UI_MENU_INFORMATION"
-#~ msgstr "情報"
-
-#~ msgid "I18N_OPENXPKI_UI_MENU_MANAGE_SECRET"
-#~ msgstr "秘密鍵を管理する"
-
-#~ msgid "I18N_OPENXPKI_UI_MENU_MY_CERTIFICATE"
-#~ msgstr "自分の証明書"
-
-# Remove?
-#~ msgid "I18N_OPENXPKI_UI_MENU_MY_TASK"
-#~ msgstr "自分のタスク"
-
-#~ msgid "I18N_OPENXPKI_UI_MENU_MY_WORKFLOW"
-#~ msgstr "自分のワークフロー"
-
-#~ msgid "I18N_OPENXPKI_UI_MENU_PKI_OPERATION"
-#~ msgstr "PKIオペレーション"
-
-#~ msgid "I18N_OPENXPKI_UI_MENU_PROCESS_INFORMATION"
-#~ msgstr "プロセス情報"
-
-#~ msgid "I18N_OPENXPKI_UI_MENU_PUBLISH_CA_CRL"
-#~ msgstr "CA / CRLの発行"
-
-# Remove?
-#~ msgid "I18N_OPENXPKI_UI_MENU_REPORT_FULL"
-#~ msgstr "全ての証明書ステータスレポート"
-
-#~ msgid "I18N_OPENXPKI_UI_MENU_REPORT_SUMMARY"
-#~ msgstr "証明書の概要"
-
-#~ msgid "I18N_OPENXPKI_UI_MENU_REQUEST"
-#~ msgstr "リクエスト"
-
-#~ msgid "I18N_OPENXPKI_UI_MENU_REQUEST_CERTIFICATE"
-#~ msgstr "証明書申請"
-
-#~ msgid "I18N_OPENXPKI_UI_MENU_REVOKE_CERTIFICATE"
-#~ msgstr "証明書を失効する"
-
-#~ msgid "I18N_OPENXPKI_UI_MENU_SCEP_SEARCH"
-#~ msgstr "SCEPワークフロー検索"
-
-# Remove?
-#~ msgid "I18N_OPENXPKI_UI_MENU_SET_MOTD"
-#~ msgstr "今日のメッセージを設定する"
-
-# Remove?
-#~ msgid "I18N_OPENXPKI_UI_MENU_SYSTEM_STATUS"
-#~ msgstr "システムステータス"
-
-#~ msgid "I18N_OPENXPKI_UI_MENU_WORKFLOW_SEARCH"
-#~ msgstr "ワークフロー検索"
-
-# Remove?
-#~ msgid "I18N_OPENXPKI_UI_NO"
-#~ msgstr "いいえ"
 
 #~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
 #~ msgstr "ファイル名"
@@ -1559,65 +3304,8 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_PAUSED_CRL_TOKEN_NOT_USABLE"
 #~ msgstr "CRL署名トークンがオンラインではありません"
 
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_ADVANCED_STYLE_DESC"
-#~ msgstr "高度な入力スタイル"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_ADVANCED_STYLE_LABEL"
-#~ msgstr "拡張プロファイル（エキスパート）"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME"
-#~ msgstr "アプリケーション名"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME_DESC"
-#~ msgstr "クライアントとして機能するアプリケーションの名前。"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_DESC"
-#~ msgstr "特別な要件がない場合は、通常はデフォルトスタイルが最適です。"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_LABEL"
-#~ msgstr "デフォルトのプロファイルスタイル"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_CN_DESC"
-#~ msgstr "一般名称(CN)"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_COMMENT"
-#~ msgstr "コメント"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_COMMENT_DESC"
-#~ msgstr "コメント"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_C_DESC"
-#~ msgstr "国"
-
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
 #~ msgstr "データセーフトークン"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_DC_DESC"
-#~ msgstr "ドメインコンポーネント"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_DEPARTMENT"
-#~ msgstr "部門"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_DEPARTMENT_DESC"
-#~ msgstr "部門"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_EMAILADDRESS"
-#~ msgstr "Eメール:"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_EMAILADDRESS_DESC"
-#~ msgstr "Eメールアドレス"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_EXTRA_HOSTNAME"
-#~ msgstr "追加のホスト名"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_EXTRA_HOSTNAME_DESC"
-#~ msgstr "証明書に追加のホスト名を入力することができます"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME"
-#~ msgstr "ホスト名"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC"
-#~ msgstr "システムに最も適したホスト名（ドメイン名）を入力します。"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_NODEID"
 #~ msgstr "ノードID"
@@ -1646,89 +3334,17 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_OPENVPN_CLIENT_USER_LABEL"
 #~ msgstr "人々のためのOpenVPNクライアントプロファイル"
 
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_OU_DESC"
-#~ msgstr "組織単位"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_O_DESC"
-#~ msgstr "組織名"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_PHONE"
-#~ msgstr "電話"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_PHONE_DESC"
-#~ msgstr "電話番号"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_PORT"
-#~ msgstr "ポート"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_PORT_DESC"
-#~ msgstr "ポート番号"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_REALNAME"
-#~ msgstr "本名"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_REALNAME_DESC"
-#~ msgstr "本名"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_AFFILIATION"
-#~ msgstr "所属"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_AFFILIATION_DESC"
-#~ msgstr "依頼者の所属"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_EMAIL"
-#~ msgstr "Eメールアドレス"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_EMAIL_DESC"
-#~ msgstr "依頼者のEメール"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_FIRSTNAME"
-#~ msgstr "名"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_FIRSTNAME_DESC"
-#~ msgstr "依頼者の名"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_LASTNAME"
-#~ msgstr "姓"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_LASTNAME_DESC"
-#~ msgstr "依頼者の姓"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_DNS"
-#~ msgstr "DNS"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_DNS_DESCRIPTION"
-#~ msgstr "DNSサーバ"
-
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_GUID"
 #~ msgstr "Microsoft GUID"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_GUID_DESCRIPTION"
 #~ msgstr "GUID"
 
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_IP"
-#~ msgstr "IPアドレス"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_IP_DESCRIPTION"
-#~ msgstr "IPアドレス"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_RID"
-#~ msgstr "RID"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_RID_DESCRIPTION"
-#~ msgstr "IRID"
-
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_UPN"
 #~ msgstr "UPN"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_UPN_DESCRIPTION"
 #~ msgstr "UPN"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI"
-#~ msgstr "URI"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
-#~ msgstr "URI"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_BASIC_DESC"
 #~ msgstr "I18N_OPENXPKI_PROFILE_SCEP_CLIENT_BASIC_DESC"
@@ -1745,47 +3361,11 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_BASIC_LABEL"
 #~ msgstr "TLSクライアント/既定の入力"
 
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL"
-#~ msgstr "TLS Client Profile"
-
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER"
 #~ msgstr "TLSサーバプロファイル"
 
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
-#~ msgstr "TLS/Web Server Profile"
-
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_USER"
 #~ msgstr "ユーザ証明書"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_USERID"
-#~ msgstr "ユーザID"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_USERID_DESC"
-#~ msgstr "ユーザID"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_USERNAME"
-#~ msgstr "ユーザ名"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_USERNAME_DESC"
-#~ msgstr "ユーザ名"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_USER_LABEL"
-#~ msgstr "User Profile"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY"
-#~ msgstr "有効"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY_1Y"
-#~ msgstr "1年"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY_2Y"
-#~ msgstr "2年"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY_3Y"
-#~ msgstr "3年"
-
-#~ msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
-#~ msgstr "指定された理由コードはサポートされていません"
 
 # Remove?
 #~ msgid "I18N_OPENXPKI_UI_REPORT_CONFIG"
@@ -1797,64 +3377,11 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_EXPIRY"
 #~ msgstr "有効期限切れレポート"
 
-# Remove?
-#~ msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_LABEL"
-#~ msgstr "レポート構成"
-
-#~ msgid "I18N_OPENXPKI_UI_REPORT_DOWNLOAD_LABEL"
-#~ msgstr "ダウンロード"
-
-#~ msgid "I18N_OPENXPKI_UI_REQUEST_WORKFLOW_ID"
-#~ msgstr "ワークフローIDのリクエスト"
-
 #~ msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
 #~ msgstr "証明書の状態を取得する処理でエラーが発生しました。"
 
-#~ msgid "I18N_OPENXPKI_UI_SEARCH_CERT_SUBJECT_LABEL"
-#~ msgstr "証明書の件名"
-
-#~ msgid "I18N_OPENXPKI_UI_SEARCH_ENTITY_HINT"
-#~ msgstr ""
-#~ "エンティティの名前（通常は共通名で使用されるFQDN）でフィルターします。完全"
-#~ "一致、ワイルドカードが許可されます。"
-
-#~ msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_HINT"
-#~ msgstr ""
-#~ "リクエストで使用されるメールアドレスでフィルタリングします。 完全一致、ワ"
-#~ "イルドカードが許可されます。"
-
-#~ msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_EMAIL_LABEL"
-#~ msgstr "依頼者Eメール"
-
-#~ msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_HINT"
-#~ msgstr "この依頼者によりリクエストされた証明書のみ表示します。(部分一致)"
-
-#~ msgid "I18N_OPENXPKI_UI_SEARCH_REQUESTOR_NAME_LABEL"
-#~ msgstr "依頼者"
-
 #~ msgid "I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL"
 #~ msgstr "SCEPトランザクションID"
-
-#~ msgid "I18N_OPENXPKI_UI_SEARCH_TRANSACTION_ID_LABEL"
-#~ msgstr "トランザクションId"
-
-#~ msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_DESCRIPTION"
-#~ msgstr "SCEP登録ワークフローは承認待ちです。"
-
-#~ msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_ENROLLMENT_LABEL"
-#~ msgstr "登録"
-
-#~ msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REQUEST_DESCRIPTION"
-#~ msgstr "承認待ちの証明書リクエスト。"
-
-#~ msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REQUEST_LABEL"
-#~ msgstr "認証リクエスト"
-
-#~ msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_DESCRIPTION"
-#~ msgstr "承認待ちのワークフローが失効されます。"
-
-#~ msgid "I18N_OPENXPKI_UI_TASKLIST_PENDING_REVOCATION_LABEL"
-#~ msgstr "失効リクエスト"
 
 #~ msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_HISTORY"
 #~ msgstr "ワークフロー履歴にアクセスするために必要な権利がありません。"
@@ -1892,28 +3419,8 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_DAMAGED"
 #~ msgstr "PKCS10リクエストが正しくフォーマットされていません"
 
-#~ msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
-#~ msgstr "今日のメッセージ"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_DESC"
-#~ msgstr ""
-#~ "この情報が正確である場合のみ、所定の情報を検証し、失効リクエストを承認して"
-#~ "ください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CRR_LABEL"
-#~ msgstr "失効の承認"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_DESC"
-#~ msgstr "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
 #~ msgstr "承認リクエスト"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_DESC"
-#~ msgstr "初期化する"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_LABEL"
-#~ msgstr "初期化する"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_AUTH_FORM_DESC"
 #~ msgstr "証明書の許可"
@@ -1921,199 +3428,11 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_AUTH_LABEL"
 #~ msgstr "証明書の許可"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_DESC"
-#~ msgstr ""
-#~ "証明書の識別子を入力するか、autosearch関数を使用して、メタデータを変更する"
-#~ "証明書を探します。証明書が見つからない/識別できない場合は、メインメニュー"
-#~ "から証明書検索を選択してください。結果のリストには、メタデータを変更するた"
-#~ "めのリンクが含まれます。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_LABEL"
-#~ msgstr "証明書を選択"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_FORM_DESC"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_FORM_LABEL"
-#~ msgstr "データの編集"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_PERSIST_DESC"
-#~ msgstr "変更されたデータをデータベースに保存する"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_PERSIST_LABEL"
-#~ msgstr "データを保持する"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_TERMINATE_DESC"
-#~ msgstr "このワークフローを中止します。メタデータは変更されません。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_TERMINATE_LABEL"
-#~ msgstr "変更を中止する"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_CONTEXT_DESC"
-#~ msgstr "以下のフォームを使用して情報を更新してください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_CONTEXT_LABEL"
-#~ msgstr "更新情報"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CLEANUP_DESC"
-#~ msgstr "ワークフローをクリーンアップする"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CLEANUP_LABEL"
-#~ msgstr "終了"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_DESC"
-#~ msgstr ""
-#~ "証明書の失効リクエストを作成します。証明書の識別子を入力するか、autosearch"
-#~ "関数を使用して証明書を探してください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_LABEL"
-#~ msgstr "失効を開始する"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_SUBMIT_DESC"
-#~ msgstr "失効申請を認証局に提出してください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_SUBMIT_LABEL"
-#~ msgstr "リクエストを送信する"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_APPROVE_CSR_DESC"
-#~ msgstr ""
-#~ "この証明書リクエストを承認します。すべての情報を検証し、このリクエストが認"
-#~ "可されている場合のみ、リクエストを行ってください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_APPROVE_CSR_LABEL"
-#~ msgstr "リクエストの承認"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_ASK_CLIENT_PASSWORD_DESC"
-#~ msgstr ""
-#~ "あなたの鍵を保護するためにパスワードを入力してください。このパスワードは後"
-#~ "で鍵をダウンロードするために必要です。覚えておいてください。パスワードは、"
-#~ "2文字のグループ（小文字/大文字/数字/特殊文字）から少なくとも8文字を含む必"
-#~ "要があります。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_ASK_CLIENT_PASSWORD_LABEL"
-#~ msgstr "パスワードを入力します"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_CERT_INFO_DESC"
-#~ msgstr ""
-#~ "この情報は証明書には載っていませんが、あなたのリクエストを検証する際には登"
-#~ "録担当者を支援します。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_CERT_INFO_LABEL"
-#~ msgstr "証明書情報の編集"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_ON_HOLD_LABEL"
-#~ msgstr "保留理由の編集"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_SAN_DESC"
-#~ msgstr "証明書リクエストの別名セクションの項目を編集します。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_SAN_LABEL"
-#~ msgstr "別名の編集"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_SUBJECT_DESC"
-#~ msgstr ""
-#~ "認証リクエストの主な件名の項目を編集します。最終的な件名は、選択したプロ"
-#~ "ファイルとPKIポリシーに基づいて入力され作成されます。最終的な提出の前に、"
-#~ "再確認と編集ができます。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_SUBJECT_LABEL"
-#~ msgstr "件名を編集する"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_VALIDITY_DESC"
-#~ msgstr ""
-#~ "証明書の有効性を変更したい場合は、フィールドに発行日/有効期限のカスタムを"
-#~ "入力します。すべての日付はUTCの時間帯で処理されます。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_VALIDITY_LABEL"
-#~ msgstr "有効性の編集"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_GENERATE_KEY_DESC"
-#~ msgstr "このリクエストの鍵を作成する"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_GENERATE_KEY_LABEL"
-#~ msgstr "鍵を作成する"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PERSIST_CSR_DESC"
-#~ msgstr "CSRを継続する"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PERSIST_CSR_LABEL"
-#~ msgstr "CSRを継続する"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PROVIDE_SERVER_KEY_PARAMS_DESC"
-#~ msgstr ""
-#~ "鍵とあなたのリクエストを自動的に作成します。鍵のパラメータを選択してくださ"
-#~ "い。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PROVIDE_SERVER_KEY_PARAMS_LABEL"
-#~ msgstr "鍵を自動的に作成する"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PUT_REQUEST_ON_HOLD_DESC"
-#~ msgstr "このリクエストが保留されている理由を入力してください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_PUT_REQUEST_ON_HOLD_LABEL"
-#~ msgstr "リクエストを保留にする"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_REJECT_REQUEST_DESC"
-#~ msgstr "リクエスト拒否"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_REJECT_REQUEST_LABEL"
-#~ msgstr "リクエスト拒否"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RELEASE_ON_HOLD_DESC"
-#~ msgstr ""
-#~ "このリクエストは以下の理由で保留になりました。続行ボタンをクリックしてロッ"
-#~ "クを解除し、リクエストを続行します。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RELEASE_ON_HOLD_LABEL"
-#~ msgstr "リリース中"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RETYPE_SERVER_PASSWORD_DESC"
-#~ msgstr ""
-#~ "自動的にパスワードが作成されました。必要に応じてこのパスワードを書き留め"
-#~ "て、秘密鍵をダウンロードしてインストールしてください。パスワードの入力を確"
-#~ "認するには、指定したフィールドにパスワードを再入力してください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_RETYPE_SERVER_PASSWORD_LABEL"
-#~ msgstr "あなたのキーパスワード"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_PROFILE_DESC"
-#~ msgstr ""
-#~ "証明書のプロファイルとサブプロファイルを選択します。選択したプロファイルが"
-#~ "ユースケースに一致することを確認します。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SELECT_PROFILE_LABEL"
-#~ msgstr "プロファイルを選択"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_ISSUER_LABEL"
-#~ msgstr "発行者の設定"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SUBMIT_DESC"
-#~ msgstr "リクエストを送信する"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SUBMIT_LABEL"
-#~ msgstr "リクエストを送信する"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_UPLOAD_PKCS10_DESC"
-#~ msgstr ""
-#~ "PKCS10形式でご要望を提供してください。ブロックをテキストエリアに投稿する"
-#~ "か、アップロードボタンを使用してローカルコンピュータのファイルを使用するこ"
-#~ "とができます。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_UPLOAD_PKCS10_LABEL"
-#~ msgstr "CSR(PKCS10)のアップロード"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDIT_CRR_DESC"
 #~ msgstr "失効リクエストの情報を編集する"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDIT_CRR_LABEL"
 #~ msgstr "リクエストを編集する"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ACCEPT_REQUEST_DESC"
-#~ msgstr "リクエストを受け付けました。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ACCEPT_REQUEST_LABEL"
-#~ msgstr "リクエスト受付"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ADD_AUTHENTICATION_DESC"
 #~ msgstr "認証情報を追加する"
@@ -2145,76 +3464,6 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FAIL_LABEL"
 #~ msgstr "失敗です"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_DESC"
-#~ msgstr "自動ポリシーの決定を無効にして、登録を続行します。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_LABEL"
-#~ msgstr "ポリシーを無効にする"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_INITIALIZE_DESC"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_INITIALIZE_LABEL"
-#~ msgstr "必須フォーマットの指定"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_RETRY_PASSWORD_LABEL"
-#~ msgstr "パスワード再入力"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_CANCEL_DESC"
-#~ msgstr "このワークフローをキャンセルします。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_CANCEL_LABEL"
-#~ msgstr "リクエストのキャンセル"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_DESC"
-#~ msgstr ""
-#~ "このプロセスによって、現在のレルム内のすべての有効なCAの新しい失効リストが"
-#~ "作成されます。失効リストは、新しい失効リストが存在する場合、または現在のリ"
-#~ "ストが期限切れに近い場合に作成されます。下のチェックボックスをオンにする"
-#~ "と、常に新しいリストを作成することができます。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_LABEL"
-#~ msgstr "CRLトリガーの問題"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ISSUE_CRL_DESC"
-#~ msgstr "失効リストを発行する"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ISSUE_CRL_LABEL"
-#~ msgstr "CRLを発行する"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_MOTD_INITIALIZE_DESCRIPTION"
-#~ msgstr ""
-#~ "ユーザーがログインするたびにメインページの上部にステータスバーとして表示さ"
-#~ "れる今日のメッセージを設定することができます。ユーザごとの権限またはすべて"
-#~ "のユーザに対してメッセージを作成できます。一般的なメッセージと権限固有の"
-#~ "メッセージが定義されている場合は、権限のメッセージのみが表示されます。リン"
-#~ "クURLを指定すると、ユーザーがメッセージボックスをクリックした時、指定され"
-#~ "たURLで新しいブラウザウィンドウが開きます。既存のメッセージを削除するに"
-#~ "は、失効日を今すぐに設定して新しいメッセージを定義するだけです。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_MOTD_INITIALIZE_LABEL"
-#~ msgstr "情報を設定する"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_CHECK_FOR_REVOCATION_DESC"
-#~ msgstr ""
-#~ "失効リクエストが受け入れられた場合、証明書は次の失効リストに含まれます。こ"
-#~ "のワークフローは、CRLが発行された後、自動的に閉じられます。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_CHECK_FOR_REVOCATION_LABEL"
-#~ msgstr "失効保留中"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_FETCH_CERTIFICATE_DESC"
-#~ msgstr "証明書の失効"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_FETCH_CERTIFICATE_LABEL"
-#~ msgstr "証明書の失効"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_ISSUE_CERTIFICATE_DESC"
-#~ msgstr "証明書の発行"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_ISSUE_CERTIFICATE_LABEL"
-#~ msgstr "発行"
-
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_DESC"
 #~ msgstr "初期状態のエクスポート"
@@ -2222,32 +3471,6 @@ msgstr "実行"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_LABEL"
 #~ msgstr "今日のメッセージ"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_POLICY_VIOLATION_COMMENT_DESC"
-#~ msgstr ""
-#~ "ポリシーなしで遵守しない証明書リクエストを提出する必要がある理由を正当な理"
-#~ "由として提出してください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_POLICY_VIOLATION_COMMENT_LABEL"
-#~ msgstr "正当性を提供する"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_DESC"
-#~ msgstr "この失効リクエストを拒否します。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_LABEL"
-#~ msgstr "リクエスト拒否"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_DETAIL_INITIALIZE_LABEL"
-#~ msgstr "レポートオプションの定義"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_SUMMARY_INITIALIZE_LABEL"
-#~ msgstr "レポートオプションの定義"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REVOKE_CERTIFICATE_DESC"
-#~ msgstr "証明書の失効スケジュール"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REVOKE_CERTIFICATE_LABEL"
-#~ msgstr "証明書の失効"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_INITIALIZE_DESC"
 #~ msgstr ""
@@ -2259,9 +3482,6 @@ msgstr "実行"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_INITIALIZE_LABEL"
 #~ msgstr "SCEP GetCA初期化"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEP_SEARCH_INITIALIZE_LABEL"
-#~ msgstr "検索を開始する"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPERS_ADD_ESCROW_CERT_TO_PUBLISH_QUEUE_DESC"
@@ -2805,40 +4025,8 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 #~ msgstr "コードを作成する"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SET_ISSUER_DESC"
-#~ msgstr ""
-#~ "通常、必要な有効期間に一致する最新の発行CAが証明書の署名に使用されます。こ"
-#~ "のダイアログでは、使用する専用の発行者証明書を設定できます。発行された証明"
-#~ "書の期限前/後の日付は、使用されるCA証明書の有効期間に合わせて調整されるこ"
-#~ "とに注意してください。これは、有効性が重複する場合にのみ機能します。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SLEEP_LABEL"
-#~ msgstr "スリープ状態"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_TOOLS_DISCONNECT_DESC"
-#~ msgstr ""
-#~ "フロントエンドからワークフローを切り離し、バックグラウンドで続行します。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_TOOLS_DISCONNECT_LABEL"
-#~ msgstr "切り離す"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_DESC"
-#~ msgstr "以下の情報を更新してください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
-#~ msgstr "リクエストの更新"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_APPROVE"
 #~ msgstr "リクエストの承認"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_ELIGIBILITY_RECHECK_LABEL"
-#~ msgstr "適正の再確認"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_PROCEED_LABEL"
-#~ msgstr "例外のポリシーで送信"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL"
-#~ msgstr "ポリシーの再評価"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_REJECT"
 #~ msgstr "リクエストの拒否"
@@ -2861,50 +4049,11 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_LABEL"
 #~ msgstr "SCEPの登録"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ERROR_DELAY_REVOCATION_TIME_NOT_IN_FUTURE"
-#~ msgstr ""
-#~ "失効日を遅延する場合、現在の失効日より未来の日付を指定してください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_EXPORT_PRIVATEKEY_RETRY_PASSWORD_BUTTON_LABEL"
-#~ msgstr "パスワード再入力"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ACTIVE_CERT_COUNT_LABEL"
 #~ msgstr "有効な証明書の数"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ALLOWED_CERT_COUNT_LABEL"
 #~ msgstr "許可された証明書の数"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVALS_LABEL"
-#~ msgstr "承認"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CASIGNER_LABEL"
-#~ msgstr "CA署名者"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CASIGNER_PLACEHOLDER"
-#~ msgstr "CA署名者"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_IGNORED_LABEL"
-#~ msgstr "無効な証明書識別子"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_LABEL"
-#~ msgstr "証明書リスト"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_LIST_PLACEHOLDER"
-#~ msgstr "証明書識別子のリストはスペースまたは改行で区切られています。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_LIST_LABEL"
-#~ msgstr "証明書リスト"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_PLACEHOLDER"
-#~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_TOOLTIP"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTSIGN_TOKEN"
-#~ msgstr "CAの発行"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_ISSUED_DESC"
@@ -3037,37 +4186,6 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTS_TO_UNPUBLISH_TOOLTIP"
 #~ msgstr " "
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_DESC"
-#~ msgstr ""
-#~ "既知の場合は、証明書の英数字の識別子を入力するか、証明書の件名を入力するだ"
-#~ "けで検索を開始できます。結果はフィールドの下に表示され、マウスの右ボタンを"
-#~ "使用して結果を選択します。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_LABEL"
-#~ msgstr "証明書"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_PLACEHOLDER"
-#~ msgstr ""
-#~ "証明書の識別子を入力するか、件名を入力して自動検索を開始してください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_IDENTIFIER_TOOLTIP"
-#~ msgstr ""
-#~ "自動検索では、件名に特定の単語が含まれている証明書が検索され、下のドロップ"
-#~ "ダウンリストに表示されます。リストから必要な証明書をクリックして選択しま"
-#~ "す。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_DESC"
-#~ msgstr "リクエストに関する情報。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_LABEL"
-#~ msgstr "依頼者の情報"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_PLACEHOLDER"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_INFO_TOOLTIP"
-#~ msgstr " "
-
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_ISSUANCE_DATA_DESC"
 #~ msgstr "Components forming the certificates subject alternative name."
@@ -3084,85 +4202,6 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_ISSUANCE_DATA_TOOLTIP"
 #~ msgstr " "
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_NOTIFIED_LIST_LABEL"
-#~ msgstr "通知の送信"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_DESC"
-#~ msgstr "証明書プロファイルの名前。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_LABEL"
-#~ msgstr "証明書プロファイル"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_PLACEHOLDER"
-#~ msgstr "証明書プロファイルを選択してください"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_PROFILE_TOOLTIP"
-#~ msgstr "予想される使用状況に基づいて適切なプロファイルを選択します。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_RENEWED_LIST_LABEL"
-#~ msgstr "既に更新された証明書"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_DESC"
-#~ msgstr "証明書の別名"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_LABEL"
-#~ msgstr "別名"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_DESC"
-#~ msgstr "証明書を構成する構成要素は別名を使用します。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_LABEL"
-#~ msgstr "別名の一部"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_PLACEHOLDER"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PARTS_TOOLTIP"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_PLACEHOLDER"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SAN_TOOLTIP"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_DESC"
-#~ msgstr "証明書の件名。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_LABEL"
-#~ msgstr "証明書の件名"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_DESC"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_LABEL"
-#~ msgstr "別名の構成要素"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_PLACEHOLDER"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PARTS_TOOLTIP"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_PLACEHOLDER"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_DESC"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_PLACEHOLDER"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_TOOLTIP"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_TOOLTIP"
-#~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHIP_ID_DESC"
-#~ msgstr "Transaction Id of this SCEP request"
-
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHIP_ID_LABEL"
 #~ msgstr "SCEP TID"
@@ -3171,27 +4210,8 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHIP_ID_PLACEHOLDER"
 #~ msgstr " "
 
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHIP_ID_TOOLTIP"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_DESC"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_LABEL"
-#~ msgstr "コメント"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_PLACEHOLDER"
-#~ msgstr "リクエスト処理のための追加コメント"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_TOOLTIP"
-#~ msgstr " "
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CREATOR_LABEL"
 #~ msgstr "作成者"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRR_INFO_LABEL"
-#~ msgstr "追加情報"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_ID_DESC"
@@ -3225,99 +4245,8 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SERIAL_TOOLTIP"
 #~ msgstr "The type of csr, usually PKCS10."
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SUBJECT_DESC"
-#~ msgstr "証明書の件名"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SUBJECT_LABEL"
-#~ msgstr "証明書の件名"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_DESC"
-#~ msgstr "CSRのタイプ（PCKS10、サーバー作成、SPKAC"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_LABEL"
-#~ msgstr "CSRのタイプ"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_PLACEHOLDER"
-#~ msgstr "CSRのタイプ"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_TOOLTIP"
-#~ msgstr "CSRのタイプ。通常はPKCS10です。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_DESC"
-#~ msgstr "失効日の遅延をすれば、失効日は未来の日付になります。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_LABEL"
-#~ msgstr "失効の遅延"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_PLACEHOLDER"
-#~ msgstr ""
-#~ "通常は必須ではありません。右のセレクタを使用するか、日付、時間を入力してく"
-#~ "ださい"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_TOOLTIP"
-#~ msgstr "所定の日時に失効が予定されている"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_DESC"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_LABEL"
-#~ msgstr "Eメール"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_PLACEHOLDER"
-#~ msgstr "my.name@mycompany.com"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EMAIL_TOOLTIP"
-#~ msgstr "有効なメールアドレスを入力してください"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_DESC"
-#~ msgstr "ダウンロードした秘密鍵を暗号化するために使用されるアルゴリズム。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENC_ALG_LABEL"
-#~ msgstr "鍵暗号化方式"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENDPOINT_DESC"
-#~ msgstr "リクエストに使用されたサーバーのエンドポイント。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENDPOINT_LABEL"
-#~ msgstr "エンドポイント"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ENTITY_LABEL"
-#~ msgstr "エンティティ名"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_DESC"
-#~ msgstr ""
-#~ "このフラグは、ワークフローが一括処理であることを示し、自動で実行する必要が"
-#~ "あります。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_LABEL"
-#~ msgstr "一括モード"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_PLACEHOLDER"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_BATCH_MODE_TOOLTIP"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_CRR_AUTO_APPROVAL_DESC"
-#~ msgstr "設定されている場合、ワークフローは手動承認を必要としません"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_CRR_AUTO_APPROVAL_LABEL"
-#~ msgstr "自動承認"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FLAG_DELAYED_REVOKE_LABEL"
 #~ msgstr "Delayed Revoke"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_DESC"
-#~ msgstr ""
-#~ "新しい失効リストを強制的に作成するには、このチェックボックスをオンにしま"
-#~ "す。デフォルトでは、新しいリストが作成されるのは、新しいリストがある場合、"
-#~ "またはリストの有効性が満期に近い場合（次の更新プロパティ）のみです。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_LABEL"
-#~ msgstr "強制的に失効リストを作成する。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_TOOLTIP"
-#~ msgstr "強制発行するには、このチェックボックスをオンにします。"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_CSR_DESC"
 #~ msgstr " "
@@ -3331,32 +4260,11 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_F_VALID_SCEP_TID_LABEL"
 #~ msgstr "SCEP Transaction Id"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_DESC"
-#~ msgstr ""
-#~ "この値は秘密鍵の漏洩の理由コードと一緒に設定し、漏洩の実際の日付がわかって"
-#~ "いる場合に設定する必要があります。それ以外の場合は空欄にします。ヒント：こ"
-#~ "のフィールドを使用して、今後失効日をリクエストすることはできません。日付は"
-#~ "UTCの時間帯で処理されます。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_LABEL"
-#~ msgstr "失効日"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_PLACEHOLDER"
-#~ msgstr ""
-#~ "通常は必須ではありません。右のセレクタを使用するか、日付、日時を入力してく"
-#~ "ださい"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_INVALIDITY_TIME_TOOLTIP"
-#~ msgstr "あなたがその意味を知っている場合のみこれを設定してください。"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IN_RENEWAL_WINDOW_LABEL"
 #~ msgstr "更新期間"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IN_REPLACE_WINDOW_LABEL"
 #~ msgstr "交換期間"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_REPLACE_LABEL"
-#~ msgstr "更新"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_SELF_SIGNED_LABEL"
 #~ msgstr "リクエストは署名されています"
@@ -3376,18 +4284,6 @@ msgstr "実行"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEYID_TOOLTIP"
 #~ msgstr "RSA is the standard for encryption and signature"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_DESC"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_ALG_LABEL"
-#~ msgstr "キーアルゴリズム"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_DESC"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_KEY_GEN_PARAMS_LABEL"
-#~ msgstr "キーパラメータ"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_LOGIN_IDS_DESC"
@@ -3414,18 +4310,6 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_PLACEHOLDER"
 #~ msgstr "ARSグループ"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_DESC"
-#~ msgstr "この証明書の担当者のメールアドレス"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_LABEL"
-#~ msgstr "メールアドレス"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_PLACEHOLDER"
-#~ msgstr "証明書所有者のメールアドレス"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_TOOLTIP"
-#~ msgstr " "
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_DESC"
 #~ msgstr "サーバエンドポイント"
 
@@ -3440,122 +4324,6 @@ msgstr "実行"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_META_ENDPOINT_TOOLTIP"
 #~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_DESC"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_LABEL"
-#~ msgstr "依頼者/所有者"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_PLACEHOLDER"
-#~ msgstr "依頼者/所有者の名前"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_TOOLTIP"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_DESC"
-#~ msgstr "システム識別子"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_LABEL"
-#~ msgstr "システム識別子"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_PLACEHOLDER"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_TOOLTIP"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTAFTER_DESC"
-#~ msgstr ""
-#~ "カレンダーを使用するか、または有効期限を<tt>DD.MM.YYYY HH：MM</tt>の形式で"
-#~ "入力してください日中の時間帯を省略すると夜の時間帯が仮定されます。日付を自"
-#~ "動的にリセットするには、フィールドを削除するか、0を入力します。すべての日"
-#~ "付はUTCの時間帯で処理されます。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTAFTER_LABEL"
-#~ msgstr "有効期限"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTAFTER_PLACEHOLDER"
-#~ msgstr "有効期限を入力してください、デフォルトの場合は空にする"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTAFTER_TOOLTIP"
-#~ msgstr ""
-#~ "カレンダーアイコンを使用するか、MM.DD.YYYY形式で日付を入力し、デフォルトを"
-#~ "使用するには0を入力します"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_DESC"
-#~ msgstr ""
-#~ "カレンダーを使用するか、または発行日を<tt>DD.MM.YYYY HH：MM</tt>の形式で入"
-#~ "力します。日中の時間地帯を省略すると、夜の時間帯が仮定されます。日付を自動"
-#~ "的にリセットするには、フィールドを削除するか、0を入力します。すべての日付"
-#~ "はUTCの時間帯で処理されます。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_LABEL"
-#~ msgstr "発行日"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_PLACEHOLDER"
-#~ msgstr "発行日を入力してください、デフォルトの場合は空にする"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_TOOLTIP"
-#~ msgstr ""
-#~ "カレンダーアイコンを使用するか、MM.DD.YYYY形式で日付を入力し、デフォルトを"
-#~ "使用するには0を入力します。日付けはUTCの時間帯です。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_DESC"
-#~ msgstr "リクエストを保留にする理由を説明する。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_LABEL"
-#~ msgstr "保留中の理由"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_PLACEHOLDER"
-#~ msgstr "保留中の理由、例:承認不明など。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_TOOLTIP"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_DESC"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_LABEL"
-#~ msgstr "パスワード"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_PLACEHOLDER"
-#~ msgstr "パスワードを再入力してください"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TOOLTIP"
-#~ msgstr "パスワードを再入力"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TYPE_DESC"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TYPE_LABEL"
-#~ msgstr "パスワードの形式"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TYPE_PLACEHOLDER"
-#~ msgstr "キー保護パスワードの形式を選択してください"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TYPE_TOOLTIP"
-#~ msgstr ""
-#~ "あなた自身でパスワードを設定することも、自動的にパスワードを作成することも"
-#~ "できます。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_DESC"
-#~ msgstr ""
-#~ "PKCS10形式のリクエストを直接フィールドに貼り付けるか、アップロードボタンを"
-#~ "使用してローカルコンピュータからファイルを読み込みます"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_LABEL"
-#~ msgstr "PKCS10のリクエスト"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_PLACEHOLDER"
-#~ msgstr ""
-#~ "PEMでエンコードされたリクエストをここに貼り付けてください（----- BEGIN "
-#~ "CERTIFICATE REQUEST -----のように表示する必要があります）。または、下のブ"
-#~ "ラウズ/アップロードボタンを使用してコンピュータからファイルを読み込みま"
-#~ "す。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
-#~ msgstr "PKCS10でエンコードされたリクエスト"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_DESC"
 #~ msgstr ""
@@ -3574,87 +4342,11 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_TOOLTIP"
 #~ msgstr "PKCS7エンコードされたリクエスト"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_CERTIFICATE_KEY_DUPLICATE"
-#~ msgstr "重複した鍵証明書"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_DESC"
-#~ msgstr ""
-#~ "このサービスのポリシーに違反したとしても、リクエストを処理する理由を簡単に"
-#~ "説明してください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_LABEL"
-#~ msgstr "ポリシー違反の説明"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_COMMENT_PLACEHOLDER"
-#~ msgstr "例:セットアップ中のDNS、証明書の交換など"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_SUBJECT_DUPLICATE_LABEL"
-#~ msgstr "サブジェクト重複のポリシーチェックに失敗しました。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_WORKFLOW_ID_KEY_DUPLICATE_ID"
-#~ msgstr "重複したキーワークフローID"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_DESC"
-#~ msgstr "理由コードは、証明書が失効された理由を示します。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_LABEL"
-#~ msgstr "理由コード"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_SUPERSEDED"
-#~ msgstr "エンティティ証明書が置き換えられました"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_UNSPECIFIED"
-#~ msgstr "詳細不明/その他の理由"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_PLACEHOLDER"
-#~ msgstr "失効の理由を設定してください"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_TOOLTIP"
-#~ msgstr "証明書を失効する理由を指定します。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REJECT_COMMENT_DESC"
-#~ msgstr "このリクエストを拒否する理由。 このコメントはユーザに表示されます。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REJECT_COMMENT_LABEL"
-#~ msgstr "拒否の理由"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REJECT_COMMENT_PLACEHOLDER"
-#~ msgstr "拒絶の理由、例:承認、重複などがありません"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REJECT_COMMENT_TOOLTIP"
-#~ msgstr "コメントはワークフローとともに保存され、ユーザーに送信されます"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_DESC"
-#~ msgstr "このワークフローによって更新される証明書。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_LABEL"
-#~ msgstr "更新された証明書"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_PLACEHOLDER"
-#~ msgstr ""
-#~ "証明書の識別子を入力するか、件名を入力して自動検索を開始してください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_CERT_IDENTIFIER_TOOLTIP"
-#~ msgstr ""
-#~ "自動検索では、件名に含まれている単語を含む証明書が検索され、下のドロップダ"
-#~ "ウンリストに表示されます。リストから必要な証明書をクリックして選択します。"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_DESC"
 #~ msgstr "このワークフローで置き換えられる証明書。"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_LABEL"
 #~ msgstr "置き換えられた証明書"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REQUEST_MODE_LABEL"
-#~ msgstr "リクエストモード"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RUN_IN_BACKGROUND_DESC"
-#~ msgstr ""
-#~ "このボックスをチェックすると、ワークフローがUIから切り離され、バックグラウ"
-#~ "ンドで実行されます。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RUN_IN_BACKGROUND_LABEL"
-#~ msgstr "バックグラウンド実行"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TID_DESC"
 #~ msgstr "SCEPリクエストのトランザクションID"
@@ -3680,32 +4372,11 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SC_ERROR_REASON_TOOLTIP"
 #~ msgstr " "
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_DESC"
-#~ msgstr "このリクエストを受信したSCEPエンドポイントの名前。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_INTERFACE_DESC"
-#~ msgstr "このリクエストを送信するために使用されたインターフェイスのタイプ。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_INTERFACE_LABEL"
-#~ msgstr "サーバインターフェース"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_LABEL"
-#~ msgstr "サーバ"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_PLACEHOLDER"
 #~ msgstr "サーバ"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_TOOLTIP"
 #~ msgstr "サーバ名の設定"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_AUTHORIZED_LABEL"
-#~ msgstr "署名者が承認されました"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_IDENTIFIER_LABEL"
-#~ msgstr "署名者証明書"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_LABEL"
-#~ msgstr "依頼者/署名者"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_IS_AUTHORIZED_LABEL"
 #~ msgstr "署名者が承認されました"
@@ -3713,23 +4384,11 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_IS_TRUSTED_LABEL"
 #~ msgstr "署名者は信頼されています"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_REVOKED_LABEL"
-#~ msgstr "署名者が失効されました"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_SIGNATURE_VALID_LABEL"
-#~ msgstr "署名者の署名が有効です"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_SUBJECT_MATCH_LABEL"
 #~ msgstr "件名の一致をリクエストする"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_TRUSTED_LABEL"
-#~ msgstr "署名者は信頼されています"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_LABEL"
 #~ msgstr "署名者は有効です"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_OK_LABEL"
-#~ msgstr "署名者の有効性を承諾しました。"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TMP_QUEUE_DESC"
@@ -3762,12 +4421,6 @@ msgstr "実行"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TOKEN_ID_TOOLTIP"
 #~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_DESC"
-#~ msgstr "このリクエストのトランザクションID"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_LABEL"
-#~ msgstr "トランザクションID"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_T_SIGNER_CERT_CRYPT_OK_DESC"
 #~ msgstr "Sigature Intact"
@@ -3821,29 +4474,6 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_ID_TOOLTIP"
 #~ msgstr " "
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_CHALLENGE_PASSWORD_LABEL"
-#~ msgstr "有効なパスワードがあります"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_HMAC_LABEL"
-#~ msgstr "有効なHMAC"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_DESC"
-#~ msgstr ""
-#~ "PEM形式の証明書をフィールドに直接貼り付けるか、アップロードボタンを使用し"
-#~ "てローカルコンピュータからファイルを読み込みます。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_LABEL"
-#~ msgstr "証明書 (PEM)"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_PLACEHOLDER"
-#~ msgstr ""
-#~ "PEMでエンコードされた証明書をここに貼り付けてください。(----- BEGIN "
-#~ "CERTIFICATE -----のように指定する必要があります。)または下の参照/アップ"
-#~ "ロードボタンを使用してコンピュータからファイルをロードしてください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_TOOLTIP"
-#~ msgstr "PEMは証明書で暗号化されました。"
-
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__DEFAULT_PUK_DESC"
 #~ msgstr " "
@@ -3888,63 +4518,11 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PRIVATE_KEY_TOOLTIP"
 #~ msgstr "RSA is the standard for encryption and signature"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_CHANGE_PROFILE"
-#~ msgstr "このリクエストの選択したプロファイルを変更する"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_CHANGE_PROFILE_LABEL"
-#~ msgstr "プロファイル選択に戻る"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_PKCS10_UPLOAD"
-#~ msgstr "作成した証明書リクエストをPKCS10形式でアップロードする"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_SELECT_TO_PROCEED"
-#~ msgstr "続行するには1つのアクションを選択してください"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_HINT_SERVER_KEY_PARAMS"
-#~ msgstr "サーバから鍵を作成する"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE"
 #~ msgstr "次へ"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_RESET"
 #~ msgstr "リセット"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_LEVEL_DESCRIPTION"
-#~ msgstr ""
-#~ "あなたへのメッセージの注意レベル。これは、メッセージボックスの種類に反映さ"
-#~ "れます。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_LEVEL_LABEL"
-#~ msgstr "重要度"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_MESSAGE_DESCRIPTION"
-#~ msgstr "表示されるメッセージ。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_MESSAGE_LABEL"
-#~ msgstr "今日のメッセージ"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_ROLE_DESCRIPTION"
-#~ msgstr ""
-#~ "このメッセージが表示されるユーザーの権限は、すべてのユーザーに表示されま"
-#~ "す。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_ROLE_LABEL"
-#~ msgstr "ユーザの権限"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_LINK_MESSAGE_DESCRIPTION"
-#~ msgstr "追加情報のリンクは、http：//を含む適切なURLでなければなりません。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_LINK_MESSAGE_LABEL"
-#~ msgstr "リンク"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_VALIDATOR_EXPIRATION_DATE_FAILED"
-#~ msgstr "満期日が誤っています。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_VALIDATOR_LINK_FAILED"
-#~ msgstr "http（s）://で始まる正しい形式のURLを入力してください"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_MOVE_TO_BACKGROUND"
-#~ msgstr "プロセスは内部プロセスに移行しました。"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DETAIL_FIELD_VALID_AT_DESCRIPTION"
@@ -3956,55 +4534,8 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DETAIL_FIELD_VALID_AT_LABEL"
 #~ msgstr "Reference Date"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_NEAR_EXPIRY"
-#~ msgstr "有効期限間近の証明書"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_RECENT_EXPIRY"
-#~ msgstr "最近の有効期限切れの証明書"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_COUNT"
-#~ msgstr "証明書の全体数"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_DISTINCT"
-#~ msgstr "全体の個別の件名"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_EXPIRED"
-#~ msgstr "有効期限切れの証明書"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_REVOKED"
-#~ msgstr "全体の失効した証明書"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_AT_DESCRIPTION"
-#~ msgstr "デフォルトで有効期限/期限切れステータスを統計するための参照日。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_AT_LABEL"
-#~ msgstr "参照日"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_COUNT"
-#~ msgstr "有効な証明書"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_DISTINTCT"
-#~ msgstr "有効な個別の件名"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_REVOKED"
-#~ msgstr "有効性はあるが失効した証明書"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SET_MOTD_SUCCESS_DESCRIPTION"
-#~ msgstr ""
-#~ "下記のメッセージは、指定されているユーザグループに設定されており、次のログ"
-#~ "イン時に表示されます。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SET_MOTD_SUCCESS_LABEL"
-#~ msgstr "メッセージを設定する"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED"
 #~ msgstr "このワークフローはユーザの操作によってキャンセルされました。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_DESC"
-#~ msgstr "このワークフローはキャンセルされました。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_LABEL"
-#~ msgstr "ユーザによってキャンセルされました"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_INITIAL_DESC"
 #~ msgstr "初期状態"
@@ -4012,190 +4543,11 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_INITIAL_LABEL"
 #~ msgstr "初期状態"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_DESC"
-#~ msgstr "証明書が発行され、リクエストに応じてクライアントに送信されます。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_LABEL"
-#~ msgstr "成功"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_INITIAL_DESC"
-#~ msgstr "初期状態"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_INITIAL_LABEL"
-#~ msgstr "初期状態"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_SUCCESS_DESC"
 #~ msgstr "このワークフローは正常に終了しました。"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_SUCCESS_LABEL"
 #~ msgstr "成功"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_BACKGROUND_DESC"
-#~ msgstr ""
-#~ "証明書失効リストの作成は、内部プロセスに移行されました。失効した証明書の数"
-#~ "によっては、このプロセスに数分かかる場合があります。下のステータス再確認ボ"
-#~ "タンを押すと、発行プロセスにリダイレクトされます。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_BACKGROUND_LABEL"
-#~ msgstr "証明書の収集"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_BACKGROUND_REASON"
-#~ msgstr "CRLは内部で作成されます。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_DESC"
-#~ msgstr "初期化中..."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_LABEL"
-#~ msgstr "初期化中"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_DESC"
-#~ msgstr "このワークフローは正常に終了しました。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_LABEL"
-#~ msgstr "発行されたCRL"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BULK_PENDING_DESC"
-#~ msgstr "この失効リクエストには承認が必要です。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BULK_PENDING_LABEL"
-#~ msgstr "承認待ち"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BY_ENTITY_PENDING_DESC"
-#~ msgstr "This revocation request requires approval."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_BY_ENTITY_PENDING_LABEL"
-#~ msgstr "この失効リクエストには承認が必要です。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_CANCELED_DESC"
-#~ msgstr "このワークフローはキャンセルされました。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_CANCELED_LABEL"
-#~ msgstr "キャンセル"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_DESC"
-#~ msgstr "このワークフローは失敗しました。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_LABEL"
-#~ msgstr "失敗"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_LABEL"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_PENDING_DESC"
-#~ msgstr "この失効リクエストには承認が必要です。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_PENDING_LABEL"
-#~ msgstr "承認待ち"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REJECTED_DESC"
-#~ msgstr "最終的に失効リクエストが拒否されました。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REJECTED_LABEL"
-#~ msgstr "失効拒否"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REQUEST_COMPLETE_DESC"
-#~ msgstr ""
-#~ "以下の失効申請の要約を見ることができます。情報の正当性をチェックし、送信ボ"
-#~ "タンを押してこの証明書の失効リクエストを送信してください。編集ボタンを使用"
-#~ "して情報を変更し、キャンセルボタンを使用してリクエストを削除します"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_REQUEST_COMPLETE_LABEL"
-#~ msgstr "リクエストを確認する"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_SUCCESS_DESC"
-#~ msgstr "証明書が失効され、失効リストが発行されました。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_SUCCESS_LABEL"
-#~ msgstr "失効した証明書"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_DESC"
-#~ msgstr "このワークフローはキャンセルされました。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_LABEL"
-#~ msgstr "キャンセル"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_DESC"
-#~ msgstr "このワークフローは成功しました。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_LABEL"
-#~ msgstr "状態"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_DESC"
-#~ msgstr "このワークフローは正常に終了しました。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_LABEL"
-#~ msgstr "秘密鍵のパスワード入力"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_DESC"
-#~ msgstr "このワークフローは正常に終了しました。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_LABEL"
-#~ msgstr "状態"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SUBJECT_DESC"
-#~ msgstr "このワークフローは正常に終了しました。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SUBJECT_LABEL"
-#~ msgstr "状態"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_DESC"
-#~ msgstr "このワークフローは失敗し、証明書は発行されませんでした。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_LABEL"
-#~ msgstr "リクエストが拒否されました"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_INITIAL_DESC"
-#~ msgstr "このワークフローは正常に終了しました。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_INITIAL_LABEL"
-#~ msgstr "状態"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ONHOLD_DESC"
-#~ msgstr ""
-#~ "このリクエストはオペレータによって保留にされました。以下の理由/コメントを"
-#~ "探してください。下のボタンを使用してコメントを編集するか、保留状態を解除す"
-#~ "ることができます。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ONHOLD_LABEL"
-#~ msgstr "保留中のリクエスト"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_DESC"
-#~ msgstr "このリクエストは、登録担当者の承認待ちです。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_LABEL"
-#~ msgstr "リクエストは承認待ちです"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_REJECTED_DESC"
-#~ msgstr ""
-#~ "あなたのリクエストは登録証明書で拒否されました。下のコメント欄に拒否理由が"
-#~ "あります。この決定は最終的なもので、ワークフローを再開することはできませ"
-#~ "ん。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_REJECTED_LABEL"
-#~ msgstr "リクエスト拒否"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SETUP_REQUEST_TYPE_DESC"
-#~ msgstr ""
-#~ "秘密鍵の提供方法を選択するか、戻って別のプロファイルを選択してください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SETUP_REQUEST_TYPE_LABEL"
-#~ msgstr "リクエストタイプを選択"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_DESC"
-#~ msgstr ""
-#~ "あなたのリクエストはすぐに送信されます。表示された情報が正しいかどうかを確"
-#~ "認してください。以下のボタンを使用して情報を更新することができます。<b>情"
-#~ "報が完全な場合は、送信ボタンを使用して追加処理のリクエストを送信してくださ"
-#~ "い</b>"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUBJECT_COMPLETE_LABEL"
-#~ msgstr "リクエスト請求"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUCCESS_DESC"
-#~ msgstr "このワークフローは成功して終了し、再実行はできません"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_SUCCESS_LABEL"
-#~ msgstr "発行済みの証明書"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_DESC"
@@ -4231,12 +4583,6 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_INITIAL_LABEL"
 #~ msgstr "状態"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_DESC"
-#~ msgstr "手動による認証が保留中です。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_LABEL"
-#~ msgstr "手動認証が保留中"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_APPROVAL_DESC"
 #~ msgstr "承認待ちです。"
 
@@ -4260,43 +4606,6 @@ msgstr "実行"
 #~ "証明書が発行され、リクエストに応じてSCEPクライアントに送信されます。"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_SUCCESS_LABEL"
-#~ msgstr "成功"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_DESC"
-#~ msgstr "このワークフローは失敗しました。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_LABEL"
-#~ msgstr "失敗"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_DESC"
-#~ msgstr "初期状態のエクスポート"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_LABEL"
-#~ msgstr "初期状態をエクスポートします。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_FAILURE_DESC"
-#~ msgstr ""
-#~ "権限がないため、秘密鍵のエクスポートが失敗しました。 証明書の所有者のみが"
-#~ "鍵にアクセスできます。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_FAILURE_LABEL"
-#~ msgstr "エクスポートに失敗しました"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_RETRY_PASSWORD_DESC"
-#~ msgstr ""
-#~ "秘密鍵の読み込みができなかったため、エクスポートファイルを作成できませんで"
-#~ "した。これは通常、間違ったパスワードを指定したことを意味します。再入力をク"
-#~ "リックし、再度パスワードを入力するか、リクエストをキャンセルします。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_RETRY_PASSWORD_LABEL"
-#~ msgstr "キーを読み込めません"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_DESC"
-#~ msgstr ""
-#~ "下のリンクをクリックして、証明書/キー形式でダウンロードしてください。この"
-#~ "リンクはこのブラウザウィンドウ内でのみ機能し、60秒後に無効になります。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_LABEL"
 #~ msgstr "成功"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_SUCCESS_DESC"
@@ -4995,70 +5304,11 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE"
 #~ msgstr "このワークフローは失敗し、再実行はできません"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_DESC"
-#~ msgstr "このワークフローは失敗し、再実行はできません"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_LABEL"
-#~ msgstr "失敗"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_CERTIFICATE_DESC"
-#~ msgstr ""
-#~ "アップロードされた鍵は、すでに許可されていない別の証明書によって使用されて"
-#~ "いることが判明しました。下のボタンを使用して新しい証明書リクエストをアップ"
-#~ "ロードするか、ワークフローをキャンセルしてください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_CERTIFICATE_LABEL"
-#~ msgstr "重複キーエラー（証明書）"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_WORKFLOW_DESC"
-#~ msgstr ""
-#~ "アップロードされた鍵は、すでに別の証明書リクエストによって使用されているこ"
-#~ "とが判明しましたが、同じ鍵を2回認証することはできません。次のボタンを使用"
-#~ "して、リクエストに新しいキーをアップロードするか、プロセスをキャンセルしま"
-#~ "す。下にリストされているブロッキングワークフローについて管理している場合"
-#~ "は、他のワークフローをキャンセルして下の再チェックボタンを使用して先に進む"
-#~ "こともできます。ブロッキングワークフローを管理できるかどうかを判断できない"
-#~ "ため、このオプションは利用できない可能性があります。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_KEY_DUPLICATE_ERROR_WORKFLOW_LABEL"
-#~ msgstr "重複キーエラー(リクエスト）"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_DESC"
-#~ msgstr ""
-#~ "下に、この証明書の新しいメタデータが表示されます。以下の操作から進んでくだ"
-#~ "さい。アボートはメタデータをデータベースに書き戻さずにワークフローを終了"
-#~ "し、更新はフォームを再び表示し、セーブはデータを保存してワークフローを終了"
-#~ "します。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_LABEL"
-#~ msgstr "データの確認"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_DESC"
-#~ msgstr "このワークフローは一時停止され、ウォッチドッグによって継続されます"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_LABEL"
-#~ msgstr "更新"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_FAILURE_DESC"
 #~ msgstr "このワークフローは失敗しました。"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_FAILURE_LABEL"
 #~ msgstr "失敗"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_INITIAL_DESC"
-#~ msgstr ""
-#~ "証明書に関連付けられたメタデータ情報を変更するには、証明書の識別子を入力し"
-#~ "てください。<br/>識別子がわからない場合は、証明書検索を使用して見つけてく"
-#~ "ださい。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_INITIAL_LABEL"
-#~ msgstr "メタデータの初期化"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_DESC"
-#~ msgstr "メタデータが更新されました。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
-#~ msgstr "メタデータ更新"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_MISC_FINAL"
 #~ msgstr "このワークフローは最終状態です。"
@@ -5085,30 +5335,6 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PIN_UNBLOCK_GET_ACT_CODE_LABEL"
 #~ msgstr "アクティベーションコードを作成する"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_DESC"
-#~ msgstr ""
-#~ "このリクエストは1つ以上のポリシーチェックに失敗しましたが、所有者は承認を"
-#~ "リクエストしました。詳細は以下のコメントと結果の項目を参照してください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL"
-#~ msgstr "保留中のポリシー違反"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_DESC"
-#~ msgstr "リクエストは拒否され、再実効はできません。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_LABEL"
-#~ msgstr "リクエスト拒否"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_DETAIL_SUCCESS_DESC"
-#~ msgstr ""
-#~ "レポートが準備完了です。ファイル名をクリックしてダウンロードしてください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_DETAIL_SUCCESS_LABEL"
-#~ msgstr "レポート結果"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_SUMMARY_SUCCESS_LABEL"
-#~ msgstr "レポート結果"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REVIEW_DESC"
 #~ msgstr ""
 #~ "リクエストの内容を確認してください。- データが正しい場合は続行をクリックす"
@@ -5132,47 +5358,8 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_INITIAL_LABEL"
 #~ msgstr "GetCAチェーンの設定"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_DESC"
-#~ msgstr "検索条件に一致する結果は見つかりませんでした。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_LABEL"
-#~ msgstr "検索結果がありません。"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS"
 #~ msgstr "ワークフローは成功して終了し、再実行はできません"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
-#~ msgstr "このワークフローは成功して終了し、再実行はできません"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL"
-#~ msgstr "成功"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CONFIRM_DESC"
-#~ msgstr ""
-#~ "リクエストを続行できますが、リクエストされた日付の証明書を発行するための有"
-#~ "効なトークンがありません！このリクエストを完了するには、新しいCAトークンを"
-#~ "追加する必要があります！"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CONFIRM_LABEL"
-#~ msgstr "CAライフタイムの不一致"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_DESC"
-#~ msgstr ""
-#~ "要求された証明書の有効期間は、構成されたCAトークンの有効性のいずれとも一致"
-#~ "しません。適切なCAトークンがアクティブ化されない限り、要求された日付の証明"
-#~ "書を取得することはできません。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_LABEL"
-#~ msgstr "CAライフタイムの不一致"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_PROCEED_BUTTON_LABEL"
-#~ msgstr "リクエストに進む"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_DESC"
-#~ msgstr "定義されたリポジトリにCA情報（CA証明書およびCRL）を発行します。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL"
-#~ msgstr "CA情報を公開する"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_BY_SUBJECT_DESC"
@@ -5182,78 +5369,11 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_BY_SUBJECT_LABEL"
 #~ msgstr "Certificate Revocation Request (CRR)"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
-#~ msgstr "証明書失効リクエスト"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_LABEL"
-#~ msgstr "証明書失効リクエスト(CRR)"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_DESC"
-#~ msgstr "証明書署名リクエスト(CSR)"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_SIGNING_REQUEST_LABEL"
-#~ msgstr "証明書署名リクエスト(CSR)"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_DESC"
 #~ msgstr "証明書を認証します。"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_LABEL"
 #~ msgstr "証明書の認証"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_DESC"
-#~ msgstr "証明書を登録します。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_LABEL"
-#~ msgstr "証明書の登録"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_DESC"
-#~ msgstr "証明書をエクスポートします。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_LABEL"
-#~ msgstr "証明書のエクスポート"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"
-#~ msgstr "定義されたリポジトリに証明書情報を公開します。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_LABEL"
-#~ msgstr "証明書の公開"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_DESC"
-#~ msgstr "証明書のメタデータを変更します。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_LABEL"
-#~ msgstr "メタデータの変更"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_DESC"
-#~ msgstr "CRLを発行します。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_LABEL"
-#~ msgstr "CRL発行"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BULK_DESC"
-#~ msgstr ""
-#~ "このワークフローでは、複数の証明書を一度に失効させることができます。有効な"
-#~ "証明書識別子のリストを提供する必要があります。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BULK_LABEL"
-#~ msgstr "一括失効リクエスト"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BY_ENTITY_DESC"
-#~ msgstr ""
-#~ "このワークフローは、特定のエンティティに属するすべての証明書を失効します"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRR_BY_ENTITY_LABEL"
-#~ msgstr "エンティティによる失効"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_LABEL"
-#~ msgstr "私有鍵のダウンロード"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_DESC"
-#~ msgstr ""
-#~ "期限切れになる証明書について、メールで期限切れの通知を送信してください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
-#~ msgstr "証明書失効通知"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_DESC"
@@ -5262,25 +5382,6 @@ msgstr "実行"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_LABEL"
 #~ msgstr "Certificate Export"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_DESC"
-#~ msgstr ""
-#~ "このレルムの証明書に関する詳細なレポートをダウンロード用に作成します。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_LABEL"
-#~ msgstr "証明書の詳細レポート"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_LIST_DESC"
-#~ msgstr "レポートをダウンロードするには、1行をクリックしてください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_LIST_LABEL"
-#~ msgstr "利用可能なレポート"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_DESC"
-#~ msgstr "いくつかの状態における証明書の数を示すレポート。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_LABEL"
-#~ msgstr "証明書ステータスレポート"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_NEAR_EXPIRY"
@@ -5314,31 +5415,11 @@ msgstr "実行"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_VALID_DISTINTCT"
 #~ msgstr "Certificate Export"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REQUEST_CHECKER_DESC"
-#~ msgstr ""
-#~ "このワークフローでは、PKCS10リクエストをアップロードして、エンコードされた"
-#~ "詳細を表示できます。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REQUEST_CHECKER_LABEL"
-#~ msgstr "リクエストチェッカー"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEPGETCA_DESC"
 #~ msgstr "SCEP GetCA"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEPGETCA_LABEL"
 #~ msgstr "SCEP GetCA"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_DESC"
-#~ msgstr "トランザクションIDでSCEPワークフローを検索する"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_LABEL"
-#~ msgstr "SCEP検索"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_DESC"
-#~ msgstr "証明書のメタデータを参照します。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_LABEL"
-#~ msgstr "メタデータの参照"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_FETCH_PUK_DESC"
 #~ msgstr "スマートカードを読み込みます。"
@@ -5366,6 +5447,3 @@ msgstr "実行"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_WORKFLOW_WAS_UPDATED"
 #~ msgstr "ワークフロー情報が更新されました。"
-
-#~ msgid "I18N_OPENXPKI_UI_YES"
-#~ msgstr "はい"

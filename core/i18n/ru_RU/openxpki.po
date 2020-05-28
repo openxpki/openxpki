@@ -331,6 +331,10 @@ msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED"
 msgstr "Отозван"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_STATUS_REVOKED_AT"
+msgstr "Отозван"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_UNKNOWN"
 msgstr "Статус сертификата УЦ"
 
@@ -829,6 +833,18 @@ msgstr "Имя учетной записи"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_PRIME239V1"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_PRIME256V1"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_SECP384R1"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_SECP521R1"
 msgstr "Имя учетной записи"
 
 #, fuzzy
@@ -2237,6 +2253,10 @@ msgstr "Описания пока нет"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_ACTION_SUCCESS_STATUS"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_ASYNC_ITEMS_DESC"
 msgstr "Технологические процессы"
 
 #, fuzzy
