@@ -138,39 +138,6 @@ sub update_head {
     return '';
 }
 
-sub walkQueryPoints {
-
-    my $self = shift;
-    my $prefix = shift;
-    my $query = shift;
-    my $params = shift;
-
-    my $call;
-
-    if (ref $params eq 'HASH') {
-        $call = $params->{call};
-        undef $params->{call};
-    } elsif ($params) {
-        $call = $params;
-    } else {
-        $call = 'get';
-    }
-
-    ##! 16: " Walk resolvers at $prefix with $call "
-
-    my $result;
-
-    my @path_prefix = $self->_build_path( $prefix );
-    my @prep_query = $self->_build_path( $query );
-
-    foreach my $resolver (  $self->get_list( [ @path_prefix, 'resolvers' ] ) ) {
-        ##! 32: 'Ask Resolver ' . $prefix.'.'.$resolver.'.'.$query
-        $result = $self->$call( [ @path_prefix, $resolver, @prep_query ] , $params );
-        return { 'VALUE' => $result, 'SOURCE' => $resolver } if ($result);
-    }
-    return;
-}
-
 sub get_scalar_as_list {
     my $self = shift;
     my $path = shift;
@@ -286,7 +253,7 @@ with all backends.
 
 =head2 walkQueryPoints
 
-Shortcut method to test multiple resolvers for a value.
+Removed - use Connector::Tee instead
 
 =head3 parameters
 
