@@ -61,8 +61,8 @@ sub output {
         if ($err->{PARAMS} && $err->{PARAMS}->{__error__}) {
             print STDERR "    " . $err->{PARAMS}->{__error__} . "\n";
         }
-    } elsif ($msg->{result} && !ref $msg->{result}) {
-        $output = $msg->{result};
+    } elsif (exists $msg->{result} && !ref $msg->{result}) {
+        $output = $msg->{result} // "<undef>";
     } else {
         print Dumper $msg;
         print "\n";

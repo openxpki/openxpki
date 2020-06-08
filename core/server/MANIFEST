@@ -270,6 +270,7 @@ OpenXPKI/Server/API2/Plugin/Token/get_ca_list.pm
 OpenXPKI/Server/API2/Plugin/Token/get_certificate_for_alias.pm
 OpenXPKI/Server/API2/Plugin/Token/get_default_token.pm
 OpenXPKI/Server/API2/Plugin/Token/get_token_alias_by_x.pm
+OpenXPKI/Server/API2/Plugin/Token/get_token_info.pm
 OpenXPKI/Server/API2/Plugin/Token/get_trust_anchors.pm
 OpenXPKI/Server/API2/Plugin/Token/is_token_usable.pm
 OpenXPKI/Server/API2/Plugin/Token/list_active_aliases.pm

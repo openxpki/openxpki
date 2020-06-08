@@ -143,12 +143,6 @@ sub online {
     return 1;
 }
 
-#sub key_usable {
-#    my $self = shift;
-#    return 0 if (not $self->{ONLINE});
-#    return 1;
-#}
-
 sub get_engine
 {
     return "";
@@ -179,6 +173,17 @@ sub get_engine_usage
         return $self->{ENGINE_USAGE};
     } else {
         return "";
+    }
+}
+
+sub get_key_info
+{
+    my $self = shift;
+    return {
+        'key_name' => $self->{KEY},
+        'key_store' => $self->{KEY_STORE},
+        'key_secret' => ($self->get_passwd() ? 1 : 0),
+        'key_usable' => ($self->key_usable()  ? 1 : 0),
     }
 }
 
@@ -392,9 +397,14 @@ is used or the engine_usage section is empty.
 
 returns the OpenSSL key_store section from the configuration.
 
+=head2 get_key_info
+
+returns as hash with some information on the key (name, storage, secret avail)
+
 =head2 get_keyfile
 
-returns the filename of the private key.
+returns the name of the private key. In case the key is stored in the
+datapool, this returns the name of a tempfile holding the key blob.
 
 =head2 get_passwd
 

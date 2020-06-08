@@ -76,7 +76,7 @@ sub is_token_usable {
     }
     catch {
         ##! 8: 'pkcs7 roundtrip failed'
-        return 0;
+        return undef;
     };
 
     return $result;

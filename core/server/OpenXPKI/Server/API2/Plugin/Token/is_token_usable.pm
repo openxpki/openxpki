@@ -16,8 +16,11 @@ use OpenXPKI::Server::Context qw( CTX );
 
 =head2 is_token_usable
 
-Checks if the token with the given alias is usable and returns true (1) or
-false (undef).
+Returns true (1) if the token with the given alias is usable. Returns
+false (0) if the token setup is ok but the key can not be used, e.g.
+a missing secret. Returns undef in case construction of the token fails
+which usually means the configuration is broken or artefacts are not
+found or not readable (keyfile / datapool items).
 
 B<Parameters>
 
@@ -89,7 +92,11 @@ command "is_token_usable" => {
     # Shortcut method, ask the token engine
     if ($operation eq 'engine') {
         CTX('log')->application()->debug('Check if token is usable using engine');
-        return $token->key_usable()
+        my $usable = 0;
+        eval {
+            $usable = $token->key_usable();
+        };
+        return $usable;
     }
 
     return OpenXPKI::Server::API2::Plugin::Token::Util->is_token_usable($token, $operation);
