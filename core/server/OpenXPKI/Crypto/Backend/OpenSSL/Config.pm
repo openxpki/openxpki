@@ -27,13 +27,6 @@ sub new
     my $self = shift;
     bless $self, $class;
 
-    ##! 2: "check XS availability"
-    if (not exists $self->{XS} or not ref $self->{XS})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_CONFIG_MISSING_XS");
-    }
-
     ##! 2: "$self->{TMP} will be checked by the central OpenSSL module"
     if (not $self->{TMP})
     {
@@ -230,14 +223,8 @@ sub dump
 
     }
 
-
-    ##! 16: 'config: ' . $config
-    ##! 2: "set the configuration to the XS library"
-    ##! 2: "should we integrate this into the get_config function?"
-    OpenXPKI::Crypto::Backend::OpenSSL::set_config ($self->{FILENAME}->{CONFIG});
-
-    ##! 1: "end"
-    return 1;
+    ##! 16: 'config: ' . $config    ##! 1: "end"
+    return $self->{FILENAME}->{CONFIG};
 }
 
 sub __get_openssl_common

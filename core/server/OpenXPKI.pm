@@ -15,8 +15,6 @@ use OpenXPKI::VERSION;
 our $VERSION = $OpenXPKI::VERSION::VERSION;
 
 use English qw (-no_match_vars);
-use XSLoader;
-XSLoader::load ("OpenXPKI", $VERSION);
 
 use OpenXPKI::Debug;
 require OpenXPKI::Exception;

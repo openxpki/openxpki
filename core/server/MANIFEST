@@ -141,7 +141,6 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Config.pm
 OpenXPKI/Crypto/Backend/OpenSSL/ECDH.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Engine.pm
-OpenXPKI/Crypto/Backend/OpenSSL/XS.pm
 
 OpenXPKI/Crypto/Backend/OpenSSL/Engine/GOST.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Engine/nCipher.pm
@@ -174,14 +173,6 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_get_payload.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_sign.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_verify.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/verify_cert.pm
-
-## XS sources
-
-typemap
-OpenXPKI.xs
-OpenXPKI/Crypto/Backend/OpenSSL.xs
-OpenXPKI/Crypto/Backend/OpenSSL/XS/CRL.xs
-OpenXPKI/Crypto/Backend/OpenSSL/XS/ECDH.xs
 
 ## database interface of the server
 

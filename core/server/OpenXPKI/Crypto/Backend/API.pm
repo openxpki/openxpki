@@ -27,9 +27,6 @@ use English;
 ##     - "" => {...} (these are the default parameters
 ##     - "TYPE:EC" => {...} means parameters if TYPE => "EC" is used
 
-
-my %object_cache_of :ATTR; # the object cache attribute
-
 sub __init_command_params : PRIVATE {
     ##! 16: 'start'
     my $self = shift;
@@ -206,112 +203,6 @@ sub get_cmd_param {
     return \%rc;
 }
 
-sub get_object {
-    my $self = shift;
-    my $ident = ident $self;
-    my $keys = shift;
-
-    foreach my $param (keys %{$keys})
-    {
-        if ($param ne "DATA" and
-            $param ne "FORMAT" and
-            $param ne "TYPE")
-        {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_ILLEGAL_PARAM",
-                params  => {NAME => $param, VALUE => $keys->{$param}});
-        }
-    }
-
-    if (not defined $keys->{DATA} or
-        not length $keys->{DATA})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_MISSING_DATA");
-    }
-
-    if ($keys->{TYPE} ne "CRL")
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_ILLEGAL_TYPE",
-            params  => {TYPE => $keys->{TYPE}});
-    }
-
-    my $ref = $self->get_instance()->get_object($keys);
-    $object_cache_of{$ident}->{$ref} = $keys->{TYPE};
-    return $ref;
-}
-
-sub get_object_function {
-    my $self = shift;
-    my $ident = ident $self;
-    my $keys = shift;
-
-    foreach my $param (keys %{$keys})
-    {
-        if ($param ne "OBJECT" and
-            $param ne "FUNCTION")
-        {
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_ILLEGAL_PARAM",
-                params  => {NAME => $param, VALUE => $keys->{$param}});
-        }
-    }
-
-    if (not ref $keys->{OBJECT})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_OBJECT_NO_REF");
-    }
-
-    if (not exists $object_cache_of{$ident} or
-        not exists $object_cache_of{$ident}->{$keys->{OBJECT}})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_OBJECT_NOT_IN_CACHE");
-    }
-
-    my $type = $object_cache_of{$ident}->{$keys->{OBJECT}};
-
-    my @functions = ();
-    if ($type eq "CRL")
-    {
-        @functions = ("version", "issuer", "next_update", "last_update",
-                      "signature_algorithm", "revoked", "serial", "itemcnt", "extensions");
-    }
-
-    if (not grep (/$keys->{FUNCTION}/, @functions))
-    {
-         OpenXPKI::Exception->throw (
-             message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_GET_OBJECT_FUNCTION_ILLEGAL_FUNCTION",
-             params  => {FUNCTION => $keys->{FUNCTION}, TYPE => $type});
-    }
-
-    return $self->get_instance()->get_object_function($keys);
-}
-
-sub free_object {
-    my $self   = shift;
-    my $ident  = ident $self;
-    my $object = shift;
-
-    if (not ref $object)
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_FREE_OBJECT_NO_REF");
-    }
-
-    if (not exists $object_cache_of{$ident} or
-        not exists $object_cache_of{$ident}->{$object})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_BACKEND_API_FREE_OBJECT_NOT_IN_CACHE");
-    }
-
-    delete $object_cache_of{$ident}->{$object};
-    return $self->get_instance()->free_object ($object);
-}
-
 sub get_key_info
 {
     ##! 1: 'start'
@@ -363,4 +254,3 @@ is the constructor.
 =head2 get_cmd_param
 
 get the command_params entry for the specified command
-

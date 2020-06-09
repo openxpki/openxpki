@@ -10,13 +10,11 @@ use warnings;
 use English;
 
 use OpenXPKI::Crypto::Backend::OpenSSL::Config;
-use OpenXPKI::Crypto::Backend::OpenSSL::XS;
 use OpenXPKI::Server::Context qw( CTX );
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 
-my %xs_of     :ATTR; # the XS object
 my %config_of :ATTR; # the Config object
 
 use Data::Dumper;
@@ -28,8 +26,6 @@ sub START {
 sub __init_local {
     my $self = shift;
     my $ident = ident $self;
-
-    $xs_of{$ident} = OpenXPKI::Crypto::Backend::OpenSSL::XS->new();
     $self->__init_config ();
 }
 
@@ -39,7 +35,6 @@ sub __init_config {
 
     $config_of{$ident} = OpenXPKI::Crypto::Backend::OpenSSL::Config->new({
                           TMP => $self->get_tmp_dir(),
-                          XS  => $xs_of{$ident},
                       });
 }
 
@@ -55,7 +50,6 @@ sub __instantiate_engine {
     my $engine_obj = eval {
         $engine->new(
             %{$self->get_params()},
-            XS => $xs_of{$ident},
         )
     };
     if (my $exc = OpenXPKI::Exception->caught())
@@ -118,7 +112,6 @@ sub __init_command {
 
     $self->get_command_params()->{ENGINE} = $self->get_engine();
     $self->get_command_params()->{CONFIG} = $config_of{$ident};
-    $self->get_command_params()->{XS}     = $xs_of{$ident};
     ##! 16: 'end'
 }
 
@@ -132,40 +125,6 @@ sub __prepare_cli {
         CONFIG  => $config_of{$ident},
     });
 }
-
-
-###########################
-##     BEGIN XS code     ##
-###########################
-
-sub get_object
-{
-    ##! 1: "start"
-    my $self  = shift;
-    my $ident = ident $self;
-    return $xs_of{$ident}->get_object(@_);
-}
-
-sub get_object_function
-{
-    ##! 1: "start"
-    my $self  = shift;
-    my $ident = ident $self;
-    return $xs_of{$ident}->get_object_function(@_);
-}
-
-sub free_object
-{
-    ##! 1: "start"
-    my $self  = shift;
-    my $ident = ident $self;
-    return $xs_of{$ident}->free_object(@_);
-}
-
-#########################
-##     END XS code     ##
-#########################
-
 
 1;
 __END__

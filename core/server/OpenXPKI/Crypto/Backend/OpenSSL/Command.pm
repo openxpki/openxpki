@@ -55,13 +55,6 @@ sub new
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_CONFIG");
     }
 
-    ##! 2: "check XS availability"
-    if (not exists $self->{XS} or not ref $self->{XS})
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_MISSING_XS");
-    }
-
     ##! 2: "$self->{TMP} will be checked by the central OpenSSL module"
     if (not $self->{TMP})
     {
@@ -245,4 +238,3 @@ expects a RFC2253 compliant DN and returns an OpenSSL DN.
 The default handler returns the content of OUTFILE. Must be overriden
 in the child class if a different handling is required. Will throw an
 exception if OUTFILE is not set, not readable or zero size.
-
