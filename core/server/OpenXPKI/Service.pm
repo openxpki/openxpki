@@ -20,6 +20,7 @@ use Data::Dumper;
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
+use OpenXPKI::Server::Context qw( CTX );
 
 my %transport              : ATTR( :init_arg<TRANSPORT> );
 my %serialization          : ATTR( :init_arg<SERIALIZATION> );
@@ -51,7 +52,8 @@ sub talk {
         $self->set_communication_state('can_receive');
         if ($OpenXPKI::Server::stop_soon) {
             ##! 1: 'stop_soon hit'
-            die "We have been asked to stop (SIGTERM)";
+            CTX('log')->system()->info("Child $$ terminated by SIGTERM");
+            exit 0;
         }
         return $rc;
     }
@@ -74,7 +76,8 @@ sub collect {
 
     if ($OpenXPKI::Server::stop_soon) {
         ##! 1: 'stop_soon hit'
-        die "We have been asked to stop (SIGTERM)";
+        CTX('log')->system()->info("Child $$ terminated by SIGTERM");
+        exit 0;
     }
 
     my $communication_state = $self->get_communication_state();
@@ -219,4 +222,3 @@ a single OpenXPKI::Exception
 an array of OpenXPKI::Exception
 
 =back
-

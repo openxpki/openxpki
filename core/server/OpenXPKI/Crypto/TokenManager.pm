@@ -7,6 +7,7 @@ use strict;
 use warnings;
 
 use Carp;
+use OpenXPKI::Control;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
@@ -458,7 +459,7 @@ sub clear_secret_group
                 group_id  => $group,
             }
         );
-        # TODO - we need to reload the watchdog and kill all active workers
+        OpenXPKI::Control::reload();
     }
 
     # reinitialize the reference object

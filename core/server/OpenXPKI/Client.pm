@@ -369,6 +369,10 @@ sub detach {
         return 2;
     }
 
+    if (!$self->is_connected()) {
+        return 3;
+    }
+
     my $msg;
     eval {
         $msg = $self->send_receive_service_msg('DETACH_SESSION');
@@ -395,6 +399,10 @@ sub logout {
     my $self  = shift;
     my $args  = shift;
 
+    if (!$self->is_connected()) {
+        return 3;
+    }
+
     my $msg = $self->send_receive_service_msg('LOGOUT');
 
     $self->session_id( '' );
@@ -408,7 +416,7 @@ sub logout {
     OpenXPKI::Exception->throw(
         message => "I18N_OPENXPKI_CLIENT_LOGOUT_FAILED",
         params  => {
-            MESSAGE_FROM_SERVER => Dumper $msg,
+            MESSAGE_FROM_SERVER => $msg,
     });
 
 }
