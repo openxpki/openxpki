@@ -12,11 +12,43 @@ use MIME::Base64;
 use Moose;
 use Crypt::PKCS10 1.8;
 
+
+has _pkcs10 => (
+    is => 'ro',
+    required => 1,
+    isa => 'Crypt::PKCS10',
+);
+
+=head1 Name
+
+OpenXPKI::Crypt::PKCS10
+
+=head1 Description
+
+Helper class to extract information from a PKCS10 request.
+
+Expects PEM encoded data with headers or raw binary as single argument
+to new.
+
+=head1 Methods
+
+=head2 data
+
+The request binary data.
+
+=cut
+
 has data => (
     is => 'ro',
     required => 1,
     isa => 'Str',
 );
+
+=head2 pem
+
+The PEM encoded request, 64 chars per line, with header and footer lines.
+
+=cut
 
 has pem => (
     is => 'ro',
@@ -33,11 +65,11 @@ has pem => (
     },
 );
 
-has _pkcs10 => (
-    is => 'ro',
-    required => 1,
-    isa => 'Crypt::PKCS10',
-);
+=head2 get_subject
+
+The subject (full DN) of the request as string as defined in RFC2253
+
+=cut
 
 has subject => (
     is => 'ro',
@@ -53,8 +85,15 @@ has subject => (
     }
 );
 
+=head2 get_subject_key_id
+
+Sha1 hash of the DER encoded public key. Uppercase hexadecimal with bytes
+separated by a colon, e.g. A1:B2:C3....
+
+=cut
+
 has subject_key_id => (
-    is => 'rw',
+    is => 'ro',
     required => 0,
     isa => 'Str',
     reader => 'get_subject_key_id',
@@ -65,8 +104,15 @@ has subject_key_id => (
     }
 );
 
+=head2 get_csr_identifier
+
+Same value as the transaction_id but encoded with base64 with "urlsafe"
+encoding (+\ replaced by -_) as also used for the cert_identifier.
+
+=cut
+
 has csr_identifier => (
-    is => 'rw',
+    is => 'ro',
     init_arg => undef,
     isa => 'Str',
     reader => 'get_csr_identifier',
@@ -80,8 +126,15 @@ has csr_identifier => (
     },
 );
 
+=head2 get_transaction_id
+
+Return the transaction_id of which is defined as the sha1 hash over
+the DER encoded request in hexadecimal format.
+
+=cut
+
 has transaction_id => (
-    is => 'rw',
+    is => 'ro',
     init_arg => undef,
     isa => 'Str',
     reader => 'get_transaction_id',
@@ -89,6 +142,31 @@ has transaction_id => (
     default => sub {
         my $self = shift;
         return sha1_hex($self->data);
+    },
+);
+
+=head2 get_digest
+
+Return the digest of the raw request which is defined as the sha1 hash over
+the DER encoded "inner" request without the signature parts given in
+hexadecimal format.
+
+I<Note>: While an RSA request has a deterministic signature and creates
+an overall identical binary each time you create a CSRs from the same
+data the signature of an ECC request contains a random number so the "outer"
+hash will change if a client recreates a CSRs.
+
+=cut
+
+has digest => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'Str',
+    reader => 'get_digest',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        return sha1_hex($self->_pkcs10()->certificationRequest());
     },
 );
 

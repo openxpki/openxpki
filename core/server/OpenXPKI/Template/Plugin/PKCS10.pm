@@ -158,6 +158,24 @@ sub transaction_id {
 
 }
 
+=head2 digest
+
+Return the digest of the raw request which is the sha1 hash on the DER encoded
+"inner" request without the signature parts given in hexadecimal format.
+
+=cut
+
+sub digest {
+
+    my $self = shift;
+    my $pkcs10 = shift;
+
+    my $csr = $self->_load($pkcs10);
+    if (!$csr) { return; }
+    return $csr->digest();
+
+}
+
 =head2 dn
 
 Returns the DN of the request as parsed hash, if second parameter
