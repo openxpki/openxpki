@@ -68,6 +68,23 @@ sub output {
         print "\n";
     }
 
+    foreach my $entry (@{$params{fileout}}) {
+        my ($key, $value) = ($entry =~ m{ \A (.*?) [=:] (.*) }xms);
+
+        if (!defined $key) {
+            die "fileout must be given as key=filename ($entry)\n";
+        }
+        next unless defined ($msg->{result}->{$key});
+        -e $value && die "fileout output file exists ($value)\n";
+
+        if (open (OUT, ">", $value)) {
+            print OUT $msg->{result}->{$key};
+            close OUT;
+        } else {
+            warn "Unable to open fileout file $value for $key!";
+        }
+    }
+
     return unless($output);
 
     if ($params{out}) {
@@ -100,6 +117,7 @@ GetOptions(\%params,
             param|set=s@
             arg=s@
             filearg=s@
+            fileout=s@
             timeout|to=i
             session
             debug
@@ -386,6 +404,15 @@ openxpkicli [options] command
     --json-pretty         human readble json
     --session             session mode, see below for details
 
+  Output control - use for testing and debugging only and might change anytime!
+
+    --out FILE            Write output to FILE instead of STDOUT. Works only in
+                          conjunction with --json or if the result is a single
+                          scalar value.
+    --fileout KEY=FILE    Write the value of the result item KEY to FILE.
+                          No file is written if the KEY is not part of the
+                          result, dies if the file exists.
+
 =head1 INVOCATION
 
 Invoke the named command through the OpenXPKI API using the given conenction socket.
@@ -444,7 +471,3 @@ Pass I<--session> as parameter and pass the ID of an existings session in
 =head2 Interactive
 
 Not supported yet :)
-
-
-
-
