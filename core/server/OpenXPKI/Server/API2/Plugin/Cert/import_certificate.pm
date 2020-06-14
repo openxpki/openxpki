@@ -275,6 +275,8 @@ command "import_certificate" => {
 
         }
 
+    } else {
+        $cert_hash->{issuer_identifier} = 'unknown';
     }
 
     $dbi->merge(
