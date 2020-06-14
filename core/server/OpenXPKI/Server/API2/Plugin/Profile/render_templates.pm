@@ -45,6 +45,7 @@ command "render_subject_from_template" => {
     profile => { isa => 'AlphaPunct', required => 1, },
     style   => { isa => 'AlphaPunct', },
     vars    => { isa => 'HashRef',    required => 1, },
+    sanitize => { isa => 'Bool', default => 1 },
 } => sub {
     my ($self, $params) = @_;
 
@@ -71,7 +72,17 @@ command "render_subject_from_template" => {
             }
         );
 
-    return $self->process_template($dn_template, $vars);
+    my $subject = $self->process_template($dn_template, $vars);
+    return "" unless($subject);
+
+    ##! 16: 'Subject ' . $subject
+    if ($params->sanitize) {
+        $subject = OpenXPKI::DN->new($subject)->get_rfc_2253_dn();
+        ##! 64: 'Subject after sanitize ' . $subject
+    }
+
+    return $subject;
+
 };
 
 =head2 render_san_from_template
