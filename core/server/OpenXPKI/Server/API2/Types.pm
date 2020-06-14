@@ -147,6 +147,17 @@ subtype 'PEMPKey',
     where { $_ =~ m{ \A -----BEGIN\ ([\w\s]*)PRIVATE\ KEY----- [^-]+ -----END\ \1PRIVATE\ KEY----- \Z }msx },
     message { "$_ is not a PEM encoded private key container" };
 
+
+=head2 PEMPubKey
+
+A PEM encoded private key container
+
+=cut
+subtype 'PEMPubKey',
+    as 'PEM',
+    where { $_ =~ m{ \A -----BEGIN\ PUBLIC\ KEY----- [^-]+ -----END\ PUBLIC\ KEY----- \Z }msx },
+    message { "$_ is not a PEM encoded public key container" };
+
 =head2 ArrayRefOrPEMCertChain
 
 An I<ArrayRef> of L</PEMCertChain> that will also accept a scalar of type
