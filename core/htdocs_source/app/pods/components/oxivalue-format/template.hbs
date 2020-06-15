@@ -24,13 +24,6 @@
         <code>{{this.valueStr}}</code>
     {{else if (eq this.format "raw")}}
         {{{defuse this.valueStr}}}
-    {{else if (eq this.format "defhash")}}
-        <dl>
-            {{#each-in v as |key val|}}
-                <dt>{{key}}</dt>
-                <dd><OxiLabel @text={{val}} @raw={{false}} /></dd>
-            {{/each-in}}
-        </dl>
     {{else if (eq this.format "deflist")}}
         <dl>
             {{#each v as |val|}}

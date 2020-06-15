@@ -467,12 +467,11 @@ code
 
 Rendered with fixed-with typo, unix linebreaks are converted to html linebreaks.
 
-defhash/deflist
-^^^^^^^^^^^^^^^
+deflist
+^^^^^^^
 
-Outputs a key/value list (dl/dt/dd) - defhash expects a hash where keys are
-labels. deflist expects an array where each item is a hash with keys key and
-value.
+Outputs a key/value list (dl/dt/dd) - expects an array where each item is a
+hash with keys key and value.
 
 ullist
 ^^^^^^

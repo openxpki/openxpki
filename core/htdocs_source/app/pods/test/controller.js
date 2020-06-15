@@ -377,14 +377,6 @@ export default class TestController extends Controller {
                     "value": "Link to <a href=\"https://www.openxpki.org\">OpenXPKI</a>",
                 },
                 {
-                    "format": "defhash",
-                    "label": "defhash",
-                    "value": {
-                        "first": "PKI",
-                        "second": "OpenXPKI",
-                    },
-                },
-                {
                     "format": "deflist",
                     "label": "deflist",
                     "value": [

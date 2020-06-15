@@ -29,7 +29,6 @@ our %FORMAT_MAP = (
     ullist => { type => 'array' },
     rawlist => { type => 'array' },
     deflist => { type => 'array' },
-    defhash => { type => 'object' },
     cert_info => { _hint => 'if prefixed with "OXJSF1:" it is a JSON string.', },
     # FIXME: use enum from OpenXPKI::Server::API2::Types
     certstatus => { type => 'string', enum => [ qw( ISSUED REVOKED CRL_ISSUANCE_PENDING EXPIRED ) ] },
