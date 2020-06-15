@@ -76,7 +76,7 @@ sub init_issuer {
         content => {
             actions => [{
                 path => 'certificate!detail!identifier!{identifier}',
-                target => 'modal',
+                target => 'popup',
             }],
             columns => [
                 { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT" },

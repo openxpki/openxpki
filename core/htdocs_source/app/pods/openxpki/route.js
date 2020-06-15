@@ -15,7 +15,7 @@ class Content {
     @tracked structure = null;
     @tracked rtoken = null;
     @tracked status = null;
-    @tracked modal = null;
+    @tracked popup = null;
     @tracked tabs = [];
     @tracked navEntries = [];
     @tracked error = null;
@@ -123,10 +123,11 @@ export default class OpenXpkiRoute extends Route {
 
         // Fetch "targetElement" parameter for use in AJAX response handler later on.
         // Pseudo-target "self" is transformed so new content will be shown in the
-        // currently active place: a modal, an active tab or on top (i.e. single hidden tab)
+        // currently active place: a modal popup, an active tab or on top (i.e. single hidden tab)
         let targetElement = req.data.target || "self";
+        if (targetElement === "modal") targetElement = "popup"; // legacy naming
         if (targetElement === "self") {
-            if (this.content.modal) { targetElement = "modal" }
+            if (this.content.popup) { targetElement = "popup" }
             else if (this.content.tabs.length > 1) { targetElement = "active" }
             else { targetElement = "top" }
         }
@@ -143,7 +144,7 @@ export default class OpenXpkiRoute extends Route {
                 doc => {
                     // work with a copy of this.content
                     this.content.status = doc.status;
-                    this.content.modal = null;
+                    this.content.popup = null;
 
                     if (doc.ping) {
                         debug("openxpki/route - sendAjax response: \"ping\" " + doc.ping);
@@ -181,8 +182,8 @@ export default class OpenXpkiRoute extends Route {
                                 main: doc.main,
                                 right: doc.right
                             };
-                            if (targetElement === "modal") {
-                                this.content.modal = newTab;
+                            if (targetElement === "popup") {
+                                this.content.popup = newTab;
                             }
                             else if (targetElement === "tab") {
                                 let tabs = this.content.tabs;

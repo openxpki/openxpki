@@ -119,7 +119,7 @@ sub init_list {
             actions => [{
                 label => 'I18N_OPENXPKI_UI_CRL_VIEW_IN_BROWSER',
                 path => 'crl!detail!crl_key!{crl_key}',
-                target => 'modal',
+                target => 'popup',
             }],
             columns => [
                 { sTitle => "I18N_OPENXPKI_UI_CRL_SERIAL" },
@@ -225,7 +225,7 @@ sub __print_detail {
     if ($crl_hash->{max_revocation_id}) {
         push @fields, { label => 'I18N_OPENXPKI_UI_REVOCATION_ID', value => $crl_hash->{max_revocation_id} };
     }
-    
+
     my $crl_key = $crl_hash->{crl_key};
     my $base =  $self->_client()->_config()->{'scripturl'} . "?page=crl!download!crl_key!$crl_key!format!";
     my $pattern = '<li><a href="'.$base.'%s" target="_blank">%s</a></li>';

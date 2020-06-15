@@ -235,7 +235,7 @@ sub init_load {
 =head2 init_context
 
 Requires parameter I<wf_id> which is the id of an existing workflow.
-Shows the context as plain key/value pairs - usually called in a modal.
+Shows the context as plain key/value pairs - usually called in a popup.
 
 =cut
 
@@ -286,7 +286,7 @@ sub init_context {
 =head2 init_attribute
 
 Requires parameter I<wf_id> which is the id of an existing workflow.
-Shows the assigned attributes as plain key/value pairs - usually called in a modal.
+Shows the assigned attributes as plain key/value pairs - usually called in a popup.
 
 =cut
 
@@ -336,7 +336,7 @@ sub init_attribute {
 =head2 init_info
 
 Requires parameter I<wf_id> which is the id of an existing workflow.
-It loads the process information to be displayed in a modal box, used
+It loads the process information to be displayed in a modal popup, used
 mainly from the workflow search / result lists.
 
 =cut
@@ -675,7 +675,7 @@ sub init_result {
                 path => 'workflow!info!wf_id!{serial}',
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
                 icon => 'view',
-                target => 'modal',
+                target => 'popup',
             }],
             columns => $header,
             data => \@lines,
@@ -898,7 +898,7 @@ sub init_mine {
                 path => 'workflow!info!wf_id!{serial}',
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
                 icon => 'view',
-                target => 'modal',
+                target => 'popup',
             }],
             columns => $self->__default_grid_head(),
             data => \@result,
@@ -1661,7 +1661,7 @@ sub action_bulk {
                     path => 'workflow!info!wf_id!{serial}',
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
                     icon => 'view',
-                    target => 'modal',
+                    target => 'popup',
                 }],
                 columns => \@fault_head,
                 data => \@result_failed,
@@ -1688,7 +1688,7 @@ sub action_bulk {
                     path => 'workflow!info!wf_id!{serial}',
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
                     icon => 'view',
-                    target => 'modal',
+                    target => 'popup',
                 }],
                 columns => $self->__default_grid_head,
                 data => \@result_done,
@@ -2786,7 +2786,7 @@ sub __render_fields {
                 $item->{value}  = {
                     label => $label,
                     page => 'certificate!detail!identifier!'.$cert_identifier,
-                    target => 'modal',
+                    target => 'popup',
                     # label is usually formated to a human readable string
                     # but we sometimes need the raw value in the UI for extras
                     value => $cert_identifier,
@@ -3100,7 +3100,7 @@ sub __render_workflow_info {
                     template => $cfg->{link}->{page},
                     params => $wfdetails_info,
                 }),
-                target => $cfg->{link}->{target} || 'modal',
+                target => $cfg->{link}->{target} || 'popup',
             }
         }
 

@@ -113,7 +113,7 @@ Grids are rendered using the `jquery datatable plugin (http://datatables.net) <h
     {
         path => STRING_PATH, # will be submitted to server as page. terms enclosed in {brackets} will be evaluated as column-keys and replaced with the value of the given row for that column
         label => STRING, # visible menu entry
-        target => STRING_TARGET # optional, where to open the new page, one of main|right|modal|tab
+        target => STRING_TARGET # optional, where to open the new page, one of main|right|popup|tab
         icon => STRING , # optional, file name of image icon, must be placed in htdocs/img/contextmenu
     }
 
@@ -121,7 +121,7 @@ Grids are rendered using the `jquery datatable plugin (http://datatables.net) <h
 Columns, whose sTitle begin with an underscore will not be displayed but used as internal information (e.g. as path in GRID_ACTION_DEF). A column with the special title ``_status`` is used as css class for the row. Also a pulldown menu to filter by status will be displayed.
 The rows hold the data in form of a positional array.
 
-Action *target* ``modal`` creates a modal popup, ``tab`` inits or extends a tabbed window view in the current section.
+Action *target* ``popup`` creates a modal popup, ``tab`` inits or extends a tabbed window view in the current section.
 
 *Example*::
 
@@ -143,7 +143,7 @@ Action *target* ``modal`` creates a modal popup, ``tab`` inits or extends a tabb
                 path => 'cert!detail!{_id}',
                 label => 'Details',
                 icon => 'view',
-                target => 'modal'
+                target => 'popup'
             },
             {
                 path => 'cert!mail2issuer!{email}',
@@ -350,7 +350,7 @@ Defines a button. There are three modes, depending on which one of these paramet
 **Common parameters** for *page* and *action*::
 
     {
-        target => [main|modal|tab|active], # (optional, default is "main")
+        target => [main|popup|tab|active], # (optional, default is "main")
         label => STRING, # The label of the button
         tooltip => STRING, # (optional)
         className => STRING, # CSS class (optional)
@@ -365,7 +365,7 @@ Defines a button. There are three modes, depending on which one of these paramet
 *target*: determines where the contents returned by the server shall be displayed:
 
 - ``main`` - as main tab (close all other tabs)
-- ``modal`` - as a modal dialog
+- ``popup`` - as a modal popup
 - ``tab`` - in a new tab
 - ``active`` - in the active tab
 
@@ -438,7 +438,7 @@ Create an internal framework link to a page or action, expects a hash like::
     {
         label => STRING, #
         page => STRING, #
-        target => [_blank|main|modal|tab|active], # (optional, defaults to "modal")
+        target => [_blank|main|popup|tab|active], # (optional, defaults to "popup")
         tooltip => STRING, # (optional)
     }
 

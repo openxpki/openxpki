@@ -223,13 +223,13 @@ export default class TestController extends Controller {
                     "label": "Download",
                     "icon": "download",
                     "path": "certificate!detail!identifier!{identifier}",
-                    "target": "modal"
+                    "target": "popup"
                 },
                 {
                     "label": "Check",
                     "icon": "download",
                     "path": "certificate!detail!identifier!{identifier}",
-                    "target": "modal"
+                    "target": "popup"
                 }
             ],
             "columns": [
