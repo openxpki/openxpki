@@ -1,6 +1,6 @@
 <div class="row" {{did-insert @onInsert}}>
     <div class="col-md-8">
-        <BsDatetimepicker
+        <BsDatetimepicker {{did-insert this.datepickerReady}}
             @date={{this.value}}
             @useCurrent={{if this.value false true}}
             @format={{this.format}}

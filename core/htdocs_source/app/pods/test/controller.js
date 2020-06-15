@@ -73,6 +73,13 @@ export default class TestController extends Controller {
                 },
                 {
                     type: "datetime",
+                    name: "dt_now_preset",
+                    label: "Date, now (preset)",
+                    timezone: "local",
+                    value: "now",
+                },
+                {
+                    type: "datetime",
                     name: "dt_some_local",
                     label: "Date, 2020-03-03 03:33",
                     timezone: "local",
