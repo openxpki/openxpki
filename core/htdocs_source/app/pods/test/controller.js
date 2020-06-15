@@ -319,7 +319,7 @@ export default class TestController extends Controller {
                     "label": "certstatus",
                     "value": {
                         "value": "issued",
-                        "label": "Issued",
+                        "label": "<i>Issued</i>",
                         "tooltip": "It's issued",
                     },
                 },
@@ -357,6 +357,11 @@ export default class TestController extends Controller {
                     "value": "Link to <a href=\"should be escaped\">OpenXPKI</a>",
                 },
                 {
+                    "format": "text",
+                    "label": "text_as_list",
+                    "value": [ "CN=sista.example.org:pkiclient,", "DC=Test Deployment,", "DC=PKI Examples,", "DC=OpenXPKI,", "DC=org" ],
+                },
+                {
                     "format": "nl2br",
                     "label": "nl2br",
                     "value": "Link to <a href=\"should be escaped\">OpenXPKI</a>\nand a comment",
@@ -383,7 +388,7 @@ export default class TestController extends Controller {
                     "format": "deflist",
                     "label": "deflist",
                     "value": [
-                        { "label": "first", "value": "PKI" },
+                        { "label": "first", "value": "PKI <a href=\"should be escaped\">" },
                         { "label": "second", "value": "<a href=\"https://www.openxpki.org\">OpenXPKI</a>", "format": "raw" },
                     ],
                 },
