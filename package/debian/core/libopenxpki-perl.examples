@@ -1,6 +1,5 @@
 examples/openxpki-etc.tgz
 examples/contrib/sampleconfig.sh
-examples/contrib/apache2-openxpki.conf
 examples/contrib/apache2-openxpki-site.conf
 examples/contrib/logrotate.conf
 examples/contrib/sql/schema-mysql.sql

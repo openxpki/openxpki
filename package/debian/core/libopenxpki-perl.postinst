@@ -49,15 +49,11 @@ case "$1" in
                 chmod -R 750 /etc/openxpki/ca/
             fi
 
-            if [ -d /etc/apache2/conf-available/ ]; then
-                if [ ! -e /etc/apache2/conf-available/openxpki.conf ]; then
-                    cp /usr/share/doc/libopenxpki-perl/examples/apache2-openxpki.conf /etc/apache2/conf-available/openxpki.conf
-                    # Activate module, this creates the symlink in conf-available
-                    /usr/sbin/a2enconf openxpki
-                    /usr/sbin/a2enmod headers
-                fi;
+            if [ -d /etc/apache2/sites-available/ ]; then
                 if [ ! -e /etc/apache2/sites-available/openxpki.conf ]; then
                     cp /usr/share/doc/libopenxpki-perl/examples/apache2-openxpki-site.conf /etc/apache2/sites-available/openxpki.conf
+                    /usr/sbin/a2enmod headers
+                    /usr/sbin/a2ensite openxpki
                 fi;
             fi;
 
