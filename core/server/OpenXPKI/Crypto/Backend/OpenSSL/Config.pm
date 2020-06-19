@@ -527,8 +527,8 @@ sub __get_extensions
                 # only add keyUsage to config if configuration entries are present
                 $config .= "keyUsage = $critical";
                 $config .= "digitalSignature," if (grep /digital_signature/, @bits);
-            $config .= "nonRepudiation,"   if (grep /non_repudiation/,   @bits);
-            $config .= "keyEncipherment,"  if (grep /key_encipherment/,  @bits);
+                $config .= "nonRepudiation,"   if (grep /non_repudiation/,   @bits);
+                $config .= "keyEncipherment,"  if (grep /key_encipherment/,  @bits);
                 $config .= "dataEncipherment," if (grep /data_encipherment/, @bits);
                 $config .= "keyAgreement,"     if (grep /key_agreement/,     @bits);
                 $config .= "keyCertSign,"      if (grep /key_cert_sign/,     @bits);
@@ -630,8 +630,8 @@ sub __get_extensions
         {
             $config .= "nsComment = $critical\"";
             my $string =  join ("", @{$profile->get_extension("netscape.comment")});
-        # FIXME: this inserts a literal \n - is this intended?
-        $string =~ s/\n/\\\\n/g;
+            # FIXME: this inserts a literal \n - is this intended?
+            $string =~ s/\n/\\\\n/g;
             $config .= "$string\"\n";
         }
         else
@@ -642,13 +642,18 @@ sub __get_extensions
         }
     }
 
-    foreach my $oid(sort $profile->get_oid_extensions()) {
+    foreach my $oid (sort $profile->get_oid_extensions()) {
 
         # Single line OIDs have only one element in the array
         # Additional lines define a sequence
         my @val = @{$profile->get_extension($oid)};
         my $string = shift @val;
-        $config .= "$oid=$string\n";
+
+        if ($profile->is_critical_extension($oid)) {
+            $config .= "$oid=critical,$string\n";
+        } else {
+            $config .= "$oid=$string\n";
+        }
 
         # if there are lines left, it goes into the section part
         $sections .= join ("\n", @val)."\n\n";
