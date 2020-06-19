@@ -120,8 +120,12 @@ if ($cmd eq 'status') {
         }
     }
 
-    if ($params{'keep-temp-files'} && $params{'keep-temp-files'} eq 'yes') {
-        $args->{KEEP_TEMP} = 1;
+    if ($params{'keep-temp-files'}) {
+        if ($params{'keep-temp-files'} eq 'yes') {
+            $args->{KEEP_TEMP} = 1;
+        } else {
+            warn sprintf("You need to set --keep-temp-files to 'yes' ('%s' given) ", $params{'keep-temp-files'});
+        }
     }
 
     exit OpenXPKI::Control::start( $args );
@@ -293,4 +297,3 @@ The openxpkictl script returns a 0 exit value on success, and >0 if  an
 error occurs.
 
 =back
-
