@@ -114,18 +114,26 @@ sub execute {
         my $ca = pop @certs if ($chain->{complete});
 
         my $ttargs = {
+            cert_identifier => $cert_identifier,
             subject => ($chain->{subject}->[0]),
             certificate => shift @certs,
             ca => $ca,
             chain => \@certs,
             key =>  $key,
         };
-        ##! 32: 'values ' . Dumper $ttargs
+        ##! 32: $ttargs
 
         # shift/pop of the entity and ca from the ends of the list
-        my $config = $tt->render( $template, $ttargs );
-
-        $context->param( $target_key , $config);
+        my $export;
+        if (my $template_dir = $self->param('template_dir')) {
+            $template =~ s{[^\w-\.]}{}g;
+            ##! 64: "Render from file $template_dir/$template"
+            $export = $tt->render_from_file( "$template_dir/$template", $ttargs );
+        } else {
+            ##! 128: $template
+            $export = $tt->render( $template, $ttargs );
+        }
+        $context->param( $target_key , $export );
     }
 
     return 1;
@@ -160,11 +168,17 @@ Mandatory if the private key can not be found in the datapool.
 
 =item template
 
-A template toolkit string to be used to render the output. The parser is
-called with five parameters. Certificates are PEM encoded, keys might be
-in binary format, depending on the key_format parameter!
+A template toolkit string or, in conjunction with I<template_dir>, the name of
+a template file to be used to render the output.
+
+The parser is called with six parameters. Certificates are PEM encoded, keys
+might be in binary format, depending on the key_format parameter!
 
 =over
+
+=item cert_identifier
+
+The cert_identifier
 
 =item certificate
 
@@ -189,6 +203,11 @@ value. Obviously, keys are only available if created or imported.
 An ARRAY of PEM encoded intermediates, might be empty.
 
 =back
+
+=item template_dir
+
+Optional, if set then I<template> is considered to be a filename in
+I<template_dir> that contains the template string.
 
 =item key_password
 
@@ -236,4 +255,3 @@ Note: If you export a key and use a persisted workflow, this will leave the
 (password protected) key readable in the context forever.
 
 =back
-

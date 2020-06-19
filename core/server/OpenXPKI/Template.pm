@@ -41,6 +41,7 @@ result is returned as a string, if processing fails, an OpenXPKI::Exception is
 thrown.
 
 =cut
+
 sub render {
 
     my $self = shift;
@@ -82,6 +83,40 @@ sub render {
     ##! 32: 'output: #' . $out . '#'
 
     return $out;
+
+}
+
+=head2 render_from_file
+
+Expects a filename instead of a template string as first argument and uses the
+content of this file as template string. The second parameter is passed
+unmodified to render as template arguments.
+
+Return undef if the file can not be read or is empty.
+
+=cut
+
+sub render_from_file {
+
+    ##! 4: 'start'
+    my $self = shift;
+    my $filename = shift;
+    my $tt_param = shift;
+
+    ##! 16: 'Load template: ' . $filename
+    if (! -e $filename || ! -r $filename ) {
+        CTX('log')->system()->warn("Template file $filename does not exist");
+        return undef;
+    }
+
+    my $template = OpenXPKI::FileUtils->read_file( $filename, 'utf8' );
+
+    if (!defined $template || $template eq "") {
+        CTX('log')->system()->warn("Template file $filename is empty");
+        return undef;
+    }
+
+    return $self->render($template, $tt_param);
 
 }
 
