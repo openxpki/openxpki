@@ -53,8 +53,6 @@
         <span class="styled-{{this.styledValue.style}}">{{this.styledValue.label}}</span>
     {{else if (eq this.format "tooltip")}}
         <OxiLabel @text={{v.value}} @tooltip={{v.tooltip}} @raw={{false}} />
-    {{else if (eq this.format "head")}}
-        1
     {{/if}}
 
 {{/let}}

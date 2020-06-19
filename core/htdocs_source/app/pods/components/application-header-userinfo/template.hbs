@@ -2,12 +2,13 @@
     {{#let this.openxpki.model.user as |u|}}
         <div class="userinfo">
             <ul class="nav">
+                {{!-- template-lint-disable no-bare-strings --}}
                 <li class="text-right">
-                    Signed in as:
+                    {{t 'userinfo.name'}}
                     <strong>{{u.realname}} <span class="user_role">({{u.role}})</span></strong>
                 </li>
                 <li class="text-right">
-                    Realm:
+                    {{t 'userinfo.realm'}}
                     <strong>{{u.pki_realm_label}} <span class="pki_realm">({{u.pki_realm}})</span></strong>
                 </li>
             </ul>

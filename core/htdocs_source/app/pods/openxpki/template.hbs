@@ -40,7 +40,7 @@
             {{#if this.model.user}}
                 <nav.item>
                     <nav.linkTo @route="openxpki" @model="logout">
-                        Log out
+                        {{t 'site.logout'}}
                     </nav.linkTo>
                 </nav.item>
             {{/if}}
@@ -85,7 +85,10 @@
                 <li class="{{if entry.active "active"}}">
                     <a {{action "activateTab" entry}}>
                         {{if entry.page.shortlabel entry.page.shortlabel entry.page.label}}
-                        <span class="tab-close" {{action "closeTab" entry}}>&times;</span>
+                        <span class="tab-close" {{action "closeTab" entry}}>
+                            {{!-- template-lint-disable no-bare-strings --}}
+                            &times;
+                        </span>
                     </a>
                 </li>
             {{/each}}
@@ -137,7 +140,7 @@
             {{/each}}
         </Modal.body>
         <Modal.footer>
-            <BsButton @onClick={{action Modal.close}}>Close</BsButton>
+            <BsButton @onClick={{action Modal.close}}>{{t 'site.close_popup'}}</BsButton>
         </Modal.footer>
     </BsModal>
 {{/let}}
@@ -151,21 +154,21 @@
     as |Modal|
 >
     <Modal.header>
-        <h4 class="modal-title">Application Error</h4>
+        <h4 class="modal-title">{{t 'error_popup.header'}}</h4>
     </Modal.header>
     <Modal.body>
         {{{this.model.error.message}}}
     </Modal.body>
     <Modal.footer>
-        <BsButton @onClick={{action "reload"}} @type="primary">Reload application</BsButton>
-        <BsButton @onClick={{action Modal.close}}>Close</BsButton>
+        <BsButton @onClick={{action "reload"}} @type="primary">{{t 'error_popup.reload'}}</BsButton>
+        <BsButton @onClick={{action Modal.close}}>{{t 'site.close_popup'}}</BsButton>
     </Modal.footer>
 </BsModal>
 
 {{#if this.model.refresh}}
 <div class="progress refresh">
     <div class="progress-bar progress-bar-striped progress-bar-info active" role="progressbar">
-        Autorefresh
+        {{t 'site.autorefresh'}}
     </div>
 </div>
 {{/if}}
@@ -173,7 +176,7 @@
 {{#if this.model.isLoading}}
 <div class="progress loading">
     <div class="progress-bar progress-bar-striped progress-bar-info active" role="progressbar">
-        Loading
+        {{t 'site.loading'}}
     </div>
 </div>
 {{/if}}

@@ -24,6 +24,7 @@ class Content {
 
 export default class OpenXpkiRoute extends Route {
     @service('oxi-config') config;
+    @service('intl') intl;
 
     // Reserved Ember property "queryParams"
     // https://api.emberjs.com/ember/3.17/classes/Route/properties/queryParams?anchor=queryParams
@@ -171,6 +172,12 @@ export default class OpenXpkiRoute extends Route {
                         this.content.navEntries = doc.structure; this.updateNavEntryActiveState();
                         this.content.user = doc.user;
                         this.content.rtoken = doc.rtoken;
+
+                        // set locale
+                        if (doc.language) {
+                            debug("openxpki/route - sendAjax response: setting locale to " + doc.language);
+                            this.intl.setLocale([doc.language]);
+                        }
                     }
                     else {
                         if (doc.page && doc.main) {
@@ -207,7 +214,7 @@ export default class OpenXpkiRoute extends Route {
                 () => {
                     this.content.isLoading = false;
                     this.content.error = {
-                        message: "The server did not return JSON data as expected.\nMaybe your authentication session has expired."
+                        message: this.intl.t('error_popup.message')
                     };
                     return resolve({});
                 }
