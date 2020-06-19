@@ -86,16 +86,16 @@ sub load_extension
 
     ## is this a critical extension?
 
-    my $critical = $config->get([ @basepath, 'critical' ]);
-
-    if ($critical) {
-        $critical = 'true';
-    } else {
-        if (!(defined $critical || $ext eq 'oid' )) {
+    my $critical;
+    if ($ext !~ m{(oid|ocsp_nocheck)}) {
+        $critical = $config->get([ @basepath, 'critical' ]);
+        if ($critical) {
+            $critical = 'true';
+        } elsif (defined $critical) {
+             $critical = 'false';
+        } else {
             CTX('log')->application()->warn("Critical flag is not set for $ext in profile $profile_path!");
-
         }
-        $critical = 'false';
     }
 
     if ($ext eq "basic_constraints")
@@ -292,7 +292,7 @@ sub load_extension
             if ($attr->{encoding} eq 'SEQUENCE') {
                 $self->set_oid_extension_sequence(
                     NAME => $name,
-                    CRITICAL => $attr->{critical} ? 'true' : 'false',
+                    CRITICAL => ($attr->{critical} ? 'true' : 'false'),
                     VALUES   => $attr->{value}
                 );
             } else {
@@ -310,9 +310,20 @@ sub load_extension
                 @values = ( $val );
 
                 $self->set_extension(NAME => $name,
-                    CRITICAL => $attr->{critical} ? 'true' : 'false',
+                    CRITICAL => ($attr->{critical} ? 'true' : 'false'),
                     VALUES   => [@values]);
             }
+        }
+    }
+    elsif ($ext eq "ocsp_nocheck")
+    {
+        if ($config->get([ @basepath ]))
+        {
+            $self->set_extension (
+                NAME => "1.3.6.1.5.5.7.48.1.5",
+                CRITICAL => "false",
+                VALUES   => [ "ASN1:NULL" ],
+            );
         }
     }
     elsif ($ext eq "netscape.comment")
@@ -707,5 +718,3 @@ sub AUTOLOAD {
 
 1;
 __END__
-
-

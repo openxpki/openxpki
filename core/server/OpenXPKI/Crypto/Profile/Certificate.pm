@@ -181,7 +181,7 @@ sub __load_profile
     foreach my $ext ("basic_constraints", "key_usage", "extended_key_usage",
                      "subject_key_identifier", "authority_key_identifier",
                      "issuer_alt_name", "crl_distribution_points", "authority_info_access",
-                     "policy_identifier", "oid",
+                     "policy_identifier", "oid", "ocsp_nocheck",
                      "netscape.comment", "netscape.certificate_type", "netscape.cdp")
     {
         ##! 16: "Load extension $profile_name, $ext"
@@ -295,4 +295,3 @@ sub set_subject_alt_name {
 }
 1;
 __END__
-
