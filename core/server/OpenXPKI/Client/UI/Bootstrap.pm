@@ -7,7 +7,7 @@ package OpenXPKI::Client::UI::Bootstrap;
 use Moose;
 use Data::Dumper;
 use Digest::SHA qw(sha1_hex);
-use OpenXPKI::i18n qw( i18nTokenizer );
+use OpenXPKI::i18n qw( i18nTokenizer get_language );
 
 extends 'OpenXPKI::Client::UI::Result';
 
@@ -22,6 +22,7 @@ sub init_structure {
         $session->param('rtoken', sha1_hex( $$. $session->id() . rand(2**32) ) );
     }
     $self->_result()->{rtoken} = $session->param('rtoken');
+    $self->_result()->{language} = get_language();
 
     if ($session->param('is_logged_in') && $user) {
         $self->_result()->{user} = $user;

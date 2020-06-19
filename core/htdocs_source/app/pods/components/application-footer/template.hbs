@@ -3,8 +3,9 @@
         {{#if this.config.footer}}
             {{{this.config.footer}}}
         {{else}}
+            {{!-- template-lint-disable no-bare-strings --}}
             <p class="text-center text-muted credit">
-                &copy; Copyright {{this.config.copyrightYear}} &ndash; <a href="http://www.openxpki.org/">The OpenXPKI Project</a>
+                &copy; {{t 'site.copyright' year=this.config.copyrightYear}} &ndash; <a href="http://www.openxpki.org/">{{t 'site.author'}}</a>
             </p>
         {{/if}}
     </div>

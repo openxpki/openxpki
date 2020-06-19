@@ -15,7 +15,7 @@ class Content {
     @tracked structure = null;
     @tracked rtoken = null;
     @tracked status = null;
-    @tracked modal = null;
+    @tracked popup = null;
     @tracked tabs = [];
     @tracked navEntries = [];
     @tracked error = null;
@@ -24,6 +24,7 @@ class Content {
 
 export default class OpenXpkiRoute extends Route {
     @service('oxi-config') config;
+    @service('intl') intl;
 
     // Reserved Ember property "queryParams"
     // https://api.emberjs.com/ember/3.17/classes/Route/properties/queryParams?anchor=queryParams
@@ -123,10 +124,11 @@ export default class OpenXpkiRoute extends Route {
 
         // Fetch "targetElement" parameter for use in AJAX response handler later on.
         // Pseudo-target "self" is transformed so new content will be shown in the
-        // currently active place: a modal, an active tab or on top (i.e. single hidden tab)
+        // currently active place: a modal popup, an active tab or on top (i.e. single hidden tab)
         let targetElement = req.data.target || "self";
+        if (targetElement === "modal") targetElement = "popup"; // legacy naming
         if (targetElement === "self") {
-            if (this.content.modal) { targetElement = "modal" }
+            if (this.content.popup) { targetElement = "popup" }
             else if (this.content.tabs.length > 1) { targetElement = "active" }
             else { targetElement = "top" }
         }
@@ -143,7 +145,7 @@ export default class OpenXpkiRoute extends Route {
                 doc => {
                     // work with a copy of this.content
                     this.content.status = doc.status;
-                    this.content.modal = null;
+                    this.content.popup = null;
 
                     if (doc.ping) {
                         debug("openxpki/route - sendAjax response: \"ping\" " + doc.ping);
@@ -170,6 +172,12 @@ export default class OpenXpkiRoute extends Route {
                         this.content.navEntries = doc.structure; this.updateNavEntryActiveState();
                         this.content.user = doc.user;
                         this.content.rtoken = doc.rtoken;
+
+                        // set locale
+                        if (doc.language) {
+                            debug("openxpki/route - sendAjax response: setting locale to " + doc.language);
+                            this.intl.setLocale([doc.language]);
+                        }
                     }
                     else {
                         if (doc.page && doc.main) {
@@ -181,8 +189,8 @@ export default class OpenXpkiRoute extends Route {
                                 main: doc.main,
                                 right: doc.right
                             };
-                            if (targetElement === "modal") {
-                                this.content.modal = newTab;
+                            if (targetElement === "popup") {
+                                this.content.popup = newTab;
                             }
                             else if (targetElement === "tab") {
                                 let tabs = this.content.tabs;
@@ -206,7 +214,7 @@ export default class OpenXpkiRoute extends Route {
                 () => {
                     this.content.isLoading = false;
                     this.content.error = {
-                        message: "The server did not return JSON data as expected.\nMaybe your authentication session has expired."
+                        message: this.intl.t('error_popup.message')
                     };
                     return resolve({});
                 }

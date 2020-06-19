@@ -272,7 +272,7 @@ sub init_result {
                 path => 'certificate!detail!identifier!{identifier}',
                 label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL',
                 icon => 'download',
-                target => 'modal'
+                target => 'popup'
             }],
             columns => $header,
             data => \@result,
@@ -544,7 +544,7 @@ sub init_mine {
                 path => 'certificate!detail!identifier!{identifier}',
                 label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL',
                 icon => 'download',
-                target => 'modal'
+                target => 'popup'
             }],
             columns => $self->__default_grid_head(),
             data => \@result,
@@ -762,7 +762,7 @@ sub init_detail {
 
 =head2 init_text
 
-Show the PEM block as text in a modal
+Show the PEM block as text in a popup
 
 =cut
 

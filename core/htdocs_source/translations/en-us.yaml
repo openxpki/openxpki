@@ -1,0 +1,36 @@
+site:
+  copyright: "Copyright {year}"
+  author: "The OpenXPKI Project"
+  header: "Open Source Trustcenter"
+  logout: "Log out"
+  autorefresh: "Autorefresh"
+  loading: "Loading..."
+  close_popup: "Close"
+
+userinfo:
+  name: "Signed in as"
+  realm: "Realm:"
+
+error_popup:
+  header: "Application Error"
+  message: "The server did not return JSON data as expected. Maybe your authentication session has expired or there is an internal error."
+  reload: "Reload application"
+
+pagination:
+  items_per_page: "Items per page"
+  x_items: "{count} Items"
+  previous: "Previous"
+  next: "Next"
+
+component:
+  oxifield_datetime:
+    timezone: "Timezone: {tz}"
+  oxifield_select:
+    custom_value: "Custom"
+  oxifield_cert_identifier:
+    no_matches: "No matches found"
+  oxifield_uploadarea:
+    reset: "Reset"
+    open: "Open file"
+  oxisection_grid:
+    select_all: "all"

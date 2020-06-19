@@ -3,51 +3,48 @@
 {{#let @content.value as |v|}}
 
     {{#if (eq this.format "certstatus")}}
-        <span class="certstatus-{{lc (try v.value v.label)}}" title={{v.tooltip}}>{{{defuse v.label}}}</span>
+        <OxiLabel @class="certstatus-{{lc (try v.value v.label)}}" @tooltip={{v.tooltip}} @text={{v.label}} @raw={{true}} />
     {{else if (eq this.format "link")}}
-        <a href="#/openxpki/{{v.page}}" target={{try v.target "modal"}} title={{v.tooltip}}>{{{defuse v.label}}}</a>
+        <a href="#/openxpki/{{v.page}}" target={{try v.target "popup"}} title={{v.tooltip}}>
+            <OxiLabel @text={{v.label}} @raw={{true}} />
+        </a>
     {{else if (eq this.format "extlink")}}
-        <a href={{v.page}} target={{try v.target "_blank"}} title={{v.tooltip}}>{{{defuse v.label}}}</a>
+        <a href={{v.page}} target={{try v.target "_blank"}} title={{v.tooltip}}>
+            <OxiLabel @text={{v.label}} @raw={{true}} />
+        </a>
     {{else if (eq this.format "timestamp")}}
         {{this.timestamp}}
     {{else if (eq this.format "datetime")}}
         {{this.datetime}}
     {{else if (eq this.format "text")}}
-        {{v}}
+        <OxiLabel @text={{v}} @raw={{false}} />
     {{else if (eq this.format "nl2br")}}
         {{#each this.valueSplitByNewline as |line|}} {{line}}<br> {{/each}}
     {{else if (eq this.format "code")}}
         <code>{{this.valueStr}}</code>
     {{else if (eq this.format "raw")}}
         {{{defuse this.valueStr}}}
-    {{else if (eq this.format "defhash")}}
-        <dl>
-            {{#each-in v as |key val|}}
-                <dt>{{key}}</dt>
-                <dd>{{val}}</dd>
-            {{/each-in}}
-        </dl>
     {{else if (eq this.format "deflist")}}
         <dl>
             {{#each v as |val|}}
                 <dt>{{val.label}}</dt>
-                <dd>{{#if (eq val.format "raw")}} {{{val.value}}} {{else}} {{val.value}} {{/if}}</dd>
+                <dd><OxiLabel @text={{val.value}} @raw={{eq val.format "raw"}} /></dd>
             {{/each}}
         </dl>
     {{else if (eq this.format "ullist")}}
         <ul class="list-unstyled">
-            {{#each v as |val|}} <li>{{val}}</li> {{/each}}
+            {{#each v as |val|}} <li><OxiLabel @text={{val}} @raw={{false}} /></li> {{/each}}
         </ul>
     {{else if (eq this.format "rawlist")}}
         <ul class="list-unstyled">
-            {{#each v as |val|}} <li>{{{defuse val}}}</li> {{/each}}
+            {{#each v as |val|}} <li><OxiLabel @text={{val}} @raw={{true}} /> </li> {{/each}}
         </ul>
     {{else if (eq this.format "linklist")}}
         <ul class="list-unstyled">
             {{#each v as |val|}}
                 <li>
-                    <a href="#/openxpki/{{val.page}}" target={{try val.target "modal"}} title={{val.tooltip}}>
-                        {{{defuse val.label}}}
+                    <a href="#/openxpki/{{val.page}}" target={{try val.target "popup"}} title={{val.tooltip}}>
+                        <OxiLabel @text={{val.label}} @raw={{true}} />
                     </a>
                 </li>
             {{/each}}
@@ -55,9 +52,7 @@
     {{else if (eq this.format "styled")}}
         <span class="styled-{{this.styledValue.style}}">{{this.styledValue.label}}</span>
     {{else if (eq this.format "tooltip")}}
-        <span title={{v.tooltip}}>{{v.value}}</span>
-    {{else if (eq this.format "head")}}
-        1
+        <OxiLabel @text={{v.value}} @tooltip={{v.tooltip}} @raw={{false}} />
     {{/if}}
 
 {{/let}}

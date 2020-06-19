@@ -73,6 +73,13 @@ export default class TestController extends Controller {
                 },
                 {
                     type: "datetime",
+                    name: "dt_now_preset",
+                    label: "Date, now (preset)",
+                    timezone: "local",
+                    value: "now",
+                },
+                {
+                    type: "datetime",
                     name: "dt_some_local",
                     label: "Date, 2020-03-03 03:33",
                     timezone: "local",
@@ -216,13 +223,13 @@ export default class TestController extends Controller {
                     "label": "Download",
                     "icon": "download",
                     "path": "certificate!detail!identifier!{identifier}",
-                    "target": "modal"
+                    "target": "popup"
                 },
                 {
                     "label": "Check",
                     "icon": "download",
                     "path": "certificate!detail!identifier!{identifier}",
-                    "target": "modal"
+                    "target": "popup"
                 }
             ],
             "columns": [
@@ -312,7 +319,7 @@ export default class TestController extends Controller {
                     "label": "certstatus",
                     "value": {
                         "value": "issued",
-                        "label": "Issued",
+                        "label": "<i>Issued</i>",
                         "tooltip": "It's issued",
                     },
                 },
@@ -350,6 +357,11 @@ export default class TestController extends Controller {
                     "value": "Link to <a href=\"should be escaped\">OpenXPKI</a>",
                 },
                 {
+                    "format": "text",
+                    "label": "text_as_list",
+                    "value": [ "CN=sista.example.org:pkiclient,", "DC=Test Deployment,", "DC=PKI Examples,", "DC=OpenXPKI,", "DC=org" ],
+                },
+                {
                     "format": "nl2br",
                     "label": "nl2br",
                     "value": "Link to <a href=\"should be escaped\">OpenXPKI</a>\nand a comment",
@@ -365,18 +377,10 @@ export default class TestController extends Controller {
                     "value": "Link to <a href=\"https://www.openxpki.org\">OpenXPKI</a>",
                 },
                 {
-                    "format": "defhash",
-                    "label": "defhash",
-                    "value": {
-                        "first": "PKI",
-                        "second": "OpenXPKI",
-                    },
-                },
-                {
                     "format": "deflist",
                     "label": "deflist",
                     "value": [
-                        { "label": "first", "value": "PKI" },
+                        { "label": "first", "value": "PKI <a href=\"should be escaped\">" },
                         { "label": "second", "value": "<a href=\"https://www.openxpki.org\">OpenXPKI</a>", "format": "raw" },
                     ],
                 },

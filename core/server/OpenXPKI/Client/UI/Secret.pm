@@ -39,7 +39,7 @@ sub init_index {
         content => {
             actions => [{
                 path => 'secret!manage!id!{_id}',
-                target => 'modal',
+                target => 'popup',
             }],
             columns => [
                 { sTitle => "Name" },

@@ -1,0 +1,36 @@
+site:
+  copyright: "Copyright {year}"
+  author: "Das OpenXPKI-Projekt"
+  header: "Open Source Trustcenter"
+  logout: "Abmelden"
+  autorefresh: "Auto-Aktualisierung"
+  loading: "Laden..."
+  close_popup: "Schließen"
+
+userinfo:
+  name: "Angemeldet als"
+  realm: "Realm:"
+
+error_popup:
+  header: "Anwendungsfehler"
+  message: "Der Server lieferte nicht die erwarteten JSON-Daten. Eventuell ist Ihre Sitzung abgelaufen oder es liegt ein interner Fehler vor."
+  reload: "Anwendung neu laden"
+
+pagination:
+  items_per_page: "Einträge pro Seite"
+  x_items: "{count} Einträge"
+  previous: "Vorherige"
+  next: "Nächste"
+
+component:
+  oxifield_datetime:
+    timezone: "Zeitzone: {tz}"
+  oxifield_select:
+    custom_value: "Angepasst"
+  oxifield_cert_identifier:
+    no_matches: "Keine Zertifikate gefunden"
+  oxifield_uploadarea:
+    reset: "Leeren"
+    open: "Datei öffnen"
+  oxisection_grid:
+    select_all: "alle"
