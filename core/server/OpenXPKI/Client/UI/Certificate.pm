@@ -616,9 +616,12 @@ sub init_detail {
         shortlabel => $dn{CN}[0]
     });
 
-    my @fields = ( { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', format => 'link',  value =>
-        { page => 'certificate!search!subject!'.uri_escape_utf8($cert->{subject}), label => $cert->{subject},
-          target => '_top', tooltip => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SUBJECT' }});
+    my @fields = ( { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', format => 'link',  value => {
+            page => 'certificate!search!subject!'.uri_escape_utf8($cert->{subject}),
+            label => $self-> __prepare_dn_for_display($cert->{subject}),
+            target => '_top',
+            tooltip => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SUBJECT'
+        }});
 
     if ($cert_attribute && $cert_attribute->{subject_alt_name}) {
         my @sanlist = map {
@@ -673,8 +676,11 @@ sub init_detail {
             value => $cert->{status},
             tooltip => $status_tooltip,
         }},
-        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER', format => 'link', tooltip => 'I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_ISSUER_LINK',
-            value => { label => $cert->{issuer_dn}, page => 'certificate!chain!identifier!'. $cert_identifier } },
+        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER', format => 'link', value => {
+            label => $self-> __prepare_dn_for_display($cert->{issuer_dn}),
+            page => 'certificate!chain!identifier!'. $cert_identifier,
+            tooltip => 'I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_ISSUER_LINK',
+        }},
     );
 
     # certificate metadata
@@ -1464,4 +1470,17 @@ sub __render_list_spec {
 
     return ( \@header, \@column, \@attrib );
 }
+
+sub __prepare_dn_for_display {
+
+    my $self = shift;
+    my $dn = shift;
+    my @dn = OpenXPKI::DN->new( $dn )->get_rdns();
+    for (my $ii=1; $ii < @dn; $ii++ ) {
+        $dn[$ii-1] .= ',';
+    }
+    return \@dn;
+}
+
+
 1;
