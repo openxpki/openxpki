@@ -1,3 +1,4 @@
+
 #!/usr/bin/perl
 
 use lib qw(../lib);
@@ -16,7 +17,7 @@ use Crypt::PKCS10;
 #Log::Log4perl->easy_init($DEBUG);
 Log::Log4perl->easy_init($ERROR);
 
-use Test::More tests => 9;
+use Test::More tests => 10;
 
 package main;
 
@@ -70,6 +71,7 @@ ok($response->is_success);
 
 $json = JSON->new->decode($response->decoded_content);
 is($wf_id,  $json->{result}->{id}, 'Pickup with same id');
+is($json->{result}->{data}->{error_code}, "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_AUTHENTICATED");
 
 # pickup with text/plain
 
@@ -83,4 +85,4 @@ $response = $ua->post('https://localhost/rpc/request', [
 );
 ok($response->is_success);
 like($response->decoded_content,qr/id=$wf_id/);
-like($response->decoded_content,qr/data.error_code=I18N_OPENXPKI_UI_ENROLLMENT_ERROR_SIGNER_NOT_AUTHORIZED/);
+like($response->decoded_content,qr/data.error_code=I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_AUTHENTICATED/);
