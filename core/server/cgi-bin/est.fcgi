@@ -15,6 +15,7 @@ use Digest::SHA qw(sha1_hex);
 use OpenXPKI::Exception;
 use OpenXPKI::Client::Simple;
 use OpenXPKI::Client::Config;
+use OpenXPKI::Client::RPC;
 use OpenXPKI::Serialization::Simple;
 
 use Log::Log4perl;
@@ -32,7 +33,8 @@ while (my $cgi = CGI::Fast->new()) {
     # /.well-known/est/cacerts
     # or with a label /.well-known/est/namedservice/cacerts
     # Supported operations are
-    # cacerts, simpleenroll, simplereenroll, fullcmc, serverkeygen, csrattrs
+    # cacerts, simpleenroll, simplereenroll, , csrattrs
+    # serverkeygen and fullcmc is not supported
 
     $log->debug('Incoming request ' . $ENV{REQUEST_URI});
     $ENV{REQUEST_URI} =~ m{.well-known/est/((\w+)/)?(cacerts|simpleenroll|simplereenroll|csrattrs)};
@@ -111,18 +113,15 @@ while (my $cgi = CGI::Fast->new()) {
 
     }
 
-    # create the client object
-    my $client = OpenXPKI::Client::Simple->new({
-        logger => $log,
-        config => $conf->{global}, # realm and locale
-        auth => $conf->{auth}, # auth config
-    });
+    # we reuse the pickup stuff and the backend factory from RPC
+    my $rpc = OpenXPKI::Client::RPC->new( config => $config );
 
+    # create the client object
+    my $client = $rpc->backend();
     if ( !$client ) {
         print $cgi->header( -status => '500 Internal Server Error');
         next;
     }
-
 
     my $out;
     my $mime = "application/pkcs7-mime; smime-type=certs-only";
@@ -174,47 +173,60 @@ while (my $cgi = CGI::Fast->new()) {
             print $cgi->header( -status => '400 Bad Request');
             next;
         }
+
+        # fall back to simpleneroll config for simplereenroll if not set
+        $operation = "simpleenroll" unless ($conf->{simplereenroll});
+
+        my $pickup_config = {(
+            workflow => 'certificate_enroll',
+            pickup => 'pkcs10',
+            pickup_attribute => 'transaction_id',
+            ),
+            %{$conf->{$operation}},
+        };
+        $log->debug(Dumper $pickup_config);
+
         my $transaction_id = sha1_hex($decoded->csrRequest);
-        $param->{pkcs10} = $decoded->csrRequest(1);
-
-        Log::Log4perl::MDC->put('tid', $transaction_id);
-        $param->{transaction_id} = $transaction_id;
-
-        my $workflow_type = $conf->{simpleenroll}->{workflow} || 'certificate_enroll';
-
-        my $wfl = $client->run_command('search_workflow_instances', {
-            type => $workflow_type,
-            attribute => { transaction_id => $transaction_id },
-            limit => 2
-        });
 
         my $workflow;
-        if (@$wfl > 1) {
+        eval {
 
-            print $cgi->header( -status => '500 Internal Server Error');
-            print 'Internal Server Error';
-            $log->error('Internal Server Error - ambigous workflow result on transaction id ' .$transaction_id);
-            $client->disconnect();
+            $param->{pkcs10} = $decoded->csrRequest(1);
+            Log::Log4perl::MDC->put('tid', $transaction_id);
+            $param->{transaction_id} = $transaction_id;
 
-        } elsif (@$wfl == 1) {
-            my $wf_id = $wfl->[0]->{workflow_id};
-            $log->info('Found workflow - reload ' .$wf_id );
-            eval {
+            # check for pickup parameter
+            my $pickup_value;
+            # namespace needs a single value
+            if ($pickup_config->{pickup_workflow}) {
+                # explicit pickup paramters are set
+                my @keys = split /\s*,\s*/, $pickup_config->{pickup};
+                foreach my $key (@keys) {
+                    # take value from param hash if defined, this makes data
+                    # from the environment avail to the pickup workflow
+                    my $val = $param->{$key} // $cgi->param($key);
+                    $pickup_value->{$key} = $val if (defined $val);
+                }
+            } else {
+                # pickup via transaction_id
+                $pickup_value = $transaction_id;
+            }
+
+            # try pickup
+            $workflow = $rpc->pickup_workflow($pickup_config, $pickup_value);
+
+            # pickup return undef if no workflow was found - start new one
+            if (!$workflow) {
+                $log->debug(sprintf("Initialize %s with params %s",
+                    $pickup_config->{workflow}, join(", ", keys %{$param})));
                 $workflow = $client->handle_workflow({
-                    type => $workflow_type,
-                    id => $wf_id
+                    type => $pickup_config->{workflow},
+                    params => $param,
                 });
-            };
-        } else {
-            eval {
-                $workflow = $client->handle_workflow({
-                    type => $workflow_type,
-                    params => $param
-                });
-            };
-            $log->info('Started new workflow ' . $workflow->{id});
-            $log->trace( 'Workflow Params '  . Dumper $param);
-        }
+            }
+
+            $log->trace( 'Workflow info '  . Dumper $workflow ) if ($log->is_trace());
+        };
 
         if (!$workflow || ( $workflow->{'proc_state'} ne 'finished' && !$workflow->{id} ) || $workflow->{'proc_state'} eq 'exception') {
             print $cgi->header( -status => '500 Internal Server Error');
@@ -225,7 +237,20 @@ while (my $cgi = CGI::Fast->new()) {
         }
 
         if ($workflow->{'proc_state'} ne 'finished') {
-            print $cgi->header( -status => '202 Request Pending - Retry Later ($transaction_id)', "-retry-after" => 300 );
+
+            # the workflow might have another idea to calculate the transaction_id
+            # so if its set in the result we overwrite the initial sha1 hash
+            if ($workflow->{context}->{transaction_id}) {
+                $transaction_id = $workflow->{context}->{transaction_id};
+            }
+
+            my $retry_after = 300;
+            if ($workflow->{'proc_state'} eq 'pause') {
+                my $delay = $workflow->{'wake_up_at'} - time();
+                $retry_after = ($delay > 30) ? $delay : 30;
+            }
+
+            print $cgi->header( -status => "202 Request Pending - Retry Later ($transaction_id)", "-retry-after" => $retry_after );
             print "202 Request Pending - Retry Later ($transaction_id)";
             $log->info('Request Pending - ' . $workflow->{'state'});
             $client->disconnect();

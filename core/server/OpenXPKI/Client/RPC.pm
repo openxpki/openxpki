@@ -60,8 +60,6 @@ sub pickup_workflow {
 
     } elsif ($config->{pickup_namespace}) {
 
-        die "The parameters pickup_attribute and pickup_namespace are mutually exclusive" if ($config->{pickup_attribute});
-
         $client->logger()->debug("Pickup via datapool with $config->{pickup_namespace} => $pickup_value" );
         my $wfl = $client->run_command('get_data_pool_entry', {
             namespace => $config->{pickup_namespace},

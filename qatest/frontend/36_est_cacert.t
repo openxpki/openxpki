@@ -72,6 +72,13 @@ my $pkcs10 = `openssl req -new -subj "/CN=est-test.openxpki.org" -nodes -newkey 
 $response = $ua->post("https://$host/.well-known/est/simpleenroll",
     Content_Type => 'application/pkcs10', Content => $pkcs10 );
 
+while ($response->code == 202) {
+    diag($response->status_line);
+    sleep 3;
+    $response = $ua->post("https://$host/.well-known/est/simpleenroll",
+        Content_Type => 'application/pkcs10', Content => $pkcs10 );
+}
+
 $length = $response->header( 'Content-Length' );
 $body = $response->decoded_content;
 
