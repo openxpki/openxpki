@@ -100,16 +100,16 @@ before '_route_call' => sub {
     # system or realm acces - no prefix
     if ( substr ($location, 0, 6) eq 'system' || substr($location, 0, 5) eq 'realm' ) {
         ##! 16: "_route_call: system or explicit realm value, reset connector offsets"
-        $self->_config()->{''}->PREFIX('');
+        $self->PREFIX('');
     } else {
         my $session = CTX('session');
         # there is no realm during init - hide tree by setting non existing prefix
         my $pki_realm = $session->data->pki_realm;
         if ($pki_realm) {
             ##! 16: "_route_call: realm value, set prefix to " . $pki_realm
-            $self->_config()->{''}->PREFIX( [ 'realm', $pki_realm ] );
+            $self->PREFIX( [ 'realm', $pki_realm ] );
         } else {
-            $self->_config()->{''}->PREFIX( "startup" );
+            $self->PREFIX( "startup" );
         }
     }
 
