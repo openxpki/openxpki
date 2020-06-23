@@ -126,7 +126,7 @@ sub execute {
         # shift/pop of the entity and ca from the ends of the list
         my $export;
         if (my $template_dir = $self->param('template_dir')) {
-            $template =~ s{[^\w-\.]}{}g;
+            $template =~ s{[^\w\-\.]}{}g;
             ##! 64: "Render from file $template_dir/$template"
             $export = $tt->render_from_file( "$template_dir/$template", $ttargs );
         } else {

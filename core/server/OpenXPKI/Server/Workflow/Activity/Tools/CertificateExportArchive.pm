@@ -77,7 +77,7 @@ sub execute {
     $zip->addString( $privkey, $key_file )
         ->desiredCompressionMethod( COMPRESSION_DEFLATED );
 
-    my $chain = CTX('api2')->get_chain( identifier => $cert_identifier, format => 'PEM' );
+    my $chain = CTX('api2')->get_chain( start_with => $cert_identifier, format => 'PEM' );
     my @certs = @{$chain->{certificates}};
 
     $zip->addString( shift @certs, $crt_file )
