@@ -5,6 +5,7 @@
 package OpenXPKI::Client::UI::Workflow;
 
 use Moose;
+use POSIX;
 use Data::Dumper;
 use Date::Parse;
 use Log::Log4perl::MDC;
@@ -83,7 +84,6 @@ has __proc_states  => (
 );
 
 extends 'OpenXPKI::Client::UI::Result';
-
 =head1 OpenXPKI::Client::UI::Workflow
 
 Generic UI handler class to render a workflow into gui elements.
@@ -366,6 +366,13 @@ sub init_info {
     }
 
     my $fields = $self->__render_workflow_info( $wf_info, $self->_client->session()->param('wfdetails') );
+
+    push @{$fields}, {
+        label => "I18N_OPENXPKI_UI_FIELD_ERROR_CODE",
+        name => "error_code",
+        value => $wf_info->{workflow}->{context}->{error_code},
+    } if ($wf_info->{workflow}->{context}->{error_code}
+        && $wf_info->{workflow}->{proc_state} =~ m{(manual|finished)});
 
     # The workflow info contains info about all control actions that
     # can be done on the workflow -> render appropriate buttons.
@@ -1873,26 +1880,24 @@ sub __render_from_workflow {
         my $wf_action = $wf_info->{workflow}->{context}->{wf_current_action};
         my $wf_action_info = $wf_info->{activity}->{ $wf_action };
 
-        # if we fallback to the state label we dont want it in the 1
-        my $label = $wf_action_info->{label};
-        if ($label) {
-            if (@breadcrumb && $wf_info->{state}->{label}) {
-                push @breadcrumb, { className => 'workflow-state', label => $wf_info->{state}->{label} };
-            }
-        } else {
-            $label = $wf_info->{state}->{label};
+        if (@breadcrumb && $wf_info->{state}->{label}) {
+            push @breadcrumb, { className => 'workflow-state', label => $wf_info->{state}->{label} };
         }
 
         $self->_page({
-            label => $label,
+            # reuse labels from init_info popup
+            label => sprintf("I18N_OPENXPKI_UI_WORKFLOW_INFO_%s_LABEL", uc($wf_proc_state)),
             breadcrumb => \@breadcrumb,
             shortlabel => $wf_info->{workflow}->{id},
-            description =>  $wf_action_info->{description},
+            description => sprintf("I18N_OPENXPKI_UI_WORKFLOW_STATE_%s_DESC", uc($wf_proc_state)),
             className => 'workflow workflow-proc-state workflow-proc-'.$wf_proc_state,
             ($wf_info->{workflow}->{id} ? (canonical_uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}) : ()),
         });
+        #I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_DESC
+        #I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC
+        #I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESC
+        #I18N_OPENXPKI_UI_WORKFLOW_STATE_RETRY_EXCEEDED_DESC
 
-        my $desc;
         my @buttons;
         my @fields;
         # Check if the workflow is in pause or exceeded
@@ -1914,34 +1919,41 @@ sub __render_from_workflow {
                 value => $wf_info->{workflow}->{context}->{wf_pause_msg}
             });
 
-            # If wakeup is less than 300 seconds away, we schedule an
-            # automated reload of the page
-            if ( $wf_info->{workflow}->{wake_up_at} ) {
+            if ($wf_proc_state eq 'pause') {
+
+                # If wakeup is less than 300 seconds away, we schedule an
+                # automated reload of the page
                 my $to_sleep = $wf_info->{workflow}->{wake_up_at} - time();
                 if ($to_sleep < 30) {
                     $self->refresh('workflow!load!wf_id!'.$wf_info->{workflow}->{id}, 30);
+                    $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_30SEC','info');
                 } elsif ($to_sleep < 300) {
-                    $self->refresh('workflow!load!wf_id!'.$wf_info->{workflow}->{id}, $to_sleep + 15);
+                    $self->refresh('workflow!load!wf_id!'.$wf_info->{workflow}->{id}, $to_sleep + 30);
+                    $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_5MIN','info');
+                } else {
+                    $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED','info');
                 }
-            }
-
-            # if there are output rules defined, we add them now
-            if ( $wf_info->{state}->{output} ) {
-                push @fields, @{$self->__render_fields( $wf_info, $view )};
-            }
-
-            if ($wf_proc_state eq 'pause') {
-                $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED','info');
-                $desc = 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_DESCRIPTION';
 
                 @buttons = ({
                     page => 'redirect!workflow!load!wf_id!'.$wf_info->{workflow}->{id},
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_RECHECK_BUTTON',
                     format => 'alternative'
                 });
+                push @fields, {
+                    label => 'I18N_OPENXPKI_UI_WORKFLOW_PAUSED_ACTION_LABEL',
+                    value => ($wf_action_info->{label} || $wf_action)
+                };
             } else {
                 $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED','error');
-                $desc = 'I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED_DESCRIPTION';
+                push @fields, {
+                    label => 'I18N_OPENXPKI_UI_WORKFLOW_EXCEPTION_FAILED_ACTION_LABEL',
+                    value => ($wf_action_info->{label} || $wf_action)
+                };
+            }
+
+            # if there are output rules defined, we add them now
+            if ( $wf_info->{state}->{output} ) {
+                push @fields, @{$self->__render_fields( $wf_info, $view )};
             }
 
         # if the workflow is currently runnig, show info without buttons
@@ -1965,18 +1977,17 @@ sub __render_from_workflow {
             });
 
             # we use the time elapsed to calculate the next update
-            my $timeout = 120;
+            my $timeout = 15;
             if ( $wf_info->{workflow}->{last_update} ) {
                 # elapsed time in MINUTES
                 my $elapsed = (time() - str2time($wf_info->{workflow}->{last_update}.' GMT')) / 60;
                 if ($elapsed > 240) {
                     $timeout = 15 * 60;
-                } elsif ($elapsed > 4) {
-                    # 4 hours = 15 min delay, 4 min = 2 min delay
-                    $timeout = int sqrt( $elapsed ) * 60;
+                } elsif ($elapsed > 1) {
+                    # 4 hours = 15 min delay, 4 min = 1 min delay
+                    $timeout = POSIX::floor(sqrt( $elapsed )) * 60;
                 }
                 $self->logger()->debug('Auto Refresh when running' . $elapsed .' / ' . $timeout );
-
             }
 
             $self->refresh('workflow!load!wf_id!'.$wf_info->{workflow}->{id}, $timeout);
@@ -1993,6 +2004,12 @@ sub __render_from_workflow {
                 value => ($wf_action_info->{label} || $wf_action)
             });
 
+            # add the exception text in case the user is allowed to see the context
+            push @fields, {
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_EXCEPTION_MESSAGE_LABEL',
+                value => $wf_info->{workflow}->{context}->{wf_exception},
+            } if ((grep /context/, @handles) && $wf_info->{workflow}->{context}->{wf_exception});
+
             # if there are output rules defined, we add them now
             if ( $wf_info->{state}->{output} ) {
                 push @fields, @{$self->__render_fields( $wf_info, $view )};
@@ -2002,15 +2019,12 @@ sub __render_from_workflow {
             if (!$self->_status()) {
                 $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION','error');
             }
-            $desc = 'I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESCRIPTION';
 
         } # end proc_state switch
 
         $self->add_section({
             type => 'keyvalue',
             content => {
-                label => '',
-                description => $desc,
                 data => \@fields,
                 buttons => [ @buttons, @buttons_handle ]
         }});
@@ -2132,6 +2146,33 @@ sub __render_from_workflow {
             ($wf_info->{workflow}->{id} ? (canonical_uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}) : ()),
         });
 
+        # set status decorator on final states, uses proc state
+        # to finalize without status message use state name "NOSTATUS"
+        # some field types are able to override the status during render so
+        # this might not be the final status line!
+        if ($wf_proc_state eq 'exception') {
+
+            $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_EXCEPTION','error');
+
+        } elsif ( $wf_info->{state}->{status} && ref $wf_info->{state}->{status} eq 'HASH' ) {
+
+            $self->_status( $wf_info->{state}->{status} );
+
+        } elsif ($wf_proc_state eq 'finished') {
+            # add special colors for success and failure
+
+            if ( $wf_info->{workflow}->{state} eq 'SUCCESS') {
+                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_SUCCESS','success');
+            } elsif ( $wf_info->{workflow}->{state} eq 'FAILURE') {
+                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_FAILURE','error');
+            } elsif ( $wf_info->{workflow}->{state} eq 'CANCELED') {
+                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_CANCELED','warn');
+            } elsif ( $wf_info->{workflow}->{state} ne 'NOSTATUS') {
+
+                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_MISC_FINAL','warn');
+            }
+        }
+
         my $fields = $self->__render_fields( $wf_info, $view );
 
         $self->logger()->trace('Field data ' . Dumper $fields) if $self->logger->is_trace;
@@ -2171,32 +2212,6 @@ sub __render_from_workflow {
             }});
         }
 
-        # set status decorator on final states, use proc state
-        # to finalize without status message use state name "NOSTATUS"
-        my $desc = $wf_info->{state}->{description};
-
-        if ($wf_proc_state eq 'exception') {
-
-            $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_EXCEPTION','error');
-
-        } elsif ( $wf_info->{state}->{status} && ref $wf_info->{state}->{status} eq 'HASH' ) {
-
-            $self->_status( $wf_info->{state}->{status} );
-
-        } elsif ($wf_proc_state eq 'finished') {
-            # add special colors for success and failure
-
-            if ( $wf_info->{workflow}->{state} eq 'SUCCESS') {
-                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_SUCCESS','success');
-            } elsif ( $wf_info->{workflow}->{state} eq 'FAILURE') {
-                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_FAILURE','error');
-            } elsif ( $wf_info->{workflow}->{state} eq 'CANCELED') {
-                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_CANCELED','warn');
-            } elsif ( $wf_info->{workflow}->{state} ne 'NOSTATUS') {
-
-                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_MISC_FINAL','warn');
-            }
-        }
     }
 
     #
@@ -2820,7 +2835,19 @@ sub __render_fields {
         # add a redirect command to the page
         } elsif ($item->{format} eq "redirect") {
 
-            $self->redirect($item->{value});
+            if (ref $item->{value}) {
+                my $v = $item->{value};
+                my $target = $v->{target} || 'workflow!load!wf_id!'.$wf_info->{workflow}->{id};
+                my $pause = $v->{pause} || 1;
+                $self->refresh($target, $pause);
+                if ($v->{label}) {
+                    $self->set_status($v->{label}, ($v->{level} || 'info'));
+                }
+            } else {
+                $self->redirect($item->{value});
+            }
+            # we dont want this to show up in the result so we unset its value
+            $item = undef;
 
         # create a link to download the given filename
         } elsif ($item->{format} =~ m{ \A download(\/([\w_\/-]+))? }xms ) {

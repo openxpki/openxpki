@@ -1789,6 +1789,10 @@ msgstr "失効日を遅延する場合、現在の失効日より未来の日付
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXCEPTION_FAILED_ACTION_LABEL"
 msgstr "失敗したアクション"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_EXCEPTION_MESSAGE_LABEL"
+msgstr "メッセージ"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXPORT_PRIVATEKEY_RETRY_PASSWORD_BUTTON_LABEL"
 msgstr "パスワード再入力"
 
@@ -2597,6 +2601,10 @@ msgstr "ワークフローを開く"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_OUTSTANDING_TASKS_LABEL"
 msgstr "未処理のタスク"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PAUSED_ACTION_LABEL"
+msgstr "停止理由"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL"
 msgstr "停止理由"
 
@@ -2713,6 +2721,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SET_MOTD_SUCCESS_LABEL"
 msgstr "メッセージを設定する"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE"
+msgstr "プロセスの状態"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_DESC"
 msgstr "このワークフローはキャンセルされました。"
@@ -2910,8 +2922,9 @@ msgstr "手動認証が保留中"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION"
 msgstr "予期しない中断"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESCRIPTION"
-msgstr "このワークフローは予期しない結果によって中断されました。"
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESC"
+msgstr "予期しない中断"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_DESC"
 msgstr "このワークフローは失敗しました。"
@@ -3011,6 +3024,10 @@ msgstr "メタデータが更新されました。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
 msgstr "メタデータ更新"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC"
+msgstr "このワークフローは失敗し、再実行はできません"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_DESC"
 msgstr ""
 "このリクエストは1つ以上のポリシーチェックに失敗しましたが、所有者は承認をリク"
@@ -3034,6 +3051,14 @@ msgstr "レポート結果"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_SUMMARY_SUCCESS_LABEL"
 msgstr "レポート結果"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RETRY_EXCEEDED_DESC"
+msgstr "リトライ制限値に達しました"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_DESC"
+msgstr "許可者の承認待ちです。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL"
 msgstr "このワークフローは現在サーバー上で実行されています。"
@@ -3074,22 +3099,19 @@ msgstr "リクエストに進む"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED"
 msgstr "このワークフローは一時停止され、ウォッチドッグによって継続されます"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_DESCRIPTION"
-msgstr ""
-"このワークフローは現在システムによって処理されており、自動的に続行されます。"
-"この一時停止の理由と次回の実行予定時刻は、以下のとおりです。"
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_30SEC"
+msgstr "このワークフローは一時停止され、ウォッチドッグによって継続されます"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_5MIN"
+msgstr "このワークフローは一時停止され、ウォッチドッグによって継続されます"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_RECHECK_BUTTON"
 msgstr "ステータスの再確認"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED"
 msgstr "このワークフローは何度もループしていたため、自動再試行が停止しました。"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED_DESCRIPTION"
-msgstr ""
-"このタスクは、自動的に再試行される予定でしたが、予定された時間内には成功しま"
-"せんでした。この一時停止の理由と最後に実行した時間を以下に示します。このプロ"
-"セスを継続するには、オペレータが手動で起動する必要があります。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_CANCELED"
 msgstr "ワークフローがユーザ操作によりキャンセルされました。"
@@ -4608,6 +4630,13 @@ msgstr "はい"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_SUCCESS_LABEL"
 #~ msgstr "成功"
 
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESCRIPTION"
+#~ msgstr "このワークフローは予期しない結果によって中断されました。"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_LABEL"
+#~ msgstr "予期しない中断"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_SUCCESS_DESC"
 #~ msgstr "このワークフローは成功して終了し、再実行はできません"
 
@@ -5321,8 +5350,9 @@ msgstr "はい"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_LABEL"
 #~ msgstr "SUCCESS"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_DESC"
-#~ msgstr "許可者の承認待ちです。"
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_LABEL"
+#~ msgstr "失敗"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_LABEL"
 #~ msgstr "承認待ち"
@@ -5360,6 +5390,17 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS"
 #~ msgstr "ワークフローは成功して終了し、再実行はできません"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_DESCRIPTION"
+#~ msgstr ""
+#~ "このワークフローは現在システムによって処理されており、自動的に続行されま"
+#~ "す。この一時停止の理由と次回の実行予定時刻は、以下のとおりです。"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED_DESCRIPTION"
+#~ msgstr ""
+#~ "このタスクは、自動的に再試行される予定でしたが、予定された時間内には成功し"
+#~ "ませんでした。この一時停止の理由と最後に実行した時間を以下に示します。この"
+#~ "プロセスを継続するには、オペレータが手動で起動する必要があります。"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_BY_SUBJECT_DESC"

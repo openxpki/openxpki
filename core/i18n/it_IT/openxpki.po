@@ -2096,6 +2096,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_EXCEPTION_FAILED_ACTION_LABEL"
 msgstr "Termina Workflow"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_EXCEPTION_MESSAGE_LABEL"
+msgstr "Link"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_EXPORT_PRIVATEKEY_RETRY_PASSWORD_BUTTON_LABEL"
 msgstr "Password"
 
@@ -2984,6 +2988,10 @@ msgstr "Workflow Aperto"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_OUTSTANDING_TASKS_LABEL"
 msgstr "Stato"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PAUSED_ACTION_LABEL"
+msgstr "Motivo Sospensione"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL"
 msgstr "Motivo Sospensione"
 
@@ -3110,6 +3118,10 @@ msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SET_MOTD_SUCCESS_LABEL"
 msgstr "SUCCESSO"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE"
+msgstr "Stato Esecuzione"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_DESC"
@@ -3341,8 +3353,10 @@ msgstr ""
 "favore il team di supporto!"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESCRIPTION"
-msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESC"
+msgstr ""
+"Questo Workflow è stato interrotto da un evento imprevisto, contatta per "
+"favore il team di supporto!"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_DESC"
 msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
@@ -3437,6 +3451,10 @@ msgstr "Le modifiche sono state salvate in via definitiva nel database."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
 msgstr "I Metadati sono stati aggiornati"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC"
+msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_DESC"
 msgstr ""
 "Questa richiesta non soddisfa uno o più criteri della policy, tuttavia il "
@@ -3464,6 +3482,14 @@ msgstr "Risultati Report"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REPORT_SUMMARY_SUCCESS_LABEL"
 msgstr "Risultati Report"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RETRY_EXCEEDED_DESC"
+msgstr "superato il limite dei retry"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_DESC"
+msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL"
@@ -3506,11 +3532,13 @@ msgstr "FALLIMENTO"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED"
 msgstr "Questo Workflow è in pausa e verrà continuato dal Watchdog"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_DESCRIPTION"
-msgstr ""
-"Questo Workflow è al momento gestito dal sistema e continuerà il proprio "
-"iter in modo automatico. Il motivo della pausa e l’orario della prossima "
-"azione sono mostrati qui sotto per tua informazione."
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_30SEC"
+msgstr "Questo Workflow è in pausa e verrà continuato dal Watchdog"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_5MIN"
+msgstr "Questo Workflow è in pausa e verrà continuato dal Watchdog"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_RECHECK_BUTTON"
@@ -3523,13 +3551,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED"
 msgstr ""
 "Questo Workflow è entrato in loop, i tentativi di riavvio automatico sono "
 "stati sospesi!"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED_DESCRIPTION"
-msgstr ""
-"Questo compito doveva ripartire in automatico, ma non lo ha fatto entro il "
-"tempo previsto. Il motivo della messa in pausa e l’orario dell’ultima azione "
-"sono mostrati qui sotto, se vuoi che il processo venga continuato, è "
-"necessario che un operatore lo riavvii manualmente."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_CANCELED"
@@ -5226,6 +5247,16 @@ msgstr "Chiave"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_SUCCESS_LABEL"
 #~ msgstr "SUCCESSO"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESCRIPTION"
+#~ msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_LABEL"
+#~ msgstr ""
+#~ "Questo Workflow è stato interrotto da un evento imprevisto, contatta per "
+#~ "favore il team di supporto!"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_SUCCESS_DESC"
 #~ msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 
@@ -5927,8 +5958,8 @@ msgstr "Chiave"
 #~ msgstr "SUCCESSO"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_DESC"
-#~ msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_LABEL"
+#~ msgstr "FALLIMENTO"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_LABEL"
@@ -5996,6 +6027,19 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CERTIFICATE_LABEL"
 #~ msgstr "Revoke the certificate"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_DESCRIPTION"
+#~ msgstr ""
+#~ "Questo Workflow è al momento gestito dal sistema e continuerà il proprio "
+#~ "iter in modo automatico. Il motivo della pausa e l’orario della prossima "
+#~ "azione sono mostrati qui sotto per tua informazione."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED_DESCRIPTION"
+#~ msgstr ""
+#~ "Questo compito doveva ripartire in automatico, ma non lo ha fatto entro "
+#~ "il tempo previsto. Il motivo della messa in pausa e l’orario dell’ultima "
+#~ "azione sono mostrati qui sotto, se vuoi che il processo venga continuato, "
+#~ "è necessario che un operatore lo riavvii manualmente."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_DESC"
