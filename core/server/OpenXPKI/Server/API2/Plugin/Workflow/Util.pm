@@ -268,10 +268,6 @@ sub _execute_activity_async {
     catch {
         # DB rollback is not needed as this process will terminate now anyway
         local $@ = $_; # makes OpenXPKI::Exception compatible with Try::Tiny
-        # FIXME Only log non-OpenXPKI::Exception errors as O:E has an internal logging (but then log the stack trace there)
-        if (my $exc = OpenXPKI::Exception->caught) {
-            $exc->show_trace(1);
-        }
         # make sure the cleanup code does not die as this would escape this method
         eval { CTX('log')->system->error($_) };
     };
