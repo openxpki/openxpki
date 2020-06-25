@@ -46,10 +46,11 @@ B<Parameters>
 =item * C<ui_info> I<Bool> - set to 1 to also return detail informations about
 the workflow that can be used in the UI
 
-=item * C<norun> I(persist|detach) - if set to persist, the initial
-context is persisted but the initial action is not run. If set to
-detach, the initial workflow including its id is returned and the
-initial action is executed in the background.
+=item * C<norun> I(persist|detach|watchdog) - if set to I<persist>, the initial
+context is persisted but the initial action is not run. If set to I<detach>,
+the initial workflow including its id is returned and the initial action is
+executed in the background (forked process). It set to I<watchdog> the context
+is persisted and control is handed over to the watchdog.
 
 =item * C<use_lock> I<HashRef|Str>. Optional, default is {}
 
@@ -92,7 +93,7 @@ command "create_workflow_instance" => {
     workflow => { isa => 'AlphaPunct', required => 1, },
     params   => { isa => 'HashRef', default => sub { {} } },
     ui_info  => { isa => 'Bool', default => 0, },
-    norun    => { isa => 'Str', matching => qr{ \A(persist|detach|)\z }xms, default => '' },
+    norun    => { isa => 'Str', matching => qr{ \A(persist|detach|watchdog|)\z }xms, default => '' },
     use_lock    => { isa => 'HashRef|Str' },
 } => sub {
     my ($self, $params) = @_;
@@ -175,9 +176,17 @@ command "create_workflow_instance" => {
     if ($norun) {
         # this runs the workflow validators using the current context
         $workflow->validate_context_before_action($initial_action);
+
         if ($norun eq 'detach') {
             ##! 16: 'Create detached'
+            # call async exec, this will only crash on a fork error so we dont
+            # use an eval here
+            $workflow = $util->execute_activity($workflow, $initial_action, 1);
+
+        } elsif ($norun eq 'watchdog') {
+            ##! 16: 'Persist and dispatch to watchdog'
             $workflow->save_initial($initial_action, 0);
+
         } else {
             ##! 16: 'Persist only'
             $workflow->save_initial($initial_action);
