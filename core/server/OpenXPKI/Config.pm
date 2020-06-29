@@ -43,6 +43,12 @@ has backend => (
     },
 );
 
+has credential_backend => (
+    is => 'rw',
+    isa => 'Bool',
+    default => 0
+    );
+
 # Here we do the chain loading of a serialized/signed config
 sub BUILD {
     my $self = shift;
@@ -67,6 +73,30 @@ sub BUILD {
 
         my $conn = $class->new( $bootstrap );
         $self->backend( $conn );
+    }
+
+    # If the node credential is defined on the top level we make assume
+    # it contains a connector specification to create a globally available
+    # node to receive passwords from
+    if ($self->backend()->exists('credentials')) {
+        my $conn = $self->backend();
+        my $meta = $conn->get_meta('credentials');
+        if ($meta->{TYPE} ne "hash" || !$conn->exists('credentials.class')) {
+            warn "Found credential node but it does not look like a connector specification"
+        } else {
+            # There is a dragon inside! We read the connector details and
+            # afterwards delete the node and write back the preinitialized
+            # connector. This makes assumptions on the internal cache and might
+            # also not work with other backend classes.
+            $self->credential_backend(1);
+            my $cc = $self->get_connector('credentials');
+            $self->_init_cache();
+            # as it is not allowed to change the type we need to unset it first
+            $conn->set('credentials' => undef);
+            # now we directly attach the connector to it
+            $conn->set('credentials' => $cc);
+            Log::Log4perl->get_logger('system')->info("Added credential connector");
+        }
     }
 
     # check if the system node is present
@@ -98,8 +128,11 @@ before '_route_call' => sub {
 
     ##! 16: "_route_call interception on $location "
     # system or realm acces - no prefix
-    if ( substr ($location, 0, 6) eq 'system' || substr($location, 0, 5) eq 'realm' ) {
+    if ( substr ($location, 0, 6) eq 'system' || substr($location, 0, 5) eq 'realm') {
         ##! 16: "_route_call: system or explicit realm value, reset connector offsets"
+        $self->PREFIX('');
+    } elsif (substr($location, 0, 11) eq "credentials" && $self->credential_backend()) {
+        ##! 16: "_route_call: request for credential"
         $self->PREFIX('');
     } else {
         my $session = CTX('session');
