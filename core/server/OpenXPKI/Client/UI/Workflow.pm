@@ -2759,6 +2759,11 @@ sub __render_fields {
 
         my $field_type = $field->{type} || '';
 
+        # we have several formats that might have non-scalar values
+        if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
+            $item->{value} = $self->serializer()->deserialize( $item->{value} );
+        }
+
         # assign autoformat based on some assumptions if no format is set
         if (!$item->{format}) {
 
@@ -2776,9 +2781,6 @@ sub __render_fields {
                 $item->{format} = 'nl2br';
             }
 
-            if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
-                $item->{value} = $self->serializer()->deserialize( $item->{value} );
-            }
             if (ref $item->{value}) {
                 if (ref $item->{value} eq 'HASH') {
                     $item->{format} = 'deflist';
@@ -2859,10 +2861,6 @@ sub __render_fields {
             my $label;
             my $basename;
             my $source;
-            # value can be a hash with additional properties - likely serialized
-            if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
-                $item->{value} = $self->serializer()->deserialize( $item->{value} );
-            }
 
             if (ref $item->{value}) {
                 my $t = $item->{value};
@@ -2899,11 +2897,7 @@ sub __render_fields {
         } elsif ($item->{format} eq "cert_info") {
             $item->{format} = 'deflist';
 
-            # its likely that we need to deserialize
             my $raw = $item->{value};
-            if (OpenXPKI::Serialization::Simple::is_serialized( $raw ) ) {
-                $raw = $self->serializer()->deserialize( $raw );
-            }
 
             # this requires that we find the profile and subject in the context
             my @val;
@@ -2935,17 +2929,11 @@ sub __render_fields {
             $item->{value} = \@val;
 
         } elsif ($item->{format} eq "ullist" || $item->{format} eq "rawlist") {
-
-            if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
-                $item->{value} = $self->serializer()->deserialize( $item->{value} );
-            }
+            # nothing to do here
 
         } elsif ($item->{format} eq "itemcnt") {
 
             my $list = $item->{value};
-            if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
-                $list = $self->serializer()->deserialize( $item->{value} );
-            }
 
             if (ref $list eq 'ARRAY') {
                 $item->{value} = scalar @{$list};
@@ -2958,9 +2946,6 @@ sub __render_fields {
 
         } elsif ($item->{format} eq "deflist") {
 
-            if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
-                $item->{value} = $self->serializer()->deserialize( $item->{value} );
-            }
             # Sort by label
             my @val;
             if ($item->{value} && (ref $item->{value} eq 'HASH')) {
@@ -2999,14 +2984,9 @@ sub __render_fields {
             }
         }
 
-
         if ($field->{template}) {
 
             my $param = { value => $item->{value} };
-            # try to deserialize if required
-            if (!ref $item->{value} && OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
-                $param = { value => $self->serializer()->deserialize( $item->{value} ) };
-            }
 
             $self->logger()->trace('Render output using template on field '.$key.', '. $field->{template} . ', params:  ' . Dumper $param) if $self->logger->is_trace;
 
