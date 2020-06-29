@@ -109,6 +109,11 @@ span.pagination-label {
   padding: 6px 0;
 }
 
+span.oxi-label {
+    display: inline-block;
+    white-space: nowrap;
+}
+
 /* Remove padding below UL and DL */
 dl, ul {
   margin-bottom: 0;

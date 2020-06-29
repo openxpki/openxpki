@@ -19,6 +19,7 @@ label{overflow:hidden;text-overflow:ellipsis}
 .table-bordered tr.spacer th{padding-top:15px;background-color:#eee}
 ul.pagination li:not(.disabled)>a{cursor:pointer}
 span.pagination-label{float:left;padding:6px 0}
+span.oxi-label{display:inline-block;white-space:nowrap}
 dl,ul{margin-bottom:0}
 .loading.progress,.refresh.progress{position:fixed;top:30px;right:20px;width:100px}
 .loading.progress .progress-bar,.refresh.progress .progress-bar{width:100%}
