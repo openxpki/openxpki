@@ -33,6 +33,23 @@ class Field {
     // oxifield-static
     @tracked verbose;
 
+    static fromHash(sourceHash) {
+        let instance = new this(); // "this" in static methods refers to class
+        for (const attr of Object.keys(sourceHash)) {
+            if (! this.prototype.hasOwnProperty(attr)) {
+                /* eslint-disable-next-line no-console */
+                console.error(
+                    `oxisection-form: unknown property "${attr}" in field "${sourceHash.name}". ` +
+                    `If it's a new property, please add it to class 'Field' defined in ../oxisection-form/component.js.`
+                );
+            }
+            else {
+                instance[attr] = sourceHash[attr];
+            }
+        }
+        return instance;
+    }
+
     clone() {
         let field = new Field();
         Object.keys(Object.getPrototypeOf(this)).forEach(k => field[k] = this[k]);
@@ -67,16 +84,7 @@ export default class OxisectionFormComponent extends Component {
         let result = [];
         for (const fieldHash of fields) {
             // convert hash into field
-            let field = new Field();
-            for (const attr of Object.keys(fieldHash)) {
-                if (! Field.prototype.hasOwnProperty(attr)) {
-                    /* eslint-disable-next-line no-console */
-                    console.error(`oxisection-form: unknown field property "${attr}" (field "${fieldHash.name}"). If it's a new property, please add it to the 'Field' class defined in oxisection-form/component.js.`);
-                }
-                else {
-                    field[attr] = fieldHash[attr];
-                }
-            }
+            let field = Field.fromHash(fieldHash);
 
             // dynamic input fields will change the form field name depending on the
             // selected option, so we need an internal reference to the original name ("_refName")
