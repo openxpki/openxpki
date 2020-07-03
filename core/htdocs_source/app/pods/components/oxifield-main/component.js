@@ -72,6 +72,6 @@ export default class OxifieldMainComponent extends Component {
 
     @action
     onInsert(element) {
-        if (this.field.focusClone) element.focus();
+        if (this.field._focusClone) element.focus();
     }
 }
