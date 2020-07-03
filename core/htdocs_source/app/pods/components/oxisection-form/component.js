@@ -179,6 +179,7 @@ export default class OxisectionFormComponent extends Component {
 
     @action
     delClone(field) {
+        if (field._canDelete === false) return;
         let fields = this.fields;
         let index = fields.indexOf(field);
         fields.removeAt(index);
