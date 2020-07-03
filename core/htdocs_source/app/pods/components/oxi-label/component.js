@@ -1,7 +1,4 @@
 import Component from '@glimmer/component';
-import { tracked } from '@glimmer/tracking';
-import { action, computed, set } from "@ember/object";
-import { debug } from '@ember/debug';
 
 /**
 Shows a label (a text) and escapes special characters.
