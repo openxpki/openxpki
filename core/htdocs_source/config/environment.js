@@ -4,7 +4,7 @@ module.exports = function(environment) {
     let ENV = {
         modulePrefix: 'openxpki',
         podModulePrefix: 'openxpki/pods',   // namespaced directory where resolver will look for resource files
-        environment,
+        environment: environment,
         rootURL: '/openxpki/',  // https://guides.emberjs.com/release/configuring-ember/embedding-applications/#toc_specifying-a-root-url
         locationType: 'hash',   // https://guides.emberjs.com/release/configuring-ember/specifying-url-type/
         EmberENV: {

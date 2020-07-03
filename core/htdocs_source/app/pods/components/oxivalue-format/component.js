@@ -3,14 +3,6 @@ import { action } from '@ember/object';
 import { getOwner } from '@ember/application';
 
 export default class OxivalueFormatComponent extends Component {
-
-/*
-
-TODO: @action defuseValue(val) ...
---> an allen Stellen verwenden , wo im Template {{{value}}} steht
-
-*/
-
     get format() {
         return (this.args.content.format || "text");
     }
