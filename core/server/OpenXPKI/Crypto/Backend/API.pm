@@ -203,17 +203,6 @@ sub get_cmd_param {
     return \%rc;
 }
 
-sub get_key_info
-{
-    ##! 1: 'start'
-    my $self  = shift;
-    my $ident = ident $self;
-    ##! 16: 'engine: ' . $self->get_instance()->get_engine()
-    return if (!defined $self->get_instance()->get_engine());
-    return $self->get_instance()->get_engine()->get_key_info();
-}
-
-
 sub key_usable {
     ##! 1: 'start'
     my $self  = shift;
