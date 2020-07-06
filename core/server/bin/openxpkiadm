@@ -11,6 +11,7 @@ use Proc::SafeExec;
 use POSIX ":sys_wait_h";
 use Errno;
 use File::Spec;
+use File::Basename;
 use YAML;
 
 # For the password hasher
@@ -30,6 +31,7 @@ use OpenXPKI::Server::Init;
 use OpenXPKI::i18n;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Config::Backend;
+use OpenXPKI::Client::Simple;
 use Log::Log4perl qw (:easy);
 
 use OpenXPKI::VERSION;
@@ -149,7 +151,7 @@ sub certificate_import {
         $api_param->{profile} = $params{profile};
     }
 
-
+    CTX('dbi')->start_txn();
     my $res = CTX('api2')->import_certificate( %$api_param );
 
     print "Successfully imported certificate into database:\n";
@@ -175,6 +177,9 @@ sub certificate_import {
         $params{identifier} = $res->{identifier};
         print "\n";
         $return = alias_add();
+    } else {
+        # alias_add closes the txn already
+        CTX('dbi')->commit();
     }
 
     return $return;
@@ -253,9 +258,11 @@ sub alias_add {
 
     my %insert_hash = ();
 
-    $insert_hash{PKI_REALM} = $params{realm};
+    $insert_hash{pki_realm} = $params{realm};
 
     my $dbi = CTX('dbi');
+    $dbi->start_txn();
+
     # Import is possible with symbolic token or group name
     if ( $params{token} || $params{group} ) {
 
@@ -321,6 +328,45 @@ sub alias_add {
         $insert_hash{alias} = $params{alias};
     }
 
+    # use file
+    my ($extracted_certdata, $extracted_keydata);
+    if (!$params{identifier} && $params{file}) {
+
+        my $filename = $params{file};
+        if ( !-r $filename ) {
+            print STDERR "ERROR: filename '$filename' is not readable\n";
+            return 2;
+        }
+
+        my $FileUtils = OpenXPKI::FileUtils->new();
+        my $certdata  = $FileUtils->read_file($filename) || '';
+
+        ($extracted_certdata) = $certdata =~ m{ \A .* (-----BEGIN\ CERTIFICATE----- .* -----END\ CERTIFICATE-----) .* \z}xms;
+        if ( !$extracted_certdata ) {
+            print STDERR "ERROR: Could not parse certificate data\n";
+            return 2;
+        }
+
+        $params{identifier} = CTX('api2')->get_cert_identifier( 'cert' => $extracted_certdata );
+    }
+
+    # check if a key is given
+    if ($params{key}) {
+        my $filename = $params{key};
+        if ( !-r $filename ) {
+            print STDERR "ERROR: filename '$filename' is not readable\n";
+            return 2;
+        }
+
+        my $FileUtils = OpenXPKI::FileUtils->new();
+        my $key = $FileUtils->read_file($filename) || '';
+        ($extracted_keydata) = $key =~ m{ \A (-----BEGIN\ ([\w\s]*)PRIVATE\ KEY----- [^-]+ -----END\ \2PRIVATE\ KEY-----) \Z }xms;
+        if ( !$extracted_keydata ) {
+            print STDERR "ERROR: Could not parse private key data\n";
+            return 2;
+        }
+    }
+
     if ( !exists( $params{identifier} ) || $params{identifier} eq '' ) {
         print STDERR "Please specify an identifier with --identifier\n";
         return 1;
@@ -355,10 +401,23 @@ sub alias_add {
     );
 
     if ( !defined $certificate ) {
-        # there is no cert with given identifier
-        print STDERR "ERROR: Could not find a certificate with "
-          . "identifier '$insert_hash{identifier}', ";
-        return 2;
+        # a certificate was provided on the CLI so we try to import it
+        if ($extracted_certdata) {
+            $certificate = CTX('api2')->import_certificate(
+                pki_realm => $params{realm},
+                data => $extracted_certdata,
+            );
+            if (!$certificate) {
+                # there is no cert with given identifier
+                print STDERR "ERROR: unable to import certificate from file";
+                return 2;
+            }
+        } else {
+            # there is no cert with given identifier and nothing to import
+            print STDERR "ERROR: Could not find a certificate with "
+              . "identifier '$insert_hash{identifier}', ";
+            return 2;
+        }
     }
 
     if ($params{notbefore}) {
@@ -415,11 +474,69 @@ sub alias_add {
         into => 'aliases',
         values  => \%insert_hash,
     );
-    $dbi->commit();
 
     print "Successfully created alias in realm $params{realm}:\n";
     __alias_print( \%insert_hash );
 
+    # check if a key was given
+    if ($extracted_keydata) {
+
+        my $client = OpenXPKI::Client::Simple->new({
+            config => {
+                realm => $insert_hash{pki_realm},
+                socket => CTX('config')->get(['system','server','socket_file']),
+            },
+            auth => { stack => '_System' },
+        });
+
+        my $token = $client->run_command("get_token_info", { alias => $insert_hash{alias} });
+        if (!$token || !$token->{key_store}) {
+            print STDERR "ERROR: Unable to get token information!";
+            return 2;
+        } elsif ($token->{key_store} eq "DATAPOOL") {
+
+            my $res = $client->run_command("set_data_pool_entry", {
+                namespace => "sys.crypto.keys",
+                encrypt => 1,
+                key => $token->{key_name},
+                value => $extracted_keydata,
+            });
+            if ($res) {
+                printf "Successfully wrote key to datapool with key '%s'\n", $token->{key_name};
+            } else {
+                print STDERR "ERROR: Problems writing key to datapool!";
+                return 2;
+            }
+
+        } elsif ($token->{key_store} eq "OPENXPKI") {
+
+            # name of the keyfile
+            my $keyfile = $token->{key_name};
+            if(-e $keyfile) {
+                print STDERR "ERROR: key file '$keyfile' exists, won't override!";
+                return 2;
+            }
+            if (!-d dirname($keyfile)) {
+                print STDERR "ERROR: directory for '$keyfile' does not exists, won't create it!";
+                return 2;
+            }
+            open (my $fh, ">", $keyfile) || die "Unable to open $keyfile for writing";
+            print $fh $extracted_keydata;
+            close $fh;
+
+            my $user = CTX('config')->get(['system','server','user']);
+            my $uid = getpwnam($user) or die "$user not known";
+
+            my $group = CTX('config')->get(['system','server','user']);
+            my $gid = getgrnam($group) or die "$group not known";
+            chown ($uid, $gid, $keyfile) || die "Unable to chown $keyfile to $uid/$gid";
+            chmod oct("0400"), $keyfile || die "Unable to change mode on $keyfile";
+            print "Successfully wrote key to $keyfile\n";
+        } else {
+            printf STDERR "ERROR: Unsupported key storage method!", $token->{key_store};
+            return 2;
+        }
+    }
 
     # Check if the alias is for an issuing ca cert -> create root ca alias
     my $cs_group = CTX('config')->get(['realm', $params{realm}, 'crypto', 'type', 'certsign']);
@@ -469,12 +586,13 @@ sub alias_add {
                 into => 'aliases',
                 values  => $root_alias,
             );
-            $dbi->commit();
         }
 
         __alias_print( $root_alias );
 
     }
+
+    $dbi->commit();
 
     return 0;
 
@@ -1333,6 +1451,7 @@ if ($cmd eq 'initdb') {
         push @options_spec, qw(
             realm=s
             file=s
+            key=s
             issuer=s
             force-no-chain
             force-issuer
@@ -1437,6 +1556,8 @@ if ($cmd eq 'initdb') {
       subject
       nogroup
       export|o=s
+      file=s
+      key=s
     );
     __init();
 
@@ -1452,7 +1573,7 @@ if ($cmd eq 'initdb') {
         $ret = alias_update();
     } elsif ($params{alias}) {
         $ret = alias_show();
-    } elsif ($params{identifier}) {
+    } elsif ($params{identifier} || $params{file}) {
         $ret = alias_add();
     } else {
         $ret = alias_list();
@@ -1943,6 +2064,9 @@ index by looking up the present aliases in the group. Recommended.
 
   --token  The name of the token type you want to add,
            e.g. certsign or datasafe.
+  --file   The filename of the PEM encoded certificate, can be given instead
+           of --identifier. If the certificate does not exists in the database
+           it is imported.
 
 Example:
 
@@ -1990,6 +2114,27 @@ Example:
     openxpkiadm alias --realm server-realm \
         --identifier rzg0GhTx81ioYGXADfuuIxFd9fw \
         --alias my-very-important-certificate
+
+=item B<alias key import>
+
+This applies as an extended functionality for all commands that create an alias.
+
+  --key    The filename of a PEM encoded private key.
+
+When provided, the system tries to copy the key data contained in the given file
+to the location defined in the token configuration. The token configuration is
+read from the OpenXPKI server process via the socket using the System stack to
+authenticate. Therefore this requires that the daemon is up and allows access
+to the I<get_token_info> call for the default System user (this configuration
+is currently hardcoded and can not be changed).
+
+For storage type "OPENXPKI" (file based) the key data is written into the
+given key file, the file is set to 0400 permissions, owned by the user the
+daemon runs with. The parent folder for the file must exist.
+
+For storage type "DATAPOOL" the key blob is loaded into the datapool, encrypted
+with the current DataVault token. This therefore requires that the DataVault
+token is already set up and available for encryption.
 
 =item B<update alias>
 
@@ -2084,10 +2229,3 @@ The openxpkiadm script returns a 0 exit value on success, and >0 if  an
 error occurs.
 
 =back
-
-
-
-
-
-
-
