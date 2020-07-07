@@ -20,7 +20,7 @@ minutes and will give you a ready to run OXI install available at http://localho
 Docker
 ------
 
-We also provide a docker image based on the debian packages as well as a docker-compose file, see 
+We also provide a docker image based on the debian packages as well as a docker-compose file, see
 https://github.com/openxpki/openxpki-docker.
 
 Debian Builds
@@ -125,31 +125,81 @@ Here is what you need to do if you *dont* use the sampleconfig script.
 #. Create a key/certificate for the internal datavault (ca = false, can be below the ca but can also be self-signed).
 #. Create a key/certificate for the scep service (ca = false, can be below the ca but can also be self-signed or from other ca).
 
-Move the key files to /etc/openxpki/ca/democa/ and name them ca-signer-1.pem, vault-1.pem, scep-1.pem.
-The key files must be readable by the openxpki user, so we recommend to make them owned by the openxpki user with mode 0400.
+**Starting with release 3.6 the default config uses the database to store the issuing ca and SCEP tokens -
+if you upgrade from an older config version check the new settings in systems/crypto.yaml.**
 
-Now import the certificates to the database. The signer token is used exclusive in the current realm,
-so we can use a shortcut and import and reference it with one command.
+Import Root CA
+##############
 
-::
+OpenXPKI needs to be able to build the full chain for any certificate so we need
+to import the Root CA(s) first::
 
-    openxpkiadm certificate import  --file ca-root-1.crt
+    $ openxpkiadm certificate import --file root.crt
 
-    openxpkiadm certificate import  --file ca-signer-1.crt \
-        --realm democa --token certsign
+Create DataVault Token
+######################
 
-As we might want to reuse SCEP and Vault token across the realms, we import them in to the global
-namespace and just create an alias in the current realm::
+Copy the DataVault Key file to /etc/openxpki/ca/vault-1.pem, it should have 0400
+permission owned by the openxpki user.
 
-    openxpkiadm certificate import  --file vault-1.crt
-    openxpkiadm certificate import  --file scep-1.crt
+Now import the certificate::
 
-    openxpkiadm alias --realm democa --token datasafe \
-        --identifier `openxpkiadm certificate id --file vault-1.crt`
+    $ openxpkiadm certificate import --file vault.crt
+
+    Starting import
+    Successfully imported certificate into database:
+      Subject:    CN=Internal DataVault
+      Issuer:     CN=Internal DataVault
+      Identifier: YsyZ4eCgzHQN607WBIcLTxMjYLI
+      Realm:      none
+
+Register it as datasafe token for the `democa` realm - you need to run this
+command for each realm.
+
+    $ openxpkiadm alias --realm democa --token datasafe --file vault.crt
+
+    Successfully created alias in realm democa:
+      Alias     : vault-2
+      Identifier: YsyZ4eCgzHQN607WBIcLTxMjYLI
+      NotBefore : 2020-07-06 18:54:43
+      NotAfter  : 2030-07-09 18:54:43
+
+Now its time to start the OpenXPKI Server::
+
+    $ openxpkictl start
+
+    Starting OpenXPKI...
+    OpenXPKI Server is running and accepting requests.
+    DONE.
+
+In the process list, you should see two process running::
+
+    14302 ?        S      0:00 openxpki watchdog ( main )
+    14303 ?        S      0:00 openxpki server ( main )
+
+If this is not the case, check */var/log/openxpki/stderr.log*.
+
+Create Issuing CA Token
+#######################
+
+The `openxpkiadm alias` command offers a shortcut to import the certificate,
+register the token and store the private key. Repeat this step for all issuer
+tokens in all realms. The system will assign the next available generation
+number and create all required internal links. In case you choose the filesystem
+as key storage the command will write the key files to the intended location but
+requires that the parent folder exist (`/etc/openxpki/ca/<realm>`)::
+
+    openxpkiadm alias --realm democa --token certsign \
+        --file democa-signer.crt --key democa-signer.pem
+
+Perform the same for the SCEP token::
 
     openxpkiadm alias --realm democa --token scep \
-        --identifier `openxpkiadm certificate id --file scep-1.crt`
+        --file scep.crt --key scep.pem
 
+**Note**: Each realm needs his own SCEP token so you need to run this command
+any realm that provides an SCEP service. It is possible to use the same SCEP
+token in multiple realms.
 
 If the import went smooth, you should see something like this (ids and times will vary)::
 
@@ -185,25 +235,15 @@ If the import went smooth, you should see something like this (ids and times wil
       not set
 
 
-Now it is time to see if anything is fine::
+An easy check to see if the signer token is working is to create a CRL::
 
-    $ openxpkictl start
-
-    Starting OpenXPKI...
-    OpenXPKI Server is running and accepting requests.
-    DONE.
-
-In the process list, you should see two process running::
-
-    14302 ?        S      0:00 openxpki watchdog ( main )
-    14303 ?        S      0:00 openxpki server ( main )
-
-If this is not the case, check */var/log/openxpki/stderr.log*.
+    $ openxpkicmd  --realm democa crl_issuance
+    Workflow created (ID: 511), State: SUCCESS
 
 Adding the Webclient
 ^^^^^^^^^^^^^^^^^^^^
 
-The webclient is included in the core packages. Just open your browser and navigate to *http://yourhost/openxpki/*. You should see the main authentication page. If you get an internal server error, make sure you have the *en_US.utf8* locale installed (``locale -a | grep en_US``)!
+The webclient is included in the core packages. Just open your browser and navigate to *https://yourhost/openxpki/*. You should see the main authentication page. If you get an internal server error, make sure you have the *en_US.utf8* locale installed (``locale -a | grep en_US``)!
 
 You can log in as user with any username/password combination, the operator login has two preconfigured operator accounts raop and raop2 with password openxpki.
 
@@ -277,5 +317,3 @@ a recent version of java ``keytool`` installed. On debian, this is
 provided by the package ``openjdk-7-jre``. Note: You can set the
 location of the keytool binary in ``system.crypto.token.javajks``, the
 default is /usr/bin/keytool.
-
-
