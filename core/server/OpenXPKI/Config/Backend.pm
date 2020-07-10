@@ -16,6 +16,9 @@ has 'checksum' => (
     init_arg => undef,
     default => sub {
         my $self = shift;
+        # in case we have code refs in the config layer we need to set this
+        # $Storable::Deparse = 1;
+        $Storable::canonical = 1;
         return sha256_hex(freeze($self->_config()));
     },
 );

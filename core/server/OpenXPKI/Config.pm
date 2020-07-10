@@ -75,6 +75,10 @@ sub BUILD {
         $self->backend( $conn );
     }
 
+    # we initialize the checksum before injecting the code ref to avoid setting
+    # $Storable::Deparse and to have the same hash with openxpkiadm
+    $self->backend()->checksum();
+
     # If the node credential is defined on the top level we make assume
     # it contains a connector specification to create a globally available
     # node to receive passwords from
@@ -362,5 +366,3 @@ need to set the empty string to blank an entry.
     ca-signer:
       inherit: default
       key: key: /etc/openxpki/ca/mykey.pem
-
-

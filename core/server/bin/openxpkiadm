@@ -1714,7 +1714,7 @@ if ($cmd eq 'initdb') {
     my $c = OpenXPKI::Config::Backend->new( LOCATION => $conf );
     print "Checking config at $conf\n";
     if ($c->get_hash('system')) {
-        print "Config ok\n";
+        printf "Config ok (%s)\n", $c->checksum();
         $ret = 0;
     } else {
         # this means the yaml was ok but there is no system node
