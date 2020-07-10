@@ -69,7 +69,7 @@ sub execute {
 
         # Check if the node exists inside the profile
         my $config_key = $unpublish ? 'unpublish' : 'publish';
-        if ($config->exists([ 'profile', $profile, ])) {
+        if ($config->exists([ 'profile', $profile, $config_key ])) {
             @target = $config->get_scalar_as_list( [ 'profile', $profile, $config_key ] );
         } else {
             @target = $config->get_scalar_as_list( [ 'profile', 'default', $config_key ] );
@@ -191,7 +191,7 @@ sub execute {
                 );
             }
         } else {
-            CTX('log')->application()->debug("Entity pubication to $target for ". $publish_key." done");
+            CTX('log')->application()->info("Entity pubication to $target for ". $publish_key." done");
 
         }
     }
