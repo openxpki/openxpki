@@ -45,10 +45,10 @@
             </Modal.body>
             <Modal.footer>
                 <BsButton @onClick={{this.executeAction}} @type="primary">
-                    {{if @button.confirm.confirm_label @button.confirm.confirm_label "Confirm"}}
+                    {{if @button.confirm.confirm_label @button.confirm.confirm_label (t 'button.confirm_dialog.ok')}}
                 </BsButton>
                 <BsButton @onClick={{action Modal.close}}>
-                    {{if @button.confirm.cancel_label @button.confirm.cancel_label "Abort"}}
+                    {{if @button.confirm.cancel_label @button.confirm.cancel_label (t 'button.confirm_dialog.cancel')}}
                 </BsButton>
             </Modal.footer>
         </BsModal>
