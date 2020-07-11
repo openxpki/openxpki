@@ -1,0 +1,38 @@
+#
+# CUSTOM CONFIGURATIONS
+# Copy this file to "localconfig.js" and adjust the options (or remove them)
+#
+
+#
+# URL path to Perl backend (protocol + host are prepended automatically).
+# Without leading slash the path is interpreted relative to index.html's path,
+# e.g.:
+#   Website: https://x.y/oxi/ca1/index.html
+#   backendPath: /cgi-bin/webui.fcgi --> https://x.y/cgi-bin/webui.fcgi
+#   backendPath:  cgi-bin/webui.fcgi --> https://x.y/oxi/ca1/cgi-bin/webui.fcgi
+#
+backendPath: /cgi-bin/webui.fcgi
+
+#
+# Year shown in footer (unless footer is replaced using "footer")
+#
+copyrightYear: 1970
+
+#
+# Site header
+#
+header: |-
+    <h2>
+        <a href="./#/"><img src="img/logo.png" class="toplogo"></a>
+        &nbsp;
+        <small>Open Source Trustcenter</small>
+    </h2>
+
+#
+# Site footer
+#
+footer: |-
+    <p class="text-center text-muted credit">
+        &copy; Copyright 2020
+        &ndash; <a href="http://www.openxpki.org/">The OpenXPKI Project</a>
+    </p>

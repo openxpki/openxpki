@@ -63,13 +63,16 @@ export default class OpenXpkiRoute extends Route {
          * load base page structure first first time or for special pages ("needReboot")
          */
         if (!this.content.navEntries.length || this.needReboot.indexOf(modelId) >= 0) {
-            structureIfNeeded = this.sendAjax({
-                page: "bootstrap!structure",
-                baseurl: window.location.pathname,
-            });
+            // don't send request yet, only create a lambda via arrow function expression
+            structureIfNeeded = () => {
+                return this.sendAjax({
+                    page: "bootstrap!structure",
+                    baseurl: window.location.pathname,
+                });
+            };
         }
         else {
-            structureIfNeeded = Promise.resolve();
+            structureIfNeeded = () => { Promise.resolve() };
         }
 
         /*
@@ -86,9 +89,9 @@ export default class OpenXpkiRoute extends Route {
         if (flatList.findBy("key", modelId) || this.needReboot.indexOf(modelId) >= 0) {
             request.target = "top";
         }
-        return structureIfNeeded.then(() => {
-            return this.sendAjax(request);
-        });
+        return this.config.ready // localconfig.js might change rootURL, so first thing is to query it
+            .then( () => structureIfNeeded() )
+            .then( () => this.sendAjax(request) );
     }
 
     // Reserved Ember function "model"
