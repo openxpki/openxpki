@@ -15,6 +15,7 @@ export default class OxiConfigService extends Service {
         let url = ENV.rootURL.replace(/\/$/, '') + '/localconfig.yaml';
         this.ready = this._loadRemote(url)
             .then( yamlStr => {
+                if (! yamlStr) return;
                 try {
                     let doc = yaml.safeLoad(yamlStr); // might be null if YAML is empty string
                     if (doc) this.localConfig = doc;
