@@ -39,13 +39,6 @@ export default class OpenXpkiRoute extends Route {
 
     @tracked content = new Content();
 
-    get backendUrl() {
-        let baseUrl = window.location.protocol + "//" + window.location.host;
-        // if backendPath contains leading slash, treat it as absolute path
-        if (!this.config.backendPath.match(/^\//)) baseUrl += window.location.pathname;
-        return baseUrl.replace(/\/$/, "") + "/" + this.config.backendPath.replace(/^\//, "");
-    }
-
     // Reserved Ember function "beforeModel"
     beforeModel(transition) {
         let queryParams = transition.to.queryParams;
@@ -119,7 +112,7 @@ export default class OpenXpkiRoute extends Route {
             },
             dataType: "json",
             type: request.action ? "POST" : "GET",
-            url: this.backendUrl,
+            url: this.config.backendUrl,
         };
         if (req.type === "POST") {
             req.data._rtoken = this.content.rtoken;

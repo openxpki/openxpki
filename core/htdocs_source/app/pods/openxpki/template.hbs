@@ -1,6 +1,6 @@
-<style type="text/css">
-    {{ this.config.localCSS }}
-</style>
+{{#if this.config.customCssUrl}}
+    <link integrity="" rel="stylesheet" href="{{this.config.customCssUrl}}">
+{{/if}}
 
 <BsNavbar
     @type="default"
