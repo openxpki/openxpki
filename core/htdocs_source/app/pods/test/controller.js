@@ -1,7 +1,15 @@
 import Controller from '@ember/controller';
 import { tracked } from '@glimmer/tracking';
+import { inject as service } from '@ember/service';
 
 export default class TestController extends Controller {
+    @service('intl') intl;
+
+    constructor() {
+        super(...arguments);
+        this.intl.setLocale(["de-de"]);
+    }
+
     testButton = {
         label: "Button",
         format: "primary",
