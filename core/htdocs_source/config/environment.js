@@ -43,8 +43,8 @@ module.exports = function(environment) {
          * Set up logging
          * https://guides.emberjs.com/release/configuring-ember/debugging/
          */
-        ENV.APP.LOG_RESOLVER = true;
-        ENV.APP.LOG_ACTIVE_GENERATION = true;
+        //ENV.APP.LOG_RESOLVER = true;
+        //ENV.APP.LOG_ACTIVE_GENERATION = true;
         ENV.APP.LOG_TRANSITIONS = true;             // Basic logging, e.g. "Transitioned into 'post'"
         ENV.APP.LOG_TRANSITIONS_INTERNAL = true;    // Detailed logging incl. internal steps made while transitioning into a route
         ENV.APP.LOG_VIEW_LOOKUPS = true;
