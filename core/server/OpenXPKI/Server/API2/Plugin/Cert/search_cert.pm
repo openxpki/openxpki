@@ -335,6 +335,11 @@ sub _make_db_query {
         $po->clear_status;
         $where->{'certificate.status'} = 'ISSUED';
         $where->{'certificate.notafter'} = { '<', time() };
+    } elsif ($po->has_status and $po->status eq 'VALID') {
+        $po->clear_status;
+        $where->{'certificate.status'} = 'ISSUED';
+        $where->{'certificate.notafter'} = { '>', time() };
+        $where->{'certificate.notbefore'} = { '<', time() };
     }
 
     $where->{'certificate.identifier'}                = $po->identifier                 if $po->has_identifier;

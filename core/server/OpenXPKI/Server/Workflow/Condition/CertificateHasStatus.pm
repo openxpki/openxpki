@@ -32,13 +32,13 @@ sub _evaluate {
 
     my $expected_status = $self->param('expected_status');
     ##! 16: "Expected status " . $expected_status
-    if ($expected_status !~ /\A(ISSUED|REVOKED|CRL_ISSUANCE_PENDING)\z/) {
+    if ($expected_status !~ /\A(ISSUED|REVOKED|CRL_ISSUANCE_PENDING|EXPIRED|VALID)\z/) {
         configuration_error('certificate has status expected status missing or invalid');
     }
 
     my $cert = CTX('dbi')->select_one(
         from => 'certificate',
-        columns => [ 'status' ],
+        columns => [ 'status', 'notbefore', 'notafter' ],
         where => {
             identifier => $identifier,
             pki_realm  => $pki_realm,
@@ -48,16 +48,27 @@ sub _evaluate {
     if (not $cert) {
         ##! 16: 'cert not found '
         CTX('log')->application()->debug("Cert status check failed, certificate not found " . $identifier);
-
         condition_error 'certificate has status cert not found';
-
     }
 
     ##! 16: 'status: ' . $cert->{'STATUS'}
-    if ($cert->{status} ne $expected_status) {
+    if ( $expected_status eq 'EXPIRED' && $cert->{status} eq 'ISSUED') {
+        if ($cert->{notafter} > time()) {
+            CTX('log')->application()->debug("Cert status check failed: certificate is not yet expired");
+            condition_error 'certificate is not yet expired';
+        }
+    } elsif ( $expected_status eq 'VALID' && $cert->{status} eq 'ISSUED') {
+        if ($cert->{notafter} < time()) {
+            CTX('log')->application()->debug("Cert status check failed: certificate has expired");
+            condition_error 'certificate has expired';
+        }
+        if ($cert->{notbefore} > time()) {
+            CTX('log')->application()->debug("Cert status check failed: certificate is not yet valid");
+            condition_error 'certificate is not yet valid';
+        }
+    } elsif ($cert->{status} ne $expected_status) {
         CTX('log')->application()->debug("Cert status check failed: ".$cert->{status}. " != ".$expected_status);
-
-        condition_error 'certificate has status does not match';
+        condition_error 'certificate status does not match';
     }
 
     return 1;
@@ -78,7 +89,6 @@ has the status given in the parameter expected_status. Only certs in the
 current realm are checked, if the certificate is not found, the condition
 behaves as the status does not match but sends another verbose error.
 
-
 =head1 Configuration
 
     is_certificate_issued:
@@ -93,7 +103,7 @@ behaves as the status does not match but sends another verbose error.
 =item expected_status
 
 The status to check against, expects a single status word, possible values
-are ISSUED, REVOKED, CRL_ISSUANCE_PENDING
+are ISSUED, REVOKED, CRL_ISSUANCE_PENDING, EXPIRED, VALID
 
 =item cert_identifier
 
@@ -107,4 +117,3 @@ is not set. If not set, a configuration_error is thrown (which is also
 false but creates a log message).
 
 =back
-
