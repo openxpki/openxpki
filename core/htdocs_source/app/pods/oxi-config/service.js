@@ -16,8 +16,8 @@ export default class OxiConfigService extends Service {
         this.ready = this._loadRemote(url)
             .then( yamlStr => {
                 try {
-                    let doc = yaml.safeLoad(yamlStr);
-                    this.localConfig = doc;
+                    let doc = yaml.safeLoad(yamlStr); // might be null if YAML is empty string
+                    if (doc) this.localConfig = doc;
                 }
                 catch (err) {
                     /* eslint-disable-next-line no-console */
