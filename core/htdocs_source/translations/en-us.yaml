@@ -39,3 +39,6 @@ component:
     open: "Open file"
   oxisection_grid:
     select_all: "all"
+  oxi_download:
+    download: "Download"
+    copy: "Copy"

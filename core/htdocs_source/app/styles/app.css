@@ -438,3 +438,31 @@ div.oxifield-upload {
 .oxi-btn-terminate:focus {
     background-color: #ad7fa8;
 }
+
+/******************************************************************************
+ * Others
+ */
+.hover-element {
+  display: inline flex;
+  flex-direction: column;
+}
+
+.hover-element .content {
+  margin: 0 auto;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.hover-element .menu {
+  display: none;
+  background-color: #dff0d8;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 10;
+  width: 100%;
+  padding: 6pt;
+}
+
+/* Show the dropdown menu on hover */
+.hover-element:hover .menu { display: block }
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.hover-element:hover .content { border-color: #bfe0a8 }

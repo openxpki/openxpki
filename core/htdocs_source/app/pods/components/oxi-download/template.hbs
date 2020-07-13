@@ -1,0 +1,22 @@
+<div class="row" {{did-insert this.onInsert}}>
+    {{#unless this.hide}}
+        <div class="col-md-8">
+            <div class="input-group">
+                <input type="text" value={{this.label}} {{on "input" this.onFileNameChange}} readonly={{this.isLink}} class="form-control" />
+                <span class="input-group-btn">
+                    <BsButton class="oxi-btn-optional" @onClick={{this.download}} @icon="glyphicon glyphicon-download-alt">
+                        {{t 'component.oxi_download.download'}}
+                    </BsButton>
+                </span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            {{#unless this.isLink}}
+                <button class="btn btn-default" {{on "click" this.copyToClipboard}}>
+                    <i class="glyphicon glyphicon-copy"></i>
+                    {{t 'component.oxi_download.copy'}}
+                </button>
+            {{/unless}}
+        </div>
+    {{/unless}}
+</div>

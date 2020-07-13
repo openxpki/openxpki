@@ -22,6 +22,15 @@
         {{#each this.valueSplitByNewline as |line|}} {{line}}<br> {{/each}}
     {{else if (eq this.format "code")}}
         <code>{{this.valueStr}}</code>
+    {{else if (eq this.format "file")}}
+        <div class="hover-element">
+            <pre class="content pre-scrollable">{{this.valueStr}}</pre>
+            <div class="menu">
+                <OxiDownload @data={{this.valueStr}} />
+            </div>
+        </div>
+    {{else if (eq this.format "download")}}
+        <OxiDownload @type={{v.type}} @data={{v.data}} @mimeType={{v.mimetype}} @fileName={{v.filename}} @autoDownload={{v.autodownload}} @hide={{v.hide}} />
     {{else if (eq this.format "raw")}}
         {{{defuse this.valueStr}}}
     {{else if (eq this.format "deflist")}}
