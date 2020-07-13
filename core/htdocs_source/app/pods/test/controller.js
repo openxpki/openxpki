@@ -1,7 +1,15 @@
 import Controller from '@ember/controller';
 import { tracked } from '@glimmer/tracking';
+import { inject as service } from '@ember/service';
 
 export default class TestController extends Controller {
+    @service('intl') intl;
+
+    constructor() {
+        super(...arguments);
+        this.intl.setLocale(["de-de"]);
+    }
+
     testButton = {
         label: "Button",
         format: "primary",
@@ -197,14 +205,22 @@ export default class TestController extends Controller {
             "empty": "No data available",
             "buttons": [
                 {
+                    "section": "Some",
+                },
+                {
                     "format": "expected",
                     "page": "certificate!search!query!rJdrIbg1P6xsE6b9RtQCXp291SE",
-                    "label": "Reload Search Form"
+                    "label": "Reload Search Form",
+                    "description": "Button 1",
                 },
                 {
                     "format": "alternative",
                     "page": "redirect!certificate!result!id!rJdrIbg1P6xsE6b9RtQCXp291SE",
-                    "label": "Refresh Result"
+                    "label": "Refresh Result",
+                    "description": "Button 2",
+                },
+                {
+                    "section": "Others",
                 },
                 {
                     "label": "New Search",

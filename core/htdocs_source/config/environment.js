@@ -4,7 +4,7 @@ module.exports = function(environment) {
     let ENV = {
         modulePrefix: 'openxpki',
         podModulePrefix: 'openxpki/pods',   // namespaced directory where resolver will look for resource files
-        environment,
+        environment: environment,
         rootURL: '/openxpki/',  // https://guides.emberjs.com/release/configuring-ember/embedding-applications/#toc_specifying-a-root-url
         locationType: 'hash',   // https://guides.emberjs.com/release/configuring-ember/specifying-url-type/
         EmberENV: {
@@ -43,8 +43,8 @@ module.exports = function(environment) {
          * Set up logging
          * https://guides.emberjs.com/release/configuring-ember/debugging/
          */
-        ENV.APP.LOG_RESOLVER = true;
-        ENV.APP.LOG_ACTIVE_GENERATION = true;
+        //ENV.APP.LOG_RESOLVER = true;
+        //ENV.APP.LOG_ACTIVE_GENERATION = true;
         ENV.APP.LOG_TRANSITIONS = true;             // Basic logging, e.g. "Transitioned into 'post'"
         ENV.APP.LOG_TRANSITIONS_INTERNAL = true;    // Detailed logging incl. internal steps made while transitioning into a route
         ENV.APP.LOG_VIEW_LOOKUPS = true;

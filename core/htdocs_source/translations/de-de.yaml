@@ -22,6 +22,11 @@ pagination:
   previous: "Vorherige"
   next: "Nächste"
 
+button:
+  confirm_dialog:
+    ok: "Bestätigen"
+    cancel: "Abbrechen"
+
 component:
   oxifield_datetime:
     timezone: "Zeitzone: {tz}"

@@ -8,7 +8,7 @@ import { debug } from '@ember/debug';
 class Field {
     @tracked type;
     @tracked name;
-    @tracked _refName; // original name, needed for dynamic input fields where 'name' can change
+    @tracked _refName; // internal use: original name, needed for dynamic input fields where 'name' can change
     @tracked value;
     @tracked label;
     @tracked tooltip;
@@ -18,9 +18,9 @@ class Field {
     // clonable fields:
     @tracked clonable;
     @tracked max;
-    @tracked canDelete;
-    @tracked canAdd;
-    @tracked focusClone = false; // initially focus clone (after adding)
+    @tracked _canDelete;
+    @tracked _canAdd;
+    @tracked _focusClone = false; // internal use: initially focus clone after adding (done in oxifield-main)
     // dynamic input fields:
     @tracked keys;
     // oxifield-datetime:
@@ -32,6 +32,23 @@ class Field {
     @tracked editable;
     // oxifield-static
     @tracked verbose;
+
+    static fromHash(sourceHash) {
+        let instance = new this(); // "this" in static methods refers to class
+        for (const attr of Object.keys(sourceHash)) {
+            if (! this.prototype.hasOwnProperty(attr)) {
+                /* eslint-disable-next-line no-console */
+                console.error(
+                    `oxisection-form: unknown property "${attr}" in field "${sourceHash.name}". ` +
+                    `If it's a new property, please add it to class 'Field' defined in ../oxisection-form/component.js.`
+                );
+            }
+            else {
+                instance[attr] = sourceHash[attr];
+            }
+        }
+        return instance;
+    }
 
     clone() {
         let field = new Field();
@@ -67,16 +84,7 @@ export default class OxisectionFormComponent extends Component {
         let result = [];
         for (const fieldHash of fields) {
             // convert hash into field
-            let field = new Field();
-            for (const attr of Object.keys(fieldHash)) {
-                if (! Field.prototype.hasOwnProperty(attr)) {
-                    /* eslint-disable-next-line no-console */
-                    console.error(`oxisection-form: unknown field property "${attr}" (field "${fieldHash.name}"). If it's a new property, please add it to the 'Field' class defined in oxisection-form/component.js.`);
-                }
-                else {
-                    field[attr] = fieldHash[attr];
-                }
-            }
+            let field = Field.fromHash(fieldHash);
 
             // dynamic input fields will change the form field name depending on the
             // selected option, so we need an internal reference to the original name ("_refName")
@@ -128,11 +136,11 @@ export default class OxisectionFormComponent extends Component {
         for (const name of this.clonableRefNames) {
             let clones = this.fields.filter(f => f._refName === name);
             for (const clone of clones) {
-                clone.canDelete = true;
-                clone.canAdd = clones.length < clones[0].max;
+                clone._canDelete = true;
+                clone._canAdd = clones.length < clones[0].max;
             }
             if (clones.length === 1) {
-                clones[0].canDelete = false;
+                clones[0]._canDelete = false;
             }
         }
         // for unknown reasons we need to trigger an update since this._updateCloneFields()
@@ -159,18 +167,19 @@ export default class OxisectionFormComponent extends Component {
 
     @action
     addClone(field) {
-        if (field.canAdd === false) return;
+        if (field._canAdd === false) return;
         let fields = this.fields;
         let index = fields.indexOf(field);
         let fieldCopy = field.clone();
         fieldCopy.value = "";
-        fieldCopy.focusClone = true;
+        fieldCopy._focusClone = true;
         fields.insertAt(index + 1, fieldCopy);
         this._updateCloneFields();
     }
 
     @action
     delClone(field) {
+        if (field._canDelete === false) return;
         let fields = this.fields;
         let index = fields.indexOf(field);
         fields.removeAt(index);

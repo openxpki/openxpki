@@ -25,10 +25,7 @@
                         {{@def.reset_label}}
                     </BsButton>
                 {{/if}}
-                {{#each @def.buttons as |btn|}}
-                    <OxiButton @button={{btn}} @onClick={{this.buttonClick}}/>
-                {{/each}}
-
+                <OxiButtonContainer @buttons={{@def.buttons}} @buttonClick={{this.buttonClick}}/>
             </div>
         </div>
     </form>
