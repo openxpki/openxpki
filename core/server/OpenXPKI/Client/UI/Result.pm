@@ -483,12 +483,12 @@ sub render {
         if (ref $redirect eq 'HASH' && $redirect->{goto}) {
             $url = $redirect->{goto};
         } elsif ($body) {
-            $url = 'openxpki/'.$self->__persist_response( { data => $body } );
+            $url = $self->__persist_response( { data => $body } );
         }
-        # if url does not start with http or slash, prepend baseurl
+        # if url does not start with http or slash, prepend baseurl + route name
         if ($url !~ m{\A http|/}x) {
             my $baseurl = $self->_session()->param('baseurl');
-            $url = $baseurl.$url;
+            $url = sprintf("%sopenxpki/%s", $baseurl, $url);
         }
         print $cgi->redirect($url);
     }
