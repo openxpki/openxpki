@@ -238,7 +238,13 @@ msgid "I18N_OPENXPKI_UI_CERT_ACTION_REVOKE"
 msgstr "Raise a <b>certificate revocation request</b>."
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA"
-msgstr "Update the meta information assocaited with this certificate."
+msgstr "<b>Update</b> the meta information associated with this certificate."
+
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_SHOW_METADATA"
+msgstr "<b>Show</b> the meta information associated with this certificate."
+
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_PUBLISH"
+msgstr "Trigger <b>publication</b> of this certificate."
 
 msgid "I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT"
 msgstr ""

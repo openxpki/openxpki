@@ -234,7 +234,13 @@ msgid "I18N_OPENXPKI_UI_CERT_ACTION_REVOKE"
 msgstr "Starte Antrag zur <b>Sperrung</b>."
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA"
-msgstr "Metadaten des Zertifikates aktualisieren."
+msgstr "Metadaten des Zertifikates <b>aktualisieren</b>."
+
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_SHOW_METADATA"
+msgstr "Metadaten des Zertifikates <b>anzeigen</b>."
+
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_PUBLISH"
+msgstr "<b>Publizierung</b> des Zertifikates anstoßen."
 
 msgid "I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT"
 msgstr ""
