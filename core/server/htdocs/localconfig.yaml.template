@@ -14,6 +14,16 @@
 backendPath: /cgi-bin/webui.fcgi
 
 #
+# URL path to a custom CSS file.
+# Might be specified as absolute or relative URL path, see "backendPath" above.
+#
+# You may add stylesheets or overwrite those from assets/openxpki.css, e.g.:
+#   #application { margin: 0 auto -30px; }
+#   #footer { height: 30px; padding-top: 5px; background-color: #000000; }
+#
+customCssPath: custom.css
+
+#
 # Year shown in footer (unless footer is replaced using "footer")
 #
 copyrightYear: 1970
