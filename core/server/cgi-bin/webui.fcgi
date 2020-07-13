@@ -216,8 +216,9 @@ while (my $cgi = CGI::Fast->new()) {
     our $cookie = {
         -name => 'oxisess-webui',
         -value => encrypt_cookie($session_front->id),
+        -SameSite => 'Strict',
         -Secure => ($ENV{'HTTPS'} ? 1 : 0),
-        -HttpOnly => 1
+        -HttpOnly => 1,
     };
 
     $log->debug('session id (front) is '. $session_front->id);
