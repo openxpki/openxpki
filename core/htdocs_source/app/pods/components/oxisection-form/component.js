@@ -137,7 +137,7 @@ export default class OxisectionFormComponent extends Component {
             let clones = this.fields.filter(f => f._refName === name);
             for (const clone of clones) {
                 clone._canDelete = true;
-                clone._canAdd = clones.length < clones[0].max;
+                clone._canAdd = clones[0].max ? clones.length < clones[0].max : 1;
             }
             if (clones.length === 1) {
                 clones[0]._canDelete = false;
