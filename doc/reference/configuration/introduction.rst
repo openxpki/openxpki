@@ -23,7 +23,7 @@ Activiate the new configuration
 
 To activate a new config without a restart, you need to do a reload::
 
-     openxpkicli reload
+     openxpkictl reload
 
 You can also just send a ``SIGHUP`` to the main process or restart the dameon.
 
