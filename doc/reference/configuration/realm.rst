@@ -273,7 +273,7 @@ GENERATION (1) available for substitution. The certificate identifier is also av
 
 Instead of having the tokens key files on the filesystem it is possible to
 store them in the datapool. Please be aware of the security implications of
-putting your CAs PRIVATE KEYS into the datapool which is readable by anbody
+putting your CAs PRIVATE KEYS into the datapool which is readable by anybody
 with access to the database or the openxpki socket!
 
 You must set the attribute ``key_store`` to ``DATAPOOL`` and provide the
@@ -295,7 +295,7 @@ This will read the SCEP key from the datapool, the used namespace is
 Using the datapool encryption hides the value of the key from database
 admins but still exposes it in clear text to anybody with access to the
 command line tool! It should be obvious that you can not store the
-data-vault token this way as it is neede to decrypt the datapool items!
+data-vault token this way as it is needed to decrypt the datapool items!
 
 Tip: Use "
 
