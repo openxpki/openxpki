@@ -198,7 +198,7 @@ You must provide a list of token group names at ``crypto.type`` to tell the syst
 token setup
 ^^^^^^^^^^^
 
-Any token used within OpenXKI needs a corresponding entry in the realm's token configuration at ``crypto.token``. The name of the token is the alias name you used while registering the correspondig certificate. ::
+Any token used within OpenXPKI needs a corresponding entry in the realm's token configuration at ``crypto.token``. The name of the token is the alias name you used while registering the correspondig certificate. ::
 
     token:
       democa-certsign:
