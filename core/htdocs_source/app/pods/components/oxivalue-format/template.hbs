@@ -20,7 +20,7 @@
         {{#each this.valueSplitByNewline as |line|}} {{line}}<br> {{/each}}
     {{else if (eq this.format "code")}}
         <code>{{this.valueStr}}</code>
-    {{else if (eq this.format "file")}}
+    {{else if (eq this.format "asciidata")}}
         <div class="hover-element">
             <pre class="content pre-scrollable">{{this.valueStr}}</pre>
             <div class="menu">
