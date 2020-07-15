@@ -14,8 +14,6 @@
         </a>
     {{else if (eq this.format "timestamp")}}
         {{this.timestamp}}
-    {{else if (eq this.format "datetime")}}
-        {{this.datetime}}
     {{else if (eq this.format "text")}}
         <OxiLabel @text={{v}} @raw={{false}} />
     {{else if (eq this.format "nl2br")}}

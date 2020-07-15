@@ -21,10 +21,6 @@ export default class OxivalueFormatComponent extends Component {
             : "---");
     }
 
-    get datetime() {
-        return moment().utc(this.args.content.value).format("YYYY-MM-DD HH:mm:ss UTC");
-    }
-
     get styledValue() {
         let m = this.args.content.value.match(/^(([a-z]+):)?(.*)$/m);
         return {
@@ -35,13 +31,13 @@ export default class OxivalueFormatComponent extends Component {
 
     @action
     click(evt) {
-        let target = evt.target;
-        if (target.tagName === "A" && target.target !== "_blank") {
+        let element = evt.target;
+        if (element.tagName === "A" && element.target !== "_blank") {
             evt.stopPropagation();
             evt.preventDefault();
             getOwner(this).lookup("route:openxpki").sendAjax({
-                page: target.href.split("#")[1].replace(/\/openxpki\//, ""),
-                target: target.target,
+                page: element.href.split("#")[1].replace(/\/openxpki\//, ""),
+                target: element.target,
             });
         }
     }
