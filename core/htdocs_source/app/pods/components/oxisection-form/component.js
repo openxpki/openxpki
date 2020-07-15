@@ -161,11 +161,6 @@ export default class OxisectionFormComponent extends Component {
     }
 
     @action
-    buttonClick(button) {
-        this.args.buttonClick(button);
-    }
-
-    @action
     addClone(field) {
         if (field._canAdd === false) return;
         let fields = this.fields;
