@@ -24,18 +24,18 @@
                         <dd.menu as |ddm|>
                             {{#each navEntry.entries as |entry|}}
                                 <ddm.item>
-                                    <ddm.linkTo @route="openxpki" @model={{entry.key}} @query={{hash force=navEntry.active}}>
+                                    <a href {{on "click" this.navigateTo}} data-page={{entry.key}}>
                                         {{entry.label}}
-                                    </ddm.linkTo>
+                                    </a>
                                 </ddm.item>
                             {{/each}}
                         </dd.menu>
                     </nav.dropdown>
                 {{else}}
                     <nav.item>
-                        <nav.linkTo @route="openxpki" @model={{navEntry.key}} @query={{hash force=navEntry.active}}>
+                        <a href {{on "click" this.navigateTo}} data-page={{navEntry.key}}>
                             {{navEntry.label}}
-                        </nav.linkTo>
+                        </a>
                     </nav.item>
                 {{/if}}
             {{/each}}
