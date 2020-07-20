@@ -30,9 +30,9 @@ export default class OxivalueFormatComponent extends Component {
     }
 
     @action
-    click(evt) {
+    internalLinkClick(evt) {
         let element = evt.target;
-        if (element.tagName === "A" && element.target !== "_blank") {
+        if (element.target !== "_blank") {
             evt.stopPropagation();
             evt.preventDefault();
             getOwner(this).lookup("route:openxpki").sendAjax({

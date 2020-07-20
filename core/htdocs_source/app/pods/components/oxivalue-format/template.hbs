@@ -1,11 +1,9 @@
-<span {{on "click" this.click}}>
-
 {{#let @content.value as |v|}}
 
     {{#if (eq this.format "certstatus")}}
         <OxiLabel @class="certstatus-{{lc (try v.value v.label)}}" @tooltip={{v.tooltip}} @text={{v.label}} @raw={{true}} />
     {{else if (eq this.format "link")}}
-        <a href="#/openxpki/{{v.page}}" target={{try v.target "popup"}} title={{v.tooltip}}>
+        <a href="#/openxpki/{{v.page}}" target={{try v.target "popup"}} title={{v.tooltip}} {{on "click" this.internalLinkClick}}>
             <OxiLabel @text={{v.label}} @raw={{true}} />
         </a>
     {{else if (eq this.format "extlink")}}
@@ -50,7 +48,7 @@
         <ul class="list-unstyled">
             {{#each v as |val|}}
                 <li>
-                    <a href="#/openxpki/{{val.page}}" target={{try val.target "popup"}} title={{val.tooltip}}>
+                    <a href="#/openxpki/{{val.page}}" target={{try val.target "popup"}} title={{val.tooltip}} {{on "click" this.internalLinkClick}}>
                         <OxiLabel @text={{val.label}} @raw={{true}} />
                     </a>
                 </li>
@@ -63,5 +61,3 @@
     {{/if}}
 
 {{/let}}
-
-</span>
