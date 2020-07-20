@@ -119,6 +119,14 @@ dl, ul {
   margin-bottom: 0;
 }
 
+/* Indent DL items */
+dd {
+  padding: 0 0 0 1em;
+}
+dd + dt {
+  padding-top: 0.5em;
+}
+
 /******************************************************************************
  * Loading indicators
  */
