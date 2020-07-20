@@ -11,10 +11,4 @@ export default class OxiLabelComponent extends Component {
     get useSpan() {
         return (this.args.tooltip || this.args.class || Array.isArray(this.args.text));
     }
-
-    get textList() {
-        return Array.isArray(this.args.text)
-            ? this.args.text
-            : [ this.args.text ];
-    }
 }
