@@ -33,7 +33,11 @@
         <dl>
             {{#each v as |val|}}
                 <dt>{{val.label}}</dt>
-                <dd><OxiLabel @text={{val.value}} @raw={{eq val.format "raw"}} /></dd>
+                {{#each (arrayify val.value) as |ddVal|}}
+                    <dd>
+                        {{#if (eq val.format "raw")}}{{{defuse ddVal}}}{{else}}{{ddVal}}{{/if}}
+                    </dd>
+                {{/each}}
             {{/each}}
         </dl>
     {{else if (eq this.format "ullist")}}
