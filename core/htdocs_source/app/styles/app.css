@@ -127,6 +127,11 @@ dd + dt {
   padding-top: 0.5em;
 }
 
+/* Spacer */
+div.spacer {
+  margin:5px;
+}
+
 /******************************************************************************
  * Loading indicators
  */
@@ -386,12 +391,7 @@ div.oxifield-upload {
 }
 
 .oxi-button-container {
-  padding-top: 20px;
   padding-bottom: 20px;
-}
-
-.oxi-button-container div.spacer {
-  margin:5px;
 }
 
 .oxi-button-container a.btn:before {
