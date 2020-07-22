@@ -23,13 +23,17 @@
                         <th {{on "click" (fn this.sort column.sortPage)}} class="sortable">
                             <span>{{column.sTitle}}</span>
                             {{#if column.isSorted}}
-                                {{#if this.pager.reverse}}
-                                    <span class="pull-right glyphicon glyphicon-sort-by-attributes-alt"></span>
-                                {{else}}
-                                    <span class="pull-right glyphicon glyphicon-sort-by-attributes"></span>
-                                {{/if}}
+                                <button type="button" class="btn btn-primary btn-xs pull-right">
+                                    {{#if this.pager.reverse}}
+                                        <span class="glyphicon glyphicon-sort-by-attributes-alt"></span>
+                                    {{else}}
+                                        <span class="glyphicon glyphicon-sort-by-attributes"></span>
+                                    {{/if}}
+                                </button>
                             {{else}}
-                                <span class="pull-right glyphicon glyphicon-sort-by-attributes-alt text-muted"></span>
+                                <button type="button" class="btn btn-default btn-xs pull-right">
+                                    <span class="glyphicon glyphicon-sort-by-attributes text-muted"></span>
+                                </button>
                             {{/if}}
                         </th>
                     {{else}}
