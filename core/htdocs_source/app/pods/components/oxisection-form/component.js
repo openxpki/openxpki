@@ -116,11 +116,17 @@ export default class OxisectionFormComponent extends Component {
         }
 
         for (let field of result) {
-            // dynamic input fields: presets are key/value hashes.
-            // we need to convert `value: { key: NAME, value: VALUE }` to `name: NAME, value: VALUE`
-            if (field.value && typeof field.value === "object") {
-                field.name = field.value.key;
-                field.value = field.value.value;
+            if (field.value) {
+                // dynamic input fields: presets are key/value hashes.
+                // we need to convert `value: { key: NAME, value: VALUE }` to `name: NAME, value: VALUE`
+                if (typeof field.value === "object") {
+                    field.name = field.value.key;
+                    field.value = field.value.value;
+                }
+                // strip trailing newlines - esp. important for type "passwordverify"
+                if (typeof field.value === 'string') {
+                    field.value = field.value.replace(/\n*$/, "");
+                }
             }
         }
 
