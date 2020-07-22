@@ -11,6 +11,7 @@ class Field {
     @tracked _refName; // internal use: original name, needed for dynamic input fields where 'name' can change
     @tracked value;
     @tracked label;
+    @tracked is_optional;
     @tracked tooltip;
     @tracked placeholder;
     @tracked actionOnChange;
@@ -28,7 +29,6 @@ class Field {
     // oxifield-select:
     @tracked options;
     @tracked prompt;
-    @tracked is_optional;
     @tracked editable;
     // oxifield-static
     @tracked verbose;
