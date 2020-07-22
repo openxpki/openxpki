@@ -41,7 +41,7 @@
             </tr>
         </thead>
         <tbody>
-            {{#each this.sortedData as |row index|}}
+            {{#each this.data as |row index|}}
                 <tr class="context {{row.className}} {{if this.hasAction "has-action"}}">
                     {{#if this.isBulkable}}
                         <td {{action "select" row}}>
