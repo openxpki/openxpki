@@ -5,7 +5,8 @@ import { debug } from '@ember/debug';
 
 /*
  * NOTE: this component differs from others in that it does not
- * react to parent content changes. Two reasons:
+ * react to changes of its parameters (this.args.*).
+ * Two reasons:
  * 1. it makes no sense to have presets for an upload area, or modified
  *    values from a parent component
  * 2. the logic for disabling buttons etc. would not work as we would
@@ -22,6 +23,14 @@ export default class OxifieldUploadComponent extends Component {
 
     get cols() { return (this.args.content.textAreaSize || {}).width || 150 }
     get rows() { return (this.args.content.textAreaSize || {}).height || 10 }
+
+    @action
+    onKeydown(event) {
+        // prevent form submit when hitting ENTER
+        if (event.keyCode === 13) {
+            event.stopPropagation();
+        }
+    }
 
     @action
     onFileUploadInsert(element) {

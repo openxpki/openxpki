@@ -7,6 +7,7 @@
             value={{this.textOutput}}
             placeholder={{@content.placeholder}}
             readonly={{if this.lockTextInput "readonly"}}
+            {{on "keydown" this.onKeydown}}
             {{on "input" this.setTextInput}}
             {{on "drop" this.fileDropped}}
             {{on "dragover" this.showCopyEffect}}
