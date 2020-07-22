@@ -59,7 +59,7 @@ sub _init_backends {
     my @realms = CTX('config')->get_keys('system.realms');
     my $backends;
     foreach my $realm (@realms) {
-        ##! 8: 'load realm $realm'
+        ##! 8: 'load realm ' . $realm
         CTX('session')->data->pki_realm( $realm );
         $backends->{$realm} = $self->_init_backends_for_realm();
     }

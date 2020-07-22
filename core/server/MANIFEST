@@ -320,13 +320,13 @@ OpenXPKI/Server/Authentication/Connector.pm
 OpenXPKI/Server/Authentication/OneTimePassword.pm
 #OpenXPKI/Server/ACL.pm
 
+OpenXPKI/Server/Notification/Base.pm
+OpenXPKI/Server/Notification/Connector.pm
+OpenXPKI/Server/Notification/Handler.pm
 OpenXPKI/Server/Notification/RT.pm
 OpenXPKI/Server/Notification/ServiceNow.pm
-OpenXPKI/Server/Notification/Base.pm
-OpenXPKI/Server/Notification/Handler.pm
 OpenXPKI/Server/Notification/SMTP.pm
 OpenXPKI/Server/Notification/SMTP/SSL.pm
-
 
 # SOAP
 OpenXPKI/SOAP.pm
