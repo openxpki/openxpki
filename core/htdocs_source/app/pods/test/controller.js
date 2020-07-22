@@ -8,6 +8,25 @@ export default class TestController extends Controller {
     constructor() {
         super(...arguments);
         this.intl.setLocale(["de-de"]);
+        // add some more grid rows
+        for (let i=0; i<50; i++) {
+            this.gridDef.content.data.push([
+                334455 + i,
+                `CN=client-${i},DC=Test Deployment,DC=OpenXPKI,DC=org`,
+                {
+                    "value": "ISSUED",
+                    "label": "Issued"
+                },
+                1585959633 + 60*60*24*i,
+                `${1585959633 + 60*60*24*i}`,
+                `ID-IS-${i}`,
+                `id-${i}`,
+                {
+                    "label": "Issued",
+                    "value": "ISSUED"
+                }
+            ]);
+        }
     }
 
     testButton = {
@@ -191,16 +210,6 @@ export default class TestController extends Controller {
 
     @tracked gridDef = {
         "content": {
-            "pager": {
-                "startat": 0,
-                "count": 2,
-                "pagersize": 5,
-                "pagesizes": [ 10, 20, 50 ],
-                "limit": 10,
-                "pagerurl": "certificate!pager!id!rJdrIbg1P6xsE6b9RtQCXp291SE",
-                "order": "notbefore",
-                "reverse": 0,
-            },
             "empty": "No data available",
             "buttons": [
                 {
@@ -292,7 +301,7 @@ export default class TestController extends Controller {
                         "label": "Issued"
                     },
                     "1585959633",
-                    1617495633,
+                    "1617495633",
                     "0qLkfCTwwj-8SoSOTtlRQLqS20o",
                     "0qLkfCTwwj-8SoSOTtlRQLqS20o",
                     {
@@ -316,6 +325,7 @@ export default class TestController extends Controller {
                         "value": "ISSUED"
                     }
                 ],
+                // ... more rows are added in constructor above
             ]
         },
         "type": "grid",

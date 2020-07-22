@@ -33,6 +33,7 @@ export default class OxisectionGridComponent extends Component {
     get rawActions() { return (this.args.def.actions || []) }
 
     get hasAction() { return this.rawActions.length > 0 }
+    get hasPager() { return !!this.pager.pagerurl }
     get multipleActions() { return this.rawActions.length > 1 }
     get firstAction() { return this.rawActions[0] }
 
@@ -119,13 +120,13 @@ export default class OxisectionGridComponent extends Component {
 
     @computed("visibleColumns", "pager.{limit,startat,order,reverse}")
     get formattedColumns() {
-        let columns = this.visibleColumns;
-        let pager = this.pager;
         let results = [];
-        for (const column of columns) {
-            let order = column.sortkey;
-            let isSorted = pager.order && pager.order === order;
-            let reverse = isSorted ? !pager.reverse : false;
+        for (const column of this.visibleColumns) {
+            let order = this.hasPager
+                ? column.sortkey // server-side sorting
+                : column.sTitle; // client-side sorting
+            let isSorted = this.pager.order && this.pager.order === order;
+            let reverse = isSorted ? !this.pager.reverse : false;
             results.push({
                 index: column.index,
                 sTitle: column.sTitle,
@@ -134,10 +135,10 @@ export default class OxisectionGridComponent extends Component {
                 isSorted: isSorted,
                 // pager information to change sorting
                 sortPage: {
-                    limit: pager.limit,
+                    limit: this.pager.limit,
                     order: order,
                     reverse: +reverse,
-                    startat: pager.startat
+                    startat: this.pager.startat
                 }
             });
         }
@@ -170,17 +171,46 @@ export default class OxisectionGridComponent extends Component {
                 originalIndex: y
             });
         }
+
         return results;
     }
 
-    @computed("data.@each.checked")
-    get allChecked() {
-        return this.data.isEvery("checked", true);
+    // split sorting from row data generation in "get data()" for better performance when re-sorting
+    @computed("data", "formattedColumns", "pager.reverse")
+    get sortedData() {
+        // server-side sorting
+        if (this.hasPager) return this.data;
+
+        // client-side sorting
+        let data = this.data.toArray();
+        let column = this.formattedColumns.findBy("isSorted");
+        let sortNum = this.formattedColumns.indexOf(column);
+        if (sortNum >= 0) {
+            let re = /^[0-9.]+$/;
+            data.sort(function(a, b) {
+                a = a.data[sortNum].value;
+                b = b.data[sortNum].value;
+                if (re.test(a) && re.test(b)) {
+                    a = parseFloat(a, 10);
+                    b = parseFloat(b, 10);
+                }
+                return (a > b) ? 1 : -1;
+            });
+            if (this.pager.reverse) {
+                data.reverseObjects();
+            }
+        }
+        return data;
     }
 
-    @computed("data.@each.checked")
+    @computed("sortedData.@each.checked")
+    get allChecked() {
+        return this.sortedData.isEvery("checked", true);
+    }
+
+    @computed("sortedData.@each.checked")
     get noneChecked() {
-        return this.data.isEvery("checked", false);
+        return this.sortedData.isEvery("checked", false);
     }
 
     @computed("buttons.@each.select")
@@ -235,7 +265,7 @@ export default class OxisectionGridComponent extends Component {
             let request = {
                 action: button.action
             };
-            request[button.selection] = this.data.filterBy("checked").getEach("originalData").getEach("" + index);
+            request[button.selection] = this.sortedData.filterBy("checked").getEach("originalData").getEach("" + index);
             set(button, "loading", true);
 
             getOwner(this).lookup("route:openxpki")
@@ -249,11 +279,13 @@ export default class OxisectionGridComponent extends Component {
 
     @action
     select(row) {
+        // (de-)select single row
         if (row) {
             set(row, "checked", !row.checked);
         }
+        // (de-)select all
         else {
-            this.data.setEach("checked", !this.allChecked);
+            this.sortedData.setEach("checked", !this.allChecked);
         }
     }
 
@@ -279,8 +311,13 @@ export default class OxisectionGridComponent extends Component {
 
     @action
     sort(page) {
-        let pager = this.pager;
-        if (!pager.pagerurl) throw new Error("oxisection-grid: No 'pagerurl' specified");
-        if (page.order) { this.setPage(page) }
+        // server-side sorting
+        if (this.hasPager) {
+            if (page.order) this.setPage(page)
+        }
+        // client-side sorting
+        else {
+            setProperties(this.pager, page);
+        }
     }
 }
