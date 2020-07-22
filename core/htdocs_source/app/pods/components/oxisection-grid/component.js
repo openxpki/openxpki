@@ -15,10 +15,18 @@ Shows a button with an optional confirm dialog.
 */
 export default class OxisectionGridComponent extends Component {
     @tracked rawData = [];
+    @tracked pager = {};
 
     constructor() {
         super(...arguments);
+
         this.rawData = this.args.def.data || [];
+
+        this.pager = this.args.def.pager || {};
+        if (this.pager.count == null)   { this.pager.count = 0 }
+        if (this.pager.startat == null) { this.pager.startat = 0 }
+        if (this.pager.limit == null)   { this.pager.limit = Number.MAX_VALUE }
+        if (this.pager.reverse == null) { this.pager.reverse = 0 }
     }
 
     get rawColumns() { return (this.args.def.columns || []) }
@@ -33,16 +41,6 @@ export default class OxisectionGridComponent extends Component {
         return this.rawColumns
         .map( (col, index) => { col.index = index; return col })
         .filter(col => col.sTitle[0] !== "_" && col.bVisible !== 0);
-    }
-
-    @computed("args.def.pager", "visibleColumns")
-    get pager() {
-        let pager = this.args.def.pager || {};
-        if (pager.count == null) { pager.count = 0 }
-        if (pager.startat == null) { pager.startat = 0 }
-        if (pager.limit == null) { pager.limit = Number.MAX_VALUE }
-        if (pager.reverse == null) { pager.reverse = 0 }
-        return pager;
     }
 
     @computed("pager.{startat,limit,order,reverse}")
@@ -267,10 +265,10 @@ export default class OxisectionGridComponent extends Component {
         let pager = this.pager;
         return getOwner(this).lookup("route:openxpki")
         .sendAjax({
-            page: pager.pagerurl,
-            limit: page.limit,
+            page:    pager.pagerurl,
+            limit:   page.limit,
             startat: page.startat,
-            order: page.order,
+            order:   page.order,
             reverse: page.reverse,
         })
         .then((res) => {
