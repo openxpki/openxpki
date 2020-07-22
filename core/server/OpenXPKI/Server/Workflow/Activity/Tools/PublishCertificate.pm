@@ -119,6 +119,8 @@ sub execute {
     $data->{pem} = $x509->pem;
     $data->{der} = $x509->data;
 
+    $data->{unpublish} = 1 if ($unpublish);
+
     # Check for publication key
     my $publish_key = $self->param('publish_key');
 
@@ -171,7 +173,8 @@ sub execute {
     my @failed;
     ##! 32: 'Targets ' . Dumper \@target
     foreach my $target (@target) {
-        eval{ $config->set( [ @path, $target, $publish_key ], $data, $param ); };
+        my $res;
+        eval{ $res = $config->set( [ @path, $target, $publish_key ], $data, $param ); };
         if (my $eval_err = $EVAL_ERROR) {
             CTX('log')->application()->debug("Publishing failed with $eval_err");
             if ($on_error eq 'queue') {
@@ -190,9 +193,11 @@ sub execute {
                     }
                 );
             }
+            CTX('log')->application()->debug("Publication backend error was $eval_err");
+        } elsif (!defined $res) {
+            CTX('log')->application()->warn("Entity pubication to $target for ". $publish_key." returned undef");
         } else {
             CTX('log')->application()->info("Entity pubication to $target for ". $publish_key." done");
-
         }
     }
 
