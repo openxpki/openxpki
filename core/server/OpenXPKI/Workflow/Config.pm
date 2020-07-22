@@ -346,14 +346,18 @@ sub __process_action {
 
         my $context_key = $conn->get( [ @item_path, 'name' ] );
         if (!$context_key) {
-            OpenXPKI::Exception->throw(
-                message => 'Field name used in workflow config is not defined',
-                params => {
-                    workflow => $wf_name,
-                    action => $action_name,
-                    field => $field_name,
-                }
-            );
+            if ($conn->exists( \@item_path )) {
+                $context_key = $field_name;
+            } else {
+                OpenXPKI::Exception->throw(
+                    message => 'Field name used in workflow config is not defined',
+                    params => {
+                        workflow => $wf_name,
+                        action => $action_name,
+                        field => $field_name,
+                    }
+                );
+            }
         }
 
         my $is_array = ($conn->exists( [ @item_path, 'min' ] ) || $conn->exists( [ @item_path, 'max' ] ));
