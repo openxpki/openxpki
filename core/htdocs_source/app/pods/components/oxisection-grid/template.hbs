@@ -102,11 +102,16 @@
     </div>
 </div>
 
-<PartialPagination
-    @pager={{@def.pager}}
-    @pages={{this.pages}}
-    @pagesizes={{this.pagesizes}}
-    @setPage={{this.setPage}}
-/>
-
-<OxiButtonContainer @buttons={{this.buttons}} @buttonClick={{this.buttonClick}}/>
+<div class="row">
+    <div class="col-md-6">
+        <OxiButtonContainer @buttons={{this.buttons}} @buttonClick={{this.buttonClick}}/>
+    </div>
+    <div class="col-md-6">
+        <PartialPagination
+            @pager={{@def.pager}}
+            @pages={{this.pages}}
+            @pagesizes={{this.pagesizes}}
+            @setPage={{this.setPage}}
+        />
+    </div>
+</div>

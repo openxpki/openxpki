@@ -127,6 +127,11 @@ dd + dt {
   padding-top: 0.5em;
 }
 
+/* Pager */
+.oxi-pager .pagination {
+  margin: 0;
+}
+
 /* Spacer */
 div.spacer {
   margin:5px;
