@@ -133,10 +133,13 @@ export default class OxisectionGridComponent extends Component {
                 format: column.format,
                 sortable: !!column.sortkey,
                 isSorted: pager.order && pager.order === order,
-                limit: pager.limit,
-                order: order,
-                reverse: +reverse,
-                startat: pager.startat
+                // pager information to change sorting
+                sortPage: {
+                    limit: pager.limit,
+                    order: order,
+                    reverse: +reverse,
+                    startat: pager.startat
+                }
             });
         }
         return results;

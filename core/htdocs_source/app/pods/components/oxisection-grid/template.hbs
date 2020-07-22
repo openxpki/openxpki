@@ -20,7 +20,7 @@
                 {{/if}}
                 {{#each this.formattedColumns as |column|}}
                     {{#if column.sortable}}
-                        <th {{action "sort" column}} class="sortable">
+                        <th {{on "click" (fn this.sort column.sortPage)}} class="sortable">
                             <span>{{column.sTitle}}</span>
                             {{#if column.isSorted}}
                                 {{#if this.pager.reverse}}
