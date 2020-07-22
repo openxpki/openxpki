@@ -75,11 +75,6 @@ export default class OxisectionFormComponent extends Component {
         this._updateCloneFields();
     }
 
-    @computed("args.def.submit_label")
-    get submitLabel() {
-        return this.args.def.submit_label || "send";
-    }
-
     _prepareFields(fields) {
         let result = [];
         for (const fieldHash of fields) {

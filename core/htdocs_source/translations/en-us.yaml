@@ -37,6 +37,9 @@ component:
   oxifield_uploadarea:
     reset: "Reset"
     open: "Open file"
+  oxisection_form:
+    submit: "Send"
+    reset: "Reset"
   oxisection_grid:
     select_all: "all"
   oxi_download:

@@ -20,9 +20,9 @@ export default class TestController extends Controller {
     @tracked formDef = {
         type: "form",
         action: "login!password",
+        reset: "login!password",
         content: {
             title: "Test input",
-            submit_label: "Perform",
             fields: [
                 {
                     type: "bool",
