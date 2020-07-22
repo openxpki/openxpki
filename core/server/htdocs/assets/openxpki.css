@@ -21,6 +21,8 @@ ul.pagination li:not(.disabled)>a{cursor:pointer}
 span.pagination-label{float:left;padding:6px 0}
 span.oxi-label{display:inline-block;white-space:nowrap}
 dl,ul{margin-bottom:0}
+dd{padding:0 0 0 1em}
+dd+dt{padding-top:.5em}
 .loading.progress,.refresh.progress{position:fixed;top:30px;right:20px;width:100px}
 .loading.progress .progress-bar,.refresh.progress .progress-bar{width:100%}
 .waiting-for-ember{margin-top:80px}
