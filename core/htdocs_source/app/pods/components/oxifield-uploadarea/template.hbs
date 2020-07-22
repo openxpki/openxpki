@@ -18,9 +18,9 @@
 <input
     type="file"
     class="oxi-file-input"
-    id={{this.fileUploadElementId}}
     style="display:none"
     {{on "change" this.fileSelected}}
+    {{did-insert this.onFileUploadInsert}}
 />
 
 <div class="row">

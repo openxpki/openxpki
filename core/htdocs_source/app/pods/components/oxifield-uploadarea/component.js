@@ -1,7 +1,6 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
-import { guidFor } from '@ember/object/internals';
 import { debug } from '@ember/debug';
 
 /*
@@ -14,7 +13,7 @@ import { debug } from '@ember/debug';
  *    from a file.
  */
 export default class OxifieldUploadComponent extends Component {
-    fileUploadElementId = 'oxi-fileupload-' + guidFor(this);
+    fileUploadElement = null;
 
     @tracked data;
     @tracked textOutput = "";
@@ -25,13 +24,18 @@ export default class OxifieldUploadComponent extends Component {
     get rows() { return (this.args.content.textAreaSize || {}).height || 10 }
 
     @action
+    onFileUploadInsert(element) {
+        this.fileUploadElement = element;
+    }
+
+    @action
     setTextInput(evt) {
         this.setData(evt.target.value);
     }
 
     @action
     openFileUpload() {
-        document.getElementById(this.fileUploadElementId).click();
+        this.fileUploadElement.click();
     }
 
     @action
