@@ -155,7 +155,12 @@ export default class TestController extends Controller {
                     type: "textarea",
                     name: "prosa",
                     label: "Textarea",
-                    value: "Hi there!\nHow are you?",
+                    value: "Hi there!\nHow are you?\n",
+                },
+                {
+                    type: "uploadarea",
+                    value: "...data...",
+                    label: "Uploadarea",
                 },
             ],
             buttons: [
@@ -188,19 +193,13 @@ export default class TestController extends Controller {
         "content": {
             "pager": {
                 "startat": 0,
-                "reverse": 1,
-                "count": 3,
-                "pagersize": 20,
-                "pagesizes": [
-                    25,
-                    50,
-                    100,
-                    250,
-                    500
-                ],
+                "count": 2,
+                "pagersize": 5,
+                "pagesizes": [ 10, 20, 50 ],
+                "limit": 10,
                 "pagerurl": "certificate!pager!id!rJdrIbg1P6xsE6b9RtQCXp291SE",
-                "limit": 25,
-                "order": "notbefore"
+                "order": "notbefore",
+                "reverse": 0,
             },
             "empty": "No data available",
             "buttons": [
