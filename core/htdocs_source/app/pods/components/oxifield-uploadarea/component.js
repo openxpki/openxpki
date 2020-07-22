@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import { inject as service } from '@ember/service';
 import { debug } from '@ember/debug';
 
 /*
@@ -14,6 +15,8 @@ import { debug } from '@ember/debug';
  *    from a file.
  */
 export default class OxifieldUploadComponent extends Component {
+    @service('intl') intl;
+
     fileUploadElement = null;
 
     @tracked data;
@@ -99,7 +102,10 @@ export default class OxifieldUploadComponent extends Component {
             this.textOutput = String.fromCharCode(...new Uint8Array(arrayBuffer));
         }
         else {
-            this.textOutput = !isSmall ? "<large file chosen>" : "<binary file>";
+            this.textOutput = `<${!isSmall
+                ? this.intl.t('component.oxifield_uploadarea.large_file')
+                : this.intl.t('component.oxifield_uploadarea.binary_file')
+            }>`;
         }
     }
 

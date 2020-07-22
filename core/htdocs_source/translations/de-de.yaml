@@ -37,6 +37,8 @@ component:
   oxifield_uploadarea:
     reset: "Leeren"
     open: "Datei öffnen"
+    large_file: "Datei zu gross für Vorschau"
+    binary_file: "Binärdatei"
   oxisection_form:
     submit: "Senden"
     reset: "Zurücksetzen"
