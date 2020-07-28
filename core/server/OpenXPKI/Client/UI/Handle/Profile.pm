@@ -38,6 +38,8 @@ sub render_profile_select {
     if ($cert_profile) {
         my $styles = $self->send_command_v2( 'get_cert_subject_profiles', { profile => $cert_profile });
         @styles = sort { lc($a->{value}) cmp lc($b->{value}) } values %{$styles};
+    } else {
+        @styles = ({ value => '', label => 'I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST'});
     }
 
     my @fields;

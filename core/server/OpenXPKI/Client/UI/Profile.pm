@@ -17,9 +17,11 @@ sub action_get_styles_for_profile {
 
     $self->logger()->trace( 'get_styles_for_profile with args: ' . Dumper $args ) if $self->logger->is_trace;
 
-    my $cert_profile = $self->param('cert_profile');
-    my $styles = $self->send_command_v2( 'get_cert_subject_profiles', { profile => $cert_profile });
-    my @styles = sort { lc($a->{value}) cmp lc($b->{value}) } values %{$styles};
+    my @styles;
+    if (my $cert_profile = $self->param('cert_profile')) {
+        my $styles = $self->send_command_v2( 'get_cert_subject_profiles', { profile => $cert_profile });
+        @styles = sort { lc($a->{value}) cmp lc($b->{value}) } values %{$styles};
+    }
 
     if (scalar @styles == 0) {
         @styles = ({ value => '', label => 'I18N_OPENXPKI_UI_PROFILE_CHOOSE_PROFILE_FIRST'});
@@ -100,6 +102,3 @@ sub action_get_key_param {
     return $self;
 
 }
-
-
-

@@ -2432,7 +2432,7 @@ sub __render_input_field {
     my $type = $field->{type} || 'text';
 
     # fields to be filled only by server sided workflows
-    next if ($type eq "server");
+    return if ($type eq "server");
 
     my $item = {
         name => $name,
