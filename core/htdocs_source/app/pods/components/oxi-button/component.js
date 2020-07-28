@@ -58,6 +58,7 @@ let format2css = {
     optional:       "oxi-btn-optional",
     alternative:    "oxi-btn-alternative",
     exceptional:    "oxi-btn-exceptional",
+    terminate:      "oxi-btn-terminate",
 };
 
 export default class OxiButtonComponent extends Component {

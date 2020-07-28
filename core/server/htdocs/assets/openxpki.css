@@ -21,6 +21,10 @@ ul.pagination li:not(.disabled)>a{cursor:pointer}
 span.pagination-label{float:left;padding:6px 0}
 span.oxi-label{display:inline-block;white-space:nowrap}
 dl,ul{margin-bottom:0}
+dd{padding:0 0 0 1em}
+dd+dt{padding-top:.5em}
+.oxi-pager .pagination{margin:0}
+div.spacer{margin:5px}
 .loading.progress,.refresh.progress{position:fixed;top:30px;right:20px;width:100px}
 .loading.progress .progress-bar,.refresh.progress .progress-bar{width:100%}
 .waiting-for-ember{margin-top:80px}
@@ -82,8 +86,7 @@ div.oxifield-upload{position:relative;padding-bottom:34px}
 .stacked-buttons .btn-bt-margin{margin-top:6px;margin-bottom:6px}
 .oxi-btn-loading{color:#fff;background-color:#428bca;border-color:#357ebd}
 .oxi-btn-loading.active,.oxi-btn-loading:active,.oxi-btn-loading:focus,.oxi-btn-loading:hover{color:#fff;background-color:#3276b1;border-color:#285e8e}
-.oxi-button-container{padding-top:20px;padding-bottom:20px}
-.oxi-button-container div.spacer{margin:5px}
+.oxi-button-container{padding-bottom:20px}
 .oxi-button-container a.btn:before{content:"\e144";color:#a0a0a0}
 .oxi-btn-expected,.oxi-btn-expected:focus,.oxi-btn-expected:hover,.oxi-btn-submit,.oxi-btn-submit:focus,.oxi-btn-submit:hover{background-color:#c9e2b3}
 .oxi-btn-optional,.oxi-btn-optional:focus,.oxi-btn-optional:hover{background-color:#e4e4da}

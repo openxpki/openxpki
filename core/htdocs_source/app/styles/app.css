@@ -119,6 +119,24 @@ dl, ul {
   margin-bottom: 0;
 }
 
+/* Indent DL items */
+dd {
+  padding: 0 0 0 1em;
+}
+dd + dt {
+  padding-top: 0.5em;
+}
+
+/* Pager */
+.oxi-pager .pagination {
+  margin: 0;
+}
+
+/* Spacer */
+div.spacer {
+  margin:5px;
+}
+
 /******************************************************************************
  * Loading indicators
  */
@@ -378,12 +396,7 @@ div.oxifield-upload {
 }
 
 .oxi-button-container {
-  padding-top: 20px;
   padding-bottom: 20px;
-}
-
-.oxi-button-container div.spacer {
-  margin:5px;
 }
 
 .oxi-button-container a.btn:before {

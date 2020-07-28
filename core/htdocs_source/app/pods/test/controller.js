@@ -8,6 +8,25 @@ export default class TestController extends Controller {
     constructor() {
         super(...arguments);
         this.intl.setLocale(["de-de"]);
+        // add some more grid rows
+        for (let i=0; i<50; i++) {
+            this.gridDef.content.data.push([
+                334455 + i,
+                `CN=client-${i},DC=Test Deployment,DC=OpenXPKI,DC=org`,
+                {
+                    "value": "ISSUED",
+                    "label": "Issued"
+                },
+                1585959633 + 60*60*24*i,
+                `${1585959633 + 60*60*24*i}`,
+                `ID-IS-${i}`,
+                `id-${i}`,
+                {
+                    "label": "Issued",
+                    "value": "ISSUED"
+                }
+            ]);
+        }
     }
 
     testButton = {
@@ -20,9 +39,9 @@ export default class TestController extends Controller {
     @tracked formDef = {
         type: "form",
         action: "login!password",
+        reset: "login!password",
         content: {
             title: "Test input",
-            submit_label: "Perform",
             fields: [
                 {
                     type: "bool",
@@ -155,7 +174,12 @@ export default class TestController extends Controller {
                     type: "textarea",
                     name: "prosa",
                     label: "Textarea",
-                    value: "Hi there!\nHow are you?",
+                    value: "Hi there!\nHow are you?\n",
+                },
+                {
+                    type: "uploadarea",
+                    value: "...data...",
+                    label: "Uploadarea",
                 },
             ],
             buttons: [
@@ -186,22 +210,6 @@ export default class TestController extends Controller {
 
     @tracked gridDef = {
         "content": {
-            "pager": {
-                "startat": 0,
-                "reverse": 1,
-                "count": 3,
-                "pagersize": 20,
-                "pagesizes": [
-                    25,
-                    50,
-                    100,
-                    250,
-                    500
-                ],
-                "pagerurl": "certificate!pager!id!rJdrIbg1P6xsE6b9RtQCXp291SE",
-                "limit": 25,
-                "order": "notbefore"
-            },
             "empty": "No data available",
             "buttons": [
                 {
@@ -293,7 +301,7 @@ export default class TestController extends Controller {
                         "label": "Issued"
                     },
                     "1585959633",
-                    1617495633,
+                    "1617495633",
                     "0qLkfCTwwj-8SoSOTtlRQLqS20o",
                     "0qLkfCTwwj-8SoSOTtlRQLqS20o",
                     {
@@ -317,6 +325,7 @@ export default class TestController extends Controller {
                         "value": "ISSUED"
                     }
                 ],
+                // ... more rows are added in constructor above
             ]
         },
         "type": "grid",
@@ -363,11 +372,6 @@ export default class TestController extends Controller {
                     "value": 1617495633,
                 },
                 {
-                    "format": "datetime",
-                    "label": "datetime",
-                    "value": 1617495633,
-                },
-                {
                     "format": "text",
                     "label": "text",
                     "value": "Link to <a href=\"should be escaped\">OpenXPKI</a>",
@@ -388,8 +392,8 @@ export default class TestController extends Controller {
                     "value": "console.log('Hello world');",
                 },
                 {
-                    "format": "file",
-                    "label": "file",
+                    "format": "asciidata",
+                    "label": "asciidata",
                     "value": "-----BEGIN CERTIFICATE-----\nMIIGdTCCBF2gAwIBAgIKBf/x2/q69qfgJjANBgkqhkiG9w0BAQsFADBTMQswCQYD\nVQQGEwJERTERMA8GA1UECgwIT3BlblhQS0kxDDAKBgNVBAsMA1BLSTEjMCEGA1UE\nAwwaT3BlblhQS0kgRGVtbyBJc3N1aW5nIENBIDEwHhcNMjAwNDE1MTQzMjUyWhcN\nMjEwNDE1MTQzMjUyWjBqMRMwEQYKCZImiZPyLGQBGRYDb3JnMRgwFgYKCZImiZPy\nLGQBGRYIT3BlblhQS0kxHzAdBgoJkiaJk/IsZAEZFg9UZXN0IERlcGxveW1lbnQx\nGDAWBgNVBAMMD2EuYi5jOnBraWNsaWVudDCCASIwDQYJKoZIhvcNAQEBBQADggEP\nADCCAQoCggEBANj1rNdqbwgOKzCE76VB6tL9oMoASVXZvmTYUGORu+NgsrdpeKiG\n1rateJkosjgcUYhSgBJzvMW/3ZjJ94s90mA9eieuHSeYyxb8CMzR/cAkTj4gYr04\nJh4Q5NWp2DU+lDGHK2VnfIdxlTQuFGu5N7BET5DfRjXIiiPjOeQhzrXoUzyU8D50\nCWVmTtQ18qLbQEOgyUgCPNCJGEglA5tGJg7vDm3LZRl8qc26ynSmUEzvq6tDreyG\n+9AsQti4qZg2FUypvI1TFjSDv+J5tyq471scPyDBYEQI/lnKo1HGH+6a0HFgUu7H\nDcOqz2kIv+kyAocS8fvUCM8c+MZWNwxh80MCAwEAAaOCAjIwggIuMIGABggrBgEF\nBQcBAQR0MHIwSgYIKwYBBQUHMAKGPmh0dHA6Ly9wa2kuZXhhbXBsZS5jb20vZG93\nbmxvYWQvT3BlblhQS0lfRGVtb19Jc3N1aW5nX0NBXzEuY2VyMCQGCCsGAQUFBzAB\nhhhodHRwOi8vb2NzcC5leGFtcGxlLmNvbS8wTQYDVR0jBEYwRIAUv47981hKI/BJ\npmcdFera3Ht0/GyhIaQfMB0xGzAZBgNVBAMMEk9wZW5YUEtJIFJvb3QgQ0EgMYIJ\nAKXvcf7VbanOMAwGA1UdEwEB/wQCMAAwTwYDVR0fBEgwRjBEoEKgQIY+aHR0cDov\nL3BraS5leGFtcGxlLmNvbS9kb3dubG9hZC9PcGVuWFBLSV9EZW1vX0lzc3Vpbmdf\nQ0FfMS5jcmwwFgYDVR0lAQH/BAwwCgYIKwYBBQUHAwIwCQYDVR0SBAIwADAOBgNV\nHQ8BAf8EBAMCB4AwgagGA1UdIASBoDCBnTCBmgYDKgMEMIGSMCsGCCsGAQUFBwIB\nFh9odHRwOi8vcGtpLmV4YW1wbGUuY29tL2Nwcy5odG1sMCsGCCsGAQUFBwIBFh9o\ndHRwOi8vcGtpLmV4YW1wbGUuY29tL2Nwcy5odG1sMDYGCCsGAQUFBwICMCoaKFRo\naXMgaXMgYSBjb21tZW50IGZvciBwb2xpY3kgb2lkIDEuMi4zLjQwHQYDVR0OBBYE\nFCmEqRsgxL3M9npTB/UlYv/IBc1rMA0GCSqGSIb3DQEBCwUAA4ICAQAlRwaMKaI9\nMuM/gpu9QEiQNfAwTD9CO6fMEfcOv6yZIaNBWlw151XxDS5qysJ5ccQuo93Hhcwa\nbEnYG7v5MFMrKvg24RW3lzHo4PdMFTeKcnKbXPIprvtWlOEqwoezdNJBP9bdSGcS\nxUSuLBPYWKt73qmc1+n8dpJp2E3FijMSPoSDV+B52Tu2d7KjYnuRtbxhAEY6Lz+2\n9BZYf+k+FGrerGyV/rpQ/IoUqQsJbffUOld0ffi+BAegIx4Ml+hPBpxu+XR1xyE7\n5Y5lzSs0NBDB7wslcG6jNGTsse3k2WumOrmbdAX5ExoYg+HAReFywJiLOzC4vqup\nRE2H1hSY3jcPJOalIk/WIzFrLJ8DbaLR4GFaABQ9WkWD9GlWZIURdmB8A+0ufoW/\nEh4YgOSI0z15QrwboZrb403A8/rZ3LTDyQmbz4iM+LJIJ+c9QG+k1AHuWLUbeoc5\n/GbNTRRb5SQXaikbOnQG+U4vX8WZxnMl6lTYa9RykzUaemFRbq8Zm4bbWdFuSWHS\n9F/K+0i806MzOITE+W2EbY5Flx5riAarTr5utOrYL041SQz5qDfxoCSlRnC9PRGH\ny8eRk4foj31XcTWNz6IBe4mNUpun6Gker6o8ahEvhbRM7FLCzqLC2zXldT+KCYUv\nYHhZ+3jIWNoPuYa6gqgJbF0WTcNS2bttEw==\n-----END CERTIFICATE-----",
                 },
                 {
@@ -419,6 +423,7 @@ export default class TestController extends Controller {
                     "value": [
                         { "label": "first", "value": "PKI <a href=\"should be escaped\">" },
                         { "label": "second", "value": "<a href=\"https://www.openxpki.org\">OpenXPKI</a>", "format": "raw" },
+                        { "label": "subject", "value": [ "CN=sista.example.org", "DC=Test Deployment", "DC=PKI Examples", "DC=OpenXPKI", "DC=org" ] },
                     ],
                 },
                 {

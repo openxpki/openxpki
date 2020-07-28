@@ -15,16 +15,25 @@ Shows a button with an optional confirm dialog.
 */
 export default class OxisectionGridComponent extends Component {
     @tracked rawData = [];
+    @tracked pager = {};
 
     constructor() {
         super(...arguments);
+
         this.rawData = this.args.def.data || [];
+
+        this.pager = this.args.def.pager || {};
+        if (this.pager.count == null)   { this.pager.count = 0 }
+        if (this.pager.startat == null) { this.pager.startat = 0 }
+        if (this.pager.limit == null)   { this.pager.limit = Number.MAX_VALUE }
+        if (this.pager.reverse == null) { this.pager.reverse = 0 }
     }
 
     get rawColumns() { return (this.args.def.columns || []) }
     get rawActions() { return (this.args.def.actions || []) }
 
     get hasAction() { return this.rawActions.length > 0 }
+    get hasPager() { return !!this.pager.pagerurl }
     get multipleActions() { return this.rawActions.length > 1 }
     get firstAction() { return this.rawActions[0] }
 
@@ -33,16 +42,6 @@ export default class OxisectionGridComponent extends Component {
         return this.rawColumns
         .map( (col, index) => { col.index = index; return col })
         .filter(col => col.sTitle[0] !== "_" && col.bVisible !== 0);
-    }
-
-    @computed("args.def.pager", "visibleColumns")
-    get pager() {
-        let pager = this.args.def.pager || {};
-        if (pager.count == null) { pager.count = 0 }
-        if (pager.startat == null) { pager.startat = 0 }
-        if (pager.limit == null) { pager.limit = Number.MAX_VALUE }
-        if (pager.reverse == null) { pager.reverse = 0 }
-        return pager;
     }
 
     @computed("pager.{startat,limit,order,reverse}")
@@ -121,22 +120,26 @@ export default class OxisectionGridComponent extends Component {
 
     @computed("visibleColumns", "pager.{limit,startat,order,reverse}")
     get formattedColumns() {
-        let columns = this.visibleColumns;
-        let pager = this.pager;
         let results = [];
-        for (const column of columns) {
-            let order = pager.pagerurl ? column.sortkey : column.sTitle;
-            let reverse = order === pager.order ? !pager.reverse : false;
+        for (const column of this.visibleColumns) {
+            let order = this.hasPager
+                ? column.sortkey // server-side sorting
+                : column.sTitle; // client-side sorting
+            let isSorted = this.pager.order && this.pager.order === order;
+            let reverse = isSorted ? !this.pager.reverse : false;
             results.push({
                 index: column.index,
                 sTitle: column.sTitle,
                 format: column.format,
                 sortable: !!column.sortkey,
-                isSorted: pager.order && pager.order === order,
-                limit: pager.limit,
-                order: order,
-                reverse: +reverse,
-                startat: pager.startat
+                isSorted: isSorted,
+                // pager information to change sorting
+                sortPage: {
+                    limit: this.pager.limit,
+                    order: order,
+                    reverse: +reverse,
+                    startat: this.pager.startat
+                }
             });
         }
         return results;
@@ -168,37 +171,36 @@ export default class OxisectionGridComponent extends Component {
                 originalIndex: y
             });
         }
+
         return results;
     }
 
+    // split sorting from row data generation in "get data()" for better performance when re-sorting
     @computed("data", "formattedColumns", "pager.reverse")
     get sortedData() {
-        let pager = this.pager;
-        let data = this.data;
-        if (pager.pagerurl) {
-            return (data || []);
-        } else {
-            data = data.toArray();
-            let columns = this.formattedColumns;
-            let column = columns.findBy("isSorted");
-            let sortNum = columns.indexOf(column);
-            if (sortNum >= 0) {
-                let re = /^[0-9.]+$/;
-                data.sort(function(a, b) {
-                    a = a.data[sortNum].value;
-                    b = b.data[sortNum].value;
-                    if (re.test(a) && re.test(b)) {
-                        a = parseFloat(a, 10);
-                        b = parseFloat(b, 10);
-                    }
-                    return (a > b) ? 1 : -1;
-                });
-                if (pager.reverse) {
-                    data.reverseObjects();
+        // server-side sorting
+        if (this.hasPager) return this.data;
+
+        // client-side sorting
+        let data = this.data.toArray();
+        let column = this.formattedColumns.findBy("isSorted");
+        let sortNum = this.formattedColumns.indexOf(column);
+        if (sortNum >= 0) {
+            let re = /^[0-9.]+$/;
+            data.sort(function(a, b) {
+                a = a.data[sortNum].value;
+                b = b.data[sortNum].value;
+                if (re.test(a) && re.test(b)) {
+                    a = parseFloat(a, 10);
+                    b = parseFloat(b, 10);
                 }
+                return (a > b) ? 1 : -1;
+            });
+            if (this.pager.reverse) {
+                data.reverseObjects();
             }
-            return data;
         }
+        return data;
     }
 
     @computed("sortedData.@each.checked")
@@ -277,9 +279,11 @@ export default class OxisectionGridComponent extends Component {
 
     @action
     select(row) {
+        // (de-)select single row
         if (row) {
             set(row, "checked", !row.checked);
         }
+        // (de-)select all
         else {
             this.sortedData.setEach("checked", !this.allChecked);
         }
@@ -293,10 +297,10 @@ export default class OxisectionGridComponent extends Component {
         let pager = this.pager;
         return getOwner(this).lookup("route:openxpki")
         .sendAjax({
-            page: pager.pagerurl,
-            limit: page.limit,
+            page:    pager.pagerurl,
+            limit:   page.limit,
             startat: page.startat,
-            order: page.order,
+            order:   page.order,
             reverse: page.reverse,
         })
         .then((res) => {
@@ -307,12 +311,13 @@ export default class OxisectionGridComponent extends Component {
 
     @action
     sort(page) {
-        let pager = this.pager;
-        if (pager.pagerurl) {
-            if (page.order) { this.setPage(page) }
+        // server-side sorting
+        if (this.hasPager) {
+            if (page.order) this.setPage(page)
         }
+        // client-side sorting
         else {
-            setProperties(pager, page);
+            setProperties(this.pager, page);
         }
     }
 }

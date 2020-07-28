@@ -20,16 +20,20 @@
                 {{/if}}
                 {{#each this.formattedColumns as |column|}}
                     {{#if column.sortable}}
-                        <th {{action "sort" column}} class="sortable">
+                        <th {{on "click" (fn this.sort column.sortPage)}} class="sortable {{if column.isSorted "bg-info"}}">
                             <span>{{column.sTitle}}</span>
                             {{#if column.isSorted}}
-                                {{#if this.pager.reverse}}
-                                    <span class="pull-right glyphicon glyphicon-sort-by-attributes-alt"></span>
-                                {{else}}
-                                    <span class="pull-right glyphicon glyphicon-sort-by-attributes"></span>
-                                {{/if}}
+                                <button type="button" class="btn btn-primary btn-xs pull-right">
+                                    {{#if this.pager.reverse}}
+                                        <span class="glyphicon glyphicon-sort-by-attributes-alt"></span>
+                                    {{else}}
+                                        <span class="glyphicon glyphicon-sort-by-attributes"></span>
+                                    {{/if}}
+                                </button>
                             {{else}}
-                                <span class="pull-right glyphicon glyphicon-sort-by-attributes-alt text-muted"></span>
+                                <button type="button" class="btn btn-default btn-xs pull-right">
+                                    <span class="glyphicon glyphicon-sort-by-attributes text-muted"></span>
+                                </button>
                             {{/if}}
                         </th>
                     {{else}}
@@ -98,11 +102,16 @@
     </div>
 </div>
 
-<PartialPagination
-    @pager={{@def.pager}}
-    @pages={{this.pages}}
-    @pagesizes={{this.pagesizes}}
-    @setPage={{this.setPage}}
-/>
-
-<OxiButtonContainer @buttons={{this.buttons}} @buttonClick={{this.buttonClick}}/>
+<div class="row">
+    <div class="col-md-6">
+        <OxiButtonContainer @buttons={{this.buttons}} @buttonClick={{this.buttonClick}}/>
+    </div>
+    <div class="col-md-6">
+        <PartialPagination
+            @pager={{@def.pager}}
+            @pages={{this.pages}}
+            @pagesizes={{this.pagesizes}}
+            @setPage={{this.setPage}}
+        />
+    </div>
+</div>

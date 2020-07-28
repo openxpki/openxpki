@@ -1,12 +1,13 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
-import { guidFor } from '@ember/object/internals';
+import { inject as service } from '@ember/service';
 import { debug } from '@ember/debug';
 
 /*
  * NOTE: this component differs from others in that it does not
- * react to parent content changes. Two reasons:
+ * react to changes of its parameters (this.args.*).
+ * Two reasons:
  * 1. it makes no sense to have presets for an upload area, or modified
  *    values from a parent component
  * 2. the logic for disabling buttons etc. would not work as we would
@@ -14,7 +15,9 @@ import { debug } from '@ember/debug';
  *    from a file.
  */
 export default class OxifieldUploadComponent extends Component {
-    fileUploadElementId = 'oxi-fileupload-' + guidFor(this);
+    @service('intl') intl;
+
+    fileUploadElement = null;
 
     @tracked data;
     @tracked textOutput = "";
@@ -25,13 +28,26 @@ export default class OxifieldUploadComponent extends Component {
     get rows() { return (this.args.content.textAreaSize || {}).height || 10 }
 
     @action
+    onKeydown(event) {
+        // prevent form submit when hitting ENTER
+        if (event.keyCode === 13) {
+            event.stopPropagation();
+        }
+    }
+
+    @action
+    onFileUploadInsert(element) {
+        this.fileUploadElement = element;
+    }
+
+    @action
     setTextInput(evt) {
         this.setData(evt.target.value);
     }
 
     @action
     openFileUpload() {
-        document.getElementById(this.fileUploadElementId).click();
+        this.fileUploadElement.click();
     }
 
     @action
@@ -86,7 +102,10 @@ export default class OxifieldUploadComponent extends Component {
             this.textOutput = String.fromCharCode(...new Uint8Array(arrayBuffer));
         }
         else {
-            this.textOutput = !isSmall ? "<large file chosen>" : "<binary file>";
+            this.textOutput = `<${!isSmall
+                ? this.intl.t('component.oxifield_uploadarea.large_file')
+                : this.intl.t('component.oxifield_uploadarea.binary_file')
+            }>`;
         }
     }
 

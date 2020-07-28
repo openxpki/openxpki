@@ -350,7 +350,6 @@ Defines a button. There are three modes, depending on which one of these paramet
 **Common parameters** for *page* and *action*::
 
     {
-        target => [main|popup|tab|active], # (optional, default is "main")
         label => STRING, # The label of the button
         tooltip => STRING, # (optional)
         className => STRING, # CSS class (optional)

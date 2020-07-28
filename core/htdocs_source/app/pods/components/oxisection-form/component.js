@@ -11,6 +11,7 @@ class Field {
     @tracked _refName; // internal use: original name, needed for dynamic input fields where 'name' can change
     @tracked value;
     @tracked label;
+    @tracked is_optional;
     @tracked tooltip;
     @tracked placeholder;
     @tracked actionOnChange;
@@ -28,7 +29,6 @@ class Field {
     // oxifield-select:
     @tracked options;
     @tracked prompt;
-    @tracked is_optional;
     @tracked editable;
     // oxifield-static
     @tracked verbose;
@@ -75,11 +75,6 @@ export default class OxisectionFormComponent extends Component {
         this._updateCloneFields();
     }
 
-    @computed("args.def.submit_label")
-    get submitLabel() {
-        return this.args.def.submit_label || "send";
-    }
-
     _prepareFields(fields) {
         let result = [];
         for (const fieldHash of fields) {
@@ -121,11 +116,17 @@ export default class OxisectionFormComponent extends Component {
         }
 
         for (let field of result) {
-            // dynamic input fields: presets are key/value hashes.
-            // we need to convert `value: { key: NAME, value: VALUE }` to `name: NAME, value: VALUE`
-            if (field.value && typeof field.value === "object") {
-                field.name = field.value.key;
-                field.value = field.value.value;
+            if (field.value) {
+                // dynamic input fields: presets are key/value hashes.
+                // we need to convert `value: { key: NAME, value: VALUE }` to `name: NAME, value: VALUE`
+                if (typeof field.value === "object") {
+                    field.name = field.value.key;
+                    field.value = field.value.value;
+                }
+                // strip trailing newlines - esp. important for type "passwordverify"
+                if (typeof field.value === 'string') {
+                    field.value = field.value.replace(/\n*$/, "");
+                }
             }
         }
 
@@ -137,7 +138,7 @@ export default class OxisectionFormComponent extends Component {
             let clones = this.fields.filter(f => f._refName === name);
             for (const clone of clones) {
                 clone._canDelete = true;
-                clone._canAdd = clones.length < clones[0].max;
+                clone._canAdd = clones[0].max ? clones.length < clones[0].max : 1;
             }
             if (clones.length === 1) {
                 clones[0]._canDelete = false;
@@ -158,11 +159,6 @@ export default class OxisectionFormComponent extends Component {
 
     get visibleFields() {
         return this.fields.filter(f => f.type !== "hidden");
-    }
-
-    @action
-    buttonClick(button) {
-        this.args.buttonClick(button);
     }
 
     @action

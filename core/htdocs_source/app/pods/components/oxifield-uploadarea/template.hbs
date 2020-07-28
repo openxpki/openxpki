@@ -7,6 +7,7 @@
             value={{this.textOutput}}
             placeholder={{@content.placeholder}}
             readonly={{if this.lockTextInput "readonly"}}
+            {{on "keydown" this.onKeydown}}
             {{on "input" this.setTextInput}}
             {{on "drop" this.fileDropped}}
             {{on "dragover" this.showCopyEffect}}
@@ -18,9 +19,9 @@
 <input
     type="file"
     class="oxi-file-input"
-    id={{this.fileUploadElementId}}
     style="display:none"
     {{on "change" this.fileSelected}}
+    {{did-insert this.onFileUploadInsert}}
 />
 
 <div class="row">

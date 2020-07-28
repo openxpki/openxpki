@@ -36,6 +36,19 @@ export default class OpenXpkiController extends Controller {
 
     @gt("model.tabs.length", 1) showTabs;
 
+    // Wen don't use <ddm.LinkTo> but our own method to navigate to target page.
+    // This way we can force Ember to do a transition even if the new page is
+    // the same page as before by setting parameter "force" a timestamp.
+    @action
+    navigateTo(event, modelId) {
+        event.stopPropagation();
+        event.preventDefault();
+        let element = event.target;
+        let page = element.getAttribute("data-page");
+        //this.lookup("route:openxpki").transitionTo("openxpki", button.page);
+        this.transitionToRoute('openxpki', page, { queryParams: { force: (new Date()).valueOf() } });
+    }
+
     @action
     activateTab(entry) {
         let tabs = this.get("model.tabs");
