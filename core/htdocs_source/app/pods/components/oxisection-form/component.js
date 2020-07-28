@@ -183,7 +183,7 @@ export default class OxisectionFormComponent extends Component {
     }
 
     // Turns all (non-empty) fields into request parameters
-    _fields2request() {
+    _fields2request(includeEmpty) {
         let result = [];
 
         for (const name of this.uniqueFieldNames) {
@@ -191,7 +191,7 @@ export default class OxisectionFormComponent extends Component {
 
             // send clonables as list (even if there's only one field) and other fields as plain values
             let potentialClones = this.fields.filter(f =>
-                f.name === name && (typeof f.value !== 'undefined') && f.value !== ""
+                f.name === name && (typeof f.value !== 'undefined') && (f.value !== "" || includeEmpty)
             );
 
             if (potentialClones.length === 0) continue;
@@ -234,7 +234,7 @@ export default class OxisectionFormComponent extends Component {
         let request = {
             action: field.actionOnChange,
             _sourceField: field.name,
-            ...this._fields2request(),
+            ...this._fields2request(true),
         };
 
         let fields = this.fields;
@@ -297,7 +297,7 @@ export default class OxisectionFormComponent extends Component {
 
         let request = {
             action: this.args.def.action,
-            ...this._fields2request(),
+            ...this._fields2request(false),
         };
 
         this.loading = true;
