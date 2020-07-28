@@ -46,6 +46,7 @@ sub render_profile_select {
     foreach my $field (@{$wf_info->{activity}->{$wf_action}->{field}}) {
         my $name = $field->{name};
         my $item = $self->__render_input_field( $field, $context->{$name} );
+        next unless ($item);
 
         if ($name eq 'cert_profile') {
             $item = {
@@ -235,6 +236,7 @@ sub render_key_select {
         }
 
         my $item = $self->__render_input_field( $field );
+        next FIELDS unless ($item);
         $item->{prompt} = $item->{placeholder}; # todo - rename in UI
         if ($name eq 'key_alg') {
             $item = {
@@ -305,7 +307,7 @@ sub render_server_password {
             $value = $context->{$field->{name}};
         }
         my $item = $self->__render_input_field( $field, $value );
-        push @fields, $item;
+        push @fields, $item if ($item);
     }
 
     # record the workflow info in the session

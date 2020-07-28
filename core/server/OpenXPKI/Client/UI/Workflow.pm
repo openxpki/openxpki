@@ -2084,8 +2084,9 @@ sub __render_from_workflow {
             }
 
             my $item = $self->__render_input_field( $field, $val );
-            push @fields, $item;
+            next unless ($item);
 
+            push @fields, $item;
             # if the field has a description text, push it to the @fielddesc list
             my $descr = $field->{description};
             if ($descr && $descr !~ /^\s*$/ && $field->{type} ne 'hidden') {
