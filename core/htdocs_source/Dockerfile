@@ -1,10 +1,11 @@
 FROM node:erbium-buster-slim
 
-WORKDIR /source
+WORKDIR /
 
 # copy depency lists separately to allow for Docker caching
-COPY package.json /source/package.json
-COPY package-lock.json /source/package-lock.json
+COPY package.json /package.json
+COPY package-lock.json /package-lock.json
 RUN npm install
 
+WORKDIR /source
 CMD npm run build
