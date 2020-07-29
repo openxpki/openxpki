@@ -885,9 +885,13 @@ sub alias_show {
 
    __alias_print($alias, $params{subject});
 
-    if ($params{export}) {
+    my $file = $params{export} || '';
+    if ($file eq "-") {
+        print CTX('api2')->get_cert( identifier => $alias->{identifier}, format => 'TXTPEM' );
+        print "\n";
+    } elsif ($file) {
+
         my $pem = CTX('api2')->get_cert( identifier => $alias->{identifier}, format => 'PEM' );
-        my $file = $params{export};
         if (-d $file) {
             $file .= sprintf('/%s.pem', $alias->{alias});
         }
@@ -2054,8 +2058,10 @@ Show the details of a single alias and export the linked certificate to a file.
 
   --alias    The full alias (e.g. ca-signer-1)
   --subject  Print the subject of the certificate
-  --export   Write PEM encoded certificate to <target>. If target is a
-             directory the alias is used as filename.
+  --export   Write PEM encoded certificate to <target>.
+             If target is a directory the alias is used as filename.
+             If target is "-" the certificate is printed to the terminal
+             including its textual representation
 
 =item B<add functional token with automatic group discovery>
 
