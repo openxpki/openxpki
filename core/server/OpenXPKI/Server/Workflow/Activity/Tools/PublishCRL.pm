@@ -179,8 +179,7 @@ sub execute {
                 );
             }
         } else {
-            CTX('log')->application()->debug("CRL pubication to $target for $crl_serial done");
-
+            CTX('log')->application()->info("CRL pubication to $target for $crl_serial done");
         }
     }
 
@@ -351,8 +350,3 @@ The ARGS placeholder is replaced with the CN part of the issuing ca. So if you
 name your ca generations as "ServerCA-1" and "ServerCA-2", you will end up
 with two crls at "http://myhost/myrealm/ServerCA-1.crl" resp.
 "http://myhost/myrealm/ServerCA-2.crl"
-
-
-
-
-

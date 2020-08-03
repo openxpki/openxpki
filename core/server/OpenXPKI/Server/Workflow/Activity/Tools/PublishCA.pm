@@ -111,8 +111,7 @@ sub execute {
                 );
             }
         } else {
-            CTX('log')->application()->debug("CA pubication to $target for ". $data->{dn}{CN}[0]." done");
-
+            CTX('log')->application()->info("CA pubication to $target for ". $data->{dn}{CN}[0]." done");
         }
     }
 
@@ -236,6 +235,3 @@ The alias name of the CA
 Used to temporary store unpublished targets when on_error is set.
 
 =back
-
-
-
