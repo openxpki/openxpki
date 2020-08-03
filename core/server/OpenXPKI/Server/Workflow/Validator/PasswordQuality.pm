@@ -39,6 +39,8 @@ sub _init {
 sub validate {
     my ( $self, $wf, $password ) = @_;
 
+    return unless($password ne '');
+
     ## prepare the environment
     if (my $reason = IsBadPassword($password)) {
         ##! 16: 'bad password entered: ' . $reason
@@ -78,4 +80,3 @@ Data::Password module. All configuration that is possible for
 Data::Password can be done using the validator config file as well.
 Based on this data, the validator fails if it believes the password
 to be bad.
-
