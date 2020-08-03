@@ -62,4 +62,3 @@ OpenXPKI::Server::Workflow::Condition::Connector::IsValue
 
 This condition looks up the value at config_path from the connector and
 checks weather the returned value is equal to the given value.
-
