@@ -2874,9 +2874,11 @@ sub __render_fields {
                 $source = $t->{source};
                 $basename = $t->{filename} if ($t->{filename});
                 $mime = $t->{mime} if ($t->{mime});
-            } else {
+            } elsif ($item->{value}) {
                 $label = $item->{value};
                 $source = "file:".$item->{value};
+            } else {
+                next FIELD;
             }
 
             if (!$basename && $source =~ m{ file:.*?([^\/]+(\.\w+)?) \z }xms) {
