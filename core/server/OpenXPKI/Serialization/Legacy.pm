@@ -127,7 +127,7 @@ sub __write_scalar {
     if ($data =~ m{[\x00-\x09]}s) {
         ##! 8: 'Found binary data - do base64'
         $type = "BASE64";
-        $data  = encode_base64( $data );
+        $data  = encode_base64( $data, '' );
     } else {
         Encode::_utf8_on($data);
     }

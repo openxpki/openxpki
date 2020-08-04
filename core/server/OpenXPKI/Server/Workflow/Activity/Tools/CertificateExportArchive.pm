@@ -96,7 +96,7 @@ sub execute {
     }
 
     if ($self->param('base64') || ($target_key !~ /\A_/)) {
-        $buffer = encode_base64( $buffer );
+        $buffer = encode_base64( $buffer, '' );
     }
 
     $context->param( $target_key => $buffer );

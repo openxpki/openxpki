@@ -178,7 +178,7 @@ sub __build_chain : PRIVATE {
         CONTAINER_FORMAT => 'PKCS7',
     });
 
-    return encode_base64($result);
+    return encode_base64($result, '');
 
 }
 

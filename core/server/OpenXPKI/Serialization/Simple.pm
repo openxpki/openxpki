@@ -67,7 +67,7 @@ sub serialize
     # detect binary data and decode this as base64
     } elsif (!ref $args && $args =~ m{[\x00-\x09]}s) {
         ##! 8: 'Found binary data - do base64'
-        return "OXB64:" . encode_base64( $args );
+        return "OXB64:" . encode_base64( $args, '' );
     } else {
         return "OXJSF1:" . $self->_json()->serialize( $args );
     }

@@ -120,7 +120,7 @@ sub get_random {
     }
 
     if ($format eq 'base64') {
-        $rand = encode_base64($rand);
+        $rand = encode_base64($rand, '');
     } elsif ($format eq 'hex') {
         $rand = unpack('H*', $rand);
     }

@@ -643,7 +643,7 @@ sub generateKey {
 
         $res = {
             pkey => $pkcs8,
-            pubkey => encode_base64($pub->data),
+            pubkey => encode_base64($pub->data, ''),
             key_id => $pub->get_subject_key_id,
         };
     };

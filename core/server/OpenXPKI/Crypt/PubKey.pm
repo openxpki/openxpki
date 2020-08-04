@@ -21,8 +21,7 @@ has pem => (
     lazy => 1,
     default => sub {
         my $self = shift;
-        my $pem = encode_base64($self->data());
-        $pem =~ s{\s}{}g;
+        my $pem = encode_base64($self->data(), '');
         $pem =~ s{ (.{64}) }{$1\n}xmsg;
         chomp $pem;
         return "-----BEGIN PUBLIC KEY-----\n$pem\n-----END PUBLIC KEY-----";

@@ -35,7 +35,7 @@ sub execute {
     }
 
     if ($b64 eq 'encode') {
-        $value = encode_base64($value);
+        $value = encode_base64($value, '');
     } elsif ($b64 eq 'decode') {
         $value = decode_base64($value);
     } elsif ($b64) {

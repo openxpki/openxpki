@@ -36,7 +36,7 @@ sub execute {
         DATA => $source });
 
     # return value is binary
-    $context->param( $target_key => encode_base64($asn1) );
+    $context->param( $target_key => encode_base64($asn1, '') );
     return undef;
 }
 

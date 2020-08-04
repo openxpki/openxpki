@@ -26,8 +26,7 @@ has pem => (
     default => sub {
         my $self = shift;
         # convert DER to PEM
-        my $pem = encode_base64($self->data());
-        $pem =~ s{\s}{}g;
+        my $pem = encode_base64($self->data(), '');
         $pem =~ s{ (.{64}) }{$1\n}xmsg;
         chomp $pem;
         return "-----BEGIN CERTIFICATE-----\n$pem\n-----END CERTIFICATE-----";
