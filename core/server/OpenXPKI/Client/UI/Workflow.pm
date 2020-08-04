@@ -3144,9 +3144,13 @@ sub __check_for_validation_error {
         my $p = $reply->{LIST}->[0]->{PARAMS};
         my $validator_msg = $p->{__ERROR__};
         my $field_errors = $p->{__FIELDS__};
-        my @fields = (ref $field_errors eq 'ARRAY') ? map { $_->{name} } @$field_errors : ();
+        if (ref $field_errors eq 'ARRAY') {
+            $self->logger()->error("Input validation error on fields ".
+                join(",", map { ref $_ ? $_->{name} : $_ } @{$field_errors}));
+        } else {
+            $self->logger()->error("Input validation error");
+        }
         $self->_status({ level => 'error', message => $validator_msg, field_errors => $field_errors });
-        $self->logger()->error("Input validation error on fields ". join ",", @fields);
         $self->logger()->trace('validation details' . Dumper $field_errors ) if $self->logger->is_trace;
         return $field_errors;
     }

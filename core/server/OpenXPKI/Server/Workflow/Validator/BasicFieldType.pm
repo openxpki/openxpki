@@ -24,7 +24,7 @@ sub _validate {
     foreach my $key (@fields) {
         ##! 32: 'test spec ' . $key
 
-        my ($field, $type, $is_array, $is_required) = split /:/, $key;
+        my ($field, $type, $is_array, $is_required, $regex) = split /:/, $key, 5;
         my $val = $context->param($field);
 
         if (!defined $val) {
@@ -40,8 +40,21 @@ sub _validate {
             }
             if (ref $val ne 'ARRAY') {
                 ##! 32: 'not array ' . $field
-                push @no_value, $field;
+                push @no_value, { name => $field, error => "I18N_OPENXPKI_UI_VALIDATOR_NOT_ARRAY" };
                 next;
+            }
+        }
+
+        if ($regex) {
+            my @value = (ref $val) ? @{$val} : ($val);
+            $regex = qr/$regex/;
+            foreach my $vv (@value) {
+                # skip empty
+                next if (!defined $vv || $vv eq '');
+                next if ($vv =~ $regex);
+                ##! 8: 'Failed on ' . $vv
+                push @no_value, { name => $field, error => "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED" };
+                last;
             }
         }
 
@@ -54,7 +67,7 @@ sub _validate {
         # check for empty string
         if ( $val eq '' ) {
             ##! 32: 'empty string ' . $field
-            push @no_value, $field;
+            push @no_value, { name => $field, error => "I18N_OPENXPKI_UI_VALIDATOR_EMPTY_BUT_REQUIRED" };
             next;
         }
 

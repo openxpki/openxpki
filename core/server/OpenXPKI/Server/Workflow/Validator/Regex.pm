@@ -87,8 +87,9 @@ sub validate {
         foreach my $val (@{$value}) {
             # skip empty
             next if (!defined $val || $val eq '');
+            next if ($val =~ $regex);
             ##! 8: 'Failed on ' . $val
-            push @errors, $val if ($val !~ $regex);
+            push @errors, $val;
         }
     } else {
         ##! 8: 'scalar mode'
