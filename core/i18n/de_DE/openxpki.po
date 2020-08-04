@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2020-06-25 15:06+0200\n"
+"PO-Revision-Date: 2020-08-03 12:19+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -516,10 +516,10 @@ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_DESC"
 msgstr "Das Passwort für die Verschlüsselung der Exportdatei."
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_LABEL"
-msgstr "Passwort"
+msgstr "Export-Passwort"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_EXPORT_PASSWORD_TOOLTIP"
-msgstr "Export-Password"
+msgstr "Export-Passwort"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_FILENAME_LABEL"
 msgstr "Keystore Download"
@@ -557,7 +557,7 @@ msgstr ""
 "vergeben wird."
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_LABEL"
-msgstr "Password"
+msgstr "Passwort"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_UNENCRYPTED_DESC"
 msgstr "Exportdatei ohne Passwort bereitstellen"
@@ -1289,6 +1289,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_CHECK_FAILED"
 msgstr "Der Wert konnte intern nicht geprüft werden"
 
+msgid "I18N_OPENXPKI_UI_VALIDATOR_EMPTY_BUT_REQUIRED"
+msgstr "Dieses Feld erfordert die Angabe eines Wertes"
+
 msgid "I18N_OPENXPKI_UI_VALIDATOR_ERROR_BOOLEAN"
 msgstr "Ungültige Kombination von Eingabewerten"
 
@@ -1313,6 +1316,9 @@ msgstr "Der übergebene PKCS10 Container kann nicht gelesen werden"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_PARAM_NOT_ALLOWED"
 msgstr "Der übergebene Schlüssel besitzt ungültige Parameter"
+
+msgid "I18N_OPENXPKI_UI_VALIDATOR_NOT_ARRAY"
+msgstr "Dieses Feld muss als Liste angegeben werden"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_NO_SUBJECT_ERROR"
 msgstr "PKCS10 Antrag enthält kein Subject"
@@ -1388,10 +1394,11 @@ msgstr "Initialize"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_DESC"
 msgstr ""
-"Type the certificate identifier or use the autosearch function to find the "
-"certificate you want to change the meta data for. If you can not find/"
-"identify your certificate please select certificate search from the main "
-"menu. The result list will contain a link to change the metadata."
+"Geben Sie den Zeritifikatsidentifier an oder verwenden Sie die automatische "
+"Suche um das Zertifikat zu finden, zu dem Sie die Metainformationen ändern "
+"möchten. Falls Sie das Zertifikat nicht finden oder auswählen können, "
+"verwenden Sie bitte die Zertifikatssuche. Das Ergebnis enthält einen "
+"direkten Link um die Änderung auszuführen."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_LABEL"
 msgstr "Zertifikat wählen"
@@ -1400,7 +1407,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_FORM_DESC"
 msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_FORM_LABEL"
-msgstr "Edit Data"
+msgstr "Daten bearbeiten"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_PERSIST_DESC"
 msgstr "Persist the changed data to the database"
@@ -1609,7 +1616,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_INITIALIZE_LABEL"
 msgstr "Specify Required Format"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_RETRY_PASSWORD_LABEL"
-msgstr "Re-enter password"
+msgstr "Passwort erneut eingeben"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_CANCEL_DESC"
 msgstr "Cancel this workflow."
@@ -2758,9 +2765,8 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SET_MOTD_SUCCESS_LABEL"
 msgstr "Nachricht gesetzt"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE"
-msgstr "Process State"
+msgstr "Workflow Status"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_DESC"
 msgstr "Dieser Workflow wurde vom Benutzer abgebrochen."
@@ -2771,9 +2777,8 @@ msgstr "Abgebrochen"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_DESC"
 msgstr "The certificate was issued and will be send to the client on request."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_LABEL"
-msgstr "SUCCESS"
+msgstr "Erfolgreich"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_INITIAL_DESC"
@@ -2902,13 +2907,12 @@ msgstr "This workflow has finished with success and can not be restarted"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SUBJECT_LABEL"
 msgstr "Zertifikatsinhalte festlegen"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_DESC"
-msgstr "This workflow failed finally."
+msgstr ""
+"Dieser Workflow ist fehlgeschlagen und kann nicht weiter bearbeitet werden."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_LABEL"
-msgstr "FAILURE"
+msgstr "Fehlgeschlagen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_INITIAL_DESC"
@@ -3010,28 +3014,30 @@ msgstr ""
 "certificate owner has access to the key."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_FAILURE_LABEL"
-msgstr "Export Failed"
+msgstr "Export fehlgeschlagen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_RETRY_PASSWORD_DESC"
 msgstr ""
-"Generating the export file failed as the private key could not be loaded. "
-"This usually means you gave the wrong password. Click retry and enter the "
-"password again or cancel the request."
+"Die Erstellung der Exportdatei ist fehlgeschlagen, da der private Schlüssel "
+"nicht geladen werden konnte. Üblicherweise bedeutet dass, das Sie ein "
+"falsches Password verwendet haben. Klicken Sie auf \"Passwort wiederholen\" "
+"um es nochmals einzugeben oder auf \"Vorgang abbrechen\"."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_RETRY_PASSWORD_LABEL"
-msgstr "Unable to load Key"
+msgstr "Schlüsselexport fehlgeschlagen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_DESC"
 msgstr ""
-"Click on the link below to download your certificate/key bundle. Note that "
-"this link will only work from within this browser window and become invalid "
-"after 60 seconds."
+"Klicken Sie auf den untenstehenden Link um die erstellte Exportdatei "
+"herunterzuladen. Bitte beachten Sie, daß der Link nur innerhalb dieses "
+"Browserfensters gültig ist und in 60 Sekunden ungültig wird."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_LABEL"
 msgstr "SUCCESS"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_DESC"
-msgstr "This workflow failed finally and can not be restarted"
+msgstr ""
+"Dieser Workflow ist fehlgeschlagen und kann nicht weiter bearbeitet werden."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_LABEL"
 msgstr "FAILURE"
@@ -3080,9 +3086,9 @@ msgstr "Aktualisiert"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_INITIAL_DESC"
 msgstr ""
-"Change metadata information associated to a certificate, please enter the "
-"identifier of the certificate.<br/>If you do not know the identifier, please "
-"use the certificate search to find it."
+"Aktualisierung der Metadaten eines Zertifikates. Geben Sie den "
+"Zertifikatsidentifier an oder verwenden Sie die Suchfunktion um dieses zu "
+"finden."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_INITIAL_LABEL"
 msgstr " "
