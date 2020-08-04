@@ -2097,45 +2097,45 @@ sub __render_from_workflow {
 
         # Render the context values if there are no fields
         if (!scalar @fields) {
-            my $fields = $self->__render_fields( $wf_info, $view );
             $self->add_section({
                 type => 'keyvalue',
                 content => {
                     label => '',
                     description => '',
-                    data => $fields,
+                    data => $self->__render_fields( $wf_info, $view ),
+                    buttons => $self->__get_form_buttons( $wf_info ),
             }});
-        }
 
+        } else {
 
-        # record the workflow info in the session
-        push @fields, $self->__register_wf_token( $wf_info, {
-            wf_action => $wf_action,
-            wf_fields => \@fields,
-        });
+            # record the workflow info in the session
+            push @fields, $self->__register_wf_token( $wf_info, {
+                wf_action => $wf_action,
+                wf_fields => \@fields,
+            });
 
-        $self->add_section({
-            type => 'form',
-            action => 'workflow',
-            content => {
-                #label => $wf_action_info->{label},
-                #description => $wf_action_info->{description},
-                submit_label => $wf_action_info->{button} || 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
-                fields => \@fields,
-                buttons => $self->__get_form_buttons( $wf_info ),
-            }
-        });
-
-        if (@fielddesc) {
             $self->add_section({
-                type => 'keyvalue',
+                type => 'form',
+                action => 'workflow',
                 content => {
-                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST',
-                    description => '',
-                    data => \@fielddesc
-            }});
-        }
+                    #label => $wf_action_info->{label},
+                    #description => $wf_action_info->{description},
+                    submit_label => $wf_action_info->{button} || 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
+                    fields => \@fields,
+                    buttons => $self->__get_form_buttons( $wf_info ),
+                }
+            });
 
+            if (@fielddesc) {
+                $self->add_section({
+                    type => 'keyvalue',
+                    content => {
+                        label => 'I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST',
+                        description => '',
+                        data => \@fielddesc
+                }});
+            }
+        }
     } else {
 
         $self->_page({
