@@ -26,6 +26,10 @@ msgstr "Azione richiesta non trovata"
 msgid "I18N_OPENXPKI_UI_APPLICATION_ERROR"
 msgstr "Errore sconosciuto dell’applicazione"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BACKEND_DID_NOT_REPORT_SUCCESS"
+msgstr "Sessione di backend terminata - eseguire di nuovo il login"
+
 msgid "I18N_OPENXPKI_UI_BACKEND_SESSION_GONE"
 msgstr "Sessione di backend terminata - eseguire di nuovo il login"
 
@@ -80,6 +84,10 @@ msgstr "Numero di serie del certificato"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
 msgstr "Informazioni Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOES_NOT_EXIST"
+msgstr "Numero di serie del certificato"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
 msgstr "Identificatore del certificato"
@@ -284,11 +292,19 @@ msgstr "Azione"
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_LABEL"
 msgstr "Azione"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_PUBLISH"
+msgstr "Azione"
+
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_RENEW"
 msgstr "Rinnova"
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_REVOKE"
 msgstr "Revoca"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_SHOW_METADATA"
+msgstr "Aggiorna i Metadati"
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA"
 msgstr "Aggiorna i Metadati"
@@ -485,6 +501,10 @@ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_CLEANUP"
 msgstr "Errore sconosciuto"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_INVALID_SIGNATURE"
+msgstr "Richiesta non valida - nessuna azione"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_APPROVED"
 msgstr "Errore sconosciuto"
 
@@ -577,6 +597,10 @@ msgstr "Errore sconosciuto"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION"
 msgstr "Nome Applicazione"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_ON_REMOTE_BACKEND"
+msgstr "Revoca"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER"
@@ -1524,6 +1548,10 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_CHECK_FAILED"
 msgstr "Fallita convalida dell’espressione data"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_EMPTY_BUT_REQUIRED"
+msgstr "Uno o più campi Soggetto contengono errori."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_ERROR_BOOLEAN"
 msgstr "Fallita convalida dell’espressione data"
 
@@ -1552,6 +1580,10 @@ msgstr "La richiesta PKCS10 non può essere letta"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_PARAM_NOT_ALLOWED"
+msgstr "Fallita convalida dell’espressione data"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_NOT_ARRAY"
 msgstr "Fallita convalida dell’espressione data"
 
 #, fuzzy
@@ -1888,6 +1920,19 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_LABEL"
 msgstr "Attiva Emissione CRL"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_TRUSTGROUP_IMPORT_DESC"
+msgstr ""
+"Questo processo attiva la creazione di una nuova Lista Revoche per tutte le "
+"CA attive nel Realm corrente. Una nuova Lista Revoche viene creata quando ci "
+"sono nuove revoche oppure in prossimità della data di scadenza della lista "
+"attuale. Puoi sempre forzare la creazione di una nuova lista spuntando la "
+"casella di controllo qui sotto."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_TRUSTGROUP_IMPORT_LABEL"
+msgstr "Attiva Emissione CRL"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ISSUE_CRL_DESC"
 msgstr "Emetti una nuova Lista Revoche"
 
@@ -1942,6 +1987,10 @@ msgstr "Respingi questa richiesta di revoca."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_LABEL"
 msgstr "Respingi Richiesta"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RELEASE_LOCK_LABEL"
+msgstr "Inizia la Revoca"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_DETAIL_INITIALIZE_LABEL"
 msgstr "Specifica Opzioni Report"
@@ -3496,6 +3545,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL"
 msgstr "Invia la richiesta"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEP_TOKEN_CERT_EXISTS_DESC"
+msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEP_TOKEN_CERT_EXISTS_LABEL"
+msgstr "SUCCESSO"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_DESC"
 msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 
@@ -3507,6 +3564,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
 msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL"
+msgstr "SUCCESSO"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_TRUSTGROUP_NEED_ISSUER_DESC"
+msgstr "superato il limite dei retry"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_TRUSTGROUP_NEED_ISSUER_LABEL"
 msgstr "SUCCESSO"
 
 #, fuzzy
@@ -3677,6 +3742,17 @@ msgstr "Esporta il Certificato nel formato desiderato"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 msgstr "Esporta Certificato"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RELEASE_LOCK_DESC"
+msgstr ""
+"Pubblica le Informazioni sulla Autorità di certificazione (CA, Certification "
+"Authority), ovvero Certificati della CA e Liste Revoche (CRL) in archivi "
+"predefiniti."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RELEASE_LOCK_LABEL"
+msgstr "Pubblica Informazioni CA"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_DESC"
 msgstr ""
 "Genera un report dettagliato sui certificati presenti in questo Realm per un "
@@ -3720,12 +3796,28 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_LABEL"
 msgstr "Ricerca nei Workflow"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_DESC"
+msgstr "Ricerca nei Workflow usando i filtri qui sotto."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_LABEL"
+msgstr "Id Transazione SCEP"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_DESC"
 msgstr "Modifica i Metadati di un certificato."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_LABEL"
 msgstr "Modifica Metadati"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_TRUSTGROUP_IMPORT_DESC"
+msgstr "Esporta il Certificato nel formato desiderato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_TRUSTGROUP_IMPORT_LABEL"
+msgstr "Esporta Certificato"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
 msgstr "Impossibile trovare le informazioni relative al Workflow"
@@ -3740,10 +3832,6 @@ msgstr "Chiave"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_ATTRIBUTE_FAILED"
-#~ msgstr "Numero di serie del certificato"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOES_NOT_EXIST"
 #~ msgstr "Numero di serie del certificato"
 
 #~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOWNLOAD_PKEY_DESC"
@@ -3825,10 +3913,6 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
 #~ msgstr "Creator"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_INVALID_REQUEST"
-#~ msgstr "Richiesta non valida - nessuna azione"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_KEY_POLICY_FAILED"
@@ -3991,10 +4075,6 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_USER_IS_CERTIFICATE_OWNER_NO_OWNER_FOUND"
 #~ msgstr "non prima del"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_REQUIRED"
-#~ msgstr "Uno o più campi Soggetto contengono errori."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_INVALID_ALGORITHM_OR_LENGTH"
@@ -4999,10 +5079,6 @@ msgstr "Chiave"
 #~ msgstr "Certificato sostituito"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TOKEN_LABEL"
-#~ msgstr "Id Transazione SCEP"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TOKEN_PLACEHOLDER"
 #~ msgstr "additional comments to help us processing the request"
 
@@ -5256,12 +5332,6 @@ msgstr "Chiave"
 #~ msgstr ""
 #~ "Questo Workflow è stato interrotto da un evento imprevisto, contatta per "
 #~ "favore il team di supporto!"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_SUCCESS_DESC"
-#~ msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_SUCCESS_LABEL"
-#~ msgstr "SUCCESSO"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_BEGIN_LOOP_NEED_CSR_DESC"

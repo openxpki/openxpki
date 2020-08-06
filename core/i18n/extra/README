@@ -1,0 +1,2 @@
+This directory is scanned for additional I18N tags, files are read by
+the build-pot.pl script when "make scan" is called.

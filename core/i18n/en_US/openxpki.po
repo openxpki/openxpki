@@ -20,6 +20,9 @@ msgstr "Requested action not found"
 msgid "I18N_OPENXPKI_UI_APPLICATION_ERROR"
 msgstr "Unknown application error"
 
+msgid "I18N_OPENXPKI_UI_BACKEND_DID_NOT_REPORT_SUCCESS"
+msgstr "Backend workflow did not report success"
+
 msgid "I18N_OPENXPKI_UI_BACKEND_SESSION_GONE"
 msgstr "Backend session terminated - please re-login"
 
@@ -64,6 +67,10 @@ msgstr "Show certificate chain"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
 msgstr "Certificate Information"
+
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOES_NOT_EXIST"
+msgstr "Certificate does not exists"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER"
 msgstr "Certificate Identifier"
@@ -231,20 +238,20 @@ msgstr "Authorize"
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_LABEL"
 msgstr "Action"
 
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_PUBLISH"
+msgstr "Trigger <b>publication</b> of this certificate."
+
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_RENEW"
 msgstr "Raise a <b>certificate renewal request</b>."
 
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_REVOKE"
 msgstr "Raise a <b>certificate revocation request</b>."
 
-msgid "I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA"
-msgstr "<b>Update</b> the meta information associated with this certificate."
-
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_SHOW_METADATA"
 msgstr "<b>Show</b> the meta information associated with this certificate."
 
-msgid "I18N_OPENXPKI_UI_CERT_ACTION_PUBLISH"
-msgstr "Trigger <b>publication</b> of this certificate."
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_UPDATE_METADATA"
+msgstr "<b>Update</b> the meta information associated with this certificate."
 
 msgid "I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT"
 msgstr ""
@@ -399,9 +406,11 @@ msgstr "Download text (TXT) format"
 msgid "I18N_OPENXPKI_UI_ELIGIBILITY_CHECK_UNEXPECTED_ERROR"
 msgstr "Eligibility check did not return properly (backend error)"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_CLEANUP"
-msgstr "Request was rejected by an operator."
+msgstr "Workflow was automatically cleaned up"
+
+msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_INVALID_SIGNATURE"
+msgstr "Missing or invalid signature on request"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_APPROVED"
 msgstr "Request was not approved"
@@ -460,6 +469,10 @@ msgstr "Renewal is not allowed"
 
 msgid "I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION"
 msgstr "Backend error during publishing "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_ON_REMOTE_BACKEND"
+msgstr "Raise a <b>certificate revocation request</b>."
 
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER"
 msgstr "The entered invalidity time is after the certificates expiration date!"
@@ -1288,6 +1301,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_CHECK_FAILED"
 msgstr "Unable to check value against given backend"
 
+msgid "I18N_OPENXPKI_UI_VALIDATOR_EMPTY_BUT_REQUIRED"
+msgstr "Required field is empty"
+
 msgid "I18N_OPENXPKI_UI_VALIDATOR_ERROR_BOOLEAN"
 msgstr "Validator failed boolean expression"
 
@@ -1311,6 +1327,9 @@ msgstr "Unable to parse PKCS10 request"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_PARAM_NOT_ALLOWED"
 msgstr "Used key parameter is not allowed by policy"
+
+msgid "I18N_OPENXPKI_UI_VALIDATOR_NOT_ARRAY"
+msgstr "Value must be a list"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_NO_SUBJECT_ERROR"
 msgstr "PKCS10 request has no subject set"
@@ -1616,6 +1635,13 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_LABEL"
 msgstr "Trigger CRL Issue"
 
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_TRUSTGROUP_IMPORT_DESC"
+msgstr "Imports a certificate and assigns it to a trustgroup."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_TRUSTGROUP_IMPORT_LABEL"
+msgstr "Import to Trustgroup"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ISSUE_CRL_DESC"
 msgstr "Issue revocation list"
 
@@ -1669,6 +1695,9 @@ msgstr "Reject this revocation request."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REJECT_CRR_LABEL"
 msgstr "Reject Request"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RELEASE_LOCK_LABEL"
+msgstr "Unlock transaction"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_DETAIL_INITIALIZE_LABEL"
 msgstr "Define Report Options"
@@ -3104,6 +3133,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL"
 msgstr "This workflow is currently running on the server."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEP_TOKEN_CERT_EXISTS_DESC"
+msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEP_TOKEN_CERT_EXISTS_LABEL"
+msgstr "SUCCESS"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_DESC"
 msgstr "No result matching your search criteria could be found."
 
@@ -3114,6 +3151,17 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
 msgstr "This workflow has finished with success and can not be restarted"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL"
+msgstr "SUCCESS"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_TRUSTGROUP_NEED_ISSUER_DESC"
+msgstr ""
+"This workflow has looped too many times and the maximum retry counter for "
+"the current action has been exceeded. This workflow will not continue "
+"without manual interaction, please contact the support team."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_TRUSTGROUP_NEED_ISSUER_LABEL"
 msgstr "SUCCESS"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CONFIRM_DESC"
@@ -3267,6 +3315,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 msgstr "Certificate Expiry Notification"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RELEASE_LOCK_DESC"
+msgstr ""
+"Deletes the link between a transaction id and a (broken) workflow so a new "
+"workflow can be created using the same transaction id"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RELEASE_LOCK_LABEL"
+msgstr "Unlock a transaction id"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_DETAIL_DESC"
 msgstr ""
 "Generate a detailed report about certificates in this realm for download."
@@ -3301,12 +3357,28 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_LABEL"
 msgstr "SCEP Search"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_DESC"
+msgstr "Search for SCEP workflows by  transaction id"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_LABEL"
+msgstr "SCEP RA Token"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_DESC"
 msgstr "Change a certificates metadata."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_LABEL"
 msgstr "Change Metadata"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_TRUSTGROUP_IMPORT_DESC"
+msgstr "Certificate Export"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_TRUSTGROUP_IMPORT_LABEL"
+msgstr "Certificate Export"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
 msgstr "Unable to load workflow information."
@@ -3321,9 +3393,6 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
 #~ msgstr "Creator"
-
-#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_INVALID_REQUEST"
-#~ msgstr "Request invalid"
 
 #~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_KEY_POLICY_FAILED"
 #~ msgstr "Key policy failed (wrong size/algorithm)"
@@ -3487,9 +3556,6 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_LABEL"
 #~ msgstr "Set Information"
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RELEASE_LOCK_LABEL"
-#~ msgstr "Unlock transaction"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_INITIALIZE_LABEL"
 #~ msgstr "Set Parameters"
 
@@ -3586,9 +3652,6 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_LABEL"
 #~ msgstr "Replaced Certificate"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TOKEN_LABEL"
-#~ msgstr "SCEP RA Token"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TOKEN_PLACEHOLDER"
 #~ msgstr "ca-scep-2"
@@ -3718,14 +3781,6 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_LABEL"
 #~ msgstr "Certificate Export"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RELEASE_LOCK_DESC"
-#~ msgstr ""
-#~ "Deletes the link between a transaction id and a (broken) workflow so a "
-#~ "new workflow can be created using the same transaction id"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RELEASE_LOCK_LABEL"
-#~ msgstr "Unlock a transaction id"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEPGETCA_DESC"
