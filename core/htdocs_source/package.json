@@ -10,8 +10,11 @@
     "doc": "doc",
     "test": "tests"
   },
+  "config": {
+    "outputpath": "dist"
+  },
   "scripts": {
-    "build": "ember build --environment=production",
+    "build": "ember build --environment=production --output-path=$npm_package_config_outputpath",
     "lint:hbs": "ember-template-lint .",
     "lint:js": "eslint .",
     "serve": "ember serve --proxy=http://localhost:8080 --output-path=dist-dev",
