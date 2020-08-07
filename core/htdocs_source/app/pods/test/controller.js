@@ -1,13 +1,14 @@
 import Controller from '@ember/controller';
+import { action } from "@ember/object";
 import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 
 export default class TestController extends Controller {
-    @service('intl') intl;
+    @service('oxi-locale') oxiLocale;
 
     constructor() {
         super(...arguments);
-        this.intl.setLocale(["de-de"]);
+        this.oxiLocale.locale = 'de-DE';
         // add some more grid rows
         for (let i=0; i<50; i++) {
             this.gridDef.content.data.push([
@@ -27,6 +28,11 @@ export default class TestController extends Controller {
                 }
             ]);
         }
+    }
+
+    @action
+    setLang(lang) {
+        this.oxiLocale.locale = lang;
     }
 
     testButton = {

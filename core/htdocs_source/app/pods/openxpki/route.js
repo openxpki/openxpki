@@ -23,7 +23,8 @@ class Content {
 }
 
 export default class OpenXpkiRoute extends Route {
-    @service('oxi-config') config;
+    @service('oxi-config') oxiConfig;
+    @service('oxi-locale') oxiLocale;
     @service('intl') intl;
 
     // Reserved Ember property "queryParams"
@@ -82,7 +83,7 @@ export default class OpenXpkiRoute extends Route {
         if (flatList.findBy("key", modelId) || this.needReboot.indexOf(modelId) >= 0) {
             request.target = "top";
         }
-        return this.config.ready // localconfig.js might change rootURL, so first thing is to query it
+        return this.oxiConfig.ready // localconfig.js might change rootURL, so first thing is to query it
             .then( () => structureIfNeeded() )
             .then( () => this.sendAjax(request) );
     }
@@ -112,7 +113,7 @@ export default class OpenXpkiRoute extends Route {
             },
             dataType: "json",
             type: request.action ? "POST" : "GET",
-            url: this.config.backendUrl,
+            url: this.oxiConfig.backendUrl,
         };
         if (req.type === "POST") {
             req.data._rtoken = this.content.rtoken;
@@ -171,8 +172,7 @@ export default class OpenXpkiRoute extends Route {
 
                         // set locale
                         if (doc.language) {
-                            debug("openxpki/route - sendAjax response: setting locale to " + doc.language);
-                            this.intl.setLocale([doc.language]);
+                            this.oxiLocale.locale = doc.language;
                         }
                     }
                     else {
