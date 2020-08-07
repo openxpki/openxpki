@@ -59,8 +59,6 @@
     "jquery": "^3.5.1",
     "js-yaml": "^3.14.0",
     "loader.js": "^4.7.0",
-    "moment": "^2.24.0",
-    "moment-timezone": "^0.5.28",
     "qunit-dom": "^1.0.0"
   },
   "engines": {
