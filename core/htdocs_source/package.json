@@ -45,7 +45,6 @@
     "ember-cli-inject-live-reload": "^2.0.2",
     "ember-cli-sri": "^2.1.1",
     "ember-cli-uglify": "^3.0.0",
-    "ember-data": "~3.20.0",
     "ember-export-application-global": "^2.0.1",
     "ember-intl": "^5.4.2",
     "ember-load-initializers": "^2.1.1",
