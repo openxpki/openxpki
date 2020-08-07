@@ -130,7 +130,7 @@ export default class OxiDownloadComponent extends Component {
     }
 
     @action
-    copyToClipboard(event) {
+    copyToClipboard(/*event*/) {
         if (this.isLink) return;
         copy(this.rawData, { target: this.baseElement });
         /* eslint-disable-next-line no-console */

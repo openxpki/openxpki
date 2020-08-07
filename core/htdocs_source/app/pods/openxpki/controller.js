@@ -40,7 +40,7 @@ export default class OpenXpkiController extends Controller {
     // This way we can force Ember to do a transition even if the new page is
     // the same page as before by setting parameter "force" a timestamp.
     @action
-    navigateTo(event, modelId) {
+    navigateTo(event /*, modelId*/) {
         event.stopPropagation();
         event.preventDefault();
         let element = event.target;
