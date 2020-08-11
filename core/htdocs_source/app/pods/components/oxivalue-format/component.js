@@ -31,15 +31,18 @@ export default class OxivalueFormatComponent extends Component {
     }
 
     @action
-    internalLinkClick(evt) {
-        let element = evt.target;
-        if (element.target !== "_blank") {
-            evt.stopPropagation();
-            evt.preventDefault();
-            getOwner(this).lookup("route:openxpki").sendAjax({
-                page: element.href.split("#")[1].replace(/\/openxpki\//, ""),
-                target: element.target,
-            });
-        }
+    internalLinkClick(linkDef, event) {
+        let target = linkDef.target || "popup";
+
+        // ignore links with _blank target
+        if (target === "_blank") return true;
+
+        // perform AJAX request instead of opening URL
+        event.stopPropagation();
+        event.preventDefault();
+        getOwner(this).lookup("route:openxpki").sendAjax({
+            page: linkDef.page,
+            target: target,
+        });
     }
 }
