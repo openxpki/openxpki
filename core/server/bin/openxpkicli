@@ -127,7 +127,18 @@ GetOptions(\%params,
          )) or pod2usage(-verbose => 0);
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
-pod2usage(-verbose => 1) if ($params{help});
+
+if ($params{help}) {
+    if (scalar @ARGV == 0) {
+        # --help without parameter
+        pod2usage(-verbose => 1)
+    } else {
+        # --help COMMAND
+        my $cmd = shift; $cmd =~ s/\W//msg;
+        unshift @ARGV, 'api_help';
+        $params{arg} = ["command=$cmd"];
+    }
+}
 
 # json pretty implies json
 if (defined $params{'json-pretty'}) {
@@ -383,6 +394,7 @@ openxpkicli [options] command
 
   Options (all arguments are optional):
     --help                brief help message
+    --help COMMAND        show help for given API command
     --man                 full documentation
     --socketfile FILE     OpenXPKI daemon socket file
     --instance  NAME      Shortcut to set socket on multi-instance configs
@@ -415,7 +427,7 @@ openxpkicli [options] command
 
 =head1 INVOCATION
 
-Invoke the named command through the OpenXPKI API using the given conenction socket.
+Invoke the named command through the OpenXPKI API using the given connection socket.
 
 Anything passed using C<arg> is added to the methods argument list. If the
 method has a PARAMS argument which accepts an array or hash, you can use

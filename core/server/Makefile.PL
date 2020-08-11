@@ -366,6 +366,7 @@ WriteMakefile(
         'Net::Server'                   => '0.94',
         'NetAddr::IP'                   => 0,
         'Params::Validate'              => '0.77',
+        'Pod::POM'                      => '2.01',
         'Proc::Daemon'                  => '0.23',
         'Proc::ProcessTable'            => '0.43',
         'Proc::SafeExec'                => '1.4',
