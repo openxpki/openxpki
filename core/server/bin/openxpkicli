@@ -107,6 +107,7 @@ GetOptions(\%params,
        qw(
             help|?
             man
+            list
             socketfile=s
             instance|i=s
             realm=s
@@ -138,6 +139,10 @@ if ($params{help}) {
         unshift @ARGV, 'api_help';
         $params{arg} = ["command=$cmd"];
     }
+}
+
+if ($params{list}) {
+    unshift @ARGV, 'api_list';
 }
 
 # json pretty implies json
@@ -396,6 +401,7 @@ openxpkicli [options] command
     --help                brief help message
     --help COMMAND        show help for given API command
     --man                 full documentation
+    --list                list all available API commands
     --socketfile FILE     OpenXPKI daemon socket file
     --instance  NAME      Shortcut to set socket on multi-instance configs
     --realm REALM         OpenXPKI realm
