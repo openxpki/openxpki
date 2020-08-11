@@ -194,8 +194,14 @@ sub execute {
         $context->param( 'signer_subject_key_identifier' => $x509->get_subject_key_id() );
     }
 
-    my $rules_prefix = $self->param('rules');
-    my @rules = $config->get_keys( $rules_prefix );
+    my $rules = $self->param('rules');
+    # explicit declaration as action parameter
+    my @rules;
+    if (ref $rules eq 'HASH') {
+        @rules = sort keys %{$rules};
+    } else {
+        @rules = $config->get_keys( $rules );
+    }
 
     my $matched = 0;
 
@@ -206,7 +212,8 @@ sub execute {
     TRUST_RULE:
     foreach my $rule (@rules) {
         ##! 32: 'Testing rule ' . $rule
-        my $trustrule = $config->get_hash("$rules_prefix.$rule");
+        my $trustrule  = (ref $rules eq 'HASH') ? $rules->{$rule}
+            : $config->get_hash("$rules.$rule");
 
         # as we expect the idenifier to be uniq we do not need a realm
         $trustrule->{realm} = $current_realm
@@ -225,10 +232,10 @@ sub execute {
             } elsif ($key eq 'realm') {
                 # if issuer_alias is used the realm check is done on the alias
                 $matched = ($trustrule->{issuer_alias}) ? 1 :
-                    ($signer_realm eq $match);
+                    ($signer_realm eq $match || $match eq '_any');
 
             } elsif ($key eq 'profile') {
-                $matched = ($signer_profile eq $match || $match eq '_any');
+                $matched = ($signer_profile eq $match);
 
             } elsif ($key eq 'issuer_alias' || $key eq 'root_alias') {
 
@@ -355,11 +362,18 @@ Boolean, weather the signer is an entity in the current realm
 
 =head1 Configuration
 
-The check for authorization uses a list of rules below the path defined
-by the rules parameter. E.g. for the SCEP workflow this is
-I<scep.[% context.server ].authorized_signer_on_behalf>.
-The list is a hash of hashes, were each entry is a combination of one or more
-matching rules. The name of the rule is just used for logging purpose:
+The check for authorization uses a list of rules. Those can be either
+given explicitly to the I<rules> parameter or as a pointer to the realm
+config. A common pattern used in OpenXPKI is to build the path for the
+rules from the server properties, e.g. the SCEP workflow uses
+I<scep.[% context.server ].authorized_signer>..
+
+If I<rules> is a scalar, it is considered to be a config path, if it is
+a hash it is taken as explicitly defined ruleset.
+
+The ruleset structure is a hash of hashes, were each entry is a combination
+of one or more matching rules. The name of the rule is just used for logging
+purpose:
 
   rule1:
     subject: CN=scep-signer.*,dc=OpenXPKI,dc=org
@@ -426,6 +440,11 @@ the given value.
 =head2 Parameters
 
 =over
+
+=item rules
+
+Usually a scalar value, taken as config path to read the rules from. Can
+also be a hash that represents an explicit ruleset (see Rules).
 
 =item export_subject
 
