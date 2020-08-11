@@ -367,8 +367,9 @@ sub __process_action {
         # but use our own field type validator
         my $required = $conn->get( [ @item_path, 'required' ] );
         my $is_required = (defined $required && $required =~ m/(yes|1)/i);
-        my $match = $conn->get( [ @item_path, 'match' ] );
+        my $match = $conn->get( [ @item_path, 'match' ] ) || '';
         if ($is_array || $is_required || $match) {
+            ##! 64: "Adding basic validator for $context_key with $is_array:$is_required:$match"
             push @basic_validator, sprintf ("%s::%01d:%01d:%s", $context_key, $is_array, $is_required, $match);
         }
 

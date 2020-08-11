@@ -67,7 +67,7 @@ sub _validate {
         # check for empty string
         if ( $val eq '' ) {
             ##! 32: 'empty string ' . $field
-            push @no_value, { name => $field, error => "I18N_OPENXPKI_UI_VALIDATOR_EMPTY_BUT_REQUIRED" };
+            push @no_value, { name => $field, error => "I18N_OPENXPKI_UI_VALIDATOR_EMPTY_BUT_REQUIRED" } if ($is_required);
             next;
         }
 
