@@ -208,6 +208,10 @@ OpenXPKI/Server/API2/Autoloader.pm
 OpenXPKI/Server/API2/EasyPlugin.pm
 OpenXPKI/Server/API2/EasyPluginMetaClassTrait.pm
 OpenXPKI/Server/API2/EasyPluginRole.pm
+OpenXPKI/Server/API2/Plugin/Api/Util/ModuleFinder.pm
+OpenXPKI/Server/API2/Plugin/Api/Util/PodPOMView.pm
+OpenXPKI/Server/API2/Plugin/Api/api_help.pm
+OpenXPKI/Server/API2/Plugin/Api/api_list.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_cert.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_cert_actions.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_cert_attributes.pm
@@ -466,6 +470,7 @@ OpenXPKI/Server/Workflow/Condition/SubjectValid.pm
 OpenXPKI/Server/Workflow/Condition/WFArray.pm
 OpenXPKI/Server/Workflow/Condition/WFHash.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowCreator.pm
+OpenXPKI/Server/Workflow/Condition/WorkflowHasState.pm
 
 OpenXPKI/Server/Workflow/Validator.pm
 OpenXPKI/Server/Workflow/Validator/BasicFieldType.pm
@@ -557,8 +562,6 @@ cgi-bin/est.fcgi
 
 # Client UI
 htdocs/img/logo.png
-htdocs/ember-fetch/fetch-fastboot.js
-htdocs/localconfig.js.template
 htdocs/fonts/glyphicons-halflings-regular.eot
 htdocs/fonts/glyphicons-halflings-regular.woff
 htdocs/fonts/glyphicons-halflings-regular.ttf
@@ -569,6 +572,7 @@ htdocs/assets/openxpki.css
 htdocs/assets/vendor.js
 htdocs/assets/auto-import-fastboot.js
 htdocs/assets/vendor.css
-htdocs/localconfig.css.template
+htdocs/localconfig.yaml.template
 htdocs/default.html
+htdocs/index.html
 htdocs/favicon.png
