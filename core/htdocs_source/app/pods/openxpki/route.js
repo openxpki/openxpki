@@ -188,7 +188,7 @@ export default class OpenXpkiRoute extends Route {
                     else {
                         if (doc.page && doc.main) {
                             debug("openxpki/route - sendAjax response: \"page\" and \"main\"");
-                            this.content.tabs = [...this.content.tabs]; // copy tabs to not trigger change observers for now
+
                             let newTab = {
                                 active: true,
                                 page: doc.page,

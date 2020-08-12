@@ -486,12 +486,11 @@ return Ember.getOwner(this).lookup("route:openxpki").sendAjax(r).then((function(
 try{for(r.s();!(t=r.n()).done;){var i,a=t.value,l=fe(o)
 try{for(l.s();!(i=l.n()).done;){var u=i.value
 if(u.name===a.name){var c=o.indexOf(u)
-o[c]=a,n.fields=o}}}catch(s){l.e(s)}finally{l.f()}}}catch(s){r.e(s)}finally{r.f()}return null}))}}},{key:"setFieldName",value:function(e,t){Ember.debug("oxisection/form: setFieldName (".concat(e.name," -> ").concat(t,")")),e.name=t}},{key:"setFieldError",value:function(e,t){Ember.debug("oxisection/form: setFieldError (".concat(e.name," = ").concat(t,")")),e.error=t}},{key:"fieldMayFocus",value:function(e,t,n){if(!this.focusFeedbackComplete&&(this.focusFeedback[e._refName]=t?n:null,Object.keys(this.focusFeedback).length===this.originalFieldCount)){if(Ember.debug("oxi-section/form: focus feedback completed from all fields"),!this.args.def.isFirstForm)return void Ember.debug("oxi-section/form: we are not the first form - NOT setting focus")
-this.focusFeedbackComplete=!0
-var r,o=fe(this.visibleFields)
-try{for(o.s();!(r=o.n()).done;){var i=r.value
-if(null!==this.focusFeedback[i._refName]){Ember.debug("oxi-section/form: first focusable field: ".concat(i._refName)),this.focusFeedback[i._refName].focus()
-break}}}catch(a){o.e(a)}finally{o.f()}}}},{key:"reset",value:function(){this.args.buttonClick({page:this.args.def.reset})}},{key:"submit",value:function(){var e=this
+o[c]=a,n.fields=o}}}catch(s){l.e(s)}finally{l.f()}}}catch(s){r.e(s)}finally{r.f()}return null}))}}},{key:"setFieldName",value:function(e,t){Ember.debug("oxisection/form: setFieldName (".concat(e.name," -> ").concat(t,")")),e.name=t}},{key:"setFieldError",value:function(e,t){Ember.debug("oxisection/form: setFieldError (".concat(e.name," = ").concat(t,")")),e.error=t}},{key:"fieldMayFocus",value:function(e,t,n){this.focusFeedbackComplete||(this.focusFeedback[e._refName]=t?n:null,Object.keys(this.focusFeedback).length===this.originalFieldCount&&(Ember.debug("oxi-section/form: focus feedback completed from all fields"),this.focusFirstField()))}},{key:"focusFirstField",value:function(){if(this.args.def.isFirstForm){this.focusFeedbackComplete=!0
+var e,t=fe(this.visibleFields)
+try{for(t.s();!(e=t.n()).done;){var n=e.value
+if(null!==this.focusFeedback[n._refName]){Ember.debug("oxi-section/form: first focusable field: ".concat(n._refName)),this.focusFeedback[n._refName].focus()
+break}}}catch(r){t.e(r)}finally{t.f()}}else Ember.debug("oxi-section/form: we are not the first form - NOT setting focus")}},{key:"reset",value:function(){this.args.buttonClick({page:this.args.def.reset})}},{key:"submit",value:function(){var e=this
 Ember.debug("oxisection/form: submit")
 var t,n=!1,r=fe(this.fields)
 try{for(r.s();!(t=r.n()).done;){var o=t.value
