@@ -195,6 +195,17 @@ export default class OpenXpkiRoute extends Route {
                                 main: doc.main,
                                 right: doc.right
                             };
+
+                            // Mark the first form on screen: only the first one is allowed to focus
+                            // its first input field.
+                            let isFirst = true;
+                            for (const section of [...(newTab.main||[]), ...(newTab.right||[])]) {
+                                if (section.type === "form") {
+                                    section.content.isFirstForm = isFirst;
+                                    if (isFirst) isFirst = false;
+                                }
+                            }
+
                             if (targetElement === "popup") {
                                 this.content.popup = newTab;
                             }

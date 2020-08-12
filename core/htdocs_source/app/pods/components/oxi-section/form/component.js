@@ -292,7 +292,11 @@ export default class OxiSectionFormComponent extends Component {
         // if all form fields sent feedback, choose first focusable field
         let feedbackCount = Object.keys(this.focusFeedback).length;
         if (feedbackCount === this.originalFieldCount) {
-            debug(`oxi-section/form: received focus feedback from all form fields`);
+            debug(`oxi-section/form: focus feedback completed from all fields`);
+            if (!this.args.def.isFirstForm) {
+                debug(`oxi-section/form: we are not the first form - NOT setting focus`);
+                return;
+            }
             this.focusFeedbackComplete = true;
             for (const field of this.visibleFields) {
                 if (this.focusFeedback[field._refName] !== null) {
