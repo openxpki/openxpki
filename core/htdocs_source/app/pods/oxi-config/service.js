@@ -1,7 +1,6 @@
 import Service from '@ember/service';
 import ENV from 'openxpki/config/environment';
-import fetch from 'fetch';
-import { isNotFoundResponse } from 'ember-fetch/errors';
+import fetch from 'cross-fetch';
 import yaml from 'js-yaml';
 
 export default class OxiConfigService extends Service {
@@ -39,7 +38,7 @@ export default class OxiConfigService extends Service {
                 return response.text()
             }
             else {
-                if (isNotFoundResponse(response)) {
+                if (response.status === 404) {
                     /* eslint-disable-next-line no-console */
                     console.info(`No ${url} provided - using defaults`);
                 }

@@ -23,17 +23,6 @@ module.exports = function(environment) {
             // when it is created
         },
 
-        // https://github.com/jasonmit/ember-cli-moment-shim
-        moment: {
-            // Options:
-            // 'all' - all years, all timezones
-            // 'subset' - subset of the timezone data to cover 2010-2020 (or 2012-2022 as of 0.5.12). all timezones.
-            // 'none' - no data, just timezone API
-            includeTimezone: 'all',
-            // include all locales
-            includeLocales: true,
-        },
-
         /*
          * Custom global constants
          */
