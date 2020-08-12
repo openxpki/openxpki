@@ -140,11 +140,24 @@ div.spacer {
 /******************************************************************************
  * Loading indicators
  */
+
+.dimmer {
+  position:fixed;
+  top:0;
+  bottom:0;
+  left:0;
+  right:0;
+  background-color:#eee;
+  opacity:0.3;
+  z-index:1001;
+}
+
 .refresh.progress, .loading.progress {
   position: fixed;
   top: 30px;
   right: 20px;
   width: 100px;
+  z-index:1002;
 }
 
 .refresh.progress .progress-bar, .loading.progress .progress-bar {

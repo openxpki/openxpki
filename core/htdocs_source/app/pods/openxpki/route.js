@@ -40,7 +40,7 @@ export default class OpenXpkiRoute extends Route {
 
     @tracked content = new Content();
 
-    // Reserved Ember function "beforeModel"
+    // Reserved Ember function
     beforeModel(transition) {
         let queryParams = transition.to.queryParams;
         let modelId = transition.to.params.model_id;
@@ -88,9 +88,8 @@ export default class OpenXpkiRoute extends Route {
             .then( () => this.sendAjax(request) );
     }
 
-    // Reserved Ember function "model"
-    /* eslint-disable-next-line no-unused-vars */
-    model(params, transition) {
+    // Reserved Ember function
+    model(params/*, transition*/) {
         this.content.page = params.model_id; this.updateNavEntryActiveState(this.content);
         return this.content;
     }
@@ -102,8 +101,19 @@ export default class OpenXpkiRoute extends Route {
         }, cfg.timeout);
     }
 
+    setLoadingState(isLoading) {
+        // note that we cannot use the Ember "loading" event as this would only
+        // trigger on route changes, but not if we do sendAjax()
+        if (isLoading) {
+            // remove focus from button to prevent user from doing another
+            // submit by hitting enter
+            document.activeElement.blur();
+        }
+        this.content.isLoading = isLoading;
+    }
+
     sendAjax(request) {
-        this.content.isLoading = true;
+        this.setLoadingState(true);
         debug("openxpki/route - sendAjax: page = " + request.page);
         // assemble request parameters
         let req = {
@@ -202,13 +212,13 @@ export default class OpenXpkiRoute extends Route {
                                 this.content.tabs = [newTab];
                             }
                         }
-                        this.content.isLoading = false;
+                        this.setLoadingState(false);
                     }
                     return resolve(doc);
                 },
                 // FAILURE
                 () => {
-                    this.content.isLoading = false;
+                    this.setLoadingState(false);
                     this.content.error = {
                         message: this.intl.t('error_popup.message')
                     };

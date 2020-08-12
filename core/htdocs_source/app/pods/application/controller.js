@@ -4,6 +4,8 @@ import { action } from '@ember/object';
 export default class ApplicationController extends Controller {
     @action
     removeLoader() {
+        // note: we don't use an Ember loading substate here as this would
+        // lead to a disruptive UX on every page (route) switch
         let el = document.getElementById("waiting-for-ember");
         if (!el) return;
         el.parentNode.removeChild(el);
