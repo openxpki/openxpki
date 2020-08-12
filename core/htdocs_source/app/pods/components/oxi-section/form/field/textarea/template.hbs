@@ -5,5 +5,5 @@
     value={{@content.value}}
     placeholder={{@content.placeholder}}
     {{on "input" this.onInput}}
-    {{did-insert @onInsert}}
+    {{did-insert (fn @mayFocus true)}}
 />

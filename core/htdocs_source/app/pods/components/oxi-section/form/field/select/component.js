@@ -11,7 +11,7 @@ export default class OxiFieldSelectComponent extends Component {
         this.customMode = this.isCustomValue(this.args.content.value);
     }
 
-    // returns true if the given value is part of the SELECT's option list
+    // returns true if the given value is NOT part of the SELECT's option list
     isCustomValue(val) {
         return (this.options.map(o => o.value).indexOf[val] < 0);
     }
@@ -56,7 +56,8 @@ export default class OxiFieldSelectComponent extends Component {
     }
 
     @action
-    setStaticValue() {
+    onInsertStatic(element) {
+        this.args.mayFocus(false, element);
         this.args.onChange(this.args.content.options[0].value);
     }
 
@@ -78,13 +79,13 @@ export default class OxiFieldSelectComponent extends Component {
     }
 
     @action
-    onInsert(element) {
-        element.focus();
-        this.args.onInsert(element);
+    onCustomInsert(element) {
+        element.focus(); // to focus after user hit the toggle button
+        this.args.mayFocus(true, element); // oxi-section/form might steal focus again on initial form rendering
     }
 
     @action
-    onCustomInputInsert(event) {
+    onCustomInput(event) {
         this.args.onChange(event.target.value);
     }
 }

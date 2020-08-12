@@ -71,6 +71,8 @@ export default class OxiSectionFormComponent extends Component {
     @tracked fields = [];
 
     clonableRefNames = [];
+    focusFeedback = {}; // gets filled with the field feedback if they may receive the focus
+    focusFeedbackComplete = false;
 
     constructor() {
         super(...arguments);
@@ -273,6 +275,34 @@ export default class OxiSectionFormComponent extends Component {
     setFieldError(field, message) {
         debug(`oxisection/form: setFieldError (${field.name} = ${message})`);
         field.error = message;
+    }
+
+    get originalFieldCount() {
+        return this.args.def.fields.filter(f => f.type !== "hidden").length;
+    }
+
+    @action
+    fieldMayFocus(field, mayFocus, element) { // 'field' is injected in our template via (fn ...)
+        if (this.focusFeedbackComplete) return;
+
+        // store DOM element if component may receive focus
+        // (NOTE: clone fields just "overwrite" the hash key with the same value)
+        this.focusFeedback[field._refName] = mayFocus ? element : null;
+
+        // if all form fields sent feedback, choose first focusable field
+        let feedbackCount = Object.keys(this.focusFeedback).length;
+        if (feedbackCount === this.originalFieldCount) {
+            debug(`oxi-section/form: received focus feedback from all form fields`);
+            this.focusFeedbackComplete = true;
+            for (const field of this.visibleFields) {
+                if (this.focusFeedback[field._refName] !== null) {
+                    debug(`oxi-section/form: first focusable field: ${field._refName}`);
+                    let elementToFocus = this.focusFeedback[field._refName];
+                    elementToFocus.focus();
+                    break;
+                }
+            }
+        }
     }
 
     @action

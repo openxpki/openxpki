@@ -5,7 +5,7 @@ import { debug } from '@ember/debug';
 Shows a drop-down list of options.
 
 ```html
-<OxiBase::Select @list={{data.keys}} @selected={{data.name}} @onChange={{myFunc}}/>
+<OxiBase::Select @list={{data.keys}} @selected={{data.name}} @onChange={{myFunc}} @onInsert={{otherFunc}}/>
 ```
 
 @module oxi-select
@@ -32,6 +32,7 @@ export default class OxiSelectComponent extends Component {
     // when the calling code has no "current selection" defined.
     @action
     startup(element) {
+        if (this.args.onInsert) this.args.onInsert(element);
         this.notifyOnChange(element.selectedIndex);
     }
 

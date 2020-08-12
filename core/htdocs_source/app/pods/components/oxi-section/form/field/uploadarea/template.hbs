@@ -11,7 +11,7 @@
             {{on "input" this.setTextInput}}
             {{on "drop" this.fileDropped}}
             {{on "dragover" this.showCopyEffect}}
-            {{did-insert @onInsert}}
+            {{did-insert (fn @mayFocus false)}}
         />
     </div>
 </div>

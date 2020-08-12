@@ -76,7 +76,7 @@ export default class TestController extends Controller {
                 },
                 {
                     type: "select",
-                    name: "test_select_2",
+                    name: "select_2",
                     label: "Select, one choice",
                     options: [
                         { value: "11", label: "Ocean" },
@@ -95,7 +95,7 @@ export default class TestController extends Controller {
                 },
                 {
                     type: "passwordverify",
-                    name: "pwd_verified",
+                    name: "pwd_verified_preset",
                     label: "Password, verifiable, preset",
                     value: "123\n",
                 },
@@ -126,7 +126,7 @@ export default class TestController extends Controller {
                 },
                 {
                     type: "datetime",
-                    name: "dt_some_local",
+                    name: "dt_some_pitcairn",
                     label: "Date, 2020-03-03 03:33",
                     value: "1583206380",
                     timezone: "Pacific/Pitcairn",
@@ -184,6 +184,7 @@ export default class TestController extends Controller {
                 },
                 {
                     type: "uploadarea",
+                    name: "uploadarea",
                     value: "...data...",
                     label: "Uploadarea",
                 },

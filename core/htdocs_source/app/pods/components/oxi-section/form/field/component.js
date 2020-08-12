@@ -68,8 +68,16 @@ export default class OxiFieldMainComponent extends Component {
         }
     }
 
+    // The sub component should call this with
+    //   {{did-insert (fn @mayFocus true)}} or
+    //   {{did-insert (fn @mayFocus false)}}
+    // depending on if it is an editable input field that may sensibly receive
+    // the focus.
+    // If it is editable, {{did-insert...}} has to be attached to the element
+    // that shall receive the input focus.
     @action
-    onInsert(element) {
-        if (this.field._focusClone) element.focus();
+    mayFocus(mayFocus, element) {
+        if (mayFocus && this.field._focusClone) element.focus();
+        this.args.fieldMayFocus(mayFocus, element);
     }
 }
