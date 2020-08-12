@@ -331,7 +331,7 @@ WriteMakefile(
         'Crypt::Argon2'                 => 0,
          'Crypt::CBC'                    => '2.29',
         'Crypt::OpenSSL::AES'           => '0.02',      # for e.g. OpenXPKI::Crypto::VolatileVault
-        'CryptX' =>             => '0.1.2',        
+        'CryptX'                        => '0.1.2',     # required by the Crypt::* modules for key checking
         'Crypt::Cipher::AES'               => 0,           # replacement to support keysize > 128
         'Crypt::PKCS10'                 => '2.000',
         'Crypt::X509'                   => '0.53',
