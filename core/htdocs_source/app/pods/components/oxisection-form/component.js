@@ -1,8 +1,9 @@
 import Component from '@glimmer/component';
-import { action, computed } from "@ember/object";
+import { action } from "@ember/object";
 import { tracked } from '@glimmer/tracking';
 import { getOwner } from '@ember/application';
 import { isArray } from '@ember/array';
+import { inject as service } from '@ember/service';
 import { debug } from '@ember/debug';
 
 class Field {
@@ -64,10 +65,12 @@ class Field {
 }
 
 export default class OxisectionFormComponent extends Component {
-    clonableRefNames = [];
+    @service('intl') intl;
 
     @tracked loading = false;
     @tracked fields = [];
+
+    clonableRefNames = [];
 
     constructor() {
         super(...arguments);
@@ -286,7 +289,7 @@ export default class OxisectionFormComponent extends Component {
         for (const field of this.fields) {
             if (!field.is_optional && !field.value) {
                 isError = true;
-                field.error = "Please specify a value";
+                field.error = this.intl.t('component.oxisection_form.missing_value');
             } else {
                 if (field.error) {
                     isError = true;

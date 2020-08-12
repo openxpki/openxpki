@@ -151,6 +151,16 @@ if [[ $IS_I18N -eq 1 ]]; then
     make                                                              >$LOG 2>&1
     make install                                                      >$LOG 2>&1
     popd                                                              >$LOG 2>&1
+
+    for lang in $(IFS=' '; grep '^LANGS' $OXI_CORE_DIR/i18n/Makefile | cut -d= -f2 | sed 's/^\s*//'); do
+        if ! grep -q ^$lang /etc/locale.gen; then
+            echo "- adding $lang to /etc/locale.gen"
+            echo "$lang.UTF-8 UTF-8" >> /etc/locale.gen
+        fi
+    done
+
+    echo ""
+    locale-gen
 fi
 
 # create SSL keys and certificates and import them into OpenXPKI

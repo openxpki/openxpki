@@ -10,8 +10,11 @@
     "doc": "doc",
     "test": "tests"
   },
+  "config": {
+    "outputpath": "dist"
+  },
   "scripts": {
-    "build": "ember build --environment=production",
+    "build": "ember build --environment=production --output-path=$npm_package_config_outputpath",
     "lint:hbs": "ember-template-lint .",
     "lint:js": "eslint .",
     "serve": "ember serve --proxy=http://localhost:8080 --output-path=dist-dev",
@@ -53,7 +56,7 @@
     "ember-template-lint": "^2.5.2",
     "eslint-plugin-ember": "^7.7.2",
     "eslint-plugin-node": "^11.0.0",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.1",
     "js-yaml": "^3.14.0",
     "loader.js": "^4.7.0",
     "moment": "^2.24.0",

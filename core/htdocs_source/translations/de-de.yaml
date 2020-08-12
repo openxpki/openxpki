@@ -42,6 +42,7 @@ component:
   oxisection_form:
     submit: "Senden"
     reset: "Zurücksetzen"
+    missing_value: "Fehlende Eingabe - bitte ergänzen"
   oxisection_grid:
     select_all: "alle"
   oxi_download:

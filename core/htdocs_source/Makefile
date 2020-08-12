@@ -19,8 +19,7 @@ build-nocache:
 	docker build --no-cache -t $(IMAGE) .
 
 compile:
-	[ -L node_modules ] || ln -fs ../node_modules
-	docker run -v $(abspath ./):/source:ro -v $(abspath ../server/htdocs):/source/dist -ti $(IMAGE)
+	docker run -ti --rm -v $(abspath ./):/source:ro -v $(abspath ../server/htdocs):/compiled --user `id -u`:`id -g` $(IMAGE)
 
 # remove the build container
 prune:
