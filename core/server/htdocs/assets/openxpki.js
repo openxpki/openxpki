@@ -486,7 +486,8 @@ return Ember.getOwner(this).lookup("route:openxpki").sendAjax(r).then((function(
 try{for(r.s();!(t=r.n()).done;){var i,a=t.value,l=fe(o)
 try{for(l.s();!(i=l.n()).done;){var u=i.value
 if(u.name===a.name){var c=o.indexOf(u)
-o[c]=a,n.fields=o}}}catch(s){l.e(s)}finally{l.f()}}}catch(s){r.e(s)}finally{r.f()}return null}))}}},{key:"setFieldName",value:function(e,t){Ember.debug("oxisection/form: setFieldName (".concat(e.name," -> ").concat(t,")")),e.name=t}},{key:"setFieldError",value:function(e,t){Ember.debug("oxisection/form: setFieldError (".concat(e.name," = ").concat(t,")")),e.error=t}},{key:"fieldMayFocus",value:function(e,t,n){if(!this.focusFeedbackComplete&&(this.focusFeedback[e._refName]=t?n:null,Object.keys(this.focusFeedback).length===this.originalFieldCount)){Ember.debug("oxi-section/form: received focus feedback from all form fields"),this.focusFeedbackComplete=!0
+o[c]=a,n.fields=o}}}catch(s){l.e(s)}finally{l.f()}}}catch(s){r.e(s)}finally{r.f()}return null}))}}},{key:"setFieldName",value:function(e,t){Ember.debug("oxisection/form: setFieldName (".concat(e.name," -> ").concat(t,")")),e.name=t}},{key:"setFieldError",value:function(e,t){Ember.debug("oxisection/form: setFieldError (".concat(e.name," = ").concat(t,")")),e.error=t}},{key:"fieldMayFocus",value:function(e,t,n){if(!this.focusFeedbackComplete&&(this.focusFeedback[e._refName]=t?n:null,Object.keys(this.focusFeedback).length===this.originalFieldCount)){if(Ember.debug("oxi-section/form: focus feedback completed from all fields"),!this.args.def.isFirstForm)return void Ember.debug("oxi-section/form: we are not the first form - NOT setting focus")
+this.focusFeedbackComplete=!0
 var r,o=fe(this.visibleFields)
 try{for(o.s();!(r=o.n()).done;){var i=r.value
 if(null!==this.focusFeedback[i._refName]){Ember.debug("oxi-section/form: first focusable field: ".concat(i._refName)),this.focusFeedback[i._refName].focus()
@@ -897,12 +898,12 @@ var r={data:G(G({},e),{},{_:(new Date).getTime()}),dataType:"json",type:e.action
 var o=r.data.target||"self"
 return"modal"===o&&(o="popup"),"self"===o&&(o=this.content.popup?"popup":this.content.tabs.length>1?"active":"top"),this.content.refresh&&(Ember.run.cancel(this.content.refresh),this.content.refresh=null),new Ember.RSVP.Promise((function(e,i){t.default.ajax(r).then((function(t){if(n.content.status=t.status,n.content.popup=null,t.ping&&(Ember.debug('openxpki/route - sendAjax response: "ping" '+t.ping),n.content.ping&&Ember.run.cancel(n.content.ping),n.doPing(t.ping)),t.refresh&&(Ember.debug('openxpki/route - sendAjax response: "refresh" '+t.refresh.href+", "+t.refresh.timeout),n.content.refresh=Ember.run.later(n,(function(){this.sendAjax({page:t.refresh.href})}),t.refresh.timeout)),t.goto)Ember.debug('openxpki/route - sendAjax response: "goto" '+t.goto),"_blank"===t.target||/^(http|\/)/.test(t.goto)?window.location.href=t.goto:n.transitionTo("openxpki",t.goto)
 else if(t.structure)Ember.debug('openxpki/route - sendAjax response: "structure"'),n.content.navEntries=t.structure,n.updateNavEntryActiveState(),n.content.user=t.user,n.content.rtoken=t.rtoken,t.language&&(n.oxiLocale.locale=t.language)
-else{if(t.page&&t.main){Ember.debug('openxpki/route - sendAjax response: "page" and "main"'),n.content.tabs=B(n.content.tabs)
-var r={active:!0,page:t.page,main:t.main,right:t.right}
-if("popup"===o)n.content.popup=r
-else if("tab"===o){var i=n.content.tabs
-i.setEach("active",!1),i.pushObject(r)}else if("active"===o){var a=n.content.tabs,l=a.indexOf(a.findBy("active"))
-a.replace(l,1,[r])}else n.content.tabs=[r]}n.setLoadingState(!1)}return e(t)}),(function(){return n.setLoadingState(!1),n.content.error={message:n.intl.t("error_popup.message")},e({})}))}))}},{key:"updateNavEntryActiveState",value:function(){var e,t=this.content.page,n=function(e,t){var n
+else{if(t.page&&t.main){Ember.debug('openxpki/route - sendAjax response: "page" and "main"')
+for(var r={active:!0,page:t.page,main:t.main,right:t.right},i=!0,a=0,l=[].concat(B(r.main||[]),B(r.right||[]));a<l.length;a++){var u=l[a]
+"form"===u.type&&(u.content.isFirstForm=i,i&&(i=!1))}if("popup"===o)n.content.popup=r
+else if("tab"===o){var c=n.content.tabs
+c.setEach("active",!1),c.pushObject(r)}else if("active"===o){var s=n.content.tabs,f=s.indexOf(s.findBy("active"))
+s.replace(f,1,[r])}else n.content.tabs=[r]}n.setLoadingState(!1)}return e(t)}),(function(){return n.setLoadingState(!1),n.content.error={message:n.intl.t("error_popup.message")},e({})}))}))}},{key:"updateNavEntryActiveState",value:function(){var e,t=this.content.page,n=function(e,t){var n
 if("undefined"==typeof Symbol||null==e[Symbol.iterator]){if(Array.isArray(e)||(n=N(e))||t&&e&&"number"==typeof e.length){n&&(e=n)
 var r=0,o=function(){}
 return{s:o,n:function(){return r>=e.length?{done:!0}:{done:!1,value:e[r++]}},e:function(e){throw e},f:o}}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}var i,a=!0,l=!1

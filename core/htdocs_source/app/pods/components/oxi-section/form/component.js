@@ -293,18 +293,22 @@ export default class OxiSectionFormComponent extends Component {
         let feedbackCount = Object.keys(this.focusFeedback).length;
         if (feedbackCount === this.originalFieldCount) {
             debug(`oxi-section/form: focus feedback completed from all fields`);
-            if (!this.args.def.isFirstForm) {
-                debug(`oxi-section/form: we are not the first form - NOT setting focus`);
-                return;
-            }
-            this.focusFeedbackComplete = true;
-            for (const field of this.visibleFields) {
-                if (this.focusFeedback[field._refName] !== null) {
-                    debug(`oxi-section/form: first focusable field: ${field._refName}`);
-                    let elementToFocus = this.focusFeedback[field._refName];
-                    elementToFocus.focus();
-                    break;
-                }
+            this.focusFirstField();
+        }
+    }
+
+    focusFirstField() {
+        if (!this.args.def.isFirstForm) {
+            debug(`oxi-section/form: we are not the first form - NOT setting focus`);
+            return;
+        }
+        this.focusFeedbackComplete = true;
+        for (const field of this.visibleFields) {
+            if (this.focusFeedback[field._refName] !== null) {
+                debug(`oxi-section/form: first focusable field: ${field._refName}`);
+                let elementToFocus = this.focusFeedback[field._refName];
+                elementToFocus.focus();
+                break;
             }
         }
     }
