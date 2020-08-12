@@ -1,0 +1,75 @@
+{{#let @content.value as |v|}}
+
+    {{#if (eq this.format "certstatus")}}
+        <OxiBase::Label @class="certstatus-{{lc (try v.value v.label)}}" @tooltip={{v.tooltip}} @text={{v.label}} @raw={{true}} />
+    {{else if (eq this.format "link")}}
+        <a href="#/openxpki/{{v.page}}"
+           target={{v.target}}
+           title={{v.tooltip}}
+           {{on "click" (fn this.internalLinkClick v)}}
+        >
+            <OxiBase::Label @text={{v.label}} @raw={{true}} />
+        </a>
+    {{else if (eq this.format "extlink")}}
+        <a href={{v.page}} target={{try v.target "_blank"}} title={{v.tooltip}}>
+            <OxiBase::Label @text={{v.label}} @raw={{true}} />
+        </a>
+    {{else if (eq this.format "timestamp")}}
+        {{this.timestamp}}
+    {{else if (eq this.format "text")}}
+        <OxiBase::Label @text={{v}} @raw={{false}} />
+    {{else if (eq this.format "nl2br")}}
+        {{#each this.valueSplitByNewline as |line|}} {{line}}<br> {{/each}}
+    {{else if (eq this.format "code")}}
+        <code>{{this.valueStr}}</code>
+    {{else if (eq this.format "asciidata")}}
+        <div class="hover-element">
+            <pre class="content pre-scrollable">{{this.valueStr}}</pre>
+            <div class="menu">
+                <OxiBase::Download @data={{this.valueStr}} />
+            </div>
+        </div>
+    {{else if (eq this.format "download")}}
+        <OxiBase::Download @type={{v.type}} @data={{v.data}} @mimeType={{v.mimetype}} @fileName={{v.filename}} @autoDownload={{v.autodownload}} @hide={{v.hide}} />
+    {{else if (eq this.format "raw")}}
+        {{{defuse this.valueStr}}}
+    {{else if (eq this.format "deflist")}}
+        <dl>
+            {{#each v as |val|}}
+                <dt>{{val.label}}</dt>
+                {{#each (arrayify val.value) as |ddVal|}}
+                    <dd>
+                        {{#if (eq val.format "raw")}}{{{defuse ddVal}}}{{else}}{{ddVal}}{{/if}}
+                    </dd>
+                {{/each}}
+            {{/each}}
+        </dl>
+    {{else if (eq this.format "ullist")}}
+        <ul class="list-unstyled">
+            {{#each v as |val|}} <li><OxiBase::Label @text={{val}} @raw={{false}} /></li> {{/each}}
+        </ul>
+    {{else if (eq this.format "rawlist")}}
+        <ul class="list-unstyled">
+            {{#each v as |val|}} <li><OxiBase::Label @text={{val}} @raw={{true}} /> </li> {{/each}}
+        </ul>
+    {{else if (eq this.format "linklist")}}
+        <ul class="list-unstyled">
+            {{#each v as |val|}}
+                <li>
+                    <a href="#/openxpki/{{val.page}}"
+                       target={{val.target}}
+                       title={{val.tooltip}}
+                       {{on "click" (fn this.internalLinkClick val)}}
+                    >
+                        <OxiBase::Label @text={{val.label}} @raw={{true}} />
+                    </a>
+                </li>
+            {{/each}}
+        </ul>
+    {{else if (eq this.format "styled")}}
+        <span class="styled-{{this.styledValue.style}}">{{this.styledValue.label}}</span>
+    {{else if (eq this.format "tooltip")}}
+        <OxiBase::Label @text={{v.value}} @tooltip={{v.tooltip}} @raw={{false}} />
+    {{/if}}
+
+{{/let}}

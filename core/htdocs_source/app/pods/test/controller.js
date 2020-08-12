@@ -342,7 +342,7 @@ export default class TestController extends Controller {
     @tracked keyvalueDef = {
         "type": "keyvalue",
         "content": {
-            "label": "oxisection-keyvalue",
+            "label": "oxisection/keyvalue",
             "description": "",
             "data": [
                 {

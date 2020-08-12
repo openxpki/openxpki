@@ -1,0 +1,18 @@
+<div class="container-fluid">
+    <div class="header row">
+        <div class="col-xs-6">
+            {{#if this.config.header}}
+                {{{this.config.header}}}
+            {{else}}
+                <h2>
+                    <a href="./#/"><img src="{{this.rootURL}}img/logo.png" class="toplogo"></a>
+                    &nbsp;
+                    <small>{{t 'site.header'}}</small>
+                </h2>
+            {{/if}}
+        </div>
+        <div class="col-xs-6">
+            <Application::Header::Userinfo/>
+        </div>
+    </div>
+</div>

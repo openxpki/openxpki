@@ -1,0 +1,117 @@
+<OxiSection::Grid::Pagination
+    @pager={{@def.pager}}
+    @pages={{this.pages}}
+    @pagesizes={{this.pagesizes}}
+    @setPage={{this.setPage}}
+/>
+
+<div class="table-responsive oxisection-grid">
+    <table class="table table-striped table-bordered table-hover {{@def.className}}">
+        <thead>
+            <tr>
+                {{#if this.isBulkable}}
+                    <th {{action "select"}}>
+                        <span class="oxi-checkbox {{if this.allChecked "checked"}}"></span>
+                        {{t 'component.oxisection_grid.select_all'}}
+                    </th>
+                {{/if}}
+                {{#if this.multipleActions}}
+                    <th>&nbsp;</th>
+                {{/if}}
+                {{#each this.formattedColumns as |column|}}
+                    {{#if column.sortable}}
+                        <th {{on "click" (fn this.sort column.sortPage)}} class="sortable {{if column.isSorted "bg-info"}}">
+                            <span>{{column.sTitle}}</span>
+                            {{#if column.isSorted}}
+                                <button type="button" class="btn btn-primary btn-xs pull-right">
+                                    {{#if this.pager.reverse}}
+                                        <span class="glyphicon glyphicon-sort-by-attributes-alt"></span>
+                                    {{else}}
+                                        <span class="glyphicon glyphicon-sort-by-attributes"></span>
+                                    {{/if}}
+                                </button>
+                            {{else}}
+                                <button type="button" class="btn btn-default btn-xs pull-right">
+                                    <span class="glyphicon glyphicon-sort-by-attributes text-muted"></span>
+                                </button>
+                            {{/if}}
+                        </th>
+                    {{else}}
+                        <th>
+                            <span>{{column.sTitle}}</span>
+                        </th>
+                    {{/if}}
+                {{/each}}
+            </tr>
+        </thead>
+        <tbody>
+            {{#each this.sortedData as |row index|}}
+                <tr class="context {{row.className}} {{if this.hasAction "has-action"}}">
+                    {{#if this.isBulkable}}
+                        <td {{action "select" row}}>
+                            <span class="oxi-checkbox {{if row.checked "checked"}}"></span>
+                        </td>
+                    {{/if}}
+                    {{#if this.multipleActions}}
+                        <td>
+                            <BsDropdown as |dd|>
+                                <dd.toggle><span class="glyphicon glyphicon-cog"></span></dd.toggle>
+                                <dd.menu @renderInPlace={{false}} as |ddm|>
+                                    {{#each @def.actions as |action|}}
+                                        <ddm.item>
+                                            <a {{on "click" (fn this.executeAction row action)}}>
+                                                {{action.label}}
+                                                {{#if action.icon}}
+                                                    <span class="pull-right glyphicon glyphicon-{{action.icon}}"></span>
+                                                {{/if}}
+                                            </a>
+                                        </ddm.item>
+                                    {{/each}}
+                                </dd.menu>
+                            </BsDropdown>
+                        </td>
+                    {{/if}}
+                    {{#each row.data as |value|}}
+                        <td {{on "click" (fn this.executeAction row this.firstAction)}}>
+                            <OxiBase::ValueFormat @content={{value}}/>
+                        </td>
+                    {{/each}}
+                </tr>
+           {{else}}
+                <tr><td colspan="{{this.columns.length}}">
+                    {{if @def.empty @def.empty "&nbsp;"}}
+                </td></tr>
+           {{/each}}
+        </tbody>
+        {{#if @def.footer}}
+            <tfoot>
+                <tr><td colspan="{{this.columns.length}}">
+                    {{@def.footer}}
+                </td></tr>
+            </tfoot>
+        {{/if}}
+    </table>
+    <div class="dropdown">
+        <ul class="dropdown-menu" role="menu">
+            {{#each @def.actions as |action|}}
+                <li>
+                    <a tabindex="-1" href="#">{{action.label}}</a>
+                </li>
+            {{/each}}
+        </ul>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <OxiBase::ButtonContainer @buttons={{this.buttons}} @buttonClick={{this.buttonClick}}/>
+    </div>
+    <div class="col-md-6">
+        <OxiSection::Grid::Pagination
+            @pager={{@def.pager}}
+            @pages={{this.pages}}
+            @pagesizes={{this.pagesizes}}
+            @setPage={{this.setPage}}
+        />
+    </div>
+</div>

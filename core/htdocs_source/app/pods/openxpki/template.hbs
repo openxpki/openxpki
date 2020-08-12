@@ -105,13 +105,13 @@
                     <div class="row">
                         <div class="{{if entry.right "col-md-8" "col-md-12"}}">
                             {{#each entry.main as |mainEntry|}}
-                                <OxisectionMain @content={{mainEntry}}/>
+                                <OxiSection @content={{mainEntry}}/>
                             {{/each}}
                         </div>
                         <div class="{{if entry.right "col-md-4" "hide"}}">
                             {{#each entry.right as |rightEntry|}}
                                 <div class="well">
-                                    <OxisectionMain @content={{rightEntry}}/>
+                                    <OxiSection @content={{rightEntry}}/>
                                 </div>
                             {{/each}}
                         </div>
@@ -140,7 +140,7 @@
         </Modal.header>
         <Modal.body>
             {{#each popup.main as |mainEntry|}}
-                <OxisectionMain @content={{mainEntry}}/>
+                <OxiSection @content={{mainEntry}}/>
             {{/each}}
         </Modal.body>
         <Modal.footer>
