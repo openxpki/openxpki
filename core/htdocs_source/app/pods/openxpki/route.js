@@ -186,8 +186,8 @@ export default class OpenXpkiRoute extends Route {
                             debug("openxpki/route - sendAjax response: \"page\" and \"main\"");
                             this._setPageContent(req.data.target, doc.page, doc.main, doc.right);
                         }
-                        this.setLoadingState(false);
                     }
+                    this.setLoadingState(false);
                     return resolve(doc);
                 },
                 // FAILURE
