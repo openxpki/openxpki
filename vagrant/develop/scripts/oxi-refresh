@@ -64,10 +64,10 @@ IS_FULLCONFIG=0
 #
 # fix problems with newer Net::DNS:
 #rm -f /usr/lib/x86_64-linux-gnu/perl5/5.20/Net/DNS.pm
-#cpanm --notest Net::DNS                                               >$LOG 2>&1
+#cpanm --notest Net::DNS                                               >>$LOG 2>&1
 
 echo "Checking and installing Perl module dependencies"
-cpanm --notest PPI                                                    >$LOG 2>&1
+cpanm --notest PPI                                                    >>$LOG 2>&1
 /code-repo/tools/scripts/makefile2cpanfile.pl > /cpanfile
 cpanm --quiet --notest --installdeps /
 
@@ -79,7 +79,7 @@ echo ""
 # fully overwrite existing config
 if [[ $IS_FULLCONFIG -eq 1 ]]; then
     echo "Writing complete OpenXPKI config into /etc/openxpki"
-    rsync -a --delete $OXI_TEST_SAMPLECONFIG_DIR/* /etc/openxpki/     >$LOG 2>&1
+    rsync -a --delete $OXI_TEST_SAMPLECONFIG_DIR/* /etc/openxpki/     >>$LOG 2>&1
     chmod 750              /etc/openxpki/config.d
     chown -R root:openxpki /etc/openxpki/config.d
 
@@ -100,8 +100,8 @@ else
     echo "Updating demo realm in /etc/openxpki/config.d/realm/democa"
     rsync -a --delete \
       $OXI_TEST_SAMPLECONFIG_DIR/config.d/realm/democa/* \
-      /etc/openxpki/config.d/realm/democa/                             >$LOG 2>&1
-    chown -R root:openxpki /etc/openxpki/config.d/realm/democa/        >$LOG 2>&1
+      /etc/openxpki/config.d/realm/democa/                             >>$LOG 2>&1
+    chown -R root:openxpki /etc/openxpki/config.d/realm/democa/        >>$LOG 2>&1
 fi
 
 echo "- modifying some config entries"
@@ -117,9 +117,9 @@ sed -ri 's/^(\s*default_language:).*/\1 en_US/' /etc/openxpki/config.d/system/se
 #
 echo -e "\nCompilation and installation"
 echo -e "- synchronizing source code from host to $OXI_CORE_DIR"
-rsync -a --delete --exclude=.git/ --exclude=node_modules/ /code-repo/core/                 $OXI_CORE_DIR      >$LOG 2>&1
-rsync -a --delete --exclude=.git/ --exclude=node_modules/ /code-repo/core/server/htdocs/*  /var/www/openxpki/ >$LOG 2>&1
-rsync -a --delete --exclude=.git/ /code-repo/core/server/cgi-bin/* /usr/lib/cgi-bin/                          >$LOG 2>&1
+rsync -a --delete --exclude=.git/ --exclude=node_modules/ /code-repo/core/                 $OXI_CORE_DIR      >>$LOG 2>&1
+rsync -a --delete --exclude=.git/ --exclude=node_modules/ /code-repo/core/server/htdocs/*  /var/www/openxpki/ >>$LOG 2>&1
+rsync -a --delete --exclude=.git/ /code-repo/core/server/cgi-bin/* /usr/lib/cgi-bin/                          >>$LOG 2>&1
 test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/index.html
 
 # Set version so Makefile.PL does not need "vergen" (which we will not copy to $OXI_CORE_DIR)
@@ -130,15 +130,15 @@ our \$VERSION = '$OXI_VERSION';
 1;
 __VERSION
 
-pushd $OXI_CORE_DIR/server                                            >$LOG 2>&1
-perl Makefile.PL                                                      >$LOG 2>&1
+pushd $OXI_CORE_DIR/server                                            >>$LOG 2>&1
+perl Makefile.PL                                                      >>$LOG 2>&1
 if [[ $IS_COMPILE -eq 1 ]]; then
     echo "- compiling OpenXPKI $OXI_VERSION"
-    make                                                              >$LOG 2>&1
+    make                                                              >>$LOG 2>&1
 fi
 echo "- installing OpenXPKI"
-make install                                                          >$LOG 2>&1
-popd                                                                  >$LOG 2>&1
+make install                                                          >>$LOG 2>&1
+popd                                                                  >>$LOG 2>&1
 
 echo "- installing CGI::Session::Driver::openxpki"
 mkdir -p /usr/share/perl5/CGI/Session/Driver
@@ -147,10 +147,10 @@ cp $OXI_CORE_DIR/server/CGI_Session_Driver/openxpki.pm /usr/share/perl5/CGI/Sess
 if [[ $IS_I18N -eq 1 ]]; then
     echo "- compiling and installing I18N files"
     echo "$OXI_VERSION" > $OXI_CORE_DIR/i18n/VERSION
-    pushd $OXI_CORE_DIR/i18n                                          >$LOG 2>&1
-    make                                                              >$LOG 2>&1
-    make install                                                      >$LOG 2>&1
-    popd                                                              >$LOG 2>&1
+    pushd $OXI_CORE_DIR/i18n                                          >>$LOG 2>&1
+    make                                                              >>$LOG 2>&1
+    make install                                                      >>$LOG 2>&1
+    popd                                                              >>$LOG 2>&1
 
     for lang in $(IFS=' '; grep '^LANGS' $OXI_CORE_DIR/i18n/Makefile | cut -d= -f2 | sed 's/^\s*//'); do
         if ! grep -q ^$lang /etc/locale.gen; then
@@ -159,8 +159,8 @@ if [[ $IS_I18N -eq 1 ]]; then
         fi
     done
 
-    echo ""
-    locale-gen
+    echo "- regenerating locales"
+    locale-gen                                                        >>$LOG 2>&1
 fi
 
 # create SSL keys and certificates and import them into OpenXPKI
@@ -175,7 +175,7 @@ if [[ $IS_RESTART -eq 1 ]]; then
     # oxi-initdb (above) already restarts OpenXPKI
     if [[ $IS_FULLCONFIG -ne 1 ]]; then
         echo "Restarting OpenXPKI"
-        openxpkictl restart                                           >$LOG 2>&1
+        openxpkictl restart                                           >>$LOG 2>&1
 
         if [[ $(openxpkictl status 2>&1) != *"is running"* ]]; then
             echo -e "\nERROR: Could not start OpenXPKI. Please see logs in /var/log/openxpki"
@@ -184,7 +184,7 @@ if [[ $IS_RESTART -eq 1 ]]; then
     fi
 
     echo "Restarting Apache"
-    systemctl restart apache2                                         >$LOG 2>&1
+    systemctl restart apache2                                         >>$LOG 2>&1
 fi
 
 echo -e "\nDone."
