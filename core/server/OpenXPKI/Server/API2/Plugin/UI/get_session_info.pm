@@ -17,13 +17,23 @@ use OpenXPKI::Server::API2::Types;
 
 =head2 get_session_info
 
-B<Parameters>
+Returns information about the current user session:
 
-=over
-
-=item * C<XXX> I<Bool> - XXX. Default: XXX
-
-=back
+    {
+        name => STR,            # user name
+        realname => STR,        # user name - descriptive label
+        role => STR,            # role
+        role_label => STR,      # role - descriptive label
+        pki_realm => STR,       # PKI realm
+        pki_realm_label => STR, # PKI realm - descriptive label
+        checksum => STR,        # config checksum
+        sid => STR,             # session ID
+        userinfo => {           # additional user info, depending on authentication backend
+            realname => STR,    # optional
+            email => STR,       # optional
+            ...
+        },
+    }
 
 =cut
 command "get_session_info" => {
@@ -44,7 +54,7 @@ command "get_session_info" => {
         role_label      => CTX('config')->get([ 'auth', 'roles', $session->data->role, 'label' ]),
         pki_realm       => $session->data->pki_realm,
         pki_realm_label => CTX('config')->get([ 'system', 'realms', $session->data->pki_realm, 'label' ]),
-        lang            => 'en',
+        lang            => 'en', # FIXME remove? Web UI now uses language setting from webui/default.conf
         checksum        => CTX('config')->checksum(),
         sid             => substr($session->id,0,4),
         userinfo        => $session->data->userinfo,
