@@ -130,6 +130,14 @@ our \$VERSION = '$OXI_VERSION';
 1;
 __VERSION
 
+echo "- purging possible target locations"
+while read -d : path; do
+    test $path == "." && continue
+    echo "    $path/OpenXPKI*"
+    rm -rf $path/OpenXPKI*
+    rm -rf $path/auto/OpenXPKI*
+done <<< $(perl -e 'print "$_:" for @INC')
+
 pushd $OXI_CORE_DIR/server                                            >>$LOG 2>&1
 perl Makefile.PL                                                      >>$LOG 2>&1
 if [[ $IS_COMPILE -eq 1 ]]; then
