@@ -41,7 +41,6 @@ use Proc::Daemon;
 use Try::Tiny;
 
 # Project modules
-use OpenXPKI;
 use OpenXPKI::Control;
 use OpenXPKI::Server;
 use OpenXPKI::Test::QA::Role::Server::ClientHelper;

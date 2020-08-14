@@ -10,8 +10,6 @@ package OpenXPKI::Crypto::Backend::OpenSSL::Command::issue_crl;
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
-use OpenXPKI;
-
 use Math::BigInt;
 use English;
 
