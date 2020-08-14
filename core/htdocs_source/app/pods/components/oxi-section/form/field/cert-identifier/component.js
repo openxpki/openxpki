@@ -81,7 +81,7 @@ export default class OxiFieldCertIdentifierComponent extends Component {
         this.args.onChange(this.search);
 
         let searchIndex = ++this.searchIndex;
-        return getOwner(this).lookup("route:openxpki").sendAjax({
+        return getOwner(this).lookup("route:openxpki").sendAjaxQuiet({
             action: "certificate!autocomplete",
             query: this.search
         }).then((doc) => {

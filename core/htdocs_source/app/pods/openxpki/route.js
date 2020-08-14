@@ -19,7 +19,7 @@ class Content {
     @tracked tabs = [];
     @tracked navEntries = [];
     @tracked error = null;
-    @tracked isLoading = false;
+    @tracked showLoadingBanner = false;
 }
 
 export default class OpenXpkiRoute extends Route {
@@ -39,6 +39,7 @@ export default class OpenXpkiRoute extends Route {
     needReboot = ["login", "logout", "login!logout", "welcome"];
 
     @tracked content = new Content();
+    quietRequest = false;
 
     // Reserved Ember function
     beforeModel(transition) {
@@ -102,6 +103,9 @@ export default class OpenXpkiRoute extends Route {
     }
 
     setLoadingState(isLoading) {
+        // don't show optical hints if quietRequest
+        if (this.quietRequest) return;
+
         // note that we cannot use the Ember "loading" event as this would only
         // trigger on route changes, but not if we do sendAjax()
         if (isLoading) {
@@ -109,10 +113,17 @@ export default class OpenXpkiRoute extends Route {
             // submit by hitting enter
             document.activeElement.blur();
         }
-        this.content.isLoading = isLoading;
+        this.content.showLoadingBanner = isLoading;
+    }
+
+    // sends an AJAX request without showing "loading" banner or dimming page
+    sendAjaxQuiet(request) {
+        this.quietRequest = true;
+        return this.sendAjax(request);
     }
 
     sendAjax(request) {
+        this.quietRequest = false;
         this.setLoadingState(true);
         debug("openxpki/route - sendAjax: " + ['page','action'].map(p=>request[p]?`${p} = ${request[p]}`:null).filter(e=>e!==null).join(", "));
         // assemble request parameters
