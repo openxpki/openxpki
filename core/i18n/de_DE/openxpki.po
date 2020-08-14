@@ -1278,7 +1278,7 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_FAILED_REGEX"
 msgstr "Der eingegebene Wert entspricht nicht dem geforderten Format"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_HAS_ERRORS"
-msgstr "Eon oder mehrere Felder weisen Fehler auf"
+msgstr "Ein oder mehrere Felder weisen Fehler auf"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CERT_SUBJECT_FIELD_LESS_THAN_MIN_COUNT"
 msgstr "Die markierten Felder sind erforderlich"
