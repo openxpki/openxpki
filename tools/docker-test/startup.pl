@@ -214,7 +214,7 @@ execute show => "cpanm --quiet --notest --installdeps $clone_dir";
 #
 print "\n====[ MySQL ]====\n";
 my $dummy = gensym;
-my $pid = open3(0, $dummy, 0, qw(sh -c mysqld) );
+my $pid = open3(0, $dummy, 0, qw(sh -c /usr/sbin/mysqld) );
 execute show => "/tools-copy/testenv/mysql-wait-for-db.sh";
 execute show => "/tools-copy/testenv/mysql-create-user.sh";
 # if there are only qatests, we create the database later on
