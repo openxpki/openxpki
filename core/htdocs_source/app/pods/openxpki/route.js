@@ -114,7 +114,7 @@ export default class OpenXpkiRoute extends Route {
 
     sendAjax(request) {
         this.setLoadingState(true);
-        debug("openxpki/route - sendAjax: page = " + request.page);
+        debug("openxpki/route - sendAjax: " + ['page','action'].map(p=>request[p]?`${p} = ${request[p]}`:null).filter(e=>e!==null).join(", "));
         // assemble request parameters
         let req = {
             data: {
@@ -125,20 +125,7 @@ export default class OpenXpkiRoute extends Route {
             type: request.action ? "POST" : "GET",
             url: this.oxiConfig.backendUrl,
         };
-        if (req.type === "POST") {
-            req.data._rtoken = this.content.rtoken;
-        }
-
-        // Fetch "targetElement" parameter for use in AJAX response handler later on.
-        // Pseudo-target "self" is transformed so new content will be shown in the
-        // currently active place: a modal popup, an active tab or on top (i.e. single hidden tab)
-        let targetElement = req.data.target || "self";
-        if (targetElement === "modal") targetElement = "popup"; // legacy naming
-        if (targetElement === "self") {
-            if (this.content.popup) { targetElement = "popup" }
-            else if (this.content.tabs.length > 1) { targetElement = "active" }
-            else { targetElement = "top" }
-        }
+        if (req.type === "POST") req.data._rtoken = this.content.rtoken;
 
         if (this.content.refresh) {
             cancel(this.content.refresh);
@@ -181,47 +168,12 @@ export default class OpenXpkiRoute extends Route {
                         this.content.rtoken = doc.rtoken;
 
                         // set locale
-                        if (doc.language) {
-                            this.oxiLocale.locale = doc.language;
-                        }
+                        if (doc.language) this.oxiLocale.locale = doc.language;
                     }
                     else {
                         if (doc.page && doc.main) {
                             debug("openxpki/route - sendAjax response: \"page\" and \"main\"");
-
-                            let newTab = {
-                                active: true,
-                                page: doc.page,
-                                main: doc.main,
-                                right: doc.right
-                            };
-
-                            // Mark the first form on screen: only the first one is allowed to focus
-                            // its first input field.
-                            let isFirst = true;
-                            for (const section of [...(newTab.main||[]), ...(newTab.right||[])]) {
-                                if (section.type === "form") {
-                                    section.content.isFirstForm = isFirst;
-                                    if (isFirst) isFirst = false;
-                                }
-                            }
-
-                            if (targetElement === "popup") {
-                                this.content.popup = newTab;
-                            }
-                            else if (targetElement === "tab") {
-                                let tabs = this.content.tabs;
-                                tabs.setEach("active", false);
-                                tabs.pushObject(newTab);
-                            }
-                            else if (targetElement === "active") {
-                                let tabs = this.content.tabs;
-                                let index = tabs.indexOf(tabs.findBy("active"));
-                                tabs.replace(index, 1, [newTab]); // top
-                            }
-                            else {
-                                this.content.tabs = [newTab];
-                            }
+                            this._setPageContent(req.data.target, doc.page, doc.main, doc.right);
                         }
                         this.setLoadingState(false);
                     }
@@ -237,6 +189,55 @@ export default class OpenXpkiRoute extends Route {
                 }
             );
         });
+    }
+
+    _setPageContent(target = 'self', page, main, right) {
+        let newTab = {
+            active: true,
+            page: page,
+            main: main,
+            right: right
+        };
+
+        // Mark the first form on screen: only the first one is allowed to focus
+        // its first input field.
+        let isFirst = true;
+        for (const section of [...(newTab.main||[]), ...(newTab.right||[])]) {
+            if (section.type === "form") {
+                section.content.isFirstForm = isFirst;
+                if (isFirst) isFirst = false;
+            }
+        }
+
+        // Pseudo-target "self" is transformed so new content will be shown in the
+        // currently active place: a modal popup, an active tab or on top (i.e. single hidden tab)
+        if (target === 'self') {
+            if (this.content.popup) { target = 'popup' }
+            else if (this.content.tabs.length > 1) { target = 'active' }
+            else { target = 'top' }
+        }
+        if (target === 'modal') target = 'popup'; // FIXME legacy naming
+
+        // Popup
+        if (target === "popup") {
+            this.content.popup = newTab;
+        }
+        // New tab
+        else if (target === "tab") {
+            let tabs = this.content.tabs;
+            tabs.setEach("active", false);
+            tabs.pushObject(newTab);
+        }
+        // Current tab
+        else if (target === "active") {
+            let tabs = this.content.tabs;
+            let index = tabs.indexOf(tabs.findBy("active"));
+            tabs.replace(index, 1, [newTab]); // top
+        }
+        // Set as only tab
+        else {
+            this.content.tabs = [newTab];
+        }
     }
 
     updateNavEntryActiveState() {

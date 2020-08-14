@@ -40,8 +40,8 @@ class Field {
             if (! this.prototype.hasOwnProperty(attr)) {
                 /* eslint-disable-next-line no-console */
                 console.error(
-                    `oxisection/form: unknown property "${attr}" in field "${sourceHash.name}". ` +
-                    `If it's a new property, please add it to class 'Field' defined in ../oxisection/form/component.js.`
+                    `oxi-section/form (${this.args.def.action}): unknown property "${attr}" in field "${sourceHash.name}". ` +
+                    `If it's a new property, please add it to class 'Field' defined in ../oxi-section/form (${this.args.def.action})/component.js.`
                 );
             }
             else {
@@ -228,14 +228,14 @@ export default class OxiSectionFormComponent extends Component {
      */
     @action
     setFieldValue(field, value) {
-        debug(`oxisection/form: setFieldValue (${field.name} = "${value}")`);
+        debug(`oxi-section/form (${this.args.def.action}): setFieldValue (${field.name} = "${value}")`);
         field.value = value;
         field.error = null;
 
         // action on change?
         if (!field.actionOnChange) { return }
 
-        debug(`oxisection/form: executing actionOnChange ("${field.actionOnChange}")`);
+        debug(`oxi-section/form (${this.args.def.action}): executing actionOnChange ("${field.actionOnChange}")`);
         let request = {
             action: field.actionOnChange,
             _sourceField: field.name,
@@ -264,7 +264,7 @@ export default class OxiSectionFormComponent extends Component {
      */
     @action
     setFieldName(field, name) {
-        debug(`oxisection/form: setFieldName (${field.name} -> ${name})`);
+        debug(`oxi-section/form (${this.args.def.action}): setFieldName (${field.name} -> ${name})`);
         field.name = name;
     }
 
@@ -273,7 +273,7 @@ export default class OxiSectionFormComponent extends Component {
      */
     @action
     setFieldError(field, message) {
-        debug(`oxisection/form: setFieldError (${field.name} = ${message})`);
+        debug(`oxi-section/form (${this.args.def.action}): setFieldError (${field.name} = ${message})`);
         field.error = message;
     }
 
@@ -292,25 +292,25 @@ export default class OxiSectionFormComponent extends Component {
         // if all form fields sent feedback, choose first focusable field
         let feedbackCount = Object.keys(this.focusFeedback).length;
         if (feedbackCount === this.originalFieldCount) {
-            debug(`oxi-section/form: focus feedback completed from all fields`);
             this.focusFirstField();
         }
     }
 
     focusFirstField() {
         if (!this.args.def.isFirstForm) {
-            debug(`oxi-section/form: we are not the first form - NOT setting focus`);
+            debug(`oxi-section/form (${this.args.def.action}): we are not the first form - NOT setting focus`);
             return;
         }
         this.focusFeedbackComplete = true;
         for (const field of this.visibleFields) {
             if (this.focusFeedback[field._refName] !== null) {
-                debug(`oxi-section/form: first focusable field: ${field._refName}`);
+                debug(`oxi-section/form (${this.args.def.action}): first focusable field: ${field._refName}`);
                 let elementToFocus = this.focusFeedback[field._refName];
                 elementToFocus.focus();
-                break;
+                return;
             }
         }
+        debug(`oxi-section/form (${this.args.def.action}): no focusable field found`);
     }
 
     @action
@@ -320,7 +320,7 @@ export default class OxiSectionFormComponent extends Component {
 
     @action
     submit() {
-        debug("oxisection/form: submit");
+        debug(`oxi-section/form (${this.args.def.action}): submit`);
 
         // check validity and gather form data
         let isError = false;
