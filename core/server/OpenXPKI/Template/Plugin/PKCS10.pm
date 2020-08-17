@@ -172,7 +172,7 @@ sub digest {
 
     my $csr = $self->_load($pkcs10);
     if (!$csr) { return; }
-    return $csr->digest();
+    return $csr->get_digest();
 
 }
 
