@@ -1,0 +1,11 @@
+<div class="checkbox">
+    <label>
+        <input
+            type="checkbox"
+            checked={{@content.value}}
+            {{on "input" this.onInput}}
+            {{did-insert (fn @mayFocus false)}}
+        />
+        {{@content.label}}
+    </label>
+</div>

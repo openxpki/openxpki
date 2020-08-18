@@ -1,0 +1,40 @@
+<div class="form-group {{if @field.error "has-error"}} {{if @field.is_optional "optional" "required"}} {{@field.class}}">
+    {{#if this.isBool}}
+        <div class="col-md-2"></div>
+    {{else}}
+        <label class="col-md-2 control-label">{{@field.label}}</label>
+    {{/if}}
+
+    {{#if @field.keys}}
+        <div class="col-md-2">
+            <OxiBase::Select @list={{@field.keys}} @selected={{@field.name}} @onChange={{this.selectFieldType}} />
+        </div>
+    {{/if}}
+
+    <div class="{{this.sFieldSize}}" {{on "keydown" this.onKeydown}}>
+        {{#if @field.tooltip}}
+            <BsTooltip @title="{{@field.tooltip}}"/>
+        {{/if}}
+
+        {{component this.type content=this.field onChange=this.onChange onError=this.onError mayFocus=this.mayFocus}}
+
+        {{#if @field.error}}
+            <span class="help-block">{{@field.error}}</span>
+        {{/if}}
+    </div>
+
+    {{#if @field.clonable}}
+        <div class="col-md-1 clonable-btn-group">
+            {{#if @field._canDelete}}
+                <BsButton @type="danger" @onClick={{this.delClone}}>
+                    <span class="glyphicon glyphicon-minus"></span>
+                </BsButton>
+            {{/if}}
+            {{#if @field._canAdd}}
+                <BsButton @type="primary" @onClick={{this.addClone}}>
+                    <span class="glyphicon glyphicon-plus"></span>
+                </BsButton>
+            {{/if}}
+        </div>
+    {{/if}}
+</div>

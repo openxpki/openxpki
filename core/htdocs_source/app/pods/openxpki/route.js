@@ -19,7 +19,7 @@ class Content {
     @tracked tabs = [];
     @tracked navEntries = [];
     @tracked error = null;
-    @tracked isLoading = false;
+    @tracked showLoadingBanner = false;
 }
 
 export default class OpenXpkiRoute extends Route {
@@ -39,8 +39,9 @@ export default class OpenXpkiRoute extends Route {
     needReboot = ["login", "logout", "login!logout", "welcome"];
 
     @tracked content = new Content();
+    quietRequest = false;
 
-    // Reserved Ember function "beforeModel"
+    // Reserved Ember function
     beforeModel(transition) {
         let queryParams = transition.to.queryParams;
         let modelId = transition.to.params.model_id;
@@ -88,9 +89,8 @@ export default class OpenXpkiRoute extends Route {
             .then( () => this.sendAjax(request) );
     }
 
-    // Reserved Ember function "model"
-    /* eslint-disable-next-line no-unused-vars */
-    model(params, transition) {
+    // Reserved Ember function
+    model(params/*, transition*/) {
         this.content.page = params.model_id; this.updateNavEntryActiveState(this.content);
         return this.content;
     }
@@ -102,9 +102,30 @@ export default class OpenXpkiRoute extends Route {
         }, cfg.timeout);
     }
 
+    setLoadingState(isLoading) {
+        // don't show optical hints if quietRequest
+        if (this.quietRequest) return;
+
+        // note that we cannot use the Ember "loading" event as this would only
+        // trigger on route changes, but not if we do sendAjax()
+        if (isLoading) {
+            // remove focus from button to prevent user from doing another
+            // submit by hitting enter
+            document.activeElement.blur();
+        }
+        this.content.showLoadingBanner = isLoading;
+    }
+
+    // sends an AJAX request without showing "loading" banner or dimming page
+    sendAjaxQuiet(request) {
+        this.quietRequest = true;
+        return this.sendAjax(request);
+    }
+
     sendAjax(request) {
-        this.content.isLoading = true;
-        debug("openxpki/route - sendAjax: page = " + request.page);
+        this.quietRequest = false;
+        this.setLoadingState(true);
+        debug("openxpki/route - sendAjax: " + ['page','action'].map(p=>request[p]?`${p} = ${request[p]}`:null).filter(e=>e!==null).join(", "));
         // assemble request parameters
         let req = {
             data: {
@@ -115,20 +136,7 @@ export default class OpenXpkiRoute extends Route {
             type: request.action ? "POST" : "GET",
             url: this.oxiConfig.backendUrl,
         };
-        if (req.type === "POST") {
-            req.data._rtoken = this.content.rtoken;
-        }
-
-        // Fetch "targetElement" parameter for use in AJAX response handler later on.
-        // Pseudo-target "self" is transformed so new content will be shown in the
-        // currently active place: a modal popup, an active tab or on top (i.e. single hidden tab)
-        let targetElement = req.data.target || "self";
-        if (targetElement === "modal") targetElement = "popup"; // legacy naming
-        if (targetElement === "self") {
-            if (this.content.popup) { targetElement = "popup" }
-            else if (this.content.tabs.length > 1) { targetElement = "active" }
-            else { targetElement = "top" }
-        }
+        if (req.type === "POST") req.data._rtoken = this.content.rtoken;
 
         if (this.content.refresh) {
             cancel(this.content.refresh);
@@ -171,44 +179,20 @@ export default class OpenXpkiRoute extends Route {
                         this.content.rtoken = doc.rtoken;
 
                         // set locale
-                        if (doc.language) {
-                            this.oxiLocale.locale = doc.language;
-                        }
+                        if (doc.language) this.oxiLocale.locale = doc.language;
                     }
                     else {
                         if (doc.page && doc.main) {
                             debug("openxpki/route - sendAjax response: \"page\" and \"main\"");
-                            this.content.tabs = [...this.content.tabs]; // copy tabs to not trigger change observers for now
-                            let newTab = {
-                                active: true,
-                                page: doc.page,
-                                main: doc.main,
-                                right: doc.right
-                            };
-                            if (targetElement === "popup") {
-                                this.content.popup = newTab;
-                            }
-                            else if (targetElement === "tab") {
-                                let tabs = this.content.tabs;
-                                tabs.setEach("active", false);
-                                tabs.pushObject(newTab);
-                            }
-                            else if (targetElement === "active") {
-                                let tabs = this.content.tabs;
-                                let index = tabs.indexOf(tabs.findBy("active"));
-                                tabs.replace(index, 1, [newTab]); // top
-                            }
-                            else {
-                                this.content.tabs = [newTab];
-                            }
+                            this._setPageContent(req.data.target, doc.page, doc.main, doc.right);
                         }
-                        this.content.isLoading = false;
                     }
+                    this.setLoadingState(false);
                     return resolve(doc);
                 },
                 // FAILURE
                 () => {
-                    this.content.isLoading = false;
+                    this.setLoadingState(false);
                     this.content.error = {
                         message: this.intl.t('error_popup.message')
                     };
@@ -216,6 +200,55 @@ export default class OpenXpkiRoute extends Route {
                 }
             );
         });
+    }
+
+    _setPageContent(target = 'self', page, main, right) {
+        let newTab = {
+            active: true,
+            page: page,
+            main: main,
+            right: right
+        };
+
+        // Mark the first form on screen: only the first one is allowed to focus
+        // its first input field.
+        let isFirst = true;
+        for (const section of [...(newTab.main||[]), ...(newTab.right||[])]) {
+            if (section.type === "form") {
+                section.content.isFirstForm = isFirst;
+                if (isFirst) isFirst = false;
+            }
+        }
+
+        // Pseudo-target "self" is transformed so new content will be shown in the
+        // currently active place: a modal popup, an active tab or on top (i.e. single hidden tab)
+        if (target === 'self') {
+            if (this.content.popup) { target = 'popup' }
+            else if (this.content.tabs.length > 1) { target = 'active' }
+            else { target = 'top' }
+        }
+        if (target === 'modal') target = 'popup'; // FIXME legacy naming
+
+        // Popup
+        if (target === "popup") {
+            this.content.popup = newTab;
+        }
+        // New tab
+        else if (target === "tab") {
+            let tabs = this.content.tabs;
+            tabs.setEach("active", false);
+            tabs.pushObject(newTab);
+        }
+        // Current tab
+        else if (target === "active") {
+            let tabs = this.content.tabs;
+            let index = tabs.indexOf(tabs.findBy("active"));
+            tabs.replace(index, 1, [newTab]); // top
+        }
+        // Set as only tab
+        else {
+            this.content.tabs = [newTab];
+        }
     }
 
     updateNavEntryActiveState() {

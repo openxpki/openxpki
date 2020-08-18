@@ -1,7 +1,0 @@
-<select ...attributes class="form-control" {{on "change" this.listChanged}} {{did-insert (action "startup")}}>
-    {{#each @list as |item|}}
-        <option value="{{item.value}}" selected={{if (eq item.value @selected) "selected"}}>
-            {{item.label}}
-        </option>
-    {{/each}}
-</select>

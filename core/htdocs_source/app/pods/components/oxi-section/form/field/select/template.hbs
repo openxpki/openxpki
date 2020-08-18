@@ -1,0 +1,35 @@
+{{#if this.isStatic}}
+    <div class="oxi-no-input" {{did-insert this.onInsertStatic}}>{{@content.options.0.label}}</div>
+{{else if @content.editable}}
+    <div class="input-group">
+        {{#if this.customMode}}
+            <input
+                type="text"
+                class="form-control"
+                value={{@content.value}}
+                placeholder={{@content.placeholder}}
+                {{on "input" this.onCustomInput}}
+                {{did-insert this.onCustomInsert}}
+            />
+        {{else}}
+            <OxiBase::Select
+                @list={{this.options}}
+                @selected={{this.sanitizedValue}}
+                @onChange={{this.optionSelected}}
+                @onInsert={{fn @mayFocus true}}
+            />
+        {{/if}}
+        <span class="input-group-btn">
+            <BsButton @type="default" @active={{this.customMode}} @onClick={{this.toggleCustomMode}}>
+                {{t 'component.oxifield_select.custom_value'}}
+            </BsButton>
+        </span>
+    </div>
+{{else}}
+    <OxiBase::Select
+        @list={{this.options}}
+        @selected={{this.sanitizedValue}}
+        @onChange={{this.optionSelected}}
+        @onInsert={{fn @mayFocus true}}
+    />
+{{/if}}
