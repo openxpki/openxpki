@@ -367,20 +367,20 @@ while (my $cgi = CGI::Fast->new()) {
 
         $log->error("workflow terminated in unexpected state" );
         $res = { error => { code => 50003, message => 'workflow terminated in unexpected state',
-            data => { pid => $$, id => $workflow->{id}, 'state' => $workflow->{'state'} } } };
+            data => { pid => $$, id => int($workflow->{id}), 'state' => $workflow->{'state'} } } };
 
     # if the workflow is running, we do not expose any data of the workflows
     } elsif ( $workflow->{'proc_state'} eq 'running' ) {
 
         $log->info(sprintf("RPC request was processed properly (Workflow: %01d is currently running)",
             $workflow->{id} ));
-        $res = { result => { id => $workflow->{id}, 'state' => '--', 'proc_state' => $workflow->{'proc_state'}, pid => $$ }};
+        $res = { result => { id => int($workflow->{id}), 'state' => '--', 'proc_state' => $workflow->{'proc_state'}, pid => $$ }};
 
     } else {
 
         $log->info(sprintf("RPC request was processed properly (Workflow: %01d, State: %s (%s))",
             $workflow->{id}, $workflow->{state}, $workflow->{'proc_state'}) );
-        $res = { result => { id => $workflow->{id}, 'state' => $workflow->{'state'}, 'proc_state' => $workflow->{'proc_state'}, pid => $$ }};
+        $res = { result => { id => int($workflow->{id}), 'state' => $workflow->{'state'}, 'proc_state' => $workflow->{'proc_state'}, pid => $$ }};
 
         # if pickup is set and workflow is not in a final state we send a 202
         if ($conf->{$method}->{pickup}) {
@@ -590,5 +590,3 @@ put the following lines into your SSL Host section:
         SSLVerifyClient optional
         SSLOptions +StdEnvVars +ExportCertData
     </Location>
-
-
