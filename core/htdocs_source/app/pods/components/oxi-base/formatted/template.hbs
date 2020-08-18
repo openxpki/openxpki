@@ -3,13 +3,7 @@
     {{#if (eq this.format "certstatus")}}
         <OxiBase::Label @class="certstatus-{{lc (try v.value v.label)}}" @tooltip={{v.tooltip}} @text={{v.label}} @raw={{true}} />
     {{else if (eq this.format "link")}}
-        <a href="#/openxpki/{{v.page}}"
-           target={{v.target}}
-           title={{v.tooltip}}
-           {{on "click" (fn this.internalLinkClick v)}}
-        >
-            <OxiBase::Label @text={{v.label}} @raw={{true}} />
-        </a>
+        <OxiBase::Formatted::Link @spec={{v}}/>
     {{else if (eq this.format "extlink")}}
         <a href={{v.page}} target={{try v.target "_blank"}} title={{v.tooltip}}>
             <OxiBase::Label @text={{v.label}} @raw={{true}} />
@@ -56,13 +50,7 @@
         <ul class="list-unstyled">
             {{#each v as |val|}}
                 <li>
-                    <a href="#/openxpki/{{val.page}}"
-                       target={{val.target}}
-                       title={{val.tooltip}}
-                       {{on "click" (fn this.internalLinkClick val)}}
-                    >
-                        <OxiBase::Label @text={{val.label}} @raw={{true}} />
-                    </a>
+                    <OxiBase::Formatted::Link @spec={{val}}/>
                 </li>
             {{/each}}
         </ul>
