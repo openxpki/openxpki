@@ -168,7 +168,7 @@ sub execute {
             }
         );
         $self->last_wf_state($result->{workflow}) if $result->{workflow};
-    } "Executing workflow activity $activity";
+    } "Executing workflow activity '$activity'";
 
     return $result;
 }
@@ -211,7 +211,7 @@ sub execute_fails {
                 params => $params // {},
             }
         );
-    } $failure, "Executing workflow activity $activity should fail";
+    } $failure, "Executing workflow activity '$activity' should fail";
 }
 
 =head2 state_is

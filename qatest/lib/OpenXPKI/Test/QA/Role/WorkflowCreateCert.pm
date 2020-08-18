@@ -90,7 +90,7 @@ sub create_cert {
 
     my $cert_info = {};
 
-    subtest "Create certificate (hostname ".$params->hostname.")" => sub {
+    subtest "Create certificate (hostname '".$params->hostname."')" => sub {
         # change PKI realm, user and role to get permission to create workflow
         my $sess_data = $self->session->data;
         die "Cannot create certificate if session data is not set" unless $sess_data->has_pki_realm;
@@ -114,7 +114,6 @@ sub create_cert {
                     enc_alg => 'aes256',
                     key_gen_params => $serializer->serialize( { KEY_LENGTH => 2048 } ),
                     password_type => 'client',
-                    csr_type => 'pkcs10'
                 },
             );
 
@@ -124,15 +123,6 @@ sub create_cert {
                     cert_subject_parts => $serializer->serialize( \%cert_subject_parts ),
                 },
             );
-
-            if ($is_server_profile) {
-                $wftest->state_is('ENTER_SAN');
-                $wftest->execute(
-                    csr_edit_san => {
-                        cert_san_parts => $serializer->serialize( { } ),
-                    },
-                );
-            }
 
             $wftest->state_is('ENTER_CERT_INFO');
             $wftest->execute(
