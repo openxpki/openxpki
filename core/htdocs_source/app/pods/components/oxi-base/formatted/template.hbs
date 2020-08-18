@@ -33,7 +33,7 @@
                 <dt>{{val.label}}</dt>
                 {{#each (arrayify val.value) as |ddVal|}}
                     <dd>
-                        {{#if (eq val.format "raw")}}{{{defuse ddVal}}}{{else}}{{ddVal}}{{/if}}
+                        <OxiBase::Formatted::Arbitrary @value={{ddVal}} @raw={{if (eq val.format "raw") true false}} />
                     </dd>
                 {{/each}}
             {{/each}}

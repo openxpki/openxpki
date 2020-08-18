@@ -1,0 +1,19 @@
+{{#if this.isString}}
+    {{#if @raw}}
+        {{{defuse @value}}}
+    {{else}}
+        {{@value}}
+    {{/if}}
+{{else}}
+    <BsButton @onClick={{this.toggleDetails}} @type="default" class="btn-xs">
+        [{{this.type}}]
+        {{#if this.detailsOpen}}
+            <span class="glyphicon glyphicon-triangle-bottom"></span>
+        {{else}}
+            <span class="glyphicon glyphicon-triangle-right"></span>
+        {{/if}}
+    </BsButton>
+    {{#if this.detailsOpen}}
+        <pre>{{this.asJSON}}</pre>
+    {{/if}}
+{{/if}}

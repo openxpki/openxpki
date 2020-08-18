@@ -434,6 +434,25 @@ export default class TestController extends Controller {
                     ],
                 },
                 {
+                    "format": "deflist",
+                    "label": "deflist-arbitrary",
+                    "value": [
+                        {
+                            "label": "hosts-by-group",
+                            "value": {
+                                "one-two-three": [
+                                    "first.example.org",
+                                    "second.example.org"
+                                ],
+                            },
+                        },
+                        {
+                            "label": "size",
+                            "value": "1234"
+                        },
+                    ],
+                },
+                {
                     "format": "ullist",
                     "label": "ullist",
                     "value": [ "PKI", "OpenXPKI" ],
