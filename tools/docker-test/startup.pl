@@ -136,7 +136,21 @@ sub git_checkout {
     return $is_local;
 }
 
+sub git_is_based_on {
+    my ($code_dir, $branch) = @_;
 
+    my $temp_coderepo = tempdir( CLEANUP => 1 );
+    # get commit id of $branch in official repo
+    `git clone --quiet --depth=1 --branch=$branch https://github.com/openxpki/openxpki.git $temp_coderepo`;
+    chdir $temp_coderepo;
+    my $commit_id_develop=`git rev-parse HEAD`;
+
+    chdir $code_dir;
+    my $exit_code = execute code => [ 'git', 'merge-base', '--is-ancestor', $commit_id_develop, 'HEAD' ];
+
+    # exit codes: 1 = develop is no ancestor of HEAD, 128 = commit ID not found
+    return ($exit_code == 0);
+}
 
 my $mode = "all"; # default mode
 $mode = "all" if $ENV{OXI_TEST_ALL};
@@ -174,19 +188,26 @@ print "\nConfiguration source:\n";
 my $config_gitbranch = $ENV{OXI_TEST_CONFIG_GITBRANCH};
 # auto-set config branch to develop if code is based on develop
 if (not $config_gitbranch) {
-    print "- no Git branch specified, auto-detecting if code is based on 'develop': ";
-    my $temp_coderepo = tempdir( CLEANUP => 1 );
-    # get commit id of branch "develop" in official repo
-    `git clone --quiet --depth=1 --branch=develop https://github.com/openxpki/openxpki.git $temp_coderepo`;
-    chdir $temp_coderepo;
-    my $commit_id_develop=`git rev-parse HEAD`;
+    print "- no Git branch specified\n";
+    print "   - checking if code is based on Github branch 'develop': ";
 
-    chdir $clone_dir;
-    my $exit_code = execute code => [ 'git', 'merge-base', '--is-ancestor', $commit_id_develop, 'HEAD' ];
-
-    # exit codes: 1 = develop is no ancestor of HEAD, 128 = commit ID not found
-    $config_gitbranch = $exit_code == 0 ? 'develop' : 'master';
-    print $exit_code == 0 ? "yes\n" : "no\n";
+    if (git_is_based_on($clone_dir, 'develop')) {
+        print "yes\n";
+        $config_gitbranch = 'develop';
+    }
+    else {
+        print "no\n";
+        print "   - checking if code is based on Github branch 'master': ";
+        if (git_is_based_on($clone_dir, 'master')) {
+            print "yes\n";
+            $config_gitbranch = 'master';
+        }
+        else {
+            print "no\n";
+            print "   --> assuming private repo based on 'develop'\n";
+            $config_gitbranch = 'develop';
+        }
+    }
 }
 git_checkout('OXI_TEST_CONFIG_GITREPO', '/config', $config_gitbranch, $ENV{OXI_TEST_CONFIG_GITCOMMIT}, $config_dir);
 
