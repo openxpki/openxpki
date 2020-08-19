@@ -1,10 +1,8 @@
 # We use our own Perl setup (language "generic" uses a stripped-down TravisCI image)
 language: generic
 
-# Ubuntu 14.04 "Trusty"
-dist: trusty
-# Run in Docker container instead of VM - currently (2016-12-14) beta for "trusty"
-sudo: required
+# Ubuntu 18.04 "Bionic" (Debian Buster equivalent)
+dist: bionic
 
 env:
     global:
@@ -36,7 +34,7 @@ before_cache:
 addons:
   apt:
     packages:
-    - libmysqlclient-dev
+    - libmariadbclient-dev
     - openssl
     - libssl-dev
     - pkg-config
@@ -47,7 +45,6 @@ addons:
 #
 # Service setup
 #
-
 before_install:
     - ./tools/testenv/mysql-wait-for-db.sh
     - ./tools/testenv/mysql-create-db.sh
