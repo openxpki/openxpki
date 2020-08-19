@@ -7,7 +7,7 @@
                     <th colspan="2">{{item.value}}</th>
                 {{else}}
                     <td>{{item.label}}</td>
-                    <td><OxiBase::ValueFormat @content={{item}}/></td>
+                    <td><OxiBase::Formatted @content={{item}}/></td>
                 {{/if}}
                 </tr>
             {{/each}}

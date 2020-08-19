@@ -87,6 +87,7 @@ export default class TestController extends Controller {
                     type: "password",
                     name: "pwd",
                     label: "Password",
+                    tooltip: "Please choose wisely",
                 },
                 {
                     type: "passwordverify",
@@ -431,6 +432,25 @@ export default class TestController extends Controller {
                         { "label": "first", "value": "PKI <a href=\"should be escaped\">" },
                         { "label": "second", "value": "<a href=\"https://www.openxpki.org\">OpenXPKI</a>", "format": "raw" },
                         { "label": "subject", "value": [ "CN=sista.example.org", "DC=Test Deployment", "DC=PKI Examples", "DC=OpenXPKI", "DC=org" ] },
+                    ],
+                },
+                {
+                    "format": "deflist",
+                    "label": "deflist-arbitrary",
+                    "value": [
+                        {
+                            "label": "hosts-by-group",
+                            "value": {
+                                "one-two-three": [
+                                    "first.example.org",
+                                    "second.example.org"
+                                ],
+                            },
+                        },
+                        {
+                            "label": "size",
+                            "value": "1234"
+                        },
                     ],
                 },
                 {

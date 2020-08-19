@@ -3,13 +3,7 @@
     {{#if (eq this.format "certstatus")}}
         <OxiBase::Label @class="certstatus-{{lc (try v.value v.label)}}" @tooltip={{v.tooltip}} @text={{v.label}} @raw={{true}} />
     {{else if (eq this.format "link")}}
-        <a href="#/openxpki/{{v.page}}"
-           target={{v.target}}
-           title={{v.tooltip}}
-           {{on "click" (fn this.internalLinkClick v)}}
-        >
-            <OxiBase::Label @text={{v.label}} @raw={{true}} />
-        </a>
+        <OxiBase::Formatted::Link @spec={{v}}/>
     {{else if (eq this.format "extlink")}}
         <a href={{v.page}} target={{try v.target "_blank"}} title={{v.tooltip}}>
             <OxiBase::Label @text={{v.label}} @raw={{true}} />
@@ -39,14 +33,18 @@
                 <dt>{{val.label}}</dt>
                 {{#each (arrayify val.value) as |ddVal|}}
                     <dd>
-                        {{#if (eq val.format "raw")}}{{{defuse ddVal}}}{{else}}{{ddVal}}{{/if}}
+                        <OxiBase::Formatted::Arbitrary @value={{ddVal}} @raw={{if (eq val.format "raw") true false}} />
                     </dd>
                 {{/each}}
             {{/each}}
         </dl>
     {{else if (eq this.format "ullist")}}
         <ul class="list-unstyled">
-            {{#each v as |val|}} <li><OxiBase::Label @text={{val}} @raw={{false}} /></li> {{/each}}
+            {{#each v as |val|}}
+                <li>
+                    <OxiBase::Formatted::Arbitrary @value={{val}} @raw={{false}} />
+                </li>
+            {{/each}}
         </ul>
     {{else if (eq this.format "rawlist")}}
         <ul class="list-unstyled">
@@ -56,13 +54,7 @@
         <ul class="list-unstyled">
             {{#each v as |val|}}
                 <li>
-                    <a href="#/openxpki/{{val.page}}"
-                       target={{val.target}}
-                       title={{val.tooltip}}
-                       {{on "click" (fn this.internalLinkClick val)}}
-                    >
-                        <OxiBase::Label @text={{val.label}} @raw={{true}} />
-                    </a>
+                    <OxiBase::Formatted::Link @spec={{val}}/>
                 </li>
             {{/each}}
         </ul>
