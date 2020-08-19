@@ -1,7 +1,11 @@
 use strict;
 use warnings;
+
+# Core modules
 use Test::More;
 use English;
+use FindBin qw( $Bin );
+
 plan tests => 3;
 
 eval {
@@ -20,7 +24,7 @@ my $test = sub {
 
     plan tests => 6 + ($loglevel == 1 ? 2 : 6);
 
-    my $stderr = `$^X -It/08_debug t/08_debug/main.pl TestModuleColor.pm $bitmask 2>&1`;
+    my $stderr = `$^X -I$Bin $Bin/main.pl TestModuleColor.pm $bitmask 2>&1`;
 
     ok(! $CHILD_ERROR, 'main.pl execution');
     like($stderr,

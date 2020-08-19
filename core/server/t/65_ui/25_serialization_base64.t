@@ -1,34 +1,42 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
-use English;
-use utf8; # otherwise the utf8 tests does not work
-# use Smart::Comments;
 
+# Core modules
+use Test::More tests => 6;
+use Test::Exception;
+use Test::Deep;
 use MIME::Base64;
 
 BEGIN { use_ok( 'OpenXPKI::Serialization::Simple' ); }
 
-print STDERR "OpenXPKI::Serialization::Simple\n" if $ENV{VERBOSE};
-
-# test default separator
-my $ref = OpenXPKI::Serialization::Simple->new ();
-ok($ref, 'Default seperator');
+my $obj;
+lives_ok { $obj = OpenXPKI::Serialization::Simple->new() } "new instance";
 
 my $binary = decode_base64("MIIJGQIBAzCCCN8GCSqGSIb3DQEHAaCCCNAEggjMMIIIyDCCA38GCSqGSIb3DQEHBqCCA3AwggNs");
 
-my $b64 = $ref->serialize( $binary );
+my $b64;
+lives_and {
+    $b64 = $obj->serialize( $binary );
+    is($b64, "OXB64:MIIJGQIBAzCCCN8GCSqGSIb3DQEHAaCCCNAEggjMMIIIyDCCA38GCSqGSIb3DQEHBqCCA3AwggNs");
+} "serialize";
 
-is($b64, "OXB64:MIIJGQIBAzCCCN8GCSqGSIb3DQEHAaCCCNAEggjMMIIIyDCCA38GCSqGSIb3DQEHBqCCA3AwggNs\n");
-
-my $bin = $ref->deserialize( $b64 );
-
-ok(pack('H*', $bin) eq  pack('H*', $binary));
+my $bin;
+lives_and {
+    $bin = $obj->deserialize( $b64 );
+    ok(pack('H*', $bin) eq pack('H*', $binary));
+} "deserialize";
 
 my $hash = { 'BIN' => $binary };
 
-$b64 = $ref->serialize( $hash );
+my $serialized;
+lives_and {
+    $serialized = $obj->serialize( $hash );
+    like($serialized, qr/^OXJSF1:/);
+} "serialize as hash, circumventing binary data detection";
 
-print "\n----$b64----\n";
+lives_and {
+    my $hash2 = $obj->deserialize( $serialized );
+    cmp_deeply($hash, $hash2);
+} "deserialize hash";
 
-my $hash2 = $ref->deserialize( $b64 );
+1;

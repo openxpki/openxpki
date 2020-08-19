@@ -72,6 +72,8 @@ I<error_code> and the target_key is empty.
 
 =head2 Activity Parameters
 
+=over
+
 =item key_id
 
 The identifier of the key, usually returned by GenerateKey
@@ -92,3 +94,4 @@ Set encryption password for the returned key
 
 The context value to write the result key to. Default is private_key.
 
+=back

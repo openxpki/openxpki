@@ -13,6 +13,9 @@ use Test::Exception;
 use Test::Deep;
 use Log::Log4perl qw(:easy);
 
+# Project modules
+use OpenXPKI::FileUtils;
+
 plan tests => 6;
 
 my $config_dir = tempdir( CLEANUP => 1 );
@@ -43,7 +46,7 @@ my $cfg_data = {
 my $lines = [];
 TAP::Parser::YAMLish::Writer->new->write($cfg_data, $lines);
 pop @$lines; shift @$lines; # remove --- and ... from beginning/end
-OpenXPKI::FileUtils->write_file({FILENAME => $config_file, CONTENT => CONF join("\n", @$lines) });
+OpenXPKI::FileUtils->write_file({FILENAME => $config_file, CONTENT => join("\n", @$lines) });
 
 #
 # Tests

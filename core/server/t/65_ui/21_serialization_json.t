@@ -1,40 +1,43 @@
-
 use strict;
 use warnings;
-use Test::More tests => 3;
-use English;
 
-# use Smart::Comments;
+# Core modules
+use Test::More tests => 4;
+use Test::Exception;
+use Test::Deep;
 
 BEGIN { use_ok( 'OpenXPKI::Serialization::JSON' ); }
 
-print STDERR "OpenXPKI::Serialization::JSON\n" if $ENV{VERBOSE};
-
-
-my $ref = OpenXPKI::Serialization::JSON->new();
+my $obj;
+lives_ok { $obj = OpenXPKI::Serialization::JSON->new() } "new instance";
 
 my $hash = {
-"HEADER" => ["Testheader"],
-"UNDEFINED" => undef,
-"LIST"   => [
-    [
-        {"Name"   => ["John Doe"]},
-        {"Serial" => [10, 12]},
-        {"Undefined" => undef},
+    "HEADER" => ["Testheader"],
+    "UNDEFINED" => undef,
+    "LIST" => [
+        [
+            {"Name"   => ["John Doe"]},
+            {"Serial" => [10, 12]},
+            {"Undefined" => undef},
+        ],
+        [
+            {"Name"   => ["Jane Doe"] },
+            {"Serial" => [11, 13] }
+        ],
     ],
-    [
-        {"Name"   => ["Jane Doe"] },
-        {"Serial" => [11, 13] }
-    ],
-    "FOOTER" => ["OK", "Abort"]
-    ]
+    "FOOTER" => ["OK", "Abort"],
 };
 
-my $text = $ref->serialize ($hash);
+my $serialized;
 
-like($text, "/{.*}/" );
+lives_and {
+    $serialized = $obj->serialize ($hash);
+    like($serialized, "/{.*}/" );
+} "serialize";
 
-my $res = $ref->deserialize($text);
-is_deeply($res, $hash, "Data structure survived (de)serialization");
+lives_and {
+    my $res = $obj->deserialize($serialized);
+    cmp_deeply($res, $hash);
+} "deserialize";
 
 1;

@@ -73,6 +73,8 @@ I<error_code> and the target_key is empty.
 
 =head2 Activity Parameters
 
+=over
+
 =item key_alg
 
 Mapped unmodified to key_alg of the api method, set to 'rsa' of not set.
@@ -96,3 +98,4 @@ RSA/DSA is set in the API method).
 
 The context value to write the result key to. Default is private_key.
 
+=back

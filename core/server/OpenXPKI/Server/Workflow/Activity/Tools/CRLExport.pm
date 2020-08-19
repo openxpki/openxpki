@@ -108,7 +108,7 @@ crl_serial on such a crl!
 
 Export the CRL in PEM encoding to the given I<target_key>
 
-=ITEM DER
+=item DER
 
 Export the CRL as binary data (DER) to the given I<target_key>, the
 target key must start with an underscore (volatile context item).
