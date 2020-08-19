@@ -40,7 +40,11 @@
         </dl>
     {{else if (eq this.format "ullist")}}
         <ul class="list-unstyled">
-            {{#each v as |val|}} <li><OxiBase::Label @text={{val}} @raw={{false}} /></li> {{/each}}
+            {{#each v as |val|}}
+                <li>
+                    <OxiBase::Formatted::Arbitrary @value={{val}} @raw={{false}} />
+                </li>
+            {{/each}}
         </ul>
     {{else if (eq this.format "rawlist")}}
         <ul class="list-unstyled">
