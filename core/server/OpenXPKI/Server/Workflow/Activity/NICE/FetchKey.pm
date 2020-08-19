@@ -92,3 +92,4 @@ Set encryption password for the returned key
 
 The context value to write the result key to. Default is private_key.
 
+=back

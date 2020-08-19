@@ -83,6 +83,8 @@ I<openssl rand> which CAN be setup using an engine / HSM.
 
 Note: fast has currently no extra implementation and uses /dev/urandom.
 
+=back
+
 =cut
 
 sub get_random {
