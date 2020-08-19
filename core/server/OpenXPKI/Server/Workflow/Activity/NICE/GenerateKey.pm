@@ -73,6 +73,8 @@ I<error_code> and the target_key is empty.
 
 =head2 Activity Parameters
 
+=over
+
 =item key_alg
 
 Mapped unmodified to key_alg of the api method, set to 'rsa' of not set.

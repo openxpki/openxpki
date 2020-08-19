@@ -1,7 +1,11 @@
 use strict;
 use warnings;
+
+# Core modules
 use Test::More;
 use English;
+use FindBin qw( $Bin );
+
 plan tests => 3;
 
 use_ok('OpenXPKI::Debug');
@@ -13,7 +17,7 @@ my $test = sub {
 
     plan tests => 6 + ($loglevel == 1 ? 2 : 12);
 
-    my $stderr = `$^X -It/08_debug t/08_debug/main.pl TestModuleInvalid.pm $bitmask 2>&1`;
+    my $stderr = `$^X -I$Bin $Bin/main.pl TestModuleInvalid.pm $bitmask 2>&1`;
 
     ok(! $CHILD_ERROR, 'main.pl execution');
     like($stderr,

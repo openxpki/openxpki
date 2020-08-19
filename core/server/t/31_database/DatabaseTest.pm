@@ -134,6 +134,7 @@ sub run {
     my $sqlite_db = $self->sqlite_db || ":memory:";
     subtest "$name (SQLite '$sqlite_db')" => sub {
         plan skip_all => "SQLite test disabled" unless $self->shall_test('sqlite');
+        eval { require DBD::SQLite } or plan skip_all => "DBD::SQLite is not installed";
         plan tests => $plan + 1 + ($self->data ? 1 : 0); # 2 from set_dbi()
         $self->set_dbi(
             params => {
@@ -151,6 +152,7 @@ sub run {
     subtest "$name (Oracle)" => sub {
         plan skip_all => "No Oracle database found / OXI_TEST_DB_ORACLE_NAME not set" unless $ENV{OXI_TEST_DB_ORACLE_NAME};
         plan skip_all => "Oracle test disabled" unless $self->shall_test('oracle');
+        eval { require DBD::Oracle } or plan skip_all => "DBD::Oracle is not installed";
         plan tests => $plan + 1 + ($self->data ? 1 : 0); # 2 from set_dbi()
         $self->set_dbi(
             params => {
@@ -168,6 +170,7 @@ sub run {
     subtest "$name (MySQL)" => sub {
         plan skip_all => "No MySQL database found / OXI_TEST_DB_MYSQL_NAME not set" unless $ENV{OXI_TEST_DB_MYSQL_NAME};
         plan skip_all => "MySQL test disabled" unless $self->shall_test('mysql');
+        eval { require DBD::mysql } or plan skip_all => "DBD::mysql is not installed";
         plan tests => $plan + 1 + ($self->data ? 1 : 0); # 2 from set_dbi()
         $self->set_dbi(
             params => {
