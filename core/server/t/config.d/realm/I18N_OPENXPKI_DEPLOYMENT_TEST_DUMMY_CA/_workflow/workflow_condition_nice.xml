@@ -1,9 +1,0 @@
-<conditions>
-	<condition name="I18N_OPENXPKI_WF_COND_NICE_CERTIFICATE_ISSUED"
-	  class="OpenXPKI::Server::Workflow::Condition::NICE::IsCertificateIssued">
-	</condition>
-	<condition name="I18N_OPENXPKI_WF_COND_NICE_CERTIFICATE_PENDING"
-	  class="OpenXPKI::Server::Workflow::Condition::NICE::IsCertificatePending">
-	</condition>	
-	
-</conditions>
