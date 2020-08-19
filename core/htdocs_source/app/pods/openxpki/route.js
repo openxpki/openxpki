@@ -143,12 +143,13 @@ export default class OpenXpkiRoute extends Route {
             this.content.refresh = null;
         }
 
+        let realTarget = this._resolveTarget(req.data.target); // has to be done before "this.content.popup = null"
+
         /* eslint-disable-next-line no-unused-vars */
         return new Promise((resolve, reject) => {
             $.ajax(req).then(
                 // SUCCESS
                 doc => {
-                    // work with a copy of this.content
                     this.content.status = doc.status;
                     this.content.popup = null;
 
@@ -184,7 +185,7 @@ export default class OpenXpkiRoute extends Route {
                     else {
                         if (doc.page && doc.main) {
                             debug("openxpki/route - sendAjax response: \"page\" and \"main\"");
-                            this._setPageContent(req.data.target, doc.page, doc.main, doc.right);
+                            this._setPageContent(realTarget, doc.page, doc.main, doc.right);
                         }
                     }
                     this.setLoadingState(false);
@@ -202,7 +203,20 @@ export default class OpenXpkiRoute extends Route {
         });
     }
 
-    _setPageContent(target = 'self', page, main, right) {
+    _resolveTarget(requestTarget) {
+        let target = requestTarget || 'self';
+        // Pseudo-target "self" is transformed so new content will be shown in the
+        // currently active place: a modal popup, an active tab or on top (i.e. single hidden tab)
+        if (target === 'self') {
+            if (this.content.popup) { target = 'popup' }
+            else if (this.content.tabs.length > 1) { target = 'active' }
+            else { target = 'top' }
+        }
+        if (target === 'modal') target = 'popup'; // FIXME remove support for legacy target 'modal'
+        return target;
+    }
+
+    _setPageContent(target, page, main, right) {
         let newTab = {
             active: true,
             page: page,
@@ -219,15 +233,6 @@ export default class OpenXpkiRoute extends Route {
                 if (isFirst) isFirst = false;
             }
         }
-
-        // Pseudo-target "self" is transformed so new content will be shown in the
-        // currently active place: a modal popup, an active tab or on top (i.e. single hidden tab)
-        if (target === 'self') {
-            if (this.content.popup) { target = 'popup' }
-            else if (this.content.tabs.length > 1) { target = 'active' }
-            else { target = 'top' }
-        }
-        if (target === 'modal') target = 'popup'; // FIXME legacy naming
 
         // Popup
         if (target === "popup") {
