@@ -10,7 +10,11 @@ export default class OxiFormattedArbitraryComponent extends Component {
     }
 
     get isString() {
-        return (this.type === 'string' || this.type === 'undefined' || this.type === 'null');
+        // what we interpret as a string...
+        return (
+            (new RegExp(/^(string|number|undefined)$/)).test(this.type)
+            || this.args.value === null
+        );
     }
 
     get asJSON() {
