@@ -1,4 +1,4 @@
-FROM debian:8-slim
+FROM debian:10-slim
 
 #
 # RUN commands are split to be able to change something in the config and still
@@ -18,9 +18,9 @@ RUN apt-get update && \
         git \
         expat libexpat-dev \
         openssl libssl-dev \
-        libmysqlclient-dev \
+        libmariadbclient-dev \
         apache2 \
-        mysql-server \
+        mariadb-server \
         curl \
         pkg-config \
         nano \
@@ -38,6 +38,11 @@ COPY cpanfile /
 RUN cpanm --quiet --notest --installdeps /
 # modules needed in startup.pl
 RUN cpanm --quiet --notest PPI Devel::Cover DateTime File::Slurp
+
+#
+# Prepare MySQL
+# (copied from /lib/systemd/system/mariadb.service)
+RUN /usr/bin/install -m 755 -o mysql -g root -d /var/run/mysqld
 
 #
 # Copy scripts from symlinked directories
