@@ -87,6 +87,7 @@ export default class TestController extends Controller {
                     type: "password",
                     name: "pwd",
                     label: "Password",
+                    tooltip: "Please choose wisely",
                 },
                 {
                     type: "passwordverify",

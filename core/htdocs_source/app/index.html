@@ -17,9 +17,6 @@
     <body>
         {{content-for "body"}}
 
-        <script src="{{rootURL}}assets/vendor.js"></script>
-        <script src="{{rootURL}}assets/openxpki.js"></script>
-
         <div id="waiting-for-ember">
             <div class="container">
                 <div class="alert alert-success" role="alert">OpenXPKI is loading ...</div>
@@ -27,5 +24,8 @@
         </div>
 
         {{content-for "body-footer"}}
+
+        <script src="{{rootURL}}assets/vendor.js"></script>
+        <script src="{{rootURL}}assets/openxpki.js"></script>
     </body>
 </html>
