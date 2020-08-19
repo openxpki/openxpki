@@ -112,7 +112,8 @@ for mode in "${!testmodes[@]}"; do
         figlet "$mode tests"
         set +e
         cd $TRAVIS_BUILD_DIR/${testmodes[$mode]} && prove -q .
-        test -n "$OXI_TEST_RUN" && exit $?
+        EXITCODE=$?
+        test -n "$OXI_TEST_RUN" && exit $EXITCODE
         set -e
     fi
 done
