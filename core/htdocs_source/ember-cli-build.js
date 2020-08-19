@@ -4,7 +4,7 @@ const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 
 module.exports = function(defaults) {
     let app = new EmberApp(defaults, {
-        minifyCSS: {
+        'minifyCSS': {
             // for available options see https://github.com/jakubpawlowicz/clean-css/tree/v3.4.28
             options: {
                 processImport: true,
@@ -22,17 +22,29 @@ module.exports = function(defaults) {
 
         // disable fingerprinting of assets in production build
         // (i.e. "openxpki.js" instead of "openxpki-1312d860591f9801798c1ef46052a7ea.js")
-        fingerprint: {
+        'fingerprint': {
             enabled: false,
         },
 
         // store app config in compiled JS file instead of <meta> tag
-        storeConfigInMeta: false,
+        'storeConfigInMeta': false,
 
         // support e.g. IE11
         'ember-cli-babel': {
             includePolyfill: true,
         },
+
+        ...(process.env.EMBER_ENV === "production" && process.env.OPENXPKI_UI_BUILD_UNMINIFIED == 1
+            ? {
+                'ember-cli-uglify': {
+                    enabled: false,
+                },
+                'sourcemaps': {
+                    enabled: true,
+                },
+            }
+            : {}
+        ),
     });
 
     // Use `app.import` to add additional libraries to the generated
