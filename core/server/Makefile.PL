@@ -32,46 +32,40 @@ my @paths = qw( /usr/local/ssl
                 /opt
               );
 
-if (exists $ENV{OPENSSL_PREFIX} 
-    && $ENV{OPENSSL_PREFIX} ne '') {
-    unshift @paths, $ENV{OPENSSL_PREFIX};
-}
-
+unshift @paths, $ENV{OPENSSL_PREFIX}
+    if (exists $ENV{OPENSSL_PREFIX} and $ENV{OPENSSL_PREFIX} ne '');
 
 my $tmp_ver;
 
-PATH:
-foreach my $path (@paths)
-{
+foreach my $path (@paths) {
     my $tmp_inc = File::Spec->catfile($path, 'include');
     $tmp_ver = File::Spec->catfile($tmp_inc, 'openssl', 'opensslv.h');
     my $tmp_lib = File::Spec->catfile($path, 'lib');
     my $tmp_bin = File::Spec->catfile($path, 'bin', 'openssl');
 
     if (-d $tmp_inc &&
-	-d $tmp_lib &&
-	-r $tmp_ver &&
-	-r $tmp_bin && -x $tmp_bin) {
-
-	$openssl_inc_dir = $tmp_inc;
-	$openssl_lib_dir = $tmp_lib;
-	$openssl_binary  = $tmp_bin;
-	last PATH;
+        -d $tmp_lib &&
+        -r $tmp_ver &&
+        -r $tmp_bin && -x $tmp_bin) {
+        $openssl_inc_dir = $tmp_inc;
+        $openssl_lib_dir = $tmp_lib;
+        $openssl_binary  = $tmp_bin;
+        last;
     }
 }
 
 # accept settings from OPENSSL_INC and OPENSSL_LIB if BOTH exist
-if (exists $ENV{OPENSSL_INC}    && $ENV{OPENSSL_INC} != "" 
-    && exists $ENV{OPENSSL_LIB} && $ENV{OPENSSL_LIB} != "") {
-
+if (exists $ENV{OPENSSL_INC} && $ENV{OPENSSL_INC} != "" &&
+    exists $ENV{OPENSSL_LIB} && $ENV{OPENSSL_LIB} != ""
+) {
     $openssl_inc_dir = $ENV{OPENSSL_INC};
     $openssl_lib_dir = $ENV{OPENSSL_LIB};
 }
 
-die "Could not find usable OpenSSL installation. Stopped" 
+die "Could not find usable OpenSSL installation. Stopped"
     unless defined $openssl_inc_dir;
 
-die "Could not find usable OpenSSL binary. Stopped" 
+die "Could not find usable OpenSSL binary. Stopped"
     unless defined $openssl_binary;
 
 print STDERR "OpenSSL library: $openssl_lib_dir\n";
@@ -92,7 +86,7 @@ if ($openssl_version_string =~ m/\s*OpenSSL\s+(\d+)\.(\d+)\.(\d+)([a-zA-Z]+)/i) 
     $openssl_version_fix   = $3;
     $openssl_version_patch = $4;
     print "$openssl_version_flavour version: major=$openssl_version_major, minor=$openssl_version_minor, fix=$openssl_version_fix, patch=$openssl_version_patch\n";
-    
+
 } elsif ($openssl_version_string =~ m/\s*(OpenSSL|LibreSSL)\s+(\d+)\.(\d+)\.(\d+)\s+/) {
     # OpenSSL 1.0
     $openssl_version_flavour = $1;
@@ -106,22 +100,21 @@ if ($openssl_version_string =~ m/\s*OpenSSL\s+(\d+)\.(\d+)\.(\d+)([a-zA-Z]+)/i) 
     exit 1;
 }
 
-# Warn on old openssl - should work but lacks support for some features 
+# Warn on old openssl - should work but lacks support for some features
 if ($openssl_version_major == 0 &&
     $openssl_version_minor == 9 &&
-    $openssl_version_fix   == 8) {
-
+    $openssl_version_fix   == 8
+) {
     print STDERR "Warning: openssl 0.9.8 found - this will work but lacks some features, e.g. server side key generation!";
-              
+
 } elsif ( $openssl_version_flavour =~ m/LibreSSL/i ) {
-    
     print STDERR "Warning: LibreSSL found, support for LibreSSL is experimental!";
-    
-} elsif (not 
+
+} elsif (not
     ($openssl_version_flavour =~ m/OpenSSL/i &&
      $openssl_version_major == 1 &&
-     (($openssl_version_minor == 0) || ($openssl_version_minor == 1) ))) {
-         
+     (($openssl_version_minor == 0) || ($openssl_version_minor == 1) ))
+) {
     print STDERR "\n";
     print STDERR "ERROR: OpenSSL 0.9.8, 1.0 or 1.1 is required.\n";
     print STDERR "Consider setting OPENSSL_PREFIX correctly.\n\n";
@@ -160,12 +153,12 @@ if (! defined $openxpki_version) {
     # already installed but outdated version file)
     # this is mainly used in archives created from 'make dist' steps
     eval {
- 	local @INC = ( '.' );
- 	require OpenXPKI::VERSION;
- 	$openxpki_version = $OpenXPKI::VERSION::VERSION;
- 	print STDERR "OpenXPKI distribution\n";
- 	print STDERR "Version from OpenXPKI::Version: $openxpki_version\n";
-     };
+         local @INC = ( '.' );
+         require OpenXPKI::VERSION;
+         $openxpki_version = $OpenXPKI::VERSION::VERSION;
+         print STDERR "OpenXPKI distribution\n";
+         print STDERR "Version from OpenXPKI::Version: $openxpki_version\n";
+    };
 }
 
 if (! defined $openxpki_version) {
@@ -193,7 +186,7 @@ library.
 
 $openxpki_version";
 
-open $fh, ">", File::Spec->catfile('OpenXPKI', 'VERSION.pm') 
+open $fh, ">", File::Spec->catfile('OpenXPKI', 'VERSION.pm')
     or die "Cannot open version module file OpenXPKI/VERSION.pm!\n";
 print $fh $module;
 close $fh;
@@ -202,13 +195,11 @@ close $fh;
 ## restore all formerly ignored modules
 my $list = `find . -name "*.pm.ignore" -print`;
 my @list = split /[\n\s+]/, $list;
-foreach my $module (@list)
-{
+foreach my $module (@list) {
     next if (not defined $module or not length $module);
     $module =~ s/\.ignore$//;
     print STDERR "Restoring module $module ... ";
-    if (not rename $module.".ignore", $module)
-    {
+    if (not rename $module.".ignore", $module) {
         print STDERR "FAILED\n";
         print STDERR "Cannot restore formerly ignored module!\n";
         print STDERR "Aborting to ensrue the consistency of the OpenXPKI release.\n";
@@ -218,70 +209,52 @@ foreach my $module (@list)
 }
 
 ## should we ignore some modules?
-
-if (exists $ENV{IGNORE_MODULES})
-{
+if (exists $ENV{IGNORE_MODULES}) {
     my $line = $ENV{IGNORE_MODULES};
-       $line =~ s/\s+/ /g;
+    $line =~ s/\s+/ /g;
     my @modules = split / /, $line;
-    foreach my $module (@modules)
-    {
+    foreach my $module (@modules) {
         print STDERR "Module $module is not going to be installed.\n";
         $module =~ s/::/\//g;
         $module .= ".pm" if (substr ($module, length($module)-4,3) ne ".pm");
-        if (not rename $module, $module.".ignore")
-        {
+        if (not rename $module, $module.".ignore") {
             print STDERR "Cannot deactivate the module $module!\n";
             print STDERR "Aborting makefile generation to enforce your installation policy.\n";
             exit 1;
         }
     }
-}
-else
-{
+} else {
     print STDERR "All modules will be installed.\n";
 }
 
 ## some information about the used OpenXPKI version
-
 print STDERR "This is OpenXPKI version $openxpki_version\n";
 
-# removed code statistics code, it introduces an annoying delay during
-# Makefile creation. it was not working accurateley anyway.
-# if you wish to generate meaningful statistics use e. g. sloccount instead
-#print STDERR "Statistics:\n";
-#my $cmd = 'cat OpenXPKI.pm OpenXPKI.xs `find OpenXPKI -type f | grep -r -v "/\."`| wc -l';
-#print STDERR "    LOC: ".`$cmd`;
-#$cmd = 'cat `find t -type f | grep -r -v "/\."`| wc -l';
-#print STDERR "    LOT: ".`$cmd`;
-#$cmd = 'cat `find . -type f | grep -r -v "/\."`| wc -l';
-#print STDERR "    LOA: ".`$cmd`;
-
 ## hack to avoid warnings from Log4perl
-
-eval 'use Log::Log4perl::Logger';
-if ($@ eq '') {
-  eval '$Log::Log4perl::Logger::NON_INIT_WARNED = 1;';
-}
-else {
-  print STDERR "Logger is not installed. Continue anyway.\n";
+eval {
+    require Log::Log4perl::Logger;
+    $Log::Log4perl::Logger::NON_INIT_WARNED = 1;
+};
+if ($@) {
+    print STDERR "Log::Log4perl is not installed. Continuing anyway.\n";
 }
 
 # check if we should add -shared
 # not all platforms support this feature
 my %flags = ();
 
-open $fh, '>test.c' or die "Cannot open test.c. Stopped";
+open $fh, ">", "test.c" or die "Cannot open test.c. Stopped";
 print $fh "int main() {}\n";
 close $fh;
+
 use Config;
 my $cc = $Config{'cc'};
 
 my $cc_supports_shared = 1;
-if (open $fh, "$cc -shared -o test test.c 2>&1 |") {
+if (open $fh, "-|", "$cc -shared -o test test.c 2>&1") {
     while (my $line = <$fh>) {
         if ($line =~ m{ unrecognized .* option .* -shared }xms) {
-	    $cc_supports_shared = 0;
+            $cc_supports_shared = 0;
         }
     }
     close $fh;
@@ -289,21 +262,17 @@ if (open $fh, "$cc -shared -o test test.c 2>&1 |") {
         $cc_supports_shared = 0;
     }
 
-    if (! $cc_supports_shared)
-    {
+    if (! $cc_supports_shared) {
         print STDERR "C compiler does not support -shared.\n";
-    }
-    else {
+    } else {
         if ($^O ne 'darwin') {
             print STDERR "C compiler supports -share. Adding it to LDDLFLAGS.\n";
             $flags{'LDDLFLAGS'} = '-shared';
-        }
-        else {
+        } else {
             print STDERR "C compiler claims to support -share. But we are on Mac OS X, experience shows that it still does not work with -share, so we won't add it to LDDLFLAGS ...\n";
         }
     }
-}
-else {
+} else {
     print STDERR "Could not run C compiler. Continue anyway.\n";
 }
 
@@ -327,12 +296,12 @@ WriteMakefile(
         'Config::Merge'                 => '1',
         'Config::Std'                   => 0,
         'Config::Versioned'             => 0,
-        'Connector'                     => '1.08',
+        'Connector'                     => '1.32',
         'Crypt::Argon2'                 => 0,
-         'Crypt::CBC'                    => '2.29',
+        'Crypt::CBC'                    => '2.29',
         'Crypt::OpenSSL::AES'           => '0.02',      # for e.g. OpenXPKI::Crypto::VolatileVault
-        'CryptX'                        => '0.1.2',     # required by the Crypt::* modules for key checking
-        'Crypt::Cipher::AES'               => 0,           # replacement to support keysize > 128
+        'CryptX'                        => '0.068',     # required by the Crypt::* modules for key checking
+        'Crypt::Cipher::AES'            => 0,           # replacement to support keysize > 128
         'Crypt::PKCS10'                 => '2.000',
         'Crypt::X509'                   => '0.53',
         'Data::Password'                => '1.07',
@@ -389,18 +358,29 @@ WriteMakefile(
         'XML::Simple'                   => '1',
         'YAML::Tiny'                    => '1.69',
     },
-    test       => {TESTS => 't/*/*.t',
-                  },
-    macro      => { OPENSSL_BINARY => $openssl_binary,
-                  },
-    clean      => {FILES => [ 't/50_auth/cgisess_*',
-                              't/*/*.db', 't/30_dbi/sqlite.db._*',
-                              'OpenXPKI/VERSION.pm',
-                              't/25_crypto/ca1', 't/25_crypto/ca2',
-                              't/25_crypto/token_test.xml', 't/50_auth/auth_test.xml', 't/config_test.xml',
-                              't/28_log/openxpki.log',
-                              't/cfg.binary.openssl']},
+    'test' => {
+        'TESTS' => 't/*/*.t',
+    },
+    'macro' => {
+        'OPENSSL_BINARY' => $openssl_binary,
+    },
+    'clean' => {
+        'FILES' => [
+            't/50_auth/cgisess_*',
+            't/*/*.db', 't/30_dbi/sqlite.db._*',
+            'OpenXPKI/VERSION.pm',
+            't/25_crypto/ca1', 't/25_crypto/ca2',
+            't/25_crypto/token_test.xml', 't/50_auth/auth_test.xml', 't/config_test.xml',
+            't/28_log/openxpki.log',
+            't/cfg.binary.openssl',
+        ],
+    },
     'XSPROTOARG' => '-noprototypes',
-    'EXE_FILES' => [ 'bin/openxpkictl','bin/openxpkicmd', 'bin/openxpkiadm', 'bin/openxpkicli'],    
+    'EXE_FILES' => [
+        'bin/openxpkictl',
+        'bin/openxpkicmd',
+        'bin/openxpkiadm',
+        'bin/openxpkicli',
+    ],
     %flags,
 );
