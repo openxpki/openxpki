@@ -7,6 +7,7 @@ use Test::Exception;
 use MIME::Base64;
 
 use utf8;
+use English;
 
 BEGIN { use_ok "OpenXPKI::Crypt::PKCS10" }
 
@@ -42,5 +43,26 @@ my $csr_identifier = $pkcs10->get_csr_identifier;
 $csr_identifier =~ tr/-_/+\//;
 my @hex_bytes = unpack("(A2)*", $pkcs10->get_transaction_id);
 is pack('H2' x 20, @hex_bytes), decode_base64($csr_identifier), "decoded Transaction ID == decoded CSR Identifier";
+
+# check performance
+if ($ENV{TEST_VERBOSE}) {
+    note "TEST_VERBOSE detected: starting performance test";
+    my $items = 1000;
+    my $begin = [ Time::HiRes::gettimeofday() ];
+    for (my $i=0; $i<$items; $i++) {
+        eval { $pkcs10 = OpenXPKI::Crypt::PKCS10->new($csr) };
+        if ($EVAL_ERROR) {
+            if (my $exc = OpenXPKI::Exception->caught) {
+                diag "OpenXPKI::Exception => ".$exc->as_string."\n";
+            } else {
+                diag "Error: ${EVAL_ERROR}\n";
+            }
+        }
+    }
+
+    my $time_spent = Time::HiRes::tv_interval( $begin, [Time::HiRes::gettimeofday()]);
+    my $csr_per_s = int($items / $time_spent);
+    note "- $csr_per_s CSRs/second (minimum should be 100 per second)";
+}
 
 1;
