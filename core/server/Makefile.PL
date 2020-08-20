@@ -258,27 +258,26 @@ print STDERR "This is OpenXPKI version $openxpki_version\n";
 #print STDERR "    LOA: ".`$cmd`;
 
 ## hack to avoid warnings from Log4perl
-
-eval 'use Log::Log4perl::Logger';
-if ($@ eq '') {
-  eval '$Log::Log4perl::Logger::NON_INIT_WARNED = 1;';
-}
-else {
-  print STDERR "Logger is not installed. Continue anyway.\n";
+eval {
+    require Log::Log4perl::Logger;
+    $Log::Log4perl::Logger::NON_INIT_WARNED = 1;
+};
+if ($@) {
+    print STDERR "Log::Log4perl is not installed. Continuing anyway.\n";
 }
 
 # check if we should add -shared
 # not all platforms support this feature
 my %flags = ();
 
-open $fh, '>test.c' or die "Cannot open test.c. Stopped";
+open $fh, ">", "test.c" or die "Cannot open test.c. Stopped";
 print $fh "int main() {}\n";
 close $fh;
 use Config;
 my $cc = $Config{'cc'};
 
 my $cc_supports_shared = 1;
-if (open $fh, "$cc -shared -o test test.c 2>&1 |") {
+if (open $fh, "-|", "$cc -shared -o test test.c 2>&1") {
     while (my $line = <$fh>) {
         if ($line =~ m{ unrecognized .* option .* -shared }xms) {
 	    $cc_supports_shared = 0;
