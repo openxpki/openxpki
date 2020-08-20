@@ -32,7 +32,7 @@ my @paths = qw( /usr/local/ssl
                 /opt
               );
 
-if (exists $ENV{OPENSSL_PREFIX} 
+if (exists $ENV{OPENSSL_PREFIX}
     && $ENV{OPENSSL_PREFIX} ne '') {
     unshift @paths, $ENV{OPENSSL_PREFIX};
 }
@@ -61,17 +61,17 @@ foreach my $path (@paths)
 }
 
 # accept settings from OPENSSL_INC and OPENSSL_LIB if BOTH exist
-if (exists $ENV{OPENSSL_INC}    && $ENV{OPENSSL_INC} != "" 
+if (exists $ENV{OPENSSL_INC}    && $ENV{OPENSSL_INC} != ""
     && exists $ENV{OPENSSL_LIB} && $ENV{OPENSSL_LIB} != "") {
 
     $openssl_inc_dir = $ENV{OPENSSL_INC};
     $openssl_lib_dir = $ENV{OPENSSL_LIB};
 }
 
-die "Could not find usable OpenSSL installation. Stopped" 
+die "Could not find usable OpenSSL installation. Stopped"
     unless defined $openssl_inc_dir;
 
-die "Could not find usable OpenSSL binary. Stopped" 
+die "Could not find usable OpenSSL binary. Stopped"
     unless defined $openssl_binary;
 
 print STDERR "OpenSSL library: $openssl_lib_dir\n";
@@ -92,7 +92,7 @@ if ($openssl_version_string =~ m/\s*OpenSSL\s+(\d+)\.(\d+)\.(\d+)([a-zA-Z]+)/i) 
     $openssl_version_fix   = $3;
     $openssl_version_patch = $4;
     print "$openssl_version_flavour version: major=$openssl_version_major, minor=$openssl_version_minor, fix=$openssl_version_fix, patch=$openssl_version_patch\n";
-    
+
 } elsif ($openssl_version_string =~ m/\s*(OpenSSL|LibreSSL)\s+(\d+)\.(\d+)\.(\d+)\s+/) {
     # OpenSSL 1.0
     $openssl_version_flavour = $1;
@@ -106,22 +106,22 @@ if ($openssl_version_string =~ m/\s*OpenSSL\s+(\d+)\.(\d+)\.(\d+)([a-zA-Z]+)/i) 
     exit 1;
 }
 
-# Warn on old openssl - should work but lacks support for some features 
+# Warn on old openssl - should work but lacks support for some features
 if ($openssl_version_major == 0 &&
     $openssl_version_minor == 9 &&
     $openssl_version_fix   == 8) {
 
     print STDERR "Warning: openssl 0.9.8 found - this will work but lacks some features, e.g. server side key generation!";
-              
+
 } elsif ( $openssl_version_flavour =~ m/LibreSSL/i ) {
-    
+
     print STDERR "Warning: LibreSSL found, support for LibreSSL is experimental!";
-    
-} elsif (not 
+
+} elsif (not
     ($openssl_version_flavour =~ m/OpenSSL/i &&
      $openssl_version_major == 1 &&
      (($openssl_version_minor == 0) || ($openssl_version_minor == 1) ))) {
-         
+
     print STDERR "\n";
     print STDERR "ERROR: OpenSSL 0.9.8, 1.0 or 1.1 is required.\n";
     print STDERR "Consider setting OPENSSL_PREFIX correctly.\n\n";
@@ -193,7 +193,7 @@ library.
 
 $openxpki_version";
 
-open $fh, ">", File::Spec->catfile('OpenXPKI', 'VERSION.pm') 
+open $fh, ">", File::Spec->catfile('OpenXPKI', 'VERSION.pm')
     or die "Cannot open version module file OpenXPKI/VERSION.pm!\n";
 print $fh $module;
 close $fh;
@@ -327,9 +327,9 @@ WriteMakefile(
         'Config::Merge'                 => '1',
         'Config::Std'                   => 0,
         'Config::Versioned'             => 0,
-        'Connector'                     => '1.08',
+        'Connector'                     => '1.32',
         'Crypt::Argon2'                 => 0,
-         'Crypt::CBC'                    => '2.29',
+        'Crypt::CBC'                    => '2.29',
         'Crypt::OpenSSL::AES'           => '0.02',      # for e.g. OpenXPKI::Crypto::VolatileVault
         'CryptX'                        => '0.1.2',     # required by the Crypt::* modules for key checking
         'Crypt::Cipher::AES'               => 0,           # replacement to support keysize > 128
@@ -401,6 +401,6 @@ WriteMakefile(
                               't/28_log/openxpki.log',
                               't/cfg.binary.openssl']},
     'XSPROTOARG' => '-noprototypes',
-    'EXE_FILES' => [ 'bin/openxpkictl','bin/openxpkicmd', 'bin/openxpkiadm', 'bin/openxpkicli'],    
+    'EXE_FILES' => [ 'bin/openxpkictl','bin/openxpkicmd', 'bin/openxpkiadm', 'bin/openxpkicli'],
     %flags,
 );
