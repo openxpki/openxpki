@@ -1,5 +1,7 @@
 package OpenXPKI::Crypt::CRL;
 
+# some code imported from Crypt::X509::CRL
+
 use strict;
 use warnings;
 use English;
@@ -139,7 +141,7 @@ has oidmap => (
         "2.5.4.11" => "OU",
         "1.2.840.113549.1.9.1" => "emailAddress",
         "0.9.2342.19200300.100.1.1" => "UID",
-        "0.9.2342.19200300.100.1.25" => "DC"
+        "0.9.2342.19200300.100.1.25" => "DC",
     }}
 );
 
@@ -427,6 +429,12 @@ sub __issuer_dn {
 
 }
 
+# Returns a HashRef of revoked certificates:
+#    {
+#        CERT_SERIAL => [ REVOCATION_TIMESTAMP, REASON ],
+#        CERT_SERIAL => [ REVOCATION_TIMESTAMP, REASON ],
+#        ...
+#    }
 sub __revoked_certs_list {
 
     my $self = shift;
@@ -434,7 +442,7 @@ sub __revoked_certs_list {
     my $items = $self->parsed()->{'tbsCertList'}->{'revokedCertificates'};
     return {} unless ($items);
     my $parser = $self->_asn1()->find('CRLReason');
-    my $crl_reason = $self->crl_reason();
+    my $crl_reason_list = $self->crl_reason();
     foreach my $crl_item (@{$items}) {
         my $cert = $self->_asn1()->find('RevokedCert')->decode( $crl_item );
         my @v = ($cert->{'revocationDate'}->{'generalTime'} // $cert->{'revocationDate'}->{'utcTime'} // 0, undef);
@@ -442,12 +450,12 @@ sub __revoked_certs_list {
             if ( $ext->{'extnID'} eq '2.5.29.21' ) { # OID for crlReason
                 my $reason = $parser->decode( $ext->{'extnValue'} );
                 if (!$parser->error && defined $reason) {
-                    $v[1] = $crl_reason->[$reason];
+                    $v[1] = $crl_reason_list->[$reason];
                 }
                 last;
             }
         }
-        $crl->{ $cert->{userCertificate} } = \@v;
+        $crl->{ $cert->{userCertificate} } = \@v; # userCertificate = serial number
     }
     return $crl;
 }
