@@ -13,8 +13,7 @@ use OpenXPKI::Debug;
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
-sub get_command
-{
+sub get_command {
     my $self = shift;
 
     my $container_format = 'X509';
@@ -23,13 +22,11 @@ sub get_command
     }
 
     ##! 4: "get_command"
-    if (not exists $self->{OUT})
-    {
-        OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_MISSING_OUTPUT_FORMAT");
+    if (not exists $self->{OUT}) {
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_MISSING_OUTPUT_FORMAT"
+        );
     }
-
-
 
     if ($container_format eq 'X509') {
         ##! 8: "DER or TXT"
@@ -120,38 +117,33 @@ sub get_command
         return [ $command ];
     }
     else {
-        OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_ILLEGAL_CONTAINER_FORMAT",
-                params => {
-                    CONTAINER_FORMAT => $container_format,
-                },
-                );
+        OpenXPKI::Exception->throw(
+            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CONVERT_CERT_ILLEGAL_CONTAINER_FORMAT",
+            params => {
+                CONTAINER_FORMAT => $container_format,
+            },
+        );
     }
 }
 
-sub hide_output
-{
+sub hide_output {
     return 0;
 }
 
-sub key_usage
-{
+sub key_usage {
     return 0;
 }
 
-
-
-sub get_result
-{
+sub get_result {
     my $self = shift;
 
     my $res = '';
     if ($self->{OUT} eq "TXT" || $self->{OUT} eq "TXTPEM") {
-        # contains result from STDOUT
-        $res = shift;
-        # openss 1.0 writes text to stdout, openssl 1.1 does not
+        $res = shift; # result from STDOUT
+        # openssl 1.1 does not write to STDOUT...
         if ($res eq '1') {
             $res = "";
+        # but openssl 1.0 does
         } else {
             $res .= "\n";
         }
@@ -160,7 +152,9 @@ sub get_result
     if ($self->{OUT} eq "DER") {
         $res .= $self->SUPER::get_result();
     } else {
-        $res .= $self->SUPER::get_result('utf8');
+        # In mode OUT => "TXT" OpenSSL will only write to STDOUT, so we
+        # have to prevent SUPER::get_result() from dying on an empty OUTFILE.
+        $res .= eval { $self->SUPER::get_result('utf8') } // "";
     }
 
     return $res;
