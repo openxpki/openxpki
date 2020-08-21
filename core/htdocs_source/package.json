@@ -32,6 +32,7 @@
     "babel-eslint": "^10.1.0",
     "bootstrap": "^3.4.1",
     "broccoli-asset-rev": "^3.0.0",
+    "broccoli-funnel": "^3.0.3",
     "copy-text-to-clipboard": "^2.2.0",
     "cross-fetch": "^3.0.5",
     "ember-auto-import": "^1.6.0",

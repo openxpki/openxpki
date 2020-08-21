@@ -1,9 +1,35 @@
 'use strict';
 
 const EmberApp = require('ember-cli/lib/broccoli/ember-app');
+const Funnel = require('broccoli-funnel');
 
 module.exports = function(defaults) {
+    // special behaviour in production mode
+    let on_production = {};
+    if (process.env.EMBER_ENV === "production") {
+        console.log("Excluding 'test' page");
+        on_production = {
+            ...on_production,
+            // https://github.com/ember-cli/ember-cli/blob/v3.18.0/lib/broccoli/ember-app.js#L319-L327
+            'trees': {
+                'app': new Funnel('app', { exclude: ['pods/test/**'] }),
+            },
+        };
+
+        if (process.env.OPENXPKI_UI_BUILD_UNMINIFIED == 1) {
+            console.log("Building unminified assets incl. sourcemaps");
+            on_production = {
+                ...on_production,
+                'ember-cli-uglify': { enabled: false },
+                'sourcemaps': { enabled: true },
+            };
+        }
+    }
+
+    // app configuration
     let app = new EmberApp(defaults, {
+        ...on_production,
+
         'minifyCSS': {
             // for available options see https://github.com/jakubpawlowicz/clean-css/tree/v3.4.28
             options: {
@@ -33,18 +59,6 @@ module.exports = function(defaults) {
         'ember-cli-babel': {
             includePolyfill: true,
         },
-
-        ...(process.env.EMBER_ENV === "production" && process.env.OPENXPKI_UI_BUILD_UNMINIFIED == 1
-            ? {
-                'ember-cli-uglify': {
-                    enabled: false,
-                },
-                'sourcemaps': {
-                    enabled: true,
-                },
-            }
-            : {}
-        ),
     });
 
     // Use `app.import` to add additional libraries to the generated
