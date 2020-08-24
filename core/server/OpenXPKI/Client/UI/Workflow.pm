@@ -2727,6 +2727,7 @@ sub __render_fields {
     }
 
     FIELD:
+    my $queued; # receives header items that depend on non-empty sections
     foreach my $field (@fields_to_render) {
 
         my $key = $field->{name} || '';
@@ -2975,6 +2976,7 @@ sub __render_fields {
             if ($item->{value} eq '') {
                 $item->{value} = $item->{label};
             }
+            $item->{empty} = $field->{ifempty} || '';
             $item->{className} //= 'spacer';
 
         } elsif ($field_type eq 'select' && !$field->{template} && $field->{option} && ref $field->{option} eq 'ARRAY') {
@@ -3027,13 +3029,24 @@ sub __render_fields {
         }
 
         # do not push items that are empty
-        if (defined $item->{value} &&
+        if (!(defined $item->{value} &&
             ((ref $item->{value} eq 'HASH' && %{$item->{value}}) ||
             (ref $item->{value} eq 'ARRAY' && @{$item->{value}}) ||
-            (ref $item->{value} eq '' && $item->{value} ne ''))) {
+            (ref $item->{value} eq '' && $item->{value} ne '')))) {
+            #noop
+        } elsif ($item->{format} eq 'head' && $item->{empty}) {
+            # queue header element
+            $queued = $item;
+
+        } else {
+            # add queded element if any
+            if ($queued) {
+                push @fields, $queued;
+                $queued = undef;
+            }
+            # push current field
             push @fields, $item;
         }
-
     }
 
     return \@fields;
