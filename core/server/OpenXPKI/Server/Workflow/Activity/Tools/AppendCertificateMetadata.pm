@@ -22,6 +22,8 @@ sub execute {
     my $cert_identifier = $self->param('cert_identifier');
     ##! 16: ' cert_identifier' . $cert_identifier
 
+    return unless ($cert_identifier);
+
     # one of error, overwrite, merge, skip
     my $mode = $self->param('mode') || 'error';
 
@@ -86,6 +88,7 @@ sub execute {
                 },
                 where => {
                     attribute_contentkey => $key,
+                    identifier           => $cert_identifier,
                 }
             );
             CTX('log')->application()->info("Overwrite certificate metadata $key with $value");
@@ -131,7 +134,9 @@ OpenXPKI::Server::Workflow::Activity::Tools::AppendCertificateMetadata
 
 =head1 Description
 
-Add arbitrary key/value items as certificate metadata
+Add arbitrary key/value items as certificate metadata.
+
+The activitiy will exit silently if cert_identifier is not set.
 
 =head2 Configuration
 
@@ -168,4 +173,3 @@ Add the new value if it does not already exists, will also work if the key
 is defined more than once.
 
 =back
-
