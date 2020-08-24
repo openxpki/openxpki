@@ -17,7 +17,7 @@ sub get_command
     if (not exists $self->{PASSWD} || $self->{PASSWD} eq '' )
     {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKEY_MISSING_PASSWD");
+            message => "genpkey requires a password");
     }
 
     # prepare parameters
@@ -28,17 +28,21 @@ sub get_command
     my $enc_alg = $self->{ENC_ALG} || 'aes256';
     my $pkeyopt = $self->{PKEYOPT};
 
-    if (defined $pkeyopt && ref $pkeyopt ne 'HASH') {
+    # if order is not important you can just pass a hash here
+    if (defined $pkeyopt && ref $pkeyopt eq 'HASH') {
+        $pkeyopt = [ $pkeyopt ];
+    }
+
+    # each array element must have at least one hashref
+    if (defined $pkeyopt && ref $pkeyopt ne 'ARRAY') {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKEY_PKEYOPT_IS_NOT_HASH");
+            message => "pkeyopts must be an array of hashes");
     }
 
     if (!$key_alg && !$self->{PARAM}) {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKEY_REQUIRE_KEY_ALG_OR_PARAM");
+            message => "no algorithm given for genpkey");
     }
-
-
 
     my @command = qw( genpkey );
     push @command, ('-engine', $engine) if ($engine);
@@ -46,11 +50,14 @@ sub get_command
     push @command, ('-out', $self->get_outfile());
 
     push @command, ('-algorithm', $key_alg) if ($key_alg); # no algorithm for e.g. DSA from params file
-    foreach my $key (keys %{$pkeyopt}) {
-        if (ref $pkeyopt->{$key} eq 'ARRAY') {
-            map { push @command, ('-pkeyopt', $key.':'.$_ ); } @{$pkeyopt->{$key}};
-        } else {
-            push @command, ('-pkeyopt', $key.':'.$pkeyopt->{$key} );
+
+    foreach my $item (@{$pkeyopt}) {
+        foreach my $key (keys %{$item}) {
+            if (ref $item->{$key} eq 'ARRAY') {
+                map { push @command, ('-pkeyopt', $key.':'.$_ ); } @{$item->{$key}};
+            } else {
+                push @command, ('-pkeyopt', $key.':'.$item->{$key} );
+            }
         }
     }
 
@@ -128,6 +135,8 @@ Algorithm to encrypt the private key, default is aes256.
 
 A hashref of key/value pairs to be passed to pkeyopt. If value is
 an array, multiple options are created using the same key.
+If order of options is relevant wrap each key/value pair into an
+arrayref.
 
 =item * PARAMFILE
 

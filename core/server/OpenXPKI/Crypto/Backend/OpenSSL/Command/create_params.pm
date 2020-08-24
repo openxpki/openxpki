@@ -23,23 +23,28 @@ sub get_command
 
     my $pkeyopt = $self->{PKEYOPT};
 
-    if (defined $pkeyopt && ref $pkeyopt ne 'HASH') {
+    # if order is not important you can just pass a hash here
+    if (defined $pkeyopt && ref $pkeyopt eq 'HASH') {
+        $pkeyopt = [ $pkeyopt ];
+    }
+
+    if (defined $pkeyopt && ref $pkeyopt ne 'ARRAY') {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKEY_PKEYOPT_IS_NOT_HASH");
     }
-
-    
 
     my @command = qw( genpkey );
     push @command, '-genparam';
     push @command, ('-out', $self->get_outfile());
 
     push @command, ('-algorithm', $self->{TYPE});
-    foreach my $key (keys %{$pkeyopt}) {
-        if (ref $pkeyopt->{$key} eq 'ARRAY') {
-            map { push @command, ('-pkeyopt', $key.':'.$_ ); } @{$pkeyopt->{$key}};
-        } else {
-            push @command, ('-pkeyopt', $key.':'.$pkeyopt->{$key} );
+    foreach my $item (@{$pkeyopt}) {
+        foreach my $key (keys %{$item}) {
+            if (ref $item->{$key} eq 'ARRAY') {
+                map { push @command, ('-pkeyopt', $key.':'.$_ ); } @{$item->{$key}};
+            } else {
+                push @command, ('-pkeyopt', $key.':'.$item->{$key} );
+            }
         }
     }
     push @command, ('-engine', $engine) if ($engine);
@@ -95,6 +100,8 @@ The algorithm, DSA or DH, no default
 
 A hashref of key/value pairs to be passed to pkeyopt. If value is
 an array, multiple options are created using the same key.
+If order of options is relevant wrap each key/value pair into an
+arrayref.
 
 =back
 

@@ -8,6 +8,7 @@ OpenXPKI::Server::API2::Plugin::Crypto::generate_key
 =cut
 
 # Project modules
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 
@@ -35,9 +36,12 @@ crypto backend's default
 
 =item * C<curve> I<Str> - only EC: curve name. Required.
 
-=item * C<pkeyopt> I<HashRef> - more options to directly pass to OpenSSL.
+=item * C<pkeyopt> I<HashRef>|I<ArrayRef> - more options to directly pass to OpenSSL.
 If specified, these option win over other parameters
 (e.g. C<options-E<gt>{rsa_keygen_bits}> wins over C<key_length>)
+For some combinations openssl needs a defined order of the option params,
+if this is required pass a list of hashes. Otherwise a hash with key/values
+will also do.
 
 =item * C<paramset> I<Str> - PEM encoded parameter set whose contents will be
 passed to C<openssl genpkey -paramfile ...>
@@ -49,7 +53,7 @@ The previous parameter C<PARAMS> was removed. The hash keys used in it are now
 
     # old
     PARAMS => {
-        PKEYOPT    =>    { ... },
+        PKEYOPT    => { ... },
         KEY_LENGTH => $len,
         ECPARAM    => $pem_ec_param,
         DSAPARAM   => $pem_dsa_param,
@@ -57,7 +61,7 @@ The previous parameter C<PARAMS> was removed. The hash keys used in it are now
     }
     # new
     key_length  => $len,
-    pkeyopt     => { ... },
+    pkeyopt     => { p1 => v1, p2 => v2 } or [{ p1 => v1 }, { p2 => v2 }],
     paramset    => $pem_ec_param, # or $pem_dsa_param
     curve       => $curve,
 
@@ -72,7 +76,7 @@ command "generate_key" => {
     key_length  => { isa => 'Int', default => 2048 },
     curve       => { isa => 'Str', },
     enc_alg     => { isa => 'Str', },
-    pkeyopt     => { isa => 'HashRef', },
+    pkeyopt     => { isa => 'HashRef|ArrayRef', },
     paramset    => { isa => 'PEM', },
 } => sub {
     my ($self, $params) = @_;
@@ -91,27 +95,20 @@ command "generate_key" => {
 
     # RSA
     if ($key_alg eq "rsa") {
-        $command->{PKEYOPT} = { rsa_keygen_bits => $params->key_length };
+        $command->{PKEYOPT} = [{ rsa_keygen_bits => $params->key_length }];
     }
     # EC
     elsif ($key_alg eq "ec") {
-        # With openssl <=1.0.1 you need to create EC the same way as DSA
-        # means params and key in two steps
-        # see http://openssl.6102.n7.nabble.com/EC-private-key-generation-problem-td47261.html
-        if (not $paramset) {
-            OpenXPKI::Exception->throw(
-                message => 'Parameter "curve" must be specified for EC key algorithm'
-            ) unless $params->has_curve;
-
-            $paramset = $token->command({
-                COMMAND => 'create_params',
-                TYPE    => 'EC',
-                PKEYOPT => { ec_paramgen_curve => $params->curve }
-            })
-            or OpenXPKI::Exception->throw(message => 'Error generating EC parameter set');
+        # explicit parameter set is given
+        if ($paramset) {
+            $command->{PARAM} = $paramset;
+            delete $command->{KEY_ALG};
+        # curve name is given, also forces named_curve to be set
+        } elsif ($params->curve) {
+            $command->{PKEYOPT} = [{ ec_paramgen_curve => $params->curve }, { ec_param_enc => "named_curve" }];
+        } elsif (!$params->has_pkeyopt) {
+            OpenXPKI::Exception->throw(message => 'Either curve, paramset or pkeyopts must be given for EC');
         }
-        $command->{PARAM} = $paramset;
-        delete $command->{KEY_ALG};
     }
     # DSA
     elsif ($key_alg eq "dsa") {
@@ -119,7 +116,7 @@ command "generate_key" => {
             $paramset = $token->command({
                 COMMAND => 'create_params',
                 TYPE    => 'DSA',
-                PKEYOPT => { dsa_paramgen_bits => $params->key_length }
+                PKEYOPT => [{ dsa_paramgen_bits => $params->key_length }]
             })
             or OpenXPKI::Exception->throw(message => 'Error generating DSA parameter set');
         }
@@ -130,12 +127,18 @@ command "generate_key" => {
     # add additional options
     if ($params->has_pkeyopt) {
         my $opt = $params->pkeyopt;
-        $command->{PKEYOPT}->{$_} = $opt->{$_} for keys %$opt;
+        if (ref $opt eq 'ARRAY') {
+            push @{$command->{PKEYOPT}}, @{$opt};
+        } elsif (ref $opt eq 'HASH') {
+            push @{$command->{PKEYOPT}}, $opt ;
+        } else {
+             OpenXPKI::Exception->throw(message => 'Unsupported format for pkeyopt');
+        }
     }
 
-    CTX('log')->audit('key')->info("generating private key", { key_alg => $key_alg});
+    CTX('log')->audit('key')->info("generating private key", { key_alg => $key_alg });
 
-    ##! 16: 'command: ' . Dumper $command
+    ##! 16: $command
     return $token->command($command);
 };
 
