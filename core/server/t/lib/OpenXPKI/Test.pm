@@ -157,6 +157,7 @@ use Test::More;
 use Test::Deep::NoTest qw( eq_deeply bag ); # use eq_deeply() without beeing in a test
 use Digest::SHA;
 use MIME::Base64;
+use YAML::Tiny;
 
 # Project modules
 use OpenXPKI::Config;
@@ -248,20 +249,28 @@ For each given string C<NAME> the following packages are tried for Moose role
 application: C<NAME> (unmodified string), C<OpenXPKI::Test::Role::NAME>,
 C<OpenXPKI::Test::QA::Role::NAME>
 
-=item * I<add_config> (optional) - I<HashRef> with additional configuration
+=item * I<add_config> (optional) - I<HashRef|Str> with additional configuration
 entries that complement or replace the default config.
 
-Keys are the dot separated configuration paths, values are HashRefs with the
-actual configuration data that will be converted into YAML and stored on disk.
+Keys are the dot separated configuration paths, values are HashRefs or YAML
+strings with the actual configuration data that will be merged (and finally
+converted into YAML and stored on disk in a temporary directory).
 
 Example:
 
     OpenXPKI::Test->new(
         add_config => {
-            "realm.alpha.auth.handler.Signature" => {
+            "realm.alpha.auth.handler.Signature1" => {
                 realm => [ "alpha" ],
                 cacert => [ "MyCertId" ],
-            }
+            },
+            # or:
+            "realm.alpha.auth.handler.Signature2" => "
+                realm:
+                 - alpha
+                cacert:
+                 - MyCertId
+            ",
         }
     );
 
@@ -733,7 +742,12 @@ constructor parameter C<add_config> to L<OpenXPKI::Test::ConfigWriter>.
 sub init_user_config {
     my ($self) = @_;
     for (keys %{ $self->user_config }) {
-        $self->add_config($_ => $self->user_config->{$_});
+        my $val = $self->user_config->{$_};
+        # support config given as YAML string
+        if (ref $val eq '') {
+            $val = YAML::Tiny->read_string($val)->[0];
+        }
+        $self->add_config($_ => $val);
     }
     # Add basic test realm if no other realm exists.
     # Without any realm we cannot set a user via CTX('authentication')
