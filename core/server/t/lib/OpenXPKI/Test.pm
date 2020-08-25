@@ -802,7 +802,8 @@ sub init_server {
     my ($self) = @_;
 
     # init log object (and force it to NOT reinitialize Log4perl)
-    OpenXPKI::Server::Context::setcontext({ log => OpenXPKI::Server::Log->new(CONFIG => undef) });
+    OpenXPKI::Server::Context::setcontext({ log => OpenXPKI::Server::Log->new(CONFIG => undef) })
+        unless OpenXPKI::Server::Context::hascontext("log"); # may already be set if multiple instances of OpenXPKI::Test are created
 
     # init basic CTX objects
     my @tasks = qw( config_versioned dbi_log api2 authentication );
@@ -822,7 +823,8 @@ sub init_server {
 
     # use the same DB connection as the test object to be able to do COMMITS
     # etc. in tests
-    OpenXPKI::Server::Context::setcontext({ dbi => $self->dbi });
+    OpenXPKI::Server::Context::setcontext({ dbi => $self->dbi })
+        unless OpenXPKI::Server::Context::hascontext("dbi"); # may already be set if multiple instances of OpenXPKI::Test are created
 
     # Set fake notification object if there is no real one already
     # (either via setup above or requested by user)
