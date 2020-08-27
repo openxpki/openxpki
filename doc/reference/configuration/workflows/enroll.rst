@@ -1,9 +1,9 @@
-SCEP Workflow
-=============
+Enrollment Workflow
+====================
 
-Before you can use the SCEP subsystem, you need to enable the SCEP Server
-in the general configuration. This section explains the business logic and
-options for the enrollment workflow.
+The enrollment workflow is used by the SCEP, EST and RPC interface. The
+details how to connect the workflow to the API differ but the general
+configuration and operational modes are the same for all three subsystems.
 
 Operational Modes
 -----------------
@@ -23,6 +23,8 @@ match the subject of the signer certificate (which is a self-signed
 certificate in this case). Especially Ciso ASA fails here as the certificate
 subject does not match the request subject.
 
+For EST and RPC this is equal to an unauthenticated/unsigned TLS request.
+
 Renewal
 +++++++
 
@@ -35,6 +37,12 @@ request from the old certificate to ensure the subjects match. Please note
 that reuse of keys is not supported, you must generate a new key for each new
 request.
 
+As you can not use a TLS server certificate to authenticate as client the
+workflow supports an approach names "surrogate certifcates" which requires
+that you create a look-alike self-signed certificate with the proper key
+usage. Have a look at the perldoc of the EvaluateSignerTrust activity for
+more details.
+
 Enrollment On Behalf
 ++++++++++++++++++++
 
@@ -44,6 +52,9 @@ is signed using a certificate issued from the PKI which is qualified as
 always choosen if the subject of request and signer do not match, so it is
 often hit by accident when Renewal or Initial Enrollment are made with
 "wrong" subjects.
+
+For SCEP the signature on the SCEP PKCS7 container is the TTP, for EST/RPC
+the TTP is the TLS client certificate used to make the connection.
 
 Workflow Logic
 --------------
@@ -83,24 +94,19 @@ approval point:
 Sample Configuration
 --------------------
 
-The workflow fetches all information from the configuration system at ``scep.<servername>`` where the servername is taken from the scep wrapper configuration.
+The workflow fetches all information from the configuration system at
+``<subsystem>.<servername>`` where the servername is taken from the wrapper
+configuration.
 
-Here is a complete sample configuration (found in `scep/generic.yaml`)::
+Here is a complete sample configuration (found in `scep/generic.yaml`). The
+sections `token`, `workflow` and `response` are only used by SCEP, the
+`export_certificate` is only applicable to the RPC output. The remainder
+of the configuration is the same for all subsystems::
 
     # By default, all scep endpoints wll use the default token defined
     # by the scep token group, if you pass a name here, it is considered
     # a group name from the alias table
     #token: ca-one-special-scep
-
-    # A renewal request is only accpeted if the used certificate will
-    # expire within this period of time.
-    renewal_period: 000060
-
-    # If the request was a replacement, optionally revoke the replaced
-    # certificate after a grace period
-    revoke_on_replace:
-        reason_code: keyCompromise
-        delay_revocation_time: +000014
 
     workflow:
         type: certificate_enroll
@@ -113,6 +119,35 @@ Here is a complete sample configuration (found in `scep/generic.yaml`)::
             pkcs10: pkcs10
             _url_params: url_params
             #_pkcs7: pkcs7
+
+    response:
+        # The scep standard is a bit unclear if the root should be in the chain
+        # or not. We consider it a security risk (trust should be always set
+        # by hand) but as most clients seem to expect it, we include the root
+        # by default.
+        # The getca response contains the certificate of the SCEP server itself
+        # and of the current active issuer (which can but need not to be the same!)
+        # You can define weather to have only the certificate itself (endentity),
+        # the chain without the root (chain)  or the chain including the root
+        # (fullchain).
+        # Note: The response is cached internally in the datapool so changes
+        # will not show up immediately - to list the cached items use
+        # openxpkicli list_data_pool_entries  --arg namespace=scep.cache.getca
+        # You can delete by setting the empty string as value with
+        # set_data_pool_entry (value="" force=1)
+        getca:
+            ra:     fullchain
+            issuer: fullchain
+
+    # A renewal request is only accpeted if the used certificate will
+    # expire within this period of time.
+    renewal_period: 000060
+
+    # If the request was a replacement, optionally revoke the replaced
+    # certificate after a grace period
+    revoke_on_replace:
+        reason_code: keyCompromise
+        delay_revocation_time: +000014
 
     authorized_signer:
         rule1:
@@ -165,25 +200,11 @@ Here is a complete sample configuration (found in `scep/generic.yaml`)::
         # This substitutes the "replace_window" from the OpenXPKI v1 config
         allow_replace: 1
 
-    response:
-        # The scep standard is a bit unclear if the root should be in the chain
-        # or not. We consider it a security risk (trust should be always set
-        # by hand) but as most clients seem to expect it, we include the root
-        # by default.
-        # The getca response contains the certificate of the SCEP server itself
-        # and of the current active issuer (which can but need not to be the same!)
-        # You can define weather to have only the certificate itself (endentity),
-        # the chain without the root (chain)  or the chain including the root
-        # (fullchain).
-        # Note: The response is cached internally in the datapool so changes
-        # will not show up immediately - to list the cached items use
-        # openxpkicli list_data_pool_entries  --arg namespace=scep.cache.getca
-        # You can delete by setting the empty string as value with
-        # set_data_pool_entry (value="" force=1)
-        getca:
-            ra:     fullchain
-            issuer: fullchain
-
+        # by default only the certificate identifier is written to the workflow
+        # set to a true value to get the PEM encoded certificate in the context,
+        # set to "chain" to get the issuer certificate and "fullchain" to get
+        # the chain including the root certificate (key chain).
+        export_certificate: chain
 
     profile:
       cert_profile: tls_server
@@ -276,6 +297,21 @@ in the workflow.
 
 Workflow Configuration
 ----------------------
+
+Test-Drive (INSECURE)
++++++++++++++++++++++
+
+If you need a server that *just creates certificates*, use the following
+policy section::
+
+    policy:
+        allow_anon_enroll: 1
+        approval_points: 0
+        max_active_certs: 0
+        allow_replace: 0
+        export_certificate: chain
+
+**This will issue any certificate for any request - so do not use this in production**
 
 Authentication
 ++++++++++++++

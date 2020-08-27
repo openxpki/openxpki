@@ -44,7 +44,7 @@ Setup and Configuration
    reference/configuration/workflows/certrequest
    reference/configuration/workflows/certrevocation
    reference/configuration/workflows/crlissuance
-   reference/configuration/workflows/scep
+   reference/configuration/workflows/enroll
    reference/configuration/workflows/smartcard
    reference/tools/openxpkiadm
    reference/tools/openxpkictl

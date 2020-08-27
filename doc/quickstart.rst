@@ -3,6 +3,12 @@
 Quickstart guide
 ================
 
+OpenXPKI is an easy-to-deploy and easy-to-use RA/CA software that makes
+handling of certificates easy but nevertheless you should **really**
+have some basic knownledge on what a PKI is. If you just want to see
+"OpenXPKI in action" for a first impression of the tool, use the
+public demo at https://demo.openxpki.org.
+
 Support
 -------
 
@@ -15,13 +21,14 @@ Vagrant
 
 We have a vagrant setup for debian buster. If you have vagrant you can just
 checkout the git repo, go to vagrant/debian and run "vagrant up test". Provisioning takes some
-minutes and will give you a ready to run OXI install available at http://localhost:8080/openxpki/.
+minutes and will give you a ready to run OXI install available at https://localhost:8443/openxpki/.
 
 Docker
 ------
 
-We also provide a docker image based on the debian packages as well as a docker-compose file, see
-https://github.com/openxpki/openxpki-docker.
+We also provide a docker image based on the debian packages as well as a
+docker-compose file, see https://github.com/openxpki/openxpki-docker.
+**Please read the hints in the README if you try this on Windows!**
 
 Debian Builds
 -------------
@@ -31,8 +38,8 @@ those running a v2 version we still maintain security and major bug fixes for th
 
 **Packages are for Debian 10 (Buster) / 64bit (arch amd64). The en_US.utf8 locale must be
 installed as the translation system will crash otherwise! The packages do NOT work
-on Ubuntu or 32bit systems. Community packages for Ubuntu have been
-discontinued due to packaging/dependancy problems.**
+on Ubuntu or 32bit systems. Packages for SLES/CentOS/RHEL/Ubuntu are available
+via subscription**
 
 Start with a debian minimal install, we recommend to add "SSH Server" and "Web Server" in the package selection menu, as this will speed up the install later.
 
@@ -50,6 +57,8 @@ Add the repository to your source list (buster)::
     echo "deb http://packages.openxpki.org/v3/debian/ buster release" > /etc/apt/sources.list.d/openxpki.list
     apt update
 
+Please do not disable the installation of "recommend" packages as this will very likely leave you with an unusable system.
+
 As the init script uses mysql as default, but does not force it as a dependency, it is crucial that you have the mysql server and the perl mysql binding installed before you pull the OpenXPKI package::
 
     apt install default-mysql-server libdbd-mysql-perl
@@ -62,15 +71,9 @@ Note, fastcgi module should be enabled explicitly, otherwise, .fcgi file will be
 
     a2enmod fcgid
 
-Some people reported that a2enmod is not available on their system, in this case try to install the apache2.2-common package.
-
 Now install the OpenXPKI core package, session driver and the translation package::
 
     apt install libopenxpki-perl openxpki-cgi-session-driver openxpki-i18n
-
-You should now restart the apache server to activate the new config::
-
-    service apache2 restart
 
 use the openxpkiadm command to verify if the system was installed correctly::
 
@@ -97,7 +100,7 @@ Now, create an empty database and assign a database user::
 
 
 Please create the empty database schema from the provided schema file. mysql and postgresql
-should work out of the box, the oracle schema is goo for testing but needs some extra indices
+should work out of the box, the oracle schema is good for testing but needs some extra indices
 to perform properly.
 
 Example call when debian packages are installed::
@@ -124,6 +127,9 @@ Here is what you need to do if you *dont* use the sampleconfig script.
 #. Create a key/certificate as signer certificate (ca = true)
 #. Create a key/certificate for the internal datavault (ca = false, can be below the ca but can also be self-signed).
 #. Create a key/certificate for the scep service (ca = false, can be below the ca but can also be self-signed or from other ca).
+
+OpenXPKI supports NIST and Brainpool ECC curves (as supported by openssl) for the CA certificates, as the Datavault
+certificate is used for data encryption it **MUST** use an RSA key!
 
 **Starting with release 3.6 the default config uses the database to store the issuing ca and SCEP tokens -
 if you upgrade from an older config version check the new settings in systems/crypto.yaml.**
@@ -243,12 +249,28 @@ An easy check to see if the signer token is working is to create a CRL::
 Adding the Webclient
 ^^^^^^^^^^^^^^^^^^^^
 
-The webclient is included in the core packages. Just open your browser and navigate to *https://yourhost/openxpki/*. You should see the main authentication page. If you get an internal server error, make sure you have the *en_US.utf8* locale installed (``locale -a | grep en_US``)!
+The package installs a default configuration for apache but requires that you
+provide a tls certificate for the WebUI by yourself. So before you can start
+the Webserver you **must** create a TLS certificate, place the key to
+`/etc/openxpki/tls/private/openxpki.pem` and the certificate to `/etc/openxpki/tls/endentity/openxpki.crt`.
 
-You can log in as user with any username/password combination, the operator login has two preconfigured operator accounts raop and raop2 with password openxpki.
+The default configuration also offers TLS client authentication. Place a copy of
+your root certificate in `/etc/openxpki/tls/chain/` and run `c_rehash /etc/openxpki/tls/chain/`
+to make it available for chain construction in apache.
 
-If you only get the "Open Source Trustcenter" banner without a login prompt, check that fcgid is enabled as described above with
-(``a2enmod fcgid; service apache2 restart``).
+You should now be able to start the apache server::
+
+    $ service apache2 restart
+
+Navigate your browser to *https://yourhost/openxpki/*. If your browser asks you to present a certificate
+for authentication, skip it. You should now see the main authentication page.
+
+You can log in as user with any username/password combination, the operator login has two preconfigured
+operator accounts raop and raop2 with password openxpki.
+
+If you only get the "Open Source Trustcenter" banner without a login prompt, check that fcgid is enabled
+as described above with (``a2enmod fcgid; service apache2 restart``). If you get an internal server error,
+make sure you have the *en_US.utf8* locale installed (``locale -a | grep en_US``)!
 
 Testdrive
 ^^^^^^^^^
