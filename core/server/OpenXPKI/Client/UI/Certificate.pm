@@ -750,10 +750,14 @@ sub init_detail {
         } if (@actions);
     }
 
-    push @fields, { label => 'I18N_OPENXPKI_UI_CERT_RELATED_LABEL', format => 'link', value => {
-        page => 'certificate!related!identifier!'.$cert_identifier,
-        label => 'I18N_OPENXPKI_UI_CERT_RELATED_HINT'
-    }};
+
+    # hide the related link if there is no data to display
+    if ($self->send_command_v2 ( "get_cert_attributes", { identifier => $cert_identifier, attribute => "system_workflow%" })) {
+        push @fields, { label => 'I18N_OPENXPKI_UI_CERT_RELATED_LABEL', format => 'link', value => {
+          page => 'certificate!related!identifier!'.$cert_identifier,
+            label => 'I18N_OPENXPKI_UI_CERT_RELATED_HINT'
+        }};
+    }
 
     $self->add_section({
         type => 'keyvalue',
