@@ -843,77 +843,41 @@ sub init_mine {
     my $self = shift;
     my $args = shift;
 
-    my $limit = $self->param('limit') || 25;
-
-    if ($limit > 500) {  $limit = 500; }
-
-    # will be removed once inline paging works
-    my $startat = $self->param('startat') || 0;
-
-    my $query = {
-        attribute => { 'creator' => $self->_session->param('user')->{name} },
-        order => 'workflow_id',
-        reverse => 1,
-    };
-
-    my $search_result = $self->send_command_v2( 'search_workflow_instances',
-        { %{$query}, ( limit => $limit, start => $startat ) } );
-
-    # if size of result is equal to limit, check for full result count
-    my $result_count = scalar @{$search_result};
-    if ($result_count == $limit) {
-        # we need to remove order/reverse
-        my %count_query = %{$query};
-        delete $count_query{order};
-        delete $count_query{reverse};
-        $result_count = $self->send_command_v2( 'search_workflow_instances_count', \%count_query );
-    }
-
-    $self->logger()->trace( "search result: " . Dumper $search_result) if $self->logger->is_trace;
-
     $self->_page({
         label => 'I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE',
         description => 'I18N_OPENXPKI_UI_MY_WORKFLOW_DESCRIPTION',
     });
 
-    my @column = @{$self->__default_grid_row()};
+    my $tasklist = $self->_client->session()->param('tasklist')->{mine};
 
-    # Store the query if we need to page
-    my $pager;
-    if ($result_count > $limit) {
-        my $queryid = $self->__generate_uid();
-        my $_query = {
-            'id' => $queryid,
-            'type' => 'workflow',
-            'count' => $result_count,
-            'query' => $query,
-            'column' => \@column,
-        };
-        $self->_client->session()->param('query_wfl_'.$queryid, $_query );
-        $pager = $self->__render_pager( $_query, { limit => $limit, startat => $startat } );
-    }
+    my $default = {
+        query => {
+            attribute => { 'creator' => $self->_session->param('user')->{name} },
+            order => 'workflow_id',
+            reverse => 1,
+        },
+        actions => [{
+            path => 'workflow!info!wf_id!{serial}',
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
+            icon => 'view',
+            target => 'popup',
+        }]
+    };
 
-    my @result = $self->__render_result_list( $search_result, \@column );
+    if (!$tasklist || ref $tasklist ne 'ARRAY') {
+        $self->__render_task_list($default);
+    } else {
+        foreach my $item (@$tasklist) {
+            if ($item->{query}) {
+                $item->{query} = { %{$default->{query}}, %{$item->{query}} };
+            } else {
+                $item->{query} = $default->{query};
+            }
+            $item->{actions} = $default->{actions} unless($item->{actions});
 
-    $self->logger()->trace( "dumper result: " . Dumper @result) if $self->logger->is_trace;
-
-    $self->add_section({
-        type => 'grid',
-        className => 'workflow',
-        content => {
-            actions => [{
-                path => 'workflow!info!wf_id!{serial}',
-                label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
-                icon => 'view',
-                target => 'popup',
-            }],
-            columns => $self->__default_grid_head(),
-            data => \@result,
-            empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
-            pager => $pager,
-
+            $self->__render_task_list($item);
         }
-    });
+    }
 
     return $self;
 
@@ -942,112 +906,11 @@ sub init_task {
 
     $self->logger()->trace( "got tasklist: " . Dumper $tasklist) if $self->logger->is_trace;
 
-    TASKLIST:
     foreach my $item (@$tasklist) {
-
-        my $query = $item->{query};
-        my $limit = 25;
-
-        if ($query->{limit}) {
-            $limit = $query->{limit};
-            delete $query->{limit};
-        }
-
-        if (!$query->{order}) {
-            $query->{order} = 'workflow_id';
-            if (!defined $query->{reverse}) {
-                $query->{reverse} = 1;
-            }
-        }
-
-        my $pager_args = { limit => $limit };
-        if ($item->{pager}) {
-            $pager_args = $item->{pager};
-        }
-
-        my @cols;
-        if ($item->{cols}) {
-            @cols = @{$item->{cols}};
-        } else {
-            @cols = (
-                { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL', field => 'workflow_id', sortkey => 'workflow_id' },
-                { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL', field => 'workflow_last_update', sortkey => 'workflow_last_update' },
-                { label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', field => 'workflow_type' },
-                { label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', field => 'workflow_state' },
-            );
-        }
-
-        # create the header from the columns spec
-        my ($header, $column, $rattrib) = $self->__render_list_spec( \@cols );
-
-        if ($rattrib) {
-            $query->{return_attributes} = $rattrib;
-        }
-
-        $self->logger()->trace( "columns : " . Dumper $column) if $self->logger->is_trace;
-
-        my $search_result = $self->send_command_v2( 'search_workflow_instances', { (limit => $limit), %$query } );
-
-        # empty message
-        my $empty = $item->{ifempty} || 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL';
-
-        my $pager;
-        my @data;
-        # No results
-        if (!@$search_result) {
-
-            if ($empty eq 'hide') {
-                next TASKLIST;
-            }
-
-        } else {
-
-            @data = $self->__render_result_list( $search_result, $column );
-
-            $self->logger()->trace( "dumper result: " . Dumper @data) if $self->logger->is_trace;
-
-            if ($limit == scalar @$search_result) {
-                my %count_query = %{$query};
-                delete $count_query{order};
-                delete $count_query{reverse};
-                my $result_count= $self->send_command_v2( 'search_workflow_instances_count', \%count_query  );
-                my $queryid = $self->__generate_uid();
-                my $_query = {
-                    'id' => $queryid,
-                    'type' => 'workflow',
-                    'count' => $result_count,
-                    'query' => $query,
-                    'column' => $column,
-                    'pager' => $pager_args,
-                };
-                $self->_client->session()->param('query_wfl_'.$queryid, $_query );
-                $pager = $self->__render_pager( $_query, $pager_args );
-            }
-
-        }
-
-        $self->add_section({
-            type => 'grid',
-            className => 'workflow',
-            content => {
-                label => $item->{label},
-                description => $item->{description},
-                actions => [{
-                    path => 'redirect!workflow!load!wf_id!{serial}',
-                    icon => 'view',
-                }],
-                columns => $header,
-                data => \@data,
-                pager => $pager,
-                empty => $empty,
-
-            }
-        });
-
+        $self->__render_task_list($item);
     }
 
     return $self;
-
 }
 
 
@@ -3139,6 +3002,116 @@ sub __render_workflow_info {
 
 }
 
+=head2 __render_task_list
+
+Expects a hash that defines a workflow query and output rules for a
+tasklist as defined in the uicontrol section.
+
+=cut
+
+sub __render_task_list {
+
+    my $self = shift;
+    my $item = shift;
+
+    my $query = $item->{query};
+    my $limit = 25;
+
+    if ($query->{limit}) {
+        $limit = $query->{limit};
+        delete $query->{limit};
+    }
+
+    if (!$query->{order}) {
+        $query->{order} = 'workflow_id';
+        if (!defined $query->{reverse}) {
+            $query->{reverse} = 1;
+        }
+    }
+
+    my $pager_args = { limit => $limit };
+    if ($item->{pager}) {
+        $pager_args = $item->{pager};
+    }
+
+    my @cols;
+    if ($item->{cols}) {
+        @cols = @{$item->{cols}};
+    } else {
+        @cols = (
+            { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL', field => 'workflow_id', sortkey => 'workflow_id' },
+            { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL', field => 'workflow_last_update', sortkey => 'workflow_last_update' },
+            { label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', field => 'workflow_type' },
+            { label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', field => 'workflow_state' },
+        );
+    }
+
+    my $actions = $item->{actions} // [{ path => 'redirect!workflow!load!wf_id!{serial}', icon => 'view' }];
+
+    # create the header from the columns spec
+    my ($header, $column, $rattrib) = $self->__render_list_spec( \@cols );
+
+    if ($rattrib) {
+        $query->{return_attributes} = $rattrib;
+    }
+
+    $self->logger()->trace( "columns : " . Dumper $column) if $self->logger->is_trace;
+
+    my $search_result = $self->send_command_v2( 'search_workflow_instances', { (limit => $limit), %$query } );
+
+    # empty message
+    my $empty = $item->{ifempty} || 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL';
+
+    my $pager;
+    my @data;
+    # No results
+    if (!@$search_result) {
+
+        return if ($empty eq 'hide');
+
+    } else {
+
+        @data = $self->__render_result_list( $search_result, $column );
+
+        $self->logger()->trace( "dumper result: " . Dumper @data) if $self->logger->is_trace;
+
+        if ($limit == scalar @$search_result) {
+            my %count_query = %{$query};
+            delete $count_query{order};
+            delete $count_query{reverse};
+            my $result_count= $self->send_command_v2( 'search_workflow_instances_count', \%count_query  );
+            my $queryid = $self->__generate_uid();
+            my $_query = {
+                'id' => $queryid,
+                'type' => 'workflow',
+                'count' => $result_count,
+                'query' => $query,
+                'column' => $column,
+                'pager' => $pager_args,
+            };
+            $self->_client->session()->param('query_wfl_'.$queryid, $_query );
+            $pager = $self->__render_pager( $_query, $pager_args );
+        }
+
+    }
+
+    $self->add_section({
+        type => 'grid',
+        className => 'workflow',
+        content => {
+            label => $item->{label},
+            description => $item->{description},
+            actions => $actions,
+            columns => $header,
+            data => \@data,
+            pager => $pager,
+            empty => $empty,
+
+        }
+    });
+
+    return \@data
+}
 
 =head2 __check_for_validation_error
 
