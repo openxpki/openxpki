@@ -2399,6 +2399,8 @@ sub __render_result_list {
 
     my @result;
 
+    my $wf_labels = $self->send_command_v2( 'get_workflow_instance_types' );
+
     foreach my $wf_item (@{$search_result}) {
 
         my @line;
@@ -2419,6 +2421,9 @@ sub __render_result_list {
                 'workflow_wakeup_at' => $wf_info->{workflow}->{wake_up_at},
             };
         }
+
+        $wf_item->{workflow_label} = $wf_labels->{$wf_item->{workflow_type}}->{label};
+        $wf_item->{workflow_description} = $wf_labels->{$wf_item->{workflow_type}}->{description};
 
         foreach my $col (@{$colums}) {
 
@@ -3041,7 +3046,7 @@ sub __render_task_list {
         @cols = (
             { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL', field => 'workflow_id', sortkey => 'workflow_id' },
             { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_UPDATED_LABEL', field => 'workflow_last_update', sortkey => 'workflow_last_update' },
-            { label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', field => 'workflow_type' },
+            { label => 'I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL', field => 'workflow_label' },
             { label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL', field => 'workflow_state' },
         );
     }
