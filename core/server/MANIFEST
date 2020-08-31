@@ -427,6 +427,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/SetContext.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetContextHash.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetCreator.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetErrorCode.pm
+OpenXPKI/Server/Workflow/Activity/Tools/SetStatusMessage.pm
 OpenXPKI/Server/Workflow/Activity/Tools/SetSource.pm
 OpenXPKI/Server/Workflow/Activity/Tools/StringToArray.pm
 OpenXPKI/Server/Workflow/Activity/Tools/TriggerCertificatePublish.pm
