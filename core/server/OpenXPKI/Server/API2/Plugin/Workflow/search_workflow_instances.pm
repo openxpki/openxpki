@@ -84,9 +84,9 @@ state, accepts the same syntax as I<state>.
 
 Legacy: I<ArrayRef> - attribute values (legacy search syntax)
 
-=item * C<last_update_after> I<Int> - filter workflows by last_update, only worflows young enough are returned
+=item * C<last_update_after> I<Str> - filter workflows by last_update, only worflows young enough are returned
 
-=item * C<last_update_before> I<Int> - filter workflows by last_update, only worflows old enough are returned
+=item * C<last_update_before> I<Str> - filter workflows by last_update, only worflows old enough are returned
 
 =item * C<limit> I<Int> - limit results
 
