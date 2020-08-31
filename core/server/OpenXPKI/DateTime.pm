@@ -7,6 +7,7 @@ use warnings;
 
 package OpenXPKI::DateTime;
 
+use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use English;
 
@@ -89,12 +90,19 @@ sub get_validity {
         elsif ($validity =~ m{\A \d{9,10} \z }xms ) {
             $validityformat = 'epoch';
 
-        } else {
-            # strip non-digits from iso date
-            if($validity =~ m{\A \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2} \z}) {
-                $validity =~ s/[^0-9]//g;
-            }
+        # strip non-digits from iso date
+        # also accept dates without time and missing "T" character
+        } elsif ($validity =~ m{\A\d{4}-\d{2}-\d{2}([T\s]\d{2}:\d{2}:\d{2})?\z}) {
+            $validity =~ s/[^0-9]//g;
             $validityformat = 'absolutedate';
+
+        } else {
+            OpenXPKI::Exception->throw(
+                message => "Invalid format given to detect",
+                params => {
+                    VALIDITY  => $validity,
+                },
+            );
         }
     }
 
@@ -118,6 +126,7 @@ sub get_validity {
         return $refdate;
     }
 
+    ##! 16: "$validityformat / $validity"
     if (   ( $validityformat eq 'absolutedate' )
         || ( $validityformat eq 'relativedate' ) )
     {
@@ -157,6 +166,7 @@ sub get_validity {
                 }
             }
         }
+        ##! 32: \%date
 
         # absolute validity
         if ( $relative eq "" ) {
