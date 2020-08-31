@@ -78,14 +78,14 @@
                     {{/each}}
                 </tr>
            {{else}}
-                <tr><td colspan="{{this.columns.length}}">
+                <tr><td colspan="{{this.formattedColumns.length}}">
                     {{if @def.empty @def.empty "&nbsp;"}}
                 </td></tr>
            {{/each}}
         </tbody>
         {{#if @def.footer}}
             <tfoot>
-                <tr><td colspan="{{this.columns.length}}">
+                <tr><td colspan="{{this.formattedColumns.length}}">
                     {{@def.footer}}
                 </td></tr>
             </tfoot>
