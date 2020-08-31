@@ -783,7 +783,7 @@ sub __render_pager {
     # Safety rule
     elsif ($limit > 500) {  $limit = 500; }
 
-    my $startat = ($args->{startat} *1) || 0;
+    my $startat = int($args->{startat});
 
     if (!$args->{pagesizes}) {
         $args->{pagesizes} = [25,50,100,250,500];
