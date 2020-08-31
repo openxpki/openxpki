@@ -13,6 +13,7 @@ use Moose::Util::TypeConstraints;
 
 # Project modules
 use OpenXPKI::Debug;
+use OpenXPKI::DateTime;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 
@@ -84,9 +85,11 @@ state, accepts the same syntax as I<state>.
 
 Legacy: I<ArrayRef> - attribute values (legacy search syntax)
 
-=item * C<last_update_after> I<Str> - filter workflows by last_update, only worflows young enough are returned
+=item * C<last_update_after> I<Str> - filter workflows by last_update
+only worflows young enough are returned, date handled by OpenXPKI::Datetime detect
 
-=item * C<last_update_before> I<Str> - filter workflows by last_update, only worflows old enough are returned
+=item * C<last_update_before> I<Str> - filter workflows by last_update,
+only worflows old enough are returned, date handled by OpenXPKI::Datetime detect
 
 =item * C<limit> I<Int> - limit results
 
@@ -250,12 +253,29 @@ sub _make_query_params {
         $where->{workflow_type} = $args->type if $args->has_type;
     }
 
-    if($args->has_last_update_after){
-        $where->{workflow_last_update}={'>',$args->last_update_after};
+    if ($args->has_last_update_after) {
+        my $date = OpenXPKI::DateTime::get_validity({
+            VALIDITY => $args->last_update_after,
+            VALIDITYFORMAT => 'detect',
+        })->iso8601();
+        $where->{workflow_last_update}={'>',$date};
     }
+
     if($args->has_last_update_before){
-        $where->{workflow_last_update}={'<',$args->last_update_before};
+        my $date = OpenXPKI::DateTime::get_validity({
+            VALIDITY => $args->last_update_before,
+            VALIDITYFORMAT => 'detect',
+        })->iso8601();
+
+        if ($where->{workflow_last_update}) {
+            # extract date from existing query hash from .._after
+            my $after = $where->{workflow_last_update}->{'>'};
+            $where->{workflow_last_update} = { -between => [ $after, $date ] };
+        } else {
+            $where->{workflow_last_update}={'<',$date};
+        }
     }
+
     #
     # helper to make sure an SQL JOIN is added for each attribute
     #
