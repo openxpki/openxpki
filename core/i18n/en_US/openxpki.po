@@ -68,7 +68,6 @@ msgstr "Show certificate chain"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL"
 msgstr "Certificate Information"
 
-
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_DOES_NOT_EXIST"
 msgstr "Certificate does not exists"
 
@@ -859,8 +858,50 @@ msgstr "Oops, something went wrong"
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Requested page not found"
 
-msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_BAD_PASSWORD"
-msgstr "Password does not meet policy requirements!"
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_COMMON_PASSWORD"
+msgstr "Password was found in a list of commonly used words."
+
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_DICT_WORD"
+msgstr "Password must not contain dictionary words."
+
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_SEQUENCE"
+msgstr "Password must not contain common sequences like 12345 or qwerty."
+
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DICT_WORD"
+msgstr "Password must not be a dictionary word."
+
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DIFFERENT_CHARS"
+msgstr "Password must contain more different characters."
+
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DIGITS"
+msgstr "Password must contain digits."
+
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_GROUPS"
+msgstr "Password must contain more different character groups (digits, small/capital letters, others)."
+
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_LONG"
+msgstr "Password is too long."
+
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_SHORT"
+msgstr "Password is too short."
+
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LETTERS"
+msgstr "Password must contain letters."
+
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_MIXED_CASE"
+msgstr "Password must contain mixed case letters."
+
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REPETITIONS"
+msgstr "Password contains too many repetitions."
+
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REVERSED_DICT_WORD"
+msgstr "Password must not be a reversed dictionary word."
+
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_SEQUENCE"
+msgstr "Password must not be a common sequences like 12345 or qwerty."
+
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_SPECIAL_CHARS"
+msgstr "Password must contain special characters."
 
 msgid "I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_NOT_USABLE"
 msgstr "Certificate signing token is not online"
@@ -1634,7 +1675,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_LABEL"
 msgstr "Trigger CRL Issue"
-
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_TRUSTGROUP_IMPORT_DESC"
 msgstr "Imports a certificate and assigns it to a trustgroup."

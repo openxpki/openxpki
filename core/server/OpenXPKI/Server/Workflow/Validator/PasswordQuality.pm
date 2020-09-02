@@ -307,11 +307,10 @@ sub validate {
     }
 
     if ($self->error) {
-        my $reasons = join(", ", $self->error_codes);
+        my ($first_error) = $self->error;
         ##! 16: 'bad password entered: ' . $reasons
-        CTX('log')->application()->error("Validator password quality failed: " . $reasons);
-        CTX('log')->application()->error("Detailed errors: " . $self->error);
-        validation_error("I18N_OPENXPKI_UI_PASSWORD_QUALITY_BAD_PASSWORD");
+        CTX('log')->application()->error("Password quality validation failed: check = ".$first_error->[0].", error = ".$first_error->[1]);
+        validation_error($first_error->[1]);
     } else {
         return 1;
     }
@@ -391,10 +390,10 @@ sub _get_or_set_enable {
 sub check_length {
     my $self = shift;
     if ($self->pwd_length < $self->minlength) {
-        return ["length" => "Password is too short."];
+        return [ "length" => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_SHORT" ];
     }
     if ($self->pwd_length > $self->maxlength) {
-        return ["length" => "Password is too long."];
+        return [ "length" => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_LONG" ];
     }
     return;
 }
@@ -449,7 +448,7 @@ sub check_common {
         }
     }
     if ($found) {
-        return [ common => "Password was found in a list of commonly used words." ];
+        return [ common => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_COMMON_PASSWORD" ];
     }
     return;
 }
@@ -489,7 +488,7 @@ sub check_diffchars {
     # check the number of chars
     my $totalchar = scalar(keys(%found));
         if ($totalchar <= $self->mindiffchars) {
-        return [ diffchars => "Password must contain more different characters." ];
+        return [ diffchars => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DIFFERENT_CHARS" ];
     }
 
     my %reportconsec;
@@ -508,7 +507,7 @@ sub check_diffchars {
             $passwdlen = $passwdlen - $rep;
         }
         if ($passwdlen < $self->minlength) {
-            return [ diffchars => "Password contains too many repetitions." ];
+            return [ diffchars => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REPETITIONS" ];
         }
     }
 
@@ -537,7 +536,7 @@ sub check_char_groups {
     $groups += (defined $self->check_specials ? 0 : 1);
 
     if ($groups < $self->min_different_char_groups) {
-        return [ groups => "Password must contain more different character groups (digits, small/capital letters, others)." ];
+        return [ groups => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_GROUPS" ];
     }
     return;
 }
@@ -545,7 +544,7 @@ sub check_char_groups {
 sub check_digits {
     my $self = shift;
     if ($self->password !~ m/\d/) {
-        return [ digits => "Password must contain digits." ];
+        return [ digits => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DIGITS" ];
     }
     return;
 }
@@ -553,7 +552,7 @@ sub check_digits {
 sub check_letters {
     my $self = shift;
     if ($self->password !~ m/[a-zA-Z]/) {
-        return [letters => "Password must contain letters." ];
+        return [letters => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LETTERS" ];
     }
     return;
 }
@@ -562,7 +561,7 @@ sub check_mixedcase {
     my $self = shift;
     my $pass = $self->password;
     if (not ($pass =~ m/[a-z]/ and $pass =~ m/[A-Z]/)) {
-        return [ mixed => "Password must contain mixed case letters."];
+        return [ mixed => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_MIXED_CASE"];
     }
     return;
 }
@@ -570,7 +569,7 @@ sub check_mixedcase {
 sub check_specials {
     my $self = shift;
     if ($self->password !~ m/[\W_]/) {
-        return [ specials => "Password must contain special characters." ];
+        return [ specials => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_SPECIAL_CHARS" ];
     }
     return;
 }
@@ -592,7 +591,7 @@ sub check_sequence {
     for my $row (@sequence) {
         my $seq = join "", @$row;
         if ($seq =~ m/\Q$password\Q/) {
-            return [ sequence => "Password must not be a common sequences like 12345 or qwerty." ];
+            return [ sequence => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_SEQUENCE" ];
         }
     }
     return;
@@ -604,7 +603,7 @@ sub check_partsequence {
 
     return $self->_check_seq_parts(sub {
         if (index($password, shift) >= 0) {
-            return [ partsequence => "Password must not contain common sequences like 12345 or qwerty." ];
+            return [ partsequence => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_SEQUENCE" ];
         }
     });
 }
@@ -645,7 +644,7 @@ sub check_partdict {
     return $self->_check_dict(sub {
         my $word = shift;
         if (index($pass, $word) > -1) {
-            return [ partdict => "Password must not contain dictionary words." ];
+            return [ partdict => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_DICT_WORD" ];
         }
     });
 }
@@ -659,7 +658,7 @@ sub check_dict {
     my $err;
     $err = $self->_check_dict(sub {
         if (shift eq $pass) {
-            return [ dict => "Password must not be a dictionary word." ];
+            return [ dict => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DICT_WORD" ];
         }
     });
     return $err if $err;
@@ -667,7 +666,7 @@ sub check_dict {
     my $reverse_pass = reverse($pass);
     $err = $self->_check_dict(sub {
         if (shift eq $reverse_pass) {
-            return [ dict => "Password must not be a reversed dictionary word." ];
+            return [ dict => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REVERSED_DICT_WORD" ];
         }
     });
 
@@ -694,15 +693,20 @@ sub _check_dict {
 }
 
 no Moose;
-# no need to fiddle with inline_constructor here
 __PACKAGE__->meta->make_immutable;
 
 
 
 # Top 10,000 passwords from Troy Hunt's Have I Been Pwned (https://haveibeenpwned.com) data set.
-# Source: https://www.ncsc.gov.uk/static-assets/documents/PwnedPasswordsTop100k.txt
-# tail -n 100000 ~/PwnedPasswordsTop100k.txt | head -n 10000 | gzip | base64
 # See: https://www.ncsc.gov.uk/blog-post/passwords-passwords-everywhere
+#
+# Updated 2020-08-26
+#
+# curl -s https://www.ncsc.gov.uk/static-assets/documents/PwnedPasswordsTop100k.txt \
+#   | tail -n 100000 \
+#   | head -n 10000 \
+#   | gzip \
+#   | base64
 
 __DATA__
 H4sIAAAAAAAAA8X9244rWZYtiL0HwI8IVEEP3V0hLiPpl1J314m8Z1ZeIjMyKzJTEBrLLiSNtAu3

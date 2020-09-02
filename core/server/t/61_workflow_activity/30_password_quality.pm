@@ -7,7 +7,7 @@ use FindBin qw( $Bin );
 use YAML::Tiny;
 
 # CPAN modules
-use Test::More tests => 9;
+use Test::More tests => 15;
 use Test::Deep;
 use Test::Exception;
 
@@ -90,7 +90,7 @@ sub password_ok {
 
 sub password_fails {
     my ($pwd, $error, $workflow_type) = @_;
-    subtest "password '$pwd' fails validation" => sub {
+    subtest "password '$pwd' must fail validation" => sub {
         my $wf = _create_wf($workflow_type);
         throws_ok { _pwd_test($wf, $pwd, $workflow_type) } $error, "validation fails";
     };
@@ -140,30 +140,45 @@ my $oxitest = OpenXPKI::Test->new(
 password_ok("v.s.pwd4oxi", $wf_legacy);
 
 # too short
-password_fails("a2b2g9" => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_BAD_PASSWORD/, $wf_legacy);
+password_fails("a2b2g9" => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_SHORT/, $wf_legacy);
+
+# too long
+password_fails("a2b2g9!.45" x 7 => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_LONG/, $wf_legacy);
 
 # too less different characters
-password_fails("123456789" => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_BAD_PASSWORD/, $wf_legacy);
+password_fails("1!111!aaa!!aa" => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_DIFFERENT_CHARS/, $wf_legacy);
+
+# too less different character groups
+password_fails("123456789" => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_GROUPS/, $wf_legacy);
 
 # contains sequence
-password_fails("ab!123456789" => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_BAD_PASSWORD/, $wf_legacy);
+password_fails("ab!123456789" => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_SEQUENCE/, $wf_legacy);
 
 # repetitive
-password_fails("!123aaaabbbbcc" => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_BAD_PASSWORD/, $wf_legacy);
+password_fails("!123aaaabbbbcc" => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_REPETITIONS/, $wf_legacy);
+
+# repetitive
+password_fails("!d.4_sunset" => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_DICT_WORD/, $wf_legacy);
 
 #
 # Tests - new algorithms
 #
 
-# dictionary word
-password_fails("troubleshooting" => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_BAD_PASSWORD/, $wf);
-password_fails(scalar(reverse("troubleshooting")) => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_BAD_PASSWORD/, $wf);
+password_ok("v.s.pwd4oxi", $wf);
+password_ok("!d.4_sunset", $wf);
 
-# dictionary word - leet speech
-password_fails("p1n3apple1" => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_BAD_PASSWORD/, $wf);
+# top 10k password
+password_fails("scvMOFAS79" => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_COMMON_PASSWORD/, $wf);
+
+# top 10k password - leet speech
+password_fails("p1n3apple1" => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_COMMON_PASSWORD/, $wf);
+
+# dictionary word
+password_fails("troubleshooting" => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_DICT_WORD/, $wf);
+password_fails(scalar(reverse("troubleshooting")) => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_REVERSED_DICT_WORD/, $wf);
 
 # is sequence
-password_fails("abcdefghijklmnopqr" => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_BAD_PASSWORD/, $wf_seq);
+password_fails("abcdefghijklmnopqr" => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_SEQUENCE/, $wf_seq);
 
 
 $oxitest->dbi->delete_and_commit(from => 'workflow', where => { workflow_type => [ @wf_types ] });

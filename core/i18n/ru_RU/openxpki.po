@@ -1126,7 +1126,63 @@ msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Тестировщик"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_BAD_PASSWORD"
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_COMMON_PASSWORD"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_DICT_WORD"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_SEQUENCE"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DICT_WORD"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DIFFERENT_CHARS"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DIGITS"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_GROUPS"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_LONG"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_SHORT"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LETTERS"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_MIXED_CASE"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REPETITIONS"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REVERSED_DICT_WORD"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_SEQUENCE"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_SPECIAL_CHARS"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy

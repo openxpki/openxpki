@@ -866,7 +866,64 @@ msgstr "おっと、何か間違っています。"
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "リクエストされたページが見つかりません"
 
-msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_BAD_PASSWORD"
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_COMMON_PASSWORD"
+msgstr "パスワードがポリシー要件を満たしていません"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_DICT_WORD"
+msgstr "パスワードがポリシー要件を満たしていません"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_SEQUENCE"
+msgstr "パスワードがポリシー要件を満たしていません"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DICT_WORD"
+msgstr "パスワードがポリシー要件を満たしていません"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DIFFERENT_CHARS"
+msgstr "パスワードがポリシー要件を満たしていません"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DIGITS"
+msgstr "パスワードがポリシー要件を満たしていません"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_GROUPS"
+msgstr "パスワードがポリシー要件を満たしていません"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_LONG"
+msgstr "パスワードがポリシー要件を満たしていません"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_SHORT"
+msgstr "パスワードがポリシー要件を満たしていません"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LETTERS"
+msgstr "パスワードがポリシー要件を満たしていません"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_MIXED_CASE"
+msgstr "パスワードがポリシー要件を満たしていません"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REPETITIONS"
+msgstr "パスワードがポリシー要件を満たしていません"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REVERSED_DICT_WORD"
+msgstr "パスワードがポリシー要件を満たしていません"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_SEQUENCE"
+msgstr "パスワードがポリシー要件を満たしていません"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_SPECIAL_CHARS"
 msgstr "パスワードがポリシー要件を満たしていません"
 
 msgid "I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_NOT_USABLE"
