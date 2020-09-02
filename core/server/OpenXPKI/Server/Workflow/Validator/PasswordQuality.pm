@@ -169,7 +169,7 @@ has top_passwords => (
     lazy => 1,
     default => sub {
         my $self = shift;
-        return [ grep { length($_) >= $self->minlength } split /\r?\n/, $_data_txt ];
+        return [ grep { length($_) >= $self->minlength and length($_) <= $self->maxlength } split /\r?\n/, $_data_txt ];
     },
 );
 
