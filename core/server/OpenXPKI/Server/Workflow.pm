@@ -233,7 +233,7 @@ sub execute_action {
             # Set workflow status to manual
             $self->_set_proc_state( 'manual' );
 
-            my $invalid_fields = $error->{invalid_fields} || {};
+            my $invalid_fields = $error->{invalid_fields} || [];
             OpenXPKI::Exception->throw (
                 message => "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATION_FAILED_ON_EXECUTE",
                 params => {
