@@ -877,7 +877,9 @@ msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DIGITS"
 msgstr "Password must contain digits."
 
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_GROUPS"
-msgstr "Password must contain more different character groups (digits, small/capital letters, others)."
+msgstr ""
+"Password must contain more different character groups (digits, small/capital "
+"letters, others)."
 
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_LONG"
 msgstr "Password is too long."
@@ -890,6 +892,9 @@ msgstr "Password must contain letters."
 
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_MIXED_CASE"
 msgstr "Password must contain mixed case letters."
+
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_PASSWORD_EMPTY"
+msgstr "Password is empty."
 
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REPETITIONS"
 msgstr "Password contains too many repetitions."

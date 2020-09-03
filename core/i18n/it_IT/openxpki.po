@@ -1098,6 +1098,10 @@ msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_MIXED_CASE"
 msgstr "La Password non soddisfa i criteri della policy!"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_PASSWORD_EMPTY"
+msgstr "La Password non soddisfa i criteri della policy!"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REPETITIONS"
 msgstr "La Password non soddisfa i criteri della policy!"
 

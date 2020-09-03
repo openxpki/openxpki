@@ -312,7 +312,7 @@ sub is_valid {
     $self->reset;
 
     if (not $self->password) {
-        $self->add_error([missing => "Password is missing"]); # FIXME I18N
+        $self->add_error([missing => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_PASSWORD_EMPTY"]);
     } else {
         $self->add_error($self->check_length);
         $self->add_error($self->check_letters) if $self->is_enabled("letters");

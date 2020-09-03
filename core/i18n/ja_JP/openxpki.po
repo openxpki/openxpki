@@ -911,6 +911,10 @@ msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_MIXED_CASE"
 msgstr "パスワードがポリシー要件を満たしていません"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_PASSWORD_EMPTY"
+msgstr "パスワードがポリシー要件を満たしていません"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REPETITIONS"
 msgstr "パスワードがポリシー要件を満たしていません"
 
