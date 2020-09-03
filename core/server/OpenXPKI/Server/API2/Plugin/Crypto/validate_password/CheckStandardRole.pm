@@ -35,6 +35,27 @@ has top_passwords => (
     },
 );
 
+sub _known_sequences; # workaround for accessor methods leading to errors when required by another role
+has _known_sequences => (
+    is => 'ro',
+    isa => 'ArrayRef[ArrayRef]',
+    init_arg => undef,
+    lazy => 1,
+    builder => '_build_known_sequences',
+);
+
+sub _build_known_sequences {
+    return [
+        [ qw/1 2 3 4 5 6 7 8 9 0/ ],
+        [ ("a" .. "z") ],
+        [ qw/q w e r t y u i o p/ ],
+        [ qw/q w e r t z u i o p/ ],
+        [ qw/a s d f g h j k l/ ],
+        [ qw/z x c v b n m/ ],
+        [ qw/y x c v b n m/ ],
+    ];
+}
+
 has _first_existing_dict => (
     is => 'ro',
     isa => 'Str',
@@ -49,8 +70,66 @@ has _first_existing_dict => (
     },
 );
 
+has _leet_perms => (
+    is => 'ro',
+    isa => 'HashRef',
+    init_arg => undef,
+    builder => '_build_leet_perms',
+);
 
-after BUILD => sub {
+sub _build_leet_perms {
+    my %leet = (
+        'a' => qr{[a4]},
+        'b' => qr{[b8]},
+        'c' => qr{[c\(\{\[<]},
+        'e' => qr{[e3]},
+        'g' => qr{[g69]},
+        'i' => qr{[i1!\|]},
+        'l' => qr{[l17\|]},
+        'o' => qr{[o0]},
+        's' => qr{[s5\$]},
+        't' => qr{[t7\+]},
+        'x' => qr{[x%]},
+        'z' => qr{[z2]},
+        '0' => qr{[0o]},
+        '1' => qr{[1l]},
+        '2' => qr{[2z]},
+        '3' => qr{[3e]},
+        '4' => qr{[4a]},
+        '5' => qr{[5s]},
+        '6' => qr{[6g]},
+        '7' => qr{[7lt]},
+        '8' => qr{[8b]},
+        '9' => qr{[9g]},
+        # escape special regex characters so we can use all unknown characters
+        # without embedding them in a qr{\Q \E}
+        '\\' => qr{\\},
+        '^' => qr{\^},
+        '$' => qr{\$},
+        '.' => qr{\.},
+        '|' => qr{\|},
+        '?' => qr{\?},
+        '*' => qr{\*},
+        '+' => qr{\+},
+        '(' => qr{\(},
+        ')' => qr{\)},
+        '[' => qr{\[},
+        ']' => qr{\]},
+        '{' => qr{\{},
+        '}' => qr{\}},
+    );
+
+    my $result_map = {};
+    # add mapping of uppercase letters to avoid lc(known_password) for speed reasons
+    for my $char (keys %leet) {
+        $result_map->{$char} = $leet{$char};
+        $result_map->{uc($char)} = $leet{$char} if $char =~ m/[a-z]/;
+    }
+    return $result_map;
+}
+
+
+before BUILD => sub { # not "after BUILD" to allow consuming class to override enabled checks.
     my $self = shift;
     ##! 16: 'Registering checks';
     $self->register_check(
@@ -62,13 +141,6 @@ after BUILD => sub {
     );
 
     $self->enable(qw( length common diffchars sequence dict ));
-
-    # ATTENTION:
-    # The has_xxx predicates must be called before any usage of their
-    # respective attributes, as otherwise their default builder triggers
-    # and has_xxx returns true.
-    $self->enable('dict') if $self->has_dictionaries;
-    $self->enable('diffchars') if $self->has_min_diff_chars;
 };
 
 
@@ -155,18 +227,6 @@ sub check_sequence {
     return;
 }
 
-sub _known_sequences {
-    return [
-        [ qw/1 2 3 4 5 6 7 8 9 0/ ],
-        [ ("a" .. "z") ],
-        [ qw/q w e r t y u i o p/ ],
-        [ qw/q w e r t z u i o p/ ],
-        [ qw/a s d f g h j k l/ ],
-        [ qw/z x c v b n m/ ],
-        [ qw/y x c v b n m/ ],
-    ];
-}
-
 sub check_dict {
     my $self = shift;
     my $pass_lc = lc($self->password);
@@ -211,62 +271,18 @@ sub _check_dict {
 }
 
 sub _leet_string_match {
-    my ($self, $lc_pwd, $known_pwd) = @_;
+    my ($self, $lc_pwd, $known_word) = @_;
 
-    my $lc_known_pwd = lc($known_pwd);
-    my @chars = split(//, $lc_known_pwd);
-    my $leet = $self->_leetperms;
+    my $leet = $self->_leet_perms;
 
     # for each character we look up the regexp
-    my $re = join "", map { $leet->{$_} // $_ } @chars;
+    my $re = "";
+    $re .= $leet->{$_} // $_ for split //, $known_word;
 
     if ($lc_pwd =~ m/^${re}$/i) {
-        return $lc_known_pwd;
+        return $known_word;
     }
     return;
-}
-
-sub _leetperms {
-    return {
-        'a' => qr{[a4]},
-        'b' => qr{[b8]},
-        'c' => qr{[c\(\{\[<]},
-        'e' => qr{[e3]},
-        'g' => qr{[g69]},
-        'i' => qr{[i1!\|]},
-        'l' => qr{[l17\|]},
-        'o' => qr{[o0]},
-        's' => qr{[s5\$]},
-        't' => qr{[t7\+]},
-        'x' => qr{[x%]},
-        'z' => qr{[z2]},
-        '0' => qr{[0o]},
-        '1' => qr{[1l]},
-        '2' => qr{[2z]},
-        '3' => qr{[3e]},
-        '4' => qr{[4a]},
-        '5' => qr{[5s]},
-        '6' => qr{[6g]},
-        '7' => qr{[7lt]},
-        '8' => qr{[8b]},
-        '9' => qr{[9g]},
-        # escape special regex characters so we can use all unknown characters
-        # without embedding them in a qr{\Q \E}
-        '\\' => qr{\\},
-        '^' => qr{\^},
-        '$' => qr{\$},
-        '.' => qr{\.},
-        '|' => qr{\|},
-        '?' => qr{\?},
-        '*' => qr{\*},
-        '+' => qr{\+},
-        '(' => qr{\(},
-        ')' => qr{\)},
-        '[' => qr{\[},
-        ']' => qr{\]},
-        '{' => qr{\{},
-        '}' => qr{\}},
-    };
 }
 
 1;
