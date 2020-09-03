@@ -18,14 +18,52 @@ requires 'password';
 requires 'enable';
 requires 'disable';
 requires 'pwd_length';
-requires 'min_len';
-requires 'max_len';
-requires 'min_diff_chars';
-requires 'min_dict_len';
-requires 'dictionaries';
 
+has max_len => (
+    is => 'rw',
+    isa => 'Int',
+    lazy => 1,
+    default => sub { 255 },
+);
 
-has top_passwords => (
+has min_len => (
+    is => 'rw',
+    isa => 'Int',
+    lazy => 1,
+    default => sub { 8 },
+);
+
+has min_diff_chars => (
+    is => 'rw',
+    isa => 'Int',
+    predicate => 'has_min_diff_chars',
+    lazy => 1,
+    default => sub { 6 },
+);
+
+# Minimal length for dictionary words that are not allowed to appear in the password.
+has min_dict_len => (
+    is => 'rw',
+    isa => 'Num',
+    predicate => 'has_min_dict_len',
+    lazy => 1,
+    default => sub { 4 },
+);
+
+has dictionaries => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    predicate => 'has_dictionaries',
+    lazy => 1,
+    default => sub { [ qw(
+        /usr/dict/web2
+        /usr/dict/words
+        /usr/share/dict/words
+        /usr/share/dict/linux.words
+    ) ] },
+);
+
+has _top_passwords => (
     is => 'rw',
     isa => 'ArrayRef',
     lazy => 1,
@@ -160,7 +198,7 @@ sub check_common {
     my $found;
     my $password = $self->password;
 
-    for my $common (@{$self->top_passwords}) {
+    for my $common (@{$self->_top_passwords}) {
         if ($password eq $common) { $found = $common; last }
     }
     if ($found) {

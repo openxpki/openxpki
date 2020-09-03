@@ -16,10 +16,27 @@ requires 'register_check';
 requires 'password';
 requires 'enable';
 requires 'disable';
-requires 'sequence_len';
 requires '_known_sequences';
 requires '_check_dict';
-requires 'min_different_char_groups';
+
+
+has sequence_len => (
+    is => 'rw',
+    isa => 'Int',
+    predicate => 'has_sequence_len',
+    lazy => 1,
+    default => sub { 5 },
+);
+
+# Minimal amount of different character groups (0 to 4)
+# Character groups: digits, small letters, capital letters, other characters
+has min_different_char_groups => (
+    is => 'rw',
+    isa => 'Num',
+    predicate => 'has_min_different_char_groups',
+    lazy => 1,
+    default => sub { 2 },
+);
 
 
 before BUILD => sub { # # not "after BUILD" to allow consuming class to process and override enabled checks

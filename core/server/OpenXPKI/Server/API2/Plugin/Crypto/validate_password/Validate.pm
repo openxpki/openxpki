@@ -112,68 +112,6 @@ has _default_checks => (
     },
 );
 
-has max_len => (
-    is => 'rw',
-    isa => 'Int',
-    lazy => 1,
-    default => sub { 255 },
-);
-
-has min_len => (
-    is => 'rw',
-    isa => 'Int',
-    lazy => 1,
-    default => sub { 8 },
-);
-
-has min_diff_chars => (
-    is => 'rw',
-    isa => 'Int',
-    predicate => 'has_min_diff_chars',
-    lazy => 1,
-    default => sub { 6 },
-);
-
-has sequence_len => (
-    is => 'rw',
-    isa => 'Int',
-    predicate => 'has_sequence_len',
-    lazy => 1,
-    default => sub { 5 },
-);
-
-# Minimal length for dictionary words that are not allowed to appear in the password.
-has min_dict_len => (
-    is => 'rw',
-    isa => 'Num',
-    predicate => 'has_min_dict_len',
-    lazy => 1,
-    default => sub { 4 },
-);
-
-has dictionaries => (
-    is => 'rw',
-    isa => 'ArrayRef',
-    predicate => 'has_dictionaries',
-    lazy => 1,
-    default => sub { [ qw(
-        /usr/dict/web2
-        /usr/dict/words
-        /usr/share/dict/words
-        /usr/share/dict/linux.words
-    ) ] },
-);
-
-# Minimal amount of different character groups (0 to 4)
-# Character groups: digits, small letters, capital letters, other characters
-has min_different_char_groups => (
-    is => 'rw',
-    isa => 'Num',
-    predicate => 'has_min_different_char_groups',
-    lazy => 1,
-    default => sub { 2 },
-);
-
 #
 # Validation data
 #
