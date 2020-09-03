@@ -1,5 +1,4 @@
 package OpenXPKI::Server::API2::Plugin::Crypto::validate_password::Validate;
-use feature 'unicode_strings';
 use Moose;
 
 # Quite some code was borrowed from Data::Transpose::PasswordPolicy
@@ -43,6 +42,12 @@ See the L<"checks" parameter|/checks> for more information.
 =cut
 
 =head1 ATTRIBUTES
+
+=cut
+
+#
+# Configuration data
+#
 
 =head2 log
 
@@ -204,10 +209,11 @@ has _errors => (
 );
 
 
-
-
-with 'OpenXPKI::Server::API2::Plugin::Crypto::validate_password::CheckStandardRole',
-     'OpenXPKI::Server::API2::Plugin::Crypto::validate_password::CheckLegacyRole';
+with
+    'OpenXPKI::Server::API2::Plugin::Crypto::validate_password::CheckStandardRole',
+    'OpenXPKI::Server::API2::Plugin::Crypto::validate_password::CheckEntropyRole',
+    'OpenXPKI::Server::API2::Plugin::Crypto::validate_password::CheckLegacyRole',
+;
 
 
 =head1 PARAMETERS

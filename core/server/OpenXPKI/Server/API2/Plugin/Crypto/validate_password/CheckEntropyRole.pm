@@ -1,21 +1,56 @@
-package OpenXPKI::Server::API2::Plugin::Crypto::validate_password::Entropy;
-use strict;
-use warnings;
-
+package OpenXPKI::Server::API2::Plugin::Crypto::validate_password::CheckEntropyRole;
 use feature 'unicode_strings';
+
+=head1 NAME
+
+OpenXPKI::Server::API2::Plugin::Crypto::validate_password::CheckEntropyRole - Check password entropy
+
+=cut
+
+use Moose::Role;
 
 # Core modules
 use POSIX qw(floor);
+
+# Project modules
+use OpenXPKI::Debug;
+
+
+requires 'register_check';
+requires 'password';
+requires 'enable';
 
 
 use constant {
     OTHER => '__unlisted character class',
     UNICODE_ASSIGNED_CHARACTERS => 143924,
 };
-my %BLOCK_CHAR_COUNT;
-my %BLOCK_REGEX;
 
-BEGIN {
+
+has min_entropy => (
+    is => 'rw',
+    isa => 'Int',
+    lazy => 1,
+    default => sub { 60 },
+);
+
+has _unicode_blocks => (
+    is => 'ro',
+    isa => 'HashRef',
+    traits  => ['Hash'],
+    init_arg => undef,
+    lazy => 1,
+    builder => '_build_unicode_blocks',
+    handles => {
+        # Returns the unicode block range by given block name
+        unicode_block => 'get',
+        # Returns a list of all defined unicode block names
+        unicode_block_names => 'keys',
+    },
+);
+
+sub _build_unicode_blocks {
+    my $result = {};
     # cat ~/Unicode\ Basic\ Multilingual\ Plane.txt | perl -e 'use utf8; while (<>) { chomp; next if /^(#|$)/; ($n,$r1,$r2) = m/^(.*) \(([^-]+)-([^-]+)\)$/; $n=~s/\x{0027}/\\\x{0027}/; print "[ 0x$r1 => 0x$r2 ] => \x{0027}$n\x{0027},\n";} '
 
     # List of selected blocks (= character classes) from Unicode's Basic Multilingual Plane (plane 0).
@@ -151,34 +186,41 @@ BEGIN {
     my $_block_ranges = {};
     for my $def (@$unicode_plane0_selected_blocks) {
         my $block = $def->[2];
-        $BLOCK_CHAR_COUNT{$block} += ($def->[1] - $def->[0] + 1);
+        $result->{$block}->{char_count} += ($def->[1] - $def->[0] + 1);
         push @{$_block_ranges->{$block}}, sprintf('\x{%x}-\x{%x}', $def->[0], $def->[1]);
     }
 
-    %BLOCK_REGEX = map { my $list = sprintf '[%s]', join(",", @{$_block_ranges->{$_}}); $_ => qr/$list/ } keys %$_block_ranges;
+    for my $block (keys %$_block_ranges) {
+        my $list = sprintf '[%s]', join(",", @{ $_block_ranges->{$block} });
+        $result->{$block}->{regex} = qr/$list/;
+    }
 
     my $char_count = 0;
-    $char_count += $_ for values %BLOCK_CHAR_COUNT;
+    $char_count += $_ for map { $_->{char_count} } values %{ $result };
 
-    $BLOCK_CHAR_COUNT{OTHER} = UNICODE_ASSIGNED_CHARACTERS - $char_count;
+    $result->{OTHER()}->{char_count} = UNICODE_ASSIGNED_CHARACTERS - $char_count;
+
+    return $result;
 }
 
-sub new {
-    my $class = shift;
-    my $self = {};
-    bless $self, $class;
-    return $self;
-}
 
-sub _get_char_class {
-    my ($self, $char) = @_;
-    for my $block (keys %BLOCK_REGEX) {
-        return $block if $char =~ $BLOCK_REGEX{$block};
+before BUILD => sub { # not "after BUILD" to allow consuming class to process and override enabled checks
+    my $self = shift;
+    ##! 16: 'Registering checks';
+    $self->register_check('entropy' => 'check_entropy');
+    $self->add_default_check('entropy');
+};
+
+
+sub check_entropy {
+    my $self = shift;
+    if ($self->_calc_entropy($self->password) < $self->min_entropy) {
+        return [ "entropy" => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_INSUFFICIENT_ENTROPY" ];
     }
-    return OTHER;
+    return;
 }
 
-sub password_entropy {
+sub _calc_entropy {
     my ($self, $passw) = @_;
 
     return 0 unless (defined($passw) && $passw ne '');
@@ -230,7 +272,7 @@ sub password_entropy {
 
     my $pci = 0; # Password complexity index
     for (keys(%$classes)) {
-        $pci += $BLOCK_CHAR_COUNT{$_};
+        $pci += $self->unicode_block($_)->{char_count};
     }
 
     if ($pci != 0) {
@@ -239,6 +281,14 @@ sub password_entropy {
     }
 
     return $entropy;
+}
+
+sub _get_char_class {
+    my ($self, $char) = @_;
+    for my $block (grep { $_ ne OTHER } $self->unicode_block_names) {
+        return $block if $char =~ $self->unicode_block($block)->{regex};
+    }
+    return OTHER;
 }
 
 1;
