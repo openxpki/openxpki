@@ -903,7 +903,7 @@ msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REVERSED_DICT_WORD"
 msgstr "Password must not be a reversed dictionary word."
 
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_SEQUENCE"
-msgstr "Password must not be a common sequences like 12345 or qwerty."
+msgstr "Password must not be a common sequence like 12345 or qwerty."
 
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_SPECIAL_CHARS"
 msgstr "Password must contain special characters."
