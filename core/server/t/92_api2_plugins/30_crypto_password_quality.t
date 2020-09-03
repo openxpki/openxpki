@@ -17,7 +17,7 @@ use lib "$Bin/../lib";
 use OpenXPKI::Test;
 #use OpenXPKI::Debug; $OpenXPKI::Debug::BITMASK{'OpenXPKI::Server::API2::Plugin::Crypto::password_quality.*'} = 255;
 
-plan tests => 15;
+plan tests => 16;
 
 #
 # Setup test context
@@ -43,7 +43,7 @@ sub password_fails {
     } "invalid password $password ($expected)";
 }
 
-my %legacy_conf = (
+my %legacy = (
     min_len => 8,
     max_len => 64,
     min_different_char_groups => 2,
@@ -51,28 +51,28 @@ my %legacy_conf = (
     sequence_len => 4,
 );
 
-password_ok "v.s.pwd4oxi", %legacy_conf;
+password_ok "v.s.pwd4oxi", %legacy;
 
 # too short
-password_fails "a2b2g9", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_SHORT", %legacy_conf;
+password_fails "a2b2g9", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_SHORT", %legacy;
 
 # too long
-password_fails "a2b2g9!.45" x 7, "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_LONG", %legacy_conf;
+password_fails "a2b2g9!.45" x 7, "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_LONG", %legacy;
 
 # too less different characters
-password_fails "1!111!aaa!!aa", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DIFFERENT_CHARS", %legacy_conf;
+password_fails "1!111!aaa!!aa", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DIFFERENT_CHARS", %legacy;
 
 # too less different character groups
-password_fails "123456789", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_GROUPS", %legacy_conf;
+password_fails "123456789", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_GROUPS", %legacy;
 
 # contains sequence
-password_fails "ab!123456789", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_SEQUENCE", %legacy_conf;
+password_fails "ab!123456789", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_SEQUENCE", %legacy;
 
 # repetitive
-password_fails "!123aaaabbbbcc", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REPETITIONS", %legacy_conf;
+password_fails "!123aaaabbbbcc", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REPETITIONS", %legacy;
 
 # repetitive
-password_fails "!d.4_SuNset", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_DICT_WORD", %legacy_conf;
+password_fails "!d.4_SuNset", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_DICT_WORD", %legacy;
 
 #
 # Tests - new algorithms
@@ -90,5 +90,10 @@ password_fails scalar(reverse("troubleshooting")), "I18N_OPENXPKI_UI_PASSWORD_QU
 
 # is sequence
 password_fails "abcdefghijklmnopqr", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_SEQUENCE";
+
+my %entropy_only = (
+    checks => 'entropy',
+);
+password_fails "abcdefghijklmnopqr", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_INSUFFICIENT_ENTROPY";
 
 1;
