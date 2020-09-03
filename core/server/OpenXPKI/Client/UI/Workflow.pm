@@ -1501,7 +1501,7 @@ sub action_bulk {
 
     if ($errors) {
 
-        $self->_status({message => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_HAS_FAILED_ITEMS_STATUS', 'level' => 'error' });
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_HAS_FAILED_ITEMS_STATUS', 'error');
 
         my @failed_id = keys %{$errors};
         my $failed_result = $self->send_command_v2( 'search_workflow_instances', { id => \@failed_id } );
@@ -1539,7 +1539,7 @@ sub action_bulk {
             }
         });
     } else {
-        $self->_status({message => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_ACTION_SUCCESS_STATUS', 'level' => 'success' });
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_ACTION_SUCCESS_STATUS', 'success');
     }
 
     if (@success) {
