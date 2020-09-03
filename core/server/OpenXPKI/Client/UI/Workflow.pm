@@ -486,7 +486,7 @@ sub init_search {
 
     # TODO Sorting / I18
     my @wf_names = keys %{$workflows};
-    my @wfl_list = map { $_ = {'value' => $_, 'label' => $workflows->{$_}->{label}} } @wf_names ;
+    my @wfl_list = map { {'value' => $_, 'label' => $workflows->{$_}->{label}} } @wf_names ;
     @wfl_list = sort { lc($a->{'label'}) cmp lc($b->{'label'}) } @wfl_list;
 
     my @fields = (
