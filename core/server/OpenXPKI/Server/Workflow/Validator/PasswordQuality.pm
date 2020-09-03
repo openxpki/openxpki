@@ -154,9 +154,10 @@ sub validate {
     );
 
     if (scalar @$errors) {
-        ##! 16: 'bad password entered: ' . $errors->[0]
-        CTX('log')->application()->error("Password quality validation failed: " . $errors->[0]);
-        validation_error($errors->[0]);
+        my $msg = join "\n", @$errors;
+        ##! 16: "Password quality validation failed: $msg"
+        CTX('log')->application()->error("Password quality validation failed: $msg");
+        validation_error($msg);
     } else {
         return 1;
     }
