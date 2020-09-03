@@ -139,7 +139,7 @@ my $oxitest = OpenXPKI::Test->new(
 
 # PLEASE NOTE:
 #   More tests regarding password validation are in
-#   core/server/t/92_api2_plugins/30_crypto_validate_password.t
+#   core/server/t/92_api2_plugins/30_crypto_password_quality.t
 
 #
 # Tests - legacy

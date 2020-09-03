@@ -1,9 +1,9 @@
-package OpenXPKI::Server::API2::Plugin::Crypto::validate_password;
+package OpenXPKI::Server::API2::Plugin::Crypto::password_quality;
 use OpenXPKI::Server::API2::EasyPlugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Crypto::validate_password
+OpenXPKI::Server::API2::Plugin::Crypto::password_quality
 
 =head1 COMMANDS
 
@@ -12,11 +12,11 @@ OpenXPKI::Server::API2::Plugin::Crypto::validate_password
 use Data::Dumper;
 
 # Project modules
-use OpenXPKI::Server::API2::Plugin::Crypto::validate_password::Validate;
+use OpenXPKI::Server::API2::Plugin::Crypto::password_quality::Validate;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
-=head2 validate_password
+=head2 password_quality
 
 Check if the given password passes certain quality checks.
 
@@ -48,7 +48,7 @@ Will result in
    [ key_length ]
 
 =cut
-command "validate_password" => {
+command "password_quality" => {
     password => { isa => 'Str', required => 1, },
     checks => { isa => 'ArrayRef', },
     max_len => { isa => 'Int', },
@@ -61,7 +61,7 @@ command "validate_password" => {
 } => sub {
     my ($self, $params) = @_;
 
-    my $validator = OpenXPKI::Server::API2::Plugin::Crypto::validate_password::Validate->new(
+    my $validator = OpenXPKI::Server::API2::Plugin::Crypto::password_quality::Validate->new(
         log => CTX('log')->application,
         $params->has_max_len ? (max_len => $params->max_len) : (),
         $params->has_min_len ? (min_len => $params->min_len) : (),

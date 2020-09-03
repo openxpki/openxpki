@@ -1,4 +1,4 @@
-package OpenXPKI::Server::API2::Plugin::Crypto::validate_password::TopPasswords;
+package OpenXPKI::Server::API2::Plugin::Crypto::password_quality::TopPasswords;
 use strict;
 use warnings;
 
@@ -8,7 +8,7 @@ use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Crypto::validate_password::TopPasswords
+OpenXPKI::Server::API2::Plugin::Crypto::password_quality::TopPasswords
 
 =head1 DESCRIPTION
 
@@ -27,7 +27,7 @@ Returns an I<ArrayRef> of the top passwords.
 
 Might be called as class method, i.e.
 
-    OpenXPKI::Server::API2::Plugin::Crypto::validate_password::TopPasswords->list
+    OpenXPKI::Server::API2::Plugin::Crypto::password_quality::TopPasswords->list
 
 =cut
 

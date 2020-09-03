@@ -1,4 +1,4 @@
-package OpenXPKI::Server::API2::Plugin::Crypto::validate_password::Validate;
+package OpenXPKI::Server::API2::Plugin::Crypto::password_quality::Validate;
 use Moose;
 
 # Quite some code was borrowed from Data::Transpose::PasswordPolicy
@@ -17,7 +17,7 @@ use OpenXPKI::Debug;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Crypto::validate_password::Validate
+OpenXPKI::Server::API2::Plugin::Crypto::password_quality::Validate
 
 =head1 SYNOPSIS
 
@@ -148,9 +148,9 @@ has _errors => (
 
 
 with
-    'OpenXPKI::Server::API2::Plugin::Crypto::validate_password::CheckStandardRole',
-    'OpenXPKI::Server::API2::Plugin::Crypto::validate_password::CheckEntropyRole',
-    'OpenXPKI::Server::API2::Plugin::Crypto::validate_password::CheckLegacyRole',
+    'OpenXPKI::Server::API2::Plugin::Crypto::password_quality::CheckStandardRole',
+    'OpenXPKI::Server::API2::Plugin::Crypto::password_quality::CheckEntropyRole',
+    'OpenXPKI::Server::API2::Plugin::Crypto::password_quality::CheckLegacyRole',
 ;
 
 

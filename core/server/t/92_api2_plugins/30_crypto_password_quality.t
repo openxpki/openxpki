@@ -29,7 +29,7 @@ sub password_ok {
     my ($password, %config) = @_;
 
     lives_and {
-        cmp_deeply $api->validate_password(password => $password, %config), [];
+        cmp_deeply $api->password_quality(password => $password, %config), [];
     } "valid password $password";
 }
 
@@ -37,7 +37,7 @@ sub password_fails {
     my ($password, $expected, %config) = @_;
 
     lives_and {
-        cmp_deeply $api->validate_password(password => $password, %config), supersetof($expected);
+        cmp_deeply $api->password_quality(password => $password, %config), supersetof($expected);
     } "invalid password $password ($expected)";
 }
 

@@ -148,7 +148,7 @@ sub _init {
 sub validate {
     my ( $self, $wf, $password ) = @_;
 
-    my $errors = CTX('api2')->validate_password(
+    my $errors = CTX('api2')->password_quality(
         password => $password,
         %{ $self->api_args },
     );

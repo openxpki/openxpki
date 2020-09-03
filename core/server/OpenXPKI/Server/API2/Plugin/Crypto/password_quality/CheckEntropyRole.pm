@@ -1,9 +1,9 @@
-package OpenXPKI::Server::API2::Plugin::Crypto::validate_password::CheckEntropyRole;
+package OpenXPKI::Server::API2::Plugin::Crypto::password_quality::CheckEntropyRole;
 use feature 'unicode_strings';
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Crypto::validate_password::CheckEntropyRole - Check password entropy
+OpenXPKI::Server::API2::Plugin::Crypto::password_quality::CheckEntropyRole - Check password entropy
 
 =cut
 

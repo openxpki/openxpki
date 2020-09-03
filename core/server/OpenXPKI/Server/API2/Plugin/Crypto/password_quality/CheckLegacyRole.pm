@@ -1,8 +1,8 @@
-package OpenXPKI::Server::API2::Plugin::Crypto::validate_password::CheckLegacyRole;
+package OpenXPKI::Server::API2::Plugin::Crypto::password_quality::CheckLegacyRole;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Crypto::validate_password::CheckLegacyRole - Legacy password quality tests
+OpenXPKI::Server::API2::Plugin::Crypto::password_quality::CheckLegacyRole - Legacy password quality tests
 
 =cut
 

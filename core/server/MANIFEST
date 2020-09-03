@@ -235,8 +235,8 @@ OpenXPKI/Server/API2/Plugin/Crypto/generate_key.pm
 OpenXPKI/Server/API2/Plugin/Crypto/get_key_identifier_from_data.pm
 OpenXPKI/Server/API2/Plugin/Crypto/get_random.pm
 OpenXPKI/Server/API2/Plugin/Crypto/validate_key_params.pm
-OpenXPKI/Server/API2/Plugin/Crypto/validate_password.pm
-OpenXPKI/Server/API2/Plugin/Crypto/validate_password/Validate.pm
+OpenXPKI/Server/API2/Plugin/Crypto/password_quality.pm
+OpenXPKI/Server/API2/Plugin/Crypto/password_quality/Validate.pm
 OpenXPKI/Server/API2/Plugin/Datapool/create_datapool_encryption_key.pm
 OpenXPKI/Server/API2/Plugin/Datapool/get_data_pool_entry.pm
 OpenXPKI/Server/API2/Plugin/Datapool/get_datavault_status.pm

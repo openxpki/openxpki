@@ -1,8 +1,8 @@
-package OpenXPKI::Server::API2::Plugin::Crypto::validate_password::CheckStandardRole;
+package OpenXPKI::Server::API2::Plugin::Crypto::password_quality::CheckStandardRole;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Crypto::validate_password::CheckStandardRole - Standard password quality tests
+OpenXPKI::Server::API2::Plugin::Crypto::password_quality::CheckStandardRole - Standard password quality tests
 
 =cut
 
@@ -10,7 +10,7 @@ use Moose::Role;
 
 # Project modules
 use OpenXPKI::Debug;
-use OpenXPKI::Server::API2::Plugin::Crypto::validate_password::TopPasswords;
+use OpenXPKI::Server::API2::Plugin::Crypto::password_quality::TopPasswords;
 
 
 requires 'register_check';
@@ -69,7 +69,7 @@ has _top_passwords => (
     lazy => 1,
     default => sub {
         my $self = shift;
-        return OpenXPKI::Server::API2::Plugin::Crypto::validate_password::TopPasswords->list;
+        return OpenXPKI::Server::API2::Plugin::Crypto::password_quality::TopPasswords->list;
     },
 );
 
