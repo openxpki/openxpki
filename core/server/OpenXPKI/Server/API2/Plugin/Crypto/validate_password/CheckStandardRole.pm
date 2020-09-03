@@ -31,8 +31,7 @@ has top_passwords => (
     lazy => 1,
     default => sub {
         my $self = shift;
-        my $passwords = OpenXPKI::Server::API2::Plugin::Crypto::validate_password::TopPasswords->list;
-        return [ grep { length($_) >= $self->min_len and length($_) <= $self->max_len } @$passwords ];
+        return OpenXPKI::Server::API2::Plugin::Crypto::validate_password::TopPasswords->list;
     },
 );
 
