@@ -278,7 +278,7 @@ sub _calc_entropy {
         my $bits_per_char = log($pci) / log(2.0);
         $entropy = floor($bits_per_char * $eff_len);
     }
-
+    ##! 32: "Password entropy: $entropy"
     return $entropy;
 }
 

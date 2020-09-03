@@ -58,7 +58,7 @@ after hook_enable_checks => sub {
     # The has_xxx predicates must be called before any usage of their
     # respective attributes, as otherwise their default builder triggers
     # and has_xxx returns true.
-    $self->enable('groups') if $self->has_min_different_char_groups;
+    $self->enable('groups') and $self->disable('entropy') if $self->has_min_different_char_groups;
     $self->enable('partsequence') and $self->disable('sequence') if $self->has_sequence_len;
     $self->enable('partdict') and $self->disable('dict') if $self->has_min_dict_len;
 };
