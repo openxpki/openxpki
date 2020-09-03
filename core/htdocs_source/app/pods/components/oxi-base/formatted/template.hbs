@@ -1,4 +1,4 @@
-{{#let @content.value as |v|}}
+{{#let @value as |v|}}
 
     {{#if (eq this.format "certstatus")}}
         <OxiBase::Label @class="certstatus-{{lc (try v.value v.label)}}" @tooltip={{v.tooltip}} @text={{v.label}} @raw={{true}} />

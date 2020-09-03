@@ -3,11 +3,11 @@ import moment from "moment-timezone";
 
 export default class OxiFormattedComponent extends Component {
     get format() {
-        return (this.args.content.format || "text");
+        return (this.args.format || "text");
     }
 
     get valueStr() {
-        return (new String(this.args.content.value || "")).replace(/\r/gm, "");
+        return (new String(this.args.value || "")).replace(/\r/gm, "");
     }
 
     get valueSplitByNewline() {
@@ -15,13 +15,13 @@ export default class OxiFormattedComponent extends Component {
     }
 
     get timestamp() {
-        return (this.args.content.value > 0
-            ? moment.unix(this.args.content.value).utc().format("YYYY-MM-DD HH:mm:ss UTC")
+        return (this.args.value > 0
+            ? moment.unix(this.args.value).utc().format("YYYY-MM-DD HH:mm:ss UTC")
             : "---");
     }
 
     get styledValue() {
-        let m = this.args.content.value.match(/^(([a-z]+):)?(.*)$/m);
+        let m = this.args.value.match(/^(([a-z]+):)?(.*)$/m);
         return {
             style: m[2],
             label: m[3],

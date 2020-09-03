@@ -59,12 +59,12 @@
         {{#if this.model.status.href}}
             <a href="{{this.model.status.href}}" target="_blank">
                 <div class="alert {{this.statusClass}}" style="cursor:pointer;">
-                    {{this.model.status.message}}
+                    <OxiBase::Formatted @format="nl2br" @value={{this.model.status.message}}/>
                 </div>
             </a>
         {{else}}
             <div class="alert {{this.statusClass}}">
-                {{this.model.status.message}}
+                <OxiBase::Formatted @format="nl2br" @value={{this.model.status.message}}/>
             </div>
         {{/if}}
     </div>

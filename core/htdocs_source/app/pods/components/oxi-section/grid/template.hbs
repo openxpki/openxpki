@@ -73,7 +73,7 @@
                     {{/if}}
                     {{#each row.data as |value|}}
                         <td {{on "click" (fn this.executeAction row this.firstAction)}}>
-                            <OxiBase::Formatted @content={{value}}/>
+                            <OxiBase::Formatted @format={{value.format}} @value={{value.value}}/>
                         </td>
                     {{/each}}
                 </tr>
