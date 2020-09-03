@@ -878,7 +878,7 @@ msgstr "Password must contain digits."
 
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_GROUPS"
 msgstr ""
-"Password must contain more different character groups (digits, small/capital "
+"Password must contain characters from more different groups (digits, small/capital "
 "letters, others)."
 
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_LONG"
