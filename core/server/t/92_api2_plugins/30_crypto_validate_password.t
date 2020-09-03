@@ -70,22 +70,20 @@ password_fails "ab!123456789", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_SEQUE
 password_fails "!123aaaabbbbcc", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REPETITIONS", %legacy_conf;
 
 # repetitive
-password_fails "!d.4_sunset", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_DICT_WORD", %legacy_conf;
+password_fails "!d.4_SuNset", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_DICT_WORD", %legacy_conf;
 
 #
 # Tests - new algorithms
 #
 password_ok "v.s.pwd4oxi";
-password_ok "!d.4_sunset";
+password_ok "!d.4_SuNset";
 
 # top 10k password
-password_fails "scvMOFAS79", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_COMMON_PASSWORD";
-
-# top 10k password - leet speech
-password_fails "p1n3apple1", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_COMMON_PASSWORD";
+password_fails "pineapple1", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_COMMON_PASSWORD";
 
 # dictionary word
-password_fails "troubleshooting", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DICT_WORD";
+password_fails "tRoublEShooting", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DICT_WORD";
+password_fails "tr0ubl3shoot1NG", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DICT_WORD";
 password_fails scalar(reverse("troubleshooting")), "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REVERSED_DICT_WORD";
 
 # is sequence

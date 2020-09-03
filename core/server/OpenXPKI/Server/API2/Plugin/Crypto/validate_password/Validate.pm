@@ -427,7 +427,7 @@ my %leetperms = (
     'l' => qr{[l17\|]},
     'o' => qr{[o0]},
     's' => qr{[s5\$]},
-    't' => qr{[t\+7]},
+    't' => qr{[t7\+]},
     'x' => qr{[x%]},
     'z' => qr{[z2]},
     '0' => qr{[0o]},
@@ -458,22 +458,6 @@ my %leetperms = (
     '}' => qr{\}},
 );
 
-sub check_common {
-    my $self = shift;
-    my $found;
-    my $password = $self->password;
-    for my $common (@{$self->top_passwords}) {
-        if (_leet_string_match($password, $common)) {
-            $found = $common;
-            last;
-        }
-    }
-    if ($found) {
-        return [ common => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_COMMON_PASSWORD" ];
-    }
-    return;
-}
-
 sub _leet_string_match {
     my ($pwd, $known_pwd) = @_;
 
@@ -482,10 +466,24 @@ sub _leet_string_match {
     my @chars = split(//, $lc_known_pwd);
 
     # for each character we look up the regexp
-    my $re = join "", map { exists $leetperms{$_} ? $leetperms{$_} : qr/\Q$_\E/ } @chars;
+    my $re = join "", map { exists $leetperms{$_} ? $leetperms{$_} : $_ } @chars;
 
     if ($lc_pwd =~ m/^${re}$/i) {
         return $lc_known_pwd;
+    }
+    return;
+}
+
+sub check_common {
+    my $self = shift;
+    my $found;
+    my $password = $self->password;
+
+    for my $common (@{$self->top_passwords}) {
+        if ($password eq $common) { $found = $common; last }
+    }
+    if ($found) {
+        return [ common => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_COMMON_PASSWORD" ];
     }
     return;
 }
@@ -656,7 +654,7 @@ sub check_partdict {
 
     return $self->_check_dict(sub {
         my $word = shift;
-        if (index($pass, $word) > -1) {
+        if (index($pass, lc($word)) > -1) {
             return [ partdict => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_DICT_WORD" ];
         }
     });
@@ -664,13 +662,13 @@ sub check_partdict {
 
 sub check_dict {
     my $self = shift;
-    my $pass = lc($self->password);
+    my $pass = $self->password;
 
     my $dict = $self->_first_existing_dict or return;
 
     my $err;
     $err = $self->_check_dict(sub {
-        if (shift eq $pass) {
+        if (_leet_string_match($pass, shift)) {
             return [ dict => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DICT_WORD" ];
         }
     });
@@ -678,7 +676,7 @@ sub check_dict {
 
     my $reverse_pass = reverse($pass);
     $err = $self->_check_dict(sub {
-        if (shift eq $reverse_pass) {
+        if (_leet_string_match($reverse_pass, shift)) {
             return [ dict => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REVERSED_DICT_WORD" ];
         }
     });
@@ -695,7 +693,6 @@ sub _check_dict {
     while (my $dict_line  = <$fh>) {
         chomp ($dict_line);
         next if length($dict_line) < $self->min_dict_len;
-        $dict_line = lc($dict_line);
         if (my $err = $check_sub->($dict_line)) {
             close($fh);
             return $err;
