@@ -289,7 +289,7 @@ sub BUILD {
     # LEGACY
     $self->enable('groups') if $self->has_min_different_char_groups;
     $self->enable('partdict') and $self->disable('dict') if $self->has_min_dict_len;
-    $self->enable('partsequence') if $self->has_sequence_len;
+    $self->enable('partsequence') and $self->disable('sequence') if $self->has_sequence_len;
 
     # Info about used dictionary
     if ($self->is_enabled('dict') or $self->is_enabled('partdict')) {
