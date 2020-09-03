@@ -64,7 +64,8 @@ has log => (
     },
 );
 
-has registered_checks => (
+# Registered checks (check_name => method_name, check_name => method_name, ...)
+has _registered_checks => (
     is => 'rw',
     isa => 'HashRef[Str]',
     traits  => ['Hash'],
@@ -75,35 +76,25 @@ has registered_checks => (
         register_check => 'set',
         # Returns the method name by given check name
         registered_check_method => 'get',
-        # Returns the hash (check_name => method_name, check_name => method_name, ...)
-        all_registered_checks => 'elements',
         # Returns a list of all available check names
-        registered_check_names => 'keys',
+        registered_checks => 'keys',
     },
 );
 
-#
-# Validation data
-#
-
-# the password to test
-has password => (
+has _enabled_checks => (
     is => 'rw',
-    isa => 'Str',
-);
-
-# the password to test
-has pwd_length => (
-    is => 'ro',
-    isa => 'Num',
-    init_arg => undef,
+    isa => 'ArrayRef',
+    traits  => ['Array'],
+    init_arg => 'checks',
     lazy => 1,
-    default => sub { length(shift->password) },
-    clearer => 'clear_pwd_length',
+    default => sub { shift->_default_checks },
+    handles => {
+        enabled_checks => 'elements',
+    },
 );
 
-# accumulated error messages
-has _errors => (
+# filled by Moose roles
+has _default_checks => (
     is => 'rw',
     isa => 'ArrayRef',
     traits  => ['Array'],
@@ -112,23 +103,10 @@ has _errors => (
     default => sub { [] },
     handles => {
         # Returns the list of ArrayRefs [ error_code => message ]
-        get_errors => 'elements',
+        add_default_check => 'push',
     },
 );
 
-#
-# Configuration data
-#
-
-# Contains the disabled checks
-has enabled_checks => (
-    is => 'rw',
-    isa => 'HashRef',
-    lazy => 1,
-    default => sub { {} },
-);
-
-# Minimum length
 has max_len => (
     is => 'rw',
     isa => 'Int',
@@ -190,6 +168,41 @@ has min_different_char_groups => (
     lazy => 1,
     default => sub { 2 },
 );
+
+#
+# Validation data
+#
+
+# the password to test
+has password => (
+    is => 'rw',
+    isa => 'Str',
+);
+
+# the password to test
+has pwd_length => (
+    is => 'ro',
+    isa => 'Num',
+    init_arg => undef,
+    lazy => 1,
+    default => sub { length(shift->password) },
+    clearer => 'clear_pwd_length',
+);
+
+# accumulated error messages
+has _errors => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    traits  => ['Array'],
+    init_arg => undef,
+    lazy => 1,
+    default => sub { [] },
+    handles => {
+        # Returns the list of ArrayRefs [ error_code => message ]
+        get_errors => 'elements',
+    },
+);
+
 
 
 
@@ -267,6 +280,19 @@ So C<groups> may be set to a value between 1 and 4.
 sub BUILD {
     my ($self) = @_;
 
+    $self->log->info("Verifying password quality with these checks: " . join(", ", sort $self->enabled_checks));
+
+    # Check if someone tried to enable unknown checks
+    for my $check ($self->enabled_checks) {
+        if (not scalar grep { $_ eq $check } $self->registered_checks) {
+            die sprintf(
+                "Attempt to enable unknown password quality check '%s'\n"
+                ."Available checks: %s\n",
+                $check, join(", ", sort $self->registered_checks)
+            );
+        }
+    }
+
     # Info about used dictionary
     if ($self->is_enabled('dict') or $self->is_enabled('partdict')) {
         if ($self->_first_existing_dict) {
@@ -291,7 +317,7 @@ sub is_valid {
         $self->add_error([missing => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_PASSWORD_EMPTY"]);
     } else {
         # execute all registered checks that are enabled
-        my @checks = sort grep { $self->is_enabled($_) } $self->all_registered_checks;
+        my @checks = sort grep { $self->is_enabled($_) } $self->registered_checks;
         for my $check_name (@checks) {
             ##! 16: "Executing check $check_name";
             my $check_method = $self->registered_check_method($check_name);
@@ -339,14 +365,14 @@ sub reset {
 # Enable the given checks (list).
 sub disable {
     my $self = shift;
-    $self->_enable_or_disable_check("disable", @_);
+    $self->_enable_or_disable_check('disable', @_);
     return 1;
 }
 
 # Enable the given checks (list).
 sub enable {
     my $self = shift;
-    $self->_enable_or_disable_check("enable", @_);
+    $self->_enable_or_disable_check('enable', @_);
     return 1;
 }
 
@@ -354,23 +380,19 @@ sub enable {
 sub is_enabled {
     my $self = shift;
     my $check = shift;
-    return $self->_get_or_set_enable($check);
+    return scalar grep { $_ eq $check } $self->enabled_checks;
 }
-
 
 sub _enable_or_disable_check {
     my ($self, $action, @args) = @_;
-    if (@args) {
-        for my $what (@args) {
-            $self->_get_or_set_enable($what, $action);
-        }
-    }
-}
+    my @new_list = $self->enabled_checks;
 
-sub _get_or_set_enable {
-    my ($self, $what, $action) = @_;
-    $self->enabled_checks->{$what} = ($action eq 'enable') if $action;
-    return $self->enabled_checks->{$what};
+    for my $check (@args) {
+        # first remove name from list
+        my @new_list = grep { $_ ne $check } @new_list;
+        # then (re-)add it if enabled
+        push @new_list, $check if $action eq 'enable';
+    }
 }
 
 no Moose;

@@ -22,7 +22,7 @@ requires '_check_dict';
 requires 'min_different_char_groups';
 
 
-after BUILD => sub {
+before BUILD => sub { # # not "after BUILD" to allow consuming class to process and override enabled checks
     my $self = shift;
     ##! 16: 'Registering checks';
     $self->register_check(
