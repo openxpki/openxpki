@@ -90,6 +90,7 @@ has _enabled_checks => (
     is => 'rw',
     isa => 'ArrayRef',
     traits  => ['Array'],
+    predicate => 'has_enabled_checks',
     init_arg => 'checks',
     lazy => 1,
     default => sub { shift->_default_checks },
@@ -224,18 +225,16 @@ So C<groups> may be set to a value between 1 and 4.
 sub BUILD {
     my ($self) = @_;
 
-    $self->log->info("Verifying password quality with these checks: " . join(", ", sort $self->enabled_checks));
+    $self->hook_register_checks;
+    $self->hook_enable_checks unless $self->has_enabled_checks; # constructor argument "checks" wins over roles
 
-    # Check if someone tried to enable unknown checks
-    for my $check ($self->enabled_checks) {
-        if (not scalar grep { $_ eq $check } $self->registered_checks) {
-            die sprintf(
-                "Attempt to enable unknown password quality check '%s'\n"
-                ."Available checks: %s\n",
-                $check, join(", ", sort $self->registered_checks)
-            );
-        }
-    }
+    my $enabled_checks = join(", ", sort $self->enabled_checks);
+    ##! 32: "Registered checks: " . join(", ", sort $self->registered_checks);
+    ##! 16: "Enabled checks: $enabled_checks";
+    $self->log->info("Verifying password quality with these checks: $enabled_checks");
+
+    # Check if someone tried to enable unknown checks (via constructor argument)
+    $self->_assert_known_check($_) for $self->enabled_checks;
 
     # Info about used dictionary
     if ($self->is_enabled('dict') or $self->is_enabled('partdict')) {
@@ -244,6 +243,21 @@ sub BUILD {
         } else {
             $self->log->warn("No dictionary found - skipping dictionary checks");
         }
+    }
+}
+
+# hooks for roles
+sub hook_register_checks {}
+sub hook_enable_checks {}
+
+sub _assert_known_check {
+    my ($self, $check) = @_;
+    if (not scalar grep { $_ eq $check } $self->registered_checks) {
+        die sprintf(
+            "Attempt to enable unknown password quality check '%s'\n"
+            ."Available checks: %s\n",
+            $check, join(", ", sort $self->registered_checks)
+        );
     }
 }
 
@@ -263,7 +277,7 @@ sub is_valid {
         # execute all registered checks that are enabled
         my @checks = sort grep { $self->is_enabled($_) } $self->registered_checks;
         for my $check_name (@checks) {
-            ##! 16: "Executing check $check_name";
+            ##! 64: "Executing check $check_name";
             my $check_method = $self->registered_check_method($check_name);
             $self->add_error($self->$check_method);
         }
@@ -332,11 +346,14 @@ sub _enable_or_disable_check {
     my @new_list = $self->enabled_checks;
 
     for my $check (@args) {
+        $self->_assert_known_check($check);
         # first remove name from list
-        my @new_list = grep { $_ ne $check } @new_list;
+        @new_list = grep { $_ ne $check } @new_list;
         # then (re-)add it if enabled
         push @new_list, $check if $action eq 'enable';
     }
+
+    $self->_enabled_checks(\@new_list);
 }
 
 no Moose;

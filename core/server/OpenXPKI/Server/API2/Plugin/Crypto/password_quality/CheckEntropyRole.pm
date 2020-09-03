@@ -204,9 +204,8 @@ sub _build_unicode_blocks {
 }
 
 
-before BUILD => sub { # not "after BUILD" to allow consuming class to process and override enabled checks
+after hook_register_checks => sub {
     my $self = shift;
-    ##! 16: 'Registering checks';
     $self->register_check('entropy' => 'check_entropy');
     $self->add_default_check('entropy');
 };

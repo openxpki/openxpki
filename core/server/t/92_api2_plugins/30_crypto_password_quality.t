@@ -13,7 +13,9 @@ use Test::Exception;
 
 # Project modules
 use lib "$Bin/../lib";
+
 use OpenXPKI::Test;
+#use OpenXPKI::Debug; $OpenXPKI::Debug::BITMASK{'OpenXPKI::Server::API2::Plugin::Crypto::password_quality.*'} = 255;
 
 plan tests => 15;
 

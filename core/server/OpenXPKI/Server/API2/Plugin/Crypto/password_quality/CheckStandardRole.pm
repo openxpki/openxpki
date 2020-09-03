@@ -167,9 +167,8 @@ sub _build_leet_perms {
 }
 
 
-before BUILD => sub { # not "after BUILD" to allow consuming class to process and override enabled checks
+after hook_register_checks => sub {
     my $self = shift;
-    ##! 16: 'Registering checks';
     $self->register_check(
         'length'    => 'check_length',
         'common'    => 'check_common',
@@ -177,7 +176,6 @@ before BUILD => sub { # not "after BUILD" to allow consuming class to process an
         'sequence'  => 'check_sequence',
         'dict'      => 'check_dict',
     );
-
     $self->add_default_check(qw( length common diffchars sequence dict ));
 };
 

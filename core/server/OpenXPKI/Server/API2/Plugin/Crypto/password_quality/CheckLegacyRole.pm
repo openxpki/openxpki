@@ -39,9 +39,8 @@ has min_different_char_groups => (
 );
 
 
-before BUILD => sub { # # not "after BUILD" to allow consuming class to process and override enabled checks
+after hook_register_checks => sub {
     my $self = shift;
-    ##! 16: 'Registering checks';
     $self->register_check(
         'letters'       => 'check_letters',
         'digits'        => 'check_digits',
@@ -51,7 +50,10 @@ before BUILD => sub { # # not "after BUILD" to allow consuming class to process 
         'partsequence'  => 'check_partsequence',
         'partdict'      => 'check_partdict',
     );
+};
 
+after hook_enable_checks => sub {
+    my $self = shift;
     # ATTENTION:
     # The has_xxx predicates must be called before any usage of their
     # respective attributes, as otherwise their default builder triggers
