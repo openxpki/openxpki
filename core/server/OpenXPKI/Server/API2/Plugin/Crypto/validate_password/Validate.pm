@@ -15,7 +15,6 @@ use Moose::Util::TypeConstraints;
 
 # Project modules
 use OpenXPKI::Debug;
-use OpenXPKI::Server::API2::Plugin::Crypto::validate_password::TopPasswords;
 
 =head1 NAME
 
@@ -65,6 +64,24 @@ has log => (
     },
 );
 
+has registered_checks => (
+    is => 'rw',
+    isa => 'HashRef[Str]',
+    traits  => ['Hash'],
+    init_arg => undef,
+    lazy => 1,
+    default => sub { {} },
+    handles => {
+        register_check => 'set',
+        # Returns the method name by given check name
+        registered_check_method => 'get',
+        # Returns the hash (check_name => method_name, check_name => method_name, ...)
+        all_registered_checks => 'elements',
+        # Returns a list of all available check names
+        registered_check_names => 'keys',
+    },
+);
+
 #
 # Validation data
 #
@@ -108,9 +125,7 @@ has enabled_checks => (
     is => 'rw',
     isa => 'HashRef',
     lazy => 1,
-    default => sub {
-        +{ map { $_ => 1 } qw( common diffchars dict sequence ) }
-    },
+    default => sub { {} },
 );
 
 # Minimum length
@@ -166,20 +181,6 @@ has dictionaries => (
     ) ] },
 );
 
-has _first_existing_dict => (
-    is => 'ro',
-    isa => 'Str',
-    init_arg => undef,
-    lazy => 1,
-    default => sub {
-        my $self = shift;
-        for my $sym (@{$self->dictionaries}) {
-            return $sym if -r $sym;
-        }
-        return "";
-    },
-);
-
 # Minimal amount of different character groups (0 to 4)
 # Character groups: digits, small letters, capital letters, other characters
 has min_different_char_groups => (
@@ -190,16 +191,11 @@ has min_different_char_groups => (
     default => sub { 2 },
 );
 
-has top_passwords => (
-    is => 'rw',
-    isa => 'ArrayRef',
-    lazy => 1,
-    default => sub {
-        my $self = shift;
-        my $passwords = OpenXPKI::Server::API2::Plugin::Crypto::validate_password::TopPasswords->list;
-        return [ grep { length($_) >= $self->min_len and length($_) <= $self->max_len } @$passwords ];
-    },
-);
+
+
+with 'OpenXPKI::Server::API2::Plugin::Crypto::validate_password::CheckStandardRole',
+     'OpenXPKI::Server::API2::Plugin::Crypto::validate_password::CheckLegacyRole';
+
 
 =head1 PARAMETERS
 
@@ -271,19 +267,6 @@ So C<groups> may be set to a value between 1 and 4.
 sub BUILD {
     my ($self) = @_;
 
-    # ATTENTION:
-    # The has_xxx predicates must be called before any usage of their
-    # respective attributes, as otherwise their default builder triggers
-    # and has_xxx returns true.
-
-    $self->enable('dict') if $self->has_dictionaries;
-    $self->enable('diffchars') if $self->has_min_diff_chars;
-
-    # LEGACY
-    $self->enable('groups') if $self->has_min_different_char_groups;
-    $self->enable('partdict') and $self->disable('dict') if $self->has_min_dict_len;
-    $self->enable('partsequence') and $self->disable('sequence') if $self->has_sequence_len;
-
     # Info about used dictionary
     if ($self->is_enabled('dict') or $self->is_enabled('partdict')) {
         if ($self->_first_existing_dict) {
@@ -307,18 +290,13 @@ sub is_valid {
     if (not $self->password) {
         $self->add_error([missing => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_PASSWORD_EMPTY"]);
     } else {
-        $self->add_error($self->check_length);
-        $self->add_error($self->check_letters) if $self->is_enabled("letters");
-        $self->add_error($self->check_digits) if $self->is_enabled("digits");
-        $self->add_error($self->check_specials) if $self->is_enabled("specials");
-        $self->add_error($self->check_mixedcase) if $self->is_enabled("mixedcase");
-        $self->add_error($self->check_char_groups) if $self->is_enabled("groups");
-        $self->add_error($self->check_sequence) if $self->is_enabled("sequence");
-        $self->add_error($self->check_dict) if $self->is_enabled("dict");
-        $self->add_error($self->check_common) if $self->is_enabled("common");
-        $self->add_error($self->check_diffchars) if $self->is_enabled("diffchars");
-        $self->add_error($self->check_partsequence) if $self->is_enabled("partsequence");
-        $self->add_error($self->check_partdict) if $self->is_enabled("partdict");
+        # execute all registered checks that are enabled
+        my @checks = sort grep { $self->is_enabled($_) } $self->all_registered_checks;
+        for my $check_name (@checks) {
+            ##! 16: "Executing check $check_name";
+            my $check_method = $self->registered_check_method($check_name);
+            $self->add_error($self->$check_method);
+        }
     }
 
     return (scalar $self->get_errors ? 0 : 1);
@@ -393,306 +371,6 @@ sub _get_or_set_enable {
     my ($self, $what, $action) = @_;
     $self->enabled_checks->{$what} = ($action eq 'enable') if $action;
     return $self->enabled_checks->{$what};
-}
-
-#
-# Checks
-#
-
-sub check_length {
-    my $self = shift;
-    if ($self->pwd_length < $self->min_len) {
-        return [ "length" => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_SHORT" ];
-    }
-    if ($self->pwd_length > $self->max_len) {
-        return [ "length" => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_LONG" ];
-    }
-    return;
-}
-
-my %leetperms = (
-    'a' => qr{[a4]},
-    'b' => qr{[b8]},
-    'c' => qr{[c\(\{\[<]},
-    'e' => qr{[e3]},
-    'g' => qr{[g69]},
-    'i' => qr{[i1!\|]},
-    'l' => qr{[l17\|]},
-    'o' => qr{[o0]},
-    's' => qr{[s5\$]},
-    't' => qr{[t7\+]},
-    'x' => qr{[x%]},
-    'z' => qr{[z2]},
-    '0' => qr{[0o]},
-    '1' => qr{[1l]},
-    '2' => qr{[2z]},
-    '3' => qr{[3e]},
-    '4' => qr{[4a]},
-    '5' => qr{[5s]},
-    '6' => qr{[6g]},
-    '7' => qr{[7lt]},
-    '8' => qr{[8b]},
-    '9' => qr{[9g]},
-    # escape special regex characters so we can use all unknown characters
-    # without embedding them in a qr{\Q \E}
-    '\\' => qr{\\},
-    '^' => qr{\^},
-    '$' => qr{\$},
-    '.' => qr{\.},
-    '|' => qr{\|},
-    '?' => qr{\?},
-    '*' => qr{\*},
-    '+' => qr{\+},
-    '(' => qr{\(},
-    ')' => qr{\)},
-    '[' => qr{\[},
-    ']' => qr{\]},
-    '{' => qr{\{},
-    '}' => qr{\}},
-);
-
-sub _leet_string_match {
-    my ($pwd, $known_pwd) = @_;
-
-    my $lc_pwd = lc($pwd);
-    my $lc_known_pwd = lc($known_pwd);
-    my @chars = split(//, $lc_known_pwd);
-
-    # for each character we look up the regexp
-    my $re = join "", map { exists $leetperms{$_} ? $leetperms{$_} : $_ } @chars;
-
-    if ($lc_pwd =~ m/^${re}$/i) {
-        return $lc_known_pwd;
-    }
-    return;
-}
-
-sub check_common {
-    my $self = shift;
-    my $found;
-    my $password = $self->password;
-
-    for my $common (@{$self->top_passwords}) {
-        if ($password eq $common) { $found = $common; last }
-    }
-    if ($found) {
-        return [ common => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_COMMON_PASSWORD" ];
-    }
-    return;
-}
-
-sub check_diffchars {
-    my $self = shift;
-    my %found;
-    my @chars = split //, $self->password;
-    my %consecutives;
-    my $previous = "";
-    for my $c (@chars) {
-        $found{$c}++;
-
-        # check previous char
-        if ($previous eq $c) {
-            $consecutives{$c}++;
-        }
-        $previous = $c;
-    }
-
-    # check the number of chars
-    my $totalchar = scalar(keys(%found));
-        if ($totalchar <= $self->min_diff_chars) {
-        return [ diffchars => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DIFFERENT_CHARS" ];
-    }
-
-    my %reportconsec;
-    # check the consecutive chars;
-    while (my ($k, $v) =  each %consecutives) {
-        if ($v > 2) {
-            $reportconsec{$k} = $v + 1;
-        }
-    }
-
-    if (%reportconsec) {
-        # we see if subtracting the number of total repetition, we are
-        # still above the minimum chars.
-        my $passwdlen = $self->pwd_length;
-        for my $rep (values %reportconsec) {
-            $passwdlen = $passwdlen - $rep;
-        }
-        if ($passwdlen < $self->min_len) {
-            return [ diffchars => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REPETITIONS" ];
-        }
-    }
-
-    # Given we have enough different characters, we check also there
-    # are not some characters which are repeated too many times;
-    # max dimension is 1/3 of the password
-    # my $maxrepeat = int($self->pwd_length / 3);
-    # # now get the hightest value;
-    # my $max = 0;
-    # for my $v (values %found) {
-    #     $max = $v if ($v > $max);
-    # }
-    # if ($max > $maxrepeat) {
-    #     return [ diffchars => "Password contains too many repetitions of a single character." ];
-    # }
-
-    return;
-}
-
-sub check_char_groups {
-    my $self = shift;
-    my $groups = 0;
-    $groups += (defined $self->check_digits ? 0 : 1);
-    $groups += (defined $self->check_letters ? 0 : 1);
-    $groups += (defined $self->check_mixedcase ? 0 : 1);
-    $groups += (defined $self->check_specials ? 0 : 1);
-
-    if ($groups < $self->min_different_char_groups) {
-        return [ groups => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_GROUPS" ];
-    }
-    return;
-}
-
-sub check_digits {
-    my $self = shift;
-    if ($self->password !~ m/\d/) {
-        return [ digits => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DIGITS" ];
-    }
-    return;
-}
-
-sub check_letters {
-    my $self = shift;
-    if ($self->password !~ m/[a-zA-Z]/) {
-        return [letters => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LETTERS" ];
-    }
-    return;
-}
-
-sub check_mixedcase {
-    my $self = shift;
-    my $pass = $self->password;
-    if (not ($pass =~ m/[a-z]/ and $pass =~ m/[A-Z]/)) {
-        return [ mixed => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_MIXED_CASE"];
-    }
-    return;
-}
-
-sub check_specials {
-    my $self = shift;
-    if ($self->password !~ m/[\W_]/) {
-        return [ specials => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_SPECIAL_CHARS" ];
-    }
-    return;
-}
-
-my @sequence = (
-    [ qw/1 2 3 4 5 6 7 8 9 0/ ],
-    [ ("a" .. "z") ],
-    [ qw/q w e r t y u i o p/ ],
-    [ qw/q w e r t z u i o p/ ],
-    [ qw/a s d f g h j k l/ ],
-    [ qw/z x c v b n m/ ],
-    [ qw/y x c v b n m/ ],
-);
-
-sub check_sequence {
-    my $self = shift;
-    my $password = lc($self->password);
-
-    for my $row (@sequence) {
-        my $seq = join "", @$row;
-        if ($seq =~ m/\Q$password\Q/) {
-            return [ sequence => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_SEQUENCE" ];
-        }
-    }
-    return;
-}
-
-sub check_partsequence {
-    my $self = shift;
-    my $password = lc($self->password);
-
-    return $self->_check_seq_parts(sub {
-        if (index($password, shift) >= 0) {
-            return [ partsequence => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_SEQUENCE" ];
-        }
-    });
-}
-
-# Constructs sub-sequences of length $self->sequence_len from @sequence
-# and calls the given $check_sub with them.
-sub _check_seq_parts {
-    my ($self, $check_sub) = @_;
-
-    my $found;
-    my $range = $self->sequence_len - 1;
-    for my $row (@sequence) {
-        my @pat = @$row;
-        # we search a pattern of 3 consecutive keys, maybe 4 is reasonable enough
-        for (my $i = 0; $i <= ($#pat - $range); $i++) {
-            my $to = $i + $range;
-            my $substring = join("", @pat[$i..$to]);
-            if (my $err = $check_sub->($substring)) {
-                return $err;
-            }
-        }
-    }
-    return;
-}
-
-sub check_partdict {
-    my $self = shift;
-    my $pass = lc($self->password);
-
-    return $self->_check_dict(sub {
-        my $word = shift;
-        if (index($pass, lc($word)) > -1) {
-            return [ partdict => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_DICT_WORD" ];
-        }
-    });
-}
-
-sub check_dict {
-    my $self = shift;
-    my $pass = $self->password;
-
-    my $dict = $self->_first_existing_dict or return;
-
-    my $err;
-    $err = $self->_check_dict(sub {
-        if (_leet_string_match($pass, shift)) {
-            return [ dict => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DICT_WORD" ];
-        }
-    });
-    return $err if $err;
-
-    my $reverse_pass = reverse($pass);
-    $err = $self->_check_dict(sub {
-        if (_leet_string_match($reverse_pass, shift)) {
-            return [ dict => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REVERSED_DICT_WORD" ];
-        }
-    });
-
-    return $err;
-}
-
-sub _check_dict {
-    my ($self, $check_sub) = @_;
-
-    my $dict = $self->_first_existing_dict or return;
-
-    open my $fh, '<', $dict or return;
-    while (my $dict_line  = <$fh>) {
-        chomp ($dict_line);
-        next if length($dict_line) < $self->min_dict_len;
-        if (my $err = $check_sub->($dict_line)) {
-            close($fh);
-            return $err;
-        }
-    }
-    close($fh);
-    return;
 }
 
 no Moose;
