@@ -142,6 +142,12 @@ sub _init {
     # FIXME legacy parameter "following"
     $api_args->{sequence_len} = $params->{following} if exists $params->{following};
 
+    # deprecation warnings
+    my @deprecated = grep { exists $params->{$_} } qw( groups dictionary following following_keyboard );
+    if (scalar @deprecated) {
+        Log::Log4perl->get_logger('openxpki.deprecated')->error('OpenXPKI::Server::Workflow::Validator::PasswordQuality configured using deprecated parameters: ' . join(", ", @deprecated));
+    }
+
     $self->api_args($api_args);
 }
 
