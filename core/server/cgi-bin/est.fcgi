@@ -38,7 +38,7 @@ while (my $cgi = CGI::Fast->new()) {
 
     $log->debug('Incoming request ' . $ENV{REQUEST_URI});
     $ENV{REQUEST_URI} =~ m{.well-known/est/((\w+)/)?(cacerts|simpleenroll|simplereenroll|csrattrs)};
-    my $label = $2 || '';
+    my $label = $2 || 'default';
     my $operation = $3;
 
     if (!$operation) {
@@ -49,6 +49,8 @@ while (my $cgi = CGI::Fast->new()) {
         next;
 
     }
+
+    $log->trace(sprintf("Incoming EST request %s on endpoint %s", $operation, $label));
 
     # set label as endpoint
     $config->endpoint($label);
@@ -67,6 +69,7 @@ while (my $cgi = CGI::Fast->new()) {
     my %envkeys;
     if ($conf->{$operation}->{env}) {
         %envkeys = map {$_ => 1} (split /\s*,\s*/, $conf->{$operation}->{env});
+        $log->trace("Found env keys " . $conf->{$operation}->{env});
     } elsif ($operation =~ /enroll/) {
         %envkeys = ( signer_cert => 1 );
     }
@@ -78,6 +81,22 @@ while (my $cgi = CGI::Fast->new()) {
 
     if ($envkeys{'endpoint'}) {
         $param->{'endpoint'} = $config->endpoint();
+    }
+
+    # be lazy and use endpoint name as servername
+    if ($envkeys{'server'}) {
+        if ($servername) {
+            $log->error("ENV server and servername are both set but are mutually exclusive");
+            print $cgi->header( -status => '500 env:server and servername are mutually exclusive');
+            next;
+        }
+        if (!$config->endpoint()) {
+            $log->error("ENV server requested but endpoint is not set");
+            print $cgi->header( -status => '500 env:server and servername are mutually exclusive');
+            next;
+        }
+        $param->{'server'} = $config->endpoint();
+        $param->{'interface'} = 'rpc';
     }
 
     # Gather data from TLS session
@@ -125,6 +144,8 @@ while (my $cgi = CGI::Fast->new()) {
 
     my $out;
     my $mime = "application/pkcs7-mime; smime-type=certs-only";
+
+    $log->trace(sprintf('Extra params for %s: %s ', $operation, Dumper $param )) if ($log->is_trace());
 
     if ($operation eq 'cacerts') {
 

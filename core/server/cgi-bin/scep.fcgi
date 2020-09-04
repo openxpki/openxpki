@@ -35,7 +35,7 @@ while (my $cgi = CGI::Fast->new()) {
     my $socket  = $conf->{global}->{socket};
     my $realm   = $conf->{global}->{realm};
     my $iprange = $conf->{global}->{iprange};
-    my $server  = $conf->{global}->{servername};
+    my $server  = $conf->{global}->{servername} || $config->endpoint();
     my $enc_alg = $conf->{global}->{encryption_algorithm};
     my $hash_alg = $conf->{global}->{hash_algorithm};
 

@@ -232,14 +232,25 @@ sub config() {
     # SCRIPT_URL is only available with mod_rewrite
     if (defined $ENV{SCRIPT_URL}) {
         $ENV{SCRIPT_URL} =~ qq|${service}/([^/]+)(/([\\w\\-\\/]*))?\$|;
-        $self->endpoint($1);
-        $self->route($3) if ($3);
+
+        if ($service eq 'est' && !$3) {
+            $self->endpoint('default');
+            $self->route($1);
+        } else {            
+            $self->endpoint($1);
+            $self->route($3) if ($3);
+        }
 
     # Should always work
     } elsif (defined $ENV{REQUEST_URI}) {
         $ENV{REQUEST_URI} =~ qq|${service}/([^/\?]+)(/([\\w\\-\\/]*))?(\\?.*)?\$|;
-        $self->endpoint($1);
-        $self->route($3) if ($3);
+        if ($service eq 'est' && !$3) {
+            $self->endpoint('default');
+            $self->route($1);
+        } else {            
+            $self->endpoint($1);
+            $self->route($3) if ($3);
+        }
 
     # Hopefully never seen
     # TODO no path is fine with e.g. EST

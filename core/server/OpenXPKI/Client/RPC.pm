@@ -30,7 +30,7 @@ sub _init_backend {
     return OpenXPKI::Client::Simple->new({
         logger => $config->logger(),
         config => $conf->{global}, # realm and locale
-        auth => $conf->{auth}, # auth config
+        auth => $conf->{auth} || {}, # auth config
     });
 
 }

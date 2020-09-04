@@ -74,11 +74,25 @@ while (my $cgi = CGI::Fast->new()) {
 
     my $client;
 
-    my $conf = $config->config();
+    my $conf;
+    eval { $conf = $config->config(); };
+    if (!$conf) {
+        $log->error($EVAL_ERROR);
+        send_output( $cgi,  { error => {
+            code => 50007,
+            message=> "Requested endpoint is not properly configured",
+            data => { pid => $$ }
+        }});
+        next;
+    }
 
     my $rpc = OpenXPKI::Client::RPC->new( config => $config );
 
     my $method = $cgi->param('method');
+
+    my $servername = $conf->{$method}->{servername} || '';
+    Log::Log4perl::MDC->put('server', $servername);
+    Log::Log4perl::MDC->put('endpoint', $config->endpoint());
 
     my $input_method = $ENV{'REQUEST_METHOD'};
 
@@ -182,11 +196,6 @@ while (my $cgi = CGI::Fast->new()) {
         next;
     }
 
-    my $servername = $conf->{$method}->{servername} || '';
-
-    Log::Log4perl::MDC->put('server', $servername);
-    Log::Log4perl::MDC->put('endpoint', $config->endpoint());
-
     my $error = '';
 
     my $workflow_type = $conf->{$method}->{workflow};
@@ -240,6 +249,31 @@ while (my $cgi = CGI::Fast->new()) {
     # IP Transport
     if ($envkeys{'client_ip'}) {
         $param->{'client_ip'} = $ENV{REMOTE_ADDR};
+    }
+
+    # be lazy and use endpoint name as servername
+    if ($envkeys{'server'}) {
+        if ($servername) {
+            $log->error("ENV server and servername are both set but are mutually exclusive");
+            send_output( $cgi,  { error => {
+                code => 50005,
+                message=> "ENV server and servername are both set but are mutually exclusive",
+                data => { pid => $$ }
+            }});
+            next;
+        } elsif (!$config->endpoint()) {
+            $log->error("ENV server requested but endpoint is not set");
+            send_output( $cgi,  { error => {
+                code => 50006,
+                message=> "ENV server requested but endpoint is not set",
+                data => { pid => $$ }
+            }});
+            next;
+        } else {
+            $param->{'server'} = $config->endpoint();
+            $param->{'interface'} = 'rpc';
+            Log::Log4perl::MDC->put('server', $param->{'server'} );
+        }
     }
 
     if ($envkeys{'endpoint'}) {
