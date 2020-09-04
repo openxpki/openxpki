@@ -1082,6 +1082,10 @@ msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_GROUPS"
 msgstr "La Password non soddisfa i criteri della policy!"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_INSUFFICIENT_ENTROPY"
+msgstr "La Password non soddisfa i criteri della policy!"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_LONG"
 msgstr "La Password non soddisfa i criteri della policy!"
 

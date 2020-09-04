@@ -878,8 +878,11 @@ msgstr "Password must contain digits."
 
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_GROUPS"
 msgstr ""
-"Password must contain characters from more different groups (digits, small/capital "
-"letters, others)."
+"Password must contain characters from more different groups (digits, small/"
+"capital letters, others)."
+
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_INSUFFICIENT_ENTROPY"
+msgstr "Password entropy is too low. Try more or more diverse characters."
 
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_LONG"
 msgstr "Password is too long."

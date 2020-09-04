@@ -1154,6 +1154,10 @@ msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_GROUPS"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_INSUFFICIENT_ENTROPY"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_LONG"
 msgstr "SPKAC-строка пуста."
 

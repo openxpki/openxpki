@@ -886,6 +886,10 @@ msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_GROUPS"
 msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_INSUFFICIENT_ENTROPY"
+msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_LONG"
 msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
 
