@@ -90,8 +90,6 @@ while (my $cgi = CGI::Fast->new()) {
 
     my $method = $cgi->param('method');
 
-    my $servername = $conf->{$method}->{servername} || '';
-    Log::Log4perl::MDC->put('server', $servername);
     Log::Log4perl::MDC->put('endpoint', $config->endpoint());
 
     my $input_method = $ENV{'REQUEST_METHOD'};
@@ -195,6 +193,9 @@ while (my $cgi = CGI::Fast->new()) {
         }
         next;
     }
+
+    my $servername = $conf->{$method}->{servername} || '';
+    Log::Log4perl::MDC->put('server', $servername);
 
     my $error = '';
 
