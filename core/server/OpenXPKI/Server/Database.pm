@@ -175,7 +175,7 @@ sub _dbi_error_handler {
         dbi_error => $dbh->errstr,
         dsn => $self->driver->dbi_dsn,
         user => $self->driver->user,
-        $more_details ? %$more_details : (),
+        ref $more_details ? %$more_details : (),
     };
 
     my $method = "";
