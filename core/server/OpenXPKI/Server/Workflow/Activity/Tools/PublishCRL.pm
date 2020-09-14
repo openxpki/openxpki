@@ -164,10 +164,10 @@ sub execute {
             CTX('log')->application()->debug("Publishing failed with $eval_err");
             if ($on_error eq 'queue') {
                 push @failed, $target;
-                CTX('log')->application()->info("CRL pubication failed for target $target, requeuing");
+                CTX('log')->application()->info("CRL publication failed for target $target, requeuing");
 
             } elsif ($on_error eq 'skip') {
-                CTX('log')->application()->warn("CRL pubication failed for target $target and skip is set");
+                CTX('log')->application()->warn("CRL publication failed for target $target and skip is set");
 
             } else {
                 OpenXPKI::Exception->throw(
@@ -179,7 +179,7 @@ sub execute {
                 );
             }
         } else {
-            CTX('log')->application()->info("CRL pubication to $target for $crl_serial done");
+            CTX('log')->application()->info("CRL publication to $target for $crl_serial done");
         }
     }
 
@@ -199,7 +199,7 @@ sub execute {
             where => { crl_key => $crl_serial }
         );
 
-        CTX('log')->system()->info("CRL pubication date set for crl $crl_serial");
+        CTX('log')->system()->info("CRL publication date set for crl $crl_serial");
 
     }
 

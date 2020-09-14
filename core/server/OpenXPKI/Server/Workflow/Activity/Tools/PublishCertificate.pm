@@ -195,9 +195,9 @@ sub execute {
             }
             CTX('log')->application()->debug("Publication backend error was $eval_err");
         } elsif (!defined $res) {
-            CTX('log')->application()->warn("Entity pubication to $target for ". $publish_key." returned undef");
+            CTX('log')->application()->warn("Entity publication to $target for ". $publish_key." returned undef");
         } else {
-            CTX('log')->application()->info("Entity pubication to $target for ". $publish_key." done");
+            CTX('log')->application()->info("Entity publication to $target for ". $publish_key." done");
         }
     }
 

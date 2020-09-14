@@ -96,10 +96,10 @@ sub execute {
             CTX('log')->application()->debug("Publishing failed with $eval_err");
             if ($on_error eq 'queue') {
                 push @failed, $target;
-                CTX('log')->application()->info("CA pubication failed for target $target, requeuing");
+                CTX('log')->application()->info("CA publication failed for target $target, requeuing");
 
             } elsif ($on_error eq 'skip') {
-                CTX('log')->application()->warn("CA pubication failed for target $target and skip is set");
+                CTX('log')->application()->warn("CA publication failed for target $target and skip is set");
 
             } else {
                 OpenXPKI::Exception->throw(
@@ -111,7 +111,7 @@ sub execute {
                 );
             }
         } else {
-            CTX('log')->application()->info("CA pubication to $target for ". $data->{dn}{CN}[0]." done");
+            CTX('log')->application()->info("CA publication to $target for ". $data->{dn}{CN}[0]." done");
         }
     }
 
