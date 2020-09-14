@@ -198,9 +198,12 @@ sub execute {
     # explicit declaration as action parameter
     my @rules;
     if (ref $rules eq 'HASH') {
+        ##! 128: $rules
         @rules = sort keys %{$rules};
+        CTX('log')->application()->debug("SignerTrust explicit rules: ". join(",", @rules));
     } else {
         @rules = $config->get_keys( $rules );
+        CTX('log')->application()->debug("SignerTrust loading rules from $rules");
     }
 
     my $matched = 0;
