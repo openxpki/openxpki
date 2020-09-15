@@ -61,15 +61,19 @@ command "password_quality" => {
 } => sub {
     my ($self, $params) = @_;
 
+    # Turn $params object into hash
+    # FIXME Move this code into a new superclass for parameter objects
+    my %params_hash = ();
+    my $meta = $params->meta;
+    for my $attr ($meta->get_attribute_list) {
+        $params_hash{$attr} = $params->$attr if $meta->get_attribute($attr)->has_value($params);
+    }
+
+    # Pass parameters to worker class 1:1
+    # ("password" will be passed too, but Moose ignores superfluous parameters)
     my $validator = OpenXPKI::Server::API2::Plugin::Crypto::password_quality::Validate->new(
         log => CTX('log')->application,
-        $params->has_max_len ? (max_len => $params->max_len) : (),
-        $params->has_min_len ? (min_len => $params->min_len) : (),
-        $params->has_min_diff_chars ? (min_diff_chars => $params->min_diff_chars) : (),
-        $params->has_sequence_len ? (sequence_len => $params->sequence_len) : (),
-        $params->has_min_dict_len ? (min_dict_len => $params->min_dict_len) : (),
-        $params->has_dictionaries ? (dictionaries => $params->dictionaries) : (),
-        $params->has_min_different_char_groups ? (min_different_char_groups => $params->min_different_char_groups) : (),
+        %params_hash,
     );
 
     my $is_valid = $validator->is_valid($params->password);

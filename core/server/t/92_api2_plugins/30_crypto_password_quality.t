@@ -17,7 +17,7 @@ use lib "$Bin/../lib";
 use OpenXPKI::Test;
 #use OpenXPKI::Debug; $OpenXPKI::Debug::BITMASK{'OpenXPKI::Server::API2::Plugin::Crypto::password_quality.*'} = 255;
 
-plan tests => 16;
+plan tests => 17;
 
 #
 # Setup test context
@@ -95,5 +95,14 @@ my %entropy_only = (
     checks => 'entropy',
 );
 password_fails "abcdefghijklmnopqr", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_INSUFFICIENT_ENTROPY";
+
+#
+# only certain check
+#
+my %one_check = (
+    checks => [ 'dict' ],
+);
+
+password_ok "abcdefghijklmnopqr", %one_check; # should not throw an error as we only check for dictionary words
 
 1;
