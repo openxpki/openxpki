@@ -364,6 +364,7 @@ OpenXPKI/Server/Workflow/Activity/CSR/GeneratePKCS10.pm
 OpenXPKI/Server/Workflow/Activity/CSR/PersistRequest.pm
 OpenXPKI/Server/Workflow/Activity/EST/CACerts.pm
 OpenXPKI/Server/Workflow/Activity/EST/GenerateCSRAttribute.pm
+OpenXPKI/Server/Workflow/Activity/Log.pm
 OpenXPKI/Server/Workflow/Activity/Noop.pm
 OpenXPKI/Server/Workflow/Activity/Reports/CertExport/AddToQueue.pm
 OpenXPKI/Server/Workflow/Activity/Reports/CertExport/GenerateExportFile.pm
