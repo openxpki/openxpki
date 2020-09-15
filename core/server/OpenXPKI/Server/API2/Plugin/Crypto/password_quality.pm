@@ -55,6 +55,7 @@ command "password_quality" => {
     min_len => { isa => 'Int', },
     min_diff_chars => { isa => 'Int', },
     sequence_len => { isa => 'Int', },
+    min_entropy => { isa => 'Int', },
     min_dict_len => { isa => 'Int', },
     dictionaries => { isa => 'ArrayRef', },
     min_different_char_groups => { isa => 'Int', },

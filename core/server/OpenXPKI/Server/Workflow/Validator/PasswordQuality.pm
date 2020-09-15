@@ -129,6 +129,7 @@ sub _init {
         maxlen       => "max_len",
         dictionaries => "dictionaries",
         mindiffchars => "min_diff_chars",
+        minentropy   => "min_entropy",
         groups       => "min_different_char_groups",    # FIXME legacy parameter "groups"
         dictionary   => "min_dict_len",                 # FIXME legacy parameter "dictionary"
         following    => "sequence_len",                 # FIXME legacy parameter "following"

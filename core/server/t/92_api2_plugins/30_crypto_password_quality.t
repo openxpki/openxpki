@@ -18,7 +18,7 @@ use lib "$Bin/../lib";
 use OpenXPKI::Test;
 #use OpenXPKI::Debug; $OpenXPKI::Debug::BITMASK{'OpenXPKI::Server::API2::Plugin::Crypto::password_quality.*'} = 255;
 
-plan tests => 19;
+plan tests => 20;
 
 #
 # Setup test context
@@ -94,10 +94,16 @@ password_ok "tr0ubl3shoot1NG.";
 # is sequence
 password_fails "abcdefghijklmnopqr", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_SEQUENCE";
 
-my %entropy_only = (
-    checks => 'entropy',
-);
+#
+# entropy
+#
 password_fails "abcdefghijklmnopqr", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_INSUFFICIENT_ENTROPY";
+
+my %high_entropy = (
+    checks => [ 'entropy' ],
+    min_entropy => 200,
+);
+password_fails "!d.4_SuNset", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_INSUFFICIENT_ENTROPY", %high_entropy;
 
 #
 # only one check, custom dictionary
