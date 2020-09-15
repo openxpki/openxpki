@@ -5,6 +5,7 @@ use warnings;
 # Core modules
 use English;
 use FindBin qw( $Bin );
+use File::Temp qw( tempfile );
 
 # CPAN modules
 use Test::More;
@@ -17,7 +18,7 @@ use lib "$Bin/../lib";
 use OpenXPKI::Test;
 #use OpenXPKI::Debug; $OpenXPKI::Debug::BITMASK{'OpenXPKI::Server::API2::Plugin::Crypto::password_quality.*'} = 255;
 
-plan tests => 18;
+plan tests => 19;
 
 #
 # Setup test context
@@ -99,12 +100,20 @@ my %entropy_only = (
 password_fails "abcdefghijklmnopqr", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_INSUFFICIENT_ENTROPY";
 
 #
-# only certain check
+# only one check, custom dictionary
 #
+# create custom dictionary
+my $madeup_dict_word = "!d.4_SuNset";
+my ($dict_fh, $dict) = tempfile(UNLINK => 1);
+print $dict_fh "$madeup_dict_word\n";
+close $dict_fh;
+
 my %one_check = (
     checks => [ 'dict' ],
+    dictionaries => [ '/no/file/here', $dict ],
 );
 
 password_ok "abcdefghijklmnopqr", %one_check; # should not throw an error as we only check for dictionary words
+password_fails $madeup_dict_word, "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DICT_WORD", %one_check;
 
 1;
