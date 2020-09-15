@@ -139,7 +139,7 @@ sub _init {
 
     # checks and conversions
     configuration_error("Parameter 'checks' is not an array") if (exists $api_args->{checks} and ref $api_args->{checks} ne 'ARRAY');
-    $api_args->{dictionaries} = split(/,/, $api_args->{dictionaries}) if exists $api_args->{dictionaries};
+    $api_args->{dictionaries} = [ split(/\s*,\s*/, $api_args->{dictionaries}) ] if exists $api_args->{dictionaries};
 
     # deprecation warnings
     my @deprecated = grep { exists $params->{$_} } qw( groups dictionary following following_keyboard );

@@ -261,6 +261,8 @@ sub check_dict {
 
     my $dict = $self->_first_existing_dict or return;
 
+    ##! 64: "Using dictionary $dict"
+
     my $err;
     $err = $self->_check_dict(sub {
         if ($self->_leet_string_match($pass_lc, shift)) {

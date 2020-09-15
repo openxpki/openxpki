@@ -5,9 +5,10 @@ use warnings;
 # Core modules
 use FindBin qw( $Bin );
 use YAML::Tiny;
+use File::Temp qw( tempfile );
 
 # CPAN modules
-use Test::More tests => 5;
+use Test::More tests => 6;
 use Test::Deep;
 use Test::Exception;
 
@@ -101,7 +102,7 @@ sub password_fails {
 # Tests - FIXME legacy
 #
 
-my ($config, $configpart, @wf_types, $wf, $wf_seq, $wf_legacy);
+my ($config, $configpart, @wf_types, $wf, $wf_seq, $wf_legacy, $wf_dict);
 $config = {};
 
 # config 1: legacy
@@ -126,6 +127,20 @@ $config = { %$config, %$configpart };
     checks:
       - sequence
 ');
+push @wf_types, $wf_seq;
+$config = { %$config, %$configpart };
+
+# config 4: only check 'dict' with custom dictionary
+my $madeup_dict_word = "!d.4_SuNset";
+my ($dict_fh, $dict) = tempfile(UNLINK => 1);
+print $dict_fh "$madeup_dict_word\n";
+close $dict_fh;
+
+($wf_dict, $configpart) = create_wf_config("
+    checks:
+      - dict
+    dictionaries: /no/file/here , $dict
+");
 push @wf_types, $wf_seq;
 $config = { %$config, %$configpart };
 
@@ -161,5 +176,8 @@ password_fails("scvMOFAS79" => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_COMMON_PASSW
 
 # is sequence
 password_fails("abcdefghijklmnopqr" => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_SEQUENCE/, $wf_seq);
+
+# is sequence
+password_fails($madeup_dict_word => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_DICT_WORD/, $wf_dict);
 
 $oxitest->dbi->delete_and_commit(from => 'workflow', where => { workflow_type => [ @wf_types ] });
