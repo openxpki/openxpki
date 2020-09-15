@@ -9,6 +9,7 @@ use OpenXPKI::Template;
 use OpenXPKI::Debug;
 use Data::Dumper;
 use File::Temp;
+use MIME::Base64 qw(encode_base64);
 
 sub execute {
 
@@ -25,6 +26,8 @@ sub execute {
     my $private_key = $self->param('private_key') || '';
 
     my $target_key = $self->param('target_key') || 'certificate_export';
+
+    my $encode = $self->param('base64');
 
     my $key;
 
@@ -91,11 +94,14 @@ sub execute {
                 certid => $cert_identifier
             });
 
-            # If no template is given, we export only the private key
-            if (!$template) {
-                $context->param( $target_key  => $privkey );
+            # If template is given we add the key to the params list
+            # otherwise we directly export the (base64 encoded) private key
+            if ($template) {
+                $key = $privkey;
+            } elsif ($encode) {
+                $context->param( $target_key  => encode_base64($privkey, '') );
             } else {
-                $key = $privkey
+                $context->param( $target_key  => $privkey );
             }
         }
     }
@@ -253,5 +259,11 @@ provided). If false/not set, the target_key is just empty on error.
 The context key to write the result to, default is I<certificate_export>.
 Note: If you export a key and use a persisted workflow, this will leave the
 (password protected) key readable in the context forever.
+
+=item base64, optional
+
+Boolean, if set the output is wrapped by a base64 encoding to avoid raw
+binary data in context. This is ineffective when a template is set, use
+the template definition instead.
 
 =back

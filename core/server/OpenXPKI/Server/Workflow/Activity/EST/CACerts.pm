@@ -5,7 +5,6 @@ use strict;
 use Data::Dumper;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use MIME::Base64 qw(encode_base64);
 
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
