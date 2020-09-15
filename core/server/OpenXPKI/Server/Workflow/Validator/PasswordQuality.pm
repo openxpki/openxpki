@@ -122,25 +122,24 @@ sub _init {
 
     my $api_args = {};
 
-    if (exists $params->{checks}) {
-        configuration_error("Parameter 'checks' is not an array") if ref $params->{checks} ne 'ARRAY';
-        $api_args->{checks} = $params->{checks};
+    # map workflow parameters to API command parameters
+    my %param_map = (
+        checks       => "checks",
+        minlen       => "min_len",
+        maxlen       => "max_len",
+        dictionaries => "dictionaries",
+        mindiffchars => "min_diff_chars",
+        groups       => "min_different_char_groups",    # FIXME legacy parameter "groups"
+        dictionary   => "min_dict_len",                 # FIXME legacy parameter "dictionary"
+        following    => "sequence_len",                 # FIXME legacy parameter "following"
+    );
+    for (keys %param_map) {
+        $api_args->{$param_map{$_}} = $params->{$_} if exists $params->{$_};
     }
 
-    $api_args->{min_len} = $params->{minlen} if exists $params->{minlen};
-    $api_args->{max_len} = $params->{maxlen} if exists $params->{maxlen};
-
-    $api_args->{dictionaries} = split(/,/, $params->{dictionaries}) if exists $params->{dictionaries};
-    $api_args->{min_diff_chars} = $params->{mindiffchars} if exists $params->{mindiffchars};
-
-    # FIXME legacy parameter "groups"
-    $api_args->{min_different_char_groups} = $params->{groups} if exists $params->{groups};
-
-    # FIXME legacy parameter "dictionary"
-    $api_args->{min_dict_len} = $params->{dictionary} if exists $params->{dictionary};
-
-    # FIXME legacy parameter "following"
-    $api_args->{sequence_len} = $params->{following} if exists $params->{following};
+    # checks and conversions
+    configuration_error("Parameter 'checks' is not an array") if (exists $api_args->{checks} and ref $api_args->{checks} ne 'ARRAY');
+    $api_args->{dictionaries} = split(/,/, $api_args->{dictionaries}) if exists $api_args->{dictionaries};
 
     # deprecation warnings
     my @deprecated = grep { exists $params->{$_} } qw( groups dictionary following following_keyboard );
