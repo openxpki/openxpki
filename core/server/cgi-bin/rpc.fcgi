@@ -514,7 +514,7 @@ The keys I<server> and I<endpoint> fill the parameters with the same name
 with the autodetected value from the URI path.
 
 The keys I<signer_cert/signer_dn> are only available on authenticated TLS
-conenctions and are filled with the PEM block and the full subject dn
+connections and are filled with the PEM block and the full subject dn
 of the client certificate. Note that this data is only available if the
 ExportCertData and StdEnvVars option is set in the apache config!
 
@@ -634,7 +634,7 @@ An explicit servername was set while env=server is also set.
 
 =item 50006 - no endpoint name for env=server
 
-The script parh could not be parsed for an endpoint name but env=server
+The script path could not be parsed for an endpoint name but env=server
 is requested.
 
 =back
