@@ -17,7 +17,7 @@ use lib "$Bin/../lib";
 use OpenXPKI::Test;
 #use OpenXPKI::Debug; $OpenXPKI::Debug::BITMASK{'OpenXPKI::Server::API2::Plugin::Crypto::password_quality.*'} = 255;
 
-plan tests => 17;
+plan tests => 18;
 
 #
 # Setup test context
@@ -87,6 +87,8 @@ password_fails "pineapple1", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_COMMON_PASSWORD"
 password_fails "tRoublEShooting", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DICT_WORD";
 password_fails "tr0ubl3shoot1NG", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DICT_WORD";
 password_fails scalar(reverse("troubleshooting")), "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REVERSED_DICT_WORD";
+
+password_ok "tr0ubl3shoot1NG.";
 
 # is sequence
 password_fails "abcdefghijklmnopqr", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_SEQUENCE";

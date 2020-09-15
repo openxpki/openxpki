@@ -38,6 +38,14 @@ has min_different_char_groups => (
     default => sub { 2 },
 );
 
+# Minimal length for dictionary words that are not allowed to appear in the password.
+has min_dict_len => (
+    is => 'rw',
+    isa => 'Num',
+    predicate => 'has_min_dict_len',
+    lazy => 1,
+    default => sub { 4 },
+);
 
 after hook_register_checks => sub {
     my $self = shift;
@@ -146,12 +154,13 @@ sub check_partdict {
     my $self = shift;
     my $pass = lc($self->password);
 
+    # _check_dict() is defined in OpenXPKI::Server::API2::Plugin::Crypto::password_quality::CheckStandardRole
     return $self->_check_dict(sub {
         my $word = shift;
         if (index($pass, lc($word)) > -1) {
             return [ partdict => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_DICT_WORD" ];
         }
-    });
+    }, $self->min_dict_len);
 }
 
 1;

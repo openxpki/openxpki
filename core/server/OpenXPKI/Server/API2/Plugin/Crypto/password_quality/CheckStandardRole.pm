@@ -41,15 +41,6 @@ has min_diff_chars => (
     default => sub { 6 },
 );
 
-# Minimal length for dictionary words that are not allowed to appear in the password.
-has min_dict_len => (
-    is => 'rw',
-    isa => 'Num',
-    predicate => 'has_min_dict_len',
-    lazy => 1,
-    default => sub { 4 },
-);
-
 has dictionaries => (
     is => 'rw',
     isa => 'ArrayRef',
@@ -287,16 +278,22 @@ sub check_dict {
     return $err;
 }
 
+# If $min_len is undef we ignore dictionary words with a different length than the password
 sub _check_dict {
-    my ($self, $check_sub) = @_;
+    my ($self, $check_sub, $min_len) = @_;
 
     my $dict = $self->_first_existing_dict or return;
-    my $min_len = $self->min_dict_len;
 
     open my $fh, '<', $dict or return;
     while (my $dict_line  = <$fh>) {
         chomp ($dict_line);
-        next if length($dict_line) < $min_len;
+
+        if (defined $min_len) {
+            next if length($dict_line) < $min_len;
+        } else {
+            next if length($dict_line) != $self->pwd_length;
+        }
+
         if (my $err = $check_sub->($dict_line)) {
             close($fh);
             return $err;
@@ -306,6 +303,10 @@ sub _check_dict {
     return;
 }
 
+# NOTE: _check_dict() only checks against dictionary words with the
+# same length as the password. If _leet_string_match() should ever be
+# extended so that e.g. "A" is mapped to "/\" (two characters) then
+# _check_dict() needs to be adjusted too.
 sub _leet_string_match {
     my ($self, $lc_pwd, $known_word) = @_;
 
