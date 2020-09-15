@@ -277,9 +277,10 @@ sub is_valid {
         # execute all registered checks that are enabled
         my @checks = sort grep { $self->is_enabled($_) } $self->registered_checks;
         for my $check_name (@checks) {
-            ##! 64: "Executing check $check_name";
             my $check_method = $self->registered_check_method($check_name);
-            $self->add_error($self->$check_method);
+            my $error = $self->$check_method;
+            ##! 64: "Result of check '$check_name': " . ($error ? 'FAILED' : 'OK')
+            $self->add_error($error);
         }
     }
 
