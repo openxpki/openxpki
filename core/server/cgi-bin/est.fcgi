@@ -59,6 +59,12 @@ while (my $cgi = CGI::Fast->new()) {
 
     my $param = {};
 
+    # look for preset params
+    foreach my $key (keys %{$conf->{$operation}}) {
+        next unless ($key =~ m{preset_(\w+)});
+        $param->{$1} = $conf->{$operation}->{$key};
+    }
+
     my $servername = $conf->{$operation}->{servername} || $conf->{global}->{servername};
     # if given, append to the paramter list
     if ($servername) {

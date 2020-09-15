@@ -210,10 +210,16 @@ while (my $cgi = CGI::Fast->new()) {
         next;
     }
 
+    my $param;
+    # look for preset params
+    foreach my $key (keys %{$conf->{$method}}) {
+        next unless ($key =~ m{preset_(\w+)});
+        $param->{$1} = $conf->{$method}->{$key};
+    }
+
     # Only parameters which are whitelisted in the config are mapped!
     # This is crucial to prevent injection of server-only parameters
     # like the autoapprove flag...
-    my $param;
 
     if ($conf->{$method}->{param}) {
         my @keys;
@@ -502,7 +508,10 @@ certain information from the environment
   [RevokeCertificateByIdentifier]
   workflow = certificate_revocation_request_v2
   param = cert_identifier, reason_code, comment, invalidity_time
-  env = signer_cert, signer_dn, client_ip
+  env = signer_cert, signer_dn, client_ip, server, endpoint
+
+The keys I<server> and I<endpoint> fill the parameters with the same name
+with the autodetected value from the URI path.
 
 The keys I<signer_cert/signer_dn> are only available on authenticated TLS
 conenctions and are filled with the PEM block and the full subject dn
@@ -510,7 +519,8 @@ of the client certificate. Note that this data is only available if the
 ExportCertData and StdEnvVars option is set in the apache config!
 
 If the workflow uses endpoint specific configuraton, you must also set the
-name of the server using the I<servername> key.
+name of the server using the I<servername> key. This is mutually exclusive
+with env=server.
 
   [RevokeCertificateByIdentifier]
   workflow = certificate_revocation_request_v2
@@ -612,6 +622,20 @@ be found in the error message.
 
 The request was handled by the server properly but the workflow has
 encountered an unexpected state.
+
+=item 50004 - error getting OpenAPI spec
+
+The openapi-spec could not be loaded. Usually this means that not all
+parameters are defined in the expeced format.
+
+=item 50005 - inconsistent configuration
+
+An explicit servername was set while env=server is also set.
+
+=item 50006 - no endpoint name for env=server
+
+The script parh could not be parsed for an endpoint name but env=server
+is requested.
 
 =back
 
