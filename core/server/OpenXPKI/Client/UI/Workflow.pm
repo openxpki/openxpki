@@ -2859,21 +2859,24 @@ sub __render_fields {
 
         if ($field->{template}) {
 
-            my $param = { value => $item->{value} };
-
-            $self->logger()->trace('Render output using template on field '.$key.', '. $field->{template} . ', params:  ' . Dumper $param) if $self->logger->is_trace;
+            $self->logger()->trace('Render output using template on field '.$key.', '. $field->{template} . ', value:  ' . Dumper $item->{value}) if $self->logger->is_trace;
 
             # Rendering target depends on value format
             # deflist iterates over each key/label pair and sets the return value into the label
             if ($item->{format} eq "deflist") {
-                foreach (@{$param->{value}}){
-                    $_->{value} = $self->send_command_v2( 'render_template', { template => $field->{template}, params => $_ } );
-                    $_->{format} = 'raw';
-                }
+                $item->{value} = [
+                    map {
+                        {
+                            value => $self->send_command_v2( 'render_template', { template => $field->{template}, params => $_ } ),
+                            format => 'raw',
+                        }
+                    }
+                    @{ $item->{value} }
+                ];
 
             # bullet list, put the full list to tt and split at the | as sep (as used in profile)
             } elsif ($item->{format} eq "ullist" || $item->{format} eq "rawlist") {
-                my $out = $self->send_command_v2( 'render_template', { template => $field->{template}, params => $param } );
+                my $out = $self->send_command_v2( 'render_template', { template => $field->{template}, params => { value => $item->{value} } } );
                 $self->logger()->debug('Return from template ' . $out );
                 if ($out) {
                     my @val = split /\s*\|\s*/, $out;
@@ -2885,10 +2888,10 @@ sub __render_fields {
 
             } elsif (ref $item->{value} eq 'HASH' && $item->{value}->{label}) {
                 $item->{value}->{label} = $self->send_command_v2( 'render_template', { template => $field->{template},
-                    params => { value => $param->{value}->{label} }} );
+                    params => { value => $item->{value}->{label} }} );
 
             } else {
-                $item->{value} = $self->send_command_v2( 'render_template', { template => $field->{template}, params => $param } );
+                $item->{value} = $self->send_command_v2( 'render_template', { template => $field->{template}, params => { value => $item->{value} } } );
             }
         }
 
