@@ -29,7 +29,7 @@ $result = $client->mock_request({
     page => 'login'
 });
 
-is($result->{page}->{label}, 'Please log in');
+is($result->{page}->{label}, 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN');
 is($result->{main}->[0]->{action}, 'login!stack');
 
 $result = $client->mock_request({

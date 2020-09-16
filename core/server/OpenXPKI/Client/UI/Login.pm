@@ -57,7 +57,7 @@ sub init_login_passwd {
 
     my $self = shift;
 
-    $self->_page ({'label' => 'Please log in'});
+    $self->_page ({'label' => 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN'});
     $self->_result()->{main} = [{ 'type' => 'form', 'action' => 'login!password', content => {
         fields => [
             { 'name' => 'username', 'label' => 'I18N_OPENXPKI_UI_LOGIN_USERNAME', 'type' => 'text' },
