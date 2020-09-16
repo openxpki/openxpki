@@ -106,7 +106,7 @@ sub add_config {
 
     # notify user about added custom config
     my $pkg = __PACKAGE__; my $line; my $i = 0;
-    while ($pkg and ($pkg eq __PACKAGE__ or $pkg =~ /^(Eval::Closure::|Class::MOP::)/)) {
+    while ($pkg and ($pkg eq __PACKAGE__ or $pkg =~ /^(Eval::Closure::|Class::MOP::|Moose::|OpenXPKI::Test$)/)) {
         ($pkg, $line) = (caller(++$i))[0,2];
     }
 
