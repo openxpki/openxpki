@@ -31,11 +31,34 @@ requires "password_hash";
 requires "testenv_root";
 
 
+=head1 CONSTRUCTOR PARAMETERS
+
+This role adds the following parameters to C<OpenXPKI::TestE<gt>new>:
+
+=over
+
+=item * I<test_realms> (optional) - ArrayRef of test realms to add.
+
+Default: [ qw( alpha beta gamma ) ].
+
+=cut
+has test_realms => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    lazy => 1,
+    default => sub { [ qw( alpha beta gamma ) ] },
+);
+
+=back
+
+=cut
+
+
 before 'init_user_config' => sub { # ... so we do not overwrite user supplied configs
     my $self = shift;
 
     # sample realms
-    for my $realm (qw( alpha beta gamma )) {
+    for my $realm (@{ $self->test_realms }) {
         $self->add_config(
             "realm.$realm" => {
                 "auth" => $self->auth_config, # $self->auth_config comes from OpenXPKI::Test
@@ -66,7 +89,8 @@ before 'init_user_config' => sub { # ... so we do not overwrite user supplied co
 after 'init_session_and_context' => sub {
     my $self = shift;
     # set PKI realm after init() as various init procedures overwrite the realm
-    $self->set_user("alpha" => "user") if $self->has_session;
+    my $realm = shift @{ $self->test_realms };
+    $self->set_user($realm => "user") if $self->has_session;
 };
 
 sub _crypto {
