@@ -741,7 +741,7 @@ constructor parameter C<add_config> to L<OpenXPKI::Test::ConfigWriter>.
 =cut
 sub init_user_config {
     my ($self) = @_;
-    for (keys %{ $self->user_config }) {
+    for (sort keys %{ $self->user_config }) { # sorting should help adding config items deeper in the tree after those at the top
         my $val = $self->user_config->{$_};
         # support config given as YAML string
         if (ref $val eq '') {
