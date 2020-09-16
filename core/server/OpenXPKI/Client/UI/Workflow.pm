@@ -2579,11 +2579,11 @@ sub __render_fields {
     } elsif ($view eq 'attribute' && (grep /attribute/, @{$wf_info->{handles}})) {
         my $attr = $wf_info->{workflow}->{attribute};
         foreach my $field (sort keys %{$attr }) {
-            push @fields_to_render, { name => $field, value => $attr->{$field}  };
+            push @fields_to_render, { name => $field, value => $attr->{$field} };
         }
     } elsif ($output) {
-        @fields_to_render = @{$wf_info->{state}->{output}};
-        $self->logger()->trace('Render output rules: ' . Dumper  \@fields_to_render  ) if $self->logger->is_trace;
+        @fields_to_render = @$output;
+        $self->logger()->trace('Render output rules: ' . Dumper  \@fields_to_render) if $self->logger->is_trace;
 
     } else {
         foreach my $field (sort keys %{$context}) {
@@ -2591,7 +2591,7 @@ sub __render_fields {
             next if ($field =~ m{ \A (wf_|_|workflow_id|sources) }x);
             push @fields_to_render, { name => $field };
         }
-        $self->logger()->trace('No output rules, render plain context: ' . Dumper  \@fields_to_render  ) if $self->logger->is_trace;
+        $self->logger()->trace('No output rules, render plain context: ' . Dumper  \@fields_to_render) if $self->logger->is_trace;
     }
 
     FIELD:
@@ -2634,7 +2634,7 @@ sub __render_fields {
             $item->{value} = $self->serializer()->deserialize( $item->{value} );
         }
 
-        # assign autoformat based on some assumptions if no format is set
+        # auto-assign format based on some assumptions if no format is set
         if (!$item->{format}) {
 
             # create a link on cert_identifier fields
@@ -2786,7 +2786,7 @@ sub __render_fields {
                 $self->logger()->trace( 'Profile fields' . Dumper $fields ) if $self->logger->is_trace;
 
                 foreach my $field (@$fields) {
-                    # this still uses "old" syntax - adjust after API refactoring
+                    # FIXME this still uses "old" syntax - adjust after API refactoring
                     my $key = $field->{id}; # Name of the context key
                     if ($raw->{$key}) {
                         push @val, { label => $field->{label}, value => $raw->{$key}, key => $key };
@@ -2866,7 +2866,6 @@ sub __render_fields {
             # Rendering target depends on value format
             # deflist iterates over each key/label pair and sets the return value into the label
             if ($item->{format} eq "deflist") {
-
                 foreach (@{$param->{value}}){
                     $_->{value} = $self->send_command_v2( 'render_template', { template => $field->{template}, params => $_ } );
                     $_->{format} = 'raw';
@@ -2874,7 +2873,6 @@ sub __render_fields {
 
             # bullet list, put the full list to tt and split at the | as sep (as used in profile)
             } elsif ($item->{format} eq "ullist" || $item->{format} eq "rawlist") {
-
                 my $out = $self->send_command_v2( 'render_template', { template => $field->{template}, params => $param } );
                 $self->logger()->debug('Return from template ' . $out );
                 if ($out) {
@@ -2890,9 +2888,7 @@ sub __render_fields {
                     params => { value => $param->{value}->{label} }} );
 
             } else {
-
                 $item->{value} = $self->send_command_v2( 'render_template', { template => $field->{template}, params => $param } );
-
             }
         }
 
@@ -2903,11 +2899,10 @@ sub __render_fields {
             (ref $item->{value} eq '' && $item->{value} ne '')))) {
             #noop
         } elsif ($item->{format} eq 'head' && $item->{empty}) {
-            # queue header element
+            # queue header element - we only add it (below) if a non-empty item follows
             $queued = $item;
-
         } else {
-            # add queded element if any
+            # add queued element if any
             if ($queued) {
                 push @fields, $queued;
                 $queued = undef;
