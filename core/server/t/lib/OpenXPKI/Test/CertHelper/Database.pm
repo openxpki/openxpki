@@ -1019,6 +1019,99 @@ sub _build_certs {
             private_key => "-----BEGIN ENCRYPTED PRIVATE KEY-----\nMIIFDjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQIoJgIbnq5r3MCAggA\nMBQGCCqGSIb3DQMHBAioJUmgKrFZEQSCBMis8a1EKX/dypouVRSdmazJJjESYZGj\ncIRH3NsyAY9vbThJlpA7HrSbZcOYmYQCOVvzDH6070r8DXdtzrZO+n3u5uuX5OZt\n1D19QwHw0zEmeNnGVsCo2Yy7AiCaIgEZ4JiupRLhKi+TBBFjyrt40ZtrlQkxQnk0\ntvqmFCrY3LdzP7mPKY2pnAHYtLsNtWao+bQrTchZjAo3RusTG2YYK2nG+LNwB8oZ\na0xFpzSQ6vkI1IBqRE7A0GebDIlNsZU2UeaH3LhhK3lilQ9GiBzoksYBQi0k76rz\nos5uYwWUdLxjqKGnG1VH9sAv3N37c0mwC613kjXcdZbJJ2fe9vKriP5Mcjua+2e+\nMEfQeEa9ABP423dKo7fN04r0vO/CmESysFygZNzU+f/Fj/KyhR3rLLRL3mX6qIZ9\n5SeDGnhCtu5oq91PAVfOd5KLr8eGwI5Yt9hm+NA/2t3K+pNYW2syzOw9/mgyLL3/\nRYuGCyW97rOqEHCW5B+7AtBek86j13dgTXAPuQIXTj8FFPtsI2l5x2J5fGtfSEzQ\nybdqRQgpcrxVlI67nqZjLC3i/BOd1S1hTAA6FbphXhhSFon+zEiKtR8gq+MCWI4I\nzfRTyo43r3I2cGdxjNAdyWGlsyp8lANQlidgxk2+AzvhJv2WIdcFD6Ub9PVkHWFg\nqJcktCDITGVDIO1t9+All/OG7nlrtquShHVGrjMJMJZm1SF090WCLou+/rnkabCH\nnQVeyLp2yfvYhPKLpWW1yIYqrxTSkf6n6QuipzvHsJmK0I3nMR8cMl5QuPnrCJxp\nfD1cvrY4MKuOd1Pe2smI+gid1jQcJ/rIh7FUslWKHD+JFVTGyUhbJNU663IpBRmL\ndmlUO0lqbgjONBWm1d1ZHX/2cUMhq1MkqTSzL0yXDePC7qt2CNz4z1ZJgChPbrwL\nYze8BvQhK3KigluEcgzSIEcbA10IqmQzX8p7ZoZI0Dhl2jKMQN2jEdp3PG151Q8M\np9lXCBL2pmE65WSdfWiA4gsYO44P5xlMWmfBpWMHll1vRV1cfgJA4/hkQud8Krw8\nywjcJurMcVEeRXmmM6GEfvSU1mqoTid5jYMuL9EvCRHltQ6skB+UusWPiEl+ODfv\nlz7+9Ltj79PpXkQEkeaWf5YBtrUa7YjYjcTpaqoS1okP06ZYayucTy+EdSivhj1R\nlZTsC4klCjHeHfaPOQYjwqOGs25HkQpzz/TofdBnDqpGXj3htQUAqm8GlW/EEhpp\nkQ1uWpk8SNMoB9K+MVER0SQZGipJKsVYvTGhUsu+bu/0XmBuIp1PIlVvNW4cXwJD\n2tEtJ9SsvaBFSW7WpcZrcumMQJByHXkHa/OsWLur3YI0/MCUjcqi5AHZtA1+2FB5\n5MkqxlZENLVKACvahGs+Q9b4Pm/T1RPhOBFaT+bgNlkApaaCAgnAN4FABr0FXHVO\niZtOfMZlvZdDNm5IHTB9ntZLtfP0vrvZ0EID7pyexUURtctjDzx1EsWmzqImCVsE\n8GScvqaKxtXJxjSh2vkqRuH4QLWi3VCBN0ZdiGfy1ADj9W2iFA+ZxA7fNkF56kei\n/vkPKvokczfjChklgPXvhX9iKJf+bidmhvWjgoapLAuSn5U+rWGocYnQgiOkyo+z\nuz4=\n-----END ENCRYPTED PRIVATE KEY-----",
         ),
 
+        'democa-root-2' => OpenXPKI::Test::CertHelper::Database::Cert->new(
+            label => 'DEMOCA Root CA 2',
+            name => 'democa-root-2',
+            db => {
+                authority_key_identifier => '13:85:FA:79:D7:82:DA:27:C5:A9:CD:FF:6D:5E:F1:8B:EA:11:B5:97',
+                cert_key => '2',
+                data => "-----BEGIN CERTIFICATE-----\nMIIDkTCCAnmgAwIBAgIBAjANBgkqhkiG9w0BAQsFADBZMRMwEQYKCZImiZPyLGQB\nGRYDT1JHMRgwFgYKCZImiZPyLGQBGRYIT3BlblhQS0kxDTALBgNVBAsMBEFDTUUx\nGTAXBgNVBAMMEERFTU9DQSBSb290IENBIDIwIhgPMjAxNzAxMDEwMDAwMDBaGA8y\nMTA1MDEzMTIzNTk1OVowWTETMBEGCgmSJomT8ixkARkWA09SRzEYMBYGCgmSJomT\n8ixkARkWCE9wZW5YUEtJMQ0wCwYDVQQLDARBQ01FMRkwFwYDVQQDDBBERU1PQ0Eg\nUm9vdCBDQSAyMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuoaqan2C\nx5CI8mUqQA3ho2hGTeQPouulmNBrofRE1lklJJUHJcpjFTYlTaSxbx5DYHBUWE9r\nwj9+h1Z8pwQvr2hTuFKeZPwKKP9CUBcDqoqaA1vARQDxYTb8cWhUgdAPQZRQf7Zr\nmzgR2Qkn7rf1T1kzgXtd3RVPU01MzR83OoF4oEm0hDZ+gUlweYGUCkJFaHGuNt8X\nWTN7+Epme7/3lKK9Qd5dwcqYXDTBWRSPb/ZFEZuNEpk+MH0qutmQme0dTMTCwO+M\n5FiZJlrptvCU+vhWMxO40fO2VuBz6QZR1+syfv+tmfv65uv4VlSqjpWKJFwwBswL\nf3TEINCkBaN3sQIDAQABo2AwXjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBQT\nhfp514LaJ8Wpzf9tXvGL6hG1lzAfBgNVHSMEGDAWgBQThfp514LaJ8Wpzf9tXvGL\n6hG1lzALBgNVHQ8EBAMCAQYwDQYJKoZIhvcNAQELBQADggEBACNtmtwC4ZT46e0U\n4HV/oOZTI0vI7MlETLzNksamfks2ab7S5cyeI/+PfIvHP4yYrSgSizXl91oRnZKf\nsxMuZlumeE/695G6C/ZVvahK+OSidLg2F1dvbLfTkFjuzBBUqWtr/q6D6aFG8YOF\na6AH9akf2BgX0ypaCyVWlTdyv1W3xBLuB75fTLVIdKLnginFcIHZCwt2HyqvvH6a\nS0em3+BnpSvDQg1N467D/anID5SiAfxwtneBxshIfTC3is/KYPSIWLeZjMPthhsE\nx3+DbjNCjKuk0x/B9kRmv+ORh90LilPK+DKVn65VA7QRmzdvhNfRBbt/EUrZJsS9\nQia7Jjw=\n-----END CERTIFICATE-----",
+                hold_instruction_code => undef,
+                identifier => 'e_ounQEZ8bB4xdHvPlZb71uzy44',
+                invalidity_time => undef,
+                issuer_dn => 'CN=DEMOCA Root CA 2,OU=ACME,DC=OpenXPKI,DC=ORG',
+                issuer_identifier => 'e_ounQEZ8bB4xdHvPlZb71uzy44',
+                notafter => '4262889599', # 2105-01-31T23:59:59
+                notbefore => '1483228800', # 2017-01-01T00:00:00
+                pki_realm => 'democa',
+                reason_code => undef,
+                req_key => undef,
+                revocation_id => undef,
+                revocation_time => undef,
+                status => 'ISSUED',
+                subject => 'CN=DEMOCA Root CA 2,OU=ACME,DC=OpenXPKI,DC=ORG',
+                subject_key_identifier => '13:85:FA:79:D7:82:DA:27:C5:A9:CD:FF:6D:5E:F1:8B:EA:11:B5:97',
+            },
+            db_alias => {
+                alias => 'root-2',
+                generation => '2',
+                group_id => 'root',
+            },
+            private_key => "-----BEGIN ENCRYPTED PRIVATE KEY-----\nMIIFDjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQIgGSXaRWQryACAggA\nMBQGCCqGSIb3DQMHBAjBXofDm/biBwSCBMhSCuUI3Dk43qSbN480JXfSKeF7bqB+\nX7KAvvEbnRMCJ93VVahEmzdeNW8IADqbUS6ns7RkwOnBhK1kEV0CrUVRPm0/sDpE\niu9NE4bUupLy118+Sa5qUWpFyO7Ex8ZtNNHnf7UKXnFDyIPkPH7Ddo2hSXSCwtMQ\n/e7Lvz6H88NJM8LVrZz+gY8JEygd5muSmcwh83bh707DIzzFwvlYd3jUAFFvt6d0\nUFulhVKqsGdQkSFqxUm1iwInOWc5uUK0Le4AuKlI6fCE+lvbwiMSjtP7okSsN5Vo\nUxcAEA/Ihhad9HIUbo1B6tDOEZfnfLQ4lk/7TClznEtKVyNrG8YgxqOwZQSUiYqh\nO7SES8BRmJXEtJhpX2zgBZyi5nQjfJ6PZolBi90OZ9HUyUvuGIjN0oWXQEnmcyUx\nf+enY0uzPoUGgZjnNSJ94tUuirKwZmhug0a+quorlHxmP1oGkOdEi66tEW49rc+e\nZw5qF0sJdcX8imwnL/dlovJ8LZ63YwD/Lz4ZXtxjHGGUhTze67jc+YSzhFC6Cdr9\nkBTszAru4gF8GOKU68VJwN5eImtfvgsOHYFT3N2CaZ4HcOaVR2L/WdNpLFGCkyK9\nEc0/x+IaObeCVK/dDfIVN6Kt5D6zNUe+y6oq30klTYIAg9H4vAwuALZ+6oXd7h+z\nmBZkcCHJv39VeRIitdU0lCuGZU+XqRYEUrLDJh4epPPS3xPvpMRd3l2byzKhggzp\nqWBveNcsiEW3C5XqhyQ4rXrFUaXeIBE/s0akT+qcIWj8b0EK2GEZjujzk5WsM6HA\ntQVfjQW5d4OMHMUuT49QiF5HE29FrYwjaxXqIAlReGKKxIdvI8NEgv1FyJxyCwuM\nxibY9ru4wPLPYL6pQ26hZLbTEHPIrlckw+0d8azVT0QoCP+2KuJ+HQkhzapgrMHx\nNHI5G/t9pT6CFxGb7QDRg9ELizvCrwvBoief4c1cKGZY9yW5n41+ngh6UXJojjhz\nkNOZQ5c0orK8dqPXODbjBeZz0ZEDGmulKjps7ICGnxR+NZscXMqfcZI+QhMsMZZu\n9l9DK/VIRVY3UeAJgK7TPxPNCkHmZzbnH/OzyUFYbm5ZG60uhvQdx8uAR1tWbPl4\nSaYeDFz/PjoOGFg49/P6P6un1QrgmnijtYqdZbxb/Lgp3ePI7pJbCK39g1AukysO\nKCma8tAJgGh/iS3OAGQnU7oYTfZFehOabx8FPYa/BTZSL2VbQiJo+QT+G8fu19bB\nSvIOY4oF7JDuyskzAQf3RzUJShg/+fMTiy+3JYatch2aa/baB1xsUiF5SdgQXXme\nnoPXwlM7oiaGUmjQ3Hxfoe/y3Zm6r0zZNXAkxWzzQm5s/GFI/JG3ZZA46rJchrnx\n7T+3rcdm6Hg4i6Fj3oBsx0KyIzBTps+UM9L5V1U0IiEDsL7J5ZJEdQD5LCOBbZ5U\n1x8QicdRqYLwV6F7ktXy00wq+7/maxExIXwCiNVnK84z2F/hi4u96+DK//XwmuiM\nCctbqX+zqOHeAVG6g7Zo+r4IEMOlMkvlwj17Z5KAiXrMIMFVloQ9qXI93ueVN6lM\nscXgWcqNiyoBwaOuRyo0TfFYSdvEPEEG+qYHjNK5RUYWgJLnv4plWHu97mkMFoN+\n9vg=\n-----END ENCRYPTED PRIVATE KEY-----",
+        ),
+
+        'democa-signer-2' => OpenXPKI::Test::CertHelper::Database::Cert->new(
+            label => 'DEMOCA Signing CA 2',
+            name => 'democa-signer-2',
+            db => {
+                authority_key_identifier => '13:85:FA:79:D7:82:DA:27:C5:A9:CD:FF:6D:5E:F1:8B:EA:11:B5:97',
+                cert_key => '3',
+                data => "-----BEGIN CERTIFICATE-----\nMIIDlDCCAnygAwIBAgIBAzANBgkqhkiG9w0BAQsFADBZMRMwEQYKCZImiZPyLGQB\nGRYDT1JHMRgwFgYKCZImiZPyLGQBGRYIT3BlblhQS0kxDTALBgNVBAsMBEFDTUUx\nGTAXBgNVBAMMEERFTU9DQSBSb290IENBIDIwIhgPMjAxNzAxMDEwMDAwMDBaGA8y\nMTA1MDEzMTIzNTk1OVowXDETMBEGCgmSJomT8ixkARkWA09SRzEYMBYGCgmSJomT\n8ixkARkWCE9wZW5YUEtJMQ0wCwYDVQQLDARBQ01FMRwwGgYDVQQDDBNERU1PQ0Eg\nU2lnbmluZyBDQSAyMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyJ0r\ncllT04JmgMQDrgb/PSiisU55b0OC9ibZ6yx0e8wV2m//wkKfMZRxTA3182hvGBvH\nlIGSG1SVq2oXqiX+b0WeXR13CZ47wQ8IQ9nkdf43EYpY6WkLn/WIQ6UQ/0OOQJCs\nsvs033741Zvqxgxx56XnXK4eWfpClnJ2OA+Gx0smzHYc8bGhr65X/DFI2LMCMPWV\nZSBbIBX9FftgndcT+efmvfb6vjxkzehyi5lpON0dlEU6YT4bmxPruGbcAAktyb36\nsRMD09m0QnYPWi3HpzsECp87PommB5SsisqiMTyWy/7VeX1jY+WLmrEg5rBe+mTq\nht1xmxpqVWSOl9hNjQIDAQABo2AwXjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQW\nBBTzeJ0fgZBS3ESd0CjhlmY+Qwn/lzAfBgNVHSMEGDAWgBQThfp514LaJ8Wpzf9t\nXvGL6hG1lzALBgNVHQ8EBAMCAQYwDQYJKoZIhvcNAQELBQADggEBAAIX4hnlaoI2\ntToreUE5Bp7RUbARrdUPyeH1Xc6hm88YuFi4rSlM3T2c/CEl+8frCJmsVSjeBXlH\nnagWnEu7VuIt5ka7RmornWyV2weXnpQRZ2np5nbo6iihXnysRSeZeCUXspPvgQ5i\nZ/CGk1/uakS3BYiwl00xpUXv3Oaz33o4U/AnXihKw+4Huo0dfe49JZpqqXeoSWFo\nfbhQfYkaDv+RXb0yQvheLHCOPVX/i9Ss/geBz/bxO2TwJ+VRC9kSltB8RkZ8Cz9V\nYm7Vvgy89+0DVYl1oegd9QV4Bo/77xdQUNt53bV2OxjHG2RsrzVQ8wB6Mmzb1ZUC\nq5u05W09qSc=\n-----END CERTIFICATE-----",
+                hold_instruction_code => undef,
+                identifier => 'w8pxr7af7trT39_Xq7PA-yXQdG0',
+                invalidity_time => undef,
+                issuer_dn => 'CN=DEMOCA Root CA 2,OU=ACME,DC=OpenXPKI,DC=ORG',
+                issuer_identifier => 'e_ounQEZ8bB4xdHvPlZb71uzy44',
+                notafter => '4262889599', # 2105-01-31T23:59:59
+                notbefore => '1483228800', # 2017-01-01T00:00:00
+                pki_realm => 'democa',
+                reason_code => undef,
+                req_key => undef,
+                revocation_id => undef,
+                revocation_time => undef,
+                status => 'ISSUED',
+                subject => 'CN=DEMOCA Signing CA 2,OU=ACME,DC=OpenXPKI,DC=ORG',
+                subject_key_identifier => 'F3:78:9D:1F:81:90:52:DC:44:9D:D0:28:E1:96:66:3E:43:09:FF:97',
+            },
+            db_alias => {
+                alias => 'democa-signer-2',
+                generation => '2',
+                group_id => 'democa-signer',
+            },
+            private_key => "-----BEGIN ENCRYPTED PRIVATE KEY-----\nMIIFDjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQIS4qcY58bqzkCAggA\nMBQGCCqGSIb3DQMHBAimQeXLRc78XgSCBMgj2fU3gqW5hjeSE4bGLNiIDL63u6Up\nFuCiOjRKSUmOekkfGdbckqMw8wSu/6hr5rDBfMiMhMwAXVn7gnF4cxH9qPBnNt6j\nENOqlCS2h4q7x7NDBKWp5r3r/Telpb1GQduws+gFv93cDIcRpRdqTwCVkOSaUbvn\nXAqk4zeemxWvKv6dUbz0GH6PkJHXRHUH/S1wl9lkctPckUSuRsktGhApzN2pKrf3\nDd65jEkIiu23rv08VwsIlt0LCPAY0uXQrUouCxI8cDCScVnKtNLzfjVDeAygEIQb\ngHiVT04XHX/OuQHG1jgLAuwCTZ1wKHU1ySKpg1+JLUOcUcMd1LTq8Mpr9i/HH5hT\noYX04pAF5PD1XOwcpbs+QIkylzApcvJZcujXWTzYfgboFVTlz+USC+R3Ckj5nf7O\nLP18GoApNudWz6grc6WXlXANaOkhmrM3bg1nClgkyhpbOyfFkDGoAoDhcDlhMt05\neYa2YAG0Lqds3ElQqjK4Xd5BRwaq/4EJjXOd/8uApbg3vLb56NJT3ucC0QzIkIk2\nrf8RPP7EWkmK2RRkHztvXfZ1HApF5PAh+dXu6rNoyXnVpuGgTQ2nlWW7W5ngoeTB\nB/E5j3H9wj/K1jyodixn347z1b3us6NQ70HKSEnlDqPAsPpaZy5lcGKubCP6FhQR\nQgtIhiO0uuYQTa/ZiYhE0WoW743eiK8ofD7GB7SJC6ek1B9Q6aihp25yNd6Quz3+\nK2bWV+T5r7HMW/JYPtP6LWvu62XrlaNfqP2AnaycprVOokOBNU/Kax6UOTzgbr3X\nlHh5QU8u4+aOGjo1QBQGk5D96EkXJVREjbCV/wuStxSiIjM0pnB/XFkDZkpQ49+z\nD4iwaAJxsvJqiOlXi/2INpyZMQO9mS4oXv+CF1ZGLIwD7MNPGGVlMiexIENPWpTS\nropVtUU7VrP6JAsXwODW1Dx3XuW9O4N0MhQfhqV+9venTHfZmBYTvc6tjBd2rTRA\nribNmaicV24f3wRJtUz5n8BlfEU3KkdspDT4+oNISVIU4xS5ICL9junFxuJNde5H\nNk92Fy0TK0uaQXmHViF8yMjYtu9n9zJp/WfES2MsAkOHMmw9EOnXbbPfUcUsYVvh\nKX9K/xK9hB3Z1GqZAWm1kGVwztAqaAgegQO2ExySeqlctYrVkK4ixkpPNM15bREk\notyLRYIVHM/YMUY4GfDWGZUgplR62fuWSAxPq5LQ0PW/TJ472gtwRb0G46laDjE7\n79tW9hHhV32Fi5yGRtROCa4gXg2kBL1/XX4jF30xbaijnnP8GkdcRJSD49nBJhvn\nTpTCQUftOL8RliMO0wsM5MA2hOh/lGhd9DIeydt5cxEHJg8CYTi4iMnwdOf33nO5\nmWjcWAaOEb/yYIcUvnJwd6R/MFfaZKpsCmiK7nKTMsGTVUED+EmI1BSiNgFvscl5\ncH4zyh1IuRvmT6jD9eFkFiuT2GigOQHt9RyAYqvdVR75mbASxvChleb8deiDYN7y\ntKvrjUc3bYY5Eut9AeomoP4mp0akc0xDEMQZM3lX+u1ZY1rWq6Z12qdOV/SC+FZ4\nx3a9MGOA6I+ik/wdUb0LF+8v45Gbm5mbugxf+NCqTqx21k8lsobAOQ71xdfL7QvU\nOIo=\n-----END ENCRYPTED PRIVATE KEY-----",
+        ),
+
+        'democa-alice-2' => OpenXPKI::Test::CertHelper::Database::Cert->new(
+            label => 'DEMOCA Client Alice 2',
+            name => 'democa-alice-2',
+            db => {
+                authority_key_identifier => 'F3:78:9D:1F:81:90:52:DC:44:9D:D0:28:E1:96:66:3E:43:09:FF:97',
+                cert_key => '5',
+                data => "-----BEGIN CERTIFICATE-----\nMIIDhjCCAm6gAwIBAgIBBTANBgkqhkiG9w0BAQsFADBcMRMwEQYKCZImiZPyLGQB\nGRYDT1JHMRgwFgYKCZImiZPyLGQBGRYIT3BlblhQS0kxDTALBgNVBAsMBEFDTUUx\nHDAaBgNVBAMME0RFTU9DQSBTaWduaW5nIENBIDIwIhgPMjAxNzAxMDEwMDAwMDBa\nGA8yMTA1MDEzMTIzNTk1OVowXjETMBEGCgmSJomT8ixkARkWA09SRzEYMBYGCgmS\nJomT8ixkARkWCE9wZW5YUEtJMQ0wCwYDVQQLDARBQ01FMR4wHAYDVQQDDBVERU1P\nQ0EgQ2xpZW50IEFsaWNlIDIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIB\nAQCywi61qJCWTXLX2crdzPP7FtF/mnk0eThHtg3Ur+vmWSBbCFjqheQACPkJU1t7\nxHSnKnZvrfsYIO7G8E4oL8+fHlcNC/Z2/67pg9xhT7q9Jxeg4J9T1APug8eUEQJz\nsMJjrtSEOqLBrJiZH6Ij848QYV/rJnCQOsMcW2HRxDCkMVuo8inQOO5881E0Pcuj\nbu9r51IPh48VbYZfZVNQmxjnw71CQ37J74fogcOIbp4wxAtT1p7craJI19J/UsGM\nJ+36NC7IYo6uVYkQlN6AO2DzJYjMYcYOISr0EjjjYeblnSaf1vJPmL5TuTghG9JL\nPly37iG+DIpZxlveRNez3pqJAgMBAAGjTTBLMAkGA1UdEwQCMAAwHQYDVR0OBBYE\nFPoylim1oEo09rnP73pXKp+f2F2jMB8GA1UdIwQYMBaAFPN4nR+BkFLcRJ3QKOGW\nZj5DCf+XMA0GCSqGSIb3DQEBCwUAA4IBAQAx5UqIonMeMix8nVfWbRx1p7UVkkAe\nNgU5OvXbk0aYDN0RN7GutDMighce4pxbnWMxRiN6sTnWJ6e/5rxUDAfQ+7WreowM\nKmKe17+Zn2OFQfdPpkgOa4ehhBaAgN8uNhIBjOw8lzZdPs1dNHLwfZOYL4GzUuoL\nqqA+0PaNBt6/Om5yXc4oWxfLUtpTS7+F4RzHgNII5mQ9uSVjG7Do3YW9fdjFahoU\nL6BcZQhdv+M7+Jm9J0M3orIGmDvoETlWQW8lP+KmvgshTwysFZgOODxRcCemQZxO\nYEZ707GsbXXEhkuH6F20YiHzhsuw514RAziZto8VIBagDoTPXAE36psj\n-----END CERTIFICATE-----",
+                hold_instruction_code => undef,
+                identifier => '-6m85_RjRFtnHbr2qzNCo44Lbb0',
+                invalidity_time => undef,
+                issuer_dn => 'CN=DEMOCA Signing CA 2,OU=ACME,DC=OpenXPKI,DC=ORG',
+                issuer_identifier => 'w8pxr7af7trT39_Xq7PA-yXQdG0',
+                notafter => '4262889599', # 2105-01-31T23:59:59
+                notbefore => '1483228800', # 2017-01-01T00:00:00
+                pki_realm => 'democa',
+                reason_code => undef,
+                req_key => undef,
+                revocation_id => undef,
+                revocation_time => undef,
+                status => 'ISSUED',
+                subject => 'CN=DEMOCA Client Alice 2,OU=ACME,DC=OpenXPKI,DC=ORG',
+                subject_key_identifier => 'FA:32:96:29:B5:A0:4A:34:F6:B9:CF:EF:7A:57:2A:9F:9F:D8:5D:A3',
+            },
+            db_alias => {
+                alias => 'democa-alice-2',
+                generation => undef,
+                group_id => undef,
+            },
+            private_key => "-----BEGIN ENCRYPTED PRIVATE KEY-----\nMIIFDjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQIxerSoYaQ/FkCAggA\nMBQGCCqGSIb3DQMHBAhT1oqVHdr+AASCBMihI5B7qJx3vAiNlzs+Xvt0tT6d3w5Y\noYvGiM0FBNM+G0DhKzSA6vftZGuLppWsqsPVmAHK5HCCJqWiXPm68TScRr8koeRK\nFSq6RRoJpROC13n5GW1Z4NTmnwz4NnrAXPWVPwmvTk7Nwawuf03ZQLRj43sszPT3\nF/i0v9BRKigHnFZyOGJsxoQa+fME9Hzn0j/MwojiA4ZhSGpClhpFgQtXLucxoV/Z\nNK8oBDdWhMfl2B3AnaMdOClOIggbTj1uYYnFs5DkUAGq33kf/XnKziz3lpX3Y1AB\neQbyBkCNxE/0UlMdlMvh6gJX2Lyr68L7GC3BfoPHzNeiU6Va19Z4F7qmiIgPFiLj\nIeYMYsqR3jhMs2uKoCkoFVWCI0rX5svwc2vhEGke5HU2dLFBaNYH7NQWzDoZoVEz\nFq6B2FsbVF9CR5WDliDh8/fF/1++00Vv0BfBrmRmi/NgbG8Lw8YXJ8V1y4smxuSs\nB88/yKUkbj9j45xd4vB/9z670pHqJaG1Bx/UC5mGXL+yUUJ0OrmPaW8/Q6mkEIRf\n1X28ziGQcKt0Lw4ezRH4/l/fxc/L/o00YUe5xUJOCsOAHGGUOU8vO46ucB/biCWk\nFfHzF7yzix9m7KxEjRwsRExTtDJYT/ewlxWQh4VeGU4IBJ4M2/7zlD1ixNK0sd0J\nS1z9dYBbhibRXnVJIQzKlMuKcUm7LIuRfOOPvO5nfYqhZvI5P3jFMqaPE8IKvRf+\n7BCAA1f0K/1AmmHlW1jC0TAofhthEbttHcfB+QFKbeflT0cCPMK/cI2KyBQtvo6v\nKEXNDTIOIxvghEdIo3vj1MZssIx1p6qY/7VvKEcrC7h47tMGy0bVetdkFNlHfDjy\nYSrZ4Uo1kXcZWTfzr8QbtEV4aRPSJ4V9fdSyIGxOMWEdhCINBNPAGTY8zK4RTJFA\nUhdM+dmKMWE4iJK+N3DK2ArF1BiGBqW++fKE17dmn617jjrARCTxCRkk1OVoVON+\nvVUt+gvroYieCxNZRaa/rWHoieDwpcwTz9+wTqG5RLuNcmKfIyToIYhikqbTh6Li\nMh7x6n9hVPd8ykBy1afG/BShpGplHb8FBuv5CI+AaAfX1u1BddrQL0G5DuvfXH6Q\nVGK/n6+QBwDyqBjAbF2swKQ6CXjzbQngHdpaon+jXO4f/3szorgXXq7MrieK982v\nxP2GiEcKiSPLQga9AeAsfmzgK3pM1or9rPROz+iZGfwYm3h1C8ECMQ9o3ql0Nr3f\n1UHwV+v3m3M5ukyiofZRb3vtocUC0eD0I4bKzI2yTDZZpYwCzFJI+leuoBDElA4P\n3QXY7aGxenu4wkrwL3wDuP5Pmh94o07Nv06A7B2/4XObdYuc47C5GCOYeflISSVu\nRH+6R5iTxbkrgD82Gd2bOBPZHbkmiV+MR9NwC8TgDvEl4XbN3Bw0I7t/1iV6BluX\nD2lJhfXUUwiesRkotKBQA4ybCZxLeJwGYtpiQas+/NVbwn7RswsAMrZ9Or/oXHvF\ngrLXlAite0kWIKTzWM5OOK+BtWq6JwZTv6vntcd7MxA+YQX6mbVvjxN9tp3HYDIW\nBzXqEGiNs2TNARchVzfty13FaMFt1C3F9gCuemRe8cEphnnJ3s0pbTm4X8rAdRLw\nFfg=\n-----END ENCRYPTED PRIVATE KEY-----",
+        ),
+
     };
 }
 
