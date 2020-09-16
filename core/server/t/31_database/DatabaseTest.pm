@@ -175,8 +175,9 @@ sub run {
         $self->set_dbi(
             params => {
                 type => "MySQL",
-                host => $ENV{OXI_TEST_DB_MYSQL_DBHOST}, # if not specified, the driver tries socket connection
-                port => $ENV{OXI_TEST_DB_MYSQL_DBPORT}, # if not specified, the driver tries socket connection
+                # if not specified, the driver tries socket connection
+                $ENV{OXI_TEST_DB_MYSQL_DBHOST} ? ( host => $ENV{OXI_TEST_DB_MYSQL_DBHOST} ) : (),
+                $ENV{OXI_TEST_DB_MYSQL_DBPORT} ? ( port => $ENV{OXI_TEST_DB_MYSQL_DBPORT} ) : (),
                 name => $ENV{OXI_TEST_DB_MYSQL_NAME},
                 user => $ENV{OXI_TEST_DB_MYSQL_USER},
                 passwd => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},

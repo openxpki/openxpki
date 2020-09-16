@@ -21,9 +21,9 @@ my $config = OpenXPKI::Test->new(
     testenv_root => $ARGV[0],
     db_conf => {
         type => "MySQL",
+        $ENV{OXI_TEST_DB_MYSQL_DBHOST} ? ( host => $ENV{OXI_TEST_DB_MYSQL_DBHOST} ) : (),
+        $ENV{OXI_TEST_DB_MYSQL_DBPORT} ? ( port => $ENV{OXI_TEST_DB_MYSQL_DBPORT} ) : (),
         name => $ENV{OXI_TEST_DB_MYSQL_NAME},
-        host => $ENV{OXI_TEST_DB_MYSQL_DBHOST},
-        port => $ENV{OXI_TEST_DB_MYSQL_DBPORT},
         user => $ENV{OXI_TEST_DB_MYSQL_USER},
         passwd => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},
     },

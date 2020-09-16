@@ -58,12 +58,11 @@ ENV LANG en_US.UTF-8
 #
 # Configuration
 #
+# We do not specify MariaDB host and port to use socket connection
 ENV OXI_TEST_SAMPLECONFIG_DIR=/opt/openxpki-config \
     OXI_TEST_DB_MYSQL_NAME=openxpki \
     OXI_TEST_DB_MYSQL_USER=openxpki \
     OXI_TEST_DB_MYSQL_PASSWORD=openxpki \
-    OXI_TEST_DB_MYSQL_DBHOST=127.0.0.1 \
-    OXI_TEST_DB_MYSQL_DBPORT=3306 \
     OXI_TEST_DB_MYSQL_DBUSER=root \
     OXI_TEST_DB_MYSQL_DBPASSWORD="" \
     OXI_TEST_ONLY=""

@@ -354,7 +354,7 @@ has db_conf => (
     predicate => 'has_db_conf',
     trigger => sub {
         my ($self, $new, $old) = @_;
-        my @keys = qw( type name host port user passwd );
+        my @keys = qw( type name user passwd );
         die "Required keys missing for 'db_conf': ".join(", ", grep { not defined $new->{$_} } @keys)
             unless eq_deeply([keys %$new], bag(@keys));
     },
@@ -461,7 +461,6 @@ has config_writer => (
         my $self = shift;
         OpenXPKI::Test::ConfigWriter->new(
             basedir => $self->testenv_root,
-            db_conf => $self->db_conf,
         )
     },
     handles => {
@@ -638,9 +637,9 @@ sub _build_conf_database {
         main => {
             debug   => 0,
             type    => $self->db_conf->{type},
+            $self->db_conf->{host} ? ( host => $self->db_conf->{host} ) : (),
+            $self->db_conf->{port} ? ( port => $self->db_conf->{port} ) : (),
             name    => $self->db_conf->{name},
-            host    => $self->db_conf->{host},
-            port    => $self->db_conf->{port},
             user    => $self->db_conf->{user},
             passwd  => $self->db_conf->{passwd},
         },
@@ -1068,9 +1067,9 @@ sub _db_config_from_env {
 
     return {
         type    => "MySQL",
+        $ENV{OXI_TEST_DB_MYSQL_DBHOST} ? ( host => $ENV{OXI_TEST_DB_MYSQL_DBHOST} ) : (),
+        $ENV{OXI_TEST_DB_MYSQL_DBPORT} ? ( port => $ENV{OXI_TEST_DB_MYSQL_DBPORT} ) : (),
         name    => $ENV{OXI_TEST_DB_MYSQL_NAME},
-        host    => $ENV{OXI_TEST_DB_MYSQL_DBHOST},
-        port    => $ENV{OXI_TEST_DB_MYSQL_DBPORT},
         user    => $ENV{OXI_TEST_DB_MYSQL_USER},
         passwd  => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},
 
