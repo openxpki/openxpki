@@ -29,20 +29,20 @@ $BASEDIR/_create-config.pl $TEMPDIR
 $BASEDIR/_create-certs.sh  $TEMPDIR/etc/openxpki
 
 # 4. Create Perl code for OpenXPKI::Test::CertHelper::Database
-$BASEDIR/_write-certhelper.pl $TEMPDIR/etc/openxpki/ca > $BASEDIR/certificates/certhelper-code.pl
+$BASEDIR/_write-certhelper.pl $TEMPDIR/etc/openxpki/ca > $BASEDIR/generated-certhelper-code.pl
 echo ""
 echo "Code for OpenXPKI::Test::CertHelper::Database is available in:"
-echo "    $BASEDIR/certificates/certhelper-code.pl"
+echo "    $BASEDIR/generated-certhelper-code.pl"
 
 # 5. Create MySQL dump
 mysqldump -h $OXI_TEST_DB_MYSQL_DBHOST -u $OXI_TEST_DB_MYSQL_USER -p"$OXI_TEST_DB_MYSQL_PASSWORD" \
     --set-charset --no-create-info \
     --skip-comments --skip-add-locks --skip-disable-keys \
     --extended-insert --complete-insert --single-transaction \
-    $OXI_TEST_DB_MYSQL_NAME > $BASEDIR/certificates/mysql-dump.sql
+    $OXI_TEST_DB_MYSQL_NAME > $BASEDIR/generated-mysql-dump.sql
 echo ""
 echo "MySQL insert script is available in:"
-echo "    $BASEDIR/certificates/mysql-dump.sql"
+echo "    $BASEDIR/generated-mysql-dump.sql"
 
 rm -rf $TEMPDIR
 

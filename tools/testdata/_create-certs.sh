@@ -250,6 +250,9 @@ make_certs $OXI_CONF beta 1  20170101000000Z 21050131235959Z
 
 make_certs $OXI_CONF gamma 1 20170101000000Z 21050131235959Z ORPHAN
 
+# democa 1 already exists in sample installation (whose database we currently use)
+make_certs $OXI_CONF democa 2  20170101000000Z 21050131235959Z
+
 rm -Rf $TEMPDIR
 
 # openxpkiadm alias list --realm alpha

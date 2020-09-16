@@ -28,4 +28,5 @@ my $config = OpenXPKI::Test->new(
         passwd => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},
     },
     with => [qw( TestRealms CryptoLayer )],
+    test_realms => [qw( alpha beta gamma democa )]
 );
