@@ -30,10 +30,11 @@ my $result;
 
 sub password_ok {
     my ($password, %config) = @_;
-
+    my $errors;
     lives_and {
-        cmp_deeply $api->password_quality(password => $password, %config), [];
-    } "valid password $password";
+        $errors = $api->password_quality(password => $password, %config);
+        cmp_deeply $errors, [];
+    } "valid password $password" or diag explain $errors;
 }
 
 sub password_fails {
