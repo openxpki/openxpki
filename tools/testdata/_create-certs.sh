@@ -197,7 +197,7 @@ make_certs() {
         openssl ca ${param[@]} -revoke $BASEPATH-christine-$GEN.crt -crl_compromise 20100304070830Z   > $TEMPDIR/log 2>&1
         openssl ca ${param[@]} -revoke $BASEPATH-don-$GEN.crt       -crl_reason cessationOfOperation  > $TEMPDIR/log 2>&1
         echo " - creating CRL"
-        openssl ca ${param[@]} -gencrl -crldays 18250 -out $TARGET_DIR/ssl/$REALM/$REALM-$GEN.crl     > $TEMPDIR/log 2>&1
+        openssl ca ${param[@]} -gencrl -crldays 18250 -out $TARGET_DIR/ca/$REALM/$REALM-$GEN.crl      > $TEMPDIR/log 2>&1
     fi
 
     # PKCS7 for client alice
@@ -225,13 +225,13 @@ make_certs() {
         $OXI_IMPORT --file $BASEPATH-bob-$GEN.crt   --alias "$REALM-bob-${GEN}" --force-no-chain  > $TEMPDIR/log 2>&1
     fi
 
-    mkdir -p $TARGET_DIR/ssl/$REALM
+    mkdir -p $TARGET_DIR/ca/$REALM
     if [ "$SPECIAL" != "ORPHAN" ]; then
-        mv $BASEPATH*.crt $TARGET_DIR/ssl/$REALM || true
-        mv $BASEPATH*.pem $TARGET_DIR/ssl/$REALM || true
-        mv $BASEPATH*.p7b $TARGET_DIR/ssl/$REALM || true
+        mv $BASEPATH*.crt $TARGET_DIR/ca/$REALM || true
+        mv $BASEPATH*.pem $TARGET_DIR/ca/$REALM || true
+        mv $BASEPATH*.p7b $TARGET_DIR/ca/$REALM || true
     else
-        mv $BASEPATH-bob-$GEN.* $TARGET_DIR/ssl/$REALM || true
+        mv $BASEPATH-bob-$GEN.* $TARGET_DIR/ca/$REALM || true
     fi
 }
 
