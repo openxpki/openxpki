@@ -80,9 +80,9 @@ has _registered_checks => (
     handles => {
         register_check => 'set',
         # Returns the method name by given check name
-        registered_check_method => 'get',
+        _registered_check_method => 'get',
         # Returns a list of all available check names
-        registered_checks => 'keys',
+        _registered_check_names => 'keys',
     },
 );
 
@@ -94,9 +94,6 @@ has _enabled_checks => (
     init_arg => 'checks',
     lazy => 1,
     default => sub { shift->_default_checks },
-    handles => {
-        enabled_checks => 'elements',
-    },
 );
 
 # filled by Moose roles
@@ -124,13 +121,13 @@ has password => (
 );
 
 # the password to test
-has pwd_length => (
+has password_length => (
     is => 'ro',
     isa => 'Num',
     init_arg => undef,
     lazy => 1,
     default => sub { length(shift->password) },
-    clearer => 'clear_pwd_length',
+    clearer => 'clear_password_length',
 );
 
 # accumulated error messages
@@ -228,16 +225,16 @@ sub BUILD {
     $self->hook_register_checks;
     $self->hook_enable_checks unless $self->has_enabled_checks; # constructor argument "checks" wins over roles
 
-    my $enabled_checks = join(", ", sort $self->enabled_checks);
-    ##! 32: "Registered checks: " . join(", ", sort $self->registered_checks);
+    my $enabled_checks = join(", ", sort @{ $self->_enabled_checks });
+    ##! 32: "Registered checks: " . join(", ", sort $self->_registered_check_names);
     ##! 16: "Enabled checks: $enabled_checks";
     $self->log->info("Verifying password quality with these checks: $enabled_checks");
 
     # Check if someone tried to enable unknown checks (via constructor argument)
-    $self->_assert_known_check($_) for $self->enabled_checks;
+    $self->_assert_known_check($_) for @{ $self->_enabled_checks };
 
     # Info about used dictionary
-    if ($self->is_enabled('dict') or $self->is_enabled('partdict')) {
+    if ($self->_is_enabled('dict') or $self->_is_enabled('partdict')) {
         if ($self->_first_existing_dict) {
             $self->log->info("Using dictionary file " . $self->_first_existing_dict);
         } else {
@@ -246,21 +243,19 @@ sub BUILD {
     }
 }
 
-# hooks for roles
-sub hook_register_checks {}
-sub hook_enable_checks {}
+=head2 is_valid
 
-sub _assert_known_check {
-    my ($self, $check) = @_;
-    if (not scalar grep { $_ eq $check } $self->registered_checks) {
-        die sprintf(
-            "Attempt to enable unknown password quality check '%s'\n"
-            ."Available checks: %s\n",
-            $check, join(", ", sort $self->registered_checks)
-        );
-    }
-}
+Returns C<1> if the given password passes all enabled checks, C<0> otherwise.
 
+B<Parameters>:
+
+=over
+
+=item C<$password> I<Str> - password to be tested
+
+=back
+
+=cut
 sub is_valid {
     my ($self, $password) = @_;
 
@@ -269,15 +264,15 @@ sub is_valid {
     }
 
     # reset the errors, we are going to do the checks anew;
-    $self->reset;
+    $self->_reset;
 
     if (not $self->password) {
         $self->add_error([missing => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_PASSWORD_EMPTY"]);
     } else {
         # execute all registered checks that are enabled
-        my @checks = sort grep { $self->is_enabled($_) } $self->registered_checks;
+        my @checks = sort grep { $self->_is_enabled($_) } $self->_registered_check_names;
         for my $check_name (@checks) {
-            my $check_method = $self->registered_check_method($check_name);
+            my $check_method = $self->_registered_check_method($check_name);
             my $error = $self->$check_method;
             ##! 64: "Result of check '$check_name': " . ($error ? 'FAILED' : 'OK')
             $self->add_error($error);
@@ -287,14 +282,11 @@ sub is_valid {
     return (scalar $self->get_errors ? 0 : 1);
 }
 
-# Adds the given ArrayRef [ error_code => message ] to the list of errors
-sub add_error {
-    my ($self, $error) = @_;
+=head2 first_error_message
 
-    return unless $error;
-    push @{$self->_errors}, $error;
-}
+Returns the first error message or C<undef> if password check succeeded.
 
+=cut
 sub first_error_message {
     my ($self) = @_;
     my ($first_error) = $self->get_errors;
@@ -315,17 +307,84 @@ sub error_codes {
 }
 
 # Clear previous validation data.
-sub reset {
+sub _reset {
     my $self = shift;
     $self->_errors([]);
-    $self->clear_pwd_length;
+    $self->clear_password_length;
 }
 
-# Enable the given checks (list).
-sub disable {
-    my $self = shift;
-    $self->_enable_or_disable_check('disable', @_);
-    return 1;
+###############################################################################
+
+=head1 METHODS FOR ROLES
+
+The following methods are meant to be used by roles implementing password
+checks.
+
+=cut
+
+=head2 hook_register_checks
+
+Hook for roles to register their available checks and set default checks.
+
+Example usage:
+
+    after hook_register_checks => sub {
+        my $self = shift;
+        $self->register_check(
+            'partsequence'  => 'check_partsequence',
+            'partdict'      => 'check_partdict',
+        );
+        $self->add_default_check(qw( partsequence partdict ));
+    };
+
+=cut
+sub hook_register_checks {}
+
+########## This method is defined in the attribute _registered_checks above
+=head2 register_check
+
+Register check names and their corresponding method names.
+
+Example usage: see L</hook_register_checks>.
+
+=cut
+##########
+
+########## This method is defined in the attribute _default_checks above
+=head2 add_default_check
+
+Enable the given list of checks by default (unless overridden by constructor
+parameter C<checks>).
+
+Example usage: see L</hook_register_checks>.
+
+=cut
+##########
+
+
+=head2 hook_enable_checks
+
+Hook for roles to enable checks based on specific conditions.
+
+Example usage:
+
+    after hook_enable_checks => sub {
+        my $self = shift;
+        $self->enable('partdict') and $self->disable('dict') if $self->has_min_dict_len;
+    };
+
+=cut
+sub hook_enable_checks {}
+
+sub _assert_known_check {
+    my ($self, $check) = @_;
+    if (not scalar grep { $_ eq $check } $self->_registered_check_names) {
+        die sprintf(
+            "Attempt to enable unknown password quality check '%s'\n"
+            ."Available checks: %s\n",
+            $check, join(", ", sort $self->_registered_check_names)
+        );
+    }
 }
 
 # Enable the given checks (list).
@@ -335,16 +394,27 @@ sub enable {
     return 1;
 }
 
+=head2 disable
+
+Disable the given list of checks.
+
+=cut
+sub disable {
+    my $self = shift;
+    $self->_enable_or_disable_check('disable', @_);
+    return 1;
+}
+
 # Return true if the given check is enabled.
-sub is_enabled {
+sub _is_enabled {
     my $self = shift;
     my $check = shift;
-    return scalar grep { $_ eq $check } $self->enabled_checks;
+    return scalar grep { $_ eq $check } @{ $self->_enabled_checks };
 }
 
 sub _enable_or_disable_check {
     my ($self, $action, @args) = @_;
-    my @new_list = $self->enabled_checks;
+    my @new_list = @{ $self->_enabled_checks };
 
     for my $check (@args) {
         $self->_assert_known_check($check);
@@ -355,6 +425,28 @@ sub _enable_or_disable_check {
     }
 
     $self->_enabled_checks(\@new_list);
+}
+
+=head2 add_error
+
+Adds the given error to the list of errors.
+
+B<Parameters>:
+
+=over
+
+=item C<$error> I<ArrayRef> - Error specified as C<[ error_code =E<gt> message ]>.
+
+C<error_code> should be equal to the name of the check.
+
+=back
+
+=cut
+sub add_error {
+    my ($self, $error) = @_;
+
+    return unless $error;
+    push @{$self->_errors}, $error;
 }
 
 no Moose;

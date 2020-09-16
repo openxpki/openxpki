@@ -17,7 +17,7 @@ requires 'register_check';
 requires 'password';
 requires 'enable';
 requires 'disable';
-requires 'pwd_length';
+requires 'password_length';
 
 has max_len => (
     is => 'rw',
@@ -173,10 +173,10 @@ after hook_register_checks => sub {
 
 sub check_length {
     my $self = shift;
-    if ($self->pwd_length < $self->min_len) {
+    if ($self->password_length < $self->min_len) {
         return [ "length" => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_SHORT" ];
     }
-    if ($self->pwd_length > $self->max_len) {
+    if ($self->password_length > $self->max_len) {
         return [ "length" => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_LONG" ];
     }
     return;
@@ -229,7 +229,7 @@ sub check_diffchars {
     if (%reportconsec) {
         # we see if subtracting the number of total repetition, we are
         # still above the minimum chars.
-        my $passwdlen = $self->pwd_length;
+        my $passwdlen = $self->password_length;
         for my $rep (values %reportconsec) {
             $passwdlen = $passwdlen - $rep;
         }
@@ -260,7 +260,6 @@ sub check_dict {
     my $reverse_pass_lc = reverse($pass_lc);
 
     my $dict = $self->_first_existing_dict or return;
-
     ##! 64: "Using dictionary $dict"
 
     my $err;
@@ -293,7 +292,7 @@ sub _check_dict {
         if (defined $min_len) {
             next if length($dict_line) < $min_len;
         } else {
-            next if length($dict_line) != $self->pwd_length;
+            next if length($dict_line) != $self->password_length;
         }
 
         if (my $err = $check_sub->($dict_line)) {

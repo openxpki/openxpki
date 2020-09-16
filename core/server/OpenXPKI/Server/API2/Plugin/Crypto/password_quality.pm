@@ -20,8 +20,6 @@ use OpenXPKI::Server::Context qw( CTX );
 
 Check if the given password passes certain quality checks.
 
-Returns undef on sucessful validation or an ArrayRef with error messages of failed checks.
-
 B<Parameters>
 
 =over
@@ -51,14 +49,14 @@ Will result in
 command "password_quality" => {
     password => { isa => 'Str', required => 1, },
     checks => { isa => 'ArrayRef', },
-    max_len => { isa => 'Int', },
     min_len => { isa => 'Int', },
-    min_diff_chars => { isa => 'Int', },
-    sequence_len => { isa => 'Int', },
-    min_entropy => { isa => 'Int', },
-    min_dict_len => { isa => 'Int', },
+    max_len => { isa => 'Int', },
     dictionaries => { isa => 'ArrayRef', },
+    min_diff_chars => { isa => 'Int', },
+    min_entropy => { isa => 'Int', },
     min_different_char_groups => { isa => 'Int', },
+    sequence_len => { isa => 'Int', },
+    min_dict_len => { isa => 'Int', },
 } => sub {
     my ($self, $params) = @_;
 
