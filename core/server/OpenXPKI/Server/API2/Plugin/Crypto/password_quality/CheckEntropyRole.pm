@@ -3,7 +3,20 @@ use feature 'unicode_strings';
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Crypto::password_quality::CheckEntropyRole - Check password entropy
+OpenXPKI::Server::API2::Plugin::Crypto::password_quality::CheckEntropyRole -
+Check password entropy
+
+=head1 CHECKS
+
+This role adds the following checks to
+L<OpenXPKI::Server::API2::Plugin::Crypto::password_quality::Validate>:
+
+C<entropy>.
+
+Enabled by default: C<entropy>.
+
+For more information about the checks see
+L<OpenXPKI::Server::API2::Plugin::Crypto::password_quality>.
 
 =cut
 

@@ -17,6 +17,8 @@ Contains a list of the top 10,000 passwords seen in data leaks from Troy Hunt's
 
 Source: https://www.ncsc.gov.uk/blog-post/passwords-passwords-everywhere
 
+Updated: 2020-08-26
+
 =cut
 
 =head1 METHODS
@@ -50,8 +52,6 @@ sub list {
 
 # Top 10,000 passwords from Troy Hunt's Have I Been Pwned (https://haveibeenpwned.com) data set.
 # See: https://www.ncsc.gov.uk/blog-post/passwords-passwords-everywhere
-#
-# Updated 2020-08-26
 #
 # curl -s https://www.ncsc.gov.uk/static-assets/documents/PwnedPasswordsTop100k.txt \
 #   | tail -n 100000 \

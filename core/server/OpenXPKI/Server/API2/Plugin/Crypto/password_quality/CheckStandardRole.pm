@@ -2,7 +2,20 @@ package OpenXPKI::Server::API2::Plugin::Crypto::password_quality::CheckStandardR
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Crypto::password_quality::CheckStandardRole - Standard password quality tests
+OpenXPKI::Server::API2::Plugin::Crypto::password_quality::CheckStandardRole -
+Standard password quality checks
+
+=head1 CHECKS
+
+This role adds the following checks to
+L<OpenXPKI::Server::API2::Plugin::Crypto::password_quality::Validate>:
+
+C<length>, C<common>, C<diffchars>, C<sequence>, C<dict>.
+
+Enabled by default: all of the above.
+
+For more information about the checks see
+L<OpenXPKI::Server::API2::Plugin::Crypto::password_quality>.
 
 =cut
 

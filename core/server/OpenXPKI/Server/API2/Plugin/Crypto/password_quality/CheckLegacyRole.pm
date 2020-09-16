@@ -2,7 +2,20 @@ package OpenXPKI::Server::API2::Plugin::Crypto::password_quality::CheckLegacyRol
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Crypto::password_quality::CheckLegacyRole - Legacy password quality tests
+OpenXPKI::Server::API2::Plugin::Crypto::password_quality::CheckLegacyRole -
+Legacy password quality checks
+
+=head1 CHECKS
+
+This role adds the following checks to
+L<OpenXPKI::Server::API2::Plugin::Crypto::password_quality::Validate>:
+
+C<groups>, C<partsequence>, C<partdict>.
+
+Enabled by default: none.
+
+For more information about the checks see
+L<OpenXPKI::Server::API2::Plugin::Crypto::password_quality>.
 
 =cut
 
@@ -153,6 +166,9 @@ sub _check_seq_parts {
 sub check_partdict {
     my $self = shift;
     my $pass = lc($self->password);
+
+    my $dict = $self->_first_existing_dict or return;
+    ##! 64: "Using dictionary $dict"
 
     # _check_dict() is defined in OpenXPKI::Server::API2::Plugin::Crypto::password_quality::CheckStandardRole
     return $self->_check_dict(sub {

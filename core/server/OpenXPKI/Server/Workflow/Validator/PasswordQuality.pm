@@ -32,12 +32,11 @@ OpenXPKI::Server::Workflow::Validator::PasswordQuality
 
 =head1 DESCRIPTION
 
-This validator checks a password for its quality. All configuration can be done
-using the validator config file.
+Check if the given password passes certain quality checks (see the
+L<"checks" parameter|/checks>). The validator fails  if it believes the
+password to be bad.
 
-Based on this data, the validator fails if it believes the password to be bad.
-
-See the L<"checks" parameter|/checks> for more information.
+All configuration can be done using the validator config file.
 
 =head2 ARGUMENT
 
@@ -63,14 +62,13 @@ I<Default>
 
 =item * C<length> - Is it in the range of permitted lengths (default: 8 - 255)?
 
-=item * C<common> - Is it not a (leet speech obfuscated) known hacked password
-like "password" et similia?
+=item * C<common> - Is it not a known hacked password like "password" et similia?
 
 =item * C<diffchars> - Does it contain enough different characters?
 
 =item * C<sequence> - Is it a sequence like 12345, abcde, or qwertz?
 
-=item * C<dict> - Is it not a (reversed) dictionary word?
+=item * C<dict> - Is it not a (reversed or leet speech obfuscated) dictionary word?
 
 =item * C<entropy> - Is the password entropy above a certain level?
 
