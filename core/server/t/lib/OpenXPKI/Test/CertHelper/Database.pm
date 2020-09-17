@@ -129,14 +129,29 @@ has pkcs7 => (
 =head2 cert
 
 Returns an instance of L<OpenXPKI::Test::CertHelper::Database::Cert> with the
-requested test certificate data.
+requested test certificate data specified by the given alias.
 
     print $db->cert("beta-alice-1")->id, "\n";
 
 =cut
 sub cert {
-    my ($self, $certname) =@_;
+    my ($self, $certname) = @_;
     return $self->_certs_by_alias->{$certname} || die "A test certificate named '$certname' does not exist.";
+}
+
+=head2 cert_by_id
+
+Returns an instance of L<OpenXPKI::Test::CertHelper::Database::Cert> with the
+requested test certificate data by the given id.
+
+    print $db->cert("qBHtYgX4yx9Bl2GI4EHMaFYF6MY")->id, "\n";
+
+=cut
+sub cert_by_id {
+    my ($self, $certid) = @_;
+    my @match = grep { $_->id eq $certid } $self->all_certs;
+    die "There is no certificate with id '$certid'." unless scalar @match;
+    return $match[0];
 }
 
 =head2 crl

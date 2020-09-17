@@ -11,6 +11,8 @@ use File::Temp qw( tempdir );
 use Test::Deep;
 use CGI::Session;
 
+#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Client::UI::Workflow'} = 100;
+
 # Project modules
 use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
@@ -80,10 +82,10 @@ my $TESTS = [
             type => 'cert_identifier',
             template => "[% USE Certificate %][% value %]<br/>[% Certificate.body(value, 'subject') %]",
         },
-        init => sub { shift->insert_testcerts(only => [ 'democa-alice-2' ]) },
         value => sub { shift->certhelper_database->cert('democa-alice-2')->id },
         expected => sub {
-            my $cert = shift->certhelper_database->cert('democa-alice-2');
+            my ($oxitest, $value) = @_;
+            my $cert = $oxitest->certhelper_database->cert_by_id($value);
             return {
                 format => 'link',
                 value => superhashof({
@@ -99,6 +101,11 @@ plan tests => 3 + scalar @$TESTS;
 
 ###############################################################################
 ###############################################################################
+
+sub init_oxitest {
+    my $oxitest = shift;
+    $oxitest->insert_testcerts(only => [ 'democa-signer-2', 'democa-alice-2' ]);
+}
 
 my $known_workflows = {};
 sub make_wf_config {
@@ -174,11 +181,6 @@ sub ui_client {
     return $client;
 }
 
-sub maybe_call {
-    my ($oxitest, $value) = @_;
-    return ref $value eq 'CODE' ? $value->($oxitest) : $value;
-}
-
 sub run_tests {
     my ($oxitest, $client, $tests) = @_;
 
@@ -197,9 +199,10 @@ sub run_tests {
             #is $result->{page}->{label}, 'testwf_process', 'Workflow parameter input page';
 
             my $fieldname = $test->{field}->{name} // 'testfield';
+            my $value = ref $test->{value} eq 'CODE' ? $test->{value}->($oxitest) : $test->{value};
             $result = $client->mock_request({
                 'action' => 'workflow!index',
-                defined $test->{value} ? ( $fieldname => maybe_call($oxitest, $test->{value}) ) : (),
+                defined $test->{value} ? ( $fieldname => $value ) : (),
                 'wf_token' => undef,
             });
 
@@ -210,7 +213,8 @@ sub run_tests {
             });
 
             my $rendered = $result->{main}->[0]->{content}->{data}->[0];
-            cmp_deeply $rendered, superhashof(maybe_call($oxitest, $test->{expected})), "matches expected value"
+            my $expected = ref $test->{expected} eq 'CODE' ? $test->{expected}->($oxitest, $value) : $test->{expected};
+            cmp_deeply $rendered, superhashof($expected), "matches expected value"
                 or diag explain $rendered;
         };
     }
@@ -221,12 +225,8 @@ sub run_tests {
 
 my $wf_defs = {};
 my @tests_extended;
-my @init;
 
 for my $test (@$TESTS) {
-    # add init code
-    push @init, $test->{init} if $test->{init};
-
     # add workflow definition
     my $conf = make_wf_config($test->{field});
     $wf_defs->{$_} = $conf->{def}->{$_} for keys %{ $conf->{def} };
@@ -246,7 +246,7 @@ my $oxitest = OpenXPKI::Test->new(
 );
 
 # test dependent initializations
-$_->($oxitest) for @init;
+init_oxitest($oxitest);
 
 # create UI client
 my $client = ui_client($oxitest);
