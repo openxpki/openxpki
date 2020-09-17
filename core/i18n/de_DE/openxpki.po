@@ -857,7 +857,72 @@ msgstr "Oops, hier ist etwas schief gegangen"
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Die angeforderte Seite wurde nicht gefunden"
 
-msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_BAD_PASSWORD"
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_COMMON_PASSWORD"
+msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_DICT_WORD"
+msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_SEQUENCE"
+msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DICT_WORD"
+msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DIFFERENT_CHARS"
+msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DIGITS"
+msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_GROUPS"
+msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_INSUFFICIENT_ENTROPY"
+msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_LONG"
+msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_SHORT"
+msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LETTERS"
+msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_MIXED_CASE"
+msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_PASSWORD_EMPTY"
+msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REPETITIONS"
+msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REVERSED_DICT_WORD"
+msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_SEQUENCE"
+msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_SPECIAL_CHARS"
 msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
 
 msgid "I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_NOT_USABLE"
@@ -3389,7 +3454,6 @@ msgstr "Search for SCEP workflows by  transaction id"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_LABEL"
 msgstr "SCEP Search"
 
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_DESC"
 msgstr "Erstellt ein neues Zertifikat/Token zur Verwendung als SCEP RA."
 
@@ -3401,7 +3465,6 @@ msgstr "Ändert die Metadaten eines Zertifikates."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_LABEL"
 msgstr "Metadaten ändern"
-
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_TRUSTGROUP_IMPORT_DESC"
 msgstr "Importiert ein Zertifikat und verknüpft es mit einer Trustgroup."

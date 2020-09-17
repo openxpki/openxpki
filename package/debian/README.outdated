@@ -62,7 +62,7 @@ INSTALL THE BUILD PREREQS AND GET OpenXPKI SOURCE
 - Obtain the SVN sources
 
 To get the latest sources, depending on your preference, you can use either
-subversion or git. 
+subversion or git.
 
   --- using Git
 
@@ -90,7 +90,7 @@ subversion or git.
 
   sudo addgroup openxpki
   sudo adduser --ingroup openxpki --disabled-password --gecos 'OpenXPKI User' openxpki
- 
+
 - Install OpenXPKI prerequisites from debian
 
   cd ~/openxpki/trunk/package/debian
@@ -105,7 +105,7 @@ CREATE PACKAGES
 
   cd ~/openxpki/trunk/package/debian
   make cpan_dependency
-  sudo dpkg -i deb/cpan/*.deb 
+  sudo dpkg -i deb/cpan/*.deb
 
   make Workflow
   sudo dpkg -i deb/cpan/libworkflow-perl*.deb
@@ -119,7 +119,7 @@ CREATE PACKAGES
   make perl-client-api
   sudo dpkg -i deb/client_api/*.deb
   make i18n && make deployment && make scep-client && make mason-html-client
-  
+
 ------------------------------------------------------------
 CREATING APT REPOSITORY
 ------------------------------------------------------------
@@ -148,7 +148,7 @@ CREATING APT REPOSITORY
   if [ -f /etc/lsb-release ]; then
     . /etc/lsb-release
     dist="$DISTRIB_CODENAME"
-  else 
+  else
     dist=squeeze
   fi
   mkdir -p ~/openxpki/dpkg/${dist}/binary/cpan
@@ -164,7 +164,7 @@ CREATING APT REPOSITORY
 - Copy the freshly-build packages to your Apache directory
 
   cd ~/openxpki/trunk/package/debian
-  
+
   cp deb/cpan/*.deb ~/openxpki/dpkg/${dist}/binary/cpan/
   cp deb/core/*.deb ~/openxpki/dpkg/${dist}/binary/core/
   cp deb/client_api/*.deb ~/openxpki/dpkg/${dist}/binary/client_api/
@@ -214,7 +214,7 @@ INSTALLING ON PRISTINE OS INSTALLATION
     libtest-pod-coverage-perl libtext-csv-perl libxml-parser-perl \
     libxml-sax-perl libxml-sax-writer-perl libxml-simple-perl \
     libipc-sharelite-perl libintl-perl libfilter-perl \
-    libdata-password-perl libdata-serializer-perl \
+    libdata-serializer-perl \
     libdatetime-format-dateparse-perl libproc-processtable-perl \
     libsys-sigaction-perl libtemplate-perl libworkflow-perl \
     libxml-filter-xinclude-perl libxml-validator-schema-perl libdbi-perl \
@@ -226,7 +226,7 @@ INSTALLING ON PRISTINE OS INSTALLATION
     apache2 libhtml-mason-perl libapache2-mod-perl2 libapache2-request-perl \
     graphviz libhttp-server-simple-perl libdata-page-perl \
     libdatetime-format-strptime-perl libdata-spreadpagination-perl \
-    libmath-round-perl libversion-perl libversion-perl libclass-std-perl 
+    libmath-round-perl libversion-perl libversion-perl libclass-std-perl
 
   sudo shutdown now
 
@@ -283,4 +283,3 @@ dh-make-perl --build --cpan XML::Validator::Schema
 dh-make-perl --build --cpan Data::Password
 dpkg -i libxml-filter-xinclude-perl_1.0-1_all.deb
 dpkg -i libxml-validator-schema-perl_1.08-1_all.deb
-dpkg -i libdata-password-perl_1.07-1_all.deb

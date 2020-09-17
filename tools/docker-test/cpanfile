@@ -18,7 +18,6 @@ requires 'DBD::Mock' => '1.45';
 requires 'DBD::SQLite' => '1.52';
 requires 'DBI' => '1';
 requires 'DBIx::Handler' => '0.14';
-requires 'Data::Password' => '1.07';
 requires 'Data::Serializer' => '0.44';
 requires 'Data::UUID' => '0';
 requires 'Date::Parse' => '0';

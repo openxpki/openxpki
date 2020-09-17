@@ -9,12 +9,12 @@ PACKAGES=\
 	openxpki-perldeps-core \
 	perl-openxpki-core \
 	perl-openxpki-client-html-mason \
-	openxpki-i18n 
+	openxpki-i18n
 
 OPT_PACKAGES=\
 	openxpki-perldeps-enrollment
 
-# CPAN dependencies that we'd like packaged for the target 
+# CPAN dependencies that we'd like packaged for the target
 # distribution
 
 EXTERNAL= \
@@ -24,7 +24,6 @@ EXTERNAL= \
 	CPAN__Meta__YAML \
 	Crypt__OpenSSL__AES \
 	DBD__Mock \
-	Data__Password \
 				Params__Validate \
 				List__MoreUtils \
 			DateTime__Locale \
@@ -93,7 +92,7 @@ EXTERNAL= \
 	    LWP__UserAgent \
 	    LWP \
 	WWW__Mechanize
-	
+
 
 
 
@@ -110,7 +109,7 @@ endif
 # Makefile.inc contains common settings for all packages (checked in)
 include Makefile.inc
 
-# optional: Makefile.local may be used locally to override 
+# optional: Makefile.local may be used locally to override
 # settings (should not be checked in)
 -include Makefile.local
 
@@ -126,7 +125,7 @@ all:
 
 # builddep basically gets any CPAN stuff needed for the build process. First,
 # it tries to use zypper to install those provided by SuSE. Then, it fetches
-# the cpan2dist stuff to automate the process of installing the remaining 
+# the cpan2dist stuff to automate the process of installing the remaining
 # packages. (we'll use cpan2dist later when packaging the openxpki prereqs
 # from cpan.
 

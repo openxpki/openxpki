@@ -21,10 +21,10 @@ PACKAGES=			\
 
 DEBIAN_VERSION = $(shell cat /etc/debian_version)
 
-# Data::Password Data::Serializer DateTime::Format::DateParse IPC::ShareLite 
-# Locale::TextDomain Proc::ProcessTable Sys::SigAction Workflow 
+# Data::Serializer DateTime::Format::DateParse IPC::ShareLite
+# Locale::TextDomain Proc::ProcessTable Sys::SigAction Workflow
 # XML::Filter::XInclude XML::SAX::PurePerl XML::Validator::Schema
-# Exception::Class 1.22 Added Exception::Class::Base->caught() 
+# Exception::Class 1.22 Added Exception::Class::Base->caught()
 
 ifeq "$(DEBIAN_VERSION)" "buster/sid"
 EXTERNAL=				\
@@ -60,10 +60,10 @@ EXTERNAL=				\
     JSON__MaybeXS \
     YAML__Tiny
 endif
-    
+
 EXTERNAL2= \
 	Connector \
-	Workflow 
+	Workflow
 
 CORE = \
     CGI \
@@ -75,11 +75,11 @@ Data__SpreadPagination_BUILDOPTS = --version 0.1.2
 
 .PHONY : $(PACKAGES) $(EXTERNAL) $(EXTERNAL2) CGI DateTime__Format__DateParse
 
-openxpki: $(PACKAGES) 
+openxpki: $(PACKAGES)
 
-cpan_dependency: $(EXTERNAL) 
+cpan_dependency: $(EXTERNAL)
 
-cpan_dependency2: $(EXTERNAL2) 
+cpan_dependency2: $(EXTERNAL2)
 
 trusty: CGI Module__Build__Tiny Module__Load
 
@@ -108,12 +108,12 @@ $(CORE):
 
 DateTime__Format__DateParse:
 	test -d deb || mkdir deb
-	test -d deb/cpan || mkdir deb/cpan/	
+	test -d deb/cpan || mkdir deb/cpan/
 	cd deb/cpan/ &&  dh-make-perl --build --notest --depends 'libdatetime-timezone-perl, libdatetime-perl, libtimedate-perl' --cpan $(subst __,::,$@)
 
 
 $(PACKAGES): info
-	test -d deb || mkdir deb	
+	test -d deb || mkdir deb
 	cd $@ && PATH=$(PATH):/usr/sbin $(MAKE) $(SUBTARGET)
 
 resultlocal:

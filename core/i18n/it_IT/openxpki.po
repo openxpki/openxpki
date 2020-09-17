@@ -1053,7 +1053,72 @@ msgstr "Chiave"
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Pagina richiesta non trovata"
 
-msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_BAD_PASSWORD"
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_COMMON_PASSWORD"
+msgstr "La Password non soddisfa i criteri della policy!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_DICT_WORD"
+msgstr "La Password non soddisfa i criteri della policy!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_SEQUENCE"
+msgstr "La Password non soddisfa i criteri della policy!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DICT_WORD"
+msgstr "La Password non soddisfa i criteri della policy!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DIFFERENT_CHARS"
+msgstr "La Password non soddisfa i criteri della policy!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DIGITS"
+msgstr "La Password non soddisfa i criteri della policy!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_GROUPS"
+msgstr "La Password non soddisfa i criteri della policy!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_INSUFFICIENT_ENTROPY"
+msgstr "La Password non soddisfa i criteri della policy!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_LONG"
+msgstr "La Password non soddisfa i criteri della policy!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_SHORT"
+msgstr "La Password non soddisfa i criteri della policy!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LETTERS"
+msgstr "La Password non soddisfa i criteri della policy!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_MIXED_CASE"
+msgstr "La Password non soddisfa i criteri della policy!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_PASSWORD_EMPTY"
+msgstr "La Password non soddisfa i criteri della policy!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REPETITIONS"
+msgstr "La Password non soddisfa i criteri della policy!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REVERSED_DICT_WORD"
+msgstr "La Password non soddisfa i criteri della policy!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_SEQUENCE"
+msgstr "La Password non soddisfa i criteri della policy!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_SPECIAL_CHARS"
 msgstr "La Password non soddisfa i criteri della policy!"
 
 msgid "I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_NOT_USABLE"
