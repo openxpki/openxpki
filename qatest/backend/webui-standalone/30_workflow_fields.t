@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 # Core modules
-use Test::More tests => 4;
+use Test::More;
 use FindBin qw( $Bin );
 use File::Temp qw( tempdir );
 
@@ -20,17 +20,61 @@ use MockUI;
 my $SESSION_DIR = tempdir( CLEANUP => 1 );
 
 my $TESTS = [
+    #
+    # headings
+    #
     {
-        field => {
-            format => 'spacer',
-        },
-        value => 0,
+        field => { format => 'spacer' },
         expected => {
             format => 'head',
             className => 'spacer',
         },
     },
 
+    #
+    # format auto-detection
+    #
+    {
+        field => { name => 'pkcs10' },
+        value => "dummy",
+        expected => {
+            format => 'code',
+            value => 'dummy',
+        },
+    },
+
+    {
+        field => { type => 'textarea' },
+        value => "one\ntwo",
+        expected => {
+            format => 'nl2br',
+            value => "one\ntwo",
+        },
+    },
+
+    # fixed hash value -> deflist
+    {
+        field => { value => { one => 1, two => 2 } },
+        expected => {
+            format => 'deflist',
+            value => [ { label => 'one', value => '1' }, { label => 'two', value => '2' } ],
+        },
+    },
+
+    # fixed array value -> ullist
+    {
+        field => { value => [ qw( one two ) ] },
+        expected => {
+            format => 'ullist',
+            value => [ qw( one two ) ],
+        },
+    },
+
+    #
+    # Specific formats
+    #
+
+    # cert_identifier
     {
         field => {
             type => 'cert_identifier',
@@ -48,7 +92,10 @@ my $TESTS = [
             };
         },
     }
+
 ];
+
+plan tests => 3 + scalar @$TESTS;
 
 ###############################################################################
 ###############################################################################
@@ -86,7 +133,7 @@ sub make_wf_config {
                         creator: any
             ',
             "realm.democa.workflow.def.$wf_type.field.testfield" => {
-                name => 'testfield',
+                name => 'testfield', # may be overwritten by $field_conf
                 %{ $field_conf },
             },
         },
@@ -149,9 +196,10 @@ sub run_tests {
 
             #is $result->{page}->{label}, 'testwf_process', 'Workflow parameter input page';
 
+            my $fieldname = $test->{field}->{name} // 'testfield';
             $result = $client->mock_request({
                 'action' => 'workflow!index',
-                'testfield' => maybe_call($oxitest, $test->{value}),
+                defined $test->{value} ? ( $fieldname => maybe_call($oxitest, $test->{value}) ) : (),
                 'wf_token' => undef,
             });
 
