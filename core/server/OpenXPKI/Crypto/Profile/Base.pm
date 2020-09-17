@@ -68,7 +68,12 @@ sub load_extension
 
     ##! 4: "Profile: $profile_path, Extension: $ext"
     my @basepath = split /\./, $profile_path;
-    push @basepath, 'extensions', $ext;
+    # the netscape stuff is one level down
+    if ($ext =~ m{netscape_(\w+)}) {
+        push @basepath, 'extensions', 'netscape', $1;
+    } else {
+        push @basepath, 'extensions', $ext;
+    }
 
     ##! 16: 'path: ' . join (".", @basepath)
 
@@ -326,17 +331,17 @@ sub load_extension
             );
         }
     }
-    elsif ($ext eq "netscape.comment")
+    elsif ($ext eq "netscape_comment")
     {
         my $comment = $config->get([ @basepath , 'text' ]);
         if ($comment)
         {
-            $self->set_extension (NAME     => "netscape.comment",
+            $self->set_extension (NAME     => "netscape_comment",
                               CRITICAL => $critical,
                               VALUES   => [ $comment ]);
         }
     }
-    elsif ($ext eq "netscape.certificate_type")
+    elsif ($ext eq "netscape_certificate_type")
     {
         my @bits = ( "ssl_client", "smime_client", "object_signing",
                      "ssl_client_ca", "smime_client_ca", "object_signing_ca", "ssl_server", "reserved" );
@@ -346,25 +351,25 @@ sub load_extension
         }
 
         if (scalar @values) {
-            $self->set_extension (NAME     => "netscape.certificate_type",
+            $self->set_extension (NAME     => "netscape_certificate_type",
               CRITICAL => $critical,
               VALUES   => [@values]);
         }
 
     }
-    elsif ($ext eq "netscape.cdp")
+    elsif ($ext eq "netscape_cdp")
     {
 
         my $cdp = $config->get([ @basepath , 'uri' ]);
         if ($cdp) {
-            $self->set_extension (NAME     => "netscape.cdp",
+            $self->set_extension (NAME     => "netscape_cdp",
                   CRITICAL => $critical,
                   VALUES   => [$cdp]);
         }
 
         my $ca_cdp = $config->get([ @basepath , 'ca_uri' ]);
         if ($ca_cdp) {
-            $self->set_extension (NAME     => "netscape.ca_cdp",
+            $self->set_extension (NAME     => "netscape_ca_cdp",
                               CRITICAL => $critical,
                               VALUES   => [$ca_cdp]);
         }

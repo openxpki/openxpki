@@ -182,7 +182,7 @@ sub __load_profile
                      "subject_key_identifier", "authority_key_identifier",
                      "issuer_alt_name", "crl_distribution_points", "authority_info_access",
                      "policy_identifier", "oid", "ocsp_nocheck",
-                     "netscape.comment", "netscape.certificate_type", "netscape.cdp")
+                     "netscape_comment", "netscape_certificate_type", "netscape_cdp")
     {
         ##! 16: "Load extension $profile_name, $ext"
         $self->load_extension({
