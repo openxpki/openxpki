@@ -47,7 +47,7 @@ sub make_wf_config {
     my ($field_conf) = @_;
 
     my $wf_type = {};
-    do { $wf_type = "TESTWORKFLOW".int(rand(2**32)) } while ($known_workflows->{$wf_type});
+    do { $wf_type = "testwf".int(rand(2**32)) } while ($known_workflows->{$wf_type});
     $known_workflows->{$wf_type} = 1;
 
     return {
@@ -55,7 +55,7 @@ sub make_wf_config {
         def => {
             "realm.democa.workflow.def.$wf_type" => '
                 head:
-                    prefix: testwf
+                    prefix: '.$wf_type.'
                     persister: OpenXPKI
                 state:
                     INITIAL:
