@@ -2594,9 +2594,8 @@ sub __render_fields {
         $self->logger()->trace('No output rules, render plain context: ' . Dumper  \@fields_to_render) if $self->logger->is_trace;
     }
 
-    FIELD:
     my $queued; # receives header items that depend on non-empty sections
-    foreach my $field (@fields_to_render) {
+    FIELD: foreach my $field (@fields_to_render) {
 
         my $key = $field->{name} || '';
         my $item = {

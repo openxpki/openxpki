@@ -22,6 +22,17 @@ my $SESSION_DIR = tempdir( CLEANUP => 1 );
 my $TESTS = [
     {
         field => {
+            format => 'spacer',
+        },
+        value => 0,
+        expected => {
+            format => 'head',
+            className => 'spacer',
+        },
+    },
+
+    {
+        field => {
             type => 'cert_identifier',
             template => "[% USE Certificate %][% value %]<br/>[% Certificate.body(value, 'subject') %]",
         },
