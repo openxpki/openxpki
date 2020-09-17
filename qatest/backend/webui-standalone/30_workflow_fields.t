@@ -19,6 +19,28 @@ use MockUI;
 
 my $SESSION_DIR = tempdir( CLEANUP => 1 );
 
+my $TESTS = [
+    {
+        field => {
+            type => 'cert_identifier',
+            template => "[% USE Certificate %][% value %]<br/>[% Certificate.body(value, 'subject') %]",
+        },
+        init => sub { shift->insert_testcerts(only => [ 'democa-alice-2' ]) },
+        value => sub { shift->certhelper_database->cert('democa-alice-2')->id },
+        expected => sub {
+            my $cert = shift->certhelper_database->cert('democa-alice-2');
+            return {
+                format => 'link',
+                value => superhashof({
+                    label => re($cert->id . '.*' . $cert->db->{subject}),
+                }),
+            };
+        },
+    }
+];
+
+###############################################################################
+###############################################################################
 
 my $known_workflows = {};
 sub make_wf_config {
@@ -107,7 +129,9 @@ sub run_tests {
     # Create workflow
     #
     for my $test (@$tests) {
-        subtest "rendering of $test->{name}" => sub {
+        my $testname = join ", ", map { sprintf "%s '%s'", $_, $test->{field}->{$_} } grep { $test->{field}->{$_} } qw( type format );
+
+        subtest "rendering of field $testname" => sub {
             $result = $client->mock_request({
                 'page' => 'workflow!index!wf_type!' . $test->{wf_type},
             });
@@ -135,31 +159,6 @@ sub run_tests {
 
 ###############################################################################
 ###############################################################################
-
-my $TESTS = [
-    {
-        name => 'cert_identifier',
-        field => {
-            type => 'cert_identifier',
-            template => "[% USE Certificate %][% value %]<br/>[% Certificate.body(value, 'subject') %]",
-        },
-        init => sub {
-            shift->insert_testcerts(only => [ 'democa-alice-2' ]);
-        },
-        value => sub {
-            return shift->certhelper_database->cert('democa-alice-2')->id;
-        },
-        expected => sub {
-            my $cert = shift->certhelper_database->cert('democa-alice-2');
-            return {
-                format => 'link',
-                value => superhashof({
-                    label => re($cert->id . '.*' . $cert->db->{subject}),
-                }),
-            };
-        },
-    }
-];
 
 my $wf_defs = {};
 my @tests_extended;
