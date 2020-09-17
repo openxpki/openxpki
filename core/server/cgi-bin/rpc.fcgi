@@ -15,7 +15,7 @@ use OpenXPKI::Client::Simple;
 use OpenXPKI::Client::Config;
 use OpenXPKI::Client::RPC;
 use OpenXPKI::Serialization::Simple;
-use OpenXPKI::i18n qw( i18nGettext );
+use OpenXPKI::i18n qw( i18nGettext i18nTokenizer );
 
 use Log::Log4perl;
 use Log::Log4perl::MDC;
@@ -37,11 +37,8 @@ sub send_output {
     my $status = '200 OK';
     my %retry_head;
     if (defined $result->{error}) {
-        if ($result->{error}->{message} && $result->{error}->{message} =~ m{I18N_OPENXPKI_UI}) {
-            $result->{error}->{message} = i18nGettext($result->{error}->{message});
-        }
         if ($use_status_codes) {
-            my ($error) = split(/[:\n]/, $result->{error}->{message});
+            my ($error) = split(/[:\n]/, i18nGettext($result->{error}->{message}));
             $status = sprintf ("%03d %s", ($result->{error}->{code}/100), $error);
         }
     } elsif ($use_status_codes && $result->{result}->{retry_after}) {
@@ -65,7 +62,13 @@ sub send_output {
         print $cgi->header( -type => 'application/json', charset => 'utf8', -status => $status, %retry_head );
         $json->max_depth(20);
         $json->canonical( $canonical_keys ? 1 : 0 );
-        print $json->encode( $result );
+
+        # run i18n tokenzier on output if a language is set
+        if ($config->language()) {
+            print i18nTokenizer($json->encode( $result ));
+        } else {
+            print $json->encode( $result );
+        }
     }
 
 }

@@ -113,6 +113,18 @@ has 'route' => (
     default => '',
 );
 
+has language => (
+    required => 0,
+    is => 'rw',
+    isa => 'Str',
+    lazy => 1,
+    default => '',
+    trigger => sub {
+        my $self = shift;
+        set_language($self->language());
+    },
+);
+
 
 # this allows a constructor with the service as scalar
 around BUILDARGS => sub {
@@ -211,7 +223,7 @@ sub __init_default {
         set_locale_prefix($config{global}{locale_directory});
     }
     if ($config{global}{default_language}) {
-        set_language($config{global}{default_language});
+        $self->language($config{global}{default_language});
     }
 
     return \%config;
@@ -260,7 +272,12 @@ sub config() {
     }
 
     # non existing files and other errors are handled inside loader
-    return $self->load_config();
+    my $config = $self->load_config();
+
+    $self->language($config->{global}->{default_language} || $self->default()->{global}->{default_language} || '');
+
+    return $config;
+
 }
 
 sub load_config {
