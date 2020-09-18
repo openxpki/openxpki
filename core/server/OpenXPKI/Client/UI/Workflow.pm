@@ -1039,9 +1039,9 @@ sub action_index {
     my %wf_param;
 
     if ($wf_args->{wf_fields}) {
-        my @fields = map { $_->{name} } @{$wf_args->{wf_fields}};
-        my $fields = $self->param( \@fields );
-        %wf_param = %{ $fields } if ($fields);
+        my @field_names = map { $_->{name} } @{$wf_args->{wf_fields}};
+        my $fields = $self->param( \@field_names );
+        %wf_param = %{ $fields } if $fields;
         $self->logger()->trace( "wf fields: " . Dumper $fields ) if $self->logger->is_trace;
     }
 
