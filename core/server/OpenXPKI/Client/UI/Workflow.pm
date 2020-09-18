@@ -2866,19 +2866,20 @@ sub __render_fields {
             # deflist iterates over each key/label pair and sets the return value into the label
             if ($item->{format} eq "deflist") {
                 $item->{value} = [
-                    map {
-                        {
-                            value => $self->send_command_v2( 'render_template', { template => $field->{template}, params => $_ } ),
-                            format => 'raw',
-                        }
-                    }
+                    map { {
+                        value => $self->send_command_v2('render_template', { template => $field->{template}, params => $_ }),
+                        format => 'raw',
+                    } }
                     @{ $item->{value} }
                 ];
 
             # bullet list, put the full list to tt and split at the | as sep (as used in profile)
             } elsif ($item->{format} eq "ullist" || $item->{format} eq "rawlist") {
-                my $out = $self->send_command_v2( 'render_template', { template => $field->{template}, params => { value => $item->{value} } } );
-                $self->logger()->debug('Return from template ' . $out );
+                my $out = $self->send_command_v2('render_template', {
+                    template => $field->{template},
+                    params => { value => $item->{value} },
+                });
+                $self->logger()->debug('Rendered template: ' . $out);
                 if ($out) {
                     my @val = split /\s*\|\s*/, $out;
                     $self->logger()->trace('Split ' . Dumper \@val) if $self->logger->is_trace;
@@ -2888,11 +2889,17 @@ sub __render_fields {
                 }
 
             } elsif (ref $item->{value} eq 'HASH' && $item->{value}->{label}) {
-                $item->{value}->{label} = $self->send_command_v2( 'render_template', { template => $field->{template},
-                    params => { value => $item->{value}->{label} }} );
+                $item->{value}->{label} = $self->send_command_v2('render_template', {
+                    template => $field->{template},
+                    params => { value => $item->{value}->{label} },
+                });
 
             } else {
-                $item->{value} = $self->send_command_v2( 'render_template', { template => $field->{template}, params => { value => $item->{value} } } );
+                $item->{value} = $self->send_command_v2('render_template', {
+                    template => $field->{template},
+                    params => { value => $item->{value} },
+                });
+            }
 
         } elsif ($field->{yaml_template}) {
             # We prepend a node to the template because
