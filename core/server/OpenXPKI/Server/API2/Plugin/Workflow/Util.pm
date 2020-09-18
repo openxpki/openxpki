@@ -51,10 +51,11 @@ sub validate_input_params {
     ##! 2: "check parameters"
     return undef unless scalar keys %{ $params };
 
-    my %fields = map { $_->name => 1 } $workflow->get_action_fields($activity);
+    # build hash of field names (and strip array indicator [] from field name)
+    my %fields = map { my $n = $_->name; $n =~ s/\[\]$//; $n => 1 } $workflow->get_action_fields($activity);
 
     # throw exception on fields not listed in the field spec
-    # TODO - perhaps build a filter from the spec and tolerate additonal params
+    # TODO - perhaps build a filter from the spec and tolerate additional params
     my $result;
     for my $key (keys %{$params}) {
         if (not exists $fields{$key}) {
