@@ -22,78 +22,113 @@ use MockUI;
 my $SESSION_DIR = tempdir( CLEANUP => 1 );
 
 my $TESTS = [
-    #
-    # headings
-    #
-    {
-        field => { format => 'spacer' },
-        expected => {
-            format => 'head',
-            className => 'spacer',
-        },
-    },
+    # #
+    # # headings
+    # #
+    # {
+    #     field => { format => 'spacer' },
+    #     expected => {
+    #         format => 'head',
+    #         className => 'spacer',
+    #     },
+    # },
+
+    # #
+    # # format auto-detection
+    # #
+    # {
+    #     field => { name => 'pkcs10' },
+    #     value => "dummy",
+    #     expected => {
+    #         format => 'code',
+    #         value => 'dummy',
+    #     },
+    # },
+
+    # {
+    #     field => { type => 'textarea' },
+    #     value => "one\ntwo",
+    #     expected => {
+    #         format => 'nl2br',
+    #         value => "one\ntwo",
+    #     },
+    # },
+
+    # # fixed hash value -> deflist
+    # {
+    #     field => { value => { one => 1, two => 2 } },
+    #     expected => {
+    #         format => 'deflist',
+    #         value => [ { label => 'one', value => '1' }, { label => 'two', value => '2' } ],
+    #     },
+    # },
+
+    # # fixed array value -> ullist
+    # {
+    #     field => { value => [ qw( one two ) ] },
+    #     expected => {
+    #         format => 'ullist',
+    #         value => [ qw( one two ) ],
+    #     },
+    # },
+
+    # #
+    # # Specific formats
+    # #
+
+    # # cert_identifier
+    # {
+    #     field => {
+    #         type => 'cert_identifier',
+    #         template => "[% USE Certificate %][% value %]<br/>[% Certificate.body(value, 'subject') %]",
+    #     },
+    #     value => sub { shift->certhelper_database->cert('democa-alice-2')->id },
+    #     expected => sub {
+    #         my ($oxitest, $value) = @_;
+    #         my $cert = $oxitest->certhelper_database->cert_by_id($value);
+    #         return {
+    #             format => 'link',
+    #             value => superhashof({
+    #                 label => re($cert->id . '.*' . $cert->db->{subject}),
+    #             }),
+    #         };
+    #     },
+    # },
 
     #
-    # format auto-detection
+    # templates generating YAML
     #
-    {
-        field => { name => 'pkcs10' },
-        value => "dummy",
-        expected => {
-            format => 'code',
-            value => 'dummy',
-        },
-    },
-
-    {
-        field => { type => 'textarea' },
-        value => "one\ntwo",
-        expected => {
-            format => 'nl2br',
-            value => "one\ntwo",
-        },
-    },
-
-    # fixed hash value -> deflist
-    {
-        field => { value => { one => 1, two => 2 } },
-        expected => {
-            format => 'deflist',
-            value => [ { label => 'one', value => '1' }, { label => 'two', value => '2' } ],
-        },
-    },
-
-    # fixed array value -> ullist
-    {
-        field => { value => [ qw( one two ) ] },
-        expected => {
-            format => 'ullist',
-            value => [ qw( one two ) ],
-        },
-    },
-
-    #
-    # Specific formats
-    #
-
-    # cert_identifier
     {
         field => {
-            type => 'cert_identifier',
-            template => "[% USE Certificate %][% value %]<br/>[% Certificate.body(value, 'subject') %]",
+            name => 'testfield[]',
+            format => 'linklist',
+            yaml_template => '
+              [% USE Certificate %]
+              [% IF value %]
+                [% FOREACH identifier = value %]
+                 - label: "[% Certificate.notafter(identifier) %] / [% identifier %]"
+                   page: "#link!to!id![% identifier %]"
+                [% END %]
+              [% END %]
+            ',
         },
-        value => sub { shift->certhelper_database->cert('democa-alice-2')->id },
+        value => sub {
+            my $oxitest = shift;
+            return [
+                $oxitest->certhelper_database->cert('democa-alice-2')->id,
+                $oxitest->certhelper_database->cert('democa-signer-2')->id,
+            ];
+        },
         expected => sub {
             my ($oxitest, $value) = @_;
-            my $cert = $oxitest->certhelper_database->cert_by_id($value);
             return {
-                format => 'link',
-                value => superhashof({
-                    label => re($cert->id . '.*' . $cert->db->{subject}),
-                }),
+                format => 'linklist',
+                value => [
+                    map { { label => re(qr{.* / $_}), page => "#link!to!id!$_" } } @$value
+                ],
             };
         },
-    }
+    },
 
 ];
 
@@ -202,7 +237,7 @@ sub run_tests {
             my $value = ref $test->{value} eq 'CODE' ? $test->{value}->($oxitest) : $test->{value};
             $result = $client->mock_request({
                 'action' => 'workflow!index',
-                defined $test->{value} ? ( $fieldname => $value ) : (),
+                defined $value ? ( $fieldname => $value ) : (),
                 'wf_token' => undef,
             });
 

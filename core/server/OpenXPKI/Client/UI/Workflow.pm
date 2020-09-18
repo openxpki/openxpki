@@ -1,14 +1,15 @@
-# OpenXPKI::Client::UI::Workflow
-# Written 2013 by Oliver Welter
-# (C) Copyright 2013 by The OpenXPKI Project
-
 package OpenXPKI::Client::UI::Workflow;
-
 use Moose;
+
+# Core modules
 use POSIX;
 use Data::Dumper;
-use Date::Parse;
+
+# CPAN modules
 use Log::Log4perl::MDC;
+use Date::Parse;
+use YAML::Loader;
+
 
 has __default_grid_head => (
     is => 'rw',
@@ -2892,6 +2893,27 @@ sub __render_fields {
 
             } else {
                 $item->{value} = $self->send_command_v2( 'render_template', { template => $field->{template}, params => { value => $item->{value} } } );
+
+        } elsif ($field->{yaml_template}) {
+            # We prepend a node to the template because
+            # 1. YAML parser chokes on arrays without parent node
+            # 2. the template renderer strips whitespaces off the very beginning which would destroy things
+            my $yaml = "placeholder:\n" . $field->{yaml_template};
+            ##! 64: 'Rendering value: ' . $item->{value}
+            my $out = $self->send_command_v2('render_template', {
+                template => $yaml,
+                params => { value => $item->{value} },
+            });
+            $self->logger->debug('Rendered YAML template: ' . $out);
+            ##! 64: 'Rendered YAML template: ' . $out
+            if ($out) {
+                my $doc = YAML::Loader->new->load($out);
+                my $structure = $doc->{placeholder};
+                $self->logger->debug('Parsed Perl structure: ' . Dumper($structure));
+                ##! 64: 'Parsed Perl structure: ' . Dumper($structure)
+                $item->{value} = $structure;
+            } else {
+                $item->{value} = undef; # prevent pushing emtpy lists
             }
         }
 
