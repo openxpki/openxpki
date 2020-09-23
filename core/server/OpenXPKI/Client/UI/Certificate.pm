@@ -975,8 +975,8 @@ sub init_download {
         my $keeproot = $self->param('root') ? 1 : 0;
         $output = $self->send_command_v2 ( "get_chain", { start_with => $cert_identifier, bundle => 1, keeproot => $keeproot });
 
-        $filename .= ".p7c";
-        $content_type = 'application/pkcs7-mime';
+        $filename .= ".p7b";
+        $content_type = 'application/x-pkcs7-certificates';
 
     } elsif ($format eq 'bundle') {
 
