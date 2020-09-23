@@ -9,6 +9,7 @@ use Data::Dumper;
 use Log::Log4perl::MDC;
 use Date::Parse;
 use YAML::Loader;
+use Try::Tiny;
 
 
 has __default_grid_head => (
@@ -2907,7 +2908,7 @@ sub __render_fields {
             # We prepend a node to the template because
             # 1. YAML parser chokes on arrays without parent node
             # 2. the template renderer strips whitespaces off the very beginning which would destroy things
-            my $yaml = "placeholder:\n" . $field->{yaml_template};
+            my $yaml = "OXI_PLACEHOLDER:\n" . $field->{yaml_template};
             ##! 64: 'Rendering value: ' . $item->{value}
             my $out = $self->send_command_v2('render_template', {
                 template => $yaml,
@@ -2916,8 +2917,17 @@ sub __render_fields {
             $self->logger->debug('Rendered YAML template: ' . $out);
             ##! 64: 'Rendered YAML template: ' . $out
             if ($out) {
-                my $doc = YAML::Loader->new->load($out);
-                my $structure = $doc->{placeholder};
+                my $doc;
+                try {
+                    $doc = YAML::Loader->new->load($out);
+                }
+                catch {
+                    OpenXPKI::Exception->throw (
+                        message => "Error parsing YAML in 'yaml_template'",
+                        params => { field => $key, error => $_, yaml => $out }
+                    );
+                };
+                my $structure = $doc->{OXI_PLACEHOLDER};
                 $self->logger->debug('Parsed Perl structure: ' . Dumper($structure));
                 ##! 64: 'Parsed Perl structure: ' . Dumper($structure)
                 $item->{value} = $structure;
