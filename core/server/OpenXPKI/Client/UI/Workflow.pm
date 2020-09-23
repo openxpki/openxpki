@@ -2319,7 +2319,6 @@ sub __render_input_field {
 
     if (!$field->{required}) {
         $item->{is_optional} = 1;
-        $item->{label} .= '*';
     }
 
     # special handling of preset cert_identifier fields
