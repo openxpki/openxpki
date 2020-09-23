@@ -2618,7 +2618,7 @@ sub __render_fields {
         }
 
         # Label, Description, Tooltip
-        foreach my $prop (qw(label description tooltip)) {
+        foreach my $prop (qw(label description tooltip preamble)) {
             if ($field->{$prop}) {
                 $item->{$prop} = $field->{$prop};
             }
