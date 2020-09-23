@@ -11,6 +11,8 @@ use Date::Parse;
 use YAML::Loader;
 use Try::Tiny;
 
+use OpenXPKI::Debug;
+
 
 has __default_grid_head => (
     is => 'rw',
@@ -1045,6 +1047,7 @@ sub action_index {
         my $fields = $self->param( \@field_names );
         %wf_param = %{ $fields } if $fields;
         $self->logger()->trace( "wf fields: " . Dumper $fields ) if $self->logger->is_trace;
+        ##! 64: "wf fields: " . Dumper $fields
     }
 
     # take over params from token, if any
@@ -1058,6 +1061,7 @@ sub action_index {
     }
 
     $self->logger()->trace( "wf params: " . Dumper \%wf_param ) if $self->logger->is_trace;
+    ##! 64: "wf params: " . Dumper \%wf_param
 
     if ($wf_args->{wf_id}) {
 
@@ -2598,9 +2602,11 @@ sub __render_fields {
     }
 
     my $queued; # receives header items that depend on non-empty sections
+    ##! 64: "Context: " . Dumper($context)
     FIELD: foreach my $field (@fields_to_render) {
 
         my $key = $field->{name} || '';
+        ##! 64: "Context value for field $key: " . (defined $context->{$key} ? Dumper($context->{$key}) : '')
         my $item = {
             name => $key,
             value => $field->{value} // (defined $context->{$key} ? $context->{$key} : ''),
@@ -2660,7 +2666,7 @@ sub __render_fields {
                     $item->{format} = 'ullist';
                 }
             }
-
+            ##! 64: 'Auto applied format: ' . $item->{format}
         }
 
         # convert format cert_identifier into a link
