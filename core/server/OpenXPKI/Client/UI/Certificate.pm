@@ -385,8 +385,10 @@ sub init_export {
                 push @line, i18nGettext('I18N_OPENXPKI_UI_CERT_STATUS_'.$item->{status});
 
             } elsif ($field =~ /(notafter|notbefore)/) {
-
                 push @line,  DateTime->from_epoch( epoch => $item->{ $field } )->iso8601();
+
+            } elsif ($field eq 'cert_key_hex') {
+                push @line, Math::BigInt->new( $item->{cert_key} )->as_hex;
 
             } else {
                 push @line, $item->{ $field };
@@ -1401,6 +1403,7 @@ sub __render_result_list {
 
         $item->{status} = 'EXPIRED' if ($item->{status} eq 'ISSUED' && $item->{notafter} < time());
 
+        # if you add patterns you also need to add those in init_export!
         my @line;
         foreach my $col (@{$colums}) {
             if ($col->{field} eq 'status') {
