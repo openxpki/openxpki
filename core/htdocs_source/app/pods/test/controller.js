@@ -135,14 +135,14 @@ export default class TestController extends Controller {
                 {
                     type: "text",
                     name: "plaintext",
-                    label: "Clone field with 2 presets",
+                    label: "Text, , clone field with 2 presets",
                     value: ["sheep #1", "sheep #2"],
                     clonable: 1,
                 },
                 {
                     type: "text",
                     name: "attributes",
-                    label: "Dynamic, clonable, 2 presets",
+                    label: "Text, dynamic, clonable, 2 presets",
                     clonable: 1,
                     is_optional: 1,
                     keys: [
@@ -163,6 +163,12 @@ export default class TestController extends Controller {
                         { key: "cert_subject", value: "Subject" },
                         { key: "transaction_id", value: "TransId" },
                     ],
+                },
+                {
+                    type: "rawtext",
+                    name: "rawtext",
+                    label: "Raw text",
+                    value: "",
                 },
                 {
                     type: "static",
