@@ -20,7 +20,7 @@ module.exports = function(defaults) {
             console.log("Building unminified assets incl. sourcemaps");
             on_production = {
                 ...on_production,
-                'ember-cli-uglify': { enabled: false },
+                'ember-cli-terser': { enabled: false },
                 'sourcemaps': { enabled: true },
             };
         }
