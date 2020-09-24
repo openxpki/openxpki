@@ -4,6 +4,5 @@
     value={{@content.value}}
     placeholder={{@content.placeholder}}
     {{on "input" this.onInput}}
-    {{on "paste" this.onPaste}}
     {{did-insert (fn @mayFocus true)}}
 />
