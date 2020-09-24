@@ -73,7 +73,7 @@ export default class OxiFieldCertIdentifierComponent extends Component {
 
     @action
     onInput(evt) {
-        this.value = evt.target.value;
+        this.value = this.urlsafe(evt.target.value);
         // don't process same value as before
         if (this.value === this.searchPrevious) { return }
         this.searchPrevious = this.value;
@@ -111,5 +111,10 @@ export default class OxiFieldCertIdentifierComponent extends Component {
         this.searchPrevious = this.value;
         this.isDropdownOpen = false;
         this.searchResults = [];
+    }
+
+    // RFC 3548 URL and filename safe base64
+    urlsafe(text) {
+        return text.replace(/\+/g, '-').replace(/\//g, '_');
     }
 }
