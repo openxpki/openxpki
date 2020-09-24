@@ -11,17 +11,18 @@ export default class OxiFieldCertIdentifierComponent extends Component {
      * If an entry from the drop-down list is chosen, then it shows
      * the certificate subject but not the true form value to be submitted.
      */
-    @tracked search = null;
+    @tracked value = null;
     @tracked isDropdownOpen = false;
     @tracked searchResults = [];
     searchIndex = 0;
     searchPrevious = null;
+    searchTimer = null;
 
     constructor() {
         super(...arguments);
         // do not turn "search" into a @computed property as we want the search field
         // to show the cert subject in case of a selection from the auto-suggest dropdown
-        this.search = this.args.content.value;
+        this.value = this.args.content.value;
     }
 
     selectNeighbor(diff) {
@@ -72,35 +73,42 @@ export default class OxiFieldCertIdentifierComponent extends Component {
 
     @action
     onInput(evt) {
-        this.search = evt.target.value;
+        this.value = evt.target.value;
+        // don't process same value as before
+        if (this.value === this.searchPrevious) { return }
+        this.searchPrevious = this.value;
+        // cancel old search query timer on new input
+        if (this.searchTimer) clearTimeout(this.searchTimer); // after check this.value === this.searchPrevious !
+        // don't search short values
+        if (this.value.length < 3) { this.isDropdownOpen = false; return }
 
-        if (this.search === this.searchPrevious) { return }
-        if (this.search.length < 3) { this.isDropdownOpen = false; return }
-        this.searchPrevious = this.search;
+        // report changes to parent component
+        this.args.onChange(this.value);
 
-        this.args.onChange(this.search);
-
-        let searchIndex = ++this.searchIndex;
-        return getOwner(this).lookup("route:openxpki").sendAjaxQuiet({
-            action: "certificate!autocomplete",
-            query: this.search
-        }).then((doc) => {
-            // only show results of most recent search
-            if (searchIndex !== this.searchIndex) { return }
-            if (doc.error) { doc = [] }
-            this.searchResults = doc;
-            if (doc[0] != null) {
-                doc[0].active = true;
-            }
-            this.isDropdownOpen = true;
-        });
+        // start search query after 300ms without input
+        this.searchTimer = setTimeout(() => {
+            let searchIndex = ++this.searchIndex;
+            getOwner(this).lookup("route:openxpki").sendAjaxQuiet({
+                action: "certificate!autocomplete",
+                query: this.value
+            }).then((doc) => {
+                // only show results of most recent search
+                if (searchIndex !== this.searchIndex) { return }
+                if (doc.error) { doc = [] }
+                this.searchResults = doc;
+                if (doc[0] != null) {
+                    doc[0].active = true;
+                }
+                this.isDropdownOpen = true;
+            });
+        }, 300);
     }
 
     @action
     selectResult(res) {
         this.args.onChange(res.value);
-        this.search = res.label;
-        this.searchPrevious = this.search;
+        this.value = res.label;
+        this.searchPrevious = this.value;
         this.isDropdownOpen = false;
         this.searchResults = [];
     }
