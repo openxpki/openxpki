@@ -39,7 +39,6 @@ export default class OpenXpkiRoute extends Route {
     needReboot = ["login", "logout", "login!logout", "welcome"];
 
     @tracked content = new Content();
-    quietRequest = false;
 
     // Reserved Ember function
     beforeModel(transition) {
@@ -103,9 +102,6 @@ export default class OpenXpkiRoute extends Route {
     }
 
     setLoadingState(isLoading) {
-        // don't show optical hints if quietRequest
-        if (this.quietRequest) return;
-
         // note that we cannot use the Ember "loading" event as this would only
         // trigger on route changes, but not if we do sendAjax()
         if (isLoading) {
@@ -118,13 +114,12 @@ export default class OpenXpkiRoute extends Route {
 
     // sends an AJAX request without showing "loading" banner or dimming page
     sendAjaxQuiet(request) {
-        this.quietRequest = true;
-        return this.sendAjax(request);
+        return this.sendAjax(request, true);
     }
 
-    sendAjax(request) {
-        this.quietRequest = false;
-        this.setLoadingState(true);
+    // send AJAX request (isQuiet: don't show optical hints if quietRequest)
+    sendAjax(request, isQuiet = false) {
+        if (! isQuiet) this.setLoadingState(true);
         debug("openxpki/route - sendAjax: " + ['page','action'].map(p=>request[p]?`${p} = ${request[p]}`:null).filter(e=>e!==null).join(", "));
         // assemble request parameters
         let req = {
@@ -188,12 +183,12 @@ export default class OpenXpkiRoute extends Route {
                             this._setPageContent(realTarget, doc.page, doc.main, doc.right);
                         }
                     }
-                    this.setLoadingState(false);
+                    if (! isQuiet) this.setLoadingState(false);
                     return resolve(doc);
                 },
                 // FAILURE
                 () => {
-                    this.setLoadingState(false);
+                    if (! isQuiet) this.setLoadingState(false);
                     this.content.error = {
                         message: this.intl.t('error_popup.message')
                     };
