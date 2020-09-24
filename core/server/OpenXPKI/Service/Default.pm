@@ -176,7 +176,7 @@ sub __is_valid_message : PRIVATE {
         return 1;
     }
 
-    CTX('log')->system()->warn('Invalid message '.$message_name.' recevied in state ' . $state_of{$ident});
+    CTX('log')->system()->warn('Invalid message '.$message_name.' received in state ' . $state_of{$ident});
 
     ##! 16: 'message is NOT valid'
     return;

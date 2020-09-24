@@ -29,7 +29,9 @@ B<Parameters>
 
 =item * C<template> I<Str> - template string including placeholders.
 
-=item * C<params> I<HashRef> - parameters to fill in the placeholders. Optional, default:  {}
+=item * C<params> I<HashRef> - parameters to fill in the placeholders. Optional, default: C<{}>
+
+=item * C<trim> I<Bool> - trim whitespaces at beginning and end of rendered string. Optional, default: C<1>
 
 =back
 
@@ -37,15 +39,13 @@ B<Parameters>
 command "render_template" => {
     template => { isa => 'Str', required => 1, },
     params   => { isa => 'HashRef', default => sub { {} } },
+    trim     => { isa => 'Bool', default => 1 },
 } => sub {
     my ($self, $params) = @_;
 
-    my $oxtt = OpenXPKI::Template->new();
+    my $oxtt = OpenXPKI::Template->new({ trim_whitespaces => $params->trim });
     my $result = $oxtt->render($params->template, $params->params);
 
-    # trim whitespaces
-    $result =~ s{ \A [\s\n]+ }{}xms;
-    $result =~ s{ [\s\n]+ \z }{}xms;
     return $result;
 };
 

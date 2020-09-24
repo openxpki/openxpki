@@ -13,18 +13,15 @@ use OpenXPKI::Serialization::Simple;
 #use OpenXPKI::Server::Context qw( CTX );
 
 sub new {
-    my $class = shift;
-    my $args = shift;
+    my ($class, $args) = @_;
 
     $args->{PLUGIN_BASE} = 'OpenXPKI::Template::Plugin';
-
-    if (!defined $args->{ENCODING}) {
-        $args->{ENCODING} =  'UTF-8';
-    }
+    $args->{ENCODING} //= 'UTF-8';
 
     $Template::Stash::PRIVATE = undef;
 
     my $self = $class->SUPER::new($args);
+    $self->{trim_whitespaces} = $args->{trim_whitespaces} // 1;
 
     return $self;
 }
@@ -43,10 +40,7 @@ thrown.
 =cut
 
 sub render {
-
-    my $self = shift;
-    my $template = shift;
-    my $tt_param = shift;
+    my ($self, $template, $tt_param) = @_;
 
     ##! 16: 'template: ' . $template
     ##! 32: 'input params: ' . Dumper $tt_param
@@ -77,8 +71,10 @@ sub render {
     }
 
     # trim spaces and newlines
-    $out =~ s{ \A \s* }{}xms;
-    $out =~ s{ \s* \z }{}xms;
+    if ($self->{trim_whitespaces}) {
+        $out =~ s{ \A [\s\n]+ }{}xms;
+        $out =~ s{ [\s\n]+ \z }{}xms;
+    }
 
     ##! 32: 'output: #' . $out . '#'
 

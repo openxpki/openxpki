@@ -1,14 +1,18 @@
-# OpenXPKI::Client::UI::Workflow
-# Written 2013 by Oliver Welter
-# (C) Copyright 2013 by The OpenXPKI Project
-
 package OpenXPKI::Client::UI::Workflow;
-
 use Moose;
+
+# Core modules
 use POSIX;
 use Data::Dumper;
-use Date::Parse;
+
+# CPAN modules
 use Log::Log4perl::MDC;
+use Date::Parse;
+use YAML::Loader;
+use Try::Tiny;
+
+use OpenXPKI::Debug;
+
 
 has __default_grid_head => (
     is => 'rw',
@@ -1039,10 +1043,11 @@ sub action_index {
     my %wf_param;
 
     if ($wf_args->{wf_fields}) {
-        my @fields = map { $_->{name} } @{$wf_args->{wf_fields}};
-        my $fields = $self->param( \@fields );
-        %wf_param = %{ $fields } if ($fields);
+        my @field_names = map { $_->{name} } @{$wf_args->{wf_fields}};
+        my $fields = $self->param( \@field_names );
+        %wf_param = %{ $fields } if $fields;
         $self->logger()->trace( "wf fields: " . Dumper $fields ) if $self->logger->is_trace;
+        ##! 64: "wf fields: " . Dumper $fields
     }
 
     # take over params from token, if any
@@ -1056,6 +1061,7 @@ sub action_index {
     }
 
     $self->logger()->trace( "wf params: " . Dumper \%wf_param ) if $self->logger->is_trace;
+    ##! 64: "wf params: " . Dumper \%wf_param
 
     if ($wf_args->{wf_id}) {
 
@@ -2578,26 +2584,28 @@ sub __render_fields {
     } elsif ($view eq 'attribute' && (grep /attribute/, @{$wf_info->{handles}})) {
         my $attr = $wf_info->{workflow}->{attribute};
         foreach my $field (sort keys %{$attr }) {
-            push @fields_to_render, { name => $field, value => $attr->{$field}  };
+            push @fields_to_render, { name => $field, value => $attr->{$field} };
         }
     } elsif ($output) {
-        @fields_to_render = @{$wf_info->{state}->{output}};
-        $self->logger()->trace('Render output rules: ' . Dumper  \@fields_to_render  ) if $self->logger->is_trace;
+        @fields_to_render = @$output;
+        # strip array indicator [] from field name
+        for (@fields_to_render) { $_->{name} =~ s/\[\]$// }
+        $self->logger()->trace('Render output rules: ' . Dumper  \@fields_to_render) if $self->logger->is_trace;
 
     } else {
         foreach my $field (sort keys %{$context}) {
-
             next if ($field =~ m{ \A (wf_|_|workflow_id|sources) }x);
             push @fields_to_render, { name => $field };
         }
-        $self->logger()->trace('No output rules, render plain context: ' . Dumper  \@fields_to_render  ) if $self->logger->is_trace;
+        $self->logger()->trace('No output rules, render plain context: ' . Dumper  \@fields_to_render) if $self->logger->is_trace;
     }
 
-    FIELD:
     my $queued; # receives header items that depend on non-empty sections
-    foreach my $field (@fields_to_render) {
+    ##! 64: "Context: " . Dumper($context)
+    FIELD: foreach my $field (@fields_to_render) {
 
         my $key = $field->{name} || '';
+        ##! 64: "Context value for field $key: " . (defined $context->{$key} ? Dumper($context->{$key}) : '')
         my $item = {
             name => $key,
             value => $field->{value} // (defined $context->{$key} ? $context->{$key} : ''),
@@ -2616,7 +2624,7 @@ sub __render_fields {
         }
 
         # Label, Description, Tooltip
-        foreach my $prop (qw(label description tooltip)) {
+        foreach my $prop (qw(label description tooltip preamble)) {
             if ($field->{$prop}) {
                 $item->{$prop} = $field->{$prop};
             }
@@ -2633,7 +2641,7 @@ sub __render_fields {
             $item->{value} = $self->serializer()->deserialize( $item->{value} );
         }
 
-        # assign autoformat based on some assumptions if no format is set
+        # auto-assign format based on some assumptions if no format is set
         if (!$item->{format}) {
 
             # create a link on cert_identifier fields
@@ -2657,7 +2665,7 @@ sub __render_fields {
                     $item->{format} = 'ullist';
                 }
             }
-
+            ##! 64: 'Auto applied format: ' . $item->{format}
         }
 
         # convert format cert_identifier into a link
@@ -2785,7 +2793,7 @@ sub __render_fields {
                 $self->logger()->trace( 'Profile fields' . Dumper $fields ) if $self->logger->is_trace;
 
                 foreach my $field (@$fields) {
-                    # this still uses "old" syntax - adjust after API refactoring
+                    # FIXME this still uses "old" syntax - adjust after API refactoring
                     my $key = $field->{id}; # Name of the context key
                     if ($raw->{$key}) {
                         push @val, { label => $field->{label}, value => $raw->{$key}, key => $key };
@@ -2858,24 +2866,28 @@ sub __render_fields {
 
         if ($field->{template}) {
 
-            my $param = { value => $item->{value} };
-
-            $self->logger()->trace('Render output using template on field '.$key.', '. $field->{template} . ', params:  ' . Dumper $param) if $self->logger->is_trace;
+            $self->logger()->trace('Render output using template on field '.$key.', '. $field->{template} . ', value:  ' . Dumper $item->{value}) if $self->logger->is_trace;
 
             # Rendering target depends on value format
-            # deflist iterates over each key/label pair and sets the return value into the label
+            # deflist: iterate over each label/value pair and render the value template
             if ($item->{format} eq "deflist") {
-
-                foreach (@{$param->{value}}){
-                    $_->{value} = $self->send_command_v2( 'render_template', { template => $field->{template}, params => $_ } );
-                    $_->{format} = 'raw';
-                }
+                $item->{value} = [
+                    map { {
+                        # $_ is a HashRef: { label => STR, key => STR, value => STR } where key is the field name (not needed here)
+                        label => $_->{label},
+                        value => $self->send_command_v2('render_template', { template => $field->{template}, params => $_ }),
+                        format => 'raw',
+                    } }
+                    @{ $item->{value} }
+                ];
 
             # bullet list, put the full list to tt and split at the | as sep (as used in profile)
             } elsif ($item->{format} eq "ullist" || $item->{format} eq "rawlist") {
-
-                my $out = $self->send_command_v2( 'render_template', { template => $field->{template}, params => $param } );
-                $self->logger()->debug('Return from template ' . $out );
+                my $out = $self->send_command_v2('render_template', {
+                    template => $field->{template},
+                    params => { value => $item->{value} },
+                });
+                $self->logger()->debug('Rendered template: ' . $out);
                 if ($out) {
                     my @val = split /\s*\|\s*/, $out;
                     $self->logger()->trace('Split ' . Dumper \@val) if $self->logger->is_trace;
@@ -2885,13 +2897,47 @@ sub __render_fields {
                 }
 
             } elsif (ref $item->{value} eq 'HASH' && $item->{value}->{label}) {
-                $item->{value}->{label} = $self->send_command_v2( 'render_template', { template => $field->{template},
-                    params => { value => $param->{value}->{label} }} );
+                $item->{value}->{label} = $self->send_command_v2('render_template', {
+                    template => $field->{template},
+                    params => { value => $item->{value}->{label} },
+                });
 
             } else {
+                $item->{value} = $self->send_command_v2('render_template', {
+                    template => $field->{template},
+                    params => { value => $item->{value} },
+                });
+            }
 
-                $item->{value} = $self->send_command_v2( 'render_template', { template => $field->{template}, params => $param } );
-
+        } elsif ($field->{yaml_template}) {
+            # We prepend a node to the template because
+            # 1. YAML parser chokes on arrays without parent node
+            # 2. the template renderer strips whitespaces off the very beginning which would destroy things
+            my $yaml = "OXI_PLACEHOLDER:\n" . $field->{yaml_template};
+            ##! 64: 'Rendering value: ' . $item->{value}
+            my $out = $self->send_command_v2('render_template', {
+                template => $yaml,
+                params => { value => $item->{value} },
+            });
+            $self->logger->debug('Rendered YAML template: ' . $out);
+            ##! 64: 'Rendered YAML template: ' . $out
+            if ($out) {
+                my $doc;
+                try {
+                    $doc = YAML::Loader->new->load($out);
+                }
+                catch {
+                    OpenXPKI::Exception->throw (
+                        message => "Error parsing YAML in 'yaml_template'",
+                        params => { field => $key, error => $_, yaml => $out }
+                    );
+                };
+                my $structure = $doc->{OXI_PLACEHOLDER};
+                $self->logger->debug('Parsed Perl structure: ' . Dumper($structure));
+                ##! 64: 'Parsed Perl structure: ' . Dumper($structure)
+                $item->{value} = $structure;
+            } else {
+                $item->{value} = undef; # prevent pushing emtpy lists
             }
         }
 
@@ -2902,11 +2948,10 @@ sub __render_fields {
             (ref $item->{value} eq '' && $item->{value} ne '')))) {
             #noop
         } elsif ($item->{format} eq 'head' && $item->{empty}) {
-            # queue header element
+            # queue header element - we only add it (below) if a non-empty item follows
             $queued = $item;
-
         } else {
-            # add queded element if any
+            # add queued element if any
             if ($queued) {
                 push @fields, $queued;
                 $queued = undef;
