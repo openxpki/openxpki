@@ -16,15 +16,14 @@ use Moose;
 has '_workflow_config' => (
     is => 'rw',
     isa => 'HashRef',
-    required => 0,
     reader => 'workflow_config',
-    builder => '_build_workflow_config'
+    lazy => 1,
+    builder => '_build_workflow_config',
 );
 
 has '_config' => (
     is => 'rw',
     isa => 'Object',
-    required => 0,
     lazy => 1, # This is fundamental! (race condition within loader -> empty ref)
     default => sub { return CTX('config'); }
 );
@@ -32,13 +31,11 @@ has '_config' => (
 has 'logger' => (
     is => 'ro',
     isa => 'Object',
-    required => 0,
     lazy => 1,
     default => sub { return CTX('log')->workflow(); }
 );
 
 sub _build_workflow_config {
-
     my $self = shift;
 
     my $conn = $self->_config();
@@ -56,38 +53,38 @@ sub _build_workflow_config {
     }
 
     # Init structure
-    $self->_workflow_config({ condition => [], validator => [], action =>[], workflow => [], persister => [] });
+    my $wf_conf = { condition => [], validator => [], action =>[], workflow => [], persister => [] };
 
     # Add persisters
     my @persister = $conn->get_keys('workflow.persister');
     foreach my $persister (@persister) {
         my $conf = $conn->get_hash(['workflow','persister', $persister]);
         $conf->{name} = $persister;
-        push @{$self->_workflow_config()->{persister}}, $conf;
+        push @{$wf_conf->{persister}}, $conf;
     }
 
     # Add workflows
     my @workflow_def = $conn->get_keys('workflow.def');
     foreach my $wf_name (@workflow_def) {
         # The main workflow definiton (the flow rules)
-        $self->__process_workflow($wf_name);
+        push @{$wf_conf->{workflow}}, $self->__process_workflow($wf_name);
 
         # Add workflow defined actions
         my @action_names = $conn->get_keys(['workflow','def', $wf_name, 'action']);
         foreach my $action_name (@action_names) {
-            $self->__process_action(['workflow','def', $wf_name, 'action', $action_name ]);
+            push @{$wf_conf->{action}}, $self->__process_action(['workflow','def', $wf_name, 'action', $action_name ]);
         }
 
         # Add workflow defined conditions
         my @condition_names = $conn->get_keys(['workflow','def', $wf_name, 'condition']);
         foreach my $condition_name (@condition_names) {
-            $self->__process_condition(['workflow','def', $wf_name, 'condition', $condition_name ]);
+            push @{$wf_conf->{condition}}, $self->__process_condition(['workflow','def', $wf_name, 'condition', $condition_name ]);
         }
 
         # Add workflow defined validators
         my @validator_names = $conn->get_keys(['workflow','def', $wf_name, 'validator']);
         foreach my $validator_name (@validator_names) {
-            $self->__process_validator(['workflow','def', $wf_name, 'validator', $validator_name ]);
+            push @{$wf_conf->{validator}}, $self->__process_validator(['workflow','def', $wf_name, 'validator', $validator_name ]);
         }
 
     }
@@ -95,22 +92,22 @@ sub _build_workflow_config {
     # Finally add the global actions
     my @action_names = $conn->get_keys(['workflow','global', 'action']);
     foreach my $action_name (@action_names) {
-        $self->__process_action(['workflow','global', 'action', $action_name]);
+        push @{$wf_conf->{action}}, $self->__process_action(['workflow','global', 'action', $action_name]);
     }
 
     # And conditions
     my @condition_names = $conn->get_keys(['workflow','global', 'condition']);
     foreach my $condition_name (@condition_names) {
-        $self->__process_condition(['workflow','global', 'condition', $condition_name ]);
+        push @{$wf_conf->{condition}}, $self->__process_condition(['workflow','global', 'condition', $condition_name ]);
     }
 
     # Validators
     my @validator_names = $conn->get_keys(['workflow','global', 'validator']);
     foreach my $validator_name (@validator_names) {
-        $self->__process_validator(['workflow','global', 'validator', $validator_name ]);
+        push @{$wf_conf->{validator}}, $self->__process_validator(['workflow','global', 'validator', $validator_name ]);
     }
 
-    push @{$self->_workflow_config()->{validator}}, {
+    push @{$wf_conf->{validator}}, {
         name => '_internal_basic_field_type',
         class => 'OpenXPKI::Server::Workflow::Validator::BasicFieldType'
     };
@@ -118,7 +115,7 @@ sub _build_workflow_config {
 
     foreach my $class (('action','condition','validator')) {
         my %defined;
-        foreach my $item (@{$self->_workflow_config()->{$class}}) {
+        foreach my $item (@{$wf_conf->{$class}}) {
             my $name = $item->{name};
             OpenXPKI::Exception->throw(
                 message => 'Item name defined twice - unable to load workflow configuration',
@@ -128,14 +125,11 @@ sub _build_workflow_config {
         }
     }
 
-    return $self->_workflow_config
-
+    return $wf_conf;
 }
 
 sub __process_workflow {
-
-    my $self = shift;
-    my $wf_name = shift;
+    my ($self, $wf_name) = @_;
 
     my $workflow = {
         type => $wf_name,
@@ -279,15 +273,10 @@ sub __process_workflow {
 
     } # end states
 
-    ##! 32: 'Workflow Config ' . Dumper $workflow
-
-    push @{$self->_workflow_config()->{workflow}}, $workflow;
-
     $self->logger()->info("Adding workflow: $wf_name");
 
-
+    ##! 32: 'Workflow Config ' . Dumper $workflow
     return $workflow;
-
 }
 
 
@@ -298,9 +287,7 @@ This includes class, class params, fields and validators.
 
 =cut
 sub __process_action {
-
-    my $self = shift;
-    my $path = shift;
+    my ($self, $path) = @_;
 
     my $conn = $self->_config();
 
@@ -433,11 +420,7 @@ sub __process_action {
 
     $self->logger()->trace("Adding action " . (Dumper $action)) if $self->logger->is_trace;
 
-
-    push @{$self->_workflow_config()->{action}}, $action;
-
     return $action;
-
 }
 
 =head2 __process_condition
@@ -447,9 +430,7 @@ This includes class, class params and parameters.
 
 =cut
 sub __process_condition {
-
-    my $self = shift;
-    my $path = shift;
+    my ($self, $path) = @_;
 
     my $conn = $self->_config();
 
@@ -490,11 +471,7 @@ sub __process_condition {
 
     $self->logger()->trace("Adding condition " . (Dumper $condition)) if $self->logger->is_trace;
 
-
-    push @{$self->_workflow_config()->{condition}}, $condition;
-
     return $condition;
-
 }
 
 
@@ -505,9 +482,7 @@ This includes class, class params and parameters.
 
 =cut
 sub __process_validator {
-
-    my $self = shift;
-    my $path = shift;
+    my ($self, $path) = @_;
 
     my $conn = $self->_config();
 
@@ -548,12 +523,9 @@ sub __process_validator {
 
     $self->logger()->trace("Adding validator " . (Dumper $validator)) if $self->logger->is_trace;
 
-
-    push @{$self->_workflow_config()->{validator}}, $validator;
-
     return $validator;
-
 }
-1;
+
+__PACKAGE__->meta->make_immutable;
 
 __END__;
