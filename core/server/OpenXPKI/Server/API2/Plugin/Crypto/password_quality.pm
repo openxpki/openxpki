@@ -222,7 +222,7 @@ command "password_quality" => {
     my $is_valid = $validator->is_valid($params->password);
 
     return [] if $is_valid;
-    return [ $validator->error_messages ];
+    return [ $validator->first_error_messages ];
 };
 
 __PACKAGE__->meta->make_immutable;
