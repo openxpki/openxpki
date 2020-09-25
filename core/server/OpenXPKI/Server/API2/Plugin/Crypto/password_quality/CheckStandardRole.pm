@@ -174,11 +174,11 @@ sub _build_leet_perms {
 after hook_register_checks => sub {
     my $self = shift;
     $self->register_check(
-        'length'    => 'check_length',
-        'common'    => 'check_common',
-        'diffchars' => 'check_diffchars',
-        'sequence'  => 'check_sequence',
-        'dict'      => 'check_dict',
+        'length'    => [ 0, 'check_length' ],
+        'dict'      => [ 10, 'check_dict' ],
+        'common'    => [ 20, 'check_common' ],
+        'sequence'  => [ 30, 'check_sequence' ],
+        'diffchars' => [ 40, 'check_diffchars' ],
     );
     $self->add_default_check(qw( length common diffchars sequence dict ));
 };
@@ -227,6 +227,7 @@ sub check_diffchars {
 
     # check the number of chars
     my $totalchar = scalar(keys(%found));
+        ##! 64: "$totalchar different characters (limit: " . $self->min_diff_chars . ")"
         if ($totalchar <= $self->min_diff_chars) {
         return [ diffchars => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DIFFERENT_CHARS" ];
     }

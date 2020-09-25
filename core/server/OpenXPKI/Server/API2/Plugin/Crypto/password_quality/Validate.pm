@@ -64,18 +64,16 @@ has log => (
     },
 );
 
-# Registered checks (check_name => method_name, check_name => method_name, ...)
+# Registered checks (check_name => [ complexity, method_name ], check_name => [ complexity, method_name ], ...)
 has _registered_checks => (
     is => 'rw',
-    isa => 'HashRef[Str]',
+    isa => 'HashRef[ArrayRef]',
     traits  => ['Hash'],
     init_arg => undef,
     lazy => 1,
     default => sub { {} },
     handles => {
         register_check => 'set',
-        # Returns the method name by given check name
-        _registered_check_method => 'get',
         # Returns a list of all available check names
         _registered_check_names => 'keys',
     },
@@ -224,16 +222,28 @@ sub is_valid {
     return (scalar $self->get_errors ? 0 : 1);
 }
 
-=head2 first_error_message
+=head2 first_error_messages
 
-Returns the first error message or C<undef> if password check succeeded.
+Returns the error messages of the checks with the lowest complexity or C<undef>
+if password is valid.
+
+I.e. for a password failing C<letters>, C<digits> and C<entropy> checks the
+result are the C<letters> nad C<digits> error messages.
 
 =cut
-sub first_error_message {
+sub first_error_messages {
     my ($self) = @_;
-    my ($first_error) = $self->get_errors;
-    return unless $first_error;
-    return $first_error->[1];
+
+    my ($lowest_complexity) = sort { $a <=> $b } map { $self->_registered_check_complexity($_->[0]) } $self->get_errors;
+    return unless defined $lowest_complexity;
+
+    my @messages =
+        map { $_->[1] }                 # fetch message
+        sort { $a->[0] cmp $b->[0] }    # sort by check name
+        grep { $self->_registered_check_complexity($_->[0]) eq $lowest_complexity }
+        $self->get_errors;
+
+    return @messages;
 }
 
 =head2 error_messages
@@ -243,7 +253,19 @@ Returns a list of error messages from all checks.
 =cut
 sub error_messages {
     my ($self) = @_;
-    return map { $_->[1] } $self->get_errors;
+
+    my @messages =
+        map { $_->[1] }
+        sort {
+            my $c_a = $self->_registered_check_complexity($a->[0]);
+            my $c_b = $self->_registered_check_complexity($b->[0]);
+            $c_a != $c_b
+                ? $c_a <=> $c_b         # primarily sort by complexity score
+                : $a->[0] cmp $b->[0];  # then by check name
+        }
+        $self->get_errors;
+
+    return @messages;
 }
 
 =head2 error_codes
@@ -300,6 +322,18 @@ Example usage: see L</hook_register_checks>.
 
 =cut
 ##########
+
+# Returns the complexity score of the given check name
+sub _registered_check_complexity {
+    my ($self, $check_name) = @_;
+    return $self->_registered_checks->{$check_name}->[0];
+}
+
+# Returns the method name by given check name
+sub _registered_check_method {
+    my ($self, $check_name) = @_;
+    return $self->_registered_checks->{$check_name}->[1];
+}
 
 ########## This method is defined in the attribute _default_checks above
 =head2 add_default_check

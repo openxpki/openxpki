@@ -63,13 +63,13 @@ has min_dict_len => (
 after hook_register_checks => sub {
     my $self = shift;
     $self->register_check(
-        'letters'       => 'check_letters',
-        'digits'        => 'check_digits',
-        'specials'      => 'check_specials',
-        'mixedcase'     => 'check_mixedcase',
-        'groups'        => 'check_char_groups',
-        'partsequence'  => 'check_partsequence',
-        'partdict'      => 'check_partdict',
+        'letters'       => [ 5, 'check_letters' ],
+        'digits'        => [ 5, 'check_digits' ],
+        'specials'      => [ 5, 'check_specials' ],
+        'mixedcase'     => [ 5, 'check_mixedcase' ],
+        'partdict'      => [ 10, 'check_partdict' ],
+        'partsequence'  => [ 30, 'check_partsequence' ],
+        'groups'        => [ 40, 'check_char_groups' ],
     );
 };
 

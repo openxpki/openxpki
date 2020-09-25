@@ -219,7 +219,7 @@ sub _build_unicode_blocks {
 
 after hook_register_checks => sub {
     my $self = shift;
-    $self->register_check('entropy' => 'check_entropy');
+    $self->register_check('entropy' => [ 50, 'check_entropy' ]);
     $self->add_default_check('entropy');
 };
 
