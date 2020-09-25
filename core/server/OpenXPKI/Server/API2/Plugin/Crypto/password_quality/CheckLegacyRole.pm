@@ -109,7 +109,7 @@ sub check_digits {
 sub check_letters {
     my $self = shift;
     if ($self->password !~ m/[a-zA-Z]/) {
-        return [letters => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LETTERS" ];
+        return [ letters => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LETTERS" ];
     }
     return;
 }
@@ -118,7 +118,7 @@ sub check_mixedcase {
     my $self = shift;
     my $pass = $self->password;
     if (not ($pass =~ m/[a-z]/ and $pass =~ m/[A-Z]/)) {
-        return [ mixed => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_MIXED_CASE"];
+        return [ mixedcase => "I18N_OPENXPKI_UI_PASSWORD_QUALITY_MIXED_CASE"];
     }
     return;
 }
