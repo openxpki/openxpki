@@ -857,73 +857,56 @@ msgstr "Oops, hier ist etwas schief gegangen"
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Die angeforderte Seite wurde nicht gefunden"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_COMMON_PASSWORD"
-msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+msgstr "Das Passwort wurde in einer Negativliste gefunden."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_DICT_WORD"
-msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+msgstr "Teile des Passwortes wurden in einem Wörterbuch gefunden."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_SEQUENCE"
-msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+msgstr "Das Passwort darf keine aufeinanderfolgenden Zeichen wie 12345 oder qwertz enthalten."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DICT_WORD"
-msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+msgstr "Das Passwort wurde in einem Wörterbuch gefunden."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DIFFERENT_CHARS"
-msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+msgstr "Das Passwort muß aus mehr unterschiedlichen Zeichen bestehen."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_DIGITS"
-msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+msgstr "Das Passwort muß Ziffern enthalten."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_GROUPS"
-msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+msgstr "Das Passwort muß Zeichen aus verschiedenen Zeichenklassen (Ziffern, Groß-/Kleinbuchstaben, Sonderzeichen) enthalten."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_INSUFFICIENT_ENTROPY"
-msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+msgstr "Das Passwort ist nicht zufällig genug, versuchen Sie mehr unterschiedliche Zeichen."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_LONG"
-msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+msgstr "Das Passwort ist zu lang."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_SHORT"
-msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+msgstr "Das Passwort ist zu kurz."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LETTERS"
-msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+msgstr "Das Passwort muß Buchstaben enthalten."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_MIXED_CASE"
-msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+msgstr "Das Passwort muß Groß- und Kleinbuchstaben enthalten."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_PASSWORD_EMPTY"
-msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+msgstr "Das Passwort darf nicht leer sein."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REPETITIONS"
-msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+msgstr "Das Passwort enthält zuviele Wiederholungen."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REVERSED_DICT_WORD"
-msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+msgstr "Das Passwort wurde in einem Wörterbuch gefunden."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_SEQUENCE"
-msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+msgstr "Das Passwort darf nicht aus aufeinanderfolgenden Zeichen wie 12345 oder qwertz bestehen."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PASSWORD_QUALITY_SPECIAL_CHARS"
-msgstr "Das Passwort erfüllt nicht die Anforderungen der Richtlinie!"
+msgstr "Das Passwort muß Sonderzeichen enthalten."
 
 msgid "I18N_OPENXPKI_UI_PAUSED_CERTSIGN_TOKEN_NOT_USABLE"
 msgstr "CA Schlüssel ist nicht verfügbar"

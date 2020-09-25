@@ -1,9 +1,5 @@
 package OpenXPKI::Server::Workflow::Validator::PasswordQuality;
 
-# Core modules
-use MIME::Base64;
-use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
-
 # CPAN modules
 use Moose;
 use MooseX::NonMoose;
@@ -62,7 +58,7 @@ I<Default>
 
 =item * C<length> - Is it in the range of permitted lengths (default: 8 - 255)?
 
-=item * C<common> - Is it not a known hacked password like "password" et similia?
+=item * C<common> - Is it not a known hacked password like "password" or similiar?
 
 =item * C<diffchars> - Does it contain enough different characters?
 
@@ -209,6 +205,10 @@ sub _init {
 
 sub validate {
     my ( $self, $wf, $password ) = @_;
+
+    # dont validate unset fields (empty passwords)
+    # use required to enforce that a password is set
+    return 1 unless (defined $password);
 
     my $errors = CTX('api2')->password_quality(
         password => $password,
