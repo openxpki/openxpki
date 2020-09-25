@@ -57,13 +57,12 @@ sub init_issuer {
             $self->_escape($cert->{subject}),
             $cert->{notbefore},
             $cert->{notafter},
-            'I18N_OPENXPKI_UI_TOKEN_STATUS_'.$cert->{status},
             $cert->{identifier},
             lc($cert->{status})
         ];
     }
 
-    # I18 Tags for scanner
+    # I18 Tags for scanner - currently unused
     # I18N_OPENXPKI_UI_TOKEN_STATUS_EXPIRED
     # I18N_OPENXPKI_UI_TOKEN_STATUS_UPCOMING
     # I18N_OPENXPKI_UI_TOKEN_STATUS_ONLINE
@@ -82,7 +81,6 @@ sub init_issuer {
                 { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT" },
                 { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE", format => 'timestamp'},
                 { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER", format => 'timestamp'},
-                { sTitle => "I18N_OPENXPKI_UI_CERTIFICATE_STATUS"},
                 { sTitle => "identifier", bVisible => 0 },
                 { sTitle => "_className" },
             ],

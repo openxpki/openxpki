@@ -11,6 +11,7 @@ OpenXPKI::Server::API2::Plugin::Token::get_ca_list
 
 # Project modules
 use OpenXPKI::Debug;
+use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Plugin::Token::Util;
 
@@ -48,16 +49,28 @@ B<Parameters>
 
 =item * C<pki_realm> I<Str> - PKI realm to query, defaults to the session realm
 
+=item * C<check_online> I<Bool> - Set to 1 to get the token online status
+(L<is_token_usable|OpenXPKI::Server::API2::Plugin::Token::is_token_usable/is_token_usable> is
+called for each alias). The status check is only possible from within the
+current session's realm, for requests regarding another realm the status is
+always C<UNKNOWN>. Default: 0
+
 =back
 
 =cut
 command "get_ca_list" => {
     pki_realm => { isa => 'AlphaPunct', },
+    check_online => { isa => 'Bool', default => 0 },
 } => sub {
     my ($self, $params) = @_;
 
     my $session_pki_realm = CTX('session')->data->pki_realm;
     my $pki_realm = $params->has_pki_realm ? $params->pki_realm : $session_pki_realm;
+
+    OpenXPKI::Exception->throw (
+        message => 'Unable to use check_online from outside realm',
+    ) if ($params->check_online && ($pki_realm ne $session_pki_realm));
+
 
     ##! 32: "Lookup group name for certsign"
     my $group = CTX('config')->get(['realm', $pki_realm, 'crypto', 'type', 'certsign']);
@@ -100,8 +113,8 @@ command "get_ca_list" => {
         elsif ($row->{notafter} < $now) {
             $item->{status} = 'EXPIRED';
         }
-        # Check if the key is usable (only in current realm)
-        elsif ($pki_realm eq $session_pki_realm) {
+        # Check if the key is usable (only if requested)
+        elsif ($params->check_online) {
             try {
                 my $token = CTX('crypto_layer')->get_token({
                     TYPE => 'certsign',
@@ -111,9 +124,13 @@ command "get_ca_list" => {
                         IDENTIFIER => $row->{identifier},
                     }
                 } );
-                $item->{status} = OpenXPKI::Server::API2::Plugin::Token::Util->is_token_usable($token)
-                    ? 'ONLINE'
-                    : 'OFFLINE';
+
+                # do not check if the token has no key store (remote ca)
+                if (defined $token->get_key_store()) {
+                    $item->{status} = OpenXPKI::Server::API2::Plugin::Token::Util->is_token_usable($token)
+                        ? 'ONLINE'
+                        : 'OFFLINE' ;
+                }
             }
             catch {
                 CTX('log')->application()->error("Eval error testing CA token ".$row->{alias}." (API command 'get_ca_list'): $_");
