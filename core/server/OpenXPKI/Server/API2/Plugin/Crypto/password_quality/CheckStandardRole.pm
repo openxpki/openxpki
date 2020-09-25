@@ -51,7 +51,7 @@ has min_diff_chars => (
     isa => 'Int',
     predicate => 'has_min_diff_chars',
     lazy => 1,
-    default => sub { 6 },
+    default => sub { my $len = shift->password_length; $len < 12 ? int($len / 2) : 6 },
 );
 
 has dictionaries => (
