@@ -476,10 +476,16 @@ export default class TestController extends Controller {
                         {
                             "label": "Workflow History",
                             "page": "workflow!history!wf_id!13567",
+                            "tooltip": "I feel like hovering",
                         },
                         {
                             "label": "Technical Log",
                             "page": "workflow!log!wf_id!13567",
+                            "tooltip": "I feel like hovering",
+                        },
+                        {
+                            "label": "Just a label (tooltip!)",
+                            "tooltip": "I feel like hovering",
                         }
                     ],
                 },

@@ -54,7 +54,11 @@
         <ul class="list-unstyled">
             {{#each v as |val|}}
                 <li>
-                    <OxiBase::Formatted::Link @spec={{val}}/>
+                    {{#if val.page}}
+                        <OxiBase::Formatted::Link @spec={{val}}/>
+                    {{else}}
+                        <OxiBase::Label @text={{val.label}} @tooltip={{val.tooltip}}/>
+                    {{/if}}
                 </li>
             {{/each}}
         </ul>
