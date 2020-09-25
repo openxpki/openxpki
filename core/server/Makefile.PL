@@ -328,6 +328,7 @@ WriteMakefile(
         'MIME::Entity'                  => 0,
         'Module::Load'                  => '0.32',      # for OpenXPKI::Server::Database
         'Moose'                         => '1',
+        'MooseX::NonMoose'              => 0,           #  OpenXPKI::Server::Workflow::Validator::PasswordQuality
         'MooseX::Params::Validate'      => '0.21',      # for OpenXPKI::Server::Database
         'Net::DNS'                      => '0.83',
         'Net::LDAP'                     => '0.32',
