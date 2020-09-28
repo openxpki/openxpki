@@ -200,7 +200,7 @@ sub handle_request {
 
     # if the backend session logged out but did not terminate
     # we get the problem that ui is logged in but backend is not
-    $self->logout_session() if ($self->session()->param('is_logged_in'));
+    $self->logout_session( $cgi ) if ($self->session()->param('is_logged_in'));
 
     # try to log in
     return $self->handle_login( { cgi => $cgi, reply => $reply } );
@@ -691,6 +691,8 @@ sub logout_session {
     $self->session()->delete();
     $self->session()->flush();
     $self->session( $self->session()->new() );
+
+    Log::Log4perl::MDC->put('sid', substr($self->session->id,0,4));
 
     # flush the session cookie
     if ($cgi && $main::cookie) {
