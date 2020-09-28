@@ -1,7 +1,7 @@
 <input
     type="text"
     class="form-control"
-    value={{@content.value}}
+    value={{this.value}}
     placeholder={{@content.placeholder}}
     {{on "input" this.onInput}}
     {{on "paste" this.onPaste}}

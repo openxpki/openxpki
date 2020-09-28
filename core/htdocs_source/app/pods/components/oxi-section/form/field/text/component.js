@@ -1,5 +1,7 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
+import { tracked } from '@glimmer/tracking';
+import { scheduleOnce } from '@ember/runloop';
 
 /*
 // Please note that currently (Ember 3.20.3) inheriting the template does not work:
@@ -18,24 +20,47 @@ export default class OxiFieldTextComponent extends OxiFieldRawtextComponent {
 */
 
 export default class OxiFieldTextComponent extends Component {
+    @tracked value = null;
+
+    constructor() {
+        super(...arguments);
+        /*
+        We need to decouple the input field from the 'value' parameter because
+        otherwise our custom onPaste() handler triggers a refresh of the input
+        field and always moves the cursor to the end (i.e. unexpected
+        behaviour if sth. is inserted in the middle
+        */
+        this.value = this.args.content.value;
+    }
+
     @action
     onInput(event) {
-        let val = this.cleanup(event.target.value);
-        this.args.onChange(val);
+        this.value = this.cleanup(event.target.value);
+        this.args.onChange(this.value);
     }
 
     // Own "paste" implementation to allow for text cleanup
     @action
     onPaste(event) {
         let paste = (event.clipboardData || window.clipboardData).getData('text');
-        let oldVal = this.args.content.value || "";
+        let pasteCleaned = this.cleanup(paste, { trimTrailingStuff: true });
+        let inputField = event.target;
+        let oldVal = this.value || "";
 
-        let val =
-            oldVal.slice(0, event.target.selectionStart) +
-            this.cleanup(paste, { trimTrailingStuff: true }) +
-            oldVal.slice(event.target.selectionEnd)
+        let newCursorPos = inputField.selectionStart + pasteCleaned.length;
 
-        this.args.onChange(val);
+        // put cursor into right position after Ember rendered all updates
+        scheduleOnce('afterRender', this, () => {
+            inputField.focus();
+            inputField.setSelectionRange(newCursorPos, newCursorPos);
+        });
+
+        this.value =
+            oldVal.slice(0, inputField.selectionStart) +
+            pasteCleaned +
+            oldVal.slice(inputField.selectionEnd);
+
+        this.args.onChange(this.value);
         event.preventDefault();
     }
 
