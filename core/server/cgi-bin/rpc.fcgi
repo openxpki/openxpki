@@ -312,6 +312,16 @@ while (my $cgi = CGI::Fast->new()) {
             if ($auth_pem) {
                 $param->{'signer_cert'} = $auth_pem if ($envkeys{'signer_cert'});
                 $param->{'tls_client_cert'} = $auth_pem if ($envkeys{'tls_client_cert'});
+                if (($envkeys{'signer_chain'} || $envkeys{'tls_client_chain'}) && $ENV{'SSL_CLIENT_CERT_CHAIN_0'}) {
+                    my @chain;
+                    for (my $cc=0;$cc<=3;$cc++)   {
+                        my $chaincert = $ENV{'SSL_CLIENT_CERT_CHAIN_'.$cc};
+                        last unless ($chaincert);
+                        push @chain, $chaincert;
+                    }
+                    $param->{'signer_chain'} = $auth_pem if ($envkeys{'signer_chain'});
+                    $param->{'tls_client_chain'} = $auth_pem if ($envkeys{'tls_client_chain'});
+                }
             }
         }
         else {
@@ -511,15 +521,23 @@ certain information from the environment
   [RevokeCertificateByIdentifier]
   workflow = certificate_revocation_request_v2
   param = cert_identifier, reason_code, comment, invalidity_time
-  env = signer_cert, signer_dn, client_ip, server, endpoint
+  env = signer_cert, signer_chain, signer_dn, client_ip, server, endpoint
 
 The keys I<server> and I<endpoint> fill the parameters with the same name
 with the autodetected value from the URI path.
 
-The keys I<signer_cert/signer_dn> are only available on authenticated TLS
-connections and are filled with the PEM block and the full subject dn
-of the client certificate. Note that this data is only available if the
-ExportCertData and StdEnvVars option is set in the apache config!
+The keys I<signer_cert/signer_dn> are available on authenticated TLS
+connections or when using raw PKCS7 payloads. They are filled with the PEM
+block and the full subject dn of the authentication/signature certificate.
+
+For TLS connections, I<signer_chain> will also pass the chain certificates
+send by the client to the workflow. TLS properties are also available via
+I<tls_client_cert/tls_client_chain/tls_client_dn>. If you use PKCS7 and TLS
+in parallel the I<signer_*> keys will point to the PKCS7 based data while
+those will always show data from the TLS client authentication.
+
+Note that you must set ExportCertData and StdEnvVars option in apache to
+make those keys available for TLS connections!
 
 If the workflow uses endpoint specific configuraton, you must also set the
 name of the server using the I<servername> key. This is mutually exclusive

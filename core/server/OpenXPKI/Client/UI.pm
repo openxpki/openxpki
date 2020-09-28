@@ -523,13 +523,20 @@ sub handle_login {
 
         # SSO Login uses data from the ENV, so no need to render anything
         if ( $login_type eq 'CLIENT_SSO' ) {
-            my $user = $ENV{'REMOTE_USER'} || '';
+            my $user = $ENV{'OPENXPKI_USER'} || $ENV{'REMOTE_USER'} || '';
             $self->logger()->trace('ENV is ' . Dumper \%ENV) if $self->logger->is_trace;
 
             if ($user) {
                 $self->logger()->info('Sending SSO Login ( '.$user.' )');
+                my $role = $ENV{'OPENXPKI_GROUP'} || '';
+                my $userinfo = {};
+                foreach my $key (keys %ENV) {
+                    next unless $key =~ m{\AOPENXPKI_USER_(\w+)};
+                    $userinfo->{$1} = $ENV{$key};
+                }
+                $self->logger()->trace('Auth Info ' . Dumper { LOGIN => $user, PSEUDO_ROLE => $role, USERINFO => $userinfo } ) if $self->logger->is_trace;
                 $reply =  $self->backend()->send_receive_service_msg( 'GET_CLIENT_SSO_LOGIN',
-                    { LOGIN => $user, PSEUDO_ROLE => '' } );
+                    { LOGIN => $user, PSEUDO_ROLE => $role, USERINFO => $userinfo } );
                 $self->logger()->trace('Auth result ' . Dumper $reply) if $self->logger->is_trace;
             } else {
                 $self->logger()->error('User missing in ENV for SSO Login');
@@ -538,14 +545,22 @@ sub handle_login {
             }
 
         } elsif ( $login_type eq 'CLIENT_X509' ) {
-            my $user = $ENV{'SSL_CLIENT_S_DN_CN'} || '';
+            my $user = $ENV{'SSL_CLIENT_S_DN_CN'} || $ENV{'SSL_CLIENT_S_DN'};
             my $cert = $ENV{'SSL_CLIENT_CERT'} || '';
+
             $self->logger()->trace('ENV is ' . Dumper \%ENV) if $self->logger->is_trace;
 
-            if ($user && $cert) {
+            if ($cert) {
                 $self->logger()->info('Sending X509 Login ( '.$user.' )');
+                my @chain;
+                # larger chains are very unlikely and we dont support stupid clients
+                for (my $cc=0;$cc<=3;$cc++)   {
+                    my $chaincert = $ENV{'SSL_CLIENT_CERT_CHAIN_'.$cc};
+                    last unless ($chaincert);
+                    push @chain, $chaincert;
+                }
                 $reply =  $self->backend()->send_receive_service_msg( 'GET_CLIENT_X509_LOGIN',
-                    { certificate => $cert } );
+                    { certificate => $cert, chain => \@chain } );
                 $self->logger()->trace('Auth result ' . Dumper $reply) if $self->logger->is_trace;
             } else {
                 $self->logger()->error('Certificate missing for X509 Login');

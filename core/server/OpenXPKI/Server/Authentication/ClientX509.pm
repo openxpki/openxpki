@@ -42,6 +42,7 @@ sub login_step {
 
     my $validate = CTX('api2')->validate_certificate(
         pem => $params->{certificate},
+        chain => $params->{chain} // [],
         anchor => $trust_anchors,
     );
 
