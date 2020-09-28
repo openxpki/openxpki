@@ -8,6 +8,7 @@ use base qw( Template );
 use Data::Dumper;
 
 use OpenXPKI::Debug;
+use OpenXPKI::FileUtils;
 use OpenXPKI::Exception;
 use OpenXPKI::Serialization::Simple;
 #use OpenXPKI::Server::Context qw( CTX );
