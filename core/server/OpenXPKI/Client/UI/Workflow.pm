@@ -219,15 +219,8 @@ sub init_load {
     }
 
     # Set single action if no special view is requested and only single action is avail
-    if (!$view && !$wf_action && $wf_info->{workflow}->{proc_state} eq 'manual' &&
-        (ref $wf_info->{state}->{output} ne 'ARRAY' || scalar(@{$wf_info->{state}->{output}}) == 0)) {
-        my @activities = @{$wf_info->{state}->{option}};
-
-        # Do not count global_cancel as alternative selection
-        if (scalar @activities == 1 || (scalar @activities == 2 && (grep /global_cancel/, @activities))) {
-            $wf_action = $activities[0];
-            $self->logger()->debug('Autoselect action ' . $wf_action );
-        }
+    if (!$view && !$wf_action && $wf_info->{workflow}->{proc_state} eq 'manual') {
+        $wf_action = $self->__get_next_auto_action($wf_info);
     }
 
     $self->__render_from_workflow({ wf_info => $wf_info, wf_action => $wf_action, view => $view });
@@ -1136,14 +1129,8 @@ sub action_index {
     if ($wf_info->{state}->{autoselect}) {
         $wf_action = $wf_info->{state}->{autoselect};
         $self->logger()->debug("Autoselect set: $wf_action");
-    } elsif (ref $wf_info->{state}->{output} ne 'ARRAY' || scalar(@{$wf_info->{state}->{output}}) == 0) {
-        my @activities = keys %{$wf_info->{activity}};
-        if (scalar @activities == 1) {
-            $wf_action = $activities[0];
-        } elsif (scalar @activities == 2 && (grep /global_cancel/, @activities)) {
-            $wf_action = ($activities[1] eq 'global_cancel') ? $activities[0] : $activities[1];
-        }
-        $self->logger()->debug("Implicit select: $wf_action") if ($wf_action);
+    } else {
+        $wf_action = $self->__get_next_auto_action($wf_info);
     }
 
     # If we call the token action from within a result list we want
@@ -1306,12 +1293,10 @@ sub action_select {
             ui_info  => 1
         });
 
-        my @activity = keys %{$wf_info->{activity}};
-        if (scalar @activity == 1) {
-            $args->{wf_action} = $activity[0];
-        }
+        $args->{wf_action} = $self->__get_next_auto_action($wf_info);
 
     } else {
+
         $args->{wf_action} = $wf_action;
     }
 
@@ -2281,6 +2266,37 @@ sub __get_form_buttons {
 
     return \@buttons;
 }
+
+
+sub __get_next_auto_action {
+
+    my $self = shift;
+    my $wf_info = shift;
+    my $wf_action;
+
+    # no auto action if the state has output rules defined
+    return if (ref $wf_info->{state}->{output} eq 'ARRAY' &&
+        scalar(@{$wf_info->{state}->{output}}) > 0);
+
+
+    my @activities = keys %{$wf_info->{activity}};
+    # only one valid activity found, so use it
+    if (scalar @activities == 1) {
+        $wf_action = $activities[0];
+
+    # do not count global_cancel as alternative selection
+    } elsif (scalar @activities == 2 && (grep /global_cancel/, @activities)) {
+        $wf_action = ($activities[1] eq 'global_cancel') ? $activities[0] : $activities[1];
+
+    }
+
+    $self->logger()->debug('Implicit autoselect of action ' . $wf_action ) if($wf_action);
+
+    return $wf_action;
+
+}
+
+
 
 =head2 __render_input_field
 
