@@ -9,14 +9,12 @@ drivers to emulate row count with a subselect
 =cut
 
 sub count_rows {
-
     my ($self, $dbi, $query) = @_;
 
     $query->string(sprintf "SELECT COUNT(*) as amount FROM (%s) as tmp", $query->string);
 
     my $sth = $dbi->run($query);
     return $sth->fetchrow_hashref->{amount};
-
 }
 
 1;

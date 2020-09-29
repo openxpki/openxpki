@@ -368,12 +368,11 @@ sub count {
     my $self = shift;
     my %query_param = @_;
 
-    foreach (qw(order_by limit offset)) {
-        delete $query_param{$_} if (defined $query_param{$_});
+    for (qw(order_by limit offset)) {
+        delete $query_param{$_} if defined $query_param{$_};
     }
 
-    return $self->driver->count_rows( $self, $self->query_builder->select(%query_param) );
-
+    return $self->driver->count_rows($self, $self->query_builder->select(%query_param) );
 }
 
 # INSERT

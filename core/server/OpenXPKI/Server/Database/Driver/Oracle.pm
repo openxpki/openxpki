@@ -74,7 +74,6 @@ sub table_drop_query {
 }
 
 sub count_rows {
-
     my ($self, $dbi, $query) = @_;
 
     # there is no "as tmp" for the table as in the default method!
@@ -82,7 +81,6 @@ sub count_rows {
 
     my $sth = $dbi->run($query);
     return $sth->fetchrow_hashref->{amount};
-
 }
 
 ################################################################################
