@@ -52,6 +52,15 @@ sub sequence_create_query {
     );
 }
 
+# Returns a query that removes an SQL sequence
+sub sequence_drop_query {
+    my ($self, $dbi, $seq) = @_;
+    # TODO For DB2 check if sequence exists before dropping to avoid errors
+    return OpenXPKI::Server::Database::Query->new(
+        string => "DROP SEQUENCE $seq",
+    );
+}
+
 sub table_drop_query {
     my ($self, $dbi, $table) = @_;
     # TODO For DB2 check if table exists before dropping to avoid errors
