@@ -10,7 +10,7 @@ if [ -z $OXI_TEST_SAMPLECONFIG_DIR ]; then
     exit 1
 fi
 
-SCHEMA="$OXI_TEST_SAMPLECONFIG_DIR/contrib/sql/schema-mysql.sql"
+SCHEMA="$OXI_TEST_SAMPLECONFIG_DIR/contrib/sql/schema-mariadb.sql"
 
 mysql "${DB_OPTS_ROOT[@]}" $OXI_TEST_DB_MYSQL_NAME < "$SCHEMA"
 
