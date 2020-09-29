@@ -214,7 +214,8 @@ sub clear_data {
 
 sub _create_table {
     my $self = shift;
-    eval { $self->dbi->drop_table("test") };
+    eval { $self->dbi->drop_table("test") }; # FIXME Remove eval{} as soon as Oracle and DB2 driver don't throw exception on non-existing table
+    diag $@ if $@;
     $self->dbi->run("CREATE TABLE test (".join(", ", @{ $self->_col_info->{fulldef} }).")");
     # Create a hash with the column names and the data
     my $col_names = $self->_col_info->{names};
@@ -223,7 +224,8 @@ sub _create_table {
         $self->dbi->insert(into => "test", values => \%values);
     }
 
-    eval { $self->dbi->drop_sequence("test") };
+    eval { $self->dbi->drop_sequence("test") }; # FIXME Remove eval{} as soon as Oracle and DB2 driver don't throw exception on non-existing table
+    diag $@ if $@;
     $self->dbi->create_sequence("test");
 
     $self->dbi->run("COMMIT");
