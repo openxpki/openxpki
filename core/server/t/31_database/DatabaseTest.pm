@@ -123,27 +123,6 @@ sub BUILD {
     $self->_log( Log::Log4perl->get_logger() );
 }
 
-sub _db_test {
-    my ($self, $name, $plan, $tests, $dbtype, $dbi_driver, $dbi_params) = positional_args(\@_,
-        { isa => 'Str'},
-        { isa => 'Str'},
-        { isa => 'HashRef'},
-        { isa => 'CodeRef' },
-    );
-
-    subtest $name => sub {
-        $self->shall_test($dbtype) or plan skip_all => "'$dbtype' test disabled";
-        eval { require $dbi_driver } or plan skip_all => "$dbi_driver is not installed";
-        plan tests => $plan + 1 + ($self->data ? 1 : 0);
-        $self->set_dbi(params => $dbi_params);
-        $tests->($self);
-        $self->_drop_table;
-        # esp. prevent prevent deadlocks due to SQLite file locking if second instance of DatabaseTest is used later on:
-        $self->dbi->disconnect;
-    };
-    $self->count_test;
-}
-
 sub run {
     my ($self, $name, $plan, $tests) = positional_args(\@_,
         { isa => 'Str'},
