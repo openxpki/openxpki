@@ -27,15 +27,11 @@ my $db = DatabaseTest->new(
         [ 3, "Rathaus" ],
     ],
 );
-my $db_check = DatabaseTest->new(
-    sqlite_db => $sqlite_db,
-    columns => $columns,
-);
 
 #
 # tests
 #
-$db->run("Transactions", 12, sub {
+$db->run("Transactions", 14, sub {
     my $t = shift;
     my $dbi = $t->dbi;
 
@@ -133,18 +129,28 @@ $db->run("Transactions", 12, sub {
         ];
     } "start transaction twice, should be ignored";
     like $t->get_log, qr/running/, "warn about starting a transaction while another one is not finished";
-});
 
-$db_check->run("Data verification", 1, sub {
-    my $t = shift;
-    my $dbi = $t->dbi;
+    $t->dbi->disconnect;
+
 
     #
-    # correct transaction with commit
+    # check if other DBI instance sees correct transaction (i.e. commit succeeded)
     #
-    is_deeply $t->get_data, [
-        [ 1, "Litfasssaeule" ],
-    ], "correct data in other handle";
+    my $db_check = DatabaseTest->new(
+        test_only => [ $t->type ],
+        sqlite_db => $sqlite_db,
+        columns => $columns,
+    );
+
+    $db_check->run("Data verification", 1, sub {
+        my $t = shift;
+        my $dbi = $t->dbi;
+
+        is_deeply $t->get_data, [
+            [ 1, "Litfasssaeule" ],
+        ], "correct data in other handle";
+    });
 });
 
-done_testing($db->test_no + $db_check->test_no);
+
+done_testing($db->test_no);
