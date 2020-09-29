@@ -1,8 +1,8 @@
-package OpenXPKI::Server::Database::Driver::MySQL;
+package OpenXPKI::Server::Database::Driver::MariaDB;
 use Moose;
 use utf8;
 with qw(
-    OpenXPKI::Server::Database::Role::SequenceEmulation
+    OpenXPKI::Server::Database::Role::SequenceSupport
     OpenXPKI::Server::Database::Role::MergeSupport
     OpenXPKI::Server::Database::Role::CountEmulation
     OpenXPKI::Server::Database::Role::Driver
@@ -10,10 +10,11 @@ with qw(
 
 =head1 Name
 
-OpenXPKI::Server::Database::Driver::MySQL - Driver for MySQL databases
+OpenXPKI::Server::Database::Driver::MySQL - Driver for MariaDB databases
 
 =cut
 
+use DBI::Const::GetInfoType; # provides %GetInfoType hash
 use OpenXPKI::Exception;
 
 ################################################################################
@@ -48,6 +49,14 @@ sub dbi_connect_params {
 # Commands to execute after connecting
 sub on_connect {
     my ($self, $dbh) = @_;
+
+    # check version
+    my $ver = $dbh->get_info($GetInfoType{SQL_DBMS_VER}); # e.g. 5.5.5-10.1.44-MariaDB-1~bionic
+    my ($mysql, $major, $minor, $patch) = $ver =~ m/^([\d\.]+-)?(\d+)\.(\d+)\.(\d+)-MariaDB.*/;
+    die "MariaDB server too old: $major.$minor.$patch - OpenXPKI 'MariaDB' driver requires version 10.3, please use 'MySQL' instead."
+        unless ($major >= 10 and $minor >= 3);
+
+    # set transaction isolation level
     $dbh->do("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED");
 }
 
@@ -59,6 +68,21 @@ sub sqlam_params {
 ################################################################################
 # required by OpenXPKI::Server::Database::Role::Driver
 #
+sub sequence_create_query {
+    my ($self, $dbi, $seq) = @_;
+
+    return OpenXPKI::Server::Database::Query->new(
+        string => "CREATE SEQUENCE $seq START = 0 INCREMENT = 1 MINVALUE = 0 NOMAXVALUE",
+    );
+}
+
+# Returns a query that removes an SQL sequence
+sub sequence_drop_query {
+    my ($self, $dbi, $seq) = @_;
+    return OpenXPKI::Server::Database::Query->new(
+        string => "DROP SEQUENCE IF EXISTS $seq",
+    );
+}
 
 sub table_drop_query {
     my ($self, $dbi, $table) = @_;
@@ -68,16 +92,12 @@ sub table_drop_query {
 }
 
 ################################################################################
-# required by OpenXPKI::Server::Database::Role::SequenceEmulation
+# required by OpenXPKI::Server::Database::Role::SequenceSupport
 #
 
-sub sql_autoinc_column { return "INT PRIMARY KEY AUTO_INCREMENT" }
-
-sub last_auto_id {
-    my ($self, $dbi) = @_;
-    my $sth = $dbi->run('select last_insert_id()');
-    my $row = $sth->fetchrow_arrayref;
-    return $row->[0];
+sub nextval_query {
+    my ($self, $seq) = @_;
+    return "SELECT NEXTVAL($seq)";
 }
 
 ################################################################################

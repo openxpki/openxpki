@@ -43,7 +43,7 @@ has 'data' => (
     isa => 'ArrayRef',
 );
 
-enum 'DBMS', [qw( sqlite mysql oracle )];
+enum 'DBMS', [qw( sqlite mysql mariadb oracle )];
 
 # restrict tests to certain dbms
 has 'test_only' => (
@@ -143,6 +143,7 @@ sub run {
             }
         );
         $tests->($self);
+        $self->_drop_table;
         # prevent deadlocks (SQLite file locking) if a second instance of DatabaseTest is used later on
         $self->dbi->disconnect;
     };
@@ -163,6 +164,7 @@ sub run {
             }
         );
         $tests->($self);
+        $self->_drop_table;
     };
     $self->count_test;
 
@@ -184,6 +186,29 @@ sub run {
             }
         );
         $tests->($self);
+        $self->_drop_table;
+    };
+    $self->count_test;
+
+    # MariaDB - runs if OXI_TEST_DB_MYSQL_NAME is set
+    subtest "$name (MariaDB)" => sub {
+        plan skip_all => "No MariaDB database found / OXI_TEST_DB_MYSQL_NAME not set" unless $ENV{OXI_TEST_DB_MYSQL_NAME};
+        plan skip_all => "MariaDB test disabled" unless $self->shall_test('mariadb');
+        eval { require DBD::mysql } or plan skip_all => "DBD::mysql is not installed";
+        plan tests => $plan + 1 + ($self->data ? 1 : 0); # 2 from set_dbi()
+        $self->set_dbi(
+            params => {
+                type => "MariaDB",
+                # if not specified, the driver tries socket connection
+                $ENV{OXI_TEST_DB_MYSQL_DBHOST} ? ( host => $ENV{OXI_TEST_DB_MYSQL_DBHOST} ) : (),
+                $ENV{OXI_TEST_DB_MYSQL_DBPORT} ? ( port => $ENV{OXI_TEST_DB_MYSQL_DBPORT} ) : (),
+                name => $ENV{OXI_TEST_DB_MYSQL_NAME},
+                user => $ENV{OXI_TEST_DB_MYSQL_USER},
+                passwd => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},
+            }
+        );
+        $tests->($self);
+        $self->_drop_table;
     };
     $self->count_test;
 }
