@@ -123,6 +123,27 @@ sub BUILD {
     $self->_log( Log::Log4perl->get_logger() );
 }
 
+sub _db_test {
+    my ($self, $name, $plan, $tests, $dbtype, $dbi_driver, $dbi_params) = positional_args(\@_,
+        { isa => 'Str'},
+        { isa => 'Str'},
+        { isa => 'HashRef'},
+        { isa => 'CodeRef' },
+    );
+
+    subtest $name => sub {
+        $self->shall_test($dbtype) or plan skip_all => "'$dbtype' test disabled";
+        eval { require $dbi_driver } or plan skip_all => "$dbi_driver is not installed";
+        plan tests => $plan + 1 + ($self->data ? 1 : 0);
+        $self->set_dbi(params => $dbi_params);
+        $tests->($self);
+        $self->_drop_table;
+        # esp. prevent prevent deadlocks due to SQLite file locking if second instance of DatabaseTest is used later on:
+        $self->dbi->disconnect;
+    };
+    $self->count_test;
+}
+
 sub run {
     my ($self, $name, $plan, $tests) = positional_args(\@_,
         { isa => 'Str'},
@@ -130,87 +151,65 @@ sub run {
         { isa => 'CodeRef' },
     );
 
+    my $test_count = $plan + 1 + ($self->data ? 1 : 0);
+
+    # creates and returns the subtest definition (i.e. coderef)
+    my $SUBTEST = sub {
+        my ($dbtype, $dbi_driver, $env_var, $dbi_params) = @_;
+
+        my $MAKEPLAN = sub {
+            return (skip_all => "$env_var not set") if ($env_var and not $ENV{$env_var});
+            return (skip_all => "'$dbtype' test disabled") unless $self->shall_test($dbtype);
+            return (skip_all => "$dbi_driver is not installed") unless eval "require $dbi_driver";
+            return (tests => $test_count);
+        };
+
+        $self->count_test;
+        # the actual test sub
+        return sub {
+            plan $MAKEPLAN->();
+            $self->set_dbi(params => $dbi_params);
+            $tests->($self);
+            $self->_drop_table;
+            # esp. prevent prevent deadlocks due to SQLite file locking if second instance of DatabaseTest is used later on:
+            $self->dbi->disconnect;
+        };
+    };
+
     # SQLite - runs always
     my $sqlite_db = $self->sqlite_db || ":memory:";
-    subtest "$name (SQLite '$sqlite_db')" => sub {
-        plan skip_all => "SQLite test disabled" unless $self->shall_test('sqlite');
-        eval { require DBD::SQLite } or plan skip_all => "DBD::SQLite is not installed";
-        plan tests => $plan + 1 + ($self->data ? 1 : 0); # 2 from set_dbi()
-        $self->set_dbi(
-            params => {
-                type => "SQLite",
-                name => $sqlite_db,
-            }
-        );
-        $tests->($self);
-        $self->_drop_table;
-        # prevent deadlocks (SQLite file locking) if a second instance of DatabaseTest is used later on
-        $self->dbi->disconnect;
-    };
-    $self->count_test;
+    subtest "$name (SQLite '$sqlite_db')" => $SUBTEST->('sqlite', 'DBD::SQLite', '', {
+        type => "SQLite",
+        name => $sqlite_db,
+    });
 
     # Oracle - runs if OXI_TEST_DB_ORACLE_NAME is set
-    subtest "$name (Oracle)" => sub {
-        plan skip_all => "No Oracle database found / OXI_TEST_DB_ORACLE_NAME not set" unless $ENV{OXI_TEST_DB_ORACLE_NAME};
-        plan skip_all => "Oracle test disabled" unless $self->shall_test('oracle');
-        eval { require DBD::Oracle } or plan skip_all => "DBD::Oracle is not installed";
-        plan tests => $plan + 1 + ($self->data ? 1 : 0); # 2 from set_dbi()
-        $self->set_dbi(
-            params => {
-                type => "Oracle",
-                name => $ENV{OXI_TEST_DB_ORACLE_NAME},
-                user => $ENV{OXI_TEST_DB_ORACLE_USER},
-                passwd => $ENV{OXI_TEST_DB_ORACLE_PASSWORD},
-            }
-        );
-        $tests->($self);
-        $self->_drop_table;
-    };
-    $self->count_test;
+    subtest "$name (Oracle)" => $SUBTEST->('oracle', 'DBD::Oracle', 'OXI_TEST_DB_ORACLE_NAME', {
+        type => "Oracle",
+        name => $ENV{OXI_TEST_DB_ORACLE_NAME},
+        user => $ENV{OXI_TEST_DB_ORACLE_USER},
+        passwd => $ENV{OXI_TEST_DB_ORACLE_PASSWORD},
+    });
 
     # MySQL - runs if OXI_TEST_DB_MYSQL_NAME is set
-    subtest "$name (MySQL)" => sub {
-        plan skip_all => "No MySQL database found / OXI_TEST_DB_MYSQL_NAME not set" unless $ENV{OXI_TEST_DB_MYSQL_NAME};
-        plan skip_all => "MySQL test disabled" unless $self->shall_test('mysql');
-        eval { require DBD::mysql } or plan skip_all => "DBD::mysql is not installed";
-        plan tests => $plan + 1 + ($self->data ? 1 : 0); # 2 from set_dbi()
-        $self->set_dbi(
-            params => {
-                type => "MySQL",
-                # if not specified, the driver tries socket connection
-                $ENV{OXI_TEST_DB_MYSQL_DBHOST} ? ( host => $ENV{OXI_TEST_DB_MYSQL_DBHOST} ) : (),
-                $ENV{OXI_TEST_DB_MYSQL_DBPORT} ? ( port => $ENV{OXI_TEST_DB_MYSQL_DBPORT} ) : (),
-                name => $ENV{OXI_TEST_DB_MYSQL_NAME},
-                user => $ENV{OXI_TEST_DB_MYSQL_USER},
-                passwd => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},
-            }
-        );
-        $tests->($self);
-        $self->_drop_table;
-    };
-    $self->count_test;
+    my %mysql_params = (
+        # if not specified, the driver tries socket connection
+        $ENV{OXI_TEST_DB_MYSQL_DBHOST} ? ( host => $ENV{OXI_TEST_DB_MYSQL_DBHOST} ) : (),
+        $ENV{OXI_TEST_DB_MYSQL_DBPORT} ? ( port => $ENV{OXI_TEST_DB_MYSQL_DBPORT} ) : (),
+        name => $ENV{OXI_TEST_DB_MYSQL_NAME},
+        user => $ENV{OXI_TEST_DB_MYSQL_USER},
+        passwd => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},
+    );
+    subtest "$name (MySQL)" => $SUBTEST->('mysql', 'DBD::mysql', 'OXI_TEST_DB_MYSQL_NAME', {
+        type => "MySQL",
+        %mysql_params,
+    });
 
     # MariaDB - runs if OXI_TEST_DB_MYSQL_NAME is set
-    subtest "$name (MariaDB)" => sub {
-        plan skip_all => "No MariaDB database found / OXI_TEST_DB_MYSQL_NAME not set" unless $ENV{OXI_TEST_DB_MYSQL_NAME};
-        plan skip_all => "MariaDB test disabled" unless $self->shall_test('mariadb');
-        eval { require DBD::mysql } or plan skip_all => "DBD::mysql is not installed";
-        plan tests => $plan + 1 + ($self->data ? 1 : 0); # 2 from set_dbi()
-        $self->set_dbi(
-            params => {
-                type => "MariaDB",
-                # if not specified, the driver tries socket connection
-                $ENV{OXI_TEST_DB_MYSQL_DBHOST} ? ( host => $ENV{OXI_TEST_DB_MYSQL_DBHOST} ) : (),
-                $ENV{OXI_TEST_DB_MYSQL_DBPORT} ? ( port => $ENV{OXI_TEST_DB_MYSQL_DBPORT} ) : (),
-                name => $ENV{OXI_TEST_DB_MYSQL_NAME},
-                user => $ENV{OXI_TEST_DB_MYSQL_USER},
-                passwd => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},
-            }
-        );
-        $tests->($self);
-        $self->_drop_table;
-    };
-    $self->count_test;
+    subtest "$name (MariaDB)" => $SUBTEST->('mariadb', 'DBD::mysql', 'OXI_TEST_DB_MYSQL_NAME', {
+        type => "MariaDB",
+        %mysql_params,
+    });
 }
 
 sub get_data {
