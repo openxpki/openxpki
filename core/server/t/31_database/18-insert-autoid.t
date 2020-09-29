@@ -27,6 +27,8 @@ my $db = DatabaseTest->new(
 #
 # tests
 #
+use_ok "OpenXPKI::Server::Database";
+
 $db->run("SQL INSERT with automatic ID = sequence generation", 2, sub {
     my $t = shift;
     my $dbi = $t->dbi;
@@ -34,11 +36,10 @@ $db->run("SQL INSERT with automatic ID = sequence generation", 2, sub {
 
     # correct insert
     lives_and {
-        use OpenXPKI::Server::Database;
 
         $rownum = $dbi->insert(
             into => "test",
-            values => { id => AUTO_ID, text => "Flatscreen", entropy => 10 },
+            values => { id => OpenXPKI::Server::Database::AUTO_ID(), text => "Flatscreen", entropy => 10 },
         );
         ok $rownum == 1;
     } "correctly execute insert query";
@@ -48,5 +49,5 @@ $db->run("SQL INSERT with automatic ID = sequence generation", 2, sub {
     ], "correct data after insert";
 });
 
-done_testing($db->test_no);
+done_testing($db->test_no + 1);
 
