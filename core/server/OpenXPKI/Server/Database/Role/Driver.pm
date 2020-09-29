@@ -34,8 +34,8 @@ requires 'dbi_dsn';
 # Returns HashRef: optional parameters to pass to connect()
 requires 'dbi_connect_params';
 
-# Returns ArrayRef or Str: commands to execute after connecting
-requires 'dbi_on_connect_do';
+# May execute custom commands after connecting, receives $dbh handle (DBI)
+requires 'on_connect';
 
 # Returns HashRef: optional parameters for SQL::Abstract::More
 requires 'sqlam_params';

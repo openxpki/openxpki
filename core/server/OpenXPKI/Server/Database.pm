@@ -139,6 +139,7 @@ sub _build_driver {
     delete $args{type};
 
     my $class = "OpenXPKI::Server::Database::Driver::".$driver;
+    ##! 32: "Trying to load driver class " . $class;
 
     eval { use Module::Load 0.32; autoload($class) };
     OpenXPKI::Exception->throw (
@@ -206,12 +207,7 @@ sub _build_dbix_handler {
         [ $self->driver->dbi_connect_params ], # driver might return a list so we enforce list context
         ref($self->driver)."::dbi_connect_params",
     );
-    my @on_connect_do = $self->_driver_return_val_to_list(
-        [ $self->driver->dbi_on_connect_do ], # driver might return a list so we enforce list context
-        ref($self->driver)."::dbi_on_connect_do",
-    );
     ##! 4: "Additional connect() attributes: " . join " | ", map { $_." = ".$params{$_} } keys %params
-    ##! 4: "SQL commands after each connect: ".join("; ", @on_connect_do);
 
     my %params_from_config;
     if ($self->db_params->{driver} && ref $self->db_params->{driver} eq 'HASH') {
@@ -237,8 +233,9 @@ sub _build_dbix_handler {
         {
             on_connect_do => sub {
                 my $dbh = shift;
-                # execute custom statements
-                $dbh->do($_) for @on_connect_do;
+                ##! 32: 'DBMS version: ' . $dbh->get_info($GetInfoType{SQL_DBMS_VER});
+                # custom on_connect actions
+                $self->driver->on_connect($dbh);
                 # on_connect_do is (also) called after fork():
                 # then we get a new DBI handle and a previous transaction is invalid
                 $self->_clear_txn_starter;
@@ -299,7 +296,7 @@ sub dbh {
     my $self = shift;
     # If this is too slow due to DB pings, we could pass "no_ping" attribute to
     # DBIx::Handler and copy the "fixup" code from DBIx::Connector::_fixup_run()
-    my $dbh = $self->_dbix_handler->dbh;     # fork safe DBI handle
+    my $dbh = $self->_dbix_handler->dbh;     # fork-safe DBI handle
     $dbh->{FetchHashKeyName} = 'NAME_lc';    # enforce lowercase names
     return $dbh;
 }

@@ -43,8 +43,9 @@ sub dbi_connect_params {
 }
 
 # Commands to execute after connecting
-sub dbi_on_connect_do {
-    "SET SESSION CHARACTERISTICS AS TRANSACTION ISOLATION LEVEL READ COMMITTED"
+sub on_connect {
+    my ($self, $dbh) = @_;
+    $dbh->do("SET SESSION CHARACTERISTICS AS TRANSACTION ISOLATION LEVEL READ COMMITTED");
 }
 
 # Parameters for SQL::Abstract::More
