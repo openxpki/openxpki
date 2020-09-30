@@ -13,6 +13,8 @@ use Test::Deep;
 use Test::Exception;
 use DateTime;
 
+# use OpenXPKI::Debug; BEGIN { $OpenXPKI::Debug::LEVEL{'OpenXPKI::Crypto::TokenManager.*'} = 100 }
+
 # Project modules
 use lib "$Bin/../lib";
 use OpenXPKI::Test;
@@ -111,34 +113,40 @@ lives_ok {
     $tm->set_secret_group_part({ GROUP => "melee_island", VALUE => $parts[0] });
     $tm->set_secret_group_part({ GROUP => "melee_island", VALUE => $parts[1] });
     $tm->set_secret_group_part({ GROUP => "melee_island", VALUE => $parts[2] });
-} "split secret: set parts";
+} "split secret no.1: set parts";
 
 lives_and {
     is $tm->is_secret_group_complete("melee_island"), 1;
-} "split secret: secret is complete";
+} "split secret no.1: secret is complete";
 
 lives_and {
      is $tm->get_secret("melee_island"), $split_secret->get_secret;
-} "split secret: retrieve correct secret";
+} "split secret no.1: retrieve correct secret";
 
 lives_and {
+    # clear_secret_group() calls OpenXPKI::Control::reload which wants to read
+    # some (non-existing) config and kill the (non-running) server...
+    no warnings 'redefine';
+    local *OpenXPKI::Control::reload = sub {
+        note "intercepted call to OpenXPKI::Control::reload()";
+    };
     $tm->clear_secret_group("melee_island");
     is $tm->is_secret_group_complete("melee_island"), 0;
-} "split secret: clear secret";
+} "split secret no.1: clear secret";
 
 lives_ok {
     $tm->set_secret_group_part({ GROUP => "melee_island", VALUE => $parts[2] });
     $tm->set_secret_group_part({ GROUP => "melee_island", VALUE => $parts[3] });
     $tm->set_secret_group_part({ GROUP => "melee_island", VALUE => $parts[4] });
-} "split secret: set different parts";
+} "split secret no.2: set different parts";
 
 lives_and {
     is $tm->is_secret_group_complete("melee_island"), 1;
-} "split secret: secret is complete";
+} "split secret no.2: secret is complete";
 
 lives_and {
      is $tm->get_secret("melee_island"), $split_secret->get_secret;
-} "split secret: retrieve correct secret";
+} "split secret no.2: retrieve correct secret";
 
 #
 # cache type "session" (Github issue #591)

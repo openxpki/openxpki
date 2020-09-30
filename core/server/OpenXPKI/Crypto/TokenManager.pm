@@ -457,11 +457,11 @@ sub clear_secret_group
 
     ##! 2: "check for the cache"
     if ($self->{SECRET}->{$realm}->{$group}->{cache} eq "session") {
-        ##! 4: "delete secret in session"
+        ##! 4: "delete session secret"
         CTX('session')->data->clear_secret( group => $group );
     }
     else {
-        ##! 4: "delete secret in database"
+        ##! 4: "delete database secret"
         my $group_id = sprintf("%s:%s", CTX('volatile_vault')->get_key_id(), $group);
         my $result = CTX('dbi')->delete(
             from => "secret",
@@ -470,11 +470,13 @@ sub clear_secret_group
                 group_id  => $group_id,
             }
         );
+        ##! 4: "reload OpenXPKI"
         OpenXPKI::Control::reload();
     }
 
     # reinitialize the reference object
     # uses the data from the hash itself as arguments for init
+    ##! 4: "reinit reference object
     $self->__init_secret( $self->{SECRET}->{$realm}->{$group} );
 
     ##! 1: "finished"
