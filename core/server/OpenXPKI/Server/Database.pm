@@ -464,6 +464,7 @@ sub next_id {
     $id->blsft($nodeid_bits);
     $id->bior(Math::BigInt->new($nodeid));
 
+    ##! 32: 'Next ID - after bitshift: ' . $id->bstr()
     return $id->bstr();
 }
 
