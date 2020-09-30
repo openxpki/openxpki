@@ -19,7 +19,7 @@ use lib "$Bin";
 use OpenXPKI::Test;
 use CommandlineTest;
 
-plan tests => 21;
+plan tests => 20;
 
 #
 # Setup test context
@@ -44,12 +44,10 @@ cert_import_ok     ($dbdata->cert("alpha-datavault-2"), qw(--realm alpha), '--to
 cert_import_ok     ($dbdata->cert("alpha-scep-2"),      qw(--realm alpha), '--token' => 'scep',         '--gen' => 2);
 cert_import_ok     ($dbdata->cert("alpha-alice-2"),     qw(--realm alpha --revoked --alias MelaleucaAlternifolia));
 
+# Import expired certificates
 cert_import_ok     ($dbdata->cert("alpha-root-1"),      qw(--realm alpha));
-# Alpha gen 1 is expired, so we expect ...UNABLE_TO_BUILD_CHAIN
-cert_import_failsok($dbdata->cert("alpha-signer-1"), qr/ unable .* build .* chain /msxi);
-my $issuer = $dbdata->cert("alpha-signer-1")->db->{issuer_identifier};
-cert_import_ok     ($dbdata->cert("alpha-signer-1"),    qw(--realm alpha), '--force-issuer', '--issuer', $issuer );
-cert_import_ok     ($dbdata->cert("alpha-alice-1"),     qw(--realm alpha), '--force-no-verify');
+cert_import_ok     ($dbdata->cert("alpha-signer-1"),    qw(--realm alpha));
+cert_import_ok     ($dbdata->cert("alpha-alice-1"),     qw(--realm alpha));
 
 my @ids = map { $dbdata->cert($_)->db->{identifier} }
     qw(
