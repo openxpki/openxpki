@@ -12,10 +12,10 @@ use Data::Dumper;
 
 use Pod::Usage;
 use Getopt::Long;
-use POSIX;
+use POSIX qw(strftime);
 use File::Spec;
 use Config::Std;
-use Cwd;
+use Cwd qw(getcwd);
 
 # use Smart::Comments;
 
