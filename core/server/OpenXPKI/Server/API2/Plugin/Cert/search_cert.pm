@@ -18,6 +18,9 @@ use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Database::Legacy;
+use OpenXPKI::Server::API2::Plugin::Cert::DateCondition;
+
+
 
 has 'return_columns_default' => (
     isa => 'ArrayRef',
@@ -330,16 +333,19 @@ sub _make_db_query {
         $where->{'certificate.pki_realm'} = $po->pki_realm;
     }
 
+    my $notafter = OpenXPKI::Server::API2::Plugin::Cert::DateCondition->new();
+    my $notbefore = OpenXPKI::Server::API2::Plugin::Cert::DateCondition->new();
+
     # Handle status
     if ($po->has_status and $po->status eq 'EXPIRED') {
         $po->clear_status;
         $where->{'certificate.status'} = 'ISSUED';
-        $where->{'certificate.notafter'} = { '<', time() };
+        $notafter->smaller_than(time());
     } elsif ($po->has_status and $po->status eq 'VALID') {
         $po->clear_status;
         $where->{'certificate.status'} = 'ISSUED';
-        $where->{'certificate.notafter'} = { '>', time() };
-        $where->{'certificate.notbefore'} = { '<', time() };
+        $notafter->greater_than(time());
+        $notbefore->smaller_than(time());
     }
 
     $where->{'certificate.identifier'}                = $po->identifier                 if $po->has_identifier;
@@ -361,21 +367,11 @@ sub _make_db_query {
     $where->{'certificate.subject'}                   = { -like => $po->subject }       if $po->has_subject;
     $where->{'certificate.issuer_dn'}                 = { -like => $po->issuer_dn }     if $po->has_issuer_dn;
 
-    if ($po->has_valid_before && $po->has_valid_after) {
-        $where->{'certificate.notbefore'} = { -between => [ $po->valid_after, $po->valid_before ] };
-    } elsif ($po->has_valid_before) {
-        $where->{'certificate.notbefore'} = { '<', $po->valid_before }
-    } elsif ($po->has_valid_after) {
-        $where->{'certificate.notbefore'} = { '>', $po->valid_after }
-    }
+    $notbefore->smaller_than($po->valid_before)  if $po->has_valid_before;
+    $notbefore->greater_than($po->valid_after)   if $po->has_valid_after;
 
-    if ($po->has_expires_before && $po->has_expires_after) {
-        $where->{'certificate.notafter'} = { -between => [ $po->expires_after, $po->expires_before ] };
-    } elsif ($po->has_expires_before) {
-        $where->{'certificate.notafter'} = { '<', $po->expires_before }
-    } elsif ($po->has_expires_after) {
-        $where->{'certificate.notafter'} = { '>', $po->expires_after }
-    }
+    $notafter->smaller_than($po->expires_before) if $po->has_expires_before;
+    $notafter->greater_than($po->expires_after)  if $po->has_expires_after;
 
     if ($po->has_revoked_before && $po->has_revoked_after) {
         $where->{'certificate.revocation_time'} = { -between => [ $po->revoked_after, $po->revoked_before ] };
@@ -393,6 +389,8 @@ sub _make_db_query {
         $where->{'certificate.invalidity_time'} = { '>', $po->invalid_after }
     }
 
+    $where->{'certificate.notafter'} = $notafter->spec if $notafter->spec;
+    $where->{'certificate.notbefore'} = $notbefore->spec if $notbefore->spec;
 
     my @join_spec = ();
 
