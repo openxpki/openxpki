@@ -35,11 +35,15 @@ OPTIONS
     --no-compile
         Skip compiling XS code parts.
 
+    --no-dbconf
+        Skip database configuration.
+
     --fast
-        Shortcut for "--no-i18n --no-compile"
+        Shortcut for "--no-i18n --no-compile --no-dbconfig".
 
     --full
-        Overwrite /etc/openxpki with slightly adjusted sample config
+        Overwrite /etc/openxpki with modified sample config.
+        (Re-)create database and import certificates.
 __HELP
 
 trap '_exit $?' EXIT
@@ -51,12 +55,14 @@ set -e
 IS_I18N=1
 IS_RESTART=1
 IS_COMPILE=1
+IS_DBCONFIG=1
 IS_FULLCONFIG=0
 # Bash string manipulation: use # to strip text off $@ and see if string still equals original $@
 [[ "${@#--no-i18n}" != "$@" ]]    && IS_I18N=0
 [[ "${@#--no-restart}" != "$@" ]] && IS_RESTART=0
 [[ "${@#--no-compile}" != "$@" ]] && IS_COMPILE=0
-[[ "${@#--fast}" != "$@" ]]       && IS_COMPILE=0 && IS_I18N=0
+[[ "${@#--no-dbconf}" != "$@" ]]  && IS_DBCONFIG=0
+[[ "${@#--fast}" != "$@" ]]       && IS_COMPILE=0 && IS_I18N=0 && IS_DBCONFIG=0
 [[ "${@#--full}" != "$@" ]]       && IS_FULLCONFIG=1
 
 #
@@ -83,6 +89,23 @@ if [[ $IS_FULLCONFIG -eq 1 ]]; then
     chmod 750              /etc/openxpki/config.d
     chown -R root:openxpki /etc/openxpki/config.d
 
+    # set en_US as default language to get correct I18N translations (e.g. in rpc.fcgi)
+    sed -ri 's/^(\s*default_language:).*/\1 en_US/' /etc/openxpki/config.d/system/server.yaml
+
+# partial config update
+else
+    #  realm democa
+    echo "Updating demo realm in /etc/openxpki/config.d/realm/democa"
+    rsync -a --delete \
+      $OXI_TEST_SAMPLECONFIG_DIR/config.d/realm/democa/* \
+      /etc/openxpki/config.d/realm/democa/                             >>$LOG 2>&1
+    chown -R root:openxpki /etc/openxpki/config.d/realm/democa/        >>$LOG 2>&1
+fi
+
+# set /var/tmp instead of /tmp (where only root has write access)
+sed -ri 's/(LOCATION:)\s*\/tmp.*/\1 \/var\/tmp/g' /etc/openxpki/config.d/realm/democa/publishing.yaml
+
+if [[ $IS_DBCONFIG -eq 1 ]]; then
     # database setup
     echo "- configuring MariaDB as database"
     cat <<__DB > /etc/openxpki/config.d/system/database.yaml
@@ -95,22 +118,7 @@ if [[ $IS_FULLCONFIG -eq 1 ]]; then
         user: $OXI_TEST_DB_MYSQL_USER
         passwd: $OXI_TEST_DB_MYSQL_PASSWORD
 __DB
-# only partial config update (only realm democa)
-else
-    echo "Updating demo realm in /etc/openxpki/config.d/realm/democa"
-    rsync -a --delete \
-      $OXI_TEST_SAMPLECONFIG_DIR/config.d/realm/democa/* \
-      /etc/openxpki/config.d/realm/democa/                             >>$LOG 2>&1
-    chown -R root:openxpki /etc/openxpki/config.d/realm/democa/        >>$LOG 2>&1
 fi
-
-echo "- modifying some config entries"
-
-# set /var/tmp instead of /tmp (where only root has write access)
-sed -ri 's/(LOCATION:)\s*\/tmp.*/\1 \/var\/tmp/g' /etc/openxpki/config.d/realm/democa/publishing.yaml
-
-# set en_US as default language to get correct I18N translations (e.g. in rpc.fcgi)
-sed -ri 's/^(\s*default_language:).*/\1 en_US/' /etc/openxpki/config.d/system/server.yaml
 
 #
 # Compile OpenXPKI
