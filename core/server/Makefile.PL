@@ -233,6 +233,7 @@ print STDERR "This is OpenXPKI version $openxpki_version\n";
 ## hack to avoid warnings from Log4perl
 eval {
     require Log::Log4perl::Logger;
+    no warnings 'once';
     $Log::Log4perl::Logger::NON_INIT_WARNED = 1;
 };
 if ($@) {
