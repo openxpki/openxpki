@@ -41,159 +41,156 @@ sub slurp {
     return unless (defined $filename && -r $filename);
 
     my $result = do {
-	open my $HANDLE, '<', $filename or return;
-	if (! $HANDLE) {
-	    die "Could not open file '$filename' for reading. Stopped";
-	}
-	# slurp mode
-	local $INPUT_RECORD_SEPARATOR;     # long version of $/
-	<$HANDLE>;
+       open my $HANDLE, '<', $filename or return;
+        if (not $HANDLE) {
+            die "Could not open file '$filename' for reading. Stopped";
+        }
+        # slurp mode
+        local $INPUT_RECORD_SEPARATOR;     # long version of $/
+        <$HANDLE>;
     };
     return $result;
 }
 
-    
+
 sub get_revision_info {
     my $result = {};
 
     my $fh;
     # first get SVN revision information
     if (open $fh, "$svn info -R 2>/dev/null |") {
-      SVN_INFO:
-	while (<$fh>) {
-	    chomp;
-	    if (m{ \A Revision: \s* (\d+) }xms) {
-		$result->{revision} = $1;
-		next SVN_INFO;
-	    }
-	    if (m{ \A Last\ Changed\ Rev: \s* (\d+) }xms) {
-		if (! exists $result->{'last-changed-revision'} ||
-		    ($1 > $result->{'last-changed-revision'})) {
-		    $result->{'last-changed-revision'} = $1;
-		}
-	    }
-	}
-	close $fh;
+        SVN_INFO:
+        while (<$fh>) {
+            chomp;
+            if (m{ \A Revision: \s* (\d+) }xms) {
+                $result->{revision} = $1;
+                next SVN_INFO;
+            }
+            if (m{ \A Last\ Changed\ Rev: \s* (\d+) }xms) {
+                if (
+                    ! exists $result->{'last-changed-revision'} ||
+                    ($1 > $result->{'last-changed-revision'})
+                ) {
+                    $result->{'last-changed-revision'} = $1;
+                }
+            }
+        }
+        close $fh;
     }
 
     # check if we are running in a git checkout
     # getting revision info from SVN did not work, try git
     if ( (`which $git 2>/dev/null`) && (`$git branch 2>/dev/null`) ) {
-	# try via git-svn...
-	if (! exists $result->{revision}) {
-	    # try to get revision from git-svn
-	    my $last_log = `$git_svn log --oneline --limit 1 2>/dev/null`;
-	    my ($revision) = ($last_log =~ m{\A r(\d+)\ \|\ .*}xms);
-	    if (defined $revision) {
-		$result->{revision} = $revision;
-	    }
-	}
+        # try via git-svn...
+        if (! exists $result->{revision}) {
+            # try to get revision from git-svn
+            my $last_log = `$git_svn log --oneline --limit 1 2>/dev/null`;
+            my ($revision) = ($last_log =~ m{\A r(\d+)\ \|\ .*}xms);
+            if (defined $revision) {
+                $result->{revision} = $revision;
+            }
+        }
 
-	# ... and via plain git
-	if (! exists $result->{revision}) {
-	    # revision could not be obtained by git-svn
-	    # reason may be that this repository does not rebase via git-svn,
-	    # but rather pulls from another repository. assume that the
-	    # svn revision information is available in git full text logs.
-	    
-	    open $fh, qq{ $git log --pretty=email | };
-	  GITLOGLINE:
-	    while (my $line = <$fh>) {
-		chomp $line;
-		# first git-svn-id line encountered wins
-		if ($line =~ m{ \A git-svn-id: .*? @(\d+) \s+ }xms) {
-		    $result->{revision} = $1;
-		    last GITLOGLINE;
-		}
-	    }
-	    close $fh;
-	}
-	# fake last-changed-revision
-	$result->{'last-changed-revision'} ||= $result->{revision};
+        # ... and via plain git
+        if (! exists $result->{revision}) {
+            # revision could not be obtained by git-svn
+            # reason may be that this repository does not rebase via git-svn,
+            # but rather pulls from another repository. assume that the
+            # svn revision information is available in git full text logs.
 
-	# obtain current head commit (may even be a detached branch)
-	my $head_commit;
-	open $fh, qq{ $git rev-list --max-count=1 HEAD | };
-	while (my $line = <$fh>) {
-	    chomp $line;
-	    $head_commit ||= $line;
-	}
-	close $fh;
+            open $fh, qq{ $git log --pretty=email | };
+            while (my $line = <$fh>) {
+                chomp $line;
+                # first git-svn-id line encountered wins
+                if ($line =~ m{ \A git-svn-id: .*? @(\d+) \s+ }xms) {
+                    $result->{revision} = $1;
+                    last;
+                }
+            }
+            close $fh;
+        }
+        # fake last-changed-revision
+        $result->{'last-changed-revision'} ||= $result->{revision};
 
-	# obtain current head commit (may even be a detached branch)
-	my $abbreviated_head_commit;
-	open $fh, qq{ $git rev-list --abbrev-commit --max-count=1 HEAD | };
-	while (my $line = <$fh>) {
-	    chomp $line;
-	    $abbreviated_head_commit ||= $line;
-	}
-	close $fh;
-	
-	$result->{'git-abbreviated-commit-hash'} = $abbreviated_head_commit;
-	$result->{'git-commit-hash'} = $head_commit;
-	
-	# obtain current branch ref (branch name)
- 	my $branch_ref = `$git symbolic-ref HEAD 2>/dev/null`;
- 	if ($CHILD_ERROR != 0) {
- 	    $branch_ref = '(unnamed branch)';
- 	}
-	chomp $branch_ref;
-	$branch_ref =~ s{ refs/heads/ }{}xms;
- 	$result->{'git-branch'} = $branch_ref;
+        # obtain current head commit (may even be a detached branch)
+        my $head_commit;
+        open $fh, qq{ $git rev-list --max-count=1 HEAD | };
+        while (my $line = <$fh>) {
+            chomp $line;
+            $head_commit ||= $line;
+        }
+        close $fh;
 
-    # obtain date of current head commit
-    my $head_commit_date = `$git show -s --format=%cD HEAD 2>/dev/null`;
-    if ($CHILD_ERROR != 0) {
-        $head_commit_date = '(unable to get commit date)';
-    }
-    chomp $head_commit_date;
-    $result->{'git-commit-date'} = $head_commit_date;
+        # obtain current head commit (may even be a detached branch)
+        my $abbreviated_head_commit;
+        open $fh, qq{ $git rev-list --abbrev-commit --max-count=1 HEAD | };
+        while (my $line = <$fh>) {
+            chomp $line;
+            $abbreviated_head_commit ||= $line;
+        }
+        close $fh;
 
-	# get git tag information
-	my @git_tags;
+        $result->{'git-abbreviated-commit-hash'} = $abbreviated_head_commit;
+        $result->{'git-commit-hash'} = $head_commit;
 
-	open $fh, qq{ $git show-ref --tags -d | };
-      GITSHOWREF:
-	while (my $line = <$fh>) {
-	    chomp $line;
-	    my ($commit, $tag) = ($line =~ m{ \A (\w+) \s+ refs/tags/(.*) }xms);
-	    if (defined $tag && ($commit eq $head_commit)) {
-		    $result->{'git-tag'} ||= $tag;
-		    push @git_tags, $tag;
-	    }
-	}
-	close $fh;
-	$result->{'git-tags'} = join(', ', @git_tags);
+        # obtain current branch ref (branch name)
+        my $branch_ref = `$git symbolic-ref HEAD 2>/dev/null`;
+        if ($CHILD_ERROR != 0) {
+            $branch_ref = '(unnamed branch)';
+        }
+        chomp $branch_ref;
+        $branch_ref =~ s{ refs/heads/ }{}xms;
+        $result->{'git-branch'} = $branch_ref;
 
+        # obtain date of current head commit
+        my $head_commit_date = `$git show -s --format=%cD HEAD 2>/dev/null`;
+        if ($CHILD_ERROR != 0) {
+            $head_commit_date = '(unable to get commit date)';
+        }
+        chomp $head_commit_date;
+        $result->{'git-commit-date'} = $head_commit_date;
 
-	# get most recent tag information
+        # get git tag information
+        my @git_tags;
 
-	foreach my $tag (undef, keys %{ $git_reference_tag_of }) {
-	    my $tag_mapping;
-	    if (defined $tag) {
-		$tag_mapping = $git_reference_tag_of->{$tag} || $tag;
-	    }
+        open $fh, qq{ $git show-ref --tags -d | };
+        while (my $line = <$fh>) {
+            chomp $line;
+            my ($commit, $tag) = ($line =~ m{ \A (\w+) \s+ refs/tags/(.*) }xms);
+            if (defined $tag && ($commit eq $head_commit)) {
+                $result->{'git-tag'} ||= $tag;
+                push @git_tags, $tag;
+            }
+        }
+        close $fh;
+        $result->{'git-tags'} = join(', ', @git_tags);
 
-	    my $reftag = '';
-	    if (defined $tag) {
-		$reftag = "--match $tag";
-	    }
+        # get most recent tag information
+        foreach my $tag (undef, keys %{ $git_reference_tag_of }) {
+            my $tag_mapping;
+            if (defined $tag) {
+                $tag_mapping = $git_reference_tag_of->{$tag} || $tag;
+            }
 
-	    open $fh, qq{ $git describe --tags $reftag 2>/dev/null | };
+            my $reftag = '';
+            if (defined $tag) {
+                $reftag = "--match $tag";
+            }
 
-	    my $description;
-	  GITDESCRIBE:
-	    while (my $line = <$fh>) {
-		chomp $line;
-		$description = $line;
-		last GITDESCRIBE;
-	    }
-	    my $postfix = '';
-	    if (defined $tag_mapping) {
-		$postfix = '-' . $tag_mapping;
-	    }
-	    $result->{'git-description' . $postfix} = $description;
-	}
+            open $fh, qq{ $git describe --tags $reftag 2>/dev/null | };
+
+            my $description;
+            while (my $line = <$fh>) {
+                chomp $line;
+                $description = $line;
+                last;
+            }
+            my $postfix = '';
+            if (defined $tag_mapping) {
+                $postfix = '-' . $tag_mapping;
+            }
+            $result->{'git-description' . $postfix} = $description;
+        }
     }
 
     return $result;
@@ -202,29 +199,28 @@ sub get_revision_info {
 
 sub upwards_find_file {
     my $filename = shift;
-    
+
     return undef unless defined $filename;
 
     my $dir = getcwd;
 
-  DIRECTORY:
     while ($dir ne '/') {
-	if (exists $params{verbose}) {
-	    print STDERR "* scanning $dir for $filename\n";
-	}
+        if (exists $params{verbose}) {
+            print STDERR "* scanning $dir for $filename\n";
+        }
 
-	my $absolute_filename = File::Spec->catfile($dir, $filename);
-	if (-e $absolute_filename) {
-	    if (exists $params{verbose}) {
-		print STDERR "* found $absolute_filename\n";
-	    }
-	    return $absolute_filename;
-	}
+        my $absolute_filename = File::Spec->catfile($dir, $filename);
+        if (-e $absolute_filename) {
+            if (exists $params{verbose}) {
+                print STDERR "* found $absolute_filename\n";
+            }
+            return $absolute_filename;
+        }
 
-	# one level up
-	my @dirs = File::Spec->splitdir($dir);
-	pop @dirs;
-	$dir = File::Spec->catdir(@dirs);
+        # one level up
+        my @dirs = File::Spec->splitdir($dir);
+        pop @dirs;
+        $dir = File::Spec->catdir(@dirs);
     }
     return;
 }
@@ -235,21 +231,21 @@ sub expand_keyword {
     my $last_arg = "";
     while (defined $arg && ($last_arg ne $arg)) {
         $last_arg = $arg;
-	# NB: reverse sorting keys results in "longer" keywords listed
-	# first, avoiding a "greedy" match of shorter but identical patterns
-	# (see 'git-tags' vs. 'git-tag')
-	foreach my $keyword (reverse sort keys %{$mapping_of->{keyword}}) {
-	    if ($arg =~ m{ $keyword }xms) {
-		my $value = $mapping_of->{keyword}->{$keyword}->{entry}->{value};
-		if (! defined $value) {
-		    die "Could not get value for keyword '$keyword'. Stopped";
-		}
-		$arg =~ s{ $keyword }{$value}xmsg;
-	    }
-	}
-	$arg = strftime($arg, gmtime(time));
+        # NB: reverse sorting keys results in "longer" keywords listed
+        # first, avoiding a "greedy" match of shorter but identical patterns
+        # (see 'git-tags' vs. 'git-tag')
+        foreach my $keyword (reverse sort keys %{$mapping_of->{keyword}}) {
+            if ($arg =~ m{ $keyword }xms) {
+                my $value = $mapping_of->{keyword}->{$keyword}->{entry}->{value};
+                if (! defined $value) {
+                    die "Could not get value for keyword '$keyword'. Stopped";
+                }
+                $arg =~ s{ $keyword }{$value}xmsg;
+            }
+        }
+        $arg = strftime($arg, gmtime(time));
     }
-    
+
     return $arg;
 }
 
@@ -259,17 +255,17 @@ sub expand_keyword {
 $ENV{LANG} = 'C';
 
 GetOptions(\%params,
-	   'help|?',
-	   'man',
-	   'verbose',
-	   'format=s',
-	   'directory=s',
-	   'dump',
-	   'dumpformat=s',
-	   'list-formats',
-	   'list-keywords',
-	   'show-revisioninfo',
-    ) or pod2usage(-verbose => 0);
+   'help|?',
+   'man',
+   'verbose',
+   'format=s',
+   'directory=s',
+   'dump',
+   'dumpformat=s',
+   'list-formats',
+   'list-keywords',
+   'show-revisioninfo',
+) or pod2usage(-verbose => 0);
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
 pod2usage(-verbose => 1) if ($params{help});
@@ -305,14 +301,13 @@ if (! scalar keys %{$revision_info}) {
     # could not get revision from git, check if cached result is available
     print STDERR "NOTE: could not determine revision info from version control\n";
     # determine base directory of VERSION_DEFINITION file
-    my ($volume, $dir, $file) =
-	File::Spec->splitpath( $def_file );
+    my ($volume, $dir, $file) = File::Spec->splitpath( $def_file );
     my $revision_file = File::Spec->catfile($dir, '.vergen_revision_state');
 
     if (-r $revision_file) {
-	print STDERR "NOTE: reading cached revision information from $revision_file\n";
-	my $data = slurp($revision_file);
-	eval $data;
+        print STDERR "NOTE: reading cached revision information from $revision_file\n";
+        my $data = slurp($revision_file);
+        eval $data;
     }
 }
 
@@ -337,30 +332,29 @@ if (! scalar keys %{$revision_info}) {
 ### %config
 ### $format_of
 
-COMPONENT:
 foreach my $component (keys %config) {
     ### $component...
 
     # ignore components starting with an underscore (custom config)
     if ($component =~ m{ \A _ }xms) {
-	next COMPONENT;
+        next;
     }
-    
+
     # coerce keyword into arrayref
     if (defined $config{$component}->{keyword}) {
         if (ref $config{$component}->{keyword} eq '') {
-	    $config{$component}->{keyword} = [ $config{$component}->{keyword} ];
-	}
+            $config{$component}->{keyword} = [ $config{$component}->{keyword} ];
+        }
     } else {
         die "No keyword defined for component $component. Stopped";
     }
 
     # built-in components
-    if ($component =~ m{ \A (?: revision | 
+    if ($component =~ m{ \A (?: revision |
                                 last-changed-revision |
                                 git-branch |
-                                git-commit-hash | 
-                                git-commit-date | 
+                                git-commit-hash |
+                                git-commit-date |
                                 git-abbreviated-commit-hash |
                                 git-tag |
                                 git-tags |
@@ -372,52 +366,53 @@ foreach my $component (keys %config) {
             value   => $revision_info->{$component},
             type    => 'built-in',
         };
-        next COMPONENT;
+        next;
     }
 
-    my $optional = (defined $config{$component}{optional} 
+    my $optional = (defined $config{$component}{optional}
                     && ($config{$component}{optional} =~ m{ \A (?:yes|true|1) \z }ixms));
     ### $optional
 
-    if (defined $config{$component}{filename}
-	&& defined $config{$component}{expression}) {
-	die "Mutually exclusive sources defined for component '$component'. Stopped";
+    if (
+        defined $config{$component}{filename}
+        && defined $config{$component}{expression}
+    ) {
+        die "Mutually exclusive sources defined for component '$component'. Stopped";
     }
 
     my $value;
     if (defined $config{$component}{filename}) {
-	my $file = upwards_find_file($config{$component}{filename});
-	
-	if (defined $file) {
-	    $value = slurp($file);
-	    if (! defined $value) {
-		$value = '';
-	    }
-	    chomp $value;
-	} else {
-	    if (! $optional) {
-		die "Could not find version file '$config{$component}{filename}' for component '$component' upwards from here. Stopped";
-	    }
-	    # default: empty
-	    $value = '';
-	}
+        my $file = upwards_find_file($config{$component}{filename});
+
+        if (defined $file) {
+            $value = slurp($file);
+            if (! defined $value) {
+                $value = '';
+            }
+            chomp $value;
+        } else {
+            if (! $optional) {
+                die "Could not find version file '$config{$component}{filename}' for component '$component' upwards from here. Stopped";
+            }
+            # default: empty
+            $value = '';
+        }
     }
     if (defined $config{$component}{expression}) {
-	# allow perl expressions in configuration
-	$value = eval $config{$component}{expression};
-	if ($EVAL_ERROR) {
-	    die "Evaluation error in expression of component '$component':\n" .$EVAL_ERROR;
-	}
-	# and even anonymous subroutines
-	if (ref $value eq 'CODE') {
-	    $value = &{$value};
-	}
+        # allow perl expressions in configuration
+        $value = eval $config{$component}{expression};
+        if ($EVAL_ERROR) {
+            die "Evaluation error in expression of component '$component':\n" .$EVAL_ERROR;
+        }
+        # and even anonymous subroutines
+        if (ref $value eq 'CODE') {
+            $value = &{$value};
+        }
     }
 
     if (! defined $value && ! $optional) {
-	die "Could not determine value for mandatory component '$component'. Stopped";
+        die "Could not determine value for mandatory component '$component'. Stopped";
     }
-
 
     $mapping_of->{component}->{$component} = {
         keyword => $config{$component}->{keyword},
@@ -476,10 +471,9 @@ if (defined $params{'dump'}) {
 
         my @values = ();
 
-       MAKEFORMAT:
         while (1) {
             my ($item) = ($dumpformat =~ m{ (KEYWORD|VALUE) }xms);
-            last MAKEFORMAT if (! defined $item);
+            last if (! defined $item);
             $dumpformat =~ s{ $item }{%s}xms;
             push @values, $vars{$item};
         }
@@ -516,7 +510,7 @@ vergen [options] COMMAND
    --format <arg>        print version using format 'arg'
    --directory <dir>     pretend to be in directory 'dir'
    --dump                dump keyword assignments
-   --dumpformat <string> use <string> as dump format 
+   --dumpformat <string> use <string> as dump format
                          (default: KEYWORD=VALUE\n)
    --list-formats        lists all user-defined formats available
    --list-keywords       lists all keywords available in formats
@@ -526,7 +520,7 @@ vergen [options] COMMAND
 =head1 DESCRIPTION
 
 B<vergen> is a tool that can help to maintain consistent version numbers
-in a project. If desired it uses Subversion and/or Git to determine 
+in a project. If desired it uses Subversion and/or Git to determine
 revision control information.
 
 Starting from the current directory, vergen searches upwards for its
@@ -540,7 +534,7 @@ its content is read and stored as the value for the corresponding component.
 Components can arbitrarily be combined to 'formats'. A format consists
 of a string that may contain any number of custom and built-in component
 names.
-It is then possible to print the resulting version string using 
+It is then possible to print the resulting version string using
 the --format option.
 
 When used within a directory hierarchy under revision control via
@@ -593,8 +587,8 @@ Use specified string as template for keyword dump. Defaults to
 'KEYWORD=VALUE\n'.
 Useful dump formats:
 
-  --dumpformat 'KEYWORD="VALUE"\n'   
-  --dumpformat 'export KEYWORD="VALUE"\n'   
+  --dumpformat 'KEYWORD="VALUE"\n'
+  --dumpformat 'export KEYWORD="VALUE"\n'
 
 =item B<--list-formats>
 
@@ -606,7 +600,7 @@ List all keywords (can be part of version format of may be referenced directly).
 
 =item B<--show-revisioninfo>
 
-Dump all revision information that could be obtained from revision control 
+Dump all revision information that could be obtained from revision control
 tools.
 
 =item B<--verbose>
@@ -657,19 +651,19 @@ with NAME being replaced with the tag-mapping.
 
 Section names are interpreted as a custom version component
 definition.
-In order to create a custom version number component you should define 
+In order to create a custom version number component you should define
 the following keys:
 
 =head3 filename
 
-File name to use. vergen searches upwards from the current directory 
+File name to use. vergen searches upwards from the current directory
 until it finds the specified file.
 The file contents will be assigned as the component value.
 
 =head3 keyword
 
-Symbolic name(s) describing the version component that can be used 
-to reference its value. More than one keyword can be used for 
+Symbolic name(s) describing the version component that can be used
+to reference its value. More than one keyword can be used for
 aliasing the component. Each of these keyword can be used to reference
 the component value. It is possible to use the keyword in a format (--format)
 or even in the contents of the version component files. The program resolves
@@ -690,7 +684,7 @@ revision control system.
 B<vergen> support Subversion-only operation, Subversion with Git (using
 git-svn to rebase the Subversion repository) and Git-only. Git-only mode
 also tries to guess Subversion version numbers from the Git log (e. g.
-when pulling from a Git repository that uses git-svn to rebase from 
+when pulling from a Git repository that uses git-svn to rebase from
 Subversion).
 
 =head3 Subversion built-ins
@@ -698,13 +692,13 @@ Subversion).
 The following named sections are hardcoded
 and can be used to access Subversion information.
 
-=head4 revision 
+=head4 revision
 
 'revision' expands to the global SVN revision number
 
 =head4 last-changed-revision
 
-'last-changed-revision' determines the highest "Last Changed Rev" 
+'last-changed-revision' determines the highest "Last Changed Rev"
 below the current directory (recursively).
 
 
