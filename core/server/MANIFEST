@@ -139,7 +139,6 @@ OpenXPKI/Crypto/Backend/OpenSSL.pm
 OpenXPKI/Crypto/Backend/OpenSSL/CLI.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Config.pm
-OpenXPKI/Crypto/Backend/OpenSSL/ECDH.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Engine.pm
 
 OpenXPKI/Crypto/Backend/OpenSSL/Engine/GOST.pm
@@ -181,6 +180,7 @@ OpenXPKI/Server/Database/Legacy.pm
 OpenXPKI/Server/Database/Query.pm
 OpenXPKI/Server/Database/QueryBuilder.pm
 OpenXPKI/Server/Database/Driver/DB2.pm
+OpenXPKI/Server/Database/Driver/MariaDB.pm
 OpenXPKI/Server/Database/Driver/MySQL.pm
 OpenXPKI/Server/Database/Driver/Oracle.pm
 OpenXPKI/Server/Database/Driver/PostgreSQL.pm
@@ -227,6 +227,7 @@ OpenXPKI/Server/API2/Plugin/Cert/list_used_issuers.pm
 OpenXPKI/Server/API2/Plugin/Cert/private_key.pm
 OpenXPKI/Server/API2/Plugin/Cert/search_cert.pm
 OpenXPKI/Server/API2/Plugin/Cert/validate_certificate.pm
+OpenXPKI/Server/API2/Plugin/Cert/DateCondition.pm
 OpenXPKI/Server/API2/Plugin/Control/reload.pm
 OpenXPKI/Server/API2/Plugin/Control/version.pm
 OpenXPKI/Server/API2/Plugin/Control/control_watchdog.pm
@@ -578,7 +579,6 @@ htdocs/fonts/glyphicons-halflings-regular.woff2
 htdocs/assets/openxpki.js
 htdocs/assets/openxpki.css
 htdocs/assets/vendor.js
-htdocs/assets/auto-import-fastboot.js
 htdocs/assets/vendor.css
 htdocs/localconfig.yaml.template
 htdocs/default.html
