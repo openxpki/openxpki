@@ -2337,7 +2337,6 @@ sub __render_input_field {
 
     if ($field->{option}) {
         $item->{options} = $field->{option};
-        map {  $_->{label} = $_->{label} } @{$item->{options}};
     }
 
     if ($field->{clonable}) {

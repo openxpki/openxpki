@@ -210,7 +210,7 @@ sub get_field_info {
         } else {
             my @item;
             if ($mode eq 'keys' || $mode eq 'map') {
-                @item = $conn->get_keys( [ @field_path, 'option', 'item' ] );
+                @item = sort $conn->get_keys( [ @field_path, 'option', 'item' ] );
             } else {
                 # option.item holds the items as list, this is mandatory
                 @item = $conn->get_list( [ @field_path, 'option', 'item' ] );
@@ -225,7 +225,6 @@ sub get_field_info {
                     next unless ($label);
                     push @option, { value => $key, label => $label };
                 }
-
             } elsif (my $label = $conn->get( [ @field_path, 'option', 'label' ] )) {
                 # if set, we generate the values from option.label + key
                 @option = map { { value => $_, label => $label.'_'.uc($_) } } @item;
