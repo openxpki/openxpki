@@ -19,7 +19,7 @@ use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 
 
-plan tests => 40;
+plan tests => 41;
 
 
 #
@@ -106,7 +106,7 @@ sub search_cert_ok {
     my $result;
     lives_and {
         $result = $oxitest->api2_command(search_cert => { %$conditions, return_columns => "subject_key_identifier" } );
-        cmp_deeply $result, ($respect_order ? \@hashes : bag(@hashes));
+        cmp_deeply $result, ($respect_order ? \@hashes : bag(@hashes)) or diag explain $result;
     } "Search cert $message";
 }
 
@@ -282,6 +282,16 @@ search_cert_ok "whose validity period ends betweem two given dates", {
     expires_before => $ar2na + 100,
     pki_realm => $dbdata->cert("alpha-root-2")->db->{pki_realm}
 }, $dbdata->cert_names_by_realm_gen(alpha => 2);
+
+# Test that status 'VALID' and valid_before (both lead to setting notbefore) lead to
+# setting notbefore to the stricter (i.e. lower) value. This should result in
+# 0 certificates as alpha-root-3 is valid in the future.
+$result = search_cert_ok "that is VALID now and valid before somewhen in the future", {
+    status => 'VALID',              # sets notbefore < now
+    valid_before => $ar3nb + 100,   # sets notbefore < $ar3nb + 100
+    valid_after => $ar3nb - 100,    # only used to filter out certs from other generations
+    pki_realm => $dbdata->cert("alpha-root-3")->db->{pki_realm}
+}, ();
 
 # By CERT_ATTRIBUTES list of conditions to search in attributes (KEY, VALUE, OPERATOR)
 # OPERATOR = [ EQUAL | LIKE | BETWEEN ]
