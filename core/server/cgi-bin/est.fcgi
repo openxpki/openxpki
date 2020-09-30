@@ -102,7 +102,7 @@ while (my $cgi = CGI::Fast->new()) {
             next;
         }
         $param->{'server'} = $config->endpoint();
-        $param->{'interface'} = 'rpc';
+        $param->{'interface'} = 'est';
     }
 
     # Gather data from TLS session
