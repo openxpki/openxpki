@@ -1314,6 +1314,10 @@ sub action_search {
 
     my $result_count = $self->send_command_v2( 'search_cert_count', $query  );
 
+    if (not defined $result_count) {
+        return $self;
+    }
+
     # No results founds
     if (!$result_count) {
         $self->set_status('I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES','error');
