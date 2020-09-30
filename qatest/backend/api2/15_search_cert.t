@@ -19,7 +19,7 @@ use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 
 
-plan tests => 41;
+plan tests => 42;
 
 
 #
@@ -149,7 +149,12 @@ while (my $cert = shift @{ $result } and $sort_ok) {
 ok($sort_ok, "Certificates are sorted correctly");
 
 # Various attributes
-search_cert_ok "by expired status", {
+search_cert_ok "by status VALID", {
+    status => "VALID",
+    pki_realm => $dbdata->cert("alpha-root-2")->db->{pki_realm}
+}, $dbdata->cert_names_by_realm_gen(alpha => 2);
+
+search_cert_ok "by status EXPIRED", {
     status => "EXPIRED",
     pki_realm => $dbdata->cert("alpha-root-1")->db->{pki_realm}
 }, $dbdata->cert_names_by_realm_gen(alpha => 1);

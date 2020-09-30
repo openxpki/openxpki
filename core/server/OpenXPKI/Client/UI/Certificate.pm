@@ -1245,12 +1245,6 @@ sub action_search {
     if (my $status = $self->param('status')) {
         $input->{'status'} = $status;
         $verbose->{'status'} = 'I18N_OPENXPKI_UI_CERT_STATUS_'.uc($status);
-        if ($status eq 'VALID') {
-            $status = 'ISSUED';
-            my $now = time();
-            $query->{valid_before} = $now;
-            $query->{expires_after} = $now;
-        }
         $query->{status} = $status;
     }
 
