@@ -90,12 +90,12 @@ sed -ri 's/^(pid_file:\s+)\S+/\1\/var\/openxpki\/openxpkid.pid/' /etc/openxpki/c
 ./tools/testenv/mysql-oxi-config.sh
 
 # Database re-init and sample config (CA certificates etc.)
-./tools/testenv/mysql-create-db.sh
-./tools/testenv/mysql-create-schema.sh
-./tools/testenv/insert-certificates.sh
+sudo ./tools/testenv/mysql-create-db.sh
+sudo ./tools/testenv/mysql-create-schema.sh
+sudo ./tools/testenv/insert-certificates.sh
 
 # Start OpenXPKI (it's in the PATH)
-openxpkictl start || (cat /var/log/openxpki/*; exit 1)
+sudo openxpkictl start || (cat /var/log/openxpki/*; exit 1)
 
 #
 # QA tests
