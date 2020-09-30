@@ -1269,10 +1269,10 @@ sub action_search {
         $verbose->{$key} = DateTime->from_epoch( epoch => $val[0] )->iso8601();
 
         if ($key eq 'valid_at') {
-            if (!$query->{valid_before} || $query->{valid_before} < $val[0]) {
+            if (!$query->{valid_before} || $query->{valid_before} > $val[0]) {
                 $query->{valid_before} = $val[0];
             }
-            if (!$query->{expires_after} || $query->{expires_after} > $val[0]) {
+            if (!$query->{expires_after} || $query->{expires_after} < $val[0]) {
                 $query->{expires_after} = $val[0];
             }
         } else {
