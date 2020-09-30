@@ -207,7 +207,7 @@ is $offset->in_units('minutes'), -30, 'autodetect relativedate';
 
 
 $dt = OpenXPKI::DateTime::get_validity( {
-    VALIDITY => "2006",
+    VALIDITY => "2006-01-01",
     VALIDITYFORMAT => 'detect',
 } );
 is OpenXPKI::DateTime::convert_date({ DATE => $dt }), "2006-01-01T00:00:00",
