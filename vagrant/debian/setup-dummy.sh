@@ -21,10 +21,10 @@ else
 fi
 
 # same for SQL dump
-if [ -f "$BASE/schema-mysql.sql.gz" ]; then
-    zcat "$BASE/schema-mysql.sql.gz" | mysql -u root openxpki
+if [ -f "$BASE/schema-mariadb.sql.gz" ]; then
+    zcat "$BASE/schema-mariadb.sql.gz" | mysql -u root openxpki
 else
-    mysql -u root openxpki < "$BASE/schema-mysql.sql"
+    mysql -u root openxpki < "$BASE/schema-mariadb.sql"
 fi
 
 # tables must exist to grant privileges so we need to out this here

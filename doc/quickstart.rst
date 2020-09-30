@@ -59,7 +59,7 @@ Add the repository to your source list (buster)::
 
 Please do not disable the installation of "recommend" packages as this will very likely leave you with an unusable system.
 
-As the init script uses mysql as default, but does not force it as a dependency, it is crucial that you have the mysql server and the perl mysql binding installed before you pull the OpenXPKI package::
+As OpenXPKI can run with different RDBMS, the package does not list any of them as dependency. You therefore need to install the required perl bindings and server software yourself::
 
     apt install default-mysql-server libdbd-mysql-perl
 
@@ -78,7 +78,7 @@ Now install the OpenXPKI core package, session driver and the translation packag
 use the openxpkiadm command to verify if the system was installed correctly::
 
     openxpkiadm version
-    Version (core): 3.0.0
+    Version (core): 3.8.0
 
 Now, create an empty database and assign a database user::
 
@@ -91,7 +91,7 @@ Now, create an empty database and assign a database user::
 
     main:
        debug: 0
-       type: MySQL
+       type: MariaDB
        name: openxpki
        host: localhost
        port: 3306
@@ -99,13 +99,16 @@ Now, create an empty database and assign a database user::
        passwd: openxpki
 
 
-Please create the empty database schema from the provided schema file. mysql and postgresql
-should work out of the box, the oracle schema is good for testing but needs some extra indices
-to perform properly.
+Starting with the v3.8 release we added a MariaDB driver that makes use of MariaDB internal
+sequences instead of the emulation code and we recommend any new installations to use it!
 
-Example call when debian packages are installed::
+Please create the empty database schema from the provided schema file. mariadb/mysql and
+postgresql should work out of the box, the oracle schema is good for testing but needs some
+extra indices to perform properly.
 
-    zcat /usr/share/doc/libopenxpki-perl/examples/schema-mysql.sql.gz | \
+Example call when debian packages >= v3.8 are installed::
+
+    zcat /usr/share/doc/libopenxpki-perl/examples/schema-mariadb.sql.gz | \
          mysql -u root --password --database  openxpki
 
 If you do not use debian packages, you can get a copy from ``contrib/sql/`` in the
