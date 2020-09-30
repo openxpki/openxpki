@@ -2290,6 +2290,12 @@ sub __get_next_auto_action {
 
     }
 
+    return unless ($wf_action);
+
+    # do not load activities that do not have fields or a uihandle class
+    return unless ($wf_info->{activity}->{$wf_action}->{field} ||
+        $wf_info->{activity}->{$wf_action}->{uihandle});
+
     $self->logger()->debug('Implicit autoselect of action ' . $wf_action ) if($wf_action);
 
     return $wf_action;
