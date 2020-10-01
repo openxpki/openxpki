@@ -161,17 +161,17 @@ sub checksum {
 
 sub get_version {
     my $self = shift;
-    Log::Log4perl->get_logger('openxpki.deprecated')->error('Call to get_version in config layer');
+    CTX('log')->deprecated->error('Call to get_version in config layer');
     return '';
 }
 
 sub get_head_version {
-    Log::Log4perl->get_logger('openxpki.deprecated')->error('Call to get_head_version in config layer');
+    CTX('log')->deprecated->error('Call to get_head_version in config layer');
 }
 
 sub update_head {
     my $self = shift;
-    Log::Log4perl->get_logger('openxpki.deprecated')->error('Call to update_head in config layer');
+    CTX('log')->deprecated->error('Call to update_head in config layer');
     return '';
 }
 

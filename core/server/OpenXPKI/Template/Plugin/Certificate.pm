@@ -111,7 +111,7 @@ sub body {
     $property = $legacy->{$property} if ($legacy->{$property});
 
     if (!defined $hash->{$property}) {
-        Log::Log4perl->get_logger('openxpki.deprecated')->error("Template Plugin Certificate.body called with legacy property ($property)!");
+        CTX('log')->deprecated->error("Template Plugin Certificate.body called with legacy property ($property)!");
         return;
     }
 

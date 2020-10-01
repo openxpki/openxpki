@@ -32,7 +32,7 @@ has 'CONFIG' => (
     default => '/etc/openxpki/log.conf',
 );
 
-for my $name (qw( application auth system workflow )) {
+for my $name (qw( application auth system workflow deprecated )) {
     my $logger = 'openxpki.' . $name;
     has $name => (
         is      => 'ro',

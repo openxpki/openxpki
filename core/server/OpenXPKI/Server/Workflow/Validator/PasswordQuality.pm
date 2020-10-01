@@ -197,7 +197,7 @@ sub _init {
     # deprecation warnings
     my @deprecated = grep { exists $params->{$_} } qw( groups dictionary following following_keyboard );
     if (scalar @deprecated) {
-        Log::Log4perl->get_logger('openxpki.deprecated')->error('OpenXPKI::Server::Workflow::Validator::PasswordQuality configured using deprecated parameters: ' . join(", ", @deprecated));
+        CTX('log')->deprecated->error('OpenXPKI::Server::Workflow::Validator::PasswordQuality configured using deprecated parameters: ' . join(", ", @deprecated));
     }
 
     $self->api_args($api_args);

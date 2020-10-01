@@ -55,7 +55,7 @@ sub execute {
         # deprecated - context key with extra brackets
         if ($key =~ m{ \A (\w+)\[\] }xms) {
             $key = $1;
-            Log::Log4perl->get_logger('openxpki.deprecated')->error("Deprecated usage of square brackets in field name ($key)");
+            CTX('log')->deprecated->error("Deprecated usage of square brackets in field name ($key)");
         }
 
         if (ref $param->{$key} eq 'ARRAY') {

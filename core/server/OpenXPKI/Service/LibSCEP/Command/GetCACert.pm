@@ -88,7 +88,7 @@ sub __build_chain : PRIVATE {
     # legacy setting
     my $strip_root = CTX('config')->get(['scep', $server, 'response', 'getcacert_strip_root']);
     if (defined $strip_root) {
-        Log::Log4perl->get_logger('openxpki.deprecated')->info('getcacert_strip_root found in SCEP settings - please upgrade your config');
+        CTX('log')->deprecated->info('getcacert_strip_root found in SCEP settings - please upgrade your config');
         if ($strip_root) {
             $ra_chain = 'chain';
             $issuer_chain = 'chain';
