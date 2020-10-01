@@ -195,7 +195,7 @@ sub _init {
     $api_args->{dictionaries} = [ split(/\s*,\s*/, $api_args->{dictionaries}) ] if exists $api_args->{dictionaries};
 
     # deprecation warnings
-    my @deprecated = grep { exists $params->{$_} } qw( groups dictionary following following_keyboard );
+    my @deprecated = grep { exists $params->{$_} } qw( dictionary following following_keyboard );
     if (scalar @deprecated) {
         CTX('log')->deprecated->error('OpenXPKI::Server::Workflow::Validator::PasswordQuality configured using deprecated parameters: ' . join(", ", @deprecated));
     }
