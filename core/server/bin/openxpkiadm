@@ -295,7 +295,7 @@ sub alias_add {
             if ($check_duplicate) {
                 print STDERR sprintf("A token with generation %01d for group %s already exists:\n",
                     $params{gen}, $params{token});
-                __alias_print($check_duplicate);
+                print STDERR __alias_print($check_duplicate);
                 return 2;
             }
 
@@ -476,7 +476,7 @@ sub alias_add {
     );
 
     print "Successfully created alias in realm $params{realm}:\n";
-    __alias_print( \%insert_hash );
+    print __alias_print( \%insert_hash );
 
     # check if a key was given
     if ($extracted_keydata) {
@@ -588,7 +588,7 @@ sub alias_add {
             );
         }
 
-        __alias_print( $root_alias );
+        print __alias_print( $root_alias );
 
     }
 
@@ -703,7 +703,7 @@ sub alias_update {
     );
 
     print "Successfully updated alias:\n";
-    __alias_print( $alias );
+    print __alias_print( $alias );
 
 
     return 0;
@@ -751,7 +751,7 @@ sub alias_list {
 
         print "=== alias without group ===\n" if ($db_alias->rows);
         while (my $alias = $db_alias->fetchrow_hashref) {
-            __alias_print( $alias, $show_subject);
+            print __alias_print( $alias, $show_subject);
         }
         return 0;
     }
@@ -798,12 +798,12 @@ sub alias_list {
         );
 
         while (my $alias = $db_alias->fetchrow_hashref) {
-            __alias_print( $alias, $show_subject );
+            print __alias_print( $alias, $show_subject );
         }
 
         # print empty message if none found and not in group mode
         if (!$db_alias->rows) {
-            __alias_print( undef );
+            print __alias_print( undef );
         }
 
         # unset in anon group list
@@ -827,7 +827,7 @@ sub alias_list {
         );
 
         while (my $alias = $db_alias->fetchrow_hashref) {
-            __alias_print( $alias, $show_subject );
+            print __alias_print( $alias, $show_subject );
         }
 
     }
@@ -849,7 +849,7 @@ sub alias_list {
     );
 
     print "=== root ca ===\ncurrent root ca:\n";
-    __alias_print( $alias, $show_subject );
+    print __alias_print( $alias, $show_subject );
 
     # Check for root ca
     $alias = $dbi->select_one(
@@ -864,7 +864,7 @@ sub alias_list {
     );
 
     print "upcoming root ca:\n";
-    __alias_print( $alias, $show_subject );
+    print __alias_print( $alias, $show_subject );
 
     return 0;
 
@@ -883,7 +883,7 @@ sub alias_show {
         limit => 1,
     );
 
-   __alias_print($alias, $params{subject});
+    print __alias_print($alias, $params{subject});
 
     my $file = $params{export} || '';
     if ($file eq "-") {
@@ -919,28 +919,29 @@ sub __alias_print {
     my $subject = shift;
 
     if (!$alias || !$alias->{alias}) {
-        print "  not set\n\n";
-        return;
+        return "  not set\n\n";
     }
 
     my $cert = CTX('api2')->get_cert( identifier => $alias->{identifier}, format => 'DBINFO' );
 
-    print "  Alias     : $alias->{alias}\n";
-    print "  Identifier: $alias->{identifier}\n";
+    my @out;
+    push @out, "  Alias     : $alias->{alias}\n";
+    push @out, "  Identifier: $alias->{identifier}\n";
 
-    print "  Subject   : $cert->{subject}\n" if ($subject);
+    push @out, "  Subject   : $cert->{subject}\n" if ($subject);
 
-    print "  NotBefore : " . DateTime->from_epoch( epoch => $alias->{notbefore} )->strftime("%F %T");
-    print DateTime->from_epoch( epoch => $cert->{notbefore} )->strftime(" (%F %T)")
+    push @out, "  NotBefore : " . DateTime->from_epoch( epoch => $alias->{notbefore} )->strftime("%F %T");
+    push @out, DateTime->from_epoch( epoch => $cert->{notbefore} )->strftime(" (%F %T)")
         if ($cert && $cert->{notbefore} != $alias->{notbefore});
 
-    print "\n";
-    print "  NotAfter  : " . DateTime->from_epoch( epoch => $alias->{notafter} )->strftime("%F %T");
+    push @out, "\n";
+    push @out, "  NotAfter  : " . DateTime->from_epoch( epoch => $alias->{notafter} )->strftime("%F %T");
 
-    print DateTime->from_epoch( epoch => $cert->{notafter} )->strftime(" (%F %T)")
+    push @out, DateTime->from_epoch( epoch => $cert->{notafter} )->strftime(" (%F %T)")
         if ($cert && $cert->{notafter} != $alias->{notafter});
 
-    print "\n\n";
+    push @out, "\n\n";
+    return join "", @out;
 
 }
 
