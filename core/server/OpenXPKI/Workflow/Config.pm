@@ -63,23 +63,26 @@ sub _build_workflow_config {
         push @{$wf_conf->{persister}}, $conf;
     }
 
+    my @global_fields = $self->__process_fields(['workflow', 'global', 'field']);
+
     # Add workflows
     my @workflow_def = $conn->get_keys('workflow.def');
     foreach my $wf_name (@workflow_def) {
         # The main workflow definiton (the flow rules)
         push @{$wf_conf->{workflow}}, $self->__process_workflow($wf_name);
 
-        my $prefix = sprintf "%s_", $conn->get( ['workflow', 'def', $wf_name, 'head', 'prefix' ] );
+        my $prefix = sprintf "%s_", $conn->get( ['workflow', 'def', $wf_name, 'head', 'prefix'] );
 
         # Workflow defined actions, conditions, validators
-        push @{$wf_conf->{action}},    $self->__process_actions(   ['workflow','def', $wf_name, 'action'], $prefix, $wf_name);
+        my @wf_fields = $self->__process_fields(['workflow', 'def', $wf_name, 'field']);
+        push @{$wf_conf->{action}},    $self->__process_actions(   ['workflow','def', $wf_name, 'action'], $prefix, $wf_name, [@global_fields, @wf_fields]);
         push @{$wf_conf->{condition}}, $self->__process_conditions(['workflow','def', $wf_name, 'condition'], $prefix);
         push @{$wf_conf->{validator}}, $self->__process_validators(['workflow','def', $wf_name, 'validator'], $prefix);
 
     }
 
     # Global actions, conditions, validators
-    push @{$wf_conf->{action}},    $self->__process_actions(   ['workflow','global', 'action'], 'global_');
+    push @{$wf_conf->{action}},    $self->__process_actions(   ['workflow','global', 'action'], 'global_', undef, \@global_fields);
     push @{$wf_conf->{condition}}, $self->__process_conditions(['workflow','global', 'condition'], 'global_');
     push @{$wf_conf->{validator}}, $self->__process_validators(['workflow','global', 'validator'], 'global_');
     push @{$wf_conf->{validator}}, {
@@ -240,6 +243,40 @@ sub __process_workflow {
     return $workflow;
 }
 
+sub __process_fields {
+    my ($self, $root_path) = @_;
+    my @result = ();
+    my $conn = $self->_config();
+
+    for my $field_name ($conn->get_keys($root_path)) {
+        my @path = (@{$root_path}, $field_name);
+        ##! 16: 'Processing field ' . join (".", @path)
+
+        my $context_key = $conn->get([ @path, 'name' ]) || $field_name;
+
+        my $field = {
+            name => $field_name,
+            context_key => $context_key,
+        };
+        #
+        # check if validator is needed
+        #
+        my $is_array = ($conn->exists( [ @path, 'min' ] ) || $conn->exists( [ @path, 'max' ] ));
+        # As the upstream "required" validator accepts the empty string as
+        # true which we want to be "false" we do not set the required flag
+        # but use our own field type validator
+        my $required = $conn->get( [ @path, 'required' ] );
+        my $is_required = (defined $required && $required =~ m/(yes|1)/i);
+        my $match = $conn->get( [ @path, 'match' ] ) || '';
+        if ($is_array || $is_required || $match) {
+            ##! 64: "Adding basic validator for $context_key with $is_array:$is_required:$match"
+            $field->{basic_validator} = sprintf ("%s::%01d:%01d:%s", $context_key, $is_array, $is_required, $match);
+        }
+
+        push @result, $field;
+    }
+    return @result;
+}
 
 =head2 __process_actions
 
@@ -248,7 +285,7 @@ This includes class, class params, fields and validators.
 
 =cut
 sub __process_actions {
-    my ($self, $root_path, $prefix, $wf_name) = @_;
+    my ($self, $root_path, $prefix, $wf_name, $fields) = @_;
     my @result = ();
     my $conn = $self->_config();
 
@@ -266,52 +303,20 @@ sub __process_actions {
 
         my @basic_validator = ();
         foreach my $field_name (@input) {
-
-            my @item_path;
-            # Fields can be defined local or global (only actions inside workflow)
-            if ($wf_name) {
-                @item_path = ( 'workflow', 'def', $wf_name, 'field', $field_name );
-                if (!$conn->exists( \@item_path )) {
-                    @item_path = ( 'workflow', 'global', 'field', $field_name );
-                }
-            } else {
-                @item_path = ( 'workflow', 'global', 'field', $field_name );
+            my ($field) = grep { $_->{name} eq $field_name } @{$fields};
+            if (!$field) {
+                OpenXPKI::Exception->throw(
+                    message => 'Field name used in workflow config is not defined',
+                    params => {
+                        workflow => $wf_name,
+                        action => $action_name,
+                        field => $field_name,
+                    }
+                );
             }
-
-            my $context_key = $conn->get( [ @item_path, 'name' ] );
-            if (!$context_key) {
-                if ($conn->exists( \@item_path )) {
-                    $context_key = $field_name;
-                } else {
-                    OpenXPKI::Exception->throw(
-                        message => 'Field name used in workflow config is not defined',
-                        params => {
-                            workflow => $wf_name,
-                            action => $action_name,
-                            field => $field_name,
-                        }
-                    );
-                }
-            }
-
-            my $is_array = ($conn->exists( [ @item_path, 'min' ] ) || $conn->exists( [ @item_path, 'max' ] ));
-
-            # As the upstream "required" validator accepts the empty string as
-            # true which we want to be "false" we do not set the required flag
-            # but use our own field type validator
-            my $required = $conn->get( [ @item_path, 'required' ] );
-            my $is_required = (defined $required && $required =~ m/(yes|1)/i);
-            my $match = $conn->get( [ @item_path, 'match' ] ) || '';
-            if ($is_array || $is_required || $match) {
-                ##! 64: "Adding basic validator for $context_key with $is_array:$is_required:$match"
-                push @basic_validator, sprintf ("%s::%01d:%01d:%s", $context_key, $is_array, $is_required, $match);
-            }
-
-            $self->logger()->debug("Adding field $field_name / $context_key");
-
-            # Push to the field list for the action
-            push @fields, { name => $context_key, is_required => 'no' };
-
+            push @basic_validator, $field->{basic_validator} if $field->{basic_validator};
+            push @fields, { name => $field->{context_key}, is_required => 'no' };
+            $self->logger()->debug("- adding field $field_name / $field->{context_key}");
         }
 
         my @validators = ();
