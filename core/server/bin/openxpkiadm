@@ -883,7 +883,8 @@ sub alias_show {
         limit => 1,
     );
 
-    print __alias_print($alias, $params{subject});
+    __alias_print($alias, $params{subject});
+    return 2 unless($alias);
 
     my $file = $params{export} || '';
     if ($file eq "-") {
