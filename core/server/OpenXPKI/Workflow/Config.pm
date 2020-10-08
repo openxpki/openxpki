@@ -69,50 +69,25 @@ sub _build_workflow_config {
         # The main workflow definiton (the flow rules)
         push @{$wf_conf->{workflow}}, $self->__process_workflow($wf_name);
 
-        # Add workflow defined actions
-        my @action_names = $conn->get_keys(['workflow','def', $wf_name, 'action']);
-        foreach my $action_name (@action_names) {
-            push @{$wf_conf->{action}}, $self->__process_action(['workflow','def', $wf_name, 'action', $action_name ]);
-        }
+        my $prefix = sprintf "%s_", $conn->get( ['workflow', 'def', $wf_name, 'head', 'prefix' ] );
 
-        # Add workflow defined conditions
-        my @condition_names = $conn->get_keys(['workflow','def', $wf_name, 'condition']);
-        foreach my $condition_name (@condition_names) {
-            push @{$wf_conf->{condition}}, $self->__process_condition(['workflow','def', $wf_name, 'condition', $condition_name ]);
-        }
-
-        # Add workflow defined validators
-        my @validator_names = $conn->get_keys(['workflow','def', $wf_name, 'validator']);
-        foreach my $validator_name (@validator_names) {
-            push @{$wf_conf->{validator}}, $self->__process_validator(['workflow','def', $wf_name, 'validator', $validator_name ]);
-        }
+        # Workflow defined actions, conditions, validators
+        push @{$wf_conf->{action}},    $self->__process_actions(   ['workflow','def', $wf_name, 'action'], $prefix, $wf_name);
+        push @{$wf_conf->{condition}}, $self->__process_conditions(['workflow','def', $wf_name, 'condition'], $prefix);
+        push @{$wf_conf->{validator}}, $self->__process_validators(['workflow','def', $wf_name, 'validator'], $prefix);
 
     }
 
-    # Finally add the global actions
-    my @action_names = $conn->get_keys(['workflow','global', 'action']);
-    foreach my $action_name (@action_names) {
-        push @{$wf_conf->{action}}, $self->__process_action(['workflow','global', 'action', $action_name]);
-    }
-
-    # And conditions
-    my @condition_names = $conn->get_keys(['workflow','global', 'condition']);
-    foreach my $condition_name (@condition_names) {
-        push @{$wf_conf->{condition}}, $self->__process_condition(['workflow','global', 'condition', $condition_name ]);
-    }
-
-    # Validators
-    my @validator_names = $conn->get_keys(['workflow','global', 'validator']);
-    foreach my $validator_name (@validator_names) {
-        push @{$wf_conf->{validator}}, $self->__process_validator(['workflow','global', 'validator', $validator_name ]);
-    }
-
+    # Global actions, conditions, validators
+    push @{$wf_conf->{action}},    $self->__process_actions(   ['workflow','global', 'action'], 'global_');
+    push @{$wf_conf->{condition}}, $self->__process_conditions(['workflow','global', 'condition'], 'global_');
+    push @{$wf_conf->{validator}}, $self->__process_validators(['workflow','global', 'validator'], 'global_');
     push @{$wf_conf->{validator}}, {
         name => '_internal_basic_field_type',
         class => 'OpenXPKI::Server::Workflow::Validator::BasicFieldType'
     };
 
-
+    # check for duplicate names
     foreach my $class (('action','condition','validator')) {
         my %defined;
         foreach my $item (@{$wf_conf->{$class}}) {
@@ -144,9 +119,7 @@ sub __process_workflow {
     my $conn = $self->_config();
 
     my $wf_persister = $conn->get( [ 'workflow', 'def', $wf_name , 'head', 'persister' ] );
-    if ($wf_persister) {
-        $workflow->{persister}  = $wf_persister;
-    }
+    $workflow->{persister} = $wf_persister if $wf_persister;
 
     my $wf_prefix = $conn->get( [ 'workflow', 'def', $wf_name , 'head', 'prefix' ] );
 
@@ -163,22 +136,18 @@ sub __process_workflow {
     my @states = $conn->get_keys( ['workflow', 'def', $wf_name, 'state' ] );
 
     # The FAILURE state is required for the autofail feature
-    if (!grep /FAILURE/, @states) {
-        push @states, 'FAILURE';
-    }
+    push @states, 'FAILURE' unless (grep /FAILURE/, @states);
 
     foreach my $state_name (@states) {
-
-        # We are not interessted in eye candy, just the logic
-        # action attribute has a list/scalar with a combo string
-        # left hand is action name, right hand the target state
-        # action: run_test1 > PENDING
+        # We are not interested in eye candy, just the logic.
+        # 'action' attribute has a list/scalar with a combo string.
+        # Left hand is action name, right hand the target state:
+        #   action: run_test1 > PENDING
 
         my @actions;
         my @action_items = $conn->get_scalar_as_list(['workflow', 'def', $wf_name, 'state', $state_name, 'action' ] );
 
         foreach my $action_item (@action_items) {
-
             my ($auto, $global, $action_name, $next_state, $nn, $conditions) =
                 ($action_item =~ m{ \A (\W?)(global_)?([\w\s]+\w)\s*>\s*(\w+)(\s*\?\s*([!\w\s]+))? }xs);
 
@@ -188,16 +157,9 @@ sub __process_workflow {
 
             $self->logger()->debug("Adding action: $action_name -> $next_state");
 
-
-            my $prefix;
             # As actions share a global namespace, we add a prefix to their names
             # except if the action has the "global" prefix
-            if ($global) {
-                $prefix = 'global_';
-            } else {
-                $prefix = $wf_prefix.'_';
-            }
-
+            my $prefix = $global ? 'global_' : "${wf_prefix}_";
 
             my $item = {
                 name => $prefix.$action_name,
@@ -230,7 +192,6 @@ sub __process_workflow {
             if (scalar @inline_action) {
 
                 $self->logger()->debug("Auto append inline actions: " . join (" > ", @inline_action));
-
 
                 my $generator_name = uc($state_name.'_'.$item->{name}).'_%01d';
                 my $generator_index = 0;
@@ -280,250 +241,214 @@ sub __process_workflow {
 }
 
 
-=head2 __process_action
+=head2 __process_actions
 
 Add the action implementation details to the global action definition.
 This includes class, class params, fields and validators.
 
 =cut
-sub __process_action {
-    my ($self, $path) = @_;
-
+sub __process_actions {
+    my ($self, $root_path, $prefix, $wf_name) = @_;
+    my @result = ();
     my $conn = $self->_config();
 
-    # Get the prefix
-    my $prefix;
-    my @path = @{$path};
+    for my $action_name ($conn->get_keys($root_path)) {
+        my @path = (@{$root_path}, $action_name);
+        $self->logger()->debug("Adding action definition: " . join (".", @path));
+        ##! 16: 'Processing action ' . join (".", @path)
 
-    $self->logger()->debug("Adding action definition: " . join (".", @path));
+        # Get the implementation class
+        my $action_class = $conn->get([ @path, 'class' ] );
 
+        # Get input fields
+        my @input = $conn->get_scalar_as_list( [ @path, 'input' ] );
+        my @fields = ();
 
-    my $wf_name;
-    # check if its a global or workflow path to determine prefix
-    if ($path[1] eq 'def') {
-        $wf_name = $path[2];
-        $prefix = $conn->get( ['workflow', 'def', $wf_name, 'head', 'prefix' ] );
-        $prefix .= '_';
-    } else {
-        $prefix = 'global_';
-    }
+        my @basic_validator = ();
+        foreach my $field_name (@input) {
 
-    my $action_name = $path[-1];
-
-    # Get the implementation class
-    my $action_class = $conn->get([ @path, 'class' ] );
-
-    # Get input fields
-    my @input = $conn->get_scalar_as_list( [ @path, 'input' ] );
-    my @fields = ();
-
-    my @basic_validator = ();
-    foreach my $field_name (@input) {
-
-        my @item_path;
-        # Fields can be defined local or global (only actions inside workflow)
-        if ($wf_name) {
-            @item_path = ( 'workflow', 'def', $wf_name, 'field', $field_name );
-            if (!$conn->exists( \@item_path )) {
+            my @item_path;
+            # Fields can be defined local or global (only actions inside workflow)
+            if ($wf_name) {
+                @item_path = ( 'workflow', 'def', $wf_name, 'field', $field_name );
+                if (!$conn->exists( \@item_path )) {
+                    @item_path = ( 'workflow', 'global', 'field', $field_name );
+                }
+            } else {
                 @item_path = ( 'workflow', 'global', 'field', $field_name );
             }
-        } else {
-            @item_path = ( 'workflow', 'global', 'field', $field_name );
-        }
 
-        my $context_key = $conn->get( [ @item_path, 'name' ] );
-        if (!$context_key) {
-            if ($conn->exists( \@item_path )) {
-                $context_key = $field_name;
-            } else {
-                OpenXPKI::Exception->throw(
-                    message => 'Field name used in workflow config is not defined',
-                    params => {
-                        workflow => $wf_name,
-                        action => $action_name,
-                        field => $field_name,
-                    }
-                );
+            my $context_key = $conn->get( [ @item_path, 'name' ] );
+            if (!$context_key) {
+                if ($conn->exists( \@item_path )) {
+                    $context_key = $field_name;
+                } else {
+                    OpenXPKI::Exception->throw(
+                        message => 'Field name used in workflow config is not defined',
+                        params => {
+                            workflow => $wf_name,
+                            action => $action_name,
+                            field => $field_name,
+                        }
+                    );
+                }
             }
-        }
 
-        my $is_array = ($conn->exists( [ @item_path, 'min' ] ) || $conn->exists( [ @item_path, 'max' ] ));
+            my $is_array = ($conn->exists( [ @item_path, 'min' ] ) || $conn->exists( [ @item_path, 'max' ] ));
 
-        # As the upstream "required" validator accepts the empty string as
-        # true which we want to be "false" we do not set the required flag
-        # but use our own field type validator
-        my $required = $conn->get( [ @item_path, 'required' ] );
-        my $is_required = (defined $required && $required =~ m/(yes|1)/i);
-        my $match = $conn->get( [ @item_path, 'match' ] ) || '';
-        if ($is_array || $is_required || $match) {
-            ##! 64: "Adding basic validator for $context_key with $is_array:$is_required:$match"
-            push @basic_validator, sprintf ("%s::%01d:%01d:%s", $context_key, $is_array, $is_required, $match);
-        }
-
-        $self->logger()->debug("Adding field $field_name / $context_key");
-
-        # Push to the field list for the action
-        push @fields, { name => $context_key, is_required => 'no' };
-
-    }
-
-    my @validators = ();
-
-    ##! 32: 'Basic validator ' . Dumper \@basic_validator
-
-    # add basic validator - if required
-    push @validators, { name => '_internal_basic_field_type', arg => \@basic_validator } if (scalar @basic_validator > 0);
-
-    # Attach validators - name => $name, arg  => [ $value ]
-    my @valid = $conn->get_scalar_as_list( [ @path, 'validator' ] );
-    foreach my $valid_name (@valid) {
-
-        my @item_path;
-        # Inside workflow, check if validator has global prefix
-        if ($valid_name =~ /^global_(\S+)/) {
-            @item_path = ( 'workflow', 'global', 'validator', $1 );
-        } else {
-            # Are we in a global definiton?
-            if ($wf_name) {
-                @item_path = ( 'workflow', 'def', $wf_name, 'validator', $valid_name );
-            } else {
-                @item_path = ( 'workflow', 'global', 'validator', $valid_name );
+            # As the upstream "required" validator accepts the empty string as
+            # true which we want to be "false" we do not set the required flag
+            # but use our own field type validator
+            my $required = $conn->get( [ @item_path, 'required' ] );
+            my $is_required = (defined $required && $required =~ m/(yes|1)/i);
+            my $match = $conn->get( [ @item_path, 'match' ] ) || '';
+            if ($is_array || $is_required || $match) {
+                ##! 64: "Adding basic validator for $context_key with $is_array:$is_required:$match"
+                push @basic_validator, sprintf ("%s::%01d:%01d:%s", $context_key, $is_array, $is_required, $match);
             }
-             # Prefix is global_ in global defs, so matches both cases
-            $valid_name = $prefix.$valid_name;
+
+            $self->logger()->debug("Adding field $field_name / $context_key");
+
+            # Push to the field list for the action
+            push @fields, { name => $context_key, is_required => 'no' };
+
         }
 
-        # Validator can have an argument list, params are handled by the global implementation definiton!
-        my @extra_args = $conn->get_scalar_as_list( [ @item_path, 'arg' ] );
+        my @validators = ();
 
-        ##! 16: 'Validator path ' . Dumper \@item_path
-        ##! 16: 'Validator arguments ' . Dumper @extra_args
+        ##! 32: 'Basic validator ' . Dumper \@basic_validator
 
-        $self->logger()->debug("Adding validator $valid_name with args " . (join", ", @extra_args));
+        # add basic validator - if required
+        push @validators, { name => '_internal_basic_field_type', arg => \@basic_validator } if (scalar @basic_validator > 0);
+
+        # Attach validators - name => $name, arg  => [ $value ]
+        my @valid = $conn->get_scalar_as_list( [ @path, 'validator' ] );
+        foreach my $valid_name (@valid) {
+
+            my @item_path;
+            # Inside workflow, check if validator has global prefix
+            if ($valid_name =~ /^global_(\S+)/) {
+                @item_path = ( 'workflow', 'global', 'validator', $1 );
+            } else {
+                # Are we in a global definiton?
+                if ($wf_name) {
+                    @item_path = ( 'workflow', 'def', $wf_name, 'validator', $valid_name );
+                } else {
+                    @item_path = ( 'workflow', 'global', 'validator', $valid_name );
+                }
+                 # Prefix is global_ in global defs, so matches both cases
+                $valid_name = $prefix.$valid_name;
+            }
+
+            # Validator can have an argument list, params are handled by the global implementation definiton!
+            my @extra_args = $conn->get_scalar_as_list( [ @item_path, 'arg' ] );
+
+            ##! 16: 'Validator path ' . Dumper \@item_path
+            ##! 16: 'Validator arguments ' . Dumper @extra_args
+
+            $self->logger()->debug("Adding validator $valid_name with args " . (join", ", @extra_args));
 
 
-        # Push to the field list for the action
-        push @validators, { name => $valid_name,  arg => \@extra_args };
+            # Push to the field list for the action
+            push @validators, { name => $valid_name,  arg => \@extra_args };
 
+        }
+
+        my $action = {
+            name => $prefix.$action_name,
+            class => $action_class,
+            field => \@fields,
+            validator => \@validators
+        };
+
+        # Additional params are read from the object itself
+        my $param = $conn->get_hash([ @path, 'param' ] );
+        $action->{$_} = $param->{$_} for keys %{$param};
+
+        $self->logger()->trace("Adding action " . (Dumper $action)) if $self->logger->is_trace;
+        ##! 32: 'Action definition: ' . Dumper($action)
+
+        push @result, $action;
     }
-
-    my $action = {
-        name => $prefix.$action_name,
-        class => $action_class,
-        field => \@fields,
-        validator => \@validators
-    };
-
-    # Additional params are read from the object itself
-    my $param = $conn->get_hash([ @path, 'param' ] );
-    map {  $action->{$_} = $param->{$_} } keys %{$param};
-
-    $self->logger()->trace("Adding action " . (Dumper $action)) if $self->logger->is_trace;
-
-    return $action;
+    return @result;
 }
 
-=head2 __process_condition
+=head2 __process_conditions
 
 Add the condition implementation details to the global definition.
 This includes class, class params and parameters.
 
 =cut
-sub __process_condition {
-    my ($self, $path) = @_;
-
+sub __process_conditions {
+    my ($self, $root_path, $prefix) = @_;
+    my @result = ();
     my $conn = $self->_config();
 
-    # Get the prefix
-    my $prefix;
-    my @path = @{$path};
+    for my $condition_name ($conn->get_keys($root_path)) {
+        my @path = (@{$root_path}, $condition_name);
+        $self->logger()->debug("Adding condition " . join(".", @path));
+        ##! 16: 'Processing condition ' . join (".", @path)
 
-    $self->logger()->debug("Adding condition " . join(".", @path));
+        # Get the implementation class
+        my $condition_class = $conn->get([ @path, 'class' ] );
 
+        my $condition = {
+            name => $prefix.$condition_name,
+            class => $condition_class,
+        };
 
-    my $wf_name;
-    # check if its a global or workflow path to determine prefix
-    if ($path[1] eq 'def') {
-        $wf_name = $path[2];
-        $prefix = $conn->get( ['workflow', 'def', $wf_name, 'head', 'prefix' ] );
-        $prefix .= '_';
-    } else {
-        $prefix = 'global_';
+        # Get params
+        my $param = $conn->get_hash([ @path, 'param' ] );
+        my @param = map { { name => $_, value => $param->{$_} } } keys %{$param};
+
+        if (scalar @param) {
+            $condition->{param} = \@param;
+        }
+
+        $self->logger()->trace("Adding condition " . (Dumper $condition)) if $self->logger->is_trace;
+        push @result, $condition;
     }
 
-    my $condition_name = $path[-1];
-
-    # Get the implementation class
-    my $condition_class = $conn->get([ @path, 'class' ] );
-
-    my $condition = {
-        name => $prefix.$condition_name,
-        class => $condition_class,
-    };
-
-    # Get params
-    my $param = $conn->get_hash([ @path, 'param' ] );
-    my @param = map { { name => $_, value => $param->{$_} } } keys %{$param};
-
-    if (scalar @param) {
-        $condition->{param} = \@param;
-    }
-
-    $self->logger()->trace("Adding condition " . (Dumper $condition)) if $self->logger->is_trace;
-
-    return $condition;
+    return @result;
 }
 
 
-=head2 __process_validator
+=head2 __process_validators
 
 Add the validator implementation details to the global definition.
 This includes class, class params and parameters.
 
 =cut
-sub __process_validator {
-    my ($self, $path) = @_;
-
+sub __process_validators {
+    my ($self, $root_path, $prefix) = @_;
+    my @result = ();
     my $conn = $self->_config();
 
-    # Get the prefix
-    my $prefix;
-    my @path = @{$path};
+    for my $validator_name ($conn->get_keys($root_path)) {
+        my @path = (@{$root_path}, $validator_name);
+        $self->logger()->debug("Adding validator " . join(".", @path));
+        ##! 16: 'Processing validator ' . join (".", @path)
 
-    $self->logger()->debug("Adding validator " . join(".", @path));
+        # Get the implementation class
+        my $validator_class = $conn->get([ @path, 'class' ] );
 
+        my $validator = {
+            name => $prefix.$validator_name,
+            class => $validator_class,
+        };
 
-    my $wf_name;
-    # check if its a global or workflow path to determine prefix
-    if ($path[1] eq 'def') {
-        $wf_name = $path[2];
-        $prefix = $conn->get( ['workflow', 'def', $wf_name, 'head', 'prefix' ] );
-        $prefix .= '_';
-    } else {
-        $prefix = 'global_';
+        # Get params
+        my $param = $conn->get_hash([ @path, 'param' ] );
+        my @param = map { { name => $_, value => $param->{$_} } } keys %{$param};
+
+        if (scalar @param) {
+            $validator->{param} = \@param;
+        }
+
+        $self->logger()->trace("Adding validator " . (Dumper $validator)) if $self->logger->is_trace;
+        push @result, $validator;
     }
-
-    my $validator_name = $path[-1];
-
-    # Get the implementation class
-    my $validator_class = $conn->get([ @path, 'class' ] );
-
-    my $validator = {
-        name => $prefix.$validator_name,
-        class => $validator_class,
-    };
-
-    # Get params
-    my $param = $conn->get_hash([ @path, 'param' ] );
-    my @param = map { { name => $_, value => $param->{$_} } } keys %{$param};
-
-    if (scalar @param) {
-        $validator->{param} = \@param;
-    }
-
-    $self->logger()->trace("Adding validator " . (Dumper $validator)) if $self->logger->is_trace;
-
-    return $validator;
+    return @result;
 }
 
 __PACKAGE__->meta->make_immutable;
