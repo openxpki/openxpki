@@ -56,7 +56,7 @@ sub _build_workflow_config {
     my $wf_conf = { condition => [], validator => [], action =>[], workflow => [], persister => [] };
 
     # Add persisters
-    my @persister = $conn->get_keys('workflow.persister');
+    my @persister = sort $conn->get_keys('workflow.persister');
     foreach my $persister (@persister) {
         my $conf = $conn->get_hash(['workflow','persister', $persister]);
         $conf->{name} = $persister;
@@ -66,7 +66,7 @@ sub _build_workflow_config {
     my @global_fields = $self->__process_fields(['workflow', 'global', 'field']);
 
     # Add workflows
-    my @workflow_def = $conn->get_keys('workflow.def');
+    my @workflow_def = sort $conn->get_keys('workflow.def');
     foreach my $wf_name (@workflow_def) {
         # The main workflow definiton (the flow rules)
         push @{$wf_conf->{workflow}}, $self->__process_workflow($wf_name);
@@ -136,7 +136,7 @@ sub __process_workflow {
         );
     }
 
-    my @states = $conn->get_keys( ['workflow', 'def', $wf_name, 'state' ] );
+    my @states = sort $conn->get_keys( ['workflow', 'def', $wf_name, 'state' ] );
 
     # The FAILURE state is required for the autofail feature
     push @states, 'FAILURE' unless (grep /FAILURE/, @states);
@@ -248,7 +248,7 @@ sub __process_fields {
     my @result = ();
     my $conn = $self->_config();
 
-    for my $field_name ($conn->get_keys($root_path)) {
+    for my $field_name (sort $conn->get_keys($root_path)) {
         my @path = (@{$root_path}, $field_name);
         ##! 16: 'Processing field ' . join (".", @path)
 
@@ -289,7 +289,7 @@ sub __process_actions {
     my @result = ();
     my $conn = $self->_config();
 
-    for my $action_name ($conn->get_keys($root_path)) {
+    for my $action_name (sort $conn->get_keys($root_path)) {
         my @path = (@{$root_path}, $action_name);
         $self->logger()->debug("Adding action definition: " . join (".", @path));
         ##! 16: 'Processing action ' . join (".", @path)
@@ -368,7 +368,7 @@ sub __process_actions {
 
         # Additional params are read from the object itself
         my $param = $conn->get_hash([ @path, 'param' ] );
-        $action->{$_} = $param->{$_} for keys %{$param};
+        $action->{$_} = $param->{$_} for sort keys %{$param};
 
         $self->logger()->trace("Adding action " . (Dumper $action)) if $self->logger->is_trace;
         ##! 32: 'Action definition: ' . Dumper($action)
@@ -389,7 +389,7 @@ sub __process_conditions {
     my @result = ();
     my $conn = $self->_config();
 
-    for my $condition_name ($conn->get_keys($root_path)) {
+    for my $condition_name (sort $conn->get_keys($root_path)) {
         my @path = (@{$root_path}, $condition_name);
         $self->logger()->debug("Adding condition " . join(".", @path));
         ##! 16: 'Processing condition ' . join (".", @path)
@@ -404,7 +404,7 @@ sub __process_conditions {
 
         # Get params
         my $param = $conn->get_hash([ @path, 'param' ] );
-        my @param = map { { name => $_, value => $param->{$_} } } keys %{$param};
+        my @param = map { { name => $_, value => $param->{$_} } } sort keys %{$param};
 
         if (scalar @param) {
             $condition->{param} = \@param;
@@ -429,7 +429,7 @@ sub __process_validators {
     my @result = ();
     my $conn = $self->_config();
 
-    for my $validator_name ($conn->get_keys($root_path)) {
+    for my $validator_name (sort $conn->get_keys($root_path)) {
         my @path = (@{$root_path}, $validator_name);
         $self->logger()->debug("Adding validator " . join(".", @path));
         ##! 16: 'Processing validator ' . join (".", @path)
@@ -444,7 +444,7 @@ sub __process_validators {
 
         # Get params
         my $param = $conn->get_hash([ @path, 'param' ] );
-        my @param = map { { name => $_, value => $param->{$_} } } keys %{$param};
+        my @param = map { { name => $_, value => $param->{$_} } } sort keys %{$param};
 
         if (scalar @param) {
             $validator->{param} = \@param;
