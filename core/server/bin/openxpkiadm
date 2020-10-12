@@ -633,7 +633,7 @@ sub __read_cert_from_file {
     my $filename = shift;
     if ( !-r $filename ) {
         print STDERR "ERROR: filename '$filename' is not readable\n";
-        return 2;
+        exit 2;
     }
 
     my $FileUtils = OpenXPKI::FileUtils->new();
@@ -646,7 +646,7 @@ sub __read_cert_from_file {
         my $cert = Crypt::X509->new( cert => $certdata );
         if ($cert->error) {
             print STDERR "ERROR: Could not parse certificate data\n";
-            return 2;
+            exit 2;
         }         
         my $pem = encode_base64($certdata, '');
         chomp $pem;
