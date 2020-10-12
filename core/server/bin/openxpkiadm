@@ -21,6 +21,7 @@ use Digest::MD5;
 use Proc::SafeExec;
 use MIME::Base64;
 use Crypt::Argon2;
+use Crypt::X509;
 
 
 # Config Builder
@@ -68,20 +69,9 @@ sub certificate_id {
         return 1;
     }
 
-    my $FileUtils = OpenXPKI::FileUtils->new();
-    my $certdata  = $FileUtils->read_file($filename);
-
-    if ( !defined $certdata ) {
-        print STDERR "ERROR: Could not parse certificate data\n";
-        return 2;
-    }
-
-    my ($extracted_certdata) = $certdata =~ m{ \A .* (-----BEGIN\ CERTIFICATE----- .* -----END\ CERTIFICATE-----) .* \z}xms;
-
-
-    my $res = CTX('api2')->get_cert_identifier( 'cert' => $extracted_certdata );
-
-    print $res;
+    my (undef, $cert_identifier)  = __read_cert_from_file($filename);
+    
+    print $cert_identifier;
     print "\n";
 
     return 0;
@@ -92,27 +82,7 @@ sub certificate_import {
 
     print STDERR "Starting import\n";
 
-    my $filename = $params{file};
-
-    if ( !-r $filename ) {
-        print STDERR "ERROR: filename '$filename' is not readable\n";
-        return 2;
-    }
-
-    my $FileUtils = OpenXPKI::FileUtils->new();
-    my $certdata  = $FileUtils->read_file($filename);
-
-    if ( !defined $certdata ) {
-        print STDERR "ERROR: Could not parse certificate data\n";
-        return 2;
-    }
-
-    my ($extracted_certdata) = $certdata =~ m{ \A .* (-----BEGIN\ ([\w\s]*)CERTIFICATE----- [^-]+ -----END\ \2CERTIFICATE-----) .* \z}xms;
-
-    if (!$extracted_certdata) {
-        print STDERR "ERROR: provided file does not contain a PEM encoded certificate\n";
-        return 2;
-    }
+    my $extracted_certdata = __read_cert_from_file($params{file});
 
     my $api_param = { data => $extracted_certdata };
 
@@ -141,8 +111,10 @@ sub certificate_import {
 
     if ($params{"force-certificate-already-exists"}) {
         $api_param->{update} = 1;
+    } elsif ($params{"force-certificate-ignore-existing"}) {
+        $api_param->{ignore_existing} = 1;
     }
-
+ 
     if ($params{revoked}) {
         $api_param->{revoked} = 1;
     }
@@ -154,17 +126,26 @@ sub certificate_import {
     CTX('dbi')->start_txn();
     my $res = CTX('api2')->import_certificate( %$api_param );
 
-    print "Successfully imported certificate into database:\n";
-    print "  Subject:    " . $res->{subject} . "\n";
-    print "  Issuer:     " . $res->{issuer_dn} . "\n";
-    print "  Identifier: " . $res->{identifier} . "\n";
-    print "  Realm:      " . ($res->{pki_realm} || 'none'). "\n";
-
+    if (!$res) {
+        print "Certificate already in database - ignored\n";
+        return 0;
+    } else {
+        print "Successfully imported certificate into database:\n";
+        print "  Subject:    " . $res->{subject} . "\n";
+        print "  Issuer:     " . $res->{issuer_dn} . "\n";
+        print "  Identifier: " . $res->{identifier} . "\n";
+        print "  Realm:      " . ($res->{pki_realm} || 'none'). "\n";
+    }
     my $return = 0;
 
     # directly register alias
     if ($params{alias} || $params{gen} || $params{token} || $params{group}) {
+        print "Deprecated - please use openxpkiadm alias with --file option instead";
         if (!$params{realm}) {
+            # cert existed so no data in result -> lookup using get_cert
+            if (!$res) {                
+                $res = CTX('api2')->get_cert( identifer => CTX('api2')->get_cert_identifier( cert => $extracted_certdata ) );
+            }
             if ($res->{pki_realm}) {
                 $params{realm} = $res->{pki_realm};
             # global realm only if no token group is used
@@ -174,7 +155,12 @@ sub certificate_import {
                 print "*Unable to register alias without realm!*\n";
             }
         }
-        $params{identifier} = $res->{identifier};
+
+        if ($res) {
+            $params{identifier} = $res->{identifer};
+        } else {
+            $params{identifier} = CTX('api2')->get_cert_identifier( cert => $extracted_certdata );
+        }
         print "\n";
         $return = alias_add();
     } else {
@@ -257,8 +243,14 @@ sub certificate_remove {
 sub alias_add {
 
     my %insert_hash = ();
+    my ($extracted_certdata, $extracted_keydata);
 
     $insert_hash{pki_realm} = $params{realm};
+
+    # use file to get identifier
+    if (!$params{identifier} && $params{file}) {
+        ($extracted_certdata, $params{identifier}) = __read_cert_from_file($params{file});
+    }
 
     my $dbi = CTX('dbi');
     $dbi->start_txn();
@@ -289,7 +281,9 @@ sub alias_add {
                 where => {
                     pki_realm => $params{realm},
                     group_id => $group,
-                    generation => $params{gen}
+                    generation => $params{gen},
+                    # write to self is checked later with force flags
+                    identifier => { "!=", $params{identifier} }
                 }
             );
             if ($check_duplicate) {
@@ -320,51 +314,12 @@ sub alias_add {
         $insert_hash{alias} = sprintf "%s-%01d", $group, $insert_hash{generation};
 
     } elsif ( !exists( $params{alias} ) || $params{alias} eq '' ) {
-        print STDERR "Please specify an alias with --alias\n";
+        print STDERR "Please specify an alias with --alias or use --token/--group\n";
         return 1;
 
     } else {
 
         $insert_hash{alias} = $params{alias};
-    }
-
-    # use file
-    my ($extracted_certdata, $extracted_keydata);
-    if (!$params{identifier} && $params{file}) {
-
-        my $filename = $params{file};
-        if ( !-r $filename ) {
-            print STDERR "ERROR: filename '$filename' is not readable\n";
-            return 2;
-        }
-
-        my $FileUtils = OpenXPKI::FileUtils->new();
-        my $certdata  = $FileUtils->read_file($filename) || '';
-
-        ($extracted_certdata) = $certdata =~ m{ \A .* (-----BEGIN\ CERTIFICATE----- .* -----END\ CERTIFICATE-----) .* \z}xms;
-        if ( !$extracted_certdata ) {
-            print STDERR "ERROR: Could not parse certificate data\n";
-            return 2;
-        }
-
-        $params{identifier} = CTX('api2')->get_cert_identifier( 'cert' => $extracted_certdata );
-    }
-
-    # check if a key is given
-    if ($params{key}) {
-        my $filename = $params{key};
-        if ( !-r $filename ) {
-            print STDERR "ERROR: filename '$filename' is not readable\n";
-            return 2;
-        }
-
-        my $FileUtils = OpenXPKI::FileUtils->new();
-        my $key = $FileUtils->read_file($filename) || '';
-        ($extracted_keydata) = $key =~ m{ \A (-----BEGIN\ ([\w\s]*)PRIVATE\ KEY----- .+? -----END\ \2PRIVATE\ KEY-----) \Z }xms;
-        if ( !$extracted_keydata ) {
-            print STDERR "ERROR: Could not parse private key data\n";
-            return 2;
-        }
     }
 
     if ( !exists( $params{identifier} ) || $params{identifier} eq '' ) {
@@ -386,45 +341,164 @@ sub alias_add {
     );
 
     if ($duplicate_alias) {
-        print STDERR "ERROR: certificate already exisits in group\n";
-        print STDERR "Alias: " . $duplicate_alias->{alias} . "\n";
-        return 2;
-    }
-
-    # query certificate table to check whether --identifer actually exists
-    my $certificate = $dbi->select_one(
-        from    => 'certificate',
-        columns => ['*'],
-        where => {
-            identifier => $insert_hash{identifier}
-        },
-    );
-
-    if ( !defined $certificate ) {
-        # a certificate was provided on the CLI so we try to import it
-        if ($extracted_certdata) {
-            $certificate = CTX('api2')->import_certificate(
-                pki_realm => $params{realm},
-                data => $extracted_certdata,
-            );
-            if (!$certificate) {
-                # there is no cert with given identifier
-                print STDERR "ERROR: unable to import certificate from file";
-                return 2;
-            }
+        # if no explicit alias or generation was given
+        # we ignore this request as the alias is already there
+        if (!$params{gen} && !$params{alias}) {
+            print "Certificate already registered as alias:\n";
+            print __alias_print($duplicate_alias);            
+            $insert_hash{alias} = $duplicate_alias->{alias};
+            return if ($params{"force-ignore-existing"});
+        # if the given alias matches the existing one 
+        } elsif ($insert_hash{alias} eq $duplicate_alias->{alias}) {
+            return if ($params{"force-ignore-existing"});
         } else {
-            # there is no cert with given identifier and nothing to import
-            print STDERR "ERROR: Could not find a certificate with "
-              . "identifier '$insert_hash{identifier}', ";
+            print STDERR "ERROR: certificate exisits in group with a different alias\n";
+            print STDERR __alias_print($duplicate_alias);
+            return 2;            
+        }
+
+        if (!$params{"force-update-existing"}) {
+            print STDERR "ERROR: certificate already exisits in group\n";
+            print STDERR "Alias: " . $duplicate_alias->{alias} . "\n";
             return 2;
         }
+    
+    } 
+    
+    # if a file is given we import it with the ignore flag
+    CTX('api2')->import_certificate(
+        pki_realm => $params{realm},
+        data => $extracted_certdata,
+        ignore_existing => 1
+    ) if ($extracted_certdata);
+
+    my $alias = __alias_update(\%insert_hash);
+    print "Successfully wrote alias:\n";
+    print __alias_print( $alias );
+
+    # Check if the alias is for an issuing ca cert -> create root ca alias
+    my $cs_group = CTX('config')->get(['realm', $params{realm}, 'crypto', 'type', 'certsign']);
+    if ( $cs_group && ($insert_hash{alias} =~ /^$cs_group-(\d+)/ )) {
+        print "\nToken is certsign, looking for root...\n";
+        my $gen = $1;
+
+        my $chain_ref = CTX('api2')->get_chain( 'start_with' => $insert_hash{identifier} );
+
+        if ($chain_ref->{complete} != 1) {
+            print STDERR "ERROR: unable to find root certificate";
+            return 2;
+        }
+        my $root_identifier = pop @{$chain_ref->{identifiers}};
+
+        # check if this root is already defined
+        my $root_alias = $dbi->select_one(
+            from   => 'aliases',
+            columns => ['*'],
+            where => {
+                identifier => $root_identifier,
+                pki_realm => $params{realm},
+                group_id => 'root'
+            },
+        );
+        if ($root_alias) {
+            print "Root ca already in alias table:\n";
+        } else {
+            print "Creating alias for root ca:\n";
+            # Get the notebefore/notafter date
+            my $certificate = $dbi->select_one(
+                from   => 'certificate',
+                columns => ['notbefore' , 'notafter' ],
+                where => { identifier => $root_identifier },
+            );
+
+            $root_alias = {
+                identifier => $root_identifier,
+                pki_realm => $params{realm},
+                group_id => 'root',
+                generation => $gen,
+                alias => sprintf ('root-%01d', $gen),
+                notbefore => $certificate->{notbefore},
+                notafter => $certificate->{notafter},
+            };
+            $dbi->insert(
+                into => 'aliases',
+                values  => $root_alias,
+            );
+        }
+
+        print __alias_print( $root_alias );
+
     }
 
+    $dbi->commit();
+
+    return 0;
+
+}
+
+sub alias_update {
+
+    my %query_hash = (
+        pki_realm =>  $params{realm}
+    );
+
+    if ($params{alias}) {
+        $query_hash{alias} = $params{alias};
+    } elsif ($params{identifier}) {
+        $query_hash{identifier} = $params{identifier};
+    } elsif ($params{file}) {
+        (undef, $query_hash{identifier}) = __read_cert_from_file($params{file});
+    } else {
+        print STDERR "You must specify either --alias, --identifier or --file\n";
+        return 1;
+    }
+
+    my $dbi = CTX('dbi');
+
+    my $alias = $dbi->select_one(
+        from   => 'aliases',
+        columns => ['*'],
+        where => \%query_hash,
+    );
+
+    if (!$alias) {
+        print STDERR "No alias entry found matching your request\n";
+        return 2;
+    }
+ 
+    __alias_update($alias);
+
+    $dbi->commit();
+
+    $alias = $dbi->select_one(
+        from   => 'aliases',
+        columns => ['*'],
+        where => \%query_hash,
+    );
+
+    print "Successfully updated alias:\n";
+    print __alias_print( $alias );
+
+
+    return 0;
+
+}
+
+# expects the hash to merge into the db
+# adds notbefore, notafter, key from params if set
+sub __alias_update {
+
+    my $insert_hash = shift;
+    
+    my $dbi = CTX('dbi');
+    # query certificate table to check whether --identifer actually exists
+    # throws an exception if the cert is not found so no error handling here
+    my $certificate = CTX('api2')->get_cert( identifier => $insert_hash->{identifier}, format => "DBINFO" );
+ 
     if ($params{notbefore}) {
         if ($params{notbefore} =~ /^\d+$/) {
-            $insert_hash{NOTBEFORE} = $params{notbefore};
+            $insert_hash->{notbefore} = $params{notbefore};
         } else {
-
             my $dt;
             eval {
                 $dt = OpenXPKI::DateTime::parse_date_utc( $params{notbefore} );
@@ -434,21 +508,21 @@ sub alias_add {
                 return 1;
             }
 
-            $insert_hash{notbefore} = $dt->epoch();
+            $insert_hash->{notbefore} = $dt->epoch();
 
-            if ($insert_hash{notbefore} < $certificate->{notbefore}) {
+            if ($insert_hash->{notbefore} < $certificate->{notbefore}) {
                 print STDERR "ERROR: notbefore exceeds certificate validity";
                 return 1;
             }
         }
     } else {
-        $insert_hash{notbefore} = $certificate->{notbefore};
+        $insert_hash->{notbefore} = $certificate->{notbefore};
     }
 
 
     if ($params{notafter}) {
         if ($params{notafter} =~ /^\d+$/) {
-            $insert_hash{notafter} = $params{notafter};
+            $insert_hash->{notafter} = $params{notafter};
         } else {
             my $dt;
             eval {
@@ -458,38 +532,51 @@ sub alias_add {
                 print STDERR "ERROR: Could not parse notafter date";
                 return 1;
             }
-            $insert_hash{notafter} = $dt->epoch();
+            $insert_hash->{notafter} = $dt->epoch();
 
-            if ($insert_hash{notafter} > $certificate->{notafter}) {
+            if ($insert_hash->{notafter} > $certificate->{notafter}) {
                 print STDERR "ERROR: notafter exceeds certificate validity";
                 return 1;
             }
         }
     } else {
-        $insert_hash{notafter} = $certificate->{notafter};
+        $insert_hash->{notafter} = $certificate->{notafter};
     }
-
-    #### insert_hash : Dumper(\%insert_hash)
-    $dbi->insert(
+         
+    #### insert_hash : Dumper($insert_hash)
+    $dbi->merge(
         into => 'aliases',
-        values  => \%insert_hash,
+        set  => $insert_hash,
+        where => {
+            alias =>  $insert_hash->{alias},
+            pki_realm => $insert_hash->{pki_realm}
+        }
     );
 
-    print "Successfully created alias in realm $params{realm}:\n";
-    print __alias_print( \%insert_hash );
-
     # check if a key was given
-    if ($extracted_keydata) {
+    if ($params{key}) {
+        my $filename = $params{key};
+        if ( !-r $filename ) {
+            print STDERR "ERROR: filename '$filename' is not readable\n";
+            return 2;
+        }
+        
+        my $key = OpenXPKI::FileUtils->new()->read_file($filename) || '';
+        my ($extracted_keydata) = $key =~ m{ \A (-----BEGIN\ ([\w\s]*)PRIVATE\ KEY----- .+? -----END\ \2PRIVATE\ KEY-----) \Z }xms;
+        if ( !$extracted_keydata ) {
+            print STDERR "ERROR: Could not parse private key data\n";
+            return 2;
+        }
 
         my $client = OpenXPKI::Client::Simple->new({
             config => {
-                realm => $insert_hash{pki_realm},
+                realm => $insert_hash->{pki_realm},
                 socket => CTX('config')->get(['system','server','socket_file']),
             },
             auth => { stack => '_System' },
         });
 
-        my $token = $client->run_command("get_token_info", { alias => $insert_hash{alias} });
+        my $token = $client->run_command("get_token_info", { alias => $insert_hash->{alias} });
         if (!$token || !$token->{key_store}) {
             print STDERR "ERROR: Unable to get token information!";
             return 2;
@@ -538,177 +625,41 @@ sub alias_add {
         }
     }
 
-    # Check if the alias is for an issuing ca cert -> create root ca alias
-    my $cs_group = CTX('config')->get(['realm', $params{realm}, 'crypto', 'type', 'certsign']);
-    if ( $cs_group && ($insert_hash{alias} =~ /^$cs_group-(\d+)/ )) {
-        print "\nToken is certsign, looking for root...\n";
-        my $gen = $1;
-
-        my $chain_ref = CTX('api2')->get_chain( 'start_with' => $insert_hash{identifier} );
-
-        if ($chain_ref->{complete} != 1) {
-            print STDERR "ERROR: unable to find root certificate";
-            return 2;
-        }
-        my $root_identifier = pop @{$chain_ref->{identifiers}};
-
-        # check if this root is already defined
-        my $root_alias = $dbi->select_one(
-            from   => 'aliases',
-            columns => ['*'],
-            where => {
-                identifier => $root_identifier,
-                pki_realm => $params{realm},
-                group_id => 'root'
-            },
-        );
-        if ($root_alias) {
-            print "Root ca already in alias table:\n";
-        } else {
-            print "Creating alias for root ca:\n";
-            # Get the notebefore/notafter date
-            $certificate = $dbi->select_one(
-                from   => 'certificate',
-                columns => ['notbefore' , 'notafter' ],
-                where => { identifier => $root_identifier },
-            );
-
-            $root_alias = {
-                identifier => $root_identifier,
-                pki_realm => $params{realm},
-                group_id => 'root',
-                generation => $gen,
-                alias => sprintf ('root-%01d', $gen),
-                notbefore => $certificate->{notbefore},
-                notafter => $certificate->{notafter},
-            };
-            $dbi->insert(
-                into => 'aliases',
-                values  => $root_alias,
-            );
-        }
-
-        print __alias_print( $root_alias );
-
-    }
-
-    $dbi->commit();
-
-    return 0;
-
+    return $insert_hash;
 }
 
-sub alias_update {
+sub __read_cert_from_file {
 
-    my %query_hash = (
-        pki_realm =>  $params{realm}
-    );
-
-    if ($params{identifier}) {
-        $query_hash{identifier} = $params{identifier};
-    } elsif ($params{alias}) {
-        $query_hash{alias} = $params{alias};
-    } else {
-        print STDERR "You must specify either --identifier or --alias\n";
-        return 1;
-    }
-
-    my $dbi = CTX('dbi');
-
-    my $alias = $dbi->select_one(
-        from   => 'aliases',
-        columns => ['*'],
-        where => \%query_hash,
-    );
-
-    if (!$alias) {
-        print STDERR "No alias entry found matching your request\n";
+    my $filename = shift;
+    if ( !-r $filename ) {
+        print STDERR "ERROR: filename '$filename' is not readable\n";
         return 2;
     }
 
-    my %update_hash = ();
+    my $FileUtils = OpenXPKI::FileUtils->new();
+    my $certdata  = $FileUtils->read_file($filename) || '';
 
-    # query certificate table to check whether --identifer actually exists
-    my $certificate = $dbi->select_one(
-        from   => 'certificate',
-        columns => ['*'],
-        where => { identifier => $alias->{identifier}, },
-    );
+    my ($extracted_certdata) = $certdata =~ m{ \A .* (-----BEGIN\ CERTIFICATE----- .* -----END\ CERTIFICATE-----) .* \z}xms;
+    if ( !$extracted_certdata ) {
 
-    if ($params{notbefore}) {
-        if ($params{notbefore} =~ /^\d+$/) {
-            $update_hash{notbefore} = $params{notbefore};
-        } else {
-            my $dt;
-            eval {
-                $dt = OpenXPKI::DateTime::parse_date_utc( $params{notbefore} );
-            };
-            if ($EVAL_ERROR || !$dt) {
-                print STDERR "ERROR: Could not parse notbefore date";
-                return 2;
-            }
-            $update_hash{notbefore} = $dt->epoch();
-        }
-        if ($update_hash{notbefore} < $certificate->{notbefore}) {
-            print STDERR "ERROR: notbefore exceeds certificate validity";
+        # DER encoded?
+        my $cert = Crypt::X509->new( cert => $certdata );
+        if ($cert->error) {
+            print STDERR "ERROR: Could not parse certificate data\n";
             return 2;
-        }
-    } elsif(defined $params{notbefore}) {
-        # this passed the literal 0 used to reset the date!
-        $update_hash{notbefore} = $certificate->{notbefore};
+        }         
+        my $pem = encode_base64($certdata, '');
+        chomp $pem;
+        $extracted_certdata = "-----BEGIN CERTIFICATE-----\n$pem\n-----END CERTIFICATE-----";
     }
 
-    if ($params{notafter}) {
-        if ($params{notafter} =~ /^\d+$/) {
-            $update_hash{notafter} = $params{notafter};
-        } else {
-            my $dt;
-            eval {
-                $dt = OpenXPKI::DateTime::parse_date_utc( $params{notafter} );
-            };
-            if ($EVAL_ERROR || !$dt) {
-                print STDERR "ERROR: Could not parse notafter date";
-                return 2;
-            }
-            $update_hash{notafter} = $dt->epoch();
-        }
-        if ($update_hash{notafter} > $certificate->{notafter}) {
-            print STDERR "ERROR: notafter exceeds certificate validity";
-            return 2;
-        }
-    } elsif(defined $params{notafter}) {
-        # this passed the literal 0 used to reset the date!
-        $update_hash{notafter} = $certificate->{notafter};
-    }
-
-    if (!%update_hash) {
-        print STDERR "ERROR: please specify at least notbefore or notafter";
-        return 1;
-    }
-
-    $dbi->update(
-        table => 'aliases',
-        set => \%update_hash,
-        where => {
-            alias =>  $alias->{alias},
-            pki_realm => $alias->{pki_realm}
-        }
-    );
-    $dbi->commit();
-
-    $alias = $dbi->select_one(
-        from   => 'aliases',
-        columns => ['*'],
-        where => \%query_hash,
-    );
-
-    print "Successfully updated alias:\n";
-    print __alias_print( $alias );
-
-
-    return 0;
+    if (wantarray) {
+        return ($extracted_certdata, CTX('api2')->get_cert_identifier( 'cert' => $extracted_certdata ));
+    } 
+    return $extracted_certdata;
 
 }
+
 
 sub alias_list {
 
@@ -1462,6 +1413,7 @@ if ($cmd eq 'initdb') {
             force-no-chain
             force-issuer
             force-certificate-already-exists
+            force-certificate-ignore-existing
             force-no-verify
             revoked
 
@@ -1489,8 +1441,8 @@ if ($cmd eq 'initdb') {
             die "You need to specify the certificate to import with --file\n";
         }
 
-        __check_realm() if ($params{realm});
-
+        __check_realm() if ($params{realm} && $params{realm} ne '_global');
+    
 #       if ((!$params{alias} && $params{group}) || ($params{alias} && !$params{group})) {
 #           die "You must always specify both --alias and --group \n";
 #       }
@@ -1564,12 +1516,14 @@ if ($cmd eq 'initdb') {
       export|o=s
       file=s
       key=s
+      force-update-existing
+      force-ignore-existing
     );
     __init();
 
     OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','dbi_log','api2','crypto_layer','dbi'], SILENT => 1, CLI => 1});
 
-    __check_realm() if ($params{realm} && $params{realm} ne '_global');
+    __check_realm() if (!$params{realm} || $params{realm} ne '_global');
 
     my $subcmd = shift || '';
 
@@ -1913,22 +1867,26 @@ Force options (use only if you exactly now what you are doing!):
         Force the issuer setting even if the chain validation fails
   --force-certificate-already-exists
         Force update for an existing certificate
+  --force-certificate-ignore-existing
+        Exit without error if the certificate exists
   --force-no-verify
         Build the chain but skip cryptographic verification
 
 Once again, only use these options if you actually have to (the occasions
-where this happens should be really, really rare). Note that force-no-chain
-might result in a wrong issuers assignment if key identifiers or subjects are
-ambiguous. Consider using explicit issuer in that cases if possible.
+where this happens should be really, really rare). Note that 
+force-no-chain might result in a wrong issuers assignment if key 
+identifiers or subjects are ambiguous. Consider using explicit issuer in 
+that cases if possible.
 
-Adds a certificate to the database. The issuer is usually auto-detected and
-needs to be given only in rare cases. By default the certificates are imported
-into the global realm, if you want to add them to a specific one, you need to
-specify it. Note that a certificate always inherits the realm of its issuer!
+Adds a certificate to the database. The issuer is usually auto-detected 
+and needs to be given only in rare cases. By default the certificates are 
+imported into the global realm, if you want to add them to a specific one, 
+you need to specify it. Note that a certificate always inherits the realm 
+of its issuer!
 
-The command outputs the subject's DN, issuer's DN and the imported realm for
-you to verify that you imported the correct certificate as well as a unique
-identifier which can be used to globally reference the certificate
+The command outputs the subject's DN, issuer's DN and the imported realm 
+for you to verify that you imported the correct certificate as well as a 
+unique identifier which can be used to globally reference the certificate
 (i.e. for configuration or as an issuer). If you don't want to remember
 the identifier, look into openxpkiadm certificate alias to find out
 how to create a symbolic name for an identifier.
@@ -1942,9 +1900,9 @@ Import a certificate which issuer is not known in the "ServerCA" realm:
   openxpkiadm certificate import --file cacert.pem \
       --force-no-chain --realm ServerCA
 
-You can create an alias directly on import by adding either alias,
-generation/group or token to the command. This will execute the alias
-command with those paramters for the imported certificate inline.
+If alias, generation/group or token is given it is used to add an alias
+after import - this option is deprecated and will be removed, use the 
+alias command with --file instead.
 
 =item B<remove>
 
@@ -2013,9 +1971,9 @@ OpenXPKI uses aliases to manage the crypto tokens for signer and
 helper tokens. Several configs options and commands are able to
 process aliases, too.
 
-The selection of functional tokens is done based on the notbefore/notafter
-date. To force certain behaviour (e.g time of a ca rollover), you can force
-a custom notbefore/notafter date on the aliases.
+The selection of functional tokens is done based on the notbefore/
+notafter date. To force certain behaviour (e.g time of a ca rollover),
+you can force a custom notbefore/notafter date on the aliases.
 
 Common options:
     --realm        PKI realm for the alias
@@ -2035,8 +1993,8 @@ If you pass a realm but no identifier, you will receive the list of
 active tokens for all token groups, the current root certificate
 and, if set, the upcoming root certificate as used by scep I<GetNexCACert>.
 
-For items with custom notbefore/notafter settings, the certificate's value
-is shown in brackets:
+For items with custom notbefore/notafter settings, the certificate's 
+value is shown in brackets:
 
     upcoming root ca:
         Alias     : root-2
@@ -2046,7 +2004,8 @@ is shown in brackets:
 
 To show the certificates subject besides the identifier, add --subject.
 
-To show a list of all or all active tokens, you can add the filter parameter:
+To show a list of all or all active tokens, you can add the filter 
+parameter:
 
   --filter all or --filter active
 
@@ -2056,7 +2015,8 @@ Specify --nogroup to list tokens that do not belong to a group.
 
 =item B<show/export a single alias>
 
-Show the details of a single alias and export the linked certificate to a file.
+Show the details of a single alias and export the linked certificate to
+a file.
 
   --alias    The full alias (e.g. ca-signer-1)
   --subject  Print the subject of the certificate
@@ -2072,9 +2032,9 @@ index by looking up the present aliases in the group. Recommended.
 
   --token  The name of the token type you want to add,
            e.g. certsign or datasafe.
-  --file   The filename of the PEM encoded certificate, can be given instead
-           of --identifier. If the certificate does not exists in the database
-           it is imported.
+  --file   The filename of the PEM encoded certificate, can be given 
+           instead  of --identifier. If the certificate does not exists 
+           in the database it is imported.
 
 Example:
 
@@ -2125,30 +2085,48 @@ Example:
 
 =item B<alias key import>
 
-This applies as an extended functionality for all commands that create an alias.
+This applies as an extended functionality for all commands that create
+an alias.
 
   --key    The filename of a PEM encoded private key.
 
-When provided, the system tries to copy the key data contained in the given file
-to the location defined in the token configuration. The token configuration is
-read from the OpenXPKI server process via the socket using the System stack to
-authenticate. Therefore this requires that the daemon is up and allows access
-to the I<get_token_info> call for the default System user (this configuration
-is currently hardcoded and can not be changed).
+When provided, the system tries to copy the key data contained in the 
+given file to the location defined in the token configuration. The token 
+configuration is read from the OpenXPKI server process via the socket 
+using the System stack to authenticate. Therefore this requires that the 
+daemon is up and allows access to the I<get_token_info> call for the 
+default System user (this configuration is currently hardcoded and can 
+not be changed).
 
-For storage type "OPENXPKI" (file based) the key data is written into the
-given key file, the file is set to 0400 permissions, owned by the user the
-daemon runs with. The parent folder for the file must exist.
+For storage type "OPENXPKI" (file based) the key data is written into 
+the given key file, the file is set to 0400 permissions, owned by the 
+user the daemon runs with. The parent folder for the file must exist.
 
-For storage type "DATAPOOL" the key blob is loaded into the datapool, encrypted
-with the current DataVault token. This therefore requires that the DataVault
-token is already set up and available for encryption.
+For storage type "DATAPOOL" the key blob is loaded into the datapool, 
+encrypted with the current DataVault token. This therefore requires 
+that the DataVault token is already set up and available for encryption.
+
+=item B<force option>
+
+All alias create commands will fail if the given certificate already 
+exists in the given group. There are two options to ignore existing items.
+
+  --force-ignore-existing  return and ignore extra settings
+  --force-update-existing  update validity and key for existing alias 
+
+This will silently return if an alias for the given identifier exists in
+the given group and no explicit generation was given. If an explicit name
+or generation was given this only return if the existing alias matches 
+the given name.
+
+With --force-ignore-existing any given additional options will not be 
+processed.
 
 =item B<update alias>
 
-Update notebefore/notafter date of an existing alias.
+Update notebefore/notafter date or set key of an existing alias.
 
-    --update        Indicates that you want to update anm existing entry
+    --update        Indicates that you want to update an existing entry
     --alias         You can select the alias by name rather than passing
                     the identifier.
 
@@ -2159,6 +2137,17 @@ Example:
          --notbefore "2014-01-01:00:00:00"
 
 This updates notbefore, notafter is not changed.
+
+Example:
+
+     openxpkiadm alias --update --realm democa \
+         --file ca-issuer-1.crt
+         --key ca-issuer-1.pem
+
+Assign the key found in ca-issuer-1.pem to the alias matching the 
+certfificate ca-issuer-1.crt. The command will die if no alias is found 
+for the given certificate or if there is already a key found. In case 
+you want "create or update" use --force-update-existing instead --update.
 
 =item B<remove alias>
 
