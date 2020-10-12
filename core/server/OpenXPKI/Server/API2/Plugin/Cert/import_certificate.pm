@@ -45,6 +45,9 @@ if one of the certificates' CAs has expired). Default: 0
 =item * C<revoked> I<Bool> - set to 1 to set the certificate status to
 I<REVOKED>. Default: 0
 
+=item * C<ignore_existing> I<Bool> - if the certificate already exists, return
+undef instead of throwing an exception. Default: 0
+
 =item * C<update> I<Bool> - do not throw an exception if certificate already
 exists, update it instead. Default: 0
 
@@ -68,6 +71,7 @@ command "import_certificate" => {
     force_noverify => { isa => 'Bool', default => 0, },
     revoked        => { isa => 'Bool|HashRef', default => 0, },
     update         => { isa => 'Bool', default => 0, },
+    ignore_existing => { isa => 'Bool', default => 0, },
     attributes     => { isa => 'HashRef'},
     profile        => { isa => 'Ident'},
 } => sub {
@@ -93,6 +97,8 @@ command "import_certificate" => {
         where => { identifier => $cert_identifier },
     );
 
+    return if ($existing_cert && $params->ignore_existing);
+
     OpenXPKI::Exception->throw(
         message => 'Certificate already exists in database',
         params  => {
@@ -101,7 +107,6 @@ command "import_certificate" => {
             status => $existing_cert->{status},
         },
     ) if ($existing_cert and not $params->update);
-
 
     my $cert_hash = {
         status => 'ISSUED',

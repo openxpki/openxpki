@@ -87,7 +87,7 @@ command "get_cert" => {
         where => { 'identifier' => $identifier },
     )
         or OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CERT_CERTIFICATE_NOT_FOUND_IN_DB',
+            message => 'Could not find a certificate with identifier',
             params => { 'IDENTIFIER' => $identifier, },
         );
 
