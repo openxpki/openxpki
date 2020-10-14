@@ -163,7 +163,7 @@ Now import the certificate::
       Realm:      none
 
 Register it as datasafe token for the `democa` realm - you need to run this
-command for each realm.
+command for each realm::
 
     $ openxpkiadm alias --realm democa --token datasafe --file vault.crt
 
@@ -187,6 +187,21 @@ In the process list, you should see two process running::
     14303 ?        S      0:00 openxpki server ( main )
 
 If this is not the case, check */var/log/openxpki/stderr.log*.
+
+You should check now if your DataVault token is working::
+
+    $ openxpkicli  get_token_info --arg alias=vault-1
+    {
+        "key_name" : "/etc/openxpki/ca/vault-1.pem",
+        "key_secret" : 1,
+        "key_store" : "OPENXPKI",
+        "key_usable" : 1
+    }
+
+If you do not see `"key_usable": 1` your token is not working! Check the
+permissions of the file (and the folders) and if the key is password
+protected if you have the right secret set in your crypto.yaml!
+
 
 Create Issuing CA Token
 #######################
