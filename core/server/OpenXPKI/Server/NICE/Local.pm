@@ -704,6 +704,10 @@ sub fetchKey {
 
 }
 
+sub testConnection {
+    return;
+}
+
 1;
 __END__
 
@@ -822,3 +826,6 @@ as subject_key_id of PKCS10 and x509 classes.
 
 Loads the private key from the datapool based on the used key_id.
 
+=head2 testConnection
+
+not implemented. returns undef.
