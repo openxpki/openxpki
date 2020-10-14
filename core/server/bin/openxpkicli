@@ -44,7 +44,11 @@ sub debug {
 
 sub format_json {
     my $msg = shift;
-    return JSON->new->pretty(defined $params{'json-pretty'})->encode($msg);
+    if (defined $params{'json-pretty'}) {
+        return JSON->new->pretty(1)->canonical(1)->encode($msg);
+    } else {
+        return JSON->new->encode($msg);
+    }
 }
 
 sub output {
@@ -67,7 +71,11 @@ sub output {
         }
     } elsif (exists $msg->{result} && !ref $msg->{result}) {
         $output = $msg->{result} // "<undef>";
+    } elsif ($msg->{result}) {
+        # always use json pretty to show non-scalar output
+        print JSON->new->pretty(1)->canonical(1)->encode($msg->{result});
     } else {
+        # this means something unhandled error bubbled up
         print Dumper $msg;
         print "\n";
     }
