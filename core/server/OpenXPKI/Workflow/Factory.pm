@@ -258,7 +258,7 @@ sub get_action_and_state_info {
     ##! 4: 'start'
 
     my $head = CTX('config')->get_hash([ 'workflow', 'def', $type, 'head' ]);
-    my $prefix = $head->{prefix};
+    my $wf_prefix = $head->{prefix};
 
     #
     # add activities (= actions)
@@ -299,18 +299,36 @@ sub get_action_and_state_info {
     ##! 64: 'Available actions ' . Dumper keys %{ $action_info->{$action} }
     $state_info->{option} = [];
     if ($state_info->{autoselect} && $state_info->{autoselect} !~ m{\Aglobal_}) {
-        $state_info->{autoselect} = $prefix.'_'.$state_info->{autoselect};
+        $state_info->{autoselect} = $wf_prefix.'_'.$state_info->{autoselect};
     }
     for my $option (@options) {
         $option =~ m{ \A (\W?)((global_)?([^\s>]+))}xs;
         $option = $2;
 
-        my $auto = $1;
+        my $action_prefix = $1;
         my $full = $2;
         my $global = $3;
         my $option_base = $4;
 
-        my $action = sprintf("%s_%s", $global ? "global" : $prefix, $option_base);
+        # evaluate action prefix
+        my $auto = 0;
+        if ($action_prefix eq '~') {
+            $auto = 1;
+        }
+        elsif (not defined $action_prefix or $action_prefix eq '') {
+            # ok
+        }
+        else {
+            OpenXPKI::Exception->throw(
+                message => 'Action contains unknown prefix. Currently supported: "~" (autoselect action)',
+                params  => {
+                    action => $option,
+                    prefix => $action_prefix,
+                },
+            );
+        }
+
+        my $action = sprintf("%s_%s", $global ? "global" : $wf_prefix, $option_base);
         ##! 16: 'Activity ' . $action
         next unless($action_info->{$action});
 
