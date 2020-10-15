@@ -56,6 +56,7 @@ OpenXPKI/Client/UI/Profile.pm
 OpenXPKI/Client/UI/Result.pm
 OpenXPKI/Client/UI/Secret.pm
 OpenXPKI/Client/UI/Source.pm
+OpenXPKI/Client/UI/Users.pm
 OpenXPKI/Client/UI/Workflow.pm
 
 
@@ -287,6 +288,7 @@ OpenXPKI/Server/API2/Plugin/UI/get_session_info.pm
 OpenXPKI/Server/API2/Plugin/UI/list_process.pm
 OpenXPKI/Server/API2/Plugin/UI/render_template.pm
 OpenXPKI/Server/API2/Plugin/UI/send_notification.pm
+OpenXPKI/Server/API2/Plugin/Users/search_users.pm
 OpenXPKI/Server/API2/Plugin/Workflow/Util.pm
 OpenXPKI/Server/API2/Plugin/Workflow/create_workflow_instance.pm
 OpenXPKI/Server/API2/Plugin/Workflow/execute_workflow_activity.pm
@@ -383,6 +385,10 @@ OpenXPKI/Server/Workflow/Activity/Reports/Summary.pm
 OpenXPKI/Server/Workflow/Activity/Skeleton.pm
 OpenXPKI/Server/Workflow/Activity/Skip.pm
 OpenXPKI/Server/Workflow/Activity/Sleep.pm
+OpenXPKI/Server/Workflow/Activity/User/HashUserPassword.pm
+OpenXPKI/Server/Workflow/Activity/User/InsertUserData.pm
+OpenXPKI/Server/Workflow/Activity/User/LoadUserData.pm
+OpenXPKI/Server/Workflow/Activity/User/PersistUserData.pm
 OpenXPKI/Server/Workflow/Activity/Tools/AddCertExtension.pm
 OpenXPKI/Server/Workflow/Activity/Tools/AppendCertificateMetadata.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
@@ -476,6 +482,7 @@ OpenXPKI/Server/Workflow/Condition/KeyGenerationMode.pm
 OpenXPKI/Server/Workflow/Condition/KeyParams.pm
 OpenXPKI/Server/Workflow/Condition/SubjectsMatch.pm
 OpenXPKI/Server/Workflow/Condition/SubjectValid.pm
+OpenXPKI/Server/Workflow/Condition/UserExists.pm
 OpenXPKI/Server/Workflow/Condition/WFArray.pm
 OpenXPKI/Server/Workflow/Condition/WFHash.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowCreator.pm
@@ -518,6 +525,7 @@ OpenXPKI/Server/Workflow/Activity/NICE/IssueCRL.pm
 OpenXPKI/Server/Workflow/Activity/NICE/IssueCertificate.pm
 OpenXPKI/Server/Workflow/Activity/NICE/RenewCertificate.pm
 OpenXPKI/Server/Workflow/Activity/NICE/RevokeCertificate.pm
+OpenXPKI/Server/Workflow/Activity/NICE/TestConnection.pm
 OpenXPKI/Server/Workflow/Activity/NICE/UnrevokeCertificate.pm
 
 OpenXPKI/Server/Workflow/Condition/NICE/IsCertificateIssued.pm
