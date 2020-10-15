@@ -115,20 +115,20 @@ export default class TestController extends Controller {
                 {
                     type: "datetime",
                     name: "dt_some_local",
-                    label: "Date, 2020-03-03 03:33",
+                    label: "Date, 2020-03-03 03:33 UTC\nepoch = 1583206380",
                     timezone: "local",
                     value: "1583206380",
                 },
                 {
                     type: "datetime",
                     name: "dt_some",
-                    label: "Date, 2020-03-03 03:33",
+                    label: "Date, 2020-03-03 03:33 UTC",
                     value: "1583206380",
                 },
                 {
                     type: "datetime",
                     name: "dt_some_pitcairn",
-                    label: "Date, 2020-03-03 03:33",
+                    label: "Date, 2020-03-03 03:33 UTC",
                     value: "1583206380",
                     timezone: "Pacific/Pitcairn",
                 },

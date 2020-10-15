@@ -7,11 +7,10 @@
             @change={{this.datePicked}}
             @openOnFocus={{true}}
             @placeholder={{@content.placeholder}}
-            @timeZone={{if (eq this.timezone "local") "" this.timezone}}
             @locale={{this.oxiLocale.locale}}
         />
     </div>
     <div class="col-md-4">
-        <input class="form-control" type="text" placeholder={{t 'component.oxifield_datetime.timezone' tz=this.timezone}} disabled/>
+        <input class="form-control" type="text" placeholder={{t 'component.oxifield_datetime.timezone' tz=this.timezoneLabel}} disabled/>
     </div>
 </div>
