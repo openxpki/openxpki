@@ -2,6 +2,7 @@ package OpenXPKI::Client::UI::Workflow;
 use Moose;
 
 # Core modules
+use DateTime;
 use POSIX;
 use Data::Dumper;
 
@@ -11,6 +12,7 @@ use Date::Parse;
 use YAML::Loader;
 use Try::Tiny;
 
+use OpenXPKI::DateTime;
 use OpenXPKI::Debug;
 
 
@@ -85,6 +87,17 @@ has __proc_states  => (
         { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION', value => 'exception' },
         { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED', value => 'finished' },
     ]; }
+);
+
+has __validity_options => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    lazy => 1,
+    default => sub { return [
+        { value => 'last_update_before', label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_BEFORE_LABEL' },
+        { value => 'last_update_after', label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_AFTER_LABEL' },
+
+    ];}
 );
 
 extends 'OpenXPKI::Client::UI::Result';
@@ -470,7 +483,19 @@ sub init_search {
 
     $self->logger()->trace('Workflows ' . Dumper $workflows) if $self->logger->is_trace;
 
-    my $preset = {};
+    my $preset = $self->_session->param('wfsearch')->{default}->{preset} || {};
+    # convert preset for last_update
+    foreach my $key (qw(last_update_before last_update_after)) {
+        next unless ($preset->{$key});
+        $preset->{last_update} = {
+            key => $key,
+            value => OpenXPKI::DateTime::get_validity({
+                VALIDITY => $preset->{$key},
+                VALIDITYFORMAT => 'detect'
+            })->epoch()
+        };
+    }
+
     if ($args->{preset}) {
         $preset = $args->{preset};
 
@@ -516,6 +541,13 @@ sub init_search {
           type => 'text',
           is_optional => 1,
           value => $preset->{wf_creator}
+        },
+        { name => 'last_update',
+          label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL',
+          'keys' => $self->__validity_options(),
+          type => 'datetime',
+          is_optional => 1,
+          value => $preset->{last_update},
         }
     );
 
@@ -1342,6 +1374,18 @@ sub action_search {
         $verbose->{wf_proc_state} = 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_' . uc($self->param('wf_proc_state'));
     }
 
+    if ($self->param('last_update_before')) {
+        $query->{last_update_before} = $self->param('last_update_before');
+        $input->{last_update} = { key => 'last_update_before', value => $self->param('last_update_before') };
+        $verbose->{last_update_before} = DateTime->from_epoch( epoch => $self->param('last_update_before') )->iso8601();
+    }
+
+    if ($self->param('last_update_after')) {
+        $query->{last_update_after} = $self->param('last_update_after');
+        $input->{last_update} = { key => 'last_update_after', value => $self->param('last_update_after') };
+        $verbose->{last_update_after} = DateTime->from_epoch( epoch => $self->param('last_update_after') )->iso8601();
+    }
+
     # Read the query pattern for extra attributes from the session
     my $spec = $self->_session->param('wfsearch')->{default};
     my $attr = $self->__build_attribute_subquery( $spec->{attributes} );
@@ -1389,6 +1433,12 @@ sub action_search {
         my $val = $verbose->{ $item->{name} };
         next unless ($val);
         $val =~ s/[^\w\s*\,]//g;
+        push @criteria, sprintf '<nobr><b>%s:</b> <i>%s</i></nobr>', $item->{label}, $val;
+    }
+
+    foreach my $item (@{$self->__validity_options()}) {
+        my $val = $verbose->{ $item->{value} };
+        next unless ($val);
         push @criteria, sprintf '<nobr><b>%s:</b> <i>%s</i></nobr>', $item->{label}, $val;
     }
 
