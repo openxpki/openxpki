@@ -133,7 +133,7 @@ sub init_index {
     }
 
     # Pass the initial activity so we get the form right away
-    my $wf_action = (keys %{$wf_info->{activity}})[0];
+    my $wf_action = $self->__get_next_auto_action($wf_info);
 
     $self->__render_from_workflow({ wf_info => $wf_info, wf_action => $wf_action });
     return $self;
@@ -1795,13 +1795,13 @@ sub __render_from_workflow {
                 });
                 push @fields, {
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_PAUSED_ACTION_LABEL',
-                    value => ($wf_action_info->{label} || $wf_action)
+                    value => $wf_action_info->{label}
                 };
             } else {
                 $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED','error');
                 push @fields, {
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_EXCEPTION_FAILED_ACTION_LABEL',
-                    value => ($wf_action_info->{label} || $wf_action)
+                    value => $wf_action_info->{label}
                 };
             }
 
@@ -1855,7 +1855,7 @@ sub __render_from_workflow {
                 'format' => 'timestamp'
             }, {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_EXCEPTION_FAILED_ACTION_LABEL',
-                value => ($wf_action_info->{label} || $wf_action)
+                value => $wf_action_info->{label}
             });
 
             # add the exception text in case the user is allowed to see the context
@@ -1889,7 +1889,7 @@ sub __render_from_workflow {
         my $wf_action_info = $wf_info->{activity}->{$wf_action};
         # if we fallback to the state label we dont want it in the 1
         my $label = $wf_action_info->{label};
-        if ($label) {
+        if ($label ne $wf_action) {
             if (@breadcrumb && $wf_info->{state}->{label}) {
                 push @breadcrumb, { className => 'workflow-state', label => $wf_info->{state}->{label} };
             }
@@ -2055,8 +2055,20 @@ sub __render_from_workflow {
                     buttons => $buttons
                 }
             });
-        # Standard case - render key/value
+
+        } elsif (!@$fields && $wf_info->{workflow}->{state} eq 'INITIAL') {
+            # initial step of workflow without fields
+            $self->add_section({
+                type => 'text',
+                content => {
+                    label => '',
+                    description => '',
+                    buttons => $buttons,
+                }
+            });
+
         } else {
+        # Standard case - render key/value
             $self->add_section({
                 type => 'keyvalue',
                 content => {
@@ -2172,9 +2184,16 @@ sub __get_action_buttons {
         my $wf_action_info = $wf_info->{activity}->{$wf_action};
 
         my %button = (
-            label => $wf_action_info->{label} || $wf_action,
+            label => $wf_action_info->{label},
             action => sprintf ('workflow!select!wf_action!%s!wf_id!%01d', $wf_action, $wf_info->{workflow}->{id}),
         );
+
+        # buttons in workflow start = only one initial start button
+        %button = (
+            label => ($wf_action_info->{label} ne $wf_action) ? $wf_action_info->{label} : 'I18N_OPENXPKI_UI_WORKFLOW_START_BUTTON',
+            page => 'workflow!start!wf_type!'. $wf_info->{workflow}->{type},
+        ) if (!$wf_info->{workflow}->{id});
+
         # TODO - we should add some configuration option for this
         if ($wf_action =~ /global_cancel/) {
             $button{confirm} = {
