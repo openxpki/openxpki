@@ -15,7 +15,7 @@ sub _evaluate
     my $param = {};
 
 
-    $param->{username} = $self->param("username") $self->param("username");
+    $param->{username} = $self->param("username") if ($self->param("username"));
     $param->{mail} = $self->param("mail") if ($param->{mail});
 
     condition_error("Neither username nor mail given") if (!keys %$param);
