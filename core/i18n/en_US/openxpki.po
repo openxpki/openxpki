@@ -767,7 +767,7 @@ msgid "I18N_OPENXPKI_UI_MENU_CRL"
 msgstr "Show Revocation Lists (CRL)"
 
 msgid "I18N_OPENXPKI_UI_MENU_CRL_ISSUE"
-msgstr "Issue a certificate revocation list (CRL)"
+msgstr "Issue a Certificate Revocation List (CRL)"
 
 msgid "I18N_OPENXPKI_UI_MENU_CSR_CHECK"
 msgstr "Request Checker"
@@ -2047,7 +2047,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_REALNAME_PLACEHOLDER"
 msgstr "Realname"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_ROLE_DESC"
-msgstr "Role of the user e.g., User, RA Operator,..."
+msgstr "Role of the user e.g. User, RA Operator,..."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_ROLE_LABEL"
 msgstr "Role"
@@ -2059,7 +2059,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_ROLE_USER"
 msgstr "User"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_USERNAME_DESC"
-msgstr "username of the account that should be edited"
+msgstr "Username of the account that should be edited"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ADDUSER_USERNAME_LABEL"
 msgstr "Username"
@@ -2285,7 +2285,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EDITUSER_REALNAME_PLACEHOLDER"
 msgstr "Realname"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EDITUSER_ROLE_DESC"
-msgstr "Role of the user e.g., User, RA Operator,..."
+msgstr "Role of the user e.g. User, RA Operator,..."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EDITUSER_ROLE_LABEL"
 msgstr "Role"
@@ -2297,7 +2297,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EDITUSER_ROLE_USER"
 msgstr "User"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EDITUSER_USERNAME_DESC"
-msgstr "username of the account that should be edited"
+msgstr "Username of the account that should be edited"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_EDITUSER_USERNAME_LABEL"
 msgstr "Username"
@@ -3050,9 +3050,9 @@ msgstr "State"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_CHOOSE_ACTION_DESC"
 msgstr ""
-"Below you see the new user attributes Please choose from the actions below "
-"how to proceed. Abort will terminate the workflow without writing the "
-"attributes back to the database, update will show the form again while save "
+"Below you see the new user attributes. Please choose from the actions below "
+"how to proceed. 'Abort' will terminate the workflow without writing the "
+"attributes back to the database, 'Update' will show the form again while 'Save' "
 "will persist the data and finish the workflow."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_CHOOSE_ACTION_LABEL"
@@ -3281,9 +3281,9 @@ msgstr "Certificate Issued"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDITUSER_CHOOSE_ACTION_DESC"
 msgstr ""
-"Below you see the new user attributes Please choose from the actions below "
-"how to proceed. Abort will terminate the workflow without writing the "
-"attributes back to the database, update will show the form again while save "
+"Below you see the new user attributes. Please choose from the actions below "
+"how to proceed. 'Abort' will terminate the workflow without writing the "
+"attributes back to the database, 'Update' will show the form again while 'Save' "
 "will persist the data and finish the workflow."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDITUSER_CHOOSE_ACTION_LABEL"
@@ -3305,7 +3305,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDITUSER_SUCCESS_DESC"
 msgstr "The changes have been persisted to the database."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDITUSER_SUCCESS_LABEL"
-msgstr "User Account was updated"
+msgstr "User account was updated"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_DESC"
@@ -3474,7 +3474,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RESETPASS_ASK_RESET_PASSWORD_LABEL"
 msgstr "Reset Password"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RESETPASS_INIT_DESC"
-msgstr "Reset the own user password"
+msgstr "Reset own user password"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RESETPASS_INIT_LABEL"
 msgstr "State"
@@ -3737,7 +3737,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REQUEST_CHECKER_LABEL"
 msgstr "Request Checker"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RESETPASS_DESC"
-msgstr "Reset the own user password"
+msgstr "Reset own user password"
 
 # reset_password workflow
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RESETPASS_LABEL"
