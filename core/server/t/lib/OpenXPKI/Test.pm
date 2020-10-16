@@ -1068,7 +1068,7 @@ sub _db_config_from_env {
     return unless $ENV{OXI_TEST_DB_MYSQL_NAME};
 
     return {
-        type    => "MySQL",
+        type    => "MariaDB",
         $ENV{OXI_TEST_DB_MYSQL_DBHOST} ? ( host => $ENV{OXI_TEST_DB_MYSQL_DBHOST} ) : (),
         $ENV{OXI_TEST_DB_MYSQL_DBPORT} ? ( port => $ENV{OXI_TEST_DB_MYSQL_DBPORT} ) : (),
         name    => $ENV{OXI_TEST_DB_MYSQL_NAME},
