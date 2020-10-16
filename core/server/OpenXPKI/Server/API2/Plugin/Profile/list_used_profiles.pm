@@ -32,11 +32,11 @@ command "list_used_profiles" => {
 
     my $pki_realm = $params->has_pki_realm ? $params->pki_realm : CTX('session')->data->pki_realm;
 
-    my $profiles = CTX('dbi')->select(
+    my $profiles = CTX('dbi')->select_hashes(
         from => 'csr',
         columns => [ -distinct => 'profile' ],
         where => { pki_realm => $pki_realm },
-    )->fetchall_arrayref({});
+    );
 
     return [
         map {

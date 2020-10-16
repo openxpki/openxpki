@@ -44,14 +44,14 @@ my $oxitest = OpenXPKI::Test->new(
 sub is_logentry_count {
     my ($wf_id, $count) = @_;
 
-    my $result = $oxitest->dbi->select(
+    my $result = $oxitest->dbi->select_hashes(
         from => 'application_log',
         columns => [ '*' ],
         where => {
             category => 'openxpki.application',
             workflow_id => $wf_id,
         }
-    )->fetchall_arrayref({});
+    );
 
     is scalar @{$result}, $count, "$count log entries found via workflow id";
 }
@@ -76,14 +76,14 @@ my $msg = sprintf "DBI Log Workflow Test %01d", $wf_id;
 ok $log->application->info($msg), 'log test message to be kept'
     or diag "ERROR: log=$log";
 
-my $result = $dbi->select(
+my $result = $dbi->select_hashes(
     from => 'application_log',
     columns => [ '*' ],
     where => {
         category => 'openxpki.application',
         message => { -like => "%$msg" },
     }
-)->fetchall_arrayref({});
+);
 is scalar @{$result}, 1, "1 log entry found via string search";
 
 # Insert test message #1 via database

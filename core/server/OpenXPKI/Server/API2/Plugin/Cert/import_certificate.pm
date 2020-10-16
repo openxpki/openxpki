@@ -368,11 +368,11 @@ sub _get_issuer {
     # Explicit issuer wins over issuer query
     $condition = { identifier => $explicit_issuer } if $explicit_issuer;
 
-    my $db_result = CTX('dbi')->select(
+    my $db_result = CTX('dbi')->select_hashes(
         from  => 'certificate',
         columns => [ '*' ],
         where => $condition,
-    )->fetchall_arrayref({});
+    );
 
     # No issuer found
     if (scalar @{$db_result} == 0) {

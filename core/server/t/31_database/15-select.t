@@ -50,29 +50,29 @@ $db->run("SQL SELECT", 8, sub {
 
     # select with AND
     lives_and {
-        $sth = $dbi->select(
+        my $arrays = $dbi->select_arrays(
             from => "test",
             columns => [ "text" ],
             where => { text => "Litfasssaeule", entropy => 1 },
         );
-        is_deeply $sth->fetchall_arrayref, [
+        is_deeply $arrays, [
             [ "Litfasssaeule" ],
         ];
-    } "select with AND";
+    } "select_arrays with AND";
 
     # select with OR
     lives_and {
-        $sth = $dbi->select(
+        my $hashes = $dbi->select_hashes(
             from => "test",
             columns => [ "text" ],
             where => { entropy => [ 1, 42] },
         );
-        is_deeply $sth->fetchall_arrayref, [
-            [ "Litfasssaeule" ],
-            [ "Buergersteig" ],
-            [ "Rathaus" ],
+        is_deeply $hashes, [
+            { text => "Litfasssaeule" },
+            { text => "Buergersteig" },
+            { text => "Rathaus" },
         ];
-    } "select with OR";
+    } "select_hashes with OR";
 
     # select with OR
     lives_and {
@@ -103,13 +103,13 @@ $db->run("SQL SELECT", 8, sub {
 
     # select without result
     lives_and {
-        $sth = $dbi->select(
+        my $one = $dbi->select_one(
             from => "test",
             columns => [ "text" ],
             where => { text => "Rathaus", entropy => 33 },
         );
-        is_deeply $sth->fetchall_arrayref, [];
-    } "select without result";
+        is_deeply $one, undef;
+    } "select_one without result";
 
     # select from non existing table
     dies_ok {

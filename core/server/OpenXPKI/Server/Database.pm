@@ -353,8 +353,21 @@ sub select {
 # Returns: DBI statement handle
 sub select_one {
     my $self = shift;
-    my $sth = $self->select(@_);
-    return $sth->fetchrow_hashref;
+    return $self->select(@_)->fetchrow_hashref;
+}
+
+# SELECT - return all rows as list of arrays
+# Returns: ArrayRef[ArrayRef]
+sub select_arrays {
+    my $self = shift;
+    return $self->select(@_)->fetchall_arrayref([]);
+}
+
+# SELECT - return all rows as list of hashes
+# Returns: ArrayRef[HashRef]
+sub select_hashes {
+    my $self = shift;
+    return $self->select(@_)->fetchall_arrayref({});
 }
 
 # SUB SELECT
@@ -777,6 +790,28 @@ Selects one row from the database and returns the results as a I<HashRef>
 For parameters see L</select>.
 
 Returns C<undef> if the query had no results.
+
+Please note that C<NULL> values will be converted to Perl C<undef>.
+
+
+
+=head2 select_arrays
+
+Selects all rows from the database and returns them as an I<ArrayRef[ArrayRef]>.
+This is a shortcut to C<$dbi-E<gt>select(...)-E<gt>fetchall_arrayref([])>.
+
+For parameters see L</select>.
+
+Please note that C<NULL> values will be converted to Perl C<undef>.
+
+
+
+=head2 select_hashes
+
+Selects all rows from the database and returns them as an I<ArrayRef[HashRef]>.
+This is a shortcut to C<$dbi-E<gt>select(...)-E<gt>fetchall_arrayref({})>.
+
+For parameters see L</select>.
 
 Please note that C<NULL> values will be converted to Perl C<undef>.
 

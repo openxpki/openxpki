@@ -92,11 +92,11 @@ lives_ok {
 } "Execute activity";
 
 lives_and {
-    my $meta = $oxitest->dbi->select(
+    my $meta = $oxitest->dbi->select_hashes(
         from => 'certificate_attributes',
         columns => [ '*' ],
         where => { identifier => $cert_id }
-    )->fetchall_arrayref({});
+    );
 
     cmp_deeply $meta, bag(
         superhashof({ attribute_contentkey => 'meta_shoesize',  attribute_value => '9' }),

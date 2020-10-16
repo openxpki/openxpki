@@ -82,8 +82,7 @@ sub BUILD {
 
 sub get_data {
     my $self = shift;
-    my $sth = $self->dbi->select(from => "test", columns => $self->_col_info->{names});
-    return $sth->fetchall_arrayref;
+    return $self->dbi->select_arrays(from => "test", columns => $self->_col_info->{names});
 }
 
 sub clear_data {

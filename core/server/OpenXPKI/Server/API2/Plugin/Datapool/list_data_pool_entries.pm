@@ -68,7 +68,7 @@ command "list_data_pool_entries" => {
         push @colums, "last_update", "notafter";
     }
 
-    my $result = CTX('dbi')->select(
+    my $result = CTX('dbi')->select_hashes(
         from   => 'datapool',
         columns => \@colums,
         where => {
@@ -78,7 +78,7 @@ command "list_data_pool_entries" => {
         },
         order_by => [ 'datapool_key', 'namespace' ],
         $params->has_limit ? ( limit => $params->limit ) : (),
-    )->fetchall_arrayref({});
+    );
 
     my @res;
     if ($params->has_metadata && $params->metadata) {

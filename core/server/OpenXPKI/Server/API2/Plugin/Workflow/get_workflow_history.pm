@@ -60,12 +60,12 @@ command "get_workflow_history" => {
         params => { type => CTX('api2')->get_workflow_type_for_id(id => $wf_id) }
     );
 
-    my $history = CTX('dbi')->select(
+    my $history = CTX('dbi')->select_hashes(
         from => 'workflow_history',
         columns => [ '*' ],
         where => { workflow_id => $wf_id },
         order_by => [ 'workflow_history_date', 'workflow_hist_id' ],
-    )->fetchall_arrayref({});
+    );
 
     ##! 64: 'history: ' . Dumper $history
     return $history;

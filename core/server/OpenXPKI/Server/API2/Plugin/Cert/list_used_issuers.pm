@@ -39,7 +39,7 @@ command "list_used_issuers" => {
     my $dbi = CTX('dbi');
     if ($params->format eq 'label') {
 
-        my $certs = $dbi->select(
+        my $result = $dbi->select_hashes(
             from   => 'certificate',
             columns => [ 'identifier', 'subject' ],
             where => {
@@ -54,8 +54,6 @@ command "list_used_issuers" => {
             },
         );
 
-        my $result = $certs->fetchall_arrayref({});
-
         @res = map {{
             value => $_->{identifier},
             label => $_->{subject}
@@ -63,14 +61,14 @@ command "list_used_issuers" => {
 
     } else {
 
-        my $result = CTX('dbi')->select(
+        my $result = CTX('dbi')->select_hashes(
             from   => 'certificate',
             columns => [ -distinct => 'issuer_identifier' ],
             where => {
                 pki_realm => $pki_realm,
                 req_key => { '!=' => undef },
             },
-        )->fetchall_arrayref({});
+        );
 
         @res = map { $_->{issuer_identifier} } @$result;
 
