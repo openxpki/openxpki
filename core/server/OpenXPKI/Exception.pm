@@ -63,9 +63,14 @@ sub full_message {
                     $formatted = "EMPTY";
                 }
                 elsif (ref $val eq 'ARRAY') {
-                    my $items = join(",", @$val);
-                    $items = substr($items, 0, $max_item_length-3) . "..." if length $items > $max_item_length;
-                    $formatted = "Array($items)";
+                    # special hack for the validator field list which is an array of hashes
+                    if ($_ eq 'FIELDS') {
+                        $formatted = join(",", map { ref $_ ? $_->{name} : $_ } @{$val});
+                    } else {
+                        my $items = join(",", @$val);
+                        $items = substr($items, 0, $max_item_length-3) . "..." if length $items > $max_item_length;
+                        $formatted = "Array($items)";
+                    }
                 }
                 elsif (ref $val eq 'HASH') {
                     my $items = join ",", map { "$_=".($val->{$_} // '') } sort keys %$val;
