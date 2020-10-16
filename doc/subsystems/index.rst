@@ -185,6 +185,13 @@ A sample RPC endpoint configuration might look like::
 The base path for config lookups is now, inside the realm config
 ``rpc.vpnclient``.
 
+If you want to deploy multiple endpoints with the same configuration you
+can also replace the explicit `servername = vpnclient` with `env = server`
+which will set the internal servername to the name of the endpoint. When
+you put your configuration in default.yaml this ends up in an automatic
+factory where each URI `.../rpc/anyname/Method` will result in a valid
+call to the workflow using `anyname` as base for the configuration lookup.
+
 TLS Client Authorization
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
