@@ -43,9 +43,9 @@ my $ua = LWP::UserAgent->new();
 $ua->ssl_opts( verify_hostname => 0,
 SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_NONE );
 
-my $req = HTTP::Request->new('POST', 'https://localhost/rpc/request/RequestCertificate',
+my $req = HTTP::Request->new('POST', 'https://localhost/rpc/enroll/RequestCertificate',
     HTTP::Headers->new( Content_Type => 'application/json'),
-    encode_json({ pkcs10 => $pkcs10, hmac => $hmac })
+    encode_json({ pkcs10 => $pkcs10, signature => $hmac })
 );
 
 my $response = $ua->request( $req );
@@ -53,7 +53,7 @@ my $response = $ua->request( $req );
 ok($response->is_success);
 my $json = JSON->new->decode($response->decoded_content);
 
-is ($json->{result}->{data}->{error_code}, 'I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_APPROVED');
+is ($json->{result}->{data}->{error_code}, 'Request was not approved');
 
 # Log in and approve request
 $result = $client->mock_request({
@@ -82,7 +82,7 @@ $result = $client->mock_request({
     'page' => 'workflow!context!wf_id!' . $workflow_id
 });
 
-is($client->get_field_from_result('hmac'), $hmac);
+is($client->get_field_from_result('signature'), $hmac);
 ok($client->get_field_from_result('is_valid_hmac'));
 
 $result = $client->mock_request({

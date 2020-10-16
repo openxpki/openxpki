@@ -38,7 +38,7 @@ my $ssl_opts = {
 };
 $ua->ssl_opts( %{$ssl_opts} );
 
-my $response = $ua->get('https://localhost/rpc/default?method=RevokeCertificateByIdentifier&reason_code=superseded&cert_identifier='.$cert_identifier);
+my $response = $ua->get('https://localhost/rpc/revoke?method=RevokeCertificateByIdentifier&reason_code=superseded&cert_identifier='.$cert_identifier);
 
 ok($response->is_success);
 

@@ -26,7 +26,7 @@ $result = $client->mock_request({
     page => 'login'
 });
 
-is($result->{page}->{label}, 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN');
+is($result->{page}->{label}, 'Please log in');
 is($result->{main}->[0]->{action}, 'login!stack');
 
 # update token in session but delete it (login is allowed without session)

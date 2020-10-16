@@ -36,7 +36,7 @@ my $ssl_opts = {
 };
 $ua->ssl_opts( %{$ssl_opts} );
 
-my $response = $ua->post('https://localhost/rpc/request', [
+my $response = $ua->post('https://localhost/rpc/enroll', [
     method => 'RequestCertificate',
     pkcs10 => $pkcs10,
     comment => 'Automated request',

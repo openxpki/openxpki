@@ -41,7 +41,7 @@ Crypt::PKCS10->setAPIversion(1);
 my $decoded = Crypt::PKCS10->new($pkcs10, ignoreNonBase64 => 1, verifySignature => 0);
 my $transaction_id = sha1_hex($decoded->csrRequest);
 
-my $response = $ua->post('https://localhost/rpc/request', [
+my $response = $ua->post('https://localhost/rpc/enroll', [
     method => 'RequestCertificate',
     pkcs10 => $pkcs10,
     comment => 'Automated request',
@@ -60,7 +60,7 @@ is($json->{result}->{state}, 'FAILURE');
 
 is($json->{result}->{data}->{transaction_id}, $transaction_id , 'Transaction Id ');
 
-$response = $ua->post('https://localhost/rpc/request', [
+$response = $ua->post('https://localhost/rpc/enroll', [
     method => 'RequestCertificate',
     pkcs10 => $pkcs10,
     comment => 'Automated request',
@@ -71,11 +71,11 @@ ok($response->is_success);
 
 $json = JSON->new->decode($response->decoded_content);
 is($wf_id,  $json->{result}->{id}, 'Pickup with same id');
-is($json->{result}->{data}->{error_code}, "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_AUTHENTICATED");
+is($json->{result}->{data}->{error_code}, "Request was not authenticated");
 
 # pickup with text/plain
 
-$response = $ua->post('https://localhost/rpc/request', [
+$response = $ua->post('https://localhost/rpc/enroll', [
     method => 'RequestCertificate',
     pkcs10 => $pkcs10,
     comment => 'Automated request',

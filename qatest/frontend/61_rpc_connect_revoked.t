@@ -14,7 +14,7 @@ use LWP::UserAgent;
 #Log::Log4perl->easy_init($DEBUG);
 Log::Log4perl->easy_init($ERROR);
 
-use Test::More tests => 2;
+use Test::More tests => 5;
 
 $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "IO::Socket::SSL";
 
@@ -29,14 +29,15 @@ my $ssl_opts = {
 };
 $ua->ssl_opts( %{$ssl_opts} );
 
-my $req = HTTP::Request->new('POST', 'https://localhost/rpc/revoke/RevokeCertificateByEntity',
+my $req = HTTP::Request->new('POST', 'https://localhost/rpc/enroll/TestConnection',
     HTTP::Headers->new( Content_Type => 'application/json'),
-    encode_json({ entity => 'entity.openxpki.org', reason_code => 'unspecified' })
 );
 
 my $response = $ua->request( $req );
 
 ok($response->is_success);
 my $json = JSON->new->decode($response->decoded_content);
-# should be an empty query if all was revoked before, if not does cleanup
-is( $json->{result}->{state}, 'FAILURE');
+is( $json->{result}->{state}, 'REJECTED');
+ok( $json->{result}->{data}->{signer_cert_identifier});
+ok( $json->{result}->{data}->{signer_authorized});
+ok( $json->{result}->{data}->{signer_revoked});
