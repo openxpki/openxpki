@@ -290,6 +290,9 @@ msgstr "Anmeldung zurücksetzen"
 msgid "I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD"
 msgstr "Zum Download hier klicken."
 
+msgid "I18N_OPENXPKI_UI_CMDB_FAILED"
+msgstr "Prüfung gegen die CMDB fehlgeschlagen"
+
 msgid "I18N_OPENXPKI_UI_CONFIG_STATUS_LABEL"
 msgstr "Konfiguration"
 
@@ -2328,6 +2331,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_TOOLTIP"
 msgstr "Fügen sie die Zertifikatskette als PEM Blöcke oder PKCS7 Container ein"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CLIENT_IP_DESC"
+msgstr "IP-Adresse des Antragsteller."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CLIENT_IP_LABEL"
+msgstr "Client IP-Addresse"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_DESC"
 msgstr " "
 
@@ -2808,6 +2817,19 @@ msgstr "Signierendes Zertifikat"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_LABEL"
 msgstr "Antragsteller/Signierer"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CHAIN_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CHAIN_LABEL"
+msgstr "Zertifikatskette Antragsteller"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_DN_DESC"
+msgstr "Subject des TLS-Client-Zertifikates"
+
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_DN_LABEL"
+msgstr "Antragsteller/Signierer"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_REVOKED_LABEL"
 msgstr "Signaturzertifikat ist gesperrt"
 
@@ -2819,6 +2841,19 @@ msgstr "Signatur ist vertrauenswürdig"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_OK_LABEL"
 msgstr "Signatur gültig"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TLS_CLIENT_CERT_DESC"
+msgstr "~"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TLS_CLIENT_CERT_LABEL"
+msgstr "Antragsteller/Signierer"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TLS_CLIENT_DN_DESC"
+msgstr "Subject des TLS-Client-Zertifikates"
+
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TLS_CLIENT_DN_LABEL"
+msgstr "Subject des TLS-Client-Zertifikates"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_DESC"
 msgstr "Transaktions-ID dieses Antrages"

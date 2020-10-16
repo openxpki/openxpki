@@ -284,6 +284,10 @@ msgstr "重置登录"
 msgid "I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD"
 msgstr "点击此处下载。"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CMDB_FAILED"
+msgstr "使用给定的凭据登录失败！"
+
 msgid "I18N_OPENXPKI_UI_CONFIG_STATUS_LABEL"
 msgstr "配置版本"
 
@@ -2215,6 +2219,14 @@ msgstr "~"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_TOOLTIP"
 msgstr "将所需的链证书复制为连接的PEM或PKCS7捆绑包"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CLIENT_IP_DESC"
+msgstr "有关请求的信息。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CLIENT_IP_LABEL"
+msgstr "实体名称"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_DESC"
 msgstr " "
 
@@ -2661,6 +2673,22 @@ msgstr "签署者证书"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_LABEL"
 msgstr "请求者/签署者"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CHAIN_DESC"
+msgstr "请求者/签署者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CHAIN_LABEL"
+msgstr "请求者/签署者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_DN_DESC"
+msgstr "请求者/签署者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_DN_LABEL"
+msgstr "请求者/签署者"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_REVOKED_LABEL"
 msgstr "签署者被吊销"
 
@@ -2672,6 +2700,22 @@ msgstr "签署者可信"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_OK_LABEL"
 msgstr "签署者有效"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TLS_CLIENT_CERT_DESC"
+msgstr "请求者/签署者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TLS_CLIENT_CERT_LABEL"
+msgstr "请求者/签署者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TLS_CLIENT_DN_DESC"
+msgstr "证书的主题备用名称。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TLS_CLIENT_DN_LABEL"
+msgstr "主题别名"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_DESC"
 msgstr "这个请求的事务ID"

@@ -296,6 +296,10 @@ msgstr "ログインをリセット"
 msgid "I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD"
 msgstr "ダウンロードするにはこちらをクリック"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CMDB_FAILED"
+msgstr "Login failed"
+
 msgid "I18N_OPENXPKI_UI_CONFIG_STATUS_LABEL"
 msgstr "設定のバージョン"
 
@@ -2306,6 +2310,14 @@ msgstr "CA署名者"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_TOOLTIP"
 msgstr " "
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CLIENT_IP_DESC"
+msgstr "リクエストに関する情報。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CLIENT_IP_LABEL"
+msgstr "エンティティ名"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_DESC"
 msgstr " "
 
@@ -2783,6 +2795,22 @@ msgstr "署名者証明書"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_LABEL"
 msgstr "依頼者/署名者"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CHAIN_DESC"
+msgstr "依頼者/署名者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CHAIN_LABEL"
+msgstr "依頼者/署名者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_DN_DESC"
+msgstr "依頼者/署名者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_DN_LABEL"
+msgstr "依頼者/署名者"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_REVOKED_LABEL"
 msgstr "署名者が失効されました"
 
@@ -2794,6 +2822,22 @@ msgstr "署名者は信頼されています"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_OK_LABEL"
 msgstr "署名者の有効性を承諾しました。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TLS_CLIENT_CERT_DESC"
+msgstr "依頼者/署名者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TLS_CLIENT_CERT_LABEL"
+msgstr "依頼者/署名者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TLS_CLIENT_DN_DESC"
+msgstr "証明書の別名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TLS_CLIENT_DN_LABEL"
+msgstr "別名"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_DESC"
 msgstr "このリクエストのトランザクションID"

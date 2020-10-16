@@ -294,6 +294,9 @@ msgstr "Reset Login"
 msgid "I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD"
 msgstr "Click here to download."
 
+msgid "I18N_OPENXPKI_UI_CMDB_FAILED"
+msgstr "Lookup in CMDB failed!"
+
 msgid "I18N_OPENXPKI_UI_CONFIG_STATUS_LABEL"
 msgstr "Config Version"
 
@@ -2205,7 +2208,6 @@ msgstr " "
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_TOOLTIP"
 msgstr " "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_DESC"
 msgstr " "
 
@@ -2218,6 +2220,12 @@ msgstr "~"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_TOOLTIP"
 msgstr ""
 "Copy the required chain certificates as concatenated PEM or PKCS7 bundle"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CLIENT_IP_DESC"
+msgstr "IP address of the incoming client connection."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CLIENT_IP_LABEL"
+msgstr "Client IP"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_DESC"
 msgstr " "
@@ -2617,7 +2625,9 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REQUEST_MODE_LABEL"
 msgstr "Request Mode"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RESETPASS_EMAIL_DESC"
-msgstr "The email address of the user account for which you want to reset the password"
+msgstr ""
+"The email address of the user account for which you want to reset the "
+"password"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RESETPASS_EMAIL_LABEL"
 msgstr "Email"
@@ -2667,6 +2677,18 @@ msgstr "Signer Certificate"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_LABEL"
 msgstr "Requestor/Signer"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CHAIN_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CHAIN_LABEL"
+msgstr "Signer Chain"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_DN_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_DN_LABEL"
+msgstr "Requestor/Signer"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_REVOKED_LABEL"
 msgstr "Signer is Revoked"
 
@@ -2678,6 +2700,18 @@ msgstr "Signer is Trusted"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_VALIDITY_OK_LABEL"
 msgstr "Signer Validity ok"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TLS_CLIENT_CERT_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TLS_CLIENT_CERT_LABEL"
+msgstr "TLS Client certificate"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TLS_CLIENT_DN_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TLS_CLIENT_DN_LABEL"
+msgstr "TLS Client"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_DESC"
 msgstr "Transaction Id of this request"
@@ -3052,8 +3086,8 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_CHOOSE_ACTION_DESC"
 msgstr ""
 "Below you see the new user attributes. Please choose from the actions below "
 "how to proceed. 'Abort' will terminate the workflow without writing the "
-"attributes back to the database, 'Update' will show the form again while 'Save' "
-"will persist the data and finish the workflow."
+"attributes back to the database, 'Update' will show the form again while "
+"'Save' will persist the data and finish the workflow."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_CHOOSE_ACTION_LABEL"
 msgstr "Check Data"
@@ -3283,8 +3317,8 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDITUSER_CHOOSE_ACTION_DESC"
 msgstr ""
 "Below you see the new user attributes. Please choose from the actions below "
 "how to proceed. 'Abort' will terminate the workflow without writing the "
-"attributes back to the database, 'Update' will show the form again while 'Save' "
-"will persist the data and finish the workflow."
+"attributes back to the database, 'Update' will show the form again while "
+"'Save' will persist the data and finish the workflow."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDITUSER_CHOOSE_ACTION_LABEL"
 msgstr "Check Data"
