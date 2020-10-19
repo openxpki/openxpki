@@ -2679,7 +2679,7 @@ sub __render_fields {
     } elsif ($output) {
         @fields_to_render = @$output;
         # strip array indicator [] from field name
-        for (@fields_to_render) { $_->{name} =~ s/\[\]$// }
+        for (@fields_to_render) { $_->{name} =~ s/\[\]$// if ($_->{name}) }
         $self->logger()->trace('Render output rules: ' . Dumper  \@fields_to_render) if $self->logger->is_trace;
 
     } else {
