@@ -34,11 +34,14 @@ sub execute {
     $pkcs10 = $context->param('pkcs10') unless($pkcs10);
 
     my $subject_prefix = $self->param('subject_prefix') || 'cert_';
+    my $verify_signature = $self->param('verify_signature') ? 1 : 0;
+
 
     # Cleanup any existing values
     $context->param({
         'csr_subject' => '',
         'csr_subject_key_identifier' => '',
+        'csr_signature_valid' => undef,
         $subject_prefix.'subject_parts' => '',
         $subject_prefix.'san_parts' => '',
         $subject_prefix.'subject_alt_name' => '',
@@ -54,7 +57,28 @@ sub execute {
 
     # extract subject from CSR and add a context entry for it
     Crypt::PKCS10->setAPIversion(1);
-    my $decoded = Crypt::PKCS10->new( $pkcs10, ignoreNonBase64 => 1, verifySignature => 0);
+    my $decoded = Crypt::PKCS10->new( $pkcs10, ignoreNonBase64 => 1, verifySignature => $verify_signature);
+
+    # if decoded is not set we have either a parse error or a signature problem
+    if (!$decoded) {
+        my $error = Crypt::PKCS10->error;
+        # if this works now it is the signature
+        $decoded = Crypt::PKCS10->new($pkcs10,
+            ignoreNonBase64 => 1,
+            verifySignature => 0 );
+
+        # if its still undef the structure is broken
+        OpenXPKI::Exception->throw(
+            message => 'PKCS10 structure can not be parsed: ' . $error
+        ) unless ($decoded);
+
+        CTX('log')->application()->warn("PKCS#10 signature invalid ($error)");
+
+        $param->{'csr_signature_valid'} = 0;
+    } elsif ($verify_signature) {
+        $param->{'csr_signature_valid'} = 1;
+        CTX('log')->application()->debug("PKCS#10 signature valid");
+    }
 
     my %hashed_dn;
     my $csr_subject = $decoded->subject();
@@ -322,6 +346,15 @@ If set to a true value, details of the used public key are available
 in the I<key_params> context entry. Requires Crypt::PK::ECC if ECC keys
 need to be handled.
 
+=item verify_signature
+
+If set to a true value, the signature of the PKCS#10 container is checked
+and the boolean result is written to csr_signature_valid. If not set, the
+parameter is deleted from the context. It is recommended to check the
+PCKS#10 container on upload already using the validator. Note that at least
+the default backend will refuse broken signatures on the request to issue,
+so you B<MUST> handle this.
+
 =item subject_prefix
 
 Prefix for context output keys to write the subject information into
@@ -430,5 +463,10 @@ the current openssl version or if custom parameters have been used.
 The key identifier of the used public key, Hex with uppercased letters.
 The format is identical to the return value of the API method
 get_key_identifier_from_data and the format used in the certificates table.
+
+=item csr_signature_valid
+
+Boolean, set only if I<validate_signature> is set and recevies a literal
+0/1 weather the PKCS#10 containers signature can be validated.
 
 =back
