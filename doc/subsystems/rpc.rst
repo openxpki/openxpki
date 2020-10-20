@@ -94,15 +94,14 @@ text with each key/parameter pairs on a new line.
 Example: Revoke Certificate by Certificate Identifier
 -----------------------------------------------------
 
-The endpoint is configured in ``/etc/openxpki/rpc/default.conf`` with
+The endpoint is configured in ``/etc/openxpki/rpc/enroll.conf`` with
 the following::
 
-    [RevokeCertificateByIdentifier]
+    [RevokeCertificate]
     workflow = certificate_revocation_request_v2
     param = cert_identifier, reason_code, comment, invalidity_time
-    env = signer_cert, signer_dn
+    env = signer_cert, signer_dn, server
     output = error_code
-    servername = signed-revoke
 
 See ``core/server/cgi-bin/rpc.cgi`` for mapping additional parameters,
 if needed.
@@ -162,8 +161,7 @@ worflow_attributes::
     workflow = certificate_enroll
     param = pkcs10, comment
     output = cert_identifier, error_code, transaction_id
-    env = signer_cert
-    servername = enroll
+    env = signer_cert, enroll
     pickup = transaction_id
 
 With a properly prepared workflow, this allows you access an existing
