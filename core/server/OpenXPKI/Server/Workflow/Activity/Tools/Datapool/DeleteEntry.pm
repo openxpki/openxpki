@@ -15,6 +15,7 @@ use OpenXPKI::Serialization::Simple;
 use OpenXPKI::DateTime;
 use DateTime;
 use Template;
+use Workflow::Exception qw(configuration_error);
 
 use Data::Dumper;
 
