@@ -40,6 +40,15 @@ sub get_command
         push @command, "-attime", $self->{ATTIME};
     }
 
+
+    if ($self->{CRL_CHECK}) {
+        push @command, ($self->{CRL_CHECK} eq 'leaf' ? '-crl_check' : '-crl_check_all');
+        OpenXPKI::Exception->throw (
+            message => "CRL check requested but no CRL given"
+        ) unless ($self->{CRL});
+        push @command, ( '-CRLfile', $self->write_temp_file( $self->{CRL} ) );
+    }
+
     push @command, ( $self->write_temp_file( $self->{CERTIFICATE} ) );
 
     ##! 32: 'SSL verify command ' . join " ", @command

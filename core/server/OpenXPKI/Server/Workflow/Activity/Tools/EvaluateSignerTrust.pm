@@ -127,8 +127,11 @@ sub execute {
         # use validate to build the chain
         $signer_realm = 'external';
 
+        my $crl_check = $self->param('crl_check') || 'none';
+
         my $chain_validate = CTX('api2')->validate_certificate(
             pem => $signer_cert,
+            crl_check => $crl_check,
         );
 
         my $cert_status = $chain_validate->{status} || '';
@@ -462,6 +465,14 @@ Boolean, if set the signer_subject_key_identifier is exported to the context.
 Boolean, if set and the signer is not found in the local database the activity
 tries to verify the certificate chain using the validate_certificate API
 method.
+
+=item crl_check
+
+Only used when the certificate is an external signer. Valid values are
+I<leaf> or I<all>, tries to use CRLs when validating the certificate for
+either the lead certificate or the full chain. The required CRLs must
+exist in the CRL table.
+
 
 =item allow_surrogate_certificate
 

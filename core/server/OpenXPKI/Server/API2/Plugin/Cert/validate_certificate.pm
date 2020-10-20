@@ -98,6 +98,8 @@ command "validate_certificate" => {
     pkcs7  => { isa => 'PEM', },
     anchor => { isa => 'ArrayRef[Str]', },
     novalidity => { isa => 'Bool', default => 0 },
+    crl_check => { isa => 'AlphaPunct', matching => qr{ \A ( none | leaf | all ) \Z }x, default => "none" },
+
 } => sub {
     my ($self, $params) = @_;
 
@@ -265,14 +267,34 @@ command "validate_certificate" => {
     ##! 32: 'Root ' . $root
     ##! 32: 'Entity' . $entity
 
-    my $valid = $default_token->command({
+    my $command = {
         COMMAND => 'verify_cert',
         # TODO - replace with NOVALIDITY once we have openssl 1.1 - see #446
         ATTIME => $params->novalidity ? ($x509->notafter - 1) : 0,
         CERTIFICATE => $entity,
         TRUSTED => $root,
         CHAIN => join "\n", @work_chain,
-    });
+    };
+
+    if ($params->crl_check eq 'leaf') {
+        ##! 32: 'CRL check for leaf'
+        my $issuer_identifier = CTX('api2')->get_cert_identifier( cert => $signer_chain[1] );
+        ##! 64: 'need crl for ' . $issuer_identifier
+        $command->{CRL} = CTX('api2')->get_crl( issuer_identifier => $issuer_identifier );
+        $command->{CRL_CHECK} = 'leaf';
+    } elsif ($params->crl_check ne 'none') {
+        ##! 32: 'CRL check for full chain'
+        my @crls;
+        for (my $ii=1; $ii<@signer_chain;$ii++) {
+            my $issuer_identifier = CTX('api2')->get_cert_identifier( cert => $signer_chain[$ii] );
+            ##! 64: 'need crl for ' . $issuer_identifier
+            push @crls, CTX('api2')->get_crl( issuer_identifier => $issuer_identifier );
+        }
+        $command->{CRL} = join "\n", @crls;
+        $command->{CRL_CHECK} = 'all';
+    }
+
+    my $valid = $default_token->command($command);
 
     ##! 64: 'Validation result ' . Dumper $valid
 

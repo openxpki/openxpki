@@ -82,7 +82,6 @@ command "get_crl" => {
     crl_serial => { isa => 'Int', },
     profile  => { isa => 'Ident' },
     format     => { isa => 'AlphaPunct', matching => qr{ \A ( PEM | DER | TXT | HASH | FULLHASH | DBINFO ) \Z }x, default => "PEM" },
-    pki_realm  => { isa => 'AlphaPunct', },
     issuer_identifier => { isa => 'Value', },
 } => sub {
 
@@ -92,10 +91,8 @@ command "get_crl" => {
 
     my $crl_key    = $params->crl_serial;
     my $format     = $params->format;
-    my $pki_realm  = $params->pki_realm;
     my $issuer_identifier = $params->issuer_identifier;
 
-    $pki_realm =  CTX('session')->data->pki_realm unless $pki_realm;
 
     my $db_results;
 
@@ -147,7 +144,11 @@ command "get_crl" => {
 
     if ( not $db_results ) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_NOT_FOUND', );
+            message => 'No CRL found for the given query',
+            params => {
+                issuer_identifier => $issuer_identifier,
+                crl_key => $crl_key,
+            } );
     }
 
     my $pem_crl = $db_results->{data};
@@ -174,7 +175,7 @@ command "get_crl" => {
         });
         if (!$output) {
             OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_API_OBJECT_GET_CRL_UNABLE_TO_CONVERT',
+                message => 'Unable to convert crl',
             );
         }
     }

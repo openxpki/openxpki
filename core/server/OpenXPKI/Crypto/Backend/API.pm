@@ -137,7 +137,10 @@ sub __init_command_params : PRIVATE {
                           "CERTIFICATE" => 1,
                           "TRUSTED"   => 1,
                           "ATTIME" => 0,
-                          "NOVALIDITY" => 0 },
+                          "NOVALIDITY" => 0,
+                          "CRL"   => 0,
+                          "CRL_CHECK" => ["leaf","all"],
+                          },
     "create_pkey"    =>  {"PASSWD"   => 1,
                           "KEY_ALG" => 0, # default RSA
                           "ENC_ALG" => 0, # default aes256

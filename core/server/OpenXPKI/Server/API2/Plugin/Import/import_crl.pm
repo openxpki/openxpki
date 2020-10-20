@@ -73,6 +73,7 @@ command "import_crl" => {
     data   => { isa => 'PEM', required => 1, },
     profile  => { isa => 'Ident' },
     skip_duplicate => { isa => 'Bool', default=> 0, },
+    nosigner => { isa => 'Bool', default=> 0, },
 } => sub {
     my ($self, $params) = @_;
 
@@ -85,28 +86,46 @@ command "import_crl" => {
     my $issuer_aik = $crl->get_authority_key_id();
     my $issuer_dn = $crl->get_issuer();
 
-    # We need the group name for the alias group
-    my $group = CTX('config')->get(['crypto', 'type', 'certsign']);
+    my $issuer;
+    # by default a CRL must match a signer certificate
+    if ($params->nosigner) {
+        $issuer = $dbi->select_one(
+            from => 'certificate',
+            columns => [ 'identifier' ],
+            where => {
+                $issuer_aik
+                    ? ('subject_key_identifier' => $issuer_aik)
+                    : ('subject' => $issuer_dn),
+            }
+        ) or OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_UI_IMPORT_CRL_ISSUER_NOT_FOUND',
+            params => { issuer_dn => $issuer_dn , issuer_aik => $issuer_aik },
+        );
 
-    ##! 16: 'Look for issuer ' . $issuer_aik . '/' . $issuer_dn . ' in group ' . $group
+    } else {
 
-    my $where = {
-        'aliases.pki_realm' => $pki_realm,
-        'aliases.group_id' => $group,
-        $issuer_aik
-            ? ('certificate.subject_key_identifier' => $issuer_aik)
-            : ('certificate.subject' => $issuer_dn),
-    };
+        # We need the group name for the alias group
+        my $group = CTX('config')->get(['crypto', 'type', 'certsign']);
 
-    my $issuer = $dbi->select_one(
-        from_join => 'certificate  identifier=identifier aliases',
-        columns => [ 'certificate.identifier' ],
-        where => $where
-    ) or OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_UI_IMPORT_CRL_ISSUER_NOT_FOUND',
-        params => { issuer_dn => $issuer_dn , group => $group, issuer_aik => $issuer_aik },
-    );
+        ##! 16: 'Look for issuer ' . $issuer_aik . '/' . $issuer_dn . ' in group ' . $group
 
+        my $where = {
+            'aliases.pki_realm' => $pki_realm,
+            'aliases.group_id' => $group,
+            $issuer_aik
+                ? ('certificate.subject_key_identifier' => $issuer_aik)
+                : ('certificate.subject' => $issuer_dn),
+        };
+
+        $issuer = $dbi->select_one(
+            from_join => 'certificate  identifier=identifier aliases',
+            columns => [ 'certificate.identifier' ],
+            where => $where
+        ) or OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_UI_IMPORT_CRL_ISSUER_NOT_FOUND',
+            params => { issuer_dn => $issuer_dn , group => $group, issuer_aik => $issuer_aik },
+        );
+    }
     ##! 32: 'Issuer ' . Dumper $issuer
 
     my $serial = $dbi->next_id('crl');
