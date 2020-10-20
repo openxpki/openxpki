@@ -85,11 +85,11 @@ lives_ok {
 } "Execute workflow action";
 
 # Check database entries
-my $meta = $oxitest->dbi->select(
+my $meta = $oxitest->dbi->select_hashes(
     from => 'workflow_attributes',
     columns => [ '*' ],
     where => { workflow_id => $workflow->id }
-)->fetchall_arrayref({});
+);
 
 cmp_deeply $meta, bag(
     superhashof({ attribute_contentkey => 'shoesize',  attribute_value => '10' }),

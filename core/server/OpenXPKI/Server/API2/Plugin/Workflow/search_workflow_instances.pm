@@ -191,7 +191,7 @@ sub _search {
     my %sql = %{ $self->_make_query_params($params, $columns) };
 
     # run SELECT query
-    my $result = CTX('dbi')->select(%sql)->fetchall_arrayref({});
+    my $result = CTX('dbi')->select_hashes(%sql);
 
     return $result;
 }

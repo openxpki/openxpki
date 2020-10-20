@@ -49,7 +49,7 @@ sub execute {
     );
 
     if (!$cert_hash && $x509->is_selfsigned() && $self->param('allow_surrogate_certificate')) {
-        my $db_results = CTX('dbi')->select(
+        my $db_results = CTX('dbi')->select_hashes(
             from    => 'certificate',
             columns => ['pki_realm', 'identifier', 'issuer_identifier', 'req_key', 'status', 'data' ],
             where   => {
@@ -57,7 +57,7 @@ sub execute {
                 req_key => { "!=" => undef }
             },
             limit => 2,
-        )->fetchall_arrayref({});
+        );
 
         if ($db_results && scalar @{$db_results}) {
             if (scalar @{$db_results} > 1) {

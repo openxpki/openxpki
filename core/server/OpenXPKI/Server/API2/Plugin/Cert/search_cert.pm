@@ -260,9 +260,9 @@ command "search_cert" => {
 
     ##! 32: 'Query ' . Dumper $sql_params
 
-    my $result = CTX('dbi')->select(
+    my $result = CTX('dbi')->select_hashes(
         %{$sql_params}
-    )->fetchall_arrayref({});
+    );
 
     ##! 128: 'Result ' . Dumper $result
 

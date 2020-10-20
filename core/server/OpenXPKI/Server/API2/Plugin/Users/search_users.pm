@@ -44,9 +44,9 @@ command "search_users" => {
         }
     }
     # execute sql query and return results
-    my $result = CTX('dbi')->select(
+    my $result = CTX('dbi')->select_hashes(
        %{$sql_params}
-    )->fetchall_arrayref({});
+    );
 
     return $result;
 

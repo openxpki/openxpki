@@ -211,7 +211,7 @@ $dbi->delete(from => 'secret', all => 1);
 $dbi->commit;
 
 # Check secrets cache
-my $secrets = $dbi->select(from => 'secret', columns => [ '*' ])->fetchall_arrayref({});
+my $secrets = $dbi->select_hashes(from => 'secret', columns => [ '*' ]);
 is scalar(@$secrets), 0,
     "Secrets cache is empty after we cleared it";
 
@@ -220,7 +220,7 @@ entry_is "pill-99", superhashof({ value => "green" }),
     "Encrypted: entry matches the one we stored";
 
 # Check secrets cache
-$secrets = $dbi->select(from => 'secret', columns => [ '*' ])->fetchall_arrayref({});
+$secrets = $dbi->select_hashes(from => 'secret', columns => [ '*' ]);
 is scalar(@$secrets), 1,
     "Secrets cache contains one entry for data pool symmetric key";
 
