@@ -8,66 +8,22 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use IO::Prompt;
-use Digest::SHA;
-use Digest::MD5;
-use Proc::SafeExec;
-use MIME::Base64;
-use Crypt::Argon2;
+
 use Data::Dumper;
+use OpenXPKI::Password;
 
 sub execute {
     # taken from hash_password() in bin/openxpkiadm
     my ($self, $workflow) = @_;
     my $context  = $workflow->context();
     my $passwd=$self->param('password');
-    my $prefix = sprintf '{%s}', $self->param('scheme');
-    my $computed_secret;
-    if ($self->param('scheme') eq 'sha') {
-        my $ctx = Digest::SHA->new();
-        $ctx->add($passwd);
-        $computed_secret = $ctx->b64digest();
 
-    } elsif ($self->param('scheme') eq 'md5') {
-        my $ctx = Digest::MD5->new();
-        $ctx->add($passwd);
-        $computed_secret = $ctx->b64digest();
-
-    } elsif ($self->param('scheme') eq 'ssha') {
-        my $ctx = Digest::SHA->new();
-        my $salt = __create_salt(3);
-        $ctx->add($passwd);
-        $ctx->add($salt);
-        $computed_secret = encode_base64( $ctx->digest() . $salt, '');
-
-    } elsif ($self->param('scheme') eq 'smd5') {
-        my $ctx = Digest::MD5->new();
-        my $salt = __create_salt(3);
-        $ctx->add($passwd);
-        $ctx->add($salt);
-        $computed_secret = encode_base64($ctx->digest() . $salt, '');
-
-    } elsif ($self->param('scheme') eq 'crypt') {
-        $computed_secret = crypt($passwd, __create_salt(3));
-
-    } elsif ($self->param('scheme') eq 'argon2') {
-        $computed_secret = Crypt::Argon2::argon2id_pass($passwd, __create_salt(16), 3, '32M', 1, 16);
-        $prefix = '';
-    }
-
-
-    $context->param( $self->param('target_key') => $prefix . $computed_secret);
+    $context->param( $self->param('target_key') => OpenXPKI::Password::hash($self->param('scheme'),$passwd));
 
     return 1;
 }
 
-sub __create_salt {
-    # taken from bin/openxpkiadm
-    my $bytes = shift;
-    my @exec = ('openssl', 'rand', '-base64', $bytes);
-    my ($salt, undef) = Proc::SafeExec::backtick(@exec);
-    chomp $salt;
-    return $salt;
-}
+
 
 1;
 __END__

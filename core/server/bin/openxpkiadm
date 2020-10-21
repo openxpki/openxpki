@@ -16,12 +16,7 @@ use YAML;
 
 # For the password hasher
 use IO::Prompt;
-use Digest::SHA;
-use Digest::MD5;
-use Proc::SafeExec;
-use MIME::Base64;
-use Crypt::Argon2;
-use Crypt::X509;
+use OpenXPKI::Password;
 
 
 # Config Builder
@@ -1272,45 +1267,13 @@ sub hash_password {
     }
 
 
-    my $prefix = sprintf '{%s}', $params{scheme};
-    my $computed_secret;
-    if ($params{scheme} eq 'sha') {
-        my $ctx = Digest::SHA->new();
-        $ctx->add($passwd);
-        $computed_secret = $ctx->b64digest();
+    my $hash=OpenXPKI::Password::hash($params{scheme},$passwd);
 
-    } elsif ($params{scheme} eq 'md5') {
-        my $ctx = Digest::MD5->new();
-        $ctx->add($passwd);
-        $computed_secret = $ctx->b64digest();
-
-    } elsif ($params{scheme} eq 'ssha') {
-        my $ctx = Digest::SHA->new();
-        my $salt = __create_salt(3);
-        $ctx->add($passwd);
-        $ctx->add($salt);
-        $computed_secret = encode_base64( $ctx->digest() . $salt, '');
-
-    } elsif ($params{scheme} eq 'smd5') {
-        my $ctx = Digest::MD5->new();
-        my $salt = __create_salt(3);
-        $ctx->add($passwd);
-        $ctx->add($salt);
-        $computed_secret = encode_base64($ctx->digest() . $salt, '');
-
-    } elsif ($params{scheme} eq 'crypt') {
-        $computed_secret = crypt($passwd, __create_salt(3));
-
-    } elsif ($params{scheme} eq 'argon2') {
-        $computed_secret = Crypt::Argon2::argon2id_pass($passwd, __create_salt(16), 3, '32M', 1, 16);
-        $prefix = '';
-    }
-
-    if (!$computed_secret) {
+    if (!$hash) {
         die "Unable to compute hash\n";
     }
 
-    printf "Your hashed password is:\n%s%s\n", $prefix, $computed_secret;
+    printf "Your hashed password is:\n%s\n", $hash;
 
     return 0;
 }
@@ -1372,13 +1335,6 @@ sub __check_realm {
     return 1;
 }
 
-sub __create_salt {
-    my $bytes = shift;
-    my @exec = ('openssl', 'rand', '-base64', $bytes);
-    my ($salt, undef) = Proc::SafeExec::backtick(@exec);
-    chomp $salt;
-    return $salt;
-}
 
 eval {
 

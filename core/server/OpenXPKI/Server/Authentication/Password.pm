@@ -105,87 +105,11 @@ sub login_step {
         }
     ) unless($role);
 
-    my $encrypted;
-    my $scheme;
 
-    # digest specified in RFC 2307 userPassword notation?
-    if ($digest =~ m{ \{ (\w+) \} (.*) }xms) {
-        ##! 8: "database uses RFC2307 password syntax"
-        $scheme = lc($1);
-        $encrypted = $2;
-    }
 
-    if (!defined $scheme) {
-        OpenXPKI::Exception->throw (
-        message => "Given digest is without scheme",
-        params  => {
-            USER => $account,
-        },
-        log => {
-            priority => 'fatal',
-            facility => 'system',
-        },
-        )
-    }
-
-    if ($scheme !~ /^(sha|ssha|md5|smd5|crypt)$/) {
-        OpenXPKI::Exception->throw (
-            message => "Given scheme is not supported",
-            params  => {
-                USER => $account,
-                SCHEME => $scheme,
-            },
-            log => {
-                priority => 'fatal',
-                facility => 'system',
-        });
-    }
-
-    my ($computed_secret, $salt);
-    if ($scheme eq 'sha') {
-        my $ctx = Digest::SHA->new();
-        $ctx->add($passwd);
-        $computed_secret = $ctx->b64digest();
-    }
-    if ($scheme eq 'ssha') {
-        $salt = substr(decode_base64($encrypted), 20);
-        my $ctx = Digest::SHA->new();
-        $ctx->add($passwd);
-        $ctx->add($salt);
-        $computed_secret = encode_base64($ctx->digest() . $salt, '');
-    }
-    if ($scheme eq 'md5') {
-        my $ctx = Digest::MD5->new();
-        $ctx->add($passwd);
-        $computed_secret = $ctx->b64digest();
-    }
-    if ($scheme eq 'smd5') {
-        $salt = substr(decode_base64($encrypted), 16);
-        my $ctx = Digest::MD5->new();
-        $ctx->add($passwd);
-        $ctx->add($salt);
-        $computed_secret = encode_base64($ctx->digest() . $salt, '');
-    }
-    if ($scheme eq 'crypt') {
-        $computed_secret = crypt($passwd, $encrypted);
-    }
-
-    if (! defined $computed_secret) {
-        OpenXPKI::Exception->throw (
-            message => "Unable to compute secret",
-            params  => {
-              USER => $account,
-              SCHEME => $scheme,
-            },
-        );
-    }
-
-    ##! 2: "ident user ::= $account and digest ::= $computed_secret"
-    $computed_secret =~ s{ =+ \z }{}xms;
-    $encrypted       =~ s{ =+ \z }{}xms;
 
     ## compare passphrases
-    if ($computed_secret ne $encrypted) {
+    if (!OpenXPKI::Password::check($passwd,$digest)) {
         ##! 4: "mismatch with digest in database ($encrypted, $salt)"
         OpenXPKI::Exception->throw (
             message => "Provided password does not match",
