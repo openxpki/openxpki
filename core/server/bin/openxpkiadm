@@ -13,6 +13,7 @@ use Errno;
 use File::Spec;
 use File::Basename;
 use YAML;
+use MIME::Base64;
 
 # For the password hasher
 use IO::Prompt;
