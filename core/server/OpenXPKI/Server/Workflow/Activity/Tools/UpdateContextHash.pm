@@ -1,4 +1,4 @@
-package OpenXPKI::Server::Workflow::Activity::Tools::SetContextHash;
+package OpenXPKI::Server::Workflow::Activity::Tools::UpdateContextHash;
 
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
@@ -27,6 +27,12 @@ sub execute
     if (!$key) {
         configuration_error('You must define a target_key');
     }
+
+    if (my $data = $context->param( $key )) {
+        $hash = ref $data ? $data :
+            OpenXPKI::Serialization::Simple->new()->deserialize( $data );
+    }
+
     delete $params->{target_key};
 
   KEY:
@@ -38,6 +44,7 @@ sub execute
         ##! 16: 'Value ' . $value
 
         if (!defined $value) {
+            delete $hash->{$key};
             next;
         }
 
@@ -58,17 +65,16 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::Tools::SetContextHash
+OpenXPKI::Server::Workflow::Activity::Tools::UpdateContextHash
 
 =head1 Description
 
-Similar to SetContext but maps parameters from the activity definition
-into a hash in the context. Any existing value in I<target_key> will be
-overwritten. See UpdateContextHash to merge old and new values.
+Similar to SetContextHash, if the target_key already contains a hash its
+values are merged with the new ones.
 
 =head2 Configuration
 
-    class: OpenXPKI::Server::Workflow::Activity::Tools::SetContextHash
+    class: OpenXPKI::Server::Workflow::Activity::Tools::UpdateContextHash
     param:
        target_key: name_of_the_hash
        key1: value1

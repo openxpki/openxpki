@@ -22,6 +22,7 @@ OpenXPKI/Log4perl.pm
 OpenXPKI/MooseParams.pm
 OpenXPKI/Random.pm
 OpenXPKI/Template.pm
+OpenXPKI/Template/Plugin/Alias.pm
 OpenXPKI/Template/Plugin/Certificate.pm
 OpenXPKI/Template/Plugin/CheckDNS.pm
 OpenXPKI/Template/Plugin/DateTime.pm
@@ -446,6 +447,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/SetSource.pm
 OpenXPKI/Server/Workflow/Activity/Tools/StringToArray.pm
 OpenXPKI/Server/Workflow/Activity/Tools/TriggerCertificatePublish.pm
 OpenXPKI/Server/Workflow/Activity/Tools/UpdateCertificateMetadata.pm
+OpenXPKI/Server/Workflow/Activity/Tools/UpdateContextHash.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ValidateChallengePassword.pm
 OpenXPKI/Server/Workflow/Activity/Tools/WFArray.pm
 OpenXPKI/Server/Workflow/Activity/Tools/WFHash.pm
