@@ -155,41 +155,6 @@ openxpkictl - start/stop script for OpenXPKI server
 
 openxpkictl [options] COMMAND
 
- Options:
-   --help
-        Brief help message
-
-   --man
-        Full documentation
-
-   --config PATH
-        Use configuration from path (base of yaml tree)
-
-   --instance|i NAME
-        Shortcut to set the config path to /etc/openxpki/<instance>/config.d
-
-   --debug [MODULE:]LEVEL
-        Show debug messages of MODULE whose level are lower or equal to the
-        given LEVEL.
-        LEVEL can be specified as a decadic or binary number (e.g. 5 or 0b101).
-        If MODULE is omitted the given LEVEL will be set for all modules.
-
-   --debug MODULE[=BITMASK]
-        Show debug messages of MODULE whose level fits into the given BITMASK
-        (i.e. "level AND BITMASK == level").
-        BITMASK can be specified as a decadic or binary number (e.g. 5 or
-        0b101). If not given BITMASK defaults to 1.
-
-   --keep-temp-files yes
-        Do not delete temporary files.
-        B<WARNING>: Files can contain confidential data!
-
-   --foreground
-        Use a non-forking server: only useful for debugging or profiling.
-
-   --no-detach
-        Do not fork away the control process - useful for docker/systemd
-
  Commands:
    start            Start OpenXPKI daemon
    stop             Stop OpenXPKI daemon
@@ -198,6 +163,7 @@ openxpkictl [options] COMMAND
    status           Get OpenXPKI daemon status
    version          Print the OpenXPKI version info
 
+See below for supported options.
 
 =head1 ARGUMENTS
 
@@ -240,15 +206,15 @@ Print a brief help message and exits.
 
 Prints the manual page and exits.
 
-=item B<--config PATH>
+=item B<--config|cfg PATH>
 
-Use PATH to point to the configuration repository.
+Use PATH to point to the configuration repository (base of yaml tree).
 Defaults to /etc/openxpki/config.d
 
-=item B<--instance NAME>
+=item B<--instance|i NAME>
 
-Shortcut to set the config path when running multiple instances
-using the proposed config path layout.
+Shortcut to set the config path when running multiple instances using
+the proposed config path layout (/etc/openxpki/I<instance>/config.d).
 
 =item B<--version>
 
@@ -256,14 +222,17 @@ Print program version and exit.
 
 =item B<--debug MODULE:LEVEL>
 
-Set specific module debug level to LEVEL (must be a positive integer). Higher
-values mean more debug output. Multiple --debug options can be specified.
-It is also possible to specify multiple debug settings in one --debug
-option by separating them with a comma.
-MODULE must be a module specification (e. g. OpenXPKI::Server) and may
-contain Perl Regular expressions.
+Set specific module debug level to LEVEL (must be a positive integer).
+Higher values mean more debug output. MODULE must be a module
+specification (e. g. OpenXPKI::Server) and may contain Perl Regular
+expressions.
 
-MODULE defaults to '.*' if not specified. LEVEL defaults to 1 if not specified.
+LEVEL can be specified as a decadic or binary number (e.g. 5 or 0b101).
+LEVEL defaults to 1 if not specified.
+
+If MODULE is omitted the given LEVEL will be set for all modules.
+
+You can add multiple --debug options on one command line.
 
 Examples:
 
@@ -277,13 +246,35 @@ Examples:
   (equivalent to --debug OpenXPKI::Server:100)
 
   --debug OpenPKI::Server:10 --debug OpenXPKI::Crypto::.*:20
-  --debug OpenXPKI::Server:10,OpenXPKI::Crypto::.*:20
-  (these two are equivalent)
 
-=item B<--foreground>
+=item B<--debug MODULE[=BITMASK]>
 
-Does not fork program away and uses a non-forking server. Pretty much
-useful only for debugging and profiling.
+Show debug messages of MODULE whose level fits into the given BITMASK
+(i.e. "level AND BITMASK == level").
+BITMASK can be specified as a decadic or binary number (e.g. 5 or
+0b101). If not given BITMASK defaults to 1.
+
+=item B<--nocensor>
+
+Turn off censoring in the Debug module.
+
+=item B<--keep-temp-files yes>
+
+Do not delete temporary files.
+B<WARNING>: Files might contain confidential data!
+
+=item B<--no-detach|nd>
+
+Do not fork away the control process - useful to run inside containers
+or from systemd.
+
+=item B<--foreground|fg>
+
+Does not fork program away and B<uses a non-forking server>. This
+limits the OpenXPKI server to handle only one request at a time, so
+this is pretty much useful only for debugging and profiling.
+
+B<DO NOT USE THIS FOR PRODUCTION>.
 
 =back
 
