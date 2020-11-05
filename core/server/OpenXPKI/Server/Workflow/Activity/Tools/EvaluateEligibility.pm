@@ -36,7 +36,7 @@ sub execute {
     # check if there are arguments
     my @attrib = $config->get_scalar_as_list( [ @prefix, 'args' ] );
 
-    ##! 32: 'Attribs ' . Dumper @attrib
+    ##! 32: 'Attribs ' . Dumper \@attrib
     # dynamic case - context is used in evaluation
     if (defined $attrib[0]) {
 
@@ -48,7 +48,7 @@ sub execute {
             push @path, $out if ($out);
         }
 
-        ##! 16: 'Lookup at path ' . Dumper @path
+        ##! 16: 'Lookup at path ' . Dumper \@path
         if (@path) {
 
             my $plain_result;
@@ -72,7 +72,7 @@ sub execute {
                 $plain_result = $config->get( [ @prefix, 'value', @path ] );
             }
 
-            ##! 32: 'result is ' . $plain_result
+            ##! 32: "result is '$plain_result'"
 
             CTX('log')->application()->debug("Eligibility check raw result " . (defined $plain_result ? $plain_result : 'undef') . ' using path ' . join('|', @path));
 
@@ -92,7 +92,7 @@ sub execute {
 
                 ##! 32: 'Check against list of expected values'
                 foreach my $valid (@expect) {
-                    ##! 64: 'Probe ' .$valid
+                    ##! 64: "Probe '$valid'"
                     if ($plain_result eq $valid) {
                         $res = 1;
                         ##! 32: 'Match found' .$valid
@@ -205,9 +205,9 @@ Put this configutation into your server configuration:
 
     eligible:
       value@: connector:your.connector
-        args:
-         - "[% context.cert_subject %]"
-         - "[% context.url_mac %]"
+      args:
+        - "[% context.cert_subject %]"
+        - "[% context.url_mac %]"
       expect:
         - Active
         - Build
@@ -215,8 +215,11 @@ Put this configutation into your server configuration:
 The check will succeed, if the value returned be the connector has a
 literal match in the given list.
 
-If you do not specify an I<expected> list, the return value is mapped to
-a boolean result by perl magic.
+If you do not specify an I<expect> list, the return value is mapped to
+a boolean result by perl magic. B<Note>: Perl magic might not work as
+expected if your data was transported in text format and has trailing
+newlines or any other "hidden" characters. Sanitize your input or use the
+I<match> option.
 
 =head3 Compare result using a RegEx
 
@@ -224,9 +227,9 @@ Instead of a static I<expect> list, you can also define a regex to evaluate:
 
     eligible:
       value@: connector:your.connector
-        args:
-         - "[% context.cert_subject %]"
-         - "[% context.url_mac %]"
+      args:
+        - "[% context.cert_subject %]"
+        - "[% context.url_mac %]"
       match:
         regex: (Active|Build)
         modifier: ''
