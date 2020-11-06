@@ -1,2 +1,5 @@
 oracle-xe-*.rpm.zip
 .vagrant/
+core/i18n/**/*.mo
+core/i18n/en_GB/openxpki.po
+core/i18n/openxpki.pot
