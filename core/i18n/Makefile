@@ -1,12 +1,13 @@
-PREFIX?=	/usr
+PREFIX       ?= /usr
 LOCALE_DIR   = $(DESTDIR)$(PREFIX)/share/locale
 MO_FILE      = openxpki.mo
 INSTALL      = install
-LANGS         = en_US en_GB de_DE ru_RU it_IT ja_JP zh_CN
-PO_SOURCES   = $(LANGS:%=%/openxpki.po)
+LANGS_REAL   = en_US de_DE ru_RU it_IT ja_JP zh_CN
+LANGS        = $(LANGS_REAL) en_GB
+PO_SOURCES   = $(LANGS_REAL:%=%/openxpki.po)
 MO_TRANSLATIONS = $(LANGS:%=%/$(MO_FILE))
 POT_SOURCES  = ../server ../../config extra/
-VERSION_FILE    = ./VERSION
+VERSION_FILE = ./VERSION
 PACKAGE      ?= openxpki-i18n
 
 TOPDIR := ../..
