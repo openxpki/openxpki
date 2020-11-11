@@ -342,6 +342,26 @@ msgstr "CRLの状態"
 msgid "I18N_OPENXPKI_UI_CRL_VIEW_IN_BROWSER"
 msgstr "ブラウザ上で詳細を確認する"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SHARE_ALREADY_ENTERED"
+msgstr "秘密鍵がクリアされました。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLITENCRYPTED_KEY_COUNT_DIFFERS_FROM_SHARE_COUNT"
+msgstr "リテラル秘密鍵"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLITENCRYPTED_UNABLE_TO_LOAD_ENCRYPTED_SHARE"
+msgstr "暗号化なし"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLITENCRYPTED_WRONG_SHARE_PASSPHRASE"
+msgstr "リテラル秘密鍵"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLIT_EMPTY_SHARE"
+msgstr "データなし"
+
 msgid "I18N_OPENXPKI_UI_CSR_EXT_CERTIFICATE_TEMPLATE"
 msgstr "証明書テンプレート"
 
@@ -4066,6 +4086,14 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_SEARCH_SCEP_TID_LABEL"
 #~ msgstr "SCEPトランザクションID"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_SECRET_GROUP_DOES_NOT_EXIST"
+#~ msgstr ""
+#~ "別名で<b>正確な</b>検索を行います。ワイルドカードとして '*' や '_' を指定"
+#~ "すると、部分一致の検索を行います。特定の別名タイプを指定する場合、コロンを"
+#~ "付けたプレフィックスを指定します。例えば 'IP:10.*' は、サブネット 10.x の"
+#~ "IPアドレスである別名アイテムを検索します。"
 
 #~ msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_HISTORY"
 #~ msgstr "ワークフロー履歴にアクセスするために必要な権利がありません。"

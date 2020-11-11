@@ -33,7 +33,7 @@ command "is_secret_complete" => {
     secret => { isa => 'AlphaPunct', required => 1, },
 } => sub {
     my ($self, $params) = @_;
-    return CTX('crypto_layer')->is_secret_group_complete($params->secret);
+    return CTX('crypto_layer')->is_secret_complete($params->secret);
 };
 
 __PACKAGE__->meta->make_immutable;

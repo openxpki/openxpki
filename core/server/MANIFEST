@@ -90,8 +90,11 @@ OpenXPKI/Crypto/Profile/Base.pm
 OpenXPKI/Crypto/Profile/Certificate.pm
 OpenXPKI/Crypto/Profile/CRL.pm
 OpenXPKI/Crypto/Secret.pm
+OpenXPKI/Crypto/SecretManager.pm
+OpenXPKI/Crypto/SecretRole.pm
 OpenXPKI/Crypto/Secret/Plain.pm
 OpenXPKI/Crypto/Secret/Split.pm
+OpenXPKI/Crypto/Secret/SplitEncrypted.pm
 OpenXPKI/Crypto/TokenManager.pm
 OpenXPKI/Crypto/Toolkit.pm
 OpenXPKI/Crypto/VolatileVault.pm

@@ -427,6 +427,26 @@ msgid "I18N_OPENXPKI_UI_CRL_VIEW_IN_BROWSER"
 msgstr "Действителен"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SHARE_ALREADY_ENTERED"
+msgstr "Неверный параметр простой аутентификации через пароль"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLITENCRYPTED_KEY_COUNT_DIFFERS_FROM_SHARE_COUNT"
+msgstr "Неверный параметр простой аутентификации через пароль"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLITENCRYPTED_UNABLE_TO_LOAD_ENCRYPTED_SHARE"
+msgstr "Неверный параметр простой аутентификации через пароль"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLITENCRYPTED_WRONG_SHARE_PASSPHRASE"
+msgstr "Неверный параметр простой аутентификации через пароль"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLIT_EMPTY_SHARE"
+msgstr "Неверный параметр простой аутентификации через пароль"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CSR_EXT_CERTIFICATE_TEMPLATE"
 msgstr "Идентификатор сертификата"
 
@@ -6232,10 +6252,6 @@ msgstr "Имя учетной записи"
 #~ msgstr "Неверный параметр простой аутентификации через пароль"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_CRYPTO_SECRET_SPLIT_EMPTY_SHARE"
-#~ msgstr "Неверный параметр простой аутентификации через пароль"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_CRYPTO_SECRET_SPLIT_INVALID_SHARE_VERSION"
 #~ msgstr "Неверный параметр простой аутентификации через пароль"
 
@@ -9503,6 +9519,10 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
 #~ msgstr "Пауза"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_SECRET_GROUP_DOES_NOT_EXIST"
+#~ msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_SUBJECT_MATCH_DONT_MATCH"

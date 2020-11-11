@@ -339,6 +339,21 @@ msgstr "CRL Status"
 msgid "I18N_OPENXPKI_UI_CRL_VIEW_IN_BROWSER"
 msgstr "show details in brower"
 
+msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SHARE_ALREADY_ENTERED"
+msgstr "Same secret share has already been entered."
+
+msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLITENCRYPTED_KEY_COUNT_DIFFERS_FROM_SHARE_COUNT"
+msgstr "Number of given keys does not match the number of shares."
+
+msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLITENCRYPTED_UNABLE_TO_LOAD_ENCRYPTED_SHARE"
+msgstr "Unable to load encrypted secret share."
+
+msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLITENCRYPTED_WRONG_SHARE_PASSPHRASE"
+msgstr "Wrong passphrase: no encrypted secret share could be unlocked."
+
+msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLIT_EMPTY_SHARE"
+msgstr "Empty share or passphrase given."
+
 msgid "I18N_OPENXPKI_UI_CSR_EXT_CERTIFICATE_TEMPLATE"
 msgstr "Certificate Template"
 
@@ -1201,7 +1216,7 @@ msgid "I18N_OPENXPKI_UI_SEARCH_TRANSACTION_ID_LABEL"
 msgstr "Transaction Id"
 
 msgid "I18N_OPENXPKI_UI_SECRET_CLEAR_SECRET_LABEL"
-msgstr "clear secret"
+msgstr "Clear secret"
 
 msgid "I18N_OPENXPKI_UI_SECRET_COMPLETE"
 msgstr "Ready"
@@ -1220,8 +1235,8 @@ msgstr "Literal Secret"
 
 msgid "I18N_OPENXPKI_UI_SECRET_PAGE_DESC"
 msgstr ""
-"The list shows the state of your secret groups defined in this realm. To "
-"login/logout click on the row."
+"The list shows the state of your secret groups defined in this realm. Click "
+"a row to manage a group."
 
 msgid "I18N_OPENXPKI_UI_SECRET_PAGE_LABEL"
 msgstr "Manage Secrets"
@@ -1230,16 +1245,16 @@ msgid "I18N_OPENXPKI_UI_SECRET_PASSPHRASE_LABEL"
 msgstr "Passphrase"
 
 msgid "I18N_OPENXPKI_UI_SECRET_STATUS_ACCEPTED"
-msgstr "Secret Accepted"
+msgstr "Secret accepted"
 
 msgid "I18N_OPENXPKI_UI_SECRET_STATUS_CLEARED"
-msgstr "Secret Cleared"
+msgstr "Secret cleared"
 
 msgid "I18N_OPENXPKI_UI_SECRET_STATUS_CLEAR_FAILED"
-msgstr "Clear Failed"
+msgstr "Clearing secret failed"
 
 msgid "I18N_OPENXPKI_UI_SECRET_STATUS_UNLOCK_FAILED"
-msgstr "Unlock Failed"
+msgstr "Unlocking failed"
 
 msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_BUTTON"
 msgstr "Unlock"

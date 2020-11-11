@@ -593,8 +593,8 @@ sub __probe_config {
     my $config = OpenXPKI::Config->new();
 
     return {
-        PIDFILE  => $config->get('system.server.pid_file'),
-        SOCKETFILE => $config->get('system.server.socket_file'),
+        PIDFILE  => $config->get('system.server.pid_file') || '',
+        SOCKETFILE => $config->get('system.server.socket_file') || '',
         TYPE => $config->get('system.server.type') || 'Fork',
     };
 
