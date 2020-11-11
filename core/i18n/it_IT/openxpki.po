@@ -413,6 +413,26 @@ msgid "I18N_OPENXPKI_UI_CRL_VIEW_IN_BROWSER"
 msgstr "mostra le liste di revoca precedenti"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SHARE_ALREADY_ENTERED"
+msgstr "Scaduto"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLITENCRYPTED_KEY_COUNT_DIFFERS_FROM_SHARE_COUNT"
+msgstr "Soggetto Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLITENCRYPTED_UNABLE_TO_LOAD_ENCRYPTED_SHARE"
+msgstr "FALLIMENTO"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLITENCRYPTED_WRONG_SHARE_PASSPHRASE"
+msgstr "Soggetto Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLIT_EMPTY_SHARE"
+msgstr "Nessun dato disponibile"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CSR_EXT_CERTIFICATE_TEMPLATE"
 msgstr "non dopo il"
 
@@ -4640,6 +4660,10 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
 #~ msgstr "Errore sconosciuto"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_SECRET_GROUP_DOES_NOT_EXIST"
+#~ msgstr "Numero di serie del certificato"
 
 # Remove?
 #, fuzzy

@@ -50,12 +50,12 @@ command "get_ui_system_status" => {
 
     # Offline Secrets
     my $offline_secrets = 0;
-    my $secrets = $crypto->get_secret_groups();
+    my $secrets = $crypto->get_secret_infos();
     for my $secret (keys %{$secrets}) {
         # Secret groups tend to have exceptions in unusual situations
         # To not crash the whole method, we put an eval around until this is
         # resolved, see #255
-        $offline_secrets++ unless eval { $crypto->is_secret_group_complete( $secret ) || 0 };
+        $offline_secrets++ unless eval { $crypto->is_secret_complete( $secret ) || 0 };
     }
 
     # Process count

@@ -555,7 +555,7 @@ Ember.debug("oxi-section/form (".concat(this.args.def.action,"): submit"))
 var t,n=!1,r=fe(this.fields)
 try{for(r.s();!(t=r.n()).done;){var o=t.value
 o.is_optional||o.value?o.error&&(n=!0):(n=!0,o.error=this.intl.t("component.oxisection_form.missing_value"))}}catch(a){r.e(a)}finally{r.f()}if(!n){var i=ue({action:this.args.def.action},this._fields2request(!1))
-return this.loading=!0,Ember.getOwner(this).lookup("route:openxpki").sendAjax(i).then((function(t){if(e.loading=!1,null!=t.status){var n,r=fe(t.status.field_errors)
+return this.loading=!0,Ember.getOwner(this).lookup("route:openxpki").sendAjax(i).then((function(t){if(e.loading=!1,null!=t.status&&void 0!==t.status.field_errors){var n,r=fe(t.status.field_errors)
 try{var o=function(){var t=n.value,r=e.fields.filter((function(e){return e.name===t.name}))
 void 0===t.index?r.setEach("error",t.error):r[t.index].error=t.error}
 for(r.s();!(n=r.n()).done;)o()}catch(a){r.e(a)}finally{r.f()}}})).finally((function(){return e.loading=!1}))}}},{key:"uniqueFieldNames",get:function(){var e,t=[],n=fe(this.fields)

@@ -33,7 +33,8 @@ command "clear_secret" => {
 } => sub {
     my ($self, $params) = @_;
     CTX('log')->audit('system')->info("clearing secret", { group => $params->secret });
-    return CTX('crypto_layer')->clear_secret_group($params->secret);
+    CTX('crypto_layer')->clear_secret($params->secret);
+    return 1;
 };
 
 __PACKAGE__->meta->make_immutable;

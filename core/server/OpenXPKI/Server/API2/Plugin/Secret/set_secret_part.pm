@@ -7,6 +7,9 @@ OpenXPKI::Server::API2::Plugin::Secret::set_secret_part
 
 =cut
 
+# CPAN modules
+use Try::Tiny;
+
 # Project modules
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
@@ -41,25 +44,27 @@ command "set_secret_part" => {
 } => sub {
     my ($self, $params) = @_;
 
-    my $result = CTX('crypto_layer')->set_secret_group_part({
-        GROUP => $params->secret,
-        $params->has_part ? (PART => $params->part) : (),
-        VALUE => $params->value,
-    });
+    try {
+        CTX('crypto_layer')->set_secret_part({
+            GROUP => $params->secret,
+            $params->has_part ? (PART => $params->part) : (),
+            VALUE => $params->value,
+        });
 
-    if ($result) {
         CTX('log')->audit('system')->info("set secret part", {
             group => $params->secret,
             $params->has_part ? (part => $params->part) : (),
         });
-    }
-    else {
+    } catch {
         CTX('log')->audit('system')->warn("incorrect secret given", {
             group => $params->secret,
             $params->has_part ? (part => $params->part) : (),
+            error => "$_",
         });
-    }
-    return $result;
+        die $_;
+    };
+
+    return 1;
 };
 
 __PACKAGE__->meta->make_immutable;
