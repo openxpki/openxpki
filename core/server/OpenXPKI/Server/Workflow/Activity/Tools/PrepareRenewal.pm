@@ -83,20 +83,35 @@ sub execute {
     $context->param(  $prefix.'cert_profile' =>  $old_profile->{profile} );
 
     $context->param( 'in_renewal_window' => 0 );
+    $context->param( 'in_renewal_grace_period' => undef );
 
-    my $renewal_notbefore = $self->param('renewal_period') || '000060';
-    # TODO - implement
-    #my $renewal_notafter = $self->param('renewal_notafter') || '00';
+    # if certificate is expired already check for grace period setting
 
-    # Reverse calculation - the date wich must not be exceeded by notafter
-    my $renewal_time = OpenXPKI::DateTime::get_validity({
-        VALIDITY       => '+' . $renewal_notbefore,
-        VALIDITYFORMAT => 'relativedate',
-    })->epoch();
+    if ($cert->{notafter} >= time) {
+        my $renewal_notbefore = $self->param('renewal_period') || '000060';
+        # Reverse calculation - the date wich must not be exceeded by notafter
+        my $renewal_time = OpenXPKI::DateTime::get_validity({
+            VALIDITY       => '+' . $renewal_notbefore,
+            VALIDITYFORMAT => 'relativedate',
+        })->epoch();
 
-    if ($cert->{notafter} <= $renewal_time) {
-        CTX('log')->application()->debug("renewal request for ".$cert->{subject}." is in renewal period ($cert_identifier)");
-        $context->param('in_renewal_window' => 1);
+        if ($cert->{notafter} <= $renewal_time) {
+            CTX('log')->application()->debug("renewal request for ".$cert->{subject}." is in renewal period ($cert_identifier)");
+            $context->param('in_renewal_window' => 1);
+        }
+
+    } elsif ($self->param('renewal_grace_period')) {
+
+        my $grace_period_time = OpenXPKI::DateTime::get_validity({
+            VALIDITY       => '-' . $self->param('renewal_grace_period'),
+            VALIDITYFORMAT => 'relativedate',
+        })->epoch();
+        CTX('log')->application()->debug("evaluated grace period for expired signer ($cert_identifier)");
+        if ($cert->{notafter} > $grace_period_time) {
+            $context->param( 'in_renewal_grace_period' => $grace_period_time );
+            $context->param( 'in_renewal_window' => 1 );
+        }
+
     }
 
     my $sources = $context->param('sources') ? $serializer->deserialize( $context->param('sources') ) : {};
@@ -133,6 +148,14 @@ Load information from this certificate.
 A OpenXPKI::Datetime specification for the renewal period. Used to set the
 I<in_renewal_window> return value. The default is 60 days.
 
+=item renewal_grace_period
+
+A OpenXPKI::Datetime specification for the renewal grace period. The grace
+period allows the original certificate to be expired for the given period.
+
+If the grace period was used, the I<in_renewal_grace_period> is set to a
+true value.
+
 =item target_prefix
 
 If set, the keys cert_profile, cert_subject and cert_subject_alt_name are
@@ -148,6 +171,11 @@ prepended by this prefix. Optional, default is empty.
 
 Boolean, 1 if the notafter date of the renewal certificate is inside the
 given validity window or 0 if not.
+
+=item in_renewal_grace_period
+
+Boolean, 1 if the renewal certificate was already expired but the notafter
+date was within the given grace_period.
 
 =item cert_profile
 
