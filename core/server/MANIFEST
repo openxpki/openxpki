@@ -20,6 +20,7 @@ OpenXPKI/FileUtils.pm
 OpenXPKI/i18n.pm
 OpenXPKI/Log4perl.pm
 OpenXPKI/MooseParams.pm
+OpenXPKI/Password.pm
 OpenXPKI/Random.pm
 OpenXPKI/Template.pm
 OpenXPKI/Template/Plugin/Alias.pm
@@ -89,12 +90,9 @@ OpenXPKI/Crypto/CLI.pm
 OpenXPKI/Crypto/Profile/Base.pm
 OpenXPKI/Crypto/Profile/Certificate.pm
 OpenXPKI/Crypto/Profile/CRL.pm
-OpenXPKI/Crypto/Secret.pm
 OpenXPKI/Crypto/SecretManager.pm
 OpenXPKI/Crypto/SecretRole.pm
 OpenXPKI/Crypto/Secret/Plain.pm
-OpenXPKI/Crypto/Secret/Split.pm
-OpenXPKI/Crypto/Secret/SplitEncrypted.pm
 OpenXPKI/Crypto/TokenManager.pm
 OpenXPKI/Crypto/Toolkit.pm
 OpenXPKI/Crypto/VolatileVault.pm
