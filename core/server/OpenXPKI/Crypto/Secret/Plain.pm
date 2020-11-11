@@ -1,243 +1,164 @@
-## OpenXPKI::Crypto::Secret::Plain.pm
-##
-## Written 2006 by Martin Bartosch for the OpenXPKI project
-## (C) Copyright 2005-2006 by The OpenXPKI Project
-
 package OpenXPKI::Crypto::Secret::Plain;
+use Moose;
+use MooseX::InsideOut;
 
-use strict;
-use warnings;
-use utf8;
+# Core modules
 use English;
 
-use Class::Std;
-
-use base qw( OpenXPKI::Crypto::Secret );
-
-use Regexp::Common;
-
+# Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Context qw( CTX );
 
-{
-    my %totalparts  : ATTR( :default(1) );
-    my %parts       : ATTR();
 
-    sub BUILD {
-        my ($self, $ident, $arg_ref) = @_;
+with 'OpenXPKI::Crypto::SecretRole';
 
-        if (defined $arg_ref && defined $arg_ref->{PARTS}) {
-            if ($arg_ref->{PARTS} !~ m{ \A $RE{num}{int} \z }xms
-            || $arg_ref->{PARTS} < 1) {
-                OpenXPKI::Exception->throw(
-                    message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
-                    params  =>
-                    {
-                        PARTS => $arg_ref->{PARTS},
-                    }
-                );
-            }
-            $totalparts{$ident} = $arg_ref->{PARTS};
-        }
-    }
 
-    sub set_secret {
-        my $self = shift;
-        my $ident = ident $self;
-        my $arg = shift;
-
-        if (! defined $arg) {
-            OpenXPKI::Exception->throw(
-            message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_MISSING_PARAMETER",
-            );
-        }
-
-        if (ref $arg eq '') {
-            if ($totalparts{$ident} != 1) {
-            OpenXPKI::Exception->throw(
-                message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
-                );
-            }
-            $parts{$ident}->[0] = $arg;
-            return 1;
-        }
-
-        if (ref $arg eq 'HASH') {
-            my $part = $arg->{PART};
-
-            if ($part !~ m{ \A $RE{num}{int} \z }xms) {
-            OpenXPKI::Exception->throw(
-                message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
-                params  =>
-                {
-                PART => $part,
-                });
-            }
-
-            if ($part < 1 || $part > $totalparts{$ident}) {
-            OpenXPKI::Exception->throw(
-                message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
-                params  =>
-                {
-                PART => $part,
-                });
-            }
-
-            if (! exists $arg->{SECRET}
-            || ref $arg->{SECRET} ne '') {
-            OpenXPKI::Exception->throw(
-                message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
-                params  =>
-                {
-                SECRET => $arg->{SECRET},
-                });
-            }
-
-            $parts{$ident}->[$part - 1] = $arg->{SECRET};
-
-            return 1;
-        }
-
-        OpenXPKI::Exception->throw(
-            message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_INVALID_PARAMETER",
-        );
-    }
-
-    sub is_complete {
-        ##! 1: 'start'
-        my $self = shift;
-        my $ident = ident $self;
-
-        for (my $ii = 0; $ii < $totalparts{$ident}; $ii++) {
-            ##! 16: $ii . ' defined? ' . ( defined $parts{$ident}->[$ii] ? '1' : '0' )
-            return 0 unless defined $parts{$ident}->[$ii];
-        }
-        return 1;
-    }
-
-    sub get_secret {
-        my $self = shift;
-        my $ident = ident $self;
-
-        return unless $self->is_complete();
-
-        return join('', @{$parts{$ident}});
-    }
-
-    sub get_serialized
-    {
-        my $self  = shift;
-        my $ident = ident $self;
-        return undef if (not $parts{$ident});
-        my %result = ();
-        my $obj = OpenXPKI::Serialization::Simple->new();
-        return CTX('volatile_vault')->encrypt($obj->serialize($parts{$ident}));
-    }
-
-    sub set_serialized
-    {
-        my $self  = shift;
-        my $ident = ident $self;
-        my $dump  = shift;
-        return if (not defined $dump or not length $dump);
-        return if (not CTX('volatile_vault')->can_decrypt($dump));
-        my $obj = OpenXPKI::Serialization::Simple->new();
-        $parts{$ident} = $obj->deserialize(CTX('volatile_vault')->decrypt($dump));
-        return 1;
-    }
-}
-
-1;
-
-=head1 Name
+=head1 NAME
 
 OpenXPKI::Crypto::Secret::Plain - Simple PIN concatenation
 
-=head1 Description
+=head1 DESCRIPTION
 
-Simple PIN container that supports "secret splitting" by dividing
+PIN container that supports a simple form of "secret splitting" by dividing
 the PIN in n components that are simply concatenated.
-
 
 Usage example: simple one-part pin (not very useful)
 
-  my $secret = OpenXPKI::Crypto::Secret->new();   # 'Plain' pin, one part
+    # 'Plain' pin, one part
+    my $secret = OpenXPKI::Crypto::Secret::Plain->new(
+        part_count => 1,
+    );
 
-  $secret->is_complete()               # returns undef
-  my $result = $secret->get_secret();  # undef
+    $secret->is_complete;               # 0
+    my $result = $secret->get_secret;   # undef
 
-  $secret->set_secret('foobar');
+    $secret->set_secret('foobar');
 
-  $secret->is_complete()               # returns true
-  $result = $secret->get_secret();     # 'foobar'
-
-
+    $secret->is_complete                # 1
+    $result = $secret->get_secret;      # 'foobar'
 
 Usage example: simple multi-part pin
 
-  my $secret = OpenXPKI::Crypto::Secret->new(
-      {
-          TYPE => 'Plain',
-          PARTS => 3,
-      });   # 'Plain' pin, three part
+    # 'Plain' pin, three part
+    my $secret = OpenXPKI::Crypto::Secret::Plain->new(
+        part_count => 3,
+    );
 
-  my $result = $secret->get_secret();  # undef
+    my $result = $secret->get_secret;   # undef
 
-  $secret->set_secret(
-      {
-          PART => 1,
-          SECRET => 'foo',
-      });
-  $secret->set_secret(
-      {
-          PART => 3,
-          SECRET => 'baz',
-      });
+    $secret->set_secret('foo', 1);
+    $secret->set_secret('baz', 3);
 
-  $secret->is_complete();           # returns undef
-  $result = $secret->get_secret();  # still undef
+    $secret->is_complete;               # 0
+    $result = $secret->get_secret;      # undef
 
-  $secret->set_secret(
-      {
-          PART => 2,
-          SECRET => 'bar',
-      });
+    $secret->set_secret('bar', 2);
 
-  $secret->is_complete();              # returns true
-  $result = $secret->get_secret();     # 'foobarbaz'
+    $secret->is_complete;               # 1
+    $result = $secret->get_secret;      # 'foobarbaz'
 
+=head1 ATTRIBUTES
 
+=head2 part_count
 
-=head2 Methods
+Required: total number of secret parts
 
-=head3 new
+=cut
 
-Constructor. If a hash reference is given the following named parameters
-are accepted:
+# required by OpenXPKI::Crypto::SecretRole
+sub required_part_count; # prevent the Moose role from complaining
+has required_part_count => (
+    is => 'ro',
+    isa => 'Num',
+    required => 1,
+    init_arg => 'part_count',
+);
 
-=over
+# an array of shares acquired using set_secret
+sub _get_parts; # required by OpenXPKI::Crypto::SecretRole, these subs are
+sub _set_parts; # a workaround to prevent the Moose role from complaining
+has _parts => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    init_arg => undef,
+    default => sub { [] },
+    traits => [ 'Array' ],
+    reader => '_get_parts',
+    writer => '_set_parts',
+    handles => {
+        set_part => 'set',
+        clear_parts => 'clear',
+    },
+);
 
-=item * TYPE
+sub BUILD {
+    my $self = shift;
 
-Must be 'Plain'
+    OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_PART_COUNT_SMALLER_ONE",
+            params  => {
+                part_count => $self->required_part_count,
+            }
+    ) if $self->required_part_count < 1;
+}
 
-=item * PARTS
+sub set_secret {
+    my ($self, $part, $index) = @_;
+    ##! 1: "start"
 
-Integer, defaults to 1. Specifies the total number of secret parts.
+    $index //= 1;
 
-=back
+    OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_SETSECRET_MISSING_PART",
+    ) unless defined $part;
 
+    OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_SETSECRET_MISSING_INDEX",
+    ) if (not defined $index and $self->required_part_count > 1);
 
-=head3 is_complete
+    OpenXPKI::Exception->throw(
+        message => "I18N_OPENXPKI_CRYPTO_SECRET_PLAIN_SETSECRET_INVALID_INDEX",
+        params  => {
+            index => $index,
+        }
+    ) if ($index < 1 or $index > $self->required_part_count);
 
-Returns true once all secret componentents are available.
+    $self->set_part($index-1, $part);
 
-=head3 get_secret
+    return 1;
+}
 
-Returns the complete secret or undef if not yet available.
+# required by OpenXPKI::Crypto::SecretRole
+sub inserted_part_count {
+    my $self = shift;
+    ##! 1: "start"
 
-=head3 set_secret
+    my $part_count = 0;
+    for (my $i = 0; $i < $self->required_part_count; $i++) {
+        ##! 16: $i . ' defined? ' . ( defined $self->_get_parts->[$i] ? '1' : '0' )
+        $part_count++ if defined $self->_get_parts->[$i];
+    }
 
-Sets (part of) the secret.
+    return $part_count;
+}
+
+# required by OpenXPKI::Crypto::SecretRole
+sub get_secret {
+    my $self = shift;
+    ##! 1: "start"
+
+    return unless $self->is_complete(); # not enough shares yet
+
+    return join('', @{$self->_get_parts});
+}
+
+# required by OpenXPKI::Crypto::SecretRole
+sub clear_secret {
+    my $self = shift;
+    ##! 1: "start"
+    $self->clear_parts;
+}
+
+__PACKAGE__->meta->make_immutable;

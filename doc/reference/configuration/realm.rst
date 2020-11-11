@@ -375,17 +375,15 @@ store it "forever". If you want to have the secret cleared at the end of
 the session, set *cache: session*.
 
 To increase the security of your key material, you can configure secret
-splitting (k of n). ::
+splitting by dividing the PIN entry into n components that are simply
+concatenated. ::
 
     secret:
       ngkey:
         label: Split secret Password
-        method: split
-        total_shares: 5
-        required_shares: 3
+        method: plain
+        total_shares: 3
         cache: daemon
-
-TODO: How to create the password segments?
 
 If you have a good reason to put your password into the configuration,
 use the *literal* type::

@@ -304,6 +304,7 @@ WriteMakefile(
         'CryptX'                        => '0.068',     # Crypt::* modules for key checking
         'Crypt::Cipher::AES'            => 0,           # replacement to support keysize > 128
         'Crypt::PKCS10'                 => '2.000',
+        'Crypt::Rijndael'               => '1.13',      # OpenXPKI::Crypto::Secret::SplitEncrypted, via Crypt::CBC
         'Crypt::X509'                   => '0.53',
         'Data::Serializer'              => '0.44',
         'Data::UUID'                    => 0,           # OpenXPKI::Template::Plugin::Utils and CPAN
@@ -329,6 +330,7 @@ WriteMakefile(
         'MIME::Entity'                  => 0,
         'Module::Load'                  => '0.32',      # OpenXPKI::Server::Database
         'Moose'                         => '1',
+        'MooseX::InsideOut'             => '0.106',     # OpenXPKI::Crypto::Secret::Split etc.
         'MooseX::NonMoose'              => 0,           # OpenXPKI::Server::Workflow::Validator::PasswordQuality
         'MooseX::Params::Validate'      => '0.21',      # OpenXPKI::Server::Database
         'Net::DNS'                      => '0.83',

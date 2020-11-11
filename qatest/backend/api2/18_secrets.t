@@ -11,8 +11,10 @@ use Test::More;
 use Test::Deep;
 use Test::Exception;
 
-# Project modules
 use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
+#use OpenXPKI::Debug; BEGIN { $OpenXPKI::Debug::LEVEL{'OpenXPKI::Crypto::SecretManager'} = 100 }
+
+# Project modules
 use OpenXPKI::Test;
 
 plan tests => 5;
@@ -45,7 +47,7 @@ my $oxitest = OpenXPKI::Test->new(
 # PLEASE NOTE:
 #
 # Various types of secret stores and options are already tested in
-# core/server/t/25_crypto/60_secret_cache.t
+# core/server/t/25_crypto/60_tokenmanager.t
 #
 
 my $part1 = "elaine";
@@ -74,6 +76,14 @@ lives_and {
 
 # clear_secret
 lives_and {
+    # 'clear_secret' calls clear_secret_group() which calls
+    # OpenXPKI::Control::reload() which wants to read
+    # some (non-existing) config and kill the (non-running) server...
+    no warnings 'redefine';
+    local *OpenXPKI::Control::reload = sub {
+        note "intercepted call to OpenXPKI::Control::reload()";
+    };
+
     $oxitest->api2_command("clear_secret" => { secret => "mi" });
 
     is CTX('crypto_layer')->get_secret("mi"), undef;

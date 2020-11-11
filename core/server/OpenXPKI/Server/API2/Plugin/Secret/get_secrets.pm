@@ -25,10 +25,16 @@ Example:
         'default' => {
             'label' => 'Default secret group of this realm',
             'type' => 'literal'
+            'complete' => 1,
+            'required_parts' => 3,
+            'inserted_parts' => 3,
         },
         'mykey' => {
             'label' => 'Main password',
             'type' => 'plain'
+            'complete' => 0,
+            'required_parts' => 1,
+            'inserted_parts' => 0,
         },
     }
 
@@ -38,17 +44,10 @@ The returned I<HashRef> now contains lowercase keys.
 
 =cut
 command "get_secrets" => {
-    status => { isa => 'Bool', default => 0, },
 } => sub {
     my ($self, $params) = @_;
 
-    my $secrets = CTX('crypto_layer')->get_secret_groups;
-    if ($params->status) {
-        foreach my $key (keys %{$secrets}) {
-            $secrets->{$key}->{complete} = CTX('crypto_layer')->is_secret_group_complete($key);
-        }
-    }
-    return $secrets;
+    return CTX('crypto_layer')->get_secret_infos;
 };
 
 __PACKAGE__->meta->make_immutable;
