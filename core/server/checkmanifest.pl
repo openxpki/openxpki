@@ -16,6 +16,8 @@ my @dynamic = qw(
 
 my $basedir = abs_path($Bin);
 
+my $exit_code = 0;
+
 # fetch files tracked in Git
 my @git_ls = `git ls-files $basedir`;
 chomp @git_ls;
@@ -38,6 +40,7 @@ my $dynamic_list = { map { ( $_ => 1) } @dynamic };
 for (sort keys %$files_manifest) {
     next if $files_git->{$_};
     next if $dynamic_list->{$_};
+    $exit_code = 1;
     print "\nSuperfluous in MANIFEST (not tracked in Git):\n=============================================\n" unless $header_printed++;
     print "$_\n";
 }
@@ -52,9 +55,12 @@ for (sort keys %$files_git) {
     $hint = "(legacy)    # " if $_ =~ /^OpenXPKI\/Server\/(ACL\.pm|Workflow\/Condition\/(ACL|ValidCSRSerialPresent)\.pm|Workflow\/Validator\/CertSubject\.pm)/;
     $hint = "(separate)  # " if $_ =~ /^CGI_Session_Driver\/Makefile/;
     next if ($hint and not $show_all);
+    $exit_code = 1;
     print "\nMissing in MANIFEST but tracked in Git:\n=======================================\n" unless $header_printed++;
     print "$hint$_\n";
 }
+
+exit $exit_code;
 
 __END__
 
