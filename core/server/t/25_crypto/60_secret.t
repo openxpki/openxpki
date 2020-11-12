@@ -18,7 +18,6 @@ use DateTime;
 # Project modules
 use lib "$Bin/../lib";
 use OpenXPKI::Test;
-use OpenXPKI::Crypto::Secret;
 
 plan tests => 20;
 
