@@ -15,6 +15,7 @@ use warnings;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Password;
 
 use Digest::SHA;
 use Digest::MD5;
