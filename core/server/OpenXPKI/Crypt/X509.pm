@@ -276,7 +276,17 @@ sub _build_san {
             foreach my $type (keys %{$name}) {
                 my $san_type = $san_map->{$type};
                 next unless($san_type);
-                push @san_list, [ $san_type, $name->{$type} ];
+                my $san_val = $name->{$type};
+                # IPs are raw byte sequence, copied from Crypt::PKCS10
+                if ($type eq 'iPAddress') {
+                    if( length $san_val == 4 ) {
+                        $san_val = sprintf( '%vd', $san_val );
+                    } else {
+                        $san_val = sprintf( '%*v02X', ':', $san_val );
+                        $san_val =~ s/([[:xdigit:]]{2}):([[:xdigit:]]{2})/$1$2/g;
+                    }
+                }
+                push @san_list, [ $san_type, $san_val ];
             }
         }
     }
