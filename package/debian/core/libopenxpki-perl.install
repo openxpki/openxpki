@@ -4,4 +4,5 @@ cgi-bin/soap.fcgi    usr/lib/cgi-bin
 cgi-bin/rpc.fcgi    usr/lib/cgi-bin
 cgi-bin/est.fcgi    usr/lib/cgi-bin
 cgi-bin/download.fcgi usr/lib/cgi-bin
+cgi-bin/healthcheck.fcgi usr/lib/cgi-bin
 htdocs/* var/www/openxpki/
