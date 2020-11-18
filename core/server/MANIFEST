@@ -579,6 +579,7 @@ cgi-bin/soap.fcgi
 cgi-bin/download.fcgi
 cgi-bin/rpc.fcgi
 cgi-bin/est.fcgi
+cgi-bin/healthcheck.fcgi
 
 # Client UI
 htdocs/img/logo.png
