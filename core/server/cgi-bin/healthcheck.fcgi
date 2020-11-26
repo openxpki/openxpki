@@ -31,11 +31,11 @@ while (my $cgi = CGI::Fast->new()) {
     }
 
     if (!$client || !$client->is_connected()) {
-        print $cgi->header( -type => 'text/plain', charset => 'utf8', -status => 500 );
+        print $cgi->header( -type => 'application/json', charset => 'utf8', -status => 500 );
         print $json->encode({ ping => 0 });
         $client = undef;
     } else {
-        print $cgi->header( -type => 'text/plain', charset => 'utf8', -status => 200 );
+        print $cgi->header( -type => 'application/json', charset => 'utf8', -status => 200 );
         print $json->encode({ ping => 1 });
     }
 }
