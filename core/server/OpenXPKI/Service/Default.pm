@@ -953,6 +953,8 @@ sub __send_error
     my $self = shift;
     my $params = shift;
 
+    ##! 1: 'handle error'
+    ##! 64: $params
     my $error;
     if ($params->{ERROR}) {
         $error = { LABEL => $params->{ERROR} };
@@ -960,24 +962,33 @@ sub __send_error
         # got exception with already stringified error
         $error = { LABEL => $params->{EXCEPTION} };
     } else {
+        my $class = ref $params->{EXCEPTION};
         # blessed exception object - there are some bubble ups where message
         # is an exception again => enforce stringification on message
-        $error = { LABEL => "".$params->{EXCEPTION}->message() };
+        $error = {
+            LABEL => "".$params->{EXCEPTION}->message(),
+        };
 
         # get all scalar/hash/array parameters from OXI::Exceptions
         # this is used to transport some extra infos for validators, etc
-        if (ref $params->{EXCEPTION} eq 'OpenXPKI::Exception' &&
-            defined $params->{EXCEPTION}->params) {
-            my $p = $params->{EXCEPTION}->params;
-            map {
-                my $key = $_;
-                my $val = $p->{$_};
-                my $ref = ref $val;
-                delete $p->{$_} unless(defined $val && $ref =~ /^(|HASH|ARRAY)$/);
-            } keys %{$p};
+        if ($class->isa('OpenXPKI::Exception')) {
+            $error->{CLASS} = $class;
+            if (defined $params->{EXCEPTION}->params) {
+                my $p = $params->{EXCEPTION}->params;
+                map {
+                    my $key = $_;
+                    my $val = $p->{$_};
+                    my $ref = ref $val;
+                    delete $p->{$_} unless(defined $val && $ref =~ /^(|HASH|ARRAY)$/);
+                } keys %{$p};
 
-            if($p) {
-                $error->{PARAMS} = $p;
+                if($p) {
+                    $error->{PARAMS} = $p;
+                }
+            }
+
+            if ($class eq 'OpenXPKI::Exception::InputValidator') {
+                $error->{ERRORS} = $params->{EXCEPTION}->{errors};
             }
         }
     }

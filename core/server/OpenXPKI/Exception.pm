@@ -15,9 +15,13 @@ use Log::Log4perl;
 
 use OpenXPKI::i18n qw( i18nGettext );
 use Exception::Class (
-    "OpenXPKI::Exception" => {
-        fields => [ "children", "params" ],
-    }
+    'OpenXPKI::Exception' => {
+        fields => [ 'children', 'params' ],
+    },
+    'OpenXPKI::Exception::InputValidator' => {
+        isa         => 'OpenXPKI::Exception',
+        fields => [ 'errors', 'action' ],
+    },
 );
 
 my $log4perl_logger;

@@ -172,11 +172,13 @@ command "create_workflow_instance" => {
 
     ##! 64: Dumper $workflow
 
+    # this runs the workflow validators using the current context
+    # TODO: merge with code in Workflow::execute_action, see #792
+    # move back into the norun branch to check context validity!
+    $workflow->validate_context_before_action($initial_action);
+
     # if save_initial crashes we want to see this
     if ($norun) {
-        # this runs the workflow validators using the current context
-        $workflow->validate_context_before_action($initial_action);
-
         if ($norun eq 'detach') {
             ##! 16: 'Create detached'
             # call async exec, this will only crash on a fork error so we dont
@@ -207,12 +209,6 @@ command "create_workflow_instance" => {
 
             # bubble up non OXI Exceptions
             if (!$EVAL_ERROR->isa('OpenXPKI::Exception')) {
-                $EVAL_ERROR->rethrow();
-            }
-
-            # bubble up Validator Exception
-            # TODO: create a dedicated exception type for this
-            if ($EVAL_ERROR->message eq 'I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATION_FAILED_ON_EXECUTE') {
                 $EVAL_ERROR->rethrow();
             }
         }
