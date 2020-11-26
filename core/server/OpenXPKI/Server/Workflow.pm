@@ -234,13 +234,11 @@ sub execute_action {
             $self->_set_proc_state( 'manual' );
 
             my $invalid_fields = $error->{invalid_fields} || [];
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_WORKFLOW_VALIDATION_FAILED_ON_EXECUTE",
-                params => {
-                    ACTION => $action_name,
-                    ERROR => $error->message(),
-                    FIELDS => $invalid_fields
-                }
+            OpenXPKI::Exception::InputValidator->throw (
+                message => $error->message(),
+                errors => $invalid_fields,
+                action => $action_name,
+                log => { facility => 'application', priority => 'debug' },
             );
         }
 
@@ -412,7 +410,44 @@ sub validate_context_before_action {
 
     my ( $self, $action_name ) = @_;
     my $action = $self->_get_action($action_name);
-    $action->validate($self);
+    eval{$action->validate($self);};
+    # TODO this really needs to be moved to a special exception, see #792
+    if( $EVAL_ERROR ) {
+        my $error = $EVAL_ERROR;
+
+        ##! 16: 'action failed with error: ' .$error
+        # Check for validation errors (dont set the workflow to exception)
+        if (ref $error eq 'Workflow::Exception::Validation') {
+
+            # nothing was persisted so far, no rollback required
+
+            # We reset the flag to prevent the context to be persisted
+            # when we reset the status now, see #236
+            $self->persist_context(0);
+
+            ##! 64: 'validator exception: ' . Dumper $error
+            # Set workflow status to manual
+            $self->_set_proc_state( 'manual' );
+
+            my $invalid_fields = $error->{invalid_fields} || [];
+            ##! 32: $invalid_fields
+            OpenXPKI::Exception::InputValidator->throw (
+                message => $error->message(),
+                errors => $invalid_fields,
+                action => $action_name,
+                log => { facility => 'application', priority => 'debug' },
+            );
+        } elsif (ref $error) {
+            $error->rethrow();
+        } else {
+            OpenXPKI::Exception->throw (
+            message => 'Unknown error during parameter validation',
+            params => {
+                ACTION => $action_name,
+                ERROR => $error,
+            });
+        }
+    }
     return 1;
 }
 
@@ -645,8 +680,6 @@ sub _runtime_exception {
     }
 
 }
-
-
 
 sub _set_proc_state {
     my $self = shift;

@@ -114,6 +114,10 @@ command "execute_workflow_activity" => {
     my $context = $workflow->context();
     $context->param($wf_params) if $wf_params;
 
+    # run validators - throws validator exception
+    # TODO: merge with code in Workflow::execute_action, see #792
+    $workflow->validate_context_before_action($wf_activity);
+
     ##! 64: Dumper $workflow
     CTX('log')->workflow()->debug(sprintf(
         "%s of workflow activity '%s' on workflow #%s ('%s')",
