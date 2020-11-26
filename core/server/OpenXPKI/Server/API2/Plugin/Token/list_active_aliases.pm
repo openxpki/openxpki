@@ -78,7 +78,7 @@ command "list_active_aliases" => {
     my $pki_realm = $params->pki_realm;
 
     if (not $params->has_group) {
-        OpenXPKI::Exception->throw("Token type or group must be given") unless $params->has_type;
+        OpenXPKI::Exception->throw( message => "Token type or group must be given" ) unless $params->has_type;
 
         $group = CTX('config')->get("realm.$pki_realm.crypto.type.".$params->type)
             or OpenXPKI::Exception->throw(
