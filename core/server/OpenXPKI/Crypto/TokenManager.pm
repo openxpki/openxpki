@@ -236,7 +236,7 @@ sub __add_token {
         params => { TYPE => $type, NAME => $name, GROUP => $config_name_group}
     ) unless $backend_class;
 
-    eval { Module::Load::autoload($backend_class) };
+    eval { Module::Load::autoload($backend_class); Module::Load::autoload($backend_api_class); };
     OpenXPKI::Exception->throw (
         message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_FAILED_LOADING_BACKEND_CLASS",
         params => { class_name => $backend_class, message => $@ }
@@ -244,7 +244,7 @@ sub __add_token {
 
     my $secret_alias = $config->get_inherit("crypto.token.$config_name_group.secret");
 
-    ##! 16: "Token backend: $backend_class, Secret group: $secret"
+    ##! 16: "Token backend: $backend_class, Secret group: $secret_alias"
 
     ##! 2: "determine secret group"
     if ($secret_alias) {
