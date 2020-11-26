@@ -22,7 +22,7 @@ use Log::Log4perl::MDC;
 use MIME::Base64 qw( encode_base64 decode_base64 );
 
 use Crypt::CBC;
-use OpenXPKI::i18n qw( i18nGettext set_language set_locale_prefix);
+use OpenXPKI::i18n qw( i18nGettext i18nTokenizer set_language set_locale_prefix);
 use OpenXPKI::Client::UI;
 use OpenXPKI::Client;
 
@@ -100,18 +100,13 @@ sub __handle_error {
 
     my $cgi = shift;
     my $error = shift;
-    if ($error) {
-        $log->error('error while handling request');
-        $log->debug($error);
-
-        # only echo UI error messages to prevent data leakage
-        if ($error !~ /I18N_OPENXPKI_UI/) {
-            $error = 'I18N_OPENXPKI_UI_APPLICATION_ERROR';
-        }
-        $error = i18nGettext($error);
+    # only echo UI error messages to prevent data leakage
+    if (!$error || $error !~ /I18N_OPENXPKI_UI/) {
+        $log->info($error || 'undef passed to handle_error');
+        $error = i18nGettext('I18N_OPENXPKI_UI_APPLICATION_ERROR');
     } else {
-        $log->error('uncaught application error');
-        $error = 'I18N_OPENXPKI_UI_APPLICATION_ERROR';
+        $error = i18nTokenizer($error);
+        $log->info($error);
     }
 
     if ( $cgi->http('HTTP_X-OPENXPKI-Client') ) {
