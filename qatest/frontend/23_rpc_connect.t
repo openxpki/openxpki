@@ -47,7 +47,7 @@ $req = HTTP::Request->new('POST', 'https://localhost/rpc/enroll/TestConnection',
     HTTP::Headers->new( Content_Type => 'application/json'),
 );
 
-my $response = $ua->request( $req );
+$response = $ua->request( $req );
 
 ok($response->is_success);
 $json = JSON->new->decode($response->decoded_content);

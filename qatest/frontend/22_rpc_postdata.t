@@ -26,7 +26,7 @@ my $ssl_opts = {
 };
 $ua->ssl_opts( %{$ssl_opts} );
 
-my $req = HTTP::Request->new('POST', 'https://localhost/rpc/search',
+my $req = HTTP::Request->new('POST', 'https://localhost/rpc/public',
     HTTP::Headers->new( Content_Type => 'application/json'),
     encode_json({ method => "SearchCertificate", common_name => 'testbox.openxpki.org:pkiclient'})
 );

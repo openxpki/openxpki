@@ -53,12 +53,21 @@ ok($response->is_success);
 my $json = JSON->new->decode($response->decoded_content);
 
 diag('Workflow Id ' . $json->{result}->{id} );
+is($json->{result}->{data}->{transaction_id}, $transaction_id , 'Transaction Id ');
+
 
 my $wf_id =  $json->{result}->{id};
 
-is($json->{result}->{state}, 'FAILURE');
+is($json->{result}->{state}, 'MANUAL_AUTHORIZATION');
 
-is($json->{result}->{data}->{transaction_id}, $transaction_id , 'Transaction Id ');
+my $client = TestCGI::factory('democa');
+my $result = $client->mock_request({
+    page => "workflow!load!id!$wf_id",
+});
+
+$result = $client->mock_request({
+    'action' => 'workflow!select!wf_action!enroll_reject_request!wf_id!' . $wf_id
+});
 
 $response = $ua->post('https://localhost/rpc/enroll', [
     method => 'RequestCertificate',
@@ -71,7 +80,7 @@ ok($response->is_success);
 
 $json = JSON->new->decode($response->decoded_content);
 is($wf_id,  $json->{result}->{id}, 'Pickup with same id');
-is($json->{result}->{data}->{error_code}, "Request was not authenticated");
+is($json->{result}->{data}->{error_code}, 'Request was rejected by an operator.');
 
 # pickup with text/plain
 
@@ -85,4 +94,4 @@ $response = $ua->post('https://localhost/rpc/enroll', [
 );
 ok($response->is_success);
 like($response->decoded_content,qr/id=$wf_id/);
-like($response->decoded_content,qr/data.error_code=I18N_OPENXPKI_UI_ENROLLMENT_ERROR_NOT_AUTHENTICATED/);
+like($response->decoded_content,qr/data.error_code=I18N_OPENXPKI_UI_ENROLLMENT_ERROR_REJECTED/);
