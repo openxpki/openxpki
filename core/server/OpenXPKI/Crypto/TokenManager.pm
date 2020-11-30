@@ -232,13 +232,13 @@ sub __add_token {
     }
 
     OpenXPKI::Exception->throw (
-        message  => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_NO_BACKEND_CLASS",
+        message  => "No backend class set for token $name",
         params => { TYPE => $type, NAME => $name, GROUP => $config_name_group}
     ) unless $backend_class;
 
     eval { Module::Load::autoload($backend_class); Module::Load::autoload($backend_api_class); };
     OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_FAILED_LOADING_BACKEND_CLASS",
+        message => "Unable to load backend class for token $name",
         params => { class_name => $backend_class, message => $@ }
     ) if $@;
 
@@ -271,13 +271,13 @@ sub __add_token {
         delete $self->{TOKEN}->{$realm}->{$type}->{$name}
             if (exists $self->{TOKEN}->{$realm}->{$type}->{$name});
         OpenXPKI::Exception->throw (
-            message  => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_CREATE_FAILED",
+            message  => "TokenManager failed to create token for $name",
             children => [ $exc ],
         );
     }
     elsif ($EVAL_ERROR) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_EVAL_ERROR',
+            message => "TokenManager failed to create token for $name",
             params => {
                 'EVAL_ERROR' => Dumper $EVAL_ERROR,
             }
@@ -288,7 +288,7 @@ sub __add_token {
         delete $self->{TOKEN}->{$realm}->{$type}->{$name}
             if (exists $self->{TOKEN}->{$realm}->{$type}->{$name});
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_ADD_TOKEN_INIT_FAILED",
+            message => "TokenManager failed to init token for $name",
         );
     }
 
@@ -314,7 +314,7 @@ sub __use_token {
     }
 
     ## the token must be present
-    OpenXPKI::Exception->throw(message => "I18N_OPENXPKI_CRYPTO_TOKENMANAGER_USE_TOKEN_NOT_PRESENT")
+    OpenXPKI::Exception->throw(message => "TokenManager failed to find token instance for $name")
         unless $instance;
 
     return $instance->login()
