@@ -102,17 +102,17 @@ sub init_structure {
         # (a sub{} allows using return instead of nested if-structures)
         my $wfdetails = sub {
             if (not exists $menu->{wfdetails}) {
-                $self->logger->warn('Config entry "wfdetails" is not defined, using defaults');
-                return '';
+                $self->logger->debug('Config entry "wfdetails" is not defined, using defaults');
+                return [];
             }
             my $result;
             unless ($result = $menu->{wfdetails}) {
-                $self->logger->info('Config entry "wfdetails" is set to "undef" to trigger defaults');
+                $self->logger->debug('Config entry "wfdetails" is set to "undef", hide from output');
                 return;
             }
             unless (ref $result eq 'ARRAY') {
                 $self->logger->warn('Config entry "wfdetails" is not an array');
-                return;
+                return [];
             }
             return $result;
         }->();
