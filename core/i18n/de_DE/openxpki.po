@@ -876,6 +876,9 @@ msgstr "Kann keinen Schlüssel ohne Passwort erstellen"
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "Nein"
 
+msgid "I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE"
+msgstr "Unter dieser Adresse ist keine Service eingerichtet."
+
 # Remove?
 msgid "I18N_OPENXPKI_UI_OOPS"
 msgstr "Oops, hier ist etwas schief gegangen"

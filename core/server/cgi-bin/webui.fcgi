@@ -237,8 +237,11 @@ while (my $cgi = CGI::Fast->new()) {
             if ($script_path =~ qq|\/([^\/]+)\$|) {
                 $script_realm = $1;
                 if (!$config{realm}{$script_realm}) {
-                    $log->fatal('No realm for ident: ' . $script_realm );
-                    die "Url based realm requested but no realm found for $script_realm!";
+                    $log->debug('No realm for ident: ' . $script_realm );
+                    __handle_error($cgi, 'I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE');
+                    $session_front->flush();
+                    $backend_client->detach();
+                    next;
                 }
                 $log->debug('detected realm is ' . $config{realm}{$script_realm});
 

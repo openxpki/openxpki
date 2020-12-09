@@ -873,6 +873,9 @@ msgstr "Unable to generate a key without a password"
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "No"
 
+msgid "I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE"
+msgstr "The requested URL has no service assigned."
+
 msgid "I18N_OPENXPKI_UI_OOPS"
 msgstr "Oops, something went wrong"
 
