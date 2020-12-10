@@ -251,6 +251,8 @@ sub execute {
         }
     }
 
+    ##! 32: \%where
+
     if ($join) {
         $sth = CTX('dbi')->select(
             from_join => 'certificate '.$join,
