@@ -695,7 +695,7 @@ msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_SECP384R1"
 msgstr "Curve secp384r1"
 
 msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_SECP521R1"
-msgstr "Curve sect521r1"
+msgstr "Curve secp521r1"
 
 msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_SECT571R1"
 msgstr "Curve sect571r1"
@@ -1023,6 +1023,9 @@ msgstr "Hostname"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC"
 msgstr "Enter the fully qualified hostname (domain name) of your system."
+
+msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_RESPONDER_LABEL"
+msgstr "OCSP Responder"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_OU_DESC"
 msgstr "Organizational Unit"

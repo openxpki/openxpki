@@ -1034,6 +1034,9 @@ msgstr "Servername"
 msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC"
 msgstr "Geben Sie bitte den FQDN (Hostname) des Systems an."
 
+msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_RESPONDER_LABEL"
+msgstr "OCSP Responder"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_OU_DESC"
 msgstr "Organisationseinheit (OU)"
 
