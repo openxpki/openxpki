@@ -28,6 +28,7 @@ sub _validate {
 
     if (!$cert) {
         ##! 16: 'unknown identifier ' . $cert_identifier
+        return if ($self->param('empty_ok'));
         validation_error("I18N_OPENXPKI_UI_VALIDATOR_CERT_IDENTIFIER_EXISTS_NO_SUCH_ID");
     }
 
@@ -108,6 +109,11 @@ The certificate identifier
 =head2 Parameter
 
 =over
+
+=item empty_ok
+
+Silently pass if no cert_identifier was given, useful when a workflow
+has an alternative way to pass the identifier, e.g. via PEM block.
 
 =item pki_realm
 
