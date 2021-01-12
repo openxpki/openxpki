@@ -14,7 +14,7 @@ use Try::Tiny;
 
 use OpenXPKI::DateTime;
 use OpenXPKI::Debug;
-
+use OpenXPKI::i18n qw( i18nTokenizer );
 
 has __default_grid_head => (
     is => 'rw',
@@ -661,8 +661,7 @@ sub init_result {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_LABEL',
             description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION' . $criteria ,
             breadcrumb => [
-                { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_LABEL', className => 'workflow-search',
- },
+                { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_LABEL', className => 'workflow-search' },
                 { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE', className => 'workflow-search-result' }
             ],
         });
@@ -701,6 +700,12 @@ sub init_result {
         push @buttons,{ label => 'I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH',
             page => 'workflow!search',
             format => 'failure'};
+
+        push @buttons, { label => 'I18N_OPENXPKI_UI_SEARCH_EXPORT_RESULT',
+            href => $self->_client()->_config()->{'scripturl'} . '?page=workflow!export!id!'.$queryid,
+            target => '_blank',
+            format => 'optional'
+            };
     }
 
     $self->add_section({
@@ -722,6 +727,96 @@ sub init_result {
     });
 
     return $self;
+
+}
+
+=head2 init_export
+
+Like init_result but send the data as CSV download, default limit is 500!
+
+=cut
+
+sub init_export {
+
+    my $self = shift;
+    my $args = shift;
+
+    my $queryid = $self->param('id');
+
+    my $limit = $self->param('limit') || 500;
+    my $startat = $self->param('startat') || 0;
+
+    # Safety rule
+    if ($limit > 500) {  $limit = 500; }
+
+    # Load query from session
+    my $result = $self->_client->session()->param('query_wfl_'.$queryid);
+
+    # result expired or broken id
+    if (!$result || !$result->{count}) {
+        $self->set_status('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY','error');
+        return $self->init_search();
+    }
+
+    # Add limits
+    my $query = $result->{query};
+    $query->{limit} = $limit;
+    $query->{start} = $startat;
+
+    if (!$query->{order}) {
+        $query->{order} = 'workflow_id';
+        if (!defined $query->{reverse}) {
+            $query->{reverse} = 1;
+        }
+    }
+
+    $self->logger()->trace( "persisted query: " . Dumper $result) if $self->logger->is_trace;
+
+    my $search_result = $self->send_command_v2( 'search_workflow_instances', $query );
+
+    $self->logger()->trace( "search result: " . Dumper $search_result) if $self->logger->is_trace;
+
+    my $header = $result->{header};
+    $header = $self->__default_grid_head() if(!$header);
+
+    my @head;
+    my @cols;
+
+    my $ii = 0;    
+    foreach my $col (@{$header}) {
+        # skip hidden fields
+        if ((!defined $col->{bVisible} || $col->{bVisible}) && $col->{sTitle} !~ /\A_/)  {
+            push @head, $col->{sTitle};
+            push @cols, $ii;
+        }
+        $ii++;
+    }
+
+    my $buffer = join("\t", @head)."\n";
+
+    my $body = $result->{column};
+    $body = $self->__default_grid_row() if(!$body);
+
+    my @lines = $self->__render_result_list( $search_result, $body );
+    my $colcnt = scalar @head - 1;
+    foreach my $line (@lines) {
+        my @t = @{$line};
+        # this hides invisible fields (assumes that hidden fields are always at the end)
+        $buffer .= join("\t", @t[0..$colcnt])."\n" 
+    }    
+
+    if (scalar @{$search_result} == $limit) {
+        $buffer .= "I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT"."\n";
+    }
+
+    print $self->cgi()->header(
+        -type => 'text/tab-separated-values',
+        -expires => "1m",
+        -attachment => "workflow export " . DateTime->now()->iso8601() .  ".txt"
+    );
+    
+    print i18nTokenizer($buffer);
+    exit;
 
 }
 
