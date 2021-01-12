@@ -21,9 +21,7 @@ sub evaluate {
     my $reason_code = $context->param('reason_code') || '';
     my $pki_realm   = CTX('session')->data->pki_realm;
 
-    OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_IDENTIFIER_MISSING',
-    ) unless $identifier;
+    configuration_error('You need to have cert_identifier in context or set it via the parameters') unless $identifier;
 
     my $cert = CTX('dbi')->select_one(
         from => 'certificate',
@@ -34,11 +32,11 @@ sub evaluate {
         }
     );
 
+    configuration_error('The given cert_identifier does not match any certificate') unless($cert);
+
     CTX('log')->application()->debug("Cert status is ".$cert->{status});
 
-
     ##! 16: 'status: ' . $cert->{'STATUS'}
-
     condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_CERTIFICATE_NOT_YET_REVOKED_CERT_IN_STATE_CRL_ISSUANCE_PENDING'
         if ('CRL_ISSUANCE_PENDING' eq $cert->{status});
 

@@ -67,6 +67,8 @@ sub _evaluate {
         condition_error('nice no useable ca token found');
     }
 
+    return 1;
+
 }
 
 1;

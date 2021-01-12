@@ -10,7 +10,6 @@ use Workflow::Exception qw( condition_error configuration_error );
 
 sub evaluate {
     condition_error("I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_ALWAYS_FALSE");
-    return 1;
 }
 
 1;

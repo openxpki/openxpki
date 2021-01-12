@@ -25,7 +25,7 @@ sub _evaluate
     if ($res==0) {
         condition_error("No user was found for the given search criteria");
     }
-    return 0;
+    return 1;
 }
 
 1;
