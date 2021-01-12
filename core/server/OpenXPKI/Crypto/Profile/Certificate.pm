@@ -120,6 +120,7 @@ sub __load_profile
         DIGEST => 'sha256',
         INCREASING_SERIALS => 1,
         RANDOMIZED_SERIAL_BYTES => 8,
+        STRING_MASK => 'utf8only',
     };
 
     ## check if those are overriden in config
@@ -260,6 +261,12 @@ sub get_digest
 {
     my $self = shift;
     return $self->{PROFILE}->{DIGEST};
+}
+
+sub get_string_mask
+{
+    my $self = shift;
+    return $self->{PROFILE}->{STRING_MASK};
 }
 
 sub set_subject

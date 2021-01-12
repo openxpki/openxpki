@@ -347,7 +347,7 @@ sub __get_ca
                "policy            = dn_policy\n".
                "name_opt          = RFC2253,-esc_msb\n".
                "utf8              = yes\n".
-               "string_mask       = utf8only\n".
+               "string_mask       = ".$self->{PROFILE}->get_string_mask()."\n".
                "\n";
 
     # add the copy_extensions only if set, this prevents adding it to the CRL config
