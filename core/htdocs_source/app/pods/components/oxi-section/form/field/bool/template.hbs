@@ -3,7 +3,7 @@
         <input
             type="checkbox"
             checked={{@content.value}}
-            {{on "input" this.onInput}}
+            {{on "change" this.onInput}}
             {{did-insert (fn @mayFocus false)}}
         />
         {{@content.label}}
