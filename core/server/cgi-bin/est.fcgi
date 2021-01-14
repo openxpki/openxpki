@@ -117,7 +117,7 @@ while (my $cgi = CGI::Fast->new()) {
             $log->info("EST authenticated client DN: $auth_dn");
 
             if ($envkeys{'signer_dn'}) {
-                $param->{'signer_cert'} = $auth_dn;
+                $param->{'signer_dn'} = $auth_dn;
             }
             if ($auth_pem && $envkeys{'signer_cert'}) {
                 $param->{'signer_cert'} = $auth_pem;
