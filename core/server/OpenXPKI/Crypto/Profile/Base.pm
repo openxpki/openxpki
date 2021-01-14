@@ -559,6 +559,13 @@ sub get_named_extensions
     return grep /[^(\d+\.)]/, keys %{$self->{PROFILE}->{EXTENSIONS}};
 }
 
+# string_mask has no effect in CRL but is required to properly build the config
+sub get_string_mask
+{
+    my $self = shift;
+    return $self->{PROFILE}->{STRING_MASK} || 'utf8only';
+}
+
 =head2 create_random_serial
 
 Generate a random serial number (ID) and return it as a L<Math::BigInt> object.

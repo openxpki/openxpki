@@ -263,12 +263,6 @@ sub get_digest
     return $self->{PROFILE}->{DIGEST};
 }
 
-sub get_string_mask
-{
-    my $self = shift;
-    return $self->{PROFILE}->{STRING_MASK};
-}
-
 sub set_subject
 {
     my $self = shift;
