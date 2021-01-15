@@ -35,7 +35,7 @@ export default class OxiDownloadComponent extends Component {
     }
 
     get label() {
-        return this.isLink ? this.url : this.fileName;
+        return this.fileName ? this.fileName : this.url;
     }
 
     constructor() {

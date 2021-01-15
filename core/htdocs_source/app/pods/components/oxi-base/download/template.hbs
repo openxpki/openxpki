@@ -11,12 +11,12 @@
             </div>
         </div>
         <div class="col-md-4">
-            {{#unless this.isLink}}
+            {{#if this.isPlain}}
                 <button class="btn btn-default" {{on "click" this.copyToClipboard}}>
                     <i class="glyphicon glyphicon-copy"></i>
                     {{t 'component.oxi_download.copy'}}
                 </button>
-            {{/unless}}
+            {{/if}}
         </div>
     {{/unless}}
 </div>

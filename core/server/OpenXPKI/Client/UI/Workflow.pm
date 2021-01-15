@@ -11,7 +11,7 @@ use Log::Log4perl::MDC;
 use Date::Parse;
 use YAML::Loader;
 use Try::Tiny;
-
+use MIME::Base64;
 use OpenXPKI::DateTime;
 use OpenXPKI::Debug;
 use OpenXPKI::i18n qw( i18nTokenizer );
@@ -1242,8 +1242,9 @@ sub action_index {
         $self->__purge_wf_token( $wf_token );
 
         # always redirect after create to have the url pointing to the created workflow
-        # do not redirect for "one shot workflows"
-        $wf_args->{redirect} = ($wf_info->{workflow}->{id} > 0);
+        # do not redirect for "one shot workflows" or workflows already in a final state
+        # as they might hold volatile data (e.g. key download)
+        $wf_args->{redirect} = ($wf_info->{workflow}->{id} > 0 && ($wf_info->{workflow}->{proc_state} ne 'finished'));
 
     } else {
         $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION!','error');
@@ -2802,10 +2803,9 @@ sub __render_fields {
             next FIELD;
         }
 
-        # Always suppress key material
-        if ($item->{value} =~ /-----BEGIN[^-]*PRIVATE KEY-----/) {
+        # Suppress key material, exceptions are vollatile and download fields
+        if ($item->{value} =~ /-----BEGIN[^-]*PRIVATE KEY-----/ && $item->{format} ne 'download' && substr($key,0,1) ne '_') {
             $item->{value} = 'I18N_OPENXPKI_UI_WORKFLOW_SENSITIVE_CONTENT_REMOVED_FROM_CONTEXT';
-
         }
 
         # Label, Description, Tooltip
@@ -2916,46 +2916,94 @@ sub __render_fields {
         # create a link to download the given filename
         } elsif ($item->{format} =~ m{ \A download(\/([\w_\/-]+))? }xms ) {
 
+            # legacy - format is "download/mime/type"
             my $mime = $2 || 'application/octect-stream';
+            $item->{format} = 'download';
 
-            $item->{format} = 'extlink';
+            # value is empty
+            next FIELD unless($item->{value});
 
-            my $label;
-            my $basename;
-            my $source;
+            # parameters given in the field definition
+            my $param = $field->{param} || {};
 
-            if (ref $item->{value}) {
-                my $t = $item->{value};
-                $label = $t->{label} || 'I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD';
+            # Arguments for the UI field
+            # label => STR           # text above the download field
+            # type => "plain" | "base64" | "link",  # optional, default: "plain"
+            # data => STR,           # plain data, Base64 data or URL
+            # mimetype => STR,       # optional: mimetype passed to browser
+            # filename => STR,       # optional: filename, default: depends on data
+            # autodownload => BOOL,  # optional: set to 1 to auto-start download
+            # hide => BOOL,          # optional: set to 1 to hide input and buttons (requires autodownload)
 
-                # Fallback for legacy config
-                if (!$t->{source} && $t->{file}) {
-                     $source = "file:".$t->{file};
+            my $vv = $item->{value};
+            # scalar value
+            if (!ref $vv) {
+                # if an explicit filename is set, we assume it is v3.10 or
+                # later so we assume the value is the data and config is in
+                # the field parameters
+                if ($param->{filename}) {
+                    $vv = { filename => $param->{filename}, data => $vv };
+                } else {
+                    $vv = { filename => $vv, source => 'file:'.$vv };
                 }
-                $source = $t->{source};
-                $basename = $t->{filename} if ($t->{filename});
-                $mime = $t->{mime} if ($t->{mime});
-            } elsif ($item->{value}) {
-                $label = $item->{value};
-                $source = "file:".$item->{value};
+            }
+
+            # very old legacy format where file was given without source
+            if ($vv->{file}) {
+                $vv->{source} = "file:".$vv->{file};
+                $vv->{filename} = $vv->{file} unless($vv->{filename});
+                delete $vv->{file};
+            }
+
+            # merge items from field param
+            $self->logger()->info(Dumper [ $vv, $param ]);
+            map { $vv->{$_} ||= $param->{$_}  } ('mime','label','binary','hide','auto','filename');
+
+            # guess filename from a file source
+            if (!$vv->{filename} && $vv->{source} && $vv->{source} =~ m{ file:.*?([^\/]+(\.\w+)?) \z }xms) {
+                $vv->{filename} = $1;
+            }
+
+            # set mime to default / from format
+            $vv->{mime} ||= $mime;
+
+            # we have an external source so we need a link
+            if ($vv->{source}) {
+                 my $target = $self->__persist_response({
+                    source => $vv->{source},
+                    attachment =>  $vv->{filename},
+                    mime => $vv->{mime}
+                });
+                $item->{value}  = {
+                    label => 'I18N_OPENXPKI_UI_CLICK_TO_DOWNLOAD',
+                    type => 'link',
+                    filename => $vv->{filename},
+                    data => $self->_client()->_config()->{'scripturl'} . "?page=".$target,
+                };
             } else {
-                next FIELD;
+                my $type;
+                # payload is binary, so encode it and set type to base64
+                if ($vv->{binary}) {
+                    $type = 'base64';
+                    $vv->{data} = encode_base64($vv->{data}, '');
+                } elsif ($vv->{base64}) {
+                    $type = 'base64';
+                }
+                $item->{value}  = {
+                    label=> $vv->{label},
+                    mimetype => $vv->{mime},
+                    filename => $vv->{filename},
+                    type => $type,
+                    data => $vv->{data},
+                };
             }
 
-            if (!$basename && $source =~ m{ file:.*?([^\/]+(\.\w+)?) \z }xms) {
-               $basename = $1;
+            if ($vv->{hide}) {
+                $item->{value}->{autodownload} = 1;
+                $item->{value}->{hide} = 1;
+            } elsif ($vv->{auto}) {
+                $item->{value}->{autodownload} = 1;
             }
-
-            my $target = $self->__persist_response({
-                source => $source,
-                attachment =>  $basename,
-                mime => $mime
-            });
-
-            $item->{value}  = {
-                label => $label,
-                page => $self->_client()->_config()->{'scripturl'} . "?page=".$target
-            };
 
         # format for cert_info block
         } elsif ($item->{format} eq "cert_info") {

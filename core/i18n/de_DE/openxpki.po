@@ -3615,9 +3615,10 @@ msgstr "Schlüsselexport fehlgeschlagen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_DESC"
 msgstr ""
-"Klicken Sie auf den untenstehenden Link um die erstellte Exportdatei "
-"herunterzuladen. Bitte beachten Sie, daß der Link nur innerhalb dieses "
-"Browserfensters gültig ist und in 60 Sekunden ungültig wird."
+"Der Download der Exportdatei sollte in Kürze automatisch starten, für PEM "
+"kodierte Formate können Sie auch den Schlüssel direkt in die Zwischenablage "
+"kopieren. Beachten Sie bitte dass die Exportdaten beim Verlassen der Seite "
+"gelöscht werden!"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_LABEL"
 msgstr "SUCCESS"

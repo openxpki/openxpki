@@ -3414,9 +3414,9 @@ msgstr "Unable to load Key"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_DESC"
 msgstr ""
-"Click on the link below to download your certificate/key bundle. Note that "
-"this link will only work from within this browser window and become invalid "
-"after 60 seconds."
+"Download of your export will start shortly, for PEM encoded key material "
+"you also use the button to copy the data to your clipboard. Note that the "
+"download option will disappear when you leave this page."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_LABEL"
 msgstr "SUCCESS"
