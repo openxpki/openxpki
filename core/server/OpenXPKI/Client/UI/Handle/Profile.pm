@@ -312,7 +312,7 @@ sub render_server_password {
 
     # record the workflow info in the session
     push @fields, $self->__register_wf_token($wf_info, {
-        wf_action =>  (keys %{$wf_info->{activity}})[0],
+        wf_action =>  $wf_action,
         wf_fields => \@fields,
         cert_profile => $context->{cert_profile}
     });
