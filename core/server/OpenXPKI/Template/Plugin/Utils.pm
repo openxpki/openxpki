@@ -7,7 +7,7 @@ use utf8;
 use Moose;
 use Net::DNS;
 use Template::Plugin;
-
+use MIME::Base64;
 use Data::Dumper;
 
 extends 'Template::Plugin';
@@ -70,5 +70,18 @@ sub ascii_to_hex {
 
 }
 
+=head3 to_base64 ( text )
+
+Encode the given (binary) data using Base64 encoding, output is without
+linebreaks or spaces.
+
+=cut
+
+sub to_base64 {
+
+    my $self = shift;
+    my $string = shift;
+    return MIME::Base64::encode_base64($string, '');
+}
 
 1;
