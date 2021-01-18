@@ -105,9 +105,6 @@ sub execute_activity {
     my ($self, $wf, $activity, $async, $wait) = @_;
     ##! 2: 'execute activity ' . $activity
 
-    Log::Log4perl::MDC->put('wfid', $wf->id());
-    Log::Log4perl::MDC->put('wftype', $wf->type());
-
     # ASYNCHRONOUS - fork
     if ($async) {
         $self->_execute_activity_async($wf, $activity); # returns the background process PID
@@ -120,6 +117,10 @@ sub execute_activity {
     }
     # SYNCHRONOUS
     else {
+
+        Log::Log4perl::MDC->put('wfid', $wf->id());
+        Log::Log4perl::MDC->put('wftype', $wf->type());
+
         $self->_execute_activity_sync($wf, $activity); # modifies the $workflow object (and so $updated_workflow)
         return $wf;
     }
@@ -243,6 +244,9 @@ sub _execute_activity_async {
         $log->trace("Forked process with PID $pid for workflow execution") if $log->is_trace;
         return $pid;
     }
+
+    Log::Log4perl::MDC->put('wfid', $workflow->id());
+    Log::Log4perl::MDC->put('wftype', $workflow->type());
 
     # child process
     try {
