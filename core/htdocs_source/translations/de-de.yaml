@@ -49,4 +49,4 @@ component:
     download: "Herunterladen"
     copy: "Kopieren"
   oxi_code:
-    copy: "Doppelklick kopiert in die Zwischenablage"
+    copy: "Doppelklick markiert gesamten Text"

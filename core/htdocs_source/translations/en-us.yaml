@@ -49,4 +49,4 @@ component:
     download: "Download"
     copy: "Copy"
   oxi_code:
-    copy: "Doubleclick to copy to clipboard"
+    copy: "Double-click to select all text"

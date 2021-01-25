@@ -403,7 +403,7 @@ export default class TestController extends Controller {
                 {
                     "format": "code",
                     "label": "code",
-                    "value": "console.log('Hello world');",
+                    "value": "console.log('Hello world');\nArray.isArray([yep:'I_am'])",
                 },
                 {
                     "format": "asciidata",

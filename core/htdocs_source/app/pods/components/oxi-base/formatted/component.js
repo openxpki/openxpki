@@ -32,9 +32,21 @@ export default class OxiFormattedComponent extends Component {
     }
 
     @action
-    copyToClipboard(/*event*/) {
-        copy(this.args.value, { target: this.baseElement });
-        /* eslint-disable-next-line no-console */
-        console.info("Contents copied to clipboard");
+    onInsertCode(element) {
+        this.codeElement = element;
     }
+
+    @action
+    selectCode() {
+        if (window.getSelection) {
+            const selection = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(this.codeElement);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        } else {
+            console.warn("Could not select text: Unsupported browser");
+        }
+    }
+
 }
