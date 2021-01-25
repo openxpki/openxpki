@@ -15,7 +15,7 @@
     {{else if (eq this.format "nl2br")}}
         {{#each this.valueSplitByNewline as |line|}} {{line}}<br> {{/each}}
     {{else if (eq this.format "code")}}
-        <code>{{this.valueStr}}</code>
+        <code title="{{t 'component.oxi_code.copy'}}" {{on "dblclick" this.copyToClipboard}}>{{this.valueStr}}</code>
     {{else if (eq this.format "asciidata")}}
         <div class="hover-element">
             <pre class="content pre-scrollable">{{this.valueStr}}</pre>

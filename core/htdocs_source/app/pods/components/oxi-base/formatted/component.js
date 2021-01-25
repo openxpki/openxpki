@@ -1,5 +1,8 @@
 import Component from '@glimmer/component';
 import moment from "moment-timezone";
+import { action } from '@ember/object';
+import copy from 'copy-text-to-clipboard';
+
 
 export default class OxiFormattedComponent extends Component {
     get format() {
@@ -26,5 +29,12 @@ export default class OxiFormattedComponent extends Component {
             style: m[2],
             label: m[3],
         };
+    }
+
+    @action
+    copyToClipboard(/*event*/) {
+        copy(this.args.value, { target: this.baseElement });
+        /* eslint-disable-next-line no-console */
+        console.info("Contents copied to clipboard");
     }
 }

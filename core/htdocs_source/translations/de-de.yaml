@@ -48,3 +48,5 @@ component:
   oxi_download:
     download: "Herunterladen"
     copy: "Kopieren"
+  oxi_code:
+    copy: "Doppelklick kopiert in die Zwischenablage"
