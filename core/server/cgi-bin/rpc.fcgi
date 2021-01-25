@@ -20,13 +20,25 @@ use OpenXPKI::i18n qw( i18nGettext i18nTokenizer );
 use Log::Log4perl;
 use Log::Log4perl::MDC;
 
-our $config = OpenXPKI::Client::Config->new('rpc');
-my $log = $config->logger();
-
-$log->info("RPC handler initialized");
+our $config;
+my $log;
 
 my $json = new JSON();
 my $use_status_codes = 0;
+
+eval {
+    $config = OpenXPKI::Client::Config->new('rpc');
+    $log = $config->logger();
+};
+
+if ($EVAL_ERROR) {
+    my $cgi = CGI::Fast->new();
+    print $cgi->header( -type => 'application/json', charset => 'utf8', -status => '500 Client Connect Failed' );
+    print $json->encode( { error => { code => 50000, message => 'Unable to fetch configuration from server - connect failed' } } );
+    die "Client Connect Failed: $EVAL_ERROR";
+}
+
+$log->info("RPC handler initialized");
 
 sub send_output {
     my ($cgi, $result, $canonical_keys) = @_;

@@ -132,7 +132,7 @@ before '_route_call' => sub {
 
     ##! 16: "_route_call interception on $location "
     # system or realm acces - no prefix
-    if ( substr ($location, 0, 6) eq 'system' || substr($location, 0, 5) eq 'realm') {
+    if ( substr ($location, 0, 6) eq 'system' || substr($location, 0, 5) eq 'realm' || substr($location, 0, 8) eq 'endpoint') {
         ##! 16: "_route_call: system or explicit realm value, reset connector offsets"
         $self->PREFIX('');
     } elsif (substr($location, 0, 11) eq "credentials" && $self->credential_backend()) {

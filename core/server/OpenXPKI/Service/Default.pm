@@ -110,6 +110,7 @@ sub __is_valid_message : PRIVATE {
             'CONTINUE_SESSION',
             'NEW_SESSION',
             'DETACH_SESSION',
+            'GET_ENDPOINT_CONFIG',
         ],
         'SESSION_ID_SENT' => [
             'PING',
@@ -651,6 +652,35 @@ sub __handle_STATUS : PRIVATE {
         },
     };
 }
+
+
+sub __handle_GET_ENDPOINT_CONFIG : PRIVATE {
+    ##! 1: 'start'
+    my $self    = shift;
+    my $ident   = ident $self;
+    my $msg = shift;
+    my $interface = $msg->{PARAMS}->{interface};
+    my $endpoint = $msg->{PARAMS}->{endpoint};
+
+    my $res;
+    ##! 64: Dumper $msg->{PARAMS}
+    if (!$interface) {
+        # nothing given. list configured interfaces/services
+        $res = { INTERFACE => [ CTX('config')->get_keys(['endpoint']) ] };
+    } elsif (!$endpoint) {
+        # default config plus names of all endpoints for given interface
+        $res = {
+            CONFIG =>   CTX('config')->get_hash(['endpoint', $interface, 'default' ]),
+            ENDPOINT => [ CTX('config')->get_keys(['endpoint', $interface ]) ],
+        };
+    } else {
+        # endpoint configuration
+        $res = { CONFIG => CTX('config')->get_hash(['endpoint', $interface, $endpoint ]) }
+    }
+    ##! 128: $res
+    return { PARAMS => $res };
+}
+
 
 sub __handle_COMMAND : PRIVATE {
     ##! 1: 'start'

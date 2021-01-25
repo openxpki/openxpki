@@ -64,6 +64,7 @@ use File::Spec;
 use OpenXPKI::Log4perl;
 use Data::Dumper;
 use Config::Std;
+use OpenXPKI::Client;
 use OpenXPKI::i18n qw( set_language set_locale_prefix);
 
 has 'service' => (
@@ -125,6 +126,17 @@ has language => (
     },
 );
 
+has 'client' => (
+    required => 0,
+    is => 'rw',
+    isa => 'OpenXPKI::Client',
+    lazy => 1,
+    predicate => "has_client",
+    default => sub {
+        return OpenXPKI::Client->new( socketfile => '/var/openxpki/openxpki.socket' );
+    }
+);
+
 
 # this allows a constructor with the service as scalar
 around BUILDARGS => sub {
@@ -155,6 +167,13 @@ sub BUILD {
     }
 
     my $config = $self->default();
+
+    if ($config->{global}->{locale_directory}) {
+        set_locale_prefix($config->{global}->{locale_directory});
+    }
+    if ($config->{global}->{default_language}) {
+        $self->language($config->{global}->{default_language});
+    }
 
     $self->logger()->debug(sprintf('Config for service %s loaded', $self->service()));
     $self->logger()->trace('Global config: ' . Dumper $config ) if $self->logger->is_trace;
@@ -200,13 +219,22 @@ sub __init_default {
     # in case an explicit script name is set, we do NOT use the default.conf
     my $service = $self->service();
     my $env_file = 'OPENXPKI_'.uc($service).'_CLIENT_CONF_FILE';
+    my $env_socket = 'OPENXPKI_'.uc($service).'_CLIENT_CONF_SOCKET';
 
     my $configfile;
-    if ($ENV{$env_file}) {
+    if (my $conf_socket = $ENV{$env_socket}) {
+        my $client = OpenXPKI::Client->new( socketfile => $conf_socket );
+        $self->client($client);
+        my $reply = $client->send_receive_service_msg('GET_ENDPOINT_CONFIG', { 'interface' => $service });
+        die "Unable to fetch endpoint default configuration from backend" unless (ref $reply->{PARAMS});
+        return $reply->{PARAMS}->{CONFIG};
+
+    } elsif ($ENV{$env_file}) {
         -f $ENV{$env_file}
             || die sprintf "Explicit config file not found (%s, from env %s)", $ENV{$env_file}, $env_file;
 
         $configfile = $ENV{$env_file};
+
     } else {
         $configfile = File::Spec->catfile( ( ($self->basepath), 'default.conf' ) );
     }
@@ -218,14 +246,6 @@ sub __init_default {
 
     # cast to an unblessed hash
     my %config = %{$config};
-
-    if ($config{global}{locale_directory}) {
-        set_locale_prefix($config{global}{locale_directory});
-    }
-    if ($config{global}{default_language}) {
-        $self->language($config{global}{default_language});
-    }
-
     return \%config;
 
 }
@@ -288,6 +308,15 @@ sub load_config {
     my $configfile = '';
 
     if (!$file && $self->endpoint()) {
+        # config via socket
+           if ($self->has_client()) {
+            $self->logger()->debug('Autodetect config for service ' . $self->service() . ' via socket ');
+            my $reply = $self->client()->send_receive_service_msg('GET_ENDPOINT_CONFIG',
+                { 'interface' => $self->service(), endpoint => $self->endpoint() });
+            die "Unable to fetch endpoint default configuration from backend" unless (ref $reply->{PARAMS});
+            return $reply->{PARAMS}->{CONFIG};
+        }
+
         $file = $self->endpoint().'.conf';
     }
 
