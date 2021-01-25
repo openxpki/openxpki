@@ -1,8 +1,8 @@
 // configuration for ember-template-lint, called via 'npm run lint:hbs'
 module.exports = {
-  extends: 'recommended',
+  extends: 'octane',
 
   rules: {
     'no-bare-strings': true,
   }
-}
+};
