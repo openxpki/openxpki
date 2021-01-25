@@ -111,9 +111,14 @@ sub openapi_spec {
     my $openapi_server_url = shift;
     my $conf = $self->config()->config();
 
+    my $info = { title => "OpenXPKI RPC API" };
+    if (my $api_info = $conf->{openapi}) {
+        $info = { %$info, %$api_info };
+    }
+
     my $openapi_spec = {
         openapi => "3.0.0",
-        info => { title => "OpenXPKI RPC API", version => "0.0.1", description => "Run a defined set of OpenXPKI workflows" },
+        info => $info,
         servers => [ { url => $openapi_server_url, description => "OpenXPKI server" } ],
         components => {
             schemas => {
@@ -144,6 +149,11 @@ sub openapi_spec {
     my $paths;
     eval {
         my $client = $self->backend() or die "Could not create OpenXPKI client";
+
+        if (!$openapi_spec->{info}->{version}) {
+            my $server_version = $client->run_command('version');
+            $openapi_spec->{info}->{version} = $server_version->{config}->{api} || 'unknown';
+        }
 
         for my $method (sort keys %$conf) {
             next unless ($conf->{$method}->{workflow});
