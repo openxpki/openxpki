@@ -20,9 +20,9 @@ class Field {
     // clonable fields:
     clonable;
     max;
-    @tracked _canDelete;
-    @tracked _canAdd;
-    @tracked _focusClone = false; // internal use: initially focus clone after adding (done in oxifield-main)
+    @tracked _canDelete; // needs to be tracked because it's updated after the field list
+    @tracked _canAdd;    // needs to be tracked because it's updated after the field list
+    _focusClone = false; // initially focus clone after adding (done in setFocusInfo() below after callback by oxisection/form/field)
     // dynamic input fields:
     keys;
     // oxifield-datetime:
@@ -75,7 +75,7 @@ export default class OxiSectionFormComponent extends Component {
 
     clonableRefNames = [];
     focusFeedback = {}; // gets filled with the field feedback if they may receive the focus
-    focusFeedbackComplete = false;
+    initialFocussingDone = false;
 
     constructor() {
         super(...arguments);
@@ -146,15 +146,12 @@ export default class OxiSectionFormComponent extends Component {
             let clones = this.fields.filter(f => f._refName === name);
             for (const clone of clones) {
                 clone._canDelete = true;
-                clone._canAdd = clones[0].max ? clones.length < clones[0].max : 1;
+                clone._canAdd = clones[0].max ? clones.length < clones[0].max : true;
             }
             if (clones.length === 1) {
                 clones[0]._canDelete = false;
             }
         }
-        // for unknown reasons we need to trigger an update since this._updateCloneFields()
-        // was inserted into addClone() and delClone()
-        this.fields = this.fields;
     }
 
     get uniqueFieldNames() {
@@ -172,21 +169,19 @@ export default class OxiSectionFormComponent extends Component {
     @action
     addClone(field) {
         if (field._canAdd === false) return;
-        let fields = this.fields;
-        let index = fields.indexOf(field);
+        let index = this.fields.indexOf(field);
         let fieldCopy = field.clone();
         fieldCopy.value = "";
         fieldCopy._focusClone = true;
-        fields.insertAt(index + 1, fieldCopy);
+        this.fields.insertAt(index + 1, fieldCopy);
         this._updateCloneFields();
     }
 
     @action
     delClone(field) {
         if (field._canDelete === false) return;
-        let fields = this.fields;
-        let index = fields.indexOf(field);
-        fields.removeAt(index);
+        let index = this.fields.indexOf(field);
+        this.fields.removeAt(index);
         this._updateCloneFields();
     }
 
@@ -284,9 +279,31 @@ export default class OxiSectionFormComponent extends Component {
         return this.args.def.fields.filter(f => f.type !== "hidden").length;
     }
 
+    /*
+    Sub components of oxi-section/form/field should call this by using the
+    modifier
+      {{may-focus this true}} or
+      {{may-focus this false}}
+    depending on if it is an editable input field that may sensibly receive
+    the focus.
+    If it is editable, {{may-focus...}} has to be attached to the DOM element
+    that shall receive the input focus.
+    */
     @action
-    fieldMayFocus(field, mayFocus, element) { // 'field' is injected in our template via (fn ...)
-        if (this.focusFeedbackComplete) return;
+    setFocusInfo(field, mayFocus, element) { // 'field' is injected in our template via (fn ...)
+        /*
+         * A) Focus for newly added clone fields
+         */
+        if (mayFocus && field._focusClone) {
+            element.focus();
+            field._focusClone = false;
+            return;
+        }
+
+        /*
+         * B) Initial form rendering focus
+         */
+        if (this.initialFocussingDone) return;
 
         // store DOM element if component may receive focus
         // (NOTE: clone fields just "overwrite" the hash key with the same value)
@@ -304,7 +321,7 @@ export default class OxiSectionFormComponent extends Component {
             debug(`oxi-section/form (${this.args.def.action}): we are not the first form - NOT setting focus`);
             return;
         }
-        this.focusFeedbackComplete = true;
+        this.initialFocussingDone = true;
         for (const field of this.visibleFields) {
             if (this.focusFeedback[field._refName] !== null) {
                 debug(`oxi-section/form (${this.args.def.action}): first focusable field: ${field._refName}`);

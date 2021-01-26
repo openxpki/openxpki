@@ -64,20 +64,7 @@ export default class OxiFieldMainComponent extends Component {
         if (event.keyCode === 9 && this.field.clonable && this.field.value !== null && this.field.value !== "") {
             event.stopPropagation();
             event.preventDefault();
-            this.args.addClone(this.args.field);
+            this.addClone();
         }
-    }
-
-    // The sub component should call this by using the modifier
-    //   {{may-focus this true}} or
-    //   {{may-focus this false}}
-    // depending on if it is an editable input field that may sensibly receive
-    // the focus.
-    // If it is editable, {{may-focus...}} has to be attached to the element
-    // that shall receive the input focus.
-    @action
-    mayFocus(mayFocus, element) {
-        if (mayFocus && this.field._focusClone) element.focus();
-        this.args.fieldMayFocus(mayFocus, element);
     }
 }
