@@ -7,41 +7,42 @@ import { inject as service } from '@ember/service';
 import { debug } from '@ember/debug';
 
 class Field {
-    @tracked type;
-    @tracked name;
-    @tracked _refName; // internal use: original name, needed for dynamic input fields where 'name' can change
-    @tracked value;
-    @tracked label;
-    @tracked is_optional;
-    @tracked tooltip;
-    @tracked placeholder;
-    @tracked actionOnChange;
+    type;
+    name;
+    _refName; // internal use: original name, needed for dynamic input fields where 'name' can change
+    value;
+    label;
+    is_optional;
+    tooltip;
+    placeholder;
+    actionOnChange;
     @tracked error;
     // clonable fields:
-    @tracked clonable;
-    @tracked max;
+    clonable;
+    max;
     @tracked _canDelete;
     @tracked _canAdd;
     @tracked _focusClone = false; // internal use: initially focus clone after adding (done in oxifield-main)
     // dynamic input fields:
-    @tracked keys;
+    keys;
     // oxifield-datetime:
-    @tracked timezone;
+    timezone;
     // oxifield-select:
-    @tracked options;
-    @tracked prompt;
-    @tracked editable;
+    options;
+    prompt;
+    editable;
     // oxifield-static
-    @tracked verbose;
+    verbose;
 
     static fromHash(sourceHash) {
         let instance = new this(); // "this" in static methods refers to class
         for (const attr of Object.keys(sourceHash)) {
-            if (! this.prototype.hasOwnProperty(attr)) {
+            // @tracked properties are prototype properties, the others instance properties
+            if (! (this.prototype.hasOwnProperty(attr) || instance.hasOwnProperty(attr))) {
                 /* eslint-disable-next-line no-console */
                 console.error(
-                    `oxi-section/form (${this.args.def.action}): unknown property "${attr}" in field "${sourceHash.name}". ` +
-                    `If it's a new property, please add it to class 'Field' defined in ../oxi-section/form (${this.args.def.action})/component.js.`
+                    `oxi-section/form: unknown property "${attr}" in field "${sourceHash.name}". ` +
+                    `If it's a new property, please add it to class 'Field' defined in app/pod/components/oxi-section/form/component.js`
                 );
             }
             else {
@@ -53,13 +54,15 @@ class Field {
 
     clone() {
         let field = new Field();
-        Object.keys(Object.getPrototypeOf(this)).forEach(k => field[k] = this[k]);
+        Object.keys(Object.getPrototypeOf(this)).forEach(k => field[k] = this[k]); // @tracked properties
+        Object.keys(this).forEach(k => field[k] = this[k]);                        // public class properties
         return field;
     }
 
     toPlainHash() {
         let hash = {};
-        Object.keys(Object.getPrototypeOf(this)).forEach(k => hash[k] = this[k]);
+        Object.keys(Object.getPrototypeOf(this)).forEach(k => hash[k] = this[k]); // @tracked properties
+        Object.keys(this).forEach(k => hash[k] = this[k]);                        // public class properties
         return hash;
     }
 }
@@ -230,7 +233,7 @@ export default class OxiSectionFormComponent extends Component {
     setFieldValue(field, value) {
         debug(`oxi-section/form (${this.args.def.action}): setFieldValue (${field.name} = "${value}")`);
         field.value = value;
-        field.error = null;
+        if (field.error) field.error = null;
 
         // action on change?
         if (!field.actionOnChange) { return }

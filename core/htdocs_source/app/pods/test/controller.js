@@ -69,6 +69,7 @@ export default class TestController extends Controller {
                     name: "select_editable",
                     label: "Select, editable",
                     editable: 1,
+                    value: 2,
                     options: [
                         { value: 1, label: "Tusen" },
                         { value: 2, label: "Takk" },
