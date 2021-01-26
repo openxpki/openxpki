@@ -11,7 +11,7 @@
             {{on "input" this.setTextInput}}
             {{on "drop" this.fileDropped}}
             {{on "dragover" this.showCopyEffect}}
-            {{did-insert (fn @mayFocus false)}}
+            {{may-focus this false}}
         />
     </div>
 </div>
@@ -21,7 +21,7 @@
     class="oxi-file-input"
     style="display:none"
     {{on "change" this.fileSelected}}
-    {{did-insert this.onFileUploadInsert}}
+    {{on-init this.setFileUploadElement}}
 />
 
 <div class="row">

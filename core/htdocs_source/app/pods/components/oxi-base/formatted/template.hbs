@@ -17,7 +17,6 @@
     {{else if (eq this.format "code")}}
         <code
             title="{{t 'component.oxi_code.copy'}}"
-            {{did-insert this.onInsertCode}}
             {{on "dblclick" this.selectCode}}
         >{{this.valueStr}}</code>
     {{else if (eq this.format "asciidata")}}

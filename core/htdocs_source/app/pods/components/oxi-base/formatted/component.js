@@ -32,16 +32,12 @@ export default class OxiFormattedComponent extends Component {
     }
 
     @action
-    onInsertCode(element) {
-        this.codeElement = element;
-    }
-
-    @action
-    selectCode() {
+    selectCode(event) {
+        let element = event.target;
         if (window.getSelection) {
             const selection = window.getSelection();
             const range = document.createRange();
-            range.selectNodeContents(this.codeElement);
+            range.selectNodeContents(element);
             selection.removeAllRanges();
             selection.addRange(range);
         } else {

@@ -36,7 +36,7 @@ export default class OxiFieldUploadComponent extends Component {
     }
 
     @action
-    onFileUploadInsert(element) {
+    setFileUploadElement(element) {
         this.fileUploadElement = element;
     }
 

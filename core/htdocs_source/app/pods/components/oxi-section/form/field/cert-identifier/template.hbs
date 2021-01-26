@@ -11,7 +11,7 @@
         {{on "input" this.onInput}}
         {{on "focus" this.onFocus}}
         {{on "blur" this.onBlur}}
-        {{did-insert (fn @mayFocus true)}}
+        {{may-focus this true}}
     />
     <ul class="dropdown-menu" role="menu">
         {{#each this.searchResults as |result|}}

@@ -4,7 +4,7 @@
             type="checkbox"
             checked={{@content.value}}
             {{on "change" this.onInput}}
-            {{did-insert (fn @mayFocus false)}}
+            {{may-focus this false}}
         />
         {{@content.label}}
     </label>

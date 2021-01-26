@@ -1,15 +1,15 @@
-<div {{did-insert this.setMode}}>
+<div>
 {{#if this.isFixed}}
     <input type="text" class="form-control in-form-group"
         value={{this.password}}
         readonly="readonly"
-        {{did-insert (fn @mayFocus false)}}
+        {{may-focus this false}}
     />
 {{else}}
     <input type="password" class="form-control in-form-group"
         value={{this.password}}
         {{on "input" this.passwordChange}}
-        {{did-insert (fn @mayFocus true)}}
+        {{may-focus this true}}
     />
 {{/if}}
     <input type={{if this.isFixed "text" "password"}} class="form-control in-form-group"

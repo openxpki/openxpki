@@ -12,8 +12,9 @@ export default class OxiFieldPasswordverifyComponent extends Component {
         return this.args.content.placeholder || "Retype password";
     }
 
-    @action
-    setMode() {
+    constructor() {
+        super(...arguments);
+
         if (this.args.content.value) {
             this.password = this.args.content.value;
             this.isFixed = true;

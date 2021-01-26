@@ -1,5 +1,5 @@
 {{#if this.isStatic}}
-    <div class="oxi-no-input" {{did-insert this.onInsertStatic}}>{{@content.options.0.label}}</div>
+    <div class="oxi-no-input" {{may-focus this true}}>{{@content.options.0.label}}</div>
 {{else if @content.editable}}
     <div class="input-group">
         {{#if this.customMode}}
@@ -9,14 +9,15 @@
                 value={{@content.value}}
                 placeholder={{@content.placeholder}}
                 {{on "input" this.onCustomInput}}
-                {{did-insert this.onCustomInsert}}
+                {{on-init this.onCustomInsert}}
+                {{may-focus this true}}
             />
         {{else}}
             <OxiBase::Select
                 @list={{this.options}}
                 @selected={{this.sanitizedValue}}
                 @onChange={{this.optionSelected}}
-                @onInsert={{fn @mayFocus true}}
+                {{may-focus this true}}
             />
         {{/if}}
         <span class="input-group-btn">
@@ -30,6 +31,6 @@
         @list={{this.options}}
         @selected={{this.sanitizedValue}}
         @onChange={{this.optionSelected}}
-        @onInsert={{fn @mayFocus true}}
+        {{may-focus this true}}
     />
 {{/if}}
