@@ -75,7 +75,7 @@ sub _build_workflow_config {
 
         # Workflow defined actions, conditions, validators
         my @wf_fields = $self->__process_fields(['workflow', 'def', $wf_name, 'field']);
-        push @{$wf_conf->{action}},    $self->__process_actions(   ['workflow','def', $wf_name, 'action'], $prefix, $wf_name, [@global_fields, @wf_fields]);
+        push @{$wf_conf->{action}},    $self->__process_actions(   ['workflow','def', $wf_name, 'action'], $prefix, $wf_name, [@wf_fields, @global_fields]);
         push @{$wf_conf->{condition}}, $self->__process_conditions(['workflow','def', $wf_name, 'condition'], $prefix);
         push @{$wf_conf->{validator}}, $self->__process_validators(['workflow','def', $wf_name, 'validator'], $prefix);
 
@@ -303,6 +303,9 @@ sub __process_actions {
 
         my @basic_validator = ();
         foreach my $field_name (@input) {
+            # it is important to use grep on the sorted list here as $fields
+            # contains the local and global definitions so there might be a
+            # "wrong" definition in a later position.
             my ($field) = grep { $_->{name} eq $field_name } @{$fields};
             if (!$field) {
                 OpenXPKI::Exception->throw(
