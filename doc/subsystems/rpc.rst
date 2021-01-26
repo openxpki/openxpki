@@ -137,7 +137,7 @@ code set in the return structure. The error codes consist of five digits,
 the first three digits are derived from the HTTP status codes followed by
 two digits for unambiguousness.
 
-To let the wrapper send the error code on HTTP layer, you need to set
+To let the wrapper send the error code on HTTP layer, you need to set::
 
   [output]
   use_http_status_codes=1
