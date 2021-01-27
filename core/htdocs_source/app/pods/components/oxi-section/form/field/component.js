@@ -61,7 +61,7 @@ export default class OxiFieldMainComponent extends Component {
             this.args.submit();
         }
         // TAB --> clonable fields: add another clone
-        if (event.keyCode === 9 && this.field.clonable && this.field.value !== null && this.field.value !== "") {
+        if (event.keyCode === 9 && this.field._lastCloneInGroup && this.field.value !== null && this.field.value !== "") {
             event.stopPropagation();
             event.preventDefault();
             this.addClone();

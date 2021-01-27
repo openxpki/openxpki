@@ -32,12 +32,12 @@
     {{#if @field.clonable}}
         <div class="col-md-1 clonable-btn-group">
             {{#if @field._canDelete}}
-                <BsButton @type="danger" @onClick={{this.delClone}}>
+                <BsButton @type="danger" @onClick={{this.delClone}} tabindex="-1">
                     <span class="glyphicon glyphicon-minus"></span>
                 </BsButton>
             {{/if}}
             {{#if @field._canAdd}}
-                <BsButton @type="primary" @onClick={{this.addClone}}>
+                <BsButton @type="primary" @onClick={{this.addClone}} tabindex="-1">
                     <span class="glyphicon glyphicon-plus"></span>
                 </BsButton>
             {{/if}}

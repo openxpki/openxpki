@@ -7,6 +7,9 @@ import { inject as service } from '@ember/service';
 import { debug } from '@ember/debug';
 
 class Field {
+    /*
+     * Common
+     */
     type;
     name;
     _refName; // internal use: original name, needed for dynamic input fields where 'name' can change
@@ -17,21 +20,34 @@ class Field {
     placeholder;
     actionOnChange;
     @tracked error;
-    // clonable fields:
-    clonable;
+    /*
+     * Clonable fields
+     */
+    clonable = false;
     max;
-    @tracked _canDelete; // needs to be tracked because it's updated after the field list
-    @tracked _canAdd;    // needs to be tracked because it's updated after the field list
+    // following attributes need to be tracked because they are updated after the field list
+    @tracked _canDelete;
+    @tracked _canAdd;
+    @tracked _lastCloneInGroup;
     _focusClone = false; // initially focus clone after adding (done in setFocusInfo() below after callback by oxisection/form/field)
-    // dynamic input fields:
+    /*
+     * Dynamic input fields
+     */
     keys;
-    // oxifield-datetime:
+    /*
+     * oxisection/form/field/datetime
+     */
+    //
     timezone;
-    // oxifield-select:
+    /*
+     * oxisection/form/field/select
+     */
     options;
     prompt;
     editable;
-    // oxifield-static
+    /*
+     * oxisection/form/field/static
+     */
     verbose;
 
     static fromHash(sourceHash) {
@@ -147,10 +163,12 @@ export default class OxiSectionFormComponent extends Component {
             for (const clone of clones) {
                 clone._canDelete = true;
                 clone._canAdd = clones[0].max ? clones.length < clones[0].max : true;
+                clone._lastCloneInGroup = false;
             }
             if (clones.length === 1) {
                 clones[0]._canDelete = false;
             }
+            clones[clones.length-1]._lastCloneInGroup = true;
         }
     }
 
