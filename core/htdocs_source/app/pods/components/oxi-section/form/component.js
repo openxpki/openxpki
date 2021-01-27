@@ -267,10 +267,10 @@ export default class OxiSectionFormComponent extends Component {
                     if (oldField.name === newField.name) {
                         let idx = fields.indexOf(oldField);
                         fields[idx] = newField;
-                        this.fields = fields; // trigger refresh FIXME remove as Array changes are auto-tracked?! (Ember enhances JS array as https://api.emberjs.com/ember/3.17/classes/Ember.NativeArray)
                     }
                 }
             }
+            this.fields = fields; // trigger refresh
             return null;
         });
     }

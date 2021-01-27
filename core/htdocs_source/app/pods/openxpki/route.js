@@ -38,7 +38,7 @@ export default class OpenXpkiRoute extends Route {
     };
     needReboot = ["login", "logout", "login!logout", "welcome"];
 
-    @tracked content = new Content();
+    content = new Content();
 
     // Reserved Ember function
     beforeModel(transition) {
