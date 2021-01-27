@@ -344,7 +344,11 @@ export default class OxiSectionFormComponent extends Component {
             if (this.focusFeedback[field._refName] !== null) {
                 debug(`oxi-section/form (${this.args.def.action}): first focusable field: ${field._refName}`);
                 let elementToFocus = this.focusFeedback[field._refName];
-                elementToFocus.focus();
+                // Wrap the focus() in a setTimeout() as otherwise Ember will complain
+                // > You attempted to update `hoverState` on `<wrapperClass:ember197>`,
+                // > but it had already been used previously in the same computation.
+                // Obviously our {{may-focus}} modifier gets triggered by focus changes.
+                setTimeout(() => elementToFocus.focus(), 1);
                 return;
             }
         }
