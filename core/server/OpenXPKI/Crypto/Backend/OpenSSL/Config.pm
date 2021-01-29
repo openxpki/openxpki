@@ -150,8 +150,19 @@ sub dump
     $config .= $self->__get_oids();
     $config .= $self->__get_engine();
 
-    if (exists $self->{PROFILE})
+    if (!exists $self->{PROFILE})
     {
+
+        $self->{FILENAME}->{CONFIG} = $self->{FU}->write_temp_file( $config );
+        ##! 2: "write configuration file " . $self->{FILENAME}->{CONFIG}
+
+    } elsif (ref $self->{PROFILE} eq 'OpenXPKI::Crypto::Profile::CSR') {
+
+        $config .= $self->__get_extensions('req_ext');
+        $self->{FILENAME}->{CONFIG} = $self->{FU}->write_temp_file( $config );
+        ##! 2: 'Found CSR profile - writing config ' . $self->{FILENAME}->{CONFIG}
+
+    } else {
 
         my $tmpdir = $self->{FU}->get_tmp_dirhandle()->dirname();
         $self->{CONFDIR} = $tmpdir;
@@ -209,21 +220,18 @@ sub dump
 
         ##! 4: "PROFILE exists => CRL or cert generation"
         $config .= $self->__get_ca();
-        $config .= $self->__get_extensions();
+        $config .= $self->__get_extensions('v3ca');
 
         ##! 2: "write configuration file ($tmpdir/openssl.cnf)"
         # writes a "non-temporary" file in the temporary directory
         $self->{FU}->write_file ({FILENAME => $self->{FILENAME}->{CONFIG},
                 CONTENT  => $config});
 
-    } else {
-
-        $self->{FILENAME}->{CONFIG} = $self->{FU}->write_temp_file( $config );
-        ##! 2: "write configuration file " . $self->{FILENAME}->{CONFIG}
-
     }
 
-    ##! 16: 'config: ' . $config    ##! 1: "end"
+    ##! 16: $config    
+    ##! 1: "end"
+
     return $self->{FILENAME}->{CONFIG};
 }
 
@@ -364,8 +372,9 @@ sub __get_extensions
 {
     ##! 4: "start"
     my $self = shift;
+    my $section_name = shift || 'v3ca';
 
-    my $config   = "\n[ v3ca ]\n";
+    my $config   = "\n[ $section_name ]\n";
     my $profile  = $self->{PROFILE};
     my $sections = "";
 

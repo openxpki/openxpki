@@ -10,8 +10,9 @@ use English;
 use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use TestCGI;
+use MIME::Base64;
 
-use Test::More tests => 4;
+use Test::More tests => 6;
 
 package main;
 
@@ -30,7 +31,7 @@ is($result->{main}->[0]->{content}->{fields}->[2]->{name}, 'wf_token');
 $result = $client->mock_request({
     'action' => 'workflow!index',
     'wf_token' => undef,
-    'cert_profile' => 'tls_client',
+    'cert_profile' => 'tls_server',
     'cert_subject_style' => '00_basic_style'
 });
 
@@ -52,7 +53,7 @@ $result = $client->mock_request({
     'action' => 'workflow!index',
     'key_alg' => 'rsa',
     'enc_alg' => 'aes256',
-    'key_gen_params{KEY_LENGTH}' => 3021,
+    'key_gen_params{KEY_LENGTH}' => 2048,
     'password_type' => 'server',
     'wf_token' => undef
 });
@@ -61,6 +62,7 @@ $result = $client->mock_request({
     'action' => 'workflow!index',
     'cert_subject_parts{hostname}' => 'testbox.openxpki.org',
     'cert_subject_parts{application_name}' => 'pkitest',
+    'cert_subject_parts{hostname2}[]' => [ 'testbox.openxpki.org' ],
     'wf_token' => undef
 });
 
@@ -126,31 +128,20 @@ $result = $client->mock_request({
     'wf_token' => undef
 });
 
-like($result->{goto}, qr/workflow!load!wf_id!\d+/, 'Got redirect');
+is($result->{main}->[0]->{content}->{data}->[2]->{name}, '_download');
+is($result->{main}->[0]->{content}->{data}->[2]->{value}->{mimetype}, 'application/x-pkcs12');
 
-($wf_id) = $result->{goto} =~ /workflow!load!wf_id!(\d+)/;
-
-diag("Download Workflow Id is $wf_id");
-
-$result = $client->mock_request({
-    'page' => $result->{goto},
-});
-
-my ($page, $link) = split "=", $result->{main}->[0]->{content}->{data}->[1]->{value}->{page};
-
-$result = $client->mock_request({
-    'page' => $link
-});
-
-open(CERT, ">tmp/entity26.id");
+open(CERT, ">tmp/entity26a.id");
 print CERT $cert_identifier;
 close CERT;
 
-open(CERT, ">tmp/entity26.p12");
-print CERT $result ;
+open(CERT, ">tmp/entity26a.p12");
+print CERT decode_base64($result->{main}->[0]->{content}->{data}->[2]->{value}->{data});
 close CERT;
 
-open(CERT, ">tmp/entity26.pass");
+open(CERT, ">tmp/entity26a.pass");
 print CERT $password ;
 close CERT;
 
+my $rc = system("openssl pkcs12 -in  tmp/entity26a.p12 -nodes -passin pass:'' -out /dev/null");
+is($rc,0);

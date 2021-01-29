@@ -1,4 +1,3 @@
-
 package OpenXPKI::Server::Workflow::Condition::CertificateHasSuccessor;
 
 use strict;

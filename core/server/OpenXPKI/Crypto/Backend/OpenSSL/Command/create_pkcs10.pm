@@ -39,8 +39,6 @@ sub get_command
     $passwd = $self->{PASSWD};
     $engine = $self->__get_used_engine();
 
-
-
     ## check parameters
 
     if (not exists $self->{SUBJECT})
@@ -63,6 +61,12 @@ sub get_command
     push @command, ('-keyform', $keyform) if ($keyform);
     push @command, ('-key', $self->write_temp_file( $self->{KEY} ));
     push @command, ('-out', $self->get_outfile());
+
+    # if profile is set we have an extension section
+    if ($self->{PROFILE}) {
+        $self->{CONFIG}->set_profile($self->{PROFILE});
+        push @command, ('-reqexts', 'req_ext');
+    }
 
     if (defined $passwd)
     {

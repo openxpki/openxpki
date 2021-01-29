@@ -11,11 +11,14 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Crypto::Profile::CSR;
 
 use Data::Dumper;
 
 sub execute
 {
+
+    ##!: 'start'
     my $self       = shift;
     my $workflow   = shift;
     my $context    = $workflow->context();
@@ -25,6 +28,7 @@ sub execute
     my $password    = $self->param('password');
     my $subject     = $self->param('cert_subject');
     my $target_key  = $self->param('target_key') || 'pkcs10';
+    my $subj_alt_names = $self->param('cert_subject_alt_name');
 
     # fallback for old workflows
     $private_key = $context->param('private_key') unless($private_key);
@@ -32,15 +36,22 @@ sub execute
     $subject     = $context->param('cert_subject') unless($subject);
 
 
+    my $profile;
+
+    ##! 64: 'subject alternative names: ' . Dumper $subj_alt_names
+    if (ref $subj_alt_names && @{$subj_alt_names} > 0) {
+        $profile = OpenXPKI::Crypto::Profile::CSR->new();
+        $profile->set_subject_alt_name($subj_alt_names);
+    }
+
     my $pkcs10 = $default_token->command({
         COMMAND => 'create_pkcs10',
         PASSWD  => $password,
         KEY     => $private_key,
         SUBJECT => $subject,
+        PROFILE => $profile,
     });
     ##! 16: 'pkcs10: ' . $pkcs10
-
-    # TODO - add SANs
 
     CTX('log')->application()->debug("generated pkcs#10 request for $subject");
 
@@ -89,5 +100,9 @@ The password for the private key.
 =item cert_subject
 
 The full subject to set in the request.
+
+=item cert_subj_alt_names
+
+List of SAN items (array reference as used in PersistCSR)
 
 =back

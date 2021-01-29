@@ -88,6 +88,7 @@ OpenXPKI/Crypto/API.pm
 OpenXPKI/Crypto/Backend/API.pm
 OpenXPKI/Crypto/CLI.pm
 OpenXPKI/Crypto/Profile/Base.pm
+OpenXPKI/Crypto/Profile/CSR.pm
 OpenXPKI/Crypto/Profile/Certificate.pm
 OpenXPKI/Crypto/Profile/CRL.pm
 OpenXPKI/Crypto/SecretManager.pm
