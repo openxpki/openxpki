@@ -10,6 +10,7 @@ use OpenXPKI::Debug;
 
 use OpenXPKI::Workflow::Context;
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Exception;
 use DateTime;
 use DateTime::Format::Strptime;
