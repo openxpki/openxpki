@@ -74,6 +74,7 @@ module.exports = function(defaults) {
   // please specify an object with the list of modules as keys
   // along with the exports of each module as its value.
   app.import('node_modules/moment/moment.js', { prepend: true }); // needed by (ember-cli-)bootstrap-datetimepicker
+  app.import('node_modules/uplot/dist/uPlot.min.css');
 
   return app.toTree();
 };
