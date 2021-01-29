@@ -10,8 +10,9 @@ use English;
 use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use TestCGI;
+use MIME::Base64;
 
-use Test::More tests => 4;
+use Test::More tests => 6;
 
 package main;
 
@@ -126,31 +127,20 @@ $result = $client->mock_request({
     'wf_token' => undef
 });
 
-like($result->{goto}, qr/workflow!load!wf_id!\d+/, 'Got redirect');
-
-($wf_id) = $result->{goto} =~ /workflow!load!wf_id!(\d+)/;
-
-diag("Download Workflow Id is $wf_id");
-
-$result = $client->mock_request({
-    'page' => $result->{goto},
-});
-
-my ($page, $link) = split "=", $result->{main}->[0]->{content}->{data}->[1]->{value}->{page};
-
-$result = $client->mock_request({
-    'page' => $link
-});
+is($result->{main}->[0]->{content}->{data}->[2]->{name}, '_download');
+is($result->{main}->[0]->{content}->{data}->[2]->{value}->{mimetype}, 'application/x-pkcs12');
 
 open(CERT, ">tmp/entity26.id");
 print CERT $cert_identifier;
 close CERT;
 
 open(CERT, ">tmp/entity26.p12");
-print CERT $result ;
+print CERT decode_base64($result->{main}->[0]->{content}->{data}->[2]->{value}->{data});
 close CERT;
 
 open(CERT, ">tmp/entity26.pass");
 print CERT $password ;
 close CERT;
 
+my $rc = system("openssl pkcs12 -in  tmp/entity26.p12 -nodes -passin pass:'' -out /dev/null");
+is($rc,0);
