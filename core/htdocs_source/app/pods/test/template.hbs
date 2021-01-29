@@ -1,10 +1,31 @@
-<OxiBase::Button @button={{hash format="expected" label="de-DE"}} @onClick={{fn this.setLang "de-DE"}}/>
-<OxiBase::Button @button={{hash format="expected" label="en-US"}} @onClick={{fn this.setLang "en-US"}}/>
 <style type="text/css">
     .test-chart { border: solid 1px #aaa; margin: 3pt; }
 </style>
-<OxiBase::Chart @data={{this.chart_line.data}} @options={{this.chart_line.options}} />
-<OxiBase::Chart @data={{this.chart_bar.data}} @options={{this.chart_bar.options}} />
-<OxiSection @content={{this.formDef}}/>
-<OxiSection @content={{this.gridDef}}/>
-<OxiSection @content={{this.keyvalueDef}}/>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-4">
+            <OxiBase::Chart @data={{this.chart_line.data}} @options={{this.chart_line.options}} />
+        </div>
+        <div class="col-md-4">
+            <OxiBase::Chart @data={{this.chart_bar.data}} @options={{this.chart_bar.options}} />
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-10">
+            <OxiBase::Button @button={{hash format="expected" label="de-DE"}} @onClick={{fn this.setLang "de-DE"}}/>
+            <OxiBase::Button @button={{hash format="expected" label="en-US"}} @onClick={{fn this.setLang "en-US"}}/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <OxiSection @content={{this.formDef}}/>
+            <OxiSection @content={{this.gridDef}}/>
+            <OxiSection @content={{this.keyvalueDef}}/>
+        </div>
+    </div>
+</div>
+

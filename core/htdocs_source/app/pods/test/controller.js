@@ -45,7 +45,7 @@ export default class TestController extends Controller {
     chart_line = {
         options: {
             type: 'line',
-            width: 500,
+            width: 400,
             height: 200,
             title: 'Line chart',
             cssClass: 'test-chart',
@@ -71,7 +71,7 @@ export default class TestController extends Controller {
     chart_bar = {
         options: {
             type: 'bar',
-            width: 500,
+            width: 400,
             height: 200,
             title: 'Bar chart',
             cssClass: 'test-chart',
