@@ -26,9 +26,9 @@ sub _evaluate {
 
     my $res = CTX('dbi')->select_one(
         from => 'certificate_attributes',
-        columns => [ 'attribute_value' ],
+        columns => [ 'identifier' ],
         where => {
-            identifier => $cert_identifier,
+            attribute_value => $cert_identifier,
             attribute_contentkey => 'system_renewal_cert_identifier',
         }
     );
@@ -39,7 +39,7 @@ sub _evaluate {
         condition_error('certificate has successor failed');
     }
 
-    CTX('log')->application()->debug("CertificateHasSuccessor condition passed:" . $res->{attribute_value});
+    CTX('log')->application()->debug("CertificateHasSuccessor condition passed:" . $res->{identifier});
 
     return 1;
     ##! 16: 'end'
