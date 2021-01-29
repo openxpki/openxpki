@@ -50,10 +50,10 @@ export default function seriesBarsPlugin(opts) {
     const groupWidth = 0.9;
     const groupDistr = SPACE_BETWEEN;
 
-    const barWidth   = 1;
+    const barWidth   = 0.9;
     const barDistr   = SPACE_BETWEEN;
 
-    const font       = Math.round(10 * pxRatio) + "px Arial";
+    const font       = Math.round(10 * pxRatio) + "px sans-serif";
 
     function pointWithin(px, py, rlft, rtop, rrgt, rbtm) {
         return px >= rlft && px <= rrgt && py >= rtop && py <= rbtm;
@@ -216,11 +216,6 @@ export default function seriesBarsPlugin(opts) {
                         ori,
                         dir,
                     },
-                    rend:   yScaleOpts,
-                    size:   yScaleOpts,
-                    mem:    yScaleOpts,
-                    inter:  yScaleOpts,
-                    toggle: yScaleOpts,
                 }
             });
 
@@ -247,7 +242,7 @@ export default function seriesBarsPlugin(opts) {
                     return _dir == 1 ? splits : splits.reverse();
                 },
                 values:     () => labels(),
-                gap:        15,
+                gap:        5,
                 size:       40,
                 labelSize:  20,
                 grid:       {show: false},
