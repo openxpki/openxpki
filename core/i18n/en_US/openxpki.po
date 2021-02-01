@@ -3804,10 +3804,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RESETPASS_LABEL"
 msgstr "Reset User Password"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_DESC"
-msgstr "Search for SCEP workflows by  transaction id"
+msgstr "Search for enrollment workflows by transaction id"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_LABEL"
-msgstr "SCEP Search"
+msgstr "Enrollment Search"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_DESC"

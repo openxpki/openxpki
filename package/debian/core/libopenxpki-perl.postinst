@@ -57,6 +57,13 @@ case "$1" in
                 fi;
             fi;
 
+            # static home
+            if [ ! -d /var/www/static ]; then
+                mkdir -p -m755 /var/www/static/democa
+                chown www-data:www-data /var/www/static/democa
+                cp /usr/share/doc/libopenxpki-perl/examples/home.html /var/www/static/democa/home.html
+            fi;
+
         fi;
 
         # Apply chown to main folder
@@ -79,7 +86,7 @@ case "$1" in
             mkdir -p -m755 /var/www/download
             chown openxpki:www-data /var/www/download
         fi;
-        
+
         # Setup logrotate
         if [ -e /etc/logrotate.d/ ] &&  [ ! -e /etc/logrotate.d/openxpki ]; then
             cp /usr/share/doc/libopenxpki-perl/examples/logrotate.conf /etc/logrotate.d/openxpki

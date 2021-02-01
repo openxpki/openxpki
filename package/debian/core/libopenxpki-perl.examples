@@ -2,4 +2,5 @@ examples/openxpki-etc.tgz
 examples/contrib/sampleconfig.sh
 examples/contrib/apache2-openxpki-site.conf
 examples/contrib/logrotate.conf
+examples/contrib/home.html
 examples/contrib/sql/schema-mariadb.sql
