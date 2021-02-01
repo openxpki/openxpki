@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2020-06-25 14:55+0200\n"
+"PO-Revision-Date: 2021-02-01 13:15+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -11,7 +11,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.0.6\n"
+"X-Generator: Poedit 2.3\n"
 "X-Poedit-Bookmarks: -1,-1,77,-1,-1,-1,-1,-1,-1,-1\n"
 
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
@@ -487,9 +487,11 @@ msgstr "Renewal is not allowed"
 msgid "I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION"
 msgstr "Backend error during publishing "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_ERROR_ON_REMOTE_BACKEND"
-msgstr "Raise a <b>certificate revocation request</b>."
+msgstr "The remote backend responded with an error"
+
+msgid "I18N_OPENXPKI_UI_ERROR_PKCS10_INVALID"
+msgstr "PKCS10 container has invalid format"
 
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER"
 msgstr "The entered invalidity time is after the certificates expiration date!"
@@ -3414,8 +3416,8 @@ msgstr "Unable to load Key"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_DESC"
 msgstr ""
-"Download of your export will start shortly, for PEM encoded key material "
-"you also use the button to copy the data to your clipboard. Note that the "
+"Download of your export will start shortly, for PEM encoded key material you "
+"also use the button to copy the data to your clipboard. Note that the "
 "download option will disappear when you leave this page."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_LABEL"
@@ -3451,6 +3453,9 @@ msgstr "Duplicate Key Error (Request)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL"
 msgstr "State"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_MANUAL_RECHECK_BUTTON"
+msgstr "Recheck Status"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_DESC"
 msgstr ""
@@ -3845,6 +3850,9 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_KEY_POLICY_FAILED"
 #~ msgstr "Key policy failed (wrong size/algorithm)"
 
+#~ msgid "I18N_OPENXPKI_UI_ISSUER_UNKNOWN"
+#~ msgstr "Issuer certificate is unknown"
+
 #~ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
 #~ msgstr "3072 bit"
 
@@ -4123,6 +4131,14 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_INITIAL_LABEL"
 #~ msgstr "State"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_ISSUE_DESC"
+#~ msgstr ""
+#~ "The request is now transfered to the CA and will be made available after "
+#~ "it was issued."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_ISSUE_LABEL"
+#~ msgstr "Request is currently processed by the CA"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_FAILURE_DESC"
 #~ msgstr "This workflow failed finally and can not be restarted"

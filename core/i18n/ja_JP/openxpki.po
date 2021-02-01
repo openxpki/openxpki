@@ -502,6 +502,10 @@ msgstr "公開処理中に内部エラーが発生しました。"
 msgid "I18N_OPENXPKI_UI_ERROR_ON_REMOTE_BACKEND"
 msgstr "失効"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_PKCS10_INVALID"
+msgstr "有効"
+
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER"
 msgstr "失効日は、証明書有効期限日以前の日付を指定してください。"
 
@@ -888,6 +892,10 @@ msgstr "パスワード無しでキーを生成しました。"
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "いいえ"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE"
+msgstr "CRLシリアル"
+
 msgid "I18N_OPENXPKI_UI_OOPS"
 msgstr "おっと、何か間違っています。"
 
@@ -1048,6 +1056,10 @@ msgstr "ホスト名"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC"
 msgstr "システムに最も適したホスト名（ドメイン名）を入力します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_RESPONDER_LABEL"
+msgstr "User Profile"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_OU_DESC"
 msgstr "組織単位"
@@ -3569,6 +3581,10 @@ msgstr "重複キーエラー(リクエスト）"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL"
 msgstr "ステータス"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_MANUAL_RECHECK_BUTTON"
+msgstr "ワークフローステータスの再確認"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_DESC"
 msgstr ""
 "下に、この証明書の新しいメタデータが表示されます。以下の操作から進んでくださ"
@@ -3973,6 +3989,10 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_ERROR_NOT_CERTIFICATE_OWNER"
 #~ msgstr "証明書所有者のみがこの操作を実行できます"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_ISSUER_UNKNOWN"
+#~ msgstr "不明"
 
 #~ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
 #~ msgstr "3072 bit"
@@ -5221,6 +5241,14 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_SUCCESS_LABEL"
 #~ msgstr "成功"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_ISSUE_DESC"
+#~ msgstr "このリクエストは、登録担当者の承認待ちです。"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_ISSUE_LABEL"
+#~ msgstr "リクエストは承認待ちです"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDIT_CRR_DESC"

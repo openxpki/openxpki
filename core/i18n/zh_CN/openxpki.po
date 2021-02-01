@@ -486,6 +486,10 @@ msgstr "在发布期间出现了后端错误"
 msgid "I18N_OPENXPKI_UI_ERROR_ON_REMOTE_BACKEND"
 msgstr "失败"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_PKCS10_INVALID"
+msgstr "有效"
+
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER"
 msgstr "输入的失效时间在证书到期日期之后！"
 
@@ -856,6 +860,10 @@ msgstr "没有密码无法生成密钥"
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "不"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE"
+msgstr "CRL序列号"
+
 msgid "I18N_OPENXPKI_UI_OOPS"
 msgstr "哎呀！出事了"
 
@@ -1016,6 +1024,10 @@ msgstr "主机名"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC"
 msgstr "输入系统的完全限定主机名（域名）。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_RESPONDER_LABEL"
+msgstr "人员（安全电子邮件/身份验证）"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_OU_DESC"
 msgstr "组织单元"
@@ -3418,6 +3430,10 @@ msgstr "重复密钥错误（请求）"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL"
 msgstr "状态"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_MANUAL_RECHECK_BUTTON"
+msgstr "重新检查工作流程状态"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_DESC"
 msgstr ""
 "您会在下面看到此证书的新元数据。请从下面的操作中进行选择。 中止将终止工作流程"
@@ -3790,6 +3806,10 @@ msgstr "是"
 #~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_KEY_POLICY_FAILED"
 #~ msgstr "Key policy failed (wrong size/algorithm)"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_ISSUER_UNKNOWN"
+#~ msgstr "未知"
+
 #~ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
 #~ msgstr "3072 bit"
 
@@ -4066,6 +4086,14 @@ msgstr "是"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_INITIAL_LABEL"
 #~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_ISSUE_DESC"
+#~ msgstr "此请求正在等待注册官员的批准。"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_ISSUE_LABEL"
+#~ msgstr "请求等待批准"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_FAILURE_DESC"
 #~ msgstr "This workflow failed finally and can not be restarted"

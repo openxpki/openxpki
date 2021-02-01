@@ -627,6 +627,10 @@ msgid "I18N_OPENXPKI_UI_ERROR_ON_REMOTE_BACKEND"
 msgstr "Revoca"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_ERROR_PKCS10_INVALID"
+msgstr "Valido"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER"
 msgstr ""
 "La data inserita per il campo “non dopo il” non può essere convalidata."
@@ -1073,6 +1077,10 @@ msgstr "Password della Chiave"
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "Chiave"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE"
+msgstr "Numero di serie del certificato"
+
 # Remove?
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_OOPS"
@@ -1243,6 +1251,10 @@ msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC"
 msgstr ""
 "Inserisci il nome completo a dominio (FQN = Fully Qualified Hostname) del "
 "tuo sistema."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_RESPONDER_LABEL"
+msgstr "Persone Fisiche (Email Sicura / Autenticazione)"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_OU_DESC"
 msgstr "Unità Organizzativa"
@@ -4009,6 +4021,13 @@ msgstr "Modifica Richiesta"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL"
 msgstr "Stato"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_MANUAL_RECHECK_BUTTON"
+msgstr ""
+"Inserisci i criteri di ricerca per selezionare i Workflow da includere nella "
+"tua azione di massa. Puoi selezionare i singoli elementi nella pagina "
+"successiva."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_DESC"
 msgstr ""
 "Qui sotto puoi vedere i nuovi metadati per questo certificato, scegli con "
@@ -4528,6 +4547,10 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_KEY_POLICY_FAILED"
 #~ msgstr "Scavalca Policy"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_ISSUER_UNKNOWN"
+#~ msgstr "sconosciuto"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
@@ -5865,6 +5888,16 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRW_INITIAL_LABEL"
 #~ msgstr "Stato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_ISSUE_DESC"
+#~ msgstr ""
+#~ "Questa richiesta è in attesa di autorizzazione da parte di un ufficiale "
+#~ "di registrazione."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_ISSUE_LABEL"
+#~ msgstr "Richiesta in attesa di approvazione"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_CA_KEY_NOT_USABLE_DESC"
 #~ msgstr "Il token di firma della CA è inutilizzabile."

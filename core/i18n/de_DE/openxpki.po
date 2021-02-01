@@ -340,7 +340,9 @@ msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SHARE_ALREADY_ENTERED"
 msgstr "Passwort gelöscht"
 
 msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLITENCRYPTED_KEY_COUNT_DIFFERS_FROM_SHARE_COUNT"
-msgstr "Die Anzahl der übergebenen Schlüssel stimmt nicht mit der Anzahl der Passwortteile überein."
+msgstr ""
+"Die Anzahl der übergebenen Schlüssel stimmt nicht mit der Anzahl der "
+"Passwortteile überein."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLITENCRYPTED_UNABLE_TO_LOAD_ENCRYPTED_SHARE"
@@ -488,6 +490,9 @@ msgstr "Systemfehler während der Veröffentlichung"
 
 msgid "I18N_OPENXPKI_UI_ERROR_ON_REMOTE_BACKEND"
 msgstr "Backend-Aufruf fehlgeschlagen"
+
+msgid "I18N_OPENXPKI_UI_ERROR_PKCS10_INVALID"
+msgstr "PKCS10 Datei kann nicht gelesen werden"
 
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_INVALIDITYTIME_AFTER_CERT_NOTAFTER"
 msgstr "Der eingegebene Zeitpunkt ist nach dem Ablaufdatum des Zertifikates!"
@@ -3653,6 +3658,9 @@ msgstr "Schlüssel bereits in einem anderen Antrag verwendet"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL"
 msgstr "Zustand"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_MANUAL_RECHECK_BUTTON"
+msgstr "Status erneut prüfen"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_DESC"
 msgstr ""
 "Nachfolgend finden Sie eine Übersicht der neuen Meta-Informationen für "
@@ -4072,6 +4080,9 @@ msgstr "ja"
 #~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_KEY_POLICY_FAILED"
 #~ msgstr "Schlüsselparameter fehlerhaft (Algorithmus/Schlüssellänge)"
 
+#~ msgid "I18N_OPENXPKI_UI_ISSUER_UNKNOWN"
+#~ msgstr "Aussteller Zertifikat unbekannt"
+
 #~ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
 #~ msgstr "3072 bit"
 
@@ -4354,6 +4365,16 @@ msgstr "ja"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_INITIAL_LABEL"
 #~ msgstr "State"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_ISSUE_DESC"
+#~ msgstr ""
+#~ "Der Antrag muss nun geprüft und freigegeben werden. Sie können den Status "
+#~ "dieses Vorgangs auf dieser Seite verfolgen."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_ISSUE_LABEL"
+#~ msgstr "Antrag erwartet Freigabe"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_FAILURE_DESC"
 #~ msgstr "This workflow failed finally and can not be restarted"
