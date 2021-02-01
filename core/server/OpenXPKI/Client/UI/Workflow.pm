@@ -2214,7 +2214,18 @@ sub __render_from_workflow {
             });
 
         } else {
-        # Standard case - render key/value
+
+            # state manual but no buttons -> user is waiting for a third party
+            # to continue the workflow and might want to reload the page
+            if ($wf_proc_state eq 'manual' && @{$buttons} == 0) {
+                $buttons = [{
+                    page => 'redirect!workflow!load!wf_id!'.$wf_info->{workflow}->{id},
+                    label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_MANUAL_RECHECK_BUTTON',
+                    format => 'alternative'
+                }];
+            }
+
+            # Standard case - render key/value
             $self->add_section({
                 type => 'keyvalue',
                 content => {
