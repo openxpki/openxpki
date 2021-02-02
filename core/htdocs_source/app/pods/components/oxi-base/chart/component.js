@@ -44,7 +44,7 @@ export default class OxiChartComponent extends Component {
             title = "",
             cssClass = "",
             x_is_timestamp = true,
-            y_values = [],
+            y_axes = [],
             legend_label = true,
             legend_value = false,
             legend_date_format = '{YYYY}-{MM}-{DD}, {HH}:{mm}:{ss}',
@@ -121,7 +121,7 @@ export default class OxiChartComponent extends Component {
          * Series
          */
         let autoScaleId = 0;
-        for (const graph of this.args.options.y_values) {
+        for (const graph of this.args.options.y_axes) {
             const {
                 label = '',
                 color = 'rgba(0, 100, 200, 1)',

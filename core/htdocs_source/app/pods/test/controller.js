@@ -52,7 +52,7 @@ export default class TestController extends Controller {
             x_is_timestamp: true,
             legend_label: true,
             legend_value: true,
-            y_values: [
+            y_axes: [
                 {
                     label: 'Certs',
                     color: 'rgba(0, 100, 200, 1)',
@@ -75,7 +75,7 @@ export default class TestController extends Controller {
             height: 200,
             title: 'Bar chart',
             cssClass: 'test-chart',
-            y_values: [
+            y_axes: [
                 {
                     label: 'Requested',
                     color: 'rgba(0, 100, 200, 0.9)',
