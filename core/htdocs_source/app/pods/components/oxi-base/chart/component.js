@@ -44,14 +44,14 @@ export default class OxiChartComponent extends Component {
             title = "",
             cssClass = "",
             x_is_timestamp = true,
-            y_axes = [],
-            legend_label = true,
+            y_axes = [ {} ], // default: one array item to make sure the loop below creates left Y-axis
+            legend_label = (this.args.options.y_axes ? true : false),
             legend_value = false,
             legend_date_format = '{YYYY}-{MM}-{DD}, {HH}:{mm}:{ss}',
             type = 'line',
             bar_group_labels,
             bar_vertical = false,
-        } = this.args.options;
+        } = this.args.options ?? {};
 
         // assemble uPlot options
         let uplotOptions = {
@@ -121,7 +121,7 @@ export default class OxiChartComponent extends Component {
          * Series
          */
         let autoScaleId = 0;
-        for (const graph of this.args.options.y_axes) {
+        for (const graph of y_axes) {
             const {
                 label = '',
                 color = 'rgba(0, 100, 200, 1)',
