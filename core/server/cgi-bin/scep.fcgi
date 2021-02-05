@@ -195,7 +195,8 @@ the config section in the scep.yaml file.
 
 =item encryption
 
-Encrpytion to use, supported values are I<DES> and I<3DES>.
+Encrpytion to use, supported values are
+I<(des | 3des | des3 | aes128 | aes192 | aes256 | blowfish | cast)>
 
 =back
 

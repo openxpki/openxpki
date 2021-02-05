@@ -49,7 +49,8 @@ the config section in the scep.yaml file.
 
 **encryption**
 
-Encrpytion to use, supported values are I<DES> and I<3DES>.
+Encrpytion to use, supported values are
+*des | 3des | des3 | aes128 | aes192 | aes256 | blowfish | cast*
 
 
 Config Path Expansion
