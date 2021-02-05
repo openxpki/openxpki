@@ -8,6 +8,8 @@ import seriesBarsPlugin from './uplot/seriesbars-plugin';
 import axisTimestampConfig from './uplot/axis-timestamp-config';
 import reducedAlphaColor from './uplot/reduced-alpha-color';
 
+import pieChartLegend  from './pie/legend';
+
 /**
 Draws a line or bar chart.
 
@@ -20,26 +22,10 @@ Draws a line or bar chart.
 @param options { hash } - display options for the chart
 */
 
-// From https://raw.githubusercontent.com/leeoniya/uPlot/1.6.4/src/domClasses.js
-const pre = "u-";
-export const LEGEND         = pre + "legend"
-export const LEGEND_LIVE    = pre + "live";
-export const LEGEND_INLINE  = pre + "inline";
-export const LEGEND_THEAD   = pre + "thead";
-export const LEGEND_SERIES  = pre + "series";
-export const LEGEND_MARKER  = pre + "marker";
-export const LEGEND_LABEL   = pre + "label";
-export const LEGEND_VALUE   = pre + "value";
-
 export default class OxiChartComponent extends Component {
     guid;
     opt = {};
     seriesCount;
-
-    // x - timestamp
-    // y - BTC price
-    // y - RSI
-    // y - RSI MA
 
     constructor() {
         super(...arguments);
@@ -306,63 +292,7 @@ export default class OxiChartComponent extends Component {
         }
 
         if (this.opt.legend_label) {
-            let legendEl = this.placeTag("table", LEGEND, element);
-            let head = this.placeTag("tr", LEGEND_THEAD, legendEl);
-            this.placeTag("th", null, head);
-
-            let legendCols = {_: 0};
-            this.addClass(legendEl, LEGEND_INLINE);
-
-            let i = 0;
-            for (const series of this.opt.series) {
-                this.initLegendRow(legendEl, i, series.label, series.color);
-                i++;
-            }
+            pieChartLegend(element, this.opt.series, s => ({ label: s.label, color: s.color }));
         }
-    }
-
-    initLegendRow(legendEl, i, label, color) {
-        let _row = [];
-
-        let row = this.placeTag("tr", LEGEND_SERIES, legendEl, legendEl.childNodes[i]);
-
-        // addClass(row, class);
-
-        let labelDiv = this.placeTag("th", null, row);
-
-        let indic = this.placeDiv(LEGEND_MARKER, labelDiv);
-
-        // indic.style.border = width + "px " + legend.dash(self, i) + " " + legend.stroke(self, i);
-        indic.style.setProperty('background-color', color);
-
-        let text = this.placeDiv(LEGEND_LABEL, labelDiv);
-        text.textContent = label;
-
-        let v = this.placeTag("td", LEGEND_VALUE, row);
-        v.textContent = "--";
-        _row.push(v);
-
-        return _row;
-    }
-
-    placeTag(tag, cls, targ, refEl) {
-        let el = document.createElement(tag);
-
-        if (cls != null)
-            this.addClass(el, cls);
-
-        if (targ != null)
-            targ.insertBefore(el, refEl);
-
-        return el;
-    }
-
-    placeDiv(cls, targ) {
-        return this.placeTag("div", cls, targ);
-    }
-
-
-    addClass(el, c) {
-        c != null && el.classList.add(c);
     }
 }
