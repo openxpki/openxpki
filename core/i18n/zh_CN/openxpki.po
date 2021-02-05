@@ -1164,6 +1164,15 @@ msgstr "报告详情"
 msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_NAME"
 msgstr "报告名称"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_SUMMARY"
+msgstr "证书状态摘要"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_TIMELINE_LABEL"
+msgstr "报告配置"
+
 msgid "I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID"
 msgstr "无法执行操作-安全令牌无效！"
 
@@ -3008,10 +3017,26 @@ msgstr "重试超出"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE"
 msgstr "您当前的角色禁止访问此工作流程属性"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_CURRENT_LABEL"
+msgstr "证书详细报告"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DRAW_CHART"
+msgstr "证书总数"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_NEAR_EXPIRY"
 msgstr "快要过期的证书"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_PROFILES"
+msgstr "过期的证书"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_RECENT_EXPIRY"
+msgstr "最近过期的证书"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_RECENT_RENEWED"
 msgstr "最近过期的证书"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_COUNT"
@@ -3022,6 +3047,14 @@ msgstr "不同主题总数"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_EXPIRED"
 msgstr "过期的证书"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_ISSUED"
+msgstr "过期的证书"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_RENEWED"
+msgstr "吊销证书总数"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_REVOKED"
 msgstr "吊销证书总数"
@@ -3040,6 +3073,14 @@ msgstr "有效的不同主题"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_REVOKED"
 msgstr "在有效期内，但已经吊销的证书"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_PROFILE_LABEL"
+msgstr "证书配置文件"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_LABEL"
+msgstr "证书状态报告"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"
 msgstr "请求的操作不可用-打开当前状态"

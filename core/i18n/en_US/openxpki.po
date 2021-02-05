@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2021-02-01 13:15+0100\n"
+"PO-Revision-Date: 2021-02-08 21:53+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -263,7 +263,6 @@ msgstr "Show related workflows"
 msgid "I18N_OPENXPKI_UI_CERT_RELATED_LABEL"
 msgstr "Relations"
 
-# Remove?
 msgid "I18N_OPENXPKI_UI_CERT_STATUS"
 msgstr "Certificate Status"
 
@@ -459,9 +458,8 @@ msgstr "Policy failed (too many valid certificates)"
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_REJECTED"
 msgstr "Request was rejected."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_REQUEST_DUPLICATE"
-msgstr "Policy failed (subject duplicate)"
+msgstr "Policy failed (request duplicate)"
 
 msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_REQUEST_NOT_AUTHORIZED"
 msgstr "Request was not properly authorized. "
@@ -1149,7 +1147,6 @@ msgstr "3 years"
 msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "Reason code given is not supported"
 
-# Remove?
 msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_LABEL"
 msgstr "Report Configuration"
 
@@ -1164,6 +1161,12 @@ msgstr "Report Details"
 
 msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_NAME"
 msgstr "Report Name"
+
+msgid "I18N_OPENXPKI_UI_REPORT_SUMMARY"
+msgstr "Certificate Status Summary"
+
+msgid "I18N_OPENXPKI_UI_REPORT_TIMELINE_LABEL"
+msgstr "Certificate Lifecycle Report"
 
 msgid "I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID"
 msgstr "Unable to perform action -  security token was invalid!"
@@ -3008,11 +3011,23 @@ msgstr "retry exceeded"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE"
 msgstr "Access to this workflow property is forbidden for your current role"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_CURRENT_LABEL"
+msgstr "Current Certificates"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DRAW_CHART"
+msgstr "Display Chart"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_NEAR_EXPIRY"
 msgstr "Certificates near Expiration"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_PROFILES"
+msgstr "Profiles"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_RECENT_EXPIRY"
 msgstr "Certificates recently expired"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_RECENT_RENEWED"
+msgstr "Certificates recently renewed"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_COUNT"
 msgstr "Overall Certificate Count"
@@ -3022,6 +3037,12 @@ msgstr "Overall Distinct Subjects"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_EXPIRED"
 msgstr "Expired Certificates"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_ISSUED"
+msgstr "Issued Certificates"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_RENEWED"
+msgstr "Overall Renewed Certificates"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_REVOKED"
 msgstr "Overall Revoked Certificates"
@@ -3042,6 +3063,12 @@ msgstr "Valid Distinct Subjects"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_REVOKED"
 msgstr "In Validity but Revoked Certificates"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_PROFILE_LABEL"
+msgstr "Certificate Profiles"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_LABEL"
+msgstr "All Issued Certificates"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"
 msgstr "Requested action not available - opening current state"

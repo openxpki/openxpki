@@ -385,6 +385,7 @@ OpenXPKI/Server/Workflow/Activity/Reports/CertExport/TagAsExported.pm
 OpenXPKI/Server/Workflow/Activity/Reports/Detail.pm
 OpenXPKI/Server/Workflow/Activity/Reports/GetList.pm
 OpenXPKI/Server/Workflow/Activity/Reports/Summary.pm
+OpenXPKI/Server/Workflow/Activity/Reports/Timeline.pm
 OpenXPKI/Server/Workflow/Activity/Skeleton.pm
 OpenXPKI/Server/Workflow/Activity/Skip.pm
 OpenXPKI/Server/Workflow/Activity/Sleep.pm

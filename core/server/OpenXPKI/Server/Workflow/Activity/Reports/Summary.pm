@@ -39,8 +39,8 @@ sub execute {
         from => 'certificate',
     );
     my %base_conditions = (
-        req_key => { '!=' => undef },
-        pki_realm => $pki_realm,
+        'certificate.req_key' => { '!=' => undef },
+        'certificate.pki_realm' => $pki_realm,
     );
 
     my $db = CTX('dbi');
@@ -128,6 +128,21 @@ sub execute {
     $result->{valid_distinct} = sprintf "%01d", $tuple->{amount} + 0;
 
 
+    # Valid by profile
+    $tuple = $db->select_arrays(
+        from_join => 'certificate certificate.req_key=req_key csr',
+        columns  => [ 'profile', 'COUNT(identifier)|amount' ],
+        where => {
+            %base_conditions,
+            status => 'ISSUED',
+            notbefore => { '<' => $epoch },
+            notafter  => { '>' => $epoch },
+        },
+        group_by => 'csr.profile',
+    );
+    ##! 1: $tuple
+    $result->{by_profile} = { map { $_->[0] => $_->[1]  } @{$tuple} };
+
     # Near expiry
     my $near_expiry_validity = $self->param('near_expiry') || '+000030';
     my $expiry_cutoff = OpenXPKI::DateTime::get_validity({
@@ -148,10 +163,9 @@ sub execute {
 
 
     # Recent expiry
-    my $recent_expiry_validity = $self->param('recent_expiry') || '-000030';
     $expiry_cutoff = OpenXPKI::DateTime::get_validity({
         REFERENCEDATE => $valid_at,
-        VALIDITY => $recent_expiry_validity,
+        VALIDITY => $self->param('recent_expiry') || '-000030',
         VALIDITYFORMAT => 'detect',
     })->epoch();
 
@@ -165,6 +179,22 @@ sub execute {
     );
     $result->{recent_expiry} = sprintf "%01d", $tuple->{amount};
 
+    $expiry_cutoff = OpenXPKI::DateTime::get_validity({
+        REFERENCEDATE => $valid_at,
+        VALIDITY => $self->param('recent_renewal') || '-000030',
+        VALIDITYFORMAT => 'detect',
+    })->epoch();
+
+    $tuple = $db->select_one(
+        from_join => 'certificate certificate.identifier=identifier certificate_attributes|ca',
+        columns  => [ 'COUNT(certificate.identifier)|amount' ],
+        where => {
+            %base_conditions,
+            notafter  => { -between => [ $expiry_cutoff, $epoch ] },
+            attribute_contentkey => 'system_renewal_cert_identifier',
+        }
+    );
+    $result->{recent_renewed} = sprintf "%01d", $tuple->{amount};
 
     ##! 32: 'Report result ' . Dumper $result
     if ($target_key) {
@@ -203,6 +233,13 @@ Default is +000030 (30 days).
 
 Parseable OpenXPKI::Datetime value (autodetected), certificates which are
 expired after the given date are shown as "recent_expiry".
+Default is -000030 (30 days in the past).
+
+=item recent_renewal
+
+Parseable OpenXPKI::Datetime value (autodetected), certificates which have
+been issued as renewal to a predecessor certificate after the given date
+are shown as "recent_renewal".
 Default is -000030 (30 days in the past).
 
 =item valid_at
@@ -271,5 +308,16 @@ the given window.
 
 Number of valid (not revoked) certificates that have been expired
 within the given window.
+
+=item recent_renewed
+
+Number of certificates that have been issued within the given window
+as a renewal to a predecessor certificate.
+
+=item by_profile
+
+Contains the share of certificate profiles of all valid certificates as
+a key/value map. The key is the internal name of the profile and the value
+is the absolute number of valid, issued certificates using this profile.
 
 =back

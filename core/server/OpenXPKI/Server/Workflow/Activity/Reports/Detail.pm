@@ -288,8 +288,6 @@ sub execute {
         chmod oct($umask), $target_name;
     }
 
-
-
     my $json;
     if (!$fh) { # target memory, receives only the data!
     

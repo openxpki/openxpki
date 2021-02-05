@@ -1595,6 +1595,14 @@ msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_NAME"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_SUMMARY"
+msgstr "Технологические процессы выдачи новых списков отзыва"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_TIMELINE_LABEL"
+msgstr "Имя учетной записи"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID"
 msgstr ""
 "Выбранный способ построения имени требует наличия, как минимум, одного "
@@ -4022,11 +4030,27 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_CURRENT_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DRAW_CHART"
+msgstr "Экспорт"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_NEAR_EXPIRY"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_PROFILES"
+msgstr "Экспорт заявки на сертификат (CSR)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_RECENT_EXPIRY"
+msgstr "Экспорт"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_RECENT_RENEWED"
 msgstr "Экспорт"
 
 #, fuzzy
@@ -4040,6 +4064,19 @@ msgstr "Экспорт"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_EXPIRED"
 msgstr "Экспорт заявки на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_ISSUED"
+msgstr "Экспорт заявки на сертификат (CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_RENEWED"
+msgstr ""
+"Используйте данный профиль сертификата только если Вы отчетливо "
+"представляете себе необходимую структуру имени субъекта сертификата, хорошо "
+"знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
+"части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
+"также произвольный набор альтернативных имен."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_REVOKED"
@@ -4074,6 +4111,14 @@ msgstr ""
 "знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
 "части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
 "также произвольный набор альтернативных имен."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_PROFILE_LABEL"
+msgstr "Профиль пользователя"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_LABEL"
+msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"

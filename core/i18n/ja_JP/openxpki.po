@@ -1197,6 +1197,15 @@ msgstr "レポートの詳細"
 msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_NAME"
 msgstr "レポート名"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_SUMMARY"
+msgstr "証明書の概要"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_REPORT_TIMELINE_LABEL"
+msgstr "レポート構成"
+
 msgid "I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID"
 msgstr "Unable to perform action -  security token was invalid!"
 
@@ -3146,10 +3155,26 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE"
 msgstr ""
 "現在の権限ではこのワークフロープロパティーへのアクセスは禁止されています"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_CURRENT_LABEL"
+msgstr "証明書の詳細レポート"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DRAW_CHART"
+msgstr "証明書の全体数"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_NEAR_EXPIRY"
 msgstr "有効期限間近の証明書"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_PROFILES"
+msgstr "有効期限切れの証明書"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_RECENT_EXPIRY"
+msgstr "最近の有効期限切れの証明書"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_RECENT_RENEWED"
 msgstr "最近の有効期限切れの証明書"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_COUNT"
@@ -3160,6 +3185,14 @@ msgstr "全体の個別の件名"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_EXPIRED"
 msgstr "有効期限切れの証明書"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_ISSUED"
+msgstr "有効期限切れの証明書"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_RENEWED"
+msgstr "全体の失効した証明書"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_REVOKED"
 msgstr "全体の失効した証明書"
@@ -3178,6 +3211,14 @@ msgstr "有効な個別の件名"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_REVOKED"
 msgstr "有効性はあるが失効した証明書"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_PROFILE_LABEL"
+msgstr "証明書プロファイル"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_LABEL"
+msgstr "証明書ステータスレポート"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"
 msgstr "リクエストされたアクションは利用できません"

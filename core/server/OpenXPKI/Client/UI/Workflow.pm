@@ -2181,28 +2181,7 @@ sub __render_from_workflow {
         # Add action buttons
         my $buttons = $self->__get_action_buttons( $wf_info ) ;
 
-        # Workflows can render grids -> only one field with format = grid
-        if (scalar @{$fields} == 1 && $fields->[0]->{format} eq 'grid') {
-
-            my $grid = $fields->[0];
-            $self->add_section({
-                type => 'grid',
-                className => 'workflow',
-                content => {
-                    actions => ($grid->{action} ? [{
-                        path => $grid->{action},
-                        label => '',
-                        icon => 'view',
-                        target => ($grid->{target} ? $grid->{target} : 'tab'),
-                    }] : undef),
-                    columns =>  $grid->{header},
-                    data => $grid->{value},
-                    empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
-                    buttons => $buttons
-                }
-            });
-
-        } elsif (!@$fields && $wf_info->{workflow}->{state} eq 'INITIAL') {
+       if (!@$fields && $wf_info->{workflow}->{state} eq 'INITIAL') {
             # initial step of workflow without fields
             $self->add_section({
                 type => 'text',
@@ -2225,17 +2204,72 @@ sub __render_from_workflow {
                 }];
             }
 
-            # Standard case - render key/value
+            my @fields = @{$fields};
+            my @section_fields;
+            while (my $field = shift @fields) {
+
+                # check if this field is a grid or chart
+                if ($field->{format} !~ m{(grid|chart)}) {
+                    push @section_fields, $field;
+                    next;
+                }
+
+                # check if we have normal fields on the stack to output
+                if (@section_fields) {
+                    $self->add_section({
+                        type => 'keyvalue',
+                        content => {
+                            label => '',
+                            description => '',
+                            data => [ @section_fields ],
+                    }});
+                    @section_fields  = ();
+                }
+
+                if ($field->{format} eq 'grid') {
+                    $self->logger()->trace('Adding grid ' . Dumper $field) if $self->logger->is_trace;
+                    $self->add_section({
+                        type => 'grid',
+                        className => 'workflow',
+                        content => {
+                            actions => ($field->{action} ? [{
+                                path => $field->{action},
+                                label => '',
+                                icon => 'view',
+                                target => ($field->{target} ? $field->{target} : 'tab'),
+                            }] : undef),
+                            columns =>  $field->{header},
+                            data => $field->{value},
+                            empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
+                            buttons => (@fields ? [] : $buttons), # add buttons if its the last item
+                        }
+                    });
+                } elsif ($field->{format} eq 'chart') {
+
+                    $self->logger()->trace('Adding chart ' . Dumper $field) if $self->logger->is_trace;
+                    $self->add_section({
+                        type => 'chart',
+                        content => {
+                            label => $field->{label} || '',
+                            options => $field->{options},
+                            data => $field->{value},
+                            empty => 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL',
+                            buttons => (@fields ? [] : $buttons), # add buttons if its the last item
+                        }
+                    });
+                }
+            }
+            # no chart/grid in the last position => output items on the stack
+
             $self->add_section({
                 type => 'keyvalue',
                 content => {
                     label => '',
                     description => '',
-                    data => $fields,
-                    buttons => $buttons
-            }});
+                    data => \@section_fields,
+                    buttons => $buttons,
+            }}) if (@section_fields);
         }
-
     }
 
     #
@@ -3079,16 +3113,122 @@ sub __render_fields {
         } elsif ($item->{format} eq "grid") {
 
             my @head;
-            # Create the required header structure
-            if ($field->{header}) {
-                @head = map { { 'sTitle' => $_ } } @{$field->{header}};
+            # item value can be data or grid specification
+            if (ref $item->{value} eq 'HASH') {
+                my $hv = $item->{value};
+                $item->{header} = [ map { { 'sTitle' => $_ } } @{$hv->{header}} ];
+                $item->{value} = $hv->{value};
+            } elsif ($field->{header}) {
+                $item->{header} = [ @head = map { { 'sTitle' => $_ } } @{$field->{header}} ];
             } else {
-                # just create empty headers for the number of columns
-                @head = map { { 'sTitle' => '' } } @{$field->{value}->[0]};
+                $item->{header} = [ @head = map { { 'sTitle' => '' } } @{$item->{value}->[0]} ];
             }
-            $item->{header} = \@head;
             $item->{action} = $field->{action};
             $item->{target} = $field->{target} ?  $field->{target} : 'tab';
+
+        } elsif ($item->{format} eq "chart") {
+
+            my @head;
+
+            my $param = $field->{param} || {};
+
+            $item->{options} = {
+                type => 'line',
+            };
+
+            # read options from the fields param method
+            foreach my $key ('width','height','type','title') {
+                $item->{options}->{$key} = $param->{$key} if (defined $param->{$key});
+            }
+
+            # series can be a hash based on the datas keys or an array
+            my $series = $param->{series};
+            if (ref $series eq 'ARRAY') {
+                $item->{options}->{series} = $series;
+            }
+
+            my $start_at = 0;
+            my $interval = 'months';
+
+            # item value can be data (array) or chart specification (hash)
+            if (ref $item->{value} eq 'HASH') {
+                # single data row chart with keys as groups
+                my $hv = $item->{value};
+                my @series;
+                my @keys;
+                if (ref $series eq 'HASH') {
+                    # series contains label as key / value hash
+                    @keys = sort keys %{$series};
+                    map {
+                        # series value can be a scalar (label) or a full hash
+                        my $ll = $series->{$_};
+                        push @series, (ref $ll ? $ll : { label => $ll });
+                        $_;
+                    } @keys;
+
+                } elsif (ref $series eq 'ARRAY') {
+                    @keys = map {
+                        my $kk = $_->{key};
+                        delete $_->{key};
+                        $kk;
+                    } @{$series};
+
+                } else {
+
+                    @keys = grep { ref $hv->{$_} ne 'HASH' } sort keys %{$hv};
+                    if (my $prefix = $param->{label}) {
+                        # label is a prefix to be merged with the key names
+                        @series = map { { label => $prefix.'_'.uc($_) } } @keys;
+                    } else {
+                        @series = map {  { label => $_ } } @keys;
+                    }
+                }
+
+                # check if we have a single row or multiple, we also assume
+                # that all keys have the same value count so we just take the
+                # first one
+                if (ref $hv->{$keys[0]}) {
+                    # get the number of items per row
+                    my $ic = scalar @{$hv->{$keys[0]}};
+
+                    # if start_at is not set, we do a backward calculation
+                    $start_at ||= DateTime->now()->subtract ( $interval => ($ic-1) );
+                    my $val = [];
+                    for (my $drw = 0; $drw < $ic; $drw++) {
+                        my @row = (undef) x @keys;
+                        unshift @row, $start_at->epoch();
+                        $start_at->add( $interval => 1 );
+                        $val->[$drw] = \@row;
+                        for (my $idx = 0; $idx < @keys; $idx++) {
+                            $val->[$drw]->[$idx+1] = $hv->{$keys[$idx]}->[$drw];
+                        }
+                    }
+                    $item->{value} = $val;
+
+                } elsif ($item->{options}->{type} eq 'pie') {
+
+                    my $sum = 0;
+                    my @val = map { $sum+=$hv->{$_}; $hv->{$_} || 0 } @keys;
+                    my $divider = 100 / $sum;
+
+                    map {  $_ *= $divider } @val;
+
+                    unshift @val, '';
+                    $item->{value} = [ \@val ];
+
+                } else {
+                    # only one row so this is easy
+                    my @val = map { $hv->{$_} || 0 } @keys;
+                    unshift @val, '';
+                    $item->{value} = [ \@val ];
+                }
+                $item->{options}->{series} = \@series if (@series);
+
+            } elsif (ref $item->{value} eq 'ARRAY' && @{$item->{value}}) {
+                if (!ref $item->{value}->[0]) {
+                    $item->{value} = [ $item->{value} ];
+                }
+            }
 
         } elsif ($item->{format} eq 'head') {
             # head can either show a value from context or a fixed label

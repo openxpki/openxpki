@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2020-08-03 12:19+0200\n"
+"PO-Revision-Date: 2021-02-08 21:54+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -11,7 +11,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.0.6\n"
+"X-Generator: Poedit 2.3\n"
 "X-Poedit-Bookmarks: -1,-1,77,-1,-1,-1,-1,-1,-1,-1\n"
 
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
@@ -335,26 +335,22 @@ msgstr "CRL Status"
 msgid "I18N_OPENXPKI_UI_CRL_VIEW_IN_BROWSER"
 msgstr "Zeige Details im Browser"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SHARE_ALREADY_ENTERED"
-msgstr "Passwort gelöscht"
+msgstr "Share wurde bereits eingegeben"
 
 msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLITENCRYPTED_KEY_COUNT_DIFFERS_FROM_SHARE_COUNT"
 msgstr ""
 "Die Anzahl der übergebenen Schlüssel stimmt nicht mit der Anzahl der "
 "Passwortteile überein."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLITENCRYPTED_UNABLE_TO_LOAD_ENCRYPTED_SHARE"
-msgstr "Unverschlüsselt"
+msgstr "Share konnte nicht geladen werden"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLITENCRYPTED_WRONG_SHARE_PASSPHRASE"
-msgstr "Literales Passwort"
+msgstr "Falsche Passphrase für Share"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CRYPTO_SECRET_SPLIT_EMPTY_SHARE"
-msgstr "Keine Daten verfügbar"
+msgstr "Share zurücksetzen"
 
 msgid "I18N_OPENXPKI_UI_CSR_EXT_CERTIFICATE_TEMPLATE"
 msgstr "Certificate Template"
@@ -822,7 +818,6 @@ msgstr "Prozess Informationen"
 msgid "I18N_OPENXPKI_UI_MENU_PUBLISH_CA_CRL"
 msgstr "CA/CRL veröffentlichen"
 
-# Remove?
 msgid "I18N_OPENXPKI_UI_MENU_REPORT_FULL"
 msgstr "Auswertung Zertifikate"
 
@@ -1162,7 +1157,6 @@ msgstr "3 Jahre"
 msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "Sperrgrund nicht unterstützt"
 
-# Remove?
 msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_LABEL"
 msgstr "Report Konfiguration"
 
@@ -1177,6 +1171,12 @@ msgstr "Report Details"
 
 msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_NAME"
 msgstr "Report Name"
+
+msgid "I18N_OPENXPKI_UI_REPORT_SUMMARY"
+msgstr "Übersicht Zertifikate"
+
+msgid "I18N_OPENXPKI_UI_REPORT_TIMELINE_LABEL"
+msgstr "Zertifikat Lebenszyklus Report"
 
 msgid "I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID"
 msgstr ""
@@ -3169,11 +3169,23 @@ msgstr ""
 "Der Zugriff auf diese Workfloweigenschaft ist für ihre Benutzerrolle nicht "
 "gestattet"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_CURRENT_LABEL"
+msgstr "Aktuelle Zertifikate"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DRAW_CHART"
+msgstr "Verwende Grafiken"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_NEAR_EXPIRY"
 msgstr "Demnächst ablaufende Zertifikate"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_PROFILES"
+msgstr "Profile"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_RECENT_EXPIRY"
 msgstr "Vor kurzem abgelaufene Zertifikate"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_RECENT_RENEWED"
+msgstr "Vor kurzem erneuerte Zertifikate"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_COUNT"
 msgstr "Gesamtzahl Zertifikate"
@@ -3183,6 +3195,12 @@ msgstr "Gesamtzahl unterschiedlicher Subjects"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_EXPIRED"
 msgstr "Abgelaufene Zertifikate"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_ISSUED"
+msgstr "Ausgestellte Zertifikate"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_RENEWED"
+msgstr "Gesamtzahl erneuerter Zertifikate"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_REVOKED"
 msgstr "Gesamtzahl gesperrter Zertifikate"
@@ -3203,6 +3221,12 @@ msgstr "Gültige unterschiedliche Subjects"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_REVOKED"
 msgstr "Nicht abgelaufene, jedoch gesperrte Zertifikate"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_PROFILE_LABEL"
+msgstr "Übersicht Profile"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_SUMMARY_LABEL"
+msgstr "Alle ausgestellten Zertifikate"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE"
 msgstr "Die gewünschte Aktion ist nicht verfügbar - öffne aktuellen Status"
