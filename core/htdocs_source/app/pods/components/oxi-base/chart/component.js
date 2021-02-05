@@ -273,7 +273,7 @@ export default class OxiChartComponent extends Component {
                     cy = 50,
                     strokeWidth = 15,
                     dashArray = 2*Math.PI*radius,
-                    dashOffset = dashArray - (dashArray * row[i] / 100),
+                    dashOffset = dashArray - (dashArray * row[i] / 100) + 3,
                     angle = (filled * 360 / 100) + startAngle;
 
                 circle.setAttribute("r",radius);
