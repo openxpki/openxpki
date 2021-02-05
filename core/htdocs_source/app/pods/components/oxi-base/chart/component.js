@@ -6,18 +6,16 @@ import { guidFor } from '@ember/object/internals';
 import uPlot from 'uplot';
 import seriesBarsPlugin from './uplot/seriesbars-plugin';
 
-//import 'uplot/dist/uPlot.min.css';
-//import wheelZoom from './chart/plugin-wheelzoom.js'
-
 /**
-...
+Draws a line or bar chart.
 
 ```html
-<OxiBase::Chart .../>
+<OxiBase::Chart @data={{this.data}} @options={{this.options}} />
 ```
 
 @module oxi-base/chart
-@param list { array } - List of hashes defining the options.
+@param data { array } - list of data rows: `[ [x1, a1, b1, c1, ...], [x2, b2, c2, ...], ... ]`
+@param options { hash } - display options for the chart
 */
 
 export default class OxiChartComponent extends Component {
