@@ -235,7 +235,7 @@ export default class TestController extends Controller {
                 x_is_timestamp: true,
                 legend_label: true,
                 legend_value: true,
-                y_axes: [
+                series: [
                     {
                         label: 'Certs',
                         color: 'rgba(0, 100, 200, 1)',
@@ -261,7 +261,7 @@ export default class TestController extends Controller {
                 width: 300,
                 height: 200,
                 title: 'Bar chart',
-                y_axes: [
+                series: [
                     {
                         label: 'Requested',
                         color: 'rgba(0, 100, 200, 0.9)',
@@ -278,13 +278,8 @@ export default class TestController extends Controller {
                         scale: '%',
                     },
                 ],
-                bar_group_labels: {
-                    a: "2019",
-                    b: "2020",
-                    c: "2021",
-                },
             },
-            data: [['a','23.8','53.6','37.4'],['b','19.6','43.3','63.4'],['c','4.2','51.8','47.4']],
+            data: [['2018','23.8','53.6','37.4'],['2019','19.6','43.3','63.4'],['2020','4.2','51.8','47.4']],
         }
     };
 
@@ -297,7 +292,7 @@ export default class TestController extends Controller {
                 width: 300,
                 height: 200,
                 title: 'Bar chart',
-                y_axes: [
+                series: [
                     {
                         label: 'Requested',
                     },

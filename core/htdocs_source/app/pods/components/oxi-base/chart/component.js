@@ -42,12 +42,11 @@ export default class OxiChartComponent extends Component {
             title = "",
             cssClass = "",
             x_is_timestamp = true,
-            y_axes = [ {} ], // default: one array item to make sure the loop below creates left Y-axis
-            legend_label = (this.args.options.y_axes ? true : false),
+            series = [ {} ], // default: one array item to make sure the loop below creates left Y-axis
+            legend_label = (this.args.options.series ? true : false),
             legend_value = false,
             legend_date_format = '{YYYY}-{MM}-{DD}, {HH}:{mm}:{ss}',
             type = 'line',
-            bar_group_labels,
             bar_vertical = false,
         } = this.args.options ?? {};
 
@@ -61,12 +60,12 @@ export default class OxiChartComponent extends Component {
          */
         this.data = [];
         for (let i=0; i<this.args.data[0].length; i++) {
-            let series = this.args.data.map(row => +row[i]);
+            let seriesData = this.args.data.map(row => +row[i]);
 
             // FIXME: Temporary workaround for seriesBarsPlugin() not working with single series
-            if (barCartSingleSeriesFix) series.push(null);
+            if (barCartSingleSeriesFix) seriesData.push(null);
 
-            this.data.push(series);
+            this.data.push(seriesData);
         }
 
         /*
@@ -129,7 +128,7 @@ export default class OxiChartComponent extends Component {
                 },
                 plugins: [
                     seriesBarsPlugin({
-                        labels: () => this.args.data.map(group => bar_group_labels ? bar_group_labels[group[0]] : group[0]), // group / time series
+                        labels: () => this.args.data.map(group => group[0]), // group / time series
                         ori: bar_vertical ? 1 : 0,
                         dir: 1,
                         singleSeriesFix: barCartSingleSeriesFix,
@@ -137,8 +136,8 @@ export default class OxiChartComponent extends Component {
                 ],
             });
             // The series loop below needs the series to be defined
-            if (!this.args.options.y_axes) {
-                for (let i = 0; i < this.data[0].length; i++) y_axes.push({})
+            if (!this.args.options.series) {
+                for (let i = 0; i < this.data[0].length; i++) series.push({})
             }
         }
 
@@ -146,7 +145,7 @@ export default class OxiChartComponent extends Component {
          * Series
          */
         let autoScaleId = 0;
-        for (const graph of y_axes) {
+        for (const graph of series) {
             const {
                 label = '',
                 color = 'rgba(0, 100, 200, 1)',
