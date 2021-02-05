@@ -229,7 +229,7 @@ export default class TestController extends Controller {
         content: {
             options: {
                 type: 'line',
-                width: 400,
+                width: 300,
                 height: 200,
                 title: 'Line chart',
                 x_is_timestamp: true,
@@ -258,7 +258,7 @@ export default class TestController extends Controller {
         content: {
             options: {
                 type: 'bar',
-                width: 400,
+                width: 300,
                 height: 200,
                 title: 'Bar chart',
                 y_axes: [
@@ -285,6 +285,31 @@ export default class TestController extends Controller {
                 },
             },
             data: [['a','23.8','53.6','37.4'],['b','19.6','43.3','63.4'],['c','4.2','51.8','47.4']],
+        }
+    };
+
+    chartDef3 = {
+        type: "chart",
+        className: "test-chart",
+        content: {
+            options: {
+                type: 'bar',
+                width: 300,
+                height: 200,
+                title: 'Bar chart',
+                y_axes: [
+                    {
+                        label: 'Requested',
+                    },
+                    {
+                        label: 'Renewed',
+                    },
+                    {
+                        label: "Revoked",
+                    },
+                ],
+            },
+            data: [['2019','23.8','53.6','37.4']],
         }
     };
 

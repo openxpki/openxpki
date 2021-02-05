@@ -55,6 +55,8 @@ export default function seriesBarsPlugin(opts) {
 
     const font       = Math.round(10 * pxRatio) + "px sans-serif";
 
+    const singleSeriesFix = opts.singleSeriesFix
+
     function pointWithin(px, py, rlft, rtop, rrgt, rbtm) {
         return px >= rlft && px <= rrgt && py >= rtop && py <= rbtm;
     }
@@ -67,8 +69,16 @@ export default function seriesBarsPlugin(opts) {
             xDraw && xDraw(ix, groupOffPx, groupWidPx);
 
             yDraw && distr(yCount, barWidth, barDistr, yIdx, (iy, offPct, dimPct) => {
-                let barOffPx = groupWidPx * offPct;
-                let barWidPx = groupWidPx * dimPct;
+
+                // FIXME: Temporary workaround for seriesBarsPlugin() not working with single series
+                let barOffPx = (singleSeriesFix)
+                    ? groupWidPx*xCount/(xCount-1) * offPct + ix * groupWidPx*(xCount-1)/xCount
+                    : groupWidPx * offPct;
+                let barWidPx = (singleSeriesFix)
+                    ? groupWidPx*xCount/(xCount-1) * dimPct
+                    : groupWidPx * dimPct;
+
+                if (singleSeriesFix && ix > 0) return
 
                 yDraw(ix, groupOffPx + barOffPx, barWidPx);
             });
@@ -234,7 +244,10 @@ export default function seriesBarsPlugin(opts) {
                         let groupLftPx = (dim * lftPct) / pxRatio;
                         let groupWidPx = (dim * widPct) / pxRatio;
 
-                        let groupCenterPx = groupLftPx + groupWidPx / 2;
+                        // FIXME: Temporary workaround for seriesBarsPlugin() not working with single series
+                        let groupCenterPx = singleSeriesFix
+                            ? ((groupLftPx + groupWidPx / 2) * u.data[0].length / (u.data[0].length - 1))
+                            : (groupLftPx + groupWidPx / 2);
 
                         splits.push(u.posToVal(groupCenterPx, 'x'));
                     });

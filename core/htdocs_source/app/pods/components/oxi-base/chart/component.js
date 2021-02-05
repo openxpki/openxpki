@@ -34,9 +34,7 @@ export default class OxiChartComponent extends Component {
         super(...arguments);
 
         this.guid = guidFor(this);
-        /*
-         * Options
-         */
+
         // Evaluate given options and set defaults
         const {
             width = 400,
@@ -52,6 +50,28 @@ export default class OxiChartComponent extends Component {
             bar_group_labels,
             bar_vertical = false,
         } = this.args.options ?? {};
+
+        // FIXME: Temporary workaround for seriesBarsPlugin() not working with single series
+        let barCartSingleSeriesFix = (type == 'bar' && this.args.data.length < 2);
+
+        /*
+         * Convert data from
+         * from [ [x1, price1, rsi1], [x2, price2, rsi2] ]
+         *   to [ [x1, x2], [price1, price2], [rsi1, rsi2] ]
+         */
+        this.data = [];
+        for (let i=0; i<this.args.data[0].length; i++) {
+            let series = this.args.data.map(row => +row[i]);
+
+            // FIXME: Temporary workaround for seriesBarsPlugin() not working with single series
+            if (barCartSingleSeriesFix) series.push(null);
+
+            this.data.push(series);
+        }
+
+        /*
+         * Options
+         */
 
         // assemble uPlot options
         let uplotOptions = {
@@ -112,6 +132,7 @@ export default class OxiChartComponent extends Component {
                         labels: () => this.args.data.map(group => bar_group_labels ? bar_group_labels[group[0]] : group[0]), // group / time series
                         ori: bar_vertical ? 1 : 0,
                         dir: 1,
+                        singleSeriesFix: barCartSingleSeriesFix,
                     }),
                 ],
             });
@@ -187,16 +208,6 @@ export default class OxiChartComponent extends Component {
         }
 
         this.options = uplotOptions;
-
-        /*
-         * Convert data from
-         * from [ [x1, price1, rsi1], [x2, price2, rsi2] ]
-         *   to [ [x1, x2], [price1, price2], [rsi1, rsi2] ]
-         */
-        this.data = [];
-        for (let i=0; i<this.args.data[0].length; i++) {
-            this.data.push(this.args.data.map(row => +row[i]));
-        }
     }
 
     @action
