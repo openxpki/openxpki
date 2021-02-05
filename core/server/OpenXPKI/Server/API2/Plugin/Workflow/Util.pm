@@ -600,7 +600,7 @@ sub fetch_workflow {
             params  => {
                 workflow_id => $id,
                 workflow_realm => $dbresult->{pki_realm},
-                session_realm => ctx('session')->data->pki_realm,
+                session_realm => CTX('session')->data->pki_realm,
             },
         );
     }
