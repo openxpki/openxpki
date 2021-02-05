@@ -115,6 +115,10 @@ export default class OxiChartComponent extends Component {
                     }),
                 ],
             });
+            // The series loop below needs the series to be defined
+            if (!this.args.options.y_axes) {
+                for (let i = 0; i < this.data[0].length; i++) y_axes.push({})
+            }
         }
 
         /*
