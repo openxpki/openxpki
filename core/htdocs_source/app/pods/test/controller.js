@@ -229,9 +229,8 @@ export default class TestController extends Controller {
         content: {
             options: {
                 type: 'line',
-                width: 300,
-                height: 200,
-                title: 'Line chart',
+                width: 250,
+                height: 150,
                 x_is_timestamp: true,
                 legend_label: true,
                 legend_value: true,
@@ -258,9 +257,8 @@ export default class TestController extends Controller {
         content: {
             options: {
                 type: 'bar',
-                width: 300,
-                height: 200,
-                title: 'Bar chart',
+                width: 250,
+                height: 150,
                 series: [
                     {
                         label: 'Requested',
@@ -289,9 +287,8 @@ export default class TestController extends Controller {
         content: {
             options: {
                 type: 'bar',
-                width: 300,
-                height: 200,
-                title: 'Bar chart',
+                width: 250,
+                height: 150,
                 series: [
                     {
                         label: 'Requested',
@@ -305,6 +302,33 @@ export default class TestController extends Controller {
                 ],
             },
             data: [['2019','23.8','53.6','37.4']],
+        }
+    };
+
+    chartDef4 = {
+        type: "chart",
+        className: "test-chart",
+        content: {
+            options: {
+                type: 'pie',
+                width: 250,
+                height: 150,
+                series: [
+                    {
+                        label: 'Requested',
+                    },
+                    {
+                        label: 'Renewed',
+                    },
+                    {
+                        label: "Revoked",
+                    },
+                    {
+                        label: "Unchanged",
+                    },
+                ],
+            },
+            data: [['2019','14','44','30','12']],
         }
     };
 

@@ -20,6 +20,17 @@ Draws a line or bar chart.
 @param options { hash } - display options for the chart
 */
 
+// From https://raw.githubusercontent.com/leeoniya/uPlot/1.6.4/src/domClasses.js
+const pre = "u-";
+export const LEGEND         = pre + "legend"
+export const LEGEND_LIVE    = pre + "live";
+export const LEGEND_INLINE  = pre + "inline";
+export const LEGEND_THEAD   = pre + "thead";
+export const LEGEND_SERIES  = pre + "series";
+export const LEGEND_MARKER  = pre + "marker";
+export const LEGEND_LABEL   = pre + "label";
+export const LEGEND_VALUE   = pre + "value";
+
 export default class OxiChartComponent extends Component {
     guid;
     opt = {};
@@ -79,7 +90,9 @@ export default class OxiChartComponent extends Component {
     @action
     plot(element) {
         const type = this.args.options.type;
-        if (type == 'line' || type == 'bar') this.drawLineOrBar(element)
+        if (type == 'line' || type == 'bar') return this.drawLineOrBar(element);
+        if (type == 'pie') return this.drawPie(element);
+        throw new Error(`Unknown chart type '${type}'`);
     }
 
     @action
@@ -249,5 +262,105 @@ export default class OxiChartComponent extends Component {
             element.appendChild(uplot.root);
             init();
         })
+    }
+
+    @action
+    drawPie(element) {
+        let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"),
+            filled = 0;
+
+        svg.setAttribute("width",this.opt.width);
+        svg.setAttribute("height",this.opt.height);
+        svg.setAttribute("viewBox","0 0 100 100");
+
+        element.appendChild(svg);
+
+        for (let row of this.args.data) {
+            let time = row.shift();
+            for (let i=0; i<row.length; i++) {
+                let circle = document.createElementNS("http://www.w3.org/2000/svg","circle"),
+                    startAngle = -90,
+                    radius = 30,
+                    cx = 50,
+                    cy = 50,
+                    strokeWidth = 15,
+                    dashArray = 2*Math.PI*radius,
+                    dashOffset = dashArray - (dashArray * row[i] / 100),
+                    angle = (filled * 360 / 100) + startAngle;
+
+                circle.setAttribute("r",radius);
+                circle.setAttribute("cx",cx);
+                circle.setAttribute("cy",cy);
+                circle.setAttribute("fill","transparent");
+                circle.setAttribute("stroke", this.opt.series[i].color);
+                circle.setAttribute("stroke-width",strokeWidth);
+                circle.setAttribute("stroke-dasharray",dashArray);
+                circle.setAttribute("stroke-dashoffset",dashOffset);
+                circle.setAttribute("transform","rotate("+(angle)+" "+cx+" "+cy+")");
+
+                svg.appendChild(circle);
+                filled+= +row[i];
+            }
+        }
+
+        if (this.opt.legend_label) {
+            let legendEl = this.placeTag("table", LEGEND, element);
+            let head = this.placeTag("tr", LEGEND_THEAD, legendEl);
+            this.placeTag("th", null, head);
+
+            let legendCols = {_: 0};
+            this.addClass(legendEl, LEGEND_INLINE);
+
+            let i = 0;
+            for (const series of this.opt.series) {
+                this.initLegendRow(legendEl, i, series.label, series.color);
+                i++;
+            }
+        }
+    }
+
+    initLegendRow(legendEl, i, label, color) {
+        let _row = [];
+
+        let row = this.placeTag("tr", LEGEND_SERIES, legendEl, legendEl.childNodes[i]);
+
+        // addClass(row, class);
+
+        let labelDiv = this.placeTag("th", null, row);
+
+        let indic = this.placeDiv(LEGEND_MARKER, labelDiv);
+
+        // indic.style.border = width + "px " + legend.dash(self, i) + " " + legend.stroke(self, i);
+        indic.style.setProperty('background-color', color);
+
+        let text = this.placeDiv(LEGEND_LABEL, labelDiv);
+        text.textContent = label;
+
+        let v = this.placeTag("td", LEGEND_VALUE, row);
+        v.textContent = "--";
+        _row.push(v);
+
+        return _row;
+    }
+
+    placeTag(tag, cls, targ, refEl) {
+        let el = document.createElement(tag);
+
+        if (cls != null)
+            this.addClass(el, cls);
+
+        if (targ != null)
+            targ.insertBefore(el, refEl);
+
+        return el;
+    }
+
+    placeDiv(cls, targ) {
+        return this.placeTag("div", cls, targ);
+    }
+
+
+    addClass(el, c) {
+        c != null && el.classList.add(c);
     }
 }
