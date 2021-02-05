@@ -23,6 +23,7 @@ Draws a line or bar chart.
 export default class OxiChartComponent extends Component {
     guid;
     opt = {};
+    seriesCount;
 
     // x - timestamp
     // y - BTC price
@@ -34,6 +35,8 @@ export default class OxiChartComponent extends Component {
 
         this.guid = guidFor(this);
 
+        this.seriesCount = this.args.data[0].length - 1;
+
         // Evaluate given options and set defaults
         const defaults = {
             width: 400,
@@ -42,8 +45,8 @@ export default class OxiChartComponent extends Component {
             cssClass: "",
             type: 'line',
             series: [],
-            // Only 'line' and 'bar' chart:
             legend_label: (this.args.options.series ? true : false),
+            // Only 'line' and 'bar' chart:
             legend_value: false,
             legend_date_format: '{YYYY}-{MM}-{DD}, {HH}:{mm}:{ss}',
             x_is_timestamp: true,
@@ -53,6 +56,24 @@ export default class OxiChartComponent extends Component {
         for (const key of Object.keys(defaults)) {
             this.opt[key] = this.args.options[key] ?? defaults[key];
         }
+
+        // Loops in 'bar' and 'pie' chart code need the series to be defined
+        if (this.opt.series.length === 0) {
+            for (let i = 0; i < this.seriesCount; i++) this.opt.series.push({})
+        }
+
+        // Defaults for series options
+        let i = 0;
+        let col_factor = 1/this.seriesCount;
+        this.opt.series = this.opt.series.map(
+            ({
+                label = '',
+                color = `rgba(${120 - i*col_factor*100}, ${150 - i*col_factor*150}, ${50 + i*col_factor*200}, 1)`,
+                fill,
+                line_width = 1,
+                scale = 'auto',
+            }) => { i++; return { label, color, fill, line_width, scale } }
+        );
     }
 
     @action
@@ -132,17 +153,10 @@ export default class OxiChartComponent extends Component {
             });
         }
 
-        let _series = this.opt.series;
-
         /*
          * BAR chart
          */
         if (this.opt.type == 'bar') {
-            // The loop below needs the series to be defined for 'bar' charts
-            if (_series.length === 0) {
-                for (let i = 0; i < uplotData[0].length; i++) _series.push({})
-            }
-
             // 'bar' chart specific options
             uPlot.assign(uplotOptions, {
                 series: [
@@ -171,7 +185,7 @@ export default class OxiChartComponent extends Component {
          */
         let autoScaleId = 0;
 
-        for (const graph of _series) {
+        for (const graph of this.opt.series) {
             let {
                 label = '',
                 color = 'rgba(0, 100, 200, 1)',
