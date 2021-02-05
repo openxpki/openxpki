@@ -404,35 +404,35 @@ var e=O[this.args.button.format]
 return void 0===e&&console.error('oxi-button: button "'.concat(this.args.button.label,'" has unknown format: "').concat(this.args.button.format,'"')),null!=e?e:""}},{key:"buttonType",get:function(){return"primary"===this.args.button.format?"primary":"default"}}])&&d(t.prototype,n),r&&d(t,r),i}(t.default),c=g((u=s).prototype,"showConfirmDialog",[n],{configurable:!0,enumerable:!0,writable:!0,initializer:function(){return!1}}),g(u.prototype,"additionalCssClass",[r],Object.getOwnPropertyDescriptor(u.prototype,"additionalCssClass"),u.prototype),g(u.prototype,"buttonType",[o],Object.getOwnPropertyDescriptor(u.prototype,"buttonType"),u.prototype),g(u.prototype,"click",[i],Object.getOwnPropertyDescriptor(u.prototype,"click"),u.prototype),g(u.prototype,"executeAction",[a],Object.getOwnPropertyDescriptor(u.prototype,"executeAction"),u.prototype),g(u.prototype,"resetConfirmState",[l],Object.getOwnPropertyDescriptor(u.prototype,"resetConfirmState"),u.prototype),u)
 e.default=_})),define("openxpki/pods/components/oxi-base/button/template",["exports"],(function(e){Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0
 var t=Ember.HTMLBars.template({id:"2zNtughA",block:'{"symbols":["Modal","@button","&attrs"],"statements":[[6,[37,2],[[32,2,["href"]]],null,[["default","else"],[{"statements":[[2,"    "],[11,"a"],[17,3],[16,0,[31,["btn ",[32,0,["additionalCssClass"]]]]],[16,6,[31,[[32,2,["href"]]]]],[16,"target",[31,[[32,2,["target"]]]]],[12],[2,"\\n"],[6,[37,2],[[32,2,["tooltip"]]],null,[["default"],[{"statements":[[2,"            "],[8,"bs-tooltip",[],[["@title"],[[32,2,["tooltip"]]]],null],[2,"\\n"]],"parameters":[]}]]],[2,"        "],[1,[32,2,["label"]]],[2,"\\n    "],[13],[2,"\\n"]],"parameters":[]},{"statements":[[2,"\\n    "],[8,"bs-button",[[17,3],[16,0,[31,[[30,[36,2],[[32,2,["loading"]],"oxi-btn-loading"],null]," ",[32,0,["additionalCssClass"]]]]],[16,"disabled",[32,2,["disabled"]]]],[["@type","@onClick"],[[32,0,["buttonType"]],[32,0,["click"]]]],[["default"],[{"statements":[[2,"\\n"],[6,[37,2],[[32,2,["tooltip"]]],null,[["default"],[{"statements":[[2,"            "],[8,"bs-tooltip",[],[["@title"],[[32,2,["tooltip"]]]],null],[2,"\\n"]],"parameters":[]}]]],[2,"        "],[1,[32,2,["label"]]],[2,"\\n    "]],"parameters":[]}]]],[2,"\\n\\n"],[6,[37,2],[[32,2,["confirm"]]],null,[["default"],[{"statements":[[2,"        "],[8,"bs-modal",[],[["@open","@closeButton","@fade","@backdrop","@backdropClose","@onHidden"],[[32,0,["showConfirmDialog"]],true,true,true,false,[30,[36,0],[[32,0],"resetConfirmState"],null]]],[["default"],[{"statements":[[2,"\\n            "],[8,[32,1,["header"]],[],[[],[]],[["default"],[{"statements":[[2,"\\n                "],[10,"h4"],[14,0,"modal-title"],[12],[2,"\\n                    "],[1,[32,2,["confirm","label"]]],[2,"\\n                "],[13],[2,"\\n            "]],"parameters":[]}]]],[2,"\\n            "],[8,[32,1,["body"]],[],[[],[]],[["default"],[{"statements":[[2,"\\n                "],[2,[32,2,["confirm","description"]]],[2,"\\n            "]],"parameters":[]}]]],[2,"\\n            "],[8,[32,1,["footer"]],[],[[],[]],[["default"],[{"statements":[[2,"\\n                "],[8,"bs-button",[],[["@onClick","@type"],[[32,0,["executeAction"]],"primary"]],[["default"],[{"statements":[[2,"\\n                    "],[1,[30,[36,2],[[32,2,["confirm","confirm_label"]],[32,2,["confirm","confirm_label"]],[30,[36,1],["button.confirm_dialog.ok"],null]],null]],[2,"\\n                "]],"parameters":[]}]]],[2,"\\n                "],[8,"bs-button",[],[["@onClick"],[[30,[36,0],[[32,0],[32,1,["close"]]],null]]],[["default"],[{"statements":[[2,"\\n                    "],[1,[30,[36,2],[[32,2,["confirm","cancel_label"]],[32,2,["confirm","cancel_label"]],[30,[36,1],["button.confirm_dialog.cancel"],null]],null]],[2,"\\n                "]],"parameters":[]}]]],[2,"\\n            "]],"parameters":[]}]]],[2,"\\n        "]],"parameters":[1]}]]],[2,"\\n"]],"parameters":[]}]]]],"parameters":[]}]]]],"hasEval":false,"upvars":["action","t","if"]}',moduleName:"openxpki/pods/components/oxi-base/button/template.hbs"})
-e.default=t})),define("openxpki/pods/components/oxi-base/chart/chart-line-bar",["exports","uplot","openxpki/pods/components/oxi-base/chart/uplot/seriesbars-plugin","openxpki/pods/components/oxi-base/chart/uplot/axis-timestamp-config"],(function(e,t,n,r){function o(e,t){(null==t||t>e.length)&&(t=e.length)
+e.default=t})),define("openxpki/pods/components/oxi-base/chart/chart-line-bar",["exports","path2d-polyfill","uplot","openxpki/pods/components/oxi-base/chart/uplot/seriesbars-plugin","openxpki/pods/components/oxi-base/chart/uplot/axis-timestamp-config"],(function(e,t,n,r,o){function i(e,t){(null==t||t>e.length)&&(t=e.length)
 for(var n=0,r=new Array(t);n<t;n++)r[n]=e[n]
-return r}function i(e){var t=document.createElement("div")
-t.id="for-computed-style",t.style.color=e,document.querySelector("body").appendChild(t)
-var n=getComputedStyle(t).color.match(/^rgba?\s*\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*(\d\.\d)\s*)?\)$/i)
-if(document.querySelector("#for-computed-style").remove(),n){var r={r:n[1],g:n[2],b:n[3]}
-return"rgba(".concat(r.r,",").concat(r.g,",").concat(r.b,",0.1)")}throw new Error("Color ".concat(e," could not be parsed."))}Object.defineProperty(e,"__esModule",{value:!0}),e.default=function(e,a,l){for(var u="bar"==a.type&&l.length<2,c=[],s=function(e){var t=l.map((function(t){return+t[e]}))
+return r}function a(e){var t=document.createElement("div")
+t.style.color=e,document.querySelector("body").appendChild(t)
+var n=getComputedStyle(t).color.match(/^rgba?\s*\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*(\d(\.\d)?)\s*)?\)$/i)
+if(t.parentNode.removeChild(t),n){var r={r:n[1],g:n[2],b:n[3]}
+return"rgba(".concat(r.r,",").concat(r.g,",").concat(r.b,",0.1)")}throw new Error("Color ".concat(e," could not be parsed."))}Object.defineProperty(e,"__esModule",{value:!0}),e.default=function(e,t,l){for(var u="bar"==t.type&&l.length<2,c=[],s=function(e){var t=l.map((function(t){return+t[e]}))
 u&&t.push(null),c.push(t)},f=0;f<l[0].length;f++)s(f)
-var p={width:a.width,height:a.height,title:a.title,class:a.cssClass,legend:{show:a.legend_label,live:a.legend_value},scales:{x:{time:a.x_is_timestamp},auto:{auto:!0},"%":{auto:!1,range:function(e){return[0,100]}}},axes:[{time:!0,values:r.default}]}
-if("line"==a.type&&a.x_is_timestamp){var d=t.default.fmtDate(a.legend_date_format)
-t.default.assign(p,{series:[{value:function(e,t){return null==t?"-":d(new Date(1e3*t))}}]})}"bar"==a.type&&t.default.assign(p,{series:[{}],scales:{x:{time:!1,values:void 0}},plugins:[(0,n.default)({labels:function(){return l.map((function(e){return e[0]}))},ori:a.bar_vertical?1:0,dir:1,singleSeriesFix:u})]})
+var p={width:t.width,height:t.height,title:t.title,class:t.cssClass,legend:{show:t.legend_label,live:t.legend_value},scales:{x:{time:t.x_is_timestamp},auto:{auto:!0},"%":{auto:!1,range:function(e){return[0,100]}}},axes:[{time:!0,values:o.default}]}
+if("line"==t.type&&t.x_is_timestamp){var d=n.default.fmtDate(t.legend_date_format)
+n.default.assign(p,{series:[{value:function(e,t){return null==t?"-":d(new Date(1e3*t))}}]})}"bar"==t.type&&n.default.assign(p,{series:[{}],scales:{x:{time:!1,values:void 0}},plugins:[(0,r.default)({labels:function(){return l.map((function(e){return e[0]}))},ori:t.bar_vertical?1:0,dir:1,singleSeriesFix:u})]})
 var b,y=0,m=function(e,t){var n
 if("undefined"==typeof Symbol||null==e[Symbol.iterator]){if(Array.isArray(e)||(n=function(e,t){if(!e)return
-if("string"==typeof e)return o(e,t)
+if("string"==typeof e)return i(e,t)
 var n=Object.prototype.toString.call(e).slice(8,-1)
 "Object"===n&&e.constructor&&(n=e.constructor.name)
 if("Map"===n||"Set"===n)return Array.from(e)
-if("Arguments"===n||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))return o(e,t)}(e))||t&&e&&"number"==typeof e.length){n&&(e=n)
-var r=0,i=function(){}
-return{s:i,n:function(){return r>=e.length?{done:!0}:{done:!1,value:e[r++]}},e:function(e){throw e},f:i}}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}var a,l=!0,u=!1
+if("Arguments"===n||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n))return i(e,t)}(e))||t&&e&&"number"==typeof e.length){n&&(e=n)
+var r=0,o=function(){}
+return{s:o,n:function(){return r>=e.length?{done:!0}:{done:!1,value:e[r++]}},e:function(e){throw e},f:o}}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}var a,l=!0,u=!1
 return{s:function(){n=e[Symbol.iterator]()},n:function(){var e=n.next()
-return l=e.done,e},e:function(e){u=!0,a=e},f:function(){try{l||null==n.return||n.return()}finally{if(u)throw a}}}}(a.series)
-try{var v=function(){var e=b.value,n=e.label,r=void 0===n?"":n,o=e.color,l=void 0===o?"rgba(0, 100, 200, 1)":o,u=e.fill,c=e.line_width,s=void 0===c?1:c,f=e.scale,d=void 0===f?"auto":f
+return l=e.done,e},e:function(e){u=!0,a=e},f:function(){try{l||null==n.return||n.return()}finally{if(u)throw a}}}}(t.series)
+try{var v=function(){var e=b.value,r=e.label,o=void 0===r?"":r,i=e.color,l=void 0===i?"rgba(0, 100, 200, 1)":i,u=e.fill,c=e.line_width,s=void 0===c?1:c,f=e.scale,d=void 0===f?"auto":f
 Array.isArray(d)&&(d="_autogenerated_".concat(++y),p.scales[d]={auto:!1,range:function(){return d}})
-var m={label:r,scale:d,fill:null!=u?u:i(l),width:s/window.devicePixelRatio}
-if("line"==a.type&&(m.stroke=l),"bar"==a.type&&(m.fill=l),p.series.push(m),p.axes.length<3){var v={scale:d,space:Math.max((a.bar_vertical?a.width:a.height)/20,15),size:60,stroke:"bar"==a.type?"black":l}
-if("%"==d&&t.default.assign(v,{values:function(e,t,n){return t.map((function(e){return"".concat(e.toFixed(0),"%")}))}}),2==p.axes.length){if(p.axes[1].scale==d)return"continue"
-t.default.assign(v,{side:1,grid:{show:!1}})}p.axes.push(v)}}
-for(m.s();!(b=m.n()).done;)v()}catch(h){m.e(h)}finally{m.f()}new t.default(p,c,(function(t,n){e.appendChild(t.root),n()}))}})),define("openxpki/pods/components/oxi-base/chart/chart-pie",["exports"],(function(e){function t(e,t){var r
+var m={label:o,scale:d,fill:null!=u?u:a(l),width:s/window.devicePixelRatio}
+if("line"==t.type&&(m.stroke=l),"bar"==t.type&&(m.fill=l),p.series.push(m),p.axes.length<3){var v={scale:d,space:Math.max((t.bar_vertical?t.width:t.height)/20,15),size:60,stroke:"bar"==t.type?"black":l}
+if("%"==d&&n.default.assign(v,{values:function(e,t,n){return t.map((function(e){return"".concat(e.toFixed(0),"%")}))}}),2==p.axes.length){if(p.axes[1].scale==d)return"continue"
+n.default.assign(v,{side:1,grid:{show:!1}})}p.axes.push(v)}}
+for(m.s();!(b=m.n()).done;)v()}catch(h){m.e(h)}finally{m.f()}new n.default(p,c,(function(t,n){e.appendChild(t.root),n()}))}})),define("openxpki/pods/components/oxi-base/chart/chart-pie",["exports"],(function(e){function t(e,t){var r
 if("undefined"==typeof Symbol||null==e[Symbol.iterator]){if(Array.isArray(e)||(r=function(e,t){if(!e)return
 if("string"==typeof e)return n(e,t)
 var r=Object.prototype.toString.call(e).slice(8,-1)
@@ -478,7 +478,7 @@ l(this,f),b(p(e=a.apply(this,arguments)),"guid",void 0),b(p(e),"opt",{}),b(p(e),
 for(var t={width:400,height:200,title:"",cssClass:null,type:"line",series:[],legend_label:!!e.args.options.series,legend_value:!1,legend_date_format:"{YYYY}-{MM}-{DD}, {HH}:{mm}:{ss}",x_is_timestamp:!0,bar_vertical:!1},n=0,r=Object.keys(t);n<r.length;n++){var o,i=r[n]
 e.opt[i]=null!==(o=e.args.options[i])&&void 0!==o?o:t[i]}if(0===e.opt.series.length)for(var u=0;u<e.seriesCount;u++)e.opt.series.push({})
 var c=0,s=1/e.seriesCount
-return e.opt.series=e.opt.series.map((function(e){var t=e.label,n=void 0===t?"":t,r=e.color,o=void 0===r?"rgba(".concat(120-c*s*100,", ").concat(150-c*s*150,", ").concat(50+c*s*200,", 1)"):r,i=e.fill,a=e.line_width,l=void 0===a?1:a,u=e.scale
+return e.opt.series=e.opt.series.map((function(e){var t=e.label,n=void 0===t?"":t,r=e.color,o=void 0===r?"rgba(".concat(Math.round(120-c*s*100),", ").concat(Math.round(150-c*s*150),", ").concat(Math.round(50+c*s*200),", 1)"):r,i=e.fill,a=e.line_width,l=void 0===a?1:a,u=e.scale
 return c++,{label:n,color:o,fill:i,line_width:l,scale:void 0===u?"auto":u}})),e}return t=f,(o=[{key:"plot",value:function(e){var t=this.args.options.type
 if("line"==t||"bar"==t)new r.default(e,this.opt,this.args.data)
 else{if("pie"!=t)throw new Error("Unknown chart type '".concat(t,"'"))
