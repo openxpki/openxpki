@@ -11,6 +11,7 @@ use OpenXPKI::DateTime;
 use OpenXPKI::Template;
 use DateTime;
 use Workflow::Exception qw(configuration_error);
+use JSON;
 
 sub execute {
 
@@ -27,57 +28,7 @@ sub execute {
     my $fh;
     my $buffer;
 
-    if ($target_key) {
-
-        # create a in memory file handle
-        open( $fh, '>', \$buffer) or die "Can't open memory file: $!\n";
-
-    } else {
-        # Setup for write to disk
-        $target_name = $self->param('target_filename');
-        my $target_dir = $self->param('target_dir');
-        my $umask = $self->param( 'target_umask' ) || "0640";
-
-        if (!$target_name) {
-            $fh = File::Temp->new( UNLINK => 0, DIR => $target_dir );
-            $target_name = $fh->filename;
-        } else {
-
-            # relative path, prefix with directory
-            if ($target_name !~ m{ \A \/ }xms) {
-                if (!$target_dir) {
-                    configuration_error('Full path for target_name or target_dir is required!');
-                }
-
-                $target_name = $target_dir.'/'.$target_name;
-            }
-
-            if (-e $target_name) {
-
-                if ($self->param('target_overwrite')) {
-                    unlink($target_name);
-                } else {
-                    OpenXPKI::Exception->throw(
-                        message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_REPORTS_TARGET_FILE_EXISTS',
-                        params => { FILENAME => $target_name }
-                    );
-                }
-            }
-
-            open $fh, ">", $target_name;
-        }
-
-        if (!$fh || !$target_name) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_REPORTS_UNABLE_TO_WRITE_REPORT_FILE',
-                params => { FILENAME => $target_name, DIRNAME => $target_dir }
-            );
-        }
-
-        chmod oct($umask), $target_name;
-    }
-
-
+    
     my $valid_at;
     if ($self->param('valid_at')) {
        $valid_at = OpenXPKI::DateTime::get_validity({
@@ -104,10 +55,11 @@ sub execute {
         profile => '',
         subject => '',
         delimiter => '|',
+        format => 'csv',
     };
 
     # try to read those from the activity config
-    foreach my $key (qw(cutoff_notbefore cutoff_notafter include_revoked include_expired unique_subject profile subject head delimiter)) {
+    foreach my $key (qw(cutoff_notbefore cutoff_notafter include_revoked include_expired unique_subject profile subject head delimiter format)) {
         if (defined $self->param($key)) {
             $p->{$key} = $self->param($key);
         }
@@ -123,7 +75,7 @@ sub execute {
         my $config = CTX('config');
 
         # override selector config
-        foreach my $key (qw(cutoff_notbefore cutoff_notafter include_revoked include_expired unique_subject profile subject head delimiter)) {
+        foreach my $key (qw(cutoff_notbefore cutoff_notafter include_revoked include_expired unique_subject profile subject head delimiter format)) {
             if ($config->exists(['report', $report_config, $key])) {
 
                 # profile and subject can be a list
@@ -282,9 +234,89 @@ sub execute {
         report_config => $report_config
     });
 
-    if ($head) { print $fh $head."\n"; }
+    if ($p->{format} eq 'memory') {
+        $buffer = {};
+        $target_key ||= '_report_data';
 
-    print $fh join($delim, "request id", "subject", "serial", "identifier", "notbefore", "notafter", "status", "issuer", @head)."\n";
+    } elsif ($target_key) {
+
+        # create a in memory file handle
+        open( $fh, '>', \$buffer) or die "Can't open memory file: $!\n";
+
+    } else {
+        # Setup for write to disk
+        $target_name = $self->param('target_filename');
+        my $target_dir = $self->param('target_dir');
+        my $umask = $self->param( 'target_umask' ) || "0640";
+
+        if (!$target_name) {
+            $fh = File::Temp->new( UNLINK => 0, DIR => $target_dir );
+            $target_name = $fh->filename;
+        } else {
+
+            # relative path, prefix with directory
+            if ($target_name !~ m{ \A \/ }xms) {
+                if (!$target_dir) {
+                    configuration_error('Full path for target_name or target_dir is required!');
+                }
+
+                $target_name = $target_dir.'/'.$target_name;
+            }
+
+            if (-e $target_name) {
+
+                if ($self->param('target_overwrite')) {
+                    unlink($target_name);
+                } else {
+                    OpenXPKI::Exception->throw(
+                        message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_REPORTS_TARGET_FILE_EXISTS',
+                        params => { FILENAME => $target_name }
+                    );
+                }
+            }
+
+            open $fh, ">", $target_name;
+        }
+
+        if (!$fh || !$target_name) {
+            OpenXPKI::Exception->throw(
+                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_REPORTS_UNABLE_TO_WRITE_REPORT_FILE',
+                params => { FILENAME => $target_name, DIRNAME => $target_dir }
+            );
+        }
+
+        chmod oct($umask), $target_name;
+    }
+
+
+
+    my $json;
+    if (!$fh) { # target memory, receives only the data!
+    
+        $buffer = {
+            header => ["request id", "subject", "serial", "identifier", "notbefore", "notafter", "status", "issuer", @head],
+            value => [],
+        };
+        $buffer->{title} = $head if ($head);
+        
+    } elsif ($p->{format} eq 'json') {
+
+        $json = JSON->new();
+        if ($head) { 
+            my $bb = $json->encode({ title => $head });
+            chop($bb); # replace the closing bracket with a comma 
+            print $fh "$bb,";
+        } else {
+            print $fh "{";
+        }
+        my $bb = $json->encode(["request id", "subject", "serial", "identifier", "notbefore", "notafter", "status", "issuer", @head]);
+        print $fh '"header":'.$bb.'],{"data":[';
+
+    } else {
+
+        if ($head) { print $fh $head."\n"; }
+        print $fh join($delim, "request id", "subject", "serial", "identifier", "notbefore", "notafter", "status", "issuer", @head)."\n";
+    }
 
     my $subject_seen = {};
     my $cnt;
@@ -350,10 +382,22 @@ sub execute {
             }
         }
 
-        print $fh join($delim, @line) . "\n";
+        if (!$fh) {
+            push @{$buffer->{value}}, \@line;
+        } elsif ($json) {
+            print $fh "," if ($cnt > 1);
+            print $fh $json->encode(\@line);
+        } else {
+            print $fh join($delim, @line) . "\n";
+        }
     }
 
-    close $fh;
+    
+    # close json structure
+    print $fh "]}" if ($json);
+    
+    # close file handle
+    close $fh if ($fh);
 
     $context->param('total_count', $cnt);
 
@@ -391,12 +435,20 @@ parameters, the default is to print all currenty valid certificates.
 
 =over
 
+=item format
+
+Default is I<csv> using I<delimiter> to create lines. If set to I<json>,
+the result is encoded using JSON with the keys I<title>, I<head> and 
+I<data>. Set to I<memory> to retrieve the data portion of the report 
+directly in the context value defined by I<target_key>.
+
 =item target_key
 
 Write the report data into the workflow context using this key. The
 filesystem is not used in this case, so all file related settings are
 ignored.
 
+If the format is set to I<memory> the default value is _report_data.
 
 =item target_filename
 

@@ -18,6 +18,8 @@ sub execute {
     my $context = $workflow->context();
     my $pki_realm = CTX('session')->data->pki_realm;
 
+    my $target_key = $self->param('target_key');
+
     my $valid_at;
     if ($self->param('valid_at')) {
        $valid_at = OpenXPKI::DateTime::get_validity({
@@ -53,7 +55,6 @@ sub execute {
         }
     );
     $result->{total_count} = sprintf "%01d", $tuple->{amount};
-
 
     # Revoked
     $tuple = $db->select_one(%base_query,
@@ -166,7 +167,11 @@ sub execute {
 
 
     ##! 32: 'Report result ' . Dumper $result
-    $context->param( $result );
+    if ($target_key) {
+        $context->param( $target_key => $result );
+    } else {
+        $context->param( $result );
+    }
 
 }
 
@@ -205,6 +210,11 @@ Default is -000030 (30 days in the past).
 Parseable OpenXPKI::Datetime value (autodetected) used as based for all
 date related calculations. Default is now.
 
+=item target_key
+
+If set, the result is written into this single context value as a hash
+using the keys named below as keys in the hash.
+
 =item cutoff_notbefore (not implemented yet)
 
 Parseable OpenXPKI::Datetime value (autodetected), hide certificates where
@@ -217,9 +227,10 @@ notafter is above given date.
 
 =back
 
-=head2 Context parameters
+=head2 Result
 
-After completion the following context parameters will be set:
+After completion the following parameters will be set in the context or
+as key/value pairs of the hash written to I<target_key>.
 
 =over 12
 
