@@ -59,7 +59,7 @@ function addClass(el, c) {
 /*
   Pie chart class
 */
-export default function PieChart(opts, data, then) {
+export default function ChartPie(element, opts, data) {
 
     // https://github.com/leeoniya/uPlot/blob/1.6.4/src/uPlot.js#L270
     const root = self.root = placeDiv(UPLOT);
@@ -124,5 +124,5 @@ export default function PieChart(opts, data, then) {
         }
     }
 
-    then(self);
+    element.appendChild(root);
 }
