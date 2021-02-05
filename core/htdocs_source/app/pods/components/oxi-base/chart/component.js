@@ -5,6 +5,8 @@ import { guidFor } from '@ember/object/internals';
 
 import uPlot from 'uplot';
 import seriesBarsPlugin from './uplot/seriesbars-plugin';
+import axisTimestampConfig from './uplot/axis-timestamp-config';
+import reducedAlphaColor from './uplot/reduced-alpha-color';
 
 /**
 Draws a line or bar chart.
@@ -98,7 +100,7 @@ export default class OxiChartComponent extends Component {
             axes: [
                 {
                     time: true,
-                    values: this.axisTimestampConfig(),
+                    values: axisTimestampConfig,
                 }, // x axis
             ],
         };
@@ -165,7 +167,7 @@ export default class OxiChartComponent extends Component {
             let seriesOpts = {
                 label,
                 scale: _scale,
-                fill: fill ?? this.reducedAlphaColor(color),
+                fill: fill ?? reducedAlphaColor(color),
                 width: line_width/window.devicePixelRatio,
                 //value: (self, rawValue) => rawValue == null ? "-" : rawValue.toFixed(0),
             }
@@ -213,76 +215,5 @@ export default class OxiChartComponent extends Component {
             element.appendChild(uplot.root);
             init();
         })
-    }
-
-    reducedAlphaColor(cssColor) {
-        const div = document.createElement('div');
-        div.id = 'for-computed-style';
-
-        div.style.color = cssColor;
-
-        // appending the created element to the DOM
-        document.querySelector('body').appendChild(div);
-
-        const match = getComputedStyle(div).color.match(/^rgba?\s*\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*(\d\.\d)\s*)?\)$/i);
-
-        // removing element from the DOM
-        document.querySelector('#for-computed-style').remove();
-
-        if (match) {
-            // match[0] is regex complete match (e.g. "rgb(0,0,0)"), not a regex capturing group
-            let col = {
-                r: match[1],
-                g: match[2],
-                b: match[3]
-            };
-            // if (match[4]) { // if alpha channel is present
-            //     parsedColor.a = match[4];
-            // }
-            return `rgba(${col.r},${col.g},${col.b},0.1)`;
-        } else {
-            throw new Error(`Color ${cssColor} could not be parsed.`);
-        }
-    }
-
-    // From https://github.com/leeoniya/uPlot/blob/1.6.3/src/opts.js#L65
-    axisTimestampConfig() {
-        const ms = 1e-3; // 1e-3 = set up for seconds, 1 = set up for milliseconds
-
-        const NL = "\n";
-
-        const yyyy    = "{YYYY}";
-        const NLyyyy  = NL + yyyy;
-        const md      = "{DD}.{MM}";
-        const NLmd    = NL + md;
-        const NLmdyy  = NL + "{DD}.{MM}.{YY}";
-
-        const hmm     = "{H}:{mm}";
-        const NLhmm = NL + hmm;
-        const ss      = ":{ss}";
-
-        const _ = null;
-
-        const s  = ms * 1e3,
-              m  = s  * 60,
-              h  = m  * 60,
-              d  = h  * 24,
-              mo = d  * 30,
-              y  = d  * 365;
-
-        // [0]:   minimum num secs in the tick incr
-        // [1]:   default tick format
-        // [2-7]: rollover tick formats
-        // [8]:   mode: 0: replace [1] -> [2-7], 1: concat [1] + [2-7]
-        return [
-        //   tick incr    default          year                    month   day                   hour    min       sec   mode
-            [y,           yyyy,            _,                      _,      _,                    _,      _,        _,       1],
-            [d * 28,      "{MMM}",         NLyyyy,                 _,      _,                    _,      _,        _,       1],
-            [d,           md,              NLyyyy,                 _,      _,                    _,      _,        _,       1],
-            [h,           "{H}",           NLmdyy,                 _,      NLmd,                 _,      _,        _,       1],
-            [m,           hmm,             NLmdyy,                 _,      NLmd,                 _,      _,        _,       1],
-            [s,           ss,              NLmdyy + " " + hmm,     _,      NLmd + " " + hmm,     _,      NLhmm,    _,       1],
-            [ms,          ss + ".{fff}",   NLmdyy + " " + hmm,     _,      NLmd + " " + hmm,     _,      NLhmm,    _,       1],
-        ];
     }
 }
