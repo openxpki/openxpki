@@ -22,8 +22,7 @@ Draws a line or bar chart.
 
 export default class OxiChartComponent extends Component {
     guid;
-    options;
-    data;
+    opt = {};
 
     // x - timestamp
     // y - BTC price
@@ -36,36 +35,50 @@ export default class OxiChartComponent extends Component {
         this.guid = guidFor(this);
 
         // Evaluate given options and set defaults
-        const {
-            width = 400,
-            height = 200,
-            title = "",
-            cssClass = "",
-            x_is_timestamp = true,
-            series = [ {} ], // default: one array item to make sure the loop below creates left Y-axis
-            legend_label = (this.args.options.series ? true : false),
-            legend_value = false,
-            legend_date_format = '{YYYY}-{MM}-{DD}, {HH}:{mm}:{ss}',
-            type = 'line',
-            bar_vertical = false,
-        } = this.args.options ?? {};
+        const defaults = {
+            width: 400,
+            height: 200,
+            title: "",
+            cssClass: "",
+            type: 'line',
+            series: [],
+            // Only 'line' and 'bar' chart:
+            legend_label: (this.args.options.series ? true : false),
+            legend_value: false,
+            legend_date_format: '{YYYY}-{MM}-{DD}, {HH}:{mm}:{ss}',
+            x_is_timestamp: true,
+            bar_vertical: false,
+        };
 
+        for (const key of Object.keys(defaults)) {
+            this.opt[key] = this.args.options[key] ?? defaults[key];
+        }
+    }
+
+    @action
+    plot(element) {
+        const type = this.args.options.type;
+        if (type == 'line' || type == 'bar') this.drawLineOrBar(element)
+    }
+
+    @action
+    drawLineOrBar(element) {
         // FIXME: Temporary workaround for seriesBarsPlugin() not working with single series
-        let barCartSingleSeriesFix = (type == 'bar' && this.args.data.length < 2);
+        let barChartSingleSeriesFix = (this.opt.type == 'bar' && this.args.data.length < 2);
 
         /*
          * Convert data from
          * from [ [x1, price1, rsi1], [x2, price2, rsi2] ]
          *   to [ [x1, x2], [price1, price2], [rsi1, rsi2] ]
          */
-        this.data = [];
+        let uplotData = [];
         for (let i=0; i<this.args.data[0].length; i++) {
             let seriesData = this.args.data.map(row => +row[i]);
 
             // FIXME: Temporary workaround for seriesBarsPlugin() not working with single series
-            if (barCartSingleSeriesFix) seriesData.push(null);
+            if (barChartSingleSeriesFix) seriesData.push(null);
 
-            this.data.push(seriesData);
+            uplotData.push(seriesData);
         }
 
         /*
@@ -74,17 +87,17 @@ export default class OxiChartComponent extends Component {
 
         // assemble uPlot options
         let uplotOptions = {
-            width,
-            height,
-            title,
-            class: cssClass,
+            width: this.opt.width,
+            height: this.opt.height,
+            title: this.opt.title,
+            class: this.opt.cssClass,
             legend: {
-                show: legend_label,
-                live: legend_value,
+                show: this.opt.legend_label,
+                live: this.opt.legend_value,
             },
             scales: {
                 x: {
-                    time: x_is_timestamp,
+                    time: this.opt.x_is_timestamp,
                 },
                 'auto': {
                     auto: true,
@@ -94,9 +107,6 @@ export default class OxiChartComponent extends Component {
                     range: (self) => [ 0, 100 ],
                 },
             },
-            series: [
-                {}, // x values
-            ],
             axes: [
                 {
                     time: true,
@@ -109,17 +119,36 @@ export default class OxiChartComponent extends Component {
          * LINE chart
          */
         // set custom date format
-        if (type == 'line' && x_is_timestamp) {
+        if (this.opt.type == 'line' && this.opt.x_is_timestamp) {
             // format strings: https://github.com/leeoniya/uPlot/blob/1.6.3/src/fmtDate.js#L74
-            let dateFormatter = uPlot.fmtDate(legend_date_format);
-            uplotOptions.series[0].value = (self, rawValue) => rawValue == null ? "-" : dateFormatter(new Date(rawValue * 1000));
+            let dateFormatter = uPlot.fmtDate(this.opt.legend_date_format);
+            uPlot.assign(uplotOptions, {
+                series: [
+                    // X values (time)
+                    {
+                        value: (self, rawValue) => rawValue == null ? "-" : dateFormatter(new Date(rawValue * 1000)),
+                    }
+                ],
+            });
         }
+
+        let _series = this.opt.series;
 
         /*
          * BAR chart
          */
-        if (type == 'bar') {
+        if (this.opt.type == 'bar') {
+            // The loop below needs the series to be defined for 'bar' charts
+            if (_series.length === 0) {
+                for (let i = 0; i < uplotData[0].length; i++) _series.push({})
+            }
+
+            // 'bar' chart specific options
             uPlot.assign(uplotOptions, {
+                series: [
+                    // X values (time)
+                    {}
+                ],
                 scales: {
                     x: {
                         time: false,
@@ -129,24 +158,21 @@ export default class OxiChartComponent extends Component {
                 plugins: [
                     seriesBarsPlugin({
                         labels: () => this.args.data.map(group => group[0]), // group / time series
-                        ori: bar_vertical ? 1 : 0,
+                        ori: this.opt.bar_vertical ? 1 : 0,
                         dir: 1,
-                        singleSeriesFix: barCartSingleSeriesFix,
+                        singleSeriesFix: barChartSingleSeriesFix,
                     }),
                 ],
             });
-            // The series loop below needs the series to be defined
-            if (!this.args.options.series) {
-                for (let i = 0; i < this.data[0].length; i++) series.push({})
-            }
         }
 
         /*
-         * Series
+         * Series - generate scales, axes, series
          */
         let autoScaleId = 0;
-        for (const graph of series) {
-            const {
+
+        for (const graph of _series) {
+            let {
                 label = '',
                 color = 'rgba(0, 100, 200, 1)',
                 fill,
@@ -155,10 +181,9 @@ export default class OxiChartComponent extends Component {
             } = graph;
 
             // Auto-generate scale if an array [min, max] was specified
-            let _scale = scale;
             if (Array.isArray(scale)) {
-                _scale = `_autogenerated_${++autoScaleId}`;
-                uplotOptions.scales[_scale] = {
+                scale = `_autogenerated_${++autoScaleId}`;
+                uplotOptions.scales[scale] = {
                     auto: false,
                     range: () => scale,
                 };
@@ -166,15 +191,15 @@ export default class OxiChartComponent extends Component {
 
             let seriesOpts = {
                 label,
-                scale: _scale,
+                scale,
                 fill: fill ?? reducedAlphaColor(color),
                 width: line_width/window.devicePixelRatio,
                 //value: (self, rawValue) => rawValue == null ? "-" : rawValue.toFixed(0),
             }
-            if (type == 'line') {
+            if (this.opt.type == 'line') {
                 seriesOpts.stroke = color;
             }
-            if (type == 'bar') {
+            if (this.opt.type == 'bar') {
                 seriesOpts.fill = color;
             }
             uplotOptions.series.push(seriesOpts);
@@ -182,20 +207,20 @@ export default class OxiChartComponent extends Component {
             // add up to 2 axis (left and right)
             if (uplotOptions.axes.length < 3) {
                 let axis = {
-                    scale: _scale,
-                    space: Math.max((bar_vertical ? width : height) / 20, 15),
+                    scale,
+                    space: Math.max((this.opt.bar_vertical ? this.opt.width : this.opt.height) / 20, 15),
                     //labelSize: 150,
                     size: 60,
-                    stroke: type == 'bar' ? 'black' : color,
+                    stroke: this.opt.type == 'bar' ? 'black' : color,
                 };
                 // special treatment for percent
-                if (_scale == '%') uPlot.assign(axis, {
+                if (scale == '%') uPlot.assign(axis, {
                     values: (u, vals, space) => vals.map(v => `${v.toFixed(0)}%`),
                 });
                 // second axis
                 if (uplotOptions.axes.length == 2) {
                     // skip if same scale as first axis
-                    if (uplotOptions.axes[1].scale == _scale) continue;
+                    if (uplotOptions.axes[1].scale == scale) continue;
                     // right hand side, no grid
                     uPlot.assign(axis, {
                         side: 1,
@@ -206,12 +231,7 @@ export default class OxiChartComponent extends Component {
             }
         }
 
-        this.options = uplotOptions;
-    }
-
-    @action
-    plot(element) {
-        new uPlot(this.options, this.data, (uplot, init) => {
+        new uPlot(uplotOptions, uplotData, (uplot, init) => {
             element.appendChild(uplot.root);
             init();
         })
