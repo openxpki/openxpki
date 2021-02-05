@@ -37,7 +37,7 @@ export default class OxiChartComponent extends Component {
             width: 400,
             height: 200,
             title: "",
-            cssClass: "",
+            cssClass: null,
             type: 'line',
             series: [],
             legend_label: (this.args.options.series ? true : false),
