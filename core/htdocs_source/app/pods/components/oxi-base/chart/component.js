@@ -266,6 +266,8 @@ export default class OxiChartComponent extends Component {
 
     @action
     drawPie(element) {
+        if (this.opt.cssClass) element.classList.add(this.opt.cssClass);
+
         let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"),
             filled = 0;
 
