@@ -8,7 +8,7 @@ import seriesBarsPlugin from './uplot/seriesbars-plugin';
 import axisTimestampConfig from './uplot/axis-timestamp-config';
 import reducedAlphaColor from './uplot/reduced-alpha-color';
 
-import pieChartLegend  from './pie/legend';
+import PieChart from './pie/pie-chart';
 
 /**
 Draws a line or bar chart.
@@ -252,47 +252,8 @@ export default class OxiChartComponent extends Component {
 
     @action
     drawPie(element) {
-        if (this.opt.cssClass) element.classList.add(this.opt.cssClass);
-
-        let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"),
-            filled = 0;
-
-        svg.setAttribute("width",this.opt.width);
-        svg.setAttribute("height",this.opt.height);
-        svg.setAttribute("viewBox","0 0 100 100");
-
-        element.appendChild(svg);
-
-        for (let row of this.args.data) {
-            let time = row.shift();
-            for (let i=0; i<row.length; i++) {
-                let circle = document.createElementNS("http://www.w3.org/2000/svg","circle"),
-                    startAngle = -90,
-                    radius = 30,
-                    cx = 50,
-                    cy = 50,
-                    strokeWidth = 15,
-                    dashArray = 2*Math.PI*radius,
-                    dashOffset = dashArray - (dashArray * row[i] / 100) + 3,
-                    angle = (filled * 360 / 100) + startAngle;
-
-                circle.setAttribute("r",radius);
-                circle.setAttribute("cx",cx);
-                circle.setAttribute("cy",cy);
-                circle.setAttribute("fill","transparent");
-                circle.setAttribute("stroke", this.opt.series[i].color);
-                circle.setAttribute("stroke-width",strokeWidth);
-                circle.setAttribute("stroke-dasharray",dashArray);
-                circle.setAttribute("stroke-dashoffset",dashOffset);
-                circle.setAttribute("transform","rotate("+(angle)+" "+cx+" "+cy+")");
-
-                svg.appendChild(circle);
-                filled+= +row[i];
-            }
-        }
-
-        if (this.opt.legend_label) {
-            pieChartLegend(element, this.opt.series, s => ({ label: s.label, color: s.color }));
-        }
+        new PieChart(this.opt, this.args.data, (pie) => {
+            element.appendChild(pie.root);
+        })
     }
 }
