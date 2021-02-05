@@ -62,12 +62,12 @@ export default class OxiChartComponent extends Component {
         }
 
         let i = 0;
-        let col_factor = 1/this.seriesCount;
+        let r = 1/this.seriesCount;
         this.opt.series = this.opt.series.map(
             ({
                 label = '',
                 // create a color palette
-                color = `rgba(${120 - i*col_factor*100}, ${150 - i*col_factor*150}, ${50 + i*col_factor*200}, 1)`,
+                color = `rgba(${Math.round(120-i*r*100)}, ${Math.round(150-i*r*150)}, ${Math.round(50+i*r*200)}, 1)`,
                 fill,
                 line_width = 1,
                 scale = 'auto',
