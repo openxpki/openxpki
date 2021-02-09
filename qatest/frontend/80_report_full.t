@@ -30,9 +30,9 @@ $result = $client->mock_request({
 
 is ($result->{status}->{level}, 'success');
 
-is($result->{main}->[0]->{content}->{data}->[2]->{format}, 'extlink');
+is($result->{main}->[0]->{content}->{data}->[2]->{format}, 'download');
 
-my $link = $result->{main}->[0]->{content}->{data}->[2]->{value}->{page};
+my $link = $result->{main}->[0]->{content}->{data}->[2]->{value}->{data};
 like($link, "/fetch/");
 
 my ($noop, $page) = split /=/, $link, 2;

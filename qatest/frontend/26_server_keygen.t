@@ -53,7 +53,7 @@ $result = $client->mock_request({
     'action' => 'workflow!index',
     'key_alg' => 'rsa',
     'enc_alg' => 'aes256',
-    'key_gen_params{KEY_LENGTH}' => 3021,
+    'key_gen_params{KEY_LENGTH}' => 3072,
     'password_type' => 'server',
     'wf_token' => undef
 });

@@ -47,7 +47,7 @@ $result = $client->mock_request({
 });
 
 # Create the pkcs10
-my $pkcs10 = `openssl req -new -subj "/CN=testbox.openxpki.org:pkiclient" -nodes -keyout tmp/pkiclient.key 2>/dev/null`;
+my $pkcs10 = `openssl req -new -newkey rsa:3000 -subj "/CN=testbox.openxpki.org:pkiclient" -nodes -keyout tmp/pkiclient.key 2>/dev/null`;
 
 $result = $client->mock_request({
     'action' => 'workflow!index',

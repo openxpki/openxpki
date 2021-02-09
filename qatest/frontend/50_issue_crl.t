@@ -24,24 +24,14 @@ is($result->{main}->[0]->{content}->{fields}->[2]->{name}, 'wf_token');
 
 $result = $client->mock_request({
     'action' => 'workflow!index',
-    'wf_token' => undef,
-});
-
-like($result->{goto}, qr/workflow!load!wf_id!\d+/, 'Got redirect');
-
-my ($wf_id) = $result->{goto} =~ /workflow!load!wf_id!(\d+)/;
-
-diag("Workflow Id is $wf_id");
-
-$result = $client->mock_request({
-    'page' => $result->{goto},
+     'wf_token' => undef,
 });
 
 is ($result->{status}->{level}, 'success', 'Status is success');
 
-# get crl id
-
-my $crlid = $result->{main}->[0]->{content}->{data}->[0]->{value}->[0]->{value} || '';
+my $crl_page = $result->{main}->[0]->{content}->{data}->[0]->{value}->[0]->{page} || '';
+ok($crl_page);
+my $crlid = pop @{[split("!", $crl_page)]};
 
 like($crlid, "/[0-9]+/",'Got CRL Id');
 

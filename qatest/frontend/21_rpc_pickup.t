@@ -80,7 +80,7 @@ ok($response->is_success);
 
 $json = JSON->new->decode($response->decoded_content);
 is($wf_id,  $json->{result}->{id}, 'Pickup with same id');
-is($json->{result}->{data}->{error_code}, 'Request was rejected by an operator.');
+is($json->{result}->{data}->{error_code}, 'Request was rejected.');
 
 # pickup with text/plain
 
