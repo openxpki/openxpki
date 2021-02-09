@@ -916,6 +916,10 @@ msgstr "Lunghezza della Chiave"
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_2048"
 msgstr "2048 bit (default)"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
+msgstr "Lunghezza della Chiave"
+
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_4096"
 msgstr "4096 bit (massima sicurezza)"
 
@@ -4608,10 +4612,6 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_ISSUER_UNKNOWN"
 #~ msgstr "sconosciuto"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
-#~ msgstr "Lunghezza della Chiave"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_NOT_IN_RENWAL_WINDOW_WARNING"

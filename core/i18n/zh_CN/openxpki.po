@@ -721,6 +721,9 @@ msgstr "密钥长度"
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_2048"
 msgstr "2048 bit"
 
+msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
+msgstr "3072 bit"
+
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_4096"
 msgstr "4096 bit"
 
@@ -3866,9 +3869,6 @@ msgstr "是"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_ISSUER_UNKNOWN"
 #~ msgstr "未知"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
-#~ msgstr "3072 bit"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"

@@ -968,6 +968,10 @@ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_2048"
 msgstr "Длина ключа"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_4096"
 msgstr "Длина ключа"
 
@@ -9369,10 +9373,6 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_KEY_ENC_"
 #~ msgstr "Имя учетной записи"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_3072"
-#~ msgstr "SPKAC-строка пуста."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_NOT_IN_RENWAL_WINDOW_WARNING"
