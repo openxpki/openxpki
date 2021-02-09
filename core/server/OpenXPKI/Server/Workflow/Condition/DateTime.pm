@@ -48,11 +48,11 @@ sub _evaluate
             : $dt_now;
 
         if ($dt_probe <= $dt_notbefore) {
-            CTX('log')->application()->info("DateTime condition failed $key $dt_probe < $dt_notbefore");
+            CTX('log')->application()->debug("DateTime condition failed $key $dt_probe < $dt_notbefore");
 
             condition_error ("$key $dt_probe is less then notbefore $dt_notbefore");
         }
-        CTX('log')->application()->info("DateTime condition passed $key $dt_probe > $dt_notbefore");
+        CTX('log')->application()->debug("DateTime condition passed $key $dt_probe > $dt_notbefore");
 
     }
 

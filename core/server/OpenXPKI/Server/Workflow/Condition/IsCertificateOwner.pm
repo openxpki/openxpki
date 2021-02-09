@@ -32,7 +32,7 @@ sub evaluate {
 
     if (!defined $res) {
         ##! 16: 'owner is not defined'
-        CTX('log')->application()->warn("IsCertificateOwner condition failed - no owner found");
+        CTX('log')->application()->debug("IsCertificateOwner condition failed - no owner found");
 
         condition_error('user is certificate owner no owner found');
     }

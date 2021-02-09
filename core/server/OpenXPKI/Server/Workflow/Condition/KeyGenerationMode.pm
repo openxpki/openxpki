@@ -58,8 +58,7 @@ sub _evaluate
         configuration_error("unknown option passed for mode ($mode)");
     }
 
-    CTX('log')->application()->info("KeyGenerationMode condition result: $result ($mode ?= $config_mode)");
-
+    CTX('log')->application()->debug("KeyGenerationMode condition result: $result ($mode ?= $config_mode)");
 
     if (!$result) {
         condition_error("Requested mode $mode is not allowed ($config_mode)");

@@ -35,7 +35,7 @@ sub _evaluate {
 
     if (!defined $res) {
         ##! 16: 'not defined'
-        CTX('log')->application()->info("CertificateAttribute condition failed - no values found");
+        CTX('log')->application()->debug("CertificateAttribute condition failed - no values found");
         condition_error('CertificateAttribute condition failed');
     }
 
