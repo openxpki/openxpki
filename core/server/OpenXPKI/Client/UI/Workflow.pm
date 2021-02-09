@@ -2205,6 +2205,15 @@ sub __render_from_workflow {
             }
 
             my @fields = @{$fields};
+
+            # if we have no fields at all in the output we need an empty
+            # section to make the UI happy and to show the buttons, if any
+            $self->add_section({
+                type => 'text',
+                content => {
+                    buttons => $buttons,
+            }}) unless (@fields);
+
             my @section_fields;
             while (my $field = shift @fields) {
 
@@ -2794,6 +2803,7 @@ sub __render_list_spec {
 =head2 __render_fields
 
 =cut
+
 sub __render_fields {
 
     my $self = shift;
