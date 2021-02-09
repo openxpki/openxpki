@@ -2382,6 +2382,9 @@ msgstr "weitere Informationen, die uns helfen ihre Anfrage zu bearbeiten"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_TOOLTIP"
 msgstr " "
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_LIST_LABEL"
+msgstr "CRLs"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_PROFILE_LABEL"
 msgstr "CRL Profil"
 
@@ -3200,7 +3203,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_COUNT"
 msgstr "Gesamtzahl Zertifikate"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_DISTINCT"
-msgstr "Gesamtzahl unterschiedlicher Subjects"
+msgstr "Unterschiedliche Subjects"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_EXPIRED"
 msgstr "Abgelaufene Zertifikate"
@@ -3209,10 +3212,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_ISSUED"
 msgstr "Ausgestellte Zertifikate"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_RENEWED"
-msgstr "Gesamtzahl erneuerter Zertifikate"
+msgstr "Erneuerte Zertifikate"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_REVOKED"
-msgstr "Gesamtzahl gesperrter Zertifikate"
+msgstr "Gesperrte Zertifikate"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_AT_DESCRIPTION"
 msgstr ""

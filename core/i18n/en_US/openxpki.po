@@ -2268,6 +2268,9 @@ msgstr "additional comments to help us processing the request"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_COMMENT_TOOLTIP"
 msgstr " "
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_LIST_LABEL"
+msgstr "CRLs"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CRL_PROFILE_LABEL"
 msgstr "CRL Profile"
 
@@ -3039,10 +3042,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_RECENT_RENEWED"
 msgstr "Certificates recently renewed"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_COUNT"
-msgstr "Overall Certificate Count"
+msgstr "Certificate Count"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_DISTINCT"
-msgstr "Overall Distinct Subjects"
+msgstr "Distinct Subjects"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_EXPIRED"
 msgstr "Expired Certificates"
@@ -3051,10 +3054,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_ISSUED"
 msgstr "Issued Certificates"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_RENEWED"
-msgstr "Overall Renewed Certificates"
+msgstr "Renewed Certificates"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_TOTAL_REVOKED"
-msgstr "Overall Revoked Certificates"
+msgstr "Revoked Certificates"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_FIELD_VALID_AT_DESCRIPTION"
 msgstr ""
