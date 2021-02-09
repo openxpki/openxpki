@@ -89,5 +89,24 @@ my $san = `openssl x509 -noout -text -in tmp/entity-san.crt | grep -A1 "X509v3 S
 
 like($san, qr/DNS:also.test.me/);
 like($san, qr/DNS:test.me/);
+like($san, qr/IP Address:127.0.0.1/);
+like($san, qr/IP Address:FE80:0:0:0:0:0:0:1/);
 
 
+# Create pkcs10 for renewal
+`openssl req -new -nodes -keyout tmp/entity-san-renew.key -out tmp/entity-san-renew.csr  -subj "/DC=org/DC=OpenXPKI/DC=Test Deployment/CN=entity-san.openxpki.org" -config openssl.conf 2>/dev/null`;
+
+ok((-s "tmp/entity-san-renew.csr"), 'csr present') || die;
+
+# do on behalf request with old certificate
+`$sscep enroll -v -u http://localhost/scep/scep -M custid=12346 -K tmp/entity-san.key -O tmp/entity-san.crt -r tmp/entity-san-renew.csr -k tmp/entity-san-renew.key -c tmp/cacert-0 -l tmp/entity-san-renew.crt  -t 1 -n 1 |  grep "Read request with transaction id"`;
+
+
+ok(-e "tmp/entity-san-renew.crt");
+
+$san = `openssl x509 -noout -text -in tmp/entity-san-renew.crt | grep -A1 "X509v3 Subject Alternative Name" | tail -n1`;
+
+like($san, qr/DNS:also.test.me/);
+like($san, qr/DNS:test.me/);
+like($san, qr/IP Address:127.0.0.1/);
+like($san, qr/IP Address:FE80:0:0:0:0:0:0:1/);

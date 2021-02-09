@@ -72,7 +72,7 @@ sub execute {
     my $error;
     if ($EVAL_ERROR) {
         $error = 'I18N_OPENXPKI_UI_NICE_BACKEND_ERROR';
-        CTX('log')->application()->error("NICE backend error: $error");
+        CTX('log')->application()->error("NICE backend error: $EVAL_ERROR");
     } elsif(!$set_context) {
         $error = $nice_backend->get_last_error() || 'I18N_OPENXPKI_UI_NICE_BACKEND_ERROR';
     }

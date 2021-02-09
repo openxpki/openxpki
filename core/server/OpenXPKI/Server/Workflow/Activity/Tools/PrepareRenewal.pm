@@ -61,7 +61,7 @@ sub execute {
         if (OpenXPKI::Serialization::Simple::is_serialized($san->{attribute_value})) {
             push @subject_alt_names, $serializer->deserialize($san->{attribute_value});
         } else {
-            my @split = split q{:}, $san->{attribute_value};
+            my @split = split q{:}, $san->{attribute_value}, 2;
             push @subject_alt_names, \@split;
         }
     }
