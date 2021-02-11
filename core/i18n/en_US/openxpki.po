@@ -3855,9 +3855,8 @@ msgstr "Enrollment Search"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_DESC"
 msgstr "Search for SCEP workflows by  transaction id"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_LABEL"
-msgstr "SCEP RA Token"
+msgstr "Generate SCEP RA Token"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_DESC"

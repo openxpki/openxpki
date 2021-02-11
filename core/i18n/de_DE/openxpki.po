@@ -4090,7 +4090,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_DESC"
 msgstr "Erstellt ein neues Zertifikat/Token zur Verwendung als SCEP RA."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_LABEL"
-msgstr "SCEP Token erstellen"
+msgstr "SCEP RA Token erstellen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_DESC"
 msgstr "Ändert die Meta-Daten eines Zertifikates."
