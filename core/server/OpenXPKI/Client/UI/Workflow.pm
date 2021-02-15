@@ -3371,11 +3371,10 @@ sub __render_workflow_info {
 
     my $self = shift;
     my $wf_info = shift;
-    my $wfdetails_config = shift;
+    my $wfdetails_config = shift || [];
 
-    if (!$wfdetails_config) {
-        $wfdetails_config = $self->__default_wfdetails;
-    }
+    $wfdetails_config = $self->__default_wfdetails
+        unless (@$wfdetails_config);
 
     my $wfdetails_info;
     # if needed, fetch enhanced info incl. workflow attributes
