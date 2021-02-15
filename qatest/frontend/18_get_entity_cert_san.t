@@ -10,7 +10,7 @@ use Log::Log4perl qw(:easy);
 use TestCGI;
 use MIME::Base64;
 
-use Test::More tests => 8;
+use Test::More tests => 16;
 
 package main;
 
