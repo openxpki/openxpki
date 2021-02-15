@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2021-02-09 09:59+0100\n"
+"PO-Revision-Date: 2021-02-15 12:48+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -2105,9 +2105,8 @@ msgstr "Approvals"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_LABEL"
 msgstr "CA Alias"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_DESC"
-msgstr "Information about the Request."
+msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_IDENTIFIER_IGNORED_LABEL"
 msgstr "Ignored Certificate Identifiers"
@@ -2606,9 +2605,8 @@ msgstr "The reason code indicates the reason why the certificate was revoked."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_LABEL"
 msgstr "Reason Code"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION"
-msgstr "Specify the reason why you want the certificate being revoked."
+msgstr "This is just a prefix"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_OPTION_AFFILIATIONCHANGED"
 msgstr "affiliation has changed"
@@ -2694,7 +2692,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RUN_IN_BACKGROUND_LABEL"
 msgstr "run in background"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_DESC"
-msgstr "Name of the SCEP endpoint receiving this request."
+msgstr "Name of the API endpoint receiving this request."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_INTERFACE_DESC"
 msgstr "The type of interface used to send this request. "
@@ -2703,14 +2701,13 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_INTERFACE_LABEL"
 msgstr "Server Interface"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_LABEL"
-msgstr "SCEP Endpoint"
+msgstr "API Endpoint"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_AUTHORIZED_LABEL"
 msgstr "Signer is Authorized"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_DESC"
-msgstr "Requestor/Signer"
+msgstr "The certificate that was used to sign this request."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_CERT_IDENTIFIER_LABEL"
 msgstr "Signer Certificate"
@@ -3187,9 +3184,8 @@ msgstr "The certificate was issued and will be send to the client on request."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_LABEL"
 msgstr "SUCCESS"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_INITIAL_DESC"
-msgstr "Initial state"
+msgstr "Select the certificate you want to start the publication for."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_INITIAL_LABEL"
 msgstr "Publish Certificate"
@@ -3207,9 +3203,8 @@ msgstr "Collecting Certificates"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_BACKGROUND_REASON"
 msgstr "CRL is generated in the background."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_DESC"
-msgstr "Initializing ..."
+msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_LABEL"
 msgstr "Issue CRL"
@@ -3406,13 +3401,13 @@ msgstr "The changes have been persisted to the database."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDITUSER_SUCCESS_LABEL"
 msgstr "User account was updated"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_DESC"
-msgstr "Manual authentication pending"
+msgstr ""
+"This request was send without any authentication information. If you are the "
+"owner of this request, please use the 'Accept Request' button to proceed."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_LABEL"
-msgstr "Manual authentication pending"
+msgstr "Manual Authentication Required"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION"
 msgstr ""
@@ -3435,9 +3430,8 @@ msgstr "FAILURE"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_DESC"
 msgstr "Export initial state"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_LABEL"
-msgstr "State"
+msgstr "Certificate Export"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_FAILURE_DESC"
 msgstr ""
@@ -3524,9 +3518,8 @@ msgstr ""
 "identifier of the certificate.<br/>If you do not know the identifier, please "
 "use the certificate search to find it."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_INITIAL_LABEL"
-msgstr "State"
+msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_DESC"
 msgstr "The changes have been persisted to the database."
@@ -3607,13 +3600,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL"
 msgstr "This workflow is currently running on the server."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEP_TOKEN_CERT_EXISTS_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
+msgstr ""
+"A valid certificate for the SCEP RA was found so there should be no need to "
+"generate a new one. Note that this workflow will <b>not</b> revoke the old "
+"certificate in case you decide to continue. "
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEP_TOKEN_CERT_EXISTS_LABEL"
-msgstr "SUCCESS"
+msgstr "Found Valid SCEP Token "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_DESC"
 msgstr "No result matching your search criteria could be found."
@@ -3627,16 +3621,13 @@ msgstr "This workflow has finished with success and can not be restarted"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL"
 msgstr "SUCCESS"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_TRUSTGROUP_NEED_ISSUER_DESC"
 msgstr ""
-"This workflow has looped too many times and the maximum retry counter for "
-"the current action has been exceeded. This workflow will not continue "
-"without manual interaction, please contact the support team."
+"The issuer of the given certificate is not known to this system. Please "
+"provide the issuer certificate to continue or cancel the workflow."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_TRUSTGROUP_NEED_ISSUER_LABEL"
-msgstr "SUCCESS"
+msgstr "Incomplete Chain"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CONFIRM_DESC"
 msgstr ""
@@ -3644,12 +3635,8 @@ msgstr ""
 "issue the certificate with the requested dates! You need to add a new CA "
 "token before this request can be finalized!"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CONFIRM_LABEL"
-msgstr ""
-"You can proceed with your request but there is no valid token available to "
-"issue the certificate with the requested dates! You need to add a new CA "
-"token before this request can be finalized!"
+msgstr "CA Validity Exceeded"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_DESC"
 msgstr ""
@@ -3785,9 +3772,8 @@ msgstr "Edit attributes of user accounts"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EDITUSER_LABEL"
 msgstr "Edit User"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_DESC"
-msgstr "Private Key Download"
+msgstr "Download the private key for an issued certificate."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_LABEL"
 msgstr "Private Key Download"
@@ -3858,21 +3844,21 @@ msgstr "Search for SCEP workflows by  transaction id"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_LABEL"
 msgstr "Generate SCEP RA Token"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_DESC"
-msgstr "Change a certificates metadata."
+msgstr "Display the metadata associated with a certificate"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_LABEL"
-msgstr "Change Metadata"
+msgstr "Show Metadata"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_TRUSTGROUP_IMPORT_DESC"
-msgstr "Certificate Export"
+msgstr ""
+"This workflows enables you to add external issuer certificates to an already "
+"configured trustgroup. Note that the root certificate of the issuer must "
+"already be known or provided during the workflow. It is not possible to "
+"import an issuer with an incomplete chain."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_TRUSTGROUP_IMPORT_LABEL"
-msgstr "Certificate Export"
+msgstr "Import to Trustgroup"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
 msgstr "Unable to load workflow information."

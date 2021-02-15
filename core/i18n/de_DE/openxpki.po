@@ -1858,10 +1858,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EDITUSER_UPDATE_CONTEXT_LABEL"
 msgstr "Meta-Daten anpassen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ACCEPT_REQUEST_DESC"
-msgstr "Accept Request"
+msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ACCEPT_REQUEST_LABEL"
-msgstr "Accept Request"
+msgstr "Antrag annehmen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_DESC"
 msgstr ""
@@ -3607,13 +3607,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDITUSER_SUCCESS_LABEL"
 msgstr "Zertifikat ausgestellt"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_DESC"
-msgstr "Warten auf manuelle Authentisierung"
+msgstr "Dieser Antrag wurde ohne Autentisierungsinformationen eingereicht. Wenn Sie der Antragsteller sind, drücken Sie 'Antrag annehmen' um fortzufahren."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_LABEL"
-msgstr "Warten auf manuelle Authentisierung"
+msgstr "Warten auf manuelle Autentisierung"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION"
 msgstr ""
