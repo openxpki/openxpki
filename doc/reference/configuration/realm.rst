@@ -1,14 +1,22 @@
 Realm
 =====
 
-In order to create a new realm the easiest way is to copy the sample directory
-tree ``realm/democa`` to a new directoy within the ``realm`` directory. Adjust the
-realm configuration file contents accordingly (see below).
+In order to create a new realm you must create a new directory below
+``config.d/realm`` with the internal name of the realm. While it is
+possible to just create a symlink or copy from the realm.tpl directory
+we recommend to read the instructions in the Quickstart document as this
+approach gives you the best options for later upgrades of the
+configuration.
 
-Then add a new section in the file ``system/realms.yaml`` where the new section key is
-identical to the new realm directory name used for the realm copy. Change the new realm
-section entries to match the desired values for the new realm.
+When finished add a new section in the file ``system/realms.yaml`` where
+the new section key is identical to the new realm directory name used for
+the realm directory. Change the new realm section entries to match the
+desired values for the new realm.
 
+Please note that you might need to perform additional steps based on the
+overall configuration options such as creating templates, static content
+or mapping items. Those should be outlined in the configurations setup
+document.
 
 The realm configuration consists of five major parts:
 
@@ -204,7 +212,7 @@ Any token used within OpenXPKI needs a corresponding entry in the realm's token 
       democa-certsign:
         backend: OpenXPKI::Crypto::Backend::OpenSSL
 
-        key: /etc/openxpki/ca/democa/ca-certsign-1.pem
+        key: /etc/openxpki/local/keys/democa/ca-certsign-1.pem
 
         # possible values are OpenSSL, nCipher, LunaCA
         engine:         OpenSSL
@@ -238,12 +246,12 @@ Usually the tokens in a system share a lot of properties. To simplify the config
 
         server-ca-1:
             inherit: default
-            key: /etc/openxpki/ca/democa/ca-certsign-1.pem
+            key: /etc/openxpki/local/keys/democa/ca-certsign-1.pem
             secret: gen1pass
 
         server-ca-2:
             inherit: default
-            key: /etc/openxpki/ca/democa/ca-certsign-2.pem
+            key: /etc/openxpki/local/keys/democa/ca-certsign-2.pem
 
 
 Inheritance can daisy chain profiles. Note that inheritance works top-down and each step replaces all values that have not been defined earlier but are defined on the current level. Therefore you should not use undef values but the empty string to declare an empty setting.
@@ -255,7 +263,7 @@ The example above will then look like::
     token:
         default:
             backend: OpenXPKI::Crypto::Backend::OpenSSL
-            key: /etc/openxpki/ca/democa/[% ALIAS %].pem
+            key: /etc/openxpki/local/keys/democa/[% ALIAS %].pem
             ......
             secret: default
 
@@ -297,8 +305,11 @@ admins but still exposes it in clear text to anybody with access to the
 command line tool! It should be obvious that you can not store the
 data-vault token this way as it is needed to decrypt the datapool items!
 
-Tip: Use "
+Starting with v3.8 the ``openxpkiadm alias`` command can handle key imports
+internally, you can load the certificate and key in one step::
 
+    openxpkiadm alias --realm democa --token scep \
+        --file democa-scep.crt --key democa-scep.pem
 
 **HSM via PKCS#11**
 

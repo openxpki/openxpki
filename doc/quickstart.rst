@@ -78,7 +78,7 @@ Now install the OpenXPKI core package, session driver and the translation packag
 use the openxpkiadm command to verify if the system was installed correctly::
 
     openxpkiadm version
-    Version (core): 3.8.0
+    Version (core): 3.10.0
 
 Now, create an empty database and assign a database user::
 
@@ -148,7 +148,7 @@ to import the Root CA(s) first::
 Create DataVault Token
 ######################
 
-Copy the DataVault Key file to /etc/openxpki/ca/vault-1.pem, it should have 0400
+Copy the DataVault Key file to /etc/openxpki/local/keys/vault-1.pem, it should have 0400
 permission owned by the openxpki user.
 
 Now import the certificate::
@@ -168,7 +168,7 @@ command for each realm::
     $ openxpkiadm alias --realm democa --token datasafe --file vault.crt
 
     Successfully created alias in realm democa:
-      Alias     : vault-2
+      Alias     : vault-1
       Identifier: YsyZ4eCgzHQN607WBIcLTxMjYLI
       NotBefore : 2020-07-06 18:54:43
       NotAfter  : 2030-07-09 18:54:43
@@ -192,7 +192,7 @@ You should check now if your DataVault token is working::
 
     $ openxpkicli  get_token_info --arg alias=vault-1
     {
-        "key_name" : "/etc/openxpki/ca/vault-1.pem",
+        "key_name" : "/etc/openxpki/local/keys/vault-1.pem",
         "key_secret" : 1,
         "key_store" : "OPENXPKI",
         "key_usable" : 1
@@ -211,7 +211,7 @@ register the token and store the private key. Repeat this step for all issuer
 tokens in all realms. The system will assign the next available generation
 number and create all required internal links. In case you choose the filesystem
 as key storage the command will write the key files to the intended location but
-requires that the parent folder exist (`/etc/openxpki/ca/<realm>`)::
+requires that the parent folder exist (`/etc/openxpki/local/keys/<realm>`)::
 
     openxpkiadm alias --realm democa --token certsign \
         --file democa-signer.crt --key democa-signer.pem
