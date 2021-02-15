@@ -860,14 +860,6 @@ msgid "I18N_OPENXPKI_UI_KEY_ALG_EC"
 msgstr "Имя учетной записи"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST2001"
-msgstr "Алгоритм ключа"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST94"
-msgstr "Алгоритм ключа"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_KEY_ALG_RSA"
 msgstr "Имя учетной записи"
 
@@ -2485,10 +2477,6 @@ msgstr "Отклонить заявку на отзыв сертификата"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_DETAIL_INITIALIZE_LABEL"
-msgstr "Прием заявки по протоколу SCEP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_SUMMARY_INITIALIZE_LABEL"
 msgstr "Прием заявки по протоколу SCEP"
 
 #, fuzzy
@@ -4265,6 +4253,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CAPUBLISH_INITIAL_LABEL"
+msgstr "Идет запуск... "
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_DESC"
 msgstr "Технологические процессы"
 
@@ -4291,14 +4283,6 @@ msgstr "Список отзыва доступен"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_BACKGROUND_REASON"
 msgstr "Список отзыва доступен"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_DESC"
-msgstr "Идет запуск... "
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_LABEL"
-msgstr "Идет запуск... "
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_DESC"
@@ -4391,25 +4375,13 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_LABEL"
 msgstr ""
 "Начальное состояние технологического процесса публикации сертификатов через "
 "LDAP"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_DESC"
-msgstr "Технологические процессы"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_LABEL"
-msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_DESC"
 msgstr "Технологические процессы"
 
 #, fuzzy
@@ -4423,14 +4395,6 @@ msgstr "Технологические процессы"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SUBJECT_LABEL"
 msgstr "Технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_DESC"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_LABEL"
-msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_INITIAL_DESC"
@@ -4543,18 +4507,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESC"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_DESC"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_LABEL"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_DESC"
-msgstr "Прием заявки по протоколу SCEP"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_LABEL"
 msgstr "Прием заявки по протоколу SCEP"
 
@@ -4621,18 +4573,6 @@ msgstr "Добавление LDAP-узла"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_LABEL"
 msgstr "Добавление LDAP-узла"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_DESC"
-msgstr ""
-"Начальное состояние технологического процесса публикации сертификатов через "
-"LDAP"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_LABEL"
-msgstr ""
-"Начальное состояние технологического процесса публикации сертификатов через "
-"LDAP"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_INITIAL_DESC"
@@ -9371,6 +9311,14 @@ msgstr "Имя учетной записи"
 #~ msgstr "Имя учетной записи"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST2001"
+#~ msgstr "Алгоритм ключа"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST94"
+#~ msgstr "Алгоритм ключа"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_KEY_ENC_"
 #~ msgstr "Имя учетной записи"
 
@@ -10114,6 +10062,10 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_POST_CODES_LABEL"
 #~ msgstr "Сохранить заявку в базе данных и выдать сертификат"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_SUMMARY_INITIALIZE_LABEL"
+#~ msgstr "Прием заявки по протоколу SCEP"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_DESC"
@@ -11713,6 +11665,14 @@ msgstr "Имя учетной записи"
 #~ msgstr "Список отзыва выдан"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_DESC"
+#~ msgstr "Идет запуск... "
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_LABEL"
+#~ msgstr "Идет запуск... "
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_LOAD_NEXT_CA_DESC"
 #~ msgstr "Идентифицирован следующий удостоверяющий центр"
 
@@ -11815,12 +11775,32 @@ msgstr "Имя учетной записи"
 #~ msgstr "Технологические процессы"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_DESC"
+#~ msgstr "Технологические процессы"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_EVAL_ELIGIBILITY_DESC"
 #~ msgstr "Прием заявок на сертификаты по протоколу SCEP"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_EVAL_ELIGIBILITY_LABEL"
 #~ msgstr "Прием заявок на сертификаты по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_DESC"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_LABEL"
+#~ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FLAG_NOTIFY_SEND_DESC"
@@ -12555,11 +12535,23 @@ msgstr "Имя учетной записи"
 #~ msgstr "Прием заявки по протоколу SCEP"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_DESC"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_LABEL"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIALIZED_DESC"
 #~ msgstr "Прием заявки по протоколу SCEP"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIALIZED_LABEL"
+#~ msgstr "Прием заявки по протоколу SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_DESC"
 #~ msgstr "Прием заявки по протоколу SCEP"
 
 #, fuzzy
@@ -13271,6 +13263,18 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_X509_PREPARED_LABEL"
 #~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_DESC"
+#~ msgstr ""
+#~ "Начальное состояние технологического процесса публикации сертификатов "
+#~ "через LDAP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_LABEL"
+#~ msgstr ""
+#~ "Начальное состояние технологического процесса публикации сертификатов "
+#~ "через LDAP"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_FAILURE_DESC"

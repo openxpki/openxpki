@@ -655,12 +655,6 @@ msgstr "DSA（仅签名）"
 msgid "I18N_OPENXPKI_UI_KEY_ALG_EC"
 msgstr "椭圆曲线"
 
-msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST2001"
-msgstr "GOST 2001"
-
-msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST94"
-msgstr "GOST 94"
-
 msgid "I18N_OPENXPKI_UI_KEY_ALG_RSA"
 msgstr "RSA"
 
@@ -1888,9 +1882,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RELEASE_LOCK_LABEL"
 msgstr "解锁事务"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_DETAIL_INITIALIZE_LABEL"
-msgstr "定义报告选项"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_SUMMARY_INITIALIZE_LABEL"
 msgstr "定义报告选项"
 
 #, fuzzy
@@ -3204,6 +3195,10 @@ msgstr "该工作流程已取消。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_LABEL"
 msgstr "被用户取消"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CAPUBLISH_INITIAL_LABEL"
+msgstr "发布证书"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_DESC"
 msgstr "证书已颁发，并将根据要求发送给客户端。"
 
@@ -3226,12 +3221,6 @@ msgstr "领取证书"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_BACKGROUND_REASON"
 msgstr "CRL在后台生成。"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_DESC"
-msgstr "正在初始化..."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_LABEL"
-msgstr "签署CRL"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_DESC"
 msgstr "此工作流程已成功完成。 已创建新的吊销列表（如有必要）。"
@@ -3302,20 +3291,11 @@ msgstr "此工作流程已取消，无法重新启动"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_LABEL"
 msgstr "已取消"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_DESC"
-msgstr "此工作流程已成功完成，无法重新启动"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_LABEL"
 msgstr "附加请求信息"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_DESC"
-msgstr "此工作流程已成功完成，无法重新启动"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_LABEL"
 msgstr "私钥密码"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_DESC"
-msgstr "此工作流程已成功完成，无法重新启动"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_LABEL"
 msgstr "证书主题替代名称"
@@ -3325,12 +3305,6 @@ msgstr "此工作流程已成功完成，无法重新启动"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SUBJECT_LABEL"
 msgstr "证书主题"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_DESC"
-msgstr "此工作流程最终失败。"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_LABEL"
-msgstr "失败"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_INITIAL_DESC"
 msgstr "此工作流程最终失败，无法重新启动"
@@ -3429,15 +3403,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESC"
 msgstr ""
 "此工作流程被意外事件中断，如果没有手动交互，它将无法继续。 请联系支持团队！"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_DESC"
-msgstr "此工作流程最终失败，无法重新启动"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_LABEL"
-msgstr "失败"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_DESC"
-msgstr "导出初始状态"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_LABEL"
 msgstr "状态"
 
@@ -3502,13 +3467,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_LABEL"
 msgstr "检查数据"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_DESC"
-msgstr "This workflow is paused and will be continued by the watchdog"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_LABEL"
-msgstr "已更新"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_INITIAL_DESC"
@@ -3870,6 +3828,12 @@ msgstr "是"
 #~ msgid "I18N_OPENXPKI_UI_ISSUER_UNKNOWN"
 #~ msgstr "未知"
 
+#~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST2001"
+#~ msgstr "GOST 2001"
+
+#~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST94"
+#~ msgstr "GOST 94"
+
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
 #~ msgstr "Keystore Download"
@@ -4030,6 +3994,9 @@ msgstr "是"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_LABEL"
 #~ msgstr "Set Information"
 
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_SUMMARY_INITIALIZE_LABEL"
+#~ msgstr "定义报告选项"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_INITIALIZE_LABEL"
 #~ msgstr "Set Parameters"
 
@@ -4144,6 +4111,27 @@ msgstr "是"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_INITIAL_LABEL"
 #~ msgstr "State"
 
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_DESC"
+#~ msgstr "正在初始化..."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_LABEL"
+#~ msgstr "签署CRL"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_DESC"
+#~ msgstr "此工作流程已成功完成，无法重新启动"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_DESC"
+#~ msgstr "此工作流程已成功完成，无法重新启动"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_DESC"
+#~ msgstr "此工作流程已成功完成，无法重新启动"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_DESC"
+#~ msgstr "此工作流程最终失败。"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_LABEL"
+#~ msgstr "失败"
+
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_ISSUE_DESC"
 #~ msgstr "此请求正在等待注册官员的批准。"
@@ -4191,6 +4179,22 @@ msgstr "是"
 #~ msgstr ""
 #~ "This workflow was interrupted by an unexpected event, please contact the "
 #~ "support team!"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_DESC"
+#~ msgstr "此工作流程最终失败，无法重新启动"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_LABEL"
+#~ msgstr "失败"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_DESC"
+#~ msgstr "导出初始状态"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_DESC"
+#~ msgstr "This workflow is paused and will be continued by the watchdog"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_LABEL"
+#~ msgstr "已更新"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_DESC"

@@ -844,12 +844,6 @@ msgstr "DSA (solo per Firma)"
 msgid "I18N_OPENXPKI_UI_KEY_ALG_EC"
 msgstr "Curva Ellittica"
 
-msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST2001"
-msgstr "GOST 2001"
-
-msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST94"
-msgstr "GOST 94"
-
 msgid "I18N_OPENXPKI_UI_KEY_ALG_RSA"
 msgstr "RSA"
 
@@ -2258,9 +2252,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RELEASE_LOCK_LABEL"
 msgstr "Inizia la Revoca"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_DETAIL_INITIALIZE_LABEL"
-msgstr "Specifica Opzioni Report"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_SUMMARY_INITIALIZE_LABEL"
 msgstr "Specifica Opzioni Report"
 
 #, fuzzy
@@ -3758,6 +3749,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_LABEL"
 msgstr "CANCELLATO"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CAPUBLISH_INITIAL_LABEL"
+msgstr "Stato"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_DESC"
 msgstr ""
 "Il certificato è stato emesso e verrà inviato al client SCEP su richiesta."
@@ -3783,12 +3778,6 @@ msgstr "Seriale"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_BACKGROUND_REASON"
 msgstr "Inizializzo..."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_DESC"
-msgstr "Inizializzo..."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_LABEL"
-msgstr "Seriale"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_DESC"
 msgstr ""
@@ -3871,23 +3860,12 @@ msgstr "Questo Workflow è stato cancellato e non può essere riavviato"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_LABEL"
 msgstr "CANCELLATO"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_LABEL"
 msgstr "Stato"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_LABEL"
 msgstr "Creator"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_LABEL"
@@ -3899,14 +3877,6 @@ msgstr "This workflow has finished with success and can not be restarted"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SUBJECT_LABEL"
 msgstr "Stato"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_DESC"
-msgstr ""
-"Questo Workflow è definitivamente fallito e non può essere riavviato. Non è "
-"stato emesso alcun certificato."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_LABEL"
-msgstr "Richiesta Rifiutata"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_INITIAL_DESC"
 msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato."
@@ -4021,15 +3991,6 @@ msgstr ""
 "Questo Workflow è stato interrotto da un evento imprevisto, contatta per "
 "favore il team di supporto!"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_DESC"
-msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_LABEL"
-msgstr "FALLIMENTO"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_DESC"
-msgstr "Esporta lo stato iniziale"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_LABEL"
 msgstr "Stato"
 
@@ -4099,12 +4060,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_LABEL"
 msgstr "Controlla Dati"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_DESC"
-msgstr "Questo Workflow è sospeso e verrà fatto proseguire dal Watchdog."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_LABEL"
-msgstr "Aggiorna"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_INITIAL_DESC"
 msgstr ""
@@ -4613,6 +4568,12 @@ msgstr "Chiave"
 #~ msgid "I18N_OPENXPKI_UI_ISSUER_UNKNOWN"
 #~ msgstr "sconosciuto"
 
+#~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST2001"
+#~ msgstr "GOST 2001"
+
+#~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST94"
+#~ msgstr "GOST 94"
+
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_NOT_IN_RENWAL_WINDOW_WARNING"
 #~ msgstr "Errore sconosciuto"
@@ -4865,6 +4826,9 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_LABEL"
 #~ msgstr "Messaggio del Giorno (MOTD)"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_SUMMARY_INITIALIZE_LABEL"
+#~ msgstr "Specifica Opzioni Report"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_DESC"
@@ -5933,6 +5897,12 @@ msgstr "Chiave"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_SUCCESS_LABEL"
 #~ msgstr "SUCCESSO"
 
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_DESC"
+#~ msgstr "Inizializzo..."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_LABEL"
+#~ msgstr "Seriale"
+
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRW_INITIAL_DESC"
 #~ msgstr ""
@@ -5941,6 +5911,25 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRW_INITIAL_LABEL"
 #~ msgstr "Stato"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_DESC"
+#~ msgstr ""
+#~ "Questo Workflow è definitivamente fallito e non può essere riavviato. Non "
+#~ "è stato emesso alcun certificato."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_LABEL"
+#~ msgstr "Richiesta Rifiutata"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_ISSUE_DESC"
@@ -6005,6 +5994,16 @@ msgstr "Chiave"
 #~ msgstr ""
 #~ "Questo Workflow è stato interrotto da un evento imprevisto, contatta per "
 #~ "favore il team di supporto!"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_DESC"
+#~ msgstr ""
+#~ "Questo Workflow è definitivamente fallito e non può essere riavviato"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_LABEL"
+#~ msgstr "FALLIMENTO"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_DESC"
+#~ msgstr "Esporta lo stato iniziale"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_BEGIN_LOOP_NEED_CSR_DESC"
@@ -6684,6 +6683,12 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_X509_PREPARED_LABEL"
 #~ msgstr "FAILURE"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_DESC"
+#~ msgstr "Questo Workflow è sospeso e verrà fatto proseguire dal Watchdog."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_LABEL"
+#~ msgstr "Aggiorna"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_FAILURE_DESC"
 #~ msgstr ""

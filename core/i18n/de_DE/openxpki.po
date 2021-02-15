@@ -666,12 +666,6 @@ msgstr "DSA (Nur Signatur)"
 msgid "I18N_OPENXPKI_UI_KEY_ALG_EC"
 msgstr "Elliptische Kurven"
 
-msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST2001"
-msgstr "GOST 2001"
-
-msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST94"
-msgstr "GOST 94"
-
 msgid "I18N_OPENXPKI_UI_KEY_ALG_RSA"
 msgstr "RSA"
 
@@ -1966,9 +1960,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_RELEASE_LOCK_LABEL"
 msgstr "Transaktion entsperren"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_DETAIL_INITIALIZE_LABEL"
-msgstr "Einstellungen für Report"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_SUMMARY_INITIALIZE_LABEL"
 msgstr "Einstellungen für Report"
 
 #, fuzzy
@@ -3352,6 +3343,10 @@ msgstr "Dieser Workflow wurde abgebrochen."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_LABEL"
 msgstr "Abgebrochen"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CAPUBLISH_INITIAL_LABEL"
+msgstr "Zertifikat veröffentlichen"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_DESC"
 msgstr ""
 "Das Zertifikat wurde ausgestellt und wird auf Anforderung an den "
@@ -3379,13 +3374,6 @@ msgstr "Gesperrte Zertifikate ermitteln"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_BACKGROUND_REASON"
 msgstr "Sperrliste wird im Hintergrund erstellt"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_DESC"
-msgstr "Initialisierung..."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_LABEL"
-msgstr "CRL erstellen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_SUCCESS_DESC"
 msgstr ""
@@ -3464,29 +3452,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_CANCELED_LABEL"
 msgstr "ABGEBROCHEN"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_DESC"
-msgstr ""
-"Dieser Workflow wurde erfolgreich beenden und kann nicht erneut gestartet "
-"werden."
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_LABEL"
 msgstr "Erweiterte Antragsdaten eingeben"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_DESC"
-msgstr ""
-"Dieser Workflow wurde erfolgreich beenden und kann nicht erneut gestartet "
-"werden."
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_LABEL"
 msgstr "Schlüsselkennwort festlegen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_DESC"
-msgstr ""
-"Dieser Workflow wurde erfolgreich beenden und kann nicht erneut gestartet "
-"werden."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_LABEL"
 msgstr "Erweiterte Zertifikatsinhalte festlegen"
@@ -3499,13 +3469,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SUBJECT_LABEL"
 msgstr "Zertifikatsinhalte festlegen"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_DESC"
-msgstr ""
-"Dieser Workflow ist fehlgeschlagen und kann nicht weiter bearbeitet werden."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_LABEL"
-msgstr "fehlgeschlagen"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_INITIAL_DESC"
@@ -3608,7 +3571,9 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EDITUSER_SUCCESS_LABEL"
 msgstr "Zertifikat ausgestellt"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_DESC"
-msgstr "Dieser Antrag wurde ohne Autentisierungsinformationen eingereicht. Wenn Sie der Antragsteller sind, drücken Sie 'Antrag annehmen' um fortzufahren."
+msgstr ""
+"Dieser Antrag wurde ohne Autentisierungsinformationen eingereicht. Wenn Sie "
+"der Antragsteller sind, drücken Sie 'Antrag annehmen' um fortzufahren."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_MANUAL_AUTHORIZATION_LABEL"
 msgstr "Warten auf manuelle Autentisierung"
@@ -3622,18 +3587,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESC"
 msgstr ""
 "Dieser Workflow wurde unerwartet beendet. Bitte kontaktieren Sie den "
 "Helpdesk."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_DESC"
-msgstr ""
-"Dieser Workflow ist fehlgeschlagen und kann nicht neu gestartet werden."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_LABEL"
-msgstr "FEHLER"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_DESC"
-msgstr "Initialisieren..."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_LABEL"
@@ -3706,12 +3659,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_LABEL"
 msgstr "Meta-Daten prüfen"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_DESC"
-msgstr "Dieser Workflow wurde pausiert und wird automatisch fortgeführt."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_LABEL"
-msgstr "Aktualisiert"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_INITIAL_DESC"
@@ -4120,6 +4067,12 @@ msgstr "ja"
 #~ msgid "I18N_OPENXPKI_UI_ISSUER_UNKNOWN"
 #~ msgstr "Aussteller Zertifikat unbekannt"
 
+#~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST2001"
+#~ msgstr "GOST 2001"
+
+#~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST94"
+#~ msgstr "GOST 94"
+
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
 #~ msgstr "Keystore Download"
@@ -4281,6 +4234,9 @@ msgstr "ja"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_LABEL"
 #~ msgstr "Set Information"
 
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_REPORT_SUMMARY_INITIALIZE_LABEL"
+#~ msgstr "Einstellungen für Report"
+
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_INITIALIZE_LABEL"
 #~ msgstr "Start Search"
@@ -4401,6 +4357,39 @@ msgstr "ja"
 #~ msgstr "State"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_DESC"
+#~ msgstr "Initialisierung..."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_LABEL"
+#~ msgstr "CRL erstellen"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_DESC"
+#~ msgstr ""
+#~ "Dieser Workflow wurde erfolgreich beenden und kann nicht erneut gestartet "
+#~ "werden."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_DESC"
+#~ msgstr ""
+#~ "Dieser Workflow wurde erfolgreich beenden und kann nicht erneut gestartet "
+#~ "werden."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_DESC"
+#~ msgstr ""
+#~ "Dieser Workflow wurde erfolgreich beenden und kann nicht erneut gestartet "
+#~ "werden."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_DESC"
+#~ msgstr ""
+#~ "Dieser Workflow ist fehlgeschlagen und kann nicht weiter bearbeitet "
+#~ "werden."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_LABEL"
+#~ msgstr "fehlgeschlagen"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_ISSUE_DESC"
 #~ msgstr ""
 #~ "Der Antrag muss nun geprüft und freigegeben werden. Sie können den Status "
@@ -4449,6 +4438,24 @@ msgstr "ja"
 #~ msgstr ""
 #~ "This workflow was interrupted by an unexpected event, please contact the "
 #~ "support team!"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_DESC"
+#~ msgstr ""
+#~ "Dieser Workflow ist fehlgeschlagen und kann nicht neu gestartet werden."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_LABEL"
+#~ msgstr "FEHLER"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_DESC"
+#~ msgstr "Initialisieren..."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_DESC"
+#~ msgstr "Dieser Workflow wurde pausiert und wird automatisch fortgeführt."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_LABEL"
+#~ msgstr "Aktualisiert"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_DESC"
