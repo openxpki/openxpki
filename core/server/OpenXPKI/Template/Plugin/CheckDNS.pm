@@ -1,10 +1,8 @@
 package OpenXPKI::Template::Plugin::CheckDNS;
 
-=head1 NAME
+=head1 OpenXPKI::Template::Plugin::CheckDNS
 
-OpenXPKI::Template::Plugin::CheckDNS
-
-=head1 DESCRIPTION
+=head2 How to use
 
 Plugin for Template::Toolkit to check FQDNs against DNS.
 
@@ -99,9 +97,7 @@ sub _init_dns {
     return $rr;
 }
 
-=head2 Methods
-
-=head3 valid
+=head2 valid
 
 Expects the fqdn to check as argument. Returns the fqdn wrapped into a
 span element with css class I<dns-failed>, I<dns-valid>, I<dns-timeout> or
@@ -158,7 +154,7 @@ sub valid {
 
 }
 
-=head3 resolve
+=head2 resolve
 
 Expects the fqdn to check as argument. The result of the dns lookup is
 appended to the fqdn using brackets. By default, the first result is

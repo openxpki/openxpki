@@ -148,16 +148,12 @@ sub generate {
 1;
 __END__
 
-=head1 NAME
-
-OpenXPKI::Template::Plugin::RandomPassword
-
-=head1 DESCRIPTION
+=head1 OpenXPKI::Template::Plugin::RandomPassword
 
 This module implements a Template Toolkit plugin that generates randomly
 generated passwords in RFC2307 syntax.
 
-=head2 USAGE
+=head2 How to use
 
 In your template, use the following line at the beginning of the file to
 load the plugin:
@@ -175,15 +171,7 @@ password instance variable. It passes the named parameters 'scheme' and
 'callback' to the function. The return value of the method is rendered
 into the template output.
 
-=head2 Constructor
-
-=head3 new
-
-Called by the Template toolkit when instantiating the plugin.
-
-=head2 Methods
-
-=head3 generate
+=head2 generate
 
 Generates a random password and returns the encrypted value.
 
