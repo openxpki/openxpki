@@ -3219,12 +3219,14 @@ sub __render_fields {
 
                     my $sum = 0;
                     my @val = map { $sum+=$hv->{$_}; $hv->{$_} || 0 } @keys;
-                    my $divider = 100 / $sum;
+                    if ($sum) {
+                        my $divider = 100 / $sum;
 
-                    map {  $_ *= $divider } @val;
+                        map {  $_ *= $divider } @val;
 
-                    unshift @val, '';
-                    $item->{value} = [ \@val ];
+                        unshift @val, '';
+                        $item->{value} = [ \@val ];
+                    }
 
                 } else {
                     # only one row so this is easy
