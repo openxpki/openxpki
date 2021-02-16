@@ -66,7 +66,8 @@ command "get_key_params" => {
             map { $_ =~ s/\A_// } @param; # strip leading underscore
         }
         else {
-            @param = grep { $_ !~ /^_/ } @param; # filter argument starting with underscore
+            # filter argument starting with underscore and ranges
+            @param = grep { $_ !~ /(^_|:)/ } @param;
         }
         $result->{$key} = \@param if @param;
     }
