@@ -720,7 +720,7 @@ gif/png/jpg as the suffix is used to detect the correct image type.
 To test your notification config, you can trigger a test message via the
 command line interface::
 
-    openxpkicli send_notification --arg message=testmail --param rcpt=me@company.org
+    openxpkicli send_notification --arg message=testmail --param notify_to=me@company.org
 
 
 RT Request Tracker
