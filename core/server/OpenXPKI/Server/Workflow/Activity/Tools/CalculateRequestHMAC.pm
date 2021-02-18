@@ -7,7 +7,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use MIME::Base64 qw(decode_base64);
 use Digest::SHA qw(hmac_sha256_hex);
-use Workflow::Exception qw(configuration_error);
+use Workflow::Exception qw(configuration_error workflow_error);
 
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
@@ -29,11 +29,13 @@ sub execute {
         configuration_error('Unable to find a secret for HMAC calculation');
     }
 
-    my $pem = $context->param('pkcs10');
-    $pem =~ s/-----(BEGIN|END)[^-]+-----//g;
-    $pem =~ s/\s//xmsg;
+    my $pkcs10 = $self->param('pkcs10') || $context->param('pkcs10');
+    workflow_error('No PKCS10 container was provided') unless($pkcs10);
+    my $pkcs10obj = OpenXPKI::Crypt::PKCS10->new( $pkcs10 );
 
-    $context->param( $target_key  => hmac_sha256_hex(decode_base64($pem), $secret) );
+    my $data = $self->param('key_only') ? $pkcs10obj->get_pub_key : $pkcs10obj->data;
+
+    $context->param( $target_key  => hmac_sha256_hex( $data, $secret) );
 
 }
 
@@ -55,6 +57,10 @@ Calculate the SHA256 HMAC for a PEM encoded CSR
 =item secret
 
 The secret key of the HMAC
+
+=item key_only
+
+Boolean, calculate the HMAC based on the public key instead of the full CSR.
 
 =item config_path
 

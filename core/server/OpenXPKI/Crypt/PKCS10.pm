@@ -99,9 +99,28 @@ has subject_key_id => (
     lazy => 1,
     default => sub {
         my $self = shift;
-        return uc join ':', ( unpack '(A2)*', sha1_hex( $self->_pkcs10()->{certificationRequestInfo}{subjectPKInfo}{subjectPublicKey}[0] ) );
+        return uc join ':', ( unpack '(A2)*', sha1_hex( $self->get_pub_key() ) );
     }
 );
+
+=head2 get_pub_key
+
+Return the public key from the request in binary format
+
+=cut
+
+has pub_key => (
+    is => 'ro',
+    required => 0,
+    isa => 'Str',
+    reader => 'get_pub_key',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        return $self->_pkcs10()->{certificationRequestInfo}{subjectPKInfo}{subjectPublicKey}[0];
+    }
+);
+
 
 =head2 get_csr_identifier
 
