@@ -2041,7 +2041,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Antrag aktualisieren"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
-msgstr "Workflow Schlüsselworte"
+msgstr "Workflow-Meta-Daten"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BACK_TO_INFO_LABEL"
 msgstr "Zurück zur Übersicht"
@@ -2120,7 +2120,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_DIALOG_CONFIRM_BUTTON"
 msgstr "Bestätigen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL"
-msgstr "Workflow Context"
+msgstr "Workflow-Context"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_COUNT_TRY_LABEL"
 msgstr "Wiederholungen"
