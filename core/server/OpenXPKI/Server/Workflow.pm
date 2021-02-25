@@ -30,33 +30,59 @@ my $default_reap_at_interval = '+0000000005';
 
 my %known_proc_states = (
 
-    #"action" defines, what should happen (=which hook-method sholuld be called), when execute_action is called on  this proc_state
-    # example: if proc_state eq 'pause', '_wake_up' is called (IN current Activity-Object!)
-    # 'none' means: no specail action needed (=no hook is called), process can go on
+    # 'action' defines what should happen (= which hook-method should be called)
+    # when execute_action() is called on this proc_state.
     #
-    # '_runtime_exception' means: its not allowed (and should not be possible) to (re-)enter a
-    # workflow with this proc_state (e.g 'finished' or 'wakeup').
+    # Special actions:
+    #  - 'none':
+    #    no special action needed (= no hook is called), process can go on
+    #  - '_runtime_exception':
+    #    it's not allowed (and should not be possible) to (re-)enter a
+    #    workflow with this proc_state (e.g 'finished' or 'wakeup').
     #
-    # see "_handle_proc_state" for details
+    # See _handle_proc_state() for details.
+    #
+    # Example:
+    #  - if proc_state is 'pause':
+    #    '_wake_up' is called (IN current Activity object!)
+    #
 
-    init        => {desc => 'set in constructor, no action executed yet',
-                    action=>'none'},
-    wakeup      => {desc =>'wakeup after pause',
-                    action=>'_runtime_exception'},
-    resume      => {desc =>'resume after exception',
-                    action=>'_runtime_exception'},
-    running     => {desc =>'action executes',
-                    action=>'none'},
-    manual      => {desc =>'action stops regulary',
-                    action=>'none'},
-    finished    => {desc =>'action finished with success',
-                    action=>'none'},#perfectly handled from WF-State-Engine
-    pause       => {desc =>'action paused',
-                    action=>'_wake_up'},
-    exception   => {desc =>'an exception has been thrown',
-                    action=>'_resume'},
-    retry_exceeded => {desc =>'count of retries has been exceeded',
-                    action=>'_resume'}
+    init => {
+        desc => 'set in constructor, no action executed yet',
+        action => 'none',
+    },
+    wakeup => {
+        desc => 'wakeup after pause',
+        action => '_runtime_exception',
+    },
+    resume => {
+        desc => 'resume after exception',
+        action => '_runtime_exception',
+    },
+    running => {
+        desc => 'action executes',
+        action => 'none',
+    },
+    manual => {
+        desc => 'action stops regulary',
+        action => 'none',
+    },
+    finished => {
+        desc => 'action finished with success',
+        action => 'none', # perfectly handled from WF-State-Engine
+    },
+    pause => {
+        desc => 'action paused',
+        action => '_wake_up',
+    },
+    exception => {
+        desc => 'an exception has been thrown',
+        action => '_resume',
+    },
+    retry_exceeded => {
+        desc => 'count of retries has been exceeded',
+        action => '_resume',
+    },
 
 );
 
@@ -521,16 +547,15 @@ sub get_global_actions {
     my $proc_state = $self->proc_state();
     if ($proc_state eq 'exception') {
         @possible_action = ('resume','fail');
-
-    } elsif ($proc_state eq 'pause') {
+    }
+    elsif ($proc_state eq 'pause') {
         @possible_action = ('wakeup','fail');
-
-    } elsif ($proc_state eq 'retry_exceeded') {
+    }
+    elsif ($proc_state eq 'retry_exceeded') {
         @possible_action = ('wakeup','fail');
-
-    } elsif ($proc_state ne 'finished') {
+    }
+    elsif ($proc_state ne 'finished') {
         @possible_action = ('fail');
-
     }
 
     # always possible
@@ -547,46 +572,48 @@ sub get_global_actions {
 
 }
 
-sub _handle_proc_state{
+sub _handle_proc_state {
     my ( $self, $action_name ) = @_;
 
     ##! 16: sprintf('action %s, handle_proc_state %s',$action_name,$self->proc_state)
 
     my $action_needed = $known_proc_states{$self->proc_state}->{action};
-    if(!$action_needed){
-
+    if (!$action_needed) {
         OpenXPKI::Exception->throw (
-                message => "Workflow is in unknown process state",
-                params  => { DESCRIPTION => sprintf('unknown proc-state: %s',$self->proc_state) }
-            );
+            message => "Workflow is in unknown process state",
+            params  => { DESCRIPTION => sprintf('unknown proc-state: %s',$self->proc_state) }
+        );
 
     }
-    if($action_needed eq 'none'){
+    if ($action_needed eq 'none') {
         ##! 16: 'no action needed for proc_state '. $self->proc_state
         return;
     }
 
     #we COULD use symbolic references to method-calls here, but - for the moment - we handle it explizit:
-    if($action_needed eq '_wake_up'){
+    if ($action_needed eq '_wake_up') {
         ##! 1: 'paused, call wakeup '
          CTX('log')->application()->debug("Action $action_name waking up");
 
         $self->_wake_up($action_name);
-    }elsif($action_needed eq '_resume'){
+    }
+    elsif ($action_needed eq '_resume') {
         ##! 1: 'call _resume '
         CTX('log')->application()->debug("Action $action_name resume");
 
         $self->_resume($action_name);
-    }elsif($action_needed eq '_runtime_exception'){
+    }
+    elsif ($action_needed eq '_runtime_exception') {
         ##! 1: 'call _runtime_exception '
         CTX('log')->application()->debug("Action $action_name runtime exception");
 
         $self->_runtime_exception($action_name);
-    }else{
+    }
+    else {
         OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_WORKFLOW_UNKNOWN_PROC_STATE_ACTION",
-                params  => {DESCRIPTION => sprintf('unknown action "%s" for proc-state: %s',$action_needed, $self->proc_state)}
-            );
+            message => "I18N_OPENXPKI_WORKFLOW_UNKNOWN_PROC_STATE_ACTION",
+            params  => {DESCRIPTION => sprintf('unknown action "%s" for proc-state: %s',$action_needed, $self->proc_state)}
+        );
     }
 
 }
@@ -903,7 +930,7 @@ Note that pause requires an epoch value for $wakeup_at and NOT a relative date!
 
 =head2 _handle_proc_state
 
-checks the current proc state and determines the follwo up action (e.g. "pause"->"wake_up")
+checks the current proc state and determines the follow up action (e.g. "pause"->"wake_up")
 
 =head2 _wake_up
 
