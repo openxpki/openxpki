@@ -27,7 +27,7 @@ sub execute {
 
     # we silently asume that all digests are supported
     # which is true on current systems using the suggested toolchain
-    my @caps = qw( Renewal POSTPKIOperation SHA-512 SHA-384 SHA-256 SHA-224 SHA-1 DES3);
+    my @caps = qw( Renewal POSTPKIOperation SHA-512 SHA-384 SHA-256 SHA-224 SHA-1 DES3 AES);
     my $next_ca = $self->get_next_ca_certificate();
     if ($next_ca) {
         push @caps, 'GetNextCACert';
