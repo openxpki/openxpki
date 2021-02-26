@@ -96,6 +96,9 @@ sub get_validity {
             $validity =~ s/[^0-9]//g;
             $validityformat = 'absolutedate';
 
+        } elsif ($validity =~ m{\A\d{8}(\d{4}(\d{2})?)?\z}) {
+            $validityformat = 'absolutedate';
+
         } else {
             OpenXPKI::Exception->throw(
                 message => "Invalid format given to detect",
@@ -295,9 +298,12 @@ terse date string.
 =item *
 
 'detect': tries to guess what it got, relativedate if it has a sign (+/-),
-epoch if it has between 8 and 10 digits and absolutedate otherwise. Also
+epoch if it has between 9 and 10 digits and absolutedate otherwise. Also
 consumes iso8601 formated strings. Days can not be autodetected as they
 look like relativedate.
+
+'absolutedate' is only valid with eight (day only), 12 (minutes) or
+14 (seconds) digits.
 
 =back
 
