@@ -25,75 +25,73 @@ use Crypt::CBC;
 use OpenXPKI::i18n qw( i18nGettext i18nTokenizer set_language set_locale_prefix);
 use OpenXPKI::Client::UI;
 use OpenXPKI::Client;
+use OpenXPKI::Client::Config;
 
-my $configfile = '/etc/openxpki/webui/default.conf';
+my $conf;
+my $log;
+my $json = new JSON();
 
-# check for explicit file in env, for fcgi
-# FcgidInitialEnv FcgidInitialEnv /etc/openxpki/<inst>/webui/default.conf
-#
-if ($ENV{OPENXPKI_WEBUI_CLIENT_CONF_FILE}
-    && -f $ENV{OPENXPKI_WEBUI_CLIENT_CONF_FILE}) {
-    $configfile = $ENV{OPENXPKI_WEBUI_CLIENT_CONF_FILE};
+eval {
+    my $config = OpenXPKI::Client::Config->new('webui');
+    $log = $config->logger();
+    # do NOT call config here as webui does not
+    # use the URI based  endpoint logic yet
+    $conf = $config->default();
+    $log->debug(Dumper $conf);# if ($log->is_trace());
+};
+
+if ($EVAL_ERROR) {
+    my $cgi = CGI::Fast->new();
+    print $cgi->header( -type => 'application/json' );
+    print $json->encode( { status => { 'level' => 'error', 'message' => i18nGettext('I18N_OPENXPKI_UI_APPLICATION_ERROR') } });
+    die $EVAL_ERROR;
 }
 
-read_config $configfile => my %config;
-
-OpenXPKI::Log4perl->init_or_fallback( $config{global}{log_config} );
-
-my $locale_directory = $config{global}{locale_directory} || '/usr/share/locale';
-my $default_language = $config{global}{default_language} || 'en_US';
-
-set_locale_prefix ($locale_directory);
-set_language      ($default_language);
-
-my $log = Log::Log4perl->get_logger();
-
-if (!$config{global}{socket}) {
-    $config{global}{socket} = '/var/openxpki/openxpki.socket';
+if (!$conf->{global}->{socket}) {
+    $conf->{global}->{socket} = '/var/openxpki/openxpki.socket';
 }
-if (!$config{global}{scripturl}) {
-    $config{global}{scripturl} = '/cgi-bin/webui.fcgi';
+if (!$conf->{global}->{scripturl}) {
+    $conf->{global}->{scripturl} = '/cgi-bin/webui.fcgi';
 }
 
 my @header_tpl;
-foreach my $key (keys %{$config{header}}) {
-    my $val = $config{header}{$key};
+foreach my $key (keys %{$conf->{header}}) {
+    my $val = $conf->{header}->{$key};
     $key =~ s/-/_/g;
     push @header_tpl, ("-$key", $val);
 }
 
 
-if ($config{global}{session_path} || defined $config{global}{ip_match} || $config{global}{session_timeout}) {
+if ($conf->{global}->{session_path} || defined $conf->{global}->{ip_match} || $conf->{global}->{session_timeout}) {
 
-    if ($config{session}) {
+    if ($conf->{session}) {
         $log->error('Session parameters in [global]  and [session] found! Ignoring [global]');
     } else {
         $log->warn('Session parameters in [global] are deprecated, please use [session]');
-        $config{session} = {
-            'ip_match' => $config{global}{ip_match} || 0,
-            'timeout' => $config{global}{session_timeout} || undef,
+        $conf->{session} = {
+            'ip_match' => $conf->{global}->{ip_match} || 0,
+            'timeout' => $conf->{global}->{session_timeout} || undef,
         };
-        $config{session_driver} = { Directory => ( $config{global}{session_path} || '/tmp') };
+        $conf->{session_driver} = { Directory => ( $conf->{global}->{session_path} || '/tmp') };
     }
 }
 
-if ($config{session}{ip_match}) {
+if ($conf->{session}->{ip_match}) {
    $CGI::Session::IP_MATCH = 1;
 }
 
-if ($config{session}{driver} && $config{session}{driver} eq 'openxpki') {
+if ($conf->{session}->{driver} && $conf->{session}->{driver} eq 'openxpki') {
     warn "Builtin session driver is deprecated and will be removed with next release!";
     $log->warn("Builtin session driver is deprecated and will be removed with next release!");
 }
 
 
-$log->info('Start fcgi loop ' . $$. ', config: ' . $configfile);
+$log->info('Start fcgi loop ' . $$);
 
 # We persist the client in the CGI *per session*
 # Sharing one client with multiple sessions requires some work on detach/
 # switching sessions in backend to prevent users from getting wrong sessions!
 
-my $json = new JSON();
 my $backend_client;
 
 sub __handle_error {
@@ -131,7 +129,7 @@ Returns the encrypted value, if no key is set, returns the plain input value.
 sub encrypt_cookie {
 
     my $value = shift;
-    my $key = $config{session}{cookey};
+    my $key = $conf->{session}->{cookey};
     return $value unless ($key && $value);
     my $cipher = Crypt::CBC->new(
         -key => $key,
@@ -150,7 +148,7 @@ Reverse to encrypt_cookie
 sub decrypt_cookie {
 
     my $value = shift;
-    my $key = $config{session}{cookey};
+    my $key = $conf->{session}->{cookey};
     return $value unless ($key && $value);
     my $plain;
     eval {
@@ -186,7 +184,7 @@ while (my $cgi = CGI::Fast->new()) {
     eval {
         if (!$backend_client || !$backend_client->is_connected()) {
             $backend_client = OpenXPKI::Client->new({
-                SOCKETFILE => $config{'global'}{'socket'}
+                SOCKETFILE => $conf->{global}->{socket}
             });
         }
     };
@@ -199,13 +197,13 @@ while (my $cgi = CGI::Fast->new()) {
 
     # this creates a standard CGI::Session object if OXI session is not used
     if (!$session_front) {
-        my $driver_args = $config{session_driver} ? $config{session_driver} : { Directory => '/tmp' };
-        $session_front = new CGI::Session($config{session}{driver}, $sess_id, $driver_args );
+        my $driver_args = $conf->{session_driver} ? $conf->{session_driver} : { Directory => '/tmp' };
+        $session_front = new CGI::Session($conf->{session}->{driver}, $sess_id, $driver_args );
         Log::Log4perl::MDC->put('sid', substr($session_front->id,0,4));
     }
 
-    if (defined $config{session}{timeout}) {
-        $session_front->expire( $config{session}{timeout} );
+    if (defined $conf->{session}->{timeout}) {
+        $session_front->expire( $conf->{session}->{timeout} );
     }
 
     our $cookie = {
@@ -220,7 +218,7 @@ while (my $cgi = CGI::Fast->new()) {
 
     # Set the path to the directory component of the script, this
     # automagically creates seperate cookies for path based realms
-    my $realm_mode = $config{global}{realm_mode} || '';
+    my $realm_mode = $conf->{global}->{realm_mode} || '';
     if ($realm_mode eq "path") {
 
         my $script_path = $ENV{'REQUEST_URI'};
@@ -236,16 +234,16 @@ while (my $cgi = CGI::Fast->new()) {
             my $script_realm;
             if ($script_path =~ qq|\/([^\/]+)\$|) {
                 $script_realm = $1;
-                if (!$config{realm}{$script_realm}) {
+                if (!$conf->{realm}->{$script_realm}) {
                     $log->debug('No realm for ident: ' . $script_realm );
                     __handle_error($cgi, 'I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE');
                     $session_front->flush();
                     $backend_client->detach();
                     next;
                 }
-                $log->debug('detected realm is ' . $config{realm}{$script_realm});
+                $log->debug('detected realm is ' . $conf->{realm}->{$script_realm});
 
-                my ($realm, $stack) = split (/;/,$config{realm}{$script_realm});
+                my ($realm, $stack) = split (/;/,$conf->{realm}->{$script_realm});
                 $session_front->param('pki_realm', $realm);
                 if ($stack) {
                     $session_front->param('auth_stack', $stack);
@@ -257,11 +255,11 @@ while (my $cgi = CGI::Fast->new()) {
         }
     } elsif ($realm_mode eq "fixed") {
         # Fixed realm mode, mode must be defined in the config
-        $session_front->param('pki_realm', $config{global}{realm});
+        $session_front->param('pki_realm', $conf->{global}->{realm});
     }
 
-    if ($config{login} && $config{login}{stack}) {
-        $ENV{OPENXPKI_AUTH_STACK} = $config{login}{stack};
+    if ($conf->{login} && $conf->{login}->{stack}) {
+        $ENV{OPENXPKI_AUTH_STACK} = $conf->{login}->{stack};
     }
 
     push @header, ('-cookie', $cgi->cookie( $cookie ));
@@ -276,7 +274,7 @@ while (my $cgi = CGI::Fast->new()) {
             backend => $backend_client,
             session => $session_front,
             logger => $log,
-            config => $config{global}
+            config => $conf->{global}
         });
 
         $result = $client->handle_request({ cgi => $cgi });
