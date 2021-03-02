@@ -57,7 +57,11 @@
         <ul class="list-unstyled">
             {{#each v as |val|}}
                 <li>
-                    {{#if val.page}}
+                    {{#if (eq val.format "extlink")}}
+                        <a href={{val.page}} target={{try val.target "_blank"}} title={{val.tooltip}}>
+                            <OxiBase::Label @text={{val.label}} @raw={{true}} />
+                        </a>
+                    {{else if val.page}}
                         <OxiBase::Formatted::Link @spec={{val}}/>
                     {{else}}
                         <OxiBase::Label @text={{val.label}} @tooltip={{val.tooltip}}/>

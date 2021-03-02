@@ -715,19 +715,17 @@ sub init_detail {
 
     # was in info, bullet list for downloads
     my $base =  $self->_client()->_config()->{'scripturl'} . "?page=certificate!download!identifier!$cert_identifier!format!";
-    my $pattern = '<li><a href="'.$base.'%s" target="_blank">%s</a></li>';
-
     push @fields, { label => 'I18N_OPENXPKI_UI_DOWNLOAD_LABEL', value => [
-        sprintf ($pattern, 'pem', 'I18N_OPENXPKI_UI_DOWNLOAD_PEM'),
-        sprintf ($pattern, 'der', 'I18N_OPENXPKI_UI_DOWNLOAD_DER'),
-        sprintf ($pattern, 'pkcs7', 'I18N_OPENXPKI_UI_DOWNLOAD_PKCS7'),
-        sprintf ($pattern, 'pkcs7!root!true', 'I18N_OPENXPKI_UI_DOWNLOAD_PKCS7_WITH_ROOT'),
-        sprintf ($pattern, 'bundle', 'I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE'),
-        sprintf ($pattern, 'install', 'I18N_OPENXPKI_UI_DOWNLOAD_INSTALL'),
-        '<li><a href="#/openxpki/certificate!text!identifier!'.$cert_identifier.'">I18N_OPENXPKI_UI_DOWNLOAD_SHOW_PEM</a></li>',
-        '<li><a href="#/openxpki/certificate!text!format!txtpem!identifier!'.$cert_identifier.'">I18N_OPENXPKI_UI_DOWNLOAD_SHOW_TEXT</a></li>',
+        { page => "${base}pem", label => 'I18N_OPENXPKI_UI_DOWNLOAD_PEM',  format => 'extlink' },
+        { page => "${base}der", label => 'I18N_OPENXPKI_UI_DOWNLOAD_DER', format => 'extlink' },
+        { page => "${base}pkcs7", label => 'I18N_OPENXPKI_UI_DOWNLOAD_PKCS7', format => 'extlink' },
+        { page => "${base}pkcs7!root!true", label => 'I18N_OPENXPKI_UI_DOWNLOAD_PKCS7_WITH_ROOT', format => 'extlink' },
+        { page => "${base}bundle", label => 'I18N_OPENXPKI_UI_DOWNLOAD_BUNDLE',  format => 'extlink' },
+        { page => "${base}install", label => 'I18N_OPENXPKI_UI_DOWNLOAD_INSTALL', format => 'extlink' },
+        { page => "certificate!text!identifier!$cert_identifier", label => 'I18N_OPENXPKI_UI_DOWNLOAD_SHOW_PEM' },
+        { page => "certificate!text!format!txtpem!identifier!$cert_identifier", label => 'I18N_OPENXPKI_UI_DOWNLOAD_SHOW_TEXT' },
         ],
-        format => 'rawlist'
+        format => 'linklist'
     };
 
     if ($is_local_entity) {

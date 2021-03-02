@@ -127,7 +127,7 @@ is shown.
 
 This is usually used to start a workflow from the menu or link, e.g.
 
-    workflow!index!wf_type!I18N_OPENXPKI_WF_TYPE_CHANGE_METADATA
+    workflow!index!wf_type!change_metadata
 
 =cut
 
