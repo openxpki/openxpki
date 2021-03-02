@@ -241,7 +241,7 @@ sub execute {
     } elsif ($target_key) {
 
         # create a in memory file handle
-        open( $fh, '>', \$buffer) or die "Can't open memory file: $!\n";
+        open( $fh, '>:encoding(UTF-8)', \$buffer) or die "Can't open memory file: $!\n";
 
     } else {
         # Setup for write to disk
@@ -275,7 +275,7 @@ sub execute {
                 }
             }
 
-            open $fh, ">", $target_name;
+            open $fh, ">:encoding(UTF-8)", $target_name;
         }
 
         if (!$fh || !$target_name) {

@@ -562,7 +562,9 @@ sub init_fetch {
         if (!$dp->{value}) {
             die "Requested data not found/expired";
         }
+
         print $cgi->header( @main::header, -type => $data->{mime}, -attachment => $data->{attachment} );
+        utf8::encode($dp->{value}) if ($data->{mime} =~ /utf-8/i);
         print $dp->{value};
 
     } elsif ($type eq 'report') {
