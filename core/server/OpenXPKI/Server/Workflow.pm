@@ -366,14 +366,12 @@ sub pause {
         $self->notify_observers( 'retry_exceeded' );
         $self->wakeup_at( 0 );
         $self->count_try($count_try);
-        $self->add_history(
-            Workflow::History->new({
-                action      => $self->{_CURRENT_ACTION},
-                description => sprintf( 'EXCEEDED: count try %d', $count_try ),
-                state       => $self->state(),
-                user        => CTX('session')->data->user,
-            })
-        );
+        $self->add_history({
+            action      => $self->{_CURRENT_ACTION},
+            description => sprintf( 'EXCEEDED: count try %d', $count_try ),
+            state       => $self->state(),
+            user        => CTX('session')->data->user,
+        });
         $self->_set_proc_state('retry_exceeded');#saves wf data
 
         CTX('log')->application()->warn("Retry exceeded on action ".$self->{_CURRENT_ACTION});
@@ -388,16 +386,12 @@ sub pause {
         $self->count_try($count_try);
         $self->context->param( wf_pause_msg => $cause_description );
         $self->notify_observers( 'pause', $self->{_CURRENT_ACTION}, $cause_description );
-        $self->add_history(
-            Workflow::History->new(
-                {
-                    action      => $self->{_CURRENT_ACTION},
-                    description => sprintf( 'PAUSED: %s, count try %d, wakeup at %s', $cause_description ,$count_try, $dt_wakeup_at),
-                    state       => $self->state(),
-                    user        => CTX('session')->data->user,
-                }
-            )
-        );
+        $self->add_history({
+            action      => $self->{_CURRENT_ACTION},
+            description => sprintf( 'PAUSED: %s, count try %d, wakeup at %s', $cause_description ,$count_try, $dt_wakeup_at),
+            state       => $self->state(),
+            user        => CTX('session')->data->user,
+        });
         $self->_set_proc_state('pause');#saves wf data
 
         CTX('log')->application()->info("Action ".$self->{_CURRENT_ACTION}." paused ($cause_description), wakeup $dt_wakeup_at");
@@ -602,16 +596,12 @@ sub _wake_up {
     eval {
         my $action = $self->_get_action($action_name);
         $self->notify_observers( 'wakeup', $action_name );
-        $self->add_history(
-            Workflow::History->new(
-                {
-                    action      => $action_name,
-                    description => 'WAKEUP',
-                    state       => $self->state(),
-                    user        => CTX('session')->data->user,
-                }
-            )
-        );
+        $self->add_history({
+            action      => $action_name,
+            description => 'WAKEUP',
+            state       => $self->state(),
+            user        => CTX('session')->data->user,
+        });
         $self->_set_proc_state('wakeup');#saves wf data
         $self->context->param( wf_pause_msg => '' );
         $action->wake_up($self);
@@ -632,16 +622,12 @@ sub _resume {
         my $action = $self->_get_action($action_name);
         my $old_state = $self->proc_state();
         $self->notify_observers( 'resume', $action_name );
-        $self->add_history(
-            Workflow::History->new(
-                {
-                    action      => $action_name,
-                    description => 'RESUME',
-                    state       => $self->state(),
-                    user        => CTX('session')->data->user,
-                }
-            )
-        );
+        $self->add_history({
+            action      => $action_name,
+            description => 'RESUME',
+            state       => $self->state(),
+            user        => CTX('session')->data->user,
+        });
         $self->context->param( wf_exception => undef ) if $self->context->param('wf_exception');
         $self->_set_proc_state('resume');#saves wf data
         $action->resume($self,$old_state);
@@ -766,15 +752,11 @@ sub _proc_state_exception {
         $self->context->param( wf_exception => $error_code );
         $self->_set_proc_state($next_proc_state);
         $self->notify_observers( $next_proc_state, $self->{_CURRENT_ACTION}, $error );
-        $self->add_history(
-            Workflow::History->new(
-                {
-                    action      => $self->{_CURRENT_ACTION},
-                    description => sprintf( 'EXCEPTION: %s ', $error_msg ),
-                    user        => CTX('session')->data->user,
-                }
-            )
-        );
+        $self->add_history({
+            action      => $self->{_CURRENT_ACTION},
+            description => sprintf( 'EXCEPTION: %s ', $error_msg ),
+            user        => CTX('session')->data->user,
+        });
         $self->_save();
 
     };
@@ -797,15 +779,11 @@ sub _fail {
         $self->state('FAILURE');
         $self->_set_proc_state('finished');
         $self->notify_observers( 'fail', $self->state, $self->{_CURRENT_ACTION}, $error);
-        $self->add_history(
-            Workflow::History->new(
-                {
-                    action      => $self->{_CURRENT_ACTION},
-                    description => 'FAIL:' . $reason,
-                    user        => CTX('session')->data->user,
-                }
-            )
-        );
+        $self->add_history({
+            action      => $self->{_CURRENT_ACTION},
+            description => 'FAIL:' . $reason,
+            user        => CTX('session')->data->user,
+        });
         $self->_save();
     };
 
