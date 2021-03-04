@@ -47,46 +47,56 @@ my %known_proc_states = (
     #    '_wake_up' is called (IN current Activity object!)
     #
 
+    # set in constructor, no action executed yet
     init => {
-        desc => 'set in constructor, no action executed yet',
-        action => 'none',
+        hook => 'none',
+        enforceable => [ 'fail' ],
     },
+    # wakeup after pause
     wakeup => {
-        desc => 'wakeup after pause',
-        action => '_runtime_exception',
+        hook => '_runtime_exception',
+        enforceable => [ 'fail' ],
     },
+    # resume after exception
     resume => {
-        desc => 'resume after exception',
-        action => '_runtime_exception',
+        hook => '_runtime_exception',
+        enforceable => [ 'fail' ],
     },
+    # action executes
     running => {
-        desc => 'action executes',
-        action => 'none',
+        hook => 'none',
+        enforceable => [ 'fail' ],
     },
+    # action stops regulary
     manual => {
-        desc => 'action stops regulary',
-        action => 'none',
+        hook => 'none',
+        enforceable => [ 'fail' ],
     },
+    # action finished with success
     finished => {
-        desc => 'action finished with success',
-        action => 'none', # perfectly handled from WF-State-Engine
+        hook => 'none', # perfectly handled from WF-State-Engine
+        enforceable => [ ],
     },
+    # action paused
     pause => {
-        desc => 'action paused',
-        action => '_wake_up',
+        hook => '_wake_up',
+        enforceable => [ 'fail', 'wakeup' ],
     },
+    # an exception has been thrown
     exception => {
-        desc => 'an exception has been thrown',
-        action => '_resume',
+        hook => '_resume',
+        enforceable => [ 'fail', 'resume' ],
     },
+    # count of retries has been exceeded
     retry_exceeded => {
-        desc => 'count of retries has been exceeded',
-        action => '_resume',
+        hook => '_resume',
+        enforceable => [ 'fail', 'wakeup' ],
     },
+    # workflow has been archived
     archived => {
-        desc => 'workflow has been archived',
-        action => '_runtime_exception',
-    }
+        hook => '_runtime_exception',
+        enforceable => [ ],
+    },
 
 );
 
@@ -556,79 +566,65 @@ that are available to the session user on this workflow.
 =cut
 
 sub get_global_actions {
+    my ($self) = @_;
 
-    my $self = shift;
-
-    # volatile or non initial workflow do not have any actions
-    if ($self->id() < 1) {
-         return [];
-    }
+    # Volatile workflows do not have any actions
+    return [] if $self->id < 1;
 
     my $role = CTX('session')->data->role || 'Anonymous';
 
-    my $acl = CTX('config')->get_hash([ 'workflow', 'def', $self->type(), 'acl', $role ] );
+    my $acl = CTX('config')->get_hash([ 'workflow', 'def', $self->type, 'acl', $role ]);
 
-    my @possible_action;
-    my $proc_state = $self->proc_state();
-    if ($proc_state eq 'exception') {
-        @possible_action = ('resume','fail');
-    }
-    elsif ($proc_state eq 'pause') {
-        @possible_action = ('wakeup','fail');
-    }
-    elsif ($proc_state eq 'retry_exceeded') {
-        @possible_action = ('wakeup','fail');
-    }
-    elsif ($proc_state ne 'finished' and $proc_state ne 'archived') {
-        @possible_action = ('fail');
-    }
+    # proc_state dependent enforceable actions
+    my @possible = @{ $known_proc_states{$self->proc_state}->{enforceable} };
+    # always possible informational actions
+    push @possible, ('history', 'techlog', 'context', 'attribute');
 
-    # always possible
-    push @possible_action, ('history', 'techlog', 'context', 'attribute');
+    ##! 16: 'possible actions: ' . join(', ', @possible)
 
     my @allowed;
-    foreach my $action (@possible_action) {
+    foreach my $action (@possible) {
         if ($acl->{$action}) {
             push @allowed, $action;
         }
     }
 
+    ##! 16: 'allowed actions: ' . join(', ', @allowed)
     return \@allowed;
-
 }
 
 sub _handle_proc_state {
     my ( $self, $action_name ) = @_;
 
-    ##! 16: sprintf('action %s, handle_proc_state %s',$action_name,$self->proc_state)
+    ##! 16: sprintf('action %s, handle_proc_state %s', $action_name, $self->proc_state)
 
-    my $action_needed = $known_proc_states{$self->proc_state}->{action};
-    if (!$action_needed) {
+    my $hook = $known_proc_states{$self->proc_state}->{hook};
+    if (!$hook) {
         OpenXPKI::Exception->throw (
             message => "Workflow is in unknown process state",
-            params  => { DESCRIPTION => sprintf('unknown proc-state: %s',$self->proc_state) }
+            params  => { DESCRIPTION => sprintf('unknown proc-state: %s', $self->proc_state) }
         );
 
     }
-    if ($action_needed eq 'none') {
-        ##! 16: 'no action needed for proc_state '. $self->proc_state
+    if ($hook eq 'none') {
+        ##! 16: 'no hook defined for proc_state '. $self->proc_state
         return;
     }
 
-    #we COULD use symbolic references to method-calls here, but - for the moment - we handle it explizit:
-    if ($action_needed eq '_wake_up') {
+    # we COULD use symbolic references to method-calls here, but - for the moment - we handle it explizit:
+    if ($hook eq '_wake_up') {
         ##! 1: 'paused, call wakeup '
-         CTX('log')->application()->debug("Action $action_name waking up");
+        CTX('log')->application()->debug("Action $action_name waking up");
 
         $self->_wake_up($action_name);
     }
-    elsif ($action_needed eq '_resume') {
+    elsif ($hook eq '_resume') {
         ##! 1: 'call _resume '
         CTX('log')->application()->debug("Action $action_name resume");
 
         $self->_resume($action_name);
     }
-    elsif ($action_needed eq '_runtime_exception') {
+    elsif ($hook eq '_runtime_exception') {
         ##! 1: 'call _runtime_exception '
         CTX('log')->application()->debug("Action $action_name runtime exception");
 
@@ -637,7 +633,7 @@ sub _handle_proc_state {
     else {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_WORKFLOW_UNKNOWN_PROC_STATE_ACTION",
-            params  => {DESCRIPTION => sprintf('unknown action "%s" for proc-state: %s',$action_needed, $self->proc_state)}
+            params  => {DESCRIPTION => sprintf('unknown hook "%s" for proc-state: %s',$hook, $self->proc_state)}
         );
     }
 
