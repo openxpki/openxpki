@@ -83,6 +83,10 @@ my %known_proc_states = (
         desc => 'count of retries has been exceeded',
         action => '_resume',
     },
+    archived => {
+        desc => 'workflow has been archived',
+        action => '_runtime_exception',
+    }
 
 );
 
@@ -554,7 +558,7 @@ sub get_global_actions {
     elsif ($proc_state eq 'retry_exceeded') {
         @possible_action = ('wakeup','fail');
     }
-    elsif ($proc_state ne 'finished') {
+    elsif ($proc_state ne 'finished' and $proc_state ne 'archived') {
         @possible_action = ('fail');
     }
 
