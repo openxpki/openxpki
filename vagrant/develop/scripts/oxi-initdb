@@ -32,9 +32,10 @@ echo -e "- re-creating database and tables"
 
 echo -e "- creating and importing sample certificates"
 rm -rf /etc/openxpki/ca/
+rm -rf /etc/openxpki/local/keys/
 $OXI_TEST_SAMPLECONFIG_DIR/contrib/sampleconfig.sh                >$LOG 2>&1
-chown -R openxpki:root /etc/openxpki/ca/
-chmod -R 750 /etc/openxpki/ca/
+chown -R openxpki:root /etc/openxpki/local/keys/
+chmod -R 750 /etc/openxpki/local/keys/
 
 echo -e "- starting OpenXPKI"
 openxpkictl start                                                 >$LOG 2>&1
