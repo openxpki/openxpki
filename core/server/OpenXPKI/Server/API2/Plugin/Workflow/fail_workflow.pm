@@ -32,6 +32,8 @@ B<Parameters>
 
 =back
 
+Returns a I<HashRef> with workflow informations like API command L<get_workflow_info|OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_info/get_workflow_info>.
+
 =cut
 command "fail_workflow" => {
     id       => { isa => 'Int', required => 1, },
@@ -47,7 +49,7 @@ command "fail_workflow" => {
 
     my $util = OpenXPKI::Server::API2::Plugin::Workflow::Util->new;
 
-    CTX('log')->system()->warn('Passing the attribute *type* to fail_workflow is deprecated.') if ($params->has_workflow);
+    CTX('log')->system()->warn('Passing the attribute *workflow* to fail_workflow is deprecated.') if ($params->has_workflow);
 
     # in case the workflow is in a state where the factory can not load
     # it, e.g. as the workflow graph has changed we update the database
