@@ -352,6 +352,27 @@ sub set_failed {
 
 }
 
+sub set_archived {
+    my ($self) = @_;
+
+    # only archive finished workflows
+    if ($self->proc_state ne 'finished') {
+        OpenXPKI::Exception->throw(
+            message => "Attempt to archive workflow that is not in proc_state 'finished'",
+        );
+    }
+
+    # no eval{} block here - callers (API commands) shall see exceptions
+    $self->_set_proc_state('archived');
+    $self->notify_observers('archive', $self->state);
+    $self->add_history({
+        description => 'ARCHIVE',
+        user        => CTX('session')->data->user,
+    });
+    $self->_save();
+
+}
+
 sub attrib {
     my ($self, $arg) = @_;
     ##! 1: 'start'
