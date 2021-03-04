@@ -52,7 +52,7 @@ command "get_workflow_history" => {
 
     my $util = OpenXPKI::Server::API2::Plugin::Workflow::Util->new;
     $util->factory->authorize_workflow({
-        ACTION => 'fail',
+        ACTION => 'history',
         ID => $wf_id,
     })
     or OpenXPKI::Exception->throw (
