@@ -2077,6 +2077,10 @@ msgstr "以下の情報を更新してください。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "リクエストの更新"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL"
+msgstr "状態"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "ワークフロー属性"
 
@@ -3191,6 +3195,10 @@ msgstr "停止理由"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE"
 msgstr "プロセスの状態"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_ARCHIVED"
+msgstr "実行状態"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
 msgstr "例外"
 
@@ -3376,6 +3384,14 @@ msgstr "このワークフローは成功して終了し、再実行はできま
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_SUCCESS_LABEL"
 msgstr "発行済みの証明書"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED"
+msgstr "このワークフローはユーザの操作によってキャンセルされました。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED_DESC"
+msgstr "このワークフローはユーザの操作によってキャンセルされました。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_DESC"
 msgstr "このワークフローはキャンセルされました。"
@@ -5289,9 +5305,6 @@ msgstr "はい"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DETAIL_FIELD_VALID_AT_LABEL"
 #~ msgstr "Reference Date"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED"
-#~ msgstr "このワークフローはユーザの操作によってキャンセルされました。"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_INITIAL_DESC"
 #~ msgstr "初期状態"

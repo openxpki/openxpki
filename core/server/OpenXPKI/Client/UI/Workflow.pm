@@ -76,7 +76,7 @@ has __default_wfdetails => (
     ] },
 );
 
-has __proc_states  => (
+has __proc_states_for_search  => (
     is => 'rw',
     isa => 'ArrayRef',
     lazy => 1,
@@ -86,6 +86,7 @@ has __proc_states  => (
         { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED', value => 'retry_exceeded' },
         { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION', value => 'exception' },
         { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED', value => 'finished' },
+        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_ARCHIVED', value => 'archived' },
     ]; }
 );
 
@@ -526,7 +527,7 @@ sub init_search {
           type => 'select',
           is_optional => 1,
           prompt => '',
-          options => $self->__proc_states(),
+          options => $self->__proc_states_for_search(),
           value => $preset->{wf_proc_state}
         },
         { name => 'wf_state',
@@ -782,7 +783,7 @@ sub init_export {
     my @head;
     my @cols;
 
-    my $ii = 0;    
+    my $ii = 0;
     foreach my $col (@{$header}) {
         # skip hidden fields
         if ((!defined $col->{bVisible} || $col->{bVisible}) && $col->{sTitle} !~ /\A_/)  {
@@ -802,8 +803,8 @@ sub init_export {
     foreach my $line (@lines) {
         my @t = @{$line};
         # this hides invisible fields (assumes that hidden fields are always at the end)
-        $buffer .= join("\t", @t[0..$colcnt])."\n" 
-    }    
+        $buffer .= join("\t", @t[0..$colcnt])."\n"
+    }
 
     if (scalar @{$search_result} == $limit) {
         $buffer .= "I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT"."\n";
@@ -814,7 +815,7 @@ sub init_export {
         -expires => "1m",
         -attachment => "workflow export " . DateTime->now()->iso8601() .  ".txt"
     );
-    
+
     print i18nTokenizer($buffer);
     exit;
 
@@ -1244,7 +1245,13 @@ sub action_index {
         # always redirect after create to have the url pointing to the created workflow
         # do not redirect for "one shot workflows" or workflows already in a final state
         # as they might hold volatile data (e.g. key download)
-        $wf_args->{redirect} = ($wf_info->{workflow}->{id} > 0 && ($wf_info->{workflow}->{proc_state} ne 'finished'));
+        my $proc_state = $wf_info->{workflow}->{proc_state};
+
+        $wf_args->{redirect} = (
+            $wf_info->{workflow}->{id} > 0
+            and $proc_state ne 'finished'
+            and $proc_state ne 'archived'
+        );
 
     } else {
         $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION!','error');
@@ -1874,7 +1881,7 @@ sub __render_from_workflow {
     }
 
     # check if the workflow is in a "non-regular" state
-    if (grep /$wf_proc_state/, ('pause','retry_exceeded','exception', 'running')) {
+    if (grep /$wf_proc_state/, ('pause','retry_exceeded','exception', 'running', 'archived')) {
 
         # same page head for all proc states
         my $wf_action = $wf_info->{workflow}->{context}->{wf_current_action};
@@ -1897,6 +1904,7 @@ sub __render_from_workflow {
         #I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC
         #I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESC
         #I18N_OPENXPKI_UI_WORKFLOW_STATE_RETRY_EXCEEDED_DESC
+        #I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED_DESC
 
         my @buttons;
         my @fields;
@@ -2019,6 +2027,17 @@ sub __render_from_workflow {
             if (!$self->_status()) {
                 $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION','error');
             }
+
+        # archived workflow
+        } elsif ( $wf_proc_state eq 'archived') {
+
+            @fields = ({
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL',
+                value => str2time($wf_info->{workflow}->{archive_after}.' GMT'),
+                'format' => 'timestamp'
+            });
+
+            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED', 'info');
 
         } # end proc_state switch
 
@@ -2177,7 +2196,7 @@ sub __render_from_workflow {
         # Add action buttons
         my $buttons = $self->__get_action_buttons( $wf_info ) ;
 
-       if (!@$fields && $wf_info->{workflow}->{state} eq 'INITIAL') {
+        if (!@$fields && $wf_info->{workflow}->{state} eq 'INITIAL') {
             # initial step of workflow without fields
             $self->add_section({
                 type => 'text',
@@ -2286,7 +2305,7 @@ sub __render_from_workflow {
         # undef = no right box
         if (defined $wfdetails_config) {
 
-            if ($view eq 'result' && $wf_info->{workflow}->{proc_state} !~ /(finished|failed)/) {
+            if ($view eq 'result' && $wf_info->{workflow}->{proc_state} !~ /(finished|failed|archived)/) {
                 push @buttons_handle, {
                     href => '#/openxpki/redirect!workflow!load!wf_id!'.$wf_info->{workflow}->{id},
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
