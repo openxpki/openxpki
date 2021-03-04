@@ -75,7 +75,7 @@ my %known_proc_states = (
     # action finished with success
     finished => {
         hook => 'none', # perfectly handled from WF-State-Engine
-        enforceable => [ ],
+        enforceable => [ 'archive' ],
     },
     # action paused
     pause => {

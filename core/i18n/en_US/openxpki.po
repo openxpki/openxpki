@@ -2808,6 +2808,26 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_TOOLTIP"
 msgstr "Your PEM encoded certificate"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_BUTTON"
+msgstr "Archive"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_CANCEL_BUTTON"
+msgstr "Abort"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_CONFIRM_BUTTON"
+msgstr "Archive Workflow"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_LABEL"
+msgstr "Archive Workflow"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_TEXT"
+msgstr ""
+"Are you sure to archive this workflow? Depending on the workflow "
+"configuration this may lead to the deletion of some or all "
+"information like workflow fields, attributes and/or history.<br>"
+"<b>This action can not be undone!</b><br><br>Pressing 'Abort' will leave the "
+"workflow untouched."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON"
 msgstr "Force Failure"
 

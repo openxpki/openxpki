@@ -340,7 +340,7 @@ as a I<HashRef>:
         },
 
         # only if "with_ui_info => 1":
-        handles  => [ ... ],          # global actions currently allowed: "wakeup", "resume" and/or "fail"
+        handles  => [ ... ],          # global actions currently allowed: "wakeup", "resume", "fail" etc.
         activity => { ... },          # currently available actions
         state => {
             button => { ... },

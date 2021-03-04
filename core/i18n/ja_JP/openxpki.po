@@ -2971,6 +2971,30 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_TOOLTIP"
 msgstr "PEMは証明書で暗号化されました。"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_BUTTON"
+msgstr "強制的に失敗させる"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_CANCEL_BUTTON"
+msgstr "キャンセル"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_CONFIRM_BUTTON"
+msgstr "確認"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_LABEL"
+msgstr "ワークフローは失敗しています"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_TEXT"
+msgstr ""
+"Confirm ボタンを押すと、このワークフローは失敗とマークされます。これはすぐに"
+"このワークフローのすべてのアクションを停止し、失敗したものとしてマークされま"
+"す。<b>この操作は元に戻すことはできません。</b><br><br>このワークフローを継続"
+"したい場合は、Abort ボタンを押してこのウィンドウを閉じます。"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON"
 msgstr "強制的に失敗させる"
 

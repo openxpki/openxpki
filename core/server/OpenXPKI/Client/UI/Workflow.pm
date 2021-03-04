@@ -1828,7 +1828,7 @@ sub __render_from_workflow {
 
         $self->logger()->debug('Adding global actions ' . join('/', @handles));
 
-        if (grep /wakeup/, @handles) {
+        if (grep /\A wakeup \Z/x, @handles) {
             my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'wakeup' } );
             push @buttons_handle, {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON',
@@ -1837,7 +1837,7 @@ sub __render_from_workflow {
             }
         }
 
-        if (grep /resume/, @handles) {
+        if (grep /\A resume \Z/x, @handles) {
             my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'resume' } );
             push @buttons_handle, {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESUME_BUTTON',
@@ -1846,7 +1846,7 @@ sub __render_from_workflow {
             };
         }
 
-        if (grep /fail/, @handles) {
+        if (grep /\A fail \Z/x, @handles) {
             my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'fail' } );
             push @buttons_handle, {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON',
@@ -1857,6 +1857,21 @@ sub __render_from_workflow {
                     description => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_TEXT',
                     confirm_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_CONFIRM_BUTTON',
                     cancel_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_CANCEL_BUTTON',
+                }
+            };
+        }
+
+        if (grep /\A archive \Z/x, @handles) {
+            my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'archive' } );
+            push @buttons_handle, {
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_BUTTON',
+                action => 'workflow!handle!wf_token!'.$token->{value},
+                format => 'exceptional',
+                confirm => {
+                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_LABEL',
+                    description => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_TEXT',
+                    confirm_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_CONFIRM_BUTTON',
+                    cancel_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_CANCEL_BUTTON',
                 }
             };
         }
