@@ -355,7 +355,7 @@ sub __authorize_workflow {
 
         return 1;
 
-    } elsif ($action =~ m{\A(fail|resume|wakeup|history|techlog|attribute|context)\z}) {
+    } elsif ($action =~ m{\A(fail|resume|wakeup|history|techlog|attribute|context|archive)\z}) {
 
         my $type = $arg_ref->{TYPE};
         $type = $arg_ref->{WORKFLOW}->type() unless ($type || !$arg_ref->{WORKFLOW});
