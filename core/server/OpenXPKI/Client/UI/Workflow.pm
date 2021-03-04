@@ -2151,11 +2151,7 @@ sub __render_from_workflow {
         # to finalize without status message use state name "NOSTATUS"
         # some field types are able to override the status during render so
         # this might not be the final status line!
-        if ($wf_proc_state eq 'exception') {
-
-            $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_EXCEPTION','error');
-
-        } elsif ( $wf_info->{state}->{status} && ref $wf_info->{state}->{status} eq 'HASH' ) {
+        if ( $wf_info->{state}->{status} && ref $wf_info->{state}->{status} eq 'HASH' ) {
 
             $self->_status( $wf_info->{state}->{status} );
 
