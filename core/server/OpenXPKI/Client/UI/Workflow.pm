@@ -62,16 +62,17 @@ has __default_wfdetails => (
             field => 'type',
         },
         {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL',
+            field => 'context.creator',
+        },
+        {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL',
-            field => 'state'
+            template => "[% IF state == 'SUCCESS' %]<b>Success</b>[% ELSE %][% state %][% END %]",
+            type => "raw",
         },
         {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL',
             field => 'proc_state',
-        },
-        {
-            label => 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL',
-            field => 'context.creator',
         },
     ] },
 );
