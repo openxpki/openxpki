@@ -1903,7 +1903,7 @@ sub __render_from_workflow {
     }
 
     # check if the workflow is in a "non-regular" state
-    if (grep /$wf_proc_state/, ('pause','retry_exceeded','exception', 'running', 'archived')) {
+    if (grep /$wf_proc_state/, ('pause','retry_exceeded','exception', 'running')) {
 
         # same page head for all proc states
         my $wf_action = $wf_info->{workflow}->{context}->{wf_current_action};
@@ -1926,7 +1926,6 @@ sub __render_from_workflow {
         #I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC
         #I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESC
         #I18N_OPENXPKI_UI_WORKFLOW_STATE_RETRY_EXCEEDED_DESC
-        #I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED_DESC
 
         my @buttons;
         my @fields;
@@ -2050,17 +2049,6 @@ sub __render_from_workflow {
                 $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION','error');
             }
 
-        # archived workflow
-        } elsif ( $wf_proc_state eq 'archived') {
-
-            @fields = ({
-                label => 'I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL',
-                value => str2time($wf_info->{workflow}->{archive_after}.' GMT'),
-                'format' => 'timestamp'
-            });
-
-            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED', 'info');
-
         } # end proc_state switch
 
         $self->add_section({
@@ -2106,6 +2094,7 @@ sub __render_from_workflow {
         my $context = $wf_info->{workflow}->{context};
         my @fields;
         my @fielddesc;
+
         foreach my $field (@{$wf_action_info->{field}}) {
 
             my $name = $field->{name};
@@ -2188,27 +2177,33 @@ sub __render_from_workflow {
             ($wf_info->{workflow}->{id} ? (canonical_uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}) : ()),
         });
 
-        # set status decorator on final states, uses proc state
-        # to finalize without status message use state name "NOSTATUS"
-        # some field types are able to override the status during render so
+        # Set status decorator on final states (uses proc_state).
+        # To finalize without status message use state name "NOSTATUS".
+        # Some field types are able to override the status during render so
         # this might not be the final status line!
         if ( $wf_info->{state}->{status} && ref $wf_info->{state}->{status} eq 'HASH' ) {
-
             $self->_status( $wf_info->{state}->{status} );
 
-        } elsif ($wf_proc_state eq 'finished') {
+        # Finished workflow
+        } elsif ('finished' eq $wf_proc_state) {
             # add special colors for success and failure
-
-            if ( $wf_info->{workflow}->{state} eq 'SUCCESS') {
-                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_SUCCESS','success');
-            } elsif ( $wf_info->{workflow}->{state} eq 'FAILURE') {
-                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_FAILURE','error');
-            } elsif ( $wf_info->{workflow}->{state} eq 'CANCELED') {
-                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_CANCELED','warn');
-            } elsif ( $wf_info->{workflow}->{state} ne 'NOSTATUS') {
-
-                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_MISC_FINAL','warn');
+            my $state = $wf_info->{workflow}->{state};
+            if ('SUCCESS' eq $state) {
+                $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATUS_SUCCESS', 'success');
             }
+            elsif ('FAILURE' eq $state) {
+                $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATUS_FAILURE', 'error');
+            }
+            elsif ('CANCELED' eq $state) {
+                $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATUS_CANCELED', 'warn');
+            }
+            elsif ('NOSTATUS' eq $state) {
+                $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATUS_MISC_FINAL', 'warn');
+            }
+
+        # Archived workflow
+        } elsif ('archived' eq $wf_proc_state) {
+            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED', 'info');
         }
 
         my $fields = $self->__render_fields( $wf_info, $view );
@@ -3420,7 +3415,9 @@ sub __render_workflow_info {
     my $wfdetails_info;
     # if needed, fetch enhanced info incl. workflow attributes
     if (
+        # if given info hash doesn't contain attribute data...
         not($wf_info->{workflow}->{attribute}) and (
+            # ...but default wfdetails reference attribute.*
                grep { ($_->{field}//'') =~              / attribute\. /msx } @$wfdetails_config
             or grep { ($_->{template}//'') =~           / attribute\. /msx } @$wfdetails_config
             or grep { (($_->{link}//{})->{page}//'') =~ / attribute\. /msx } @$wfdetails_config
