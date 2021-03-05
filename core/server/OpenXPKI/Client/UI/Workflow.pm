@@ -1218,7 +1218,7 @@ sub action_index {
         # purge the workflow token
         $self->__purge_wf_token( $wf_token );
 
-    } elsif($wf_args->{wf_type}) {
+    } elsif ($wf_args->{wf_type}) {
 
         $wf_info = $self->send_command_v2( 'create_workflow_instance', {
             workflow => $wf_args->{wf_type}, params => \%wf_param, ui_info => 1
@@ -1293,8 +1293,8 @@ sub action_index {
 
 =head2 action_handle
 
-Execute a workflow internal action (fail, resume, wakeup). Requires the
-workflow and action to be set in the wf_token info.
+Execute a workflow internal action (fail, resume, wakeup, archive). Requires
+the workflow and action to be set in the wf_token info.
 
 =cut
 
@@ -1319,6 +1319,8 @@ sub action_handle {
         return $self;
     }
 
+    my $handle = $wf_args->{wf_handle};
+
     if (!$wf_args->{wf_handle}) {
         $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_HANDLE_WITHOUT_ACTION!','error');
         return $self;
@@ -1327,23 +1329,27 @@ sub action_handle {
     Log::Log4perl::MDC->put('wfid', $wf_args->{wf_id});
 
 
-    if ($wf_args->{wf_handle} eq 'fail') {
+    if ('fail' eq $handle) {
         $self->logger()->info(sprintf "Workflow %01d set to failure by operator", $wf_args->{wf_id} );
 
         $wf_info = $self->send_command_v2( 'fail_workflow', {
             id => $wf_args->{wf_id},
         });
-    } elsif ($wf_args->{wf_handle} eq 'wakeup') {
+    } elsif ('wakeup' eq $handle) {
         $self->logger()->info(sprintf "Workflow %01d trigger wakeup", $wf_args->{wf_id} );
         $wf_info = $self->send_command_v2( 'wakeup_workflow', {
             id => $wf_args->{wf_id}, async => 1, wait => 1
         });
-    } elsif ($wf_args->{wf_handle} eq 'resume') {
+    } elsif ('resume' eq $handle) {
         $self->logger()->info(sprintf "Workflow %01d trigger resume", $wf_args->{wf_id} );
         $wf_info = $self->send_command_v2( 'resume_workflow', {
             id => $wf_args->{wf_id}, async => 1, wait => 1
         });
-
+    } elsif ('archive' eq $handle) {
+        $self->logger()->info(sprintf "Workflow %01d trigger archive", $wf_args->{wf_id} );
+        $wf_info = $self->send_command_v2( 'archive_workflow', {
+            id => $wf_args->{wf_id}
+        });
     }
 
     $self->__render_from_workflow({ wf_info => $wf_info });
