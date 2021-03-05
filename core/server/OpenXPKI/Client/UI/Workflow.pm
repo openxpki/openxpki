@@ -3254,7 +3254,7 @@ sub __render_fields {
                     if ($sum) {
                         my $divider = 100 / $sum;
 
-                        map {  $_ *= $divider } @val;
+                        @val = map {  $_ * $divider } @val;
 
                         unshift @val, '';
                         $item->{value} = [ \@val ];
