@@ -255,7 +255,7 @@ sub execute_action {
     # so we just ignore any expcetions here
     if ($self->_has_paused()) {
         ##! 16: 'action paused'
-    } elsif( $EVAL_ERROR ) {
+    } elsif ( $EVAL_ERROR ) {
 
         my $error = $EVAL_ERROR;
 
@@ -373,11 +373,11 @@ sub set_archived {
     }
 
     # no eval{} block here - callers (API commands) shall see exceptions
-    $self->_set_proc_state('archived');
+    $self->proc_state('archived');
     $self->notify_observers('archive', $self->state);
     $self->add_history({
         description => 'ARCHIVE',
-        user        => CTX('session')->data->user,
+        user => CTX('session')->data->user,
     });
     $self->_save();
 
