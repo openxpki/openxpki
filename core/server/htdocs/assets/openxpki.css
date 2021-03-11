@@ -23,9 +23,18 @@ dd{padding:0 0 0 1em}
 dd+dt{padding-top:.5em}
 .oxi-pager .pagination{margin:0}
 div.spacer{margin:5px}
-.dimmer{position:fixed;top:0;bottom:0;left:0;right:0;background-color:#eee;opacity:.3;z-index:1001}
-.loading.progress,.refresh.progress{position:fixed;top:30px;right:20px;width:100px;z-index:1002}
-.loading.progress .progress-bar,.refresh.progress .progress-bar{width:100%}
+.dimmer{position:fixed;top:0;bottom:0;left:0;right:0;background-color:#fff;opacity:.7;z-index:1001}
+.loading-banner,.refresh-banner{position:fixed;right:1%;z-index:1002}
+.refresh-banner{top:3%}
+.loading-banner{top:1%}
+.spin{-webkit-animation:spin 1s infinite linear;animation:spin 1s infinite linear}
+.spin-slow{-webkit-animation:spin 5s infinite linear;animation:spin 5s infinite linear}
+@-webkit-keyframes spin{0%{-webkit-transform:rotate(0);transform:rotate(0)}
+100%{-webkit-transform:rotate(359deg);transform:rotate(359deg)}
+}
+@keyframes spin{0%{-webkit-transform:rotate(0);transform:rotate(0)}
+100%{-webkit-transform:rotate(359deg);transform:rotate(359deg)}
+}
 .waiting-for-ember{margin-top:80px}
 .oxi-pagehead ol.breadcrumb{margin:10px 0 0;padding:0;background-color:transparent;border:none;border-radius:0;list-style:none inside;color:#a0a0a0}
 ol.breadcrumb>li+li:before{color:#a0a0a0}

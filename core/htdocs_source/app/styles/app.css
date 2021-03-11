@@ -147,21 +147,40 @@ div.spacer {
   bottom:0;
   left:0;
   right:0;
-  background-color:#eee;
-  opacity:0.3;
+  background-color:#fff;
+  opacity:0.7;
   z-index:1001;
 }
 
-.refresh.progress, .loading.progress {
+.refresh-banner {
   position: fixed;
-  top: 30px;
-  right: 20px;
-  width: 100px;
+  top: 3%;
+  right: 1%;
   z-index:1002;
 }
 
-.refresh.progress .progress-bar, .loading.progress .progress-bar {
-  width: 100%;
+.loading-banner {
+  position: fixed;
+  top: 1%;
+  right: 1%;
+  z-index:1002;
+}
+
+.spin {
+  -webkit-animation: spin 1000ms infinite linear;
+  animation: spin 1000ms infinite linear;
+}
+.spin-slow {
+  -webkit-animation: spin 5000ms infinite linear;
+  animation: spin 5000ms infinite linear;
+}
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(359deg); transform: rotate(359deg); }
+}
+@keyframes spin {
+  0% { -webkit-transform: rotate(0deg); transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(359deg); transform: rotate(359deg); }
 }
 
 .waiting-for-ember {

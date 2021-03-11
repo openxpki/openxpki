@@ -172,18 +172,20 @@
 </BsModal>
 
 {{#if this.model.refresh}}
-<div class="progress refresh">
-    <div class="progress-bar progress-bar-striped progress-bar-info active" role="progressbar">
-        {{t 'site.autorefresh'}}
+    <div class="refresh-banner">
+        <span class="alert alert-info" role="alert">
+            <span class="glyphicon glyphicon-refresh spin-slow"></span>
+            &nbsp;{{t 'site.autorefresh'}}
+        </span>
     </div>
-</div>
 {{/if}}
 
 {{#if this.model.showLoadingBanner}}
-<div class="dimmer"></div>
-<div class="progress loading">
-    <div class="progress-bar progress-bar-striped progress-bar-info active" role="progressbar">
-        {{t 'site.loading'}}
+    <div class="dimmer"></div>
+    <div class="loading-banner">
+        <h4 class="alert alert-info" role="alert">
+            <span class="glyphicon glyphicon-refresh spin"></span>
+            &nbsp;{{t 'site.loading'}}
+        </h4>
     </div>
-</div>
 {{/if}}
