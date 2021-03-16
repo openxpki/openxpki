@@ -15,7 +15,6 @@ use POSIX;
 use Test::More;
 use File::Find;
 use File::Spec;
-use File::Basename qw( fileparse );
 use Cwd qw( abs_path );
 use FindBin qw( $Bin );
 
