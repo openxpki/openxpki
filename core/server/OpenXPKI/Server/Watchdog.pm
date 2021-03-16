@@ -103,12 +103,6 @@ our $TERMINATE = 0;
 our $RELOAD = 0;
 
 
-has workflow_table => (
-    is => 'ro',
-    isa => 'Str',
-    default => 'workflow',
-);
-
 has max_fork_redo => (
     is => 'rw',
     isa => 'Int',
@@ -550,7 +544,7 @@ sub __scan_for_paused_workflows {
     # There is no ordering here, so we might not get the earliest hit
     # This is useful in distributed environments to prevent locks/races
     my $workflow = $self->{dbi}->select_one(
-        from  => $self->workflow_table,
+        from  => 'workflow',
         columns => [ qw(
             workflow_id
             workflow_type
@@ -623,7 +617,7 @@ sub __flag_and_fetch_workflow {
     my $row_count;
     eval {
         $row_count = $self->{dbi}->update(
-            table => $self->workflow_table,
+            table => 'workflow',
             set => {
                 watchdog_key => $rand_key,
                 workflow_last_update => DateTime->now->strftime( '%Y-%m-%d %H:%M:%S' ),

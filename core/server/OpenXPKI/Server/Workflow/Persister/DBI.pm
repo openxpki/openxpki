@@ -17,8 +17,8 @@ use DateTime::Format::Strptime;
 
 use Data::Dumper;
 
-my @FIELDS = qw( workflow_table history_table );
-__PACKAGE__->mk_accessors(@FIELDS);
+# my @FIELDS = qw( );
+# __PACKAGE__->mk_accessors(@FIELDS);
 
 # limits
 my $context_value_max_length = 32768;
@@ -33,11 +33,11 @@ my $parser = DateTime::Format::Strptime->new(
 
 sub init {
     my ($self, $params) = @_;
-    for (@FIELDS) {
-        $self->$_( $params->{$_} ) if $params->{$_};
-    }
+    # for (@FIELDS) {
+    #     $self->$_( $params->{$_} ) if $params->{$_};
+    # }
     $self->SUPER::init($params);
-    return;    # no useful return value
+    return; # no useful return value
 }
 
 sub create_workflow {
@@ -45,7 +45,7 @@ sub create_workflow {
     my $workflow = shift;
     ##! 1: "create workflow (only id)"
 
-    my $id = CTX('dbi')->next_id(lc($self->workflow_table // 'workflow'));
+    my $id = CTX('dbi')->next_id('workflow');
 
     ##! 2: "BTW we shredder many workflow IDs here"
 
@@ -330,7 +330,7 @@ sub create_history {
         ##! 64: 'Persisting history ' . Dumper $entry
         next if $entry->is_saved;
 
-        my $id = $dbi->next_id(lc($self->history_table // 'workflow_history'));
+        my $id = $dbi->next_id('workflow_history');
         ##! 8: "workflow history id: $id"
 
         ##! 2: "inserting data into workflow history table"

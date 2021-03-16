@@ -161,12 +161,10 @@ sub _workflow_persister {
     my ($self) = @_;
     return {
         OpenXPKI => {
-            class           => "OpenXPKI::Server::Workflow::Persister::DBI",
-            workflow_table  => "WORKFLOW",
-            history_table   => "WORKFLOW_HISTORY",
+            class => "OpenXPKI::Server::Workflow::Persister::DBI",
         },
         Volatile => {
-            class           => "OpenXPKI::Server::Workflow::Persister::Null",
+            class => "OpenXPKI::Server::Workflow::Persister::Null",
         },
     };
 }
