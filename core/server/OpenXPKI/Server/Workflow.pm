@@ -23,7 +23,7 @@ use OpenXPKI::Serialization::Simple;
 use OpenXPKI::DateTime;
 
 
-__PACKAGE__->mk_accessors( qw( proc_state count_try wakeup_at reap_at session_info persist_context is_startup ) );
+__PACKAGE__->mk_accessors( qw( proc_state count_try wakeup_at reap_at session_info persist_context is_startup archive_at ) );
 
 
 my $default_reap_at_interval = '+0000000005';
@@ -542,20 +542,43 @@ can be skipped by passing a true value as second argument.
 
 =cut
 sub set_reap_at_interval {
-    my ($self, $interval, $bNoSave) = @_;
+    my ($self, $interval, $skip_saving) = @_;
 
     ##! 16: sprintf('set retry interval to %s',$interval )
 
-    my $reap_at = OpenXPKI::DateTime::get_validity(
-            {
-            VALIDITY => $interval,
-            VALIDITYFORMAT => 'relativedate',
-            },
-        )->epoch();
+    my $reap_at = OpenXPKI::DateTime::get_validity({
+        VALIDITY => $interval,
+        VALIDITYFORMAT => 'relativedate',
+    })->epoch;
 
     $self->reap_at($reap_at);
     # if the wf is already running, immediately save data to db:
-    $self->_save() if (!$bNoSave && $self->is_running());
+    $self->_save if ((not $skip_saving) and $self->is_running);
+}
+
+=head2 set_archive_after
+
+Set the auto-archiving interval (relative date format, see L<OpenXPKI::DateTime>).
+
+The interval is converted into an epoch timestamp and written to the
+C<archive_at> field in the database.
+
+Triggers a DB update via persister unless C<$skip_saving> is set to a TRUE value.
+
+=cut
+sub set_archive_after {
+    my ($self, $interval, $skip_saving) = @_;
+
+    ##! 16: sprintf('set archive interval to %s', $interval)
+
+    my $epoch = OpenXPKI::DateTime::get_validity({
+        VALIDITY => $interval,
+        VALIDITYFORMAT => 'relativedate',
+    })->epoch;
+
+    $self->archive_at($epoch);
+    # if the wf is already running, immediately save data to db:
+    $self->_save if ((not $skip_saving) and $self->is_running);
 }
 
 =head2 get_global_actions
@@ -917,6 +940,7 @@ The workflow-table is expanded with 4 new persistent fields (see database schema
     workflow_wakeup_at
     workflow_count_try
     workflow_reap_at
+    workflow_archive_at
 
 Essential field is C<workflow_proc_state>, internally "proc_state". All known and possible proc_states and their follow-up actions are defined in %known_proc_states.
 "running" will be set, before SUPER::execute_action/Activity::run is called.
