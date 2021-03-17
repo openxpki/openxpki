@@ -369,18 +369,22 @@ sub set_archived {
     if ($self->proc_state ne 'finished') {
         OpenXPKI::Exception->throw(
             message => "Attempt to archive workflow that is not in proc_state 'finished'",
+            params => { type => $self->type, proc_state => $self->proc_state },
         );
     }
 
-    # no eval{} block here - callers (API commands) shall see exceptions
+    # no eval{} block here - callers (e.g. API commands) shall see exceptions
     $self->proc_state('archived');
+
     $self->notify_observers('archive', $self->state);
     $self->add_history({
         description => 'ARCHIVE',
         user => CTX('session')->data->user,
     });
+
     $self->_save();
 
+    CTX('log')->workflow->info(sprintf('Archived workflow %s (type %s)', $self->id, $self->type));
 }
 
 sub attrib {
