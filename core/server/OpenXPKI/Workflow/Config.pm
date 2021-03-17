@@ -120,11 +120,13 @@ sub __process_workflow {
     };
 
     my $conn = $self->_config();
+    my @cfg_wf_head = ('workflow', 'def', $wf_name, 'head');
+    my @cfg_wf_state = ('workflow', 'def', $wf_name, 'state');
 
-    my $wf_persister = $conn->get( [ 'workflow', 'def', $wf_name , 'head', 'persister' ] );
+    my $wf_persister = $conn->get( [ @cfg_wf_head, 'persister' ] );
     $workflow->{persister} = $wf_persister if $wf_persister;
 
-    my $wf_prefix = $conn->get( [ 'workflow', 'def', $wf_name , 'head', 'prefix' ] );
+    my $wf_prefix = $conn->get( [ @cfg_wf_head, 'prefix' ] );
 
     if (!$wf_prefix || ($wf_prefix =~ /[^a-z0-9]/)) {
         OpenXPKI::Exception->throw(
@@ -136,7 +138,7 @@ sub __process_workflow {
         );
     }
 
-    my @states = sort $conn->get_keys( ['workflow', 'def', $wf_name, 'state' ] );
+    my @states = sort $conn->get_keys( \@cfg_wf_state );
 
     # The FAILURE state is required for the autofail feature
     push @states, 'FAILURE' unless (grep /FAILURE/, @states);
@@ -148,7 +150,7 @@ sub __process_workflow {
         #   action: run_test1 > PENDING
 
         my @actions;
-        my @action_items = $conn->get_scalar_as_list(['workflow', 'def', $wf_name, 'state', $state_name, 'action' ] );
+        my @action_items = $conn->get_scalar_as_list([ @cfg_wf_state, $state_name, 'action' ] );
 
         foreach my $action_item (@action_items) {
             my ($auto, $global, $action_name, $next_state, $nn, $conditions) =
@@ -229,7 +231,7 @@ sub __process_workflow {
         };
 
         # Autorun
-        my $is_autorun = $conn->get(['workflow', 'def', $wf_name, 'state', $state_name, 'autorun' ] );
+        my $is_autorun = $conn->get([ @cfg_wf_state, $state_name, 'autorun' ] );
         if ($is_autorun && $is_autorun =~ m/(1|true|yes)/) {
             $state->{autorun} = 'yes';
         }
