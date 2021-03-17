@@ -21,7 +21,7 @@ sub new
 
     my $keys = shift;
 
-    $self->{JSON} = new JSON(%{$keys});
+    $self->{JSON} = JSON->new(%{$keys});
     $self->{JSON}->allow_nonref;
     return unless defined $self->{JSON};
 

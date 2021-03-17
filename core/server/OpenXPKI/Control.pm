@@ -558,7 +558,7 @@ Get a list of all running workers with pid, time and info
 
 sub list_process {
 
-    my $proc = new Proc::ProcessTable;
+    my $proc = Proc::ProcessTable->new;
     my @result;
     my $pgrp = getpgrp($$); # Process Group of myself
     foreach my $p ( @{$proc->table} ) {
@@ -597,7 +597,7 @@ sub __get_processgroup_pids {
     my $process_group = shift;
     my @result;
 
-    my $pt = new Proc::ProcessTable;
+    my $pt = Proc::ProcessTable->new;
     foreach my $process (@{$pt->table}) {
         if (getpgrp($process->pid) == $process_group) {
             push @result, $process->pid;

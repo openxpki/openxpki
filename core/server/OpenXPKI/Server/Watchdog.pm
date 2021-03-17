@@ -418,7 +418,7 @@ sub __main_loop {
             if (!$slots_avail_count) {
                 ##! 8: 'slots avail count reached zero - do recalc'
                 $slots_avail_count = $self->max_worker_count();
-                my $pt = new Proc::ProcessTable;
+                my $pt = Proc::ProcessTable->new;
                 foreach my $ps (@{$pt->table}) {
                     if ($ps->ppid == $$) {
                         ##! 32: 'Found watchdog child '.$ps->pid.' - remaining process count: ' . $slots_avail_count

@@ -27,7 +27,7 @@ sub _validate {
 
     # Render the DN - get the input data from the context
     if (!ref $subject_parts) {
-        $subject_parts = OpenXPKI::Serialization::Simple->new()->deserialize( $subject_parts );
+        $subject_parts = OpenXPKI::Serialization::Simple->new->deserialize( $subject_parts );
     }
 
     my $cert_subject = CTX('api2')->render_subject_from_template(
@@ -38,7 +38,7 @@ sub _validate {
 
     return if (!$cert_subject);
 
-    my $dn = new OpenXPKI::DN( $cert_subject );
+    my $dn = OpenXPKI::DN->new( $cert_subject );
     my %hash = $dn->get_hashed_content();
 
     if (!defined $hash{CN}) {
