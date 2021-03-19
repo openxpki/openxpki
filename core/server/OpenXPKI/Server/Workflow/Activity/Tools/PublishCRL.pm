@@ -2,17 +2,31 @@ package OpenXPKI::Server::Workflow::Activity::Tools::PublishCRL;
 
 use strict;
 use English;
-use base qw( OpenXPKI::Server::Workflow::Activity );
 
-use OpenXPKI::DN;
+
+use Moose;
+use MooseX::NonMoose;
+extends qw( OpenXPKI::Server::Workflow::Activity );
+with qw( OpenXPKI::Server::Workflow::Role::Publish );
+
+use MIME::Base64;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Crypt::X509;
 use Workflow::Exception qw(configuration_error workflow_error);
 
-use Data::Dumper;
+__PACKAGE__->mk_accessors( qw( crl_profile  ) );
+
+sub __get_targets_from_profile {
+
+    my $self = shift;
+    my $profile = $self->crl_profile() || 'default';
+    ##! 16: 'Load targets from profile '. $profile
+    my @target = CTX('config')->get_scalar_as_list( [ 'crl', $profile, 'publish' ] );
+    return \@target;
+
+}
 
 sub execute {
 
@@ -25,8 +39,6 @@ sub execute {
 
     my $dbi = CTX('dbi');
 
-    my $default_token = CTX('api2')->get_default_token();
-    my $prefix = $self->param('prefix') || '';
     my $ca_alias = $self->param('ca_alias') // $context->param('ca_alias');
     my $crl_serial = $self->param('crl_serial') // $context->param('crl_serial');
 
@@ -39,7 +51,6 @@ sub execute {
     }
 
     my $certificate = CTX('api2')->get_certificate_for_alias( 'alias' => $ca_alias );
-    my $x509_issuer = OpenXPKI::Crypt::X509->new( $certificate->{data} );
     my $ca_identifier = $certificate->{identifier};
 
     my $crl;
@@ -87,15 +98,17 @@ sub execute {
 
     }
 
+    if (!$crl || !$crl->{data}) {
+        workflow_error('Unable to load CRL for publishing');
+    }
+
+    $self->crl_profile( $crl->{profile} );
+    my ($prefix, $target) = $self->__fetch_targets(['publishing','crl']);
+
+    # no targets returned
+    return unless ($target);
 
     ##! 16: "Start publishing - CRL Serial $crl_serial , ca alias $ca_alias"
-
-    if (!$crl || !$crl->{data}) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CRL_UNABLE_TO_LOAD_CRL',
-            params => { 'CRL_SERIAL' => $crl_serial },
-        );
-    }
 
     # split of group and generation from alias
     $ca_alias =~ /^(.*)-(\d+)$/;
@@ -107,90 +120,25 @@ sub execute {
         generation => $2,
     };
 
-    # Convert to DER
-    $data->{der} = $default_token->command({
-        COMMAND => 'convert_crl',
-        DATA    => $crl->{data},
-        OUT     => 'DER',
-    });
-
-    if (!defined $data->{der} || $data->{der} eq '') {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CRL_COULD_NOT_CONVERT_CRL_TO_DER',
-        );
+    if ($crl->{data} =~ m{-----BEGIN\ ([^-]+)-----\s*(.*)\s*-----END\ \1-----}xms) {
+        $data->{der} = decode_base64($2);
     }
 
+    if (!defined $data->{der} || $data->{der} eq '') {
+        workflow_error('Failed to convert CRL to DER');        
+    }
+
+    my $x509_issuer = OpenXPKI::Crypt::X509->new( $certificate->{data} );
     # Get Issuer Info from selected ca
     $data->{issuer} = $x509_issuer->subject_hash();
     $data->{subject} = $x509_issuer->get_subject();
     $data->{subject_key_identifier} = $x509_issuer->get_subject_key_id();
-
-
-    my @target;
-    my @prefix = ('publishing', 'crl');
-
-    if ($prefix) {
-        @prefix = split ( /\./, $prefix );
-        ##! 16: 'Load targets using prefix '. $prefix
-        @target = $config->get_keys( \@prefix );
-    } else {
-        my $profile = $crl->{profile} || 'default';
-        ##! 16: 'Load targets from profile '. $profile
-        @target = $config->get_scalar_as_list( [ 'crl', $profile, 'publish' ] );
-    }
-
-    if ( $context->param( 'tmp_publish_queue' ) ) {
-        my $queue =  $context->param( 'tmp_publish_queue' );
-        ##! 16: 'Overwrite targets from context queue'
-        if (!ref $queue) {
-            $queue  = OpenXPKI::Serialization::Simple->new()->deserialize( $queue );
-        }
-        @target = @{$queue};
-    }
-
-
-    # Some connectors return a one item array with an empty element
-    ##! 32: 'Targets ' . Dumper \@target
-    return unless (@target && $target[0]);
-
-    my $on_error = $self->param('on_error') || '';
-    my @failed;
-
-    foreach my $target (@target) {
-        ##! 16: 'Start publishing to ' . $target
-        eval{ $config->set( [ @prefix, $target, $data->{issuer}{CN}[0] ], $data ); };
-        if (my $eval_err = $EVAL_ERROR) {
-            ##! 16: 'failed with error ' . $eval_err
-            CTX('log')->application()->debug("Publishing failed with $eval_err");
-            if ($on_error eq 'queue') {
-                push @failed, $target;
-                CTX('log')->application()->info("CRL publication failed for target $target, requeuing");
-
-            } elsif ($on_error eq 'skip') {
-                CTX('log')->application()->warn("CRL publication failed for target $target and skip is set");
-
-            } else {
-                OpenXPKI::Exception->throw(
-                    message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PUBLICATION_FAILED',
-                    params => {
-                        TARGET => $target,
-                        ERROR => $eval_err
-                    }
-                );
-            }
-        } else {
-            CTX('log')->application()->info("CRL publication to $target for $crl_serial done");
-        }
-    }
-
-    if (@failed) {
-        $context->param( 'tmp_publish_queue' => \@failed );
-        $self->pause('I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION');
-        # pause stops execution of the remaining code
-    }
-
-    $context->param( { 'tmp_publish_queue' => undef });
-
+            
+    my $failed = $self->__walk_targets( $prefix, $target, $data->{issuer}{CN}[0], $data, {} );
+    
+    # pause stops execution of the remaining code
+    $self->pause('I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION') if ($failed);
+     
     # Set the publication date in the database, only if not set already
     if (!$crl->{publication_date}) {
         $dbi->update(
@@ -222,7 +170,7 @@ I<crl_serial> can have the value "latest" which will resolve to the crl with
 the highest last_update date for the issuer created by the default profile.
 
 The list of targets can be defined via an activity parameter or is read from
-the CRl profile definition (see below). In either case each connector is
+the CRL profile definition (see below). In either case each connector is
 called with the CN of the issuing ca as location. The data portion contains
 a hash ref with the keys I<pem>, I<der> and I<subject> (issuer subject)
 holding the appropriate strings and I<issuer> which is the issuer subject
@@ -247,9 +195,9 @@ there is no publication defined for the profile!
 =head2 Publication without Profile
 
 Instead of reading the publication targets from the profile you can point
-the activity directly to a list of connectors setting I<prefix> to the base
-path of a hash. Each key is the internal name of the target, the value must
-be a connector reference.
+the activity directly to a list of connectors by setting I<prefix> to the
+base path of a hash. Each key is the internal name of the target, the value
+must be a connector reference.
 
 =head1 Configuration
 
@@ -263,33 +211,17 @@ be a connector reference.
 
 =over
 
-=item prefix
+=item prefix / target
 
-The config path where the connector configuration resides, in the default
-configuration this is I<publishing.crl>.
+Enables publishing to a fixed set of connectors, disables per
+profile settings. Base path fot I<target> is I<publishing.crl>
+
+See OpenXPKI::Server::Workflow::Role::Publish
 
 =item on_error
 
-Define what to do on problems with the publication connectors. One of:
-
-=over
-
-=item exception (default)
-
-The connector exception bubbles up and the workflow terminates.
-
-=item skip
-
-Skip the publication target and continue with the next one.
-
-=item queue
-
-Similar to skip, but failed targets are added to a queue. As long as
-the queue is not empty, pause/wake_up is used to retry those targets
-with the retry parameters set. This obvioulsy requires I<retry_count>
-to be set.
-
-=back
+Define what to do on problems with the publication connectors.
+See OpenXPKI::Server::Workflow::Role::Publish
 
 =item crl_serial
 

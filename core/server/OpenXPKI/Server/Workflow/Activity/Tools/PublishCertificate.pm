@@ -1,91 +1,64 @@
-# OpenXPKI::Server::Workflow::Activity::Tools::PublishCertificate
-# Copyright (c) 2009 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::Tools::PublishCertificate;
 
 use strict;
 use English;
-use base qw( OpenXPKI::Server::Workflow::Activity );
+
+use Moose;
+use MooseX::NonMoose;
+extends qw( OpenXPKI::Server::Workflow::Activity );
+with qw( OpenXPKI::Server::Workflow::Role::Publish );
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Crypt::X509;
+use Workflow::Exception qw(configuration_error workflow_error);
 
 use Data::Dumper;
 
+sub __get_targets_from_profile {
+
+    my $self = shift;
+
+    my $cert_identifier = $self->param('cert_identifier') //  $self->workflow()->context()->param('cert_identifier');
+
+    ##! 16: 'Lookup profile for identifier ' . $cert_identifier
+    my $profile = CTX('api2')->get_profile_for_cert( identifier => $cert_identifier );
+
+    workflow_error("Given cert_identifier ($cert_identifier) was not found") unless($profile);
+
+    # Check if the node exists inside the profile
+    my $config_key = $self->param('unpublish') ? 'unpublish' : 'publish';
+    my @target;
+    if (CTX('config')->exists([ 'profile', $profile, $config_key ])) {
+        @target = CTX('config')->get_scalar_as_list( [ 'profile', $profile, $config_key ] );
+    } else {
+        @target = CTX('config')->get_scalar_as_list( [ 'profile', 'default', $config_key ] );
+    }
+
+    return \@target;
+
+}
 
 sub execute {
+
     ##! 1: 'start'
     my $self     = shift;
     my $workflow = shift;
     my $context = $workflow->context();
-
     my $config        = CTX('config');
 
-    my $cert_identifier = $self->param('cert_identifier');
+    my $cert_identifier = $self->param('cert_identifier') //  $context->param('cert_identifier');
+    configuration_error('No cert_identifier was set') unless($cert_identifier);
 
-    if (!$cert_identifier) {
-        $cert_identifier = $context->param('cert_identifier');
-    }
+    my ($prefix, $target) = $self->__fetch_targets(['publishing','entity']);
 
-    if (!$cert_identifier) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPI_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CERTIFICATE_USING_PROFILE_NO_CERT_IDENTIFIER'
-        );
-    }
+    # no targets returned
+    return unless ($target);
 
-    my @target;
-    my @path;
-    # Detect if we are in profile or prefix mode
-    my $prefix = $self->param('prefix');
 
     my $unpublish = $self->param('unpublish') || 0;
-
-    if (defined $prefix) {
-        if (!$prefix || !$config->exists( $prefix )) {
-            CTX('log')->application()->debug('Publication in prefix mode but prefix not set or empty');
-
-            return 1;
-        }
-
-        @path = split /\./, $prefix;
-        # Get the list of targets from prefix
-        @target = $config->get_keys( $prefix );
-
-    } else {
-
-        # Profile mode
-
-        ##! 16: 'Lookup profile for identifier ' . $cert_identifier
-        my $profile = CTX('api2')->get_profile_for_cert( identifier => $cert_identifier );
-
-        if (!$profile) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPI_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CERTIFICATE_NO_PROFILE_FOR_CERTIFICATE',
-                params => { 'CERT_IDENTIFIER' => $cert_identifier },
-            );
-        }
-
-        # Check if the node exists inside the profile
-        my $config_key = $unpublish ? 'unpublish' : 'publish';
-        if ($config->exists([ 'profile', $profile, $config_key ])) {
-            @target = $config->get_scalar_as_list( [ 'profile', $profile, $config_key ] );
-        } else {
-            @target = $config->get_scalar_as_list( [ 'profile', 'default', $config_key ] );
-        }
-
-        # Reuse the prefix value to build the full path
-        @path = ( 'publishing','entity' );
-
-    }
-
-    # If the data point does not exist, we get a one item undef array
-    return unless (@target && $target[0]);
-
-
     ##! 16: 'Start publishing - load certificate for identifier ' . $cert_identifier
-
 
     my @cols = (not $unpublish) ? ('data', 'subject')
         : ('data', 'subject', 'reason_code', 'revocation_time', 'invalidity_time');
@@ -100,19 +73,13 @@ sub execute {
     );
 
     if (!$data || !$data->{data}) {
-        OpenXPKI::Exception->throw(
-            message => 'Unable to load given certificate in PublishCertificate',
-            params => { 'CERT_IDENTIFIER' => $cert_identifier },
-        );
+        workflow_error('Unable to load given certificate in PublishCertificate');
     }
-
-    CTX('log')->application()->debug('Publication for ' . $data->{subject} . ', targets ' . join(",", @target));
-
 
     # Prepare the data
     my $x509 = OpenXPKI::Crypt::X509->new( $data->{data} );
     if (!$x509) {
-        OpenXPKI::Exception->throw( message => 'Unable to parse certificate in PublishCertificate' );
+        workflow_error('Unable to parse certificate in PublishCertificate');
     }
 
     delete $data->{data};
@@ -127,29 +94,19 @@ sub execute {
     # Defined but empty, stop publication
     if (defined($publish_key) && !$publish_key) {
         CTX('log')->application()->info('Dont publish as publish_key is defined but empty for ' .$data->{subject});
-
         return 1;
     }
 
     # No publication key set, parse out CN
     if (!$publish_key) {
         my $rdn_hash = $x509->subject_hash();
-
         $publish_key = $rdn_hash->{CN}->[0];
         # something went wrong - no CN set?
-        if (!$publish_key) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CERTIFICATES_UNABLE_TO_PARSE_SUBJECT',
-            );
-        }
-
+        workflow_error('Unable to parse subject or no commonName set') unless($publish_key);
     }
 
-
     ##! 32: 'Data for publication '. Dumper ( $data )
-
     CTX('log')->application()->info('Start publication to '.$publish_key.' for ' .$data->{subject});
-
 
     # Required for special connectors (grabbing extended data from the workflow)
     # TODO: should be replaced by e.g. a static factory
@@ -159,55 +116,10 @@ sub execute {
        ##! 16: 'Export context to connector ' . Dumper $param
     }
 
-    # overwrite targets when we are in the wake up loop
-    if ( $context->param( 'tmp_publish_queue' ) ) {
-        my $queue =  $context->param( 'tmp_publish_queue' );
-        ##! 16: 'Load targets from context queue'
-        if (!ref $queue) {
-            $queue  = OpenXPKI::Serialization::Simple->new()->deserialize( $queue );
-        }
-        @target = @{$queue};
-    }
+    my $failed = $self->__walk_targets( $prefix, $target, $publish_key, $data, $param );
 
-    my $on_error = $self->param('on_error') || '';
-    my @failed;
-    ##! 32: 'Targets ' . Dumper \@target
-    foreach my $target (@target) {
-        my $res;
-        eval{ $res = $config->set( [ @path, $target, $publish_key ], $data, $param ); };
-        if (my $eval_err = $EVAL_ERROR) {
-            CTX('log')->application()->debug("Publishing failed with $eval_err");
-            if ($on_error eq 'queue') {
-                push @failed, $target;
-                CTX('log')->application()->info("Entity publication failed for target $target, requeuing");
-
-            } elsif ($on_error eq 'skip') {
-                CTX('log')->application()->warn("Entity publication failed for target $target and skip is set");
-
-            } else {
-                OpenXPKI::Exception->throw(
-                    message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PUBLICATION_FAILED',
-                    params => {
-                        TARGET => $target,
-                        ERROR => $eval_err
-                    }
-                );
-            }
-            CTX('log')->application()->debug("Publication backend error was $eval_err");
-        } elsif (!defined $res) {
-            CTX('log')->application()->warn("Entity publication to $target for ". $publish_key." returned undef");
-        } else {
-            CTX('log')->application()->info("Entity publication to $target for ". $publish_key." done");
-        }
-    }
-
-    if (@failed) {
-        $context->param( 'tmp_publish_queue' => \@failed );
-        $self->pause('I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION');
-        # pause stops execution of the remaining code
-    }
-
-    $context->param( { 'tmp_publish_queue' => undef });
+    # pause stops execution of the remaining code
+    $self->pause('I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION') if ($failed);
 
     ##! 4: 'end'
     return 1;
@@ -283,9 +195,12 @@ Define the connector references and implementations in publishing.yaml
 
 =over
 
-=item prefix
+=item prefix / target
 
-Enables publishing to a fixed set of connectors, disables per profile settings.
+Enables publishing to a fixed set of connectors, disables per
+profile settings. Base path fot I<target> is I<publishing.entity>
+
+See OpenXPKI::Server::Workflow::Role::Publish
 
 =item cert_identifier
 
@@ -308,25 +223,7 @@ Boolean, if set the full context is passed to the connector in the third argumen
 
 =item on_error
 
-Define what to do on problems with the publication connectors. One of:
-
-=over
-
-=item exception (default)
-
-The connector exception bubbles up and the workflow terminates.
-
-=item skip
-
-Skip the publication target and continue with the next one.
-
-=item queue
-
-Similar to skip, but failed targets are added to a queue. As long as
-the queue is not empty, pause/wake_up is used to retry those targets
-with the retry parameters set. This obvioulsy requires I<retry_count>
-to be set.
-
-=back
+Define what to do on problems with the publication connectors.
+See OpenXPKI::Server::Workflow::Role::Publish
 
 =back

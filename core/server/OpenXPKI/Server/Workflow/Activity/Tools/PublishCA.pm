@@ -1,19 +1,24 @@
-# OpenXPKI::Server::Workflow::Activity::Tools::PublishCA
-# Copyright (c) 2015 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::Tools::PublishCA;
 
 use strict;
 use English;
-use base qw( OpenXPKI::Server::Workflow::Activity );
 
-use OpenXPKI::DN;
+use Moose;
+use MooseX::NonMoose;
+extends qw( OpenXPKI::Server::Workflow::Activity );
+with qw( OpenXPKI::Server::Workflow::Role::Publish );
+
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Crypt::X509;
+use Workflow::Exception qw(configuration_error workflow_error);
 
-use Data::Dumper;
+
+sub __get_targets_from_profile {
+    # there is no default for CA publishing -> exception
+    configuration_error("You must provide target or prefix for CA publishing");
+}
 
 sub execute {
     ##! 1: 'start'
@@ -23,24 +28,14 @@ sub execute {
     my $config        = CTX('config');
     my $pki_realm = CTX('session')->data->pki_realm;
 
-    if (!$self->param('prefix')) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPI_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CA_NO_PREFIX'
-        );
-    }
+    my ($prefix, $target) = $self->__fetch_targets(['publishing','cacert']);
 
-    my $default_token = CTX('api2')->get_default_token();
-    my $prefix = $self->param('prefix');
-    my $ca_alias = $context->param('ca_alias');
+    # no targets returned
+    return unless ($target);
 
-    if (!$ca_alias) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPI_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CA_NO_CA_ALIAS'
-        );
-    }
+    my $ca_alias = $context->param('ca_alias') || configuration_error('No ca alias found for ca publish');
 
     ##! 16: "Start publishing - ca alias $ca_alias"
-
     # split of group and generation from alias
     $ca_alias =~ /^(.*)-(\d+)$/;
 
@@ -63,66 +58,10 @@ sub execute {
     $data->{pem} = $x509->pem();
     $data->{der} = $x509->data();
 
-    if (!defined $data->{der} || $data->{der} eq '') {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_TOOLS_PUBLISH_CA_COULD_NOT_CONVERT_CERT_TO_DER',
-        );
-    }
+    my $failed = $self->__walk_targets( $prefix, $target, $data->{dn}{CN}[0], $data );
 
-    my @target;
-    my @prefix = split /\./, $prefix;
-
-    # overwrite targets when we are in the wake up loop
-    if ( $context->param( 'tmp_publish_queue' ) ) {
-        my $queue =  $context->param( 'tmp_publish_queue' );
-        ##! 16: 'Load targets from context queue'
-        if (!ref $queue) {
-            $queue  = OpenXPKI::Serialization::Simple->new()->deserialize( $queue );
-        }
-        @target = @{$queue};
-    } else {
-        @target = $config->get_keys( \@prefix );
-    }
-
-    # If the data point does not exist, we get a one item undef array
-    return unless ($target[0]);
-
-    my $on_error = $self->param('on_error') || '';
-    my @failed;
-    ##! 32: 'Targets ' . Dumper \@target
-    foreach my $target (@target) {
-        eval{ $config->set( [ @prefix, $target, $data->{dn}{CN}[0] ], $data ); };
-        if (my $eval_err = $EVAL_ERROR) {
-            CTX('log')->application()->debug("Publishing failed with $eval_err");
-            if ($on_error eq 'queue') {
-                push @failed, $target;
-                CTX('log')->application()->info("CA publication failed for target $target, requeuing");
-
-            } elsif ($on_error eq 'skip') {
-                CTX('log')->application()->warn("CA publication failed for target $target and skip is set");
-
-            } else {
-                OpenXPKI::Exception->throw(
-                    message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_PUBLICATION_FAILED',
-                    params => {
-                        TARGET => $target,
-                        ERROR => $eval_err
-                    }
-                );
-            }
-        } else {
-            CTX('log')->application()->info("CA publication to $target for ". $data->{dn}{CN}[0]." done");
-        }
-    }
-
-    if (@failed) {
-        $context->param( 'tmp_publish_queue' => \@failed );
-        $self->pause('I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION');
-        # pause stops execution of the remaining code
-    }
-
-    $context->param( { 'tmp_publish_queue' => undef });
-
+    # pause stops execution of the remaining code
+    $self->pause('I18N_OPENXPKI_UI_ERROR_DURING_PUBLICATION') if ($failed);
 
     ##! 4: 'end'
     return;
@@ -192,10 +131,12 @@ here is an example connector:
 
 =over
 
-=item prefix
+=item prefix / target
 
-The config path where the connector configuration resides, in the default
-configuration this is I<publishing.cacert>.
+Enables publishing to a fixed set of connectors, disables per
+profile settings. Base path fot I<target> is I<publishing.cacert>
+
+See OpenXPKI::Server::Workflow::Role::Publish
 
 =item on_error
 
