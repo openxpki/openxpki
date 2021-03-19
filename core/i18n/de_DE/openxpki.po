@@ -2624,7 +2624,7 @@ msgstr "Gewünschtes gültig bis Datum eingeben, leer für Standard"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTAFTER_TOOLTIP"
 msgstr ""
-"Verwenden Sie das Kalendersymbol oder geben Sie MM.DD.YYYY direkt ein, leer "
+"Verwenden Sie das Kalendersymbol oder geben Sie DD.MM.YYYY direkt ein, leer "
 "für Standard"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_DESC"
@@ -2642,7 +2642,7 @@ msgstr "Gewünschtes gültig ab Datum eingeben, leer für Standard"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_TOOLTIP"
 msgstr ""
-"Verwenden Sie das Kalendersymbol oder geben Sie MM.DD.YYYY direkt ein, leer "
+"Verwenden Sie das Kalendersymbol oder geben Sie DD.MM.YYYY direkt ein, leer "
 "für Standard"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_DESC"
@@ -4038,10 +4038,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_LABEL"
 msgstr "SCEP RA Token erstellen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_DESC"
-msgstr "Ändert die Meta-Daten eines Zertifikates."
+msgstr "Zeigt die Meta-Daten eines Zertifikates an."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_LABEL"
-msgstr "Meta-Daten ändern"
+msgstr "Meta-Daten anzeigen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_TRUSTGROUP_IMPORT_DESC"
 msgstr "Importiert ein Zertifikat und verknüpft es mit einer Trustgroup."
