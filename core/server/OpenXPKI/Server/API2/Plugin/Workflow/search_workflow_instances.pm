@@ -54,8 +54,9 @@ of I<HashRefs>:
         'workflow_wakeup_at' => '0'
     }
 
-The default sort order is by workflow id with the highest workflow_id as
-first element (order = >workflow_id, reverse => 1).
+The default sort order is by workflow id with the highest id as first element
+(C<order =E<gt> workflow_id, reverse =E<gt> 1>).
+
 If I<order> is set, I<reverse> is 0.
 
 B<Parameters>
@@ -97,7 +98,7 @@ only worflows old enough are returned, date handled by OpenXPKI::Datetime detect
 
 =item * C<order> I<Str> - column name to order by.
 
-=item * C<reverse> I<Bool> - 0 for ascending order, 1 for descending
+=item * C<reverse> I<Bool> - 0 for ascending order, 1 for descending (default: ascending)
 
 =item * C<return_attributes> I<ArrayRef> - add the given attributes as
 columns to the result set. Each attribute is added as extra column
@@ -118,7 +119,7 @@ command "search_workflow_instances" => {
     start      => { isa => 'Int', },
     limit      => { isa => 'Int', },
     order      => { isa => 'Str', },
-    reverse    => { isa => 'Bool', default => 0 },
+    reverse    => { isa => 'Bool' },
     check_acl  => { isa => 'Bool', default => 0 },
     return_attributes => {isa => 'ArrayRef', default => sub { [] } },
 } => sub {
@@ -440,11 +441,16 @@ sub _make_query_params {
         }
 
         # Custom ordering
-        if (!$args->has_order || $args->order eq '') {
-            $params->{order_by} = '-workflow_id';
-        } else {
-            $params->{order_by} = sprintf "%s%s", ($args->reverse ? '-' : ''), $args->order;
+        my $column = $args->order;
+        my $default_desc = 0;
+        # Default ordering if column not given or empty
+        if (not $column) {
+            $column = 'workflow_id';
+            $default_desc = 1;
         }
+        my $desc = $args->has_reverse ? $args->reverse : $default_desc;
+
+        $params->{order_by} = sprintf "%s%s", $desc ? '-' : '', $column;
     }
 
     ##! 32: 'generated parameters: ' . Dumper $params
