@@ -2929,6 +2929,7 @@ sub __render_fields {
         } elsif ($item->{format} eq "workflow_id") {
 
             my $workflow_id = $item->{value};
+            next FIELD unless($workflow_id);
 
             my $can_access = $self->send_command_v2( 'check_workflow_acl',
                     { id => $workflow_id  });
@@ -2938,7 +2939,7 @@ sub __render_fields {
                 $item->{value}  = {
                     label => $workflow_id,
                     page => 'workflow!load!wf_id!'.$workflow_id,
-                    target => 'tab',
+                    target => '_blank',
                     value => $workflow_id,
                 };
             } else {
