@@ -50,6 +50,8 @@ sub init {
 
     }
 
+    $self->log( CTX('log')->application() );
+
     # call Workflow::Action's init()
     $self->SUPER::init($wf, $params_merged);
 
@@ -57,10 +59,6 @@ sub init {
 
     ##! 32: 'merged params ' . Dumper  $params_merged
     ##! 32: 'map ' . Dumper  $_map
-
-
-    $self->log( CTX('log')->application() );
-
     ##! 1: 'end'
     return 1;
 }
