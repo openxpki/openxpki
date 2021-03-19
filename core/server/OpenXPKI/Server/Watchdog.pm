@@ -567,7 +567,7 @@ sub __scan_for_paused_workflows {
 
     #select again:
     my $wf_id = $workflow->{workflow_id};
-    $self->__flag_and_fetch_workflow( $wf_id ) or return;
+    $self->__flag_for_wakeup( $wf_id ) or return;
 
     ##! 16: 'WF now ready to re-instantiate '
     CTX('log')->workflow()->info(sprintf( 'watchdog, paused wf %d now ready to re-instantiate, start fork process', $wf_id ));
@@ -583,9 +583,9 @@ sub __scan_for_paused_workflows {
     return $wf_id;
 }
 
-=head2 __flag_and_fetch_workflow( wf_id )
+=head2 __flag_for_wakeup( wf_id )
 
-Flag the database row for wf_id.
+Flag the workflow with the given ID as "being woken up" via database.
 
 To prevent a workflow from being reloaded by two watchdog instances, this
 method first writes a random marker to create "row lock" and tries to reload
@@ -593,7 +593,7 @@ the row using this marker. If either one fails, returnes undef.
 
 =cut
 
-sub __flag_and_fetch_workflow {
+sub __flag_for_wakeup {
     my ($self, $wf_id) = @_;
 
     return unless $wf_id;    #this is real defensive programming ...;-)
@@ -656,13 +656,7 @@ block and returns the error message in case of error.
 sub __wake_up_workflow {
     my ($self, $args) = @_;
 
-    CTX('session')->data->pki_realm($args->{pki_realm});
-    CTX('session')->data->thaw($args->{workflow_session}); # "user" and "role" will be set
-
-    # Set MDC for logging
-    Log::Log4perl::MDC->put('user', CTX('session')->data->user);
-    Log::Log4perl::MDC->put('role', CTX('session')->data->role);
-    Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
+    $self->__restore_session($args->{pki_realm}, $args->{workflow_session});
 
     $self->{dbi}->start_txn;
 
@@ -675,6 +669,18 @@ sub __wake_up_workflow {
     ##! 32: 'wakeup returned ' . Dumper $wf_info
 
     # commit/rollback is done inside workflow engine
+}
+
+sub __restore_session {
+    my ($self, $realm, $frozen_session) = @_;
+
+    CTX('session')->data->pki_realm($realm);     # set realm
+    CTX('session')->data->thaw($frozen_session); # set user and role
+
+    # Set MDC for logging
+    Log::Log4perl::MDC->put('user', CTX('session')->data->user);
+    Log::Log4perl::MDC->put('role', CTX('session')->data->role);
+    Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
 }
 
 no Moose;
