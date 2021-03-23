@@ -73,7 +73,10 @@ IS_FULLCONFIG=0
 #cpanm --notest Net::DNS                                               >>$LOG 2>&1
 
 echo "Checking and installing Perl module dependencies"
-cpanm --notest PPI                                                    >>$LOG 2>&1
+# Install PPI (the check avoids unneccessary requests to CPAN)
+if ! perl -e 'use PPI;' >/dev/null 2>&1; then
+    cpanm --notest PPI                                                >>$LOG 2>&1
+fi
 /code-repo/tools/scripts/makefile2cpanfile.pl > /cpanfile
 cpanm --quiet --notest --installdeps /
 
