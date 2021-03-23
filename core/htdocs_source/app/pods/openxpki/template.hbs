@@ -175,17 +175,17 @@
     <div class="refresh-banner">
         <span class="alert alert-info" role="alert">
             <span class="glyphicon glyphicon-refresh spin-slow"></span>
-            &nbsp;{{t 'site.autorefresh'}}
+            &nbsp;{{t 'site.banner.autorefresh'}}
         </span>
     </div>
 {{/if}}
 
-{{#if this.model.showLoadingBanner}}
+{{#if this.model.loadingBanner}}
     <div class="dimmer"></div>
     <div class="loading-banner">
         <h4 class="alert alert-info" role="alert">
             <span class="glyphicon glyphicon-refresh spin"></span>
-            &nbsp;{{t 'site.loading'}}
+            &nbsp;{{this.model.loadingBanner}}
         </h4>
     </div>
 {{/if}}

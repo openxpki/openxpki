@@ -19,7 +19,7 @@ class Content {
     @tracked tabs = [];
     @tracked navEntries = [];
     @tracked error = null;
-    @tracked showLoadingBanner = false;
+    @tracked loadingBanner = null;
 }
 
 export default class OpenXpkiRoute extends Route {
@@ -101,15 +101,18 @@ export default class OpenXpkiRoute extends Route {
         }, cfg.timeout);
     }
 
-    setLoadingState(isLoading) {
+    // Sets the loading state, i.e. dims the page and shows a banner with the
+    // given message.
+    // If 'message' is set to null, the banner will be hidden.
+    setLoadingBanner(message) {
         // note that we cannot use the Ember "loading" event as this would only
         // trigger on route changes, but not if we do sendAjax()
-        if (isLoading) {
+        if (message) {
             // remove focus from button to prevent user from doing another
             // submit by hitting enter
             document.activeElement.blur();
         }
-        this.content.showLoadingBanner = isLoading;
+        this.content.loadingBanner = message;
     }
 
     // sends an AJAX request without showing "loading" banner or dimming page
@@ -119,7 +122,7 @@ export default class OpenXpkiRoute extends Route {
 
     // send AJAX request (isQuiet: don't show optical hints if quietRequest)
     sendAjax(request, isQuiet = false) {
-        if (! isQuiet) this.setLoadingState(true);
+        if (! isQuiet) this.setLoadingBanner(this.intl.t('site.banner.loading'));
         debug("openxpki/route - sendAjax: " + ['page','action'].map(p=>request[p]?`${p} = ${request[p]}`:null).filter(e=>e!==null).join(", "));
         // assemble request parameters
         let req = {
@@ -148,27 +151,37 @@ export default class OpenXpkiRoute extends Route {
                     this.content.status = doc.status;
                     this.content.popup = null;
 
+                    // Ping
                     if (doc.ping) {
                         debug("openxpki/route - sendAjax response: \"ping\" " + doc.ping);
                         if (this.content.ping) { cancel(this.content.ping) }
                         this.doPing(doc.ping);
                     }
+
+                    // Auto refresh
                     if (doc.refresh) {
                         debug("openxpki/route - sendAjax response: \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout);
                         this.content.refresh = later(this, function() {
                             this.sendAjax({ page: doc.refresh.href });
                         }, doc.refresh.timeout);
                     }
+
+                    // Redirect
                     if (doc.goto) {
                         debug("openxpki/route - sendAjax response: \"goto\" " + doc.goto);
                         if (doc.target === '_blank' || /^(http|\/)/.test(doc.goto)) {
+                            let banner = doc.loading_banner || this.intl.t('site.banner.redirecting');
+                            this.setLoadingBanner(banner); // never hide banner as browser will open a new page
                             window.location.href = doc.goto;
                         }
                         else {
                             this.transitionTo("openxpki", doc.goto);
                         }
+                        return resolve(); // no data returned as we are redirecting anyway
                     }
-                    else if (doc.structure) {
+
+                    // "Bootstrapping" - menu, user info, locale
+                    if (doc.structure) {
                         debug("openxpki/route - sendAjax response: \"structure\"");
                         this.content.navEntries = doc.structure; this.updateNavEntryActiveState();
                         this.content.user = doc.user;
@@ -177,18 +190,20 @@ export default class OpenXpkiRoute extends Route {
                         // set locale
                         if (doc.language) this.oxiLocale.locale = doc.language;
                     }
+                    // Page contents
                     else {
                         if (doc.page && doc.main) {
                             debug("openxpki/route - sendAjax response: \"page\" and \"main\"");
                             this._setPageContent(realTarget, doc.page, doc.main, doc.right);
                         }
                     }
-                    if (! isQuiet) this.setLoadingState(false);
-                    return resolve(doc);
+
+                    if (! isQuiet) this.setLoadingBanner(null);
+                    return resolve(doc); // calling code might handle other data
                 },
                 // FAILURE
                 () => {
-                    if (! isQuiet) this.setLoadingState(false);
+                    if (! isQuiet) this.setLoadingBanner(null);
                     this.content.error = {
                         message: this.intl.t('error_popup.message')
                     };

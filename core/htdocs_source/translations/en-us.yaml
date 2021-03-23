@@ -3,8 +3,10 @@ site:
   author: "The OpenXPKI Project"
   header: "Open Source Trustcenter"
   logout: "Log out"
-  autorefresh: "Autorefresh"
-  loading: "Loading..."
+  banner:
+    autorefresh: "Autorefresh"
+    loading: "Loading..."
+    redirecting: "Redirecting..."
   close_popup: "Close"
 
 userinfo:
