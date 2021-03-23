@@ -705,6 +705,14 @@ sub alias_list {
 
     if ($params{group}) {
         $where->{group_id} = $params{group};
+
+    } elsif ($params{token}) {
+        my $group = ($params{token} eq "root") ? 'root' : $groups->{$params{token}};
+        if (!$group) {
+            print STDERR "There is no token of type $params{token} defined\n";
+            return 2;
+        } 
+        $where->{group_id} = $group;
     } else {
         $where->{group_id} = { '!=', '' };
     }
