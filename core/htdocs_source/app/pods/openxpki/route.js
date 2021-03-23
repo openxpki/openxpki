@@ -94,17 +94,33 @@ export default class OpenXpkiRoute extends Route {
         return this.content;
     }
 
-    doPing(cfg) {
+    _ping(href, timeout) {
         this.content.ping = later(this, () => {
-            $.ajax({ url: cfg.href });
-            return this.doPing(cfg);
-        }, cfg.timeout);
+            $.ajax({ url: href });
+            return this._ping(href, timeout);
+        }, timeout);
+    }
+
+    _autoRefreshOnce(href, timeout) {
+        this.content.refresh = later(this, function() {
+            this.sendAjax({ page: href });
+        }, timeout);
+    }
+
+    _redirect(url, target, banner = this.intl.t('site.banner.redirecting')) {
+        if (target === '_blank' || /^(http|\/)/.test(url)) {
+            this._setLoadingBanner(banner); // never hide banner as browser will open a new page
+            window.location.href = url;
+        }
+        else {
+            this.transitionTo("openxpki", url);
+        }
     }
 
     // Sets the loading state, i.e. dims the page and shows a banner with the
     // given message.
     // If 'message' is set to null, the banner will be hidden.
-    setLoadingBanner(message) {
+    _setLoadingBanner(message) {
         // note that we cannot use the Ember "loading" event as this would only
         // trigger on route changes, but not if we do sendAjax()
         if (message) {
@@ -122,7 +138,7 @@ export default class OpenXpkiRoute extends Route {
 
     // send AJAX request (isQuiet: don't show optical hints if quietRequest)
     sendAjax(request, isQuiet = false) {
-        if (! isQuiet) this.setLoadingBanner(this.intl.t('site.banner.loading'));
+        if (! isQuiet) this._setLoadingBanner(this.intl.t('site.banner.loading'));
         debug("openxpki/route - sendAjax: " + ['page','action'].map(p=>request[p]?`${p} = ${request[p]}`:null).filter(e=>e!==null).join(", "));
         // assemble request parameters
         let req = {
@@ -155,29 +171,20 @@ export default class OpenXpkiRoute extends Route {
                     if (doc.ping) {
                         debug("openxpki/route - sendAjax response: \"ping\" " + doc.ping);
                         if (this.content.ping) { cancel(this.content.ping) }
-                        this.doPing(doc.ping);
+                        this._ping(doc.ping);
                     }
 
                     // Auto refresh
                     if (doc.refresh) {
                         debug("openxpki/route - sendAjax response: \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout);
-                        this.content.refresh = later(this, function() {
-                            this.sendAjax({ page: doc.refresh.href });
-                        }, doc.refresh.timeout);
+                        this._autoRefreshOnce(doc.refresh.href, doc.refresh.timeout);
                     }
 
                     // Redirect
                     if (doc.goto) {
                         debug("openxpki/route - sendAjax response: \"goto\" " + doc.goto);
-                        if (doc.target === '_blank' || /^(http|\/)/.test(doc.goto)) {
-                            let banner = doc.loading_banner || this.intl.t('site.banner.redirecting');
-                            this.setLoadingBanner(banner); // never hide banner as browser will open a new page
-                            window.location.href = doc.goto;
-                        }
-                        else {
-                            this.transitionTo("openxpki", doc.goto);
-                        }
-                        return resolve(); // no data returned as we are redirecting anyway
+                        this._redirect(doc.goto, doc.target, doc.loading_banner);
+                        return resolve(doc);
                     }
 
                     // "Bootstrapping" - menu, user info, locale
@@ -198,12 +205,12 @@ export default class OpenXpkiRoute extends Route {
                         }
                     }
 
-                    if (! isQuiet) this.setLoadingBanner(null);
+                    if (! isQuiet) this._setLoadingBanner(null);
                     return resolve(doc); // calling code might handle other data
                 },
                 // FAILURE
                 () => {
-                    if (! isQuiet) this.setLoadingBanner(null);
+                    if (! isQuiet) this._setLoadingBanner(null);
                     this.content.error = {
                         message: this.intl.t('error_popup.message')
                     };
