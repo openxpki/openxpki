@@ -15,7 +15,10 @@ userinfo:
 
 error_popup:
   header: "Application Error"
-  message: "The server did not return JSON data as expected. Maybe your authentication session has expired or there is an internal error."
+  message:
+    server: "The server did not return the expected data. Maybe your authentication session has expired or there is an internal error. HTTP code: {code}"
+    network: "The server connection seems to be lost: {reason}"
+    client: "There was an error while processing the data received from the server: {reason}"
   reload: "Reload application"
 
 pagination:

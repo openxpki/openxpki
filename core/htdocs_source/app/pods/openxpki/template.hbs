@@ -163,7 +163,7 @@
         <h4 class="modal-title">{{t 'error_popup.header'}}</h4>
     </Modal.header>
     <Modal.body>
-        {{{this.model.error.message}}}
+        {{{this.model.error}}}
     </Modal.body>
     <Modal.footer>
         <BsButton @onClick={{action "reload"}} @type="primary">{{t 'error_popup.reload'}}</BsButton>

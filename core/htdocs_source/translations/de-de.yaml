@@ -15,7 +15,10 @@ userinfo:
 
 error_popup:
   header: "Anwendungsfehler"
-  message: "Der Server lieferte nicht die erwarteten JSON-Daten. Eventuell ist Ihre Sitzung abgelaufen oder es liegt ein interner Fehler vor."
+  message:
+    server: "Der Server lieferte nicht die erwarteten Daten. Eventuell ist Ihre Sitzung abgelaufen oder es liegt ein interner Fehler vor. HTTP-Code: {code}"
+    network: "Die Verbindung zum Server scheint nicht zu bestehen: {reason}"
+    client: "Es trat ein Fehler beim Verarbeiten der empfangenen Serverdaten auf: {reason}"
   reload: "Anwendung neu laden"
 
 pagination:

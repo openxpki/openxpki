@@ -4,6 +4,7 @@ import { later, cancel } from '@ember/runloop';
 import { Promise } from 'rsvp';
 import { set as emSet } from '@ember/object';
 import { inject as service } from '@ember/service';
+import { isArray } from '@ember/array';
 import { debug } from '@ember/debug';
 import fetch from 'fetch';
 
@@ -42,6 +43,17 @@ export default class OpenXpkiRoute extends Route {
     needReboot = ["login", "logout", "login!logout", "welcome"];
 
     content = new Content();
+    /*
+    Custom handlers for exceptions returned by the server (HTTP status codes):
+        [
+            {
+                status_code: [ 403, ... ], // array or string
+                redirect: "https://...",
+            },
+            { ... }
+        ]
+    */
+    serverExceptions = [];
 
     // Reserved Ember function
     beforeModel(transition) {
@@ -143,6 +155,33 @@ export default class OpenXpkiRoute extends Route {
         this.content.loadingBanner = message;
     }
 
+    // Apply custom exception handler for given status code if one was set up
+    // (bootstrap parameter 'on_exception').
+    _handleServerException(status_code) {
+        debug(`Exception - handling server HTTP status code: ${status_code}`);
+        // Check custom exception handlers
+        for (let handler of this.serverExceptions) {
+            let codes = isArray(handler.status_code) ? handler.status_code : [ handler.status_code ];
+            if (codes.find(c => c == status_code)) {
+                // Show message
+                if (handler.message) {
+                    this._setLoadingBanner(null);
+                    this.content.error = handler.message;
+                }
+                // Redirect
+                else if (handler.redirect) {
+                    // we intentionally do NOT remove the loading banner here
+                    debug(`Exception - redirecting to ${handler.redirect}`);
+                    this._redirect(handler.redirect);
+                }
+                return;
+            }
+        }
+        // Unhandled exception
+        this._setLoadingBanner(null);
+        this.content.error = this.intl.t('error_popup.message.server', { code: status_code });
+    }
+
     /**
      * Send AJAX request quietly, i.e. without showing the "loading" banner or
      * dimming the page.
@@ -207,14 +246,28 @@ export default class OpenXpkiRoute extends Route {
         }
 
         return fetch(url, fetchParams)
-        // Unpack JSON data
         .then(response => {
-            if (response.ok) return response.json();
-            // server error
-            throw new Error(`Server returned HTTP code ${response.status}`);
+            // If OK: unpack JSON data
+            if (response.ok) {
+                return response.json();
+            }
+            // Handle non-2xx HTTP status codes
+            else {
+                this._handleServerException(response.status);
+                return null;
+            }
         })
-        // Successful request
+        // Network error, thrown by fetch() itself
+        .catch(error => {
+            this._setLoadingBanner(null);
+            this.content.error = this.intl.t('error_popup.message.network', { reason: error.message });
+            return null;
+        })
         .then(doc => {
+            // Errors occured and handlers above returned null
+            if (!doc) return {};
+
+            // Successful request
             this.content.status = doc.status;
             this.content.popup = null;
 
@@ -247,6 +300,9 @@ export default class OpenXpkiRoute extends Route {
 
                 // set locale
                 if (doc.language) this.oxiLocale.locale = doc.language;
+
+                // set custom exception handling
+                if (doc.on_exception) this.serverExceptions = doc.on_exception;
             }
             // Page contents
             else {
@@ -256,17 +312,15 @@ export default class OpenXpkiRoute extends Route {
                 }
             }
 
-            if (! isQuiet) this._setLoadingBanner(null);
+            this._setLoadingBanner(null);
             return doc; // calling code might handle other data
         })
-        // Network or server error
+        // Client side error
         .catch(error => {
-            if (! isQuiet) this._setLoadingBanner(null);
-            this.content.error = {
-                message: this.intl.t('error_popup.message')
-            };
-            return {};
-        });
+            this._setLoadingBanner(null);
+            this.content.error = this.intl.t('error_popup.message.client', { reason: error.message });
+            return null;
+        })
     }
 
     _resolveTarget(requestTarget) {
