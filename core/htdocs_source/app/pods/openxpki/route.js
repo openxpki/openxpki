@@ -105,81 +105,8 @@ export default class OpenXpkiRoute extends Route {
 
     // Reserved Ember function
     model(params/*, transition*/) {
-        this.content.page = params.model_id; this.updateNavEntryActiveState(this.content);
+        this.content.page = params.model_id; this._updateNavEntryActiveState(this.content);
         return this.content;
-    }
-
-    _ping(href, timeout) {
-        this.content.ping = later(this, () => {
-            fetch(href, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-OPENXPKI-Client': '1',
-                },
-            })
-            .catch(error => {
-                /* eslint-disable-next-line no-console */
-                console.error(`Error loading ${href} (network error: ${error.name})`);
-            });
-            return this._ping(href, timeout);
-        }, timeout);
-    }
-
-    _autoRefreshOnce(href, timeout) {
-        this.content.refresh = later(this, function() {
-            this.sendAjax({ page: href });
-        }, timeout);
-    }
-
-    _redirect(url, target, banner = this.intl.t('site.banner.redirecting')) {
-        if (target === '_blank' || /^(http|\/)/.test(url)) {
-            this._setLoadingBanner(banner); // never hide banner as browser will open a new page
-            window.location.href = url;
-        }
-        else {
-            this.transitionTo("openxpki", url);
-        }
-    }
-
-    // Sets the loading state, i.e. dims the page and shows a banner with the
-    // given message.
-    // If 'message' is set to null, the banner will be hidden.
-    _setLoadingBanner(message) {
-        // note that we cannot use the Ember "loading" event as this would only
-        // trigger on route changes, but not if we do sendAjax()
-        if (message) {
-            // remove focus from button to prevent user from doing another
-            // submit by hitting enter
-            document.activeElement.blur();
-        }
-        this.content.loadingBanner = message;
-    }
-
-    // Apply custom exception handler for given status code if one was set up
-    // (bootstrap parameter 'on_exception').
-    _handleServerException(status_code) {
-        debug(`Exception - handling server HTTP status code: ${status_code}`);
-        // Check custom exception handlers
-        for (let handler of this.serverExceptions) {
-            let codes = isArray(handler.status_code) ? handler.status_code : [ handler.status_code ];
-            if (codes.find(c => c == status_code)) {
-                // Show message
-                if (handler.message) {
-                    this._setLoadingBanner(null);
-                    this.content.error = handler.message;
-                }
-                // Redirect
-                else if (handler.redirect) {
-                    // we intentionally do NOT remove the loading banner here
-                    debug(`Exception - redirecting to ${handler.redirect}`);
-                    this._redirect(handler.redirect);
-                }
-                return;
-            }
-        }
-        // Unhandled exception
-        this._setLoadingBanner(null);
-        this.content.error = this.intl.t('error_popup.message.server', { code: status_code });
     }
 
     /**
@@ -294,7 +221,7 @@ export default class OpenXpkiRoute extends Route {
             // "Bootstrapping" - menu, user info, locale
             if (doc.structure) {
                 debug("openxpki/route - sendAjax response: \"structure\"");
-                this.content.navEntries = doc.structure; this.updateNavEntryActiveState();
+                this.content.navEntries = doc.structure; this._updateNavEntryActiveState();
                 this.content.user = doc.user;
                 this.content.rtoken = doc.rtoken;
 
@@ -334,6 +261,79 @@ export default class OpenXpkiRoute extends Route {
         }
         if (target === 'modal') target = 'popup'; // FIXME remove support for legacy target 'modal'
         return target;
+    }
+
+    // Sets the loading state, i.e. dims the page and shows a banner with the
+    // given message.
+    // If 'message' is set to null, the banner will be hidden.
+    _setLoadingBanner(message) {
+        // note that we cannot use the Ember "loading" event as this would only
+        // trigger on route changes, but not if we do sendAjax()
+        if (message) {
+            // remove focus from button to prevent user from doing another
+            // submit by hitting enter
+            document.activeElement.blur();
+        }
+        this.content.loadingBanner = message;
+    }
+
+    _ping(href, timeout) {
+        this.content.ping = later(this, () => {
+            fetch(href, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-OPENXPKI-Client': '1',
+                },
+            })
+            .catch(error => {
+                /* eslint-disable-next-line no-console */
+                console.error(`Error loading ${href} (network error: ${error.name})`);
+            });
+            return this._ping(href, timeout);
+        }, timeout);
+    }
+
+    _autoRefreshOnce(href, timeout) {
+        this.content.refresh = later(this, function() {
+            this.sendAjax({ page: href });
+        }, timeout);
+    }
+
+    _redirect(url, target, banner = this.intl.t('site.banner.redirecting')) {
+        if (target === '_blank' || /^(http|\/)/.test(url)) {
+            this._setLoadingBanner(banner); // never hide banner as browser will open a new page
+            window.location.href = url;
+        }
+        else {
+            this.transitionTo("openxpki", url);
+        }
+    }
+
+    // Apply custom exception handler for given status code if one was set up
+    // (bootstrap parameter 'on_exception').
+    _handleServerException(status_code) {
+        debug(`Exception - handling server HTTP status code: ${status_code}`);
+        // Check custom exception handlers
+        for (let handler of this.serverExceptions) {
+            let codes = isArray(handler.status_code) ? handler.status_code : [ handler.status_code ];
+            if (codes.find(c => c == status_code)) {
+                // Show message
+                if (handler.message) {
+                    this._setLoadingBanner(null);
+                    this.content.error = handler.message;
+                }
+                // Redirect
+                else if (handler.redirect) {
+                    // we intentionally do NOT remove the loading banner here
+                    debug(`Exception - redirecting to ${handler.redirect}`);
+                    this._redirect(handler.redirect);
+                }
+                return;
+            }
+        }
+        // Unhandled exception
+        this._setLoadingBanner(null);
+        this.content.error = this.intl.t('error_popup.message.server', { code: status_code });
     }
 
     _setPageContent(target, page, main, right) {
@@ -376,7 +376,7 @@ export default class OpenXpkiRoute extends Route {
         }
     }
 
-    updateNavEntryActiveState() {
+    _updateNavEntryActiveState() {
         let page = this.content.page;
         for (const entry of this.content.navEntries) {
             emSet(entry, "active", (entry.key === page));
