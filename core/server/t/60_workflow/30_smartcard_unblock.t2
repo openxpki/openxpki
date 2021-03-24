@@ -514,7 +514,7 @@ $msg = $client->send_receive_command_msg(
 
 ok( is_error_response($msg),
     'Test with invalid token - msg should be error' );
-is( $msg->{LIST}->[0]->{LABEL},
+is( $msg->{ERROR}->{LABEL},
     'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SMARTCARD_GETLDAPDATA_LDAP_ENTRY_NOT_FOUND',
     'Check that login failed due to missing LDAP entry'
 );

@@ -336,12 +336,11 @@ sub run_command {
     $self->last_reply( $reply );
     if ($reply->{SERVICE_MSG} ne 'COMMAND') {
         my $message;
-        if ($reply->{'LIST'} && ref $reply->{'LIST'} eq 'ARRAY') {
-            # Workflow errors
-            if ($reply->{'LIST'}->[0]->{PARAMS} && $reply->{'LIST'}->[0]->{PARAMS}->{__ERROR__}) {
-                $message = $reply->{'LIST'}->[0]->{PARAMS}->{__ERROR__};
-            } elsif($reply->{'LIST'}->[0]->{LABEL}) {
-                $message = $reply->{'LIST'}->[0]->{LABEL};
+        if (my $err = $reply->{'ERROR'}) {
+            if ($err->{PARAMS} && $err->{PARAMS}->{__ERROR__}) {
+                $message = $err->{PARAMS}->{__ERROR__};
+            } elsif($err->{LABEL}) {
+                $message = $err->{LABEL};
             }
         } else {
             $message = 'unknown error';

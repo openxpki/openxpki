@@ -165,8 +165,24 @@ sub handle_request {
     # Do this before connecting the server to have the client in the
     # new session and to recover from backend session failure
     if ($page eq 'logout' || $action eq 'logout') {
+
+        # For SSO Logins the session might hold an external link 
+        # to logout from the SSO provider
+        my $authinfo = $self->session()->param('authinfo') || {};
+        my $redirectTo = $authinfo->{logout};
+
+        # clear the session before redirecting to make sure we are safe
         $self->logout_session( $cgi );
         $self->logger()->info('Logout from session');
+
+        # now perform the redirect if set
+        if ($redirectTo) {
+            $self->logger()->debug("External redirect on logout to " . $redirectTo);
+            my $result = OpenXPKI::Client::UI::Result->new({ client => $self, cgi => $cgi });        
+            $result->redirect( $redirectTo );
+            return $result->render();            
+        }
+        
     }
 
     my $reply = $self->backend()->send_receive_service_msg('PING');
@@ -657,7 +673,8 @@ sub handle_login {
         $self->logger()->trace('Server Error Msg: '. Dumper $reply) if $self->logger->is_trace;
 
         # Failure here is likely a wrong password
-        if ($reply->{'LIST'} && $reply->{'LIST'}->[0]->{LABEL} eq 'I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED') {
+
+        if ($reply->{'ERROR'} && $reply->{'ERROR'}->{CLASS} eq 'OpenXPKI::Exception::Authentication') {
             $result->set_status(i18nGettext('I18N_OPENXPKI_UI_LOGIN_FAILED'),'error');
         } else {
             $result->set_status_from_error_reply($reply);

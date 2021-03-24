@@ -3566,10 +3566,10 @@ sub __check_for_validation_error {
 
     my $self = shift;
     my $reply = $self->_last_reply();
-    if ($reply->{LIST}->[0]->{CLASS} eq 'OpenXPKI::Exception::InputValidator' &&
-        $reply->{LIST}->[0]->{ERRORS}) {
-        my $validator_msg = $reply->{LIST}->[0]->{LABEL};
-        my $field_errors = $reply->{LIST}->[0]->{ERRORS};
+    if ($reply->{'ERROR'}->{CLASS} eq 'OpenXPKI::Exception::InputValidator' &&
+        $reply->{'ERROR'}->{ERRORS}) {
+        my $validator_msg = $reply->{'ERROR'}->{LABEL};
+        my $field_errors = $reply->{'ERROR'}->{ERRORS};
         if (ref $field_errors eq 'ARRAY') {
             $self->logger()->error("Input validation error on fields ".
                 join(",", map { ref $_ ? $_->{name} : $_ } @{$field_errors}));

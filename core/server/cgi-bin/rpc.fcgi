@@ -410,12 +410,12 @@ while (my $cgi = CGI::Fast->new()) {
         my $error = $client->last_error() || $eval_err;
 
         # TODO this needs to be reworked
-        if ($reply->{LIST}->[0]->{CLASS} eq 'OpenXPKI::Exception::InputValidator' &&
-            $reply->{LIST}->[0]->{ERRORS}) {
+        if ($reply->{ERROR}->{CLASS} eq 'OpenXPKI::Exception::InputValidator' &&
+            $reply->{ERROR}->{ERRORS}) {
             $res = { error => {
                 code => 40003,
                 message => $error,
-                fields => $reply->{LIST}->[0]->{ERRORS},
+                fields => $reply->{ERROR}->{ERRORS},
                 data => { pid => $$ }
             } };
 

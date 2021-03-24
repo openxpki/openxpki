@@ -48,7 +48,7 @@ my $msg = $client->send_receive_command_msg(
 );
 ok(is_error_response($msg), 'Successfully complains about missing field')
     or diag Dumper $msg;
-is($msg->{LIST}->[0]->{LABEL}, 'I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS', 'Correct error message');
+is($msg->{ERROR}->{LABEL}, 'I18N_OPENXPKI_SERVER_API_WORKFLOW_MISSING_REQUIRED_FIELDS', 'Correct error message');
 $msg = $client->send_receive_command_msg(
     'create_workflow_instance',
     {

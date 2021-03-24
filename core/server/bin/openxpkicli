@@ -63,7 +63,7 @@ sub output {
         if (not ref $msg->{error}) {
             print STDERR "Error: " . $msg->{error} . "\n";
         } else {
-            my $err = $msg->{error}->{LIST}->[0];
+            my $err = $msg->{error}->{ERROR};
             print STDERR "Error: " . $err->{LABEL} . "\n";
             if ($err->{PARAMS} && $err->{PARAMS}->{__error__}) {
                 print STDERR "    " . $err->{PARAMS}->{__error__} . "\n";

@@ -60,7 +60,7 @@ foreach my $wf_type (@forbidden_workflows) {
         },
     );
     ok(is_error_response($msg) &&
-        $msg->{LIST}->[0]->{LABEL} eq 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_CREATE_PERMISSION_DENIED', 'Disallows creation of ' . $wf_type) or diag Dumper $msg;
+        $msg->{ERROR}->{LABEL} eq 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_CREATE_PERMISSION_DENIED', 'Disallows creation of ' . $wf_type) or diag Dumper $msg;
 }
 # ... but we should be able to create a CSR workflow
 $msg = $client->send_receive_command_msg(
@@ -107,7 +107,7 @@ $msg = $client->send_receive_command_msg(
     },
 ); 
 ok(is_error_response($msg) &&
-    $msg->{LIST}->[0]->{LABEL} eq 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_WORKFLOW_CREATOR_NOT_ACCEPTABLE', 'Cannot call get_workflow_info on workflow of somebody else') or diag Dumper $msg;
+    $msg->{ERROR}->{LABEL} eq 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_WORKFLOW_CREATOR_NOT_ACCEPTABLE', 'Cannot call get_workflow_info on workflow of somebody else') or diag Dumper $msg;
 
 $msg = $client->send_receive_command_msg(
     'execute_workflow_activity',
@@ -120,7 +120,7 @@ $msg = $client->send_receive_command_msg(
     },
 ); 
 ok(is_error_response($msg) &&
-    $msg->{LIST}->[0]->{LABEL} eq 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_WORKFLOW_CREATOR_NOT_ACCEPTABLE', 'Cannot execute activity on workflow of somebody else') or diag Dumper $msg;
+    $msg->{ERROR}->{LABEL} eq 'I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED_WORKFLOW_CREATOR_NOT_ACCEPTABLE', 'Cannot execute activity on workflow of somebody else') or diag Dumper $msg;
 
 # create our own workflow
 $msg = $client->send_receive_command_msg(
@@ -162,7 +162,7 @@ $msg = $client->send_receive_command_msg(
     },
 ); 
 ok(is_error_response($msg) &&
-    $msg->{LIST}->[0]->{LABEL} !~ qr/I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED/, 'Cannot execute activity on our own workflow - but not because of ACL reading problems') or diag Dumper $msg;
+    $msg->{ERROR}->{LABEL} !~ qr/I18N_OPENXPKI_SERVER_ACL_AUTHORIZE_WORKFLOW_READ_PERMISSION_DENIED/, 'Cannot execute activity on our own workflow - but not because of ACL reading problems') or diag Dumper $msg;
 
 # LOGOUT
 eval {

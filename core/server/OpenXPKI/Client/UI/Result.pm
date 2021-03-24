@@ -233,13 +233,12 @@ sub set_status_from_error_reply {
     my $reply = shift;
 
     my $message = 'I18N_OPENXPKI_UI_UNKNOWN_ERROR';
-    if ($reply->{'LIST'}
-        && ref $reply->{'LIST'} eq 'ARRAY') {
+    if ($reply->{'ERROR'}) {
         # Workflow errors
-        if ($reply->{'LIST'}->[0]->{PARAMS} && $reply->{'LIST'}->[0]->{PARAMS}->{__ERROR__}) {
-            $message = $reply->{'LIST'}->[0]->{PARAMS}->{__ERROR__};
-        } elsif($reply->{'LIST'}->[0]->{LABEL}) {
-            $message = $reply->{'LIST'}->[0]->{LABEL};
+        if ($reply->{'ERROR'}->{PARAMS} && $reply->{'ERROR'}->{PARAMS}->{__ERROR__}) {
+            $message = $reply->{'ERROR'}->{PARAMS}->{__ERROR__};
+        } elsif($reply->{'ERROR'}->{LABEL}) {
+            $message = $reply->{'ERROR'}->{LABEL};
         }
 
         $self->logger()->error($message);

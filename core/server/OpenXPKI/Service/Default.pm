@@ -1027,7 +1027,7 @@ sub __send_error
 
     return $self->talk({
         SERVICE_MSG => "ERROR",
-        LIST        => [ $error ]
+        ERROR => $error,
     });
 }
 
