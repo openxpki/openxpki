@@ -59,6 +59,10 @@ module.exports = function(defaults) {
     'ember-cli-babel': {
       includePolyfill: true,
     },
+
+    'ember-fetch': {
+      preferNative: true
+    },
   });
 
   // Use `app.import` to add additional libraries to the generated
