@@ -41,6 +41,7 @@ my %ATTR_TYPES = (
     user                 => { isa => 'Str', },
     role                 => { isa => 'Str', },
     userinfo             => { isa => 'HashRef|Undef' },
+    authinfo             => { isa => 'HashRef|Undef' },  # login / refresh links for SSO
     pki_realm            => { isa => 'Str', },
     challenge            => { isa => 'Str', },
     authentication_stack => { isa => 'Str', },
@@ -136,6 +137,7 @@ The following methods are available to access the session attributes:
     created                 clear_created
     modified                clear_modified
     ui_session              clear_ui_session
+    authinfo                clear_authinfo
 
 
 =head2 get_attributes

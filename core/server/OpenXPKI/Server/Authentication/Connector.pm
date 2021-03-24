@@ -1,161 +1,91 @@
-## OpenXPKI::Server::Authentication::Connector
-##
-## Written 2013 by Oliver Welter, based on
-## OpenXPKI::Server::Authentication::Password
-## (C) Copyright 2013 by The OpenXPKI Project
-
 package OpenXPKI::Server::Authentication::Connector;
 
 use strict;
 use warnings;
 
 use OpenXPKI::Debug;
-use OpenXPKI::Exception;
+use OpenXPKI::Server::Authentication::Handle;
 use OpenXPKI::Server::Context qw( CTX );
 
 use Moose;
 
-has prefix => (
-    is => 'ro',
-    isa => 'ArrayRef',
+extends 'OpenXPKI::Server::Authentication::Base';
+
+has '+role' => (
+    required => 1,
 );
 
-has role => (
-    is => 'ro',
-    isa => 'Str|Undef',
-);
+sub handleInput {
 
-has name => (
-    is => 'ro',
-    isa => 'Str',
-    default => 'Connector',
-);
-
-has description => (
-    is => 'ro',
-    isa => 'Str',
-    default => '',
-);
-
-
-around BUILDARGS => sub {
-
-    my $orig = shift;
-    my $class = shift;
-
-    # path is passed as single argument
-    my $path = shift;
-    my $config = CTX('config');
-
-    my @prefix = split /\./, $path;
-
-    ##! 2: "load name and description for handler"
-    return $class->$orig({
-        description => $config->get("$path.description"),
-        name => $config->get("$path.label"),
-        role => $config->get("$path.role"),
-        prefix => \@prefix,
-    });
-
-};
-
-
-sub login_step {
     ##! 1: 'start'
-    my $self    = shift;
-    my $arg_ref = shift;
-
-    my $name    = $arg_ref->{HANDLER};
-    my $msg     = $arg_ref->{MESSAGE};
-
-    if (! exists $msg->{PARAMS}->{LOGIN} ||
-        ! exists $msg->{PARAMS}->{PASSWD}) {
-        ##! 4: 'no login data received (yet)'
-        return (undef, undef,
-            {
-        SERVICE_MSG => "GET_PASSWD_LOGIN",
-        PARAMS      => {
-                    NAME        => $self->name(),
-                    DESCRIPTION => $self->description(),
-            },
-            },
-        );
-    }
+    my $self  = shift;
+    my $msg   = shift;
 
 
     ##! 2: 'login data received'
-    my $account = $msg->{PARAMS}->{LOGIN};
-    my $passwd  = $msg->{PARAMS}->{PASSWD};
+    my $username = $msg->{LOGIN} // $msg->{username};
+    my $passwd  = $msg->{PASSWD} // $msg->{password};
 
-    ##! 2: "account ... $account"
+    return unless ($username && defined $passwd);
 
     # check account - password checking is done using an authentication
     # connector with password binding.
 
-    my $result = CTX('config')->get( [ @{$self->prefix()}, 'source', $account ], { password =>  $passwd } );
+    my $result = CTX('config')->get( [ @{$self->prefix()}, 'source', $username ], { password =>  $passwd } );
 
-    if (defined $result && ref $result ne '') {
-        # this usually means a wrong connector definition
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_CONNECTOR_RETURN_NOT_SCALAR",
-            params  => {
-              SOURCE => $self->source(),
-              ACCOUNT => $account,
-            },
-        );
-    }
+    # as we use a bind connect, we dont know the exact reason
+    return OpenXPKI::Server::Authentication::Handle->new(
+        username => $username,
+        error => OpenXPKI::Server::Authentication::Handle::LOGIN_FAILED,
+    ) unless ($result);
 
-    if ($result) {
-        # result ok - return user, role, service ready message
-        CTX('log')->auth()->info("Login successful for user $account with role " . $self->role());
+    # this usually means a wrong connector definition
+    return OpenXPKI::Server::Authentication::Handle->new(
+        username => $username,
+        error => OpenXPKI::Server::Authentication::Handle::UNKNOWN_ERROR,
+        error_message => 'Password connector did not return a scalar'
+    ) if (defined $result && ref $result ne '');
 
-        # fetch userinfo from handler- will be undef if not set
-        my $userinfo = CTX('config')->get_hash( [ @{$self->prefix()}, 'user', $account ] );
+    CTX('log')->auth()->info("Login successful for user $username with role " . $self->role());
+    # fetch userinfo from handler- will be undef if not set
+    my $userinfo = CTX('config')->get_hash( [ @{$self->prefix()}, 'user', $username ] );
 
-        return ($account, $self->role(), { SERVICE_MSG => 'SERVICE_READY', }, $userinfo);
-    }
-
-    ##! 4: "Login failed for $account with result $result"
-    CTX('log')->auth()->error("Login FAILED for user $account with role " . $self->role());
-    OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_PASSWORD_LOGIN_FAILED",
-        params  => {
-            USER => $account,
-        },
+    return OpenXPKI::Server::Authentication::Handle->new(
+        username => $username,
+        userid => $username,
+        role => $self->role(),
+        userinfo => $userinfo || {},
     );
+
 }
 
 
 1;
+
 __END__
 
-=head1 Name
+=head1 OpenXPKI::Server::Authentication::Connector
 
-OpenXPKI::Server::Authentication::Connector - passphrase based authentication
-using connector backend.
+Passphrase based authentication using connector backend.
 
-=head1 Description
-
-Replacement for OpenXPKI::Server::Authentication::Password which checks the
+Alternative to OpenXPKI::Server::Authentication::Password which checks the
 password aganist a connector backend using the password as bind parameter.
 
-=head1 Configuration
+=head2 Configuration
 
-Requires name, description as all other connectors. The connector just checks
-the password, the role is static for all users and given as key I<role>.
-The key I<source> must be a connector reference that supports the password
-bind query syntax.
-Suited connectors are e.g. Connector::Builtin::Authentication::*
+Requires I<role> to be set, will use the incoming username to query the
+connector at I<$prefix.source.$username>, sendind the password as "bind"
+password in the data section. Suited connectors are e.g.
+Connector::Builtin::Authentication::*
 
     User Password:
         type: Connector
-        label: User Password
-        description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD
         role: User
         source@: connector:auth.connector.localuser
         user@: connector:auth.connector.userinfo
 
-returns a pair of (user, role, response_message) for a given login
-step. If user and role are undefined, the login is not yet finished.
+If the user parameter is set, the username is used to fetch the
+I<userinfo> hash.
 
-If the user parameter is set, it is queried to fetch I<userinfo>.
+Returns an instance of OpenXPKI::Server::Authentication::Handle
+or undef if not login parameters are given

@@ -18,6 +18,8 @@ use Data::Dumper;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
+use OpenXPKI::Server::Authentication::Handle;
+
 ## constructor and destructor stuff
 
 sub new {
@@ -161,7 +163,90 @@ sub list_authentication_stacks {
     return \%stacks;
 }
 
+sub get_stack_info {
+
+    ##! 1: "start"
+
+    my $self = shift;
+    my $stack = shift;
+    my $realm = CTX('session')->data->pki_realm;
+
+    # no result at all usually means we even did not try to login
+    # fetch the required "challenges" from the STACK! We use the fast
+    # path via the config layer - FIXME - check if we should cache this
+
+    my $auth_type = CTX('config')->get(['auth','stack', $stack, 'type']);
+    my $auth_param;
+    if (!$auth_type) {
+        ##! 8: "legacy config found for $stack"
+        # for legacy handler / configs we call the first handler
+        # to determine the type from the given service message
+        my $handler = $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{HANDLER}->[0];
+        my $handlerClass = $self->{PKI_REALM}->{$realm}->{HANDLER}->{$handler};
+        if (!$handlerClass->isa('OpenXPKI::Server::Authentication::Base')) {
+            my ($user, $role, $return_msg) = $handlerClass->login_step({
+                HANDLER => $handler,
+                MESSAGE => { PARAMS => {}},
+            });
+            $return_msg->{SERVICE_MSG} =~ /GET_(\w+)_LOGIN/;
+            $auth_type = lc($1) || 'passwd';
+        } else {
+            $auth_type = 'passwd';
+        }
+    } else {
+        $auth_param = CTX('config')->get_hash(['auth','stack', $stack, 'param']);
+    }
+
+    ##! 8: "Auth Type $auth_type"
+    ##! 32: $auth_param
+    # TODO - clean this up and return some more abstract info
+    return (undef, undef, { SERVICE_MSG => 'GET_'.uc($auth_type).'_LOGIN', PARAMS => ($auth_param //= {}) });
+}
+
+sub __legacy_login {
+
+    ##! 8: "start"
+
+    my $self = shift;
+    my $handlerClass = shift;
+    my $handler = shift;
+    my $msg = shift;
+
+    my ($user, $role, $return_msg, $userinfo);
+    eval {
+        ($user, $role, $return_msg, $userinfo) = $handlerClass->login_step({
+            HANDLER => $handler,
+            MESSAGE => $msg,
+        });
+    };
+    if ($EVAL_ERROR) {
+        CTX('log')->auth()->debug("Login to $handler failed with error $EVAL_ERROR");
+        return OpenXPKI::Server::Authentication::Handle->new(
+            username => $msg->{PARAMS}->{LOGIN} || 'unknown',
+            userid => ($user || $msg->{PARAMS}->{LOGIN} || 'unknown'),
+            error => 128,
+            error_message => "$EVAL_ERROR",
+            handler => $handler,
+        );
+    }
+
+    if ($user && $role) {
+        return OpenXPKI::Server::Authentication::Handle->new(
+            username => $user,
+            userid => $user,
+            role => $role,
+            userinfo => $userinfo,
+            handler => $handler,
+            is_valid => 1,
+        );
+    }
+
+    return;
+}
+
 sub login_step {
+
+    ##! 1: "start"
     my $self    = shift;
     my $arg_ref = shift;
 
@@ -171,87 +256,91 @@ sub login_step {
 
     ##! 16: 'realm: ' . $realm
     ##! 16: 'stack: ' . $stack
+    ##! 64: $msg
     if (! exists $self->{PKI_REALM}->{$realm}->{STACK}->{$stack} ||
         ! scalar @{$self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{HANDLER}}) {
         OpenXPKI::Exception->throw(
             message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_INVALID_STACK",
             params  => {
-        STACK => $stack
-        },
-        log     => {
-        priority => 'warn',
-        facility => 'auth'
-        },
+                STACK => $stack
+            },
+            log     => {
+                priority => 'warn',
+                facility => 'auth'
+            },
         );
     }
 
     ##! 2: "try the different available handlers for the stack $stack"
-    my $ok = 0;
-    my $user;
-    my $role;
-    my $return_msg = {};
-    my $userinfo = {};
+    my $last_result;
   HANDLER:
     foreach my $handler (@{$self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{HANDLER}}) {
         ##! 4: "handler $handler from stack $stack"
-        my $ref = $self->{PKI_REALM}->{$realm}->{HANDLER}->{$handler};
-        if (! ref $ref) { # note the great choice of variable name ...
-            OpenXPKI::Exception->throw (
-                message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_INCORRECT_HANDLER",
-                params  => {
-            PKI_REALM => $realm,
-            HANDLER => $handler,
-        },
-        log => {
-            priority => 'error',
-            facility => 'auth',
-        },
-        );
-        }
-        eval {
-            ($user, $role, $return_msg, $userinfo) = $ref->login_step({
+        my $handlerClass = $self->{PKI_REALM}->{$realm}->{HANDLER}->{$handler};
+
+        OpenXPKI::Exception->throw (
+            message => "Invalid handler given for stack",
+            params  => {
+                PKI_REALM => $realm,
                 HANDLER => $handler,
-                MESSAGE => $msg,
-            });
-        };
-        if (! $EVAL_ERROR) {
-            ##! 8: "login step ok"
-            $ok = 1;
+            },
+            log => {
+                priority => 'error',
+                facility => 'auth',
+            }
+        ) unless (ref $handlerClass);
 
-            ##! 8: "session configured"
-            last HANDLER;
+        # The more modern classes inherit from this base class
+        # so we test for it to fetch legacy implementations
+        my $auth_result;
+        if ($handlerClass->isa('OpenXPKI::Server::Authentication::Base')) {
+            ##! 16: 'New handler'
+            # the new handlers should not throw errors
+            $auth_result = $handlerClass->handleInput( $msg->{PARAMS} );
         } else {
-            ##! 8: "EVAL_ERROR detected"
-            ##! 64: '$EVAL_ERROR = ' . $EVAL_ERROR
+            ##! 16: 'Legacy handler'
+            # legacy stuff
+            $auth_result = $self->__legacy_login( $handlerClass, $handler, $msg);
         }
-    }
-    if (! $ok) {
-        ##! 4: "show at minimum the last error message"
-        if (my $exc = OpenXPKI::Exception->caught()) {
-            OpenXPKI::Exception->throw (
-                message  => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED",
-                children => [ $exc ],
-            log => {
-                priority => 'warn',
-                facility => 'auth',
-            });
-        } else {
-            OpenXPKI::Exception->throw (
-                message  => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_FAILED",
-                params => { error => scalar $EVAL_ERROR },
-            log => {
-                priority => 'warn',
-                facility => 'auth',
-            });
+
+        # store the result if we got a result
+        if ($auth_result) {
+            ##! 8: 'Got auth result'
+            ##! 64: Dumper $auth_result
+            $last_result = $auth_result;
+            # abort processing if the login was valid
+            last HANDLER if ($auth_result->is_valid());
         }
     }
 
-    if (defined $user && defined $role) {
-        CTX('log')->auth()->info("Login successful using authentication stack '$stack' (user: '$user', role: '$role')");
-        return ($user, $role, $return_msg, $userinfo);
+    ##! 16: Dumper $last_result
+    # no result at all usually means we even did not try to login
+    # fetch the required "challenges" from the STACK! We use the fast
+    # path via the config layer - FIXME - check if we should cache this
+    return $self->get_stack_info($stack) unless ($last_result);
+
+    # if we have a result but it is not valid we tried to log in but failed
+    # we use the "old" exception pattern as we need to rework the error
+    # handling first.....
+    if (!$last_result->is_valid()) {
+        OpenXPKI::Exception::Authentication->throw(
+            message => 'Authentication failed',
+            error => $last_result->error_message(),
+            authinfo => $last_result->authinfo(),
+            log => { facility => 'auth', priority => 'error' },
+        );
     }
 
-    return (undef, undef, $return_msg);
+    CTX('log')->auth()->info(sprintf("Login successful (user: %s, role: %s)",
+        $last_result->userid, $last_result->role));
+
+    return (
+        $last_result->userid,
+        $last_result->role,
+        { SERVICE_MSG => 'SERVICE_READY' },
+        ($last_result->userinfo // {}),
+        ($last_result->authinfo // {})
+    );
 
 };
 

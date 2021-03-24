@@ -69,6 +69,33 @@ sub init_login_passwd {
 
 }
 
+
+sub init_login_dynamic {
+
+    my $self = shift;
+
+    # expect a hash with fields (array of fields, mandatory)
+    # and optional strings for label, description, button
+    my $args = shift;
+
+    $self->_page ({
+        'label' => $args->{label} || 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN',
+        'description' => $args->{description} || '',
+    });
+    $self->_result()->{main} = [{
+        type => 'form',
+        action => 'login!dynamic',
+        submit_label =>  $args->{button} || 'I18N_OPENXPKI_UI_LOGIN_BUTTON',
+        content => {
+            fields => $args->{field}
+        }
+    }];
+
+    return $self;
+
+}
+
+
 sub init_login_missing_data {
 
     my $self = shift;

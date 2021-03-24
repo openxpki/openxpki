@@ -22,6 +22,10 @@ use Exception::Class (
         isa         => 'OpenXPKI::Exception',
         fields => [ 'errors', 'action' ],
     },
+    'OpenXPKI::Exception::Authentication' => {
+        isa         => 'OpenXPKI::Exception',
+        fields => [ 'error', 'authinfo' ],
+    },
 );
 
 my $log4perl_logger;

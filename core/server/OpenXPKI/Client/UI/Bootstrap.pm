@@ -24,6 +24,13 @@ sub init_structure {
     $self->_result()->{rtoken} = $session->param('rtoken');
     $self->_result()->{language} = get_language();
 
+    # To issue redirects to the UI, we store the referrer
+    # default is mainly relevant for test scripts
+    my $baseurl = $self->param('baseurl') || '/openxpki';
+    $baseurl =~ s|/$||;
+    $session->param('baseurl',  $baseurl.'/#/');
+    $self->logger->debug("Baseurl from referrer: " . $baseurl);
+
     if ($session->param('is_logged_in') && $user) {
         $self->_result()->{user} = $user;
         my $menu = $self->send_command_v2( 'get_menu' );
@@ -130,14 +137,16 @@ sub init_structure {
             $self->_result()->{ping} = $ping;
         }
 
+        # Redirection targets for apache based SSO Handling
+        if (my $auth = $session->param('authinfo')) {
+            if (my $target = ($auth->{resume} || $auth->{login})) {
+                $self->_result()->{on_exception} = [{
+                    status_code => [ 403, 401 ],
+                    redirect => $target,
+                }];
+            }
+        }
     }
-
-    # To issue redirects to the UI, we store the referrer
-    # default is mainly relevant for test scripts
-    my $baseurl = $self->param('baseurl') || '/openxpki';
-    $baseurl =~ s|/$||;
-    $session->param('baseurl',  $baseurl.'/#/');
-    $self->logger->debug("Baseurl from referrer: " . $baseurl);
 
     $session->flush();
 
@@ -147,7 +156,7 @@ sub init_structure {
             key => 'logout',
             label =>  'I18N_OPENXPKI_UI_CLEAR_LOGIN',
             entries =>  []
-        }]
+        }];
     }
 
     return $self;

@@ -1,7 +1,3 @@
-# OpenXPKI::Client::ui
-# Written 2013 by Oliver Welter
-# (C) Copyright 2013 by The OpenXPKI Project
-
 package OpenXPKI::Client::UI;
 
 use Moose;
@@ -12,7 +8,7 @@ use CGI::Session;
 use URI::Escape;
 use Log::Log4perl::MDC;
 use Data::Dumper;
-
+use OpenXPKI::Template;
 use OpenXPKI::Client;
 use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Client::UI::Bootstrap;
@@ -584,6 +580,66 @@ sub handle_login {
                 return $result->init_login_missing_data()->render();
             }
 
+        } elsif( $login_type  eq 'DYNAMIC' ) {
+            # TODO - move all this stuff into the Login class using action/index
+            $reply =  $self->backend()->send_receive_service_msg( 'GET_DYNAMIC_LOGIN');
+
+            my $auth = $reply->{PARAMS};
+            if ($auth->{source} eq 'environment') {
+                $self->logger()->trace('ENV is ' . Dumper \%ENV) if $self->logger->is_trace;
+                my $data;
+                foreach my $key (keys %{$auth->{envkeys}}) {
+                    my $envkey = $auth->{envkeys}->{$key};
+                    $self->logger()->debug("Try to load $key from $envkey");
+                    next unless defined ($ENV{$envkey});
+                    $data->{$key} = $ENV{$envkey};
+                }
+                # at least some items were found so we send them to the backend
+                if ($data) {
+                    $self->logger()->trace('Sending auth data ' . Dumper $data) if $self->logger->is_trace;
+                    $reply = $self->backend()->send_receive_service_msg( 'GET_DYNAMIC_LOGIN', $data );
+
+                # as nothing was found we do not even try to login in and look for a redirect
+                } elsif (my $loginurl = $auth->{login}) {
+
+                    # the login url might contain a backlink to the running instance
+                    $loginurl = OpenXPKI::Template->new()->render( $loginurl,
+                        { baseurl => $session->param('baseurl') } );
+
+                    $self->logger()->debug("No auth data in environment - redirect found $loginurl");
+                    $result->redirect( { goto => $loginurl, target => '_blank' } );
+                    return $result->render();
+
+                # bad luck - something seems to be really wrong
+                } else {
+                    $self->logger()->error('Not ENV data to perform SSO Login');
+                    $self->logout_session( $cgi );
+                    return $result->init_login_missing_data()->render();
+                }
+            } elsif ($auth->{source} eq 'form') {
+
+                my $data;
+                if ($cgi->param('action') && $cgi->param('action') eq 'login!dynamic') {
+                    $self->logger()->debug('Seems to be an auth try - assemble data');
+                    $self->logger()->debug(Dumper $auth);
+                    foreach my $field (@{$auth->{field}}) {
+                        my $val = $cgi->param($field->{name});
+                        next unless ($val);
+                        $data->{$field->{name}} = $val;
+                    }
+                    $self->logger()->trace('Got data ' . Dumper $data) if $self->logger->is_trace;
+                }
+
+                if ($data) {
+                    $reply = $self->backend()->send_receive_service_msg( 'GET_DYNAMIC_LOGIN', $data );
+                    $self->logger()->trace('Auth result ' . Dumper $reply) if $self->logger->is_trace;
+                } else {
+                    return $result->init_login_dynamic($auth)->render();
+                }
+            }
+
+            $self->logger()->trace('Auth result ' . Dumper $reply) if $self->logger->is_trace;
+
         } elsif( $login_type  eq 'PASSWD' ) {
 
             # Credentials are passed!
@@ -622,6 +678,9 @@ sub handle_login {
             # fetch redirect from old session before deleting it!
             my $redirect = $session->param('redirect');
 
+            # get the base url before deleting the session
+            my $baseurl = $session->param('baseurl');
+
             # delete the old instance data
             $session->delete();
             $session->flush();
@@ -638,6 +697,21 @@ sub handle_login {
             # set some data
             $session->param('backend_session_id', $self->backend()->get_session_id() );
             Log::Log4perl::MDC->put('sid', substr($session->id,0,4));
+            
+            # move userinfo to own node
+            $session->param('userinfo', $reply->{PARAMS}->{userinfo} || {});
+            delete $reply->{PARAMS}->{userinfo};
+
+            # merge baseurl to authinfo links
+            my $authinfo = {};
+            if (my $ai = $reply->{PARAMS}->{authinfo}) {
+                my $tt = OpenXPKI::Template->new();
+                foreach my $key (keys %{$ai}) {
+                    $authinfo->{$key} = $tt->render( $ai->{$key}, { baseurl => $baseurl } );
+                }
+            }
+            $session->param('authinfo', $authinfo);
+            delete $reply->{PARAMS}->{authinfo};
 
             $session->param('user', $reply->{PARAMS});
             $session->param('pki_realm', $reply->{PARAMS}->{pki_realm});

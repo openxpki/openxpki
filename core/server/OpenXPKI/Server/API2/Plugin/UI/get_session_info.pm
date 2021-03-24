@@ -33,6 +33,10 @@ Returns information about the current user session:
             email => STR,       # optional
             ...
         },
+        authinfo => {           # optional, params for authentication handlers
+            logout => STR,      # redirect target for logout (used by UI)
+            ....
+        }
     }
 
 =cut
@@ -47,17 +51,21 @@ command "get_session_info" => {
         $session->data->userinfo->{realname}) {
         $realname = $session->data->userinfo->{realname};
     }
+
+    my $role_label = CTX('config')->get([ 'auth', 'roles', $session->data->role, 'label' ]) || $session->data->role;
+    my $pki_realm_label = CTX('config')->get([ 'system', 'realms', $session->data->pki_realm, 'label' ]) || $session->data->pki_realm;
+
     return {
         name            => $session->data->user,
         role            => $session->data->role,
         realname        => $realname,
-        role_label      => CTX('config')->get([ 'auth', 'roles', $session->data->role, 'label' ]),
+        role_label      => $role_label,
         pki_realm       => $session->data->pki_realm,
-        pki_realm_label => CTX('config')->get([ 'system', 'realms', $session->data->pki_realm, 'label' ]),
-        lang            => 'en', # FIXME remove? Web UI now uses language setting from webui/default.conf
-        checksum        => CTX('config')->checksum(),
+        pki_realm_label => $pki_realm_label,
+        checksum        => substr(CTX('config')->checksum(),0,8),
         sid             => substr($session->id,0,4),
-        userinfo        => $session->data->userinfo,
+        userinfo        => $session->data->userinfo || {},
+        authinfo        => $session->data->authinfo || {},
     }
 };
 

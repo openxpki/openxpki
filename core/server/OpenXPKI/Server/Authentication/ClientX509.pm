@@ -53,14 +53,10 @@ sub login_step {
 1;
 __END__
 
-=head1 Name
+=head1 OpenXPKI::Server::Authentication::ClientX509
 
-OpenXPKI::Server::Authentication::ClientX509 - support for client based X509 authentication.
-
-=head1 Description
-
-Leaves the SSL negotation to the client, requires the certificate chain of the authenticated
-client to be passed.
+Leaves the SSL negotation to the client, requires the certificate chain
+of the authenticated client to be passed.
 
 See OpenXPKI::Server::Authentication::X509 for configuration and options.
 

@@ -3,24 +3,15 @@ package OpenXPKI::Server::Authentication::OneTimePassword;
 use strict;
 use warnings;
 
-use Moose;
 use OpenXPKI::Debug;
-use OpenXPKI::Exception;
+use OpenXPKI::Server::Authentication::Handle;
 use OpenXPKI::Server::Context qw( CTX );
+
+use Moose;
 use Digest::SHA;
 use MIME::Base64;
 
-has label => (
-    is => 'ro',
-    isa => 'Str',
-    default => 'One-Time-Password',
-);
-
-has description => (
-    is => 'ro',
-    isa => 'Str',
-    default => 'Login using a One-Time-Password',
-);
+extends 'OpenXPKI::Server::Authentication::Base';
 
 has namespace => (
     is => 'ro',
@@ -40,44 +31,17 @@ has salt => (
     required => 1,
 );
 
-has role => (
-    is => 'ro',
-    isa => 'Str',
-    default => '',
-);
-
-around BUILDARGS => sub {
-
-    my $orig  = shift;
-    my $class = shift;
-
-    my $config = CTX('config')->get_hash($_[0]);
-
-    return $class->$orig( $config );
-
-};
-
-sub login_step {
+sub handleInput {
 
     ##! 1: 'start'
-    my $self    = shift;
-    my $arg_ref = shift;
+    my $self  = shift;
+    my $msg   = shift;
 
-    my $name    = $arg_ref->{HANDLER};
-    my $msg     = $arg_ref->{MESSAGE};
 
-    if (! exists $msg->{PARAMS}->{LOGIN} ) {
-        ##! 4: 'no login data received (yet)'
-        return (undef, undef, {
-            SERVICE_MSG => "GET_PASSWD_LOGIN",
-            PARAMS      => {
-                NAME        => $self->label(),
-                DESCRIPTION => $self->description(),
-            },
-        });
-    }
+    ##! 2: 'login data received'
+    my $token = $msg->{LOGIN} // $msg->{token};
 
-    my $token = $msg->{PARAMS}->{LOGIN};
+    return unless ($token);
 
     my $ctx = Digest::SHA->new();
     $ctx->add($token);
@@ -91,33 +55,30 @@ sub login_step {
         key => $hashed_key,
     );
 
-    if (!$val->{value}) {
-        OpenXPKI::Exception->throw (
-            message => "OTP Login failed - token not found",
-        );
-    }
+    return OpenXPKI::Server::Authentication::Handle->new(
+        username => $token,
+        error => OpenXPKI::Server::Authentication::Handle::USER_UNKNOWN
+    ) if (!$val->{value});
 
-    if ($val->{expiration_date} && $val->{expiration_date} < time()) {
-        OpenXPKI::Exception->throw (
-            message => "OTP Login failed - token expired",
-        );
-    }
+    return OpenXPKI::Server::Authentication::Handle->new(
+        username => $token,
+        error => OpenXPKI::Server::Authentication::Handle::USER_LOCKED
+    ) if ($val->{expiration_date} && $val->{expiration_date} < time());
 
     my $data = OpenXPKI::Serialization::Simple->new()->deserialize($val->{value});
-    if (!$data->{user}) {
-        OpenXPKI::Exception->throw (
-            message => "OTP Login failed - no username set",
-        );
-    }
+
+    return OpenXPKI::Server::Authentication::Handle->new(
+        username => $token,
+        error => OpenXPKI::Server::Authentication::Handle::LOGIN_FAILED
+    ) if (!$data->{user});
 
     my $role = $self->role() || $data->{role};
-    if (!$role) {
-        OpenXPKI::Exception->throw (
-            message => "OTP Login failed - no role set",
-        );
-    }
+    return OpenXPKI::Server::Authentication::Handle->new(
+        username => $token,
+        userid => $data->{user},
+        error => OpenXPKI::Server::Authentication::Handle::NOT_AUTHORIZED
+    ) if (!$role);
 
-    # do not expire on first use
     if (!$self->permanent()) {
         CTX('api2')->delete_data_pool_entry(
             namespace => $self->namespace(),
@@ -125,9 +86,15 @@ sub login_step {
         );
     }
 
-    return ( $data->{user}, $role, {
-        SERVICE_MSG => 'SERVICE_READY',
-    });
+    my $user = $data->{user};
+    delete $data->{user};
+    return OpenXPKI::Server::Authentication::Handle->new(
+        username => $token,
+        userid => $data->{user},
+        role => $role,
+        userinfo => $data || {},
+    );
+
 }
 
 1;
@@ -141,17 +108,13 @@ OpenXPKI::Server::Authentication::OneTimePassword
 =head1 Description
 
 Provides an authentication handler for One Time Passwords based on
-datapool items. The handler expects the token as username.
+datapool items.
 
-=head1 Functions
+=head2 Login Parameters
 
-=head2 new
+The handler expects the token with key I<token>.
 
-is the constructor. It requires the config prefix as single argument.
-
-=head1 Configuration
-
-=head2 Parameters
+=head2 Configuration Parameters
 
 =over
 

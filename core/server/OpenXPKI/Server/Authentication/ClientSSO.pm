@@ -15,7 +15,62 @@ use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
-use base qw( OpenXPKI::Server::Authentication::External );
+sub new {
+    my $that = shift;
+    my $class = ref($that) || $that;
+
+    my $self = {};
+
+    bless $self, $class;
+
+    ##! 1: "start"
+
+    my $path = shift;
+    my $config = CTX('config');
+
+    ##! 2: "load name and description for handler"
+
+    $self->{DESC} = $config->get("$path.description");
+    $self->{NAME} = $config->get("$path.label");
+
+    ##! 2: "load command"
+    $self->{COMMAND} = $config->get("$path.command");
+
+    ##! 2: "command: ".$self->{COMMAND}
+
+    $self->{ROLE} = $config->get("$path.role");
+
+    ##! 2: "role: ".$self->{ROLE}
+
+    if (not length $self->{ROLE})
+    {
+        delete $self->{ROLE};
+        $self->{PATTERN} = $config->get("$path.pattern");
+        $self->{REPLACE} = $config->get("$path.replacement");
+    }
+
+    # get environment settings
+    ##! 2: "loading environment variable settings"
+
+    my @clearenv;
+    my $environment = $config->get_hash("$path.env");
+
+    foreach my $name (keys %{$environment}) {
+
+        $self->{ENV}->{$name} = $environment->{$name};
+        if (exists $self->{CLEARENV})
+        {
+            push @{$self->{CLEARENV}}, $name;
+        } else {
+            $self->{CLEARENV} = [ $name ];
+        }
+        ##! 4: "setenv: $name ::= $value"
+    }
+
+    ##! 2: "finished"
+
+    return $self;
+}
 
 sub login_step {
     ##! 1: 'start'
@@ -129,23 +184,14 @@ sub login_step {
 1;
 __END__
 
-=head1 Name
-
-OpenXPKI::Server::Authentication::ClientSSO - support for client based SSO.
-
-=head1 Description
+=head1 OpenXPKI::Server::Authentication::ClientSSO
 
 This is the class which supports OpenXPKI with an authentication method
-via an SSO mechanism on the client side of the daemon. This can be for example
-an installed Shibboleth system on the web server. Please notice that you must
-trust the web server in this case.
+via an SSO mechanism on the client side of the daemon. This can be for
+example an installed Shibboleth system on the web server. Please notice
+that you must trust the web server in this case.
+
 The parameters are passed as a hash reference.
-
-=head1 Functions
-
-=head2 new
-
-is inherited from OpenXPKI::Server::Authentication::External
 
 =head2 login
 

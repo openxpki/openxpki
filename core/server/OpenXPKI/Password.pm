@@ -144,6 +144,7 @@ It returns a hash in the format C<{SCHEME}encrypted_string>, C<$argon...> or und
 =head2 check
 
 checks if a password matches the provided digest.
+
 The digest must have the format: C<{SCHEME}encrypted_string> or must start with C<$argon2>
 
 SCHEME is one of sha (SHA1), md5 (MD5), crypt (Unix crypt), smd5 (encrypted

@@ -153,6 +153,7 @@ sub __is_valid_message : PRIVATE {
             'GET_CLIENT_SSO_LOGIN',
             'GET_CLIENT_X509_LOGIN',
             'GET_X509_LOGIN',
+            'GET_DYNAMIC_LOGIN',
             'NEW_SESSION',
             'CONTINUE_SESSION',
             'DETACH_SESSION',
@@ -501,29 +502,8 @@ sub __handle_GET_AUTHENTICATION_STACK : PRIVATE {
             STATE => 'WAITING_FOR_LOGIN',
         });
         CTX('session')->data->authentication_stack($requested_stack);
-        my ($user, $role, $reply, $userinfo) = CTX('authentication')->login_step({
-            STACK   => $requested_stack,
-            MESSAGE => $message,
-        });
-        if (defined $user && defined $role) {
-            ##! 4: 'login successful'
-            # successful login, save it in the session
-            # and make the session valid
-            CTX('session')->data->user($user);
-            CTX('session')->data->role($role);
-            CTX('session')->data->userinfo($userinfo) if ($userinfo);
-
-            CTX('session')->is_valid(1); # mark session as "valid"
-
-            Log::Log4perl::MDC->put('user', $user);
-            Log::Log4perl::MDC->put('role', $role);
-
-            $self->__change_state({ STATE => 'MAIN_LOOP', });
-        }
-        else {
-            ##! 4: 'login unsuccessful'
-        }
-        return $reply;
+        # set session and forward state on success, returns reply
+        return $self->__handle_login( $message );
     }
 
     return;
@@ -553,32 +533,8 @@ sub __handle_GET_PASSWD_LOGIN : PRIVATE {
     }
     }
 
-    my ($user, $role, $reply, $userinfo) = CTX('authentication')->login_step({
-        STACK   => CTX('session')->data->authentication_stack,
-        MESSAGE => $message,
-    });
-    ##! 16: 'user: ' . $user
-    ##! 16: 'role: ' . $role
-    ##! 16: 'reply: ' . Dumper $reply
-    if (defined $user && defined $role) {
-        CTX('log')->system->debug("Successful login from user $user, role $role");
-        ##! 4: 'login successful'
-        # successful login, save it in the session and mark session as valid
-        CTX('session')->data->user($user);
-        CTX('session')->data->role($role);
-        CTX('session')->data->userinfo($userinfo) if ($userinfo);
+    return $self->__handle_login( $message );
 
-        CTX('session')->is_valid(1);
-
-        Log::Log4perl::MDC->put('user', $user);
-        Log::Log4perl::MDC->put('role', $role);
-
-        $self->__change_state({ STATE => 'MAIN_LOOP', });
-    }
-    else {
-        ##! 4: 'login unsuccessful'
-    }
-    return $reply;
 }
 
 sub __handle_GET_CLIENT_SSO_LOGIN : PRIVATE {
@@ -607,6 +563,16 @@ sub __handle_GET_X509_LOGIN : PRIVATE {
     # X509 login is handled the same as password login, too
     return $self->__handle_GET_PASSWD_LOGIN($msg);
 }
+
+sub __handle_GET_DYNAMIC_LOGIN : PRIVATE {
+    ##! 1: 'start'
+    my $self = shift;
+    my $msg  = shift;
+
+    # X509 login is handled the same as password login, too
+    return $self->__handle_GET_PASSWD_LOGIN($msg);
+}
+
 
 sub __handle_LOGOUT : PRIVATE {
     ##! 1: 'start'
@@ -901,6 +867,41 @@ sub __change_state : PRIVATE {
     }
 
     return 1;
+}
+
+sub __handle_login {
+
+    my $self    = shift;
+    my $ident   = ident $self;
+    my $message = shift;
+
+    my ($user, $role, $reply, $userinfo, $authinfo) = CTX('authentication')->login_step({
+        STACK   => CTX('session')->data->authentication_stack,
+        MESSAGE => $message,
+    });
+    ##! 16: 'reply: ' . Dumper $reply
+    if ($user && $role) {
+        ##! 4: 'login successful'
+        ##! 16: 'user: ' . $user
+        ##! 16: 'role: ' . $role
+        ##! 16: 'userinfo: ' . Dumper $userinfo
+        ##! 16: 'authinfo: ' . Dumper $authinfo
+
+        CTX('log')->system->debug("Successful login from user $user, role $role");
+        # successful login, save it in the session and mark session as valid
+        CTX('session')->data->user($user);
+        CTX('session')->data->role($role);
+        CTX('session')->data->userinfo($userinfo) if ($userinfo);
+        CTX('session')->data->authinfo($authinfo) if ($authinfo);
+        CTX('session')->is_valid(1);
+
+        Log::Log4perl::MDC->put('user', $user);
+        Log::Log4perl::MDC->put('role', $role);
+
+        $self->__change_state({ STATE => 'MAIN_LOOP', });
+    }
+
+    return $reply;
 }
 
 sub run
