@@ -5,7 +5,7 @@ import { Promise } from 'rsvp';
 import { set as emSet } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { debug } from '@ember/debug';
-import $ from "jquery";
+import fetch from 'fetch';
 
 class Content {
     @tracked user = null;
@@ -22,6 +22,9 @@ class Content {
     @tracked loadingBanner = null;
 }
 
+/**
+ * @module
+ */
 export default class OpenXpkiRoute extends Route {
     @service('oxi-config') oxiConfig;
     @service('oxi-locale') oxiLocale;
@@ -96,7 +99,16 @@ export default class OpenXpkiRoute extends Route {
 
     _ping(href, timeout) {
         this.content.ping = later(this, () => {
-            $.ajax({ url: href });
+            fetch(href, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-OPENXPKI-Client': '1',
+                },
+            })
+            .catch(error => {
+                /* eslint-disable-next-line no-console */
+                console.error(`Error loading ${href} (network error: ${error.name})`);
+            });
             return this._ping(href, timeout);
         }, timeout);
     }
@@ -131,92 +143,129 @@ export default class OpenXpkiRoute extends Route {
         this.content.loadingBanner = message;
     }
 
-    // sends an AJAX request without showing "loading" banner or dimming page
+    /**
+     * Send AJAX request quietly, i.e. without showing the "loading" banner or
+     * dimming the page.
+     *
+     * @param {hash} request - Request data
+     * @return {Promise} Promise receiving the JSON document on success or `{}` on error
+     */
     sendAjaxQuiet(request) {
         return this.sendAjax(request, true);
     }
 
-    // send AJAX request (isQuiet: don't show optical hints if quietRequest)
+    /**
+     * Send AJAX request.
+     *
+     * @param {hash} request - Request data
+     * @param {bool} isQuiet - set to `true` to hide optical hints (loading banner)
+     * @return {Promise} Promise receiving the JSON document on success or `{}` on error
+     */
     sendAjax(request, isQuiet = false) {
         if (! isQuiet) this._setLoadingBanner(this.intl.t('site.banner.loading'));
         debug("openxpki/route - sendAjax: " + ['page','action'].map(p=>request[p]?`${p} = ${request[p]}`:null).filter(e=>e!==null).join(", "));
-        // assemble request parameters
-        let req = {
-            data: {
-                ...request,
-                "_": new Date().getTime(),
-            },
-            dataType: "json",
-            type: request.action ? "POST" : "GET",
-            url: this.oxiConfig.backendUrl,
-        };
-        if (req.type === "POST") req.data._rtoken = this.content.rtoken;
 
         if (this.content.refresh) {
             cancel(this.content.refresh);
             this.content.refresh = null;
         }
 
-        let realTarget = this._resolveTarget(req.data.target); // has to be done before "this.content.popup = null"
+        let realTarget = this._resolveTarget(request.target); // has to be done before "this.content.popup = null"
 
-        /* eslint-disable-next-line no-unused-vars */
-        return new Promise((resolve, reject) => {
-            $.ajax(req).then(
-                // SUCCESS
-                doc => {
-                    this.content.status = doc.status;
-                    this.content.popup = null;
+        let data = {
+            ...request,
+            '_': new Date().getTime(),
+        }
+        let url = this.oxiConfig.backendUrl;
+        let fetchParams = {
+            method: 'GET', // default
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-OPENXPKI-Client': '1',
+            },
+        };
 
-                    // Ping
-                    if (doc.ping) {
-                        debug("openxpki/route - sendAjax response: \"ping\" " + doc.ping);
-                        if (this.content.ping) { cancel(this.content.ping) }
-                        this._ping(doc.ping);
-                    }
+        // converts plain (not nested!) key => value hash into URL parameter string
+        let getUrlParamStr = (data) => {
+            let params = new URLSearchParams();
+            Object.keys(data).forEach(k => params.set(k, data[k]));
+            return params.toString();
+        };
 
-                    // Auto refresh
-                    if (doc.refresh) {
-                        debug("openxpki/route - sendAjax response: \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout);
-                        this._autoRefreshOnce(doc.refresh.href, doc.refresh.timeout);
-                    }
+        // POST
+        if (request.action) {
+            fetchParams.method = "POST";
+            fetchParams.body = getUrlParamStr({
+                ...data,
+                _rtoken: this.content.rtoken,
+            });
+        }
+        // GET
+        else {
+            url += '?' + getUrlParamStr(data);
+        }
 
-                    // Redirect
-                    if (doc.goto) {
-                        debug("openxpki/route - sendAjax response: \"goto\" " + doc.goto);
-                        this._redirect(doc.goto, doc.target, doc.loading_banner);
-                        return resolve(doc);
-                    }
+        return fetch(url, fetchParams)
+        // Unpack JSON data
+        .then(response => {
+            if (response.ok) return response.json();
+            // server error
+            throw new Error(`Server returned HTTP code ${response.status}`);
+        })
+        // Successful request
+        .then(doc => {
+            this.content.status = doc.status;
+            this.content.popup = null;
 
-                    // "Bootstrapping" - menu, user info, locale
-                    if (doc.structure) {
-                        debug("openxpki/route - sendAjax response: \"structure\"");
-                        this.content.navEntries = doc.structure; this.updateNavEntryActiveState();
-                        this.content.user = doc.user;
-                        this.content.rtoken = doc.rtoken;
+            // Ping
+            if (doc.ping) {
+                debug("openxpki/route - sendAjax response: \"ping\" " + doc.ping);
+                if (this.content.ping) { cancel(this.content.ping) }
+                this._ping(doc.ping);
+            }
 
-                        // set locale
-                        if (doc.language) this.oxiLocale.locale = doc.language;
-                    }
-                    // Page contents
-                    else {
-                        if (doc.page && doc.main) {
-                            debug("openxpki/route - sendAjax response: \"page\" and \"main\"");
-                            this._setPageContent(realTarget, doc.page, doc.main, doc.right);
-                        }
-                    }
+            // Auto refresh
+            if (doc.refresh) {
+                debug("openxpki/route - sendAjax response: \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout);
+                this._autoRefreshOnce(doc.refresh.href, doc.refresh.timeout);
+            }
 
-                    if (! isQuiet) this._setLoadingBanner(null);
-                    return resolve(doc); // calling code might handle other data
-                },
-                // FAILURE
-                () => {
-                    if (! isQuiet) this._setLoadingBanner(null);
-                    this.content.error = {
-                        message: this.intl.t('error_popup.message')
-                    };
-                    return resolve({});
+            // Redirect
+            if (doc.goto) {
+                debug("openxpki/route - sendAjax response: \"goto\" " + doc.goto);
+                this._redirect(doc.goto, doc.target, doc.loading_banner);
+                return doc;
+            }
+
+            // "Bootstrapping" - menu, user info, locale
+            if (doc.structure) {
+                debug("openxpki/route - sendAjax response: \"structure\"");
+                this.content.navEntries = doc.structure; this.updateNavEntryActiveState();
+                this.content.user = doc.user;
+                this.content.rtoken = doc.rtoken;
+
+                // set locale
+                if (doc.language) this.oxiLocale.locale = doc.language;
+            }
+            // Page contents
+            else {
+                if (doc.page && doc.main) {
+                    debug("openxpki/route - sendAjax response: \"page\" and \"main\"");
+                    this._setPageContent(realTarget, doc.page, doc.main, doc.right);
                 }
-            );
+            }
+
+            if (! isQuiet) this._setLoadingBanner(null);
+            return doc; // calling code might handle other data
+        })
+        // Network or server error
+        .catch(error => {
+            if (! isQuiet) this._setLoadingBanner(null);
+            this.content.error = {
+                message: this.intl.t('error_popup.message')
+            };
+            return {};
         });
     }
 
