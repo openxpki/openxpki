@@ -58,6 +58,21 @@ module.exports = function(defaults) {
     // support e.g. IE11
     'ember-cli-babel': {
       includePolyfill: true,
+      includeExternalHelpers: true, // import these helpers from a shared module, reducing app size overall
+    },
+
+    // options for @babel/preset-env (evaluated by 'ember-cli-babel' and passed on)
+    // 'babel': {
+    //   useBuiltIns: 'usage', // auto import polyfills without the need to specify them
+    //   // options for core-js, see https://babeljs.io/docs/en/babel-preset-env#corejs
+    //   corejs: {
+    //     version: '3.9.1',
+    //   },
+    // },
+
+    // fetch() polyfill does not exist in core-js (via ember-cli-babel), so we need to add it:
+    'ember-fetch': {
+      preferNative: true,
     },
   });
 

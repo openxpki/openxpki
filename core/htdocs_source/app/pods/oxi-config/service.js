@@ -1,6 +1,6 @@
 import Service from '@ember/service';
 import ENV from 'openxpki/config/environment';
-import fetch from 'cross-fetch';
+import fetch from 'fetch';
 import yaml from 'js-yaml';
 
 export default class OxiConfigService extends Service {

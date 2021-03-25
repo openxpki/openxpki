@@ -4,8 +4,9 @@ import { later, cancel } from '@ember/runloop';
 import { Promise } from 'rsvp';
 import { set as emSet } from '@ember/object';
 import { inject as service } from '@ember/service';
+import { isArray } from '@ember/array';
 import { debug } from '@ember/debug';
-import $ from "jquery";
+import fetch from 'fetch';
 
 class Content {
     @tracked user = null;
@@ -19,9 +20,12 @@ class Content {
     @tracked tabs = [];
     @tracked navEntries = [];
     @tracked error = null;
-    @tracked showLoadingBanner = false;
+    @tracked loadingBanner = null;
 }
 
+/**
+ * @module
+ */
 export default class OpenXpkiRoute extends Route {
     @service('oxi-config') oxiConfig;
     @service('oxi-locale') oxiLocale;
@@ -39,6 +43,17 @@ export default class OpenXpkiRoute extends Route {
     needReboot = ["login", "logout", "login!logout", "welcome"];
 
     content = new Content();
+    /*
+    Custom handlers for exceptions returned by the server (HTTP status codes):
+        [
+            {
+                status_code: [ 403, ... ], // array or string
+                redirect: "https://...",
+            },
+            { ... }
+        ]
+    */
+    serverExceptions = [];
 
     // Reserved Ember function
     beforeModel(transition) {
@@ -90,112 +105,167 @@ export default class OpenXpkiRoute extends Route {
 
     // Reserved Ember function
     model(params/*, transition*/) {
-        this.content.page = params.model_id; this.updateNavEntryActiveState(this.content);
+        this.content.page = params.model_id; this._updateNavEntryActiveState(this.content);
         return this.content;
     }
 
-    doPing(cfg) {
-        this.content.ping = later(this, () => {
-            $.ajax({ url: cfg.href });
-            return this.doPing(cfg);
-        }, cfg.timeout);
-    }
-
-    setLoadingState(isLoading) {
-        // note that we cannot use the Ember "loading" event as this would only
-        // trigger on route changes, but not if we do sendAjax()
-        if (isLoading) {
-            // remove focus from button to prevent user from doing another
-            // submit by hitting enter
-            document.activeElement.blur();
-        }
-        this.content.showLoadingBanner = isLoading;
-    }
-
-    // sends an AJAX request without showing "loading" banner or dimming page
+    /**
+     * Send AJAX request quietly, i.e. without showing the "loading" banner or
+     * dimming the page.
+     *
+     * @param {hash} request - Request data
+     * @return {Promise} Promise receiving the JSON document on success or `{}` on error
+     */
     sendAjaxQuiet(request) {
         return this.sendAjax(request, true);
     }
 
-    // send AJAX request (isQuiet: don't show optical hints if quietRequest)
+    /**
+     * Send AJAX request.
+     *
+     * @param {hash} request - Request data
+     * @param {bool} isQuiet - set to `true` to hide optical hints (loading banner)
+     * @return {Promise} Promise receiving the JSON document on success or `{}` on error
+     */
     sendAjax(request, isQuiet = false) {
-        if (! isQuiet) this.setLoadingState(true);
+        if (! isQuiet) this._setLoadingBanner(this.intl.t('site.banner.loading'));
         debug("openxpki/route - sendAjax: " + ['page','action'].map(p=>request[p]?`${p} = ${request[p]}`:null).filter(e=>e!==null).join(", "));
-        // assemble request parameters
-        let req = {
-            data: {
-                ...request,
-                "_": new Date().getTime(),
-            },
-            dataType: "json",
-            type: request.action ? "POST" : "GET",
-            url: this.oxiConfig.backendUrl,
-        };
-        if (req.type === "POST") req.data._rtoken = this.content.rtoken;
 
         if (this.content.refresh) {
             cancel(this.content.refresh);
             this.content.refresh = null;
         }
 
-        let realTarget = this._resolveTarget(req.data.target); // has to be done before "this.content.popup = null"
+        let realTarget = this._resolveTarget(request.target); // has to be done before "this.content.popup = null"
 
-        /* eslint-disable-next-line no-unused-vars */
-        return new Promise((resolve, reject) => {
-            $.ajax(req).then(
-                // SUCCESS
-                doc => {
-                    this.content.status = doc.status;
-                    this.content.popup = null;
+        let data = {
+            ...request,
+            '_': new Date().getTime(),
+        }
+        let url = this.oxiConfig.backendUrl;
+        let fetchParams = {
+            method: 'GET', // default
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-OPENXPKI-Client': '1',
+            },
+        };
 
-                    if (doc.ping) {
-                        debug("openxpki/route - sendAjax response: \"ping\" " + doc.ping);
-                        if (this.content.ping) { cancel(this.content.ping) }
-                        this.doPing(doc.ping);
-                    }
-                    if (doc.refresh) {
-                        debug("openxpki/route - sendAjax response: \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout);
-                        this.content.refresh = later(this, function() {
-                            this.sendAjax({ page: doc.refresh.href });
-                        }, doc.refresh.timeout);
-                    }
-                    if (doc.goto) {
-                        debug("openxpki/route - sendAjax response: \"goto\" " + doc.goto);
-                        if (doc.target === '_blank' || /^(http|\/)/.test(doc.goto)) {
-                            window.location.href = doc.goto;
-                        }
-                        else {
-                            this.transitionTo("openxpki", doc.goto);
-                        }
-                    }
-                    else if (doc.structure) {
-                        debug("openxpki/route - sendAjax response: \"structure\"");
-                        this.content.navEntries = doc.structure; this.updateNavEntryActiveState();
-                        this.content.user = doc.user;
-                        this.content.rtoken = doc.rtoken;
+        // POST
+        if (request.action) {
+            fetchParams.method = "POST";
+            fetchParams.body = this._toUrlParams({
+                ...data,
+                _rtoken: this.content.rtoken,
+            });
+        }
+        // GET
+        else {
+            url += '?' + this._toUrlParams(data);
+        }
 
-                        // set locale
-                        if (doc.language) this.oxiLocale.locale = doc.language;
-                    }
-                    else {
-                        if (doc.page && doc.main) {
-                            debug("openxpki/route - sendAjax response: \"page\" and \"main\"");
-                            this._setPageContent(realTarget, doc.page, doc.main, doc.right);
-                        }
-                    }
-                    if (! isQuiet) this.setLoadingState(false);
-                    return resolve(doc);
-                },
-                // FAILURE
-                () => {
-                    if (! isQuiet) this.setLoadingState(false);
-                    this.content.error = {
-                        message: this.intl.t('error_popup.message')
-                    };
-                    return resolve({});
+        return fetch(url, fetchParams)
+        .then(response => {
+            // If OK: unpack JSON data
+            if (response.ok) {
+                return response.json();
+            }
+            // Handle non-2xx HTTP status codes
+            else {
+                this._handleServerException(response.status);
+                return null;
+            }
+        })
+        // Network error, thrown by fetch() itself
+        .catch(error => {
+            this._setLoadingBanner(null);
+            this.content.error = this.intl.t('error_popup.message.network', { reason: error.message });
+            return null;
+        })
+        .then(doc => {
+            // Errors occured and handlers above returned null
+            if (!doc) return {};
+
+            // Successful request
+            this.content.status = doc.status;
+            this.content.popup = null;
+
+            // Ping
+            if (doc.ping) {
+                debug("openxpki/route - sendAjax response: \"ping\" " + doc.ping);
+                if (this.content.ping) { cancel(this.content.ping) }
+                this._ping(doc.ping);
+            }
+
+            // Auto refresh
+            if (doc.refresh) {
+                debug("openxpki/route - sendAjax response: \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout);
+                this._autoRefreshOnce(doc.refresh.href, doc.refresh.timeout);
+            }
+
+            // Redirect
+            if (doc.goto) {
+                debug("openxpki/route - sendAjax response: \"goto\" " + doc.goto);
+                this._redirect(doc.goto, doc.target, doc.loading_banner);
+                return doc;
+            }
+
+            // "Bootstrapping" - menu, user info, locale
+            if (doc.structure) {
+                debug("openxpki/route - sendAjax response: \"structure\"");
+                this.content.navEntries = doc.structure; this._updateNavEntryActiveState();
+                this.content.user = doc.user;
+                this.content.rtoken = doc.rtoken;
+
+                // set locale
+                if (doc.language) this.oxiLocale.locale = doc.language;
+
+                // set custom exception handling
+                if (doc.on_exception) this.serverExceptions = doc.on_exception;
+            }
+            // Page contents
+            else {
+                if (doc.page && doc.main) {
+                    debug("openxpki/route - sendAjax response: \"page\" and \"main\"");
+                    this._setPageContent(realTarget, doc.page, doc.main, doc.right);
                 }
-            );
-        });
+            }
+
+            this._setLoadingBanner(null);
+            return doc; // calling code might handle other data
+        })
+        // Client side error
+        .catch(error => {
+            this._setLoadingBanner(null);
+            this.content.error = this.intl.t('error_popup.message.client', { reason: error.message });
+            return null;
+        })
+    }
+
+    /*
+     * Convert plain (not nested!) key => value hash into URL parameter string.
+     * Source: https://github.com/zloirock/core-js/blob/master/packages/core-js/modules/web.url-search-params.js
+     *
+     * TODO: Replace with...
+     *
+     *     _toUrlParams(data) {
+     *         let params = new URLSearchParams();
+     *         Object.keys(data).forEach(k => params.set(k, data[k]));
+     *         return params.toString();
+     *     }
+     *
+     * ...once https://github.com/babel/ember-cli-babel/issues/395 is fixed and we can
+     * set up @babel/preset-env to use core-js version 3.x
+     */
+    _toUrlParams(entries) {
+        let result = [];
+        let URLPARAM_FIND = /[!'()~]|%20/g;
+        let URLPARAM_REPLACE = { '!': '%21', "'": '%27', '(': '%28', ')': '%29', '~': '%7E', '%20': '+' };
+        let serialize = it => encodeURIComponent(it).replace(URLPARAM_FIND, match => URLPARAM_REPLACE[match]);
+
+        Object.keys(entries).forEach(k => result.push(serialize(k) + '=' + serialize(entries[k])));
+        return result.join('&');
     }
 
     _resolveTarget(requestTarget) {
@@ -209,6 +279,79 @@ export default class OpenXpkiRoute extends Route {
         }
         if (target === 'modal') target = 'popup'; // FIXME remove support for legacy target 'modal'
         return target;
+    }
+
+    // Sets the loading state, i.e. dims the page and shows a banner with the
+    // given message.
+    // If 'message' is set to null, the banner will be hidden.
+    _setLoadingBanner(message) {
+        // note that we cannot use the Ember "loading" event as this would only
+        // trigger on route changes, but not if we do sendAjax()
+        if (message) {
+            // remove focus from button to prevent user from doing another
+            // submit by hitting enter
+            document.activeElement.blur();
+        }
+        this.content.loadingBanner = message;
+    }
+
+    _ping(href, timeout) {
+        this.content.ping = later(this, () => {
+            fetch(href, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-OPENXPKI-Client': '1',
+                },
+            })
+            .catch(error => {
+                /* eslint-disable-next-line no-console */
+                console.error(`Error loading ${href} (network error: ${error.name})`);
+            });
+            return this._ping(href, timeout);
+        }, timeout);
+    }
+
+    _autoRefreshOnce(href, timeout) {
+        this.content.refresh = later(this, function() {
+            this.sendAjax({ page: href });
+        }, timeout);
+    }
+
+    _redirect(url, target, banner = this.intl.t('site.banner.redirecting')) {
+        if (target === '_blank' || /^(http|\/)/.test(url)) {
+            this._setLoadingBanner(banner); // never hide banner as browser will open a new page
+            window.location.href = url;
+        }
+        else {
+            this.transitionTo("openxpki", url);
+        }
+    }
+
+    // Apply custom exception handler for given status code if one was set up
+    // (bootstrap parameter 'on_exception').
+    _handleServerException(status_code) {
+        debug(`Exception - handling server HTTP status code: ${status_code}`);
+        // Check custom exception handlers
+        for (let handler of this.serverExceptions) {
+            let codes = isArray(handler.status_code) ? handler.status_code : [ handler.status_code ];
+            if (codes.find(c => c == status_code)) {
+                // Show message
+                if (handler.message) {
+                    this._setLoadingBanner(null);
+                    this.content.error = handler.message;
+                }
+                // Redirect
+                else if (handler.redirect) {
+                    // we intentionally do NOT remove the loading banner here
+                    debug(`Exception - redirecting to ${handler.redirect}`);
+                    this._redirect(handler.redirect);
+                }
+                return;
+            }
+        }
+        // Unhandled exception
+        this._setLoadingBanner(null);
+        this.content.error = this.intl.t('error_popup.message.server', { code: status_code });
     }
 
     _setPageContent(target, page, main, right) {
@@ -251,7 +394,7 @@ export default class OpenXpkiRoute extends Route {
         }
     }
 
-    updateNavEntryActiveState() {
+    _updateNavEntryActiveState() {
         let page = this.content.page;
         for (const entry of this.content.navEntries) {
             emSet(entry, "active", (entry.key === page));
