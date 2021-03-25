@@ -58,6 +58,7 @@ module.exports = function(defaults) {
     // support e.g. IE11
     'ember-cli-babel': {
       includePolyfill: true,
+      includeExternalHelpers: true, // import these helpers from a shared module, reducing app size overall
     },
 
     // options for @babel/preset-env (evaluated by 'ember-cli-babel' and passed on)
