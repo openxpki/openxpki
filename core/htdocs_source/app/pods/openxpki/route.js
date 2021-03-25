@@ -152,24 +152,17 @@ export default class OpenXpkiRoute extends Route {
             },
         };
 
-        // converts plain (not nested!) key => value hash into URL parameter string
-        let getUrlParamStr = (data) => {
-            let params = new URLSearchParams();
-            Object.keys(data).forEach(k => params.set(k, data[k]));
-            return params.toString();
-        };
-
         // POST
         if (request.action) {
             fetchParams.method = "POST";
-            fetchParams.body = getUrlParamStr({
+            fetchParams.body = this._toUrlParams({
                 ...data,
                 _rtoken: this.content.rtoken,
             });
         }
         // GET
         else {
-            url += '?' + getUrlParamStr(data);
+            url += '?' + this._toUrlParams(data);
         }
 
         return fetch(url, fetchParams)
@@ -248,6 +241,31 @@ export default class OpenXpkiRoute extends Route {
             this.content.error = this.intl.t('error_popup.message.client', { reason: error.message });
             return null;
         })
+    }
+
+    /*
+     * Convert plain (not nested!) key => value hash into URL parameter string.
+     * Source: https://github.com/zloirock/core-js/blob/master/packages/core-js/modules/web.url-search-params.js
+     *
+     * TODO: Replace with...
+     *
+     *     _toUrlParams(data) {
+     *         let params = new URLSearchParams();
+     *         Object.keys(data).forEach(k => params.set(k, data[k]));
+     *         return params.toString();
+     *     }
+     *
+     * ...once https://github.com/babel/ember-cli-babel/issues/395 is fixed and we can
+     * set up @babel/preset-env to use core-js version 3.x
+     */
+    _toUrlParams(entries) {
+        let result = [];
+        let URLPARAM_FIND = /[!'()~]|%20/g;
+        let URLPARAM_REPLACE = { '!': '%21', "'": '%27', '(': '%28', ')': '%29', '~': '%7E', '%20': '+' };
+        let serialize = it => encodeURIComponent(it).replace(URLPARAM_FIND, match => URLPARAM_REPLACE[match]);
+
+        Object.keys(entries).forEach(k => result.push(serialize(k) + '=' + serialize(entries[k])));
+        return result.join('&');
     }
 
     _resolveTarget(requestTarget) {

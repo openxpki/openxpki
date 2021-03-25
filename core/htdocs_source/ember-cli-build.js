@@ -60,8 +60,18 @@ module.exports = function(defaults) {
       includePolyfill: true,
     },
 
+    // options for @babel/preset-env (evaluated by 'ember-cli-babel' and passed on)
+    // 'babel': {
+    //   useBuiltIns: 'usage', // auto import polyfills without the need to specify them
+    //   // options for core-js, see https://babeljs.io/docs/en/babel-preset-env#corejs
+    //   corejs: {
+    //     version: '3.9.1',
+    //   },
+    // },
+
+    // fetch() polyfill does not exist in core-js (via ember-cli-babel), so we need to add it:
     'ember-fetch': {
-      preferNative: true
+      preferNative: true,
     },
   });
 
