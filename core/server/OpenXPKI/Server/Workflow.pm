@@ -384,6 +384,7 @@ sub set_archived {
         user => CTX('session')->data->user,
     });
 
+    $self->persist_context(2); # enforce DB update of context parameters and attributes
     $self->_save();
 
     CTX('log')->workflow->info(sprintf('Archived workflow %s (type %s)', $self->id, $self->type));
