@@ -731,20 +731,25 @@ sub __auto_archive_workflows {
         },
     );
 
-    for my $row (@$rows) {
-        # Don't crash Watchdog only if some archiving fails
-        try {
+    ##! 16: 'Archiving candidates: ' . join(', ', map { $_->{workflow_id} } @$rows)
+
+    my $id;
+    # Don't crash Watchdog only if some archiving fails
+    try {
+        for my $row (@$rows) {
+            $id = $row->{workflow_id};
             $self->__flag_for_archiving($row->{workflow_id}, $row->{workflow_archive_at}) or next;
             $self->__restore_session($row->{pki_realm}, $row->{workflow_session});
 
             my $workflow = CTX('workflow_factory')->get_factory->fetch_workflow($row->{workflow_type}, $row->{workflow_id});
-            $workflow->archive_at(undef); # clear value of "0" that we used as a flag
-            $workflow->set_archived; # does DB update, might throw exception on wrong proc_states etc.
+            # Archive workflow: does DB update, might throw exception on wrong proc_state etc.
+            # Also sets "archive_at" to undef.
+            $workflow->set_archived;
         }
-        catch {
-            CTX('log')->system->error(sprintf('Error archiving wf %s: %s', $$row->{workflow_id}, $_));
-        };
     }
+    catch {
+        CTX('log')->system->error(sprintf('Error archiving wf %s: %s', $id, $_));
+    };
 
     $self->_next_auto_archiving( time + $self->interval_auto_archiving );
 }

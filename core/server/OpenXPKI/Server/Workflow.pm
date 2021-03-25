@@ -374,6 +374,8 @@ sub set_archived {
     }
 
     # no eval{} block here - callers (e.g. API commands) shall see exceptions
+
+    $self->archive_at(undef); # clear value of "0" that is used as a flag "archiving in progress" (see Watchdog)
     $self->proc_state('archived');
 
     $self->notify_observers('archive', $self->state);
@@ -913,7 +915,7 @@ sub set {
     my ( $self, $prop, $value ) = @_;
     my $calling_pkg = ( caller 1 )[0];
     unless ( ( $calling_pkg =~ /^OpenXPKI::Server::Workflow/ ) || ( $calling_pkg =~ /^Workflow/ ) ) {
-        carp "Tried to set from: ", join ', ', caller 1;
+        carp "Forbidden attempt to set workflow attribute from: ", join(', ', map { $_ || '' } caller(1));
         workflow_error "Don't try to use my private setters from '$calling_pkg'!";
     }
     $self->{$prop} = $value;
