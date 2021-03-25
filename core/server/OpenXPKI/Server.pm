@@ -823,24 +823,6 @@ sub __log_and_die {
     return 1;
 }
 
-### obsolete??? (ak, 2007/03/12)
-sub command
-{
-    my $self = shift;
-
-    ## check that there is a session
-
-    if (not CTX('session'))
-    {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_COMMAND_MISSING_SESSION");
-    }
-
-    ## try to authenticate the user
-
-    CTX('authentication')->login() unless CTX('session')->is_valid;
-}
-
 1;
 __END__
 
