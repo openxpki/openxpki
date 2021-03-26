@@ -129,8 +129,21 @@ fi
 echo -e "\nCompilation and installation"
 echo -e "- synchronizing source code from host to $OXI_CORE_DIR"
 rsync -a --delete --exclude=.git/ --exclude=node_modules/ /code-repo/core/                 $OXI_CORE_DIR      >>$LOG 2>&1
-rsync -a --delete --exclude=.git/ --exclude=node_modules/ /code-repo/core/server/htdocs/*  /var/www/openxpki/ >>$LOG 2>&1
-rsync -a --delete --exclude=.git/ /code-repo/core/server/cgi-bin/* /usr/lib/cgi-bin/                          >>$LOG 2>&1
+
+if [ -d /code-repo/myperl-openxpki-ee/opt/myperl/site_perl/OpenXPKI ]; then
+    echo -e "  --> including EE code"
+    rsync -a /code-repo/myperl-openxpki-ee/opt/myperl/site_perl/OpenXPKI/  $OXI_CORE_DIR/server/OpenXPKI/     >>$LOG 2>&1
+fi
+
+echo -e "- synchronizing UI code and configuring web server"
+rsync -a --delete --exclude=.git/ --exclude=node_modules/ /code-repo/core/server/htdocs/   /var/www/openxpki/ >>$LOG 2>&1
+rsync -a --delete --exclude=.git/ /code-repo/core/server/cgi-bin/ /usr/lib/cgi-bin/                           >>$LOG 2>&1
+
+if [ -d /code-repo/myperl-openxpki-ee/opt/myperl/share/cgi-bin ]; then
+    echo -e "  --> including EE code"
+    rsync -a /code-repo/myperl-openxpki-ee/opt/myperl/share/cgi-bin/ /usr/lib/cgi-bin/                        >>$LOG 2>&1
+fi
+
 cat $OXI_TEST_SAMPLECONFIG_DIR/contrib/apache2-openxpki-site.conf \
  | perl -pe 's{^(\s*RewriteRule \^\.\*\$ https://)}{#$1}'\
  > /etc/apache2/sites-available/openxpki.conf
