@@ -6,6 +6,7 @@ use utf8;
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
+use OpenXPKI::Random;
 use OpenXPKI::Server::Context qw( CTX );
 use MIME::Base64;
 use Digest::SHA;
@@ -16,9 +17,13 @@ use Crypt::Argon2;
 use POSIX;
 
 sub hash {
-    my $scheme=shift;
-    my $passwd=shift;
-    my $encrypted=shift;
+
+    ##! 1: 'start'
+
+    my $scheme = shift;
+    my $passwd = shift;
+    ##! 16: "$scheme / $passwd"
+    my $encrypted = shift;
     my $prefix = sprintf '{%s}', $scheme;
     my $computed_secret;
     if ($scheme eq 'sha') {
@@ -54,14 +59,19 @@ sub hash {
         $prefix = '';
     }
     if (!$computed_secret){
+        ##! 4: 'unable to hash password'
         return undef;
     }
     return $prefix . $computed_secret;
 }
 
 sub check {
-    my $passwd=shift;
-    my $hash=shift;
+
+    my $passwd = shift;
+    my $hash = shift;
+    ##! 16:  $hash
+    ##! 64: "Given password is $passwd"
+
     my $encrypted;
     my $scheme;
 
@@ -69,10 +79,16 @@ sub check {
         # handle common case: RFC2307 password syntax
         $scheme = lc($1);
         $encrypted = $2;
-    }elsif( rindex($hash, "\$argon2id", 0) ==0 ){
+    } elsif ( rindex($hash, "\$argon2id", 0) ==0 ){
         # handle special case of argon2
         return Crypt::Argon2::argon2id_verify($hash,$passwd);
-    }else{
+    } elsif ($hash =~ m{\$[156]\$}) {
+        # native format of openssl passwd, same as {crypt}
+        $scheme = 'crypt';
+        $encrypted = $hash;
+        # prepend the old scheme to not break the equality check at the end
+        $hash = "{crypt}$hash";
+    } else {
         # digest is not recognized
         OpenXPKI::Exception->throw (
             message => "Given digest is without scheme",
@@ -82,6 +98,8 @@ sub check {
                 facility => 'system',
         });
     }
+
+    ##! 16: $scheme
     if ($scheme !~ /^(sha|ssha|md5|smd5|crypt)$/) {
         OpenXPKI::Exception->throw (
             message => "Given scheme is not supported",
@@ -94,6 +112,7 @@ sub check {
         });
     }
     
+
     my $computed_hash = hash($scheme,$passwd,$encrypted);
 
     if (! defined $computed_hash) {
@@ -105,18 +124,17 @@ sub check {
         );
     }
 
-    ##! 2: "ident user ::= $account and digest ::= $computed_secret"
+    ##! 32: "$computed_hash ?= $hash"
     $computed_hash =~ s{ =+ \z }{}xms;
     $hash       =~ s{ =+ \z }{}xms;
     return $computed_hash eq $hash;
     
 }
 sub __create_salt {
+
     my $bytes = shift;
-    my @exec = ('openssl', 'rand', '-base64', $bytes);
-    my ($salt, undef) = Proc::SafeExec::backtick(@exec);
-    chomp $salt;
-    return $salt;
+    return OpenXPKI::Random->new()->get_random($bytes);
+
 }
 1;
 

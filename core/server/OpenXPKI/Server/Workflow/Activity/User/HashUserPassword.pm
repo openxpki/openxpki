@@ -16,9 +16,16 @@ sub execute {
     # taken from hash_password() in bin/openxpkiadm
     my ($self, $workflow) = @_;
     my $context  = $workflow->context();
-    my $passwd=$self->param('password');
+    my $passwd = $self->param('password');
+    my $scheme = $self->param('scheme') || 'argon2';
 
-    $context->param( $self->param('target_key') => OpenXPKI::Password::hash($self->param('scheme'),$passwd));
+    my $target_key =  $self->param('target_key') || '_password';
+
+    my $hashed = OpenXPKI::Password::hash($scheme,$passwd);
+
+    workflow_error('Unable to create hashed password') unless($hashed);
+
+    $context->param( $target_key => $hashed );
 
     return 1;
 }
@@ -59,7 +66,8 @@ The password to be hashed
 
 =item scheme
 
-The scheme used for hashing the password, available are: sha, md5, ssha, smd5, crypt, argon2
+The scheme used for hashing the password, check OpenXPKI::Password for
+supported schemes. Default is argon2.
 
 =item target_key
 
