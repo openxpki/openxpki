@@ -17,11 +17,12 @@ sub handleInput {
     my $self  = shift;
     my $msg   = shift;
 
-    ##! 2: 'login data received'
     my $username = $msg->{LOGIN} // $msg->{username};
     my $passwd  = $msg->{PASSWD} // $msg->{password};
 
     return unless ($username && defined $passwd);
+    ##! 2: 'login data received'
+    ##! 16: "Got username $username"
 
     my $role = $self->role() || '';
     my $digest;
@@ -31,12 +32,14 @@ sub handleInput {
     my $userinfo;
     if (!$role) {
         $userinfo = CTX('config')->get_hash( [ @{$self->prefix()}, 'user', $username ] );
+        ##! 64: $userinfo
         $digest = $userinfo->{digest} || '';
         delete $userinfo->{digest};
         $role = $userinfo->{role} || '';
         delete $userinfo->{role};
     } else {
         $digest = CTX('config')->get( [ @{$self->prefix()}, 'user', $username ] );
+        ##! 64: $digest
     }
 
     return OpenXPKI::Server::Authentication::Handle->new(
@@ -52,6 +55,8 @@ sub handleInput {
         username => $username,
         error => OpenXPKI::Server::Authentication::Handle::LOGIN_FAILED,
     ) unless(OpenXPKI::Password::check($passwd,$digest));
+
+    ##! 4: 'succeeded'
 
     return OpenXPKI::Server::Authentication::Handle->new(
         username => $username,

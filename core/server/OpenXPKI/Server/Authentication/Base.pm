@@ -5,7 +5,6 @@ use warnings;
 
 use Moose;
 use OpenXPKI::Debug;
-use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
 ## constructor and destructor stuff
@@ -21,6 +20,13 @@ has prefix => (
     isa => 'ArrayRef',
 );
 
+has authinfo => (
+    is => 'ro',
+    isa => 'HashRef',
+    predicate => 'has_authinfo',
+    default => sub { return {} },
+);
+
 around BUILDARGS => sub {
     my $orig = shift;
     my $class = shift;
@@ -29,7 +35,6 @@ around BUILDARGS => sub {
     my @path = (ref $prefix) ? @{$prefix} : (split /\./, $prefix);
 
     my $config = CTX('config');
-
     my $args = { prefix => \@path };
     for my $attr ( $class->meta->get_all_attributes ) {
         my $attrname = $attr->name();
@@ -75,6 +80,11 @@ if a string was passed it was split at the delimiter character.
 =item role
 
 Should receive a role preset, type is String/Undef.
+
+=item authinfo
+
+HashRef that might be added or preset to the returned handle.
+See the handler subclass for details.
 
 =back
 

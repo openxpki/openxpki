@@ -20,23 +20,34 @@ use constant {
     UNKNOWN_ERROR => 128,
 };
 
+has messages => (
+    is => 'rw',
+    isa => 'HashRef',
+    lazy => 1,
+    default => sub { return {
+        1   => 'I18N_OPENXPKI_UI_LOGIN_USER_UNKNOWN',
+        2   => 'I18N_OPENXPKI_UI_LOGIN_FAILED',
+        4   => 'I18N_OPENXPKI_UI_LOGIN_USER_LOCKED',
+        8   => 'I18N_OPENXPKI_UI_LOGIN_USER_NOT_AUTHORIZED',
+        64  => 'I18N_OPENXPKI_UI_LOGIN_SERVICE_UNAVAILABLE',
+        128 =>'I18N_OPENXPKI_UI_LOGIN_UNKNOWN_ERROR'
+    }; }
+);
+
 has error => (
     is => 'rw',
     isa => 'Int',
     predicate => 'has_error',
     clearer => 'clear_error',
     default => VALID,
-    trigger => sub {
-        my $self = shift;
-        $self->clear_error_message();
-    }
 );
 
-has error_message => (
+has __error_message => (
     is => 'rw',
     isa => 'Str',
-    builder => '__get_error_message',
+    predicate => 'has_error_message',
     clearer => 'clear_error_message',
+    init_arg  => 'error_message',
 );
 
 has username => (
@@ -71,22 +82,14 @@ has authinfo => (
 );
 
 
-sub __get_error_message {
+sub error_message {
 
     my $self = shift;
     return '' unless ($self->has_error());
 
-    my $msg = {
-        VALID => '',
-        USER_UNKNOWN => 'I18N_OPENXPKI_UI_LOGIN_USER_UNKNOWN',
-        LOGIN_FAILED => 'I18N_OPENXPKI_UI_LOGIN_FAILED',
-        USER_LOCKED => 'I18N_OPENXPKI_UI_LOGIN_USER_LOCKED',
-        NOT_AUTHORIZED => 'I18N_OPENXPKI_UI_LOGIN_USER_NOT_AUTHORIZED',
-        SERVICE_UNAVAILABLE  => 'I18N_OPENXPKI_UI_LOGIN_SERVICE_UNAVAILABLE',
-        UNKNOWN_ERROR => 'I18N_OPENXPKI_UI_LOGIN_UNKNOWN_ERROR',
-    };
+    return $self->__error_message() if ($self->has_error_message());
 
-    return $msg->{$self->error()} || 'I18N_OPENXPKI_UI_LOGIN_UNKNOWN_ERROR';
+    return $self->messages()->{$self->error()} || 'I18N_OPENXPKI_UI_LOGIN_UNKNOWN_ERROR';
 
 }
 

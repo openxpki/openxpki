@@ -405,7 +405,7 @@ while (my $cgi = CGI::Fast->new()) {
 
         my $reply = $client->last_reply();
         $log->error(Dumper $reply);
-
+        
         # Validation error
         my $error = $client->last_error() || $eval_err;
 
@@ -420,6 +420,9 @@ while (my $cgi = CGI::Fast->new()) {
             } };
 
         } else {
+            if ($reply->{ERROR} && $reply->{ERROR}->{LABEL}) {
+                $error = $reply->{ERROR}->{LABEL};
+            }
             $log->error("Unable to create workflow: ". $error );
             if (!$error || $error !~ /I18N_OPENXPKI_UI_/) {
                 $error = 'uncaught error';
@@ -427,7 +430,7 @@ while (my $cgi = CGI::Fast->new()) {
             $res = { error => { code => 50002, message => $error, data => { pid => $$ } } };
         }
 
-    # no ID and not not finished is an unrecoverable startup error
+    # no ID and not finished is an unrecoverable startup error
     } elsif (( $workflow->{'proc_state'} ne 'finished' && !$workflow->{id} ) || $workflow->{'proc_state'} eq 'exception') {
 
         $log->error("workflow terminated in unexpected state" );

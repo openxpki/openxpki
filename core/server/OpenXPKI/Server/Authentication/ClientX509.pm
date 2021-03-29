@@ -15,34 +15,25 @@ use Moose;
 
 extends 'OpenXPKI::Server::Authentication::X509';
 
-sub login_step {
+
+sub handleInput {
 
     ##! 1: 'start'
-    my $self    = shift;
-    my $arg_ref = shift;
+    my $self  = shift;
+    my $msg   = shift;
 
-    my $msg     = $arg_ref->{MESSAGE};
-    my $params = $msg->{PARAMS};
+    ##! 2: 'login data received'
+    ##! 64: $msg
+    my $certificate = $msg->{certificate};
 
-    if (! $params->{certificate} ) {
-        ##! 4: 'no login data received (yet)'
-        return (undef, undef, {
-            SERVICE_MSG => "GET_CLIENT_X509_LOGIN",
-            PARAMS      => {
-                NAME        => $self->label(),
-                DESCRIPTION => $self->description(),
-            },
-        });
-    }
-
-    ##! 2: "credentials ... present"
+    return unless($certificate);
 
     my $trust_anchors = $self->trust_anchors();
     ##! 32: 'trust anchors ' . Dumper $trust_anchors
 
     my $validate = CTX('api2')->validate_certificate(
-        pem => $params->{certificate},
-        chain => $params->{chain} // [],
+        pem => $msg->{certificate},
+        chain => $msg->{chain} // [],
         anchor => $trust_anchors,
     );
 

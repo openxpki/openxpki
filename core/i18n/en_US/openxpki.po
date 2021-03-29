@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2021-02-15 12:48+0100\n"
+"PO-Revision-Date: 2021-04-01 17:03+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -19,6 +19,9 @@ msgstr "Requested action not found"
 
 msgid "I18N_OPENXPKI_UI_APPLICATION_ERROR"
 msgstr "Unknown application error"
+
+msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED"
+msgstr "Authentication failed"
 
 msgid "I18N_OPENXPKI_UI_BACKEND_DID_NOT_REPORT_SUCCESS"
 msgstr "Backend workflow did not report success"
@@ -736,6 +739,12 @@ msgstr "4096 bit"
 msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
 msgstr "Username"
 
+msgid "I18N_OPENXPKI_UI_LOGIN_ABORT_BUTTON"
+msgstr "Abort"
+
+msgid "I18N_OPENXPKI_UI_LOGIN_BUTTON"
+msgstr "Login"
+
 msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
 msgstr "Login with the given credentials failed!"
 
@@ -755,13 +764,30 @@ msgstr "Password"
 msgid "I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN"
 msgstr "Please log in"
 
+msgid "I18N_OPENXPKI_UI_LOGIN_SERVICE_UNAVAILABLE"
+msgstr "Login service unavailable"
+
 msgid "I18N_OPENXPKI_UI_LOGIN_SUBMIT"
-msgstr "Send"
+msgstr "Login"
+
+msgid "I18N_OPENXPKI_UI_LOGIN_TOKEN"
+msgstr "Token"
+
+msgid "I18N_OPENXPKI_UI_LOGIN_UNKNOWN_ERROR"
+msgstr "Unknown error on login"
 
 msgid "I18N_OPENXPKI_UI_LOGIN_USERNAME"
 msgstr "Username"
 
-# Remove?
+msgid "I18N_OPENXPKI_UI_LOGIN_USER_LOCKED"
+msgstr "User is locked"
+
+msgid "I18N_OPENXPKI_UI_LOGIN_USER_NOT_AUTHORIZED"
+msgstr "User is not authorized"
+
+msgid "I18N_OPENXPKI_UI_LOGIN_USER_UNKNOWN"
+msgstr "User unknown"
+
 msgid "I18N_OPENXPKI_UI_MENU_BULK"
 msgstr "Bulk Approve/Reject"
 
@@ -777,7 +803,6 @@ msgstr "Certificate Search"
 msgid "I18N_OPENXPKI_UI_MENU_CHANGE_METADATA"
 msgstr "Change Certificate Metadata"
 
-# Remove?
 msgid "I18N_OPENXPKI_UI_MENU_CRL"
 msgstr "Show Revocation Lists (CRL)"
 
@@ -875,6 +900,15 @@ msgstr "The requested URL has no service assigned."
 
 msgid "I18N_OPENXPKI_UI_OOPS"
 msgstr "Oops, something went wrong"
+
+msgid "I18N_OPENXPKI_UI_OTP_LOGIN_BUTTON"
+msgstr "Redeem Token"
+
+msgid "I18N_OPENXPKI_UI_OTP_LOGIN_DESC"
+msgstr "Provide your One Time Password to access this service"
+
+msgid "I18N_OPENXPKI_UI_OTP_LOGIN_LABEL"
+msgstr "One Time Password"
 
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Requested page not found"
@@ -3626,11 +3660,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_CANCELED"
 msgstr "This workflow was canceled by user interaction"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_EXCEPTION"
-msgstr ""
-"This workflow was interrupted by an unexpected event, please contact the "
-"support team"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_FAILURE"
 msgstr "This workflow failed finally and can not be restarted"
 
@@ -3826,9 +3855,6 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_KEY_POLICY_FAILED"
 #~ msgstr "Key policy failed (wrong size/algorithm)"
-
-#~ msgid "I18N_OPENXPKI_UI_ISSUER_UNKNOWN"
-#~ msgstr "Issuer certificate is unknown"
 
 #~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST2001"
 #~ msgstr "GOST 2001"
@@ -4257,6 +4283,11 @@ msgstr "Yes"
 #~ "within the expected period of time. The reason for this pause and the "
 #~ "time of the last execution is shown below, if you want this process to be "
 #~ "continued, an operator needs to manually wake it up."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_EXCEPTION"
+#~ msgstr ""
+#~ "This workflow was interrupted by an unexpected event, please contact the "
+#~ "support team"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_DESC"

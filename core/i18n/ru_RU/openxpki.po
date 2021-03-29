@@ -26,6 +26,10 @@ msgid "I18N_OPENXPKI_UI_APPLICATION_ERROR"
 msgstr "Пауза"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED"
+msgstr "Профиль пользователя общего назначения"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_BACKEND_DID_NOT_REPORT_SUCCESS"
 msgstr "Экспорт заявки на сертификат (CSR)"
 
@@ -972,6 +976,14 @@ msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
 msgstr "Имя учетной записи"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_ABORT_BUTTON"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_BUTTON"
+msgstr "Процесс закончился с ошибкой"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
 msgstr "Процесс закончился с ошибкой"
 
@@ -997,12 +1009,36 @@ msgid "I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN"
 msgstr "Имя учетной записи"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_SERVICE_UNAVAILABLE"
+msgstr "Профиль пользователя"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_LOGIN_SUBMIT"
 msgstr "Процесс закончился с ошибкой"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_TOKEN"
+msgstr "Профиль пользователя"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_UNKNOWN_ERROR"
+msgstr "Пауза"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_LOGIN_USERNAME"
 msgstr "Профиль пользователя"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_USER_LOCKED"
+msgstr "Профиль пользователя"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_USER_NOT_AUTHORIZED"
+msgstr "Профиль пользователя"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_USER_UNKNOWN"
+msgstr "Статус сертификата УЦ"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_BULK"
@@ -1152,6 +1188,23 @@ msgstr "Выпуск списка отзыва сертификатов (CRL)"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_OOPS"
 msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OTP_LOGIN_BUTTON"
+msgstr "Процесс закончился с ошибкой"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OTP_LOGIN_DESC"
+msgstr ""
+"Используйте данный профиль сертификата только если Вы отчетливо "
+"представляете себе необходимую структуру имени субъекта сертификата, хорошо "
+"знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
+"части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
+"также произвольный набор альтернативных имен."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OTP_LOGIN_LABEL"
+msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
@@ -4761,10 +4814,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_CANCELED"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_EXCEPTION"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_FAILURE"
 msgstr "Дочерние технологические процессы"
 
@@ -6729,10 +6778,6 @@ msgstr "Имя учетной записи"
 
 #~ msgid "I18N_OPENXPKI_PROFILE_TLS_BASIC_STYLE"
 #~ msgstr "Профиль TLS сервера общего назначения"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_MAIL"
-#~ msgstr "Профиль пользователя общего назначения"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_PROFILE_USER_AUTHENTICATION_NOMAIL"
@@ -9301,10 +9346,6 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_KEY_POLICY_FAILED"
 #~ msgstr "Родительский технологический процесс"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_ISSUER_UNKNOWN"
-#~ msgstr "Статус сертификата УЦ"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_KEY_ALG_"
@@ -13363,6 +13404,10 @@ msgstr "Имя учетной записи"
 #~ msgstr ""
 #~ "Начальное состояние технологического процесса публикации сертификатов "
 #~ "через LDAP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_EXCEPTION"
+#~ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_ISSUANCE_DESC"

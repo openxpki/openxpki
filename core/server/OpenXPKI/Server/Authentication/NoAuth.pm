@@ -11,12 +11,6 @@ use OpenXPKI::Server::Context qw( CTX );
 
 extends 'OpenXPKI::Server::Authentication::Base';
 
-has authinfo => (
-    is => 'ro',
-    isa => 'HashRef',
-    default => sub { return {} },
-);
-
 
 sub parseRole {
 
@@ -60,7 +54,7 @@ sub handleInput {
         userinfo => \%userinfo,
         authinfo => {
             uid => $username,
-            %{$self->authinfo},
+            %{$self->authinfo()},
         },
     );
 }
@@ -80,8 +74,8 @@ it will be assigned to any incoming username. Otherwise the key I<role>
 from the incoming message is used. If you need to postprocess the role
 information
 
-Any additional parameters
-set in the incoming hash will be set as I<userinfo>.
+Any additional parameters set in the incoming hash will be set as
+I<userinfo>.
 
 The I<authinfo> section can be set as parameter to the handler (HashRef),
 the key I<uid> is always populated with the I<username>.

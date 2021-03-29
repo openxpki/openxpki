@@ -252,6 +252,7 @@ sub _build_client {
 
     # this should not happen
     $reply = $client->send_receive_service_msg('PING') unless($reply);
+    $self->last_reply( $reply );
 
     if ($reply->{SERVICE_MSG} eq 'GET_PKI_REALM') {
         my $realm = $self->realm();
@@ -264,49 +265,137 @@ sub _build_client {
         my $auth = $self->auth();
         $reply = $client->send_receive_service_msg('GET_PKI_REALM',{
             PKI_REALM => $realm,
-            AUTHENTICATION_STACK => $auth->{stack},
-            LOGIN => $auth->{user},
-            PASSWD => $auth->{pass},
+            (!ref $auth->{stack} ? (AUTHENTICATION_STACK => $auth->{stack}) : ()),
         });
+        $self->last_reply( $reply );
     }
 
     if ($reply->{SERVICE_MSG} eq 'GET_AUTHENTICATION_STACK') {
         my $auth = $self->auth();
-        if (! $auth || !$auth->{stack}) {
+
+        my $auth_stack;
+        # Option 1: No Auth stack in config - we are screwed
+        if (!$auth->{stack}) {
             $log->fatal("Found more than one auth stack but no stack is specified");
-            $log->trace("Stacks found:" . Dumper (keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}}));
+            $log->trace("Stacks found:" . join(" ", keys %{$reply->{PARAMS}->{AUTHENTICATION_STACKS}}));
             die "No auth stack specified";
+
         }
-        $log->debug("Selecting auth stack ". $auth->{stack});
+
+        # Option 2: Single Auth stack in config - take it
+        if (!ref $auth->{stack}) {
+            $auth_stack = $auth->{stack};
+
+        # Option 3: Mutliple Auth stacks in config
+        # check type against current env for prereqs
+        # Those are currently hardcoded:
+        # type "sso" requires OPENXPKI_USER or REMOTE_USER in ENV
+        # type "x509" requires SSL_CLIENT_CERT
+        # type "passwd" is always selected
+        } else {
+            my $stacks = $reply->{PARAMS}->{AUTHENTICATION_STACKS};
+            foreach my $stack (@{$auth->{stack}}) {
+                if (!$stacks->{$stack}) {
+                    $log->debug("Auth stack $stack in config is not offered by server");
+                    next;
+                }
+                my $stack_type = $stacks->{$stack}->{type} || 'passwd';
+                if ($stack_type eq 'passwd') {
+                    $log->debug("Selecting $stack / passwd");
+                    $auth_stack = $stack;
+                    last;
+                } elsif ($stack_type eq 'client') {
+                    if (!$ENV{REMOTE_USER} && !$ENV{'OPENXPKI_USER'}) {
+                        $log->debug("Skipping $stack / client");
+                        next;
+                    }
+                    $log->debug("Selecting $stack / client");
+                    $auth_stack = $stack;
+                    last;
+                } elsif ($stack_type eq 'x509') {
+                    if (!$ENV{SSL_CLIENT_CERT}) {
+                        $log->debug("Skipping $stack / x509");
+                        next;
+                    }
+                    $log->debug("Selecting $stack / x509");
+                    $auth_stack = $stack;
+                    last;
+                } else {
+                    $log->debug("Skipping $stack / unknown type $stack_type");
+                }
+            }
+            # failed to select a stack (might be better to use the first or last one as a default?)
+            if (!$auth_stack) {
+                $log->fatal("Mutliple auth stacks given but none matches the prepreqs");
+                die "No auth stack could be selected specified";
+            }
+        }
+
+        $log->debug("Selecting auth stack ". $auth_stack);
+        # we send the stack without params which will either return a session
+        # for anonymous stacks or the required parameter list.
+
         $reply = $client->send_receive_service_msg('GET_AUTHENTICATION_STACK',{
-            AUTHENTICATION_STACK => $auth->{stack},
-            LOGIN => $auth->{user},
-            PASSWD => $auth->{pass}
+            AUTHENTICATION_STACK => $auth_stack,
         });
+        $self->last_reply( $reply );
+        $log->trace("Auth stack request ". Dumper $reply) if $log->is_trace;
     }
 
+    # FIXME / TODO - most of this code is duplicated in the WebUI Login code
     if ($reply->{SERVICE_MSG} =~ /GET_(.*)_LOGIN/) {
         my $login_type = $1;
 
-        if( $login_type !~ /\A(CLIENT_SSO|CLIENT_X509|X509|PASSWD)\z/ ) {
+        my $auth = $reply->{PARAMS};
+        my $data;
+        # no configuration defined yet
+        if ($login_type eq 'X509') {
+            $data->{certificate} = $ENV{SSL_CLIENT_CERT};
+            my @chain;
+            # larger chains are very unlikely and we dont support stupid clients
+            for (my $cc=0;$cc<=3;$cc++)   {
+                my $chaincert = $ENV{'SSL_CLIENT_CERT_CHAIN_'.$cc};
+                last unless ($chaincert);
+                push @chain, $chaincert;
+            }
+            $data->{chain} = \@chain if(@chain);
+
+        } elsif ($login_type eq 'CLIENT') {
+            $self->logger()->trace('ENV is ' . Dumper \%ENV) if $self->logger->is_trace;
+            # we reuse the defaults for the old SSO handler from the UI
+
+            if ($auth->{envkeys}) {
+                foreach my $key (keys %{$auth->{envkeys}}) {
+                    my $envkey = $auth->{envkeys}->{$key};
+                    $self->logger()->debug("Try to load $key from $envkey");
+                    next unless defined ($ENV{$envkey});
+                    $data->{$key} = $ENV{$envkey};
+                }
+            # legacy support
+            } elsif (my $user = $ENV{'OPENXPKI_USER'} || $ENV{'REMOTE_USER'} || '') {
+                $data->{username} = $user;
+                $data->{role} = $ENV{'OPENXPKI_GROUP'} if($ENV{'OPENXPKI_GROUP'});
+            }
+
+        } elsif($login_type eq 'PASSWD') {
+
+            # just add any parameters except stack
+            $data = { %{$self->auth()} };
+            delete $data->{stack};
+
+        } else {
             $log->error("Unsupported login scheme: $login_type");
             die "Unsupported login scheme: $login_type. Stopped";
         }
 
-        my $auth = $self->auth();
-        if (! $auth || !$auth->{stack}) {
-            $log->fatal("Login/Password required but not configured");
-            die "No login/password specified";
-        }
-        $log->debug("Do login with user ". $auth->{user});
-        $reply = $client->send_receive_service_msg('GET_'.$login_type.'_LOGIN',{
-            LOGIN => $auth->{user}, PASSWD => $auth->{pass},
-        });
+        $log->trace("Auth data ". Dumper $data) if $log->is_trace;
+        $reply = $client->send_receive_service_msg('GET_'.$login_type.'_LOGIN', $data );
+        $self->last_reply( $reply );
     }
 
     if ($reply->{SERVICE_MSG} ne 'SERVICE_READY') {
         $log->fatal("Initialization failed - message is " . $reply->{SERVICE_MSG});
-        $log->trace('Last reply: ' .Dumper $reply);
+        $log->trace('Last reply: ' .Dumper $reply) if $log->is_trace;
         die "Initialization failed. Stopped";
     }
     return $client;

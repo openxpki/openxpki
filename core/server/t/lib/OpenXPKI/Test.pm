@@ -1098,6 +1098,7 @@ sub auth_config {
             $self->auth_stack() => {
                 description => "OpenXPKI test authentication stack",
                 handler => "OxiTest",
+                type  => "Password",
             },
         },
         handler => {
@@ -1133,7 +1134,6 @@ sub auth_config {
             "Anonymous"   => { label => "Anonymous" },
             "CA Operator" => { label => "CA Operator" },
             "RA Operator" => { label => "RA Operator" },
-            "SmartCard"   => { label => "SmartCard" },
             "System"      => { label => "System" },
             "User"        => { label => "User" },
         },

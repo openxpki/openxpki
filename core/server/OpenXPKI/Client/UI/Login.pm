@@ -56,27 +56,14 @@ sub init_auth_stack {
 sub init_login_passwd {
 
     my $self = shift;
-
-    $self->_page ({'label' => 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN'});
-    $self->_result()->{main} = [{ 'type' => 'form', 'action' => 'login!password', content => {
-        fields => [
-            { 'name' => 'username', 'label' => 'I18N_OPENXPKI_UI_LOGIN_USERNAME', 'type' => 'text' },
-            { 'name' => 'password', 'label' => 'I18N_OPENXPKI_UI_LOGIN_PASSWORD', 'type' => 'password' },
-        ]}
-    }];
-
-    return $self;
-
-}
-
-
-sub init_login_dynamic {
-
-    my $self = shift;
-
-    # expect a hash with fields (array of fields, mandatory)
-    # and optional strings for label, description, button
+    # expect a hash with fields (array of fields)and strings for label, description, button
+    # if no fields are given, the default is to show username and password
     my $args = shift;
+
+    $args->{field} = [
+        { 'name' => 'username', 'label' => 'I18N_OPENXPKI_UI_LOGIN_USERNAME', 'type' => 'text' },
+        { 'name' => 'password', 'label' => 'I18N_OPENXPKI_UI_LOGIN_PASSWORD', 'type' => 'password' },
+    ] unless ($args->{field});
 
     $self->_page ({
         'label' => $args->{label} || 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN',
@@ -84,10 +71,11 @@ sub init_login_dynamic {
     });
     $self->_result()->{main} = [{
         type => 'form',
-        action => 'login!dynamic',
-        submit_label =>  $args->{button} || 'I18N_OPENXPKI_UI_LOGIN_BUTTON',
+        action => 'login!password',
         content => {
-            fields => $args->{field}
+            fields => $args->{field},
+            submit_label =>  $args->{button} || 'I18N_OPENXPKI_UI_LOGIN_BUTTON',
+            buttons => [{ label => 'I18N_OPENXPKI_UI_LOGIN_ABORT_BUTTON', page => 'logout', format => 'failure' }]
         }
     }];
 

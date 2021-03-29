@@ -27,6 +27,10 @@ msgid "I18N_OPENXPKI_UI_APPLICATION_ERROR"
 msgstr "Errore sconosciuto dell’applicazione"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED"
+msgstr "Workflow"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_BACKEND_DID_NOT_REPORT_SUCCESS"
 msgstr "Sessione di backend terminata - eseguire di nuovo il login"
 
@@ -920,6 +924,14 @@ msgstr "4096 bit (massima sicurezza)"
 msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
 msgstr "Nome utente"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_ABORT_BUTTON"
+msgstr "Forza Ripristino"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_BUTTON"
+msgstr "Impossibile effettuare il Login con le credenziali fornite!"
+
 msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
 msgstr "Impossibile effettuare il Login con le credenziali fornite!"
 
@@ -940,12 +952,36 @@ msgid "I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN"
 msgstr "Algoritmo della Chiave"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_SERVICE_UNAVAILABLE"
+msgstr "Nome utente"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_LOGIN_SUBMIT"
 msgstr "Impossibile effettuare il Login con le credenziali fornite!"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_TOKEN"
+msgstr "Nome utente"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_UNKNOWN_ERROR"
+msgstr "Errore sconosciuto"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_LOGIN_USERNAME"
 msgstr "Nome utente"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_USER_LOCKED"
+msgstr "Nome utente"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_USER_NOT_AUTHORIZED"
+msgstr "Nome utente"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_USER_UNKNOWN"
+msgstr "sconosciuto"
 
 # Remove?
 #, fuzzy
@@ -1083,6 +1119,18 @@ msgstr "Numero di serie del certificato"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_OOPS"
 msgstr "Chiave"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OTP_LOGIN_BUTTON"
+msgstr "Impossibile effettuare il Login con le credenziali fornite!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OTP_LOGIN_DESC"
+msgstr "Common Name"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OTP_LOGIN_LABEL"
+msgstr "Workflow Id"
 
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Pagina richiesta non trovata"
@@ -4244,12 +4292,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_CANCELED"
 msgstr "Questo Workflow è stato cancellato da un’azione dell’utente."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_EXCEPTION"
-msgstr ""
-"Questo Workflow è stato interrotto da un evento imprevisto, contatta per "
-"favore il team di supporto!"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_FAILURE"
 msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
 
@@ -4563,10 +4605,6 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_KEY_POLICY_FAILED"
 #~ msgstr "Scavalca Policy"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_ISSUER_UNKNOWN"
-#~ msgstr "sconosciuto"
 
 #~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST2001"
 #~ msgstr "GOST 2001"
@@ -6780,6 +6818,12 @@ msgstr "Chiave"
 #~ "il tempo previsto. Il motivo della messa in pausa e l’orario dell’ultima "
 #~ "azione sono mostrati qui sotto, se vuoi che il processo venga continuato, "
 #~ "è necessario che un operatore lo riavvii manualmente."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_EXCEPTION"
+#~ msgstr ""
+#~ "Questo Workflow è stato interrotto da un evento imprevisto, contatta per "
+#~ "favore il team di supporto!"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_RENEWAL_REQUEST_DESC"

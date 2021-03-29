@@ -1,43 +1,77 @@
+#!/usr/bin/perl
 use strict;
 use warnings;
+
+# Core modules
 use English;
-use Test::More skip_all => 'See Issue #188 [fix password access to travis-ci]';
-#plan tests => 4;
+use FindBin qw( $Bin );
 
-print STDERR "OpenXPKI::Server::Authentication::External (dynamic role)\n" if $ENV{VERBOSE};
+# CPAN modules
+use Test::More;
+use Test::Deep;
+use Test::Exception;
 
-use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::Init;
-use OpenXPKI::Server::Authentication;
+#use OpenXPKI::Debug; BEGIN { $OpenXPKI::Debug::LEVEL{'OpenXPKI::Crypto::Secret.*'} = 100 }
 
-## init XML cache
-OpenXPKI::Server::Init::init(
-    {
-	TASKS => [
-        'config_test',
-        'log',
-        'dbi',
-    ],
-	SILENT => 1,
-    });
+# Project modules
+use lib "$Bin/../lib";
+use OpenXPKI::Test;
 
-## load authentication configuration
-my $auth = OpenXPKI::Server::Authentication::External->new("auth.handler.External Dynamic Role");
-ok($auth, 'Auth object creation');
 
-my ($user, $role, $reply) = $auth->login_step({
-    STACK   => 'External Dynamic',
-    MESSAGE => {
-        'SERVICE_MSG' => 'GET_PASSWD_LOGIN',
-        'PARAMS'      => {
-            'LOGIN'  => 'John Doe',
-            'PASSWD' => 'User',
+plan tests => 20;
+
+my $oxitest = OpenXPKI::Test->new(
+    with => "AuthLayer",
+    add_config => {
+        "realm.test.auth.handler.NoAuthStaticRole" => {             
+            role => "myrole"            
         },
-    },
-});
+        "realm.test.auth.handler.NoAuthWithRole" => {
+        },
+    }
+);
 
-is($user, 'John Doe', 'Correct user');
-is($role, 'User', 'Correct role');
-is($reply->{'SERVICE_MSG'}, 'SERVICE_READY', 'Service ready.');
+use_ok "OpenXPKI::Server::Authentication::NoAuth";
 
-1;
+my $auth;
+note "Static role";
+lives_ok {
+    $auth = OpenXPKI::Server::Authentication::NoAuth->new('auth.handler.NoAuthStaticRole');
+} "class loaded";
+
+my $user = $auth->handleInput({});
+ok (!defined $user);
+
+$user = $auth->handleInput({ username => 'foo', role => 'ignore' });
+ok (defined $user);
+
+is(ref $user, 'OpenXPKI::Server::Authentication::Handle');
+ok($user->is_valid());
+ok($user->username() eq 'foo');
+ok($user->role() eq 'myrole');
+
+
+note "Dynamic role";
+lives_ok {
+    $auth = OpenXPKI::Server::Authentication::NoAuth->new('auth.handler.NoAuthWithRole');
+} "class loaded";
+
+$user = $auth->handleInput({});
+ok (!defined $user);
+
+note 'missing role';
+$user = $auth->handleInput({ username => 'foo'  });
+ok (defined $user);
+
+is(ref $user, 'OpenXPKI::Server::Authentication::Handle');
+ok(!$user->is_valid());
+is($user->username(), 'foo');
+is($user->error(), OpenXPKI::Server::Authentication::Handle::NOT_AUTHORIZED );
+
+$user = $auth->handleInput({ username => 'foo', role => 'myrole' });
+ok (defined $user);
+
+is(ref $user, 'OpenXPKI::Server::Authentication::Handle');
+ok($user->is_valid());
+is($user->username(), 'foo');
+is($user->role(), 'myrole');

@@ -21,6 +21,10 @@ msgid "I18N_OPENXPKI_UI_APPLICATION_ERROR"
 msgstr "Application error"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED"
+msgstr "ワークフローの取り消し"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_BACKEND_DID_NOT_REPORT_SUCCESS"
 msgstr "再ログインしてください"
 
@@ -753,6 +757,14 @@ msgstr "4096 bit"
 msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
 msgstr "ユーザー名"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_ABORT_BUTTON"
+msgstr "戻る"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_BUTTON"
+msgstr "送信"
+
 msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
 msgstr "Login failed"
 
@@ -771,11 +783,35 @@ msgstr "パスワード"
 msgid "I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN"
 msgstr "ログインしてください"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_SERVICE_UNAVAILABLE"
+msgstr "ユーザ名"
+
 msgid "I18N_OPENXPKI_UI_LOGIN_SUBMIT"
 msgstr "送信"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_TOKEN"
+msgstr "ユーザ名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_UNKNOWN_ERROR"
+msgstr "不明なエラー"
+
 msgid "I18N_OPENXPKI_UI_LOGIN_USERNAME"
 msgstr "ユーザ名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_USER_LOCKED"
+msgstr "ユーザ名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_USER_NOT_AUTHORIZED"
+msgstr "ユーザ名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_USER_UNKNOWN"
+msgstr "不明"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_MENU_BULK"
@@ -895,6 +931,18 @@ msgstr "CRLシリアル"
 
 msgid "I18N_OPENXPKI_UI_OOPS"
 msgstr "おっと、何か間違っています。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OTP_LOGIN_BUTTON"
+msgstr "送信"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OTP_LOGIN_DESC"
+msgstr "一般名称(CN)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OTP_LOGIN_LABEL"
+msgstr "技術的なログ"
 
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "リクエストされたページが見つかりません"
@@ -3789,9 +3837,6 @@ msgstr "このワークフローは何度もループしていたため、自動
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_CANCELED"
 msgstr "ワークフローがユーザ操作によりキャンセルされました。"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_EXCEPTION"
-msgstr "このワークフローは予期しないイベントによって中断されました。"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_FAILURE"
 msgstr "ワークフローが失敗しました。"
 
@@ -4008,10 +4053,6 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_ERROR_NOT_CERTIFICATE_OWNER"
 #~ msgstr "証明書所有者のみがこの操作を実行できます"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_ISSUER_UNKNOWN"
-#~ msgstr "不明"
 
 #~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST2001"
 #~ msgstr "GOST 2001"
@@ -6115,6 +6156,9 @@ msgstr "はい"
 #~ "このタスクは、自動的に再試行される予定でしたが、予定された時間内には成功し"
 #~ "ませんでした。この一時停止の理由と最後に実行した時間を以下に示します。この"
 #~ "プロセスを継続するには、オペレータが手動で起動する必要があります。"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_EXCEPTION"
+#~ msgstr "このワークフローは予期しないイベントによって中断されました。"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_BY_SUBJECT_DESC"

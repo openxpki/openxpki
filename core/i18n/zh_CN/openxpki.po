@@ -21,6 +21,10 @@ msgstr "找不到请求的动作"
 msgid "I18N_OPENXPKI_UI_APPLICATION_ERROR"
 msgstr "未知的应用程序错误"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED"
+msgstr "吊销ID"
+
 msgid "I18N_OPENXPKI_UI_BACKEND_DID_NOT_REPORT_SUCCESS"
 msgstr "后端工作流程未报告成功"
 
@@ -724,6 +728,14 @@ msgstr "4096 bit"
 msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
 msgstr "用户名"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_ABORT_BUTTON"
+msgstr "返回"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_BUTTON"
+msgstr "发送"
+
 msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
 msgstr "使用给定的凭据登录失败！"
 
@@ -741,11 +753,35 @@ msgstr "密码"
 msgid "I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN"
 msgstr "请登录"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_SERVICE_UNAVAILABLE"
+msgstr "用户名"
+
 msgid "I18N_OPENXPKI_UI_LOGIN_SUBMIT"
 msgstr "发送"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_TOKEN"
+msgstr "用户名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_UNKNOWN_ERROR"
+msgstr "未知错误"
+
 msgid "I18N_OPENXPKI_UI_LOGIN_USERNAME"
 msgstr "用户名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_USER_LOCKED"
+msgstr "用户名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_USER_NOT_AUTHORIZED"
+msgstr "用户名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_USER_UNKNOWN"
+msgstr "未知"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_MENU_BULK"
@@ -863,6 +899,18 @@ msgstr "CRL序列号"
 
 msgid "I18N_OPENXPKI_UI_OOPS"
 msgstr "哎呀！出事了"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OTP_LOGIN_BUTTON"
+msgstr "发送"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OTP_LOGIN_DESC"
+msgstr "通用名称"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_OTP_LOGIN_LABEL"
+msgstr "技术日志"
 
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "找不到请求的页面"
@@ -3635,9 +3683,6 @@ msgstr "此工作流已循环很多次，自动重试已停止！"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_CANCELED"
 msgstr "用户交互取消了此工作流程"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_EXCEPTION"
-msgstr "此工作流程被意外事件中断，请联系支持团队"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_FAILURE"
 msgstr "此工作流程最终失败，无法重新启动"
 
@@ -3823,10 +3868,6 @@ msgstr "是"
 
 #~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_KEY_POLICY_FAILED"
 #~ msgstr "Key policy failed (wrong size/algorithm)"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_ISSUER_UNKNOWN"
-#~ msgstr "未知"
 
 #~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST2001"
 #~ msgstr "GOST 2001"
@@ -4239,6 +4280,9 @@ msgstr "是"
 #~ "within the expected period of time. The reason for this pause and the "
 #~ "time of the last execution is shown below, if you want this process to be "
 #~ "continued, an operator needs to manually wake it up."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_EXCEPTION"
+#~ msgstr "此工作流程被意外事件中断，请联系支持团队"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_DESC"

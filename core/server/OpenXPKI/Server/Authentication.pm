@@ -77,27 +77,34 @@ sub __load_pki_realm
     # Fake Session for Config!
     CTX('session')->data->pki_realm( $realm );
 
-    my @handlers = $config->get_keys('auth.handler');
-    foreach my $handler (@handlers) {
-        $self->__load_handler ({
-            HANDLER   => $handler
-        });
-    }
+    my %handlers;
 
-    my @stacks = $config->get_keys('auth.stack');
+    my @stacks = $config->get_keys(['auth','stack']);
     foreach my $stack (@stacks) {
 
-        $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{DESCRIPTION} =
-            $config->get("auth.stack.$stack.description");
+        $self->{PKI_REALM}->{$realm}->{STACK}->{$stack} = {
+            name => $stack,
+            label => $stack, # might be overriden
+        };
 
-        $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{LABEL} =
-            $config->get("auth.stack.$stack.label") || $stack;
+        foreach my $key ('label','description','type','logo') {
+            my $val = $config->get(['auth','stack',$stack, $key]);
+            next unless $val;
+            $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{$key} = $val;
+        }
 
         ##! 8: "determine all used handlers"
-        my @supported_handler = $config->get_scalar_as_list("auth.stack.$stack.handler");
+        my @supported_handler = $config->get_scalar_as_list( ['auth','stack', $stack,'handler' ]);
         ##! 32: " supported_handler " . Dumper @supported_handler
-        $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{HANDLER} = \@supported_handler;
+        $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{handler} = \@supported_handler;
 
+        # record the handler to be loaded later
+        map { $handlers{$_} = 1; } @supported_handler;
+
+    }
+
+    foreach my $handler (keys %handlers) {
+        $self->__load_handler ( $handler );
     }
 
     ##! 64: "Realm auth config " . Dumper $self->{PKI_REALM}->{$realm}
@@ -111,15 +118,19 @@ sub __load_handler
 {
     ##! 4: "start"
     my $self  = shift;
-    my $keys  = shift;
-    my $handler = $keys->{HANDLER};
+    my $handler  = shift;
 
     my $realm = CTX('session')->data->pki_realm;
     my $config = CTX('config');
 
     ##! 8: "load handler type"
 
-    my $type = $config->get("auth.handler.$handler.type");
+    my $type = $config->get(['auth','handler',$handler,'type']);
+
+    OpenXPKI::Exception->throw (
+        message => "No type given for authentication handler $handler"
+    ) unless($type);
+
     $type =~ s/[^a-zA-Z0-9]//g;
 
     ##! 8: "name ::= $handler"
@@ -151,16 +162,13 @@ sub list_authentication_stacks {
 
     ##! 2: "get PKI realm"
     my $realm = CTX('session')->data->pki_realm;
+    my %ret = map {
+        my %vv = %{$self->{PKI_REALM}->{$realm}->{STACK}->{$_}};
+        delete $vv{handler};
+        ($_ => \%vv);
+    } keys %{$self->{PKI_REALM}->{$realm}->{STACK}};
 
-    ##! 2: "get authentication stack"
-    my %stacks = ();
-    foreach my $stack (sort keys %{$self->{PKI_REALM}->{$realm}->{STACK}}) {
-        $stacks{$stack}->{NAME}        = $stack;
-        $stacks{$stack}->{DESCRIPTION} = $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{DESCRIPTION};
-        $stacks{$stack}->{LABEL} = $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{LABEL};
-    }
-    ##! 1: 'end'
-    return \%stacks;
+    return \%ret;
 }
 
 sub get_stack_info {
@@ -171,30 +179,55 @@ sub get_stack_info {
     my $stack = shift;
     my $realm = CTX('session')->data->pki_realm;
 
-    # no result at all usually means we even did not try to login
-    # fetch the required "challenges" from the STACK! We use the fast
-    # path via the config layer - FIXME - check if we should cache this
+    CTX('log')->auth()->debug('Request stack info for ' . $stack);
 
-    my $auth_type = CTX('config')->get(['auth','stack', $stack, 'type']);
+    # no result at all usually means we even did not try to login
+    # fetch the required "challenges" from the STACK!
+    my $auth_type = $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{type};
     my $auth_param;
     if (!$auth_type) {
         ##! 8: "legacy config found for $stack"
         # for legacy handler / configs we call the first handler
         # to determine the type from the given service message
-        my $handler = $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{HANDLER}->[0];
+        my $handler = $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{handler}->[0];
         my $handlerClass = $self->{PKI_REALM}->{$realm}->{HANDLER}->{$handler};
+
+        CTX('log')->deprecated()->error("Please add auth type to stack $stack");
+        ##! 16: 'Handler is ' . $handler
+        ##! 128: $handlerClass
+        # custom handler using old pattern and old config - get type from login method
         if (!$handlerClass->isa('OpenXPKI::Server::Authentication::Base')) {
+            ##! 32: 'Legacy class - call login_step'
             my ($user, $role, $return_msg) = $handlerClass->login_step({
                 HANDLER => $handler,
                 MESSAGE => { PARAMS => {}},
             });
-            $return_msg->{SERVICE_MSG} =~ /GET_(\w+)_LOGIN/;
-            $auth_type = lc($1) || 'passwd';
+            ##! 64: $return_msg
+            my $auth_type = 'passwd';
+            if ($return_msg->{SERVICE_MSG} eq 'GET_CLIENT_SSO_LOGIN') {
+                $auth_type = 'client';
+            } elsif ($return_msg->{SERVICE_MSG} eq 'GET_CLIENT_X509_LOGIN') {
+                $auth_type = 'x509';
+            }
+            CTX('log')->auth()->debug("Determined auth type $auth_type from legacy handler");
+            CTX('log')->deprecated()->error("Found old authentication handler for $handler - please upgrade");
+
+        # get type based on class name for legacy configurations and migrated handlers
+        } elsif ($handlerClass->isa('OpenXPKI::Server::Authentication::X509')) {
+            ##! 32: 'Handler is x509 subclass'
+            $auth_type = 'x509';
         } else {
+            ##! 32: 'Handler is no special class, assign passwd'
             $auth_type = 'passwd';
         }
     } else {
         $auth_param = CTX('config')->get_hash(['auth','stack', $stack, 'param']);
+        CTX('log')->auth()->trace("Handler $auth_type with params " . Dumper $auth_param) if CTX('log')->auth()->is_trace;
+    }
+
+    # we need to support this in the clients first but want to have it in the config already
+    if ($auth_type eq 'anon') {
+        $auth_type = 'passwd';
     }
 
     ##! 8: "Auth Type $auth_type"
@@ -213,6 +246,12 @@ sub __legacy_login {
     my $msg = shift;
 
     my ($user, $role, $return_msg, $userinfo);
+
+    # map back new keys to old keys in case somebody has an old handler
+    $msg->{PARAMS}->{LOGIN} //= $msg->{PARAMS}->{username};
+    $msg->{PARAMS}->{PASSWD} //= $msg->{PARAMS}->{password};
+    # delete as it might show up in the userinfo otherwise
+    delete $msg->{PARAMS}->{password};
     eval {
         ($user, $role, $return_msg, $userinfo) = $handlerClass->login_step({
             HANDLER => $handler,
@@ -258,9 +297,9 @@ sub login_step {
     ##! 16: 'stack: ' . $stack
     ##! 64: $msg
     if (! exists $self->{PKI_REALM}->{$realm}->{STACK}->{$stack} ||
-        ! scalar @{$self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{HANDLER}}) {
+        ! scalar @{$self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{handler}}) {
         OpenXPKI::Exception->throw(
-            message => "I18N_OPENXPKI_SERVER_AUTHENTICATION_LOGIN_INVALID_STACK",
+            message => "Got invalid authentication stack",
             params  => {
                 STACK => $stack
             },
@@ -271,10 +310,12 @@ sub login_step {
         );
     }
 
+    CTX('log')->auth()->debug('Incoming auth for stack ' . $stack);
+
     ##! 2: "try the different available handlers for the stack $stack"
     my $last_result;
   HANDLER:
-    foreach my $handler (@{$self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{HANDLER}}) {
+    foreach my $handler (@{$self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{handler}}) {
         ##! 4: "handler $handler from stack $stack"
         my $handlerClass = $self->{PKI_REALM}->{$realm}->{HANDLER}->{$handler};
 
@@ -295,7 +336,16 @@ sub login_step {
         my $auth_result;
         if ($handlerClass->isa('OpenXPKI::Server::Authentication::Base')) {
             ##! 16: 'New handler'
-            # the new handlers should not throw errors
+            # just in case somebody wrote a custom login / client
+            # we map back the old names to the new keys
+            if (exists $msg->{PARAMS}->{LOGIN}) {
+                $msg->{PARAMS}->{username} //= $msg->{PARAMS}->{LOGIN};
+                delete $msg->{PARAMS}->{LOGIN};
+            }
+            if (exists $msg->{PARAMS}->{PASSWD}) {
+                $msg->{PARAMS}->{password} //= $msg->{PARAMS}->{PASSWD};
+                delete $msg->{PARAMS}->{PASSWD};
+            }
             $auth_result = $handlerClass->handleInput( $msg->{PARAMS} );
         } else {
             ##! 16: 'Legacy handler'
@@ -310,6 +360,7 @@ sub login_step {
             $last_result = $auth_result;
             # abort processing if the login was valid
             last HANDLER if ($auth_result->is_valid());
+            CTX('log')->auth()->info('Got invalid auth result from handler ' . $handler);
         }
     }
 
@@ -323,8 +374,9 @@ sub login_step {
     # we use the "old" exception pattern as we need to rework the error
     # handling first.....
     if (!$last_result->is_valid()) {
+        CTX('log')->auth()->warn(sprintf('Login failed  (user: %s, error: %s)', $last_result->username() || 'not set', $last_result->error_message()));
         OpenXPKI::Exception::Authentication->throw(
-            message => 'Authentication failed',
+            message => 'I18N_OPENXPKI_UI_AUTHENTICATION_FAILED',
             error => $last_result->error_message(),
             authinfo => $last_result->authinfo(),
             log => { facility => 'auth', priority => 'error' },

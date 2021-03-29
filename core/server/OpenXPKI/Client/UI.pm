@@ -503,7 +503,7 @@ sub handle_login {
 
             # List stacks and hide those starting with an underscore
             my @stack_list = map {
-                ($stacks->{$_}->{NAME} !~ /^_/) ? ($_ = {'value' => $stacks->{$_}->{NAME}, 'label' => i18nGettext($stacks->{$_}->{LABEL})} ) : ()
+                ($stacks->{$_}->{name} !~ /^_/) ? ($_ = {'value' => $stacks->{$_}->{name}, 'label' => i18nGettext($stacks->{$_}->{label})} ) : ()
             } keys %{$stacks};
 
             # Directly load stack if there is only one
@@ -532,31 +532,50 @@ sub handle_login {
 
         ## FIXME - need a good way to configure login handlers
         $self->logger()->info('Requested login type ' . $login_type );
+        my $auth = $reply->{PARAMS};
 
         # SSO Login uses data from the ENV, so no need to render anything
-        if ( $login_type eq 'CLIENT_SSO' ) {
-            my $user = $ENV{'OPENXPKI_USER'} || $ENV{'REMOTE_USER'} || '';
-            $self->logger()->trace('ENV is ' . Dumper \%ENV) if $self->logger->is_trace;
+        if ( $login_type eq 'CLIENT' ) {
 
-            if ($user) {
-                $self->logger()->info('Sending SSO Login ( '.$user.' )');
-                my $role = $ENV{'OPENXPKI_GROUP'} || '';
-                my $userinfo = {};
-                foreach my $key (keys %ENV) {
-                    next unless $key =~ m{\AOPENXPKI_USER_(\w+)};
-                    $userinfo->{$1} = $ENV{$key};
+            $self->logger()->trace('ENV is ' . Dumper \%ENV) if $self->logger->is_trace;
+            my $data;
+            if ($auth->{envkeys}) {
+                foreach my $key (keys %{$auth->{envkeys}}) {
+                    my $envkey = $auth->{envkeys}->{$key};
+                    $self->logger()->debug("Try to load $key from $envkey");
+                    next unless defined ($ENV{$envkey});
+                    $data->{$key} = $ENV{$envkey};
                 }
-                $self->logger()->trace('Auth Info ' . Dumper { LOGIN => $user, PSEUDO_ROLE => $role, USERINFO => $userinfo } ) if $self->logger->is_trace;
-                $reply =  $self->backend()->send_receive_service_msg( 'GET_CLIENT_SSO_LOGIN',
-                    { LOGIN => $user, PSEUDO_ROLE => $role, USERINFO => $userinfo } );
-                $self->logger()->trace('Auth result ' . Dumper $reply) if $self->logger->is_trace;
+            # legacy support
+            } elsif (my $user = $ENV{'OPENXPKI_USER'} || $ENV{'REMOTE_USER'} || '') {
+                $data->{username} = $user;
+                $data->{role} = $ENV{'OPENXPKI_GROUP'} if($ENV{'OPENXPKI_GROUP'});
+            }
+
+            # at least some items were found so we send them to the backend
+            if ($data) {
+                $self->logger()->trace('Sending auth data ' . Dumper $data) if $self->logger->is_trace;
+                $reply = $self->backend()->send_receive_service_msg( 'GET_CLIENT_LOGIN', $data );
+
+            # as nothing was found we do not even try to login in and look for a redirect
+            } elsif (my $loginurl = $auth->{login}) {
+
+                # the login url might contain a backlink to the running instance
+                $loginurl = OpenXPKI::Template->new()->render( $loginurl,
+                    { baseurl => $session->param('baseurl') } );
+
+                $self->logger()->debug("No auth data in environment - redirect found $loginurl");
+                $result->redirect( { goto => $loginurl, target => '_blank' } );
+                return $result->render();
+
+            # bad luck - something seems to be really wrong
             } else {
-                $self->logger()->error('User missing in ENV for SSO Login');
+                $self->logger()->error('No ENV data to perform SSO Login');
                 $self->logout_session( $cgi );
                 return $result->init_login_missing_data()->render();
             }
 
-        } elsif ( $login_type eq 'CLIENT_X509' ) {
+        } elsif ( $login_type eq 'X509' ) {
             my $user = $ENV{'SSL_CLIENT_S_DN_CN'} || $ENV{'SSL_CLIENT_S_DN'};
             my $cert = $ENV{'SSL_CLIENT_CERT'} || '';
 
@@ -571,7 +590,7 @@ sub handle_login {
                     last unless ($chaincert);
                     push @chain, $chaincert;
                 }
-                $reply =  $self->backend()->send_receive_service_msg( 'GET_CLIENT_X509_LOGIN',
+                $reply =  $self->backend()->send_receive_service_msg( 'GET_X509_LOGIN',
                     { certificate => $cert, chain => \@chain } );
                 $self->logger()->trace('Auth result ' . Dumper $reply) if $self->logger->is_trace;
             } else {
@@ -580,81 +599,34 @@ sub handle_login {
                 return $result->init_login_missing_data()->render();
             }
 
-        } elsif( $login_type  eq 'DYNAMIC' ) {
-            # TODO - move all this stuff into the Login class using action/index
-            $reply =  $self->backend()->send_receive_service_msg( 'GET_DYNAMIC_LOGIN');
-
-            my $auth = $reply->{PARAMS};
-            if ($auth->{source} eq 'environment') {
-                $self->logger()->trace('ENV is ' . Dumper \%ENV) if $self->logger->is_trace;
-                my $data;
-                foreach my $key (keys %{$auth->{envkeys}}) {
-                    my $envkey = $auth->{envkeys}->{$key};
-                    $self->logger()->debug("Try to load $key from $envkey");
-                    next unless defined ($ENV{$envkey});
-                    $data->{$key} = $ENV{$envkey};
-                }
-                # at least some items were found so we send them to the backend
-                if ($data) {
-                    $self->logger()->trace('Sending auth data ' . Dumper $data) if $self->logger->is_trace;
-                    $reply = $self->backend()->send_receive_service_msg( 'GET_DYNAMIC_LOGIN', $data );
-
-                # as nothing was found we do not even try to login in and look for a redirect
-                } elsif (my $loginurl = $auth->{login}) {
-
-                    # the login url might contain a backlink to the running instance
-                    $loginurl = OpenXPKI::Template->new()->render( $loginurl,
-                        { baseurl => $session->param('baseurl') } );
-
-                    $self->logger()->debug("No auth data in environment - redirect found $loginurl");
-                    $result->redirect( { goto => $loginurl, target => '_blank' } );
-                    return $result->render();
-
-                # bad luck - something seems to be really wrong
-                } else {
-                    $self->logger()->error('Not ENV data to perform SSO Login');
-                    $self->logout_session( $cgi );
-                    return $result->init_login_missing_data()->render();
-                }
-            } elsif ($auth->{source} eq 'form') {
-
-                my $data;
-                if ($cgi->param('action') && $cgi->param('action') eq 'login!dynamic') {
-                    $self->logger()->debug('Seems to be an auth try - assemble data');
-                    $self->logger()->debug(Dumper $auth);
-                    foreach my $field (@{$auth->{field}}) {
-                        my $val = $cgi->param($field->{name});
-                        next unless ($val);
-                        $data->{$field->{name}} = $val;
-                    }
-                    $self->logger()->trace('Got data ' . Dumper $data) if $self->logger->is_trace;
-                }
-
-                if ($data) {
-                    $reply = $self->backend()->send_receive_service_msg( 'GET_DYNAMIC_LOGIN', $data );
-                    $self->logger()->trace('Auth result ' . Dumper $reply) if $self->logger->is_trace;
-                } else {
-                    return $result->init_login_dynamic($auth)->render();
-                }
-            }
-
-            $self->logger()->trace('Auth result ' . Dumper $reply) if $self->logger->is_trace;
-
         } elsif( $login_type  eq 'PASSWD' ) {
 
-            # Credentials are passed!
+            # form send / credentials are passed (works with an empty form too...)
             if ($cgi->param('action') && $cgi->param('action') eq 'login!password') {
                 $self->logger()->debug('Seems to be an auth try - validating');
-                ##FIXME - Input validation, dynamic config (alternate logins)!
-                $reply = $self->backend()->send_receive_service_msg( $status,
-                    { LOGIN => scalar $cgi->param('username'), PASSWD =>  scalar $cgi->param('password') } );
+                ##FIXME - Input validation
+
+                my $data;
+                my @fields = $auth->{field} ?
+                    (map { $_->{name} } @{$auth->{field}}) :
+                    ('username','password');
+
+                foreach my $field (@fields) {
+                    my $val = $cgi->param($field);
+                    next unless ($val);
+                    $data->{$field} = $val;
+                }
+
+                $reply = $self->backend()->send_receive_service_msg( 'GET_PASSWD_LOGIN', $data );
                 $self->logger()->trace('Auth result ' . Dumper $reply) if $self->logger->is_trace;
 
             } else {
                 $self->logger()->debug('No credentials, render form');
-                return $result->init_login_passwd()->render();
+                return $result->init_login_passwd($auth)->render();
             }
+
         } else {
+
             $self->logger()->warn('Unknown login type ' . $login_type );
         }
     }

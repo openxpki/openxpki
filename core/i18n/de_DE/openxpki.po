@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2021-02-09 09:58+0100\n"
+"PO-Revision-Date: 2021-04-01 17:02+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -19,6 +19,9 @@ msgstr "Die ausgewählte Aktion ist nicht verfügbar"
 
 msgid "I18N_OPENXPKI_UI_APPLICATION_ERROR"
 msgstr "Unerwartetet Fehler in der Anwendung"
+
+msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED"
+msgstr "Autentifizierung fehlgeschlagen"
 
 msgid "I18N_OPENXPKI_UI_BACKEND_DID_NOT_REPORT_SUCCESS"
 msgstr "Backend-Worfklow endete nicht erfolgreich"
@@ -737,6 +740,12 @@ msgstr "4096 bit"
 msgid "I18N_OPENXPKI_UI_KEY_XX_YY"
 msgstr "Key"
 
+msgid "I18N_OPENXPKI_UI_LOGIN_ABORT_BUTTON"
+msgstr "Abbrechen"
+
+msgid "I18N_OPENXPKI_UI_LOGIN_BUTTON"
+msgstr "Anmelden"
+
 msgid "I18N_OPENXPKI_UI_LOGIN_FAILED"
 msgstr "Anmeldung fehlgeschlagen!"
 
@@ -755,11 +764,29 @@ msgstr "Passwort"
 msgid "I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN"
 msgstr "Bitte anmelden"
 
+msgid "I18N_OPENXPKI_UI_LOGIN_SERVICE_UNAVAILABLE"
+msgstr "Anmeldeserver nicht verfügbar"
+
 msgid "I18N_OPENXPKI_UI_LOGIN_SUBMIT"
 msgstr "absenden"
 
+msgid "I18N_OPENXPKI_UI_LOGIN_TOKEN"
+msgstr "Token"
+
+msgid "I18N_OPENXPKI_UI_LOGIN_UNKNOWN_ERROR"
+msgstr "Unbekannter Fehler bei der Anmeldung"
+
 msgid "I18N_OPENXPKI_UI_LOGIN_USERNAME"
 msgstr "Benutzername"
+
+msgid "I18N_OPENXPKI_UI_LOGIN_USER_LOCKED"
+msgstr "Benutzer gesperrt"
+
+msgid "I18N_OPENXPKI_UI_LOGIN_USER_NOT_AUTHORIZED"
+msgstr "Benutzer nicht berechtigt"
+
+msgid "I18N_OPENXPKI_UI_LOGIN_USER_UNKNOWN"
+msgstr "Benutzer unbekannt"
 
 msgid "I18N_OPENXPKI_UI_MENU_BULK"
 msgstr "Massenbearbeitung"
@@ -841,9 +868,8 @@ msgstr "Systemnachrichten verwalten"
 msgid "I18N_OPENXPKI_UI_MENU_SYSTEM_STATUS"
 msgstr "System Status"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_USERS"
-msgstr "Anträge"
+msgstr "Benutzer"
 
 msgid "I18N_OPENXPKI_UI_MENU_WORKFLOW_SEARCH"
 msgstr "Vorgangssuche"
@@ -879,6 +905,15 @@ msgstr "Unter dieser Adresse ist keine Service eingerichtet."
 # Remove?
 msgid "I18N_OPENXPKI_UI_OOPS"
 msgstr "Oops, hier ist etwas schief gegangen"
+
+msgid "I18N_OPENXPKI_UI_OTP_LOGIN_BUTTON"
+msgstr "Token einlösen"
+
+msgid "I18N_OPENXPKI_UI_OTP_LOGIN_DESC"
+msgstr "Geben Sie ihr Einmalpasswort ein um sich anzumelden"
+
+msgid "I18N_OPENXPKI_UI_OTP_LOGIN_LABEL"
+msgstr "Einmalpasswort"
 
 msgid "I18N_OPENXPKI_UI_PAGE_NOT_FOUND"
 msgstr "Die angeforderte Seite wurde nicht gefunden"
@@ -3855,11 +3890,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_CANCELED"
 msgstr "Dieser Workflow wurde abgebrochen."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_EXCEPTION"
-msgstr ""
-"Dieser Workflow wurde ungeplant unterbrochen und erforderte einen manuellen "
-"Eingriff."
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_FAILURE"
 msgstr ""
 "Dieser Workflow ist fehlgeschlagen und kann nicht weiter bearbeitet werden."
@@ -4063,9 +4093,6 @@ msgstr "ja"
 
 #~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_KEY_POLICY_FAILED"
 #~ msgstr "Schlüsselparameter fehlerhaft (Algorithmus/Schlüssellänge)"
-
-#~ msgid "I18N_OPENXPKI_UI_ISSUER_UNKNOWN"
-#~ msgstr "Aussteller Zertifikat unbekannt"
 
 #~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST2001"
 #~ msgstr "GOST 2001"
@@ -4502,6 +4529,11 @@ msgstr "ja"
 #~ "within the expected period of time. The reason for this pause and the "
 #~ "time of the last execution is shown below, if you want this process to be "
 #~ "continued, an operator needs to manually wake it up."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_EXCEPTION"
+#~ msgstr ""
+#~ "Dieser Workflow wurde ungeplant unterbrochen und erforderte einen "
+#~ "manuellen Eingriff."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_DESC"

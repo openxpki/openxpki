@@ -11,23 +11,21 @@ use OpenXPKI::Crypt::X509;
 use MIME::Base64;
 
 use Moose;
+use OpenXPKI::Server::Authentication::Handle;
+
+extends 'OpenXPKI::Server::Authentication::Base';
 
 use Data::Dumper;
-
-
-has label => (
-    is => 'rw',
-    isa => 'Str',
-);
-
-has description => (
-    is => 'rw',
-    isa => 'Str',
-);
 
 has path => (
     is => 'ro',
     isa => 'ArrayRef',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        CTX('log')->deprecated()->error('Please use prefix instead of path');
+        return $self->prefix();
+    }
 );
 
 has trust_anchors => (
@@ -40,7 +38,12 @@ has trust_anchors => (
 has default_role => (
     is => 'rw',
     isa => 'Str',
-    default => ''
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        CTX('log')->deprecated()->error('Please use role instead of default_role');
+        return $self->role();
+    }
 );
 
 has user_arg => (
@@ -49,44 +52,21 @@ has user_arg => (
     default => 'subject'
 );
 
-## constructor and destructor stuff
-
-around BUILDARGS => sub {
-
-    my $orig = shift;
-    my $class = shift;
-
-    my @path = split /\./, shift;
-
-    return $class->$orig({ path => \@path });
-
-};
-
-
 sub BUILD {
 
     my $self = shift;
 
-    my @path = @{$self->path()};
+    my @prefix = @{$self->prefix()};
 
     ##! 2: "load name and description for handler"
 
     my $config = CTX('config');
 
-    ##! 8: 'Config Path: ' . Dumper \@path
+    OpenXPKI::Exception->throw(
+        message => 'x509 authentication requires default role or user handler!',
+    ) unless ($self->has_role() || CTX('config')->exists([ @prefix, 'user' ]));
 
-    $self->description( $config->get( [ @path, 'description'] ) );
-    $self->label( $config->get( [ @path, 'label'] ) );
-
-    if (my $role = $config->get([ @path, 'role' ])) {
-        $self->default_role( $role );
-    } elsif (!CTX('config')->exists([ @path, 'user' ])) {
-        OpenXPKI::Exception->throw(
-            message => 'x509 authentication requires default role or user handler!',
-        );
-    }
-
-    if (my $arg = $config->get([ @path, 'arg' ])) {
+    if (my $arg = $config->get([ @prefix, 'arg' ])) {
         $self->user_arg($arg);
     }
 
@@ -95,16 +75,7 @@ sub BUILD {
 sub _load_anchors {
 
     my $self = shift;
-    return CTX('api2')->get_trust_anchors( path => [ @{$self->path()}, 'trust_anchor' ] );
-
-}
-
-sub login_step {
-
-    # This is an abstract class - please use the implementations!
-    OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_ABSTRACT_CLASS',
-    );
+    return CTX('api2')->get_trust_anchors( path => [ @{$self->prefix()}, 'trust_anchor' ] );
 
 }
 
@@ -114,16 +85,14 @@ sub _validation_result {
     my $validate = shift;
 
     ##! 32: 'validation result ' . Dumper $validate
-    if ($validate->{status} ne 'TRUSTED') {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_AUTHENTICATION_X509_SIGNER_CERT_NOT_TRUSTED',
-            params  => {
-                'STATUS' => $validate->{status}
-            },
-        );
-    }
 
-    my @path = @{$self->path()};
+    return OpenXPKI::Server::Authentication::Handle->new(
+        error => OpenXPKI::Server::Authentication::Handle::LOGIN_FAILED,
+        error_message => 'client certificate validation faild with status ' . $validate->{status},
+    ) unless($validate->{status} eq 'TRUSTED');
+
+
+    my @prefix = @{$self->prefix()};
 
     my $x509_signer = OpenXPKI::Crypt::X509->new( $validate->{chain}->[0] ) ;
     my $signer_subject = $x509_signer->get_subject();
@@ -135,7 +104,7 @@ sub _validation_result {
     my %dn_hash = $dn->get_hashed_content();
     ##! 16: 'dn hash ' . Dumper %dn_hash;
 
-    my $has_handler = CTX('config')->exists([ @path, 'user' ]);
+    my $has_handler = CTX('config')->exists([ @prefix, 'user' ]);
     # Argument to use as username
     my $arg = $self->user_arg();
     my $username;
@@ -144,6 +113,8 @@ sub _validation_result {
         $username = $x509_signer->get_subject();
     } elsif ($arg eq "serial") {
         $username = $x509_signer->get_serial();
+    } elsif ($arg eq "cert_identifier") {
+        $username = $x509_signer->get_cert_identifier();
     } elsif ($arg eq "certificate") {
         OpenXPKI::Exception->throw(
             message => 'x509 client authentication: certificate as argument without handler!',
@@ -152,31 +123,24 @@ sub _validation_result {
         $username = $x509_signer->pem;
     } else {
         $arg = uc($arg);
-        OpenXPKI::Exception->throw(
-            message => 'x509 client authentication requires '.$arg.' but certificate has none!',
-            log => { priortity => 'fatal', facility => 'system' }
-        ) if (!$dn_hash{$arg} || !$dn_hash{$arg}[0]);
+        return OpenXPKI::Server::Authentication::Handle->new(
+            error => OpenXPKI::Server::Authentication::Handle::UNKNOWN_ERROR,
+            error_message => 'x509 client authentication requires '.$arg.' but certificate has none!',
+        ) unless($dn_hash{$arg} && $dn_hash{$arg}[0]);
         $username = $dn_hash{$arg}[0];
     }
-
-    OpenXPKI::Exception->throw(
-        message => 'x509 client unable to set username!',
-        log => { priortity => 'fatal', facility => 'system' }
-    ) if (!$username);
-
 
     # fetch userinfo from handler
     my $userinfo;
     my $role = $self->default_role();
 
     if ($has_handler) {
-        $userinfo = CTX('config')->get_hash( [ @path,  'user', $username ] );
+        $userinfo = CTX('config')->get_hash( [ @prefix,  'user', $username ] );
 
-        OpenXPKI::Exception->throw(
-            message => 'x509 client authentication did not find user!',
-            params => { 'argument' => $arg, username => $username },
-            log => { priortity => 'fatal', facility => 'system' }
-        ) if (!$userinfo || !$userinfo->{username});
+        return OpenXPKI::Server::Authentication::Handle->new(
+            username => $username,
+            error => OpenXPKI::Server::Authentication::Handle::USER_UNKNOWN,
+        ) unless($userinfo && $userinfo->{username});
 
         # set role if no default role was set
         $role = $userinfo->{role} unless ($role);
@@ -186,16 +150,21 @@ sub _validation_result {
 
     }
 
-    ##! 16: 'role: ' . $role
-    if (!$role) {
-        ##! 16: 'no certificate role found'
-        OpenXPKI::Exception->throw (
-            message => 'x509 client authentication did not find role!',
-            params  => { username => $username }
-        );
-    }
+    return OpenXPKI::Server::Authentication::Handle->new(
+        username => $username,
+        error => OpenXPKI::Server::Authentication::Handle::NOT_AUTHORIZED,
+    ) unless($role);
 
-    return ($username, $role, { SERVICE_MSG => 'SERVICE_READY', }, $userinfo );
+    return OpenXPKI::Server::Authentication::Handle->new(
+        username => $username,
+        userid => $username,
+        role => $role,
+        userinfo => $userinfo,
+        authinfo => {
+            uid => $username,
+            %{$self->authinfo},
+        },
+    );
 
 }
 
@@ -283,6 +252,14 @@ Serial in integer notation - as string
 
 The PEM encoded certificate
 
+=item I<cert_identifier>
+
+The cert_identifier.
+
+I<Note>: If you use certificates from an external CA you will not be able
+to resolve the identifier back to any information unless you import them
+into the certificate database!
+
 =item I<*>
 
 Any part that is set in the DN hash, if an attribute is multivalued the
@@ -306,7 +283,6 @@ Allow all certiticates issued from the internal realm I<user-ca> and set
 their role to I<User>. Set CN as username (default).
 
     type: ClientX509
-    label: Client Certificate Auth
     role: User
     trust_anchor:
         realm: user-ca
@@ -318,7 +294,6 @@ that contains at least the key I<username>, all other keys are made
 available in the C<userinfo> structure (e.g. I<realname> and I<emailaddress>).
 
     type: ClientX509
-    label: Client Certificate Auth
     role: User
     user@: connector:my.user.info.source
     arg: subject
@@ -332,7 +307,6 @@ returned by the connector must also contain I<role>. As I<arg> is also
 not set the query parameter given to the connector is only the common name.
 
     type: ClientX509
-    label: Client Certificate Auth
     user@: connector:my.user.info.source
     trust_anchor:
         realm: user-ca

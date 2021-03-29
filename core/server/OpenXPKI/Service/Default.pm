@@ -150,10 +150,8 @@ sub __is_valid_message : PRIVATE {
             'PING',
             'LOGOUT',
             'GET_PASSWD_LOGIN',
-            'GET_CLIENT_SSO_LOGIN',
-            'GET_CLIENT_X509_LOGIN',
+            'GET_CLIENT_LOGIN',
             'GET_X509_LOGIN',
-            'GET_DYNAMIC_LOGIN',
             'NEW_SESSION',
             'CONTINUE_SESSION',
             'DETACH_SESSION',
@@ -537,21 +535,12 @@ sub __handle_GET_PASSWD_LOGIN : PRIVATE {
 
 }
 
-sub __handle_GET_CLIENT_SSO_LOGIN : PRIVATE {
+sub __handle_GET_CLIENT_LOGIN : PRIVATE {
     ##! 1: 'start'
     my $self = shift;
     my $msg  = shift;
 
     # SSO login is basically handled in the same way as password login
-    return $self->__handle_GET_PASSWD_LOGIN($msg);
-}
-
-sub __handle_GET_CLIENT_X509_LOGIN : PRIVATE {
-    ##! 1: 'start'
-    my $self = shift;
-    my $msg  = shift;
-
-    # client X509 login is basically handled in the same way as password login
     return $self->__handle_GET_PASSWD_LOGIN($msg);
 }
 
@@ -563,16 +552,6 @@ sub __handle_GET_X509_LOGIN : PRIVATE {
     # X509 login is handled the same as password login, too
     return $self->__handle_GET_PASSWD_LOGIN($msg);
 }
-
-sub __handle_GET_DYNAMIC_LOGIN : PRIVATE {
-    ##! 1: 'start'
-    my $self = shift;
-    my $msg  = shift;
-
-    # X509 login is handled the same as password login, too
-    return $self->__handle_GET_PASSWD_LOGIN($msg);
-}
-
 
 sub __handle_LOGOUT : PRIVATE {
     ##! 1: 'start'
