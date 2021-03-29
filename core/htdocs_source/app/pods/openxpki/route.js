@@ -251,7 +251,7 @@ export default class OpenXpkiRoute extends Route {
      *
      *     _toUrlParams(data) {
      *         let params = new URLSearchParams();
-     *         Object.keys(data).forEach(k => params.set(k, data[k]));
+     *         Object.keys(data).forEach(k => params.set(k, data[k] ?? ''));
      *         return params.toString();
      *     }
      *
@@ -262,7 +262,7 @@ export default class OpenXpkiRoute extends Route {
         let result = [];
         let URLPARAM_FIND = /[!'()~]|%20/g;
         let URLPARAM_REPLACE = { '!': '%21', "'": '%27', '(': '%28', ')': '%29', '~': '%7E', '%20': '+' };
-        let serialize = it => encodeURIComponent(it).replace(URLPARAM_FIND, match => URLPARAM_REPLACE[match]);
+        let serialize = v => encodeURIComponent(v ?? '').replace(URLPARAM_FIND, match => URLPARAM_REPLACE[match]);
 
         Object.keys(entries).forEach(k => result.push(serialize(k) + '=' + serialize(entries[k])));
         return result.join('&');
