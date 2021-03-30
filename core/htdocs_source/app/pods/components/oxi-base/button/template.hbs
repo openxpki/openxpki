@@ -8,6 +8,10 @@
         {{#if @button.tooltip}}
             <BsTooltip @title={{@button.tooltip}}/>
         {{/if}}
+        {{#if @button.image}}
+            <img src={{@button.image}}/>
+            <br/>
+        {{/if}}
         {{@button.label}}
     </a>
 {{else}}
@@ -21,6 +25,10 @@
     >
         {{#if @button.tooltip}}
             <BsTooltip @title={{@button.tooltip}}/>
+        {{/if}}
+        {{#if @button.image}}
+            <img src={{@button.image}}/>
+            <br/>
         {{/if}}
         {{@button.label}}
     </BsButton>
