@@ -323,6 +323,7 @@ lives_and {
             state => 'PERSIST',
             type => $wf_t2->type,
             wake_up_at => ignore(),
+            archive_at => ignore(),
             description => ignore(),
             label => 'wf_type_2',
         }),

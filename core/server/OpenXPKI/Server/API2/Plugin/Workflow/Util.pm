@@ -335,6 +335,7 @@ as a I<HashRef>:
             count_try   => ...,
             wake_up_at  => ...,
             reap_at     => ...,
+            archive_at  => ...,
             context     => { ... },
             attribute   => { ... },   # only if "with_attributes => 1"
         },
@@ -405,6 +406,7 @@ sub get_wf_info {
             count_try   => $workflow->count_try,
             wake_up_at  => $workflow->wakeup_at,
             reap_at     => $workflow->reap_at,
+            archive_at  => $workflow->archive_at,
             context     => { %{$workflow->context->param } }, # make a copy
             $args{with_attributes} ? ( attribute => $workflow->attrib ) : (),
         }
