@@ -28,7 +28,10 @@ export default class OxiSectionComponent extends Component {
             .finally(() => set(button, "loading", false));
         }
         else {
-            getOwner(this).lookup("route:openxpki").transitionTo("openxpki", button.page);
+            getOwner(this)
+            .lookup("route:openxpki")
+            .transitionTo("openxpki", button.page)
+            .then(() => set(button, "loading", false));
         }
     }
 }
