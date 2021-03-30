@@ -4,31 +4,58 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-3">
-            <OxiSection @content={{this.chartDef1}}/>
-        </div>
-        <div class="col-md-3">
-            <OxiSection @content={{this.chartDef2}}/>
-        </div>
-        <div class="col-md-3">
-            <OxiSection @content={{this.chartDef3}}/>
-        </div>
-        <div class="col-md-3">
-            <OxiSection @content={{this.chartDef4}}/>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-2"></div>
-        <div class="col-md-10">
-            <OxiBase::Button @button={{hash format="expected" label="de-DE"}} @onClick={{fn this.setLang "de-DE"}}/>
-            <OxiBase::Button @button={{hash format="expected" label="en-US"}} @onClick={{fn this.setLang "en-US"}}/>
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-body">
+                    <OxiBase::Button @button={{hash format="expected" label="de-DE"}} @onClick={{fn this.setLang "de-DE"}}/>
+                    <OxiBase::Button @button={{hash format="expected" label="en-US"}} @onClick={{fn this.setLang "en-US"}}/>
+                </div>
+            </div>
         </div>
     </div>
     <div class="row">
         <div class="col-md-12">
-            <OxiSection @content={{this.formDef}}/>
-            <OxiSection @content={{this.gridDef}}/>
-            <OxiSection @content={{this.keyvalueDef}}/>
+            <div class="panel panel-primary">
+                <div class="panel-heading"></div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <OxiSection @content={{this.chartDef1}}/>
+                        </div>
+                        <div class="col-md-3">
+                            <OxiSection @content={{this.chartDef2}}/>
+                        </div>
+                        <div class="col-md-3">
+                            <OxiSection @content={{this.chartDef3}}/>
+                        </div>
+                        <div class="col-md-3">
+                            <OxiSection @content={{this.chartDef4}}/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading"></div>
+                <div class="panel-body">
+                    <OxiSection @content={{this.formDef}}/>
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading"></div>
+                <div class="panel-body">
+                    <OxiSection @content={{this.gridDef}}/>
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading"></div>
+                <div class="panel-body">
+                    <OxiSection @content={{this.keyvalueDef}}/>
+                </div>
+            </div>
         </div>
     </div>
 </div>

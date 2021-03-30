@@ -42,11 +42,12 @@ export default class TestController extends Controller {
         disabled: false,
     };
 
-    @tracked formDef = {
+    formDef = {
         type: "form",
         action: "login!password",
         reset: "login!password",
         content: {
+            label: "oxi-section/form",
             title: "Test input",
             fields: [
                 {
@@ -336,8 +337,11 @@ export default class TestController extends Controller {
         }
     };
 
-    @tracked gridDef = {
+    gridDef = {
+        "type": "grid",
+        "className": "certificate",
         "content": {
+            "label": "oxi-section/grid",
             "empty": "No data available",
             "buttons": [
                 {
@@ -456,14 +460,12 @@ export default class TestController extends Controller {
                 // ... more rows are added in constructor above
             ]
         },
-        "type": "grid",
-        "className": "certificate"
     };
 
-    @tracked keyvalueDef = {
+    keyvalueDef = {
         "type": "keyvalue",
         "content": {
-            "label": "oxisection/keyvalue",
+            "label": "oxi-section/keyvalue",
             "description": "",
             "data": [
                 {
