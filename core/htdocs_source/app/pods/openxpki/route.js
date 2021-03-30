@@ -207,7 +207,7 @@ export default class OpenXpkiRoute extends Route {
             // Redirect
             if (doc.goto) {
                 debug("openxpki/route - sendAjax response: \"goto\" " + doc.goto);
-                this._redirect(doc.goto, doc.target, doc.loading_banner);
+                this._redirect(doc.goto, doc.type, doc.loading_banner);
                 return doc;
             }
 
@@ -317,8 +317,8 @@ export default class OpenXpkiRoute extends Route {
         }, timeout);
     }
 
-    _redirect(url, target, banner = this.intl.t('site.banner.redirecting')) {
-        if (target === '_blank' || /^(http|\/)/.test(url)) {
+    _redirect(url, type = 'internal', banner = this.intl.t('site.banner.redirecting')) {
+        if (type == 'external' || /^(http|\/)/.test(url)) {
             this._setLoadingBanner(banner); // never hide banner as browser will open a new page
             window.location.href = url;
         }

@@ -162,7 +162,7 @@ sub handle_request {
     # new session and to recover from backend session failure
     if ($page eq 'logout' || $action eq 'logout') {
 
-        # For SSO Logins the session might hold an external link 
+        # For SSO Logins the session might hold an external link
         # to logout from the SSO provider
         my $authinfo = $self->session()->param('authinfo') || {};
         my $redirectTo = $authinfo->{logout};
@@ -174,11 +174,11 @@ sub handle_request {
         # now perform the redirect if set
         if ($redirectTo) {
             $self->logger()->debug("External redirect on logout to " . $redirectTo);
-            my $result = OpenXPKI::Client::UI::Result->new({ client => $self, cgi => $cgi });        
+            my $result = OpenXPKI::Client::UI::Result->new({ client => $self, cgi => $cgi });
             $result->redirect( $redirectTo );
-            return $result->render();            
+            return $result->render();
         }
-        
+
     }
 
     my $reply = $self->backend()->send_receive_service_msg('PING');
@@ -451,7 +451,7 @@ sub handle_login {
         } elsif (my $loginurl = $self->_config()->{loginurl}) {
 
             $self->logger()->debug("Redirect to external login page " . $loginurl );
-            $result->redirect( { goto => $loginurl, target => '_blank' } );
+            $result->redirect( { goto => $loginurl, type => 'external' } );
             return $result->render();
             # Do a real exit to skip the error handling of the script body
             exit;
@@ -565,7 +565,7 @@ sub handle_login {
                     { baseurl => $session->param('baseurl') } );
 
                 $self->logger()->debug("No auth data in environment - redirect found $loginurl");
-                $result->redirect( { goto => $loginurl, target => '_blank' } );
+                $result->redirect( { goto => $loginurl, type => 'external' } );
                 return $result->render();
 
             # bad luck - something seems to be really wrong
@@ -669,7 +669,7 @@ sub handle_login {
             # set some data
             $session->param('backend_session_id', $self->backend()->get_session_id() );
             Log::Log4perl::MDC->put('sid', substr($session->id,0,4));
-            
+
             # move userinfo to own node
             $session->param('userinfo', $reply->{PARAMS}->{userinfo} || {});
             delete $reply->{PARAMS}->{userinfo};
