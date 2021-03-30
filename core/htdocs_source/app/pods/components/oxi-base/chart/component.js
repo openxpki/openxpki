@@ -7,16 +7,16 @@ import ChartPie from './chart-pie';
 import ChartLineBar from './chart-line-bar';
 
 /**
-Draws a line or bar chart.
-
-```html
-<OxiBase::Chart @data={{this.data}} @options={{this.options}} />
-```
-
-@module oxi-base/chart
-@param data { array } - list of data rows: `[ [x1, a1, b1, c1, ...], [x2, b2, c2, ...], ... ]`
-@param options { hash } - display options for the chart
-*/
+ * Draws a line or bar chart.
+ *
+ * ```html
+ * <OxiBase::Chart @data={{this.data}} @options={{this.options}} />
+ * ```
+ *
+ * @module oxi-base/chart
+ * @param { array } data - list of data rows: `[ [x1, a1, b1, c1, ...], [x2, b2, c2, ...], ... ]`
+ * @param { hash } options - display options for the chart
+ */
 
 export default class OxiChartComponent extends Component {
     guid;

@@ -5,14 +5,15 @@ import { debug } from '@ember/debug';
 import copy from 'copy-text-to-clipboard';
 
 /**
-Offers a file for download, optionally showing a button
-and optionally auto-starting the download.
-
-```html
-<OxiBase::Download @type="base64" @data={{this.fileData}} @mimeType="text/plain" @fileName="book.txt" @autoDownload={{true}} @hide={{true}}/>
-<OxiBase::Download @type="link" @data="img/logo.png" @fileName="openxpki.png" />
-```
-*/
+ * Offers a file for download, optionally showing a button
+ * and optionally auto-starting the download.
+ *
+ * ```html
+ * <OxiBase::Download @type="base64" @data={{this.fileData}} @mimeType="text/plain" @fileName="book.txt" @autoDownload={{true}} @hide={{true}}/>
+ * <OxiBase::Download @type="link" @data="img/logo.png" @fileName="openxpki.png" />
+ * ```
+ * @module oxi-base/download
+ */
 export default class OxiDownloadComponent extends Component {
     type = this.args.type || "";
     isLink = this.type == "link";

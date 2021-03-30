@@ -3,7 +3,34 @@ import moment from "moment-timezone";
 import { action } from '@ember/object';
 import copy from 'copy-text-to-clipboard';
 
-
+/**
+ * Shows a formatted piece of text or data.
+ *
+ * ```html
+ * <OxiBase::Formatted @format="timestamp" value="1617102928"/>
+ * ```
+ *
+ * @module oxi-base/formatted
+ * @param { string } format - how the value shall be formatted
+ * Possible formats:
+ * - `certstatus`
+ * - `link`
+ * - `extlink`
+ * - `timestamp`
+ * - `text`
+ * - `nl2br`
+ * - `code`
+ * - `asciidata`
+ * - `download`
+ * - `raw`
+ * - `deflist`
+ * - `ullist`
+ * - `rawlist`
+ * - `linklist`
+ * - `styled`
+ * - `tooltip`
+ * @param value - value to be formatted - the data type depends on the format
+ */
 export default class OxiFormattedComponent extends Component {
     get format() {
         return (this.args.format || "text");

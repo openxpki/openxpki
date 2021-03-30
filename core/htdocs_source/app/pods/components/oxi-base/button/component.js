@@ -4,49 +4,49 @@ import { action, computed, set } from "@ember/object";
 import { debug } from '@ember/debug';
 
 /**
-Shows a button with an optional confirm dialog.
-
-The component has two modes:
-
-1. show a `<a href/>` tag and simply open the given URL:
-   ```html
-   <OxiBase::Button @button={{myDef2}} class="btn btn-default"/>
-   ```
-2. show a `<button/>` tag and handle clicks via callback:
-   ```html
-   <OxiBase::Button @button={{myDef1}} @onClick={{sendData}} class="btn btn-default"/>
-   ```
-
-@module oxi-button
-@param { hash } button - Hash containing the button definition.
-Mode 1 `<a href>`:
-```javascript
-{
-    format: "primary",
-    label: "Learn",                     // mandatory
-    tooltip: "Just fyi",
-    href: "https://www.openxpki.org",   // mandatory
-    target: "_blank",
-}
-```
-Mode 2 `<button>`:
-```javascript
-{
-    format: "expected",
-    label: "Move",                      // mandatory
-    tooltip: "This should move it",
-    disabled: false,
-    confirm: {
-        label: "Really sure?",          // mandatory if "confirm" exists
-        description: "Think!",          // mandatory if "confirm" exists
-        confirm_label: ""
-        cancel_label: ""
-    },
-}
-```
-@param { callback } onClick - Action handler to be called.
-The `button` hash will be passed on to the handler as single parameter.
-*/
+ * Shows a button with an optional confirm dialog.
+ *
+ * The component has two modes:
+ *
+ * 1. show a `<a href/>` tag and simply open the given URL:
+ *    ```html
+ *    <OxiBase::Button @button={{myDef2}} class="btn btn-default"/>
+ *    ```
+ * 2. show a `<button/>` tag and handle clicks via callback:
+ *    ```html
+ *    <OxiBase::Button @button={{myDef1}} @onClick={{sendData}} class="btn btn-default"/>
+ *    ```
+ *
+ * @param { hash } button - the button definition.
+ * Mode 1 `<a href>`:
+ * ```javascript
+ * {
+ *     format: "primary",
+ *     label: "Learn",                     // mandatory
+ *     tooltip: "Just fyi",
+ *     href: "https://www.openxpki.org",   // mandatory - triggers the <a href...> format
+ *     target: "_blank",
+ * }
+ * ```
+ * Mode 2 `<button>`:
+ * ```javascript
+ * {
+ *     format: "expected",
+ *     label: "Move",                      // mandatory
+ *     tooltip: "This should move it",
+ *     disabled: false,
+ *     confirm: {
+ *         label: "Really sure?",          // mandatory if "confirm" exists
+ *         description: "Think!",          // mandatory if "confirm" exists
+ *         confirm_label: ""
+ *         cancel_label: ""
+ *     },
+ * }
+ * ```
+ * @module oxi-base/button
+ * @param { callback } onClick - Action handler to be called.
+ * The `button` hash will be passed on to the handler as single parameter.
+ */
 
 // mapping of format codes to CSS classes applied to the button
 let format2css = {

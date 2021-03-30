@@ -4,15 +4,16 @@ import { action, computed, set, setProperties } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 
 /**
-Shows a button with an optional confirm dialog.
-
-@module oxisection/grid
-@param { hash } content - Hash containing the grid contents
-```javascript
-{
-}
-```
-*/
+ * Draws a grid.
+ *
+ * @module oxi-section/form
+ * @param { hash } def - section definition
+ * ```javascript
+ * {
+ *     ... // TODO
+ * }
+ * ```
+ */
 export default class OxiSectionGridComponent extends Component {
     @tracked rawData = [];
     @tracked pager = {};

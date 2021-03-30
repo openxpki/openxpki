@@ -1,18 +1,18 @@
 import Helper from "@ember/component/helper";
 
-/*
-
-Interpret the given string as HTML code and remove
-<script> tags and "onXxx" / "javascript" attributes.
-
-Useful for strings that will be output without escaping
-using the triple mustache syntax (see example below).
-
-Example:
-
-    <span>{{{defuse this.label}}}</span>
-
-*/
+/**
+ * Interpret the given string as HTML code and remove
+ * `<script>` tags and `onXxx` / `javascript` attributes.
+ *
+ * Useful for strings that will be output without escaping
+ * using the triple mustache syntax (see example below).
+ *
+ * Example:
+ * ```html
+ * <span>{{{defuse this.label}}}</span>
+ * ```
+ * @module helper/defuse
+ */
 export default class Defuse extends Helper {
     compute([html]) {
         if (html === null || html === undefined) return "";

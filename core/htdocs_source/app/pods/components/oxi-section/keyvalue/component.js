@@ -1,6 +1,17 @@
 import Component from '@glimmer/component';
 import { computed } from '@ember/object';
 
+/**
+ * Draws a list of key/value pairs.
+ *
+ * @module oxi-section/keyvalue
+ * @param { hash } def - section definition
+ * ```javascript
+ * {
+ *     ... // TODO
+ * }
+ * ```
+ */
 export default class OxiSectionKeyvalueComponent extends Component {
     @computed("args.def.data")
     get items() {
