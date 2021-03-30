@@ -647,6 +647,7 @@ export default class TestController extends Controller {
                         page: 'workflow!index!wf_type!certificate_revocation_request_v2',
                     },
                 },
+                { type: 'newline' },
                 {
                     type: 'button', content: {
                         label: 'SCEP Workflow Search',

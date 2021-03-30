@@ -19,6 +19,7 @@ export default class OxiSectionTilesComponent extends Component {
                 result.push(newline);
                 col = 0;
             }
+            if (t.type == 'newline') col = 0;
             result.push(t);
         }
         return result;
