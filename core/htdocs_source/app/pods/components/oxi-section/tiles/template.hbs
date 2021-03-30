@@ -1,0 +1,14 @@
+{{#if @def.tiles.length}}
+    <div class="center-block" style="width:max-content; max-width: 100%">
+        <p class="text-{{this.align}}">
+            {{#each this.tiles as |tile|}}
+                {{#if (eq tile.type "button")}}
+                    <OxiBase::Button @button={{tile.content}} @onClick={{@buttonClick}} class="btn btn-default oxi-tile"/>
+                {{/if}}
+                {{#if (eq tile.type "newline")}}
+                    <br/>
+                {{/if}}
+            {{/each}}
+        </p>
+    </div>
+{{/if}}
