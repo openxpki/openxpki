@@ -22,8 +22,9 @@ use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::DateTime;
 
-
-__PACKAGE__->mk_accessors( qw( proc_state count_try wakeup_at reap_at session_info persist_context is_startup archive_at ) );
+my @PERSISTENT_FIELDS = qw( proc_state count_try wakeup_at reap_at archive_at );
+my @TRANSIENT_FIELDS = qw( session_info persist_context is_startup ); # session_info is a special case: saved, but only read by watchdog
+__PACKAGE__->mk_accessors( @PERSISTENT_FIELDS, @TRANSIENT_FIELDS );
 
 
 my $default_reap_at_interval = '+0000000005';
@@ -117,8 +118,8 @@ sub init {
     # so the persister knows that these shall be deleted from the storage.
     $self->{_attributes} = {};
 
-    my $proc_state = 'init';
-    my $count_try =  0;
+    $self->proc_state('init');
+    $self->count_try(0);
 
     # For existing workflows - check for the watchdog extra fields
     if ($id) {
@@ -126,11 +127,9 @@ sub init {
         my $wf_info   = $persister->fetch_workflow($id);
 
         # fetch additional infos from database:
-        $count_try = $wf_info->{count_try} if ($wf_info->{count_try});
-        $proc_state = $wf_info->{proc_state} if ($wf_info->{proc_state});
-
-        $self->wakeup_at( $wf_info->{wakeup_at} );
-        $self->reap_at( $wf_info->{reap_at} );
+        for my $attr (@PERSISTENT_FIELDS) {
+            $self->$attr($wf_info->{$attr}) if ($wf_info->{$attr});
+        }
     } else {
         $self->is_startup(1);
     }
@@ -140,10 +139,6 @@ sub init {
     # so we clear the cache in the current state anytime we init a workflow
     # see jonasbn/perl-workflow#9
     $self->_get_workflow_state()->clear_condition_cache();
-
-    ##! 16: 'count try: '.$count_try
-    $self->count_try( $count_try );
-    $self->proc_state( $proc_state );
 
     return $self;
 }
