@@ -249,7 +249,7 @@ For each given string C<NAME> the following packages are tried for Moose role
 application: C<NAME> (unmodified string), C<OpenXPKI::Test::Role::NAME>,
 C<OpenXPKI::Test::QA::Role::NAME>
 
-=item * I<add_config> (optional) - I<HashRef|Str> with additional configuration
+=item * I<add_config> (optional) - I<HashRef> with additional configuration
 entries that complement or replace the default config.
 
 Keys are the dot separated configuration paths, values are HashRefs or YAML
