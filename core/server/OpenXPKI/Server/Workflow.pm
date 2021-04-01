@@ -23,7 +23,8 @@ use OpenXPKI::Serialization::Simple;
 use OpenXPKI::DateTime;
 
 my @PERSISTENT_FIELDS = qw( proc_state count_try wakeup_at reap_at archive_at );
-my @TRANSIENT_FIELDS = qw( session_info persist_context is_startup ); # session_info is a special case: saved, but only read by watchdog
+# "session_info" is a special case: saved, but only read by watchdog
+my @TRANSIENT_FIELDS = qw( session_info persist_context is_startup is_forced_fail );
 __PACKAGE__->mk_accessors( @PERSISTENT_FIELDS, @TRANSIENT_FIELDS );
 
 
@@ -120,6 +121,7 @@ sub init {
 
     $self->proc_state('init');
     $self->count_try(0);
+    $self->is_forced_fail(0);
 
     # For existing workflows - check for the watchdog extra fields
     if ($id) {
@@ -351,7 +353,10 @@ sub set_failed {
     my $error = shift;
     my $reason = shift;
 
-    $self->_fail($error, $reason);
+    $self->is_forced_fail(1); # flag for persister
+
+    $self->persist_context(2); # enforce DB update of context parameters and attributes as persister may remove them
+    $self->_fail($error, $reason); # also saves to DB
 
     return $self;
 
@@ -379,7 +384,7 @@ sub set_archived {
         user => CTX('session')->data->user,
     });
 
-    $self->persist_context(2); # enforce DB update of context parameters and attributes
+    $self->persist_context(2); # enforce DB update of context parameters and attributes as persister may remove them
     $self->_save();
 
     CTX('log')->workflow->info(sprintf('Archived workflow %s (type %s)', $self->id, $self->type));
