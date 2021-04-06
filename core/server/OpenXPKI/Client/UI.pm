@@ -709,7 +709,11 @@ sub handle_login {
 
             $session->flush();
 
-            $result->init_index();
+            if ($authinfo->{login}) {
+                $result->redirect( $authinfo->{login} );
+            } else {
+                $result->init_index();
+            }
             return $result->render();
         }
     }
