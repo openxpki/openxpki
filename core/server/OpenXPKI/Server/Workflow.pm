@@ -355,7 +355,6 @@ sub set_failed {
 
     $self->is_forced_fail(1); # flag for persister
 
-    $self->persist_context(2); # enforce DB update of context parameters and attributes as persister may remove them
     $self->_fail($error, $reason); # also saves to DB
 
     return $self;
@@ -384,7 +383,6 @@ sub set_archived {
         user => CTX('session')->data->user,
     });
 
-    $self->persist_context(2); # enforce DB update of context parameters and attributes as persister may remove them
     $self->_save();
 
     CTX('log')->workflow->info(sprintf('Archived workflow %s (type %s)', $self->id, $self->type));
