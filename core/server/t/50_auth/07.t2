@@ -1,49 +1,53 @@
+#!/usr/bin/perl
 use strict;
 use warnings;
+
+# Core modules
 use English;
+use FindBin qw( $Bin );
+
+# CPAN modules
 use Test::More;
-plan tests => 5;
+use Test::Deep;
+use Test::Exception;
 
-diag "OpenXPKI::Server::ACL Correctness\n" if $ENV{VERBOSE};
+# Project modules
+use lib "$Bin/../lib";
+use OpenXPKI::Test;
 
-use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Server::Init;
-use OpenXPKI::Server::Session;
-use OpenXPKI::Server::ACL;
+plan tests => 14;
 
-## init XML cache
-OpenXPKI::Server::Init::init(
-    {
-	TASKS => [
-        'config_test',
-        'log',
-        'dbi',
-    ],
-	SILENT => 1,
-    });
+# when adding authlayer alone the system is missing the crypto tokens
+# but adding the other roles kills the auth layer overload...
+my $oxitest = OpenXPKI::Test->new(
+    with => qw( AuthLayer ),
+    add_config => {
+        "realm.test.auth.handler.Cert" => { 
+            type => 'ClientX509',            
+            role => 'System',
+            trust_anchor => { realm => 'test' }            
+        },
+    }
+);
 
-## create new session
-my $session = OpenXPKI::Server::Session->new(
-    type => "File",
-    config => { directory => "t/50_auth/", },
-)->create;
-ok($session, 'Session object creation');
-ok(OpenXPKI::Server::Context::setcontext({session => $session}), 'Set session in CTX');
 
-## configure the session
-$session->data->pki_realm("Test Root CA");
-$session->data->role("CA Operator");
-$session->is_valid(1);
-ok($session->is_valid, 'Session made valid');
+use_ok "OpenXPKI::Server::Authentication::ClientX509";
 
-## initialize the ACL
-my $acl = OpenXPKI::Server::ACL->new();
-ok($acl, 'ACL object instantiated');
+$oxitest->insert_testcerts();
+my $pem = $oxitest->certhelper_database->cert("alpha-alice-2")->data;
 
-## start the real ACL tests
+my $auth = OpenXPKI::Server::Authentication::ClientX509->new('auth.handler.Cert');
+ok (defined $auth);
 
-ok($acl->authorize ({ACTIVITYCLASS => "Test::Test",
-                     ACTIVITY      => "Test::activity",
-                     AFFECTED_ROLE => "User"}), 'authorize');
+my $user = $auth->handleInput({});
+ok (!defined $user);
+
+$user = $auth->handleInput({ certificate => $pem });
+ok (defined $user);
+
+is(ref $user, 'OpenXPKI::Server::Authentication::Handle');
+ok($user->is_valid());
+is_deeply($user->userinfo(), {realname => 'John Doe'});
+ok($user->role() eq 'NotSoAnon');
 
 1;

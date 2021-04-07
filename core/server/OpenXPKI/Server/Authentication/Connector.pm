@@ -46,9 +46,8 @@ sub handleInput {
         error_message => 'Password connector did not return a scalar'
     ) if (defined $result && ref $result ne '');
 
-    CTX('log')->auth()->info("Login successful for user $username with role " . $self->role());
     # fetch userinfo from handler- will be undef if not set
-    my $userinfo = CTX('config')->get_hash( [ @{$self->prefix()}, 'user', $username ] );
+    my $userinfo = $self->get_userinfo($username);
 
     return OpenXPKI::Server::Authentication::Handle->new(
         username => $username,

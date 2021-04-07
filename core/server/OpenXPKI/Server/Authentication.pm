@@ -20,6 +20,8 @@ use OpenXPKI::Server::Context qw( CTX );
 
 use OpenXPKI::Server::Authentication::Handle;
 
+# preload to get debug working
+use  OpenXPKI::Server::Authentication::Base;
 ## constructor and destructor stuff
 
 sub new {
@@ -379,7 +381,6 @@ sub login_step {
             message => 'I18N_OPENXPKI_UI_AUTHENTICATION_FAILED',
             error => $last_result->error_message(),
             authinfo => $last_result->authinfo(),
-            log => { facility => 'auth', priority => 'error' },
         );
     }
 

@@ -68,6 +68,9 @@ sub BUILD {
 
     if (my $arg = $config->get([ @prefix, 'arg' ])) {
         $self->user_arg($arg);
+        OpenXPKI::Exception->throw(
+            message => 'x509 client authentication: certificate as argument without handler!',
+        ) if ($arg eq "certificate" && !CTX('config')->exists([ @prefix, 'user' ]));
     }
 
 }
@@ -116,10 +119,6 @@ sub _validation_result {
     } elsif ($arg eq "cert_identifier") {
         $username = $x509_signer->get_cert_identifier();
     } elsif ($arg eq "certificate") {
-        OpenXPKI::Exception->throw(
-            message => 'x509 client authentication: certificate as argument without handler!',
-            log => { priortity => 'fatal', facility => 'system' }
-        ) if (!$has_handler);
         $username = $x509_signer->pem;
     } else {
         $arg = uc($arg);
@@ -135,7 +134,7 @@ sub _validation_result {
     my $role = $self->default_role();
 
     if ($has_handler) {
-        $userinfo = CTX('config')->get_hash( [ @prefix,  'user', $username ] );
+        $userinfo = $self->get_userinfo($username);
 
         return OpenXPKI::Server::Authentication::Handle->new(
             username => $username,

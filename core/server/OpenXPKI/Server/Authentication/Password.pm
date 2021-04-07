@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Moose;
+use Data::Dumper;
 use OpenXPKI::Debug;
 use OpenXPKI::Password;
 use OpenXPKI::Server::Authentication::Handle;
@@ -33,6 +34,7 @@ sub handleInput {
     if (!$role) {
         $userinfo = CTX('config')->get_hash( [ @{$self->prefix()}, 'user', $username ] );
         ##! 64: $userinfo
+        $self->logger->trace("Got userinfo for #$username#: " . Dumper $userinfo) if ($self->logger->is_trace);
         $digest = $userinfo->{digest} || '';
         delete $userinfo->{digest};
         $role = $userinfo->{role} || '';

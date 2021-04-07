@@ -37,6 +37,8 @@ sub handleInput {
     my $self  = shift;
     my $msg   = shift;
 
+    $self->logger->debug('Incoming auth using Anonymous handler');
+
     my %email = $self->email() ? ( email => $self->email() ) : ();
     return OpenXPKI::Server::Authentication::Handle->new(
         username => $self->user(),

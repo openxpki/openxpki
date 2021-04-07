@@ -15,7 +15,6 @@ use Moose;
 
 extends 'OpenXPKI::Server::Authentication::X509';
 
-
 sub handleInput {
 
     ##! 1: 'start'
@@ -28,8 +27,18 @@ sub handleInput {
 
     return unless($certificate);
 
+    $self->logger->debug('Incoming auth with x509 handler');
+    $self->logger->trace("Login using x509 certificate:\n$certificate") if ($self->logger->is_trace);
+
     my $trust_anchors = $self->trust_anchors();
     ##! 32: 'trust anchors ' . Dumper $trust_anchors
+
+    $self->logger->trace("Trust Anchors: ". Dumper $trust_anchors) if ($self->logger->is_trace);
+
+    return OpenXPKI::Server::Authentication::Handle->new(
+        error_message => 'No trustanchors defined',
+        error => OpenXPKI::Server::Authentication::Handle::UNKNOWN_ERROR,
+    ) unless($trust_anchors);
 
     my $validate = CTX('api2')->validate_certificate(
         pem => $msg->{certificate},

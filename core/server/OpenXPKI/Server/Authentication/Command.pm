@@ -62,6 +62,9 @@ sub handleInput {
             # run template toolkit in case there are tags in the string
             $value = $self->toolkit()->render($value, $msg) if ($value =~ m{\[%});
 
+            next unless($value ne '');
+
+            $self->logger->debug("Adding env key $name");
             # set environment for executable
             $ENV{$name} = $value;
         }
@@ -89,6 +92,8 @@ sub handleInput {
     my ($out, $retval) = Proc::SafeExec::backtick(@cmd);
     map { delete $ENV{$_} } @clearenv; # clear environment
 
+    $self->logger->debug("Got return value $retval / $out");
+
     ##! 2: "command returned $retval, STDOUT was: $out"
     if ($retval != 0) {
         return OpenXPKI::Server::Authentication::Handle->new(
@@ -106,6 +111,7 @@ sub handleInput {
     } else {
 
         if ($self->has_output_template()) {
+            $self->logger->debug("Render output template for role");
             $out = $self->toolkit()->render($self->output_template, { out => $out });
         }
         # trim whitespace on both ends

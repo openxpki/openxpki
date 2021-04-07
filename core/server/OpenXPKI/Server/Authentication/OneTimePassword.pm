@@ -8,6 +8,7 @@ use OpenXPKI::Server::Authentication::Handle;
 use OpenXPKI::Server::Context qw( CTX );
 
 use Moose;
+use Data::Dumper;
 use Digest::SHA;
 use MIME::Base64;
 
@@ -43,12 +44,12 @@ sub handleInput {
 
     return unless ($token);
 
+    $self->logger->debug('OTP login - hashed token - ' . $hashed_key );
+
     my $ctx = Digest::SHA->new();
     $ctx->add($token);
     $ctx->add($self->salt());
     my $hashed_key = $ctx->hexdigest;
-
-    CTX('log')->auth()->debug('OTP login - hashed token - ' . $hashed_key );
 
     my $val = CTX('api2')->get_data_pool_entry(
         namespace => $self->namespace(),
@@ -59,6 +60,8 @@ sub handleInput {
         username => $token,
         error => OpenXPKI::Server::Authentication::Handle::USER_UNKNOWN
     ) if (!$val->{value});
+
+    $self->logger->trace('Got OTP token ' . Dumper $val ) if ($self->logger->is_trace);
 
     return OpenXPKI::Server::Authentication::Handle->new(
         username => $token,

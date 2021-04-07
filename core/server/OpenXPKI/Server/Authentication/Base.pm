@@ -2,7 +2,6 @@ package OpenXPKI::Server::Authentication::Base;
 
 use strict;
 use warnings;
-
 use Moose;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
@@ -27,6 +26,14 @@ has authinfo => (
     default => sub { return {} },
 );
 
+has logger => (
+    lazy => 1,
+    is => 'rw',
+    isa => 'Object',
+    default => sub { return CTX('log')->auth(); }
+);
+
+
 around BUILDARGS => sub {
     my $orig = shift;
     my $class = shift;
@@ -36,10 +43,10 @@ around BUILDARGS => sub {
 
     my $config = CTX('config');
     my $args = { prefix => \@path };
-    for my $attr ( $class->meta->get_all_attributes ) {
-        my $attrname = $attr->name();
+    for my $attr ( $class->meta->get_all_attributes ) {        
+        my $attrname = $attr->name();        
         next if $attrname =~ m/^_/; # skip apparently internal params
-        my $meta = $config->get_meta( [ @path , $attrname ] );
+        my $meta = $config->get_meta( [ @path , $attrname ] );        
         next unless($meta && $meta->{TYPE});
         if ($meta->{TYPE} eq 'scalar') {
             $args->{$attrname} = $config->get( [ @path , $attrname ] );
@@ -50,8 +57,24 @@ around BUILDARGS => sub {
             $args->{$attrname} = $config->get_hash( [ @path , $attrname ] );
         }
     }
+    ##! 32: 'Bootstrap handler '.$path[-1]
+    ##! 64: $args
+
     return $class->$orig(%{$args});
+
 };
+
+# fetch the userinfo from prefix.user, expects the username as parameter
+# and returns an (empty) hash. Classes should use this to allow an easy
+# expansion of this functionality
+sub get_userinfo {
+
+    my $self = shift;
+    my $username = shift;
+    my $userinfo = CTX('config')->get_hash( [ @{$self->prefix()}, 'user', $username ] );
+    return $userinfo || {};
+
+}
 
  1;
 
