@@ -3114,8 +3114,8 @@ sub __render_fields {
             my @val;
             if ($item->{value} && (ref $item->{value} eq 'HASH')) {
                 @val = map { { label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};
+                $item->{value} = \@val;
             }
-            $item->{value} = \@val;
 
         } elsif ($item->{format} eq "grid") {
 
@@ -3308,6 +3308,7 @@ sub __render_fields {
             # 2. the template renderer strips whitespaces off the very beginning which would destroy things
             my $yaml = "OXI_PLACEHOLDER:\n" . $field->{yaml_template};
             ##! 64: 'Rendering value: ' . $item->{value}
+            $self->logger->debug('Template value: ' . Dumper $item );
             my $out = $self->send_command_v2('render_template', {
                 template => $yaml,
                 params => { value => $item->{value} },
