@@ -31,6 +31,7 @@ sub execute {
     $context->param({
         'cert_subject_parts' => '',
         'cert_san_parts' => '',
+        'cert_info' => '',
     });
 
     # Source hash
@@ -88,12 +89,12 @@ sub execute {
 
     ##! 32: 'Merged DN ' . Dumper \%hashed_dn
 
-
+    my $userinfo = CTX('session')->data->userinfo || {};
     my $cert_subject_parts = CTX('api2')->preset_subject_parts_from_profile(
         profile => $cert_profile,
         style => $cert_subject_style,
         section => 'subject',
-        preset => \%hashed_dn
+        preset =>  { %hashed_dn, ( userinfo => $userinfo ) },
     );
 
     $param->{'cert_subject_parts'} = $serializer->serialize( $cert_subject_parts );
@@ -139,8 +140,7 @@ sub execute {
         }
     }
 
-    # call preset on cert_info block with, add userinfo from session if set
-    my $userinfo = CTX('session')->data->userinfo || {};
+    # call preset on cert_info block with userinfo from session
     my $cert_info = CTX('api2')->preset_subject_parts_from_profile(
         profile => $cert_profile,
         style => $cert_subject_style,

@@ -236,11 +236,12 @@ sub execute {
 
     } else {
 
+        my $userinfo = CTX('session')->data->userinfo || {};
         my $cert_subject_parts = CTX('api2')->preset_subject_parts_from_profile(
             profile => $cert_profile,
             style => $cert_subject_style,
             section => 'subject',
-            preset => \%hashed_dn
+            preset =>  { %hashed_dn, ( userinfo => $userinfo ) },
         );
 
         $param->{$subject_prefix.'subject_parts'} = $serializer->serialize( $cert_subject_parts );
@@ -282,8 +283,7 @@ sub execute {
             }
         }
 
-        # call preset on cert_info block with, add userinfo from session if set
-        my $userinfo = CTX('session')->data->userinfo || {};
+        # call preset on cert_info block with userinfo from session
         my $cert_info = CTX('api2')->preset_subject_parts_from_profile(
             profile => $cert_profile,
             style => $cert_subject_style,

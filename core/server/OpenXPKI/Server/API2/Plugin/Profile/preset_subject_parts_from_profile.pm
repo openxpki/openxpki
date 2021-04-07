@@ -37,6 +37,40 @@ of the given style
 
 =back
 
+The parser knows four different notations for the preset rules.
+
+=over
+
+=item clonable field word.X
+
+Expects $param->{word} to be an array and creates one field item for
+each value. The I<X> is a literal character.
+
+=item DN component rdn / rdn.n
+
+Create a field using the n-th value of the dn component I<rdn>. If I<n>
+is not given the first component is used. E.g. to set a field to the
+commonName of a used CSR write I<CN> or I<CN.0>. To use the second
+occurence of "organizational unit" write I<OU.1>.
+
+The list of supported RDNs is I<C|ST|O|OU|CN|DC|L|UID|SN|GN>.
+
+=item additional data word.key
+
+If additional key/value data was passed as input, e.g. the userinfo hash
+you can access those items writing e.g. I<userinfo.email>. To avoid any
+ambigouties the section name must be lowercase and match the key of the
+hash in the input data, the latter key can use any word character.
+
+=item template
+
+If none of the above rules is matched, the string is handed over to
+template toolkit using the preset hash as variable input. If the field
+is clonable, the result is split at the pipe symbol and a field is added
+for each non-empty item.
+
+=back
+
 =cut
 command "preset_subject_parts_from_profile" => {
     profile => { isa => 'AlphaPunct', required => 1, },
@@ -73,7 +107,9 @@ command "preset_subject_parts_from_profile" => {
         my @val;
         if ($preset =~ m{ \A \s* (\w+)\.X \s* \z }xs) {
             my $comp = $1;
-            ##! 32: 'Hashed DN Component ' . Dumper $hashed_dn{$comp}
+            ##! 16: "Clonable field $comp"
+            ##! 64: $params->preset->{$comp}
+            next FIELDS unless (ref $params->preset->{$comp} eq 'ARRAY');
             foreach my $v (@{$params->preset->{$comp}}) {
                 ##! 16: 'clonable iterator value ' . $v
                 push @val, $v if (defined $v && $v ne '');
@@ -85,6 +121,18 @@ command "preset_subject_parts_from_profile" => {
             my $pos = $3 || 0;
             my $val = $params->preset->{$comp}->[$pos];
             ##! 16: "Fixed dn component $comp/$pos: $val"
+            if (defined $val && $val ne '') {
+                @val = ($val);
+            }
+
+        # something like "userinfo.email", matches only lowercase, letter only
+        # first parts to avoid conflicts with DN components
+        } elsif ($preset =~ m{ \A \s* ([a-z]+)\.(\w+) \s* \z }xs) {
+            my $sect = $1;
+            my $comp = $2;
+            ##! 16: "Extra info $sect -> $comp"
+            next FIELDS unless (ref $params->preset->{$sect} eq 'HASH');
+            my $val = $params->preset->{$sect}->{$comp};
             if (defined $val && $val ne '') {
                 @val = ($val);
             }
