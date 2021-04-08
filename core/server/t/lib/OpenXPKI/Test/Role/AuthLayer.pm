@@ -21,7 +21,7 @@ requires "testenv_root";
 
 before 'init_user_config' => sub { # ... so we do not overwrite user supplied configs
     my $self = shift;
-    $self->add_config(
+    $self->add_conf(
         "system.realms.test" => { label => "AuthTestRealm", baseurl => "http://127.0.0.1/test/" },
         "realm.test.auth.stack" => {
             Testing => { handler => 'Testing', type => 'passwd' },

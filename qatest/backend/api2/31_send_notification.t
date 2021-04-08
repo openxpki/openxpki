@@ -56,6 +56,6 @@ lives_and {
             forbidden => "move",
         },
     });
-    my $url = $oxitest->get_config("system.realms.test.baseurl");
+    my $url = $oxitest->get_conf("system.realms.test.baseurl");
     like $TestNotificationDummyHandler::RESULT, qr{ rock .* move .* \Q$url\E }msxi;
 } "Invoke notification handler";

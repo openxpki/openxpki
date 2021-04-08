@@ -464,16 +464,16 @@ has config_writer => (
         )
     },
     handles => {
-        add_config => "add_config",
-        get_config => "get_config_node",
+        add_conf => "add_config",
+        get_conf => "get_config_node",
         default_realm => "default_realm",
     },
 );
-=head2 add_config
+=head2 add_conf
 
 Just a shortcut to L<OpenXPKI::Test::ConfigWriter/add_config>.
 
-=head2 get_config
+=head2 get_conf
 
 Just a shortcut to L<OpenXPKI::Test::ConfigWriter/get_config_node>.
 
@@ -713,8 +713,8 @@ So in a role you can e.g. inject configuration entries as follows:
         my $self = shift;
 
         # do not overwrite existing node (e.g. inserted by other roles)
-        if (not $self->config_writer->get_config_node("a.b.c", 1)) {
-            $self->add_config(
+        if (not $self->get_conf("a.b.c", 1)) {
+            $self->add_conf(
                 "a.b.c" => {
                     key => "value",
                 },
@@ -725,7 +725,7 @@ So in a role you can e.g. inject configuration entries as follows:
 =cut
 sub init_base_config {
     my ($self) = @_;
-    $self->add_config(
+    $self->add_conf(
         "system.database" => $self->conf_database,
         "system.server.session" => $self->conf_session,
         "system.server.log4perl" => $self->path_log4perl_conf,
@@ -746,13 +746,13 @@ sub init_user_config {
         if (ref $val eq '') {
             $val = YAML::Tiny->read_string($val)->[0];
         }
-        $self->add_config($_ => $val);
+        $self->add_conf($_ => $val);
     }
     # Add basic test realm if no other realm exists.
     # Without any realm we cannot set a user via CTX('authentication')
     if (scalar @{ $self->config_writer->get_realms } == 0) {
         note "Setting up a basic PKI realm 'test' as no other realm was defined";
-        $self->add_config(
+        $self->add_conf(
             "system.realms.test" => { label => "TestRealm", baseurl => "http://127.0.0.1/test/" },
             "realm.test.auth" => $self->auth_config,
         );
@@ -808,7 +808,7 @@ sub init_server {
     my @tasks = qw( config_versioned dbi_log api2 authentication );
     # init notification object if needed
     my $cfg_notification = "realm.".$self->default_realm.".notification";
-    if ($self->get_config($cfg_notification, 1)) {
+    if ($self->get_conf($cfg_notification, 1)) {
         note "Config node $cfg_notification found, initializing real CTX('notification') object";
         push @tasks, "notification";
     }

@@ -26,8 +26,8 @@ before 'init_user_config' => sub { # ... so we do not overwrite user supplied co
     my $self = shift;
 
     # do not overwrite existing node (e.g. inserted by OpenXPKI::Test::QA::Role::SampleConfig)
-    if (not $self->config_writer->get_config_node("system.crypto.token.default", 1)) {
-        $self->add_config(
+    if (not $self->get_conf("system.crypto.token.default", 1)) {
+        $self->add_conf(
             "system.crypto.token.default" => {
                 backend   => "OpenXPKI::Crypto::Backend::OpenSSL",
                 api       => "OpenXPKI::Crypto::Backend::API",

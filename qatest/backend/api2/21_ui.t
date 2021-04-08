@@ -116,7 +116,7 @@ lives_and {
 # get_menu
 
 lives_and {
-    my $refdata = $oxitest->get_config("realm.democa.uicontrol.CA Operator");
+    my $refdata = $oxitest->get_conf("realm.democa.uicontrol.CA Operator");
     my $data = $oxitest->api2_command('get_menu');
     cmp_deeply $data, $refdata;
 } "get_menu";

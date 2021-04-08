@@ -193,7 +193,7 @@ sub ui_client {
     my $client = MockUI->new({
         session => $session,
         logger => CTX('log')->system,
-        config => { socket => $oxitest->get_config('system.server.socket_file') },
+        config => { socket => $oxitest->get_conf('system.server.socket_file') },
     });
 
     $client->update_rtoken();

@@ -59,7 +59,7 @@ before 'init_user_config' => sub { # ... so we do not overwrite user supplied co
 
     # sample realms
     for my $realm (@{ $self->test_realms }) {
-        $self->add_config(
+        $self->add_conf(
             "realm.$realm" => {
                 "auth" => $self->auth_config, # $self->auth_config comes from OpenXPKI::Test
                 "crypto" => $self->_crypto($realm),
@@ -80,7 +80,7 @@ before 'init_user_config' => sub { # ... so we do not overwrite user supplied co
                 "crl" => { "default" => $self->_crl_default },
             },
         );
-        $self->add_config(
+        $self->add_conf(
             "system.realms.$realm" => $self->_system_realm($realm)
         );
     }
