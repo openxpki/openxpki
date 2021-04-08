@@ -114,7 +114,7 @@ sub init {
 
     $self->{_CURRENT_ACTION} = '';
 
-    # Workflow attributes (should be stored by persistor class).
+    # Workflow attributes (should be stored by persister class).
     # Values set to "undef" will be stored like that in $self->{_attributes},
     # so the persister knows that these shall be deleted from the storage.
     $self->{_attributes} = {};
