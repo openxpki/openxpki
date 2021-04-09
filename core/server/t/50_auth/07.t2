@@ -20,12 +20,12 @@ plan tests => 14;
 # when adding authlayer alone the system is missing the crypto tokens
 # but adding the other roles kills the auth layer overload...
 my $oxitest = OpenXPKI::Test->new(
-    with => qw( AuthLayer ),
+    with => [ qw( TestRealms AuthLayer CryptoLayer ) ],
     add_config => {
-        "realm.test.auth.handler.Cert" => { 
-            type => 'ClientX509',            
+        "realm.alpha.auth.handler.Cert" => {
+            type => 'ClientX509',
             role => 'System',
-            trust_anchor => { realm => 'test' }            
+            trust_anchor => { realm => 'alpha' }
         },
     }
 );
@@ -34,7 +34,7 @@ my $oxitest = OpenXPKI::Test->new(
 use_ok "OpenXPKI::Server::Authentication::ClientX509";
 
 $oxitest->insert_testcerts();
-my $pem = $oxitest->certhelper_database->cert("alpha-alice-2")->data;
+my $pem = $oxitest->certhelper_database->cert("beta-alice-1")->data;
 
 my $auth = OpenXPKI::Server::Authentication::ClientX509->new('auth.handler.Cert');
 ok (defined $auth);
