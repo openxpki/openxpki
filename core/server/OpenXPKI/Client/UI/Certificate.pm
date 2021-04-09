@@ -685,9 +685,9 @@ sub init_detail {
         }},
     );
 
-    # certificate metadata
-
+    # certificate metadata - show only for certificates from the current or empty realm
     if ((my $metadata_config = $self->_client->session()->param('certdetails')->{metadata}) &&
+        (!$cert->{pki_realm} || $cert->{pki_realm} eq $self->_session->param('pki_realm')) &&
         (my $cert_attrs = $self->send_command_v2( get_cert_attributes => { identifier => $cert_identifier, attribute => 'meta_%' }, 1))) {
         my @metadata_lines;
         for my $cfg (@$metadata_config) {
@@ -751,8 +751,9 @@ sub init_detail {
     }
 
 
-    # hide the related link if there is no data to display
-    if ($self->send_command_v2 ( "get_cert_attributes", { identifier => $cert_identifier, attribute => "system_workflow%" })) {
+    # hide the related link if there is no data to display or cert is not from this realm
+    if (($cert->{pki_realm} eq $self->_session->param('pki_realm')) &&
+        ($self->send_command_v2 ( "get_cert_attributes", { identifier => $cert_identifier, attribute => "system_workflow%" }))) {
         push @fields, { label => 'I18N_OPENXPKI_UI_CERT_RELATED_LABEL', format => 'link', value => {
           page => 'certificate!related!identifier!'.$cert_identifier,
             label => 'I18N_OPENXPKI_UI_CERT_RELATED_HINT'
@@ -1085,7 +1086,12 @@ sub action_autocomplete {
             format => 'DBINFO',
         });
 
-        if ($search_result) {
+        if (!$search_result) {
+
+        } elsif ($search_result->{pki_realm} ne $self->_session->param('pki_realm')) {
+            # silently swallow this result and stop searching
+            $term = "";
+        } else {
             push @result, {
                 value => $search_result->{identifier},
                 label => $self->_escape($search_result->{subject}),

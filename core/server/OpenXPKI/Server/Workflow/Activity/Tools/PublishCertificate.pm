@@ -56,7 +56,6 @@ sub execute {
     # no targets returned
     return unless ($target);
 
-
     my $unpublish = $self->param('unpublish') || 0;
     ##! 16: 'Start publishing - load certificate for identifier ' . $cert_identifier
 
@@ -69,6 +68,7 @@ sub execute {
         columns => \@cols,
         where => {
            identifier => $cert_identifier,
+           pki_realm => CTX('session')->data->pki_realm,
         },
     );
 

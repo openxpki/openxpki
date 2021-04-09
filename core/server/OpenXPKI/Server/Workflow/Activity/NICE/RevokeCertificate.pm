@@ -1,7 +1,3 @@
-# OpenXPKI::Server::Workflow::Activity::NICE::RevokeCertificate
-# Written by Oliver Welter for the OpenXPKI Project 2011
-# Copyright (c) 2011 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::NICE::RevokeCertificate;
 
 use strict;
@@ -13,6 +9,7 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Database; # to get AUTO_ID
+use Workflow::Exception qw(configuration_error workflow_error);
 
 use OpenXPKI::Server::NICE::Factory;
 
@@ -31,29 +28,24 @@ sub execute {
     ##! 16: 'start revocation for cert identifier' . $cert_identifier
     my $cert = $dbi->select_one(
         from => 'certificate',
-        columns => [ 'identifier', 'reason_code', 'invalidity_time', 'status' ],
+        columns => [ 'identifier', 'reason_code', 'invalidity_time', 'status', 'pki_realm' ],
         where => { identifier => $cert_identifier },
     );
 
-    if (! defined $cert) {
-       OpenXPKI::Exception->throw(
-           message => 'nice certificate to revoked not found in database',
-           params => { identifier => $cert_identifier }
-       );
+    if (!defined $cert) {
+        workflow_error('nice certificate to revoked not found in database');
+    }
+
+    if ($cert->{pki_realm} ne CTX('session')->data->pki_realm) {
+        workflow_error('Certificate is not in the current realm');
     }
 
     if ($cert->{status} ne 'ISSUED') {
-        OpenXPKI::Exception->throw(
-            message => 'certificate to be revoked is not in issued state',
-            params => { identifier => $cert_identifier, status => $cert->{status} }
-        );
+        workflow_error('certificate to be revoked is not in issued state');
     }
 
     if (!$cert->{reason_code}) {
-        OpenXPKI::Exception->throw(
-            message => 'nice certificate to be revoked has no reason code set',
-            params => { identifier => $cert_identifier }
-        );
+        workflow_error('nice certificate to be revoked has no reason code set');
     }
 
     CTX('log')->application()->info("start cert revocation for identifier $cert_identifier, workflow " . $workflow->id);
