@@ -44,12 +44,12 @@ sub handleInput {
 
     return unless ($token);
 
-    $self->logger->debug('OTP login - hashed token - ' . $hashed_key );
-
     my $ctx = Digest::SHA->new();
     $ctx->add($token);
     $ctx->add($self->salt());
     my $hashed_key = $ctx->hexdigest;
+
+    $self->logger->debug("OTP login - plain token: $token - hashed token/dp key: $hashed_key");
 
     my $val = CTX('api2')->get_data_pool_entry(
         namespace => $self->namespace(),
