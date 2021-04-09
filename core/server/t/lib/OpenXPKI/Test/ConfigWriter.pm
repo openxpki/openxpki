@@ -233,15 +233,4 @@ sub get_realms {
     return [ keys %{ $self->_config->{system}->{realms} } ];
 }
 
-=head2 default_realm
-
-Returns the first defined test realm. The result may be different if other roles
-are applied to C<OpenXPKI::Test>.
-
-=cut
-sub default_realm {
-    my ($self) = @_;
-    return $self->get_realms->[0];
-}
-
 __PACKAGE__->meta->make_immutable;

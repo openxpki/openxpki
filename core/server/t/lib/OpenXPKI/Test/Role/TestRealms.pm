@@ -84,13 +84,8 @@ before 'init_user_config' => sub { # ... so we do not overwrite user supplied co
             "system.realms.$realm" => $self->_system_realm($realm)
         );
     }
-};
 
-after 'init_session_and_context' => sub {
-    my $self = shift;
-    # set PKI realm after init() as various init procedures overwrite the realm
-    my $realm = shift @{ $self->test_realms };
-    $self->set_user($realm => "user") if $self->has_session;
+    $self->default_realm(shift @{ $self->test_realms }); # set first one as default
 };
 
 sub _crypto {

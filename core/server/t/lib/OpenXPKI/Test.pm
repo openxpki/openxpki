@@ -466,7 +466,6 @@ has config_writer => (
     handles => {
         add_conf => "add_config",
         get_conf => "get_config_node",
-        default_realm => "default_realm",
     },
 );
 =head2 add_conf
@@ -477,11 +476,20 @@ Just a shortcut to L<OpenXPKI::Test::ConfigWriter/add_config>.
 
 Just a shortcut to L<OpenXPKI::Test::ConfigWriter/get_config_node>.
 
+=cut
+
+
 =head2 default_realm
 
-Just a shortcut to L<OpenXPKI::Test::ConfigWriter/default_realm>.
+Returns the configured default realm.
 
 =cut
+has default_realm => (
+    is => 'rw',
+    isa => 'Str',
+    init_arg => undef,
+    predicate => 'has_default_realm',
+);
 
 =head2 session
 
@@ -653,6 +661,9 @@ B<Only called internally:> initialize logging.
 =cut
 sub init_logging {
     my ($self) = @_;
+
+    note "Test-Framework: init_logging";
+
     OpenXPKI::Log4perl->init_or_fallback( \($self->_log4perl_screen) );
 
     # additional workflow log (database)
@@ -725,6 +736,9 @@ So in a role you can e.g. inject configuration entries as follows:
 =cut
 sub init_base_config {
     my ($self) = @_;
+
+    note "Test-Framework: init_base_config";
+
     $self->add_conf(
         "system.database" => $self->conf_database,
         "system.server.session" => $self->conf_session,
@@ -740,6 +754,21 @@ constructor parameter C<add_config> to L<OpenXPKI::Test::ConfigWriter>.
 =cut
 sub init_user_config {
     my ($self) = @_;
+
+    note "Test-Framework: init_user_config";
+
+    # Add basic test realm.
+    # Without any realm we cannot set a user via CTX('authentication')
+    $self->add_conf(
+        "system.realms.test" => {
+            label => "TestRealm",
+            baseurl => "http://127.0.0.1/test/",
+        },
+        "realm.test.auth" => $self->auth_config,
+        "realm.test.workflow.def" => {},
+    );
+
+    # Add user supplied config (via constructor argument "add_config")
     for (sort keys %{ $self->user_config }) { # sorting should help adding config items deeper in the tree after those at the top
         my $val = $self->user_config->{$_};
         # support config given as YAML string
@@ -748,14 +777,13 @@ sub init_user_config {
         }
         $self->add_conf($_ => $val);
     }
-    # Add basic test realm if no other realm exists.
-    # Without any realm we cannot set a user via CTX('authentication')
-    if (scalar @{ $self->config_writer->get_realms } == 0) {
-        note "Setting up a basic PKI realm 'test' as no other realm was defined";
-        $self->add_conf(
-            "system.realms.test" => { label => "TestRealm", baseurl => "http://127.0.0.1/test/" },
-            "realm.test.auth" => $self->auth_config,
-        );
+
+    if (not $self->has_default_realm) {
+        note "Setting default realm to 'test' as no other realm was set";
+        $self->default_realm('test');
+    }
+    else {
+        note "Default realm: ".$self->default_realm;
     }
 }
 
@@ -766,6 +794,8 @@ B<Only called internally:> write test configuration to disk (temporary directory
 =cut
 sub write_config {
     my ($self) = @_;
+
+    note "Test-Framework: write_config";
 
     # write configuration YAML files
     $self->config_writer->create;
@@ -800,24 +830,29 @@ B<Only called internally:> initializes the basic server context objects:
 sub init_server {
     my ($self) = @_;
 
+    note "Test-Framework: init_server";
+
     # init log object (and force it to NOT reinitialize Log4perl)
     OpenXPKI::Server::Context::setcontext({ log => OpenXPKI::Server::Log->new(CONFIG => undef) })
         unless OpenXPKI::Server::Context::hascontext("log"); # may already be set if multiple instances of OpenXPKI::Test are created
 
     # init basic CTX objects
     my @tasks = qw( config_versioned dbi_log api2 authentication );
+
     # init notification object if needed
     my $cfg_notification = "realm.".$self->default_realm.".notification";
     if ($self->get_conf($cfg_notification, 1)) {
         note "Config node $cfg_notification found, initializing real CTX('notification') object";
         push @tasks, "notification";
     }
-    my %task_hash = map { $_ => 1 } @tasks;
+
     # add tasks requested via constructor parameter "also_init" (or injected by roles)
+    my %task_hash = map { $_ => 1 } @tasks;
     for (grep { not $task_hash{$_} } @{ $self->also_init }) {
         push @tasks, $_;
         $task_hash{$_} = 1; # prevent duplicate tasks in "also_init"
     }
+
     OpenXPKI::Server::Init::init({ TASKS  => \@tasks, SILENT => 1, CLI => 0 });
 
     # use the same DB connection as the test object to be able to do COMMITS
@@ -856,6 +891,8 @@ This is the standard hook for roles to modify session data, e.g.:
 =cut
 sub init_session_and_context {
     my ($self) = @_;
+
+    note "Test-Framework: init_session_and_context";
 
     $self->session(OpenXPKI::Server::Session->new(load_config => 1)->create);
 

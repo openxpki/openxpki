@@ -142,12 +142,8 @@ before 'init_base_config' => sub { # happens before init_user_config() so we do 
     $self->_load_default_config("system/server.yaml",   $self->can('_customize_system_server'));   # can() returns a CodeRef
     $self->_load_default_config("system/version.yaml");
     $self->_load_default_config("system/watchdog.yaml", $self->can('_customize_system_watchdog')); # can() returns a CodeRef
-};
 
-after 'init_session_and_context' => sub {
-    my $self = shift;
-    # set PKI realm after init() as various init procedures overwrite the realm
-    $self->session->data->pki_realm("democa") if $self->has_session;
+    $self->default_realm("democa");
 };
 
 # Loads the given default config YAML and adds it to the test environment,
