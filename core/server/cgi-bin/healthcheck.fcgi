@@ -12,7 +12,7 @@ use JSON;
 use OpenXPKI::Client;
 use Log::Log4perl qw(:easy);
 
-Log::Log4perl->easy_init($ERROR);
+Log::Log4perl->easy_init($FATAL);
 
 my $client;
 my $json = new JSON();
@@ -31,7 +31,9 @@ sub __client {
                 SOCKETFILE => $socketfile,
             });
             $client->init_session();
+            DEBUG("Got new client: " . $client->session_id());
         };
+        ERROR("Unable to bootstrap client: $EVAL_ERROR") if ($EVAL_ERROR);
     }
     return $client;
 }
@@ -39,14 +41,17 @@ sub __client {
 sub ping {
     my $cgi = shift;
 
-    my $client = __client();
+    # if client is not set try to bootstrap it
+    $client ||= __client();
     if (!$client || !$client->is_connected()) {
         print $cgi->header( -type => 'application/json', charset => 'utf8', -status => 500 );
         print $json->encode({ ping => 0 });
         $client = undef;
+        ERROR("ping failed");
     } else {
         print $cgi->header( -type => 'application/json', charset => 'utf8', -status => 200 );
         print $json->encode({ ping => 1 });
+        TRACE("ping ok");
     }
 }
 
@@ -57,7 +62,7 @@ sub showenv {
     print $json->encode( \%ENV );
 
 }
-
+DEBUG("Start healtcheck pid $$");
 while (my $cgi = CGI::Fast->new()) {
 
     $ENV{REQUEST_URI} =~ m{healthcheck/(\w+)};
@@ -72,4 +77,5 @@ while (my $cgi = CGI::Fast->new()) {
 
 }
 
+DEBUG("Healtcheck terminated pid $$");
 $client->close_connection() if ($client);
