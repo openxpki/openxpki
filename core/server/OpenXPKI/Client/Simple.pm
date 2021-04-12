@@ -388,6 +388,8 @@ sub _build_client {
             die "Unsupported login scheme: $login_type. Stopped";
         }
 
+        $data = $self->__jwt_signature($data, $reply->{SIGN}) if ($reply->{SIGN});
+
         $log->trace("Auth data ". Dumper $data) if $log->is_trace;
         $reply = $client->send_receive_service_msg('GET_'.$login_type.'_LOGIN', $data );
         $self->last_reply( $reply );
@@ -400,6 +402,22 @@ sub _build_client {
     }
     return $client;
 }
+
+
+sub __jwt_signature {
+
+    my $self = shift;
+    my $payload = shift;
+    my $jws = shift;
+
+    my $auth = $self->auth();
+    return unless($auth->{'sign.key'});
+    $self->logger()->debug('Sign data using key id ' . $jws->{keyid} );
+    my $pkey = decode_base64($auth->{'sign.key'});
+    return encode_jwt(payload => $payload, key=> \$pkey, alg=>'ES256');
+
+}
+
 
 sub run_legacy_command {
     my $self = shift;

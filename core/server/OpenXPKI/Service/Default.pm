@@ -511,27 +511,8 @@ sub __handle_GET_PASSWD_LOGIN : PRIVATE {
     ##! 1: 'start'
     my $self    = shift;
     my $ident   = ident $self;
-    my $message = shift;
 
-    ## do not let users with non-ASCII characters in their username
-    ## log in, as this will cause a crash on the web interface. This
-    ## is a known bug (#1909037), and this code is here as a workaround
-    ## until it is fixed.
-    if (exists $message->{PARAMS}->{LOGIN}) {
-    if (! defined $message->{PARAMS}->{LOGIN}) {
-        OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_SERVICE_DEFAULT_GET_PASSWD_USERNAME_UNDEFINED',
-        );
-    }
-
-    if ($message->{PARAMS}->{LOGIN} !~ m{ \A \p{IsASCII}+ \z }xms) {
-        OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_SERVICE_DEFAULT_GET_PASSWD_LOGIN_NON_ASCII_USERNAME_BUG',
-        );
-    }
-    }
-
-    return $self->__handle_login( $message );
+    return $self->__handle_login( shift );
 
 }
 
@@ -540,8 +521,7 @@ sub __handle_GET_CLIENT_LOGIN : PRIVATE {
     my $self = shift;
     my $msg  = shift;
 
-    # SSO login is basically handled in the same way as password login
-    return $self->__handle_GET_PASSWD_LOGIN($msg);
+    return $self->__handle_login( shift );
 }
 
 sub __handle_GET_X509_LOGIN : PRIVATE {
@@ -549,8 +529,7 @@ sub __handle_GET_X509_LOGIN : PRIVATE {
     my $self = shift;
     my $msg  = shift;
 
-    # X509 login is handled the same as password login, too
-    return $self->__handle_GET_PASSWD_LOGIN($msg);
+    return $self->__handle_login( shift );
 }
 
 sub __handle_LOGOUT : PRIVATE {

@@ -270,11 +270,18 @@ while (my $cgi = CGI::Fast->new()) {
     my $result;
     eval {
 
+        my %pkey;
+        if ($conf->{auth}->{'sign.key'}) {
+            my $pk = decode_base64($conf->{auth}->{'sign.key'});
+            $pkey{auth} = \$pk;
+        }
+
         my $client = OpenXPKI::Client::UI->new({
             backend => $backend_client,
             session => $session_front,
             logger => $log,
-            config => $conf->{global}
+            config => $conf->{global},
+            %pkey,
         });
 
         $result = $client->handle_request({ cgi => $cgi });

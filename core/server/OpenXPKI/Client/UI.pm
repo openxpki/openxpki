@@ -8,6 +8,8 @@ use CGI::Session;
 use URI::Escape;
 use Log::Log4perl::MDC;
 use Data::Dumper;
+use Crypt::JWT qw(encode_jwt);
+use MIME::Base64;
 use OpenXPKI::Template;
 use OpenXPKI::Client;
 use OpenXPKI::i18n qw( i18nGettext );
@@ -45,6 +47,14 @@ has '_config' => (
     is => 'ro',
     isa => 'HashRef',
     init_arg => 'config',
+);
+
+# holds key object to sign socket communication
+has '_auth' => (
+    is => 'ro',
+    isa => 'Ref',
+    init_arg => 'auth',
+    predicate => 'has_auth',
 );
 
 # Hold warnings from init
@@ -306,6 +316,21 @@ sub __get_action {
 
 }
 
+
+sub __jwt_signature {
+
+    my $self = shift;
+    my $payload = shift;
+    my $jws = shift;
+
+    return unless($self->has_auth());
+
+    $self->logger()->debug('Sign data using key id ' . $jws->{keyid} );
+    my $pkey = $self->_auth();
+    return encode_jwt(payload => $payload, key=> $pkey, alg=>'ES256');
+
+}
+
 sub handle_page {
 
     my $self = shift;
@@ -533,6 +558,7 @@ sub handle_login {
         ## FIXME - need a good way to configure login handlers
         $self->logger()->info('Requested login type ' . $login_type );
         my $auth = $reply->{PARAMS};
+        my $jws = $reply->{SIGN};
 
         # SSO Login uses data from the ENV, so no need to render anything
         if ( $login_type eq 'CLIENT' ) {
@@ -555,6 +581,9 @@ sub handle_login {
             # at least some items were found so we send them to the backend
             if ($data) {
                 $self->logger()->trace('Sending auth data ' . Dumper $data) if $self->logger->is_trace;
+
+                $data = $self->__jwt_signature($data, $jws) if ($jws);
+
                 $reply = $self->backend()->send_receive_service_msg( 'GET_CLIENT_LOGIN', $data );
 
             # as nothing was found we do not even try to login in and look for a redirect
@@ -590,8 +619,11 @@ sub handle_login {
                     last unless ($chaincert);
                     push @chain, $chaincert;
                 }
-                $reply =  $self->backend()->send_receive_service_msg( 'GET_X509_LOGIN',
-                    { certificate => $cert, chain => \@chain } );
+
+                my $data = { certificate => $cert, chain => \@chain };
+                $data = $self->__jwt_signature($data, $jws) if ($jws);
+
+                $reply =  $self->backend()->send_receive_service_msg( 'GET_X509_LOGIN', $data);
                 $self->logger()->trace('Auth result ' . Dumper $reply) if $self->logger->is_trace;
             } else {
                 $self->logger()->error('Certificate missing for X509 Login');
@@ -616,6 +648,8 @@ sub handle_login {
                     next unless ($val);
                     $data->{$field} = $val;
                 }
+
+                $data = $self->__jwt_signature($data, $jws) if ($jws);
 
                 $reply = $self->backend()->send_receive_service_msg( 'GET_PASSWD_LOGIN', $data );
                 $self->logger()->trace('Auth result ' . Dumper $reply) if $self->logger->is_trace;
