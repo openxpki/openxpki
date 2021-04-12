@@ -51,6 +51,7 @@ use File::Temp;
 use Proc::ProcessTable;
 
 # Project modules
+use OpenXPKI::VERSION;
 use OpenXPKI::Debug;
 
 
@@ -159,11 +160,35 @@ sub start {
         }
     }
 
-    ## this is only an informal message and not an error - so do not use STDERR
-    print STDOUT "Starting OpenXPKI...\n" if (not $silent);
+    if ($config->{depend} && (my $core = $config->{depend}->{core})) {
+        my ($Major, $Minor) = ($OpenXPKI::VERSION::VERSION =~ m{\A(\d)\.(\d+)});
+        my ($major, $minor) = ($core =~ m{\A(\d)\.(\d+)});
+        if ($major != $Major) {
+            print STDERR "Major version of code and config differs - unable to proceed\n";
+            return 1;
+        }
+        if ($Minor < $minor) {
+            print STDERR sprintf "Config dependancy (%s) not fullfilled by this release (%s)\n",
+                $core, $OpenXPKI::VERSION::VERSION;
+            return 1;
+        }
+    } else {
+        print STDERR "Config depend is not set - unable to check config prereq!\n";
+        print STDERR "Hint: Add expected minimum version to 'system.version.depend.core'\n";
+    }
+
+    if (not $silent) {
+        eval {require OpenXPKI::Enterprise;};
+        if ($EVAL_ERROR) {
+            print STDOUT "Starting OpenXPKI Community Edition v$OpenXPKI::VERSION::VERSION\n";
+        } else {
+            print STDOUT "Starting OpenXPKI Enterprise Edition v$OpenXPKI::VERSION::VERSION\n";
+            if ($config->{license}) {
+                print STDOUT OpenXPKI::Enterprise::get_license_string($config->{license})."\n";
+            }
+        }
+    }
     unlink $pidfile if ($pidfile && -e $pidfile);
-
-
 
     # fork off server launcher
     my $redo_count = 0;
@@ -412,6 +437,20 @@ sub status {
     return 0;
 }
 
+sub version {
+
+    my $args = shift;
+    my $config = OpenXPKI::Control::__probe_config( $args );
+    eval {require OpenXPKI::Enterprise;};
+    if ($EVAL_ERROR) {
+        print STDOUT "OpenXPKI Community Edition v$OpenXPKI::VERSION::VERSION\n\n";
+    } else {
+        print STDOUT "OpenXPKI Enterprise Edition v$OpenXPKI::VERSION::VERSION\n";
+        print STDOUT OpenXPKI::Enterprise::get_license_string($config->{license})."\n";
+    }
+    return 0;
+
+}
 
 =head2 reload
 
@@ -596,6 +635,8 @@ sub __probe_config {
         PIDFILE  => $config->get('system.server.pid_file') || '',
         SOCKETFILE => $config->get('system.server.socket_file') || '',
         TYPE => $config->get('system.server.type') || 'Fork',
+        depend => $config->get_hash('system.version.depend') || undef,
+        license => $config->get('system.license') || '',
     };
 
 }

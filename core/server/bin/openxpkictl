@@ -45,7 +45,7 @@ if ($params{version}) {
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
 pod2usage(-verbose => 1) if ($params{help});
 if (scalar @ARGV != 1) {
-    print STDERR "Usage: openxpkictl [OPTIONS] start|stop|restart|reload|status\n";
+    print STDERR "Usage: openxpkictl [OPTIONS] start|stop|restart|reload|status|version\n";
     exit 0;
 }
 
@@ -68,7 +68,12 @@ Log::Log4perl->easy_init($ERROR);
 
 my $cmd = shift;
 
-if ($cmd eq 'status') {
+if ($cmd eq 'version') {
+
+    OpenXPKI::Control::version( $args );
+    exit 0;
+
+} elsif ($cmd eq 'status') {
 
     if (OpenXPKI::Control::status( $args )) {
         exit 3;
@@ -161,7 +166,7 @@ openxpkictl [options] COMMAND
    reload           Reload the configuration
    restart          Restart OpenXPKI daemon
    status           Get OpenXPKI daemon status
-   version          Print the OpenXPKI version info
+   version          Print the OpenXPKI version and license info
 
 See below for supported options.
 
@@ -191,6 +196,10 @@ Restarts the OpenXPKI daemon.
 =item B<status>
 
 Checks the OpenXPKI daemon status.
+
+=item B<version>
+
+Print information on the version and license.
 
 =back
 
