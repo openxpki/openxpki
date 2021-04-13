@@ -1444,10 +1444,6 @@ msgstr "Usa la history del workflow per auditing o per la ricerca di errori"
 msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_NAME"
 msgstr "Nessun dato disponibile"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_REPORT_SUMMARY"
-msgstr "Report Riassuntivo"
-
 # Remove?
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_REPORT_TIMELINE_LABEL"
@@ -3867,9 +3863,6 @@ msgstr "Questo Workflow è definitivamente fallito."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_LABEL"
 msgstr "FALLIMENTO"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
-msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato."
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_LABEL"
 msgstr "Stato"
 
@@ -4739,6 +4732,10 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_EXPIRY"
 #~ msgstr "Certificato in Scadenza"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_REPORT_SUMMARY"
+#~ msgstr "Report Riassuntivo"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
@@ -5944,6 +5941,10 @@ msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_LABEL"
 #~ msgstr "Seriale"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
+#~ msgstr ""
+#~ "Questo Workflow è definitivamente fallito e non può essere riavviato."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRW_INITIAL_DESC"

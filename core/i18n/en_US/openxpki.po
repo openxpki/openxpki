@@ -1193,9 +1193,6 @@ msgstr "Report Details"
 msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_NAME"
 msgstr "Report Name"
 
-msgid "I18N_OPENXPKI_UI_REPORT_SUMMARY"
-msgstr "Certificate Status Summary"
-
 msgid "I18N_OPENXPKI_UI_REPORT_TIMELINE_LABEL"
 msgstr "Certificate Lifecycle Report"
 
@@ -3267,10 +3264,6 @@ msgstr "This workflow failed finally."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_LABEL"
 msgstr "FAILURE"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
-msgstr "This workflow failed finally and can not be restarted"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_LABEL"
 msgstr " "
 
@@ -3955,6 +3948,9 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_BASIC_LABEL"
 #~ msgstr "TLS Client / Default Naming"
 
+#~ msgid "I18N_OPENXPKI_UI_REPORT_SUMMARY"
+#~ msgstr "Certificate Status Summary"
+
 #~ msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_HISTORY"
 #~ msgstr ""
 #~ "You do not have the required privileges to access the workflow history"
@@ -4146,6 +4142,10 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_LABEL"
 #~ msgstr "Issue CRL"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
+#~ msgstr "This workflow failed finally and can not be restarted"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_DESC"

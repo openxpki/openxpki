@@ -1204,9 +1204,6 @@ msgstr "Report Details"
 msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_NAME"
 msgstr "Report Name"
 
-msgid "I18N_OPENXPKI_UI_REPORT_SUMMARY"
-msgstr "Übersicht Zertifikate"
-
 msgid "I18N_OPENXPKI_UI_REPORT_TIMELINE_LABEL"
 msgstr "Zertifikat Lebenszyklus Report"
 
@@ -3445,9 +3442,6 @@ msgstr "Dieser Workflow ist fehlgeschlagen"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_LABEL"
 msgstr "FEHLER"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
-msgstr ""
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_LABEL"
 msgstr " "
 
@@ -4185,6 +4179,9 @@ msgstr "ja"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_BASIC_LABEL"
 #~ msgstr "TLS Client / Default Naming"
+
+#~ msgid "I18N_OPENXPKI_UI_REPORT_SUMMARY"
+#~ msgstr "Übersicht Zertifikate"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_SECRET_GROUP_DOES_NOT_EXIST"

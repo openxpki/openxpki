@@ -1209,10 +1209,6 @@ msgstr "报告详情"
 msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_NAME"
 msgstr "报告名称"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_REPORT_SUMMARY"
-msgstr "证书状态摘要"
-
 # Remove?
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_REPORT_TIMELINE_LABEL"
@@ -3304,10 +3300,6 @@ msgstr "此工作流程最终失败。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_LABEL"
 msgstr "失败"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
-msgstr "此工作流程最终失败，无法重新启动"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_LABEL"
 msgstr " "
 
@@ -3967,6 +3959,10 @@ msgstr "是"
 #~ msgstr "TLS Client / Default Naming"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_REPORT_SUMMARY"
+#~ msgstr "证书状态摘要"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_SECRET_GROUP_DOES_NOT_EXIST"
 #~ msgstr "证书不存在"
 
@@ -4161,6 +4157,10 @@ msgstr "是"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_LABEL"
 #~ msgstr "签署CRL"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
+#~ msgstr "此工作流程最终失败，无法重新启动"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_DESC"
 #~ msgstr "此工作流程已成功完成，无法重新启动"

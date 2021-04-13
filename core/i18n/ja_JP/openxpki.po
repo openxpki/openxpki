@@ -1242,10 +1242,6 @@ msgstr "レポートの詳細"
 msgid "I18N_OPENXPKI_UI_REPORT_LIST_REPORT_NAME"
 msgstr "レポート名"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_REPORT_SUMMARY"
-msgstr "証明書の概要"
-
 # Remove?
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_REPORT_TIMELINE_LABEL"
@@ -3445,10 +3441,6 @@ msgstr "このワークフローは失敗しました。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_LABEL"
 msgstr "失敗"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
-msgstr "このワークフローは正常に終了しました。"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_LABEL"
 msgstr " "
 
@@ -4167,6 +4159,10 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_EXPIRY"
 #~ msgstr "有効期限切れレポート"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_REPORT_SUMMARY"
+#~ msgstr "証明書の概要"
 
 #~ msgid "I18N_OPENXPKI_UI_SCANALYZE_UNKNOWN_BACKEND_ERROR"
 #~ msgstr "証明書の状態を取得する処理でエラーが発生しました。"
@@ -5314,6 +5310,10 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_LABEL"
 #~ msgstr "初期化中"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
+#~ msgstr "このワークフローは正常に終了しました。"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_DESC"
 #~ msgstr "このワークフローは成功しました。"
