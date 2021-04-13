@@ -1976,6 +1976,9 @@ msgstr "Please update / complete the information below."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Update Request"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL"
+msgstr "Archive after"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Workflow Attributes"
 
@@ -2805,6 +2808,26 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_X509_TOOLTIP"
 msgstr "Your PEM encoded certificate"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_BUTTON"
+msgstr "Archive"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_CANCEL_BUTTON"
+msgstr "Abort"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_CONFIRM_BUTTON"
+msgstr "Archive Workflow"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_LABEL"
+msgstr "Archive Workflow"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_TEXT"
+msgstr ""
+"Are you sure to archive this workflow? Depending on the workflow "
+"configuration this may lead to the deletion of some or all "
+"information like workflow fields, attributes and/or history.<br>"
+"<b>This action can not be undone!</b><br><br>Pressing 'Abort' will leave the "
+"workflow untouched."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON"
 msgstr "Force Failure"
 
@@ -3027,6 +3050,9 @@ msgstr "Pause Reason"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE"
 msgstr "Process State"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_ARCHIVED"
+msgstr "archived"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
 msgstr "exception"
 
@@ -3196,6 +3222,12 @@ msgstr "A new user account was created"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_SUCCESS_LABEL"
 msgstr "New User Created"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED"
+msgstr "This workflow was archived."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED_DESC"
+msgstr "This workflow was archived."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_DESC"
 msgstr "This workflow was canceled."

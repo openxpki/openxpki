@@ -62,21 +62,22 @@ has __default_wfdetails => (
             field => 'type',
         },
         {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL',
+            field => 'context.creator',
+        },
+        {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL',
-            field => 'state'
+            template => "[% IF state == 'SUCCESS' %]<b>Success</b>[% ELSE %][% state %][% END %]",
+            type => "raw",
         },
         {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL',
             field => 'proc_state',
         },
-        {
-            label => 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL',
-            field => 'context.creator',
-        },
     ] },
 );
 
-has __proc_states  => (
+has __proc_states_for_search  => (
     is => 'rw',
     isa => 'ArrayRef',
     lazy => 1,
@@ -86,6 +87,7 @@ has __proc_states  => (
         { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED', value => 'retry_exceeded' },
         { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION', value => 'exception' },
         { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED', value => 'finished' },
+        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_ARCHIVED', value => 'archived' },
     ]; }
 );
 
@@ -526,7 +528,7 @@ sub init_search {
           type => 'select',
           is_optional => 1,
           prompt => '',
-          options => $self->__proc_states(),
+          options => $self->__proc_states_for_search(),
           value => $preset->{wf_proc_state}
         },
         { name => 'wf_state',
@@ -782,7 +784,7 @@ sub init_export {
     my @head;
     my @cols;
 
-    my $ii = 0;    
+    my $ii = 0;
     foreach my $col (@{$header}) {
         # skip hidden fields
         if ((!defined $col->{bVisible} || $col->{bVisible}) && $col->{sTitle} !~ /\A_/)  {
@@ -802,8 +804,8 @@ sub init_export {
     foreach my $line (@lines) {
         my @t = @{$line};
         # this hides invisible fields (assumes that hidden fields are always at the end)
-        $buffer .= join("\t", @t[0..$colcnt])."\n" 
-    }    
+        $buffer .= join("\t", @t[0..$colcnt])."\n"
+    }
 
     if (scalar @{$search_result} == $limit) {
         $buffer .= "I18N_OPENXPKI_UI_CERT_EXPORT_EXCEEDS_LIMIT"."\n";
@@ -814,7 +816,7 @@ sub init_export {
         -expires => "1m",
         -attachment => "workflow export " . DateTime->now()->iso8601() .  ".txt"
     );
-    
+
     print i18nTokenizer($buffer);
     exit;
 
@@ -1216,7 +1218,7 @@ sub action_index {
         # purge the workflow token
         $self->__purge_wf_token( $wf_token );
 
-    } elsif($wf_args->{wf_type}) {
+    } elsif ($wf_args->{wf_type}) {
 
         $wf_info = $self->send_command_v2( 'create_workflow_instance', {
             workflow => $wf_args->{wf_type}, params => \%wf_param, ui_info => 1
@@ -1244,7 +1246,13 @@ sub action_index {
         # always redirect after create to have the url pointing to the created workflow
         # do not redirect for "one shot workflows" or workflows already in a final state
         # as they might hold volatile data (e.g. key download)
-        $wf_args->{redirect} = ($wf_info->{workflow}->{id} > 0 && ($wf_info->{workflow}->{proc_state} ne 'finished'));
+        my $proc_state = $wf_info->{workflow}->{proc_state};
+
+        $wf_args->{redirect} = (
+            $wf_info->{workflow}->{id} > 0
+            and $proc_state ne 'finished'
+            and $proc_state ne 'archived'
+        );
 
     } else {
         $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION!','error');
@@ -1285,8 +1293,8 @@ sub action_index {
 
 =head2 action_handle
 
-Execute a workflow internal action (fail, resume, wakeup). Requires the
-workflow and action to be set in the wf_token info.
+Execute a workflow internal action (fail, resume, wakeup, archive). Requires
+the workflow and action to be set in the wf_token info.
 
 =cut
 
@@ -1311,6 +1319,8 @@ sub action_handle {
         return $self;
     }
 
+    my $handle = $wf_args->{wf_handle};
+
     if (!$wf_args->{wf_handle}) {
         $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_HANDLE_WITHOUT_ACTION!','error');
         return $self;
@@ -1319,23 +1329,27 @@ sub action_handle {
     Log::Log4perl::MDC->put('wfid', $wf_args->{wf_id});
 
 
-    if ($wf_args->{wf_handle} eq 'fail') {
+    if ('fail' eq $handle) {
         $self->logger()->info(sprintf "Workflow %01d set to failure by operator", $wf_args->{wf_id} );
 
         $wf_info = $self->send_command_v2( 'fail_workflow', {
             id => $wf_args->{wf_id},
         });
-    } elsif ($wf_args->{wf_handle} eq 'wakeup') {
+    } elsif ('wakeup' eq $handle) {
         $self->logger()->info(sprintf "Workflow %01d trigger wakeup", $wf_args->{wf_id} );
         $wf_info = $self->send_command_v2( 'wakeup_workflow', {
             id => $wf_args->{wf_id}, async => 1, wait => 1
         });
-    } elsif ($wf_args->{wf_handle} eq 'resume') {
+    } elsif ('resume' eq $handle) {
         $self->logger()->info(sprintf "Workflow %01d trigger resume", $wf_args->{wf_id} );
         $wf_info = $self->send_command_v2( 'resume_workflow', {
             id => $wf_args->{wf_id}, async => 1, wait => 1
         });
-
+    } elsif ('archive' eq $handle) {
+        $self->logger()->info(sprintf "Workflow %01d trigger archive", $wf_args->{wf_id} );
+        $wf_info = $self->send_command_v2( 'archive_workflow', {
+            id => $wf_args->{wf_id}
+        });
     }
 
     $self->__render_from_workflow({ wf_info => $wf_info });
@@ -1821,7 +1835,7 @@ sub __render_from_workflow {
 
         $self->logger()->debug('Adding global actions ' . join('/', @handles));
 
-        if (grep /wakeup/, @handles) {
+        if (grep /\A wakeup \Z/x, @handles) {
             my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'wakeup' } );
             push @buttons_handle, {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_WAKEUP_BUTTON',
@@ -1830,7 +1844,7 @@ sub __render_from_workflow {
             }
         }
 
-        if (grep /resume/, @handles) {
+        if (grep /\A resume \Z/x, @handles) {
             my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'resume' } );
             push @buttons_handle, {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESUME_BUTTON',
@@ -1839,7 +1853,7 @@ sub __render_from_workflow {
             };
         }
 
-        if (grep /fail/, @handles) {
+        if (grep /\A fail \Z/x, @handles) {
             my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'fail' } );
             push @buttons_handle, {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON',
@@ -1850,6 +1864,21 @@ sub __render_from_workflow {
                     description => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_TEXT',
                     confirm_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_CONFIRM_BUTTON',
                     cancel_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_CANCEL_BUTTON',
+                }
+            };
+        }
+
+        if (grep /\A archive \Z/x, @handles) {
+            my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'archive' } );
+            push @buttons_handle, {
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_BUTTON',
+                action => 'workflow!handle!wf_token!'.$token->{value},
+                format => 'exceptional',
+                confirm => {
+                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_LABEL',
+                    description => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_TEXT',
+                    confirm_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_CONFIRM_BUTTON',
+                    cancel_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_CANCEL_BUTTON',
                 }
             };
         }
@@ -2065,6 +2094,7 @@ sub __render_from_workflow {
         my $context = $wf_info->{workflow}->{context};
         my @fields;
         my @fielddesc;
+
         foreach my $field (@{$wf_action_info->{field}}) {
 
             my $name = $field->{name};
@@ -2147,27 +2177,33 @@ sub __render_from_workflow {
             ($wf_info->{workflow}->{id} ? (canonical_uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}) : ()),
         });
 
-        # set status decorator on final states, uses proc state
-        # to finalize without status message use state name "NOSTATUS"
-        # some field types are able to override the status during render so
+        # Set status decorator on final states (uses proc_state).
+        # To finalize without status message use state name "NOSTATUS".
+        # Some field types are able to override the status during render so
         # this might not be the final status line!
         if ( $wf_info->{state}->{status} && ref $wf_info->{state}->{status} eq 'HASH' ) {
-
             $self->_status( $wf_info->{state}->{status} );
 
-        } elsif ($wf_proc_state eq 'finished') {
+        # Finished workflow
+        } elsif ('finished' eq $wf_proc_state) {
             # add special colors for success and failure
-
-            if ( $wf_info->{workflow}->{state} eq 'SUCCESS') {
-                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_SUCCESS','success');
-            } elsif ( $wf_info->{workflow}->{state} eq 'FAILURE') {
-                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_FAILURE','error');
-            } elsif ( $wf_info->{workflow}->{state} eq 'CANCELED') {
-                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_CANCELED','warn');
-            } elsif ( $wf_info->{workflow}->{state} ne 'NOSTATUS') {
-
-                $self->set_status( 'I18N_OPENXPKI_UI_WORKFLOW_STATUS_MISC_FINAL','warn');
+            my $state = $wf_info->{workflow}->{state};
+            if ('SUCCESS' eq $state) {
+                $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATUS_SUCCESS', 'success');
             }
+            elsif ('FAILURE' eq $state) {
+                $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATUS_FAILURE', 'error');
+            }
+            elsif ('CANCELED' eq $state) {
+                $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATUS_CANCELED', 'warn');
+            }
+            elsif ('NOSTATUS' eq $state) {
+                $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATUS_MISC_FINAL', 'warn');
+            }
+
+        # Archived workflow
+        } elsif ('archived' eq $wf_proc_state) {
+            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED', 'info');
         }
 
         my $fields = $self->__render_fields( $wf_info, $view );
@@ -2177,7 +2213,7 @@ sub __render_from_workflow {
         # Add action buttons
         my $buttons = $self->__get_action_buttons( $wf_info ) ;
 
-       if (!@$fields && $wf_info->{workflow}->{state} eq 'INITIAL') {
+        if (!@$fields && $wf_info->{workflow}->{state} eq 'INITIAL') {
             # initial step of workflow without fields
             $self->add_section({
                 type => 'text',
@@ -2286,7 +2322,7 @@ sub __render_from_workflow {
         # undef = no right box
         if (defined $wfdetails_config) {
 
-            if ($view eq 'result' && $wf_info->{workflow}->{proc_state} !~ /(finished|failed)/) {
+            if ($view eq 'result' && $wf_info->{workflow}->{proc_state} !~ /(finished|failed|archived)/) {
                 push @buttons_handle, {
                     href => '#/openxpki/redirect!workflow!load!wf_id!'.$wf_info->{workflow}->{id},
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
@@ -3219,7 +3255,7 @@ sub __render_fields {
                     if ($sum) {
                         my $divider = 100 / $sum;
 
-                        map {  $_ *= $divider } @val;
+                        @val = map {  $_ * $divider } @val;
 
                         unshift @val, '';
                         $item->{value} = [ \@val ];
@@ -3379,7 +3415,9 @@ sub __render_workflow_info {
     my $wfdetails_info;
     # if needed, fetch enhanced info incl. workflow attributes
     if (
+        # if given info hash doesn't contain attribute data...
         not($wf_info->{workflow}->{attribute}) and (
+            # ...but default wfdetails reference attribute.*
                grep { ($_->{field}//'') =~              / attribute\. /msx } @$wfdetails_config
             or grep { ($_->{template}//'') =~           / attribute\. /msx } @$wfdetails_config
             or grep { (($_->{link}//{})->{page}//'') =~ / attribute\. /msx } @$wfdetails_config

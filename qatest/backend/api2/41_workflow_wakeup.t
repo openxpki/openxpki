@@ -52,7 +52,7 @@ my $workflow_def = {
         },
     },
     'acl' => {
-        'User' => { creator => 'any', techlog => 1, history => 1 },
+        'User' => { creator => 'any', techlog => 1, history => 1, wakeup => 1 },
     },
 };
 

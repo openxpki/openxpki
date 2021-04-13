@@ -335,12 +335,13 @@ as a I<HashRef>:
             count_try   => ...,
             wake_up_at  => ...,
             reap_at     => ...,
+            archive_at  => ...,
             context     => { ... },
             attribute   => { ... },   # only if "with_attributes => 1"
         },
 
         # only if "with_ui_info => 1":
-        handles  => [ ... ],          # global actions currently allowed: "wakeup", "resume" and/or "fail"
+        handles  => [ ... ],          # global actions currently allowed: "wakeup", "resume", "fail" etc.
         activity => { ... },          # currently available actions
         state => {
             button => { ... },
@@ -405,6 +406,7 @@ sub get_wf_info {
             count_try   => $workflow->count_try,
             wake_up_at  => $workflow->wakeup_at,
             reap_at     => $workflow->reap_at,
+            archive_at  => $workflow->archive_at,
             context     => { %{$workflow->context->param } }, # make a copy
             $args{with_attributes} ? ( attribute => $workflow->attrib ) : (),
         }
@@ -412,9 +414,8 @@ sub get_wf_info {
 
     return $basic_wf_info unless $args{with_ui_info};
 
-    my $activity_state_info = $self->get_activity_and_state_info(
+    my $action_state_info = $self->factory->get_action_and_state_info(
         $workflow->type,
-        $head->{prefix},
         $workflow->state,
         # fetch actions of current state (or use given action):
         [ $args{activity} ? $args{activity} : $workflow->get_current_actions() ],
@@ -426,93 +427,9 @@ sub get_wf_info {
         %{ $basic_wf_info },
         # activity => { ... }
         # state => { ... }
-        %{ $activity_state_info },
+        %{ $action_state_info },
         # handles => [ ... ]
         handles => $workflow->get_global_actions(),
-    };
-}
-
-# Returns a HashRef with configuration details (actions, states) of the given
-# workflow type and state.
-sub get_activity_and_state_info {
-    my ($self, $type, $prefix, $state, $actions, $context) = positional_args(\@_,   # OpenXPKI::MooseParams
-        { isa => 'Str', },
-        { isa => 'Str', },
-        { isa => 'Str', },
-        { isa => 'ArrayRef', },
-        { isa => 'HashRef|Undef', optional => 1, default => sub { {} } },
-    );
-    ##! 4: 'start'
-
-    #
-    # add activities (= actions)
-    #
-    my $action_info = {};
-
-    OpenXPKI::Connector::WorkflowContext::set_context($context) if $context;
-    for my $action (@{ $actions }) {
-        $action_info->{$action} = $self->factory->get_action_info($action, $type);
-    }
-    OpenXPKI::Connector::WorkflowContext::set_context() if $context;
-
-    #
-    # add state UI info
-    #
-    my $state_info = CTX('config')->get_hash([ 'workflow', 'def', $type, 'state', $state ]);
-
-    # replace hash key "output" with detailed field informations
-    if ($state_info->{output}) {
-        my @output_fields = ref $state_info->{output} eq 'ARRAY'
-            ? @{ $state_info->{output} }
-            : CTX('config')->get_list([ 'workflow', 'def', $type, 'state', $state, 'output' ]);
-
-        # query detailed field informations
-        $state_info->{output} = [ map { $self->factory->get_field_info($_, $type) } @output_fields ];
-    }
-
-    # add button info
-    my $button = $state_info->{button};
-    $state_info->{button} = {};
-
-    # possible actions (options / activity names) in the right order
-    delete $state_info->{action};
-    my @options = CTX('config')->get_scalar_as_list([ 'workflow', 'def', $type, 'state', $state, 'action' ]);
-
-    # check defined actions and only list the possible ones
-    # (non global actions are prefixed)
-    ##! 64: 'Available actions ' . Dumper keys %{ $action_info->{$action} }
-    $state_info->{option} = [];
-    if ($state_info->{autoselect} && $state_info->{autoselect} !~ m{\Aglobal_}) {
-        $state_info->{autoselect} = $prefix.'_'.$state_info->{autoselect};
-    }
-    for my $option (@options) {
-        $option =~ m{ \A (\W?)((global_)?([^\s>]+))}xs;
-        $option = $2;
-
-        my $auto = $1;
-        my $full = $2;
-        my $global = $3;
-        my $option_base = $4;
-
-        my $action = sprintf("%s_%s", $global ? "global" : $prefix, $option_base);
-        ##! 16: 'Activity ' . $action
-        next unless($action_info->{$action});
-
-        push @{$state_info->{option}}, $action;
-        if ($auto && !$state_info->{autoselect}) {
-            $state_info->{autoselect} = $action;
-        }
-
-        # Add button config if available
-        $state_info->{button}->{$action} = $button->{$option} if $button->{$option};
-    }
-
-    # add button markup (head)
-    $state_info->{button}->{_head} = $button->{_head} if $button->{_head};
-
-    return {
-        activity => $action_info,
-        state => $state_info,
     };
 }
 

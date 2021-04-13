@@ -33,6 +33,7 @@ I<HashRef> with informations:
             count_try   => ...,
             wake_up_at  => ...,
             reap_at     => ...,
+            archive_at  => ...,
             context     => { ... },
             attribute   => { ... },   # only if "with_attributes => 1"
         },

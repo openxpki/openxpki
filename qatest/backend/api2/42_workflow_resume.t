@@ -49,7 +49,7 @@ my $workflow_def1 = {
         },
     },
     'acl' => {
-        'User' => { creator => 'any', techlog => 1, history => 1 },
+        'User' => { creator => 'any', techlog => 1, history => 1, resume => 1 },
     },
 };
 
@@ -74,7 +74,7 @@ my $workflow_def2 = {
         },
     },
     'acl' => {
-        'User' => { creator => 'any', techlog => 1, history => 1 },
+        'User' => { creator => 'any', techlog => 1, history => 1, resume => 1 },
     },
 };
 

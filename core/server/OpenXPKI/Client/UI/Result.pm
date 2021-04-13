@@ -9,6 +9,7 @@ use Data::Dumper;
 use HTML::Entities;
 use Digest::SHA qw(sha1_base64);
 use MIME::Base64;
+use JSON;
 
 use OpenXPKI::i18n qw( i18nTokenizer );
 use OpenXPKI::Serialization::Simple;
@@ -437,7 +438,7 @@ sub render {
     $result->{page} = $self->_page() if $self->_page();
     $result->{refresh} = $self->_refresh() if ($self->_refresh());
 
-    my $json = new JSON()->utf8;
+    my $json = JSON->new->utf8;
     my $body;
     my $redirect;
 

@@ -86,13 +86,14 @@ sub __update_workflow {
     CTX('dbi')->merge(
         into => 'workflow',
         set  => {
-            workflow_state       => $workflow->state(),
+            workflow_state       => $workflow->state,
             workflow_last_update => DateTime->now->strftime('%Y-%m-%d %H:%M:%S'),
-            workflow_proc_state  => $workflow->proc_state(),
-            workflow_wakeup_at   => $workflow->wakeup_at() || 0,
-            workflow_count_try   => $workflow->count_try(),
-            workflow_reap_at     => $workflow->reap_at() || 0,
-            workflow_session     => $workflow->session_info(),
+            workflow_proc_state  => $workflow->proc_state,
+            workflow_wakeup_at   => $workflow->wakeup_at || 0,
+            workflow_count_try   => $workflow->count_try,
+            workflow_reap_at     => $workflow->reap_at || 0,
+            workflow_session     => $workflow->session_info,
+            workflow_archive_at  => $workflow->archive_at,
             # always reset the watchdog key, if the workflow is updated from within
             # the API/Factory, as the worlds most famous db system is unable to
             # handle NULL values we use a literal....
@@ -100,7 +101,7 @@ sub __update_workflow {
         },
         set_once => {
             pki_realm     => CTX('session')->data->pki_realm,
-            workflow_type => $workflow->type(),
+            workflow_type => $workflow->type,
         },
         where => {
             workflow_id   => $id,
@@ -243,6 +244,7 @@ sub fetch_workflow {
             workflow_count_try
             workflow_wakeup_at
             workflow_reap_at
+            workflow_archive_at
         ) ],
         where => {
             workflow_id => $id,
@@ -266,6 +268,7 @@ sub fetch_workflow {
         count_try   => $result->{workflow_count_try},
         wakeup_at   => $result->{workflow_wakeup_at},
         reap_at     => $result->{workflow_reap_at},
+        archive_at  => $result->{workflow_archive_at},
         context     => OpenXPKI::Workflow::Context->new(),
     };
 

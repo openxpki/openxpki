@@ -89,7 +89,7 @@ command "get_workflow_base_info" => {
         },
         # activity =>
         # state =>
-        %{ $util->get_activity_and_state_info($params->type, $head->{prefix}, $state, \@actions, undef) },
+        %{ $util->factory->get_action_and_state_info($params->type, $state, \@actions, undef) },
     };
 };
 

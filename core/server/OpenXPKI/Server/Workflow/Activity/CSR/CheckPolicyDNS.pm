@@ -19,12 +19,12 @@ sub execute
     my $workflow   = shift;
     my $context    = $workflow->context();
 
-    my $ser = new OpenXPKI::Serialization::Simple;
+    my $ser = OpenXPKI::Serialization::Simple->new;
 
     my %items;
     if (my $check = $self->param('check_cn')) {
         ##! 16: 'check_dn ' . $check;
-        my $dn = new OpenXPKI::DN( $context->param('cert_subject') );
+        my $dn = OpenXPKI::DN->new( $context->param('cert_subject') );
         my %hash = $dn->get_hashed_content();
         $items{ $hash{CN}[0] } = $check;
     }

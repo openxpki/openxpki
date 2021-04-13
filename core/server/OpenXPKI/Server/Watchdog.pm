@@ -168,6 +168,12 @@ has interval_session_purge => (
     default => 0
 );
 
+has interval_auto_archiving => (
+    is => 'rw',
+    isa => 'Int',
+    default => 0,
+);
+
 has _uid => (
     is => 'ro',
     isa => 'Str',
@@ -189,6 +195,12 @@ has _exception_count => (
 );
 
 has _next_session_cleanup => (
+    is => 'rw',
+    isa => 'Int',
+    init_arg => undef,
+);
+
+has _next_auto_archiving => (
     is => 'rw',
     isa => 'Int',
     init_arg => undef,
@@ -365,7 +377,7 @@ sub run {
         # set process name
         OpenXPKI::Server::__set_process_name("watchdog: init");
 
-        CTX('log')->system()->info(sprintf( 'Watchdog initialized, delays are: initial: %01d, idle: %01d, run: %01d"',
+        CTX('log')->system()->info(sprintf( 'Watchdog initialized, delays are: initial: %01d, idle: %01d, run: %01d',
                 $self->interval_wait_initial(), $self->interval_loop_idle(), $self->interval_loop_run() ));
 
         # wait some time for server startup...
@@ -378,7 +390,12 @@ sub run {
         if ($self->interval_session_purge) {
             $self->_next_session_cleanup( time );
             $self->_session_purge_handler( OpenXPKI::Server::Session->new(load_config => 1) );
-            CTX('log')->system()->info("Initialize session purge from watchdog with interval " . $self->interval_session_purge());
+            CTX('log')->system->info("Initialize session purge from watchdog with interval " . $self->interval_session_purge);
+        }
+
+        if ($self->interval_auto_archiving) {
+            $self->_next_auto_archiving( time );
+            CTX('log')->system->info("Initialize auto-archiving from watchdog with interval " . $self->interval_auto_archiving);
         }
 
         #
@@ -413,12 +430,13 @@ sub __main_loop {
         try {
             $self->__reload if $RELOAD;
             $self->__purge_expired_sessions;
+            $self->__auto_archive_workflows;
 
             # if slots_avail_count is zero, do a recalc
             if (!$slots_avail_count) {
                 ##! 8: 'slots avail count reached zero - do recalc'
                 $slots_avail_count = $self->max_worker_count();
-                my $pt = new Proc::ProcessTable;
+                my $pt = Proc::ProcessTable->new;
                 foreach my $ps (@{$pt->table}) {
                     if ($ps->ppid == $$) {
                         ##! 32: 'Found watchdog child '.$ps->pid.' - remaining process count: ' . $slots_avail_count
@@ -513,6 +531,7 @@ sub __reload {
         interval_loop_idle
         interval_loop_run
         interval_session_purge
+        interval_auto_archiving
     )) {
         if ($new_cfg->{$key}) {
             ##! 16: 'Update key ' . $key
@@ -567,7 +586,7 @@ sub __scan_for_paused_workflows {
 
     #select again:
     my $wf_id = $workflow->{workflow_id};
-    $self->__flag_and_fetch_workflow( $wf_id ) or return;
+    $self->__flag_for_wakeup( $wf_id ) or return;
 
     ##! 16: 'WF now ready to re-instantiate '
     CTX('log')->workflow()->info(sprintf( 'watchdog, paused wf %d now ready to re-instantiate, start fork process', $wf_id ));
@@ -583,9 +602,9 @@ sub __scan_for_paused_workflows {
     return $wf_id;
 }
 
-=head2 __flag_and_fetch_workflow( wf_id )
+=head2 __flag_for_wakeup( wf_id )
 
-Flag the database row for wf_id.
+Flag the workflow with the given ID as "being woken up" via database.
 
 To prevent a workflow from being reloaded by two watchdog instances, this
 method first writes a random marker to create "row lock" and tries to reload
@@ -593,7 +612,7 @@ the row using this marker. If either one fails, returnes undef.
 
 =cut
 
-sub __flag_and_fetch_workflow {
+sub __flag_for_wakeup {
     my ($self, $wf_id) = @_;
 
     return unless $wf_id;    #this is real defensive programming ...;-)
@@ -656,13 +675,7 @@ block and returns the error message in case of error.
 sub __wake_up_workflow {
     my ($self, $args) = @_;
 
-    CTX('session')->data->pki_realm($args->{pki_realm});
-    CTX('session')->data->thaw($args->{workflow_session}); # "user" and "role" will be set
-
-    # Set MDC for logging
-    Log::Log4perl::MDC->put('user', CTX('session')->data->user);
-    Log::Log4perl::MDC->put('role', CTX('session')->data->role);
-    Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
+    $self->__restore_session($args->{pki_realm}, $args->{workflow_session});
 
     $self->{dbi}->start_txn;
 
@@ -675,6 +688,130 @@ sub __wake_up_workflow {
     ##! 32: 'wakeup returned ' . Dumper $wf_info
 
     # commit/rollback is done inside workflow engine
+}
+
+sub __restore_session {
+    my ($self, $realm, $frozen_session) = @_;
+
+    CTX('session')->data->pki_realm($realm);     # set realm
+    CTX('session')->data->thaw($frozen_session); # set user and role
+
+    # Set MDC for logging
+    Log::Log4perl::MDC->put('user', CTX('session')->data->user);
+    Log::Log4perl::MDC->put('role', CTX('session')->data->role);
+    Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
+}
+
+=head2 __auto_archive_workflows
+
+Archive workflows whose "archive_at" date was exceeded.
+
+=cut
+
+sub __auto_archive_workflows {
+    my $self = shift;
+
+    return unless ($self->interval_auto_archiving and time > $self->_next_auto_archiving);
+
+    CTX('log')->system->debug("Init workflow auto archiving from watchdog");
+
+    # Search for paused workflows that are ready to be archived.
+    my $rows = $self->{dbi}->select_hashes(
+        from  => 'workflow',
+        columns => [ qw(
+            workflow_id
+            workflow_type
+            workflow_session
+            pki_realm
+            workflow_archive_at
+        ) ],
+        where => {
+            'workflow_proc_state' => { '!=', 'archived' },
+            'workflow_archive_at' => { '<', time() },
+        },
+    );
+
+    ##! 16: 'Archiving candidates: ' . join(', ', map { $_->{workflow_id} } @$rows)
+
+    my $id;
+    # Don't crash Watchdog only if some archiving fails
+    try {
+        for my $row (@$rows) {
+            $id = $row->{workflow_id};
+            $self->__flag_for_archiving($row->{workflow_id}, $row->{workflow_archive_at}) or next;
+            $self->__restore_session($row->{pki_realm}, $row->{workflow_session});
+
+            my $workflow = CTX('workflow_factory')->get_factory->fetch_workflow($row->{workflow_type}, $row->{workflow_id});
+            # Archive workflow: does DB update, might throw exception on wrong proc_state etc.
+            # Also sets "archive_at" to undef.
+            $workflow->set_archived;
+        }
+    }
+    catch {
+        CTX('log')->system->error(sprintf('Error archiving wf %s: %s', $id, $_));
+    };
+
+    $self->_next_auto_archiving( time + $self->interval_auto_archiving );
+}
+
+=head2 __flag_for_archiving( wf_id )
+
+Flag the workflow with the given ID as "being archived" via database to prevent
+a workflow from being archived by two watchdog instances.
+
+Flagging is done by updating DB field C<workflow_archive_at> with an
+intermediate value of C<0>. It is updated to C<null> once archiving is
+finished, so a permanent value of C<0> indicates a severe error.
+
+Returns C<1> upon success or C<undef> if workflow is/was archived by another
+process.
+
+=cut
+
+sub __flag_for_archiving {
+    my ($self, $wf_id, $expected_archive_at) = @_;
+
+    return unless ($wf_id and $expected_archive_at);
+
+    CTX('log')->workflow->debug(sprintf('watchdog: auto-archiving wf %d, setting flag', $wf_id));
+
+    $self->{dbi}->start_txn;
+
+    # Flag workflow as "being archived" by setting "workflow_archive_at" to
+    # an intermediate value of "0". It is updated to undef once archiving is
+    # finished, so when checking workflows later on a "0" indicates a
+    # severe error during archiving.
+    my $update_count;
+    try {
+        # "" it to undef later on, so a permanent value of 0 is an indicator
+        $update_count = $self->{dbi}->update(
+            table => 'workflow',
+            set => {
+                workflow_archive_at => 0,
+            },
+            where => {
+                workflow_archive_at => $expected_archive_at,
+                workflow_id         => $wf_id,
+            },
+        );
+        $self->{dbi}->commit;
+    }
+    # We use DB transaction isolation level "READ COMMITTED":
+    # So in the meantime another watchdog process might have picked up this
+    # workflow and changed the database. Two things can happen:
+    # 1. other process did not commit -> timeout exception because of DB row lock
+    catch {
+        $self->{dbi}->rollback;
+        CTX('log')->system->warn(sprintf('watchdog: auto-archiving wf %d failed (most probably other process does same job): %s', $wf_id, $_));
+        return;
+    };
+    # 2. other process committed changes -> our update's where clause misses ($update_count = 0).
+    if ($update_count < 1) {
+        CTX('log')->system->warn(sprintf('watchdog: auto-archiving wf %d failed (already archived by other process)', $wf_id));
+        return;
+    }
+
+    return 1;
 }
 
 no Moose;

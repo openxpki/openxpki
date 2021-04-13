@@ -260,7 +260,7 @@ sub _load_plugins {
 
     my $cmd_package_map = {};
 
-    $self->log->info("Loading ".(scalar keys %{ $pkg_map })." API plugins");
+    $self->log->debug("Loading ".(scalar keys %{ $pkg_map })." API plugins");
 
     for my $pkg (keys %{ $pkg_map }) {
         my $file = $pkg_map->{$pkg};

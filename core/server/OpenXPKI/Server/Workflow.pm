@@ -22,8 +22,10 @@ use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::DateTime;
 
-
-__PACKAGE__->mk_accessors( qw( proc_state count_try wakeup_at reap_at session_info persist_context is_startup ) );
+my @PERSISTENT_FIELDS = qw( proc_state count_try wakeup_at reap_at archive_at );
+# "session_info" is a special case: saved, but only read by watchdog
+my @TRANSIENT_FIELDS = qw( session_info persist_context is_startup is_forced_fail );
+__PACKAGE__->mk_accessors( @PERSISTENT_FIELDS, @TRANSIENT_FIELDS );
 
 
 my $default_reap_at_interval = '+0000000005';
@@ -47,41 +49,55 @@ my %known_proc_states = (
     #    '_wake_up' is called (IN current Activity object!)
     #
 
+    # set in constructor, no action executed yet
     init => {
-        desc => 'set in constructor, no action executed yet',
-        action => 'none',
+        hook => 'none',
+        enforceable => [ 'fail' ],
     },
+    # wakeup after pause
     wakeup => {
-        desc => 'wakeup after pause',
-        action => '_runtime_exception',
+        hook => '_runtime_exception',
+        enforceable => [ 'fail' ],
     },
+    # resume after exception
     resume => {
-        desc => 'resume after exception',
-        action => '_runtime_exception',
+        hook => '_runtime_exception',
+        enforceable => [ 'fail' ],
     },
+    # action executes
     running => {
-        desc => 'action executes',
-        action => 'none',
+        hook => 'none',
+        enforceable => [ 'fail' ],
     },
+    # action stops regulary
     manual => {
-        desc => 'action stops regulary',
-        action => 'none',
+        hook => 'none',
+        enforceable => [ 'fail' ],
     },
+    # action finished with success
     finished => {
-        desc => 'action finished with success',
-        action => 'none', # perfectly handled from WF-State-Engine
+        hook => 'none', # perfectly handled from WF-State-Engine
+        enforceable => [ 'archive' ],
     },
+    # action paused
     pause => {
-        desc => 'action paused',
-        action => '_wake_up',
+        hook => '_wake_up',
+        enforceable => [ 'fail', 'wakeup' ],
     },
+    # an exception has been thrown
     exception => {
-        desc => 'an exception has been thrown',
-        action => '_resume',
+        hook => '_resume',
+        enforceable => [ 'fail', 'resume' ],
     },
+    # count of retries has been exceeded
     retry_exceeded => {
-        desc => 'count of retries has been exceeded',
-        action => '_resume',
+        hook => '_resume',
+        enforceable => [ 'fail', 'wakeup' ],
+    },
+    # workflow has been archived
+    archived => {
+        hook => '_runtime_exception',
+        enforceable => [ ],
     },
 
 );
@@ -98,13 +114,14 @@ sub init {
 
     $self->{_CURRENT_ACTION} = '';
 
-    # Workflow attributes (should be stored by persistor class).
+    # Workflow attributes (should be stored by persister class).
     # Values set to "undef" will be stored like that in $self->{_attributes},
     # so the persister knows that these shall be deleted from the storage.
     $self->{_attributes} = {};
 
-    my $proc_state = 'init';
-    my $count_try =  0;
+    $self->proc_state('init');
+    $self->count_try(0);
+    $self->is_forced_fail(0);
 
     # For existing workflows - check for the watchdog extra fields
     if ($id) {
@@ -112,11 +129,9 @@ sub init {
         my $wf_info   = $persister->fetch_workflow($id);
 
         # fetch additional infos from database:
-        $count_try = $wf_info->{count_try} if ($wf_info->{count_try});
-        $proc_state = $wf_info->{proc_state} if ($wf_info->{proc_state});
-
-        $self->wakeup_at( $wf_info->{wakeup_at} );
-        $self->reap_at( $wf_info->{reap_at} );
+        for my $attr (@PERSISTENT_FIELDS) {
+            $self->$attr($wf_info->{$attr}) if ($wf_info->{$attr});
+        }
     } else {
         $self->is_startup(1);
     }
@@ -126,10 +141,6 @@ sub init {
     # so we clear the cache in the current state anytime we init a workflow
     # see jonasbn/perl-workflow#9
     $self->_get_workflow_state()->clear_condition_cache();
-
-    ##! 16: 'count try: '.$count_try
-    $self->count_try( $count_try );
-    $self->proc_state( $proc_state );
 
     return $self;
 }
@@ -241,7 +252,7 @@ sub execute_action {
     # so we just ignore any expcetions here
     if ($self->_has_paused()) {
         ##! 16: 'action paused'
-    } elsif( $EVAL_ERROR ) {
+    } elsif ( $EVAL_ERROR ) {
 
         my $error = $EVAL_ERROR;
 
@@ -342,10 +353,39 @@ sub set_failed {
     my $error = shift;
     my $reason = shift;
 
-    $self->_fail($error, $reason);
+    $self->is_forced_fail(1); # flag for persister
+
+    $self->_fail($error, $reason); # also saves to DB
 
     return $self;
 
+}
+
+sub set_archived {
+    my ($self) = @_;
+
+    # only archive finished workflows
+    if ($self->proc_state ne 'finished') {
+        OpenXPKI::Exception->throw(
+            message => "Attempt to archive workflow that is not in proc_state 'finished'",
+            params => { type => $self->type, proc_state => $self->proc_state },
+        );
+    }
+
+    # no eval{} block here - callers (e.g. API commands) shall see exceptions
+
+    $self->archive_at(undef); # clear value of "0" that is used as a flag "archiving in progress" (see Watchdog)
+    $self->proc_state('archived');
+
+    $self->notify_observers('archive', $self->state);
+    $self->add_history({
+        description => 'ARCHIVE',
+        user => CTX('session')->data->user,
+    });
+
+    $self->_save();
+
+    CTX('log')->workflow->info(sprintf('Archived workflow %s (type %s)', $self->id, $self->type));
 }
 
 sub attrib {
@@ -507,20 +547,43 @@ can be skipped by passing a true value as second argument.
 
 =cut
 sub set_reap_at_interval {
-    my ($self, $interval, $bNoSave) = @_;
+    my ($self, $interval, $skip_saving) = @_;
 
     ##! 16: sprintf('set retry interval to %s',$interval )
 
-    my $reap_at = OpenXPKI::DateTime::get_validity(
-            {
-            VALIDITY => $interval,
-            VALIDITYFORMAT => 'relativedate',
-            },
-        )->epoch();
+    my $reap_at = OpenXPKI::DateTime::get_validity({
+        VALIDITY => $interval,
+        VALIDITYFORMAT => 'relativedate',
+    })->epoch;
 
     $self->reap_at($reap_at);
     # if the wf is already running, immediately save data to db:
-    $self->_save() if (!$bNoSave && $self->is_running());
+    $self->_save if ((not $skip_saving) and $self->is_running);
+}
+
+=head2 set_archive_after
+
+Set the auto-archiving interval (relative date format, see L<OpenXPKI::DateTime>).
+
+The interval is converted into an epoch timestamp and written to the
+C<archive_at> field in the database.
+
+Triggers a DB update via persister unless C<$skip_saving> is set to a TRUE value.
+
+=cut
+sub set_archive_after {
+    my ($self, $interval, $skip_saving) = @_;
+
+    ##! 16: sprintf('set archive interval to %s', $interval)
+
+    my $epoch = OpenXPKI::DateTime::get_validity({
+        VALIDITY => $interval,
+        VALIDITYFORMAT => 'relativedate',
+    })->epoch;
+
+    $self->archive_at($epoch);
+    # if the wf is already running, immediately save data to db:
+    $self->_save if ((not $skip_saving) and $self->is_running);
 }
 
 =head2 get_global_actions
@@ -531,79 +594,65 @@ that are available to the session user on this workflow.
 =cut
 
 sub get_global_actions {
+    my ($self) = @_;
 
-    my $self = shift;
-
-    # volatile or non initial workflow do not have any actions
-    if ($self->id() < 1) {
-         return [];
-    }
+    # Volatile workflows do not have any actions
+    return [] if $self->id < 1;
 
     my $role = CTX('session')->data->role || 'Anonymous';
 
-    my $acl = CTX('config')->get_hash([ 'workflow', 'def', $self->type(), 'acl', $role ] );
+    my $acl = CTX('config')->get_hash([ 'workflow', 'def', $self->type, 'acl', $role ]);
 
-    my @possible_action;
-    my $proc_state = $self->proc_state();
-    if ($proc_state eq 'exception') {
-        @possible_action = ('resume','fail');
-    }
-    elsif ($proc_state eq 'pause') {
-        @possible_action = ('wakeup','fail');
-    }
-    elsif ($proc_state eq 'retry_exceeded') {
-        @possible_action = ('wakeup','fail');
-    }
-    elsif ($proc_state ne 'finished') {
-        @possible_action = ('fail');
-    }
+    # proc_state dependent enforceable actions
+    my @possible = @{ $known_proc_states{$self->proc_state}->{enforceable} };
+    # always possible informational actions
+    push @possible, ('history', 'techlog', 'context', 'attribute');
 
-    # always possible
-    push @possible_action, ('history', 'techlog', 'context', 'attribute');
+    ##! 16: 'possible actions: ' . join(', ', @possible)
 
     my @allowed;
-    foreach my $action (@possible_action) {
+    foreach my $action (@possible) {
         if ($acl->{$action}) {
             push @allowed, $action;
         }
     }
 
+    ##! 16: 'allowed actions: ' . join(', ', @allowed)
     return \@allowed;
-
 }
 
 sub _handle_proc_state {
     my ( $self, $action_name ) = @_;
 
-    ##! 16: sprintf('action %s, handle_proc_state %s',$action_name,$self->proc_state)
+    ##! 16: sprintf('action %s, handle_proc_state %s', $action_name, $self->proc_state)
 
-    my $action_needed = $known_proc_states{$self->proc_state}->{action};
-    if (!$action_needed) {
+    my $hook = $known_proc_states{$self->proc_state}->{hook};
+    if (!$hook) {
         OpenXPKI::Exception->throw (
             message => "Workflow is in unknown process state",
-            params  => { DESCRIPTION => sprintf('unknown proc-state: %s',$self->proc_state) }
+            params  => { DESCRIPTION => sprintf('unknown proc-state: %s', $self->proc_state) }
         );
 
     }
-    if ($action_needed eq 'none') {
-        ##! 16: 'no action needed for proc_state '. $self->proc_state
+    if ($hook eq 'none') {
+        ##! 16: 'no hook defined for proc_state '. $self->proc_state
         return;
     }
 
-    #we COULD use symbolic references to method-calls here, but - for the moment - we handle it explizit:
-    if ($action_needed eq '_wake_up') {
+    # we COULD use symbolic references to method-calls here, but - for the moment - we handle it explizit:
+    if ($hook eq '_wake_up') {
         ##! 1: 'paused, call wakeup '
-         CTX('log')->application()->debug("Action $action_name waking up");
+        CTX('log')->application()->debug("Action $action_name waking up");
 
         $self->_wake_up($action_name);
     }
-    elsif ($action_needed eq '_resume') {
+    elsif ($hook eq '_resume') {
         ##! 1: 'call _resume '
         CTX('log')->application()->debug("Action $action_name resume");
 
         $self->_resume($action_name);
     }
-    elsif ($action_needed eq '_runtime_exception') {
+    elsif ($hook eq '_runtime_exception') {
         ##! 1: 'call _runtime_exception '
         CTX('log')->application()->debug("Action $action_name runtime exception");
 
@@ -612,7 +661,7 @@ sub _handle_proc_state {
     else {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_WORKFLOW_UNKNOWN_PROC_STATE_ACTION",
-            params  => {DESCRIPTION => sprintf('unknown action "%s" for proc-state: %s',$action_needed, $self->proc_state)}
+            params  => {DESCRIPTION => sprintf('unknown hook "%s" for proc-state: %s',$hook, $self->proc_state)}
         );
     }
 
@@ -865,7 +914,7 @@ sub set {
     my ( $self, $prop, $value ) = @_;
     my $calling_pkg = ( caller 1 )[0];
     unless ( ( $calling_pkg =~ /^OpenXPKI::Server::Workflow/ ) || ( $calling_pkg =~ /^Workflow/ ) ) {
-        carp "Tried to set from: ", join ', ', caller 1;
+        carp "Forbidden attempt to set workflow attribute from: ", join(', ', map { $_ || '' } caller(1));
         workflow_error "Don't try to use my private setters from '$calling_pkg'!";
     }
     $self->{$prop} = $value;
@@ -896,6 +945,7 @@ The workflow-table is expanded with 4 new persistent fields (see database schema
     workflow_wakeup_at
     workflow_count_try
     workflow_reap_at
+    workflow_archive_at
 
 Essential field is C<workflow_proc_state>, internally "proc_state". All known and possible proc_states and their follow-up actions are defined in %known_proc_states.
 "running" will be set, before SUPER::execute_action/Activity::run is called.

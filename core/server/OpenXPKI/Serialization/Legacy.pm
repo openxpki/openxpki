@@ -58,7 +58,7 @@ sub new {
 sub _json {
     my $self = shift;
     if (!$self->{JSON}) {
-        $self->{JSON} = new JSON()->allow_blessed();
+        $self->{JSON} = JSON->new->allow_blessed;
     }
     return $self->{JSON};
 }

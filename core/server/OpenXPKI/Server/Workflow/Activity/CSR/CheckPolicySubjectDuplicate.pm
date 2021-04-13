@@ -45,7 +45,7 @@ sub execute
 
     if ($self->param('cn_only')) {
         ##! 32: 'match cn only'
-        my $dn = new OpenXPKI::DN( $cert_subject );
+        my $dn = OpenXPKI::DN->new( $cert_subject );
         my %hash = $dn->get_hashed_content();
         $query->{subject} = 'CN='.$hash{CN}[0].',%';
     } else {

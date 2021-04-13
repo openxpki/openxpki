@@ -15,6 +15,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow;
 use OpenXPKI::Workflow::Context;
+use OpenXPKI::MooseParams;
 use Workflow::Exception qw( configuration_error workflow_error );
 use Data::Dumper;
 
@@ -195,8 +196,8 @@ sub get_field_info {
 
     my $field = $conn->get_hash( \@field_path );
 
-    # Check for option tag and do explicit calls to ensure recursive resolve
-    # this code is duplicated in OpenXPKI::Server::API2::Plugin::Profile::Util
+    # Check for option tag and do explicit calls to ensure recursive resolving.
+    # This code is duplicated in OpenXPKI::Server::API2::Plugin::Profile::Util
     # as we need the same syntax in the profiles - TODO move to common API
     if ($field->{option}) {
 
@@ -240,6 +241,92 @@ sub get_field_info {
 
     return $field;
 
+}
+
+# Returns a HashRef with configuration details (actions, states) of the given
+# workflow type and state.
+sub get_action_and_state_info {
+    my ($self, $type, $state, $actions, $context) = positional_args(\@_,   # OpenXPKI::MooseParams
+        { isa => 'Str', },
+        { isa => 'Str', },
+        { isa => 'ArrayRef', },
+        { isa => 'HashRef|Undef', optional => 1, default => sub { {} } },
+    );
+    ##! 4: 'start'
+
+    my $head = CTX('config')->get_hash([ 'workflow', 'def', $type, 'head' ]);
+    my $prefix = $head->{prefix};
+
+    #
+    # add activities (= actions)
+    #
+    my $action_info = {};
+
+    OpenXPKI::Connector::WorkflowContext::set_context($context) if $context;
+    for my $action (@{ $actions }) {
+        $action_info->{$action} = $self->get_action_info($action, $type);
+    }
+    OpenXPKI::Connector::WorkflowContext::set_context() if $context;
+
+    #
+    # add state UI info
+    #
+    my $state_info = CTX('config')->get_hash([ 'workflow', 'def', $type, 'state', $state ]);
+
+    # replace hash key "output" with detailed field informations
+    if ($state_info->{output}) {
+        my @output_fields = ref $state_info->{output} eq 'ARRAY'
+            ? @{ $state_info->{output} }
+            : CTX('config')->get_list([ 'workflow', 'def', $type, 'state', $state, 'output' ]);
+
+        # query detailed field informations
+        $state_info->{output} = [ map { $self->get_field_info($_, $type) } @output_fields ];
+    }
+
+    # add button info
+    my $button = $state_info->{button};
+    $state_info->{button} = {};
+
+    # possible actions (options / activity names) in the right order
+    delete $state_info->{action};
+    my @options = CTX('config')->get_scalar_as_list([ 'workflow', 'def', $type, 'state', $state, 'action' ]);
+
+    # check defined actions and only list the possible ones
+    # (non global actions are prefixed)
+    ##! 64: 'Available actions ' . Dumper keys %{ $action_info->{$action} }
+    $state_info->{option} = [];
+    if ($state_info->{autoselect} && $state_info->{autoselect} !~ m{\Aglobal_}) {
+        $state_info->{autoselect} = $prefix.'_'.$state_info->{autoselect};
+    }
+    for my $option (@options) {
+        $option =~ m{ \A (\W?)((global_)?([^\s>]+))}xs;
+        $option = $2;
+
+        my $auto = $1;
+        my $full = $2;
+        my $global = $3;
+        my $option_base = $4;
+
+        my $action = sprintf("%s_%s", $global ? "global" : $prefix, $option_base);
+        ##! 16: 'Activity ' . $action
+        next unless($action_info->{$action});
+
+        push @{$state_info->{option}}, $action;
+        if ($auto && !$state_info->{autoselect}) {
+            $state_info->{autoselect} = $action;
+        }
+
+        # Add button config if available
+        $state_info->{button}->{$action} = $button->{$option} if $button->{$option};
+    }
+
+    # add button markup (head)
+    $state_info->{button}->{_head} = $button->{_head} if $button->{_head};
+
+    return {
+        activity => $action_info,
+        state => $state_info,
+    };
 }
 
 =head2 authorize_workflow
@@ -355,7 +442,7 @@ sub __authorize_workflow {
 
         return 1;
 
-    } elsif ($action =~ m{\A(fail|resume|wakeup|history|techlog|attribute|context)\z}) {
+    } elsif ($action =~ m{\A(fail|resume|wakeup|history|techlog|attribute|context|archive)\z}) {
 
         my $type = $arg_ref->{TYPE};
         $type = $arg_ref->{WORKFLOW}->type() unless ($type || !$arg_ref->{WORKFLOW});

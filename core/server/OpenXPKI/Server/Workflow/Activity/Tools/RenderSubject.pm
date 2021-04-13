@@ -25,8 +25,8 @@ sub execute {
     my $context = $workflow->context();
     my $config = CTX('config');
 
-    my $tt = new Template();
-    my $ser = new OpenXPKI::Serialization::Simple;
+    my $tt = Template->new;
+    my $ser = OpenXPKI::Serialization::Simple->new;
     my $result;
 
 

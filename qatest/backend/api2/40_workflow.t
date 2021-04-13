@@ -18,7 +18,7 @@ use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 use OpenXPKI::Test::CertHelper::Database;
 
-plan tests => 34;
+plan tests => 35;
 
 #
 # Setup test context
@@ -129,7 +129,7 @@ sub workflow_def {
             },
         },
         'acl' => {
-            'User' => { 'creator' => ($acl // 'any') },
+            'User' => { creator => ($acl // 'any'), fail => 1, resume => 1, wakeup => 1, archive => 1, attribute => 1 },
             'Guard' => { techlog => 1, history => 1 },
         },
     };
@@ -316,7 +316,6 @@ lives_and {
                 creator => 'wilhelm',
                 link => 'http://www.denic.de',
                 message => 'Lucy in the sky with diamonds',
-                wf_current_action => 'wftype2_initialize',
             },
             last_update => ignore(),
             proc_state => 'manual',
@@ -324,6 +323,7 @@ lives_and {
             state => 'PERSIST',
             type => $wf_t2->type,
             wake_up_at => ignore(),
+            archive_at => ignore(),
             description => ignore(),
             label => 'wf_type_2',
         }),
@@ -352,7 +352,7 @@ lives_and {
                 ],
             },
         },
-        handles => [],
+        handles => [ 'fail', 'attribute' ],
     };
 } "get_workflow_info() - via ID";
 
@@ -409,7 +409,7 @@ lives_and {
 #
 # get_workflow_log
 #
-throws_ok { $oxitest->api2_command("get_workflow_log" => { id => $wf_t1_sync->id }) } qr/unauthorized/i,
+throws_ok { $oxitest->api2_command("get_workflow_log" => { id => $wf_t1_sync->id }) } qr/no permission/i,
     "get_workflow_log() - throw exception on unauthorized user";
 
 CTX('session')->data->role('Guard');
@@ -450,12 +450,11 @@ CTX('session')->data->role('Guard');
 lives_and {
     my $result = $oxitest->api2_command("get_workflow_history" => { id => $wf_t1_sync->id });
     cmp_deeply $result, [
-        superhashof({ workflow_state => "INITIAL", workflow_action => re(qr/create/i) }),
         superhashof({ workflow_state => "INITIAL", workflow_action => re(qr/initialize/i) }),
         superhashof({ workflow_state => "PERSIST", workflow_action => re(qr/add_message/i) }),
         superhashof({ workflow_state => re(qr/^PERSIST/), workflow_action => re(qr/add_link/i) }),
         superhashof({ workflow_state => re(qr/^PERSIST/), workflow_action => re(qr/set_motd/i) }),
-    ];
+    ] or diag explain $result;
 } "get_workflow_history()";
 CTX('session')->data->role('User');
 
@@ -586,7 +585,7 @@ lives_and {
         $prev_id = $_->{'workflow_id'};
     }
     is $sorting_ok, 1;
-} "search_workflow_instances() - result ordering by ID descending (default)";
+} "search_workflow_instances() - result ordering with defaults (ID, descending)";
 
 # Check reverse (ascending) order by ID
 lives_and {
@@ -594,23 +593,35 @@ lives_and {
     my $prev_id;
     my $sorting_ok = 1;
     for (@{$result}) {
-        $sorting_ok = 0 if $prev_id and $_->{'workflow_id'} <= $prev_id;
+        $sorting_ok = 0 if ($prev_id and $_->{'workflow_id'} <= $prev_id);
         $prev_id = $_->{'workflow_id'};
     }
     is $sorting_ok, 1;
-} "search_workflow_instances() - result ordering by ID ascending (= not reversed)";
+} "search_workflow_instances() - result ordering by default column, ascending";
 
-# Check custom order by TYPE
+# Check custom order by last update, ascending
 lives_and {
     my $result = $oxitest->api2_command("search_workflow_instances" => { pki_realm => "alpha", order => "workflow_last_update" });
     my $prev_val;
     my $sorting_ok = 1;
     for (@{$result}) {
-        $sorting_ok = 0 if $prev_val and ($_->{'workflow_last_update'} cmp $prev_val) > 0;
+        $sorting_ok = 0 if ($prev_val and ($prev_val cmp $_->{'workflow_last_update'}) > 0);
         $prev_val = $_->{'workflow_last_update'};
     }
     is $sorting_ok, 1 or diag explain $result;
-} "search_workflow_instances() - result ordering by custom column";
+} "search_workflow_instances() - result ordering by custom column, ascending";
+
+# Check custom order by last update, dewscending
+lives_and {
+    my $result = $oxitest->api2_command("search_workflow_instances" => { pki_realm => "alpha", order => "workflow_last_update", reverse => 1 });
+    my $prev_val;
+    my $sorting_ok = 1;
+    for (@{$result}) {
+        $sorting_ok = 0 if ($prev_val and ($prev_val cmp $_->{'workflow_last_update'}) < 0);
+        $prev_val = $_->{'workflow_last_update'};
+    }
+    is $sorting_ok, 1 or diag explain $result;
+} "search_workflow_instances() - result ordering by custom column, descending";
 
 search_result
     {
