@@ -33,15 +33,15 @@ sub execute {
     );
 
     if (!defined $cert) {
-        workflow_error('nice certificate to revoked not found in database');
+        workflow_error('nice certificate to be revoked not found in database');
     }
 
     if ($cert->{pki_realm} ne CTX('session')->data->pki_realm) {
-        workflow_error('Certificate is not in the current realm');
+        workflow_error('certificate is not in the current realm');
     }
 
     if ($cert->{status} ne 'ISSUED') {
-        workflow_error('certificate to be revoked is not in issued state');
+        workflow_error('certificate to be revoked is not in state "issued"');
     }
 
     if (!$cert->{reason_code}) {
