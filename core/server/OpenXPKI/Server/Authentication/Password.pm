@@ -18,6 +18,7 @@ sub handleInput {
     my $self  = shift;
     my $msg   = shift;
 
+    ##! 64: $msg
     my $username = $msg->{LOGIN} // $msg->{username};
     my $passwd  = $msg->{PASSWD} // $msg->{password};
 

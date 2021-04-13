@@ -320,14 +320,17 @@ sub __get_action {
 sub __jwt_signature {
 
     my $self = shift;
-    my $payload = shift;
+    my $data = shift;
     my $jws = shift;
 
     return unless($self->has_auth());
 
     $self->logger()->debug('Sign data using key id ' . $jws->{keyid} );
     my $pkey = $self->_auth();
-    return encode_jwt(payload => $payload, key=> $pkey, alg=>'ES256');
+    return encode_jwt(payload => {
+        param => $data,
+        sid => $self->backend()->get_session_id(),
+    }, key=> $pkey, auto_iat => 1, alg=>'ES256');
 
 }
 

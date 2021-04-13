@@ -354,11 +354,7 @@ sub __handle_PING : PRIVATE {
         ##! 16: 'we are in state WAITING_FOR_LOGIN'
         ##! 16: 'auth stack: ' . CTX('session')->data->authentication_stack
         ##! 16: 'pki realm: ' . CTX('session')->data->pki_realm
-        my ($user, $role, $reply) = CTX('authentication')->login_step({
-            STACK   => CTX('session')->data->authentication_stack,
-            MESSAGE => $message,
-        });
-        return $reply;
+        return $self->__handle_login( $message );
     }
     return { SERVICE_MSG => 'START_SESSION' };
 }
@@ -433,11 +429,7 @@ sub __handle_SESSION_ID_ACCEPTED : PRIVATE {
         ##! 16: 'we are in state WAITING_FOR_LOGIN'
         ##! 16: 'auth stack: ' . CTX('session')->data->authentication_stack
         ##! 16: 'pki realm: ' . CTX('session')->data->pki_realm
-        my ($user, $role, $reply) = CTX('authentication')->login_step({
-            STACK   => CTX('session')->data->authentication_stack,
-            MESSAGE => $message,
-        });
-        return $reply;
+        return $self->__handle_login( $message );
     }
 
     if ($state_of{$ident} eq 'MAIN_LOOP') {
@@ -501,6 +493,7 @@ sub __handle_GET_AUTHENTICATION_STACK : PRIVATE {
         });
         CTX('session')->data->authentication_stack($requested_stack);
         # set session and forward state on success, returns reply
+        delete $message->{PARAMS}->{'AUTHENTICATION_STACK'};
         return $self->__handle_login( $message );
     }
 
@@ -519,7 +512,6 @@ sub __handle_GET_PASSWD_LOGIN : PRIVATE {
 sub __handle_GET_CLIENT_LOGIN : PRIVATE {
     ##! 1: 'start'
     my $self = shift;
-    my $msg  = shift;
 
     return $self->__handle_login( shift );
 }
@@ -527,7 +519,6 @@ sub __handle_GET_CLIENT_LOGIN : PRIVATE {
 sub __handle_GET_X509_LOGIN : PRIVATE {
     ##! 1: 'start'
     my $self = shift;
-    my $msg  = shift;
 
     return $self->__handle_login( shift );
 }

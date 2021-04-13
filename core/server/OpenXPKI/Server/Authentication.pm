@@ -15,6 +15,9 @@ use utf8;
 use English;
 use OpenXPKI::Debug;
 use Data::Dumper;
+use Crypt::JWT qw(decode_jwt);
+use Digest::SHA qw(sha1);
+use MIME::Base64 qw(encode_base64url decode_base64);
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
@@ -95,6 +98,13 @@ sub __load_pki_realm
             $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{$key} = $val;
         }
 
+        if (my $sign = $config->get_hash(['auth','stack',$stack,'sign'])) {
+            my $pk = decode_base64($sign->{'key'});
+            my $keyid = $sign->{'keyid'} || substr(encode_base64url(sha1($pk)),0,8);
+            $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{keyid} = $keyid;
+            $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{key} = \$pk;
+        }
+
         ##! 8: "determine all used handlers"
         my @supported_handler = $config->get_scalar_as_list( ['auth','stack', $stack,'handler' ]);
         ##! 32: " supported_handler " . Dumper @supported_handler
@@ -167,6 +177,7 @@ sub list_authentication_stacks {
     my %ret = map {
         my %vv = %{$self->{PKI_REALM}->{$realm}->{STACK}->{$_}};
         delete $vv{handler};
+        delete $vv{key};
         ($_ => \%vv);
     } keys %{$self->{PKI_REALM}->{$realm}->{STACK}};
 
@@ -232,10 +243,15 @@ sub get_stack_info {
         $auth_type = 'passwd';
     }
 
+    my %jwsign;
+    if (my $keyid = $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{keyid}) {
+        $jwsign{SIGN} = { keyid => $keyid };
+    }
+
     ##! 8: "Auth Type $auth_type"
     ##! 32: $auth_param
     # TODO - clean this up and return some more abstract info
-    return (undef, undef, { SERVICE_MSG => 'GET_'.uc($auth_type).'_LOGIN', PARAMS => ($auth_param //= {}) });
+    return (undef, undef, { SERVICE_MSG => 'GET_'.uc($auth_type).'_LOGIN', PARAMS => ($auth_param //= {}), %jwsign });
 }
 
 sub __legacy_login {
@@ -245,26 +261,26 @@ sub __legacy_login {
     my $self = shift;
     my $handlerClass = shift;
     my $handler = shift;
-    my $msg = shift;
+    my $param = shift;
 
     my ($user, $role, $return_msg, $userinfo);
 
     # map back new keys to old keys in case somebody has an old handler
-    $msg->{PARAMS}->{LOGIN} //= $msg->{PARAMS}->{username};
-    $msg->{PARAMS}->{PASSWD} //= $msg->{PARAMS}->{password};
+    $param->{LOGIN} //= $param->{username};
+    $param->{PASSWD} //= $param->{password};
     # delete as it might show up in the userinfo otherwise
-    delete $msg->{PARAMS}->{password};
+    delete $param->{password};
     eval {
         ($user, $role, $return_msg, $userinfo) = $handlerClass->login_step({
             HANDLER => $handler,
-            MESSAGE => $msg,
+            MESSAGE => { PARAMS => $param },
         });
     };
     if ($EVAL_ERROR) {
         CTX('log')->auth()->debug("Login to $handler failed with error $EVAL_ERROR");
         return OpenXPKI::Server::Authentication::Handle->new(
-            username => $msg->{PARAMS}->{LOGIN} || 'unknown',
-            userid => ($user || $msg->{PARAMS}->{LOGIN} || 'unknown'),
+            username => $param->{LOGIN} || 'unknown',
+            userid => ($user || $param->{LOGIN} || 'unknown'),
             error => 128,
             error_message => "$EVAL_ERROR",
             handler => $handler,
@@ -291,13 +307,14 @@ sub login_step {
     my $self    = shift;
     my $arg_ref = shift;
 
-    my $msg     = $arg_ref->{MESSAGE};
+    ##! 128: $arg_ref
+    my $param     = $arg_ref->{MESSAGE}->{PARAMS};
     my $stack   = $arg_ref->{STACK};
     my $realm   = CTX('session')->data->pki_realm;
 
     ##! 16: 'realm: ' . $realm
     ##! 16: 'stack: ' . $stack
-    ##! 64: $msg
+    ##! 64: $param
     if (! exists $self->{PKI_REALM}->{$realm}->{STACK}->{$stack} ||
         ! scalar @{$self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{handler}}) {
         OpenXPKI::Exception->throw(
@@ -313,6 +330,46 @@ sub login_step {
     }
 
     CTX('log')->auth()->debug('Incoming auth for stack ' . $stack);
+
+    # empty request (incoming ping/stack info), no need to check authentication
+    if (!defined $param || (ref $param && (scalar keys %{$param}) == 0)) {
+        ##! 16: 'empty parameters'
+
+    # stack requires signature
+    } elsif (my $key = $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{key}) {
+        OpenXPKI::Exception->throw(
+            message => 'AuthStack configuration is broken - signature missing'
+        ) if (ref $param);
+
+        ##! 16: 'Incoming signature token, decoding'
+        my $data;
+        eval{$data = decode_jwt(token => $param, key => $key);};
+        if ($EVAL_ERROR || !$data) {
+            ##! 8: 'Got an error while decoding token'
+            OpenXPKI::Exception->throw(
+                message => 'AuthStack configuration is broken - decoding signature failed',
+                params => { error => $EVAL_ERROR },
+            );
+        }
+        ##! 32: $data
+        OpenXPKI::Exception::Authentication->throw(
+            message => 'I18N_OPENXPKI_UI_AUTHENTICATION_FAILED',
+            params => { error => 'Replay Alert - session id does not match' },
+            log     => { priority => 'error', facility => 'auth' }
+        ) if ($data->{sid} ne CTX('session')->id);
+
+        $param = $data->{param};
+
+    } elsif (defined $param && !ref $param) {
+        ##! 16: 'Unrequested signature token, decode without key'
+        my $data = decode_jwt(token => $param, ignore_signature => 1);
+        ##! 32: $data
+        $param = $data->{param};
+
+    } else {
+        ##! 16: 'Default auth request - plain hash'
+    }
+
 
     ##! 2: "try the different available handlers for the stack $stack"
     my $last_result;
@@ -340,19 +397,19 @@ sub login_step {
             ##! 16: 'New handler'
             # just in case somebody wrote a custom login / client
             # we map back the old names to the new keys
-            if (exists $msg->{PARAMS}->{LOGIN}) {
-                $msg->{PARAMS}->{username} //= $msg->{PARAMS}->{LOGIN};
-                delete $msg->{PARAMS}->{LOGIN};
+            if (exists $param->{LOGIN}) {
+                $param->{username} //= $param->{LOGIN};
+                delete $param->{LOGIN};
             }
-            if (exists $msg->{PARAMS}->{PASSWD}) {
-                $msg->{PARAMS}->{password} //= $msg->{PARAMS}->{PASSWD};
-                delete $msg->{PARAMS}->{PASSWD};
+            if (exists $param->{PASSWD}) {
+                $param->{password} //= $param->{PASSWD};
+                delete $param->{PASSWD};
             }
-            $auth_result = $handlerClass->handleInput( $msg->{PARAMS} );
+            $auth_result = $handlerClass->handleInput( $param );
         } else {
             ##! 16: 'Legacy handler'
             # legacy stuff
-            $auth_result = $self->__legacy_login( $handlerClass, $handler, $msg);
+            $auth_result = $self->__legacy_login( $handlerClass, $handler, $param);
         }
 
         # store the result if we got a result
