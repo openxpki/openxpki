@@ -144,9 +144,8 @@ OpenXPKI::Server::Workflow::Activity::Tools::Approve
 
 =head1 Description
 
-This class implements simple possibility to store approvals as a
-serialized array. This allows for easy evaluation of needed approvals
-in the condition class Condition::Approved.
+Store approvals as a serialized array. This allows for easy evaluation
+of needed approvals in L<OpenXPKI::Server::Workflow::Condition::Approved>.
 
 The activity has several operational modes, that are determined by the
 I<mode> parameter.

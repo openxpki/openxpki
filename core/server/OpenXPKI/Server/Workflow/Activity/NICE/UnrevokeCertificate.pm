@@ -38,13 +38,13 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::NICE::unrevokeCertificate;
+OpenXPKI::Server::Workflow::Activity::NICE::UnrevokeCertificate;
 
 =head1 Description
 
-Activity to unrevoke a certificate using the configured NICE backend.
+Unrevoke a certificate using the configured NICE backend.
 
-See OpenXPKI::Server::NICE::unrevokeCertificate for details
+See L<OpenXPKI::Server::NICE/unrevokeCertificate> for details
 
 =head1 Parameters
 

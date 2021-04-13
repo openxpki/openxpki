@@ -79,7 +79,7 @@ OpenXPKI::Server::Workflow::Activity::Tools::Datapool::GetEntry
 
 =head1 Description
 
-This class sets an entry in the Datapool.
+Retrieve an entry from the Datapool.
 
 =head1 Configuration
 

@@ -47,7 +47,7 @@ OpenXPKI::Server::Workflow::Activity::NICE::CheckForRevocation;
 
 =head1 Description
 
-Activity to check if a former revocation request was processed by the NICE backend.
+Check if a former revocation request was processed by the NICE backend.
 Pauses the workflow if certificate is not revoked.
 
 See OpenXPKI::Server::NICE::checkForRevocation for details

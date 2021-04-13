@@ -68,8 +68,9 @@ OpenXPKI::Server::Workflow::Activity::Tools::Datapool::ModifyEntry
 
 =head1 Description
 
-This class modifies the key and/or expiration date of a datapool entry.
-It does NOT change the value of a datapool entry.
+Modify the key and/or expiration date of a datapool entry.
+
+This does NOT change the value of a datapool entry.
 
 =head1 Configuration
 

@@ -82,7 +82,7 @@ OpenXPKI::Server::Workflow::Activity::Tools::Datapool::SetEntry
 
 =head1 Description
 
-This class sets an entry in the Datapool.
+Sets an entry in the Datapool.
 
 =head1 Configuration
 

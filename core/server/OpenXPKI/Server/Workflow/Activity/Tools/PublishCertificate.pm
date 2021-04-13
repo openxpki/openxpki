@@ -134,10 +134,12 @@ OpenXPKI::Server::Workflow::Activity::Tools::PublishCertificate
 
 =head1 Description
 
-This class publishes a single certificate based on the publishing information
-associated with the certificate profile or a given prefix. The certificate is
-identified by the parameter cert_identifier which can be set in the action
-definition. If unset, the class falls back to the context value of cert_identifier.
+Publish a single certificate based on the publishing information
+associated with the certificate profile or a given prefix.
+
+The certificate is identified by the parameter cert_identifier which can be set
+in the action definition. If unset, the class falls back to the context value
+of C<cert_identifier>.
 
 =head2 Publication by Profile
 

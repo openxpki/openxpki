@@ -92,6 +92,6 @@ OpenXPKI::Server::Workflow::Activity::NICE::RevokeCertificate;
 
 =head1 Description
 
-Activity to start certificate revocation using the configured NICE backend.
+Start certificate revocation using the configured NICE backend.
 
 See OpenXPKI::Server::NICE::revokeCertificate for details

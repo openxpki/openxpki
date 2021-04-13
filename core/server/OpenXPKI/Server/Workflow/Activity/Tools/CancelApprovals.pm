@@ -38,8 +38,8 @@ OpenXPKI::Server::Workflow::Activity::Tools::CancelApprovals
 
 =head1 Description
 
-This class implements the deletion of all approvals which were stored
-with OpenXPKI::Server::Workflow::Activity::Tools::Approve in the related
+Delete all approvals which were stored with
+L<OpenXPKI::Server::Workflow::Activity::Tools::Approve> in the related
 workflow. This is done by storing an empty hash reference in the
 variable approvals.
 

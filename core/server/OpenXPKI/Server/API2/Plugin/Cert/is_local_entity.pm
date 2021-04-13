@@ -17,9 +17,9 @@ use OpenXPKI::Server::API2::Types;
 
 Check if the given certificate identifier is a local entity.
 
-Returns true if the certificate as req_key set and the realm matches.
+Returns C<1> if the certificate has C<req_key> set and the realm matches.
 
-Returns undef if the certificate is not found at all and false if the
+Returns C<undef> if the certificate was not found at all and C<0> if the
 certificate is not an entity in the given realm.
 
 B<Parameters>
@@ -30,7 +30,7 @@ B<Parameters>
 
 =item * C<pki_realm> I<Str>
 
-PKI realm. Optional, default: current realm. Supports I<_any> to check in all realms.
+PKI realm. Optional, default: current realm. If set to C<"_any"> all realms are checked.
 
 =back
 

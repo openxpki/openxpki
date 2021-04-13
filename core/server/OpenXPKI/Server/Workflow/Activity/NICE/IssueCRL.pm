@@ -79,7 +79,7 @@ OpenXPKI::Server::Workflow::Activity::NICE::IssueCRL;
 
 =head1 Description
 
-Activity to initate CRL issuance using the configured NICE backend.
+Initate CRL issuance using the configured NICE backend.
 
 See OpenXPKI::Server::NICE::issueCRL for details
 
@@ -88,7 +88,7 @@ See OpenXPKI::Server::NICE::issueCRL for details
 =head2 Input
 
 All parameters except ca_alias, are mapped to the backend as is. Please
-check the documentation of the used backend for available parameters. 
+check the documentation of the used backend for available parameters.
 
 =over
 

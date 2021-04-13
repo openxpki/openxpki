@@ -51,7 +51,7 @@ OpenXPKI::Server::Workflow::Activity::Tools::Datapool::DeleteEntry
 
 =head1 Description
 
-This class deletes an entry from the Datapool, defined by namespace and key.
+Delete an entry from the Datapool, defined by C<namespace> and C<key>.
 
 =head1 Configuration
 
