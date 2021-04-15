@@ -69,7 +69,7 @@ OpenXPKI::Server::Workflow::Activity::Tools::MergeContextHash
 
 =head1 Description
 
-Similar to SetContextHash but merged the current value from the context
+Similar to SetContextHash but merges the current value from the context
 found at target_key with the result. If a key is set but has an undef
 value it is removed from the hash.
 

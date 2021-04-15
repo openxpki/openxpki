@@ -59,9 +59,23 @@ sub execute {
         }
     }
 
-    # Datapool handles only scalar values so we need to serialize
-    # any non scalar items
-    if ($self->param('serialize') && ref $params->{ value }) {
+    # implicit delete is deprecated to we call delete here
+    if ($params->{ value } eq '') {
+        ##! 32: 'Emtpy value - reroute to delete command'
+        CTX('api2')->delete_data_pool_entry(
+            namespace => $params->{namespace},
+            key => $params->{key}
+        );
+        CTX('log')->application()->info('Delete (implicit) datapool entry for key '.$params->{key}.' in namespace '.$params->{namespace});
+        return 1;
+
+    } elsif (ref $params->{ value }) {
+        ##! 32: 'its a ref! ' . ref $params->{ value }
+        ##! 64: $params->{ value }
+        # Datapool handles only scalar values so we need to serialize
+        # any non scalar items
+        workflow_error ('Datapool value is not a scalar - set the serialize parameter to enable automatic serialization')
+            unless($self->param('serialize'));
         $params->{ value } = OpenXPKI::Serialization::Simple->new()->serialize( $params->{ value } );
     }
 
@@ -124,7 +138,10 @@ The value used as datapool key, use I<_map> syntax to use values from context!
 =item value
 
 The actual value written to the datapool, use I<_map> syntax to use values
-from context!
+from context! If the value is an empty string, the item is deleted from the
+datapool. If the value is not a scalar you must set the I<serialize>
+attribute to enable automatic serialization, otherwise the call will fail
+with an error.
 
 =item pki_realm
 
