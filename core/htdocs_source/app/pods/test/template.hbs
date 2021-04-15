@@ -38,30 +38,32 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            <div class="panel panel-primary">
-                <div class="panel-heading"></div>
-                <div class="panel-body">
-                    <OxiSection @content={{this.formDef}}/>
+            {{#each this.forms as |form index|}}
+                <OxiBase::Button
+                    @button={{hash format="expected" label=form.content.title}}
+                    @onClick={{fn this.setCurrentForm index}}
+                />
+            {{/each}}
+
+            {{#each this.forms as |form index|}}
+                {{#if (eq index this.selectedFormIndex) }}
+                    <div class="panel panel-primary">
+                        <div class="panel-heading"></div>
+                        <div class="panel-body">
+                            <OxiSection @content={{form}}/>
+                        </div>
+                    </div>
+                {{/if}}
+            {{/each}}
+
+            {{#each this.sections as |sectionDef|}}
+                <div class="panel panel-primary">
+                    <div class="panel-heading"></div>
+                    <div class="panel-body">
+                        <OxiSection @content={{sectionDef}}/>
+                    </div>
                 </div>
-            </div>
-            <div class="panel panel-primary">
-                <div class="panel-heading"></div>
-                <div class="panel-body">
-                    <OxiSection @content={{this.gridDef}}/>
-                </div>
-            </div>
-            <div class="panel panel-primary">
-                <div class="panel-heading"></div>
-                <div class="panel-body">
-                    <OxiSection @content={{this.keyvalueDef}}/>
-                </div>
-            </div>
-            <div class="panel panel-primary">
-                <div class="panel-heading"></div>
-                <div class="panel-body">
-                    <OxiSection @content={{this.tilesDef}}/>
-                </div>
-            </div>
+            {{/each}}
         </div>
     </div>
 </div>
