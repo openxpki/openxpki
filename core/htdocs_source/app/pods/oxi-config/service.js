@@ -1,11 +1,12 @@
 import Service from '@ember/service';
+import { tracked } from '@glimmer/tracking';
 import ENV from 'openxpki/config/environment';
 import fetch from 'fetch';
 import yaml from 'js-yaml';
 
 export default class OxiConfigService extends Service {
-    localConfig = {};
-    ready; // will be set to a Promise that will fulfill if localconfig.js is loaded (or server returned error)
+    @tracked localConfig = {};
+    ready; // will be set to a Promise that will fulfill if localconfig.yaml is loaded (or server returned error)
 
     constructor() {
         super(...arguments);
@@ -14,10 +15,12 @@ export default class OxiConfigService extends Service {
         let url = ENV.rootURL.replace(/\/$/, '') + '/localconfig.yaml';
         this.ready = this._loadRemote(url)
             .then( yamlStr => {
+                console.debug(`Custom config (YAML):\n${yamlStr}`);
                 if (! yamlStr) return;
                 try {
                     let doc = yaml.safeLoad(yamlStr); // might be null if YAML is empty string
                     if (doc) this.localConfig = doc;
+                    console.debug('Custom config (decoded):', this.localConfig);
                 }
                 catch (err) {
                     /* eslint-disable-next-line no-console */
