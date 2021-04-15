@@ -144,9 +144,7 @@ export default class OpenXpkiRoute extends Route {
         }
         let url = this.oxiConfig.backendUrl;
         let fetchParams = {
-            method: 'GET', // default
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-OPENXPKI-Client': '1',
             },
@@ -155,13 +153,16 @@ export default class OpenXpkiRoute extends Route {
         // POST
         if (request.action) {
             fetchParams.method = "POST";
-            fetchParams.body = this._toUrlParams({
+            fetchParams.headers['Content-Type'] = 'application/json';
+            fetchParams.body = JSON.stringify({
                 ...data,
                 _rtoken: this.content.rtoken,
             });
         }
         // GET
         else {
+            fetchParams.method = "GET";
+            fetchParams.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
             url += '?' + this._toUrlParams(data);
         }
 
