@@ -41,6 +41,10 @@ B<Parameters>
 
 =item * C<workflow> I<Str> - workflow name
 
+=item * C<activity> I<Str> - name of the action to execute
+
+This is only required if the workflow has more than one initial action.
+
 =item * C<params> I<HashRef> - workflow parameters. Optional, default: {}
 
 =item * C<ui_info> I<Bool> - set to 1 to also return detail informations about
@@ -91,6 +95,7 @@ key as String instead of using a HashRef.
 =cut
 command "create_workflow_instance" => {
     workflow => { isa => 'AlphaPunct', required => 1, },
+    activity => { isa => 'AlphaPunct' },
     params   => { isa => 'HashRef', default => sub { {} } },
     ui_info  => { isa => 'Bool', default => 0, },
     norun    => { isa => 'Str', matching => qr{ \A(persist|detach|watchdog|)\z }xms, default => '' },
@@ -152,14 +157,22 @@ command "create_workflow_instance" => {
     my $state = undef;
 
     my @actions = $workflow->get_current_actions;
-    if (scalar @actions != 1) {
-        OpenXPKI::Exception->throw (
-            message => "Workflow definition does not specify exactly one first activity",
-            params => { type => $type }
-        );
-    }
 
-    my $initial_action = shift @actions;
+    my $initial_action;
+    if ($initial_action = $params->activity) {
+        OpenXPKI::Exception->throw (
+            message => 'Given activity is not an inital action to this workflow',
+            params => { type => $type, action => $initial_action }
+        ) unless (grep { $_ eq $initial_action } @actions);
+
+    } elsif (scalar @actions != 1) {
+        OpenXPKI::Exception->throw (
+            message => "Workflow definition does not specify exactly one first activity and no activity was given",
+            params => { type => $type, actions => \@actions }
+        );
+    } else {
+        $initial_action = shift @actions;
+    }
 
     ##! 8: "initial action: " . $initial_action
 

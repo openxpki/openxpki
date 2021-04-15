@@ -48,7 +48,7 @@ B<Parameters>
 
 =cut
 command "get_workflow_base_info" => {
-    type      => { isa => 'AlphaPunct', },
+    type      => { isa => 'AlphaPunct', required => 1 },
 } => sub {
     my ($self, $params) = @_;
 
@@ -74,7 +74,7 @@ command "get_workflow_base_info" => {
     my @actions;
     for my $state (@{$wf_config->{state}}) {
         next unless $state->{name} eq 'INITIAL';
-        @actions = ($state->{action}->[0]->{name});
+        @actions = map { $_->{name} } @{$state->{action}};
         last;
     }
 
