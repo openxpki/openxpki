@@ -90,7 +90,7 @@ command "get_ui_system_status" => {
                 notbefore => { '<', $now },
                 notafter => { '>', $now },
             },
-            group_by => "identifier",
+            group_by => ["identifier","profile"],
             order_by => "latest_update",
         );
         $result->{crl_expiry} = $db_crl ? $db_crl->{latest_update} : 0;
