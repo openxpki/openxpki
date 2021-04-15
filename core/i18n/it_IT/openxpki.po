@@ -38,6 +38,10 @@ msgid "I18N_OPENXPKI_UI_BACKEND_SESSION_GONE"
 msgstr "Sessione di backend terminata - eseguire di nuovo il login"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_BACKEND_UNREACHABLE"
+msgstr "Nome della Curva"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_BULK_APPROVE_CRR_LABEL"
 msgstr "Approva Revoca"
 
@@ -2373,10 +2377,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Richiesta Aggiornamento"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL"
-msgstr "Stato"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Stato"
 
@@ -3818,10 +3818,6 @@ msgstr "Certificato Emesso"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED"
-msgstr "Stato"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED_DESC"
 msgstr "Stato"
 
 #, fuzzy
@@ -5457,6 +5453,10 @@ msgstr "Chiave"
 #~ msgstr "Genera Codice"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL"
+#~ msgstr "Stato"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_AUTH_FAILURE_DESC"
 #~ msgstr ""
 #~ "Questo Workflow è definitivamente fallito e non può essere riavviato"
@@ -5949,6 +5949,10 @@ msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_WORKFLOW_ID_LABEL"
 #~ msgstr "ID Workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED_DESC"
+#~ msgstr "Stato"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_FAILURE_DESC"

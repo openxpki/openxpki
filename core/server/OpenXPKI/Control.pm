@@ -168,7 +168,7 @@ sub start {
             return 1;
         }
         if ($Minor < $minor) {
-            print STDERR sprintf "Config dependancy (%s) not fullfilled by this release (%s)\n",
+            print STDERR sprintf "Config dependency (%s) not fullfilled by this release (%s)\n",
                 $core, $OpenXPKI::VERSION::VERSION;
             return 1;
         }

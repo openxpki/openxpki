@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2021-04-01 17:03+0200\n"
+"PO-Revision-Date: 2021-04-15 09:08+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -28,6 +28,9 @@ msgstr "Backend workflow did not report success"
 
 msgid "I18N_OPENXPKI_UI_BACKEND_SESSION_GONE"
 msgstr "Backend session terminated - please re-login"
+
+msgid "I18N_OPENXPKI_UI_BACKEND_UNREACHABLE"
+msgstr "Backend service is not reachable or not responding"
 
 msgid "I18N_OPENXPKI_UI_BULK_APPROVE_CRR_LABEL"
 msgstr "Approve Revocation"
@@ -1976,9 +1979,6 @@ msgstr "Please update / complete the information below."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Update Request"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL"
-msgstr "Archive after"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Workflow Attributes"
 
@@ -2823,10 +2823,9 @@ msgstr "Archive Workflow"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_TEXT"
 msgstr ""
 "Are you sure to archive this workflow? Depending on the workflow "
-"configuration this may lead to the deletion of some or all "
-"information like workflow fields, attributes and/or history.<br>"
-"<b>This action can not be undone!</b><br><br>Pressing 'Abort' will leave the "
-"workflow untouched."
+"configuration this may lead to the deletion of some or all information like "
+"workflow fields, attributes and/or history.<br><b>This action can not be "
+"undone!</b><br><br>Pressing 'Abort' will leave the workflow untouched."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON"
 msgstr "Force Failure"
@@ -3224,9 +3223,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_SUCCESS_LABEL"
 msgstr "New User Created"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED"
-msgstr "This workflow was archived."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED_DESC"
 msgstr "This workflow was archived."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_DESC"
@@ -4061,6 +4057,9 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 #~ msgstr "Generate Code"
 
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL"
+#~ msgstr "Archive after"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_APPROVE"
 #~ msgstr "Approve Request"
 
@@ -4163,6 +4162,9 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_SUBJECT_MATCH_LABEL"
 #~ msgstr "Request Subject Matches"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED_DESC"
+#~ msgstr "This workflow was archived."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_INITIAL_DESC"

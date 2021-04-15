@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2021-04-01 17:02+0200\n"
+"PO-Revision-Date: 2021-04-15 09:08+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -28,6 +28,9 @@ msgstr "Backend-Worfklow endete nicht erfolgreich"
 
 msgid "I18N_OPENXPKI_UI_BACKEND_SESSION_GONE"
 msgstr "Sitzung abgelaufen - bitte erneut anmelden"
+
+msgid "I18N_OPENXPKI_UI_BACKEND_UNREACHABLE"
+msgstr "Der Server ist nicht erreichbar oder antwortet nicht"
 
 msgid "I18N_OPENXPKI_UI_BULK_APPROVE_CRR_LABEL"
 msgstr "Sperrung genehmigen"
@@ -2072,9 +2075,6 @@ msgstr "Bitte aktualisieren/komplettieren Sie die nachfolgenden Informationen."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Antrag aktualisieren"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL"
-msgstr "Archivierung"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Workflow-Meta-Daten"
 
@@ -2973,9 +2973,9 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_ARCHIVING_DIALOG_TEXT"
 msgstr ""
 "Soll dieser Workflow wirklich archiviert werden? Je nach Workflow-"
 "Konfiguration kann dies zur Löschung einiger oder aller Informationen wie "
-"Workflow-Felder, -Attribute und/oder -History führen.<br>"
-"<b>Diese Aktion kann nicht rückgängig gemacht werden!</b>"
-"<br><br>Beim Drücken von 'Abbrechen' werden keine Änderungen vorgenommen."
+"Workflow-Felder, -Attribute und/oder -History führen.<br><b>Diese Aktion "
+"kann nicht rückgängig gemacht werden!</b><br><br>Beim Drücken von "
+"'Abbrechen' werden keine Änderungen vorgenommen."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON"
 msgstr "Abbruch erzwingen"
@@ -3399,9 +3399,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_SUCCESS_LABEL"
 msgstr "Zertifikat ausgestellt"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED"
-msgstr "Dieser Workflow wurde archiviert."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED_DESC"
 msgstr "Dieser Workflow wurde archiviert."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_DESC"
@@ -4303,6 +4300,9 @@ msgstr "ja"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 #~ msgstr "Generate Code"
 
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL"
+#~ msgstr "Archivierung"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_APPROVE"
 #~ msgstr "Antrag genehmigen"
 
@@ -4406,6 +4406,9 @@ msgstr "ja"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_SUBJECT_MATCH_LABEL"
 #~ msgstr "Request Subject Matches"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED_DESC"
+#~ msgstr "Dieser Workflow wurde archiviert."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_INITIAL_DESC"

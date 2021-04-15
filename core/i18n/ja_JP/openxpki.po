@@ -31,6 +31,10 @@ msgstr "再ログインしてください"
 msgid "I18N_OPENXPKI_UI_BACKEND_SESSION_GONE"
 msgstr "再ログインしてください"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BACKEND_UNREACHABLE"
+msgstr "種別"
+
 msgid "I18N_OPENXPKI_UI_BULK_APPROVE_CRR_LABEL"
 msgstr "失効の承認"
 
@@ -2077,10 +2081,6 @@ msgstr "以下の情報を更新してください。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "リクエストの更新"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL"
-msgstr "状態"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "ワークフロー属性"
 
@@ -3411,10 +3411,6 @@ msgstr "発行済みの証明書"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED"
-msgstr "このワークフローはユーザの操作によってキャンセルされました。"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED_DESC"
 msgstr "このワークフローはユーザの操作によってキャンセルされました。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_DESC"
@@ -4863,6 +4859,10 @@ msgstr "はい"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 #~ msgstr "コードを作成する"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL"
+#~ msgstr "状態"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_APPROVE"
 #~ msgstr "リクエストの承認"
 
@@ -5329,6 +5329,10 @@ msgstr "はい"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DETAIL_FIELD_VALID_AT_LABEL"
 #~ msgstr "Reference Date"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED_DESC"
+#~ msgstr "このワークフローはユーザの操作によってキャンセルされました。"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_INITIAL_DESC"
 #~ msgstr "初期状態"

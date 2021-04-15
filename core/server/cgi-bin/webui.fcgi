@@ -186,12 +186,13 @@ while (my $cgi = CGI::Fast->new()) {
             $backend_client = OpenXPKI::Client->new({
                 SOCKETFILE => $conf->{global}->{socket}
             });
+            $backend_client->send_receive_service_msg('PING');
         }
     };
 
     if (my $eval_err = $EVAL_ERROR) {
        $log->error('Error creating backend client ' . $eval_err);
-       __handle_error($cgi, $eval_err);
+       __handle_error($cgi, "I18N_OPENXPKI_UI_BACKEND_UNREACHABLE");
        next;
     }
 

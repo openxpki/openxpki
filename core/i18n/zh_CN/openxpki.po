@@ -31,6 +31,10 @@ msgstr "后端工作流程未报告成功"
 msgid "I18N_OPENXPKI_UI_BACKEND_SESSION_GONE"
 msgstr "后端会话已终止-请重新登录"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BACKEND_UNREACHABLE"
+msgstr "曲线名称"
+
 msgid "I18N_OPENXPKI_UI_BULK_APPROVE_CRR_LABEL"
 msgstr "批准吊销"
 
@@ -1997,10 +2001,6 @@ msgstr "请更新/完成以下信息。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "更新请求"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL"
-msgstr "状态"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "工作流程属性"
 
@@ -3272,10 +3272,6 @@ msgstr "证书颁发"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED"
 msgstr "状态"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED_DESC"
-msgstr "状态"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_DESC"
 msgstr "该工作流程已取消。"
 
@@ -4083,6 +4079,10 @@ msgstr "是"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 #~ msgstr "Generate Code"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL"
+#~ msgstr "状态"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_APPROVE"
 #~ msgstr "Approve Request"
 
@@ -4182,6 +4182,10 @@ msgstr "是"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_SUBJECT_MATCH_LABEL"
 #~ msgstr "Request Subject Matches"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED_DESC"
+#~ msgstr "状态"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_INITIAL_DESC"
