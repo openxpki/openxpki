@@ -2624,6 +2624,9 @@ sub __render_input_field {
     }
 
     if ($item->{type} eq 'static' && $field->{template}) {
+        if (OpenXPKI::Serialization::Simple::is_serialized($value)) {
+            $item->{value} = $self->serializer()->deserialize($value);
+        }
         $item->{verbose} = $self->send_command_v2( 'render_template', { template => $field->{template}, params => $item } );
     }
 
