@@ -832,6 +832,9 @@ sub init_server {
 
     note "[OpenXPKI::Test->init_server]";
 
+    OpenXPKI::Server::Context::reset();
+    OpenXPKI::Server::Init::reset();
+
     # init log object (and force it to NOT reinitialize Log4perl)
     OpenXPKI::Server::Context::setcontext({ log => OpenXPKI::Server::Log->new(CONFIG => undef) })
         unless OpenXPKI::Server::Context::hascontext("log"); # may already be set if multiple instances of OpenXPKI::Test are created
