@@ -548,7 +548,7 @@ around BUILDARGS => sub {
                     if (not $@) { $role = $p; last }
                 }
                 die "Could not find test class role '$shortname'" unless $role;
-                Moose::Util::apply_all_roles($class, $role);
+                Moose::Util::ensure_all_roles($class, $role);
             }
         }
         @args = %arg_hash;
