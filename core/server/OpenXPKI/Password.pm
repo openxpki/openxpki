@@ -22,42 +22,72 @@ sub hash {
 
     my $scheme = shift;
     my $passwd = shift;
-    ##! 16: "$scheme / $passwd"
-    my $encrypted = shift;
+
+    my $params = shift;
+
     my $prefix = sprintf '{%s}', $scheme;
     my $computed_secret;
-    if ($scheme eq 'sha') {
-        my $ctx = Digest::SHA->new();
-        $ctx->add($passwd);
-        $computed_secret = $ctx->b64digest();
 
-    } elsif ($scheme eq 'md5') {
-        my $ctx = Digest::MD5->new();
-        $ctx->add($passwd);
-        $computed_secret = $ctx->b64digest();
+    if (my ($salted, $algo, $len) = $scheme =~ m{\A(s?)(md5|sha(224|256|384|512)?)\z}) {
+        ##! 32: "$algo ($salted)"
+        ##! 64: "$passwd / $params"
 
-    } elsif ($scheme eq 'ssha') {
-        my $ctx = Digest::SHA->new();
-        my $salt = $encrypted ? substr(decode_base64($encrypted), 20) : __create_salt(3);
-        $ctx->add($passwd);
-        $ctx->add($salt);
-        $computed_secret = encode_base64( $ctx->digest() . $salt, '');
+        my $ctx;
+        if ($algo eq 'md5') {
+            $ctx = Digest::MD5->new();
+            $len = 128;
+        } elsif ($algo eq 'sha') {
+            $ctx = Digest::SHA->new();
+            $len = 160;
+        } else {
+            $ctx = Digest::SHA->new($algo);
+        }
 
-    } elsif ($scheme eq 'smd5') {
-        my $ctx = Digest::MD5->new();
-        my $salt = $encrypted ? substr(decode_base64($encrypted), 16) : __create_salt(3);
         $ctx->add($passwd);
-        $ctx->add($salt);
-        $computed_secret = encode_base64($ctx->digest() . $salt, '');
+
+        my $salt = '';
+        if ($params) {
+            $salt = substr(decode_base64($params), ($len/8));
+        } elsif ($salted) {
+            # a salt with half the size of the hash function should be ok
+            $salt = __create_salt($len / 16);
+        }
+
+        if ($salt) {
+            $ctx->add($salt);
+            $computed_secret = encode_base64( $ctx->digest() . $salt, '');
+        } else {
+            $computed_secret = $ctx->b64digest();
+        }
 
     } elsif ($scheme eq 'crypt') {
-        my $salt = $encrypted ? $encrypted : __create_salt(3);
+
+        my $salt = $params ? $params : __create_salt(3);
         $computed_secret = crypt($passwd, $salt);
 
     } elsif ($scheme eq 'argon2') {
-        $computed_secret = Crypt::Argon2::argon2id_pass($passwd, __create_salt(16), 3, '32M', 1, 16);
+
+        ##! 64: $params
+        my $salt;
+        if ($params->{salt}) {
+            $salt = $params->{salt};
+        } elsif ($params->{saltbytes}) {
+            $salt = __create_salt( int($params->{saltbytes}) )
+        } else {
+            $salt = __create_salt();
+        }
+
+        # argon2id_pass($passwd, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
+        $computed_secret = Crypt::Argon2::argon2id_pass( $passwd, $salt,
+            ($params->{time} || 3),
+            ($params->{memory} || '32M'),
+            ($params->{p} || 1),
+            ($params->{tag} || 16)
+        );
         $prefix = '';
+
     }
+
     if (!$computed_secret){
         ##! 4: 'unable to hash password'
         return undef;
@@ -90,28 +120,14 @@ sub check {
         $hash = "{crypt}$hash";
     } else {
         # digest is not recognized
-        OpenXPKI::Exception->throw (
-            message => "Given digest is without scheme",
-            params  => {},
-            log => {
-                priority => 'fatal',
-                facility => 'system',
-        });
+        OpenXPKI::Exception->throw ( message => "Given digest is without scheme" );
     }
 
     ##! 16: $scheme
-    if ($scheme !~ /^(sha|ssha|md5|smd5|crypt)$/) {
-        OpenXPKI::Exception->throw (
-            message => "Given scheme is not supported",
-            params  => {
-                SCHEME => $scheme,
-            },
-            log => {
-                priority => 'fatal',
-                facility => 'system',
-        });
-    }
-    
+    OpenXPKI::Exception->throw (
+        message => "Given scheme is not supported",
+        params  => { SCHEME => $scheme }
+    ) unless (OpenXPKI::Password::has_scheme($scheme));
 
     my $computed_hash = hash($scheme,$passwd,$encrypted);
 
@@ -128,11 +144,17 @@ sub check {
     $computed_hash =~ s{ =+ \z }{}xms;
     $hash       =~ s{ =+ \z }{}xms;
     return $computed_hash eq $hash;
-    
+
 }
+
+sub has_scheme {
+    my $scheme = shift;
+    return ($scheme =~ m{\A(crypt|argon2|s?md5|s?sha(224|256|384|512)?)\z});
+}
+
 sub __create_salt {
 
-    my $bytes = shift;
+    my $bytes = shift || 16;
     return OpenXPKI::Random->new()->get_random($bytes);
 
 }
@@ -150,14 +172,57 @@ Provides utility functions for hashing passwords and checking passwords against 
 
 =head1 Functions
 
-=head2 hash
+=head2 hash I<scheme>, I<passwd>, I<params>
 
 hashes a password according to the provided scheme.
 
-SCHEME is one of sha (SHA1), md5 (MD5), crypt (Unix crypt), smd5 (encrypted
-MD5), ssha (encrypted SHA1) or argon2.
+SCHEME is one of sha (SHA1), md5 (MD5), crypt (Unix crypt), smd5 (salted
+MD5), ssha (salted SHA1), ssha (salted SHA256) or argon2.
 
-It returns a hash in the format C<{SCHEME}encrypted_string>, C<$argon...> or undef if no hash could be computed
+It returns a hash in the format C<{SCHEME}encrypted_string>, or undef if
+no hash could be computed.
+
+For argon2 the return format is unencoded token generated by Crypt::Argon2
+C<$argon...>.
+
+For all algorithms except argon2, I<params> can be the encoded part of a
+prior call to hash which effectively extracts the salt from the given
+string which will result in the same encoded string if the same password
+was given. The default is to create a random salt of suitable size.
+
+For argon2 I<params> must be a hashref with the following options,
+options are passed as-is to Crypt::Argon2::argon2id_pass, details on
+the options can be found there.
+
+=over
+
+=item salt
+
+A literal value to be used as salt. The class does not make any checks so
+make sure the salt has enough entropy.
+
+=item saltbytes
+
+Number of bytes to generate a salt, the default is 16 bytes. Is overridden
+by salt.
+
+=item time
+
+argon2 time cost factor, default is 3.
+
+=item memory
+
+argon2 memory cost factor, expects a memory size in k, M or G, default is 32M.
+
+=item p
+
+paralellism factor, default is 1.
+
+=item tag
+
+tag size, default is 16.
+
+=back
 
 =head2 check
 

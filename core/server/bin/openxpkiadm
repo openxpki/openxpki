@@ -1276,7 +1276,7 @@ sub hash_password {
     }
 
 
-    my $hash=OpenXPKI::Password::hash($params{scheme},$passwd);
+    my $hash = OpenXPKI::Password::hash($params{scheme},$passwd);
 
     if (!$hash) {
         die "Unable to compute hash\n";
@@ -1531,9 +1531,9 @@ if ($cmd eq 'initdb') {
     OpenXPKI::Server::Init::init({TASKS  => ['config_versioned','log','api2','dbi'], SILENT => 1, CLI => 1});
 
     if (!$params{scheme}) {
-        $params{scheme} = 'ssha';
-    } elsif ($params{scheme} !~ /^(sha|ssha|md5|smd5|crypt|argon2)$/) {
-        die "Unsupported scheme - supported values: sha|ssha|md5|smd5|crypt|argon2\n";
+        $params{scheme} = 'ssha256';
+    } elsif (!OpenXPKI::Password::has_scheme($params{scheme})) {
+        die "Unsupported scheme - see perldoc OpenXPKI::Password\n";
     }
 
     $ret = hash_password();
@@ -2140,7 +2140,7 @@ Create the hash of a given password to be used with the internal user database.
 Command options:
 
   --scheme   The hashing scheme to use, allowed values are
-             ssha|sha|smd5|md5|crypt|argon2, default is ssha
+             sshaXXX|shaXXX|smd5|md5|crypt|argon2, default is ssha256
              see also OpenXPKI::Server::Authentication::Password
 
   --plain    do not hide the password on enter, no retype required

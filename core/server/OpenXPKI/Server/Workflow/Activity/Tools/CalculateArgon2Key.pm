@@ -5,8 +5,8 @@ use strict;
 use Data::Dumper;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use Crypt::Argon2;
-use Workflow::Exception qw(configuration_error);
+use OpenXPKI::Password;
+use Workflow::Exception qw(configuration_error workflow_error);
 
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
@@ -25,10 +25,9 @@ sub execute {
     my $memory = $self->param('memory_cost') || '32M';
     configuration_error('Memory cost parameter has invalid format') unless ($memory =~ m{\A\d+[kMG]\z});
 
-    $salt = CTX('api2')->get_random(binary => 1, length => 16) unless($salt);
+    my $key = OpenXPKI::Password::hash('argon2', $password, { salt => $salt, memory => $memory });
 
-    my $key = Crypt::Argon2::argon2id_pass($password, $salt, 3, $memory, 1, 16);
-
+    workflow_error('Unable to generate Argon2 key') unless($key);
     $context->param( $target_key  => $key  );
 
 }
