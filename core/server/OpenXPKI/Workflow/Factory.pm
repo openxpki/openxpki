@@ -489,6 +489,7 @@ authorize the current user.
 =cut
 
 sub check_acl {
+
     my ($self, $type, $wf_creator, $user, $role) = @_;
     ##! 1: 'start'
 
@@ -497,30 +498,32 @@ sub check_acl {
         $role = CTX('session')->data->has_role ? CTX('session')->data->role : 'Anonymous';
     }
 
-    my $allowed_creator_re = CTX('config')->get([ 'workflow', 'def', $type, 'acl', $role, 'creator' ]);
-    return unless defined $allowed_creator_re;
+    my @allowed_creator = CTX('config')->get_scalar_as_list([ 'workflow', 'def', $type, 'acl', $role, 'creator' ]);
+    ##! 32: 'Rules ' . join (",", @allowed_creator)
+    return unless scalar @allowed_creator;
 
-    # Creator can be self, any, others or a regex
     my $is_allowed = 0;
-    # Access only to own workflows - check session user against creator
-    if ($allowed_creator_re eq 'self') {
-        $is_allowed = ($wf_creator eq $user);
+    foreach my $allowed_creator_re (@allowed_creator) {
+        # Access only to own workflows - check session user against creator
+        if ($allowed_creator_re eq 'self') {
+            $is_allowed = ($wf_creator eq $user);
 
-    # No access to own workflows
-    } elsif ($allowed_creator_re eq 'others') {
-        $is_allowed = ($wf_creator ne $user);
+        # No access to own workflows
+        } elsif ($allowed_creator_re eq 'others') {
+            $is_allowed = ($wf_creator ne $user);
 
-    # access to any workflow
-    } elsif ($allowed_creator_re eq 'any') {
-        $is_allowed = 1;
+        # access to any workflow
+        } elsif ($allowed_creator_re eq 'any') {
+            $is_allowed = 1;
 
-    # Access by Regex - check
-    } else {
-        $is_allowed = ($wf_creator =~ qr/$allowed_creator_re/);
+        # Access by Regex - check
+        } else {
+            $is_allowed = ($wf_creator =~ qr/$allowed_creator_re/);
+        }
+        ##! 64: "$allowed_creator_re / " . ($is_allowed ? '1' : '0')
+        last if $is_allowed;
     }
-
     return $is_allowed;
-
 }
 
 =head2 update_proc_state($wf, $old_state, $new_state)
