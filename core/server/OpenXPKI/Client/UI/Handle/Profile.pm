@@ -278,6 +278,7 @@ sub render_server_password {
     my $self = shift; # reference to the wrapping workflow/result
     my $args = shift;
     my $wf_action = shift;
+    my $param = shift;
 
     $self->logger()->trace( 'render_server_password with args: ' . Dumper $args ) if $self->logger->is_trace;
 
@@ -285,13 +286,18 @@ sub render_server_password {
     my $context = $wf_info->{workflow}->{context};
 
     my @fields;
-    my $pwdfailed = 0;
+
+    my $bytes = 18;
+    my $format = 'base64';
+    if ($param) {
+        ($bytes, $format) = split /!/, $param;
+    }
 
     my $wf_action_info = $wf_info->{activity}->{$wf_action};
     foreach my $field (@{$wf_action_info->{field}}) {
         my $value;
         if ($field->{name} eq '_password') {
-            $value = $self->send_command_v2( 'get_random', { length => 16 });
+            $value = $self->send_command_v2( 'get_random', { length => $bytes, format => $format } );
             if (!$value) {
                 $self->set_status('I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_ERROR_LABEL','error');
                 $self->add_section({

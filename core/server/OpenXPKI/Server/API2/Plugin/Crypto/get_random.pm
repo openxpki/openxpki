@@ -17,7 +17,7 @@ use OpenXPKI::Random;
 
 =head2 get_random
 
-Generates and returns Base64 encoded (pseudo-)random bytes which are
+Generates and returns Base64/Hex encoded (pseudo-)random bytes which are
 considered cryptographically secure unless mode=fast is set.
 
 See OpenXPKI::Random for details.
@@ -28,7 +28,7 @@ B<Parameters>
 
 =item * C<length> I<Int> - length in bytes.
 
-Please note that the returned string is Base64 encoded an thus longer.
+Please note that the returned string is Base64/Hex encoded an thus longer.
 
 =item * C<format> I<Str>
 
