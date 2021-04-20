@@ -60,8 +60,9 @@ my @init_tasks = qw(
 );
 #
 
-my %is_initialized = map { $_ => 0 } @init_tasks;
-
+my %is_initialized;
+sub reset { %is_initialized = map { $_ => 0 } @init_tasks }
+OpenXPKI::Server::Init::reset(); # there is also CORE::reset() so we need the package prefix
 
 # holds log statements until the logging subsystem has been initialized
 my @log_queue;
@@ -582,6 +583,12 @@ small. It returns an instance of OpenXPKI::XML::Config.
 
 Initializes the code for internationalization. It requires an instance
 of OpenXPKI::XML::Config in the parameter CONFIG.
+
+=head3 reset
+
+Resets the initialization state.
+
+Used to re-initialize the server in tests.
 
 =head2 Cryptographic Initialization
 

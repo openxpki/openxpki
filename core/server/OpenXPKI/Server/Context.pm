@@ -18,34 +18,36 @@ our @EXPORT_OK = qw( CTX );
 
 use OpenXPKI::Exception;
 
-my $context = {
-    initialized => 0,
+my $context;
+sub reset {
+    $context = {
+        initialized => 0,
 
-    exported => {
-        # always created by this package
-        config           => undef,
-        workflow_factory => undef,
-        crypto_layer     => undef,
-        pki_realm        => undef,
-        pki_realm_by_cfg => undef,
-        volatile_vault   => undef,
-        log              => undef,
-        dbi              => undef,
-        dbi_log          => undef,
+        exported => {
+            # always created by this package
+            config           => undef,
+            workflow_factory => undef,
+            crypto_layer     => undef,
+            pki_realm        => undef,
+            pki_realm_by_cfg => undef,
+            volatile_vault   => undef,
+            log              => undef,
+            dbi              => undef,
+            dbi_log          => undef,
 
-        # user-settable
-        api            => undef,
-        api2           => undef,
-        server         => undef,
-        acl            => undef,
-        session        => undef,
-        authentication => undef,
-        notification   => undef,
-        workflow_id    => undef,
-    },
-};
-
-our %who_forked_me;
+            # user-settable
+            api            => undef,
+            api2           => undef,
+            server         => undef,
+            acl            => undef,
+            session        => undef,
+            authentication => undef,
+            notification   => undef,
+            workflow_id    => undef,
+        },
+    };
+}
+OpenXPKI::Server::Context::reset(); # there is also CORE::reset() so we need the package prefix
 
 # only called statically
 sub CTX {
@@ -285,3 +287,10 @@ Check if the requested entry is available from the context.
 
 Delete the recorded session from the context. Used during server startup
 where we start with a mock session and need a real one later.
+
+=head2 reset
+
+Resets the context, i.e. deletes all context objects by resetting the file
+scope ("static") variables to their initial state.
+
+Used to re-initialize the server in tests.
