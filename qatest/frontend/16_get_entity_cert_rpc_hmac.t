@@ -62,7 +62,7 @@ $result = $client->mock_request({
     'wf_proc_state' => '',
     'wf_state' => '',
     'wf_type' => 'certificate_enroll',
-    'transaction_id[]' =>  $json->{result}->{transaction_id},
+    'transaction_id' =>  $json->{result}->{transaction_id},
 });
 
 ok($result->{goto});

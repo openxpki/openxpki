@@ -23,9 +23,10 @@ use MIME::Base64 qw( encode_base64 decode_base64 );
 
 use Crypt::CBC;
 use OpenXPKI::i18n qw( i18nGettext i18nTokenizer set_language set_locale_prefix);
-use OpenXPKI::Client::UI;
 use OpenXPKI::Client;
 use OpenXPKI::Client::Config;
+use OpenXPKI::Client::UI;
+use OpenXPKI::Client::UI::Request;
 
 my $conf;
 my $log;
@@ -285,14 +286,16 @@ while (my $cgi = CGI::Fast->new()) {
             %pkey,
         });
 
-        $result = $client->handle_request({ cgi => $cgi });
+        my $req = OpenXPKI::Client::UI::Request->new( cgi => $cgi, logger => $log );
+        $log->trace( Dumper $req ) if ($log->is_trace());
+        $result = $client->handle_request( $req );
         $log->debug('request handled');
-        $log->trace( Dumper $result );
+        $log->trace( Dumper $result ) if ($log->is_trace());
     };
 
     if (!$result || ref $result !~ /OpenXPKI::Client::UI/) {
         __handle_error($cgi, $EVAL_ERROR);
-        $log->trace('result was ' . Dumper $result);
+        $log->trace('result was ' . Dumper $result) if ($log->is_trace());
     }
 
     # write session changes to backend

@@ -152,8 +152,19 @@ sub mock_request {
 
         $self->logger()->trace( Dumper $data ) if $self->logger->is_trace;
 
-        $ua->default_header( 'content-type' => 'application/x-www-form-urlencoded');
-        $res = $ua->post($server_endpoint, $data);
+        # strip off trailing array indicator and trim whitespace
+        %{$data} = map {
+            my ($kk) = ($_ =~ m{([^\[]+)(\[\])?\z});
+            my $vv = $data->{$_};
+            $vv =~ s{\A\s+|\s+\z}{}xmsg unless (ref $vv);
+            $kk => $vv;
+        } keys %{$data};
+
+        $res = $ua->request(HTTP::Request->new('POST', $server_endpoint,
+            HTTP::Headers->new( Content_Type => 'application/json'),
+            $self->json()->encode( $data )
+        ));
+
     } else {
         my $qsa = '?';
         map { $qsa .= sprintf "%s=%s&", $_, uri_escape($data->{$_} // ''); } keys %{$data};

@@ -54,7 +54,7 @@ $result = $client->mock_request({
     'wf_proc_state' => '',
     'wf_state' => '',
     'wf_type' => 'certificate_enroll',
-    'transaction_id[]' => $sceptid,
+    'transaction_id' => $sceptid,
 });
 
 ok($result->{goto});

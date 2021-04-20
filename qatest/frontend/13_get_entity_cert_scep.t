@@ -39,6 +39,7 @@ ok((! -e "tmp/entity.crt"), 'No certificate issued');
 
 my @t = split(/:\s+/, $scep);
 my $sceptid = $t[2];
+chomp $sceptid;
 
 diag("Transaction Id: $sceptid");
 
@@ -47,7 +48,7 @@ $result = $client->mock_request({
     'action' => 'workflow!search',
     'wf_type' => 'certificate_enroll',
     'wf_token' => undef,
-    'transaction_id[]' => $sceptid,
+    'transaction_id' => $sceptid,
 });
 
 ok($result->{goto});
@@ -78,6 +79,7 @@ $scep = `$sscep enroll -v -u http://localhost/scep/scep -M custid=12345 -K tmp/p
 
 @t = split(/:\s+/, $scep);
 $sceptid = $t[2];
+chomp $sceptid;
 
 diag("Transaction Id: $sceptid");
 
@@ -86,7 +88,7 @@ $result = $client->mock_request({
     'action' => 'workflow!search',
     'wf_type' => 'certificate_enroll',
     'wf_token' => undef,
-    'transaction_id[]' => $sceptid,
+    'transaction_id' => $sceptid,
 });
 
 ok($result->{goto});

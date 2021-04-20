@@ -60,7 +60,7 @@ $result = $client->mock_request({
 $result = $client->mock_request({
     'action' => 'workflow!index',
     'cert_subject_parts{hostname}' => 'testbox.openxpki.org',
-    'cert_subject_parts{hostname2}[]' => ['testbox.openxpki.net'],
+    'cert_subject_parts{hostname2}' => ['testbox.openxpki.net'],
     'wf_token' => undef
 });
 

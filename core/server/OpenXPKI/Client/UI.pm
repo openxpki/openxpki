@@ -152,16 +152,18 @@ sub BUILD {
 sub handle_request {
 
     my $self = shift;
-    my $args = shift;
-    my $cgi = $args->{cgi};
+    my $req = shift;
+    my $cgi = $req->cgi();
 
-    my $action = $self->__get_action( $cgi ) || '';
-    my $page = $cgi->param('page') || '';
+    my $page = $req->param('page') || '';
+    my $action = $self->__get_action( $req ) || '';
+
+    $self->logger()->debug("Incoming request page: $page / action: $action");
 
     # Check for goto redirection first
     if ($action =~ /^redirect!(.+)/  || $page =~ /^redirect!(.+)/) {
         my $goto = $1;
-        my $result = OpenXPKI::Client::UI::Result->new({ client => $self, cgi => $cgi });
+        my $result = OpenXPKI::Client::UI::Result->new({ client => $self, req => $req });
         $self->logger()->debug("Send redirect to $goto");
         $result->redirect( $goto );
         return $result->render();
@@ -184,7 +186,7 @@ sub handle_request {
         # now perform the redirect if set
         if ($redirectTo) {
             $self->logger()->debug("External redirect on logout to " . $redirectTo);
-            my $result = OpenXPKI::Client::UI::Result->new({ client => $self, cgi => $cgi });
+            my $result = OpenXPKI::Client::UI::Result->new({ client => $self, req => $req });
             $result->redirect( $redirectTo );
             return $result->render();
         }
@@ -203,7 +205,7 @@ sub handle_request {
     }
 
     if ( $reply->{SERVICE_MSG} eq 'ERROR' ) {
-        my $result = OpenXPKI::Client::UI::Result->new({ client => $self, cgi => $cgi });
+        my $result = OpenXPKI::Client::UI::Result->new({ client => $self, req => $req });
         $self->logger()->debug("Got error from server");
         return $result->set_status_from_error_reply( $reply );
     }
@@ -211,13 +213,13 @@ sub handle_request {
 
     # Call to bootstrap components
     if ($page =~ /^bootstrap!(.+)/) {
-        my $result = OpenXPKI::Client::UI::Bootstrap->new({ client => $self, cgi => $cgi });
+        my $result = OpenXPKI::Client::UI::Bootstrap->new({ client => $self, req => $req });
         return $result->init_structure( )->render();
     }
 
     # Only handle requests if we have an open channel
     if ( $reply->{SERVICE_MSG} eq 'SERVICE_READY' ) {
-        return $self->handle_page( $args );
+        return $self->handle_page( { req => $req } );
     }
 
     # if the backend session logged out but did not terminate
@@ -225,7 +227,7 @@ sub handle_request {
     $self->logout_session( $cgi ) if ($self->session()->param('is_logged_in'));
 
     # try to log in
-    return $self->handle_login( { cgi => $cgi, reply => $reply } );
+    return $self->handle_login( { req => $req, reply => $reply } );
 
 }
 
@@ -243,7 +245,9 @@ sub __load_class {
 
     my $self = shift;
     my $call = shift;
-    my $cgi = shift;
+    my $req = shift;
+
+    $self->logger()->debug("Incoming call to load_class $call");
 
     my ($class, $method, $param) = ($call =~ /\A (\w+)\!? (\w+)? \!?(.*) \z/xms);
 
@@ -273,7 +277,7 @@ sub __load_class {
         return (undef, undef);
     }
 
-    my $result = $class->new({ client => $self, cgi => $cgi, extra => \%extra });
+    my $result = $class->new({ client => $self, req => $req, extra => \%extra });
 
     return ($result, $method);
 
@@ -292,20 +296,21 @@ is empty or not set returns undef.
 sub __get_action {
 
     my $self = shift;
-    my $cgi = shift;
+    my $req = shift;
 
     my $rtoken_session = $self->session()->param('rtoken') || '';
-    my $rtoken_request = $cgi->param('_rtoken') || '';
+    my $rtoken_request = $req->param('_rtoken') || '';
     # check XSRF token
-    if ($cgi->param('action')) {
+    if ($req->param('action')) {
         if ($rtoken_request && ($rtoken_request eq $rtoken_session)) {
-            return $cgi->param('action');
+            $self->logger()->debug("Valid action request - returning " . $req->param('action'));
+            return $req->param('action');
 
         # required to make the login page work when the session expires, #552
-        } elsif( !$rtoken_session and ($cgi->param('action') =~ /^login\!/ )) {
+        } elsif( !$rtoken_session and ($req->param('action') =~ /^login\!/ )) {
 
             $self->logger()->debug("Login with expired session - ignoring rtoken");
-            return $cgi->param('action');
+            return $req->param('action');
         } else {
 
             $self->logger()->debug("Request with invalid rtoken ($rtoken_request != $rtoken_session)!");
@@ -340,7 +345,8 @@ sub handle_page {
     my $args = shift;
     my $method_args = shift || {};
 
-    my $cgi = $args->{cgi};
+    my $req = $args->{req};
+    my $cgi = $req->cgi();
 
     # set action and page - args always wins about cgi
 
@@ -350,16 +356,18 @@ sub handle_page {
     if (defined $args->{action}) {
        $action = $args->{action};
     } else {
-        $action = $self->__get_action( $cgi );
+        $action = $self->__get_action( $req );
     }
 
-    my $page = (defined $args->{page} ? $args->{page} : $cgi->param('page')) || 'home';
+    $self->logger()->trace('Handle page ' . Dumper $args ) if $self->logger->is_trace;
+
+    my $page = (defined $args->{page} ? $args->{page} : $req->param('page')) || 'home';
 
     if ($action) {
         $self->logger()->info('handle action ' . $action);
 
         my $method;
-        ($result, $method) = $self->__load_class( $action, $cgi );
+        ($result, $method) = $self->__load_class( $action, $req );
 
         if ($result) {
             $method  = "action_$method";
@@ -380,7 +388,7 @@ sub handle_page {
 
         my $method;
         if ($page) {
-            ($result, $method) = $self->__load_class( $page, $cgi );
+            ($result, $method) = $self->__load_class( $page, $req );
         }
 
         if (!$result) {
@@ -407,19 +415,20 @@ sub handle_login {
     my $self = shift;
     my $args = shift;
 
-    my $cgi = $args->{cgi};
+    my $req = $args->{req};
+    my $cgi = $req->cgi();
     my $reply = $args->{reply};
 
     $reply = $self->backend()->send_receive_service_msg('PING') if (!$reply);
 
     my $status = $reply->{SERVICE_MSG};
 
-    my $result = OpenXPKI::Client::UI::Login->new({ client => $self, cgi => $cgi });
+    my $result = OpenXPKI::Client::UI::Login->new({ client => $self, req => $req });
 
     # Login works in three steps realm -> auth stack -> credentials
 
     my $session = $self->session();
-    my $page = $cgi->param('page') || '';
+    my $page = $req->param('page') || '';
 
     # this is the incoming logout action
     if ($page eq 'logout') {
@@ -433,19 +442,19 @@ sub handle_login {
     }
 
     # action is only valid within a post request
-    my $action = $self->__get_action( $cgi ) || '';
+    my $action = $self->__get_action( $req ) || '';
 
     $self->logger()->info('not logged in - doing auth - page is '.$page.' - action is ' . $action);
 
     # Special handling for pki_realm and stack params
-    if ($action eq 'login!realm' && $cgi->param('pki_realm')) {
-        $session->param('pki_realm', scalar $cgi->param('pki_realm'));
+    if ($action eq 'login!realm' && $req->param('pki_realm')) {
+        $session->param('pki_realm', scalar $req->param('pki_realm'));
         $session->param('auth_stack', undef);
-        $self->logger()->debug('set realm in session: ' . $cgi->param('pki_realm') );
+        $self->logger()->debug('set realm in session: ' . $req->param('pki_realm') );
     }
-    if($action eq 'login!stack' && $cgi->param('auth_stack')) {
-        $session->param('auth_stack', scalar $cgi->param('auth_stack'));
-        $self->logger()->debug('set auth_stack in session: ' . $cgi->param('auth_stack') );
+    if($action eq 'login!stack' && $req->param('auth_stack')) {
+        $session->param('auth_stack', scalar $req->param('auth_stack'));
+        $self->logger()->debug('set auth_stack in session: ' . $req->param('auth_stack') );
     }
 
     # ENV always overrides session, keep this after the above block to prevent
@@ -460,7 +469,6 @@ sub handle_login {
     my $pki_realm = $session->param('pki_realm') || '';
     my $auth_stack =  $session->param('auth_stack') || '';
 
-
     # if this is an initial request, force redirect to the login page
     # will do an external redirect in case loginurl is set in config
     if ($action !~ /^login/ && $page !~ /^login/) {
@@ -474,7 +482,7 @@ sub handle_login {
         if (my $loginpage = $self->_config()->{loginpage}) {
 
             # internal call to handle_page
-            return $self->handle_page({ action => '', page => $loginpage, cgi => $cgi });
+            return $self->handle_page({ action => '', page => $loginpage, req => $req });
 
         } elsif (my $loginurl = $self->_config()->{loginurl}) {
 
@@ -637,7 +645,8 @@ sub handle_login {
         } elsif( $login_type  eq 'PASSWD' ) {
 
             # form send / credentials are passed (works with an empty form too...)
-            if ($cgi->param('action') && $cgi->param('action') eq 'login!password') {
+
+            if (($self->__get_action($req) || '') eq 'login!password') {
                 $self->logger()->debug('Seems to be an auth try - validating');
                 ##FIXME - Input validation
 
@@ -647,7 +656,7 @@ sub handle_login {
                     ('username','password');
 
                 foreach my $field (@fields) {
-                    my $val = $cgi->param($field);
+                    my $val = $req->param($field);
                     next unless ($val);
                     $data->{$field} = $val;
                 }

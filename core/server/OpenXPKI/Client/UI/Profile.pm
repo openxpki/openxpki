@@ -64,8 +64,7 @@ sub action_get_key_param {
     $self->logger()->trace( '$key_gen_param_supported: ' . Dumper $key_gen_param_supported ) if $self->logger->is_trace;
 
     # The field names used in the ui are in the request
-    my $in = $self->param();
-    my $key_gen_params = $in->{key_gen_params};
+    my $key_gen_params = $self->param('key_gen_params');
 
     my @fields;
     foreach my $pn (keys %{$key_gen_params}) {

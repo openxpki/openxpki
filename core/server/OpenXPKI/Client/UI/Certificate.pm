@@ -1256,25 +1256,25 @@ sub action_search {
     $input->{validity_options} = [];
     foreach my $key (qw(valid_before valid_after expires_before expires_after
         revoked_before revoked_after invalid_before invalid_after valid_at)) {
-        my @val = $self->param($key.'[]');
-        next unless ($val[0]);
-        if ($val[0] =~ /[^0-9]/) {
+        my $val = $self->param($key);
+        next unless ($val);
+        if ($val =~ /[^0-9]/) {
             $self->logger()->warn('skipping non-numeric value for validity option ' .$key);
             next;
         }
-        push @{$input->{validity_options}}, { key => $key, value => $val[0] };
+        push @{$input->{validity_options}}, { key => $key, value => $val };
 
-        $verbose->{$key} = DateTime->from_epoch( epoch => $val[0] )->iso8601();
+        $verbose->{$key} = DateTime->from_epoch( epoch => $val )->iso8601();
 
         if ($key eq 'valid_at') {
-            if (!$query->{valid_before} || $query->{valid_before} > $val[0]) {
-                $query->{valid_before} = $val[0];
+            if (!$query->{valid_before} || $query->{valid_before} > $val) {
+                $query->{valid_before} = $val;
             }
-            if (!$query->{expires_after} || $query->{expires_after} < $val[0]) {
-                $query->{expires_after} = $val[0];
+            if (!$query->{expires_after} || $query->{expires_after} < $val) {
+                $query->{expires_after} = $val;
             }
         } else {
-            $query->{$key} = $val[0];
+            $query->{$key} = $val;
         }
     }
 

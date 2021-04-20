@@ -60,15 +60,15 @@ $result = $client->mock_request({
 $result = $client->mock_request({
     'action' => 'workflow!index',
     'cert_subject_parts{CN}' => 'testbox.openxpki.org',
-    'cert_subject_parts{OU}[]' => ['PKI','OpenXPKI'],
+    'cert_subject_parts{OU}' => ['PKI','OpenXPKI'],
     'cert_subject_parts{C}' => 'DE',
     'wf_token' => undef
 });
 
 $result = $client->mock_request({
     'action' => 'workflow!index',
-    'cert_san_parts{ip}[]' => [ '127.0.0.1' ],
-    'cert_san_parts{dns}[]' => [ 'testbox.openxpki.com','testbox.openxpki.net' ],
+    'cert_san_parts{ip}' => [ '127.0.0.1' ],
+    'cert_san_parts{dns}' => [ 'testbox.openxpki.com','testbox.openxpki.net' ],
     'wf_token' => undef
 });
 

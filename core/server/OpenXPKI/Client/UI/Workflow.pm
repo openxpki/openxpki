@@ -1163,23 +1163,14 @@ sub action_index {
     }
 
     my %wf_param;
-
     if ($wf_args->{wf_fields}) {
-        my @field_names = map { $_->{name} } @{$wf_args->{wf_fields}};
-        my $fields = $self->param( \@field_names );
-        %wf_param = %{ $fields } if $fields;
-        $self->logger()->trace( "wf fields: " . Dumper $fields ) if $self->logger->is_trace;
-        ##! 64: "wf fields: " . Dumper $fields
+        %wf_param = %{$self->param_from_fields( $wf_args->{wf_fields} )};
+        $self->logger()->trace( "wf fields: " . Dumper \%wf_param ) if $self->logger->is_trace;
     }
 
     # take over params from token, if any
     if($wf_args->{wf_param}) {
         %wf_param = (%wf_param, %{$wf_args->{wf_param}});
-    }
-
-    # Apply serialization
-    foreach my $key (keys %wf_param) {
-        $wf_param{$key} = $self->serializer()->serialize($wf_param{$key}) if (ref $wf_param{$key});
     }
 
     $self->logger()->trace( "wf params: " . Dumper \%wf_param ) if $self->logger->is_trace;
@@ -1600,7 +1591,7 @@ sub action_bulk {
     $self->logger()->trace('Doing bulk with arguments: '. Dumper $wf_args) if $self->logger->is_trace;
 
     # wf_token is also used as name of the form field
-    my @serials = $self->param($wf_token.'[]');
+    my @serials = $self->param($wf_token);
 
     my @success; # list of wf_info results
     my $errors; # hash with wf_id => error
@@ -2592,7 +2583,6 @@ sub __render_input_field {
 
     if ($field->{clonable}) {
         $item->{clonable} = 1;
-        $item->{name} .= '[]';
     }
 
     if (!$field->{required}) {
@@ -2650,7 +2640,7 @@ sub __delegate_call {
     my $wf_action = shift || '';
 
     my ($class, $method, $n, $param) = $call =~ /([\w\:\_]+)::([\w\_]+)(!([!\w]+))?/;
-    $self->logger()->debug("deletegating render to $class, $method" );
+    $self->logger()->debug("delegate render to $class, $method" );
     eval "use $class; 1;";
     if ($param) {
         $class->$method( $self, $args, $wf_action, $param );

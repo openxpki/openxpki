@@ -380,17 +380,12 @@ sub __translate_form_def {
         if ($field->{keys}) {
             $new->{name} =  $field_name.'{*}';
             my $format = $field_name.'{%s}';
-            $format .= '[]' if ($new->{clonable});
 
             my @keys = map { {
                 value => sprintf ($format, $_->{value}),
                 label => $_->{label}
             } } @{$field->{keys}};
             $new->{keys} = \@keys;
-        }
-
-        if ($new->{clonable}) {
-            $new->{name} .= '[]';
         }
 
         if ($renew eq 'clear') {

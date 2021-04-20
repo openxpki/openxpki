@@ -45,7 +45,7 @@ $result = $client->mock_request({
     'action' => 'workflow!search',
     'wf_type' => 'certificate_enroll',
     'wf_token' => undef,
-    'transaction_id[]' => $sceptid,
+    'transaction_id' => $sceptid,
 });
 
 ok($result->{goto});

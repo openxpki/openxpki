@@ -4,3 +4,5 @@ core/i18n/**/*.mo
 core/i18n/en_GB/openxpki.po
 core/i18n/openxpki.pot
 core/server/OpenXPKI/VERSION.pm
+*.rpm
+*.deb

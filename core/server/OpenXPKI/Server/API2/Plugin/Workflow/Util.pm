@@ -11,6 +11,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Connector::WorkflowContext;
 use OpenXPKI::MooseParams;
 use OpenXPKI::Debug;
+use OpenXPKI::Serialization::Simple;
 
 has factory => (
     is => 'rw',
@@ -56,6 +57,8 @@ sub validate_input_params {
 
     # throw exception on fields not listed in the field spec
     # TODO - perhaps build a filter from the spec and tolerate additional params
+    my $ser = OpenXPKI::Serialization::Simple->new();
+
     my $result;
     for my $key (keys %{$params}) {
         if (not exists $fields{$key}) {
@@ -71,7 +74,9 @@ sub validate_input_params {
                 log => { priority => 'error', facility => 'workflow' },
             );
         }
-        $result->{$key} = $params->{$key};
+        # it looks like at least the validator pattern in workflow has problems with non-scalar items
+        # so we just add serialization here to all items
+        $result->{$key} = ref $params->{$key} ? $ser->serialize($params->{$key}) : $params->{$key};
     }
 
     return $result;

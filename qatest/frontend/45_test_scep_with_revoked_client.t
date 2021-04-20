@@ -41,7 +41,7 @@ $result = $client->mock_request({
     'wf_proc_state' => '',
     'wf_state' => 'FAILURE',
     'wf_type' => 'certificate_enroll',
-    'cert_subject[]' => 'CN=entity.openxpki.org*'
+    'cert_subject' => 'CN=entity.openxpki.org*'
 });
 
 ok($result->{goto});

@@ -17,9 +17,10 @@ use OpenXPKI::Serialization::Simple;
 use Moose;
 
 # Attributes set via constructor by OpenXPKI::Client::UI->__load_class()
-has cgi => (
+has req => (
     is => 'ro',
     isa => 'Object',
+    predicate => 'has_req',
 );
 
 has extra => (
@@ -108,6 +109,14 @@ sub _init_session {
 
     my $self = shift;
     return $self->_client()->session();
+
+}
+
+sub cgi {
+
+    my $self = shift;
+    return unless ($self->has_req());
+    return $self->req()->cgi;
 
 }
 
@@ -280,96 +289,21 @@ return type!
 
 =item arrayref
 
-Give a list of keys to retrieve, return value is a hashref holding the value
-for all your keys, set to undef if not found. Non-scalar keys will be combined
-to hashref or arrayref but contain only the items listed in the input.
+no longer supported - use param_from_fields instead
 
 =item undef
 
-Returns a complete hash of all values defined in extra and cgi->param.
-Parameters with array or hash notation ([] or {} in their name), are converted
-to hashref/arrayref.
+no longer supported
 
 =back
 
 =cut
 
 sub param {
+
     my ($self, $key) = @_;
 
-    # Single param key given, just return what we find
-    return $self->_single_param($key) if (defined $key && ref $key eq '');
-
-    my $result;
-    my $cgi = $self->cgi();
-    my @keys;
-
-    # List of keys given
-    if (ref $key eq 'ARRAY') {
-        $self->logger->trace('Param request for keylist: ' . join ",", @{$key} ) if $self->logger->is_trace;
-        my $extra = $self->extra();
-        foreach my $p (@{$key}) {
-            $self->logger->trace("Fetching $p");
-            # Resolve wildcard keys used in dynamic key fields
-            if ($p =~ m{ \A (\w+)\{\*\}(\[\])? \z }xs) {
-                my $pattern = '^'.$1.'{\w+}';
-                $self->logger->debug("Wildcard pattern found in '$p' - searching for: $pattern");
-                foreach my $wc ($cgi->param) {
-                    push @keys, $wc if ($wc =~ /$pattern/);
-                }
-                $self->logger->debug('Wildcard pattern - resulting keys: ' . join ",", @keys) if self->logger->is_debug;
-
-            # Parameter is in extra attributes
-            } elsif (defined $extra->{$p}) {
-                $result->{$p} = $extra->{$p};
-
-            # Queue key to get it from cgi later
-            } else {
-                push @keys, $p;
-            }
-        }
-    # All params requested
-    } else {
-        $result = $self->extra();
-        @keys = $cgi->param if ($cgi);
-        $self->logger->trace('Param request for full set - cgi keys ' . Dumper \@keys ) if $self->logger->is_trace;
-    }
-
-    return $result unless $cgi;
-
-    foreach my $name (@keys) {
-        # check for broken CGI implementations
-        die "Got reference where name was expected" if ref $name;
-
-        # for workflows - strip internal fields starting with "wf_"
-        next if $name =~ m{ \A wf_ }xms;
-
-        # autodetection of array and hashes
-        if ($name =~ m{ \A (\w+)\[\] \z }xms) {
-            my @val = $self->_single_param($name);
-            $result->{$1} = defined $val[0] ? \@val : [];
-        } elsif ($name =~ m{ \A (\w+)\{(\w+)\}(\[\])? \z }xms) {
-            $result->{$1} = {} unless $result->{$1};
-            # if $3 is set we have an array element of a named parameter
-            # (e.g. multivalued subject_parts)
-            if ($3) {
-                my @val = $self->_single_param($name);
-                $result->{$1}->{$2} = defined $val[0] ? \@val : [];
-            } else {
-                my $val = $self->_single_param($name);
-                $result->{$1}->{$2} = $val if defined $val;
-            }
-        } else {
-            my $val = $self->_single_param($name);
-            $result->{$name} = $val if defined $val;
-        }
-    }
-    return $result;
-
-}
-
-sub _single_param {
-    my ($self, $key) = @_;
+    die "param now requires a single key as argument" if (!$key || ref $key);
 
     $self->logger->trace("Param request for scalar '$key'") if $self->logger->is_trace;
 
@@ -377,23 +311,57 @@ sub _single_param {
     my @queries = (
         # Try 'extra' parameters
         sub { return $self->extra->{$key} },
-        # Try CGI parameters (and strip whitespaces)
-        sub { return unless $cgi; return map { my $v = $_; $v =~ s/^\s+|\s+$//g; $v } ($cgi->multi_param($key)) },
-        # Try Base64 encoded CGI parameters
-        sub { return unless $cgi; return map { decode_base64($_) } ($cgi->multi_param("_encoded_base64_$key")) },
+        # Try parameter via request object
+        sub { return $self->req()->param($key) },
     );
 
-    my @values;
-    for my $query (@queries) {
-        @values = $query->();
-        last if defined $values[0];
+    if (wantarray) {
+        for my $query (@queries) {
+            my @values = $query->();
+            return @values if defined $values[0];
+        }
+    } else {
+        for my $query (@queries) {
+            my $val = $query->();
+            return $val if (defined $val);
+        }
     }
 
-    $self->logger->trace("Value(s): " . join(", ", map { $_ // '<undef>' } @values)) if $self->logger->is_trace;
+    $self->logger->trace("Nothing found for parameter $key") if $self->logger->is_trace;
 
-    return wantarray
-        ? @values
-        : $values[0];
+    return;
+}
+
+sub param_from_fields {
+
+    my ($self, $fields) = @_;
+
+    my $param = {};
+    foreach my $item (@{$fields}) {
+        my $name = $item->{name};
+        if ($name =~ m{ \[\] \z }xms) {
+            $self->logger()->warn("Got field name with square brackets $name");
+            $name = substr($name,0,-2);
+        }
+        next if $name =~ m{ \A wf_ }xms;
+
+        my $vv;
+        if ($item->{clonable}) {
+            my @vv = $self->param($name);
+            $vv = \@vv;
+        } else {
+            $vv = $self->param($name);
+        }
+
+        if ($name =~ m{ \A (\w+)\{(\w+)\} \z }xs) {
+            $param->{$1} ||= ();
+            $param->{$1}->{$2} = $vv;
+        } else {
+            $param->{$name} = $vv;
+        }
+    }
+    $self->logger()->trace( "params: " . Dumper $param ) if $self->logger->is_trace;
+    return $param;
 }
 
 =head2 logger
@@ -866,7 +834,7 @@ sub __build_attribute_subquery {
         my $pattern = $item->{pattern} || '';
         my $operator = uc($item->{operator} || 'IN');
         my $transform = $item->{transform} || '';
-        my @val = $self->param($key.'[]');
+        my @val = $self->param($key);
 
         my @preprocessed;
 
@@ -931,7 +899,7 @@ sub __build_attribute_preset {
 
     foreach my $item (@{$attributes}) {
         my $key = $item->{key};
-        my @val = $self->param($key.'[]');
+        my @val = $self->param($key);
         while (my $val = shift @val) {
             push @attr,  { key => $key, value => $val };
         }
