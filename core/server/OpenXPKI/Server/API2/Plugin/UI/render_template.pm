@@ -11,7 +11,7 @@ OpenXPKI::Server::API2::Plugin::UI::render_template
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 use OpenXPKI::Template;
-
+use OpenXPKI::Debug;
 
 =head1 COMMANDS
 
@@ -43,6 +43,8 @@ command "render_template" => {
 } => sub {
     my ($self, $params) = @_;
 
+    ##! 64: $params->template
+    ##! 128: $params->params
     my $oxtt = OpenXPKI::Template->new({ trim_whitespaces => $params->trim });
     my $result = $oxtt->render($params->template, $params->params);
 

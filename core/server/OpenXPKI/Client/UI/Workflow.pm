@@ -2159,11 +2159,22 @@ sub __render_from_workflow {
         }
     } else {
 
+        my $description;
+        if ($wf_info->{state}->{template}) {
+            my $user = $self->_client->session()->param('user');
+            $description = $self->send_command_v2( 'render_template', {
+                template => $wf_info->{state}->{template}, params => {
+                    context => $wf_info->{workflow}->{context},
+                    user => { name => $user->{name},  role => $user->{role} },
+                },
+            });
+        }
+
         $self->_page({
             label => $wf_info->{state}->{label} || $wf_info->{workflow}->{title} || $wf_info->{workflow}->{label},
             breadcrumb => \@breadcrumb,
             shortlabel => $wf_info->{workflow}->{id},
-            description =>  $wf_info->{state}->{description},
+            description => $description || $wf_info->{state}->{description},
             className => 'workflow workflow-page ' . ($wf_info->{state}->{uiclass} || ''),
             ($wf_info->{workflow}->{id} ? (canonical_uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}) : ()),
         });
