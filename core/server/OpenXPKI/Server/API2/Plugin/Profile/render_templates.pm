@@ -13,6 +13,7 @@ OpenXPKI::Server::API2::Plugin::Profile::render_templates
 use Template;
 
 # Project modules
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
 has tt => (
@@ -53,6 +54,7 @@ command "render_subject_from_template" => {
 
     my $profile = $params->profile;
     my $vars    = $params->vars; $self->cleanup_for_tt($vars);
+    ##! 64: $vars
     my $style;
     if ($params->has_style) {
         $style = $params->style;
@@ -344,7 +346,7 @@ B<Parameters>
 =cut
 sub cleanup_for_tt {
     my ($self, $vars) = @_;
-
+    ##! 64: $vars
     # TT has issues with empty values so we delete keys without content
     map {
         delete $vars->{$_} if ( ref $vars->{$_} eq '' && (!defined $vars->{$_} || $vars->{$_} eq '') );

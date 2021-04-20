@@ -19,7 +19,12 @@ extends 'OpenXPKI::Server::Workflow::Validator';
 
 sub _validate {
 
+    ##! 1: 'start'
     my ( $self, $workflow, $profile, $style, $subject_parts ) = @_;
+
+
+    ##! 32: "$profile, $style"
+    ##! 64: $subject_parts
 
     return if (not defined $profile);
     return if (not defined $style);
@@ -27,6 +32,7 @@ sub _validate {
 
     # Render the DN - get the input data from the context
     if (!ref $subject_parts) {
+        ##! 32: 'deserialize'
         $subject_parts = OpenXPKI::Serialization::Simple->new->deserialize( $subject_parts );
     }
 
@@ -35,6 +41,8 @@ sub _validate {
         style   => $style,
         vars    => $subject_parts
     );
+
+    ##! 32: "Subject $cert_subject"
 
     return if (!$cert_subject);
 
