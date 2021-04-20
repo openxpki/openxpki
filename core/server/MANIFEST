@@ -485,6 +485,7 @@ OpenXPKI/Server/Workflow/Condition/CertificateHasStatus.pm
 OpenXPKI/Server/Workflow/Condition/CertificateHasSuccessor.pm
 OpenXPKI/Server/Workflow/Condition/CertificateIsLocalEntity.pm
 OpenXPKI/Server/Workflow/Condition/CertificateNotYetRevoked.pm
+OpenXPKI/Server/Workflow/Condition/CheckPassword.pm
 OpenXPKI/Server/Workflow/Condition/Connector/Exists.pm
 OpenXPKI/Server/Workflow/Condition/Connector/IsValue.pm
 OpenXPKI/Server/Workflow/Condition/DatapoolEntry.pm
