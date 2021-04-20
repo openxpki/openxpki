@@ -289,7 +289,7 @@ if ($params{wfid}) {
         COMMAND => 'create_workflow_instance',
         PARAMS => {
             workflow => $wf_type,
-            activity => $params{wfaction},
+            ($params{wfaction} ? (activity => $params{wfaction}) :()),
             params => \%wf_parameters,
         },
         API => 2
