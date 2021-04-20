@@ -85,7 +85,7 @@ before 'init_user_config' => sub { # ... so we do not overwrite user supplied co
         );
     }
 
-    $self->default_realm(shift @{ $self->test_realms }); # set first one as default
+    $self->default_realm($self->test_realms->[0]); # set first one as default
 };
 
 sub _crypto {
