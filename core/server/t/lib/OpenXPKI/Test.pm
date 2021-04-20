@@ -662,7 +662,7 @@ B<Only called internally:> initialize logging.
 sub init_logging {
     my ($self) = @_;
 
-    note "Test-Framework: init_logging";
+    note "[OpenXPKI::Test->init_logging]";
 
     OpenXPKI::Log4perl->init_or_fallback( \($self->_log4perl_screen) );
 
@@ -687,10 +687,10 @@ sub init_logging {
         # as this accesses the actual appender class, but we need the wrapper class Log::Log4perl::Appender
         # (https://www.perlmonks.org/?node_id=1199218)
         $Log::Log4perl::Logger::APPENDER_BY_NAME{'File'}->threshold('DEBUG');
-        note ">";
-        note "> All log messages (log level DEBUG) will be written to:";
-        note "> ".$self->log_path;
-        note ">";
+        note "  >";
+        note "  > All log messages (log level DEBUG) will be written to:";
+        note "  > ".$self->log_path;
+        note "  >";
     }
 }
 
@@ -737,7 +737,7 @@ So in a role you can e.g. inject configuration entries as follows:
 sub init_base_config {
     my ($self) = @_;
 
-    note "Test-Framework: init_base_config";
+    note "[OpenXPKI::Test->init_base_config]";
 
     $self->add_conf(
         "system.database" => $self->conf_database,
@@ -755,7 +755,7 @@ constructor parameter C<add_config> to L<OpenXPKI::Test::ConfigWriter>.
 sub init_user_config {
     my ($self) = @_;
 
-    note "Test-Framework: init_user_config";
+    note "[OpenXPKI::Test->init_user_config]";
 
     # Add basic test realm.
     # Without any realm we cannot set a user via CTX('authentication')
@@ -779,11 +779,11 @@ sub init_user_config {
     }
 
     if (not $self->has_default_realm) {
-        note "Setting default realm to 'test' as no other realm was set";
+        note "  Setting default realm to 'test' as no other realm was set";
         $self->default_realm('test');
     }
     else {
-        note "Default realm: ".$self->default_realm;
+        note "  Default realm: ".$self->default_realm;
     }
 }
 
@@ -795,7 +795,7 @@ B<Only called internally:> write test configuration to disk (temporary directory
 sub write_config {
     my ($self) = @_;
 
-    note "Test-Framework: write_config";
+    note "[OpenXPKI::Test->write_config]";
 
     # write configuration YAML files
     $self->config_writer->create;
@@ -830,7 +830,7 @@ B<Only called internally:> initializes the basic server context objects:
 sub init_server {
     my ($self) = @_;
 
-    note "Test-Framework: init_server";
+    note "[OpenXPKI::Test->init_server]";
 
     # init log object (and force it to NOT reinitialize Log4perl)
     OpenXPKI::Server::Context::setcontext({ log => OpenXPKI::Server::Log->new(CONFIG => undef) })
@@ -842,7 +842,7 @@ sub init_server {
     # init notification object if needed
     my $cfg_notification = "realm.".$self->default_realm.".notification";
     if ($self->get_conf($cfg_notification, 1)) {
-        note "Config node $cfg_notification found, initializing real CTX('notification') object";
+        note "  Config node $cfg_notification found, initializing real CTX('notification') object";
         push @tasks, "notification";
     }
 
@@ -863,7 +863,7 @@ sub init_server {
     # Set fake notification object if there is no real one already
     # (either via setup above or requested by user)
     if (not OpenXPKI::Server::Context::hascontext("notification")) {
-        note "Initializing mockup CTX('notification') object";
+        note "  Initializing mockup CTX('notification') object";
         OpenXPKI::Server::Context::setcontext({
             notification =>
                 Moose::Meta::Class->create('OpenXPKI::Test::AnonymousClass::Notification::Mockup' => (
@@ -892,7 +892,7 @@ This is the standard hook for roles to modify session data, e.g.:
 sub init_session_and_context {
     my ($self) = @_;
 
-    note "Test-Framework: init_session_and_context";
+    note "[OpenXPKI::Test->init_session_and_context]";
 
     $self->session(OpenXPKI::Server::Session->new(load_config => 1)->create);
 
@@ -946,7 +946,7 @@ sub set_user {
     Log::Log4perl::MDC->put('user', $realuser);
     Log::Log4perl::MDC->put('role', $role);
 
-    note "Set session to realm $realm: user '$user' ($role)";
+    note "  session set to realm '$realm', user '$user', role '$role'";
 }
 
 =head2 api2_command

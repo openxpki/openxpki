@@ -97,7 +97,7 @@ sub write_yaml {
     my ($self, $filepath, $data) = @_;
 
     $self->_make_parent_dir($filepath);
-    note "Writing $filepath";
+    note "  writing $filepath";
     $self->write_str($filepath, YAML::Tiny->new($data)->write_string);
 }
 
@@ -148,7 +148,7 @@ sub _add_config_entry {
         $node->{$last_key} = $data;
     }
 
-    note sprintf("- %s%s%s",
+    note sprintf("  - %s%s%s",
         $key,
         $source ? " ($source)" : "",
         $overwrite_hint,
