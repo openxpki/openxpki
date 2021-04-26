@@ -133,6 +133,20 @@ Example call when debian packages >= v3.8 are installed::
 If you do not use debian packages, you can get a copy from ``contrib/sql/`` in the
 config repository https://github.com/openxpki/openxpki-config.
 
+You should now be able to start the server::
+
+    $ openxpkictl start
+
+    Starting OpenXPKI...
+    OpenXPKI Server is running and accepting requests.
+    DONE.
+
+    In the process list, you should see two process running::
+
+    14302 ?        S      0:00 openxpki watchdog ( main )
+    14303 ?        S      0:00 openxpki server ( main )
+
+    If this is not the case, check */var/log/openxpki/stderr.log*.
 
 Setup base certificates
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -165,39 +179,12 @@ to import the Root CA(s) first::
 
     $ openxpkiadm certificate import --file root.crt
 
-Create DataVault Token
-######################
+As of v3.10 the openxpiadm alias command can be used to manage the keys
+directly but this requires that the server is started and the directory
+for the keys exists, the default location is `/etc/openxpki/local/keys`
+so we need to create the directory before we proceed::
 
-The DataVault is a self-signed certificate using an RSA key, see #2 above.
-
-Copy the DataVault key file to /etc/openxpki/local/keys/vault-1.pem, it should have 0400
-permission owned by the openxpki user.
-
-Now import the certificate::
-
-    $ openxpkiadm certificate import --file vault.crt
-
-    Starting import
-    Successfully imported certificate into database:
-      Subject:    CN=Internal DataVault
-      Issuer:     CN=Internal DataVault
-      Identifier: YsyZ4eCgzHQN607WBIcLTxMjYLI
-      Realm:      none
-
-Register it as datasafe token for the `democa` realm - you need to run this
-command for each realm::
-
-    $ openxpkiadm alias --realm democa --token datasafe --file vault.crt
-
-    Successfully created alias in realm democa:
-      Alias     : vault-1
-      Identifier: YsyZ4eCgzHQN607WBIcLTxMjYLI
-      NotBefore : 2020-07-06 18:54:43
-      NotAfter  : 2030-07-09 18:54:43
-
-Now its time to start the OpenXPKI Server::
-
-    $ openxpkictl start
+    $ mkdir -p /etc/openxpki/local/keys
 
     Starting OpenXPKI...
     OpenXPKI Server is running and accepting requests.
@@ -209,6 +196,39 @@ In the process list, you should see two process running::
     14303 ?        S      0:00 openxpki server ( main )
 
 If this is not the case, check */var/log/openxpki/stderr.log*.
+
+Create DataVault Token
+######################
+
+Create an RSA key with at least 3072 bits, either chose no password or
+the password configured for the token in your `crypto.yaml`. Create a
+self-signed certificate with this key with subject "/CN=DataVault".
+
+Now import the certificate and its key::
+
+    $ openxpkiadm certificate import --file vault.crt
+
+    Starting import
+    Successfully imported certificate into database:
+      Subject:    CN=Internal DataVault
+      Issuer:     CN=Internal DataVault
+      Identifier: YsyZ4eCgzHQN607WBIcLTxMjYLI
+      Realm:      none
+
+Register it as datasafe token for the `democa` realm and provide the
+matching key file to get it loaded into the right place::
+
+    $ openxpkiadm alias --realm democa --token datasafe \
+        --file vault.crt --key vault.key
+
+    Successfully created alias in realm democa:
+      Alias     : vault-1
+      Identifier: YsyZ4eCgzHQN607WBIcLTxMjYLI
+      NotBefore : 2020-07-06 18:54:43
+      NotAfter  : 2030-07-09 18:54:43
+
+In case you have multiple realms, you need to run this command for each
+realm but should omit the key file for any additional realms.
 
 You should check now if your DataVault token is working::
 
@@ -223,7 +243,6 @@ You should check now if your DataVault token is working::
 If you do not see `"key_usable": 1` your token is not working! Check the
 permissions of the file (and the folders) and if the key is password
 protected if you have the right secret set in your crypto.yaml!
-
 
 Create Issuing CA Token
 #######################
@@ -279,7 +298,6 @@ If the import went smooth, you should see something like this (ids and times wil
 
     upcoming root ca:
       not set
-
 
 An easy check to see if the signer token is working is to create a CRL::
 
