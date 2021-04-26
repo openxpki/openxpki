@@ -26,6 +26,7 @@ sub hash {
     my $params = shift;
 
     my $prefix = sprintf '{%s}', $scheme;
+
     my $computed_secret;
 
     if (my ($salted, $algo, $len) = $scheme =~ m{\A(s?)(md5|sha(224|256|384|512)?)\z}) {
@@ -86,6 +87,8 @@ sub hash {
         );
         $prefix = '';
 
+    } elsif ($scheme eq 'plain') {
+        $computed_secret = $passwd;
     }
 
     if (!$computed_secret){
@@ -149,7 +152,7 @@ sub check {
 
 sub has_scheme {
     my $scheme = shift;
-    return ($scheme =~ m{\A(crypt|argon2|s?md5|s?sha(224|256|384|512)?)\z});
+    return ($scheme =~ m{\A(plain|crypt|argon2|s?md5|s?sha(224|256|384|512)?)\z});
 }
 
 sub __create_salt {

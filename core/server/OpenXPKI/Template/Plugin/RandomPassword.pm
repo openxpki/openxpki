@@ -14,6 +14,8 @@ use Template::Plugin;
 
 use Data::Dumper;
 
+use OpenXPKI::Random;
+use OpenXPKI::Password;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use Digest::SHA;
@@ -32,115 +34,35 @@ sub generate {
     my $self = shift;
     my $args = shift;
 
-    my $password = '';
-    my $rv = '';
-
     if (! defined $args || ref $args ne 'HASH') {
-    OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_TEMPLATE_PASSWORD_GENERATE_MISSING_SCHEME_SPECIFICATION",
-        params  => {
-        },
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_TEMPLATE_PASSWORD_GENERATE_MISSING_SCHEME_SPECIFICATION",
         );
     }
 
-    if ($args->{scheme} eq 'plain') {
-    my $pool = '';
-    foreach my $cmd ('ps',
-             'netstat -na',
-             'date',
-             'openssl rand -base 64 128',
-             'vmstat',
-             'free',
-             'df',
-        ) {
-        $pool .= `$cmd 2>&1` || '';
-    }
-    my $ctx = Digest::SHA->new();
-    $ctx->add($pool);
-    $password = substr($ctx->b64digest, 0, 8);
-    $rv = "{PLAIN}$password";
-    }
-
-    if ($args->{scheme} eq 'sha') {
-    $password = $self->generate(
-        {
-        scheme => 'plain',
-        });
-    $password = substr($password, 7);
-
-    my $ctx = Digest::SHA->new();
-    $ctx->add($password);
-    $rv = '{SHA}' . $ctx->b64digest;
-    }
-
-    if ($args->{scheme} eq 'ssha') {
-    my $salt = $self->generate(
-        {
-        scheme => 'plain',
-        });
-    $salt = substr($salt, 7, 4);
-
-    $password = $self->generate(
-        {
-        scheme => 'plain',
-        });
-    $password = substr($password, 7);
-
-    my $ctx = Digest::SHA->new();
-    $ctx->add($password);
-    $ctx->add($salt);
-    $rv = '{SSHA}' . MIME::Base64::encode_base64($ctx->digest . $salt, '');
-    }
-
-    if ($args->{scheme} eq 'md5') {
-    $password = $self->generate(
-        {
-        scheme => 'plain',
-        });
-    $password = substr($password, 7);
-
-    my $ctx = Digest::MD5->new();
-    $ctx->add($password);
-    $rv = '{MD5}' . $ctx->b64digest;
-    }
-
-    if ($args->{scheme} eq 'smd5') {
-    my $salt = $self->generate(
-        {
-        scheme => 'plain',
-        });
-    $salt = substr($salt, 7, 4);
-
-    $password = $self->generate(
-        {
-        scheme => 'plain',
-        });
-    $password = substr($password, 7);
-
-    my $ctx = Digest::MD5->new();
-    $ctx->add($password);
-    $ctx->add($salt);
-    $rv = '{SMD5}' . MIME::Base64::encode_base64($ctx->digest . $salt, '');
+    my $password = OpenXPKI::Random->new()->get_random( $args->{bytes} || 9 );
+    my $rv;
+    if ($args->{scheme} eq 'none') {
+        return $password;
+    } else {
+        $rv = OpenXPKI::Password::hash($args->{scheme}, $password);
     }
 
     if ($rv eq '') {
-    OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_TEMPLATE_PASSWORD_GENERATE_INVALID_SCHEME_SPECIFICATION",
-        params  => {
-        SCHEME => $args->{scheme},
-        },
+        OpenXPKI::Exception->throw (
+            message => "I18N_OPENXPKI_TEMPLATE_PASSWORD_GENERATE_INVALID_SCHEME_SPECIFICATION",
+            params  => { SCHEME => $args->{scheme} },
         );
     }
 
     if (defined $args->{callback}) {
-    my $callback = eval "$args->{callback}";
-
-    if (ref $callback eq 'CODE') {
-        eval {
-        $_ = $password;
-        &$callback($password, $rv);
-        };
-    }
+        my $callback = eval "$args->{callback}";
+        if (ref $callback eq 'CODE') {
+            eval {
+            $_ = $password;
+            &$callback($password, $rv);
+            };
+        }
     }
     return $rv;
 }
@@ -151,7 +73,7 @@ __END__
 =head1 OpenXPKI::Template::Plugin::RandomPassword
 
 This module implements a Template Toolkit plugin that generates randomly
-generated passwords in RFC2307 syntax.
+generated passwords in RFC2307 syntax. The used alphabet is Base64.
 
 =head2 How to use
 
@@ -181,11 +103,19 @@ Named parameters:
 
 =item scheme
 
-Required. Specifies the password scheme to use. Supported values are 'plain',
-'sha' (SHA1 hash), 'ssha' (seeded SHA1 hash), 'md5' (MD5 hash), 'ssha'
-(seeded SHA1 hash) and 'smd5' (seeded MD5 hash).
+Required. Specifies the password scheme to use.
+
+The special value I<none> outputs the generated password as is (without
+a scheme prefix). Anything else will be handled by OpenXPKI::Password and
+print the generated hashed password.
 
 The recommended scheme is 'ssha'.
+
+=item bytes
+
+The number of random bytes, default is 9, which generates a 12 bas63
+characters. Note: If this number is not a multiple of 3 you will have
+padding characters to fill up to a valid base64 word.
 
 =item callback
 

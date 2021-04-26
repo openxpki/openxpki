@@ -127,5 +127,18 @@ sub realm {
 
 }
 
+sub label {
+
+    my $self = shift;
+    my $wf_id = shift;
+
+    my $wf = $self->_load($wf_id);
+    if (!$wf || !$wf->{'workflow_type'}) { return; }
+
+    my $label = CTX('config')->get([ 'workflow', 'def', $wf->{'workflow_type'}, 'head', 'label' ]);
+
+    return $label || $wf->{'workflow_type'};
+
+}
 
 1;

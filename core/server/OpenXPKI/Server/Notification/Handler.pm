@@ -165,6 +165,10 @@ Creates a hashref containing useful values from the realm and the workflow.
 
 =over
 
+=item workflow information
+
+    meta_wf_id, meta_wf_type, meta_wf_state
+
 =item realm info, from I<system.realms>
 
     meta_pki_realm, meta_label, meta_baseurl
