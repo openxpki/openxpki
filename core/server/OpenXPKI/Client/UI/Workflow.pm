@@ -2199,7 +2199,7 @@ sub __render_from_workflow {
             elsif ('CANCELED' eq $state) {
                 $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATUS_CANCELED', 'warn');
             }
-            elsif ('NOSTATUS' eq $state) {
+            elsif ('NOSTATUS' ne $state) {
                 $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATUS_MISC_FINAL', 'warn');
             }
 
