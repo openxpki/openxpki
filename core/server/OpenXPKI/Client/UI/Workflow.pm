@@ -1893,6 +1893,22 @@ sub __render_from_workflow {
         }
     }
 
+    # helper sub to render the pages description text from state/action using a template
+    my $templated_description = sub {
+        my $page_def = shift;
+        my $description;
+        if ($page_def->{template}) {
+            my $user = $self->_client->session()->param('user');
+            $description = $self->send_command_v2( 'render_template', {
+                template => $page_def->{template}, params => {
+                    context => $wf_info->{workflow}->{context},
+                    user => { name => $user->{name},  role => $user->{role} },
+                },
+            });
+        }
+        return  $description || $page_def->{description} || '';
+    };
+
     # check if the workflow is in a "non-regular" state
     if (grep /$wf_proc_state/, ('pause','retry_exceeded','exception', 'running')) {
 
@@ -2067,7 +2083,7 @@ sub __render_from_workflow {
             label => $label,
             breadcrumb => \@breadcrumb,
             shortlabel => $wf_info->{workflow}->{id},
-            description =>  $wf_action_info->{description},
+            description =>  $templated_description->($wf_action_info),
             className => 'workflow workflow-action ' . ($wf_action_info->{uiclass} || ''),
             canonical_uri => sprintf('workflow!load!wf_id!%01d!wf_action!%s', $wf_info->{workflow}->{id}, $wf_action),
         });
@@ -2159,22 +2175,11 @@ sub __render_from_workflow {
         }
     } else {
 
-        my $description;
-        if ($wf_info->{state}->{template}) {
-            my $user = $self->_client->session()->param('user');
-            $description = $self->send_command_v2( 'render_template', {
-                template => $wf_info->{state}->{template}, params => {
-                    context => $wf_info->{workflow}->{context},
-                    user => { name => $user->{name},  role => $user->{role} },
-                },
-            });
-        }
-
         $self->_page({
             label => $wf_info->{state}->{label} || $wf_info->{workflow}->{title} || $wf_info->{workflow}->{label},
             breadcrumb => \@breadcrumb,
             shortlabel => $wf_info->{workflow}->{id},
-            description => $description || $wf_info->{state}->{description},
+            description =>  $templated_description->($wf_info->{state}),
             className => 'workflow workflow-page ' . ($wf_info->{state}->{uiclass} || ''),
             ($wf_info->{workflow}->{id} ? (canonical_uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}) : ()),
         });
