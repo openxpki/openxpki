@@ -14,6 +14,19 @@ not behave correctly or even wont start.
 For a quick overview of config changes, you should always check the
 config repository at https://github.com/openxpki/openxpki-config.
 
+Release v3.12
+--------------
+
+**Mandatory upgrade**
+
+Major rework of the authentication layer - the handlers `External` and `ClientSSO`
+that were also referenced in the default configuration (but of no real use in the
+default setup) have been **removed** from the code tree. A similar functionality
+is available via the new handlers `NoAuth` and `Command`. In case you have those
+handlers as "leftovers" of the default configuration you should just remove them.
+If you have used them, please adjust the configuration before you upgrade.
+
+
 Release v3.x
 ------------
 

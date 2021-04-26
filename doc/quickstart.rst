@@ -30,6 +30,25 @@ We also provide a docker image based on the debian packages as well as a
 docker-compose file, see https://github.com/openxpki/openxpki-docker.
 **Please read the hints in the README if you try this on Windows!**
 
+
+Configuration
+-------------
+
+The debian package come with a sample configuration, for a production setup
+we recommend to remove the `/etc/openxpki` folder created by the package and
+replace it with a checkout of the `community` branch of the configuration
+repository available at https://github.com/openxpki/openxpki-config. Please
+also have a look at the [QUICKSTART.md document](https://github.com/openxpki/openxpki-config/blob/community/QUICKSTART.md)
+which has some more detailed instructions how to setup the system.
+
+**Note**: The configuration is (usually) backward compatible but most releases
+introduce new components and new configuration that can not be used with
+old releases. Make sure your code version is recent enough to run the config!
+Starting with v3.12, the code checks its compatibility with the config itself
+via the `system.version.depend` node. We recommend to keep and maintain this
+in your config!
+
+
 Debian Builds
 -------------
 
@@ -122,17 +141,18 @@ The debian package comes with a shell script ``sampleconfig.sh`` that does all t
 (look in /usr/share/doc/libopenxpki-perl/examples/). The script will create a two stage ca with
 a root ca certificate and below your issuing ca and certs for SCEP and the internal datasafe.
 
-The sample script provides certs for a quickstart but should never be used for production systems
+This script provides a quickstart but should **never be used for production systems**
 (it has the fixed passphrase *root* for all keys ;) and no policy/crl, etc config ).
 
-Here is what you need to do if you *dont* use the sampleconfig script.
+Here is what you need to do if you *dont* use the sampleconfig script:.:
 
-#. Create a key/certificate as signer certificate (ca = true)
+#. Create a key/certificate as signer certificate (your CA certificate, *ca = true*)
 #. Create a key/certificate for the internal datavault (ca = false, can be below the ca but can also be self-signed).
 #. Create a key/certificate for the scep service (ca = false, can be below the ca but can also be self-signed or from other ca).
 
 OpenXPKI supports NIST and Brainpool ECC curves (as supported by openssl) for the CA certificates, as the Datavault
-certificate is used for data encryption it **MUST** use an RSA key!
+certificate is used for data encryption it **MUST** use an RSA key! You should also remove the `democa` realm and
+create a realm with a proper name (see [reference/configuration/introduction.html#main-configuration]).
 
 **Starting with release 3.6 the default config uses the database to store the issuing ca and SCEP tokens -
 if you upgrade from an older config version check the new settings in systems/crypto.yaml.**
@@ -148,7 +168,9 @@ to import the Root CA(s) first::
 Create DataVault Token
 ######################
 
-Copy the DataVault Key file to /etc/openxpki/local/keys/vault-1.pem, it should have 0400
+The DataVault is a self-signed certificate using an RSA key, see #2 above.
+
+Copy the DataVault key file to /etc/openxpki/local/keys/vault-1.pem, it should have 0400
 permission owned by the openxpki user.
 
 Now import the certificate::
