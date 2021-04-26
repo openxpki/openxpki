@@ -3,6 +3,7 @@ use Moose;
 use JSON;
 use CGIMock;
 use CGI::Session;
+use OpenXPKI::Client::UI::Request;
 
 extends 'OpenXPKI::Client::UI';
 
@@ -47,11 +48,13 @@ sub mock_request {
 
     $self->cgi->data( $data );
 
+
+
     my($out);
     local *STDOUT;
     open(STDOUT, '>', \$out);
 
-    $self->handle_request( { cgi => $self->cgi } );
+    $self->handle_request( OpenXPKI::Client::UI::Request->new( cgi => $self->cgi() ) );
     my $json = $self->json()->decode($out);
 
     if (ref $json->{main} && $json->{main}->[0]->{content}->{fields}) {
