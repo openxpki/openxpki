@@ -1,3 +1,6 @@
+.oxi-checkbox,span.oxi-label{display:inline-block}
+.clonable-btn-group,span.oxi-label{white-space:nowrap}
+.oxi-button-container a.btn:before,ol.breadcrumb .cert-search:before,ol.breadcrumb .workflow-search:before,ol.breadcrumb .workflow-state:before,ol.breadcrumb .workflow-type:before{font-family:"Glyphicons Halflings";padding-right:5px}
 body,body>.ember-view,html{height:100%}
 #waiting-for-ember .alert{margin-top:1em}
 #application{min-height:100%;height:auto!important;height:100%;margin:0 auto -60px;padding:0 0 60px}
@@ -17,7 +20,6 @@ label{overflow:hidden;text-overflow:ellipsis}
 .table-bordered tr.spacer th{padding-top:15px;background-color:#eee}
 ul.pagination li:not(.disabled)>a{cursor:pointer}
 span.pagination-label{float:left;padding:6px 0}
-span.oxi-label{display:inline-block;white-space:nowrap}
 dl,ul{margin-bottom:0}
 dd{padding:0 0 0 1em}
 dd+dt{padding-top:.5em}
@@ -39,9 +41,9 @@ div.spacer{margin:5px}
 .oxi-pagehead ol.breadcrumb{margin:10px 0 0;padding:0;background-color:transparent;border:none;border-radius:0;list-style:none inside;color:#a0a0a0}
 ol.breadcrumb>li+li:before{color:#a0a0a0}
 .oxi-pagehead ol.breadcrumb+h2{margin-top:10px}
-ol.breadcrumb .workflow-type:before{padding-right:5px;font-family:"Glyphicons Halflings";content:"\e136";color:#a0a0a0}
-ol.breadcrumb .workflow-state:before{padding-right:5px;font-family:"Glyphicons Halflings";content:"\e062";color:#a0a0a0}
-ol.breadcrumb .cert-search:before,ol.breadcrumb .workflow-search:before{padding-right:5px;font-family:"Glyphicons Halflings";content:"\e003";color:#a0a0a0}
+ol.breadcrumb .workflow-type:before{content:"\e136";color:#a0a0a0}
+ol.breadcrumb .workflow-state:before{content:"\e062";color:#a0a0a0}
+ol.breadcrumb .cert-search:before,ol.breadcrumb .workflow-search:before{content:"\e003";color:#a0a0a0}
 ol.breadcrumb .cert-search-result:before,ol.breadcrumb .workflow-search-result:before{padding-right:5px;font-family:"Glyphicons Halflings";content:"\e056";color:#a0a0a0}
 .oxi-grid-container{padding-bottom:40px}
 div.oxisection-grid th.sortable{cursor:pointer;-webkit-user-select:none}
@@ -90,16 +92,15 @@ div.required input,div.required select,div.required textarea{background-color:#f
 div.required input.form-control[disabled],div.required select.form-control[disabled],div.required textarea.form-control[disabled]{border:1px solid #ccc}
 div.optional label.control-label:after{content:'*'}
 div.optional input,div.optional select,div.optional textarea{border:1px dashed #888}
-.oxi-checkbox{position:relative;top:4px;display:inline-block;width:18px;height:18px;border:2px solid;border-radius:2px;border-color:rgba(0,0,0,.54)}
+.oxi-checkbox{position:relative;top:4px;width:18px;height:18px;border:2px solid;border-radius:2px;border-color:rgba(0,0,0,.54)}
 .oxi-checkbox.checked:after{position:absolute;left:2px;top:2px;width:10px;height:10px;border-radius:2px;opacity:.54;background-color:#000;content:' '}
 div.oxifield-upload{position:relative;padding-bottom:34px}
-.clonable-btn-group{white-space:nowrap}
 .stacked-buttons{margin-top:4px;margin-bottom:4px}
 .stacked-buttons .btn-bt-margin{margin-top:6px;margin-bottom:6px}
 .oxi-btn-loading{color:#fff;background-color:#428bca;border-color:#357ebd}
 .oxi-btn-loading.active,.oxi-btn-loading:active,.oxi-btn-loading:focus,.oxi-btn-loading:hover{color:#fff;background-color:#3276b1;border-color:#285e8e}
 .oxi-button-container{padding-bottom:20px}
-.oxi-button-container a.btn:before{padding-right:5px;font-family:"Glyphicons Halflings";content:"\e144";color:#a0a0a0}
+.oxi-button-container a.btn:before{content:"\e144";color:#a0a0a0}
 .oxi-btn-expected,.oxi-btn-expected:focus,.oxi-btn-expected:hover,.oxi-btn-submit,.oxi-btn-submit:focus,.oxi-btn-submit:hover{background-color:#c9e2b3}
 .oxi-btn-optional,.oxi-btn-optional:focus,.oxi-btn-optional:hover{background-color:#e4e4da}
 .oxi-btn-cancel,.oxi-btn-cancel:focus,.oxi-btn-cancel:hover,.oxi-btn-failure,.oxi-btn-failure:focus,.oxi-btn-failure:hover{background-color:#e39f9f}
@@ -112,3 +113,4 @@ div.oxifield-upload{position:relative;padding-bottom:34px}
 .hover-element .menu{display:none;background-color:#dff0d8;box-shadow:0 8px 16px 0 rgba(0,0,0,.2);z-index:10;width:100%;padding:6pt}
 .hover-element:hover .menu{display:block}
 .hover-element:hover .content{border-color:#bfe0a8}
+.dropdown-divider{height:0;margin:.5rem 0;overflow:hidden;border-top:1px solid #e9ecef}

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2021-04-15 09:08+0200\n"
+"PO-Revision-Date: 2021-04-26 11:53+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -815,6 +815,13 @@ msgstr "Sperrliste (CRL) erzeugen"
 
 msgid "I18N_OPENXPKI_UI_MENU_CSR_CHECK"
 msgstr "Antragsprüfung"
+
+msgid "I18N_OPENXPKI_UI_MENU_HEAD_REPORT"
+msgstr "Auswertungen"
+
+# Remove?
+msgid "I18N_OPENXPKI_UI_MENU_HEAD_SYSTEM_STATUS"
+msgstr "Systemzustand"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_MENU_HOME"

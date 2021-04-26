@@ -524,3 +524,11 @@ div.oxifield-upload {
 
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .hover-element:hover .content { border-color: #bfe0a8 }
+
+/* class is from bootstrap 4.0 but it looks like we do not have this in the assets? */
+.dropdown-divider {
+	height: 0;
+	margin: .5rem 0;
+	overflow: hidden;
+	border-top: 1px solid #e9ecef;
+}

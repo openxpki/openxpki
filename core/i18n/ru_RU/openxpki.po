@@ -1077,6 +1077,14 @@ msgid "I18N_OPENXPKI_UI_MENU_CSR_CHECK"
 msgstr "Имя учетной записи"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_HEAD_REPORT"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_HEAD_SYSTEM_STATUS"
+msgstr "Статус"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_HOME"
 msgstr "Имя учетной записи"
 

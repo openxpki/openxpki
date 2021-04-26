@@ -1018,6 +1018,16 @@ msgid "I18N_OPENXPKI_UI_MENU_CSR_CHECK"
 msgstr "Mostra Liste Revoche (CRL)"
 
 # Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_HEAD_REPORT"
+msgstr "Report Completo"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_HEAD_SYSTEM_STATUS"
+msgstr "Stato del Sistema"
+
+# Remove?
 msgid "I18N_OPENXPKI_UI_MENU_HOME"
 msgstr "Home"
 

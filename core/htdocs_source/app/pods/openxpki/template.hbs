@@ -24,11 +24,19 @@
                         <dd.menu as |ddm|>
                             {{#each navEntry.entries as |entry|}}
                                 <ddm.item>
-                                    {{! We need the href in addition to the click handler to support
-                                        opening the page in a new window }}
-                                    <a href="{{url-for "openxpki" entry.key}}" {{on "click" (fn this.navigateTo entry.key)}}>
-                                        {{entry.label}}
-                                    </a>
+                                    {{#if entry.key}}
+                                        {{! We need the href in addition to the click handler to support
+                                            opening the page in a new window }}
+                                        <a href="{{url-for "openxpki" entry.key}}" {{on "click" (fn this.navigateTo entry.key)}}>
+                                            {{entry.label}}
+                                        </a>
+                                    {{else}}
+                                        {{#if entry.label}}
+                                            <span class="dropdown-header">{{entry.label}}</span>
+                                        {{else}}
+                                            <div class="dropdown-divider"></div>
+                                        {{/if}}
+                                    {{/if}}
                                 </ddm.item>
                             {{/each}}
                         </dd.menu>
