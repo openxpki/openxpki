@@ -22,7 +22,7 @@ use OpenXPKI::Test;
 
 use OpenXPKI::Server::Context qw( CTX );
 
- 
+
 
 use OpenXPKI::Server::Authentication;
 
@@ -31,7 +31,7 @@ plan tests => 18;
 my $ot = OpenXPKI::Test->new(
     with => "AuthLayer",
 );
- 
+
 
 use_ok "OpenXPKI::Server::Authentication";
 
@@ -44,7 +44,8 @@ my @res = $auth->login_step({
     MESSAGE => { PARAMS => {} }
 });
 ok ($res[0], 'Anonymous');
-
+use Data::Dumper;
+print Dumper \@res;
 @res = $auth->login_step({
     STACK => 'Password',
     MESSAGE => { PARAMS => {} }

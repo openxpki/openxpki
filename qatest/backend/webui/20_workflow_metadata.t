@@ -68,7 +68,7 @@ $result = $client->mock_request({
 $result = $client->mock_request({
     'action' => 'workflow!index',
     'wf_token' => undef,
-    'meta_email[]' =>  [ 'mail1@openxpki.org' ],
+    'meta_email' =>  [ 'mail1@openxpki.org' ],
 });
 
 $result = $client->mock_request({

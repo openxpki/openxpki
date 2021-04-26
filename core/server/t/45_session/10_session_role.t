@@ -62,7 +62,7 @@ lives_and {
 } "session ID is automatically created";
 
 # Set all attributes
-for my $name (grep { $_ !~ /^ ( modified | _secrets | is_valid | userinfo ) $/msx } @{ $session->data->get_attribute_names }) {
+for my $name (grep { $_ !~ /^ ( modified | _secrets | is_valid | userinfo | authinfo ) $/msx } @{ $session->data->get_attribute_names }) {
     $session->data->$name(int(rand(2**32-1)));
 }
 $session->data->userinfo({ 'name' => 'John Doe', 'email' => 'john@doe.org' });

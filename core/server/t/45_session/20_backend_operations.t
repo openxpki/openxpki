@@ -44,7 +44,7 @@ sub driver_ok {
 
         # set all attributes except "user" (and those not comparable as scalars):
         # "user" is left out to test persist/resume for uninitialized attributes
-        for my $name (grep { $_ !~ /^(modified|_secrets|user|is_valid|userinfo)$/ } @{ $session->data->get_attribute_names }) {
+        for my $name (grep { $_ !~ /^(modified|_secrets|user|is_valid|userinfo|authinfo)$/ } @{ $session->data->get_attribute_names }) {
             $session->data->$name(int(rand(2**32-1)));
         }
         $session->data->userinfo({ 'name' => 'John Doe', 'email' => 'john@doe.org' });

@@ -29,7 +29,7 @@ is($x509->pem, $example_certificate, 'certificate has not been mangled in any wa
 is($x509->get_subject, 'CN=Example certificate', 'subject is as expected');
 is_deeply($x509->get_subject_alt_name,
     [
-        [ 
+        [
             'dirName',
             {
                 rdnSequence => [
@@ -64,8 +64,8 @@ is_deeply($x509->get_subject_alt_name,
         ],
         [ 'DNS', 'dns.example.com' ],
         [ 'email', 'email@example.com' ],
-        [ 'IP', "\xdb\x41\x75\x8e" ],
-        [ 'IP', "\x70\x46\x2b\x39\xe3\x23\x8b\x27\x2f\xef\x72\x6c\x11\x97\x9a\x7e" ]
+        [ 'IP', "219.65.117.142" ],
+        [ 'IP', "7046:2B39:E323:8B27:2FEF:726C:1197:9A7E" ]
     ],
     'SAN is as expected');
 is($x509->notbefore, 1587130167, 'not before is as expected');
