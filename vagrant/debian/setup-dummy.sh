@@ -41,6 +41,3 @@ fi
 
 # Need to pickup new group
 /etc/init.d/apache2 restart
-
-# Start
-openxpkictl start
