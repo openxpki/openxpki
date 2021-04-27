@@ -133,21 +133,6 @@ Example call when debian packages >= v3.8 are installed::
 If you do not use debian packages, you can get a copy from ``contrib/sql/`` in the
 config repository https://github.com/openxpki/openxpki-config.
 
-You should now be able to start the server::
-
-    $ openxpkictl start
-
-    Starting OpenXPKI...
-    OpenXPKI Server is running and accepting requests.
-    DONE.
-
-    In the process list, you should see two process running::
-
-    14302 ?        S      0:00 openxpki watchdog ( main )
-    14303 ?        S      0:00 openxpki server ( main )
-
-    If this is not the case, check */var/log/openxpki/stderr.log*.
-
 System Setup
 ------------
 
@@ -158,11 +143,17 @@ The debian package comes with a shell script ``sampleconfig.sh`` that does all t
 (look in /usr/share/doc/libopenxpki-perl/examples/). The script will create a two stage ca with
 a root ca certificate and below your issuing ca and certs for SCEP and the internal datasafe.
 
+It will also start the required services, you should be able to log into the system via the
+webbrowser using the default credentials (see section `Testdrive`_ below).
+
 This script provides a quickstart but should **never be used for production systems**
 (it has the fixed passphrase *root* for all keys ;) and no policy/crl, etc config ).
 
 Production Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^
+
+For a production setup we recommend to remove the `/etc/openxpki` folder that was installed
+by the package and use a checkout of the [openxpki-config repository](https://github.com/openxpki/openxpki-config).
 
 You need to create the following keys/certificates yourself if you *dont* use the sampleconfig script.
 
@@ -202,7 +193,7 @@ If this is not the case, check */var/log/openxpki/stderr.log*.
 Import Root CA
 ##############
 
-The Root CA is outside the scope of OpenXPKI, we recommend to use (clca)[https://github.com/openxpki/clca].
+The Root CA is outside the scope of OpenXPKI, we recommend to use [clca](https://github.com/openxpki/clca).
 
 As OpenXPKI needs to be able to build the full chain for any certificate,
 we need to import the Root CA(s) first::
