@@ -148,8 +148,11 @@ You should now be able to start the server::
 
     If this is not the case, check */var/log/openxpki/stderr.log*.
 
-Setup base certificates
-^^^^^^^^^^^^^^^^^^^^^^^
+System Setup
+------------
+
+Sample / Demo Configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The debian package comes with a shell script ``sampleconfig.sh`` that does all the work for you
 (look in /usr/share/doc/libopenxpki-perl/examples/). The script will create a two stage ca with
@@ -158,11 +161,14 @@ a root ca certificate and below your issuing ca and certs for SCEP and the inter
 This script provides a quickstart but should **never be used for production systems**
 (it has the fixed passphrase *root* for all keys ;) and no policy/crl, etc config ).
 
-Here is what you need to do if you *dont* use the sampleconfig script:.:
+Production Configuration
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-#. Create a key/certificate as signer certificate (your CA certificate, *ca = true*)
-#. Create a key/certificate for the internal datavault (ca = false, can be below the ca but can also be self-signed).
-#. Create a key/certificate for the scep service (ca = false, can be below the ca but can also be self-signed or from other ca).
+You need to create the following keys/certificates yourself if you *dont* use the sampleconfig script.
+
+#. Issuing CA certificate (recommend with a Root CA on top of it)
+#. Internal DataVault Certificate
+#. Certificate for the SCEP RA
 
 OpenXPKI supports NIST and Brainpool ECC curves (as supported by openssl) for the CA certificates, as the Datavault
 certificate is used for data encryption it **MUST** use an RSA key! You should also remove the `democa` realm and
@@ -171,20 +177,16 @@ create a realm with a proper name (see [reference/configuration/introduction.htm
 **Starting with release 3.6 the default config uses the database to store the issuing ca and SCEP tokens -
 if you upgrade from an older config version check the new settings in systems/crypto.yaml.**
 
-Import Root CA
-##############
-
-OpenXPKI needs to be able to build the full chain for any certificate so we need
-to import the Root CA(s) first::
-
-    $ openxpkiadm certificate import --file root.crt
-
 As of v3.10 the openxpiadm alias command can be used to manage the keys
 directly but this requires that the server is started and the directory
 for the keys exists, the default location is `/etc/openxpki/local/keys`
 so we need to create the directory before we proceed::
 
     $ mkdir -p /etc/openxpki/local/keys
+
+We also need to start the server now (there is also an init-script and systemd unit available)::
+
+    $ openxpkictl start
 
     Starting OpenXPKI...
     OpenXPKI Server is running and accepting requests.
@@ -197,12 +199,28 @@ In the process list, you should see two process running::
 
 If this is not the case, check */var/log/openxpki/stderr.log*.
 
-Create DataVault Token
-######################
+Import Root CA
+##############
+
+The Root CA is outside the scope of OpenXPKI, we recommend to use (clca)[https://github.com/openxpki/clca].
+
+As OpenXPKI needs to be able to build the full chain for any certificate,
+we need to import the Root CA(s) first::
+
+    $ openxpkiadm certificate import --file root.crt
+
+
+DataVault Token
+###############
 
 Create an RSA key with at least 3072 bits, either chose no password or
 the password configured for the token in your `crypto.yaml`. Create a
-self-signed certificate with this key with subject "/CN=DataVault".
+self-signed certificate with this key with subject "/CN=DataVault". You
+can find a usable sample config file to create an **unencrypted** key
+in the contrib folder::
+
+    $ openssl req -new -keyout vault.key -out vault.crt -days 1100 \
+        -config /etc/openxpki/contrib/vault.openssl.cnf
 
 Now import the certificate and its key::
 
@@ -244,39 +262,29 @@ If you do not see `"key_usable": 1` your token is not working! Check the
 permissions of the file (and the folders) and if the key is password
 protected if you have the right secret set in your crypto.yaml!
 
-Create Issuing CA Token
-#######################
+Issuing CA Token
+################
+
+The creation and management of the Issuing CA keys and certificates themselves
+is **not** part of OpenXPKI, you need to have the keys and certificates at hand
+before you proceed. The keys must either be unprotected or use the secret
+referenced in the realms `crypto.yaml`.
 
 The `openxpkiadm alias` command offers a shortcut to import the certificate,
 register the token and store the private key. Repeat this step for all issuer
 tokens in all realms. The system will assign the next available generation
 number and create all required internal links. In case you choose the filesystem
 as key storage the command will write the key files to the intended location but
-requires that the parent folder exist (`/etc/openxpki/local/keys/<realm>`)::
+requires that the folder exist (`/etc/openxpki/local/keys/<realm>`)::
 
     openxpkiadm alias --realm democa --token certsign \
         --file democa-signer.crt --key democa-signer.pem
-
-Perform the same for the SCEP token::
-
-    openxpkiadm alias --realm democa --token scep \
-        --file scep.crt --key scep.pem
-
-**Note**: Each realm needs his own SCEP token so you need to run this command
-any realm that provides an SCEP service. It is possible to use the same SCEP
-token in multiple realms.
 
 If the import went smooth, you should see something like this (ids and times will vary)::
 
     $ openxpkiadm alias --realm democa
 
     === functional token ===
-    scep (scep):
-    Alias     : scep-1
-    Identifier: YsBNZ7JYTbx89F_-Z4jn_RPFFWo
-    NotBefore : 2015-01-30 20:44:40
-    NotAfter  : 2016-01-30 20:44:40
-
     vault (datasafe):
     Alias     : vault-1
     Identifier: lZILS1l6Km5aIGS6pA7P7azAJic
@@ -305,7 +313,7 @@ An easy check to see if the signer token is working is to create a CRL::
     Workflow created (ID: 511), State: SUCCESS
 
 Adding the Webclient
-^^^^^^^^^^^^^^^^^^^^
+--------------------
 
 The package installs a default configuration for apache but requires that you
 provide a tls certificate for the WebUI by yourself. So before you can start
@@ -344,7 +352,24 @@ Testdrive
 #. You can now login with your username and fetch the certificate
 
 Enabling the SCEP service
-^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------
+
+SCEP RA Certificate
+^^^^^^^^^^^^^^^^^^^
+
+Create a certificate to be used as SCEP RA, this is usually a TLS Server
+certificate from the CA itself or signed by an external CA. Import the
+certificate and register it as SCEP RA token::
+
+    openxpkiadm alias --realm democa --token scep \
+        --file scep.crt --key scep.pem
+
+**Note**: Each realm needs his own SCEP token so you need to run this command
+any realm that provides an SCEP service. It is possible to use the same SCEP
+token in multiple realms.
+
+Install SCEP Wrapper
+^^^^^^^^^^^^^^^^^^^^
 
 SCEP was moved to a new tool called *LibSCEP*, you need to install the library
 and perl bindings yourself::
@@ -389,7 +414,7 @@ finish and you should end up with a certificate matching your request in the tmp
 folder.
 
 Support for Java Keystore
-^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------
 
 OpenXPKI can assemble server generated keys into java keystores for
 immediate use with java based applications like tomcat. This requires

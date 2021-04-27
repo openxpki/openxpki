@@ -46,23 +46,53 @@ Stack
 
 The realm's authentication combines the configured authentication handlers to offer different authentication stacks. On the login page, the entries of the stack are shown and a user can choose between them. The stacks are configured in the file located in ``<realm-basedir>/auth/stack.yaml``. If, for example, one would like to enable only anonymous logins and password based logins, this file's contents could be as follows::
 
-   Anonymous:
-      handler: Anonymous
+    Anonymous:
+        label: Guest Login
+        handler: Anonymous
+        type: anon
 
-   User:
-      handler:
+    User:
+        label: User Login
+        type: passwd
+        handler:
           - Operator Password
           - User Password
 
-In this configuration, the realm offers two login stacks, namely *Anonymous* and *Operator*. The stack *Anonymous*  uses the Handler_ ``Anonymous`` and the logins using the stack *User* may be performed by both handlers ``Operator Password`` and ``User Password``. Therefore, when selecting this variant, both logins with credentials configured for  ``Operator Password`` and for ``User Password`` are supported. You can define any number of stacks and reuse the same handlers inside. You must define at least one stack.
+In this configuration, the realm offers two login stacks, namely *Anonymous* and *User*.
+The stack *Anonymous* uses the Handler_ ``Anonymous`` and the logins
+using the stack *User* may be performed by both handlers ``Operator Password`` and
+``User Password``. Therefore, when selecting this variant, both logins with credentials
+configured for ``Operator Password`` and for ``User Password`` are supported. You can define
+any number of stacks and reuse the same handlers inside. You must define at least one stack.
+
+**Advanced Usage**
+
+Use the TLS Client Certificate from the HTTPS connection::
+
+    Certificate:
+        handler: Certificate
+        type: x509
+
+Use the REMOTE_USER field from basic auth, optionally pass additonal ENV keys from advanced auth modules::
+
+    BasicAuth:
+        handler: ExternalSSO
+        label: Login with Company Directory
+        type: client
+        envkeys:
+            email: AUTH_PROVIDER_email_field
 
 
 Handler
 ^^^^^^^
 
-A handler consists of a perl module, that provides the authentication mechanism. The name of the handler is used to be referenced in the stack definition, mandatory entries of each handler are *type* and *label*. All handlers are defined below OpenXPKI::Server::Authentication, where *type* is equal to the name of the module.
+A handler consists of a perl module, that provides the authentication mechanism. The name of
+the handler is used to be referenced in the stack definition, mandatory entries of all handlers
+is *type*. All handlers are defined below OpenXPKI::Server::Authentication, where *type* is equal
+to the name of the module.
 
-Here is a list of the default handlers and their configuration sets.
+Here is a list of some handlers and their configuration sets, more can be found in the sample
+configuration. Extensive documentation can be found in the perldoc for the classes.
 
 **Anonymous user**
 
@@ -70,29 +100,27 @@ If you just need an anonymous connection, you can use the *Anonymous* handler. :
 
     Anonymous:
         type: Anonymous
-        label: Anonymous
+        # the verbose name is shown in the UI
+        name: Guest User
 
     System:
         type: Anonymous
-        label: System
         role: System
 
 If no role is provided, you get the anonymous role. **Do never set any other role than system, unless you exactly know what you are doing!**
 
 **x509 based authentication**
 
-*X509Client* uses the SSL client authentication feature of apache/mod_ssl. It passes the signer certificate to a validation function that cryptographically checks the chain and tests the chain against a list of trusted anchors.
+*X509* uses the SSL client authentication feature of apache/mod_ssl. It passes the signer certificate to a validation function that cryptographically checks the chain and tests the chain against a list of trusted anchors.
 
 The configuration is the same for both handlers (apart from the class name)::
 
     Certificate:
-        type: ClientX509
-        label: Certificate
-        description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_CERTIFICATE_WEBSERVER
+        type: X509
         role: User
         realm: democa
 
-Please check `perldoc OpenXPKI::Server::Authentication::X509` for details. The *ChallengeX509* handler is no longer supported due to missing APIs in modern browsers.
+Please check `perldoc OpenXPKI::Server::Authentication::X509` for details.
 
 **Password database handler**
 
@@ -100,7 +128,6 @@ The password database handler allows to specify user/password/role pairs directl
 
     Password:
         type: Password
-        label: User Password
         description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD
         user:
             John Doe:
@@ -119,12 +146,12 @@ The passwords are hashed, the used hash algorithm is given as prefix inside the 
    password="secretpassword"
    echo -n $(echo -n "$password$salt" | openssl sha1 -binary)$salt | openssl enc -base64
 
+*Note*: As of v3.10 we also directly support the format of the `openssl passwd` command starting with the Dollar sign.
+
 If you plan to use static passwords for a larger amount of users, you should consider to use a connector instead::
 
     Password:
         type: Password
-        label: User Password
-        description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD
         user@: connector:auth.connector.userdb
 
 Define the user database file inside auth.connector.yaml::
@@ -154,8 +181,6 @@ the configuration (same for all users handled by this item)::
 
     Password Connector:
         type: Connector
-        label: User Password
-        description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_PASSWORD
         role: User
         source@: connector:auth.connector.localuser
 
@@ -174,21 +199,9 @@ An example config to authenticate RA Operators against ActiveDirectory using the
 
 If you have a proxy or sso system in front of your OpenXPKI server that authenticates your users, the external handler can be used to set the user information::
 
-    External Dynamic Role:
-        type: External
-        label: External Dynamic Role
-        description: I18N_OPENXPKI_CONFIG_AUTH_HANDLER_DESCRIPTION_EXTERNAL
-        command: echo -n $PASSWD
-        # if this field is empty then the role is determined dynamically -->
-        role: ''
-        pattern: x
-        replacement: x
-        env:
-           LOGIN: __USER__
-           PASSWD: __PASSWD__
-
-
-TODO: This needs some useful example code.
+    ExternalAuth:
+        type: NoAuth
+        role: User
 
 Crypto layer
 ------------
