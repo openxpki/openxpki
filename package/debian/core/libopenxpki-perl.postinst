@@ -109,6 +109,12 @@ case "$1" in
             echo "pkiadm ALL=(ALL) NOPASSWD:/etc/init.d/openxpki" > /etc/sudoers.d/pkiadm
         fi;
 
+        if [ -e "/var/openxpki/openxpki.socket" ]; then
+            echo "OpenXPKI seems to be running! You should restart it NOW to avoid any";
+            echo "compatibility issues. You usually also need to restart the webserver"
+            echo "process."
+        fi;
+
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
