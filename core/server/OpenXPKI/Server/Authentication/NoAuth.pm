@@ -20,7 +20,9 @@ sub parseRole {
     if ($self->has_role()) {
         return $self->role();
     }
-    return $msg->{role} || undef;
+
+    return $self->map_role($msg->{role});
+
 }
 
 
@@ -68,11 +70,11 @@ __END__
 This handler does not perform any authentication, it relies on an
 external party to pass in authenticated information.
 
-If handler returns undef unless the I<username> attribute is a true
+Handler returns undef unless the I<username> attribute is a true
 value. If you provide the I<role> attribute as parameter to the handler,
 it will be assigned to any incoming username. Otherwise the key I<role>
-from the incoming message is used. If you need to postprocess the role
-information
+from the incoming message is used. In case I<rolemap> is set, the role
+given role name will be translated using the map.
 
 Any additional parameters set in the incoming hash will be set as
 I<userinfo>.

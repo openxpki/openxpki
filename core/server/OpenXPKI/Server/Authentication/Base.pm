@@ -6,12 +6,16 @@ use Moose;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
-## constructor and destructor stuff
-
 has role => (
     is => 'ro',
     isa => 'Str|Undef',
     predicate => 'has_role',
+);
+
+has rolemap => (
+    is => 'ro',
+    isa => 'HashRef',
+    predicate => 'has_rolemap',
 );
 
 has prefix => (
@@ -43,10 +47,10 @@ around BUILDARGS => sub {
 
     my $config = CTX('config');
     my $args = { prefix => \@path };
-    for my $attr ( $class->meta->get_all_attributes ) {        
-        my $attrname = $attr->name();        
+    for my $attr ( $class->meta->get_all_attributes ) {
+        my $attrname = $attr->name();
         next if $attrname =~ m/^_/; # skip apparently internal params
-        my $meta = $config->get_meta( [ @path , $attrname ] );        
+        my $meta = $config->get_meta( [ @path , $attrname ] );
         next unless($meta && $meta->{TYPE});
         if ($meta->{TYPE} eq 'scalar') {
             $args->{$attrname} = $config->get( [ @path , $attrname ] );
@@ -64,9 +68,6 @@ around BUILDARGS => sub {
 
 };
 
-# fetch the userinfo from prefix.user, expects the username as parameter
-# and returns an (empty) hash. Classes should use this to allow an easy
-# expansion of this functionality
 sub get_userinfo {
 
     my $self = shift;
@@ -75,6 +76,32 @@ sub get_userinfo {
     return $userinfo || {};
 
 }
+
+sub map_role {
+
+    my $self = shift;
+    my $role = shift || '';
+
+    # no role map defined, do nothing
+    return $role unless ($self->has_rolemap);
+
+    my $rolemap = $self->rolemap;
+
+    # role contained in map
+    return $rolemap->{$role} if ($rolemap->{$role});
+
+    $self->logger->debug("Role $role not found in map, check for _default");
+
+    # the asterisk marks a default role
+    return $rolemap->{'_default'} if ($rolemap->{'_default'});
+
+    $self->logger->info("Unknown role $role was given");
+
+    # no luck this time
+    return ;
+
+}
+
 
  1;
 
@@ -123,3 +150,23 @@ I<username>, I<userid> and I<role> must be set. On error the I<error>
 attribute must be set. See OpenXPKI::Server::Authentication::Handle for
 more details / options.
 
+=head2 Methods
+
+=head3 get_userinfo
+
+Expects the username as parameter and queries the configuration layer
+at I<prefix>.user.I<username> for the userinfo hash. Returns an empty
+hash if no userinfo was found.
+
+Implementations should use this to allow an easy expansion of this
+functionality
+
+=head3 map_role
+
+Check if the given string is a valid key in I<rolemap> and return its
+value.
+
+You can define the special key I<_default> to use as a fallback in case
+the string is not found. If neither one matches, undef is returned.
+
+If I<rolemap> is not set, returns the input string.
