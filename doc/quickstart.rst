@@ -210,7 +210,7 @@ self-signed certificate with this key with subject "/CN=DataVault". You
 can find a usable sample config file to create an **unencrypted** key
 in the contrib folder::
 
-    $ openssl req -new -keyout vault.key -out vault.crt -days 1100 \
+    $ openssl req -new -x509 -keyout vault.key -out vault.crt -days 1100 \
         -config /etc/openxpki/contrib/vault.openssl.cnf
 
 Now import the certificate and its key::
