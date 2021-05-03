@@ -17,7 +17,7 @@ config repository at https://github.com/openxpki/openxpki-config.
 Release v3.12
 --------------
 
-**Mandatory upgrade**
+**Important: a configuration update is required when upgrading to v3.12**
 
 Major rework of the authentication layer - the handlers `External` and `ClientSSO`
 that were also referenced in the default configuration (but of no real use in the
