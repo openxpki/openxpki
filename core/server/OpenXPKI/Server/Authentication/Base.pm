@@ -70,10 +70,14 @@ around BUILDARGS => sub {
 
 sub get_userinfo {
 
+    ##! 1: 'start'
     my $self = shift;
     my $username = shift;
-    my $userinfo = CTX('config')->get_hash( [ @{$self->prefix()}, 'user', $username ] );
-    return $userinfo || {};
+    ##! 16: $username
+    my $userinfo = CTX('config')->get_hash( [ @{$self->prefix()}, 'user', $username ] ) || {};
+    ##! 64: $userinfo
+    $self->logger->trace("Userinfo for $username is " . Dumper $userinfo);
+    return $userinfo;
 
 }
 
@@ -82,11 +86,13 @@ sub map_role {
     my $self = shift;
     my $role = shift || '';
 
+    ##! 16: 'map role ' . $role
     # no role map defined, do nothing
     return $role unless ($self->has_rolemap);
 
     my $rolemap = $self->rolemap;
 
+    ##! 128: $rolemap
     # role contained in map
     return $rolemap->{$role} if ($rolemap->{$role});
 
