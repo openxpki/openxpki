@@ -159,7 +159,7 @@ sub action_result {
         # convert action link into a token to prevent injection of data
         my $action;
         if (substr($btn{action},0,23) eq 'workflow!bulk!wf_action') {
-            $action = substr($btn{action},23);
+            $action = substr($btn{action},24);
         } else {
             $action = $btn{action};
         }
