@@ -31,6 +31,7 @@ B<Changes compared to API v1:> Parameter C<NOHIDE> was renamed to C<showall>
 =cut
 command "get_cert_profiles" => {
     showall => { isa => 'Bool', default => 0, },
+    group =>   { isa => 'AlphaPunct', },
 } => sub {
     my ($self, $params) = @_;
 
@@ -40,6 +41,11 @@ command "get_cert_profiles" => {
     my @profile_names = $config->get_keys('profile');
     for my $profile (@profile_names) {
         next if ($profile =~ /^(template|default|sample)$/);
+
+        if ($params->group) {
+            my @groups = $config->get_scalar_as_list([ 'profile', $profile, 'group' ]);
+            next unless (grep { $_ eq $params->group } @groups);
+        }
 
         my $label = $config->get([ 'profile', $profile, 'label' ]) || $profile;
         my $desc = $config->get([ 'profile', $profile, 'description' ]) || '';

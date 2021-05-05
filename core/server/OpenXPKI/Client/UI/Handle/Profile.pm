@@ -13,14 +13,16 @@ sub render_profile_select {
     my $self = shift; # reference to the wrapping workflow/result
     my $args = shift;
     my $wf_action = shift;
+    my $param = shift || '';
 
+    my %extra = split /!/, $param;
 
     $self->logger()->trace( 'render_profile_select with args: ' . Dumper $args ) if $self->logger->is_trace;
 
     my $wf_info = $args->{wf_info};
 
     # Get the list of profiles from the backend - return is a hash with id => hash
-    my $profiles = $self->send_command_v2( 'get_cert_profiles', {});
+    my $profiles = $self->send_command_v2( 'get_cert_profiles', \%extra );
     # Transform hash into value/label list and sort it
     # Apply translation to sort on translated strings
     map { $profiles->{$_}->{label} = i18nGettext($profiles->{$_}->{label}) } keys %{$profiles};
@@ -105,12 +107,21 @@ sub render_subject_form {
     my $wf_action = shift;
     my $param = shift;
 
-    my $section;
-    my $mode = 'enroll';
-
+    my %extra;
     if ($param) {
-        ($section, $mode) = split /!/, $param;
+        my @param = split /!/, $param;
+        # Legacy format, section only
+        if (@param == 1) {
+            $extra{'section'} = $param[0];
+        } elsif (@param == 2 && $param[0] =~ m{(section|mode)}) {
+            $extra{$param[0]} = $param[1];
+        } else {
+            %extra = @param;
+        }
     }
+
+    my $section = $extra{'section'};
+    my $mode = $extra{'mode'} || 'enroll';
 
     my $wf_info = $args->{wf_info};
 
@@ -287,17 +298,26 @@ sub render_server_password {
 
     my @fields;
 
-    my $bytes = 18;
-    my $format = 'base64';
+    my %extra;
     if ($param) {
-        ($bytes, $format) = split /!/, $param;
+        my @param = split /!/, $param;
+        # Legacy format, section only
+        if (@param == 1) {
+             $extra{'length'} = $param[0];
+        } elsif (@param == 2 && $param[0] =~ m{\A\d+\z}) {
+            $extra{'length'} = $param[1];
+        } else {
+            %extra = @param;
+        }
     }
+    $extra{'format'} ||= 'base64';
+    $extra{'length'} ||= 18;
 
     my $wf_action_info = $wf_info->{activity}->{$wf_action};
     foreach my $field (@{$wf_action_info->{field}}) {
         my $value;
         if ($field->{name} eq '_password') {
-            $value = $self->send_command_v2( 'get_random', { length => $bytes, format => $format } );
+            $value = $self->send_command_v2( 'get_random', \%extra );
             if (!$value) {
                 $self->set_status('I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_ERROR_LABEL','error');
                 $self->add_section({
