@@ -14,7 +14,6 @@ use English;
 use OpenXPKI::Serialization::Simple;
 use MIME::Base64;
 use XML::Simple;
-use OpenXPKI::FileUtils;
 use File::Temp;
 
 use Data::Dumper;

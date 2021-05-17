@@ -8,7 +8,7 @@ use warnings;
 use English;
 
 use Class::Std;
-
+use OpenXPKI::FileUtils;
 use OpenXPKI::Debug;
 use Crypt::LibSCEP;
 use MIME::Base64;

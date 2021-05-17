@@ -18,7 +18,6 @@ use DateTime;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use OpenXPKI::FileUtils;
 use OpenXPKI::Serialization::Simple;
 
 use RT::Client::REST;

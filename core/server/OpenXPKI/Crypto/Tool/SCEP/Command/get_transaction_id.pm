@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 use Class::Std;
-
+use OpenXPKI::FileUtils;
 use OpenXPKI::Debug;
 use Data::Dumper;
 
