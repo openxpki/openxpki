@@ -88,6 +88,8 @@ sub START {
     } else {
         $self->__load_config_system_token($arg_ref);
     }
+
+    ##! 64: $self->get_params()
     $self->__init_engine();
     $self->__init_shell();
     $self->__init_command();
@@ -290,7 +292,7 @@ sub __init_engine
 
     if (!exists $params_of{$ident}->{ENGINE} || $params_of{$ident}->{ENGINE} eq '') {
         OpenXPKI::Exception->throw (
-            message => 'I18N_OPENXPKI_TOOLKIT_ENGINE_UNDEFINED',
+            message => 'Crypto Toolkit engine undefined',
         );
     }
 
@@ -299,31 +301,19 @@ sub __init_engine
     if ($EVAL_ERROR)
     {
         OpenXPKI::Exception->throw (
-            message => 'I18N_OPENXPKI_TOOLKIT_INIT_ENGINE_USE_FAILED',
-            params  => { 'ERRVAL' => $EVAL_ERROR,
-                       },
+            message => 'Crypto Toolkit loading engine class failed',
+            params  => { 'ERRVAL' => $EVAL_ERROR },
         );
     }
-    $self->__instantiate_engine($engine);
-}
 
-# add XS parameters to OpenSSL part, set config in OpenSSL
-sub __instantiate_engine {
-    ##! 8: 'start'
-    my $self = shift;
-    my $ident = ident $self;
-    my $engine = shift;
-
-    delete $engine_of{$ident};
     $engine_of{$ident} = eval {
         $engine->new(
-            TMP => $tmp_dir_of{$ident},
-            %{$params_of{$ident}},
+            %{$self->get_params()},
         )
     };
     if (my $exc = OpenXPKI::Exception->caught()) {
         OpenXPKI::Exception->throw (
-            message  => "I18N_OPENXPKI_TOOLKIT_INIT_ENGINE_NEW_FAILED",
+            message => 'Crypto Toolkit init of engine failed',
             children => [ $exc ]);
     } elsif ($EVAL_ERROR) {
         $EVAL_ERROR->rethrow();
@@ -456,29 +446,30 @@ sub command {
         # a stderr log file, which leads to multiple exceptions
         # for one error
         $self->__instantiate_cli($cli_class);
-    if (ref $cmds ne 'HASH') {
-        ##! 16: "standard invocation"
-            $self->__prepare_cli($cmds);
 
-        $cli_of{$ident}->execute();
-    } else {
-        # command returned a hash instead of a arrayref, this means
-        # that we need to extract parameters for execute
+        if (ref $cmds ne 'HASH') {
+            ##! 16: "standard invocation"
+                $self->__prepare_cli($cmds);
 
-        if (! exists $cmds->{COMMAND}) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_TOOLKIT_COMMAND_MISSING_SUBPARAMETER_COMMAND");
-        }
-        if (! exists $cmds->{PARAMS}) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_TOOLKIT_COMMAND_MISSING_SUBPARAMETER_PARAMS");
-        }
+            $cli_of{$ident}->execute();
+        } else {
+            # command returned a hash instead of a arrayref, this means
+            # that we need to extract parameters for execute
+
+            if (! exists $cmds->{COMMAND}) {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_TOOLKIT_COMMAND_MISSING_SUBPARAMETER_COMMAND");
+            }
+            if (! exists $cmds->{PARAMS}) {
+            OpenXPKI::Exception->throw (
+                message => "I18N_OPENXPKI_TOOLKIT_COMMAND_MISSING_SUBPARAMETER_PARAMS");
+            }
 
             $self->__prepare_cli($cmds->{COMMAND});
-        $cli_of{$ident}->execute({
+            $cli_of{$ident}->execute({
                 PARAMS => $cmds->{PARAMS},
-        });
-    }
+            });
+        }
 
         my $result = $cli_of{$ident}->get_result();
         ##! 128: 'before get_result()'

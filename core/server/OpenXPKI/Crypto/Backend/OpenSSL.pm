@@ -34,34 +34,17 @@ sub __init_config {
     my $ident = ident $self;
 
     $config_of{$ident} = OpenXPKI::Crypto::Backend::OpenSSL::Config->new({
-                          TMP => $self->get_tmp_dir(),
-                      });
+        TMP => $self->get_tmp_dir(),
+    });
 }
 
-sub __instantiate_engine {
+sub __init_engine {
     ##! 16: 'start'
     my $self = shift;
     my $ident = ident $self;
 
-    my $engine = shift;
-
-    ##! 16: "engine: $engine"
-
-    my $engine_obj = eval {
-        $engine->new(
-            %{$self->get_params()},
-        )
-    };
-    if (my $exc = OpenXPKI::Exception->caught())
-    {
-        OpenXPKI::Exception->throw (
-            message  => "I18N_OPENXPKI_BACKEND_OPENSSL_INIT_ENGINE_NEW_FAILED",
-            children => [ $exc ]);
-    } elsif ($EVAL_ERROR) {
-        $EVAL_ERROR->rethrow();
-    }
-    $self->set_engine($engine_obj);
-    $config_of{$ident}->set_engine($engine_obj);
+    $self->SUPER::__init_engine();
+    $config_of{$ident}->set_engine( $self->get_engine() );
     ##! 16: 'end'
 }
 
@@ -74,11 +57,11 @@ sub __instantiate_cli {
 
     eval {
         $cli_obj = $cli_class->new({
-                               ENGINE => $self->get_engine(),
-                               SHELL  => $self->get_shell(),
-                               TMP    => $self->get_tmp_dir(),
-                               CONFIG => $config_of{$ident},
-                            });
+            ENGINE => $self->get_engine(),
+            SHELL  => $self->get_shell(),
+            TMP    => $self->get_tmp_dir(),
+            CONFIG => $config_of{$ident},
+        });
     };
     if (my $exc = OpenXPKI::Exception->caught()) {
         OpenXPKI::Exception->throw(
