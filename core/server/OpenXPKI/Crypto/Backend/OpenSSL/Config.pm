@@ -34,8 +34,6 @@ sub new
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_CONFIG_TEMPORARY_DIRECTORY_UNAVAILABLE");
     }
 
-    $self->{FU} = OpenXPKI::FileUtils->new({ TMP => $self->{TMP} });
-
     return $self;
 }
 
@@ -150,6 +148,9 @@ sub dump
     $config .= $self->__get_oids();
     $config .= $self->__get_engine();
 
+    # recreate in case it was unset
+    $self->{FU} ||= OpenXPKI::FileUtils->new({ TMP => $self->{TMP} });
+
     if (!exists $self->{PROFILE})
     {
 
@@ -229,7 +230,7 @@ sub dump
 
     }
 
-    ##! 16: $config    
+    ##! 16: $config
     ##! 1: "end"
 
     return $self->{FILENAME}->{CONFIG};
@@ -695,6 +696,8 @@ sub cleanup
 
     ##! 2: "delete index.txt database"
     delete $self->{INDEX_TXT} if (exists $self->{INDEX_TXT});
+
+    $self->__cleanup_files();
 
     ##! 1: "end"
     return 1;

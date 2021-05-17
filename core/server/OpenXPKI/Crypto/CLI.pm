@@ -119,66 +119,71 @@ sub execute {
         );
     }
 
+    if (@{$command_of{$ident}} > 1) {
+        OpenXPKI::Exception->throw(
+            message => 'Calling Crypto CLI with more than one command is no longer supported'
+        );
+    }
+
     $self->set_environment();
 
-    ##! 2: "execute commands"
-    for (my $i=0; $i < scalar @{$command_of{$ident}}; $i++) {
-        my $cmd = $command_of{$ident}->[$i];
-        ##! 4: "command: " . Dumper $cmd
-        my @cmd;
-        if (ref $cmd eq 'ARRAY') {
-            @cmd = @{ $cmd };
-        }
-        else {
-            @cmd = split q{ }, $cmd;
-        }
-        ##! 16: 'split cmd (was backticks): ' . Dumper \@cmd
+    my $cmd = $command_of{$ident}->[0];
 
-        open my $STDOUT, '>', $stdout_file_of{$ident}->filename;
-        open my $STDERR, '>', $stderr_file_of{$ident}->filename;
-        my ($shell, @wrapper_cmd) =
-            __deal_with_wrapper($shell_of{$ident}, @cmd);
+    ##! 2: "execute command"
+    ##! 4: "command: " . Dumper $cmd
+    my @cmd;
+    if (ref $cmd eq 'ARRAY') {
+        @cmd = @{ $cmd };
+    }
+    else {
+        @cmd = split q{ }, $cmd;
+    }
+    ##! 16: 'split cmd (was backticks): ' . Dumper \@cmd
 
-        my $command = Proc::SafeExec->new({
-            exec   => [ $shell, @wrapper_cmd ],
-            stdin  => 'new',
-            stdout => $STDOUT,
-            stderr => $STDERR,
-        });
-        eval {
-            $command->wait();
-        };
+    open my $STDOUT, '>', $stdout_file_of{$ident}->filename;
+    open my $STDERR, '>', $stderr_file_of{$ident}->filename;
+    my ($shell, @wrapper_cmd) =
+        __deal_with_wrapper($shell_of{$ident}, @cmd);
 
-        if ($EVAL_ERROR && $EVAL_ERROR ne "Child was already waited on without calling the wait method\n") {
-            # the above may fail if the child has already exited,
-            # we ignore that
-            my $stderr = $self->get_stderr();
+    my $command = Proc::SafeExec->new({
+        exec   => [ $shell, @wrapper_cmd ],
+        stdin  => 'new',
+        stdout => $STDOUT,
+        stderr => $STDERR,
+    });
+    eval {
+        $command->wait();
+    };
 
-            $self->log()->error('OpenSSL error: ' . $stderr);
+    if ($EVAL_ERROR && $EVAL_ERROR ne "Child was already waited on without calling the wait method\n") {
+        # the above may fail if the child has already exited,
+        # we ignore that
+        my $stderr = $self->get_stderr();
 
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_WAIT_FAILED',
-                params  => {
-                EVAL_ERROR => $EVAL_ERROR,
-                },
-            );
-        }
-        ##! 16: 'stdout_file: ' . $stdout_file_of{$ident}
-        ##! 16: 'stderr_file: ' . $stderr_file_of{$ident}
-        close($STDOUT);
-        close($STDERR);
-        if ($command->exit_status()) {
-            my $stderr = $self->get_stderr();
+        $self->log()->error('OpenSSL error: ' . $stderr);
 
-            $self->log()->error('OpenSSL error: ' . $stderr);
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_WAIT_FAILED',
+            params  => {
+            EVAL_ERROR => $EVAL_ERROR,
+            },
+        );
+    }
+    ##! 16: 'stdout_file: ' . $stdout_file_of{$ident}
+    ##! 16: 'stderr_file: ' . $stderr_file_of{$ident}
+    close($STDOUT);
+    close($STDERR);
+    if ($command->exit_status()) {
+        my $stderr = $self->get_stderr();
 
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_FAILED',
-                params  => {
-                'EXIT_STATUS' => $command->exit_status(),
-                },
-            );
-        }
+        $self->log()->error('OpenSSL error: ' . $stderr);
+
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_CRYPTO_CLI_EXECUTE_FAILED',
+            params  => {
+            'EXIT_STATUS' => $command->exit_status(),
+            },
+        );
     }
 
     ##! 1: "end"
