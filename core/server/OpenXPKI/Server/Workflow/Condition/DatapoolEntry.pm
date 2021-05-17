@@ -1,17 +1,12 @@
-# OpenXPKI::Server::Workflow::Condition::DatapoolEntry
-# Written by Martin Bartosch for the OpenXPKI project 2010
-# Copyright (c) 2010 by The OpenXPKI Project
 package OpenXPKI::Server::Workflow::Condition::DatapoolEntry;
 
 use strict;
 use warnings;
 use base qw( OpenXPKI::Server::Workflow::Condition );
-use DateTime;
 use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug;
 use English;
-use Data::Dumper;
 
 sub _evaluate
 {
@@ -41,33 +36,36 @@ sub _evaluate
         }
     }
 
-    ##! 32: 'Query params ' . Dumper $ds_params
+    ##! 32: $params
 
     my $msg = CTX('api2')->get_data_pool_entry(%$params);
 
-    ##! 32: 'api returned ' . Dumper $msg
+    ##! 128: $msg
 
-    my $datapool_value = $msg->{value};
+    my $datapool_value = $msg->{value} //  '';
 
+    ##! 64: $datapool_value
     if ($condition eq 'exists') {
-        if (! defined $datapool_value) {
-            ##! 64: ' value not exist'
+        if (!$msg) {
+            ##! 64: ' value does not exist'
             condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_DATAPOOLENTRY_DOES_NOT_EXIST';
         }
     } elsif ($condition eq 'notnull') {
-        if (! defined $datapool_value || ($datapool_value eq '')) {
-            ##! 64: ' value empty'
+        if ($datapool_value eq '') {
+            ##! 64: ' value is empty'
             condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_DATAPOOLENTRY_VALUE_EMPTY';
         }
     } elsif ($condition eq 'equals') {
+
+        my $val = $self->param('value') // configuration_error('You must provide a value to compare');
         if ($datapool_value ne $self->param('value')) {
             ##! 64: ' value equality mismatch '
             condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_DATAPOOLENTRY_EQUALITY_MISMATCH';
         }
     } elsif ($condition eq 'regex') {
-        my $val = $self->param('value');
+        my $val = $self->param('value') || configuration_error('You must provide a non-empty string as regex');
         my $regex = qr/$val/ms;
-        if ($datapool_value =~ /$regex/) {
+        if ($datapool_value !~ /$regex/) {
             ##! 64: ' value regex mismatch '
             condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_DATAPOOL_REGEX_MISMATCH';
         }
@@ -75,6 +73,7 @@ sub _evaluate
         ##! 64: ' invalid condition '
         condition_error 'I18N_OPENXPKI_SERVER_WORKFLOW_CONDITION_DATAPOOLENTRY_INVALID_CONDITION';
     }
+
 
     return 1;
 }
@@ -100,10 +99,51 @@ OpenXPKI::Server::Workflow::Condition::DatapoolEntry
 Checks if the specified datapool entry exists, is not empty or matches
 a given string or regex.
 
-Parameters:
+=head2 Parameters
 
-namespace:     check entries in this namespace (required)
-key:           checks are applied to this datapool entry
-condition:     type of check: 'exists', 'notnull', 'regex', 'equals'
-value:         comparison value for regex or equals check
+=over
+
+=item namespace
+
+check entries in this namespace (required)
+
+=item key
+
+checks are applied to this datapool entry
+
+=item condition
+
+type of check
+
+=over
+
+=item exists
+
+true if an item with the given namespace/key exists
+
+=item notnull
+
+true if the item defined by namespace/key has an non-empty value. This
+case is today almost equal to I<exists>, as the default API methods dont
+allow to set an empty value to the datapool.
+
+=item equals
+
+true if the datapool value is equal to the string provided via I<value>.
+The check is done as a string comparison, so be aware if you compare
+numbers.
+
+=item regex
+
+Compiles I<value> to a regex with modifiers I</ms> and compares it
+against the value from the datapool. A non-existing (or empty) value
+will match the empty string.
+
+=back
+
+=item value
+
+comparison value for I<regex> or I<equals> check
+
+=back
 

@@ -89,7 +89,7 @@ sub param {
         return $self->params()->{$name};
     } else {
         my $map = $self->_map();
-        return undef unless ($map->{$name});
+        return unless ($map->{$name});
         ##! 16: 'query for mapped key ' . $name
 
         my $template = $map->{$name};
@@ -139,7 +139,7 @@ sub param {
             return $out;
         }
     }
-    return undef;
+    return;
 }
 
 1;
