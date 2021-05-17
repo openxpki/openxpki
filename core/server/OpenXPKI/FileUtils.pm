@@ -1,8 +1,4 @@
 ## OpenXPKI::FileUtils
-## Written 2006 by Alexander Klink for the OpenXPKI project
-## largely based on code in OpenXPKI.pm written by Michael Bell
-## and Martin Bartosch for the OpenXPKI project
-## (C) Copyright 2006 by The OpenXPKI Project
 package OpenXPKI::FileUtils;
 
 use strict;
@@ -23,6 +19,24 @@ my %safe_dir_of      :ATTR; # a hash of directories created with safe_tmpdir
 my %temp_handles     :ATTR;
 my %temp_dir         :ATTR;
 
+
+=head1 OpenXPKI::FileUtils
+
+Helper class for file operations and temp file management.
+
+=head2 Parameters
+
+The constructor expects arguments as a hash.
+
+=item TMP
+
+The parent directory to use for all temporary items created. If not
+set I</tmp> is used.
+
+=back
+
+=cut
+
 sub BUILD {
     my ($self, $ident, $arg_ref ) = @_;
 
@@ -34,6 +48,16 @@ sub BUILD {
         $temp_dir{$ident} = '/tmp';
     }
 }
+
+=head1 Functions
+
+=head2 read_file I<filename>, I<encoding>
+
+Reads the content of the given filename and returns it as string, pass
+I<utf8> as second parameter to read the file in utf8 mode. Throws an
+exception if the file can not be read.
+
+=cut
 
 sub read_file {
     my $self = shift;
@@ -79,6 +103,14 @@ sub read_file {
     return $result;
 }
 
+=head2 write_file I<{ FILENAME, CONTENT, FORCE }>
+
+Expects a hash with the keys I<CONTENT> and I<FILENAME>. The method will
+B<NOT> overwrite an existing file but throw an exception if the target
+already exists, unless I<FORCE> is passed a true value or the filename
+is a tempfile created by I<get_safe_tmpfile> before.
+
+=cut
 
 sub write_file {
     my $self     = shift;
@@ -126,6 +158,17 @@ sub write_file {
 
 }
 
+=head2 get_safe_tmpfile { TMP }
+
+Create an emtpty tempfile and returns its name. You can pass a hash with
+the key I<TMP> set to the parent directory to use, if not set the
+directory given to the constructor is used.
+
+The file will B<NOT> be removed unless you call the I<cleanup> method of
+this class instance.
+
+=cut
+
 sub get_safe_tmpfile {
     ##! 1: 'start'
     my $self = shift;
@@ -133,10 +176,16 @@ sub get_safe_tmpfile {
     my $arg_ref = shift;
 
     ##! 2: 'build template'
-    my $template = $self->__get_safe_template ($arg_ref);
+    my $template = $self->__get_safe_template($arg_ref);
 
     ##! 2: 'build tmp file'
-    my $fh = File::Temp->new( TEMPLATE => $template, UNLINK => 1 );
+    # with UNLINK => 1 the file will be scheduled for deletion after the
+    # file handle goes out of scope which is the end of this method!
+    # this might lead to a race condition where the caller writes to the
+    # file whereas the OS removes the file from the (visible) filesystem
+    # The class will keep a list of files internally and remove those when
+    # the I<cleanup> method is called
+    my $fh = File::Temp->new( TEMPLATE => $template, UNLINK => 0 );
     if (! $fh) {
         OpenXPKI::Exception->throw (
             message => 'I18N_OPENXPKI_FILEUTILS_GET_SAFE_TMPFILE_MAKE_FAILED'
@@ -152,6 +201,16 @@ sub get_safe_tmpfile {
     ##! 1: 'end: $filename'
     return $filename;
 }
+
+=head2  get_safe_tmpdir
+
+Create an emtpty directory and returns its name. You can pass a hash with
+the key I<TMP> set to the parent directory to use, if not set the
+directory given to the constructor is used.
+
+The directory will B<NEVER> be removed autmatically.
+
+=cut
 
 sub get_safe_tmpdir {
     ##! 1: 'start'
@@ -202,7 +261,7 @@ sub get_tmp_handle {
 
 }
 
-=head2 get_tmp_dir
+=head2 get_tmp_dirhandle
 
 Create a temporary directory and return the object handle of it.
 The return value can be used in string context to get the name of the
@@ -262,25 +321,43 @@ sub __get_safe_template
     my $ident = ident $self;
     my $arg_ref = shift;
 
+
+    my $tmpdir = $arg_ref->{TMP} || $temp_dir{$ident};
+
     ##! 2: 'check TMP'
-    if (not exists $arg_ref->{TMP}) {
+    if (!$tmpdir) {
         OpenXPKI::Exception->throw (
             message => 'I18N_OPENXPKI_FILEUTILS_GET_SAFE_TEMPLATE_MISSING_TMP');
     }
-    if (not -d $arg_ref->{TMP}) {
+    if (not -d $tmpdir) {
         OpenXPKI::Exception->throw (
             message => 'I18N_OPENXPKI_FILEUTILS_GET_SAFE_TEMPLATE_DIR_DOES_NOT_EXIST',
-            params => {DIR => $arg_ref->{TMP}});
+            params => {DIR => $tmpdir});
     }
 
     ##! 2: 'build template'
-    return File::Spec->catfile($arg_ref->{TMP}, "openxpki${PID}XXXXXXXX");
+    return File::Spec->catfile($tmpdir, "openxpki${PID}XXXXXXXX");
 }
+
+=head2 cleanup
+
+Unlink files created with get_safe_tempfile and remove all handles
+held by the instance so File::Temp should cleanup them.
+
+B<Warning>: This method is not fork-safe and will delete any files
+created with get_safe_tempfile across forks!
+
+=cut
 
 sub cleanup {
 
     my $self = shift;
     my $ident = ident $self;
+
+    $temp_handles{$ident} = [];
+
+    # when the KEEP_ALL marker is set we also do not run our cleanup
+    return if ($File::Temp::KEEP_ALL);
 
     foreach my $file (keys %{$safe_filename_of{$ident}}) {
         if (-e $file) {
@@ -289,60 +366,9 @@ sub cleanup {
         }
     }
 
-    $temp_handles{$ident} = [];
-
     return 1;
 }
 
 1;
 
 __END__
-
-=head1 Name
-
-OpenXPKI - base module for all OpenXPKI core modules.
-
-=head1 Exported functions
-
-Exported function are function which can be imported by every other
-object. These function are exported to enforce a common behaviour of
-all OpenXPKI modules for debugging and error handling.
-
-C<use OpenXPKI::API qw (debug);>
-
-=head2 debug
-
-You should call the function in the following way:
-
-C<$self-E<gt>debug ("help: $help");>
-
-All other stuff is generated fully automatically by the debug function.
-
-=head1 Functions
-
-=head2 read_file
-
-Example: $self->read_file($filename);
-
-
-=head2 write_file
-
-Example: $self->write_file (FILENAME => $filename, CONTENT => $data);
-
-The method will raise an exception if the file already exists unless
-the optional argument FORCE is set. In this case the method will overwrite
-the specified file.
-
-Example: $self->write_file (FILENAME => $filename, CONTENT => $data, FORCE => 1);
-
-=head2 get_safe_tmpfile
-
-Example: my $file = $self->get_safe_tmpfile ({TMP => "/tmp"});
-
-This method creates a safe temporary file and returns the filename.
-
-=head2 get_safe_tmpdir
-
-Example: my $dir = $self->get_tmpdir ({TMP => "/tmp"});
-
-This method creates a safe temporary directory and returns the path to it.
