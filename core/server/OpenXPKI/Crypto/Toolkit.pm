@@ -268,18 +268,7 @@ sub __load_config_realm_token {
     ) unless ($output);
 
     $params_of{$ident}->{KEY} = $output;
-
-    my $fu = OpenXPKI::FileUtils->new();
-    my $cert_filename = $fu->get_safe_tmpfile({
-        TMP => $tmp_dir_of{$ident},
-    });
-    $fu->write_file({
-        FILENAME => $cert_filename,
-        CONTENT  => $cert,
-        FORCE    => 1,
-    });
-    chmod 0644, $cert_filename;
-    $params_of{$ident}->{CERT} = $cert_filename;
+    $params_of{$ident}->{CERT} = $cert;
 
     ##! 1: 'end'
 }

@@ -38,14 +38,19 @@ sub new {
                         ENGINE_USAGE
                         KEY_STORE
                         TMP
-			WRAPPER
+			            WRAPPER
                        }) {
 
     if (exists $keys->{$key}) {
-            ##! 128: 'setting key ' . $key . ' to value ' . Dumper $keys->{$key}
+        ##! 128: 'setting key ' . $key . ' to value ' . Dumper $keys->{$key}
         $self->{$key} = $keys->{$key};
+        }
     }
-    }
+
+    # use this instance ONLY for files that need to stay alive for the
+    # lifetime of the instance of this token
+    $self->{FU} = OpenXPKI::FileUtils->new({ TMP => $self->{TMP} });
+
     $self->__check_engine_usage();
     $self->__check_key_store();
 
@@ -200,12 +205,6 @@ sub get_keyfile
     if ($self->get_key_store() eq "DATAPOOL") {
         ##! 16: 'Get key from datapool ' . $self->{KEY}
         if (!$self->{'tmp_keyfile'} || ! -e $self->{'tmp_keyfile'}) {
-            my $fu = OpenXPKI::FileUtils->new();
-            my $dir = $fu->get_safe_tmpdir({
-                TMP => $self->{TMP},
-            });
-            $self->{'tmp_keyfile'} = $dir.'/'.$self->{KEY};
-
             my $dp = CTX('api2')->get_data_pool_entry(
                 namespace => 'sys.crypto.keys',
                 key => $self->{KEY},
@@ -217,9 +216,11 @@ sub get_keyfile
                     params => { KEY => $self->{KEY} }
                 );
             }
+            my $dir = $self->{FU}->get_tmp_dirhandle();
+            $self->{'tmp_keyfile'} = $dir.'/'.$self->{KEY};
 
             ##! 16: 'Writing keyfile ' . $self->{'tmp_keyfile'}
-            $fu->write_file({
+            $self->{FU}->write_file({
                 FILENAME => $self->{'tmp_keyfile'},
                 CONTENT => $dp->{value}
             });
@@ -248,7 +249,12 @@ sub get_passwd
 sub get_certfile
 {
     my $self = shift;
-    return $self->{CERT};
+    if (!$self->{'tmp_certfile'} || ! -e $self->{'tmp_certfile'}) {
+        my $cert_filename = $self->{FU}->write_temp_file($self->{CERT});
+        $self->{'tmp_certfile'} = $cert_filename;
+        ##! 16: 'Writing out certfile ' . $self->{'tmp_certfile'}
+    }
+    return $self->{'tmp_certfile'};
 }
 
 sub get_chainfile
@@ -301,21 +307,6 @@ sub key_usable {
         return 0;
     }
     return 1;
-}
-
-# cleanup temporary key files
-sub DESTROY{
-    my $self = shift;
-
-    if ($self->{'tmp_keyfile'} && -e $self->{'tmp_keyfile'}) {
-        unlink $self->{'tmp_keyfile'};
-        rmdir dirname($self->{'tmp_keyfile'});;
-    }
-
-    if ($self->{TMP} && $self->{CERT} && -e $self->{CERT} && dirname($self->{CERT}) eq $self->{TMP}) {
-        unlink $self->{CERT};
-    }
-
 }
 
 1;
