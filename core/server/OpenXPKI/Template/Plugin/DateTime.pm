@@ -24,10 +24,12 @@ use base qw( Template::Plugin );
 use Template::Plugin;
 use OpenXPKI::DateTime;
 
-=head2 validity(timespec)
+=head2 validity (timespec, reference)
 
 Calculate the epoch timestamp from the given validity specification. Can
-be any value recognized by OpenXPKI::DateTime::get_validity
+be any value recognized by OpenXPKI::DateTime::get_validity.
+
+You can pass an epoch to use as reference, the default is now.
 
 =cut
 
@@ -35,9 +37,18 @@ sub validity {
 
     my $self = shift;
     my $value = shift;
+    my $reference = shift;
+
+    my $refdate;
+    if ($reference) {
+        $refdate = DateTime->from_epoch( epoch => $reference );
+    } else {
+        $refdate = DateTime->now( time_zone => 'UTC' );
+    }
 
     return OpenXPKI::DateTime::get_validity({
-        VALIDITY => $value ,
+        REFERENCEDATE => $refdate,
+        VALIDITY => $value,
         VALIDITYFORMAT => 'detect'
     })->epoch();
 
