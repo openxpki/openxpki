@@ -43,7 +43,7 @@ sub BUILD {
     if (($ENV{'CONTENT_TYPE'} || '') =~ m{\Aapplication/json}) {
         $self->logger()->debug('Incoming JSON');
         my $json = JSON->new->utf8;
-        my $data = $json->decode( $self->cgi()->param('POSTDATA') );
+        my $data = $json->decode( ~~$self->cgi()->param('POSTDATA') );
         %keys = ( %keys, %$data );
         $self->logger()->trace( Dumper $data );
         $self->method('POST');
