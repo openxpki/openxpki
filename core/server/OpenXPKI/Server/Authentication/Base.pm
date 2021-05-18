@@ -3,6 +3,8 @@ package OpenXPKI::Server::Authentication::Base;
 use strict;
 use warnings;
 use Moose;
+
+use Data::Dumper;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
@@ -76,7 +78,7 @@ sub get_userinfo {
     ##! 16: $username
     my $userinfo = CTX('config')->get_hash( [ @{$self->prefix()}, 'user', $username ] ) || {};
     ##! 64: $userinfo
-    $self->logger->trace("Userinfo for $username is " . Dumper $userinfo);
+    $self->logger->trace("Userinfo for $username is " . Dumper $userinfo) if ($self->logger->is_trace);
     return $userinfo;
 
 }
