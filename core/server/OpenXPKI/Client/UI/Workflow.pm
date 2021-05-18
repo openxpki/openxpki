@@ -1336,6 +1336,11 @@ sub action_handle {
         $wf_info = $self->send_command_v2( 'resume_workflow', {
             id => $wf_args->{wf_id}, async => 1, wait => 1
         });
+    } elsif ('reset' eq $handle) {
+        $self->logger()->info(sprintf "Workflow %01d trigger reset", $wf_args->{wf_id} );
+        $wf_info = $self->send_command_v2( 'reset_workflow', {
+            id => $wf_args->{wf_id}
+        });
     } elsif ('archive' eq $handle) {
         $self->logger()->info(sprintf "Workflow %01d trigger archive", $wf_args->{wf_id} );
         $wf_info = $self->send_command_v2( 'archive_workflow', {
@@ -1597,7 +1602,7 @@ sub action_bulk {
     my $errors; # hash with wf_id => error
 
     my ($command, %params);
-    if ($wf_args->{wf_action} =~ m{(fail|wakeup|resume)}) {
+    if ($wf_args->{wf_action} =~ m{(fail|wakeup|resume|reset)}) {
         $command = $wf_args->{wf_action}.'_workflow';
         %params = %{$wf_args->{params}} if ($wf_args->{params});
     } elsif ($wf_args->{wf_action} =~ m{\w+_\w+}) {
@@ -1816,7 +1821,7 @@ sub __render_from_workflow {
 
     my $wf_proc_state = $wf_info->{workflow}->{proc_state} || 'init';
 
-    # add buttons for manipulative handles (wakeup, fail, resume)
+    # add buttons for manipulative handles (wakeup, fail, reset, resume)
     # to be added to the default button list
 
     my @handles;
@@ -1841,6 +1846,21 @@ sub __render_from_workflow {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESUME_BUTTON',
                 action => 'workflow!handle!wf_token!'.$token->{value},
                 format => 'exceptional'
+            };
+        }
+
+        if (grep /\A reset \Z/x, @handles) {
+            my $token = $self->__register_wf_token( $wf_info, { wf_handle => 'reset' } );
+            push @buttons_handle, {
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESET_BUTTON',
+                action => 'workflow!handle!wf_token!'.$token->{value},
+                format => 'reset',
+                confirm => {
+                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESET_DIALOG_LABEL',
+                    description => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESET_DIALOG_TEXT',
+                    confirm_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESET_DIALOG_CONFIRM_BUTTON',
+                    cancel_label => 'I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESET_DIALOG_CANCEL_BUTTON',
+                }
             };
         }
 

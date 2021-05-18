@@ -67,7 +67,7 @@ my %known_proc_states = (
     # action executes
     running => {
         hook => 'none',
-        enforceable => [ 'fail' ],
+        enforceable => [ 'fail', 'reset' ],
     },
     # action stops regulary
     manual => {
@@ -87,7 +87,7 @@ my %known_proc_states = (
     # an exception has been thrown
     exception => {
         hook => '_resume',
-        enforceable => [ 'fail', 'resume' ],
+        enforceable => [ 'fail', 'resume', 'reset' ],
     },
     # count of retries has been exceeded
     retry_exceeded => {
@@ -345,6 +345,28 @@ sub execute_action {
     CTX('dbi')->commit unless $autorun;
 
     return $state;
+}
+
+sub reset_hungup {
+
+    my $self = shift;
+    eval {
+        $self->notify_observers( 'wakeup', '' );
+        $self->add_history({
+            action      => '',
+            description => 'RESET',
+            state       => $self->state(),
+            user        => CTX('session')->data->user,
+        });
+        $self->context->param( wf_exception => undef );
+        $self->_set_proc_state('manual');#saves wf data
+    };
+    if (my $eval_err = $EVAL_ERROR) {
+        $self->_proc_state_exception( $eval_err );
+        # Don't use 'workflow_error' here since $eval_err should already
+        # be a Workflow::Exception object or subclass
+        croak $eval_err;
+    }
 }
 
 sub set_failed {
