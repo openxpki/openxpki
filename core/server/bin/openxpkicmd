@@ -86,6 +86,16 @@ sub dump_workflow {
     }
 }
 
+# GetOpts would work without this and leave the stuff in ARGV but we
+# want to enforce a proper syntax to avoid any issues when upgrading
+# or changing something
+my @extra;
+my ($dashidx) = grep { $ARGV[$_] eq '--' } (0 .. @ARGV-1);
+if ($dashidx) {
+    @extra = splice @ARGV, $dashidx;
+    shift @extra;
+}
+
 GetOptions(\%params,
        qw(
             help|?
@@ -135,6 +145,7 @@ if ( $params{nosplit} ) {
 }
 
 my %wf_parameters;
+push @wf_parameters, @extra;
 foreach my $entry (@wf_parameters) {
     my ($key, $value) = ($entry =~ m{ \A (.*?) [=:] (.*) }xms);
     if (! defined $key) {

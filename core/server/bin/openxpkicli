@@ -115,6 +115,17 @@ sub output {
     }
 }
 
+
+# GetOpts would work without this and leave the stuff in ARGV but we
+# want to enforce a proper syntax to avoid any issues when upgrading
+# or changing something
+my @extra;
+my ($dashidx) = grep { $ARGV[$_] eq '--' } (0 .. @ARGV-1);
+if ($dashidx) {
+    @extra = splice @ARGV, $dashidx;
+    shift @extra;
+}
+
 GetOptions(\%params,
        qw(
             help|?
@@ -208,6 +219,8 @@ foreach my $entry (@parameters) {
 }
 
 my @args = split(/,/, join(',', @{$params{arg}}));
+push @args, @extra;
+
 foreach my $entry (@args) {
     my ($key, $value) = ($entry =~ m{ \A (.*?) [=:] (.*) }xms);
 
@@ -217,7 +230,6 @@ foreach my $entry (@args) {
     }
 
     $args{$key} = $value;
-
 }
 
 foreach my $entry (@{$params{filearg}}) {
@@ -447,14 +459,17 @@ openxpkicli [options] command
 
 Invoke the named command through the OpenXPKI API using the given connection socket.
 
-Anything passed using C<arg> is added to the methods argument list. If the
-method has a PARAMS argument which accepts an array or hash, you can use
-param to fill this argument. You must not mix value only and key=value param
-calls on one command.
+Anything passed using C<arg> is added to the methods argument list, you can also
+add arguments after the special argument C<--> at the end of the line. If the method
+has a PARAMS argument which accepts an array or hash, you can use param to fill this
+argument. You must not mix value only and key=value param calls on one command.
 
 =head1 EXAMPLES
 
-openxpkicli --realm "Server CA" --arg message=testmail --param rcpt=pki@mycompany.local send_notification
+openxpkicli --realm "Server CA" --arg message=testmail \
+    --param notify_to=pki@mycompany.local send_notification
+
+openxpkicli --realm "Server CA" get_token_info -- alias=vault-2
 
 =head1 Operational Modes
 
@@ -483,8 +498,8 @@ init and error handling do not print proper json).
 
 B<Example>
 
-    `openxpkicli --authstack=Testing --authuser=raop --authpass=openxpki \
-        --session login`
+    openxpkicli --authstack=Testing --authuser=raop --authpass=openxpki \
+        --session login
 
     echo $OPENXPKI_SESSION_ID
 
