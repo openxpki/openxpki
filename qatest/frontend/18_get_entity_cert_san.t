@@ -23,8 +23,6 @@ my $sscep = -e "./sscep" ? './sscep' : 'sscep';
 
 ok((-s "tmp/cacert-0"),'CA certs present') || die;
 
-# Chain for TLS based requests later
-`cat tmp/cacert-* > tmp/chain.pem`;
 `rm -f tmp/entity-san.*`;
 
 # Create the pkcs10
