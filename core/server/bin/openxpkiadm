@@ -581,6 +581,16 @@ sub __alias_update {
             return;
         } elsif ($token->{key_store} eq "DATAPOOL") {
 
+            my $check_dv = $client->run_command("get_datavault_status", { check_online => 1 });
+            if (!$check_dv) {
+                print STDERR "ERROR: You must setup a datavault token before you can import keys into the system!";
+                return;
+            }
+            if (!$check_dv->{online}) {
+                print STDERR "ERROR: Your datavault token is not online, unable to import key!";
+                return;
+            }
+
             my $res = $client->run_command("set_data_pool_entry", {
                 namespace => "sys.crypto.keys",
                 encrypt => 1,
