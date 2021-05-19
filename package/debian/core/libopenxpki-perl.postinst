@@ -42,6 +42,15 @@ case "$1" in
                 # do NOT chmod the top folder as e.g. apache needs access
                 chmod 750 /etc/openxpki/config.d
 
+                if [ -e "/etc/openxpki/config.d/realm.tpl/auth/handler.yaml" ]; then
+                    # replace the default password in the test handler
+                    if [ -z "$OPENXPKI_TEST_PASSWORD" ]; then
+                        OPENXPKI_TEST_PASSWORD=$(openssl rand -base64 9)
+                    fi
+                    sed -r "s/digest:.*/digest: '{plain}$OPENXPKI_TEST_PASSWORD'/g" -i /etc/openxpki/config.d/realm.tpl/auth/handler.yaml
+                    echo "OpenXPKI Password for Test Accounts was set to ##$OPENXPKI_TEST_PASSWORD##";
+                fi
+
             fi
 
             if [ -d /etc/openxpki/ca/ ]; then

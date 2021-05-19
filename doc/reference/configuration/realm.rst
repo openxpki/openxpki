@@ -76,8 +76,7 @@ Use the TLS Client Certificate from the HTTPS connection::
 Use the REMOTE_USER field from basic auth, optionally pass additonal ENV keys from advanced auth modules::
 
     BasicAuth:
-        handler: ExternalSSO
-        label: Login with Company Directory
+        handler: NoAuth
         type: client
         envkeys:
             email: AUTH_PROVIDER_email_field
@@ -116,9 +115,11 @@ If no role is provided, you get the anonymous role. **Do never set any other rol
 The configuration is the same for both handlers (apart from the class name)::
 
     Certificate:
-        type: X509
+        type: ClientX509
         role: User
-        realm: democa
+        trust_anchor:
+            realm: userca
+
 
 Please check `perldoc OpenXPKI::Server::Authentication::X509` for details.
 
