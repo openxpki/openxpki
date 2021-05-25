@@ -11,19 +11,13 @@ use TestCGI;
 use MIME::Base64 qw(decode_base64);
 use Digest::SHA qw(hmac_sha256_hex);
 use LWP::UserAgent;
-
-use Test::More tests => 10;
+use Crypt::X509;
+use Test::More tests => 11;
 
 package main;
 
 my $result;
 my $client = TestCGI::factory('democa');
-
-my $sscep = -e "./sscep" ? './sscep' : 'sscep';
-
-`$sscep getca -c tmp/cacert -u http://localhost/scep/scep`;
-
-ok((-s "tmp/cacert-0"),'CA certs present') || die;
 
 # Create the pkcs10
 `openssl req -new -subj "/CN=entity-hmac-test.openxpki.org" -nodes -keyout tmp/entity-hmac.key -out tmp/entity-hmac.csr 2>/dev/null`;
@@ -74,7 +68,6 @@ diag('Found workflow ' . $workflow_id );
 
 is($result->{main}->[0]->{content}->{data}->[0]->[3], 'PENDING');
 
-# load raw context to find certificate id
 $result = $client->mock_request({
     'page' => 'workflow!context!wf_id!' . $workflow_id
 });
@@ -83,7 +76,17 @@ is($client->get_field_from_result('signature'), $hmac);
 ok($client->get_field_from_result('is_valid_hmac'));
 
 $result = $client->mock_request({
-    'action' => 'workflow!select!wf_action!enroll_reject_request!wf_id!' . $workflow_id,
+    'action' => 'workflow!select!wf_action!enroll_approve_csr!wf_id!' . $workflow_id,
 });
 
-is ($result->{right}->[0]->{content}->{data}->[3]->{value}, 'FAILURE', 'Status is FAILURE');
+is($result->{right}->[0]->{content}->{data}->[3]->{value}, '<b>Success</b>', 'Status is SUCCESS');
+
+# load raw context to find certificate id
+$result = $client->mock_request({
+    'page' => 'workflow!context!wf_id!' . $workflow_id
+});
+
+my $cert = $client->get_field_from_result('certificate');
+ok($cert =~ m{-----BEGIN[^-]*CERTIFICATE-----(.+)-----END[^-]*CERTIFICATE-----}xms);
+my $x509 = new Crypt::X509( cert => decode_base64($1) );
+is($x509->not_after - $x509->not_before, 24*30*3600);
