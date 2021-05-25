@@ -134,6 +134,7 @@ command "modify_data_pool_entry" => {
     }
 
     my $new_values;
+    my %extra_where;
     if ($params->has_expiration_date) {
         my $exp = $params->expiration_date;
         my $current = $existing->{notafter} || 0;
@@ -153,12 +154,14 @@ command "modify_data_pool_entry" => {
             if ($adjust eq 'newer') {
                 if ($current > 0 && $expiry > $current) {
                     $new_values->{notafter} = $expiry;
+                    $extra_where{notafter} = {'<', $expiry};
                 } else {
                     CTX('log')->system()->debug("Ignore new expiration date as it is not newer");
                 }
             } elsif ($adjust eq 'older') {
                 if ($expiry < $current) {
                     $new_values->{notafter} = $expiry;
+                    $extra_where{notafter} = {'>', $expiry};
                 } else {
                     CTX('log')->system()->debug("Ignore new expiration date as it is not older");
                 }
@@ -191,6 +194,7 @@ command "modify_data_pool_entry" => {
             pki_realm    => $requested_pki_realm,
             datapool_key => $params->key,
             namespace    => $params->namespace,
+            %extra_where
         },
     );
 
