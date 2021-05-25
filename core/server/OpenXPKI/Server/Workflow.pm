@@ -583,9 +583,9 @@ sub set_reap_at_interval {
     $self->_save if ((not $skip_saving) and $self->is_running);
 }
 
-=head2 set_archive_after
+=head2 set_archive_at
 
-Set the auto-archiving interval (relative date format, see L<OpenXPKI::DateTime>).
+Set the auto-archiving interval (relative date format or epoch, see L<OpenXPKI::DateTime>).
 
 The interval is converted into an epoch timestamp and written to the
 C<archive_at> field in the database.
@@ -593,17 +593,17 @@ C<archive_at> field in the database.
 Triggers a DB update via persister unless C<$skip_saving> is set to a TRUE value.
 
 =cut
-sub set_archive_after {
+sub set_archive_at {
     my ($self, $interval, $skip_saving) = @_;
 
     ##! 16: sprintf('set archive interval to %s', $interval)
-
-    my $epoch = OpenXPKI::DateTime::get_validity({
-        VALIDITY => $interval,
-        VALIDITYFORMAT => 'relativedate',
-    })->epoch;
-
-    $self->archive_at($epoch);
+    if ($interval =~ m{\A\+}) {
+        $interval = OpenXPKI::DateTime::get_validity({
+            VALIDITY => $interval,
+            VALIDITYFORMAT => 'relativedate',
+        })->epoch;
+    }
+    $self->archive_at($interval);
     # if the wf is already running, immediately save data to db:
     $self->_save if ((not $skip_saving) and $self->is_running);
 }

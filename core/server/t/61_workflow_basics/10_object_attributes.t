@@ -19,7 +19,7 @@ use lib "$Bin";
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Test;
 
-plan tests => 22;
+plan tests => 25;
 
 #
 # Setup test context
@@ -88,15 +88,29 @@ for my $k (keys %defaults) {
 }
 
 #
-# Check 'archive_after'
+# Check 'archive_at'
 #
 is $workflow->archive_at, undef, "'archive_at' initially undefined";
 
-$workflow->set_archive_after('+000000000030');
+$workflow->set_archive_at('+000000000030');
 $workflow->_save();
 
 ok $workflow->archive_at > time(), "'archive_at' defined after setting";
 my $archive_at = $workflow->archive_at;
+
+lives_and {
+    $workflow_dup = $factory->fetch_workflow($workflow_type, $workflow->id);
+    ok ref $workflow_dup;
+} "refetch workflow from database";
+
+is $workflow_dup->archive_at, $archive_at, "'archive_at' was correctly persisted to database";
+
+
+$archive_at = time() + 100;
+$workflow->set_archive_at($archive_at);
+$workflow->_save();
+
+ok $workflow->archive_at == $archive_epoch, "'archive_at' defined after explicit set";
 
 lives_and {
     $workflow_dup = $factory->fetch_workflow($workflow_type, $workflow->id);
