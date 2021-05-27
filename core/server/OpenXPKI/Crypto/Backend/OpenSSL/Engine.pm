@@ -51,10 +51,18 @@ sub new {
     # lifetime of the instance of this token
     $self->{FU} = OpenXPKI::FileUtils->new({ TMP => $self->{TMP} });
 
+    $self->__set_engine_params( $keys );
     $self->__check_engine_usage();
     $self->__check_key_store();
 
     return $self;
+}
+
+sub __set_engine_params() {
+    # set special engine parameters in child classes
+    my $self = shift;
+    my $keys = shift;
+    return 1;
 }
 
 sub __check_engine_usage {

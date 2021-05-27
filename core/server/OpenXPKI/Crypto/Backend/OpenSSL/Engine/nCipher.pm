@@ -34,69 +34,39 @@ use OpenXPKI::Server::Context qw( CTX );
 
 use Memoize;
 
-sub new {
-    my $that = shift;
-    my $class = ref($that) || $that;
+sub __set_engine_params() {
 
-    my $self = {};
-
-    my $keys = { @_ };
-
-    bless ($self, $class);
-    ##! 2: "new: class instantiated"
+    my $self = shift;
+    my $keys = shift;
 
     # defaults
     $self->{NFAST_HOME} = '/opt/nfast';
     $self->{CHECKCMDTIMEOUT} = 25;
     $self->{ONLINECHECKGRACEPERIOD} = 60;
 
-    ## token mode will be ignored
     foreach my $key (qw(
-        OPENSSL
-        NAME
-        KEY
-        PASSWD
-        SECRET
-        CERT
-        INTERNAL_CHAIN
-        ENGINE_SECTION
-        ENGINE_USAGE
-        KEY_STORE
-        WRAPPER
         NFAST_HOME
         CHECKCMDTIMEOUT
         ONLINECHECKGRACEPERIOD
     ) ) {
-        if (exists $keys->{$key}) {
-            $self->{$key} = $keys->{$key};
-        }
+        $self->{$key} = $keys->{$key} if (defined $keys->{$key});
     }
-    $self->__check_engine_usage();
-    $self->__check_key_store();
 
     if (! -d $self->{NFAST_HOME} || ! -x $self->{NFAST_HOME}) {
         OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_NFAST_HOME_NOT_ACCESSIBLE",
-            params  => {
-        NFAST_HOME => $self->{NFAST_HOME},
-        },
-            );
+            message => "Path to nfast home directory is not accessible",
+            params  => { NFAST_HOME => $self->{NFAST_HOME} },
+        );
     }
 
     foreach my $entry (qw( CHECKCMDTIMEOUT ONLINECHECKGRACEPERIOD )) {
-    if (! defined $self->{$entry}
-        || ($self->{$entry} !~ m{ \A \d+ \z }xms)) {
         OpenXPKI::Exception->throw (
-        message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_INVALID_VALUE",
-        params  => {
-            PARAMETER => $entry,
-            VALUE     => $self->{$entry},
-        },
-        );
-    }
+            message => "Value of $entry must be an integer",
+            params  => { VALUE => $self->{$entry}, },
+        ) unless ($self->{$entry} =~ m{ \A \d+ \z }xms);
     }
 
-    return $self;
+    return 1;
 }
 
 sub get_engine

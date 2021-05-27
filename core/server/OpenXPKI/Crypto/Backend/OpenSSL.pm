@@ -150,11 +150,6 @@ as first parameter followed by a hash with parameter. Example:
 
   $token->command ({COMMAND => "create_key", TYPE => "RSA", ...});
 
-=head1 XS functions
-
-We support some library functions via our XS module. Please see
-our XS module for more informations.
-
 =over
 
 =item * get_object
@@ -189,4 +184,4 @@ our engine module for more informations.
 
 =head1 See Also
 
-OpenXPKI::Crypto::Backend::OpenSSL::XS and OpenXPKI::Crypto::Backend::OpenSSL::Engine
+OpenXPKI::Crypto::Backend::OpenSSL::Engine
