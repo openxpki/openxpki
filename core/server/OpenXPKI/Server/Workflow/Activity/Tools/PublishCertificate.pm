@@ -59,8 +59,8 @@ sub execute {
     my $unpublish = $self->param('unpublish') || 0;
     ##! 16: 'Start publishing - load certificate for identifier ' . $cert_identifier
 
-    my @cols = (not $unpublish) ? ('data', 'subject')
-        : ('data', 'subject', 'reason_code', 'revocation_time', 'invalidity_time');
+    my @cols = ('data', 'subject', 'identifier');
+    push @cols, ('reason_code', 'revocation_time', 'invalidity_time') if ($unpublish);
 
     # Load and convert the certificate
     my $data = CTX('dbi')->select_one(
