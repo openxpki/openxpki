@@ -177,8 +177,6 @@ while (my $cgi = CGI::Fast->new()) {
 
     $sess_id = decrypt_cookie($sess_id);
 
-    my $session_front;
-
     Log::Log4perl::MDC->remove();
     Log::Log4perl::MDC->put('sid', $sess_id ? substr($sess_id,0,4) : undef);
 
@@ -197,12 +195,10 @@ while (my $cgi = CGI::Fast->new()) {
        next;
     }
 
-    # this creates a standard CGI::Session object if OXI session is not used
-    if (!$session_front) {
-        my $driver_args = $conf->{session_driver} ? $conf->{session_driver} : { Directory => '/tmp' };
-        $session_front = new CGI::Session($conf->{session}->{driver}, $sess_id, $driver_args );
-        Log::Log4perl::MDC->put('sid', substr($session_front->id,0,4));
-    }
+
+    my $driver_args = $conf->{session_driver} ? $conf->{session_driver} : { Directory => '/tmp' };
+    my $session_front = new CGI::Session($conf->{session}->{driver}, $sess_id, $driver_args );
+    Log::Log4perl::MDC->put('sid', substr($session_front->id,0,4));
 
     if (defined $conf->{session}->{timeout}) {
         $session_front->expire( $conf->{session}->{timeout} );
