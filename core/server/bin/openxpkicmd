@@ -287,6 +287,7 @@ if ($params{wfid}) {
                 $reply = $client->send_receive_command_msg( 'get_workflow_info',
                     {
                         id => $params{wfid},
+                        with_attributes => ($params{attribute} ? 1 : 0),
                     }
                 );
                 dump_workflow( $reply, $json );
