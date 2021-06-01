@@ -30,7 +30,7 @@ has 'logger' => (
     lazy => 1,
     is => 'ro',
     isa => 'Object',
-    'default' => sub{ return Log::Log4perl->get_logger( ); }
+    default => sub { return Log::Log4perl->get_logger; }
 );
 
 sub BUILD {
@@ -38,14 +38,14 @@ sub BUILD {
     my $self = shift;
 
     my %keys;
-    my @keys = $self->cgi()->param;
+    my @keys = $self->cgi->param;
     map { $keys{$_} = undef } @keys;
     if (($ENV{'CONTENT_TYPE'} || '') =~ m{\Aapplication/json}) {
-        $self->logger()->debug('Incoming JSON');
+        $self->logger->debug('Incoming JSON');
         my $json = JSON->new->utf8;
-        my $data = $json->decode( ~~$self->cgi()->param('POSTDATA') );
+        my $data = $json->decode( scalar $self->cgi->param('POSTDATA') );
         %keys = ( %keys, %$data );
-        $self->logger()->trace( Dumper $data );
+        $self->logger->trace( Dumper $data );
         $self->method('POST');
     }
 
@@ -63,12 +63,12 @@ sub BUILD {
         }
         next unless ($key =~ m{ \A (\w+)\{(\w+)\} \z }xs);
         my $item = $1; my $subkey = $2;
-        $self->logger()->debug("Translate hash parameter $key");
+        $self->logger->debug("Translate hash parameter $key");
         $keys{$item} = {} unless($keys{$item});
         $keys{$item}{$subkey} = $keys{$key};
     }
 
-    $self->logger()->debug(Dumper \%keys);
+    $self->logger->debug(Dumper \%keys);
 
     $self->data( \%keys );
 
