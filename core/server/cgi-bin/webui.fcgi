@@ -20,7 +20,7 @@ use Config::Std;
 use OpenXPKI::Log4perl;
 use Log::Log4perl::MDC;
 use MIME::Base64 qw( encode_base64 decode_base64 );
-
+use Digest::SHA;
 use Crypt::CBC;
 use OpenXPKI::i18n qw( i18nGettext i18nTokenizer set_language set_locale_prefix);
 use OpenXPKI::Client;
@@ -120,6 +120,32 @@ sub __handle_error {
     return;
 }
 
+sub __get_cookie_cipher {
+
+    my $key = $conf->{session}->{cookey} || '';
+    # a list of ENV variables, added to the cookie passphrase
+    # binds the cookie encyption to the system environment
+    # Even if the Cryrp::CBC module will run a hash on the passphrase
+    # we directly use sha256 here to preprocess the input data one by one
+    # to keep the memory footprint as small as possible
+    if ($conf->{session}->{fingerprint}) {
+        $log->trace('Use fingerprint for cookie encryption: ' . $conf->{session}->{fingerprint});
+        my $sha = Digest::SHA->new('sha256');
+        $sha->add($key) if ($key);
+        map { $sha->add($ENV{$_}) if ($ENV{$_}); } split /\W+/, $conf->{session}->{fingerprint};
+        $key = $sha->digest;
+        $log->trace(sprintf('Cookie encryption key: %*vx', '', $key)) if ($log->trace);
+    }
+    return unless ($key);
+    my $cipher = Crypt::CBC->new(
+        -key => $key,
+        -pbkdf => 'opensslv2',
+        -cipher => 'Crypt::OpenSSL::AES',
+    );
+    return $cipher;
+
+}
+
 =head2 encrypt_cookie
 
 The key is read from the config, the cookie value is expected as argument.
@@ -130,12 +156,11 @@ Returns the encrypted value, if no key is set, returns the plain input value.
 sub encrypt_cookie {
 
     my $value = shift;
-    my $key = $conf->{session}->{cookey};
-    return $value unless ($key && $value);
-    my $cipher = Crypt::CBC->new(
-        -key => $key,
-        -cipher => 'Crypt::OpenSSL::AES',
-    );
+    return $value unless ($value);
+
+    my $cipher = __get_cookie_cipher();
+    return $value unless ($cipher);
+
     return encode_base64($cipher->encrypt($value));
 
 }
@@ -149,21 +174,16 @@ Reverse to encrypt_cookie
 sub decrypt_cookie {
 
     my $value = shift;
-    my $key = $conf->{session}->{cookey};
-    return $value unless ($key && $value);
+    my $cipher = __get_cookie_cipher();
+    return $value unless ($cipher);
     my $plain;
     eval {
-        my $cipher = Crypt::CBC->new(
-            -key => $key,
-            -cipher => 'Crypt::OpenSSL::AES',
-        );
         $plain = $cipher->decrypt(decode_base64($value));
     };
     if (!$plain) {
         $log->error("Unable to decrypt cookie ($EVAL_ERROR)");
     }
     return $plain;
-
 }
 
 while (my $cgi = CGI::Fast->new()) {
