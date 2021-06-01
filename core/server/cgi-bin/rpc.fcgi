@@ -353,6 +353,7 @@ while (my $cgi = CGI::Fast->new()) {
 
     $log->trace( "Calling $method on ".$config->endpoint()." with parameters: " . Dumper $param ) if $log->is_trace;
 
+    my $res;
     my $workflow;
     eval {
 
@@ -381,8 +382,34 @@ while (my $cgi = CGI::Fast->new()) {
             }
         }
 
+        # Endpoint has a "resume and execute" definition so run action if possible
+        if (my $execute_action = $conf->{$method}->{execute_action}) {
+            if (!$workflow) {
+                $log->error( 'resume request but no workflow found' );
+                $res = { error => { code => 40402, message => 'resume request but no workflow found',
+                    data => { pid => $$ } } };
+            } elsif ($workflow->{'proc_state'} ne 'manual') {
+                $log->error( 'resume request but workflow is not in manual state' );
+                $res = { error => { code => 40403, message => 'resume request but workflow is not in manual state',
+                    data => { pid => $$, id => int($workflow->{id}), 'state' => $workflow->{'state'}, 'proc_state' => $workflow->{'proc_state'} } } };
+            } else {
+                my $actions_avail = $client->run_command('get_workflow_activities', { id => $workflow->{id} });
+                if (!(grep { $_ eq  $execute_action } @{$actions_avail})) {
+                    $log->error( 'resume request but expected action not available' );
+                    $res = { error => { code => 40404, message => 'resume request but expected action not available',
+                        data => { pid => $$, id => int($workflow->{id}), 'state' => $workflow->{'state'}, 'proc_state' => $workflow->{'proc_state'} } } };
+                } else {
+                    $log->debug("Resume #".$workflow->{id}." and $execute_action with params " . join(", ", keys %{$param}));
+                    $workflow = $client->handle_workflow({
+                        id => $workflow->{id},
+                        activity => $execute_action,
+                        params => $param
+                    });
+                }
+            }
+
         # pickup return undef if no workflow was found
-        if (!$workflow) {
+        } elsif (!$workflow) {
             $log->debug("Initialize $workflow_type with params " . join(", ", keys %{$param}));
             $workflow = $client->handle_workflow({
                 type => $workflow_type,
@@ -393,19 +420,20 @@ while (my $cgi = CGI::Fast->new()) {
         $log->trace( 'Workflow info '  . Dumper $workflow ) if ($log->is_trace());
     };
 
-    my $res;
+
     if ( my $exc = OpenXPKI::Exception->caught() ) {
         $log->error("Unable to instantiate workflow: ". $exc->message );
         $res = { error => { code => 50002, message => $exc->message, data => { pid => $$ } } };
-    }
-    elsif (!$client) {
+    } elsif ($res) {
+        # nothing to do here
+    } elsif (!$client) {
         $res = { error => { code => 50001, message => $EVAL_ERROR, data => { pid => $$ } } };
     }
     elsif (my $eval_err = $EVAL_ERROR) {
 
         my $reply = $client->last_reply();
         $log->error(Dumper $reply);
-        
+
         # Validation error
         my $error = $client->last_error() || $eval_err;
 
@@ -641,6 +669,21 @@ Supported types are application/json and application/pkcs7.
 =item 40401 - Invalid method / setup incomplete
 
 The method name given is either not defined or has no workflow defined
+
+=item 40402 - Resume requested but nothing to pickup
+
+The method name has an execute statement but no workflow to be continued
+was found using  the given pickup rules
+
+=item 40403 - Resume requested but workflow is not in manual state
+
+The method name has an execute statement but the loaded workflow is
+not in a state that accepts external input
+
+=item 40404 - Resume requested but expected method is not available
+
+The method name has an execute statement but the expected activity is
+not available in the loaded workflow
 
 =item 50001 - Error creating RPC client
 
