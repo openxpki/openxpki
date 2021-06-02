@@ -68,7 +68,7 @@ has __default_wfdetails => (
         {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL',
             template => "[% IF state == 'SUCCESS' %]<b>Success</b>[% ELSE %][% state %][% END %]",
-            type => "raw",
+            format => "raw",
         },
         {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL',
