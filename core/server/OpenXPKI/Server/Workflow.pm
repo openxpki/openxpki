@@ -32,7 +32,7 @@ my $default_reap_at_interval = '+0000000005';
 
 my %known_proc_states = (
 
-    # 'action' defines what should happen (= which hook-method should be called)
+    # 'hook' defines what should happen (= which hook-method should be called)
     # when execute_action() is called on this proc_state.
     #
     # Special actions:
@@ -49,7 +49,7 @@ my %known_proc_states = (
     #    '_wake_up' is called (IN current Activity object!)
     #
 
-    # set in constructor, no action executed yet
+    # state 'init' is set in constructor, no action executed yet
     init => {
         hook => 'none',
         enforceable => [ 'fail' ],
@@ -76,7 +76,7 @@ my %known_proc_states = (
     },
     # action finished with success
     finished => {
-        hook => 'none', # perfectly handled from WF-State-Engine
+        hook => 'none', # perfectly handled by Workflow state engine
         enforceable => [ 'archive' ],
     },
     # action paused
@@ -610,8 +610,8 @@ sub set_archive_at {
 
 =head2 get_global_actions
 
-Return an arrayref with the names of the global actions wakeup, resume, fail
-that are available to the session user on this workflow.
+Return an I<ArrayRef> with the names of the global actions like C<wakeup>,
+C<resume> or C<fail> on this workflow that are available to the session user.
 
 =cut
 
