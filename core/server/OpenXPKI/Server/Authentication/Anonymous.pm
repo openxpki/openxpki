@@ -42,7 +42,7 @@ sub handleInput {
     my %email = $self->email() ? ( email => $self->email() ) : ();
     return OpenXPKI::Server::Authentication::Handle->new(
         username => $self->user(),
-        userid => $self->user(),
+        userid => $self->get_userid( $self->user() ),
         role => $self->role(),
         userinfo => {
             realname => $self->name(),

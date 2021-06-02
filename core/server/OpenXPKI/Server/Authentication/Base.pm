@@ -14,6 +14,12 @@ has role => (
     predicate => 'has_role',
 );
 
+has namespace => (
+    is => 'ro',
+    isa => 'Str',
+    predicate => 'has_namespace',
+);
+
 has rolemap => (
     is => 'ro',
     isa => 'HashRef',
@@ -69,6 +75,15 @@ around BUILDARGS => sub {
     return $class->$orig(%{$args});
 
 };
+
+sub get_userid {
+
+    my $self = shift;
+    my $username = shift;
+    return $username unless($self->has_namespace());
+
+    return sprintf("%s:%s", $self->namespace(),$username);
+}
 
 sub get_userinfo {
 
@@ -144,6 +159,13 @@ Should receive a role preset, type is String/Undef.
 HashRef that might be added or preset to the returned handle.
 See the handler subclass for details.
 
+=item namespace
+
+String to be used as namespace prefix when generating the userid. Should
+be three to eight lowercase characters, the values I<certid>, I<system>
+and I<internal> are reserved and must only be used if the handler returns
+an adequate userid.
+
 =back
 
 =head2 Implementations
@@ -168,6 +190,16 @@ hash if no userinfo was found.
 
 Implementations should use this to allow an easy expansion of this
 functionality
+
+=head3 get_userid
+
+While the username is related to the credentials that where used to
+authentuicate the userid should provide a unique and durable handle
+to link items to an identity. In case you have multiple authentication
+backends the userid should be prefixed by a namespace - this method is
+a simpe wrapper that expects the username and returns it prefixed with
+the namespace set as parameter to this class. If namespace is not set,
+it returns the unmodified input value.
 
 =head3 map_role
 

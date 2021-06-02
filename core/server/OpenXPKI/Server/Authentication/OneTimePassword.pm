@@ -93,7 +93,7 @@ sub handleInput {
     delete $data->{user};
     return OpenXPKI::Server::Authentication::Handle->new(
         username => $token,
-        userid => $data->{user},
+        userid => $self->get_userid( $data->{user} ),
         role => $role,
         userinfo => $data || {},
     );

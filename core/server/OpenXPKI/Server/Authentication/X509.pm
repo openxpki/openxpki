@@ -156,7 +156,7 @@ sub _validation_result {
 
     return OpenXPKI::Server::Authentication::Handle->new(
         username => $username,
-        userid => $username,
+        userid => $self->get_userid( $username ),
         role => $role,
         userinfo => $userinfo,
         authinfo => {
