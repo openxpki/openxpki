@@ -95,6 +95,9 @@ if [[ $IS_FULLCONFIG -eq 1 ]]; then
     # set en_US as default language to get correct I18N translations (e.g. in rpc.fcgi)
     sed -ri 's/^(\s*default_language:).*/\1 en_US/' /etc/openxpki/config.d/system/server.yaml
 
+    # set OpenXPKI socket owner to webserver user
+    sed -ri 's/^(\s*socket_owner:).*/\1 www-data/' /etc/openxpki/config.d/system/server.yaml
+
 # partial config update
 else
     #  realm democa
@@ -105,11 +108,37 @@ else
     chown -R root:openxpki /etc/openxpki/config.d/realm/democa/        >>$LOG 2>&1
 fi
 
+set +e
+test_auth_exists=$(grep -c "Testing:" /etc/openxpki/config.d/realm/democa/auth/stack.yaml)
+set -e
+
+if [ $test_auth_exists -eq 0 ]; then
+    echo "Adding authentication stack 'Testing'"
+    # add test auth stack (e.g. user: raop / password: openxpki)
+    sed -zri 's/^/Testing:\n    handler: TestAccounts\n    type: passwd\n\n/' /etc/openxpki/config.d/realm/democa/auth/stack.yaml
+    cat <<__HANDLER >> /etc/openxpki/config.d/realm/democa/auth/handler.yaml
+
+TestAccounts:
+    type: Password
+    label: Test Accounts
+    user:
+        caop:
+            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
+            role: CA Operator
+        raop:
+            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
+            role: RA Operator
+        user:
+            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
+            role: User
+__HANDLER
+fi
+
 # set /var/tmp instead of /tmp (where only root has write access)
 sed -ri 's/(LOCATION:)\s*\/tmp.*/\1 \/var\/tmp/g' /etc/openxpki/config.d/realm/democa/publishing.yaml
 
+# database setup
 if [[ $IS_DBCONFIG -eq 1 ]]; then
-    # database setup
     echo "- configuring MariaDB as database"
     cat <<__DB > /etc/openxpki/config.d/system/database.yaml
     main:
@@ -122,6 +151,14 @@ if [[ $IS_DBCONFIG -eq 1 ]]; then
         passwd: $OXI_TEST_DB_MYSQL_PASSWORD
 __DB
 fi
+
+# write system version (OpenXPKI::Control checks it)
+OXI_VERSION=$(cat /code-repo/.VERSION_MAJOR <(echo .) /code-repo/.VERSION_MINOR <(echo .) /code-repo/.VERSION_RELEASE | tr -d "\n" )
+sed -zri 's/depend:\s*\n\s+core:[^\n]+\n//' /etc/openxpki/config.d/system/version.yaml
+cat <<__VERSION >> /etc/openxpki/config.d/system/version.yaml
+depend:
+    core: $OXI_VERSION
+__VERSION
 
 #
 # Compile OpenXPKI
@@ -151,7 +188,6 @@ cat $OXI_TEST_SAMPLECONFIG_DIR/contrib/apache2-openxpki-site.conf \
 test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/index.html
 
 # Set version so Makefile.PL does not need "vergen" (which we will not copy to $OXI_CORE_DIR)
-OXI_VERSION=$(cat /code-repo/.VERSION_MAJOR <(echo .) /code-repo/.VERSION_MINOR <(echo .) /code-repo/.VERSION_RELEASE | tr -d "\n" )
 cat <<__VERSION > $OXI_CORE_DIR/server/OpenXPKI/VERSION.pm
 package OpenXPKI::VERSION;
 our \$VERSION = '$OXI_VERSION';
