@@ -109,7 +109,7 @@ div.oxifield-upload{position:relative;padding-bottom:34px}
 .oxi-btn-terminate,.oxi-btn-terminate:focus,.oxi-btn-terminate:hover{background-color:#ad7fa8}
 .oxi-tile{border:1px solid transparent}
 .ember-tooltip .tooltip-inner{background-color:revert}
-.oxi-popover{background-color:#eee;border-color:#aaa}
+.oxi-popover{background-color:#eee;border-color:#aaa;width:600px}
 .oxi-popover .tooltip-inner{color:revert;background-color:revert;border-radius:revert}
 .hover-element{display:inline flex;flex-direction:column}
 .hover-element .content{margin:0 auto}

@@ -7,11 +7,11 @@
         {{else if @tooltip_page}}
             <EmberPopover
                 @tooltipClass="oxi-popover"
-                @onShow={{this.fetchContent}}
-                @updateFor={{this.popoverContent}}
+                @onShow={{this.fetchTooltip}}
+                @updateFor={{this.tooltipReady}}
             >
-                {{#if this.popoverContent}}
-                    <OxiSection @content={{this.popoverContent}}/>
+                {{#if this.tooltipContent}}
+                    <OxiSection @content={{this.tooltipContent}} @onInit={{this.setTooltipReady}}/>
                 {{else}}
                     wait...
                 {{/if}}

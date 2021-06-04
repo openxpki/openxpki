@@ -5,4 +5,6 @@
     <div class="description">{{{@content.content.description}}}</div>
 {{/if}}
 
-{{component this.type def=this.sectionData buttonClick=this.buttonClick}}
+<span {{on-init this.initialized}}>
+    {{component this.type def=this.sectionData buttonClick=this.buttonClick}}
+</span>

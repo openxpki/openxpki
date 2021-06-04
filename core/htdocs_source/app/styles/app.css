@@ -509,6 +509,7 @@ div.oxifield-upload {
 .oxi-popover {
   background-color: #eee;
   border-color: #aaa;
+  width: 600px;
 }
 
 .oxi-popover .tooltip-inner {

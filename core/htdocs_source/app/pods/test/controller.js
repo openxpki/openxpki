@@ -37,14 +37,30 @@ export default class TestController extends Controller {
                 console.info(Object.entries(req.queryParams).map(e => `MOCKUP SERVER> ${e[0]} = ${e[1]}`).join("\n"));
                 console.debug(req);
 
-                if (req.queryParams?.page == 'system!user!123') {
+                if (req.queryParams?.page == 'tooltip!user!123') {
                     let result = {
-                        type: "keyvalue",
+                        type: "text",
                         content: {
-                            data: [
-                                { format: "raw", label: "User:", value: "Fred <b>Flintstone</b>" },
-                            ],
+                            description: "Fred&nbsp;<b>Flintstone</b>",
                         },
+                    };
+
+                    return [200, {"Content-Type": "application/json"}, JSON.stringify(result)];
+                }
+
+                if (req.queryParams?.page == 'tooltip!chart') {
+                    let result = {
+                        type: 'chart',
+                        className: 'test-chart',
+                        content: {
+                            options: {
+                                type: 'pie',
+                                title: 'Pie',
+                                width: 300, height: 150,
+                                series: [ { label: 'Requested' }, { label: 'Renewed' }, { label: 'Revoked' } ],
+                            },
+                            data: [['2019','14','44','30']],
+                        }
                     };
 
                     return [200, {"Content-Type": "application/json"}, JSON.stringify(result)];
@@ -631,11 +647,19 @@ export default class TestController extends Controller {
                     },
                     {
                         format: "tooltip",
-                        label: "tooltip (url)",
+                        label: "tooltip (url - keyvalue)",
                         value: {
-                            value: "Hover me",
-                            tooltip_page: "system!user!123",
+                            value: "Hover me for username",
+                            tooltip_page: "tooltip!user!123",
                             tooltip_page_args: { test: 1 },
+                        }
+                    },
+                    {
+                        format: "tooltip",
+                        label: "tooltip (url - chart)",
+                        value: {
+                            value: "Hover me for chart",
+                            tooltip_page: "tooltip!chart",
                         }
                     },
                     {

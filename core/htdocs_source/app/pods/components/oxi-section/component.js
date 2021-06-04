@@ -34,4 +34,9 @@ export default class OxiSectionComponent extends Component {
             .then(() => set(button, "loading", false));
         }
     }
+
+    @action
+    initialized() {
+        if (this.args.onInit) this.args.onInit();
+    }
 }

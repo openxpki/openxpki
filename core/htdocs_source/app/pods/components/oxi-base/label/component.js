@@ -16,16 +16,24 @@ import { getOwner } from '@ember/application';
  * @param { bool } raw - set to `true` to allow HTML entities incl. `<script>` tags etc.
  */
 export default class OxiLabelComponent extends Component {
-    @tracked popoverContent = null;
+    @tracked tooltipContent = null;
+    @tracked tooltipReady = false;
 
     @action
-    fetchContent(event) {
-        if (this.popoverContent) return;
+    fetchTooltip(event) {
+        if (this.tooltipContent) return;
         getOwner(this).lookup("route:openxpki").sendAjaxQuiet({
             page: this.args.tooltip_page,
             ...this.args.tooltip_page_args,
         }).then((doc) => {
-            this.popoverContent = doc;
+            this.tooltipContent = doc;
         });
+    }
+
+    @action
+    setTooltipReady(element) {
+        // Referenced via @updateFor={{this.tooltipReady}} -- this
+        // will trigger a repositioning if the content is too big
+        this.tooltipReady = true;
     }
 }
