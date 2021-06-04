@@ -498,6 +498,15 @@ div.oxifield-upload {
 }
 
 /******************************************************************************
+ * Tooltips
+ */
+
+/* Fix strange ember-tooltip CSS bug that show darker inner background */
+.ember-tooltip .tooltip-inner {
+  background-color: revert;
+}
+
+/******************************************************************************
  * Others
  */
 .hover-element {

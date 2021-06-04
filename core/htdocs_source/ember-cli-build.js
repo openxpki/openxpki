@@ -43,7 +43,7 @@ module.exports = function(defaults) {
       importBootstrapCSS: true,
       importBootstrapFont: true,
       // only include used components into compiled JS
-      whitelist: ['bs-button', 'bs-modal', 'bs-dropdown', 'bs-tooltip', 'bs-navbar', 'bs-collapse'],
+      whitelist: ['bs-button', 'bs-modal', 'bs-dropdown', 'bs-navbar', 'bs-collapse'],
     },
 
     // disable fingerprinting of assets in production build

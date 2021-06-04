@@ -13,7 +13,7 @@
 
     <div class="{{this.sFieldSize}}" {{on "keydown" this.onKeydown}}>
         {{#if @field.tooltip}}
-            <BsTooltip @title="{{@field.tooltip}}"/>
+            <EmberTooltip>{{@field.tooltip}}</EmberTooltip>
         {{/if}}
 
         {{component

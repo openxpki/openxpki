@@ -1,5 +1,14 @@
-{{#if this.useSpan}}
-    {{#each (arrayify @text) as |txt|}}<span class="oxi-label {{@class}}" title={{@tooltip}}>{{#if @raw}}{{{defuse txt}}}{{else}}{{txt}}{{/if}}</span>{{/each}}
-{{else}}
-    {{#if @raw}}{{{defuse @text}}}{{else}}{{@text}}{{/if}}
-{{/if}}
+{{~#each (arrayify @text) as |txt|~}}
+    <span class="oxi-label {{@class}}">
+        {{#if @tooltip}}
+            <EmberTooltip>
+                {{@tooltip}}
+            </EmberTooltip>
+        {{/if}}
+    {{#if @raw}}
+        {{{defuse txt}}}
+    {{else}}
+        {{txt}}
+    {{/if}}
+    </span>
+{{~/each~}}
