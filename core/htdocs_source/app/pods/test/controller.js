@@ -33,13 +33,27 @@ export default class TestController extends Controller {
                 resolve(response);
             });
             this.get('/cgi-bin/webui.fcgi', req => {
-                console.info(`GET REQUEST: ${req.url}`);
-                console.info(Object.entries(req.queryParams).map(e => `${e[0]} = ${e[1]}`).join("\n"));
+                console.info(`MOCKUP SERVER> GET request: ${req.url}`);
+                console.info(Object.entries(req.queryParams).map(e => `MOCKUP SERVER> ${e[0]} = ${e[1]}`).join("\n"));
                 console.debug(req);
+
+                if (req.queryParams?.page == 'system!user!123') {
+                    let result = {
+                        type: "keyvalue",
+                        content: {
+                            data: [
+                                { format: "raw", label: "User:", value: "Fred <b>Flintstone</b>" },
+                            ],
+                        },
+                    };
+
+                    return [200, {"Content-Type": "application/json"}, JSON.stringify(result)];
+                }
+
                 return emptyResponse();
             });
             this.post('/cgi-bin/webui.fcgi', req => {
-                console.info(`POST REQUEST: ${req.url}`);
+                console.info(`MOCKUP SERVER> POST request: ${req.url}`);
                 if (req.requestHeaders['content-type'].match(/^application\/x-www-form-urlencoded/)) {
                     console.info(decodeURIComponent(req.requestBody.replace(/\+/g, ' ')).split('&').join("\n"));
                 }
@@ -305,13 +319,13 @@ export default class TestController extends Controller {
                     {
                         type: "static",
                         name: "label1",
-                        label: "Label",
+                        label: "Static",
                         value: "on my shirt",
                     },
                     {
                         type: "static",
                         name: "label2",
-                        label: "Label",
+                        label: "Static",
                         value: "on my shirt",
                         verbose: "is sewed onto my shirt"
                     },
@@ -614,6 +628,15 @@ export default class TestController extends Controller {
                             value: "Hover me",
                             tooltip: "...to see more",
                         },
+                    },
+                    {
+                        format: "tooltip",
+                        label: "tooltip (url)",
+                        value: {
+                            value: "Hover me",
+                            tooltip_page: "system!user!123",
+                            tooltip_page_args: { test: 1 },
+                        }
                     },
                     {
                         format: "head",

@@ -72,7 +72,13 @@
     {{else if (eq this.format "styled")}}
         <span class="styled-{{this.styledValue.style}}">{{this.styledValue.label}}</span>
     {{else if (eq this.format "tooltip")}}
-        <OxiBase::Label @text={{v.value}} @tooltip={{v.tooltip}} @raw={{false}} />
+        <OxiBase::Label
+            @text={{v.value}}
+            @tooltip={{v.tooltip}}
+            @tooltip_page={{v.tooltip_page}}
+            @tooltip_page_args={{v.tooltip_page_args}}
+            @raw={{false}}
+        />
     {{/if}}
 
 {{/let}}

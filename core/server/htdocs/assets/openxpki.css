@@ -1,5 +1,3 @@
-.oxi-checkbox,span.oxi-label{display:inline-block}
-.clonable-btn-group,span.oxi-label{white-space:nowrap}
 .oxi-button-container a.btn:before,ol.breadcrumb .cert-search:before,ol.breadcrumb .workflow-search:before,ol.breadcrumb .workflow-state:before,ol.breadcrumb .workflow-type:before{font-family:"Glyphicons Halflings";padding-right:5px}
 body,body>.ember-view,html{height:100%}
 #waiting-for-ember .alert{margin-top:1em}
@@ -20,6 +18,7 @@ label{overflow:hidden;text-overflow:ellipsis}
 .table-bordered tr.spacer th{padding-top:15px;background-color:#eee}
 ul.pagination li:not(.disabled)>a{cursor:pointer}
 span.pagination-label{float:left;padding:6px 0}
+span.oxi-label{display:inline-block;white-space:nowrap}
 dl,ul{margin-bottom:0}
 dd{padding:0 0 0 1em}
 dd+dt{padding-top:.5em}
@@ -92,9 +91,10 @@ div.required input,div.required select,div.required textarea{background-color:#f
 div.required input.form-control[disabled],div.required select.form-control[disabled],div.required textarea.form-control[disabled]{border:1px solid #ccc}
 div.optional label.control-label:after{content:'*'}
 div.optional input,div.optional select,div.optional textarea{border:1px dashed #888}
-.oxi-checkbox{position:relative;top:4px;width:18px;height:18px;border:2px solid;border-radius:2px;border-color:rgba(0,0,0,.54)}
+.oxi-checkbox{position:relative;top:4px;display:inline-block;width:18px;height:18px;border:2px solid;border-radius:2px;border-color:rgba(0,0,0,.54)}
 .oxi-checkbox.checked:after{position:absolute;left:2px;top:2px;width:10px;height:10px;border-radius:2px;opacity:.54;background-color:#000;content:' '}
 div.oxifield-upload{position:relative;padding-bottom:34px}
+.clonable-btn-group{white-space:nowrap}
 .stacked-buttons{margin-top:4px;margin-bottom:4px}
 .stacked-buttons .btn-bt-margin{margin-top:6px;margin-bottom:6px}
 .oxi-btn-loading{color:#fff;background-color:#428bca;border-color:#357ebd}
@@ -109,6 +109,8 @@ div.oxifield-upload{position:relative;padding-bottom:34px}
 .oxi-btn-terminate,.oxi-btn-terminate:focus,.oxi-btn-terminate:hover{background-color:#ad7fa8}
 .oxi-tile{border:1px solid transparent}
 .ember-tooltip .tooltip-inner{background-color:revert}
+.oxi-popover{background-color:#eee;border-color:#aaa}
+.oxi-popover .tooltip-inner{color:revert;background-color:revert;border-radius:revert}
 .hover-element{display:inline flex;flex-direction:column}
 .hover-element .content{margin:0 auto}
 .hover-element .menu{display:none;background-color:#dff0d8;box-shadow:0 8px 16px 0 rgba(0,0,0,.2);z-index:10;width:100%;padding:6pt}

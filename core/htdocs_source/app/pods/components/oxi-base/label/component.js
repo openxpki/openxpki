@@ -1,4 +1,7 @@
 import Component from '@glimmer/component';
+import { action } from '@ember/object';
+import { tracked } from '@glimmer/tracking';
+import { getOwner } from '@ember/application';
 
 /**
  * Shows a label (a text) and escapes special characters.
@@ -13,7 +16,16 @@ import Component from '@glimmer/component';
  * @param { bool } raw - set to `true` to allow HTML entities incl. `<script>` tags etc.
  */
 export default class OxiLabelComponent extends Component {
-    get useSpan() {
-        return (this.args.tooltip || this.args.class || Array.isArray(this.args.text));
+    @tracked popoverContent = null;
+
+    @action
+    fetchContent(event) {
+        if (this.popoverContent) return;
+        getOwner(this).lookup("route:openxpki").sendAjaxQuiet({
+            page: this.args.tooltip_page,
+            ...this.args.tooltip_page_args,
+        }).then((doc) => {
+            this.popoverContent = doc;
+        });
     }
 }

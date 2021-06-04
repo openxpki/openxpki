@@ -506,6 +506,17 @@ div.oxifield-upload {
   background-color: revert;
 }
 
+.oxi-popover {
+  background-color: #eee;
+  border-color: #aaa;
+}
+
+.oxi-popover .tooltip-inner {
+  color: revert;
+  background-color: revert;
+  border-radius: revert;
+}
+
 /******************************************************************************
  * Others
  */

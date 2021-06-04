@@ -4,6 +4,18 @@
             <EmberTooltip>
                 {{@tooltip}}
             </EmberTooltip>
+        {{else if @tooltip_page}}
+            <EmberPopover
+                @tooltipClass="oxi-popover"
+                @onShow={{this.fetchContent}}
+                @updateFor={{this.popoverContent}}
+            >
+                {{#if this.popoverContent}}
+                    <OxiSection @content={{this.popoverContent}}/>
+                {{else}}
+                    wait...
+                {{/if}}
+            </EmberPopover>
         {{/if}}
     {{#if @raw}}
         {{{defuse txt}}}
