@@ -98,6 +98,9 @@ if [[ $IS_FULLCONFIG -eq 1 ]]; then
     # set OpenXPKI socket owner to webserver user
     sed -ri 's/^(\s*socket_owner:).*/\1 www-data/' /etc/openxpki/config.d/system/server.yaml
 
+    # set plain datavault password "root"
+    sed -zri 's/(secret:\s+default:\s+.*?)value@?:[^\n]+/\1value: root/' /etc/openxpki/config.d/system/crypto.yaml
+
 # partial config update
 else
     #  realm democa
