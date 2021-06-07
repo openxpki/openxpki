@@ -10,7 +10,6 @@
 use CGI 4.08;
 use CGI::Fast;
 use CGI::Session;
-use CGI::Carp qw (fatalsToBrowser);
 use JSON;
 use English;
 use strict;
@@ -41,11 +40,11 @@ eval {
     $log->debug(Dumper $conf);# if ($log->is_trace());
 };
 
-if ($EVAL_ERROR) {
+if (my $err = $EVAL_ERROR) {
     my $cgi = CGI::Fast->new();
     print $cgi->header( -type => 'application/json' );
     print $json->encode( { status => { 'level' => 'error', 'message' => i18nGettext('I18N_OPENXPKI_UI_APPLICATION_ERROR') } });
-    die $EVAL_ERROR;
+    die $err;
 }
 
 if (!$conf->{global}->{socket}) {
