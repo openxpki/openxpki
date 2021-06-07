@@ -78,8 +78,14 @@ label {
   margin-top:5px;
 }
 
+/* Menu (navigation bar) */
 .navbar {
   margin-bottom:10px;
+}
+
+.navbar .dropdown-header {
+  border-bottom: 1px solid #e9ecef;
+  margin-top: 0.75em;
 }
 
 .maincontent {

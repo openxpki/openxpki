@@ -12,6 +12,7 @@ label{overflow:hidden;text-overflow:ellipsis}
 .tab-close:focus,.tab-close:hover{color:#000;text-decoration:none;cursor:pointer;opacity:.5}
 .modal-header+.modal-body h3{margin-top:5px}
 .navbar{margin-bottom:10px}
+.navbar .dropdown-header{border-bottom:1px solid #e9ecef;margin-top:.75em}
 .maincontent{margin-bottom:300px}
 .container.sections{padding-top:20px}
 .section{padding:0!important}
