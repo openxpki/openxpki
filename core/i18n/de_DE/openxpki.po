@@ -367,6 +367,28 @@ msgstr "Challenge Password"
 msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
 msgstr "Schlüsselerzeugung fehlgeschlagen"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST"
+msgstr "ja"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
+msgstr "die Sperrung wird nach dem angegebenen Zeitpunkt ausgeführt"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT"
+msgstr ""
+"Eine verzögerte Sperrung erlaubt es ein Zertifikat zu einem Zeitpunkt in der "
+"Zukunft automatisch zu sperren."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
+msgstr "ohne Angabe / andere Gründe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
+msgstr "die Sperrung wird nach dem angegebenen Zeitpunkt ausgeführt"
+
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "verzögerte Sperrung beantragt"
 
@@ -2808,6 +2830,10 @@ msgstr "Bitte geben Sie den Sperrgrund an"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_CODE_TOOLTIP"
 msgstr "Bitte geben Sie den Sperrgrund an"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REASON_DESC"
+msgstr "Der Sperrgrund gibt an wieseo dieses Zertikat gesperrt wurde."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REJECT_COMMENT_DESC"
 msgstr ""
 "Grund für die Ablehnung. Diese Begründung ist für den Benutzer sichtbar."
@@ -2866,6 +2892,25 @@ msgstr "Passwort"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RESETPASS_RESET_PASSWORD_PLACEHOLDER"
 msgstr "Bitte wiederholen Sie das Passwort"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_TIME_DESC"
+msgstr ""
+"Eine verzögerte Sperrung erlaubt es ein Zertifikat zu einem Zeitpunkt in der "
+"Zukunft automatisch zu sperren."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_TIME_LABEL"
+msgstr "Verzögerte Sperrung"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_TIME_PLACEHOLDER"
+msgstr ""
+"normalerweise nicht erforderlich, wählen Sie ggf. rechts einen Zeitpunkt"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REVOCATION_TIME_TOOLTIP"
+msgstr "die Sperrung wird nach dem angegebenen Zeitpunkt ausgeführt"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RUN_IN_BACKGROUND_DESC"
 msgstr ""
@@ -3501,6 +3546,11 @@ msgstr "Dieser Workflow ist fehlgeschlagen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_LABEL"
 msgstr "FEHLER"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
+msgstr ""
+"Dieser Workflow ist fehlgeschlagen und kann nicht erneut gestartet werden."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_LABEL"
 msgstr " "
