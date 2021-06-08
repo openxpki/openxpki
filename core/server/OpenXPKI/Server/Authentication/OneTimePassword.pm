@@ -89,11 +89,11 @@ sub handleInput {
         );
     }
 
-    my $user = $data->{user};
+    my $userid = $self->get_userid( $data->{user} );
     delete $data->{user};
     return OpenXPKI::Server::Authentication::Handle->new(
         username => $token,
-        userid => $self->get_userid( $data->{user} ),
+        userid => $userid,
         role => $role,
         userinfo => $data || {},
     );
@@ -164,6 +164,32 @@ The username to use
 
 The role to set, only effective if the handler has not set a role.
 
+=item *
+
+The remaining hash is set as userinfo.
+
 =back
 
+=head2 Example Configuration
 
+Create a stack with type I<password> and a single input field.
+
+  stack:
+    OTP:
+      label: OneTimePassword
+      handler: OneTimePassword
+      type: passwd
+      param:
+        label: I18N_OPENXPKI_UI_OTP_LOGIN_LABEL
+        description: I18N_OPENXPKI_UI_OTP_LOGIN_DESC
+        button: I18N_OPENXPKI_UI_OTP_LOGIN_BUTTON
+        field:
+            - name: token
+            label: I18N_OPENXPKI_UI_LOGIN_TOKEN
+            type: password
+
+  handler:
+    OneTimePassword:
+      type: OneTimePassword
+      salt: openxpki
+      role: User
