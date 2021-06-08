@@ -2107,7 +2107,7 @@ msgstr "Bitte aktualisieren/komplettieren Sie die nachfolgenden Informationen."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Antrag aktualisieren"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
 msgstr "Archivierung"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"

@@ -2097,6 +2097,10 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FQDN_FAILED"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_HREF_FAILED"
+msgstr "SPKAC-строка пуста."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_VALIDITY_STRING_FAILED"
 msgstr "SPKAC-строка пуста."
 
@@ -2630,6 +2634,10 @@ msgstr "Технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
@@ -10767,10 +10775,6 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_WRITE_PIN_OK_LABEL"
 #~ msgstr "Изменить профиль сертификата "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL"
-#~ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_AUTH_FAILURE_DESC"

@@ -1568,6 +1568,10 @@ msgstr "给定表达式的验证程序失败"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FQDN_FAILED"
 msgstr "给定的FQDN格式无效"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_HREF_FAILED"
+msgstr "给定表达式的验证程序失败"
+
 msgid "I18N_OPENXPKI_UI_VALIDATOR_VALIDITY_STRING_FAILED"
 msgstr "输入的日期/时间无法验证。"
 
@@ -2031,6 +2035,10 @@ msgstr "请更新/完成以下信息。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "更新请求"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
+msgstr "状态"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "工作流程属性"
@@ -4156,10 +4164,6 @@ msgstr "是"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 #~ msgstr "Generate Code"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL"
-#~ msgstr "状态"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_APPROVE"
 #~ msgstr "Approve Request"

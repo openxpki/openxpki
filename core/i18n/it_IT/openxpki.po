@@ -1874,6 +1874,10 @@ msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FQDN_FAILED"
 msgstr "Fallita convalida dell’espressione data"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_HREF_FAILED"
+msgstr "Fallita convalida dell’espressione data"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_VALIDATOR_VALIDITY_STRING_FAILED"
 msgstr "Il valore date/time inserito non è stato convalidato."
 
@@ -2412,6 +2416,10 @@ msgstr "Per favore Aggiorna / Completa le informazioni qui sotto."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Richiesta Aggiornamento"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
+msgstr "Stato"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
@@ -5533,10 +5541,6 @@ msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 #~ msgstr "Genera Codice"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL"
-#~ msgstr "Stato"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_AUTH_FAILURE_DESC"

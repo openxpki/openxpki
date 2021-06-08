@@ -1610,6 +1610,10 @@ msgstr "バリデータが指定された式で失敗しました。"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FQDN_FAILED"
 msgstr "FQDNの形式が正しくありません。"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_HREF_FAILED"
+msgstr "バリデータが指定された式で失敗しました。"
+
 msgid "I18N_OPENXPKI_UI_VALIDATOR_VALIDITY_STRING_FAILED"
 msgstr "入力された日付/時刻を検証できませんでした。"
 
@@ -2110,6 +2114,10 @@ msgstr "以下の情報を更新してください。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "リクエストの更新"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
+msgstr "状態"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "ワークフロー属性"
@@ -4938,10 +4946,6 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 #~ msgstr "コードを作成する"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL"
-#~ msgstr "状態"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_APPROVE"
 #~ msgstr "リクエストの承認"
