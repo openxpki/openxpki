@@ -24,6 +24,8 @@ sub _init {
         $self->error( 'I18N_OPENXPKI_UI_VALIDATOR_REGEX_EMAIL_FAILED' );
     } elsif ($self->regex() eq 'fqdn') {
         $self->error( 'I18N_OPENXPKI_UI_VALIDATOR_REGEX_FQDN_FAILED' );
+    } elsif ($self->regex() eq 'href') {
+        $self->error( 'I18N_OPENXPKI_UI_VALIDATOR_REGEX_HREF_FAILED' );
     } else {
         $self->error( 'I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED' );
     }
@@ -58,7 +60,10 @@ sub validate {
         $regex = qr/ \A \S+\@([\w-]+\.)+(\w+) \z /xi;
 
     } elsif ($regex eq 'fqdn') {
-        $regex = qr/ \A (([\w\-]+\.)+)[\w\-]{2,} \z /xi;
+        $regex = qr/ \A (([a-z0-9][\w\-]*\.)+)[\w\-]{2,} \z /xi;
+
+    } elsif ($regex eq 'href') {
+        $regex = qr/ \A http(s)?:\/\/ (([a-z0-9][\w\-]*\.)+)[\w\-]{2,} /xi;
 
     # or quote the string if no named match
     } else {
@@ -168,6 +173,13 @@ Basic check for valid email syntax
 A fully qualified domain name, must have at least one dot, all "word"
 characters are accepted for the domain parts. Last domain part must have
 at least two characters
+
+=item href
+
+A lightweight check for a URI to be used as href target, valid if the
+string starts with http(s):// followed by I<fqdn>. The check is "open
+ended", so it allows arbitrary sequences after something that looks
+like a valid FQDN.
 
 =back
 

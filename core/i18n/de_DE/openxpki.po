@@ -1581,6 +1581,9 @@ msgstr "Überprüfung des Eingabeparameters ist fehlgeschlagen"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FQDN_FAILED"
 msgstr "Der übergebene FQDN hat ein ungültiges Format"
 
+msgid "I18N_OPENXPKI_UI_VALIDATOR_REGEX_HREF_FAILED"
+msgstr "Bitte geben Sie eine vollständige URL inkl. http(s):// ein"
+
 msgid "I18N_OPENXPKI_UI_VALIDATOR_VALIDITY_STRING_FAILED"
 msgstr "Das übergebene Datum wurde nicht erkannt"
 
@@ -1984,7 +1987,7 @@ msgstr ""
 "Vergangenheit liegt."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_MOTD_INITIALIZE_LABEL"
-msgstr "Set Information"
+msgstr "Nachrichtendetails angeben"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_NICE_CHECK_FOR_REVOCATION_DESC"
 msgstr ""
@@ -2103,6 +2106,9 @@ msgstr "Bitte aktualisieren/komplettieren Sie die nachfolgenden Informationen."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Antrag aktualisieren"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL"
+msgstr "Archivierung"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Workflow-Meta-Daten"
@@ -4380,9 +4386,6 @@ msgstr "ja"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 #~ msgstr "Generate Code"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL"
-#~ msgstr "Archivierung"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_APPROVE"
 #~ msgstr "Antrag genehmigen"
