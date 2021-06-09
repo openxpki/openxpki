@@ -145,6 +145,7 @@ B<before> you use C<OpenXPKI::Test>:
 
 # Core modules
 use Data::Dumper;
+use File::Path qw( remove_tree );
 use File::Temp qw( tempdir );
 use Module::Load qw( autoload );
 
@@ -393,7 +394,7 @@ has testenv_root => (
     is => 'rw',
     isa => 'Str',
     lazy => 1,
-    default => sub { scalar(tempdir( CLEANUP => 1 )) },
+    default => sub { scalar(tempdir( CLEANUP => 0 )) }, # "CLEANUP => 1" would interfere with forked processes (Watchdog)
 );
 
 =item * I<log_level> (optional) - L<Log::Log4Perl> log level for screen output.
@@ -525,6 +526,7 @@ has conf_database       => ( is => 'rw', isa => 'HashRef', lazy => 1, builder =>
 # password for all openxpki users
 has password            => ( is => 'rw', isa => 'Str', lazy => 1, default => "openxpki" );
 has password_hash       => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { my $self = shift; $self->_get_password_hash($self->password) } );
+has testenv_root_pid    => ( is => 'rw', isa => 'Str', init_arg => undef);
 
 around BUILDARGS => sub {
     my $orig  = shift;
@@ -559,6 +561,7 @@ sub BUILD {
     my $self = shift;
 
     $ENV{OXI_TESTENV_ROOT} = $self->testenv_root;
+    $self->testenv_root_pid($$);
 
     $self->init_logging;
     $self->init_base_config;
@@ -572,6 +575,21 @@ sub BUILD {
     # child code after $self->$orig()
     #
     $self->init_session_and_context;
+}
+
+sub DEMOLISH {
+    my $self = shift;
+    return unless $self->testenv_root_pid == $$;
+    if ($self->enable_file_log) {
+        diag "==========";
+        diag "Log file was enabled: " . $self->log_path;
+        diag "Temporary directory will NOT be removed!";
+        diag "==========";
+    }
+    else {
+        # using "tempdir(CLEANUP => 1)" would interfere with forked processes (Watchdog)
+        remove_tree($self->testenv_root);
+    }
 }
 
 sub _build_log4perl {

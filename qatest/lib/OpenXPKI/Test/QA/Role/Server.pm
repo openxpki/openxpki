@@ -31,7 +31,6 @@ L<OpenXPKI::Test::QA::Role::SampleConfig>):
 =cut
 
 # Core modules
-use File::Temp qw( tempdir );
 use IPC::SysV qw(IPC_PRIVATE IPC_CREAT IPC_EXCL S_IRWXU IPC_NOWAIT);
 use IPC::Semaphore;
 use Test::More;
