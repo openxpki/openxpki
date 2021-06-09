@@ -12,7 +12,7 @@ use Test::Exception;
 use Data::UUID;
 use Try::Tiny;
 
-#use OpenXPKI::Debug; $OpenXPKI::Debug::BITMASK{'OpenXPKI::Server::Workflow::Persister.*'} = 16;
+# use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Workflow::Persister.*'} = 32;
 
 # Project modules
 use lib "$Bin/../lib";
@@ -43,12 +43,12 @@ throws_ok {
             ",
         },
     );
-} qr/defaults must contain/, "Fail on wrong arguments for persister defaults";
+} qr/defaults must contain/, "fail on wrong arguments for persister defaults";
 
-sub items_ok($$) {
-    my ($config, $items) = @_;
+sub items_ok($$$) {
+    my ($testname, $config, $items) = @_;
 
-    subtest "check items" => sub {
+    subtest $testname => sub {
         my $workflow_type = "TESTWORKFLOW".int(rand(2**32));
 
         #
@@ -69,7 +69,7 @@ sub items_ok($$) {
 
                     state:
                         INITIAL:
-                            action: start_auto > AUTO
+                            action: step1 > AUTO
 
                         AUTO:
                             action: set_context set_attr > SUCCESS
@@ -78,7 +78,7 @@ sub items_ok($$) {
                         SUCCESS:
 
                     action:
-                        start_auto:
+                        step1:
                             class: OpenXPKI::Server::Workflow::Activity::Noop
 
                         set_context:
@@ -94,14 +94,25 @@ sub items_ok($$) {
                                 shoesize: 10
                                 color: blue
                                 hairstyle: bald
+
+                    field:
+                        vehicle:
+                            name: vehicle
+                            type: text
+                            cleanup: none
+
+                    attribute:
+                        shoesize:
+                            cleanup: none
+
                     acl:
-                        PrincesOfTheUniverse:
+                        MyFairyKing:
                             creator: any
                 ",
             },
         );
 
-        $oxitest->session->data->role("PrincesOfTheUniverse");
+        $oxitest->session->data->role("MyFairyKing");
 
         my $wf1;
 
@@ -113,7 +124,7 @@ sub items_ok($$) {
 
         # Run workflow actions to trigger cleanup
         lives_ok {
-            $wf1->execute_action("testwf_start_auto");
+            $wf1->execute_action("testwf_step1");
         } "execute workflow action";
 
         my $wf2;
@@ -144,8 +155,7 @@ sub items_ok($$) {
 # Tests
 #
 
-# Internal cleanup defaults
-items_ok
+items_ok "internal cleanup defaults" =>
     # config
     {
         # Internal defaults:
@@ -155,17 +165,18 @@ items_ok
     },
     # expected results
     {
-        field => {},
+        field => {
+            vehicle => "plane", # explicitely configured as "cleanup: none"
+        },
         attribute => {
             shoesize  => 10,
             color     => 'blue',
             hairstyle => 'bald',
         },
-        history => [ qw( testwf_start_auto testwf_set_context testwf_set_attr ) ],
+        history => [ qw( testwf_step1 testwf_set_context testwf_set_attr ) ],
     };
 
-# Explicit persister cleanup settings (merged with internal defaults)
-items_ok
+items_ok "explicit persister cleanup settings" => # ... merged with internal defaults
     # config
     {
         persister =>
@@ -176,8 +187,11 @@ items_ok
     },
     # expected results
     {
-        field => {},
-        attribute => {},
+        field => {
+            vehicle => "plane", # explicitely configured as "cleanup: none"
+        },
+        attribute => {
+            shoesize  => 10, # explicitely configured as "cleanup: none"
+        },
         history => [ qw( ) ],
     };
-
