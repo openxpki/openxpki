@@ -179,6 +179,7 @@ sub _customize_system_server {
     $conf->{user} =  (getpwuid(geteuid))[0]; # run under same user as test scripts
     $conf->{group} = (getgrgid(getegid))[0];
     $conf->{socket_file} = $self->path_socket_file;
+    $conf->{socket_owner} = (getpwuid(geteuid))[0]; # same user as the one who runs the test scripts
     $conf->{pid_file} = $self->path_pid_file;
     $conf->{stderr} = $self->path_stderr_file;
     $conf->{tmpdir} = $self->path_temp_dir;
