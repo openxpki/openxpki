@@ -64,12 +64,12 @@ sub workflow_def {
                 'label' => 'I18N_OPENXPKI_UI_WORKFLOW_ACTION_MOTD_INITIALIZE_LABEL',
                 'description' => 'I18N_OPENXPKI_UI_WORKFLOW_ACTION_MOTD_INITIALIZE_DESCRIPTION',
             },
-            'do_something' => {
-                'class' => 'OpenXPKI::Test::Is13Prime',
-            },
             'pause_before_fork' => {
                 'class' => 'OpenXPKI::Server::Workflow::Activity::Tools::Disconnect',
                 'param' => { 'pause_info' => 'We want this to be picked up by the watchdog' },
+            },
+            'do_something' => {
+                'class' => 'OpenXPKI::Test::Is13Prime',
             },
         },
         'field' => {},
@@ -154,12 +154,11 @@ lives_and {
 lives_and {
     $result = $tester->send_command_ok("get_workflow_history" => { id => $wf_id });
     cmp_deeply $result, [
-        superhashof({ workflow_state => "INITIAL", workflow_action => re(qr/create/i) }),
-        superhashof({ workflow_state => "INITIAL", workflow_action => re(qr/initialize/i) }),
-        superhashof({ workflow_state => "BACKGROUNDING", workflow_action => re(qr/pause_before_fork/i) }), # pause
-        superhashof({ workflow_state => "BACKGROUNDING", workflow_action => re(qr/pause_before_fork/i) }), # wakeup
-        superhashof({ workflow_state => "BACKGROUNDING", workflow_action => re(qr/pause_before_fork/i) }), # state change
-        superhashof({ workflow_state => "LOITERING", workflow_action => re(qr/do_something/i) }),
+        superhashof({ workflow_state => "INITIAL", workflow_action => re(qr/initialize/i), workflow_description => re(qr/^EXECUTE/) }),
+        superhashof({ workflow_state => "BACKGROUNDING", workflow_action => re(qr/pause_before_fork/i), workflow_description => re(qr/^PAUSED/) }), # pause
+        superhashof({ workflow_state => "BACKGROUNDING", workflow_action => re(qr/pause_before_fork/i), workflow_description => re(qr/^WAKEUP/) }), # wakeup
+        superhashof({ workflow_state => "BACKGROUNDING", workflow_action => re(qr/pause_before_fork/i), workflow_description => re(qr/^EXECUTE/) }), # state change
+        superhashof({ workflow_state => "LOITERING", workflow_action => re(qr/do_something/i), workflow_description => re(qr/^AUTORUN/) }),
     ] or diag explain $result;
 } "get_workflow_history()";
 
