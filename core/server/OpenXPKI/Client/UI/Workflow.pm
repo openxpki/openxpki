@@ -1498,7 +1498,7 @@ sub action_search {
 
     if ($self->param('wf_creator')) {
         $input->{wf_creator} = $self->param('wf_creator');
-        $attr->{'creator'} = ~~$self->param('wf_creator');
+        $attr->{'creator'} = scalar $self->param('wf_creator');
         $verbose->{wf_creator} = $self->param('wf_creator');
     }
 
@@ -2782,6 +2782,8 @@ sub __render_result_list {
                 push @line, $context->{ $col->{field} };
             } elsif ($col->{source} eq 'attribute') {
                 push @line, $wf_item->{ $col->{field} }
+            } elsif ($col->{field} eq 'creator') {
+                push @line, $self->__render_creator_tooltip($wf_item->{creator}, $col);
             } else {
                 # hu ?
             }
@@ -2825,15 +2827,10 @@ sub __render_list_spec {
         # we must create a copy as we change the hash in the session info otherwise
         my %col = %{$cols->[$ii]};
         my $head = { sTitle => $col{label} };
-        if ($col{sortkey}) {
-            $head->{sortkey} = $col{sortkey};
-        }
-        if ($col{format}) {
-            $head->{format} = $col{format};
-        }
-        push @header, $head;
 
-        if ($col{template}) {
+        if ($col{field} eq 'creator') {
+            $attrib{'creator'} = 1;
+            $col{format} = 'tooltip';
 
         } elsif ($col{field} =~ m{\A (attribute)\.(\S+) }xi) {
             $col{source} = $1;
@@ -2845,12 +2842,20 @@ sub __render_list_spec {
             $col{source} = $1;
             $col{field} = $2;
 
-        } else {
+        } elsif (!$col{template}) {
             $col{source} = 'workflow';
             $col{field} = uc($col{field})
 
         }
         push @column, \%col;
+
+        if ($col{sortkey}) {
+            $head->{sortkey} = $col{sortkey};
+        }
+        if ($col{format}) {
+            $head->{format} = $col{format};
+        }
+        push @header, $head;
     }
 
     push @header, { sTitle => 'serial', bVisible => 0 };
@@ -3368,32 +3373,15 @@ sub __render_fields {
             }
 
         } elsif ($field->{yaml_template}) {
-            # We prepend a node to the template because
-            # 1. YAML parser chokes on arrays without parent node
-            # 2. the template renderer strips whitespaces off the very beginning which would destroy things
-            my $yaml = "OXI_PLACEHOLDER:\n" . $field->{yaml_template};
             ##! 64: 'Rendering value: ' . $item->{value}
             $self->logger->debug('Template value: ' . Dumper $item );
-            my $out = $self->send_command_v2('render_template', {
-                template => $yaml,
+            my $structure = $self->send_command_v2('render_yaml_template', {
+                template => $field->{yaml_template},
                 params => { value => $item->{value} },
             });
-            $self->logger->debug('Rendered YAML template: ' . $out);
+            $self->logger->debug('Rendered YAML template: ' . Dumper $structure);
             ##! 64: 'Rendered YAML template: ' . $out
-            if ($out) {
-                my $doc;
-                try {
-                    $doc = YAML::Loader->new->load($out);
-                }
-                catch {
-                    OpenXPKI::Exception->throw (
-                        message => "Error parsing YAML in 'yaml_template'",
-                        params => { field => $key, error => $_, yaml => $out }
-                    );
-                };
-                my $structure = $doc->{OXI_PLACEHOLDER};
-                $self->logger->debug('Parsed Perl structure: ' . Dumper($structure));
-                ##! 64: 'Parsed Perl structure: ' . Dumper($structure)
+            if (defined $structure) {
                 $item->{value} = $structure;
             } else {
                 $item->{value} = undef; # prevent pushing emtpy lists
@@ -3450,6 +3438,7 @@ sub __render_workflow_info {
                grep { ($_->{field}//'') =~              / attribute\. /msx } @$wfdetails_config
             or grep { ($_->{template}//'') =~           / attribute\. /msx } @$wfdetails_config
             or grep { (($_->{link}//{})->{page}//'') =~ / attribute\. /msx } @$wfdetails_config
+            or grep { ($_->{field}//'') =~              / \Acreator /msx } @$wfdetails_config
         )
     ) {
         $wfdetails_info = $self->send_command_v2( 'get_workflow_info',  {
@@ -3461,30 +3450,27 @@ sub __render_workflow_info {
         $wfdetails_info = $wf_info->{workflow};
     }
 
-    # translate $wfdetails_info->{context}->{creator} to $wfdetails_info_flat->{"context.creator"}
-    my $wfdetails_info_flat = { %{ $wfdetails_info } }; # make a copy
-    for my $subname (qw(context attribute)) {
-        my $subhash;
-        next unless $subhash = $wfdetails_info_flat->{ $subname };
-        for my $key ( keys %$subhash ) {
-            $wfdetails_info_flat->{"$subname.$key"} = $subhash->{ $key };
-        }
-        delete $wfdetails_info_flat->{ $subname };
-    }
-
     # assemble infos
     my @data;
     for my $cfg (@$wfdetails_config) {
         my $value;
 
-        if ($cfg->{template}) {
+        my $field = $cfg->{field} // '';
+        if ($field eq 'creator') {
+            # we enforce tooltip, if you need something else use a template on attribute.creator
+            $cfg->{format} = 'tooltip';
+            $value = $self->__render_creator_tooltip($wfdetails_info->{attribute}->{creator}, $cfg);
+        } elsif ($cfg->{template}) {
             $value = $self->send_command_v2( render_template => {
                 template => $cfg->{template},
                 params => $wfdetails_info,
             });
-        }
-        elsif ($cfg->{field}) {
-            $value = $wfdetails_info_flat->{ $cfg->{field} } // '-';
+        } elsif ($field =~ m{\A attribute\.(\S+) }xi) {
+            $value = $wfdetails_info->{attribute}->{$1} // '-';
+        } elsif ($field =~ m{\A context\.(\S+) }xi) {
+            $value = $wfdetails_info->{context}->{$1} // '-';
+        } elsif ($field) {
+            $value = $wfdetails_info->{$field} // '-';
         }
 
         # if it's a link: render URL template ("page")
@@ -3508,6 +3494,66 @@ sub __render_workflow_info {
     }
 
     return \@data;
+
+}
+
+=head2 __render_creator_tooltip
+
+Expects the userid of a creator and the field definition.
+
+If the field has I<yaml_template> set, the template is parsed with the
+value of the creator given as key I<creator> in the parameter hash. If
+the resulting data structure is a hash and has a non-empty key I<value>,
+it is used as value for the field.
+
+If the field has I<template> set, the result of this template is used as
+value for the field, the literal value given as I<creator> is used as
+tooltip.
+
+If neither one is set, the C<creator()> method from the C<Metadata>
+Plugin is used as default renderer.
+
+In case the template does not provide a usable value, the literal value
+of I<creator> is returned as value with an error message as I<tooltip>.
+The error message depends on weather the creator string has a namespace
+tag or not.
+
+=cut
+
+sub __render_creator_tooltip {
+
+    my $self = shift;
+    my $creator = shift;
+    my $field = shift;
+
+    # the field comes with a YAML template = render the field definiton from it
+    my $value;
+    if ($field->{yaml_template}) {
+        my $val = $self->send_command_v2( render_yaml_template => {
+            template => $field->{yaml_template},
+            params => { creator => $creator },
+        });
+        $value = $val if (ref $val eq 'HASH' && $val->{value});
+
+    # use template (or default template) to set username
+    } else {
+        my $username = $self->send_command_v2( render_template => {
+            template => $field->{template} || '[% USE Metadata; Metadata.creator(creator) %]',
+            params => { creator => $creator },
+        });
+        $value = { value => $username } if ($username);
+        $value->{tooltip} = $creator if ($username ne $creator);
+    }
+
+    # creator has no namespace so there was nothing to resolve
+    if (!$value && $creator !~ m{\A\w+:}) {
+        $value = { value => $creator, tooltip => 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_NO_NAMESPACE' };
+    }
+
+    # still no result
+    $value //= { value => $creator, tooltip => 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_UNABLE_TO_RESOLVE' };
+
+    return $value;
 
 }
 

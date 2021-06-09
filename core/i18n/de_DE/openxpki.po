@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2021-05-19 10:34+0200\n"
+"PO-Revision-Date: 2021-06-09 11:56+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -366,28 +366,6 @@ msgstr "Challenge Password"
 
 msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
 msgstr "Schlüsselerzeugung fehlgeschlagen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CUST"
-msgstr "ja"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
-msgstr "die Sperrung wird nach dem angegebenen Zeitpunkt ausgeführt"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT"
-msgstr ""
-"Eine verzögerte Sperrung erlaubt es ein Zertifikat zu einem Zeitpunkt in der "
-"Zukunft automatisch zu sperren."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
-msgstr "ohne Angabe / andere Gründe"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
-msgstr "die Sperrung wird nach dem angegebenen Zeitpunkt ausgeführt"
 
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "verzögerte Sperrung beantragt"
@@ -2201,8 +2179,17 @@ msgstr "Sie sind nicht berechtigt diesen Workflow zu starten."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
 msgstr "Der Workflow konnte nicht gestartet werden: Typ unbekannt"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_ANONYMOUS"
+msgstr "anonymer Benutzer"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL"
 msgstr "Ersteller"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_NO_NAMESPACE"
+msgstr "Ersteller ist keiner Domäne zugewiesen"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_UNABLE_TO_RESOLVE"
+msgstr "Erstellerkennung kann nicht aufgelöst werden"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ERROR_DELAY_REVOCATION_TIME_NOT_IN_FUTURE"
 msgstr "Der gewünschte Sperrzeitpunkt liegt in der Vergangenheit."
@@ -4201,8 +4188,30 @@ msgstr "aufwecken"
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "ja"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CUST"
+#~ msgstr "ja"
+
 #~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
 #~ msgstr "Ersteller"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
+#~ msgstr "die Sperrung wird nach dem angegebenen Zeitpunkt ausgeführt"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT"
+#~ msgstr ""
+#~ "Eine verzögerte Sperrung erlaubt es ein Zertifikat zu einem Zeitpunkt in "
+#~ "der Zukunft automatisch zu sperren."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
+#~ msgstr "ohne Angabe / andere Gründe"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
+#~ msgstr "die Sperrung wird nach dem angegebenen Zeitpunkt ausgeführt"
 
 #~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_KEY_POLICY_FAILED"
 #~ msgstr "Schlüsselparameter fehlerhaft (Algorithmus/Schlüssellänge)"

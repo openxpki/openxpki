@@ -116,7 +116,7 @@ sub _validation_result {
         $username = $x509_signer->get_subject();
     } elsif ($arg eq "serial") {
         $username = $x509_signer->get_serial();
-    } elsif ($arg eq "cert_identifier") {
+    } elsif ($arg eq "cert_identifier" || $arg eq "certid") {
         $username = $x509_signer->get_cert_identifier();
     } elsif ($arg eq "certificate") {
         $username = $x509_signer->pem;
@@ -251,7 +251,7 @@ Serial in integer notation - as string
 
 The PEM encoded certificate
 
-=item I<cert_identifier>
+=item I<cert_identifier> / I<certid>
 
 The cert_identifier.
 
