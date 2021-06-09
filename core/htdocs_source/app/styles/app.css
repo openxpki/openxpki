@@ -510,18 +510,24 @@ div.oxifield-upload {
 /* Fix strange ember-tooltip CSS bug that show darker inner background */
 .ember-tooltip .tooltip-inner {
   background-color: revert;
+  max-width: 40em;
 }
 
-.oxi-popover {
+.ember-tooltip {
+  max-width: 40em;
+}
+
+.ember-popover {
   background-color: #eee;
   border-color: #aaa;
-  width: 600px;
+  max-width: 40em;
 }
 
-.oxi-popover .tooltip-inner {
+.ember-popover .tooltip-inner {
   color: revert;
   background-color: revert;
   border-radius: revert;
+  max-width: 40em;
 }
 
 /******************************************************************************

@@ -6,7 +6,6 @@
             </EmberTooltip>
         {{else if @tooltip_page}}
             <EmberPopover
-                @tooltipClass="oxi-popover"
                 @onShow={{this.fetchTooltip}}
                 @updateFor={{this.tooltipReady}}
             >

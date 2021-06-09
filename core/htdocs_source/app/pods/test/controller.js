@@ -639,10 +639,18 @@ export default class TestController extends Controller {
                     },
                     {
                         format: "tooltip",
-                        label: "tooltip",
+                        label: "tooltip (short)",
                         value: {
                             value: "Hover me",
-                            tooltip: "...to see more",
+                            tooltip: "This is a short tooltip.",
+                        },
+                    },
+                    {
+                        format: "tooltip",
+                        label: "tooltip (long)",
+                        value: {
+                            value: "Hover me",
+                            tooltip: "This_is_intentionally_a_very_long_tooltip_text that came out of the blue. While it sprung into existence strange waves of gravity formed in a distant galaxy.",
                         },
                     },
                     {
