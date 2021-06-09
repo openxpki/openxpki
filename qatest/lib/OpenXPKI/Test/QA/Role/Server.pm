@@ -248,7 +248,6 @@ sub new_client_tester {
     return OpenXPKI::Test::QA::Role::Server::ClientHelper->new(
         socket_file => $self->get_conf("system.server.socket_file"),
         password => $self->password,
-        auth_stack => $self->auth_stack, # $self->auth_stack comes from OpenXPKI::Test
     );
 }
 

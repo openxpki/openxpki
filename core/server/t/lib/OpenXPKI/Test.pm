@@ -525,7 +525,6 @@ has conf_database       => ( is => 'rw', isa => 'HashRef', lazy => 1, builder =>
 # password for all openxpki users
 has password            => ( is => 'rw', isa => 'Str', lazy => 1, default => "openxpki" );
 has password_hash       => ( is => 'rw', isa => 'Str', lazy => 1, default => sub { my $self = shift; $self->_get_password_hash($self->password) } );
-has auth_stack          => ( is => 'ro', isa => 'Str', lazy => 1, default => "Testing" );
 
 around BUILDARGS => sub {
     my $orig  = shift;
@@ -934,7 +933,7 @@ sub set_user {
     $self->session->data->pki_realm($realm);
 
     my ($realuser, $role, $reply) = OpenXPKI::Server::Context::CTX('authentication')->login_step({
-        STACK   => $self->auth_stack,
+        STACK   => 'OxiTestAuthStack',
         MESSAGE => {
             PARAMS => { LOGIN => $user, PASSWD => $self->password },
         },
@@ -1135,14 +1134,14 @@ sub auth_config {
     my ($self) = @_;
     return {
         stack => {
-            $self->auth_stack() => {
+            "OxiTestAuthStack" => {
                 description => "OpenXPKI test authentication stack",
-                handler => "OxiTest",
-                type  => "Password",
+                handler => "OxiTestAuthHandler",
+                type  => "passwd",
             },
         },
         handler => {
-            "OxiTest" => {
+            "OxiTestAuthHandler" => {
                 label => "OpenXPKI test authentication handler",
                 type  => "Password",
                 user  => {
