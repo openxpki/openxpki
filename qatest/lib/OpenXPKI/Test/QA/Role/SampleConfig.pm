@@ -116,7 +116,7 @@ has path_stderr_file => (
     default => sub { shift->testenv_root."/var/log/openxpki/stderr.log" },
 );
 
-# BEFORE ... so OpenXPKI::Test->init_base_config wins with it's few base settings
+# BEFORE ... so OpenXPKI::Test->init_base_config wins with its few base settings
 before 'init_base_config' => sub { # happens before init_user_config() so we do not overwrite more specific configs of other roles
     my $self = shift;
 

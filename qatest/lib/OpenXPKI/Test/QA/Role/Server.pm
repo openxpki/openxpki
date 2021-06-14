@@ -102,7 +102,7 @@ around 'init_server' => sub {
     note "Starting test server...";
 
     # We need Proc::Daemon because Net::Server::Fork's parent process will not
-    # go beyong "loop()" (called by "run()") so we could not start our tests
+    # go beyond "loop()" (called by "run()") so we could not start our tests
     # otherwise.
     # We use a semaphore to know when the child process has finished the server
     # initialization tasks.
