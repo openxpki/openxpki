@@ -577,7 +577,7 @@ search_result { pki_realm => "beta" },
 # Check descending order (by ID)
 lives_and {
     my $result = $oxitest->api2_command("search_workflow_instances" => { pki_realm => "alpha" });
-    BAIL_OUT("Test impossible as query gave less than 2 results") unless scalar @{$result} > 1;
+    die("Test impossible as query gave less than 2 results") unless scalar @{$result} > 1;
     my $prev_id;
     my $sorting_ok = 1;
     for (@{$result}) {

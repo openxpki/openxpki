@@ -49,7 +49,7 @@ $db->run("SQL MERGE", 8, sub {
             where => { id => 1 },
         );
         ok $rownum > 0; # MySQL returns 2 on update
-    } "replace existing data" or BAIL_OUT;
+    } "replace existing data" or die("could not replace existing data (1)");
     is_deeply $t->get_data, [
         [ 1, "soundofsilence" ],
     ], "verify data";
@@ -62,7 +62,7 @@ $db->run("SQL MERGE", 8, sub {
             where => { id => 1 },
         );
         ok $rownum > 0; # MySQL returns 2 on update
-    } "replace existing data with 10000 character value" or BAIL_OUT;
+    } "replace existing data with 10000 character value" or die("could not replace existing data (2)");
     is_deeply $t->get_data, [
         [ 1, $bigdata ],
     ], "verify data";
@@ -75,7 +75,7 @@ $db->run("SQL MERGE", 8, sub {
             where => { id => 2 },
         );
         is $rownum, 1;
-    } "replace non-existing data (i.e. insert)" or BAIL_OUT;
+    } "replace non-existing data (i.e. insert)" or die("could not replace existing data (3)");
     is_deeply $t->get_data, [
         [ 1, $bigdata ],
         [ 2, "autobahn" ],
@@ -89,7 +89,7 @@ $db->run("SQL MERGE", 8, sub {
             where => { id => 3 },
         );
         is $rownum, 1;
-    } "replace non-existing data (i.e. insert 10000 character value)" or BAIL_OUT;
+    } "replace non-existing data (i.e. insert 10000 character value)" or die("could not replace existing data (4)");
     is_deeply $t->get_data, [
         [ 1, $bigdata ],
         [ 2, "autobahn" ],

@@ -38,7 +38,7 @@ sub is_encrypted_key {
             skip "OpenSSL executable not found", 1 if not `which openssl`;
             # write encrypted key
             open my $fh, ">", "$tempdir/key_enc"
-                or BAIL_OUT "Error creating temporary file $tempdir/key_enc";
+                or die("Error creating temporary file $tempdir/key_enc");
             print $fh $key_enc;
             close $fh;
             # decrypt key
@@ -46,7 +46,7 @@ sub is_encrypted_key {
             `openssl $algo -in "$tempdir/key_enc" -passin "pass:$password" -out "$tempdir/key_dec" > /dev/null 2>&1`;
             # read decrypted key
             open $fh, '<', "$tempdir/key_dec"
-                or BAIL_OUT "Error reading temporary file $tempdir/key_dec";
+                or die("Error reading temporary file $tempdir/key_dec");
             local $/;
             my $key_dec = <$fh>;
             close $fh;

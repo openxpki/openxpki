@@ -87,7 +87,7 @@ sub get_data {
 
 sub clear_data {
     my $self = shift;
-    BAIL_OUT("Cannot re-init data because attribute 'data' was not set") unless $self->has_data;
+    die("Cannot re-init data because attribute 'data' was not set") unless $self->has_data;
     note "Clearing test data";
     $self->_drop_table;
     $self->_create_table;
@@ -96,7 +96,7 @@ sub clear_data {
 # Returns all log messages since the last call of this method
 sub get_log {
     my $appender = Log::Log4perl->appender_by_name("Everything")
-        or BAIL_OUT("Could not access Log4perl appender");
+        or die("Could not access Log4perl appender");
     my $messages = $appender->string;
     $appender->string("");
     return $messages;

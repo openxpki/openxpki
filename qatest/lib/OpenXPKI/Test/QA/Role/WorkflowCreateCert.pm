@@ -135,7 +135,7 @@ sub create_cert {
                 },
             );
 
-            $wftest->state_is('SUBJECT_COMPLETE') or BAIL_OUT;
+            $wftest->state_is('SUBJECT_COMPLETE') or die('workflow state is not SUBJECT_COMPLETE');
 
             # Test FQDNs should not validate so we need a policy exception request
             # (on rare cases the responsible router might return a valid address, so we check)
@@ -178,7 +178,7 @@ sub create_cert {
             $wftest->execute(
                 csr_approve_csr => {},
             );
-            $wftest->state_is('SUCCESS') or BAIL_OUT;
+            $wftest->state_is('SUCCESS') or die('workflow state is not SUCCESS');
 
             my $temp = $self->api2_command(
                 get_workflow_info => { id => $wftest->id }

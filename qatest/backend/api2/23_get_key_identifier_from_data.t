@@ -53,7 +53,7 @@ SKIP: {
     #
     # extract public key bytes via OpenSSL and build reference ID
     #
-    open my $fh, ">", "$tempdir/csr.pem" or BAIL_OUT "Error creating temporary file $tempdir/csr.pem";
+    open my $fh, ">", "$tempdir/csr.pem" or die("Error creating temporary file $tempdir/csr.pem");
     print $fh $pkcs10 and close $fh;
 
     $ENV{OPENSSL_CONF} = "/dev/null"; # prevents "WARNING: can't open config file: ..."

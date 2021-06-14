@@ -116,7 +116,7 @@ sub connect {
                 SOCKETFILE => $self->socket_file,
             })
         );
-    } "create client instance" or BAIL_OUT "Could not create client instance";
+    } "create client instance" or die("Could not create client instance");
 }
 
 =head2 init_session

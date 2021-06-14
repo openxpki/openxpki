@@ -120,7 +120,7 @@ sub items_ok($$$) {
         lives_and {
             $wf1 = CTX('workflow_factory')->get_factory->create_workflow($workflow_type);
             ok ref $wf1;
-        } "create test workflow" or BAIL_OUT "Could not create workflow";
+        } "create test workflow" or die("Could not create workflow");
 
         # Run workflow actions to trigger cleanup
         lives_ok {

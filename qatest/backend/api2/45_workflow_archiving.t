@@ -70,10 +70,10 @@ my $start_epoch = time();
 lives_and {
     $result = CTX('api2')->create_workflow_instance(workflow => $workflow_type);
     ok ref $result;
-} "create test workflow" or BAIL_OUT "Could not create workflow";
+} "create test workflow" or die("Could not create workflow");
 
 my $wf_info = $result->{workflow};
-my $wf_id = $wf_info->{id} or BAIL_OUT('Workflow ID not found');
+my $wf_id = $wf_info->{id} or die('Workflow ID not found');
 
 # get_workflow_info - check 'archive_at'
 lives_and {

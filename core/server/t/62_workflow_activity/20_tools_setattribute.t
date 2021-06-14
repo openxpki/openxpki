@@ -72,7 +72,7 @@ my $workflow;
 lives_and {
     $workflow = CTX('workflow_factory')->get_factory->create_workflow($workflow_type);
     ok ref $workflow;
-} "Create test workflow" or BAIL_OUT "Could not create workflow";
+} "Create test workflow" or die("Could not create workflow");
 
 # Insert the workflow attributes to be changed
 insert_meta_attribute($oxitest->dbi, $workflow->id, shoesize  => 9);

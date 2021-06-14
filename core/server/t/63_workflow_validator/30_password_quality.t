@@ -71,7 +71,7 @@ sub _create_wf {
         #$workflow = $oxitest->create_workflow($WORKFLOW_TYPE);
         $workflow = CTX('workflow_factory')->get_factory->create_workflow($workflow_type);
         ok ref $workflow;
-    } "Create test workflow" or BAIL_OUT "Could not create workflow";
+    } "Create test workflow" or die("Could not create workflow");
 
     return $workflow;
 }

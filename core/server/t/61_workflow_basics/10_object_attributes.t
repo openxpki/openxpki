@@ -56,7 +56,7 @@ my $workflow_dup;
 lives_and {
     $workflow = $factory->create_workflow($workflow_type);
     ok ref $workflow;
-} "create test workflow" or BAIL_OUT "Could not create workflow";
+} "create test workflow" or die("Could not create workflow");
 
 #
 # Check initial values of our custom object attributes

@@ -28,7 +28,7 @@ plan skip_all => "No MySQL database found / OXI_TEST_DB_MYSQL_NAME not set" unle
 sub log_contains {
     my ($regex) = @_;
     my $appender = Log::Log4perl->appender_by_name("Everything")
-        or BAIL_OUT("Could not access Log4perl appender");
+        or die("Could not access Log4perl appender");
     my $messages = $appender->string;
     $appender->string("");
     like $messages, $regex;

@@ -101,7 +101,7 @@ sub wait_for_proc_state {
         $result = $client->send_command_ok("search_workflow_instances" => { id => [ $wfid ] });
         # no workflow found?
         if (not scalar @$result or $result->[0]->{'workflow_id'} != $wfid) {
-            BAIL_OUT("Workflow with ID $wfid not found");
+            die("Workflow with ID $wfid not found");
         }
         # wait if paused (i.e. resuming in progress) or still running (the remaining steps)
         if (not $result->[0]->{'workflow_proc_state'} =~ $state_regex) {
@@ -111,7 +111,7 @@ sub wait_for_proc_state {
         # expected proc state reached
         return 1;
     }
-    BAIL_OUT("Timeout reached while waiting for workflow to reach state $state_regex");
+    die("Timeout reached while waiting for workflow to reach state $state_regex");
 }
 
 my $result;
@@ -122,8 +122,8 @@ lives_and {
     });
 } "create_workflow_instance()";
 
-my $wf = $result->{workflow} or BAIL_OUT('Workflow data not found');
-my $wf_id = $wf->{id} or BAIL_OUT('Workflow ID not found');
+my $wf = $result->{workflow} or die('Workflow data not found');
+my $wf_id = $wf->{id} or die('Workflow ID not found');
 
 ##diag explain OpenXPKI::Workflow::Config->new->workflow_config;
 
