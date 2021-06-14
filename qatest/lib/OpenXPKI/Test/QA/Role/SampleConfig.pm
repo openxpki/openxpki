@@ -197,6 +197,7 @@ sub _customize_system_watchdog {
     $conf->{interval_wait_initial} = 1;
     $conf->{interval_loop_idle} = 1;
     $conf->{interval_loop_run} = 1;
+    $conf->{interval_auto_archiving} = 1;
     $conf->{disabled} = $self->start_watchdog ? 0 : 1;
 }
 

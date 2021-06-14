@@ -114,4 +114,26 @@ sub fetch_workflow {
     return $wf;
 }
 
+sub wait_for_proc_state {
+    my ($self, $wfid, $state_regex) = @_;
+
+    my $result;
+    my $count = 0;
+    while ($count++ < 20) {
+        $result = OpenXPKI::Server::Context::CTX('api2')->search_workflow_instances(id => [ $wfid ]);
+        # no workflow found?
+        if (not scalar @$result or $result->[0]->{'workflow_id'} != $wfid) {
+            BAIL_OUT("Workflow with ID $wfid not found");
+        }
+        # wait if paused (i.e. resuming in progress) or still running (the remaining steps)
+        if (not $result->[0]->{'workflow_proc_state'} =~ $state_regex) {
+            sleep 1;
+            next;
+        }
+        # expected proc state reached
+        return 1;
+    }
+    BAIL_OUT("Timeout reached while waiting for workflow to reach state $state_regex");
+}
+
 1;
