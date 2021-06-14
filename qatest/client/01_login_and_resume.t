@@ -30,19 +30,19 @@ my $oxitest = OpenXPKI::Test->new(
 #
 # Tests
 #
-my $tester = $oxitest->new_client_tester;
-$tester->login("democa" => "caop");
+my $client = $oxitest->new_client_tester;
+$client->login("democa" => "caop");
 
-my $result = $tester->send_command_ok("get_session_info");
+my $result = $client->send_command_ok("get_session_info");
 is $result->{name}, "caop", "session info contains user name";
 
-my $session_id = $tester->client->get_session_id;
+my $session_id = $client->client->get_session_id;
 
-$tester->client->close_connection;
+$client->client->close_connection;
 
 
-my $tester2 = $oxitest->new_client_tester;
-$tester2->init_session({ SESSION_ID => $session_id });
+my $client2 = $oxitest->new_client_tester;
+$client2->init_session({ SESSION_ID => $session_id });
 
 
 $oxitest->stop_server;
