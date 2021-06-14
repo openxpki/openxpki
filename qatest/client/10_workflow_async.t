@@ -94,7 +94,7 @@ $tester->login("democa" => "caop");
 
 sub wait_for_proc_state {
     my ($wfid, $state_regex) = @_;
-    my $testname = "Waiting for workflow state $state_regex";
+
     my $result;
     my $count = 0;
     while ($count++ < 20) {
@@ -109,11 +109,11 @@ sub wait_for_proc_state {
             next;
         }
         # expected proc state reached
-        ok $testname;
-        return $result;
+        return 1;
     }
     BAIL_OUT("Timeout reached while waiting for workflow to reach state $state_regex");
 }
+
 my $result;
 
 lives_and {
@@ -131,22 +131,19 @@ my $wf_id = $wf->{id} or BAIL_OUT('Workflow ID not found');
 # wait for wakeup by watchdog
 #
 note "waiting for backgrounded (forked) workflow to finish";
-$result = wait_for_proc_state $wf_id, qr/^(finished|exception)$/;
-
-# compare result
-cmp_deeply $result, [ superhashof({
-    'workflow_id' => $wf_id,
-    'workflow_proc_state' => 'finished', # could be 'exception' if things go wrong
-    'workflow_state' => 'SUCCESS',
-}) ], "Workflow finished successfully" or diag explain $result;
+wait_for_proc_state $wf_id, qr/^(finished|exception)$/;
 
 #
 # get_workflow_info - check action results
 #
 lives_and {
     $result = $tester->send_command_ok("get_workflow_info" => { id => $wf_id });
-    cmp_deeply $result->{workflow}->{context}->{is_13_prime}, 1;
-} "Workflow action returns correct result";
+    cmp_deeply $result->{workflow}, superhashof( {
+        'proc_state' => 'finished', # could be 'exception' if things go wrong
+        'state' => 'SUCCESS',
+        'context' => superhashof( { 'is_13_prime' => 1 } ),
+    } );
+} "Workflow finished successfully and with correct action result";
 
 #
 # get_workflow_history - check correct execution history
