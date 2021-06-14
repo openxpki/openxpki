@@ -1,4 +1,7 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
+#
+# Tests if the 'archive_at' config parmeter is correctly processed.
+#
 use strict;
 use warnings;
 
