@@ -8,6 +8,7 @@ use FindBin qw( $Bin );
 
 # CPAN modules
 use Test::More;
+use Test::Deep;
 use Test::Exception;
 use Log::Log4perl;
 use Log::Log4perl::Appender;
@@ -87,7 +88,11 @@ my $result = $dbi->select_hashes(
         message => { -like => "%$msg" },
     }
 );
-is scalar @{$result}, 1, "1 log entry found via string search";
+
+cmp_deeply $result, superbagof(superhashof({
+    workflow_id => $wf_id,
+    priority => $loglevel_int,
+})), "log entry found via string search";
 
 # Insert test message #1 via database
 ok $dbi->insert_and_commit(
