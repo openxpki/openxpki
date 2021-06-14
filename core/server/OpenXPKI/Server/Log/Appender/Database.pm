@@ -11,17 +11,6 @@ use OpenXPKI::Server::Database; # we must import "auto_id"
 
 our @ISA = qw(Log::Log4perl::Appender);
 
-my %LOGLEVELS = (
-    ALL     => 0,
-    TRACE   => 5000,
-    DEBUG   => 10000,
-    INFO    => 20000,
-    WARN    => 30000,
-    ERROR   => 40000,
-    FATAL   => 50000,
-    OFF     => (2 ** 31) - 1,
-);
-
 sub new {
     my($proto, %p) = @_;
     my $class = ref $proto || $proto;
@@ -84,10 +73,7 @@ sub log {
         $timestamp = time();
     }
 
-    my $loglevel_int = 0;
-    if ( exists $LOGLEVELS{$loglevel} ) {
-        $loglevel_int = $LOGLEVELS{$loglevel};
-    }
+    my $loglevel_int = $Log::Log4perl::Level::PRIORITY{$loglevel} // $ALL;
 
     eval {
         my $wf_id = Log::Log4perl::MDC->get('wfid') || 0;
