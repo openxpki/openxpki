@@ -202,6 +202,9 @@ sub debug {
 
     $msg = "(line $line): $msg";
 
+    $subroutine =~ s/OpenXPKI::Server::Workflow::/O:S:W:/;
+    $subroutine =~ s/OpenXPKI::Server::/O:S:/;
+    $subroutine =~ s/OpenXPKI::Client::/O:C:/;
     $msg = "$subroutine $msg\n";
 
     my $timestamp = strftime("%F %T", localtime(time));
