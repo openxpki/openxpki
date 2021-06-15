@@ -196,6 +196,9 @@ sub get_field_info {
 
     my $field = $conn->get_hash( \@field_path );
 
+    # set field's context key to the field name
+    $field->{name} //= $field_name;
+
     # Check for option tag and do explicit calls to ensure recursive resolving.
     # This code is duplicated in OpenXPKI::Server::API2::Plugin::Profile::Util
     # as we need the same syntax in the profiles - TODO move to common API
