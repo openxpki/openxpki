@@ -273,7 +273,7 @@ sub __load_class {
     $class = "OpenXPKI::Client::UI::".ucfirst($class);
     eval "use $class;1";
     if ($EVAL_ERROR) {
-        $self->logger()->error("Failed loading handler class $class");
+        $self->logger()->error("Failed loading handler class $class: $EVAL_ERROR");
         return (undef, undef);
     }
 
