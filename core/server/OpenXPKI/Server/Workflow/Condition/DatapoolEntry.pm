@@ -42,7 +42,7 @@ sub _evaluate
 
     ##! 128: $msg
 
-    my $datapool_value = $msg->{value} //  '';
+    my $datapool_value = $msg ? $msg->{value} : '';
 
     ##! 64: $datapool_value
     if ($condition eq 'exists') {
