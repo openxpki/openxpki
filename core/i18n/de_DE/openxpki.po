@@ -367,6 +367,28 @@ msgstr "Challenge Password"
 msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
 msgstr "Schlüsselerzeugung fehlgeschlagen"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST"
+msgstr "ja"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
+msgstr "die Sperrung wird nach dem angegebenen Zeitpunkt ausgeführt"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT"
+msgstr ""
+"Eine verzögerte Sperrung erlaubt es ein Zertifikat zu einem Zeitpunkt in der "
+"Zukunft automatisch zu sperren."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
+msgstr "ohne Angabe / andere Gründe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
+msgstr "die Sperrung wird nach dem angegebenen Zeitpunkt ausgeführt"
+
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "verzögerte Sperrung beantragt"
 
@@ -2085,8 +2107,8 @@ msgstr "Bitte aktualisieren/komplettieren Sie die nachfolgenden Informationen."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Antrag aktualisieren"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL"
-msgstr "Archiviere am/in"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
+msgstr "Archiviere am"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Workflow-Meta-Daten"
@@ -3124,14 +3146,13 @@ msgstr "Benutzer"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL"
 msgstr "Workflow Id"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO"
-msgstr "Technische Informationen"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_ARCHIVED_DESC"
-msgstr "Dieser Workflow wurde archiviert."
+msgstr ""
+"Dieser Workflow wurde archiviert. Mit 'Workflow öffnen' gelangen Sie zur "
+"Detailanischt des aktuellen Status."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_ARCHIVED_LABEL"
-msgstr "Archiviert"
+msgstr "Workflow archiviert"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_DESC"
 msgstr ""
@@ -3142,6 +3163,14 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_LABEL"
 msgstr "Unerwarteter Fehler"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FAILED_DESC"
+msgstr ""
+"Dieser Workflow wurde beendet. Mit 'Workflow öffnen' gelangen Sie zur "
+"Detailanischt des aktuellen Status."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FAILED_LABEL"
+msgstr "Beendet"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_DESC"
 msgstr ""
@@ -3286,6 +3315,9 @@ msgstr "archiviert"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
 msgstr "exception"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FAILED"
+msgstr "fehlgeschlagen"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED"
 msgstr "abgeschlossen"
 
@@ -3426,9 +3458,6 @@ msgstr "Nachricht gesetzt"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_START_BUTTON"
 msgstr "Workflow starten"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE"
-msgstr "Workflow Status"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_CHOOSE_ACTION_DESC"
@@ -3753,6 +3782,9 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_LABEL"
 msgstr "SUCCESS"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILED"
+msgstr "Dieser Workflow ist fehlgeschlagen."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_DESC"
 msgstr ""
@@ -4204,30 +4236,8 @@ msgstr "aufwecken"
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "ja"
 
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CUST"
-#~ msgstr "ja"
-
 #~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
 #~ msgstr "Ersteller"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
-#~ msgstr "die Sperrung wird nach dem angegebenen Zeitpunkt ausgeführt"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT"
-#~ msgstr ""
-#~ "Eine verzögerte Sperrung erlaubt es ein Zertifikat zu einem Zeitpunkt in "
-#~ "der Zukunft automatisch zu sperren."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
-#~ msgstr "ohne Angabe / andere Gründe"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
-#~ msgstr "die Sperrung wird nach dem angegebenen Zeitpunkt ausgeführt"
 
 #~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_KEY_POLICY_FAILED"
 #~ msgstr "Schlüsselparameter fehlerhaft (Algorithmus/Schlüssellänge)"
@@ -4515,6 +4525,12 @@ msgstr "ja"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_SUBJECT_MATCH_LABEL"
 #~ msgstr "Request Subject Matches"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO"
+#~ msgstr "Technische Informationen"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE"
+#~ msgstr "Workflow Status"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_INITIAL_DESC"

@@ -3155,8 +3155,17 @@ msgstr "ユーザ"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL"
 msgstr "ワークフローID"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO"
-msgstr "情報"
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_ARCHIVED_DESC"
+msgstr ""
+"このワークフローは何度もループするため停止しました。手動の操作なしではサーバ"
+"によって処理されません。[ワークフローを開く]ボタンを使用して、現在の状態の詳"
+"細を表示し、例外を処理することができます。(追加の承認が必要になる場合がありま"
+"す。)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_ARCHIVED_LABEL"
+msgstr "リトライ制限値に達しました"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_DESC"
 msgstr ""
@@ -3167,6 +3176,16 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_LABEL"
 msgstr "予期しないエラー"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FAILED_DESC"
+msgstr ""
+"このワークフローは最終状態です。[ワークフローを開く]ボタンを使用して、ワーク"
+"フローの詳細を表示することができます。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FAILED_LABEL"
+msgstr "ワークフローが終了しました。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_DESC"
 msgstr ""
@@ -3309,6 +3328,10 @@ msgstr "実行状態"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
 msgstr "例外"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FAILED"
+msgstr "完了"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED"
 msgstr "完了"
@@ -3453,10 +3476,6 @@ msgstr "メッセージを設定する"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_START_BUTTON"
 msgstr "戻る"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE"
-msgstr "プロセスの状態"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_CHOOSE_ACTION_DESC"
@@ -3742,6 +3761,10 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_LABEL"
 msgstr "成功"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILED"
+msgstr "このワークフローは失敗し、再実行はできません"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_DESC"
 msgstr "このワークフローは失敗し、再実行はできません"
@@ -5398,6 +5421,9 @@ msgstr "はい"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD__PRIVATE_KEY_TOOLTIP"
 #~ msgstr "RSA is the standard for encryption and signature"
 
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO"
+#~ msgstr "情報"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_CONTINUE"
 #~ msgstr "次へ"
 
@@ -5413,6 +5439,10 @@ msgstr "はい"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DETAIL_FIELD_VALID_AT_LABEL"
 #~ msgstr "Reference Date"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE"
+#~ msgstr "プロセスの状態"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED_DESC"

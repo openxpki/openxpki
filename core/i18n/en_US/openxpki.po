@@ -368,6 +368,27 @@ msgstr "Challenge password"
 msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
 msgstr "Key generation failed"
 
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST"
+msgstr "Yes"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
+msgstr "This is just a prefix"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT"
+msgstr "This is just a prefix"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
+msgstr "unspecified / other reason"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
+msgstr "This is just a prefix"
+
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "Delayed revocation requested."
 
@@ -1990,8 +2011,8 @@ msgstr "Please update / complete the information below."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Update Request"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL"
-msgstr "Archive at/after"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
+msgstr "Archive at"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Workflow Attributes"
@@ -2971,14 +2992,13 @@ msgstr "User"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL"
 msgstr "Workflow Id"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO"
-msgstr "Technical Log"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_ARCHIVED_DESC"
-msgstr "This workflow was archived."
+msgstr ""
+"This workflow has been archived. Use the 'Open Workflow' button to show the "
+"details of the workflow."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_ARCHIVED_LABEL"
-msgstr "Archived"
+msgstr "Workflow archived"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_DESC"
 msgstr ""
@@ -2989,6 +3009,14 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_LABEL"
 msgstr "Unexpected error"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FAILED_DESC"
+msgstr ""
+"This workflow is in a final state. Use the 'Open Workflow' button to show "
+"the details of the workflow."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FAILED_LABEL"
+msgstr "Finished"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_DESC"
 msgstr ""
@@ -3129,6 +3157,9 @@ msgstr "archived"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
 msgstr "exception"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FAILED"
+msgstr "failed"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED"
 msgstr "finished"
 
@@ -3264,9 +3295,6 @@ msgstr "Message set"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_START_BUTTON"
 msgstr "Start Workflow"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE"
-msgstr "State"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_CHOOSE_ACTION_DESC"
 msgstr ""
@@ -3552,6 +3580,9 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_LABEL"
 msgstr "SUCCESS"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILED"
+msgstr "This workflow failed finally"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_DESC"
 msgstr "This workflow failed finally and can not be restarted"
@@ -3965,30 +3996,9 @@ msgstr "Wake Up"
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Yes"
 
-# Remove?
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CUST"
-#~ msgstr "Yes"
-
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
 #~ msgstr "Creator"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
-#~ msgstr "This is just a prefix"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT"
-#~ msgstr "This is just a prefix"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
-#~ msgstr "unspecified / other reason"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
-#~ msgstr "This is just a prefix"
 
 #~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_KEY_POLICY_FAILED"
 #~ msgstr "Key policy failed (wrong size/algorithm)"
@@ -4272,6 +4282,12 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_SUBJECT_MATCH_LABEL"
 #~ msgstr "Request Subject Matches"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO"
+#~ msgstr "Technical Log"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE"
+#~ msgstr "State"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_INITIAL_DESC"
