@@ -12,7 +12,7 @@ use Test::Exception;
 use Data::UUID;
 use Try::Tiny;
 
-# use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Workflow::Persister.*'} = 32;
+#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Workflow::Persister.*'} = 32;
 
 # Project modules
 use lib "$Bin/../lib";
@@ -22,11 +22,122 @@ use OpenXPKI::Test;
 
 try {
     require OpenXPKI::Server::Workflow::Persister::Archiver;
-    plan tests => 3;
+    plan tests => 5;
 }
 catch {
     plan skip_all => "persister 'Archiver' no available";
 };
+
+my $wf_cleanup = "
+    head:
+        prefix: testwf
+        persister: Archiver
+
+    state:
+        INITIAL:
+            action: step1 > AUTO
+
+        AUTO:
+            action: set_context set_attr > SUCCESS
+            autorun: 1
+
+        SUCCESS:
+            output:
+              - temp
+
+    action:
+        step1:
+            class: OpenXPKI::Server::Workflow::Activity::Noop
+
+        set_context:
+            class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+            param:
+                env: sky
+                temp: -10
+                vehicle: plane
+
+        set_attr:
+            class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
+            param:
+                color: blue
+                hairstyle: bald
+                shoesize: 10
+
+    field:
+        env:
+            type: text
+
+        temp:
+            type: text
+
+        vehicle:
+            type: text
+            cleanup: none
+
+    attribute:
+        shoesize:
+            cleanup: none
+
+    acl:
+        MyFairyKing:
+            creator: any
+";
+
+my $wf_onfail = "
+    head:
+        prefix: testwf
+        persister: Archiver
+
+    state:
+        INITIAL:
+            action: step1 > AUTO
+
+        AUTO:
+            action: set_context set_attr > LOITER
+            autorun: 1
+
+        LOITER:
+            action: step1 > SUCCESS
+
+        SUCCESS:
+
+    action:
+        step1:
+            class: OpenXPKI::Server::Workflow::Activity::Noop
+
+        set_context:
+            class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
+            param:
+                env: sky
+                temp: -10
+                vehicle: plane
+
+        set_attr:
+            class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
+            param:
+                color: blue
+                hairstyle: bald
+                shoesize: 10
+
+    field:
+        env:
+            type: text
+
+        temp:
+            type: text
+
+        vehicle:
+            type: text
+            onfail: keep
+
+    attribute:
+        shoesize:
+            onfail: keep
+
+    acl:
+        MyFairyKing:
+            creator: any
+";
 
 #
 # Fail on wrong persister arguments
@@ -45,8 +156,12 @@ throws_ok {
     );
 } qr/defaults must contain/, "fail on wrong arguments for persister defaults";
 
-sub items_ok($$$) {
-    my ($testname, $config, $items) = @_;
+sub items_ok($@) {
+    my $testname = shift;
+    my %args = @_;
+    my $config = $args{config};
+    my $items = $args{expected};
+    my $test_mode = $args{test_mode};
 
     subtest $testname => sub {
         my $workflow_type = "TESTWORKFLOW".int(rand(2**32));
@@ -62,59 +177,7 @@ sub items_ok($$$) {
                     "class: OpenXPKI::Server::Workflow::Persister::Archiver\n" .
                     ($config->{persister} // ""),
 
-                "realm.alpha.workflow.def.$workflow_type" => "
-                    head:
-                        prefix: testwf
-                        persister: Archiver
-
-                    state:
-                        INITIAL:
-                            action: step1 > AUTO
-
-                        AUTO:
-                            action: set_context set_attr > SUCCESS
-                            autorun: 1
-
-                        SUCCESS:
-                            output:
-                              - temp
-
-                    action:
-                        step1:
-                            class: OpenXPKI::Server::Workflow::Activity::Noop
-
-                        set_context:
-                            class: OpenXPKI::Server::Workflow::Activity::Tools::SetContext
-                            param:
-                                env: sky
-                                temp: -10
-                                vehicle: plane
-
-                        set_attr:
-                            class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
-                            param:
-                                color: blue
-                                hairstyle: bald
-                                shoesize: 10
-
-                    field:
-                        vehicle:
-                            name: vehicle
-                            type: text
-                            cleanup: none
-
-                        temp:
-                            name: temp
-                            type: text
-
-                    attribute:
-                        shoesize:
-                            cleanup: none
-
-                    acl:
-                        MyFairyKing:
-                            creator: any
-                ",
+                "realm.alpha.workflow.def.$workflow_type" => ($test_mode eq 'cleanup' ? $wf_cleanup : $wf_onfail),
             },
         );
 
@@ -128,10 +191,17 @@ sub items_ok($$$) {
             ok ref $wf1;
         } "create test workflow" or die("Could not create workflow");
 
-        # Run workflow actions to trigger cleanup
+        # Run workflow action to
+        #  - set fields and attributes and
+        #  - trigger cleanup (only if $fail == 0)
         lives_ok {
             $wf1->execute_action("testwf_step1");
         } "execute workflow action";
+
+        if ($test_mode eq 'onfail') {
+            note "manually failing workflow";
+            $wf1->set_failed('entangled something', 'we just saw this...');
+        }
 
         my $wf2;
         lives_and {
@@ -150,7 +220,8 @@ sub items_ok($$$) {
 
         my $history = [ map { $_->action } $wf2->get_history ];
         cmp_bag $history, $items->{history},
-            "correct history" or diag explain $history;
+            "correct history"
+                or diag(join "", map { sprintf "[%s] %s --> ", $_->state, $_->action  } sort { $a->date->epoch <=> $b->date->epoch } $wf2->get_history);
 
         $oxitest->dbi->delete_and_commit(from => 'workflow', where => { workflow_type => $workflow_type });
         $oxitest->dbi->delete_and_commit(from => 'workflow_attributes', where => { workflow_id => $wf1->id });
@@ -173,16 +244,20 @@ sub items_ok($$$) {
 #   hairstyle: bald
 #   shoesize: 10        # explicitely configured as "cleanup: none"
 
-items_ok "internal cleanup defaults, excluding explicite field config" =>
+# =============================================================================
+# Standard cleanup
+#
+items_ok "standard cleanup: internal defaults",
+    test_mode => 'cleanup',
     # config
-    {
+    config => {
         # Internal defaults:
         #   field: finished
         #   attribute: none
         #   history: archived
     },
     # expected results
-    {
+    expected => {
         field => {
             vehicle => "plane", # explicitely configured as "cleanup: none"
             temp => -10,        # part of the 'output' of state SUCCESS
@@ -195,9 +270,10 @@ items_ok "internal cleanup defaults, excluding explicite field config" =>
         history => [ qw( testwf_step1 testwf_set_context testwf_set_attr ) ],
     };
 
-items_ok "explicit persister cleanup settings" => # ... merged with internal defaults
+items_ok "standard cleanup: explicit persister settings", # ... merged with internal defaults
+    test_mode => 'cleanup',
     # config
-    {
+    config => {
         persister =>
             "cleanup_defaults:\n" .
             "    attribute: finished\n" .
@@ -205,13 +281,61 @@ items_ok "explicit persister cleanup settings" => # ... merged with internal def
             "",
     },
     # expected results
-    {
+    expected => {
         field => {
             vehicle => "plane", # explicitely configured as "cleanup: none"
             temp => -10,        # part of the 'output' of state SUCCESS
         },
         attribute => {
-            shoesize  => 10, # explicitely configured as "cleanup: none"
+            shoesize => 10,     # explicitely configured as "cleanup: none"
         },
         history => [ qw( ) ],
     };
+
+# =============================================================================
+# Cleanup upon forced failure
+#
+items_ok "forced failure: internal defaults",
+    test_mode => 'onfail',
+    # config
+    config => {
+        # Internal defaults:
+        #   field: keep
+        #   attribute: drop
+        #   history: keep
+    },
+    # expected results
+    expected => {
+        field => {
+            env => 'sky',
+            temp => -10,
+            vehicle => "plane",
+        },
+        attribute => {
+            shoesize => 10,     # explicitely configured as "onfail: keep"
+        },
+        # duplicate 'testwf_set_attr' as state FAILURE also logs it as action
+        history => [ qw( testwf_step1 testwf_set_context testwf_set_attr testwf_set_attr ) ],
+   };
+
+items_ok "forced failure: explicit persister settings",
+    test_mode => 'onfail',
+    # config
+    config => {
+        persister =>
+            "onfail_defaults:\n" .
+            "    field: drop\n" .
+            "    history: drop\n" .
+            "",
+    },
+    # expected results
+    expected => {
+        field => {
+            vehicle => "plane", # explicitely configured as "onfail: keep"
+        },
+        attribute => {
+            shoesize => 10,     # explicitely configured as "onfail: keep"
+        },
+        # state FAILURE also logs 'testwf_set_attr' as action
+        history => [ qw( testwf_set_attr ) ],
+   };

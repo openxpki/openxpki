@@ -135,6 +135,11 @@ has __proc_state_i18n => (
             desc =>  'I18N_OPENXPKI_UI_WORKFLOW_INFO_ARCHIVED_DESC',
             search => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_ARCHIVED',
         },
+        failed => {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_FAILED_LABEL',
+            desc =>  'I18N_OPENXPKI_UI_WORKFLOW_INFO_FAILED_DESC',
+            search => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FAILED',
+        },
     } },
 );
 
@@ -429,7 +434,7 @@ sub init_info {
         name => "error_code",
         value => $wf_info->{workflow}->{context}->{error_code},
     } if ($wf_info->{workflow}->{context}->{error_code}
-        && $wf_info->{workflow}->{proc_state} =~ m{(manual|finished)});
+        && $wf_info->{workflow}->{proc_state} =~ m{(manual|finished|failed)});
 
     # The workflow info contains info about all control actions that
     # can be done on the workflow -> render appropriate buttons.
@@ -2270,6 +2275,10 @@ sub __render_from_workflow {
         # Archived workflow
         } elsif ('archived' eq $wf_proc_state) {
             $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED', 'info');
+
+        # Forcibly failed workflow
+        } elsif ('failed' eq $wf_proc_state) {
+            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILED', 'error');
         }
 
         my $fields = $self->__render_fields( $wf_info, $view );
