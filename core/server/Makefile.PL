@@ -293,6 +293,7 @@ WriteMakefile(
         'CGI::Fast'                     => '2.10',
         'CGI::Session'                  => '3.95',
         'CGI'                           => '4.21',
+        'Cache::LRU'                    => 0,
         'Class::Std'                    => '0.0.8',
         'Config::Merge'                 => '1',
         'Config::Std'                   => 0,

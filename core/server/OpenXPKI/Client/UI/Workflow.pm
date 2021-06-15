@@ -5,6 +5,8 @@ use Moose;
 use DateTime;
 use POSIX;
 use Data::Dumper;
+use Cache::LRU;
+use Digest::SHA qw(sha1_hex);
 
 # CPAN modules
 use Log::Log4perl::MDC;
@@ -15,6 +17,9 @@ use MIME::Base64;
 use OpenXPKI::DateTime;
 use OpenXPKI::Debug;
 use OpenXPKI::i18n qw( i18nTokenizer );
+
+# used to cache static patterns like the creator lookup
+my $template_cache = Cache::LRU->new( size => 256 );
 
 has __default_grid_head => (
     is => 'rw',
@@ -63,7 +68,7 @@ has __default_wfdetails => (
         },
         {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL',
-            field => 'context.creator',
+            field => 'creator',
         },
         {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_LABEL',
@@ -103,6 +108,7 @@ has __validity_options => (
 );
 
 extends 'OpenXPKI::Client::UI::Result';
+
 =head1 OpenXPKI::Client::UI::Workflow
 
 Generic UI handler class to render a workflow into gui elements.
@@ -2919,8 +2925,13 @@ sub __render_fields {
             format =>  $field->{format} || ''
         };
 
+
+        if ($field->{uiclass}) {
+            $item->{className} = $field->{uiclass};
+        }
+
         if ($item->{format} eq 'spacer') {
-            push @fields, { format => 'head', className => 'spacer' };
+            push @fields, { format => 'head', className => $item->{className}||'spacer' };
             next FIELD;
         }
 
@@ -3458,8 +3469,17 @@ sub __render_workflow_info {
         my $field = $cfg->{field} // '';
         if ($field eq 'creator') {
             # we enforce tooltip, if you need something else use a template on attribute.creator
-            $cfg->{format} = 'tooltip';
-            $value = $self->__render_creator_tooltip($wfdetails_info->{attribute}->{creator}, $cfg);
+            if ($wfdetails_info->{attribute}->{creator} =~ m{certid:([\w-]+)}) {
+                $cfg->{format} = 'link';
+                # for a link the tooltip is on the top level and the value is a
+                # scalar so we need to remap this
+                $value = $self->__render_creator_tooltip($wfdetails_info->{attribute}->{creator}, $cfg);
+                $value->{label} = $value->{value};
+                $value->{page} = 'certificate!detail!identifier!'.$1;
+            } else {
+                $cfg->{format} = 'tooltip';
+                $value = $self->__render_creator_tooltip($wfdetails_info->{attribute}->{creator}, $cfg);
+            }
         } elsif ($cfg->{template}) {
             $value = $self->send_command_v2( render_template => {
                 template => $cfg->{template},
@@ -3507,16 +3527,16 @@ the resulting data structure is a hash and has a non-empty key I<value>,
 it is used as value for the field.
 
 If the field has I<template> set, the result of this template is used as
-value for the field, the literal value given as I<creator> is used as
-tooltip.
+tooltip for the field, the literal value given as I<creator> is used as
+the visible value. If the namespace of the item is I<certid>, the value
+will be created as link pointing to the certificate details popup.
 
 If neither one is set, the C<creator()> method from the C<Metadata>
 Plugin is used as default renderer.
 
-In case the template does not provide a usable value, the literal value
-of I<creator> is returned as value with an error message as I<tooltip>.
-The error message depends on weather the creator string has a namespace
-tag or not.
+In case the template does not provide a usable value, the tooltip will
+show an error message, depending on weather the creator string has a
+namespace tag or not.
 
 =cut
 
@@ -3526,9 +3546,27 @@ sub __render_creator_tooltip {
     my $creator = shift;
     my $field = shift;
 
+    my $cacheid;
+    my $value = { value => $creator };
+    if (!$field->{nocache}) {
+        # Enable caching of the creator information
+        # The key is made from the creator name and the template string
+        # and bound to the user session to avoid information leakage in
+        # case the template binds to the users role/permissions
+        $cacheid = Digest::SHA->new()
+            ->add($self->_session->id())
+            ->add($field->{yaml_template} // $field->{template} // '')
+            ->add($creator//'')->hexdigest;
+
+        $self->logger()->trace('creator tooltip cache id ' .  $cacheid);
+        my $value = $template_cache->get($cacheid);
+        return $value if($value);
+
+    }
+
     # the field comes with a YAML template = render the field definiton from it
-    my $value;
     if ($field->{yaml_template}) {
+        $self->logger()->debug('render creator tooltip from yaml template');
         my $val = $self->send_command_v2( render_yaml_template => {
             template => $field->{yaml_template},
             params => { creator => $creator },
@@ -3537,22 +3575,27 @@ sub __render_creator_tooltip {
 
     # use template (or default template) to set username
     } else {
+        $self->logger()->debug('render creator name from template');
         my $username = $self->send_command_v2( render_template => {
             template => $field->{template} || '[% USE Metadata; Metadata.creator(creator) %]',
             params => { creator => $creator },
         });
-        $value = { value => $username } if ($username);
-        $value->{tooltip} = $creator if ($username ne $creator);
+        if ($username) {
+            $value->{tooltip} = (($username ne $creator) ? $username : '');
+        }
     }
 
     # creator has no namespace so there was nothing to resolve
-    if (!$value && $creator !~ m{\A\w+:}) {
-        $value = { value => $creator, tooltip => 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_NO_NAMESPACE' };
+    if (!defined $value->{tooltip} && $creator !~ m{\A\w+:}) {
+        $value->{tooltip} = 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_NO_NAMESPACE';
     }
 
     # still no result
-    $value //= { value => $creator, tooltip => 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_UNABLE_TO_RESOLVE' };
+    $value->{tooltip} //= { 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_UNABLE_TO_RESOLVE' };
 
+    $self->logger()->trace(Dumper { cacheid => $cacheid, value => $value} );
+
+    $template_cache->set($cacheid => $value) if($cacheid);
     return $value;
 
 }
