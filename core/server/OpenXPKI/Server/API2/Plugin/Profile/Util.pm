@@ -69,7 +69,7 @@ sub get_input_elements {
         my %lcinput = map { lc $_ => $input->{$_} } keys %{$input};
 
         # if type is select, add options array ref
-        if ($lcinput{type} eq 'select') {
+        if ($lcinput{type} && $lcinput{type} eq 'select') {
             ##! 32: 'type is select'
 
             # up to v3.1 the select fields in form elements only had a

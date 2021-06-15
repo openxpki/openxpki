@@ -132,7 +132,7 @@ value set in the I<value> parameter is returned (default is the empty hash).
 If not matched, undef is returned (exception if die_on_undef is set).
 
 If I<invert> is set, the pattern match result is inverted - for each item!
-For multiple arguments thie means you get a true result only of no value
+For multiple arguments this means you get a true result only of no value
 matches!
 
 In I<replace> mode (allowed with I<get> only), the result of the substituion
