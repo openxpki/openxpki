@@ -66,19 +66,27 @@ sub _build_workflow_config {
     my @global_fields = $self->__process_fields(['workflow', 'global', 'field']);
 
     # Add workflows
+    my %known_prefixes;
     my @workflow_def = sort $conn->get_keys('workflow.def');
     foreach my $wf_name (@workflow_def) {
         # The main workflow definiton (the flow rules)
         push @{$wf_conf->{workflow}}, $self->__process_workflow($wf_name);
 
-        my $prefix = sprintf "%s_", $conn->get( ['workflow', 'def', $wf_name, 'head', 'prefix'] );
+        my $prefix = $conn->get( ['workflow', 'def', $wf_name, 'head', 'prefix'] );
+
+        OpenXPKI::Exception->throw(
+            message => "Duplicate workflow prefix '$prefix' - unable to load workflow configuration",
+            params => { workflow_a => $known_prefixes{$prefix}, workflow_b => $wf_name }
+        ) if defined $known_prefixes{$prefix};
+        $known_prefixes{$prefix} = $wf_name;
+
+        $prefix = $prefix . '_';
 
         # Workflow defined actions, conditions, validators
         my @wf_fields = $self->__process_fields(['workflow', 'def', $wf_name, 'field']);
         push @{$wf_conf->{action}},    $self->__process_actions(   ['workflow','def', $wf_name, 'action'], $prefix, $wf_name, [@wf_fields, @global_fields]);
         push @{$wf_conf->{condition}}, $self->__process_conditions(['workflow','def', $wf_name, 'condition'], $prefix);
         push @{$wf_conf->{validator}}, $self->__process_validators(['workflow','def', $wf_name, 'validator'], $prefix);
-
     }
 
     # Global actions, conditions, validators
@@ -92,14 +100,13 @@ sub _build_workflow_config {
 
     # check for duplicate names
     foreach my $class (('action','condition','validator')) {
-        my %defined;
+        my %known_item;
         foreach my $item (@{$wf_conf->{$class}}) {
             my $name = $item->{name};
             OpenXPKI::Exception->throw(
-                message => 'Item name defined twice - unable to load workflow configuration',
-                params => { name => $name, class => $class }
-            ) if (defined $defined{$name});
-            $defined{$name} = 1;
+                message => "Duplicate $class name '$name' - unable to load workflow configuration",
+            ) if defined $known_item{$name};
+            $known_item{$name} = 1;
         }
     }
 
