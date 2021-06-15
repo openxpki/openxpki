@@ -3797,4 +3797,6 @@ the form submission so you either need to properly setup the environment to
 use the default action (see action_index) or set the wf_handler to a custom
 method for parsing the form data.
 
-1;
+=cut
+
+__PACKAGE__->meta->make_immutable;
