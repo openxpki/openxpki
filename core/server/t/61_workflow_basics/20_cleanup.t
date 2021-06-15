@@ -76,6 +76,8 @@ sub items_ok($$$) {
                             autorun: 1
 
                         SUCCESS:
+                            output:
+                              - temp
 
                     action:
                         step1:
@@ -91,15 +93,19 @@ sub items_ok($$$) {
                         set_attr:
                             class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
                             param:
-                                shoesize: 10
                                 color: blue
                                 hairstyle: bald
+                                shoesize: 10
 
                     field:
                         vehicle:
                             name: vehicle
                             type: text
                             cleanup: none
+
+                        temp:
+                            name: temp
+                            type: text
 
                     attribute:
                         shoesize:
@@ -155,7 +161,19 @@ sub items_ok($$$) {
 # Tests
 #
 
-items_ok "internal cleanup defaults" =>
+# Input for each test:
+#
+# Fields:
+#   env: sky
+#   temp: -10           # part of the 'output' of state SUCCESS
+#   vehicle: plane      # explicitely configured as "cleanup: none"
+#
+# Attributes:
+#   color: blue
+#   hairstyle: bald
+#   shoesize: 10        # explicitely configured as "cleanup: none"
+
+items_ok "internal cleanup defaults, excluding explicite field config" =>
     # config
     {
         # Internal defaults:
@@ -167,6 +185,7 @@ items_ok "internal cleanup defaults" =>
     {
         field => {
             vehicle => "plane", # explicitely configured as "cleanup: none"
+            temp => -10,        # part of the 'output' of state SUCCESS
         },
         attribute => {
             shoesize  => 10,
@@ -189,6 +208,7 @@ items_ok "explicit persister cleanup settings" => # ... merged with internal def
     {
         field => {
             vehicle => "plane", # explicitely configured as "cleanup: none"
+            temp => -10,        # part of the 'output' of state SUCCESS
         },
         attribute => {
             shoesize  => 10, # explicitely configured as "cleanup: none"
