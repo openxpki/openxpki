@@ -948,17 +948,16 @@ sub factory {
 }
 
 sub delete {
-
     my $self = shift;
 
     OpenXPKI::Exception->throw (
-        message => "Unable to delete workflow from proc_state " . $self->proc_state,
+        message => "Deleting workflows not allowed in proc_state '" . $self->proc_state . "'",
         params => { type => $self->proc_state },
     ) unless ($self->proc_state =~ m{(archived|finished|failed)});
 
     my $persister = $self->factory()->get_persister_for_workflow_type($self->type);
     OpenXPKI::Exception->throw (
-        message => "This workflow does not implement the delete method",
+        message => "The persister of this workflow does not support workflow deletion",
         params => { type => $self->type },
     ) unless ($persister->can('delete_workflow'));
 
