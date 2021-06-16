@@ -69,7 +69,9 @@ To avoid an "untrusted package" warning, you should add our package signing key 
 The https connection is protected by a Let's Encrypt certificate but if you want to validate the key on your own, the fingerprint is::
 
     gpg --print-md sha256 Release.key
-    Release.key: 9B156AD0 F0E6A6C7 86FABE7A D8363C4E 1611A2BE 2B251336 01D1CDB4 6C24BEF3
+    Release.key: 55D89776 006F632B E0196E3E D2495509 BAFDDC74 22FEAAD2 F055074E 0FE3A724
+
+You can also find the key on the github repository in `package/debian/Release.key`.
 
 Add the repository to your source list (buster)::
 
