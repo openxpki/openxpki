@@ -3591,7 +3591,7 @@ sub __render_creator_tooltip {
     }
 
     # still no result
-    $value->{tooltip} //= { 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_UNABLE_TO_RESOLVE' };
+    $value->{tooltip} //= 'I18N_OPENXPKI_UI_WORKFLOW_CREATOR_UNABLE_TO_RESOLVE';
 
     $self->logger()->trace(Dumper { cacheid => $cacheid, value => $value} );
 
