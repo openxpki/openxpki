@@ -626,7 +626,7 @@ export default class TestController extends Controller {
                                 label: "hosts-by-group",
                                 value: {
                                     'one-two-three': [
-                                        "first.example.org",
+                                        "first.loooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-example.org",
                                         "second.example.org"
                                     ],
                                 },
