@@ -22,7 +22,9 @@ export default class TestController extends Controller {
                     '        <a href="./#/"><img src="img/logo.png" class="toplogo"></a>' + "\n" +
                     '        &nbsp;' + "\n" +
                     '        <small>Test page</small>' + "\n" +
-                    '    </h2>'
+                    '    </h2>' + "\n" +
+                    'accessibility:' + "\n" +
+                    '    tooltipOnFocus: on' + "\n"
             ]);
             let emptyResponse = () => new Promise(resolve => {
                 let response = [
@@ -356,6 +358,39 @@ export default class TestController extends Controller {
                         name: "uploadarea",
                         value: "...data...",
                         label: "Uploadarea",
+                    },
+                ],
+            }
+        },
+
+        {
+            type: "form",
+            action: "login!password",
+            reset: "login!password",
+            content: {
+                label: "oxi-section/form #6",
+                title: "Tooltips",
+                fields: [
+                    {
+                        type: "rawtext",
+                        name: "rawtext #1",
+                        label: "Raw text",
+                        value: "",
+                        tooltip: "Hidden message found."
+                    },
+                    {
+                        type: "rawtext",
+                        name: "rawtext #2",
+                        label: "Raw text",
+                        value: "",
+                        tooltip: "Use sushi in fish bowl in sink."
+                    },
+                    {
+                        type: "textarea",
+                        name: "prosa",
+                        label: "Textarea",
+                        value: "Hi there!\nHow are you?\n",
+                        tooltip: "You should give the peanuts to the two-headed squirrel."
                     },
                 ],
             }

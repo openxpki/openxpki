@@ -1,7 +1,10 @@
 import Component from '@glimmer/component';
 import { action } from "@ember/object";
+import { inject as service } from '@ember/service';
 
 export default class OxiFieldMainComponent extends Component {
+    @service('oxi-config') config;
+
     get isBool() {
         return this.args.field.type === "bool";
     }

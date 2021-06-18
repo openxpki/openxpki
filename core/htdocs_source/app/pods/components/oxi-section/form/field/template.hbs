@@ -13,7 +13,18 @@
 
     <div class="{{this.sFieldSize}}" {{on "keydown" this.onKeydown}}>
         {{#if @field.tooltip}}
-            <EmberTooltip>{{@field.tooltip}}</EmberTooltip>
+            {{#if config.tooltipOnFocus}}
+                {{! Showing a tooltop on focus is EmberTooltip's default behaviour }}
+                <EmberTooltip>{{@field.tooltip}}</EmberTooltip>
+            {{else}}
+                {{!
+                Due to a bug in EmberTooltip we have to set @event="focus" although we
+                do NOT want the tooltip to show on focus - uuh ooh.
+                In EmberTooltip's code @event is overridden by @showOn and @hideOn but setting
+                it is necessary to prevent the automatic addition of a 'focusin' event listener.
+                }}
+                <EmberTooltip @event="focus" @showOn="mouseenter" @hideOn="mouseleave">{{@field.tooltip}}</EmberTooltip>
+            {{/if}}
         {{/if}}
 
         {{component

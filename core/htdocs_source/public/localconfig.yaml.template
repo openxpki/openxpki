@@ -46,3 +46,10 @@ footer: |-
         &copy; Copyright 2020
         &ndash; <a href="http://www.openxpki.org/">The OpenXPKI Project</a>
     </p>
+
+#
+# Accessibility features:
+# - show tooltips if input field is focussed (additionally to mouse over)
+#
+accessibility:
+    tooltipOnFocus: on

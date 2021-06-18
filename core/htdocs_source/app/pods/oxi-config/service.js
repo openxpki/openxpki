@@ -90,4 +90,8 @@ export default class OxiConfigService extends Service {
     get footer() {
         return this.localConfig.footer;
     }
+
+    get tooltipOnFocus() {
+        return this.localConfig.accessibility.tooltipOnFocus.match(/^(1|on|true|enable)$/i);
+    }
 }
