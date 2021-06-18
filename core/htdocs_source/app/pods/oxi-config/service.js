@@ -92,6 +92,6 @@ export default class OxiConfigService extends Service {
     }
 
     get tooltipOnFocus() {
-        return this.localConfig.accessibility.tooltipOnFocus.match(/^(1|on|true|enable)$/i);
+        return this.localConfig.accessibility?.tooltipOnFocus?.match(/^(1|on|true|enable)$/i);
     }
 }
