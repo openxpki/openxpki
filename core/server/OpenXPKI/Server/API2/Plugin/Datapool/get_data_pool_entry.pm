@@ -43,6 +43,8 @@ Returns:
         expiration_date => 12356,   # date of expiration (epoch)
     }
 
+Returns undef if no item is found.
+
 B<Parameters>
 
 =over

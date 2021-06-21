@@ -48,18 +48,18 @@ sub execute {
 
     ##! 16: ' Fetch from datapool ' . Dumper $params
 
+    my $retval;
     my $msg = CTX('api2')->get_data_pool_entry(%$params);
 
     ##! 32: ' Result from datapool ' . Dumper $msg
 
-    # Prevent export of encrypted data to persisted context items
-    if ($msg->{encrypted} && ($target_key !~ /^_/)) {
-         workflow_error( 'persisting encrypted data is not allowed' );
-    }
-
-    my $retval = $msg->{value};
-
-    if ( (not defined $retval) && (defined $default_value)) {
+    if ($msg) {
+        # Prevent export of encrypted data to persisted context items
+        if ($msg->{encrypted} && ($target_key !~ /^_/)) {
+            workflow_error( 'persisting encrypted data is not allowed' );
+        }
+        $retval = $msg->{value};
+    } elsif (defined $default_value) {
         ##! 16: 'No result - using default value'
         $retval = $default_value;
     }
