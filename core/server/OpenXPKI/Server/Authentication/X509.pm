@@ -134,7 +134,13 @@ sub _validation_result {
     my $role = $self->default_role();
 
     if ($has_handler) {
-        $userinfo = $self->get_userinfo($username);
+        eval{$userinfo = $self->get_userinfo($username);};
+
+        return OpenXPKI::Server::Authentication::Handle->new(
+            username => $username,
+            error => OpenXPKI::Server::Authentication::Handle::SERVICE_UNAVAILABLE,
+            error_message => "$EVAL_ERROR"
+        ) if ($EVAL_ERROR);
 
         return OpenXPKI::Server::Authentication::Handle->new(
             username => $username,

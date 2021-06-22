@@ -2,6 +2,7 @@ package OpenXPKI::Server::Authentication::Connector;
 
 use strict;
 use warnings;
+use English;
 
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Authentication::Handle;
@@ -31,9 +32,22 @@ sub handleInput {
     # check account - password checking is done using an authentication
     # connector with password binding.
 
-    my $result = CTX('config')->get( [ @{$self->prefix()}, 'source', $username ], { password =>  $passwd } );
+    my $userinfo;
+    my $result;
+    eval {
+        $result = CTX('config')->get( [ @{$self->prefix()}, 'source', $username ], { password =>  $passwd } );
+        # fetch userinfo from handler if login was ok - will be undef if not set
+        $userinfo = $self->get_userinfo($username) if ($result && ref $result eq '');
+    };
 
-    # as we use a bind connect, we dont know the exact reason
+    # connector died, return service unavailable message
+    return OpenXPKI::Server::Authentication::Handle->new(
+        username => $username,
+        error => OpenXPKI::Server::Authentication::Handle::SERVICE_UNAVAILABLE,
+        error_message => "$EVAL_ERROR"
+    ) if ($EVAL_ERROR);
+
+    # none or false result -> login failed, details are unknown
     return OpenXPKI::Server::Authentication::Handle->new(
         username => $username,
         error => OpenXPKI::Server::Authentication::Handle::LOGIN_FAILED,
@@ -44,11 +58,9 @@ sub handleInput {
         username => $username,
         error => OpenXPKI::Server::Authentication::Handle::UNKNOWN_ERROR,
         error_message => 'Password connector did not return a scalar'
-    ) if (defined $result && ref $result ne '');
+    ) if (ref $result ne '');
 
-    # fetch userinfo from handler- will be undef if not set
-    my $userinfo = $self->get_userinfo($username);
-
+    # all good - login the user
     return OpenXPKI::Server::Authentication::Handle->new(
         username => $username,
         userid => $self->get_userid( $username ),

@@ -2,6 +2,7 @@ package OpenXPKI::Server::Authentication::Password;
 
 use strict;
 use warnings;
+use English;
 
 use Moose;
 use Data::Dumper;
@@ -32,18 +33,25 @@ sub handleInput {
     # check account - the handler config has a connector at .user
     # that returns password or password and role for a requested username
     my $userinfo;
-    if (!$role) {
-        $userinfo = CTX('config')->get_hash( [ @{$self->prefix()}, 'user', $username ] );
-        ##! 64: $userinfo
-        $self->logger->trace("Got userinfo for #$username#: " . Dumper $userinfo) if ($self->logger->is_trace);
-        $digest = $userinfo->{digest} || '';
-        delete $userinfo->{digest};
-        $role = $userinfo->{role} || '';
-        delete $userinfo->{role};
-    } else {
-        $digest = CTX('config')->get( [ @{$self->prefix()}, 'user', $username ] );
-        ##! 64: $digest
-    }
+    eval {
+        if (!$role) {
+            $userinfo = CTX('config')->get_hash( [ @{$self->prefix()}, 'user', $username ] );
+            ##! 64: $userinfo
+            $self->logger->trace("Got userinfo for #$username#: " . Dumper $userinfo) if ($self->logger->is_trace);
+            $digest = $userinfo->{digest} || '';
+            delete $userinfo->{digest};
+            $role = $userinfo->{role} || '';
+            delete $userinfo->{role};
+        } else {
+            $digest = CTX('config')->get( [ @{$self->prefix()}, 'user', $username ] );
+            ##! 64: $digest
+        }
+    };
+    return OpenXPKI::Server::Authentication::Handle->new(
+        username => $username,
+        error => OpenXPKI::Server::Authentication::Handle::SERVICE_UNAVAILABLE,
+        error_message => "$EVAL_ERROR"
+    ) if ($EVAL_ERROR);
 
     return OpenXPKI::Server::Authentication::Handle->new(
         error => OpenXPKI::Server::Authentication::Handle::USER_UNKNOWN,
