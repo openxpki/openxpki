@@ -334,6 +334,8 @@ sub chain {
     my $self = shift;
     my $cert_id = shift;
 
+    return unless ($cert_id);
+
     my $chain = CTX('api2')->get_chain( start_with => $cert_id, format => 'PEM' );
     my @certs = @{$chain->{certificates}};
 
@@ -357,6 +359,7 @@ sub attr {
     my $cert_id = shift;
     my $attr = shift;
 
+    return unless ($cert_id);
     my $hash = CTX('api2')->get_cert_attributes(
         identifier => $cert_id, attribute => $attr
     );
@@ -379,6 +382,7 @@ sub pem {
     my $self = shift;
     my $cert_id = shift;
 
+    return unless ($cert_id);
     my $pem;
     eval {
         $pem = CTX('api2')->get_cert( identifier => $cert_id, 'format' => 'PEM' );
@@ -397,7 +401,7 @@ sub profile {
 
     my $self = shift;
     my $cert_id = shift;
-
+    return unless ($cert_id);
     my $profile = CTX('api2')->get_profile_for_cert( identifier => $cert_id );
     return $profile || '';
 
