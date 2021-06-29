@@ -89,6 +89,10 @@ sub handleInput {
         @cmd = split " " , $cmd;
     }
 
+
+    # make sure Proc::SafeExec can collect exit status via waitpid()
+    local $SIG{'CHLD'} = 'DEFAULT' if (not $SIG{'CHLD'} or $SIG{'CHLD'} eq 'IGNORE');
+
     my ($out, $retval) = Proc::SafeExec::backtick(@cmd);
     map { delete $ENV{$_} } @clearenv; # clear environment
 

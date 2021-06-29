@@ -145,6 +145,9 @@ sub execute {
     my ($shell, @wrapper_cmd) =
         __deal_with_wrapper($shell_of{$ident}, @cmd);
 
+    # make sure Proc::SafeExec can collect exit status via waitpid()
+    local $SIG{'CHLD'} = 'DEFAULT' if (not $SIG{'CHLD'} or $SIG{'CHLD'} eq 'IGNORE');
+
     my $command = Proc::SafeExec->new({
         exec   => [ $shell, @wrapper_cmd ],
         stdin  => 'new',
