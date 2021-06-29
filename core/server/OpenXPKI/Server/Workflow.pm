@@ -387,9 +387,9 @@ sub set_archived {
     my ($self) = @_;
 
     # only archive finished workflows
-    if ($self->proc_state != m{(failed|finished)}) {
+    if ($self->proc_state ne 'finished' and $self->proc_state ne 'failed') {
         OpenXPKI::Exception->throw(
-            message => "Attempt to archive workflow that is not in proc_state 'finished/failed'",
+            message => "Attempt to archive workflow that is not in proc_state 'finished' or 'failed'",
             params => { type => $self->type, proc_state => $self->proc_state },
         );
     }
