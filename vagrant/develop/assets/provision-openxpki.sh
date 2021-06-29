@@ -78,34 +78,17 @@ if [ -e /etc/logrotate.d/ ]; then
     cp $OXI_TEST_SAMPLECONFIG_DIR/contrib/logrotate.conf /etc/logrotate.d/openxpki
 fi
 
-# CONFIGURATION and DATABASE SETUP
-/vagrant/scripts/oxi-refresh --full 2>&1 | tee $LOG
-
-#
 # Apache configuration
-#
-if [ -e /etc/init.d/apache2 ]; then
+if which apache2 >/dev/null; then
     echo "Configuring Apache"
-    # Ubuntu/Jessie
-    if [ -d /etc/apache2/conf-available ]; then
-        cp $OXI_TEST_SAMPLECONFIG_DIR/contrib/apache2-openxpki.conf /etc/apache2/conf-available/openxpki.conf
-        /usr/sbin/a2enconf openxpki
-    fi
-    # Wheezy etc.
-    if [ -d /etc/apache2/conf.d ]; then
-        cp $OXI_TEST_SAMPLECONFIG_DIR/contrib/apache2-openxpki.conf /etc/apache2/conf.d/openxpki.conf
-    fi
 
     a2enmod cgid                                                      >$LOG 2>&1
     a2enmod fcgid                                                     >$LOG 2>&1
-    # Needed to pickup new group
-    /etc/init.d/apache2 restart                                       >$LOG 2>&1
-
-    # Specify hostname to force MySQL connection via TCP, not socket
-    echo "Configuration OpenXPKI WebUI"
-    sed -ri 's/^(#\s*)?(DataSource\s*=).*/\2 dbi:mysql:dbname=openxpki;host=127.0.0.1/' /etc/openxpki/webui/default.conf
-    sed -ri 's/^(#\s*)?(User\s*=).*/\2 openxpki_session/' /etc/openxpki/webui/default.conf
-    sed -ri 's/^(#\s*)?(Password\s*=).*/\2 mysecret/' /etc/openxpki/webui/default.conf
+    # (Apache will be restarted by oxi-refresh)
 fi
+
+# CONFIGURATION and DATABASE SETUP
+/vagrant/scripts/oxi-refresh --full 2>&1 | tee $LOG
+
 
 set +e

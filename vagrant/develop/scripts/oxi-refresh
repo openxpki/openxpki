@@ -101,6 +101,14 @@ if [[ $IS_FULLCONFIG -eq 1 ]]; then
     # set plain datavault password "root"
     sed -zri 's/(secret:\s+default:\s+.*?)value@?:[^\n]+/\1value: root/' /etc/openxpki/config.d/system/crypto.yaml
 
+    if grep -q '^vagrant:' /etc/passwd; then
+        # Specify hostname to force MySQL connection via TCP, not socket
+        echo "- Vagrant Box detected: modifying WebUI config"
+        sed -ri 's/^(#\s*)?(DataSource\s*=).*/\2 dbi:mysql:dbname=openxpki;host=127.0.0.1/' /etc/openxpki/webui/default.conf
+        sed -ri 's/^(#\s*)?(User\s*=).*/\2 openxpki_session/' /etc/openxpki/webui/default.conf
+        sed -ri 's/^(#\s*)?(Password\s*=).*/\2 mysecret/' /etc/openxpki/webui/default.conf
+    fi
+
 # partial config update
 else
     #  realm democa
@@ -116,7 +124,7 @@ test_auth_exists=$(grep -c "Testing:" /etc/openxpki/config.d/realm/democa/auth/s
 set -e
 
 if [ $test_auth_exists -eq 0 ]; then
-    echo "Adding authentication stack 'Testing'"
+    echo "- adding authentication stack 'Testing'"
     # add test auth stack (e.g. user: raop / password: openxpki)
     sed -zri 's/^/Testing:\n    handler: TestAccounts\n    type: passwd\n\n/' /etc/openxpki/config.d/realm/democa/auth/stack.yaml
     cat <<__HANDLER >> /etc/openxpki/config.d/realm/democa/auth/handler.yaml
@@ -187,6 +195,7 @@ fi
 cat $OXI_TEST_SAMPLECONFIG_DIR/contrib/apache2-openxpki-site.conf \
  | perl -pe 's{^(\s*RewriteRule \^\.\*\$ https://)}{#$1}'\
  > /etc/apache2/sites-available/openxpki.conf
+/usr/sbin/a2ensite openxpki
 
 test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/index.html
 
