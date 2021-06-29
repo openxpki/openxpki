@@ -381,7 +381,7 @@ sub run {
                 $self->interval_wait_initial(), $self->interval_loop_idle(), $self->interval_loop_run() ));
 
         # wait some time for server startup...
-        ##! 16: sprintf('watchdog: original PID %d, initail wait for %d seconds', $self->{original_pid} , $self->interval_wait_initial());
+        ##! 16: sprintf('watchdog: original PID %d, initially waiting for %d seconds', $self->{original_pid} , $self->interval_wait_initial());
         sleep($self->interval_wait_initial());
 
         $self->_exception_count(0);
@@ -432,9 +432,9 @@ sub __main_loop {
             $self->__purge_expired_sessions;
             $self->__auto_archive_workflows;
 
-            # if slots_avail_count is zero, do a recalc
+            # if slots_avail_count is zero, do a recalculation
             if (!$slots_avail_count) {
-                ##! 8: 'slots avail count reached zero - do recalc'
+                ##! 8: 'no slots available - doing recalculation'
                 $slots_avail_count = $self->max_worker_count();
                 my $pt = Proc::ProcessTable->new;
                 foreach my $ps (@{$pt->table}) {
@@ -445,7 +445,7 @@ sub __main_loop {
                 }
             }
 
-            ##! 32: 'slots avail counter is ' . $slots_avail_count
+            ##! 32: 'available slots: ' . $slots_avail_count
 
             # duration of pause depends on whether a workflow was found or not
             my $sec = $self->interval_loop_idle;
@@ -455,7 +455,7 @@ sub __main_loop {
                 OpenXPKI::Server::__set_process_name("watchdog (OVERLOAD)");
                 CTX('log')->system->warn(sprintf "Watchdog process limit (%01d) reached, will sleep for %01d seconds", $self->max_worker_count(), $sec );
             } elsif (my $wf_id = $self->__scan_for_paused_workflows()) {
-                ##! 32: 'watchdog busy - forked child ' . $wf_id
+                ##! 32: 'watchdog busy - forked child for wf ' . $wf_id
                 $sec = $self->interval_loop_run;
                 $slots_avail_count--;
                 OpenXPKI::Server::__set_process_name("watchdog (busy)");
