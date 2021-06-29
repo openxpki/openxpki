@@ -81,7 +81,7 @@ sub get_command {
 
     ## build the command
 
-    my @command = qw( cms -sign -binary -outform PEM );
+    my @command = qw( cms -sign -binary -outform PEM -nosmimecap );
     push @command, ("-nodetach") if ( not $self->{DETACH} );
     push @command, ("-engine", $engine) if ($engine);
     push @command, ("-keyform", $keyform) if ($keyform);
