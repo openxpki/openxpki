@@ -11,7 +11,7 @@ OpenXPKI::Daemonize - Helper functions to cleanly fork background processes
 use English;
 
 # CPAN modules
-use POSIX qw(:signal_h setuid setgid);
+use POSIX ();
 
 # Project modules
 use OpenXPKI::Debug;
@@ -97,18 +97,15 @@ sub fork_child {
     # child process
     #
 
-    # Reset handler for SIGCHLD:
-    # IGNORE could prevent Proc::SafeExec or system() from working correctly
-    # (see https://docstore.mik.ua/orelly/perl/cookbook/ch16_20.htm)
-    $SIG{CHLD} = 'DEFAULT';
-    $SIG{HUP}  = $self->sighup_handler  if $self->sighup_handler;
-    $SIG{TERM} = $self->sigterm_handler if $self->sigterm_handler;
+    $SIG{'CHLD'} = 'DEFAULT'; # reset SIGCHLD handler so calls to system() etc. work
+    $SIG{'HUP'}  = $self->sighup_handler  if $self->sighup_handler;
+    $SIG{'TERM'} = $self->sigterm_handler if $self->sigterm_handler;
 
     if ($self->gid) {
-        setgid($self->gid);
+        POSIX::setgid($self->gid);
     }
     if ($self->uid) {
-        setuid($self->uid);
+        POSIX::setuid($self->uid);
         $ENV{USER} = getpwuid($self->uid);
         $ENV{HOME} = ((getpwuid($self->uid))[7]);
     }
@@ -125,14 +122,25 @@ sub fork_child {
     return $pid;
 }
 
+=head2 DEMOLISH
+
+Hand C<SIGCHLD> processing over to operating system (see note on C<SIGCHLD> at
+L</fork_child>).
+
+=cut
+sub DEMOLISH {
+    my $self = shift;
+    $SIG{'CHLD'} = 'IGNORE';
+}
+
 # "The most paranoid of programmers block signals for a fork to prevent a
 # signal handler in the child process being called before Perl can update
 # the child's $$ variable, its process id."
 # (https://docstore.mik.ua/orelly/perl/cookbook/ch16_21.htm)
 sub _block_sigint {
     my ($self) = @_;
-    my $sigint = POSIX::SigSet->new(SIGINT);
-    sigprocmask(SIG_BLOCK, $sigint, $self->old_sig_set)
+    my $sigint = POSIX::SigSet->new(POSIX::SIGINT());
+    POSIX::sigprocmask(POSIX::SIG_BLOCK(), $sigint, $self->old_sig_set)
         or OpenXPKI::Exception->throw(
             message => 'Unable to block SIGINT before fork()',
             log => { priority => 'fatal', facility => 'system' }
@@ -141,7 +149,7 @@ sub _block_sigint {
 
 sub _unblock_sigint {
     my ($self) = @_;
-    sigprocmask(SIG_SETMASK, $self->old_sig_set)
+    POSIX::sigprocmask(POSIX::SIG_SETMASK(), $self->old_sig_set)
         or OpenXPKI::Exception->throw(
             message => 'Unable to reset old signals after fork()',
             log => { priority => 'fatal', facility => 'system' }
