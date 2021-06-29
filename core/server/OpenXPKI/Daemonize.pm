@@ -68,25 +68,35 @@ This is to make sure error messages still go to the desired log files.
 
 B<Note on SIGCHLD>
 
-For the parent process we set C<$SIG{CHLD} = "IGNORE"> to prevent zombie child
-processes.
+The most compatible way to handle C<SIGCHLD> seems to set it to C<'DEFAULT'>,
+letting Perl handle it. This way commands like C<system()> will work properly.
 
-But C<IGNORE> can lead to problems with system calls e.g. via L<Proc::SafeExec>
-or L<system>, see
-L<the Perl CookBook|https://docstore.mik.ua/orelly/perl/cookbook/ch16_20.htm>
-for details.
+For the child process we set C<$SIG{'CHLD'} = 'DEFAULT'>.
 
-Thus in the child process we set C<$SIG{CHLD} = "DEFAULT"> to prevent these
-problems.
+The problem is that child processes will become zombies unless the parent
+calls C<waitpid()> to reap them.
 
-But in the parent process after forking you should manually set
-C<$SIG{CHLD} = "DEFAULT"> if you want to do system calls.
+For the parent process we set up an own C<SIGCHLD> handler that calls C<waitpid()>
+to properly reap child processes without affecting calls to C<system()>.
+
+Obviously due to a bug (L<https://github.com/Perl/perl5/issues/17662>) maybe in
+conjunction with our use of L<Net::Server> C<SIGCHLD> handling is not reset when
+the parent process exits. That is why in C<DEMOLISH> we explicitely hand over
+child reaping to the operating system via C<$SIG{'CHLD'} = 'IGNORE'>.
+
+Also see L<https://perldoc.perl.org/perlipc#Signals>.
 
 =cut
 sub fork_child {
     my ($self) = @_;
 
-    $SIG{CHLD} = 'IGNORE'; # IGNORE means: child zombies are auto-removed from process table
+    # reap child processes while allowing e.g. system() to work properly
+    $SIG{'CHLD'} = sub {
+        # Reap any child process (-1) that became a zombie.
+        # The loop is needed as there would be no second SIGCHLD if another
+        # process dies while this handler runs.
+        1 while waitpid(-1, POSIX::WNOHANG()) > 0; # do nothing, just reap
+    };
 
     my $pid = $self->_try_fork($self->max_fork_redo);
 
