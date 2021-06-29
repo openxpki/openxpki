@@ -15,6 +15,8 @@ use Data::Dumper;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
+# TODO needs to be renamed as digest check is not key related
+
 =head2 validate_key_params
 
 Check if all given key params match the defined rules.
@@ -29,16 +31,24 @@ For I<key_length> you can give a discret number or a range min:max,
 borders are included. You can leave out the upper side (e.g. 1024:)
 which will match any size above, to avoid a lower limit set it to "0"
 
+You can add arbitrary attributes which will result in a "is contained
+in list" operation. The attribute I<digest_alg> has an expansion from
+I<sha2> to I<sha224 sha256 sha384 sha512>.
+
 Return is a list with all parameter names that failed validation.
 
 B<Parameters>
 
 =over
 
-=item * C<key_params> I<Hash> - the hash with the keys properties
+=item * C<key_params> I<Hash>
 
-=item * C<key_rules> I<Hash>  - the hash with the rules for all as defined in the
-                                profile (algorithm is the key of the first level)
+the hash with the keys properties
+
+=item * C<key_rules> I<Hash>
+
+the hash with the rules as defined in the profile, the attribute
+name (e.g. I<key_length>) must be the key of the first level.
 
 =back
 
@@ -105,6 +115,12 @@ command "validate_key_params" => {
                     ##! 16: "Valid match found in range $val / $range"
                     next ATTR;
                 }
+            }
+        }
+
+        if ($attr eq 'digest_alg') {
+            if (grep {$_ eq 'sha2'}, @expect)) {
+                push @expect, ('sha224','sha256','sha384','sha512');
             }
         }
 
