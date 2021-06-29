@@ -8,6 +8,7 @@ use Try::Tiny;
 # Project modules
 use OpenXPKI::Server;
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Daemonize;
 use OpenXPKI::Connector::WorkflowContext;
 use OpenXPKI::MooseParams;
 use OpenXPKI::Debug;
