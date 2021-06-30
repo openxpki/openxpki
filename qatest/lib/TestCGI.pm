@@ -155,7 +155,7 @@ sub mock_request {
         # strip off trailing array indicator and trim whitespace
         %{$data} = map {
             my ($kk) = ($_ =~ m{([^\[]+)(\[\])?\z});
-            my $vv = $data->{$_};
+            my $vv = $data->{$_} // '';
             $vv =~ s{\A\s+|\s+\z}{}xmsg unless (ref $vv);
             $kk => $vv;
         } keys %{$data};

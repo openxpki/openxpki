@@ -41,7 +41,7 @@ my $req = HTTP::Request->new('POST', 'https://localhost/rpc/enroll/RequestCertif
 
 my $response = $ua->request( $req );
 
-ok($response->is_success);
+ok($response->is_success) || die $response->decoded_content;
 my $json = JSON->new->decode($response->decoded_content);
 
 is ($json->{result}->{data}->{error_code}, 'Request was not approved');

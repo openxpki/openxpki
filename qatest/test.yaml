@@ -5,5 +5,5 @@ uri:
 
 ssl_opts:
     verify_hostname: 0
-#    SSL_verify_mode: SSL_VERIFY_NONE
+    SSL_verify_mode: 0
     SSL_ca_path: /etc/ssl/certs
