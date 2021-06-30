@@ -1502,45 +1502,44 @@ sub action_search {
     my $verbose = {};
     my $input;
 
-    if ($self->param('wf_type')) {
-        $query->{type} = $self->param('wf_type');
-        $input->{wf_type} = $self->param('wf_type');
-        $verbose->{wf_type} = $self->param('wf_type');
-
+    if (my $type = $self->param('wf_type')) {
+        $query->{type} = $type;
+        $input->{wf_type} = $type;
+        $verbose->{wf_type} = $type;
     }
 
-    if ($self->param('wf_state')) {
-        $query->{state} = $self->param('wf_state');
-        $input->{wf_state} = $self->param('wf_state');
-        $verbose->{wf_state} = $self->param('wf_state');
+    if (my $state = $self->param('wf_state')) {
+        $query->{state} = $state;
+        $input->{wf_state} = $state;
+        $verbose->{wf_state} = $state;
     }
 
-    if ($self->param('wf_proc_state')) {
-        $query->{proc_state} = $self->param('wf_proc_state');
-        $input->{wf_proc_state} = $self->param('wf_proc_state');
-        $verbose->{wf_proc_state} = 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_' . uc($self->param('wf_proc_state'));
+    if (my $proc_state = $self->param('wf_proc_state')) {
+        $query->{proc_state} = $proc_state;
+        $input->{wf_proc_state} = $proc_state;
+        $verbose->{wf_proc_state} = $self->__get_proc_state_label($proc_state);
     }
 
-    if ($self->param('last_update_before')) {
-        $query->{last_update_before} = $self->param('last_update_before');
-        $input->{last_update} = { key => 'last_update_before', value => $self->param('last_update_before') };
-        $verbose->{last_update_before} = DateTime->from_epoch( epoch => $self->param('last_update_before') )->iso8601();
+    if (my $last_update_before = $self->param('last_update_before')) {
+        $query->{last_update_before} = $last_update_before;
+        $input->{last_update} = { key => 'last_update_before', value => $last_update_before };
+        $verbose->{last_update_before} = DateTime->from_epoch( epoch => $last_update_before )->iso8601();
     }
 
-    if ($self->param('last_update_after')) {
-        $query->{last_update_after} = $self->param('last_update_after');
-        $input->{last_update} = { key => 'last_update_after', value => $self->param('last_update_after') };
-        $verbose->{last_update_after} = DateTime->from_epoch( epoch => $self->param('last_update_after') )->iso8601();
+    if (my $last_update_after = $self->param('last_update_after')) {
+        $query->{last_update_after} = $last_update_after;
+        $input->{last_update} = { key => 'last_update_after', value => $last_update_after };
+        $verbose->{last_update_after} = DateTime->from_epoch( epoch => $last_update_after )->iso8601();
     }
 
     # Read the query pattern for extra attributes from the session
     my $spec = $self->_session->param('wfsearch')->{default};
     my $attr = $self->__build_attribute_subquery( $spec->{attributes} );
 
-    if ($self->param('wf_creator')) {
-        $input->{wf_creator} = $self->param('wf_creator');
-        $attr->{'creator'} = scalar $self->param('wf_creator');
-        $verbose->{wf_creator} = $self->param('wf_creator');
+    if (my $wf_creator = $self->param('wf_creator')) {
+        $input->{wf_creator} = $wf_creator;
+        $attr->{'creator'} = scalar $wf_creator;
+        $verbose->{wf_creator} = $wf_creator;
     }
 
     if ($attr) {
@@ -3775,6 +3774,16 @@ sub __check_for_validation_error {
         return $field_errors;
     }
     return;
+}
+
+sub __get_proc_state_label {
+    my ($self, $proc_state) = @_;
+    return $proc_state ? $self->__proc_state_i18n->{$proc_state}->{label} : '-';
+}
+
+sub __get_proc_state_desc {
+    my ($self, $proc_state) = @_;
+    return $proc_state ? $self->__proc_state_i18n->{$proc_state}->{desc} : '-';
 }
 
 =head1 example workflow config
