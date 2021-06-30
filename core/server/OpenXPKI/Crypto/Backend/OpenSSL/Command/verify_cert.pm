@@ -113,6 +113,15 @@ chain (calls openssl verify).
 If set to a true value the verification is also true if ertificates in
 the chain are expired.
 
+=item CRL
+
+Must contain one or more PEM encoded CRLs.
+Enables CRL_CHECK with option 'all'.
+
+=item CRL_CHECK
+
+Set to I<leaf> to only validate the entity certificate.
+
 =back
 
 =head2 hide_output

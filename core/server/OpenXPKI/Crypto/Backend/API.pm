@@ -128,7 +128,10 @@ sub __init_command_params : PRIVATE {
     "pkcs7_verify"    => {"CHAIN"   => 0, # optional only when NO_VERIFY is set
                           "NO_CHAIN" => 0,
                           "CONTENT" => 0,
-                          "PKCS7"   => 1},
+                          "PKCS7"   => 1,
+                          "CRL"   => 0,
+                          "CRL_CHECK" => ["leaf","all"],
+                          },
 
     "pkcs7_get_payload" => {"PKCS7" => 1,
                             "NOSIGS" => 1,

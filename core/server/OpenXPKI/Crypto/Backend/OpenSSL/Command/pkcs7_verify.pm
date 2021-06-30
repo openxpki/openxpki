@@ -64,6 +64,14 @@ sub get_command
         push @command, ("-CAfile",$chainfile);
     }
 
+    if ($self->{CRL_CHECK}) {
+        push @command, ($self->{CRL_CHECK} eq 'leaf' ? '-crl_check' : '-crl_check_all');
+        OpenXPKI::Exception->throw (
+            message => "CRL check requested but no CRL given"
+        ) unless ($self->{CRL});
+        push @command, ( '-CRLfile', $self->write_temp_file( $self->{CRL} ) );
+    }
+
     return [ \@command ];
 }
 
@@ -105,6 +113,18 @@ OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_verify
 is an array of PEM encoded certificates, mandatory unless NO_CHAIN is set
 
 =item * NO_CHAIN (do not check the signer certificate)
+
+=item CRL
+
+Must contain one or more PEM encoded CRLs.
+
+Enables I<CRL_CHECK> with option 'all'.
+If NOCHAIN is set, sets I<CRL_CHECK> to leaf
+
+
+=item CRL_CHECK
+
+Set to I<leaf> to only validate the entity certificate.
 
 =back
 
