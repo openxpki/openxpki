@@ -3520,6 +3520,8 @@ sub __render_workflow_info {
             $value = $wfdetails_info->{attribute}->{$1} // '-';
         } elsif ($field =~ m{\A context\.(\S+) }xi) {
             $value = $wfdetails_info->{context}->{$1} // '-';
+        } elsif ($field eq 'proc_state') {
+            $value = $self->__get_proc_state_label($wfdetails_info->{$field});
         } elsif ($field) {
             $value = $wfdetails_info->{$field} // '-';
         }
