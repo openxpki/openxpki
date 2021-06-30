@@ -62,6 +62,8 @@ B<Parameters>
 
 =item * C<skip_duplicate> I<Bool>
 
+=item * C<nosigner> I<Bool> - import CRLs for issuers not in the certsign group
+
 =back
 
 B<Changes compared to API v1:>

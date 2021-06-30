@@ -43,9 +43,14 @@ the serial (crl_key) of the database table
 certificate identifier of the issuer, if set the latest crl of this
 issuer is returned.
 
+=item ignore_expired
+
+Will return undef if the next_update timestamp of the lastest crl found
+is in the past. Ineffective when used with I<crl_serial>.
+
 =item profile
 
-CRL profile. For security reasons you must set this also when requesting a 
+CRL profile. For security reasons you must set this also when requesting a
 non-default CRL by its serial number!
 
 =item format
@@ -83,6 +88,7 @@ command "get_crl" => {
     profile  => { isa => 'Ident' },
     format     => { isa => 'AlphaPunct', matching => qr{ \A ( PEM | DER | TXT | HASH | FULLHASH | DBINFO ) \Z }x, default => "PEM" },
     issuer_identifier => { isa => 'Value', },
+    ignore_expired =>  { isa => 'Bool', },
 } => sub {
 
     my ($self, $params) = @_;
@@ -107,16 +113,16 @@ command "get_crl" => {
             from => 'crl',
             columns => [ @columns, 'profile' ],
             where => {
-                crl_key => $crl_key,                
+                crl_key => $crl_key,
             },
         );
-        
+
         my $profile = $params->profile || '';
         my $crl_profile = $db_results->{profile} || '';
         if ($crl_profile ne $profile) {
             OpenXPKI::Exception->throw(
                 message => 'CRLs profile does not match requested profile',
-                params => { crl_profile => $crl_profile, requested => $profile } 
+                params => { crl_profile => $crl_profile, requested => $profile }
             );
         }
 
@@ -134,10 +140,14 @@ command "get_crl" => {
             columns => \@columns,
             where => {
                 issuer_identifier => $issuer_identifier,
-                profile => $params->profile ? $params->profile : undef,                
+                profile => $params->profile ? $params->profile : undef,
             },
             order_by => '-last_update'
         );
+
+        if ($db_results && $params->ignore_expired) {
+            return if ($db_results->{next_update} < time());
+        }
     }
 
     ##! 32: 'DB Result ' . Dumper $db_results
