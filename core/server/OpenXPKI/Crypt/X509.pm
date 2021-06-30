@@ -208,6 +208,17 @@ has serial => (
     }
 );
 
+has cdp => (
+    is => 'ro',
+    init_arg => undef,
+    isa => 'ArrayRef',
+    reader => 'get_cdp',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        return $self->_cert()->CRLDistributionPoints();
+    }
+);
 
 around BUILDARGS => sub {
 

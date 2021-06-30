@@ -304,6 +304,24 @@ sub notafter {
 
 }
 
+=head2 cdp
+
+Return the URIs of the CDPs contained in the certificate as arrayref.
+
+=cut
+
+sub cdp {
+
+    my $self = shift;
+
+    my $pem = $self->pem( shift );
+    return unless($pem);
+
+    my $x509 = OpenXPKI::Crypt::X509->new($pem);
+    return $x509_issuer->get_cdp();
+
+}
+
 =head2 pki_realm
 
 Return the verbose label of the workflow realm
