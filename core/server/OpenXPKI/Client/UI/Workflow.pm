@@ -101,10 +101,16 @@ has __validity_options => (
 has __proc_state_i18n => (
     is => 'ro', isa => 'HashRef', lazy => 1, init_arg => undef,
     default => sub { return {
+        # label = short label
+        #   - heading for workflow info popup (workflow search results)
+        #   - search dropdown
+        #   - technical info block on workflow page
+        #
+        # desc = description
+        #   - workflow info popup (workflow search results)
         running => {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_LABEL',
             desc =>  'I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_DESC',
-            hide_from_search_dropdown => 1,
         },
         manual => {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_MANUAL_LABEL',
@@ -134,16 +140,6 @@ has __proc_state_i18n => (
             label => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_FAILED_LABEL',
             desc =>  'I18N_OPENXPKI_UI_WORKFLOW_INFO_FAILED_DESC',
         },
-    } },
-);
-
-has __proc_state_i18n_irregular => (
-    is => 'ro', isa => 'HashRef', lazy => 1, init_arg => undef,
-    default => sub { return {
-        running         => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_DESC',
-        pause           => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC',
-        exception       => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESC',
-        retry_exceeded  => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_RETRY_EXCEEDED_DESC',
     } },
 );
 
@@ -479,13 +475,13 @@ sub init_info {
         isLarge => 1,
     });
 
-    my $i18n = $self->__proc_state_i18n->{$wf_info->{workflow}->{proc_state}};
+    my $proc_state = $wf_info->{workflow}->{proc_state};
 
     $self->add_section({
         type => 'keyvalue',
         content => {
-            label => $i18n->{label},
-            description => $i18n->{desc},
+            label => $self->__get_proc_state_label($proc_state),
+            description => $self->__get_proc_state_desc($proc_state),
             data => $fields,
             buttons => \@buttons_handle,
     }});
@@ -546,12 +542,11 @@ sub init_search {
     my @wfl_list = map { {'value' => $_, 'label' => $workflows->{$_}->{label}} } @wf_names ;
     @wfl_list = sort { lc($a->{'label'}) cmp lc($b->{'label'}) } @wfl_list;
 
-    my $i18n = $self->__proc_state_i18n;
     my $proc_states = [
         sort { $a->{label} cmp $b->{label} }
-        map { { label => i18nGettext($i18n->{$_}->{label}), value => $_} }
-        grep { not $i18n->{$_}->{hide_from_search_dropdown} }
-        keys %{$i18n}
+        map { { label => i18nGettext($self->__get_proc_state_label($_)), value => $_} }
+        grep { $_ ne 'running' }
+        keys %{ $self->__proc_state_i18n }
     ];
 
     my @fields = (
@@ -1970,7 +1965,13 @@ sub __render_from_workflow {
     };
 
     # show buttons to proceed with workflow if it's in "non-regular" state
-    if (grep /$wf_proc_state/, ('pause', 'retry_exceeded', 'exception', 'running')) {
+    my %irregular = (
+        running => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_DESC',
+        pause => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC',
+        exception => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESC',
+        retry_exceeded => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_RETRY_EXCEEDED_DESC',
+    );
+    if ($irregular{$wf_proc_state}) {
 
         # same page head for all proc states
         my $wf_action = $wf_info->{workflow}->{context}->{wf_current_action};
@@ -1980,8 +1981,8 @@ sub __render_from_workflow {
             push @breadcrumb, { className => 'workflow-state', label => $wf_info->{state}->{label} };
         }
 
-        my $label = $self->__proc_state_i18n->{$wf_proc_state}->{label}; # reuse labels from init_info popup
-        my $desc = $self->__proc_state_i18n_irregular->{$wf_proc_state};
+        my $label = $self->__get_proc_state_label($wf_proc_state); # reuse labels from init_info popup
+        my $desc = $irregular{$wf_proc_state};
 
         $self->_page({
             label => $label,
@@ -2804,16 +2805,10 @@ sub __render_result_list {
                 if ($field eq "workflow_state") {
                     my $state = $wf_item->{'workflow_state'};
                     my $proc_state = $wf_item->{'workflow_proc_state'};
-                    if ($proc_state eq 'exception') {
-                        $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_LABEL )";
 
-                    } elsif ($proc_state eq 'pause') {
-                        $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_INFO_PAUSE_LABEL )";
-
-                    } elsif ($proc_state eq 'retry_exceeded') {
-                        $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_INFO_RETRY_EXCEEDED_LABEL )";
-
-                    }
+                    if (grep /\A $proc_state \Z/x, qw( exception pause retry_exceeded )) {
+                        $state .= sprintf(" (%s)", $self->__get_proc_state_label($proc_state));
+                    };
                     push @line, $state;
                 } else {
                     push @line, $wf_item->{ $field };
