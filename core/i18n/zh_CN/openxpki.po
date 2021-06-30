@@ -2123,7 +2123,19 @@ msgstr "您无权启动此工作流程"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
 msgstr "无法启动工作流程：未知类型"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_ANONYMOUS"
+msgstr "创造者"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL"
+msgstr "创造者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_NO_NAMESPACE"
+msgstr "创造者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_UNABLE_TO_RESOLVE"
 msgstr "创造者"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ERROR_DELAY_REVOCATION_TIME_NOT_IN_FUTURE"
@@ -3646,6 +3658,14 @@ msgstr "所做的更改已保存到数据库中。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
 msgstr "元数据已更新"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_DESC"
+msgstr "此吊销请求需要批准。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_LABEL"
+msgstr "等待批准"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC"
 msgstr ""
 "该工作流程已暂停，稍后将由系统继续。 您可以在下面找到有关暂停原因和计划的唤醒"
@@ -3896,6 +3916,14 @@ msgstr "私钥下载"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "类型"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_DESC"
+msgstr "此工作流程允许一次吊销多个证书。 您需要提供有效证书标识符的列表。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_LABEL"
+msgstr "批量吊销请求"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_DESC"
 msgstr "通过电子邮件发送在30天之内到期的所有证书的到期通知。"

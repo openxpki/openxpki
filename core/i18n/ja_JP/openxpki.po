@@ -2206,7 +2206,19 @@ msgstr "このワークフローを開始することは許可されていませ
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
 msgstr "ワークフローを開始できません：原因不明"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_ANONYMOUS"
+msgstr "作成者"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL"
+msgstr "作成者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_NO_NAMESPACE"
+msgstr "作成者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_UNABLE_TO_RESOLVE"
 msgstr "作成者"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ERROR_DELAY_REVOCATION_TIME_NOT_IN_FUTURE"
@@ -3803,6 +3815,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
 msgstr "メタデータ更新"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_DESC"
+msgstr "この失効リクエストには承認が必要です。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_LABEL"
+msgstr "承認待ち"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC"
 msgstr "このワークフローは失敗し、再実行はできません"
 
@@ -4057,6 +4077,16 @@ msgstr "私有鍵のダウンロード"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "タイプ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_DESC"
+msgstr ""
+"このワークフローでは、複数の証明書を一度に失効させることができます。有効な証"
+"明書識別子のリストを提供する必要があります。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_LABEL"
+msgstr "一括失効リクエスト"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_DESC"
 msgstr ""
