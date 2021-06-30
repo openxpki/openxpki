@@ -2123,7 +2123,19 @@ msgstr "您无权启动此工作流程"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
 msgstr "无法启动工作流程：未知类型"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_ANONYMOUS"
+msgstr "创造者"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL"
+msgstr "创造者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_NO_NAMESPACE"
+msgstr "创造者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_UNABLE_TO_RESOLVE"
 msgstr "创造者"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ERROR_DELAY_REVOCATION_TIME_NOT_IN_FUTURE"
@@ -3027,8 +3039,15 @@ msgstr "用户"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL"
 msgstr "工作流程ID"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO"
-msgstr "技术日志"
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_ARCHIVED_DESC"
+msgstr ""
+"此工作流程已循环多次，因此已停止，如果没有手动交互，服务器将无法处理它。 使"
+"用“打开工作流程”按钮显示当前状态的详细信息并处理异常（可能需要附加授权）。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_ARCHIVED_LABEL"
+msgstr "循环重试次数超过"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_DESC"
 msgstr ""
@@ -3038,6 +3057,15 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_LABEL"
 msgstr "意外的错误"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FAILED_DESC"
+msgstr ""
+"此工作流程处于最终状态。 使用“打开工作流程”按钮显示工作流程的详细信息。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FAILED_LABEL"
+msgstr "工作流程完成"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_DESC"
 msgstr ""
@@ -3160,30 +3188,8 @@ msgstr "暂停动作"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL"
 msgstr "暂停原因"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE"
-msgstr "处理状态"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_ARCHIVED"
-msgstr "运行状态"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
-msgstr "异常"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED"
-msgstr "完成"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL"
 msgstr "运行状态"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL"
-msgstr "手动"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE"
-msgstr "暂停"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
-msgstr "重试超出"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE"
 msgstr "您当前的角色禁止访问此工作流程属性"
@@ -3311,9 +3317,6 @@ msgstr "消息集"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_START_BUTTON"
 msgstr "返回"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE"
-msgstr "处理状态"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_CHOOSE_ACTION_DESC"
@@ -3593,6 +3596,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_LABEL"
 msgstr "成功"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILED"
+msgstr "此工作流程最终失败，无法重新启动"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_DESC"
 msgstr "此工作流程最终失败，无法重新启动"
 
@@ -3647,6 +3654,14 @@ msgstr "所做的更改已保存到数据库中。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
 msgstr "元数据已更新"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_DESC"
+msgstr "此吊销请求需要批准。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_LABEL"
+msgstr "等待批准"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC"
 msgstr ""
@@ -3898,6 +3913,14 @@ msgstr "私钥下载"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "类型"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_DESC"
+msgstr "此工作流程允许一次吊销多个证书。 您需要提供有效证书标识符的列表。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_LABEL"
+msgstr "批量吊销请求"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_DESC"
 msgstr "通过电子邮件发送在30天之内到期的所有证书的到期通知。"
@@ -4264,6 +4287,35 @@ msgstr "是"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_SUBJECT_MATCH_LABEL"
 #~ msgstr "Request Subject Matches"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO"
+#~ msgstr "技术日志"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_ARCHIVED"
+#~ msgstr "运行状态"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
+#~ msgstr "异常"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FAILED"
+#~ msgstr "完成"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED"
+#~ msgstr "完成"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL"
+#~ msgstr "手动"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE"
+#~ msgstr "暂停"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
+#~ msgstr "重试超出"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE"
+#~ msgstr "处理状态"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED_DESC"

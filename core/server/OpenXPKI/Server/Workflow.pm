@@ -24,7 +24,7 @@ use OpenXPKI::DateTime;
 
 my @PERSISTENT_FIELDS = qw( proc_state count_try wakeup_at reap_at archive_at );
 # "session_info" is a special case: saved, but only read by watchdog
-my @TRANSIENT_FIELDS = qw( session_info persist_context is_startup is_forced_fail );
+my @TRANSIENT_FIELDS = qw( session_info persist_context is_startup );
 __PACKAGE__->mk_accessors( @PERSISTENT_FIELDS, @TRANSIENT_FIELDS );
 
 
@@ -99,7 +99,11 @@ my %known_proc_states = (
         hook => '_runtime_exception',
         enforceable => [ ],
     },
-
+    # workflow was forcibly failed
+    failed => {
+        hook => '_runtime_exception',
+        enforceable => [ 'archive' ],
+    },
 );
 
 sub init {
@@ -121,7 +125,6 @@ sub init {
 
     $self->proc_state('init');
     $self->count_try(0);
-    $self->is_forced_fail(0);
 
     # For existing workflows - check for the watchdog extra fields
     if ($id) {
@@ -307,7 +310,7 @@ sub execute_action {
         my $autofail = $self->_get_workflow_state()->{_actions}->{$action_name}->{autofail};
         if (defined $autofail && $autofail =~ /(yes|1)/i) {
             ##! 16: 'execute failed and has autofail set'
-            $self->_fail($error);
+            $self->_fail(error => $error);
         }
 
         # Something unexpected went wrong inside the action, throw exception
@@ -370,17 +373,9 @@ sub reset_hungup {
 }
 
 sub set_failed {
+    my ($self, $error, $reason) = @_;
 
-    my $self = shift;
-    my $error = shift;
-    my $reason = shift;
-
-    $self->is_forced_fail(1); # flag for persister
-
-    $self->_fail($error, $reason); # also saves to DB
-
-    return $self;
-
+    $self->_fail(error => $error, reason => $reason, forced => 1); # also saves to DB
 }
 
 sub set_archived {
@@ -862,37 +857,36 @@ sub _proc_state_exception {
 }
 
 sub _fail {
-
-    my $self = shift;
-    my $error = shift;
-    my $reason = shift || 'autofail';
+    my ($self, %args) = @_;
+    my $error = $args{error};
+    my $forced = $args{forced} || 0;
+    my $reason = $args{reason} || ($forced ? 'unknown' : 'autofail');
 
     # do not fail workflow that are finished
-    if ( $self->proc_state eq 'finished' ) {
-        CTX('log')->workflow()->warn("Called fail on already finished workflow #" . $self->id);
+    if ($self->proc_state eq 'finished') {
+        CTX('log')->workflow->warn("Called fail on already finished workflow #" . $self->id);
         return;
     }
 
+    my $proc_state = $forced ? 'failed' : 'finished';
+
     eval{
         $self->state('FAILURE');
-        $self->_set_proc_state('finished');
-        $self->notify_observers( 'fail', $self->state, $self->{_CURRENT_ACTION}, $error);
+        $self->_set_proc_state($proc_state);
+        $self->notify_observers('fail', $self->state, $self->{_CURRENT_ACTION}, $error);
         $self->add_history({
-            action      => $self->{_CURRENT_ACTION},
+            action => $self->{_CURRENT_ACTION},
             description => 'FAIL:' . $reason,
-            user        => CTX('session')->data->user,
+            user => CTX('session')->data->user,
         });
         $self->_save();
     };
 
-    if ($reason eq 'autofail') {
-        CTX('log')->application()->error("Auto-Fail workflow ".$self->id." after action ".$self->{_CURRENT_ACTION}." with error " . $error);
-
+    if ($forced) {
+        CTX('log')->application->info("Forced Fail for workflow ".$self->id." after action ".$self->{_CURRENT_ACTION});
     } else {
-        CTX('log')->application()->info("Forced Fail for workflow ".$self->id." after action ".$self->{_CURRENT_ACTION});
-
+        CTX('log')->application->error("Auto-Fail workflow ".$self->id." after action ".$self->{_CURRENT_ACTION}." with error " . $error);
     }
-
 }
 
 sub is_running(){

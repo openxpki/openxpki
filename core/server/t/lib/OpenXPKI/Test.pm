@@ -782,7 +782,15 @@ sub init_user_config {
             baseurl => "http://127.0.0.1/test/",
         },
         "realm.test.auth" => $self->auth_config,
-        "realm.test.workflow.def" => {},
+        "realm.test.workflow" => {
+            def => {}, # node is required by OpenXPKI
+            persister => {
+                # fallback default persister
+                OpenXPKI => {
+                    class => "OpenXPKI::Server::Workflow::Persister::DBI",
+                },
+            },
+        },
     );
 
     # Add user supplied config (via constructor argument "add_config")

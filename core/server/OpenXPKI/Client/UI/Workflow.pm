@@ -16,10 +16,15 @@ use Try::Tiny;
 use MIME::Base64;
 use OpenXPKI::DateTime;
 use OpenXPKI::Debug;
-use OpenXPKI::i18n qw( i18nTokenizer );
+use OpenXPKI::i18n qw( i18nTokenizer i18nGettext );
+
+
+extends 'OpenXPKI::Client::UI::Result';
+
 
 # used to cache static patterns like the creator lookup
 my $template_cache = Cache::LRU->new( size => 256 );
+
 
 has __default_grid_head => (
     is => 'rw',
@@ -82,20 +87,6 @@ has __default_wfdetails => (
     ] },
 );
 
-has __proc_states_for_search  => (
-    is => 'rw',
-    isa => 'ArrayRef',
-    lazy => 1,
-    default => sub { return [
-        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL', value => 'manual' },
-        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE', value => 'pause' },
-        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED', value => 'retry_exceeded' },
-        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION', value => 'exception' },
-        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED', value => 'finished' },
-        { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_ARCHIVED', value => 'archived' },
-    ]; }
-);
-
 has __validity_options => (
     is => 'rw',
     isa => 'ArrayRef',
@@ -107,7 +98,50 @@ has __validity_options => (
     ];}
 );
 
-extends 'OpenXPKI::Client::UI::Result';
+has __proc_state_i18n => (
+    is => 'ro', isa => 'HashRef', lazy => 1, init_arg => undef,
+    default => sub { return {
+        # label = short label
+        #   - heading for workflow info popup (workflow search results)
+        #   - search dropdown
+        #   - technical info block on workflow page
+        #
+        # desc = description
+        #   - workflow info popup (workflow search results)
+        running => {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_LABEL',
+            desc =>  'I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_DESC',
+        },
+        manual => {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_MANUAL_LABEL',
+            desc =>  'I18N_OPENXPKI_UI_WORKFLOW_INFO_MANUAL_DESC',
+        },
+        finished => {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_LABEL',
+            desc =>  'I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_DESC',
+        },
+        pause => {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_PAUSE_LABEL',
+            desc =>  'I18N_OPENXPKI_UI_WORKFLOW_INFO_PAUSE_DESC',
+        },
+        exception => {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_LABEL',
+            desc =>  'I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_DESC',
+        },
+        retry_exceeded => {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_RETRY_EXCEEDED_LABEL',
+            desc =>  'I18N_OPENXPKI_UI_WORKFLOW_INFO_RETRY_EXCEEDED_DESC',
+        },
+        archived => {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_ARCHIVED_LABEL',
+            desc =>  'I18N_OPENXPKI_UI_WORKFLOW_INFO_ARCHIVED_DESC',
+        },
+        failed => {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_FAILED_LABEL',
+            desc =>  'I18N_OPENXPKI_UI_WORKFLOW_INFO_FAILED_DESC',
+        },
+    } },
+);
 
 =head1 OpenXPKI::Client::UI::Workflow
 
@@ -390,7 +424,7 @@ sub init_info {
         name => "error_code",
         value => $wf_info->{workflow}->{context}->{error_code},
     } if ($wf_info->{workflow}->{context}->{error_code}
-        && $wf_info->{workflow}->{proc_state} =~ m{(manual|finished)});
+        && $wf_info->{workflow}->{proc_state} =~ m{(manual|finished|failed)});
 
     # The workflow info contains info about all control actions that
     # can be done on the workflow -> render appropriate buttons.
@@ -441,26 +475,13 @@ sub init_info {
         isLarge => 1,
     });
 
-    #I18N_OPENXPKI_UI_WORKFLOW_INFO_ARCHIVED_LABEL
-    #I18N_OPENXPKI_UI_WORKFLOW_INFO_ARCHIVED_DESC
-    #I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_LABEL
-    #I18N_OPENXPKI_UI_WORKFLOW_INFO_MANUAL_LABEL
-    #I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_LABEL
-    #I18N_OPENXPKI_UI_WORKFLOW_INFO_PAUSE_LABEL
-    #I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_LABEL
-    #I18N_OPENXPKI_UI_WORKFLOW_INFO_RETRY_EXCEEDED_LABEL
-    #I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_DESC
-    #I18N_OPENXPKI_UI_WORKFLOW_INFO_MANUAL_DESC
-    #I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_DESC
-    #I18N_OPENXPKI_UI_WORKFLOW_INFO_PAUSE_DESC
-    #I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_DESC
-    #I18N_OPENXPKI_UI_WORKFLOW_INFO_RETRY_EXCEEDED_DESC
+    my $proc_state = $wf_info->{workflow}->{proc_state};
 
     $self->add_section({
         type => 'keyvalue',
         content => {
-            label => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_'.uc( $wf_info->{workflow}->{proc_state} ).'_LABEL',
-            description => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_'.uc( $wf_info->{workflow}->{proc_state} ).'_DESC',
+            label => $self->__get_proc_state_label($proc_state),
+            description => $self->__get_proc_state_desc($proc_state),
             data => $fields,
             buttons => \@buttons_handle,
     }});
@@ -521,6 +542,13 @@ sub init_search {
     my @wfl_list = map { {'value' => $_, 'label' => $workflows->{$_}->{label}} } @wf_names ;
     @wfl_list = sort { lc($a->{'label'}) cmp lc($b->{'label'}) } @wfl_list;
 
+    my $proc_states = [
+        sort { $a->{label} cmp $b->{label} }
+        map { { label => i18nGettext($self->__get_proc_state_label($_)), value => $_} }
+        grep { $_ ne 'running' }
+        keys %{ $self->__proc_state_i18n }
+    ];
+
     my @fields = (
         { name => 'wf_type',
           label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_LABEL',
@@ -536,7 +564,7 @@ sub init_search {
           type => 'select',
           is_optional => 1,
           prompt => '',
-          options => $self->__proc_states_for_search(),
+          options => $proc_states,
           value => $preset->{wf_proc_state}
         },
         { name => 'wf_state',
@@ -1469,45 +1497,44 @@ sub action_search {
     my $verbose = {};
     my $input;
 
-    if ($self->param('wf_type')) {
-        $query->{type} = $self->param('wf_type');
-        $input->{wf_type} = $self->param('wf_type');
-        $verbose->{wf_type} = $self->param('wf_type');
-
+    if (my $type = $self->param('wf_type')) {
+        $query->{type} = $type;
+        $input->{wf_type} = $type;
+        $verbose->{wf_type} = $type;
     }
 
-    if ($self->param('wf_state')) {
-        $query->{state} = $self->param('wf_state');
-        $input->{wf_state} = $self->param('wf_state');
-        $verbose->{wf_state} = $self->param('wf_state');
+    if (my $state = $self->param('wf_state')) {
+        $query->{state} = $state;
+        $input->{wf_state} = $state;
+        $verbose->{wf_state} = $state;
     }
 
-    if ($self->param('wf_proc_state')) {
-        $query->{proc_state} = $self->param('wf_proc_state');
-        $input->{wf_proc_state} = $self->param('wf_proc_state');
-        $verbose->{wf_proc_state} = 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_' . uc($self->param('wf_proc_state'));
+    if (my $proc_state = $self->param('wf_proc_state')) {
+        $query->{proc_state} = $proc_state;
+        $input->{wf_proc_state} = $proc_state;
+        $verbose->{wf_proc_state} = $self->__get_proc_state_label($proc_state);
     }
 
-    if ($self->param('last_update_before')) {
-        $query->{last_update_before} = $self->param('last_update_before');
-        $input->{last_update} = { key => 'last_update_before', value => $self->param('last_update_before') };
-        $verbose->{last_update_before} = DateTime->from_epoch( epoch => $self->param('last_update_before') )->iso8601();
+    if (my $last_update_before = $self->param('last_update_before')) {
+        $query->{last_update_before} = $last_update_before;
+        $input->{last_update} = { key => 'last_update_before', value => $last_update_before };
+        $verbose->{last_update_before} = DateTime->from_epoch( epoch => $last_update_before )->iso8601();
     }
 
-    if ($self->param('last_update_after')) {
-        $query->{last_update_after} = $self->param('last_update_after');
-        $input->{last_update} = { key => 'last_update_after', value => $self->param('last_update_after') };
-        $verbose->{last_update_after} = DateTime->from_epoch( epoch => $self->param('last_update_after') )->iso8601();
+    if (my $last_update_after = $self->param('last_update_after')) {
+        $query->{last_update_after} = $last_update_after;
+        $input->{last_update} = { key => 'last_update_after', value => $last_update_after };
+        $verbose->{last_update_after} = DateTime->from_epoch( epoch => $last_update_after )->iso8601();
     }
 
     # Read the query pattern for extra attributes from the session
     my $spec = $self->_session->param('wfsearch')->{default};
     my $attr = $self->__build_attribute_subquery( $spec->{attributes} );
 
-    if ($self->param('wf_creator')) {
-        $input->{wf_creator} = $self->param('wf_creator');
-        $attr->{'creator'} = scalar $self->param('wf_creator');
-        $verbose->{wf_creator} = $self->param('wf_creator');
+    if (my $wf_creator = $self->param('wf_creator')) {
+        $input->{wf_creator} = $wf_creator;
+        $attr->{'creator'} = scalar $wf_creator;
+        $verbose->{wf_creator} = $wf_creator;
     }
 
     if ($attr) {
@@ -1937,8 +1964,14 @@ sub __render_from_workflow {
         return  $description || $page_def->{description} || '';
     };
 
-    # check if the workflow is in a "non-regular" state
-    if (grep /$wf_proc_state/, ('pause','retry_exceeded','exception', 'running')) {
+    # show buttons to proceed with workflow if it's in "non-regular" state
+    my %irregular = (
+        running => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_DESC',
+        pause => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC',
+        exception => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESC',
+        retry_exceeded => 'I18N_OPENXPKI_UI_WORKFLOW_STATE_RETRY_EXCEEDED_DESC',
+    );
+    if ($irregular{$wf_proc_state}) {
 
         # same page head for all proc states
         my $wf_action = $wf_info->{workflow}->{context}->{wf_current_action};
@@ -1948,19 +1981,17 @@ sub __render_from_workflow {
             push @breadcrumb, { className => 'workflow-state', label => $wf_info->{state}->{label} };
         }
 
+        my $label = $self->__get_proc_state_label($wf_proc_state); # reuse labels from init_info popup
+        my $desc = $irregular{$wf_proc_state};
+
         $self->_page({
-            # reuse labels from init_info popup
-            label => sprintf("I18N_OPENXPKI_UI_WORKFLOW_INFO_%s_LABEL", uc($wf_proc_state)),
+            label => $label,
             breadcrumb => \@breadcrumb,
             shortlabel => $wf_info->{workflow}->{id},
-            description => sprintf("I18N_OPENXPKI_UI_WORKFLOW_STATE_%s_DESC", uc($wf_proc_state)),
+            description => $desc,
             className => 'workflow workflow-proc-state workflow-proc-'.$wf_proc_state,
             ($wf_info->{workflow}->{id} ? (canonical_uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}) : ()),
         });
-        #I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_DESC
-        #I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC
-        #I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESC
-        #I18N_OPENXPKI_UI_WORKFLOW_STATE_RETRY_EXCEEDED_DESC
 
         my @buttons;
         my @fields;
@@ -2239,6 +2270,10 @@ sub __render_from_workflow {
         # Archived workflow
         } elsif ('archived' eq $wf_proc_state) {
             $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED', 'info');
+
+        # Forcibly failed workflow
+        } elsif ('failed' eq $wf_proc_state) {
+            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILED', 'error');
         }
 
         my $fields = $self->__render_fields( $wf_info, $view );
@@ -2770,16 +2805,10 @@ sub __render_result_list {
                 if ($field eq "workflow_state") {
                     my $state = $wf_item->{'workflow_state'};
                     my $proc_state = $wf_item->{'workflow_proc_state'};
-                    if ($proc_state eq 'exception') {
-                        $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION )";
 
-                    } elsif ($proc_state eq 'pause') {
-                        $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE )";
-
-                    } elsif ($proc_state eq 'retry_exceeded') {
-                        $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED )";
-
-                    }
+                    if (grep /\A $proc_state \Z/x, qw( exception pause retry_exceeded failed )) {
+                        $state .= sprintf(" (%s)", $self->__get_proc_state_label($proc_state));
+                    };
                     push @line, $state;
                 } else {
                     push @line, $wf_item->{ $field };
@@ -3491,6 +3520,8 @@ sub __render_workflow_info {
             $value = $wfdetails_info->{attribute}->{$1} // '-';
         } elsif ($field =~ m{\A context\.(\S+) }xi) {
             $value = $wfdetails_info->{context}->{$1} // '-';
+        } elsif ($field eq 'proc_state') {
+            $value = $self->__get_proc_state_label($wfdetails_info->{$field});
         } elsif ($field) {
             $value = $wfdetails_info->{$field} // '-';
         }
@@ -3740,6 +3771,16 @@ sub __check_for_validation_error {
         return $field_errors;
     }
     return;
+}
+
+sub __get_proc_state_label {
+    my ($self, $proc_state) = @_;
+    return $proc_state ? $self->__proc_state_i18n->{$proc_state}->{label} : '-';
+}
+
+sub __get_proc_state_desc {
+    my ($self, $proc_state) = @_;
+    return $proc_state ? $self->__proc_state_i18n->{$proc_state}->{desc} : '-';
 }
 
 =head1 example workflow config

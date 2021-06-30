@@ -2522,7 +2522,19 @@ msgstr "Creator"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE"
 msgstr "Creator"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_ANONYMOUS"
+msgstr "Creator"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_LABEL"
+msgstr "Creator"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_NO_NAMESPACE"
+msgstr "Creator"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_UNABLE_TO_RESOLVE"
 msgstr "Creator"
 
 #, fuzzy
@@ -3539,8 +3551,12 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL"
 msgstr "Workflow Id"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO"
-msgstr "Action"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_ARCHIVED_DESC"
+msgstr "superato il limite dei retry"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_ARCHIVED_LABEL"
+msgstr "superato il limite dei retry"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_DESC"
@@ -3549,6 +3565,18 @@ msgstr "Id Transazione di questa richiesta SCEP"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_LABEL"
 msgstr "Azione"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FAILED_DESC"
+msgstr ""
+"Attiva questo flag per forzare la creazione di una nuova Lista Revoche "
+"(CRL). Di default, una nuova Lista Revoche viene generata solo se ci sono "
+"nuove revoche di certificati, o se la validità della Lista Revoche attuale è "
+"prossima alla scadenza (proprietà prossimo aggiornamento)."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FAILED_LABEL"
+msgstr "Workflow Id"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_DESC"
@@ -3698,31 +3726,8 @@ msgstr "Motivo Sospensione"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL"
 msgstr "Motivo Sospensione"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE"
-msgstr "Stato Esecuzione"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_ARCHIVED"
-msgstr "Stato Esecuzione"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
-msgstr "eccezione"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED"
-msgstr "completato"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL"
 msgstr "Stato Esecuzione"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL"
-msgstr "manuale"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE"
-msgstr "in pausa"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
-msgstr "superato il limite dei retry"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE"
@@ -3861,10 +3866,6 @@ msgstr "SUCCESSO"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_START_BUTTON"
 msgstr "Forza Ripristino"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE"
-msgstr "Stato Esecuzione"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_CHOOSE_ACTION_DESC"
@@ -4185,6 +4186,10 @@ msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_LABEL"
 msgstr "SUCCESSO"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILED"
+msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_DESC"
 msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
 
@@ -4242,6 +4247,14 @@ msgstr "Le modifiche sono state salvate in via definitiva nel database."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
 msgstr "I Metadati sono stati aggiornati"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_DESC"
+msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_LABEL"
+msgstr "In Attesa di Approvazione"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC"
@@ -4532,6 +4545,17 @@ msgstr "SCEP Endpoint"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "Tipo"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_DESC"
+msgstr ""
+"Pubblica le Informazioni sulla Autorità di certificazione (CA, Certification "
+"Authority), ovvero Certificati della CA e Liste Revoche (CRL) in archivi "
+"predefiniti."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_LABEL"
+msgstr "Pubblica Informazioni CA"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_DESC"
@@ -6017,11 +6041,38 @@ msgstr "Chiave"
 #~ msgstr "RSA is the standard for encryption and signature"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO"
+#~ msgstr "Action"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_CANCEL"
 #~ msgstr "continua"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_RESET"
 #~ msgstr "torna indietro"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_ARCHIVED"
+#~ msgstr "Stato Esecuzione"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
+#~ msgstr "eccezione"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FAILED"
+#~ msgstr "completato"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED"
+#~ msgstr "completato"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL"
+#~ msgstr "manuale"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE"
+#~ msgstr "in pausa"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
+#~ msgstr "superato il limite dei retry"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DETAIL_FIELD_VALID_AT_DESCRIPTION"
@@ -6035,6 +6086,10 @@ msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_WORKFLOW_ID_LABEL"
 #~ msgstr "ID Workflow"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE"
+#~ msgstr "Stato Esecuzione"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED_DESC"

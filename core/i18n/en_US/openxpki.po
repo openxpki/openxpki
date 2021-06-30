@@ -368,6 +368,27 @@ msgstr "Challenge password"
 msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
 msgstr "Key generation failed"
 
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST"
+msgstr "Yes"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
+msgstr "This is just a prefix"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT"
+msgstr "This is just a prefix"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
+msgstr "unspecified / other reason"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
+msgstr "This is just a prefix"
+
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "Delayed revocation requested."
 
@@ -1990,8 +2011,8 @@ msgstr "Please update / complete the information below."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Update Request"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AFTER_LABEL"
-msgstr "Archive at/after"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
+msgstr "Archive at"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Workflow Attributes"
@@ -2873,23 +2894,23 @@ msgstr ""
 "undone!</b><br><br>Pressing 'Abort' will leave the workflow untouched."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_BUTTON"
-msgstr "Force Failure"
+msgstr "Discard"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_CANCEL_BUTTON"
-msgstr "Abort"
+msgstr "Back"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_CONFIRM_BUTTON"
-msgstr "Fail Workflow"
+msgstr "Discard Workflow"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_LABEL"
-msgstr "Fail Workflow"
+msgstr "Discard Workflow"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_FAILURE_DIALOG_TEXT"
 msgstr ""
-"Press the confirm button to mark this workflow as failed. This will "
-"immediately stop all actions on this workflow and mark it as failed. <b>This "
-"action can not be undone!</b><br><br>If you want to keep this workflow, "
-"press the abort button to close this window without touching the workflow."
+"Press <i>Discard Workflow</i> to mark this workflow as failed. This will not "
+"run any more actions on this workflow and immediately stop it. <b>This "
+"action can not be undone!</b><br><br>To continue with the workflow, press "
+"the <i>Back</i> button."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FORCE_RESET_BUTTON"
 msgstr "Reset"
@@ -2971,11 +2992,10 @@ msgstr "User"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ID_LABEL"
 msgstr "Workflow Id"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO"
-msgstr "Technical Log"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_ARCHIVED_DESC"
-msgstr "This workflow was archived."
+msgstr ""
+"This workflow has been archived. Use the 'Open Workflow' button to show the "
+"details of the workflow."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_ARCHIVED_LABEL"
 msgstr "Archived"
@@ -2990,13 +3010,21 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_LABEL"
 msgstr "Unexpected error"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FAILED_DESC"
+msgstr ""
+"This workflow has been manually discarded. Use the 'Open Workflow' button to "
+"show more details."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FAILED_LABEL"
+msgstr "Discarded"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_DESC"
 msgstr ""
 "This workflow is in a final state. Use the 'Open Workflow' button to show "
-"the details of the workflow."
+"more details."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_LABEL"
-msgstr "Workflow finished"
+msgstr "Finished"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_MANUAL_DESC"
 msgstr ""
@@ -3015,7 +3043,7 @@ msgstr ""
 "(additional authorization might be required)."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_PAUSE_LABEL"
-msgstr "Workflow paused"
+msgstr "Paused"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_RETRY_EXCEEDED_DESC"
 msgstr ""
@@ -3030,7 +3058,7 @@ msgstr "Loop retries exceeded"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_DESC"
 msgstr ""
 "This workflow is currently executed by the server. Use the 'Open Workflow' "
-"button to show the details of the workflow."
+"button to show more details."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_LABEL"
 msgstr "Workflow running"
@@ -3120,29 +3148,8 @@ msgstr "Paused action"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL"
 msgstr "Pause Reason"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE"
-msgstr "Process State"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_ARCHIVED"
-msgstr "archived"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
-msgstr "exception"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED"
-msgstr "finished"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL"
 msgstr "Run State"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL"
-msgstr "manual"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE"
-msgstr "paused"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
-msgstr "retry exceeded"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE"
 msgstr "Access to this workflow property is forbidden for your current role"
@@ -3264,9 +3271,6 @@ msgstr "Message set"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_START_BUTTON"
 msgstr "Start Workflow"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE"
-msgstr "State"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ADDUSER_CHOOSE_ACTION_DESC"
 msgstr ""
@@ -3552,6 +3556,9 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_SUCCESS_LABEL"
 msgstr "SUCCESS"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILED"
+msgstr "This workflow failed finally"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILURE_DESC"
 msgstr "This workflow failed finally and can not be restarted"
@@ -3965,30 +3972,9 @@ msgstr "Wake Up"
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Yes"
 
-# Remove?
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CUST"
-#~ msgstr "Yes"
-
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
 #~ msgstr "Creator"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
-#~ msgstr "This is just a prefix"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT"
-#~ msgstr "This is just a prefix"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
-#~ msgstr "unspecified / other reason"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
-#~ msgstr "This is just a prefix"
 
 #~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_KEY_POLICY_FAILED"
 #~ msgstr "Key policy failed (wrong size/algorithm)"
@@ -4272,6 +4258,33 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_SUBJECT_MATCH_LABEL"
 #~ msgstr "Request Subject Matches"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO"
+#~ msgstr "Technical Log"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_ARCHIVED"
+#~ msgstr "archived"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
+#~ msgstr "exception"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FAILED"
+#~ msgstr "failed"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED"
+#~ msgstr "finished"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL"
+#~ msgstr "manual"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE"
+#~ msgstr "paused"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
+#~ msgstr "retry exceeded"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE"
+#~ msgstr "State"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_INITIAL_DESC"
