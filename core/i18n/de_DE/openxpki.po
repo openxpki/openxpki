@@ -3152,7 +3152,7 @@ msgstr ""
 "Detailanischt des aktuellen Status."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_ARCHIVED_LABEL"
-msgstr "Workflow archiviert"
+msgstr "Archiviert"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_DESC"
 msgstr ""
@@ -3178,7 +3178,7 @@ msgstr ""
 "Detailanischt des aktuellen Status."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_LABEL"
-msgstr "Workflow beendet"
+msgstr "Beendet"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_MANUAL_DESC"
 msgstr ""
@@ -3187,7 +3187,7 @@ msgstr ""
 "den möglichen nächsten Aktionen."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_MANUAL_LABEL"
-msgstr "Workflow in Bearbeitung"
+msgstr "In Bearbeitung"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_PAUSE_DESC"
 msgstr ""
@@ -3197,7 +3197,7 @@ msgstr ""
 "(entsprechende Berechtigung erforderlich)."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_PAUSE_LABEL"
-msgstr "Workflow pausiert"
+msgstr "Pausiert"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_RETRY_EXCEEDED_DESC"
 msgstr ""
@@ -3216,7 +3216,7 @@ msgstr ""
 "öffnen' gelangen Sie zur Detailanischt des aktuellen Status."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_LABEL"
-msgstr "Workflow wird ausgeführt"
+msgstr "Wird ausgeführt"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN"
 msgstr "Ungültige Anforderung - Aktion ohne Token"
@@ -3309,29 +3309,8 @@ msgstr "Grund"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE"
 msgstr "Zustand"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_ARCHIVED"
-msgstr "archiviert"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
-msgstr "exception"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FAILED"
-msgstr "fehlgeschlagen"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED"
-msgstr "abgeschlossen"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL"
 msgstr "Status"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL"
-msgstr "manuell"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE"
-msgstr "pausiert"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
-msgstr "zu viele Fehlversuche"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE"
 msgstr ""
@@ -4528,6 +4507,27 @@ msgstr "ja"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO"
 #~ msgstr "Technische Informationen"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_ARCHIVED"
+#~ msgstr "archiviert"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
+#~ msgstr "exception"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FAILED"
+#~ msgstr "fehlgeschlagen"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED"
+#~ msgstr "abgeschlossen"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL"
+#~ msgstr "manuell"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE"
+#~ msgstr "pausiert"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
+#~ msgstr "zu viele Fehlversuche"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE"
 #~ msgstr "Workflow Status"

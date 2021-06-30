@@ -3322,31 +3322,8 @@ msgstr "停止理由"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE"
 msgstr "プロセスの状態"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_ARCHIVED"
-msgstr "実行状態"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
-msgstr "例外"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FAILED"
-msgstr "完了"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED"
-msgstr "完了"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL"
 msgstr "実行状態"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL"
-msgstr "マニュアル"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE"
-msgstr "一時停止"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
-msgstr "再試行の回数が最大数を超えています"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE"
 msgstr ""
@@ -5429,6 +5406,29 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_RESET"
 #~ msgstr "リセット"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_ARCHIVED"
+#~ msgstr "実行状態"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
+#~ msgstr "例外"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FAILED"
+#~ msgstr "完了"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED"
+#~ msgstr "完了"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL"
+#~ msgstr "マニュアル"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE"
+#~ msgstr "一時停止"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
+#~ msgstr "再試行の回数が最大数を超えています"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DETAIL_FIELD_VALID_AT_DESCRIPTION"

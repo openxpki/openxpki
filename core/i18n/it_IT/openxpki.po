@@ -3718,31 +3718,8 @@ msgstr "Motivo Sospensione"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE"
 msgstr "Stato Esecuzione"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_ARCHIVED"
-msgstr "Stato Esecuzione"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
-msgstr "eccezione"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FAILED"
-msgstr "completato"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED"
-msgstr "completato"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL"
 msgstr "Stato Esecuzione"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL"
-msgstr "manuale"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE"
-msgstr "in pausa"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
-msgstr "superato il limite dei retry"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE"
@@ -6046,6 +6023,29 @@ msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_LABEL_RESET"
 #~ msgstr "torna indietro"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_ARCHIVED"
+#~ msgstr "Stato Esecuzione"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
+#~ msgstr "eccezione"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FAILED"
+#~ msgstr "completato"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED"
+#~ msgstr "completato"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL"
+#~ msgstr "manuale"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE"
+#~ msgstr "in pausa"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
+#~ msgstr "superato il limite dei retry"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DETAIL_FIELD_VALID_AT_DESCRIPTION"

@@ -3179,31 +3179,8 @@ msgstr "暂停原因"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE"
 msgstr "处理状态"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_ARCHIVED"
-msgstr "运行状态"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
-msgstr "异常"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FAILED"
-msgstr "完成"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED"
-msgstr "完成"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL"
 msgstr "运行状态"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL"
-msgstr "手动"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE"
-msgstr "暂停"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
-msgstr "重试超出"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE"
 msgstr "您当前的角色禁止访问此工作流程属性"
@@ -4288,6 +4265,29 @@ msgstr "是"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO"
 #~ msgstr "技术日志"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_ARCHIVED"
+#~ msgstr "运行状态"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
+#~ msgstr "异常"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FAILED"
+#~ msgstr "完成"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED"
+#~ msgstr "完成"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL"
+#~ msgstr "手动"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE"
+#~ msgstr "暂停"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
+#~ msgstr "重试超出"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE"
 #~ msgstr "处理状态"

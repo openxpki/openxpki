@@ -16,7 +16,7 @@ use Try::Tiny;
 use MIME::Base64;
 use OpenXPKI::DateTime;
 use OpenXPKI::Debug;
-use OpenXPKI::i18n qw( i18nTokenizer );
+use OpenXPKI::i18n qw( i18nTokenizer i18nGettext );
 
 
 extends 'OpenXPKI::Client::UI::Result';
@@ -104,41 +104,35 @@ has __proc_state_i18n => (
         running => {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_LABEL',
             desc =>  'I18N_OPENXPKI_UI_WORKFLOW_INFO_RUNNING_DESC',
+            hide_from_search_dropdown => 1,
         },
         manual => {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_MANUAL_LABEL',
             desc =>  'I18N_OPENXPKI_UI_WORKFLOW_INFO_MANUAL_DESC',
-            search => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL',
         },
         finished => {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_LABEL',
             desc =>  'I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_DESC',
-            search => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED',
         },
         pause => {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_PAUSE_LABEL',
             desc =>  'I18N_OPENXPKI_UI_WORKFLOW_INFO_PAUSE_DESC',
-            search => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE',
         },
         exception => {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_LABEL',
             desc =>  'I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_DESC',
-            search => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION',
         },
         retry_exceeded => {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_RETRY_EXCEEDED_LABEL',
             desc =>  'I18N_OPENXPKI_UI_WORKFLOW_INFO_RETRY_EXCEEDED_DESC',
-            search => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED',
         },
         archived => {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_ARCHIVED_LABEL',
             desc =>  'I18N_OPENXPKI_UI_WORKFLOW_INFO_ARCHIVED_DESC',
-            search => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_ARCHIVED',
         },
         failed => {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_INFO_FAILED_LABEL',
             desc =>  'I18N_OPENXPKI_UI_WORKFLOW_INFO_FAILED_DESC',
-            search => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FAILED',
         },
     } },
 );
@@ -554,8 +548,9 @@ sub init_search {
 
     my $i18n = $self->__proc_state_i18n;
     my $proc_states = [
-        map { { label => $i18n->{$_}->{search}, value => $_} }
-        grep { $i18n->{$_}->{search} }
+        sort { $a->{label} cmp $b->{label} }
+        map { { label => i18nGettext($i18n->{$_}->{label}), value => $_} }
+        grep { not $i18n->{$_}->{hide_from_search_dropdown} }
         keys %{$i18n}
     ];
 
@@ -2811,13 +2806,13 @@ sub __render_result_list {
                     my $state = $wf_item->{'workflow_state'};
                     my $proc_state = $wf_item->{'workflow_proc_state'};
                     if ($proc_state eq 'exception') {
-                        $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION )";
+                        $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_INFO_EXCEPTION_LABEL )";
 
                     } elsif ($proc_state eq 'pause') {
-                        $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE )";
+                        $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_INFO_PAUSE_LABEL )";
 
                     } elsif ($proc_state eq 'retry_exceeded') {
-                        $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED )";
+                        $state .= " ( I18N_OPENXPKI_UI_WORKFLOW_INFO_RETRY_EXCEEDED_LABEL )";
 
                     }
                     push @line, $state;
