@@ -69,13 +69,13 @@ sub _validate {
         validation_error('I18N_OPENXPKI_UI_VALIDATOR_KEY_PARAM_ALGO_NOT_ALLOWED');
     }
 
-    my $params = CTX('api2')->get_key_params( profile => $cert_profile, alg => $key_alg, showall => 1 );
+    my $key_rules = CTX('api2')->get_key_params( profile => $cert_profile, alg => $key_alg, showall => 1 );
 
     ##! 32: 'Params expected ' . Dumper $params
 
-    my $result = CTX('api2')->validate_key_params(
-        key_params => $key_params,
-        key_rules => $params,
+    my $result = CTX('api2')->validate_ruleset(
+        input => $key_params,
+        ruleset => $key_rules,
     );
 
     if (@{$result}) {

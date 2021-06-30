@@ -1,9 +1,9 @@
-package OpenXPKI::Server::API2::Plugin::Crypto::validate_key_params;
+package OpenXPKI::Server::API2::Plugin::Crypto::validate_ruleset;
 use OpenXPKI::Server::API2::EasyPlugin;
 
 =head1 NAME
 
-OpenXPKI::Server::API2::Plugin::Crypto::validate_key_params
+OpenXPKI::Server::API2::Plugin::Crypto::validate_ruleset
 
 =head1 COMMANDS
 
@@ -15,14 +15,11 @@ use Data::Dumper;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
-# TODO needs to be renamed as digest check is not key related
+=head2 validate_ruleset
 
-=head2 validate_key_params
+Check if input data matches a defined ruleset.
 
-Check if all given key params match the defined rules.
-
-Expects a hash with the current key params and a hash with the key
-definition as defined in the profile section.
+Expects a hash with the params to validate and a hash with a ruleset.
 
 The leafes of the rules can be either a list or a single item. The
 special term I<_any> matches any value (even if the key is not set!)
@@ -31,9 +28,10 @@ For I<key_length> you can give a discret number or a range min:max,
 borders are included. You can leave out the upper side (e.g. 1024:)
 which will match any size above, to avoid a lower limit set it to "0"
 
-You can add arbitrary attributes which will result in a "is contained
-in list" operation. The attribute I<digest_alg> has an expansion from
-I<sha2> to I<sha224 sha256 sha384 sha512>.
+The attribute I<digest_alg> has an expansion from I<sha2> to
+I<sha224 sha256 sha384 sha512>.
+
+Any other attributes will result in a "is contained in list" operation.
 
 Return is a list with all parameter names that failed validation.
 
@@ -41,11 +39,11 @@ B<Parameters>
 
 =over
 
-=item * C<key_params> I<Hash>
+=item * C<input> I<Hash>
 
 the hash with the keys properties
 
-=item * C<key_rules> I<Hash>
+=item * C<ruleset> I<Hash>
 
 the hash with the rules as defined in the profile, the attribute
 name (e.g. I<key_length>) must be the key of the first level.
@@ -54,9 +52,9 @@ name (e.g. I<key_length>) must be the key of the first level.
 
 B<Example>
 
-    validate_key_params({
-        key_params => { key_length => 512 }
-        key_rules => {
+    validate_ruleset({
+        input => { key_length => 512 }
+        ruleset => {
             key_length =>  [
                 _1024, # explicit length, hidden in UI
                 2048,  # explicit length, shown in UI selectors
@@ -70,26 +68,27 @@ Will result in
    [ key_length ]
 
 =cut
-command "validate_key_params" => {
-    key_params => { isa => 'HashRef', required => 1,  },
-    key_rules => { isa => 'HashRef', required => 1, },
+
+command "validate_ruleset" => {
+    input => { isa => 'HashRef', required => 1,  },
+    ruleset => { isa => 'HashRef', required => 1, },
 } => sub {
     my ($self, $params) = @_;
 
-    my $key_params = $params->key_params;
-    my $key_rules = $params->key_rules;
+    my $input = $params->input;
+    my $ruleset = $params->ruleset;
 
-    ##! 16: 'Params ' . Dumper $key_params
-    ##! 16: 'Rules ' . Dumper $key_rules
+    ##! 16: 'Input ' . Dumper $input
+    ##! 16: 'Rules ' . Dumper $ruleset
 
     my @error;
 
     ATTR:
-    foreach my $attr (keys %{$key_rules}) {
+    foreach my $attr (keys %{$ruleset}) {
 
-        my $val = $key_params->{$attr} || '';
+        my $val = $input->{$attr} || '';
 
-        my @expect = (!ref $key_rules->{$attr}) ? ($key_rules->{$attr}) : @{$key_rules->{$attr}};
+        my @expect = (!ref $ruleset->{$attr}) ? ($ruleset->{$attr}) : @{$ruleset->{$attr}};
 
         if (grep(/\A_any\z/, @expect)) {
             next ATTR;
@@ -119,7 +118,7 @@ command "validate_key_params" => {
         }
 
         if ($attr eq 'digest_alg') {
-            if (grep {$_ eq 'sha2'}, @expect)) {
+            if (grep {$_ eq 'sha2'} @expect) {
                 push @expect, ('sha224','sha256','sha384','sha512');
             }
         }
@@ -131,6 +130,29 @@ command "validate_key_params" => {
     }
 
     return \@error;
+};
+
+
+=head2 validate_key_params
+
+Alias to validate_ruleset for backward compatibility, the input
+parameters are mapped as is to the new method.
+
+B<Parameters>
+
+=over
+
+=item * C<key_params> I<Hash>
+
+=item * C<key_rules> I<Hash>
+
+=cut
+command "validate_key_params" => {
+    key_params => { isa => 'HashRef', required => 1,  },
+    key_rules => { isa => 'HashRef', required => 1, },
+} => sub {
+    my ($self, $params) = @_;
+    return $self->api->validate_ruleset( input => $params->key_params, ruleset => $params->key_rules );
 };
 
 __PACKAGE__->meta->make_immutable;

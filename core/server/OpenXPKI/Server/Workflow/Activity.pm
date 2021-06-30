@@ -7,6 +7,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Workflow::Pause;
+use OpenXPKI::Server::Workflow::Helpers;
 use Workflow::Exception qw( workflow_error configuration_error );
 use Data::Dumper;
 
@@ -165,7 +166,7 @@ sub param {
         return $self->{PARAMS}{$name};
     } else {
         my $map = $self->_map();
-        return undef unless ( defined $map->{$name});
+        return unless ( defined $map->{$name}) ;
         return unless ($map->{$name});
         ##! 16: 'query for mapped key ' . $name
 
@@ -216,40 +217,11 @@ sub param {
             return $out;
         }
     }
-    return undef;
+    return;
 }
 
 sub _get_service_config_path {
-
-    my $self = shift;
-    my $default_path = shift;
-
-    my @prefix;
-
-    if (my $config_path = $self->param('config_path')) {
-        ##! 32: 'Explicit config path is set ' . $config_path
-        @prefix = split /\./, $config_path;
-    # auto create from interface and server in context if not set
-    } else {
-        my $context = $self->workflow()->context();
-        my $interface = $context->param('interface');
-        my $server = $context->param('server');
-
-        if (!$server || !$interface) {
-            configuration_error('Neither config_path nor interface/server is set!');
-        }
-
-        @prefix = ( $interface, $server );
-        if (ref $default_path) {
-            push @prefix, @{$default_path};
-        } else {
-            push @prefix, $default_path;
-        }
-        ##! 32: 'Autobuild config_path from interface ' . join ".", @prefix
-    }
-
-    return \@prefix;
-
+    return OpenXPKI::Server::Workflow::Helpers::get_service_config_path( @_ );
 }
 
 sub get_max_allowed_retries{

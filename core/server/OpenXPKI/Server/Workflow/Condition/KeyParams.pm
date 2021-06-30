@@ -59,9 +59,9 @@ sub _evaluate
 
     ##! 32: 'Params expected ' . Dumper $params
 
-    my $result = CTX('api2')->validate_key_params(
-        key_params => $key_params,
-        key_rules => $key_rules,
+    my $result = CTX('api2')->validate_ruleset(
+        input => $key_params,
+        ruleset => $key_rules,
     );
 
     if (@{$result}) {
@@ -104,12 +104,22 @@ the profile or from the key_rules parameter.
 
 =over
 
+=item key_alg
+
+The algorithm of the key, must match a key on the top level of
+the key_rules.
+
+=item key_params
+
+The parameters of the key to validate as hashref.
+
+=item key_rules
+
+Ruleset to validate against, if not given the paramter I<cert_profile>
+is mandatory and the rules are read from the profile definition.
+
 =item cert_profile
 
-Name of the certificate profile
-
-=item pkcs10
-
-PEM encoded PKCS10
+Name of the certificate profile, only used if I<key_rules> is not set.
 
 =back

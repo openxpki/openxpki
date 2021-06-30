@@ -245,7 +245,7 @@ OpenXPKI/Server/API2/Plugin/Control/purge_application_log.pm
 OpenXPKI/Server/API2/Plugin/Crypto/generate_key.pm
 OpenXPKI/Server/API2/Plugin/Crypto/get_key_identifier_from_data.pm
 OpenXPKI/Server/API2/Plugin/Crypto/get_random.pm
-OpenXPKI/Server/API2/Plugin/Crypto/validate_key_params.pm
+OpenXPKI/Server/API2/Plugin/Crypto/validate_ruleset.pm
 OpenXPKI/Server/API2/Plugin/Crypto/password_quality.pm
 OpenXPKI/Server/API2/Plugin/Crypto/password_quality/CheckEntropyRole.pm
 OpenXPKI/Server/API2/Plugin/Crypto/password_quality/CheckLegacyRole.pm
@@ -368,9 +368,9 @@ OpenXPKI/Workflow/Handler.pm
 
 OpenXPKI/Server/Watchdog.pm
 OpenXPKI/Server/Workflow.pm
+OpenXPKI/Server/Workflow/Helpers.pm
 OpenXPKI/Server/Workflow/Pause.pm
 OpenXPKI/Server/Workflow/Stub.pm
-
 
 OpenXPKI/Server/Workflow/WFObject.pm
 OpenXPKI/Server/Workflow/WFObject/WFArray.pm
@@ -504,6 +504,7 @@ OpenXPKI/Server/Workflow/Condition/KeyParams.pm
 OpenXPKI/Server/Workflow/Condition/SubjectsMatch.pm
 OpenXPKI/Server/Workflow/Condition/SubjectValid.pm
 OpenXPKI/Server/Workflow/Condition/UserExists.pm
+OpenXPKI/Server/Workflow/Condition/ValidateRuleset.pm
 OpenXPKI/Server/Workflow/Condition/WFArray.pm
 OpenXPKI/Server/Workflow/Condition/WFHash.pm
 OpenXPKI/Server/Workflow/Condition/WorkflowCreator.pm
