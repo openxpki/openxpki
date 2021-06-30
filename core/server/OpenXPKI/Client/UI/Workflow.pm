@@ -2806,7 +2806,7 @@ sub __render_result_list {
                     my $state = $wf_item->{'workflow_state'};
                     my $proc_state = $wf_item->{'workflow_proc_state'};
 
-                    if (grep /\A $proc_state \Z/x, qw( exception pause retry_exceeded )) {
+                    if (grep /\A $proc_state \Z/x, qw( exception pause retry_exceeded failed )) {
                         $state .= sprintf(" (%s)", $self->__get_proc_state_label($proc_state));
                     };
                     push @line, $state;
