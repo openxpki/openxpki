@@ -79,7 +79,10 @@ our $schema = "
         contentInfo EncryptedContentInfo
     }
 
-    RecipientInfos ::= SET OF RecipientInfo
+    RecipientInfos ::= CHOICE {
+        riSet       SET OF RecipientInfo,
+        riSequence  SEQUENCE OF RecipientInfo
+    }
 
     EncryptedContentInfo ::= SEQUENCE {
         contentType ContentType,
@@ -375,7 +378,8 @@ sub __build_envelope_enveloped_data {
     my $cc = $self->parsed()->{content};
 
     my $enc_oid = $cc->{contentInfo}->{contentEncryptionAlgorithm}->{algorithm};
-    my %key_enc_oid = map { $_->{keyEncryptionAlgorithm}->{algorithm} => 1 } @{$cc->{'recipientInfos'}};
+    my $ri = $cc->{'recipientInfos'}->{riSet} || $cc->{'recipientInfos'}->{riSequence};
+    my %key_enc_oid = map { $_->{keyEncryptionAlgorithm}->{algorithm} => 1 } @{$ri};
 
     return {
         enc_alg => $oids{$enc_oid} || $enc_oid,
@@ -394,7 +398,7 @@ sub __build_certlist {
 
 sub __build_rcptlist {
     my $self = shift;
-    my $ri = $self->parsed()->{content}->{recipientInfos};
+    my $ri = $self->parsed()->{content}->{'recipientInfos'}->{riSet} || $self->parsed()->{content}->{'recipientInfos'}->{riSequence};
     return [ map {
         {
             serialNumber => $_->{issuerAndSerialNumber}->{serialNumber},
