@@ -54,9 +54,9 @@ nvm exec npm install
 
 To run the web UI locally you have to:
 
-1. Start an OpenXPKI backend via Docker or Vagrant. It's expected to listen on localhost:8080
+1. Start an OpenXPKI backend via Docker or Vagrant. It's expected to listen on localhost:8443
 2. Now run the Ember based web UI with live reload (on code changes) via:
-   `npm run serve` (this calls "ember serve ..." and proxies AJAX requests to localhost:8080)
+   `npm run serve` (this calls "ember serve ..." and proxies AJAX requests to localhost:8443)
 3. Visit the web UI at [http://localhost:4200/openxpki/#/](http://localhost:4200/openxpki/#/).
 4. Visit tests at [http://localhost:4200/openxpki/#/test](http://localhost:4200/openxpki/#/test).
 
