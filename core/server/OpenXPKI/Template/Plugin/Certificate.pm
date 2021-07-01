@@ -313,12 +313,13 @@ Return the URIs of the CDPs contained in the certificate as arrayref.
 sub cdp {
 
     my $self = shift;
+    my $cert_id = shift;
 
-    my $pem = $self->pem( shift );
+    my $pem = $self->pem($cert_id);
     return unless($pem);
 
     my $x509 = OpenXPKI::Crypt::X509->new($pem);
-    return $x509_issuer->get_cdp();
+    return $x509->get_cdp();
 
 }
 
