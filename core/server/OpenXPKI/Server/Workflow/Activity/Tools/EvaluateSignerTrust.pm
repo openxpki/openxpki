@@ -194,7 +194,14 @@ sub execute {
     }
 
     if ($self->param('export_key_identifier')) {
-        $context->param( 'signer_subject_key_identifier' => $x509->get_subject_key_id() );
+        if ($self->param('export_key_identifier') eq 'hash') {
+            $context->param( 'signer_subject_key_identifier' => $x509->get_public_key_hash() );
+        } elsif ($self->param('export_key_identifier') eq 'both') {
+            $context->param( 'signer_public_key_hash' => $x509->get_public_key_hash());
+            $context->param( 'signer_subject_key_identifier' => $x509->get_subject_key_id() );
+        } else {
+            $context->param( 'signer_subject_key_identifier' => $x509->get_subject_key_id() );
+        }
     }
 
     my $rules = $self->param('rules');
@@ -355,10 +362,10 @@ the identifier of the signer certificate
 the subject of the signer certificate,
 only exported if export_subject parameter is set
 
-=item signer_subject_key_identifier
+=item signer_subject_key_identifier, signer_public_key_hash
 
-the signer_key_identifier of the signer certificate,
-only exported if export_key_identifier parameter is set
+the signer_key_identifier / public_key_hash of the signer
+certificate, see export_key_identifier parameter for details.
 
 =item signer_in_current_realm
 
@@ -458,7 +465,17 @@ Boolean, if set the signer_subject is exported to the context.
 
 =item export_key_identifier
 
-Boolean, if set the signer_subject_key_identifier is exported to the context.
+Export information about the signers subject_key_identifier. As there is
+an ambiguity on this term, you can switch the behaviour.
+
+The default behaviour on any true value is to write the key identifier
+read from the certificate to  I<signer_subject_key_identifier>. If you
+pass I<hash>, you get the value of the SHA1 hash of the public key as
+defined in RFC5280 in this field. If you pass I<both>, the SHA1 has will
+be written as an additional field to I<signer_public_key_hash>.
+
+B<Note>: If a certificate does not contain an explicit subject key
+identifier, this always falls back to the SHA1 hash.
 
 =item allow_external_signer
 
