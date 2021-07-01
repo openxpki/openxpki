@@ -41,13 +41,15 @@ nvm install
 ### Ember CLI
 
 ```bash
-nvm exec npm install -g ember-cli
+nvm use
+npm install -g ember-cli
 ```
 
 ## Installation of required Node.js modules
 
 ```bash
-nvm exec npm install
+nvm use
+npm install
 ```
 
 ## Running / Development
@@ -63,9 +65,10 @@ To run the web UI locally you have to:
 ### Linting
 
 ```bash
-nvm exec npm run lint:hbs
-nvm exec npm run lint:js
-nvm exec npm run lint:js -- --fix
+nvm use
+npm run lint:hbs
+npm run lint:js
+npm run lint:js -- --fix
 ```
 
 ### Building (production)
@@ -73,23 +76,26 @@ nvm exec npm run lint:js -- --fix
 ```bash
 make
 # or manually:
-nvm exec npm run build
+nvm use
+npm run build
 ```
 
 ### Updating ember-cli
 
 ```bash
+nvm use
 ember-cli-update
-nvm exec npm install
-nvm exec npm audit fix
-nvm exec npm dedupe
+npm install
+npm audit fix
+npm dedupe
 ```
 
 ### Running Tests (currently not used)
 
 ```bash
-nvm exec ember test
-nvm exec ember test --server
+nvm use
+ember test
+ember test --server
 ```
 
 ## Further Reading / Useful Links
