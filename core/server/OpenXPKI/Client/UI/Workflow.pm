@@ -2862,19 +2862,20 @@ sub __render_list_spec {
     for (my $ii = 0; $ii < scalar @{$cols}; $ii++) {
 
         # we must create a copy as we change the hash in the session info otherwise
-        my %col = %{$cols->[$ii]};
+        my %col = %{ $cols->[$ii] };
+        my $field = $col{field} // ''; # prevent "Use of uninitialized value $col{"field"} in string eq"
         my $head = { sTitle => $col{label} };
 
-        if ($col{field} eq 'creator') {
+        if ($field eq 'creator') {
             $attrib{'creator'} = 1;
             $col{format} = 'tooltip';
 
-        } elsif ($col{field} =~ m{\A (attribute)\.(\S+) }xi) {
+        } elsif ($field =~ m{\A (attribute)\.(\S+) }xi) {
             $col{source} = $1;
             $col{field} = $2;
             $attrib{$2} = 1;
 
-        } elsif ($col{field} =~ m{\A (context)\.(\S+) }xi) {
+        } elsif ($field =~ m{\A (context)\.(\S+) }xi) {
             # we use this later to avoid the pattern match
             $col{source} = $1;
             $col{field} = $2;
