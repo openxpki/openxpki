@@ -58,16 +58,19 @@ export default class OxiConfigService extends Service {
         });
     }
 
-    _rel2absUrl(relativeUrl) {
+    // Takes the given absolute or relative path and returns a URL
+    _rel2absUrl(path) {
         let baseUrl = window.location.protocol + '//' + window.location.host;
-        // if relativeUrl contains leading slash, treat it as absolute path
-        if (! relativeUrl.match(/^\//)) baseUrl += window.location.pathname;
-        return baseUrl.replace(/\/$/, '') + '/' + relativeUrl.replace(/^\//, '');
 
+        // add current path if given path is relative
+        if (! path.match(/^\//)) baseUrl += window.location.pathname;
+
+        return baseUrl.replace(/\/$/, '') + '/' + path.replace(/^\//, '');
     }
 
     get backendUrl() {
-        let path = this.localConfig.backendPath || '/cgi-bin/webui.fcgi';
+        // default to relative path to support URL-based realms
+        let path = this.localConfig.backendPath || 'cgi-bin/webui.fcgi';
         return this._rel2absUrl(path);
     }
 
