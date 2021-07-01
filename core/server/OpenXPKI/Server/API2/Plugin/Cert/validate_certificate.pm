@@ -79,6 +79,43 @@ certificates)
 
 =item * C<anchor> I<ArrayRef> - list of trust anchors (certificate identifiers).
 
+=item * C<novalidity> I<Bool> - treat expired certificates as good
+
+=item * C<crl_check> I<Str> - one of none, soft, leaf, all
+
+=back
+
+B<CRL Check>
+
+For certificates that are managed by this PKI instance, the revocation
+status is ALWAYS checked based in the information in the database.
+
+If you want to validate externally issued certificates, you can pass the
+I<crl_check> parameter with one of the following values (default is I<none>).
+There is currently no special return value for CRL checks, failure to
+validate will just return the status "BROKEN".
+
+=over
+
+=item none
+
+Do not perform a CRL check, this is the default.
+
+=item soft
+
+Tries to find a valid CRL for the leaf certificate but will silently skip
+the revocation check if no CRL is found.
+
+=item leaf
+
+Tries to find a valid CRL for the leaf certificate, will throw an exception
+if there is no fresh CRL information.
+
+=item all
+
+Tries to find a valid CRL for all certifiates in the chain, will throw an
+exception if there is no fresh CRL information for any element.
+
 =back
 
 B<Changes compared to API v1:>
@@ -98,7 +135,7 @@ command "validate_certificate" => {
     pkcs7  => { isa => 'PEM', },
     anchor => { isa => 'ArrayRef[Str]', },
     novalidity => { isa => 'Bool', default => 0 },
-    crl_check => { isa => 'AlphaPunct', matching => qr{ \A ( none | leaf | all ) \Z }x, default => "none" },
+    crl_check => { isa => 'AlphaPunct', matching => qr{ \A ( none | soft | leaf | all ) \Z }x, default => "none" },
 
 } => sub {
     my ($self, $params) = @_;
@@ -260,7 +297,7 @@ command "validate_certificate" => {
     }
 
     my @work_chain = @signer_chain;
-    ##! 64: 'Work Chain ' . Dumper \@work_chain
+    ##! 64: \@signer_chain
 
     my $root = pop @work_chain;
 
@@ -276,7 +313,25 @@ command "validate_certificate" => {
         CHAIN => join "\n", @work_chain,
     };
 
-    if ($params->crl_check eq 'leaf') {
+
+    if ($params->crl_check eq 'soft') {
+        ##! 16: 'CRL soft check for leaf'
+        my $issuer_identifier = CTX('api2')->get_cert_identifier( cert => $signer_chain[1] );
+        ##! 32: 'need crl for ' . $issuer_identifier
+        my $crl_list = CTX('api2')->get_crl_list(
+            issuer_identifier => $issuer_identifier,
+            limit => 1,
+            expires_after => time()
+        );
+        ##! 64: $crl_list
+        if (@$crl_list) {
+            $command->{CRL} = CTX('api2')->get_crl( crl_serial => $crl_list->[0]->{crl_key} );
+            $command->{CRL_CHECK} = 'leaf';
+        } else {
+            ##! 16: 'No crl found'
+            CTX('log')->system()->debug('Skipping CRL check as no valid CRL was found for ' .$issuer_identifier);
+        }
+    } elsif ($params->crl_check eq 'leaf') {
         ##! 32: 'CRL check for leaf'
         my $issuer_identifier = CTX('api2')->get_cert_identifier( cert => $signer_chain[1] );
         ##! 64: 'need crl for ' . $issuer_identifier
@@ -294,7 +349,8 @@ command "validate_certificate" => {
         $command->{CRL_CHECK} = 'all';
     }
 
-    my $valid = $default_token->command($command);
+    my $valid;
+    eval{ $valid = $default_token->command($command); };
 
     ##! 64: 'Validation result ' . Dumper $valid
 
