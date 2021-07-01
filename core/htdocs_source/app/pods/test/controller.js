@@ -11,7 +11,9 @@ export default class TestController extends Controller {
         super(...arguments);
         this.oxiLocale.locale = 'de-DE';
 
-        // set up request interceptor / server mockup
+        /*
+         * set up request interceptor / server mockup
+         */
         const server = new Pretender(function() {
             // simulate localconfig.yaml
             this.get('/openxpki/localconfig.yaml', request => [
@@ -34,11 +36,15 @@ export default class TestController extends Controller {
                 ];
                 resolve(response);
             });
-            this.get('/cgi-bin/webui.fcgi', req => {
+
+            this.get('/openxpki/cgi-bin/webui.fcgi', req => {
                 console.info(`MOCKUP SERVER> GET request: ${req.url}`);
                 console.info(Object.entries(req.queryParams).map(e => `MOCKUP SERVER> ${e[0]} = ${e[1]}`).join("\n"));
                 console.debug(req);
 
+                /*
+                 * dynamic tooltip - text
+                 */
                 if (req.queryParams?.page == 'tooltip!user!123') {
                     let result = {
                         type: "text",
@@ -50,6 +56,9 @@ export default class TestController extends Controller {
                     return [200, {"Content-Type": "application/json"}, JSON.stringify(result)];
                 }
 
+                /*
+                 * dynamic tooltip - chart
+                 */
                 if (req.queryParams?.page == 'tooltip!chart') {
                     let result = {
                         type: 'chart',
@@ -70,15 +79,46 @@ export default class TestController extends Controller {
 
                 return emptyResponse();
             });
-            this.post('/cgi-bin/webui.fcgi', req => {
+
+            this.post('/openxpki/cgi-bin/webui.fcgi', req => {
                 console.info(`MOCKUP SERVER> POST request: ${req.url}`);
+                let params;
                 if (req.requestHeaders['content-type'].match(/^application\/x-www-form-urlencoded/)) {
-                    console.info(decodeURIComponent(req.requestBody.replace(/\+/g, ' ')).split('&').join("\n"));
+                    params = decodeURIComponent(req.requestBody.replace(/\+/g, ' ')).split('&').join("\n");
                 }
                 else {
-                    console.info(req.requestBody);
+                    params = JSON.parse(req.requestBody);
                 }
+                console.info(params);
                 console.debug(req);
+
+                /*
+                 * autocomplete
+                 */
+                if (params?.action == 'text!autocomplete') {
+                    let val = params.value;
+                    let forest = params.params.forest;
+                    let comment = params.form_params.comment;
+
+                    console.info(`MOCKUP SERVER> autocomplete - value: ${val}, forest: ${forest}, comment: ${comment}`);
+
+                    let result;
+                    if ('boom' === val) {
+                        result = { error: 'There is no spoon.' };
+                    }
+                    else if ('void' === val) {
+                        result = [];
+                    }
+                    else {
+                        result = [
+                            { label : `Bag - ${comment}`, value : `${val}-123` },
+                            { label : `Box - ${comment}`, value : `${val}-567` },
+                            { label : `Bucket - ${comment}`, value : `${val}-890` },
+                        ];
+                    }
+                    return [200, {"Content-Type": "application/json"}, JSON.stringify(result)];
+                }
+
                 return emptyResponse();
             });
         });
@@ -133,6 +173,44 @@ export default class TestController extends Controller {
     };
 
     forms = [
+        {
+            type: "form",
+            action: "login!text",
+            reset: "login!text",
+            content: {
+                label: "oxi-section/form #0",
+                title: "Text",
+                fields: [
+                    {
+                        type: "text",
+                        name: "text",
+                        label: "Text",
+                        value: "",
+                    },
+                    {
+                        type: "text",
+                        name: "comment",
+                        label: "Text (preset - this will be used in the autocomplete-demo below)",
+                        value: "rain",
+                    },
+                    {
+                        type: "text",
+                        name: "text (autocomplete)",
+                        label: "Autocomplete",
+                        value: "pre",
+                        tooltip: "Simulated autocomplete: Enter anything to get three results, or 'boom' to simulate server-side error, or 'void' for empty result list.",
+                        autocomplete: {
+                            action: "text!autocomplete",
+                            params: {
+                                forest: "deep",
+                            },
+                            form_params: [ "comment" ],
+                        },
+                    },
+                ],
+            }
+        },
+
         {
             type: "form",
             action: "login!password",

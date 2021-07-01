@@ -431,6 +431,11 @@ div.oxifield-upload {
   white-space: nowrap;
 }
 
+.oxi-autocomplete {
+  padding-top: 6pt;
+  color: #777;
+}
+
 /******************************************************************************
  * Buttons
  */

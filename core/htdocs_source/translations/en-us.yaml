@@ -48,6 +48,8 @@ component:
     retype_password: "Retype password"
     error_retype_password: "Please retype password in second input field"
     error_no_match: "Passwords do not match"
+  oxifield_text:
+    no_search_results: "(no search results)"
   oxisection_form:
     submit: "Send"
     reset: "Reset"
@@ -59,3 +61,4 @@ component:
     copy: "Copy"
   oxi_code:
     copy: "Double-click to select all text"
+

@@ -48,6 +48,8 @@ component:
     retype_password: "Passwort wiederholen"
     error_retype_password: "Bitte Passwort in zweiten Eingabefeld wiederholen"
     error_no_match: "Passworte stimmen nicht überein"
+  oxifield_text:
+    no_search_results: "(keine Suchergebnisse)"
   oxisection_form:
     submit: "Senden"
     reset: "Zurücksetzen"

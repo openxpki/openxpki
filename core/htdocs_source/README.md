@@ -118,6 +118,26 @@ ember test
 ember test --server
 ```
 
+## Hints
+
+### Inheriting template from parent component
+
+Please note that currently (Ember 3.20.3) inheriting the template does not work:
+
+```javascript
+import OxiFieldRawtextComponent from '../rawtext/component';
+import OxiFieldRawtextTemplate from '../rawtext/template';
+
+export default class OxiFieldTextComponent extends OxiFieldRawtextComponent {
+    layout OxiFieldRawtextTemplate;
+
+    @action
+    onInput(event) {
+        this.args.onChange(event.target.value);
+    }
+}
+```
+
 ## Further Reading / Useful Links
 
 * [ember.js](https://emberjs.com/)

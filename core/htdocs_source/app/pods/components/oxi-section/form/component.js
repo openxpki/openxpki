@@ -49,6 +49,10 @@ class Field {
      * oxisection/form/field/static
      */
     verbose;
+    /*
+     * oxisection/form/field/text
+     */
+    autocomplete;
 
     static fromHash(sourceHash) {
         let instance = new this(); // "this" in static methods refers to class
@@ -252,6 +256,7 @@ export default class OxiSectionFormComponent extends Component {
 
     /**
      * @param field { hash } - field definition (gets passed in via this components' template, i.e. is a reference to this components' "model")
+     * @param value { string } - the field's new value
      */
     @action
     setFieldValue(field, value) {
@@ -302,6 +307,17 @@ export default class OxiSectionFormComponent extends Component {
     setFieldError(field, message) {
         debug(`oxi-section/form (${this.args.def.action}): setFieldError (${field.name} = ${message})`);
         field.error = message;
+    }
+
+    /**
+     * @param fieldName { string } - field name
+     */
+    @action
+    getFieldValue(fieldName) {
+        debug(`oxi-section/form (${this.args.def.action}): getFieldValue (${fieldName})`);
+
+        let fieldVals = this._fields2request(true);
+        return fieldVals[fieldName];
     }
 
     get originalFieldCount() {
