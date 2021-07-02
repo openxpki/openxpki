@@ -23,6 +23,18 @@ our %oids = (
     '1.2.840.113549.1.7.7' => 'dataWithAttributes',
     '1.2.840.113549.1.7.8' => 'encryptedPrivateKeyInfo',
 
+    # attribute extension
+    '2.16.840.1.113733.1.9.2' => 'messageType',
+    '2.16.840.1.113733.1.9.3' => 'pkiStatus',
+    '2.16.840.1.113733.1.9.4' => 'failInfo',
+    '2.16.840.1.113733.1.9.5' => 'senderNonce',
+    '2.16.840.1.113733.1.9.6' => 'recipientNonce',
+    '2.16.840.1.113733.1.9.7' => 'transactionID',
+    '2.16.840.1.113733.1.9.8' => 'extensionReq',
+    # used in SCEP, from PKCS#9
+    '1.2.840.113549.1.9.4'    => 'messageDigest',
+    '1.2.840.113549.1.9.5'    => 'signingTime',
+
     # signature digests
     '1.2.840.113549.2.5' => 'md5',
     '1.3.14.3.2.26' => 'sha1',
@@ -361,13 +373,31 @@ sub __build_envelope_signed_data {
     my $digest_oid = $si->{digestAlgorithm}->{algorithm};
     my $sig_oid = $si->{digestEncryptionAlgorithm}->{algorithm};
 
+    my $mapattrib = sub {
+        my $attr = shift;
+        my %attrib = map {
+            my $t = $oids{$_->{type}} || $_->{type};
+            my $v = (@{$_->{values}} > 1) ? $_->{values} : $_->{values}->[0];
+            $t => $v;
+        } @{$attr};
+        return \%attrib;
+    };
+
+    my $aa = $si->{authenticatedAttributes}->{aaSet} || $si->{authenticatedAttributes}->{aaSequence};
+    my $attrib = $mapattrib->($aa) if ($aa);
+
+    my $ua = $si->{unauthenticatedAttributes}->{uaSet} || $si->{unauthenticatedAttributes}->{uaSequence};
+    my $uattrib = $mapattrib->($ua) if ($ua);
+
     return {
         digest_alg => $oids{$digest_oid} || $digest_oid,
         sig_alg =>  $oids{$sig_oid} || $sig_oid,
         signer =>  {
             serialNumber => $si->{sid}->{issuerAndSerialNumber}->{serialNumber},
             issuer => OpenXPKI::Crypt::DN->new( sequence => $si->{sid}->{issuerAndSerialNumber}->{issuer} ),
-        }
+        },
+        authAttr => $attrib,
+        unauthAttr => $uattrib,
     };
 
 }
