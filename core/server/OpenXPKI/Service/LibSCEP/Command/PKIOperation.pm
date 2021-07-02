@@ -15,7 +15,6 @@ use OpenXPKI::DateTime;
 use OpenXPKI::Client::Simple;
 use Data::Dumper;
 use MIME::Base64;
-use Math::BigInt;
 use DateTime::Format::DateParse;
 
 =head1 Name

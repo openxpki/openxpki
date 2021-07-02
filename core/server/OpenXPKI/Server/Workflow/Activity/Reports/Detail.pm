@@ -328,8 +328,7 @@ sub execute {
             $subject_seen ->{ $subject } = 1;
         }
 
-        my $serial = Math::BigInt->new( $item->{cert_key} )->as_hex();
-        $serial =~ s{\A 0x}{}xms;
+        my $serial = unpack('H*', Math::BigInt->new( $item->{cert_key})->to_bytes );
 
         my $status = $item->{status};
         if ($status eq 'ISSUED' && $item->{notafter} < $epoch) {

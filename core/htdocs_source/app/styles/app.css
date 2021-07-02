@@ -342,6 +342,23 @@ tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
 /* keep line wraps in code */
 code { white-space: pre; }
 
+/* certificate serial number in details popup */
+tr.certserial td li {
+  line-height:1.8em;
+}
+/* First child is the hex number */
+tr.certserial td li:first-child::after {
+  content: "hex";
+  font-size: .70em;
+  vertical-align: sub;
+}
+/* Last child is the decimal number */
+tr.certserial td li:last-child::after {
+  content: "dec";
+  font-size: .70em;
+  vertical-align: sub;
+}
+
 /******************************************************************************
  * Form fields
  */

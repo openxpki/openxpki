@@ -5,7 +5,6 @@ use warnings;
 use English;
 
 use OpenXPKI::DN;
-use Math::BigInt;
 use Digest::SHA qw(sha1_base64 sha1_hex);
 use OpenXPKI::DateTime;
 use MIME::Base64;

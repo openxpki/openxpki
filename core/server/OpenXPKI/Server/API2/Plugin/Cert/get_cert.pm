@@ -122,9 +122,7 @@ command "get_cert" => {
     }
 
     # Hex Serial
-    my $serial = Math::BigInt->new($cert->{cert_key});
-    $cert->{cert_key_hex} = $serial->as_hex;
-    $cert->{cert_key_hex} =~ s{\A 0x}{}xms;
+    $cert->{cert_key_hex} = unpack('H*', Math::BigInt->new($cert->{cert_key})->to_bytes );
 
     # Expired Status
     $cert->{status} = 'EXPIRED' if $cert->{status} eq 'ISSUED' and $cert->{notafter} < time();

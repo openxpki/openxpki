@@ -86,6 +86,9 @@ tr.gridrow-danger:hover>td{background-color:#e6c1c7!important}
 .certstatus-unknown,.dns-timeout{color:#79d1f3}
 .styled-attention,.styled-failed{font-weight:700}
 code{white-space:pre}
+tr.certserial td li{line-height:1.8em}
+tr.certserial td li:first-child::after{content:"hex";font-size:.7em;vertical-align:sub}
+tr.certserial td li:last-child::after{content:"dec";font-size:.7em;vertical-align:sub}
 input.in-form-group{margin-bottom:15px}
 .oxi-no-input{padding-top:6px}
 div.required input,div.required select,div.required textarea{background-color:#fff3c2;border:1px solid #444}

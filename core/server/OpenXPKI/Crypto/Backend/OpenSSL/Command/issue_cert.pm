@@ -10,8 +10,6 @@ package OpenXPKI::Crypto::Backend::OpenSSL::Command::issue_cert;
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
-use Math::BigInt;
-
 sub get_command
 {
     my $self = shift;

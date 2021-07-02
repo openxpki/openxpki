@@ -65,15 +65,9 @@ sub set_crl_items {
     foreach my $item (@$list) {
 
         ##! 64: 'CRL item ' . Dumper $item
-        my $serial = shift @{$item};
-
-        if ($serial !~ /\A0x/) {
-            $serial = Math::BigInt->new ($serial)->as_hex();
-        }
-        # strip of 0x
-        $serial = substr( $serial , 2);
-        # expand to an even number of digits
-        $serial = "0".$serial if (length ($serial) % 2);
+        my $rawserial = shift @{$item};
+        # Constructor detects leading 0x as hex, unpack creates a paired hex output
+        my $serial = unpack('H*', Math::BigInt->new( $rawserial )->to_bytes );
 
         my $timestamp = '700101000000Z';
         my $reason_code = 'unspecified';
@@ -185,8 +179,7 @@ sub dump
                     message => "I18N_OPENXPKI_CRYPTO_OPENSSL_CONFIG_DUMP_WRONG_SERIAL");
             }
             ##! 8: "serial accepted by Math::BigInt"
-            my $hex = substr ($serial->as_hex(), 2);
-            $hex = "0".$hex if (length ($hex) % 2);
+            my $hex = unpack('H*', $serial->to_bytes );
             ##! 8: "hex serial is $hex"
             $self->{FU}->write_file ({FILENAME => $self->{FILENAME}->{SERIAL},
                                CONTENT  => $hex});

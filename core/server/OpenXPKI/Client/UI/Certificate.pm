@@ -388,7 +388,8 @@ sub init_export {
                 push @line,  DateTime->from_epoch( epoch => $item->{ $field } )->iso8601();
 
             } elsif ($field eq 'cert_key_hex') {
-                push @line, Math::BigInt->new( $item->{cert_key} )->as_hex;
+                push @line, unpack('H*', Math::BigInt->new( $item->{cert_key})->to_bytes );
+
 
             } else {
                 push @line, $item->{ $field };
@@ -666,10 +667,10 @@ sub init_detail {
     #I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE_CESSATIONOFOPERATION
 
     push @fields, (
-        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SERIAL', format => 'tooltip', value => {
-            value => '0x'.$cert->{cert_key_hex},
-            tooltip => $cert->{cert_key}
-        }},
+        { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SERIAL', format => 'ullist',
+            value => [ $cert->{cert_key_hex}, $cert->{cert_key} ],
+            className => 'certserial',
+        },
         { label => 'I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER', value => $cert_identifier },
         { label => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTBEFORE', value => $cert->{notbefore}, format => 'timestamp'  },
         { label => 'I18N_OPENXPKI_UI_CERTIFICATE_NOTAFTER', value => $cert->{notafter}, format => 'timestamp' },
@@ -1413,7 +1414,7 @@ sub __render_result_list {
             } elsif ($col->{field} eq 'statusclass') {
                 push @line, lc($item->{status});
             } elsif ($col->{field} eq 'cert_key_hex') {
-                push @line, Math::BigInt->new( $item->{cert_key} )->as_hex;
+                push @line, unpack('H*', Math::BigInt->new( $item->{cert_key})->to_bytes );
             } else {
                 push @line, $item->{  $col->{field} };
             }
