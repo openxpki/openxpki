@@ -1,10 +1,10 @@
 import Service from '@ember/service';
-import { inject as service } from '@ember/service';
+import { inject } from '@ember/service';
 import { debug } from '@ember/debug';
 import moment from "moment-timezone";
 
 export default class OxiLocaleService extends Service {
-    @service('intl') intl;
+    @inject('intl') intl;
 
     _locale = null;
 

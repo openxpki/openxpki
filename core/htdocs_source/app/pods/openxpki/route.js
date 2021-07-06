@@ -3,7 +3,7 @@ import { tracked } from '@glimmer/tracking';
 import { later, cancel } from '@ember/runloop';
 import { Promise } from 'rsvp';
 import { set as emSet } from '@ember/object';
-import { inject as service } from '@ember/service';
+import { inject } from '@ember/service';
 import { isArray } from '@ember/array';
 import { debug } from '@ember/debug';
 import fetch from 'fetch';
@@ -27,9 +27,9 @@ class Content {
  * @module
  */
 export default class OpenXpkiRoute extends Route {
-    @service('oxi-config') oxiConfig;
-    @service('oxi-locale') oxiLocale;
-    @service('intl') intl;
+    @inject('oxi-config') oxiConfig;
+    @inject('oxi-locale') oxiLocale;
+    @inject('intl') intl;
 
     // Reserved Ember property "queryParams"
     // https://api.emberjs.com/ember/3.17/classes/Route/properties/queryParams?anchor=queryParams

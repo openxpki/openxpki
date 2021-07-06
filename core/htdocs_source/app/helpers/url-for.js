@@ -1,5 +1,5 @@
 import Helper from "@ember/component/helper";
-import { inject as service } from '@ember/service';
+import { inject } from '@ember/service';
 
 /**
  * Returns the URL for the given Ember route.
@@ -11,7 +11,7 @@ import { inject as service } from '@ember/service';
  * @module helper/url-for
  */
 export default class UrlFor extends Helper {
-    @service router;
+    @inject router;
 
     compute([route, model, params]) {
         return this.router.urlFor(route, model, { queryParams: params });

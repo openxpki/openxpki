@@ -3,7 +3,7 @@ import { action } from "@ember/object";
 import { tracked } from '@glimmer/tracking';
 import { getOwner } from '@ember/application';
 import { isArray } from '@ember/array';
-import { inject as service } from '@ember/service';
+import { inject } from '@ember/service';
 import { debug } from '@ember/debug';
 
 class Field {
@@ -95,7 +95,7 @@ class Field {
  * ```
  */
 export default class OxiSectionFormComponent extends Component {
-    @service('intl') intl;
+    @inject('intl') intl;
 
     @tracked loading = false;
     @tracked fields = [];

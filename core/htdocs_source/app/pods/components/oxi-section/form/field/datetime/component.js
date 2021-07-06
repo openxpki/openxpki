@@ -1,10 +1,10 @@
 import Component from '@glimmer/component';
 import { action, computed } from '@ember/object';
-import { inject as service } from '@ember/service';
+import { inject } from '@ember/service';
 import moment from "moment-timezone";
 
 export default class OxiFieldDatetimeComponent extends Component {
-    @service('oxi-locale') oxiLocale;
+    @inject('oxi-locale') oxiLocale;
 
     format = "DD.MM.YYYY HH:mm"; // do not add "ZZ" as this results in the date being converted to local timezone (why?)
     value;

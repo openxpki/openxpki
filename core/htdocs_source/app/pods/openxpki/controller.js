@@ -2,10 +2,10 @@ import Controller from '@ember/controller';
 import { tracked } from '@glimmer/tracking';
 import { action, computed, set } from '@ember/object';
 import { gt } from '@ember/object/computed';
-import { inject as service } from '@ember/service';
+import { inject } from '@ember/service';
 
 export default class OpenXpkiController extends Controller {
-    @service('oxi-config') config;
+    @inject('oxi-config') config;
 
     // Reserved Ember properties
     // https://api.emberjs.com/ember/release/classes/Controller
