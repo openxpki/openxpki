@@ -38,11 +38,11 @@ cd core/htdocs_source
 nvm install
 ```
 
-### Ember CLI
+### Ember CLI and other global Tools
 
 ```bash
 nvm use
-npm install -g ember-cli
+npm install -g ember-cli ember-cli-update npm-check-updates
 ```
 
 ## Installation of required Node.js modules
@@ -71,7 +71,7 @@ npm run lint:js
 npm run lint:js -- --fix
 ```
 
-### Building (production)
+### Build (production)
 
 ```bash
 make
@@ -85,10 +85,24 @@ npm run build
 ```bash
 nvm use
 ember-cli-update
-npm install
 npm audit fix
 npm dedupe
+# to install the modules on your host and update package-lock.json:
+npm install
 ```
+
+After this a [rebuild](#build-production) needs to be done.
+
+### Updating dependencies
+
+```bash
+nvm use
+ncu -u
+# to install the modules on your host and update package-lock.json:
+npm install
+```
+
+After this a [rebuild](#build-production) needs to be done.
 
 ### Running Tests (currently not used)
 
