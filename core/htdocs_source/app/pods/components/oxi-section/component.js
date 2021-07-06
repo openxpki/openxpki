@@ -23,7 +23,8 @@ export default class OxiSectionComponent extends Component {
         debug("oxisection/main: buttonClick");
         set(button, "loading", true);
         if (button.action) {
-            getOwner(this).lookup("route:openxpki")
+            getOwner(this)
+            .lookup("route:openxpki")
             .sendAjax({ action: button.action })
             .finally(() => set(button, "loading", false));
         }

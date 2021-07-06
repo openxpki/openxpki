@@ -26,8 +26,7 @@ export default class OxiFieldTextComponent extends Component {
 
     constructor() {
         super(...arguments);
-        // do not turn "search" into a @computed property as we want the search field
-        // to show the cert subject in case of a selection from the auto-suggest dropdown
+
         this.value = this.args.content.value;
 
         if (this.isAutoComplete) {
@@ -91,9 +90,13 @@ export default class OxiFieldTextComponent extends Component {
         return result;
     }
 
-    /**************************************************************************
+
+    /*
+     **************************************************************************
      * Autocomplete related methods below...
+     **************************************************************************
      */
+
 
     autocomplete() {
         // don't process same value as before
