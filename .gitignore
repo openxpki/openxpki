@@ -6,3 +6,6 @@ core/i18n/openxpki.pot
 core/server/OpenXPKI/VERSION.pm
 *.rpm
 *.deb
+myperl-openxpki-ee/
+*.sublime-project
+*.sublime-workspace
