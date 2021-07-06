@@ -13,7 +13,7 @@
 
     <div class="{{this.sFieldSize}}" {{on "keydown" this.onKeydown}}>
         {{#if @field.tooltip}}
-            {{#if config.tooltipOnFocus}}
+            {{#if this.config.tooltipOnFocus}}
                 {{! Showing a tooltop on focus is EmberTooltip's default behaviour }}
                 <EmberTooltip>{{@field.tooltip}}</EmberTooltip>
             {{else}}
