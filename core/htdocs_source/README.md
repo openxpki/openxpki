@@ -66,9 +66,15 @@ To run the web UI locally you have to:
 
 ```bash
 nvm use
+# Handlebars templates and JavaScript
+npm run lint
+npm run lint:fix
+# only Handlebars templates
 npm run lint:hbs
+npm run lint:hbs:fix
+# only JavaScript
 npm run lint:js
-npm run lint:js -- --fix
+npm run lint:js:fix
 ```
 
 ### Build (production)
