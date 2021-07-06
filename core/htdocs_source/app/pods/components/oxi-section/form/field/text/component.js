@@ -50,10 +50,8 @@ export default class OxiFieldTextComponent extends Component {
 
     @action
     onInput(evt) {
-        this.value = this.cleanup(evt.target.value);
-        this.args.onChange(this.value); // report changes to parent component
-
-        if (this.isAutoComplete) this.autocomplete();
+        let value = this.cleanup(evt.target.value);
+        this.setValue(value);
     }
 
     // Own "paste" implementation to allow for text cleanup
@@ -72,13 +70,23 @@ export default class OxiFieldTextComponent extends Component {
             inputField.setSelectionRange(newCursorPos, newCursorPos);
         });
 
-        this.value =
+        let value =
             oldVal.slice(0, inputField.selectionStart) +
             pasteCleaned +
             oldVal.slice(inputField.selectionEnd);
 
-        this.args.onChange(this.value);
+        this.setValue(value);
         event.preventDefault();
+    }
+
+    setValue(value) {
+        this.value = value;
+        this.args.onChange(value); // report changes to parent component
+
+        // fetch autocomplete list (but don't process same input value twice)
+        if (this.isAutoComplete && value !== this.searchPrevious) {
+            this.autocompleteQuery(value);
+        }
     }
 
     // Strips newlines + leading (and if chosen trailing) whitespaces and quotation marks
@@ -98,19 +106,17 @@ export default class OxiFieldTextComponent extends Component {
      */
 
 
-    autocomplete() {
-        // don't process same value as before
-        if (this.value === this.searchPrevious) { return }
-        this.searchPrevious = this.value;
+    autocompleteQuery(value) {
+        this.searchPrevious = value;
 
         this.searchResults = []; // make sure changed input (e.g. under 3 characters) will not show old result list again
         this.label = '';
 
         // cancel old search query timer on new input
-        if (this.searchTimer) clearTimeout(this.searchTimer); // after check this.value === this.searchPrevious !
+        if (this.searchTimer) clearTimeout(this.searchTimer); // after check value === this.searchPrevious !
 
         // don't search short values
-        if (this.value.length < 3) { this.isDropdownOpen = false; return }
+        if (value.length < 3) { this.isDropdownOpen = false; return }
 
         // start search query after 300ms without input
         this.searchTimer = setTimeout(() => {
@@ -185,7 +191,19 @@ export default class OxiFieldTextComponent extends Component {
 
     @action
     onFocus() {
-        if (this.searchResults.length) { this.isDropdownOpen = true }
+        console.debug(this.isAutoComplete)
+        if (this.isAutoComplete) {
+            // If we also send other form field(s) then better refresh the
+            // autocomplete results as the other field(s) might have changed.
+            console.debug('form_params', this.args.content?.autocomplete?.form_params)
+            if (this.args.content?.autocomplete?.form_params) {
+                this.autocompleteQuery(this.value);
+            }
+            // Otherwise just show result list again
+            else {
+                if (this.searchResults.length) this.isDropdownOpen = true;
+            }
+        }
     }
 
     @action
