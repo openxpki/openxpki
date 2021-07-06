@@ -606,6 +606,15 @@ cgi-bin/est.fcgi
 cgi-bin/healthcheck.fcgi
 
 # Client UI
+# NOTE:
+#   core/htdocs_source/update-manifest.pl will update the list below.
+#   UPDATE_MANIFEST_UI_LIST - do not remove this comment
+htdocs/assets/chunk.143.aa471a53ceab19c83b5e.js
+htdocs/assets/chunk.178.6b09d97c65e70339ea4f.js
+htdocs/assets/chunk.57.9a01ed9372a494e52474.js
+htdocs/assets/chunk.57.9a01ed9372a494e52474.js.LICENSE.txt
+htdocs/assets/chunk.958.c87dc3541eae597256d3.js
+htdocs/assets/chunk.958.c87dc3541eae597256d3.js.LICENSE.txt
 htdocs/assets/openxpki.css
 htdocs/assets/openxpki.js
 htdocs/assets/vendor.css
@@ -628,15 +637,16 @@ htdocs/img/my-tasks.png
 htdocs/img/my-workflows.png
 htdocs/img/reports.png
 htdocs/img/request.png
-htdocs/img/revoke2.png
 htdocs/img/revoke.png
+htdocs/img/revoke2.png
 htdocs/img/system-status-critical.png
 htdocs/img/system-status-major.png
 htdocs/img/system-status-minor.png
 htdocs/img/system-status-ok.png
-htdocs/img/system-status.png
 htdocs/img/system-status-warning.png
+htdocs/img/system-status.png
 htdocs/img/ticket.png
 htdocs/img/transaction-id.png
 htdocs/img/workflow-search.png
+htdocs/index.html
 htdocs/localconfig.yaml.template

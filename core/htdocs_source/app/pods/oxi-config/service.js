@@ -18,7 +18,7 @@ export default class OxiConfigService extends Service {
                 console.debug(`Custom config (YAML):\n${yamlStr}`);
                 if (! yamlStr) return;
                 try {
-                    let doc = yaml.safeLoad(yamlStr); // might be null if YAML is empty string
+                    let doc = yaml.load(yamlStr); // might be null if YAML is empty string
                     if (doc) this.localConfig = doc;
                     console.debug('Custom config (decoded):', this.localConfig);
                 }
