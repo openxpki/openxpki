@@ -98,7 +98,7 @@ export default class TestController extends Controller {
                 if (params?.action == 'text!autocomplete') {
                     let val = params.value;
                     let forest = params.params.forest;
-                    let comment = params.form_params.comment;
+                    let comment = params.form_params.comment || '(not provided)';
 
                     console.info(`MOCKUP SERVER> autocomplete - value: ${val}, forest: ${forest}, comment: ${comment}`);
 
@@ -190,14 +190,26 @@ export default class TestController extends Controller {
                     {
                         type: "text",
                         name: "comment",
-                        label: "Text (preset - this will be used in the autocomplete-demo below)",
+                        label: "Comment (will be used in autocomplete below)",
                         value: "rain",
                     },
                     {
                         type: "text",
-                        name: "text (autocomplete)",
+                        name: "text_autocomplete",
                         label: "Autocomplete",
                         value: "pre",
+                        tooltip: "Simulated autocomplete: Enter anything to get three results, or 'boom' to simulate server-side error, or 'void' for empty result list.",
+                        autocomplete: {
+                            action: "text!autocomplete",
+                            params: {
+                                forest: "shallow",
+                            },
+                        },
+                    },
+                    {
+                        type: "text",
+                        name: "text_autocomplete_ref",
+                        label: "Autocomplete (using field 'comment')",
                         tooltip: "Simulated autocomplete: Enter anything to get three results, or 'boom' to simulate server-side error, or 'void' for empty result list.",
                         autocomplete: {
                             action: "text!autocomplete",

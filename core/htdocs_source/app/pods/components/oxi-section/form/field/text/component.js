@@ -115,11 +115,16 @@ export default class OxiFieldTextComponent extends Component {
         // start search query after 300ms without input
         this.searchTimer = setTimeout(() => {
             let searchIndex = ++this.searchIndex;
+
+            let params = this.args.content.autocomplete.params || {};
+            let form_param_names = this.args.content.autocomplete.form_params || [];
+            let form_params = Object.fromEntries(form_param_names.map(n => [ n, this.args.getFieldValue(n) ]))
+
             getOwner(this).lookup("route:openxpki").sendAjaxQuiet({
                 action: this.args.content.autocomplete.action,
-                value: this.value,
-                params: this.args.content.autocomplete.params,
-                form_params: Object.fromEntries(this.args.content.autocomplete.form_params.map(n => [ n, this.args.getFieldValue(n) ])),
+                value,
+                params,
+                form_params,
             }).then((doc) => {
                 // only show results of most recent search (if parallel requests were sent)
                 if (searchIndex !== this.searchIndex) { return }
