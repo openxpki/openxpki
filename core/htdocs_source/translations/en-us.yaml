@@ -44,6 +44,10 @@ component:
     open: "Open file"
     large_file: "File too large for preview"
     binary_file: "Binary file"
+  oxifield_passwordverify:
+    retype_password: "Retype password"
+    error_retype_password: "Please retype password in second input field"
+    error_no_match: "Passwords do not match"
   oxisection_form:
     submit: "Send"
     reset: "Reset"

@@ -1,15 +1,18 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action, computed } from '@ember/object';
+import { inject } from '@ember/service';
 
 export default class OxiFieldPasswordverifyComponent extends Component {
+    @inject('intl') intl;
+
     @tracked password = "";
     @tracked confirm = "";
     @tracked isFixed = false;
 
     @computed("args.content.placeholder")
     get placeholder() {
-        return this.args.content.placeholder || "Retype password";
+        return this.args.content.placeholder || this.intl.t('component.oxifield_passwordverify.retype_password');
     }
 
     constructor() {
@@ -28,7 +31,9 @@ export default class OxiFieldPasswordverifyComponent extends Component {
         let value = this.password === this.confirm ? this.password : null;
         this.args.onChange(value);
         if (this.password !== this.confirm) {
-            let msg = this.confirm ? "Passwords do not match" : "Please retype password";
+            let msg = this.confirm
+                ? this.intl.t('component.oxifield_passwordverify.error_no_match')
+                : this.intl.t('component.oxifield_passwordverify.error_retype_password');
             this.args.onError(msg);
         }
     }
