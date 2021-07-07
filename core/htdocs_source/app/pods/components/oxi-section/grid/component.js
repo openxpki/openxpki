@@ -305,7 +305,7 @@ export default class OxiSectionGridComponent extends Component {
             reverse: page.reverse,
         })
         .then((res) => {
-            this.rawData = res.data;
+            this.rawData = res.data || [];
             setProperties(pager, page);
         });
     }
