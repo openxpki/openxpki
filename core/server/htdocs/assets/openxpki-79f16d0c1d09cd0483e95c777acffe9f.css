@@ -99,6 +99,7 @@ div.optional input,div.optional select,div.optional textarea{border:1px dashed #
 .oxi-checkbox.checked:after{position:absolute;left:2px;top:2px;width:10px;height:10px;border-radius:2px;opacity:.54;background-color:#000;content:' '}
 div.oxifield-upload{position:relative;padding-bottom:34px}
 .clonable-btn-group{white-space:nowrap}
+.oxi-autocomplete{padding-top:6pt;color:#777}
 .stacked-buttons{margin-top:4px;margin-bottom:4px}
 .stacked-buttons .btn-bt-margin{margin-top:6px;margin-bottom:6px}
 .oxi-btn-loading{color:#fff;background-color:#428bca;border-color:#357ebd}

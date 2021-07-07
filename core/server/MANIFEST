@@ -609,15 +609,15 @@ cgi-bin/healthcheck.fcgi
 # NOTE:
 #   core/htdocs_source/update-manifest.pl will update the list below.
 #   UPDATE_MANIFEST_UI_LIST - do not remove this comment
-htdocs/assets/chunk.143.8f7cbdb1a215391d5a77.js
-htdocs/assets/chunk.178.888d081731aa7b5c04dc.js
+htdocs/assets/chunk.143.a28e9fb22261037815c6.js
+htdocs/assets/chunk.178.cf74f2b0b50f20f56c61.js
 htdocs/assets/chunk.57.9a01ed9372a494e52474.js
 htdocs/assets/chunk.57.9a01ed9372a494e52474.js.LICENSE.txt
 htdocs/assets/chunk.958.c87dc3541eae597256d3.js
 htdocs/assets/chunk.958.c87dc3541eae597256d3.js.LICENSE.txt
-htdocs/assets/openxpki-bc69de631114c7ee59e7118d12efeedb.js
-htdocs/assets/openxpki-f09a54cb36fdc47c0c67a09244c73abe.css
-htdocs/assets/vendor-5f416a4812461d5101c20bcaa83599f8.js
+htdocs/assets/openxpki-79f16d0c1d09cd0483e95c777acffe9f.css
+htdocs/assets/openxpki-c41734e1469cf11a1bbad5145a7fc13a.js
+htdocs/assets/vendor-0f15177d0bfb86a43608e6e4857eadf2.js
 htdocs/assets/vendor-fa50ae6c3d2eb65d2cfcf2cfaf499518.css
 htdocs/default.html
 htdocs/favicon.png
