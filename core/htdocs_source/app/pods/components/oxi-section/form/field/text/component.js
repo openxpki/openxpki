@@ -23,6 +23,8 @@ export default class OxiFieldTextComponent extends Component {
     searchIndex = 0;
     searchPrevious = null;
     searchTimer = null;
+    autocompleteParams = {}; // mapping: parameter name => function that returns the value
+    autocompleteContainsFieldReferences = false;
 
     constructor() {
         super(...arguments);
@@ -33,13 +35,27 @@ export default class OxiFieldTextComponent extends Component {
             if (this.args.content.autocomplete?.action === undefined) {
                 throw new Error(`oxi-section/form/field/text: parameter "autocomplete.action" missing`);
             }
-            let params = this.args.content.autocomplete?.params;
-            if (params && Object.prototype.toString.call(params) !== '[object Object]') {
-                throw new Error(`oxi-section/form/field/text: parameter "autocomplete.params" must be a hash`);
-            }
-            let form_params = this.args.content.autocomplete?.form_params;
-            if (form_params && !isArray(form_params)) {
-                throw new Error(`oxi-section/form/field/text: parameter "autocomplete.form_params" must be an array`);
+            let params;
+            if (params = this.args.content.autocomplete?.params) {
+                if (Object.prototype.toString.call(params) !== '[object Object]')
+                    throw new Error(`oxi-section/form/field/text: parameter "autocomplete.params" must be a hash`);
+
+                this.autocompleteParams = Object.fromEntries(
+                    Object.entries(params)
+                    .map(p => {
+                        let func;
+                        // query another field's value
+                        if (Object.prototype.toString.call(p[1]) === '[object Object]') {
+                            if (! p[1].field) throw new Error(`oxi-section/form/field/text: autocomplete parameter definition "${p[0]}" does not contain "field" attribute`);
+                            func = () => this.args.getFieldValue(p[1].field);
+                            this.autocompleteContainsFieldReferences = true;
+                        }
+                        else {
+                            func = () => p[1];
+                        }
+                        return [ p[0], func ];
+                    })
+                );
             }
         }
     }
@@ -122,15 +138,15 @@ export default class OxiFieldTextComponent extends Component {
         this.searchTimer = setTimeout(() => {
             let searchIndex = ++this.searchIndex;
 
-            let params = this.args.content.autocomplete.params || {};
-            let form_param_names = this.args.content.autocomplete.form_params || [];
-            let form_params = Object.fromEntries(form_param_names.map(n => [ n, this.args.getFieldValue(n) ]))
+            // assemble additional query parameters
+            let params = Object.fromEntries(
+                Object.entries(this.autocompleteParams).map(p => [ p[0], p[1].call() ])
+            );
 
             getOwner(this).lookup("route:openxpki").sendAjaxQuiet({
                 action: this.args.content.autocomplete.action,
                 value,
                 params,
-                form_params,
             }).then((doc) => {
                 // only show results of most recent search (if parallel requests were sent)
                 if (searchIndex !== this.searchIndex) { return }
@@ -191,12 +207,10 @@ export default class OxiFieldTextComponent extends Component {
 
     @action
     onFocus() {
-        console.debug(this.isAutoComplete)
         if (this.isAutoComplete) {
             // If we also send other form field(s) then better refresh the
             // autocomplete results as the other field(s) might have changed.
-            console.debug('form_params', this.args.content?.autocomplete?.form_params)
-            if (this.args.content?.autocomplete?.form_params) {
+            if (this.autocompleteContainsFieldReferences) {
                 this.autocompleteQuery(this.value);
             }
             // Otherwise just show result list again

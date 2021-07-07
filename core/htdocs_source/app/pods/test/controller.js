@@ -97,10 +97,10 @@ export default class TestController extends Controller {
                  */
                 if (params?.action == 'text!autocomplete') {
                     let val = params.value;
-                    let forest = params.params.forest;
-                    let comment = params.form_params.comment || '(not provided)';
+                    let forest = params.params.forest || '(not provided)';
+                    let comment = params.params.the_comment || '(not provided)';
 
-                    console.info(`MOCKUP SERVER> autocomplete - value: ${val}, forest: ${forest}, comment: ${comment}`);
+                    console.info(`MOCKUP SERVER> autocomplete - value: ${val}, forest: ${forest}, the_comment: ${comment}`);
 
                     let result;
                     if ('boom' === val) {
@@ -215,8 +215,8 @@ export default class TestController extends Controller {
                             action: "text!autocomplete",
                             params: {
                                 forest: "deep",
+                                the_comment: { field: "comment" },
                             },
-                            form_params: [ "comment" ],
                         },
                     },
                 ],
