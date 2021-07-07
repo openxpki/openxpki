@@ -49,7 +49,8 @@ module.exports = function(defaults) {
     // disable fingerprinting of assets in production build
     // (i.e. "openxpki.js" instead of "openxpki-1312d860591f9801798c1ef46052a7ea.js")
     'fingerprint': {
-      enabled: false,
+      enabled: true,
+      extensions: ['js', 'css', 'map'], // default also includes 'png', 'jpg', 'gif'
     },
 
     // store app config in compiled JS file instead of <meta> tag
