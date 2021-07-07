@@ -181,6 +181,7 @@ export default class OpenXpkiRoute extends Route {
         // Network error, thrown by fetch() itself
         .catch(error => {
             this._setLoadingBanner(null);
+            console.error('The server connection seems to be lost', error);
             this.content.error = this.intl.t('error_popup.message.network', { reason: error.message });
             return null;
         })
@@ -239,6 +240,7 @@ export default class OpenXpkiRoute extends Route {
         // Client side error
         .catch(error => {
             this._setLoadingBanner(null);
+            console.error('There was an error while processing the data', error);
             this.content.error = this.intl.t('error_popup.message.client', { reason: error });
             return null;
         })
@@ -339,6 +341,7 @@ export default class OpenXpkiRoute extends Route {
                 // Show message
                 if (handler.message) {
                     this._setLoadingBanner(null);
+                    console.error(handler.message);
                     this.content.error = handler.message;
                 }
                 // Redirect
@@ -352,6 +355,7 @@ export default class OpenXpkiRoute extends Route {
         }
         // Unhandled exception
         this._setLoadingBanner(null);
+        console.error(`Server did not return expected data: ${status_code}`);
         this.content.error = this.intl.t('error_popup.message.server', { code: status_code });
     }
 
