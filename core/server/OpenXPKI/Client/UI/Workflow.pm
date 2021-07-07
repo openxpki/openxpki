@@ -2678,10 +2678,8 @@ sub __render_input_field {
         if ($item->{clonable}) {
             if (ref $value) {
                 $item->{value} = $value;
-            } elsif(OpenXPKI::Serialization::Simple::is_serialized($value)) {
-                my $val = $self->serializer()->deserialize($value);
-                # The UI crashes on empty lists
-                $item->{value} = $val if (scalar @{$val} && defined $val->[0]);
+            } elsif (OpenXPKI::Serialization::Simple::is_serialized($value)) {
+                $item->{value} = $self->serializer()->deserialize($value);
             } elsif ($value) {
                 $item->{value} = [ $value ];
             }
