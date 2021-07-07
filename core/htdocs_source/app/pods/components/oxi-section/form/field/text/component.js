@@ -211,7 +211,9 @@ export default class OxiFieldTextComponent extends Component {
             // If we also send other form field(s) then better refresh the
             // autocomplete results as the other field(s) might have changed.
             if (this.autocompleteContainsFieldReferences) {
-                this.autocompleteQuery(this.value);
+                // We don't use the current value (maybe chosen from the autocomplete
+                // result list) but the same value as used for the previous query.
+                this.autocompleteQuery(this.searchPrevious);
             }
             // Otherwise just show result list again
             else {
@@ -237,7 +239,6 @@ export default class OxiFieldTextComponent extends Component {
         this.value = res.value;
         this.label = res.label;
         this.args.onChange(this.value);
-        this.searchPrevious = this.value;
         this.isDropdownOpen = false;
     }
 }
