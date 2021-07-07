@@ -239,7 +239,7 @@ export default class OpenXpkiRoute extends Route {
         // Client side error
         .catch(error => {
             this._setLoadingBanner(null);
-            this.content.error = this.intl.t('error_popup.message.client', { reason: error.message });
+            this.content.error = this.intl.t('error_popup.message.client', { reason: error });
             return null;
         })
     }
