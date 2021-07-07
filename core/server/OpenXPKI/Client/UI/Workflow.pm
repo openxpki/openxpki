@@ -2647,28 +2647,24 @@ sub __render_input_field {
     # fields to be filled only by server sided workflows
     return if ($type eq "server");
 
+    # common attributes for all field types
     my $item = {
         name => $name,
         label => $field->{label} || $name,
         type => $type
     };
-
     $item->{placeholder} = $field->{placeholder} if ($field->{placeholder});
     $item->{tooltip} = $field->{tooltip} if ($field->{tooltip});
+    $item->{clonable} = 1 if $field->{clonable};
+    $item->{is_optional} = 1 unless $field->{required};
 
-    if ($field->{option}) {
-        $item->{options} = $field->{option};
-    }
+    # type 'select'
+    $item->{options} = $field->{option} if $field->{option};
 
-    if ($field->{clonable}) {
-        $item->{clonable} = 1;
-    }
+    # type 'text'
+    $item->{autocomplete} = $field->{autocomplete} if $field->{autocomplete};
 
-    if (!$field->{required}) {
-        $item->{is_optional} = 1;
-    }
-
-    # special handling of preset cert_identifier fields
+    # type 'cert_identifier' - special handling of preset value
     if ($type eq 'cert_identifier' && $value) {
         $item->{type} = 'static';
     }
