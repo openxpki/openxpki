@@ -134,7 +134,7 @@
 
 {{#let this.model.popup as |popup|}}
     <BsModal
-        @open={{popup}}
+        @open={{if popup true false}}
         @closeButton={{true}}
         @fade={{true}}
         @backdrop={{true}}
@@ -160,7 +160,7 @@
 {{/let}}
 
 <BsModal
-    @open={{this.model.error}}
+    @open={{if this.model.error true false}}
     @closeButton={{true}}
     @fade={{true}}
     @backdrop={{true}}
