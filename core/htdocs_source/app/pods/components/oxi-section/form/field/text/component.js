@@ -116,7 +116,7 @@ export default class OxiFieldTextComponent extends Component {
         if (this.searchTimer) clearTimeout(this.searchTimer); // after check value === this.searchPrevious !
 
         // don't search short values
-        if (value.length < 3) { this.isDropdownOpen = false; return }
+        if ((value||"").length < 3) { this.isDropdownOpen = false; return }
 
         // start search query after 300ms without input
         this.searchTimer = setTimeout(() => {
