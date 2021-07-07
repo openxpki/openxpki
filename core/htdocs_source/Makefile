@@ -30,6 +30,7 @@ compile:
 	  -e "OPENXPKI_UI_BUILD_UNMINIFIED=${BUILD_UNMINIFIED}" \
 	  --user `id -u`:`id -g` \
 	  $(IMAGE)
+	perl update-manifest.pl $(abspath ../server)
 
 # remove the build container
 prune:
