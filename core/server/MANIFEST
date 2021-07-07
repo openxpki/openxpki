@@ -609,16 +609,16 @@ cgi-bin/healthcheck.fcgi
 # NOTE:
 #   core/htdocs_source/update-manifest.pl will update the list below.
 #   UPDATE_MANIFEST_UI_LIST - do not remove this comment
-htdocs/assets/chunk.143.aa471a53ceab19c83b5e.js
-htdocs/assets/chunk.178.6b09d97c65e70339ea4f.js
+htdocs/assets/chunk.143.8f7cbdb1a215391d5a77.js
+htdocs/assets/chunk.178.888d081731aa7b5c04dc.js
 htdocs/assets/chunk.57.9a01ed9372a494e52474.js
 htdocs/assets/chunk.57.9a01ed9372a494e52474.js.LICENSE.txt
 htdocs/assets/chunk.958.c87dc3541eae597256d3.js
 htdocs/assets/chunk.958.c87dc3541eae597256d3.js.LICENSE.txt
-htdocs/assets/openxpki.css
-htdocs/assets/openxpki.js
-htdocs/assets/vendor.css
-htdocs/assets/vendor.js
+htdocs/assets/openxpki-bc69de631114c7ee59e7118d12efeedb.js
+htdocs/assets/openxpki-f09a54cb36fdc47c0c67a09244c73abe.css
+htdocs/assets/vendor-5f416a4812461d5101c20bcaa83599f8.js
+htdocs/assets/vendor-fa50ae6c3d2eb65d2cfcf2cfaf499518.css
 htdocs/default.html
 htdocs/favicon.png
 htdocs/fonts/glyphicons-halflings-regular.eot
