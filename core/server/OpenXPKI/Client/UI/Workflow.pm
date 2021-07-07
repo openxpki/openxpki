@@ -2676,7 +2676,7 @@ sub __render_input_field {
     if (defined $value) {
         # clonables need array as value
         if ($item->{clonable}) {
-            if (ref $value) {
+            if (ref $value eq 'ARRAY') {
                 $item->{value} = $value;
             } elsif (OpenXPKI::Serialization::Simple::is_serialized($value)) {
                 $item->{value} = $self->serializer()->deserialize($value);
