@@ -384,7 +384,7 @@ sub alias_add {
         my $chain_ref = CTX('api2')->get_chain( 'start_with' => $insert_hash{identifier} );
 
         if ($chain_ref->{complete} != 1) {
-            print STDERR "ERROR: unable to find root certificate";
+            print STDERR "ERROR: unable to find root certificate\n";
             return 2;
         }
         my $root_identifier = pop @{$chain_ref->{identifiers}};
@@ -503,14 +503,14 @@ sub __alias_update {
                 $dt = OpenXPKI::DateTime::parse_date_utc( $params{notbefore} );
             };
             if ($EVAL_ERROR || !$dt) {
-                print STDERR "ERROR: Could not parse notbefore date";
+                print STDERR "ERROR: Could not parse notbefore date\n";
                 return;
             }
 
             $insert_hash->{notbefore} = $dt->epoch();
 
             if ($insert_hash->{notbefore} < $certificate->{notbefore}) {
-                print STDERR "ERROR: notbefore exceeds certificate validity";
+                print STDERR "ERROR: notbefore exceeds certificate validity\n";
                 return;
             }
         }
@@ -528,13 +528,13 @@ sub __alias_update {
                 $dt = OpenXPKI::DateTime::parse_date_utc( $params{notafter} );
             };
             if ($EVAL_ERROR || !$dt) {
-                print STDERR "ERROR: Could not parse notafter date";
+                print STDERR "ERROR: Could not parse notafter date\n";
                 return;
             }
             $insert_hash->{notafter} = $dt->epoch();
 
             if ($insert_hash->{notafter} > $certificate->{notafter}) {
-                print STDERR "ERROR: notafter exceeds certificate validity";
+                print STDERR "ERROR: notafter exceeds certificate validity\n";
                 return;
             }
         }
@@ -577,30 +577,34 @@ sub __alias_update {
 
         my $token = $client->run_command("get_token_info", { alias => $insert_hash->{alias} });
         if (!$token || !$token->{key_store}) {
-            print STDERR "ERROR: Unable to get token information!";
+            print STDERR "ERROR: Unable to get token information!\n";
             return;
         } elsif ($token->{key_store} eq "DATAPOOL") {
 
             my $check_dv = $client->run_command("get_datavault_status", { check_online => 1 });
             if (!$check_dv) {
-                print STDERR "ERROR: You must setup a datavault token before you can import keys into the system!";
+                print STDERR "ERROR: You must setup a datavault token before you can import keys into the system!\n";
                 return;
             }
             if (!$check_dv->{online}) {
-                print STDERR "ERROR: Your datavault token is not online, unable to import key!";
+                print STDERR "ERROR: Your datavault token is not online, unable to import key!\n";
                 return;
             }
 
-            my $res = $client->run_command("set_data_pool_entry", {
-                namespace => "sys.crypto.keys",
-                encrypt => 1,
-                key => $token->{key_name},
-                value => $extracted_keydata,
-            });
+            my $res;
+            eval{
+                $res = $client->run_command("set_data_pool_entry", {
+                    namespace => "sys.crypto.keys",
+                    encrypt => 1,
+                    force => $params{'force-update-key'},
+                    key => $token->{key_name},
+                    value => $extracted_keydata,
+                });
+            };
             if ($res) {
                 printf "Successfully wrote key to datapool with key '%s'\n", $token->{key_name};
             } else {
-                print STDERR "ERROR: Problems writing key to datapool!";
+                print STDERR "ERROR: Problems writing key to datapool!\n";
                 return;
             }
 
@@ -608,15 +612,15 @@ sub __alias_update {
 
             # name of the keyfile
             my $keyfile = $token->{key_name};
-            if(-e $keyfile) {
-                print STDERR "ERROR: key file '$keyfile' exists, won't override!";
+            if(-e $keyfile && !$params{'force-update-key'}) {
+                print STDERR "ERROR: key file '$keyfile' exists, won't override!\n";
                 return;
             }
             if (!-d dirname($keyfile)) {
-                print STDERR "ERROR: directory for '$keyfile' does not exists, won't create it!";
+                print STDERR "ERROR: directory for '$keyfile' does not exists, won't create it!\n";
                 return;
             }
-            open (my $fh, ">", $keyfile) || die "Unable to open $keyfile for writing";
+            open (my $fh, ">", $keyfile) || die "Unable to open $keyfile for writing\n";
             print $fh $extracted_keydata;
             close $fh;
 
@@ -629,7 +633,7 @@ sub __alias_update {
             chmod oct("0400"), $keyfile || die "Unable to change mode on $keyfile";
             print "Successfully wrote key to $keyfile\n";
         } else {
-            printf STDERR "ERROR: Unsupported key storage method!", $token->{key_store};
+            printf STDERR "ERROR: Unsupported key storage method (%s)!\n", $token->{key_store};
             return;
         }
     }
@@ -1496,6 +1500,7 @@ if ($cmd eq 'initdb') {
       key=s
       force-update-existing
       force-ignore-existing
+      force-update-key
     );
     __init();
 
@@ -1670,7 +1675,7 @@ if ($cmd eq 'initdb') {
             my @path = split /\./, $params{debug};
             foreach my $item (@path) {
                 if (!defined $hash->{$item}) {
-                    print STDERR "No such component ($item)";
+                    print STDERR "No such component ($item)\n";
                     $hash = {};
                     last;
                 }
@@ -2100,6 +2105,13 @@ the given name.
 
 With --force-ignore-existing any given additional options will not be
 processed.
+
+The command will fail if a key to import is specified but the target
+already exists. To force overwrite of an existing key use
+
+    --force-update-key
+
+Please note that this will overwrite the existing file in place!
 
 =item B<update alias>
 
