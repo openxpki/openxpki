@@ -476,7 +476,7 @@ sub _make_db_query {
     }
 
     if ( $po->has_profile ) {
-        push @join_spec, qw( certificate.req_key=req_key csr );
+        push @join_spec, ("{certificate.req_key=req_key,certificate.pki_realm=pki_realm}","csr");
         $where->{ 'csr.profile' } = $po->profile;
     }
 

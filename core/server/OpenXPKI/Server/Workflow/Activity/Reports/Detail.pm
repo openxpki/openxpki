@@ -189,7 +189,7 @@ sub execute {
     my $join = '';
     # join csr table for profile
     if ($need_csr) {
-        $join = ' req_key=req_key csr ';
+        $join = ' {req_key=req_key,pki_realm=pki_realm} csr ';
         push @{$cols}, 'csr.profile';
     }
 

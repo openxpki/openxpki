@@ -269,13 +269,15 @@ command "import_certificate" => {
             $dbi->merge(
                 into => 'csr',
                 set => {
-                    pki_realm => $cert_hash->{pki_realm},
                     format => 'import',
                     profile => $params->profile,
                     subject => $cert_hash->{subject},
                     req_key => $cert_hash->{req_key},
                 },
-                where => { req_key => $cert_hash->{req_key} },
+                where => {
+                    req_key => $cert_hash->{req_key},
+                    pki_realm => $cert_hash->{pki_realm},
+                },
             );
 
         }

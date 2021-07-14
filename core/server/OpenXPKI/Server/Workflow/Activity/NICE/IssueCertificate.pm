@@ -34,7 +34,10 @@ sub execute {
     my $csr = CTX('dbi')->select_one(
         from => 'csr',
         columns => [ '*' ],
-        where => { req_key => $csr_serial },
+        where => {
+            req_key => $csr_serial,
+            pki_realm => CTX('session')->data->pki_realm,
+        },
     );
 
     ##! 64: 'csr: ' . Dumper $csr

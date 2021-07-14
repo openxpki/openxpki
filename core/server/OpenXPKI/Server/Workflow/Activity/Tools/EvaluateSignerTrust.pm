@@ -86,7 +86,7 @@ sub execute {
 
     # Check the chain
     # set from either db query or from chain validation
-    my ($signer_issuer, $signer_req_key, $signer_root, $signer_revoked, @signer_chain);
+    my ($signer_issuer, $signer_root, $signer_revoked, @signer_chain);
     my $signer_realm = 'unknown';
     my $signer_profile = 'unknown';
 
@@ -97,19 +97,12 @@ sub execute {
         $context->param('signer_cert_identifier' => $signer_identifier);
         $signer_realm = $cert_hash->{pki_realm} || '_global';
         $signer_issuer = $cert_hash->{issuer_identifier};
-        $signer_req_key = $cert_hash->{req_key};
         $signer_revoked = ($cert_hash->{status} ne 'ISSUED');
 
         # Get the profile of the certificate, if it was issued from this CA
-
-        if ($signer_req_key) {
-            my $csr_hash = CTX('dbi')->select_one(
-                from    => 'csr',
-                columns => [ 'profile' ],
-                where   => { req_key => $signer_req_key },
-            );
-            $signer_profile = $csr_hash->{profile} if $csr_hash->{profile};
-
+        if ($cert_hash->{req_key}) {
+            my $profile = CTX('api2')->get_profile_for_cert( identifier => $signer_identifier );
+            $signer_profile = $profile if ($profile);
             if ( $current_realm eq $signer_realm ) {
                 $context->param('signer_in_current_realm' => 1 );
             }

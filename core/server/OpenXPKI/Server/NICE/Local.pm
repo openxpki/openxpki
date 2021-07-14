@@ -45,7 +45,7 @@ sub issueCertificate {
 
     ##! 1: 'Starting '
     my $serializer = OpenXPKI::Serialization::Simple->new();
-    my $realm = CTX('session')->data->pki_realm;
+    my $pki_realm = CTX('session')->data->pki_realm;
     my $config = CTX('config');
 
     my $csr_serial = $csr->{req_key};
@@ -67,7 +67,10 @@ sub issueCertificate {
             attribute_value
         ) ],
         from => 'csr_attributes',
-        where => { req_key => $csr_serial },
+        where => {
+            req_key => $csr_serial,
+            pki_realm => $pki_realm
+        },
     );
 
     while (my $attr = $cert_attr->fetchrow_hashref) {

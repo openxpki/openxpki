@@ -130,7 +130,7 @@ sub execute {
 
     # Valid by profile
     $tuple = $db->select_arrays(
-        from_join => 'certificate certificate.req_key=req_key csr',
+        from_join => 'certificate {req_key=req_key,pki_realm=pki_realm} csr',
         columns  => [ 'profile', 'COUNT(identifier)|amount' ],
         where => {
             %base_conditions,

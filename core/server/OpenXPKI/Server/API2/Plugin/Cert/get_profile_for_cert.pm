@@ -42,7 +42,7 @@ command "get_profile_for_cert" => {
     my $identifier = $params->identifier;
 
     my $result = CTX('dbi')->select_one(
-        from_join => 'certificate req_key=req_key csr',
+        from_join => 'certificate {req_key=req_key,pki_realm=pki_realm} csr',
         columns => [ 'csr.profile' ],
         where => { 'certificate.identifier' => $identifier },
     );

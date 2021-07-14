@@ -14,7 +14,6 @@ sub execute {
 
     ##! 1: 'start'
     my ($self, $workflow) = @_;
-    my $pki_realm  = CTX('session')->data->pki_realm;
     my $serializer = OpenXPKI::Serialization::Simple->new();
     my $context    = $workflow->context();
 
@@ -71,16 +70,10 @@ sub execute {
 
     # look up the certificate profile via the csr table
     ##! 32: ' Look for old csr: ' . $cert->{req_key}
-    my $old_profile = $dbi->select_one(
-        from => 'csr',
-        columns => [ 'profile' ],
-        where => {
-            req_key => $cert->{req_key},
-        }
-    );
+    my $old_profile = CTX('api2')->get_profile_for_cert( identifier => $cert_identifier );
 
-    ##! 32: 'Found profile ' . $old_profile->{PROFILE}
-    $context->param(  $prefix.'cert_profile' =>  $old_profile->{profile} );
+    ##! 32: 'Found profile ' . $old_profile
+    $context->param(  $prefix.'cert_profile' =>  $old_profile );
 
     $context->param( 'in_renewal_window' => 0 );
     $context->param( 'in_renewal_grace_period' => undef );
