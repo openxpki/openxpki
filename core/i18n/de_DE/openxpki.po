@@ -18,7 +18,7 @@ msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Die ausgewählte Aktion ist nicht verfügbar"
 
 msgid "I18N_OPENXPKI_UI_APPLICATION_ERROR"
-msgstr "Unerwartetet Fehler in der Anwendung"
+msgstr "Unerwarteter Fehler in der Anwendung"
 
 msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED"
 msgstr "Autentifizierung fehlgeschlagen"
