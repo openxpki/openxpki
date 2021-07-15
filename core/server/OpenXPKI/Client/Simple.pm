@@ -550,7 +550,7 @@ sub handle_workflow {
             die "No workflow object received!";
         }
 
-        $self->logger()->trace($reply->{workflow});
+        $self->logger()->trace(Dumper $reply->{workflow});
 
     } elsif ($wf_type) {
         $reply = $self->run_command('create_workflow_instance',{

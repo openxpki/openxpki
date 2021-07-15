@@ -268,7 +268,7 @@ sub config() {
         if ($service eq 'est' && !$3) {
             $self->endpoint('default');
             $self->route($1);
-        } else {            
+        } else {
             $self->endpoint($1);
             $self->route($3) if ($3);
         }
@@ -279,7 +279,7 @@ sub config() {
         if ($service eq 'est' && !$3) {
             $self->endpoint('default');
             $self->route($1);
-        } else {            
+        } else {
             $self->endpoint($1);
             $self->route($3) if ($3);
         }

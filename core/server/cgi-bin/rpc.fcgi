@@ -13,7 +13,7 @@ use MIME::Base64;
 use OpenXPKI::Exception;
 use OpenXPKI::Client::Simple;
 use OpenXPKI::Client::Config;
-use OpenXPKI::Client::RPC;
+use OpenXPKI::Client::Service::RPC;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::i18n qw( i18nGettext i18nTokenizer );
 
@@ -101,7 +101,7 @@ while (my $cgi = CGI::Fast->new()) {
         next;
     }
 
-    my $rpc = OpenXPKI::Client::RPC->new( config => $config );
+    my $rpc = OpenXPKI::Client::Service::RPC->new( config => $config );
 
     my $method = $cgi->param('method');
 

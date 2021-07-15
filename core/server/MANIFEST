@@ -38,9 +38,14 @@ OpenXPKI/VERSION.pm
 ## Client
 OpenXPKI/Client.pm
 OpenXPKI/Client/Config.pm
-OpenXPKI/Client/RPC.pm
 OpenXPKI/Client/SCEP.pm
 OpenXPKI/Client/Simple.pm
+
+# Wrappers for EST, RPC...
+OpenXPKI/Client/Service/Base.pm
+OpenXPKI/Client/Service/RPC.pm
+OpenXPKI/Client/Service/Response.pm
+OpenXPKI/Client/Service/Role/PickupWorkflow.pm
 
 # New UI Client
 OpenXPKI/Client/UI.pm
