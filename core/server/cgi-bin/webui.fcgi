@@ -173,6 +173,9 @@ Reverse to encrypt_cookie
 sub decrypt_cookie {
 
     my $value = shift;
+
+    return unless($value);
+
     my $cipher = __get_cookie_cipher();
     return $value unless ($cipher);
     my $plain;

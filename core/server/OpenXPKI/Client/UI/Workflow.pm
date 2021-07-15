@@ -2774,7 +2774,8 @@ sub __render_result_list {
             $field = 'workflow_id' if ($field eq 'workflow_serial');
 
             # we need to load the wf info
-            if (!$wf_info && ($col->{template} || $col->{source} eq 'context')) {
+            my $colsrc = $col->{source} || '';
+            if (!$wf_info && ($col->{template} || $colsrc eq 'context')) {
                 $wf_info = $self->send_command_v2( 'get_workflow_info',  {
                     id => $wf_item->{'workflow_id'},
                     with_attributes => 1,
@@ -2793,7 +2794,7 @@ sub __render_result_list {
                 };
                 push @line, $self->send_command_v2( 'render_template', { template => $col->{template}, params => $ttp } );
 
-            } elsif ($col->{source} eq 'workflow') {
+            } elsif ($colsrc eq 'workflow') {
 
                 # Special handling of the state field
                 if ($field eq "workflow_state") {
@@ -2809,9 +2810,9 @@ sub __render_result_list {
 
                 }
 
-            } elsif ($col->{source} eq 'context') {
+            } elsif ($colsrc eq 'context') {
                 push @line, $context->{ $col->{field} };
-            } elsif ($col->{source} eq 'attribute') {
+            } elsif ($colsrc eq 'attribute') {
                 push @line, $wf_item->{ $col->{field} }
             } elsif ($col->{field} eq 'creator') {
                 push @line, $self->__render_creator_tooltip($wf_item->{creator}, $col);
