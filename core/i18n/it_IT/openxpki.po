@@ -452,11 +452,6 @@ msgstr "Password della Chiave"
 msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
 msgstr "Cifratura"
 
-# Remove?
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CUST"
-msgstr "Chiave"
-
 # This is just a prefix
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
@@ -2418,10 +2413,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Richiesta Aggiornamento"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
-msgstr "Stato"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Stato"
 
@@ -3158,6 +3149,27 @@ msgstr ""
 "caricare un file dal tuo computer."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
+msgstr "La tua richiesta codificata in formato PKCS10"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_DESC"
+msgstr ""
+"Incolla la tua richiesta in formato PKCS10 direttamente nel campo testuale "
+"oppure usa il pulsante upload per caricare un file dal tuo computer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_LABEL"
+msgstr "Richiesta PKCS10"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_PLACEHOLDER"
+msgstr ""
+"Incolla la tua richiesta in formato PEM qui (deve iniziare con -----BEGIN "
+"CERTIFICATE REQUEST——) oppure usa il pulsante browse/upload qui sotto per "
+"caricare un file dal tuo computer."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_TOOLTIP"
 msgstr "La tua richiesta codificata in formato PKCS10"
 
 #, fuzzy
@@ -4500,6 +4512,14 @@ msgstr "Modifica i Metadati di un certificato."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_LABEL"
 msgstr "Modifica Metadati"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_DESC"
+msgstr "Esporta il Certificato nel formato desiderato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_LABEL"
+msgstr "Esporta Certificato"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_DESC"
 msgstr "Emetti le Liste Revoche (CRL)."
 
@@ -4740,6 +4760,11 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CRL_LAST_ITEMCNT"
 #~ msgstr "mostra le liste di revoca precedenti"
+
+# Remove?
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CUST"
+#~ msgstr "Chiave"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
@@ -5567,6 +5592,10 @@ msgstr "Chiave"
 #~ msgstr "Genera Codice"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
+#~ msgstr "Stato"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_AUTH_FAILURE_DESC"
 #~ msgstr ""
 #~ "Questo Workflow è definitivamente fallito e non può essere riavviato"
@@ -5873,28 +5902,6 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_META_ENDPOINT_TOOLTIP"
 #~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_DESC"
-#~ msgstr ""
-#~ "Incolla la tua richiesta in formato PKCS10 direttamente nel campo "
-#~ "testuale oppure usa il pulsante upload per caricare un file dal tuo "
-#~ "computer"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_LABEL"
-#~ msgstr "Richiesta PKCS10"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_PLACEHOLDER"
-#~ msgstr ""
-#~ "Incolla la tua richiesta in formato PEM qui (deve iniziare con -----BEGIN "
-#~ "CERTIFICATE REQUEST——) oppure usa il pulsante browse/upload qui sotto per "
-#~ "caricare un file dal tuo computer."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_TOOLTIP"
-#~ msgstr "La tua richiesta codificata in formato PKCS10"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_SUBJECT_CHANGED_WARNING"

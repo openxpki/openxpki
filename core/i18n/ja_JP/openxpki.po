@@ -381,10 +381,6 @@ msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
 msgstr "キー識別子"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_CUST"
-msgstr "はい"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
 msgstr "証明書を失効する理由を指定します。"
 
@@ -2115,10 +2111,6 @@ msgstr "以下の情報を更新してください。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "リクエストの更新"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
-msgstr "状態"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "ワークフロー属性"
 
@@ -2803,6 +2795,23 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
 msgstr "PKCS10でエンコードされたリクエスト"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_DESC"
+msgstr ""
+"PKCS7形式の証明書バンドルをフィールドに直接貼り付けるか、アップロードボタンを"
+"使用してローカルコンピューターからファイルをロードしてください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_LABEL"
+msgstr "PKCS7"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_PLACEHOLDER"
+msgstr ""
+"PEMエンコードされたリクエストをここに貼り付けて(----- BEGIN PKCS7 ----- のよ"
+"うにする必要があります)、または下の参照/アップロードボタンを使用してコン"
+"ピューターからファイルをロードしてください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_TOOLTIP"
+msgstr "PKCS7エンコードされたリクエスト"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_CERTIFICATE_KEY_DUPLICATE"
 msgstr "重複した鍵証明書"
@@ -4036,6 +4045,14 @@ msgstr "証明書のメタデータを変更します。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_LABEL"
 msgstr "メタデータの変更"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_DESC"
+msgstr "証明書をエクスポートします。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_LABEL"
+msgstr "証明書のエクスポート"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_DESC"
 msgstr "CRLを発行します。"
 
@@ -4188,6 +4205,10 @@ msgstr "はい"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CRL_LAST_ITEMCNT"
 #~ msgstr "古い失効リストを表示する"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CUST"
+#~ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
 #~ msgstr "作成者"
@@ -4974,6 +4995,10 @@ msgstr "はい"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 #~ msgstr "コードを作成する"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
+#~ msgstr "状態"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_APPROVE"
 #~ msgstr "リクエストの承認"
 
@@ -5261,23 +5286,6 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_META_ENDPOINT_TOOLTIP"
 #~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_DESC"
-#~ msgstr ""
-#~ "PKCS7形式の証明書バンドルをフィールドに直接貼り付けるか、アップロードボタ"
-#~ "ンを使用してローカルコンピューターからファイルをロードしてください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_LABEL"
-#~ msgstr "PKCS7"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_PLACEHOLDER"
-#~ msgstr ""
-#~ "PEMエンコードされたリクエストをここに貼り付けて(----- BEGIN PKCS7 ----- の"
-#~ "ようにする必要があります)、または下の参照/アップロードボタンを使用してコン"
-#~ "ピューターからファイルをロードしてください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_TOOLTIP"
-#~ msgstr "PKCS7エンコードされたリクエスト"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_DESC"
 #~ msgstr "このワークフローで置き換えられる証明書。"

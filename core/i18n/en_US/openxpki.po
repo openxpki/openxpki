@@ -368,11 +368,6 @@ msgstr "Challenge password"
 msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
 msgstr "Key generation failed"
 
-# Remove?
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_CUST"
-msgstr "Yes"
-
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
 msgstr "This is just a prefix"
@@ -2011,9 +2006,6 @@ msgstr "Please update / complete the information below."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Update Request"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
-msgstr "Archive at"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Workflow Attributes"
 
@@ -2650,6 +2642,23 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
 msgstr "Your PKCS10 encoded request"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_DESC"
+msgstr ""
+" Paste your PKCS7 formated certificate bundle directly into the field or use "
+"the upload button to load a file from your local computer"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_LABEL"
+msgstr "PKCS7"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_PLACEHOLDER"
+msgstr ""
+" Please paste your PEM encoded request here (must look like  -----BEGIN "
+"PKCS7-----) or use the browse/upload button below to load a file from your "
+"computer."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_TOOLTIP"
+msgstr "Your PEM formatted PKCS7 encoded container"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_CERTIFICATE_KEY_DUPLICATE"
 msgstr "Duplicated Key Certificates"
@@ -3839,6 +3848,12 @@ msgstr "Change a certificates metadata."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_LABEL"
 msgstr "Change Metadata"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_DESC"
+msgstr "Import certificate revocation lists from external CAs"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_LABEL"
+msgstr "CRL Import"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_DESC"
 msgstr "Issue certificate revocation lists."
 
@@ -3971,6 +3986,11 @@ msgstr "Wake Up"
 # Remove?
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Yes"
+
+# Remove?
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CUST"
+#~ msgstr "Yes"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
@@ -4156,6 +4176,9 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 #~ msgstr "Generate Code"
 
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
+#~ msgstr "Archive at"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_APPROVE"
 #~ msgstr "Approve Request"
 
@@ -4223,23 +4246,6 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_META_ENDPOINT_TOOLTIP"
 #~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_DESC"
-#~ msgstr ""
-#~ " Paste your PKCS7 formated certificate bundle directly into the field or "
-#~ "use the upload button to load a file from your local computer"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_LABEL"
-#~ msgstr "PKCS7"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_PLACEHOLDER"
-#~ msgstr ""
-#~ " Please paste your PEM encoded request here (must look like  -----BEGIN "
-#~ "PKCS7-----) or use the browse/upload button below to load a file from "
-#~ "your computer."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_TOOLTIP"
-#~ msgstr "Your PEM formatted PKCS7 encoded container"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_DESC"
 #~ msgstr "The certificate to be replaced by this workflow."

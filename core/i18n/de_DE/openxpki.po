@@ -368,10 +368,6 @@ msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
 msgstr "Schlüsselerzeugung fehlgeschlagen"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_CUST"
-msgstr "ja"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
 msgstr "die Sperrung wird nach dem angegebenen Zeitpunkt ausgeführt"
 
@@ -2107,9 +2103,6 @@ msgstr "Bitte aktualisieren/komplettieren Sie die nachfolgenden Informationen."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Antrag aktualisieren"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
-msgstr "Archiviere am"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Workflow-Meta-Daten"
 
@@ -2789,6 +2782,23 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
 msgstr "Ihr PKCS#10 Zertifikatsantrag"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_DESC"
+msgstr ""
+" Paste your PKCS7 formated request/response directly into the field or use "
+"the upload button to load a file from your local computer"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_LABEL"
+msgstr "PKCS7 Eingabe"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_PLACEHOLDER"
+msgstr ""
+"Fügen Sie hier den PEM kodierten PKCS7 Block ein ( -----BEGIN PKCS7-----) "
+"oder verwenden Sie 'Durchsuchen' um eine Datei von ihrem Arbeitsplatzrechner "
+"auszuwählen."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_TOOLTIP"
+msgstr "Your PKCS7 encoded request/response"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_CERTIFICATE_KEY_DUPLICATE"
 msgstr "Policy Verletzung: Zertifikate mit diesem Schlüssel"
@@ -4078,6 +4088,12 @@ msgstr "Ändern der Meta-Daten eines Zertifikates"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_LABEL"
 msgstr "Meta-Daten ändern"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_DESC"
+msgstr "Importiert Sperrliste von externen CAs"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_LABEL"
+msgstr "Sperrliste importieren"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_DESC"
 msgstr "Erlaubt das Ausstellen von Sperrlisten."
 
@@ -4210,6 +4226,10 @@ msgstr "aufwecken"
 
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "ja"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_CUST"
+#~ msgstr "ja"
 
 #~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
 #~ msgstr "Ersteller"
@@ -4397,6 +4417,9 @@ msgstr "ja"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 #~ msgstr "Generate Code"
 
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
+#~ msgstr "Archiviere am"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_APPROVE"
 #~ msgstr "Antrag genehmigen"
 
@@ -4466,23 +4489,6 @@ msgstr "ja"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_META_ENDPOINT_TOOLTIP"
 #~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_DESC"
-#~ msgstr ""
-#~ " Paste your PKCS7 formated request/response directly into the field or "
-#~ "use the upload button to load a file from your local computer"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_LABEL"
-#~ msgstr "PKCS7 Eingabe"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_PLACEHOLDER"
-#~ msgstr ""
-#~ "Fügen Sie hier den PEM kodierten PKCS7 Block ein ( -----BEGIN PKCS7-----) "
-#~ "oder verwenden Sie 'Durchsuchen' um eine Datei von ihrem "
-#~ "Arbeitsplatzrechner auszuwählen."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_TOOLTIP"
-#~ msgstr "Your PKCS7 encoded request/response"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_DESC"
 #~ msgstr "The certificate to be replaced by this workflow."
