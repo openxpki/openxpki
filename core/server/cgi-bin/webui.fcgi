@@ -37,7 +37,7 @@ eval {
     # do NOT call config here as webui does not
     # use the URI based  endpoint logic yet
     $conf = $config->default();
-    $log->debug(Dumper $conf);# if ($log->is_trace());
+    $log->trace(Dumper $conf) if ($log->is_trace());
 };
 
 if (my $err = $EVAL_ERROR) {

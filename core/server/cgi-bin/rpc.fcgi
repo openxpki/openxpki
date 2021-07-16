@@ -90,7 +90,7 @@ while (my $cgi = CGI::Fast->new()) {
     my $client;
 
     my $conf;
-    eval { $conf = $config->config(); };
+    eval { $conf = $config->parse_uri()->config(); };
     if (!$conf) {
         $log->error($EVAL_ERROR);
         send_output( $cgi,  { error => {

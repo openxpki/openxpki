@@ -23,25 +23,20 @@ while (my $cgi = CGI::Fast->new()) {
     # Supported operations are
     # cacerts, simpleenroll, simplereenroll, , csrattrs
     # serverkeygen and fullcmc is not supported
-    $ENV{REQUEST_URI} =~ m{.well-known/est/((\w+)/)?(cacerts|simpleenroll|simplereenroll|csrattrs)};
-    my $label = $2 || 'default';
-    my $operation = $3;
-
-    if (!$operation) {
+    $config->parse_uri();
+    my $operation = $config->route();
+    if ($operation !~ m{(cacerts|simpleenroll|simplereenroll|csrattrs)}) {
         print $cgi->header( -status => '501 Not implemented', -type => 'text/plain');
         print "Method not implemented\n";
         $log->error('Method not implemented');
         next;
     }
 
-    $log->trace(sprintf("Incoming EST request %s on endpoint %s", $operation, $label));
-
-    # set label as endpoint
-    $config->endpoint($label);
+    $log->trace(sprintf("Incoming EST request %s on endpoint %s", $operation, $config->endpoint()));
 
     if ( lc( $ENV{HTTPS} // '' ) eq 'on') {
         # what we expect -> noop
-    } elsif ($config->load_config()->{global}->{insecure}) {
+    } elsif ($config->config()->{global}->{insecure}) {
         # RFC demands TLS for EST but we might have a SSL proxy in front
         $log->debug("unauthenticated (plain http)");
 
@@ -95,7 +90,7 @@ while (my $cgi = CGI::Fast->new()) {
     } else {
 
         # Default is base64 encoding, but we can turn on binary
-        my $conf = $config->load_config();
+        my $conf = $config->config();
         my $encoding = $conf->{global}->{encoding} || 'base64';
         my $out = $response->result;
         if ($encoding eq 'binary') {

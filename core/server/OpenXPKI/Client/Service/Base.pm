@@ -55,7 +55,7 @@ sub build_params {
     my $self = shift;
     my $operation = shift;
 
-    my $conf = $self->config()->load_config();
+    my $conf = $self->config()->config();
 
     my $param = {};
     # look for preset params
@@ -138,7 +138,7 @@ sub handle_enrollment_request {
     my $config = $self->config();
     my $log = $self->logger();
 
-    my $conf = $config->load_config();
+    my $conf = $config->config();
 
     my $param = $self->build_params( $operation );
 
@@ -302,7 +302,7 @@ sub handle_property_request {
     my $config = $self->config();
     my $log = $self->logger();
 
-    my $conf = $config->load_config();
+    my $conf = $config->config();
 
     my $param = $self->build_params( $operation );
 

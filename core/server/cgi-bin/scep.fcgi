@@ -29,7 +29,7 @@ my $json = new JSON();
 
 while (my $cgi = CGI::Fast->new()) {
 
-    my $conf = $config->config();
+    my $conf = $config->parse_uri()->config();
 
     my $service = $conf->{global}->{service} || 'SCEP';
     my $socket  = $conf->{global}->{socket};

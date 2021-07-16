@@ -14,8 +14,6 @@ use List::Util;
 use JSON;
 
 # Project modules
-use OpenXPKI::Client::Config;
-use OpenXPKI::Connector::WorkflowContext;
 use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
