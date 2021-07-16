@@ -8,6 +8,7 @@ use Try::Tiny;
 # Project modules
 use OpenXPKI::Server;
 use OpenXPKI::Server::Context qw( CTX );
+use OpenXPKI::Daemonize;
 use OpenXPKI::Connector::WorkflowContext;
 use OpenXPKI::MooseParams;
 use OpenXPKI::Debug;
@@ -151,10 +152,10 @@ B<Positional parameters>
 sub _execute_activity_sync {
     my ($self, $workflow, $activity) = @_;
     ##! 4: 'start'
+    ##! 64: 'wf: ' . $workflow->type . ', activity: ' . $activity
 
     my $log = CTX('log')->workflow;
 
-    ##! 64: Dumper $workflow
     OpenXPKI::Server::__set_process_name("workflow: id %d", $workflow->id());
     # run activity
     eval { $self->_run_activity($workflow, $activity) };
@@ -234,6 +235,7 @@ B<Positional parameters>
 sub _execute_activity_async {
     my ($self, $workflow, $activity) = @_;
     ##! 4: 'start'
+    ##! 64: 'wf: ' . $workflow->type . ', activity: ' . $activity
 
     my $log = CTX('log')->workflow;
 
@@ -245,7 +247,7 @@ sub _execute_activity_async {
 
     # parent process
     if ($pid > 0) {
-        ##! 32: ' Workflow instance succesfully forked with pid ' . $pid
+        ##! 32: 'Workflow instance succesfully forked with pid ' . $pid
         $log->trace("Forked process with PID $pid for workflow execution") if $log->is_trace;
         return $pid;
     }
@@ -255,7 +257,7 @@ sub _execute_activity_async {
 
     # child process
     try {
-        ##! 16: ' Workflow instance succesfully forked - I am the workflow'
+        ##! 16: 'I am the child process running the activity'
         # append fork info to process name
         OpenXPKI::Server::__set_process_name("workflow: id %d (detached)", $workflow->id());
 

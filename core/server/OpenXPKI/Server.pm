@@ -278,7 +278,7 @@ sub pre_loop_hook {
         # We need it, too, because otherwise
         # $? is -1 after a `$command` backtick call
         # (for example when doing external dynamic authentication) ...
-        $SIG{CHLD} = 'DEFAULT';
+        $SIG{'CHLD'} = 'DEFAULT';
     }
 
 }

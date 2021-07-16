@@ -11,7 +11,7 @@ OpenXPKI::Daemonize - Helper functions to cleanly fork background processes
 use English;
 
 # CPAN modules
-use POSIX qw(:signal_h setuid setgid);
+use POSIX ();
 
 # Project modules
 use OpenXPKI::Debug;
@@ -68,25 +68,35 @@ This is to make sure error messages still go to the desired log files.
 
 B<Note on SIGCHLD>
 
-For the parent process we set C<$SIG{CHLD} = "IGNORE"> to prevent zombie child
-processes.
+The most compatible way to handle C<SIGCHLD> seems to set it to C<'DEFAULT'>,
+letting Perl handle it. This way commands like C<system()> will work properly.
 
-But C<IGNORE> can lead to problems with system calls e.g. via L<Proc::SafeExec>
-or L<system>, see
-L<the Perl CookBook|https://docstore.mik.ua/orelly/perl/cookbook/ch16_20.htm>
-for details.
+For the child process we set C<$SIG{'CHLD'} = 'DEFAULT'>.
 
-Thus in the child process we set C<$SIG{CHLD} = "DEFAULT"> to prevent these
-problems.
+The problem is that child processes will become zombies unless the parent
+calls C<waitpid()> to reap them.
 
-But in the parent process after forking you should manually set
-C<$SIG{CHLD} = "DEFAULT"> if you want to do system calls.
+For the parent process we set up an own C<SIGCHLD> handler that calls C<waitpid()>
+to properly reap child processes without affecting calls to C<system()>.
+
+Obviously due to a bug (L<https://github.com/Perl/perl5/issues/17662>) maybe in
+conjunction with our use of L<Net::Server> C<SIGCHLD> handling is not reset when
+the parent process exits. That is why in C<DEMOLISH> we explicitely hand over
+child reaping to the operating system via C<$SIG{'CHLD'} = 'IGNORE'>.
+
+Also see L<https://perldoc.perl.org/perlipc#Signals>.
 
 =cut
 sub fork_child {
     my ($self) = @_;
 
-    $SIG{CHLD} = 'IGNORE'; # IGNORE means: child zombies are auto-removed from process table
+    # reap child processes while allowing e.g. system() to work properly
+    $SIG{'CHLD'} = sub {
+        # Reap any child process (-1) that became a zombie.
+        # The loop is needed as there would be no second SIGCHLD if another
+        # process dies while this handler runs.
+        1 while waitpid(-1, POSIX::WNOHANG()) > 0; # do nothing, just reap
+    };
 
     my $pid = $self->_try_fork($self->max_fork_redo);
 
@@ -97,18 +107,15 @@ sub fork_child {
     # child process
     #
 
-    # Reset handler for SIGCHLD:
-    # IGNORE could prevent Proc::SafeExec or system() from working correctly
-    # (see https://docstore.mik.ua/orelly/perl/cookbook/ch16_20.htm)
-    $SIG{CHLD} = 'DEFAULT';
-    $SIG{HUP}  = $self->sighup_handler  if $self->sighup_handler;
-    $SIG{TERM} = $self->sigterm_handler if $self->sigterm_handler;
+    $SIG{'CHLD'} = 'DEFAULT'; # reset SIGCHLD handler so calls to system() etc. work
+    $SIG{'HUP'}  = $self->sighup_handler  if $self->sighup_handler;
+    $SIG{'TERM'} = $self->sigterm_handler if $self->sigterm_handler;
 
     if ($self->gid) {
-        setgid($self->gid);
+        POSIX::setgid($self->gid);
     }
     if ($self->uid) {
-        setuid($self->uid);
+        POSIX::setuid($self->uid);
         $ENV{USER} = getpwuid($self->uid);
         $ENV{HOME} = ((getpwuid($self->uid))[7]);
     }
@@ -125,14 +132,25 @@ sub fork_child {
     return $pid;
 }
 
+=head2 DEMOLISH
+
+Hand C<SIGCHLD> processing over to operating system (see note on C<SIGCHLD> at
+L</fork_child>).
+
+=cut
+sub DEMOLISH {
+    my $self = shift;
+    $SIG{'CHLD'} = 'IGNORE';
+}
+
 # "The most paranoid of programmers block signals for a fork to prevent a
 # signal handler in the child process being called before Perl can update
 # the child's $$ variable, its process id."
 # (https://docstore.mik.ua/orelly/perl/cookbook/ch16_21.htm)
 sub _block_sigint {
     my ($self) = @_;
-    my $sigint = POSIX::SigSet->new(SIGINT);
-    sigprocmask(SIG_BLOCK, $sigint, $self->old_sig_set)
+    my $sigint = POSIX::SigSet->new(POSIX::SIGINT());
+    POSIX::sigprocmask(POSIX::SIG_BLOCK(), $sigint, $self->old_sig_set)
         or OpenXPKI::Exception->throw(
             message => 'Unable to block SIGINT before fork()',
             log => { priority => 'fatal', facility => 'system' }
@@ -141,7 +159,7 @@ sub _block_sigint {
 
 sub _unblock_sigint {
     my ($self) = @_;
-    sigprocmask(SIG_SETMASK, $self->old_sig_set)
+    POSIX::sigprocmask(POSIX::SIG_SETMASK(), $self->old_sig_set)
         or OpenXPKI::Exception->throw(
             message => 'Unable to reset old signals after fork()',
             log => { priority => 'fatal', facility => 'system' }
