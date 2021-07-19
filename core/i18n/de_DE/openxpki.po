@@ -612,7 +612,7 @@ msgstr "PKCS8 (PEM)"
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_DESC"
 msgstr ""
 "Das Passwort welches bei der Erstellung des Antrages vergeben wurde. Wird "
-"ebenfalls für die exportierte Datei verwendet sofern kein anderen Passwort "
+"ebenfalls für die exportierte Datei verwendet sofern kein anderes Passwort "
 "vergeben wird."
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_PASSWORD_LABEL"
