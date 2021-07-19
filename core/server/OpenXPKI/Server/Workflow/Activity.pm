@@ -11,29 +11,29 @@ use OpenXPKI::Server::Workflow::Helpers;
 use Workflow::Exception qw( workflow_error configuration_error );
 use Data::Dumper;
 
-__PACKAGE__->mk_accessors( qw( resulting_state workflow _map log ) );
+__PACKAGE__->mk_accessors( qw( workflow _map log ) );
 
 sub init {
     my ( $self, $wf, $params ) = @_;
-    ##! 1: 'start ' . $params->{name}
-    ##! 64: 'self: ' . Dumper $self
-    ##! 64: 'params: ' . Dumper $params
-    ##! 64: 'wf: ' . Dumper $wf
 
-    # FIXME - this is a bit of a hack - we're peeking into Workflow's
-    # internal structures here. Workflow should provide a way to get
-    # the resulting state for an activity itself.
-    $self->resulting_state($wf->{_states}->{$wf->state()}->{_actions}->{$params->{name}}->{resulting_state});
-    ##! 16: 'Workflow :'.ref $wf
-    ##! 16: 'resulting_state: ' . $self->resulting_state()
+    my $action_name = $params->{name};
+    ##! 1: 'start ' . $action_name
+    ##! 32: $params
+    ##! 64: $self
+    ##! 128: $wf
+
     $self->{PKI_REALM} = CTX('session')->data->pki_realm;
     ##! 16: 'self->{PKI_REALM} = ' . $self->{PKI_REALM}
 
     $self->workflow( $wf );
 
-
     # copy the source params
     my $params_merged = { % { $params }};
+
+    # since Workflow 1.55 this is merged from the state config
+    # as we dont want this in the list we need to delete it
+    delete $params_merged->{resulting_state};
+    delete $params_merged->{condition};
 
     # init the _map parameters
     my $_map = {};
@@ -58,8 +58,8 @@ sub init {
 
     $self->_map( $_map );
 
-    ##! 32: 'merged params ' . Dumper  $params_merged
-    ##! 32: 'map ' . Dumper  $_map
+    ##! 32: $params_merged
+    ##! 32: $_map
     ##! 1: 'end'
     return 1;
 }
@@ -143,13 +143,15 @@ sub param {
 
         my $map = $self->_map();
 
+        my %params = %{ $self->{PARAMS} };
+        ##! 64: \%params
         if (wantarray) {
-            my @keys = keys %{ $self->{PARAMS} };
+            my @keys = keys %params;
             push @keys, (keys %{ $map });
             return @keys;
         }
 
-        my $result = { %{ $self->{PARAMS} } };
+        my $result = { %params };
         # add mapped params
         foreach my $key (keys %{ $map }) {
             $result->{$key} = $self->param( $key );
