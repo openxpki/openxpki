@@ -47,8 +47,8 @@ command "get_cert_subject_profiles" => {
         next unless ($params->showall or $config->exists(['profile', $profile, 'style', $id, 'ui' ]));
         $styles->{$id} = {
             value => $id,
-            label => $config->get(['profile', $profile, 'style', $id, 'label']),
-            description => $config->get(['profile', $profile, 'style', $id, 'description']),
+            label => $config->get(['profile', $profile, 'style', $id, 'label']) || '',
+            description => $config->get(['profile', $profile, 'style', $id, 'description'])  || '',
         }
     }
 
