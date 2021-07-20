@@ -24,9 +24,14 @@ backendPath: /cgi-bin/webui.fcgi
 customCssPath: custom.css
 
 #
+# Page title (browser title bar)
+#
+pageTitle: "OpenXPKI - Open Source Trustcenter"
+
+#
 # Year shown in footer (unless footer is replaced using "footer")
 #
-copyrightYear: 1970
+copyrightYear: 2021
 
 #
 # Site header
@@ -43,7 +48,7 @@ header: |-
 #
 footer: |-
     <p class="text-center text-muted credit">
-        &copy; Copyright 2020
+        &copy; Copyright 2021
         &ndash; <a href="http://www.openxpki.org/">The OpenXPKI Project</a>
     </p>
 

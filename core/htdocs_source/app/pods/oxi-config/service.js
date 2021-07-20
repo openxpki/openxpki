@@ -94,7 +94,12 @@ export default class OxiConfigService extends Service {
         return this.localConfig.footer;
     }
 
+    get pageTitle() {
+        return this.localConfig.pageTitle || 'OpenXPKI - Open Source Trustcenter';
+    }
+
     get tooltipOnFocus() {
         return this.localConfig.accessibility?.tooltipOnFocus?.match(/^(1|on|true|enable)$/i);
     }
+
 }

@@ -44,6 +44,7 @@
     "ember-cli-babel": "^7.26.6",
     "ember-cli-bootstrap-datetimepicker": "^0.9.3",
     "ember-cli-dependency-checker": "^3.2.0",
+    "ember-cli-head": "^2.0.0",
     "ember-cli-htmlbars": "^5.7.1",
     "ember-cli-inject-live-reload": "^2.1.0",
     "ember-cli-sri": "^2.1.1",

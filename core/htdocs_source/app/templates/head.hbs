@@ -1,0 +1,7 @@
+{{!-- 
+  The Content below gets added to the documents <head> by ember-cli-head.
+  The 'model' available here is an instance of the 'head-data' service
+  as defined in app/pods/head-data/service.js.
+--}}
+<title>{{this.model.config.pageTitle}}</title>
+<meta property="og:title" content={{this.model.config.pageTitle}} />
