@@ -3,7 +3,7 @@
 </div>
 
 <div class="container-fluid">
-    <form class="form-horizontal" role="form">
+    <form class="form-horizontal">
         {{#each this.visibleFields as |field|}}
             <OxiSection::Form::Field
                 @field={{field}}
@@ -14,7 +14,7 @@
                 @setError={{fn this.setFieldError field}}
                 @submit={{this.submit}}
                 @setFocusInfo={{fn this.setFocusInfo field}}
-                @getFieldValue={{fn this.getFieldValue}}
+                @getFieldValue={{this.getFieldValue}}
             />
         {{/each}}
         <div class="form-group">

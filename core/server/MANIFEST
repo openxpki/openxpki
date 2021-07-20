@@ -609,13 +609,13 @@ cgi-bin/healthcheck.fcgi
 # NOTE:
 #   core/htdocs_source/update-manifest.pl will update the list below.
 #   UPDATE_MANIFEST_UI_LIST - do not remove this comment
-htdocs/assets/chunk.143.cb33a651c15b03ace478.js
-htdocs/assets/chunk.178.0394ef685da3a603b89f.js
+htdocs/assets/chunk.143.aeb4a148c3d64810d322.js
+htdocs/assets/chunk.178.180690988f8e960f6569.js
 htdocs/assets/chunk.57.9a01ed9372a494e52474.js
 htdocs/assets/chunk.57.9a01ed9372a494e52474.js.LICENSE.txt
 htdocs/assets/chunk.958.c87dc3541eae597256d3.js
 htdocs/assets/chunk.958.c87dc3541eae597256d3.js.LICENSE.txt
-htdocs/assets/openxpki-43e876a7a8237de31ac96c68b8dffaff.js
+htdocs/assets/openxpki-38977d0ff9637c0ca67b12ecb13cab61.js
 htdocs/assets/openxpki-f445fdbd16d516b69fd1a11434d1cde9.css
 htdocs/assets/vendor-31430f8704bf2f5dd196f5f23f6d56a3.js
 htdocs/assets/vendor-fa50ae6c3d2eb65d2cfcf2cfaf499518.css
