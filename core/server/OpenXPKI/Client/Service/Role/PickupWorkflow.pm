@@ -3,6 +3,7 @@ package OpenXPKI::Client::Service::Role::PickupWorkflow;
 use warnings;
 use strict;
 use English;
+use Data::Dumper;
 
 use Moose::Role;
 
