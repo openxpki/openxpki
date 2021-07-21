@@ -24,22 +24,17 @@ use OpenXPKI::Serialization::JSON;
 use OpenXPKI::Serialization::Legacy;
 use MIME::Base64;
 
-has 'BACKEND' => (
-    is => 'ro',
-    isa => 'Str',
-    required => 0,
-    default => 'JSON'
-);
-
 has '_json' => (
     is => 'ro',
     isa => 'Object',
+    lazy => 1,
     builder => '_init_json',
 );
 
 has '_legacy' => (
     is => 'ro',
     isa => 'Object',
+    lazy => 1,
     builder => '_init_legacy',
 );
 
