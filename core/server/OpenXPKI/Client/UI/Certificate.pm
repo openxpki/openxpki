@@ -1222,7 +1222,7 @@ sub action_search {
     my $verbose = {};
     foreach my $key (qw(subject issuer_dn)) {
         my $val = $self->param($key);
-        $self->logger()->trace("$key: $val");
+        $self->logger()->trace("$key: " . ($val//''));
         if (defined $val && $val ne '') {
             $query->{$key} = '%'.$val.'%';
             $input->{$key} = $val;
