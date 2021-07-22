@@ -61,8 +61,6 @@ sub BUILD {
 
     # special transformations: create the expected keys in the cache so the
     # check in param() will succeed.
-    # keys key{subkey} should be available with their explicit key and
-    # mapped as hash via the base key
     foreach my $key (keys %cache) {
         # binary data is base64 encoded with the key name prefixed with
         # '_encoded_base64_'
@@ -70,11 +68,15 @@ sub BUILD {
             $cache{substr($key,16)} = undef;
             next;
         }
-        next unless ($key =~ m{ \A (\w+)\{(\w+)\} \z }xs);
-        my $item = $1; my $subkey = $2;
-        $self->logger->debug("Translate hash parameter $key");
-        $cache{$item} = {} unless($cache{$item});
-        $cache{$item}{$subkey} = $cache{$key};
+
+        # keys key{subkey} should be available with their explicit key and
+        # mapped as hash via the base key
+        if ($key =~ m{ \A (\w+)\{(\w+)\} \z }xs) {
+            my $item = $1; my $subkey = $2;
+            $self->logger->debug("Translate hash parameter $key");
+            $cache{$item} = {} unless($cache{$item});
+            $cache{$item}{$subkey} = $cache{$key};
+        }
     }
 
     $self->logger->debug('Request parameters: ' . join(' | ', keys %cache));
