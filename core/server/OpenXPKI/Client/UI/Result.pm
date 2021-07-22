@@ -298,15 +298,15 @@ sub param {
 
     my ($self, $key) = @_;
 
-    die "param now requires a single key as argument" if (!$key || ref $key);
+    die "param() expects a single key (string) as argument\n" if (!$key or ref $key);
 
-    $self->logger->trace("Param request for scalar '$key'") if $self->logger->is_trace;
+    $self->logger->trace("Param request for '$key'") if $self->logger->is_trace;
 
     my @queries = (
         # Try 'extra' parameters
         sub { return $self->extra->{$key} },
         # Try parameter via request object
-        sub { return $self->req()->param($key) },
+        sub { return $self->req->param($key) },
     );
 
     if (wantarray) {
