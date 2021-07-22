@@ -37,7 +37,12 @@ sub BUILD {
 
     my $self = shift;
 
+    #
+    # Preset all keys in the cache (for JSON data, also set the values)
+    #
     my %keys;
+
+    # keys from CGI params
     my @keys = $self->cgi->param;
     map { $keys{$_} = undef } @keys;
 
@@ -51,14 +56,13 @@ sub BUILD {
         $self->method('POST');
     }
 
-    # there are two special transformations
+    # special transformations: create the expected keys in the cache so the
+    # check in param() will succeed.
     # keys key{subkey} should be available with their explicit key and
     # mapped as hash via the base key
-    # binary data is base64 encoded with the key name prefixed with the
-    # literal '_encoded_base64_'
-    # this loop creates the expected keys so the entry check in the param
-    # loops will recognize them
     foreach my $key (keys %keys) {
+        # binary data is base64 encoded with the key name prefixed with
+        # '_encoded_base64_'
         if (substr($key,0,16) eq '_encoded_base64_') {
             $keys{substr($key,16)} = undef;
             next;

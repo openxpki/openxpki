@@ -273,27 +273,22 @@ sub set_status_from_error_reply {
 
 =head2 param
 
-This method returns value from the input. It combines the real cgi parameters
-with those encoded in the action name using "!". The method has multiple
-personalities depending on the key you pass as argument. Parameters from the
-action name have precedence.
+Returns input parameter values, i.e. real CGI parameters and those appended to
+the action name using C<!>. Parameters from the action name have precedence.
+
+The method's behaviour depends on the argument it gets passed:
+
+B<Parameters>
 
 =over
 
-=item scalar
+=item * I<Str> C<$key> - parameter name to retrieve. If a stringified hash or
+array element is passed (e.g. C<key_param{curve_name}>) then only scalar values
+are returned. In this case C<param()> will NOT try to resolve a group of params
+to a non scalar return type.
 
-Return the value with the given key. Key can be a stringified hash/array
-element, e.g. "key_param{curve_name}" (no quotation marks!). This will only
-return scalar values and NOT try to resolve a group of params to a non scalar
-return type!
-
-=item arrayref
-
-no longer supported - use param_from_fields instead
-
-=item undef
-
-no longer supported
+Please note that passing an I<ArrayRef> is no longer supported - please use
+L</param_from_fields> instead. Passing C<undef>is also no longer supported.
 
 =back
 
