@@ -13,7 +13,7 @@ has cgi => (
     required => 1,
 );
 
-has data => (
+has cache => (
     is => 'rw',
     isa => 'HashRef',
     default => sub { return {}; }
@@ -72,7 +72,7 @@ sub BUILD {
 
     $self->logger->debug(Dumper \%keys);
 
-    $self->data( \%keys );
+    $self->cache( \%keys );
 
 }
 
@@ -85,30 +85,30 @@ sub param {
 
     # send all keys
     if (!$name) {
-        die "Request without key is only allowed in array mode" unless (wantarray);
-        return keys %{$self->data()};
+        die "Request without key is only allowed in list context" unless wantarray;
+        return keys %{$self->cache};
     }
 
     # try key without trailing array indicator if it does not exist
-    if ($name =~ m{\[\]\z} && !exists $self->data()->{$name}) {
+    if ($name =~ m{\[\]\z} && !exists $self->cache->{$name}) {
         $name =  substr($name,0,-2);
         $self->logger()->debug('Strip trailing array markers, new key '.$name);
     }
 
-    return unless (exists $self->data()->{$name});
+    return unless exists $self->cache->{$name};
 
     my $cgi = $self->cgi;
     my @queries = (
         # Try CGI parameters (and strip whitespaces)
         sub { return unless $cgi; return map { my $v = $_; $v =~ s/^\s+|\s+$//g; $v } ($cgi->multi_param($name)) },
         # Try Base64 encoded parameter from JSON input
-        sub { return unless $self->data()->{"_encoded_base64_$name"};
+        sub { return unless $self->cache->{"_encoded_base64_$name"};
             return map { decode_base64($_) } (ref $self->data()->{"_encoded_base64_$name"} ? @{$self->data()->{"_encoded_base64_$name"}} : ($self->data()->{"_encoded_base64_$name"})) },
         # Try Base64 encoded CGI parameters
         sub { return unless $cgi; return map { decode_base64($_) } ($cgi->multi_param("_encoded_base64_$name")) },
     );
 
-    if  (!defined $self->data()->{$name}) {
+    if  (!defined $self->cache->{$name}) {
 
         $self->logger()->debug('Not in cache, query cgi');
         my @values;
@@ -119,10 +119,10 @@ sub param {
 
         $self->logger()->debug('Got value ' . Dumper \@values);
         if (wantarray) {
-            $self->data()->{$name} = \@values;
+            $self->cache->{$name} = \@values;
             return @values;
         } elsif (defined $values[0]) {
-            $self->data()->{$name} = $values[0];
+            $self->cache->{$name} = $values[0];
             return $values[0];
         } else {
             return;
@@ -130,18 +130,18 @@ sub param {
 
     }
 
-    $self->logger()->debug('Return from cache');
+    $self->logger->debug('Return from cache');
     if (wantarray) {
-        return ($self->data()->{$name})
-            if(!ref $self->data()->{$name});
+        return ($self->cache->{$name})
+            if(!ref $self->cache->{$name});
 
-        return @{$self->data()->{$name}};
+        return @{$self->cache->{$name}};
     }
 
-    return $self->data()->{$name}->[0]
-            if (ref $self->data()->{$name} eq 'ARRAY');
+    return $self->cache->{$name}->[0]
+            if (ref $self->cache->{$name} eq 'ARRAY');
 
-    return $self->data()->{$name};
+    return $self->cache->{$name};
 
 }
 
