@@ -10,6 +10,7 @@ use MIME::Base64;
 use CGI 4.08 qw( -utf8 );
 use HTML::Entities;
 use JSON;
+use Moose::Util::TypeConstraints;
 
 # Project modules
 use OpenXPKI::i18n qw( i18nTokenizer );
@@ -19,20 +20,20 @@ use OpenXPKI::Serialization::Simple;
 # Attributes set via constructor by OpenXPKI::Client::UI->__load_class()
 has req => (
     is => 'ro',
-    isa => 'Object',
+    isa => 'OpenXPKI::Client::UI::Request',
     predicate => 'has_req',
 );
 
 has extra => (
     is => 'rw',
     isa => 'HashRef',
-    default => sub { return {}; }
+    default => sub { return {}; },
 );
 
 has _client => (
     is => 'ro',
-    isa => 'Object',
-    init_arg => 'client'
+    isa => 'OpenXPKI::Client::UI',
+    init_arg => 'client',
 );
 
 # Internal attributes
@@ -45,7 +46,7 @@ has _page => (
     is => 'rw',
     isa => 'HashRef|Undef',
     lazy => 1,
-    default => undef
+    default => undef,
 );
 
 has _status => (
@@ -60,7 +61,7 @@ has _last_reply => (
 
 has _session => (
     is => 'ro',
-    isa => 'Object',
+    isa => 'CGI::Session',
     lazy => 1,
     builder => '_init_session',
 );
@@ -68,7 +69,7 @@ has _session => (
 has _result => (
     is => 'rw',
     isa => 'HashRef|Undef',
-    default => sub { return {}; }
+    default => sub { {} },
 );
 
 has _refresh => (
@@ -84,9 +85,9 @@ has redirect => (
 
 has serializer => (
     is => 'ro',
-    isa => 'Object',
+    isa => duck_type( [qw( serialize deserialize )] ),
     lazy => 1,
-    default => sub { return OpenXPKI::Serialization::Simple->new(); }
+    default => sub { OpenXPKI::Serialization::Simple->new() },
 );
 
 has type => (

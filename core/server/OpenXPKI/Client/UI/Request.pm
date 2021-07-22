@@ -11,9 +11,9 @@ use Log::Log4perl;
 
 
 has cgi => (
+    required => 1,
     is => 'ro',
     isa => 'CGI',
-    required => 1,
 );
 
 has cache => (

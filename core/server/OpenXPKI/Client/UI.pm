@@ -25,26 +25,24 @@ use OpenXPKI::Client::UI::Login;
 has 'session' => (
     required => 1,
     is => 'rw',
-    isa => 'Object|Undef',
+    isa => 'CGI::Session|Undef',
 );
 
 # the OXI::Client object
 has 'backend' => (
-    required => 0,
-    lazy => 1,
     is => 'rw',
-    isa => 'Object',
+    isa => 'OpenXPKI::Client',
+    lazy => 1,
     builder => '_init_backend',
     trigger => \&_init_backend,
 );
 
 # should be passed by the ui script to be shared, if not we create it
 has 'logger' => (
-    required => 0,
-    lazy => 1,
     is => 'ro',
-    isa => 'Object',
-    'default' => sub{ return Log::Log4perl->get_logger( ); }
+    isa => 'Log::Log4perl::Logger',
+    lazy => 1,
+    default => sub{ return Log::Log4perl->get_logger( ); },
 );
 
 has '_config' => (
