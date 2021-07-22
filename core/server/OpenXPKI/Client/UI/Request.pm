@@ -40,19 +40,22 @@ sub BUILD {
     #
     # Preset all keys in the cache (for JSON data, also set the values)
     #
-    my %keys;
+    my %cache;
 
-    # keys from CGI params
+    # store keys from CGI params
     my @keys = $self->cgi->param;
-    map { $keys{$_} = undef } @keys;
+    $cache{$_} = undef for @keys;
 
-    # keys and values from JSON
+    # store keys and values from JSON POST data
     if (($self->cgi->content_type // '') eq 'application/json') {
-        $self->logger->debug('Incoming JSON');
+        $self->logger->debug('Incoming POST data in JSON format (application/json)');
         my $json = JSON->new->utf8;
-        my $data = $json->decode( scalar $self->cgi->param('POSTDATA') );
-        %keys = ( %keys, %$data );
-        $self->logger->trace( Dumper $data );
+        my $json_data = $json->decode( scalar $self->cgi->param('POSTDATA') );
+
+        # wrap values in an ArrayRef as param() expects it
+        $cache{$_} = [ $json_data->{$_} ] for keys %$json_data;
+
+        $self->logger->trace( Dumper $json_data );
         $self->method('POST');
     }
 
@@ -60,23 +63,23 @@ sub BUILD {
     # check in param() will succeed.
     # keys key{subkey} should be available with their explicit key and
     # mapped as hash via the base key
-    foreach my $key (keys %keys) {
+    foreach my $key (keys %cache) {
         # binary data is base64 encoded with the key name prefixed with
         # '_encoded_base64_'
         if (substr($key,0,16) eq '_encoded_base64_') {
-            $keys{substr($key,16)} = undef;
+            $cache{substr($key,16)} = undef;
             next;
         }
         next unless ($key =~ m{ \A (\w+)\{(\w+)\} \z }xs);
         my $item = $1; my $subkey = $2;
         $self->logger->debug("Translate hash parameter $key");
-        $keys{$item} = {} unless($keys{$item});
-        $keys{$item}{$subkey} = $keys{$key};
+        $cache{$item} = {} unless($cache{$item});
+        $cache{$item}{$subkey} = $cache{$key};
     }
 
-    $self->logger->debug(Dumper \%keys);
+    $self->logger->debug('Request parameters: ' . join(' | ', keys %cache));
 
-    $self->cache( \%keys );
+    $self->cache( \%cache );
 
 }
 
@@ -99,62 +102,53 @@ sub param {
         $self->logger->debug('Strip trailing array markers, new key '.$name);
     }
 
+    # valid key?
     return unless exists $self->cache->{$name};
 
-    my $cgi = $self->cgi;
-    my @queries = (
-        # Try CGI parameters (and strip whitespaces)
-        sub {
-            return unless $cgi;
-            return map { my $v = $_; $v =~ s/^\s+|\s+$//g; $v } ($cgi->multi_param($name))
-        },
-        # Try Base64 encoded parameter from JSON input
-        sub {
-            my $value = $self->cache->{"_encoded_base64_$name"};
-            return unless $value;
-            return map { decode_base64($_) } (ref $value ? @{$value} : ($value))
-        },
-        # Try Base64 encoded CGI parameters
-        sub {
-            return unless $cgi;
-            return map { decode_base64($_) } ($cgi->multi_param("_encoded_base64_$name"))
-        },
-    );
-
-    if  (!defined $self->cache->{$name}) {
-
+    # cache miss - query parameter
+    unless (defined $self->cache->{$name}) {
         $self->logger->debug('Not in cache, query cgi');
-        my @values;
+
+        my $cgi = $self->cgi;
+        my @queries = (
+            # Try CGI parameters (and strip whitespaces)
+            sub {
+                return unless $cgi;
+                return map { my $v = $_; $v =~ s/^\s+|\s+$//g; $v } ($cgi->multi_param($name))
+            },
+            # Try Base64 encoded parameter from JSON input
+            sub {
+                my $value = $self->cache->{"_encoded_base64_$name"};
+                return unless $value;
+                return map { decode_base64($_) } (ref $value ? @{$value} : ($value))
+            },
+            # Try Base64 encoded CGI parameters
+            sub {
+                return unless $cgi;
+                return map { decode_base64($_) } ($cgi->multi_param("_encoded_base64_$name"))
+            },
+        );
+
         for my $query (@queries) {
-            @values = $query->();
-            last if defined $values[0];
+            my @values = $query->();
+            if (scalar @values) {
+                $self->cache->{$name} = \@values;
+                last;
+            }
         }
-
-        $self->logger->debug('Got value ' . Dumper \@values);
-        if (wantarray) {
-            $self->cache->{$name} = \@values;
-            return @values;
-        } elsif (defined $values[0]) {
-            $self->cache->{$name} = $values[0];
-            return $values[0];
-        } else {
-            return;
-        }
-
+        $self->logger->debug('Not in cache, queried value: ' . Dumper $self->cache->{$name});
+    }
+    else {
+        $self->logger->debug('Return from cache');
     }
 
-    $self->logger->debug('Return from cache');
     if (wantarray) {
-        return ($self->cache->{$name})
-            if(!ref $self->cache->{$name});
-
-        return @{$self->cache->{$name}};
+        return @{ $self->cache->{$name} };
     }
-
-    return $self->cache->{$name}->[0]
-            if (ref $self->cache->{$name} eq 'ARRAY');
-
-    return $self->cache->{$name};
+    else {
+        return $self->cache->{$name}->[0] if defined $self->cache->{$name};
+        return;
+    }
 
 }
 
