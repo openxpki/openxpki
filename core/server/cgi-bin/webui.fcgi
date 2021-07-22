@@ -285,7 +285,7 @@ while (my $cgi = CGI::Fast->new()) {
     push @header, ('-cookie', $cgi->cookie( $cookie ));
     push @header, ('-type','application/json; charset=UTF-8');
 
-    $log->trace('Init UI using backend ' . Dumper $backend_client);
+    $log->trace('Init UI using backend ' . ref $backend_client);
 
     my $result;
     eval {
@@ -304,16 +304,16 @@ while (my $cgi = CGI::Fast->new()) {
             %pkey,
         });
 
-        my $req = OpenXPKI::Client::UI::Request->new( cgi => $cgi, logger => $log );
-        $log->trace( Dumper $req ) if ($log->is_trace());
+        my $req = OpenXPKI::Client::UI::Request->new( cgi => $cgi, logger => $log, session => $session_front );
+        $log->trace(ref($req).' - '.Dumper({ map { $_ => $req->{$_} } qw( method cache cgi ) }) ) if ($log->is_trace());
         $result = $client->handle_request( $req );
-        $log->debug('request handled');
-        $log->trace( Dumper $result ) if ($log->is_trace());
+        $log->debug('Request handled');
+        $log->trace(ref($result).' - '.Dumper({ map { $_ => $result->{$_} } qw( type _page redirect extra _result ) }) ) if $log->is_trace();
     };
 
     if (!$result || ref $result !~ /OpenXPKI::Client::UI/) {
         __handle_error($cgi, $EVAL_ERROR);
-        $log->trace('result was ' . Dumper $result) if ($log->is_trace());
+        $log->trace('Result: ' . Dumper $result) if $log->is_trace();
     }
 
     # write session changes to backend

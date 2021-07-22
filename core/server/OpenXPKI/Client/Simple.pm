@@ -657,7 +657,7 @@ sub __reinit_session {
         $self->logger()->info('New backend session with id ' . $client_session);
     }
     $session->param('backend_session_id', $client_session);
-    $self->logger()->trace( Dumper $session ) if $self->logger->is_trace;
+    $self->logger()->trace( Dumper $session->dataref ) if $self->logger->is_trace;
 
     return $reply;
 

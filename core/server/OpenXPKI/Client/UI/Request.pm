@@ -90,7 +90,7 @@ sub param {
     my $self = shift;
     my $name = shift;
 
-    $self->logger->debug('Param request for '.$name);
+    my $msg = "Param request for '$name': ";
 
     # send all keys
     if (!$name) {
@@ -100,8 +100,8 @@ sub param {
 
     # try key without trailing array indicator if it does not exist
     if ($name =~ m{\[\]\z} && !exists $self->cache->{$name}) {
-        $name =  substr($name,0,-2);
-        $self->logger->debug('Strip trailing array markers, new key '.$name);
+        $name = substr($name,0,-2);
+        $msg.= "strip array markers, new key '$name', ";
     }
 
     # valid key?
@@ -109,8 +109,6 @@ sub param {
 
     # cache miss - query parameter
     unless (defined $self->cache->{$name}) {
-        $self->logger->debug('Not in cache, query cgi');
-
         my $cgi = $self->cgi;
         my @queries = (
             # Try CGI parameters (and strip whitespaces)
@@ -138,10 +136,10 @@ sub param {
                 last;
             }
         }
-        $self->logger->debug('Not in cache, queried value: ' . Dumper $self->cache->{$name});
+        $self->logger->trace($msg . 'not in cache. Query result: ' . join(' | ', @{ $self->cache->{$name} })) if $self->logger->is_trace;
     }
     else {
-        $self->logger->debug('Return from cache');
+        $self->logger->trace($msg . 'return from cache');
     }
 
     if (wantarray) {

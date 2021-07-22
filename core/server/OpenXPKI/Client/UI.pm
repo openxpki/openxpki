@@ -126,7 +126,7 @@ sub _init_backend {
 
     Log::Log4perl::MDC->put('ssid', substr($client_id,0,4));
 
-    $self->logger()->trace( Dumper $session ) if $self->logger->is_trace;
+    $self->logger()->trace( Dumper $session->dataref ) if $self->logger->is_trace;
     return $client;
 }
 
@@ -359,7 +359,7 @@ sub handle_page {
         $action = $self->__get_action( $req );
     }
 
-    $self->logger()->trace('Handle page ' . Dumper $args ) if $self->logger->is_trace;
+    $self->logger()->trace('Handle page: ' . Dumper { map { $_ => $args->{$_} } grep { $_ ne 'req' } keys %$args } ) if $self->logger->is_trace;
 
     my $page = (defined $args->{page} ? $args->{page} : $req->param('page')) || 'home';
 
@@ -559,7 +559,7 @@ sub handle_login {
     }
 
     $self->logger()->debug("Selected realm $pki_realm, new status " . $status);
-    $self->logger()->trace(Dumper $reply) if $self->logger->is_trace;
+    $self->logger()->trace('Reply: ' . Dumper $reply) if $self->logger->is_trace;
 
     # we have more than one login handler and leave it to the login
     # class to render it right.
