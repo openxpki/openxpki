@@ -40,7 +40,9 @@ sub BUILD {
     my %keys;
     my @keys = $self->cgi->param;
     map { $keys{$_} = undef } @keys;
-    if (($ENV{'CONTENT_TYPE'} || '') =~ m{\Aapplication/json}) {
+
+    # keys and values from JSON
+    if (($self->cgi->content_type // '') eq 'application/json') {
         $self->logger->debug('Incoming JSON');
         my $json = JSON->new->utf8;
         my $data = $json->decode( scalar $self->cgi->param('POSTDATA') );
