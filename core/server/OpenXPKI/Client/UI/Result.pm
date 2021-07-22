@@ -307,7 +307,6 @@ sub param {
 
     $self->logger->trace("Param request for scalar '$key'") if $self->logger->is_trace;
 
-    my $cgi = $self->cgi;
     my @queries = (
         # Try 'extra' parameters
         sub { return $self->extra->{$key} },
