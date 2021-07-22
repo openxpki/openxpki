@@ -1,15 +1,20 @@
 package OpenXPKI::Client::UI;
-
 use Moose;
 
 use English;
+
+# Core modules
 use Encode;
+use Data::Dumper;
+use MIME::Base64;
+
+# CPAN modules
 use CGI::Session;
 use URI::Escape;
 use Log::Log4perl::MDC;
-use Data::Dumper;
 use Crypt::JWT qw(encode_jwt);
-use MIME::Base64;
+
+# Project modules
 use OpenXPKI::Template;
 use OpenXPKI::Client;
 use OpenXPKI::i18n qw( i18nGettext );

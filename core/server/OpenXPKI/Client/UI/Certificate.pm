@@ -1,18 +1,22 @@
-# OpenXPKI::Client::UI::Certificate
-# Written 2013 by Oliver Welter
-# (C) Copyright 2013 by The OpenXPKI Project
-
 package OpenXPKI::Client::UI::Certificate;
-
 use Moose;
+
+# Core modules
 use Data::Dumper;
-use OpenXPKI::DN;
 use Math::BigInt;
+
+# CPAN modules
 use URI::Escape;
 use DateTime;
 use Digest::SHA qw(sha1_base64);
+
+# Project modules
+use OpenXPKI::DN;
 use OpenXPKI::i18n qw( i18nGettext );
 use OpenXPKI::Serialization::Simple;
+
+
+extends 'OpenXPKI::Client::UI::Result';
 
 
 has __default_grid_head => (
@@ -67,8 +71,6 @@ has __validity_options => (
     ]; }
 );
 
-
-extends 'OpenXPKI::Client::UI::Result';
 
 sub BUILD {
     my $self = shift;

@@ -1,20 +1,20 @@
-# OpenXPKI::Client::UI::Result
-# Written 2013 by Oliver Welter
-# (C) Copyright 2013 by The OpenXPKI Project
-
 package OpenXPKI::Client::UI::Result;
+use Moose;
 
-use CGI 4.08 qw( -utf8 );
+# Core modules
 use Data::Dumper;
-use HTML::Entities;
 use Digest::SHA qw(sha1_base64);
 use MIME::Base64;
+
+# CPAN modules
+use CGI 4.08 qw( -utf8 );
+use HTML::Entities;
 use JSON;
 
+# Project modules
 use OpenXPKI::i18n qw( i18nTokenizer );
 use OpenXPKI::Serialization::Simple;
 
-use Moose;
 
 # Attributes set via constructor by OpenXPKI::Client::UI->__load_class()
 has req => (

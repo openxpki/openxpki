@@ -1,15 +1,18 @@
 package OpenXPKI::Client::UI::Request;
+use Moose;
 
+# Core modules
 use Data::Dumper;
-use JSON;
 use MIME::Base64;
+
+# CPAN modules
+use JSON;
 use Log::Log4perl;
 
-use Moose;
 
 has cgi => (
     is => 'ro',
-    isa => 'Object',
+    isa => 'CGI',
     required => 1,
 );
 
@@ -25,13 +28,13 @@ has method => (
     default => 'GET',
 );
 
-has 'logger' => (
-    required => 0,
-    lazy => 1,
+has logger => (
     is => 'ro',
     isa => 'Object',
+    lazy => 1,
     default => sub { return Log::Log4perl->get_logger; }
 );
+
 
 sub BUILD {
 
