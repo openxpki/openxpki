@@ -174,6 +174,7 @@ use OpenXPKI::Server::Log;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Test::ConfigWriter;
 use OpenXPKI::Test::CertHelper::Database;
+use OpenXPKI::Test::Log4perlCallerFilter;
 
 Moose::Exporter->setup_import_methods(
     as_is     => [ \&OpenXPKI::Server::Context::CTX ],
@@ -408,6 +409,19 @@ has log_level => (
     default => "WARN",
 );
 
+=item * I<log_class> (optional) - A regex: only show log messages originating
+from Perl packages matching this value.
+
+E.g. C<log_class =E<gt> qr/^OpenXPKI::Client::UI/> to show messages from all
+packages below this namespace. Default: qr/^/ (= all packages)
+
+=cut
+has log_class => (
+    is => 'rw',
+    isa => 'Regexp',
+    default => sub { qr/^/ },
+);
+
 =item * I<enable_workflow_log> (optional) - if set to 1 workflow related log
 entries will be written into the database. This allows e.g. for querying the
 workflow log / history.
@@ -619,6 +633,8 @@ sub _log4perl_screen {
 
     my $threshold_screen = $ENV{TEST_VERBOSE} ? uc($self->log_level) : 'OFF';
     my $log_path = $self->log_path;
+    my $log_class_re = $self->log_class; # will get stringified below
+
     return qq(
         log4perl.rootLogger                     = INFO, Screen, File
         log4perl.category.openxpki.auth         = TRACE
@@ -630,9 +646,13 @@ sub _log4perl_screen {
         log4perl.category.connector             = WARN
         log4perl.category.Workflow              = OFF
 
+        log4perl.filter.OxiTestFilter           = OpenXPKI::Test::Log4perlCallerFilter
+        log4perl.filter.OxiTestFilter.class_re  = $log_class_re
+
         log4perl.appender.Screen                = Log::Log4perl::Appender::Screen
         log4perl.appender.Screen.layout         = Log::Log4perl::Layout::PatternLayout
-        log4perl.appender.Screen.layout.ConversionPattern = # %d %m [pid=%P|%i]%n
+        log4perl.appender.Screen.layout.ConversionPattern = # >> %m [%C]%n
+        log4perl.appender.Screen.Filter         = OxiTestFilter
         log4perl.appender.Screen.Threshold      = $threshold_screen
 
         # "File" is disabled by default
