@@ -55,6 +55,7 @@ sub BUILD {
     # store keys from CGI params
     my @keys = $self->cgi->param;
     $cache{$_} = undef for @keys;
+    do { $self->logger->debug(sprintf('CGI param: %s=%s', $_, join(',', $self->cgi->multi_param($_)))) for $self->cgi->param } if $self->logger->is_debug;
 
     # store keys and values from JSON POST data
     if (($self->cgi->content_type // '') eq 'application/json') {
@@ -77,7 +78,7 @@ sub BUILD {
         # wrap Scalars and HashRefs in an ArrayRef as param() expects it (but leave ArrayRefs as is)
         $cache{$_} = (ref $data->{$_} eq 'ARRAY' ? $data->{$_} : [ $data->{$_} ]) for keys %$data;
 
-        $self->logger->trace(Dumper $data) if $self->logger->is_trace;
+        $self->logger->debug('JSON param: ' . Dumper $data) if $self->logger->is_debug;
         $self->method('POST');
     }
 
@@ -91,8 +92,6 @@ sub BUILD {
         }
     }
 
-    $self->logger->debug('Request parameters: ' . join(' | ', keys %cache));
-
     $self->cache( \%cache );
 
 }
@@ -102,7 +101,7 @@ sub param {
     my $self = shift;
     my $name = shift;
 
-    my $msg = "Param request for '$name': ";
+    my $msg = sprintf "Param request (%s) for '%s': ", wantarray ? 'list' : 'scalar', $name;
 
     # send all keys
     if (!$name) {
@@ -148,7 +147,7 @@ sub param {
                 last;
             }
         }
-        $self->logger->trace($msg . 'not in cache. Query result: ' . join(' | ', @{ $self->cache->{$name} })) if $self->logger->is_trace;
+        $self->logger->trace($msg . 'not in cache. Query result: (' . join(', ', @{ $self->cache->{$name} // [] }) . ')') if $self->logger->is_trace;
     }
     else {
         $self->logger->trace($msg . 'return from cache');
