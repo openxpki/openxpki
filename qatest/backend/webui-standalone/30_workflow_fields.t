@@ -22,86 +22,86 @@ use MockUI;
 my $SESSION_DIR = tempdir( CLEANUP => 1 );
 
 my $TESTS = [
-    # #
-    # # headings
-    # #
-    # {
-    #     field => { format => 'spacer' },
-    #     expected => {
-    #         format => 'head',
-    #         className => 'spacer',
-    #     },
-    # },
+    #
+    # headings
+    #
+    {
+        field => { format => 'spacer' },
+        expected => {
+            format => 'head',
+            className => 'spacer',
+        },
+    },
 
-    # #
-    # # format auto-detection
-    # #
-    # {
-    #     field => { name => 'pkcs10' },
-    #     value => "dummy",
-    #     expected => {
-    #         format => 'code',
-    #         value => 'dummy',
-    #     },
-    # },
+    #
+    # format auto-detection
+    #
+    {
+        field => { name => 'pkcs10' },
+        value => "dummy",
+        expected => {
+            format => 'code',
+            value => 'dummy',
+        },
+    },
 
-    # {
-    #     field => { type => 'textarea' },
-    #     value => "one\ntwo",
-    #     expected => {
-    #         format => 'nl2br',
-    #         value => "one\ntwo",
-    #     },
-    # },
+    {
+        field => { type => 'textarea' },
+        value => "one\ntwo",
+        expected => {
+            format => 'nl2br',
+            value => "one\ntwo",
+        },
+    },
 
-    # # fixed hash value -> deflist
-    # {
-    #     field => { value => { one => 1, two => 2 } },
-    #     expected => {
-    #         format => 'deflist',
-    #         value => [ { label => 'one', value => '1' }, { label => 'two', value => '2' } ],
-    #     },
-    # },
+    # fixed hash value -> deflist
+    {
+        field => { value => { one => 1, two => 2 } },
+        expected => {
+            format => 'deflist',
+            value => [ { label => 'one', value => '1' }, { label => 'two', value => '2' } ],
+        },
+    },
 
-    # # fixed array value -> ullist
-    # {
-    #     field => { value => [ qw( one two ) ] },
-    #     expected => {
-    #         format => 'ullist',
-    #         value => [ qw( one two ) ],
-    #     },
-    # },
+    # fixed array value -> ullist
+    {
+        field => { value => [ qw( one two ) ] },
+        expected => {
+            format => 'ullist',
+            value => [ qw( one two ) ],
+        },
+    },
 
-    # #
-    # # Specific formats
-    # #
+    #
+    # Specific formats
+    #
 
-    # # cert_identifier
-    # {
-    #     field => {
-    #         type => 'cert_identifier',
-    #         template => "[% USE Certificate %][% value %]<br/>[% Certificate.body(value, 'subject') %]",
-    #     },
-    #     value => sub { shift->certhelper_database->cert('democa-alice-2')->id },
-    #     expected => sub {
-    #         my ($oxitest, $value) = @_;
-    #         my $cert = $oxitest->certhelper_database->cert_by_id($value);
-    #         return {
-    #             format => 'link',
-    #             value => superhashof({
-    #                 label => re($cert->id . '.*' . $cert->db->{subject}),
-    #             }),
-    #         };
-    #     },
-    # },
+    # cert_identifier
+    {
+        field => {
+            type => 'cert_identifier',
+            template => '[% USE Certificate %][% value %]<br/>[% Certificate.body(value, "subject") %]',
+        },
+        value => sub { shift->certhelper_database->cert('democa-alice-2')->id },
+        expected => sub {
+            my ($oxitest, $value) = @_;
+            my $cert = $oxitest->certhelper_database->cert_by_id($value);
+            return {
+                format => 'link',
+                value => superhashof({
+                    label => re($cert->id . '.*' . $cert->db->{subject}),
+                }),
+            };
+        },
+    },
 
     #
     # templates generating YAML
     #
     {
         field => {
-            name => 'testfield[]',
             format => 'linklist',
+            max => 2, # flags the field as "clonable" so backend accepts two input values
             yaml_template => '
               [% USE Certificate %]
               [% IF value %]
@@ -132,7 +132,7 @@ my $TESTS = [
 
 ];
 
-plan tests => 3 + scalar @$TESTS;
+plan tests => 4 + 2 * scalar(@$TESTS);
 
 ###############################################################################
 ###############################################################################
@@ -157,6 +157,7 @@ sub make_wf_config {
                 head:
                     prefix: '.$wf_type.'
                     persister: OpenXPKI
+
                 state:
                     INITIAL:
                         action:
@@ -164,6 +165,7 @@ sub make_wf_config {
                     SUCCESS:
                         output:
                             - testfield
+
                 action:
                     process:
                         class: OpenXPKI::Server::Workflow::Activity::Noop
@@ -187,29 +189,37 @@ sub ui_client {
 
     require_ok( 'OpenXPKI::Client::UI' );
 
-    my $session = new CGI::Session(undef, undef, { Directory => $SESSION_DIR });
+    my $session = CGI::Session->new(undef, undef, { Directory => $SESSION_DIR });
 
     my $result;
-    my $client = MockUI->new({
+    my $client = MockUI->new(
         session => $session,
         logger => CTX('log')->system,
         config => { socket => $oxitest->get_conf('system.server.socket_file') },
-    });
+    );
 
     $client->update_rtoken();
 
-    #
-    # Login
-    #
-    $result = $client->mock_request({ page => 'login' });
-    is $result->{main}->[0]->{action}, 'login!password', 'Login form';
+    $result = $client->mock_request({
+        page => 'login',
+    });
+    is $result->{main}->[0]->{action}, 'login!realm', 'Login - realm selection'
+      or diag explain $result;
+
+    $result = $client->mock_request({
+        'action' => 'login!realm',
+        'pki_realm' => 'democa',
+    });
+    is $result->{main}->[0]->{action}, 'login!password', 'Login - password entry'
+      or diag explain $result;
 
     $result = $client->mock_request({
         'action' => 'login!password',
         'username' => 'raop',
         'password' => 'openxpki'
     });
-    is $result->{goto}, 'redirect!welcome', 'Login successful';
+    is $result->{goto}, 'redirect!welcome', 'Login successful'
+      or diag explain $result;
 
     $client->update_rtoken();
 
@@ -223,35 +233,46 @@ sub run_tests {
     #
     # Create workflow
     #
-    for my $test (@$tests) {
-        my $testname = join ", ", map { sprintf "%s '%s'", $_, $test->{field}->{$_} } grep { $test->{field}->{$_} } qw( type format );
+    for my $json_request (qw (0 1)) {
+        for my $test (@$tests) {
+            my $testname = join ", ", map { sprintf "%s='%s'", $_, $test->{field}->{$_} } grep { $test->{field}->{$_} } qw( type format name );
+            if (not $testname and my $ref = ref($test->{field}->{value} // '')) {
+                $testname = "$ref value";
+            }
+            subtest sprintf('render %s (%s data)', $testname, $json_request ? 'JSON' : 'form') => sub {
+                # start workflow
+                $result = $client->mock_request({
+                    page => 'workflow!index!wf_type!' . $test->{wf_type},
+                });
+                is $result->{main}->[0]->{content}->{submit_label}, 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON', 'Workflow parameter input page'
+                  or diag explain $result;
 
-        subtest "rendering of field $testname" => sub {
-            $result = $client->mock_request({
-                'page' => 'workflow!index!wf_type!' . $test->{wf_type},
-            });
+                # send input parameter / run action
+                my $fieldname = $test->{field}->{name} // 'testfield';
+                my $value = ref $test->{value} eq 'CODE' ? $test->{value}->($oxitest) : $test->{value};
 
-            #is $result->{page}->{label}, 'testwf_process', 'Workflow parameter input page';
+                my $params = {
+                    action => 'workflow!index',
+                    defined $value ? ( $fieldname => $value ) : (),
+                    wf_token => undef,
+                };
 
-            my $fieldname = $test->{field}->{name} // 'testfield';
-            my $value = ref $test->{value} eq 'CODE' ? $test->{value}->($oxitest) : $test->{value};
-            $result = $client->mock_request({
-                'action' => 'workflow!index',
-                defined $value ? ( $fieldname => $value ) : (),
-                'wf_token' => undef,
-            });
+                $result = $json_request ? $client->mock_json_request($params) : $client->mock_request($params);
 
-            #like $result->{goto}, qr/workflow!load!wf_id!\d+/, 'Got redirect';
+                if ($result->{goto}) {
+                    note 'Received redirect instruction';
+                    $result = $client->mock_request({
+                        page => $result->{goto},
+                    });
+                }
 
-            $result = $client->mock_request({
-                'page' => $result->{goto},
-            });
+                my $rendered = $result->{main}->[0]->{content}->{data}->[0];
+                my $expected = ref $test->{expected} eq 'CODE' ? $test->{expected}->($oxitest, $value) : $test->{expected};
 
-            my $rendered = $result->{main}->[0]->{content}->{data}->[0];
-            my $expected = ref $test->{expected} eq 'CODE' ? $test->{expected}->($oxitest, $value) : $test->{expected};
-            cmp_deeply $rendered, superhashof($expected), "matches expected value"
-                or diag explain $rendered;
-        };
+                cmp_deeply $rendered, superhashof($expected), "matches expected value"
+                    or diag explain $result;
+            };
+        }
     }
 }
 
@@ -278,6 +299,8 @@ my $oxitest = OpenXPKI::Test->new(
     with => [ "SampleConfig", "Server", "Workflows" ],
     also_init => "crypto_layer",
     add_config => $wf_defs,
+    # log_level => 'TRACE',
+    # log_class => qr/^OpenXPKI::Client::UI::Request/,
 );
 
 # test dependent initializations
