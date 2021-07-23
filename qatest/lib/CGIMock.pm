@@ -1,18 +1,22 @@
 package CGIMock;
 
 use Moose;
+use namespace::autoclean;
+
+# Core modules
 use Data::Dumper;
+use Carp qw( cluck confess );
 
 has data => (
     is => 'rw',
     isa => 'HashRef',
-    default => sub{ return {} }
+    default => sub{ return {} },
 );
 
 has url_data => (
     is => 'rw',
     isa => 'HashRef',
-    default => sub{ return {} }
+    default => sub{ return {} },
 );
 
 sub param {
@@ -23,7 +27,7 @@ sub param {
     if ($name) {
         my $val = $self->data()->{$name};
         if (ref $val eq 'ARRAY') {
-            warn "param in list context is deprecated - use multi_param";
+            cluck "param in list context is deprecated - use multi_param"; # warn
             return @{$val};
         }
         return $val;
@@ -41,7 +45,7 @@ sub multi_param {
     my $name = shift;
 
     if (!wantarray) {
-        die "multi_param must not be used outside list context";
+        confess "multi_param must not be used outside list context"; # die
     }
 
     if ($name) {
@@ -85,4 +89,5 @@ sub header {}
 sub cookie {}
 sub http {  return 1; }
 
-1;
+
+__PACKAGE__->meta->make_immutable;
