@@ -251,7 +251,7 @@ or simpler:
 
 =head2 CTX(@)
 
-It is also possible to call CTX() in array context to obtain multiple
+It is also possible to call CTX() in list context to obtain multiple
 context entries at once:
 
   my ($config, $log, $dbi) = CTX('xml_config', 'log', 'dbi');

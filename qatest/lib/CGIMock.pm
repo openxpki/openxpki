@@ -23,7 +23,7 @@ sub param {
     if ($name) {
         my $val = $self->data()->{$name};
         if (ref $val eq 'ARRAY') {
-            warn "param in array context is deprecated - use multi_param";
+            warn "param in list context is deprecated - use multi_param";
             return @{$val};
         }
         return $val;
@@ -41,7 +41,7 @@ sub multi_param {
     my $name = shift;
 
     if (!wantarray) {
-        die "multi_param must not be used outside array context";
+        die "multi_param must not be used outside list context";
     }
 
     if ($name) {
