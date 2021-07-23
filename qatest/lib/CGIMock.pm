@@ -19,6 +19,13 @@ has url_data => (
     default => sub{ return {} },
 );
 
+has content_type => (
+    is => 'rw',
+    isa => 'Str',
+    default => 'application/x-www-form-urlencoded',
+);
+
+
 sub param {
 
     my $self = shift;
