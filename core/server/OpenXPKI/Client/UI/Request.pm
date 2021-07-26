@@ -1,5 +1,7 @@
 package OpenXPKI::Client::UI::Request;
+
 use Moose;
+use namespace::autoclean;
 
 # Core modules
 use Data::Dumper;
@@ -147,7 +149,7 @@ sub param {
 }
 
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 
 __END__;
