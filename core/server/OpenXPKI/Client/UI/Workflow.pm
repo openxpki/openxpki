@@ -2179,10 +2179,10 @@ sub __render_from_workflow {
                 $val = undef;
             }
 
-            my $item = $self->__render_input_field( $field, $val );
+            my ($item, @more_items) = $self->__render_input_field( $field, $val );
             next unless ($item);
 
-            push @fields, $item;
+            push @fields, $item, @more_items;
             # if the field has a description text, push it to the @fielddesc list
             my $descr = $field->{description};
             if ($descr && $descr !~ /^\s*$/ && $field->{type} ne 'hidden') {
@@ -2630,6 +2630,9 @@ sub __get_next_auto_action {
 Render the UI code for a input field from the server sided definition.
 Does translation of labels and mangles values for multi-valued componentes.
 
+Might dynamically create additional input fields and thus return a list with
+several field definitions.
+
 =cut
 
 sub __render_input_field {
@@ -2637,6 +2640,8 @@ sub __render_input_field {
     my $self = shift;
     my $field = shift;
     my $value = shift;
+
+    die "__render_input_field() must be called in list context: it may return more than one field definition" unless wantarray;
 
     my $name = $field->{name};
     next if ($name =~ m{ \A workflow_id }x);
@@ -2657,6 +2662,9 @@ sub __render_input_field {
     $item->{tooltip} = $field->{tooltip} if ($field->{tooltip});
     $item->{clonable} = 1 if $field->{clonable};
     $item->{is_optional} = 1 unless $field->{required};
+
+    # includes dynamically generated additional fields
+    my @all_items = ($item);
 
     # type 'select'
     $item->{options} = $field->{option} if $field->{option};
@@ -2693,7 +2701,7 @@ sub __render_input_field {
         $item->{verbose} = $self->send_command_v2( 'render_template', { template => $field->{template}, params => $item } );
     }
 
-    return $item;
+    return @all_items;
 
 }
 
