@@ -179,7 +179,7 @@ sub init_index {
     my $args = shift;
 
     my $wf_info = $self->send_command_v2( 'get_workflow_base_info', {
-        type => $self->param('wf_type')
+        type => scalar $self->param('wf_type')
     });
 
     if (!$wf_info) {
@@ -209,7 +209,7 @@ sub init_start {
     my $args = shift;
 
     my $wf_info = $self->send_command_v2( 'create_workflow_instance', {
-       workflow => $self->param('wf_type'), params   => {}, ui_info => 1
+       workflow => scalar $self->param('wf_type'), params => {}, ui_info => 1
     });
 
     if (!$wf_info) {
@@ -1631,7 +1631,7 @@ sub action_bulk {
     $self->logger()->trace('Doing bulk with arguments: '. Dumper $wf_args) if $self->logger->is_trace;
 
     # wf_token is also used as name of the form field
-    my @serials = $self->param($wf_token);
+    my @serials = $self->multi_param($wf_token);
 
     my @success; # list of wf_info results
     my $errors; # hash with wf_id => error

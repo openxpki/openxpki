@@ -7,6 +7,7 @@ use namespace::autoclean;
 use Data::Dumper;
 use Digest::SHA qw(sha1_base64);
 use MIME::Base64;
+use Carp qw( confess );
 
 # CPAN modules
 use CGI 4.08 qw( -utf8 );
@@ -276,19 +277,18 @@ sub set_status_from_error_reply {
 
 =head2 param
 
-Returns input parameter values, i.e. real CGI parameters and those appended to
-the action name using C<!>. Parameters from the action name have precedence.
+Returns a single input parameter, i.e. real CGI parameters and those appended
+to the action name using C<!>. Parameters from the action name have precedence.
 
-The method's behaviour depends on the argument it gets passed:
+If the input parameter has got multiple values then only the first value is
+returned.
 
 B<Parameters>
 
 =over
 
-=item * I<Str> C<$key> - parameter name to retrieve. If a stringified hash or
-array element is passed (e.g. C<key_param{curve_name}>) then only scalar values
-are returned. In this case C<param()> will NOT try to resolve a group of params
-to a non scalar return type.
+=item * I<Str> C<$key> - parameter name to retrieve: a plain parameter name or
+a stringified hash (e.g. C<key_param{curve_name}>).
 
 Please note that passing an I<ArrayRef> is no longer supported - please use
 L</param_from_fields> instead. Passing C<undef>is also no longer supported.
@@ -301,23 +301,41 @@ sub param {
 
     my ($self, $key) = @_;
 
-    die "param() expects a single key (string) as argument\n" if (!$key or ref $key);
+    confess 'param() must be called in scalar context' if wantarray; # die
 
-    $self->logger->trace("Param request for '$key'") if $self->logger->is_trace;
+    my @val = $self->__param($key);
+    return $val[0];
+}
+
+sub multi_param {
+
+    my ($self, $key) = @_;
+
+    confess 'multi_param() must be called in list context' unless wantarray; # die
+
+    my @val = $self->__param($key);
+    return @val;
+}
+
+sub __param {
+
+    my ($self, $key) = @_;
+
+    confess "param() / multi_param() expect a single key (string) as argument\n" if (not $key or ref $key); # die
 
     my @queries = (
-        # Try 'extra' parameters
+        # Try extra parameters appended to action
         sub { return $self->extra->{$key} },
         # Try parameter via request object
-        sub { return $self->req->param($key) },
+        sub { return $self->req->multi_param($key) },
     );
 
-    for my $query (@queries) {
-        my @values = $query->();
-        return (wantarray ? @values : $values[0]) if defined $values[0];
+    for my $q (@queries) {
+        my @val = $q->();
+        return @val if defined $val[0];
     }
 
-    $self->logger->trace("Unknown parameter '$key'") if $self->logger->is_trace;
+    $self->logger->trace("Requested parameter '$key' was not found") if $self->logger->is_trace;
     return;
 }
 
@@ -334,7 +352,7 @@ sub param_from_fields {
         }
         next if $name =~ m{ \A wf_ }xms;
 
-        my @v_list = $self->param($name);
+        my @v_list = $self->multi_param($name);
         my $vv;
         if ($item->{clonable}) {
             $vv = \@v_list;
@@ -826,7 +844,7 @@ sub __build_attribute_subquery {
         my $pattern = $item->{pattern} || '';
         my $operator = uc($item->{operator} || 'IN');
         my $transform = $item->{transform} || '';
-        my @val = $self->param($key);
+        my @val = $self->multi_param($key);
 
         my @preprocessed;
 
@@ -891,7 +909,7 @@ sub __build_attribute_preset {
 
     foreach my $item (@{$attributes}) {
         my $key = $item->{key};
-        my @val = $self->param($key);
+        my @val = $self->multi_param($key);
         while (my $val = shift @val) {
             push @attr,  { key => $key, value => $val };
         }

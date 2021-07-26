@@ -86,12 +86,12 @@ sub init_list {
     my $args = shift;
 
     my $crl_list = $self->send_command_v2( 'get_crl_list' , {
-        issuer_identifier => $self->param('issuer')
+        issuer_identifier => scalar $self->param('issuer'),
     });
 
     my $issuer_info = $self->send_command_v2( 'get_cert' , {
         format => 'DBINFO',
-        identifier => $self->param('issuer')
+        identifier => scalar $self->param('issuer'),
     });
 
     $self->logger()->trace("result: " . Dumper $crl_list) if $self->logger->is_trace;
