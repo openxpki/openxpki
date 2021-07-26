@@ -11,12 +11,13 @@ use MIME::Base64;
 use JSON;
 use Log::Log4perl;
 use Crypt::JWT qw( decode_jwt );
+use Moose::Util::TypeConstraints;
 
 
 has cgi => (
     required => 1,
     is => 'ro',
-    isa => 'CGI',
+    isa => duck_type( [qw( param multi_param content_type )] ), # not "isa => 'CGI'" as we use CGIMock in tests
 );
 
 has session => (
@@ -39,7 +40,7 @@ has method => (
 
 has logger => (
     is => 'ro',
-    isa => 'Object',
+    isa => 'Log::Log4perl::Logger',
     lazy => 1,
     default => sub { return Log::Log4perl->get_logger; }
 );
