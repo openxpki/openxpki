@@ -46,6 +46,17 @@ has logger => (
     default => sub { return Log::Log4perl->get_logger; }
 );
 
+has __prefix_base64 => (
+    is => 'ro',
+    isa => 'Str',
+    default => '_encoded_base64_',
+);
+
+has __prefix_jwt => (
+    is => 'ro',
+    isa => 'Str',
+    default => '_encrypted_jwt_',
+);
 
 sub BUILD {
 
@@ -68,17 +79,6 @@ sub BUILD {
         my $json = JSON->new->utf8;
         my $data = $json->decode( scalar $self->cgi->param('POSTDATA') );
 
-        # JWT encrypted data
-        if (my $token = $data->{'_encrypted_jwt'}) {
-            $self->logger->debug('Incoming JWT encrypted parameters');
-
-            my $key = $self->session->param('jwt_encryption_key')
-              or $self->logger->error("Encrypted '_encrypted_jwt' was received but client session has no key");
-
-            my $decrypted = decode_jwt(token => $token, key => $key);
-            $data->{'_encrypted_jwt'} = $decrypted; # wrap in ArrayRef as param() expects
-        }
-
         # wrap Scalars and HashRefs in an ArrayRef as param() expects it (but leave ArrayRefs as is)
         $cache{$_} = (ref $data->{$_} eq 'ARRAY' ? $data->{$_} : [ $data->{$_} ]) for keys %$data;
 
@@ -89,11 +89,12 @@ sub BUILD {
     # special transformations: insert sanitized keys names in the cache so the
     # check in param() will succeed.
     foreach my $key (keys %cache) {
-        # base64 encoded binary data
-        if (my ($item) = $key =~ /^_encoded_base64_(.*)/) {
-            $cache{$item} = undef;
-            next;
-        }
+        # Base64 encoded binary data
+        my $prefix_b64 = $self->__prefix_base64;
+        if (my ($item) = $key =~ /^$prefix_b64(.*)/) { $cache{$item} = undef; next }
+        # JWT encrypted data
+        my $prefix_jwt = $self->__prefix_jwt;
+        if (my ($item) = $key =~ /^$prefix_jwt(.*)/) { $cache{$item} = undef; next }
     }
 
     $self->cache( \%cache );
@@ -145,6 +146,10 @@ sub __param {
     # cache miss - query parameter
     unless (defined $self->cache->{$key}) {
         my $cgi = $self->cgi;
+
+        my $prefix_b64 = $self->__prefix_base64;
+        my $prefix_jwt = $self->__prefix_jwt;
+
         my @queries = (
             # Try CGI parameters (and strip whitespaces)
             sub {
@@ -153,14 +158,29 @@ sub __param {
             },
             # Try Base64 encoded parameter from JSON input
             sub {
-                my $value = $self->cache->{"_encoded_base64_$key"};
+                my $value = $self->cache->{$prefix_b64.$key};
                 return unless $value;
                 return map { decode_base64($_) } (ref $value ? @{$value} : ($value))
             },
             # Try Base64 encoded CGI parameters
             sub {
                 return unless $cgi;
-                return map { decode_base64($_) } ($cgi->multi_param("_encoded_base64_$key"))
+                return map { decode_base64($_) } ($cgi->multi_param($prefix_b64.$key))
+            },
+            # Try JWT encrypted CGI parameters (might be deep structures)
+            sub {
+                return unless $cgi;
+                my $token = $cgi->param($prefix_jwt.$key);
+                return unless $token;
+
+                my $key = $self->session->param('jwt_encryption_key');
+                unless ($key) {
+                    $self->logger->error("JWT encrypted parameter received but client session contains no decryption key");
+                    return;
+                }
+
+                my $decrypted = decode_jwt(token => $token, key => $key);
+                return $decrypted;
             },
         );
 

@@ -17,6 +17,8 @@ use MIME::Base64;
 use OpenXPKI::DateTime;
 use OpenXPKI::Debug;
 use OpenXPKI::i18n qw( i18nTokenizer i18nGettext );
+use Crypt::JWT qw( encode_jwt );
+use Crypt::PRNG;
 
 
 extends 'OpenXPKI::Client::UI::Result';
@@ -2701,8 +2703,40 @@ sub __render_input_field {
         $item->{verbose} = $self->send_command_v2( 'render_template', { template => $field->{template}, params => $item } );
     }
 
+    # type 'hidden' and encrypted
+    for (@all_items) {
+        $self->__encrypt_input_field($_) if $_->{encrypt}; # removes 'encrypt' and sets 'encrypted'
+    }
+
     return @all_items;
 
+}
+
+# fill input field definition from workflow field, return additional field definitions
+sub __encrypt_input_field {
+    my ($self, $item) = @_;
+
+    my $key = $self->_session->param('jwt_encryption_key');
+    if (not $key) {
+        $key = Crypt::PRNG::random_bytes(32);
+        $self->_session->param('jwt_encryption_key', $key);
+    }
+
+    my $token = encode_jwt(
+        payload => $item->{value} // {},
+        enc => 'A256CBC-HS512',
+        alg => 'PBES2-HS512+A256KW', # uses "HMAC-SHA512" as the PRF and "AES256-WRAP" for the encryption scheme
+        key => $key, # can be any length for PBES2-HS512+A256KW
+        extra_headers => {
+            p2c => 8000, # PBES2 iteration count
+            p2s => 32,   # PBES2 salt length
+        },
+    );
+
+    # overwrite parameters
+    delete $item->{encrypt};
+    $item->{encrypted} = 1;
+    $item->{value} = $token;
 }
 
 =head2 __delegate_call
