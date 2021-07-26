@@ -312,20 +312,12 @@ sub param {
         sub { return $self->req->param($key) },
     );
 
-    if (wantarray) {
-        for my $query (@queries) {
-            my @values = $query->();
-            return @values if defined $values[0];
-        }
-    } else {
-        for my $query (@queries) {
-            my $val = $query->();
-            return $val if (defined $val);
-        }
+    for my $query (@queries) {
+        my @values = $query->();
+        return (wantarray ? @values : $values[0]) if defined $values[0];
     }
 
-    $self->logger->trace("Nothing found for parameter $key") if $self->logger->is_trace;
-
+    $self->logger->trace("Unknown parameter '$key'") if $self->logger->is_trace;
     return;
 }
 
