@@ -52,33 +52,24 @@ sub BUILD {
     # store keys and values from JSON POST data
     if (($self->cgi->content_type // '') eq 'application/json') {
         $self->logger->debug('Incoming POST data in JSON format (application/json)');
+
         my $json = JSON->new->utf8;
-        my $json_data = $json->decode( scalar $self->cgi->param('POSTDATA') );
+        my $data = $json->decode( scalar $self->cgi->param('POSTDATA') );
 
         # wrap Scalars and HashRefs in an ArrayRef as param() expects it (but leave ArrayRefs as is)
-        $cache{$_} = (ref $json_data->{$_} eq 'ARRAY' ? $json_data->{$_} : [ $json_data->{$_} ]) for keys %$json_data;
+        $cache{$_} = (ref $data->{$_} eq 'ARRAY' ? $data->{$_} : [ $data->{$_} ]) for keys %$data;
 
-        $self->logger->trace( Dumper $json_data );
+        $self->logger->trace(Dumper $data) if $self->logger->is_trace;
         $self->method('POST');
     }
 
-    # special transformations: create the expected keys in the cache so the
+    # special transformations: insert sanitized keys names in the cache so the
     # check in param() will succeed.
     foreach my $key (keys %cache) {
-        # binary data is base64 encoded with the key name prefixed with
-        # '_encoded_base64_'
-        if (substr($key,0,16) eq '_encoded_base64_') {
-            $cache{substr($key,16)} = undef;
+        # base64 encoded binary data
+        if (my ($item) = $key =~ /^_encoded_base64_(.*)/) {
+            $cache{$item} = undef;
             next;
-        }
-
-        # keys key{subkey} should be available with their explicit key and
-        # mapped as hash via the base key
-        if ($key =~ m{ \A (\w+)\{(\w+)\} \z }xs) {
-            my $item = $1; my $subkey = $2;
-            $self->logger->debug("Translate hash parameter $key");
-            $cache{$item} = {} unless($cache{$item});
-            $cache{$item}{$subkey} = $cache{$key};
         }
     }
 
