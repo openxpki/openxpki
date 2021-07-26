@@ -77,7 +77,7 @@ set can contain those columns even if not explicitly specified.
 
 There is also a limitation for some RDBMS that BLOB columns such as I<data>
 can not be used with distinct. Requesting a BLOB columns while DISTINTCT is
-used and will result in a server side exception.
+used will result in a server side exception.
 
 B<Parameters>
 
@@ -130,6 +130,8 @@ so you can use asterisk (*) as placeholder)
 
 =item * C<cert_attributes> I<HashRef> - key is attribute name, value is passed
 "as is" as where statement on value, see documentation of SQL::Abstract.
+You can search for "non existing" attributes by passing I<undef> as value
+(works only as scalar value part).
 
 Legacy: I<ArrayRef> - list of condition I<HashRefs> to search
 in attributes (KEY, VALUE, OPERATOR). Operator can be "EQUAL", "LIKE" or
@@ -436,11 +438,13 @@ sub _make_db_query {
 
                 my $table_alias = "certattr$ii";
 
+                # key is set but not defined means we look for a non-existent item => requires an "outer join"
                 if (!defined $po->cert_attributes->{$key}) {
-                    next;
+                    push @join_spec, ( "=>certificate.identifier=identifier,$table_alias.attribute_contentkey='$key'", "certificate_attributes|$table_alias" );
+                } else {
+                    push @join_spec, ( "certificate.identifier=identifier,$table_alias.attribute_contentkey='$key'", "certificate_attributes|$table_alias" );
                 }
 
-                push @join_spec, ( "certificate.identifier=identifier,$table_alias.attribute_contentkey='$key'", "certificate_attributes|$table_alias" );
                 # add search constraint
                 $where->{ "$table_alias.attribute_value" } = $po->cert_attributes->{$key};
 

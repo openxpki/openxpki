@@ -154,7 +154,11 @@ sub execute
             my $value = $self->param($key);
             next unless (defined $value && $value ne '');
             ##! 16: 'Add key with value ' . $value
-            $query->{cert_attributes}->{$key} = { '=', $value };
+            if ($value eq '<undef>') {
+                $query->{cert_attributes}->{$key} = undef;
+            } else {
+                $query->{cert_attributes}->{$key} = { '=', $value };
+            }
         }
     }
 
@@ -269,6 +273,8 @@ and casing is handled internally)
 =item meta_*, system_*
 
 Lets you search for any certificate attribute having a listed prefix.
+You can set the special value I<<undef>> (including the angle brackets)
+to search for rows without a certain attribute.
 
 =item target_key
 
