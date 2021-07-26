@@ -88,6 +88,7 @@ export default class TestController extends Controller {
              */
             this.post('/openxpki/cgi-bin/webui.fcgi', req => {
                 console.info(`MOCKUP SERVER> POST request: ${req.url}`);
+                console.debug(req);
                 let params;
                 if (req.requestHeaders['content-type'].match(/^application\/x-www-form-urlencoded/)) {
                     params = decodeURIComponent(req.requestBody.replace(/\+/g, ' ')).split('&').join("\n");
@@ -95,8 +96,7 @@ export default class TestController extends Controller {
                 else {
                     params = JSON.parse(req.requestBody);
                 }
-                console.info(params);
-                console.debug(req);
+                console.info('MOCKUP SERVER> parameters:', params);
 
                 /*
                  * autocomplete
@@ -105,6 +105,9 @@ export default class TestController extends Controller {
                     let val = params.text_autocomplete;
                     let forest = params.forest || '(not provided)';
                     let comment = params.the_comment || '(not provided)';
+
+                    if (params._encrypted_jwt_secure_param != 'fake_jwt_token')
+                      throw new Error('Encrypted JWT token was not sent');
 
                     console.info(`MOCKUP SERVER> autocomplete - value: ${val}, forest: ${forest}, the_comment: ${comment}`);
 
@@ -200,6 +203,12 @@ export default class TestController extends Controller {
                         value: "rain",
                     },
                     {
+                        type: "hidden",
+                        name: "enc_param",
+                        value: "fake_jwt_token",
+                        encrypted: 1,
+                    },
+                    {
                         type: "text",
                         name: "text_autocomplete",
                         label: "Autocomplete",
@@ -210,6 +219,7 @@ export default class TestController extends Controller {
                             params: {
                                 forest: "deep",
                                 the_comment: { field: "comment" },
+                                secure_param: { field: "enc_param" },
                             },
                         },
                     },

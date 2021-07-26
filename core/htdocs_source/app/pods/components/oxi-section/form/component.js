@@ -53,6 +53,10 @@ class Field {
      * oxisection/form/field/text
      */
     autocomplete;
+    /*
+     * hidden fields
+     */
+    encrypted;
 
     static fromHash(sourceHash) {
         let instance = new this(); // "this" in static methods refers to class
@@ -237,12 +241,17 @@ export default class OxiSectionFormComponent extends Component {
                 f.name === name && (typeof f.value !== 'undefined') && (f.value !== "" || includeEmpty)
             );
 
-            if (potentialClones.length === 0) continue;
+            if (potentialClones.length === 0) continue; // there's not even one field to send
+
+            // prefix for encrypted fields
+            if (potentialClones[0].type == 'hidden' && potentialClones[0].encrypted) {
+                newName = `_encrypted_jwt_${newName}`;
+            }
 
             // encode ArrayBuffer as Base64 and change field name as a flag
             let encodeValue = (val) => {
                 if (val instanceof ArrayBuffer) {
-                    newName = `_encoded_base64_${name}`;
+                    newName = `_encoded_base64_${newName}`;
                     return btoa(String.fromCharCode(...new Uint8Array(val)));
                 }
                 else {
