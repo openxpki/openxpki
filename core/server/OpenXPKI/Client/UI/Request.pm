@@ -82,6 +82,13 @@ sub BUILD {
 
 }
 
+sub multi_param {
+    my ($self, @args) = @_;
+
+    my @list_of_params = $self->param($self, @args); # list context
+    return @list_of_params;
+}
+
 sub param {
 
     my $self = shift;
