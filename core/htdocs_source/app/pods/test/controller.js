@@ -37,6 +37,9 @@ export default class TestController extends Controller {
                 resolve(response);
             });
 
+            /* ************************
+             * GET requests
+             */
             this.get('/openxpki/cgi-bin/webui.fcgi', req => {
                 console.info(`MOCKUP SERVER> GET request: ${req.url}`);
                 console.info(Object.entries(req.queryParams).map(e => `MOCKUP SERVER> ${e[0]} = ${e[1]}`).join("\n"));
@@ -80,6 +83,9 @@ export default class TestController extends Controller {
                 return emptyResponse();
             });
 
+            /* ************************
+             * POST requests
+             */
             this.post('/openxpki/cgi-bin/webui.fcgi', req => {
                 console.info(`MOCKUP SERVER> POST request: ${req.url}`);
                 let params;
@@ -96,9 +102,9 @@ export default class TestController extends Controller {
                  * autocomplete
                  */
                 if (params?.action == 'text!autocomplete') {
-                    let val = params.value;
-                    let forest = params.params.forest || '(not provided)';
-                    let comment = params.params.the_comment || '(not provided)';
+                    let val = params.text_autocomplete;
+                    let forest = params.forest || '(not provided)';
+                    let comment = params.the_comment || '(not provided)';
 
                     console.info(`MOCKUP SERVER> autocomplete - value: ${val}, forest: ${forest}, the_comment: ${comment}`);
 
@@ -198,18 +204,6 @@ export default class TestController extends Controller {
                         name: "text_autocomplete",
                         label: "Autocomplete",
                         value: "pre",
-                        tooltip: "Simulated autocomplete: Enter anything to get three results, or 'boom' to simulate server-side error, or 'void' for empty result list.",
-                        autocomplete: {
-                            action: "text!autocomplete",
-                            params: {
-                                forest: "shallow",
-                            },
-                        },
-                    },
-                    {
-                        type: "text",
-                        name: "text_autocomplete_ref",
-                        label: "Autocomplete (using field 'comment')",
                         tooltip: "Simulated autocomplete: Enter anything to get three results, or 'boom' to simulate server-side error, or 'void' for empty result list.",
                         autocomplete: {
                             action: "text!autocomplete",
