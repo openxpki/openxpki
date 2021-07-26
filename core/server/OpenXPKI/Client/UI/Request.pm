@@ -190,11 +190,12 @@ and provides a transparent interface to the application to retrieve
 parameter values regardless which transport format was used.
 
 If the data was POSTed as JSON blob, the parameters are already expanded
-with the values in the I<data> hash. If data was send via a CGI method
-(either form-encoded or GET), the I<data> hash holds the keys and the
-value undef and the parameter expansion is done on the first request.
+with the values in the I<cache> hash. If data was send via a CGI method
+(either form-encoded or GET), the I<cache> hash holds the keys and the
+value undef and the parameter expansion is done on the first request to
+L</param>.
 
-The C<param> method will B<not> try to guess the type of the attribute,
+The L</param> method will B<not> try to guess the type of the attribute,
 the requestor must use the method in list context to retrieve a
 multi-valued attribute. As the CGI transport does not provide information
 on the character of the attribute, the class always tries to translate items
