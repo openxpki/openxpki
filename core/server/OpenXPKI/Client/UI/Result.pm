@@ -1,5 +1,7 @@
 package OpenXPKI::Client::UI::Result;
+
 use Moose;
+use namespace::autoclean;
 
 # Core modules
 use Data::Dumper;
@@ -340,12 +342,15 @@ sub param_from_fields {
         }
         next if $name =~ m{ \A wf_ }xms;
 
+        my @v_list = $self->param($name);
         my $vv;
         if ($item->{clonable}) {
-            my @vv = $self->param($name);
-            $vv = \@vv;
+            $vv = \@v_list;
         } else {
-            $vv = $self->param($name);
+            if ((my $amount = scalar @v_list) > 1) {
+                $self->logger->warn(sprintf "Received %s values for non-clonable field '%s'", scalar @v_list, $name);
+            }
+            $vv = $v_list[0];
         }
 
         if ($name =~ m{ \A (\w+)\{(\w+)\} \z }xs) {
@@ -905,4 +910,4 @@ sub __build_attribute_preset {
 }
 
 
-1;
+__PACKAGE__->meta->make_immutable;
