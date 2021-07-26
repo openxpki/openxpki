@@ -55,8 +55,8 @@ sub BUILD {
         my $json = JSON->new->utf8;
         my $json_data = $json->decode( scalar $self->cgi->param('POSTDATA') );
 
-        # wrap values in an ArrayRef as param() expects it
-        $cache{$_} = [ $json_data->{$_} ] for keys %$json_data;
+        # wrap Scalars and HashRefs in an ArrayRef as param() expects it (but leave ArrayRefs as is)
+        $cache{$_} = (ref $json_data->{$_} eq 'ARRAY' ? $json_data->{$_} : [ $json_data->{$_} ]) for keys %$json_data;
 
         $self->logger->trace( Dumper $json_data );
         $self->method('POST');
