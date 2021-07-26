@@ -54,7 +54,7 @@ sub mock_request {
     local *STDOUT;
     open(STDOUT, '>', \$out);
 
-    $self->handle_request( OpenXPKI::Client::UI::Request->new( cgi => $self->cgi() ) );
+    $self->handle_request( OpenXPKI::Client::UI::Request->new( cgi => $self->cgi(), session => $self->session ) );
     my $json = $self->json()->decode($out);
 
     if (ref $json->{main} && $json->{main}->[0]->{content}->{fields}) {
