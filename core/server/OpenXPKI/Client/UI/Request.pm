@@ -6,6 +6,7 @@ use namespace::autoclean;
 # Core modules
 use Data::Dumper;
 use MIME::Base64;
+use Carp qw( confess );
 
 # CPAN modules
 use JSON;
@@ -99,78 +100,84 @@ sub BUILD {
 
 }
 
-sub multi_param {
-    my ($self, @args) = @_;
+sub param {
+    my ($self, $key) = @_;
 
-    my @list_of_params = $self->param($self, @args); # list context
-    return @list_of_params;
+    confess 'param() must be called in scalar context' if wantarray; # die
+
+    my @values = $self->__param($key); # list context
+    return $values[0] if defined $values[0];
+    return;
 }
 
-sub param {
+sub multi_param {
+    my ($self, $key) = @_;
 
-    my $self = shift;
-    my $name = shift;
+    confess 'multi_param() must be called in list context' unless wantarray; # die
+    my @values = $self->__param($key); # list context
+    return @values;
+}
 
-    my $msg = sprintf "Param request (%s) for '%s': ", wantarray ? 'list' : 'scalar', $name;
+sub param_keys {
+    my ($self) = @_;
 
     # send all keys
-    if (!$name) {
-        die "Request without key is only allowed in list context" unless wantarray;
-        return keys %{$self->cache};
-    }
+    confess 'param_keys() must be called in list context' unless wantarray; # die
+    return keys %{$self->cache};
+}
+
+sub __param {
+    my ($self, $key) = @_;
+
+    confess "param() / multi_param() expect a single key (string) as argument\n" if (not $key or ref $key); # die
+
+    my $msg = sprintf "Param request for '%s': ", $key;
 
     # try key without trailing array indicator if it does not exist
-    if ($name =~ m{\[\]\z} && !exists $self->cache->{$name}) {
-        $name = substr($name,0,-2);
-        $msg.= "strip array markers, new key '$name', ";
+    if ($key =~ m{\[\]\z} && !exists $self->cache->{$key}) {
+        $key = substr($key,0,-2);
+        $msg.= "strip array markers, new key '$key', ";
     }
 
     # valid key?
-    return unless exists $self->cache->{$name};
+    return unless exists $self->cache->{$key};
 
     # cache miss - query parameter
-    unless (defined $self->cache->{$name}) {
+    unless (defined $self->cache->{$key}) {
         my $cgi = $self->cgi;
         my @queries = (
             # Try CGI parameters (and strip whitespaces)
             sub {
                 return unless $cgi;
-                return map { my $v = $_; $v =~ s/^\s+|\s+$//g; $v } ($cgi->multi_param($name))
+                return map { my $v = $_; $v =~ s/^\s+|\s+$//g; $v } ($cgi->multi_param($key))
             },
             # Try Base64 encoded parameter from JSON input
             sub {
-                my $value = $self->cache->{"_encoded_base64_$name"};
+                my $value = $self->cache->{"_encoded_base64_$key"};
                 return unless $value;
                 return map { decode_base64($_) } (ref $value ? @{$value} : ($value))
             },
             # Try Base64 encoded CGI parameters
             sub {
                 return unless $cgi;
-                return map { decode_base64($_) } ($cgi->multi_param("_encoded_base64_$name"))
+                return map { decode_base64($_) } ($cgi->multi_param("_encoded_base64_$key"))
             },
         );
 
         for my $query (@queries) {
             my @values = $query->();
             if (scalar @values) {
-                $self->cache->{$name} = \@values;
+                $self->cache->{$key} = \@values;
                 last;
             }
         }
-        $self->logger->trace($msg . 'not in cache. Query result: (' . join(', ', @{ $self->cache->{$name} // [] }) . ')') if $self->logger->is_trace;
+        $self->logger->trace($msg . 'not in cache. Query result: (' . join(', ', @{ $self->cache->{$key} // [] }) . ')') if $self->logger->is_trace;
     }
     else {
         $self->logger->trace($msg . 'return from cache');
     }
 
-    if (wantarray) {
-        return @{ $self->cache->{$name} };
-    }
-    else {
-        return $self->cache->{$name}->[0] if defined $self->cache->{$name};
-        return;
-    }
-
+    return ($self->cache->{$key} ? @{ $self->cache->{$key} } : ());
 }
 
 
@@ -195,8 +202,20 @@ with the values in the I<cache> hash. If data was send via a CGI method
 value undef and the parameter expansion is done on the first request to
 L</param>.
 
+=head1 Methods
+
+=head2 param
+
+Retrieves the value(s) of the named parameter.
+
 The L</param> method will B<not> try to guess the type of the attribute,
-the requestor must use the method in list context to retrieve a
-multi-valued attribute. As the CGI transport does not provide information
-on the character of the attribute, the class always tries to translate items
-from scalar to array and vice-versa.
+the requestor must use L</multi_param> or call C<param> in list context to
+retrieve a multi-valued attribute.
+
+As the CGI transport does not provide information on the character of the
+attribute, the class always tries to translate items from scalar to list
+and vice-versa.
+
+=head2 multi_param
+
+Retrieves the named parameter but enforces list context.
