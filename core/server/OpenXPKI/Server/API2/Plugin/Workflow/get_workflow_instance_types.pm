@@ -41,6 +41,7 @@ command "get_workflow_instance_types" => {
     while (my $line = $sth->fetchrow_hashref) {
         my $type = $line->{workflow_type};
         my $label = $cfg->get([ 'workflow', 'def', $type, 'head', 'label' ]);
+        next unless($label || $cfg->exists([ 'workflow', 'def', $type, 'head']));
         my $desc = $cfg->get([ 'workflow', 'def', $type, 'head', 'description' ]);
         $result->{$type} = {
             label => $label || $type,
