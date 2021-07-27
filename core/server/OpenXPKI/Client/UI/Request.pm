@@ -143,14 +143,12 @@ sub __param {
             },
             # Try Base64 encoded parameter from JSON input
             sub {
-                my $value = $self->cache->{$prefix_b64.$key};
-                return unless $value;
-                return map { decode_base64($_) } @{$value}
+                return map { decode_base64($_) } $self->__get_cache($prefix_b64.$key)
             },
             # Try Base64 encoded CGI parameters
             sub {
                 return unless $cgi;
-                return map { decode_base64($_) } ($cgi->multi_param($prefix_b64.$key))
+                return map { decode_base64($_) } $cgi->multi_param($prefix_b64.$key)
             },
         );
 
@@ -161,13 +159,23 @@ sub __param {
                 last;
             }
         }
-        $self->logger->trace($msg . 'not in cache. Query result: (' . join(', ', @{ $self->cache->{$key} // [] }) . ')') if $self->logger->is_trace;
+        $self->logger->trace($msg . 'not in cache. Query result: (' . join(', ', $self->__get_cache($key)) . ')') if $self->logger->is_trace;
     }
     else {
         $self->logger->trace($msg . 'return from cache');
     }
 
-    return ($self->cache->{$key} ? @{ $self->cache->{$key} } : ());
+    return $self->__get_cache($key); # list
+}
+
+# Returns a list of values (may be a single value or an empty list)
+sub __get_cache {
+
+    my $self = shift;
+    my $key = shift;
+
+    return @{ $self->cache->{$key} // [] }
+
 }
 
 
