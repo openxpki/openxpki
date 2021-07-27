@@ -31,8 +31,7 @@ sub execute {
         # Determine the name of the key group for cert signing
         $group_name = $config->get(['crypto','type', $self->param('token') ]);
         if (!$group_name) {
-            workflow_error( "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_LIST_ACTIVE_TOKEN_NO_GROUP_FOUND_FOR_TYPE",
-                     { TOKEN => $self->param('token') } );
+            workflow_error "No group name found for type " . $self->param('token');
         }
 
     # explicit group name
@@ -41,16 +40,12 @@ sub execute {
 
     # oops
     } else {
-        configuration_error( 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_LIST_ACTIVE_TOKEN_NO_GROUP_OR_TYPE_GIVEN' );
+        configuration_error 'Neither group nor token type was given';
     }
 
     my $token_list = CTX('api2')->list_active_aliases( group => $group_name );
-
     if (!@{$token_list} && !$self->param('empty_ok')) {
-        workflow_error(
-            "I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_LIST_ACTIVE_TOKEN_DID_NOT_FIND_ANY_TOKEN",
-            { GROUP => $group_name }
-        );
+        workflow_error "No active tokens found for group $group_name";
     }
 
     ##! 32: "Active tokens found " . Dumper $token_list
