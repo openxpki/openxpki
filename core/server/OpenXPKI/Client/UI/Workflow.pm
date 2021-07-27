@@ -2721,20 +2721,24 @@ sub __render_input_field {
     }
 
     # type 'hidden' and encrypted
-    for (@all_items) {
-        $self->__encrypt_input_field($_) if $_->{encrypt}; # removes 'encrypt' and sets 'encrypted'
+    for my $item (@all_items) {
+        if ($item->{encrypt}) {
+            delete $item->{encrypt};
+            $item->{value} = $self->_encrypt_jwt($item->{value});
+            $item->{encrypted} = 1;
+        }
     }
 
     return @all_items;
 
 }
 
-# fill input field definition from workflow field, return additional field definitions
-sub __encrypt_input_field {
-    my ($self, $item) = @_;
+# encrypt given data
+sub _encrypt_jwt {
+    my ($self, $value) = @_;
 
     die "Only hash values are supported for encrypted input fields\n"
-      unless ref $item->{value} eq 'HASH';
+      unless ref $value eq 'HASH';
 
     my $key = $self->_session->param('jwt_encryption_key');
     if (not $key) {
@@ -2743,7 +2747,7 @@ sub __encrypt_input_field {
     }
 
     my $token = encode_jwt(
-        payload => $item->{value} // {},
+        payload => $value,
         enc => 'A256CBC-HS512',
         alg => 'PBES2-HS512+A256KW', # uses "HMAC-SHA512" as the PRF and "AES256-WRAP" for the encryption scheme
         key => $key, # can be any length for PBES2-HS512+A256KW
@@ -2753,10 +2757,7 @@ sub __encrypt_input_field {
         },
     );
 
-    # overwrite parameters
-    delete $item->{encrypt};
-    $item->{encrypted} = 1;
-    $item->{value} = $token;
+    return $token
 }
 
 =head2 __delegate_call
