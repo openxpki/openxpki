@@ -14,6 +14,7 @@ use CGI 4.08 qw( -utf8 );
 use HTML::Entities;
 use JSON;
 use Moose::Util::TypeConstraints;
+use Data::UUID;
 
 # Project modules
 use OpenXPKI::i18n qw( i18nTokenizer );
@@ -916,6 +917,134 @@ sub __build_attribute_preset {
     }
 
     return \@attr;
+
+}
+
+=head2 decrypted_param
+
+Return a decrypted JWT input parameter (whose only allowed type is I<HashRef>).
+
+C<undef> is returned if the parameter does not exist or if it was not encrypted.
+
+B<Parameters>
+
+=over
+
+=item * I<Str> C<$key> - parameter name to retrieve.
+
+=back
+
+=cut
+
+sub decrypted_param {
+
+    my $self = shift;
+    my $param_name = shift;
+
+    my $item = $self->param($param_name)
+        or return;
+
+    if ($item->{__jwt_key} ne $self->_session->param('jwt_encryption_key')) {
+        $self->logger->debug("Parameter '".$param_name."'' was not JWT encrypted");
+        return;
+    }
+
+    return $item;
+
+}
+
+=head2 make_autocomplete_input
+
+Fills the details of an autocomplete input field into the given C<$input_field>
+hash according to the given C<$def> workflow field definition.
+
+Returns an additional hidden, to-be-encrypted input field.
+
+The autocomplete
+
+B<Parameters>
+
+=over
+
+=item * I<HashRef> C<$input_field> - input field definition
+
+=back
+
+=cut
+
+sub make_autocomplete_input {
+
+    my $self = shift;
+    my $input_field = shift;
+    my $def = shift;
+
+    my $enc_field_name = Data::UUID->new->create_str; # name for additional input field
+
+    # $def = {
+    #     action: "text!autocomplete",
+    #     params: {
+    #         user: {
+    #             reference_1: "comment",
+    #         },
+    #         persist: {
+    #             static_a: "deep",
+    #             sql_query: { "-like": "$key_id:%" },
+    #         },
+    #     },
+    # }
+    my $p = $def->{params} // {};
+    my $p_user = $p->{user} // {};
+    my $p_persist = $p->{persist} // {};
+
+    delete $input_field->{autocomplete}; # we use a new option name to distginguish
+    $input_field->{autocomplete_query} = {  # the wf config param from the UI param
+        action => $def->{action},
+        params => {
+            %$p_user,
+            __encrypted => $enc_field_name,
+        },
+    };
+
+    # additional input field with encrypted data (protected from frontend modification)
+    return {
+        type => 'hidden',
+        name => $enc_field_name,
+        encrypt => 1,
+        value => {
+            persistent_params => $p_persist,
+            user_param_whitelist => [ sort keys %$p_user ], # allowed in subsequent request from frontend
+        },
+    };
+
+}
+
+=head2 fetch_autocomplete_params
+
+Uses the C<__encrypted> request parameter to re-assemble .
+
+B<Parameters>
+
+=over
+
+=item * I<HashRef> C<$input_field> - input field definition
+
+=back
+
+=cut
+
+sub fetch_autocomplete_params {
+
+    my $self = shift;
+
+    my $data = $self->decrypted_param('__encrypted')
+        or return;
+
+    my %params = %{ $data->{persistent_params} };
+    $params{$_} = $self->param($_) for @{ $data->{user_param_whitelist} };
+
+    $self->logger->trace("Autocomplete params: " . Dumper \%params) if $self->logger->is_trace;
+
+    return \%params;
 
 }
 

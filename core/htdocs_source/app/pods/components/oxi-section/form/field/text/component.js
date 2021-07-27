@@ -25,8 +25,7 @@ export default class OxiFieldTextComponent extends Component {
     searchIndex = 0;
     searchPrevious = null;
     searchTimer = null;
-    acStaticParams = new Map();   // mapping: parameter name => static value
-    acFieldRefParams = new Map(); // mapping: parameter name => source field name
+    acFieldRefParams = new Map(); // mapping: (source field name) => (parameter name for autocomplete query)
 
     constructor() {
         super(...arguments);
@@ -35,32 +34,25 @@ export default class OxiFieldTextComponent extends Component {
         this.value = content.value;
 
         if (this.isAutoComplete) {
-            if (content.autocomplete?.action === undefined) {
-                throw new Error(`oxi-section/form/field/text: parameter "autocomplete.action" missing`);
+            if (content.autocomplete_query?.action === undefined) {
+                throw new Error(`oxi-section/form/field/text: parameter "autocomplete_query.action" missing`);
             }
             let params;
-            if (params = content.autocomplete?.params) {
+            if (params = content.autocomplete_query?.params) {
                 if (Object.prototype.toString.call(params) !== '[object Object]')
-                    throw new Error(`oxi-section/form/field/text: parameter "autocomplete.params" must be a hash`);
+                    throw new Error(`oxi-section/form/field/text: parameter "autocomplete_query.params" must be a hash`);
 
-                for (const [key, value] of Object.entries(params)) {
-                    let func;
-                    // if the value is a hash, it's a reference to another field
-                    if (Object.prototype.toString.call(value) === '[object Object]') {
-                        if (! value.field) throw new Error(`oxi-section/form/field/text: autocomplete parameter definition "${key}" does not contain "field" attribute`);
-                        this.acFieldRefParams.set(key, value.field);
-                    }
-                    // otherwise it's a plain string
-                    else {
-                        this.acStaticParams.set(key, value);
-                    }
+                for (const [param_name, ref_field] of Object.entries(params)) {
+                    // param_name - parameter name for autocomplete query
+                    // ref_field - name of another form field whose value to use
+                    this.acFieldRefParams.set(ref_field, param_name);
                 }
             }
         }
     }
 
     get isAutoComplete() {
-        return this.args.content.autocomplete;
+        return this.args.content.autocomplete_query;
     }
 
     @action
@@ -138,16 +130,12 @@ export default class OxiFieldTextComponent extends Component {
             let searchIndex = ++this.searchIndex;
 
             // resolve referenced fields and their values
-            let enc = new Map(); this.acFieldRefParams.forEach((v, k) => { enc.set(v, k) }); // inverted map
-            let ref = this.args.encodeFields(enc.keys(), enc); // returns an Object
-            // static parameters
-            let plain = Object.fromEntries(this.acStaticParams);
+            let ref = this.args.encodeFields(this.acFieldRefParams.keys(), this.acFieldRefParams); // returns an Object
 
             getOwner(this).lookup("route:openxpki").sendAjaxQuiet({
-                action: this.args.content.autocomplete.action,
+                action: this.args.content.autocomplete_query.action,
                 [this.args.content.name] : value, // [] denotes a dynamic key name
                 ...ref,
-                ...plain,
             }).then((doc) => {
                 // only show results of most recent search (if parallel requests were sent)
                 if (searchIndex !== this.searchIndex) { return }

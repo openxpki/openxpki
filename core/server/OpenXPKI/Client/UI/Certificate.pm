@@ -1074,9 +1074,11 @@ sub action_autocomplete {
     my $self = shift;
     my $args = shift;
 
-    my $term = $self->param('query') || '';
+    my $term = $self->param('cert_identifier') || '';
+    my $params = $self->fetch_autocomplete_params;
 
-    $self->logger()->trace( "autocomplete term: " . Dumper $term) if $self->logger->is_trace;
+    $self->logger()->trace( "autocomplete query: $term") if $self->logger->is_trace;
+
 
     my @result;
     # If we see a string with length of 25 to 27 with only base64 chars
@@ -1111,10 +1113,9 @@ sub action_autocomplete {
             valid_before => time(),
             expires_after => time(),
             status => 'ISSUED',
-            entity_only => 1
+            entity_only => 1,
+            %{ $params->{search_cert_args} },
         });
-
-        $self->logger()->trace( "search result: " . Dumper $search_result) if $self->logger->is_trace;
 
         foreach my $item (@{$search_result}) {
             push @result, {

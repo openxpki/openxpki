@@ -18,7 +18,6 @@ use Try::Tiny;
 use MIME::Base64;
 use Crypt::JWT qw( encode_jwt );
 use Crypt::PRNG;
-use Data::UUID;
 
 # Project modules
 use OpenXPKI::DateTime;
@@ -2681,7 +2680,8 @@ sub __render_input_field {
     $item->{options} = $field->{option} if $field->{option};
 
     # type 'text' - autocomplete
-    push @all_items, $self->__autocomplete_input_field($item, $field->{autocomplete})
+    # make_autocomplete_input() modifies $item and returns an addtional field definition
+    push @all_items, $self->make_autocomplete_input($item, $field->{autocomplete})
       if $field->{autocomplete};
 
     # type 'cert_identifier' - special handling of preset value
@@ -2750,61 +2750,6 @@ sub __encrypt_input_field {
     delete $item->{encrypt};
     $item->{encrypted} = 1;
     $item->{value} = $token;
-}
-
-# create input field definition from workflow field
-sub __autocomplete_input_field {
-    my $self = shift;
-    my $input_field = shift;
-    my $def = shift;
-
-    # action: "text!autocomplete",
-    # params: {
-    #     forest: "deep",
-    #     the_comment: { field: "comment" },
-    # },
-    my $params = $def->{params} // {};
-
-    my %references = ();
-    my %static_params = ();
-
-    for my $key (keys %$params) {
-        my $value = $params->{$key};
-        # references to other fields
-        if (ref $value and $value->{field}) {
-            $references{$key} = $value;
-        }
-        else {
-            $static_params{$key} = $value;
-        }
-    }
-    #my %referenced_fields = map { $_ => $params->{$_} } grep { ref $params->{$_} and $params->{$_}->{field} } keys %$params;
-
-    use Data::Dumper;
-    $self->logger->info("REFERENCED " . Dumper(\%references));
-    $self->logger->info("STATIC " . Dumper(\%static_params));
-
-    # protected from the frontend modification
-    my $encrypted_name = Data::UUID->new->create_str;
-    my $encrypted = {
-        type => 'hidden',
-        name => $encrypted_name,
-        encrypt => 1,
-        value => {
-            static_params => \%static_params,
-            whitelist => [ sort keys %references ], # allowed in subsequent request from frontend
-        },
-    };
-
-    $input_field->{autocomplete} = {
-        action => $def->{action},
-        params => {
-            %references,
-            backend_data => { field => $encrypted_name },
-        },
-    };
-
-    return $encrypted;
 }
 
 =head2 __delegate_call

@@ -52,7 +52,7 @@ class Field {
     /*
      * oxisection/form/field/text
      */
-    autocomplete;
+    autocomplete_query;
     /*
      * hidden fields
      */
