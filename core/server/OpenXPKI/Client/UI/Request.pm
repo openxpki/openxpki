@@ -173,13 +173,13 @@ sub __param {
                 my $token = $cgi->param($prefix_jwt.$key);
                 return unless $token;
 
-                my $key = $self->session->param('jwt_encryption_key');
-                unless ($key) {
+                my $jwt_key = $self->session->param('jwt_encryption_key');
+                unless ($jwt_key) {
                     $self->logger->error("JWT encrypted parameter received but client session contains no decryption key");
                     return;
                 }
 
-                my $decrypted = decode_jwt(token => $token, key => $key);
+                my $decrypted = decode_jwt(token => $token, key => $jwt_key);
                 return $decrypted;
             },
         );
