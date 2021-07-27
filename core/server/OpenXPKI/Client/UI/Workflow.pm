@@ -2651,7 +2651,8 @@ sub __render_input_field {
     my $field = shift;
     my $value = shift;
 
-    die "__render_input_field() must be called in list context: it may return more than one field definition" unless wantarray;
+    die "__render_input_field() must be called in list context: it may return more than one field definition\n"
+      unless wantarray;
 
     my $name = $field->{name};
     next if ($name =~ m{ \A workflow_id }x);
@@ -2725,6 +2726,9 @@ sub __render_input_field {
 sub __encrypt_input_field {
     my ($self, $item) = @_;
 
+    die "Only hash values are supported for encrypted input fields\n"
+      unless ref $item->{value} eq 'HASH';
+
     my $key = $self->_session->param('jwt_encryption_key');
     if (not $key) {
         $key = Crypt::PRNG::random_bytes(32);
@@ -2750,7 +2754,9 @@ sub __encrypt_input_field {
 
 # create input field definition from workflow field
 sub __autocomplete_input_field {
-    my ($self, $input_field, $def) = @_;
+    my $self = shift;
+    my $input_field = shift;
+    my $def = shift;
 
     # action: "text!autocomplete",
     # params: {
