@@ -2681,7 +2681,7 @@ sub __render_input_field {
 
     # type 'text' - autocomplete
     # make_autocomplete_input() modifies $item and returns an addtional field definition
-    push @all_items, $self->make_autocomplete_input($item, $field->{autocomplete})
+    push @all_items, $self->make_autocomplete_input($field->{autocomplete}, $item)
       if $field->{autocomplete};
 
     # type 'cert_identifier' - special handling of preset value

@@ -955,18 +955,38 @@ sub decrypted_param {
 
 =head2 make_autocomplete_input
 
-Fills the details of an autocomplete input field into the given C<$input_field>
-hash according to the given C<$def> workflow field definition.
+Take a text fields' C<autocomplete> argument C<$ac_def> (workflow config) and
+fill in the autocomplete details into the given pre-filled UI field definition
+C<$input_field>.
 
-Returns an additional hidden, to-be-encrypted input field.
+Returns an additional hidden, to-be-encrypted UI field definition.
 
-The autocomplete
+Text input fields with autocompletion are configured as follows:
+
+    type: text
+    autocomplete:
+        action: certificate!autocomplete
+        params:
+            user:
+                param_1: field_name_1
+                param_2: field_name_1
+            persist:
+                query:
+                    status: { "-like": "%done" }
+
+Parameters below C<user> are filled from the referenced form fields.
+
+Parameters below C<persist> may contain data structures (I<HashRefs>, I<ArrayRefs>)
+as they arebackend-encrypted and sent to the client as a JWT token. They can
+be considered safe from user manipulation.
 
 B<Parameters>
 
 =over
 
-=item * I<HashRef> C<$input_field> - input field definition
+=item * I<HashRef> C<$ac_def> - workflow config: content of text fields' C<autocomplete> argument
+
+=item * I<HashRef> C<$input_field> - pre-filled UI field definition
 
 =back
 
@@ -975,12 +995,12 @@ B<Parameters>
 sub make_autocomplete_input {
 
     my $self = shift;
+    my $ac_def = shift;
     my $input_field = shift;
-    my $def = shift;
 
     my $enc_field_name = Data::UUID->new->create_str; # name for additional input field
 
-    # $def = {
+    # $ac_def = {
     #     action: "text!autocomplete",
     #     params: {
     #         user: {
@@ -992,13 +1012,13 @@ sub make_autocomplete_input {
     #         },
     #     },
     # }
-    my $p = $def->{params} // {};
+    my $p = $ac_def->{params} // {};
     my $p_user = $p->{user} // {};
     my $p_persist = $p->{persist} // {};
 
     delete $input_field->{autocomplete}; # we use a new option name to distginguish
     $input_field->{autocomplete_query} = {  # the wf config param from the UI param
-        action => $def->{action},
+        action => $ac_def->{action},
         params => {
             %$p_user,
             __encrypted => $enc_field_name,
