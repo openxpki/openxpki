@@ -774,8 +774,17 @@ msgid "I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN"
 msgstr "请登录"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_REALM_SELECTION_DESC"
+msgstr "真实姓名"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_LOGIN_SERVICE_UNAVAILABLE"
 msgstr "用户名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_DESC"
+msgstr ""
+"此工作流程被意外事件中断，如果没有手动交互，它将无法继续。 请联系支持团队！"
 
 msgid "I18N_OPENXPKI_UI_LOGIN_SUBMIT"
 msgstr "发送"
@@ -1347,6 +1356,10 @@ msgstr "密钥检查值与秘密不匹配"
 
 msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
 msgstr "解锁"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STACK_HINT_LIST"
+msgstr "返回总览"
 
 msgid "I18N_OPENXPKI_UI_SUPPORT_TRAILER"
 msgstr ""

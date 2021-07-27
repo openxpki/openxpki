@@ -804,8 +804,16 @@ msgid "I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN"
 msgstr "ログインしてください"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_REALM_SELECTION_DESC"
+msgstr "本名"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_LOGIN_SERVICE_UNAVAILABLE"
 msgstr "ユーザ名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_DESC"
+msgstr "予期しない中断"
 
 msgid "I18N_OPENXPKI_UI_LOGIN_SUBMIT"
 msgstr "送信"
@@ -1385,6 +1393,10 @@ msgstr "キーチェック値が秘密鍵とあっていません"
 
 msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
 msgstr "ロック解除"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STACK_HINT_LIST"
+msgstr "概要に戻る"
 
 msgid "I18N_OPENXPKI_UI_SUPPORT_TRAILER"
 msgstr ""

@@ -978,8 +978,18 @@ msgid "I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN"
 msgstr "Algoritmo della Chiave"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_REALM_SELECTION_DESC"
+msgstr "Descrizione nome reale"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_LOGIN_SERVICE_UNAVAILABLE"
 msgstr "Nome utente"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_DESC"
+msgstr ""
+"Questo Workflow è stato interrotto da un evento imprevisto, contatta per "
+"favore il team di supporto!"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_LOGIN_SUBMIT"
@@ -1622,6 +1632,10 @@ msgstr "Scarica"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
 msgstr "Scarica"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_STACK_HINT_LIST"
+msgstr "mostra le liste di revoca precedenti"
 
 msgid "I18N_OPENXPKI_UI_SUPPORT_TRAILER"
 msgstr ""

@@ -24,7 +24,10 @@ sub init_realm_select {
 
     my @realms = sort { lc($a->{label}) cmp lc($b->{label}) } @{$realms};
 
-    $self->_page ({'label' => 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN'});
+    $self->_page ({
+        'label' => 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN',
+        'description' => 'I18N_OPENXPKI_UI_LOGIN_REALM_SELECTION_DESC'
+    });
     $self->_result()->{main} = [{ 'type' => 'form', 'action' => 'login!realm',  content => {
         fields => [
             { 'name' => 'pki_realm', 'label' => 'I18N_OPENXPKI_UI_PKI_REALM_LABEL', 'type' => 'select', 'options' => \@realms },
@@ -40,7 +43,11 @@ sub init_auth_stack {
 
     my @stacks = sort { lc($a->{label}) cmp lc($b->{label}) } @{$stacks};
 
-    $self->_page ({'label' => 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN'});
+    $self->_page ({
+        'label' => 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN',
+        'description' => 'I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_DESC',
+    });
+
     $self->_result()->{main} = [
         { 'type' => 'form', 'action' => 'login!stack', content => {
             title => '', submit_label => 'I18N_OPENXPKI_UI_LOGIN_SUBMIT',
@@ -49,6 +56,20 @@ sub init_auth_stack {
             ]
         }
     }];
+
+    my @stackdesc = map {
+        $_->{description} ? ({ label => $_->{label}, value => $_->{description}, format => 'raw' }) : ()
+    } @stacks;
+
+    if (@stackdesc > 0) {
+        $self->add_section({
+            type => 'keyvalue',
+            content => {
+                label => 'I18N_OPENXPKI_UI_STACK_HINT_LIST',
+                description => '',
+                data => \@stackdesc
+        }});
+    }
 
     return $self;
 }

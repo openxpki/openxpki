@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2021-06-22 15:13+0200\n"
+"PO-Revision-Date: 2021-07-27 09:11+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -785,8 +785,14 @@ msgstr "Passwort"
 msgid "I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN"
 msgstr "Bitte anmelden"
 
+msgid "I18N_OPENXPKI_UI_LOGIN_REALM_SELECTION_DESC"
+msgstr " "
+
 msgid "I18N_OPENXPKI_UI_LOGIN_SERVICE_UNAVAILABLE"
 msgstr "Anmeldeserver nicht verfügbar"
+
+msgid "I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_DESC"
+msgstr "Bitte wählen Sie das gewünschte Verfahren für die Anmeldung"
 
 msgid "I18N_OPENXPKI_UI_LOGIN_SUBMIT"
 msgstr "absenden"
@@ -1343,6 +1349,9 @@ msgstr "Passwort entspricht nicht der hinterlegten Prüfsumme"
 
 msgid "I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL"
 msgstr "Entsperren"
+
+msgid "I18N_OPENXPKI_UI_STACK_HINT_LIST"
+msgstr "Anmeldeverfahren"
 
 msgid "I18N_OPENXPKI_UI_SUPPORT_TRAILER"
 msgstr ""

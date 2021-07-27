@@ -542,7 +542,11 @@ sub handle_login {
 
             # List stacks and hide those starting with an underscore
             my @stack_list = map {
-                ($stacks->{$_}->{name} !~ /^_/) ? ($_ = {'value' => $stacks->{$_}->{name}, 'label' => i18nGettext($stacks->{$_}->{label})} ) : ()
+                ($stacks->{$_}->{name} !~ /^_/) ? ($_ = {
+                    'value' => $stacks->{$_}->{name},
+                    'label' => i18nGettext($stacks->{$_}->{label}),
+                    'description' => $stacks->{$_}->{description}
+                }) : ()
             } keys %{$stacks};
 
             # Directly load stack if there is only one
