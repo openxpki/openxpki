@@ -102,7 +102,9 @@ sub BUILD {
 }
 
 sub param {
-    my ($self, $key) = @_;
+
+    my $self = shift;
+    my $key = shift;
 
     confess 'param() must be called in scalar context' if wantarray; # die
 
@@ -112,7 +114,9 @@ sub param {
 }
 
 sub multi_param {
-    my ($self, $key) = @_;
+
+    my $self = shift;
+    my $key = shift;
 
     confess 'multi_param() must be called in list context' unless wantarray; # die
     my @values = $self->__param($key); # list context
@@ -120,7 +124,8 @@ sub multi_param {
 }
 
 sub param_keys {
-    my ($self) = @_;
+
+    my $self = shift;
 
     # send all keys
     confess 'param_keys() must be called in list context' unless wantarray; # die
@@ -128,7 +133,9 @@ sub param_keys {
 }
 
 sub __param {
-    my ($self, $key) = @_;
+
+    my $self = shift;
+    my $key = shift;
 
     confess "param() / multi_param() expect a single key (string) as argument\n" if (not $key or ref $key); # die
 
@@ -167,20 +174,15 @@ sub __param {
                 return unless $cgi;
                 return map { decode_base64($_) } ($cgi->multi_param($prefix_b64.$key))
             },
-            # Try JWT encrypted CGI parameters (might be deep structures)
+            # Try JWT encrypted JSON data (may be deep structure when decrypted)
             sub {
                 return unless $cgi;
-                my $token = $cgi->param($prefix_jwt.$key);
-                return unless $token;
-
-                my $jwt_key = $self->session->param('jwt_encryption_key');
-                unless ($jwt_key) {
-                    $self->logger->error("JWT encrypted parameter received but client session contains no decryption key");
-                    return;
-                }
-
-                my $decrypted = decode_jwt(token => $token, key => $jwt_key);
-                return $decrypted;
+                return $self->__decrypt_jwt(@{ $self->cache->{$prefix_jwt.$key} });
+            },
+            # Try JWT encrypted CGI parameters (may be deep structure when decrypted)
+            sub {
+                return unless $cgi;
+                return $self->__decrypt_jwt($cgi->param($prefix_jwt.$key));
             },
         );
 
@@ -200,6 +202,30 @@ sub __param {
     return ($self->cache->{$key} ? @{ $self->cache->{$key} } : ());
 }
 
+sub __decrypt_jwt {
+
+    my $self = shift;
+    my $token = shift;
+
+    return unless $token;
+
+    my $jwt_key = $self->session->param('jwt_encryption_key');
+    unless ($jwt_key) {
+        $self->logger->debug("JWT encrypted parameter received but client session contains no decryption key");
+        return;
+    }
+
+    my $decrypted = decode_jwt(token => $token, key => $jwt_key);
+    unless (ref $decrypted eq 'HASH') {
+        $self->logger->error("Decrypted JWT data is not a HashRef but a " . ref $decrypted);
+        return;
+    }
+
+    $decrypted->{__jwt_key} = $jwt_key; # prove that it originated from JWT encoded data
+
+    return $decrypted;
+
+}
 
 __PACKAGE__->meta->make_immutable;
 
