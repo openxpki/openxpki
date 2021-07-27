@@ -39,7 +39,7 @@ has logger => (
     default => sub { return Log::Log4perl->get_logger; }
 );
 
-has __prefix_base64 => (
+has _prefix_base64 => (
     is => 'ro',
     isa => 'Str',
     default => '_encoded_base64_',
@@ -77,7 +77,7 @@ sub BUILD {
     # check in param() will succeed.
     foreach my $key (keys %cache) {
         # Base64 encoded binary data
-        my $prefix_b64 = $self->__prefix_base64;
+        my $prefix_b64 = $self->_prefix_base64;
         if (my ($item) = $key =~ /^$prefix_b64(.*)/) { $cache{$item} = undef; next }
     }
 
@@ -92,7 +92,7 @@ sub param {
 
     confess 'param() must be called in scalar context' if wantarray; # die
 
-    my @values = $self->__param($key); # list context
+    my @values = $self->_param($key); # list context
     return $values[0] if defined $values[0];
     return;
 }
@@ -101,7 +101,7 @@ sub multi_param {
     my ($self, $key) = @_;
 
     confess 'multi_param() must be called in list context' unless wantarray; # die
-    my @values = $self->__param($key); # list context
+    my @values = $self->_param($key); # list context
     return @values;
 }
 
@@ -113,8 +113,10 @@ sub param_keys {
     return keys %{$self->cache};
 }
 
-sub __param {
-    my ($self, $key) = @_;
+sub _param {
+
+    my $self = shift;
+    my $key = shift;
 
     confess "param() / multi_param() expect a single key (string) as argument\n" if (not $key or ref $key); # die
 
@@ -133,7 +135,7 @@ sub __param {
     unless (defined $self->cache->{$key}) {
         my $cgi = $self->cgi;
 
-        my $prefix_b64 = $self->__prefix_base64;
+        my $prefix_b64 = $self->_prefix_base64;
 
         my @queries = (
             # Try CGI parameters (and strip whitespaces)
@@ -143,7 +145,7 @@ sub __param {
             },
             # Try Base64 encoded parameter from JSON input
             sub {
-                return map { decode_base64($_) } $self->__get_cache($prefix_b64.$key)
+                return map { decode_base64($_) } $self->_get_cache($prefix_b64.$key)
             },
             # Try Base64 encoded CGI parameters
             sub {
@@ -159,17 +161,17 @@ sub __param {
                 last;
             }
         }
-        $self->logger->trace($msg . 'not in cache. Query result: (' . join(', ', $self->__get_cache($key)) . ')') if $self->logger->is_trace;
+        $self->logger->trace($msg . 'not in cache. Query result: (' . join(', ', $self->_get_cache($key)) . ')') if $self->logger->is_trace;
     }
     else {
         $self->logger->trace($msg . 'return from cache');
     }
 
-    return $self->__get_cache($key); # list
+    return $self->_get_cache($key); # list
 }
 
 # Returns a list of values (may be a single value or an empty list)
-sub __get_cache {
+sub _get_cache {
 
     my $self = shift;
     my $key = shift;
@@ -177,7 +179,6 @@ sub __get_cache {
     return @{ $self->cache->{$key} // [] }
 
 }
-
 
 __PACKAGE__->meta->make_immutable;
 
