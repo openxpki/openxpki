@@ -953,13 +953,12 @@ sub decrypted_param {
 
 }
 
-=head2 make_autocomplete_input
+=head2 make_autocomplete_query
 
-Take a text fields' C<autocomplete> argument C<$ac_def> (workflow config) and
-fill in the autocomplete details into the given pre-filled UI field definition
-C<$input_field>.
+Create the autocomplete config for a UI text field from the given workflow
+field configuration C<$wf_field>.
 
-Returns an additional hidden, to-be-encrypted UI field definition.
+Also returns an additional hidden, to-be-encrypted UI field definition.
 
 Text input fields with autocompletion are configured as follows:
 
@@ -977,56 +976,55 @@ Text input fields with autocompletion are configured as follows:
 Parameters below C<user> are filled from the referenced form fields.
 
 Parameters below C<persist> may contain data structures (I<HashRefs>, I<ArrayRefs>)
-as they arebackend-encrypted and sent to the client as a JWT token. They can
+as they are backend-encrypted and sent to the client as a JWT token. They can
 be considered safe from user manipulation.
 
 B<Parameters>
 
 =over
 
-=item * I<HashRef> C<$ac_def> - workflow config: content of text fields' C<autocomplete> argument
-
-=item * I<HashRef> C<$input_field> - pre-filled UI field definition
+=item * I<HashRef> C<$wf_field> - workflow field config
 
 =back
 
 =cut
 
-sub make_autocomplete_input {
+sub make_autocomplete_query {
 
     my $self = shift;
-    my $ac_def = shift;
-    my $input_field = shift;
+    my $wf_field = shift;
 
-    my $enc_field_name = Data::UUID->new->create_str; # name for additional input field
+    return unless $wf_field->{autocomplete};
 
-    # $ac_def = {
-    #     action: "text!autocomplete",
-    #     params: {
-    #         user: {
-    #             reference_1: "comment",
-    #         },
-    #         persist: {
-    #             static_a: "deep",
-    #             sql_query: { "-like": "$key_id:%" },
+    # $wf_field = {
+    #     type: "text",
+    #     autocomplete: {
+    #         action: "text!autocomplete",
+    #         params: {
+    #             user: {
+    #                 reference_1: "comment",
+    #             },
+    #             persist: {
+    #                 static_a: "deep",
+    #                 sql_query: { "-like": "$key_id:%" },
+    #             },
     #         },
     #     },
     # }
-    my $p = $ac_def->{params} // {};
+
+    my $p = $wf_field->{autocomplete}->{params} // {};
     my $p_user = $p->{user} // {};
     my $p_persist = $p->{persist} // {};
 
-    delete $input_field->{autocomplete}; # we use a new option name to distginguish
-    $input_field->{autocomplete_query} = {  # the wf config param from the UI param
-        action => $ac_def->{action},
-        params => {
-            %$p_user,
-            __encrypted => $enc_field_name,
-        },
+    my $enc_field_name = Data::UUID->new->create_str; # name for additional input field
+
+    my $ac_query_params = {  # the wf config param from the UI param
+        %$p_user,
+        __encrypted => $enc_field_name,
     };
 
     # additional input field with encrypted data (protected from frontend modification)
-    return {
+    my $enc_field = {
         type => 'hidden',
         name => $enc_field_name,
         encrypt => 1,
@@ -1035,6 +1033,8 @@ sub make_autocomplete_input {
             user_param_whitelist => [ sort keys %$p_user ], # allowed in subsequent request from frontend
         },
     };
+
+    return ($ac_query_params, $enc_field)
 
 }
 
