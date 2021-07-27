@@ -1,6 +1,8 @@
 package OpenXPKI::Client::UI::Workflow;
 use Moose;
 
+extends 'OpenXPKI::Client::UI::Result';
+
 # Core modules
 use DateTime;
 use POSIX;
@@ -14,15 +16,14 @@ use Date::Parse;
 use YAML::Loader;
 use Try::Tiny;
 use MIME::Base64;
-use OpenXPKI::DateTime;
-use OpenXPKI::Debug;
-use OpenXPKI::i18n qw( i18nTokenizer i18nGettext );
 use Crypt::JWT qw( encode_jwt );
 use Crypt::PRNG;
 use Data::UUID;
 
-
-extends 'OpenXPKI::Client::UI::Result';
+# Project modules
+use OpenXPKI::DateTime;
+use OpenXPKI::Debug;
+use OpenXPKI::i18n qw( i18nTokenizer i18nGettext );
 
 
 # used to cache static patterns like the creator lookup
@@ -2162,6 +2163,7 @@ sub __render_from_workflow {
 
         my $context = $wf_info->{workflow}->{context};
         my @fields;
+        my @additional_fields;
         my @fielddesc;
 
         foreach my $field (@{$wf_action_info->{field}}) {
@@ -2185,7 +2187,9 @@ sub __render_from_workflow {
             my ($item, @more_items) = $self->__render_input_field( $field, $val );
             next unless ($item);
 
-            push @fields, $item, @more_items;
+            push @fields, $item;
+            push @additional_fields, @more_items;
+
             # if the field has a description text, push it to the @fielddesc list
             my $descr = $field->{description};
             if ($descr && $descr !~ /^\s*$/ && $field->{type} ne 'hidden') {
@@ -2220,7 +2224,7 @@ sub __render_from_workflow {
                     #label => $wf_action_info->{label},
                     #description => $wf_action_info->{description},
                     submit_label => $wf_action_info->{button} || 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
-                    fields => \@fields,
+                    fields => [ @fields, @additional_fields ],
                     buttons => $self->__get_form_buttons( $wf_info ),
                 }
             });
@@ -2633,8 +2637,11 @@ sub __get_next_auto_action {
 Render the UI code for a input field from the server sided definition.
 Does translation of labels and mangles values for multi-valued componentes.
 
-Might dynamically create additional input fields and thus return a list with
-several field definitions.
+This method might dynamically create additional "helper" fields on-the-fly
+(usually of type I<hidden>) and may thus return a list with several field
+definitions.
+
+The first returned item is always the one corresponding to the workflow field.
 
 =cut
 
