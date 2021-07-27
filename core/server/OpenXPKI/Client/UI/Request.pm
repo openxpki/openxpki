@@ -167,7 +167,7 @@ sub __param {
             sub {
                 my $value = $self->cache->{$prefix_b64.$key};
                 return unless $value;
-                return map { decode_base64($_) } (ref $value ? @{$value} : ($value))
+                return map { decode_base64($_) } @{$value}
             },
             # Try Base64 encoded CGI parameters
             sub {
