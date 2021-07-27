@@ -104,6 +104,8 @@ if [[ $IS_FULLCONFIG -eq 1 ]]; then
     if grep -q '^vagrant:' /etc/passwd; then
         # Specify hostname to force MySQL connection via TCP, not socket
         echo "- Vagrant Box detected: modifying WebUI config"
+
+        sed -ri 's/^(#\s*)?(driver\s*=).*/\2 driver:openxpki/' /etc/openxpki/webui/default.conf
         sed -ri 's/^(#\s*)?(DataSource\s*=).*/\2 dbi:mysql:dbname=openxpki;host=127.0.0.1/' /etc/openxpki/webui/default.conf
         sed -ri 's/^(#\s*)?(User\s*=).*/\2 openxpki_session/' /etc/openxpki/webui/default.conf
         sed -ri 's/^(#\s*)?(Password\s*=).*/\2 mysecret/' /etc/openxpki/webui/default.conf
