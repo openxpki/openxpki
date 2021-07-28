@@ -1187,7 +1187,7 @@ sub action_find {
                 'type' => 'certificate',
                 'count' => scalar @{$search_result},
                 'query' => { cert_serial => $serial, entity_only => 1 },
-                'input' => { cert_serial => $self->param('cert_serial') },
+                'input' => { cert_serial => scalar $self->param('cert_serial') },
                 'header' =>  $self->__default_grid_head,
                 'column' => $self->__default_grid_row,
                 'pager'  => {},

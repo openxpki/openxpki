@@ -406,7 +406,7 @@ sub render {
     if ($self->_status()) {
         $result->{status} = $self->_status();
     } elsif ($self->param('_status')) {
-        my $status = $self->_client->session()->param($self->param('_status'));
+        my $status = $self->_client->session()->param(scalar $self->param('_status'));
         if ($status && ref $status eq 'HASH') {
             $self->logger()->debug("Set persisted status " . $status->{message});
             $result->{status} = $status;
