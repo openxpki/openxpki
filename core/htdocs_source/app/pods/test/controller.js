@@ -203,10 +203,9 @@ export default class TestController extends Controller {
                         value: "rain",
                     },
                     {
-                        type: "hidden",
+                        type: "encrypted",
                         name: "enc_param",
                         value: "fake_jwt_token",
-                        encrypted: 1,
                     },
                     {
                         type: "text",
@@ -214,12 +213,12 @@ export default class TestController extends Controller {
                         label: "Autocomplete",
                         value: "pre",
                         tooltip: "Simulated autocomplete: Enter anything to get three results, or 'boom' to simulate server-side error, or 'void' for empty result list.",
-                        autocomplete: {
+                        autocomplete_query: {
                             action: "text!autocomplete",
                             params: {
                                 forest: "deep",
-                                the_comment: { field: "comment" },
-                                secure_param: { field: "enc_param" },
+                                the_comment: "comment",
+                                secure_param: "enc_param",
                             },
                         },
                     },

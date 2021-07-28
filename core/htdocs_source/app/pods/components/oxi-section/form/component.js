@@ -53,10 +53,6 @@ class Field {
      * oxisection/form/field/text
      */
     autocomplete_query;
-    /*
-     * hidden fields
-     */
-    encrypted;
 
     static fromHash(sourceHash) {
         let instance = new this(); // "this" in static methods refers to class
@@ -111,6 +107,10 @@ export default class OxiSectionFormComponent extends Component {
     clonableRefNames = [];
     focusFeedback = {}; // gets filled with the field feedback if they may receive the focus
     initialFocussingDone = false;
+
+    hiddenFieldFilter(f) {
+        return f.type !== "hidden" && f.type !== "encrypted";
+    }
 
     constructor() {
         super(...arguments);
@@ -200,7 +200,7 @@ export default class OxiSectionFormComponent extends Component {
     }
 
     get visibleFields() {
-        return this.fields.filter(f => f.type !== "hidden");
+        return this.fields.filter(this.hiddenFieldFilter);
     }
 
     @action
@@ -243,9 +243,9 @@ export default class OxiSectionFormComponent extends Component {
 
             if (potentialClones.length === 0) continue; // there's not even one field to send
 
-            // prefix for encrypted fields
-            if (potentialClones[0].type == 'hidden' && potentialClones[0].encrypted) {
-                newName = `_encrypted_jwt_${newName}`;
+            if (potentialClones[0].type == 'encrypted') {
+                // prefix triggers auto-decryption in the backend
+                newName = '_encrypted_jwt_' + newName;
             }
 
             // encode ArrayBuffer as Base64 and change field name as a flag
@@ -337,7 +337,7 @@ export default class OxiSectionFormComponent extends Component {
     }
 
     get originalFieldCount() {
-        return this.args.def.fields.filter(f => f.type !== "hidden").length;
+        return this.args.def.fields.filter(this.hiddenFieldFilter).length;
     }
 
     /*

@@ -1025,9 +1025,8 @@ sub make_autocomplete_query {
 
     # additional input field with encrypted data (protected from frontend modification)
     my $enc_field = {
-        type => 'hidden',
         name => $enc_field_name,
-        encrypt => 1,
+        type => 'encrypted',
         value => {
             persistent_params => $p_persist,
             user_param_whitelist => [ sort keys %$p_user ], # allowed in subsequent request from frontend

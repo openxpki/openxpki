@@ -2720,13 +2720,9 @@ sub __render_input_field {
         $item->{verbose} = $self->send_command_v2( 'render_template', { template => $field->{template}, params => $item } );
     }
 
-    # type 'hidden' and encrypted
-    for my $item (@all_items) {
-        if ($item->{encrypt}) {
-            delete $item->{encrypt};
-            $item->{value} = $self->_encrypt_jwt($item->{value});
-            $item->{encrypted} = 1;
-        }
+    # type 'encrypted'
+    for (@all_items) {
+        $_->{value} = $self->_encrypt_jwt($_->{value}) if $_->{type} eq 'encrypted';
     }
 
     return @all_items;
