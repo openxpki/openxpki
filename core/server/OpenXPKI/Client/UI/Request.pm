@@ -79,6 +79,18 @@ sub BUILD {
         my $json = JSON->new->utf8;
         my $data = $json->decode( scalar $self->cgi->param('POSTDATA') );
 
+        # Resolve stringified depth-one-hashes - turn parameters like
+        #   key{one} = 34
+        #   key{two} = 56
+        # into a HashRef
+        #   key => { one => 34, two => 56 }
+        foreach my $combined_key (keys %$data) {
+            if (my ($key, $subkey) = $combined_key =~ m{ \A (\w+)\{(\w+)\} \z }xs) {
+                $data->{$key} //= {};
+                $data->{$key}->{$subkey} = $data->{$combined_key};
+            }
+        }
+
         # wrap Scalars and HashRefs in an ArrayRef as param() expects it (but leave ArrayRefs as is)
         $cache{$_} = (ref $data->{$_} eq 'ARRAY' ? $data->{$_} : [ $data->{$_} ]) for keys %$data;
 
@@ -92,6 +104,7 @@ sub BUILD {
         # Base64 encoded binary data
         my $prefix_b64 = $self->_prefix_base64;
         if (my ($item) = $key =~ /^$prefix_b64(.*)/) { $cache{$item} = undef; next }
+
         # JWT encrypted data
         my $prefix_jwt = $self->_prefix_jwt;
         if (my ($item) = $key =~ /^$prefix_jwt(.*)/) { $cache{$item} = undef; next }
