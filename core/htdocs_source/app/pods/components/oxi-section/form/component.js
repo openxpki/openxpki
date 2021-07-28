@@ -162,7 +162,7 @@ export default class OxiSectionFormComponent extends Component {
             if (field.value) {
                 // dynamic input fields: presets are key/value hashes.
                 // we need to convert `value: { key: NAME, value: VALUE }` to `name: NAME, value: VALUE`
-                if (typeof field.value === "object") {
+                if (typeof field.value === 'object' && field.value.key) {
                     field.name = field.value.key;
                     field.value = field.value.value;
                 }
