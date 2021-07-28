@@ -2733,7 +2733,7 @@ sub __render_input_field {
 sub _encrypt_jwt {
     my ($self, $value) = @_;
 
-    die "Only hash values are supported for encrypted input fields\n"
+    die "Only values of type HashRef are supported for encrypted input fields\n"
       unless ref $value eq 'HASH';
 
     my $key = $self->_session->param('jwt_encryption_key');
