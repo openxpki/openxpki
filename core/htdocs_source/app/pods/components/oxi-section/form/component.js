@@ -20,6 +20,7 @@ class Field {
     placeholder;
     actionOnChange;
     @tracked error;
+    autofill;
     /*
      * Clonable fields
      */

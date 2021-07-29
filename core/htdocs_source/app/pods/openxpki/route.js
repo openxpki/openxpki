@@ -7,6 +7,7 @@ import { inject } from '@ember/service';
 import { isArray } from '@ember/array';
 import { debug } from '@ember/debug';
 import fetch from 'fetch';
+import ow from 'ow';
 
 class Content {
     @tracked user = null;
@@ -143,30 +144,23 @@ export default class OpenXpkiRoute extends Route {
             '_': new Date().getTime(),
         }
         let url = this.oxiConfig.backendUrl;
-        let fetchParams = {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-OPENXPKI-Client': '1',
-            },
+        let headers = {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-OPENXPKI-Client': '1',
         };
 
         // POST
+        let method;
         if (request.action) {
-            fetchParams.method = "POST";
-            fetchParams.headers['Content-Type'] = 'application/json';
-            fetchParams.body = JSON.stringify({
-                ...data,
-                _rtoken: this.content.rtoken,
-            });
+            method = 'POST';
+            data = { ...data, _rtoken: this.content.rtoken };
         }
         // GET
         else {
-            fetchParams.method = "GET";
-            fetchParams.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
-            url += '?' + this._toUrlParams(data);
+            method = 'GET';
         }
 
-        return fetch(url, fetchParams)
+        return this.backendFetch({ url, method, data, headers })
         .then(response => {
             // If OK: unpack JSON data
             if (response.ok) {
@@ -177,13 +171,6 @@ export default class OpenXpkiRoute extends Route {
                 this._handleServerException(response.status);
                 return null;
             }
-        })
-        // Network error, thrown by fetch() itself
-        .catch(error => {
-            this._setLoadingBanner(null);
-            console.error('The server connection seems to be lost', error);
-            this.content.error = this.intl.t('error_popup.message.network', { reason: error.message });
-            return null;
         })
         .then(doc => {
             // Errors occured and handlers above returned null
@@ -244,6 +231,41 @@ export default class OpenXpkiRoute extends Route {
             this.content.error = this.intl.t('error_popup.message.client', { reason: error });
             return null;
         })
+    }
+
+    backendFetch({ url, method, headers = {}, data, contentType }) {
+        // type validationi
+        ow(method, ow.string.oneOf(['GET', 'POST']));
+
+        let params = {
+            method,
+            headers,
+        };
+
+        if (method == 'POST') {
+            // type validation
+            ow(contentType, ow.optional.string.oneOf(['application/json']));
+            params.headers['Content-Type'] = contentType;
+
+            contentType ||= 'application/json';
+            if (contentType == 'application/json') {
+                params.body = JSON.stringify(data);
+            }
+
+        }
+
+        if (method == 'GET') {
+            url += '?' + this._toUrlParams(data);
+        }
+
+        return fetch(url, params)
+        // Network error, thrown by fetch() itself
+        .catch(error => {
+            this._setLoadingBanner(null);
+            console.error('The server connection seems to be lost', error);
+            this.content.error = this.intl.t('error_popup.message.network', { reason: error.message });
+            return null;
+        });
     }
 
     /*

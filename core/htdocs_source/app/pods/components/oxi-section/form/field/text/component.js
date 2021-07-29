@@ -49,6 +49,8 @@ export default class OxiFieldTextComponent extends Component {
                 }
             }
         }
+
+        this.args.initAutofill(val => this.setValue(this.cleanup(val), false)); // pass function that fills in the result
     }
 
     get isAutoComplete() {
@@ -57,8 +59,7 @@ export default class OxiFieldTextComponent extends Component {
 
     @action
     onInput(evt) {
-        let value = this.cleanup(evt.target.value);
-        this.setValue(value);
+        this.setValue(this.cleanup(evt.target.value));
     }
 
     // Own "paste" implementation to allow for text cleanup
@@ -86,12 +87,12 @@ export default class OxiFieldTextComponent extends Component {
         event.preventDefault();
     }
 
-    setValue(value) {
+    setValue(value, runAutocomplete = true) {
         this.value = value;
         this.args.onChange(value); // report changes to parent component
 
         // fetch autocomplete list (but don't process same input value twice)
-        if (this.isAutoComplete && value !== this.searchPrevious) {
+        if (runAutocomplete && this.isAutoComplete && value !== this.searchPrevious) {
             this.autocompleteQuery(value);
         }
     }

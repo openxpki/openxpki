@@ -83,6 +83,17 @@ export default class TestController extends Controller {
                 return emptyResponse();
             });
 
+            /*
+             * Autofill
+             */
+            this.get('/autofill', req => {
+                console.info(`MOCKUP SERVER> autofill request`);
+                console.info(Object.entries(req.queryParams).map(e => `MOCKUP SERVER> ${e[0]} = ${e[1]}`).join("\n"));
+                console.debug(req);
+                let result = req.queryParams;
+                return [200, {"Content-Type": "application/json"}, JSON.stringify(result)];
+            });
+
             /* ************************
              * POST requests
              */
@@ -216,10 +227,25 @@ export default class TestController extends Controller {
                         autocomplete_query: {
                             action: "text!autocomplete",
                             params: {
-                                forest: "deep",
                                 the_comment: "comment",
                                 secure_param: "enc_param",
                             },
+                        },
+                    },
+                    {
+                        type: "text",
+                        name: "text_autofill",
+                        label: "Autofill",
+                        autofill: {
+                            request: {
+                                url: `${window.location.protocol}//${window.location.host}/autofill`,
+                                method: 'GET',
+                                params: {
+                                    user: { the_comment: "comment" },
+                                    static: { forest: "deep" },
+                                },
+                            },
+                            trigger: "auto",
                         },
                     },
                 ],
