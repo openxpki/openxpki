@@ -2676,8 +2676,10 @@ sub __render_input_field {
     # includes dynamically generated additional fields
     my @all_items = ($item);
 
-    # type 'select'
-    $item->{options} = $field->{option} if $field->{option};
+    # type 'select' - fill in options
+    if ($type eq 'select' and $field->{option}) {
+        $item->{options} = $field->{option};
+    }
 
     # type 'text' - autocomplete
     if ($field->{autocomplete}) {
