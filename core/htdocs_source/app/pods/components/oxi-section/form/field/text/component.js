@@ -49,8 +49,6 @@ export default class OxiFieldTextComponent extends Component {
                 }
             }
         }
-
-        this.args.initAutofill(val => this.setValue(this.cleanup(val), false)); // pass function that fills in the result
     }
 
     get isAutoComplete() {
