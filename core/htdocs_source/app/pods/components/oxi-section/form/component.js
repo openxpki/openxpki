@@ -54,6 +54,10 @@ class Field {
      * oxisection/form/field/text
      */
     autocomplete_query;
+    /*
+     * oxisection/form/field/textarea
+     */
+    allow_upload;
 
     static fromHash(sourceHash) {
         let instance = new this(); // "this" in static methods refers to class

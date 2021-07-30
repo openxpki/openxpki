@@ -2681,7 +2681,18 @@ sub __render_input_field {
         $item->{options} = $field->{option};
     }
 
-    # type 'text' - autocomplete
+    # type 'cert_identifier' - special handling of preset value
+    if ($type eq 'cert_identifier' && $value) {
+        $item->{type} = 'static';
+    }
+
+    # type 'uploadarea' - transform into 'textarea'
+    if ($type eq 'uploadarea') {
+        $item->{type} = 'textarea';
+        $item->{allow_upload} = 1;
+    }
+
+    # option 'autocomplete'
     if ($field->{autocomplete}) {
         my ($ac_query_params, $enc_field) = $self->make_autocomplete_query($field);
         # "autocomplete_query" to distinguish it from the wf config param
@@ -2691,11 +2702,6 @@ sub __render_input_field {
         };
         # additional field definition
         push @all_items, $enc_field;
-    }
-
-    # type 'cert_identifier' - special handling of preset value
-    if ($type eq 'cert_identifier' && $value) {
-        $item->{type} = 'static';
     }
 
     if (defined $value) {

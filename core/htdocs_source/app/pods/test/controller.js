@@ -474,10 +474,27 @@ export default class TestController extends Controller {
                         value: "Hi there!\nHow are you?\n",
                     },
                     {
-                        type: "uploadarea",
-                        name: "uploadarea",
+                        type: "textarea",
+                        name: "prosa_autofill",
+                        label: "Textarea",
+                        value: "",
+                        autofill: {
+                            request: {
+                                url: `${window.location.protocol}//${window.location.host}/autofill`,
+                                method: 'GET',
+                                params: {
+                                    static: { this: "it" },
+                                },
+                            },
+                            label: "The Oracle",
+                        },
+                    },
+                    {
+                        type: "textarea",
+                        name: "textarea_upload",
                         value: "...data...",
                         label: "Uploadarea",
+                        allow_upload: 1,
                         autofill: {
                             request: {
                                 url: `${window.location.protocol}//${window.location.host}/autofill`,
