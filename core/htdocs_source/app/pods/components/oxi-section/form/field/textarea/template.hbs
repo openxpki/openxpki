@@ -34,7 +34,7 @@
                     disabled={{this.value}}
                     @icon="glyphicon glyphicon-refresh"
                 >
-                    <EmberTooltip>{{t 'component.oxifield_uploadarea.autofill.button' target=@content.autofill.label}}</EmberTooltip>
+                    <EmberTooltip>{{@autofillButtonLabel}}</EmberTooltip>
                 </BsButton>
             {{/if}}
 

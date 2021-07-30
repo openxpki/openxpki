@@ -7,6 +7,7 @@ import ow from 'ow';
 
 export default class OxiFieldMainComponent extends Component {
     @inject('oxi-config') config;
+    @inject('intl') intl;
 
     autofillFieldRefParams = new Map(); // mapping: (source field name) => (parameter name for autocomplete query)
     autofillValueSetter; // callback passed in from the actual component
@@ -97,6 +98,7 @@ export default class OxiFieldMainComponent extends Component {
             }),
             'autorun': ow.optional.any(ow.boolean, ow.number, ow.string.oneOf(['0', '1'])),
             'label': ow.string,
+            'button_label': ow.optional.string,
         }));
 
         let ref_params = autofill.request?.params?.user;
@@ -142,5 +144,18 @@ export default class OxiFieldMainComponent extends Component {
         }).then(doc => {
             this.autofillValueSetter(JSON.stringify(doc));
         });
+    }
+
+    get autofillButtonLabel() {
+        let autofill = this.args.field.autofill;
+        return (autofill.button_label
+            ? autofill.button_label
+            : this.intl.t('autofill.button', { target: autofill.label })
+        );
+    }
+
+    get autofillResultLabel() {
+        let autofill = this.args.field.autofill;
+        return this.intl.t('autofill.result', { target: autofill.label });
     }
 }

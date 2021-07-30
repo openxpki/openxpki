@@ -247,6 +247,7 @@ export default class TestController extends Controller {
                             },
                             autorun: true,
                             label: "The Oracle",
+                            button_label: "Per Smartcard erzeugen",
                         },
                     },
                 ],
@@ -487,6 +488,7 @@ export default class TestController extends Controller {
                                 },
                             },
                             label: "The Oracle",
+                            button_label: "Per Smartcard erzeugen",
                         },
                     },
                     {

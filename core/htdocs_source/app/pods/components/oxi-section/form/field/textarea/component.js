@@ -23,10 +23,9 @@ export default class OxiFieldTextareaComponent extends Component {
         if (this.args.content.autofill) this.args.initAutofill(
             // pass in function that fills in the result
             val => {
-                let label = this.intl.t('component.oxifield_uploadarea.autofill.result', { target: this.args.content.autofill.label });
                 // convert string to ArrayBuffer
                 let reader = new FileReader();
-                reader.onload = (e) => this.setFileData(e.target.result, label);
+                reader.onload = (e) => this.setFileData(e.target.result, this.args.autofillResultLabel);
                 reader.readAsArrayBuffer(new Blob([val], { type : 'text/plain' }));
             }
         );
