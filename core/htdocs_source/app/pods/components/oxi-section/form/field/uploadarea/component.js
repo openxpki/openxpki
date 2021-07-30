@@ -4,25 +4,21 @@ import { tracked } from '@glimmer/tracking';
 import { inject } from '@ember/service';
 import { debug } from '@ember/debug';
 
-/*
- * NOTE: this component differs from others in that it does not
- * react to changes of its parameters (this.args.*).
- * Two reasons:
- * 1. it makes no sense to have presets for an upload area, or modified
- *    values from a parent component
- * 2. the logic for disabling buttons etc. would not work as we would
- *    not know if a value set somewhere else was a manual input or came
- *    from a file.
- */
 export default class OxiFieldUploadComponent extends Component {
     @inject('intl') intl;
 
     fileUploadElement = null;
 
-    @tracked data;
-    @tracked textOutput = "";
+    @tracked value;             // the actual value
+    @tracked textOutput = "";   // what is shown in the text field
     @tracked filename = "";
     @tracked lockTextInput = false;
+
+    constructor() {
+        super(...arguments);
+
+        this.textOutput = this.args.content.value;
+    }
 
     get cols() { return (this.args.content.textAreaSize || {}).width || 150 }
     get rows() { return (this.args.content.textAreaSize || {}).height || 10 }
@@ -41,8 +37,8 @@ export default class OxiFieldUploadComponent extends Component {
     }
 
     @action
-    setTextInput(evt) {
-        this.setData(evt.target.value);
+    onInput(evt) {
+        this.setValue(evt.target.value);
     }
 
     @action
@@ -72,7 +68,7 @@ export default class OxiFieldUploadComponent extends Component {
 
     @action
     resetInput() {
-        this.setData(null);
+        this.setValue(null);
         this.textOutput = "";
         this.filename = "";
         this.lockTextInput = false;
@@ -83,6 +79,7 @@ export default class OxiFieldUploadComponent extends Component {
         this.lockTextInput = true;
         this.filename = file.name;
 
+        // convert file to ArrayBuffer
         let reader = new FileReader();
         reader.onload = (e) => this.setFileData(e.target.result);
 
@@ -91,7 +88,7 @@ export default class OxiFieldUploadComponent extends Component {
     }
 
     setFileData(arrayBuffer) {
-        this.setData(arrayBuffer);
+        this.setValue(arrayBuffer);
 
         // show contents if it's a text block
         const textStart = "-----BEGIN";
@@ -109,8 +106,8 @@ export default class OxiFieldUploadComponent extends Component {
         }
     }
 
-    setData(data) {
-        this.data = data;
-        this.args.onChange(data);
+    setValue(value) {
+        this.value = value;
+        this.args.onChange(value);
     }
 }

@@ -8,7 +8,7 @@
             placeholder={{@content.placeholder}}
             readonly={{if this.lockTextInput "readonly"}}
             {{on "keydown" this.onKeydown}}
-            {{on "input" this.setTextInput}}
+            {{on "input" this.onInput}}
             {{on "drop" this.fileDropped}}
             {{on "dragover" this.showCopyEffect}}
             {{may-focus this false}}
@@ -28,29 +28,32 @@
     <div class="col-md-5">
         {{this.filename}}
     </div>
-    <div class="col-md-3">
-        {{#if this.data}}
-            <BsButton
-                @type='default'
-                class="oxi-btn-cancel btn-block btn-sm"
-                @onClick={{this.resetInput}}
-                @icon="glyphicon glyphicon-trash"
-            >
-                &nbsp;
-                {{t 'component.oxifield_uploadarea.reset'}}
-            </BsButton>
-        {{/if}}
-    </div>
-    <div class="col-md-4">
-        <BsButton
-            @type='default'
-            class="oxi-btn-optional btn-block btn-sm"
-            @onClick={{this.openFileUpload}}
-            disabled={{this.data}}
-            @icon="glyphicon glyphicon-folder-open"
-        >
-            &nbsp;
-            {{t 'component.oxifield_uploadarea.open'}}
-        </BsButton>
+    <div class="col-md-7">
+        <div class="input-group">
+            <span class="input-group-btn">
+                <BsButton
+                    @type='default'
+                    class="input-group-btn oxi-btn-cancel btn-block btn-sm"
+                    @onClick={{this.resetInput}}
+                    disabled={{not this.value}}
+                    @icon="glyphicon glyphicon-trash"
+                >
+                    &nbsp;
+                    {{t 'component.oxifield_uploadarea.reset'}}
+                </BsButton>
+            </span>
+            <span class="input-group-btn">
+                <BsButton
+                    @type='default'
+                    class="input-group-btn oxi-btn-optional btn-block btn-sm"
+                    @onClick={{this.openFileUpload}}
+                    disabled={{this.value}}
+                    @icon="glyphicon glyphicon-folder-open"
+                >
+                    &nbsp;
+                    {{t 'component.oxifield_uploadarea.open'}}
+                </BsButton>
+            </span>
+        </div>
     </div>
 </div>
