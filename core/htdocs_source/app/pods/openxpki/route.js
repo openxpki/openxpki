@@ -246,9 +246,9 @@ export default class OpenXpkiRoute extends Route {
         if (method == 'POST') {
             // type validation
             ow(contentType, ow.optional.string.oneOf(['application/json']));
+            contentType ||= 'application/json';
             params.headers['Content-Type'] = contentType;
 
-            contentType ||= 'application/json';
             if (contentType == 'application/json') {
                 params.body = JSON.stringify(data);
             }
