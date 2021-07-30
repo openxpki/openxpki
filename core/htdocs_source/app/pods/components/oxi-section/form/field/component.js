@@ -83,7 +83,6 @@ export default class OxiFieldMainComponent extends Component {
         if (!autofill) return;
 
         this.autofillValueSetter = valueSetter;
-        console.log("SETTER", valueSetter);
 
         // type validation
         ow(autofill, 'autofill', ow.object.exactShape({
