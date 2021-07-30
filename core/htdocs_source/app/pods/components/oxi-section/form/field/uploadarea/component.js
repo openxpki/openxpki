@@ -18,6 +18,18 @@ export default class OxiFieldUploadComponent extends Component {
         super(...arguments);
 
         this.textOutput = this.args.content.value;
+
+        // Add autofill behaviour
+        if (this.args.content.autofill) this.args.initAutofill(
+            // pass in function that fills in the result
+            val => {
+                let label = this.intl.t('component.oxifield_uploadarea.autofill.result', { target: this.args.content.autofill.label });
+                // convert string to ArrayBuffer
+                let reader = new FileReader();
+                reader.onload = (e) => this.setFileData(e.target.result, label);
+                reader.readAsArrayBuffer(new Blob([val], { type : 'text/plain' }));
+            }
+        );
     }
 
     get cols() { return (this.args.content.textAreaSize || {}).width || 150 }
@@ -76,18 +88,17 @@ export default class OxiFieldUploadComponent extends Component {
 
     // expects a File object
     setFile(file) {
-        this.lockTextInput = true;
-        this.filename = file.name;
-
         // convert file to ArrayBuffer
         let reader = new FileReader();
-        reader.onload = (e) => this.setFileData(e.target.result);
+        reader.onload = (e) => this.setFileData(e.target.result, file.name);
 
         debug(`oxifield-uploadarea: setFile() - loading contents of ${file.name}`);
         reader.readAsArrayBuffer(file);
     }
 
-    setFileData(arrayBuffer) {
+    setFileData(arrayBuffer, name) {
+        this.lockTextInput = true;
+        this.filename = name;
         this.setValue(arrayBuffer);
 
         // show contents if it's a text block

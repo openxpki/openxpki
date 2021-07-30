@@ -27,7 +27,7 @@
             {{/if}}
         {{/if}}
 
-        {{component
+        {{#component
             this.type
             content=this.field
             onChange=this.onChange
@@ -35,7 +35,9 @@
             setFocusInfo=@setFocusInfo
             encodeFields=@encodeFields
             initAutofill=this.initAutofill
+            autofillQuery=this.autofillQuery
         }}
+        {{/component}}
 
         {{#if @field.error}}
             <span class="help-block">{{@field.error}}</span>

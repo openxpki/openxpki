@@ -44,6 +44,9 @@ component:
     open: "Open file"
     large_file: "File too large for preview"
     binary_file: "Binary file"
+    autofill:
+      button: "Query {target}"
+      result: "Query result from: {target}"
   oxifield_passwordverify:
     retype_password: "Retype password"
     error_retype_password: "Please retype password in second input field"

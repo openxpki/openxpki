@@ -245,7 +245,8 @@ export default class TestController extends Controller {
                                     static: { forest: "deep" },
                                 },
                             },
-                            trigger: "auto",
+                            autorun: true,
+                            label: "The Oracle",
                         },
                     },
                 ],
@@ -477,6 +478,18 @@ export default class TestController extends Controller {
                         name: "uploadarea",
                         value: "...data...",
                         label: "Uploadarea",
+                        autofill: {
+                            request: {
+                                url: `${window.location.protocol}//${window.location.host}/autofill`,
+                                method: 'GET',
+                                params: {
+                                    user: { text: "rawtext" },
+                                    static: { forest: "deep" },
+                                },
+                            },
+                            autorun: 1,
+                            label: "The Oracle",
+                        },
                     },
                 ],
             }

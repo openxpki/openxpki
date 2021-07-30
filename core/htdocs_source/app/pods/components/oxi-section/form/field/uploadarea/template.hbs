@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-10">
         <textarea
             class="form-control"
             rows={{this.rows}}
@@ -14,6 +14,38 @@
             {{may-focus this false}}
         />
     </div>
+    <div class="col-md-2">
+        <BsButton
+            class="oxi-btn-exceptional btn-block btn-sm"
+            @onClick={{this.openFileUpload}}
+            disabled={{this.value}}
+            @icon="glyphicon glyphicon-folder-open"
+        >
+            <EmberTooltip>{{t 'component.oxifield_uploadarea.open'}}</EmberTooltip>
+        </BsButton>
+
+        {{#if @content.autofill}}
+            <BsButton
+                class="oxi-btn-exceptional btn-block btn-sm"
+                @onClick={{@autofillQuery}}
+                disabled={{this.value}}
+                @icon="glyphicon glyphicon-refresh"
+            >
+                <EmberTooltip>{{t 'component.oxifield_uploadarea.autofill.button' target=@content.autofill.label}}</EmberTooltip>
+            </BsButton>
+        {{/if}}
+
+        <BsButton
+            @type='default'
+            class="oxi-btn-cancel btn-block btn-sm"
+            @onClick={{this.resetInput}}
+            disabled={{not this.value}}
+            @icon="glyphicon glyphicon-trash"
+        >
+            <EmberTooltip>{{t 'component.oxifield_uploadarea.reset'}}</EmberTooltip>
+        </BsButton>
+
+    </div>
 </div>
 
 <input
@@ -24,36 +56,4 @@
     {{on-init this.setFileUploadElement}}
 />
 
-<div class="row">
-    <div class="col-md-5">
-        {{this.filename}}
-    </div>
-    <div class="col-md-7">
-        <div class="input-group">
-            <span class="input-group-btn">
-                <BsButton
-                    @type='default'
-                    class="input-group-btn oxi-btn-cancel btn-block btn-sm"
-                    @onClick={{this.resetInput}}
-                    disabled={{not this.value}}
-                    @icon="glyphicon glyphicon-trash"
-                >
-                    &nbsp;
-                    {{t 'component.oxifield_uploadarea.reset'}}
-                </BsButton>
-            </span>
-            <span class="input-group-btn">
-                <BsButton
-                    @type='default'
-                    class="input-group-btn oxi-btn-optional btn-block btn-sm"
-                    @onClick={{this.openFileUpload}}
-                    disabled={{this.value}}
-                    @icon="glyphicon glyphicon-folder-open"
-                >
-                    &nbsp;
-                    {{t 'component.oxifield_uploadarea.open'}}
-                </BsButton>
-            </span>
-        </div>
-    </div>
-</div>
+{{this.filename}}

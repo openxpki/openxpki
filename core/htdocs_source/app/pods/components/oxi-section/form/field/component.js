@@ -2,12 +2,14 @@ import Component from '@glimmer/component';
 import { action } from "@ember/object";
 import { inject } from '@ember/service';
 import { getOwner } from '@ember/application';
+import { debug } from '@ember/debug';
 import ow from 'ow';
 
 export default class OxiFieldMainComponent extends Component {
     @inject('oxi-config') config;
 
     autofillFieldRefParams = new Map(); // mapping: (source field name) => (parameter name for autocomplete query)
+    autofillValueSetter; // callback passed in from the actual component
 
     get isBool() {
         return this.args.field.type === 'bool';
@@ -75,16 +77,16 @@ export default class OxiFieldMainComponent extends Component {
         }
     }
 
-    get autofill() {
-        return this.args.field.autofill;
-    }
-
     @action
-    initAutofill(setValueCallback) {
-        if (!this.autofill) return;
+    initAutofill(valueSetter) {
+        let autofill = this.args.field.autofill;
+        if (!autofill) return;
+
+        this.autofillValueSetter = valueSetter;
+        console.log("SETTER", valueSetter);
 
         // type validation
-        ow(this.autofill, 'autofill', ow.object.exactShape({
+        ow(autofill, 'autofill', ow.object.exactShape({
             'request': ow.object.exactShape({
                 'url': ow.string,
                 'method': ow.optional.string.oneOf(['GET', 'POST']),
@@ -94,10 +96,11 @@ export default class OxiFieldMainComponent extends Component {
                 }),
 
             }),
-            'trigger': ow.string.oneOf(['auto', 'button']),
+            'autorun': ow.optional.any(ow.boolean, ow.number, ow.string.oneOf(['0', '1'])),
+            'label': ow.string,
         }));
 
-        let ref_params = this.autofill.request?.params?.user;
+        let ref_params = autofill.request?.params?.user;
         if (ref_params) {
             for (const [param_name, ref_field] of Object.entries(ref_params)) {
                 // param_name - parameter name for autocomplete query
@@ -106,28 +109,28 @@ export default class OxiFieldMainComponent extends Component {
             }
         }
 
-        if (this.autofill.trigger == 'auto') {
-            this.autofillQuery().then(doc => {
-                console.debug("Autofill response", doc);
-                setValueCallback(JSON.stringify(doc));
-            });
+        if (autofill.autorun) {
+            this.autofillQuery();
         }
     }
 
     @action
     autofillQuery() {
+        let autofill = this.args.field.autofill;
+        if (!autofill) return;
+
         // resolve referenced fields and their values
         let data = {
             ...this.args.encodeFields(this.autofillFieldRefParams.keys(), this.autofillFieldRefParams), // returns an Object
-            ...(this.autofill.request.params.static || {}),
+            ...(autofill.request.params.static || {}),
         };
 
         return getOwner(this).lookup("route:openxpki").backendFetch({
-            url: this.autofill.request.url,
-            method: this.autofill.request.method || 'GET',
+            url: autofill.request.url,
+            method: autofill.request.method || 'GET',
             data,
         }).then((response) => {
-            console.log("AUTOFILL response: ", response)
+            debug("Autofill response: " + JSON.stringify(response));
             // If OK: unpack JSON data
             if (response.ok) {
                 return response.json();
@@ -137,6 +140,8 @@ export default class OxiFieldMainComponent extends Component {
                 console.error(response.status);
                 return null;
             }
+        }).then(doc => {
+            this.autofillValueSetter(JSON.stringify(doc));
         });
     }
 }
