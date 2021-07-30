@@ -3194,7 +3194,8 @@ sub __render_fields {
                 }
             } else {
                 # if nothing is found, transform raw values to a deflist
-                @val = map { { key => $_, label => $_, value => $item->{value}->{$_}} } sort keys %{$item->{value}};
+                my $kv = $item->{value} || {};
+                @val = map { { key => $_, label => $_, value => $kv->{$_}} } sort keys %{$kv};
 
             }
 
