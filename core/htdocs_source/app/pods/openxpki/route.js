@@ -31,6 +31,7 @@ export default class OpenXpkiRoute extends Route {
     @inject('oxi-config') oxiConfig;
     @inject('oxi-locale') oxiLocale;
     @inject('intl') intl;
+    @inject router;
 
     // Reserved Ember property "queryParams"
     // https://api.emberjs.com/ember/3.17/classes/Route/properties/queryParams?anchor=queryParams
@@ -348,7 +349,7 @@ export default class OpenXpkiRoute extends Route {
             window.location.href = url;
         }
         else {
-            this.transitionTo("openxpki", url);
+            this.router.transitionTo("openxpki", url);
         }
     }
 

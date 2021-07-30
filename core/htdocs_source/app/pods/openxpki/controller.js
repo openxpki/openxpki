@@ -6,6 +6,7 @@ import { inject } from '@ember/service';
 
 export default class OpenXpkiController extends Controller {
     @inject('oxi-config') config;
+    @inject router;
 
     // Reserved Ember properties
     // https://api.emberjs.com/ember/release/classes/Controller
@@ -43,8 +44,7 @@ export default class OpenXpkiController extends Controller {
     navigateTo(page, event) {
         event.stopPropagation();
         event.preventDefault();
-        //this.lookup("route:openxpki").transitionTo("openxpki", button.page);
-        this.transitionToRoute('openxpki', page, { queryParams: { force: (new Date()).valueOf() } });
+        this.router.transitionTo('openxpki', page, { queryParams: { force: (new Date()).valueOf() } });
     }
 
     @action
