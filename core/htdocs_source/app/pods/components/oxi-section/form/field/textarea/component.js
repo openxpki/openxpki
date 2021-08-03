@@ -82,7 +82,7 @@ export default class OxiFieldTextareaComponent extends Component {
         let reader = new FileReader();
         reader.onload = (e) => this.setFileData(e.target.result, file.name);
 
-        debug(`oxifield-uploadarea: setFile() - loading contents of ${file.name}`);
+        debug(`oxifield-textarea: setFile() - loading contents of ${file.name}`);
         reader.readAsArrayBuffer(file);
     }
 
@@ -101,8 +101,8 @@ export default class OxiFieldTextareaComponent extends Component {
         }
         else {
             this.textOutput = `<${!isSmall
-                ? this.intl.t('component.oxifield_uploadarea.large_file')
-                : this.intl.t('component.oxifield_uploadarea.binary_file')
+                ? this.intl.t('component.oxifield_textarea.large_file')
+                : this.intl.t('component.oxifield_textarea.binary_file')
             }>`;
         }
     }
@@ -113,7 +113,7 @@ export default class OxiFieldTextareaComponent extends Component {
         let reader = new FileReader();
         reader.onload = (e) => this.setFileData(e.target.result, sourceLabel);
 
-        debug('oxifield-uploadarea: setAutofill() - setting autofill response');
+        debug(`oxifield-textarea: setAutofill() - setting autofill response from ${sourceLabel}`);
         reader.readAsArrayBuffer(new Blob([val], { type : 'text/plain' }));
     }
 
