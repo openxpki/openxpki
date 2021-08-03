@@ -18,22 +18,12 @@ export default class OxiFieldTextareaComponent extends Component {
         super(...arguments);
 
         this.textOutput = this.args.content.value;
-
-        // Add autofill behaviour
-        if (this.args.content.autofill) this.args.initAutofill(
-            // pass in function that fills in the result
-            val => {
-                // convert string to ArrayBuffer
-                let reader = new FileReader();
-                reader.onload = (e) => this.setFileData(e.target.result, this.args.autofillResultLabel);
-                reader.readAsArrayBuffer(new Blob([val], { type : 'text/plain' }));
-            }
-        );
+        if (this.textOutput) this.setValue(this.textOutput);
     }
 
     get cols() { return (this.args.content.textAreaSize || {}).width || 150 }
     get rows() { return (this.args.content.textAreaSize || {}).height || 10 }
-    get externalSources() { return this.args.content.autofill || this.args.content.allow_upload }
+    get hasContent() { return this.value ? true : false }
 
     @action
     onKeydown(event) {
@@ -96,9 +86,9 @@ export default class OxiFieldTextareaComponent extends Component {
         reader.readAsArrayBuffer(file);
     }
 
-    setFileData(arrayBuffer, name) {
+    setFileData(arrayBuffer, sourceLabel) {
         this.lockTextInput = true;
-        this.filename = name;
+        this.filename = sourceLabel;
         this.setValue(arrayBuffer);
 
         // show contents if it's a text block
@@ -115,6 +105,16 @@ export default class OxiFieldTextareaComponent extends Component {
                 : this.intl.t('component.oxifield_uploadarea.binary_file')
             }>`;
         }
+    }
+
+    @action
+    setAutofill(val, sourceLabel) {
+        // convert string to ArrayBuffer
+        let reader = new FileReader();
+        reader.onload = (e) => this.setFileData(e.target.result, sourceLabel);
+
+        debug('oxifield-uploadarea: setAutofill() - setting autofill response');
+        reader.readAsArrayBuffer(new Blob([val], { type : 'text/plain' }));
     }
 
     setValue(value) {

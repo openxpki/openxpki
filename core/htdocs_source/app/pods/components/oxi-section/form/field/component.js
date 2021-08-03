@@ -2,14 +2,10 @@ import Component from '@glimmer/component';
 import { action } from "@ember/object";
 import { inject } from '@ember/service';
 import { debug } from '@ember/debug';
-import ow from 'ow';
 
 export default class OxiFieldMainComponent extends Component {
     @inject('oxi-backend') backend;
     @inject('intl') intl;
-
-    autofillFieldRefParams = new Map(); // mapping: (source field name) => (parameter name for autocomplete query)
-    autofillValueSetter; // callback passed in from the actual component
 
     get isBool() {
         return this.args.field.type === 'bool';
@@ -34,6 +30,10 @@ export default class OxiFieldMainComponent extends Component {
             size = 7;
         }
         return 'col-md-' + size;
+    }
+
+    get autofillConfig() {
+        return this.args.field.autofill ? this.args.field.autofill : null;
     }
 
     @action
@@ -75,84 +75,5 @@ export default class OxiFieldMainComponent extends Component {
             event.preventDefault();
             this.addClone();
         }
-    }
-
-    @action
-    initAutofill(valueSetter) {
-        let autofill = this.args.field.autofill;
-        if (!autofill) return;
-
-        this.autofillValueSetter = valueSetter;
-
-        // type validation
-        ow(autofill, 'autofill', ow.object.exactShape({
-            'request': ow.object.exactShape({
-                'url': ow.string,
-                'method': ow.optional.string.oneOf(['GET', 'POST']),
-                'params': ow.optional.object.exactShape({
-                    'user': ow.optional.object,
-                    'static': ow.optional.object,
-                }),
-
-            }),
-            'autorun': ow.optional.any(ow.boolean, ow.number, ow.string.oneOf(['0', '1'])),
-            'label': ow.string,
-            'button_label': ow.optional.string,
-        }));
-
-        let ref_params = autofill.request?.params?.user;
-        if (ref_params) {
-            for (const [param_name, ref_field] of Object.entries(ref_params)) {
-                // param_name - parameter name for autocomplete query
-                // ref_field - name of another form field whose value to use
-                this.autofillFieldRefParams.set(ref_field, param_name);
-            }
-        }
-
-        if (autofill.autorun) {
-            this.autofillQuery();
-        }
-    }
-
-    @action
-    autofillQuery() {
-        let autofill = this.args.field.autofill;
-        if (!autofill) return;
-
-        // resolve referenced fields and their values
-        let data = {
-            ...this.args.encodeFields(this.autofillFieldRefParams.keys(), this.autofillFieldRefParams), // returns an Object
-            ...(autofill.request.params.static || {}),
-        };
-
-        return this.backend.request({
-            url: autofill.request.url,
-            method: autofill.request.method || 'GET',
-            data,
-        }).then((response) => {
-            debug(`oxi-section/form/field (${this.field.name}): autofill response = ${JSON.stringify(response)}`);
-            // If OK: unpack JSON data
-            if (response?.ok) {
-                this.autofillValueSetter(JSON.stringify(response.json()));
-            }
-            // Handle non-2xx HTTP status codes
-            else {
-                if (response.status) console.error(response.status);
-                return null;
-            }
-        });
-    }
-
-    get autofillButtonLabel() {
-        let autofill = this.args.field.autofill;
-        return (autofill.button_label
-            ? autofill.button_label
-            : this.intl.t('autofill.button', { target: autofill.label })
-        );
-    }
-
-    get autofillResultLabel() {
-        let autofill = this.args.field.autofill;
-        return this.intl.t('autofill.result', { target: autofill.label });
     }
 }

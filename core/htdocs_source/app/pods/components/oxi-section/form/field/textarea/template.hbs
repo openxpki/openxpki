@@ -1,4 +1,4 @@
-{{#if this.externalSources}}
+{{#if (or @content.allow_upload (has-block "autofill"))}}
     <div class="row">
         <div class="col-md-10">
             <textarea
@@ -20,29 +20,23 @@
                 <BsButton
                     class="oxi-btn-exceptional btn-block btn-sm"
                     @onClick={{this.openFileUpload}}
-                    disabled={{this.value}}
+                    disabled={{this.hasContent}}
                     @icon="glyphicon glyphicon-folder-open"
                 >
                     <EmberTooltip>{{t 'component.oxifield_uploadarea.open'}}</EmberTooltip>
                 </BsButton>
             {{/if}}
 
-            {{#if @content.autofill}}
-                <BsButton
-                    class="oxi-btn-exceptional btn-block btn-sm"
-                    @onClick={{@autofillQuery}}
-                    disabled={{this.value}}
-                    @icon="glyphicon glyphicon-refresh"
-                >
-                    <EmberTooltip>{{@autofillButtonLabel}}</EmberTooltip>
-                </BsButton>
+            {{#if (has-block "autofill")}}
+                {{!-- "autofill" button: parameters: (isDisabled, valueSetter) --}}
+                {{yield this.hasContent this.setAutofill to="autofill"}}
             {{/if}}
 
             <BsButton
                 @type='default'
                 class="oxi-btn-cancel btn-block btn-sm"
                 @onClick={{this.resetInput}}
-                disabled={{not this.value}}
+                disabled={{not this.hasContent}}
                 @icon="glyphicon glyphicon-trash"
             >
                 <EmberTooltip>{{t 'component.oxifield_uploadarea.reset'}}</EmberTooltip>
