@@ -36,6 +36,7 @@ export default class Autofill extends Component {
     fieldRefParams = new Map(); // mapping: (source field name) => (parameter name for autocomplete query)
     valueSetter; // callback passed in from the actual component
 
+    convert;
 
     constructor() {
         super(...arguments);
@@ -51,6 +52,7 @@ export default class Autofill extends Component {
                 }),
 
             }),
+            'convert': ow.optional.string,
             'autorun': ow.optional.any(ow.boolean, ow.number, ow.string.oneOf(['0', '1'])),
             'label': ow.string,
             'button_label': ow.optional.string,
@@ -68,6 +70,11 @@ export default class Autofill extends Component {
                 this.fieldRefParams.set(ref_field, param_name);
             }
         }
+
+        this.convert = (response) => response.text();
+        // if (this.args.config?.convert.matches(/^json:/) {
+        //    this.convert = (response) => response.json() ... ;
+        // }
 
         // Function to encode fields (from form)
         ow(this.args.encodeFields, 'encodeFields', ow.function);
@@ -93,12 +100,14 @@ export default class Autofill extends Component {
             method: this.request.method || 'GET',
             data,
         }).then((response) => {
-            debug("Autofill response: " + JSON.stringify(response));
+            debug("Autofill: response = " + JSON.stringify(response));
             // If OK: unpack JSON data
             if (response?.ok) {
-                let data = JSON.stringify(response.json());
                 let label = this.intl.t('autofill.result', { target: this.label });
-                return this.valueSetter(data, label);
+                this.convert(response).then(data => {
+                    debug("Autofill: data = " + data);
+                    return this.valueSetter(data, label);
+                });
             }
             // Handle non-2xx HTTP status codes
             else {
