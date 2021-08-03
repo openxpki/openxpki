@@ -10,7 +10,6 @@ import copy from 'copy-text-to-clipboard';
  * <OxiBase::Formatted @format="timestamp" value="1617102928"/>
  * ```
  *
- * @module oxi-base/formatted
  * @param { string } format - how the value shall be formatted
  * Possible formats:
  * - `certstatus`
@@ -30,6 +29,7 @@ import copy from 'copy-text-to-clipboard';
  * - `styled`
  * - `tooltip`
  * @param value - value to be formatted - the data type depends on the format
+ * @module component/oxi-base/formatted
  */
 export default class OxiFormattedComponent extends Component {
     get format() {

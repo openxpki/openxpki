@@ -5,7 +5,7 @@ import { Promise } from 'rsvp';
 import { debug } from '@ember/debug';
 
 /**
- * @module
+ * @module route/openxpki
  */
 export default class OpenXpkiRoute extends Route {
     @inject('oxi-content') content;

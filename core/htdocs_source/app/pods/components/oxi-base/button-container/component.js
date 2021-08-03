@@ -8,11 +8,11 @@ import { computed } from '@ember/object';
  * <OxiBase::ButtonContainer @buttons={{data}} @buttonClick={{myFunc}}/>
  * ```
  *
- * @module oxi-base/button-container
  * @param { array } buttons - List of button definitions to be passed to {@link module:oxi-base/button}
  * If a button definition hash contains the attributes `break_before` or
  * `break_after` then a line break will be inserted before or after that
  * button.
+ * @module component/oxi-base/button-container
  */
 export default class OxiButtonContainerComponent extends Component {
     get buttonGroups() {

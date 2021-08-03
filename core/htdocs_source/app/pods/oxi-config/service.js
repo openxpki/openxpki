@@ -4,6 +4,12 @@ import ENV from 'openxpki/config/environment';
 import fetch from 'fetch';
 import yaml from 'js-yaml';
 
+/**
+ * Loads the YAML configuration from the backend and makes it available to
+ * the other components.
+ *
+ * @module service/oxi-config
+ */
 export default class OxiConfigService extends Service {
     @tracked localConfig = {};
     ready; // will be set to a Promise that will fulfill if localconfig.yaml is loaded (or server returned error)

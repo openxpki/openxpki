@@ -7,7 +7,7 @@ import Helper from "@ember/component/helper";
  * ```html
  * {{#unless (and @empty @disableIfEmpty)}}
  *   <button ...>
- * {{/if}}
+ * {{/unless}}
  * ```
  * @module helper/and
  */

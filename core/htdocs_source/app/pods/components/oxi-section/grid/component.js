@@ -6,13 +6,13 @@ import { tracked } from '@glimmer/tracking';
 /**
  * Draws a grid.
  *
- * @module oxi-section/form
  * @param { hash } def - section definition
  * ```javascript
  * {
  *     ... // TODO
  * }
  * ```
+ * @module component/oxi-section/grid
  */
 export default class OxiSectionGridComponent extends Component {
     @inject('oxi-content') content;

@@ -7,6 +7,12 @@ import { set as emSet } from '@ember/object';
 import { debug } from '@ember/debug';
 import fetch from 'fetch';
 
+/**
+ * Stores the current page contents and state and provides methods to send
+ * requests to the backend.
+ *
+ * @module service/oxi-content
+ */
 export default class OxiContentService extends Service {
     @inject router;
     @inject('intl') intl;

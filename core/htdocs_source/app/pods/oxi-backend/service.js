@@ -4,6 +4,11 @@ import { debug } from '@ember/debug';
 import fetch from 'fetch';
 import ow from 'ow';
 
+/**
+ * Provides low level functions to send backend requests.
+ *
+ * @module service/oxi-backend
+ */
 export default class OxiBackendService extends Service {
     @inject('intl') intl;
 

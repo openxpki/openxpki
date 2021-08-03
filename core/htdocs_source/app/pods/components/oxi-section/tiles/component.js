@@ -4,7 +4,6 @@ import { computed } from '@ember/object';
 /**
  * Draws tiles.
  *
- * @module oxi-section/tiles
  * @param { hash } def - section definition
  * ```javascript
  * {
@@ -25,6 +24,7 @@ import { computed } from '@ember/object';
  *      ],
  * }
  * ```
+ * @module component/oxi-section/tiles
  */
 export default class OxiSectionTilesComponent extends Component {
     @computed("args.def.tiles")

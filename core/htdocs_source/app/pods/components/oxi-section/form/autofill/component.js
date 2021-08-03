@@ -4,6 +4,24 @@ import { inject } from '@ember/service';
 import { debug } from '@ember/debug';
 import ow from 'ow';
 
+/**
+ * Implements autofill functionality, e.g. shows a button and sends a request
+ * the the backend on button click (or when component is intialized).
+ *
+ * To use the autofill functionality in any form field, the field's template
+ * needs to include the following code:
+ * ```html
+ * {{#if (has-block "autofill")}}
+ *   {{yield this.disableAutofillButton this.setAutofillValue to="autofill"}}
+ * {{/if}}
+ * ```
+ * @param { hash } config - the autofill configuration
+ * @param { bool } disabled - set to true to disable the button
+ * @param { function } encodeFields - function that encodes the given form fields (see {@link component/oxi-section/form})
+ * @param { function } valueSetter - function that processes the server response (will be given the response data)
+ * @module component/oxi-section/form/autofill
+ */
+
 export default class Autofill extends Component {
     @inject('intl') intl;
     @inject('oxi-backend') backend;

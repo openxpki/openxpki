@@ -94,13 +94,13 @@ class Field {
 /**
  * Draws a form.
  *
- * @module oxi-section/form
  * @param { hash } def - section definition
  * ```javascript
  * {
  *     ... // TODO
  * }
  * ```
+ * @module component/oxi-section/form
  */
 export default class OxiSectionFormComponent extends Component {
     @inject('intl') intl;
