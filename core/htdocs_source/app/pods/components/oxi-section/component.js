@@ -1,11 +1,11 @@
 import Component from '@glimmer/component';
 import { action, set } from "@ember/object";
 import { debug } from '@ember/debug';
-import { getOwner } from '@ember/application';
 import { inject } from '@ember/service';
 
 export default class OxiSectionComponent extends Component {
     @inject router;
+    @inject('oxi-content') content;
 
     get type() {
         return `oxi-section/${this.args.content.type}`;
@@ -26,9 +26,7 @@ export default class OxiSectionComponent extends Component {
         debug("oxisection/main: buttonClick");
         set(button, "loading", true);
         if (button.action) {
-            getOwner(this)
-            .lookup("route:openxpki")
-            .sendAjax({ action: button.action })
+            this.content.updateRequest({ action: button.action })
             .finally(() => set(button, "loading", false));
         }
         else {

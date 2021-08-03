@@ -1,8 +1,10 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
-import { getOwner } from '@ember/application';
+import { inject } from '@ember/service';
 
 export default class OxiFormattedLinkComponent extends Component {
+    @inject('oxi-content') content;
+
     @action
     internalLinkClick(event) {
         let target = this.args.spec.target || "popup";
@@ -13,7 +15,7 @@ export default class OxiFormattedLinkComponent extends Component {
         // perform AJAX request instead of opening URL
         event.stopPropagation();
         event.preventDefault();
-        getOwner(this).lookup("route:openxpki").sendAjax({
+        this.content.updateRequest({
             page: this.args.spec.page,
             target: target,
         });

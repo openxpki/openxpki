@@ -1,7 +1,7 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
-import { getOwner } from '@ember/application';
+import { inject } from '@ember/service';
 
 /**
  * Shows a label (a text) and escapes special characters.
@@ -16,13 +16,15 @@ import { getOwner } from '@ember/application';
  * @param { bool } raw - set to `true` to allow HTML entities incl. `<script>` tags etc.
  */
 export default class OxiLabelComponent extends Component {
+    @inject('oxi-content') content;
+
     @tracked tooltipContent = null;
     @tracked tooltipReady = false;
 
     @action
     fetchTooltip(event) {
         if (this.tooltipContent) return;
-        getOwner(this).lookup("route:openxpki").sendAjaxQuiet({
+        this.content.updateRequestQuiet({
             page: this.args.tooltip_page,
             ...this.args.tooltip_page_args,
         }).then((doc) => {

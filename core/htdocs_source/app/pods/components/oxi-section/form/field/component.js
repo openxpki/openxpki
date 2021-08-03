@@ -1,12 +1,11 @@
 import Component from '@glimmer/component';
 import { action } from "@ember/object";
 import { inject } from '@ember/service';
-import { getOwner } from '@ember/application';
 import { debug } from '@ember/debug';
 import ow from 'ow';
 
 export default class OxiFieldMainComponent extends Component {
-    @inject('oxi-config') config;
+    @inject('oxi-backend') backend;
     @inject('intl') intl;
 
     autofillFieldRefParams = new Map(); // mapping: (source field name) => (parameter name for autocomplete query)
@@ -126,23 +125,21 @@ export default class OxiFieldMainComponent extends Component {
             ...(autofill.request.params.static || {}),
         };
 
-        return getOwner(this).lookup("route:openxpki").backendFetch({
+        return this.backend.request({
             url: autofill.request.url,
             method: autofill.request.method || 'GET',
             data,
         }).then((response) => {
-            debug("Autofill response: " + JSON.stringify(response));
+            debug(`oxi-section/form/field (${this.field.name}): autofill response = ${JSON.stringify(response)}`);
             // If OK: unpack JSON data
-            if (response.ok) {
-                return response.json();
+            if (response?.ok) {
+                this.autofillValueSetter(JSON.stringify(response.json()));
             }
             // Handle non-2xx HTTP status codes
             else {
-                console.error(response.status);
+                if (response.status) console.error(response.status);
                 return null;
             }
-        }).then(doc => {
-            this.autofillValueSetter(JSON.stringify(doc));
         });
     }
 

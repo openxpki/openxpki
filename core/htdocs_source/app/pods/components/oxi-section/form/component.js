@@ -1,7 +1,6 @@
 import Component from '@glimmer/component';
 import { action } from "@ember/object";
 import { tracked } from '@glimmer/tracking';
-import { getOwner } from '@ember/application';
 import { isArray } from '@ember/array';
 import { inject } from '@ember/service';
 import { debug } from '@ember/debug';
@@ -105,6 +104,7 @@ class Field {
  */
 export default class OxiSectionFormComponent extends Component {
     @inject('intl') intl;
+    @inject('oxi-content') content;
 
     @tracked loading = false;
     @tracked fields = [];
@@ -297,7 +297,7 @@ export default class OxiSectionFormComponent extends Component {
 
         let fields = this.fields;
 
-        return getOwner(this).lookup("route:openxpki").sendAjax(request, true)
+        return this.content.updateRequest(request, true)
         .then((doc) => {
             for (const newField of this._prepareFields(doc.fields)) {
                 for (const oldField of fields) {
@@ -432,7 +432,7 @@ export default class OxiSectionFormComponent extends Component {
         };
 
         this.loading = true;
-        return getOwner(this).lookup("route:openxpki").sendAjax(request)
+        return this.content.updateRequest(request)
         .then((res) => {
             this.loading = false;
             if (res.status != null && res.status.field_errors !== undefined) {
