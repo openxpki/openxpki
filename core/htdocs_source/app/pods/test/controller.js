@@ -37,6 +37,9 @@ export default class TestController extends Controller {
                 resolve(response);
             });
 
+            /* ************************
+             * GET requests
+             */
             this.get('/openxpki/cgi-bin/webui.fcgi', req => {
                 console.info(`MOCKUP SERVER> GET request: ${req.url}`);
                 console.info(Object.entries(req.queryParams).map(e => `MOCKUP SERVER> ${e[0]} = ${e[1]}`).join("\n"));
@@ -80,8 +83,12 @@ export default class TestController extends Controller {
                 return emptyResponse();
             });
 
+            /* ************************
+             * POST requests
+             */
             this.post('/openxpki/cgi-bin/webui.fcgi', req => {
                 console.info(`MOCKUP SERVER> POST request: ${req.url}`);
+                console.debug(req);
                 let params;
                 if (req.requestHeaders['content-type'].match(/^application\/x-www-form-urlencoded/)) {
                     params = decodeURIComponent(req.requestBody.replace(/\+/g, ' ')).split('&').join("\n");
@@ -89,16 +96,18 @@ export default class TestController extends Controller {
                 else {
                     params = JSON.parse(req.requestBody);
                 }
-                console.info(params);
-                console.debug(req);
+                console.info('MOCKUP SERVER> parameters:', params);
 
                 /*
                  * autocomplete
                  */
                 if (params?.action == 'text!autocomplete') {
-                    let val = params.value;
-                    let forest = params.params.forest || '(not provided)';
-                    let comment = params.params.the_comment || '(not provided)';
+                    let val = params.text_autocomplete;
+                    let forest = params.forest || '(not provided)';
+                    let comment = params.the_comment || '(not provided)';
+
+                    if (params._encrypted_jwt_secure_param != 'fake_jwt_token')
+                      throw new Error('Encrypted JWT token was not sent');
 
                     console.info(`MOCKUP SERVER> autocomplete - value: ${val}, forest: ${forest}, the_comment: ${comment}`);
 
@@ -194,28 +203,22 @@ export default class TestController extends Controller {
                         value: "rain",
                     },
                     {
+                        type: "encrypted",
+                        name: "enc_param",
+                        value: "fake_jwt_token",
+                    },
+                    {
                         type: "text",
                         name: "text_autocomplete",
                         label: "Autocomplete",
                         value: "pre",
                         tooltip: "Simulated autocomplete: Enter anything to get three results, or 'boom' to simulate server-side error, or 'void' for empty result list.",
-                        autocomplete: {
-                            action: "text!autocomplete",
-                            params: {
-                                forest: "shallow",
-                            },
-                        },
-                    },
-                    {
-                        type: "text",
-                        name: "text_autocomplete_ref",
-                        label: "Autocomplete (using field 'comment')",
-                        tooltip: "Simulated autocomplete: Enter anything to get three results, or 'boom' to simulate server-side error, or 'void' for empty result list.",
-                        autocomplete: {
+                        autocomplete_query: {
                             action: "text!autocomplete",
                             params: {
                                 forest: "deep",
-                                the_comment: { field: "comment" },
+                                the_comment: "comment",
+                                secure_param: "enc_param",
                             },
                         },
                     },

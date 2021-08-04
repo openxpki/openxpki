@@ -50,9 +50,14 @@ fi
 #
 apt-get update >$LOG 2>&1
 apt-get upgrade --assume-yes
-# libzip-dev for Net::SSLeay
-# libexpat1-dev for XML::Parser
-install_packages mc rsync gettext apache2 libapache2-mod-fcgid libssl-dev libzip-dev libexpat1-dev libtest-deep-perl libtest-exception-perl
+# libzip-dev - for Net::SSLeay
+# libexpat1-dev - for XML::Parser
+# linux-headers-amd64 - required to compile guest addons using "vagrant vbguest" (on the host)
+install_packages mc rsync gettext \
+  apache2 libapache2-mod-fcgid \
+  libssl-dev libzip-dev libexpat1-dev \
+  libtest-deep-perl libtest-exception-perl \
+  linux-headers-amd64
 
 #
 # Install CPANminus

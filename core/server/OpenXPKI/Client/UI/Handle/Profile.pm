@@ -47,7 +47,7 @@ sub render_profile_select {
     my @fields;
     foreach my $field (@{$wf_info->{activity}->{$wf_action}->{field}}) {
         my $name = $field->{name};
-        my $item = $self->__render_input_field( $field, $context->{$name} );
+        my ($item, @more_items) = $self->__render_input_field( $field, $context->{$name} );
         next unless ($item);
 
         if ($name eq 'cert_profile') {
@@ -55,17 +55,17 @@ sub render_profile_select {
                 %{$item},
                 options => \@profiles,
                 actionOnChange => 'profile!get_styles_for_profile',
-                prompt => $item->{placeholder}, # todo - rename in UI
+                prompt => $item->{placeholder}, # TODO - rename in UI
             };
         } elsif ($name eq 'cert_subject_style') {
             $item = {
                 %{$item},
                 options => \@styles,
-                prompt => $item->{placeholder}, # todo - rename in UI
+                prompt => $item->{placeholder}, # TODO - rename in UI
             };
         }
 
-        push @fields, $item;
+        push @fields, $item, @more_items;
     }
 
 
@@ -246,9 +246,10 @@ sub render_key_select {
             next FIELDS;
         }
 
-        my $item = $self->__render_input_field( $field );
+        my ($item, @more_items) = $self->__render_input_field( $field );
         next FIELDS unless ($item);
-        $item->{prompt} = $item->{placeholder}; # todo - rename in UI
+
+        $item->{prompt} = $item->{placeholder}; # TODO - rename in UI
         if ($name eq 'key_alg') {
             $item = {
                 %{$item},
@@ -260,6 +261,7 @@ sub render_key_select {
         } elsif ($name eq 'csr_type') {
              $item->{value} = 'pkcs10';
         }
+
         push @fields, $item;
     }
 
@@ -332,8 +334,8 @@ sub render_server_password {
         } else {
             $value = $context->{$field->{name}};
         }
-        my $item = $self->__render_input_field( $field, $value );
-        push @fields, $item if ($item);
+        my @items = $self->__render_input_field( $field, $value );
+        push @fields, @items;
     }
 
     # record the workflow info in the session

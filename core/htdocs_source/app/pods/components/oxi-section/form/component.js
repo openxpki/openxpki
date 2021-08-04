@@ -52,7 +52,7 @@ class Field {
     /*
      * oxisection/form/field/text
      */
-    autocomplete;
+    autocomplete_query;
 
     static fromHash(sourceHash) {
         let instance = new this(); // "this" in static methods refers to class
@@ -108,6 +108,10 @@ export default class OxiSectionFormComponent extends Component {
     focusFeedback = {}; // gets filled with the field feedback if they may receive the focus
     initialFocussingDone = false;
 
+    hiddenFieldFilter(f) {
+        return f.type !== "hidden" && f.type !== "encrypted";
+    }
+
     constructor() {
         super(...arguments);
         this.fields = this._prepareFields(this.args.def.fields);
@@ -158,7 +162,7 @@ export default class OxiSectionFormComponent extends Component {
             if (field.value) {
                 // dynamic input fields: presets are key/value hashes.
                 // we need to convert `value: { key: NAME, value: VALUE }` to `name: NAME, value: VALUE`
-                if (typeof field.value === "object") {
+                if (typeof field.value === 'object' && field.value.key) {
                     field.name = field.value.key;
                     field.value = field.value.value;
                 }
@@ -196,7 +200,7 @@ export default class OxiSectionFormComponent extends Component {
     }
 
     get visibleFields() {
-        return this.fields.filter(f => f.type !== "hidden");
+        return this.fields.filter(this.hiddenFieldFilter);
     }
 
     @action
@@ -218,24 +222,36 @@ export default class OxiSectionFormComponent extends Component {
         this._updateCloneFields();
     }
 
-    // Turns all (non-empty) fields into request parameters
-    _fields2request(includeEmpty) {
-        let result = [];
+    // Turns all (non-empty) fields into request parameters (returns an Object)
+    _encodeAllFields({ includeEmpty = false }) {
+        return this._encodeFields({
+            includeEmpty,
+            fieldNames: this.uniqueFieldNames,
+        });
+    }
 
-        for (const name of this.uniqueFieldNames) {
-            var newName = name;
+    _encodeFields({ fieldNames, includeEmpty = false, renameMap = new Map() }) {
+        let result = new Map();
+
+        for (const name of fieldNames) {
+            var newName = renameMap.has(name) ? renameMap.get(name) : name;
 
             // send clonables as list (even if there's only one field) and other fields as plain values
             let potentialClones = this.fields.filter(f =>
                 f.name === name && (typeof f.value !== 'undefined') && (f.value !== "" || includeEmpty)
             );
 
-            if (potentialClones.length === 0) continue;
+            if (potentialClones.length === 0) continue; // there's not even one field to send
+
+            if (potentialClones[0].type == 'encrypted') {
+                // prefix triggers auto-decryption in the backend
+                newName = '_encrypted_jwt_' + newName;
+            }
 
             // encode ArrayBuffer as Base64 and change field name as a flag
             let encodeValue = (val) => {
                 if (val instanceof ArrayBuffer) {
-                    newName = `_encoded_base64_${name}`;
+                    newName = `_encoded_base64_${newName}`;
                     return btoa(String.fromCharCode(...new Uint8Array(val)));
                 }
                 else {
@@ -247,11 +263,11 @@ export default class OxiSectionFormComponent extends Component {
                 ? potentialClones.map(c => encodeValue(c.value))    // array for clonable fields
                 : encodeValue(potentialClones[0].value)             // or plain value otherwise
             // setting 'result' must be separate step as encodeValue() modifies 'newName'
-            result[newName] = value;
+            result.set(newName, value);
 
-            debug(`${name} = ${ potentialClones[0].clonable ? `[${result[newName]}]` : `"${result[newName]}"` }`);
+            debug(`${name} = ${ potentialClones[0].clonable ? `[${value}]` : `"${value}"` }`);
         }
-        return result;
+        return Object.fromEntries(result);
     }
 
     /**
@@ -271,7 +287,7 @@ export default class OxiSectionFormComponent extends Component {
         let request = {
             action: field.actionOnChange,
             _sourceField: field.name,
-            ...this._fields2request(true),
+            ...this._encodeAllFields({ includeEmpty: true }),
         };
 
         let fields = this.fields;
@@ -310,18 +326,18 @@ export default class OxiSectionFormComponent extends Component {
     }
 
     /**
-     * @param fieldName { string } - field name
+     * @param fieldNames { array } - the list of field names to encode
+     * @param renameMap { Map } - optional mappings: source field name => target field name
      */
     @action
-    getFieldValue(fieldName) {
-        debug(`oxi-section/form (${this.args.def.action}): getFieldValue (${fieldName})`);
+    encodeFields(fieldNames, renameMap) {
+        debug(`oxi-section/form (${this.args.def.action}): encodeFields ()`);
 
-        let fieldVals = this._fields2request(true);
-        return fieldVals[fieldName];
+        return this._encodeFields({ fieldNames, renameMap, includeEmpty: true });
     }
 
     get originalFieldCount() {
-        return this.args.def.fields.filter(f => f.type !== "hidden").length;
+        return this.args.def.fields.filter(this.hiddenFieldFilter).length;
     }
 
     /*
@@ -407,7 +423,7 @@ export default class OxiSectionFormComponent extends Component {
 
         let request = {
             action: this.args.def.action,
-            ...this._fields2request(false),
+            ...this._encodeAllFields({ includeEmpty: false }),
         };
 
         this.loading = true;

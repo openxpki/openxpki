@@ -1,16 +1,20 @@
 package OpenXPKI::Client::UI::Result;
+
 use Moose;
+use namespace::autoclean;
 
 # Core modules
 use Data::Dumper;
 use Digest::SHA qw(sha1_base64);
 use MIME::Base64;
+use Carp qw( confess );
 
 # CPAN modules
 use CGI 4.08 qw( -utf8 );
 use HTML::Entities;
 use JSON;
 use Moose::Util::TypeConstraints;
+use Data::UUID;
 
 # Project modules
 use OpenXPKI::i18n qw( i18nTokenizer );
@@ -274,19 +278,18 @@ sub set_status_from_error_reply {
 
 =head2 param
 
-Returns input parameter values, i.e. real CGI parameters and those appended to
-the action name using C<!>. Parameters from the action name have precedence.
+Returns a single input parameter, i.e. real CGI parameters and those appended
+to the action name using C<!>. Parameters from the action name have precedence.
 
-The method's behaviour depends on the argument it gets passed:
+If the input parameter has got multiple values then only the first value is
+returned.
 
 B<Parameters>
 
 =over
 
-=item * I<Str> C<$key> - parameter name to retrieve. If a stringified hash or
-array element is passed (e.g. C<key_param{curve_name}>) then only scalar values
-are returned. In this case C<param()> will NOT try to resolve a group of params
-to a non scalar return type.
+=item * I<Str> C<$key> - parameter name to retrieve: a plain parameter name or
+a stringified hash (e.g. C<key_param{curve_name}>).
 
 Please note that passing an I<ArrayRef> is no longer supported - please use
 L</param_from_fields> instead. Passing C<undef>is also no longer supported.
@@ -299,31 +302,41 @@ sub param {
 
     my ($self, $key) = @_;
 
-    die "param() expects a single key (string) as argument\n" if (!$key or ref $key);
+    confess 'param() must be called in scalar context' if wantarray; # die
 
-    $self->logger->trace("Param request for '$key'") if $self->logger->is_trace;
+    my @val = $self->__param($key);
+    return $val[0];
+}
+
+sub multi_param {
+
+    my ($self, $key) = @_;
+
+    confess 'multi_param() must be called in list context' unless wantarray; # die
+
+    my @val = $self->__param($key);
+    return @val;
+}
+
+sub __param {
+
+    my ($self, $key) = @_;
+
+    confess "param() / multi_param() expect a single key (string) as argument\n" if (not $key or ref $key); # die
 
     my @queries = (
-        # Try 'extra' parameters
+        # Try extra parameters appended to action
         sub { return $self->extra->{$key} },
         # Try parameter via request object
-        sub { return $self->req->param($key) },
+        sub { return $self->req->multi_param($key) },
     );
 
-    if (wantarray) {
-        for my $query (@queries) {
-            my @values = $query->();
-            return @values if defined $values[0];
-        }
-    } else {
-        for my $query (@queries) {
-            my $val = $query->();
-            return $val if (defined $val);
-        }
+    for my $q (@queries) {
+        my @val = $q->();
+        return @val if defined $val[0];
     }
 
-    $self->logger->trace("Nothing found for parameter $key") if $self->logger->is_trace;
-
+    $self->logger->trace("Requested parameter '$key' was not found") if $self->logger->is_trace;
     return;
 }
 
@@ -340,12 +353,15 @@ sub param_from_fields {
         }
         next if $name =~ m{ \A wf_ }xms;
 
+        my @v_list = $self->multi_param($name);
         my $vv;
         if ($item->{clonable}) {
-            my @vv = $self->param($name);
-            $vv = \@vv;
+            $vv = \@v_list;
         } else {
-            $vv = $self->param($name);
+            if ((my $amount = scalar @v_list) > 1) {
+                $self->logger->warn(sprintf "Received %s values for non-clonable field '%s'", scalar @v_list, $name);
+            }
+            $vv = $v_list[0];
         }
 
         if ($name =~ m{ \A (\w+)\{(\w+)\} \z }xs) {
@@ -390,7 +406,7 @@ sub render {
     if ($self->_status()) {
         $result->{status} = $self->_status();
     } elsif ($self->param('_status')) {
-        my $status = $self->_client->session()->param($self->param('_status'));
+        my $status = $self->_client->session()->param(scalar $self->param('_status'));
         if ($status && ref $status eq 'HASH') {
             $self->logger()->debug("Set persisted status " . $status->{message});
             $result->{status} = $status;
@@ -829,7 +845,7 @@ sub __build_attribute_subquery {
         my $pattern = $item->{pattern} || '';
         my $operator = uc($item->{operator} || 'IN');
         my $transform = $item->{transform} || '';
-        my @val = $self->param($key);
+        my @val = $self->multi_param($key);
 
         my @preprocessed;
 
@@ -894,7 +910,7 @@ sub __build_attribute_preset {
 
     foreach my $item (@{$attributes}) {
         my $key = $item->{key};
-        my @val = $self->param($key);
+        my @val = $self->multi_param($key);
         while (my $val = shift @val) {
             push @attr,  { key => $key, value => $val };
         }
@@ -904,5 +920,152 @@ sub __build_attribute_preset {
 
 }
 
+=head2 decrypted_param
 
-1;
+Return a decrypted JWT input parameter (whose only allowed type is I<HashRef>).
+
+C<undef> is returned if the parameter does not exist or if it was not encrypted.
+
+B<Parameters>
+
+=over
+
+=item * I<Str> C<$key> - parameter name to retrieve.
+
+=back
+
+=cut
+
+sub decrypted_param {
+
+    my $self = shift;
+    my $param_name = shift;
+
+    my $item = $self->param($param_name)
+        or return;
+
+    if ($item->{__jwt_key} ne $self->_session->param('jwt_encryption_key')) {
+        $self->logger->debug("Parameter '".$param_name."'' was not JWT encrypted");
+        return;
+    }
+
+    return $item;
+
+}
+
+=head2 make_autocomplete_query
+
+Create the autocomplete config for a UI text field from the given workflow
+field configuration C<$wf_field>.
+
+Also returns an additional hidden, to-be-encrypted UI field definition.
+
+Text input fields with autocompletion are configured as follows:
+
+    type: text
+    autocomplete:
+        action: certificate!autocomplete
+        params:
+            user:
+                param_1: field_name_1
+                param_2: field_name_1
+            persist:
+                query:
+                    status: { "-like": "%done" }
+
+Parameters below C<user> are filled from the referenced form fields.
+
+Parameters below C<persist> may contain data structures (I<HashRefs>, I<ArrayRefs>)
+as they are backend-encrypted and sent to the client as a JWT token. They can
+be considered safe from user manipulation.
+
+B<Parameters>
+
+=over
+
+=item * I<HashRef> C<$wf_field> - workflow field config
+
+=back
+
+=cut
+
+sub make_autocomplete_query {
+
+    my $self = shift;
+    my $wf_field = shift;
+
+    return unless $wf_field->{autocomplete};
+
+    # $wf_field = {
+    #     type: "text",
+    #     autocomplete: {
+    #         action: "text!autocomplete",
+    #         params: {
+    #             user: {
+    #                 reference_1: "comment",
+    #             },
+    #             persist: {
+    #                 static_a: "deep",
+    #                 sql_query: { "-like": "$key_id:%" },
+    #             },
+    #         },
+    #     },
+    # }
+
+    my $p = $wf_field->{autocomplete}->{params} // {};
+    my $p_user = $p->{user} // {};
+    my $p_persist = $p->{persist} // {};
+
+    my $enc_field_name = Data::UUID->new->create_str; # name for additional input field
+
+    my $ac_query_params = {  # the wf config param from the UI param
+        %$p_user,
+        __encrypted => $enc_field_name,
+    };
+
+    # additional input field with encrypted data (protected from frontend modification)
+    my $enc_field = {
+        name => $enc_field_name,
+        type => 'encrypted',
+        value => {
+            persistent_params => $p_persist,
+            user_param_whitelist => [ sort keys %$p_user ], # allowed in subsequent request from frontend
+        },
+    };
+
+    return ($ac_query_params, $enc_field)
+
+}
+
+=head2 fetch_autocomplete_params
+
+Uses the C<__encrypted> request parameter to re-assemble .
+
+B<Parameters>
+
+=over
+
+=item * I<HashRef> C<$input_field> - input field definition
+
+=back
+
+=cut
+
+sub fetch_autocomplete_params {
+
+    my $self = shift;
+
+    my $data = $self->decrypted_param('__encrypted')
+        or return;
+
+    my %params = %{ $data->{persistent_params} };
+    $params{$_} = $self->param($_) for @{ $data->{user_param_whitelist} };
+
+    $self->logger->trace("Autocomplete params: " . Dumper \%params) if $self->logger->is_trace;
+
+    return \%params;
+
+}
+
+
+__PACKAGE__->meta->make_immutable;

@@ -18,50 +18,41 @@ export default class OxiFieldTextComponent extends Component {
      */
     @tracked value = null;
     @tracked label = null;
+
+    // autocomplete related:
     @tracked isDropdownOpen = false;
     @tracked searchResults = [];
     searchIndex = 0;
     searchPrevious = null;
     searchTimer = null;
-    autocompleteParams = {}; // mapping: parameter name => function that returns the value
-    autocompleteContainsFieldReferences = false;
+    acFieldRefParams = new Map(); // mapping: (source field name) => (parameter name for autocomplete query)
 
     constructor() {
         super(...arguments);
 
-        this.value = this.args.content.value;
+        let content = this.args.content;
+        this.value = content.value;
 
         if (this.isAutoComplete) {
-            if (this.args.content.autocomplete?.action === undefined) {
-                throw new Error(`oxi-section/form/field/text: parameter "autocomplete.action" missing`);
+            if (content.autocomplete_query?.action === undefined) {
+                throw new Error(`oxi-section/form/field/text: parameter "autocomplete_query.action" missing`);
             }
             let params;
-            if (params = this.args.content.autocomplete?.params) {
+            if (params = content.autocomplete_query?.params) {
                 if (Object.prototype.toString.call(params) !== '[object Object]')
-                    throw new Error(`oxi-section/form/field/text: parameter "autocomplete.params" must be a hash`);
+                    throw new Error(`oxi-section/form/field/text: parameter "autocomplete_query.params" must be a hash`);
 
-                this.autocompleteParams = Object.fromEntries(
-                    Object.entries(params)
-                    .map(p => {
-                        let func;
-                        // query another field's value
-                        if (Object.prototype.toString.call(p[1]) === '[object Object]') {
-                            if (! p[1].field) throw new Error(`oxi-section/form/field/text: autocomplete parameter definition "${p[0]}" does not contain "field" attribute`);
-                            func = () => this.args.getFieldValue(p[1].field);
-                            this.autocompleteContainsFieldReferences = true;
-                        }
-                        else {
-                            func = () => p[1];
-                        }
-                        return [ p[0], func ];
-                    })
-                );
+                for (const [param_name, ref_field] of Object.entries(params)) {
+                    // param_name - parameter name for autocomplete query
+                    // ref_field - name of another form field whose value to use
+                    this.acFieldRefParams.set(ref_field, param_name);
+                }
             }
         }
     }
 
     get isAutoComplete() {
-        return this.args.content.autocomplete;
+        return this.args.content.autocomplete_query;
     }
 
     @action
@@ -138,15 +129,13 @@ export default class OxiFieldTextComponent extends Component {
         this.searchTimer = setTimeout(() => {
             let searchIndex = ++this.searchIndex;
 
-            // assemble additional query parameters
-            let params = Object.fromEntries(
-                Object.entries(this.autocompleteParams).map(p => [ p[0], p[1].call() ])
-            );
+            // resolve referenced fields and their values
+            let ref = this.args.encodeFields(this.acFieldRefParams.keys(), this.acFieldRefParams); // returns an Object
 
             getOwner(this).lookup("route:openxpki").sendAjaxQuiet({
-                action: this.args.content.autocomplete.action,
-                value,
-                params,
+                action: this.args.content.autocomplete_query.action,
+                [this.args.content.name] : value, // [] denotes a dynamic key name
+                ...ref,
             }).then((doc) => {
                 // only show results of most recent search (if parallel requests were sent)
                 if (searchIndex !== this.searchIndex) { return }
@@ -210,7 +199,7 @@ export default class OxiFieldTextComponent extends Component {
         if (this.isAutoComplete) {
             // If we also send other form field(s) then better refresh the
             // autocomplete results as the other field(s) might have changed.
-            if (this.autocompleteContainsFieldReferences) {
+            if (this.acFieldRefParams.size > 0) {
                 // We don't use the current value (maybe chosen from the autocomplete
                 // result list) but the same value as used for the previous query.
                 this.autocompleteQuery(this.searchPrevious);

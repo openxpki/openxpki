@@ -161,7 +161,7 @@ sub handle_request {
     my $page = $req->param('page') || '';
     my $action = $self->__get_action( $req ) || '';
 
-    $self->logger()->debug("Incoming request page: $page / action: $action");
+    $self->logger()->debug('Incoming request: ' . join(', ', $page ? "page '$page'" : (), $action ? "action '$action'" : ()));
 
     # Check for goto redirection first
     if ($action =~ /^redirect!(.+)/  || $page =~ /^redirect!(.+)/) {

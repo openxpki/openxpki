@@ -1,6 +1,8 @@
 package OpenXPKI::Client::UI::Workflow;
 use Moose;
 
+extends 'OpenXPKI::Client::UI::Result';
+
 # Core modules
 use DateTime;
 use POSIX;
@@ -14,12 +16,13 @@ use Date::Parse;
 use YAML::Loader;
 use Try::Tiny;
 use MIME::Base64;
+use Crypt::JWT qw( encode_jwt );
+use Crypt::PRNG;
+
+# Project modules
 use OpenXPKI::DateTime;
 use OpenXPKI::Debug;
 use OpenXPKI::i18n qw( i18nTokenizer i18nGettext );
-
-
-extends 'OpenXPKI::Client::UI::Result';
 
 
 # used to cache static patterns like the creator lookup
@@ -179,7 +182,7 @@ sub init_index {
     my $args = shift;
 
     my $wf_info = $self->send_command_v2( 'get_workflow_base_info', {
-        type => $self->param('wf_type')
+        type => scalar $self->param('wf_type')
     });
 
     if (!$wf_info) {
@@ -209,7 +212,7 @@ sub init_start {
     my $args = shift;
 
     my $wf_info = $self->send_command_v2( 'create_workflow_instance', {
-       workflow => $self->param('wf_type'), params   => {}, ui_info => 1
+       workflow => scalar $self->param('wf_type'), params => {}, ui_info => 1
     });
 
     if (!$wf_info) {
@@ -1631,7 +1634,7 @@ sub action_bulk {
     $self->logger()->trace('Doing bulk with arguments: '. Dumper $wf_args) if $self->logger->is_trace;
 
     # wf_token is also used as name of the form field
-    my @serials = $self->param($wf_token);
+    my @serials = $self->multi_param($wf_token);
 
     my @success; # list of wf_info results
     my $errors; # hash with wf_id => error
@@ -2159,6 +2162,7 @@ sub __render_from_workflow {
 
         my $context = $wf_info->{workflow}->{context};
         my @fields;
+        my @additional_fields;
         my @fielddesc;
 
         foreach my $field (@{$wf_action_info->{field}}) {
@@ -2179,10 +2183,12 @@ sub __render_from_workflow {
                 $val = undef;
             }
 
-            my $item = $self->__render_input_field( $field, $val );
+            my ($item, @more_items) = $self->__render_input_field( $field, $val );
             next unless ($item);
 
             push @fields, $item;
+            push @additional_fields, @more_items;
+
             # if the field has a description text, push it to the @fielddesc list
             my $descr = $field->{description};
             if ($descr && $descr !~ /^\s*$/ && $field->{type} ne 'hidden') {
@@ -2217,7 +2223,7 @@ sub __render_from_workflow {
                     #label => $wf_action_info->{label},
                     #description => $wf_action_info->{description},
                     submit_label => $wf_action_info->{button} || 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
-                    fields => \@fields,
+                    fields => [ @fields, @additional_fields ],
                     buttons => $self->__get_form_buttons( $wf_info ),
                 }
             });
@@ -2630,6 +2636,12 @@ sub __get_next_auto_action {
 Render the UI code for a input field from the server sided definition.
 Does translation of labels and mangles values for multi-valued componentes.
 
+This method might dynamically create additional "helper" fields on-the-fly
+(usually of type I<hidden>) and may thus return a list with several field
+definitions.
+
+The first returned item is always the one corresponding to the workflow field.
+
 =cut
 
 sub __render_input_field {
@@ -2637,6 +2649,9 @@ sub __render_input_field {
     my $self = shift;
     my $field = shift;
     my $value = shift;
+
+    die "__render_input_field() must be called in list context: it may return more than one field definition\n"
+      unless wantarray;
 
     my $name = $field->{name};
     next if ($name =~ m{ \A workflow_id }x);
@@ -2658,11 +2673,23 @@ sub __render_input_field {
     $item->{clonable} = 1 if $field->{clonable};
     $item->{is_optional} = 1 unless $field->{required};
 
+    # includes dynamically generated additional fields
+    my @all_items = ($item);
+
     # type 'select'
     $item->{options} = $field->{option} if $field->{option};
 
-    # type 'text'
-    $item->{autocomplete} = $field->{autocomplete} if $field->{autocomplete};
+    # type 'text' - autocomplete
+    if ($field->{autocomplete}) {
+        my ($ac_query_params, $enc_field) = $self->make_autocomplete_query($field);
+        # "autocomplete_query" to distinguish it from the wf config param
+        $item->{autocomplete_query} = {
+            action => $field->{autocomplete}->{action},
+            params => $ac_query_params,
+        };
+        # additional field definition
+        push @all_items, $enc_field;
+    }
 
     # type 'cert_identifier' - special handling of preset value
     if ($type eq 'cert_identifier' && $value) {
@@ -2693,8 +2720,40 @@ sub __render_input_field {
         $item->{verbose} = $self->send_command_v2( 'render_template', { template => $field->{template}, params => $item } );
     }
 
-    return $item;
+    # type 'encrypted'
+    for (@all_items) {
+        $_->{value} = $self->_encrypt_jwt($_->{value}) if $_->{type} eq 'encrypted';
+    }
 
+    return @all_items;
+
+}
+
+# encrypt given data
+sub _encrypt_jwt {
+    my ($self, $value) = @_;
+
+    die "Only values of type HashRef are supported for encrypted input fields\n"
+      unless ref $value eq 'HASH';
+
+    my $key = $self->_session->param('jwt_encryption_key');
+    if (not $key) {
+        $key = Crypt::PRNG::random_bytes(32);
+        $self->_session->param('jwt_encryption_key', $key);
+    }
+
+    my $token = encode_jwt(
+        payload => $value,
+        enc => 'A256CBC-HS512',
+        alg => 'PBES2-HS512+A256KW', # uses "HMAC-SHA512" as the PRF and "AES256-WRAP" for the encryption scheme
+        key => $key, # can be any length for PBES2-HS512+A256KW
+        extra_headers => {
+            p2c => 8000, # PBES2 iteration count
+            p2s => 32,   # PBES2 salt length
+        },
+    );
+
+    return $token
 }
 
 =head2 __delegate_call
