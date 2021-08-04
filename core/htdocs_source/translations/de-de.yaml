@@ -39,7 +39,7 @@ component:
     custom_value: "Angepasst"
   oxifield_cert_identifier:
     no_matches: "Keine Zertifikate gefunden"
-  oxifield_uploadarea:
+  oxifield_textarea:
     reset: "Leeren"
     open: "Datei öffnen"
     large_file: "Datei zu gross für Vorschau"
@@ -61,3 +61,7 @@ component:
     copy: "Kopieren"
   oxi_code:
     copy: "Doppelklick markiert gesamten Text"
+
+autofill:
+  button: "{target} abfragen"
+  result: "Abfrageergebnis von: {target}"

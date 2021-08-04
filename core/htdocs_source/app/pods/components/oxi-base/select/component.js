@@ -8,7 +8,6 @@ import { debug } from '@ember/debug';
  * <OxiBase::Select @list={{data.keys}} @selected={{data.name}} @onChange={{myFunc}} @onInsert={{otherFunc}}/>
  * ```
  *
- * @module oxi-base/select
  * @param { array } list - List of hashes defining the options.
  * Each hash is expected to have these keys:
  * ```javascript
@@ -21,6 +20,7 @@ import { debug } from '@ember/debug';
  * @param { callback } onChange - called if a selection was made.
  * It gets passed two arguments: *value* and *label* of the selected item.
  * The callback is also called initially to set the value of the first list item.
+ * @module component/oxi-base/select
  */
 export default class OxiSelectComponent extends Component {
     @action

@@ -2,12 +2,12 @@ import Component from '@glimmer/component';
 import { tracked  } from '@glimmer/tracking';
 import { action, set } from '@ember/object';
 import { scheduleOnce } from '@ember/runloop';
-import { getOwner } from '@ember/application';
 import { isArray } from '@ember/array';
 import { inject } from '@ember/service';
 
 export default class OxiFieldTextComponent extends Component {
     @inject('intl') intl;
+    @inject('oxi-content') content;
 
     /*
      * Note: the search input field is two-fold:
@@ -57,8 +57,7 @@ export default class OxiFieldTextComponent extends Component {
 
     @action
     onInput(evt) {
-        let value = this.cleanup(evt.target.value);
-        this.setValue(value);
+        this.setValue(this.cleanup(evt.target.value));
     }
 
     // Own "paste" implementation to allow for text cleanup
@@ -86,12 +85,12 @@ export default class OxiFieldTextComponent extends Component {
         event.preventDefault();
     }
 
-    setValue(value) {
+    setValue(value, runAutocomplete = true) {
         this.value = value;
         this.args.onChange(value); // report changes to parent component
 
         // fetch autocomplete list (but don't process same input value twice)
-        if (this.isAutoComplete && value !== this.searchPrevious) {
+        if (runAutocomplete && this.isAutoComplete && value !== this.searchPrevious) {
             this.autocompleteQuery(value);
         }
     }
@@ -132,7 +131,7 @@ export default class OxiFieldTextComponent extends Component {
             // resolve referenced fields and their values
             let ref = this.args.encodeFields(this.acFieldRefParams.keys(), this.acFieldRefParams); // returns an Object
 
-            getOwner(this).lookup("route:openxpki").sendAjaxQuiet({
+            this.content.updateRequestQuiet({
                 action: this.args.content.autocomplete_query.action,
                 [this.args.content.name] : value, // [] denotes a dynamic key name
                 ...ref,

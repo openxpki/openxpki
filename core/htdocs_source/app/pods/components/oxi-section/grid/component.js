@@ -1,20 +1,22 @@
 import Component from '@glimmer/component';
-import { getOwner } from '@ember/application';
+import { inject } from '@ember/service';
 import { action, computed, set, setProperties } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 
 /**
  * Draws a grid.
  *
- * @module oxi-section/form
  * @param { hash } def - section definition
  * ```javascript
  * {
  *     ... // TODO
  * }
  * ```
+ * @module component/oxi-section/grid
  */
 export default class OxiSectionGridComponent extends Component {
+    @inject('oxi-content') content;
+
     @tracked rawData = [];
     @tracked pager = {};
 
@@ -248,7 +250,7 @@ export default class OxiSectionGridComponent extends Component {
             window.location.href = path;
         }
         else {
-            return getOwner(this).lookup("route:openxpki").sendAjax({
+            return this.content.updateRequest({
                 page: path,
                 target: act.target
             });
@@ -269,8 +271,7 @@ export default class OxiSectionGridComponent extends Component {
             request[button.selection] = this.sortedData.filterBy("checked").getEach("originalData").getEach("" + index);
             set(button, "loading", true);
 
-            getOwner(this).lookup("route:openxpki")
-            .sendAjax(request)
+            this.content.updateRequest(request)
             .then(() => set(button, "loading", false));
         }
         else {
@@ -296,8 +297,7 @@ export default class OxiSectionGridComponent extends Component {
             return;
         }
         let pager = this.pager;
-        return getOwner(this).lookup("route:openxpki")
-        .sendAjax({
+        return this.content.updateRequest({
             page:    pager.pagerurl,
             limit:   page.limit,
             startat: page.startat,

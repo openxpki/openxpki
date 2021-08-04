@@ -43,9 +43,9 @@ import { debug } from '@ember/debug';
  *     },
  * }
  * ```
- * @module oxi-base/button
  * @param { callback } onClick - Action handler to be called.
  * The `button` hash will be passed on to the handler as single parameter.
+ * @module component/oxi-base/button
  */
 
 // mapping of format codes to CSS classes applied to the button

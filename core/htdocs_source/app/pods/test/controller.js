@@ -83,6 +83,17 @@ export default class TestController extends Controller {
                 return emptyResponse();
             });
 
+            /*
+             * Autofill
+             */
+            this.get('/autofill', req => {
+                console.info(`MOCKUP SERVER> autofill request`);
+                console.info(Object.entries(req.queryParams).map(e => `MOCKUP SERVER> ${e[0]} = ${e[1]}`).join("\n"));
+                console.debug(req);
+                let result = req.queryParams;
+                return [200, {"Content-Type": "application/json"}, JSON.stringify(result)];
+            });
+
             /* ************************
              * POST requests
              */
@@ -216,10 +227,27 @@ export default class TestController extends Controller {
                         autocomplete_query: {
                             action: "text!autocomplete",
                             params: {
-                                forest: "deep",
                                 the_comment: "comment",
                                 secure_param: "enc_param",
                             },
+                        },
+                    },
+                    {
+                        type: "text",
+                        name: "text_autofill",
+                        label: "Autofill",
+                        autofill: {
+                            request: {
+                                url: `${window.location.protocol}//${window.location.host}/autofill`,
+                                method: 'GET',
+                                params: {
+                                    user: { the_comment: "comment" },
+                                    static: { forest: "deep" },
+                                },
+                            },
+                            autorun: true,
+                            label: "The Oracle",
+                            button_label: "Per Smartcard erzeugen",
                         },
                     },
                 ],
@@ -447,10 +475,40 @@ export default class TestController extends Controller {
                         value: "Hi there!\nHow are you?\n",
                     },
                     {
-                        type: "uploadarea",
-                        name: "uploadarea",
+                        type: "textarea",
+                        name: "prosa_autofill",
+                        label: "Textarea",
+                        value: "",
+                        autofill: {
+                            request: {
+                                url: `${window.location.protocol}//${window.location.host}/autofill`,
+                                method: 'GET',
+                                params: {
+                                    static: { this: "it" },
+                                },
+                            },
+                            label: "The Oracle",
+                            button_label: "Per Smartcard erzeugen",
+                        },
+                    },
+                    {
+                        type: "textarea",
+                        name: "textarea_upload",
                         value: "...data...",
                         label: "Uploadarea",
+                        allow_upload: 1,
+                        autofill: {
+                            request: {
+                                url: `${window.location.protocol}//${window.location.host}/autofill`,
+                                method: 'GET',
+                                params: {
+                                    user: { text: "rawtext" },
+                                    static: { forest: "deep" },
+                                },
+                            },
+                            autorun: 1,
+                            label: "The Oracle",
+                        },
                     },
                 ],
             }

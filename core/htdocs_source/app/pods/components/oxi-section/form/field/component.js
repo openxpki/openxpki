@@ -1,12 +1,14 @@
 import Component from '@glimmer/component';
 import { action } from "@ember/object";
 import { inject } from '@ember/service';
+import { debug } from '@ember/debug';
 
 export default class OxiFieldMainComponent extends Component {
-    @inject('oxi-config') config;
+    @inject('oxi-backend') backend;
+    @inject('intl') intl;
 
     get isBool() {
-        return this.args.field.type === "bool";
+        return this.args.field.type === 'bool';
     }
 
     get field() {
@@ -28,6 +30,10 @@ export default class OxiFieldMainComponent extends Component {
             size = 7;
         }
         return 'col-md-' + size;
+    }
+
+    get autofillConfig() {
+        return this.args.field.autofill ? this.args.field.autofill : null;
     }
 
     @action

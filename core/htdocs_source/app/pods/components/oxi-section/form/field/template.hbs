@@ -27,14 +27,30 @@
             {{/if}}
         {{/if}}
 
-        {{component
-            this.type
-            content=this.field
-            onChange=this.onChange
-            onError=this.onError
-            setFocusInfo=@setFocusInfo
-            encodeFields=@encodeFields
+        {{#let
+            (component
+                this.type
+                content=this.field
+                onChange=this.onChange
+                onError=this.onError
+                setFocusInfo=@setFocusInfo
+            ) as |FieldInstance|
         }}
+            <FieldInstance>
+                <:autofill as |isDisabled valueSetter|>
+                    {{#if this.autofillConfig}}
+                        <OxiSection::Form::Autofill
+                            @config={{this.autofillConfig}}
+                            @disabled={{isDisabled}}
+                            @valueSetter={{valueSetter}}
+                            @encodeFields={{@encodeFields}}
+                        />
+                    {{/if}}
+                </:autofill>
+            </FieldInstance>
+        {{/let}}
+{{!--             autofill=this.autofill
+ --}}
 
         {{#if @field.error}}
             <span class="help-block">{{@field.error}}</span>

@@ -39,7 +39,7 @@ component:
     custom_value: "Custom"
   oxifield_cert_identifier:
     no_matches: "No matches found"
-  oxifield_uploadarea:
+  oxifield_textarea:
     reset: "Reset"
     open: "Open file"
     large_file: "File too large for preview"
@@ -62,3 +62,6 @@ component:
   oxi_code:
     copy: "Double-click to select all text"
 
+autofill:
+  button: "Query {target}"
+  result: "Query result from: {target}"

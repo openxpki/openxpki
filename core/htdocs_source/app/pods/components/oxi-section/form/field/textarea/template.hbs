@@ -1,9 +1,68 @@
-<textarea
-    class="form-control"
-    rows={{this.rows}}
-    cols={{this.cols}}
-    value={{@content.value}}
-    placeholder={{@content.placeholder}}
-    {{on "input" this.onInput}}
-    {{may-focus this true}}
-/>
+{{#if (or @content.allow_upload (has-block "autofill"))}}
+    <div class="row">
+        <div class="col-md-10">
+            <textarea
+                class="form-control"
+                rows={{this.rows}}
+                cols={{this.cols}}
+                value={{this.textOutput}}
+                placeholder={{@content.placeholder}}
+                readonly={{if this.lockTextInput "readonly"}}
+                {{on "keydown" this.onKeydown}}
+                {{on "input" this.onInput}}
+                {{on "drop" this.fileDropped}}
+                {{on "dragover" this.showCopyEffect}}
+                {{may-focus this true}}
+            />
+        </div>
+        <div class="col-md-2">
+            {{#if @content.allow_upload}}
+                <BsButton
+                    class="oxi-btn-exceptional btn-block btn-sm"
+                    @onClick={{this.openFileUpload}}
+                    disabled={{this.hasContent}}
+                    @icon="glyphicon glyphicon-folder-open"
+                >
+                    <EmberTooltip>{{t 'component.oxifield_textarea.open'}}</EmberTooltip>
+                </BsButton>
+            {{/if}}
+
+            {{#if (has-block "autofill")}}
+                {{!-- "autofill" button: parameters: (isDisabled, valueSetter) --}}
+                {{yield this.hasContent this.setAutofill to="autofill"}}
+            {{/if}}
+
+            <BsButton
+                @type='default'
+                class="oxi-btn-cancel btn-block btn-sm"
+                @onClick={{this.resetInput}}
+                disabled={{not this.hasContent}}
+                @icon="glyphicon glyphicon-trash"
+            >
+                <EmberTooltip>{{t 'component.oxifield_textarea.reset'}}</EmberTooltip>
+            </BsButton>
+
+        </div>
+    </div>
+
+    {{this.filename}}
+{{else}}
+    <textarea
+        class="form-control"
+        rows={{this.rows}}
+        cols={{this.cols}}
+        value={{this.textOutput}}
+        placeholder={{@content.placeholder}}
+        {{may-focus this true}}
+    />
+{{/if}}
+
+{{#if @content.allow_upload}}
+    <input
+        type="file"
+        class="oxi-file-input"
+        style="display:none"
+        {{on "change" this.fileSelected}}
+        {{on-init this.setFileUploadElement}}
+    />
+{{/if}}
