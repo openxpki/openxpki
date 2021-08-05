@@ -15,7 +15,7 @@ use Test::Exception;
 use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 
-plan tests => 4;
+plan tests => 3;
 
 #
 # Init helpers
@@ -25,8 +25,6 @@ my $oxitest = OpenXPKI::Test->new(
     #log_level => 'trace',
 );
 my $dbdata = $oxitest->certhelper_database;
-
-use_ok "OpenXPKI::Crypto::CRL"; # this is missing in OpenXPKI::Server::API::Object
 
 $oxitest->insert_testcerts(exclude => ["alpha-signer-2"]);
 
