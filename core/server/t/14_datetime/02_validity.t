@@ -2,10 +2,9 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Test::More;
+use Test::Exception;
 
-plan tests => 21;
-
-note "DATETIME FUNCTIONS: VALIDITY COMPUTATION\n";
+plan tests => 22;
 
 use DateTime;
 use OpenXPKI::DateTime;
@@ -146,6 +145,13 @@ $dt = OpenXPKI::DateTime::get_validity( {
 $offset = $dt - $refdate;
 is($offset->in_units('minutes'), -30, 'get_validity() relativedate +0000000030');
 
+throws_ok {
+	OpenXPKI::DateTime::get_validity( {
+	    REFERENCEDATE => $refdate,
+		VALIDITY => "+0",
+		VALIDITYFORMAT => 'relativedate',
+	} );
+} qr/I18N_OPENXPKI_DATETIME_GET_VALIDITY_INVALID_VALIDITY/;
 
 # Absolute date
 ###########################################################################

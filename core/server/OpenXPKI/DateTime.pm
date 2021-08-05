@@ -171,6 +171,18 @@ sub get_validity {
         }
         ##! 32: \%date
 
+        # e.g. if '+0' was given
+        if (not defined $date{year}) {
+            OpenXPKI::Exception->throw(
+                message =>
+                  "I18N_OPENXPKI_DATETIME_GET_VALIDITY_INVALID_VALIDITY",
+                params => {
+                    VALIDITYFORMAT => $validityformat,
+                    VALIDITY       => $params->{VALIDITY},
+                },
+            );
+        }
+
         # absolute validity
         if ( $relative eq "" ) {
             return DateTime->new( %date, time_zone => 'UTC', );
