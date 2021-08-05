@@ -110,7 +110,7 @@ my $entry_no = 0;
 for (@some_uuids) {
     $oxitest->api2_command('set_data_pool_entry' => {
         namespace => $namespace2,
-        key => sprintf("pill-%02d", $entry_no, $_),
+        key => sprintf("pill-%02d", $entry_no),
         value => $_,
     }) and $entry_no++;
 }
@@ -123,7 +123,7 @@ lives_and {
     });
     $entry_no = 0;
     cmp_deeply $result, bag(
-        map { { namespace => $namespace2, key => sprintf("pill-%02d", $entry_no++, $_) } } @some_uuids,
+        map { { namespace => $namespace2, key => sprintf("pill-%02d", $entry_no++) } } @some_uuids,
     );
 } "Listing: all stored entries";
 
@@ -169,7 +169,7 @@ lives_ok {
         namespace => $namespace,
         key => "deleteme",
         newkey => "deleteme",
-        expiration_date => 0,
+        expiration_date => '+00',
     });
 } "Delete entry via 'modify_data_pool_entry' by setting EXPIRATION_DATE to 0";
 
