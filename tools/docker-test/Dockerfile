@@ -10,7 +10,8 @@ FROM debian:10-slim
 #
 ARG DEBIAN_FRONTEND=noninteractive
 
-# language-pack-de is needed for the i18n test
+# language-pack-de ... needed for the i18n test
+# wamerican ... provides /usr/share/dict/words (used by OpenXPKI::Server::API2::Plugin::Crypto::password_quality)
 RUN apt-get update && \
     apt-get -qq -y install \
         locales \
@@ -25,6 +26,7 @@ RUN apt-get update && \
         pkg-config \
         nano \
         figlet \
+        wamerican \
         && \
     apt-get clean
 
