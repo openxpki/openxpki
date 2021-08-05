@@ -55,7 +55,7 @@ my $result;
 # get_ca_list
 #
 lives_and {
-    my $data = $api->get_ca_list();
+    my $data = $api->get_ca_list(check_online => 1);
 
     cmp_deeply $data, bag(
         {
@@ -82,7 +82,7 @@ lives_and {
             notbefore   => $as3->db->{notbefore},
             status      => "UPCOMING",
         },
-    );
+    ) or diag explain $data;
 } "get_ca_list - list signing CAs with correct status";
 
 lives_and {

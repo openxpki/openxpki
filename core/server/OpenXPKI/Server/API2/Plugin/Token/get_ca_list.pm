@@ -126,10 +126,10 @@ command "get_ca_list" => {
                 } );
 
                 # do not check if the token has no key store (remote ca)
-                if (defined $token->get_key_store()) {
+                if ($token->get_instance->get_engine->can('get_key_store')) {
                     $item->{status} = OpenXPKI::Server::API2::Plugin::Token::Util->is_token_usable($token)
                         ? 'ONLINE'
-                        : 'OFFLINE' ;
+                        : 'OFFLINE';
                 }
             }
             catch {
