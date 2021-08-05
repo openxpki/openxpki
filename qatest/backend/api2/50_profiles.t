@@ -216,7 +216,7 @@ cmp_deeply $result, {
 $result = $oxitest->api2_command("get_key_algs" => {
     profile => "tls_server",
 });
-cmp_deeply $result, bag( qw( dsa rsa ec ) ), "list key algorithms";
+cmp_deeply $result, bag( qw( rsa ec ) ), "list key algorithms";
 
 #
 # get_key_enc
@@ -224,13 +224,13 @@ cmp_deeply $result, bag( qw( dsa rsa ec ) ), "list key algorithms";
 $result = $oxitest->api2_command("get_key_enc" => {
     profile => "tls_server",
 });
-cmp_deeply $result, bag( qw( aes256 idea ) ), "list key encryption algorithms";
+cmp_deeply $result, bag( qw( aes256 ) ), "list key encryption algorithms";
 
 $result = $oxitest->api2_command("get_key_enc" => {
     profile => "tls_server",
     showall => 1,
 });
-cmp_deeply $result, bag( qw( aes256 idea 3des ) ), "list key encryption algorithms (including hidden)";
+cmp_deeply $result, bag( qw( aes256 ) ), "list key encryption algorithms (including hidden)";
 
 #
 # get_key_params
@@ -245,7 +245,7 @@ $result = $oxitest->api2_command("get_key_params" => {
     alg => 'rsa',
 });
 cmp_deeply $result, {
-    key_length => bag( qw( 2048 4096 ) ),
+    key_length => bag( qw( 2048 3072 4096 ) ),
 }, "list key parameters for RSA";
 
 $result = $oxitest->api2_command("get_key_params" => {
@@ -254,7 +254,7 @@ $result = $oxitest->api2_command("get_key_params" => {
     showall => 1,
 });
 cmp_deeply $result, {
-    key_length => bag( qw( 1024 2048 4096 ) ),
+    key_length => bag( qw( 2048 3072 4096 2048:4096 ) ),
 }, "list key parameters for RSA (including hidden)";
 
 #
