@@ -1,51 +1,29 @@
-## Base module tests
-##
-
 use strict;
 use warnings;
-use Test::More;
 
-use OpenXPKI::DateTime;
+# CPAN modules
+use Test::More;
 use DateTime;
 
-plan tests => 5;
+
+plan tests => 6;
+
+
 
 my $epoch = 1142434089;
-my $dt = DateTime->from_epoch( epoch => $epoch ); 
+my $dt = DateTime->from_epoch( epoch => $epoch );
 
-is(OpenXPKI::DateTime::convert_date(
-       { 
-	   OUTFORMAT => 'epoch', 
-	   DATE      => $dt,
-       }),
-   $epoch, 'convert date to epoch works');
+sub is_conversion($$$) {
+    my ($format, $expected, $test_name) = @_;
+    is OpenXPKI::DateTime::convert_date({ OUTFORMAT => $format, DATE => $dt }), $expected, $test_name;
+}
 
-is(OpenXPKI::DateTime::convert_date(
-       { 
-	   OUTFORMAT => 'iso8601', 
-	   DATE      => $dt,
-       }),
-   '2006-03-15T14:48:09', 'convert date to iso8601 works');
+use_ok 'OpenXPKI::DateTime';
 
-is(OpenXPKI::DateTime::convert_date(
-       { 
-	   OUTFORMAT => 'openssltime', 
-	   DATE      => $dt,
-       }),
-   '060315144809Z', 'convert date to openssltime works');
-
-is(OpenXPKI::DateTime::convert_date(
-       { 
-	   OUTFORMAT => 'terse', 
-	   DATE      => $dt,
-       }),
-   '20060315144809', 'convert date to terse works');
-
-is(OpenXPKI::DateTime::convert_date(
-       { 
-	   OUTFORMAT => 'printable', 
-	   DATE      => $dt,
-       }),
-   '2006-03-15 14:48:09', 'convert date to printable works');
+is_conversion 'epoch', $epoch, 'conversion to epoch';
+is_conversion 'iso8601', '2006-03-15T14:48:09', 'conversion to iso8601';
+is_conversion 'openssltime', '060315144809Z', 'conversion to openssltime';
+is_conversion 'terse', '20060315144809', 'conversion to terse';
+is_conversion 'printable', '2006-03-15 14:48:09', 'conversion to printable';
 
 1;
