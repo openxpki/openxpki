@@ -77,9 +77,12 @@ lives_and {
     my $data = $oxitest->api2_command('get_ui_system_status');
     cmp_deeply $data, {
         config => {
-            commit => re(qr/^\w+$/), # git commit id
+            api => re(qr/^[0-9\.]+$/),
+            commit => ignore(), # git commit id
             config => re(qr/^[0-9\.]+$/),
-            package => re(qr/^debian-[0-9\.]+$/),
+            depend => {
+                core => re(qr/^[0-9\.]+$/),
+            }
         },
         crl_expiry =>       re(qr/^\d+$/),
         dv_expiry =>        re(qr/^\d+$/),
