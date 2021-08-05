@@ -780,23 +780,9 @@ sub init_base_config {
         "system.database" => $self->conf_database,
         "system.server.session" => $self->conf_session,
         "system.server.log4perl" => $self->path_log4perl_conf,
-    );
-}
 
-=head2 init_user_config
-
-B<Only called internally:> pass additional config entries that were supplied via
-constructor parameter C<add_config> to L<OpenXPKI::Test::ConfigWriter>.
-
-=cut
-sub init_user_config {
-    my ($self) = @_;
-
-    note "[OpenXPKI::Test->init_user_config]";
-
-    # Add basic test realm.
-    # Without any realm we cannot set a user via CTX('authentication')
-    $self->add_conf(
+        # Add basic test realm.
+        # Without any realm we cannot set a user via CTX('authentication')
         "system.realms.test" => {
             label => "TestRealm",
             baseurl => "http://127.0.0.1/test/",
@@ -812,6 +798,18 @@ sub init_user_config {
             },
         },
     );
+}
+
+=head2 init_user_config
+
+B<Only called internally:> pass additional config entries that were supplied via
+constructor parameter C<add_config> to L<OpenXPKI::Test::ConfigWriter>.
+
+=cut
+sub init_user_config {
+    my ($self) = @_;
+
+    note "[OpenXPKI::Test->init_user_config]";
 
     # Add user supplied config (via constructor argument "add_config")
     for (sort keys %{ $self->user_config }) { # sorting should help adding config items deeper in the tree after those at the top

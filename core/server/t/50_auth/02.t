@@ -26,7 +26,7 @@ use OpenXPKI::Server::Context qw( CTX );
 
 use OpenXPKI::Server::Authentication;
 
-plan tests => 18;
+plan tests => 10;
 
 my $ot = OpenXPKI::Test->new(
     with => "AuthLayer",
@@ -39,57 +39,58 @@ use_ok "OpenXPKI::Server::Authentication";
 my $auth;
 lives_ok { $auth = OpenXPKI::Server::Authentication->new(); } "class loaded";
 
-my @res = $auth->login_step({
-    STACK => 'Testing',
-    MESSAGE => { PARAMS => {} }
-});
-ok ($res[0], 'Anonymous');
-use Data::Dumper;
-print Dumper \@res;
-@res = $auth->login_step({
-    STACK => 'Password',
-    MESSAGE => { PARAMS => {} }
-});
+my @res;
+lives_and {
+    @res = $auth->login_step({
+        STACK => 'Testing',
+        MESSAGE => { PARAMS => {} }
+    });
+    ok ($res[0], 'Anonymous');
+};
+
+lives_and {
+    @res = $auth->login_step({
+        STACK => 'Password',
+        MESSAGE => { PARAMS => {} }
+    });
+    cmp_deeply(\@res, superbagof({ 'SERVICE_MSG' => 'GET_PASSWD_LOGIN', PARAMS=> {} }));
+};
 
 note 'Fallthru';
 
-is_deeply($res[2], { 'SERVICE_MSG' => 'GET_PASSWD_LOGIN', PARAMS=> {} });
+lives_and {
+    @res = $auth->login_step({
+        STACK => 'FallThru',
+        MESSAGE => { PARAMS => { username => 'foo' } },
+    });
+    cmp_deeply(\@res, superbagof('foo', 'Anonymous', { 'SERVICE_MSG' => 'SERVICE_READY' }));
+};
 
-@res = $auth->login_step({
-    STACK => 'FallThru',
-    MESSAGE => { PARAMS => { username => 'foo' } },
-});
+lives_and {
+    @res = $auth->login_step({
+        STACK => 'FallThru',
+        MESSAGE => { PARAMS => { username => 'foo', password => 'wrongsecret' } },
+    });
+    cmp_deeply(\@res, superbagof('foo', 'Anonymous', { 'SERVICE_MSG' => 'SERVICE_READY' }));
+};
 
-is_deeply($res[2], { 'SERVICE_MSG' => 'SERVICE_READY' });
-is($res[0], 'foo');
-is($res[1], 'Anonymous');
-
-@res = $auth->login_step({
-    STACK => 'FallThru',
-    MESSAGE => { PARAMS => { username => 'foo', password => 'wrongsecret' } },
-});
-
-is_deeply($res[2], { 'SERVICE_MSG' => 'SERVICE_READY' });
-is($res[0], 'foo');
-is($res[1], 'Anonymous');
-
-@res = $auth->login_step({
-    STACK => 'FallThru',
-    MESSAGE => { PARAMS => { username => 'foo', password => 'secret' } },
-});
-
-is_deeply($res[2], { 'SERVICE_MSG' => 'SERVICE_READY' });
-is($res[0], 'foo');
-is($res[1], 'User');
-
+lives_and {
+    @res = $auth->login_step({
+        STACK => 'FallThru',
+        MESSAGE => { PARAMS => { username => 'foo', password => 'secret' } },
+    });
+    cmp_deeply(\@res, superbagof('foo', 'User', { 'SERVICE_MSG' => 'SERVICE_READY' }));
+};
 
 note 'Password only';
 
-@res = $auth->login_step({
-    STACK => 'Password',
-    MESSAGE => { PARAMS => { username => 'foo' } },
-});
-is_deeply($res[2], { 'SERVICE_MSG' => 'GET_PASSWD_LOGIN', PARAMS=> {} });
+lives_and {
+    @res = $auth->login_step({
+        STACK => 'Password',
+        MESSAGE => { PARAMS => { username => 'foo' } },
+    });
+    cmp_deeply(\@res, superbagof({ 'SERVICE_MSG' => 'GET_PASSWD_LOGIN', PARAMS=> {} }));
+};
 
 throws_ok {
     @res = $auth->login_step({
@@ -98,15 +99,12 @@ throws_ok {
     });
 } qr/I18N_OPENXPKI_UI_AUTHENTICATION_FAILED/, "wrong secret";
 
-@res = $auth->login_step({
-    STACK => 'Password',
-    MESSAGE => { PARAMS => { username => 'foo', password => 'secret' } },
-});
-
-is_deeply($res[2], { 'SERVICE_MSG' => 'SERVICE_READY' });
-is($res[0], 'foo');
-is($res[1], 'User');
-
-
+lives_and {
+    @res = $auth->login_step({
+        STACK => 'Password',
+        MESSAGE => { PARAMS => { username => 'foo', password => 'secret' } },
+    });
+    cmp_deeply(\@res, superbagof('foo', 'User', { 'SERVICE_MSG' => 'SERVICE_READY' }));
+};
 
 1;
