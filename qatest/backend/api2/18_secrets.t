@@ -17,7 +17,7 @@ use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 # Project modules
 use OpenXPKI::Test;
 
-plan tests => 5;
+plan tests => 6;
 
 #
 # Setup test context
@@ -25,14 +25,14 @@ plan tests => 5;
 my $oxitest = OpenXPKI::Test->new(
     with => [ qw( TestRealms CryptoLayer ) ],
     add_config => {
-        "realm.alpha.crypto.secret.mi" => {
+        "realm.alpha.crypto.secret.mi-1" => {
             label => "Monkey Island",
             export => 1,
             method => "plain",
             total_shares => "3",
             cache => "daemon",
         },
-        "realm.alpha.crypto.secret.mi2" => {
+        "realm.alpha.crypto.secret.mi-2" => {
             label => "Monkey Island",
             export => 1,
             method => "plain",
@@ -57,21 +57,21 @@ my $part3 = "swords";
 # set_secret_part
 lives_and {
     $oxitest->api2_command("set_secret_part" => {
-        secret => "mi", part => 2, value => $part2
+        secret => "mi-$_", part => 2, value => $part2
     });
     $oxitest->api2_command("set_secret_part" => {
-        secret => "mi", part => 1, value => $part1
+        secret => "mi-$_", part => 1, value => $part1
     });
     $oxitest->api2_command("set_secret_part" => {
-        secret => "mi", part => 3, value => $part3
+        secret => "mi-$_", part => 3, value => $part3
     });
 
-    is CTX('crypto_layer')->get_secret("mi"), "$part1$part2$part3";
-} "set_secret_part - store secret";
+    is CTX('crypto_layer')->get_secret("mi-$_"), "$part1$part2$part3";
+} "set_secret_part - store secret no. $_" for (1..2);
 
 # is_secret_complete
 lives_and {
-    is $oxitest->api2_command("is_secret_complete" => { secret => "mi" }), 1;
+    is $oxitest->api2_command("is_secret_complete" => { secret => "mi-1" }), 1;
 } "is_secret_complete - verify completeness";
 
 # clear_secret
@@ -84,23 +84,42 @@ lives_and {
         note "intercepted call to OpenXPKI::Control::reload()";
     };
 
-    $oxitest->api2_command("clear_secret" => { secret => "mi" });
+    $oxitest->api2_command("clear_secret" => { secret => "mi-1" });
 
-    is CTX('crypto_layer')->get_secret("mi"), undef;
+    is CTX('crypto_layer')->get_secret("mi-1"), undef;
 } "clear_secret";
 
 # is_secret_complete
 lives_and {
-    is $oxitest->api2_command("is_secret_complete" => { secret => "mi" }), 0;
+    is $oxitest->api2_command("is_secret_complete" => { secret => "mi-1" }), 0;
 } "is_secret_complete - verify incompleteness";
 
 # get_secrets
 lives_and {
-    cmp_deeply $oxitest->api2_command("get_secrets"), {
-        'default' => { label => ignore(),        type => ignore() },
-        'mi'      => { label => 'Monkey Island', type => 'plain' },
-        'mi2'     => { label => 'Monkey Island', type => 'plain' },
-    };
+    my $secrets = $oxitest->api2_command("get_secrets");
+    cmp_deeply $secrets, {
+        'default' => {
+            label => ignore(),
+            type => ignore(),
+            complete => 1,
+            inserted_parts => 1,
+            required_parts => 1,
+        },
+        'mi-1' => {
+            label => 'Monkey Island',
+            type => 'plain',
+            complete => 0,
+            inserted_parts => 0,
+            required_parts => 3,
+         },
+        'mi-2' => {
+            label => 'Monkey Island',
+            type => 'plain',
+            complete => 1,
+            inserted_parts => 3,
+            required_parts => 3,
+         },
+    } or diag explain $secrets;
 } "get_secrets";
 
 1;
