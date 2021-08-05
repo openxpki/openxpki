@@ -114,7 +114,7 @@ is an array of PEM encoded certificates, mandatory unless NO_CHAIN is set
 
 =item * NO_CHAIN (do not check the signer certificate)
 
-=item CRL
+=item * CRL
 
 Must contain one or more PEM encoded CRLs.
 
@@ -122,7 +122,7 @@ Enables I<CRL_CHECK> with option 'all'.
 If NOCHAIN is set, sets I<CRL_CHECK> to leaf
 
 
-=item CRL_CHECK
+=item * CRL_CHECK
 
 Set to I<leaf> to only validate the entity certificate.
 

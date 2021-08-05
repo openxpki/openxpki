@@ -28,6 +28,8 @@ Helper class for file operations and temp file management.
 
 The constructor expects arguments as a hash.
 
+=over
+
 =item TMP
 
 The parent directory to use for all temporary items created. If not

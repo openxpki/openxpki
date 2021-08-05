@@ -146,6 +146,8 @@ B<Parameters>
 
 =item * C<key_rules> I<Hash>
 
+=back
+
 =cut
 command "validate_key_params" => {
     key_params => { isa => 'HashRef', required => 1,  },

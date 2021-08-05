@@ -164,7 +164,7 @@ The username to use
 
 The role to set, only effective if the handler has not set a role.
 
-=item *
+=item ...
 
 The remaining hash is set as userinfo.
 
