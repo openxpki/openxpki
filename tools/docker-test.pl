@@ -192,7 +192,7 @@ if ($batch) {
 else {
     `which sha256sum` or die "Sorry, I need the 'sha256sum' command line tool\n";
 
-    print "(This might take more than 10 minutes on first execution)\n";
+    print "(might take more than 10 minutes when first run on a new host)\n";
     # Make scripts accessible for "docker build" (Dockerfile).
     # Only update TAR file if neccessary to prevent Docker from always rebuilding the image
     my $tarfile = "$Bin/docker-test/scripts.tar";
