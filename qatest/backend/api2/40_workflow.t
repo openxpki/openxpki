@@ -424,11 +424,14 @@ subtest "get_workflow_log()" => sub {
 
     isnt scalar @$result, 0, "log has at least one entry";
 
+    # remove noisy message that occurs since Workflow 1.53
+    my @clean_log = grep { $_->[2] ne 'Using standard field class' } @$result;
+
     # check first message
     my $i = -1;
-    $i = -2 if $result->[$i]->[2] =~ / during .* startup /msxi;
-    like $result->[$i]->[2], qr/ execute .* initialize /msxi, "'initialize' is the first (second) message"
-        or diag explain $result;
+    $i = -2 if $clean_log[$i]->[2] =~ / during .* startup /msxi;
+    like $clean_log[$i]->[2], qr/ execute .* initialize /msxi, "'initialize' is the first (second) message"
+        or diag explain \@clean_log;
 
     # Check sorting
     my $prev_ts = 4294967295; # 2106-02-07T06:28:15
