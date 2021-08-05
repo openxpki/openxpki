@@ -113,7 +113,7 @@ sub BUILD {
 sub _init_session {
 
     my $self = shift;
-    return $self->_client()->session();
+    return $self->_client->session;
 
 }
 
@@ -406,7 +406,7 @@ sub render {
     if ($self->_status()) {
         $result->{status} = $self->_status();
     } elsif ($self->param('_status')) {
-        my $status = $self->_client->session()->param(scalar $self->param('_status'));
+        my $status = $self->_session->param(scalar $self->param('_status'));
         if ($status && ref $status eq 'HASH') {
             $self->logger()->debug("Set persisted status " . $status->{message});
             $result->{status} = $status;
@@ -605,7 +605,7 @@ sub __register_wf_token {
     my $id = $self->__generate_uid();
     $self->logger()->debug('wf token id ' . $id);
     $self->logger()->trace('token info ' . Dumper  $token) if $self->logger()->is_trace;
-    $self->_client->session()->param($id, $token);
+    $self->_session->param($id, $token);
     return { name => 'wf_token', type => 'hidden', value => $id };
 }
 
@@ -632,7 +632,7 @@ sub __register_wf_token_initial {
 
     my $id = $self->__generate_uid();
     $self->logger()->debug('wf token id ' . $id);
-    $self->_client->session()->param($id, $token);
+    $self->_session->param($id, $token);
     return  "workflow!index!wf_token!$id";
 }
 
@@ -655,8 +655,8 @@ sub __fetch_wf_token {
 
     $self->logger()->debug( "load wf_token " . $id );
 
-    my $token = $self->_client->session()->param($id);
-    $self->_client->session()->clear($id) if($purge);
+    my $token = $self->_session->param($id);
+    $self->_session->clear($id) if($purge);
     return $token;
 
 }
@@ -672,7 +672,7 @@ sub __purge_wf_token {
     my $id = shift;
 
     $self->logger()->debug( "purge wf_token " . $id );
-    $self->_client->session()->clear($id);
+    $self->_session->clear($id);
 
     return $self;
 
@@ -703,9 +703,9 @@ sub __persist_response {
         $data = { data => $out };
     }
 
-    $self->_client->session()->param('response_'.$id, $data );
+    $self->_session->param('response_'.$id, $data );
 
-    $self->_client->session()->expire('response_'.$id, $expire) if ($expire);
+    $self->_session->expire('response_'.$id, $expire) if ($expire);
 
     return  "result!fetch!id!$id";
 
@@ -724,7 +724,7 @@ sub __fetch_response {
     my $id = shift;
 
     $self->logger()->debug('fetch response ' . $id);
-    my $response = $self->_client->session()->param('response_'.$id);
+    my $response = $self->_session->param('response_'.$id);
     if (!$response) {
         $self->logger()->error( "persisted response with id $id does not exist" );
         return;
@@ -812,12 +812,12 @@ sub __temp_param {
 
     # one argument - get request
     if (!defined $data) {
-        return $self->_client->session()->param( $key );
+        return $self->_session->param( $key );
     }
 
     $expire = '+15m' unless defined $expire;
-    $self->_client->session()->param($key, $data);
-    $self->_client->session()->expire($key, $expire) if ($expire);
+    $self->_session->param($key, $data);
+    $self->_session->expire($key, $expire) if ($expire);
 
     return $self;
 }
