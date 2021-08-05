@@ -20,7 +20,7 @@ use lib $Bin, "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 # use OpenXPKI::Debug; BEGIN { $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Database.*'} = 0b1111111 }
 use OpenXPKI::Test;
 
-plan tests => 15;
+plan tests => 13;
 
 =pod
 
@@ -139,12 +139,15 @@ import_ok     ($oxitest, $dbdata->cert("alpha-root-2"));
 import_ok     ($oxitest, $dbdata->cert("alpha-signer-2"));
 # expired root certificate
 import_ok     ($oxitest, $dbdata->cert("alpha-root-1"));
-# cert signed with invalid (expired) issuer, i.e. failing chain verification
-import_failsok($oxitest, $dbdata->cert("alpha-signer-1"), qr/chain/i);
-# cert signed by expired issuer with forced acceptance of failed issuer check
-import_ok     ($oxitest, $dbdata->cert("alpha-signer-1"), force_issuer=>1);
-# cert signed by expired issuer with disabled issuer check
-import_ok     ($oxitest, $dbdata->cert("alpha-alice-1"),  force_noverify=>1);
+
+# NOTE: Importing expired certificates is allowed now
+# cert signed with expired issuer (we allow this since 2019-10-11)
+import_ok     ($oxitest, $dbdata->cert("alpha-signer-1"));
+# # cert signed by expired issuer with forced acceptance of failed issuer check
+# import_ok     ($oxitest, $dbdata->cert("alpha-signer-1"), force_issuer=>1);
+# # cert signed by expired issuer with disabled issuer check
+# import_ok     ($oxitest, $dbdata->cert("alpha-alice-1"),  force_noverify=>1);
+
 # known issuer that is not root and triggers chain lookup
 import_ok     ($oxitest, $dbdata->cert("alpha-bob-2"));
 
