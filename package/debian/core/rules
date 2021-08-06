@@ -25,7 +25,7 @@ binary-indep-stamp: arrange
 	dh_installdocs	
 	dh_installexamples
 	dh_installchangelogs
-	dh_compress
+	dh_compress -X.conf -X.sh
 	dh_fixperms
 	dh_strip
 	dh_installdeb
