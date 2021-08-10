@@ -62,6 +62,7 @@ case "$1" in
                 if [ ! -e /etc/apache2/sites-available/openxpki.conf ]; then
                     cp /usr/share/doc/libopenxpki-perl/examples/apache2-openxpki-site.conf /etc/apache2/sites-available/openxpki.conf
                     /usr/sbin/a2enmod headers
+                    /usr/sbin/a2enmod rewrite
                     /usr/sbin/a2ensite openxpki
                 fi;
             fi;
