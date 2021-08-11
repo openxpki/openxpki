@@ -132,6 +132,11 @@ sub _build_driver {
     my $self = shift;
     my %args = %{$self->db_params}; # copy hash
 
+    # Remove undefined value (= empty option in originating config file)
+    for (keys %args) {
+        delete $args{$_} unless defined $args{$_};
+    }
+
     my $driver = $args{type};
     OpenXPKI::Exception->throw (
         message => "Parameter 'type' missing: it must equal the last part of a package in the OpenXPKI::Server::Database::Driver::* namespace.",
