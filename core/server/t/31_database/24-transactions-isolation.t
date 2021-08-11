@@ -31,7 +31,6 @@ my $log = Log::Log4perl->get_logger;
 
 my $db_params = {
     type => "MySQLTest",
-    host => "127.0.0.1", # if not specified, the driver tries socket connection
     name => $ENV{OXI_TEST_DB_MYSQL_NAME},
     user => $ENV{OXI_TEST_DB_MYSQL_USER},
     passwd => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},
