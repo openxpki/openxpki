@@ -83,27 +83,25 @@ sub execute {
 }
 
 sub git_checkout {
-    my ($env_repo, $dir_repo, $branch, $commit, $target) = @_;
+    my ($env_repo, $branch, $commit, $target) = @_;
 
-    my $repo;
-    my $is_local = 0;
-    # remote repo as specified
-    if ($ENV{$env_repo}) {
-        $repo = $ENV{$env_repo};
-        _stop 100, "Sorry, local repositories specified by file:// are not supported.\nUse this instead:\ndocker run -v /my/host/path:$dir_repo ..."
-            if $repo =~ / \A file /msx;
-    }
+    my $repo = $ENV{$env_repo};
+
+    _stop 100, "Please specify either a remote or local Git repo:\ndocker run -e $env_repo=https://...\ndocker run -e $env_repo=/repo -v /my/host/path:/repo ..."
+        if $repo !~ m{ \A ( / | (https?|ssh):// ) }msx;
+
+    my $is_local = not $repo =~ / \A (https?|ssh): /msx;
+
     # local repo from host (if Docker volume is mounted)
-    else {
-        # only continue if $dir_repo is a mountpoint (= device number differs from parent dir)
-        _stop 101, "Please specify either a remote or local Git repo:\ndocker run -e $env_repo=https://...\ndocker run -v /my/host/path:$dir_repo"
-            unless (-d $dir_repo and (stat $dir_repo)[0] != (stat "/")[0]);
-        $repo = "file://$dir_repo";
-        $is_local = 1;
+    if ($is_local) {
+        # stop unless $repo is a mountpoint (= device number differs from parent dir)
+        _stop 101, "Path specified in $env_repo is not a mountpoint"
+            unless (-d $repo and (stat $repo)[0] != (stat "/")[0]);
+        $repo = "file://$repo";
     }
 
     my $code = execute code => [ "git", "ls-remote", "-h", $repo ];
-    _stop 104, "Repo $repo either does not exist or is not readable" if $code;
+    _stop 103, "Repo $repo either does not exist or is not readable" if $code;
 
     #
     # Clone repository
@@ -122,7 +120,7 @@ sub git_checkout {
     #
     # Informations
     #
-    printf "  Repo:   %s\n", $is_local ? "local" : $ENV{$env_repo};
+    printf "  Repo:   %s%s\n", $ENV{$env_repo}, $is_local ? " (local)" : "";
     printf "  Branch: %s\n", $branch // "(default)";
     printf "  Commit: %s\n", $commit // "HEAD";
 
@@ -178,8 +176,8 @@ print "\n####[ Run tests in Docker container ]####\n";
 # Code repository
 #
 print "\nCode source:\n";
-my $local_repo = git_checkout('OXI_TEST_GITREPO', '/repo', $ENV{OXI_TEST_GITBRANCH}, $ENV{OXI_TEST_GITCOMMIT}, $clone_dir);
-_stop 103, "Code coverage tests only work with local repo" if ($mode eq "coverage" and not $local_repo);
+my $local_repo = git_checkout('OXI_TEST_GITREPO', $ENV{OXI_TEST_GITBRANCH}, $ENV{OXI_TEST_GITCOMMIT}, $clone_dir);
+_stop 104, "Code coverage tests only work with local repo" if ($mode eq "coverage" and not $local_repo);
 
 #
 # Config repository
@@ -191,25 +189,25 @@ if (not $config_gitbranch) {
     print "- no Git branch specified\n";
     print "   - checking if code is based on Github branch 'develop': ";
 
-    if (git_is_based_on($clone_dir, 'develop')) {
+    if (git_is_based_on($clone_dir, 'community')) {
         print "yes\n";
-        $config_gitbranch = 'develop';
+        $config_gitbranch = 'community';
     }
     else {
         print "no\n";
         print "   - checking if code is based on Github branch 'master': ";
-        if (git_is_based_on($clone_dir, 'master')) {
+        if (git_is_based_on($clone_dir, 'develop')) {
             print "yes\n";
-            $config_gitbranch = 'master';
+            $config_gitbranch = 'develop';
         }
         else {
             print "no\n";
-            print "   --> assuming private repo based on 'develop'\n";
-            $config_gitbranch = 'develop';
+            print "   --> assuming private repo based on 'community'\n";
+            $config_gitbranch = 'community';
         }
     }
 }
-git_checkout('OXI_TEST_CONFIG_GITREPO', '/config', $config_gitbranch, $ENV{OXI_TEST_CONFIG_GITCOMMIT}, $config_dir);
+git_checkout('OXI_TEST_CONFIG_GITREPO', $config_gitbranch, $ENV{OXI_TEST_CONFIG_GITCOMMIT}, $config_dir);
 
 #
 # List selected tests
@@ -261,10 +259,12 @@ chdir "$clone_dir/core/server";
 if ($mode eq "coverage") {
     print "\n====[ Testing the code coverage (this will take a while) ]====\n";
     execute show => "cover -test";
+
+    my $cover_src = "$clone_dir/core/server/cover_db";
     use DateTime;
     my $dirname = "code-coverage-".(DateTime->now->strftime('%Y%m%d-%H%M%S'));
-    my $cover_src = "$clone_dir/core/server/cover_db";
-    my $cover_target = "/repo/$dirname";
+    my $cover_target = sprintf "/%s/%s", $ENV{OXI_TEST_GITREPO}, $dirname;
+
     if (-d $cover_src) {
         system "mv", $cover_src, $cover_target;
         if (-d $cover_target) {
