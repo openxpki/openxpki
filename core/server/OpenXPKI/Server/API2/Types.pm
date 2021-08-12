@@ -74,7 +74,7 @@ A string used as identifier, allows word + underscore
 subtype 'Ident', # names $re_int_or_hex_string in old API
     as 'Str',
     where { $_ =~ qr{ \A [\w\-]+ \z }xmsi },
-    message { "$_ contains characters not allowed in an ident string" };
+    message { ($_//'<undef>') . " contains characters not allowed in an ident string" };
 
 =head2 Empty
 
@@ -84,7 +84,7 @@ The empty string
 subtype 'Empty',
     as 'Str',
     where { $_ =~ qr{ \A \z }xmsi },
-    message { "$_ is not the empty string" };
+    message { ($_//'<undef>') . " is not the empty string" };
 
 =head2 Base64
 
@@ -95,7 +95,7 @@ safe encoding.
 subtype 'Base64', # named $re_base64_string in old API
     as 'Str',
     where { $_ =~ qr{ \A [ A-Z a-z 0-9 = \+ / \- _ ]+ \z }xms },
-    message { "$_ contains characters not allowed in Base64 encoded strings" };
+    message { ($_//'<undef>') . " contains characters not allowed in Base64 encoded strings" };
 
 =head2 PEM
 
@@ -105,7 +105,7 @@ A PEM encoded data (i.e. Base64 encoded string separated by newlines).
 subtype 'PEM', # named $re_cert_string in old API (where it also wrongly included the underscore).
     as 'Str',  # "-" is needed for headers like -----BEGIN CERTIFICATE-----
     where { $_ =~ qr{ \A [ A-Z a-z 0-9 \+ / = \- \  \n \r ]+ \z }xms },
-    message { "$_ contains characters not allowed in PEM encoded data" };
+    message { ($_//'<undef>') . " contains characters not allowed in PEM encoded data" };
 
 =head2 PEMCert
 
@@ -115,7 +115,7 @@ A PEM encoded certificate
 subtype 'PEMCert',
     as 'PEM',
     where { $_ =~ m{ \A -----BEGIN\ ([\w\s]*)CERTIFICATE----- [^-]+ -----END\ \1CERTIFICATE----- \Z }msx },
-    message { "$_ is not a PEM encoded certificate" };
+    message { ($_//'<undef>') . " is not a PEM encoded certificate" };
 
 =head2 PEMCertChain
 
@@ -125,7 +125,7 @@ A PEM encoded certificate chain
 subtype 'PEMCertChain',
     as 'PEM',
     where { $_ =~ m{ \A ( -----BEGIN\ ([\w\s]*)CERTIFICATE----- [^-]+ -----END\ \2CERTIFICATE----- \s* )+ \Z }msx },
-    message { "$_ is not a PEM encoded certificate chain" };
+    message { ($_//'<undef>') . " is not a PEM encoded certificate chain" };
 
 =head2 PEMPKCS7
 
@@ -135,7 +135,7 @@ A PEM encoded PKCS7 container
 subtype 'PEMPKCS7',
     as 'PEM',
     where { $_ =~ m{ \A -----BEGIN\ PKCS7----- [^-]+ -----END\ PKCS7----- \Z }msx },
-    message { "$_ is not a PEM encoded PKCS7 container" };
+    message { ($_//'<undef>') . " is not a PEM encoded PKCS7 container" };
 
 =head2 PEMPKey
 
@@ -145,7 +145,7 @@ A PEM encoded private key container
 subtype 'PEMPKey',
     as 'PEM',
     where { $_ =~ m{ \A -----BEGIN\ ([\w\s]*)PRIVATE\ KEY----- [^-]+ -----END\ \1PRIVATE\ KEY----- \Z }msx },
-    message { "$_ is not a PEM encoded private key container" };
+    message { ($_//'<undef>') . " is not a PEM encoded private key container" };
 
 
 =head2 PEMPubKey
@@ -156,7 +156,7 @@ A PEM encoded private key container
 subtype 'PEMPubKey',
     as 'PEM',
     where { $_ =~ m{ \A -----BEGIN\ PUBLIC\ KEY----- [^-]+ -----END\ PUBLIC\ KEY----- \Z }msx },
-    message { "$_ is not a PEM encoded public key container" };
+    message { ($_//'<undef>') . " is not a PEM encoded public key container" };
 
 =head2 ArrayRefOrPEMCertChain
 
