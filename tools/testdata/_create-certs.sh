@@ -12,7 +12,14 @@
 
 # Where to store the certificates
 OXI_CONF="$1"
-[ ! -z "$OXI_CONF" -a -d "$OXI_CONF" ] || ( echo "OpenXPKI test config directory must be specified as first parameter"; exit 1 )
+if [[ -z "$OXI_CONF" ]]; then
+    echo "$(basename $0): test config directory must be specified as first parameter";
+    exit 1
+fi
+if [[ ! -d "$OXI_CONF" ]]; then
+    echo "$(basename $0): given test config directory $OXI_CONF does not exist";
+    exit 1
+fi
 
 # Only variable that is globally used
 TEMPDIR=`mktemp -d`
@@ -145,7 +152,7 @@ make_certs() {
 
     echo "Certificates for CA $2 (generation $GEN)"
 
-    echo " - creation using OpenSSL"
+    echo " - create via OpenSSL"
     # Self signed DataVault cert
     issue_cert "-extensions vault_cert" \
         $BASEPATH-datavault-$GEN "$SUBJECT_BASE DataVault $GEN" \
@@ -192,11 +199,11 @@ make_certs() {
             $BASEPATH-don-$GEN "$SUBJECT_BASE Client Don $GEN" \
             $BASEPATH-signer-$GEN $VALID_FROM $VALID_TO
 
-        echo " - revoking certificates christine and don"
+        echo " - revoke certificates christine and don"
         param=(-config $TEMPDIR/openssl.cnf -batch -verbose -keyfile $BASEPATH-signer-$GEN.pem -cert $BASEPATH-signer-$GEN.crt -passin pass:root)
         openssl ca ${param[@]} -revoke $BASEPATH-christine-$GEN.crt -crl_compromise 20100304070830Z   > $TEMPDIR/log 2>&1
         openssl ca ${param[@]} -revoke $BASEPATH-don-$GEN.crt       -crl_reason cessationOfOperation  > $TEMPDIR/log 2>&1
-        echo " - creating CRL"
+        echo " - create CRL"
         openssl ca ${param[@]} -gencrl -crldays 18250 -out $TARGET_DIR/ca/$REALM/$REALM-$GEN.crl      > $TEMPDIR/log 2>&1
     fi
 
