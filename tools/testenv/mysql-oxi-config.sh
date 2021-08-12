@@ -5,7 +5,7 @@ echo "MySQL: creating OpenXPKI database configuration"
 cat <<__DB > /etc/openxpki/config.d/system/database.yaml
 main:
     debug: 0
-    type: MySQL
+    type: MariaDB
     host: $OXI_TEST_DB_MYSQL_DBHOST
     port: $OXI_TEST_DB_MYSQL_DBPORT
     name: $OXI_TEST_DB_MYSQL_NAME
