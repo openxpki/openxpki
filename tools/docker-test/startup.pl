@@ -316,14 +316,11 @@ execute show => "/tools-copy/testenv/mysql-create-db.sh";
 execute show => "/tools-copy/testenv/mysql-create-schema.sh";
 
 #
-# Sample config (CA certificates etc.)
+# Start OpenXPKI and insert test certificates
 #
-execute show => "/tools-copy/testenv/insert-certificates.sh";
-
-#
-# Start OpenXPKI
-#
+`mkdir -p /etc/openxpki/local/keys/`;
 execute show => "/usr/local/bin/openxpkictl start";
+execute show => "/tools-copy/testenv/insert-certificates.sh";
 
 #
 # QA tests
