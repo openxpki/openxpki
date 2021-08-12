@@ -1,11 +1,35 @@
-oracle-xe-*.rpm.zip
+#
+# local config
+#
 .vagrant/
+
+# Sublime text editor
+*.sublime-project
+*.sublime-workspace
+
+# assets for Vagrant VM
+oracle-xe-*.rpm.zip
+
+#
+# Generated files
+#
+*.rpm
+*.deb
+core/server/OpenXPKI/VERSION.pm
+
+# translations
 core/i18n/**/*.mo
 core/i18n/en_GB/openxpki.po
 core/i18n/openxpki.pot
-core/server/OpenXPKI/VERSION.pm
-*.rpm
-*.deb
+
+# UI API
+core/htdocs_source/docs-api
+
+# test environment
+tools/testdata/generated-*
+tools/docker-test/scripts.tar
+
+#
+# Others
+#
 myperl-openxpki-ee/
-*.sublime-project
-*.sublime-workspace
