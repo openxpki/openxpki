@@ -396,7 +396,14 @@ has testenv_root => (
     isa => 'Str',
     lazy => 1,
     default => sub { scalar(tempdir( CLEANUP => 0 )) }, # "CLEANUP => 1" would interfere with forked processes (Watchdog)
+    # set flag if attribute was set via constructor
+    initializer => sub {
+        my ($self, $value, $callback, $attr) = @_;
+        $self->_custom_testenv_root(1);
+        $callback->($value);
+    },
 );
+has _custom_testenv_root => ( is => 'rw', isa => 'Bool', lazy => 1, default => 0 );
 
 =item * I<log_level> (optional) - L<Log::Log4Perl> log level for screen output.
 This is only relevant if C<$ENV{TEST_VERBOSE}> is set, i.e. user calls C<prove -v ...>.
@@ -601,8 +608,9 @@ sub DEMOLISH {
         diag "==========";
     }
     else {
-        # using "tempdir(CLEANUP => 1)" would interfere with forked processes (Watchdog)
-        remove_tree($self->testenv_root);
+        # using "tempdir(CLEANUP => 1)" in the attribute builder would
+        # interfere with forked processes (Watchdog)
+        remove_tree($self->testenv_root) unless $self->_custom_testenv_root;
     }
 }
 
