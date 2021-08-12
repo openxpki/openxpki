@@ -321,6 +321,7 @@ WriteMakefile(
         'Devel::NYTProf'                => 0,           # CPAN
         'English'                       => '1',         # for broken Perl installations like on Ubuntu Drapper
         'Exception::Class'              => '1.22',
+        'File::Which'                   => '1.27',      # docker-test.pl
         'HTML::Entities'                => 0,
         'IO::Prompt'                    => '0.099004',  # for deployment tools
         'JSON'                          => 0,

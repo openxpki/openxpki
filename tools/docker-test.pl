@@ -22,6 +22,9 @@ use Pod::Usage;
 use POSIX ":sys_wait_h";
 use Symbol qw( gensym );
 
+# CPAN modules
+use File::Which qw();
+
 
 # $interactive
 #   1 = STDIN can be used for input
@@ -83,6 +86,7 @@ sub get_branch_commit {
 
 
 my $project_root = realpath("$Bin/../");
+my $engine = File::Which::which('docker') || File::Which::which('podman') || die "Could not find 'docker' or 'podman'\n";
 
 #
 # Parse command line arguments
@@ -220,14 +224,14 @@ else {
     }
     chdir $olddir;
 
-    @cmd = ( qw( docker build -t oxi-test ), "$Bin/docker-test");
+    @cmd = ( $engine, qw( build -t oxi-test ), "$Bin/docker-test");
     execute \@cmd;
 }
 
 #
 # Run container
 #
-@cmd = ( qw( docker run -it --rm ), @docker_args, "oxi-test" );
+@cmd = ( $engine, qw( run -it --rm ), @docker_args, "oxi-test" );
 printf "\nExecuting: %s\n", join(" ", @cmd);
 execute \@cmd, 1;
 
