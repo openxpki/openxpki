@@ -28,15 +28,6 @@ has token => (
     },
 );
 
-has socket => (
-    is => 'ro',
-    lazy => 1,
-    default => sub {
-        my $self = shift;
-        return OpenXPKI::Config::Backend->new(LOCATION => $self->config_dir);
-    },
-);
-
 sub BUILD {
     my $self = shift;
     my $args = shift;
