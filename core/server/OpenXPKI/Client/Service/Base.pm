@@ -85,6 +85,11 @@ sub build_params {
         $param->{'client_ip'} = $ENV{REMOTE_ADDR};
     }
 
+    # User Agent
+    if ($envkeys{'user_agent'}) {
+        $param->{'user_agent'} = $ENV{HTTP_USER_AGENT};
+    }
+
     if ($envkeys{'endpoint'}) {
         $param->{'endpoint'} = $self->config()->endpoint();
     }

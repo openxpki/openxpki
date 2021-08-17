@@ -273,6 +273,11 @@ while (my $cgi = CGI::Fast->new()) {
         $param->{'client_ip'} = $ENV{REMOTE_ADDR};
     }
 
+    # User Agent
+    if ($envkeys{'user_agent'}) {
+        $param->{'user_agent'} = $ENV{HTTP_USER_AGENT};
+    }
+
     # be lazy and use endpoint name as servername
     if ($envkeys{'server'}) {
         if ($servername) {
