@@ -57,7 +57,7 @@ sub sqlam_params {
 }
 
 ################################################################################
-# required by OpenXPKI::Server::Database::Role::Driver
+# required by OpenXPKI::Server::Database::Role::SequenceEmulation
 #
 
 sub table_drop_query {
@@ -66,10 +66,6 @@ sub table_drop_query {
         string => "DROP TABLE IF EXISTS $table",
     );
 }
-
-################################################################################
-# required by OpenXPKI::Server::Database::Role::SequenceEmulation
-#
 
 sub sql_autoinc_column { return "INT PRIMARY KEY AUTO_INCREMENT" }
 

@@ -45,10 +45,6 @@ sub sqlam_params {
     sql_dialect => 'Oracle',
 };
 
-################################################################################
-# required by OpenXPKI::Server::Database::Role::Driver
-#
-
 sub sequence_create_query {
     my ($self, $dbi, $seq) = @_;
     return OpenXPKI::Server::Database::Query->new(

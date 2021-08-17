@@ -53,10 +53,6 @@ sub sqlam_params {
     limit_offset => 'LimitOffset',    # see SQL::Abstract::Limit source code
 }
 
-################################################################################
-# required by OpenXPKI::Server::Database::Role::Driver
-#
-
 sub sequence_create_query {
     my ($self, $dbi, $seq) = @_;
     return OpenXPKI::Server::Database::Query->new(

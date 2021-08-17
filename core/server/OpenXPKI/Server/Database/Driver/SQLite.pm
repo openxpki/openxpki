@@ -45,10 +45,6 @@ sub sqlam_params {
     limit_offset => 'LimitOffset',    # see SQL::Abstract::Limit source code
 }
 
-################################################################################
-# required by OpenXPKI::Server::Database::Role::Driver
-#
-
 sub table_drop_query {
     my ($self, $dbi, $table) = @_;
     return OpenXPKI::Server::Database::Query->new(
