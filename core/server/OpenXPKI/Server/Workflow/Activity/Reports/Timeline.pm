@@ -50,8 +50,8 @@ sub execute {
         $base_conditions{issuer_identifier} = $issuer;
     }
 
-    my $select_column = 'EXTRACT(YEAR_MONTH FROM (FROM_UNIXTIME(%s)))|ivl';
-    my $group_query = 'MONTH(FROM_UNIXTIME(%s)), YEAR(FROM_UNIXTIME(%1$s))';
+    my $select_column = 'CONCAT(EXTRACT(YEAR FROM FROM_UNIXTIME(%s)),EXTRACT(MONTH FROM FROM_UNIXTIME(%1$s)))|ivl';
+    my $group_query = 'EXTRACT(MONTH FROM FROM_UNIXTIME(%s)), EXTRACT(YEAR FROM FROM_UNIXTIME(%1$s))';
 
     my $db = CTX('dbi');
     my $series;
