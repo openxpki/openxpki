@@ -18,14 +18,20 @@ use SQL::Abstract::More; # TODO Use SQL::Maker instead of SQL::Abstract::More? (
 
 # Constructor arguments
 
+has 'driver' => (
+    is => 'ro',
+    does => 'OpenXPKI::Server::Database::Role::Driver',
+    required => 1,
+);
+
 has 'sqlam' => ( # SQL query builder
-    is => 'rw',
+    is => 'ro',
     isa => 'SQL::Abstract::More',
     required => 1,
 );
 
 has 'namespace' => ( # database namespace (i.e. schema) to prepend to tables
-    is => 'rw',
+    is => 'ro',
     isa => 'Str',
 );
 
@@ -67,8 +73,13 @@ sub _make_query {
 
     # Call SQL::Abstract::More method and store results
     my ($sql, @bind) = $self->sqlam->$method(%sqlam_args);
+
+    # Custom SQL replacements to support non-standard SQL (e.g. FROM_UNIXTIME)
+    $sql = $self->driver->do_sql_replacements($sql);
+
     $query->string($sql);
     $query->add_params(@bind); # there might already be bind values from a JOIN
+
     return $query;
 }
 

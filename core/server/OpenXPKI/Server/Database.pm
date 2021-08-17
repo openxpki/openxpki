@@ -70,6 +70,7 @@ has 'query_builder' => (
     default => sub {
         my $self = shift;
         return OpenXPKI::Server::Database::QueryBuilder->new(
+            driver => $self->driver,
             sqlam => $self->sqlam,
             $self->driver->namespace ? (namespace => $self->driver->namespace) : (),
         );

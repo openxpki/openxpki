@@ -52,6 +52,29 @@ sub table_drop_query {
     );
 }
 
+sub _get_x_from_date {
+    my ($part, $date) = @_;
+
+    my $date_map = {
+        year => '%Y',
+        month => '%m',
+        day => '%d',
+        hour => '%H',
+        minute => '%M',
+        second => '%S',
+    };
+    return sprintf "strftime('%s', %s)", $date_map->{lc($part)}, $date;
+}
+
+sub do_sql_replacements {
+    my ($self, $sql) = @_;
+
+    $sql =~ s/from_unixtime \s* \( \s* ( [^\)]+ ) \)/DATETIME($1, 'unixepoch')/msxi;
+    $sql =~ s/extract \s* \( \s* ( [^\)\s]+ ) \s+ from \s+ ( [^\(]* \( [^\)]* \) )* [^\)]* \)/_get_x_from_date($1,$2)/emsxi;
+
+    return $sql;
+}
+
 ################################################################################
 # required by OpenXPKI::Server::Database::Role::SequenceEmulation
 #

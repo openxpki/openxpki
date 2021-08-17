@@ -58,6 +58,9 @@ requires 'merge_query';
 # Returns OpenXPKI::Server::Database::Query: to count the rows of a given SELECT statement
 requires 'count_rows';
 
+# Returns a HashRef of qr() expressions and their replacement strings
+requires 'do_sql_replacements';
+
 1;
 
 =head1 SYNOPSIS

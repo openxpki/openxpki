@@ -79,6 +79,15 @@ sub count_rows {
     return $sth->fetchrow_hashref->{amount};
 }
 
+sub do_sql_replacements {
+    my ($self, $sql) = @_;
+
+    $sql =~ s{from_unixtime \s* \( \s* ( [^\)]+ ) \)}{TO_DATE\('19700101','YYYYMMDD'\) + \(1/86400\) * $1}msxi;
+
+    return $sql;
+}
+
+
 ################################################################################
 # required by OpenXPKI::Server::Database::Role::SequenceSupport
 #

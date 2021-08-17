@@ -65,6 +65,11 @@ sub table_drop_query {
     );
 }
 
+# FIXME do_sql_replacements() - insert DB2 version of UNIX_TIMESTAMP
+#   ...possibly something like:
+#   VALUES(CAST("1970-01-01-00.00.00.000000+00:00" AS TIMESTAMP WITH TIME ZONE) + 1611140400 seconds)
+sub do_sql_replacements { shift; shift } # return input argument
+
 ################################################################################
 # required by OpenXPKI::Server::Database::Role::SequenceSupport
 #

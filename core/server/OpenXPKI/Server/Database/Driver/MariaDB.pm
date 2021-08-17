@@ -88,6 +88,8 @@ sub table_drop_query {
     );
 }
 
+sub do_sql_replacements { shift; shift } # return input argument
+
 ################################################################################
 # required by OpenXPKI::Server::Database::Role::SequenceSupport
 #

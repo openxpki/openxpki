@@ -56,6 +56,8 @@ sub sqlam_params {
     limit_offset => 'LimitOffset',    # see SQL::Abstract::Limit source code
 }
 
+sub do_sql_replacements { shift; shift } # return input argument
+
 ################################################################################
 # required by OpenXPKI::Server::Database::Role::SequenceEmulation
 #
