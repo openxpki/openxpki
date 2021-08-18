@@ -39,6 +39,12 @@ has logger => (
     default => sub { return Log::Log4perl->get_logger; }
 );
 
+has __prefix_base64 => (
+    is => 'ro',
+    isa => 'Str',
+    default => '_encoded_base64_',
+);
+
 
 sub BUILD {
 
@@ -70,11 +76,9 @@ sub BUILD {
     # special transformations: insert sanitized keys names in the cache so the
     # check in param() will succeed.
     foreach my $key (keys %cache) {
-        # base64 encoded binary data
-        if (my ($item) = $key =~ /^_encoded_base64_(.*)/) {
-            $cache{$item} = undef;
-            next;
-        }
+        # Base64 encoded binary data
+        my $prefix_b64 = $self->__prefix_base64;
+        if (my ($item) = $key =~ /^$prefix_b64(.*)/) { $cache{$item} = undef; next }
     }
 
     $self->logger->debug('Request parameters: ' . join(' | ', keys %cache));
@@ -128,6 +132,9 @@ sub __param {
     # cache miss - query parameter
     unless (defined $self->cache->{$key}) {
         my $cgi = $self->cgi;
+
+        my $prefix_b64 = $self->__prefix_base64;
+
         my @queries = (
             # Try CGI parameters (and strip whitespaces)
             sub {
@@ -136,14 +143,14 @@ sub __param {
             },
             # Try Base64 encoded parameter from JSON input
             sub {
-                my $value = $self->cache->{"_encoded_base64_$key"};
+                my $value = $self->cache->{$prefix_b64.$key};
                 return unless $value;
                 return map { decode_base64($_) } (ref $value ? @{$value} : ($value))
             },
             # Try Base64 encoded CGI parameters
             sub {
                 return unless $cgi;
-                return map { decode_base64($_) } ($cgi->multi_param("_encoded_base64_$key"))
+                return map { decode_base64($_) } ($cgi->multi_param($prefix_b64.$key))
             },
         );
 
