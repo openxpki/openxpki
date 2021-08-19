@@ -90,6 +90,9 @@ case "$1" in
         # create index.html as symlink to default.html
         test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/index.html
 
+        # copy localconfig.yaml
+        test -e /var/www/openxpki/localconfig.yaml || cp /var/www/openxpki/localconfig.yaml.template /var/www/openxpki/localconfig.yaml
+
         # default download directory for CRLs
         if [ ! -d /var/www/download ]; then
             mkdir -p -m755 /var/www/download
