@@ -58,13 +58,48 @@ installdeps() {
     apt-get  install --fix-broken --yes
 }
 
+runtest() {
+
+    export OPENXPKI_TEST_PASSWORD=openxpki
+    cd /tmp
+    rm -rf /etc/openxpki/
+    dpkg --force-depends -i /packages/*.deb
+    apt-get  install --fix-broken --yes
+
+    /etc/init.d/mysql start
+    echo "
+    DROP database if exists openxpki;
+    CREATE database openxpki CHARSET utf8;
+    CREATE USER 'openxpki'@'localhost' IDENTIFIED BY 'openxpki';
+    CREATE USER 'openxpki_session'@'localhost' IDENTIFIED BY 'mysecret';
+    GRANT ALL ON openxpki.* TO 'openxpki'@'localhost';
+    flush privileges;" | mysql -u root
+
+    zcat "/usr/share/doc/libopenxpki-perl/examples/schema-mariadb.sql.gz" | mysql -u root openxpki
+
+    /usr/bin/openxpkictl start
+
+    openssl req -batch -x509 -newkey rsa:2048 -days 300 -nodes -keyout vault.key -out vault.crt -subj "/CN=Vault"
+    openssl req -batch -x509 -newkey rsa:2048 -days 1050 -nodes -keyout signer.key -out signer.crt -subj "/CN=Test CA Signer"
+    mkdir -p /etc/openxpki/local/keys/
+    openxpkiadm alias --file vault.crt --key vault.key --realm democa --token datasafe
+    openxpkiadm alias --file signer.crt --key signer.key --realm democa --token certsign
+
+    cd /tmp/openxpki/qatest/backend/webui
+
+    prove .
+}
+
 # no target, build openxpki base module
 if [ $# == 1 ] && [ "$1" == "repo" ]; then
     makerepo
 else
     test -d /deps && installdeps
     test -d /tmp/openxpki/ || fetchgit
-    if [ $# == 0 ]; then
+    if [ $# == 1 ] && [ "$1" == "test" ]; then
+        runtest
+        exit 0
+    elif [ $# == 0 ]; then
         make openxpki
     # should be a list of make targets
     else
