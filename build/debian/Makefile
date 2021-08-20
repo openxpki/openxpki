@@ -3,6 +3,9 @@
 build-deps.lst:
 	cp ../../package/debian/build-deps.lst .
 
+debian-deps.lst:
+	cp ../../package/debian/debian-deps.lst .
+
 build: build-deps.lst
 	docker build -t oxibuilder4debian .
 

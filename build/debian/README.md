@@ -40,3 +40,10 @@ extra packages (e.g. libscep) from the `extra` folder.
 
 If you want to sign the packages, place the required keys into the
 directory `secret`, you will be prompted for the passwords.
+
+Step 5 - Run Test
+-----------------
+
+Run `make test` to execute a minimal testset using the packages from a
+previous build in the `packages` directory.
+
