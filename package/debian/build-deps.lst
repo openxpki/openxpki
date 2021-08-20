@@ -34,3 +34,4 @@ liblog-dispatch-perl
 libxml-simple-perl
 libdata-page-perl
 libjson-maybexs-perl
+liburiparser1
