@@ -21,26 +21,6 @@ PACKAGES=			\
 
 DEBIAN_VERSION = $(shell cat /etc/debian_version)
 
-# Data::Serializer DateTime::Format::DateParse IPC::ShareLite
-# Locale::TextDomain Proc::ProcessTable Sys::SigAction Workflow
-# XML::Filter::XInclude XML::SAX::PurePerl XML::Validator::Schema
-# Exception::Class 1.22 Added Exception::Class::Base->caught()
-
-ifeq "$(DEBIAN_VERSION)" "buster/sid"
-EXTERNAL=				\
-	Crypt__OpenSSL__AES		\
-	Crypt__Cipher__AES \
-	Crypt__Argon2 \
-	Data__SpreadPagination		\
-	Class__Observable 		\
-	Config__Versioned \
-	Proc__SafeExec \
-	XML__Filter__XInclude \
-	Crypt__PKCS10 \
-	DBIx__Handler \
-    DBIx__TransactionManager \
-    Log__Log4perl__Layout__JSON
-else
 EXTERNAL=				\
 	Crypt__OpenSSL__AES		\
 	Crypt__Cipher__AES \
@@ -59,7 +39,6 @@ EXTERNAL=				\
     Log__Log4perl__Layout__JSON \
     JSON__MaybeXS \
     YAML__Tiny
-endif
 
 EXTERNAL2= \
 	Connector \
@@ -77,9 +56,13 @@ Data__SpreadPagination_BUILDOPTS = --version 0.1.2
 
 openxpki: $(PACKAGES)
 
+cpan: cpan_dependency cpan_dependency2
+
 cpan_dependency: $(EXTERNAL)
 
 cpan_dependency2: $(EXTERNAL2)
+
+release: cpan_dependency cpan_dependency2 Crypt__LibSCEP openxpki
 
 trusty: CGI Module__Build__Tiny Module__Load
 
