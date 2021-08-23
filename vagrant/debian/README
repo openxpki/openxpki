@@ -4,9 +4,7 @@ Package Mirror
 The vagrant files contain (where useful) a shared folder definition for
 the package mirror. Create an empty directory packages.openxpki.org next
 to the openxpki repository tree. This will be shared as /packages.openxpki.org
-and used as source for installing the openxpki packages. Its also used as 
-target for creating the upstream mirror in the build-jessie/build-trusty 
-machines.   
+and used as source for installing the openxpki packages. 
 
 Vagrant Machines
 ################
@@ -21,17 +19,3 @@ develop:
   The /code-repo tree is shared with the host, change code on the host 
   machine and use scripts/deploy.sh inside the guest to copy it over to 
   the actual code base.
-
-build: 
-  build cpan deps, core and i18 from the current tree.
-  Installs those packages, runs sample-setup and qatests.
-  If you want to create a copy of the public mirror, you need to create
-  the /packages.openxpki.org directory inside the vagrant machine, either
-  as local directory or as a shared folder as described above.
-  Then, after packages are built (which is done be the provisioning script
-  usually), call scripts/prepare.sh  from the host and afterwards
-  scripts/reprepro.sh from INSIDE the virtual machine. This will use the 
-  reprepro tool to create a repo structure. The signing key is defined in
-  package/debian/reprepro-debian/distributions and must be available
-  on your hosts gpg keyring.  
-

@@ -15,25 +15,12 @@ Vagrant.configure("2") do |config|
     test.vm.synced_folder "../../package/debian/deb", "/packages"
   end
 
-  config.vm.define "build" do |build|
-    build.vm.hostname = "oxi-build"
-    build.vm.provision :shell, :path => "provision-build.sh"
-    build.vm.synced_folder "../..", "/code-repo"
-    if File.exists?(File.expand_path('../../../packages.openxpki.org'))
-      build.vm.synced_folder "../../../packages.openxpki.org", "/packages.openxpki.org"
-    end
-  end
-
   config.vm.define "develop" do |develop|
     develop.vm.hostname = "oxi-dev"
     develop.vm.provision :shell, :path => "provision-develop.sh"
     develop.vm.network :forwarded_port, guest: 80, host: 8080
     develop.vm.network :forwarded_port, guest: 443, host: 8443
     develop.vm.synced_folder "../../", "/code-repo"
-    develop.vm.synced_folder "../../core/server/", "/usr/local/lib/x86_64-linux-gnu/perl/5.28.1/"
-    develop.vm.synced_folder "../../core/server/cgi-bin/", "/usr/lib/cgi-bin/"
-    develop.vm.synced_folder "../../config/", "/etc/openxpki/"
-    develop.vm.synced_folder "../../qatest/", "/qatest/"
   end
 
   # Provider-specific configuration so you can fine-tune various
@@ -42,7 +29,7 @@ Vagrant.configure("2") do |config|
   #
   config.vm.provider :virtualbox do |vb|
     # Use VBoxManage to customize the VM. For example to change memory:
-    vb.customize ["modifyvm", :id, "--memory", "1024"]
+    vb.customize ["modifyvm", :id, "--memory", "2048"]
   end
 
   config.ssh.forward_agent = true
