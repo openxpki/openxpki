@@ -342,16 +342,18 @@ sub parse_uri() {
     } elsif (defined $ENV{REQUEST_URI}) {
         ($ep, $nn, $rt) = $ENV{REQUEST_URI} =~ qq|${service}/([^/\?]+)(/([\\w\\-\\/]*))?(\\?.*)?\$|;
     }
-    $self->logger()->warn("Parsed URI: $ep => $rt".($rt||''));
+
     if (!$ep) {
         $self->logger()->warn("Unable to detect script name - please check the docs");
         $self->logger()->trace(Dumper \%ENV) if $self->logger->is_debug;
     } elsif (($service =~ m{(est|cmc)}) && !$rt) {
+        $self->logger()->debug("URI without endpoint, setting route: $ep");
         $self->endpoint('default');
         $self->route($ep);
     } else {
         $self->endpoint($ep);
         $self->route($rt) if ($rt);
+        $self->logger()->debug("Parsed URI: $ep => ".($rt||''));
     }
 
     return $self;
