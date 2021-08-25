@@ -77,7 +77,7 @@ my %known_proc_states = (
     # action finished with success
     finished => {
         hook => 'none', # perfectly handled by Workflow state engine
-        enforceable => [ 'archive' ],
+        enforceable => [ 'archive', 'delete' ],
     },
     # action paused
     pause => {
@@ -97,12 +97,12 @@ my %known_proc_states = (
     # workflow has been archived
     archived => {
         hook => '_runtime_exception',
-        enforceable => [ ],
+        enforceable => [ 'delete' ],
     },
     # workflow was forcibly failed
     failed => {
         hook => '_runtime_exception',
-        enforceable => [ 'archive' ],
+        enforceable => [ 'archive', 'delete' ],
     },
 );
 

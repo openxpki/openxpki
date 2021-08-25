@@ -3194,7 +3194,7 @@ msgstr ""
 "zur Detailansicht des aktuellen Status."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FAILED_LABEL"
-msgstr "Beendet"
+msgstr "Verworfen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO_FINISHED_DESC"
 msgstr ""
