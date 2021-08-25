@@ -336,11 +336,13 @@ sub parse_uri() {
 
     # Test for specific config file based on script name
     # SCRIPT_URL is only available with mod_rewrite
-    my ($ep, $nn, $rt);
+    # expected pattern is servicename/endpoint/route,
+    # route can contain a suffix like .exe which is used by some scep clients
+    my ($ep, $rt);
     if (defined $ENV{SCRIPT_URL}) {
-        ($ep, $nn, $rt) = $ENV{SCRIPT_URL} =~ qq|${service}/([^/]+)(/([\\w\\-\\/]*))?\$|;
+        ($ep, $rt) = $ENV{SCRIPT_URL} =~ qr@ ${service} / ([^/]+) (?:/ ([\w\-\/]+ (?:\.\w{3})? ) )?\z@x;
     } elsif (defined $ENV{REQUEST_URI}) {
-        ($ep, $nn, $rt) = $ENV{REQUEST_URI} =~ qq|${service}/([^/\?]+)(/([\\w\\-\\/]*))?(\\?.*)?\$|;
+        ($ep,$rt) = $ENV{REQUEST_URI} =~ qr@ ${service} / ([^/\?]+) (?:/([\w\-\/]+ (?:\.\w{3})? ))? (\?.*)? \z@x;
     }
 
     if (!$ep) {
