@@ -387,8 +387,8 @@ div.required textarea.form-control[disabled] {
   border:1px solid #ccc;
 }
 
-div.optional label.control-label:after {
-  content: '*';
+div.optional .col-form-label:after {
+  content: ' *';
 }
 
 div.optional input,
