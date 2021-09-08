@@ -1,4 +1,4 @@
-<div class="form-group {{if @field.error "has-error"}} {{if @field.is_optional "optional" "required"}} {{@field.class}}">
+<div class="form-group row {{if @field.error "has-error"}} {{if @field.is_optional "optional" "required"}} {{@field.class}}">
     {{#if this.isBool}}
         <div class="col-lg-2"></div>
     {{else}}
@@ -50,8 +50,6 @@
                 </:autofill>
             </FieldInstance>
         {{/let}}
-{{!--             autofill=this.autofill
- --}}
 
         {{#if @field.error}}
             <span class="help-block">{{@field.error}}</span>
