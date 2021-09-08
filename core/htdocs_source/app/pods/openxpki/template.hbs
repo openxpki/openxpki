@@ -113,12 +113,12 @@
             <div class="tab-pane {{if entry.active "active"}}">
                 <div class="Xcontainer sections">
                     <div class="row">
-                        <div class="{{if entry.right "col-md-8" "col-md-12"}}">
+                        <div class="{{if entry.right "col-lg-8" "col-lg-12"}}">
                             {{#each entry.main as |mainEntry|}}
                                 <OxiSection @content={{mainEntry}}/>
                             {{/each}}
                         </div>
-                        <div class="{{if entry.right "col-md-4" "hide"}}">
+                        <div class="{{if entry.right "col-lg-4" "hide"}}">
                             {{#each entry.right as |rightEntry|}}
                                 <div class="well">
                                     <OxiSection @content={{rightEntry}}/>

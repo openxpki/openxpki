@@ -1,12 +1,12 @@
 <div class="form-group {{if @field.error "has-error"}} {{if @field.is_optional "optional" "required"}} {{@field.class}}">
     {{#if this.isBool}}
-        <div class="col-md-2"></div>
+        <div class="col-lg-2"></div>
     {{else}}
-        <label class="col-md-2 control-label">{{@field.label}}</label>
+        <label class="col-lg-2 control-label">{{@field.label}}</label>
     {{/if}}
 
     {{#if @field.keys}}
-        <div class="col-md-2">
+        <div class="col-lg-2">
             <OxiBase::Select @list={{@field.keys}} @selected={{@field.name}} @onChange={{this.selectFieldType}} />
         </div>
     {{/if}}
@@ -59,7 +59,7 @@
     </div>
 
     {{#if @field.clonable}}
-        <div class="col-md-1 clonable-btn-group">
+        <div class="col-lg-1 clonable-btn-group">
             {{#if @field._canDelete}}
                 <BsButton @type="danger" @onClick={{this.delClone}} tabindex="-1">
                     <span class="glyphicon glyphicon-minus"></span>

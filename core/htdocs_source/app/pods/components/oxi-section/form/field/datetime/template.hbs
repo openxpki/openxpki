@@ -1,5 +1,5 @@
 <div class="row" {{may-focus this false}}>
-    <div class="col-md-8">
+    <div class="col-lg-8">
         <BsDatetimepicker {{on-init this.datepickerReady}}
             @date={{this.value}}
             @useCurrent={{if this.value false true}}
@@ -10,7 +10,7 @@
             @locale={{this.oxiLocale.locale}}
         />
     </div>
-    <div class="col-md-4">
+    <div class="col-lg-4">
         <input class="form-control" type="text" placeholder={{t 'component.oxifield_datetime.timezone' tz=this.timezoneLabel}} disabled/>
     </div>
 </div>

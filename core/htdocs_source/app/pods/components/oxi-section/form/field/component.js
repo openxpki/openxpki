@@ -29,7 +29,7 @@ export default class OxiFieldMainComponent extends Component {
         } else {
             size = 7;
         }
-        return 'col-md-' + size;
+        return 'col-lg-' + size;
     }
 
     get autofillConfig() {

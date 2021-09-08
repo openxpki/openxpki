@@ -4,14 +4,14 @@
             {{#each @buttons as |btn|}}
                 <div class="row stacked-buttons">
                     {{#if btn.section}}
-                        <div class="col-xs-12">
+                        <div class="col-12">
                             <strong>{{btn.section}}</strong>
                         </div>
                     {{else}}
-                        <div class="col-xs-4">
+                        <div class="col-4">
                             <OxiBase::Button @button={{btn}} class="btn-block" @onClick={{@buttonClick}}/>
                         </div>
-                        <div class="col-xs-8 btn-bt-margin">
+                        <div class="col-8 btn-bt-margin">
                             {{btn.description}}
                         </div>
                     {{/if}}
