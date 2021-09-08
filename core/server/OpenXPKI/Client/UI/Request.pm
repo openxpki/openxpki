@@ -95,6 +95,7 @@ sub BUILD {
         $cache{$_} = (ref $data->{$_} eq 'ARRAY' ? $data->{$_} : [ $data->{$_} ]) for keys %$data;
 
         $self->logger->debug('JSON param: ' . Dumper $data) if $self->logger->is_debug;
+
         $self->method('POST');
     }
 
