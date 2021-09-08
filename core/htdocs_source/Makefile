@@ -4,6 +4,14 @@ IMAGE=oxiuibuild
 .DEFAULT_GOAL := cache
 BUILD_UNMINIFIED = 0
 
+ifneq (, $(shell which podman))
+	RUN_C = podman
+	RUN_C_OPTS =
+else
+	RUN_C = docker
+	RUN_C_OPTS = --user `id -u`:`id -g`
+endif
+
 # main target: compile Ember code using (cached) Docker image
 cache: build compile
 
@@ -17,21 +25,20 @@ nocache: build-nocache compile
 # Docker image is built using the internal Docker cache, the last image
 # layer holding the copy of the source code is invalidated on code changes
 build:
-	docker build -t $(IMAGE) .
+	$(RUN_C) build -t $(IMAGE) .
 
 # force rebuild, will also update Node.js module dependencies
 build-nocache:
-	docker build --no-cache -t $(IMAGE) .
+	$(RUN_C) build --no-cache -t $(IMAGE) .
 
 compile:
-	docker run -ti --rm \
+	$(RUN_C) run -ti --rm \
 	  -v $(abspath ./):/source:ro \
 	  -v $(abspath ../server/htdocs):/compiled \
 	  -e "OPENXPKI_UI_BUILD_UNMINIFIED=${BUILD_UNMINIFIED}" \
-	  --user `id -u`:`id -g` \
-	  $(IMAGE)
+	  $(RUN_C_OPTS) $(IMAGE)
 	perl update-manifest.pl $(abspath ../server)
 
 # remove the build container
 prune:
-	docker rmi $(IMAGE)
+	$(RUN_C) rmi $(IMAGE)

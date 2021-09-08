@@ -1,4 +1,4 @@
-FROM node:fermium-buster-slim
+FROM docker.io/library/node:fermium-buster-slim
 
 # Note: npm needs Git to fetch some modules directly from Github
 RUN apt-get update && \
