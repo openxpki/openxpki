@@ -33,7 +33,7 @@
     "@glimmer/component": "^1.0.4",
     "@glimmer/tracking": "^1.0.4",
     "babel-eslint": "^10.1.0",
-    "bootstrap": "^3.4.1",
+    "bootstrap": "^4.6.0",
     "broccoli-asset-rev": "^3.0.0",
     "broccoli-funnel": "^3.0.8",
     "copy-text-to-clipboard": "^3.0.1",
