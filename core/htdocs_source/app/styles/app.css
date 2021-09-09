@@ -87,7 +87,7 @@ label {
 
 .navbar .dropdown-header {
   border-bottom: 1px solid #e9ecef;
-  margin-top: 0.75em;
+  padding: 0.5rem 0.5rem;
 }
 
 .maincontent {
