@@ -145,6 +145,10 @@ div.spacer {
   margin:5px;
 }
 
+.row + .row {
+  margin-top: 1rem;
+}
+
 /******************************************************************************
  * Loading indicators
  */
