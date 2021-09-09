@@ -35,6 +35,12 @@ export default class OpenXpkiController extends Controller {
         return "alert-info";
     }
 
+    @computed("model.status.message")
+    get statusHidden() {
+        let message = this.get("model.status.message");
+        return !message;
+    }
+
     @gt("model.tabs.length", 1) showTabs;
 
     // Wen don't use <ddm.LinkTo> but our own method to navigate to target page.

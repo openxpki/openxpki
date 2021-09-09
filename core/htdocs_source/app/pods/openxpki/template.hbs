@@ -65,13 +65,13 @@
 <div class="container-fluid  {{this.model.tabs.firstObject.page.className}}">
     <div class="oxi-message">
         {{#if this.model.status.href}}
-            <a href="{{this.model.status.href}}" target="_blank">
+            <a href="{{this.model.status.href}}" target="_blank" hidden={{this.statusHidden}}>
                 <div class="alert {{this.statusClass}}" style="cursor:pointer;">
                     <OxiBase::Formatted @format="nl2br" @value={{this.model.status.message}}/>
                 </div>
             </a>
         {{else}}
-            <div class="alert {{this.statusClass}}">
+            <div class="alert {{this.statusClass}}" hidden={{this.statusHidden}}>
                 <OxiBase::Formatted @format="nl2br" @value={{this.model.status.message}}/>
             </div>
         {{/if}}
