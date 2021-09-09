@@ -1,17 +1,17 @@
 <div class="container-fluid">
     <div class="header row">
-        <div class="col-6">
+        <div class="col-6 align-self-center">
             {{#if this.config.header}}
                 {{{this.config.header}}}
             {{else}}
                 <h2>
-                    <a href="./#/"><img src="{{this.rootURL}}img/logo.png" class="toplogo"></a>
+                    <a href="./#/"><img src="{{this.rootURL}}img/logo.png" class="toplogo align-middle"></a>
                     &nbsp;
-                    <small>{{t 'site.header'}}</small>
+                    <small class="align-middle text-black-50">{{t 'site.header'}}</small>
                 </h2>
             {{/if}}
         </div>
-        <div class="col-6">
+        <div class="col-6 align-self-center">
             <Application::Header::Userinfo/>
         </div>
     </div>
