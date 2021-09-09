@@ -20,10 +20,10 @@
                 {{/if}}
                 {{#each this.formattedColumns as |column|}}
                     {{#if column.sortable}}
-                        <th {{on "click" (fn this.sort column.sortPage)}} class="sortable {{if column.isSorted "bg-info"}}">
+                        <th {{on "click" (fn this.sort column.sortPage)}} class="sortable {{if column.isSorted "bg-secondary text-white"}}">
                             <span>{{column.sTitle}}</span>
                             {{#if column.isSorted}}
-                                <button type="button" class="btn btn-primary btn-sm pull-right">
+                                <button type="button" class="btn btn-light btn-sm float-right">
                                     {{#if this.pager.reverse}}
                                         <span class="glyphicon glyphicon-sort-by-attributes-alt"></span>
                                     {{else}}
@@ -31,7 +31,7 @@
                                     {{/if}}
                                 </button>
                             {{else}}
-                                <button type="button" class="btn btn-light btn-sm pull-right">
+                                <button type="button" class="btn btn-light btn-sm float-right">
                                     <span class="glyphicon glyphicon-sort-by-attributes text-muted"></span>
                                 </button>
                             {{/if}}
@@ -62,7 +62,7 @@
                                             <a {{on "click" (fn this.executeAction row action)}}>
                                                 {{action.label}}
                                                 {{#if action.icon}}
-                                                    <span class="pull-right glyphicon glyphicon-{{action.icon}}"></span>
+                                                    <span class="float-right glyphicon glyphicon-{{action.icon}}"></span>
                                                 {{/if}}
                                             </a>
                                         </ddm.item>
