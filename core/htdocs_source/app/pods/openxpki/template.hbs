@@ -81,7 +81,7 @@
         {{#if this.model.tabs.firstObject.page.breadcrumb.length}}
             <ol class="breadcrumb">
                 {{#each this.model.tabs.firstObject.page.breadcrumb as |entry|}}
-                    {{#if entry.label}}<li class="{{entry.className}}">{{entry.label}}</li>{{/if}}
+                    {{#if entry.label}}<li class="breadcrumb-item {{entry.className}}">{{entry.label}}</li>{{/if}}
                 {{/each}}
             </ol>
         {{/if}}

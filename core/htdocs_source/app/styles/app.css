@@ -202,52 +202,40 @@ div.spacer {
 /******************************************************************************
  * Breadcrumbs
  */
-.oxi-pagehead ol.breadcrumb {
-  margin:10px 0 0 0;
+
+.breadcrumb {
   padding: 0;
+  margin-bottom: 1rem;
   background-color: transparent;
-  border: none;
   border-radius: 0;
-  list-style: none inside;
   color: #a0a0a0;
 }
 
-ol.breadcrumb > li + li:before {
+.breadcrumb-item + .breadcrumb-item::before {
   color: #a0a0a0;
 }
 
-.oxi-pagehead ol.breadcrumb + h2 {
-  margin-top:10px;
-}
-
-ol.breadcrumb .workflow-type:before {
-  padding-right: 5px;
+.breadcrumb-item::before {
   font-family: "Glyphicons Halflings";
+  padding-right: 0.5rem;
+}
+
+.breadcrumb .workflow-type::before {
   content: "\e136";
-  color: #a0a0a0;
 }
 
-ol.breadcrumb .workflow-state:before {
-  padding-right: 5px;
-  font-family: "Glyphicons Halflings";
+.breadcrumb .workflow-state::before {
   content: "\e062";
-  color: #a0a0a0;
 }
 
-ol.breadcrumb .workflow-search:before,
-ol.breadcrumb .cert-search:before {
-  padding-right: 5px;
-  font-family: "Glyphicons Halflings";
+.breadcrumb .workflow-search::before,
+.breadcrumb .cert-search::before {
   content: "\e003";
-  color: #a0a0a0;
 }
 
-ol.breadcrumb .workflow-search-result:before,
-ol.breadcrumb .cert-search-result:before {
-  padding-right: 5px;
-  font-family: "Glyphicons Halflings";
+.breadcrumb .workflow-search-result::before,
+.breadcrumb .cert-search-result::before {
   content: "\e056";
-  color: #a0a0a0;
 }
 
 /******************************************************************************
