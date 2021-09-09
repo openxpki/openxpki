@@ -476,18 +476,31 @@ div.oxifield-upload {
 
 /* Button format from workflow defs */
 .oxi-btn-expected,
+.oxi-btn-submit,
+.oxi-btn-optional,
+.oxi-btn-failure,
+.oxi-btn-cancel,
+.oxi-btn-reset,
+.oxi-btn-alternative,
+.oxi-btn-exceptional,
+.oxi-btn-terminate {
+  color: #333;
+  border-color: #ccc;
+}
+
+.oxi-btn-expected,
 .oxi-btn-expected:hover,
 .oxi-btn-expected:focus,
 .oxi-btn-submit,
 .oxi-btn-submit:hover,
 .oxi-btn-submit:focus {
-    background-color: #c9e2b3;
+  background-color: #c9e2b3;
 }
 
 .oxi-btn-optional,
 .oxi-btn-optional:hover,
 .oxi-btn-optional:focus {
-    background-color: #e4e4da;
+  background-color: #e4e4da;
 }
 
 .oxi-btn-failure,
@@ -496,7 +509,7 @@ div.oxifield-upload {
 .oxi-btn-cancel,
 .oxi-btn-cancel:hover,
 .oxi-btn-cancel:focus {
-    background-color: #e39f9f;
+  background-color: #e39f9f;
 }
 
 .oxi-btn-reset,
@@ -505,19 +518,19 @@ div.oxifield-upload {
 .oxi-btn-alternative,
 .oxi-btn-alternative:hover,
 .oxi-btn-alternative:focus {
-    background-color: #ffd78c;
+  background-color: #ffd78c;
 }
 
 .oxi-btn-exceptional,
 .oxi-btn-exceptional:hover,
 .oxi-btn-exceptional:focus {
-    background-color: #79d1f3;
+  background-color: #79d1f3;
 }
 
 .oxi-btn-terminate,
 .oxi-btn-terminate:hover,
 .oxi-btn-terminate:focus {
-    background-color: #ad7fa8;
+  background-color: #ad7fa8;
 }
 
 /******************************************************************************

@@ -10,11 +10,11 @@ import { debug } from '@ember/debug';
  *
  * 1. show a `<a href/>` tag and simply open the given URL:
  *    ```html
- *    <OxiBase::Button @button={{myDef2}} class="btn btn-default"/>
+ *    <OxiBase::Button @button={{myDef2}} class="btn btn-secondary"/>
  *    ```
  * 2. show a `<button/>` tag and handle clicks via callback:
  *    ```html
- *    <OxiBase::Button @button={{myDef1}} @onClick={{sendData}} class="btn btn-default"/>
+ *    <OxiBase::Button @button={{myDef1}} @onClick={{sendData}} class="btn btn-secondary"/>
  *    ```
  *
  * @param { hash } button - the button definition.

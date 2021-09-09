@@ -3,16 +3,16 @@
         <div class="col-lg-8">
             <div class="input-group">
                 <input type="text" value={{this.label}} {{on "input" this.onFileNameChange}} readonly={{this.isLink}} class="form-control" />
-                <span class="input-group-btn">
-                    <BsButton class="oxi-btn-optional" @onClick={{this.download}} @icon="glyphicon glyphicon-download-alt">
+                <div class="input-group-append">
+                    <BsButton class="btn oxi-btn-optional" @onClick={{this.download}} @icon="glyphicon glyphicon-download-alt">
                         {{t 'component.oxi_download.download'}}
                     </BsButton>
-                </span>
+                </div>
             </div>
         </div>
         <div class="col-lg-4">
             {{#if this.isPlain}}
-                <button class="btn btn-default" type="button" {{on "click" this.copyToClipboard}}>
+                <button class="btn oxi-btn-optional" type="button" {{on "click" this.copyToClipboard}}>
                     <i class="glyphicon glyphicon-copy"></i>
                     {{t 'component.oxi_download.copy'}}
                 </button>
