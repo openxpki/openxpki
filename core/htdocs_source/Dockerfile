@@ -36,4 +36,4 @@ COPY package-lock.json /package-lock.json
 
 # install node modules
 WORKDIR /
-RUN npm install
+RUN npm install && npm audit fix
