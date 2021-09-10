@@ -2,7 +2,6 @@
     {{on "keydown" this.onKeydown}}
     {{on "mousedown" this.onMouseDown}}
     class="dropdown"
-    class={{if this.isDropdownOpen "open"}}
 >
     <input
         type="text"
@@ -15,17 +14,13 @@
         {{on "paste" this.onPaste}}
         {{may-focus this true}}
     />
-    <ul class="dropdown-menu" role="menu">
+    <div class="dropdown-menu {{if this.isDropdownOpen "show"}}" role="menu">
         {{#each this.searchResults as |result|}}
-            <li class="{{if result.active "active"}}">
-                <a {{action "selectResult" result}}>{{result.label}}</a>
-            </li>
+            <a class="dropdown-item {{if result.active "active"}}" {{action "selectResult" result}}>{{result.label}}</a>
         {{else}}
-            <li>
-                <a>{{t 'component.oxifield_text.no_search_results'}}</a>
-            </li>
+            <a class="dropdown-item">{{t 'component.oxifield_text.no_search_results'}}</a>
         {{/each}}
-    </ul>
+    </div>
 </div>
 {{#if this.isAutoComplete}}
     <div class="oxi-autocomplete">{{this.label}}&nbsp;</div>
