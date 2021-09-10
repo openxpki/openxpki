@@ -1,14 +1,21 @@
 <div class="row" {{may-focus this false}}>
     <div class="col-lg-8">
-        <BsDatetimepicker {{on-init this.datepickerReady}}
-            @date={{this.value}}
-            @useCurrent={{if this.value false true}}
-            @format={{this.format}}
-            @change={{this.datePicked}}
-            @openOnFocus={{true}}
-            @placeholder={{@content.placeholder}}
-            @locale={{this.oxiLocale.locale}}
-        />
+        <div class="input-group">
+            <EmberFlatpickr
+                class="form-control"
+                @date={{this.date}}
+                @onReady={{this.onReady}}
+                @onChange={{this.datePicked}}
+                @enableTime={{true}}
+                @dateFormat={{t 'component.oxifield_datetime.date_format'}}
+                @locale={{this.oxiLocale.shortLocale}}
+                placeholder={{@content.placeholder}}
+            />
+            <div class="input-group-append">
+                <BsButton @onClick={{this.flatpickr.open}} @icon="glyphicon glyphicon-calendar">
+                </BsButton>
+            </div>
+        </div>
     </div>
     <div class="col-lg-4">
         <input class="form-control" type="text" placeholder={{t 'component.oxifield_datetime.timezone' tz=this.timezoneLabel}} disabled/>

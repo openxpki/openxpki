@@ -418,6 +418,14 @@ div.oxifield-upload {
   color: #777;
 }
 
+/* Datetime */
+div.optional input.flatpickr-input {
+  background-color: transparent;
+}
+div.required input.flatpickr-input {
+  background-color: #fff3c2;
+}
+
 /******************************************************************************
  * Buttons
  */

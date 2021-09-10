@@ -365,6 +365,7 @@ export default class TestController extends Controller {
                         type: "datetime",
                         name: "dt_now",
                         label: "Date, now",
+                        placeholder: "Please select a date...",
                     },
                     {
                         type: "datetime",

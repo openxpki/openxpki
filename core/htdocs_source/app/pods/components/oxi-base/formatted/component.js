@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import moment from "moment-timezone";
+import { DateTime } from 'luxon';
 import { action } from '@ember/object';
 import copy from 'copy-text-to-clipboard';
 
@@ -46,8 +46,8 @@ export default class OxiFormattedComponent extends Component {
 
     get timestamp() {
         return (this.args.value > 0
-            ? moment.unix(this.args.value).utc().format("YYYY-MM-DD HH:mm:ss UTC")
-            : "---");
+            ? DateTime.fromSeconds(parseInt(this.args.value)).toFormat('yyyy-MM-dd HH:mm:ss') + ' UTC'
+            : '---');
     }
 
     get styledValue() {
