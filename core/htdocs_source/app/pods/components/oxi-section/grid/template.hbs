@@ -1,9 +1,15 @@
-<OxiSection::Grid::Pagination
-    @pager={{@def.pager}}
-    @pages={{this.pages}}
-    @pagesizes={{this.pagesizes}}
-    @setPage={{this.setPage}}
-/>
+{{#if @def.pager}}
+    <div class="row mb-2">
+        <div class="col-12">
+            <OxiSection::Grid::Pagination
+                @pager={{@def.pager}}
+                @pages={{this.pages}}
+                @pagesizes={{this.pagesizes}}
+                @setPage={{this.setPage}}
+            />
+        </div>
+    </div>
+{{/if}}
 
 <div class="table-responsive oxisection-grid">
     <table class="table table-striped table-bordered table-hover {{@def.className}}">
@@ -107,11 +113,13 @@
         <OxiBase::ButtonContainer @buttons={{this.buttons}} @buttonClick={{this.buttonClick}}/>
     </div>
     <div class="col-lg-6">
-        <OxiSection::Grid::Pagination
-            @pager={{@def.pager}}
-            @pages={{this.pages}}
-            @pagesizes={{this.pagesizes}}
-            @setPage={{this.setPage}}
-        />
+        {{#if @def.pager}}
+            <OxiSection::Grid::Pagination
+                @pager={{@def.pager}}
+                @pages={{this.pages}}
+                @pagesizes={{this.pagesizes}}
+                @setPage={{this.setPage}}
+            />
+        {{/if}}
     </div>
 </div>

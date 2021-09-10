@@ -103,16 +103,6 @@ label {
   background-color: #eee;
 }
 
-/* Fix pointer on bootstrap navbars */
-ul.pagination li:not(.disabled) > a {
-  cursor: pointer;
-}
-
-span.pagination-label {
-  float: left;
-  padding: 6px 0;
-}
-
 span.oxi-label {
     display: inline-block;
     white-space: nowrap;
@@ -131,11 +121,6 @@ dd + dt {
   padding-top: 0.5em;
 }
 
-/* Pager */
-.oxi-pager .pagination {
-  margin: 0;
-}
-
 /* Spacer */
 div.spacer {
   margin:5px;
@@ -143,6 +128,13 @@ div.spacer {
 
 .row + .row {
   margin-top: 1rem;
+}
+
+/******************************************************************************
+ * Pagination
+ */
+.pagination li:not(.disabled) > a {
+  cursor: pointer;
 }
 
 /******************************************************************************
