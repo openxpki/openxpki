@@ -5,6 +5,7 @@
 <BsNavbar
     @type="default"
     @backgroundColor="light"
+    class="border-top border-bottom py-0"
     @collapsed={{true}}
     @onCollapse={{action (mut this.collapsed) true}}
     @onExpand={{action (mut this.collapsed) false}} as |navbar|
