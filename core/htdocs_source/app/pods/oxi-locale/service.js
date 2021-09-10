@@ -10,13 +10,13 @@ export default class OxiLocaleService extends Service {
     constructor() {
         super(...arguments);
 
-        this.locale = 'en-US';
+        this.locale = 'en-us';
     }
 
     set locale(locale) {
         this._locale = locale;
         debug("oxi-locale - setting locale to " + locale);
-        this.intl.setLocale([locale]);
+        this.intl.setLocale([locale, 'en-us']); // use "en-us" as fallback in case of missing translations
     }
 
     get locale() {
