@@ -233,7 +233,7 @@ export default class TestController extends Controller {
                         },
                     },
                     {
-                        type: "text",
+                        type: "textarea",
                         name: "text_autofill",
                         label: "Autofill",
                         autofill: {
