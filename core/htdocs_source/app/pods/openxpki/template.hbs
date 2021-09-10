@@ -140,7 +140,7 @@
         @backdrop={{true}}
         @backdropClose={{false}}
         @onHidden={{action "clearPopupData"}}
-        @size={{if popup.page.isLarge "lg"}}
+        @size={{if popup.page.isLarge "xl" "lg"}}
         as |Modal|
     >
         <Modal.header>
@@ -165,6 +165,7 @@
     @fade={{true}}
     @backdrop={{true}}
     @backdropClose={{false}}
+    @size="lg"
     as |Modal|
 >
     <Modal.header>
