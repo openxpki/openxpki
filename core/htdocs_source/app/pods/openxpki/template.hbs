@@ -27,7 +27,7 @@
                                     {{#if entry.key}}
                                         {{! We need the href in addition to the click handler to support
                                             opening the page in a new window }}
-                                        <a class="nav-link" href="{{url-for "openxpki" entry.key}}" {{on "click" (fn this.navigateTo entry.key)}}>
+                                        <a class="dropdown-item nav-link" href="{{url-for "openxpki" entry.key}}" {{on "click" (fn this.navigateTo entry.key)}}>
                                             {{entry.label}}
                                         </a>
                                     {{else}}
