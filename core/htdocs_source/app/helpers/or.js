@@ -12,7 +12,7 @@ import Helper from "@ember/component/helper";
  * @module helper/or
  */
 export default class Or extends Helper {
-    compute(...args) {
+    compute(args) {
         return args.reduce((ac, val) => ac || !!val); // true if all are true
     }
 }
