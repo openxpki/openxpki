@@ -3415,14 +3415,6 @@ sub __render_fields {
                 }
             }
 
-        } elsif ($item->{format} eq 'head') {
-            # head can either show a value from context or a fixed label
-            if ($item->{value} eq '') {
-                $item->{value} = $item->{label};
-            }
-            $item->{empty} = $field->{ifempty} || '';
-            $item->{className} //= 'spacer';
-
         } elsif ($field_type eq 'select' && !$field->{template} && $field->{option} && ref $field->{option} eq 'ARRAY') {
             foreach my $option (@{$field->{option}}) {
                 next unless (defined $option->{value});
