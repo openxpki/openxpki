@@ -56,11 +56,15 @@
                     </div>
                 {{/if}}
             {{/each}}
+        </div>
+    </div>
 
+    <div class="row">
+        <div class="col-lg-12">
             {{#each this.sections as |sectionDef|}}
-                <div class="panel panel-primary">
-                    <div class="panel-heading"></div>
-                    <div class="panel-body">
+                <div class="card border-info">
+                    <div class="card-header bg-info"></div>
+                    <div class="card-body">
                         <OxiSection @content={{sectionDef}}/>
                     </div>
                 </div>
