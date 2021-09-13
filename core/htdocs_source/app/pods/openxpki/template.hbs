@@ -95,10 +95,10 @@
         </div>
     {{/if}}
     {{#if this.showTabs}}
-        <ul class="nav nav-tabs">
+        <ul class="nav nav-tabs mb-3">
             {{#each this.model.tabs as |entry|}}
-                <li class="{{if entry.active "active"}}">
-                    <a {{action "activateTab" entry}}>
+                <li class="nav-item">
+                    <a class="nav-link {{if entry.active "active"}}" {{action "activateTab" entry}} href="#">
                         {{if entry.page.shortlabel entry.page.shortlabel entry.page.label}}
                         <span class="tab-close" {{action "closeTab" entry}}>
                             {{!-- template-lint-disable no-bare-strings --}}
@@ -109,23 +109,23 @@
             {{/each}}
         </ul>
     {{/if}}
-    <div class="tab-content">
+    <div class="tab-content pb-3">
         {{#each this.model.tabs as |entry|}}
             <div class="tab-pane {{if entry.active "active"}}">
-                <div class="Xcontainer sections">
-                    <div class="row">
-                        <div class="{{if entry.right "col-lg-8" "col-lg-12"}}">
-                            {{#each entry.main as |mainEntry|}}
-                                <OxiSection @content={{mainEntry}}/>
-                            {{/each}}
-                        </div>
-                        <div class="{{if entry.right "col-lg-4" "hide"}}">
-                            {{#each entry.right as |rightEntry|}}
-                                <div class="well">
+                <div class="row">
+                    <div class="{{if entry.right "col-lg-8" "col-lg-12"}}">
+                        {{#each entry.main as |mainEntry|}}
+                            <OxiSection @content={{mainEntry}}/>
+                        {{/each}}
+                    </div>
+                    <div class="{{if entry.right "col-lg-4" "hide"}}">
+                        {{#each entry.right as |rightEntry|}}
+                            <div class="card bg-light border-secondary">
+                                <div class="card-body">
                                     <OxiSection @content={{rightEntry}}/>
                                 </div>
-                            {{/each}}
-                        </div>
+                            </div>
+                        {{/each}}
                     </div>
                 </div>
             </div>
