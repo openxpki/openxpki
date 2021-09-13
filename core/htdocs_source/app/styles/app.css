@@ -88,11 +88,6 @@ label {
   background-color: #eee;
 }
 
-span.oxi-label {
-    display: inline-block;
-    white-space: nowrap;
-}
-
 /* Remove padding below UL and DL */
 dl, ul {
   margin-bottom: 0;

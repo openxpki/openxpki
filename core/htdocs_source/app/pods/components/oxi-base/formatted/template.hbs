@@ -12,6 +12,8 @@
         {{this.timestamp}}
     {{else if (eq this.format "text")}}
         <OxiBase::Label @text={{v}} @raw={{false}} />
+    {{else if (eq this.format "subject")}}
+        <OxiBase::Label @text={{v}} @raw={{false}} @inline={{true}} @nowrap={{true}} />
     {{else if (eq this.format "nl2br")}}
         {{#each this.valueSplitByNewline as |line|}} {{line}}<br> {{/each}}
     {{else if (eq this.format "code")}}
