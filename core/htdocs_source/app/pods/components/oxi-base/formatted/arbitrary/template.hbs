@@ -5,7 +5,11 @@
         {{@value}}
     {{/if}}
 {{else}}
-    <BsButton @onClick={{this.toggleDetails}} @type="default" class="btn-sm">
+    <BsButton
+        @onClick={{this.toggleDetails}}
+        @type=""
+        class="btn-sm btn-light border-secondary"
+    >
         [{{this.type}}]
         {{#if this.detailsOpen}}
             <span class="glyphicon glyphicon-triangle-bottom"></span>

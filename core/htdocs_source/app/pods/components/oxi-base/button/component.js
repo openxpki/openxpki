@@ -66,7 +66,7 @@ export default class OxiButtonComponent extends Component {
 
     @computed("args.button.format")
     get additionalCssClass() {
-        if (!this.args.button.format) { return "btn-light" }
+        if (!this.args.button.format) { return "btn-light border-secondary" }
         let cssClass = format2css[this.args.button.format];
         if (cssClass === undefined) {
             /* eslint-disable-next-line no-console */

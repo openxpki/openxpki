@@ -21,7 +21,12 @@
             />
         {{/if}}
         <span class="input-group-btn">
-            <BsButton @type="default" @active={{this.customMode}} @onClick={{this.toggleCustomMode}}>
+            <BsButton
+                @type=""
+                @active={{this.customMode}}
+                @onClick={{this.toggleCustomMode}}
+                class="btn-light border-secondary"
+            >
                 {{t 'component.oxifield_select.custom_value'}}
             </BsButton>
         </span>
