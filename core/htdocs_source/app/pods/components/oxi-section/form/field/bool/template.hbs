@@ -2,9 +2,11 @@
     <input class="form-check-input"
         type="checkbox"
         checked={{@content.value}}
+        required={{not @content.is_optional}}
         {{on "change" this.onInput}}
         {{may-focus this false}}
     />
+    <div class="invalid-feedback">{{@error}}</div>
     <label class="form-check-label">
         {{@content.label}}
     </label>

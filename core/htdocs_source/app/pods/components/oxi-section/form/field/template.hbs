@@ -1,4 +1,4 @@
-<div class="form-group row {{if @field.error "has-error"}} {{if @field.is_optional "optional" "required"}} {{@field.class}}">
+<div class="form-group row {{if @field.is_optional "optional" "required"}} {{@field.class}}">
     {{#if this.isBool}}
         <div class="col-lg-2"></div>
     {{else}}
@@ -35,15 +35,12 @@
                 onError=this.onError
                 setFocusInfo=@setFocusInfo
                 encodeFields=@encodeFields
+                error=field._error
             ) as |FieldInstance|
         }}
             <FieldInstance>
             </FieldInstance>
         {{/let}}
-
-        {{#if @field.error}}
-            <span class="help-block">{{@field.error}}</span>
-        {{/if}}
     </div>
 
     {{#if @field.clonable}}

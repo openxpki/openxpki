@@ -3,6 +3,8 @@
     class="form-control"
     value={{@content.value}}
     placeholder={{@content.placeholder}}
+    required={{not @content.is_optional}}
     {{on "input" this.onInput}}
     {{may-focus this true}}
 />
+<div class="invalid-feedback">{{@error}}</div>

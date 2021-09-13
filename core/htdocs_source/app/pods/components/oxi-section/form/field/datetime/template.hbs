@@ -1,6 +1,6 @@
 <div class="row" {{may-focus this false}}>
     <div class="col-lg-8">
-        <div class="input-group">
+        <div class="input-group has-validation">
             <EmberFlatpickr
                 class="form-control"
                 @date={{this.date}}
@@ -10,7 +10,9 @@
                 @dateFormat={{t 'component.oxifield_datetime.date_format'}}
                 @locale={{this.oxiLocale.shortLocale}}
                 placeholder={{@content.placeholder}}
+                required={{not @content.is_optional}}
             />
+            <div class="invalid-feedback">{{@error}}</div>
             <div class="input-group-append">
                 <BsButton @onClick={{this.flatpickr.open}} @icon="glyphicon glyphicon-calendar">
                 </BsButton>

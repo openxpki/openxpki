@@ -8,12 +8,15 @@
         class="form-control"
         value={{this.value}}
         placeholder={{@content.placeholder}}
+        required={{not @content.is_optional}}
         {{on "input" this.onInput}}
         {{on "focus" this.onFocus}}
         {{on "blur" this.onBlur}}
         {{on "paste" this.onPaste}}
         {{may-focus this true}}
     />
+    <div class="invalid-feedback">{{@error}}</div>
+
     <div class="dropdown-menu {{if this.isDropdownOpen "show"}}" role="menu">
         {{#each this.searchResults as |result|}}
             <a class="dropdown-item {{if result.active "active"}}" {{action "selectResult" result}}>{{result.label}}</a>

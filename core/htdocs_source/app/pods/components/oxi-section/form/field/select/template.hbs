@@ -8,17 +8,21 @@
                 class="form-control"
                 value={{@content.value}}
                 placeholder={{@content.placeholder}}
+                required={{not @content.is_optional}}
                 {{on "input" this.onCustomInput}}
                 {{on-init this.onCustomInsert}}
                 {{may-focus this true}}
             />
+            <div class="invalid-feedback">{{@error}}</div>
         {{else}}
             <OxiBase::Select
                 @list={{this.options}}
                 @selected={{this.sanitizedValue}}
                 @onChange={{this.optionSelected}}
+                required={{not @content.is_optional}}
                 {{may-focus this true}}
             />
+            <div class="invalid-feedback">{{@error}}</div>
         {{/if}}
         <span class="input-group-btn">
             <BsButton
@@ -36,6 +40,8 @@
         @list={{this.options}}
         @selected={{this.sanitizedValue}}
         @onChange={{this.optionSelected}}
+        required={{not @content.is_optional}}
         {{may-focus this true}}
     />
+    <div class="invalid-feedback">{{@error}}</div>
 {{/if}}

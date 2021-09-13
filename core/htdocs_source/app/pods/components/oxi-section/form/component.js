@@ -18,7 +18,7 @@ class Field {
     tooltip;
     placeholder;
     actionOnChange;
-    @tracked error;
+    @tracked _error; // client-side error state
     autofill;
     /*
      * Clonable fields
@@ -132,6 +132,7 @@ export default class OxiSectionFormComponent extends Component {
             // dynamic input fields will change the form field name depending on the
             // selected option, so we need an internal reference to the original name ("_refName")
             field._refName = field.name;
+
             // set placeholder
             if (typeof field.placeholder === "undefined") {
                 field.placeholder = "";
@@ -290,10 +291,10 @@ export default class OxiSectionFormComponent extends Component {
     setFieldValue(field, value) {
         debug(`oxi-section/form (${this.args.def.action}): setFieldValue (${field.name} = "${value}")`);
         field.value = value;
-        if (field.error) field.error = null;
+        this.setFieldError(field, '');
 
         // action on change?
-        if (!field.actionOnChange) { return }
+        if (!field.actionOnChange) { return Promise.resolve() }
 
         debug(`oxi-section/form (${this.args.def.action}): executing actionOnChange ("${field.actionOnChange}")`);
         let request = {
@@ -334,7 +335,11 @@ export default class OxiSectionFormComponent extends Component {
     @action
     setFieldError(field, message) {
         debug(`oxi-section/form (${this.args.def.action}): setFieldError (${field.name} = ${message})`);
-        field.error = message;
+        field._error = message;
+        let domElement = this.focusFeedback[field._refName];
+        if (domElement) {
+            domElement.setCustomValidity(message);
+        }
     }
 
     /**
@@ -420,18 +425,15 @@ export default class OxiSectionFormComponent extends Component {
         debug(`oxi-section/form (${this.args.def.action}): submit`);
 
         // check validity and gather form data
-        let isError = false;
         for (const field of this.fields) {
             if (!field.is_optional && !field.value) {
-                isError = true;
-                field.error = this.intl.t('component.oxisection_form.missing_value');
+                this.setFieldError(field, this.intl.t('component.oxisection_form.missing_value'));
+                return;
             } else {
-                if (field.error) {
-                    isError = true;
-                }
+                // previously detected error (client- or server-side)?
+                if (field._error) return;
             }
         }
-        if (isError) { return }
 
         let request = {
             action: this.args.def.action,
@@ -442,13 +444,15 @@ export default class OxiSectionFormComponent extends Component {
         return this.content.updateRequest(request)
         .then((res) => {
             this.loading = false;
-            if (res.status != null && res.status.field_errors !== undefined) {
+            if (res?.status?.field_errors !== undefined) {
                 for (const faultyField of res.status.field_errors) {
                     let clones = this.fields.filter(f => f.name === faultyField.name);
                     if (typeof faultyField.index === "undefined") {
-                        clones.setEach("error", faultyField.error);
+                        for (const clone of clones) {
+                            this.setFieldError(clone, faultyField.error);
+                        }
                     } else {
-                        clones[faultyField.index].error = faultyField.error;
+                        this.setFieldError(clones[faultyField.index], faultyField.error);
                     }
                 }
             }

@@ -14,7 +14,7 @@
             {{on "dragover" this.showCopyEffect}}
             {{may-focus this true}}
         />
-        <div class="invalid-feedback">{{@content._error}}</div>
+        <div class="invalid-feedback">{{@error}}</div>
     </div>
     <div class="col-lg-2">
         {{#if @content.allow_upload}}
