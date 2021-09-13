@@ -18,6 +18,8 @@
         {{/if}}
     </BsButton>
     {{#if this.detailsOpen}}
-        <pre style="white-space: pre-wrap">{{this.asJSON}}</pre>
+        <div class="card card-body bg-light">
+            <pre style="white-space: pre-wrap">{{this.asJSON}}</pre>
+        </div>
     {{/if}}
 {{/if}}
