@@ -315,10 +315,6 @@ tr.certserial td li:last-child::after {
  * Form fields
  */
 
-input.in-form-group {
-  margin-bottom: 15px;
-}
-
 .oxi-no-input {
   padding-top: 6px;
 }

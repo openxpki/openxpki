@@ -1,11 +1,11 @@
 {{#if this.isFixed}}
 
-    <input type="text" class="form-control in-form-group"
+    <input type="text" class="form-control mb-2"
         value={{this.password}}
         required={{not @content.is_optional}}
         disabled
     />
-    <input type="text" class="form-control in-form-group"
+    <input type="text" class="form-control"
         value={{this.confirm}}
         placeholder={{this.placeholder}}
         required={{not @content.is_optional}}
@@ -15,13 +15,13 @@
 
 {{else}}
 
-    <input type="password" class="form-control in-form-group"
+    <input type="password" class="form-control mb-2"
         value={{this.password}}
         required={{not @content.is_optional}}
         {{on "input" this.passwordChange}}
         {{may-focus this true}}
     />
-    <input type="password" class="form-control in-form-group"
+    <input type="password" class="form-control"
         value={{this.confirm}}
         placeholder={{this.placeholder}}
         required={{not @content.is_optional}}
