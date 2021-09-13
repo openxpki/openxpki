@@ -58,6 +58,7 @@ export default class OxiFieldTextareaComponent extends Component {
     fileDropped(evt) {
         evt.stopPropagation();
         evt.preventDefault();
+        if (!this.args.allow_upload) return;
         this.setFile(evt.dataTransfer.files[0]);
     }
 
@@ -65,6 +66,7 @@ export default class OxiFieldTextareaComponent extends Component {
     showCopyEffect(evt) {
         evt.stopPropagation();
         evt.preventDefault();
+        if (!this.args.allow_upload) return;
         evt.dataTransfer.dropEffect = 'copy'; // show as "copy" action
     }
 

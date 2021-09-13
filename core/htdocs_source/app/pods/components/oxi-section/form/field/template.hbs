@@ -38,16 +38,6 @@
             ) as |FieldInstance|
         }}
             <FieldInstance>
-                <:autofill as |isDisabled valueSetter|>
-                    {{#if this.autofillConfig}}
-                        <OxiSection::Form::Autofill
-                            @config={{this.autofillConfig}}
-                            @disabled={{isDisabled}}
-                            @valueSetter={{valueSetter}}
-                            @encodeFields={{@encodeFields}}
-                        />
-                    {{/if}}
-                </:autofill>
             </FieldInstance>
         {{/let}}
 

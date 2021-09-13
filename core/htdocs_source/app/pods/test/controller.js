@@ -478,7 +478,7 @@ export default class TestController extends Controller {
                     {
                         type: "textarea",
                         name: "prosa_autofill",
-                        label: "Textarea",
+                        label: "Textarea (Autofill)",
                         value: "",
                         autofill: {
                             request: {
@@ -496,7 +496,7 @@ export default class TestController extends Controller {
                         type: "textarea",
                         name: "textarea_upload",
                         value: "...data...",
-                        label: "Uploadarea",
+                        label: "Textarea (Autofill + Upload)",
                         allow_upload: 1,
                         autofill: {
                             request: {
