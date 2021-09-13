@@ -510,6 +510,7 @@ div.required input.flatpickr-input {
  * Tiles
  */
 .oxi-tile {
+  background: transparent;
   border: 1px solid transparent;
 }
 
