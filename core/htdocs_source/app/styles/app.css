@@ -80,7 +80,7 @@ label {
 }
 
 .table-bordered tr.spacer th {
-  padding-top:15px;
+  padding-top: 1rem;
   background-color: #eee;
 }
 

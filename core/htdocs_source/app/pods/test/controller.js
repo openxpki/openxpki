@@ -684,6 +684,10 @@ export default class TestController extends Controller {
                 description: "",
                 data: [
                     {
+                        format: "head",
+                        value: "These is all we got:",
+                    },
+                    {
                         format: "certstatus",
                         label: "certstatus",
                         value: {
@@ -714,6 +718,11 @@ export default class TestController extends Controller {
                         format: "timestamp",
                         label: "timestamp",
                         value: 1617495633,
+                    },
+                    {
+                        format: "head",
+                        value: "More values...",
+                        className: "spacer",
                     },
                     {
                         format: "text",
