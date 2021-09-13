@@ -426,10 +426,11 @@ div.required input.flatpickr-input {
   padding-bottom: 20px;
 }
 
-.oxi-button-container a.btn:before {
-  padding-right: 5px;
+.oxi-button-container a.btn::before {
   font-family: "Glyphicons Halflings";
   content: "\e144";
+  font-size: 80%;
+  padding-right: 0.5rem;
   color: #a0a0a0;
 }
 
