@@ -37,10 +37,6 @@ label {
   text-overflow: ellipsis;
 }
 
-.description {
-  margin-bottom: 12px;
-}
-
 .tab-close {
   font-size: 18px;
   font-weight: bold;
