@@ -862,6 +862,30 @@ export default class TestController extends Controller {
                         label: "head",
                     },
                 ],
+                buttons: [
+                    {
+                        format: "expected",
+                        page: "certificate!search!query!rJdrIbg1P6xsE6b9RtQCXp291SE",
+                        label: "Reload Search Form",
+                    },
+                    {
+                        format: "alternative",
+                        page: "redirect!certificate!result!id!rJdrIbg1P6xsE6b9RtQCXp291SE",
+                        label: "Refresh Result",
+                        break_after: 1,
+                    },
+                    {
+                        label: "New Search",
+                        format: "failure",
+                        page: "certificate!search"
+                    },
+                    {
+                        label: "Export Result",
+                        format: "optional",
+                        target: "_blank",
+                        href: "/cgi-bin/webui.fcgi?page=certificate!export!id!rJdrIbg1P6xsE6b9RtQCXp291SE"
+                    }
+                ],
             }
         },
 

@@ -101,11 +101,6 @@ dd + dt {
   padding-top: 0.5em;
 }
 
-/* Spacer */
-div.spacer {
-  margin:5px;
-}
-
 .row + .row {
   margin-top: 1rem;
 }

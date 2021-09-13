@@ -19,14 +19,15 @@
             {{/each}}
         {{else}}
             {{#each this.buttonGroups as |btnGroup|}}
-                {{#each btnGroup as |btn|}}
-                    {{#if btn.section}}
-                        <!-- Section are not supported yet -->
-                    {{else}}
-                        <OxiBase::Button @button={{btn}} @onClick={{@buttonClick}}/>
-                    {{/if}}
-                {{/each}}
-                <div class="spacer"></div>
+                <div class="mb-1">
+                    {{#each btnGroup as |btn|}}
+                        {{#if btn.section}}
+                            <!-- Section are not supported yet -->
+                        {{else}}
+                            <OxiBase::Button @button={{btn}} @onClick={{@buttonClick}}/>
+                        {{/if}}
+                    {{/each}}
+                </div>
             {{/each}}
         {{/if}}
     </span>
