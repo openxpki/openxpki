@@ -44,8 +44,16 @@ export default class OxiSectionTilesComponent extends Component {
                 result.push(newline);
                 col = 0;
             }
-            if (t.type == 'newline') col = 0;
-            result.push(t);
+
+            let newTile = { ...t };
+
+            if (t.type == 'newline') {
+                col = 0;
+            } else {
+                newTile.content ||= {};
+                newTile.content.format = 'tile'; // button format
+            }
+            result.push(newTile);
         }
         return result;
     }
