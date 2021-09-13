@@ -28,13 +28,8 @@ body {
 */
 
 .toplogo {
-  padding-top:6px;
-  padding-right:12px;
-}
-
-label {
-  overflow: hidden;
-  text-overflow: ellipsis;
+  padding-top: 0.5rem;
+  padding-right: 1rem;
 }
 
 .tab-close {
@@ -99,6 +94,10 @@ dd + dt {
 
 .row + .row {
   margin-top: 1rem;
+}
+
+.userinfo {
+  font-size: 80%;
 }
 
 /******************************************************************************
