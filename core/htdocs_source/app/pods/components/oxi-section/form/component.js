@@ -291,7 +291,7 @@ export default class OxiSectionFormComponent extends Component {
     setFieldValue(field, value) {
         debug(`oxi-section/form (${this.args.def.action}): setFieldValue (${field.name} = "${value}")`);
         field.value = value;
-        this.setFieldError(field, '');
+        if (value !== undefined && value !== '') this.setFieldError(field, '');
 
         // action on change?
         if (!field.actionOnChange) { return Promise.resolve() }
