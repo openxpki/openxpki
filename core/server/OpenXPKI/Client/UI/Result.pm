@@ -1039,7 +1039,9 @@ sub make_autocomplete_query {
 
 =head2 fetch_autocomplete_params
 
-Uses the C<__encrypted> request parameter to re-assemble .
+Uses the C<__encrypted> request parameter to re-assemble the full hash of
+autocomplete parameters by decoding the encrypted static values and querying
+the whitelisted dynamic values.
 
 B<Parameters>
 
@@ -1049,6 +1051,7 @@ B<Parameters>
 
 =back
 
+B<Returns> a I<HashRef> of query parameters
 =cut
 
 sub fetch_autocomplete_params {
@@ -1056,7 +1059,7 @@ sub fetch_autocomplete_params {
     my $self = shift;
 
     my $data = $self->decrypted_param('__encrypted')
-        or return;
+        or return {};
 
     my %params = %{ $data->{persistent_params} };
     $params{$_} = $self->param($_) for @{ $data->{user_param_whitelist} };

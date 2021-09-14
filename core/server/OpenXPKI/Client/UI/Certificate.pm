@@ -1075,7 +1075,7 @@ sub action_autocomplete {
     my $args = shift;
 
     my $term = $self->param('cert_identifier') || '';
-    my $params = $self->fetch_autocomplete_params;
+    my $params = $self->fetch_autocomplete_params; # from OpenXPKI::Client::UI::Result
 
     $self->logger()->trace( "autocomplete query: $term") if $self->logger->is_trace;
 
@@ -1114,7 +1114,7 @@ sub action_autocomplete {
             expires_after => time(),
             status => 'ISSUED',
             entity_only => 1,
-            %{ $params->{search_cert_args} },
+            %$params,
         });
 
         foreach my $item (@{$search_result}) {

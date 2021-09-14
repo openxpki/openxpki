@@ -2681,9 +2681,21 @@ sub __render_input_field {
         $item->{options} = $field->{option};
     }
 
-    # type 'cert_identifier' - special handling of preset value
-    if ($type eq 'cert_identifier' && $value) {
-        $item->{type} = 'static';
+    # type 'cert_identifier'
+    if ($type eq 'cert_identifier') {
+        # special handling of preset value
+        if ($value) {
+            $item->{type} = 'static';
+        }
+        else {
+            $item->{type} = 'text';
+            $item->{autocomplete_query} = {
+                action => "certificate!autocomplete",
+                params => {
+                    cert_identifier => $item->{name},
+                },
+            };
+        }
     }
 
     # type 'uploadarea' - transform into 'textarea'
