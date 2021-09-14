@@ -1,13 +1,9 @@
+@import url("bootstrap-v4-tweaks.css");
 @import url("glyphicons.css");
 
 /******************************************************************************
  * Header, page structure, basic elements
  */
-html,
-body {
-  height: 100%;
-  /* The html and body elements cannot have any padding or margin. */
-}
 
 #waiting-for-ember .alert {
   margin-top: 1em;
@@ -19,13 +15,6 @@ body {
   padding-top: 20px;
   background-color: #f5f5f5;
 }
-
-/*
-.header {
-  margin-top: 0;
-  margin-bottom: 0;
-}
-*/
 
 .toplogo {
   padding-top: 0.5rem;
@@ -46,54 +35,6 @@ body {
   text-decoration: none;
   cursor: pointer;
   opacity: 0.5;
-}
-
-.modal-header + .modal-body h3 {
-  margin-top:5px;
-}
-
-/* Menu (navigation bar) */
-.navbar {
-  margin-bottom:10px;
-}
-
-.navbar .dropdown-header {
-  border-bottom: 1px solid #e9ecef;
-  padding: 0.5rem 0.5rem;
-}
-
-.maincontent {
-  margin-bottom:300px;
-}
-
-.container.sections {
-  padding-top:20px;
-}
-
-.section {
-  padding:0px !important;
-}
-
-.table-bordered tr.spacer th {
-  padding-top: 1rem;
-  background-color: #eee;
-}
-
-/* Remove padding below UL and DL */
-dl, ul {
-  margin-bottom: 0;
-}
-
-/* Indent DL items */
-dd {
-  padding: 0 0 0 1em;
-}
-dd + dt {
-  padding-top: 0.5em;
-}
-
-.row + .row {
-  margin-top: 1rem;
 }
 
 .userinfo {
@@ -151,10 +92,6 @@ dd + dt {
 @keyframes spin {
   0% { -webkit-transform: rotate(0deg); transform: rotate(0deg); }
   100% { -webkit-transform: rotate(359deg); transform: rotate(359deg); }
-}
-
-.waiting-for-ember {
-  margin-top: 80px;
 }
 
 /******************************************************************************
@@ -258,8 +195,15 @@ tr.gridrow-danger > td {background-color: #ebcccc !important;}
 tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
 
 /******************************************************************************
- * Status labels inside key/value lists
+ * Key-Value lists
  */
+
+.table-bordered tr.spacer th {
+  padding-top: 1rem;
+  background-color: #eee;
+}
+
+/* Status labels */
 .styled-valid,
 .dns-valid,
 .certstatus-issued {
@@ -291,21 +235,20 @@ tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
 .styled-failed {
   font-weight: bold;
 }
-/* keep line wraps in code */
+
+/* <code> - keep line wraps */
 code { white-space: pre; }
 
 /* certificate serial number in details popup */
 tr.certserial td li {
   line-height:1.8em;
 }
-/* First child is the hex number */
-tr.certserial td li:first-child::after {
+tr.certserial td li:first-child::after { /* first child is the hex number */
   content: "hex";
   font-size: .70em;
   vertical-align: sub;
 }
-/* Last child is the decimal number */
-tr.certserial td li:last-child::after {
+tr.certserial td li:last-child::after { /* last child is the decimal number */
   content: "dec";
   font-size: .70em;
   vertical-align: sub;
@@ -316,7 +259,7 @@ tr.certserial td li:last-child::after {
  */
 
 .oxi-no-input {
-  padding-top: 6px;
+  padding-top: 0.4rem;
 }
 
 /* Input fields */
