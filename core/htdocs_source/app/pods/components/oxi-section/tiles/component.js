@@ -45,12 +45,14 @@ export default class OxiSectionTilesComponent extends Component {
                 col = 0;
             }
 
-            let newTile = { ...t };
+            let newTile = {
+                ...t,
+                content: { ...t.content }, // explicitely copy content so Ember does not complain if we set format below
+            };
 
             if (t.type == 'newline') {
                 col = 0;
             } else {
-                newTile.content ||= {};
                 newTile.content.format = 'tile'; // button format
             }
             result.push(newTile);
