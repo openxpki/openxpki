@@ -354,10 +354,12 @@ command "validate_certificate" => {
 
     ##! 64: 'Validation result ' . Dumper $valid
 
-    $chain_status = 'BROKEN' unless($valid);
+    if (!$valid) {
+        $chain_status = 'BROKEN';
 
-    # check given trust anchors
-    if ($valid and $params->has_anchor) {
+    # check against given trust anchors
+    } elsif ($params->has_anchor) {
+
         $chain_status = 'UNTRUSTED';
         my @trust_anchors = @{ $params->anchor };
         ##! 16: 'Checking valid certificate against trust anchor list'
