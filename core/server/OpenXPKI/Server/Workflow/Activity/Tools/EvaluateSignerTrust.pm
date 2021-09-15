@@ -90,7 +90,6 @@ sub execute {
     my $signer_realm = 'unknown';
     my $signer_profile = 'unknown';
 
-
     if ($cert_hash) {
         ##! 16: 'certificate found in database'
         # certificate was found in local database
@@ -131,8 +130,13 @@ sub execute {
         if (!$cert_status ) {
             ##! 32: 'chain validation died'
             CTX('log')->application()->warn("Unable to build chain for external certificate");
+
+        } elsif ($cert_status eq 'BROKEN') {
+            ##! 32: 'chain reported broken'
+            CTX('log')->application()->warn("Chain validation was not successful");
+
         } else {
-            ##! 32: 'chain validation status ' . $chain_validate->{status}
+            ##! 32: 'chain validation status ' . $cert_status
             @signer_chain = @{$chain_validate->{chain}};
             # remove the entity from the chain
             shift @signer_chain;
