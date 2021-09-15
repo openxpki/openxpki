@@ -2,10 +2,11 @@
     <input class="form-check-input"
         type="checkbox"
         checked={{@content.value}}
+        id={{@content.name}}
         {{on "change" this.onInput}}
         {{may-focus this false}}
     />
-    <label class="form-check-label">
+    <label class="form-check-label" for={{@content.name}}>
         {{@content.label}}
     </label>
 </div>
