@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action, computed } from "@ember/object";
+import { action } from "@ember/object";
 import { debug } from '@ember/debug';
 
 export default class OxiFieldSelectComponent extends Component {
@@ -17,9 +17,8 @@ export default class OxiFieldSelectComponent extends Component {
         return (this.options.map(o => o.value).indexOf[val] < 0);
     }
 
-    @computed("args.content.{options,prompt,is_optional}")
     get options() {
-        var options, prompt, ref;
+        let options, prompt, ref;
         prompt = this.args.content.prompt;
         if (!prompt && this.args.content.is_optional) {
             prompt = "";
@@ -32,7 +31,6 @@ export default class OxiFieldSelectComponent extends Component {
         }
     }
 
-    @computed("args.content.{options,editable,is_optional}")
     get isStatic() {
         let options = this.args.content.options;
         let isEditable = this.args.content.editable;

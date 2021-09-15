@@ -1,5 +1,4 @@
 import Component from '@glimmer/component';
-import { computed } from '@ember/object';
 
 /**
  * Draws tiles.
@@ -27,7 +26,6 @@ import { computed } from '@ember/object';
  * @module component/oxi-section/tiles
  */
 export default class OxiSectionTilesComponent extends Component {
-    @computed("args.def.tiles")
     get tiles() {
         let tiles = this.args.def.tiles || [];
         let maxcol = this.args.def.maxcol;
@@ -60,7 +58,6 @@ export default class OxiSectionTilesComponent extends Component {
         return result;
     }
 
-    @computed("args.def.align")
     get align() {
         let defaultAlign = 'left';
         let align = this.args.def.align || defaultAlign;

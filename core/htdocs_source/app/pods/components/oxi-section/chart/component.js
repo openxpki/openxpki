@@ -1,5 +1,4 @@
 import Component from '@glimmer/component';
-import { computed } from '@ember/object';
 
 /**
  * Draws a chart.
@@ -7,7 +6,6 @@ import { computed } from '@ember/object';
  * @module component/oxi-section/chart
  */
 export default class OxiSectionKeyvalueComponent extends Component {
-    @computed("args.def.options")
     get options() {
         let add = {};
         if (this.args.def.className) {

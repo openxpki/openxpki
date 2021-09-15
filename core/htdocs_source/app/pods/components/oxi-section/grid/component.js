@@ -40,7 +40,6 @@ export default class OxiSectionGridComponent extends Component {
     get multipleActions() { return this.rawActions.length > 1 }
     get firstAction() { return this.rawActions[0] }
 
-    @computed("rawColumns")
     get visibleColumns() {
         return this.rawColumns
         .map( (col, index) => { col.index = index; return col })

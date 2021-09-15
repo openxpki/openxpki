@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action, computed } from '@ember/object';
+import { action } from '@ember/object';
 import { inject } from '@ember/service';
 
 export default class OxiFieldPasswordverifyComponent extends Component {
@@ -10,7 +10,6 @@ export default class OxiFieldPasswordverifyComponent extends Component {
     @tracked confirm = "";
     @tracked isFixed = false;
 
-    @computed("args.content.placeholder")
     get placeholder() {
         return this.args.content.placeholder || this.intl.t('component.oxifield_passwordverify.retype_password');
     }
