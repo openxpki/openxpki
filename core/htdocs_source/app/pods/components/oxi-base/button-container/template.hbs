@@ -1,8 +1,12 @@
 {{#if (or @buttons (has-block))}}
     <span class="oxi-button-container">
         {{#if this.hasDescription}}
-            {{#each @buttons as |btn|}}
-                <div class="row stacked-buttons">
+
+            {{#each @buttons as |btn index|}}
+                {{#if (and (has-block) (eq index 0))}}
+                    {{yield}}
+                {{/if}}
+                <div class="row align-items-center my-2">
                     {{#if btn.section}}
                         <div class="col-12">
                             <strong>{{btn.section}}</strong>
@@ -11,13 +15,15 @@
                         <div class="col-4">
                             <OxiBase::Button @button={{btn}} class="btn-block" @onClick={{@buttonClick}}/>
                         </div>
-                        <div class="col-8 btn-bt-margin">
+                        <div class="col-8">
                             {{btn.description}}
                         </div>
                     {{/if}}
                 </div>
             {{/each}}
+
         {{else}}
+
             {{#each this.buttonGroups as |btnGroup index|}}
                 <div class="mb-1"> {{!-- vertical spacing between button group rows --}}
                     {{#if (and (has-block) (eq index 0))}}
@@ -32,6 +38,7 @@
                     {{/each}}
                 </div>
             {{/each}}
+
         {{/if}}
     </span>
 {{/if}}

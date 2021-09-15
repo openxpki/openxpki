@@ -338,16 +338,6 @@ div.required input.flatpickr-input {
 /******************************************************************************
  * Buttons
  */
-.stacked-buttons {
-  margin-top: 4px;
-  margin-bottom: 4px;
-}
-
-.stacked-buttons .btn-bt-margin {
-  margin-top: 6px;
-  margin-bottom: 6px;
-}
-
 .oxi-btn-loading {
   color: #fff;
   background-color: #428bca;
