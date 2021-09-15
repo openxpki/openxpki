@@ -3,13 +3,14 @@ package OpenXPKI::Server::Workflow::Activity::Tools::UpdateContextHash;
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
+use English;
+use Data::Dumper;
+use Workflow::Exception qw( configuration_error );
+
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
-use English;
-
-use Data::Dumper;
 
 sub execute
 {
