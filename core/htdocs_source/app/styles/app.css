@@ -146,10 +146,6 @@ div.oxisection-grid th.sortable {
   -webkit-user-select: none;
 }
 
-tr.has-action {
-  cursor: pointer;
-}
-
 /* plain grid-row without status */
 tr.gridrow > td {}
 tr.gridrow:hover > td {background-color: #E7E7E7 !important;}
