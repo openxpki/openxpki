@@ -358,65 +358,50 @@ div.required input.flatpickr-input {
 }
 
 /* Button format from workflow defs */
-.oxi-btn-expected,
-.oxi-btn-submit,
-.oxi-btn-optional,
-.oxi-btn-failure,
-.oxi-btn-cancel,
-.oxi-btn-reset,
-.oxi-btn-alternative,
-.oxi-btn-exceptional,
-.oxi-btn-terminate {
-  color: #333;
-  border-color: #ccc;
-}
 
-.oxi-btn-expected,
-.oxi-btn-expected:hover,
+.oxi-btn-expected:not(:hover),
 .oxi-btn-expected:focus,
-.oxi-btn-submit,
-.oxi-btn-submit:hover,
+.oxi-btn-submit:not(:hover),
 .oxi-btn-submit:focus {
+  color: #333; border-color: #ccc;
   background-color: #c9e2b3;
 }
 
-.oxi-btn-optional,
-.oxi-btn-optional:hover,
+.oxi-btn-optional:not(:hover),
 .oxi-btn-optional:focus {
+  color: #333; border-color: #ccc;
   background-color: #e4e4da;
 }
 
-.oxi-btn-failure,
-.oxi-btn-failure:hover,
+.oxi-btn-failure:not(:hover),
 .oxi-btn-failure:focus,
-.oxi-btn-cancel,
-.oxi-btn-cancel:hover,
+.oxi-btn-cancel:not(:hover),
 .oxi-btn-cancel:focus {
+  color: #333; border-color: #ccc;
   background-color: #e39f9f;
 }
 
-.oxi-btn-reset,
-.oxi-btn-reset:hover,
+.oxi-btn-reset:not(:hover),
 .oxi-btn-reset:focus,
-.oxi-btn-alternative,
-.oxi-btn-alternative:hover,
+.oxi-btn-alternative:not(:hover),
 .oxi-btn-alternative:focus {
+  color: #333; border-color: #ccc;
   background-color: #ffd78c;
 }
 
-.oxi-btn-exceptional,
-.oxi-btn-exceptional:hover,
+.oxi-btn-exceptional:not(:hover),
 .oxi-btn-exceptional:focus {
+  color: #333; border-color: #ccc;
   background-color: #79d1f3;
 }
 
-.oxi-btn-terminate,
-.oxi-btn-terminate:hover,
+.oxi-btn-terminate:not(:hover),
 .oxi-btn-terminate:focus {
+  color: #333; border-color: #ccc;
   background-color: #ad7fa8;
 }
 
-.oxi-btn-tile {
+.oxi-btn-tile:not(:hover) {
   background: transparent;
   border: 1px solid transparent;
 }
