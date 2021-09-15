@@ -2,6 +2,7 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action, set } from "@ember/object";
 import { debug } from '@ember/debug';
+import ow from 'ow';
 
 /**
  * Shows a button with an optional confirm dialog.
@@ -73,6 +74,33 @@ export default class OxiButtonComponent extends Component {
             console.error(`oxi-button: button "${this.args.button.label}" has unknown format: "${this.args.button.format}"`);
         }
         return cssClass ?? "";
+    }
+
+    constructor() {
+        super(...arguments);
+
+        // Parameter validation
+        ow(this.args.button, 'button', ow.any(
+            ow.object.partialShape({
+                'label': ow.string.not.empty,
+                'format': ow.optional.string,
+                'tooltip': ow.optional.string,
+                'disabled': ow.optional.boolean,
+                'confirm': ow.optional.object.exactShape({
+                    'label': ow.string.not.empty,
+                    'description': ow.string.not.empty,
+                    'confirm_label': ow.optional.string,
+                    'cancel_label': ow.optional.string,
+                }),
+            }),
+            ow.object.partialShape({
+                'label': ow.string.not.empty,
+                'href': ow.string.not.empty,
+                'format': ow.optional.string,
+                'tooltip': ow.optional.string,
+                'target': ow.optional.string,
+            }),
+        ));
     }
 
     @action
