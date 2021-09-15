@@ -65,7 +65,11 @@
                                 <dd.menu @renderInPlace={{false}} as |ddm|>
                                     {{#each @def.actions as |action|}}
                                         <ddm.item>
-                                            <a {{on "click" (fn this.executeAction row action)}}>
+                                            <a
+                                                class="dropdown-item"
+                                                role="button"
+                                                {{on "click" (fn this.executeAction row action)}}
+                                            >
                                                 {{action.label}}
                                                 {{#if action.icon}}
                                                     <span class="float-right glyphicon glyphicon-{{action.icon}}"></span>
@@ -100,9 +104,7 @@
     <div class="dropdown">
         <ul class="dropdown-menu" role="menu">
             {{#each @def.actions as |action|}}
-                <li>
-                    <a tabindex="-1" href="#">{{action.label}}</a>
-                </li>
+                <a class="dropdown-item" role="button" tabindex="-1" href="#">{{action.label}}</a>
             {{/each}}
         </ul>
     </div>
