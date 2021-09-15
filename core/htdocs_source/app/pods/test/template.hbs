@@ -13,6 +13,7 @@
             </div>
         </div>
     </div>
+
     <div class="row">
         <div class="col-lg-12">
             <div class="card border-info">
@@ -36,6 +37,7 @@
             </div>
         </div>
     </div>
+
     <div class="row">
         <div class="col-lg-12">
             {{#each this.forms as |form index|}}
@@ -56,6 +58,22 @@
                     </div>
                 {{/if}}
             {{/each}}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card border-info">
+                <div class="card-header bg-info"></div>
+                <div class="card-body">
+                    <form class="form-inline">
+                        <OxiBase::ButtonContainer @buttons={{this.forms.1.content.buttons}}>
+                            <BsButton @type="" class="oxi-btn-submit"> Submit </BsButton>
+                            <BsButton @type="" class="oxi-btn-reset"> Reset </BsButton>
+                        </OxiBase::ButtonContainer>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 

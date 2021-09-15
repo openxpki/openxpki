@@ -314,6 +314,7 @@ export default class TestController extends Controller {
                             label: "Really sure?",
                             description: "Think about it one more time.",
                         },
+                        break_before: 1,
                     },
                     {
                         ...this._testButton,

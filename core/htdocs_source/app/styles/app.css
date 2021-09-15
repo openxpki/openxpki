@@ -360,16 +360,11 @@ div.required input.flatpickr-input {
   border-color: #285e8e;
 }
 
-.oxi-button-container {
-  padding-bottom: 20px;
-}
-
 .oxi-button-container a.btn::before {
   font-family: "Glyphicons Halflings";
   content: "\e144";
   font-size: 80%;
   padding-right: 0.5rem;
-  color: #a0a0a0;
 }
 
 /* Button format from workflow defs */

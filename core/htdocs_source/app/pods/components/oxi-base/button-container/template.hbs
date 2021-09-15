@@ -1,4 +1,4 @@
-{{#if @buttons}}
+{{#if (or @buttons (has-block))}}
     <span class="oxi-button-container">
         {{#if this.hasDescription}}
             {{#each @buttons as |btn|}}
@@ -18,8 +18,11 @@
                 </div>
             {{/each}}
         {{else}}
-            {{#each this.buttonGroups as |btnGroup|}}
-                <div class="mb-1">
+            {{#each this.buttonGroups as |btnGroup index|}}
+                <div class="mb-1"> {{!-- vertical spacing between button group rows --}}
+                    {{#if (and (has-block) (eq index 0))}}
+                        {{yield}}
+                    {{/if}}
                     {{#each btnGroup as |btn|}}
                         {{#if btn.section}}
                             <!-- Section are not supported yet -->
