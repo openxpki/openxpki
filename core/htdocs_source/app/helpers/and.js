@@ -13,6 +13,6 @@ import Helper from "@ember/component/helper";
  */
 export default class And extends Helper {
     compute(args) {
-        return args.reduce((ac, val) => ac && !!val); // true if all are true
+        return !!args.reduce((ac, val) => ac && !!val); // true if all are true
     }
 }
