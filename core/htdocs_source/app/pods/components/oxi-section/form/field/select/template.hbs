@@ -13,7 +13,6 @@
                 {{on-init this.onCustomInsert}}
                 {{may-focus this true}}
             />
-            <div class="invalid-feedback">{{@error}}</div>
         {{else}}
             <OxiBase::Select
                 @list={{this.options}}
@@ -22,9 +21,8 @@
                 required={{not @content.is_optional}}
                 {{may-focus this true}}
             />
-            <div class="invalid-feedback">{{@error}}</div>
         {{/if}}
-        <span class="input-group-btn">
+        <span class="input-group-append">
             <BsButton
                 @type=""
                 @active={{this.customMode}}
@@ -34,6 +32,7 @@
                 {{t 'component.oxifield_select.custom_value'}}
             </BsButton>
         </span>
+        <div class="invalid-feedback">{{@error}}</div>
     </div>
 {{else}}
     <OxiBase::Select
