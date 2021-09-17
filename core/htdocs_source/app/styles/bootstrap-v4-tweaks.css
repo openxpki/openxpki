@@ -15,11 +15,6 @@ dd + dt {
   padding-top: 0.5em;
 }
 
-/* Add margin between adjacent rows */
-.row + .row {
-  margin-top: 1rem;
-}
-
 /* Do not set green color for labels of "valid" checkboxes */
 .was-validated .form-check-input:valid ~ .form-check-label {
     color: inherit;
