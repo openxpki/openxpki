@@ -14,10 +14,10 @@
         {{navbar.toggle}}
     </div>
     <navbar.content>
-        <navbar.nav as |nav|>
+        <navbar.nav class="mr-auto" as |nav|>
             {{#each this.model.navEntries as |navEntry|}}
                 {{#if navEntry.entries.length}}
-                    <nav.dropdown as |dd|>
+                    <nav.dropdown class="mx-2" as |dd|>
                         <dd.toggle class="text-light">
                             {{navEntry.label}}
                             <span class="caret"></span>
@@ -43,7 +43,7 @@
                         </dd.menu>
                     </nav.dropdown>
                 {{else}}
-                    <nav.item>
+                    <nav.item class="mx-2">
                         <a class="nav-link text-light" href="{{url-for "openxpki" navEntry.key}}" {{on "click" (fn this.navigateTo navEntry.key)}}>
                             {{navEntry.label}}
                         </a>
@@ -51,7 +51,7 @@
                 {{/if}}
             {{/each}}
         </navbar.nav>
-        <navbar.nav class="navbar-right" as |nav|>
+        <navbar.nav as |nav|>
             {{#if this.model.user}}
                 <nav.item>
                     <nav.linkTo @route="openxpki" @model="logout" class="text-light">
