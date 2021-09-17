@@ -253,6 +253,15 @@ tr.certserial td li:last-child::after { /* last child is the decimal number */
   padding-top: 0.4rem;
 }
 
+/* Labels */
+form label.col-form-label {
+  font-weight: normal;
+}
+
+form div.required label.col-form-label {
+  font-weight: bold;
+}
+
 /* Input fields */
 div.required input,
 div.required select,
@@ -265,10 +274,6 @@ div.required input.form-control[disabled] ,
 div.required select.form-control[disabled],
 div.required textarea.form-control[disabled] {
   border:1px solid #ccc;
-}
-
-div.optional .col-form-label:after {
-  content: ' *';
 }
 
 div.optional input,
