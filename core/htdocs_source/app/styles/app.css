@@ -189,9 +189,13 @@ tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
  * Key-Value lists
  */
 
-.table-bordered tr.spacer th {
-  padding-top: 1rem;
+.oxi-keyvalue-head.spacer {
+  margin-top: 1rem;
   background-color: #eee;
+}
+
+.oxi-keyvalue-label::after {
+  content: ':';
 }
 
 /* Status labels */
@@ -231,17 +235,15 @@ tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
 code { white-space: pre; }
 
 /* certificate serial number in details popup */
-tr.certserial td li {
-  line-height:1.8em;
-}
-tr.certserial td li:first-child::after { /* first child is the hex number */
+.certserial ul li:first-child::after { /* first child is the hex number */
   content: "hex";
-  font-size: .70em;
+  font-size: .7em;
   vertical-align: sub;
+  line-height: 1.8em;
 }
-tr.certserial td li:last-child::after { /* last child is the decimal number */
+.certserial ul li:last-child::after { /* last child is the decimal number */
   content: "dec";
-  font-size: .70em;
+  font-size: .7em;
   vertical-align: sub;
 }
 
