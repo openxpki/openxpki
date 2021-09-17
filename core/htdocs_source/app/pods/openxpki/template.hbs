@@ -113,20 +113,26 @@
         {{#each this.model.tabs as |entry|}}
             <div class="tab-pane {{if entry.active "active"}}">
                 <div class="row">
+                    {{!-- Main page content --}}
                     <div class="{{if entry.right "col-lg-8" "col-lg-12"}}">
                         {{#each entry.main as |mainEntry|}}
-                            <OxiSection @content={{mainEntry}}/>
+                            {{#let (or (eq mainEntry.type "form")) as |asCard|}}
+                                <OxiSection @content={{mainEntry}} @renderAsCard={{asCard}} />
+                            {{/let}}
                         {{/each}}
                     </div>
-                    <div class="{{if entry.right "col-lg-4" "hide"}}">
-                        {{#each entry.right as |rightEntry|}}
-                            <div class="card bg-light border-secondary">
-                                <div class="card-body">
-                                    <OxiSection @content={{rightEntry}}/>
+                    {{!-- Main page content --}}
+                    {{#if entry.right}}
+                        <div class="col-lg-4">
+                            {{#each entry.right as |rightEntry|}}
+                                <div class="card bg-light border-secondary">
+                                    <div class="card-body">
+                                        <OxiSection @content={{rightEntry}}/>
+                                    </div>
                                 </div>
-                            </div>
-                        {{/each}}
-                    </div>
+                            {{/each}}
+                        </div>
+                    {{/if}}
                 </div>
             </div>
         {{/each}}

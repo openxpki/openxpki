@@ -1,10 +1,34 @@
-{{#if @content.content.label}}
-    <h3>{{@content.content.label}}</h3>
-{{/if}}
-{{#if @content.content.description}}
-    <div class="mb-3">{{{@content.content.description}}}</div>
-{{/if}}
+{{#if @renderAsCard}}
 
-<span {{on-init this.initialized}}>
-    {{component this.type def=this.sectionData buttonClick=this.buttonClick}}
-</span>
+    <div class="card bg-light mb-3">
+
+        {{#if (or @content.content.label @content.content.description)}}
+            <div class="card-header">
+                {{#if @content.content.label}}
+                    <h4>{{@content.content.label}}</h4>
+                {{/if}}
+                {{#if @content.content.description}}
+                    {{{@content.content.description}}}
+                {{/if}}
+            </div>
+        {{/if}}
+
+        <div class="card-body pb-0" {{on-init this.initialized}}>
+            {{component this.type def=this.sectionData buttonClick=this.buttonClick}}
+        </div>
+    </div>
+
+{{else}}
+
+    {{#if @content.content.label}}
+        <h4>{{@content.content.label}}</h4>
+    {{/if}}
+    {{#if @content.content.description}}
+        <div class="mb-3">{{{@content.content.description}}}</div>
+    {{/if}}
+
+    <span {{on-init this.initialized}}>
+        {{component this.type def=this.sectionData buttonClick=this.buttonClick}}
+    </span>
+
+{{/if}}
