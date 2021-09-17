@@ -268,7 +268,7 @@ form div.required label.col-form-label {
 div.required input,
 div.required select,
 div.required textarea {
-  background-color:#fff3c2;
+  background-color:#fff3c2 !important;
   border:1px solid #444;
 }
 
