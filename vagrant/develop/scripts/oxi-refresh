@@ -65,13 +65,12 @@ IS_FULLCONFIG=0
 [[ "${@#--fast}" != "$@" ]]       && IS_COMPILE=0 && IS_I18N=0 && IS_DBCONFIG=0
 [[ "${@#--full}" != "$@" ]]       && IS_FULLCONFIG=1
 
-echo "Running OpenXPKI installation refresh script with these parameters:"
-[[ $IS_I18N -eq 0 ]]        && echo "  --no-i18n"
-[[ $IS_RESTART -eq 0 ]]     && echo "  --no-restart"
-[[ $IS_COMPILE -eq 0 ]]     && echo "  --no-compile"
-[[ $IS_DBCONFIG -eq 0 ]]    && echo "  --no-dbconf"
-[[ $IS_FULLCONFIG -eq 1 ]]  && echo "  --full"
-
+echo "Script configuration:"
+echo "  [$([ "$IS_FULLCONFIG" -eq 1 ] && echo "X" || echo " ")] Overwrite /etc/openxpki, recreate DB and certs"
+echo "  [$([ "$IS_DBCONFIG" -eq 1 ] && echo "X" || echo " ")] Write database configuration file"
+echo "  [$([ "$IS_COMPILE" -eq 1 ] && echo "X" || echo " ")] Compile OpenXPKI"
+echo "  [$([ "$IS_I18N" -eq 1 ] && echo "X" || echo " ")] Compile i18n"
+echo "  [$([ "$IS_RESTART" -eq 1 ] && echo "X" || echo " ")] Restart OpenXPKI & Apache"
 echo
 
 #
