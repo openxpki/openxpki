@@ -9,6 +9,10 @@
   margin-top: 1em;
 }
 
+.oxi-header {
+  margin-bottom: 0;
+}
+
 /* Set the fixed height of the footer here */
 #footer {
   height: 60px;

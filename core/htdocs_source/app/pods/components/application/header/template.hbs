@@ -1,20 +1,20 @@
 <div class="container-fluid bg-dark text-light">
     <div class="row py-2 align-items-center">
         {{#if this.config.header}}
-            <div class="col-2 col-md-8">
+            <div class="col">
                 {{{this.config.header}}}
             </div>
         {{else}}
-            <div class="col-2">
+            <div class="col">
                 <a href="./#/"><img src="{{this.rootURL}}img/logo.png"></a>
             </div>
-            <div class="d-none d-md-flex col-md-6">
-                <h4>
+            <div class="col d-none d-md-flex justify-content-center">
+                <h4 class="oxi-header">
                     {{t 'site.header'}}
                 </h4>
             </div>
         {{/if}}
-        <div class="col-10 col-md-4">
+        <div class="col">
             <Application::Header::Userinfo/>
         </div>
     </div>
