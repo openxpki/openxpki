@@ -20,11 +20,11 @@ export default class TestController extends Controller {
                     200,
                     { "Content-type": "application/yaml" },
                     'header: |-' + "\n" +
-                    '    <h2>' + "\n" +
+                    '    <h3>' + "\n" +
                     '        <a href="./#/"><img src="img/logo.png" class="toplogo"></a>' + "\n" +
                     '        &nbsp;' + "\n" +
                     '        <small>Test page</small>' + "\n" +
-                    '    </h2>' + "\n" +
+                    '    </h3>' + "\n" +
                     'accessibility:' + "\n" +
                     '    tooltipOnFocus: on' + "\n"
             ]);

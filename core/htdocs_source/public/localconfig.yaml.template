@@ -37,11 +37,11 @@ copyrightYear: 2021
 # Site header
 #
 header: |-
-    <h2>
+    <h3>
         <a href="./#/"><img src="img/logo.png" class="toplogo"></a>
         &nbsp;
         <small>Open Source Trustcenter</small>
-    </h2>
+    </h3>
 
 #
 # Site footer
