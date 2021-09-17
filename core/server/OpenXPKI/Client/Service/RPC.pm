@@ -1,15 +1,18 @@
 package OpenXPKI::Client::Service::RPC;
-
 use Moose;
-use warnings;
-use strict;
+
+with 'OpenXPKI::Client::Service::Role::PickupWorkflow';
+
+# Core modules
 use Carp;
 use English;
 use Data::Dumper;
+
+# CPAN modules
+use JSON;
+
+# Project modules
 use OpenXPKI::Client::Simple;
-
-
-with 'OpenXPKI::Client::Service::Role::PickupWorkflow';
 
 has config => (
     is      => 'rw',
