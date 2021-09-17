@@ -11,6 +11,11 @@ use Convert::ASN1 ':tag';
 use OpenXPKI::Crypt::DN;
 use OpenXPKI::Crypt::X509;
 
+use Moose::Exporter;
+Moose::Exporter->setup_import_methods(
+    as_is => ['decode_tag','encode_tag']
+);
+
 our %oids = (
     # pkcs7 data types
     '1.2.840.113549.1.7.0' => 'module',
@@ -31,7 +36,8 @@ our %oids = (
     '2.16.840.1.113733.1.9.6' => 'recipientNonce',
     '2.16.840.1.113733.1.9.7' => 'transactionID',
     '2.16.840.1.113733.1.9.8' => 'extensionReq',
-    # used in SCEP, from PKCS#9
+    # used in SCEP/CMS, from PKCS#9
+    '1.2.840.113549.1.9.3'    => 'contentType',
     '1.2.840.113549.1.9.4'    => 'messageDigest',
     '1.2.840.113549.1.9.5'    => 'signingTime',
 
@@ -65,7 +71,6 @@ our %oids = (
     '1.3.101.112' => 'ed25519',
 
 );
-
 
 our $schema = "
     PKCS7TypeOnlyInfo ::= SEQUENCE {
@@ -377,7 +382,7 @@ sub __build_envelope_signed_data {
         my $attr = shift;
         my %attrib = map {
             my $t = $oids{$_->{type}} || $_->{type};
-            my $v = (@{$_->{values}} > 1) ? $_->{values} : $_->{values}->[0];
+            my $v = (@{$_->{values}} > 1) ? $_->{values} : decode_tag($_->{values}->[0]);
             $t => $v;
         } @{$attr};
         return \%attrib;
@@ -392,6 +397,7 @@ sub __build_envelope_signed_data {
     return {
         digest_alg => $oids{$digest_oid} || $digest_oid,
         sig_alg =>  $oids{$sig_oid} || $sig_oid,
+        signature => $si->{encryptedDigest},
         signer =>  {
             serialNumber => $si->{sid}->{issuerAndSerialNumber}->{serialNumber},
             issuer => OpenXPKI::Crypt::DN->new( sequence => $si->{sid}->{issuerAndSerialNumber}->{issuer} ),
@@ -439,8 +445,14 @@ sub __build_rcptlist {
 
 sub __build_payload {
     my $self = shift;
-    my $raw = $self->parsed()->{content}->{contentInfo}->{content};
+    return decode_tag( $self->parsed()->{content}->{contentInfo}->{content} );
 
+}
+
+# static methods that are also exported
+sub decode_tag {
+
+    my $raw = shift;
     # the raw content starts with tag and length as bytes sequences
     # the length of each sequence is itself encoded in the first bit
     # tagbytes is the number of bytes that are used to encode the tag
@@ -452,6 +464,13 @@ sub __build_payload {
     # we need to strip those sequences from the top of the raw value
     return substr($raw, $tagbytes + $lengthbytes);
 }
+
+sub encode_tag {
+    my $value = shift;
+    my $class = shift || 4;
+    return asn_encode_tag($class).asn_encode_length(length($value)).$value;
+}
+
 
 1;
 
