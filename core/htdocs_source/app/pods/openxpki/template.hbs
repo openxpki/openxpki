@@ -3,9 +3,9 @@
 {{/if}}
 
 <BsNavbar
-    @type="default"
-    @backgroundColor="light"
-    class="border-top border-bottom py-0 mb-2"
+    @type="dark"
+    @backgroundColor="secondary"
+    class="py-0 mb-2"
     @collapsed={{true}}
     @onCollapse={{action (mut this.collapsed) true}}
     @onExpand={{action (mut this.collapsed) false}} as |navbar|
@@ -18,7 +18,7 @@
             {{#each this.model.navEntries as |navEntry|}}
                 {{#if navEntry.entries.length}}
                     <nav.dropdown as |dd|>
-                        <dd.toggle>
+                        <dd.toggle class="text-light">
                             {{navEntry.label}}
                             <span class="caret"></span>
                         </dd.toggle>
@@ -28,7 +28,7 @@
                                     {{#if entry.key}}
                                         {{! We need the href in addition to the click handler to support
                                             opening the page in a new window }}
-                                        <a class="dropdown-item nav-link" href="{{url-for "openxpki" entry.key}}" {{on "click" (fn this.navigateTo entry.key)}}>
+                                        <a class="dropdown-item" href="{{url-for "openxpki" entry.key}}" {{on "click" (fn this.navigateTo entry.key)}}>
                                             {{entry.label}}
                                         </a>
                                     {{else}}
@@ -44,7 +44,7 @@
                     </nav.dropdown>
                 {{else}}
                     <nav.item>
-                        <a class="nav-link" href="{{url-for "openxpki" navEntry.key}}" {{on "click" (fn this.navigateTo navEntry.key)}}>
+                        <a class="nav-link text-light" href="{{url-for "openxpki" navEntry.key}}" {{on "click" (fn this.navigateTo navEntry.key)}}>
                             {{navEntry.label}}
                         </a>
                     </nav.item>
@@ -54,7 +54,7 @@
         <navbar.nav class="navbar-right" as |nav|>
             {{#if this.model.user}}
                 <nav.item>
-                    <nav.linkTo @route="openxpki" @model="logout">
+                    <nav.linkTo @route="openxpki" @model="logout" class="text-light">
                         {{t 'site.logout'}}
                     </nav.linkTo>
                 </nav.item>
