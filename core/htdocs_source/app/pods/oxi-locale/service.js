@@ -24,6 +24,6 @@ export default class OxiLocaleService extends Service {
     }
 
     get shortLocale() {
-        return this._locale.split(/-/)[0];
+        return this._locale.split(/[-_]/)[0];
     }
 }
