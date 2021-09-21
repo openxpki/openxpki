@@ -60,8 +60,12 @@ has transaction_id => (
 
 # Use predefined numeric codes for dedicated problems
 our %named_messages = (
+    '40002' => 'Unable to parse request',
+    '40003' => 'Incoming enrollment with empty body',
     '40006' => 'Request was rejected',
     '50001' => 'Unable to initialize client',
+    '50003' => 'Unexpected response from backend',
+    '50011' => 'Unable to initialize endpoint parameters',
 );
 
 # this allows a constructor with the error code as scalar
