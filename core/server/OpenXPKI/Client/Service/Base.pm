@@ -26,6 +26,7 @@ has backend => (
     is      => 'rw',
     isa     => 'Object|Undef',
     lazy => 1,
+    predicate => 'has_backend',
     builder => '_init_backend',
 );
 
@@ -240,7 +241,6 @@ sub handle_enrollment_request {
 
     if (!$workflow || ( $workflow->{'proc_state'} ne 'finished' && !$workflow->{id} ) || $workflow->{'proc_state'} eq 'exception') {
         $log->error( $EVAL_ERROR ? $EVAL_ERROR : 'Internal Server Error');
-        $client->disconnect();
         return OpenXPKI::Client::Service::Response->new( 50003 );
     }
 
@@ -259,7 +259,6 @@ sub handle_enrollment_request {
         }
 
         $log->info('Request Pending - ' . $workflow->{'state'});
-        $client->disconnect();
         return OpenXPKI::Client::Service::Response->new({
             retry_after => $retry_after,
             workflow => $workflow,
@@ -271,7 +270,6 @@ sub handle_enrollment_request {
     my $cert_identifier = $workflow->{context}->{cert_identifier};
 
     if (!$cert_identifier) {
-        $client->disconnect();
         return OpenXPKI::Client::Service::Response->new({
             error => 40006,
             ($workflow->{context}->{error_code} ? (error_message => $workflow->{context}->{error_code}) : ()),
@@ -283,7 +281,6 @@ sub handle_enrollment_request {
         format => 'PKCS7',
         identifier => $cert_identifier,
     });
-    $client->disconnect();
 
     $log->debug( 'Sending cert ' . $cert_identifier);
 
@@ -327,8 +324,6 @@ sub handle_property_request {
         params => $param
     });
 
-    $client->disconnect();
-
     $log->trace( 'Workflow info '  . Dumper $workflow );
 
     my $out = $workflow->{context}->{output};
@@ -345,6 +340,16 @@ sub handle_property_request {
         workflow => $workflow,
     });
 
+}
+
+sub terminate {
+
+    my $self = shift;
+    if ($self->has_backend()) {
+        if (my $client = $self->backend()) {
+            $client->disconnect();
+        }
+    }
 }
 
 1;

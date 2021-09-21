@@ -66,6 +66,9 @@ while (my $cgi = CGI::Fast->new()) {
     $log->debug('Status: ' . $response->http_status_line());
     $log->trace(Dumper $response) if ($log->is_trace);
 
+    # close backend connection
+    $client->terminate();
+
     if ($response->has_error()) {
 
         print $cgi->header(

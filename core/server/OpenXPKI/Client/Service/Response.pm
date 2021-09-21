@@ -119,6 +119,26 @@ sub error_message {
 
 }
 
+sub is_server_error {
+
+    my $self = shift;
+    return 0 unless ($self->has_error());
+    my $err = $self->error();
+    return 0 unless ($err >= 50000);
+    return $err;
+
+}
+
+sub is_client_error {
+
+    my $self = shift;
+    return 0 unless ($self->has_error());
+    my $err = $self->error();
+    return 0 unless ($err >= 40000 && $err < 50000);
+    return $err;
+
+}
+
 1;
 
  __END__;
