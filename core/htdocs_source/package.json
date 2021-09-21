@@ -15,7 +15,7 @@
   },
   "scripts": {
     "build": "ember build --environment=production --output-path=$npm_package_config_outputpath",
-    "lint": "npm-run-all --aggregate-output --continue-on-error --parallel 'lint:!(fix)'",
+    "lint": "npm-run-all --aggregate-output --continue-on-error --parallel \"lint:!(fix)\"",
     "lint:fix": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*:fix",
     "lint:hbs": "ember-template-lint .",
     "lint:hbs:fix": "ember-template-lint . --fix",
@@ -29,7 +29,7 @@
   "devDependencies": {
     "@ember/jquery": "^2.0.0",
     "@ember/optional-features": "^2.0.0",
-    "@ember/test-helpers": "^2.2.8",
+    "@ember/test-helpers": "^2.4.2",
     "@glimmer/component": "^1.0.4",
     "@glimmer/tracking": "^1.0.4",
     "babel-eslint": "^10.1.0",
@@ -39,7 +39,7 @@
     "copy-text-to-clipboard": "^3.0.1",
     "ember-auto-import": "^2.0.2",
     "ember-bootstrap": "4.9.0",
-    "ember-cli": "~3.27.0",
+    "ember-cli": "~3.28.0",
     "ember-cli-app-version": "^5.0.0",
     "ember-cli-babel": "^7.26.6",
     "ember-cli-bootstrap-datetimepicker": "^0.9.3",
@@ -50,7 +50,7 @@
     "ember-cli-sri": "^2.1.1",
     "ember-cli-terser": "^4.0.2",
     "ember-export-application-global": "^2.0.1",
-    "ember-fetch": "^8.1.0",
+    "ember-fetch": "^8.1.1",
     "ember-intl": "^5.7.0",
     "ember-load-initializers": "^2.1.2",
     "ember-maybe-import-regenerator": "^0.1.6",
@@ -58,14 +58,15 @@
     "ember-page-title": "^6.2.2",
     "ember-qunit": "^5.1.4",
     "ember-resolver": "^8.0.2",
-    "ember-source": "~3.27.5",
-    "ember-template-lint": "^3.5.0",
+    "ember-source": "~3.28.0",
+    "ember-template-lint": "^3.6.0",
     "ember-tooltips": "^3.4.7",
-    "eslint": "^7.30.0",
+    "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-ember": "^10.5.1",
+    "eslint-plugin-ember": "^10.5.4",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-prettier": "^3.4.1",
+    "eslint-plugin-qunit": "^6.2.0",
     "jquery": "^3.6.0",
     "js-yaml": "^4.1.0",
     "loader.js": "^4.7.0",
@@ -82,7 +83,7 @@
     "webpack": "^5.42.1"
   },
   "engines": {
-    "node": "10.* || >= 12"
+    "node": "12.* || 14.* || >= 16"
   },
   "ember": {
     "edition": "octane"
