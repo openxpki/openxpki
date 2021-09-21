@@ -103,6 +103,7 @@ After this a [rebuild](#build-production) needs to be done.
 
 ```bash
 nvm use
+# NOTE: the following command belongs to the package "npm-check-updates", not "ncu"!
 ncu -u
 # to install the modules on your host and update package-lock.json:
 npm install

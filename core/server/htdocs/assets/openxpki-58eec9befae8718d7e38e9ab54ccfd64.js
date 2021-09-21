@@ -82,7 +82,7 @@ Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0,n.default.APP&
 var o={name:"App Version",initialize:(0,t.default)(r,l)}
 e.default=o})),define("openxpki/initializers/container-debug-adapter",["exports","ember-resolver/resolvers/classic/container-debug-adapter"],(function(e,t){Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0
 var n={name:"container-debug-adapter",initialize:function(){var e=arguments[1]||arguments[0]
-e.register("container-debug-adapter:main",t.default),e.inject("container-debug-adapter:main","namespace","application:main")}}
+e.register("container-debug-adapter:main",t.default)}}
 e.default=n})),define("openxpki/initializers/export-application-global",["exports","ember","openxpki/config/environment"],(function(e,t,n){function r(){var e=arguments[1]||arguments[0]
 if(!1!==n.default.exportApplicationGlobal){var r
 if("undefined"!=typeof window)r=window
