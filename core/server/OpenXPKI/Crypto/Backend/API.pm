@@ -156,6 +156,7 @@ sub __init_command_params : PRIVATE {
                           },
     "asn1_genconf"    => {"DATA" => 1 },
 
+    "sign_digest"     =>  {"DIGEST" => 1},
     };
 
     ## reassign the updated value to the command_params attribute

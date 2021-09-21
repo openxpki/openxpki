@@ -182,6 +182,7 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_get_chain.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_get_payload.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_sign.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/pkcs7_verify.pm
+OpenXPKI/Crypto/Backend/OpenSSL/Command/sign_digest.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/verify_cert.pm
 
 # Collection of reusable items as Moose::Role

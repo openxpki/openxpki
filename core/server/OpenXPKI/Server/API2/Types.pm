@@ -214,10 +214,10 @@ coerce 'ArrayRefOrCommaList',
 
 =head2 TokenType
 
-Enumeration: I<certsign>, I<crlsign>, I<datasafe> or I<scep>.
+Enumeration: I<certsign>, I<crlsign>, I<datasafe>, I<cmcra> or I<scep>.
 
 =cut
-enum 'TokenType', [qw( certsign crlsign datasafe scep )];
+enum 'TokenType', [qw( certsign crlsign datasafe scep cmcra)];
 
 =head2 CertStatus
 
