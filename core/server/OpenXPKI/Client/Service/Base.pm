@@ -277,12 +277,23 @@ sub handle_enrollment_request {
         });
     }
 
-    my $result = $client->run_command('get_cert',{
-        format => 'PKCS7',
-        identifier => $cert_identifier,
-    });
+    $log->debug( 'Sending output for ' . $cert_identifier);
 
-    $log->debug( 'Sending cert ' . $cert_identifier);
+    return $self->_prepare_result($workflow, $operation);
+
+}
+
+sub _prepare_result {
+
+    my $self = shift;
+    my $workflow = shift;
+    # not used for the default case
+    # my $operation = shift;
+
+    my $result = $self->backend()->run_command('get_cert',{
+        format => 'PKCS7',
+        identifier => $workflow->{context}->{cert_identifier},
+    });
 
     $result =~ s{-----(BEGIN|END) PKCS7-----}{}g;
     $result =~ s{\s}{}gxms;
@@ -291,7 +302,6 @@ sub handle_enrollment_request {
         result => $result,
         workflow => $workflow,
     });
-
 
 }
 

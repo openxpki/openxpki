@@ -94,7 +94,7 @@ while (my $cgi = CGI::Fast->new()) {
 
         # Default is base64 encoding, but we can turn on binary
         my $conf = $config->config();
-        my $encoding = $conf->{global}->{encoding} || 'base64';
+        my $encoding = $conf->{output}->{encoding} || 'base64';
         my $out = $response->result;
         if ($encoding eq 'binary') {
             $out = decode_base64($out);
