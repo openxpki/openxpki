@@ -235,6 +235,13 @@ export default class OxiSectionFormComponent extends Component {
         });
     }
 
+    _fromEntries(iterable) {
+        return [...iterable].reduce((obj, [key, val]) => {
+            obj[key] = val;
+            return obj;
+        }, {});
+    }
+
     _encodeFields({ fieldNames, includeEmpty = false, renameMap = new Map() }) {
         let result = new Map();
 
@@ -272,7 +279,7 @@ export default class OxiSectionFormComponent extends Component {
 
             debug(`${name} = ${ potentialClones[0].clonable ? `[${value}]` : `"${value}"` }`);
         }
-        return Object.fromEntries(result);
+        return this._fromEntries(result); // FIXME: once we drop IE11 support replace with: return Object.fromEntries(result);
     }
 
     /**

@@ -610,16 +610,16 @@ cgi-bin/healthcheck.fcgi
 # NOTE:
 #   core/htdocs_source/update-manifest.pl will update the list below.
 #   UPDATE_MANIFEST_UI_LIST - do not remove this comment
-htdocs/assets/chunk.143.bce811f9294fb3c582a8.js
-htdocs/assets/chunk.178.00737e19d5969d89d208.js
-htdocs/assets/chunk.831.5eb27e353412e8c8b8c8.js
-htdocs/assets/chunk.831.5eb27e353412e8c8b8c8.js.LICENSE.txt
+htdocs/assets/chunk.143.79529fd9e7d9fd57901f.js
+htdocs/assets/chunk.178.32bac715f3816b414525.js
+htdocs/assets/chunk.831.528b40907aa563a7304c.js
+htdocs/assets/chunk.831.528b40907aa563a7304c.js.LICENSE.txt
 htdocs/assets/chunk.958.29a8232813fa6bc1ebef.js
 htdocs/assets/chunk.958.29a8232813fa6bc1ebef.js.LICENSE.txt
-htdocs/assets/openxpki-dc4b48ebf78f0bf0705bc5aac759453b.js
+htdocs/assets/openxpki-4d4b5834fd0eec21c7db488d8f2c2f8b.js
 htdocs/assets/openxpki-f445fdbd16d516b69fd1a11434d1cde9.css
 htdocs/assets/vendor-10a061f062fc517487df42241ca680d6.css
-htdocs/assets/vendor-9a934e69f3f0f4b950678cb31aaa87e8.js
+htdocs/assets/vendor-2332dfdb24db65eaf5fffec0db8d9028.js
 htdocs/default.html
 htdocs/favicon.png
 htdocs/fonts/glyphicons-halflings-regular.eot
