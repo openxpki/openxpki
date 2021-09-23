@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import { action } from "@ember/object";
 import { inject } from '@ember/service';
 import { debug } from '@ember/debug';
-import ow from 'ow';
+import { assert, optional, union, enums, object, type, boolean, string } from 'superstruct';
 
 /**
  * Implements autofill functionality, e.g. shows a button and sends a request
@@ -41,22 +41,23 @@ export default class Autofill extends Component {
     constructor() {
         super(...arguments);
 
-        // Config
-        ow(this.args.config, 'config', ow.object.exactShape({
-            'request': ow.object.exactShape({
-                'url': ow.string,
-                'method': ow.optional.string.oneOf(['GET', 'POST']),
-                'params': ow.optional.object.exactShape({
-                    'user': ow.optional.object,
-                    'static': ow.optional.object,
-                }),
-
+        // Input validation
+        assert(this.args.config, object({
+            'request': object({
+                'url': string(),
+                'method': optional(enums(['GET', 'POST'])),
+                'params': optional(object({
+                    'user': optional(type({})),
+                    'static': optional(type({})),
+                })),
             }),
-            'convert': ow.optional.string,
-            'autorun': ow.optional.any(ow.boolean, ow.number, ow.string.oneOf(['0', '1'])),
-            'label': ow.string,
-            'button_label': ow.optional.string,
+            'label': string(),
+            'convert': optional(string()),
+            'autorun': optional(union(boolean(), enums([0, 1, '0', '1']))),
+            'button_label': optional(string()),
         }));
+
+        // Config
         this.request = this.args.config.request;
         this.autorun = this.args.config.autorun;
         this.label = this.args.config.label;

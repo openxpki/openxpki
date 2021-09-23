@@ -2,7 +2,7 @@ import Service from '@ember/service';
 import { inject } from '@ember/service';
 import { debug } from '@ember/debug';
 import fetch from 'fetch';
-import ow from 'ow';
+import { assert, optional, enums } from 'superstruct';
 
 /**
  * Provides low level functions to send backend requests.
@@ -13,8 +13,8 @@ export default class OxiBackendService extends Service {
     @inject('intl') intl;
 
     request({ url, method = 'GET', headers = {}, data, contentType }) {
-        // type validationi
-        ow(method, ow.string.oneOf(['GET', 'POST']));
+        // type validation
+        assert(method, enums(['GET', 'POST']));
 
         let params = {
             method,
@@ -27,7 +27,8 @@ export default class OxiBackendService extends Service {
 
         if (method == 'POST') {
             // type validation
-            ow(contentType, ow.optional.string.oneOf(['application/json']));
+            ow(contentType, optional(enums(['application/json'])));
+
             contentType ||= 'application/json';
             params.headers['Content-Type'] = contentType;
 
