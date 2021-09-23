@@ -12,7 +12,7 @@ RUN mkdir /build && chmod 0777 /build
 
 # Specify command
 #   We do some copy magic to ensure we use node_modules/ from the container,
-#   not the one bind-mounted one from the host.
+#   not the one bind-mounted from the host.
 #   The output path for compiled assets is changed to /compiled, "outputpath"
 #   is used in package.json via "$npm_package_config_outputpath".
 RUN echo '#!/bin/bash \n\

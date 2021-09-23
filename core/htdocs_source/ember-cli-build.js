@@ -7,6 +7,7 @@ module.exports = function(defaults) {
   // special behaviour in production mode
   let on_production = {};
   if (process.env.EMBER_ENV === "production") {
+    console.log("\n****************************************");
     console.log("Excluding 'test' page");
     on_production = {
       ...on_production,
@@ -17,13 +18,14 @@ module.exports = function(defaults) {
     };
 
     if (process.env.OPENXPKI_UI_BUILD_UNMINIFIED == 1) {
-      console.log("Building unminified assets incl. sourcemaps");
+      console.log("Building un-minified assets incl. sourcemaps");
       on_production = {
         ...on_production,
         'ember-cli-terser': { enabled: false },
         'sourcemaps': { enabled: true },
       };
     }
+    console.log("****************************************\n");
   }
 
   // app configuration
@@ -60,6 +62,11 @@ module.exports = function(defaults) {
     'ember-cli-babel': {
       includePolyfill: true,
       includeExternalHelpers: true, // import these helpers from a shared module, reducing app size overall
+    },
+
+    'babel': {
+      // sourcemaps work without the following, but for some reason it generates smaller files:
+      sourceMaps: (process.env.OPENXPKI_UI_BUILD_UNMINIFIED == 1) ? 'inline' : false,
     },
 
     // options for @babel/preset-env (evaluated by 'ember-cli-babel' and passed on)
