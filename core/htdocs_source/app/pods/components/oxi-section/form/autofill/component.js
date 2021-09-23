@@ -41,6 +41,7 @@ export default class Autofill extends Component {
     constructor() {
         super(...arguments);
 
+// TODO Reactivate type checking once we drop IE11 support
 /*
         NOTE: we could also use one of these:
           https://www.npmjs.com/package/joi
@@ -85,11 +86,13 @@ export default class Autofill extends Component {
         // }
 
         // Function to encode fields (from form)
-        ow(this.args.encodeFields, 'encodeFields', ow.function);
+        // TODO Reactivate type checking once we drop IE11 support
+        //ow(this.args.encodeFields, 'encodeFields', ow.function);
         this.encodeFields = this.args.encodeFields;
 
         // Function to set field value (from field instance)
-        ow(this.args.valueSetter, 'valueSetter', ow.function);
+        // TODO Reactivate type checking once we drop IE11 support
+        //ow(this.args.valueSetter, 'valueSetter', ow.function);
         this.valueSetter = this.args.valueSetter;
 
         if (this.autorun) this.query();

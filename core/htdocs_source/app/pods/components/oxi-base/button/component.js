@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action, set } from "@ember/object";
 import { debug } from '@ember/debug';
-import ow from 'ow';
+//import ow from 'ow';
 
 /**
  * Shows a button with an optional confirm dialog.
@@ -79,7 +79,9 @@ export default class OxiButtonComponent extends Component {
     constructor() {
         super(...arguments);
 
-        // Parameter validation
+        // type validation
+        // TODO Reactivate type checking once we drop IE11 support
+        /*
         ow(this.args.button, 'button', ow.any(
             ow.object.partialShape({
                 'label': ow.string.not.empty,
@@ -101,6 +103,7 @@ export default class OxiButtonComponent extends Component {
                 'target': ow.optional.string,
             }),
         ));
+        */
     }
 
     @action
