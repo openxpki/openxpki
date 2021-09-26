@@ -96,7 +96,7 @@ sub render_system_status {
         push @fields, {
             label  => 'No CRL found!',
             value  => '---',
-            className => 'warning'
+            className => 'oxi-status-warning'
         };
         $warning = 1;
     } elsif ($status->{crl_expiry} < $now) {
@@ -104,7 +104,7 @@ sub render_system_status {
             label  => 'CRL expired - update required!',
             format => 'timestamp',
             value  => $status->{crl_expiry},
-            className => 'danger'
+            className => 'oxi-status-danger'
         };
         $critical = 1;
     } elsif ($status->{crl_expiry} < ($now + 5*86400)) {
@@ -112,7 +112,7 @@ sub render_system_status {
             label  => 'CRL is near expiration - update recommended!',
             format => 'timestamp',
             value  => $status->{crl_expiry},
-            className => 'warning'
+            className => 'oxi-status-warning'
         };
         $warning = 1;
     } else {
@@ -131,7 +131,7 @@ sub render_system_status {
         push @fields, {
             label  => 'No encryption token set!',
             value => '---',
-            className => 'warning',
+            className => 'oxi-status-warning',
         };
     } else {
 
@@ -140,7 +140,7 @@ sub render_system_status {
             push @fields, {
                 label  => 'Active Encryption Token',
                 value  => 'No token found',
-                className => 'danger',
+                className => 'oxi-status-danger',
             };
             $critical = 1;
         } elsif ($dp_status->{online}) {
@@ -153,7 +153,7 @@ sub render_system_status {
             push @fields, {
                 label  => 'Active Encryption Token',
                 value  => sprintf('not available (%s)', $dp_status->{alias}),
-                className => 'danger',
+                className => 'oxi-status-danger',
             };
             $critical = 1;
         }
@@ -166,7 +166,7 @@ sub render_system_status {
                 label  => 'Encryption token is expired',
                 format => 'timestamp',
                 value  => $status->{dv_expiry},
-                className => 'danger',
+                className => 'oxi-status-danger',
             };
         } elsif ($status->{dv_expiry} < $now + 30*86400) {
             $warning = 1;
@@ -174,7 +174,7 @@ sub render_system_status {
                 label  => 'Encryption token expires',
                 format => 'timestamp',
                 value  => $status->{dv_expiry},
-                className => 'warning',
+                className => 'oxi-status-warning',
             };
         }
     }
@@ -183,7 +183,7 @@ sub render_system_status {
         push @fields, {
             label  => 'I18N_OPENXPKI_UI_WATCHDOG_STATUS_LABEL',
             value  => 'I18N_OPENXPKI_UI_WATCHDOG_NOT_RUNNING',
-            className => 'danger',
+            className => 'oxi-status-danger',
         };
         $critical = 1;
     }
@@ -227,7 +227,7 @@ sub render_system_status {
 
             my $className = '';
             if ($alias->{status} ne 'ONLINE') {
-                $className = 'danger';
+                $className = 'oxi-status-danger';
                 $critical = 1;
             }
 

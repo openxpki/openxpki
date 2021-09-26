@@ -235,6 +235,18 @@ tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
   font-weight: bold;
 }
 
+/* same colors as Bootstrap's "alert-danger" */
+.oxi-status-danger {
+  background-color:#f8d7da;
+  color: #721c24;
+}
+
+/* same colors as Bootstrap's "alert-warning" */
+.oxi-status-warning {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
 /* <code> - keep line wraps */
 code { white-space: pre; }
 
