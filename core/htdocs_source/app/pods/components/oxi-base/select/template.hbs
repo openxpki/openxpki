@@ -2,7 +2,7 @@
 The top HTML element in the template of this component has to be <select>
 as otherwise the calling components' use of {{may-focus}} would not work.
 --}}
-<select ...attributes class="form-control" {{on "change" this.listChanged}} {{on-init this.startup}}>
+<select ...attributes class="form-control custom-select" {{on "change" this.listChanged}} {{on-init this.startup}}>
     {{#each @list as |item|}}
         <option value="{{item.value}}" selected={{if (eq item.value @selected) "selected"}}>
             {{item.label}}

@@ -309,6 +309,5 @@ export default class OxiContentService extends Service {
             }
         }
         this.navEntries = this.navEntries; // trigger updates
-        console.log("NAVENTRIES" + this.navEntries.length)
     }
 }

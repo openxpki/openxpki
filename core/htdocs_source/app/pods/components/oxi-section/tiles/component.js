@@ -1,5 +1,4 @@
 import Component from '@glimmer/component';
-import { computed } from '@ember/object';
 
 /**
  * Draws tiles.
@@ -27,7 +26,6 @@ import { computed } from '@ember/object';
  * @module component/oxi-section/tiles
  */
 export default class OxiSectionTilesComponent extends Component {
-    @computed("args.def.tiles")
     get tiles() {
         let tiles = this.args.def.tiles || [];
         let maxcol = this.args.def.maxcol;
@@ -44,13 +42,22 @@ export default class OxiSectionTilesComponent extends Component {
                 result.push(newline);
                 col = 0;
             }
-            if (t.type == 'newline') col = 0;
-            result.push(t);
+
+            let newTile = {
+                ...t,
+                content: { ...t.content }, // explicitely copy content so Ember does not complain if we set format below
+            };
+
+            if (t.type == 'newline') {
+                col = 0;
+            } else {
+                newTile.content.format = 'tile'; // button format
+            }
+            result.push(newTile);
         }
         return result;
     }
 
-    @computed("args.def.align")
     get align() {
         let defaultAlign = 'left';
         let align = this.args.def.align || defaultAlign;

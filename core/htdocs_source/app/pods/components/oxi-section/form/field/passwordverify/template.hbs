@@ -1,21 +1,33 @@
-<div>
 {{#if this.isFixed}}
-    <input type="text" class="form-control in-form-group"
+
+    <input type="text" class="form-control mb-2"
         value={{this.password}}
-        readonly="readonly"
-        {{may-focus this false}}
+        required={{not @content.is_optional}}
+        disabled
     />
+    <input type="text" class="form-control"
+        value={{this.confirm}}
+        placeholder={{this.placeholder}}
+        required={{not @content.is_optional}}
+        {{on "input" this.confirmPasswordChange}}
+        {{may-focus this true}}
+    />
+
 {{else}}
-    <input type="password" class="form-control in-form-group"
+
+    <input type="password" class="form-control mb-2"
         value={{this.password}}
+        required={{not @content.is_optional}}
         {{on "input" this.passwordChange}}
         {{may-focus this true}}
     />
-{{/if}}
-    <input type={{if this.isFixed "text" "password"}} class="form-control in-form-group"
+    <input type="password" class="form-control"
         value={{this.confirm}}
         placeholder={{this.placeholder}}
-        {{on "focus" this.confirmFocusIn}}
+        required={{not @content.is_optional}}
         {{on "input" this.confirmPasswordChange}}
     />
-</div>
+
+{{/if}}
+
+<div class="invalid-feedback">{{@error}}</div>

@@ -1,17 +1,20 @@
-<div class="container-fluid">
-    <div class="header row">
-        <div class="col-xs-6">
-            {{#if this.config.header}}
+<div class="container-fluid bg-dark text-light">
+    <div class="row py-2 align-items-center oxi-header-bar">
+        {{#if this.config.header}}
+            <div class="col">
                 {{{this.config.header}}}
-            {{else}}
-                <h2>
-                    <a href="./#/"><img src="{{this.rootURL}}img/logo.png" class="toplogo"></a>
-                    &nbsp;
-                    <small>{{t 'site.header'}}</small>
-                </h2>
-            {{/if}}
-        </div>
-        <div class="col-xs-6">
+            </div>
+        {{else}}
+            <div class="col">
+                <a href="./#/"><img src="{{this.rootURL}}img/logo.png"></a>
+            </div>
+            <div class="col d-none d-md-flex justify-content-center">
+                <h4 class="oxi-header">
+                    {{t 'site.header'}}
+                </h4>
+            </div>
+        {{/if}}
+        <div class="col">
             <Application::Header::Userinfo/>
         </div>
     </div>

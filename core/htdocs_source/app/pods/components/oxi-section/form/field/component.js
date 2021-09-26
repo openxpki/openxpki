@@ -20,18 +20,6 @@ export default class OxiFieldMainComponent extends Component {
         return `oxi-section/form/field/${this.args.field.type}`;
     }
 
-    get sFieldSize() {
-        let size;
-        let keys = this.args.field.keys;
-        if (keys) {
-            let keysize = 2;
-            size = 7 - keysize;
-        } else {
-            size = 7;
-        }
-        return 'col-md-' + size;
-    }
-
     get autofillConfig() {
         return this.args.field.autofill ? this.args.field.autofill : null;
     }
@@ -53,7 +41,7 @@ export default class OxiFieldMainComponent extends Component {
 
     @action
     onChange(value) {
-        this.args.setValue(value);
+        return this.args.setValue(value);
     }
 
     @action

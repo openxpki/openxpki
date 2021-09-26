@@ -5,7 +5,11 @@
         {{@value}}
     {{/if}}
 {{else}}
-    <BsButton @onClick={{this.toggleDetails}} @type="default" class="btn-xs">
+    <BsButton
+        @onClick={{this.toggleDetails}}
+        @type=""
+        class="btn-sm btn-light border-secondary"
+    >
         [{{this.type}}]
         {{#if this.detailsOpen}}
             <span class="glyphicon glyphicon-triangle-bottom"></span>
@@ -14,6 +18,8 @@
         {{/if}}
     </BsButton>
     {{#if this.detailsOpen}}
-        <pre style="white-space: pre-wrap">{{this.asJSON}}</pre>
+        <div class="card card-body bg-light">
+            <pre style="white-space: pre-wrap">{{this.asJSON}}</pre>
+        </div>
     {{/if}}
 {{/if}}

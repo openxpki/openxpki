@@ -1,33 +1,44 @@
-{{#if @buttons}}
-    <span class="oxi-button-container">
+{{#if (or @buttons (has-block))}}
+    <div class="oxi-button-container mt-3">
         {{#if this.hasDescription}}
-            {{#each @buttons as |btn|}}
-                <div class="row stacked-buttons">
+
+            {{#each @buttons as |btn index|}}
+                {{#if (and (has-block) (eq index 0))}}
+                    {{yield}}
+                {{/if}}
+                <div class="row align-items-center my-2">
                     {{#if btn.section}}
-                        <div class="col-xs-12">
+                        <div class="col-12">
                             <strong>{{btn.section}}</strong>
                         </div>
                     {{else}}
-                        <div class="col-xs-4">
+                        <div class="col-6 col-md-4">
                             <OxiBase::Button @button={{btn}} class="btn-block" @onClick={{@buttonClick}}/>
                         </div>
-                        <div class="col-xs-8 btn-bt-margin">
+                        <div class="col-6 col-md-8">
                             {{btn.description}}
                         </div>
                     {{/if}}
                 </div>
             {{/each}}
+
         {{else}}
-            {{#each this.buttonGroups as |btnGroup|}}
-                {{#each btnGroup as |btn|}}
-                    {{#if btn.section}}
-                        <!-- Section are not supported yet -->
-                    {{else}}
-                        <OxiBase::Button @button={{btn}} @onClick={{@buttonClick}}/>
+
+            {{#each this.buttonGroups as |btnGroup index|}}
+                <div class="mb-1"> {{!-- vertical spacing between button group rows --}}
+                    {{#if (and (has-block) (eq index 0))}}
+                        {{yield}}
                     {{/if}}
-                {{/each}}
-                <div class="spacer"></div>
+                    {{#each btnGroup as |btn|}}
+                        {{#if btn.section}}
+                            <!-- Section are not supported yet -->
+                        {{else}}
+                            <OxiBase::Button @button={{btn}} @onClick={{@buttonClick}}/>
+                        {{/if}}
+                    {{/each}}
+                </div>
             {{/each}}
+
         {{/if}}
-    </span>
+    </div>
 {{/if}}

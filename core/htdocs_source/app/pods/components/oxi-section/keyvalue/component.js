@@ -1,5 +1,4 @@
 import Component from '@glimmer/component';
-import { computed } from '@ember/object';
 
 /**
  * Draws a list of key/value pairs.
@@ -13,7 +12,6 @@ import { computed } from '@ember/object';
  * @module component/oxi-section/keyvalue
  */
 export default class OxiSectionKeyvalueComponent extends Component {
-    @computed("args.def.data")
     get items() {
         let items = this.args.def.data || [];
         for (const i of items) {

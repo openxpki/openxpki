@@ -8,6 +8,7 @@
                 class="form-control"
                 value={{@content.value}}
                 placeholder={{@content.placeholder}}
+                required={{not @content.is_optional}}
                 {{on "input" this.onCustomInput}}
                 {{on-init this.onCustomInsert}}
                 {{may-focus this true}}
@@ -17,20 +18,29 @@
                 @list={{this.options}}
                 @selected={{this.sanitizedValue}}
                 @onChange={{this.optionSelected}}
+                required={{not @content.is_optional}}
                 {{may-focus this true}}
             />
         {{/if}}
-        <span class="input-group-btn">
-            <BsButton @type="default" @active={{this.customMode}} @onClick={{this.toggleCustomMode}}>
+        <span class="input-group-append">
+            <BsButton
+                @type=""
+                @active={{this.customMode}}
+                @onClick={{this.toggleCustomMode}}
+                class="btn-light border-secondary"
+            >
                 {{t 'component.oxifield_select.custom_value'}}
             </BsButton>
         </span>
+        <div class="invalid-feedback">{{@error}}</div>
     </div>
 {{else}}
     <OxiBase::Select
         @list={{this.options}}
         @selected={{this.sanitizedValue}}
         @onChange={{this.optionSelected}}
+        required={{not @content.is_optional}}
         {{may-focus this true}}
     />
+    <div class="invalid-feedback">{{@error}}</div>
 {{/if}}

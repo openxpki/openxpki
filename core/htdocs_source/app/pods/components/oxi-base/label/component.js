@@ -21,6 +21,13 @@ export default class OxiLabelComponent extends Component {
     @tracked tooltipContent = null;
     @tracked tooltipReady = false;
 
+    get cssClasses() {
+        let classes = [];
+        if (this.args.inline || Array.isArray(this.args.text)) classes.push('d-inline-flex');
+        classes.push(this.args.nowrap ? 'text-nowrap' : 'text-wrap');
+        return classes.join(' ');
+    }
+
     @action
     fetchTooltip(event) {
         if (this.tooltipContent) return;

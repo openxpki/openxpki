@@ -1,34 +1,49 @@
 <style type="text/css">
     .test-chart { border: solid 1px #aaa; margin: 3pt; }
+    .crosses dt::before {
+        display: inline-block;
+        width: 1em;
+        content: "\2717";
+        color: #e00;
+    }
+
+    .crosses dd {
+        padding-left: 1em;
+    }
+
+    .row .card {
+        margin-bottom: 2rem;
+    }
 </style>
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-primary">
-                <div class="panel-body">
+        <div class="col-lg-12">
+            <div class="card border-info">
+                <div class="card-body">
                     <OxiBase::Button @button={{hash format="expected" label="de-DE"}} @onClick={{fn this.setLang "de-DE"}}/>
                     <OxiBase::Button @button={{hash format="expected" label="en-US"}} @onClick={{fn this.setLang "en-US"}}/>
                 </div>
             </div>
         </div>
     </div>
+
     <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-primary">
-                <div class="panel-heading"></div>
-                <div class="panel-body">
+        <div class="col-lg-12">
+            <div class="card border-info">
+                <div class="card-header bg-info"></div>
+                <div class="card-body">
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-lg-3">
                             <OxiSection @content={{this.chartDef1}}/>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-lg-3">
                             <OxiSection @content={{this.chartDef2}}/>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-lg-3">
                             <OxiSection @content={{this.chartDef3}}/>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-lg-3">
                             <OxiSection @content={{this.chartDef4}}/>
                         </div>
                     </div>
@@ -36,30 +51,52 @@
             </div>
         </div>
     </div>
+
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-lg-12">
             {{#each this.forms as |form index|}}
                 <OxiBase::Button
-                    @button={{hash format="expected" label=form.content.title}}
+                    class="btn btn-info"
+                    @button={{hash label=form.content.title}}
                     @onClick={{fn this.setCurrentForm index}}
                 />
             {{/each}}
 
             {{#each this.forms as |form index|}}
                 {{#if (eq index this.selectedFormIndex) }}
-                    <div class="panel panel-primary">
-                        <div class="panel-heading"></div>
-                        <div class="panel-body">
+                    <div class="card border-info">
+                        <div class="card-header bg-info"></div>
+                        <div class="card-body">
                             <OxiSection @content={{form}}/>
                         </div>
                     </div>
                 {{/if}}
             {{/each}}
+        </div>
+    </div>
 
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card border-info">
+                <div class="card-header bg-info"></div>
+                <div class="card-body">
+                    <form class="form-inline">
+                        <OxiBase::ButtonContainer @buttons={{this.forms.1.content.buttons}}>
+                            <BsButton @type="" class="oxi-btn-submit"> Submit </BsButton>
+                            <BsButton @type="" class="oxi-btn-reset"> Reset </BsButton>
+                        </OxiBase::ButtonContainer>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
             {{#each this.sections as |sectionDef|}}
-                <div class="panel panel-primary">
-                    <div class="panel-heading"></div>
-                    <div class="panel-body">
+                <div class="card border-info">
+                    <div class="card-header bg-info"></div>
+                    <div class="card-body">
                         <OxiSection @content={{sectionDef}}/>
                     </div>
                 </div>

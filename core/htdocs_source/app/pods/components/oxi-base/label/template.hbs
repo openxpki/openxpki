@@ -1,5 +1,5 @@
 {{~#each (arrayify @text) as |txt|~}}
-    <span class="oxi-label {{@class}}">
+    <div class="{{@class}} {{this.cssClasses}}">
         {{#if @tooltip}}
             <EmberTooltip>
                 {{@tooltip}}
@@ -21,5 +21,5 @@
     {{else}}
         {{txt}}
     {{/if}}
-    </span>
+    </div>
 {{~/each~}}

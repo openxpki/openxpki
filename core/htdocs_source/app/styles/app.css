@@ -1,22 +1,21 @@
+@import url("bootstrap-v4-tweaks.css");
+@import url("glyphicons.css");
+
 /******************************************************************************
  * Header, page structure, basic elements
  */
+
 html,
 body {
   height: 100%;
-  /* The html and body elements cannot have any padding or margin. */
 }
 
-/* Wrapper for page content to push down footer */
-body > .ember-view {
-  height: 100%;
+.oxi-header {
+  margin-bottom: 0;
 }
 
-#waiting-for-ember .alert {
-  margin-top: 1em;
-}
-
-#application {
+/* Only used to push down the footer element */
+.oxi-application {
   min-height: 100%;
   height: auto !important;
   height: 100%;
@@ -26,36 +25,10 @@ body > .ember-view {
   padding: 0 0 60px;
 }
 
-/* Set the fixed height of the footer here */
-#footer {
+.oxi-footer {
   height: 60px;
   padding-top: 20px;
   background-color: #f5f5f5;
-}
-
-.header {
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-.toplogo {
-  padding-top:6px;
-  padding-right:12px;
-}
-
-.header .userinfo {
-  font-size: small;
-  color: #aaa;
-  margin-top: 20px;
-}
-
-label {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.description {
-  margin-bottom: 12px;
 }
 
 .tab-close {
@@ -74,73 +47,15 @@ label {
   opacity: 0.5;
 }
 
-.modal-header + .modal-body h3 {
-  margin-top:5px;
+.userinfo {
+  font-size: 80%;
 }
 
-/* Menu (navigation bar) */
-.navbar {
-  margin-bottom:10px;
-}
-
-.navbar .dropdown-header {
-  border-bottom: 1px solid #e9ecef;
-  margin-top: 0.75em;
-}
-
-.maincontent {
-  margin-bottom:300px;
-}
-
-.container.sections {
-  padding-top:20px;
-}
-
-.section {
-  padding:0px !important;
-}
-
-.table-bordered tr.spacer th {
-  padding-top:15px;
-  background-color: #eee;
-}
-
-/* Fix pointer on bootstrap navbars */
-ul.pagination li:not(.disabled) > a {
+/******************************************************************************
+ * Pagination
+ */
+.pagination li:not(.disabled) > a {
   cursor: pointer;
-}
-
-span.pagination-label {
-  float: left;
-  padding: 6px 0;
-}
-
-span.oxi-label {
-    display: inline-block;
-    white-space: nowrap;
-}
-
-/* Remove padding below UL and DL */
-dl, ul {
-  margin-bottom: 0;
-}
-
-/* Indent DL items */
-dd {
-  padding: 0 0 0 1em;
-}
-dd + dt {
-  padding-top: 0.5em;
-}
-
-/* Pager */
-.oxi-pager .pagination {
-  margin: 0;
-}
-
-/* Spacer */
-div.spacer {
-  margin:5px;
 }
 
 /******************************************************************************
@@ -158,16 +73,16 @@ div.spacer {
   z-index:1001;
 }
 
-.refresh-banner {
+.oxi-loading-banner {
   position: fixed;
-  top: 3%;
+  top: 1%;
   right: 1%;
   z-index:1002;
 }
 
-.loading-banner {
+.oxi-refresh-banner {
   position: fixed;
-  top: 1%;
+  top: 3%;
   right: 1%;
   z-index:1002;
 }
@@ -189,59 +104,43 @@ div.spacer {
   100% { -webkit-transform: rotate(359deg); transform: rotate(359deg); }
 }
 
-.waiting-for-ember {
-  margin-top: 80px;
-}
-
 /******************************************************************************
  * Breadcrumbs
  */
-.oxi-pagehead ol.breadcrumb {
-  margin:10px 0 0 0;
+
+.breadcrumb {
   padding: 0;
+  margin-bottom: 1rem;
   background-color: transparent;
-  border: none;
   border-radius: 0;
-  list-style: none inside;
   color: #a0a0a0;
 }
 
-ol.breadcrumb > li + li:before {
+.breadcrumb-item + .breadcrumb-item::before {
   color: #a0a0a0;
 }
 
-.oxi-pagehead ol.breadcrumb + h2 {
-  margin-top:10px;
-}
-
-ol.breadcrumb .workflow-type:before {
-  padding-right: 5px;
+.breadcrumb-item::before {
   font-family: "Glyphicons Halflings";
+  padding-right: 0.5rem;
+}
+
+.breadcrumb .workflow-type::before {
   content: "\e136";
-  color: #a0a0a0;
 }
 
-ol.breadcrumb .workflow-state:before {
-  padding-right: 5px;
-  font-family: "Glyphicons Halflings";
+.breadcrumb .workflow-state::before {
   content: "\e062";
-  color: #a0a0a0;
 }
 
-ol.breadcrumb .workflow-search:before,
-ol.breadcrumb .cert-search:before {
-  padding-right: 5px;
-  font-family: "Glyphicons Halflings";
+.breadcrumb .workflow-search::before,
+.breadcrumb .cert-search::before {
   content: "\e003";
-  color: #a0a0a0;
 }
 
-ol.breadcrumb .workflow-search-result:before,
-ol.breadcrumb .cert-search-result:before {
-  padding-right: 5px;
-  font-family: "Glyphicons Halflings";
+.breadcrumb .workflow-search-result::before,
+.breadcrumb .cert-search-result::before {
   content: "\e056";
-  color: #a0a0a0;
 }
 
 /******************************************************************************
@@ -255,10 +154,6 @@ ol.breadcrumb .cert-search-result:before {
 div.oxisection-grid th.sortable {
   cursor: pointer;
   -webkit-user-select: none;
-}
-
-tr.has-action {
-  cursor: pointer;
 }
 
 /* plain grid-row without status */
@@ -306,8 +201,19 @@ tr.gridrow-danger > td {background-color: #ebcccc !important;}
 tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
 
 /******************************************************************************
- * Status labels inside key/value lists
+ * Key-Value lists
  */
+
+.oxi-keyvalue-head.spacer {
+  margin-top: 1rem;
+  background-color: #eee;
+}
+
+.oxi-keyvalue-label::after {
+  content: ':';
+}
+
+/* Status labels */
 .styled-valid,
 .dns-valid,
 .certstatus-issued {
@@ -339,23 +245,32 @@ tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
 .styled-failed {
   font-weight: bold;
 }
-/* keep line wraps in code */
+
+/* same colors as Bootstrap's "alert-danger" */
+.oxi-status-danger {
+  background-color:#f8d7da;
+  color: #721c24;
+}
+
+/* same colors as Bootstrap's "alert-warning" */
+.oxi-status-warning {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+/* <code> - keep line wraps */
 code { white-space: pre; }
 
 /* certificate serial number in details popup */
-tr.certserial td li {
-  line-height:1.8em;
-}
-/* First child is the hex number */
-tr.certserial td li:first-child::after {
+.certserial ul li:first-child::after { /* first child is the hex number */
   content: "hex";
-  font-size: .70em;
+  font-size: .7em;
   vertical-align: sub;
+  line-height: 1.8em;
 }
-/* Last child is the decimal number */
-tr.certserial td li:last-child::after {
+.certserial ul li:last-child::after { /* last child is the decimal number */
   content: "dec";
-  font-size: .70em;
+  font-size: .7em;
   vertical-align: sub;
 }
 
@@ -363,19 +278,24 @@ tr.certserial td li:last-child::after {
  * Form fields
  */
 
-input.in-form-group {
-  margin-bottom: 15px;
+.oxi-no-input {
+  padding-top: 0.4rem;
 }
 
-.oxi-no-input {
-  padding-top: 6px;
+/* Labels */
+form label.col-form-label {
+  font-weight: normal;
+}
+
+form div.required label.col-form-label {
+  font-weight: bold;
 }
 
 /* Input fields */
 div.required input,
 div.required select,
 div.required textarea {
-  background-color:#fff3c2;
+  background-color:#fff3c2 !important;
   border:1px solid #444;
 }
 
@@ -383,10 +303,6 @@ div.required input.form-control[disabled] ,
 div.required select.form-control[disabled],
 div.required textarea.form-control[disabled] {
   border:1px solid #ccc;
-}
-
-div.optional label.control-label:after {
-  content: '*';
 }
 
 div.optional input,
@@ -436,19 +352,17 @@ div.oxifield-upload {
   color: #777;
 }
 
+/* Datetime */
+div.optional input.flatpickr-input {
+  background-color: transparent;
+}
+div.required input.flatpickr-input {
+  background-color: #fff3c2;
+}
+
 /******************************************************************************
  * Buttons
  */
-.stacked-buttons {
-  margin-top: 4px;
-  margin-bottom: 4px;
-}
-
-.stacked-buttons .btn-bt-margin {
-  margin-top: 6px;
-  margin-bottom: 6px;
-}
-
 .oxi-btn-loading {
   color: #fff;
   background-color: #428bca;
@@ -461,67 +375,59 @@ div.oxifield-upload {
   border-color: #285e8e;
 }
 
-.oxi-button-container {
-  padding-bottom: 20px;
-}
-
-.oxi-button-container a.btn:before {
-  padding-right: 5px;
+.oxi-button-container a.btn::before {
   font-family: "Glyphicons Halflings";
   content: "\e144";
-  color: #a0a0a0;
+  font-size: 80%;
+  padding-right: 0.5rem;
 }
 
 /* Button format from workflow defs */
-.oxi-btn-expected,
-.oxi-btn-expected:hover,
+
+.oxi-btn-expected:not(:hover),
 .oxi-btn-expected:focus,
-.oxi-btn-submit,
-.oxi-btn-submit:hover,
+.oxi-btn-submit:not(:hover),
 .oxi-btn-submit:focus {
-    background-color: #c9e2b3;
+  color: #333; border-color: #ccc;
+  background-color: #c9e2b3;
 }
 
-.oxi-btn-optional,
-.oxi-btn-optional:hover,
+.oxi-btn-optional:not(:hover),
 .oxi-btn-optional:focus {
-    background-color: #e4e4da;
+  color: #333; border-color: #ccc;
+  background-color: #e4e4da;
 }
 
-.oxi-btn-failure,
-.oxi-btn-failure:hover,
+.oxi-btn-failure:not(:hover),
 .oxi-btn-failure:focus,
-.oxi-btn-cancel,
-.oxi-btn-cancel:hover,
+.oxi-btn-cancel:not(:hover),
 .oxi-btn-cancel:focus {
-    background-color: #e39f9f;
+  color: #333; border-color: #ccc;
+  background-color: #e39f9f;
 }
 
-.oxi-btn-reset,
-.oxi-btn-reset:hover,
+.oxi-btn-reset:not(:hover),
 .oxi-btn-reset:focus,
-.oxi-btn-alternative,
-.oxi-btn-alternative:hover,
+.oxi-btn-alternative:not(:hover),
 .oxi-btn-alternative:focus {
-    background-color: #ffd78c;
+  color: #333; border-color: #ccc;
+  background-color: #ffd78c;
 }
 
-.oxi-btn-exceptional,
-.oxi-btn-exceptional:hover,
+.oxi-btn-exceptional:not(:hover),
 .oxi-btn-exceptional:focus {
-    background-color: #79d1f3;
+  color: #333; border-color: #ccc;
+  background-color: #79d1f3;
 }
 
-.oxi-btn-terminate,
-.oxi-btn-terminate:hover,
+.oxi-btn-terminate:not(:hover),
 .oxi-btn-terminate:focus {
-    background-color: #ad7fa8;
+  color: #333; border-color: #ccc;
+  background-color: #ad7fa8;
 }
 
-/******************************************************************************
- * Tiles
- */
-.oxi-tile {
+.oxi-btn-tile:not(:hover) {
+  background: transparent;
   border: 1px solid transparent;
 }
 
@@ -579,11 +485,3 @@ div.oxifield-upload {
 
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .hover-element:hover .content { border-color: #bfe0a8 }
-
-/* class is from bootstrap 4.0 but it looks like we do not have this in the assets? */
-.dropdown-divider {
-	height: 0;
-	margin: .5rem 0;
-	overflow: hidden;
-	border-top: 1px solid #e9ecef;
-}

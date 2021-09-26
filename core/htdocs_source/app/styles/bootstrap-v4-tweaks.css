@@ -1,0 +1,27 @@
+/******************************************************************************
+ * Bootstrap v4 fixes
+ */
+
+/* Remove padding below UL and DL */
+dl, ul {
+  margin-bottom: 0;
+}
+
+/* Indent DL items */
+dd {
+  padding: 0 0 0 1em;
+}
+dd + dt {
+  padding-top: 0.5em;
+}
+
+/* Do not set green color for labels of "valid" checkboxes */
+.was-validated .form-check-input:valid ~ .form-check-label {
+    color: inherit;
+}
+
+/* Menu (navigation bar) */
+.navbar .dropdown-header {
+  border-bottom: 1px solid #e9ecef;
+  padding: 0.5rem 0.5rem;
+}

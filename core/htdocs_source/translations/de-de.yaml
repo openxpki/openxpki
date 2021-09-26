@@ -35,6 +35,7 @@ button:
 component:
   oxifield_datetime:
     timezone: "Zeitzone: {tz}"
+    date_format: "d.m.Y H:i" # see https://flatpickr.js.org/formatting/
   oxifield_select:
     custom_value: "Angepasst"
   oxifield_cert_identifier:

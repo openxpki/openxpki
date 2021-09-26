@@ -6,7 +6,7 @@ export default class ApplicationController extends Controller {
     removeLoader() {
         // note: we don't use an Ember loading substate here as this would
         // lead to a disruptive UX on every page (route) switch
-        let el = document.getElementById("waiting-for-ember");
+        let el = document.querySelector(".oxi-loading-banner");
         if (!el) return;
         el.parentNode.removeChild(el);
     }

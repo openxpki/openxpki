@@ -1,20 +1,20 @@
 {{#if this.items.length}}
-    <table class="table table-bordered">
-        <tbody>
-            {{#each this.items as |item|}}
-                <tr class="{{item.className}}">
-                {{#if item.isHead}}
-                    <th colspan="2">{{item.value}}</th>
-                {{else}}
-                    <td>{{item.label}}</td>
-                    <td>
-                        {{#if item.preamble}}<i>{{item.preamble}}</i><br/>{{/if}}
-                        <OxiBase::Formatted @format={{item.format}} @value={{item.value}}/>
-                    </td>
-                {{/if}}
-                </tr>
-            {{/each}}
-        </tbody>
-    </table>
+    <div class="container-fluid oxi-keyvalue">
+        {{#each this.items as |item|}}
+            <div class="row {{item.className}} py-1 oxi-keyvalue-head">
+            {{#if item.isHead}}
+                <div class="col-12">{{item.value}}</div>
+            {{else}}
+                <div class="col-md-4 px-2 text-md-right text-secondary font-weight-bold oxi-keyvalue-label">
+                    {{~item.label~}}
+                </div>
+                <div class="col-md-8 px-2 ml-3 ml-md-0">
+                    {{#if item.preamble}}<i>{{item.preamble}}</i><br/>{{/if}}
+                    <OxiBase::Formatted @format={{item.format}} @value={{item.value}}/>
+                </div>
+            {{/if}}
+            </div>
+        {{/each}}
+    </div>
     <OxiBase::ButtonContainer @buttons={{@def.buttons}} @buttonClick={{@buttonClick}}/>
 {{/if}}

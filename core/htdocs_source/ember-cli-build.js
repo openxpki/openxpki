@@ -41,9 +41,9 @@ module.exports = function(defaults) {
     },
 
     'ember-bootstrap': {
-      bootstrapVersion: 3,
+      bootstrapVersion: 4,
       importBootstrapCSS: true,
-      importBootstrapFont: true,
+      importBootstrapFont: false,
       // only include used components into compiled JS
       whitelist: ['bs-button', 'bs-modal', 'bs-dropdown', 'bs-navbar', 'bs-collapse'],
     },
@@ -82,6 +82,11 @@ module.exports = function(defaults) {
     'ember-fetch': {
       preferNative: true,
     },
+
+    // flatpickr date picker
+    'flatpickr': {
+      locales: ['de', 'it', 'ja', 'ru', 'zh'],
+    },
   });
 
   // Use `app.import` to add additional libraries to the generated
@@ -96,7 +101,6 @@ module.exports = function(defaults) {
   // modules that you would like to import into your application
   // please specify an object with the list of modules as keys
   // along with the exports of each module as its value.
-  app.import('node_modules/moment/moment.js', { prepend: true }); // needed by (ember-cli-)bootstrap-datetimepicker
   app.import('node_modules/uplot/dist/uPlot.min.css');
 
   return app.toTree();

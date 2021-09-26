@@ -1,7 +1,8 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action, computed, set } from "@ember/object";
+import { action, set } from "@ember/object";
 import { debug } from '@ember/debug';
+//import ow from 'ow';
 
 /**
  * Shows a button with an optional confirm dialog.
@@ -10,11 +11,11 @@ import { debug } from '@ember/debug';
  *
  * 1. show a `<a href/>` tag and simply open the given URL:
  *    ```html
- *    <OxiBase::Button @button={{myDef2}} class="btn btn-default"/>
+ *    <OxiBase::Button @button={{myDef2}} class="btn btn-secondary"/>
  *    ```
  * 2. show a `<button/>` tag and handle clicks via callback:
  *    ```html
- *    <OxiBase::Button @button={{myDef1}} @onClick={{sendData}} class="btn btn-default"/>
+ *    <OxiBase::Button @button={{myDef1}} @onClick={{sendData}} class="btn btn-secondary"/>
  *    ```
  *
  * @param { hash } button - the button definition.
@@ -59,14 +60,14 @@ let format2css = {
     alternative:    "oxi-btn-alternative",
     exceptional:    "oxi-btn-exceptional",
     terminate:      "oxi-btn-terminate",
+    tile:           "oxi-btn-tile",
 };
 
 export default class OxiButtonComponent extends Component {
     @tracked showConfirmDialog = false;
 
-    @computed("args.button.format")
     get additionalCssClass() {
-        if (!this.args.button.format) { return "" }
+        if (!this.args.button.format) { return "btn-light border-secondary" }
         let cssClass = format2css[this.args.button.format];
         if (cssClass === undefined) {
             /* eslint-disable-next-line no-console */
@@ -75,9 +76,34 @@ export default class OxiButtonComponent extends Component {
         return cssClass ?? "";
     }
 
-    @computed("args.button.format")
-    get buttonType() {
-        return (this.args.button.format === "primary" ? "primary" : "default");
+    constructor() {
+        super(...arguments);
+
+        // type validation
+        // TODO Reactivate type checking once we drop IE11 support
+        /*
+        ow(this.args.button, 'button', ow.any(
+            ow.object.partialShape({
+                'label': ow.string.not.empty,
+                'format': ow.optional.string,
+                'tooltip': ow.optional.string,
+                'disabled': ow.optional.boolean,
+                'confirm': ow.optional.object.exactShape({
+                    'label': ow.string.not.empty,
+                    'description': ow.string.not.empty,
+                    'confirm_label': ow.optional.string,
+                    'cancel_label': ow.optional.string,
+                }),
+            }),
+            ow.object.partialShape({
+                'label': ow.string.not.empty,
+                'href': ow.string.not.empty,
+                'format': ow.optional.string,
+                'tooltip': ow.optional.string,
+                'target': ow.optional.string,
+            }),
+        ));
+        */
     }
 
     @action

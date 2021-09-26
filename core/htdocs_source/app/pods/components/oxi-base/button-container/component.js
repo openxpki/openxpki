@@ -1,5 +1,4 @@
 import Component from '@glimmer/component';
-import { computed } from '@ember/object';
 
 /**
  * Shows buttons as a group.
@@ -16,19 +15,21 @@ import { computed } from '@ember/object';
  */
 export default class OxiButtonContainerComponent extends Component {
     get buttonGroups() {
+        let buttons = this.args.buttons || [];
+        let groups = [];
         let currentGroup = [];
-        let groups = [currentGroup];
-        let buttons = this.args.buttons;
 
         for (const btn of buttons) {
-            if (btn.break_before) { currentGroup = []; groups.push(currentGroup) }
+            if (btn.break_before) { groups.push(currentGroup); currentGroup = [] }
             currentGroup.push(btn);
-            if (btn.break_after)  { currentGroup = []; groups.push(currentGroup) }
+            if (btn.break_after)  { groups.push(currentGroup); currentGroup = [] }
         }
+
+        groups.push(currentGroup);
+
         return groups;
     }
 
-    @computed("args.buttons.@each.description")
     get hasDescription() {
         let ref;
         return (ref = this.args.buttons) != null ? ref.isAny("description") : void 0;

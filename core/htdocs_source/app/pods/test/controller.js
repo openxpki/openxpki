@@ -20,11 +20,11 @@ export default class TestController extends Controller {
                     200,
                     { "Content-type": "application/yaml" },
                     'header: |-' + "\n" +
-                    '    <h2>' + "\n" +
+                    '    <h3>' + "\n" +
                     '        <a href="./#/"><img src="img/logo.png" class="toplogo"></a>' + "\n" +
                     '        &nbsp;' + "\n" +
                     '        <small>Test page</small>' + "\n" +
-                    '    </h2>' + "\n" +
+                    '    </h3>' + "\n" +
                     'accessibility:' + "\n" +
                     '    tooltipOnFocus: on' + "\n"
             ]);
@@ -233,7 +233,7 @@ export default class TestController extends Controller {
                         },
                     },
                     {
-                        type: "text",
+                        type: "textarea",
                         name: "text_autofill",
                         label: "Autofill",
                         autofill: {
@@ -314,6 +314,7 @@ export default class TestController extends Controller {
                             label: "Really sure?",
                             description: "Think about it one more time.",
                         },
+                        break_before: 1,
                     },
                     {
                         ...this._testButton,
@@ -365,6 +366,7 @@ export default class TestController extends Controller {
                         type: "datetime",
                         name: "dt_now",
                         label: "Date, now",
+                        placeholder: "Please select a date...",
                     },
                     {
                         type: "datetime",
@@ -477,7 +479,7 @@ export default class TestController extends Controller {
                     {
                         type: "textarea",
                         name: "prosa_autofill",
-                        label: "Textarea",
+                        label: "Textarea (Autofill)",
                         value: "",
                         autofill: {
                             request: {
@@ -495,7 +497,7 @@ export default class TestController extends Controller {
                         type: "textarea",
                         name: "textarea_upload",
                         value: "...data...",
-                        label: "Uploadarea",
+                        label: "Textarea (Autofill + Upload)",
                         allow_upload: 1,
                         autofill: {
                             request: {
@@ -683,6 +685,10 @@ export default class TestController extends Controller {
                 description: "",
                 data: [
                     {
+                        format: "head",
+                        value: "These is all we got:",
+                    },
+                    {
                         format: "certstatus",
                         label: "certstatus",
                         value: {
@@ -713,6 +719,11 @@ export default class TestController extends Controller {
                         format: "timestamp",
                         label: "timestamp",
                         value: 1617495633,
+                    },
+                    {
+                        format: "head",
+                        value: "More values...",
+                        className: "spacer",
                     },
                     {
                         format: "text",
@@ -768,6 +779,7 @@ export default class TestController extends Controller {
                             { label: "second", value: "<a href=\"https://www.openxpki.org\">OpenXPKI</a>", format: "raw" },
                             { label: "subject", value: [ "CN=sista.example.org", "DC=Test Deployment", "DC=PKI Examples", "DC=OpenXPKI", "DC=org" ] },
                         ],
+                        className: "crosses",
                     },
                     {
                         format: "deflist",
@@ -860,6 +872,30 @@ export default class TestController extends Controller {
                         format: "head",
                         label: "head",
                     },
+                ],
+                buttons: [
+                    {
+                        format: "expected",
+                        page: "certificate!search!query!rJdrIbg1P6xsE6b9RtQCXp291SE",
+                        label: "Reload Search Form",
+                    },
+                    {
+                        format: "alternative",
+                        page: "redirect!certificate!result!id!rJdrIbg1P6xsE6b9RtQCXp291SE",
+                        label: "Refresh Result",
+                        break_after: 1,
+                    },
+                    {
+                        label: "New Search",
+                        format: "failure",
+                        page: "certificate!search"
+                    },
+                    {
+                        label: "Export Result",
+                        format: "optional",
+                        target: "_blank",
+                        href: "/cgi-bin/webui.fcgi?page=certificate!export!id!rJdrIbg1P6xsE6b9RtQCXp291SE"
+                    }
                 ],
             }
         },

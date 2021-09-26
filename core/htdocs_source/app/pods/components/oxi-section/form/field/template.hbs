@@ -1,8 +1,8 @@
-<div class="form-group {{if @field.error "has-error"}} {{if @field.is_optional "optional" "required"}} {{@field.class}}">
+<div class="form-group row {{if @field.is_optional "optional" "required"}} {{@field.class}}">
     {{#if this.isBool}}
         <div class="col-md-2"></div>
     {{else}}
-        <label class="col-md-2 control-label">{{@field.label}}</label>
+        <label class="col-md-2 col-form-label text-md-right">{{@field.label}}</label>
     {{/if}}
 
     {{#if @field.keys}}
@@ -11,7 +11,7 @@
         </div>
     {{/if}}
 
-    <div class="{{this.sFieldSize}}" {{on "keydown" this.onKeydown}}>
+    <div class="col" {{on "keydown" this.onKeydown}}>
         {{#if @field.tooltip}}
             {{#if this.config.tooltipOnFocus}}
                 {{! Showing a tooltop on focus is EmberTooltip's default behaviour }}
@@ -35,27 +35,12 @@
                 onError=this.onError
                 setFocusInfo=@setFocusInfo
                 encodeFields=@encodeFields
+                error=@field._error
             ) as |FieldInstance|
         }}
             <FieldInstance>
-                <:autofill as |isDisabled valueSetter|>
-                    {{#if this.autofillConfig}}
-                        <OxiSection::Form::Autofill
-                            @config={{this.autofillConfig}}
-                            @disabled={{isDisabled}}
-                            @valueSetter={{valueSetter}}
-                            @encodeFields={{@encodeFields}}
-                        />
-                    {{/if}}
-                </:autofill>
             </FieldInstance>
         {{/let}}
-{{!--             autofill=this.autofill
- --}}
-
-        {{#if @field.error}}
-            <span class="help-block">{{@field.error}}</span>
-        {{/if}}
     </div>
 
     {{#if @field.clonable}}
