@@ -779,6 +779,7 @@ export default class TestController extends Controller {
                             { label: "second", value: "<a href=\"https://www.openxpki.org\">OpenXPKI</a>", format: "raw" },
                             { label: "subject", value: [ "CN=sista.example.org", "DC=Test Deployment", "DC=PKI Examples", "DC=OpenXPKI", "DC=org" ] },
                         ],
+                        className: "crosses",
                     },
                     {
                         format: "deflist",
