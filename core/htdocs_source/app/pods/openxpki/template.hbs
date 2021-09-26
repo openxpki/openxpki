@@ -116,7 +116,7 @@
                     {{!-- Main page content --}}
                     <div class="{{if entry.right "col-lg-8" "col-lg-12"}}">
                         {{#each entry.main as |mainEntry|}}
-                            {{#let (or (eq mainEntry.type "form")) as |asCard|}}
+                            {{#let (or (eq mainEntry.type "keyvalue")) as |asCard|}}
                                 <OxiSection @content={{mainEntry}} @renderAsCard={{asCard}} />
                             {{/let}}
                         {{/each}}
