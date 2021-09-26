@@ -16,13 +16,11 @@
     <body>
         {{content-for "body"}}
 
-        <div id="waiting-for-ember">
-            <div class="loading-banner">
-                <h4 class="alert alert-info" role="alert">
-                    <span class="glyphicon glyphicon-refresh spin"></span>
-                    &nbsp;OpenXPKI is loading...
-                </h4>
-            </div>
+        <div class="oxi-loading-banner">
+            <h4 class="alert alert-info" role="alert">
+                <span class="glyphicon glyphicon-refresh spin"></span>
+                &nbsp;OpenXPKI is loading...
+            </h4>
         </div>
 
         {{content-for "body-footer"}}
