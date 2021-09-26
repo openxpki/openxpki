@@ -19,6 +19,7 @@
     <div class="col-lg-2">
         {{#if @content.allow_upload}}
             <BsButton
+                @type="light"
                 class="oxi-btn-exceptional btn-block btn-sm"
                 @onClick={{this.openFileUpload}}
                 disabled={{this.hasContent}}
@@ -39,7 +40,7 @@
 
         {{#if (or @content.allow_upload @content.autofill)}}
             <BsButton
-                @type='default'
+                @type="light"
                 class="oxi-btn-cancel btn-block btn-sm"
                 @onClick={{this.resetInput}}
                 disabled={{not this.hasContent}}

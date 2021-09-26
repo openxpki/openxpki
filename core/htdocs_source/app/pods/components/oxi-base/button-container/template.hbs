@@ -1,5 +1,5 @@
 {{#if (or @buttons (has-block))}}
-    <span class="oxi-button-container">
+    <div class="oxi-button-container mt-3">
         {{#if this.hasDescription}}
 
             {{#each @buttons as |btn index|}}
@@ -40,5 +40,5 @@
             {{/each}}
 
         {{/if}}
-    </span>
+    </div>
 {{/if}}

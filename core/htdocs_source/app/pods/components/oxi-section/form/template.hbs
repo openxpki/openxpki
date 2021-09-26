@@ -19,7 +19,7 @@
         <div class="offset-lg-2 col-lg-7">
             <OxiBase::ButtonContainer @buttons={{@def.buttons}} @buttonClick={{@buttonClick}}>
                 <BsButton
-                    @type=""
+                    @type="light"
                     @onClick={{this.submit}}
                     class="{{if this.loading "oxi-btn-loading"}} oxi-btn-submit"
                 >
@@ -27,7 +27,7 @@
                 </BsButton>
                 {{#if @def.reset}}
                     <BsButton
-                        @type=""
+                        @type="light"
                         @onClick={{this.reset}}
                         class="oxi-btn-reset"
                     >
