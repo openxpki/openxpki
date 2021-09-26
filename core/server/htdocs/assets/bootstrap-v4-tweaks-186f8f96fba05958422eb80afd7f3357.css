@@ -1,0 +1,5 @@
+dl,ul{margin-bottom:0}
+dd{padding:0 0 0 1em}
+dd+dt{padding-top:.5em}
+.was-validated .form-check-input:valid~.form-check-label{color:inherit}
+.navbar .dropdown-header{border-bottom:1px solid #e9ecef;padding:.5rem}
