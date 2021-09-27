@@ -490,7 +490,8 @@ specific OID (1.3.6.1.4.1.311.20.2). If your request contains this OID
 **and** the value of this oid is listed in the profile map, the workflow
 will use the given profile definition to issue the certificate. If no OID
 is present or the value is not in the map, the default profile from the
-server configuration is used.
+server configuration is used. This map is also used if the you pass the
+*profile* as parameter in an RPC call.
 
 The map is a hash list::
 
