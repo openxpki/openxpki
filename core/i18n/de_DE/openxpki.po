@@ -14,6 +14,12 @@ msgstr ""
 "X-Generator: Poedit 2.3\n"
 "X-Poedit-Bookmarks: -1,-1,77,-1,-1,-1,-1,-1,-1,-1\n"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHECK_POLICY_DNS_LABEL"
+msgstr "Fehlerhafte DNS Prüfungen"
+
+msgid "I18N_OPENXPKI_UI_DNS_CHECK_PREAMBLE"
+msgstr "FQDNs mit Ergebnis der DNS Prüfung"
+
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Die ausgewählte Aktion ist nicht verfügbar"
 
@@ -2482,7 +2488,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SUBJECT_DESC"
 msgstr "Subject des Antrags"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_SUBJECT_LABEL"
-msgstr "Subject (Antrags)"
+msgstr "Subject (Antrag)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CSR_TYPE_DESC"
 msgstr "Typ des CSR (PCKS10, server generated, SPKAC)"
