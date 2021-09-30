@@ -216,13 +216,29 @@ tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
  * Key-Value lists
  */
 
+@media (min-width: 768px) {
+  .oxi-keyvalue-label {
+    flex: 0 0 auto;
+    width: auto;
+    max-width: 27%; /* must be less than "col-4" = 33.333%, see app/pods/components/oxi-section/keyvalue/template.hbs */
+  }
+}
+
+.oxi-keyvalue-dots {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.oxi-keyvalue-dots::after {
+  content:
+    ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
+    ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
+    ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
+}
+
 .oxi-keyvalue-head.spacer {
   margin-top: 1rem;
   background-color: #eee;
-}
-
-.oxi-keyvalue-label::after {
-  content: ':';
 }
 
 /* Status labels */
