@@ -3,9 +3,9 @@
 {{/if}}
 
 <BsNavbar
-    @type="dark"
-    @backgroundColor="secondary"
-    class="py-2 py-lg-0 mb-2"
+    @type="light"
+    @backgroundColor=""
+    class="py-2 py-lg-0 mb-2 oxi-navbar"
     @collapsed={{true}}
     @onCollapse={{action (mut this.collapsed) true}}
     @onExpand={{action (mut this.collapsed) false}} as |navbar|
@@ -18,7 +18,7 @@
             {{#each this.model.navEntries as |navEntry|}}
                 {{#if navEntry.entries.length}}
                     <nav.dropdown class="mx-2" as |dd|>
-                        <dd.toggle class="text-light">
+                        <dd.toggle>
                             {{navEntry.label}}
                             <span class="caret"></span>
                         </dd.toggle>
@@ -44,7 +44,7 @@
                     </nav.dropdown>
                 {{else}}
                     <nav.item class="mx-2">
-                        <a class="nav-link text-light" href="{{url-for "openxpki" navEntry.key}}" {{on "click" (fn this.navigateTo navEntry.key)}}>
+                        <a class="nav-link" href="{{url-for "openxpki" navEntry.key}}" {{on "click" (fn this.navigateTo navEntry.key)}}>
                             {{navEntry.label}}
                         </a>
                     </nav.item>
@@ -54,7 +54,7 @@
         <navbar.nav as |nav|>
             {{#if this.model.user}}
                 <nav.item>
-                    <nav.linkTo @route="openxpki" @model="logout" class="text-light">
+                    <nav.linkTo @route="openxpki" @model="logout">
                         {{t 'site.logout'}}
                     </nav.linkTo>
                 </nav.item>
