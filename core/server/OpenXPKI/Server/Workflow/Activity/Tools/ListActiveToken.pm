@@ -35,8 +35,8 @@ sub execute {
         }
 
     # explicit group name
-    } elsif ($self->param('group')) {
-        $group_name = $self->param('group');
+    } elsif ($self->param('alias_group')) {
+        $group_name = $self->param('alias_group');
 
     # oops
     } else {
@@ -85,7 +85,7 @@ parameter is set to a true value.
 
 Name of the token type to look up, e.g. certsign
 
-=item group
+=item alias_group
 
 Name of the group to look up, e.g. ca-signer
 
