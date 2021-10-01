@@ -5,7 +5,6 @@ dd+dt{padding-top:.5em}
 .navbar .dropdown-header{border-bottom:1px solid #e9ecef;padding:.5rem}
 @font-face{font-family:"Glyphicons Halflings";src:url(../fonts/glyphicons-halflings-regular.eot);src:url(../fonts/glyphicons-halflings-regular.eot?#iefix) format("embedded-opentype"),url(../fonts/glyphicons-halflings-regular.woff2) format("woff2")}
 .glyphicon,i.glyphicon{position:relative;top:1px;display:inline-block;font-family:"Glyphicons Halflings";font-style:normal;font-weight:400;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-.styled-attention,.styled-failed,.tab-close{font-weight:700}
 .glyphicon-asterisk:before{content:"\002a"}
 .glyphicon-plus:before{content:"\002b"}
 .glyphicon-eur:before,.glyphicon-euro:before{content:"\20ac"}
@@ -270,7 +269,7 @@ body,html{height:100%}
 .oxi-navbar.navbar-light .navbar-nav .nav-link{color:#484b4f}
 .oxi-application{min-height:100%;height:auto!important;height:100%;margin:0 auto -60px;padding:0 0 60px}
 .oxi-footer{height:60px;padding-top:20px;background-color:#f5f5f5}
-.tab-close{font-size:18px;line-height:1;color:#000;text-shadow:0 1px 0 #fff;opacity:.2}
+.tab-close{font-size:18px;font-weight:700;line-height:1;color:#000;text-shadow:0 1px 0 #fff;opacity:.2}
 .tab-close:focus,.tab-close:hover{color:#000;text-decoration:none;cursor:pointer;opacity:.5}
 .breadcrumb,.breadcrumb-item+.breadcrumb-item::before{color:#a0a0a0}
 .userinfo{font-size:80%}
@@ -327,13 +326,14 @@ tr.gridrow-danger:hover>td{background-color:#e6c1c7!important}
 @media (min-width:768px){.oxi-keyvalue-label{flex:0 0 auto;width:auto;max-width:27%}
 }
 .oxi-keyvalue-dots{overflow:hidden;white-space:nowrap}
-.oxi-keyvalue-dots::after{content:". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "}
+.oxi-keyvalue-dots::after{content:". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";color:#9cA5Ad}
 .oxi-keyvalue-head.spacer{margin-top:1rem;background-color:#eee}
 .certstatus-issued,.dns-valid,.styled-valid{color:green}
 .certstatus-revoked,.dns-failed,.styled-failed{color:red}
 .certstatus-crl_issuance_pending,.dns-skipped,.styled-attention{color:orange}
 .certstatus-expired{color:#444}
 .certstatus-unknown,.dns-timeout{color:#79d1f3}
+.styled-attention,.styled-failed{font-weight:700}
 .oxi-status-danger{background-color:#f8d7da;color:#721c24}
 .oxi-status-warning{background-color:#fff3cd;color:#856404}
 code{white-space:pre}
