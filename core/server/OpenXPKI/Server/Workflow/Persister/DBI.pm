@@ -83,6 +83,9 @@ sub __update_workflow {
     my $id  = $workflow->id;
     ##! 16: sprintf "WF #$id: saving workflow, state: %s, proc_state: %s", $workflow->state(), $workflow->proc_state()
 
+    # save user info so Watchdog is able to resume workflow in correct context
+    my $workflow_session = CTX('session')->data->freeze(only => [ "user", "role" ]);
+
     CTX('dbi')->merge(
         into => 'workflow',
         set  => {
@@ -92,7 +95,7 @@ sub __update_workflow {
             workflow_wakeup_at   => $workflow->wakeup_at || 0,
             workflow_count_try   => $workflow->count_try,
             workflow_reap_at     => $workflow->reap_at || 0,
-            workflow_session     => $workflow->session_info,
+            workflow_session     => $workflow_session,
             workflow_archive_at  => $workflow->archive_at,
             # always reset the watchdog key, if the workflow is updated from within
             # the API/Factory, as the worlds most famous db system is unable to
@@ -100,7 +103,7 @@ sub __update_workflow {
             watchdog_key => '__CATCHME',
         },
         set_once => {
-            pki_realm     => CTX('session')->data->pki_realm,
+            pki_realm => CTX('session')->data->pki_realm,
             workflow_type => $workflow->type,
         },
         where => {

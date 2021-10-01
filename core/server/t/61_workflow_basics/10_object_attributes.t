@@ -66,7 +66,6 @@ my %defaults = (
     count_try => 0,
     wakeup_at => undef,
     reap_at => undef,
-    session_info => undef,
     persist_context => 0,
     is_startup => 1,
     archive_at => undef,

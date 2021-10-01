@@ -23,8 +23,7 @@ use OpenXPKI::Serialization::Simple;
 use OpenXPKI::DateTime;
 
 my @PERSISTENT_FIELDS = qw( proc_state count_try wakeup_at reap_at archive_at );
-# "session_info" is a special case: saved, but only read by watchdog
-my @TRANSIENT_FIELDS = qw( session_info persist_context is_startup );
+my @TRANSIENT_FIELDS = qw( persist_context is_startup );
 __PACKAGE__->mk_accessors( @PERSISTENT_FIELDS, @TRANSIENT_FIELDS );
 
 
@@ -139,10 +138,10 @@ sub init {
         $self->is_startup(1);
     }
 
-    # the condition cache bug also affects the get_action_fields method
-    # which we use prior execute_action to validate the input parameters
-    # so we clear the cache in the current state anytime we init a workflow
-    # see jonasbn/perl-workflow#9
+    # The condition cache bug also affects the get_action_fields method
+    # which we use prior execute_action() to validate the input parameters.
+    # So we clear the cache in the current state anytime we init a workflow.
+    # See jonasbn/perl-workflow#9
     $self->_get_workflow_state()->clear_condition_cache();
 
     return $self;
@@ -170,10 +169,6 @@ sub execute_action {
 
     try {
         $self->persist_context(1);
-
-        $self->session_info(
-            CTX('session')->data->freeze(only => [ "user", "role" ])
-        );
 
         # The workflow module internally caches conditions and does NOT clear
         # this cache if you just refetch a workflow! As the workflow state
@@ -543,9 +538,6 @@ sub save_initial {
         ##! 32: 'Send to watchdog with a delay of ' . $delay
         $self->proc_state('pause');
         $self->wakeup_at( time() + $delay );
-        $self->session_info(
-            CTX('session')->data->freeze(only => [ "user", "role" ])
-        );
     }
 
     $self->context->param( wf_current_action => $action_name );
