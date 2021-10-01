@@ -611,15 +611,15 @@ cgi-bin/healthcheck.fcgi
 #   core/htdocs_source/update-manifest.pl will update the list below.
 #   UPDATE_MANIFEST_UI_LIST - do not remove this comment
 htdocs/assets/bootstrap-v4-tweaks-186f8f96fba05958422eb80afd7f3357.css
-htdocs/assets/chunk.143.37c7f14a9d20b4b7a5aa.js
-htdocs/assets/chunk.178.a99fb9f003c8a402548a.js
+htdocs/assets/chunk.143.4d45387287ce3b66809d.js
+htdocs/assets/chunk.178.068b53a99c284feb3188.js
 htdocs/assets/chunk.458.e1af0f4774b5bca829a3.js
 htdocs/assets/chunk.458.e1af0f4774b5bca829a3.js.LICENSE.txt
 htdocs/assets/chunk.958.8cc193dbcfcf30fabc7a.js
 htdocs/assets/chunk.958.8cc193dbcfcf30fabc7a.js.LICENSE.txt
 htdocs/assets/glyphicons-8dfa4dd41b8ab62e14cf32e7dd3756bc.css
+htdocs/assets/openxpki-06967617b0f4165f64c11d09440adf67.js
 htdocs/assets/openxpki-6856afd3b1543a5a61e4a54b166e988e.css
-htdocs/assets/openxpki-df23e9c5f058bde16618aa4435ac6fff.js
 htdocs/assets/vendor-67e170cb8fa57fdce6f57b2b245651ad.css
 htdocs/assets/vendor-f1354306221c81e3af7676ed0bda1ed6.js
 htdocs/default.html
