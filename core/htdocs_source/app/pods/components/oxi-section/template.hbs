@@ -14,7 +14,7 @@
         {{/if}}
 
         <div class="card-body py-2" {{on-init this.initialized}}>
-            {{component this.type def=this.sectionData buttonClick=this.buttonClick}}
+            {{component this.type def=this.sectionData buttonClick=this.buttonClick isInfoBox=@isInfoBox}}
         </div>
     </div>
 
@@ -28,7 +28,7 @@
     {{/if}}
 
     <span {{on-init this.initialized}}>
-        {{component this.type def=this.sectionData buttonClick=this.buttonClick}}
+        {{component this.type def=this.sectionData buttonClick=this.buttonClick isInfoBox=@isInfoBox}}
     </span>
 
 {{/if}}

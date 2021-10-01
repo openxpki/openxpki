@@ -26,8 +26,28 @@ body {
   color: #484b4f;
 }
 
+/* Shrink application width for large screens */
+@media (min-width: 1600px) {
+  .oxi-application {
+    flex: 0 0 83.333333%; /* = col-10 */
+    max-width: 83.333333%;
+  }
+}
+@media (min-width: 2000px) {
+  .oxi-application {
+    flex: 0 0 66.666667%; /* = col-8 */
+    max-width: 66.666667%;
+  }
+}
+@media (min-width: 2600px) {
+  .oxi-application {
+    flex: 0 0 50%; /* = col-6 */
+    max-width: 50%;
+  }
+}
+
 /* Only used to push down the footer element */
-.oxi-application {
+.oxi-push-footer {
   min-height: 100%;
   height: auto !important;
   height: 100%;
@@ -40,6 +60,10 @@ body {
 .oxi-footer {
   height: 60px;
   padding-top: 20px;
+  background-color: #f5f5f5;
+}
+
+.oxi-the-void {
   background-color: #f5f5f5;
 }
 
@@ -216,12 +240,33 @@ tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
  * Key-Value lists
  */
 
+/* above "md" = 768px */
 @media (min-width: 768px) {
   .oxi-keyvalue-label {
     flex: 0 0 auto;
     width: auto;
-    max-width: 27%; /* must be less than "col-4" = 33.333%, see app/pods/components/oxi-section/keyvalue/template.hbs */
+    max-width: 35%; /* must be less than "col-5" = 41.6%, see app/pods/components/oxi-section/keyvalue/template.hbs */
   }
+}
+
+/* above "lg" = 992px */
+@media (min-width: 992px) {
+  .oxi-keyvalue-label {
+    max-width: 27%; /* must be less than "col-4" = 33.3%, see app/pods/components/oxi-section/keyvalue/template.hbs */
+  }
+}
+
+/* above "xl" = 1140px */
+@media (min-width: 1140px) {
+  .oxi-keyvalue-label {
+    max-width: 19%; /* must be less than "col-3" = 25.0% */
+  }
+}
+
+.oxi-keyvalue-label-infobox {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: 42%;
 }
 
 .oxi-keyvalue-dots {
@@ -231,6 +276,13 @@ tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
 
 .oxi-keyvalue-dots::after {
   content:
+    ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
+    ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
+    ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
+    ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
+    ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
+    ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
+    ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
     ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
     ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
     ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";

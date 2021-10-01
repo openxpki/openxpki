@@ -1,8 +1,18 @@
 {{!-- <HeadLayout/> is required by ember-cli-head --}}
 <HeadLayout/>
 
-<div class="oxi-application" {{on-init this.removeLoader}}>
-    <Application::Header/>
-    {{outlet}}
+<div class="container-fluid h-100">
+    <div class="row h-100">
+        <div class="col p-0 oxi-the-void">
+        </div>
+        <div class="col-12 p-0 oxi-application" {{on-init this.removeLoader}}>
+            <div class="oxi-push-footer">
+                <Application::Header/>
+                {{outlet}}
+            </div>
+            <Application::Footer/>
+        </div>
+        <div class="col p-0 oxi-the-void">
+        </div>
+    </div>
 </div>
-<Application::Footer/>

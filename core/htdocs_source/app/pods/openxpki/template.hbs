@@ -114,20 +114,22 @@
             <div class="tab-pane {{if entry.active "active"}}">
                 <div class="row">
                     {{!-- Main page content --}}
-                    <div class="{{if entry.right "col-lg-8" "col-lg-12"}}">
+                    <div class="{{if entry.right "col-lg-8" "col-12"}}">
                         {{#each entry.main as |mainEntry|}}
-                            {{#let (or (eq mainEntry.type "keyvalue")) as |asCard|}}
-                                <OxiSection @content={{mainEntry}} @renderAsCard={{asCard}} />
-                            {{/let}}
+                            <div class="p-0 {{if (and (eq mainEntry.type "form") (not entry.right)) "col-xl-8" "col-12"}}">
+                                {{#let (or (eq mainEntry.type "keyvalue")) as |asCard|}}
+                                    <OxiSection @content={{mainEntry}} @renderAsCard={{asCard}} />
+                                {{/let}}
+                            </div>
                         {{/each}}
                     </div>
-                    {{!-- Main page content --}}
+                    {{!-- Infobox - right hand info column --}}
                     {{#if entry.right}}
                         <div class="col-lg-4">
                             {{#each entry.right as |rightEntry|}}
                                 <div class="card bg-light border-secondary">
                                     <div class="card-body">
-                                        <OxiSection @content={{rightEntry}}/>
+                                        <OxiSection @content={{rightEntry}} @isInfoBox={{true}} />
                                     </div>
                                 </div>
                             {{/each}}
