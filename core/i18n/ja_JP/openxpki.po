@@ -405,6 +405,10 @@ msgstr "失敗"
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_OK"
 msgstr "ok"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DNS_CHECK_PREAMBLE"
+msgstr "失敗"
+
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_SKIPPED"
 msgstr "n/a"
 
@@ -869,6 +873,21 @@ msgstr "リクエストチェック"
 
 # Remove?
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_HEAD_CA_CRL_OPS"
+msgstr "全ての証明書ステータスレポート"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_HEAD_ENROLLMENT"
+msgstr "全ての証明書ステータスレポート"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_HEAD_MISC"
+msgstr "全ての証明書ステータスレポート"
+
+# Remove?
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_HEAD_REPORT"
 msgstr "全ての証明書ステータスレポート"
 
@@ -1141,6 +1160,10 @@ msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC"
 msgstr "システムに最も適したホスト名（ドメイン名）を入力します。"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
+msgstr "国"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_RESPONDER_LABEL"
 msgstr "User Profile"
 
@@ -1215,6 +1238,10 @@ msgstr "URI"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
 msgstr "URI"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_STATE_DESC"
+msgstr "システムに最も適したホスト名（ドメイン名）を入力します。"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL"
 msgstr "TLS Client Profile"
@@ -2123,6 +2150,10 @@ msgstr "以下の情報を更新してください。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "リクエストの更新"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
+msgstr "状態"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "ワークフロー属性"
 
@@ -2454,6 +2485,10 @@ msgstr "CA署名者"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_TOOLTIP"
 msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHECK_POLICY_DNS_LABEL"
+msgstr "SCEP TID"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CLIENT_IP_DESC"
@@ -3040,6 +3075,10 @@ msgstr "このリクエストのトランザクションID"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_LABEL"
 msgstr "トランザクションID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_AGENT_LABEL"
+msgstr "別名"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_CHALLENGE_PASSWORD_LABEL"
 msgstr "有効なパスワードがあります"
@@ -4122,6 +4161,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 msgstr "証明書失効通知"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RATOKEN_LABEL"
+msgstr "SCEPトークン"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RELEASE_LOCK_DESC"
 msgstr ""
 "このワークフローでは、複数の証明書を一度に失効させることができます。有効な証"
@@ -4195,6 +4238,12 @@ msgstr "証明書のエクスポート"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
 msgstr "ワークフロー情報を読み込めません。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_USER_AGENT_DESC"
+msgstr ""
+"このワークフローでは、SCEPインターフェイスを使用して証明書の登録リクエストを"
+"処理します。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKEUP_AT_LABEL"
 msgstr "実行"
@@ -5007,10 +5056,6 @@ msgstr "はい"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 #~ msgstr "コードを作成する"
 
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
-#~ msgstr "状態"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_APPROVE"
 #~ msgstr "リクエストの承認"
 
@@ -5026,11 +5071,6 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ELIGIBILITY_RESULT_LABEL"
 #~ msgstr "適正確認の結果"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_DESC"
-#~ msgstr ""
-#~ "このワークフローでは、SCEPインターフェイスを使用して証明書の登録リクエスト"
-#~ "を処理します。"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_LABEL"
 #~ msgstr "SCEPの登録"
@@ -5187,10 +5227,6 @@ msgstr "はい"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_ISSUANCE_DATA_TOOLTIP"
 #~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHIP_ID_LABEL"
-#~ msgstr "SCEP TID"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHIP_ID_PLACEHOLDER"

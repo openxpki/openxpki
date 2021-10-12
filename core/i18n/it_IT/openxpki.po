@@ -492,6 +492,11 @@ msgstr "Mostra Liste Revoche (CRL)"
 
 # Remove?
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_DNS_CHECK_PREAMBLE"
+msgstr "Mostra Liste Revoche (CRL)"
+
+# Remove?
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_SKIPPED"
 msgstr "Mostra Liste Revoche (CRL)"
 
@@ -1051,6 +1056,21 @@ msgstr "Mostra Liste Revoche (CRL)"
 
 # Remove?
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_HEAD_CA_CRL_OPS"
+msgstr "Report Completo"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_HEAD_ENROLLMENT"
+msgstr "Report Completo"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_HEAD_MISC"
+msgstr "Report Completo"
+
+# Remove?
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_HEAD_REPORT"
 msgstr "Report Completo"
 
@@ -1345,6 +1365,10 @@ msgstr ""
 "tuo sistema."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
+msgstr "Paese"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_RESPONDER_LABEL"
 msgstr "Persone Fisiche (Email Sicura / Autenticazione)"
 
@@ -1419,6 +1443,12 @@ msgstr "URI"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
 msgstr "URI"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_STATE_DESC"
+msgstr ""
+"Inserisci il nome completo a dominio (FQN = Fully Qualified Hostname) del "
+"tuo sistema."
 
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL"
 msgstr "Client TLS"
@@ -2427,6 +2457,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Richiesta Aggiornamento"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
+msgstr "Stato"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Stato"
 
@@ -2793,6 +2827,10 @@ msgstr "CSR Type"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_TOOLTIP"
 msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHECK_POLICY_DNS_LABEL"
+msgstr "SCEP TID"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CLIENT_IP_DESC"
@@ -3426,6 +3464,10 @@ msgstr "Transaction Id of this SCEP request"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_LABEL"
 msgstr "SCEP TID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_AGENT_LABEL"
+msgstr "Nome alternativo per il campo Soggetto"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_CHALLENGE_PASSWORD_LABEL"
@@ -4600,6 +4642,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 msgstr "Esporta Certificato"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RATOKEN_LABEL"
+msgstr "Id Transazione SCEP"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RELEASE_LOCK_DESC"
 msgstr ""
 "Pubblica le Informazioni sulla Autorità di certificazione (CA, Certification "
@@ -4686,6 +4732,12 @@ msgstr "Esporta Certificato"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
 msgstr "Impossibile trovare le informazioni relative al Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_USER_AGENT_DESC"
+msgstr ""
+"Questo Workflow gestisce le richieste di sottoscrizione dei certificati "
+"tramite interfaccia SCEP."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKEUP_AT_LABEL"
 msgstr "Riavvia"
@@ -5606,10 +5658,6 @@ msgstr "Chiave"
 #~ msgstr "Genera Codice"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
-#~ msgstr "Stato"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_AUTH_FAILURE_DESC"
 #~ msgstr ""
 #~ "Questo Workflow è definitivamente fallito e non può essere riavviato"
@@ -5637,11 +5685,6 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ELIGIBILITY_RESULT_LABEL"
 #~ msgstr "Risultato della tua azione di massa."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_DESC"
-#~ msgstr ""
-#~ "Questo Workflow gestisce le richieste di sottoscrizione dei certificati "
-#~ "tramite interfaccia SCEP."
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_LABEL"
 #~ msgstr "Sottoscrizione SCEP"
@@ -5800,10 +5843,6 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_ISSUANCE_DATA_TOOLTIP"
 #~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHIP_ID_LABEL"
-#~ msgstr "SCEP TID"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHIP_ID_PLACEHOLDER"

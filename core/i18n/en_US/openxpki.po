@@ -14,12 +14,6 @@ msgstr ""
 "X-Generator: Poedit 2.3\n"
 "X-Poedit-Bookmarks: -1,-1,77,-1,-1,-1,-1,-1,-1,-1\n"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHECK_POLICY_DNS_LABEL"
-msgstr "Failed Policy Check DNS"
-
-msgid "I18N_OPENXPKI_UI_DNS_CHECK_PREAMBLE"
-msgstr "FQDNs with DNS lookup result"
-
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
 msgstr "Requested action not found"
 
@@ -398,6 +392,9 @@ msgstr "fail"
 
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_OK"
 msgstr "ok"
+
+msgid "I18N_OPENXPKI_UI_DNS_CHECK_PREAMBLE"
+msgstr "FQDNs with DNS lookup result"
 
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_SKIPPED"
 msgstr "n/a"
@@ -844,15 +841,21 @@ msgstr "Issue a Certificate Revocation List (CRL)"
 msgid "I18N_OPENXPKI_UI_MENU_CSR_CHECK"
 msgstr "Request Checker"
 
-# Remove?
-msgid "I18N_OPENXPKI_UI_MENU_HEAD_REPORT"
-msgstr "Reports"
+msgid "I18N_OPENXPKI_UI_MENU_HEAD_CA_CRL_OPS"
+msgstr "CA/CRL operation"
 
-# Remove?
+msgid "I18N_OPENXPKI_UI_MENU_HEAD_ENROLLMENT"
+msgstr "Enrollment RA"
+
+msgid "I18N_OPENXPKI_UI_MENU_HEAD_MISC"
+msgstr "Misc"
+
+msgid "I18N_OPENXPKI_UI_MENU_HEAD_REPORT"
+msgstr "Report"
+
 msgid "I18N_OPENXPKI_UI_MENU_HEAD_SYSTEM_STATUS"
 msgstr "System Information"
 
-# Remove?
 msgid "I18N_OPENXPKI_UI_MENU_HOME"
 msgstr "Home"
 
@@ -865,7 +868,6 @@ msgstr "Manage Secrets"
 msgid "I18N_OPENXPKI_UI_MENU_MY_CERTIFICATE"
 msgstr "My Certificates"
 
-# Remove?
 msgid "I18N_OPENXPKI_UI_MENU_MY_TASK"
 msgstr "My Tasks"
 
@@ -881,7 +883,6 @@ msgstr "Process Information"
 msgid "I18N_OPENXPKI_UI_MENU_PUBLISH_CA_CRL"
 msgstr "Publish CA/CRL"
 
-# Remove?
 msgid "I18N_OPENXPKI_UI_MENU_REPORT_FULL"
 msgstr "Full Certificate Status Report"
 
@@ -900,11 +901,9 @@ msgstr "Revoke certificate"
 msgid "I18N_OPENXPKI_UI_MENU_SCEP_SEARCH"
 msgstr "SCEP Workflow Search"
 
-# Remove?
 msgid "I18N_OPENXPKI_UI_MENU_SET_MOTD"
 msgstr "Set Message of the Day"
 
-# Remove?
 msgid "I18N_OPENXPKI_UI_MENU_SYSTEM_STATUS"
 msgstr "System Status"
 
@@ -1040,7 +1039,9 @@ msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME"
 msgstr "Application Name"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME_DESC"
-msgstr "The name of the application acting as client."
+msgstr ""
+"The name of the application, added with a colon to the hostname. Three to "
+"twelve charaters (a-z, 0-9, dash, underscore)."
 
 msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_DESC"
 msgstr ""
@@ -1094,6 +1095,9 @@ msgstr "Hostname"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC"
 msgstr "Enter the fully qualified hostname (domain name) of your system."
+
+msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
+msgstr "Locality Name"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_RESPONDER_LABEL"
 msgstr "OCSP Responder"
@@ -1169,6 +1173,9 @@ msgstr "URI"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
 msgstr "URI"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_STATE_DESC"
+msgstr "State or Province Name"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL"
 msgstr "TLS Client"
@@ -1692,7 +1699,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_SUBMIT_DESC"
 msgstr "Submit your revocation request to the certification office."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CRR_SUBMIT_LABEL"
-msgstr "Submit request"
+msgstr "Submit Request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_APPROVE_CSR_DESC"
 msgstr ""
@@ -2022,6 +2029,9 @@ msgstr "Please update / complete the information below."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Update Request"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
+msgstr "Archive at"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Workflow Attributes"
 
@@ -2332,6 +2342,9 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_TOOLTIP"
 msgstr ""
 "Copy the required chain certificates as concatenated PEM or PKCS7 bundle"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHECK_POLICY_DNS_LABEL"
+msgstr "Failed Policy Check DNS"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CLIENT_IP_DESC"
 msgstr "IP address of the incoming client connection."
 
@@ -2384,12 +2397,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_DESC"
 msgstr ""
 "With delayed revocation you can schedule a revocation for a date in the "
 "future."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_AGENT_LABEL"
-msgstr "User-Agent"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_USER_AGENT_DESC"
-msgstr "The User-Agent string send by the client"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_DELAY_REVOCATION_LABEL"
 msgstr "Delayed Revocation"
@@ -2881,6 +2888,9 @@ msgstr "Transaction Id of this request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_LABEL"
 msgstr "Transaction ID"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_AGENT_LABEL"
+msgstr "User-Agent"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_CHALLENGE_PASSWORD_LABEL"
 msgstr "Has Valid Password"
@@ -3928,6 +3938,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 msgstr "Certificate Expiry Notification"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RATOKEN_LABEL"
+msgstr "Generate SCEP RA Token"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RELEASE_LOCK_DESC"
 msgstr ""
 "Deletes the link between a transaction id and a (broken) workflow so a new "
@@ -4001,6 +4015,9 @@ msgstr "Import to Trustgroup"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
 msgstr "Unable to load workflow information."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_USER_AGENT_DESC"
+msgstr "The User-Agent string send by the client"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKEUP_AT_LABEL"
 msgstr "Wake Up"
@@ -4197,9 +4214,6 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 #~ msgstr "Generate Code"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
-#~ msgstr "Archive at"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_APPROVE"
 #~ msgstr "Approve Request"

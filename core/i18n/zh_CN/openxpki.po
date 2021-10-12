@@ -392,6 +392,10 @@ msgstr "失败"
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_OK"
 msgstr "好"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DNS_CHECK_PREAMBLE"
+msgstr "失败"
+
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_SKIPPED"
 msgstr "不适用"
 
@@ -840,6 +844,21 @@ msgstr "请求检查器"
 
 # Remove?
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_HEAD_CA_CRL_OPS"
+msgstr "完整证书状态报告"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_HEAD_ENROLLMENT"
+msgstr "完整证书状态报告"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_HEAD_MISC"
+msgstr "完整证书状态报告"
+
+# Remove?
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_HEAD_REPORT"
 msgstr "完整证书状态报告"
 
@@ -1110,6 +1129,10 @@ msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC"
 msgstr "输入系统的完全限定主机名（域名）。"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
+msgstr "国家"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_RESPONDER_LABEL"
 msgstr "人员（安全电子邮件/身份验证）"
 
@@ -1184,6 +1207,10 @@ msgstr "URI"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
 msgstr "URI"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_STATE_DESC"
+msgstr "输入系统的完全限定主机名（域名）。"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL"
 msgstr "TLS客户端"
@@ -2044,6 +2071,10 @@ msgstr "请更新/完成以下信息。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "更新请求"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
+msgstr "状态"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "工作流程属性"
 
@@ -2364,6 +2395,10 @@ msgstr "~"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_TOOLTIP"
 msgstr "将所需的链证书复制为连接的PEM或PKCS7捆绑包"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHECK_POLICY_DNS_LABEL"
+msgstr "违反策略的说明"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CLIENT_IP_DESC"
@@ -2917,6 +2952,10 @@ msgstr "这个请求的事务ID"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_LABEL"
 msgstr "事务ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_AGENT_LABEL"
+msgstr "主题别名"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_VALID_CHALLENGE_PASSWORD_LABEL"
 msgstr "拥有有效密码"
@@ -3957,6 +3996,10 @@ msgstr "通过电子邮件发送在30天之内到期的所有证书的到期通�
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 msgstr "证书过期通知"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RATOKEN_LABEL"
+msgstr "SCEP RA令牌"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RELEASE_LOCK_DESC"
 msgstr ""
 "删除事务ID和（损坏的）工作流程之间的链接，以便可以使用相同的事务ID创建新的工"
@@ -4023,6 +4066,12 @@ msgstr "证书导出"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
 msgstr "无法加载工作流信息。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_USER_AGENT_DESC"
+msgstr ""
+"This workflow handles certificate enrollment requests using the SCEP "
+"interface."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKEUP_AT_LABEL"
 msgstr "唤醒"
@@ -4222,10 +4271,6 @@ msgstr "是"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
 #~ msgstr "Generate Code"
 
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
-#~ msgstr "状态"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_APPROVE"
 #~ msgstr "Approve Request"
 
@@ -4237,11 +4282,6 @@ msgstr "是"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ELIGIBILITY_RESULT_LABEL"
 #~ msgstr "Result of Eligibility Check"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_DESC"
-#~ msgstr ""
-#~ "This workflow handles certificate enrollment requests using the SCEP "
-#~ "interface."
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_LABEL"
 #~ msgstr "SCEP Enrollment"

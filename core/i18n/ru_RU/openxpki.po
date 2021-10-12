@@ -495,6 +495,10 @@ msgid "I18N_OPENXPKI_UI_DNS_CHECK_OK"
 msgstr "Имя учетной записи"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_DNS_CHECK_PREAMBLE"
+msgstr "Имя учетной записи"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_SKIPPED"
 msgstr "Имя учетной записи"
 
@@ -1101,6 +1105,18 @@ msgid "I18N_OPENXPKI_UI_MENU_CSR_CHECK"
 msgstr "Имя учетной записи"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_HEAD_CA_CRL_OPS"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_HEAD_ENROLLMENT"
+msgstr "Имя учетной записи"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_HEAD_MISC"
+msgstr "Имя учетной записи"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_HEAD_REPORT"
 msgstr "Имя учетной записи"
 
@@ -1460,6 +1476,15 @@ msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC"
 msgstr "Это полное сетевое имя компьютера"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
+msgstr ""
+"Используйте данный профиль сертификата только если Вы отчетливо "
+"представляете себе необходимую структуру имени субъекта сертификата, хорошо "
+"знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
+"части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
+"также произвольный набор альтернативных имен."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_RESPONDER_LABEL"
 msgstr "Профиль пользователя"
 
@@ -1586,6 +1611,10 @@ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
 msgstr ""
 "Параметр URI (Uniform Resource Identifier) представляет собой адрес или "
 "ссылку на источник информации. Например: www.openxpki.org/~testuser."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_STATE_DESC"
+msgstr "Это полное сетевое имя компьютера"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL"
@@ -2645,6 +2674,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_UPDATE_CRR_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL"
 msgstr "Дочерние технологические процессы"
 
@@ -3064,6 +3097,10 @@ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_TOOLTIP"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHECK_POLICY_DNS_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
@@ -3851,6 +3888,10 @@ msgstr ""
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_TRANSACTION_ID_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_USER_AGENT_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
@@ -5103,6 +5144,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RATOKEN_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RELEASE_LOCK_DESC"
 msgstr "Выпуск списка отзыва сертификатов (CRL)"
 
@@ -5185,6 +5230,10 @@ msgstr "Родительский технологический процесс"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION"
 msgstr "SPKAC-строка пуста."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_USER_AGENT_DESC"
+msgstr "Это поле можно использовать для комментариев."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKEUP_AT_LABEL"
@@ -10826,10 +10875,6 @@ msgstr "Имя учетной записи"
 #~ msgstr "Изменить профиль сертификата "
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ARCHIVE_AT_LABEL"
-#~ msgstr "Дочерние технологические процессы"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_AUTH_FAILURE_DESC"
 #~ msgstr "Дочерние технологические процессы"
 
@@ -10877,10 +10922,6 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ELIGIBILITY_RESULT_LABEL"
 #~ msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_DESC"
-#~ msgstr "Это поле можно использовать для комментариев."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_LABEL"
@@ -11079,10 +11120,6 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_ISSUANCE_DATA_TOOLTIP"
 #~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHIP_ID_LABEL"
-#~ msgstr "Родительский технологический процесс"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHIP_ID_PLACEHOLDER"
