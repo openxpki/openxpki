@@ -82,7 +82,7 @@ sub execute {
 
     if ($error) {
         # Catch exception as "pause" if configured
-        if ($self->param('pause_on_error')) {
+        if ($param->{pause_on_error}) {
             CTX('log')->application()->warn("NICE issueCertificate failed but pause_on_error is requested ");
             $self->pause($error);
         }
@@ -112,18 +112,31 @@ sub execute {
 
         # Record the certificate owner information, see
         # https://github.com/openxpki/openxpki/issues/183
-        my $owner = $self->param('cert_owner');
 
-        ##! 64: 'Params ' . Dumper $self->param()
-        ##! 32: 'Owner ' . $owner
-        if ($owner) {
+
+        ##! 64: $param
+        if ($param->{cert_owner}) {
+            ##! 32: 'Owner ' . $param->{cert_owner}
             CTX('dbi')->insert(
                 into => 'certificate_attributes',
                 values => {
                     attribute_key => AUTO_ID,
                     identifier => $set_context->{cert_identifier},
                     attribute_contentkey => 'system_cert_owner',
-                    attribute_value => $owner,
+                    attribute_value => $param->{cert_owner},
+                },
+            );
+        }
+
+        if ($param->{cert_tenant}) {
+            ##! 32: 'Tenant ' . $param->{cert_tenant}
+            CTX('dbi')->insert(
+                into => 'certificate_attributes',
+                values => {
+                    attribute_key => AUTO_ID,
+                    identifier => $set_context->{cert_identifier},
+                    attribute_contentkey => 'system_cert_tenant',
+                    attribute_value => $param->{cert_tenant},
                 },
             );
         }
@@ -190,6 +203,14 @@ Set to the originating certificate identifier if this is a renewal request.
 This will route the processing to the renewCertificate method of the NICE
 backend and add the old certificate identifier as predecessor using the
 certificate_attributes table (key I<system_renewal_cert_identifier>).
+
+=item cert_owner
+
+The userid that should be set as certificate owner (I<system_cert_owner>).
+
+=item cert_tenant
+
+The owner group / tenant for this certificate (I<system_cert_tenant>).
 
 =back
 
