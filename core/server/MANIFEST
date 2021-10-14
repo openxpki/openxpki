@@ -227,6 +227,7 @@ OpenXPKI/Server/API2/Plugin/Api/Util/ModuleFinder.pm
 OpenXPKI/Server/API2/Plugin/Api/Util/PodPOMView.pm
 OpenXPKI/Server/API2/Plugin/Api/api_help.pm
 OpenXPKI/Server/API2/Plugin/Api/api_list.pm
+OpenXPKI/Server/API2/Plugin/Cert/evaluate_trust_rule.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_cert.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_cert_actions.pm
 OpenXPKI/Server/API2/Plugin/Cert/get_cert_attributes.pm

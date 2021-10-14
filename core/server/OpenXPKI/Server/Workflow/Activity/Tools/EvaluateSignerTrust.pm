@@ -222,91 +222,39 @@ sub execute {
         CTX('log')->application()->debug("SignerTrust loading rules from $rules");
     }
 
+    if (!@rules) {
+        CTX('log')->application()->info("No rules were found - skip signer authorization check.");
+        return 1;
+    }
+
     my $matched = 0;
 
     CTX('log')->application()->debug("Trusted Signer Authorization $signer_profile / $signer_realm / $signer_subject / $signer_identifier");
 
-    my $meta;
-
     TRUST_RULE:
     foreach my $rule (@rules) {
         ##! 32: 'Testing rule ' . $rule
-        my $trustrule  = (ref $rules eq 'HASH') ? $rules->{$rule}
+        my $trustrule = (ref $rules eq 'HASH') ? $rules->{$rule}
             : $config->get_hash("$rules.$rule");
 
         # as we expect the idenifier to be uniq we do not need a realm
         $trustrule->{realm} = $current_realm
             if (!$trustrule->{realm} && !$trustrule->{identifier});
 
-        $matched = 0;
-        foreach my $key (keys %{$trustrule}) {
-            my $match = $trustrule->{$key};
-            ##! 64: 'expected match ' . $key . '/' . $match
-            if ($key eq 'subject') {
-                $matched = ($signer_subject =~ /^$match$/i);
-
-            } elsif ($key eq 'identifier') {
-                $matched = ($signer_identifier eq $match);
-
-            } elsif ($key eq 'realm') {
-                # if issuer_alias is used the realm check is done on the alias
-                $matched = ($trustrule->{issuer_alias}) ? 1 :
-                    ($signer_realm eq $match || $match eq '_any');
-
-            } elsif ($key eq 'profile') {
-                $matched = ($signer_profile eq $match);
-
-            } elsif ($key eq 'issuer_alias' || $key eq 'root_alias') {
-
-                my $identifier = ($key eq 'issuer_alias') ? $signer_issuer : $signer_root;
-                my $alias = CTX('dbi')->select_one(
-                    from    => 'aliases',
-                    columns => [ 'alias' ],
-                    where   => {
-                        group_id => $match,
-                        identifier => $identifier,
-                        notbefore => { '<' => time },
-                        notafter  => { '>' => time },
-                        pki_realm => [ $trustrule->{realm}, '_global' ],
-                    },
-                );
-                ##! 64: "Result for $key ($identifier) in $match: " . ($alias->{alias} || 'no result')
-                $matched = (defined $alias->{alias});
-
-            } elsif ($key =~ m{meta_}) {
-                # reset the matched state!
-                $matched = 0;
-                if (!defined $meta->{$key}) {
-                    my $attr = CTX('api2')->get_cert_attributes(
-                        identifier => $signer_identifier,
-                        attribute => $key
-                    );
-                    $meta->{$key} = $attr->{$key} || [];
-                    ##! 64: 'Loaded attr ' . Dumper $meta->{$key}
-                }
-                foreach my $aa (@{$meta->{$key}}) {
-                    ##! 64: "Attr $aa"
-                    next unless ($aa eq $match);
-                    $matched = 1;
-                    last;
-                }
-
-            } else {
-                CTX('log')->system()->error("Trusted Signer Authorization unknown ruleset $key/$match");
-
-                $matched = 0;
-            }
-            next TRUST_RULE if (!$matched);
-
-            CTX('log')->application()->debug("Trusted Signer Authorization matched subrule $rule/$match");
-
-            ##! 32: 'Matched ' . $match
-        }
+        ##! 64: $trustrule
+        my $matched = CTX('api2')->evaluate_trust_rule(
+            signer_subject  => $signer_subject,
+            signer_identifier   => $signer_identifier,
+            signer_realm    => $signer_realm,
+            signer_profile  => $signer_profile,
+            signer_issuer   => $signer_issuer,
+            signer_root     => $signer_root,
+            rule            => $trustrule,
+        );
 
         if ($matched) {
             ##! 16: 'Passed validation rule #'.$rule,
             CTX('log')->application()->info("Trusted Signer Authorization matched rule $rule");
-
             $context->param('signer_authorized' => 1);
             return 1;
         }
@@ -353,7 +301,7 @@ true if the signer matches one of the given rules. This does B<NOT> depend
 on the trust status of the certificate, so you need to check both flags or
 delegate the chain validation to another component (e.g. tls config of
 webserver). Will be I<undef> in case the certificate chain could not be
-validated at all.
+validated at all or no trust rules have been found.
 
 =item signer_validity_ok
 

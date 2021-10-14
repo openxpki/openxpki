@@ -67,7 +67,7 @@ OpenXPKI::Server::Workflow::Activity::Tools::ListActiveToken
 =head1 Description
 
 Load the alias names of all active tokens in the given token group (parameter
-I<group>) or with the given token type (paramater I<token>).
+I<alias_group>) or with the given token type (paramater I<token>).
 The list of token names will be in the context with key token_alias_list
 as array, sorted by notbefore data, most current first. The target
 key can be set using the target_key parameter
