@@ -198,6 +198,7 @@ my %common_params = (
     revoked_after            => { isa => 'Int' },
     invalid_before           => { isa => 'Int' },
     invalid_after            => { isa => 'Int' },
+    tenant                   => { isa => 'Tenant' },
 );
 
 command "search_cert" => {
@@ -403,65 +404,76 @@ sub _make_db_query {
     }
 
     my $ii = 0;
-    # handle certificate attributes (such as SANs)
+
+
+    my $attributes;
     if ( $po->has_cert_attributes ) {
-        # we need to join over the certificate_attributes table
+        ##! 16: 'has attributes'
+        $attributes = $po->cert_attributes;
+    }
+    my $tenant = $po->tenant || CTX('api2')->get_primary_tenant();
+    if ( $tenant ) {
+        ##! 16: 'has tenant set ' . $tenant
+        $attributes = CTX('authentication')->tenant_handler()->certificate_attribute_filter( $tenant, $attributes );
+    }
 
-        # Legacy API
-        if (ref $po->cert_attributes eq 'ARRAY') {
+    # handle certificate attributes (such as SANs)
+    if (ref $attributes eq 'HASH') {
+        ##! 64: $attributes
+        foreach my $key (keys %{$attributes}) {
 
-            foreach my $attrib ( @{ $po->cert_attributes } ) {
-                ##! 16: 'certificate attribute: ' . Dumper $entry
-                my $table_alias = "certattr$ii";
+            my $table_alias = "certattr$ii";
 
-                # add join table
-                push @join_spec, ( 'certificate.identifier=identifier', "certificate_attributes|$table_alias" );
-
-                # add search constraint
-                $where->{ "$table_alias.attribute_contentkey" } = $attrib->{KEY};
-
-                $attrib->{OPERATOR} //= 'LIKE';
-                # sanitize wildcards (don't overdo it...)
-                if ($attrib->{OPERATOR} eq 'LIKE' && !(ref $attrib->{VALUE})) {
-                    $attrib->{VALUE} =~ s/\*/%/g;
-                    $attrib->{VALUE} =~ s/%%+/%/g;
-                }
-                # TODO #legacydb search_cert's CERT_ATTRIBUTES allows old DB layer syntax
-                $where->{ "$table_alias.attribute_value" } =
-                    OpenXPKI::Server::Database::Legacy->convert_dynamic_cond($attrib);
-
-                $ii++;
+            # key is set but not defined means we look for a non-existent item => requires an "outer join"
+            if (!defined $attributes->{$key}) {
+                push @join_spec, ( "=>certificate.identifier=identifier,$table_alias.attribute_contentkey='$key'", "certificate_attributes|$table_alias" );
+            } else {
+                push @join_spec, ( "certificate.identifier=identifier,$table_alias.attribute_contentkey='$key'", "certificate_attributes|$table_alias" );
             }
-        } else {
 
-            foreach my $key (keys %{$po->cert_attributes}) {
+            # add search constraint
+            $where->{ "$table_alias.attribute_value" } = $attributes->{$key};
 
-                my $table_alias = "certattr$ii";
-
-                # key is set but not defined means we look for a non-existent item => requires an "outer join"
-                if (!defined $po->cert_attributes->{$key}) {
-                    push @join_spec, ( "=>certificate.identifier=identifier,$table_alias.attribute_contentkey='$key'", "certificate_attributes|$table_alias" );
-                } else {
-                    push @join_spec, ( "certificate.identifier=identifier,$table_alias.attribute_contentkey='$key'", "certificate_attributes|$table_alias" );
-                }
-
-                # add search constraint
-                $where->{ "$table_alias.attribute_value" } = $po->cert_attributes->{$key};
-
-                # if the attribute should be returned we add the table name used
-                if (defined $return_attrib->{$key}) {
-                    $return_attrib->{$key} = $table_alias;
-                # if not, we need to add a group statement to suppress
-                # as simple scalar query can never be multivalued we skip it
-                } elsif (ref $po->cert_attributes->{$key}) {
-                    ##! 32: 'Need group on ' .$key
-                    $params->{distinct} = 1;
-                }
-
-                $ii++;
-
+            # if the attribute should be returned we add the table name used
+            if (defined $return_attrib->{$key}) {
+                $return_attrib->{$key} = $table_alias;
+            # if not, we need to add a group statement to suppress
+            # as simple scalar query can never be multivalued we skip it
+            } elsif (ref $attributes->{$key}) {
+                ##! 32: 'Need group on ' .$key
+                $params->{distinct} = 1;
             }
+
+            $ii++;
+
         }
+
+    # Legacy API
+    } elsif (ref $attributes eq 'ARRAY') {
+        ##! 64: $attributes
+        foreach my $attrib ( @{ $attributes } ) {
+            ##! 16: 'certificate attribute: ' . Dumper $entry
+            my $table_alias = "certattr$ii";
+
+            # add join table
+            push @join_spec, ( 'certificate.identifier=identifier', "certificate_attributes|$table_alias" );
+
+            # add search constraint
+            $where->{ "$table_alias.attribute_contentkey" } = $attrib->{KEY};
+
+            $attrib->{OPERATOR} //= 'LIKE';
+            # sanitize wildcards (don't overdo it...)
+            if ($attrib->{OPERATOR} eq 'LIKE' && !(ref $attrib->{VALUE})) {
+                $attrib->{VALUE} =~ s/\*/%/g;
+                $attrib->{VALUE} =~ s/%%+/%/g;
+            }
+            # TODO #legacydb search_cert's CERT_ATTRIBUTES allows old DB layer syntax
+            $where->{ "$table_alias.attribute_value" } =
+                OpenXPKI::Server::Database::Legacy->convert_dynamic_cond($attrib);
+
+            $ii++;
+        }
+        CTX('log')->deprecated()->error('array syntax for attributes in search_cert is deprecated');
     }
 
     ##! 64: 'return_attrib ' . Dumper $return_attrib

@@ -47,7 +47,7 @@ sub create_workflow {
 
     my $id = CTX('dbi')->next_id('workflow');
 
-    ##! 2: "BTW we shredder many workflow IDs here"
+    ##! 2: "Next id $id - we shredder many workflow IDs here"
 
     CTX('log')->workflow()->info("Created workflow ID $id.");
 
@@ -131,9 +131,9 @@ sub __update_workflow_context {
         ##! 32: "WF #$id: Only update internals " . join(":", @updated )
     }
 
-    # do not persit the virtual workflow_id/creator field
+    # do not persit the virtual workflow_id/creator/tenant field
     # ignore "volatile" context parameters starting with an underscore
-    @updated = grep { $_ !~ /\A(_.+|creator|workflow_id)\z/ } @updated;
+    @updated = grep { $_ !~ /\A(_.+|creator|workflow_id|tenant)\z/ } @updated;
 
     for my $key (@updated) {
         my $value = $params->{$key};
@@ -314,8 +314,9 @@ sub fetch_extra_workflow_data {
     }
     $workflow->attrib($attrs);
 
-    # add "virtual" creator
+    # add "virtual" creator and tenant
     $context->param( 'creator' => $attrs->{creator} );
+    $context->param( 'tenant' => $attrs->{tenant} ) if ($attrs->{tenant});
 
     # clear the updated flag
     $context->reset_updated();

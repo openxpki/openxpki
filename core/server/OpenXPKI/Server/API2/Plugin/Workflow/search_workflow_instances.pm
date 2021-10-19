@@ -109,6 +109,7 @@ using the attribute name as key.
 =cut
 command "search_workflow_instances" => {
     pki_realm  => { isa => 'AlphaPunct', },
+    tenant     => { isa => 'Tenant' },
     id         => { isa => 'ArrayRef', },
     type       => { isa => 'ArrayOrAlphaPunct', coerce => 1, },
     state      => { isa => 'ArrayRef|HashRef|StateName' },
@@ -152,6 +153,7 @@ C<order>, C<reverse>.
 =cut
 command "search_workflow_instances_count" => {
     pki_realm  => { isa => 'AlphaPunct', },
+    tenant     => { isa => 'Tenant' },
     id         => { isa => 'ArrayRef', },
     type       => { isa => 'ArrayOrAlphaPunct', coerce => 1, },
     state      => { isa => 'ArrayRef|HashRef|StateName', },
@@ -202,6 +204,8 @@ sub _make_query_params {
     my ($self, $args, $columns) = @_;
 
     my $re_alpha_string = qr{ \A [ \w \- \. : \s ]* \z }xms;
+
+    my $tenant = $args->tenant || CTX('api2')->get_primary_tenant();
 
     my $where = {};
     my $params = {
@@ -291,55 +295,66 @@ sub _make_query_params {
     my @join_spec = ();
     my %attr_value_colspec = (); # map: joined attribute's name => full table.column spec of attribute value
     my $ii = 0;
-    if ( $args->has_attribute ) {
-        # we need to join over the workflow_attributes table
 
-        # Legacy API
-        if (ref $args->attribute eq 'ARRAY') {
+    my $attributes;
+    if ($args->has_attribute) {
+        ##! 16: 'has attributes'
+        $attributes = $args->attribute;
+    }
+    if ( $tenant ) {
+        ##! 16: 'has tenant set ' . $tenant
+        $attributes = CTX('authentication')->tenant_handler()->workflow_attribute_filter( $tenant, $attributes );
+    }
 
-            for my $cond (@{$args->attribute}) {
-                ##! 16: 'certificate attribute: ' . Dumper $cond
-                my $table_alias = "workflowattr$ii";
+    if (ref $attributes eq 'HASH') {
 
-                # add join table
-                push @join_spec, ( 'workflow.workflow_id=workflow_id', "workflow_attributes|$table_alias" );
+        foreach my $key (keys %{$attributes}) {
 
-                # add search constraint
-                $where->{ "$table_alias.attribute_contentkey" } = $cond->{KEY};
+            my $table_alias = "workflowattr$ii";
 
-                $cond->{OPERATOR} //= 'EQUAL';
-                # sanitize wildcards (don't overdo it...)
-                if ($cond->{OPERATOR} eq 'LIKE') {
-                    $cond->{VALUE} =~ s/\*/%/g;
-                    $cond->{VALUE} =~ s/%%+/%/g;
-                }
-                # TODO #legacydb search_workflow_instances' ATTRIBUTE allows old DB layer syntax
-                $where->{ "$table_alias.attribute_value" } =
-                    OpenXPKI::Server::Database::Legacy->convert_dynamic_cond($cond);
+            # add join table
+            push @join_spec, ( 'workflow.workflow_id=workflow_id', "workflow_attributes|$table_alias" );
 
-                $ii++;
-            }
-        } else {
+            # add search constraint
+            $where->{ "$table_alias.attribute_contentkey" } = $key;
+            $where->{ "$table_alias.attribute_value" } = $attributes->{$key};
+            $attr_value_colspec{$key} = "$table_alias.attribute_value";
+            $ii++;
 
-            foreach my $key (keys %{$args->attribute}) {
-
-                my $table_alias = "workflowattr$ii";
-
-                # add join table
-                push @join_spec, ( 'workflow.workflow_id=workflow_id', "workflow_attributes|$table_alias" );
-
-                # add search constraint
-                $where->{ "$table_alias.attribute_contentkey" } = $key;
-                $where->{ "$table_alias.attribute_value" } = $args->attribute->{$key};
-                $attr_value_colspec{$key} = "$table_alias.attribute_value";
-                $ii++;
-
-                # if the attribute should be returned we add the table name used
-                $return_attrib->{$key} = $table_alias if (defined $return_attrib->{$key});
-
-            }
+            # if the attribute should be returned we add the table name used
+            $return_attrib->{$key} = $table_alias if (defined $return_attrib->{$key});
 
         }
+
+    } elsif (ref $attributes eq 'ARRAY') {
+
+        ##! 64: $attributes
+        for my $cond (@{$attributes}) {
+            ##! 16: 'certificate attribute: ' . Dumper $cond
+            my $table_alias = "workflowattr$ii";
+
+            # add join table
+            push @join_spec, ( 'workflow.workflow_id=workflow_id', "workflow_attributes|$table_alias" );
+
+            # add search constraint
+            $where->{ "$table_alias.attribute_contentkey" } = $cond->{KEY};
+
+            $cond->{OPERATOR} //= 'EQUAL';
+            # sanitize wildcards (don't overdo it...)
+            if ($cond->{OPERATOR} eq 'LIKE') {
+                $cond->{VALUE} =~ s/\*/%/g;
+                $cond->{VALUE} =~ s/%%+/%/g;
+            }
+            # TODO #legacydb search_workflow_instances' ATTRIBUTE allows old DB layer syntax
+            $where->{ "$table_alias.attribute_value" } =
+                OpenXPKI::Server::Database::Legacy->convert_dynamic_cond($cond);
+
+            $ii++;
+
+            # if the attribute should be returned we add the table name used
+            $return_attrib->{ $cond->{KEY} } = $table_alias if (defined $return_attrib->{ $cond->{KEY} });
+        }
+        CTX('log')->deprecated()->error('array syntax for attributes in search_workflow_instances is deprecated');
     }
 
     ##! 64: 'return_attrib ' . Dumper $return_attrib

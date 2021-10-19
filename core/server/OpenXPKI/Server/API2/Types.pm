@@ -3,6 +3,7 @@ use Moose::Util::TypeConstraints;
 
 # Core modules
 use Math::BigInt;
+use OpenXPKI::Server::Context qw( CTX );
 
 =head1 NAME
 
@@ -211,6 +212,15 @@ subtype 'ArrayRefOrCommaList',
 coerce 'ArrayRefOrCommaList',
     from 'Str',
     via { [ split /\s*,\s*/, $_ ] };
+
+
+=head2 Tenant
+=cut
+
+subtype 'Tenant',
+    as 'Str',
+    where { CTX('api2')->can_access_tenant( tenant => $_ ); },
+    message {  $_ ? $_. ' is not a valid tenant in this session' : 'non-empty tenant must be given for this user' };
 
 =head2 TokenType
 

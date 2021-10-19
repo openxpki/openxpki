@@ -212,7 +212,8 @@ sub init_start {
     my $args = shift;
 
     my $wf_info = $self->send_command_v2( 'create_workflow_instance', {
-       workflow => scalar $self->param('wf_type'), params => {}, ui_info => 1
+       workflow => scalar $self->param('wf_type'), params => {}, ui_info => 1,
+       $self->__tenant(),
     });
 
     if (!$wf_info) {
@@ -1250,8 +1251,10 @@ sub action_index {
 
     } elsif ($wf_args->{wf_type}) {
 
+
         $wf_info = $self->send_command_v2( 'create_workflow_instance', {
-            workflow => $wf_args->{wf_type}, params => \%wf_param, ui_info => 1
+            workflow => $wf_args->{wf_type}, params => \%wf_param, ui_info => 1,
+            $self->__tenant(),
         });
         if (!$wf_info) {
 
@@ -1496,7 +1499,7 @@ sub action_search {
     my $self = shift;
     my $args = shift;
 
-    my $query = { };
+    my $query = { $self->__tenant() };
     my $verbose = {};
     my $input;
 
@@ -1689,7 +1692,7 @@ sub action_bulk {
         $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_HAS_FAILED_ITEMS_STATUS', 'error');
 
         my @failed_id = keys %{$errors};
-        my $failed_result = $self->send_command_v2( 'search_workflow_instances', { id => \@failed_id } );
+        my $failed_result = $self->send_command_v2( 'search_workflow_instances', { id => \@failed_id, $self->__tenant() } );
 
         my @result_failed = $self->__render_result_list( $failed_result, $self->__default_grid_row );
 
@@ -3716,6 +3719,8 @@ sub __render_task_list {
     my $query = $item->{query};
     my $limit = 25;
 
+    $query = { $self->__tenant(), %$query } unless($query->{tenant});
+
     if ($query->{limit}) {
         $limit = $query->{limit};
         delete $query->{limit};
@@ -3756,7 +3761,7 @@ sub __render_task_list {
 
     $self->logger()->trace( "columns : " . Dumper $column) if $self->logger->is_trace;
 
-    my $search_result = $self->send_command_v2( 'search_workflow_instances', { (limit => $limit), %$query } );
+    my $search_result = $self->send_command_v2( 'search_workflow_instances', { limit => $limit, %$query } );
 
     # empty message
     my $empty = $item->{ifempty} || 'I18N_OPENXPKI_UI_TASK_LIST_EMPTY_LABEL';

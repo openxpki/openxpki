@@ -99,7 +99,8 @@ command "create_workflow_instance" => {
     params   => { isa => 'HashRef', default => sub { {} } },
     ui_info  => { isa => 'Bool', default => 0, },
     norun    => { isa => 'Str', matching => qr{ \A(persist|detach|watchdog|)\z }xms, default => '' },
-    use_lock    => { isa => 'HashRef|Str' },
+    use_lock => { isa => 'HashRef|Str' },
+    tenant   => { isa => 'Tenant' },
 } => sub {
     my ($self, $params) = @_;
     my $type = $params->workflow;
@@ -107,6 +108,9 @@ command "create_workflow_instance" => {
     my $norun = $params->norun || '';
 
     ##! 1: 'Norun ' . $norun
+
+    my $tenant = $params->tenant || CTX('api2')->get_primary_tenant();
+    ##! 32: "Tenant $tenant"
 
     my $util = OpenXPKI::Server::API2::Plugin::Workflow::Util->new;
 
@@ -147,6 +151,12 @@ command "create_workflow_instance" => {
     # This is crucial and must be done before the first execute as otherwise
     # workflow ACLs fails when the first non-initial action is autorun
     $workflow->attrib({ creator => $creator });
+
+    # add the tenant information to context and attributes
+    if ($tenant) {
+        $workflow->attrib({ tenant => $tenant });
+        $context->{PARAMS}{'tenant'} = $tenant;
+    }
 
     OpenXPKI::Server::Context::setcontext({ workflow_id => $id, force => 1 });
 

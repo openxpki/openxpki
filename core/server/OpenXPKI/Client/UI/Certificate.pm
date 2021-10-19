@@ -503,11 +503,12 @@ sub init_mine {
         },
         order => 'notbefore',
         reverse => 1,
+        $self->__tenant(),
     };
 
     $self->logger()->trace( "search query: " . Dumper $query) if $self->logger->is_trace;
 
-    my $search_result = $self->send_command_v2( 'search_cert', { %$query, ( limit => $limit, start => $startat ) } );
+    my $search_result = $self->send_command_v2( 'search_cert', { %$query, limit => $limit, start => $startat } );
 
     my $result_count = scalar @{$search_result};
     my $pager;
@@ -900,7 +901,7 @@ sub init_related {
 
     my @result;
     if (scalar @wfid) {
-        my $cert_workflows = $self->send_command_v2( 'search_workflow_instances', {  id => \@wfid, check_acl => 1 });
+        my $cert_workflows = $self->send_command_v2( 'search_workflow_instances', { id => \@wfid, check_acl => 1, $self->__tenant() });
         $self->logger()->trace("workflow results" . Dumper $cert_workflows) if ($self->logger()->is_trace());;
 
         my $workflow_labels = $self->send_command_v2( 'get_workflow_instance_types');
@@ -1115,6 +1116,7 @@ sub action_autocomplete {
             status => 'ISSUED',
             entity_only => 1,
             %$params,
+            $self->__tenant(),
         });
 
         foreach my $item (@{$search_result}) {
@@ -1168,7 +1170,8 @@ sub action_find {
         my $search_result = $self->send_command_v2( 'search_cert', {
             return_columns => 'identifier',
             cert_serial => $serial,
-            entity_only => 1
+            entity_only => 1,
+            $self->__tenant(),
         });
         if (!$search_result || @{$search_result} == 0) {
             $self->set_status('I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_NO_SUCH_SERIAL','error');
@@ -1186,7 +1189,7 @@ sub action_find {
                 'id' => $queryid,
                 'type' => 'certificate',
                 'count' => scalar @{$search_result},
-                'query' => { cert_serial => $serial, entity_only => 1 },
+                'query' => { cert_serial => $serial, entity_only => 1, $self->__tenant() },
                 'input' => { cert_serial => scalar $self->param('cert_serial') },
                 'header' =>  $self->__default_grid_head,
                 'column' => $self->__default_grid_row,
@@ -1220,7 +1223,7 @@ sub action_search {
 
     $self->logger()->trace("input params: " . Dumper $self->cgi()->param()) if $self->logger->is_trace;
 
-    my $query = { entity_only => 1 };
+    my $query = { entity_only => 1, $self->__tenant() };
     my $input = {}; # store the input data the reopen the form later
     my $verbose = {};
     foreach my $key (qw(subject issuer_dn)) {
