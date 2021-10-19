@@ -19,7 +19,7 @@ use lib "$Bin";
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Test;
 
-plan tests => 20;
+plan tests => 18;
 
 #
 # Setup test context
