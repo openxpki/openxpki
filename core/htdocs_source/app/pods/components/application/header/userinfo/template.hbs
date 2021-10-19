@@ -3,14 +3,21 @@
         <div class="userinfo text-nowrap">
             <ul class="nav flex-column">
                 {{!-- template-lint-disable no-bare-strings --}}
-                <li class="text-right">
+                <li class="text-right user">
                     {{t 'userinfo.name'}}
-                    <strong>{{u.realname}} <span class="user_role">({{u.role}})</span></strong>
+                    <strong>{{u.realname}} <span>({{u.role}})</span></strong>
                 </li>
-                <li class="text-right">
+                <li class="text-right pki_realm">
                     {{t 'userinfo.realm'}}
-                    <strong>{{u.pki_realm_label}} <span class="pki_realm">({{u.pki_realm}})</span></strong>
+                    <strong>{{u.pki_realm_label}} <span>({{u.pki_realm}})</span></strong>
                 </li>
+                {{#let this.tenants as |tt|}}
+                    {{#if tt}}
+                    <li class="text-right tenant">
+                        {{t 'userinfo.tenant'}} <strong>{{tt.label}} <span>({{tt.value}})</span></strong>
+                    </li>
+                    {{/if}}
+                {{/let}}
             </ul>
         </div>
     {{/let}}

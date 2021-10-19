@@ -26,6 +26,7 @@ export default class OxiContentService extends Service {
     @tracked refresh = null;
     @tracked structure = null;
     @tracked rtoken = null;
+    @tracked tenant = null;
     @tracked status = null;
     @tracked popup = null;
     @tracked tabs = [];
@@ -82,6 +83,9 @@ export default class OxiContentService extends Service {
         // GET
         else {
             method = 'GET';
+        }
+        if (this.tenant) {
+            data = { ...data, _tenant: this.tenant };
         }
 
         return this.backend.request({ url, method, data })
@@ -141,6 +145,8 @@ export default class OxiContentService extends Service {
 
                 // set custom exception handling
                 if (doc.on_exception) this.serverExceptions = doc.on_exception;
+
+                if (doc.tenant) this.tenant = doc.tenant;
             }
             // Page contents
             else {

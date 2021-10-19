@@ -12,6 +12,7 @@ site:
 userinfo:
   name: "Signed in as"
   realm: "Realm:"
+  tenant: "Tenant:"
 
 error_popup:
   header: "Application Error"

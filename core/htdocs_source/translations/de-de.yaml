@@ -12,6 +12,7 @@ site:
 userinfo:
   name: "Angemeldet als"
   realm: "Realm:"
+  tenant: "Mandant:"
 
 error_popup:
   header: "Anwendungsfehler"

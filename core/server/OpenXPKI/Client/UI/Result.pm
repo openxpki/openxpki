@@ -340,6 +340,15 @@ sub __param {
     return;
 }
 
+# return a list/hash (tenant => $tenant)_from_env to be directly included
+# in any api call. Returns an empty list if tenant is not set
+sub __tenant {
+    my $self = shift;
+    my $tenant = $self->param('_tenant');
+    return (tenant => $tenant) if ($tenant);
+    return ();
+}
+
 sub param_from_fields {
 
     my ($self, $fields) = @_;
