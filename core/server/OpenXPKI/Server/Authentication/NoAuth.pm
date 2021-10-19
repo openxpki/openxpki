@@ -48,11 +48,14 @@ sub handleInput {
     my %userinfo = %{$msg};
     delete $userinfo{username};
     delete $userinfo{role};
+    my $tenant = $userinfo{tenant};
+    delete $userinfo{tenant};
 
     return OpenXPKI::Server::Authentication::Handle->new(
         username => $username,
         userid => $self->get_userid( $username ),
         role => $role,
+        tenant => $tenant,
         userinfo => \%userinfo,
         authinfo => {
             uid => $username,
@@ -77,7 +80,7 @@ from the incoming message is used. In case I<rolemap> is set, the role
 given role name will be translated using the map.
 
 Any additional parameters set in the incoming hash will be set as
-I<userinfo>.
+I<userinfo>, except I<tenant> which will be assigned to the Handle.
 
 The I<authinfo> section can be set as parameter to the handler (HashRef),
 the key I<uid> is always populated with the I<username>.

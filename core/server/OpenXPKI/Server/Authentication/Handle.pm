@@ -65,6 +65,12 @@ has role => (
     isa => 'Str',
 );
 
+has tenant => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    predicate => 'has_tenant',
+);
+
 has userinfo => (
     is => 'rw',
     isa => 'HashRef|Undef',
@@ -81,6 +87,18 @@ has authinfo => (
     default => sub { return {}; }
 );
 
+around 'BUILDARGS' => sub{
+    my( $orig, $self, @params ) = @_;
+    my $params = { @params };
+    if (exists $params->{tenant}) {
+        if (!defined $params->{tenant}) {
+            delete $params->{tenant};
+        } elsif (!ref $params->{tenant}) {
+            $params->{tenant} = [$params->{tenant}];
+        }
+    }
+    $self->$orig($params);
+};
 
 sub error_message {
 

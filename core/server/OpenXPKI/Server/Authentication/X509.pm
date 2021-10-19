@@ -167,6 +167,8 @@ sub _validation_result {
         delete $userinfo->{role};
         $username = $userinfo->{username};
         delete $userinfo->{username};
+        $tenant = $userinfo->{tenant};
+        delete $userinfo->{tenant};
 
     }
 
@@ -179,6 +181,7 @@ sub _validation_result {
         username => $username,
         userid => $self->get_userid( $username ),
         role => $role,
+        tenant => $tenant,
         userinfo => $userinfo,
         authinfo => {
             uid => $username,

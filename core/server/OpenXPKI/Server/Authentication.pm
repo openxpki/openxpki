@@ -184,7 +184,7 @@ sub list_authentication_stacks {
     return \%ret;
 }
 
-sub get_stack_info {
+sub __get_stack_info {
 
     ##! 1: "start"
 
@@ -243,15 +243,19 @@ sub get_stack_info {
         $auth_type = 'passwd';
     }
 
-    my %jwsign;
+    my $stack_reply = {
+        type => $auth_type,
+        params => ($auth_param //= {}),
+    };
+
     if (my $keyid = $self->{PKI_REALM}->{$realm}->{STACK}->{$stack}->{keyid}) {
-        $jwsign{SIGN} = { keyid => $keyid };
+        $stack_reply->{sign} = { keyid => $keyid };
     }
 
     ##! 8: "Auth Type $auth_type"
-    ##! 32: $auth_param
-    # TODO - clean this up and return some more abstract info
-    return (undef, undef, { SERVICE_MSG => 'GET_'.uc($auth_type).'_LOGIN', PARAMS => ($auth_param //= {}), %jwsign });
+    ##! 32: $stack_reply
+    return $stack_reply;
+
 }
 
 sub __legacy_login {
@@ -427,7 +431,7 @@ sub login_step {
     # no result at all usually means we even did not try to login
     # fetch the required "challenges" from the STACK! We use the fast
     # path via the config layer - FIXME - check if we should cache this
-    return $self->get_stack_info($stack) unless ($last_result);
+    return $self->__get_stack_info($stack) unless ($last_result);
 
     # if we have a result but it is not valid we tried to log in but failed
     # we use the "old" exception pattern as we need to rework the error
@@ -444,13 +448,7 @@ sub login_step {
     CTX('log')->auth()->info(sprintf("Login successful (user: %s, role: %s)",
         $last_result->userid, $last_result->role));
 
-    return (
-        $last_result->userid,
-        $last_result->role,
-        { SERVICE_MSG => 'SERVICE_READY' },
-        ($last_result->userinfo // {}),
-        ($last_result->authinfo // {})
-    );
+    return $last_result;
 
 };
 

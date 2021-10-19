@@ -824,33 +824,49 @@ sub __handle_login {
     my $ident   = ident $self;
     my $message = shift;
 
-    my ($user, $role, $reply, $userinfo, $authinfo) = CTX('authentication')->login_step({
+    my $auth_reply = CTX('authentication')->login_step({
         STACK   => CTX('session')->data->authentication_stack,
         MESSAGE => $message,
     });
-    ##! 16: 'reply: ' . Dumper $reply
-    if ($user && $role) {
-        ##! 4: 'login successful'
-        ##! 16: 'user: ' . $user
-        ##! 16: 'role: ' . $role
-        ##! 16: 'userinfo: ' . Dumper $userinfo
-        ##! 16: 'authinfo: ' . Dumper $authinfo
 
-        CTX('log')->system->debug("Successful login from user $user, role $role");
+    # returns an instance of OpenXPKI::Server::Authentication::Handle
+    # if the login was successful, auth failure throws an exception
+    if (ref $auth_reply eq 'OpenXPKI::Server::Authentication::Handle') {
+
+        ##! 4: 'login successful'
+        ##! 16: 'user: ' . $auth_reply->userid
+        ##! 16: 'role: ' . $auth_reply->role
+        ##! 32: $auth_reply
+
+        CTX('log')->system->debug("Successful login from user ". $auth_reply->userid .", role ". $auth_reply->role);
         # successful login, save it in the session and mark session as valid
-        CTX('session')->data->user($user);
-        CTX('session')->data->role($role);
-        CTX('session')->data->userinfo($userinfo) if ($userinfo);
-        CTX('session')->data->authinfo($authinfo) if ($authinfo);
+        CTX('session')->data->user( $auth_reply->userid );
+        CTX('session')->data->role( $auth_reply->role );
+        if ($auth_reply->has_tenant) {
+            CTX('session')->data->tenant( $auth_reply->tenant );
+        } else {
+            CTX('session')->data->clear_tenant();
+        }
+        CTX('session')->data->userinfo( $auth_reply->userinfo // {} );
+        CTX('session')->data->authinfo( $auth_reply->authinfo // {} );
         CTX('session')->is_valid(1);
 
-        Log::Log4perl::MDC->put('user', $user);
-        Log::Log4perl::MDC->put('role', $role);
+        Log::Log4perl::MDC->put('user', $auth_reply->userid );
+        Log::Log4perl::MDC->put('role', $auth_reply->role );
 
         $self->__change_state({ STATE => 'MAIN_LOOP', });
+
+        return { SERVICE_MSG => 'SERVICE_READY' };
     }
 
-    return $reply;
+    # returns a hash with information for the login stack if
+    # no or insufficient auth data was passed
+    return {
+        SERVICE_MSG => 'GET_'.uc($auth_reply->{type}).'_LOGIN',
+        PARAMS => $auth_reply->{params},
+        ($auth_reply->{sign} ? (SIGN => $auth_reply->{sign}) : ()),
+    };
+
 }
 
 sub run

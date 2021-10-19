@@ -984,23 +984,25 @@ sub set_user {
 
     $self->session->data->pki_realm($realm);
 
-    my ($realuser, $role, $reply) = OpenXPKI::Server::Context::CTX('authentication')->login_step({
+    my $reply = OpenXPKI::Server::Context::CTX('authentication')->login_step({
         STACK   => 'OxiTestAuthStack',
         MESSAGE => {
             PARAMS => { LOGIN => $user, PASSWD => $self->password },
         },
     });
+;
+    die "Could not set user to '$user' " unless(ref $reply eq 'OpenXPKI::Server::Authentication::Handle');
 
-    die "Could not set user to '$user': ".Dumper($reply) unless $realuser && $role;
-
-    $self->session->data->user($realuser);
+    my $userid = $reply->userid;
+    my $role = $reply->role;
+    $self->session->data->user($userid);
     $self->session->data->role($role);
     $self->session->is_valid(1);
 
-    Log::Log4perl::MDC->put('user', $realuser);
+    Log::Log4perl::MDC->put('user', $userid);
     Log::Log4perl::MDC->put('role', $role);
 
-    note "  session set to realm '$realm', user '$user', role '$role'";
+    note " session set to realm '$realm', user '$userid', role '$role' ";
 }
 
 =head2 api2_command
@@ -1209,6 +1211,7 @@ sub auth_config {
                     raop2 => {
                         digest => $self->password_hash,
                         role   => "RA Operator",
+                        tenant => 'Tenant B',
                     },
                     user => {
                         digest => $self->password_hash,
@@ -1216,7 +1219,8 @@ sub auth_config {
                     },
                     user2 => {
                         digest => $self->password_hash,
-                        role   => "User"
+                        role   => "User",
+                        tenant => 'Tenant B',
                     },
                 },
             },

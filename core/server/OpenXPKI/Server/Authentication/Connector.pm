@@ -85,7 +85,7 @@ password aganist a connector backend using the password as bind parameter.
 =head2 Configuration
 
 Requires I<role> to be set, will use the incoming username to query the
-connector at I<$prefix.source.$username>, sendind the password as "bind"
+connector at I<$prefix.source.$username>, sending the password as "bind"
 password in the data section. Suited connectors are e.g.
 Connector::Builtin::Authentication::*
 

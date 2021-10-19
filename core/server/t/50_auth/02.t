@@ -26,7 +26,7 @@ use OpenXPKI::Server::Context qw( CTX );
 
 use OpenXPKI::Server::Authentication;
 
-plan tests => 10;
+plan tests => 29;
 
 my $ot = OpenXPKI::Test->new(
     with => "AuthLayer",
@@ -39,72 +39,116 @@ use_ok "OpenXPKI::Server::Authentication";
 my $auth;
 lives_ok { $auth = OpenXPKI::Server::Authentication->new(); } "class loaded";
 
-my @res;
+my $res;
 lives_and {
-    @res = $auth->login_step({
+    $res = $auth->login_step({
         STACK => 'Testing',
         MESSAGE => { PARAMS => {} }
     });
-    ok ($res[0], 'Anonymous');
+    ok(ref $res eq 'OpenXPKI::Server::Authentication::Handle');
+    is($res->userid, 'Anonymous');
 };
 
 lives_and {
-    @res = $auth->login_step({
+    $res = $auth->login_step({
         STACK => 'Password',
         MESSAGE => { PARAMS => {} }
     });
-    cmp_deeply(\@res, superbagof({ 'SERVICE_MSG' => 'GET_PASSWD_LOGIN', PARAMS=> {} }));
+    cmp_deeply($res, { 'type' => 'passwd', params => {} });
 };
 
 note 'Fallthru';
 
 lives_and {
-    @res = $auth->login_step({
+    $res = $auth->login_step({
         STACK => 'FallThru',
         MESSAGE => { PARAMS => { username => 'foo' } },
     });
-    cmp_deeply(\@res, superbagof('foo', 'Anonymous', { 'SERVICE_MSG' => 'SERVICE_READY' }));
+    ok(ref $res eq 'OpenXPKI::Server::Authentication::Handle');
+    is($res->userid, 'foo');
+    is($res->role, 'Anonymous');
 };
 
 lives_and {
-    @res = $auth->login_step({
+    $res = $auth->login_step({
         STACK => 'FallThru',
         MESSAGE => { PARAMS => { username => 'foo', password => 'wrongsecret' } },
     });
-    cmp_deeply(\@res, superbagof('foo', 'Anonymous', { 'SERVICE_MSG' => 'SERVICE_READY' }));
+    ok(ref $res eq 'OpenXPKI::Server::Authentication::Handle');
+    is($res->userid, 'foo');
+    is($res->role, 'Anonymous');
 };
 
 lives_and {
-    @res = $auth->login_step({
+    $res = $auth->login_step({
         STACK => 'FallThru',
         MESSAGE => { PARAMS => { username => 'foo', password => 'secret' } },
     });
-    cmp_deeply(\@res, superbagof('foo', 'User', { 'SERVICE_MSG' => 'SERVICE_READY' }));
+    ok(ref $res eq 'OpenXPKI::Server::Authentication::Handle');
+    is($res->userid, 'foo');
+    is($res->role, 'User');
 };
 
 note 'Password only';
 
 lives_and {
-    @res = $auth->login_step({
+    $res = $auth->login_step({
         STACK => 'Password',
         MESSAGE => { PARAMS => { username => 'foo' } },
     });
-    cmp_deeply(\@res, superbagof({ 'SERVICE_MSG' => 'GET_PASSWD_LOGIN', PARAMS=> {} }));
+    cmp_deeply($res, { 'type' => 'passwd', params => {} });
 };
 
 throws_ok {
-    @res = $auth->login_step({
+    $res = $auth->login_step({
         STACK => 'Password',
         MESSAGE => { PARAMS => { username => 'foo', password => 'wrongsecret' } },
     });
 } qr/I18N_OPENXPKI_UI_AUTHENTICATION_FAILED/, "wrong secret";
 
 lives_and {
-    @res = $auth->login_step({
+    $res = $auth->login_step({
         STACK => 'Password',
         MESSAGE => { PARAMS => { username => 'foo', password => 'secret' } },
     });
-    cmp_deeply(\@res, superbagof('foo', 'User', { 'SERVICE_MSG' => 'SERVICE_READY' }));
+    ok(ref $res eq 'OpenXPKI::Server::Authentication::Handle');
+    is($res->userid, 'foo');
+    is($res->role, 'User');
 };
+
+note 'Password with Tenant';
+lives_and {
+    $res = $auth->login_step({
+        STACK => 'Tenant',
+        MESSAGE => { PARAMS => { username => 'foo', password => 'secret' } },
+    });
+    ok(ref $res eq 'OpenXPKI::Server::Authentication::Handle');
+    is($res->role, 'User');
+    cmp_deeply($res->tenant, ['Tenant A']);
+};
+
+lives_and {
+    $res = $auth->login_step({
+        STACK => 'Tenant',
+        MESSAGE => { PARAMS => { username => 'bar', password => 'secret' } },
+    });
+    ok(ref $res eq 'OpenXPKI::Server::Authentication::Handle');
+    is($res->role, 'Operator');
+    cmp_deeply($res->tenant, ['']);
+};
+
+lives_and {
+    $res = $auth->login_step({
+        STACK => 'Tenant',
+        MESSAGE => { PARAMS => { username => 'guest', password => 'secret' } },
+    });
+    ok(ref $res eq 'OpenXPKI::Server::Authentication::Handle');
+    is($res->userid, 'guest');
+    is($res->role, 'Anonymous');
+    ok(!$res->has_tenant());
+};
+
+
+
 
 1;
