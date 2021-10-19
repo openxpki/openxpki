@@ -452,6 +452,46 @@ sub login_step {
 
 };
 
+sub tenant_handler {
+
+    ##! 1: 'start'
+    my $self = shift;
+
+    my $role = shift || CTX('session')->data->role;
+    ##! 8: 'role ' . $role
+    my $conf = CTX('config')->get_hash(['auth', 'roles', $role, 'tenant']);
+
+    ##! 64: $conf
+    # no tenant config defined for role
+    return unless ($conf);
+
+    # type or class must be defined
+    my $class;
+    if ($conf->{class}) {
+        $class = $conf->{class};
+        delete $conf->{class};
+    } elsif ($conf->{type}) {
+        $class = 'OpenXPKI::Server::AccessControl::Tenant::'.$conf->{type};
+        delete $conf->{type};
+    } else {
+        OpenXPKI::Exception::Authentication->throw(
+            message => 'Tenant handler has neither class nor type set',
+            params => { role => $role, param => $conf }
+        );
+    }
+    ##! 32: $class
+    eval "use $class;1";
+    if ($EVAL_ERROR) {
+        OpenXPKI::Exception->throw (
+            message => "Unable to load access control handler class $class",
+            params  => {ERRVAL => $EVAL_ERROR}
+        );
+    }
+
+    return $class->new( %{$conf} );
+
+}
+
 1;
 __END__
 
@@ -490,10 +530,34 @@ Reply is the reply message that is to be sent to the user
 (i.e. a challenge, or the 'SERVICE_READY' message in case
 the authentication has been successful).
 
+=head2 tenant_handler
+
+Return the handler class that provides the filters and access
+restrictions for multi-tenant setups. Handlers are bound to a role,
+if you dont pass the role as parameter the value from the current
+session is used.
+
+Configuration for tenant handlers is done in I<auth.roles>:
+
+    RA Operator:
+        label: RA Operator
+        # will load OpenXPKI::Server::AccessControl::Tenant::Base
+        tenant:
+            type: Base
+
+    Local Registrar:
+        label: Local Staff
+        # will load OpenXPKI::Custom::TenantRules with "foo => bar"
+        # passed to the constructor
+        tenant:
+            class: OpenXPKI::Custom::TenantRules
+            foo: bar
+
 =head1 See Also
 
 OpenXPKI::Server::Authentication::Anonymous
-OpenXPKI::Server::Authentication::External
-OpenXPKI::Server::Authentication::LDAP
+OpenXPKI::Server::Authentication::ClientX509
+OpenXPKI::Server::Authentication::Connector
+OpenXPKI::Server::Authentication::NoAuth
+OpenXPKI::Server::Authentication::OneTimePassword
 OpenXPKI::Server::Authentication::Password
-OpenXPKI::Server::Authentication::X509
