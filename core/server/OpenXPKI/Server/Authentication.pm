@@ -298,7 +298,6 @@ sub __legacy_login {
             role => $role,
             userinfo => $userinfo,
             handler => $handler,
-            is_valid => 1,
         );
     }
 
@@ -445,6 +444,15 @@ sub login_step {
         );
     }
 
+    if ($self->tenant_handler( $last_result->role() ) && !$last_result->has_tenant()) {
+        CTX('log')->auth()->error(sprintf('Login failed, no tenant information for user: %s, role: %s)', $last_result->username(), $last_result->role()));
+        OpenXPKI::Exception::Authentication->throw(
+            message => 'I18N_OPENXPKI_UI_AUTHENTICATION_FAILED_TENANT_REQUIRED',
+            authinfo => $last_result->authinfo(),
+            params => { username => $last_result->username(), role => $last_result->role() }
+        );
+    }
+
     CTX('log')->auth()->info(sprintf("Login successful (user: %s, role: %s)",
         $last_result->userid, $last_result->role));
 
@@ -474,7 +482,7 @@ sub tenant_handler {
         $class = 'OpenXPKI::Server::AccessControl::Tenant::'.$conf->{type};
         delete $conf->{type};
     } else {
-        OpenXPKI::Exception::Authentication->throw(
+        OpenXPKI::Exception->throw(
             message => 'Tenant handler has neither class nor type set',
             params => { role => $role, param => $conf }
         );

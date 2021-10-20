@@ -67,7 +67,7 @@ has role => (
 
 has tenant => (
     is => 'rw',
-    isa => 'ArrayRef',
+    isa => 'ArrayRef[Str]',
     predicate => 'has_tenant',
 );
 
@@ -125,6 +125,8 @@ sub is_valid {
     return unless($self->username());
     return unless($self->userid());
     return unless($self->role());
+
+    return 1;
 
 }
 

@@ -1565,7 +1565,9 @@ sub action_search {
 
     # No results founds
     if (!$result_count) {
-        $self->set_status('I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES','error');
+        # if $result_count is undefined there was an error with the query
+        # status was set to the error message from the run_command sub
+        $self->set_status('I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES','error') if (defined $result_count);
         return $self->init_search({ preset => $input });
     }
 

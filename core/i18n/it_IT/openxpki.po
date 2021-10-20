@@ -31,6 +31,10 @@ msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED"
 msgstr "Workflow"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED_TENANT_REQUIRED"
+msgstr "Workflow"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_BACKEND_DID_NOT_REPORT_SUCCESS"
 msgstr "Sessione di backend terminata - eseguire di nuovo il login"
 

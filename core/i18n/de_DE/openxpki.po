@@ -21,7 +21,10 @@ msgid "I18N_OPENXPKI_UI_APPLICATION_ERROR"
 msgstr "Unerwarteter Fehler in der Anwendung"
 
 msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED"
-msgstr "Autentifizierung fehlgeschlagen"
+msgstr "Anmeldung fehlgeschlagen"
+
+msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED_TENANT_REQUIRED"
+msgstr "Anmeldung fehlgeschlagen (Benutzerdaten unvollständig)"
 
 msgid "I18N_OPENXPKI_UI_BACKEND_DID_NOT_REPORT_SUCCESS"
 msgstr "Backend-Worfklow endete nicht erfolgreich"

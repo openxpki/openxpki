@@ -778,7 +778,7 @@ sub handle_login {
         # Failure here is likely a wrong password
 
         if ($reply->{'ERROR'} && $reply->{'ERROR'}->{CLASS} eq 'OpenXPKI::Exception::Authentication') {
-            $result->set_status(i18nGettext('I18N_OPENXPKI_UI_LOGIN_FAILED'),'error');
+            $result->set_status(i18nGettext( $reply->{'ERROR'}->{LABEL} ),'error');
         } else {
             $result->set_status_from_error_reply($reply);
         }
