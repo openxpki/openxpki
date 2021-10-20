@@ -60,6 +60,10 @@ command "evaluate_trust_rule" => {
         } elsif ($key eq 'issuer_alias' || $key eq 'root_alias') {
 
             my $identifier = ($key eq 'issuer_alias') ? $params->signer_issuer : $params->signer_root;
+
+            # identifier was not passed so we can not check it - abort rule
+            return unless($identifier);
+
             my $alias = CTX('dbi')->select_one(
                 from    => 'aliases',
                 columns => [ 'alias' ],

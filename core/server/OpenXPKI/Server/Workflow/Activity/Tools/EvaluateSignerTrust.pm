@@ -246,9 +246,9 @@ sub execute {
             signer_subject  => $signer_subject,
             signer_identifier   => $signer_identifier,
             signer_realm    => $signer_realm,
-            signer_profile  => $signer_profile,
-            signer_issuer   => $signer_issuer,
-            signer_root     => $signer_root,
+            ($signer_profile ? (signer_profile  => $signer_profile) : ()),
+            ($signer_issuer  ? (signer_issuer   => $signer_issuer) : ()),
+            ($signer_root    ? (signer_root     => $signer_root) : ()),
             rule            => $trustrule,
         );
 
