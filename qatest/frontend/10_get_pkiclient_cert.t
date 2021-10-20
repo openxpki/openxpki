@@ -14,7 +14,7 @@ use Test::More tests => 3;
 package main;
 
 my $result;
-my $client = TestCGI::factory('democa');
+my $client = TestCGI::factory('democa','alice');
 
 # create temp dir
 -d "tmp/" || mkdir "tmp/";
@@ -85,6 +85,12 @@ if ($result->{main}->[0]->{content}->{fields} &&
         'wf_token' => undef
     });
 };
+
+$client = TestCGI::factory('democa');
+
+$result = $client->mock_request({
+    page => 'workflow!load!wf_id!' . $wf_id
+});
 
 $result = $client->mock_request({
     'action' => 'workflow!select!wf_action!csr_approve_csr!wf_id!' . $wf_id,

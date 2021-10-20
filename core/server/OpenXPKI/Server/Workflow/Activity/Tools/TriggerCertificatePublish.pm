@@ -60,7 +60,9 @@ sub execute {
     # Create publishing workflow
     my $wf_info = CTX('api2')->create_workflow_instance(
         workflow      => $workflow_type,
-        params        => $params
+        params        => $params,
+        norun         => 'detach',
+        _run_as_system => 1,
     );
 
     CTX('log')->application()->info('Publishing workflow created with id ' . $wf_info->{workflow}->{id});
