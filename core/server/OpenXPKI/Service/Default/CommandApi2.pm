@@ -73,6 +73,15 @@ client:
 =cut
 sub execute {
     my $self = shift;
+
+    if ($self->params) {
+        my @violated = grep { $_ =~ /\A_/ } (keys %{$self->params});
+        OpenXPKI::Exception->throw(
+            message => 'No access to private parameters via socket',
+            params => { keys => \@violated },
+        ) if (@violated);
+    }
+
     return {
         SERVICE_MSG => 'COMMAND',
         COMMAND => $self->command,
