@@ -104,16 +104,18 @@ B<Positional parameters>
 
 =item * C<$wait> I<Bool> - wait for background execution to start (max. 15 seconds).
 
+=item * C<$role> I<Str> - run as role (implies async)
+
 =back
 
 =cut
 sub execute_activity {
-    my ($self, $wf, $activity, $async, $wait) = @_;
+    my ($self, $wf, $activity, $async, $wait, $role) = @_;
     ##! 2: 'execute activity ' . $activity
 
     # ASYNCHRONOUS - fork
-    if ($async) {
-        $self->_execute_activity_async($wf, $activity); # returns the background process PID
+    if ($async || $wait || $role) { # async marker
+        $self->_execute_activity_async($wf, $activity, $role); # returns the background process PID
         if ($wait) {
             return $self->watch($wf); # wait and fetch updated workflow state
         }
@@ -229,11 +231,13 @@ B<Positional parameters>
 
 =item * C<$activity> (Str) - workflow activity
 
+=item * C<$role> (Str) - role to run as
+
 =back
 
 =cut
 sub _execute_activity_async {
-    my ($self, $workflow, $activity) = @_;
+    my ($self, $workflow, $activity, $role) = @_;
     ##! 4: 'start'
     ##! 64: 'wf: ' . $workflow->type . ', activity: ' . $activity
 
@@ -265,11 +269,12 @@ sub _execute_activity_async {
         if (CTX('session')->type ne 'Memory') {
             my $session = OpenXPKI::Server::Session->new(type => "Memory")->create;
             $session->data->user( CTX('session')->data->user );
-            $session->data->role( CTX('session')->data->role );
+            $session->data->role( $role || CTX('session')->data->role );
             $session->data->pki_realm( CTX('session')->data->pki_realm );
 
             OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
             Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
+            Log::Log4perl::MDC->put('role', $session->data->role );
         }
 
         # run activity

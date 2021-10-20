@@ -49,6 +49,23 @@ sub create_workflow{
     return $self->SUPER::create_workflow( $wf_type, $context, 'OpenXPKI::Server::Workflow' );
 }
 
+sub create_workflow_as_system {
+    my ( $self, $wf_type, $context,  ) = @_;
+    ##! 1: 'start'
+
+    $self->__authorize_workflow({
+        ACTION => 'create',
+        TYPE   => $wf_type,
+        ROLE   => 'System'
+    });
+
+    if (!$context) {
+        $context = OpenXPKI::Workflow::Context->new();
+    }
+
+    return $self->SUPER::create_workflow( $wf_type, $context, 'OpenXPKI::Server::Workflow' );
+}
+
 sub fetch_workflow {
     my ( $self, $wf_type, $wf_id ) = @_;
     ##! 1: 'start'
@@ -395,7 +412,7 @@ sub __authorize_workflow {
     my $realm    = CTX('session')->data->pki_realm;
     ##! 16: 'realm: ' . $realm
 
-    my $role     = CTX('session')->data->role || 'Anonymous';
+    my $role     = $arg_ref->{ROLE} || CTX('session')->data->role || 'Anonymous';
     ##! 16: 'role: ' . $role
 
     my $user     = CTX('session')->data->user;
@@ -405,14 +422,13 @@ sub __authorize_workflow {
     if ($action eq 'create') {
         my $type = $arg_ref->{TYPE};
 
-        $conn->exists([ 'workflow', 'def', $type])
-            or OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE',
-                params  => {
-                    'REALM'   => $realm,
-                    'WF_TYPE' => $type,
-                },
-            );
+        OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_UI_WORKFLOW_CREATE_UNKNOWN_TYPE',
+            params  => {
+                'realm'   => $realm,
+                'type' => $type,
+            }
+        ) unless($conn->exists([ 'workflow', 'def', $type]));
 
         # if creator is set then access is allowed
         $conn->exists([ 'workflow', 'def', $type, 'acl', $role, 'creator' ])

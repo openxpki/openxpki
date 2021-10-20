@@ -90,6 +90,10 @@ The namespace has a default of I<workflow.lock>, so if you dont need to
 modify neither namespace or error handling you can directly pass the locks
 key as String instead of using a HashRef.
 
+=item * C<_run_as_system> I<Bool>. Optional
+
+Execute the workflow with the permissions of the system role.
+
 =back
 
 =cut
@@ -101,24 +105,40 @@ command "create_workflow_instance" => {
     norun    => { isa => 'Str', matching => qr{ \A(persist|detach|watchdog|)\z }xms, default => '' },
     use_lock => { isa => 'HashRef|Str' },
     tenant   => { isa => 'Tenant' },
+    _run_as_system  => { isa => 'Bool', default => 0 },
 } => sub {
     my ($self, $params) = @_;
     my $type = $params->workflow;
 
-    my $norun = $params->norun || '';
+    my $norun = $params->norun;
 
-    ##! 1: 'Norun ' . $norun
-
-    my $tenant = $params->tenant || CTX('api2')->get_primary_tenant();
-    ##! 32: "Tenant $tenant"
+    ##! 16: 'Norun ' . $norun
+    ##! 64: Dumper $params
 
     my $util = OpenXPKI::Server::API2::Plugin::Workflow::Util->new;
 
-    my $workflow = CTX('workflow_factory')->get_factory->create_workflow($type)
-        or OpenXPKI::Exception->throw (
-            message => "Could not start workflow (type might be unknown)",
-            params => { type => $type }
-        );
+    my $workflow;
+    my $tenant;
+    if ($params->_run_as_system) {
+
+        OpenXPKI::Exception->throw (
+            message => '_run_as_system requires norun=detach'
+        ) unless($norun eq 'detach');
+
+        $workflow = CTX('workflow_factory')->get_factory->create_workflow_as_system($type);
+
+    } else {
+
+        $tenant = $params->tenant || CTX('api2')->get_primary_tenant();
+        ##! 32: "Tenant $tenant"
+
+        $workflow = CTX('workflow_factory')->get_factory->create_workflow($type);
+    }
+
+    OpenXPKI::Exception->throw (
+        message => "Could not initialize workflow",
+        params => { type => $type }
+    ) unless($workflow);
 
     my $id = $workflow->id;
     ##! 2: "New workflow's ID: $id"
@@ -206,7 +226,7 @@ command "create_workflow_instance" => {
             ##! 16: 'Create detached'
             # call async exec, this will only crash on a fork error so we dont
             # use an eval here
-            $workflow = $util->execute_activity($workflow, $initial_action, 1);
+            $workflow = $util->execute_activity($workflow, $initial_action, 1, 0, 'System');
 
         } elsif ($norun eq 'watchdog') {
             ##! 16: 'Persist and dispatch to watchdog'
