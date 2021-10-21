@@ -16,6 +16,23 @@ has '+role' => (
     required => 1,
 );
 
+has mode => (
+    is => 'ro',
+    isa => 'Str',
+    lazy => 1,
+    matching => qr{ \A(authonly|combined|userinfo|)\z }xms,
+    default => sub {
+        my $self = shift;
+        return 'authonly'
+            unless(CTX('config')->exists( [ @{$self->prefix()}, 'user' ]));
+
+        return 'combined'
+            unless(CTX('config')->exists( [ @{$self->prefix()}, 'source' ]));
+
+        return 'userinfo';
+    },
+);
+
 sub handleInput {
 
     ##! 1: 'start'
@@ -35,9 +52,19 @@ sub handleInput {
     my $userinfo;
     my $result;
     eval {
-        $result = CTX('config')->get( [ @{$self->prefix()}, 'source', $username ], { password =>  $passwd } );
-        # fetch userinfo from handler if login was ok - will be undef if not set
-        $userinfo = $self->get_userinfo($username) if ($result && ref $result eq '');
+        my $mode = $self->mode();
+        $self->logger->debug("Query username $username with mode $mode");
+        # combined mode, make a "bind" query with get_hash
+        # using a non-empty response as userinfo
+        if ($mode eq 'combined') {
+            $userinfo = CTX('config')->get_hash( [ @{$self->prefix()}, 'user', $username ], { password =>  $passwd } );
+            $result = $userinfo if (keys %{$userinfo});
+        } else {
+            $result = CTX('config')->get( [ @{$self->prefix()}, 'source', $username ], { password =>  $passwd } );
+
+            # fetch userinfo from handler if login was ok and mode is userinfo
+            $userinfo = $self->get_userinfo($username) if ($result && $mode eq 'userinfo');
+        }
     };
 
     # connector died, return service unavailable message
@@ -53,19 +80,17 @@ sub handleInput {
         error => OpenXPKI::Server::Authentication::Handle::LOGIN_FAILED,
     ) unless ($result);
 
-    # this usually means a wrong connector definition
-    return OpenXPKI::Server::Authentication::Handle->new(
-        username => $username,
-        error => OpenXPKI::Server::Authentication::Handle::UNKNOWN_ERROR,
-        error_message => 'Password connector did not return a scalar'
-    ) if (ref $result ne '');
-
     # all good - login the user
+    # check for tenant
+    $userinfo //= {};
+    my $tenant = $userinfo->{tenant};
+    delete $userinfo->{tenant};
     return OpenXPKI::Server::Authentication::Handle->new(
         username => $username,
         userid => $self->get_userid( $username ),
         role => $self->role(),
         userinfo => $userinfo || {},
+        tenant => $tenant,
     );
 
 }
@@ -82,7 +107,12 @@ Passphrase based authentication using connector backend.
 Alternative to OpenXPKI::Server::Authentication::Password which checks the
 password aganist a connector backend using the password as bind parameter.
 
+Returns an instance of OpenXPKI::Server::Authentication::Handle
+or undef if not login parameters are given.
+
 =head2 Configuration
+
+=head3 Authentication Only
 
 Requires I<role> to be set, will use the incoming username to query the
 connector at I<$prefix.source.$username>, sending the password as "bind"
@@ -93,10 +123,24 @@ Connector::Builtin::Authentication::*
         type: Connector
         role: User
         source@: connector:auth.connector.localuser
+
+=head3 Authentication plus dedicated userinfo
+
+If you add a node I<user> to the configuration, the class will first
+perform the authentication and, if successful, run a second query to
+I<$prefix.user.$username>. The query is done B<without> the password
+and expects a hash to be returned. The hash will be returned in the
+I<userinfo> attribute.
+
+    User Password:
+        type: Connector
+        role: User
+        source@: connector:auth.connector.localuser
         user@: connector:auth.connector.userinfo
 
-If the user parameter is set, the username is used to fetch the
-I<userinfo> hash.
+=head3 Combined mode
 
-Returns an instance of OpenXPKI::Server::Authentication::Handle
-or undef if not login parameters are given
+If B<only> the I<user> node exists, only a single query B<including>
+the password is done on I<$prefix.user.$username>. The login is
+successful, if a non-empty hash is returned. The unfiltered hash is
+set as I<userinfo>.

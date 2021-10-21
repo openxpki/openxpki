@@ -423,6 +423,7 @@ sub login_step {
             # abort processing if the login was valid
             last HANDLER if ($auth_result->is_valid());
             CTX('log')->auth()->info('Got invalid auth result from handler ' . $handler);
+            CTX('log')->auth()->debug($auth_result->error_message());
         }
     }
 
