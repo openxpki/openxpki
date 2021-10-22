@@ -409,9 +409,10 @@ sub run {
     };
 
     eval { $self->{dbi}->disconnect };
-
+    CTX('config')->cleanup();
     ##! 1: 'End of run()'
     exit;   # child process MUST never leave run()
+
 }
 
 =head2 __main_loop

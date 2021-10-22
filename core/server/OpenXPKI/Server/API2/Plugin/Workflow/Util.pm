@@ -290,9 +290,10 @@ sub _execute_activity_async {
     };
 
     eval { CTX('dbi')->disconnect };
-
+    CTX('config')->cleanup();
     ##! 16: 'Backgrounded workflow finished - exit child'
     exit;
+
 }
 
 # runs the given workflow activity on the Workflow engine

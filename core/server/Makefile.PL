@@ -298,7 +298,7 @@ WriteMakefile(
         'Config::Merge'                 => '1',
         'Config::Std'                   => 0,
         'Config::Versioned'             => 0,
-        'Connector'                     => '1.32',
+        'Connector'                     => '1.43',
         'Crypt::Argon2'                 => 0,
         'Crypt::CBC'                    => '2.29',
         'Crypt::OpenSSL::AES'           => '0.02',      # e.g. OpenXPKI::Crypto::VolatileVault

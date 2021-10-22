@@ -18,7 +18,7 @@ use Data::Dumper;
 use Log::Log4perl;
 
 # Make sure the underlying connector is recent
-use Connector 1.08;
+use Connector 1.43;
 
 extends 'Connector::Multi';
 

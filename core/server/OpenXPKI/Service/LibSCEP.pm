@@ -259,7 +259,7 @@ MESSAGE:
         if ( $service_msg eq 'LOGOUT' ) {
             ##! 8: "logout received - killing session and connection"
             CTX('log')->system()->info('Terminating session');
-
+            CTX('config')->cleanup();
             exit 0;
         }
 

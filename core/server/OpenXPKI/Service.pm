@@ -53,6 +53,7 @@ sub talk {
         if ($OpenXPKI::Server::stop_soon) {
             ##! 1: 'stop_soon hit'
             CTX('log')->system()->info("Child $$ terminated by SIGTERM");
+            CTX('config')->cleanup();
             exit 0;
         }
         return $rc;
@@ -77,6 +78,7 @@ sub collect {
     if ($OpenXPKI::Server::stop_soon) {
         ##! 1: 'stop_soon hit'
         CTX('log')->system()->info("Child $$ terminated by SIGTERM");
+        CTX('config')->cleanup();
         exit 0;
     }
 
