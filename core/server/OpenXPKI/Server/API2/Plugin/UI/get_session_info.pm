@@ -59,12 +59,12 @@ command "get_session_info" => {
     my $role_label = CTX('config')->get([ 'auth', 'roles', $session->data->role, 'label' ]) || $session->data->role;
     my $pki_realm_label = CTX('config')->get([ 'system', 'realms', $session->data->pki_realm, 'label' ]) || $session->data->pki_realm;
 
-    my @tenant;
-    if ($session->data->has_tenant) {
-        @tenant = map {
+    my @tenants;
+    if ($session->data->has_tenants) {
+        @tenants = map {
             my $tenant_label = CTX('config')->get([ 'auth', 'tenant', $_, 'label' ]);
             { value => $_, label => ($tenant_label || $_) };
-        } @{$session->data->tenant};
+        } @{$session->data->tenants};
     }
 
     return {
@@ -78,7 +78,7 @@ command "get_session_info" => {
         sid             => substr($session->id,0,4),
         userinfo        => $session->data->userinfo || {},
         authinfo        => $session->data->authinfo || {},
-        (@tenant ? (tenant => \@tenant) : ()),
+        (@tenants ? (tenants => \@tenants) : ()),
     }
 };
 

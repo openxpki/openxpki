@@ -48,14 +48,15 @@ sub handleInput {
     my %userinfo = %{$msg};
     delete $userinfo{username};
     delete $userinfo{role};
-    my $tenant = $userinfo{tenant};
+
+    my $tenants = $userinfo{tenant}; # Str or ArrayRef
     delete $userinfo{tenant};
 
     return OpenXPKI::Server::Authentication::Handle->new(
         username => $username,
         userid => $self->get_userid( $username ),
         role => $role,
-        tenant => $tenant,
+        tenants => $tenants || [],
         userinfo => \%userinfo,
         authinfo => {
             uid => $username,

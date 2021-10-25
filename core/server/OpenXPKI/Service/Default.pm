@@ -842,10 +842,10 @@ sub __handle_login {
         # successful login, save it in the session and mark session as valid
         CTX('session')->data->user( $auth_reply->userid );
         CTX('session')->data->role( $auth_reply->role );
-        if ($auth_reply->has_tenant) {
-            CTX('session')->data->tenant( $auth_reply->tenant );
+        if ($auth_reply->has_tenants) {
+            CTX('session')->data->tenants( $auth_reply->tenants );
         } else {
-            CTX('session')->data->clear_tenant();
+            CTX('session')->data->clear_tenants();
         }
         CTX('session')->data->userinfo( $auth_reply->userinfo // {} );
         CTX('session')->data->authinfo( $auth_reply->authinfo // {} );

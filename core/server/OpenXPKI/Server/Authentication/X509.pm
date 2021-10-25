@@ -146,7 +146,7 @@ sub _validation_result {
 
     # fetch userinfo from handler
     my $role = $self->default_role();
-    my $tenant;
+    my $tenants;
     my $userinfo;
     if (CTX('config')->exists([ @prefix, 'user' ])) {
         eval{$userinfo = $self->get_userinfo($username);};
@@ -167,7 +167,7 @@ sub _validation_result {
         delete $userinfo->{role};
         $username = $userinfo->{username};
         delete $userinfo->{username};
-        $tenant = $userinfo->{tenant};
+        $tenants = $userinfo->{tenant}; # Str or ArrayRef
         delete $userinfo->{tenant};
 
     }
@@ -181,7 +181,7 @@ sub _validation_result {
         username => $username,
         userid => $self->get_userid( $username ),
         role => $role,
-        tenant => $tenant,
+        tenants => $tenants || [],
         userinfo => $userinfo,
         authinfo => {
             uid => $username,

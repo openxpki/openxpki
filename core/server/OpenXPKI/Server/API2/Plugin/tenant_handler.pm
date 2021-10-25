@@ -40,7 +40,7 @@ command "can_access_tenant" => {
 
     my $handler = CTX('authentication')->tenant_handler();
 
-    return $handler->check_access( CTX('session')->data->tenant, $params->tenant ) if ($handler);
+    return $handler->check_access( CTX('session')->data->tenants, $params->tenant ) if ($handler);
 
     # if no handler is set, the empty tenant is allowed
     return 1 unless($params->tenant);
@@ -82,10 +82,10 @@ command "get_primary_tenant" => {
         return;
     }
 
-    my $tenant = $handler->get_primary_tenant( CTX('session')->data->tenant );
+    my $tenant = $handler->get_primary_tenant( CTX('session')->data->tenants );
     OpenXPKI::Exception->throw (
         message => "Unable to get primary tenant for this role",
-        params => { tenant => CTX('session')->data->tenant, handler => $handler }
+        params => { tenants => CTX('session')->data->tenants, handler => $handler }
     ) unless ($tenant);
 
     ##! 32: "Got primary tenant handler: $tenant - update session"

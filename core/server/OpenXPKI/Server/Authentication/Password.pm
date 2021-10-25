@@ -40,7 +40,7 @@ sub handleInput {
     # check account - the handler config has a connector at .user
     # that returns password or password and role for a requested username
     my $userinfo;
-    my $tenant;
+    my $tenants;
     eval {
 
         if ($mode eq 'hash' || !$role) {
@@ -54,7 +54,7 @@ sub handleInput {
                 $role = $userinfo->{role};
             }
             delete $userinfo->{role};
-            $tenant = $userinfo->{tenant};
+            $tenants = $userinfo->{tenant};
             delete $userinfo->{tenant};
         } else {
             $digest = CTX('config')->get( [ @{$self->prefix()}, 'user', $username ] );
@@ -88,7 +88,7 @@ sub handleInput {
         username => $username,
         userid => $self->get_userid( $username ),
         role => $role,
-        tenant => $tenant,
+        tenants => $tenants || [],
         userinfo => $userinfo || {},
     );
 

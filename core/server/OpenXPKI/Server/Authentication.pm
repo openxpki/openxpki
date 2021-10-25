@@ -445,7 +445,7 @@ sub login_step {
         );
     }
 
-    if ($self->tenant_handler( $last_result->role() ) && !$last_result->has_tenant()) {
+    if ($self->tenant_handler( $last_result->role() ) && !$last_result->has_tenants()) {
         CTX('log')->auth()->error(sprintf('Login failed, no tenant information for user: %s, role: %s)', $last_result->username(), $last_result->role()));
         OpenXPKI::Exception::Authentication->throw(
             message => 'I18N_OPENXPKI_UI_AUTHENTICATION_FAILED_TENANT_REQUIRED',

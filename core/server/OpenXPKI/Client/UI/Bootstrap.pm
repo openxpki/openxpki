@@ -35,9 +35,9 @@ sub init_structure {
         $self->_result()->{user} = $user;
 
         # Preselect tenant, for now we just pick the first from the list
-        if ($user->{tenant}) {
-            $self->_result()->{tenant} = $user->{tenant}->[0]->{value};
-            $self->logger()->trace('Preset tenant from items ' . Dumper $user->{tenant}) if $self->logger->is_trace;
+        if ($user->{tenants}) {
+            $self->_result()->{tenant} = $user->{tenants}->[0]->{value};
+            $self->logger()->trace('Preset tenant from items ' . Dumper $user->{tenants}) if $self->logger->is_trace;
         }
 
         my $menu = $self->send_command_v2( 'get_menu' );

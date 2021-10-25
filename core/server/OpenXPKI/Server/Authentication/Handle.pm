@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Moose;
+use Moose::Util::TypeConstraints;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
@@ -65,10 +66,14 @@ has role => (
     isa => 'Str',
 );
 
-has tenant => (
+subtype 'TenantList' => as 'ArrayRef[Str]';
+coerce 'TenantList' => from 'Str', via { [ $_ ] };
+
+has tenants => (
     is => 'rw',
-    isa => 'ArrayRef[Str]',
-    predicate => 'has_tenant',
+    isa => 'TenantList',
+    coerce => 1,
+    predicate => 'has_tenants',
 );
 
 has userinfo => (
@@ -86,19 +91,6 @@ has authinfo => (
     isa => 'HashRef',
     default => sub { return {}; }
 );
-
-around 'BUILDARGS' => sub{
-    my( $orig, $self, @params ) = @_;
-    my $params = { @params };
-    if (exists $params->{tenant}) {
-        if (!defined $params->{tenant}) {
-            delete $params->{tenant};
-        } elsif (!ref $params->{tenant}) {
-            $params->{tenant} = [$params->{tenant}];
-        }
-    }
-    $self->$orig($params);
-};
 
 sub error_message {
 

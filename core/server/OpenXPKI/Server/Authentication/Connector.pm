@@ -83,14 +83,15 @@ sub handleInput {
     # all good - login the user
     # check for tenant
     $userinfo //= {};
-    my $tenant = $userinfo->{tenant};
+    my $tenants = $userinfo->{tenant}; # Str or ArrayRef
     delete $userinfo->{tenant};
+
     return OpenXPKI::Server::Authentication::Handle->new(
         username => $username,
         userid => $self->get_userid( $username ),
         role => $self->role(),
         userinfo => $userinfo || {},
-        tenant => $tenant,
+        tenants => $tenants || [],
     );
 
 }
