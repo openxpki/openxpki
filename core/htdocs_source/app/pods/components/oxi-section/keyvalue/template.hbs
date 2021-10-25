@@ -1,7 +1,7 @@
 {{#if this.items.length}}
     <div class="container-fluid oxi-keyvalue">
         {{#each this.items as |item|}}
-            <div class="row {{item.className}} py-1 oxi-keyvalue-head">
+            <div class="row {{item.className}} py-1 px-2 oxi-keyvalue-head">
             {{#if item.isHead}}
                 <div class="col-12">{{item.value}}</div>
             {{else}}
