@@ -16,6 +16,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::DateTime;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
+with 'OpenXPKI::Server::API2::TenantRole';
 
 subtype 'StateName',
     as 'Str',
@@ -66,6 +67,12 @@ B<Parameters>
 =item * C<check_acl> I<Bool> - set to 1 to only return workflow that the current user is allowed to access. Default: 0
 
 =item * C<pki_realm> I<Str> - PKI realm
+
+=item * C<tenant> I<Str>
+
+Search for workflows of the given tenant, fallback to the primary
+tenant if not given, unfiltered search if set to the emtpy string.
+Mandatory if tenant mode is active.
 
 =item * C<id> I<ArrayRef> - list of workflow IDs
 
@@ -205,8 +212,6 @@ sub _make_query_params {
 
     my $re_alpha_string = qr{ \A [ \w \- \. : \s ]* \z }xms;
 
-    my $tenant = $args->tenant || CTX('api2')->get_primary_tenant();
-
     my $where = {};
     my $params = {
         where => $where,
@@ -301,7 +306,8 @@ sub _make_query_params {
         ##! 16: 'has attributes'
         $attributes = $args->attribute;
     }
-    if ( $tenant ) {
+
+    if ( my $tenant = $self->get_validated_tenant( $args->tenant ) ) {
         ##! 16: 'has tenant set ' . $tenant
         $attributes = CTX('authentication')->tenant_handler()->workflow_attribute_filter( $tenant, $attributes );
     }

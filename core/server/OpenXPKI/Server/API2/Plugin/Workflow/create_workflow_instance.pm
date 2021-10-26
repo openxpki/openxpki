@@ -15,8 +15,7 @@ use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 use OpenXPKI::Server::API2::Plugin::Workflow::Util;
-
-
+with 'OpenXPKI::Server::API2::TenantRole';
 
 =head1 COMMANDS
 
@@ -90,9 +89,17 @@ The namespace has a default of I<workflow.lock>, so if you dont need to
 modify neither namespace or error handling you can directly pass the locks
 key as String instead of using a HashRef.
 
+=item * C<tenant> I<Str>. Optional
+
+Assign the new workflow to the given tenant. The value must be a valid
+tenant for the current session user, if it is not given and tenant mode
+is turned on, the primary tenant is loaded. Set to the emtpy string to
+not assign the workflow to any tenant.
+
 =item * C<_run_as_system> I<Bool>. Optional
 
-Execute the workflow with the permissions of the system role.
+Execute the workflow with the permissions of the system role, disables
+validation or autodiscovery of the tenant.
 
 =back
 
@@ -125,15 +132,15 @@ command "create_workflow_instance" => {
             message => '_run_as_system requires norun=detach'
         ) unless($norun eq 'detach');
 
+        $tenant = $params->tenant;
         $workflow = CTX('workflow_factory')->get_factory->create_workflow_as_system($type);
 
     } else {
 
-        $tenant = $params->tenant || CTX('api2')->get_primary_tenant();
-        ##! 32: "Tenant $tenant"
-
+        $tenant = $self->get_validated_tenant( $params->tenant );
         $workflow = CTX('workflow_factory')->get_factory->create_workflow($type);
     }
+    ##! 32: "Tenant $tenant"
 
     OpenXPKI::Exception->throw (
         message => "Could not initialize workflow",

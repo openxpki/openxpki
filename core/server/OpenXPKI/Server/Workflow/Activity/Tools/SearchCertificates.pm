@@ -42,6 +42,12 @@ sub execute
         return_columns => 'identifier',
     };
 
+    if (defined $self->param('tenant')) {
+        $query->{tenant} = $self->param('tenant');
+    } elsif ($workflow->attrib('tenant')) {
+        $query->{tenant} = $workflow->attrib('tenant');
+    }
+
     if (!$include_revoked) {
         $query->{status} = 'ISSUED';
     };
@@ -238,6 +244,11 @@ See the parameter section for available filters.
 =item realm
 
 The realm to search in, default is the current realm, I<_any> searches globally
+
+=item tenant
+
+The tenant to search for, the default is to use the tenant of the
+current workflow.
 
 =item profile
 

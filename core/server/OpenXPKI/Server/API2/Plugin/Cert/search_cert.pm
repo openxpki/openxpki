@@ -19,8 +19,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Database::Legacy;
 use OpenXPKI::Server::API2::Plugin::Cert::DateCondition;
-
-
+with 'OpenXPKI::Server::API2::TenantRole';
 
 has 'return_columns_default' => (
     isa => 'ArrayRef',
@@ -87,6 +86,12 @@ All parameters are optional and can be used to filter the result list:
 
 =item * C<pki_realm> L<AlphaPunct|OpenXPKI::Server::API2::Types/AlphaPunct> - certificate realm. Specify "_any"
 for a global search. Default: current session's realm
+
+=item * C<tenant> I<Str>
+
+Search for workflows of the given tenant, fallback to the primary
+tenant if not given, unfiltered search if set to the emtpy string.
+Mandatory if tenant mode is active.
 
 =item * C<entity_only> I<Bool> - certificate CA
 
@@ -411,8 +416,8 @@ sub _make_db_query {
         ##! 16: 'has attributes'
         $attributes = $po->cert_attributes;
     }
-    my $tenant = $po->tenant || CTX('api2')->get_primary_tenant();
-    if ( $tenant ) {
+
+    if (my $tenant = $self->get_validated_tenant( $po->tenant )) {
         ##! 16: 'has tenant set ' . $tenant
         $attributes = CTX('authentication')->tenant_handler()->certificate_attribute_filter( $tenant, $attributes );
     }

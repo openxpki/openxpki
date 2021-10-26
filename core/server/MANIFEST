@@ -223,6 +223,9 @@ OpenXPKI/Server/API2/Autoloader.pm
 OpenXPKI/Server/API2/EasyPlugin.pm
 OpenXPKI/Server/API2/EasyPluginMetaClassTrait.pm
 OpenXPKI/Server/API2/EasyPluginRole.pm
+OpenXPKI/Server/API2/TenantRole.pm
+OpenXPKI/Server/API2/PluginRole.pm
+OpenXPKI/Server/API2/Types.pm
 OpenXPKI/Server/API2/Plugin/tenant_handler.pm
 OpenXPKI/Server/API2/Plugin/Api/Util/ModuleFinder.pm
 OpenXPKI/Server/API2/Plugin/Api/Util/PodPOMView.pm
@@ -329,8 +332,6 @@ OpenXPKI/Server/API2/Plugin/Workflow/start_workflow.pm
 OpenXPKI/Server/API2/Plugin/Workflow/wakeup_resume_workflow.pm
 
 
-OpenXPKI/Server/API2/PluginRole.pm
-OpenXPKI/Server/API2/Types.pm
 OpenXPKI/Server/Context.pm
 OpenXPKI/Server/Init.pm
 OpenXPKI/Server/Session.pm

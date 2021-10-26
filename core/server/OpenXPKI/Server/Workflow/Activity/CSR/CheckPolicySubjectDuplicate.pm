@@ -36,6 +36,7 @@ sub execute
         status => 'ISSUED',
         entity_only => 1,
         return_columns => 'identifier',
+        tenant => '',
     };
 
     if ($self->param('any_realm')) {

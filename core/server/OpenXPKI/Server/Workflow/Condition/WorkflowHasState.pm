@@ -17,7 +17,10 @@ sub _evaluate
 
     my $wfl;
     eval {
-        my $result = CTX('api2')->search_workflow_instances( id => [ $wf_id ] );
+        my $result = CTX('api2')->search_workflow_instances(
+            id => [ $wf_id ],
+            tenant => '',
+        );
         ##! 32: $result->[0]
         $wfl = $result->[0] if ($result->[0]);
     };

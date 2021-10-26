@@ -11,7 +11,7 @@ OpenXPKI::Server::API2::Plugin::Cert::get_cert_attributes
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 
-
+with 'OpenXPKI::Server::API2::TenantRole';
 
 =head1 COMMANDS
 
