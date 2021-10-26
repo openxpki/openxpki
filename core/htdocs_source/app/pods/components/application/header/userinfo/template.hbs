@@ -18,7 +18,7 @@
                             <dd.toggle>
                                 <strong>{{this.currentTenant}}</strong> <span class="caret"></span>
                             </dd.toggle>
-                            <dd.menu as |ddm|>
+                            <dd.menu class="dropdown-menu-right" as |ddm|>
                                 {{#each this.content.user.tenants as |t|}}
                                     <ddm.item>
                                         <ddm.linkTo {{on 'click' (fn this.setTenant t)}}>{{t.label}}</ddm.linkTo>
