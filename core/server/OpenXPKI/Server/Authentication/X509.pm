@@ -181,8 +181,8 @@ sub _validation_result {
         username => $username,
         userid => $self->get_userid( $username ),
         role => $role,
-        tenants => $tenants || [],
         userinfo => $userinfo,
+        $tenants ? (tenants => $tenants) : (),
         authinfo => {
             uid => $username,
             %{$self->authinfo},

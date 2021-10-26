@@ -91,7 +91,7 @@ sub handleInput {
         userid => $self->get_userid( $username ),
         role => $self->role(),
         userinfo => $userinfo || {},
-        tenants => $tenants || [],
+        $tenants ? (tenants => $tenants) : (),
     );
 
 }
