@@ -23,7 +23,10 @@ sub execute {
     ($name =~ m{\A\w*\z}) || configuration_error("Given tag name contains non-word characters");
 
     if (my $wf_id = $self->param('workflow_id')) {
-        my $ext_workflow = CTX('api2')->search_workflow_instances( id => [ $wf_id ] );
+        my $ext_workflow = CTX('api2')->search_workflow_instances(
+            id => [ $wf_id ],
+            tenant => '',
+        );
         if (!$ext_workflow->[0]) {
             workflow_error('The given workflow id was not found');
         }

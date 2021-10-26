@@ -63,6 +63,7 @@ sub execute {
         params        => $params,
         norun         => 'detach',
         _run_as_system => 1,
+        ($workflow->attrib('tenant') ? (tenant => $workflow->attrib('tenant')) : ()),
     );
 
     CTX('log')->application()->info('Publishing workflow created with id ' . $wf_info->{workflow}->{id});

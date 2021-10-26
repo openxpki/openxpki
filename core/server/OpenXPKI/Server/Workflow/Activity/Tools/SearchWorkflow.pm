@@ -53,6 +53,12 @@ sub execute {
         $attr->{'creator'} = ~~ $self->param('wf_creator');
     }
 
+    if (defined $self->param('tenant')) {
+        $query->{tenant} = $self->param('tenant');
+    } elsif ($workflow->attrib('tenant')) {
+        $query->{tenant} = $workflow->attrib('tenant');
+    }
+
     foreach my $key ($self->param()) {
         ##! 16: 'Param key ' . $key
         next unless $key =~ /attr_(\w+)/;
@@ -156,6 +162,11 @@ Context key to write the search result to, default is search_result.
 =item wf_type, wf_state, wf_creator, wf_proc_state
 
 Values are passed as arguments for the respective workflow properties.
+
+=item tenant
+
+The tenant to search for, the default is to use the tenant of the
+current workflow.
 
 =item attr_*
 

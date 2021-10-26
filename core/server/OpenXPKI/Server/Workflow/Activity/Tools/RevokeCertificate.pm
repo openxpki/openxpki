@@ -115,12 +115,12 @@ sub execute {
     }
 
     # Create a new workflow
-    my $tenant = $workflow->attrib('tenant');
+
     my $wf_info = CTX('api2')->create_workflow_instance(
         workflow  => $workflow_type,
         params    => $param,
         norun     => 'detach',
-        ($tenant ? (tenant => $workflow->attrib('tenant')) : ()),
+        ($workflow->attrib('tenant') ? (tenant => $workflow->attrib('tenant')) : ()),
     );
 
     ##! 16: 'Revocation Workflow created with id ' . $wf_info->{workflow}->{id}

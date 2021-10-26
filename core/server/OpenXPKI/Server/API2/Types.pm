@@ -218,9 +218,7 @@ coerce 'ArrayRefOrCommaList',
 =cut
 
 subtype 'Tenant',
-    as 'Str',
-    where { CTX('api2')->can_access_tenant( tenant => $_ ); },
-    message {  $_ ? $_. ' is not a valid tenant in this session' : 'non-empty tenant must be given for this user' };
+    as 'Str';
 
 =head2 TokenType
 

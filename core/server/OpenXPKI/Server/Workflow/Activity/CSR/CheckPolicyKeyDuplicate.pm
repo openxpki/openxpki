@@ -36,6 +36,7 @@ sub execute
         entity_only => 1,
         subject_key_identifier => $key_identifier,
         return_columns => 'identifier',
+        tenant => '',
     };
 
     if ($self->param('any_realm')) {
