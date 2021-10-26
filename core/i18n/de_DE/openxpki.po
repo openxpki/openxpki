@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2021-07-27 09:11+0200\n"
+"PO-Revision-Date: 2021-10-20 13:10+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -844,6 +844,9 @@ msgstr "Sperrliste (CRL) erzeugen"
 msgid "I18N_OPENXPKI_UI_MENU_CSR_CHECK"
 msgstr "Antragsprüfung"
 
+msgid "I18N_OPENXPKI_UI_MENU_ENROLLMENT_SEARCH"
+msgstr "Enrollment-Vorgänge suchen"
+
 msgid "I18N_OPENXPKI_UI_MENU_HEAD_CA_CRL_OPS"
 msgstr "Sperrlisten und CA Zertifikate"
 
@@ -904,11 +907,9 @@ msgstr "Zertifikat sperren"
 msgid "I18N_OPENXPKI_UI_MENU_SCEP_SEARCH"
 msgstr "Enrollment-Vorgänge suchen"
 
-# Remove?
 msgid "I18N_OPENXPKI_UI_MENU_SET_MOTD"
 msgstr "Systemnachrichten verwalten"
 
-# Remove?
 msgid "I18N_OPENXPKI_UI_MENU_SYSTEM_STATUS"
 msgstr "System Status"
 
@@ -1055,7 +1056,9 @@ msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME"
 msgstr "Anwendungsbezeichner"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_APPLICATION_NAME_DESC"
-msgstr "Bezeichner der Anwendung"
+msgstr ""
+"Name oder Bezeichner der Anwendung. Wird mit einem Doppelpunkt anden "
+"Hostnamen angefügt, drei bis zwölf Zeichen (a-z, 0-9, Binde-/Unterstrich)"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_BASIC_STYLE_DESC"
 msgstr ""
@@ -1193,6 +1196,9 @@ msgstr "Region oder Bundesland (ST)"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL"
 msgstr "TLS Client"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_DUAL_LABEL"
+msgstr "TLS Client/Server (Dual Auth)"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
 msgstr "TLS/Web Server"
@@ -1878,6 +1884,12 @@ msgstr "Profil wählen"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_ISSUER_LABEL"
 msgstr "Issuer setzen"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_VALIDITY_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_VALIDITY_LABEL"
+msgstr "Zertifikatslaufzeit"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SUBMIT_DESC"
 msgstr "Antrag absenden"
 
@@ -2193,6 +2205,9 @@ msgstr "Submit with Policy Exception"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL"
 msgstr "Policyprüfung wiederholen"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_SET_VALIDITY_LABEL"
+msgstr "Laufzeit ändern"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CANCEL_BUTTON"
 msgstr "Antrag abbrechen"
 
@@ -2448,6 +2463,18 @@ msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_TOOLTIP"
 msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_VALIDITY_DESC"
+msgstr "Die Laufzeit/Gültigkeitsdauer des Zertifikates"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_VALIDITY_LABEL"
+msgstr "Zertifikatslaufzeit"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_VALIDITY_OPTION_DEFAULT"
+msgstr "Standard"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_VALIDITY_OPTION_SHORT"
+msgstr "verkürzte Laufzeit (45 Tage)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_DESC"
 msgstr " "
@@ -3887,6 +3914,15 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL"
 msgstr "Policyverletzung"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_CERT_EXISTS_DESC"
+msgstr ""
+"Es wurde ein gültiges RA Token gefunden, das noch nicht erneuert werden muss."
+"Wenn Sie fortfahren wird ein neues Zertifikat erstellt, das bestehende"
+"Zertifikat bleibt erhalten und wird <b>NICHT</b> revoziert."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_CERT_EXISTS_LABEL"
+msgstr "Gültiges RA Token gefunden"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_DESC"
 msgstr "Der Antrag wurde abgelehnt und kann nicht erneut eingereicht werden."
 
@@ -3968,16 +4004,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL"
 msgstr "Dieser Workflow wird gerade vom Server ausgeführt."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEP_TOKEN_CERT_EXISTS_DESC"
-msgstr ""
-"Dieser Workflow wurde erfolgreich abgeschlossen und kann nicht erneut "
-"gestartet werden."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEP_TOKEN_CERT_EXISTS_LABEL"
-msgstr "ERFOLGREICH"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_DESC"
 msgstr "Für Ihre Suchanfrage wurden keine Ergebnisse gefunden."
@@ -4183,9 +4209,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 msgstr "Ablaufwarnung"
 
-#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RATOKEN_DESC"
+msgstr "Erstellt ein neues Zertifikat zur Verwendung als RA Token."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RATOKEN_LABEL"
-msgstr "SCEP RA Token erstellen"
+msgstr "RA Token aktualisieren"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RELEASE_LOCK_DESC"
 msgstr ""
@@ -4237,12 +4265,6 @@ msgstr "Enrollment-Workflow nach 'transaction id' suchen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_LABEL"
 msgstr "Enrollment-Workflowsuche"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_DESC"
-msgstr "Erstellt ein neues Zertifikat/Token zur Verwendung als SCEP RA."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_LABEL"
-msgstr "SCEP RA Token erstellen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_DESC"
 msgstr "Zeigt die Meta-Daten eines Zertifikates an."
@@ -4747,6 +4769,9 @@ msgstr "ja"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_LABEL"
 #~ msgstr "Certificate Export"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_LABEL"
+#~ msgstr "SCEP RA Token erstellen"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_FETCH_PUK_DESC"

@@ -848,6 +848,11 @@ msgstr "请求检查器"
 
 # Remove?
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_ENROLLMENT_SEARCH"
+msgstr "完整证书状态报告"
+
+# Remove?
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_HEAD_CA_CRL_OPS"
 msgstr "完整证书状态报告"
 
@@ -1217,6 +1222,10 @@ msgid "I18N_OPENXPKI_UI_PROFILE_STATE_DESC"
 msgstr "输入系统的完全限定主机名（域名）。"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL"
+msgstr "TLS客户端"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_DUAL_LABEL"
 msgstr "TLS客户端"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
@@ -1854,6 +1863,16 @@ msgstr "选择配置文件"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_ISSUER_LABEL"
 msgstr "设置颁发者"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_VALIDITY_DESC"
+msgstr ""
+"如果要更改证书的有效性，请在字段中输入自定义不早于/不晚于日期。 请注意，所有"
+"日期均以UTC时区处理！"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_VALIDITY_LABEL"
+msgstr "编辑有效期"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SUBMIT_DESC"
 msgstr "提交请求"
 
@@ -2132,6 +2151,10 @@ msgstr "提交策略例外"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL"
 msgstr "重新评估策略"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_SET_VALIDITY_LABEL"
+msgstr "编辑有效期"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CANCEL_BUTTON"
 msgstr "取消请求"
 
@@ -2386,6 +2409,25 @@ msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_TOOLTIP"
 msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_VALIDITY_DESC"
+msgstr "证书的主题备用名称。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_VALIDITY_LABEL"
+msgstr "签署者有效"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_VALIDITY_OPTION_DEFAULT"
+msgstr "签署者有效"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_VALIDITY_OPTION_SHORT"
+msgstr ""
+"该值只能与keyCompromise的原因码一起设置，并且在知道实际的泄露日期时才可以设"
+"置。 对于所有其他情况，请留空。 提示：此字段将来不能用于请求吊销日期。 日期以"
+"UTC时区处理！"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_DESC"
@@ -3740,6 +3782,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL"
 msgstr "违反策略待处理"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_CERT_EXISTS_DESC"
+msgstr "此工作流程已成功完成，无法重新启动"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_CERT_EXISTS_LABEL"
+msgstr "成功"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_DESC"
 msgstr "该请求最终被拒绝，无法重新启动。"
 
@@ -3810,12 +3860,6 @@ msgstr "该工作流当前由服务器处理，请稍后返回以检查其状态
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL"
 msgstr "该工作流当前正在服务器上运行。"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEP_TOKEN_CERT_EXISTS_DESC"
-msgstr "此工作流程已成功完成，无法重新启动"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEP_TOKEN_CERT_EXISTS_LABEL"
-msgstr "成功"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_DESC"
 msgstr "找不到符合您搜索条件的结果。"
@@ -4001,6 +4045,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 msgstr "证书过期通知"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RATOKEN_DESC"
+msgstr "通过事务ID搜索SCEP工作流程"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RATOKEN_LABEL"
 msgstr "SCEP RA令牌"
 
@@ -4049,12 +4097,6 @@ msgstr "通过事务ID搜索SCEP工作流程"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_LABEL"
 msgstr "SCEP搜索"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_DESC"
-msgstr "通过事务ID搜索SCEP工作流程"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_LABEL"
-msgstr "SCEP RA令牌"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_DESC"
 msgstr "更改证书元数据。"
@@ -4541,6 +4583,9 @@ msgstr "是"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_LABEL"
 #~ msgstr "Certificate Export"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_LABEL"
+#~ msgstr "SCEP RA令牌"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_FETCH_PUK_DESC"
