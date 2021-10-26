@@ -117,9 +117,10 @@
                     <div class="{{if entry.right "col-lg-8" "col-12"}}">
                         {{#each entry.main as |mainEntry|}}
                             <div class="p-0 {{if (and (eq mainEntry.type "form") (not entry.right)) "col-xl-8" "col-12"}}">
-                                {{#let (or (eq mainEntry.type "keyvalue")) as |asCard|}}
-                                    <OxiSection @content={{mainEntry}} @renderAsCard={{asCard}} />
-                                {{/let}}
+                                <OxiSection
+                                    @content={{mainEntry}}
+                                    @renderAsCard={{(and (eq mainEntry.type "keyvalue") (not mainEntry.content.buttons))}}
+                                />
                             </div>
                         {{/each}}
                     </div>
@@ -128,8 +129,11 @@
                         <div class="col-lg-4">
                             {{#each entry.right as |rightEntry|}}
                                 <div class="card bg-light border-secondary">
-                                    <div class="card-body">
-                                        <OxiSection @content={{rightEntry}} @isInfoBox={{true}} />
+                                    <div class="card-body p-1">
+                                        <OxiSection
+                                            @content={{rightEntry}}
+                                            @isInfoBox={{true}}
+                                        />
                                     </div>
                                 </div>
                             {{/each}}
