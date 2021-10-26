@@ -877,6 +877,11 @@ msgstr "リクエストチェック"
 
 # Remove?
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_MENU_ENROLLMENT_SEARCH"
+msgstr "全ての証明書ステータスレポート"
+
+# Remove?
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_MENU_HEAD_CA_CRL_OPS"
 msgstr "全ての証明書ステータスレポート"
 
@@ -1248,6 +1253,10 @@ msgid "I18N_OPENXPKI_UI_PROFILE_STATE_DESC"
 msgstr "システムに最も適したホスト名（ドメイン名）を入力します。"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL"
+msgstr "TLS Client Profile"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_DUAL_LABEL"
 msgstr "TLS Client Profile"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
@@ -1910,6 +1919,16 @@ msgstr "プロファイルを選択"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_ISSUER_LABEL"
 msgstr "発行者の設定"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_VALIDITY_DESC"
+msgstr ""
+"証明書の有効性を変更したい場合は、フィールドに発行日/有効期限のカスタムを入力"
+"します。すべての日付はUTCの時間帯で処理されます。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_VALIDITY_LABEL"
+msgstr "有効性の編集"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SUBMIT_DESC"
 msgstr "リクエストを送信する"
 
@@ -2214,6 +2233,10 @@ msgstr "例外のポリシーで送信"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL"
 msgstr "ポリシーの再評価"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_SET_VALIDITY_LABEL"
+msgstr "有効性の編集"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CANCEL_BUTTON"
 msgstr "リクエストのキャンセル"
 
@@ -2473,6 +2496,26 @@ msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_TOOLTIP"
 msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_VALIDITY_DESC"
+msgstr "証明書の別名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_VALIDITY_LABEL"
+msgstr "署名者は有効です"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_VALIDITY_OPTION_DEFAULT"
+msgstr "署名者は有効です"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_VALIDITY_OPTION_SHORT"
+msgstr ""
+"この値は秘密鍵の漏洩の理由コードと一緒に設定し、漏洩の実際の日付がわかってい"
+"る場合に設定する必要があります。それ以外の場合は空欄にします。ヒント：この"
+"フィールドを使用して、今後失効日をリクエストすることはできません。日付はUTCの"
+"時間帯で処理されます。"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_DESC"
@@ -3895,6 +3938,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL"
 msgstr "保留中のポリシー違反"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_CERT_EXISTS_DESC"
+msgstr "このワークフローは成功して終了し、再実行はできません"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_CERT_EXISTS_LABEL"
+msgstr "成功"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_DESC"
 msgstr "リクエストは拒否され、再実効はできません。"
 
@@ -3968,14 +4019,6 @@ msgstr "許可者の承認待ちです。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL"
 msgstr "このワークフローは現在サーバー上で実行されています。"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEP_TOKEN_CERT_EXISTS_DESC"
-msgstr "このワークフローは成功して終了し、再実行はできません"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEP_TOKEN_CERT_EXISTS_LABEL"
-msgstr "成功"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_DESC"
 msgstr "検索条件に一致する結果は見つかりませんでした。"
@@ -4165,6 +4208,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 msgstr "証明書失効通知"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RATOKEN_DESC"
+msgstr "トランザクションIDでSCEPワークフローを検索する"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RATOKEN_LABEL"
 msgstr "SCEPトークン"
 
@@ -4217,14 +4264,6 @@ msgstr "トランザクションIDでSCEPワークフローを検索する"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_LABEL"
 msgstr "SCEP検索"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_DESC"
-msgstr "トランザクションIDでSCEPワークフローを検索する"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_LABEL"
-msgstr "SCEPトークン"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_DESC"
 msgstr "証明書のメタデータを参照します。"
@@ -6455,6 +6494,10 @@ msgstr "はい"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_REPORT_SUMMARY_VALID_DISTINTCT"
 #~ msgstr "Certificate Export"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_LABEL"
+#~ msgstr "SCEPトークン"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_FETCH_PUK_DESC"
 #~ msgstr "スマートカードを読み込みます。"

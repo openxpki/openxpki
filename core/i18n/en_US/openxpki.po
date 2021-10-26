@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2021-09-27 14:13+0200\n"
+"PO-Revision-Date: 2021-10-20 13:10+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -844,6 +844,9 @@ msgstr "Issue a Certificate Revocation List (CRL)"
 msgid "I18N_OPENXPKI_UI_MENU_CSR_CHECK"
 msgstr "Request Checker"
 
+msgid "I18N_OPENXPKI_UI_MENU_ENROLLMENT_SEARCH"
+msgstr "Enrollment Workflow Search"
+
 msgid "I18N_OPENXPKI_UI_MENU_HEAD_CA_CRL_OPS"
 msgstr "CA/CRL operation"
 
@@ -902,7 +905,7 @@ msgid "I18N_OPENXPKI_UI_MENU_REVOKE_CERTIFICATE"
 msgstr "Revoke certificate"
 
 msgid "I18N_OPENXPKI_UI_MENU_SCEP_SEARCH"
-msgstr "SCEP Workflow Search"
+msgstr "Enrollment Workflow Search"
 
 msgid "I18N_OPENXPKI_UI_MENU_SET_MOTD"
 msgstr "Set Message of the Day"
@@ -1182,6 +1185,9 @@ msgstr "State or Province Name"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL"
 msgstr "TLS Client"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_TLS_DUAL_LABEL"
+msgstr "TLS Client/Server (Dual Auth)"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_SERVER_LABEL"
 msgstr "TLS/Web Server"
@@ -1820,6 +1826,12 @@ msgstr "Select Profile"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_ISSUER_LABEL"
 msgstr "Set Issuer"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_VALIDITY_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SET_VALIDITY_LABEL"
+msgstr "Certificate Validity"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_SUBMIT_DESC"
 msgstr "Submit request"
 
@@ -2092,6 +2104,9 @@ msgstr "Submit with Policy Exception"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_POLICY_VIOLATION_RECHECK_LABEL"
 msgstr "Re-Evaluate Policy"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_SET_VALIDITY_LABEL"
+msgstr "Change Validity"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CANCEL_BUTTON"
 msgstr "Cancel Request"
 
@@ -2331,6 +2346,18 @@ msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_TOOLTIP"
 msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_VALIDITY_DESC"
+msgstr "The validity period of the certificate."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_VALIDITY_LABEL"
+msgstr "Certificate Validity"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_VALIDITY_OPTION_DEFAULT"
+msgstr "default validity"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_VALIDITY_OPTION_SHORT"
+msgstr "short validity (45 days)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CHAIN_DESC"
 msgstr " "
@@ -3684,6 +3711,15 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_POLICY_VIOLATION_LABEL"
 msgstr "Policy Violation Pending"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_CERT_EXISTS_DESC"
+msgstr ""
+"A valid certificate for the RA token was found so there should be no need to "
+"generate a new one. Note that this workflow will <b>not</b> revoke the old "
+"certificate in case you decide to continue."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_CERT_EXISTS_LABEL"
+msgstr "Valid RA Token exists"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_DESC"
 msgstr "The request was finally rejected and can not be restartet."
 
@@ -3742,15 +3778,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL"
 msgstr "This workflow is currently running on the server."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEP_TOKEN_CERT_EXISTS_DESC"
-msgstr ""
-"A valid certificate for the SCEP RA was found so there should be no need to "
-"generate a new one. Note that this workflow will <b>not</b> revoke the old "
-"certificate in case you decide to continue. "
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEP_TOKEN_CERT_EXISTS_LABEL"
-msgstr "Found Valid SCEP Token "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_DESC"
 msgstr "No result matching your search criteria could be found."
@@ -3941,9 +3968,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 msgstr "Certificate Expiry Notification"
 
-#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RATOKEN_DESC"
+msgstr "Generate a new RA token in case the old one is near its expiration."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RATOKEN_LABEL"
-msgstr "Generate SCEP RA Token"
+msgstr "Update RA Token"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RELEASE_LOCK_DESC"
 msgstr ""
@@ -3992,13 +4021,6 @@ msgstr "Search for enrollment workflows by transaction id"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_LABEL"
 msgstr "Enrollment Search"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_DESC"
-msgstr "Search for SCEP workflows by  transaction id"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_LABEL"
-msgstr "Generate SCEP RA Token"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SHOW_METADATA_DESC"
 msgstr "Display the metadata associated with a certificate"
@@ -4509,6 +4531,9 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEPGETCA_LABEL"
 #~ msgstr "Manage SCEP GetCA"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_LABEL"
+#~ msgstr "Generate SCEP RA Token"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_FETCH_PUK_DESC"
