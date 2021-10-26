@@ -34,9 +34,18 @@ export default class OxiContentService extends Service {
     @tracked error = null;
     @tracked loadingBanner = null;
 
+    get tenantCssClass() {
+        if (!this.tenant) return '';
+        return 'tenant-'
+          + this.tenant
+          .toLowerCase()
+          .replace(/[_\s]/g, '-')
+          .replace(/[^a-z0-9-]/g, '')
+          .replace(/-+/g, '-')
+    }
+
     constructor() {
         super(...arguments);
-
     }
 
     /**
@@ -171,6 +180,10 @@ export default class OxiContentService extends Service {
     setPage(page) {
         this.page = page;
         this._updateNavEntryActiveState();
+    }
+
+    setTenant(tenant) {
+        this.tenant = tenant;
     }
 
     _resolveTarget(requestTarget) {

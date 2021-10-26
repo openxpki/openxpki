@@ -1,24 +1,36 @@
 {{#if this.content.user}}
-    {{#let this.content.user as |u|}}
-        <div class="userinfo text-nowrap">
-            <ul class="nav flex-column">
-                {{!-- template-lint-disable no-bare-strings --}}
-                <li class="text-right user">
-                    {{t 'userinfo.name'}}
-                    <strong>{{u.realname}} <span>({{u.role}})</span></strong>
-                </li>
-                <li class="text-right pki_realm">
-                    {{t 'userinfo.realm'}}
-                    <strong>{{u.pki_realm_label}} <span>({{u.pki_realm}})</span></strong>
-                </li>
-                {{#let this.tenants as |tt|}}
-                    {{#if tt}}
-                    <li class="text-right tenant">
-                        {{t 'userinfo.tenant'}} <strong>{{tt.label}} <span>({{tt.value}})</span></strong>
-                    </li>
+    <div class="userinfo text-nowrap">
+        <ul class="nav flex-column">
+            {{!-- template-lint-disable no-bare-strings --}}
+            <li class="text-right user">
+                {{t 'userinfo.name'}}
+                <strong>{{this.content.user.realname}} ({{this.content.user.role}})</strong>
+            </li>
+            <li class="text-right pki_realm">
+                {{t 'userinfo.realm'}}
+                <strong>{{this.content.user.pki_realm_label}} ({{this.content.user.pki_realm}})</strong>
+            </li>
+            {{#if this.currentTenant}}
+                <li class="text-right tenant">
+                    {{#if this.hasMultipleTenants}}
+                        {{t 'userinfo.tenant'}}
+                        <BsDropdown style="display: inline" as |dd|>
+                            <dd.toggle>
+                                <strong>{{this.currentTenant}}</strong> <span class="caret"></span>
+                            </dd.toggle>
+                            <dd.menu as |ddm|>
+                                {{#each this.content.user.tenants as |t|}}
+                                    <ddm.item>
+                                        <ddm.linkTo {{on 'click' (fn this.setTenant t)}}>{{t.label}}</ddm.linkTo>
+                                    </ddm.item>
+                                {{/each}}
+                            </dd.menu>
+                        </BsDropdown>
+                    {{else}}
+                        {{t 'userinfo.tenant'}} <strong>{{this.currentTenant}}</strong>
                     {{/if}}
-                {{/let}}
-            </ul>
-        </div>
-    {{/let}}
+                </li>
+            {{/if}}
+        </ul>
+    </div>
 {{/if}}
