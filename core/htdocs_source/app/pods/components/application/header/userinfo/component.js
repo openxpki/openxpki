@@ -1,9 +1,11 @@
 import Component from '@glimmer/component';
-import { inject } from '@ember/service';
+import { inject as service } from '@ember/service';
+import { inject as controller } from '@ember/controller';
 import { action } from '@ember/object';
 
 export default class ApplicationHeaderUserinfo extends Component {
-    @inject('oxi-content') content;
+    @service('oxi-content') content;
+    @controller('openxpki') openxpki;
 
     get currentTenant() {
         if (!this.content.tenant || !this.content.user.tenants) return;
@@ -32,6 +34,8 @@ export default class ApplicationHeaderUserinfo extends Component {
 
     @action
     setTenant(tenant) {
+        if (tenant.value == this.content.tenant) return;
         this.content.setTenant(tenant.value);
+        this.openxpki.navigateTo('welcome');
     }
 }

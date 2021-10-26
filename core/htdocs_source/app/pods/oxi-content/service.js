@@ -155,7 +155,8 @@ export default class OxiContentService extends Service {
                 // set custom exception handling
                 if (doc.on_exception) this.serverExceptions = doc.on_exception;
 
-                if (doc.tenant) this.tenant = doc.tenant;
+                // do not overwrite current tenant on repeated bootstrapping
+                if (this.tenant === null && doc.tenant) this.setTenant(doc.tenant);
             }
             // Page contents
             else {
