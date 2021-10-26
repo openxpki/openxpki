@@ -60,7 +60,8 @@ command "get_session_info" => {
     my $pki_realm_label = CTX('config')->get([ 'system', 'realms', $session->data->pki_realm, 'label' ]) || $session->data->pki_realm;
 
     my @tenants;
-    if ($session->data->has_tenants) {
+    # only expose tenant list if the current session has a handler
+    if ($session->data->has_tenants && CTX('authentication')->tenant_handler()) {
         @tenants = map {
             my $tenant_label = CTX('config')->get([ 'auth', 'tenant', $_, 'label' ]);
             { value => $_, label => ($tenant_label || $_) };
