@@ -1,38 +1,64 @@
 {{#let @value as |v|}}
 
-    {{#if (eq this.format "certstatus")}}
+    {{#if (eq "dummy-placeholder" this.format)}}
+        {{!-- just so that all following "else if" look the same --}}
+
+    {{else if (eq "raw" this.format)}}
+        <OxiBase::Label @text={{this.valueStr}} @raw={{true}} @truncate={{true}} @raw_tooltip={{v}}/>
+
+    {{else if (eq "text" this.format)}}
+        <OxiBase::Label @text={{v}} @raw={{false}} @truncate={{true}} @raw_tooltip={{v}}/>
+
+    {{else if (eq "subject" this.format)}}
+        <OxiBase::Label @text={{v}} @raw={{false}} @inline={{true}} @nowrap={{true}} />
+
+    {{else if (eq "nl2br" this.format)}}
+        {{#each this.valueSplitByNewline as |line|}} {{line}}<br> {{/each}}
+
+    {{else if (eq "timestamp" this.format)}}
+        {{this.timestamp}}
+
+    {{else if (eq "styled" this.format)}}
+        <span class="styled-{{this.styledValue.style}}">{{this.styledValue.label}}</span>
+
+    {{else if (eq "certstatus" this.format)}}
         <OxiBase::Label @class="certstatus-{{lc (try v.value v.label)}}" @tooltip={{v.tooltip}} @text={{v.label}} @raw={{true}} />
-    {{else if (eq this.format "link")}}
+
+    {{else if (eq "link" this.format)}}
         <OxiBase::Formatted::Link @spec={{v}}/>
-    {{else if (eq this.format "extlink")}}
+
+    {{else if (eq "extlink" this.format)}}
         <a href={{v.page}} target={{try v.target "_blank"}} title={{v.tooltip}}>
             <OxiBase::Label @text={{v.label}} @raw={{true}} />
         </a>
-    {{else if (eq this.format "timestamp")}}
-        {{this.timestamp}}
-    {{else if (eq this.format "text")}}
-        <OxiBase::Label @text={{v}} @raw={{false}} />
-    {{else if (eq this.format "subject")}}
-        <OxiBase::Label @text={{v}} @raw={{false}} @inline={{true}} @nowrap={{true}} />
-    {{else if (eq this.format "nl2br")}}
-        {{#each this.valueSplitByNewline as |line|}} {{line}}<br> {{/each}}
-    {{else if (eq this.format "code")}}
+
+    {{else if (eq "tooltip" this.format)}}
+        <OxiBase::Label
+            @text={{v.value}}
+            @tooltip={{v.tooltip}}
+            @tooltip_page={{v.tooltip_page}}
+            @tooltip_page_args={{v.tooltip_page_args}}
+            @raw={{false}}
+        />
+
+    {{else if (eq "code" this.format)}}
         <code
             title="{{t 'component.oxi_code.copy'}}"
             {{on "dblclick" this.selectCode}}
         >{{this.valueStr}}</code>
-    {{else if (eq this.format "asciidata")}}
+
+    {{else if (eq "asciidata" this.format)}}
         <div class="hover-element">
             <pre class="content pre-scrollable">{{this.valueStr}}</pre>
             <div class="menu">
                 <OxiBase::Download @data={{this.valueStr}} />
             </div>
         </div>
-    {{else if (eq this.format "download")}}
+
+    {{else if (eq "download" this.format)}}
         <OxiBase::Download @type={{v.type}} @data={{v.data}} @mimeType={{v.mimetype}} @fileName={{v.filename}} @autoDownload={{v.autodownload}} @hide={{v.hide}} />
-    {{else if (eq this.format "raw")}}
-        {{{defuse this.valueStr}}}
-    {{else if (eq this.format "deflist")}}
+
+    {{else if (eq "deflist" this.format)}}
         <dl>
             {{#each v as |val|}}
                 <dt>{{val.label}}</dt>
@@ -43,7 +69,8 @@
                 {{/each}}
             {{/each}}
         </dl>
-    {{else if (eq this.format "ullist")}}
+
+    {{else if (eq "ullist" this.format)}}
         <ul class="list-unstyled">
             {{#each v as |val|}}
                 <li>
@@ -51,11 +78,13 @@
                 </li>
             {{/each}}
         </ul>
-    {{else if (eq this.format "rawlist")}}
+
+    {{else if (eq "rawlist" this.format)}}
         <ul class="list-unstyled">
             {{#each v as |val|}} <li><OxiBase::Label @text={{val}} @raw={{true}} /> </li> {{/each}}
         </ul>
-    {{else if (eq this.format "linklist")}}
+
+    {{else if (eq "linklist" this.format)}}
         <ul class="list-unstyled">
             {{#each v as |val|}}
                 <li>
@@ -71,16 +100,7 @@
                 </li>
             {{/each}}
         </ul>
-    {{else if (eq this.format "styled")}}
-        <span class="styled-{{this.styledValue.style}}">{{this.styledValue.label}}</span>
-    {{else if (eq this.format "tooltip")}}
-        <OxiBase::Label
-            @text={{v.value}}
-            @tooltip={{v.tooltip}}
-            @tooltip_page={{v.tooltip_page}}
-            @tooltip_page_args={{v.tooltip_page_args}}
-            @raw={{false}}
-        />
+
     {{/if}}
 
 {{/let}}

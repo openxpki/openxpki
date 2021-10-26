@@ -4,6 +4,10 @@
             <EmberTooltip>
                 {{@tooltip}}
             </EmberTooltip>
+        {{else if @raw_tooltip}}
+            <EmberTooltip>
+                {{{defuse @raw_tooltip}}}
+            </EmberTooltip>
         {{else if @tooltip_page}}
             <EmberPopover
                 @onShow={{this.fetchTooltip}}

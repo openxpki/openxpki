@@ -13,6 +13,8 @@ import { inject } from '@ember/service';
  * @param { string|array } text - the text to display. If an array is given, the contents are separated via <span> tags
  * @param { string } tooltip - a tooltop text to display. Optional.
  * @param { bool } raw - set to `true` to allow HTML entities incl. `<script>` tags etc.
+ * @param { bool } nowrap - do not wrap long text
+ * @param { bool } truncate - truncate long text
  * @module component/oxi-base/label
  */
 export default class OxiLabelComponent extends Component {
@@ -24,7 +26,11 @@ export default class OxiLabelComponent extends Component {
     get cssClasses() {
         let classes = [];
         if (this.args.inline || Array.isArray(this.args.text)) classes.push('d-inline-flex');
-        classes.push(this.args.nowrap ? 'text-nowrap' : 'text-wrap');
+        classes.push(
+            this.args.truncate
+              ? 'text-truncate'
+              : (this.args.nowrap ? 'text-nowrap' : 'text-wrap')
+        );
         return classes.join(' ');
     }
 
