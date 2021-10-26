@@ -54,7 +54,7 @@
         <navbar.nav as |nav|>
             {{#if this.model.user}}
                 <nav.item>
-                    <nav.linkTo @route="openxpki" @model="logout">
+                    <nav.linkTo {{on "click" this.logout}}>
                         {{t 'site.logout'}}
                     </nav.linkTo>
                 </nav.item>

@@ -8,8 +8,8 @@ import { debug } from '@ember/debug';
  * @module route/openxpki
  */
 export default class OpenXpkiRoute extends Route {
+    @inject('oxi-config') config;
     @inject('oxi-content') content;
-    @inject('oxi-config') oxiConfig;
 
     // Reserved Ember property "queryParams"
     // https://api.emberjs.com/ember/3.17/classes/Route/properties/queryParams?anchor=queryParams
@@ -20,7 +20,7 @@ export default class OpenXpkiRoute extends Route {
         limit:    { refreshModel: true },
         force:    { refreshModel: true },
     };
-    needReboot = ["login", "logout", "login!logout", "welcome"];
+    needsBootstrap = ["login", "login!logout", "welcome"];
 
     /*
     Custom handlers for exceptions returned by the server (HTTP status codes):
@@ -48,9 +48,9 @@ export default class OpenXpkiRoute extends Route {
         let structureIfNeeded; // chain of ajax calls via Promises
 
         /*
-         * load base page structure first first time or for special pages ("needReboot")
+         * load base page structure first first time or for special pages ("needsBootstrap")
          */
-        if (!this.content.navEntries.length || this.needReboot.indexOf(modelId) >= 0) {
+        if (!this.content.navEntries.length || this.needsBootstrap.indexOf(modelId) >= 0) {
             // don't send request yet, only create a lambda via arrow function expression
             structureIfNeeded = () => {
                 return this.content.updateRequest({
@@ -72,12 +72,12 @@ export default class OpenXpkiRoute extends Route {
         if (queryParams.limit) { request.limit = queryParams.limit }
         if (queryParams.startat) { request.startat = queryParams.startat }
 
-        // load as top content if 'modelId' is part of navigation or in 'needReboot' list
+        // load as top content if 'modelId' is part of navigation or in 'needsBootstrap' list
         let flatList = this.content.navEntries.reduce((p, n) => p.concat(n, n.entries || []), []);
-        if (flatList.findBy("key", modelId) || this.needReboot.indexOf(modelId) >= 0) {
+        if (flatList.findBy("key", modelId) || this.needsBootstrap.indexOf(modelId) >= 0) {
             request.target = "top";
         }
-        return this.oxiConfig.ready // localconfig.js might change rootURL, so first thing is to query it
+        return this.config.ready // localconfig.js might change rootURL, so first thing is to query it
             .then( () => structureIfNeeded() )
             .then( () => this.content.updateRequest(request) );
     }

@@ -6,6 +6,7 @@ import { inject } from '@ember/service';
 
 export default class OpenXpkiController extends Controller {
     @inject('oxi-config') config;
+    @inject('oxi-content') content;
     @inject router;
 
     // Reserved Ember properties
@@ -43,14 +44,20 @@ export default class OpenXpkiController extends Controller {
 
     @gt("model.tabs.length", 1) showTabs;
 
-    // Wen don't use <ddm.LinkTo> but our own method to navigate to target page.
+    // We don't use <ddm.LinkTo> but our own method to navigate to target page.
     // This way we can force Ember to do a transition even if the new page is
     // the same page as before by setting parameter "force" a timestamp.
     @action
     navigateTo(page, event) {
-        event.stopPropagation();
-        event.preventDefault();
+        if (event) { event.stopPropagation(); event.preventDefault() }
         this.router.transitionTo('openxpki', page, { queryParams: { force: (new Date()).valueOf() } });
+    }
+
+    @action
+    logout(event) {
+        if (event) { event.stopPropagation(); event.preventDefault() }
+        this.content.setTenant(null);
+        this.navigateTo('logout');
     }
 
     @action
