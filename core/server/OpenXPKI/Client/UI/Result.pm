@@ -428,9 +428,11 @@ sub render {
 
     my $json = JSON->new->utf8;
     my $body;
-    my $redirect;
 
-    if ($redirect = $self->redirect()) {
+    # page redirect
+    my $redirect = $self->redirect;
+    my $redirect_url;
+    if ($redirect) {
         if (ref $redirect ne 'HASH') {
             $redirect = { goto => $redirect };
         }
@@ -441,10 +443,16 @@ sub render {
             $self->__temp_param($uid, $result->{status}, 15);
             $redirect->{goto} .= '!_status!' . $uid;
         }
+        $redirect_url = $redirect->{goto};
 
+        $redirect->{session_id} = $self->_session->id;
         $body = $json->encode( $redirect );
+
+    # raw data
     } elsif ($result->{_raw}) {
         $body = i18nTokenizer ( $json->encode($result->{_raw}) );
+
+    # regular response
     } else {
         $result->{session_id} = $self->_session->id;
 
@@ -457,28 +465,36 @@ sub render {
     }
 
 
-    my $cgi = $self->cgi();
+    my $cgi = $self->cgi;
     # Return the output into the given pointer
     if ($output && ref $output eq 'SCALAR') {
         $$output = $body;
-    } elsif (ref $cgi && $cgi->http('HTTP_X-OPENXPKI-Client')) {
-        # Start output stream
-        print $cgi->header( @main::header );
-        print $body;
+
+    } elsif (ref $cgi) {
+        if ($cgi->http('HTTP_X-OPENXPKI-Client')) {
+            # Start output stream
+            print $cgi->header( @main::header );
+            print $body;
+
+        } else {
+            my $url;
+            # redirect to given page
+            if ($redirect_url) {
+                $url = $redirect_url;
+            # redirect to downloads / result pages
+            } elsif ($body) {
+                $url = $self->__persist_response( { data => $body } );
+            }
+            # if url does not start with http or slash, prepend baseurl + route name
+            if ($url !~ m{\A http|/}x) {
+                my $baseurl = $self->_session()->param('baseurl');
+                $url = sprintf("%sopenxpki/%s", $baseurl, $url);
+            }
+            print $cgi->redirect($url);
+        }
+
     } else {
-        # Do a redirect to the baseurl
-        my $url;
-        if (ref $redirect eq 'HASH' && $redirect->{goto}) {
-            $url = $redirect->{goto};
-        } elsif ($body) {
-            $url = $self->__persist_response( { data => $body } );
-        }
-        # if url does not start with http or slash, prepend baseurl + route name
-        if ($url !~ m{\A http|/}x) {
-            my $baseurl = $self->_session()->param('baseurl');
-            $url = sprintf("%sopenxpki/%s", $baseurl, $url);
-        }
-        print $cgi->redirect($url);
+        $self->logger->error("Cannot render result - CGI object not available");
     }
 
     return $self;

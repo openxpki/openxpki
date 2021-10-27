@@ -759,6 +759,8 @@ sub _recreate_frontend_session() {
     my $data = shift;
     my $auth_info = shift;
 
+    $self->logger->trace('Got session info: '. Dumper $data) if $self->logger->is_trace;
+
     # fetch redirect from old session before deleting it!
     my $redirect = $session->param('redirect');
 
@@ -798,10 +800,123 @@ sub _recreate_frontend_session() {
         $session->param('motd', $motd->{PARAMS} );
     }
 
-    $self->logger->trace('Got session info: '. Dumper $data) if $self->logger->is_trace;
+    # menu
+    my $reply = $self->backend->send_receive_command_msg( 'get_menu' );
+    $self->_set_menu($session, $reply->{PARAMS}) if ref $reply->{PARAMS} eq 'HASH';
 
     $session->flush;
 
+}
+
+sub _set_menu {
+    my $self = shift;
+    my $session = shift;
+    my $menu = shift;
+
+    $self->logger->trace('Menu ' . Dumper $menu) if $self->logger->is_trace;
+
+    $session->param('menu', $menu->{main});
+
+    # persist the optional parts of the menu hash (landmark, tasklist, search attribs)
+    $session->param('landmark', $menu->{landmark} || {});
+    $self->logger->trace('Got landmarks: ' . Dumper $menu->{landmark}) if $self->logger->is_trace;
+
+    # Keepalive pings to endpoint
+    if ($menu->{ping}) {
+        my $ping;
+        if (ref $menu->{ping} eq 'HASH') {
+            $ping = $menu->{ping};
+            $ping->{timeout} *= 1000; # Javascript expects timeout in ms
+        } else {
+            $ping = { href => $menu->{ping}, timeout => 120000 };
+        }
+        $session->param('ping', $ping);
+    }
+
+    # tasklist, wfsearch, certsearch and bulk can have multiple branches
+    # using named keys. We try to autodetect legacy formats and map
+    # those to a "default" key
+    # TODO Remove legacy compatibility
+
+    # config items are a list of hashes
+    foreach my $key (qw(tasklist bulk)) {
+
+        if (ref $menu->{$key} eq 'ARRAY') {
+            $session->param($key, { 'default' => $menu->{$key} });
+        } elsif (ref $menu->{$key} eq 'HASH') {
+            $session->param($key, $menu->{$key} );
+        } else {
+            $session->param($key, { 'default' => [] });
+        }
+        $self->logger->trace("Got $key: " . Dumper $menu->{$key}) if $self->logger->is_trace;
+    }
+
+    # top level is a hash that must have a "attributes" node
+    # legacy format was a single list of attributes
+    # TODO Remove legacy compatibility
+    foreach my $key (qw(wfsearch certsearch)) {
+
+        # plain attributes
+        if (ref $menu->{$key} eq 'ARRAY') {
+            $session->param($key, { 'default' => { attributes => $menu->{$key} } } );
+        } elsif (ref $menu->{$key} eq 'HASH') {
+            $session->param($key, $menu->{$key} );
+        } else {
+            $session->param($key, { 'default' => {} });
+        }
+        $self->logger->trace("Got $key: " . Dumper $menu->{$key}) if $self->logger->is_trace;
+    }
+
+    # Check syntax of "certdetails".
+    # (the sub{} below allows using "return" instead of nested "if"-structures)
+    my $certdetails = sub {
+        my $result;
+        unless ($result = $menu->{certdetails}) {
+            $self->logger->warn('Config entry "certdetails" is empty');
+            return {};
+        }
+        unless (ref $result eq 'HASH') {
+            $self->logger->warn('Config entry "certdetails" is not a hash');
+            return {};
+        }
+        if ($result->{metadata}) {
+            if (ref $result->{metadata} eq 'ARRAY') {
+                for my $md (@{ $result->{metadata} }) {
+                    if (not ref $md eq 'HASH') {
+                        $self->logger->warn('Config entry "certdetails.metadata" contains an item that is not a hash');
+                        $result->{metadata} = [];
+                        last;
+                    }
+                }
+            }
+            else {
+                $self->logger->warn('Config entry "certdetails.metadata" is not an array');
+                $result->{metadata} = [];
+            }
+        }
+        return $result;
+    }->();
+    $session->param('certdetails', $certdetails);
+
+    # Check syntax of "wfdetails".
+    # (the sub{} below allows using "return" instead of nested "if"-structures)
+    my $wfdetails = sub {
+        if (not exists $menu->{wfdetails}) {
+            $self->logger->debug('Config entry "wfdetails" is not defined, using defaults');
+            return [];
+        }
+        my $result;
+        unless ($result = $menu->{wfdetails}) {
+            $self->logger->debug('Config entry "wfdetails" is set to "undef", hide from output');
+            return;
+        }
+        unless (ref $result eq 'ARRAY') {
+            $self->logger->warn('Config entry "wfdetails" is not an array');
+            return [];
+        }
+        return $result;
+    }->();
+    $session->param('wfdetails', $wfdetails);
 }
 
 =head2 logout_session
@@ -818,7 +933,7 @@ sub logout_session {
     my $self = shift;
     my $cgi = shift;
 
-    $self->logger()->info("session logout");
+    $self->logger->info("session logout");
 
     my $session = $self->session();
     $self->backend()->logout();
