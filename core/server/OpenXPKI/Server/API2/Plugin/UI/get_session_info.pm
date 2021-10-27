@@ -61,7 +61,7 @@ command "get_session_info" => {
 
     my @tenants;
     # only expose tenant list if the current session has a handler
-    if ($session->data->has_tenants && CTX('authentication')->tenant_handler()) {
+    if ($session->data->has_tenants && CTX('authentication')->has_tenant_handler()) {
         @tenants = map {
             my $tenant_label = CTX('config')->get([ 'auth', 'tenant', $_, 'label' ]);
             { value => $_, label => ($tenant_label || $_) };

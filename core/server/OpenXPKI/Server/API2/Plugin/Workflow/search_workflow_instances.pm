@@ -309,7 +309,7 @@ sub _make_query_params {
 
     if ( my $tenant = $self->get_validated_tenant( $args->tenant ) ) {
         ##! 16: 'has tenant set ' . $tenant
-        $attributes = CTX('authentication')->tenant_handler()->workflow_attribute_filter( $tenant, $attributes );
+        $attributes = CTX('authentication')->tenant_handler()->workflow_search_filter( $tenant, $attributes );
     }
 
     if (ref $attributes eq 'HASH') {

@@ -1,11 +1,3 @@
-## OpenXPKI::Server::Authentication.pm
-##
-## Written 2003 by Michael Bell
-## Rewritten 2005 and 2006 by Michael Bell for the OpenXPKI project
-## adapted to new Service::Default semantics 2007 by Alexander Klink
-## for the OpenXPKI project
-## (C) Copyright 2003-2007 by The OpenXPKI Project
-
 package OpenXPKI::Server::Authentication;
 
 use strict;
@@ -119,6 +111,11 @@ sub __load_pki_realm
         $self->__load_handler ( $handler );
     }
 
+    my @roles = CTX('config')->get_keys(['auth', 'roles']);
+    foreach my $role (@roles) {
+        $self->__load_tenant ( $role );
+    }
+
     ##! 64: "Realm auth config " . Dumper $self->{PKI_REALM}->{$realm}
 
     CTX('session')->data->pki_realm( $restore_realm ) if $restore_realm;
@@ -161,6 +158,59 @@ sub __load_handler
 
     ##! 4: "end"
     return 1;
+}
+
+sub __load_tenant {
+
+    ##! 4: "start"
+    my $self  = shift;
+    my $role  = shift;
+
+    my $realm = CTX('session')->data->pki_realm;
+    my $config = CTX('config');
+
+    my $conf = $config->get_hash(['auth', 'roles', $role, 'tenant']);
+
+    return unless ($conf);
+
+    # always add the null handler if it does not exist
+    if (!$self->{PKI_REALM}->{$realm}->{TENANT}->{_default}) {
+        eval "use OpenXPKI::Server::AccessControl::Tenant::Null;1";
+        $self->{PKI_REALM}->{$realm}->{TENANT}->{_default} = OpenXPKI::Server::AccessControl::Tenant::Null->new();
+        CTX('log')->auth()->info('Loaded tenant null handler');
+    }
+
+    ##! 64: $conf
+    # type or class must be defined
+    my $class;
+    # no tenant config defined for role, return null handler
+    if ($conf->{class}) {
+        $class = $conf->{class};
+        delete $conf->{class};
+    } elsif ($conf->{type}) {
+        $class = 'OpenXPKI::Server::AccessControl::Tenant::'.$conf->{type};
+        delete $conf->{type};
+    } else {
+        OpenXPKI::Exception->throw(
+            message => 'Tenant handler has neither class nor type set',
+            params => { role => $role, param => $conf }
+        );
+    }
+    ##! 32: $class
+    eval "use $class;1";
+    if ($EVAL_ERROR) {
+        OpenXPKI::Exception->throw (
+            message => "Unable to load access control handler class $class",
+            params  => {ERRVAL => $EVAL_ERROR}
+        );
+    }
+
+    $self->{PKI_REALM}->{$realm}->{TENANT}->{$role} = $class->new( %{$conf} );
+
+    CTX('log')->auth()->info('Loaded tenant handler for role ' . $role);
+
+    return 1;
+
 }
 
 ########################################################################
@@ -445,7 +495,7 @@ sub login_step {
         );
     }
 
-    if ($self->tenant_handler( $last_result->role() ) && !$last_result->has_tenants()) {
+    if ($self->has_tenant_handler( $last_result->role() ) && !$last_result->has_tenants()) {
         CTX('log')->auth()->error(sprintf('Login failed, no tenant information for user: %s, role: %s)', $last_result->username(), $last_result->role()));
         OpenXPKI::Exception::Authentication->throw(
             message => 'I18N_OPENXPKI_UI_AUTHENTICATION_FAILED_TENANT_REQUIRED',
@@ -461,6 +511,18 @@ sub login_step {
 
 };
 
+sub has_tenant_handler {
+
+    ##! 1: 'start'
+    my $self = shift;
+
+    my $role = shift || CTX('session')->data->role;
+    my $realm = CTX('session')->data->pki_realm;
+
+    return defined $self->{PKI_REALM}->{$realm}->{TENANT}->{$role};
+
+}
+
 sub tenant_handler {
 
     ##! 1: 'start'
@@ -468,37 +530,10 @@ sub tenant_handler {
 
     my $role = shift || CTX('session')->data->role;
     ##! 8: 'role ' . $role
-    my $conf = CTX('config')->get_hash(['auth', 'roles', $role, 'tenant']);
+    my $realm = CTX('session')->data->pki_realm;
 
-    ##! 64: $conf
-    # no tenant config defined for role
-    return unless ($conf);
-
-    # type or class must be defined
-    my $class;
-    if ($conf->{class}) {
-        $class = $conf->{class};
-        delete $conf->{class};
-    } elsif ($conf->{type}) {
-        $class = 'OpenXPKI::Server::AccessControl::Tenant::'.$conf->{type};
-        delete $conf->{type};
-    } else {
-        OpenXPKI::Exception->throw(
-            message => 'Tenant handler has neither class nor type set',
-            params => { role => $role, param => $conf }
-        );
-    }
-    ##! 32: $class
-    eval "use $class;1";
-    if ($EVAL_ERROR) {
-        OpenXPKI::Exception->throw (
-            message => "Unable to load access control handler class $class",
-            params  => {ERRVAL => $EVAL_ERROR}
-        );
-    }
-
-    return $class->new( %{$conf} );
-
+    # return the handler from the cache list by role or the null handler from _default
+    return $self->{PKI_REALM}->{$realm}->{TENANT}->{$role} // $self->{PKI_REALM}->{$realm}->{TENANT}->{_default};
 }
 
 1;
@@ -538,6 +573,11 @@ calls can then be made until this state is achieved.
 Reply is the reply message that is to be sent to the user
 (i.e. a challenge, or the 'SERVICE_READY' message in case
 the authentication has been successful).
+
+=head2 has_tenant_handler
+
+Return true/false if the given role (default session role) has a tenant
+handler configured that needs to be used.
 
 =head2 tenant_handler
 
