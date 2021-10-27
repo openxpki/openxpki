@@ -75,12 +75,13 @@ command "get_primary_tenant" => {
         return CTX('session')->data->primary_tenant();
     }
 
-    my $handler = CTX('authentication')->tenant_handler();
-    if (!$handler) {
+    if (!CTX('authentication')->has_tenant_handler()) {
         ##! 32: 'No handler - set primary tenant to undef'
         CTX('session')->data->primary_tenant( undef );
         return;
     }
+
+    my $handler = CTX('authentication')->tenant_handler();
 
     my $tenant = $handler->get_primary_tenant( CTX('session')->data->tenants );
     OpenXPKI::Exception->throw (
