@@ -85,43 +85,39 @@ export default class OxiContentService extends Service {
                 return {};
             }
 
-            // did server-side session change (e.g. user was logged out due to timeout)?
-            if (this.last_session_id) {
-                if (doc.session_id && doc.session_id !== this.last_session_id) {
-                    console.error("SESSION ID CHANGE", this.last_session_id, doc.session_id)
+            // chain backend calls via Promise
+            let maybeBootstrap = this.isBootstrapNeeded(doc.session_id)
+                ? this.bootstrap()
+                : Promise.resolve()
+
+            return maybeBootstrap.then(() => {
+                // Successful request
+                this.status = doc.status;
+                this.popup = null;
+
+                // Auto refresh
+                if (doc.refresh) {
+                    debug("_request(): response - \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout);
+                    this._autoRefreshOnce(doc.refresh.href, doc.refresh.timeout);
                 }
-            }
-            else {
-                console.error("FIRST TIME", this.last_session_id, doc.session_id)
-            }
-            if (doc.session_id) this.last_session_id = doc.session_id;
 
-            // Successful request
-            this.status = doc.status;
-            this.popup = null;
+                // Redirect
+                if (doc.goto) {
+                    debug("_request(): response - \"goto\" " + doc.goto);
+                    this._redirect(doc.goto, doc.type, doc.loading_banner);
+                    return doc;
+                }
 
-            // Auto refresh
-            if (doc.refresh) {
-                debug("_request(): response - \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout);
-                this._autoRefreshOnce(doc.refresh.href, doc.refresh.timeout);
-            }
+                // Page contents
+                if (doc.page && doc.main) {
+                    debug("_request(): response - \"page\" and \"main\"");
+                    this._setPageContent(realTarget, doc.page, doc.main, doc.right);
+                }
 
-            // Redirect
-            if (doc.goto) {
-                debug("_request(): response - \"goto\" " + doc.goto);
-                this._redirect(doc.goto, doc.type, doc.loading_banner);
-                return doc;
-            }
+                this._setLoadingBanner(null);
 
-            // Page contents
-            if (doc.page && doc.main) {
-                debug("_request(): response - \"page\" and \"main\"");
-                this._setPageContent(realTarget, doc.page, doc.main, doc.right);
-            }
-
-            this._setLoadingBanner(null);
-
-            return doc; // calling code might handle other data
+                return doc; // calling code might handle other data
+            })
         })
         // Client side error
         .catch(error => {
@@ -130,6 +126,24 @@ export default class OxiContentService extends Service {
             this.error = this.intl.t('error_popup.message.client', { reason: error });
             return null;
         });
+    }
+
+    isBootstrapNeeded(session_id) {
+        let last_id = this.last_session_id
+        if (session_id) this.last_session_id = session_id;
+
+        // did server-side session change (e.g. user was logged out due to timeout)?
+        if (last_id) {
+            if (session_id && session_id !== last_id) {
+                debug('Bootstrap needed: session ID changed')
+                return true
+            }
+        }
+        else {
+            debug('Bootstrap needed: first backend call')
+            return true
+        }
+        return false
     }
 
     // "Bootstrapping" - menu, user info, locale, ...
@@ -143,7 +157,7 @@ export default class OxiContentService extends Service {
 
             if (doc.rtoken) this.rtoken = doc.rtoken; // CSRF token
             if (doc.language) this.oxiLocale.locale = doc.language;
-            if (doc.user) this.user = doc.user;
+            this.user = doc.user; // this also unsets the user on logout!
 
             // do not overwrite current tenant on repeated bootstrapping
             if (this.tenant === null && doc.tenant) this.setTenant(doc.tenant);

@@ -45,23 +45,6 @@ export default class OpenXpkiRoute extends Route {
             delete queryParams.force;
         }
 
-        let structureIfNeeded; // chain of ajax calls via Promises
-
-        /*
-         * load base page structure first first time or for special pages ("topTarget")
-         */
-
-        if (!this.content.navEntries.length || this.topTarget.indexOf(modelId) >= 0) {
-            // don't send request yet, only create a lambda via arrow function expression
-            structureIfNeeded = () => {
-                return this.content.bootstrap();
-            };
-        }
-        else {
-            structureIfNeeded = () => { Promise.resolve() };
-        }
-//        structureIfNeeded = () => { Promise.resolve() };
-
         /*
          * load requested page part
          */
@@ -77,7 +60,6 @@ export default class OpenXpkiRoute extends Route {
             request.target = "top";
         }
         return this.config.ready // localconfig.js might change rootURL, so first thing is to query it
-            .then( () => structureIfNeeded() )
             .then( () => this.content.updateRequest(request) );
     }
 
