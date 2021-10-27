@@ -33,6 +33,8 @@ export default class OxiContentService extends Service {
     @tracked navEntries = [];
     @tracked error = null;
     @tracked loadingBanner = null;
+    last_session_id = null; // to track server-side logouts with session id changes
+    serverExceptions = []; // custom HTTP response code error handling
 
     get tenantCssClass() {
         if (!this.tenant) return '';
@@ -68,7 +70,6 @@ export default class OxiContentService extends Service {
      */
     updateRequest(request, isQuiet = false) {
         if (! isQuiet) this._setLoadingBanner(this.intl.t('site.banner.loading'));
-        debug("openxpki/route - updateRequest: " + ['page','action'].map(p=>request[p]?`${p} = ${request[p]}`:null).filter(e=>e!==null).join(", "));
 
         if (this.refresh) {
             cancel(this.refresh);
@@ -76,6 +77,111 @@ export default class OxiContentService extends Service {
         }
 
         let realTarget = this._resolveTarget(request.target); // has to be done before "this.popup = null"
+
+        return this._request(request, isQuiet)
+        .then(doc => {
+            // Errors occured and handlers above returned null
+            if (!doc) {
+                this._setLoadingBanner(null);
+                return {};
+            }
+
+            // chain backend calls via Promise
+            let maybeBootstrap = this.isBootstrapNeeded(doc.session_id)
+                ? this.bootstrap()
+                : Promise.resolve()
+
+            return maybeBootstrap.then(() => {
+                // Successful request
+                this.status = doc.status;
+                this.popup = null;
+
+                // Auto refresh
+                if (doc.refresh) {
+                    debug("updateRequest(): response - \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout);
+                    this._autoRefreshOnce(doc.refresh.href, doc.refresh.timeout);
+                }
+
+                // Redirect
+                if (doc.goto) {
+                    debug("updateRequest(): response - \"goto\" " + doc.goto);
+                    this._redirect(doc.goto, doc.type, doc.loading_banner);
+                    return doc;
+                }
+
+                // Page contents
+                if (doc.page && doc.main) {
+                    debug("updateRequest(): response - \"page\" and \"main\"");
+                    this._setPageContent(realTarget, doc.page, doc.main, doc.right);
+                }
+
+                this._setLoadingBanner(null);
+
+                return doc; // calling code might handle other data
+            })
+        })
+        // Client side error
+        .catch(error => {
+            this._setLoadingBanner(null);
+            console.error('There was an error while processing the data', error);
+            this.error = this.intl.t('error_popup.message.client', { reason: error });
+            return null;
+        });
+    }
+
+    isBootstrapNeeded(session_id) {
+        let last_id = this.last_session_id
+        if (session_id) this.last_session_id = session_id;
+
+        // did server-side session change (e.g. user was logged out due to timeout)?
+        if (last_id) {
+            if (session_id && session_id !== last_id) {
+                debug('Bootstrap needed: session ID changed')
+                return true
+            }
+        }
+        else {
+            debug('Bootstrap needed: first backend call')
+            return true
+        }
+        return false
+    }
+
+    // "Bootstrapping" - menu, user info, locale, ...
+    bootstrap() {
+        return this._request({
+            page: "bootstrap!structure",
+            baseurl: window.location.pathname,
+        }, true)
+        .then(doc => {
+            debug("bootstrap(): response");
+
+            if (doc.rtoken) this.rtoken = doc.rtoken; // CSRF token
+            if (doc.language) this.oxiLocale.locale = doc.language;
+            this.user = doc.user; // this also unsets the user on logout!
+
+            // do not overwrite current tenant on repeated bootstrapping
+            if (this.tenant === null && doc.tenant) this.setTenant(doc.tenant);
+
+            // menu
+            if (doc.structure) { this.navEntries = doc.structure; this._refreshNavEntries() }
+
+            // keepalive ping
+            if (doc.ping) {
+                debug("bootstrap(): setting ping = " + doc.ping);
+                if (this.ping) cancel(this.ping);
+                this._ping(doc.ping);
+            }
+
+            // custom HTTP error code handling
+            if (doc.on_exception) this.serverExceptions = doc.on_exception;
+
+            return doc;
+        });
+    }
+
+    _request(request, isQuiet = false) {
+        debug("_request(" + ['page','action'].map(p=>request[p]?`${p} = ${request[p]}`:null).filter(e=>e!==null).join(", ") + ")");
 
         let data = {
             ...request,
@@ -114,73 +220,11 @@ export default class OxiContentService extends Service {
                 return null;
             }
         })
-        .then(doc => {
-            // Errors occured and handlers above returned null
-            if (!doc) return {};
-
-            // Successful request
-            this.status = doc.status;
-            this.popup = null;
-
-            // Ping
-            if (doc.ping) {
-                debug("openxpki/route - updateRequest response: \"ping\" " + doc.ping);
-                if (this.ping) { cancel(this.ping) }
-                this._ping(doc.ping);
-            }
-
-            // Auto refresh
-            if (doc.refresh) {
-                debug("openxpki/route - updateRequest response: \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout);
-                this._autoRefreshOnce(doc.refresh.href, doc.refresh.timeout);
-            }
-
-            // Redirect
-            if (doc.goto) {
-                debug("openxpki/route - updateRequest response: \"goto\" " + doc.goto);
-                this._redirect(doc.goto, doc.type, doc.loading_banner);
-                return doc;
-            }
-
-            // "Bootstrapping" - menu, user info, locale
-            if (doc.structure) {
-                debug("openxpki/route - updateRequest response: \"structure\"");
-                this.navEntries = doc.structure; this._updateNavEntryActiveState();
-                this.user = doc.user;
-                this.rtoken = doc.rtoken;
-
-                // set locale
-                if (doc.language) this.oxiLocale.locale = doc.language;
-
-                // set custom exception handling
-                if (doc.on_exception) this.serverExceptions = doc.on_exception;
-
-                // do not overwrite current tenant on repeated bootstrapping
-                if (this.tenant === null && doc.tenant) this.setTenant(doc.tenant);
-            }
-            // Page contents
-            else {
-                if (doc.page && doc.main) {
-                    debug("openxpki/route - updateRequest response: \"page\" and \"main\"");
-                    this._setPageContent(realTarget, doc.page, doc.main, doc.right);
-                }
-            }
-
-            this._setLoadingBanner(null);
-            return doc; // calling code might handle other data
-        })
-        // Client side error
-        .catch(error => {
-            this._setLoadingBanner(null);
-            console.error('There was an error while processing the data', error);
-            this.error = this.intl.t('error_popup.message.client', { reason: error });
-            return null;
-        })
     }
 
     setPage(page) {
         this.page = page;
-        this._updateNavEntryActiveState();
+        this._refreshNavEntries();
     }
 
     setTenant(tenant) {
@@ -315,7 +359,7 @@ export default class OxiContentService extends Service {
         }
     }
 
-    _updateNavEntryActiveState() {
+    _refreshNavEntries() {
         let page = this.page;
         for (const entry of this.navEntries) {
             emSet(entry, "active", (entry.key === page));

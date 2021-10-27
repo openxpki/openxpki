@@ -48,8 +48,8 @@ module.exports = function(defaults) {
       whitelist: ['bs-button', 'bs-modal', 'bs-dropdown', 'bs-navbar', 'bs-collapse'],
     },
 
-    // disable fingerprinting of assets in production build
-    // (i.e. "openxpki.js" instead of "openxpki-1312d860591f9801798c1ef46052a7ea.js")
+    // fingerprinting of assets in production build
+    // (i.e. "openxpki.js" or "openxpki-1312d860591f9801798c1ef46052a7ea.js")
     'fingerprint': {
       enabled: true,
       extensions: ['js', 'css', 'map'], // default also includes 'png', 'jpg', 'gif'

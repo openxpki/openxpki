@@ -692,6 +692,20 @@ sub handle_login {
 
         if ( $reply->{SERVICE_MSG} eq 'COMMAND' ) {
 
+            my $session_info = $reply->{PARAMS};
+
+            # merge baseurl to authinfo links
+            # (we need to get the baseurl before recreating the session below)
+            my $auth_info = {};
+            my $baseurl = $session->param('baseurl');
+            if (my $ai = $session_info->{authinfo}) {
+                my $tt = OpenXPKI::Template->new;
+                for my $key (keys %{$ai}) {
+                    $auth_info->{$key} = $tt->render( $ai->{$key}, { baseurl => $baseurl } );
+                }
+            }
+            delete $session_info->{authinfo};
+
             #$self->backend()->rekey_session();
             #my $new_backend_session_id = $self->backend()->get_session_id();
 
@@ -699,71 +713,19 @@ sub handle_login {
             # The backend session remains the same but can not be used by an
             # adversary as the id is never exposed and we destroy the old frontend
             # session so access to the old session is not possible
+            $self->_recreate_frontend_session($session, $session_info, $auth_info);
 
-            # fetch redirect from old session before deleting it!
-            my $redirect = $session->param('redirect');
-
-            # get the base url before deleting the session
-            my $baseurl = $session->param('baseurl');
-
-            # delete the old instance data
-            $session->delete();
-            $session->flush();
-            # call new on the existing session object to reuse settings
-            $session = $session->new();
-
-            $self->logger()->debug('New frontend session id : '. $session->id );
-
-            if ($redirect) {
-                $self->logger()->trace('Carry over redirect target ' . $redirect);
-                $session->param('redirect', $redirect);
-            }
-
-            # set some data
-            $session->param('backend_session_id', $self->backend()->get_session_id() );
             Log::Log4perl::MDC->put('sid', substr($session->id,0,4));
 
-            # move userinfo to own node
-            $session->param('userinfo', $reply->{PARAMS}->{userinfo} || {});
-            delete $reply->{PARAMS}->{userinfo};
-
-            # merge baseurl to authinfo links
-            my $authinfo = {};
-            if (my $ai = $reply->{PARAMS}->{authinfo}) {
-                my $tt = OpenXPKI::Template->new();
-                foreach my $key (keys %{$ai}) {
-                    $authinfo->{$key} = $tt->render( $ai->{$key}, { baseurl => $baseurl } );
-                }
-            }
-            $session->param('authinfo', $authinfo);
-            delete $reply->{PARAMS}->{authinfo};
-
-            $session->param('user', $reply->{PARAMS});
-            $session->param('pki_realm', $reply->{PARAMS}->{pki_realm});
-            $session->param('is_logged_in', 1);
-            $session->param('initialized', 1);
-
-            $self->session($session);
-
-            # Check for MOTD
-            my $motd = $self->backend()->send_receive_command_msg( 'get_motd' );
-            if (ref $motd->{PARAMS} eq 'HASH') {
-                $self->logger()->trace('Got MOTD: '. Dumper $motd->{PARAMS} ) if $self->logger->is_trace;
-                $self->session()->param('motd', $motd->{PARAMS} );
-            }
-
+            # FIXME Remove direct access to $main::cookie and main::encrypt_cookie
             if ($main::cookie) {
                 $main::cookie->{'-value'} = main::encrypt_cookie($session->id);
                 push @main::header, ('-cookie', $cgi->cookie( $main::cookie ));
             }
+            $self->logger->trace('CGI Header ' . Dumper \@main::header ) if $self->logger->is_trace;
 
-            $self->logger()->trace('Got session info: '. Dumper $reply->{PARAMS}) if $self->logger->is_trace;
-            $self->logger()->trace('CGI Header ' . Dumper \@main::header ) if $self->logger->is_trace;
-
-            $session->flush();
-
-            if ($authinfo->{login}) {
-                $result->redirect( $authinfo->{login} );
+            if ($auth_info->{login}) {
+                $result->redirect( $auth_info->{login} );
             } else {
                 $result->init_index();
             }
@@ -790,6 +752,173 @@ sub handle_login {
 
 }
 
+sub _recreate_frontend_session() {
+
+    my $self = shift;
+    my $session = shift;
+    my $data = shift;
+    my $auth_info = shift;
+
+    $self->logger->trace('Got session info: '. Dumper $data) if $self->logger->is_trace;
+
+    # fetch redirect from old session before deleting it!
+    my $redirect = $session->param('redirect');
+
+    # delete the old instance data
+    $session->delete;
+    $session->flush;
+    # call new on the existing session object to reuse settings
+    $session = $session->new;
+
+    $self->logger->debug('New frontend session id : '. $session->id );
+
+    if ($redirect) {
+        $self->logger->trace('Carry over redirect target ' . $redirect);
+        $session->param('redirect', $redirect);
+    }
+
+    # set some data
+    $session->param('backend_session_id', $self->backend->get_session_id );
+
+    # move userinfo to own node
+    $session->param('userinfo', $data->{userinfo} || {});
+    delete $data->{userinfo};
+
+    $session->param('authinfo', $auth_info);
+
+    $session->param('user', $data);
+    $session->param('pki_realm', $data->{pki_realm});
+    $session->param('is_logged_in', 1);
+    $session->param('initialized', 1);
+
+    $self->session($session);
+
+    # Check for MOTD
+    my $motd = $self->backend->send_receive_command_msg( 'get_motd' );
+    if (ref $motd->{PARAMS} eq 'HASH') {
+        $self->logger->trace('Got MOTD: '. Dumper $motd->{PARAMS} ) if $self->logger->is_trace;
+        $session->param('motd', $motd->{PARAMS} );
+    }
+
+    # menu
+    my $reply = $self->backend->send_receive_command_msg( 'get_menu' );
+    $self->_set_menu($session, $reply->{PARAMS}) if ref $reply->{PARAMS} eq 'HASH';
+
+    $session->flush;
+
+}
+
+sub _set_menu {
+    my $self = shift;
+    my $session = shift;
+    my $menu = shift;
+
+    $self->logger->trace('Menu ' . Dumper $menu) if $self->logger->is_trace;
+
+    $session->param('menu', $menu->{main});
+
+    # persist the optional parts of the menu hash (landmark, tasklist, search attribs)
+    $session->param('landmark', $menu->{landmark} || {});
+    $self->logger->trace('Got landmarks: ' . Dumper $menu->{landmark}) if $self->logger->is_trace;
+
+    # Keepalive pings to endpoint
+    if ($menu->{ping}) {
+        my $ping;
+        if (ref $menu->{ping} eq 'HASH') {
+            $ping = $menu->{ping};
+            $ping->{timeout} *= 1000; # Javascript expects timeout in ms
+        } else {
+            $ping = { href => $menu->{ping}, timeout => 120000 };
+        }
+        $session->param('ping', $ping);
+    }
+
+    # tasklist, wfsearch, certsearch and bulk can have multiple branches
+    # using named keys. We try to autodetect legacy formats and map
+    # those to a "default" key
+    # TODO Remove legacy compatibility
+
+    # config items are a list of hashes
+    foreach my $key (qw(tasklist bulk)) {
+
+        if (ref $menu->{$key} eq 'ARRAY') {
+            $session->param($key, { 'default' => $menu->{$key} });
+        } elsif (ref $menu->{$key} eq 'HASH') {
+            $session->param($key, $menu->{$key} );
+        } else {
+            $session->param($key, { 'default' => [] });
+        }
+        $self->logger->trace("Got $key: " . Dumper $menu->{$key}) if $self->logger->is_trace;
+    }
+
+    # top level is a hash that must have a "attributes" node
+    # legacy format was a single list of attributes
+    # TODO Remove legacy compatibility
+    foreach my $key (qw(wfsearch certsearch)) {
+
+        # plain attributes
+        if (ref $menu->{$key} eq 'ARRAY') {
+            $session->param($key, { 'default' => { attributes => $menu->{$key} } } );
+        } elsif (ref $menu->{$key} eq 'HASH') {
+            $session->param($key, $menu->{$key} );
+        } else {
+            $session->param($key, { 'default' => {} });
+        }
+        $self->logger->trace("Got $key: " . Dumper $menu->{$key}) if $self->logger->is_trace;
+    }
+
+    # Check syntax of "certdetails".
+    # (the sub{} below allows using "return" instead of nested "if"-structures)
+    my $certdetails = sub {
+        my $result;
+        unless ($result = $menu->{certdetails}) {
+            $self->logger->warn('Config entry "certdetails" is empty');
+            return {};
+        }
+        unless (ref $result eq 'HASH') {
+            $self->logger->warn('Config entry "certdetails" is not a hash');
+            return {};
+        }
+        if ($result->{metadata}) {
+            if (ref $result->{metadata} eq 'ARRAY') {
+                for my $md (@{ $result->{metadata} }) {
+                    if (not ref $md eq 'HASH') {
+                        $self->logger->warn('Config entry "certdetails.metadata" contains an item that is not a hash');
+                        $result->{metadata} = [];
+                        last;
+                    }
+                }
+            }
+            else {
+                $self->logger->warn('Config entry "certdetails.metadata" is not an array');
+                $result->{metadata} = [];
+            }
+        }
+        return $result;
+    }->();
+    $session->param('certdetails', $certdetails);
+
+    # Check syntax of "wfdetails".
+    # (the sub{} below allows using "return" instead of nested "if"-structures)
+    my $wfdetails = sub {
+        if (not exists $menu->{wfdetails}) {
+            $self->logger->debug('Config entry "wfdetails" is not defined, using defaults');
+            return [];
+        }
+        my $result;
+        unless ($result = $menu->{wfdetails}) {
+            $self->logger->debug('Config entry "wfdetails" is set to "undef", hide from output');
+            return;
+        }
+        unless (ref $result eq 'ARRAY') {
+            $self->logger->warn('Config entry "wfdetails" is not an array');
+            return [];
+        }
+        return $result;
+    }->();
+    $session->param('wfdetails', $wfdetails);
+}
+
 =head2 logout_session
 
 Delete and flush the current session and recreate a new one using
@@ -804,7 +933,7 @@ sub logout_session {
     my $self = shift;
     my $cgi = shift;
 
-    $self->logger()->info("session logout");
+    $self->logger->info("session logout");
 
     my $session = $self->session();
     $self->backend()->logout();
