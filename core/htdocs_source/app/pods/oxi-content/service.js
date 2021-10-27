@@ -34,6 +34,7 @@ export default class OxiContentService extends Service {
     @tracked error = null;
     @tracked loadingBanner = null;
     last_session_id = null; // to track server-side logouts with session id changes
+    serverExceptions = []; // custom HTTP response code error handling
 
     get tenantCssClass() {
         if (!this.tenant) return '';
