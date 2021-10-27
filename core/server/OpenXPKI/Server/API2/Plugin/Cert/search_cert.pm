@@ -419,7 +419,7 @@ sub _make_db_query {
 
     if (my $tenant = $self->get_validated_tenant( $po->tenant )) {
         ##! 16: 'has tenant set ' . $tenant
-        $attributes = CTX('authentication')->tenant_handler()->certificate_attribute_filter( $tenant, $attributes );
+        $attributes = CTX('authentication')->tenant_handler()->certificate_search_filter( $tenant, $attributes );
     }
 
     # handle certificate attributes (such as SANs)

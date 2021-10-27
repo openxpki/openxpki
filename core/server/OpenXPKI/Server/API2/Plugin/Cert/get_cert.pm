@@ -131,9 +131,13 @@ command "get_cert" => {
     if ($format eq 'DBINFO') {
         ##! 2: "Preparing output for DBINFO format"
         delete $cert->{data};
-
+        # TODO -  add tenant filter
         if ($params->has_attribute) {
-            $cert->{cert_attributes} = $self->api->get_cert_attributes( identifier => $identifier, attribute => $params->attribute );
+            $cert->{cert_attributes} = $self->api->get_cert_attributes(
+                identifier => $identifier,
+                attribute => $params->attribute,
+                tenant => '',
+            );
         }
 
         return $cert;

@@ -31,7 +31,11 @@ sub _evaluate {
         configuration_error('You need to have cert_identifier in context or set it via the parameters');
     }
 
-    my $res =  CTX('api2')->get_cert_attributes( identifier => $cert_identifier, attribute => $attribute );
+    my $res =  CTX('api2')->get_cert_attributes(
+        identifier => $cert_identifier,
+        attribute => $attribute,
+        tenant => '',
+    );
 
     if (!defined $res) {
         ##! 16: 'not defined'

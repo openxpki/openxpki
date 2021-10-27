@@ -84,7 +84,8 @@ command "evaluate_trust_rule" => {
             if (!defined $meta->{$key}) {
                 my $attr = CTX('api2')->get_cert_attributes(
                     identifier => $params->signer_identifier,
-                    attribute => $key
+                    attribute => $key,
+                    tenant => ''
                 );
                 $meta->{$key} = $attr->{$key} || [];
                 ##! 64: 'Loaded attr ' . Dumper $meta->{$key}
