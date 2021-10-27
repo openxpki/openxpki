@@ -124,7 +124,7 @@ lives_and {
     });
     ok(ref $res eq 'OpenXPKI::Server::Authentication::Handle');
     is($res->role, 'User');
-    cmp_deeply($res->tenant, ['Tenant A']);
+    cmp_deeply($res->tenants, ['Tenant A']);
 };
 
 lives_and {
@@ -134,7 +134,7 @@ lives_and {
     });
     ok(ref $res eq 'OpenXPKI::Server::Authentication::Handle');
     is($res->role, 'Operator');
-    cmp_deeply($res->tenant, ['']);
+    ok(!$res->has_tenants());
 };
 
 lives_and {
@@ -145,7 +145,7 @@ lives_and {
     ok(ref $res eq 'OpenXPKI::Server::Authentication::Handle');
     is($res->userid, 'guest');
     is($res->role, 'Anonymous');
-    ok(!$res->has_tenant());
+    ok(!$res->has_tenants());
 };
 
 
