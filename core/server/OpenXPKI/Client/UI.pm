@@ -692,6 +692,20 @@ sub handle_login {
 
         if ( $reply->{SERVICE_MSG} eq 'COMMAND' ) {
 
+            my $session_info = $reply->{PARAMS};
+
+            # merge baseurl to authinfo links
+            # (we need to get the baseurl before recreating the session below)
+            my $auth_info = {};
+            my $baseurl = $session->param('baseurl');
+            if (my $ai = $session_info->{authinfo}) {
+                my $tt = OpenXPKI::Template->new;
+                for my $key (keys %{$ai}) {
+                    $auth_info->{$key} = $tt->render( $ai->{$key}, { baseurl => $baseurl } );
+                }
+            }
+            delete $session_info->{authinfo};
+
             #$self->backend()->rekey_session();
             #my $new_backend_session_id = $self->backend()->get_session_id();
 
@@ -699,71 +713,19 @@ sub handle_login {
             # The backend session remains the same but can not be used by an
             # adversary as the id is never exposed and we destroy the old frontend
             # session so access to the old session is not possible
+            $self->_recreate_frontend_session($session, $session_info, $auth_info);
 
-            # fetch redirect from old session before deleting it!
-            my $redirect = $session->param('redirect');
-
-            # get the base url before deleting the session
-            my $baseurl = $session->param('baseurl');
-
-            # delete the old instance data
-            $session->delete();
-            $session->flush();
-            # call new on the existing session object to reuse settings
-            $session = $session->new();
-
-            $self->logger()->debug('New frontend session id : '. $session->id );
-
-            if ($redirect) {
-                $self->logger()->trace('Carry over redirect target ' . $redirect);
-                $session->param('redirect', $redirect);
-            }
-
-            # set some data
-            $session->param('backend_session_id', $self->backend()->get_session_id() );
             Log::Log4perl::MDC->put('sid', substr($session->id,0,4));
 
-            # move userinfo to own node
-            $session->param('userinfo', $reply->{PARAMS}->{userinfo} || {});
-            delete $reply->{PARAMS}->{userinfo};
-
-            # merge baseurl to authinfo links
-            my $authinfo = {};
-            if (my $ai = $reply->{PARAMS}->{authinfo}) {
-                my $tt = OpenXPKI::Template->new();
-                foreach my $key (keys %{$ai}) {
-                    $authinfo->{$key} = $tt->render( $ai->{$key}, { baseurl => $baseurl } );
-                }
-            }
-            $session->param('authinfo', $authinfo);
-            delete $reply->{PARAMS}->{authinfo};
-
-            $session->param('user', $reply->{PARAMS});
-            $session->param('pki_realm', $reply->{PARAMS}->{pki_realm});
-            $session->param('is_logged_in', 1);
-            $session->param('initialized', 1);
-
-            $self->session($session);
-
-            # Check for MOTD
-            my $motd = $self->backend()->send_receive_command_msg( 'get_motd' );
-            if (ref $motd->{PARAMS} eq 'HASH') {
-                $self->logger()->trace('Got MOTD: '. Dumper $motd->{PARAMS} ) if $self->logger->is_trace;
-                $self->session()->param('motd', $motd->{PARAMS} );
-            }
-
+            # FIXME Remove direct access to $main::cookie and main::encrypt_cookie
             if ($main::cookie) {
                 $main::cookie->{'-value'} = main::encrypt_cookie($session->id);
                 push @main::header, ('-cookie', $cgi->cookie( $main::cookie ));
             }
+            $self->logger->trace('CGI Header ' . Dumper \@main::header ) if $self->logger->is_trace;
 
-            $self->logger()->trace('Got session info: '. Dumper $reply->{PARAMS}) if $self->logger->is_trace;
-            $self->logger()->trace('CGI Header ' . Dumper \@main::header ) if $self->logger->is_trace;
-
-            $session->flush();
-
-            if ($authinfo->{login}) {
-                $result->redirect( $authinfo->{login} );
+            if ($auth_info->{login}) {
+                $result->redirect( $auth_info->{login} );
             } else {
                 $result->init_index();
             }
@@ -787,6 +749,58 @@ sub handle_login {
 
     $self->logger()->debug("unhandled error during auth");
     return;
+
+}
+
+sub _recreate_frontend_session() {
+
+    my $self = shift;
+    my $session = shift;
+    my $data = shift;
+    my $auth_info = shift;
+
+    # fetch redirect from old session before deleting it!
+    my $redirect = $session->param('redirect');
+
+    # delete the old instance data
+    $session->delete;
+    $session->flush;
+    # call new on the existing session object to reuse settings
+    $session = $session->new;
+
+    $self->logger->debug('New frontend session id : '. $session->id );
+
+    if ($redirect) {
+        $self->logger->trace('Carry over redirect target ' . $redirect);
+        $session->param('redirect', $redirect);
+    }
+
+    # set some data
+    $session->param('backend_session_id', $self->backend->get_session_id );
+
+    # move userinfo to own node
+    $session->param('userinfo', $data->{userinfo} || {});
+    delete $data->{userinfo};
+
+    $session->param('authinfo', $auth_info);
+
+    $session->param('user', $data);
+    $session->param('pki_realm', $data->{pki_realm});
+    $session->param('is_logged_in', 1);
+    $session->param('initialized', 1);
+
+    $self->session($session);
+
+    # Check for MOTD
+    my $motd = $self->backend->send_receive_command_msg( 'get_motd' );
+    if (ref $motd->{PARAMS} eq 'HASH') {
+        $self->logger->trace('Got MOTD: '. Dumper $motd->{PARAMS} ) if $self->logger->is_trace;
+        $session->param('motd', $motd->{PARAMS} );
+    }
+
+    $self->logger->trace('Got session info: '. Dumper $data) if $self->logger->is_trace;
+
+    $session->flush;
 
 }
 
