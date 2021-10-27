@@ -53,7 +53,8 @@ sub execute {
 
         my $attr = CTX('api2')->get_cert_attributes(
             identifier => $cert_identifier,
-            attribute => $key
+            attribute => $key,
+            tenant => '',
         );
         my $item = $attr->{$key};
 

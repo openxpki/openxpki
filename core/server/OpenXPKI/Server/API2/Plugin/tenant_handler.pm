@@ -95,4 +95,30 @@ command "get_primary_tenant" => {
 
 };
 
+=head2 get_certificate_tenant
+
+Get the tenant owner of a certificate.
+
+Returns the content of the system_cert_tenant attribute or undef if
+none is found.
+
+=cut
+
+command "get_certificate_tenant" => {
+    identifier => { isa => 'Str', required => 1, },
+} => sub {
+    my ($self, $params) = @_;
+    ##! 1: 'start'
+
+    my $db_owner = CTX('dbi')->select_one(
+        from => 'certificate_attributes',
+        columns => [ 'attribute_value' ],
+        where =>  { identifier => $params->identifier, attribute_contentkey => 'system_cert_tenant' },
+    );
+    ##! 32: $db_owner
+    return unless ($db_owner);
+
+    return $db_owner->{attribute_value};
+};
+
 __PACKAGE__->meta->make_immutable;

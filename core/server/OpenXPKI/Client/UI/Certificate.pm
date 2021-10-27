@@ -587,7 +587,7 @@ sub init_detail {
     my $cert = $self->send_command_v2( 'get_cert', {
         identifier => $cert_identifier,
         format => 'DBINFO',
-        attribute => 'subject_%' }, 1);
+        attribute => 'subject_alt_name' }, 1);
 
     if (!$cert) {
         $self->_page({
@@ -690,10 +690,17 @@ sub init_detail {
     );
 
     # certificate metadata - show only for certificates from the current or empty realm
-    if ((my $metadata_config = $self->_client->session()->param('certdetails')->{metadata}) &&
-        (!$cert->{pki_realm} || $cert->{pki_realm} eq $self->_session->param('pki_realm')) &&
-        (my $cert_attrs = $self->send_command_v2( get_cert_attributes => { identifier => $cert_identifier, attribute => 'meta_%' }, 1))) {
+    sub {
+        my $metadata_config = $self->_client->session()->param('certdetails')->{metadata};
+        return unless ($metadata_config);
+        return unless (!$cert->{pki_realm} || $cert->{pki_realm} eq $self->_session->param('pki_realm'));
+        my $cert_attrs = $self->send_command_v2( get_cert_attributes => {
+                identifier => $cert_identifier,
+                attribute => 'meta_%',
+                $self->__tenant() }, 1);
+        return unless $cert_attrs;
         my @metadata_lines;
+
         for my $cfg (@$metadata_config) {
             my $line;
             if ($cfg->{template}) {
@@ -713,7 +720,7 @@ sub init_detail {
         push @fields, (
             { label => 'I18N_OPENXPKI_UI_CERTIFICATE_METADATA', value => \@metadata_lines, format => "rawlist" },
         ) if (scalar @metadata_lines);
-    }
+    }->();
 
     # for i18n parser I18N_OPENXPKI_CERT_ISSUED CRL_ISSUANCE_PENDING I18N_OPENXPKI_CERT_REVOKED I18N_OPENXPKI_CERT_EXPIRED
 
@@ -757,7 +764,11 @@ sub init_detail {
 
     # hide the related link if there is no data to display or cert is not from this realm
     if (($cert->{pki_realm} eq $self->_session->param('pki_realm')) &&
-        ($self->send_command_v2 ( "get_cert_attributes", { identifier => $cert_identifier, attribute => "system_workflow%" }))) {
+        ($self->send_command_v2 ( "get_cert_attributes", {
+            identifier => $cert_identifier,
+            attribute => "system_workflow%",
+            $self->__tenant()
+        }))) {
         push @fields, { label => 'I18N_OPENXPKI_UI_CERT_RELATED_LABEL', format => 'link', value => {
           page => 'certificate!related!identifier!'.$cert_identifier,
             label => 'I18N_OPENXPKI_UI_CERT_RELATED_HINT'
