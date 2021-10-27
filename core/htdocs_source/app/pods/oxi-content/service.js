@@ -98,20 +98,20 @@ export default class OxiContentService extends Service {
 
                 // Auto refresh
                 if (doc.refresh) {
-                    debug("_request(): response - \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout);
+                    debug("updateRequest(): response - \"refresh\" " + doc.refresh.href + ", " + doc.refresh.timeout);
                     this._autoRefreshOnce(doc.refresh.href, doc.refresh.timeout);
                 }
 
                 // Redirect
                 if (doc.goto) {
-                    debug("_request(): response - \"goto\" " + doc.goto);
+                    debug("updateRequest(): response - \"goto\" " + doc.goto);
                     this._redirect(doc.goto, doc.type, doc.loading_banner);
                     return doc;
                 }
 
                 // Page contents
                 if (doc.page && doc.main) {
-                    debug("_request(): response - \"page\" and \"main\"");
+                    debug("updateRequest(): response - \"page\" and \"main\"");
                     this._setPageContent(realTarget, doc.page, doc.main, doc.right);
                 }
 
