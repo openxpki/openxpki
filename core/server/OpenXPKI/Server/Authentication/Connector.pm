@@ -9,6 +9,7 @@ use OpenXPKI::Server::Authentication::Handle;
 use OpenXPKI::Server::Context qw( CTX );
 
 use Moose;
+use Moose::Util::TypeConstraints;
 
 extends 'OpenXPKI::Server::Authentication::Base';
 
@@ -16,11 +17,15 @@ has '+role' => (
     required => 1,
 );
 
+subtype 'ModeString',
+    as 'Str',
+    where { $_ =~ qr{ \A(authonly|combined|userinfo)\z }xms },
+    message { "mode must be one of authonly|combined|userinfo, $_ was given" };
+
 has mode => (
     is => 'ro',
-    isa => 'Str',
+    isa => 'ModeString',
     lazy => 1,
-    matching => qr{ \A(authonly|combined|userinfo|)\z }xms,
     default => sub {
         my $self = shift;
         return 'authonly'
