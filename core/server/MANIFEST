@@ -153,6 +153,7 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Config.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Engine.pm
 
+OpenXPKI/Crypto/Backend/OpenSSL/Engine/LunaGem.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Engine/nCipher.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Engine/OpenSSL.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Engine/PKCS11.pm
