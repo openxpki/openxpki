@@ -1970,10 +1970,6 @@ msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
 msgstr "Tipo"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_ROLE"
-msgstr "Consenti Retry"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_USER"
 msgstr "Consenti Retry"
 
@@ -5079,6 +5075,14 @@ msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_DAMAGED"
 #~ msgstr "La richiesta di tipo PKCS10 non è impostata correttamente"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED"
+#~ msgstr "Creator"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_ROLE"
+#~ msgstr "Consenti Retry"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
 #~ msgstr "Approva Richiesta"

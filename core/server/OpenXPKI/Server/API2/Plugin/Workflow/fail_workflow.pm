@@ -64,15 +64,11 @@ command "fail_workflow" => {
     ##! 2: "load workflow"
     my $workflow = $util->fetch_workflow($wf_id);
 
-    $util->factory->authorize_workflow({
-        ACTION => 'fail',
-        WORKFLOW => $workflow,
-    })
+    $util->factory->can_access_handle($workflow->type(), 'fail')
     or OpenXPKI::Exception->throw (
-        message => "No permission to execute fail_workflow on this workflow type",
-        params => { type => $workflow->type() }
+        message => "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE",
+        params => { type => $workflow->type(),  handle => 'fail' }
     );
-
 
     if (!$error) { $error = 'Failed by user'; }
     if (!$reason) { $reason = 'userfail'; }

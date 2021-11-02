@@ -59,7 +59,7 @@ command "get_workflow_base_info" => {
     # TODO we might use the OpenXPKI::Workflow::Config object for this
     # Note: Using create_workflow shreds a workflow id and creates an orphaned entry in the history table
 
-    if (not $util->factory->authorize_workflow({ ACTION => 'create', TYPE => $params->type })) {
+    if (not $util->factory->can_create_workflow( $params->type )) {
         OpenXPKI::Exception->throw(
             message => 'User is not authorized to fetch workflow info',
             params => { type => $params->type }

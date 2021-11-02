@@ -8,6 +8,7 @@ OpenXPKI::Server::API2::Plugin::Workflow::get_workflow_history
 =cut
 
 # Project modules
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 
@@ -51,13 +52,18 @@ command "get_workflow_history" => {
     my $wf_id = $params->id;
 
     my $util = OpenXPKI::Server::API2::Plugin::Workflow::Util->new;
-    $util->factory->authorize_workflow({
-        ACTION => 'history',
-        ID => $wf_id,
-    })
+
+    $self->api->check_workflow_acl( id => $wf_id )
     or OpenXPKI::Exception->throw (
-        message => "No permission to execute get_workflow_history on this workflow type",
-        params => { type => CTX('api2')->get_workflow_type_for_id(id => $wf_id) }
+        message => 'I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_USER',
+    );
+
+    my $wf_type = CTX('api2')->get_workflow_type_for_id( id => $wf_id );
+
+    $util->factory->can_access_handle($wf_type, 'history')
+    or OpenXPKI::Exception->throw (
+        message => 'I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE',
+        params => { type => $wf_type,  handle => 'history' }
     );
 
     my $history = CTX('dbi')->select_hashes(

@@ -516,8 +516,9 @@ sub has_tenant_handler {
     ##! 1: 'start'
     my $self = shift;
 
-    my $role = shift || CTX('session')->data->role;
+    my $role = shift;
     my $realm = CTX('session')->data->pki_realm;
+    $role ||= (CTX('session')->data->role || 'Anonymous');
 
     return defined $self->{PKI_REALM}->{$realm}->{TENANT}->{$role};
 
@@ -528,7 +529,8 @@ sub tenant_handler {
     ##! 1: 'start'
     my $self = shift;
 
-    my $role = shift || CTX('session')->data->role;
+    my $role = shift;
+    $role ||= (CTX('session')->data->role || 'Anonymous');
     ##! 8: 'role ' . $role
     my $realm = CTX('session')->data->pki_realm;
 

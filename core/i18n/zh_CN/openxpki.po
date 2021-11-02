@@ -1650,9 +1650,6 @@ msgstr "欢迎来到您的 OpenXPKI 信任中心"
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
 msgstr "每日消息"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_ROLE"
-msgstr "您当前的角色禁止访问此工作流程"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_USER"
 msgstr "当前用户禁止访问此工作流程"
 
@@ -4263,6 +4260,13 @@ msgstr "是"
 
 #~ msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_KEY_TOO_SHORT"
 #~ msgstr "The provided key is too short"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED"
+#~ msgstr "您无权启动此工作流程"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_ROLE"
+#~ msgstr "您当前的角色禁止访问此工作流程"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_LABEL"
 #~ msgstr "Approve"

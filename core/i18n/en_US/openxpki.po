@@ -1599,9 +1599,6 @@ msgstr "Welcome to your OpenXPKI Trustcenter"
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
 msgstr "Message of the Day"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_ROLE"
-msgstr "Access to this workflow is forbidden for your current role"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_USER"
 msgstr "Access to this workflow is forbidden for the current user"
 
@@ -4186,6 +4183,12 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_KEY_TOO_SHORT"
 #~ msgstr "The provided key is too short"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED"
+#~ msgstr "You are not allowed to access this workflow"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_ROLE"
+#~ msgstr "Access to this workflow is forbidden for your current role"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_LABEL"
 #~ msgstr "Approve"

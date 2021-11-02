@@ -103,6 +103,14 @@ Get the tenant owner of a certificate.
 Returns the content of the system_cert_tenant attribute or undef if
 none is found.
 
+B<Parameters>
+
+=over
+
+=item * C<identifier> I<Str> - certificate identifier
+
+=back
+
 =cut
 
 command "get_certificate_tenant" => {
@@ -120,6 +128,36 @@ command "get_certificate_tenant" => {
     return unless ($db_owner);
 
     return $db_owner->{attribute_value};
+};
+
+=head2 get_workflow_tenant
+
+Returns the content of the workflows tenant attribute or undef if
+none is found.
+
+B<Parameters>
+
+=over
+
+=item * C<id> I<Int> - workflow ID
+
+=back
+
+=cut
+
+command "get_workflow_tenant" => {
+    id => { isa => 'Int', required => 1, },
+} => sub {
+    my ($self, $params) = @_;
+
+    my $result = CTX('dbi')->select_one(
+        from => 'workflow_attributes',
+        columns => [ 'attribute_value' ],
+        where => { attribute_contentkey => 'tenant', workflow_id => $params->id },
+    );
+
+    return unless $result;
+    return $result->{attribute_value};
 };
 
 __PACKAGE__->meta->make_immutable;

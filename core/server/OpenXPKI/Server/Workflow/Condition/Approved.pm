@@ -39,15 +39,9 @@ sub _init
 
 sub evaluate
 {
-    my ( $self, $wf ) = @_;
+    my ( $self, $workflow ) = @_;
 
-    my $wf_factory = $wf->factory();
-
-    my $unfiltered_wf = $wf_factory->fetch_unfiltered_workflow(
-        $wf->type(),
-        $wf->id(),
-    );
-    my $context = $unfiltered_wf->context();
+    my $context = $workflow->context();
 
     ## load config
     my $roles = $self->role();

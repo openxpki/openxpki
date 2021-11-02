@@ -98,7 +98,7 @@ command "get_rpc_openapi_spec" => {
 
     my $workflow = $params->workflow;
 
-    if (not $self->factory->authorize_workflow({ ACTION => 'create', TYPE => $workflow })) {
+    if (not $self->factory->can_create_workflow( $workflow )) {
         OpenXPKI::Exception->throw(
             message => 'User is not authorized to fetch workflow info',
             params => { workflow => $workflow }

@@ -40,13 +40,10 @@ command "reset_workflow" => {
     ##! 2: "load workflow"
     my $workflow = $util->fetch_workflow($wf_id);
 
-    $util->factory->authorize_workflow({
-        ACTION => 'reset',
-        WORKFLOW => $workflow,
-    })
+    $util->factory->can_access_handle($workflow->type(), 'reset')
     or OpenXPKI::Exception->throw (
-        message => "No permission to execute reset_workflow on this workflow type",
-        params => { type => $workflow->type() }
+        message => "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE",
+        params => { type => $workflow->type(), handle => 'reset' }
     );
 
     $workflow->reset_hungup();

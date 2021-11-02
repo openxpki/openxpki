@@ -1641,10 +1641,6 @@ msgstr "Willkommen zu ihrem OpenXPKI Trustcenter"
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
 msgstr "Nachricht des Tages"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_ROLE"
-msgstr ""
-"Der Zugriff auf diesen Workflow ist für ihre Benutzerrolle nicht gestattet"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_USER"
 msgstr "Der Zugriff auf diesen Workflow ist für ihren Benutzer nicht gestattet"
 
@@ -3917,8 +3913,8 @@ msgstr "Policyverletzung"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_CERT_EXISTS_DESC"
 msgstr ""
 "Es wurde ein gültiges RA Token gefunden, das noch nicht erneuert werden muss."
-"Wenn Sie fortfahren wird ein neues Zertifikat erstellt, das bestehende"
-"Zertifikat bleibt erhalten und wird <b>NICHT</b> revoziert."
+"Wenn Sie fortfahren wird ein neues Zertifikat erstellt, das "
+"bestehendeZertifikat bleibt erhalten und wird <b>NICHT</b> revoziert."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_CERT_EXISTS_LABEL"
 msgstr "Gültiges RA Token gefunden"
@@ -4423,6 +4419,13 @@ msgstr "ja"
 
 #~ msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_KEY_TOO_SHORT"
 #~ msgstr "Der Schlüssel ist zu kurz"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED"
+#~ msgstr "Sie sind nicht berechtigt diesen Workflow zu öffnen."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_ROLE"
+#~ msgstr ""
+#~ "Der Zugriff auf diesen Workflow ist für ihre Benutzerrolle nicht gestattet"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_LABEL"
 #~ msgstr "Freigeben"

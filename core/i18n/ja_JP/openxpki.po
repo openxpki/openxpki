@@ -1692,9 +1692,6 @@ msgstr "OpenXPKI Trustcenter へようこそ"
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
 msgstr "今日のメッセージ"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_ROLE"
-msgstr "現在の権限ではこのワークフローへのアクセスは禁止されています"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_USER"
 msgstr "現在のユーザーはこのワークフローへのアクセスを禁止しています"
 
@@ -4489,6 +4486,13 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_VALIDATOR_PKCS10_DAMAGED"
 #~ msgstr "PKCS10リクエストが正しくフォーマットされていません"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED"
+#~ msgstr "このワークフローを開始することは許可されていません"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_ROLE"
+#~ msgstr "現在の権限ではこのワークフローへのアクセスは禁止されています"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_CSR_LABEL"
 #~ msgstr "承認リクエスト"
