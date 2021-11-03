@@ -192,6 +192,11 @@ div.oxi-grid th.sortable {
   -webkit-user-select: none;
 }
 
+/* temporary solution until we implement per-item configurable text wrapping */
+.oxi-grid {
+  white-space: nowrap;
+}
+
 .oxi-grid .oxi-formatted-subject {
   white-space: nowrap;
 }
@@ -299,6 +304,7 @@ tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
 }
 
 .oxi-infobox .oxi-keyvalue .oxi-base-label {
+  /* like Bootstraps "text-truncate" class */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
