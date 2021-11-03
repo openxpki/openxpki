@@ -3,8 +3,10 @@ dd{padding:0 0 0 1em}
 dd+dt{padding-top:.5em}
 .was-validated .form-check-input:valid~.form-check-label{color:inherit}
 .navbar .dropdown-header{border-bottom:1px solid #e9ecef;padding:.5rem}
+.form-control::placeholder{color:#cec3b9}
 @font-face{font-family:"Glyphicons Halflings";src:url(../fonts/glyphicons-halflings-regular.eot);src:url(../fonts/glyphicons-halflings-regular.eot?#iefix) format("embedded-opentype"),url(../fonts/glyphicons-halflings-regular.woff2) format("woff2")}
 .glyphicon,i.glyphicon{position:relative;top:1px;display:inline-block;font-family:"Glyphicons Halflings";font-style:normal;font-weight:400;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.styled-attention,.styled-failed,.tab-close{font-weight:700}
 .glyphicon-asterisk:before{content:"\002a"}
 .glyphicon-plus:before{content:"\002b"}
 .glyphicon-eur:before,.glyphicon-euro:before{content:"\20ac"}
@@ -276,7 +278,7 @@ body,html{height:100%}
 }
 .oxi-push-footer{min-height:100%;height:auto!important;height:100%;margin:0 auto -60px;padding:0 0 60px}
 .oxi-footer{height:60px;padding-top:20px}
-.tab-close{font-size:18px;font-weight:700;line-height:1;color:#000;text-shadow:0 1px 0 #fff;opacity:.2}
+.tab-close{font-size:18px;line-height:1;color:#000;text-shadow:0 1px 0 #fff;opacity:.2}
 .tab-close:focus,.tab-close:hover{color:#000;text-decoration:none;cursor:pointer;opacity:.5}
 .breadcrumb,.breadcrumb-item+.breadcrumb-item::before{color:#a0a0a0}
 .userinfo{font-size:80%}
@@ -298,7 +300,8 @@ body,html{height:100%}
 .breadcrumb .cert-search::before,.breadcrumb .workflow-search::before{content:"\e003"}
 .breadcrumb .cert-search-result::before,.breadcrumb .workflow-search-result::before{content:"\e056"}
 .oxi-grid-container{padding-bottom:40px}
-div.oxisection-grid th.sortable{cursor:pointer;-webkit-user-select:none}
+div.oxi-grid th.sortable{cursor:pointer;-webkit-user-select:none}
+.oxi-grid,.oxi-grid .oxi-formatted-subject{white-space:nowrap}
 tr.gridrow-issued:hover>td,tr.gridrow:hover>td{background-color:#E7E7E7!important}
 tr.gridrow-expired>td{background-color:#fcf8e3!important}
 tr.gridrow-expired:hover>td{background-color:#E7E7E7!important}
@@ -340,12 +343,12 @@ tr.gridrow-danger:hover>td{background-color:#e6c1c7!important}
 .oxi-keyvalue-dots{overflow:hidden;white-space:nowrap}
 .oxi-keyvalue-dots::after{content:". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";color:#9cA5Ad}
 .oxi-keyvalue-head.spacer{margin-top:1rem;background-color:#eee}
+.oxi-infobox .oxi-keyvalue .oxi-base-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .certstatus-issued,.dns-valid,.styled-valid{color:green}
 .certstatus-revoked,.dns-failed,.styled-failed{color:red}
 .certstatus-crl_issuance_pending,.dns-skipped,.styled-attention{color:orange}
 .certstatus-expired{color:#444}
 .certstatus-unknown,.dns-timeout{color:#79d1f3}
-.styled-attention,.styled-failed{font-weight:700}
 .oxi-status-danger{background-color:#f8d7da;color:#721c24}
 .oxi-status-warning{background-color:#fff3cd;color:#856404}
 code{white-space:pre}
