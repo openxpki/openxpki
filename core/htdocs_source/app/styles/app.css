@@ -187,9 +187,13 @@ body {
   padding-bottom:40px;
 }
 
-div.oxisection-grid th.sortable {
+div.oxi-grid th.sortable {
   cursor: pointer;
   -webkit-user-select: none;
+}
+
+.oxi-grid .oxi-formatted-subject {
+  white-space: nowrap;
 }
 
 /* plain grid-row without status */
@@ -292,6 +296,12 @@ tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
 .oxi-keyvalue-head.spacer {
   margin-top: 1rem;
   background-color: #eee;
+}
+
+.oxi-infobox .oxi-keyvalue .oxi-base-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Status labels */

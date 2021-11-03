@@ -1,5 +1,5 @@
 {{~#each (arrayify @text) as |txt|~}}
-    <div class="{{@class}} {{this.cssClasses}}">
+    <div class="{{@class}} {{this.cssClasses}} oxi-base-label">
         {{#if @tooltip}}
             <EmberTooltip>
                 {{@tooltip}}

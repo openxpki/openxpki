@@ -4,13 +4,13 @@
         {{!-- just so that all following "else if" look the same --}}
 
     {{else if (eq "raw" this.format)}}
-        <OxiBase::Label @text={{this.valueStr}} @raw={{true}} @truncate={{true}} @raw_tooltip={{v}}/>
+        <OxiBase::Label @text={{this.valueStr}} @raw={{true}} @raw_tooltip={{v}}/>
 
     {{else if (eq "text" this.format)}}
-        <OxiBase::Label @text={{v}} @raw={{false}} @truncate={{true}} @raw_tooltip={{v}}/>
+        <OxiBase::Label @text={{v}} @raw={{false}} @tooltip={{v}}/>
 
     {{else if (eq "subject" this.format)}}
-        <OxiBase::Label @text={{v}} @raw={{false}} @inline={{true}} @nowrap={{true}} />
+        <OxiBase::Label @text={{v}} @raw={{false}} @tooltip={{v}} @inline={{true}} @class="oxi-formatted-subject" />
 
     {{else if (eq "nl2br" this.format)}}
         {{#each this.valueSplitByNewline as |line|}} {{line}}<br> {{/each}}

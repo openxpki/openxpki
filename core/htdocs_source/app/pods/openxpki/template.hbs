@@ -114,7 +114,7 @@
             <div class="tab-pane {{if entry.active "active"}}">
                 <div class="row">
                     {{!-- Main page content --}}
-                    <div class="{{if entry.right "col-lg-8" "col-12"}}">
+                    <div class="{{if entry.right "col-lg-8" "col-12"}} oxi-main">
                         {{#each entry.main as |mainEntry|}}
                             <div class="p-0 {{if (and (eq mainEntry.type "form") (not entry.right)) "col-xl-8" "col-12"}}">
                                 <OxiSection
@@ -126,7 +126,7 @@
                     </div>
                     {{!-- Infobox - right hand info column --}}
                     {{#if entry.right}}
-                        <div class="col-lg-4">
+                        <div class="col-lg-4 oxi-infobox">
                             {{#each entry.right as |rightEntry|}}
                                 <div class="card bg-light border-secondary">
                                     <div class="card-body p-1">
