@@ -495,13 +495,23 @@ sub login_step {
         );
     }
 
-    if ($self->has_tenant_handler( $last_result->role() ) && !$last_result->has_tenants()) {
-        CTX('log')->auth()->error(sprintf('Login failed, no tenant information for user: %s, role: %s)', $last_result->username(), $last_result->role()));
-        OpenXPKI::Exception::Authentication->throw(
-            message => 'I18N_OPENXPKI_UI_AUTHENTICATION_FAILED_TENANT_REQUIRED',
-            authinfo => $last_result->authinfo(),
-            params => { username => $last_result->username(), role => $last_result->role() }
-        );
+    if ($self->has_tenant_handler( $last_result->role() )) {
+        if (!$last_result->has_tenants()) {
+            CTX('log')->auth()->error(sprintf('Login failed, no tenant information for user: %s, role: %s)', $last_result->username(), $last_result->role()));
+            OpenXPKI::Exception::Authentication->throw(
+                message => 'I18N_OPENXPKI_UI_AUTHENTICATION_FAILED_TENANT_REQUIRED',
+                authinfo => $last_result->authinfo(),
+                params => { username => $last_result->username(), role => $last_result->role() }
+            );
+        }
+        if (!defined $self->tenant_handler( $last_result->role() )->validate_tenants( $last_result->tenants() )) {
+            CTX('log')->auth()->error(sprintf('Login failed, tenant information not valid for handler: %s, role: %s)', $last_result->username(), $last_result->role()));
+            OpenXPKI::Exception::Authentication->throw(
+                message => 'I18N_OPENXPKI_UI_AUTHENTICATION_FAILED_TENANT_INVALID',
+                authinfo => $last_result->authinfo(),
+                params => { username => $last_result->username(), role => $last_result->role(), $last_result->tenants() }
+            );
+        }
     }
 
     CTX('log')->auth()->info(sprintf("Login successful (user: %s, role: %s)",
