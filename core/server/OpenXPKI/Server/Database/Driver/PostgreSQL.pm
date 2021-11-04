@@ -78,7 +78,7 @@ sub table_drop_query {
 sub do_sql_replacements {
     my ($self, $sql) = @_;
 
-    $sql =~ s/from_unixtime \s* \( \s* ( [^\)]+ ) \)/TO_TIMESTAMP($1)/msxi;
+    $sql =~ s/from_unixtime \s* \( \s* ( [^\)]+ ) \)/TO_TIMESTAMP($1)/gmsxi;
 
     return $sql;
 }

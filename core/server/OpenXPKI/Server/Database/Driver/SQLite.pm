@@ -69,8 +69,8 @@ sub _get_x_from_date {
 sub do_sql_replacements {
     my ($self, $sql) = @_;
 
-    $sql =~ s/from_unixtime \s* \( \s* ( [^\)]+ ) \)/DATETIME($1, 'unixepoch')/msxi;
-    $sql =~ s/extract \s* \( \s* ( [^\)\s]+ ) \s+ from \s+ ( [^\(]* \( [^\)]* \) )* [^\)]* \)/_get_x_from_date($1,$2)/emsxi;
+    $sql =~ s/from_unixtime \s* \( \s* ( [^\)]+ ) \)/DATETIME($1, 'unixepoch')/gmsxi;
+    $sql =~ s/extract \s* \( \s* ( [^\)\s]+ ) \s+ from \s+ ( [^\(]* \( [^\)]* \) )* [^\)]* \)/_get_x_from_date($1,$2)/gemsxi;
 
     return $sql;
 }

@@ -82,7 +82,7 @@ sub count_rows {
 sub do_sql_replacements {
     my ($self, $sql) = @_;
 
-    $sql =~ s{from_unixtime \s* \( \s* ( [^\)]+ ) \)}{TO_DATE\('19700101','YYYYMMDD'\) + \(1/86400\) * $1}msxi;
+    $sql =~ s{from_unixtime \s* \( \s* ( [^\)]+ ) \)}{TO_DATE\('19700101','YYYYMMDD'\) + \(1/86400\) * $1}gmsxi;
 
     return $sql;
 }
