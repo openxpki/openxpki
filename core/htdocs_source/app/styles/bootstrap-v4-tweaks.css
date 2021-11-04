@@ -26,6 +26,12 @@ dd + dt {
   padding: 0.5rem 0.5rem;
 }
 
+/* lighter placeholder color */
 .form-control::placeholder {
   color: #cec3b9;
+}
+
+/* always grow small tables to container width */
+.table thead th {
+  width: 100%;
 }
