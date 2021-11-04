@@ -10,6 +10,7 @@ body {
   height: 100%;
 }
 
+/* Header */
 .oxi-header {
   margin-bottom: 0;
 }
@@ -18,6 +19,7 @@ body {
   color: #757373;
 }
 
+/* Navigation bar (menu) */
 .oxi-navbar {
   background-color: #e8e8e8;
   border-bottom: 2px solid #757373;
@@ -26,24 +28,43 @@ body {
   color: #484b4f;
 }
 
+/* Content */
+.oxi-page {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.oxi-page > .row {
+  min-height: 100vh;
+}
+
+.oxi-content {
+  background-color: #fff;
+}
+
 /* Shrink application width for large screens */
 @media (min-width: 1600px) {
-  .oxi-application {
+  .oxi-width-restricted {
     flex: 0 0 83.333333%; /* = col-10 */
     max-width: 83.333333%;
   }
 }
 @media (min-width: 2000px) {
-  .oxi-application {
+  .oxi-width-restricted {
     flex: 0 0 66.666667%; /* = col-8 */
     max-width: 66.666667%;
   }
 }
 @media (min-width: 2600px) {
-  .oxi-application {
+  .oxi-width-restricted {
     flex: 0 0 50%; /* = col-6 */
     max-width: 50%;
   }
+}
+
+.oxi-width-full {
+  flex: 0 0 calc(100% - 1.5rem);
+  max-width: calc(100% - 1.5rem);
 }
 
 /* Only used to push down the footer element */
@@ -60,10 +81,6 @@ body {
 .oxi-footer {
   height: 60px;
   padding-top: 20px;
-  background-color: #f5f5f5;
-}
-
-.oxi-the-void {
   background-color: #f5f5f5;
 }
 
@@ -85,6 +102,41 @@ body {
 
 .userinfo {
   font-size: 80%;
+}
+
+/******************************************************************************
+ * Vertical resize "button" bar
+ */
+
+.oxi-resize-overlay {
+  max-width: 1.5rem;
+  padding-top: 10% !important;
+  text-align: center;
+  flex-grow: 100; /* to win over flex sizing of oxi-the-void, i.e. get max-width */
+}
+.oxi-resize-overlay span::after {
+}
+
+/* Restricted size page container */
+.oxi-width-restricted + .oxi-resize-overlay:hover {
+  background-color: #007bff;
+}
+
+.oxi-width-restricted + .oxi-resize-overlay span::after {
+  content: "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" ;
+  white-space: pre;
+  visibility: hidden;
+  color: #fff;
+}
+
+.oxi-width-restricted + .oxi-resize-overlay:hover span::after {
+  visibility: visible;
+}
+
+/* Full size page container */
+.oxi-width-full + .oxi-resize-overlay span::after {
+  content: "«" '\A' "«" '\A' "«" '\A' "«" '\A' "«" '\A' "«" '\A' "«" '\A' "«" '\A' "«" '\A' "«" ;
+  white-space: pre;
 }
 
 /******************************************************************************
@@ -184,7 +236,7 @@ body {
  */
 
 .oxi-grid-container {
-  padding-bottom:40px;
+  padding-bottom: 40px;
 }
 
 div.oxi-grid th.sortable {
@@ -192,12 +244,7 @@ div.oxi-grid th.sortable {
   -webkit-user-select: none;
 }
 
-/* temporary solution until we implement per-item configurable text wrapping */
 .oxi-grid {
-  white-space: nowrap;
-}
-
-.oxi-grid .oxi-formatted-subject {
   white-space: nowrap;
 }
 
