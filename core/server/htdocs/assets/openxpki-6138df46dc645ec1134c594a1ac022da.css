@@ -1,9 +1,11 @@
 .oxi-header,dl,ul{margin-bottom:0}
+.oxi-page,.oxi-page>.row{min-height:100vh}
 dd{padding:0 0 0 1em}
 dd+dt{padding-top:.5em}
 .was-validated .form-check-input:valid~.form-check-label{color:inherit}
 .navbar .dropdown-header{border-bottom:1px solid #e9ecef;padding:.5rem}
 .form-control::placeholder{color:#cec3b9}
+.table thead th{width:100%}
 @font-face{font-family:"Glyphicons Halflings";src:url(../fonts/glyphicons-halflings-regular.eot);src:url(../fonts/glyphicons-halflings-regular.eot?#iefix) format("embedded-opentype"),url(../fonts/glyphicons-halflings-regular.woff2) format("woff2")}
 .glyphicon,i.glyphicon{position:relative;top:1px;display:inline-block;font-family:"Glyphicons Halflings";font-style:normal;font-weight:400;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 .styled-attention,.styled-failed,.tab-close{font-weight:700}
@@ -144,7 +146,7 @@ dd+dt{padding-top:.5em}
 .glyphicon-circle-arrow-up:before{content:"\e133"}
 .glyphicon-circle-arrow-down:before{content:"\e134"}
 .glyphicon-globe:before{content:"\e135"}
-.breadcrumb .workflow-type::before,.glyphicon-wrench:before{content:"\e136"}
+.glyphicon-wrench:before{content:"\e136"}
 .glyphicon-tasks:before{content:"\e137"}
 .glyphicon-filter:before{content:"\e138"}
 .glyphicon-briefcase:before{content:"\e139"}
@@ -268,20 +270,27 @@ dd+dt{padding-top:.5em}
 body,html{height:100%}
 .oxi-header-bar{color:#757373}
 .oxi-navbar{background-color:#e8e8e8;border-bottom:2px solid #757373}
-.oxi-footer,.oxi-the-void{background-color:#f5f5f5}
 .oxi-navbar.navbar-light .navbar-nav .nav-link{color:#484b4f}
-@media (min-width:1600px){.oxi-application{flex:0 0 83.333333%;max-width:83.333333%}
+.oxi-page{background-color:#f5f5f5}
+.oxi-content{background-color:#fff}
+@media (min-width:1600px){.oxi-width-restricted{flex:0 0 83.333333%;max-width:83.333333%}
 }
-@media (min-width:2000px){.oxi-application{flex:0 0 66.666667%;max-width:66.666667%}
+@media (min-width:2000px){.oxi-width-restricted{flex:0 0 66.666667%;max-width:66.666667%}
 }
-@media (min-width:2600px){.oxi-application{flex:0 0 50%;max-width:50%}
+@media (min-width:2600px){.oxi-width-restricted{flex:0 0 50%;max-width:50%}
 }
+.oxi-width-full{flex:0 0 calc(100% - 1.5rem);max-width:calc(100% - 1.5rem)}
 .oxi-push-footer{min-height:100%;height:auto!important;height:100%;margin:0 auto -60px;padding:0 0 60px}
-.oxi-footer{height:60px;padding-top:20px}
+.oxi-footer{height:60px;padding-top:20px;background-color:#f5f5f5}
 .tab-close{font-size:18px;line-height:1;color:#000;text-shadow:0 1px 0 #fff;opacity:.2}
 .tab-close:focus,.tab-close:hover{color:#000;text-decoration:none;cursor:pointer;opacity:.5}
-.breadcrumb,.breadcrumb-item+.breadcrumb-item::before{color:#a0a0a0}
 .userinfo{font-size:80%}
+.oxi-resize-overlay{max-width:1.5rem;padding-top:10%!important;text-align:center;flex-grow:100}
+.oxi-width-restricted+.oxi-resize-overlay:hover{background-color:#007bff}
+.oxi-width-restricted+.oxi-resize-overlay span::after{content:"»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»" '\A' "»";white-space:pre;visibility:hidden;color:#fff}
+.breadcrumb,.breadcrumb-item+.breadcrumb-item::before{color:#a0a0a0}
+.oxi-width-restricted+.oxi-resize-overlay:hover span::after{visibility:visible}
+.oxi-width-full+.oxi-resize-overlay span::after{content:"«" '\A' "«" '\A' "«" '\A' "«" '\A' "«" '\A' "«" '\A' "«" '\A' "«" '\A' "«" '\A' "«";white-space:pre}
 .pagination li:not(.disabled)>a{cursor:pointer}
 .dimmer{position:fixed;top:0;bottom:0;left:0;right:0;background-color:#fff;opacity:.7;z-index:1001}
 .oxi-loading-banner{position:fixed;top:1%;right:1%;z-index:1002}
@@ -296,12 +305,13 @@ body,html{height:100%}
 }
 .breadcrumb{padding:0;margin-bottom:1rem;background-color:transparent;border-radius:0}
 .breadcrumb-item::before,.oxi-button-container a.btn::before{font-family:"Glyphicons Halflings";padding-right:.5rem}
+.breadcrumb .workflow-type::before{content:"\e136"}
 .breadcrumb .workflow-state::before{content:"\e062"}
 .breadcrumb .cert-search::before,.breadcrumb .workflow-search::before{content:"\e003"}
 .breadcrumb .cert-search-result::before,.breadcrumb .workflow-search-result::before{content:"\e056"}
 .oxi-grid-container{padding-bottom:40px}
 div.oxi-grid th.sortable{cursor:pointer;-webkit-user-select:none}
-.oxi-grid,.oxi-grid .oxi-formatted-subject{white-space:nowrap}
+.oxi-grid{white-space:nowrap}
 tr.gridrow-issued:hover>td,tr.gridrow:hover>td{background-color:#E7E7E7!important}
 tr.gridrow-expired>td{background-color:#fcf8e3!important}
 tr.gridrow-expired:hover>td{background-color:#E7E7E7!important}
