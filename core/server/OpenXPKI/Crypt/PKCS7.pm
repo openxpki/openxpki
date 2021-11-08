@@ -465,9 +465,65 @@ sub decode_tag {
     return substr($raw, $tagbytes + $lengthbytes);
 }
 
+=head2 encode_tag
+
+Takes a value and a class and encodes value as ASN1 tag. The class can
+be any valid class number (integer) or a class name from the following
+list:
+
+=over
+
+=item INTEGER
+
+=item BIT STRING
+
+=item OCTET STRING
+
+=item NULL
+
+=item OBJECT IDENTIFIER
+
+=item UTF8String
+
+=item SEQUENCE
+
+=item SET
+
+=item PrintableString
+
+=item T61String
+
+=item IA5String
+
+=item UTCTime
+
+=back
+
+=cut
+
 sub encode_tag {
     my $value = shift;
     my $class = shift || 4;
+
+    my %tagmap = (
+        'INTEGER' => 2,
+        'BIT STRING' => 3,
+        'OCTET STRING' => 4,
+        'NULL' => 5,
+        'OBJECT IDENTIFIER' => 6,
+        'UTF8String' => 12,
+        'SEQUENCE' => 16,
+        'SET' => 17,
+        'PrintableString' => 19,
+        'T61String' => 20,
+        'IA5String' => 22,
+        'UTCTime' => 23
+    );
+
+    if ($class !~ m{\A\d+\z}) {
+        $class = $tagmap{$class} || die "Invalid class name given";
+    }
+
     return asn_encode_tag($class).asn_encode_length(length($value)).$value;
 }
 
