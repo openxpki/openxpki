@@ -1,12 +1,14 @@
 package OpenXPKI::Crypt::DN;
 
 use Moose;
+use OpenXPKI::DN;
 
 with 'OpenXPKI::Role::SubjectOID';
 
 has sequence => (
-    is => 'ro',
+    is => 'rw',
     isa => 'ArrayRef',
+    writer => '_sequence',
 );
 
 has subject => (
@@ -56,6 +58,29 @@ sub __create_openssl_subject {
         $subject .= '/'.$comp;
     }
     return $subject;
+
+}
+
+sub from_string {
+
+    my $self = OpenXPKI::Crypt::DN->new();
+    my $string = shift;
+
+    my $dn = OpenXPKI::DN->new( $string );
+
+    my @rdnlist = $dn->get_parsed();
+    my @result;
+    foreach my $comp (@rdnlist) {
+        my @temp = map {
+            {
+                type => $self->get_oid_for_name($_->[0]),
+                value => { utf8String => $_->[1] }
+            };
+        } (@$comp);
+        push @result, \@temp;
+    }
+    $self->_sequence(\@result);
+    return $self;
 
 }
 

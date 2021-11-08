@@ -10,6 +10,14 @@ has subject_oid_map => (
     builder => '__build_subject_oid_map',
 );
 
+has subject_oid_reverse_map => (
+    is => 'rw',
+    isa => 'HashRef',
+    required => 0,
+    lazy => 1,
+    builder => '__build_subject_oid_reverse_map'
+);
+
 sub __build_subject_oid_map {
     return {
         "2.5.4.3"                       => ['CN','commonName'],
@@ -45,6 +53,22 @@ sub __build_subject_oid_map {
     };
 }
 
+sub __build_subject_oid_reverse_map {
+
+    my $self = shift;
+    my $map = $self->subject_oid_map();
+    my $flip_map;
+    foreach my $oid (keys %{$map}) {
+        my $val = $map->{$oid};
+        if (ref $val) {
+            map { $flip_map->{$_} = $oid; } @{$val};
+        } else {
+            $flip_map->{$val} = $oid;
+        }
+    }
+    return $flip_map;
+}
+
 sub render_rdn {
 
     my $self = shift;
@@ -58,6 +82,16 @@ sub render_rdn {
 
     my ($val) = values %{$rdn->{value}};
     return "$name=$val";
+}
+
+sub get_oid_for_name {
+
+    my $self = shift;
+    my $name = shift;
+
+    my $map = $self->subject_oid_reverse_map();
+    return $map->{$name};
+
 }
 
 1;
