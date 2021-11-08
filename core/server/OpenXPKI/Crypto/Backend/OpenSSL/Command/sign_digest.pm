@@ -35,14 +35,8 @@ sub get_command {
                   "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_KEY"
             );
         }
-        if ( not exists $self->{CERT} ) {
-            OpenXPKI::Exception->throw( message =>
-                  "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_PKCS7_SIGN_MISSING_CERT"
-            );
-        }
 
         # prepare parameters
-
         $passwd = $self->{PASSWD};
         my $engine_usage = $self->{ENGINE}->get_engine_usage();
         $engine = $self->__get_used_engine();
@@ -129,32 +123,32 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_sign
+OpenXPKI::Crypto::Backend::OpenSSL::Command::sign_digest
 
 =head1 Functions
 
 =head2 get_command
 
-If you want to create a signature with the used engine/token then you have
-only to specify the CONTENT.
+If you want to create a signature with the used engine/token then you
+have to specify only DIGEST (the binary digest value that should be
+signed). If you want to create a normal signature then you must
+specify KEY and PASSWD.
 
-If you want to create a normal signature then you must specify at minimum
-a CERT, a KEY and a PASSWD. If you want to use the engine then you must use
-ENGINE_USAGE ::= ALWAYS||PRIV_KEY_OPS too.
+If you want to use the engine then you must use ENGINE_USAGE ::=
+ALWAYS||PRIV_KEY_OPS too.
+
+The signature will be done with the SHA algorithm, the length
+is determined from the size of the content. Supported digest length
+are 128, 224, 256, 384, 512 bits.
+
 
 =over
 
-=item * CONTENT
-
-=item * ENGINE_USAGE
-
-=item * CERT
+=item * DIGEST
 
 =item * KEY
 
 =item * PASSWD
-
-=item * DETACH (strip off the content from the resulting PKCS#7 structure)
 
 =back
 
@@ -168,4 +162,4 @@ returns true
 
 =head2 get_result
 
-returns the PKCS#7 signature in PEM format
+returns the raw signature in binary format
