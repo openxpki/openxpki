@@ -23,6 +23,9 @@ msgstr "Unerwarteter Fehler in der Anwendung"
 msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED"
 msgstr "Anmeldung fehlgeschlagen"
 
+msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED_TENANT_INVALID"
+msgstr "Anmeldung fehlgeschlagen (Mandateninformation ungültig)"
+
 msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED_TENANT_REQUIRED"
 msgstr "Anmeldung fehlgeschlagen (Benutzerdaten unvollständig)"
 

@@ -25,6 +25,10 @@ msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED"
 msgstr "ワークフローの取り消し"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED_TENANT_INVALID"
+msgstr "ワークフローの取り消し"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED_TENANT_REQUIRED"
 msgstr "ワークフローの取り消し"
 
