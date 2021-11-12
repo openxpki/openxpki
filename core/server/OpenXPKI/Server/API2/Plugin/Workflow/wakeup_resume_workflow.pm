@@ -154,7 +154,7 @@ sub _wakeup_or_resume_workflow {
 
     # wakeup from watchdog is always ok
     my @caller = $self->rawapi->my_caller(1);
-    ($caller[0] ne 'OpenXPKI::Server::Watchdog')
+    ($caller[0] eq 'OpenXPKI::Server::Watchdog')
     or ($util->factory->can_access_handle($workflow->type(), ($wakeup_mode ? 'wakeup' : 'resume')))
     or OpenXPKI::Exception->throw (
         message => "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE",
