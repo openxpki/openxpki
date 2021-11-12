@@ -86,7 +86,9 @@
                 {{/each}}
             </ol>
         {{/if}}
-        <h3>{{this.model.tabs.firstObject.page.label}}</h3>
+        {{#if this.model.tabs.firstObject.page.label}}
+            <h3>{{this.model.tabs.firstObject.page.label}}</h3>
+        {{/if}}
     </div>
 
     {{#if this.model.tabs.firstObject.page.description}}
