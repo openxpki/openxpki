@@ -63,8 +63,9 @@ sub execute {
     ##! 16: "$offset_year / $offset_month"
     my $get_index = sub {
         my $value = shift;
-        return ((int($value / 100) - $offset_year) * 12)
-             + (($value % 100) - $offset_month);
+        my ($year, $month) = ($value =~ m{(\d{4})(\d+)});
+        return (($year - $offset_year) * 12)
+             + ($month - $offset_month);
     };
 
     my $last_group = $db->select_one(%base_query, columns => [ sprintf($select_column, $stop_at) ]);
