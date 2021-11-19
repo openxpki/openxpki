@@ -45,6 +45,7 @@ OpenXPKI/Client/Simple.pm
 OpenXPKI/Client/Service/Base.pm
 OpenXPKI/Client/Service/RPC.pm
 OpenXPKI/Client/Service/Response.pm
+OpenXPKI/Client/Service/SCEP.pm
 OpenXPKI/Client/Service/Role/PickupWorkflow.pm
 
 # New UI Client
@@ -89,6 +90,7 @@ OpenXPKI/Crypt/PKCS7.pm
 OpenXPKI/Crypt/PKCS10.pm
 OpenXPKI/Crypt/PubKey.pm
 OpenXPKI/Crypt/X509.pm
+OpenXPKI/Crypt/PKCS7/SCEP.pm
 
 ## Crypto layer
 
@@ -259,6 +261,7 @@ OpenXPKI/Server/API2/Plugin/Control/purge_application_log.pm
 OpenXPKI/Server/API2/Plugin/Crypto/generate_key.pm
 OpenXPKI/Server/API2/Plugin/Crypto/get_key_identifier_from_data.pm
 OpenXPKI/Server/API2/Plugin/Crypto/get_random.pm
+OpenXPKI/Server/API2/Plugin/Crypto/scep_message_handler.pm
 OpenXPKI/Server/API2/Plugin/Crypto/validate_ruleset.pm
 OpenXPKI/Server/API2/Plugin/Crypto/password_quality.pm
 OpenXPKI/Server/API2/Plugin/Crypto/password_quality/CheckEntropyRole.pm
@@ -606,6 +609,7 @@ bin/openxpkicmd
 
 # cgi stuff
 cgi-bin/scep.fcgi
+cgi-bin/scep-beta.fcgi
 cgi-bin/webui.fcgi
 cgi-bin/soap.fcgi
 cgi-bin/download.fcgi

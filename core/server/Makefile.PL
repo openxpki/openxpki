@@ -302,8 +302,7 @@ WriteMakefile(
         'Crypt::Argon2'                 => 0,
         'Crypt::CBC'                    => '2.29',
         'Crypt::OpenSSL::AES'           => '0.02',      # e.g. OpenXPKI::Crypto::VolatileVault
-        'CryptX'                        => '0.068',     # Crypt::* modules for key checking
-        'Crypt::Cipher::AES'            => 0,           # replacement to support keysize > 128
+        'CryptX'                        => '0.068',     # Crypt::* modules for key checking, Ciphers for Crypt::CBC
         'Crypt::JWT'                    => 0,
         'Crypt::PKCS10'                 => '2.000',
         'Crypt::Rijndael'               => '1.13',      # OpenXPKI::Crypto::Secret::SplitEncrypted, via Crypt::CBC
