@@ -13,7 +13,7 @@ use OpenXPKI::Crypt::X509;
 
 use Moose::Exporter;
 Moose::Exporter->setup_import_methods(
-    as_is => ['decode_tag','encode_tag']
+    as_is => ['decode_tag','encode_tag','find_oid']
 );
 
 our %oids = (
@@ -420,6 +420,7 @@ sub __build_envelope_enveloped_data {
     return {
         enc_alg => $oids{$enc_oid} || $enc_oid,
         key_alg => [ map { $oids{$_} || $_ } keys %key_enc_oid ],
+        recipient => $self->recipients()
     };
 
 }
@@ -447,6 +448,12 @@ sub __build_payload {
     my $self = shift;
     return decode_tag( $self->parsed()->{content}->{contentInfo}->{content} );
 
+}
+
+sub find_oid {
+    my $name = shift;
+    my %rmap = reverse %OpenXPKI::Crypt::PKCS7::oids;
+    return $rmap{$name} || $name;
 }
 
 # static methods that are also exported
