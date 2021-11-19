@@ -37,6 +37,12 @@ has logger => (
     default  => sub { my $self = shift; return $self->config()->logger() },
 );
 
+has operation => (
+    is      => 'ro',
+    isa     => 'Str',
+    #required => 1,
+);
+
 sub _init_backend {
 
     my $self = shift;
@@ -139,13 +145,15 @@ sub handle_enrollment_request {
 
     my $self = shift;
     my $cgi = shift;
-    my $operation = shift;
+    my $operation = shift || $self->operation();
 
     my $config = $self->config();
     my $log = $self->logger();
 
     my $conf = $config->config();
 
+    # Build configuration parameters, can be overloaded by protocols
+    # e.g. SCEP to inject data from the input
     my $param = $self->build_params( $operation );
 
     if (!defined $param) {
@@ -158,29 +166,35 @@ sub handle_enrollment_request {
         return OpenXPKI::Client::Service::Response->new( 50001 );
     }
 
-    # The CSR comes PEM encoded without borders as POSTDATA
-    my $pkcs10 = $cgi->param( 'POSTDATA' );
+    # if pkcs10 was not already passed from build params
+    # we assume it is a raw POST
+    if (!defined $param->{pkcs10}) {
+        # Usually PEM encoded but without borders as POSTDATA
+        my $pkcs10 = $cgi->param( 'POSTDATA' );
+        if (!$pkcs10) {
+            $log->debug( 'Incoming enrollment with empty body' );
+            return OpenXPKI::Client::Service::Response->new( 40003 );
+        }
 
-    if (!$pkcs10) {
-        $log->debug( 'Incoming enrollment with empty body' );
-        return OpenXPKI::Client::Service::Response->new( 40003 );
-    }
+        # Crypt::PKCS10 expects binary or PEM with headers
+        # for simplecmc the payload is already binary -> noop
+        # for EST the payload is base64 encoded -> decode
+        # Sending PEM with headers is not allowed in neither one but
+        # will be gracefully accepted and converted by Crypt::PKSC10
+        if ($pkcs10 =~ m{\A [\w/+=\s]+ \z}xm) {
+            $pkcs10 = decode_base64($pkcs10);
+        }
 
-    # Crypt::PKCS10 expects binary or PEM with headers
-    # for simplecmc the payload is already binary -> noop
-    # for EST the payload is base64 encoded -> decode
-    # Sending PEM with headers is not allowed in neither one but
-    # will be gracefully accepted and converted by Crypt::PKSC10
-    if ($pkcs10 =~ m{\A [\w/+=\s]+ \z}xm) {
-        $pkcs10 = decode_base64($pkcs10);
-    }
-
-    Crypt::PKCS10->setAPIversion(1);
-    my $decoded = Crypt::PKCS10->new($pkcs10, ignoreNonBase64 => 1, verifySignature => 1);
-    if (!$decoded) {
-        $log->error('Unable to parse PKCS10: '. Crypt::PKCS10->error);
-        $log->debug($pkcs10);
-        return OpenXPKI::Client::Service::Response->new( 40002 );
+        Crypt::PKCS10->setAPIversion(1);
+        my $decoded = Crypt::PKCS10->new($pkcs10, ignoreNonBase64 => 1, verifySignature => 1);
+        if (!$decoded) {
+            $log->error('Unable to parse PKCS10: '. Crypt::PKCS10->error);
+            $log->debug($pkcs10);
+            return OpenXPKI::Client::Service::Response->new( 40002 );
+        }
+        $param->{pkcs10} = $decoded->csrRequest(1);
+        # we might accept transaction_id via GET with POSTed payload
+        $param->{transaction_id} = sha1_hex($decoded->csrRequest) unless($param->{transaction_id});
     }
 
     # fall back to simpleneroll config for simplereenroll if not set
@@ -197,14 +211,10 @@ sub handle_enrollment_request {
     };
     $log->debug(Dumper $pickup_config);
 
-    my $transaction_id = sha1_hex($decoded->csrRequest);
-
     my $workflow;
     eval {
 
-        $param->{pkcs10} = $decoded->csrRequest(1);
-        Log::Log4perl::MDC->put('tid', $transaction_id);
-        $param->{transaction_id} = $transaction_id;
+        Log::Log4perl::MDC->put('tid', $param->{transaction_id});
 
         # check for pickup parameter
         my $pickup_value;
@@ -220,7 +230,7 @@ sub handle_enrollment_request {
             }
         } else {
             # pickup via transaction_id
-            $pickup_value = $transaction_id;
+            $pickup_value = $param->{transaction_id};
         }
 
         # try pickup
@@ -240,18 +250,17 @@ sub handle_enrollment_request {
     };
 
     if (!$workflow || ( $workflow->{'proc_state'} ne 'finished' && !$workflow->{id} ) || $workflow->{'proc_state'} eq 'exception') {
+        if (my $err = $client->last_reply()->{ERROR}) {
+            if ($err->{CLASS} eq 'OpenXPKI::Exception::InputValidator') {
+                $log->error( 'Input validation failed');
+                return OpenXPKI::Client::Service::Response->new( 40004 );
+            }
+        }
         $log->error( $EVAL_ERROR ? $EVAL_ERROR : 'Internal Server Error');
         return OpenXPKI::Client::Service::Response->new( 50003 );
     }
 
     if ($workflow->{'proc_state'} ne 'finished') {
-
-        # the workflow might have another idea to calculate the transaction_id
-        # so if its set in the result we overwrite the initial sha1 hash
-        if ($workflow->{context}->{transaction_id}) {
-            $transaction_id = $workflow->{context}->{transaction_id};
-        }
-
         my $retry_after = 300;
         if ($workflow->{'proc_state'} eq 'pause') {
             my $delay = $workflow->{'wake_up_at'} - time();
@@ -309,7 +318,7 @@ sub handle_property_request {
 
     my $self = shift;
     my $cgi = shift;
-    my $operation = shift;
+    my $operation = shift || $self->operation();
 
     my $config = $self->config();
     my $log = $self->logger();
@@ -329,10 +338,27 @@ sub handle_property_request {
     }
 
     # TODO - we need to consolidate the workflows for the different protocols
+    my $workflow_type = $conf->{$operation}->{workflow} ||
+        $self->config()->service().'_'.lc($operation);
+    $log->debug( 'Start workflow type ' . $workflow_type );
+    $log->trace( 'Workflow Paramters '  . Dumper $param );
+
+
     my $workflow = $client->handle_workflow({
-        type => $conf->{$operation}->{workflow} || 'est_'.$operation,
+        type => $workflow_type,
         params => $param
     });
+
+    if (!$workflow || ( $workflow->{'proc_state'} ne 'finished' )) {
+        if (my $err = $client->last_reply()->{ERROR}) {
+            if ($err->{CLASS} eq 'OpenXPKI::Exception::InputValidator') {
+                $log->error( 'Input validation failed');
+                return OpenXPKI::Client::Service::Response->new( 40004 );
+            }
+        }
+        $log->error( $EVAL_ERROR ? $EVAL_ERROR : 'Internal Server Error');
+        return OpenXPKI::Client::Service::Response->new( 50003 );
+    }
 
     $log->trace( 'Workflow info '  . Dumper $workflow );
 

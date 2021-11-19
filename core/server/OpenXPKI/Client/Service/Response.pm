@@ -60,8 +60,10 @@ has transaction_id => (
 
 # Use predefined numeric codes for dedicated problems
 our %named_messages = (
+    '40001' => 'Signature invalid',
     '40002' => 'Unable to parse request',
     '40003' => 'Incoming enrollment with empty body',
+    '40004' => 'Missing or invalid parameters',
     '40006' => 'Request was rejected',
     '50001' => 'Unable to initialize client',
     '50003' => 'Unexpected response from backend',

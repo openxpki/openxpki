@@ -50,17 +50,18 @@ while (my $cgi = CGI::Fast->new()) {
     my $client = OpenXPKI::Client::Service::Base->new(
         config => $config,
         logger => $log,
+        operation => $operation,
     );
 
     my $response;
     my $mime = "application/pkcs7-mime; smime-type=certs-only";
     if ($operation eq 'cacerts') {
-        $response = $client->handle_property_request($cgi, $operation);
+        $response = $client->handle_property_request($cgi);
     } elsif($operation eq 'csrattrs') {
         $mime = "application/csrattrs";
-        $response = $client->handle_property_request($cgi, $operation);
+        $response = $client->handle_property_request($cgi);
     } else {
-        $response = $client->handle_enrollment_request($cgi, $operation);
+        $response = $client->handle_enrollment_request($cgi);
     }
 
     $log->debug('Status: ' . $response->http_status_line());
