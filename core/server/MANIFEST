@@ -170,6 +170,7 @@ OpenXPKI/Crypto/Backend/OpenSSL/Command/create_pkcs10.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_pkcs12.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_pkey.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/create_random.pm
+OpenXPKI/Crypto/Backend/OpenSSL/Command/decrypt_digest.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/get_pkcs8_keytype.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/get_pubkey.pm
 OpenXPKI/Crypto/Backend/OpenSSL/Command/is_issuer.pm

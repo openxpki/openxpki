@@ -96,6 +96,11 @@ sub __init_command_params : PRIVATE {
                           "INCLUDE_PADDING" => 0,
                           "BINARY" => 0,
                           "NOENGINE" => 0},
+    "decrypt_digest"  => { 'DATA'   => 1,
+                           'KEY' => 0,
+                           'PASSWD' => 0,
+                           'CERT' => 0
+                         },
     "get_pkcs8_keytype" => { 'DATA'   => 1,
                             'PASSWD' => 1,
                            },
@@ -158,6 +163,7 @@ sub __init_command_params : PRIVATE {
 
     "sign_digest"     =>  {"DIGEST" => 1,
                            "KEY" => 0,
+                           'PASSWD' => 0,
                            "CERT" => 0 },
     };
 

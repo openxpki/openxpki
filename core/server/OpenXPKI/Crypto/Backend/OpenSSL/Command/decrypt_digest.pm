@@ -1,9 +1,9 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Command::sign_digest
+## OpenXPKI::Crypto::Backend::OpenSSL::Command::decrypt_digest
 
 use strict;
 use warnings;
 
-package OpenXPKI::Crypto::Backend::OpenSSL::Command::sign_digest;
+package OpenXPKI::Crypto::Backend::OpenSSL::Command::decrypt_digest;
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 
@@ -26,13 +26,13 @@ sub get_command {
 
         # check minimum requirements
         if ( not exists $self->{PASSWD} ) {
-            OpenXPKI::Exception->throw(
-                message => "No password given to sign_digest"
+            OpenXPKI::Exception->throw( message =>
+                "No password given to decrypt_digest"
             );
         }
         if ( not exists $self->{KEY} ) {
-            OpenXPKI::Exception->throw(
-                message => "No key given to sign_digest"
+            OpenXPKI::Exception->throw( message =>
+                "No key given to decrypt_digest"
             );
         }
 
@@ -52,20 +52,8 @@ sub get_command {
 
     ## check parameters
 
-    if ( not $self->{DIGEST} ) {
-      OpenXPKI::Exception->throw( message => 'The digest parameter is required for this operation' );
-    }
-
-    my $digest;
-    my $len = length($self->{DIGEST})*8;
-    if ($len == 128) {
-        $digest = 'md5';
-    } elsif ($len == 160) {
-        $digest = 'sha1';
-    } elsif ($len =~ m{224|256|384|512}) {
-        $digest = 'sha'.$len;
-    } else {
-        OpenXPKI::Exception->throw( message => 'Invalid digest lenght' );
+    if ( not $self->{DATA} ) {
+      OpenXPKI::Exception->throw( message => 'The data parameter is required for this operation' );
     }
 
     if ( not $self->{KEYFILE} ) {
@@ -74,15 +62,12 @@ sub get_command {
 
     ## build the command
 
-    my @command = qw( pkeyutl -sign );
+    my @command = qw( pkeyutl -decrypt );
     push @command, ("-inkey", $self->{KEYFILE});
-
-    push @command, ('-pkeyopt', "digest:$digest");
-
     push @command, ('-engine', $engine) if ($engine);
     push @command, ('-keyform', $keyform) if ($keyform);
 
-    push @command, ('-in', $self->write_temp_file( $self->{DIGEST} ));
+    push @command, ('-in', $self->write_temp_file( $self->{DATA} ));
 
     push @command, ('-out', $self->get_outfile());
 
@@ -111,7 +96,7 @@ sub __get_used_engine {
 }
 
 sub hide_output {
-    return 0;
+    return 1;
 }
 
 ## please notice that key_usage means usage of the engine's key
@@ -131,22 +116,17 @@ OpenXPKI::Crypto::Backend::OpenSSL::Command::sign_digest
 
 =head2 get_command
 
-If you want to create a signature with the used engine/token then you
-have to specify only DIGEST (the binary digest value that should be
-signed). If you want to create a normal signature then you must
+If you want to decrypt a digest with the used engine/token then you
+have to specify only DATA (the binary value of the cipher text that
+should be decrypted). If you want to use an external key you must
 specify KEY and PASSWD.
 
 If you want to use the engine then you must use ENGINE_USAGE ::=
 ALWAYS||PRIV_KEY_OPS too.
 
-The signature will be done with the MD5 or SHA1/2 algorithm, the type
-and length is determined from the size of the content. Supported digest
-length are 128 (md5), 160 (sha1) and 224, 256, 384, 512 bits for sha2.
-
-
 =over
 
-=item * DIGEST
+=item * DATA
 
 =item * KEY
 
@@ -164,4 +144,4 @@ returns true
 
 =head2 get_result
 
-returns the raw signature in binary format
+returns the raw decrypted data in binary format
