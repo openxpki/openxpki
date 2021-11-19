@@ -53,23 +53,23 @@ while (my $cgi = CGI::Fast->new()) {
     Log::Log4perl::MDC->put('server', $server);
 
     # the allowed IP range from the config file
-    my $allowed_range = new NetAddr::IP $iprange;
+    my $requesting_host = new NetAddr::IP $ENV{'REMOTE_ADDR'}; # the host;
+    if ($iprange && $iprange ne '0.0.0.0/0') {
+        my $allowed_range = new NetAddr::IP $iprange;
+        # Check if requesting host is allowed to talk to us
+        if (!$requesting_host->within($allowed_range)) {
+            # TODO: better response?
 
-    my $requesting_host = new NetAddr::IP $ENV{'REMOTE_ADDR'}; # the host
+            print $cgi->header(
+            -type => 'text/plain',
+            -status => '403 Access denied'
+            );
 
-    # Check if requesting host is allowed to talk to us
-    if (!$requesting_host->within($allowed_range)) {
-        # TODO: better response?
+            print "Access to this service was denied by configuration.";
 
-        print $cgi->header(
-           -type => 'text/plain',
-           -status => '403 Access denied'
-        );
-
-        print "Access to this service was denied by configuration.";
-
-        $log->error("Unauthorized access from $requesting_host");
-        next;
+            $log->error("Unauthorized access from $requesting_host");
+            next;
+        }
     }
 
     # Fetch SCEP message from CGI (cf. Section 3.1 of the SCEP draft)
