@@ -75,9 +75,13 @@ lives_and {
 } "Create test workflow" or die("Could not create workflow");
 
 # Insert the workflow attributes to be changed
-insert_meta_attribute($oxitest->dbi, $workflow->id, shoesize  => 9);
-insert_meta_attribute($oxitest->dbi, $workflow->id, color     => 'blue');
-insert_meta_attribute($oxitest->dbi, $workflow->id, hairstyle => 'bald');
+$workflow->attrib({
+    creator => 'dummy', # OpenXPKI::Workflow::Factory->can_access_workflow() needs it set
+    shoesize => 9,
+    color => 'blue',
+    hairstyle => 'bald',
+});
+$workflow->save_initial(); # also saves attributes ("creator"!)
 
 # Run action that updates the attributes
 lives_ok {
@@ -92,6 +96,7 @@ my $meta = $oxitest->dbi->select_hashes(
 );
 
 cmp_deeply $meta, bag(
+    superhashof({ attribute_contentkey => 'creator',   attribute_value => 'dummy' }),
     superhashof({ attribute_contentkey => 'shoesize',  attribute_value => '10' }),
     superhashof({ attribute_contentkey => 'color',     attribute_value => 'blue' }),
 
@@ -111,6 +116,7 @@ lives_and {
 lives_and {
     my $attrs = $workflow_dup->attrib;
     cmp_deeply $attrs, {
+        creator   => 'dummy',
         shoesize  => 10,
         color     => 'blue',
         # TODO This entry should be deleted - see https://github.com/openxpki/openxpki/issues/527

@@ -58,6 +58,7 @@ action:
     set_attr:
         class: OpenXPKI::Server::Workflow::Activity::Tools::SetAttribute
         param:
+            creator: dummy
             color: blue
             hairstyle: bald
             shoesize: 10
@@ -156,7 +157,7 @@ sub items_ok($@) {
             workflow_id => ignore()
         }, "correct context items";
 
-        cmp_deeply $wf2->attrib, $items->{attribute},
+        cmp_deeply $wf2->attrib, { %{$items->{attribute}}, creator => 'dummy' },
             "correct attributes";
 
         my $history = [ map { $_->action } $wf2->get_history ];

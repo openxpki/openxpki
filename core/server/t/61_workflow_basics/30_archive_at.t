@@ -89,6 +89,8 @@ sub archive_at_ok($$$) {
         # Create workflow
         lives_and {
             $wf1 = CTX('workflow_factory')->get_factory->create_workflow($workflow_type);
+            $wf1->attrib({ creator => 'dummy' }); # OpenXPKI::Workflow::Factory->can_access_workflow() needs it set
+            $wf1->save_initial(); # also saves attributes ("creator"!)
             ok ref $wf1;
         } "create test workflow" or die("Could not create workflow");
 

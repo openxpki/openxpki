@@ -18,6 +18,9 @@ use Test::More;
 use Test::Exception;
 use Log::Log4perl;
 
+use FindBin qw( $Bin );
+require "$Bin/DatabaseTest.pm";
+
 #use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Database.*'} = 100;
 
 plan skip_all => "No MySQL database found / OXI_TEST_DB_MYSQL_NAME not set" unless $ENV{OXI_TEST_DB_MYSQL_NAME};
@@ -43,10 +46,8 @@ Log::Log4perl->init(\"
 my $log = Log::Log4perl->get_logger();
 
 my $db_params = {
-    type => "MySQLTest",
-    name => $ENV{OXI_TEST_DB_MYSQL_NAME},
-    user => $ENV{OXI_TEST_DB_MYSQL_USER},
-    passwd => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},
+    %{ DatabaseTest->new()->get_dbi_params('mariadb') },
+    type => 'MySQLTest',
 };
 
 use_ok "OpenXPKI::Server::Database";
@@ -101,4 +102,4 @@ bob_sees 1, "LED-Panel", "Bob sees new data";
 $db_bob->commit; # to be able to drop database
 $db_alice->run("DROP TABLE test");
 
-done_testing(6);
+done_testing();

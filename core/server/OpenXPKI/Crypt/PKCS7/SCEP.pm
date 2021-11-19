@@ -31,6 +31,8 @@ This class generate Full PKI Response structures based on RFC5272.
 
 =head2 Parameters
 
+=over
+
 =item signer
 
 A OpenXPKI::Crypt::X509 object representing the signer certificate.
@@ -42,10 +44,9 @@ private key of the signer, currently only Crypt::PK::RSA and
 Crypt::PK::ECC are supported. You can pass both arguments at
 construction time or set them on the instance.
 
-=item
+=back
 
 print Dumper $req->request()->envelope()->{recipient};
-
 
 =cut
 

@@ -32,6 +32,7 @@ sub sqlam_params { limit_offset => 'LimitOffset' }
 sub last_auto_id { 1; } # dummy
 sub sql_autoinc_column { return "INTEGER PRIMARY KEY AUTOINCREMENT" }
 sub table_drop_query { }
+sub do_sql_replacements { shift; shift }
 __PACKAGE__->meta->make_immutable;
 
 package OpenXPKI::Server::Database::Driver::OxitestdbList;

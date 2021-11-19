@@ -67,7 +67,9 @@ sub driver_ok {
         lives_and {
             my $d1 = $session->data_as_hashref;  delete $d1->{modified};
             my $d2 = $session2->data_as_hashref; delete $d2->{modified};
-            cmp_deeply $d2, $d1;
+            cmp_deeply
+              { %{$d2}, primary_tenant => undef },
+              { %{$d1}, primary_tenant => ignore() };
         } "data is the same after freeze-thaw-cycle";
 
         # make sure session expires

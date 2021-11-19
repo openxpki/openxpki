@@ -19,7 +19,7 @@ use lib "$Bin";
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Test;
 
-plan tests => 18;
+plan tests => 16;
 
 #
 # Setup test context
@@ -66,7 +66,6 @@ my %defaults = (
     count_try => 0,
     wakeup_at => undef,
     reap_at => undef,
-    persist_context => 0,
     is_startup => 1,
     archive_at => undef,
 );
@@ -75,7 +74,8 @@ for my $k (keys %defaults) {
     is $workflow->$k, $defaults{$k}, "correct default value of '$k' after creation";
 }
 
-$workflow->_save();
+$workflow->attrib({ creator => 'dummy' }); # OpenXPKI::Workflow::Factory->can_access_workflow() needs it set
+$workflow->save_initial(); # also saves attributes ("creator"!)
 
 lives_and {
     $workflow_dup = $factory->fetch_workflow($workflow_type, $workflow->id);
