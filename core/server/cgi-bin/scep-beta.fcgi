@@ -86,8 +86,11 @@ while (my $cgi = CGI::Fast->new()) {
         if ($EVAL_ERROR) {
             $response = OpenXPKI::Client::Service::Response->new( 50010 );
 
+        } elsif (!$client->attr()->{alias}) {
+            $response = OpenXPKI::Client::Service::Response->new ( 40002 );
+
         } elsif (!$client->signer) {
-            $response = OpenXPKI::Client::Service::Response->new (40001 );
+            $response = OpenXPKI::Client::Service::Response->new ( 40001 );
 
         # Enrollment request
         } elsif ($client->message_type eq 'PKCSReq' || $client->message_type eq 'GetCertInitial') {

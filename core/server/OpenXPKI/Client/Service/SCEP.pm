@@ -100,12 +100,21 @@ sub generate_pkcs7_response {
     );
 
     if ($response->is_pending()) {
+        $self->logger->info('Send pending response for ' . $self->transaction_id );
         return $self->backend()->run_command('scep_generate_pending_response', \%params);
     }
 
     if ($response->is_client_error()) {
 
+        # if an invalid recipient token was given, the alias is unset
+        # the API will take the  default token to generate the reponse
+        # but we must remove the undef value from the parameters list
+        delete $params{alias} unless ($params{alias});
+
         my $failInfo = ($response->error == 40001) ? 'badMessageCheck' : 'badRequest';
+
+        $self->logger->warn('Client error / malformed request ' . $failInfo);
+
         return $self->backend()->run_command('scep_generate_failure_response',
             { %params, failinfo => $failInfo });
     }
