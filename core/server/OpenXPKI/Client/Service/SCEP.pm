@@ -147,7 +147,7 @@ around 'build_params' => sub {
         $params->{signer_cert} = $self->signer();
     } elsif ($self->message_type() =~ m{\AGet(Cert|CRL)\z}) {
         $params->{issuer} = $self->attr()->{issuer_serial}->{issuer};
-        $params->{serial} = $self->attr()->{issuer_serial}->{serialNumber};
+        $params->{serial} = $self->attr()->{issuer_serial}->{serial};
     }
 
     $self->logger->trace(Dumper $params);

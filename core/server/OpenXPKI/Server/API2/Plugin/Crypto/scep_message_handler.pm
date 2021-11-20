@@ -47,7 +47,7 @@ command "scep_unwrap_message" => {
     ##! 64: $rcpt
     my $db_rcpt = $self->api->search_cert(
         issuer_dn => $rcpt->{issuer}->get_subject(),
-        cert_serial => $rcpt->{serialNumber}->bstr(),
+        cert_serial => $rcpt->{serial},
         return_columns => ['identifier','status','data']
     );
 
@@ -55,7 +55,7 @@ command "scep_unwrap_message" => {
         message => 'No certificate found to decrypt the message',
         params => {
             issuer_dn => $rcpt->{issuer}->get_subject(),
-            cert_serial => $rcpt->{serialNumber}->bstr(),
+            cert_serial => $rcpt->{serial},
         }
     ) unless($db_rcpt);
 
@@ -63,7 +63,7 @@ command "scep_unwrap_message" => {
         message => 'Recipient certificate is revoked',
         params => {
             issuer_dn => $rcpt->{issuer}->get_subject(),
-            cert_serial => $rcpt->{serialNumber}->bstr(),
+            cert_serial => $rcpt->{serial},
         }
     ) unless($db_rcpt->[0]->{status} eq 'ISSUED');
 

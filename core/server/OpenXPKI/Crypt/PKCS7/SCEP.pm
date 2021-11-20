@@ -19,6 +19,8 @@ use OpenXPKI::Crypt::PKCS7 qw(encode_tag decode_tag find_oid);
 # CTX is only used to generate random for nonce and keys
 use OpenXPKI::Server::Context qw( CTX );
 
+with 'OpenXPKI::Role::IssuerSerial';
+
 =head1 NAME
 
 OpenXPKI::Crypt::PKCS7::SCEP
@@ -202,7 +204,7 @@ sub __build_signer {
     my $certlist = $self->message()->certificates();
 
     # iterate over the certlist and check serial/issuer to find the right one
-    my $serial = $self->message()->envelope()->{signer}->{serialNumber}->bstr();
+    my $serial = $self->message()->envelope()->{signer}->{serial};
     my $subject = $self->message()->envelope()->{signer}->{issuer}->get_subject();
     ##! 32: "Looking for $subject  / $serial"
     foreach my $cert (@$certlist) {
@@ -279,10 +281,7 @@ sub issuer_serial {
     my $parser = $asn1->find('IssuerAndSerialNumber') || die $asn1->error;
     my $iasn = $parser->decode($self->payload()) || die $parser->error;
 
-    return {
-        serialNumber => $iasn->{serialNumber}->bstr(),
-        issuer => OpenXPKI::Crypt::DN->new( sequence => $iasn->{issuer} )->get_subject()
-    };
+    return iasn_from_hash( $iasn );
 }
 
 sub __get_cbc {

@@ -10,11 +10,13 @@ use Moose;
 use Convert::ASN1 ':tag';
 use OpenXPKI::Crypt::DN;
 use OpenXPKI::Crypt::X509;
-
 use Moose::Exporter;
+
 Moose::Exporter->setup_import_methods(
     as_is => ['decode_tag','encode_tag','find_oid']
 );
+
+with 'OpenXPKI::Role::IssuerSerial';
 
 our %oids = (
     # pkcs7 data types
@@ -398,10 +400,7 @@ sub __build_envelope_signed_data {
         digest_alg => $oids{$digest_oid} || $digest_oid,
         sig_alg =>  $oids{$sig_oid} || $sig_oid,
         signature => $si->{encryptedDigest},
-        signer =>  {
-            serialNumber => $si->{sid}->{issuerAndSerialNumber}->{serialNumber},
-            issuer => OpenXPKI::Crypt::DN->new( sequence => $si->{sid}->{issuerAndSerialNumber}->{issuer} ),
-        },
+        signer => iasn_from_hash( $si->{sid}->{issuerAndSerialNumber} ),
         authAttr => $attrib,
         unauthAttr => $uattrib,
     };
@@ -437,10 +436,7 @@ sub __build_rcptlist {
     my $self = shift;
     my $ri = $self->parsed()->{content}->{'recipientInfos'}->{riSet} || $self->parsed()->{content}->{'recipientInfos'}->{riSequence};
     return [ map {
-        {
-            serialNumber => $_->{issuerAndSerialNumber}->{serialNumber},
-            issuer => OpenXPKI::Crypt::DN->new( sequence => $_->{issuerAndSerialNumber}->{issuer} )
-        }
+        iasn_from_hash( $_->{issuerAndSerialNumber} );
     } @{$ri} ];
 }
 
