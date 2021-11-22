@@ -15,6 +15,7 @@ use File::Basename;
 use YAML;
 use MIME::Base64;
 use Crypt::X509;
+use JSON; # early use of JSON avoids "Subroutine JSON::PP::Boolean::(++ redefined at /usr/share/perl/5.28/overload.pm line 48"
 
 # For the password hasher
 use IO::Prompt;
