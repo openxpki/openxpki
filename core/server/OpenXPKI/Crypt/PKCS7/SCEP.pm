@@ -27,26 +27,18 @@ OpenXPKI::Crypt::PKCS7::SCEP
 
 =head1 DESCRIPTION
 
-This class generate Full PKI Response structures based on RFC5272.
+This class parses and generates SCEP request messages and responses.
 
-=head2 Parameters
+To parse an SCEP message, you can either pass the PKCS7 request message
+as single argument to the I<new> method, or set it via I<message> later.
+Call one of the C<create_*_response> methods to generate a response for
+this request.
 
-=over
+If you want to generate a response without having the request, you must
+call new with all parameters that are required to initialize the class
+as denoted below.
 
-=item signer
-
-A OpenXPKI::Crypt::X509 object representing the signer certificate.
-
-=item signer_key
-
-A Crypt::PK::* or OpenXPKI::Crypto::Backend::API object holding the
-private key of the signer, currently only Crypt::PK::RSA and
-Crypt::PK::ECC are supported. You can pass both arguments at
-construction time or set them on the instance.
-
-=back
-
-print Dumper $req->request()->envelope()->{recipient};
+=head2 Parameters / Accessor methods
 
 =cut
 
@@ -76,6 +68,14 @@ has _asn1 => (
     isa => 'Convert::ASN1',
 );
 
+=head3 message
+
+The outer PKCS7 (signedData) message as OpenXPKI::Crypt::PKCS7 object.
+This is the parsed result of the data passed to the constructor.
+
+=cut
+
+
 has message => (
     is => 'rw',
     isa => 'OpenXPKI::Crypt::PKCS7',
@@ -84,12 +84,24 @@ has message => (
     default => sub { die "input message was not set - attributes not available"; }
 );
 
+=head3 request
+
+Returns the inner PKCS7 (envelopedData) as OpenXPKI::Crypt::PKCS7 object
+
+=cut
+
 has request => (
     is => 'ro',
     isa => 'OpenXPKI::Crypt::PKCS7',
     lazy => 1,
     default => sub { return OpenXPKI::Crypt::PKCS7->new(shift->message->payload); },
 );
+
+=head3 message_type
+
+Return the messageType from the envelope of the message (see mapMessageType)
+
+=cut
 
 has message_type => (
     is => 'ro',
@@ -100,12 +112,25 @@ has message_type => (
     }
 );
 
+=head3 transaction_id
+
+Returns the transaction_id of the request, must be passed to the
+constructor when generating a new instances without a message.
+
+=cut
+
 has transaction_id => (
     is => 'ro',
     isa => 'Str',
     lazy => 1,
     default => sub { return shift->message()->envelope()->{authAttr}->{transactionID}; }
 );
+
+=head3 request_nonce
+
+Returns the value of the request nonce.
+
+=cut
 
 has request_nonce => (
     is => 'ro',
@@ -115,12 +140,32 @@ has request_nonce => (
     default => sub { return shift->message()->envelope()->{authAttr}->{senderNonce}; }
 );
 
+=head3 reply_nonce
+
+The nonce used to generate the response message. If not set a random
+nonce is created when the response is created. Note that the nonce will
+be generated only B<once> so subsequent calls to any generate_response
+method will use the same nonce value! The RFC defines a 16 byte nonce
+size but the size is adjusted to the sender nonce size in case this
+differs to support devices using a 8 bytes nonce as reported on the
+mailing list.
+
+=cut
+
 has reply_nonce => (
-    is => 'ro',
+    is => 'rw',
     isa => 'Str',
     lazy => 1,
     default => sub { return CTX('api2')->get_random( length => 16, binary => 1 ); }
 );
+
+=head3 digest_alg
+
+Returns the name of the digest algorithm used.
+
+Must be set when generating any response.
+
+=cut
 
 has digest_alg => (
     is => 'rw',
@@ -129,12 +174,28 @@ has digest_alg => (
     default => sub { return shift->message()->envelope()->{digest_alg}; }
 );
 
+=head3 enc_alg
+
+Returns the name of the encryption algorithm used.
+
+Must be set when generating a success response.
+
+=cut
+
 has enc_alg => (
     is => 'rw',
     isa => 'Str',
     lazy => 1,
     default => sub { return shift->request()->envelope()->{enc_alg}; }
 );
+
+=head3 signer
+
+A OpenXPKI::Crypt::X509 object representing the signer of the request.
+
+This must be set before you can generate a success response.
+
+=cut
 
 has signer => (
     is => 'ro',
@@ -143,12 +204,25 @@ has signer => (
     builder => '__build_signer'
 );
 
+=head3 recipient
+
+Returns the recipient information for the message, the return value is
+an IssuerSerial hash as defined in OpenXPKI::Role::IssuerSerial
+
+=cut
+
 has recipient => (
     is => 'rw',
     isa => 'HashRef',
     lazy => 1,
     builder => '__build_recipient'
 );
+
+=head3 payload
+
+Reads the payload from the response, returns the decypted raw binary data.
+
+=cut
 
 has payload => (
     is => 'ro',
@@ -158,21 +232,43 @@ has payload => (
 
 );
 
+=head3 ratoken
+
+A OpenXPKI::Crypt::X509 object representing the SCEP RA certificate.
+
+=cut
+
 has ratoken => (
     is => 'rw',
     isa => 'OpenXPKI::Crypt::X509',
 );
 
-# set for response, entity must be the first
-has certs => (
-    is => 'rw',
-    isa => 'ArrayRef[Str]',
-);
+=head3 ratoken_key
+
+A Crypt::PK::* or OpenXPKI::Crypto::Backend::API object holding the
+private key of the RA, currently only Crypt::PK::RSA is supported.
+You can pass both arguments at construction time or set them on the
+instance.
+
+=cut
 
 has ratoken_key => (
     is => 'rw',
     predicate => 'has_key',
     #isa => 'Crypt::PK::RSA | Crypt::PK::ECC',
+);
+
+=head3 certs
+
+An array ref holding the DER encoded certificates that will be set
+as response to a certRep SUCCESS. The entity certificate must be the
+first item.
+
+=cut
+
+has certs => (
+    is => 'rw',
+    isa => 'ArrayRef[Str]',
 );
 
 around BUILDARGS => sub {
@@ -268,11 +364,25 @@ sub __extract_payload {
 
 }
 
+=head3  pkcs10
+
+Returns the PKCS10 request from a enrollment message as
+OpenXPKI::Crypt::PKCS10 object.
+
+=cut
+
 sub pkcs10 {
 
     my $self = shift;
     return OpenXPKI::Crypt::PKCS10->new( $self->payload() );
 }
+
+=head3 issuer_serial
+
+Returns a hash with issuer and serial extracted from the payload of a
+GetCRL or GetCert request. See OpenXPKI::Role::IssuerSerial.
+
+=cut
 
 sub issuer_serial {
 
@@ -467,6 +577,23 @@ sub __generate_response {
 
 }
 
+=head2 Response Generation
+
+There is an individual method to generate success, pending and failure
+responses. They all require that the class was either initiated with an
+incoming PKCS7 message or that the ratoken, transaction_id and digest
+algorithm are set.
+
+All methods returned the DER encoded PKCS7 message as binary data.
+
+=head3 create_cert_response
+
+Generate a success response, requires that I<certs> was set to contain
+the expected return data, I<signer> is set to the recipient
+certificate and I<enc_alg> is provided.
+
+=cut
+
 sub create_cert_response {
 
     ##! 8: 'start response'
@@ -543,12 +670,30 @@ sub create_cert_response {
 
 }
 
+=head3 create_pending_response
+
+Generate a pending response from the transaction_id passed to the
+constructor. Returns the binary DER encoded response.
+
+=cut
+
 sub create_pending_response {
 
     my $self = shift;
     return $self->__generate_response();
 
 }
+
+=head3 create_failure_response
+
+Generate a failure response using the transaction_id passed to the
+constructor and the error value passed as argument. The error can
+be given either a integer or one of the defined error codes
+I<badAlg, badMessageCheck, badRequest, badTime, badCertId>
+
+Returns the binary DER encoded response.
+
+=cut
 
 sub create_failure_response {
 
@@ -564,7 +709,3 @@ sub create_failure_response {
 
 
 1;
-
-
-#492b6b6d3032314a57334471397264674562596d473936334f775173574d42650a
-#openssl aes-256-cbc  -in inner.raw  -d -iv 5868736b6b444a6d614e44537131795 -K 492b6b3032314a57334471397264674562596d473936334f775173574d42650
