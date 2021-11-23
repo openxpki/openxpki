@@ -1136,23 +1136,21 @@ sub _db_config_from_production {
 
     # make sure OpenXPKI::Config::Backend reads from the given LOCATION
     my $old_env = $ENV{OPENXPKI_CONF_PATH}; delete $ENV{OPENXPKI_CONF_PATH};
-    my $config = OpenXPKI::Config::Backend->new(LOCATION => "/etc/openxpki/config.d");
+
+    my $config = OpenXPKI::Config->new(config_dir => "/etc/openxpki/config.d");
+
+    # read config - we use get() instead of get_hash() to support config links like "passwd@:"
+    my $path = 'system.database.main';
+    my %conf = map { $_ => ($config->get("$path.$_")//undef) } (qw(type name host port user passwd));
+
+    # set environment variables
+    my $env_path = 'system.database.main.environment';
+    $ENV{$_} = $config->get("$env_path.$_") for ($config->get_keys($env_path));
+
+    # reset to previous value
     $ENV{OPENXPKI_CONF_PATH} = $old_env if $old_env;
 
-    my $db_conf = $config->get_hash('system.database.main');
-    my $conf = {
-        type    => $db_conf->{type},
-        name    => $db_conf->{name},
-        host    => $db_conf->{host},
-        port    => $db_conf->{port},
-        user    => $db_conf->{user},
-        passwd  => $db_conf->{passwd},
-    };
-    # Set environment variables
-    my $db_env = $config->get_hash("system.database.main.environment");
-    $ENV{$_} = $db_env->{$_} for (keys %{$db_env});
-
-    return $conf;
+    return \%conf;
 }
 
 sub _db_config_from_env {
