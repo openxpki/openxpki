@@ -3836,10 +3836,10 @@ sub __check_for_validation_error {
         my $validator_msg = $reply->{'ERROR'}->{LABEL};
         my $field_errors = $reply->{'ERROR'}->{ERRORS};
         if (ref $field_errors eq 'ARRAY') {
-            $self->logger()->error("Input validation error on fields ".
+            $self->logger()->info('Input validation error on fields '.
                 join(",", map { ref $_ ? $_->{name} : $_ } @{$field_errors}));
         } else {
-            $self->logger()->error("Input validation error");
+            $self->logger()->info('Input validation error');
         }
         $self->_status({ level => 'error', message => $validator_msg, field_errors => $field_errors });
         $self->logger()->trace('validation details' . Dumper $field_errors ) if $self->logger->is_trace;

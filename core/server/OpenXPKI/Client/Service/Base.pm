@@ -252,7 +252,7 @@ sub handle_enrollment_request {
     if (!$workflow || ( $workflow->{'proc_state'} ne 'finished' && !$workflow->{id} ) || $workflow->{'proc_state'} eq 'exception') {
         if (my $err = $client->last_reply()->{ERROR}) {
             if ($err->{CLASS} eq 'OpenXPKI::Exception::InputValidator') {
-                $log->error( 'Input validation failed');
+                $log->info( 'Input validation failed' );
                 return OpenXPKI::Client::Service::Response->new( 40004 );
             }
         }
@@ -352,11 +352,11 @@ sub handle_property_request {
     if (!$workflow || ( $workflow->{'proc_state'} ne 'finished' )) {
         if (my $err = $client->last_reply()->{ERROR}) {
             if ($err->{CLASS} eq 'OpenXPKI::Exception::InputValidator') {
-                $log->error( 'Input validation failed');
+                $log->info( 'Input validation failed' );
                 return OpenXPKI::Client::Service::Response->new( 40004 );
             }
         }
-        $log->error( $EVAL_ERROR ? $EVAL_ERROR : 'Internal Server Error');
+        $log->error( $EVAL_ERROR ? $EVAL_ERROR : 'Internal Server Error' );
         return OpenXPKI::Client::Service::Response->new( 50003 );
     }
 
