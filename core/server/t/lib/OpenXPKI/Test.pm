@@ -1122,43 +1122,44 @@ sub _build_dbi {
 sub _build_db_conf {
     my ($self) = @_;
 
-    my $conf;
-    $conf = $self->_db_config_from_production unless $self->force_test_db;
-    $conf ||= $self->_db_config_from_env;
-    die "Could not read database config from /etc/openxpki or env variables" unless $conf;
-    return $conf;
+    if ($ENV{OXI_TEST_DB_CONFIG_PATH} and not $self->force_test_db) {
+        return $self->_db_config_from_production($ENV{OXI_TEST_DB_CONFIG_PATH});
+    }
+    elsif ($ENV{OXI_TEST_DB_MYSQL_NAME}) {
+        return $self->_db_config_from_env;
+    }
+    else {
+        die "Please set either OXI_TEST_DB_CONFIG_PATH or OXI_TEST_DB_MYSQL_* environment variables";
+    }
 }
 
 sub _db_config_from_production {
-    my ($self) = @_;
+    my ($self, $config_dir) = @_;
 
-    return unless (-d "/etc/openxpki/config.d" and -r "/etc/openxpki/config.d");
+    die "Could not read database config from $config_dir"
+      unless (-d $config_dir and -r $config_dir);
 
     # make sure OpenXPKI::Config::Backend reads from the given LOCATION
     my $old_env = $ENV{OPENXPKI_CONF_PATH}; delete $ENV{OPENXPKI_CONF_PATH};
-    my $config = OpenXPKI::Config::Backend->new(LOCATION => "/etc/openxpki/config.d");
+
+    my $config = OpenXPKI::Config->new(config_dir => $config_dir);
+
+    # read config - we use get() instead of get_hash() to support config links like "passwd@:"
+    my $path = 'system.database.main';
+    my %conf = map { $_ => ($config->get("$path.$_")//undef) } (qw(type name host port user passwd));
+
+    # set environment variables
+    my $env_path = 'system.database.main.environment';
+    $ENV{$_} = $config->get("$env_path.$_") for ($config->get_keys($env_path));
+
+    # reset to previous value
     $ENV{OPENXPKI_CONF_PATH} = $old_env if $old_env;
 
-    my $db_conf = $config->get_hash('system.database.main');
-    my $conf = {
-        type    => $db_conf->{type},
-        name    => $db_conf->{name},
-        host    => $db_conf->{host},
-        port    => $db_conf->{port},
-        user    => $db_conf->{user},
-        passwd  => $db_conf->{passwd},
-    };
-    # Set environment variables
-    my $db_env = $config->get_hash("system.database.main.environment");
-    $ENV{$_} = $db_env->{$_} for (keys %{$db_env});
-
-    return $conf;
+    return \%conf;
 }
 
 sub _db_config_from_env {
     my ($self) = @_;
-
-    return unless $ENV{OXI_TEST_DB_MYSQL_NAME};
 
     return {
         type    => "MariaDB",
@@ -1167,7 +1168,6 @@ sub _db_config_from_env {
         name    => $ENV{OXI_TEST_DB_MYSQL_NAME},
         user    => $ENV{OXI_TEST_DB_MYSQL_USER},
         passwd  => $ENV{OXI_TEST_DB_MYSQL_PASSWORD},
-
     };
 }
 
