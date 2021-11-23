@@ -35,7 +35,7 @@ sub execute {
     # no template, no key, just export the plain certificate
     if (!$template && !defined $key_password) {
 
-        my $export_format = uc($self->param('export_format')) || 'PEM';
+        my $export_format = uc($self->param('export_format') || 'PEM');
         my $data;
         if ($export_format eq 'PEM') {
             $data = CTX('api2')->get_cert( identifier => $cert_identifier, format => 'PEM' );
