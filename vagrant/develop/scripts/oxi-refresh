@@ -3,6 +3,27 @@
 test $(whoami) != "root" && echo "Please run this as root: sudo $0" && exit 1
 set -o pipefail
 
+if [[
+    -z $OXI_TEST_SAMPLECONFIG_DIR ||
+    -z $OXI_TEST_DB_MYSQL_DBHOST ||
+    -z $OXI_TEST_DB_MYSQL_DBPORT ||
+    -z $OXI_TEST_DB_MYSQL_NAME ||
+    -z $OXI_TEST_DB_MYSQL_USER ||
+    -z $OXI_TEST_DB_MYSQL_PASSWORD
+]]; then
+    cat <<EOF
+This script needs the following environment variables set:
+    OXI_CORE_DIR                # target, e.g. /opt/openxpki/core/server
+    OXI_TEST_SAMPLECONFIG_DIR   # e.g. /etc/openxpki
+    OXI_TEST_DB_MYSQL_DBHOST
+    OXI_TEST_DB_MYSQL_DBPORT
+    OXI_TEST_DB_MYSQL_NAME
+    OXI_TEST_DB_MYSQL_USER
+    OXI_TEST_DB_MYSQL_PASSWORD
+EOF
+    exit 1
+fi
+
 #
 # Exit handler
 #
