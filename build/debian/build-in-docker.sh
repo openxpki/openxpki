@@ -21,7 +21,7 @@ makerepo() {
 
     CONFDIR=""
     if [ ! -d "/repository/conf" ]; then
-        CONFDIR="--confdir /tmp/openxpki/build/debian/reprepro"
+        CONFDIR="--confdir /openxpki/build/debian/reprepro"
     fi
     find /packages /extra-packages -name "*.deb" | \
         xargs -L1 --no-run-if-empty reprepro $CONFDIR --basedir /repository includedeb buster;
