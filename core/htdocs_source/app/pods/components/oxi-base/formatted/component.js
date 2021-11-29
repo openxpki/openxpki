@@ -46,7 +46,7 @@ export default class OxiFormattedComponent extends Component {
 
     get timestamp() {
         return (this.args.value > 0
-            ? DateTime.fromSeconds(parseInt(this.args.value)).toFormat('yyyy-MM-dd HH:mm:ss') + ' UTC'
+            ? DateTime.fromSeconds(parseInt(this.args.value)).setZone('utc').toFormat('yyyy-MM-dd HH:mm:ss') + ' UTC'
             : '---');
     }
 

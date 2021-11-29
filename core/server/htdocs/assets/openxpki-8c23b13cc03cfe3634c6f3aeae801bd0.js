@@ -275,7 +275,7 @@ e.default=n})),define("openxpki/pods/components/oxi-base/formatted/component",["
 Object.defineProperty(e,"__esModule",{value:!0}),e.default=void 0
 var d=(p=function(e){(0,r.default)(a,e)
 var o=(0,l.default)(a)
-function a(){return(0,t.default)(this,a),o.apply(this,arguments)}return(0,n.default)(a,[{key:"format",get:function(){return this.args.format||"text"}},{key:"valueStr",get:function(){return new String(this.args.value||"").replace(/\r/gm,"")}},{key:"valueSplitByNewline",get:function(){return this.valueStr.split(/\n/)}},{key:"timestamp",get:function(){return this.args.value>0?i.DateTime.fromSeconds(parseInt(this.args.value)).toFormat("yyyy-MM-dd HH:mm:ss")+" UTC":"---"}},{key:"styledValue",get:function(){var e=this.args.value.match(/^(([a-z]+):)?(.*)$/m)
+function a(){return(0,t.default)(this,a),o.apply(this,arguments)}return(0,n.default)(a,[{key:"format",get:function(){return this.args.format||"text"}},{key:"valueStr",get:function(){return new String(this.args.value||"").replace(/\r/gm,"")}},{key:"valueSplitByNewline",get:function(){return this.valueStr.split(/\n/)}},{key:"timestamp",get:function(){return this.args.value>0?i.DateTime.fromSeconds(parseInt(this.args.value)).setZone("utc").toFormat("yyyy-MM-dd HH:mm:ss")+" UTC":"---"}},{key:"styledValue",get:function(){var e=this.args.value.match(/^(([a-z]+):)?(.*)$/m)
 return{style:e[2],label:e[3]}}},{key:"selectCode",value:function(e){var t=e.target
 if(window.getSelection){var n=window.getSelection(),r=document.createRange()
 r.selectNodeContents(t),n.removeAllRanges(),n.addRange(r)}else console.warn("Could not select text: Unsupported browser")}}]),a}(a.default),(0,o.default)(p.prototype,"selectCode",[u.action],Object.getOwnPropertyDescriptor(p.prototype,"selectCode"),p.prototype),p)
