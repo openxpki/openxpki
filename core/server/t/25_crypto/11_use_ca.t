@@ -93,6 +93,11 @@ lives_and {
 # - wrong KEY_LENGTH value
 # - wrong ENC_ALG value
 
+my $first_curve=`openssl ecparam -list_curves | grep -m1 -P '^\\s*[^:]+\\s*:' | sed -E 's/^\\s*(\\w+)\\s*:.*/\\1/'`;
+chomp $first_curve;
+
+note "Using first EC curve reported by 'openssl ecparam -list_curves': $first_curve";
+
 ## create EC key
 lives_and {
     # OpenSSL <= 1.0.1 needs a separate parameter file for EC keys
@@ -100,7 +105,7 @@ lives_and {
         COMMAND => "create_params",
         TYPE    => "EC",
         PKEYOPT => {
-            ec_paramgen_curve => "sect571r1",
+            ec_paramgen_curve => $first_curve,
         },
     });
     my $key = $default_token->command({
