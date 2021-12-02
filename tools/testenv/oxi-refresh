@@ -1,0 +1,213 @@
+#!/bin/bash
+## <info> Configure environment and install OpenXPKI from host sources
+test $(whoami) != "root" && echo "Please run this as root: sudo $0" && exit 1
+set -o pipefail
+
+if [[
+    -z $OXI_SOURCE_DIR ||
+    -z $OXI_CORE_DIR ||
+    -z $OXI_TEST_SAMPLECONFIG_DIR ||
+    -z $OXI_TEST_DB_MYSQL_DBHOST ||
+    -z $OXI_TEST_DB_MYSQL_DBPORT ||
+    -z $OXI_TEST_DB_MYSQL_NAME ||
+    -z $OXI_TEST_DB_MYSQL_USER ||
+    -z $OXI_TEST_DB_MYSQL_PASSWORD
+]]; then
+    cat <<EOF
+This script needs the following environment variables set:
+    OXI_SOURCE_DIR              # OpenXPKI repository contents, e.g. /code-repo
+    OXI_EE_SOURCE_DIR           # optional: EE source code
+    OXI_CORE_DIR                # target, e.g. /opt/openxpki/core
+    OXI_TEST_SAMPLECONFIG_DIR   # e.g. /code-repo/config
+    OXI_TEST_DB_MYSQL_DBHOST
+    OXI_TEST_DB_MYSQL_DBPORT
+    OXI_TEST_DB_MYSQL_NAME
+    OXI_TEST_DB_MYSQL_USER
+    OXI_TEST_DB_MYSQL_PASSWORD
+EOF
+    exit 1
+fi
+
+#
+# Exit handler
+#
+LOG=$(mktemp)
+function _exit () {
+    if [ $1 -ne 0 -a $1 -ne 333 ]; then
+        echo "================================================================================"
+        echo "$0: ERROR - last command exited with code $1, output:"
+        echo "================================================================================"
+        cat $LOG
+    fi
+    rm -f $LOG
+    exit $1
+}
+
+[[ "${@#--help}" != "$@" ]] && cat <<__HELP && exit 1
+SYNOPSIS
+    $(basename "$0") [OPTIONS]
+
+DESCRIPTION
+    $(cat "$0" | grep "[[:blank:]]#*[[:blank:]]*<info>" | cut -d ">" -f2 | sed s/'^[[:blank:]]*'//)
+
+OPTIONS
+    --no-restart
+        Skip restarting OpenXPKI and Apache.
+
+    --no-i18n
+        Skip updating internationalization files.
+
+    --no-compile
+        Skip compiling XS code parts.
+
+    --no-dbconf
+        Skip database configuration.
+
+    --fast
+        Shortcut for "--no-i18n --no-compile --no-dbconfig".
+
+    --full
+        Overwrite /etc/openxpki with modified sample config.
+        (Re-)create database and import certificates.
+__HELP
+
+trap '_exit $?' EXIT
+set -e
+
+#
+# Command line options
+#
+IS_RESTART=1
+IS_DBCONFIG=1
+IS_FULLCONFIG=0
+# Bash string manipulation: use # to strip text off $@ and see if string still equals original $@
+[[ "${@#--no-restart}" != "$@" ]] && IS_RESTART=0
+[[ "${@#--no-dbconf}" != "$@" ]]  && IS_DBCONFIG=0
+[[ "${@#--fast}" != "$@" ]]       && IS_DBCONFIG=0
+[[ "${@#--full}" != "$@" ]]       && IS_FULLCONFIG=1
+
+echo "[$([ "$IS_FULLCONFIG" -eq 1 ] && echo "X" || echo " ")] Overwrite /etc/openxpki, recreate DB and certs"
+echo "[$([ "$IS_DBCONFIG" -eq 1 ] && echo "X" || echo " ")] Write database configuration file"
+echo "[$([ "$IS_RESTART" -eq 1 ] && echo "X" || echo " ")] Restart OpenXPKI & Apache"
+echo
+
+#
+# Copy current code and realm CA-ONE config
+#
+
+# fully overwrite existing config
+if [[ $IS_FULLCONFIG -eq 1 ]]; then
+    echo "Write complete OpenXPKI config into /etc/openxpki"
+    rsync -a --delete $OXI_TEST_SAMPLECONFIG_DIR/* /etc/openxpki/ >>$LOG 2>&1
+    rsync -a --delete $OXI_TEST_SAMPLECONFIG_DIR/contrib/local/* /etc/openxpki/local/ >>$LOG 2>&1
+
+    chmod 750              /etc/openxpki/config.d
+    chown -R root:openxpki /etc/openxpki/config.d
+    chmod 750              /etc/openxpki/local
+    chown -R root:openxpki /etc/openxpki/local
+
+    # set en_US as default language to get correct I18N translations (e.g. in rpc.fcgi)
+    sed -ri 's/^(\s*default_language:).*/\1 en_US/' /etc/openxpki/config.d/system/server.yaml
+
+    # set OpenXPKI socket owner to webserver user
+    sed -ri 's/^(\s*socket_owner:).*/\1 www-data/' /etc/openxpki/config.d/system/server.yaml
+
+    # set plain datavault password "root"
+    sed -zri 's/(secret:\s+default:\s+.*?)value@?:[^\n]+/\1value: root/' /etc/openxpki/config.d/system/crypto.yaml
+
+    if grep -q '^vagrant:' /etc/passwd; then
+        # Specify hostname to force MySQL connection via TCP, not socket
+        echo "- Vagrant Box detected: modifying WebUI config"
+
+        sed -ri 's/^(#\s*)?(driver\s*=).*/\2 driver:openxpki/' /etc/openxpki/webui/default.conf
+        sed -ri 's/^(#\s*)?(DataSource\s*=).*/\2 dbi:mysql:dbname=openxpki;host=127.0.0.1/' /etc/openxpki/webui/default.conf
+        sed -ri 's/^(#\s*)?(User\s*=).*/\2 openxpki_session/' /etc/openxpki/webui/default.conf
+        sed -ri 's/^(#\s*)?(Password\s*=).*/\2 mysecret/' /etc/openxpki/webui/default.conf
+    fi
+
+# partial config update
+else
+    # realm democa
+    echo "Update demo realm in /etc/openxpki/config.d/realm/democa"
+    rsync -a --delete \
+      $OXI_TEST_SAMPLECONFIG_DIR/config.d/realm/democa/* \
+      /etc/openxpki/config.d/realm/democa/                             >>$LOG 2>&1
+    chown -R root:openxpki /etc/openxpki/config.d/realm/democa/        >>$LOG 2>&1
+fi
+
+set +e
+test_auth_exists=$(grep -c "Testing:" /etc/openxpki/config.d/realm/democa/auth/stack.yaml)
+set -e
+
+if [ $test_auth_exists -eq 0 ]; then
+    echo "- add authentication stack 'Testing'"
+    # add test auth stack (e.g. user: raop / password: openxpki)
+    sed -zri 's/^/Testing:\n    handler: TestAccounts\n    type: passwd\n\n/' /etc/openxpki/config.d/realm/democa/auth/stack.yaml
+    cat <<__HANDLER >> /etc/openxpki/config.d/realm/democa/auth/handler.yaml
+
+TestAccounts:
+    type: Password
+    label: Test Accounts
+    user:
+        caop:
+            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
+            role: CA Operator
+        raop:
+            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
+            role: RA Operator
+        user:
+            digest: "{ssha}JQ2BAoHQZQgecmNjGF143k4U2st6bE5B"
+            role: User
+__HANDLER
+fi
+
+# set /var/tmp instead of /tmp (where only root has write access)
+sed -ri 's/(LOCATION:)\s*\/tmp.*/\1 \/var\/tmp/g' /etc/openxpki/config.d/realm/democa/publishing.yaml
+
+# database setup
+if [[ $IS_DBCONFIG -eq 1 ]]; then
+    echo "- configure MariaDB as database"
+    cat <<__DB > /etc/openxpki/config.d/system/database.yaml
+    main:
+        debug: 0
+        type: MariaDB
+        host: $OXI_TEST_DB_MYSQL_DBHOST
+        port: $OXI_TEST_DB_MYSQL_DBPORT
+        name: $OXI_TEST_DB_MYSQL_NAME
+        user: $OXI_TEST_DB_MYSQL_USER
+        passwd: $OXI_TEST_DB_MYSQL_PASSWORD
+__DB
+fi
+
+#
+# Compile and install OpenXPKI
+#
+echo ""
+echo "Install OpenXPKI"
+$(dirname $0)/oxi-install "$@" | sed 's/^/  /g'
+
+# create SSL keys and certificates and import them into OpenXPKI
+if [[ $IS_FULLCONFIG -eq 1 ]]; then
+    echo ""
+    $(dirname $0)/oxi-initdb
+fi
+
+if [[ $IS_RESTART -eq 1 ]]; then
+    echo ""
+
+    # oxi-initdb (above) already restarts OpenXPKI
+    if [[ $IS_FULLCONFIG -ne 1 ]]; then
+        echo "Restart OpenXPKI"
+        openxpkictl restart                                           >>$LOG 2>&1
+
+        if [[ $(openxpkictl status 2>&1) != *"is running"* ]]; then
+            echo -e "\nERROR: Could not start OpenXPKI. Please see logs in /var/log/openxpki"
+            exit 333
+        fi
+    fi
+
+    echo "Restart Apache"
+    systemctl restart apache2                                         >>$LOG 2>&1
+fi
+
+echo -e "\nDone."

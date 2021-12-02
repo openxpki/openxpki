@@ -35,8 +35,8 @@ install_packages mariadb-client libdbd-mysql-perl
 # Database setup
 #
 set -e
-/code-repo/tools/testenv/mysql-wait-for-db.sh
-/code-repo/tools/testenv/mysql-create-db.sh
-/code-repo/tools/testenv/mysql-create-user.sh
-/code-repo/tools/testenv/mysql-create-schema.sh
+$OXI_SOURCE_DIR/tools/testenv/mysql-wait-for-db.sh
+$OXI_SOURCE_DIR/tools/testenv/mysql-create-db.sh
+$OXI_SOURCE_DIR/tools/testenv/mysql-create-user.sh
+$OXI_SOURCE_DIR/tools/testenv/mysql-create-schema.sh
 set +e

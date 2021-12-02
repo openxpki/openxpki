@@ -1,0 +1,181 @@
+#!/bin/bash
+## <info> Copy code from host, compile, install OpenXPKI + dependencies
+test $(whoami) != "root" && echo "Please run this as root: sudo $0" && exit 1
+set -o pipefail
+
+if [[
+    -z $OXI_SOURCE_DIR ||
+    -z $OXI_CORE_DIR ||
+    -z $OXI_TEST_SAMPLECONFIG_DIR
+]]; then
+    cat <<EOF
+This script needs the following environment variables set:
+    OXI_SOURCE_DIR              # OpenXPKI repository contents, e.g. /code-repo
+    OXI_EE_SOURCE_DIR           # optional: EE source code
+    OXI_CORE_DIR                # target, e.g. /opt/openxpki/core
+    OXI_TEST_SAMPLECONFIG_DIR   # e.g. /code-repo/config
+EOF
+    exit 1
+fi
+
+#
+# Exit handler
+#
+LOG=$(mktemp)
+function _exit () {
+    if [ $1 -ne 0 -a $1 -ne 333 ]; then
+        echo "================================================================================"
+        echo "$0: ERROR - last command exited with code $1, output:"
+        echo "================================================================================"
+        cat $LOG
+    fi
+    rm -f $LOG
+    exit $1
+}
+
+[[ "${@#--help}" != "$@" ]] && cat <<__HELP && exit 1
+SYNOPSIS
+    $(basename "$0") [OPTIONS]
+
+DESCRIPTION
+    $(cat "$0" | grep "[[:blank:]]#*[[:blank:]]*<info>" | cut -d ">" -f2 | sed s/'^[[:blank:]]*'//)
+
+OPTIONS
+    --no-i18n
+        Skip updating internationalization files.
+
+    --no-compile
+        Skip compiling XS code parts.
+
+    --fast
+        Shortcut for "--no-i18n --no-compile --no-dbconfig".
+__HELP
+
+trap '_exit $?' EXIT
+set -e
+
+#
+# Command line options
+#
+IS_I18N=1
+IS_COMPILE=1
+# Bash string manipulation: use # to strip text off $@ and see if string still equals original $@
+[[ "${@#--no-i18n}" != "$@" ]]    && IS_I18N=0
+[[ "${@#--no-compile}" != "$@" ]] && IS_COMPILE=0
+[[ "${@#--fast}" != "$@" ]]       && IS_COMPILE=0 && IS_I18N=0
+
+echo "[$([ "$IS_COMPILE" -eq 1 ] && echo "X" || echo " ")] Compile OpenXPKI"
+echo "[$([ "$IS_I18N" -eq 1 ] && echo "X" || echo " ")] Compile i18n"
+echo
+
+#
+# Grab and install Perl module dependencies from Makefile.PL using PPI
+#
+# fix problems with newer Net::DNS:
+#rm -f /usr/lib/x86_64-linux-gnu/perl5/5.20/Net/DNS.pm
+#cpanm --notest Net::DNS                                               >>$LOG 2>&1
+
+echo "Check and install Perl module dependencies"
+# Install PPI (the check avoids unneccessary requests to CPAN)
+if ! perl -e 'use PPI;' >/dev/null 2>&1; then
+    cpanm --notest PPI                                                >>$LOG 2>&1
+fi
+$OXI_SOURCE_DIR/tools/scripts/makefile2cpanfile.pl > /cpanfile
+cpanm --quiet --notest --installdeps /
+
+#
+# Write system version (OpenXPKI::Control checks it)
+#
+OXI_VERSION=$(cat $OXI_SOURCE_DIR/.VERSION_MAJOR <(echo .) $OXI_SOURCE_DIR/.VERSION_MINOR <(echo .) $OXI_SOURCE_DIR/.VERSION_RELEASE | tr -d "\n" )
+sed -zri 's/depend:\s*\n\s+core:[^\n]+\n//' /etc/openxpki/config.d/system/version.yaml
+cat <<__VERSION >> /etc/openxpki/config.d/system/version.yaml
+depend:
+    core: $OXI_VERSION
+__VERSION
+
+#
+# Compile OpenXPKI
+#
+echo -e "\nCompilation and installation"
+echo -e "- synchronize source code from host to $OXI_CORE_DIR"
+rsync -a --delete --exclude=.git/ --exclude=node_modules/ $OXI_SOURCE_DIR/core/                 $OXI_CORE_DIR      >>$LOG 2>&1
+
+if [ -d $OXI_EE_SOURCE_DIR/opt/myperl/site_perl/OpenXPKI ]; then
+    echo -e "  --> incl. EE code"
+    rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/site_perl/OpenXPKI/  $OXI_CORE_DIR/server/OpenXPKI/     >>$LOG 2>&1
+fi
+
+echo -e "- synchronize UI code and configuring web server"
+rsync -a --delete --exclude=.git/ --exclude=node_modules/ $OXI_SOURCE_DIR/core/server/htdocs/   /var/www/openxpki/ >>$LOG 2>&1
+rsync -a --delete --exclude=.git/ $OXI_SOURCE_DIR/core/server/cgi-bin/ /usr/lib/cgi-bin/                           >>$LOG 2>&1
+
+if [ -d $OXI_EE_SOURCE_DIR/opt/myperl/share/cgi-bin ]; then
+    echo -e "  --> incl. EE code"
+    rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/share/cgi-bin/ /usr/lib/cgi-bin/                        >>$LOG 2>&1
+fi
+
+cat $OXI_TEST_SAMPLECONFIG_DIR/contrib/apache2-openxpki-site.conf \
+ | perl -pe 's{^(\s*RewriteRule \^\.\*\$ https://)}{#$1}'\
+ > /etc/apache2/sites-available/openxpki.conf
+/usr/sbin/a2ensite openxpki > /dev/null
+
+test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/index.html
+
+/usr/sbin/a2enmod ssl rewrite headers > /dev/null
+
+# Community config: copy home.html
+if [ -e $OXI_TEST_SAMPLECONFIG_DIR/contrib/home.html ]; then
+    echo -e "- copy static home.html"
+    mkdir -p /var/www/static/democa
+    cp $OXI_TEST_SAMPLECONFIG_DIR/contrib/home.html /var/www/static/democa/home.html
+fi
+
+# Set version so Makefile.PL does not need "vergen" (which we will not copy to $OXI_CORE_DIR)
+cat <<__VERSION > $OXI_CORE_DIR/server/OpenXPKI/VERSION.pm
+package OpenXPKI::VERSION;
+our \$VERSION = '$OXI_VERSION';
+1;
+__VERSION
+
+echo "- purge possible target locations"
+while read -d : path; do
+    test $path == "." && continue
+    echo "    $path/OpenXPKI*"
+    rm -rf $path/OpenXPKI*
+    rm -rf $path/auto/OpenXPKI*
+done <<< $(perl -e 'print "$_:" for @INC')
+
+pushd $OXI_CORE_DIR/server                                            >>$LOG 2>&1
+perl Makefile.PL                                                      >>$LOG 2>&1
+if [[ $IS_COMPILE -eq 1 ]]; then
+    echo "- compile OpenXPKI $OXI_VERSION"
+    make                                                              >>$LOG 2>&1
+fi
+echo "- install OpenXPKI"
+make install                                                          >>$LOG 2>&1
+popd                                                                  >>$LOG 2>&1
+
+echo "- install CGI::Session::Driver::openxpki"
+mkdir -p /usr/share/perl5/CGI/Session/Driver
+cp $OXI_CORE_DIR/server/CGI_Session_Driver/openxpki.pm /usr/share/perl5/CGI/Session/Driver/
+
+if [[ $IS_I18N -eq 1 ]]; then
+    echo "- compile and install I18N files"
+    echo "$OXI_VERSION" > $OXI_CORE_DIR/i18n/VERSION
+    pushd $OXI_CORE_DIR/i18n                                          >>$LOG 2>&1
+    make                                                              >>$LOG 2>&1
+    make install                                                      >>$LOG 2>&1
+    popd                                                              >>$LOG 2>&1
+
+    echo "- regenerate locales"
+    TEMP_MAKEFILE=$(mktemp)
+    cat $OXI_CORE_DIR/i18n/Makefile <(echo -e "print-langs:\n\techo \$(LANGS)") > $TEMP_MAKEFILE
+    for lang in $(IFS=' '; make -s -f $TEMP_MAKEFILE print-langs); do
+        if ! grep -q ^$lang /etc/locale.gen; then
+            echo "    adding $lang to /etc/locale.gen"
+            echo "$lang.UTF-8 UTF-8" >> /etc/locale.gen
+        fi
+    done
+
+    locale-gen                                                        >>$LOG 2>&1
+fi

@@ -19,18 +19,18 @@ trap '_exit $?' EXIT
 #
 # Recreate certificates and DB
 #
-echo -e "Recreating database and certificates"
+echo -e "Recreate database and certificates"
 
-echo -e "- stopping OpenXPKI"
+echo -e "- stop OpenXPKI"
 openxpkictl stop                                                  >$LOG 2>&1
 
 set -e
 
-echo -e "- re-creating database and tables"
-/code-repo/tools/testenv/mysql-create-db.sh                       >$LOG 2>&1
-/code-repo/tools/testenv/mysql-create-schema.sh                   >$LOG 2>&1
+echo -e "- recreate database and tables"
+$OXI_SOURCE_DIR/tools/testenv/mysql-create-db.sh                       >$LOG 2>&1
+$OXI_SOURCE_DIR/tools/testenv/mysql-create-schema.sh                   >$LOG 2>&1
 
-echo -e "- creating and importing sample certificates"
+echo -e "- create and import sample certificates"
 rm -rf /etc/openxpki/ca/
 rm -rf /etc/openxpki/local/keys/
 $OXI_TEST_SAMPLECONFIG_DIR/contrib/sampleconfig.sh                >$LOG 2>&1
@@ -38,7 +38,7 @@ chown -R openxpki:root /etc/openxpki/local/keys/
 chmod -R 750 /etc/openxpki/local/keys/
 chown -R www-data:www-data /etc/openxpki/tls/
 
-echo -e "- starting OpenXPKI"
+echo -e "- start OpenXPKI"
 openxpkictl start                                                 >$LOG 2>&1
 
 if [[ $(openxpkictl status 2>&1) != *"is running"* ]]; then

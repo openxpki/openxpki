@@ -88,7 +88,7 @@ if which apache2 >/dev/null; then
 fi
 
 # CONFIGURATION and DATABASE SETUP
-/vagrant/scripts/oxi-refresh --full 2>&1 | tee $LOG
+$OXI_SOURCE_DIR/tools/testenv/oxi-refresh --full 2>&1 | tee $LOG
 
 
 set +e
