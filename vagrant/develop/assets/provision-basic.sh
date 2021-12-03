@@ -64,7 +64,10 @@ install_packages mc rsync gettext \
   apache2 libapache2-mod-fcgid \
   libssl-dev libzip-dev libexpat1-dev \
   libtest-deep-perl libtest-exception-perl \
-  linux-headers-amd64
+  linux-headers-amd64 \
+  mc
+
+apt-get install -t $(lsb_release -sc)-backports git
 
 #
 # Install CPANminus
