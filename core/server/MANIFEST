@@ -448,6 +448,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/ExportToFile.pm
 OpenXPKI/Server/Workflow/Activity/Tools/GenerateKey.pm
 OpenXPKI/Server/Workflow/Activity/Tools/GeneratePassword.pm
 OpenXPKI/Server/Workflow/Activity/Tools/GetCertificateIdentifier.pm
+OpenXPKI/Server/Workflow/Activity/Tools/GetIdentifierForAlias.pm
 OpenXPKI/Server/Workflow/Activity/Tools/GetSystemStatus.pm
 OpenXPKI/Server/Workflow/Activity/Tools/InjectExtraParam.pm
 OpenXPKI/Server/Workflow/Activity/Tools/ListActiveToken.pm
