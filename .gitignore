@@ -32,4 +32,9 @@ tools/docker-test/scripts.tar
 #
 # Others
 #
+
+# EE repo
 myperl-openxpki-ee/
+
+# Config file created by script in openxpki-docker-ee
+.oxi-docker-coretest
