@@ -56,6 +56,14 @@ sub execute {
                 bundle => 1,
                 keeproot => $self->param('include_root_cert')
             );
+        } elsif ($export_format eq 'PKCS7DER') {
+            $data = CTX('api2')->get_chain(
+                start_with => $cert_identifier,
+                bundle => 1,
+                format => 'DER',
+                keeproot => $self->param('include_root_cert')
+            );
+            $data = encode_base64($data,'') if ($encode);
         } else {
             configuration_error('Invalid export format ' . $export_format);
         }
@@ -211,13 +219,18 @@ Exports the certificate as PEM block
 
 =item DER
 
-Exports the certificate in DER format as binary! Will obey the I<base64>
-flag.
+Exports the certificate in DER format as binary! Will obey the
+I<base64> flag.
 
 =item PKCS7
 
 Create a PKCS7 bundle including the issuer chain, will contain the root
 certificate if I<include_root_cert> is set.
+
+=item PKCS7DER
+
+Same as PKCS7 but the output is the raw binary DER encoding, will obey
+the I<base64> flag.
 
 =item BUNDLE
 
@@ -317,7 +330,7 @@ Note: If you export a key and use a persisted workflow, this will leave the
 =item base64, optional
 
 Boolean, if set the output is wrapped by a base64 encoding to avoid raw
-binary data in context. This is ineffective when a template is set, use
-the template definition instead.
+binary data in context. Only available with format DER or PKCS7DER.
+Ineffective when a template is set, use the template definition instead.
 
 =back
