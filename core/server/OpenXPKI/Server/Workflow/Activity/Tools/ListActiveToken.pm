@@ -24,28 +24,23 @@ sub execute {
 
     my $config = CTX('config');
 
-    my $group_name;
-
+    my %args;
     # get group name from type
     if ($self->param('token')) {
-        # Determine the name of the key group for cert signing
-        $group_name = $config->get(['crypto','type', $self->param('token') ]);
-        if (!$group_name) {
-            workflow_error "No group name found for type " . $self->param('token');
-        }
+        $args{type} = $self->param('token');
 
     # explicit group name
     } elsif ($self->param('alias_group')) {
-        $group_name = $self->param('alias_group');
+        $args{group} = $self->param('alias_group');
 
     # oops
     } else {
         configuration_error 'Neither group nor token type was given';
     }
 
-    my $token_list = CTX('api2')->list_active_aliases( group => $group_name );
+    my $token_list = CTX('api2')->list_active_aliases( %args );
     if (!@{$token_list} && !$self->param('empty_ok')) {
-        workflow_error "No active tokens found for group $group_name";
+        workflow_error "No active tokens found for " . (values %args)[0];
     }
 
     ##! 32: "Active tokens found " . Dumper $token_list

@@ -78,13 +78,15 @@ command "list_active_aliases" => {
     my $pki_realm = $params->pki_realm;
 
     if (not $params->has_group) {
-        OpenXPKI::Exception->throw( message => "Token type or group must be given" ) unless $params->has_type;
+        OpenXPKI::Exception->throw(
+            message => "Token type or group must be given"
+        ) unless $params->has_type;
 
-        $group = CTX('config')->get("realm.$pki_realm.crypto.type.".$params->type)
-            or OpenXPKI::Exception->throw(
-                message => "Could not find token group by type",
-                params => { type => $params->type },
-            );
+        $group = CTX('config')->get(['realm', $pki_realm, 'crypto', 'type', $params->type ])
+        or OpenXPKI::Exception->throw(
+            message => "Could not find token group by type",
+            params => { type => $params->type },
+        );
     }
 
     my $validity = OpenXPKI::Server::API2::Plugin::Token::Util->validity_to_epoch($params->validity);
@@ -92,41 +94,35 @@ command "list_active_aliases" => {
     my $aliases = CTX('dbi')->select(
         from => 'aliases',
         columns => [
-            'aliases.notbefore',
-            'aliases.notafter',
-            'aliases.alias',
-            'aliases.identifier',
+            'notbefore',
+            'notafter',
+            'alias',
+            'identifier',
         ],
         where => {
-            'aliases.pki_realm' => $pki_realm,
-            'aliases.group_id'  => $group,
-            'aliases.notbefore' => { '<' => $validity->{notbefore} },
-            'aliases.notafter'  => { '>' => $validity->{notafter} },
+            'pki_realm' => $pki_realm,
+            'group_id'  => $group,
+            'notbefore' => { '<' => $validity->{notbefore} },
+            'notafter'  => { '>' => $validity->{notafter} },
         },
-        order_by => [ '-aliases.notbefore' ],
+        order_by => [ '-notbefore' ],
     );
 
     my @result;
     while (my $row = $aliases->fetchrow_hashref) {
-        my $item = {
-            alias => $row->{alias},
-            identifier => $row->{identifier},
-            notbefore => $row->{notbefore},
-            notafter  => $row->{notafter},
-        };
         # security check: only do online/offline check if we check the session PKI realm
         if ($params->check_online) {
             if ($params->pki_realm eq CTX('session')->data->pki_realm) {
-                $item->{status} = $self->api->is_token_usable(alias => $row->{alias})
+                $row->{status} = $self->api->is_token_usable(alias => $row->{alias})
                     ? 'ONLINE'
                     : 'OFFLINE';
             }
             else {
-                $item->{status} = 'UNKNOWN';
+                $row->{status} = 'UNKNOWN';
                 CTX('log')->application->warn("API command 'list_active_aliases' was called to query another realm's tokens with 'check_online = 1'. This is forbidden, 'status' will be set to UNKNOWN.");
             }
         }
-        push @result, $item;
+        push @result, $row;
     }
 
     return \@result;
