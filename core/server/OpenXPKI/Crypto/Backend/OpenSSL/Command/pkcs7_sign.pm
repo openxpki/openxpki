@@ -63,6 +63,8 @@ sub get_command {
         $self->{KEYFILE}  = $self->{ENGINE}->get_keyfile();
     }
 
+    $self->{OUTFORM} = "PEM" if (not exists $self->{OUTFORM});
+
     ## check parameters
 
     if ( not $self->{CONTENT} ) {
@@ -81,7 +83,8 @@ sub get_command {
 
     ## build the command
 
-    my @command = qw( cms -sign -binary -outform PEM -nosmimecap );
+    my @command = qw( cms -sign -binary -nosmimecap );
+    push @command, ("-outform", $self->{OUTFORM} );
     push @command, ("-nodetach") if ( not $self->{DETACH} );
     push @command, ("-engine", $engine) if ($engine);
     push @command, ("-keyform", $keyform) if ($keyform);

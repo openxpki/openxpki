@@ -129,7 +129,8 @@ sub __init_command_params : PRIVATE {
     "pkcs7_sign"      => {"PASSWD"  => 0,
                           "KEY"     => 0,
                           "CERT"    => 0,
-                          "CONTENT" => 1},
+                          "CONTENT" => 1,
+                          "OUTFORM" => ['__undef', 'DER','PEM'],},
     "pkcs7_verify"    => {"CHAIN"   => 0, # optional only when NO_VERIFY is set
                           "NO_CHAIN" => 0,
                           "CONTENT" => 0,
