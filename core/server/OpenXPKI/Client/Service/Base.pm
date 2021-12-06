@@ -367,9 +367,11 @@ sub handle_property_request {
     return OpenXPKI::Client::Service::Response->new( 50003 ) unless($out);
 
     # the workflows should return base64 encoded raw data
-    # but the old workflows returned PKCS7 with PEM headers
-    $out =~ s{-----(BEGIN|END) PKCS7-----}{}g;
-    $out =~ s{\s}{}gxms;
+    # but the old EST GetCA workflow returned PKCS7 with PEM headers
+    if ($workflow_type eq 'est_cacerts') {
+        $out =~ s{-----(BEGIN|END) PKCS7-----}{}g;
+        $out =~ s{\s}{}gxms;
+    }
 
     return OpenXPKI::Client::Service::Response->new({
         result => $out,

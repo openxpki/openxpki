@@ -124,11 +124,8 @@ while (my $cgi = CGI::Fast->new()) {
 
     my $mime;
     if ($operation eq 'GetCACaps') {
-        my @caps = qw( Renewal POSTPKIOperation SHA-512 SHA-384 SHA-256 SHA-224 SHA-1 DES3 AES);
         $mime = 'text/plain';
-        $response = OpenXPKI::Client::Service::Response->new({
-            result => encode_base64(join("\n", @caps)),
-        });
+        $response = $client->handle_property_request($cgi);
     }
 
     if ($operation eq 'GetCACert') {
@@ -148,6 +145,14 @@ while (my $cgi = CGI::Fast->new()) {
             'charset' => 'utf8',
         );
         print $response->error_message()."\n";
+    } elsif ($mime eq 'text/plain') {
+        print $cgi->header(
+            -status => $response->http_status_line(),
+            -type => 'text/plain',
+            'charset' => 'utf8',
+            'content-length' => length $response->result,
+        );
+        print $response->result;
     } else {
         my $out = decode_base64($response->result);
         print $cgi->header(
