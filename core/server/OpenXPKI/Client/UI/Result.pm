@@ -878,9 +878,10 @@ sub __build_attribute_subquery {
             # embed into search pattern from config
             $val = sprintf($pattern, $val) if ($pattern);
 
-            # replace asterisk as wildcard for like fields
+            # replace asterisk and question mark as wildcard for like fields
             if ($operator =~ /LIKE/i) {
                 $val =~ s/\*/%/g;
+                $val =~ s/\?/_/g;
             }
 
             if ($transform =~ /lower/) {
@@ -943,6 +944,27 @@ sub __build_attribute_preset {
 
     return \@attr;
 
+}
+
+
+=head2 transate_sql_wildcards
+
+Replace "literal" wildcards asterisk and question mark by percent and
+underscore for SQL queries.
+
+=cut
+
+sub transate_sql_wildcards  {
+
+    my $self = shift;
+    my $val = shift;
+
+    return $val if (ref $val);
+
+    $val =~ s/\*/%/g;
+    $val =~ s/\?/_/g;
+
+    return $val;
 }
 
 =head2 decrypted_param

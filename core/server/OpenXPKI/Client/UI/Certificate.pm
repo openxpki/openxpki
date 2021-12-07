@@ -124,12 +124,19 @@ sub init_search {
     }
 
     my @fields = (
-        { name => 'subject', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', type => 'text', is_optional => 1, value => $preset->{subject} },
-        { name => 'san', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SAN', type => 'text', is_optional => 1, value => $preset->{san} },
-        { name => 'status', label => 'I18N_OPENXPKI_UI_CERTIFICATE_STATUS', type => 'select', is_optional => 1, prompt => 'all', options => \@states, , value => $preset->{status} },
-        { name => 'profile', label => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE', type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list, value => $preset->{profile} },
-        { name => 'issuer_identifier', label => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER', type => 'select', is_optional => 1, prompt => 'all', options => \@issuer_list, value => $preset->{issuer_identifier} },
-        { name => 'validity', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY', 'keys' => $self->__validity_options(), type => 'datetime', is_optional => 1, clonable => 1, value => $preset->{validity_options} || [ { key => 'valid_at', value => '' }], },
+        { name => 'subject', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', placeholder => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SUBJECT_PLACEHOLDER',
+            type => 'text', is_optional => 1, value => $preset->{subject} },
+        { name => 'san', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SAN', placeholder => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SAN_PLACEHOLDER',
+            type => 'text', is_optional => 1, value => $preset->{san} },
+        { name => 'status', label => 'I18N_OPENXPKI_UI_CERTIFICATE_STATUS',
+            type => 'select', is_optional => 1, prompt => 'all', options => \@states, , value => $preset->{status} },
+        { name => 'profile', label => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE',
+            type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list, value => $preset->{profile} },
+        { name => 'issuer_identifier', label => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER',
+            type => 'select', is_optional => 1, prompt => 'all', options => \@issuer_list, value => $preset->{issuer_identifier} },
+        { name => 'validity', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY', placeholder => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_VALIDITY_PLACEHOLDER',
+            type => 'datetime', is_optional => 1, clonable => 1,
+            'keys' => $self->__validity_options(), value => $preset->{validity_options} || [ { key => 'valid_at', value => '' }], },
    );
 
     my $attributes = $self->_client->session()->param('certsearch')->{default}->{attributes};
@@ -145,12 +152,15 @@ sub init_search {
         push @fields, {
             name => 'attributes',
             label => 'I18N_OPENXPKI_UI_CERTIFICATE_METADATA',
+            placeholder => 'I18N_OPENXPKI_UI_SEARCH_METADATA_PLACEHOLDER',
             'keys' => \@attrib,
             type => 'text',
             is_optional => 1,
             'clonable' => 1,
             'value' => $preset->{attributes} || [{ 'key' => $attrib[0]->{value}, value => ''}],
         } if (@attrib);
+
+        unshift @meta_description, { value => 'I18N_OPENXPKI_UI_CERTIFICATE_METADATA', format => 'head' } if (@meta_description);
     }
 
     $self->add_section({
@@ -172,8 +182,10 @@ sub init_search {
            description => 'I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL',
            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
            fields => [
-               { name => 'cert_identifier', label => 'I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER', type => 'text', is_optional => 1, value => $preset->{cert_identifier} },
-               { name => 'cert_serial', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SERIAL', type => 'text', is_optional => 1, value => $preset->{cert_serial} },
+               { name => 'cert_identifier', label => 'I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER',
+                type => 'text', is_optional => 1, value => $preset->{cert_identifier} },
+               { name => 'cert_serial', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SERIAL', placeholder => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SERIAL_PLACEHOLDER',
+                type => 'text', is_optional => 1, value => $preset->{cert_serial} },
            ]
         }},
     );
@@ -190,7 +202,7 @@ sub init_search {
               { label => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE', value => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_HINT', format => 'raw' },
               { label => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER',  value => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER_HINT', format => 'raw' },
               { label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY', value => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY_HINT', format => 'raw' },
-              @meta_description
+              @meta_description,
             ]
         }
     });
@@ -1227,10 +1239,8 @@ Handle search requests and display the result as grid
 
 sub action_search {
 
-
     my $self = shift;
     my $args = shift;
-
 
     $self->logger()->trace("input params: " . Dumper $self->cgi()->param()) if $self->logger->is_trace;
 
@@ -1316,8 +1326,7 @@ sub action_search {
             $type = $1;
             $val = $2;
         }
-        $val =~ s{\*}{%}g;
-        $val =~ s{\?}{_}g;
+        $val = $self->transate_sql_wildcards($val);
         $attr->{subject_alt_name} = { -like => "$type:$val" };
     }
 

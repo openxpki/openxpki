@@ -564,7 +564,6 @@ sub init_search {
         },
         { name => 'wf_proc_state',
           label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL',
-
           type => 'select',
           is_optional => 1,
           prompt => '',
@@ -573,6 +572,7 @@ sub init_search {
         },
         { name => 'wf_state',
           label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_LABEL',
+          placeholder => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_PLACEHOLDER',
           type => 'text',
           is_optional => 1,
           prompt => '',
@@ -580,6 +580,7 @@ sub init_search {
         },
         { name => 'wf_creator',
           label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL',
+          placeholder => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_PLACEHOLDER',
           type => 'text',
           is_optional => 1,
           value => $preset->{wf_creator}
@@ -595,14 +596,20 @@ sub init_search {
 
     # Searchable attributes are read from the menu bootstrap
     my $attributes = $self->_session->param('wfsearch')->{default}->{attributes};
+    my @meta_description;
     if ($attributes && (ref $attributes eq 'ARRAY')) {
         my @attrib;
         foreach my $item (@{$attributes}) {
             push @attrib, { value => $item->{key}, label=> $item->{label} };
+            if ($item->{description}) {
+                push @meta_description, { label=> $item->{label}, value => $item->{description}, format => 'raw' };
+            }
         }
+        unshift @meta_description, { value => 'I18N_OPENXPKI_UI_WORKFLOW_METADATA_LABEL', format => 'head' } if (@meta_description);
         push @fields, {
             name => 'attributes',
-            label => 'Metadata',
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_METADATA_LABEL',
+            placeholder => 'I18N_OPENXPKI_UI_SEARCH_METADATA_PLACEHOLDER',
             'keys' => \@attrib,
             type => 'text',
             is_optional => 1,
@@ -634,6 +641,22 @@ sub init_search {
             submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
             fields => \@fields
 
+        }
+    });
+
+    $self->add_section({
+        type => 'keyvalue',
+        content => {
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_FIELD_HINT_LIST',
+            description => '',
+            data => [
+              { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_LABEL', value => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_HINT', format => 'raw' },
+              { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL', value => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_HINT', format => 'raw' },
+              { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_LABEL', value => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_HINT', format => 'raw' },
+              { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL', value => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_HINT', format => 'raw' },
+              { label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL', value => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_HINT', format => 'raw' },
+              @meta_description
+            ]
         }
     });
 
@@ -1510,7 +1533,7 @@ sub action_search {
     }
 
     if (my $state = $self->param('wf_state')) {
-        $query->{state} = $state;
+        $query->{state} = [ split /\s/, $state ];
         $input->{wf_state} = $state;
         $verbose->{wf_state} = $state;
     }
@@ -1539,7 +1562,7 @@ sub action_search {
 
     if (my $wf_creator = $self->param('wf_creator')) {
         $input->{wf_creator} = $wf_creator;
-        $attr->{'creator'} = scalar $wf_creator;
+        $attr->{'creator'} = { -like => $self->transate_sql_wildcards($wf_creator) };
         $verbose->{wf_creator} = $wf_creator;
     }
 

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2021-10-20 13:10+0200\n"
+"PO-Revision-Date: 2021-12-07 15:49+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -182,11 +182,25 @@ msgstr "Result of your search query"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_TITLE"
 msgstr "Certificate Search Result"
 
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SAN_PLACEHOLDER"
+msgstr "exact search for SAN items, type can be given with TYPE:VALUE"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SERIAL_PLACEHOLDER"
+msgstr ""
+"serial in decimal or hexadecimal notation, spaces and colons are ignored"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SAN"
 msgstr "Search for certificates with this SAN"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SUBJECT"
 msgstr "Search for certificates with this subject"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SUBJECT_PLACEHOLDER"
+msgstr ""
+"executes a substring match on the full certificate DN, wildcards can be used."
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_VALIDITY_PLACEHOLDER"
+msgstr "select criteria and timestamp"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SERIAL"
 msgstr "Certificate Serial"
@@ -1283,6 +1297,9 @@ msgstr "Export Result"
 
 msgid "I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES"
 msgstr "Your query did not return any matches!"
+
+msgid "I18N_OPENXPKI_UI_SEARCH_METADATA_PLACEHOLDER"
+msgstr "search filters depend on attribute, see below"
 
 msgid "I18N_OPENXPKI_UI_SEARCH_NEW_SEARCH"
 msgstr "New Search"
@@ -3155,6 +3172,11 @@ msgstr "last update after"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_BEFORE_LABEL"
 msgstr "last update before"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_HINT"
+msgstr ""
+"Find only workflows that have been update last after/before the given "
+"timestamp."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL"
 msgstr "Last Update"
 
@@ -3172,6 +3194,9 @@ msgstr "Priority"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_LOG_TIMESTAMP_LABEL"
 msgstr "Timestamp"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_METADATA_LABEL"
+msgstr "Metadata"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_FIELD_LEVEL_DESCRIPTION"
 msgstr ""
@@ -3221,6 +3246,9 @@ msgstr "Paused action"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PAUSE_REASON_LABEL"
 msgstr "Pause Reason"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_HINT"
+msgstr "The internal processing state of the workflow."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL"
 msgstr "Run State"
@@ -3293,14 +3321,31 @@ msgstr "Requested action not available - opening current state"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_RESET_BUTTON"
 msgstr "Go Back"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_HINT"
+msgstr ""
+"Show only workflows owned by the given creator, exact match, including the "
+"namespace prefix, if set. Can contain '*' and '?' wildcard."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL"
 msgstr "Creator"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_PLACEHOLDER"
+msgstr "exact match for creator, including namespace prefix, wildcards allowed"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESC"
 msgstr "Search for workflows using the filters below."
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_FIELD_HINT_LIST"
+msgstr "Explanation on the search filters:"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_LABEL"
 msgstr "Search for Workflows"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_META_CERT_SUBJECT_HINT"
+msgstr ""
+"Find only workflows that are in the given state, exact match only, no "
+"wildcards are allowed but multiple states can be given separated by space."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION"
 msgstr "Results of your search:"
@@ -3320,11 +3365,22 @@ msgstr "Search the database"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL"
 msgstr "Workflow Id"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_HINT"
+msgstr ""
+"Find only workflows that are in the given state, exact match only, no "
+"wildcards are allowed but multiple states can be given separated by space."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_LABEL"
 msgstr "State"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_PLACEHOLDER"
+msgstr "exact match of an internal state name, e.g. SUCCESS or PENDING"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL"
 msgstr "Search now"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_HINT"
+msgstr "Filter on the selected workflow type."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_LABEL"
 msgstr "Type"
@@ -4054,6 +4110,11 @@ msgstr "Wake Up"
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "Yes"
 
+#~ msgid "I18N_OPENXPKI_UI_CERTIFICATE_SERIAL_HINT"
+#~ msgstr ""
+#~ "Find a certificate by its serial number. In hexadecimal notation, spaces "
+#~ "and colons will be ignored."
+
 # Remove?
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CUST"
@@ -4334,9 +4395,6 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO"
 #~ msgstr "Technical Log"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_ARCHIVED"
-#~ msgstr "archived"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
 #~ msgstr "exception"
