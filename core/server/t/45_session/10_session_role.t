@@ -86,8 +86,11 @@ lives_and {
 
     my $session2 = OpenXPKI::Server::Session->new(type => "TestDriver")->create;
     $session2->data->thaw($frozen1);
+    my $d2 = $session2->data_as_hashref;
 
-    cmp_deeply $session2->data_as_hashref, $session_data;
+    cmp_deeply
+      { %{$d2}, primary_tenant => undef },
+      { %{$session_data}, primary_tenant => ignore() };
 } "thaw data (except 'user') into session 2";
 
 lives_and {
