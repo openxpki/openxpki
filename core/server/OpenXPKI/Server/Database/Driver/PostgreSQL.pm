@@ -46,6 +46,7 @@ sub dbi_connect_params {
 sub on_connect {
     my ($self, $dbh) = @_;
     $dbh->do("SET SESSION CHARACTERISTICS AS TRANSACTION ISOLATION LEVEL READ COMMITTED");
+    $dbh->do("SET CLIENT_MIN_MESSAGES TO WARNING");
 }
 
 # Parameters for SQL::Abstract::More
