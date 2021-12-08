@@ -58,7 +58,7 @@ my %legacy = (
     sequence_len => 4,
 );
 
-password_ok "v.s.pwd4oxi", %legacy;
+password_ok "vry.s.pwd4oxi", %legacy;
 
 # too short
 password_fails "a2.2g9", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_SHORT", %legacy;
@@ -76,7 +76,7 @@ password_fails "58232305623", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_GROUPS", %legac
 password_fails "ab!123456789", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_SEQUENCE", %legacy;
 
 # repetitive
-password_fails "!123aaaabbbbcc", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REPETITIONS", %legacy;
+password_fails "!123....======%%", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_REPETITIONS", %legacy;
 
 # repetitive
 password_fails "!d.4_SuNset", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_CONTAINS_DICT_WORD", %legacy;
@@ -94,7 +94,7 @@ password_fails "JEu8Zqlo", "I18N_OPENXPKI_UI_PASSWORD_QUALITY_LENGTH_TOO_SHORT",
 #
 # Tests - new algorithms
 #
-password_ok "v.s.pwd4oxi";
+password_ok "vry.s.pwd4oxi";
 password_ok "!d.4_SuNset";
 
 # top 10k password

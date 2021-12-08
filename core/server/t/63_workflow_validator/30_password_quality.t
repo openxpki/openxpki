@@ -160,7 +160,7 @@ my $oxitest = OpenXPKI::Test->new(
 # Tests - legacy
 #
 
-password_ok("v.s.pwd4oxi", $wf_legacy);
+password_ok("vry.s.pwd4oxi", $wf_legacy);
 
 # too less different characters
 password_fails("1!111!aaa!!aa" => qr/I18N_OPENXPKI_UI_PASSWORD_QUALITY_DIFFERENT_CHARS/, $wf_legacy);
