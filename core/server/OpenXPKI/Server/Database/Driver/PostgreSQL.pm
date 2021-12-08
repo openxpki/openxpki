@@ -57,7 +57,7 @@ sub sqlam_params {
 sub sequence_create_query {
     my ($self, $dbi, $seq) = @_;
     return OpenXPKI::Server::Database::Query->new(
-        string => "CREATE SEQUENCE $seq START WITH 0 INCREMENT BY 1 MINVALUE 0 NO MAXVALUE ORDER",
+        string => "CREATE SEQUENCE $seq START WITH 0 INCREMENT BY 1 MINVALUE 0 NO MAXVALUE",
     );
 }
 
