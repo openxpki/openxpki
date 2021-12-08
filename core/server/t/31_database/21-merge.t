@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use English;
 use Test::More;
+use Test::Deep;
 use Test::Exception;
 use FindBin qw( $Bin );
 
@@ -41,7 +42,7 @@ $db->run("SQL MERGE", 11, sub {
         );
         ok $rownum > 0; # MySQL returns 2 on update
     } "replace existing data";
-    is_deeply $t->get_data, [
+    cmp_bag $t->get_data, [
         [ 1, "Digital Signage", 5],
         [ 2, "Buergersteig",  3],
     ], "verify data";
@@ -55,7 +56,7 @@ $db->run("SQL MERGE", 11, sub {
         );
         ok $rownum > 0; # MySQL returns 2 on update
     } "replace existing data (two values)";
-    is_deeply $t->get_data, [
+    cmp_bag $t->get_data, [
         [ 1, "Elektroschild", 27],
         [ 2, "Buergersteig",  3],
     ], "verify data";
@@ -69,7 +70,7 @@ $db->run("SQL MERGE", 11, sub {
         );
         is $rownum, 1;
     } "replace non-existing data (i.e. insert)";
-    is_deeply $t->get_data, [
+    cmp_bag $t->get_data, [
         [ 1, "Elektroschild", 27],
         [ 2, "Buergersteig",  3],
         [ 3, "Rathaus",       42],
@@ -85,7 +86,7 @@ $db->run("SQL MERGE", 11, sub {
         );
         ok $rownum > 0;
     } "partly update row ignoring 'set_once'";
-    is_deeply $t->get_data, [
+    cmp_bag $t->get_data, [
         [ 1, "Elektroschild", 27],
         [ 2, "Buergersteig",  3],
         [ 3, "Saftladen",     42],
@@ -101,7 +102,7 @@ $db->run("SQL MERGE", 11, sub {
         );
         is $rownum, 1;
     } "insert new row obeying 'set_once'";
-    is_deeply $t->get_data, [
+    cmp_bag $t->get_data, [
         [ 1, "Elektroschild", 27],
         [ 2, "Buergersteig",  3],
         [ 3, "Saftladen",     42],

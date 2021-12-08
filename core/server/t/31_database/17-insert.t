@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use English;
 use Test::More;
+use Test::Deep;
 use Test::Exception;
 use FindBin qw( $Bin );
 
@@ -26,7 +27,7 @@ my $db = DatabaseTest->new(
 #
 # tests
 #
-$db->run("SQL INSERT", 8, sub {
+$db->run("SQL INSERT", 11, sub {
     my $t = shift;
     my $dbi = $t->dbi;
     my $rownum;
@@ -40,6 +41,8 @@ $db->run("SQL INSERT", 8, sub {
     } "OpenXPKI::Exception", "fail if wrong method parameters are given";
     like $@, qr/(dummytestparameter)/i, "return correct error message";
 
+    lives_ok { $dbi->rollback() } "rollback";
+
     # specify wrong column name, should complain
     throws_ok {
         $dbi->insert(
@@ -48,6 +51,8 @@ $db->run("SQL INSERT", 8, sub {
         );
     } "OpenXPKI::Exception", "fail to insert wrong column name";
     like $@, qr/dummytestcolumn/i, "return correct error message";
+
+    lives_ok { $dbi->rollback() } "rollback";
 
     # insert duplicate primary key, should complain
     throws_ok {
@@ -58,6 +63,8 @@ $db->run("SQL INSERT", 8, sub {
     } "OpenXPKI::Exception", "fail to insert duplicate primary key";
     like $@, qr/(unique|duplicate)/i, "return correct error message";
 
+    lives_ok { $dbi->rollback() } "rollback";
+
     # correct insert
     lives_and {
         $rownum = $dbi->insert(
@@ -66,7 +73,7 @@ $db->run("SQL INSERT", 8, sub {
         );
         ok $rownum == 1;
     } "correctly execute insert query";
-    is_deeply $t->get_data, [
+    cmp_bag $t->get_data, [
         [ 1, "Litfasssaeule", 333 ],
         [ 2, "Flatscreen",    10  ],
     ], "correct data after insert";

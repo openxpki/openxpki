@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use English;
 use Test::More;
+use Test::Deep;
 use Test::Exception;
 use File::Temp qw/ tempfile /;
 use FindBin qw( $Bin );
@@ -45,7 +46,7 @@ $db->run("Transactions", 14, sub {
             values => { id => 4, text => "Schwimmhalle" },
         );
         $dbi->commit;
-        is_deeply $t->get_data, [
+        cmp_bag $t->get_data, [
             [ 1, "Litfasssaeule" ],
             [ 2, "Buergersteig" ],
             [ 3, "Rathaus" ],
@@ -64,7 +65,7 @@ $db->run("Transactions", 14, sub {
             where => { id => 4 },
         );
         $dbi->rollback;
-        is_deeply $t->get_data, [
+        cmp_bag $t->get_data, [
             [ 1, "Litfasssaeule" ],
             [ 2, "Buergersteig" ],
             [ 3, "Rathaus" ],
@@ -82,7 +83,7 @@ $db->run("Transactions", 14, sub {
             where => { id => 4 },
         );
         $dbi->commit;
-        is_deeply $t->get_data, [
+        cmp_bag $t->get_data, [
             [ 1, "Litfasssaeule" ],
             [ 2, "Buergersteig" ],
             [ 3, "Rathaus" ],
@@ -99,7 +100,7 @@ $db->run("Transactions", 14, sub {
             where => { id => 3 },
         );
         $dbi->rollback;
-        is_deeply $t->get_data, [
+        cmp_bag $t->get_data, [
             [ 1, "Litfasssaeule" ],
             [ 2, "Buergersteig" ],
             [ 3, "Rathaus" ],
@@ -124,7 +125,7 @@ $db->run("Transactions", 14, sub {
             where => { id => 3 },
         );
         $dbi->commit;
-        is_deeply $t->get_data, [
+        cmp_bag $t->get_data, [
             [ 1, "Litfasssaeule" ]
         ];
     } "start transaction twice, should be ignored";
@@ -146,7 +147,7 @@ $db->run("Transactions", 14, sub {
         my $t = shift;
         my $dbi = $t->dbi;
 
-        is_deeply $t->get_data, [
+        cmp_bag $t->get_data, [
             [ 1, "Litfasssaeule" ],
         ], "correct data in other handle";
     });

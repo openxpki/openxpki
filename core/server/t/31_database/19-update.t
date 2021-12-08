@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use English;
 use Test::More;
+use Test::Deep;
 use Test::Exception;
 use FindBin qw( $Bin );
 
@@ -55,7 +56,7 @@ $db->run("SQL UPDATE", 3, sub {
     } "update 2 rows";
 
     # check data
-    is_deeply $t->get_data, [
+    cmp_bag $t->get_data, [
         [ 1, "Litfasssaeule", 5 ],
         [ 2, "Buergersteig",  5 ],
         [ 3, "Rathaus",       42 ],

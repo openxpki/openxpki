@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use English;
 use Test::More;
+use Test::Deep;
 use Test::Exception;
 use FindBin qw( $Bin );
 
@@ -43,7 +44,7 @@ $db->run("SQL DELETE", 12, sub {
         ok $rownum == 0;
     } "no update with non-matching where clause";
 
-    is_deeply $t->get_data, [
+    cmp_bag $t->get_data, [
         [ 1, "Litfasssaeule", 1 ],
         [ 2, "Buergersteig",  1 ],
         [ 3, "Rathaus",       42 ],
@@ -59,7 +60,7 @@ $db->run("SQL DELETE", 12, sub {
         is $rownum, 1;
     } "delete one row";
 
-    is_deeply $t->get_data, [
+    cmp_bag $t->get_data, [
         [ 1, "Litfasssaeule", 1],
         [ 2, "Buergersteig",  1],
         [ 4, "Kindergarten",  3],
@@ -74,7 +75,7 @@ $db->run("SQL DELETE", 12, sub {
         is $rownum, 2;
     } "delete multiple rows";
 
-    is_deeply $t->get_data, [
+    cmp_bag $t->get_data, [
         [ 4, "Kindergarten",  3],
     ], "deleted rows are really gone";
 
@@ -99,7 +100,7 @@ $db->run("SQL DELETE", 12, sub {
         $dbi->delete(from => "test", all => 1)
     } "allow intended deletion of all rows";
 
-    is_deeply $t->get_data, [];
+    cmp_bag $t->get_data, [];
 });
 
 done_testing($db->test_no);
