@@ -10,14 +10,9 @@ VBOX="$1"
 #
 touch /etc/environment
 
-[ ! $(grep -q OXI_SOURCE_DIR /etc/environment) ] \
-  && echo "OXI_SOURCE_DIR=/code-repo" >> /etc/environment
-
-[ ! $(grep -q OXI_EE_SOURCE_DIR /etc/environment) ] \
-  && echo "OXI_EE_SOURCE_DIR=/code-repo/myperl-openxpki-ee" >> /etc/environment
-
-[ ! $(grep -q OXI_TEST_SAMPLECONFIG_DIR /etc/environment) ] \
-  && echo "OXI_TEST_SAMPLECONFIG_DIR=/code-repo/config" >> /etc/environment
+$(grep -q OXI_SOURCE_DIR /etc/environment) || echo "OXI_SOURCE_DIR=/code-repo" >> /etc/environment
+$(grep -q OXI_EE_SOURCE_DIR /etc/environment) || echo "OXI_EE_SOURCE_DIR=/code-repo/myperl-openxpki-ee" >> /etc/environment
+$(grep -q OXI_TEST_SAMPLECONFIG_DIR /etc/environment) || echo "OXI_TEST_SAMPLECONFIG_DIR=/code-repo/config" >> /etc/environment
 
 # Read our configuration and the one written by previous (DB) provisioning scripts
 while read def; do export $def; done < /etc/environment
@@ -81,7 +76,7 @@ fi
 # Helper scripts
 #
 tools_dir="$OXI_SOURCE_DIR/tools/testenv"
-if [ ! $(grep -q $tools_dir /root/.bashrc) ]; then
+if ! $(grep -q $tools_dir /root/.bashrc); then
     echo "export PATH=$PATH:$tools_dir" >> /root/.bashrc
     echo "export PATH=$PATH:$tools_dir" >> /home/vagrant/.profile
     echo "$tools_dir/oxi-help"          >> /home/vagrant/.profile
