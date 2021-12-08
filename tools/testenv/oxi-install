@@ -10,10 +10,10 @@ if [[
 ]]; then
     cat <<EOF
 This script needs the following environment variables set:
-    OXI_SOURCE_DIR              # OpenXPKI repository contents, e.g. /code-repo
-    OXI_EE_SOURCE_DIR           # optional: EE source code
-    OXI_CORE_DIR                # target, e.g. /opt/openxpki/core
-    OXI_TEST_SAMPLECONFIG_DIR   # e.g. /code-repo/config
+    OXI_SOURCE_DIR              # source: public code, e.g. /code-repo
+    OXI_EE_SOURCE_DIR           # source: EE code (optional)
+    OXI_TEST_SAMPLECONFIG_DIR   # source: config, e.g. /code-repo/config
+    OXI_CORE_DIR                # target: where "core" gets copied to and tests are run, e.g. /opt/openxpki/core
 EOF
     exit 1
 fi
