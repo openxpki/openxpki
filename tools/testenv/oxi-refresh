@@ -1,4 +1,9 @@
 #!/bin/bash
+
+#
+# This script is used in the Vagrant Box "develop"
+#
+
 ## <info> Configure environment and install OpenXPKI from host sources
 test $(whoami) != "root" && echo "Please run this as root: sudo $0" && exit 1
 set -o pipefail
@@ -185,6 +190,14 @@ fi
 echo ""
 echo "Install OpenXPKI"
 $(dirname $0)/oxi-install "$@" | sed 's/^/  /g'
+
+# configure web server
+echo -e "\nConfigure Apache web server"
+cat $OXI_TEST_SAMPLECONFIG_DIR/contrib/apache2-openxpki-site.conf \
+ | perl -pe 's{^(\s*RewriteRule \^\.\*\$ https://)}{#$1}'\
+ > /etc/apache2/sites-available/openxpki.conf
+/usr/sbin/a2ensite openxpki > /dev/null
+/usr/sbin/a2enmod ssl rewrite headers > /dev/null
 
 # create SSL keys and certificates and import them into OpenXPKI
 if [[ $IS_FULLCONFIG -eq 1 ]]; then

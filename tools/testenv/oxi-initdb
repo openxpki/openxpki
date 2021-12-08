@@ -30,7 +30,7 @@ echo -e "- recreate database and tables"
 $OXI_SOURCE_DIR/tools/testenv/mysql-create-db.sh                       >$LOG 2>&1
 $OXI_SOURCE_DIR/tools/testenv/mysql-create-schema.sh                   >$LOG 2>&1
 
-echo -e "- create and import sample certificates"
+echo -e "- create and import sample certificates (takes a while!)"
 rm -rf /etc/openxpki/ca/
 rm -rf /etc/openxpki/local/keys/
 $OXI_TEST_SAMPLECONFIG_DIR/contrib/sampleconfig.sh                >$LOG 2>&1

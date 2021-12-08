@@ -87,11 +87,21 @@ cpanm --quiet --notest --installdeps /
 # Write system version (OpenXPKI::Control checks it)
 #
 OXI_VERSION=$(cat $OXI_SOURCE_DIR/.VERSION_MAJOR <(echo .) $OXI_SOURCE_DIR/.VERSION_MINOR <(echo .) $OXI_SOURCE_DIR/.VERSION_RELEASE | tr -d "\n" )
-sed -zri 's/depend:\s*\n\s+core:[^\n]+\n//' /etc/openxpki/config.d/system/version.yaml
-cat <<__VERSION >> /etc/openxpki/config.d/system/version.yaml
-depend:
-    core: $OXI_VERSION
-__VERSION
+
+# use modify-config if available (= openxpki-docker-ee environment)
+if which modify-config > /dev/null; then
+    TEMPDIR=$(mktemp -d)
+    echo "core: $OXI_VERSION" > $TEMPDIR/version.yaml
+    echo "system.version.depend: $TEMPDIR/version.yaml" > $TEMPDIR/mod.yaml
+
+    modify-config --src  /etc/openxpki/config.d --dest /etc/openxpki/config.d --mod $TEMPDIR/mod.yaml
+
+    rm -rf $TEMPDIR
+# try modifying file directly otherwise
+else
+    sed -zri 's/depend:\s*\n\s+core:[^\n]+\n//' /etc/openxpki/config.d/system/version.yaml
+    echo -e "\ndepend:\n    core: $OXI_VERSION" >> /etc/openxpki/config.d/system/version.yaml
+fi
 
 #
 # Compile OpenXPKI
@@ -105,7 +115,7 @@ if [ -d $OXI_EE_SOURCE_DIR/opt/myperl/site_perl/OpenXPKI ]; then
     rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/site_perl/OpenXPKI/  $OXI_CORE_DIR/server/OpenXPKI/     >>$LOG 2>&1
 fi
 
-echo -e "- synchronize UI code and configuring web server"
+echo -e "- synchronize UI code"
 rsync -a --delete --exclude=.git/ --exclude=node_modules/ $OXI_SOURCE_DIR/core/server/htdocs/   /var/www/openxpki/ >>$LOG 2>&1
 rsync -a --delete --exclude=.git/ $OXI_SOURCE_DIR/core/server/cgi-bin/ /usr/lib/cgi-bin/                           >>$LOG 2>&1
 
@@ -114,14 +124,7 @@ if [ -d $OXI_EE_SOURCE_DIR/opt/myperl/share/cgi-bin ]; then
     rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/share/cgi-bin/ /usr/lib/cgi-bin/                        >>$LOG 2>&1
 fi
 
-cat $OXI_TEST_SAMPLECONFIG_DIR/contrib/apache2-openxpki-site.conf \
- | perl -pe 's{^(\s*RewriteRule \^\.\*\$ https://)}{#$1}'\
- > /etc/apache2/sites-available/openxpki.conf
-/usr/sbin/a2ensite openxpki > /dev/null
-
 test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/index.html
-
-/usr/sbin/a2enmod ssl rewrite headers > /dev/null
 
 # Community config: copy home.html
 if [ -e $OXI_TEST_SAMPLECONFIG_DIR/contrib/home.html ]; then
