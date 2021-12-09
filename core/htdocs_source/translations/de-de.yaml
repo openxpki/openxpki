@@ -63,6 +63,8 @@ component:
     copy: "Kopieren"
   oxi_code:
     copy: "Doppelklick markiert gesamten Text"
+  oxifield_static:
+    unset: <nicht gesetzt>
 
 autofill:
   button: "{target} abfragen"

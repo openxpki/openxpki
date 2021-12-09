@@ -63,6 +63,8 @@ component:
     copy: "Copy"
   oxi_code:
     copy: "Double-click to select all text"
+  oxifield_static:
+    unset: <not set>
 
 autofill:
   button: "Query {target}"

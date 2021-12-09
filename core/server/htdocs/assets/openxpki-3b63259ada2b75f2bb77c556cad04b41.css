@@ -269,6 +269,7 @@ dd+dt{padding-top:.5em}
 .glyphicon-menu-up:before{content:"\e260"}
 body,html{height:100%}
 .oxi-header-bar{color:#757373}
+img.toplogo{height:40px}
 .oxi-navbar{background-color:#e8e8e8;border-bottom:2px solid #757373}
 .oxi-navbar.navbar-light .navbar-nav .nav-link{color:#484b4f}
 .oxi-page{background-color:#f5f5f5}

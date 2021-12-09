@@ -1,7 +1,9 @@
 <div class="oxi-no-input" {{may-focus this false}}>
     {{#if @content.verbose}}
         {{{@content.verbose}}}
+    {{else if @content.value}}
+        {{{@content.value}}}
     {{else}}
-        {{@content.value}}
+        {{t 'component.oxifield_datetime.date_format'}}
     {{/if}}
 </div>

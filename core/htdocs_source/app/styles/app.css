@@ -19,6 +19,10 @@ body {
   color: #757373;
 }
 
+img.toplogo {
+  height: 40px;
+}
+
 /* Navigation bar (menu) */
 .oxi-navbar {
   background-color: #e8e8e8;
