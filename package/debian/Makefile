@@ -25,6 +25,7 @@ EXTERNAL=				\
 	Crypt__OpenSSL__AES		\
 	Crypt__Cipher__AES \
 	Crypt__Argon2 \
+	Crypt__LibSCEP \
 	Data__SpreadPagination		\
 	Class__Observable 		\
 	Git__PurePerl \
