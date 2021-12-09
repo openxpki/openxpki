@@ -381,22 +381,25 @@ sub __translate_form_def {
             value => $values->{$field->{id}},
         };
 
-        if ($field->{type} eq 'freetext') {
-            $new->{type} = 'text';
-        } elsif ($field->{type} eq 'select') {
+        if ($field->{type} eq 'select') {
             $new->{type} = 'select';
             $new->{options} = $field->{options};
+        } elsif ($field->{type} =~ m{static|textarea|datetime}) {
+               $new->{type} = $field->{type};
         } else {
             $new->{type} = 'text';
         }
 
-        if (defined $field->{min}) {
-            if ($field->{min} == 0) {
-                $new->{is_optional} = 1;
-            } else {
-                $new->{min} = $field->{min};
-                $new->{clonable} = 1;
-            }
+        # reasons to make the field optional
+        if ((defined $field->{min} && $field->{min} == 0)
+            || (defined $field->{required} && $field->{required} eq '0')
+            || ($field->{type} eq 'static')) {
+            $new->{is_optional} = 1;
+        }
+
+        if ($field->{min}) {
+            $new->{min} = $field->{min};
+            $new->{clonable} = 1;
         }
 
         if (defined $field->{max}) {

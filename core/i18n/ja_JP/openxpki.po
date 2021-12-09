@@ -1244,6 +1244,14 @@ msgstr "姓"
 msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_LASTNAME_DESC"
 msgstr "依頼者の姓"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_REALNAME"
+msgstr "姓"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_REALNAME_DESC"
+msgstr "依頼者の姓"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_DNS"
 msgstr "DNS"
 

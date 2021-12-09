@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2021-12-07 16:11+0100\n"
+"PO-Revision-Date: 2021-12-09 12:31+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -1184,6 +1184,12 @@ msgstr "Nachname"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_LASTNAME_DESC"
 msgstr "Nachname des Antragsteller"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_REALNAME"
+msgstr "Antragsteller"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_REALNAME_DESC"
+msgstr "Vollständiger Name des Antragstellers"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_DNS"
 msgstr "DNS"

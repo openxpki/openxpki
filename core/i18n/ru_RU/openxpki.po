@@ -1599,6 +1599,14 @@ msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_LASTNAME_DESC"
 msgstr "Это полное сетевое имя компьютера"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_REALNAME"
+msgstr "Имя компьютера (hostname)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_REALNAME_DESC"
+msgstr "Это полное сетевое имя компьютера"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_DNS"
 msgstr "Профиль пользователя"
 

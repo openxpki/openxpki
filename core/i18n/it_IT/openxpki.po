@@ -1449,6 +1449,14 @@ msgstr "Cognome"
 msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_LASTNAME_DESC"
 msgstr "Descrizione Cognome"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_REALNAME"
+msgstr "Cognome"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_REQUESTOR_REALNAME_DESC"
+msgstr "Descrizione Cognome"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_DNS"
 msgstr "DNS"
 
