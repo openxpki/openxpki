@@ -272,16 +272,22 @@ export default [
                 },
                 {
                     type: "static",
-                    name: "label1",
+                    name: "static",
                     label: "Static",
                     value: "on my shirt",
                 },
                 {
                     type: "static",
-                    name: "label2",
+                    name: "static (verbose)",
                     label: "Static",
                     value: "on my shirt",
                     verbose: "is sewed onto my shirt"
+                },
+                {
+                    type: "static",
+                    name: "static (empty)",
+                    label: "Static",
+                    value: "",
                 },
                 {
                     type: "textarea",
