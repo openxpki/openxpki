@@ -1,4 +1,8 @@
-<form class="was-validated">
+{{!
+    "novalidate" disables the browser's default validation and
+    gets rid of "Please fill out this field" popups
+}}
+<form class="was-validated" novalidate>
     {{#each this.visibleFields as |field|}}
         <OxiSection::Form::Field
             @field={{field}}
