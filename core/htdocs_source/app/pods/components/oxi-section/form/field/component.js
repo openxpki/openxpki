@@ -6,6 +6,7 @@ import { debug } from '@ember/debug';
 export default class OxiFieldMainComponent extends Component {
     @inject('oxi-backend') backend;
     @inject('intl') intl;
+    @inject('oxi-config') config;
 
     get isBool() {
         return this.args.field.type === 'bool';
