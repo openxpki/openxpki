@@ -29,9 +29,7 @@ export default class TestController extends Controller {
                     '        <a href="./#/"><img src="img/logo.png" class="toplogo"></a>' + "\n" +
                     '        &nbsp;' + "\n" +
                     '        <small>Test page</small>' + "\n" +
-                    '    </h3>' + "\n" +
-                    'accessibility:' + "\n" +
-                    '    tooltipOnFocus: on' + "\n"
+                    '    </h3>' + "\n"
             ]);
             let emptyResponse = () => new Promise(resolve => {
                 let response = [
