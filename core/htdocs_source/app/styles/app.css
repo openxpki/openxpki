@@ -606,6 +606,10 @@ div.required input.flatpickr-input {
   max-width: 40em;
 }
 
+.oxi-has-tooltip {
+  cursor: help;
+}
+
 /******************************************************************************
  * Others
  */

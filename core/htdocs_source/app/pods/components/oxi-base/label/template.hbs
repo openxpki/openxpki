@@ -1,15 +1,16 @@
 {{~#each (arrayify @text) as |txt|~}}
     <div class="{{@class}} {{this.cssClasses}} oxi-base-label">
         {{#if @tooltip}}
-            <EmberTooltip>
+            <EmberTooltip @delay={{this.config.tooltipDelay}}>
                 {{@tooltip}}
             </EmberTooltip>
         {{else if @raw_tooltip}}
-            <EmberTooltip>
+            <EmberTooltip @delay={{this.config.tooltipDelay}}>
                 {{{defuse @raw_tooltip}}}
             </EmberTooltip>
         {{else if @tooltip_page}}
             <EmberPopover
+                @delay={{this.config.tooltipDelay}}
                 @onShow={{this.fetchTooltip}}
                 @updateFor={{this.tooltipReady}}
             >
