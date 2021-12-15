@@ -610,6 +610,10 @@ div.required input.flatpickr-input {
   cursor: help;
 }
 
+.oxi-tooltip-icon {
+  font-size: 0.75rem;
+}
+
 /******************************************************************************
  * Others
  */

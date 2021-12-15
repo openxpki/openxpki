@@ -2,7 +2,34 @@
     {{#if this.isBool}}
         <div class="col-md-2"></div>
     {{else}}
-        <label class="col-md-2 col-form-label text-md-right">{{@field.label}}</label>
+        <label class="col-md-2 col-form-label text-md-right">
+            {{@field.label}}
+
+            {{#if @field.tooltip}}
+                <span class="glyphicon glyphicon-info-sign text-primary oxi-tooltip-icon">
+                {{#if this.config.tooltipOnFocus}}
+                    {{! Showing a tooltip on focus is EmberTooltip's default behaviour }}
+                    <EmberTooltip>
+                        {{@field.tooltip}}
+                    </EmberTooltip>
+                {{else}}
+                    {{!
+                        Due to a bug in EmberTooltip we have to set @event="focus" although we
+                        do NOT want the tooltip to show on focus - uuh ooh.
+                        In EmberTooltip's code @event is overridden by @showOn and @hideOn but setting
+                        it is necessary to prevent the automatic addition of a 'focusin' event listener.
+                    }}
+                    <EmberTooltip
+                        @event="focus"
+                        @showOn="mouseenter"
+                        @hideOn="mouseleave"
+                    >
+                        {{@field.tooltip}}
+                    </EmberTooltip>
+                {{/if}}
+                </span>
+            {{/if}}
+        </label>
     {{/if}}
 
     {{#if @field.keys}}
@@ -12,32 +39,6 @@
     {{/if}}
 
     <div class="col" {{on "keydown" this.onKeydown}}>
-        {{#if @field.tooltip}}
-            {{#if this.config.tooltipOnFocus}}
-                {{! Showing a tooltip on focus is EmberTooltip's default behaviour }}
-                <EmberTooltip
-                    @delay={{this.config.tooltipDelay}}
-                >
-                    {{@field.tooltip}}
-                </EmberTooltip>
-            {{else}}
-                {{!
-                    Due to a bug in EmberTooltip we have to set @event="focus" although we
-                    do NOT want the tooltip to show on focus - uuh ooh.
-                    In EmberTooltip's code @event is overridden by @showOn and @hideOn but setting
-                    it is necessary to prevent the automatic addition of a 'focusin' event listener.
-                }}
-                <EmberTooltip
-                    @delay={{this.config.tooltipDelay}}
-                    @event="focus"
-                    @showOn="mouseenter"
-                    @hideOn="mouseleave"
-                >
-                    {{@field.tooltip}}
-                </EmberTooltip>
-            {{/if}}
-        {{/if}}
-
         {{#let
             (component
                 this.type

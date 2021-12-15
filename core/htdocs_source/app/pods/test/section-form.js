@@ -162,6 +162,7 @@ export default [
                     name: "pwd_verified_preset",
                     label: "Password, verifiable, preset",
                     value: "123\n",
+                    tooltip: "Rinse and repeat",
                 },
             ],
         }
@@ -180,6 +181,7 @@ export default [
                     name: "dt_now",
                     label: "Date, now",
                     placeholder: "Please select a date...",
+                    tooltip: "It's now or never!",
                 },
                 {
                     type: "datetime",
