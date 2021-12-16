@@ -7,26 +7,18 @@
 
             {{#if @field.tooltip}}
                 <span class="glyphicon glyphicon-info-sign text-primary oxi-tooltip-icon">
-                {{#if this.config.tooltipOnFocus}}
-                    {{! Showing a tooltip on focus is EmberTooltip's default behaviour }}
-                    <EmberTooltip>
-                        {{@field.tooltip}}
-                    </EmberTooltip>
-                {{else}}
-                    {{!
-                        Due to a bug in EmberTooltip we have to set @event="focus" although we
-                        do NOT want the tooltip to show on focus - uuh ooh.
-                        In EmberTooltip's code @event is overridden by @showOn and @hideOn but setting
-                        it is necessary to prevent the automatic addition of a 'focusin' event listener.
-                    }}
-                    <EmberTooltip
-                        @event="focus"
-                        @showOn="mouseenter"
-                        @hideOn="mouseleave"
-                    >
-                        {{@field.tooltip}}
-                    </EmberTooltip>
-                {{/if}}
+                {{! Show a tooltip on tab focus or mouseover }}
+                <EmberTooltip>
+                    {{@field.tooltip}}
+                </EmberTooltip>
+                {{!
+                    Show tooltip on mouseover, but not on (tab) focus.
+                    Due to a bug in EmberTooltip we have to set @event="focus" although we
+                    do NOT want the tooltip to show on focus - uuh ooh.
+                    In EmberTooltip's code @event is overridden by @showOn and @hideOn but setting
+                    it is necessary to prevent the automatic addition of a 'focusin' event listener.
+                }}
+                {{! <EmberTooltip @event="focus" @showOn="mouseenter" @hideOn="mouseleave"> }}
                 </span>
             {{/if}}
         </label>

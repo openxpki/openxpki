@@ -104,10 +104,6 @@ export default class OxiConfigService extends Service {
         return this.localConfig.pageTitle || 'OpenXPKI - Open Source Trustcenter';
     }
 
-    get tooltipOnFocus() {
-        return this.localConfig.accessibility?.tooltipOnFocus?.match(/^(1|on|true|enable)$/i);
-    }
-
     get tooltipDelay() {
         return (this.localConfig.accessibility?.tooltipDelay?.match(/^\s+$/i)
             ? this.localConfig.accessibility.tooltipDelay

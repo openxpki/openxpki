@@ -56,7 +56,5 @@ footer: |-
 # Accessibility features
 #
 accessibility:
-    # show tooltips if input field is focussed (additionally to mouse over)
-    tooltipOnFocus: on
-    # delay in ms before tooltip is shown on input fields
+    # delay in ms before tooltip is shown on output fields (labels)
     tooltipDelay: 1000
