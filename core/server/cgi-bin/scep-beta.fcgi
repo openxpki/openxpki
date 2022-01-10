@@ -26,7 +26,8 @@ while (my $cgi = CGI::Fast->new()) {
            -type => 'text/plain',
            -status => '404 Not Found (no such server)'
         );
-        $log->error('server not set - unknwown endpoint and no default set');
+        print 'server not set - unknown endpoint';
+        $log->error('server not set - unknown endpoint and no default set');
         next;
     }
 
@@ -59,6 +60,7 @@ while (my $cgi = CGI::Fast->new()) {
                     -type => 'text/plain',
                     -status => '400 Bad Request (empty body)'
                 );
+                print 'Bad Request - body is empty';
                 next;
             }
             $log->debug("Got PKIOperation via POST");
