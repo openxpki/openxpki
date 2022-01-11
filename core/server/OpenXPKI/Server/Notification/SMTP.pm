@@ -195,7 +195,7 @@ sub _init_transport {
 
     # Net::SMTP returns undef if it can not reach the configured socket
     if (!$transport || !ref $transport) {
-        CTX('log')->system()->fatal(sprintf("Failed creating smtp transport (host: %s, user: %s)", $smtp{Host}, $smtp{User}));
+        CTX('log')->system()->fatal(sprintf("Failed creating smtp transport (host: %s, user: %s)", ($smtp{Host} // 'unset'), ($smtp{User} // 'unset')));
         return undef;
     }
 
