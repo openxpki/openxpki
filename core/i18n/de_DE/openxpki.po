@@ -172,7 +172,7 @@ msgstr "Es wurde kein Zertifikat mit dieser Seriennummer gefunden!"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_DESC"
 msgstr ""
 "Zertifikate die ihren Suchkriterien entsprechen, weitere Informationen "
-"erhalten Sie durch anlicken der Zeile."
+"erhalten Sie durch anklicken der Zeile."
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL"
 msgstr "Ergebnis der Zertifikatssuche"
