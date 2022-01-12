@@ -40,6 +40,21 @@ has parsed => (
     isa => 'HashRef',
 );
 
+has algorithm => (
+    is => 'ro',
+    isa => 'Str',
+    lazy => 1,
+    reader => 'get_algorithm',
+    default => sub {
+        my $self = shift;
+        my $oid = $self->parsed()->{algorithm}->{algorithm};
+        return 'ec' if ($oid eq '1.2.840.10045.2.1');
+        return 'rsa' if ($oid eq '1.2.840.113549.1.1.1');
+        return $oid;
+    }
+);
+
+
 has subject_key_id => (
     is => 'rw',
     required => 0,
