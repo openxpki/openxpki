@@ -39,34 +39,33 @@ sub get_command
     $passwd = $self->{PASSWD};
     $engine = $self->__get_used_engine();
 
-    ## check parameters
+    # if profile is set we have an extension section
+    if ($self->{PROFILE}) {
+        $self->{CONFIG}->set_profile($self->{PROFILE});
 
-    if (not exists $self->{SUBJECT})
-    {
+    }
+
+    ## build the command
+    my @command = qw( req -new );
+
+    # subject from string via command line
+    if ($self->{SUBJECT}) {
+        ## fix DN-handling of OpenSSL
+        my $subject = $self->get_openssl_dn ($self->{SUBJECT});
+        push @command, ('-subj', $subject);
+        push @command, '-multivalue-rdn' if ($subject =~ /[^\\](\\\\)*\+/);
+
+    # will profile will provide DN via config?
+    } elsif (!($self->{PROFILE} && $self->{PROFILE}->get_subject())) {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_COMMAND_CREATE_PKCS10_MISSING_SUBJECT");
     }
 
-    ## prepare data
-
-    ## fix DN-handling of OpenSSL
-    my $subject = $self->get_openssl_dn ($self->{SUBJECT});
-
-    ## build the command
-    my @command = qw( req -new );
-    push @command, ('-subj', $subject);
-    push @command, '-multivalue-rdn' if ($subject =~ /[^\\](\\\\)*\+/);
     push @command, ('-nameopt', 'utf8');
     push @command, ('-engine', $engine) if ($engine);
     push @command, ('-keyform', $keyform) if ($keyform);
     push @command, ('-key', $self->write_temp_file( $self->{KEY} ));
     push @command, ('-out', $self->get_outfile());
-
-    # if profile is set we have an extension section
-    if ($self->{PROFILE}) {
-        $self->{CONFIG}->set_profile($self->{PROFILE});
-        push @command, ('-reqexts', 'req_ext');
-    }
 
     if (defined $passwd)
     {

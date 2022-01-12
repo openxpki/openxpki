@@ -108,6 +108,19 @@ sub get_digest
     return $self->{PROFILE}->{DIGEST};
 }
 
+sub set_subject
+{
+    my $self = shift;
+    $self->{PROFILE}->{SUBJECT} = shift;
+    return 1;
+}
+
+sub get_subject
+{
+    my $self = shift;
+    return $self->{PROFILE}->{SUBJECT} || '';
+}
+
 sub set_subject_alt_name {
     my $self = shift;
     my $subj_alt_name = shift;
