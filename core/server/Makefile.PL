@@ -290,6 +290,7 @@ WriteMakefile(
     'CCFLAGS'   => '-O2 -g '.$Config{ccflags},
     'PREREQ_PM' => {
         'Archive::Zip'                  => 0,
+        'Authen::SASL'                  => 0, # required for Auth in SMTP
         'CGI::Fast'                     => '2.10',
         'CGI::Session'                  => '3.95',
         'CGI'                           => '4.21',
