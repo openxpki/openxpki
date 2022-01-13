@@ -856,7 +856,7 @@ sub alias_show {
         limit => 1,
     );
 
-    __alias_print($alias, $params{subject});
+    print __alias_print($alias, $params{subject});
     return 2 unless($alias);
 
     my $file = $params{export} || '';
