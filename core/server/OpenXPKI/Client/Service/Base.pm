@@ -154,7 +154,7 @@ sub handle_enrollment_request {
 
     # Build configuration parameters, can be overloaded by protocols
     # e.g. SCEP to inject data from the input
-    my $param = $self->build_params( $operation );
+    my $param = $self->build_params( $operation, $cgi );
 
     if (!defined $param) {
         return OpenXPKI::Client::Service::Response->new( 50010 );
@@ -325,7 +325,7 @@ sub handle_property_request {
 
     my $conf = $config->config();
 
-    my $param = $self->build_params( $operation );
+    my $param = $self->build_params( $operation, $cgi );
 
     if (!defined $param) {
         return OpenXPKI::Client::Service::Response->new( 50010 );

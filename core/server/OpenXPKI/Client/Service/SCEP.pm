@@ -134,8 +134,9 @@ around 'build_params' => sub {
 
     my $orig = shift;
     my $self = shift;
+    my @args = @_;
 
-    my $params = $self->$orig(@_);
+    my $params = $self->$orig(@args);
 
     return unless($params); # something is wrong
 
@@ -150,6 +151,26 @@ around 'build_params' => sub {
         $params->{pkcs10} = $self->attr()->{pkcs10};
         $params->{transaction_id} = $self->transaction_id();
         $params->{signer_cert} = $self->signer();
+
+        # Load url paramters if defined by config
+        my $conf = $self->config()->config()->{'PKIOperation'};
+        if ($conf->{param}) {
+            my $cgi = $args[1];
+            my $extra;
+            my @extra_params;
+            # The legacy version - map anything
+            if ($conf->{param} eq '*') {
+                @extra_params = $cgi->url_param();
+            } else {
+                @extra_params = split /\s*,\s*/, $conf->{param};
+            }
+            foreach my $param (@extra_params) {
+                next if ($param eq "operation");
+                next if ($param eq "message");
+                $extra->{$param} = $cgi->url_param($param);
+            }
+            $params->{_url_params} = $extra;
+        }
     } elsif ($self->message_type() eq 'GetCertInitial') {
         $params->{pkcs10} = '';
         $params->{transaction_id} = $self->transaction_id();
