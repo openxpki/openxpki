@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2021-12-09 12:30+0100\n"
+"PO-Revision-Date: 2022-01-19 11:32+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -576,6 +576,39 @@ msgstr "The specified notafter date must not be equal to the notbefore date."
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_NOTAFTER_IN_THE_PAST"
 msgstr "The specified notafter date is in the past."
 
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION"
+msgstr "Expiry Notification"
+
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_ALERT"
+msgstr "notified (alert)"
+
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_CREATED"
+msgstr "in progress"
+
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_DISABLED"
+msgstr "disabled"
+
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_FAILED"
+msgstr "failed"
+
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_INFO"
+msgstr "notified (info)"
+
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_NOTIFIED"
+msgstr "notified"
+
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_PENDING"
+msgstr "active"
+
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_RENEWED"
+msgstr "renewed"
+
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_SUPPRESS"
+msgstr "suppressed"
+
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_WARN"
+msgstr "notified (warn)"
+
 msgid "I18N_OPENXPKI_UI_EXPORT_CERTIFICATE_FAILED_TO_LOAD_PRIVATE_KEY"
 msgstr "Failed to export private key (wrong password?)."
 
@@ -1128,6 +1161,22 @@ msgstr "OCSP Responder"
 msgid "I18N_OPENXPKI_UI_PROFILE_OU_DESC"
 msgstr "Organizational Unit"
 
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_CONTACT"
+msgstr "Owner (Email)"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_CONTACT_DESC"
+msgstr ""
+"Email adress of the certificate owner. This is used for e.g. sending the "
+"expiry notifications."
+
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_GROUP"
+msgstr "Owner (Group)"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_GROUP_DESC"
+msgstr ""
+"Support group that owns this certificate.  This is used for e.g. sending the "
+"expiry notifications."
+
 msgid "I18N_OPENXPKI_UI_PROFILE_O_DESC"
 msgstr "Organization name"
 
@@ -1142,6 +1191,9 @@ msgstr "Port"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_PORT_DESC"
 msgstr "Port number"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_RATOKEN_LABEL"
+msgstr "RA/SCEP Token"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_REALNAME"
 msgstr "Realname"
@@ -1624,6 +1676,9 @@ msgstr "Welcome to your OpenXPKI Trustcenter"
 
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
 msgstr "Message of the Day"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ABORT_BUTTON"
+msgstr "Cancel"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_USER"
 msgstr "Access to this workflow is forbidden for the current user"
@@ -2607,6 +2662,28 @@ msgstr "certificate holders email address"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_TOOLTIP"
 msgstr " "
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EXPIRY_NOTIFICATION_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EXPIRY_NOTIFICATION_LABEL"
+msgstr "Expiry-Notification"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_CONTACT_DESC"
+msgstr ""
+"Email adress of the certificate owner. This is used for e.g. sending the "
+"expiry notifications."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_CONTACT_LABEL"
+msgstr "Owner (Email)"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_GROUP_DESC"
+msgstr ""
+"Support group that owns this certificate.  This is used for e.g. sending the "
+"expiry notifications."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_GROUP_LABEL"
+msgstr "Owner (Group)"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_DESC"
 msgstr " "
 
@@ -2664,6 +2741,12 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_TOOLTIP"
 msgstr ""
 "Use the calendar icon or enter a date in MM.DD.YYYY format, type 0 to use "
 "the default. Dates are in UTC timezone!"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFY_EXPIRY_MESSAGE_LABEL"
+msgstr "Notification"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFY_EXPIRY_RCPT_LABEL"
+msgstr "Recipient"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_DESC"
 msgstr "Describe the reason why you want to set the request on hold."
@@ -3347,12 +3430,6 @@ msgstr "Explanation on the search filters:"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_LABEL"
 msgstr "Search for Workflows"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_META_CERT_SUBJECT_HINT"
-msgstr ""
-"Find only workflows that are in the given state, exact match only, no "
-"wildcards are allowed but multiple states can be given separated by space."
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION"
 msgstr "Results of your search:"
 
@@ -4033,6 +4110,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 msgstr "Certificate Expiry Notification"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_MESSAGE_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_MESSAGE_LABEL"
+msgstr "Expiry Notification (email)"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RATOKEN_DESC"
 msgstr "Generate a new RA token in case the old one is near its expiration."
 
@@ -4208,9 +4291,6 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_GUID_DESCRIPTION"
 #~ msgstr "GUID"
 
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_UPN"
-#~ msgstr "UPN"
-
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_UPN_DESCRIPTION"
 #~ msgstr "UPN"
 
@@ -4352,22 +4432,8 @@ msgstr "Yes"
 #~ msgstr "Request is SelfSigned"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_DESC"
-#~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_LABEL"
-#~ msgstr "Requester/Owner"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_PLACEHOLDER"
 #~ msgstr "Name of the Requester/Owner"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_DESC"
-#~ msgstr " The server endpoint used for the request."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_LABEL"
-#~ msgstr "Endpoint / Server"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_PLACEHOLDER"
@@ -4419,6 +4485,12 @@ msgstr "Yes"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
 #~ msgstr "retry exceeded"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_META_CERT_SUBJECT_HINT"
+#~ msgstr ""
+#~ "Find only workflows that are in the given state, exact match only, no "
+#~ "wildcards are allowed but multiple states can be given separated by space."
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE"
 #~ msgstr "State"

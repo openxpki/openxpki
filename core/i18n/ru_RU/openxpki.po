@@ -735,6 +735,50 @@ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_NOTAFTER_IN_THE_PAST"
 msgstr "SPKAC-строка пуста."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_ALERT"
+msgstr "Профиль пользователя общего назначения"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_CREATED"
+msgstr "Профиль пользователя общего назначения"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_DISABLED"
+msgstr "Профиль пользователя общего назначения"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_FAILED"
+msgstr "Профиль пользователя общего назначения"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_INFO"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_NOTIFIED"
+msgstr "Идентификатор сертификата"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_PENDING"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_RENEWED"
+msgstr "Отозван"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_SUPPRESS"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_WARN"
+msgstr "Выпуск списка отзыва сертификатов (CRL)"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_EXPORT_CERTIFICATE_FAILED_TO_LOAD_PRIVATE_KEY"
 msgstr "Идентификатор сертификата"
 
@@ -1521,6 +1565,22 @@ msgid "I18N_OPENXPKI_UI_PROFILE_OU_DESC"
 msgstr "Профиль пользователя"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_CONTACT"
+msgstr "Профиль пользователя"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_CONTACT_DESC"
+msgstr "TCP-порт, используемый с данным сертификатом"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_GROUP"
+msgstr "Профиль пользователя"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_GROUP_DESC"
+msgstr "Профиль пользователя"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_O_DESC"
 msgstr ""
 "Используйте данный профиль сертификата только если Вы отчетливо "
@@ -1549,6 +1609,10 @@ msgstr "Профиль пользователя"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_PORT_DESC"
 msgstr "TCP-порт, используемый с данным сертификатом"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_RATOKEN_LABEL"
+msgstr "Профиль TLS сервера "
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_REALNAME"
@@ -2223,6 +2287,10 @@ msgstr "Имя учетной записи"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ABORT_BUTTON"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
@@ -3482,6 +3550,34 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_TOOLTIP"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EXPIRY_NOTIFICATION_DESC"
+msgstr "Это поле можно использовать для комментариев."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EXPIRY_NOTIFICATION_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_CONTACT_DESC"
+msgstr "Это поле можно использовать для комментариев."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_CONTACT_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_GROUP_DESC"
+msgstr ""
+"Для использования данного профиля сертификата достаточно ввести Ваше имя, "
+"имя Вашей учетной записи и адрес электронной почты. Это простейший профиль "
+"пользователя, который следует использовать, если нет особых требований к "
+"сертифкату. В противном случае следует использовать расширенный профиль."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_GROUP_LABEL"
+msgstr "Адрес электронной почты"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_DESC"
 msgstr ""
 "Для использования данного профиля сертификата достаточно ввести Ваше имя, "
@@ -3562,6 +3658,14 @@ msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_TOOLTIP"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFY_EXPIRY_MESSAGE_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFY_EXPIRY_RCPT_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
@@ -4468,10 +4572,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_META_CERT_SUBJECT_HINT"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION"
 msgstr "Имя субъекта - владельца сертификата."
 
@@ -5257,6 +5357,14 @@ msgstr "Экспорт"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_MESSAGE_DESC"
+msgstr "Экспорт"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_MESSAGE_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
@@ -9733,10 +9841,6 @@ msgstr "Имя учетной записи"
 #~ "названия подразделения и двух компонентов доменного имени."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
-#~ msgstr "Профиль TLS сервера "
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_NODEID"
 #~ msgstr ""
 #~ "Используйте данный профиль сертификата только если Вы отчетливо "
@@ -9819,10 +9923,6 @@ msgstr "Имя учетной записи"
 #~ "используется для идентификации компьютеров типа контроллеров доменов. "
 #~ "Если вам нужен сертификат для контроллера домена, вы должны указать GUID, "
 #~ "иначе сертификатом невозможно будет пользоваться."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_UPN"
-#~ msgstr "Профиль пользователя"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_UPN_DESCRIPTION"
@@ -11417,29 +11517,8 @@ msgstr "Имя учетной записи"
 #~ msgstr "Родительский технологический процесс"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_DESC"
-#~ msgstr ""
-#~ "Для использования данного профиля сертификата достаточно ввести Ваше имя, "
-#~ "имя Вашей учетной записи и адрес электронной почты. Это простейший "
-#~ "профиль пользователя, который следует использовать, если нет особых "
-#~ "требований к сертифкату. В противном случае следует использовать "
-#~ "расширенный профиль."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_LABEL"
-#~ msgstr "Адрес электронной почты"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_PLACEHOLDER"
 #~ msgstr "SPKAC-строка пуста."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_DESC"
-#~ msgstr "Это поле можно использовать для комментариев."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_LABEL"
-#~ msgstr "Родительский технологический процесс"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_PLACEHOLDER"
@@ -11723,6 +11802,10 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DETAIL_FIELD_VALID_AT_LABEL"
 #~ msgstr "Экспорт"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_META_CERT_SUBJECT_HINT"
+#~ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_APPROVAL_LABEL"

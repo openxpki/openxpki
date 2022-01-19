@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2021-12-09 12:31+0100\n"
+"PO-Revision-Date: 2022-01-19 11:23+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -217,7 +217,9 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT"
 msgstr "Subject"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT_HINT"
-msgstr "Sucht die gegebene Zeichenkette im 'Distinguished Name' des Zertifikates. Platzhalter sind erlaubt."
+msgstr ""
+"Sucht die gegebene Zeichenkette im 'Distinguished Name' des Zertifikates. "
+"Platzhalter sind erlaubt."
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY"
 msgstr "Gültigkeit"
@@ -577,6 +579,39 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_NOTAFTER_IN_THE_PAST"
 msgstr "Das gültig bis Datum liegt in der Vergangenheit"
+
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION"
+msgstr "Ablaufbenachrichtigung"
+
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_ALERT"
+msgstr "benachrichtigt (Alert)"
+
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_CREATED"
+msgstr "wird erstellt"
+
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_DISABLED"
+msgstr "deaktiviert"
+
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_FAILED"
+msgstr "fehlgeschlagen"
+
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_INFO"
+msgstr "benachrichtigt (Info)"
+
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_NOTIFIED"
+msgstr "benachrichtigt"
+
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_PENDING"
+msgstr "aktiviert"
+
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_RENEWED"
+msgstr "bereits erneuert"
+
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_SUPPRESS"
+msgstr "unterdrückt"
+
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_WARN"
+msgstr "benachrichtigt (Warnung)"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_CERTIFICATE_FAILED_TO_LOAD_PRIVATE_KEY"
 msgstr ""
@@ -1140,6 +1175,22 @@ msgstr "OCSP Responder"
 msgid "I18N_OPENXPKI_UI_PROFILE_OU_DESC"
 msgstr "Organisationseinheit (OU)"
 
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_CONTACT"
+msgstr "Eigentümer (E-Mail)"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_CONTACT_DESC"
+msgstr ""
+"E-Mail-Adresse des Eigentümers - wird verwendet um u.a. die "
+"Ablaufbenachrichtigung zu versenden."
+
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_GROUP"
+msgstr "Eigentümer (Gruppe)"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_GROUP_DESC"
+msgstr ""
+"Support-Gruppe des Eigentümers - wird verwendet um u.a. die "
+"Ablaufbenachrichtigung zu versenden."
+
 msgid "I18N_OPENXPKI_UI_PROFILE_O_DESC"
 msgstr "Organisation (O)"
 
@@ -1154,6 +1205,9 @@ msgstr "Port"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_PORT_DESC"
 msgstr "Port Nummer"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_RATOKEN_LABEL"
+msgstr "RA/SCEP Zertifikat"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_REALNAME"
 msgstr "Realname"
@@ -1667,6 +1721,9 @@ msgstr "Willkommen zu ihrem OpenXPKI Trustcenter"
 
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
 msgstr "Nachricht des Tages"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ABORT_BUTTON"
+msgstr "Abbrechen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_USER"
 msgstr "Der Zugriff auf diesen Workflow ist für ihren Benutzer nicht gestattet"
@@ -2744,6 +2801,31 @@ msgstr "E-Mail-Adresse des Verantwortlichen"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_TOOLTIP"
 msgstr " "
 
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EXPIRY_NOTIFICATION_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EXPIRY_NOTIFICATION_LABEL"
+msgstr "Ablaufbenachrichtigung:"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_CONTACT_DESC"
+msgstr ""
+"E-Mail-Adresse des Eigentümers - wird verwendet um u.a. die "
+"Ablaufbenachrichtigung zu versenden."
+
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_CONTACT_LABEL"
+msgstr "Eigentümer (E-Mail)"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_GROUP_DESC"
+msgstr ""
+"Support-Gruppe des Eigentümers - wird verwendet um u.a. die "
+"Ablaufbenachrichtigung zu versenden."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_GROUP_LABEL"
+msgstr "Eigentümer (Gruppe)"
+
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_DESC"
 msgstr " "
 
@@ -2803,6 +2885,12 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_TOOLTIP"
 msgstr ""
 "Verwenden Sie das Kalendersymbol oder geben Sie DD.MM.YYYY direkt ein, leer "
 "für Standard"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFY_EXPIRY_MESSAGE_LABEL"
+msgstr "Nachricht"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFY_EXPIRY_RCPT_LABEL"
+msgstr "Empfänger"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_DESC"
 msgstr ""
@@ -3507,12 +3595,6 @@ msgstr "Erläuterungen zu den Suchfiltern:"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_LABEL"
 msgstr "Suche nach Workflows"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_META_CERT_SUBJECT_HINT"
-msgstr ""
-"Finde nur Workflows in diesem Status, exakte Suche, keine Platzhalter "
-"erlaubt, mehrere Werte können mit Leerzeichen getrennt angegeben werden."
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION"
 msgstr "Ergebnisse zu ihrer Suchanfrage:"
 
@@ -3616,7 +3698,6 @@ msgstr "Dieser Workflow wurde abgebrochen."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CANCELED_LABEL"
 msgstr "Abgebrochen"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CAPUBLISH_INITIAL_LABEL"
 msgstr "Zertifikat veröffentlichen"
 
@@ -3628,9 +3709,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_ENROLL_SUCCESS_LABEL"
 msgstr "erfolgreich"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_INITIAL_DESC"
-msgstr "Start"
+msgstr ""
+"Wählen Sie das Zertifikat aus, für dass sie die Veröffentlichung starten "
+"möchten."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_INITIAL_LABEL"
 msgstr "Zertifikat veröffentlichen"
@@ -3931,9 +4013,9 @@ msgstr "Status erneut prüfen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_DESC"
 msgstr ""
-"Nachfolgend finden Sie eine Übersicht der neuen Meta-Informationen für "
-"dieses Zertifikat. Bitte wählen Sie über die Schaltflächen wie weiter "
-"verfahren werden soll."
+"Änderungen an den Daten werden zunächst nur in diesem Workflow gespeichert, "
+"um die Daten abschliessend beim Zertifikat abzulegen muss der Workflow mit "
+"\"Daten speichern\" erfolgreich abgeschlossen werden."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_LABEL"
 msgstr "Meta-Daten prüfen"
@@ -4083,16 +4165,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_LABEL"
 msgstr "ERFOLGREICH"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_TRUSTGROUP_NEED_ISSUER_DESC"
 msgstr ""
-"Die maximale Anzahl an Wiederholungen für diese Aktion wurde überschritten. "
-"Der Workflow wird nicht automatisch fortgesetzt, bitte kontaktieren Sie den "
-"Helpdesk."
+"Die Zertifikatskette für das importierte Zertifikat ist dem System nicht "
+"bekannt. Bitte fügen Sie die fehlenden Zwischenzertifikate / Root-"
+"Zertifikate ein."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_TRUSTGROUP_NEED_ISSUER_LABEL"
-msgstr "ERFOLGREICH"
+msgstr "Zertifikatskette unvollständig"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CONFIRM_DESC"
 msgstr ""
@@ -4273,6 +4353,12 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 msgstr "Ablaufwarnung"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_MESSAGE_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_MESSAGE_LABEL"
+msgstr "Ablaufwarnung (E-Mail Versand)"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RATOKEN_DESC"
 msgstr "Erstellt ein neues Zertifikat zur Verwendung als RA Token."
 
@@ -4432,9 +4518,6 @@ msgstr "ja"
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_GUID_DESCRIPTION"
 #~ msgstr "GUID"
 
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_UPN"
-#~ msgstr "UPN"
-
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_UPN_DESCRIPTION"
 #~ msgstr "UPN"
 
@@ -4587,24 +4670,8 @@ msgstr "ja"
 #~ msgstr "Request is SelfSigned"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_DESC"
-#~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_LABEL"
-#~ msgstr "Requestor/Owner"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_PLACEHOLDER"
 #~ msgstr "Name of the Requestor/Owner"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_DESC"
-#~ msgstr " The server endpoint used for the request."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_LABEL"
-#~ msgstr "Endpoint"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_PLACEHOLDER"
@@ -4655,6 +4722,12 @@ msgstr "ja"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
 #~ msgstr "zu viele Fehlversuche"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_META_CERT_SUBJECT_HINT"
+#~ msgstr ""
+#~ "Finde nur Workflows in diesem Status, exakte Suche, keine Platzhalter "
+#~ "erlaubt, mehrere Werte können mit Leerzeichen getrennt angegeben werden."
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE"
 #~ msgstr "Workflow Status"

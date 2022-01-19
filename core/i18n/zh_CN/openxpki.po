@@ -581,6 +581,56 @@ msgstr "指定的不迟于日期不得等于不早于日期。"
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_NOTAFTER_IN_THE_PAST"
 msgstr "指定的不迟于日期在过去。"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION"
+msgstr "主题替代名称"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_ALERT"
+msgstr "吊销ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_CREATED"
+msgstr "吊销ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_DISABLED"
+msgstr "吊销ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_FAILED"
+msgstr "吊销ID"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_INFO"
+msgstr ""
+"在所有SAN项目上搜索<b>完全匹配</b>匹配项。 可以通过添加 '*' 或 '_' 作为通配符"
+"来执行子字符串匹配。 要查找特定的SAN类型，请将期望的类型设置为带有冒号的前"
+"缀，例如 'IP:10.*' 以查找10.x子网中IP地址的所有SAN项目。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_NOTIFIED"
+msgstr "证书标识符"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_PENDING"
+msgstr ""
+"在所有SAN项目上搜索<b>完全匹配</b>匹配项。 可以通过添加 '*' 或 '_' 作为通配符"
+"来执行子字符串匹配。 要查找特定的SAN类型，请将期望的类型设置为带有冒号的前"
+"缀，例如 'IP:10.*' 以查找10.x子网中IP地址的所有SAN项目。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_RENEWED"
+msgstr "提出一个<b>证书续订请求</b>。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_SUPPRESS"
+msgstr "颁发者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_WARN"
+msgstr "主题替代名称"
+
 msgid "I18N_OPENXPKI_UI_EXPORT_CERTIFICATE_FAILED_TO_LOAD_PRIVATE_KEY"
 msgstr "导出私钥失败（密码错误？）。"
 
@@ -1168,6 +1218,22 @@ msgstr "人员（安全电子邮件/身份验证）"
 msgid "I18N_OPENXPKI_UI_PROFILE_OU_DESC"
 msgstr "组织单元"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_CONTACT"
+msgstr "端口"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_CONTACT_DESC"
+msgstr "端口号"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_GROUP"
+msgstr "UPN"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_GROUP_DESC"
+msgstr "组织单元"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_O_DESC"
 msgstr "组织名称"
 
@@ -1182,6 +1248,10 @@ msgstr "端口"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_PORT_DESC"
 msgstr "端口号"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_RATOKEN_LABEL"
+msgstr "人员（安全电子邮件/身份验证）"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_REALNAME"
 msgstr "真名"
@@ -1681,6 +1751,10 @@ msgstr "欢迎来到您的 OpenXPKI 信任中心"
 
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
 msgstr "每日消息"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ABORT_BUTTON"
+msgstr "返回"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_USER"
 msgstr "当前用户禁止访问此工作流程"
@@ -2696,6 +2770,30 @@ msgstr "证书持有者的电子邮件地址"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_TOOLTIP"
 msgstr " "
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EXPIRY_NOTIFICATION_DESC"
+msgstr " The server endpoint used for the request."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EXPIRY_NOTIFICATION_LABEL"
+msgstr "Endpoint / Server"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_CONTACT_DESC"
+msgstr " The server endpoint used for the request."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_CONTACT_LABEL"
+msgstr "Endpoint / Server"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_GROUP_DESC"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_GROUP_LABEL"
+msgstr "Requestor/Owner"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_DESC"
 msgstr " "
 
@@ -2750,6 +2848,14 @@ msgstr "请输入期望的不早于日期，默认为空"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_TOOLTIP"
 msgstr ""
 "使用日历图标或以MM.DD.YYYY格式输入日期，键入0以使用默认值。 日期为UTC时区！"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFY_EXPIRY_MESSAGE_LABEL"
+msgstr "证书过期通知"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFY_EXPIRY_RCPT_LABEL"
+msgstr "证书过期通知"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_DESC"
 msgstr "描述您为什么要将请求设置为搁置的原因。"
@@ -3436,10 +3542,6 @@ msgstr "提示填写表格字段"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_LABEL"
 msgstr "搜索工作流程"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_META_CERT_SUBJECT_HINT"
-msgstr "状态"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION"
 msgstr "搜索结果："
 
@@ -4117,6 +4219,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 msgstr "证书过期通知"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_MESSAGE_DESC"
+msgstr "通过电子邮件发送在30天之内到期的所有证书的到期通知。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_MESSAGE_LABEL"
+msgstr "证书过期通知"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RATOKEN_DESC"
 msgstr "通过事务ID搜索SCEP工作流程"
 
@@ -4289,9 +4399,6 @@ msgstr "是"
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_GUID_DESCRIPTION"
 #~ msgstr "GUID"
 
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_UPN"
-#~ msgstr "UPN"
-
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_UPN_DESCRIPTION"
 #~ msgstr "UPN"
 
@@ -4434,22 +4541,8 @@ msgstr "是"
 #~ msgstr "Request is SelfSigned"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_DESC"
-#~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_LABEL"
-#~ msgstr "Requestor/Owner"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_PLACEHOLDER"
 #~ msgstr "Name of the Requestor/Owner"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_DESC"
-#~ msgstr " The server endpoint used for the request."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_LABEL"
-#~ msgstr "Endpoint / Server"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_PLACEHOLDER"
@@ -4499,6 +4592,10 @@ msgstr "是"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
 #~ msgstr "重试超出"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_META_CERT_SUBJECT_HINT"
+#~ msgstr "状态"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_PLACEHOLDER"

@@ -597,6 +597,58 @@ msgstr "発行日とは違った有効期限を指定してください。"
 msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_NOTAFTER_IN_THE_PAST"
 msgstr "指定された有効期限は古いものです。"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION"
+msgstr "別名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_ALERT"
+msgstr "ワークフローの取り消し"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_CREATED"
+msgstr "ワークフローの取り消し"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_DISABLED"
+msgstr "ワークフローの取り消し"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_FAILED"
+msgstr "ワークフローの取り消し"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_INFO"
+msgstr ""
+"別名で<b>正確な</b>検索を行います。ワイルドカードとして '*' や '_' を指定する"
+"と、部分一致の検索を行います。特定の別名タイプを指定する場合、コロンを付けた"
+"プレフィックスを指定します。例えば 'IP:10.*' は、サブネット 10.x のIPアドレス"
+"である別名アイテムを検索します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_NOTIFIED"
+msgstr "証明書識別名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_PENDING"
+msgstr ""
+"別名で<b>正確な</b>検索を行います。ワイルドカードとして '*' や '_' を指定する"
+"と、部分一致の検索を行います。特定の別名タイプを指定する場合、コロンを付けた"
+"プレフィックスを指定します。例えば 'IP:10.*' は、サブネット 10.x のIPアドレス"
+"である別名アイテムを検索します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_RENEWED"
+msgstr "更新"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_SUPPRESS"
+msgstr "発行者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_WARN"
+msgstr "別名"
+
 msgid "I18N_OPENXPKI_UI_EXPORT_CERTIFICATE_FAILED_TO_LOAD_PRIVATE_KEY"
 msgstr ""
 "秘密鍵のエクスポートに失敗しました（パスワードが間違っている可能性がありま"
@@ -1199,6 +1251,22 @@ msgstr "User Profile"
 msgid "I18N_OPENXPKI_UI_PROFILE_OU_DESC"
 msgstr "組織単位"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_CONTACT"
+msgstr "ポート"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_CONTACT_DESC"
+msgstr "ポート番号"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_GROUP"
+msgstr "UPN"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_GROUP_DESC"
+msgstr "組織単位"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_O_DESC"
 msgstr "組織名"
 
@@ -1213,6 +1281,10 @@ msgstr "ポート"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_PORT_DESC"
 msgstr "ポート番号"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_RATOKEN_LABEL"
+msgstr "データセーフトークン"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_REALNAME"
 msgstr "本名"
@@ -1723,6 +1795,10 @@ msgstr "OpenXPKI Trustcenter へようこそ"
 
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
 msgstr "今日のメッセージ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ABORT_BUTTON"
+msgstr "戻る"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_USER"
 msgstr "現在のユーザーはこのワークフローへのアクセスを禁止しています"
@@ -2795,6 +2871,30 @@ msgstr "証明書所有者のメールアドレス"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_TOOLTIP"
 msgstr " "
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EXPIRY_NOTIFICATION_DESC"
+msgstr "サーバエンドポイント"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EXPIRY_NOTIFICATION_LABEL"
+msgstr "サーバエンドポイント"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_CONTACT_DESC"
+msgstr "サーバエンドポイント"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_CONTACT_LABEL"
+msgstr "サーバエンドポイント"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_GROUP_DESC"
+msgstr "ARSグループ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_GROUP_LABEL"
+msgstr "ARSグループ"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_DESC"
 msgstr " "
 
@@ -2854,6 +2954,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_TOOLTIP"
 msgstr ""
 "カレンダーアイコンを使用するか、MM.DD.YYYY形式で日付を入力し、デフォルトを使"
 "用するには0を入力します。日付けはUTCの時間帯です。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFY_EXPIRY_MESSAGE_LABEL"
+msgstr "証明書失効通知"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFY_EXPIRY_RCPT_LABEL"
+msgstr "証明書失効通知"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_DESC"
 msgstr "リクエストを保留にする理由を説明する。"
@@ -3581,10 +3689,6 @@ msgstr "フォームフィールドを記入するためのヒント"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_LABEL"
 msgstr "ワークフローを検索する"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_META_CERT_SUBJECT_HINT"
-msgstr "状態"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION"
 msgstr "検索結果:"
 
@@ -4280,6 +4384,15 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 msgstr "証明書失効通知"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_MESSAGE_DESC"
+msgstr ""
+"期限切れになる証明書について、メールで期限切れの通知を送信してください。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_MESSAGE_LABEL"
+msgstr "証明書失効通知"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RATOKEN_DESC"
 msgstr "トランザクションIDでSCEPワークフローを検索する"
 
@@ -4446,9 +4559,6 @@ msgstr "はい"
 #~ msgid "I18N_OPENXPKI_UI_PAUSED_CRL_TOKEN_NOT_USABLE"
 #~ msgstr "CRL署名トークンがオンラインではありません"
 
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
-#~ msgstr "データセーフトークン"
-
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_NODEID"
 #~ msgstr "ノードID"
 
@@ -4481,9 +4591,6 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_GUID_DESCRIPTION"
 #~ msgstr "GUID"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_UPN"
-#~ msgstr "UPN"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_UPN_DESCRIPTION"
 #~ msgstr "UPN"
@@ -5438,20 +5545,8 @@ msgstr "はい"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_LOGIN_IDS_TOOLTIP"
 #~ msgstr "Check this box to force issuance."
 
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_DESC"
-#~ msgstr "ARSグループ"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_LABEL"
-#~ msgstr "ARSグループ"
-
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_PLACEHOLDER"
 #~ msgstr "ARSグループ"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_DESC"
-#~ msgstr "サーバエンドポイント"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_LABEL"
-#~ msgstr "サーバエンドポイント"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_PLACEHOLDER"
 #~ msgstr "サーバエンドポイント"
@@ -5645,6 +5740,10 @@ msgstr "はい"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DETAIL_FIELD_VALID_AT_LABEL"
 #~ msgstr "Reference Date"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_META_CERT_SUBJECT_HINT"
+#~ msgstr "状態"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_PLACEHOLDER"

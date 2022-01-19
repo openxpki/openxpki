@@ -749,6 +749,50 @@ msgid "I18N_OPENXPKI_UI_ERROR_VALIDATOR_VALIDITY_TIME_NOTAFTER_IN_THE_PAST"
 msgstr "La data inserita per il campo “non dopo il” è già passata."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION"
+msgstr "Numero di serie del certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_ALERT"
+msgstr "Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_CREATED"
+msgstr "Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_DISABLED"
+msgstr "Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_FAILED"
+msgstr "Workflow"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_INFO"
+msgstr "Numero di serie del certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_NOTIFIED"
+msgstr "Identificatore del certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_PENDING"
+msgstr "Numero di serie del certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_RENEWED"
+msgstr "Rinnova"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_SUPPRESS"
+msgstr "Numero di serie del certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPIRY_NOTIFICATION_WARN"
+msgstr "Numero di serie del certificato"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_EXPORT_CERTIFICATE_FAILED_TO_LOAD_PRIVATE_KEY"
 msgstr ""
 "Inserisci la passphrase impostata durante la creazione del certificato."
@@ -1404,6 +1448,22 @@ msgstr "Persone Fisiche (Email Sicura / Autenticazione)"
 msgid "I18N_OPENXPKI_UI_PROFILE_OU_DESC"
 msgstr "Unità Organizzativa"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_CONTACT"
+msgstr "Porta"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_CONTACT_DESC"
+msgstr "Numero Porta"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_GROUP"
+msgstr "UPN"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_OWNER_GROUP_DESC"
+msgstr "Unità Organizzativa"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_O_DESC"
 msgstr "Nome Organizzazione"
 
@@ -1418,6 +1478,10 @@ msgstr "Porta"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_PORT_DESC"
 msgstr "Numero Porta"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_RATOKEN_LABEL"
+msgstr "Token Datasafe"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_REALNAME"
 msgstr "Nome reale"
@@ -2000,6 +2064,10 @@ msgstr "Curva Ellittica"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WF_TYPE_MOTD_LABEL"
 msgstr "Tipo"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ABORT_BUTTON"
+msgstr "Forza Ripristino"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_USER"
@@ -3151,6 +3219,30 @@ msgstr "Indirizzo Email del proprietario del certificato"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_TOOLTIP"
 msgstr " "
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EXPIRY_NOTIFICATION_DESC"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EXPIRY_NOTIFICATION_LABEL"
+msgstr "Commento"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_CONTACT_DESC"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_CONTACT_LABEL"
+msgstr "Commento"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_GROUP_DESC"
+msgstr " "
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_GROUP_LABEL"
+msgstr "Richiedente/Proprietario"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_DESC"
 msgstr " "
 
@@ -3214,6 +3306,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTBEFORE_TOOLTIP"
 msgstr ""
 "Usa l’icona del calendario oppure inserisci una data in formato MM.GG.AAAA. "
 "Inserisci 0 per usare il valore di default"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFY_EXPIRY_MESSAGE_LABEL"
+msgstr "Esporta Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_NOTIFY_EXPIRY_RCPT_LABEL"
+msgstr "Esporta Certificato"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ONHOLD_COMMENT_DESC"
 msgstr "Descrivi il motivo per cui sospendi la richiesta.."
@@ -3989,10 +4089,6 @@ msgstr "Suggerimenti per la compilazione dei campi del modulo:"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_LABEL"
 msgstr "Ricerca nei Workflow"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_META_CERT_SUBJECT_HINT"
-msgstr "Stato"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION"
 msgstr "Risultati della tua ricerca:"
 
@@ -4760,6 +4856,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 msgstr "Esporta Certificato"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_MESSAGE_DESC"
+msgstr "Esporta il Certificato nel formato desiderato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_MESSAGE_LABEL"
+msgstr "Esporta Certificato"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RATOKEN_DESC"
 msgstr "Ricerca nei Workflow usando i filtri qui sotto."
 
@@ -5003,9 +5107,6 @@ msgstr "Chiave"
 #~ msgid "I18N_OPENXPKI_UI_PAUSED_CRL_TOKEN_NOT_USABLE"
 #~ msgstr "Il token di firma della CRL non è online"
 
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_DATASAFE_TOKEN_LABEL"
-#~ msgstr "Token Datasafe"
-
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_NODEID"
 #~ msgstr "Nome Organizzazione"
@@ -5042,9 +5143,6 @@ msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_GUID_DESCRIPTION"
 #~ msgstr "GUID"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_UPN"
-#~ msgstr "UPN"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_UPN_DESCRIPTION"
 #~ msgstr "UPN"
@@ -6048,24 +6146,8 @@ msgstr "Chiave"
 #~ msgstr "Check this box to force issuance."
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_DESC"
-#~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_LABEL"
-#~ msgstr "Richiedente/Proprietario"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_PLACEHOLDER"
 #~ msgstr "Nome del Richiedente/Proprietario"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_DESC"
-#~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_LABEL"
-#~ msgstr "Commento"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_PLACEHOLDER"
@@ -6262,6 +6344,10 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_DETAIL_FIELD_VALID_AT_LABEL"
 #~ msgstr "Reference Date"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_META_CERT_SUBJECT_HINT"
+#~ msgstr "Stato"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_PLACEHOLDER"
