@@ -197,7 +197,11 @@ sub _create_object {
         my $secret = OpenXPKI::Crypto::Secret::Plain->new(
             part_count => 1,
         );
-        $secret->set_secret($secret_def->{value});
+        if (defined $secret_def->{value}) {
+            $secret->set_secret($secret_def->{value});
+        } else {
+            CTX('log')->application->warn("Creating literal secret but secret value is undef");
+        }
         return $secret;
     }
     elsif ('plain' eq $method) {
