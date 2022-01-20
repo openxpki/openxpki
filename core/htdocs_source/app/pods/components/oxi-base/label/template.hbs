@@ -1,5 +1,5 @@
 {{~#each (arrayify @text) as |txt|~}}
-    <div class="{{@class}} {{this.cssClasses}} oxi-base-label">
+    <div class="{{@class}} {{this.cssClasses}}">
         {{#if @tooltip}}
             <EmberTooltip @delay={{this.config.tooltipDelay}}>
                 {{@tooltip}}

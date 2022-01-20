@@ -354,7 +354,7 @@ tr.gridrow-danger:hover > td {background-color: #e6c1c7 !important;}
   background-color: #eee;
 }
 
-.oxi-infobox .oxi-keyvalue .oxi-base-label {
+.oxi-truncate {
   /* like Bootstraps "text-truncate" class */
   overflow: hidden;
   text-overflow: ellipsis;
