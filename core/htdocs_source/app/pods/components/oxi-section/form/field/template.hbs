@@ -3,10 +3,10 @@
         <div class="col-md-2"></div>
     {{else}}
         <label class="col-md-2 col-form-label text-md-right">
-            {{@field.label}}
+            {{@field.label}}&nbsp;{{! (prevent HTML line break)
 
-            {{#if @field.tooltip}}
-                <span class="glyphicon glyphicon-info-sign text-primary oxi-tooltip-icon">
+          }}{{#if @field.tooltip}}{{! (prevent HTML line break)
+              }}<span class="glyphicon glyphicon-info-sign text-primary oxi-tooltip-icon">
                 {{! Show a tooltip on tab focus or mouseover }}
                 <EmberTooltip>
                     {{@field.tooltip}}
