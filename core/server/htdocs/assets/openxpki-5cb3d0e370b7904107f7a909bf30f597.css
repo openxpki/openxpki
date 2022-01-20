@@ -1,5 +1,6 @@
 .oxi-header,dl,ul{margin-bottom:0}
 .oxi-page,.oxi-page>.row{min-height:100vh}
+.oxi-keyvalue-dots,.oxi-truncate{overflow:hidden}
 dd{padding:0 0 0 1em}
 dd+dt{padding-top:.5em}
 .was-validated .form-check-input:valid~.form-check-label{color:inherit}
@@ -294,6 +295,7 @@ img.toplogo{height:40px}
 .breadcrumb,.breadcrumb-item+.breadcrumb-item::before{color:#a0a0a0}
 .oxi-width-restricted+.oxi-resize-overlay:hover span::after{visibility:visible}
 .oxi-width-full+.oxi-resize-overlay span::after{content:"«" '\A' "«" '\A' "«" '\A' "«" '\A' "«" '\A' "«" '\A' "«" '\A' "«" '\A' "«" '\A' "«";white-space:pre}
+.oxi-grid,.oxi-keyvalue-dots,.oxi-truncate{white-space:nowrap}
 .pagination li:not(.disabled)>a{cursor:pointer}
 .dimmer{position:fixed;top:0;bottom:0;left:0;right:0;background-color:#fff;opacity:.7;z-index:1001}
 .oxi-loading-banner{position:fixed;top:1%;right:1%;z-index:1002}
@@ -314,7 +316,6 @@ img.toplogo{height:40px}
 .breadcrumb .cert-search-result::before,.breadcrumb .workflow-search-result::before{content:"\e056"}
 .oxi-grid-container{padding-bottom:40px}
 div.oxi-grid th.sortable{cursor:pointer;-webkit-user-select:none}
-.oxi-grid{white-space:nowrap}
 tr.gridrow-issued:hover>td,tr.gridrow:hover>td{background-color:#E7E7E7!important}
 tr.gridrow-expired>td{background-color:#fcf8e3!important}
 tr.gridrow-expired:hover>td{background-color:#E7E7E7!important}
@@ -353,10 +354,9 @@ tr.gridrow-danger:hover>td{background-color:#e6c1c7!important}
 @media (min-width:1140px){.oxi-keyvalue-label{max-width:19%}
 }
 .oxi-keyvalue-label-infobox{flex:0 0 auto;width:auto;max-width:42%}
-.oxi-keyvalue-dots{overflow:hidden;white-space:nowrap}
 .oxi-keyvalue-dots::after{content:". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . " ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";color:#9cA5Ad}
 .oxi-keyvalue-head.spacer{margin-top:1rem;background-color:#eee}
-.oxi-infobox .oxi-keyvalue .oxi-base-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.oxi-truncate{text-overflow:ellipsis}
 .certstatus-issued,.dns-valid,.styled-valid{color:green}
 .certstatus-revoked,.dns-failed,.styled-failed{color:red}
 .certstatus-crl_issuance_pending,.dns-skipped,.styled-attention{color:orange}
