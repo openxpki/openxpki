@@ -259,11 +259,14 @@ sub _prepare_template_vars {
             $template_vars->{'approvals'} = $ser->deserialize( $approvals );
         }
 
-
         # Shortcut
         $template_vars->{'requestor'} = 'unknown';
-        $template_vars->{'requestor'} = $template_vars->{'cert_info'}->{requestor_gname}.' ' if ($template_vars->{'cert_info'}->{requestor_gname});
-        $template_vars->{'requestor'} .= $template_vars->{'cert_info'}->{requestor_name}.' ' if ($template_vars->{'cert_info'}->{requestor_name});
+        if ($template_vars->{'cert_info'}->{requestor_realname}) {
+            $template_vars->{'requestor'} = $template_vars->{'cert_info'}->{requestor_realname};
+        } elsif ($template_vars->{'cert_info'}->{requestor_name}) {
+            $template_vars->{'requestor'} =
+                $template_vars->{'cert_info'}->{requestor_gname}.' '.$template_vars->{'cert_info'}->{requestor_name};
+        }
     }
 
     ##! 32: 'template vars ' . Dumper $template_vars
