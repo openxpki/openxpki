@@ -49,6 +49,7 @@ export default [
                     type: "textarea",
                     name: "text_autofill",
                     label: "Autofill",
+                    rows: 5,
                     autofill: {
                         request: {
                             url: `${window.location.protocol}//${window.location.host}/autofill`,

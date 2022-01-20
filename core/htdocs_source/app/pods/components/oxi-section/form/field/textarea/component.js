@@ -21,8 +21,7 @@ export default class OxiFieldTextareaComponent extends Component {
         if (this.textOutput) this.setValue(this.textOutput);
     }
 
-    get cols() { return (this.args.content.textAreaSize || {}).width || 150 }
-    get rows() { return (this.args.content.textAreaSize || {}).height || 10 }
+    get rows() { return this.args.content?.rows || 10 }
     get hasContent() { return this.value ? true : false }
 
     @action

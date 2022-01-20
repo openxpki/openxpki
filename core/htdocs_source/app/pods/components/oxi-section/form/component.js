@@ -56,6 +56,7 @@ class Field {
     /*
      * oxisection/form/field/textarea
      */
+    rows;
     allow_upload;
 
     static fromHash(sourceHash) {
