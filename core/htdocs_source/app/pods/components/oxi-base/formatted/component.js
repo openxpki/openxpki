@@ -7,7 +7,7 @@ import copy from 'copy-text-to-clipboard';
  * Shows a formatted piece of text or data.
  *
  * ```html
- * <OxiBase::Formatted @format="timestamp" value="1617102928"/>
+ * <OxiBase::Formatted @format="timestamp" @value="1617102928" @class="big" />
  * ```
  *
  * @param { string } format - how the value shall be formatted
