@@ -21,10 +21,6 @@ export default class OxiFieldMainComponent extends Component {
         return `oxi-section/form/field/${this.args.field.type}`;
     }
 
-    get autofillConfig() {
-        return this.args.field.autofill ? this.args.field.autofill : null;
-    }
-
     @action
     addClone() {
         this.args.addClone(this.args.field);
