@@ -41,7 +41,7 @@ export default class Autofill extends Component {
     constructor() {
         super(...arguments);
 
-// TODO Reactivate type checking once we drop IE11 support
+// TODO Reactivate type checking (with "superstruct", not "ow"!) once we drop IE11 support
 /*
         NOTE: we could also use one of these:
           https://www.npmjs.com/package/joi
