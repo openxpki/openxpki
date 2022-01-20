@@ -2,6 +2,11 @@
     <link integrity="" rel="stylesheet" href="{{this.config.customCssUrl}}">
 {{/if}}
 
+{{!
+  *************************************
+  Menu
+  *************************************
+}}
 <BsNavbar
     @type="light"
     @backgroundColor=""
@@ -64,6 +69,11 @@
 </BsNavbar>
 
 <div class="container-fluid {{this.model.tabs.firstObject.page.className}}">
+    {{!
+      *************************************
+      Messages
+      *************************************
+    }}
     <div class="oxi-message">
         {{#if this.model.status.href}}
             <a href="{{this.model.status.href}}" target="_blank" hidden={{this.statusHidden}}>
@@ -78,6 +88,11 @@
         {{/if}}
     </div>
 
+    {{!
+      *************************************
+      Breadcrumb and page title
+      *************************************
+    }}
     <div class="oxi-pagehead">
         {{#if this.model.tabs.firstObject.page.breadcrumb.length}}
             <ol class="breadcrumb">
@@ -96,6 +111,11 @@
             {{{this.model.tabs.firstObject.page.description}}}
         </div>
     {{/if}}
+    {{!
+      *************************************
+      Tab bar
+      *************************************
+    }}
     {{#if this.showTabs}}
         <ul class="nav nav-tabs mb-3">
             {{#each this.model.tabs as |entry|}}
@@ -115,7 +135,9 @@
         {{#each this.model.tabs as |entry|}}
             <div class="tab-pane {{if entry.active "active"}}">
                 <div class="row">
-                    {{!-- Main page content --}}
+                    {{!
+                      Main page content
+                    }}
                     <div class="{{if entry.right "col-lg-8" "col-12"}} oxi-main">
                         {{#each entry.main as |mainEntry|}}
                             <div class="p-0 {{if (and (eq mainEntry.type "form") (not entry.right)) "col-xl-8" "col-12"}}">
@@ -126,7 +148,9 @@
                             </div>
                         {{/each}}
                     </div>
-                    {{!-- Infobox - right hand info column --}}
+                    {{!
+                      Infobox - right hand info column
+                    }}
                     {{#if entry.right}}
                         <div class="col-lg-4 oxi-infobox">
                             {{#each entry.right as |rightEntry|}}

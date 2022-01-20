@@ -1,7 +1,7 @@
 import Helper from "@ember/component/helper";
 
 /**
- * Test if all of the given expressions evaluate to true.
+ * Check if all given expressions evaluate to true.
  *
  * Example:
  * ```html
