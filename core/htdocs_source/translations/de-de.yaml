@@ -8,6 +8,7 @@ site:
     loading: "Laden..."
     redirecting: "Weiterleitung..."
   close_popup: "Schließen"
+  workflow_info: "Workflow"
 
 userinfo:
   name: "Angemeldet als"

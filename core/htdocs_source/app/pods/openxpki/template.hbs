@@ -74,18 +74,20 @@
       Messages
       *************************************
     }}
-    <div class="oxi-message">
-        {{#if this.model.status.href}}
-            <a href="{{this.model.status.href}}" target="_blank" hidden={{this.statusHidden}}>
-                <div class="alert {{this.statusClass}}" style="cursor:pointer;">
+    <div class="row">
+        <div class="col oxi-message">
+            {{#if this.model.status.href}}
+                <a href="{{this.model.status.href}}" target="_blank" hidden={{this.statusHidden}}>
+                    <div class="alert {{this.statusClass}}" style="cursor:pointer;">
+                        <OxiBase::Formatted @format="nl2br" @value={{this.model.status.message}}/>
+                    </div>
+                </a>
+            {{else}}
+                <div class="alert {{this.statusClass}}" hidden={{this.statusHidden}}>
                     <OxiBase::Formatted @format="nl2br" @value={{this.model.status.message}}/>
                 </div>
-            </a>
-        {{else}}
-            <div class="alert {{this.statusClass}}" hidden={{this.statusHidden}}>
-                <OxiBase::Formatted @format="nl2br" @value={{this.model.status.message}}/>
-            </div>
-        {{/if}}
+            {{/if}}
+        </div>
     </div>
 
     {{!
@@ -93,22 +95,26 @@
       Breadcrumb and page title
       *************************************
     }}
-    <div class="oxi-pagehead">
-        {{#if this.model.tabs.firstObject.page.breadcrumb.length}}
-            <ol class="breadcrumb">
-                {{#each this.model.tabs.firstObject.page.breadcrumb as |entry|}}
-                    {{#if entry.label}}<li class="breadcrumb-item {{entry.className}}">{{entry.label}}</li>{{/if}}
-                {{/each}}
-            </ol>
-        {{/if}}
-        {{#if this.model.tabs.firstObject.page.label}}
-            <h3>{{this.model.tabs.firstObject.page.label}}</h3>
-        {{/if}}
+    <div class="row">
+        <div class="col oxi-pagehead">
+            {{#if this.model.tabs.firstObject.page.breadcrumb.length}}
+                <ol class="breadcrumb">
+                    {{#each this.model.tabs.firstObject.page.breadcrumb as |entry|}}
+                        {{#if entry.label}}<li class="breadcrumb-item {{entry.className}}">{{entry.label}}</li>{{/if}}
+                    {{/each}}
+                </ol>
+            {{/if}}
+            {{#if this.model.tabs.firstObject.page.label}}
+                <h3>{{this.model.tabs.firstObject.page.label}}</h3>
+            {{/if}}
+        </div>
     </div>
 
     {{#if this.model.tabs.firstObject.page.description}}
-        <div class="mb-3">
-            {{{this.model.tabs.firstObject.page.description}}}
+        <div class="row">
+            <div class="col mb-3">
+                {{{this.model.tabs.firstObject.page.description}}}
+            </div>
         </div>
     {{/if}}
     {{!
@@ -116,58 +122,80 @@
       Tab bar
       *************************************
     }}
-    {{#if this.showTabs}}
-        <ul class="nav nav-tabs mb-3">
-            {{#each this.model.tabs as |entry|}}
-                <li class="nav-item">
-                    <a class="nav-link {{if entry.active "active"}}" {{action "activateTab" entry}} href="#">
-                        {{if entry.page.shortlabel entry.page.shortlabel entry.page.label}}
-                        <span class="tab-close" {{action "closeTab" entry}}>
-                            {{!-- template-lint-disable no-bare-strings --}}
-                            &times;
-                        </span>
-                    </a>
-                </li>
-            {{/each}}
-        </ul>
-    {{/if}}
-    <div class="tab-content pb-3">
-        {{#each this.model.tabs as |entry|}}
-            <div class="tab-pane {{if entry.active "active"}}">
-                <div class="row">
-                    {{!
-                      Main page content
-                    }}
-                    <div class="{{if entry.right "col-lg-8" "col-12"}} oxi-main">
-                        {{#each entry.main as |mainEntry|}}
-                            <div class="p-0 {{if (and (eq mainEntry.type "form") (not entry.right)) "col-xl-8" "col-12"}}">
-                                <OxiSection
-                                    @content={{mainEntry}}
-                                    @renderAsCard={{(and (eq mainEntry.type "keyvalue") (not mainEntry.content.buttons))}}
-                                />
-                            </div>
-                        {{/each}}
-                    </div>
-                    {{!
-                      Infobox - right hand info column
-                    }}
-                    {{#if entry.right}}
-                        <div class="col-lg-4 oxi-infobox">
-                            {{#each entry.right as |rightEntry|}}
-                                <div class="card bg-light border-secondary">
-                                    <div class="card-body p-1">
-                                        <OxiSection
-                                            @content={{rightEntry}}
-                                            @isInfoBox={{true}}
-                                        />
-                                    </div>
+    <div class="row">
+        <div class="col">
+            {{#if this.showTabs}}
+                <ul class="nav nav-tabs mb-3">
+                    {{#each this.model.tabs as |entry|}}
+                        <li class="nav-item">
+                            <a class="nav-link {{if entry.active "active"}}" {{action "activateTab" entry}} href="#">
+                                {{if entry.page.shortlabel entry.page.shortlabel entry.page.label}}
+                                <span class="tab-close" {{action "closeTab" entry}}>
+                                    {{!-- template-lint-disable no-bare-strings --}}
+                                    &times;
+                                </span>
+                            </a>
+                        </li>
+                    {{/each}}
+                </ul>
+            {{/if}}
+            <div class="tab-content pb-3">
+                {{#each this.model.tabs as |entry|}}
+                    <div class="tab-pane {{if entry.active "active"}}">
+                        {{#let (and entry.right this.showInfoBlock) as |showInfo|}}
+                            <div class="row">
+                                {{!
+                                  Main page content
+                                }}
+                                <div class="col-11 {{if showInfo "col-lg-7"}} oxi-main order-0">
+                                    {{#each entry.main as |mainEntry|}}
+                                        {{! extra row/col level to restrict form width if info block
+                                             is hidden (as overly long input fields look ugly) }}
+                                        <div class="row">
+                                            <div class="col {{if (and (not showInfo) (eq mainEntry.type "form")) "col-xl-10"}}">
+                                                <OxiSection
+                                                    @content={{mainEntry}}
+                                                    @renderAsCard={{(and (eq mainEntry.type "keyvalue") (not mainEntry.content.buttons))}}
+                                                />
+                                            </div>
+                                        </div>
+                                    {{/each}}
                                 </div>
-                            {{/each}}
-                        </div>
-                    {{/if}}
-                </div>
+                                {{!
+                                  Infobox - right hand info column
+                                }}
+                                {{#if entry.right}}
+                                    {{#if showInfo}}
+                                        <div class="col-12 col-lg-4 order-2 order-lg-1 pr-lg-0 oxi-infobox">
+                                            {{#each entry.right as |rightEntry|}}
+                                                <div class="card bg-light border-secondary">
+                                                    <div class="card-body p-1">
+                                                        <OxiSection
+                                                            @content={{rightEntry}}
+                                                            @isInfoBox={{true}}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            {{/each}}
+                                        </div>
+                                    {{/if}}
+                                    <div class="col-6 col-lg-1 order-1 order-lg-2 pt-3 pl-lg-0">
+                                        <BsButton
+                                            @type="light"
+                                            class="btn-sm"
+                                            @onClick={{this.toggleInfoBlock}}
+                                            @icon="glyphicon glyphicon-{{if showInfo "remove-sign" "info-sign"}}"
+                                        >
+                                            {{t 'site.workflow_info'}}
+                                        </BsButton>
+                                    </div>
+                                {{/if}}
+                            </div>
+                        {{/let}}
+                    </div>
+                {{/each}}
             </div>
-        {{/each}}
+        </div>
     </div>
 </div>
 

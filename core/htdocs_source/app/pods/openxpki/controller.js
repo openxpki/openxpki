@@ -24,6 +24,7 @@ export default class OpenXpkiController extends Controller {
     limit = null;
 
     @tracked loading = false;
+    @tracked showInfoBlock = false;
 
     @computed("model.status.{level,message}")
     get statusClass() {
@@ -86,5 +87,10 @@ export default class OpenXpkiController extends Controller {
     @action
     clearPopupData() {
         return this.set("model.popup", null);
+    }
+
+    @action
+    toggleInfoBlock() {
+        this.showInfoBlock = !this.showInfoBlock;
     }
 }
