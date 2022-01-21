@@ -21,6 +21,18 @@ export default class OxiFieldMainComponent extends Component {
         return `oxi-section/form/field/${this.args.field.type}`;
     }
 
+    // Options for <EmberTooltip>, i.e. Popper.js
+    // See https://popper.js.org/docs/v1/#modifiers..preventOverflow
+    get popperOptions() {
+        return {
+            modifiers: {
+                preventOverflow: {
+                    escapeWithReference: false,
+                }
+            }
+        }
+    }
+
     @action
     addClone() {
         this.args.addClone(this.args.field);
