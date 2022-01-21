@@ -52,6 +52,9 @@ sub get_command {
     $outfile_of{$ident} = $fu_of{$ident}->get_safe_tmpfile({
         'TMP' => $tmp_of{$ident},
     });
+    # keytool dies if the outfile exists so we remove it but keep the
+    # name so it is cleaned up by the FU class later
+    unlink($outfile_of{$ident});
 
     my $pkcs12 = $fu_of{$ident}->get_safe_tmpfile({
         'TMP' => $tmp_of{$ident},
@@ -68,11 +71,15 @@ sub get_command {
     $ENV{jkspass} = $password_out_of{$ident};
     $ENV{p12pass} = $password_of{$ident};
 
-    my $command = "-importkeystore ";
-    $command .= " -srcstoretype PKCS12 -srcstorepass:env p12pass -srckeystore " . $pkcs12;
-    $command .= " -deststoretype JKS -storepass:env jkspass -destkeystore ". $outfile_of{$ident};
+    my @command = ('-importkeystore',
+        '-srcstoretype','PKCS12',
+        '-srcstorepass:env','p12pass',
+        '-srckeystore', $pkcs12,
+        '-deststoretype','JKS',
+        '-storepass:env','jkspass',
+        '-destkeystore', $outfile_of{$ident});
 
-    return [ $command ];
+    return [ \@command ];
 
 }
 
