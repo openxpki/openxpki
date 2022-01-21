@@ -1961,39 +1961,7 @@ sub __render_from_workflow {
         }
     }
 
-    # we set the breadcrumb only if the workflow has a title set
-    # fallback to label if title is not DEFINED is done in the API
-    # setting title to the empty string will suppress breadcrumbs
-    my @breadcrumb;
-    if ($wf_info->{workflow}->{title}) {
-        if ($wf_info->{workflow}->{id}) {
-            push @breadcrumb, {
-                className => 'workflow-type' ,
-                label => sprintf("%s (#%01d)", $wf_info->{workflow}->{title}, $wf_info->{workflow}->{id})
-            };
-        } elsif ($wf_info->{workflow}->{state} eq 'INITIAL') {
-            push @breadcrumb, {
-                className => 'workflow-type',
-                label => sprintf("%s", $wf_info->{workflow}->{title})
-            };
-        }
-    }
 
-    # helper sub to render the pages description text from state/action using a template
-    my $templated_description = sub {
-        my $page_def = shift;
-        my $description;
-        if ($page_def->{template}) {
-            my $user = $self->_client->session()->param('user');
-            $description = $self->send_command_v2( 'render_template', {
-                template => $page_def->{template}, params => {
-                    context => $wf_info->{workflow}->{context},
-                    user => { name => $user->{name},  role => $user->{role} },
-                },
-            });
-        }
-        return  $description || $page_def->{description} || '';
-    };
 
     # show buttons to proceed with workflow if it's in "non-regular" state
     my %irregular = (
@@ -2008,16 +1976,12 @@ sub __render_from_workflow {
         my $wf_action = $wf_info->{workflow}->{context}->{wf_current_action};
         my $wf_action_info = $wf_info->{activity}->{ $wf_action };
 
-        if (@breadcrumb && $wf_info->{state}->{label}) {
-            push @breadcrumb, { className => 'workflow-state', label => $wf_info->{state}->{label} };
-        }
-
         my $label = $self->__get_proc_state_label($wf_proc_state); # reuse labels from init_info popup
         my $desc = $irregular{$wf_proc_state};
 
         $self->_page({
             label => $label,
-            breadcrumb => \@breadcrumb,
+            breadcrumb => $self->__get_breadcrumb($wf_info, $wf_info->{state}->{label}),
             shortlabel => $wf_info->{workflow}->{id},
             description => $desc,
             className => 'workflow workflow-proc-state workflow-proc-'.$wf_proc_state,
@@ -2158,121 +2122,22 @@ sub __render_from_workflow {
     # if there is one activity selected (or only one present), we render it now
     } elsif ($wf_action) {
 
-        my $wf_action_info = $wf_info->{activity}->{$wf_action};
-        # if we fallback to the state label we dont want it in the 1
-        my $label = $wf_action_info->{label};
-        if ($label ne $wf_action) {
-            if (@breadcrumb && $wf_info->{state}->{label}) {
-                push @breadcrumb, { className => 'workflow-state', label => $wf_info->{state}->{label} };
-            }
+        $self->__render_workflow_action_head($wf_info, $wf_action);
+
+        # delegation based on activity    ;
+        if (my $uihandle = $wf_info->{activity}->{$wf_action}->{uihandle}) {
+            $self->__delegate_call($uihandle, $args, $wf_action);
         } else {
-            $label = $wf_info->{state}->{label};
+            $self->__render_workflow_action_body($wf_info, $wf_action, $view);
         }
 
-        $self->_page({
-            label => $label,
-            breadcrumb => \@breadcrumb,
-            shortlabel => $wf_info->{workflow}->{id},
-            description =>  $templated_description->($wf_action_info),
-            className => 'workflow workflow-action ' . ($wf_action_info->{uiclass} || ''),
-            canonical_uri => sprintf('workflow!load!wf_id!%01d!wf_action!%s', $wf_info->{workflow}->{id}, $wf_action),
-        });
-
-        # delegation based on activity
-        if ($wf_action_info->{uihandle}) {
-            return $self->__delegate_call($wf_action_info->{uihandle}, $args, $wf_action);
-        }
-
-        $self->logger()->trace('activity info ' . Dumper $wf_action_info ) if $self->logger->is_trace;
-
-        # we allow prefill of the form if the workflow is started
-        my $do_prefill = $wf_info->{workflow}->{state} eq 'INITIAL';
-
-        my $context = $wf_info->{workflow}->{context};
-        my @fields;
-        my @additional_fields;
-        my @fielddesc;
-
-        foreach my $field (@{$wf_action_info->{field}}) {
-
-            my $name = $field->{name};
-            next if ($name =~ m{ \A workflow_id }x);
-            next if ($name =~ m{ \A wf_ }x);
-            next if ($field->{type} && $field->{type} eq "server");
-
-            my $val = $self->param($name);
-            if ($do_prefill && defined $val) {
-                # XSS prevention - very rude, but if you need to pass something
-                # more sophisticated use the wf_token technique
-                $val =~ s/[^A-Za-z0-9_=,-\. ]//;
-            } elsif (defined $context->{$name}) {
-                $val = $context->{$name};
-            } else {
-                $val = undef;
-            }
-
-            my ($item, @more_items) = $self->__render_input_field( $field, $val );
-            next unless ($item);
-
-            push @fields, $item;
-            push @additional_fields, @more_items;
-
-            # if the field has a description text, push it to the @fielddesc list
-            my $descr = $field->{description};
-            if ($descr && $descr !~ /^\s*$/ && $field->{type} ne 'hidden') {
-                push @fielddesc, { label => $item->{label}, value => $descr, format => 'raw' };
-            }
-
-        }
-
-        # Render the context values if there are no fields
-        if (!scalar @fields) {
-            $self->add_section({
-                type => 'keyvalue',
-                content => {
-                    label => '',
-                    description => '',
-                    data => $self->__render_fields( $wf_info, $view ),
-                    buttons => $self->__get_form_buttons( $wf_info ),
-            }});
-
-        } else {
-
-            # record the workflow info in the session
-            push @fields, $self->__register_wf_token( $wf_info, {
-                wf_action => $wf_action,
-                wf_fields => \@fields,
-            });
-
-            $self->add_section({
-                type => 'form',
-                action => 'workflow',
-                content => {
-                    #label => $wf_action_info->{label},
-                    #description => $wf_action_info->{description},
-                    submit_label => $wf_action_info->{button} || 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
-                    fields => [ @fields, @additional_fields ],
-                    buttons => $self->__get_form_buttons( $wf_info ),
-                }
-            });
-
-            if (@fielddesc) {
-                $self->add_section({
-                    type => 'keyvalue',
-                    content => {
-                        label => 'I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST',
-                        description => '',
-                        data => \@fielddesc
-                }});
-            }
-        }
     } else {
 
         $self->_page({
             label => $wf_info->{state}->{label} || $wf_info->{workflow}->{title} || $wf_info->{workflow}->{label},
-            breadcrumb => \@breadcrumb,
+            breadcrumb => $self->__get_breadcrumb($wf_info),
             shortlabel => $wf_info->{workflow}->{id},
-            description =>  $templated_description->($wf_info->{state}),
+            description => $self->__get_templated_description($wf_info, $wf_info->{state}),
             className => 'workflow workflow-page ' . ($wf_info->{state}->{uiclass} || ''),
             ($wf_info->{workflow}->{id} ? (canonical_uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}) : ()),
         });
@@ -3879,6 +3744,180 @@ sub __get_proc_state_label {
 sub __get_proc_state_desc {
     my ($self, $proc_state) = @_;
     return $proc_state ? $self->__proc_state_i18n->{$proc_state}->{desc} : '-';
+}
+
+# methods extracted from __render_workflow_info
+# this should be moved to a seperate file/class
+sub __get_breadcrumb {
+
+    my $self = shift;
+    my $wf_info = shift;
+    my $state_label = shift;
+    # we set the breadcrumb only if the workflow has a title set
+    # fallback to label if title is not DEFINED is done in the API
+    # setting title to the empty string will suppress breadcrumbs
+    my @breadcrumb;
+    if ($wf_info->{workflow}->{title}) {
+        if ($wf_info->{workflow}->{id}) {
+            push @breadcrumb, {
+                className => 'workflow-type' ,
+                label => sprintf("%s (#%01d)", $wf_info->{workflow}->{title}, $wf_info->{workflow}->{id})
+            };
+        } elsif ($wf_info->{workflow}->{state} eq 'INITIAL') {
+            push @breadcrumb, {
+                className => 'workflow-type',
+                label => sprintf("%s", $wf_info->{workflow}->{title})
+            };
+        }
+    }
+
+    if (@breadcrumb && $state_label) {
+        push @breadcrumb, { className => 'workflow-state', label => $state_label };
+    }
+
+    return \@breadcrumb;
+
+}
+
+  # helper sub to render the pages description text from state/action using a template
+sub __get_templated_description {
+
+    my $self = shift;
+    my $wf_info = shift;
+    my $page_def = shift;
+    my $description;
+    if ($page_def->{template}) {
+        my $user = $self->_client->session()->param('user');
+        $description = $self->send_command_v2( 'render_template', {
+            template => $page_def->{template}, params => {
+                context => $wf_info->{workflow}->{context},
+                user => { name => $user->{name},  role => $user->{role} },
+            },
+        });
+    }
+    return  $description || $page_def->{description} || '';
+}
+
+sub __render_workflow_action_head {
+
+    my $self = shift;
+    my $wf_info = shift;
+    my $wf_action = shift;
+
+    my $wf_action_info = $wf_info->{activity}->{$wf_action};
+    # if we fallback to the state label we dont want it in the 1
+    my $label = $wf_action_info->{label};
+    my $breadcrumb;
+    if ($label ne $wf_action) {
+        $breadcrumb = $self->__get_breadcrumb($wf_info, $wf_info->{state}->{label}),
+    } else {
+        $label = $wf_info->{state}->{label};
+        $breadcrumb  = $self->__get_breadcrumb($wf_info);
+    }
+
+    $self->_page({
+        label => $label,
+        breadcrumb => $breadcrumb,
+        shortlabel => $wf_info->{workflow}->{id},
+        description => $self->__get_templated_description($wf_info, $wf_action_info),
+        className => 'workflow workflow-action ' . ($wf_action_info->{uiclass} || ''),
+        canonical_uri => sprintf('workflow!load!wf_id!%01d!wf_action!%s', $wf_info->{workflow}->{id}, $wf_action),
+    });
+
+}
+
+sub __render_workflow_action_body {
+
+    my $self = shift;
+    my $wf_info = shift;
+    my $wf_action = shift;
+    my $view = shift;
+
+    my $wf_action_info = $wf_info->{activity}->{$wf_action};
+
+    $self->logger()->trace('activity info ' . Dumper $wf_action_info ) if $self->logger->is_trace;
+
+    # we allow prefill of the form if the workflow is started
+    my $do_prefill = $wf_info->{workflow}->{state} eq 'INITIAL';
+
+    my $context = $wf_info->{workflow}->{context};
+    my @fields;
+    my @additional_fields;
+    my @fielddesc;
+
+    foreach my $field (@{$wf_action_info->{field}}) {
+
+        my $name = $field->{name};
+        next if ($name =~ m{ \A workflow_id }x);
+        next if ($name =~ m{ \A wf_ }x);
+        next if ($field->{type} && $field->{type} eq "server");
+
+        my $val = $self->param($name);
+        if ($do_prefill && defined $val) {
+            # XSS prevention - very rude, but if you need to pass something
+            # more sophisticated use the wf_token technique
+            $val =~ s/[^A-Za-z0-9_=,-\. ]//;
+        } elsif (defined $context->{$name}) {
+            $val = $context->{$name};
+        } else {
+            $val = undef;
+        }
+
+        my ($item, @more_items) = $self->__render_input_field( $field, $val );
+        next unless ($item);
+
+        push @fields, $item;
+        push @additional_fields, @more_items;
+
+        # if the field has a description text, push it to the @fielddesc list
+        my $descr = $field->{description};
+        if ($descr && $descr !~ /^\s*$/ && $field->{type} ne 'hidden') {
+            push @fielddesc, { label => $item->{label}, value => $descr, format => 'raw' };
+        }
+
+    }
+
+    # Render the context values if there are no fields
+    if (!scalar @fields) {
+        $self->add_section({
+            type => 'keyvalue',
+            content => {
+                label => '',
+                description => '',
+                data => $self->__render_fields( $wf_info, $view ),
+                buttons => $self->__get_form_buttons( $wf_info ),
+        }});
+
+    } else {
+
+        # record the workflow info in the session
+        push @fields, $self->__register_wf_token( $wf_info, {
+            wf_action => $wf_action,
+            wf_fields => \@fields,
+        });
+
+        $self->add_section({
+            type => 'form',
+            action => 'workflow',
+            content => {
+                #label => $wf_action_info->{label},
+                #description => $wf_action_info->{description},
+                submit_label => $wf_action_info->{button} || 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
+                fields => [ @fields, @additional_fields ],
+                buttons => $self->__get_form_buttons( $wf_info ),
+            }
+        });
+
+        if (@fielddesc) {
+            $self->add_section({
+                type => 'keyvalue',
+                content => {
+                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST',
+                    description => '',
+                    data => \@fielddesc
+            }});
+        }
+    }
 }
 
 =head1 example workflow config
