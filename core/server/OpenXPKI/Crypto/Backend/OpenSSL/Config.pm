@@ -174,7 +174,8 @@ sub build_config
     $config .=
         "openssl_conf = openssl_init\n".
         "[ openssl_init ]\n".
-        "engines = engine_section\n"
+        "engines = engine_section\n".
+        $engines
     if ($engines);
 
         # We overwrite the DN by -subj so this is irrelevant but OpenSSL
