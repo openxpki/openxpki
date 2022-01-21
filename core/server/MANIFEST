@@ -625,17 +625,17 @@ cgi-bin/healthcheck.fcgi
 #   core/htdocs_source/update-manifest.pl will update the list below.
 #   UPDATE_MANIFEST_UI_LIST - do not remove this comment
 htdocs/assets/bootstrap-v4-tweaks-ab92eeef543fbc1b09c6c4a88b5d88b3.css
-htdocs/assets/chunk.143.9af0009a0646e6b29dfb.js
-htdocs/assets/chunk.178.3c0040f70ab72cd332a7.js
+htdocs/assets/chunk.143.09b19b9c673142837335.js
+htdocs/assets/chunk.178.02015416f8581c5a5500.js
 htdocs/assets/chunk.458.e1af0f4774b5bca829a3.js
 htdocs/assets/chunk.458.e1af0f4774b5bca829a3.js.LICENSE.txt
 htdocs/assets/chunk.958.8cc193dbcfcf30fabc7a.js
 htdocs/assets/chunk.958.8cc193dbcfcf30fabc7a.js.LICENSE.txt
 htdocs/assets/glyphicons-8dfa4dd41b8ab62e14cf32e7dd3756bc.css
 htdocs/assets/openxpki-5cb3d0e370b7904107f7a909bf30f597.css
-htdocs/assets/openxpki-fc657875f646f7a93c7be6eb3e35eaa3.js
-htdocs/assets/vendor-260e3f82562b3cba538157bcf4535ef6.js
+htdocs/assets/openxpki-eb1936c7bfa5969a9a5824280455058a.js
 htdocs/assets/vendor-67e170cb8fa57fdce6f57b2b245651ad.css
+htdocs/assets/vendor-77936c3e1db8e71e816d9868f6421ba2.js
 htdocs/default.html
 htdocs/favicon.png
 htdocs/fonts/glyphicons-halflings-regular.eot
