@@ -223,8 +223,10 @@ sub _build_client {
 
     my $self = shift;
 
+    my $timeout = $self->_config()->{'timeout'};
     my $client = OpenXPKI::Client->new({
         SOCKETFILE => $self->socket(),
+        ($timeout ? (TIMEOUT => $timeout) : ())
     });
 
     if (! defined $client) {
