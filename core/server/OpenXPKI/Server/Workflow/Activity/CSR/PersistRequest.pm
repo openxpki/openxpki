@@ -125,9 +125,9 @@ sub execute
     }
 
     foreach my $validity_param (qw( notbefore notafter )) {
-        if (defined $context->param($validity_param)) {
+        my $val = $self->param($validity_param) || $context->param($validity_param);
+        if ($val) {
             my $source = $source_ref->{$validity_param};
-            my $val = $context->param($validity_param);
             ##! 16: $validity_param . ' ' .$val
             $dbi->insert(
                 into => 'csr_attributes',

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2022-01-19 11:23+0100\n"
+"PO-Revision-Date: 2022-01-27 10:07+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -1897,7 +1897,8 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_VALIDITY_DESC"
 msgstr ""
 "Um das Zertifikat mit einer abweichenden Gültigkeit auszustellen geben Sie "
 "bitte das gewünschte gültig bis/gültig ab Datum in die Felder ein. Beachten "
-"Sie bitte, dass alle Zeitangaben auf UTC bezogen sind!"
+"Sie bitte, dass alle Zeitangaben auf UTC bezogen sind! Die Angabe eines "
+"absoluten 'gültig bis' Datums überschreibt alle anderen Laufzeit-Parameter!  "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_EDIT_VALIDITY_LABEL"
 msgstr "Gültigkeit ändern"
@@ -2801,7 +2802,6 @@ msgstr "E-Mail-Adresse des Verantwortlichen"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_TOOLTIP"
 msgstr " "
 
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EXPIRY_NOTIFICATION_DESC"
 msgstr " "
 
@@ -2813,7 +2813,6 @@ msgstr ""
 "E-Mail-Adresse des Eigentümers - wird verwendet um u.a. die "
 "Ablaufbenachrichtigung zu versenden."
 
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_CONTACT_LABEL"
 msgstr "Eigentümer (E-Mail)"
 
@@ -2824,7 +2823,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_GROUP_LABEL"
 msgstr "Eigentümer (Gruppe)"
-
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_DESC"
 msgstr " "
