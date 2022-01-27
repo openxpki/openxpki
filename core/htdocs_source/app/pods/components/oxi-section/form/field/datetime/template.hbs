@@ -14,7 +14,19 @@
             />
             <div class="invalid-feedback">{{@error}}</div>
             <div class="input-group-append">
-                <BsButton @onClick={{this.flatpickr.open}} @icon="glyphicon glyphicon-calendar">
+                {{#if this.allowClearing}}
+                    <BsButton
+                        @onClick={{this.flatpickr.clear}}
+                        @icon="glyphicon glyphicon-trash"
+                        @type="light"
+                        class="oxi-btn-cancel btn-sm"
+                    >
+                    </BsButton>
+                {{/if}}
+                <BsButton
+                    @onClick={{this.flatpickr.open}}
+                    @icon="glyphicon glyphicon-calendar"
+                >
                 </BsButton>
             </div>
         </div>

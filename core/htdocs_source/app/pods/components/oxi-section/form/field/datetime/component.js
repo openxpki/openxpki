@@ -1,5 +1,6 @@
 import Component from '@glimmer/component';
 import { action, computed } from '@ember/object';
+import { tracked } from '@glimmer/tracking';
 import { inject } from '@ember/service';
 import { DateTime, SystemZone } from 'luxon';
 
@@ -9,6 +10,7 @@ export default class OxiFieldDatetimeComponent extends Component {
     date;
     flatpickr; // reference to the JS object
     timezoneLabel = this.args.content.timezone || "UTC";
+    @tracked allowClearing = false
 
     get timezone() {
         let tz = this.args.content.timezone || "utc";
@@ -42,11 +44,16 @@ export default class OxiFieldDatetimeComponent extends Component {
 
     @action
     datePicked(dates, dateStr, flatpickr) {
-        if (!dates[0]) return;
-
-        let dt = DateTime.fromJSDate(dates[0]);
-        dt = dt.setZone(this.timezone, { keepLocalTime: true });
-
-        this.args.onChange(dt.toSeconds());
+        let epoch = null
+        if (dates[0]) {
+            let dt = DateTime.fromJSDate(dates[0])
+            dt = dt.setZone(this.timezone, { keepLocalTime: true })
+            epoch = dt.toSeconds()
+            this.allowClearing = true
+        }
+        else {
+            this.allowClearing = false
+        }
+        this.args.onChange(epoch)
     }
 }

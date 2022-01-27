@@ -203,6 +203,7 @@ export default [
                     name: "dt_some",
                     label: "Date, 2020-03-03 03:33 UTC",
                     value: "1583206380",
+                    is_optional: 1,
                 },
                 {
                     type: "datetime",
@@ -210,6 +211,7 @@ export default [
                     label: "Date, 2020-03-03 03:33 UTC",
                     value: "1583206380",
                     timezone: "Pacific/Pitcairn",
+                    is_optional: 1,
                 },
             ],
         }
