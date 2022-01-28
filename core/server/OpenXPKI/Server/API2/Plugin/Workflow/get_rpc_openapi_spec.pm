@@ -143,7 +143,7 @@ sub _openapi_field_schema {
         push @required_fields, $fieldname if $wf_field->{required};
 
         my $field = {};
-        my $hint = "";
+        my @hints = ();
 
         #
         # use OpenAPI type spec if provided
@@ -165,21 +165,21 @@ sub _openapi_field_schema {
             # add "format" specific OpenAPI attributes
             my $match = $FORMAT_MAP{ $wf_field->{format} // "" };
             if ($match) {
-                $hint .= delete $match->{_hint} if $match->{_hint};
+                push @hints, delete $match->{_hint} if $match->{_hint};
                 $field = { %$field, %$match };
             }
 
             # add "type" specific OpenAPI attributes
             $match = $TYPE_MAP{ $wf_field->{type} // "" };
             if ($match) {
-                $hint .= delete $match->{_hint} if $match->{_hint};
+                push @hints, delete $match->{_hint} if $match->{_hint};
                 $field = { %$field, %$match };
             }
 
             # add fieldname specific OpenAPI attributes
             $match = $KEY_MAP{ $fieldname };
             if ($match) {
-                $hint .= delete $match->{_hint} if $match->{_hint};
+                push @hints, delete $match->{_hint} if $match->{_hint};
                 $field = { %$field, %$match };
             }
 
@@ -201,7 +201,7 @@ sub _openapi_field_schema {
 
         # if not already set, use UI label as description (must be non-empty by OpenAPI spec)
         $field->{description} //= $wf_field->{label} ? i18nGettext($wf_field->{label}) : $fieldname;
-        $field->{description} .= " ($hint)" if $hint;
+        $field->{description} .= ' ('.join(' ', @hints).')' if scalar @hints;
 
         $field_specs->{$fieldname} = $field;
     }
