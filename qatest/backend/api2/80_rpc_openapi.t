@@ -48,7 +48,7 @@ sub workflow_def {
         action => {
             'initialize' => {
                 class => 'OpenXPKI::Server::Workflow::Activity::Noop',
-                input => [ 'message', 'size', 'role' ],
+                input => [ qw( message size role revoke_workflow_id ) ],
             },
         },
         field => {
@@ -72,6 +72,14 @@ sub workflow_def {
                 label => 'role label',
                 option => { 'item' => [ '_any', 'User', 'RA Operator' ] },
                 required => '1',
+            },
+            'revoke_workflow_id' => {
+                label => 'I18N_OPENXPKI_UI_REVOCATION_WORKFLOW_ID',
+                api_type => 'Int',
+            },
+            'revoke_workflow_id' => {
+                label => 'I18N_OPENXPKI_UI_REVOCATION_WORKFLOW_ID',
+                api_type => 'Int',
             },
         },
         acl => {
@@ -97,7 +105,7 @@ my $oxitest = OpenXPKI::Test->new(
 lives_and {
     my $result = $oxitest->api2_command("get_rpc_openapi_spec" => {
         workflow => "wf_type_1_$uuid",
-        input => [ qw( message size role ) ],
+        input => [ qw( message size role revoke_workflow_id ) ],
         output => [ qw( message role ) ], # "role" should be ignored because workflow does not define it as output
     });
     cmp_deeply $result, {
@@ -118,6 +126,10 @@ lives_and {
                 'role' => {
                     description => 'role label',
                     type => 'string'
+                },
+                'revoke_workflow_id' => {
+                    description => 'I18N_OPENXPKI_UI_REVOCATION_WORKFLOW_ID',
+                    type => 'integer',
                 },
             },
             required => [ 'message', 'role' ],
