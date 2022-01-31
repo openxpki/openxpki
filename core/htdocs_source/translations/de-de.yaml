@@ -14,6 +14,7 @@ userinfo:
   name: "Angemeldet als"
   realm: "Realm:"
   tenant: "Mandant:"
+  last_login: "Letze Anmeldung:"
 
 error_popup:
   header: "Anwendungsfehler"

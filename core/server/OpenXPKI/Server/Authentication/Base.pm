@@ -5,6 +5,8 @@ use warnings;
 use Moose;
 
 use Data::Dumper;
+use OpenXPKI::DateTime;
+use Digest::SHA qw(sha256_base64);
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
@@ -35,6 +37,13 @@ has authinfo => (
     is => 'ro',
     isa => 'HashRef',
     predicate => 'has_authinfo',
+    default => sub { return {} },
+);
+
+has history => (
+    is => 'ro',
+    isa => 'HashRef',
+    predicate => 'has_history',
     default => sub { return {} },
 );
 
@@ -96,6 +105,54 @@ sub get_userinfo {
     $self->logger->trace("Userinfo for $username is " . Dumper $userinfo) if ($self->logger->is_trace);
     return $userinfo;
 
+}
+
+sub register_login {
+
+    my $self = shift;
+    my $handle = shift;
+
+    return unless ($self->has_history());
+
+    return unless ($handle->is_valid());
+
+    my $history = $self->history();
+    return unless (defined $history->{last_login});
+
+    my $userid = sha256_base64($handle->userid());
+
+    my $dp_val = CTX('api2')->get_data_pool_entry(
+        namespace => "sys.auth.history",
+        key =>  $userid,
+    );
+
+    my $ser = OpenXPKI::Serialization::Simple->new();
+    if ($dp_val) {
+        my $val = $ser->deserialize($dp_val->{value});
+        $handle->userinfo()->{last_login} = $val->{last_login};
+        $self->logger->trace('Got last_login from datapool: ' . Dumper $val) if ($self->logger->is_trace);
+    } else {
+        $handle->userinfo()->{last_login} = time();
+        $self->logger->trace('No last_login found');
+    }
+
+    my %item = (
+        namespace => "sys.auth.history",
+        key => sha256_base64($handle->userid()),
+        value => $ser->serialize({last_login => time()}),
+        force => 1,
+    );
+
+    $item{expiration_date} = OpenXPKI::DateTime::get_validity({
+        VALIDITY => $history->{last_login},
+        VALIDITYFORMAT => 'detect'
+    })->epoch() if ($history->{last_login});
+
+    $self->logger->trace('Update last_login information: ' . Dumper \%item) if ($self->logger->is_trace);
+
+    CTX('api2')->set_data_pool_entry(%item);
+
+    return 1;
 }
 
 sub map_role {
@@ -210,3 +267,19 @@ You can define the special key I<_default> to use as a fallback in case
 the string is not found. If neither one matches, undef is returned.
 
 If I<rolemap> is not set, returns the input string.
+
+=head3 register_login
+
+Expects an instance of OpenXPKI::Server::Authentication::Handle and
+writes status information from the given result into the datapool
+based on the setting of the I<history> attribute.
+
+If I<history> contains the key I<last_login> and the given handle is a
+valid login, the timestamp of the last successful login will be read
+from the datapool and populated into the I<userinfo> hash. If no item
+is found, the current timestamp is used. The datapool item will then
+be updated with the current timestamp, the valus of the I<last_login>
+attribute will be used as expiry time (see set_data_pool_item).
+
+The method will return without any changes made, if the handle is not
+a valid authentication result.

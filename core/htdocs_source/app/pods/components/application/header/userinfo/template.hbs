@@ -10,6 +10,12 @@
                 {{t 'userinfo.realm'}}
                 <strong>{{this.content.user.pki_realm_label}} ({{this.content.user.pki_realm}})</strong>
             </li>
+            {{#if this.content.user.last_login}}
+            <li class="text-right last_login">
+                {{t 'userinfo.last_login'}}
+                <strong><OxiBase::Formatted @format="timestamp" @value={{this.content.user.last_login}} @class="big" @truncate={{true}} /></strong>
+            </li>
+            {{/if}}
             {{#if this.currentTenant}}
                 <li class="text-right tenant">
                     {{#if this.hasMultipleTenants}}

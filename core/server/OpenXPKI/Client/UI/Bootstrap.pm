@@ -47,6 +47,11 @@ sub init_structure {
             $self->logger->trace('Preset tenant from items ' . Dumper $user->{tenants}) if $self->logger->is_trace;
         }
 
+        # Last Login
+        if (my $last_login = $session->param('userinfo')->{last_login}) {
+            $user->{last_login} = $last_login;
+        }
+
         $self->_result->{structure} = $session->param('menu');
 
         # Ping endpoint
