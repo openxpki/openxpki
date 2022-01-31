@@ -22,7 +22,7 @@ use OpenXPKI::Server::API2::Types;
 command "evaluate_trust_rule" => {
     signer_subject  => { isa => 'Str', required => 1 },
     signer_identifier => { isa => 'Str', required => 1 },
-    signer_realm    => { isa => 'Str', required => 1 },
+    signer_realm    => { isa => 'Str', default => '' },
     signer_profile  => { isa => 'Str' },
     signer_issuer   => { isa => 'Str' }, # identifier
     signer_root     => { isa => 'Str' }, # identifier
@@ -48,7 +48,7 @@ command "evaluate_trust_rule" => {
         } elsif ($key eq 'realm') {
             # if issuer_alias is used the realm check is done on the alias
             $matched = ($trustrule->{issuer_alias}) ? 1 :
-                ($params->signer_realm eq $match || $match eq '_any');
+                ($match eq '_any' || $params->signer_realm eq $match);
 
         } elsif ($key eq 'profile') {
 
