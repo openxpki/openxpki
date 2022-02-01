@@ -50,12 +50,6 @@ case "$1" in
                     sed -r "s/digest:.*/digest: '{plain}$OPENXPKI_TEST_PASSWORD'/g" -i /etc/openxpki/config.d/realm.tpl/auth/handler.yaml
                     echo "OpenXPKI Password for Test Accounts was set to ##$OPENXPKI_TEST_PASSWORD##";
                 fi
-
-            fi
-
-            if [ -d /etc/openxpki/ca/ ]; then
-                chown -R openxpki:root /etc/openxpki/ca/
-                chmod -R 750 /etc/openxpki/ca/
             fi
 
             if [ -d /etc/apache2/sites-available/ ]; then
