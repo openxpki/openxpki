@@ -298,7 +298,6 @@ WriteMakefile(
         'Class::Std'                    => '0.0.8',
         'Config::Merge'                 => '1',
         'Config::Std'                   => 0,
-        'Config::Versioned'             => 0,
         'Connector'                     => '1.43',
         'Crypt::Argon2'                 => 0,
         'Crypt::CBC'                    => '2.29',
@@ -346,8 +345,6 @@ WriteMakefile(
         'Proc::ProcessTable'            => '0.43',
         'Proc::SafeExec'                => '1.4',
         'Regexp::Common'                => '2',
-        ## 'RT::Client::REST::Ticket'      => '0', CURRENTLY OPTIONAL
-        ## 'RT::Client::REST'              => '0', CURRENTLY OPTIONAL
         'SOAP::Lite'                    => 0,
         'SQL::Abstract::More'           => '1.28',      # OpenXPKI::Server::Database
         'Sub::Exporter'                 => 0,           # OpenXPKI::MooseParams
@@ -361,7 +358,6 @@ WriteMakefile(
         'Try::Tiny'                     => '0.28',
         'URI::Escape'                   => 0,           # should be part of the core modules but who knows
         'Workflow'                      => '0.27',
-        'XML::Simple'                   => '1',
         'YAML::Tiny'                    => '1.69',
     },
     'test' => {
