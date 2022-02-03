@@ -40,7 +40,7 @@ if ($EVAL_ERROR) {
 
 $log->info("RPC handler initialized");
 
-my %error_msg = (
+my $error_msg = {
     40001 => 'No method set in request',
     40002 => 'Decoding of POST data failed',
     40003 => 'Wrong input values',
@@ -60,7 +60,7 @@ my %error_msg = (
     50005 => 'ENV variable "server" and servername are both set but are mutually exclusive',
     50006 => 'ENV variable "server" requested but endpoint is not set',
     50007 => 'Requested endpoint is not properly configured',
-);
+};
 
 # Takes the given error code and returns a HashRef like
 #   {
@@ -84,7 +84,7 @@ sub failure {
     my $code = shift;
     my @args = @_;
 
-    my $message = $error_msg{$code} // 'Unknown error';
+    my $message = $error_msg->{$code} // 'Unknown error';
     my $data = { pid => $$ };
     my $details_log;
     my $details_public;
@@ -174,7 +174,7 @@ while (my $cgi = CGI::Fast->new()) {
         next;
     }
 
-    my $rpc = OpenXPKI::Client::Service::RPC->new( config => $config );
+    my $rpc = OpenXPKI::Client::Service::RPC->new( config => $config, error_messages => $error_msg );
 
     my $method = $cgi->param('method');
 

@@ -20,6 +20,12 @@ has config => (
     required => 1,
 );
 
+has error_messages => (
+    is      => 'rw',
+    isa     => 'HashRef',
+    required => 1,
+);
+
 has backend => (
     is      => 'rw',
     isa     => 'Object|Undef',
@@ -73,8 +79,15 @@ sub openapi_spec {
                             description => 'Only set if an error occured while executing the command',
                             required => [qw( code message data )],
                             properties => {
-                                'code' => { type => 'integer', },
-                                'message' => { type => 'string', },
+                                'code' => {
+                                    type => 'integer',
+                                    description => "Code indicating the type of error:\n"
+                                        . join("\n", map { " * $_ - ".$self->error_messages->{$_} } sort keys %{ $self->error_messages }),
+                                    enum => [ map { $_+0 } sort keys %{ $self->error_messages } ],
+                                },
+                                'message' => {
+                                    type => 'string',
+                                },
                                 'data' => {
                                     type => 'object',
                                     properties => {
