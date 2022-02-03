@@ -89,7 +89,7 @@ sub openapi_spec {
         },
     };
 
-    my $paths;
+    my $paths = {};
     eval {
         my $client = $self->backend() or die "Could not create OpenXPKI client";
 
