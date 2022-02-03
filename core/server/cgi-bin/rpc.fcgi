@@ -53,7 +53,7 @@ sub send_output {
             my ($error) = split(/[:\n]/, i18nGettext($result->{error}->{message}));
             $status = sprintf ("%03d %s", ($result->{error}->{code}/100), $error);
         }
-    } elsif ($use_status_codes && $result->{result}->{retry_after}) {
+    } elsif ($use_status_codes && $result->{result} && $result->{result}->{retry_after}) {
         $status = '202 Request Pending - Retry Later';
         %retry_head = ("-retry-after" => $result->{result}->{retry_after} );
     }
@@ -63,7 +63,7 @@ sub send_output {
        if ($result->{error}) {
            print 'error.code=' . $result->{error}->{code}."\n";
            print 'error.message=' . $result->{error}->{message}."\n";
-       } else {
+       } elsif ($result->{result}) {
            print 'id=' . $result->{result}->{id}."\n";
            print 'state=' . $result->{result}->{state}."\n";
            print 'retry_after=' . $result->{result}->{retry_after} ."\n" if ($result->{result}->{retry_after});
