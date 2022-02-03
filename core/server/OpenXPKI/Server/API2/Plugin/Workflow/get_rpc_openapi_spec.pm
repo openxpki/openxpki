@@ -147,72 +147,84 @@ sub _openapi_field_schema {
         my @hints = ();
 
         #
-        # use OpenAPI type spec if provided
+        # 1) try to detect OpenXPKI's "format" and/or "type" to set (any or all of)
+        #  - type
+        #  - description
+        #  - format
+        #  - enum
+        # etc.
+        #
+
+        # TODO: Handle select fields (check if options are specified)
+
+        # map OpenXPKI to OpenAPI types
+        my $internal_type = $wf_field->{type}; # variable used in exception
+
+        # add "format" specific OpenAPI attributes
+        my $match = $FORMAT_MAP{ $wf_field->{format} // "" };
+        if ($match) {
+            push @hints, delete $match->{_hint} if $match->{_hint};
+            $field = { %$field, %$match };
+        }
+
+        # add "type" specific OpenAPI attributes
+        $match = $TYPE_MAP{ $wf_field->{type} // "" };
+        if ($match) {
+            push @hints, delete $match->{_hint} if $match->{_hint};
+            $field = { %$field, %$match };
+        }
+
+        # add fieldname specific OpenAPI attributes
+        $match = $KEY_MAP{ $fieldname };
+        if ($match) {
+            push @hints, delete $match->{_hint} if $match->{_hint};
+            $field = { %$field, %$match };
+        }
+
+        # field contains regular expression
+        if ($wf_field->{match}) {
+            my $ecma_regex = $self->_perlre_to_ecma($wf_field->{match});
+            if ($ecma_regex) {
+                $field->{pattern} = $ecma_regex;
+            }
+            else {
+                push @hints, 'String must match the Perl regex /'.$wf_field->{match}.'/msx .';
+            }
+        }
+
+        if (!scalar keys %$field) {
+            push @missing_fields, $wf_field->{name};
+            $field = { type => 'unknown' };
+        }
+
+        # special handling for multivalue fields:
+        # they are represented as Arrays of values of their specified type
+        if (defined $wf_field->{min} or $wf_field->{max}) {
+            $field = {
+                type => 'array',
+                items => $field,
+            }
+        }
+
+        #
+        # 2) use OpenAPI type spec if provided to set/overwrite
+        #  - type
+        #  - properties
+        #  - decription
         #
         if ($wf_field->{api_type}) {
-            $field = $self->api->get_openapi_typespec(spec => $wf_field->{api_type});
+            $field = {
+                %$field,
+                %{ $self->api->get_openapi_typespec(spec => $wf_field->{api_type}) },
+            };
             # use API specific label if provided
             $field->{description} = i18nGettext($wf_field->{api_label}) if $wf_field->{api_label};
-        }
-        #
-        # ...otherwise try to map OpenXPKI's "format" and/or "type" to an OpenAPI type
-        #
-        else {
-            # TODO: Handle select fields (check if options are specified)
-
-            # map OpenXPKI to OpenAPI types
-            my $internal_type = $wf_field->{type}; # variable used in exception
-
-            # add "format" specific OpenAPI attributes
-            my $match = $FORMAT_MAP{ $wf_field->{format} // "" };
-            if ($match) {
-                push @hints, delete $match->{_hint} if $match->{_hint};
-                $field = { %$field, %$match };
-            }
-
-            # add "type" specific OpenAPI attributes
-            $match = $TYPE_MAP{ $wf_field->{type} // "" };
-            if ($match) {
-                push @hints, delete $match->{_hint} if $match->{_hint};
-                $field = { %$field, %$match };
-            }
-
-            # add fieldname specific OpenAPI attributes
-            $match = $KEY_MAP{ $fieldname };
-            if ($match) {
-                push @hints, delete $match->{_hint} if $match->{_hint};
-                $field = { %$field, %$match };
-            }
-
-            # field contains regular expression
-            if ($wf_field->{match}) {
-                my $ecma_regex = $self->_perlre_to_ecma($wf_field->{match});
-                if ($ecma_regex) {
-                    $field->{pattern} = $ecma_regex;
-                }
-                else {
-                    push @hints, 'String must match the Perl regex /'.$wf_field->{match}.'/msx .';
-                }
-            }
-
-            if (!scalar keys %$field) {
-                push @missing_fields, $wf_field->{name};
-                $field = { type => 'unknown' };
-            }
-
-            # special handling for multivalue fields:
-            # they are represented as Arrays of values of their specified type
-            if (defined $wf_field->{min} or $wf_field->{max}) {
-                $field = {
-                    type => 'array',
-                    items => $field,
-                }
-            }
-
         }
 
         # if not already set, use UI label as description (must be non-empty by OpenAPI spec)
         $field->{description} //= $wf_field->{label} ? i18nGettext($wf_field->{label}) : $fieldname;
+
+        # add hints to description
         $field->{description} .= ' ('.join(' ', @hints).')' if scalar @hints;
 
         $field_specs->{$fieldname} = $field;
