@@ -34,15 +34,92 @@ eval {
 if ($EVAL_ERROR) {
     my $cgi = CGI::Fast->new();
     print $cgi->header( -type => 'application/json', charset => 'utf8', -status => '500 Client Connect Failed' );
-    print $json->encode( { error => { code => 50000, message => 'Unable to fetch configuration from server - connect failed' } } );
+    print $json->encode( failure(50000) );
     die "Client Connect Failed: $EVAL_ERROR";
 }
 
 $log->info("RPC handler initialized");
 
+my %error_msg = (
+    40001 => 'No method set in request',
+    40002 => 'Decoding of POST data failed',
+    40003 => 'Wrong input values',
+    40004 => 'RAW post not allowed (no method set in request)',
+    40005 => 'RAW post with unknown content type',
+
+    40401 => 'Invalid method / setup incomplete',
+    40402 => 'Resume requested but no workflow found',
+    40403 => 'Resume requested but workflow is not in manual state',
+    40404 => 'Resume requested but expected workflow action not available',
+
+    50000 => 'Unable to fetch configuration from server - connect failed',
+    50001 => 'Error creating RPC client',
+    50002 => 'Server exception',
+    50003 => 'Workflow terminated in unexpected state',
+    50004 => 'Unable to query OpenAPI specification from OpenXPKI server',
+    50005 => 'ENV variable "server" and servername are both set but are mutually exclusive',
+    50006 => 'ENV variable "server" requested but endpoint is not set',
+    50007 => 'Requested endpoint is not properly configured',
+);
+
+# Takes the given error code and returns a HashRef like
+#   {
+#     error => {
+#       code => 50000,
+#       message => "...",
+#       data => { pid => $$, ... },
+#     }
+#   }
+# Also logs the error via $log->error().
+#
+# Parameters:
+#   $code - error code (Int)
+#   $message - optional: additional error message (Str)
+#   $messages - optional: two different messages for logging (internal) and client result (public) (ArrayRef)
+#   $data - optional: additional information for 'data' part (HashRef)
+#
+# Example:
+#   failure(50007, [ "Public error message", "Internal error: $eval_err" ]);
+sub failure {
+    my $code = shift;
+    my @args = @_;
+
+    my $message = $error_msg{$code} // 'Unknown error';
+    my $data = { pid => $$ };
+    my $details_log;
+    my $details_public;
+
+    # check remaining arguments
+    for my $arg (@args) {
+        # Scalar = additional error message
+        if (not ref $arg and length($arg)) {
+            $details_public = $arg;
+            $details_log = $arg;
+        }
+        # ArrayRef = two different additional error messages [external, internal]
+        elsif (ref $arg eq 'ARRAY') {
+            $details_public = $arg->[0];
+            $details_log = $arg->[1];
+        }
+        # HashRef = additional data
+        elsif (ref $arg eq 'HASH') {
+            $data = { %$data, %$arg };
+        }
+    }
+
+    $log->error($code . ' - ' . join(': ', $message, $details_log // ()));
+
+    return {
+        error => {
+            code => $code,
+            message => join(': ', $message, $details_public // ()),
+            data => $data,
+        }
+    }
+}
+
 sub send_output {
     my ($cgi, $result, $canonical_keys) = @_;
-
 
     $log->trace("Raw result: ". Dumper $result) if ($log->is_trace());
 
@@ -82,7 +159,6 @@ sub send_output {
             print $json->encode( $result );
         }
     }
-
 }
 
 while (my $cgi = CGI::Fast->new()) {
@@ -91,13 +167,10 @@ while (my $cgi = CGI::Fast->new()) {
 
     my $conf;
     eval { $conf = $config->parse_uri()->config(); };
+    my $eval_err = $EVAL_ERROR;
+
     if (!$conf) {
-        $log->error($EVAL_ERROR);
-        send_output( $cgi,  { error => {
-            code => 50007,
-            message=> "Requested endpoint is not properly configured",
-            data => { pid => $$ }
-        }});
+        send_output( $cgi, failure(50007, [undef, $eval_err]) );
         next;
     }
 
@@ -118,11 +191,7 @@ while (my $cgi = CGI::Fast->new()) {
     if (my $raw = $cgi->param('POSTDATA')) {
 
         if (!$conf->{input}->{allow_raw_post}) {
-            $log->error("RPC no method set in request");
-            send_output( $cgi,  { error => {
-                code => 40004,
-                message=> "RAW post not allowed",
-            }});
+            send_output( $cgi, failure(40004) );
             next;
         }
 
@@ -145,8 +214,9 @@ while (my $cgi = CGI::Fast->new()) {
                 $raw = $pkcs7_content->{value};
                 $log->trace("PKCS7 content: " . Dumper  $pkcs7_content) if ($log->is_trace());
             };
-            if ($EVAL_ERROR || !$raw) {
-                send_output( $cgi,  { error => { code => 50001, message => $EVAL_ERROR, data => { pid => $$ } } } );
+            $eval_err = $EVAL_ERROR;
+            if ($eval_err || !$raw) {
+                send_output( $cgi, failure(50001, $eval_err) );
                 $client->disconnect() if ($client);
                 next;
             }
@@ -156,12 +226,7 @@ while (my $cgi = CGI::Fast->new()) {
 
         } else {
 
-            $log->error("Unsupported content type with RPC POSTDATA");
-            send_output( $cgi,  { error => {
-                code => 40005,
-                message=> "Unsupported content type with RPC POSTDATA",
-                type => $content_type
-            }});
+            send_output( $cgi, failure(40005, { type => $content_type }) );
             next;
         }
 
@@ -170,14 +235,10 @@ while (my $cgi = CGI::Fast->new()) {
         $json->max_depth(  $conf->{input}->{parse_depth} || 5 );
 
         $log->trace("RPC raw postdata : " . $raw) if ($log->is_trace());
-        eval{$postdata = $json->decode($raw);};
-        if (!$postdata || $EVAL_ERROR) {
-            $log->error("RPC decoding postdata failed: " . $EVAL_ERROR);
-            send_output( $cgi,  { error => {
-                code => 40002,
-                message=> "RPC decoding postdata failed",
-                data => { pid => $$ }
-            }});
+        eval{ $postdata = $json->decode($raw) };
+        $eval_err = $EVAL_ERROR;
+        if (!$postdata or $eval_err) {
+            send_output( $cgi, failure(40002, [ undef, $eval_err ]) );
             next;
         }
         # read "method" from JSON data if not found in URL before
@@ -188,12 +249,7 @@ while (my $cgi = CGI::Fast->new()) {
 
     # method should be set now
     if ( !$method ) {
-        $log->error("RPC no method set in request");
-        send_output( $cgi,  { error => {
-            code => 40001,
-            message=> "RPC no method set in request",
-            data => { pid => $$ }
-        }});
+        send_output( $cgi, failure(40001) );
         next;
     }
 
@@ -202,7 +258,7 @@ while (my $cgi = CGI::Fast->new()) {
         my $baseurl = sprintf "%s://%s:%s%s", ($cgi->https ? 'https' : 'http'), $cgi->virtual_host, $cgi->virtual_port, $cgi->request_uri;
         my $spec = $rpc->openapi_spec($baseurl);
         if (!$spec) {
-            send_output($cgi, { error => { code => 50004, message => "Unable to query OpenAPI specification from OpenXPKI server", data => { pid => $$ } } });
+            send_output($cgi, failure(50004));
         } else {
             send_output($cgi, $spec, 1);
         }
@@ -216,12 +272,7 @@ while (my $cgi = CGI::Fast->new()) {
 
     my $workflow_type = $conf->{$method}->{workflow};
     if ( !defined $workflow_type ) {
-        $log->error("RPC no workflow_type set for requested method $method");
-        send_output( $cgi,  { error => {
-            code => 40401,
-            message=> "RPC method $method not found or no workflow_type set",
-            data => { pid => $$ }
-        }});
+        send_output( $cgi, failure(40401, "RPC method $method not found or no workflow_type set") );
         next;
     }
 
@@ -281,20 +332,10 @@ while (my $cgi = CGI::Fast->new()) {
     # be lazy and use endpoint name as servername
     if ($envkeys{'server'}) {
         if ($servername) {
-            $log->error("ENV server and servername are both set but are mutually exclusive");
-            send_output( $cgi,  { error => {
-                code => 50005,
-                message=> "ENV server and servername are both set but are mutually exclusive",
-                data => { pid => $$ }
-            }});
+            send_output( $cgi, failure(50005) );
             next;
         } elsif (!$config->endpoint()) {
-            $log->error("ENV server requested but endpoint is not set");
-            send_output( $cgi,  { error => {
-                code => 50006,
-                message=> "ENV server requested but endpoint is not set",
-                data => { pid => $$ }
-            }});
+            send_output( $cgi, failure(50006) );
             next;
         } else {
             $param->{'server'} = $config->endpoint();
@@ -390,19 +431,13 @@ while (my $cgi = CGI::Fast->new()) {
         # Endpoint has a "resume and execute" definition so run action if possible
         if (my $execute_action = $conf->{$method}->{execute_action}) {
             if (!$workflow) {
-                $log->error( 'resume request but no workflow found' );
-                $res = { error => { code => 40402, message => 'resume request but no workflow found',
-                    data => { pid => $$ } } };
+                $res = failure(40402);
             } elsif ($workflow->{'proc_state'} ne 'manual') {
-                $log->error( 'resume request but workflow is not in manual state' );
-                $res = { error => { code => 40403, message => 'resume request but workflow is not in manual state',
-                    data => { pid => $$, id => int($workflow->{id}), 'state' => $workflow->{'state'}, 'proc_state' => $workflow->{'proc_state'} } } };
+                $res = failure(40403, { id => int($workflow->{id}), 'state' => $workflow->{'state'}, proc_state => $workflow->{'proc_state'} });
             } else {
                 my $actions_avail = $client->run_command('get_workflow_activities', { id => $workflow->{id} });
                 if (!(grep { $_ eq  $execute_action } @{$actions_avail})) {
-                    $log->error( 'resume request but expected action not available' );
-                    $res = { error => { code => 40404, message => 'resume request but expected action not available',
-                        data => { pid => $$, id => int($workflow->{id}), 'state' => $workflow->{'state'}, 'proc_state' => $workflow->{'proc_state'} } } };
+                    $res = failure(40404, { id => int($workflow->{id}), 'state' => $workflow->{'state'}, proc_state => $workflow->{'proc_state'} });
                 } else {
                     $log->debug("Resume #".$workflow->{id}." and $execute_action with params " . join(", ", keys %{$param}));
                     $workflow = $client->handle_workflow({
@@ -424,17 +459,16 @@ while (my $cgi = CGI::Fast->new()) {
 
         $log->trace( 'Workflow info '  . Dumper $workflow ) if ($log->is_trace());
     };
-
+    $eval_err = $EVAL_ERROR;
 
     if ( my $exc = OpenXPKI::Exception->caught() ) {
-        $log->error("Unable to instantiate workflow: ". $exc->message );
-        $res = { error => { code => 50002, message => $exc->message, data => { pid => $$ } } };
+        $res = failure(50002, $exc->message);
     } elsif ($res) {
         # nothing to do here
     } elsif (!$client) {
-        $res = { error => { code => 50001, message => $EVAL_ERROR, data => { pid => $$ } } };
+        $res = failure(50001, $eval_err);
     }
-    elsif (my $eval_err = $EVAL_ERROR) {
+    elsif ($eval_err) {
 
         my $reply = $client->last_reply();
         $log->error(Dumper $reply);
@@ -445,30 +479,21 @@ while (my $cgi = CGI::Fast->new()) {
         # TODO this needs to be reworked
         if ($reply->{ERROR}->{CLASS} eq 'OpenXPKI::Exception::InputValidator' &&
             $reply->{ERROR}->{ERRORS}) {
-            $res = { error => {
-                code => 40003,
-                message => $error,
-                fields => $reply->{ERROR}->{ERRORS},
-                data => { pid => $$ }
-            } };
+            $res = failure(40003, $error, { fields => $reply->{ERROR}->{ERRORS} });
 
         } else {
             if ($reply->{ERROR} && $reply->{ERROR}->{LABEL}) {
                 $error = $reply->{ERROR}->{LABEL};
             }
-            $log->error("Unable to create workflow: ". $error );
-            if (!$error || $error !~ /I18N_OPENXPKI_UI_/) {
-                $error = 'uncaught error';
-            }
-            $res = { error => { code => 50002, message => $error, data => { pid => $$ } } };
+            my $msg_public = (($error//'') =~ /I18N_OPENXPKI_UI_/) ? $error : 'uncaught error';
+            my $msg_log = $error;
+            $res = failure(50002, [ $msg_public, $msg_log ]);
         }
 
     # no ID and not finished is an unrecoverable startup error
     } elsif (( $workflow->{'proc_state'} ne 'finished' && !$workflow->{id} ) || $workflow->{'proc_state'} eq 'exception') {
 
-        $log->error("workflow terminated in unexpected state" );
-        $res = { error => { code => 50003, message => 'workflow terminated in unexpected state',
-            data => { pid => $$, id => int($workflow->{id}), 'state' => $workflow->{'state'} } } };
+        $res = failure(50003, { id => int($workflow->{id}), 'state' => $workflow->{'state'} });
 
     # if the workflow is running, we do not expose any data of the workflows
     } elsif ( $workflow->{'proc_state'} eq 'running' ) {
