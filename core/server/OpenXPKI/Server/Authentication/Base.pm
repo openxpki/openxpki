@@ -6,7 +6,7 @@ use Moose;
 
 use Data::Dumper;
 use OpenXPKI::DateTime;
-use Digest::SHA qw(sha256_base64);
+use Digest::SHA qw(sha256_hex);
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 
@@ -119,7 +119,7 @@ sub register_login {
     my $history = $self->history();
     return unless (defined $history->{last_login});
 
-    my $userid = sha256_base64($handle->userid());
+    my $userid = sha256_hex($handle->userid());
 
     my $dp_val = CTX('api2')->get_data_pool_entry(
         namespace => "sys.auth.history",
@@ -138,7 +138,7 @@ sub register_login {
 
     my %item = (
         namespace => "sys.auth.history",
-        key => sha256_base64($handle->userid()),
+        key => sha256_hex($handle->userid()),
         value => $ser->serialize({last_login => time()}),
         force => 1,
     );
