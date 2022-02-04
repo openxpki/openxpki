@@ -22,6 +22,7 @@ use POSIX;
 use English;
 use Filter::Util::Call;
 use Data::Dumper;
+use Import::Into;
 
 our %LEVEL;
 our %BITMASK;
@@ -77,9 +78,13 @@ sub import {
     printf STDERR "Debugging module '%s' with bitmask %b%s\n", $module, $BITMASK{$module}, ($NOCENSOR ? ' - censor off!' : '.');
 
     #print STDERR "Add Debug in $module\n";
-    ## activate debugging for this module
+
+    ## activate debugging for $module
     $self = bless {MODULE => $module}, $self;
     filter_add($self);
+
+    ## Automatically add 'use Data::Dumper' to $module
+    Data::Dumper->import::into($module);
 }
 
 sub __level_to_bitmask {

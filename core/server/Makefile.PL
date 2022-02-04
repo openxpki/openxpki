@@ -322,6 +322,7 @@ WriteMakefile(
         'Exception::Class'              => '1.22',
         'File::Which'                   => '1.27',      # docker-test.pl
         'HTML::Entities'                => 0,
+        'Import::Into'                  => '1.002005',  # OpenXPKI::Debug
         'IO::Prompt'                    => '0.099004',  # for deployment tools
         'JSON'                          => 0,
         'Locale::gettext_pp'            => 0,
