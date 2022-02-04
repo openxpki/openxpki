@@ -187,7 +187,7 @@ command "create_workflow_instance" => {
 
     OpenXPKI::Server::Context::setcontext({ workflow_id => $id, force => 1 });
 
-    ##! 16: 'workflow id ' .  $wf_id
+    ##! 16: 'workflow id ' .  $id
     CTX('log')->workflow->info("Workflow instance $id created for $creator (type: '$type')");
 
     # load the first state and check for the initial action
