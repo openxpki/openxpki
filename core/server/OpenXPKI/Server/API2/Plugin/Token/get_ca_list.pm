@@ -16,7 +16,6 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Plugin::Token::Util;
 
 # CPAN modules
-use Data::Dumper;
 use Try::Tiny;
 
 

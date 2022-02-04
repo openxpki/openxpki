@@ -2,7 +2,6 @@ package OpenXPKI::Server::API2::Plugin::Profile::Util;
 use Moose;
 
 # Project modules
-use Data::Dumper;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 

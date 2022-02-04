@@ -15,7 +15,6 @@ use OpenXPKI::Server::Database::Legacy;
 
 use OpenXPKI::Server::NICE::Factory;
 
-use Data::Dumper;
 
 sub execute {
 

@@ -11,7 +11,6 @@ use English;
 use OpenXPKI::DN;
 use OpenXPKI::Crypt::X509;
 use OpenXPKI::Serialization::Simple;
-use Data::Dumper;
 use Template;
 use Digest::SHA qw(sha1_hex);
 

@@ -18,7 +18,6 @@ use OpenXPKI::Exception;
 use English;
 
 use DateTime;
-use Data::Dumper;
 #use Smart::Comments;
 
 

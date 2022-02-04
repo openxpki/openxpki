@@ -8,7 +8,6 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Database; # to get AUTO_ID
-use Data::Dumper;
 use Workflow::Exception qw(configuration_error workflow_error);
 
 sub execute {

@@ -10,7 +10,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::Template;
 use Workflow::Exception qw(configuration_error);
 
-use Data::Dumper;
 
 sub execute {
     ##! 1: 'execute'

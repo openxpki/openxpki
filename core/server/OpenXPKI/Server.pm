@@ -21,7 +21,6 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Init;
 use OpenXPKI::Server::Watchdog;
 use OpenXPKI::Server::Notification::Handler;
-use Data::Dumper;
 
 our $stop_soon = 0;
 our $main_pid;

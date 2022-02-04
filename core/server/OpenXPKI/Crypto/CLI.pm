@@ -14,7 +14,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::FileUtils;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context;
-use Data::Dumper;
 use Proc::SafeExec;
 use Log::Log4perl qw(:easy);
 

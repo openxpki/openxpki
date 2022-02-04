@@ -13,7 +13,6 @@ use OpenXPKI::Exception;
 use English;
 use OpenXPKI::Server::Context qw( CTX );
 
-use Data::Dumper;
 
 sub new {
     my $that = shift;

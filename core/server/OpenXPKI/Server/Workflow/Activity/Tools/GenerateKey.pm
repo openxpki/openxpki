@@ -8,7 +8,6 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use Workflow::Exception qw( configuration_error );
 
-use Data::Dumper;
 
 sub execute
 {

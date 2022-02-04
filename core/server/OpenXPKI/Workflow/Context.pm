@@ -6,7 +6,6 @@ use strict;
 use warnings;
 use English;
 use Encode;
-use Data::Dumper;
 use Workflow 1.39;
 
 use OpenXPKI::Debug;

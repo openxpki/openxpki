@@ -8,7 +8,6 @@ OpenXPKI::Server::API2::Plugin::Cert::get_crl
 =cut
 
 # Project modules
-use Data::Dumper;
 use MIME::Base64;
 use OpenXPKI::Debug;
 use OpenXPKI::Crypt::CRL;

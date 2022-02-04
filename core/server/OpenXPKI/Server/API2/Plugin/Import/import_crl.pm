@@ -7,7 +7,6 @@ OpenXPKI::Server::API2::Plugin::Import::import_crl
 
 =cut
 
-use Data::Dumper;
 
 # Project modules
 use OpenXPKI::Debug;

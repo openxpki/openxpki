@@ -13,7 +13,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use Workflow::Exception qw( configuration_error );
 
-use Data::Dumper;
 
 sub execute {
     my $self          = shift;

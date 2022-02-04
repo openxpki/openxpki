@@ -10,7 +10,6 @@ use Class::Std;
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use Data::Dumper;
 
 # skip shell init from Toolkit as we dont need it
 sub __init_shell { }

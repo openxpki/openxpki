@@ -7,7 +7,6 @@ OpenXPKI::Server::API2::Plugin::tenant_handler
 
 =cut
 
-use Data::Dumper;
 
 # Project modules
 use OpenXPKI::Debug;

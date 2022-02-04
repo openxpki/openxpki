@@ -9,7 +9,6 @@ use Class::Std;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
-use Data::Dumper;
 
 my %command        : ATTR;
 my %command_params : ATTR( :get<PARAMS> );

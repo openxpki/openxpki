@@ -6,7 +6,6 @@ use English;
 
 use base qw( OpenXPKI::Server::Workflow::Condition );
 
-use Data::Dumper;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow::Helpers;

@@ -5,7 +5,6 @@ use warnings;
 use Moose;
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Debug;
-use Data::Dumper;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
 

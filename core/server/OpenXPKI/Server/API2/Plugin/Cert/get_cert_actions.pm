@@ -7,7 +7,6 @@ OpenXPKI::Server::API2::Plugin::Cert::get_cert_actions
 
 =cut
 
-use Data::Dumper;
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );

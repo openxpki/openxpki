@@ -12,7 +12,6 @@ use utf8;
 use base qw( Template::Plugin );
 use Template::Plugin;
 
-use Data::Dumper;
 
 use OpenXPKI::Random;
 use OpenXPKI::Password;

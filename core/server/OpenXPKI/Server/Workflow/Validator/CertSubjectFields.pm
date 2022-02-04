@@ -13,7 +13,6 @@ use OpenXPKI::Serialization::Simple;
 use English;
 use Template;
 
-use Data::Dumper;
 
 extends 'OpenXPKI::Server::Workflow::Validator';
 

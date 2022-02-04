@@ -5,7 +5,6 @@ use warnings;
 use utf8;
 
 use base qw( Template );
-use Data::Dumper;
 
 use OpenXPKI::Debug;
 use OpenXPKI::FileUtils;

@@ -8,7 +8,6 @@ OpenXPKI::Server::API2::Plugin::Cert::get_crl_list
 =cut
 
 # Project modules
-use Data::Dumper;
 use OpenXPKI::Debug;
 use MIME::Base64;
 use OpenXPKI::Server::Context qw( CTX );

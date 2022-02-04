@@ -10,7 +10,6 @@ OpenXPKI::Server::API2::Plugin::Datapool::get_data_pool_entry
 =cut
 
 # Core modules
-use Data::Dumper;
 
 # Project modules
 use OpenXPKI::Debug;

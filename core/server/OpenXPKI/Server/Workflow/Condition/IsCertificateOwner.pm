@@ -7,7 +7,6 @@ use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug;
 
-use Data::Dumper;
 
 sub evaluate {
     ##! 1: 'start'

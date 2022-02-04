@@ -9,7 +9,6 @@ use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use English;
 use OpenXPKI::Serialization::Simple;
-use Data::Dumper;
 use File::Temp;
 use Proc::SafeExec;
 use Workflow::Exception qw( configuration_error );

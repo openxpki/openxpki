@@ -8,7 +8,6 @@ use Class::Std;
 
 use OpenXPKI::Debug;
 use OpenXPKI::FileUtils;
-use Data::Dumper;
 
 my %fu_of      :ATTR; # a FileUtils instance
 my %outfile_of :ATTR;

@@ -4,7 +4,6 @@ use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
 use English;
-use Data::Dumper;
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;

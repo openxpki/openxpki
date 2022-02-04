@@ -9,7 +9,6 @@ OpenXPKI::Server::API2::Plugin::Crypto::password_quality
 
 =cut
 
-use Data::Dumper;
 
 # Project modules
 use OpenXPKI::Server::API2::Plugin::Crypto::password_quality::Validate;

@@ -14,7 +14,6 @@ use OpenXPKI::MooseParams;
 use OpenXPKI::Server::Database::Role::Driver;
 use OpenXPKI::Server::Database::QueryBuilder;
 use OpenXPKI::Server::Database::Query;
-use Data::Dumper;
 use DBIx::Handler;
 use DBI::Const::GetInfoType; # provides %GetInfoType hash
 use Math::BigInt;

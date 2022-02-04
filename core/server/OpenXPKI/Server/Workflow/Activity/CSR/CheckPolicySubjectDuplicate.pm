@@ -11,7 +11,6 @@ use OpenXPKI::DN;
 use OpenXPKI::DateTime;
 use OpenXPKI::Serialization::Simple;
 
-use Data::Dumper;
 
 sub execute
 {

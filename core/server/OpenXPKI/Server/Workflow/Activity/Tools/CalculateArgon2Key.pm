@@ -2,7 +2,6 @@ package OpenXPKI::Server::Workflow::Activity::Tools::CalculateArgon2Key;
 
 use warnings;
 use strict;
-use Data::Dumper;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Password;

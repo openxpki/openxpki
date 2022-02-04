@@ -1,6 +1,5 @@
 package OpenXPKI::Server::NICE::Local;
 
-use Data::Dumper;
 
 use English;
 use OpenXPKI::Debug;

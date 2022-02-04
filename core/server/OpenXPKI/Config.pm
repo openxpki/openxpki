@@ -14,7 +14,6 @@ use OpenXPKI::Config::Backend;
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-use Data::Dumper;
 use Log::Log4perl;
 
 # Make sure the underlying connector is recent

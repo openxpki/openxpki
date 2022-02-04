@@ -11,7 +11,6 @@ use Class::Std;
 
 use OpenXPKI::Debug;
 use Crypt::LibSCEP;
-use Data::Dumper;
 
 my %scep_handle_of   :ATTR;
 

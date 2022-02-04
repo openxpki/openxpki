@@ -7,7 +7,6 @@ OpenXPKI::Server::API2::Plugin::Cert::validate_certificate
 
 =cut
 
-use Data::Dumper;
 
 # Project modules
 use OpenXPKI::Debug;

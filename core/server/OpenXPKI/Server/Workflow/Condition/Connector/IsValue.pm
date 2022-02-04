@@ -9,7 +9,6 @@ use base qw( OpenXPKI::Server::Workflow::Condition );
 use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Context qw( CTX );
 
-use Data::Dumper;
 use OpenXPKI::Debug;
 
 sub _evaluate

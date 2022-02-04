@@ -12,7 +12,6 @@ use Class::Std;
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-use Data::Dumper;
 
 # The instance of the corresponding Backend/Tool class
 my %instance_of       :ATTR( :get<instance> );

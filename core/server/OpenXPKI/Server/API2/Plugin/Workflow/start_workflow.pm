@@ -12,7 +12,6 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
 use OpenXPKI::Server::API2::Plugin::Workflow::Util;
 use OpenXPKI::Debug;
-use Data::Dumper;
 
 
 =head1 COMMANDS

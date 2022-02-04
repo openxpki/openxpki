@@ -9,7 +9,6 @@ OpenXPKI::Server::API2::Plugin::Crypto::validate_ruleset
 
 =cut
 
-use Data::Dumper;
 
 # Project modules
 use OpenXPKI::Debug;

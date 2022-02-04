@@ -15,7 +15,6 @@ use OpenXPKI::Exception;
 use DateTime;
 use DateTime::Format::Strptime;
 
-use Data::Dumper;
 
 # my @FIELDS = qw( );
 # __PACKAGE__->mk_accessors(@FIELDS);

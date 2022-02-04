@@ -15,7 +15,6 @@ Base class for profiles used in the CA.
 
 # Core modules
 use English;
-use Data::Dumper;
 use MIME::Base64;
 
 # CPAN modules

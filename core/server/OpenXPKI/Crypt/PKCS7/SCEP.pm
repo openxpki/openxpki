@@ -3,7 +3,6 @@ package OpenXPKI::Crypt::PKCS7::SCEP;
 use strict;
 use warnings;
 use English;
-use Data::Dumper;
 use MIME::Base64;
 use Moose;
 use Convert::ASN1 ':tag';

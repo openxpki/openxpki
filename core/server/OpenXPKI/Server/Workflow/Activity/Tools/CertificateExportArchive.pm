@@ -7,7 +7,6 @@ use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use Data::Dumper;
 use MIME::Base64 qw(encode_base64);
 use Workflow::Exception qw(configuration_error);
 

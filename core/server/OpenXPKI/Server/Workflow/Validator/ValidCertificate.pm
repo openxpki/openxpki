@@ -2,7 +2,6 @@ package OpenXPKI::Server::Workflow::Validator::ValidCertificate;
 
 use strict;
 use warnings;
-use Data::Dumper;
 use base qw( OpenXPKI::Server::Workflow::Validator );
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Crypt::X509;

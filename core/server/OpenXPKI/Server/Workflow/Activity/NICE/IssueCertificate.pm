@@ -17,7 +17,6 @@ use OpenXPKI::Server::Database::Legacy;
 use OpenXPKI::Server::NICE::Factory;
 use OpenXPKI::Server::Database; # to get AUTO_ID
 
-use Data::Dumper;
 
 sub execute {
 

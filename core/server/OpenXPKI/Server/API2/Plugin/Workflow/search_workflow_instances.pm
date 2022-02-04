@@ -8,7 +8,6 @@ OpenXPKI::Server::API2::Plugin::Workflow::search_workflow_instances
 =cut
 
 # CPAN modules
-use Data::Dumper;
 use Moose::Util::TypeConstraints;
 
 # Project modules

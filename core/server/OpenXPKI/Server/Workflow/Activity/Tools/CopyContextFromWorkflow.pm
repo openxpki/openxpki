@@ -9,7 +9,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use English;
 
-use Data::Dumper;
 
 sub execute
 {

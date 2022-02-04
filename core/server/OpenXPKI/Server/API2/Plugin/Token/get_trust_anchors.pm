@@ -10,7 +10,6 @@ OpenXPKI::Server::API2::Plugin::Token::get_trust_anchors
 =cut
 
 # Project modules
-use Data::Dumper;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 

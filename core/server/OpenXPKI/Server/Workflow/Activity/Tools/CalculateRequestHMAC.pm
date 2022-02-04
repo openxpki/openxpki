@@ -2,7 +2,6 @@ package OpenXPKI::Server::Workflow::Activity::Tools::CalculateRequestHMAC;
 
 use warnings;
 use strict;
-use Data::Dumper;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use MIME::Base64 qw(decode_base64);

@@ -15,7 +15,6 @@ use OpenXPKI::Server::Authentication::Handle;
 
 extends 'OpenXPKI::Server::Authentication::Base';
 
-use Data::Dumper;
 
 has path => (
     is => 'ro',

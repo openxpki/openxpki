@@ -7,7 +7,6 @@ use base qw( Workflow::Condition );
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
-use Data::Dumper;
 
 __PACKAGE__->mk_accessors( qw( workflow params _map ) );
 

@@ -11,7 +11,6 @@ use OpenXPKI::Exception;
 
 extends 'OpenXPKI::Client';
 
-use Data::Dumper;
 
 has service => (
     is      => 'ro',

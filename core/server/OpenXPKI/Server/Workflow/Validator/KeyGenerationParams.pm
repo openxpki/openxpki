@@ -3,7 +3,6 @@ package OpenXPKI::Server::Workflow::Validator::KeyGenerationParams;
 use strict;
 use warnings;
 use base qw( OpenXPKI::Server::Workflow::Validator );
-use Data::Dumper;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( validation_error configuration_error );

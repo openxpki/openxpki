@@ -17,7 +17,6 @@ use OpenXPKI::Server::Workflow;
 use OpenXPKI::Workflow::Context;
 use OpenXPKI::MooseParams;
 use Workflow::Exception qw( configuration_error workflow_error );
-use Data::Dumper;
 
 sub new {
     my $class = ref $_[0] || $_[0];

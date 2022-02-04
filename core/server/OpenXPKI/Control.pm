@@ -43,7 +43,6 @@ use English;
 
 # Core modules
 use POSIX ":sys_wait_h";
-use Data::Dumper;
 use Digest::SHA qw( sha256_base64 );
 use File::Temp;
 

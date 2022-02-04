@@ -19,7 +19,6 @@ use Moose;
 
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use Data::Dumper;
 use OpenXPKI::Serialization::JSON;
 use OpenXPKI::Serialization::Legacy;
 use MIME::Base64;

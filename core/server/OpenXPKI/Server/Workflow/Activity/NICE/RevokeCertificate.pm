@@ -13,7 +13,6 @@ use Workflow::Exception qw(configuration_error workflow_error);
 
 use OpenXPKI::Server::NICE::Factory;
 
-use Data::Dumper;
 
 sub execute {
 

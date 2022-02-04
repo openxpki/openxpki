@@ -14,7 +14,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 
 use Template;
-use Data::Dumper;
 
 sub execute {
     ##! 1: 'start'

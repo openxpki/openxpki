@@ -7,7 +7,6 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Template;
 use OpenXPKI::Debug;
-use Data::Dumper;
 use File::Temp;
 use MIME::Base64;
 use Workflow::Exception qw(configuration_error);

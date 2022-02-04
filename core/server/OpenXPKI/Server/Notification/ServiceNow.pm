@@ -11,7 +11,6 @@ use strict;
 use warnings;
 use English;
 
-use Data::Dumper;
 
 use DateTime;
 use OpenXPKI::Server::Context qw( CTX );

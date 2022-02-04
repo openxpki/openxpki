@@ -2,7 +2,6 @@
 package OpenXPKI::Server::Workflow::Stub;
 
 use OpenXPKI::Debug;
-use Data::Dumper;
 use OpenXPKI::Exception;
 
 sub new {

@@ -10,7 +10,6 @@ use base qw( Exporter );
 use Storable qw(dclone);
 
 use OpenXPKI::Debug;
-use Data::Dumper;
 
 our @EXPORT_OK = qw( CTX );
 

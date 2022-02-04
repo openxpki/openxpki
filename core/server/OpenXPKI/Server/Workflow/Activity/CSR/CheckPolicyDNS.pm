@@ -11,7 +11,6 @@ use OpenXPKI::DN;
 use Net::DNS;
 use OpenXPKI::Serialization::Simple;
 
-use Data::Dumper;
 
 sub execute
 {

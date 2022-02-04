@@ -12,7 +12,6 @@ use OpenXPKI::Exception;
 use English;
 use OpenXPKI::Server::Context qw( CTX );
 
-use Data::Dumper;
 
 sub login {
     my $self = shift;

@@ -9,7 +9,6 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server::Workflow::Pause;
 use OpenXPKI::Server::Workflow::Helpers;
 use Workflow::Exception qw( workflow_error configuration_error );
-use Data::Dumper;
 
 __PACKAGE__->mk_accessors( qw( workflow _map log ) );
 

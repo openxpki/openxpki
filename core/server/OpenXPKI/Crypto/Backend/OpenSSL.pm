@@ -17,7 +17,6 @@ use OpenXPKI::Exception;
 
 my %config_of :ATTR; # the Config object
 
-use Data::Dumper;
 
 sub START {
     ##! 16: 'OpenSSL start'

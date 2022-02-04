@@ -81,7 +81,6 @@ default: 1
 
 # Core modules
 use English;
-use Data::Dumper;
 use POSIX;
 
 # CPAN modules

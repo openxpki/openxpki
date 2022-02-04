@@ -10,7 +10,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use Workflow::Exception qw(configuration_error workflow_error);
 
-use Data::Dumper;
 
 sub execute {
     ##! 1: 'start'

@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use English;
 
-use Data::Dumper;
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;

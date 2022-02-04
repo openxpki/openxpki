@@ -13,7 +13,6 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::DateTime;
 use OpenXPKI::Client::Simple;
-use Data::Dumper;
 use MIME::Base64;
 use DateTime::Format::DateParse;
 

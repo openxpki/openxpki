@@ -23,7 +23,6 @@ use OpenXPKI::Workflow::Config;
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 
-use Data::Dumper;
 
 has '_cache' => (
     is => 'rw',

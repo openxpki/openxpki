@@ -9,7 +9,6 @@ use warnings;
 use English;
 use Carp qw( croak carp );
 use Scalar::Util qw( blessed );
-use Data::Dumper;
 
 # CPAN modules
 use Try::Tiny;

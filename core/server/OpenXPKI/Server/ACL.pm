@@ -16,7 +16,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
-use Data::Dumper;
 
 ## constructor and destructor stuff
 

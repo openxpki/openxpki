@@ -7,7 +7,6 @@ OpenXPKI::Server::API2::Plugin::UI::get_session_info
 
 =cut
 
-use Data::Dumper;
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );

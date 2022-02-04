@@ -8,7 +8,6 @@ use English;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use Data::Dumper;
 use OpenXPKI::Server::NICE::Factory;
 
 sub execute {

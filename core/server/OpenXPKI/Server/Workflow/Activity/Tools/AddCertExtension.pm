@@ -10,7 +10,6 @@ use OpenXPKI::Server::Workflow::WFObject::WFArray;
 use English;
 use Workflow::Exception qw( configuration_error );
 
-use Data::Dumper;
 
 sub execute
 {

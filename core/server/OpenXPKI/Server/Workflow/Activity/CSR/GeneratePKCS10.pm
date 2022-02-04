@@ -13,7 +13,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Crypto::Profile::CSR;
 
-use Data::Dumper;
 
 sub execute
 {

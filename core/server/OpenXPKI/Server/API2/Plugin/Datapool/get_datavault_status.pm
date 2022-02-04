@@ -11,7 +11,6 @@ OpenXPKI::Server::API2::Plugin::Datapool::get_datavault_status
 
 # Core modules
 use English;
-use Data::Dumper;
 
 # Project modules
 use OpenXPKI::Debug;

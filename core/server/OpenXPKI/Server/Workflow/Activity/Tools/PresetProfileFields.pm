@@ -10,7 +10,6 @@ use OpenXPKI::Debug;
 use English;
 use OpenXPKI::DN;
 use OpenXPKI::Serialization::Simple;
-use Data::Dumper;
 use Template;
 use Digest::SHA qw(sha1_hex);
 

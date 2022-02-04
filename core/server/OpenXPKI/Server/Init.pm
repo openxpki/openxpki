@@ -35,7 +35,6 @@ use OpenXPKI::Server::Session;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Serialization::Fast;
 
-use Data::Dumper;
 
 use Digest::SHA qw( sha1_base64 );
 

@@ -19,7 +19,6 @@ use OpenXPKI::DateTime;
 use English;
 
 use DateTime;
-use Data::Dumper;
 # use Smart::Comments;
 
 

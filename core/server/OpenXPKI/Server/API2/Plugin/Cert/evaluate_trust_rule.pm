@@ -7,7 +7,6 @@ OpenXPKI::Server::API2::Plugin::Cert::evaluate_trust_rule
 
 =cut
 
-use Data::Dumper;
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );

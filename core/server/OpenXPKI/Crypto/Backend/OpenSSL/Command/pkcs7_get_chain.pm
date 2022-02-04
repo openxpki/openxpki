@@ -9,7 +9,6 @@ use warnings;
 
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::pkcs7_get_chain;
 
-use Data::Dumper;
 use OpenXPKI::Debug;
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 use English;

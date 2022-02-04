@@ -25,7 +25,6 @@ package OpenXPKI::Crypto::Backend::OpenSSL::Engine::nCipher;
 use strict;
 use warnings;
 use English;
-use Data::Dumper;
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Engine);
 use OpenXPKI::Debug;

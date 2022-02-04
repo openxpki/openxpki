@@ -13,7 +13,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Database; # to get AUTO_ID
 use Log::Log4perl;
-use Data::Dumper;
 
 sub execute {
     ##! 1: 'start'

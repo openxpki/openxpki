@@ -7,7 +7,6 @@ use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw( condition_error configuration_error );
 use OpenXPKI::Server::Workflow::WFObject::WFHash;
 use OpenXPKI::Debug;
-use Data::Dumper;
 use English;
 
 sub _evaluate {

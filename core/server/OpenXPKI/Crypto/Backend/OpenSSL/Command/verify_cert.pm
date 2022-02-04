@@ -7,7 +7,6 @@ use warnings;
 
 package OpenXPKI::Crypto::Backend::OpenSSL::Command::verify_cert;
 
-use Data::Dumper;
 use OpenXPKI::Debug;
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
 

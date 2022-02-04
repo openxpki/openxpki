@@ -2,7 +2,6 @@ package OpenXPKI::Server::Workflow::Activity::Tools::GetIdentifierForAlias;
 
 use warnings;
 use strict;
-use Data::Dumper;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use Workflow::Exception qw(configuration_error workflow_error);

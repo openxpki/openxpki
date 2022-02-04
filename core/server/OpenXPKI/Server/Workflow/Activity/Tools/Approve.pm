@@ -10,7 +10,6 @@ use OpenXPKI::Debug;
 use Workflow::Exception qw(configuration_error);
 
 use English;
-use Data::Dumper;
 use Digest::SHA qw( sha1_hex );
 
 sub execute

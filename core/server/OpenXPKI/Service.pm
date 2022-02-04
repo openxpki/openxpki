@@ -15,7 +15,6 @@ use Class::Std;
 # see http://search.cpan.org/~lbaxter/Sys-SigAction/dbd-oracle-timeout.POD
 use Sys::SigAction qw( set_sig_handler );
 
-use Data::Dumper;
 ## used modules
 
 use OpenXPKI::Debug;

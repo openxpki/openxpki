@@ -14,7 +14,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::Crypt::X509;
 use Workflow::Exception qw(configuration_error workflow_error);
 
-use Data::Dumper;
 
 sub __get_targets_from_profile {
 

@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use English;
 
-use Data::Dumper;
 
 use Encode;
 use OpenXPKI::Server::Context qw( CTX );

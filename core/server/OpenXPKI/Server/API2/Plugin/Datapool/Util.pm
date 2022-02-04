@@ -11,7 +11,6 @@ related plugins that provides some utility methods
 =cut
 
 # Core modules
-use Data::Dumper;
 
 # CPAN modules
 use Try::Tiny;

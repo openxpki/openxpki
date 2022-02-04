@@ -10,7 +10,6 @@ use Class::Std;
 
 use OpenXPKI::Debug;
 use OpenXPKI::FileUtils;
-use Data::Dumper;
 use English;
 
 my %fu_of       :ATTR; # a FileUtils instance

@@ -7,7 +7,6 @@ use Moose;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
-use Data::Dumper;
 
 extends 'Workflow::Validator';
 

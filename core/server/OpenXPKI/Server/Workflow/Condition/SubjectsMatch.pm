@@ -9,7 +9,6 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug;
 use OpenXPKI::DN;
 
-use Data::Dumper;
 
 sub _evaluate {
     ##! 1: 'start'

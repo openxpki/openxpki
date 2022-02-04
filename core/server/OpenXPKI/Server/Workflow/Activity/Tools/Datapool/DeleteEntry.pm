@@ -17,7 +17,6 @@ use DateTime;
 use Template;
 use Workflow::Exception qw(configuration_error);
 
-use Data::Dumper;
 
 sub execute {
     ##! 1: 'start'

@@ -10,7 +10,6 @@ use OpenXPKI::Exception;
 
 use Workflow::Exception qw( configuration_error validation_error );
 
-use Data::Dumper;
 
 extends 'OpenXPKI::Server::Workflow::Validator';
 

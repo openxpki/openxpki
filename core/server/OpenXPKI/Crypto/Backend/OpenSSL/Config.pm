@@ -17,7 +17,6 @@ use OpenXPKI::DateTime;
 use English;
 use OpenXPKI::FileUtils;
 
-use Data::Dumper;
 
 sub new
 {

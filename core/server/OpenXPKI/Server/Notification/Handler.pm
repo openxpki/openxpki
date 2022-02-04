@@ -27,7 +27,6 @@ use strict;
 use warnings;
 use English;
 
-use Data::Dumper;
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;

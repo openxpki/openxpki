@@ -9,7 +9,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use IO::Prompt;
 
-use Data::Dumper;
 use OpenXPKI::Password;
 
 sub execute {

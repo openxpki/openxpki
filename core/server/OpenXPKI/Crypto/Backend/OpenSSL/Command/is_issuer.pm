@@ -8,7 +8,6 @@ use strict;
 use warnings;
 
 use OpenXPKI::Debug;
-use Data::Dumper;
 
 sub get_command
 {

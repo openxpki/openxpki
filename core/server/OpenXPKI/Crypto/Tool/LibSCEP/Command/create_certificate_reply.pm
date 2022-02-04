@@ -8,7 +8,6 @@ use warnings;
 use English;
 
 use Class::Std;
-use Data::Dumper;
 use OpenXPKI::FileUtils;
 use OpenXPKI::Debug;
 use Crypt::LibSCEP;

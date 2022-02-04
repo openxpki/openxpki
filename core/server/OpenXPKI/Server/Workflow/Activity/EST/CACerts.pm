@@ -2,7 +2,6 @@ package OpenXPKI::Server::Workflow::Activity::EST::CACerts;
 
 use warnings;
 use strict;
-use Data::Dumper;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 

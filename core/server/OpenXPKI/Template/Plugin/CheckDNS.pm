@@ -21,7 +21,6 @@ use Moose;
 use Net::DNS;
 use Template::Plugin;
 
-use Data::Dumper;
 
 use HTML::Entities;
 use OpenXPKI::Debug;

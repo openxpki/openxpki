@@ -18,7 +18,6 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::DateTime;
-use Data::Dumper;
 use MIME::Base64;
 use Math::BigInt;
 use DateTime::Format::DateParse;

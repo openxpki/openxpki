@@ -9,7 +9,6 @@ use warnings;
 use Class::Std;
 use OpenXPKI::FileUtils;
 use OpenXPKI::Debug;
-use Data::Dumper;
 
 # OpenSSL::Command is used as there is no SCEP::Command ...
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);

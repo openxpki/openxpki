@@ -15,7 +15,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
-use Data::Dumper;
 
 sub execute {
 

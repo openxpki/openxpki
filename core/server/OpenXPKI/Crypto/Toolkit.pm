@@ -19,7 +19,6 @@ use Template;
 use OpenXPKI::Exception;
 use OpenXPKI::FileUtils;
 use English;
-use Data::Dumper;
 
 use File::Spec;
 

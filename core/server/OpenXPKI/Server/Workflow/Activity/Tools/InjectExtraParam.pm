@@ -13,7 +13,6 @@ use OpenXPKI::Serialization::Simple;
 use English;
 use Workflow::Exception qw( configuration_error );
 
-use Data::Dumper;
 
 sub execute
 {

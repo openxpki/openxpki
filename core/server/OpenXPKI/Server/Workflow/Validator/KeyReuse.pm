@@ -13,7 +13,6 @@ use OpenXPKI::Debug;
 
 use OpenXPKI::Crypt::PKCS10;
 
-use Data::Dumper;
 
 extends 'OpenXPKI::Server::Workflow::Validator';
 

@@ -15,7 +15,6 @@ our $VERSION = $OpenXPKI::VERSION::VERSION;
 
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use Data::Dumper;
 use MIME::Base64;
 
 sub new {

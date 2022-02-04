@@ -2,7 +2,6 @@ package OpenXPKI::Server::Workflow::Activity::EST::GenerateCSRAttribute;
 
 use warnings;
 use strict;
-use Data::Dumper;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use MIME::Base64 qw(encode_base64);

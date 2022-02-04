@@ -14,7 +14,6 @@ use OpenXPKI::Serialization::Simple;
 
 use OpenXPKI::Server::NICE::Factory;
 
-use Data::Dumper;
 
 sub execute {
     my $self     = shift;

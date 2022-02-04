@@ -20,7 +20,6 @@ use OpenXPKI::Server::Session::Data::SCEP;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Service::LibSCEP::Command;
 use OpenXPKI::Serialization::Simple;
-use Data::Dumper;
 
 sub init {
     my $self  = shift;

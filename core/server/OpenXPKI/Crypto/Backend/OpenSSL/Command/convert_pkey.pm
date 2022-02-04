@@ -6,7 +6,6 @@ use warnings;
 use OpenXPKI::Debug;
 
 use base qw(OpenXPKI::Crypto::Backend::OpenSSL::Command);
-use Data::Dumper;
 
 sub get_command
 {

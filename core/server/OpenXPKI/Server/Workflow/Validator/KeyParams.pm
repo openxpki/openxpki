@@ -3,7 +3,6 @@ package OpenXPKI::Server::Workflow::Validator::KeyParams;
 use strict;
 use warnings;
 use base qw( OpenXPKI::Server::Workflow::Validator );
-use Data::Dumper;
 use Crypt::PKCS10;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
