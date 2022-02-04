@@ -35,7 +35,7 @@ sub import {
         # use OpenXPKI::Debug 'ModuleName',
         # we just assume that the module is the caller of the
         # import function (which is the normal use anyways)
-        $module = (caller(0))[0];
+        $module = scalar caller;
     }
 
     if ($USE_COLOR) {
@@ -79,7 +79,7 @@ sub import {
     #print STDERR "Add Debug in $module\n";
     ## activate debugging for this module
     $self = bless {MODULE => $module}, $self;
-    filter_add($self) ;
+    filter_add($self);
 }
 
 sub __level_to_bitmask {
