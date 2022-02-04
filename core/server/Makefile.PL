@@ -325,6 +325,7 @@ WriteMakefile(
         'Import::Into'                  => '1.002005',  # OpenXPKI::Debug
         'IO::Prompt'                    => '0.099004',  # for deployment tools
         'JSON'                          => 0,
+        'JSON::PP'                      => '4.02',      # rpc.fcgi; 4.02000-1 is included in Debian Buster
         'Locale::gettext_pp'            => 0,
         'Log::Log4perl'                 => '0.51',
         'Log::Log4perl::Layout::JSON'   => 0,

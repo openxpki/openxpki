@@ -8,7 +8,7 @@ use CGI::Fast;
 use Data::Dumper;
 use English;
 
-use JSON;
+use JSON::PP;
 use MIME::Base64;
 use OpenXPKI::Exception;
 use OpenXPKI::Client::Simple;
@@ -22,9 +22,13 @@ use Log::Log4perl::MDC;
 
 our $config;
 my $log;
-
-my $json = new JSON();
 my $use_status_codes = 0;
+my $json = new JSON::PP();
+
+# Use plain scalars as boolean values. The default representation as
+# JSON::PP::Boolean would cause the values to be serialized later on.
+# A JSON false would be converted to a trueish scalar "OXJSF1:false".
+$json->boolean_values(0,1);
 
 eval {
     $config = OpenXPKI::Client::Config->new('rpc');
@@ -232,12 +236,15 @@ while (my $cgi = CGI::Fast->new()) {
         $json->max_depth(  $conf->{input}->{parse_depth} || 5 );
 
         $log->trace("RPC raw postdata : " . $raw) if ($log->is_trace());
+
+        # decode JSON
         eval{ $postdata = $json->decode($raw) };
         $eval_err = $EVAL_ERROR;
         if (!$postdata or $eval_err) {
             send_output( $cgi, failure(40002, [ undef, $eval_err ]) );
             next;
         }
+
         # read "method" from JSON data if not found in URL before
         $method = $postdata->{method} unless $method;
     }
