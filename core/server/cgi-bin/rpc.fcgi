@@ -180,8 +180,6 @@ while (my $cgi = CGI::Fast->new()) {
 
     Log::Log4perl::MDC->put('endpoint', $config->endpoint());
 
-    my $input_method = $ENV{'REQUEST_METHOD'};
-
     $use_status_codes = $conf->{output} && $conf->{output}->{use_http_status_codes};
 
     # check for request parameters in JSON data (HTTP body)
@@ -204,7 +202,6 @@ while (my $cgi = CGI::Fast->new()) {
         $log->debug("RPC postdata with Content-Type: $content_type");
 
         if ($content_type =~ m{\Aapplication/pkcs7}) {
-            $input_method = 'PKCS7';
             $pkcs7 = $raw;
             eval {
                 $client = $rpc->backend();
@@ -222,7 +219,7 @@ while (my $cgi = CGI::Fast->new()) {
             }
 
         } elsif ($content_type =~ m{\Aapplication/json}) {
-            $input_method = 'JSON';
+            # nothing to do here
 
         } else {
 
@@ -424,7 +421,7 @@ while (my $cgi = CGI::Fast->new()) {
             if ($pickup_value) {
                 $workflow = $rpc->pickup_workflow($conf->{$method}, $pickup_value);
             } else {
-                $log->trace( "No pickup because $pickup_key has not a value" ) if $log->is_trace;
+                $log->trace( "No pickup because $pickup_key has no value" ) if $log->is_trace;
             }
         }
 
