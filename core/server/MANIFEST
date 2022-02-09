@@ -612,7 +612,7 @@ bin/openxpkicmd
 
 # cgi stuff
 cgi-bin/scep.fcgi
-cgi-bin/scep-beta.fcgi
+cgi-bin/scepv3.fcgi
 cgi-bin/webui.fcgi
 cgi-bin/soap.fcgi
 cgi-bin/download.fcgi
