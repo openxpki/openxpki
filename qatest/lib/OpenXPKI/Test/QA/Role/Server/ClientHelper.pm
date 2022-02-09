@@ -116,7 +116,7 @@ sub connect {
                 SOCKETFILE => $self->socket_file,
             })
         );
-    } "create client instance" or die("Could not create client instance");
+    } "create client instance" or BAIL_OUT("Could not create client instance");
 }
 
 =head2 init_session
@@ -151,7 +151,7 @@ sub init_session {
              "<< server expects GET_PKI_REALM or GET_AUTHENTICATION_STACK"
              or diag explain $self->response;
         }
-    } "initialize client session";
+    } "initialize client session" or BAIL_OUT("Could not initialize client session");
 }
 
 =head2 login
