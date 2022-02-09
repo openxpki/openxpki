@@ -29,9 +29,7 @@ Named parameters:
 
 =item * B<profile> - Certificate profile (I<Str>, optional, default: tls_server)
 
-=item * B<requestor_gname> - Surname of person requesting cert (I<Str>, optional)
-
-=item * B<requestor_name> - Name of person requesting cert (I<Str>, optional)
+=item * B<requestor_realname> - Full name of person requesting cert (I<Str>, optional)
 
 =item * B<requestor_email> - Email of person requesting cert (I<Str>, optional)
 
@@ -63,15 +61,10 @@ has profile => (
     isa => 'Str',
     default => "tls_server",
 );
-has requestor_gname => (
+has requestor_realname => (
     is => 'rw',
     isa => 'Str',
-    default => "Andreas",
-);
-has requestor_name => (
-    is => 'rw',
-    isa => 'Str',
-    default => "Anders",
+    default => "Andreas Anders",
 );
 has requestor_email => (
     is => 'rw',

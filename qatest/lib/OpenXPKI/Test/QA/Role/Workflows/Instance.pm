@@ -168,7 +168,8 @@ sub execute {
             }
         );
         $self->last_wf_state($result->{workflow}) if $result->{workflow};
-    } "Executing workflow activity '$activity'";
+    } "Executing workflow activity '$activity'"
+      or BAIL_OUT('Error executing workflow activity');
 
     return $result;
 }
@@ -232,7 +233,8 @@ B<Positional Parameters>
 =cut
 sub state_is {
     my ($self, $expected_state) = @_;
-    is $self->state, $expected_state, "workflow state is '$expected_state'";
+    is $self->state, $expected_state, "workflow state is '$expected_state'"
+      or BAIL_OUT('Wrong workflow state');
 }
 
 __PACKAGE__->meta->make_immutable;

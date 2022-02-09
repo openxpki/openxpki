@@ -81,7 +81,6 @@ sub create_cert {
         hostname => $params->hostname,
         $is_server_profile ? (
             hostname2 => $params->hostname2,
-            port => 8080,
         ) : (),
         $is_client_profile ? (
             application_name => $params->application_name,
@@ -128,8 +127,7 @@ sub create_cert {
             $wftest->execute(
                 'csr_edit_cert_info' => {
                     cert_info => $serializer->serialize( {
-                        requestor_gname => $params->requestor_gname,
-                        requestor_name  => $params->requestor_name,
+                        requestor_realname  => $params->requestor_realname,
                         requestor_email => $params->requestor_email,
                     } )
                 },

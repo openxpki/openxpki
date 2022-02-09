@@ -130,7 +130,7 @@ sub workflow_def {
         },
         'acl' => {
             'User' => { creator => ($acl // 'any'), fail => 1, resume => 1, wakeup => 1, archive => 1, attribute => 1 },
-            'Guard' => { techlog => 1, history => 1 },
+            'Guard' => { creator => 'any', techlog => 1, history => 1 },
         },
     };
 };
@@ -409,7 +409,7 @@ lives_and {
 #
 # get_workflow_log
 #
-throws_ok { $oxitest->api2_command("get_workflow_log" => { id => $wf_t1_sync->id }) } qr/no permission/i,
+throws_ok { $oxitest->api2_command("get_workflow_log" => { id => $wf_t1_sync->id }) } qr/I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE/i,
     "get_workflow_log() - throw exception on unauthorized user";
 
 CTX('session')->data->role('Guard');

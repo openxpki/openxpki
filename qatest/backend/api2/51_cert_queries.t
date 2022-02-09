@@ -29,8 +29,7 @@ my $oxitest = OpenXPKI::Test->new(
 my $cert = $oxitest->create_cert(
     profile => "tls_server",
     hostname => "fun",
-    requestor_gname => 'Sarah',
-    requestor_name => 'Dessert',
+    requestor_realname => 'Sarah Dessert',
     requestor_email => 'sahar@d-sert.d',
 );
 my $cert_id = $cert->{identifier};

@@ -75,7 +75,7 @@ $oxitest->create_cert(
 $oxitest->create_cert(
     profile => "tls_client",
     hostname => "127.0.0.1",
-    application_name => "Joust",
+    application_name => "joust",
 );
 $result = $oxitest->api2_command("list_used_profiles");
 cmp_deeply $result, superbagof(
@@ -168,7 +168,6 @@ cmp_deeply $result, superbagof(
     qw(
         hostname
         hostname2
-        port
     )
 ), "list field definitions (tls_server.style.00_basic_style.ui.subject)";
 
@@ -185,8 +184,7 @@ cmp_deeply $result, superbagof(
         })
     }
     qw(
-        requestor_gname
-        requestor_name
+        requestor_realname
         requestor_email
         requestor_affiliation
         comment
@@ -202,8 +200,7 @@ cmp_deeply $result, {
         $_ => ignore()
     }
     qw(
-        requestor_gname
-        requestor_name
+        requestor_realname
         requestor_email
         requestor_affiliation
         comment
@@ -263,9 +260,7 @@ cmp_deeply $result, {
 my $vars = {
     hostname => "james",
     hostname2 => [ "johann", "jo" ],
-    port => 333,
-    requestor_gname => "My",
-    requestor_name  => "Self",
+    requestor_realname => "My Self",
     requestor_email => 'my@self.me',
     # for 05_advanced_style:
     CN => "ACME",
@@ -276,7 +271,7 @@ $result = $oxitest->api2_command("render_subject_from_template" => {
     profile => "tls_server",
     vars => $vars,
 });
-like $result, qr/ CN=james:333 /msxi, "render cert subject (default style)";
+like $result, qr/ CN=james /msxi, "render cert subject (default style)";
 
 $result = $oxitest->api2_command("render_subject_from_template" => {
     profile => "tls_server",
@@ -308,7 +303,7 @@ $result = $oxitest->api2_command("render_metadata_from_template" => {
     vars => $vars,
 });
 cmp_deeply $result, {
-    requestor => sprintf("%s %s", $vars->{requestor_gname}, $vars->{requestor_name}),
+    requestor => $vars->{requestor_realname},
     email => $vars->{requestor_email},
     entity => $vars->{hostname},
 }, "render cert metadata";
