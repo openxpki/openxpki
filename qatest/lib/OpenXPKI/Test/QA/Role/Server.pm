@@ -136,7 +136,7 @@ around 'init_server' => sub {
             # closes all file handles which would cause problems with Log4perl
             $self->$orig();                  # OpenXPKI::Test->init_server
             $self->init_session_and_context; # this step from OpenXPKI::Test->BUILD would otherwise not be executed as we never return
-            $self->_start_openxpki_server($orig);
+            $self->_start_openxpki_server;
         }
         catch {
             eval { Log::Log4perl->get_logger()->error($_) };
@@ -178,7 +178,7 @@ around 'init_server' => sub {
 
 # Imitate OpenXPKI::Server->start()
 sub _start_openxpki_server {
-    my ($self, $server_init_callback) = @_;
+    my ($self) = @_;
     # TODO Replace test specific server startup with OpenXPKI::Server->start() once we have a complete test env (so all context objects + watchdog will be initialized)
 
     OpenXPKI::Server::Watchdog->start_or_reload;
