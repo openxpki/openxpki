@@ -626,10 +626,10 @@ sub __alias_update {
             close $fh;
 
             my $user = CTX('config')->get(['system','server','user']);
-            my $uid = getpwnam($user) or die "$user not known";
+            my $uid = getpwnam($user) // die "$user not known"; # might be 0 in Docker so we need //, not ||
 
             my $group = CTX('config')->get(['system','server','user']);
-            my $gid = getgrnam($group) or die "$group not known";
+            my $gid = getgrnam($group) // die "$group not known";
             chown ($uid, $gid, $keyfile) || die "Unable to chown $keyfile to $uid/$gid";
             chmod oct("0400"), $keyfile || die "Unable to change mode on $keyfile";
             print "Successfully wrote key to $keyfile\n";
