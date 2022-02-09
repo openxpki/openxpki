@@ -91,10 +91,14 @@ my $engine = File::Which::which('docker') || File::Which::which('podman') || die
 #
 # Parse command line arguments
 #
-my ($help, $repo, $branch, $commit, $conf_repo, $conf_branch, $conf_commit, $test_all, @_only, $test_coverage, $batch);
+my ($help, $repo, $branch, $commit, $conf_repo, $conf_branch, $conf_commit, $test_all, $test_core, $test_qa, $test_coverage, $batch);
+my @_only = ();
+
 my $parseok = GetOptions(
     'all'            => \$test_all,
     'only=s'         => \@_only,
+    'core'           => \$test_core,
+    'qa|qatest'      => \$test_qa,
     'cover|coverage' => \$test_coverage,
     'c|commit=s'     => \$commit,
     'b|branch=s'     => \$branch,
@@ -105,6 +109,9 @@ my $parseok = GetOptions(
     'batch'          => \$batch,
     'help'           => \$help,
 );
+
+push @_only, qw( t/ ) if $test_core;
+push @_only, qw( qatest/backend/api2 qatest/backend/webui qatest/client ) if $test_qa; # matches the list in docker-test/startup.pl
 
 my $test_only = join ',', @_only;
 
@@ -250,10 +257,17 @@ docker-test.pl --help
 Modes:
 
     --all
-        Run all unit and QA tests
+        Run all tests
 
     --only TESTSPEC
         Run only the given tests (option can be specified multiple times)
+
+    --core
+        Run unit tests
+
+    --qa
+    --qatest
+        Run QA tests
 
     --cover
         Run code coverage tests instead of normal tests and copy the directory
