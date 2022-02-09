@@ -659,7 +659,7 @@ sub _log4perl_screen {
 
         log4perl.appender.Screen                = Log::Log4perl::Appender::Screen
         log4perl.appender.Screen.layout         = Log::Log4perl::Layout::PatternLayout
-        log4perl.appender.Screen.layout.ConversionPattern = # >> %m [%C]%n
+        log4perl.appender.Screen.layout.ConversionPattern = # >> %p %m [%C]%n
         log4perl.appender.Screen.Filter         = OxiTestFilter
         log4perl.appender.Screen.Threshold      = $threshold_screen
 
@@ -669,7 +669,7 @@ sub _log4perl_screen {
         log4perl.appender.File.syswrite         = 1
         log4perl.appender.File.utf8             = 1
         log4perl.appender.File.layout           = Log::Log4perl::Layout::PatternLayout
-        log4perl.appender.File.layout.ConversionPattern = # %d %m [pid=%P|%i]%n
+        log4perl.appender.File.layout.ConversionPattern = %p %m [%C] pid=%P|%i%n
         log4perl.appender.File.Threshold        = OFF
     );
 }
