@@ -381,6 +381,7 @@ sub __translate_form_def {
             value => $values->{$field->{id}},
         };
 
+        $field->{type} //= '';
         if ($field->{type} eq 'select') {
             $new->{type} = 'select';
             $new->{options} = $field->{options};

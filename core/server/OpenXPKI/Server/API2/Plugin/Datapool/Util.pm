@@ -116,7 +116,7 @@ sub set_entry {
         expiration_date => { isa => 'Int', optional => 1 },
         force           => { isa => 'Bool', optional => 1 },
     );
-    ##! 64: "args: ".join(", ", map { "$_=".$args{$_} } sort grep { $_ ne "valuess"} keys %args)
+    ##! 64: "args: ".join(", ", map { "$_=".($args{$_} // '<undef>') } sort grep { $_ ne "values"} keys %args)
 
     my $dbi = CTX('dbi');
 

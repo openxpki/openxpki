@@ -127,7 +127,7 @@ command "set_data_pool_entry" => {
     # symmetric encryption
     else {
         my $enc_key = $self->get_realm_encryption_key( CTX('session')->data->pki_realm ); # from ::Util
-        ##! 16: "symmetrically encrypted value: setting up volatile vault (".join(", ", map { "$_=".$enc_key->{$_} } sort keys %$enc_key).")"
+        ##! 16: "symmetrically encrypted value: setting up volatile vault (".join(", ", map { "$_=".($enc_key->{$_} // '<undef>') } sort keys %$enc_key).")"
         my $vault = OpenXPKI::Crypto::VolatileVault->new({
             %{$enc_key},
             TOKEN => $self->api->get_default_token,
