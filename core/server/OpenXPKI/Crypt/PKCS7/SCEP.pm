@@ -504,7 +504,7 @@ sub __generate_response {
         # devices send and expect 8 bytes nonces so we force a non-compliant
         # nonce size in case the senders nonce is not 16 bytes
         my $len = length $self->request_nonce();
-        if ($len != 16) {
+        if ($len && $len != 16) {
             ##! 16: 'Force non-compliant nonce length'
             $self->reply_nonce( CTX('api2')->get_random( length => $len, binary => 1 ));
         }
