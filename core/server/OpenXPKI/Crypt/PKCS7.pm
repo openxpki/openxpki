@@ -178,7 +178,7 @@ our $schema = "
         version                     INTEGER,
         sid                         SignerIdentifier, -- CMS variant, not PKCS#7
         digestAlgorithm             AlgorithmIdentifier,
-        authenticatedAttributes     AuthenticatedAttributesChoice,
+        authenticatedAttributes     AuthenticatedAttributesChoice OPTIONAL,
         digestEncryptionAlgorithm   AlgorithmIdentifier,
         encryptedDigest             EncryptedDigest,
         unauthenticatedAttributes   UnauthenticatedAttributesChoice OPTIONAL
