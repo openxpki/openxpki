@@ -23,7 +23,7 @@ use Log::Log4perl::MDC;
 our $config;
 my $log;
 
-my $json = new JSON();
+my $json = JSON->new->utf8;
 my $use_status_codes = 0;
 
 eval {
