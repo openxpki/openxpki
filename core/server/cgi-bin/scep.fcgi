@@ -9,7 +9,6 @@ use CGI::Fast;
 use Data::Dumper;
 use English;
 
-use JSON;
 use MIME::Base64;
 use NetAddr::IP;
 use OpenXPKI::Exception;
@@ -24,8 +23,6 @@ our $config = OpenXPKI::Client::Config->new('scep');
 my $log = $config->logger();
 
 $log->info("SCEP handler initialized");
-
-my $json = new JSON();
 
 while (my $cgi = CGI::Fast->new()) {
 

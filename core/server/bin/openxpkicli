@@ -18,8 +18,8 @@ use JSON;
 use OpenXPKI::Client;
 use OpenXPKI::Log4perl;
 
-# we want utf8
-binmode(STDOUT, ":utf8");
+binmode(STDOUT, ':encoding(UTF-8)');
+binmode(STDERR, ':encoding(UTF-8)');
 
 my %params = (
     authstack => '_System',
@@ -45,9 +45,9 @@ sub debug {
 sub format_json {
     my $msg = shift;
     if (defined $params{'json-pretty'}) {
-        return JSON->new->pretty(1)->canonical(1)->encode($msg);
+        return JSON->new->utf8->pretty(1)->canonical(1)->encode($msg);
     } else {
-        return JSON->new->encode($msg);
+        return encode_json($msg);
     }
 }
 
@@ -73,7 +73,7 @@ sub output {
         $output = $msg->{result} // "<undef>";
     } elsif ($msg->{result}) {
         # always use json pretty to show non-scalar output
-        print JSON->new->pretty(1)->canonical(1)->encode($msg->{result});
+        print JSON->new->utf8->pretty(1)->canonical(1)->encode($msg->{result});
     } else {
         # this means something unhandled error bubbled up
         print Dumper $msg;

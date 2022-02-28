@@ -86,7 +86,7 @@ sub init_json {
 
     $self->logger()->debug('Got content ' . join("",@content));
 
-    my $json = JSON->new->utf8->decode(join("",@content));
+    my $json = decode_json(join("",@content));
 
     $self->_result()->{_raw} = $json;
     return $self;

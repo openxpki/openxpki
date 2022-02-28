@@ -18,8 +18,8 @@ use Data::Dumper;
 use OpenXPKI::Client;
 #use OpenXPKI::Serialization::Simple;
 
-# we want utf8
-binmode(STDOUT, ":utf8");
+binmode(STDOUT, ':encoding(UTF-8)');
+binmode(STDERR, ':encoding(UTF-8)');
 
 my %params = (
     authstack => '_System',
@@ -81,7 +81,7 @@ sub dump_workflow {
         $json->{workflow} = { id => $reply->{PARAMS}->{workflow}->{id},
             state => $reply->{PARAMS}->{workflow}->{state} };
 
-        print JSON->new->pretty(defined $params{'json-pretty'})->encode($json);
+        print JSON->new->utf8->pretty(defined $params{'json-pretty'})->encode($json);
         print "\n";
     }
 }

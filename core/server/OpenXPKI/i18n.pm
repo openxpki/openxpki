@@ -38,7 +38,11 @@ sub set_locale_prefix
 
 sub i18nGettext {
     my $text = shift;
-    return $text if (not defined $text or length($text) == 0);
+
+    # do not handle empty strings or strings that do not start with I18N...
+    # this also fixes a problem with already translated texts having utf8
+    # characters as they break when handled by gettext
+    return $text unless (defined $text && length($text) && $text =~ m{\AI18N_});
 
     my $arg_ref;
     my $ref_of_first_argument = ref($_[0]);

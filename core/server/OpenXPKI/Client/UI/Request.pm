@@ -76,8 +76,7 @@ sub BUILD {
     if (($self->cgi->content_type // '') eq 'application/json') {
         $self->logger->debug('Incoming POST data in JSON format (application/json)');
 
-        my $json = JSON->new->utf8;
-        my $data = $json->decode( scalar $self->cgi->param('POSTDATA') );
+        my $data = decode_json( scalar $self->cgi->param('POSTDATA') );
 
         # Resolve stringified depth-one-hashes - turn parameters like
         #   key{one} = 34

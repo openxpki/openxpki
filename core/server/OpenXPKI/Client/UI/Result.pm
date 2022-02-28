@@ -426,9 +426,7 @@ sub render {
     $result->{page} = $self->_page() if $self->_page();
     $result->{refresh} = $self->_refresh() if ($self->_refresh());
 
-    my $json = JSON->new->utf8;
     my $body;
-
     # page redirect
     my $redirect = $self->redirect;
     my $redirect_url;
@@ -446,11 +444,11 @@ sub render {
         $redirect_url = $redirect->{goto};
 
         $redirect->{session_id} = $self->_session->id;
-        $body = $json->encode( $redirect );
+        $body = encode_json( $redirect );
 
     # raw data
     } elsif ($result->{_raw}) {
-        $body = i18nTokenizer ( $json->encode($result->{_raw}) );
+        $body = i18nTokenizer ( encode_json($result->{_raw}) );
 
     # regular response
     } else {
@@ -461,7 +459,7 @@ sub render {
              $self->_session()->param('motd', undef);
              $result->{status} = $motd;
         }
-        $body = i18nTokenizer ( $json->encode($result) );
+        $body = i18nTokenizer ( encode_json($result) );
     }
 
 

@@ -535,7 +535,7 @@ sub _send_plain {
     $smtpmsg .= "Cc: " . join(",", @{$vars->{cc}}) . "\n" if ($vars->{cc});
     $smtpmsg .= "Reply-To: " . $cfg->{reply} . "\n" if ($cfg->{reply});
     $smtpmsg .= "Subject: $vars->{prefix} $subject\n";
-    $smtpmsg .= "\n$output";
+    $smtpmsg .= "\n". Encode::encode_utf8($output);
 
     ##! 64: "SMTP Msg --------------------\n$smtpmsg\n ----------------------------------";
 

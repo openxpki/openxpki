@@ -29,7 +29,6 @@ use OpenXPKI::Client::UI::Request;
 
 my $conf;
 my $log;
-my $json = new JSON();
 
 eval {
     my $config = OpenXPKI::Client::Config->new('webui');
@@ -43,7 +42,7 @@ eval {
 if (my $err = $EVAL_ERROR) {
     my $cgi = CGI::Fast->new();
     print $cgi->header( -type => 'application/json' );
-    print $json->encode( { status => { 'level' => 'error', 'message' => i18nGettext('I18N_OPENXPKI_UI_APPLICATION_ERROR') } });
+    print encode_json( { status => { 'level' => 'error', 'message' => i18nGettext('I18N_OPENXPKI_UI_APPLICATION_ERROR') } });
     die $err;
 }
 
@@ -109,7 +108,7 @@ sub __handle_error {
 
     if ( $cgi->http('HTTP_X-OPENXPKI-Client') ) {
         print $cgi->header( -type => 'application/json' );
-        print $json->encode( { status => { 'level' => 'error', 'message' => $error } });
+        print encode_json( { status => { 'level' => 'error', 'message' => $error } });
     } else {
         print $cgi->header( -type => 'text/html' );
         print $cgi->start_html( -title => $error );

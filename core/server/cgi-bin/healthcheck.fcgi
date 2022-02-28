@@ -15,8 +15,6 @@ use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($FATAL);
 
 my $client;
-my $json = new JSON();
-
 my @allowed_methods = ('ping');
 
 # do NOT expose this unless you are in a test environment
@@ -45,12 +43,12 @@ sub ping {
     $client ||= __client();
     if (!$client || !$client->is_connected()) {
         print $cgi->header( -type => 'application/json', charset => 'utf8', -status => 500 );
-        print $json->encode({ ping => 0 });
+        print encode_json({ ping => 0 });
         $client = undef;
         ERROR("ping failed");
     } else {
         print $cgi->header( -type => 'application/json', charset => 'utf8', -status => 200 );
-        print $json->encode({ ping => 1 });
+        print encode_json({ ping => 1 });
         TRACE("ping ok");
     }
 }
@@ -59,7 +57,7 @@ sub showenv {
 
     my $cgi = shift;
     print $cgi->header( -type => 'application/json', charset => 'utf8', -status => 200 );
-    print $json->encode( \%ENV );
+    print encode_json( \%ENV );
 
 }
 DEBUG("Start healtcheck pid $$");
