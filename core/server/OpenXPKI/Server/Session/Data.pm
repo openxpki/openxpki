@@ -25,6 +25,14 @@ application logic
 has is_dirty => ( is => 'rw', isa => 'Bool', init_arg => undef, default => 0);
 has _is_empty => ( is => 'rw', isa => 'Bool', init_arg => undef, default => 1);
 
+ has '_json' => (
+    is => 'ro',
+    isa => 'JSON',
+    # explicit utf8 off here as we exchange the UTF8 string with the database!
+    default => sub { return JSON->new()->utf8(0); },
+    lazy => 1,
+);
+
 # handler that gets triggered on attribute changes
 sub _attr_change {
     my ($self, $val, $old_val) = @_;
@@ -263,7 +271,7 @@ sub freeze {
         delete $data_hash->{$_} for @{ $params{except} };
     }
 
-    return "JSON:".encode_json($data_hash);
+    return "JSON:".($self->_json()->encode($data_hash));
 }
 
 =head2 thaw
@@ -289,8 +297,7 @@ sub thaw {
     else {
         OpenXPKI::Exception->throw(message => "Unknown format of serialized data")
             unless $frozen =~ /^JSON:/;
-        $frozen =~ s/^JSON://;
-        $data_hash = decode_json($frozen);
+        $data_hash = $self->_json()->decode(substr($frozen,5));
     }
 
     # set session attributes via accessor methods
