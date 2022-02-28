@@ -588,7 +588,7 @@ sub handle_login {
                     my $envkey = $auth->{envkeys}->{$key};
                     $self->logger()->debug("Try to load $key from $envkey");
                     next unless defined ($ENV{$envkey});
-                    $data->{$key} = $ENV{$envkey};
+                    $data->{$key} = Encode::decode('UTF-8', $ENV{$envkey}, Encode::LEAVE_SRC | Encode::FB_CROAK);
                 }
             # legacy support
             } elsif (my $user = $ENV{'OPENXPKI_USER'} || $ENV{'REMOTE_USER'} || '') {
