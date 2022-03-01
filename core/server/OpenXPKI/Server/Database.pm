@@ -248,6 +248,8 @@ sub _build_dbix_handler {
         }
     );
 
+    $self->driver->perform_checks($dbix->dbh);
+
     ##! 32: 'DBIx Handle ' . Dumper $dbix
 
     return $dbix;

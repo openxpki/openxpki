@@ -45,6 +45,9 @@ sub dbi_connect_params {
     mysql_bind_type_guessing => 0, # FIXME See https://github.com/openxpki/openxpki/issues/44
 }
 
+# Custom checks after driver instantiation
+sub perform_checks { }
+
 # Commands to execute after connecting
 sub on_connect {
     my ($self, $dbh) = @_;

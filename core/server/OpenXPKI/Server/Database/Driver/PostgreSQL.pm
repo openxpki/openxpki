@@ -42,6 +42,9 @@ sub dbi_connect_params {
     pg_enable_utf8 => 1,
 }
 
+# Custom checks after driver instantiation
+sub perform_checks { }
+
 # Commands to execute after connecting
 sub on_connect {
     my ($self, $dbh) = @_;

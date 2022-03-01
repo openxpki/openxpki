@@ -46,8 +46,9 @@ sub dbi_connect_params {
     mysql_bind_type_guessing => 0, # FIXME See https://github.com/openxpki/openxpki/issues/44
 }
 
-# Commands to execute after connecting
-sub on_connect {
+
+# Custom checks after driver instantiation
+sub perform_checks {
     my ($self, $dbh) = @_;
 
     # check version
@@ -55,6 +56,11 @@ sub on_connect {
     my ($mysql, $major, $minor, $patch) = $ver =~ m/^([\d\.]+-)?(\d+)\.(\d+)\.(\d+)-MariaDB.*/;
     die "MariaDB server too old: $major.$minor.$patch - OpenXPKI 'MariaDB' driver requires version 10.3, please use 'MySQL' instead."
         unless ($major >= 10 and $minor >= 3);
+}
+
+# Commands to execute after connecting
+sub on_connect {
+    my ($self, $dbh) = @_;
 
     # set transaction isolation level
     $dbh->do("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED");

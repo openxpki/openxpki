@@ -19,6 +19,8 @@ my $columns = [ # yes an ArrayRef to have a defined order!
     text => "VARCHAR(100)",
 ];
 my (undef, $sqlite_db) = tempfile(UNLINK => 1);
+`sqlite3 $sqlite_db "PRAGMA journal_mode = WAL"`; # switch SQLite db to WAL mode
+
 my $db = DatabaseTest->new(
     sqlite_db => $sqlite_db,
     columns => $columns,

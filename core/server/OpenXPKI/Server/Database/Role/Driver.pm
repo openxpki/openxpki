@@ -34,6 +34,9 @@ requires 'dbi_dsn';
 # Returns HashRef: optional parameters to pass to connect()
 requires 'dbi_connect_params';
 
+# May execute custom checks after the driver is instantiated
+requires 'perform_checks';
+
 # May execute custom commands after connecting, receives $dbh handle (DBI)
 requires 'on_connect';
 

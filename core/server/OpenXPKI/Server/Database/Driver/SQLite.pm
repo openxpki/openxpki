@@ -35,6 +35,20 @@ sub dbi_dsn {
 # Additional parameters for DBI's connect()
 sub dbi_connect_params {
     sqlite_unicode => 1,
+    sqlite_use_immediate_transaction => 0,
+}
+
+# Custom checks after driver instantiation
+sub perform_checks {
+    my ($self, $dbh) = @_;
+
+    if (my $name = $dbh->sqlite_db_filename) {
+        my $mode = $dbh->selectall_arrayref("PRAGMA journal_mode")->[0]->[0];
+        die "SQLite database $name must be set to WAL mode.\n"
+           ."This can be done e.g. by running\n"
+           ."  sqlite3 $name \"PRAGMA journal_mode = WAL\""
+          if ($mode ne 'wal');
+    }
 }
 
 # Commands to execute after connecting
