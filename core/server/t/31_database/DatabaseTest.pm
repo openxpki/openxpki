@@ -138,7 +138,7 @@ sub run {
         my ($dbtype, $dbi_driver, $env_var, $testname) = @_;
 
         return note "$env_var not set" if ($env_var and not $ENV{$env_var});
-        return note "'$dbtype' test disabled" unless $self->shall_test($dbtype);
+        return unless $self->shall_test($dbtype);
         return note "$dbi_driver is not installed" unless eval "require $dbi_driver";
 
         my $dbi_params = $self->get_dbi_params($dbtype);
@@ -147,27 +147,35 @@ sub run {
         # the actual test sub
         subtest $testname => sub {
             plan tests => $plan + 2;
-            my $connection;
+            my ($conn1, $conn2);
             lives_ok {
-                $connection = DatabaseTestConnection->new(
+                $conn1 = DatabaseTestConnection->new(
                     type => $dbtype,
                     dbi_params => $dbi_params,
                     columns => $self->columns,
                     $self->has_data ? (data => $self->data) : (),
                 );
-            } $dbi_params->{type}.": create Database instance";
+                $conn2 = DatabaseTestConnection->new(
+                    type => $dbtype,
+                    dbi_params => $dbi_params,
+                    columns => $self->columns,
+                );
+            } $dbi_params->{type}.": create Database instances";
 
-SKIP: {
-            skip "no 'data' given", 1 unless $self->has_data;
-            lives_ok {
-                $connection->_create_table;
-            } $dbi_params->{type}.": insert test data";
-}
+            SKIP: {
+                skip "no data provided to insert", 1 unless $self->has_data;
+                lives_ok {
+                    $conn1->_create_table;
+                } $dbi_params->{type}.": insert test data";
+            }
 
-            $tests->($connection);
-            $connection->_drop_table if $self->has_data;
+            $tests->($conn1, $conn2);
+            $conn1->dbi->commit;
+            $conn2->dbi->commit;
+            $conn1->_drop_table if $self->has_data;
             # esp. prevent prevent deadlocks due to SQLite file locking if second instance of DatabaseTest is used later on:
-            $connection->dbi->disconnect;
+            $conn1->dbi->disconnect;
+            $conn2->dbi->disconnect;
         };
     };
 
