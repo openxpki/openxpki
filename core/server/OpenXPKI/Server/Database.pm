@@ -951,8 +951,8 @@ Named parameters:
 Records the start of a new transaction (i.e. sets a flag) without database
 interaction.
 
-If the flag was already set (= another transaction is running), a C<ROLLBACK> is
-performed first and an error message is logged.
+If the flag was already set (= another transaction is running), nothing happens
+but a debug message is logged.
 
 Please note that after a C<fork()> the flag is be reset as the C<DBI> handle
 is also reset (so there cannot be a running transaction).
