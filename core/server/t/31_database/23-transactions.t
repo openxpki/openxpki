@@ -34,28 +34,54 @@ my $db = DatabaseTest->new(
 #
 # tests
 #
-$db->run("Transactions", 14, sub {
-    my $t = shift;
-    my $dbi = $t->dbi;
+$db->run("Transactions", 16, sub {
+    my ($t1, $t2) = @_;
+    my $dbi = $t1->dbi;
 
     #
     # correct transaction with commit
     #
     lives_ok { $dbi->start_txn } "start transaction";
-    lives_and {
+
+    lives_ok {
         $dbi->insert(
             into => "test",
             values => { id => 4, text => "Schwimmhalle" },
         );
+    } "insert row";
+
+    # check with second DBI instance
+    SKIP: {
+        skip "concurrent access not possible with SQLite", 1 if $t1->type eq 'sqlite';
+        cmp_bag $t2->get_data, [
+            [ 1, "Litfasssaeule" ],
+            [ 2, "Buergersteig" ],
+            [ 3, "Rathaus" ],
+        ], "inserted row not visible yet in second DBI handle";
+    }
+
+    lives_and {
         $dbi->commit;
-        cmp_bag $t->get_data, [
+        cmp_bag $t1->get_data, [
             [ 1, "Litfasssaeule" ],
             [ 2, "Buergersteig" ],
             [ 3, "Rathaus" ],
             [ 4, "Schwimmhalle" ],
         ];
-    } "insert a row";
-    unlike $t->get_log, qr/transaction start/, "no negative log messages";
+    } "inserted row visible after commit";
+
+    # check with second DBI instance
+    SKIP: {
+        skip "concurrent access not possible with SQLite", 1 if $t1->type eq 'sqlite';
+        cmp_bag $t2->get_data, [
+            [ 1, "Litfasssaeule" ],
+            [ 2, "Buergersteig" ],
+            [ 3, "Rathaus" ],
+            [ 4, "Schwimmhalle" ],
+        ], "inserted row visible in second DBI handle after commit";
+    }
+
+    unlike $t1->get_log, qr/transaction start/, "no negative log messages";
 
     #
     # correct transaction with rollback
@@ -67,14 +93,14 @@ $db->run("Transactions", 14, sub {
             where => { id => 4 },
         );
         $dbi->rollback;
-        cmp_bag $t->get_data, [
+        cmp_bag $t1->get_data, [
             [ 1, "Litfasssaeule" ],
             [ 2, "Buergersteig" ],
             [ 3, "Rathaus" ],
             [ 4, "Schwimmhalle" ],
         ];
     } "delete a row, but rollback";
-    unlike $t->get_log, qr/transaction start/, "no negative log messages";
+    unlike $t1->get_log, qr/transaction start/, "no negative log messages";
 
     #
     # commit without "transaction start"
@@ -85,13 +111,13 @@ $db->run("Transactions", 14, sub {
             where => { id => 4 },
         );
         $dbi->commit;
-        cmp_bag $t->get_data, [
+        cmp_bag $t1->get_data, [
             [ 1, "Litfasssaeule" ],
             [ 2, "Buergersteig" ],
             [ 3, "Rathaus" ],
         ];
     } "delete a row + commit";
-    like $t->get_log, qr/transaction start/, "warn about missing start_txn()";
+    like $t1->get_log, qr/transaction start/, "warn about missing start_txn()";
 
     #
     # rollback without "transaction start"
@@ -102,13 +128,13 @@ $db->run("Transactions", 14, sub {
             where => { id => 3 },
         );
         $dbi->rollback;
-        cmp_bag $t->get_data, [
+        cmp_bag $t1->get_data, [
             [ 1, "Litfasssaeule" ],
             [ 2, "Buergersteig" ],
             [ 3, "Rathaus" ],
         ];
     } "delete a row + rollback";
-    like $t->get_log, qr/transaction start/, "warn about missing start_txn()";
+    like $t1->get_log, qr/transaction start/, "warn about missing start_txn()";
 
     #
     # start transaction while other not finished
@@ -127,32 +153,18 @@ $db->run("Transactions", 14, sub {
             where => { id => 3 },
         );
         $dbi->commit;
-        cmp_bag $t->get_data, [
+        cmp_bag $t1->get_data, [
             [ 1, "Litfasssaeule" ]
         ];
     } "start transaction twice, should be ignored";
-    like $t->get_log, qr/running/, "warn about starting a transaction while another one is not finished";
+    like $t1->get_log, qr/running/, "warn about starting a transaction while another one is not finished";
 
-    $t->dbi->disconnect;
+    $t1->dbi->disconnect;
 
-
-    #
-    # check if other DBI instance sees correct transaction (i.e. commit succeeded)
-    #
-    my $db_check = DatabaseTest->new(
-        test_only => [ $t->type ],
-        sqlite_db => $sqlite_db,
-        columns => $columns,
-    );
-
-    $db_check->run("Data verification", 1, sub {
-        my $t = shift;
-        my $dbi = $t->dbi;
-
-        cmp_bag $t->get_data, [
-            [ 1, "Litfasssaeule" ],
-        ], "correct data in other handle";
-    });
+    # check with second DBI instance
+    cmp_bag $t2->get_data, [
+        [ 1, "Litfasssaeule" ],
+    ], "correct data in other DBI handle";
 });
 
 
