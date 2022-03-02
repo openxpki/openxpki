@@ -14,6 +14,7 @@ OpenXPKI::Server::Database::Driver::MySQL - Driver for MySQL databases
 
 =cut
 
+use DBI qw(:sql_types);
 use OpenXPKI::Exception;
 
 ################################################################################
@@ -52,6 +53,10 @@ sub perform_checks { }
 sub on_connect {
     my ($self, $dbh) = @_;
     $dbh->do("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED");
+
+    my $sth = $dbh->prepare("SET SESSION innodb_lock_wait_timeout = ?");
+    $sth->bind_param(1, $self->lock_timeout, SQL_INTEGER);
+    $sth->execute;
 }
 
 # Parameters for SQL::Abstract::More

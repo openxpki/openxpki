@@ -1,26 +1,3 @@
-package OpenXPKI::Server::Database::Driver::MariaDBTest;
-use Moose;
-extends 'OpenXPKI::Server::Database::Driver::MariaDB';
-
-around 'dbi_dsn' => sub {
-    my $orig = shift;
-    my $self = shift;
-    return $self->$orig(@_) . ";mysql_read_timeout=1";
-};
-
-
-package OpenXPKI::Server::Database::Driver::SQLiteTest;
-use Moose;
-extends 'OpenXPKI::Server::Database::Driver::SQLite';
-
-around 'on_connect' => sub {
-    my $orig = shift;
-    my ($self, $dbh) = @_;
-    $self->$orig($dbh);
-    $dbh->func(100, 'busy_timeout');
-};
-
-
 package main;
 
 use strict;
@@ -59,18 +36,14 @@ my (undef, $sqlite_db) = tempfile(UNLINK => 1);
 my $tests = [
     {
         db_params => {
-            %{ DatabaseTest->new()->get_dbi_params('sqlite') },
-            type => 'SQLiteTest',
+            %{ DatabaseTest->new->get_dbi_params('sqlite') },
             name => $sqlite_db,
         }
     },
     {
         env_var => 'OXI_TEST_DB_MYSQL_NAME',
-        db_params => {
-            %{ DatabaseTest->new()->get_dbi_params('mariadb') },
-            type => 'MariaDBTest',
-        }
-    }
+        db_params => DatabaseTest->new->get_dbi_params('mariadb'),
+    },
 ];
 
 for my $test (@{$tests}) {
@@ -126,9 +99,9 @@ for my $test (@{$tests}) {
                 $db_bob->start_txn;
             } "Test 2: Bob starts a transaction";
 
-            dies_ok {
+            throws_ok {
                 $db_bob->update(table => "test", set => { text => "Marktgasse" }, where => { id => 2 });
-            } "Test 2: Bob fails trying to update the same row (row lock)";
+            } qr/ lock /msxi, "Test 2: Bob fails trying to update the same row (row lock)";
 
             handle_sees $db_bob, 2, "Buergersteig", "Test 2: Bob still sees old data";
 

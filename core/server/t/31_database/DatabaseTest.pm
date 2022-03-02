@@ -74,9 +74,14 @@ sub get_dbi_params {
         { isa => 'DBMS' },
     );
 
+    my %common = (
+        lock_timeout => 1,
+    );
+
     if ('sqlite' eq $db_type) {
         return {
             type => "SQLite",
+            %common,
             name => ($self->sqlite_db || ":memory:"),
         }
     }
@@ -84,6 +89,7 @@ sub get_dbi_params {
     if ('oracle' eq $db_type) {
         return {
             type => "Oracle",
+            %common,
             name => $ENV{OXI_TEST_DB_ORACLE_NAME},
             user => $ENV{OXI_TEST_DB_ORACLE_USER},
             passwd => $ENV{OXI_TEST_DB_ORACLE_PASSWORD},
@@ -102,6 +108,7 @@ sub get_dbi_params {
     if ('mysql' eq $db_type) {
         return {
             type => "MySQL",
+            %common,
             %mysql_params,
         }
     }
@@ -109,6 +116,7 @@ sub get_dbi_params {
     if ('mariadb' eq $db_type) {
         return {
             type => "MariaDB",
+            %common,
             %mysql_params,
         }
     }
@@ -116,6 +124,7 @@ sub get_dbi_params {
     if ('postgres' eq $db_type) {
         return {
             type => "PostgreSQL",
+            %common,
             $ENV{OXI_TEST_DB_POSTGRES_DBHOST} ? ( host => $ENV{OXI_TEST_DB_POSTGRES_DBHOST} ) : (),
             $ENV{OXI_TEST_DB_POSTGRES_DBPORT} ? ( port => $ENV{OXI_TEST_DB_POSTGRES_DBPORT} ) : (),
             name => $ENV{OXI_TEST_DB_POSTGRES_NAME},

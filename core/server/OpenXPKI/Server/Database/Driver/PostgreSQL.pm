@@ -49,7 +49,9 @@ sub perform_checks { }
 sub on_connect {
     my ($self, $dbh) = @_;
     $dbh->do("SET SESSION CHARACTERISTICS AS TRANSACTION ISOLATION LEVEL READ COMMITTED");
-    $dbh->do("SET CLIENT_MIN_MESSAGES TO WARNING");
+    $dbh->do("SET client_min_messages TO warning");
+    $dbh->do("SET lock_timeout TO ?", undef, $self->lock_timeout * 1000);
+    $dbh->commit; # PostgreSQL settings get lost if the current transaction is rolled back, so we commit here.
 }
 
 # Parameters for SQL::Abstract::More

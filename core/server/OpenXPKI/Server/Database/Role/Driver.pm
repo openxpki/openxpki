@@ -20,6 +20,7 @@ has 'host'         => ( is => 'ro', isa => 'Str' );
 has 'port'         => ( is => 'ro', isa => 'Int' );
 has 'user'         => ( is => 'ro', isa => 'Str' );
 has 'passwd'       => ( is => 'ro', isa => 'Str' );
+has 'lock_timeout' => ( is => 'ro', isa => 'Int', default => 5 ); # in seconds
 
 ################################################################################
 # Required in drivers classes that consume this role

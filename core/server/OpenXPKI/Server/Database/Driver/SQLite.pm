@@ -52,7 +52,10 @@ sub perform_checks {
 }
 
 # Commands to execute after connecting
-sub on_connect { }
+sub on_connect {
+    my ($self, $dbh) = @_;
+    $dbh->func($self->lock_timeout * 1000, 'busy_timeout');
+}
 
 # Parameters for SQL::Abstract::More
 sub sqlam_params {
