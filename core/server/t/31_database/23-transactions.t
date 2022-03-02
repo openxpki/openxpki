@@ -34,7 +34,7 @@ my $db = DatabaseTest->new(
 #
 # tests
 #
-$db->run("Transactions", 16, sub {
+$db->run("Transactions", 17, sub {
     my ($t1, $t2) = @_;
     my $dbi = $t1->dbi;
 
@@ -92,6 +92,11 @@ $db->run("Transactions", 16, sub {
             from => "test",
             where => { id => 4 },
         );
+        cmp_bag $t1->get_data, [
+            [ 1, "Litfasssaeule" ],
+            [ 2, "Buergersteig" ],
+            [ 3, "Rathaus" ],
+        ];
         $dbi->rollback;
         cmp_bag $t1->get_data, [
             [ 1, "Litfasssaeule" ],
