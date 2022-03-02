@@ -44,6 +44,10 @@ my $tests = [
         env_var => 'OXI_TEST_DB_MYSQL_NAME',
         db_params => DatabaseTest->new->get_dbi_params('mariadb'),
     },
+    {
+        env_var => 'OXI_TEST_DB_POSTGRES_NAME',
+        db_params => DatabaseTest->new->get_dbi_params('postgres'),
+    },
 ];
 
 for my $test (@{$tests}) {
@@ -102,6 +106,10 @@ for my $test (@{$tests}) {
             throws_ok {
                 $db_bob->update(table => "test", set => { text => "Marktgasse" }, where => { id => 2 });
             } qr/ lock /msxi, "Test 2: Bob fails trying to update the same row (row lock)";
+
+            lives_ok {
+                $db_bob->rollback; # needed by PostgreSQL as Bobs previous update() results in a failed txn
+            } "Test 2: Bob rolls back failed transaction";
 
             handle_sees $db_bob, 2, "Buergersteig", "Test 2: Bob still sees old data";
 
