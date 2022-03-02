@@ -113,10 +113,8 @@ for my $test (@{$tests}) {
                 $db_alice->commit;
             } "Test 1: Alice commits transaction";
 
-            SKIP: {
-                skip "concurrent access during txn not possible with SQLite", 1 if $is_sqlite;
-                handle_sees $db_bob, 1, "LED-Panel", "Test 1: Bob sees Alices new data";
-            }
+            $db_bob->commit if $is_sqlite; # SQLite defaults to REPEATABLE READ isolation level, i.e. only a new txn sees the updated data
+            handle_sees $db_bob, 1, "LED-Panel", "Test 1: Bob sees Alices new data";
 
             # Two instances writing
             lives_ok {
@@ -138,43 +136,36 @@ for my $test (@{$tests}) {
                 $db_alice->commit;
             } "Test 2: Alice commits transaction";
 
-            SKIP: {
-                skip "concurrent access during txn not possible with SQLite", 1 if $is_sqlite;
-                handle_sees $db_bob, 2, "Shopping-Meile", "Test 2: Bob sees Alices new data";
-            }
+            $db_bob->commit if $is_sqlite;
+            handle_sees $db_bob, 2, "Shopping-Meile", "Test 2: Bob sees Alices new data";
 
             # Combined "query & commit" commands
             lives_ok {
                 $db_alice->insert_and_commit(into => "test", values => { text => "Hutladen", id => 3 });
             } "Test 3: Alice runs an 'insert & commit' command";
 
-            SKIP: {
-                skip "concurrent access during txn not possible with SQLite", 1 if $is_sqlite;
-                handle_sees $db_bob, 3, "Hutladen", "Test 3: Bob sees Alices new data";
-            }
+            $db_bob->commit if $is_sqlite;
+            handle_sees $db_bob, 3, "Hutladen", "Test 3: Bob sees Alices new data";
 
             lives_ok {
                 $db_alice->update_and_commit(table => "test", set => { text => "Basecap-Shop" }, where => { id => 3 });
             } "Test 3: Alice runs an 'update & commit' command";
 
-            SKIP: {
-                skip "concurrent access during txn not possible with SQLite", 1 if $is_sqlite;
-                handle_sees $db_bob, 3, "Basecap-Shop", "Test 3: Bob sees Alices new data";
-            }
+            $db_bob->commit if $is_sqlite;
+            handle_sees $db_bob, 3, "Basecap-Shop", "Test 3: Bob sees Alices new data";
 
             lives_ok {
                 $db_alice->merge_and_commit(into => "test", set => { text => "Happy Hat" }, where => { id => 3 });
             } "Test 3: Alice runs an 'merge & commit' command";
 
-            SKIP: {
-                skip "concurrent access during txn not possible with SQLite", 1 if $is_sqlite;
-                handle_sees $db_bob, 3, "Happy Hat", "Test 3: Bob sees Alices new data";
-            }
+            $db_bob->commit if $is_sqlite;
+            handle_sees $db_bob, 3, "Happy Hat", "Test 3: Bob sees Alices new data";
 
             lives_ok {
                 $db_alice->delete_and_commit(from => "test", where => { id => 3 });
             } "Test 3: Alice runs an 'delete & commit' command";
 
+            $db_bob->commit if $is_sqlite;
             handle_sees $db_bob, 3, undef, "Test 3: Bob sees Alices deletions";
 
             $db_bob->commit; # to be able to drop database
