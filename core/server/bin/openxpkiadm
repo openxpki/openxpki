@@ -41,7 +41,7 @@ binmode(STDOUT, ':encoding(UTF-8)');
 binmode(STDERR, ':encoding(UTF-8)');
 
 my %params = ( module => [] );
-my @options_spec = ('config=s','instance|i=s','verbose','debug|:s');
+my @options_spec = ('config=s','instance|i=s','verbose','debug:s');
 my $cmd = shift || 'help';
 my $ret = 255;
 
