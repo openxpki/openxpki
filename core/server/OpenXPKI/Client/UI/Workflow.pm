@@ -2415,6 +2415,8 @@ sub __get_action_buttons {
                 }
             }
             if ($hint->{format}) {
+                # do not render hidden buttons
+                next if ($hint->{format} eq 'hidden');
                 $button{format} = $hint->{format};
             }
             if ($hint->{confirm}) {
