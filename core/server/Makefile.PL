@@ -357,7 +357,7 @@ WriteMakefile(
         'Time::HiRes'                   => '1',
         'Try::Tiny'                     => '0.28',
         'URI::Escape'                   => 0,           # should be part of the core modules but who knows
-        'Workflow'                      => '0.27',
+        'Workflow'                      => '1.60',
         'YAML::Tiny'                    => '1.69',
     },
     'test' => {

@@ -87,7 +87,7 @@ sub param {
     } else {
 
         ##! 16: 'Call without value'
-        return $self->SUPER::param( @_ );
+        return scalar $self->SUPER::param( @_ );
     }
 
 }
