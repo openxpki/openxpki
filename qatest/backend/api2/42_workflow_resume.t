@@ -109,7 +109,7 @@ subtest "workflow crashing on some action" => sub {
     $TestWorkflowResume::trigger_exception = 1; # this will be used in TestWorkflowActivityWithException to trigger the exception
     my $wf;
     lives_ok {
-        $wf = $oxitest->create_workflow("wf_that_explodes1_$uuid");
+        $wf = $oxitest->create_workflow_ok("wf_that_explodes1_$uuid");
     } "workflow is created";
 
     my $result;
@@ -145,7 +145,7 @@ subtest "workflow crashing on INITIAL action" => sub {
 
     my $wf;
     lives_and {
-        $wf = $oxitest->create_workflow("wf_that_explodes2_$uuid");
+        $wf = $oxitest->create_workflow_ok("wf_that_explodes2_$uuid");
         like $wf->id, qr/^\d+$/;
     } "create_workflow() returns after crash in INITIAL action";
 

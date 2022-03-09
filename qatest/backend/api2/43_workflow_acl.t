@@ -113,20 +113,20 @@ CTX('session')->data->pki_realm("alpha");
 
 CTX('session')->data->role('User');
 CTX('session')->data->user('alma');
-my $alma_any = $oxitest->create_workflow("wf_type_1_any_$uuid");
-my $alma_self = $oxitest->create_workflow("wf_type_2_self_$uuid");
-my $alma_others = $oxitest->create_workflow("wf_type_3_others_$uuid");
-my $alma_regex = $oxitest->create_workflow("wf_type_4_regex1_$uuid");
-my $alma_regex2 = $oxitest->create_workflow("wf_type_5_regex2_$uuid");
+my $alma_any = $oxitest->create_workflow_ok("wf_type_1_any_$uuid");
+my $alma_self = $oxitest->create_workflow_ok("wf_type_2_self_$uuid");
+my $alma_others = $oxitest->create_workflow_ok("wf_type_3_others_$uuid");
+my $alma_regex = $oxitest->create_workflow_ok("wf_type_4_regex1_$uuid");
+my $alma_regex2 = $oxitest->create_workflow_ok("wf_type_5_regex2_$uuid");
 
 # "superuser" edeltraut
 CTX('session')->data->role('DieDarf');
 CTX('session')->data->user('edeltraut');
-my $edel_any = $oxitest->create_workflow("wf_type_1_any_$uuid");
-my $edel_self = $oxitest->create_workflow("wf_type_2_self_$uuid");
-my $edel_others = $oxitest->create_workflow("wf_type_3_others_$uuid");
-my $edel_regex = $oxitest->create_workflow("wf_type_4_regex1_$uuid");
-my $edel_noaccess = $oxitest->create_workflow("wf_type_6_noaccess_$uuid");
+my $edel_any = $oxitest->create_workflow_ok("wf_type_1_any_$uuid");
+my $edel_self = $oxitest->create_workflow_ok("wf_type_2_self_$uuid");
+my $edel_others = $oxitest->create_workflow_ok("wf_type_3_others_$uuid");
+my $edel_regex = $oxitest->create_workflow_ok("wf_type_4_regex1_$uuid");
+my $edel_noaccess = $oxitest->create_workflow_ok("wf_type_6_noaccess_$uuid");
 
 my $all_ids = [
     $alma_any->id,      # access for all users

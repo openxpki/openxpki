@@ -79,7 +79,7 @@ $oxitest->set_user("democa" => "user");
 my $wftest;
 
 lives_and {
-    $wftest = $oxitest->create_workflow("mywf_$uuid");
+    $wftest = $oxitest->create_workflow_ok("mywf_$uuid");
     $wftest->state_is('INTERMEDIATE');
 } 'Create test workflow' or die "Creating workflow failed";
 

@@ -72,7 +72,7 @@ my $oxitest = OpenXPKI::Test->new(
 CTX('session')->data->pki_realm('alpha');
 CTX('session')->data->role('User');
 CTX('session')->data->user('wilhelm');
-my $wf = $oxitest->create_workflow("wf_with_a_rest_$uuid");
+my $wf = $oxitest->create_workflow_ok("wf_with_a_rest_$uuid");
 $wf->state_is("RESTING");
 
 my $info = $oxitest->api2_command("wakeup_workflow" => { id => $wf->id });
@@ -81,7 +81,7 @@ is $info->{workflow}->{state}, "SUCCESS", "synchronous wakeup successful";
 #
 # asynchronous wakeup ('watch'), but watching and waiting
 #
-$wf = $oxitest->create_workflow("wf_with_a_rest_$uuid");
+$wf = $oxitest->create_workflow_ok("wf_with_a_rest_$uuid");
 $wf->state_is("RESTING");
 
 $info = $oxitest->api2_command("wakeup_workflow" => { id => $wf->id, async => 1, wait => 1 });
@@ -90,7 +90,7 @@ is $info->{workflow}->{state}, "SUCCESS", "asynchronous wakeup successful (block
 #
 # asynchronous wakeup ('fork')
 #
-$wf = $oxitest->create_workflow("wf_with_a_rest_$uuid");
+$wf = $oxitest->create_workflow_ok("wf_with_a_rest_$uuid");
 $wf->state_is("RESTING");
 
 $info = $oxitest->api2_command("wakeup_workflow" => { id => $wf->id, async => 1 });

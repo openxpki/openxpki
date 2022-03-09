@@ -49,7 +49,7 @@ my $cert_info = $oxitest->create_cert(
 # get_ui_system_status
 
 lives_and {
-    my $wftest = $oxitest->create_workflow(
+    my $wftest = $oxitest->create_workflow_ok(
         "certificate_revocation_request_v2" => {
             cert_identifier => $cert_info->{identifier},
             reason_code => 'keyCompromise',
@@ -65,10 +65,10 @@ lives_and {
 } 'Create workflow: auto-revoke certificate' or die "Creating workflow failed";
 
 lives_ok {
-    my $wftest = $oxitest->create_workflow(
+    my $wftest = $oxitest->create_workflow_ok(
         "crl_issuance" => { force_issue => 1 }
     );
-} 'Issue CRL';
+} 'issue CRL';
 
 lives_and {
     my $data = $oxitest->api2_command('get_ui_system_status');

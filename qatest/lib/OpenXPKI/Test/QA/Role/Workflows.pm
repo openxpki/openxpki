@@ -59,7 +59,7 @@ This role adds the following methods to L<OpenXPKI::Test>:
 
 =cut
 
-=head2 create_workflow
+=head2 create_workflow_ok
 
 Creates and returns a workflow instance wrapped in
 L<OpenXPKI::Test::QA::Role::Workflows::Instance> which can be used for
@@ -76,7 +76,7 @@ B<Positional Parameters>
 =back
 
 =cut
-sub create_workflow {
+sub create_workflow_ok {
     my ($self, $type, $params) = @_;
 
     my $wf = OpenXPKI::Test::QA::Role::Workflows::Instance->new(

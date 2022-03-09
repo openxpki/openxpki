@@ -34,7 +34,7 @@ use OpenXPKI::Serialization::Simple;
 
 
 requires 'also_init';
-requires 'create_workflow'; # effectively requires 'OpenXPKI::Test::QA::Role::Workflows'
+requires 'create_workflow_ok'; # effectively requires 'OpenXPKI::Test::QA::Role::Workflows'
 requires 'session';
 
 
@@ -100,7 +100,7 @@ sub create_cert {
 
         my $result;
         lives_and {
-            my $wftest = $self->create_workflow(
+            my $wftest = $self->create_workflow_ok(
                 "certificate_signing_request_v2" => {
                     cert_profile => $params->profile,
                     cert_subject_style => "00_basic_style",

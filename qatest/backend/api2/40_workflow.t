@@ -166,18 +166,18 @@ CTX('session')->data->role('User');
 CTX('session')->data->pki_realm("alpha");
 
 CTX('session')->data->user('wilhelm');
-my $wf_t1_sync =   $oxitest->create_workflow("wf_type_1_$uuid", $params);
-my $wf_t1_async1 = $oxitest->create_workflow("wf_type_1_$uuid", $params);
-my $wf_t1_async2 = $oxitest->create_workflow("wf_type_1_$uuid", $params);
+my $wf_t1_sync =   $oxitest->create_workflow_ok("wf_type_1_$uuid", $params);
+my $wf_t1_async1 = $oxitest->create_workflow_ok("wf_type_1_$uuid", $params);
+my $wf_t1_async2 = $oxitest->create_workflow_ok("wf_type_1_$uuid", $params);
 
 CTX('session')->data->user('franz');
-my $wf_t1_fail = $oxitest->create_workflow("wf_type_1_$uuid", $params);
+my $wf_t1_fail = $oxitest->create_workflow_ok("wf_type_1_$uuid", $params);
 
 CTX('session')->data->user('wilhelm');
-my $wf_t2 =   $oxitest->create_workflow("wf_type_2_$uuid", $params);
+my $wf_t2 =   $oxitest->create_workflow_ok("wf_type_2_$uuid", $params);
 
 CTX('session')->data->pki_realm("beta");
-my $wf_t4 =   $oxitest->create_workflow("wf_type_4_$uuid", $params);
+my $wf_t4 =   $oxitest->create_workflow_ok("wf_type_4_$uuid", $params);
 
 throws_ok {
     CTX('session')->data->pki_realm("alpha");
