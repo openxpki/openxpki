@@ -78,13 +78,6 @@ has last_wf_state => (
     predicate => 'has_last_wf_state',
 );
 
-has client => (
-    is => 'rw',
-    isa => 'OpenXPKI::Test::QA::Role::Server::ClientHelper',
-    init_arg => undef,
-    predicate => 'is_server',
-);
-
 #
 #
 #
@@ -94,17 +87,14 @@ sub BUILD {
     die "Please specify either 'type' (to create a new workflow) or 'id' (fetch existing one)"
         unless $self->id || $self->type;
 
-    if ($self->oxitest->meta->get_method('new_client_tester')) {
-        note "OpenXPKI::Test::QA::Role::Workflows: using client to send workflow related API commands";
-        $self->client($self->oxitest->new_client_tester);
-    }
-    else {
-        note "OpenXPKI::Test::QA::Role::Workflows: using direct API access";
-    }
+    note "OpenXPKI::Test::QA::Role::Workflows: " . ($self->oxitest->meta->find_attribute_by_name('client')
+        ? "using client to send workflow related API commands"
+        : "using direct API access"
+    );
 
     # new workflow
     if ($self->type) {
-        my $data = $self->api_command(
+        my $data = $self->oxitest->api2_command(
             create_workflow_instance => { workflow => $self->type, params => $self->params }
         );
         my $id = $data->{workflow}->{id} or die explain $data;
@@ -128,7 +118,7 @@ Queries the API for the current workflow metadata and returns it (I<HashRef>).
 =cut
 sub metadata {
     my ($self) = @_;
-    my $data = $self->api_command(
+    my $data = $self->oxitest->api2_command(
         get_workflow_info => { id => $self->id }
     );
     $self->last_wf_state($data->{workflow}) if $data->{workflow};
@@ -175,7 +165,7 @@ sub execute {
 
     my $result;
     lives_ok {
-        $result = $self->api_command(
+        $result = $self->oxitest->api2_command(
             execute_workflow_activity => {
                 id => $self->id,
                 activity => $activity,
@@ -221,7 +211,7 @@ sub execute_fails {
 
     my $result;
     throws_ok {
-        $self->api_command(
+        $self->oxitest->api2_command(
             execute_workflow_activity => {
                 id => $self->id,
                 activity => $activity,
@@ -251,28 +241,6 @@ sub state_is {
     my ($self, $expected_state) = @_;
     is $self->state, $expected_state, "workflow state is '$expected_state'"
       or BAIL_OUT('Wrong workflow state');
-}
-
-sub api_command {
-    my ($self, $command, $params) = @_;
-
-    # use client if we can (i.e. if we have a running test server)
-    # (using the API directly could lead to dying tests because an API command
-    #  might fork and then the test process would end prematurely)
-    if ($self->is_server) {
-        $self->client->login(
-            $self->oxitest->session->data->pki_realm,
-            $self->oxitest->session->data->user
-        ) unless $self->client->is_connected;
-
-        my $result = $self->client->send('COMMAND', { COMMAND => $command, PARAMS => $params, API => 2 });
-
-        BAIL_OUT("Failed sending API command '$command'") unless $self->client->is_service_msg('COMMAND');
-        return $result;
-    }
-    else {
-        return $self->oxitest->api2_command($command, $params);
-    }
 }
 
 __PACKAGE__->meta->make_immutable;

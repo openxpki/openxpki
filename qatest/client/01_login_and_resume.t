@@ -15,10 +15,6 @@ use Test::Deep;
 use lib "$Bin/../lib", "$Bin/../../core/server/t/lib";
 use OpenXPKI::Test;
 
-
-plan tests => 7;
-
-
 #
 # Setup test env
 #
@@ -30,15 +26,14 @@ my $oxitest = OpenXPKI::Test->new(
 #
 # Tests
 #
-my $client = $oxitest->new_client_tester;
-$client->login("democa" => "caop");
+$oxitest->client->login("democa" => "caop");
 
-my $result = $client->send_command_ok("get_session_info");
+my $result = $oxitest->client->send_command_ok("get_session_info");
 is $result->{name}, "caop", "session info contains user name";
 
-my $session_id = $client->client->get_session_id;
+my $session_id = $oxitest->client->oxi_client->get_session_id;
 
-$client->client->close_connection;
+$oxitest->client->oxi_client->close_connection;
 
 
 my $client2 = $oxitest->new_client_tester;
@@ -47,4 +42,4 @@ $client2->init_session({ SESSION_ID => $session_id });
 
 $oxitest->stop_server;
 
-1;
+done_testing;

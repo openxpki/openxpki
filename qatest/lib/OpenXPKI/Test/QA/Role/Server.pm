@@ -78,6 +78,22 @@ has semaphore => (
     init_arg => undef,
 );
 
+
+=head2 client
+
+Returns a singleton instance of L<OpenXPKI::Test::QA::Role::Server::ClientHelper>
+that can be used to test client commands against the running server.
+
+=cut
+has client => (
+    is => 'rw',
+    isa => 'OpenXPKI::Test::QA::Role::Server::ClientHelper',
+    init_arg => undef,
+    lazy => 1,
+    predicate => 'has_client',
+    builder => 'new_client_tester',
+);
+
 =head2 init_server
 
 (Replaces L<OpenXPKI::Test/init_server>)
@@ -253,6 +269,7 @@ sub new_client_tester {
 # no-op DEMOLISH in case the consuming class does not have one. If it does have
 # one, that will win. Then we modify it (theirs or ours)
 # Also see: http://www.perlmonks.org/?node_id=837397
+# TODO Convert into exit hook once we migrated to Test2 (see https://metacpan.org/dist/Test2-Suite/source/lib/Test2/Plugin/ExitSummary.pm)
 sub DEMOLISH {}
 before DEMOLISH => sub {
     my $self = shift;

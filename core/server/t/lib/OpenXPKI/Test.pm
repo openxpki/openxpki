@@ -15,7 +15,7 @@ Basic test environment:
 Start an OpenXPKI test server:
 
     my $oxitest = OpenXPKI::Test->new(with => [ qw( SampleConfig Server ) ]);
-    my $client = $oxitest->new_client_tester;
+    my $client = $oxitest->client;
     # $client is a "OpenXPKI::Test::QA::Role::Server::ClientHelper"
     $client->connect;
     $client->init_session;
@@ -1029,7 +1029,11 @@ sub set_user {
 
 Executes the given API2 command and returns the result.
 
-Convenience method to prevent usage of C<CTX('api2')> in test files.
+If a running test server is available the command is executed using the client
+helper L<OpenXPKI::Test::QA::Role::Server::ClientHelper>. This prevents test
+process crashed in case the API command forks.
+
+Otherwise it just wraps C<CTX('api2')>.
 
 B<Positional Parameters>
 
@@ -1044,7 +1048,29 @@ B<Positional Parameters>
 =cut
 sub api2_command {
     my ($self, $command, $params) = @_;
-    return OpenXPKI::Server::Context::CTX('api2')->$command($params ? (%$params) : ());
+
+    # use client if we can (i.e. if we have a running test server)
+    # (using the API directly could lead to dying tests because an API command
+    #  might fork and then the test process would end prematurely)
+    if ($self->meta->find_attribute_by_name('client')) {
+        $self->client->login(
+            $self->session->data->pki_realm,
+            $self->session->data->user
+        ) unless $self->client->is_connected;
+
+        my $result = $self->client->send('COMMAND', {
+            COMMAND => $command,
+            PARAMS => $params // {},
+            API => 2,
+        });
+
+        BAIL_OUT("Failed sending API command '$command'") unless $self->client->is_service_msg('COMMAND');
+        return $result;
+    }
+    # directly use API
+    else {
+        return OpenXPKI::Server::Context::CTX('api2')->$command($params ? (%$params) : ());
+    }
 }
 
 =head2 insert_testcerts

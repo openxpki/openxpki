@@ -75,12 +75,12 @@ has password => (
 
 =head1 METHODS
 
-=head2 client
+=head2 oxi_client
 
 Returns a reference to the L<OpenXPKI::Client> object internally used.
 
 =cut
-has client => (
+has oxi_client => (
     is => 'rw',
     isa => 'OpenXPKI::Client',
     init_arg => undef,
@@ -111,7 +111,7 @@ sub connect {
     try {
         # instantiating the client means starting it as all initialization is
         # done in the constructor
-        $self->client(
+        $self->oxi_client(
             OpenXPKI::Client->new({
                 TIMEOUT => 5,
                 SOCKETFILE => $self->socket_file,
@@ -143,7 +143,7 @@ sub init_session {
     $self->connect;
 
     try {
-        $self->response($self->client->init_session($args));
+        $self->response($self->oxi_client->init_session($args));
         # if we sent an active session...
         if ($args and $args->{'SESSION_ID'}) {
             $self->is_service_msg("SERVICE_READY") or die "expected next step SERVICE_READY";
@@ -178,9 +178,14 @@ B<Positional parameters>
 sub login {
     my ($self, $realm, $user) = @_;
 
-    $self->init_session unless ($self->is_connected and $self->client->get_session_id);
+    $self->init_session unless ($self->is_connected and $self->oxi_client->get_session_id);
 
     try {
+        if ($self->oxi_client->is_logged_in) {
+            $self->oxi_client->logout;
+            $self->init_session;
+        }
+
         # requested by server only if there is more than one realm in the config
         if ($self->is_service_msg("GET_PKI_REALM")) {
             $self->send('GET_PKI_REALM', { PKI_REALM => $realm });
@@ -242,7 +247,7 @@ sub send {
     die "Please call 'connect', 'init_session' or at least 'login' before sending commands"
      unless $self->is_connected;
 
-    $self->response($self->client->send_receive_service_msg($msg, $args));
+    $self->response($self->oxi_client->send_receive_service_msg($msg, $args));
     if (my $err = $self->get_error) { die $err; }
 
     return $self->response->{PARAMS};
