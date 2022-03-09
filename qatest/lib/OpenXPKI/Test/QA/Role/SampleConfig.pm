@@ -144,6 +144,7 @@ before 'init_base_config' => sub { # happens before init_user_config() so we do 
     $self->_load_default_config("system/watchdog.yaml", '_customize_system_watchdog');
 
     $self->default_realm("democa");
+    $self->default_user("caop");
 };
 
 # Loads the given default config YAML and adds it to the test environment,

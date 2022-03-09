@@ -513,6 +513,18 @@ has default_realm => (
     predicate => 'has_default_realm',
 );
 
+=head2 default_user
+
+Returns the configured default user.
+
+=cut
+has default_user => (
+    is => 'rw',
+    isa => 'Str',
+    init_arg => undef,
+    predicate => 'has_default_user',
+);
+
 =head2 session
 
 Returns the session context object C<CTX('session')> once L</init_server> was
@@ -836,6 +848,14 @@ sub init_user_config {
     else {
         note "  Default realm: ".$self->default_realm;
     }
+
+    if (not $self->has_default_user) {
+        note "  Setting default user to 'user' as no other realm was set";
+        $self->default_user('caop');
+    }
+    else {
+        note "  Default user: ".$self->default_user;
+    }
 }
 
 =head2 write_config
@@ -957,7 +977,7 @@ sub init_session_and_context {
     });
 
     # set default user (after session init as CTX('session') is needed by auth handler
-    $self->set_user($self->default_realm, "user");
+    $self->set_user($self->default_realm, $self->default_user);
 }
 
 =head2 set_user

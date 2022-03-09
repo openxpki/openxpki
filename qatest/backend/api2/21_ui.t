@@ -42,9 +42,6 @@ my $cert_info = $oxitest->create_cert(
     profile => "tls_server",
 );
 
-# set user role to be allowed to create workflows etc.
-$oxitest->set_user("democa" => "caop");
-
 #
 # Tests
 #
