@@ -216,10 +216,10 @@ sub is_next_step {
         or diag("server response: ".explain($self->response));
 }
 
-=head2 send_ok
+=head2 send
 
 Sends the given message to the server using
-L<OpenXPKI::Client/send_receive_service_msg> and wraps that in a test.
+L<OpenXPKI::Client/send_receive_service_msg>.
 
 Returns the server response (I<HashRef>).
 
@@ -234,24 +234,32 @@ B<Positional parameters>
 =back
 
 =cut
-sub send_ok {
+sub send {
     my ($self, $msg, $args) = @_;
 
     die "Please call 'connect', 'init_session' or at least 'login' before sending commands"
      unless $self->is_connected;
 
-    lives_and {
-        $self->response($self->client->send_receive_service_msg($msg, $args));
-        if (my $err = $self->get_error) {
-            diag "error: $err";
-            fail;
-        }
-        else {
-            pass;
-        }
-    } ">> send $msg".($msg eq "COMMAND" ? ": ".$args->{COMMAND} : "");
+    $self->response($self->client->send_receive_service_msg($msg, $args));
+    if (my $err = $self->get_error) { die $err; }
 
     return $self->response->{PARAMS};
+}
+
+=head2 send_ok
+
+Like L</send> but wrapped in a C<lives_ok> test.
+
+=cut
+sub send_ok {
+    my ($self, $msg, $args) = @_;
+
+    my $result;
+    lives_ok {
+        $result = $self->send($msg, $args);
+    } ">> send $msg".($msg eq "COMMAND" ? ": ".$args->{COMMAND} : "");
+
+    return $result;
 }
 
 =head2 send_command_ok
