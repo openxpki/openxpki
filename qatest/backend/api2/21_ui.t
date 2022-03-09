@@ -23,7 +23,7 @@ use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 use OpenXPKI::Serialization::Simple;
 
-plan tests => 12;
+plan tests => 9;
 
 
 #
@@ -42,9 +42,6 @@ my $cert_info = $oxitest->create_cert(
     profile => "tls_server",
 );
 
-# set user role to be allowed to create workflows etc.
-$oxitest->set_user("democa" => "caop");
-
 #
 # Tests
 #
@@ -52,7 +49,7 @@ $oxitest->set_user("democa" => "caop");
 # get_ui_system_status
 
 lives_and {
-    my $wftest = $oxitest->create_workflow(
+    my $wftest = $oxitest->create_workflow_ok(
         "certificate_revocation_request_v2" => {
             cert_identifier => $cert_info->{identifier},
             reason_code => 'keyCompromise',
@@ -68,10 +65,10 @@ lives_and {
 } 'Create workflow: auto-revoke certificate' or die "Creating workflow failed";
 
 lives_ok {
-    my $wftest = $oxitest->create_workflow(
+    my $wftest = $oxitest->create_workflow_ok(
         "crl_issuance" => { force_issue => 1 }
     );
-} 'Issue CRL';
+} 'issue CRL';
 
 lives_and {
     my $data = $oxitest->api2_command('get_ui_system_status');
@@ -97,11 +94,11 @@ lives_and {
 
 ## list_process
 
-# we use the client to get real server process names
-my $client = $oxitest->new_client_tester;
-$client->login("democa" => "caop");
+$oxitest->client->login("democa" => "caop");
+
 lives_and {
-    my $data = $client->send_command_ok("list_process");
+    # we use the client to get real server process names
+    my $data = $oxitest->client->send_command_ok("list_process");
     cmp_deeply $data, superbagof(
         {
             info => re(qr/openxpki.*main/),
@@ -131,6 +128,7 @@ lives_and {
         namespace   => 'webui.motd',
         key         => '_any',
         value       => OpenXPKI::Serialization::Simple->new->serialize('rotflbtc'),
+        force       => 1,
     });
 
     my $data = $oxitest->api2_command('get_motd');

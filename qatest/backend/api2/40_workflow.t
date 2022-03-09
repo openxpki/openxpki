@@ -130,7 +130,7 @@ sub workflow_def {
         },
         'acl' => {
             'User' => { creator => ($acl // 'any'), fail => 1, resume => 1, wakeup => 1, archive => 1, attribute => 1 },
-            'Guard' => { techlog => 1, history => 1 },
+            'Guard' => { creator => 'any', techlog => 1, history => 1 },
         },
     };
 };
@@ -166,18 +166,18 @@ CTX('session')->data->role('User');
 CTX('session')->data->pki_realm("alpha");
 
 CTX('session')->data->user('wilhelm');
-my $wf_t1_sync =   $oxitest->create_workflow("wf_type_1_$uuid", $params);
-my $wf_t1_async1 = $oxitest->create_workflow("wf_type_1_$uuid", $params);
-my $wf_t1_async2 = $oxitest->create_workflow("wf_type_1_$uuid", $params);
+my $wf_t1_sync =   $oxitest->create_workflow_ok("wf_type_1_$uuid", $params);
+my $wf_t1_async1 = $oxitest->create_workflow_ok("wf_type_1_$uuid", $params);
+my $wf_t1_async2 = $oxitest->create_workflow_ok("wf_type_1_$uuid", $params);
 
 CTX('session')->data->user('franz');
-my $wf_t1_fail = $oxitest->create_workflow("wf_type_1_$uuid", $params);
+my $wf_t1_fail = $oxitest->create_workflow_ok("wf_type_1_$uuid", $params);
 
 CTX('session')->data->user('wilhelm');
-my $wf_t2 =   $oxitest->create_workflow("wf_type_2_$uuid", $params);
+my $wf_t2 =   $oxitest->create_workflow_ok("wf_type_2_$uuid", $params);
 
 CTX('session')->data->pki_realm("beta");
-my $wf_t4 =   $oxitest->create_workflow("wf_type_4_$uuid", $params);
+my $wf_t4 =   $oxitest->create_workflow_ok("wf_type_4_$uuid", $params);
 
 throws_ok {
     CTX('session')->data->pki_realm("alpha");
@@ -409,7 +409,7 @@ lives_and {
 #
 # get_workflow_log
 #
-throws_ok { $oxitest->api2_command("get_workflow_log" => { id => $wf_t1_sync->id }) } qr/no permission/i,
+throws_ok { $oxitest->api2_command("get_workflow_log" => { id => $wf_t1_sync->id }) } qr/I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE/i,
     "get_workflow_log() - throw exception on unauthorized user";
 
 CTX('session')->data->role('Guard');

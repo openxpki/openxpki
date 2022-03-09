@@ -21,6 +21,7 @@ my $oxitest = OpenXPKI::Test->new(
     with => [ qw( SampleConfig Server ) ],
     start_watchdog => 1,
 );
+
 #
 # We have to test API command "control_watchdog" via a client due to the
 # way OpenXPKI::Control->get_pids() collects process informations.
@@ -28,7 +29,8 @@ my $oxitest = OpenXPKI::Test->new(
 # processes started by the server as they would be in another process group as
 # the test process (that calls the API).
 #
-my $client = $oxitest->new_client_tester->login("democa" => "caop");
+
+$oxitest->client->login("democa" => "caop");
 
 #
 # Tests
@@ -40,7 +42,7 @@ sub is_run_status {
     my $tick = 0;
 
     while (1) {
-        my $result = $client->send_command_ok("control_watchdog" => { action => "status" });
+        my $result = $oxitest->client->send_command_ok("control_watchdog" => { action => "status" });
         my $is_running = (scalar @{ $result->{pid} } > 0);
         if ($expected ? ($is_running) : (not $is_running)) { pass $msg and last };
         last if ++$tick == $MAX_WAIT;
@@ -52,17 +54,17 @@ sub is_run_status {
 is_run_status 1, "status of running watchdog";
 
 lives_and {
-    $client->send_command_ok("control_watchdog" => { action => "stop" });
+    $oxitest->client->send_command_ok("control_watchdog" => { action => "stop" });
     is_run_status 0;
 } "stop watchdog";
 
 lives_and {
-    $client->send_command_ok("control_watchdog" => { action => "start" });
+    $oxitest->client->send_command_ok("control_watchdog" => { action => "start" });
     is_run_status 1;
 } "start watchdog again";
 
 lives_and {
-    my $result = $client->send_command_ok("control_watchdog" => { action => "status" });
+    my $result = $oxitest->client->send_command_ok("control_watchdog" => { action => "status" });
     cmp_deeply $result, { pid => [ re(qr/^\d+$/) ], children => 0 }
 } "watchdog status info";
 

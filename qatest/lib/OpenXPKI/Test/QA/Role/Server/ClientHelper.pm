@@ -37,6 +37,7 @@ use Test::More;
 use Test::Exception;
 
 # CPAN modules
+use Try::Tiny;
 
 # Project modules
 use OpenXPKI::Client;
@@ -74,12 +75,12 @@ has password => (
 
 =head1 METHODS
 
-=head2 client
+=head2 oxi_client
 
 Returns a reference to the L<OpenXPKI::Client> object internally used.
 
 =cut
-has client => (
+has oxi_client => (
     is => 'rw',
     isa => 'OpenXPKI::Client',
     init_arg => undef,
@@ -107,16 +108,18 @@ sub connect {
 
     return if $self->is_connected;
 
-    lives_ok {
+    try {
         # instantiating the client means starting it as all initialization is
         # done in the constructor
-        $self->client(
+        $self->oxi_client(
             OpenXPKI::Client->new({
                 TIMEOUT => 5,
                 SOCKETFILE => $self->socket_file,
             })
         );
-    } "create client instance" or die("Could not create client instance");
+    } catch {
+        BAIL_OUT("Could not create client instance: $_");
+    };
 }
 
 =head2 init_session
@@ -139,19 +142,20 @@ sub init_session {
 
     $self->connect;
 
-    lives_and {
-        $self->response($self->client->init_session($args));
+    try {
+        $self->response($self->oxi_client->init_session($args));
         # if we sent an active session...
         if ($args and $args->{'SESSION_ID'}) {
-            $self->is_next_step("SERVICE_READY");
+            $self->is_service_msg("SERVICE_READY") or die "expected next step SERVICE_READY";
         }
         else {
             # server wants the PKI realm only if there is more than one available
-            ok ($self->is_service_msg("GET_PKI_REALM") or $self->is_service_msg("GET_AUTHENTICATION_STACK")),
-             "<< server expects GET_PKI_REALM or GET_AUTHENTICATION_STACK"
-             or diag explain $self->response;
+            $self->is_service_msg("GET_PKI_REALM") or $self->is_service_msg("GET_AUTHENTICATION_STACK")
+              or die "expected next step GET_PKI_REALM or GET_AUTHENTICATION_STACK",
         }
-    } "initialize client session";
+    } catch {
+        BAIL_OUT("Could not initialize client session: $_");
+    };
 }
 
 =head2 login
@@ -174,24 +178,27 @@ B<Positional parameters>
 sub login {
     my ($self, $realm, $user) = @_;
 
-    $self->init_session unless ($self->is_connected and $self->client->get_session_id);
+    $self->init_session unless ($self->is_connected and $self->oxi_client->get_session_id);
 
-    subtest "client login" => sub {
+    try {
+        if ($self->oxi_client->is_logged_in) {
+            $self->oxi_client->logout;
+            $self->init_session;
+        }
+
         # requested by server only if there is more than one realm in the config
         if ($self->is_service_msg("GET_PKI_REALM")) {
-            plan tests => 6;
-            $self->send_ok('GET_PKI_REALM', { PKI_REALM => $realm });
-            $self->is_next_step("GET_AUTHENTICATION_STACK");
-        }
-        else {
-            plan tests => 4;
+            $self->send('GET_PKI_REALM', { PKI_REALM => $realm });
+            $self->is_service_msg("GET_AUTHENTICATION_STACK") or die "expected next step GET_AUTHENTICATION_STACK";
         }
 
-        $self->send_ok('GET_AUTHENTICATION_STACK', { AUTHENTICATION_STACK => 'OxiTestAuthStack' });
-        $self->is_next_step("GET_PASSWD_LOGIN");
+        $self->send('GET_AUTHENTICATION_STACK', { AUTHENTICATION_STACK => 'OxiTestAuthStack' });
+        $self->is_service_msg("GET_PASSWD_LOGIN") or die "expected next step GET_PASSWD_LOGIN";
 
-        $self->send_ok('GET_PASSWD_LOGIN', { LOGIN => $user, PASSWD => $self->password });
-        $self->is_next_step("SERVICE_READY");
+        $self->send('GET_PASSWD_LOGIN', { LOGIN => $user, PASSWD => $self->password });
+        $self->is_service_msg("SERVICE_READY") or die "expected next step SERVICE_READY";
+    } catch {
+        BAIL_OUT("Client login failed: $_");
     };
 
     return $self;
@@ -216,10 +223,10 @@ sub is_next_step {
         or diag("server response: ".explain($self->response));
 }
 
-=head2 send_ok
+=head2 send
 
 Sends the given message to the server using
-L<OpenXPKI::Client/send_receive_service_msg> and wraps that in a test.
+L<OpenXPKI::Client/send_receive_service_msg>.
 
 Returns the server response (I<HashRef>).
 
@@ -234,24 +241,32 @@ B<Positional parameters>
 =back
 
 =cut
-sub send_ok {
+sub send {
     my ($self, $msg, $args) = @_;
 
     die "Please call 'connect', 'init_session' or at least 'login' before sending commands"
      unless $self->is_connected;
 
-    lives_and {
-        $self->response($self->client->send_receive_service_msg($msg, $args));
-        if (my $err = $self->get_error) {
-            diag "error: $err";
-            fail;
-        }
-        else {
-            pass;
-        }
-    } ">> send $msg".($msg eq "COMMAND" ? ": ".$args->{COMMAND} : "");
+    $self->response($self->oxi_client->send_receive_service_msg($msg, $args));
+    if (my $err = $self->get_error) { die $err; }
 
     return $self->response->{PARAMS};
+}
+
+=head2 send_ok
+
+Like L</send> but wrapped in a C<lives_ok> test.
+
+=cut
+sub send_ok {
+    my ($self, $msg, $args) = @_;
+
+    my $result;
+    lives_ok {
+        $result = $self->send($msg, $args);
+    } ">> send $msg".($msg eq "COMMAND" ? ": ".$args->{COMMAND} : "");
+
+    return $result;
 }
 
 =head2 send_command_ok

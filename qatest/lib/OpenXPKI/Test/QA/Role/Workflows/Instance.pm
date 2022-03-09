@@ -5,6 +5,7 @@ use utf8;
 # Core modules
 use Test::More;
 use Test::Exception;
+use Moose::Util;
 
 # Project modules
 use OpenXPKI::Server::Context;
@@ -85,6 +86,11 @@ sub BUILD {
 
     die "Please specify either 'type' (to create a new workflow) or 'id' (fetch existing one)"
         unless $self->id || $self->type;
+
+    note "OpenXPKI::Test::QA::Role::Workflows: " . ($self->oxitest->meta->find_attribute_by_name('client')
+        ? "using client to send workflow related API commands"
+        : "using direct API access"
+    );
 
     # new workflow
     if ($self->type) {
@@ -168,7 +174,8 @@ sub execute {
             }
         );
         $self->last_wf_state($result->{workflow}) if $result->{workflow};
-    } "Executing workflow activity '$activity'";
+    } "Executing workflow activity '$activity'"
+      or BAIL_OUT('Error executing workflow activity');
 
     return $result;
 }
@@ -232,7 +239,8 @@ B<Positional Parameters>
 =cut
 sub state_is {
     my ($self, $expected_state) = @_;
-    is $self->state, $expected_state, "workflow state is '$expected_state'";
+    is $self->state, $expected_state, "workflow state is '$expected_state'"
+      or BAIL_OUT('Wrong workflow state');
 }
 
 __PACKAGE__->meta->make_immutable;

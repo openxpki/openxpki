@@ -89,8 +89,7 @@ my $oxitest = OpenXPKI::Test->new(
     },
 );
 
-my $client = $oxitest->new_client_tester;
-$client->login("democa" => "caop");
+$oxitest->client->login("democa" => "caop");
 
 sub wait_for_proc_state {
     my ($wfid, $state_regex) = @_;
@@ -98,7 +97,7 @@ sub wait_for_proc_state {
     my $result;
     my $count = 0;
     while ($count++ < 20) {
-        $result = $client->send_command_ok("search_workflow_instances" => { id => [ $wfid ] });
+        $result = $oxitest->client->send_command_ok("search_workflow_instances" => { id => [ $wfid ] });
         # no workflow found?
         if (not scalar @$result or $result->[0]->{'workflow_id'} != $wfid) {
             die("Workflow with ID $wfid not found");
@@ -117,7 +116,7 @@ sub wait_for_proc_state {
 my $result;
 
 lives_and {
-    $result = $client->send_command_ok("create_workflow_instance" => {
+    $result = $oxitest->client->send_command_ok("create_workflow_instance" => {
         workflow => "wf_type_1",
     });
 } "create_workflow_instance()";
@@ -137,7 +136,7 @@ wait_for_proc_state $wf_id, qr/^(finished|exception)$/;
 # get_workflow_info - check action results
 #
 lives_and {
-    $result = $client->send_command_ok("get_workflow_info" => { id => $wf_id });
+    $result = $oxitest->client->send_command_ok("get_workflow_info" => { id => $wf_id });
     cmp_deeply $result->{workflow}, superhashof( {
         'proc_state' => 'finished', # could be 'exception' if things go wrong
         'state' => 'SUCCESS',
@@ -149,7 +148,7 @@ lives_and {
 # get_workflow_history - check correct execution history
 #
 lives_and {
-    $result = $client->send_command_ok("get_workflow_history" => { id => $wf_id });
+    $result = $oxitest->client->send_command_ok("get_workflow_history" => { id => $wf_id });
     cmp_deeply $result, [
         superhashof({ workflow_state => "INITIAL", workflow_action => re(qr/initialize/i), workflow_description => re(qr/^EXECUTE/) }),
         superhashof({ workflow_state => "BACKGROUNDING", workflow_action => re(qr/pause_before_fork/i), workflow_description => re(qr/^PAUSED/) }), # pause

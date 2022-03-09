@@ -230,8 +230,7 @@ search_cert_ok "limit results and use offset", {
 my $uuid = Data::UUID->new->create_str;
 my $cert_info = $oxitest->create_cert(
     hostname => "acme-$uuid.local",
-    requestor_gname => 'Till',
-    requestor_name => $uuid,
+    requestor_realname => "Till $uuid",
     requestor_email => 'tilltom@morning',
 );
 

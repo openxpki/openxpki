@@ -86,6 +86,7 @@ before 'init_user_config' => sub { # ... so we do not overwrite user supplied co
     }
 
     $self->default_realm($self->test_realms->[0]); # set first one as default
+    # the default user that corresponds to $self->auth_config which we use is already set OpenXPKI::Test
 };
 
 sub _crypto {

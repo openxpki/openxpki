@@ -103,6 +103,8 @@ my $oxitest = OpenXPKI::Test->new(
 # create_workflow_instance
 #
 lives_and {
+    $oxitest->session->data->role('User');
+
     my $result = $oxitest->api2_command("get_rpc_openapi_spec" => {
         workflow => "wf_type_1_$uuid",
         input => [ qw( message size role revoke_workflow_id ) ],

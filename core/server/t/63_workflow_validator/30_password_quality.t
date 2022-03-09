@@ -152,6 +152,8 @@ my $oxitest = OpenXPKI::Test->new(
     add_config => $config,
 );
 
+$oxitest->session->data->role('User');
+
 # PLEASE NOTE:
 #   More tests regarding password validation are in
 #   core/server/t/92_api2_plugins/30_crypto_password_quality.t

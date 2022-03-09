@@ -135,21 +135,22 @@ before 'init_base_config' => sub { # happens before init_user_config() so we do 
     $config->_make_parent_dir($self->path_stderr_file);
 
     # add default configs
-    $self->_load_default_config("realm/democa",         $self->can('_customize_democa'));          # can() returns a CodeRef
+    $self->_load_default_config("realm/democa",         '_customize_democa');
     $self->_load_default_config("system/crypto.yaml");
     # NO $self->_load_default_config("system.database") -- it's completely customized for tests
     $self->_load_default_config("system/realms.yaml");
-    $self->_load_default_config("system/server.yaml",   $self->can('_customize_system_server'));   # can() returns a CodeRef
+    $self->_load_default_config("system/server.yaml",   '_customize_system_server');
     $self->_load_default_config("system/version.yaml");
-    $self->_load_default_config("system/watchdog.yaml", $self->can('_customize_system_watchdog')); # can() returns a CodeRef
+    $self->_load_default_config("system/watchdog.yaml", '_customize_system_watchdog');
 
     $self->default_realm("democa");
+    $self->default_user("caop");
 };
 
 # Loads the given default config YAML and adds it to the test environment,
 # customizing it if an additional CodeRef is given.
 sub _load_default_config {
-    my ($self, $node, $customizer_coderef) = @_;
+    my ($self, $node, $customizer) = @_;
     my @parts = split /\//, $node;
     $parts[-1] =~ s/\.yaml$//; # strip ".yaml" if it's a file
 
@@ -158,7 +159,7 @@ sub _load_default_config {
     # descent into config hash down to $node
     for (@parts) { $config_hash = $config_hash->{$_} };
     # customize config (call supplied method)
-    $customizer_coderef->($self, $config_hash) if $customizer_coderef;
+    $self->can($customizer)->($self, $config_hash) if $customizer; # can() returns a CodeRef
     # add configuration
     $self->add_conf(join(".",@parts) => $config_hash);
     return $config_hash;
