@@ -37,6 +37,7 @@ use Test::More;
 use Test::Exception;
 
 # CPAN modules
+use Try::Tiny;
 
 # Project modules
 use OpenXPKI::Client;
@@ -107,7 +108,7 @@ sub connect {
 
     return if $self->is_connected;
 
-    lives_ok {
+    try {
         # instantiating the client means starting it as all initialization is
         # done in the constructor
         $self->client(
@@ -116,7 +117,9 @@ sub connect {
                 SOCKETFILE => $self->socket_file,
             })
         );
-    } "create client instance" or BAIL_OUT("Could not create client instance");
+    } catch {
+        BAIL_OUT("Could not create client instance: $_");
+    };
 }
 
 =head2 init_session
@@ -139,19 +142,20 @@ sub init_session {
 
     $self->connect;
 
-    lives_and {
+    try {
         $self->response($self->client->init_session($args));
         # if we sent an active session...
         if ($args and $args->{'SESSION_ID'}) {
-            $self->is_next_step("SERVICE_READY");
+            $self->is_service_msg("SERVICE_READY") or die "expected next step SERVICE_READY";
         }
         else {
             # server wants the PKI realm only if there is more than one available
-            ok ($self->is_service_msg("GET_PKI_REALM") or $self->is_service_msg("GET_AUTHENTICATION_STACK")),
-             "<< server expects GET_PKI_REALM or GET_AUTHENTICATION_STACK"
-             or diag explain $self->response;
+            $self->is_service_msg("GET_PKI_REALM") or $self->is_service_msg("GET_AUTHENTICATION_STACK")
+              or die "expected next step GET_PKI_REALM or GET_AUTHENTICATION_STACK",
         }
-    } "initialize client session" or BAIL_OUT("Could not initialize client session");
+    } catch {
+        BAIL_OUT("Could not initialize client session: $_");
+    };
 }
 
 =head2 login
@@ -176,22 +180,20 @@ sub login {
 
     $self->init_session unless ($self->is_connected and $self->client->get_session_id);
 
-    subtest "client login" => sub {
+    try {
         # requested by server only if there is more than one realm in the config
         if ($self->is_service_msg("GET_PKI_REALM")) {
-            plan tests => 6;
-            $self->send_ok('GET_PKI_REALM', { PKI_REALM => $realm });
-            $self->is_next_step("GET_AUTHENTICATION_STACK");
-        }
-        else {
-            plan tests => 4;
+            $self->send('GET_PKI_REALM', { PKI_REALM => $realm });
+            $self->is_service_msg("GET_AUTHENTICATION_STACK") or die "expected next step GET_AUTHENTICATION_STACK";
         }
 
-        $self->send_ok('GET_AUTHENTICATION_STACK', { AUTHENTICATION_STACK => 'OxiTestAuthStack' });
-        $self->is_next_step("GET_PASSWD_LOGIN");
+        $self->send('GET_AUTHENTICATION_STACK', { AUTHENTICATION_STACK => 'OxiTestAuthStack' });
+        $self->is_service_msg("GET_PASSWD_LOGIN") or die "expected next step GET_PASSWD_LOGIN";
 
-        $self->send_ok('GET_PASSWD_LOGIN', { LOGIN => $user, PASSWD => $self->password });
-        $self->is_next_step("SERVICE_READY");
+        $self->send('GET_PASSWD_LOGIN', { LOGIN => $user, PASSWD => $self->password });
+        $self->is_service_msg("SERVICE_READY") or die "expected next step SERVICE_READY";
+    } catch {
+        BAIL_OUT("Client login failed: $_");
     };
 
     return $self;

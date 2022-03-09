@@ -23,7 +23,7 @@ use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 use OpenXPKI::Serialization::Simple;
 
-plan tests => 12;
+plan tests => 9;
 
 
 #
