@@ -518,7 +518,7 @@ sub start_txn {
 
     # we have to enforce the actual DB connection which clears
     # $self->_txn_starter at this point as otherwise the very first commit()
-    # $self->_txn_starter and think there is no running transaction.
+    # thinks that there is no running transaction.
     $self->ping;
 
     my $caller = [ caller ];
