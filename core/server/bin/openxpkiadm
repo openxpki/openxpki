@@ -563,7 +563,7 @@ sub __alias_update {
         }
 
         my $key = OpenXPKI::FileUtils->new()->read_file($filename) || '';
-        my ($extracted_keydata) = $key =~ m{ \A (-----BEGIN\ ([\w\s]*)PRIVATE\ KEY----- .+? -----END\ \2PRIVATE\ KEY-----) \Z }xms;
+        my ($extracted_keydata) = $key =~ m{ (-----BEGIN\ ([\w\s]*)PRIVATE\ KEY----- .+? -----END\ \2PRIVATE\ KEY-----) }xms;
         if ( !$extracted_keydata ) {
             print STDERR "ERROR: Could not parse private key data\n";
             return;
