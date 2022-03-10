@@ -12,6 +12,7 @@ use Scalar::Util;
 
 # CPAN modules
 # Project modules
+use OpenXPKI::Debug;
 
 =head1 COMMANDS
 
@@ -41,52 +42,129 @@ command "get_openapi_typespec" => {
 } => sub {
     my ($self, $params) = @_;
 
-    my $tree = $self->_parse($params->spec);
-    return $self->_translate_to_openapi($tree);
+    my $tree = $self->_parse_composition($params->spec);
+    return $self->_translate_types($tree);
 };
 
 # create an intermediate type spec tree (parse tree)
-sub _parse {
+sub _parse_composition {
     my ($self, $def) = @_;
 
     # basic checks
-    my $opening = () = $def =~ /\[/g;
-    my $closing = () = $def =~ /\]/g;
+    my $opening = () = $def =~ / (?<! \\ ) \[ /gx;
+    my $closing = () = $def =~ / (?<! \\ ) \] /gx;
     die "Unbalanced square brackets in type definition: $def" unless $opening == $closing;
 
-    $def =~ s/\s//gm;
+    ##! 8: "Raw definition:     $def"
+
+    # remove whitespaces outside enums <...>
+    my $stripped_def = '';
+    my $inside_brackets = 0;
+    my $escape_char = 0;
+    for my $char (split('', $def)) {
+        if ($inside_brackets) {
+            if ($escape_char)     { $escape_char = 0 }
+            elsif ('\\' eq $char) { $escape_char = 1 }
+            elsif ('>' eq $char)  { $inside_brackets = 0 }
+            $stripped_def .= $char; next;
+        }
+        else {
+            if ('<' eq $char) { $inside_brackets = 1 }
+            elsif ($char =~ /\s/) { next }
+            $stripped_def .= $char;
+        }
+    }
+
+    $def = $stripped_def;
+
+    ##! 8: "Whitespace cleanup: $def"
+
     my $root = [ $def ];
     my @to_parse = ($root); # list of child enumerations to parse
 
     while (my $children = shift @to_parse) {
         for my $child (@$children) {
-            my @parts = ($child =~ m/^ (?: ( [^\[\]():]+ ) : )? ( [^\[\]]+ ) (?: \[ (.*) \] )? $/msxi);
+            ##! 8: "COMPONENT: $child"
+            my @parts = ($child =~ m/^
+                (?:
+                    (
+                        [^\[\]():]+     # key (=name): anything but []():
+                    )
+                    :                   # colon
+                )?
+                (
+                    (?: \\ [\[\]] | [^\[\]] )+    # type: anything but plain []
+                )
+                (?:
+                    \[
+                        (.*)            # inner type (=subtype): anything between []
+                    \]
+                )?
+                $
+            /msxi);
             die "Wrong syntax at OpenAPI type specification: $child" unless scalar @parts;
 
-            my $inner = $parts[2];
+            my ($key, $type, $inner) = @parts;
+
+            ##! 8: "    KEY: " . ($key//"")
+            ##! 8: "   TYPE: " . ($type//"")
+            ##! 8: "  INNER: " . ($inner//"")
 
             my @inner_parts = ();
             if ($inner) {
                 # regex matching
-                @inner_parts = ($parts[2] =~ m/
-                    (?: [,\|]?
-                        (
-                            [^\[\],\|]+  # an item without sub items i.e. no brackets
-                            (?: \[     # balanced bracket matching
-                                (?:
-                                    [^\[\]] | (?R)
-                                )*
-                            \] )?
+                @inner_parts = ($inner =~ m/
+                        [,\|]?                          # comma or pipe
+                        (?<squarebracketgroup>          # balanced square brackets [] or none
+                            (?:                             # no square brackets:
+                                (?<bracketgroup>                # balanced brackets () or none - needed e.g. to distinct commata inside brackets from those in square brackets
+                                    (?:                             # no brackets:
+                                        \\ [\[\]\(\),\|]                    # escaped bracket, comma or pipe
+                                        |                               # or
+                                          [^\[\]\(\),\|]                    # anything but plain bracket, comma or pipe
+                                    )+
+                                    (?:                             # maybe: balanced brackets ()
+                                        (?<!\\) \(                      # opening balanced plain bracket
+                                            (?:                         # inside:
+                                                \\ [\[\]\(\)]                   # escaped bracket
+                                                |                           # or
+                                                  [^\[\]\(\)]                   # anything but plain bracket
+                                                |                           # or
+                                                (?&bracketgroup)        # recursively another "bracket group"
+                                            )*
+                                        (?<!\\) \)                      # closing balanced plain bracket
+                                    )?
+                                )
+                            )+
+                            (?:                             # maybe: balanced square brackets []
+                                (?<!\\) \[                      # opening balanced (plain) bracket
+                                    (?:                         # inside:
+                                        \\ [\[\]]                   # escaped bracket
+                                        |                           # or
+                                          [^\[\]]                   # anything but plain bracket
+                                        |                           # or
+                                        (?&squarebracketgroup)      # recursively another "square bracket group"
+                                    )*
+                                (?<!\\) \]                      # closing balanced (plain) bracket
+                            )?
                         )
-                    )
                 /gxi);
+                die "Wrong syntax at OpenAPI type specification: $inner" unless scalar @inner_parts;
+
+                # only take element 1, 3, 5 etc. (= outer capture group, the others are the inner "bracketgroup")
+                my @temp = ();
+                for (my $i = 0; $i <= $#inner_parts; $i++) {
+                    push @temp, $inner_parts[$i] if $i % 2 == 0;
+                }
+                @inner_parts = @temp;
+                ##! 8: "  INNER PARTS: " . Dumper(\@inner_parts)
                 push @to_parse, \@inner_parts;
             }
 
             # replace element in child list with parsed version (by assigning new content to lvalue for-loop variable)
             $child = {
-                key => $parts[0],  # might be undef
-                type => $parts[1], # mandatory
+                key => $key,  # might be undef
+                type => $type, # mandatory
                 inner => @inner_parts ? \@inner_parts: undef,
                 raw => $child,
             };
@@ -98,7 +176,7 @@ sub _parse {
 }
 
 # process the intermediate type spec tree and create an OpenAPI type definition tree
-sub _translate_to_openapi {
+sub _translate_types {
     my ($self, $tree) = @_;
 
     my $root;
@@ -144,8 +222,27 @@ sub _translate_to_openapi {
             }
         }
 
-        elsif (my @parts = $srcdef->{type} =~ /^ ( Int(?:eger)? | Num(?:eric)? | Str(?:ing)? | Bool(?:ean)? ) (?: \( ( [^()]+ ) \) )? $/xi) {
-            my ($type, $params) = @parts;
+        elsif (
+            my @parts = $srcdef->{type} =~ /
+                ^
+                ( Int(?:eger)? | Num(?:eric)? | Str(?:ing)? | Bool(?:ean)? )
+                (?:
+                    \(                      # opening bracket
+                        (
+                            (?:             # no brackets:
+                                \\ [\(\)]       # escaped brackets
+                                |               # or
+                                  [^\(\)]       # anything but plain brackets
+                            )+
+                        )
+                    \)                      # closing bracket
+                )?
+                $
+            /xi
+        ) {
+            my ($type, $param_str) = @parts;
+            ##! 8: "TYPE: $type"
+            ##! 8: "  PARAMS: " . ($param_str//"")
             $type = lc($type);
             $type = "string" if $type eq "str";
             $type = "integer" if $type eq "int";
@@ -155,12 +252,56 @@ sub _translate_to_openapi {
             $targetdef = { type => $type };
 
             # type parameters specified?
-            if ($params) {
-                for my $param (split ",", $params) {
-                    my ($k,$v) = split /[:=]/, $param;
-                    die "Invalid parameter syntax in round brackets in '".$srcdef->{raw}."'" unless defined $k && defined $v;
+            if ($param_str) {
+                my @params = $param_str =~ m/
+                    ,?                              # comma?
+                    (                               # balanced brackets <> or none (for enum)
+                        (?:                             # no brackets:
+                            \\ [<>,]                        # escaped bracket <> or comma
+                            |                               # or
+                              [^<>,]                        # anything but plain bracket or comma
+                        )+
+                        (?:                             # maybe: balanced brackets <>
+                            (?<!\\) <                       # opening balanced plain bracket
+                                (?:                         # inside:
+                                    \\ [<>]                     # escaped bracket
+                                    |                           # or
+                                      [^<>]                     # anything but plain bracket
+                                )*
+                            (?<!\\) >                       # closing balanced plain bracket
+                        )?
+                    )
+                /gxi;
+
+                for my $param (@params) {
+                    ##! 8: "    PARAM: $param"
+                    my ($k,@v) = split /:/, $param;
+                    die "Invalid parameter syntax in round brackets in '".$srcdef->{raw}."'" unless defined $k && scalar @v;
+                    my $v = join ":", @v;
                     $v = $v+0 if Scalar::Util::looks_like_number($v); # OpenAPI complains about numeric parameters in quotes
-                    $targetdef->{$k} = $v;
+                    if (lc($k) eq "enum") {
+                        ##! 8: "      ENUM: $v"
+                        $v =~ s/ ^ < (.*) > $ /$1/msxi;
+                        my @enum_values = $v =~ m/
+                            ,?                  # comma
+                            (
+                                (?:             # no brackets or comma:
+                                    \\ [<>,]        # escaped bracket <> or comma
+                                    |               # or
+                                      [^<>,]        # anything but plain bracket or comma
+                                )+
+                            )
+                        /gxi;
+
+                        # convert to numbers if parent type is integer
+                        @enum_values = map { $_+0 } @enum_values if $type eq "integer";
+
+                        ##! 8: "      ENUM VALUES: " . Dumper(\@enum_values)
+                        $targetdef->{$k} = \@enum_values;
+                    }
+                    else {
+                        $targetdef->{$k} = $v;
+                    }
                 }
             }
         }

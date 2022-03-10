@@ -5,6 +5,8 @@ use warnings;
 # Core modules
 use English;
 use FindBin qw( $Bin );
+use Scalar::Util;
+use B ();
 
 # CPAN modules
 use Test::More;
@@ -15,7 +17,8 @@ use Test::Exception;
 use lib "$Bin/../lib";
 use OpenXPKI::Test;
 
-plan tests => 9;
+# use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::API2::Plugin::Workflow::get_openapi_typespec'} = 100;
+
 
 
 my $oxitest = OpenXPKI::Test->new;
@@ -111,10 +114,72 @@ lives_and {
 } "type parameters";
 
 #
-# Complex nested type spec
+# Enum
 #
 lives_and {
-    my $result = CTX('api2')->get_openapi_typespec(spec => "Array[Hash[age:Int(minimum:0),size:Int,hobbies:Array[Str]]]");
+    my $result = CTX('api2')->get_openapi_typespec(spec =>
+        'String(minLength:5, maxLength:10, enum:<eins,zwei \, Komma,dr \> \] ei>)'
+    );
+    cmp_deeply $result, {
+        type => 'string',
+        minLength => 5,
+        maxLength => 10,
+        enum => [ 'eins', 'zwei \, Komma', 'dr \> \] ei' ],
+    } or diag explain $result;
+} "string enum";
+
+lives_and {
+    my $result = CTX('api2')->get_openapi_typespec(spec =>
+        'Array[String(minLength:5, maxLength:10, enum:<eins,zwei \, Komma,dr \> \] ei>) | Int(enum:<1,4,5>)]'
+    );
+
+    my $isnum = sub {
+        my $num = shift;
+        return sub {
+            my $v = shift;
+            # check if internal representation is numeric
+            #
+            my $b_obj = B::svref_2object(\$v);
+            my $flags = $b_obj->FLAGS;
+            my $comp_1 = ($flags & ( B::SVp_IOK | B::SVp_NOK ));
+            my $comp_2 = ($flags & B::SVp_POK);
+            return (0, "'$v' is represented as a string internally") unless ($comp_1 and not $comp_2);
+            return (0, "expected: $num, got: $v") unless ($v == $num);
+            return 1;
+        }
+    };
+
+    cmp_deeply $result, {
+        type => 'array',
+        items => {
+            'oneOf' => [
+                {
+                    type => 'string',
+                    minLength => 5,
+                    maxLength => 10,
+                    enum => [ 'eins', 'zwei \, Komma', 'dr \> \] ei' ],
+                },
+                {
+                    type => 'integer',
+                    enum => [
+                        code($isnum->(1)),
+                        num(4),
+                        num(5),
+                    ]
+                },
+            ]
+        }
+    } or diag explain $result;
+} "array with string and int enums";
+
+#
+# Complex nested type spec
+#
+
+lives_and {
+    my $result = CTX('api2')->get_openapi_typespec(spec =>
+        'Array[ Hash[ age:Int( minimum:0 ), size:Int, hobbies:Array[ Str(enum:<eins,zwei \, Komma,dr \> \] ei>) ]]]'
+    );
     cmp_deeply $result, {
         type => 'array',
         items => {
@@ -122,10 +187,28 @@ lives_and {
             properties => {
                 'age' => { type => 'integer', minimum => '0' },
                 'size' => { type => 'integer' },
-                'hobbies' => { type => 'array', items => { type => 'string'}, },
+                'hobbies' => { type => 'array', items => { type => 'string', enum => [ 'eins', 'zwei \, Komma', 'dr \> \] ei' ] }, },
             },
         }
     } or diag explain $result;
-} "complex nested type spec";
+} "complex nested type spec with whitespace everywhere";
 
-1;
+lives_and {
+    my $result = CTX('api2')->get_openapi_typespec(spec =>
+        'Array[Hash[age:Int(minimum:0),size:Int,hobbies:Array[Str(enum:<eins,zwei \, Komma,dr \> \] ei>)]]]'
+    );
+#    my $result = CTX('api2')->get_openapi_typespec(spec => 'Array[ Hash[ age:Int( minimum:0 ), size:Int, hobbies:Array[ Str(enum:<eins,zwei \, Komma,dr \> \] ei>) ]]]');
+    cmp_deeply $result, {
+        type => 'array',
+        items => {
+            type => 'object',
+            properties => {
+                'age' => { type => 'integer', minimum => '0' },
+                'size' => { type => 'integer' },
+                'hobbies' => { type => 'array', items => { type => 'string', enum => [ 'eins', 'zwei \, Komma', 'dr \> \] ei' ] }, },
+            },
+        }
+    } or diag explain $result;
+} "complex nested type spec with whitespace only in enum";
+
+done_testing;
