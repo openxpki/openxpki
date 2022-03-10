@@ -175,7 +175,7 @@ has digest_alg => (
 
 =head3 enc_alg
 
-Returns the name of the encryption algorithm used.
+Returns the name of the (symmetric) encryption algorithm used.
 
 Must be set when generating a success response.
 
@@ -186,6 +186,22 @@ has enc_alg => (
     isa => 'Str',
     lazy => 1,
     default => sub { return shift->request()->envelope()->{enc_alg}; }
+);
+
+
+=head3 key_alg
+
+Returns the name of the key algorithm used to encrypt the payload key.
+
+Must be set when generating a success response.
+
+=cut
+
+has key_alg => (
+    is => 'rw',
+    isa => 'Str',
+    lazy => 1,
+    default => sub { return shift->request()->envelope()->{key_alg}->[0]; }
 );
 
 =head3 signer
@@ -331,23 +347,38 @@ sub __extract_payload {
     my $req = $self->request()->parsed();
     my $ri = $req->{content}->{recipientInfos}->{riSet}->[0];
 
-    my $sym_key_enc = $ri->{encryptedKey};
-
     my $skey = $self->ratoken_key();
     OpenXPKI::Exception->throw(
         message => 'You must set the ratoken_key before you can decode the payload'
     ) unless ($skey);
 
+
+    my $key_alg = $self->key_alg();
+    OpenXPKI::Exception->throw(
+        message => 'Unsupported payload encrpytion algorithm used',
+        params => { key_alg => $key_alg }
+    ) unless ($key_alg =~ m{(rsaEncryption|rsaesOaep)});
+
+    my $sym_key_enc = $ri->{encryptedKey};
     my $content_key;
     if (ref $skey eq 'OpenXPKI::Crypto::Backend::API') {
         ##! 64: 'Token api'
+        my %padding;
+        $padding{PADDING} = 'oaep' if ($key_alg eq 'rsaesOaep');
+
         $content_key = $skey->command({
             COMMAND => 'decrypt_digest',
             DATA => $sym_key_enc,
+            %padding,
         });
     } elsif (ref $skey eq 'Crypt::PK::RSA') {
         ##! 64: 'RSA soft key'
-        $content_key = $skey->decrypt( $sym_key_enc, 'v1.5' );
+        if ($key_alg eq 'rsaesOaep') {
+            # we assume it is sha1 (no idea where to find what its really in?)
+            $content_key = $skey->decrypt( $sym_key_enc, 'oaep' );
+        } else {
+            $content_key = $skey->decrypt( $sym_key_enc, 'v1.5' );
+        }
     } else {
         OpenXPKI::Exception->throw( message => 'Invalid encryption key type', params => { skey => ref $skey } );
     }
@@ -628,8 +659,13 @@ sub create_cert_response {
     my $pkAlg = $cert->_cert()->PubKeyAlg();
     my ($encryptedKey, $keyEncAlg);
     if ($pkAlg eq 'RSA') {
-        $keyEncAlg = '1.2.840.113549.1.1.1';
-        $encryptedKey = Crypt::PK::RSA->new(\$rkey)->encrypt( $content_key, 'v1.5' );
+        if ($self->key_alg() eq 'rsaesOaep') {
+            $keyEncAlg = '1.2.840.113549.1.1.7';
+            $encryptedKey = Crypt::PK::RSA->new(\$rkey)->encrypt( $content_key, 'oaep' );
+        } else {
+            $keyEncAlg = '1.2.840.113549.1.1.1';
+            $encryptedKey = Crypt::PK::RSA->new(\$rkey)->encrypt( $content_key, 'v1.5' );
+        }
     # TODO - Support for ECC
     } else {
         die "Unsupported key algorithm for recipient";

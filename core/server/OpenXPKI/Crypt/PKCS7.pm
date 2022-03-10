@@ -68,6 +68,7 @@ our %oids = (
 
     # encryption key types
     '1.2.840.113549.1.1.1' => 'rsaEncryption',
+    '1.2.840.113549.1.1.7' => 'rsaesOaep',
     '1.2.840.10045.2.1' => 'ecPublicKey',
     '1.3.101.110' => 'curve25519',
     '1.3.101.112' => 'ed25519',

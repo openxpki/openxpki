@@ -67,8 +67,9 @@ sub get_command {
     push @command, ('-engine', $engine) if ($engine);
     push @command, ('-keyform', $keyform) if ($keyform);
 
-    push @command, ('-in', $self->write_temp_file( $self->{DATA} ));
+    push @command, ('-pkeyopt', 'rsa_padding_mode:'.$self->{PADDING}) if ($self->{PADDING});
 
+    push @command, ('-in', $self->write_temp_file( $self->{DATA} ));
     push @command, ('-out', $self->get_outfile());
 
     if ( defined $passwd ) {

@@ -98,7 +98,8 @@ sub __init_command_params : PRIVATE {
     "decrypt_digest"  => { 'DATA'   => 1,
                            'KEY' => 0,
                            'PASSWD' => 0,
-                           'CERT' => 0
+                           'CERT' => 0,
+                           'PADDING' => ["__undef","oaep","pkcs1"],
                          },
     "get_pkcs8_keytype" => { 'DATA'   => 1,
                             'PASSWD' => 1,

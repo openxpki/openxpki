@@ -138,6 +138,7 @@ command "scep_generate_cert_response" => {
     reply_nonce    => { isa => 'Str' },
     digest_alg  => { isa => 'Str', default => 'sha256' },
     enc_alg     => { isa => 'Str', default => 'aes-256-cbc' },
+    key_alg     => { isa => 'Str', default => 'rsaEncryption' },
 } => sub {
 
     my ($self, $params) = @_;
@@ -189,6 +190,7 @@ sub __generate_response {
         transaction_id => $params->transaction_id,
         digest_alg => $params->digest_alg,
         enc_alg => $params->enc_alg,
+        key_alg => $params->key_alg,
         ($mode eq 'success' ? (signer => OpenXPKI::Crypt::X509->new($params->signer)) : ()),
     );
 
