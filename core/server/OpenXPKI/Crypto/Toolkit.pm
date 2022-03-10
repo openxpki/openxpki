@@ -459,6 +459,11 @@ sub command {
             });
         }
 
+        # TODO - we need to clean this up - the first call reads STDOUT
+        # from the CLI object and passes the return valued to the command
+        # object. As most command send the payload to a dedicated outfile
+        # this is "only" the verbose output of the command itself which is
+        # also used by those commands to render the result
         my $result = $cli_of{$ident}->get_result();
         ##! 128: 'before get_result()'
         $result = $cmd_ref->get_result($result);

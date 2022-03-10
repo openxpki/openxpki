@@ -150,11 +150,14 @@ sub get_result {
     }
 
     if ($self->{OUT} eq "DER") {
-        $res .= $self->SUPER::get_result();
+        $res = $self->SUPER::get_result();
     } else {
-        # In mode OUT => "TXT" OpenSSL will only write to STDOUT, so we
-        # have to prevent SUPER::get_result() from dying on an empty OUTFILE.
-        $res .= eval { $self->SUPER::get_result('utf8') } // "";
+        # In mode OUT => "TXT" OpenSSL 1.0 will only write to STDOUT, so we need to
+        # check if the outfile exists
+        my $out = $self->get_outfile();
+        if (-e $out) {
+            $res .= $self->{FU}->read_file($out,'utf8');
+        }
     }
 
     return $res;

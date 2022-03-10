@@ -157,7 +157,8 @@ sub get_openssl_dn
 sub get_result
 {
     my $self = shift;
-    my $encoding = shift || '';
+    # the result string passed from toolkit - not used
+    my $toolkit_result = shift;
 
     if (!defined $self->{OUTFILE}) {
         OpenXPKI::Exception->throw (
@@ -165,8 +166,7 @@ sub get_result
         );
     }
 
-    my $ret = $self->{FU}->read_file($self->get_outfile(), $encoding );
-
+    my $ret = $self->{FU}->read_file($self->get_outfile());
     if (!defined $ret || $ret eq '') {
         OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_CRYPTO_OPENSSL_OUTFILE_IS_EMPTY",

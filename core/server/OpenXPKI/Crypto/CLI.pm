@@ -221,7 +221,7 @@ sub get_result {
     my $ret = 1;
     if ($stdout_file_of{$ident}) {
         ## there was an output
-        $ret = $fu_of{$ident}->read_file($stdout_file_of{$ident}, 'utf8');
+        $ret = $fu_of{$ident}->read_file($stdout_file_of{$ident});
         $ret = $engine_of{$ident}->filter_stdout($ret);
         if ($ret eq '') {
             $ret = 1;
