@@ -66,6 +66,16 @@ lives_and {
 #
 # Arrays
 #
+
+# without item type
+lives_and {
+    my $result = CTX('api2')->get_openapi_typespec(spec => "Array");
+    cmp_deeply $result, {
+        type => 'array',
+        items => {},
+    } or diag explain $result;
+} "array without item type";
+
 # with item type
 lives_and {
     my $result = CTX('api2')->get_openapi_typespec(spec => "Array[Str]");
@@ -89,6 +99,15 @@ lives_and {
 #
 # Objects
 #
+
+# without property specification
+lives_and {
+    my $result = CTX('api2')->get_openapi_typespec(spec => "Hash");
+    cmp_deeply $result, {
+        type => 'object',
+    } or diag explain $result;
+} "object without property specification";
+
 # with property specification
 lives_and {
     my $result = CTX('api2')->get_openapi_typespec(spec => "Hash[ name:Str, age:Int ]");
@@ -98,6 +117,19 @@ lives_and {
             'name' => { type => 'string' },
             'age' => { type => 'integer' },
         }
+    } or diag explain $result;
+} "object with property specification";
+
+# with required properties
+lives_and {
+    my $result = CTX('api2')->get_openapi_typespec(spec => "Hash[ name:Str!, age:Int ]");
+    cmp_deeply $result, {
+        type => 'object',
+        properties => {
+            'name' => { type => 'string' },
+            'age' => { type => 'integer' },
+        },
+        required => [ 'name' ],
     } or diag explain $result;
 } "object with property specification";
 
@@ -195,7 +227,7 @@ lives_and {
 
 lives_and {
     my $result = CTX('api2')->get_openapi_typespec(spec =>
-        'Array[Hash[age:Int(minimum:0),size:Int,hobbies:Array[Str(enum:<eins,zwei \, Komma,dr \> \] ei>)]]]'
+        'Array[Hash[age:Int(minimum:0),size:Int!,hobbies:Array[Str(enum:<eins,zwei \, Komma,dr \> \] ei>)]]]'
     );
 #    my $result = CTX('api2')->get_openapi_typespec(spec => 'Array[ Hash[ age:Int( minimum:0 ), size:Int, hobbies:Array[ Str(enum:<eins,zwei \, Komma,dr \> \] ei>) ]]]');
     cmp_deeply $result, {
@@ -207,6 +239,7 @@ lives_and {
                 'size' => { type => 'integer' },
                 'hobbies' => { type => 'array', items => { type => 'string', enum => [ 'eins', 'zwei \, Komma', 'dr \> \] ei' ] }, },
             },
+            required => [ 'size' ],
         }
     } or diag explain $result;
 } "complex nested type spec with whitespace only in enum";
