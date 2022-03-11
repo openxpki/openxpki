@@ -289,6 +289,8 @@ sub _translate_types {
                     die "Invalid parameter syntax in round brackets in '".$srcdef->{raw}."'" unless defined $k && scalar @v;
                     my $v = join ":", @v;
                     $v = $v+0 if Scalar::Util::looks_like_number($v); # OpenAPI complains about numeric parameters in quotes
+
+                    # enum
                     if (lc($k) eq "enum") {
                         ##! 8: "      ENUM: $v"
                         $v =~ s/ ^ < (.*) > $ /$1/msxi;
@@ -303,12 +305,19 @@ sub _translate_types {
                             )
                         /gxi;
 
-                        # convert to numbers if parent type is integer
-                        @enum_values = map { $_+0 } @enum_values if $type eq "integer";
+                        # convert to numbers if parent type is integer or number
+                        if ("integer" eq $type or "number" eq $type) {
+                            @enum_values = map { $_+0 } @enum_values ;
+                        }
+                        # unescape backslash escaped characters
+                        elsif ("string" eq $type) {
+                            @enum_values = map { s/ \\ (.) /$1/gmx; $_ } @enum_values ;
+                        }
 
                         ##! 8: "      ENUM VALUES: " . Dumper(\@enum_values)
                         $targetdef->{$k} = \@enum_values;
                     }
+                    # plain parameter
                     else {
                         $targetdef->{$k} = $v;
                     }

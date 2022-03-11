@@ -150,13 +150,13 @@ lives_and {
 #
 lives_and {
     my $result = CTX('api2')->get_openapi_typespec(spec =>
-        'String(minLength:5, maxLength:10, enum:<eins,zwei \, Komma,dr \> \] ei>)'
+        'String(minLength:5, maxLength:10, enum:<eins,zwei \\\, Komma,dr \> \] ei>)'
     );
     cmp_deeply $result, {
         type => 'string',
         minLength => 5,
         maxLength => 10,
-        enum => [ 'eins', 'zwei \, Komma', 'dr \> \] ei' ],
+        enum => [ 'eins', 'zwei \, Komma', 'dr > ] ei' ],
     } or diag explain $result;
 } "string enum";
 
@@ -189,7 +189,7 @@ lives_and {
                     type => 'string',
                     minLength => 5,
                     maxLength => 10,
-                    enum => [ 'eins', 'zwei \, Komma', 'dr \> \] ei' ],
+                    enum => [ 'eins', 'zwei , Komma', 'dr > ] ei' ],
                 },
                 {
                     type => 'integer',
@@ -219,7 +219,7 @@ lives_and {
             properties => {
                 'age' => { type => 'integer', minimum => '0' },
                 'size' => { type => 'integer' },
-                'hobbies' => { type => 'array', items => { type => 'string', enum => [ 'eins', 'zwei \, Komma', 'dr \> \] ei' ] }, },
+                'hobbies' => { type => 'array', items => { type => 'string', enum => [ 'eins', 'zwei , Komma', 'dr > ] ei' ] }, },
             },
         }
     } or diag explain $result;
@@ -237,7 +237,7 @@ lives_and {
             properties => {
                 'age' => { type => 'integer', minimum => '0' },
                 'size' => { type => 'integer' },
-                'hobbies' => { type => 'array', items => { type => 'string', enum => [ 'eins', 'zwei \, Komma', 'dr \> \] ei' ] }, },
+                'hobbies' => { type => 'array', items => { type => 'string', enum => [ 'eins', 'zwei , Komma', 'dr > ] ei' ] }, },
             },
             required => [ 'size' ],
         }
