@@ -185,6 +185,7 @@ sub _openapi_field_schema {
         if ($wf_field->{match}) {
             my $ecma_regex = $self->_perlre_to_ecma($wf_field->{match});
             if ($ecma_regex) {
+                $field->{type} = 'string';
                 $field->{pattern} = $ecma_regex;
             }
             else {
