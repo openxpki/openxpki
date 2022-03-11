@@ -106,7 +106,10 @@ sub _parse_composition {
 
             my ($key, $type, $inner) = @parts;
 
-            ##! 8: "    KEY: " . ($key//"")
+            # Type ending with "!" denotes a required Hash item
+            my $is_required_obj_item = (($type//"") =~ m/!$/); $type =~ s/!$//;
+
+            ##! 8: "    KEY: " . ($key//"") . ($is_required_obj_item ? " (required item)" : "")
             ##! 8: "   TYPE: " . ($type//"")
             ##! 8: "  INNER: " . ($inner//"")
 
@@ -157,6 +160,7 @@ sub _parse_composition {
                     push @temp, $inner_parts[$i] if $i % 2 == 0;
                 }
                 @inner_parts = @temp;
+
                 ##! 8: "  INNER PARTS: " . Dumper(\@inner_parts)
                 push @to_parse, \@inner_parts;
             }
@@ -165,8 +169,9 @@ sub _parse_composition {
             $child = {
                 key => $key,  # might be undef
                 type => $type, # mandatory
-                inner => @inner_parts ? \@inner_parts: undef,
+                inner => @inner_parts ? \@inner_parts: undef, # will be substituted in later loop run
                 raw => $child,
+                is_required_obj_item => $is_required_obj_item,
             };
 
         }
@@ -206,19 +211,24 @@ sub _translate_types {
             }
             # no array type specified
             else {
-                $targetdef->{items} = {};
+                $targetdef->{items} = {}; # OpenAPI treats {} as the "any-type"
             }
         }
 
         elsif ($srcdef->{type} =~ /^ ( Obj(ect)? | Hash(Ref)? ) $/xi) {
             $targetdef = { type => 'object' };
 
-            my $object_item_types = $srcdef->{inner};
+            my $object_items = $srcdef->{inner};
             # if object properties were specified
-            if ($object_item_types) {
+            if ($object_items) {
+                # creat empty container for object properties
                 my $properties = {};
-                $targetdef->{properties} = $properties;
-                push @todo, [ $srcdef, $properties, $_, $_->{key} ] for @$object_item_types;
+                $targetdef->{properties} = $properties; # the HashRef will be populated in a later loop run
+                # list required properties
+                my @required = map { $_->{key} } grep { $_->{is_required_obj_item} } @$object_items;
+                $targetdef->{required} = \@required if scalar @required;
+                # append object item to processing queue
+                push @todo, [ $srcdef, $properties, $_, $_->{key} ] for @$object_items;
             }
         }
 
