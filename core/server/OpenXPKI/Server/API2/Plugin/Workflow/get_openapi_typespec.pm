@@ -14,6 +14,14 @@ use Scalar::Util;
 # Project modules
 use OpenXPKI::Debug;
 
+# Allowed parameters for certain OpenAPI 3.0 data types.
+# Source: https://swagger.io/docs/specification/data-models/data-types/
+our %OPENAPI_ALLOWED_TYPE_PARAMETERS = (
+    number =>  [ qw( format nullable enum minimum maximum exclusiveMinimum exclusiveMaximum multipleOf ) ],
+    integer => [ qw( format nullable enum minimum maximum exclusiveMinimum exclusiveMaximum multipleOf ) ],
+    string =>  [ qw( format nullable enum minLength maxLength pattern ) ],
+);
+
 =head1 COMMANDS
 
 =head2 get_openapi_typespec
@@ -286,9 +294,18 @@ sub _translate_types {
                 for my $param (@params) {
                     ##! 8: "    PARAM: $param"
                     my ($k,@v) = split /:/, $param;
-                    die "Invalid parameter syntax in round brackets in '".$srcdef->{raw}."'" unless defined $k && scalar @v;
                     my $v = join ":", @v;
-                    $v = $v+0 if Scalar::Util::looks_like_number($v); # OpenAPI complains about numeric parameters in quotes
+                    die "Invalid parameter syntax in round brackets in '".$srcdef->{raw}."'" unless defined $k && scalar @v;
+
+                    # check if type allows this parameter
+                    if (my $allowed = $OPENAPI_ALLOWED_TYPE_PARAMETERS{$type}) {
+                        die "Parameter '$k' not allowed in OpenAPI type '$type'" unless scalar grep { m/^\Q$k\E$/ } @$allowed;
+                    }
+
+                    # OpenAPI complains about numeric parameters in quotes. If
+                    # we convert them to Perl's internal number representation
+                    # then JSON will output them without quotes.
+                    $v = $v+0 if Scalar::Util::looks_like_number($v);
 
                     # enum
                     if (lc($k) eq "enum") {

@@ -145,6 +145,10 @@ lives_and {
     } or diag explain $result;
 } "type parameters";
 
+throws_ok {
+    CTX('api2')->get_openapi_typespec(spec => "String(dummy:10)");
+} qr/not.*allowed/i, "wrong type parameters";
+
 #
 # Enum
 #
@@ -207,7 +211,6 @@ lives_and {
 #
 # Complex nested type spec
 #
-
 lives_and {
     my $result = CTX('api2')->get_openapi_typespec(spec =>
         'Array[ Hash[ age:Int( minimum:0 ), size:Int, hobbies:Array[ Str(enum:<eins,zwei \, Komma,dr \> \] ei>) ]]]'
@@ -229,7 +232,6 @@ lives_and {
     my $result = CTX('api2')->get_openapi_typespec(spec =>
         'Array[Hash[age:Int(minimum:0),size:Int!,hobbies:Array[Str(enum:<eins,zwei \, Komma,dr \> \] ei>)]]]'
     );
-#    my $result = CTX('api2')->get_openapi_typespec(spec => 'Array[ Hash[ age:Int( minimum:0 ), size:Int, hobbies:Array[ Str(enum:<eins,zwei \, Komma,dr \> \] ei>) ]]]');
     cmp_deeply $result, {
         type => 'array',
         items => {
