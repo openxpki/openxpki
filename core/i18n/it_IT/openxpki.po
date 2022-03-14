@@ -27,6 +27,14 @@ msgid "I18N_OPENXPKI_UI_APPLICATION_ERROR"
 msgstr "Errore sconosciuto dell’applicazione"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_APPROVAL_RULE_DNS_VALIDATION_LABEL"
+msgstr "Token Datasafe"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_APPROVAL_RULE_DOMAIN_VALIDATION_LABEL"
+msgstr "Richiesta di Revoca"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED"
 msgstr "Workflow"
 
@@ -2197,6 +2205,13 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_APPROVE_CSR_LABEL"
 msgstr "Approva la richiesta"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_APPROVE_WITH_COMMENT_DESC"
+msgstr ""
+"Approva questa richiesta di certificato. La richiesta deve essere approvata "
+"solo dopo aver verificato tutte le informazioni e aver ritenuto la richiesta "
+"legale e autorizzata!"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_ASK_CLIENT_PASSWORD_DESC"
 msgstr ""
@@ -4531,14 +4546,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
 msgstr "I Metadati sono stati aggiornati"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_DESC"
-msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_LABEL"
-msgstr "In Attesa di Approvazione"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC"
 msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
 
@@ -4835,17 +4842,6 @@ msgstr "SCEP Endpoint"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "Tipo"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_DESC"
-msgstr ""
-"Pubblica le Informazioni sulla Autorità di certificazione (CA, Certification "
-"Authority), ovvero Certificati della CA e Liste Revoche (CRL) in archivi "
-"predefiniti."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_LABEL"
-msgstr "Pubblica Informazioni CA"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_DESC"
@@ -7187,6 +7183,14 @@ msgstr "Chiave"
 #~ msgstr "FALLIMENTO"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_DESC"
+#~ msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_LABEL"
+#~ msgstr "In Attesa di Approvazione"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_DESC"
 #~ msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 
@@ -7299,6 +7303,17 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_LABEL"
 #~ msgstr "Esporta Certificato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_DESC"
+#~ msgstr ""
+#~ "Pubblica le Informazioni sulla Autorità di certificazione (CA, "
+#~ "Certification Authority), ovvero Certificati della CA e Liste Revoche "
+#~ "(CRL) in archivi predefiniti."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_LABEL"
+#~ msgstr "Pubblica Informazioni CA"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_DESC"

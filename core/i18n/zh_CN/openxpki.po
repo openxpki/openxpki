@@ -22,6 +22,14 @@ msgid "I18N_OPENXPKI_UI_APPLICATION_ERROR"
 msgstr "未知的应用程序错误"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_APPROVAL_RULE_DNS_VALIDATION_LABEL"
+msgstr "人员（安全电子邮件/身份验证）"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_APPROVAL_RULE_DOMAIN_VALIDATION_LABEL"
+msgstr "证书吊销请求"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED"
 msgstr "吊销ID"
 
@@ -1872,6 +1880,12 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_APPROVE_CSR_LABEL"
 msgstr "批准请求"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_APPROVE_WITH_COMMENT_DESC"
+msgstr ""
+"批准此证书申请。 仅当您已验证所有信息并确信此请求是合法且经过授权时，才这样"
+"做！"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_ASK_CLIENT_PASSWORD_DESC"
 msgstr ""
@@ -3935,14 +3949,6 @@ msgstr "所做的更改已保存到数据库中。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
 msgstr "元数据已更新"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_DESC"
-msgstr "此吊销请求需要批准。"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_LABEL"
-msgstr "等待批准"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC"
 msgstr ""
 "该工作流程已暂停，稍后将由系统继续。 您可以在下面找到有关暂停原因和计划的唤醒"
@@ -4203,14 +4209,6 @@ msgstr "私钥下载"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "类型"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_DESC"
-msgstr "此工作流程允许一次吊销多个证书。 您需要提供有效证书标识符的列表。"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_LABEL"
-msgstr "批量吊销请求"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_DESC"
 msgstr "通过电子邮件发送在30天之内到期的所有证书的到期通知。"
@@ -4702,6 +4700,14 @@ msgstr "是"
 #~ msgstr "已更新"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_DESC"
+#~ msgstr "此吊销请求需要批准。"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_LABEL"
+#~ msgstr "等待批准"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_DESC"
 #~ msgstr ""
 #~ "The certificate was issued and will be send to the SCEP client on request."
@@ -4755,6 +4761,14 @@ msgstr "是"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_LABEL"
 #~ msgstr "Certificate Export"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_DESC"
+#~ msgstr "此工作流程允许一次吊销多个证书。 您需要提供有效证书标识符的列表。"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_LABEL"
+#~ msgstr "批量吊销请求"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_DESC"

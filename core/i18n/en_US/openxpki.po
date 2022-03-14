@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2022-01-27 10:08+0100\n"
+"PO-Revision-Date: 2022-03-14 11:43+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -19,6 +19,12 @@ msgstr "Requested action not found"
 
 msgid "I18N_OPENXPKI_UI_APPLICATION_ERROR"
 msgstr "Unknown application error"
+
+msgid "I18N_OPENXPKI_UI_APPROVAL_RULE_DNS_VALIDATION_LABEL"
+msgstr "DNS Validation"
+
+msgid "I18N_OPENXPKI_UI_APPROVAL_RULE_DOMAIN_VALIDATION_LABEL"
+msgstr "CMDB/Domain Check"
 
 msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED"
 msgstr "Login with the given credentials failed!"
@@ -1796,6 +1802,13 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_APPROVE_CSR_LABEL"
 msgstr "Approve Request"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_APPROVE_WITH_COMMENT_DESC"
+msgstr ""
+"Approval of this request requires an additional comment due to policy "
+"reasons. Please describe the circumstances for you approval decission and "
+"continue only if you have validated all information and are convinced that "
+"this request is legal and authorized!"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_ASK_CLIENT_PASSWORD_DESC"
 msgstr ""
 "Please enter a password to protect your key. You need this password later to "
@@ -2043,7 +2056,7 @@ msgstr "Issue"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_POLICY_VIOLATION_COMMENT_DESC"
 msgstr ""
 "Please provide a justification why you need to submit a certificate request "
-"which does not comply with out policies."
+"which does not comply with our policies."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_POLICY_VIOLATION_COMMENT_LABEL"
 msgstr "Provide Justification"
@@ -2290,7 +2303,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVALS_LABEL"
 msgstr "Approvals"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVAL_ERRORS_LABEL"
-msgstr "Approval Errors"
+msgstr "Failed Approval Rules"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_LABEL"
 msgstr "CA Alias"
@@ -3834,12 +3847,6 @@ msgstr "The changes have been persisted to the database."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
 msgstr "Metadata was updated"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_DESC"
-msgstr "This metadata update request requires approval."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_LABEL"
-msgstr "Approval Pending"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC"
 msgstr ""
 "This workflow has been paused and will be continued later by the system. You "
@@ -4094,14 +4101,6 @@ msgstr "Private Key Download"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "Type"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_DESC"
-msgstr ""
-"This workflow allows the update of metadata for multiple certificates at "
-"once. You need to provide a list of certificate identifiers."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_LABEL"
-msgstr "Bulk Metadata Update Request"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_DESC"
 msgstr ""
@@ -4594,6 +4593,12 @@ msgstr "Yes"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_LABEL"
 #~ msgstr "Updated"
 
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_DESC"
+#~ msgstr "This metadata update request requires approval."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_LABEL"
+#~ msgstr "Approval Pending"
+
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_DESC"
 #~ msgstr ""
@@ -4659,6 +4664,14 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_LABEL"
 #~ msgstr "Certificate Export"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_DESC"
+#~ msgstr ""
+#~ "This workflow allows the update of metadata for multiple certificates at "
+#~ "once. You need to provide a list of certificate identifiers."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_LABEL"
+#~ msgstr "Bulk Metadata Update Request"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_DESC"

@@ -21,6 +21,14 @@ msgid "I18N_OPENXPKI_UI_APPLICATION_ERROR"
 msgstr "Application error"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_APPROVAL_RULE_DNS_VALIDATION_LABEL"
+msgstr "データセーフトークン"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_APPROVAL_RULE_DOMAIN_VALIDATION_LABEL"
+msgstr "証明書失効リクエスト"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED"
 msgstr "ワークフローの取り消し"
 
@@ -1919,6 +1927,12 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_APPROVE_CSR_LABEL"
 msgstr "リクエストの承認"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_APPROVE_WITH_COMMENT_DESC"
+msgstr ""
+"この証明書リクエストを承認します。すべての情報を検証し、このリクエストが認可"
+"されている場合のみ、リクエストを行ってください。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CSR_ASK_CLIENT_PASSWORD_DESC"
 msgstr ""
@@ -4095,14 +4109,6 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
 msgstr "メタデータ更新"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_DESC"
-msgstr "この失効リクエストには承認が必要です。"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_LABEL"
-msgstr "承認待ち"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC"
 msgstr "このワークフローは失敗し、再実行はできません"
 
@@ -4365,16 +4371,6 @@ msgstr "私有鍵のダウンロード"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_LABEL"
 msgstr "タイプ"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_DESC"
-msgstr ""
-"このワークフローでは、複数の証明書を一度に失効させることができます。有効な証"
-"明書識別子のリストを提供する必要があります。"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_LABEL"
-msgstr "一括失効リクエスト"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_DESC"
 msgstr ""
@@ -6567,6 +6563,14 @@ msgstr "はい"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_FAILURE_LABEL"
 #~ msgstr "失敗"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_DESC"
+#~ msgstr "この失効リクエストには承認が必要です。"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_LABEL"
+#~ msgstr "承認待ち"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_MISC_FINAL"
 #~ msgstr "このワークフローは最終状態です。"
 
@@ -6637,6 +6641,16 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_LABEL"
 #~ msgstr "証明書の認証"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_DESC"
+#~ msgstr ""
+#~ "このワークフローでは、複数の証明書を一度に失効させることができます。有効な"
+#~ "証明書識別子のリストを提供する必要があります。"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_LABEL"
+#~ msgstr "一括失効リクエスト"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_DESC"
