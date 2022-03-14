@@ -69,23 +69,27 @@ OpenXPKI::Server::Workflow::Activity::Tools::StringToArray
 
 =head1 Description
 
-Trigger notifications using the configured notifcation backends.
+Split a given string into a list using a regex.
 
-=head2 Message
 
-Specifiy the name of the message template to send using the I<message> parameter.
+=head2 Parameter
 
-=head2 Additional parameters
+=over
 
-To make arbitrary value available for the templates, you can specify additional
-parameters to be mapped into the notififer. Example:
+=item value
 
-    <action name="I18N_OPENXPKI_WF_ACTION_TEST_NOTIFY1"
-        class="OpenXPKI::Server::Workflow::Activity::Tools::Notify"
-        message="csr_created"
-        _map_fixed_value="a fixed value"
-        _map_from_context="$my_context_key">
-     </action>
+The string to split.
 
-The I<_map_> prefix is stripped, the remainder is used as key.
-Values starting with a $ sign are interpreted as context keys.
+=item target_key
+
+The context key to write the result to.
+
+=item regex
+
+The regex to split at, the default is I<\s+> (any whitespace character)
+
+=item modifier
+
+An optional modified to the regex pattern.
+
+=back
