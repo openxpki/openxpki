@@ -5,7 +5,6 @@ use warnings;
 use utf8;
 
 use Moose;
-use Net::DNS;
 use Template::Plugin;
 use MIME::Base64;
 use Data::Dumper;

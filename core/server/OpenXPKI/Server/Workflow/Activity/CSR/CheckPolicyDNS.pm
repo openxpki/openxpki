@@ -8,9 +8,8 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::DN;
-use Net::DNS;
-use OpenXPKI::Serialization::Simple;
 
+use OpenXPKI::Serialization::Simple;
 
 sub execute
 {
@@ -45,92 +44,28 @@ sub execute
 
     ##! 32: 'Items to check ' . Dumper \%items
     if (!%items) {
-        $context->param('check_policy_dns','');
+        $context->param( 'check_policy_dns' => undef );
         return 1;
     }
 
-
     CTX('log')->application()->info("Check DNS policy on these items: " . (join "|", keys %items));
 
-
-    my $resolver = Net::DNS::Resolver->new;
-
-    my $timeout = $self->param('timeout') || 30;
-    $resolver->udp_timeout( $timeout );
-    $resolver->tcp_timeout( $timeout );
-
-    # resolver waits until retrans interval has elapsed and we want the
-    # resolver to return quickly, so adjust retrans if timeout is small
-    if ($resolver->retrans > $timeout) {
-        $resolver->retrans($timeout);
-    }
-    $resolver->retry(1);
-
+    my $resolver = OpenXPKI::Server::Workflow::Activity::CSR::CheckPolicyDNS::DNSBackend->new();
     if ($self->param('servers')) {
         my @server = split /,/, $self->param('servers');
-        $resolver->nameservers( @server );
+        $resolver->resolver( \@server );
+    }
+    if (my $timeout = $self->param('timeout')) {
+        $resolver->timeout( $timeout );
     }
 
-    my @errors;
-    FQDN:
-    foreach my $fqdn (keys %items) {
-
-        # wildcard domains can not be checked so we skip them
-        if ($fqdn =~ m{^\*\.}) {
-            next;
-        }
-
-        # its useless if it is not a fqdn, we dont accept isolated hostnames here
-        if ($fqdn !~ m{ \A [a-z0-9] [a-z0-9-]* (\.[a-z0-9-]*[a-z0-9])+ \z }xi) {
-            push @errors, $fqdn;
-            next;
-        }
-
-        my $reply;
-        eval { $reply = $resolver->send( $fqdn ); };
-
-        ##! 64: 'resolv for ' . $fqdn . Dumper $reply
-        if (!$reply || !$reply->answer) {
-            ##! 32: 'No answer for ' . $fqdn . ' error: ' . $resolver->errorstring()
-            push @errors, $fqdn;
-            next FQDN;
-        }
-
-        if ($items{$fqdn} eq 'AC') {
-            ##! 32: 'Valid answer for ' . $fqdn
-            next;
-        }
-
-        if ($items{$fqdn} eq 'A') {
-            foreach my $rr ($reply->answer) {
-                if ($rr->type eq "A") {
-                    ##! 32: 'Valid a-record for ' . $fqdn
-                    next FQDN;
-                }
-            }
-            ##! 16: 'no a-record found for ' . $fqdn
-            push @errors, $fqdn;
-
-        } elsif ($items{$fqdn} eq 'A') {
-
-            foreach my $rr ($reply->answer) {
-                if ($rr->cname) {
-                    ##! 32: 'Valid c-record for ' . $fqdn
-                    next FQDN;
-                }
-            }
-            ##! 16: 'no c-record found for ' . $fqdn
-            push @errors, $fqdn;
-        }
-
-    }
+    my @errors = $resolver->check_dns(\%items);
 
     ##! 32: 'errors ' . Dumper \@errors
     if (@errors) {
+
         $context->param('check_policy_dns', $ser->serialize(\@errors) );
-
         CTX('log')->application()->info("Policy DNS check failed on " . scalar @errors . " items");
-
 
     } else {
         $context->param( { 'check_policy_dns' => undef } );
@@ -140,6 +75,24 @@ sub execute
 }
 
 1;
+
+package OpenXPKI::Server::Workflow::Activity::CSR::CheckPolicyDNS::DNSBackend;
+
+use Moose;
+with 'OpenXPKI::Role::DNSValidation';
+
+sub check_dns {
+
+    my $self = shift;
+    my $items = shift;
+
+    my $errors = $self->validate_dns($items);
+    return keys %$errors;
+
+}
+
+1;
+
 
 =head1 NAME
 
@@ -169,7 +122,7 @@ Check subject alternative name section, same values as check_cn.
 
 =item timeout
 
-The timeout (per query) in seconds, default is 30 seconds.
+The timeout (per query) in seconds, default is 10 seconds.
 
 =item servers
 
