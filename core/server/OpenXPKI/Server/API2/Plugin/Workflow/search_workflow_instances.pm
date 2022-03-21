@@ -266,7 +266,7 @@ sub _make_query_params {
         my $date = OpenXPKI::DateTime::get_validity({
             VALIDITY => $args->last_update_after,
             VALIDITYFORMAT => 'detect',
-        })->iso8601();
+        })->strftime("%F %T");
         $where->{workflow_last_update}={'>',$date};
     }
 
@@ -274,7 +274,7 @@ sub _make_query_params {
         my $date = OpenXPKI::DateTime::get_validity({
             VALIDITY => $args->last_update_before,
             VALIDITYFORMAT => 'detect',
-        })->iso8601();
+        })->strftime("%F %T");
 
         if ($where->{workflow_last_update}) {
             # extract date from existing query hash from .._after

@@ -41,7 +41,10 @@ sub dbi_connect_params { }
 sub perform_checks { }
 
 # Commands to execute after connecting
-sub on_connect { }
+sub on_connect {
+    my ($self, $dbh) = @_;
+    $dbh->do("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY--MM-DD HH24:MI:SS'");
+}
 
 # Parameters for SQL::Abstract::More
 sub sqlam_params {
