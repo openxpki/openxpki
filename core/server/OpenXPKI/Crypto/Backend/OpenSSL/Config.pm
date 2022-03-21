@@ -134,7 +134,7 @@ sub dump
     if ($self->{CONFDIR}) {
         $self->{FILENAME}->{CONFIG} = $self->{CONFDIR}."/openssl.cnf";
 
-        ##! 2: "write configuration file ($tmpdir/openssl.cnf)"
+        ##! 2: "write configuration file " . $self->{FILENAME}->{CONFIG}
         # writes a "non-temporary" file in the temporary directory
         $self->__get_fu()->write_file ({
             FILENAME => $self->{FILENAME}->{CONFIG},
@@ -252,7 +252,9 @@ sub build_config
 
         ##! 4: "PROFILE exists => CRL or cert generation"
         $config .= $self->__get_ca();
-        $config .= $self->__get_extensions('v3ca');
+        # there might be cases where we do not have any extensions but
+        # as the section is hard coded as reference we need an empty one
+        $config .= $self->__get_extensions('v3ca') || "[ v3ca ]\n";
 
     }
 
