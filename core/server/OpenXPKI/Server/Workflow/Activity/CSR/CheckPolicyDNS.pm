@@ -50,14 +50,16 @@ sub execute
 
     CTX('log')->application()->info("Check DNS policy on these items: " . (join "|", keys %items));
 
-    my $resolver = OpenXPKI::Server::Workflow::Activity::CSR::CheckPolicyDNS::DNSBackend->new();
+
+    my %dnsparam;
     if ($self->param('servers')) {
         my @server = split /,/, $self->param('servers');
-        $resolver->resolver( \@server );
+        $dnsparam{resolver} = \@server;
     }
     if (my $timeout = $self->param('timeout')) {
-        $resolver->timeout( $timeout );
+        $dnsparam{timeout} = $timeout;
     }
+    my $resolver = OpenXPKI::Server::Workflow::Activity::CSR::CheckPolicyDNS::DNSBackend->new(%dnsparam);
 
     my @errors = $resolver->check_dns(\%items);
 
