@@ -53,7 +53,7 @@ sub certificate_id {
     my $filename = $params{file};
 
     if ( !-r $filename ) {
-        print STDERR "ERROR: filename '$filename' is not readable\n";
+        print STDERR "filename '$filename' is not readable\n";
         return 2;
     }
 
@@ -210,7 +210,7 @@ sub certificate_remove {
         }
 
         if ( $is_issuer ) {
-            print STDERR "ERROR: Certificate not deleted because it is referenced as the issuer of "
+            print STDERR "Certificate not deleted because it is referenced as the issuer of "
                 . $cnt . " certificate(s) in the database.\n";
             return 2;
         }
@@ -233,7 +233,7 @@ sub certificate_remove {
         return 0;
     }
     else {
-        print STDERR "ERROR: Certificate $name "
+        print STDERR "Certificate $name "
           . "(identifier: $identifier) not found in database.\n";
         return 2;
     }
@@ -351,13 +351,13 @@ sub alias_add {
         } elsif ($insert_hash{alias} eq $duplicate_alias->{alias}) {
             return if ($params{"force-ignore-existing"});
         } else {
-            print STDERR "ERROR: certificate exisits in group with a different alias\n";
+            print STDERR "certificate exisits in group with a different alias\n";
             print STDERR __alias_print($duplicate_alias);
             return 2;
         }
 
         if (!$params{"force-update-existing"}) {
-            print STDERR "ERROR: certificate already exisits in group\n";
+            print STDERR "certificate already exisits in group\n";
             print STDERR "Alias: " . $duplicate_alias->{alias} . "\n";
             return 2;
         }
@@ -386,7 +386,7 @@ sub alias_add {
         my $chain_ref = CTX('api2')->get_chain( 'start_with' => $insert_hash{identifier} );
 
         if ($chain_ref->{complete} != 1) {
-            print STDERR "ERROR: unable to find root certificate\n";
+            print STDERR "unable to find root certificate\n";
             return 2;
         }
         my $root_identifier = pop @{$chain_ref->{identifiers}};
@@ -505,14 +505,14 @@ sub __alias_update {
                 $dt = OpenXPKI::DateTime::parse_date_utc( $params{notbefore} );
             };
             if ($EVAL_ERROR || !$dt) {
-                print STDERR "ERROR: Could not parse notbefore date\n";
+                print STDERR "Could not parse notbefore date\n";
                 return;
             }
 
             $insert_hash->{notbefore} = $dt->epoch();
 
             if ($insert_hash->{notbefore} < $certificate->{notbefore}) {
-                print STDERR "ERROR: notbefore exceeds certificate validity\n";
+                print STDERR "notbefore exceeds certificate validity\n";
                 return;
             }
         }
@@ -530,13 +530,13 @@ sub __alias_update {
                 $dt = OpenXPKI::DateTime::parse_date_utc( $params{notafter} );
             };
             if ($EVAL_ERROR || !$dt) {
-                print STDERR "ERROR: Could not parse notafter date\n";
+                print STDERR "Could not parse notafter date\n";
                 return;
             }
             $insert_hash->{notafter} = $dt->epoch();
 
             if ($insert_hash->{notafter} > $certificate->{notafter}) {
-                print STDERR "ERROR: notafter exceeds certificate validity\n";
+                print STDERR "notafter exceeds certificate validity\n";
                 return;
             }
         }
@@ -558,14 +558,14 @@ sub __alias_update {
     if ($params{key}) {
         my $filename = $params{key};
         if ( !-r $filename ) {
-            print STDERR "ERROR: filename '$filename' is not readable\n";
+            print STDERR "filename '$filename' is not readable\n";
             return;
         }
 
         my $key = OpenXPKI::FileUtils->new()->read_file($filename) || '';
         my ($extracted_keydata) = $key =~ m{ (-----BEGIN\ ([\w\s]*)PRIVATE\ KEY----- .+? -----END\ \2PRIVATE\ KEY-----) }xms;
         if ( !$extracted_keydata ) {
-            print STDERR "ERROR: Could not parse private key data\n";
+            print STDERR "Could not parse private key data\n";
             return;
         }
 
@@ -579,17 +579,17 @@ sub __alias_update {
 
         my $token = $client->run_command("get_token_info", { alias => $insert_hash->{alias} });
         if (!$token || !$token->{key_store}) {
-            print STDERR "ERROR: Unable to get token information!\n";
+            print STDERR "Unable to get token information!\n";
             return;
         } elsif ($token->{key_store} eq "DATAPOOL") {
 
             my $check_dv = $client->run_command("get_datavault_status", { check_online => 1 });
             if (!$check_dv) {
-                print STDERR "ERROR: You must setup a datavault token before you can import keys into the system!\n";
+                print STDERR "You must setup a datavault token before you can import keys into the system!\n";
                 return;
             }
             if (!$check_dv->{online}) {
-                print STDERR "ERROR: Your datavault token is not online, unable to import key!\n";
+                print STDERR "Your datavault token is not online, unable to import key!\n";
                 return;
             }
 
@@ -606,7 +606,7 @@ sub __alias_update {
             if ($res) {
                 printf "Successfully wrote key to datapool with key '%s'\n", $token->{key_name};
             } else {
-                print STDERR "ERROR: Problems writing key to datapool!\n";
+                print STDERR "Problems writing key to datapool!\n";
                 return;
             }
 
@@ -615,11 +615,11 @@ sub __alias_update {
             # name of the keyfile
             my $keyfile = $token->{key_name};
             if(-e $keyfile && !$params{'force-update-key'}) {
-                print STDERR "ERROR: key file '$keyfile' exists, won't override!\n";
+                print STDERR "key file '$keyfile' exists, won't override!\n";
                 return;
             }
             if (!-d dirname($keyfile)) {
-                print STDERR "ERROR: directory for '$keyfile' does not exists, won't create it!\n";
+                print STDERR "directory for '$keyfile' does not exists, won't create it!\n";
                 return;
             }
             open (my $fh, ">", $keyfile) || die "Unable to open $keyfile for writing\n";
@@ -627,15 +627,15 @@ sub __alias_update {
             close $fh;
 
             my $user = CTX('config')->get(['system','server','user']);
-            my $uid = getpwnam($user) // die "$user not known"; # might be 0 in Docker so we need //, not ||
+            my $uid = getpwnam($user) // die "$user not known\n"; # might be 0 in Docker so we need //, not ||
 
             my $group = CTX('config')->get(['system','server','user']);
-            my $gid = getgrnam($group) // die "$group not known";
-            chown ($uid, $gid, $keyfile) || die "Unable to chown $keyfile to $uid/$gid";
-            chmod oct("0400"), $keyfile || die "Unable to change mode on $keyfile";
+            my $gid = getgrnam($group) // die "$group not known\n";
+            chown ($uid, $gid, $keyfile) || die "Unable to chown $keyfile to $uid/$gid\n";
+            chmod oct("0400"), $keyfile || die "Unable to change mode on $keyfile\n";
             print "Successfully wrote key to $keyfile\n";
         } else {
-            printf STDERR "ERROR: Unsupported key storage method (%s)!\n", $token->{key_store};
+            printf STDERR "Unsupported key storage method (%s)!\n", $token->{key_store};
             return;
         }
     }
@@ -647,8 +647,7 @@ sub __read_cert_from_file {
 
     my $filename = shift;
     if ( !-r $filename ) {
-        print STDERR "ERROR: filename '$filename' is not readable\n";
-        exit 2;
+        die "filename '$filename' is not readable\n";
     }
 
     my $FileUtils = OpenXPKI::FileUtils->new();
@@ -660,8 +659,7 @@ sub __read_cert_from_file {
         # DER encoded?
         my $cert = Crypt::X509->new( cert => $certdata );
         if ($cert->error) {
-            print STDERR "ERROR: Could not parse certificate data\n";
-            exit 2;
+            die "Could not parse certificate data from $filename\n";
         }
         my $pem = encode_base64($certdata, '');
         chomp $pem;
@@ -878,7 +876,7 @@ sub alias_show {
                 return;
             }
         }
-        open(my $fh, ">", $file) || die "Unable to write to $file";
+        open(my $fh, ">", $file) || die "Unable to write to $file\n";
         print $fh $pem;
         close ($fh);
         print "Certificate was written to $file\n";
@@ -959,7 +957,7 @@ sub certificate_chain {
     if ( !defined $certificate
         && !defined $params{'force-certificate-not-found'} )
     {
-        print STDERR "ERROR: Certificate '$cert_name' not found in realm "
+        print STDERR "Certificate '$cert_name' not found in realm "
           . "$params{realm}.\n";
         return 2;
     }
@@ -990,7 +988,7 @@ sub certificate_chain {
     if ( !defined $issuer
         && !defined $params{'force-issuer-certificate-not-found'} )
     {
-        print STDERR "ERROR: Issuer certificate '$issuer_name' "
+        print STDERR "Issuer certificate '$issuer_name' "
           . "(identifier: $issuer_identifier) not found in database.\n";
         return 2;
     }
@@ -1174,7 +1172,7 @@ sub certificate_list {
             }
         }
     }
-    exit 0;
+    return 0;
 }
 
 sub alias_del {
@@ -1369,7 +1367,7 @@ eval {
 if ($cmd eq 'initdb') {
 
     push @options_spec, qw(dry-run force);
-    die "initdb is no longer supported!\nPlease use the provided schema dumps to setup your database.";
+    die "initdb is no longer supported!\nPlease use the provided schema dumps to setup your database.\n";
 
 } elsif ($cmd eq 'certificate') {
 
@@ -1576,13 +1574,13 @@ if ($cmd eq 'initdb') {
     delete $ENV{OPENXPKI_CONF_PATH};
 
     if (!$params{config}) {
-        die "You must provide the path to the source config using --config!";
+        die "You must provide the path to the source config using --config!\n";
     }
 
-    -e $params{config} || die "Given config path does not exist!";
+    -e $params{config} || die "Given config path does not exist!\n";
     my $config = OpenXPKI::Config::Backend->new( LOCATION => $params{config} );
     if (!$config->exists('system')) {
-        die "Loaded config does not contain the system node!";
+        die "Loaded config does not contain the system node!\n";
     }
 
     my $target = $params{output} || 'config.oxi';
@@ -1595,7 +1593,7 @@ if ($cmd eq 'initdb') {
     }
 
     my $raw = freeze($config->_config());
-    open FILE, ">", $target || die "Unable to open/write to $target";
+    open FILE, ">", $target || die "Unable to open/write to $target\n";
     # Signed config
     if ($params{key} && $params{cert}) {
         my $FileUtils = OpenXPKI::FileUtils->new;
@@ -1623,7 +1621,7 @@ if ($cmd eq 'initdb') {
         $command->wait();
 
         if ($command->exit_status() != 0 || ! -e $outfile) {
-            die "Signature creation failed (OpenSSL returned ".$command->exit_status().")";
+            die "Signature creation failed (OpenSSL returned ".$command->exit_status().")\n";
         }
 
         my $pkcs7  = $FileUtils->read_file($outfile);
@@ -1717,14 +1715,23 @@ if ($cmd eq 'initdb') {
 
 };
 
+# the oracle driver misbehaves if we destroy the handle without a
+# proper disconnect so we check for a dbi object and calldisconnect
+if (OpenXPKI::Server::Context::hascontext('dbi')) {
+    CTX('dbi')->disconnect();
+}
+if (OpenXPKI::Server::Context::hascontext('dbi_log')) {
+    CTX('dbi_log')->disconnect();
+}
+
 if (ref $EVAL_ERROR eq "OpenXPKI::Exception") {
     print  OpenXPKI::i18n::gettext($EVAL_ERROR->message()) ."\n";
     map { print "   $_: " . $EVAL_ERROR->params->{$_} ."\n";  } keys %{$EVAL_ERROR->params};
     print "\n";
     exit 1;
 } elsif (my $eval_err = $EVAL_ERROR) {
-    die $eval_err;
-    print "\n";
+    print STDERR "Command failed: $eval_err";
+    exit 1;
 } elsif ($ret) {
     print "\n";
     pod2usage( -verbose => 0 ) if ($ret == 1 || $ret == 255);
