@@ -179,7 +179,7 @@ sub key_usable {
         return 0;
     }
 
-    if ($CHILD_ERROR != 0) {
+    if ($CHILD_ERROR > 0) {
         ##! 4: "nCipher nfkminfo returned error code $CHILD_ERROR"
         CTX('log')->system()->error('nCipher key_usable command returned with error: ' . $CHILD_ERROR);
 
@@ -354,7 +354,7 @@ sub online {
         );
     }
 
-    if ($CHILD_ERROR != 0) {
+    if ($CHILD_ERROR > 0) {
     ##! 4: "nCipher enquiry: hardserver is not running (error code $CHILD_ERROR)"
     OpenXPKI::Exception->throw (
         message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_ONLINE_COMMAND_INVOCATION_ERROR",
@@ -465,7 +465,7 @@ sub __getKeyHash {
         );
     }
 
-    if ($CHILD_ERROR != 0) {
+    if ($CHILD_ERROR > 0) {
         ##! 2: "nCipher nfkmverify returned error code $CHILD_ERROR"
     OpenXPKI::Exception->throw (
         message => "I18N_OPENXPKI_CRYPTO_OPENSSL_ENGINE_NCIPHER_GETKEYHASH_COMMAND_INVOCATION_ERROR",
