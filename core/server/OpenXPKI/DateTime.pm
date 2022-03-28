@@ -138,6 +138,7 @@ sub get_validity {
         if ( $validityformat eq 'relativedate' ) {
             ( $relative, $validity ) =
               ( $validity =~ m{ \A ([+\-]?)(\d+) \z }xms );
+            $relative ||= '+';
         }
 
         if ( ( !defined $validity ) || ( $validity eq "" ) ) {
@@ -291,7 +292,12 @@ Possible validity formats (specified via VALIDITYFORMAT):
 =item *
 
 'relativedate': the specified validity is interpreted as a relative
-terse date string. This is the default.
+terse date string. The default is to calculate a date with a positive
+offset (future date), to get a date in the past, add a minus sign as
+prefix, e.g. to get current time yesterday I<-000001>. A leading
+plus sign is also accepted but superfluous.
+
+This is the default format.
 
 =item *
 
