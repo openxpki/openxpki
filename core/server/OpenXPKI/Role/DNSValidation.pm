@@ -86,7 +86,7 @@ sub validate_dns {
         }
         if ($items->{$fqdn} =~ m{C}) {
             foreach my $rr ($reply->answer) {
-                if ($rr->cname) {
+                if ($rr->type eq "CNAME") {
                     ##! 32: 'Valid c-record for ' . $fqdn
                     next FQDN;
                 }
