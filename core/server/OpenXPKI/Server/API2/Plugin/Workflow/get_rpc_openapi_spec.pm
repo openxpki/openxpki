@@ -181,6 +181,11 @@ sub _openapi_field_schema {
             $field = { %$field, %$match };
         }
 
+        # SELECT fields
+        if ($wf_field->{option}) {
+            $field->{enum} = [ map { $_->{value} } @{ $wf_field->{option} } ];
+        }
+
         # field contains regular expression
         if ($wf_field->{match}) {
             my $ecma_regex = $self->_perlre_to_ecma($wf_field->{match});
@@ -193,7 +198,7 @@ sub _openapi_field_schema {
             }
         }
 
-        if (!scalar keys %$field) {
+        if (not scalar keys %$field) {
             push @missing_fields, $wf_field->{name};
             $field = { type => 'unknown' };
         }

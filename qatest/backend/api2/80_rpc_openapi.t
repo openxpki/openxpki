@@ -127,7 +127,8 @@ lives_and {
                 },
                 'role' => {
                     description => 'role label',
-                    type => 'string'
+                    type => 'string',
+                    enum => [ '_any', 'User', 'RA Operator' ],
                 },
                 'revoke_workflow_id' => {
                     description => 'I18N_OPENXPKI_UI_REVOCATION_WORKFLOW_ID',
@@ -146,7 +147,8 @@ lives_and {
                 },
                 'role' => {
                     description => 'role label',
-                    type => 'string'
+                    type => 'string',
+                    enum => [ '_any', 'User', 'RA Operator' ],
                 },
             },
             required => [ 'message', 'role' ],
