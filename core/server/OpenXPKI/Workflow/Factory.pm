@@ -211,9 +211,8 @@ sub get_field_info {
             }
 
             if ($mode eq 'map') {
-                # expects that item is a link to a deeper hash structure
-                # where the each hash item has a key "label" set
-                # will hide items with an empty label
+                # Expects 'item' to be a link to a deeper hash structure where each
+                # hash item has a key "label" set. Hides items with an empty label.
                 foreach my $key (@item) {
                     my $label = $conn->get( [ @field_path, 'option', 'item', $key, 'label' ] );
                     next unless ($label);
@@ -225,7 +224,7 @@ sub get_field_info {
 
             } else {
                 # the minimum default - use keys as labels
-                @option = map { { value => $_, label => $_  } }  @item;
+                @option = map { { value => $_, label => $_  } } @item;
             }
         }
         $field->{option} = \@option;
