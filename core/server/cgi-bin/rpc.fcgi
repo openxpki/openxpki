@@ -63,8 +63,8 @@ my $error_msg = {
     50003 => 'Workflow terminated in unexpected state',
     50004 => 'Unable to query OpenAPI specification from OpenXPKI server',
     50005 => 'ENV variable "server" and servername are both set but are mutually exclusive',
-    50006 => 'ENV variable "server" requested but endpoint is not set',
-    50007 => 'Requested endpoint is not properly configured',
+    50006 => 'ENV variable "server" requested but RPC endpoint could not be determined from URL',
+    50007 => 'Requested RPC endpoint is not configured properly',
 };
 
 # Takes the given error code and returns a HashRef like
