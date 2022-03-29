@@ -32,14 +32,13 @@ sub instance {
     OpenXPKI::Exception->throw (message => "I18N_OPENXPKI_WORKFLOW_FACTORY_INSTANCE_METHOD_NOT_SUPPORTED");
 }
 
-sub create_workflow{
-    my ( $self, $wf_type, $context ) = @_;
-    ##! 1: 'start'
+sub _create_wf {
+    my ( $self, $wf_type, $context, $create_as ) = @_;
 
     OpenXPKI::Exception->throw (
         message => 'I18N_OPENXPKI_UI_WORKFLOW_CREATE_NOT_ALLOWED',
         params =>  { type => $wf_type }
-    ) unless($self->can_create_workflow($wf_type));
+    ) unless($self->can_create_workflow($wf_type, $create_as));
 
     if (!$context) {
         $context = OpenXPKI::Workflow::Context->new();
@@ -48,20 +47,16 @@ sub create_workflow{
     return $self->SUPER::create_workflow( $wf_type, $context, 'OpenXPKI::Server::Workflow' );
 }
 
+sub create_workflow {
+    my ( $self, $wf_type, $context ) = @_;
+    ##! 1: 'start'
+    return $self->_create_wf($wf_type, $context)
+}
+
 sub create_workflow_as_system {
     my ( $self, $wf_type, $context,  ) = @_;
     ##! 1: 'start'
-
-    OpenXPKI::Exception->throw (
-        message => 'I18N_OPENXPKI_UI_WORKFLOW_CREATE_NOT_ALLOWED',
-        params =>  { type => $wf_type }
-    ) unless($self->can_create_workflow($wf_type, 'System'));
-
-    if (!$context) {
-        $context = OpenXPKI::Workflow::Context->new();
-    }
-
-    return $self->SUPER::create_workflow( $wf_type, $context, 'OpenXPKI::Server::Workflow' );
+    return $self->_create_wf($wf_type, $context, 'System')
 }
 
 sub fetch_workflow {
