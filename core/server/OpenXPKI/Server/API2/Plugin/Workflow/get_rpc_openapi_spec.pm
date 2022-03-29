@@ -233,11 +233,18 @@ sub _openapi_field_schema {
         # add hints to description
         $field->{description} .= ' ('.join(' ', @hints).')' if scalar @hints;
 
+        # Consistency checks
+        OpenXPKI::Exception->throw(
+            message => 'Inconsistency found: enum/select field is not allowed to have "match" specified',
+            params => { workflow => $workflow, field => $fieldname }
+        ) if ($field->{pattern} and $field->{enum});
+
+
         $field_specs->{$fieldname} = $field;
     }
 
     if (@missing_fields) {
-        CTX('log')->system()->warn("Missing definitions for OpenAPI Spec for $workflow / ".join(", ", @missing_fields));
+        CTX('log')->system()->warn("Missing definitions for OpenAPI spec for $workflow / ".join(", ", @missing_fields));
     }
 
     return {
