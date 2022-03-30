@@ -13,7 +13,7 @@ use Test::More;
 use Test::Deep;
 use Test::Exception;
 
-#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Workflow::Validator::BasicFieldType.*'} = 100;
+#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Workflow::Validator::BasicFieldType.*'} = 32;
 
 # Project modules
 use lib "$Bin/../lib";
@@ -22,20 +22,23 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Test;
 
 
-my $wf_type; # current workflow type
+my $WF_TYPE; # current workflow type
+my $FIELD_NAME; # current field name
 
 #
 # Setup test context
 #
 sub create_test {
-    my ($param_yaml) = @_;
+    my ($field_def) = @_;
 
     # global variable
-    $wf_type = "testwf".int(rand(2**32));
+    $WF_TYPE = "testwf".int(rand(2**32));
+
+    ($FIELD_NAME) = keys %$field_def;
 
     my $cfg = YAML::Tiny->read_string("
         head:
-            prefix: $wf_type
+            prefix: $WF_TYPE
             persister: OpenXPKI
         acl:
             User:
@@ -49,23 +52,18 @@ sub create_test {
             testit:
                 class: OpenXPKI::Server::Workflow::Activity::Noop
                 input:
-                    - myfield
-        field:
-            myfield:
-                name: myfield
+                    - $FIELD_NAME
+        field: {}
     ")->[0];
 
-    $cfg->{field}->{myfield} = {
-        %{ $cfg->{field}->{myfield} },
-        %{ YAML::Tiny->read_string($param_yaml)->[0] },
-    } if $param_yaml;
+    $cfg->{field} = $field_def;
 
     # test object
     return OpenXPKI::Test->new(
         with => [ qw( TestRealms ) ],
         also_init => "workflow_factory",
         add_config => {
-            "realm.alpha.workflow.def.$wf_type" => $cfg,
+            "realm.alpha.workflow.def.$WF_TYPE" => $cfg,
         },
     );
 }
@@ -76,7 +74,7 @@ sub _create_wf {
     # Create workflow
     lives_and {
         #$workflow = $oxitest->create_workflow($WORKFLOW_TYPE);
-        $workflow = CTX('workflow_factory')->get_factory->create_workflow($wf_type);
+        $workflow = CTX('workflow_factory')->get_factory->create_workflow($WF_TYPE);
         ok ref $workflow;
     } "Create test workflow" or die("Could not create workflow");
 
@@ -86,8 +84,8 @@ sub _create_wf {
 sub _test_field {
     my ($input) = @_;
     my $wf = _create_wf();
-    $wf->context->param("myfield" => $input) if defined $input;
-    $wf->execute_action("${wf_type}_testit");
+    $wf->context->param($FIELD_NAME, $input) if defined $input;
+    $wf->execute_action("${WF_TYPE}_testit");
 }
 
 sub is_valid {
@@ -107,54 +105,62 @@ sub validation_fails {
 #
 
 sub test_field_with($$) {
-    my ($field_config, $test_cb) = @_;
+    my ($cfg, $test_cb) = @_;
 
     # default
-    my $oxitest = create_test($field_config);
+    my $oxitest = create_test($cfg);
     $oxitest->session->data->role('User');
 
-    $field_config =~ s/\n/ | /gm;
-    subtest "$field_config" => sub {
+    my $cfg_str = YAML::Tiny->new(values %$cfg)->write_string();
+    $cfg_str =~ s/^---\n//m;
+    $cfg_str =~ s/^\s+//g;
+    $cfg_str = join " | ", split /\n/, $cfg_str;
+
+    subtest "$cfg_str" => sub {
         $test_cb->();
     };
 
-    $oxitest->dbi->delete_and_commit(from => 'workflow', where => { workflow_type => $wf_type });
+    $oxitest->dbi->delete_and_commit(from => 'workflow', where => { workflow_type => $WF_TYPE });
 }
 
+my $error = qr/I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_INVALID/;
+
 # no validation
-test_field_with '' => sub {
+test_field_with { myfield => {} }, sub {
     is_valid("anything");
     is_valid("");
     is_valid(undef);
+    is_valid("sn\x{00F6}\x{0664}w\x{2150}flake"); # UTF-8
 };
 
 # REQUIRED
-test_field_with 'required: 1' => sub {
-    validation_fails(undef, qr/I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_INVALID/);
+test_field_with { myfield => { required => 1 } }, sub {
+    validation_fails(undef, $error);
 };
 
 # MATCH
-test_field_with 'match: ^snow.*$' => sub {
+test_field_with { myfield => { match => '^sn\x{00F6}\x{0664}w\x{2150}.*$' } }, sub {
     is_valid(undef);
     is_valid('');
-    is_valid('snowflake');
-    validation_fails('asnow', qr/I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_INVALID/);
-    validation_fails('now', qr/I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_INVALID/);
+    is_valid("sn\x{00F6}\x{0664}w\x{2150}flake");
+    validation_fails('asnow', $error);
+    validation_fails('nö٤w', $error);
 };
-# UTF-8 does not work
-# test_field_with 'match: ^snö٤😃.*$' => sub {
-#     is_valid(undef);
-#     is_valid('');
-#     is_valid('snö٤😃flake');
-#     validation_fails('nö٤', qr/I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_INVALID/);
-# };
 
 # MIN / MAX = array expected
-test_field_with "min: 1\nmax: 2" => sub {
+test_field_with { myfield => { min => 1, max => 2 } }, sub {
     is_valid(undef);
     is_valid([ 'a', 'b' ]);
-    validation_fails('', qr/I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_INVALID/);
-    validation_fails('anything', qr/I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_INVALID/);
+    validation_fails('', $error);
+    validation_fails('anything', $error);
+};
+
+# invalid UTF-8 non-character code points
+test_field_with { myfield => {} }, sub {
+    validation_fails("\x{FDD0}", $error);
+};
+test_field_with { _hidden_field => {} }, sub {
+    is_valid("\x{FDD0}", $error);
 };
 
 done_testing;

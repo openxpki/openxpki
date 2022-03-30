@@ -271,16 +271,16 @@ sub __process_fields {
         # check if validator is needed
         #
         my $is_array = ($conn->exists( [ @path, 'min' ] ) || $conn->exists( [ @path, 'max' ] ));
+        my $type = $conn->get( [ @path, 'type' ] ) || '';
         # As the upstream "required" validator accepts the empty string as
         # true which we want to be "false" we do not set the required flag
         # but use our own field type validator
         my $required = $conn->get( [ @path, 'required' ] );
         my $is_required = (defined $required && $required =~ m/(yes|1)/i);
         my $match = $conn->get( [ @path, 'match' ] ) || '';
-        if ($is_array || $is_required || $match) {
-            ##! 64: "Adding basic validator for $context_key with $is_array:$is_required:$match"
-            $field->{basic_validator} = sprintf ("%s::%01d:%01d:%s", $context_key, $is_array, $is_required, $match);
-        }
+
+        ##! 64: "Adding basic validator for $context_key with $type:$is_array:$is_required:$match"
+        $field->{basic_validator} = sprintf ("%s:%s:%01d:%01d:%s", $context_key, $type, $is_array, $is_required, $match);
 
         push @result, $field;
     }
@@ -326,7 +326,7 @@ sub __process_actions {
                     }
                 );
             }
-            push @basic_validator, $field->{basic_validator} if $field->{basic_validator};
+            push @basic_validator, $field->{basic_validator} if $field->{basic_validator}; # 'basic_validator' is set in __process_fields()
             push @fields, { name => $field->{context_key}, is_required => 'no' };
             $self->logger()->debug("- adding field $field_name / $field->{context_key}");
         }
