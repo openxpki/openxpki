@@ -28,7 +28,7 @@ sub _validate {
 
         if (!defined $val) {
             ##! 32: 'undefined ' . $field
-            push @no_value, $field if ($is_required);
+            push @no_value, $field if $is_required;
             next;
         }
 
@@ -45,7 +45,7 @@ sub _validate {
         }
 
         if ($regex) {
-            my @value = (ref $val) ? @{$val} : ($val);
+            my @value = ref $val ? @{$val} : ($val);
             $regex = qr/$regex/;
             foreach my $vv (@value) {
                 # skip empty
@@ -58,15 +58,15 @@ sub _validate {
         }
 
         # ignore deep checks on refs for now
-        if ( ref $val ) {
-            ##! 32: 'found ref - skipping ' . $field
+        if (ref $val) {
+            ##! 32: 'found ref - skipping "required" and utf-8 checks for ' . $field
             next;
         }
 
         # check for empty string
-        if ( $val eq '' ) {
+        if ($is_required and $val eq '') {
             ##! 32: 'empty string ' . $field
-            push @no_value, { name => $field, error => "I18N_OPENXPKI_UI_VALIDATOR_EMPTY_BUT_REQUIRED" } if ($is_required);
+            push @no_value, { name => $field, error => "I18N_OPENXPKI_UI_VALIDATOR_EMPTY_BUT_REQUIRED" };
             next;
         }
 
