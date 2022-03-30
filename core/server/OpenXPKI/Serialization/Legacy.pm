@@ -56,9 +56,7 @@ sub new {
 
 sub _json {
     my $self = shift;
-    if (!$self->{JSON}) {
-        $self->{JSON} = JSON->new->allow_blessed;
-    }
+    $self->{JSON} = JSON->new->utf8->allow_blessed unless $self->{JSON};
     return $self->{JSON};
 }
 
@@ -539,7 +537,7 @@ sub __read_json {
 
     # utf8::upgrade( $msg );
     ##! 4: 'json data ' . $msg
-    my $json = JSON->new()->decode( $msg );
+    my $json = $self->_json->decode( $msg );
 
     ##! 4: 'json decoded ' . Dumper $json
 
