@@ -3,7 +3,7 @@ package OpenXPKI::Serialization::JSON;
 use strict;
 use warnings;
 
-use JSON -convert_blessed_universally;
+use JSON;
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use English;
@@ -21,8 +21,7 @@ sub new
 
     my $keys = shift;
 
-    $self->{JSON} = JSON->new(%{$keys});
-    $self->{JSON}->allow_nonref;
+    $self->{JSON} = JSON->new(%{$keys})->allow_nonref;
     return unless defined $self->{JSON};
 
     return $self;
