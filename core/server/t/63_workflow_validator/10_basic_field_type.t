@@ -88,16 +88,21 @@ sub _test_field {
     $wf->execute_action("${WF_TYPE}_testit");
 }
 
+sub _fmt_input {
+    my ($input) = @_;
+    return '' unless $input;
+    my $input_fmt = join "", map { /[a-z0-9\(\)]/i ? $_ : sprintf '\\x{%02x}', ord $_ } split //, $input;
+    return defined $input_fmt ? "input '$input_fmt'" : "empty input";
+}
+
 sub is_valid {
     my ($input) = @_;
-    my $input_fmt = defined $input ? "input '$input'" : "empty input";
-    lives_ok { _test_field($input) } "$input_fmt is valid";
+    lives_ok { _test_field($input) } _fmt_input($input)." is valid";
 }
 
 sub validation_fails {
     my ($input, $error) = @_;
-    my $input_fmt = defined $input ? "input '$input'" : "empty input";
-    throws_ok { _test_field($input) } $error, "$input_fmt raises exception";
+    throws_ok { _test_field($input) } $error, _fmt_input($input)." raises exception";
 }
 
 #
@@ -112,11 +117,11 @@ sub test_field_with($$) {
     $oxitest->session->data->role('User');
 
     my $cfg_str = YAML::Tiny->new(values %$cfg)->write_string();
-    $cfg_str =~ s/^---\n//m;
+    $cfg_str =~ s/^---\s+//m;
     $cfg_str =~ s/^\s+//g;
-    $cfg_str = join " | ", split /\n/, $cfg_str;
+    $cfg_str = join ", ", split /\n/, $cfg_str;
 
-    subtest "$cfg_str" => sub {
+    subtest "$FIELD_NAME = $cfg_str" => sub {
         $test_cb->();
     };
 
