@@ -18,10 +18,6 @@ use Log::Log4perl qw(:easy);
 use lib "$Bin/../../lib", "$Bin/../../../core/server/t/lib";
 use OpenXPKI::Test;
 
-
-plan tests => 42;
-
-
 #
 # Init helpers
 #
@@ -301,10 +297,10 @@ $result = search_cert_ok "that is VALID now and valid before somewhen in the fut
 # OPERATOR = [ EQUAL | LIKE | BETWEEN ]
 # Note that the $uuid is used both in requestor name and hostname (subject)
 $result = search_cert_ok "by attributes (operators LIKE and EQUAL)" => {
-    cert_attributes => [
-        { KEY => 'meta_requestor', VALUE => "*$uuid*" }, # default operator is LIKE
-        { KEY => 'meta_email', VALUE => 'tilltom@morning', OPERATOR => 'EQUAL' },
-    ],
+    cert_attributes => {
+        meta_requestor => { -like => "%$uuid%" },
+        meta_email => 'tilltom@morning',
+    },
     pki_realm => "_ANY"
 }, "NO_CHECK";
 
@@ -314,9 +310,9 @@ cmp_deeply $result, [
 
 # Test NOT_EQUAL operator
 $result = search_cert_ok "by attributes (operator NOT_EQUAL)" => {
-    cert_attributes => [
-        { KEY => 'meta_requestor', VALUE => "Till $uuid", OPERATOR => 'NOT_EQUAL' },
-    ],
+    cert_attributes => {
+        meta_requestor => { '!=' => "Till $uuid" },
+    },
     pki_realm => "_ANY"
 }, "NO_CHECK";
 
@@ -338,10 +334,10 @@ cmp_deeply $result, array_each(
 
 # Github issue #501 - SQL JOIN statement breaks when searching for attributes AND profile
 $result = search_cert_ok "by attributes and profile (issue #501)" => {
-    cert_attributes => [
-        { KEY => 'meta_requestor', VALUE => "*$uuid*" }, # default operator is LIKE
-        { KEY => 'meta_email', VALUE => 'tilltom@morning', OPERATOR => 'EQUAL' },
-    ],
+    cert_attributes => {
+        meta_requestor => { -like => "%$uuid%" },
+        meta_email => 'tilltom@morning',
+    },
     profile => $cert_info->{profile},
     pki_realm => "_ANY"
 }, "NO_CHECK";
@@ -352,10 +348,10 @@ cmp_deeply $result, [
 
 # Github issue #575 - search_cert fails on Oracle when ORDER = 'identifier'
 $result = search_cert_ok "by attributes and with ORDER = 'identifier' (issue #575)" => {
-    cert_attributes => [
-        { KEY => 'meta_requestor', VALUE => "*$uuid*" }, # default operator is LIKE
-        { KEY => 'meta_email', VALUE => 'tilltom@morning', OPERATOR => 'EQUAL' },
-    ],
+    cert_attributes => {
+        meta_requestor => { -like => "%$uuid%" },
+        meta_email => 'tilltom@morning',
+    },
     order => "identifier",
     pki_realm => "_ANY"
 }, "NO_CHECK";
@@ -364,12 +360,6 @@ cmp_deeply $result, [
     superhashof({ subject => re(qr/$uuid/i) })
 ], "Correct result";
 
-$uuid = Data::UUID->new->create_str;
-my $umlaut_cert_info = $oxitest->create_cert(
-    hostname => "acme-$uuid.local",
-    requestor_gname => 'Till Tyskøl',
-    requestor_name => $uuid,
-    requestor_email => 'tilltom@morning',
-);
-
 $oxitest->delete_testcerts; # only deletes those from OpenXPKI::Test::CertHelper::Database
+
+done_testing;
