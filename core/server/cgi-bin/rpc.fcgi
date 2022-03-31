@@ -24,7 +24,7 @@ our $config;
 my $log;
 
 my $use_status_codes = 0;
-my $json = JSON::PP()->new->utf8;
+my $json = JSON::PP->new->utf8;
 
 # Use plain scalars as boolean values. The default representation as
 # JSON::PP::Boolean would cause the values to be serialized later on.
