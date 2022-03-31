@@ -133,7 +133,7 @@ so you can use asterisk (*) as placeholder)
 =item * C<status> L<CertStatus|OpenXPKI::Server::API2::Types/CertStatus> - certificate status
 
 =item * C<cert_attributes> I<HashRef> - key is attribute name, value is passed
-"as is" as where statement on value, see documentation of SQL::Abstract.
+"as is" as where statement on value, see documentation of L<SQL::Abstract>.
 You can search for "non existing" attributes by passing I<undef> as value
 (works only as scalar value part).
 
