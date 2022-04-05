@@ -190,7 +190,6 @@ sub __generate_response {
         transaction_id => $params->transaction_id,
         digest_alg => $params->digest_alg,
         enc_alg => $params->enc_alg,
-        key_alg => $params->key_alg,
         ($mode eq 'success' ? (signer => OpenXPKI::Crypt::X509->new($params->signer)) : ()),
     );
 
@@ -202,6 +201,7 @@ sub __generate_response {
 
     if ($mode eq 'success') {
         my $chain = $self->api->get_chain( start_with => $params->identifier, format => 'DER' );
+        $req->key_alg( $params->key_alg );
         $req->certs( $chain->{certificates} );
         return encode_base64($req->create_cert_response());
     }
