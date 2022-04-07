@@ -373,15 +373,15 @@ var o=function(e){return e instanceof ArrayBuffer?(f="_encoded_base64_".concat(f
 p.set(f,a),(0,x.debug)("".concat(e," = ").concat(l[0].clonable?"[".concat(a,"]"):'"'.concat(a,'"')))}
 for(c.s();!(t=c.n()).done;){var f
 d()}}catch(m){c.e(m)}finally{c.f()}return this._fromEntries(p)}},{key:"setFieldValue",value:function(e,n){var r=this
-if((0,x.debug)("oxi-section/form (".concat(this.args.def.action,"): setFieldValue (").concat(e.name,' = "').concat(n,'")')),e.value=n,void 0!==n&&""!==n&&this.setFieldError(e,""),!e.actionOnChange)return Promise.resolve();(0,x.debug)("oxi-section/form (".concat(this.args.def.action,'): executing actionOnChange ("').concat(e.actionOnChange,'")'))
+if((0,x.debug)("oxi-section/form (".concat(this.args.def.action,"): setFieldValue (").concat(e.name,' = "').concat(n,'")')),e.value=n,this.setFieldError(e,null),!e.actionOnChange)return Promise.resolve();(0,x.debug)("oxi-section/form (".concat(this.args.def.action,'): executing actionOnChange ("').concat(e.actionOnChange,'")'))
 var l=(0,t.default)({action:e.actionOnChange,_sourceField:e.name},this._encodeAllFields({includeEmpty:!0})),a=this.fields
 return this.content.updateRequest(l,!0).then((function(e){var t,n=(0,o.default)(r._prepareFields(e.fields))
 try{for(n.s();!(t=n.n()).done;){var l,i=t.value,u=(0,o.default)(a)
 try{for(u.s();!(l=u.n()).done;){var s=l.value
 if(s.name===i.name){var p=a.indexOf(s)
-a[p]=i}}}catch(c){u.e(c)}finally{u.f()}}}catch(c){n.e(c)}finally{n.f()}return r.fields=a,null}))}},{key:"setFieldName",value:function(e,t){(0,x.debug)("oxi-section/form (".concat(this.args.def.action,"): setFieldName (").concat(e.name," -> ").concat(t,")")),e.name=t}},{key:"setFieldError",value:function(e,t){(0,x.debug)("oxi-section/form (".concat(this.args.def.action,"): setFieldError (").concat(e.name," = ").concat(t,")")),e._error=t
+a[p]=i}}}catch(c){u.e(c)}finally{u.f()}}}catch(c){n.e(c)}finally{n.f()}return r.fields=a,null}))}},{key:"setFieldName",value:function(e,t){(0,x.debug)("oxi-section/form (".concat(this.args.def.action,"): setFieldName (").concat(e.name," -> ").concat(t,")")),e.name=t}},{key:"setFieldError",value:function(e,t){(0,x.debug)("oxi-section/form (".concat(this.args.def.action,"): setFieldError (").concat(e.name," = ").concat(t,")"))
 var n=this.focusFeedback[e._refName]
-n&&n.setCustomValidity(t)}},{key:"encodeFields",value:function(e,t){return(0,x.debug)("oxi-section/form (".concat(this.args.def.action,"): encodeFields ()")),this._encodeFields({fieldNames:e,renameMap:t,includeEmpty:!0})}},{key:"originalFieldCount",get:function(){return this.args.def.fields.filter(this.hiddenFieldFilter).length}},{key:"setFocusInfo",value:function(e,t,n){if(t&&e._focusClone)return n.focus(),void(e._focusClone=!1)
+n&&(t||(t=""),e._error=t,n&&n.setCustomValidity(t))}},{key:"encodeFields",value:function(e,t){return(0,x.debug)("oxi-section/form (".concat(this.args.def.action,"): encodeFields ()")),this._encodeFields({fieldNames:e,renameMap:t,includeEmpty:!0})}},{key:"originalFieldCount",get:function(){return this.args.def.fields.filter(this.hiddenFieldFilter).length}},{key:"setFocusInfo",value:function(e,t,n){if(t&&e._focusClone)return n.focus(),void(e._focusClone=!1)
 this.initialFocussingDone||(this.focusFeedback[e._refName]=t?n:null,Object.keys(this.focusFeedback).length===this.originalFieldCount&&this.focusFirstField())}},{key:"focusFirstField",value:function(){var e=this
 if(this.args.def.isFirstForm){this.initialFocussingDone=!0
 var t,n=(0,o.default)(this.visibleFields)

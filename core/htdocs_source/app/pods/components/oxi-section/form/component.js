@@ -292,7 +292,7 @@ export default class OxiSectionFormComponent extends Component {
     setFieldValue(field, value) {
         debug(`oxi-section/form (${this.args.def.action}): setFieldValue (${field.name} = "${value}")`);
         field.value = value;
-        if (value !== undefined && value !== '') this.setFieldError(field, '');
+        this.setFieldError(field, null);
 
         // action on change?
         if (!field.actionOnChange) { return Promise.resolve() }
@@ -336,11 +336,12 @@ export default class OxiSectionFormComponent extends Component {
     @action
     setFieldError(field, message) {
         debug(`oxi-section/form (${this.args.def.action}): setFieldError (${field.name} = ${message})`);
-        field._error = message;
-        let domElement = this.focusFeedback[field._refName];
-        if (domElement) {
-            domElement.setCustomValidity(message);
-        }
+        let domElement = this.focusFeedback[field._refName]
+        if (!domElement) return
+
+        if (!message) message = '' // setCustomValidity() requires empty string to reset error
+        field._error = message
+        if (domElement) domElement.setCustomValidity(message)
     }
 
     /**
