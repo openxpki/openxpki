@@ -82,7 +82,7 @@ Please do not disable the installation of "recommend" packages as this will very
 
 As OpenXPKI can run with different RDBMS, the package does not list any of them as dependency. You therefore need to install the required perl bindings and server software yourself::
 
-    apt install default-mysql-server libdbd-mysql-perl
+    apt install mariadb-server libdbd-mariadb-perl
 
 We strongly recommend to use a fastcgi module as it speeds up the UI, we recommend mod_fcgid as it is in the official main repository (mod_fastcgi will also work but is only available in the non-free repo)::
 

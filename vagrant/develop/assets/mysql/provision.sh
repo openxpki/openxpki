@@ -29,7 +29,7 @@ docker run -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root \
 #
 # Install MySQL client
 #
-install_packages mariadb-client libdbd-mysql-perl
+install_packages mariadb-client libdbd-mariadb-perl
 
 #
 # Database setup
