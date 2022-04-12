@@ -10,7 +10,7 @@ with qw(
 
 =head1 Name
 
-OpenXPKI::Server::Database::Driver::MySQL - Driver for MariaDB databases
+OpenXPKI::Server::Database::Driver::MariaDB - Driver for MariaDB databases
 
 =cut
 
@@ -22,7 +22,7 @@ use OpenXPKI::Exception;
 #
 
 # DBI compliant driver name
-sub dbi_driver { 'mysql' }
+sub dbi_driver { 'MariaDB' }
 
 # DSN string including all parameters.
 sub dbi_dsn {
@@ -41,9 +41,9 @@ sub dbi_dsn {
 
 # Additional parameters for DBI's connect()
 sub dbi_connect_params {
-    mysql_enable_utf8 => 1,
-    mysql_auto_reconnect => 0, # taken from DBIx::Connector::Driver::mysql::_connect()
-    mysql_bind_type_guessing => 0, # FIXME See https://github.com/openxpki/openxpki/issues/44
+    # mysql_enable_utf8 => 1,  # not necessary with MariaDB
+    mariadb_auto_reconnect => 0, # taken from DBIx::Connector::Driver::mysql::_connect()
+    mariadb_bind_type_guessing => 0, # FIXME See https://github.com/openxpki/openxpki/issues/44
 }
 
 # Commands to execute after connecting
@@ -52,7 +52,7 @@ sub on_connect {
 
     # check version
     my $ver = $dbh->get_info($GetInfoType{SQL_DBMS_VER}); # e.g. 5.5.5-10.1.44-MariaDB-1~bionic
-    my ($mysql, $major, $minor, $patch) = $ver =~ m/^([\d\.]+-)?(\d+)\.(\d+)\.(\d+)-MariaDB.*/;
+    my ($mysql, $major, $minor, $patch) = $ver =~ m/^([\d\.]+-)?(\d+)\.(\d+)\.(\d+)(?:-\w*)?/;
     die "MariaDB server too old: $major.$minor.$patch - OpenXPKI 'MariaDB' driver requires version 10.3, please use 'MySQL' instead."
         unless ($major >= 10 and $minor >= 3);
 
