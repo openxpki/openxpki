@@ -302,7 +302,7 @@ sub issueCertificate {
             ca_identifier => $ca_token->get_instance()->get_cert_identifier(),
             csr_serial  => $csr_serial
         },
-        {}
+        undef
     );
 
     ##! 16: 'cert_identifier: ' . $cert_identifier
