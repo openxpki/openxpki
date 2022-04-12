@@ -97,6 +97,7 @@ sub generate_pkcs7_response {
         request_nonce   => $self->attr()->{sender_nonce},
         digest_alg      => $self->attr()->{digest_alg},
         enc_alg         => $self->attr()->{enc_alg},
+        key_alg         => $self->attr()->{key_alg},
     );
 
     if ($response->is_pending()) {

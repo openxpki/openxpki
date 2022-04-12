@@ -51,8 +51,8 @@ command "scep_unwrap_message" => {
         message_type => $req->message_type(),
         digest_alg => $req->digest_alg(),
         enc_alg => $req->enc_alg(),
+        key_alg => $req->key_alg(),
     };
-
 
     # issuer / serial hash
     my $rcpt = $req->recipient();
