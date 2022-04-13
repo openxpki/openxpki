@@ -262,16 +262,17 @@ sub __process_fields {
         ##! 16: 'Processing field ' . join (".", @path)
 
         my $context_key = $conn->get([ @path, 'name' ]) || $field_name;
+        my $type = $conn->get( [ @path, 'type' ] ) || '';
 
         my $field = {
             name => $field_name,
             context_key => $context_key,
+            type => $type,
         };
         #
         # check if validator is needed
         #
         my $is_array = ($conn->exists( [ @path, 'min' ] ) || $conn->exists( [ @path, 'max' ] ));
-        my $type = $conn->get( [ @path, 'type' ] ) || '';
         # As the upstream "required" validator accepts the empty string as
         # true which we want to be "false" we do not set the required flag
         # but use our own field type validator
@@ -327,7 +328,12 @@ sub __process_actions {
                 );
             }
             push @basic_validator, $field->{basic_validator} if $field->{basic_validator}; # 'basic_validator' is set in __process_fields()
-            push @fields, { name => $field->{context_key}, is_required => 'no' };
+            push @fields, {
+                name => $field->{context_key},
+                is_required => 'no',
+                class => 'OpenXPKI::Server::Workflow::Field', # Workflow::Action::InputField always sets type to "basic"
+                type => $field->{type},
+            };
             $self->logger()->debug("- adding field $field_name / $field->{context_key}");
         }
 
@@ -375,7 +381,7 @@ sub __process_actions {
             name => $prefix.$action_name,
             class => $action_class,
             field => \@fields,
-            validator => \@validators
+            validator => \@validators,
         };
 
         # Additional params are read from the object itself

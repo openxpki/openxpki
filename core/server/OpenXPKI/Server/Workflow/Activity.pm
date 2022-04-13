@@ -8,6 +8,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Workflow::Pause;
 use OpenXPKI::Server::Workflow::Helpers;
+use OpenXPKI::Server::Workflow::Field; # Workflow::Action calls $class->new() without require'ing the module first
 use Workflow::Exception qw( workflow_error configuration_error );
 
 __PACKAGE__->mk_accessors( qw( workflow _map log ) );

@@ -493,6 +493,8 @@ OpenXPKI/Server/Workflow/Activity/Transfer/SCP.pm
 # FIXME: Remove for production
 OpenXPKI/Server/Workflow/Activity/WorkflowTest.pm
 
+OpenXPKI/Server/Workflow/Field.pm
+
 OpenXPKI/Server/Workflow/Persister/Null.pm
 OpenXPKI/Server/Workflow/Persister/DBI.pm
 OpenXPKI/Server/Workflow/Persister/NoHistory.pm
