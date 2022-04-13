@@ -47,7 +47,7 @@ $log->info("RPC handler initialized");
 
 my $error_msg = {
     40001 => 'No method set in request',
-    40002 => 'Decoding of POST data failed',
+    40002 => 'Decoding of JSON encoded POST data failed',
     40003 => 'Wrong input values',
     40004 => 'RAW post not allowed (no method set in request)',
     40005 => 'RAW post with unknown content type',
@@ -680,7 +680,7 @@ server (which might also be related to on inappropriate input data).
 
 No method name could be found in the request.
 
-=item 40002 - decoding of POST data failed
+=item 40002 - decoding of JSON encoded POST data failed
 
 Data send as JSON POST could not be parsed. The reason is either malformed
 JSON structure or the data has nested structures exceeding the parse_depth.
