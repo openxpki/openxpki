@@ -139,10 +139,10 @@ sub get_factory {
         return $self->_cache->{ $pki_realm };
     }
 
-    my $yaml_config = OpenXPKI::Workflow::Config->new()->workflow_config();
+    my $config = OpenXPKI::Workflow::Config->new()->workflow_config();
 
     my $workflow_factory = OpenXPKI::Workflow::Factory->new();
-    $workflow_factory->add_config( %{$yaml_config} );
+    $workflow_factory->add_config( %{$config} );
 
     ##! 32: Dumper $workflow_factory
 
