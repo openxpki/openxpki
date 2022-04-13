@@ -73,19 +73,6 @@ sub _validate {
             push @no_value, { name => $field, error => "I18N_OPENXPKI_UI_VALIDATOR_EMPTY_BUT_REQUIRED" };
             next;
         }
-
-        # UTF-8 check (not for underscore fields or binary fields)
-        if (not ($field =~ /^_/ or $type eq 'binary')) {
-            try {
-                # We cannot use Encode::is_utf8($val, 1) as this does not complain
-                # e.g. about invalid UTF8 non-character code points like \x{FDD0}
-                Encode::encode('UTF-8', $val, Encode::LEAVE_SRC | Encode::FB_CROAK);
-            } catch {
-                ##! 32: "$field - UTF-8 validation failed"
-                push @no_value, { name => $field, error => "I18N_OPENXPKI_UI_VALIDATOR_INVALID_UTF8" };
-            };
-        }
-
     }
 
     if ( scalar @no_value ) {

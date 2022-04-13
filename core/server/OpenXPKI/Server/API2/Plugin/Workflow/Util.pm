@@ -54,7 +54,7 @@ sub validate_input_params {
     return undef unless scalar keys %{ $params };
 
     # build hash of field names (and strip array indicator [] from field name)
-    my %fields = map { my $n = $_->name; $n =~ s/\[\]$//; $n => 1 } $workflow->get_action_fields($activity);
+    my %fields = map { my $n = $_->name; $n =~ s/\[\]$//; $n => $_ } $workflow->get_action_fields($activity);
 
     # throw exception on fields not listed in the field spec
     # TODO - perhaps build a filter from the spec and tolerate additional params
@@ -70,13 +70,40 @@ sub validate_input_params {
                     id       => $workflow->id,
                     activity => $activity,
                     param    => $key,
-                    value    => $params->{$key}
+                    value    => $params->{$key},
                 },
                 log => { priority => 'error', facility => 'workflow' },
             );
         }
-        # it looks like at least the validator pattern in workflow has problems with non-scalar items
-        # so we just add serialization here to all items
+
+        # Check for invalid UTF-8 strings.
+        # The check has to be done here and not later e.g. in BasicFieldType as
+        # UTF8 decoding takes place in OpenXPKI::Workflow::Context->param(),
+        # i.e. before validators get executed. This would lead to double
+        # decode() in case of valid UTF8 and thus false alarms.
+        if (not ($key =~ /^_/ or $fields{$key}->type eq 'binary')) {
+            my $val = $params->{$key};
+            try {
+                # We cannot use Encode::is_utf8($val, 1) as this does not complain
+                # e.g. about invalid UTF8 non-character code points like \x{FDD0}
+                Encode::decode('UTF-8', $val, Encode::LEAVE_SRC | Encode::FB_CROAK);
+            } catch {
+                OpenXPKI::Exception->throw (
+                    message => "I18N_OPENXPKI_UI_INVALID_UTF8",
+                    params => {
+                        workflow => $workflow->type,
+                        id       => $workflow->id,
+                        activity => $activity,
+                        param    => $key,
+                        # value => ... DO NOT output the value as this leads to garbage
+                    },
+                    log => { priority => 'error', facility => 'workflow' },
+                );
+            };
+        }
+
+        # Serialize arrays and hashes.
+        # It looks like at least the validator pattern in workflow has problems with non-scalar items
         $result->{$key} = ref $params->{$key} ? $ser->serialize($params->{$key}) : $params->{$key};
     }
 
