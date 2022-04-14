@@ -29,9 +29,9 @@ docker run -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root \
 #
 # Install MySQL client
 #
-install_packages mariadb-client libmariadb-dev
+install_packages mariadb-client libmariadb-dev libdbd-mysql-perl
 
-# Install newest DBD::MariaDB.
+# Install newest DBD::MariaDB from CPAN.
 # Default Debian 10 package libdbd-mariadb-perl is version 1.11 which has a bug:
 #   DBD::MariaDB disconnect_all: 1 database handlers were not released (possible bug in driver) at .../DBI.pm line 759.
 #   DBD::MariaDB disconnect_all: Client library was not properly deinitialized (possible bug in driver) at .../DBI.pm line 759.

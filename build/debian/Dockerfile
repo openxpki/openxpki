@@ -11,7 +11,7 @@ RUN apt update && apt install -y gpg reprepro
 
 # packages required for testing
 RUN apt install --assume-yes libtest-deep-perl libtest-exception-perl \
-    mariadb-server libdbd-mariadb-perl
+    default-mysql-server libdbd-mysql-perl 
 
 COPY build-deps.lst .
 RUN cat build-deps.lst | xargs apt install --assume-yes

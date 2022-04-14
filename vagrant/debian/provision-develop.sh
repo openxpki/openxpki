@@ -12,9 +12,9 @@ apt-get update
 rm -rf /etc/openxpki/
 
 # Install mysql without password (no prompt)
-DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes mariadb-server
+DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes default-mysql-server
 
-apt-get install --assume-yes --force-yes libdbd-mariadb-perl libapache2-mod-fcgid \
+apt-get install --assume-yes --force-yes libdbd-mysql-perl libapache2-mod-fcgid \
     libopenxpki-perl openxpki-i18n openxpki-cgi-session-driver \
     libcrypt-libscep-perl libscep
 
