@@ -160,12 +160,4 @@ test_field_with { myfield => { min => 1, max => 2 } }, sub {
     validation_fails('anything', $error);
 };
 
-# invalid UTF-8 non-character code points
-test_field_with { myfield => {} }, sub {
-    validation_fails("\x{FDD0}", $error);
-};
-test_field_with { _hidden_field => {} }, sub {
-    is_valid("\x{FDD0}", $error);
-};
-
 done_testing;
