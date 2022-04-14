@@ -917,6 +917,9 @@ msgstr "Тестировщик"
 msgid "I18N_OPENXPKI_UI_INVALID_PROFILE"
 msgstr "Изменить профиль сертификата "
 
+msgid "I18N_OPENXPKI_UI_INVALID_UTF8"
+msgstr "Входные данные в кодировке UTF8 содержат недопустимые символы/байты."
+
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_ISSUERS_LIST"
 msgstr "Технологические процессы выдачи новых списков отзыва"

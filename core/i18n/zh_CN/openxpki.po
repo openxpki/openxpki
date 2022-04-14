@@ -731,6 +731,10 @@ msgstr "找不到CRL的颁发者证书！"
 msgid "I18N_OPENXPKI_UI_INVALID_PROFILE"
 msgstr "无效配置文件"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_INVALID_UTF8"
+msgstr "无效配置文件"
+
 msgid "I18N_OPENXPKI_UI_ISSUERS_LIST"
 msgstr "颁发此域的证书"
 

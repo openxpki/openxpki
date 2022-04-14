@@ -717,6 +717,9 @@ msgstr "Unable to find issuer certificate for CRL!"
 msgid "I18N_OPENXPKI_UI_INVALID_PROFILE"
 msgstr "Invalid Profile"
 
+msgid "I18N_OPENXPKI_UI_INVALID_UTF8"
+msgstr "UTF8 encoded input data contains invalid characters/bytes."
+
 msgid "I18N_OPENXPKI_UI_ISSUERS_LIST"
 msgstr " Issuing certificates of this Realm"
 
