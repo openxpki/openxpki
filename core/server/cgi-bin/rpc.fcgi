@@ -9,9 +9,7 @@ use Data::Dumper;
 use English;
 
 use JSON::PP;
-use MIME::Base64;
 use OpenXPKI::Exception;
-use OpenXPKI::Client::Simple;
 use OpenXPKI::Client::Config;
 use OpenXPKI::Client::Service::RPC;
 use OpenXPKI::Serialization::Simple;
