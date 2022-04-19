@@ -10,7 +10,7 @@ with qw(
 
 =head1 Name
 
-OpenXPKI::Server::Database::Driver::MySQL - Driver for MySQL databases
+OpenXPKI::Server::Database::Driver::MySQL
 
 =cut
 
@@ -112,6 +112,8 @@ sub merge_query {
 __PACKAGE__->meta->make_immutable;
 
 =head1 Description
+
+Driver for MySQL databases (tested with 5.6/5.7 only)!
 
 This class is not meant to be instantiated directly.
 Use L<OpenXPKI::Server::Database/new> instead.

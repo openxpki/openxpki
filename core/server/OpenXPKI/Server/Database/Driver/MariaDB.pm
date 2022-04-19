@@ -10,8 +10,7 @@ with qw(
 
 =head1 Name
 
-OpenXPKI::Server::Database::Driver::MySQL - Driver for MariaDB databases
-
+OpenXPKI::Server::Database::Driver::MariaDB
 =cut
 
 use DBI qw(:sql_types);
@@ -54,7 +53,7 @@ sub perform_checks {
 
     # check version
     my $ver = $dbh->get_info($GetInfoType{SQL_DBMS_VER}); # e.g. 5.5.5-10.1.44-MariaDB-1~bionic
-    my ($mysql, $major, $minor, $patch) = $ver =~ m/^([\d\.]+-)?(\d+)\.(\d+)\.(\d+)-MariaDB.*/;
+    my ($mysql, $major, $minor, $patch) = $ver =~ m/^([\d\.]+-)?(\d+)\.(\d+)\.(\d+)(?:-\w*)?/;
     die "MariaDB server too old: $major.$minor.$patch - OpenXPKI 'MariaDB' driver requires version 10.3, please use 'MySQL' instead."
         unless ($major >= 10 and $minor >= 3);
 }
@@ -136,6 +135,10 @@ sub merge_query {
 __PACKAGE__->meta->make_immutable;
 
 =head1 Description
+
+Driver for MariaDB servers based on DBD::mysql client library.
+
+Requires MariaDB >= 10.3.
 
 This class is not meant to be instantiated directly.
 Use L<OpenXPKI::Server::Database/new> instead.

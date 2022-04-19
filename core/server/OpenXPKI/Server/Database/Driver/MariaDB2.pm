@@ -10,7 +10,7 @@ with qw(
 
 =head1 Name
 
-OpenXPKI::Server::Database::Driver::MariaDB - Driver for MariaDB databases using DBD::MariaDB
+OpenXPKI::Server::Database::Driver::MariaDB2
 
 =cut
 
@@ -136,6 +136,13 @@ sub merge_query {
 __PACKAGE__->meta->make_immutable;
 
 =head1 Description
+
+Driver for MariaDB servers based on DBD::MariaDB client library.
+
+Requires MariaDB >= 10.3.
+
+Does B<not> work on debian buster due to a bug in DBD::MariaDB v1.11
+client library, use the MariaDB class with the old mysql lib instead.
 
 This class is not meant to be instantiated directly.
 Use L<OpenXPKI::Server::Database/new> instead.
