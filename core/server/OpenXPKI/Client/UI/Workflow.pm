@@ -22,6 +22,7 @@ use Crypt::PRNG;
 # Project modules
 use OpenXPKI::DateTime;
 use OpenXPKI::Debug;
+use OpenXPKI::Dumper;
 use OpenXPKI::i18n qw( i18nTokenizer i18nGettext );
 
 
@@ -3379,12 +3380,12 @@ sub __render_fields {
 
         } elsif ($field->{yaml_template}) {
             ##! 64: 'Rendering value: ' . $item->{value}
-            $self->logger->debug('Template value: ' . Dumper $item );
+            $self->logger->debug('Template value: ' . SDumper $item );
             my $structure = $self->send_command_v2('render_yaml_template', {
                 template => $field->{yaml_template},
                 params => { value => $item->{value} },
             });
-            $self->logger->debug('Rendered YAML template: ' . Dumper $structure);
+            $self->logger->debug('Rendered YAML template: ' . SDumper $structure);
             ##! 64: 'Rendered YAML template: ' . $out
             if (defined $structure) {
                 $item->{value} = $structure;

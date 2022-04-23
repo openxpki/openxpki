@@ -4,9 +4,9 @@ use Moose;
 use namespace::autoclean;
 
 # Core modules
-use Data::Dumper;
 use MIME::Base64;
 use Carp qw( confess );
+use OpenXPKI::Dumper;
 
 # CPAN modules
 use JSON;
@@ -93,8 +93,7 @@ sub BUILD {
         # wrap Scalars and HashRefs in an ArrayRef as param() expects it (but leave ArrayRefs as is)
         $cache{$_} = (ref $data->{$_} eq 'ARRAY' ? $data->{$_} : [ $data->{$_} ]) for keys %$data;
 
-        $self->logger->debug('JSON param: ' . Dumper $data) if $self->logger->is_debug;
-
+        $self->logger->debug('JSON param: ' . SDumper $data) if $self->logger->is_debug;
         $self->method('POST');
     }
 
