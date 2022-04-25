@@ -309,15 +309,45 @@ Adding the Webclient
 --------------------
 
 The package installs a default configuration for apache but requires that you
-provide a tls certificate for the WebUI by yourself. So before you can start
-the Webserver you **must** create a TLS certificate, place the key to
-`/etc/openxpki/tls/private/openxpki.pem` and the certificate to `/etc/openxpki/tls/endentity/openxpki.crt`.
+configure a tls certificate and setup the configuration for the webui session
+storage.
 
-The default configuration also offers TLS client authentication. Place a copy of
-your root certificate in `/etc/openxpki/tls/chain/` and run `c_rehash /etc/openxpki/tls/chain/`
-to make it available for chain construction in apache.
+TLS Setup
+^^^^^^^^^
 
-You should now be able to start the apache server::
+Create a TLS certificate (self-signed or from an external PKI) and copy the
+key to `/etc/openxpki/tls/private/openxpki.pem`
+and the certificate to `/etc/openxpki/tls/endentity/openxpki.crt`.
+
+The default configuration also offers TLS client authentication. You need to
+place a copy of your root certificate in `/etc/openxpki/tls/chain/` and run
+`c_rehash /etc/openxpki/tls/chain/` to make it available for chain construction
+in apache. If you don't want to use client authentication you must remove the
+`SSLCACertificatePath` and `SSLVerify*` options as the webserver will not start
+if this path is empty.
+
+Session Storage
+^^^^^^^^^^^^^^^
+
+The default configuration now uses a database backend to store the webui
+session information. Please review the section `[session]` and
+`[session_driver]` in the file `/etc/openxpki/webui/default.conf`. It is
+strongly advised to use a dedicated user here with access only to the
+`frontend_session` table for security reasons. You can even put this on
+a different database as the information is not used by the backend.
+
+If you have a single node setup, you can switch to the filesystem based
+driver.
+
+Module Setup
+^^^^^^^^^^^^
+
+Ensure that fcgid is enabled (``a2enmod fcgid``).
+
+Testdrive
+^^^^^^^^^
+
+You should now be able to (re)start the apache server::
 
     $ service apache2 restart
 
@@ -333,13 +363,6 @@ The usernames are `alice` and `bob` (users) and `rob`, `rose` and `raop` (operat
 user database have a look at the files in the auth directory and the
 `<reference/configuration/realm.html#authentication>`_
 
-If you only get the "Open Source Trustcenter" banner without a login prompt, check that fcgid is enabled
-as described above with (``a2enmod fcgid; service apache2 restart``). If you get an internal server error,
-make sure you have the *en_US.utf8* locale installed (``locale -a | grep en_US``)!
-
-Testdrive
-^^^^^^^^^
-
 #. Login as User (Username: bob, Password: <see above>)
 #. Go to "Request", select "Request new certificate"
 #. Complete the pages until you get to the status "PENDING" (gray box on the right)
@@ -349,6 +372,19 @@ Testdrive
 #. After some seconds, your first certificate is ready :)
 #. You can download the certificate by clicking on the link in the first row field "certificate"
 #. You can now login with your username and fetch the certificate
+
+Troubleshooting
+^^^^^^^^^^^^^^^
+
+If you only get the "Open Source Trustcenter" banner without a login prompt, make sure that the
+fcgi module is properly loaded and available. To see the output of the wrapper script, it might
+be helpful to use the browsers developer console (F12 or CTRL+F12 on most browsers).
+
+If you get an internal server error, make sure you have the *en_US.utf8* locale installed
+(``locale -a | grep en_US``)!
+
+For further investigation, check `/var/log/openxpki/webui.log` and `/var/log/apache/error.log`.
+
 
 Enabling the SCEP service
 --------------------------
@@ -370,14 +406,18 @@ token in multiple realms.
 Install SCEP Wrapper
 ^^^^^^^^^^^^^^^^^^^^
 
-SCEP was moved to a new tool called *LibSCEP*, you need to install the library
-and perl bindings yourself::
+Starting with v3.18, the default configuration uses a pure perl implementation
+for the SCEP server so there is no need to install any additional tools anymore.
+
+If you run an older configuration or want to stick with LibSCEP for any reason,
+you have to install the library and perl bindings with::
 
     apt install libcrypt-libscep-perl libscep
 
-The SCEP logic is already included in the core distribution. The package installs
-a wrapper script into */usr/lib/cgi-bin/* and creates a suitable alias in the apache
-config redirecting all requests to ``http://host/scep/<any value>`` to the wrapper.
+The remaining SCEP logic is already included in the core distribution. The package
+installs a wrapper script into */usr/lib/cgi-bin/* and creates a suitable alias in
+the apache config redirecting all requests to ``http://host/scep/<any value>`` to
+the wrapper.
 A default config is placed at /etc/openxpki/scep/default.conf. For a testdrive,
 there is no need for any configuration, just call ``http://host/scep/scep``.
 
