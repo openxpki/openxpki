@@ -70,7 +70,7 @@ sub BUILD {
     # store keys from CGI params
     my @keys = $self->cgi->param;
     $cache{$_} = undef for @keys;
-    do { $self->logger->debug(sprintf('CGI param: %s=%s', $_, join(',', $self->cgi->multi_param($_)))) for $self->cgi->param } if $self->logger->is_debug;
+    do { $self->logger->trace(sprintf('CGI param: %s=%s', $_, join(',', $self->cgi->multi_param($_)))) for $self->cgi->param } if $self->logger->is_trace;
 
     # store keys and values from JSON POST data
     if (($self->cgi->content_type // '') eq 'application/json') {
