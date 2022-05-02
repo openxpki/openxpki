@@ -200,7 +200,7 @@ sub render_system_status {
         }
     }
 
-    if ($status->{watchdog} < 1) {
+    if (($status->{watchdog} // 0) < 1) {
         push @fields, {
             label  => 'I18N_OPENXPKI_UI_WATCHDOG_STATUS_LABEL',
             value  => 'I18N_OPENXPKI_UI_WATCHDOG_NOT_RUNNING',
