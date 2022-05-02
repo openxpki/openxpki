@@ -50,7 +50,10 @@ command "get_ui_system_status" => {
 
     # Offline Secrets
     my $offline_secrets = 0;
-    my $secrets = $crypto->get_secret_infos();
+
+    # prevent crashing while method on e.g. I18N_OPENXPKI_SECRET_GROUP_DOES_NOT_EXIST
+    my $secrets = eval { $crypto->get_secret_infos() } // {};
+
     for my $secret (keys %{$secrets}) {
         # Secret groups tend to have exceptions in unusual situations
         # To not crash the whole method, we put an eval around until this is
