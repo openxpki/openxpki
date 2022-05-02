@@ -56,10 +56,10 @@ sub execute {
     my $series;
 
     my $first_group = $db->select_one(%base_query, columns => [ sprintf($select_column, $start_at) ]);
-    my $offset_year = int($first_group->{ivl} / 100);
-    my $offset_month = $first_group->{ivl} % 100;
+    my ($offset_year, $offset_month) = ($first_group->{ivl} =~ m{(\d{4})(\d+)});
 
-    ##! 16: "$offset_year / $offset_month"
+    ##! 16: "$first_group->{ivl} / $offset_year / $offset_month"
+
     my $get_index = sub {
         my $value = shift;
         my ($year, $month) = ($value =~ m{(\d{4})(\d+)});
