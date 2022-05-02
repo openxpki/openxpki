@@ -759,10 +759,6 @@ msgstr "CRLの発行者証明書を見つけることができません"
 msgid "I18N_OPENXPKI_UI_INVALID_PROFILE"
 msgstr "無効なプロファイル"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_INVALID_UTF8"
-msgstr "無効なプロファイル"
-
 msgid "I18N_OPENXPKI_UI_ISSUERS_LIST"
 msgstr " このレルムの証明書を発行"
 

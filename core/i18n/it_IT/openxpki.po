@@ -919,9 +919,6 @@ msgstr "Pagina richiesta non trovata"
 msgid "I18N_OPENXPKI_UI_INVALID_PROFILE"
 msgstr "Numero di serie del certificato"
 
-msgid "I18N_OPENXPKI_UI_INVALID_UTF8"
-msgstr "I dati di input codificati UTF8 contengono caratteri/byte non validi."
-
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_ISSUERS_LIST"
 msgstr "Emissione Lista Revoche (CRL)"
