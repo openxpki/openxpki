@@ -52,6 +52,11 @@ sub certificate_id {
 
     my $filename = $params{file};
 
+    if (!$filename ) {
+        print STDERR "The --file option is mandatory\n";
+        return 2;
+    }
+
     if ( !-r $filename ) {
         print STDERR "filename '$filename' is not readable\n";
         return 2;
