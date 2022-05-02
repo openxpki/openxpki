@@ -21,7 +21,7 @@ other connector punctuation chars, Unicode marks, dash ("-"), colon (":"), space
 subtype 'AlphaPunct', # named $re_alpha_string in old API
     as 'Str',
     where { $_ =~ qr{ \A [ \w \- \. : \s ]* \z }xms },
-    message { "$_ is not an alphanumeric string plus punctuation chars" };
+    message { sprintf "'%s' is not an alphanumeric string plus punctuation chars", ($_ ? "'$_'" : '<undef>') };
 
 =head2 ArrayOrAlphaPunct
 
@@ -43,7 +43,7 @@ A postive integer value (excluding zero)
 subtype 'PosInt',
     as 'Int',
     where { $_ > 0 },
-    message { "$_ is not a positive integer" };
+    message { sprintf "'%s' is not a positive integer", ($_ ? "'$_'" : '<undef>') };
 
 =head2 Hex
 
@@ -53,7 +53,7 @@ A string containing a number in hexadecimal notation
 subtype 'Hex', # names $re_int_or_hex_string in old API
     as 'Str',
     where { $_ =~ qr{ \A 0x[0-9a-f]+ \z }xmsi },
-    message { "$_ contains characters not allowed in a hexadecimal number" };
+    message { sprintf "'%s' contains characters not allowed in a hexadecimal number", ($_ ? "'$_'" : '<undef>') };
 
 =head2 IntOrHex
 
@@ -75,7 +75,7 @@ A string used as identifier, allows word + underscore
 subtype 'Ident', # names $re_int_or_hex_string in old API
     as 'Str',
     where { $_ =~ qr{ \A [\w\-]+ \z }xmsi },
-    message { ($_//'<undef>') . " contains characters not allowed in an ident string" };
+    message { sprintf "'%s' contains characters not allowed in an ident string", ($_ ? "'$_'" : '<undef>') };
 
 =head2 Empty
 
@@ -85,7 +85,7 @@ The empty string
 subtype 'Empty',
     as 'Str',
     where { $_ =~ qr{ \A \z }xmsi },
-    message { ($_//'<undef>') . " is not the empty string" };
+    message { sprintf "'%s' is not the empty string", ($_ ? "'$_'" : '<undef>') };
 
 =head2 Base64
 
@@ -96,7 +96,7 @@ safe encoding.
 subtype 'Base64', # named $re_base64_string in old API
     as 'Str',
     where { $_ =~ qr{ \A [ A-Z a-z 0-9 = \+ / \- _ ]+ \z }xms },
-    message { ($_//'<undef>') . " contains characters not allowed in Base64 encoded strings" };
+    message { sprintf "'%s' contains characters not allowed in Base64 encoded strings", ($_ ? "'$_'" : '<undef>') };
 
 =head2 PEM
 
@@ -106,7 +106,7 @@ A PEM encoded data (i.e. Base64 encoded string separated by newlines).
 subtype 'PEM', # named $re_cert_string in old API (where it also wrongly included the underscore).
     as 'Str',  # "-" is needed for headers like -----BEGIN CERTIFICATE-----
     where { $_ =~ qr{ \A [ A-Z a-z 0-9 \+ / = \- \  \n \r ]+ \z }xms },
-    message { ($_//'<undef>') . " contains characters not allowed in PEM encoded data" };
+    message { sprintf "'%s' contains characters not allowed in PEM encoded data", ($_ ? "'$_'" : '<undef>') };
 
 =head2 PEMCert
 
@@ -116,7 +116,7 @@ A PEM encoded certificate
 subtype 'PEMCert',
     as 'PEM',
     where { $_ =~ m{ \A -----BEGIN\ ([\w\s]*)CERTIFICATE----- [^-]+ -----END\ \1CERTIFICATE----- \Z }msx },
-    message { ($_//'<undef>') . " is not a PEM encoded certificate" };
+    message { sprintf "'%s' is not a PEM encoded certificate", ($_ ? "'$_'" : '<undef>') };
 
 =head2 PEMCertChain
 
@@ -126,7 +126,7 @@ A PEM encoded certificate chain
 subtype 'PEMCertChain',
     as 'PEM',
     where { $_ =~ m{ \A ( -----BEGIN\ ([\w\s]*)CERTIFICATE----- [^-]+ -----END\ \2CERTIFICATE----- \s* )+ \Z }msx },
-    message { ($_//'<undef>') . " is not a PEM encoded certificate chain" };
+    message { sprintf "'%s' is not a PEM encoded certificate chain", ($_ ? "'$_'" : '<undef>') };
 
 =head2 PEMPKCS7
 
@@ -136,7 +136,7 @@ A PEM encoded PKCS7 container
 subtype 'PEMPKCS7',
     as 'PEM',
     where { $_ =~ m{ \A -----BEGIN\ PKCS7----- [^-]+ -----END\ PKCS7----- \Z }msx },
-    message { ($_//'<undef>') . " is not a PEM encoded PKCS7 container" };
+    message { sprintf "'%s' is not a PEM encoded PKCS7 container", ($_ ? "'$_'" : '<undef>') };
 
 =head2 PEMPKey
 
@@ -146,7 +146,7 @@ A PEM encoded private key container
 subtype 'PEMPKey',
     as 'PEM',
     where { $_ =~ m{ \A -----BEGIN\ ([\w\s]*)PRIVATE\ KEY----- [^-]+ -----END\ \1PRIVATE\ KEY----- \Z }msx },
-    message { ($_//'<undef>') . " is not a PEM encoded private key container" };
+    message { sprintf "'%s' is not a PEM encoded private key container", ($_ ? "'$_'" : '<undef>') };
 
 
 =head2 PEMPubKey
@@ -157,7 +157,7 @@ A PEM encoded private key container
 subtype 'PEMPubKey',
     as 'PEM',
     where { $_ =~ m{ \A -----BEGIN\ PUBLIC\ KEY----- [^-]+ -----END\ PUBLIC\ KEY----- \Z }msx },
-    message { ($_//'<undef>') . " is not a PEM encoded public key container" };
+    message { sprintf "'%s' is not a PEM encoded public key container", ($_ ? "'$_'" : '<undef>') };
 
 =head2 ArrayRefOrPEMCertChain
 
