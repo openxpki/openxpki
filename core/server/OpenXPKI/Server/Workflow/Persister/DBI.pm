@@ -293,12 +293,10 @@ sub fetch_extra_workflow_data {
     );
     # context was set in fetch_workflow
     my $context = $workflow->context();
-    $context->{_init} = 1;
     while (my $row = $sth->fetchrow_arrayref) {
         ##! 32: "Setting context param: ".$row->[0]." => ".$row->[1]
         $context->param($row->[0] => $row->[1]);
     }
-    $context->{_init} = 0;
 
     # Attributes
     $sth = $dbi->select(
