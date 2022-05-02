@@ -96,7 +96,8 @@ sub failure {
         }
     }
 
-    $log->error($code . ' - ' . join(': ', $message, $details_log // ()));
+    # $log might not yet be initialised
+    eval { $log->error($code . ' - ' . join(': ', $message, $details_log // ())) };
 
     return {
         error => {
