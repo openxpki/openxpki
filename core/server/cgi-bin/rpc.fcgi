@@ -479,7 +479,7 @@ while (my $cgi = CGI::Fast->new()) {
         # TODO this needs to be reworked
         if ($reply->{ERROR}->{CLASS} eq 'OpenXPKI::Exception::InputValidator' &&
             $reply->{ERROR}->{ERRORS}) {
-            $res = failure(40003, $error, { fields => $reply->{ERROR}->{ERRORS} });
+            $res = failure(40003, { fields => $reply->{ERROR}->{ERRORS} });
 
         } else {
             if ($reply->{ERROR} && $reply->{ERROR}->{LABEL}) {
