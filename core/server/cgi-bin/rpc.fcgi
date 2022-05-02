@@ -29,20 +29,6 @@ my $json = JSON::PP->new->utf8;
 # A JSON false would be converted to a trueish scalar "OXJSF1:false".
 $json->boolean_values(0,1);
 
-eval {
-    $config = OpenXPKI::Client::Config->new('rpc');
-    $log = $config->logger();
-};
-
-if ($EVAL_ERROR) {
-    my $cgi = CGI::Fast->new();
-    print $cgi->header( -type => 'application/json', charset => 'utf8', -status => '500 Client Connect Failed' );
-    print $json->encode( failure(50000) );
-    die "Client Connect Failed: $EVAL_ERROR";
-}
-
-$log->info("RPC handler initialized");
-
 my $error_msg = {
     40001 => 'No method set in request',
     40002 => 'Decoding of JSON encoded POST data failed',
@@ -163,6 +149,20 @@ sub send_output {
         }
     }
 }
+
+eval {
+    $config = OpenXPKI::Client::Config->new('rpc');
+    $log = $config->logger();
+};
+
+if ($EVAL_ERROR) {
+    my $cgi = CGI::Fast->new();
+    print $cgi->header( -type => 'application/json', charset => 'utf8', -status => '500 Client Connect Failed' );
+    print $json->encode( failure(50000) );
+    die "Client Connect Failed: $EVAL_ERROR";
+}
+
+$log->info("RPC handler initialized");
 
 while (my $cgi = CGI::Fast->new()) {
 
