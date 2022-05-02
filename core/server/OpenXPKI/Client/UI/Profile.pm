@@ -70,14 +70,14 @@ sub action_get_key_param {
     foreach my $pn (keys %{$key_gen_params}) {
         my @param;
         my $param_name = lc($pn);
-        if ($key_gen_param_supported->{$param_name}) {
-            @param = map { { value => $_, label => 'I18N_OPENXPKI_UI_KEY_'.uc($param_name.'_'.$_) } } @{$key_gen_param_supported->{$param_name}};
+        if (my $supported_params = $key_gen_param_supported->{$param_name}) {
+            @param = map { { value => $_, label => 'I18N_OPENXPKI_UI_KEY_'.uc($param_name.'_'.$_) } } @{$supported_params};
 
             my $preset = $key_gen_params->{$pn};
 
-            $self->logger()->trace( 'Preset '.$preset. ' Values ' . Dumper $key_gen_param_supported->{$param_name}) if $self->logger->is_trace;
+            $self->logger()->trace('Preset = '.($preset?"'$preset'":'(none)'). ', Options = ' . Dumper $supported_params) if $self->logger->is_trace;
 
-            if (!(grep $preset,  @{$key_gen_param_supported->{$param_name}})) {
+            if (!(grep $preset, @{$supported_params})) {
                 $preset = $param[0]->{value};
             }
 
