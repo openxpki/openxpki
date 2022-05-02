@@ -1,22 +1,27 @@
 #!/usr/bin/perl
-
 use strict;
 use warnings;
 
+# Core modules
 use CGI;
 use CGI::Fast;
 use Data::Dumper;
+use JSON::PP;
+use Scalar::Util qw( blessed );
 use English;
 
-use JSON::PP;
+# CPAN modules
+use Try::Tiny;
+use Log::Log4perl;
+use Log::Log4perl::MDC;
+
+# Project modules
 use OpenXPKI::Exception;
 use OpenXPKI::Client::Config;
 use OpenXPKI::Client::Service::RPC;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::i18n qw( i18nGettext i18nTokenizer );
 
-use Log::Log4perl;
-use Log::Log4perl::MDC;
 
 our $config;
 my $log;
@@ -35,6 +40,7 @@ my $error_msg = {
     40003 => 'Wrong input values',
     40004 => 'RAW post not allowed (no method set in request)',
     40005 => 'RAW post with unknown content type',
+    40006 => 'Unknown RPC error',
 
     40401 => 'Invalid method / setup incomplete',
     40402 => 'Resume requested but no workflow found',
@@ -104,7 +110,8 @@ sub failure {
             code => $code,
             message => join(': ', $message, $details_public // ()),
             data => $data,
-        }
+        },
+        rpc_failure => 1, # flag to help error handling
     }
 }
 
@@ -116,6 +123,7 @@ sub send_output {
     my $status = '200 OK';
     my %retry_head;
     if (defined $result->{error}) {
+        delete $result->{rpc_failure};
         if ($use_status_codes) {
             my ($error) = split(/[:\n]/, i18nGettext($result->{error}->{message}));
             $status = sprintf ("%03d %s", ($result->{error}->{code}/100), $error);
@@ -167,384 +175,377 @@ $log->info("RPC handler initialized");
 
 CGI_LOOP:
 while (my $cgi = CGI::Fast->new()) {
-
     my $client;
 
-    my $conf;
-    eval { $conf = $config->parse_uri()->config(); };
-    my $eval_err = $EVAL_ERROR;
+    try {
+        my $conf;
+        eval { $conf = $config->parse_uri()->config(); };
+        my $eval_err = $EVAL_ERROR;
 
-    if (!$conf) {
-        send_output( $cgi, failure(50007, [undef, $eval_err]) );
-        next CGI_LOOP;
-    }
+        die failure( 50007, [undef, $eval_err] ) unless $conf;
 
-    my $rpc = OpenXPKI::Client::Service::RPC->new( config => $config, error_messages => $error_msg );
+        my $rpc = OpenXPKI::Client::Service::RPC->new( config => $config, error_messages => $error_msg );
 
-    Log::Log4perl::MDC->put('endpoint', $config->endpoint());
+        Log::Log4perl::MDC->put('endpoint', $config->endpoint());
 
-    $use_status_codes = $conf->{output} && $conf->{output}->{use_http_status_codes};
+        $use_status_codes = $conf->{output} && $conf->{output}->{use_http_status_codes};
 
-    # check for request parameters in JSON data (HTTP body)
-    my $method = $cgi->param('method');
-    my $json_data;
-    my $pkcs7_content;
-    my $pkcs7;
-    if (my $raw = $cgi->param('POSTDATA')) {
+        # check for request parameters in JSON data (HTTP body)
+        my $method = $cgi->param('method');
+        my $json_data;
+        my $pkcs7_content;
+        my $pkcs7;
+        if (my $raw = $cgi->param('POSTDATA')) {
 
-        if (!$conf->{input}->{allow_raw_post}) {
-            send_output( $cgi, failure(40004) );
-            next CGI_LOOP;
-        }
+            die failure( 40004 ) unless $conf->{input}->{allow_raw_post};
 
-        my $content_type = $ENV{'CONTENT_TYPE'} || '';
-        if (!$content_type) {
-            $content_type =~ 'application/json';
-            $log->warn("RPC POSTDATA request without content-type header");
-        }
-
-        $log->debug("RPC postdata with Content-Type: $content_type");
-
-        if ($content_type =~ m{\Aapplication/pkcs7}) {
-            $pkcs7 = $raw;
-            eval {
-                $client = $rpc->backend();
-                $pkcs7_content = $client->run_command('unwrap_pkcs7_signed_data', {
-                   pkcs7 => $pkcs7,
-                });
-                $raw = $pkcs7_content->{value};
-                $log->trace("PKCS7 content: " . Dumper  $pkcs7_content) if ($log->is_trace());
-            };
-            $eval_err = $EVAL_ERROR;
-            if ($eval_err || !$raw) {
-                send_output( $cgi, failure(50001, $eval_err) );
-                $client->disconnect() if ($client);
-                next CGI_LOOP;
+            my $content_type = $ENV{'CONTENT_TYPE'} || '';
+            if (!$content_type) {
+                $content_type =~ 'application/json';
+                $log->warn("RPC POSTDATA request without content-type header");
             }
 
-        } elsif ($content_type =~ m{\Aapplication/json}) {
-            # nothing to do here
+            $log->debug("RPC postdata with Content-Type: $content_type");
 
-        } else {
-
-            send_output( $cgi, failure(40005, { type => $content_type }) );
-            next CGI_LOOP;
-        }
-
-        # TODO - evaluate security implications regarding blessed objects
-        # and consider to filter out serialized objects for security reasons
-        $json->max_depth(  $conf->{input}->{parse_depth} || 5 );
-
-        $log->trace("RPC raw postdata : " . $raw) if ($log->is_trace());
-
-        # decode JSON
-        eval{ $json_data = $json->decode($raw) };
-        $eval_err = $EVAL_ERROR;
-        if (!$json_data or $eval_err) {
-            send_output( $cgi, failure(40002, [ undef, $eval_err ]) );
-            next CGI_LOOP;
-        }
-
-        # read "method" from JSON data if not found in URL before
-        $method = $json_data->{method} unless $method;
-    }
-
-    my $get_param = sub { my $k = shift; $json_data ? $json_data->{$k} : $cgi->param($k) };
-
-    $method = $config->route() unless $method;
-
-    # method should be set now
-    if ( !$method ) {
-        send_output( $cgi, failure(40001) );
-        next CGI_LOOP;
-    }
-
-    # special handling for requests for OpenAPI (Swagger) spec?
-    if ($method eq 'openapi-spec') {
-        my $baseurl = sprintf "%s://%s:%s%s", ($cgi->https ? 'https' : 'http'), $cgi->virtual_host, $cgi->virtual_port, $cgi->request_uri;
-        my $spec = $rpc->openapi_spec($baseurl);
-        if (!$spec) {
-            send_output($cgi, failure(50004));
-        } else {
-            send_output($cgi, $spec, 1);
-        }
-        next CGI_LOOP;
-    }
-
-    my $servername = $conf->{$method}->{servername} || '';
-    Log::Log4perl::MDC->put('server', $servername);
-
-    my $error = '';
-
-    my $workflow_type = $conf->{$method}->{workflow};
-    if ( !defined $workflow_type ) {
-        send_output( $cgi, failure(40401, "RPC method $method not found or no workflow_type set") );
-        next CGI_LOOP;
-    }
-
-    my $param;
-    # look for preset params
-    foreach my $key (keys %{$conf->{$method}}) {
-        next unless ($key =~ m{preset_(\w+)});
-        $param->{$1} = $conf->{$method}->{$key};
-    }
-
-    # Only parameters which are whitelisted in the config are mapped!
-    # This is crucial to prevent injection of server-only parameters
-    # like the autoapprove flag...
-
-    if ($conf->{$method}->{param}) {
-        my @keys;
-        @keys = split /\s*,\s*/, $conf->{$method}->{param};
-        foreach my $key (@keys) {
-            my $val = $get_param->($key);
-            next unless (defined $val);
-
-            if (!ref $val) {
-                $val =~ s/\A\s+//;
-                $val =~ s/\s+\z//;
-            }
-            $param->{$key} = $val;
-        }
-    }
-
-    # if given, append to the paramter list
-    if ($servername) {
-        $param->{'server'} = $servername;
-        $param->{'interface'} = 'rpc';
-    }
-
-    my %envkeys;
-    if ($conf->{$method}->{env}) {
-        %envkeys = map {$_ => 1} (split /\s*,\s*/, $conf->{$method}->{env});
-    }
-
-    # IP Transport
-    if ($envkeys{'client_ip'}) {
-        $param->{'client_ip'} = $ENV{REMOTE_ADDR};
-    }
-
-    # User Agent
-    if ($envkeys{'user_agent'}) {
-        $param->{'user_agent'} = $ENV{HTTP_USER_AGENT};
-    }
-
-    # be lazy and use endpoint name as servername
-    if ($envkeys{'server'}) {
-        if ($servername) {
-            send_output( $cgi, failure(50005) );
-            next CGI_LOOP;
-        } elsif (!$config->endpoint()) {
-            send_output( $cgi, failure(50006) );
-            next CGI_LOOP;
-        } else {
-            $param->{'server'} = $config->endpoint();
-            $param->{'interface'} = 'rpc';
-            Log::Log4perl::MDC->put('server', $param->{'server'} );
-        }
-    }
-
-    if ($envkeys{'endpoint'}) {
-        $param->{'endpoint'} = $config->endpoint();
-    }
-
-    # Gather data from TLS session
-    my $auth_dn = '';
-    my $auth_pem = '';
-    if ( defined $ENV{HTTPS} && lc( $ENV{HTTPS} ) eq 'on' ) {
-
-        $log->debug("calling context is https");
-        $auth_dn = $ENV{SSL_CLIENT_S_DN};
-        $auth_pem = $ENV{SSL_CLIENT_CERT};
-        if ( defined $auth_dn ) {
-            $log->info("RPC authenticated client DN: $auth_dn");
-
-            if ($envkeys{'signer_dn'}) {
-                $param->{'signer_dn'} = $auth_dn;
-            }
-
-            if ($envkeys{'tls_client_dn'}) {
-                $param->{'tls_client_dn'} = $auth_dn;
-            }
-
-            if ($auth_pem) {
-                $param->{'signer_cert'} = $auth_pem if ($envkeys{'signer_cert'});
-                $param->{'tls_client_cert'} = $auth_pem if ($envkeys{'tls_client_cert'});
-                if (($envkeys{'signer_chain'} || $envkeys{'tls_client_chain'}) && $ENV{'SSL_CLIENT_CERT_CHAIN_0'}) {
-                    my @chain;
-                    for (my $cc=0;$cc<=3;$cc++)   {
-                        my $chaincert = $ENV{'SSL_CLIENT_CERT_CHAIN_'.$cc};
-                        last unless ($chaincert);
-                        push @chain, $chaincert;
-                    }
-                    $param->{'signer_chain'} = $auth_pem if ($envkeys{'signer_chain'});
-                    $param->{'tls_client_chain'} = $auth_pem if ($envkeys{'tls_client_chain'});
-                }
-            }
-        }
-        else {
-            $log->debug("RPC unauthenticated (no cert)");
-        }
-    } else {
-        $log->debug("RPC unauthenticated (plain http)");
-    }
-
-    if ($pkcs7_content && $envkeys{'pkcs7'}) {
-        $param->{'_pkcs7'} = $pkcs7;
-    }
-
-    if ($pkcs7_content && $envkeys{'signer_cert'}) {
-        $param->{'signer_cert'} = $pkcs7_content->{signer};
-    }
-
-    $log->trace( "Calling $method on ".$config->endpoint()." with parameters: " . Dumper $param ) if $log->is_trace;
-
-    my $res;
-    my $workflow;
-    eval {
-
-        # create the client object
-        $client = $rpc->backend() or die "Unable to create client";
-
-        # check for pickup parameter
-        if (my $pickup_key = $conf->{$method}->{pickup}) {
-            my $pickup_value;
-            # namespace needs a single value
-            if ($conf->{$method}->{pickup_workflow}) {
-                my @keys = split /\s*,\s*/, $pickup_key;
-                foreach my $key (@keys) {
-                    # take value from param hash if defined, this makes data
-                    # from the environment avail to the pickup workflow
-                    my $val = $param->{$key} // $get_param->($key);
-                    $pickup_value->{$key} = $val if (defined $val);
-                }
-            } else {
-                $pickup_value = $get_param->($pickup_key);
-            }
-            if ($pickup_value) {
-                $workflow = $rpc->pickup_workflow($conf->{$method}, $pickup_value);
-            } else {
-                $log->trace( "No pickup because $pickup_key has no value" ) if $log->is_trace;
-            }
-        }
-
-        # Endpoint has a "resume and execute" definition so run action if possible
-        if (my $execute_action = $conf->{$method}->{execute_action}) {
-            if (!$workflow) {
-                $res = failure(40402);
-            } elsif ($workflow->{'proc_state'} ne 'manual') {
-                $res = failure(40403, { id => int($workflow->{id}), 'state' => $workflow->{'state'}, proc_state => $workflow->{'proc_state'} });
-            } else {
-                my $actions_avail = $client->run_command('get_workflow_activities', { id => $workflow->{id} });
-                if (!(grep { $_ eq  $execute_action } @{$actions_avail})) {
-                    $res = failure(40404, { id => int($workflow->{id}), 'state' => $workflow->{'state'}, proc_state => $workflow->{'proc_state'} });
-                } else {
-                    $log->debug("Resume #".$workflow->{id}." and $execute_action with params " . join(", ", keys %{$param}));
-                    $workflow = $client->handle_workflow({
-                        id => $workflow->{id},
-                        activity => $execute_action,
-                        params => $param
+            if ($content_type =~ m{\Aapplication/pkcs7}) {
+                $pkcs7 = $raw;
+                eval {
+                    $client = $rpc->backend();
+                    $pkcs7_content = $client->run_command('unwrap_pkcs7_signed_data', {
+                       pkcs7 => $pkcs7,
                     });
+                    $raw = $pkcs7_content->{value};
+                    $log->trace("PKCS7 content: " . Dumper  $pkcs7_content) if ($log->is_trace());
+                };
+                $eval_err = $EVAL_ERROR;
+                if ($eval_err || !$raw) {
+                    die failure( 50001, $eval_err );
                 }
+
+            } elsif ($content_type =~ m{\Aapplication/json}) {
+                # nothing to do here
+            } else {
+                die failure( 40005, { type => $content_type } );
             }
 
-        # pickup return undef if no workflow was found
-        } elsif (!$workflow) {
-            $log->debug("Initialize $workflow_type with params " . join(", ", keys %{$param}));
-            $workflow = $client->handle_workflow({
-                type => $workflow_type,
-                params => $param
-            });
+            # TODO - evaluate security implications regarding blessed objects
+            # and consider to filter out serialized objects for security reasons
+            $json->max_depth(  $conf->{input}->{parse_depth} || 5 );
+
+            $log->trace("RPC raw postdata : " . $raw) if ($log->is_trace());
+
+            # decode JSON
+            eval{ $json_data = $json->decode($raw) };
+            die failure( 40002, [ undef, $EVAL_ERROR ] ) if (!$json_data or $EVAL_ERROR);
+
+            # read "method" from JSON data if not found in URL before
+            $method = $json_data->{method} unless $method;
         }
 
-        $log->trace( 'Workflow info '  . Dumper $workflow ) if ($log->is_trace());
-    };
-    $eval_err = $EVAL_ERROR;
+        my $get_param = sub { my $k = shift; $json_data ? $json_data->{$k} : $cgi->param($k) };
 
-    if ( my $exc = OpenXPKI::Exception->caught() ) {
-        $res = failure(50002, $exc->message);
-    } elsif ($res) {
-        # nothing to do here
-    } elsif (!$client) {
-        $res = failure(50001, $eval_err);
-    }
-    elsif ($eval_err) {
+        $method = $config->route() unless $method;
 
-        my $reply = $client->last_reply();
-        $log->error(Dumper $reply);
+        # method should be set now
+        die failure( 40001 ) unless $method;
 
-        # Validation error
-        my $error = $client->last_error() || $eval_err;
-
-        # TODO this needs to be reworked
-        if ($reply->{ERROR}->{CLASS} eq 'OpenXPKI::Exception::InputValidator' &&
-            $reply->{ERROR}->{ERRORS}) {
-            $res = failure(40003, { fields => $reply->{ERROR}->{ERRORS} });
-
-        } else {
-            if ($reply->{ERROR} && $reply->{ERROR}->{LABEL}) {
-                $error = $reply->{ERROR}->{LABEL};
-            }
-            my $msg_public = (($error//'') =~ /I18N_OPENXPKI_UI_/) ? $error : 'uncaught error';
-            my $msg_log = $error;
-            $res = failure(50002, [ $msg_public, $msg_log ]);
+        # special handling for requests for OpenAPI (Swagger) spec?
+        if ($method eq 'openapi-spec') {
+            my $baseurl = sprintf "%s://%s:%s%s", ($cgi->https ? 'https' : 'http'), $cgi->virtual_host, $cgi->virtual_port, $cgi->request_uri;
+            my $spec = $rpc->openapi_spec($baseurl) or die failure( 50004 );
+            send_output($cgi, $spec, 1);
+            next CGI_LOOP;
         }
 
-    # no ID and not finished is an unrecoverable startup error
-    } elsif (( $workflow->{'proc_state'} ne 'finished' && !$workflow->{id} ) || $workflow->{'proc_state'} eq 'exception') {
+        my $servername = $conf->{$method}->{servername} || '';
+        Log::Log4perl::MDC->put('server', $servername);
 
-        $res = failure(50003, { id => int($workflow->{id}), 'state' => $workflow->{'state'} });
+        my $error = '';
 
-    # if the workflow is running, we do not expose any data of the workflows
-    } elsif ( $workflow->{'proc_state'} eq 'running' ) {
+        my $workflow_type = $conf->{$method}->{workflow};
+        die failure( 40401, "RPC method $method not found or no workflow_type set" )
+          unless defined $workflow_type;
 
-        $log->info(sprintf("RPC request was processed properly (Workflow: %01d is currently running)",
-            $workflow->{id} ));
-        $res = { result => { id => int($workflow->{id}), 'state' => '--', 'proc_state' => $workflow->{'proc_state'}, pid => $$ }};
-
-    } else {
-
-        $log->info(sprintf("RPC request was processed properly (Workflow: %01d, State: %s (%s))",
-            $workflow->{id}, $workflow->{state}, $workflow->{'proc_state'}) );
-        $res = { result => { id => int($workflow->{id}), 'state' => $workflow->{'state'}, 'proc_state' => $workflow->{'proc_state'}, pid => $$ }};
-
-        # if pickup is set and workflow is not in a final state we send a 202
-        if ($conf->{$method}->{pickup}) {
-            if ($workflow->{'proc_state'} eq 'pause') {
-                my $delay = $workflow->{'wake_up_at'} - time();
-                $res->{result}->{retry_after} = ($delay > 30) ? $delay : 30;
-                $log->debug("Need retry - workflow is paused - delay $delay");
-            } elsif ($workflow->{'proc_state'} ne 'finished') {
-                $res->{result}->{retry_after} = 300;
-                $log->debug("Need retry - workflow is " . $workflow->{'proc_state'});
-            }
+        my $param;
+        # look for preset params
+        foreach my $key (keys %{$conf->{$method}}) {
+            next unless ($key =~ m{preset_(\w+)});
+            $param->{$1} = $conf->{$method}->{$key};
         }
 
-        # Map context parameters to the response if requested
-        if ($conf->{$method}->{output}) {
-            $res->{result}->{data} = {};
+        # Only parameters which are whitelisted in the config are mapped!
+        # This is crucial to prevent injection of server-only parameters
+        # like the autoapprove flag...
+
+        if ($conf->{$method}->{param}) {
             my @keys;
-            @keys = split /\s*,\s*/, $conf->{$method}->{output};
-            $log->debug("Keys " . join(", ", @keys));
-            $log->trace("Raw context: ". Dumper $workflow->{context}) if ($log->is_trace());
+            @keys = split /\s*,\s*/, $conf->{$method}->{param};
             foreach my $key (@keys) {
-                my $val = $workflow->{context}->{$key};
+                my $val = $get_param->($key);
                 next unless (defined $val);
-                next unless ($val ne '' || ref $val);
-                if (OpenXPKI::Serialization::Simple::is_serialized($val)) {
-                    $val = OpenXPKI::Serialization::Simple->new()->deserialize( $val );
+
+                if (!ref $val) {
+                    $val =~ s/\A\s+//;
+                    $val =~ s/\s+\z//;
                 }
-                $res->{result}->{data}->{$key} = $val;
+                $param->{$key} = $val;
             }
         }
+
+        # if given, append to the paramter list
+        if ($servername) {
+            $param->{'server'} = $servername;
+            $param->{'interface'} = 'rpc';
+        }
+
+        my %envkeys;
+        if ($conf->{$method}->{env}) {
+            %envkeys = map {$_ => 1} (split /\s*,\s*/, $conf->{$method}->{env});
+        }
+
+        # IP Transport
+        if ($envkeys{'client_ip'}) {
+            $param->{'client_ip'} = $ENV{REMOTE_ADDR};
+        }
+
+        # User Agent
+        if ($envkeys{'user_agent'}) {
+            $param->{'user_agent'} = $ENV{HTTP_USER_AGENT};
+        }
+
+        # be lazy and use endpoint name as servername
+        if ($envkeys{'server'}) {
+            if ($servername) {
+                die failure( 50005 );
+            } elsif (!$config->endpoint()) {
+                die failure( 50006 );
+            } else {
+                $param->{'server'} = $config->endpoint();
+                $param->{'interface'} = 'rpc';
+                Log::Log4perl::MDC->put('server', $param->{'server'} );
+            }
+        }
+
+        if ($envkeys{'endpoint'}) {
+            $param->{'endpoint'} = $config->endpoint();
+        }
+
+        # Gather data from TLS session
+        my $auth_dn = '';
+        my $auth_pem = '';
+        if ( defined $ENV{HTTPS} && lc( $ENV{HTTPS} ) eq 'on' ) {
+
+            $log->debug("calling context is https");
+            $auth_dn = $ENV{SSL_CLIENT_S_DN};
+            $auth_pem = $ENV{SSL_CLIENT_CERT};
+            if ( defined $auth_dn ) {
+                $log->info("RPC authenticated client DN: $auth_dn");
+
+                if ($envkeys{'signer_dn'}) {
+                    $param->{'signer_dn'} = $auth_dn;
+                }
+
+                if ($envkeys{'tls_client_dn'}) {
+                    $param->{'tls_client_dn'} = $auth_dn;
+                }
+
+                if ($auth_pem) {
+                    $param->{'signer_cert'} = $auth_pem if ($envkeys{'signer_cert'});
+                    $param->{'tls_client_cert'} = $auth_pem if ($envkeys{'tls_client_cert'});
+                    if (($envkeys{'signer_chain'} || $envkeys{'tls_client_chain'}) && $ENV{'SSL_CLIENT_CERT_CHAIN_0'}) {
+                        my @chain;
+                        for (my $cc=0;$cc<=3;$cc++)   {
+                            my $chaincert = $ENV{'SSL_CLIENT_CERT_CHAIN_'.$cc};
+                            last unless ($chaincert);
+                            push @chain, $chaincert;
+                        }
+                        $param->{'signer_chain'} = $auth_pem if ($envkeys{'signer_chain'});
+                        $param->{'tls_client_chain'} = $auth_pem if ($envkeys{'tls_client_chain'});
+                    }
+                }
+            }
+            else {
+                $log->debug("RPC unauthenticated (no cert)");
+            }
+        } else {
+            $log->debug("RPC unauthenticated (plain http)");
+        }
+
+        if ($pkcs7_content && $envkeys{'pkcs7'}) {
+            $param->{'_pkcs7'} = $pkcs7;
+        }
+
+        if ($pkcs7_content && $envkeys{'signer_cert'}) {
+            $param->{'signer_cert'} = $pkcs7_content->{signer};
+        }
+
+        $log->trace( "Calling $method on ".$config->endpoint()." with parameters: " . Dumper $param ) if $log->is_trace;
+
+        my $res;
+        my $workflow;
+
+        try {
+            # create the client object
+            $client = $rpc->backend() or die failure( 50001, "Unable to create client" );
+
+            # check for pickup parameter
+            if (my $pickup_key = $conf->{$method}->{pickup}) {
+                my $pickup_value;
+                # namespace needs a single value
+                if ($conf->{$method}->{pickup_workflow}) {
+                    my @keys = split /\s*,\s*/, $pickup_key;
+                    foreach my $key (@keys) {
+                        # take value from param hash if defined, this makes data
+                        # from the environment avail to the pickup workflow
+                        my $val = $param->{$key} // $get_param->($key);
+                        $pickup_value->{$key} = $val if (defined $val);
+                    }
+                } else {
+                    $pickup_value = $get_param->($pickup_key);
+                }
+                if ($pickup_value) {
+                    $workflow = $rpc->pickup_workflow($conf->{$method}, $pickup_value);
+                } else {
+                    $log->trace( "No pickup because $pickup_key has no value" ) if $log->is_trace;
+                }
+            }
+
+            # Endpoint has a "resume and execute" definition so run action if possible
+            if (my $execute_action = $conf->{$method}->{execute_action}) {
+                if (!$workflow) {
+                    die failure( 40402 );
+                } elsif ($workflow->{'proc_state'} ne 'manual') {
+                    die failure( 40403, { id => int($workflow->{id}), 'state' => $workflow->{'state'}, proc_state => $workflow->{'proc_state'} } );
+                } else {
+                    my $actions_avail = $client->run_command('get_workflow_activities', { id => $workflow->{id} });
+                    if (!(grep { $_ eq  $execute_action } @{$actions_avail})) {
+                        die failure( 40404, { id => int($workflow->{id}), 'state' => $workflow->{'state'}, proc_state => $workflow->{'proc_state'} } );
+                    } else {
+                        $log->debug("Resume #".$workflow->{id}." and $execute_action with params " . join(", ", keys %{$param}));
+                        $workflow = $client->handle_workflow({
+                            id => $workflow->{id},
+                            activity => $execute_action,
+                            params => $param
+                        });
+                    }
+                }
+
+            # pickup return undef if no workflow was found
+            } elsif (!$workflow) {
+                $log->debug("Initialize $workflow_type with params " . join(", ", keys %{$param}));
+                $workflow = $client->handle_workflow({
+                    type => $workflow_type,
+                    params => $param
+                });
+            }
+
+            $log->trace( 'Workflow info '  . Dumper $workflow ) if ($log->is_trace());
+        }
+        catch {
+            #
+            # Special internal error hash generated by failure() - rethrow
+            #
+            if (ref $_ eq 'HASH' and $_->{rpc_failure}) {
+                die $_;
+            }
+
+            #
+            # OpenXPKI::Exception - convert into special internal error hash
+            #
+            if ( blessed $_ and $_->isa('OpenXPKI::Exception') ) {
+                die failure( 50002, $_->message );
+            }
+
+            #
+            # Validation error
+            #
+            my $reply = $client->last_reply();
+            $log->error(Dumper $reply);
+
+            my $error = $client->last_error() || $_;
+
+            # TODO this needs to be reworked
+            if ($reply->{ERROR}
+                && ($reply->{ERROR}->{CLASS}//'') eq 'OpenXPKI::Exception::InputValidator'
+                && $reply->{ERROR}->{ERRORS}
+            ) {
+                die failure( 40003, { fields => $reply->{ERROR}->{ERRORS} } );
+
+            } else {
+                if ($reply->{ERROR} && $reply->{ERROR}->{LABEL}) {
+                    $error = $reply->{ERROR}->{LABEL};
+                }
+                my $msg_public = (($error//'') =~ /I18N_OPENXPKI_UI_/) ? $error : 'uncaught error';
+                my $msg_log = $error;
+                die failure( 50002, [ $msg_public, $msg_log ] );
+            }
+        };
+
+        if (not $res) {
+            # no ID and not finished is an unrecoverable startup error
+            if (( $workflow->{'proc_state'} ne 'finished' && !$workflow->{id} ) || $workflow->{'proc_state'} eq 'exception') {
+
+                die failure( 50003, { id => int($workflow->{id}), 'state' => $workflow->{'state'} } );
+
+            # if the workflow is running, we do not expose any data of the workflows
+            } elsif ( $workflow->{'proc_state'} eq 'running' ) {
+
+                $log->info(sprintf("RPC request was processed properly (Workflow: %01d is currently running)",
+                    $workflow->{id} ));
+                $res = { result => { id => int($workflow->{id}), 'state' => '--', 'proc_state' => $workflow->{'proc_state'}, pid => $$ }};
+
+            } else {
+
+                $log->info(sprintf("RPC request was processed properly (Workflow: %01d, State: %s (%s))",
+                    $workflow->{id}, $workflow->{state}, $workflow->{'proc_state'}) );
+                $res = { result => { id => int($workflow->{id}), 'state' => $workflow->{'state'}, 'proc_state' => $workflow->{'proc_state'}, pid => $$ }};
+
+                # if pickup is set and workflow is not in a final state we send a 202
+                if ($conf->{$method}->{pickup}) {
+                    if ($workflow->{'proc_state'} eq 'pause') {
+                        my $delay = $workflow->{'wake_up_at'} - time();
+                        $res->{result}->{retry_after} = ($delay > 30) ? $delay : 30;
+                        $log->debug("Need retry - workflow is paused - delay $delay");
+                    } elsif ($workflow->{'proc_state'} ne 'finished') {
+                        $res->{result}->{retry_after} = 300;
+                        $log->debug("Need retry - workflow is " . $workflow->{'proc_state'});
+                    }
+                }
+
+                # Map context parameters to the response if requested
+                if ($conf->{$method}->{output}) {
+                    $res->{result}->{data} = {};
+                    my @keys;
+                    @keys = split /\s*,\s*/, $conf->{$method}->{output};
+                    $log->debug("Keys " . join(", ", @keys));
+                    $log->trace("Raw context: ". Dumper $workflow->{context}) if ($log->is_trace());
+                    foreach my $key (@keys) {
+                        my $val = $workflow->{context}->{$key};
+                        next unless (defined $val);
+                        next unless ($val ne '' || ref $val);
+                        if (OpenXPKI::Serialization::Simple::is_serialized($val)) {
+                            $val = OpenXPKI::Serialization::Simple->new()->deserialize( $val );
+                        }
+                        $res->{result}->{data}->{$key} = $val;
+                    }
+                }
+            }
+        }
+        send_output( $cgi,  $res );
     }
-
-    send_output( $cgi,  $res );
-
-    if ($client) {
-        $client->disconnect();
+    catch {
+        # special internal error hash generated by failure()
+        if (ref $_ eq 'HASH' and defined $_->{rpc_failure}) {
+            send_output( $cgi, $_ );
+        }
+        # unknown error
+        else {
+            send_output( $cgi, failure(40006, [ undef, $_ ]) );
+        }
     }
-
+    finally {
+        $client->disconnect() if $client;
+    };
 }
 
 
