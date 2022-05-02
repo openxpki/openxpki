@@ -9,6 +9,7 @@ use Data::Dumper;
 use JSON::PP;
 use Scalar::Util qw( blessed );
 use English;
+use Encode;
 
 # CPAN modules
 use Try::Tiny;
@@ -41,6 +42,7 @@ my $error_msg = {
     40004 => 'RAW post not allowed (no method set in request)',
     40005 => 'RAW post with unknown content type',
     40006 => 'Unknown RPC error',
+    40007 => 'POST data contains invalid UTF8 octets',
 
     40401 => 'Invalid method / setup incomplete',
     40402 => 'Resume requested but no workflow found',
@@ -242,7 +244,21 @@ while (my $cgi = CGI::Fast->new()) {
             $method = $json_data->{method} unless $method;
         }
 
-        my $get_param = sub { my $k = shift; $json_data ? $json_data->{$k} : $cgi->param($k) };
+        # accessor that takes a key and returns either JSON value (if available)
+        # or the CGI param value.
+        my $get_param = sub {
+            my $k = shift;
+            if ($json_data) {
+                return $json_data->{$k}; # UTF-8 decoding already done by JSON modules
+            }
+            else {
+                my $raw = $cgi->param($k);  # assume this is an UTF-8 encoded octet stream
+                return unless defined $raw; # ..to be able to test for undef below
+                my $value = eval { Encode::decode("UTF-8", $raw, Encode::LEAVE_SRC | Encode::FB_CROAK) }
+                    or die failure(40007, [undef, "Could not decode field '$k' - $EVAL_ERROR"]);
+                return $value;
+            }
+        };
 
         $method = $config->route() unless $method;
 
