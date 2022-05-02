@@ -186,7 +186,7 @@ while (my $cgi = CGI::Fast->new()) {
 
     # check for request parameters in JSON data (HTTP body)
     my $method = $cgi->param('method');
-    my $postdata;
+    my $json_data;
     my $pkcs7_content;
     my $pkcs7;
     if (my $raw = $cgi->param('POSTDATA')) {
@@ -237,18 +237,20 @@ while (my $cgi = CGI::Fast->new()) {
         $log->trace("RPC raw postdata : " . $raw) if ($log->is_trace());
 
         # decode JSON
-        eval{ $postdata = $json->decode($raw) };
+        eval{ $json_data = $json->decode($raw) };
         $eval_err = $EVAL_ERROR;
-        if (!$postdata or $eval_err) {
+        if (!$json_data or $eval_err) {
             send_output( $cgi, failure(40002, [ undef, $eval_err ]) );
             next;
         }
 
         # read "method" from JSON data if not found in URL before
-        $method = $postdata->{method} unless $method;
+        $method = $json_data->{method} unless $method;
     }
 
-    $method = $config->route() unless($method);
+    my $get_param = sub { my $k = shift; $json_data ? $json_data->{$k} : $cgi->param($k) };
+
+    $method = $config->route() unless $method;
 
     # method should be set now
     if ( !$method ) {
@@ -294,13 +296,7 @@ while (my $cgi = CGI::Fast->new()) {
         my @keys;
         @keys = split /\s*,\s*/, $conf->{$method}->{param};
         foreach my $key (@keys) {
-
-            my $val;
-            if ($postdata) {
-                $val = $postdata->{$key};
-            } else {
-                $val = $cgi->param($key);
-            }
+            my $val = $get_param->($key);
             next unless (defined $val);
 
             if (!ref $val) {
@@ -418,11 +414,11 @@ while (my $cgi = CGI::Fast->new()) {
                 foreach my $key (@keys) {
                     # take value from param hash if defined, this makes data
                     # from the environment avail to the pickup workflow
-                    my $val = $param->{$key} // ($postdata ? $postdata->{$key} : $cgi->param($key));
+                    my $val = $param->{$key} // $get_param->($key);
                     $pickup_value->{$key} = $val if (defined $val);
                 }
             } else {
-                $pickup_value = $postdata ? $postdata->{$pickup_key} : $cgi->param($pickup_key);
+                $pickup_value = $get_param->($pickup_key);
             }
             if ($pickup_value) {
                 $workflow = $rpc->pickup_workflow($conf->{$method}, $pickup_value);
