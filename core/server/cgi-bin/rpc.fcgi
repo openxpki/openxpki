@@ -165,6 +165,7 @@ if ($EVAL_ERROR) {
 
 $log->info("RPC handler initialized");
 
+CGI_LOOP:
 while (my $cgi = CGI::Fast->new()) {
 
     my $client;
@@ -175,7 +176,7 @@ while (my $cgi = CGI::Fast->new()) {
 
     if (!$conf) {
         send_output( $cgi, failure(50007, [undef, $eval_err]) );
-        next;
+        next CGI_LOOP;
     }
 
     my $rpc = OpenXPKI::Client::Service::RPC->new( config => $config, error_messages => $error_msg );
@@ -193,7 +194,7 @@ while (my $cgi = CGI::Fast->new()) {
 
         if (!$conf->{input}->{allow_raw_post}) {
             send_output( $cgi, failure(40004) );
-            next;
+            next CGI_LOOP;
         }
 
         my $content_type = $ENV{'CONTENT_TYPE'} || '';
@@ -218,7 +219,7 @@ while (my $cgi = CGI::Fast->new()) {
             if ($eval_err || !$raw) {
                 send_output( $cgi, failure(50001, $eval_err) );
                 $client->disconnect() if ($client);
-                next;
+                next CGI_LOOP;
             }
 
         } elsif ($content_type =~ m{\Aapplication/json}) {
@@ -227,7 +228,7 @@ while (my $cgi = CGI::Fast->new()) {
         } else {
 
             send_output( $cgi, failure(40005, { type => $content_type }) );
-            next;
+            next CGI_LOOP;
         }
 
         # TODO - evaluate security implications regarding blessed objects
@@ -241,7 +242,7 @@ while (my $cgi = CGI::Fast->new()) {
         $eval_err = $EVAL_ERROR;
         if (!$json_data or $eval_err) {
             send_output( $cgi, failure(40002, [ undef, $eval_err ]) );
-            next;
+            next CGI_LOOP;
         }
 
         # read "method" from JSON data if not found in URL before
@@ -255,7 +256,7 @@ while (my $cgi = CGI::Fast->new()) {
     # method should be set now
     if ( !$method ) {
         send_output( $cgi, failure(40001) );
-        next;
+        next CGI_LOOP;
     }
 
     # special handling for requests for OpenAPI (Swagger) spec?
@@ -267,7 +268,7 @@ while (my $cgi = CGI::Fast->new()) {
         } else {
             send_output($cgi, $spec, 1);
         }
-        next;
+        next CGI_LOOP;
     }
 
     my $servername = $conf->{$method}->{servername} || '';
@@ -278,7 +279,7 @@ while (my $cgi = CGI::Fast->new()) {
     my $workflow_type = $conf->{$method}->{workflow};
     if ( !defined $workflow_type ) {
         send_output( $cgi, failure(40401, "RPC method $method not found or no workflow_type set") );
-        next;
+        next CGI_LOOP;
     }
 
     my $param;
@@ -332,10 +333,10 @@ while (my $cgi = CGI::Fast->new()) {
     if ($envkeys{'server'}) {
         if ($servername) {
             send_output( $cgi, failure(50005) );
-            next;
+            next CGI_LOOP;
         } elsif (!$config->endpoint()) {
             send_output( $cgi, failure(50006) );
-            next;
+            next CGI_LOOP;
         } else {
             $param->{'server'} = $config->endpoint();
             $param->{'interface'} = 'rpc';
