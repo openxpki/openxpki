@@ -19,6 +19,8 @@ my $client = TestCGI::factory('democa');
 
 my $sscep = -e "./sscep" ? './sscep' : 'sscep';
 
+SKIP: { skip 'sscep not available', 9 unless -e $sscep;
+
 ok((-s "tmp/entity.crt"),'Old cert present') || die;
 
 # Generate new CSR
@@ -83,3 +85,4 @@ ok($client->get_field_from_result('revocation_workflow_id'));
 
 is(`openssl  x509 -noout -enddate -in tmp/entity.crt`, `openssl  x509 -noout -enddate -in tmp/entity2.crt`, 'Notafter matches');
 
+}

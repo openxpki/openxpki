@@ -18,6 +18,8 @@ my $client = TestCGI::factory('democa');
 
 my $sscep = -e "./sscep" ? './sscep' : 'sscep';
 
+SKIP: { skip 'sscep not available', 6 unless -e $sscep;
+
 `$sscep getca -c tmp/cacert -u http://localhost/scep/scep`;
 
 ok((-s "tmp/cacert-0"),'CA certs present') || die;
@@ -62,4 +64,6 @@ $result = $client->mock_request({
 
 foreach my $line (@{$result->{main}->[0]->{content}->{data}}) {
     ok($line->{value}, 'signer_revoked is set') if ($line->{label} =~ 'signer_revoked');
+}
+
 }

@@ -18,6 +18,8 @@ my $client = TestCGI::factory('democa');
 
 my $sscep = -e "./sscep" ? './sscep' : 'sscep';
 
+SKIP: { skip 'sscep not available', 12 unless -e $sscep;
+
 `$sscep getca -c tmp/cacert -u http://localhost/scep/scep`;
 
 ok((-s "tmp/cacert-0"),'CA certs present') || die;
@@ -122,3 +124,4 @@ open(CERT, ">tmp/entity.id");
 print CERT $cert_identifier;
 close CERT;
 
+}

@@ -20,6 +20,8 @@ my $client = TestCGI::factory('democa');
 
 my $sscep = -e "./sscep" ? './sscep' : 'sscep';
 
+SKIP: { skip 'sscep not available', 10 unless -e $sscep;
+
 `$sscep getca -c tmp/cacert -u http://localhost/scep/scep`;
 
 ok((-s "tmp/cacert-0"),'CA certs present') || die;
@@ -80,3 +82,5 @@ $result = $client->mock_request({
 });
 
 is ($result->{right}->[0]->{content}->{data}->[3]->{value}, 'FAILURE', 'Status is FAILURE');
+
+}

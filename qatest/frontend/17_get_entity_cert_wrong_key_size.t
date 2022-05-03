@@ -20,6 +20,8 @@ my $client = TestCGI::factory('democa');
 
 my $sscep = -e "./sscep" ? './sscep' : 'sscep';
 
+SKIP: { skip 'sscep not available', 7 unless -e $sscep;
+
 `$sscep getca -c tmp/cacert -u http://localhost/scep/scep`;
 
 ok((-s "tmp/cacert-0"),'CA certs present') || die;
@@ -74,3 +76,4 @@ $result = $client->mock_request({
 
 is($client->get_field_from_result('error_code'), 'Policy failed (provided key does not match the requirements)');
 
+}

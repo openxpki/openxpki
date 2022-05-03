@@ -16,6 +16,8 @@ package main;
 my $result;
 my $client = TestCGI::factory('democa');
 
+SKIP: { skip 'tmp/entity.id does not exist (sscep not available)', 3 unless -r 'tmp/entity.id';
+
 my $cert_identifier = do { # slurp
     local $INPUT_RECORD_SEPARATOR;
     open my $HANDLE, '<tmp/entity.id';
@@ -57,4 +59,6 @@ while (my $line = shift @certlist) {
 
         last CERTLIST;
     }
+}
+
 }

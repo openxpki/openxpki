@@ -19,6 +19,8 @@ my $client = TestCGI::factory('democa');
 
 my $sscep = -e "./sscep" ? './sscep' : 'sscep';
 
+SKIP: { skip 'sscep not available', 16 unless -e $sscep;
+
 `$sscep getca -c tmp/cacert -u http://localhost/scep/scep`;
 
 ok((-s "tmp/cacert-0"),'CA certs present') || die;
@@ -108,3 +110,5 @@ like($san, qr/DNS:also.test.me/);
 like($san, qr/DNS:test.me/);
 like($san, qr/IP Address:127.0.0.1/);
 like($san, qr/IP Address:FE80:0:0:0:0:0:0:1/);
+
+}

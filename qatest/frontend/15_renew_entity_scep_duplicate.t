@@ -19,6 +19,8 @@ my $client = TestCGI::factory('democa');
 
 my $sscep = -e "./sscep" ? './sscep' : 'sscep';
 
+SKIP: { skip 'sscep not available', 7 unless -e $sscep;
+
 ok((-s "tmp/entity.crt"),'Old cert present') || die;
 
 # Generate new CSR
@@ -67,3 +69,5 @@ like($client->get_field_from_result('error_code'), "/Policy failed/");
 ok($client->get_field_from_result('check_policy_subject_duplicate'));
 
 $client->fail_workflow($workflow_id);
+
+}

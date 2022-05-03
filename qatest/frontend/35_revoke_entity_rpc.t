@@ -18,6 +18,8 @@ use Test::More tests => 2;
 
 package main;
 
+SKIP: { skip 'tmp/entity.id does not exist (sscep not available)', 2 unless -r 'tmp/entity.id';
+
 my $cert_identifier = do { # slurp
     local $INPUT_RECORD_SEPARATOR;
     open my $HANDLE, '<tmp/entity.id';
@@ -47,3 +49,5 @@ my $json = JSON->new->decode($response->decoded_content);
 diag('Workflow Id ' . $json->{result}->{id} );
 
 is($json->{result}->{state}, 'SUCCESS');
+
+}
