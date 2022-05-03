@@ -48,7 +48,7 @@ my $response = $ua->post('https://localhost/rpc/enroll', [
     ],
 );
 
-ok($response->is_success);
+ok $response->is_success, 'HTTP request successful' or diag explain $response;
 
 my $json = JSON->new->decode($response->decoded_content);
 

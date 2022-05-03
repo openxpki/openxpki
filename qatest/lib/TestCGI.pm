@@ -7,6 +7,7 @@ use Log::Log4perl qw(:easy);
 use URI::Escape;
 use LWP::UserAgent;
 use IO::Socket::SSL qw( SSL_VERIFY_NONE );
+use Test::More;
 no warnings qw( redundant );
 
 has config => (
@@ -203,16 +204,15 @@ sub mock_request {
 }
 
 sub get_field_from_result {
-    my $self = shift;
-    my $field = shift;
 
-    my @data = @{$self->last_result()->{main}->[0]->{content}->{data}};
-    while (my $line = shift @data ) {
-        $self->logger()->trace( Dumper $line ) if $self->logger->is_trace;
-        return $line->{value} if ($line->{label} eq $field);
-    }
-    $self->logger()->debug( 'No result for field ' . $field );
-    return undef;
+    my $self = shift;
+    my $field_name = shift;
+
+    my $fields = eval { $self->last_result->{main}->[0]->{content}->{data} } // [];
+    my ($field) = grep { ($_->{name} eq $field_name or $_->{label} eq $field_name) } @$fields;
+
+    return unless $field;
+    return $field->{value};
 }
 
 
@@ -257,6 +257,96 @@ sub fail_workflow {
     return $result->{right}->[0]->{content}->{data}->[2]->{value};
 }
 
+# Submit and approve CSR. Returns cert ID if workflow was successful.
+sub approve_csr {
+
+    my $self = shift;
+    my $wf_id = shift;
+
+    # Submit with policy violation
+    $self->try_action('csr_enter_policy_violation_comment');
+
+    # Enter comment
+    if ($self->has_field('policy_comment')) {
+        $self->try_action('workflow', { 'policy_comment' => 'Testing', 'wf_token' => undef });
+    }
+
+    # Approve with policy violation
+    if ($self->try_action('csr_approve_csr_with_comment')) {
+        note "Policy violation: enter operator comment";
+        $self->try_action('workflow', { 'operator_comment' => 'Testing' });
+    }
+
+    # Standard approval
+    $self->try_action('csr_approve_csr');
+
+    if ($self->last_result->{status} and $self->last_result->{status}->{level} eq 'success') {
+        my $cert = $self->get_field_from_result('cert_identifier');
+        my $cert_id = $cert ? $cert->{value} : undef;
+        note "Certificate identifier: ". ($cert_id // '<undef>');
+        return $cert_id;
+    }
+
+    return;
+}
+
+sub has_button_action {
+
+    my $self = shift;
+    my $action = shift;
+
+    # main site action
+    return $action if (eval { $self->last_result->{main}->[0]->{action} } // '') eq $action;
+
+    # individual button
+    my $buttons = $self->last_result->{main}->[0]->{content}->{buttons};
+    my ($full_action) = grep { m/!wf_action!$action\b/ } map { $_->{action} // '' } @$buttons;
+    return $full_action;
+}
+
+# Calls the first available action of the given list, passing the given parameters.
+sub try_action {
+
+    my $self = shift;
+    my $actions = shift;
+    my $params = shift;
+
+    $actions = [ $actions ] unless ref $actions eq 'ARRAY';
+
+    for my $action (@$actions) {
+        my $full_action;
+
+        # main site action
+        $full_action = $action if ((eval { $self->last_result->{main}->[0]->{action} } // '') eq $action);
+
+        # individual button
+        if (!$full_action) {
+            my $buttons = $self->last_result->{main}->[0]->{content}->{buttons};
+            ($full_action) = grep { m/!wf_action!$action\b/ } map { $_->{action} // '' } @$buttons;
+        }
+
+        next unless $full_action;
+
+        note "Calling action: $full_action";
+        return $self->mock_request({
+            'action' => $full_action,
+            'wf_token' => $self->wf_token,
+            %{ $params // {} },
+        });
+    }
+
+    return;
+}
+
+sub has_field {
+
+    my $self = shift;
+    my $field = shift;
+
+    my $fields = $self->last_result->{main}->[0]->{content}->{fields};
+    return scalar grep { ($_->{name} // '') eq $field } @$fields;
+}
+
 # Static call that generates a ready-to-use client
 sub factory {
 
@@ -264,23 +354,27 @@ sub factory {
     my $user = shift || 'raop';
 
     my $client = TestCGI->new( %$p );
+    my $result;
 
     $client->mock_request({});
 
     $client->update_rtoken();
 
-    $client ->mock_request({ page => 'login'});
+    $result = $client ->mock_request({ page => 'login'});
+    die "No login page" unless $client->has_button_action('login!stack');
 
-    $client ->mock_request({
+    $result = $client->mock_request({
         'action' => 'login!stack',
         'auth_stack' => "Testing",
     });
+    die "No password input" unless $client->has_button_action('login!password');
 
-    $client ->mock_request({
+    $result = $client->mock_request({
         'action' => 'login!password',
         'username' => $user,
         'password' => 'openxpki'
     });
+    die "No redirect to start page" unless $result->{goto} eq 'redirect!welcome';
 
     # refetch new rtoken, also inits session via bootstrap
     $client->update_rtoken();

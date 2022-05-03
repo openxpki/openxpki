@@ -11,7 +11,7 @@ use TestCGI;
 use MIME::Base64;
 use Crypt::X509;
 
-use Test::More tests => 4;
+use Test::More tests => 3;
 
 package main;
 
@@ -78,31 +78,7 @@ $result = $client->mock_request({
     'wf_token' => undef
 });
 
-
-# this is either submit or the link to enter a policy violation comment
-$result = $client->mock_request({
-    'action' => $result->{main}->[0]->{content}->{buttons}->[0]->{action}
-});
-
-if ($result->{main}->[0]->{content}->{fields} &&
-    $result->{main}->[0]->{content}->{fields}->[0]->{name} eq 'policy_comment') {
-
-    $result = $client->mock_request({
-        'action' => 'workflow!index',
-        'policy_comment' => 'Testing',
-        'wf_token' => undef
-    });
-};
-
-$result = $client->mock_request({
-    'action' => 'workflow!select!wf_action!csr_approve_csr!wf_id!' . $wf_id,
-});
-
-
-is ($result->{status}->{level}, 'success', 'Status is success');
-
-my $cert_identifier = $result->{main}->[0]->{content}->{data}->[0]->{value}->{label};
-$cert_identifier =~ s/\<br.*$//g;
+my $cert_identifier = $client->approve_csr($wf_id);
 
 # Download the certificate
 $result = $client->mock_request({
