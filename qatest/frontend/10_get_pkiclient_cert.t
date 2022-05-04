@@ -14,7 +14,7 @@ use Test::More tests => 2;
 package main;
 
 my $result;
-my $client = TestCGI::factory('democa', 'alice');
+my $client = TestCGI::factory('democa', 0);
 
 # create temp dir
 -d "tmp/" || mkdir "tmp/";
@@ -50,25 +50,19 @@ $result = $client->mock_request({
 # Create the pkcs10
 my $pkcs10 = `openssl req -new -newkey rsa:3000 -subj "/CN=testbox.openxpki.org:pkiclient" -nodes -keyout tmp/pkiclient.key 2>/dev/null`;
 
-$result = $client->mock_request({
-    'action' => 'workflow!index',
+$client->run_action('workflow' => {
     'pkcs10' => $pkcs10,
     'csr_type' => 'pkcs10',
-    'wf_token' => undef
 });
 
-
-$result = $client->mock_request({
+$client->run_action('workflow', {
     'action' => 'workflow!index',
     'cert_subject_parts{hostname}' => 'testbox.openxpki.org',
     'cert_subject_parts{application_name}' => 'pkiclient',
-    'wf_token' => undef
 });
 
-$result = $client->mock_request({
-    'action' => 'workflow!index',
+$client->run_action('workflow', {
     'cert_info{requestor_email}' => 'test@openxpki.local',
-    'wf_token' => undef
 });
 
 $client->approve_csr($wf_id);
@@ -79,7 +73,8 @@ $result = $client->mock_request({
     page => 'workflow!load!wf_id!' . $wf_id
 });
 
-my $cert_identifier = $client->approve_csr($wf_id);
+my $cert_identifier = $client->approve_csr($wf_id)
+  or BAIL_OUT('Could not retrieve certificate ID: '.Dumper($client->last_result));
 
 # Download the certificate
 $result = $client->mock_request({

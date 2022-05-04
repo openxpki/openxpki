@@ -263,18 +263,22 @@ sub approve_csr {
     my $self = shift;
     my $wf_id = shift;
 
+    # Submit
+    $self->try_action('csr_submit');
+
     # Submit with policy violation
     $self->try_action('csr_enter_policy_violation_comment');
 
     # Enter comment
     if ($self->has_field('policy_comment')) {
-        $self->try_action('workflow', { 'policy_comment' => 'Testing', 'wf_token' => undef });
+        note "< policy violation: enter comment";
+        $self->run_action('workflow', { 'policy_comment' => 'Testing', 'wf_token' => undef });
     }
 
     # Approve with policy violation
     if ($self->try_action('csr_approve_csr_with_comment')) {
-        note "Policy violation: enter operator comment";
-        $self->try_action('workflow', { 'operator_comment' => 'Testing' });
+        note "< policy violation: enter operator comment";
+        $self->run_action('workflow', { 'operator_comment' => 'Testing' });
     }
 
     # Standard approval
@@ -283,7 +287,7 @@ sub approve_csr {
     if ($self->last_result->{status} and $self->last_result->{status}->{level} eq 'success') {
         my $cert = $self->get_field_from_result('cert_identifier');
         my $cert_id = $cert ? $cert->{value} : undef;
-        note "Certificate identifier: ". ($cert_id // '<undef>');
+        note "> certificate identifier: ". ($cert_id // '<undef>');
         return $cert_id;
     }
 
@@ -305,6 +309,7 @@ sub has_button_action {
 }
 
 # Calls the first available action of the given list, passing the given parameters.
+# Does nothing if no action was performed.
 sub try_action {
 
     my $self = shift;
@@ -327,7 +332,7 @@ sub try_action {
 
         next unless $full_action;
 
-        note "Calling action: $full_action";
+        note "> calling action: $full_action";
         return $self->mock_request({
             'action' => $full_action,
             'wf_token' => $self->wf_token,
@@ -336,6 +341,23 @@ sub try_action {
     }
 
     return;
+}
+
+# Calls the first available action of the given list, passing the given parameters.
+# Throws an exception if no action was performed.
+sub run_action {
+
+    my $self = shift;
+    my $actions = shift;
+    my $params = shift;
+
+    $actions = [ $actions ] unless ref $actions eq 'ARRAY';
+    my $result = $self->try_action($actions, $params);
+
+    die sprintf("None of the given action were available: %s\n%s", join(', ', @$actions), Dumper($self->last_result))
+      unless $result;
+
+    return $result;
 }
 
 sub has_field {
@@ -347,13 +369,16 @@ sub has_field {
     return scalar grep { ($_->{name} // '') eq $field } @$fields;
 }
 
-# Static call that generates a ready-to-use client
+# Static call that generates a ready-to-use client.
+# Parameters:
+# - I<Str> $realm
+# - I<Bool> $user_raop: set to 0 to try login with basic user (no raop)
 sub factory {
 
-    my $p = { realm =>  shift };
-    my $user = shift || 'raop';
+    my $realm = shift;
+    my $user_raop = shift || 1;
 
-    my $client = TestCGI->new( %$p );
+    my $client = TestCGI->new(realm => $realm);
     my $result;
 
     $client->mock_request({});
@@ -361,20 +386,18 @@ sub factory {
     $client->update_rtoken();
 
     $result = $client ->mock_request({ page => 'login'});
-    die "No login page" unless $client->has_button_action('login!stack');
 
-    $result = $client->mock_request({
-        'action' => 'login!stack',
-        'auth_stack' => "Testing",
-    });
-    die "No password input" unless $client->has_button_action('login!password');
+    $client->run_action('login!stack', { 'auth_stack' => "Testing" });
 
-    $result = $client->mock_request({
-        'action' => 'login!password',
-        'username' => $user,
-        'password' => 'openxpki'
-    });
-    die "No redirect to start page" unless $result->{goto} eq 'redirect!welcome';
+    # try login with 'user' (docker-ee, Vagrant Box "develop") and 'alice' (community config)
+    my @try_users = $user_raop ? [ 'raop' ] : [ 'user', 'alice' ];
+    for my $user (@try_users) {
+        $client->run_action('login!password', { 'username' => $user, 'password' => 'openxpki' });
+        last if ($client->last_result->{goto} // '') eq 'redirect!welcome';
+    }
+
+    die "Login failed - no redirect to start page: ".Dumper($client->last_result)
+      unless ($client->last_result->{goto} // '') eq 'redirect!welcome';
 
     # refetch new rtoken, also inits session via bootstrap
     $client->update_rtoken();
