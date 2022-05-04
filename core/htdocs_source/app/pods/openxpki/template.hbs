@@ -71,6 +71,19 @@
 <div class="container-fluid {{this.model.tabs.firstObject.page.className}}">
     {{!
       *************************************
+      Old browser warning
+      *************************************
+    }}
+    <div class="row">
+        <div class="col oxi-message">
+            <div class="alert alert-danger" hidden={{not (and (not this.content.user) this.oldBrowser)}}>
+                {{t 'site.old_browser' browser=this.oldBrowser}}
+            </div>
+        </div>
+    </div>
+
+    {{!
+      *************************************
       Messages
       *************************************
     }}
