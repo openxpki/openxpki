@@ -13,10 +13,11 @@ RUN mkdir /build && chmod 0777 /build
 # Specify command
 #   We do some copy magic to ensure we use node_modules/ from the container,
 #   not the one bind-mounted from the host.
-#   The output path for compiled assets is changed to /compiled, "outputpath"
-#   is used in package.json via "$npm_package_config_outputpath".
+#   The output path for compiled assets is changed to /compiled via
+#   OPENXPKI_BUILD_OUTPUT_PATH (which is read inpackage.json).
 RUN echo '#!/bin/bash \n\
 set -e \n\
+echo "[Copy source code excl. node_modules]" \n\
 OPTS=(-rlD --delete --inplace --quiet) \n\
 rsync "${OPTS[@]}" \\\n\
   --exclude node_modules \\\n\
@@ -25,8 +26,8 @@ rsync "${OPTS[@]}" \\\n\
   /source/ /build \n\
 rsync "${OPTS[@]}" /node_modules/ /build/node_modules \n\
 cd /build \n\
-npm config set openxpki:outputpath /compiled \n\
-npm run build' > /build.sh \
+echo "[Build Ember application]" \n\
+OPENXPKI_BUILD_OUTPUT_PATH=/compiled npm run build' > /build.sh \
   && chmod 0755 /build.sh
 CMD /build.sh
 
