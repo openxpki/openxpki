@@ -629,17 +629,17 @@ cgi-bin/healthcheck.fcgi
 #   core/htdocs_source/update-manifest.pl will update the list below.
 #   UPDATE_MANIFEST_UI_LIST - do not remove this comment
 htdocs/assets/bootstrap-v4-tweaks-ab92eeef543fbc1b09c6c4a88b5d88b3.css
-htdocs/assets/chunk.143.d0acf7c15af722a849e2.js
-htdocs/assets/chunk.178.408d5b808c29b6980a04.js
-htdocs/assets/chunk.458.e1af0f4774b5bca829a3.js
-htdocs/assets/chunk.458.e1af0f4774b5bca829a3.js.LICENSE.txt
-htdocs/assets/chunk.958.8cc193dbcfcf30fabc7a.js
-htdocs/assets/chunk.958.8cc193dbcfcf30fabc7a.js.LICENSE.txt
+htdocs/assets/chunk.143.f2ceb645fc235588bd82.js
+htdocs/assets/chunk.15.dc672b2fc9d1e9863775.js
+htdocs/assets/chunk.15.dc672b2fc9d1e9863775.js.LICENSE.txt
+htdocs/assets/chunk.178.257a6fe00c9b46408d77.js
+htdocs/assets/chunk.958.5f17ee27b3598d43962d.js
+htdocs/assets/chunk.958.5f17ee27b3598d43962d.js.LICENSE.txt
 htdocs/assets/glyphicons-8dfa4dd41b8ab62e14cf32e7dd3756bc.css
-htdocs/assets/openxpki-27060ea639d3e498e7b8b47c4c77d9ee.js
+htdocs/assets/openxpki-067161bdc366f38ccced984d4d90afab.js
 htdocs/assets/openxpki-5cb3d0e370b7904107f7a909bf30f597.css
-htdocs/assets/vendor-4e23e616831af3261a25cbe635fd20d9.js
 htdocs/assets/vendor-67e170cb8fa57fdce6f57b2b245651ad.css
+htdocs/assets/vendor-838718aa57d590602ec974411bf6230c.js
 htdocs/default.html
 htdocs/favicon.png
 htdocs/fonts/glyphicons-halflings-regular.eot
