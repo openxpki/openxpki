@@ -93,7 +93,6 @@ use strict;
 use warnings;
 use English;
 
-use Data::Dumper;
 
 use DateTime;
 use OpenXPKI::Server::Context qw( CTX );
@@ -195,7 +194,7 @@ sub _init_transport {
 
     # Net::SMTP returns undef if it can not reach the configured socket
     if (!$transport || !ref $transport) {
-        CTX('log')->system()->fatal(sprintf("Failed creating smtp transport (host: %s, user: %s)", $smtp{Host}, $smtp{User}));
+        CTX('log')->system()->fatal(sprintf("Failed creating smtp transport (host: %s, user: %s)", ($smtp{Host} // 'unset'), ($smtp{User} // 'unset')));
         return undef;
     }
 
@@ -535,8 +534,11 @@ sub _send_plain {
     $smtpmsg .= "To: " . $vars->{to} . "\n";
     $smtpmsg .= "Cc: " . join(",", @{$vars->{cc}}) . "\n" if ($vars->{cc});
     $smtpmsg .= "Reply-To: " . $cfg->{reply} . "\n" if ($cfg->{reply});
-    $smtpmsg .= "Subject: $vars->{prefix} $subject\n";
-    $smtpmsg .= "\n$output";
+    $smtpmsg .= "Subject: ".Encode::encode('MIME-B', "$vars->{prefix} $subject")."\n";
+    $smtpmsg .= "MIME-Version: 1.0\n";
+    $smtpmsg .= "Content-Transfer-Encoding: 8bit\n";
+    $smtpmsg .= "Content-Type: text/plain; charset=utf-8\n";
+    $smtpmsg .= "\n". Encode::encode_utf8($output);
 
     ##! 64: "SMTP Msg --------------------\n$smtpmsg\n ----------------------------------";
 
