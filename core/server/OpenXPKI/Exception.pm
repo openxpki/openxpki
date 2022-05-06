@@ -131,8 +131,8 @@ sub throw {
 
     my $self = $proto->new(%exception_args);
 
-    # suppress logging if "log => undef"
-    if (exists $args{log} && !defined $args{log}) {
+    # suppress logging if "log => undef" or L4p is not initialized
+    if ((exists $args{log} && !defined $args{log}) || !Log::Log4perl->initialized()) {
         die $self;
     }
 

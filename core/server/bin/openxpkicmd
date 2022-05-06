@@ -14,6 +14,7 @@ use POSIX qw( strftime );
 use Getopt::Long;
 use Pod::Usage;
 use Data::Dumper;
+use Log::Log4perl qw(:easy);
 
 use OpenXPKI::Client;
 #use OpenXPKI::Serialization::Simple;
@@ -122,6 +123,7 @@ GetOptions(\%params,
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
 pod2usage(-verbose => 1) if ($params{help});
 
+Log::Log4perl->easy_init($params{debug} ? $DEBUG : $WARN );
 
 # json pretty implies json
 if ($params{'json-pretty'}) {
