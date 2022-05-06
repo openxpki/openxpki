@@ -4,11 +4,11 @@
             {{!-- template-lint-disable no-bare-strings --}}
             <li class="text-right user">
                 {{t 'userinfo.name'}}
-                <strong>{{this.content.user.realname}} ({{this.content.user.role}})</strong>
+                <strong>{{this.content.user.realname}} <span>({{this.content.user.role}})</span></strong>
             </li>
             <li class="text-right pki_realm">
                 {{t 'userinfo.realm'}}
-                <strong>{{this.content.user.pki_realm_label}} ({{this.content.user.pki_realm}})</strong>
+                <strong>{{this.content.user.pki_realm_label}} <span>({{this.content.user.pki_realm}})</span></strong>
             </li>
             {{#if this.content.user.last_login}}
             <li class="text-right last_login">
