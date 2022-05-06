@@ -20,7 +20,7 @@ my $client = TestCGI::factory('democa');
 
 my $sscep = -e "./sscep" ? './sscep' : 'sscep';
 
-SKIP: { skip 'sscep not available', 10 unless -e $sscep;
+SKIP: { skip 'sscep not available', 10 if (system "$sscep > /dev/null");
 
 `$sscep getca -c tmp/cacert -u http://localhost/scep/scep`;
 

@@ -19,7 +19,7 @@ my $client = TestCGI::factory('democa');
 
 my $sscep = -e "./sscep" ? './sscep' : 'sscep';
 
-SKIP: { skip 'sscep not available', 8 unless -e $sscep;
+SKIP: { skip 'sscep not available', 8 if (system "$sscep > /dev/null");
 
 # Generate new CSR
 `openssl req -new -subj "/DC=org/DC=OpenXPKI/DC=Test Deployment/CN=entity.openxpki.org" -nodes -keyout tmp/entity3.key -out tmp/entity3.csr 2>/dev/null`;

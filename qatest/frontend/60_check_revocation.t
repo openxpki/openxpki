@@ -9,7 +9,7 @@ use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use TestCGI;
 
-use Test::More tests => 9;
+use Test::More;
 
 package main;
 
@@ -23,6 +23,11 @@ my $crl= do { # slurp
 };
 
 for my $cert (('entity','entity2','pkiclient')) {
+
+    if (! -e "tmp/$cert.id") {
+        ok(0, "No such cert $cert.id");
+        next;
+    }
 
     # Load cert status page using cert identifier
     my $cert_identifier = do { # slurp
@@ -53,3 +58,5 @@ for my $cert (('entity','entity2','pkiclient')) {
     ok($crl =~ /\s$serial\s/im, 'Serial found on CRL');
 
 }
+
+done_testing();
