@@ -60,6 +60,7 @@ command "scep_unwrap_message" => {
     my $db_rcpt = $self->api->search_cert(
         issuer_dn => $rcpt->{issuer}->get_subject(),
         cert_serial => $rcpt->{serial},
+        pki_realm => '_any',
         return_columns => ['identifier','status','data']
     );
 
