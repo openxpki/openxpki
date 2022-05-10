@@ -51,7 +51,10 @@ sub on_connect {
     $dbh->do("SET SESSION CHARACTERISTICS AS TRANSACTION ISOLATION LEVEL READ COMMITTED");
     $dbh->do("SET client_min_messages TO warning");
     $dbh->do("SET lock_timeout TO ?", undef, $self->lock_timeout * 1000);
-    $dbh->commit; # PostgreSQL settings get lost if the current transaction is rolled back, so we commit here.
+    # PostgreSQL settings get lost if the current transaction is rolled back, so we commit here.
+    # DBI logger and session handler have autocommit on and DBI cause a warning on superflous
+    # commits so we need to make this conditional
+    $dbh->commit unless($dbh->{AutoCommit});
 }
 
 # Parameters for SQL::Abstract::More
