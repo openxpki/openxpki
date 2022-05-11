@@ -3,6 +3,7 @@ package OpenXPKI::Server::Workflow::Activity::Tools::ValidateChallengePassword;
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
+use OpenXPKI::Template;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
@@ -38,25 +39,15 @@ sub execute {
     my $mode =  $config->get( [ @prefix, 'mode' ] ) || '';
 
     my @attrib = $config->get_scalar_as_list( [ @prefix, 'args' ] );
-    my $tt = Template->new();
+    my $tt = OpenXPKI::Template->new();
     my @path;
     my $param =  { context => $context->param() };
     foreach my $item (@attrib) {
-        my $out;
-        if (!$tt->process(\$item, $param, \$out)) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WORKFLOW_ACTIVITY_SCEP_EVALUATE_CHALLENGE_ERROR_PARSING_TEMPLATE',
-                params => {
-                    'TEMPLATE' => $item,
-                    'ERROR' => $tt->error()
-                }
-            );
-        }
+        my $out = $tt->render($item, $param);
         push @path, $out if ($out);
     }
 
     CTX('log')->application()->debug("challenge validation path " . join("|", @path));
-
 
     my $res;
     # bind mode passes the plain password as additional argument
