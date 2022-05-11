@@ -19,7 +19,7 @@ my $client = TestCGI::factory('democa');
 
 my $sscep = -e "./sscep" ? './sscep' : 'sscep';
 
-SKIP: { skip 'sscep not available', 7 if (system "$sscep > /dev/null");
+SKIP: { skip 'sscep not available', 7 if (system "$sscep > /dev/null 2>&1");
 
 ok((-s "tmp/entity.crt"),'Old cert present') || die;
 
