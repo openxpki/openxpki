@@ -16,6 +16,9 @@ package main;
 my $result;
 my $client = TestCGI::factory('democa');
 
+my $sscep = -e "./sscep" ? './sscep' : 'sscep';
+SKIP: { skip 'sscep not available', 12 if (system "$sscep > /dev/null 2>&1");
+
 my $crl= do { # slurp
     local $INPUT_RECORD_SEPARATOR;
     open my $HANDLE, '<tmp/crl.txt';
@@ -24,10 +27,7 @@ my $crl= do { # slurp
 
 for my $cert (('entity','entity2','pkiclient')) {
 
-    if (! -e "tmp/$cert.id") {
-        ok(0, "No such cert $cert.id");
-        next;
-    }
+    ok(-e "tmp/$cert.id", "No such cert $cert.id") or next;
 
     # Load cert status page using cert identifier
     my $cert_identifier = do { # slurp
@@ -36,7 +36,7 @@ for my $cert (('entity','entity2','pkiclient')) {
         <$HANDLE>;
     };
 
-    diag('Testing '  .$cert . ' / ' .$cert_identifier );
+    note 'Testing '  .$cert . ' / ' .$cert_identifier;
 
     $result = $client->mock_request({
         'page' => 'certificate!detail!identifier!'.$cert_identifier
@@ -53,9 +53,11 @@ for my $cert (('entity','entity2','pkiclient')) {
 
     is($status, 'REVOKED');
 
-    diag($serial);
+    note $serial;
     like( $serial, "/[0-9a-f]+/", 'Got serial');
     ok($crl =~ /\s$serial\s/im, 'Serial found on CRL');
+
+}
 
 }
 
