@@ -12,7 +12,7 @@ use Log::Log4perl qw(:easy);
 use TestCGI;
 use MIME::Base64;
 
-use Test::More tests => 6;
+use Test::More tests => 5;
 
 package main;
 
@@ -26,81 +26,48 @@ $result = $client->mock_request({
     'page' => 'workflow!index!wf_type!certificate_signing_request_v2',
 });
 
-is($result->{main}->[0]->{content}->{fields}->[2]->{name}, 'wf_token');
+is $client->has_field('wf_token'), 1, 'field "wf_token" present';
 
-$result = $client->mock_request({
-    'action' => 'workflow!index',
-    'wf_token' => undef,
+$result = $client->run_action('workflow', {
     'cert_profile' => 'tls_client',
-    'cert_subject_style' => '00_basic_style'
+    'cert_subject_style' => '00_basic_style',
 });
 
 like($result->{goto}, qr/workflow!load!wf_id!\d+/, 'Got redirect');
-
 my ($wf_id) = $result->{goto} =~ /workflow!load!wf_id!(\d+)/;
-
 note "Workflow Id is $wf_id";
 
-$result = $client->mock_request({
+$client->mock_request({
     'page' => $result->{goto},
 });
 
-$result = $client->mock_request({
-    'action' => 'workflow!select!wf_action!csr_provide_server_key_params!wf_id!'.$wf_id,
-});
+$client->run_action('csr_provide_server_key_params');
 
-$result = $client->mock_request({
-    'action' => 'workflow!index',
+$client->run_action('workflow', {
     'key_alg' => 'rsa',
     'enc_alg' => 'aes256',
     'key_gen_params{KEY_LENGTH}' => 3072,
     'password_type' => 'server',
-    'wf_token' => undef
 });
 
-$result = $client->mock_request({
-    'action' => 'workflow!index',
+$client->run_action('workflow', {
     'cert_subject_parts{hostname}' => 'testbox.openxpki.org',
     'cert_subject_parts{application_name}' => 'pkitest',
-    'wf_token' => undef
 });
 
-$result = $client->mock_request({
-    'action' => 'workflow!index',
-    'wf_token' => undef
-});
+$client->run_action('workflow');
+$client->run_action('csr_enter_policy_violation_comment');
 
-$result = $client->mock_request({
-    'action' => $result->{main}->[0]->{content}->{buttons}->[0]->{action}
-});
-
-if ($result->{main}->[0]->{content}->{fields} &&
-    $result->{main}->[0]->{content}->{fields}->[0]->{name} eq 'policy_comment') {
-    $result = $client->mock_request({
-        'action' => 'workflow!index',
-        'policy_comment' => 'Testing',
-        'wf_token' => undef
-    });
+if ($client->has_field('policy_comment')) {
+    $client->run_action('workflow', { 'policy_comment' => 'Testing' });
 }
 
 my $data = $client->prefill_from_result();
 my $password = $data->{'_password'};
 note "Password is $password";
 
-$result = $client->mock_request({
-    'action' => 'workflow!index',
-    '_password' => $password,
-    'wf_token' => undef
-});
-
-$result = $client->mock_request({
-    'action' => 'workflow!select!wf_action!csr_approve_csr!wf_id!' . $wf_id,
-});
-
-is ($result->{status}->{level}, 'success', 'Status is success');
-
-my $cert_identifier = $result->{main}->[0]->{content}->{data}->[0]->{value}->{label};
-$cert_identifier =~ s/\<br.*$//g;
+$client->run_action('workflow', { '_password' => $password });
+my $cert_identifier = $client->approve_csr();
 
 # Download the certificate
 $result = $client->mock_request({
