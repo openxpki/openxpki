@@ -67,7 +67,7 @@ chown www-data:www-data /var/www/openxpki
 
 # LOG FILES
 
-for f in scep.log soap.log webui.log rpc.log; do
+for f in scep.log soap.log webui.log rpc.log est.log; do
     touch /var/log/openxpki/$f
     chown www-data:openxpki /var/log/openxpki/$f
     chmod 640 /var/log/openxpki/$f
