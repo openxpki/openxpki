@@ -98,7 +98,7 @@ sub __walk_targets {
         my $res;
         eval{ $res = $config->set( [ @{$prefix}, $target, $publish_key ], $data, $param ); };
         if (my $eval_err = $EVAL_ERROR) {
-            CTX('log')->application()->debug("Publishing failed with $eval_err");
+            CTX('log')->application()->debug("Publishing to '".join('.', @{$prefix}, $target, $publish_key)."' failed: $eval_err");
             if ($on_error eq 'queue') {
                 push @failed, $target;
                 CTX('log')->application()->info("Publication failed for target $target, requeuing");
