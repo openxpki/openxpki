@@ -42,7 +42,7 @@ has json => (
 
 has wf_token => (
     is => 'rw',
-    isa => 'Str',
+    isa => 'Str|Undef',
     lazy => 1,
     default => ''
 );
@@ -196,7 +196,8 @@ sub mock_request {
     }
 
     if (ref $json->{main} && $json->{main}->[0]->{content}->{fields}) {
-        map {  $self->wf_token($_->{value}) if ($_->{name} eq 'wf_token') } @{$json->{main}->[0]->{content}->{fields}};
+        my ($token) = map { $_->{value} } grep { $_->{name} eq 'wf_token' } @{$json->{main}->[0]->{content}->{fields}};
+        $self->wf_token($token); # might be undef
     }
 
     $self->last_result($json);
@@ -272,7 +273,7 @@ sub approve_csr {
     # Enter comment
     if ($self->has_field('policy_comment')) {
         note "< policy violation: enter comment";
-        $self->run_action('workflow', { 'policy_comment' => 'Testing', 'wf_token' => undef });
+        $self->run_action('workflow', { 'policy_comment' => 'Testing' });
     }
 
     # Approve with policy violation
