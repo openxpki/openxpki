@@ -9,7 +9,7 @@ use Data::Dumper;
 use Log::Log4perl qw(:easy);
 use TestCGI;
 
-use Test::More tests => 5;
+use Test::More tests => 4;
 
 package main;
 
@@ -20,20 +20,21 @@ $result = $client->mock_request({
     'page' => 'workflow!index!wf_type!crl_issuance',
 });
 
-is($result->{main}->[0]->{content}->{fields}->[2]->{name}, 'wf_token');
+is $client->has_field('wf_token'), 1, 'field "wf_token" present';
 
-$result = $client->mock_request({
-    'action' => 'workflow!index',
-     'wf_token' => undef,
-});
+$result = $client->run_action('workflow', { 'force_issue' => 1 });
 
-is ($result->{status}->{level}, 'success', 'Status is success');
+# while ($client->last_result->{refresh}) {
+#     note "got 'refresh' - waiting 2 seconds";
+#     sleep 2;
+#     $client->mock_request({ 'page' => $client->last_result->{refresh}->{href} });
+# }
 
 my $crl_page = $result->{main}->[0]->{content}->{data}->[0]->{value}->[0]->{page} || '';
-ok($crl_page);
+ok $crl_page, 'got CRL page';
 my $crlid = pop @{[split("!", $crl_page)]};
 
-like($crlid, "/[0-9]+/",'Got CRL Id');
+like $crlid, "/[0-9]+/",'got CRL Id';
 
 # download crl as text
 $result = $client->mock_request({
