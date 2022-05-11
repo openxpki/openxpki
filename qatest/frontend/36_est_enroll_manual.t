@@ -38,7 +38,7 @@ my $response = $ua->post("https://$host/.well-known/est/simpleenroll",
 
 my $transaction_id = $response->header( 'X-Openxpki-Transaction-Id' );
 
-diag($response->status_line);
+note $response->status_line;
 is($response->code, 202);
 
 my $client = TestCGI::factory('democa');
@@ -58,7 +58,7 @@ $result = $client->mock_request({
 });
 
 my $workflow_id = $result->{main}->[0]->{content}->{data}->[0]->[0];
-diag('Found workflow ' . $workflow_id );
+note 'Found workflow ' . $workflow_id;
 
 $result = $client->mock_request({
     'action' => 'workflow!select!wf_action!enroll_approve_csr!wf_id!' . $workflow_id
@@ -73,7 +73,7 @@ my $cert_identifier = $client->get_field_from_result('cert_identifier');
 if (ref $cert_identifier) { $cert_identifier = $cert_identifier->{label}; }
 
 ok($cert_identifier,'Cert Identifier found');
-diag($cert_identifier);
+note $cert_identifier;
 
 
 $response = $ua->post("https://$host/.well-known/est/simpleenroll",

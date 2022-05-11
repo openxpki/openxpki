@@ -64,7 +64,7 @@ $result = $client->mock_request({
 });
 
 my $workflow_id = $result->{main}->[0]->{content}->{data}->[0]->[0];
-diag('Found workflow ' . $workflow_id );
+note 'Found workflow ' . $workflow_id;
 
 is($result->{main}->[0]->{content}->{data}->[0]->[3], 'PENDING');
 

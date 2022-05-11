@@ -39,7 +39,7 @@ like($result->{goto}, qr/workflow!load!wf_id!\d+/, 'Got redirect');
 
 my ($wf_id) = $result->{goto} =~ /workflow!load!wf_id!(\d+)/;
 
-diag("Workflow Id is $wf_id");
+note "Workflow Id is $wf_id";
 
 $result = $client->mock_request({
     'page' => $result->{goto},
@@ -86,7 +86,7 @@ if ($result->{main}->[0]->{content}->{fields} &&
 
 my $data = $client->prefill_from_result();
 my $password = $data->{'_password'};
-diag("Password is $password");
+note "Password is $password";
 
 $result = $client->mock_request({
     'action' => 'workflow!index',

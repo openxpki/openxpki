@@ -52,7 +52,7 @@ ok $response->is_success, 'HTTP request successful' or diag explain $response;
 
 my $json = JSON->new->decode($response->decoded_content);
 
-diag('Workflow Id ' . $json->{result}->{id} );
+note 'Workflow Id ' . $json->{result}->{id};
 is($json->{result}->{data}->{transaction_id}, $transaction_id , 'Transaction Id ');
 
 

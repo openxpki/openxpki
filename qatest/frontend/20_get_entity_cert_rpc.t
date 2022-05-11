@@ -49,9 +49,9 @@ my $json = JSON->new->decode($response->decoded_content);
 
 ok($json->{result}->{data}->{cert_identifier});
 
-diag('Workflow Id ' . $json->{result}->{id} );
+note 'Workflow Id ' . $json->{result}->{id};
 
-diag('Cert Identifier' . $json->{result}->{data}->{cert_identifier} );
+note 'Cert Identifier' . $json->{result}->{data}->{cert_identifier};
 
 is($json->{result}->{state}, 'SUCCESS');
 

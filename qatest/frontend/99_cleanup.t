@@ -24,7 +24,7 @@ my @cert_identifier;
 my @files = <tmp/*.id>;
 foreach my $file (@files) {
 
-    diag('Revoke '  .$file);
+    note "Revoke $file";
     # Load cert status page using cert identifier
     my $cert_identifier = do { # slurp
         local $INPUT_RECORD_SEPARATOR;
@@ -51,7 +51,7 @@ like($result->{goto}, qr/workflow!load!wf_id!\d+/, 'Got redirect');
 
 my ($wf_id) = $result->{goto} =~ /workflow!load!wf_id!(\d+)/;
 
-diag("Cleanup / Bulk Revoke Workflow Id $wf_id");
+note "Cleanup / Bulk Revoke Workflow Id $wf_id";
 
 $result = $client->mock_request({
     'page' => $result->{goto},

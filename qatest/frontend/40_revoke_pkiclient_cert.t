@@ -31,7 +31,7 @@ my $cert_identifier = do { # slurp
     <$HANDLE>;
 };
 
-diag('Start revocation for ' . $cert_identifier);
+note 'Start revocation for ' . $cert_identifier;
 
 $result = $client->mock_request({
     'action' => 'workflow!index',
@@ -44,7 +44,7 @@ like($result->{goto}, qr/workflow!load!wf_id!\d+/, 'Got redirect');
 
 my ($wf_id) = $result->{goto} =~ /workflow!load!wf_id!(\d+)/;
 
-diag("Revoking pkiclient, cert identifier $cert_identifier, Workflow Id $wf_id");
+note "Revoking pkiclient, cert identifier $cert_identifier, Workflow Id $wf_id";
 
 $result = $client->mock_request({
     'page' => $result->{goto},

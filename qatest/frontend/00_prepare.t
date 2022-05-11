@@ -25,7 +25,7 @@ my @cert_identifier;
 
 my @files = <tmp/*>;
 foreach my $file (@files) {
-    diag('Unlink '  .$file);
+    note 'Unlink '  .$file;
     # Load cert status page using cert identifier
     unlink $file;
 }

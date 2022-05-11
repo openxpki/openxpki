@@ -43,7 +43,7 @@ my $scep = `$sscep enroll -v -u http://localhost/scep/scep -M signature=$hmac -r
 my @t = split(/:\s+/, $scep);
 my $sceptid = $t[2];
 
-diag("Transaction Id: $sceptid");
+note "Transaction Id: $sceptid";
 ok($sceptid) || die "Unable to get transaction id";
 
 # Log in and approve request
@@ -64,7 +64,7 @@ $result = $client->mock_request({
 });
 
 my $workflow_id = $result->{main}->[0]->{content}->{data}->[0]->[0];
-diag('Found workflow ' . $workflow_id );
+note 'Found workflow ' . $workflow_id;
 
 is($result->{main}->[0]->{content}->{data}->[0]->[3], 'PENDING');
 
