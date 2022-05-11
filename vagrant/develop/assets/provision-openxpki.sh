@@ -79,7 +79,7 @@ if [ -e /etc/logrotate.d/ ]; then
 fi
 
 # Apache configuration
-if which apache2 >/dev/null; then
+if command -v apache2 >/dev/null; then
     echo "Configuring Apache"
 
     a2enmod cgid                                                      >$LOG 2>&1

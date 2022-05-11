@@ -4,7 +4,7 @@ IMAGE=oxiuibuild
 .DEFAULT_GOAL := cache
 BUILD_UNMINIFIED = 0
 
-ifneq (, $(shell which podman))
+ifneq (, $(shell command -v podman))
 	RUN_C = podman
 	RUN_C_OPTS =
 else

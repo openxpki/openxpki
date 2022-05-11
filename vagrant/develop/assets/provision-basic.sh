@@ -21,7 +21,7 @@ while read def; do export $def; done < /etc/environment
 # Install Virtualbox guest addins
 #
 install_vbox=0
-if $(which VBoxService >/dev/null); then
+if $(command -v VBoxService >/dev/null); then
     INSTALLED_VBOX=$(VBoxService --version | sed -r 's/^([0-9\.]+).*/\1/')
     if [ "$INSTALLED_VBOX" != "$VBOX" ]; then
         echo "Installed VBoxGuestAdditions ($INSTALLED_VBOX) do not match Virtualbox version ($VBOX)"
@@ -67,7 +67,7 @@ apt-get install -t $(lsb_release -sc)-backports git
 #
 # Install CPANminus
 #
-if ! which cpanm >/dev/null; then
+if ! command -v cpanm >/dev/null; then
     echo "Installing cpanm"
     curl -s -L https://cpanmin.us | perl - --sudo App::cpanminus >$LOG 2>&1 || _exit $?
 fi

@@ -151,7 +151,7 @@ if [[ $IS_I18N -eq 1 ]]; then
     popd                                                              >>$LOG 2>&1
 
     # Debian only...
-    if which locale-gen 2>/dev/null; then
+    if command -v locale-gen >/dev/null; then
         echo "- regenerate locales"
         TEMP_MAKEFILE=$(mktemp)
         cat $OXI_CORE_DIR/i18n/Makefile <(echo -e "print-langs:\n\techo \$(LANGS)") > $TEMP_MAKEFILE
@@ -174,7 +174,7 @@ fi
 # in openxpki-docker-ee environment use modify-config
 # (needs OpenXPKI::Config::Backend, so OpenXPKI needs to be installed first)
 echo "- modify config (system.version.depend.core)"
-if which modify-config > /dev/null; then
+if command -v modify-config > /dev/null; then
     TEMPDIR=$(mktemp -d)
     echo "core: $OXI_VERSION" > $TEMPDIR/version.yaml
     echo "system.version.depend: $TEMPDIR/version.yaml" > $TEMPDIR/mod.yaml

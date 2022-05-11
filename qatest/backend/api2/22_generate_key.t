@@ -35,7 +35,7 @@ sub is_encrypted_key {
             or $skip_decoding = 1;
         SKIP: {
             skip "Previous test failed, so this is useless", 1 if $skip_decoding;
-            skip "OpenSSL executable not found", 1 if not `which openssl`;
+            skip "OpenSSL executable not found", 1 if not `sh -c 'command -v openssl'`;
             # write encrypted key
             open my $fh, ">", "$tempdir/key_enc"
                 or die("Error creating temporary file $tempdir/key_enc");

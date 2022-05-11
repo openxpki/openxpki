@@ -117,7 +117,7 @@ set +e
 #
 # Install CPANminus and modules
 #
-if ! which cpanm >/dev/null; then
+if ! command -v cpanm >/dev/null; then
     echo "Installing cpanm"
     curl -s -L https://cpanmin.us | perl - --sudo App::cpanminus >$LOG 2>&1 || _exit $?
 fi
