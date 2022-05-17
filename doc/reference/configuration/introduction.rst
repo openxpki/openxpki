@@ -18,8 +18,8 @@ Config versioning
 
 This idea was dropped, configuration is now read freshly from the filesystem at every restart of the daemon.
 
-Activiate the new configuration
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Activate the new configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To activate a new config without a restart, you need to do a reload::
 
