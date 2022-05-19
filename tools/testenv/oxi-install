@@ -137,6 +137,15 @@ if [[ $IS_COMPILE -eq 1 ]]; then
 fi
 echo "- install OpenXPKI"
 make install                                                          >>$LOG 2>&1
+
+echo "- replace shebang in Perl scripts"
+export perldir=$(grep ^SITEPREFIX Makefile | tr -d " " | cut -d= -f2)/bin
+( \
+    find $OXI_CORE_DIR/server/bin/ -type f -printf "$perldir/%f\n"; \
+    find /usr/lib/cgi-bin -name '*.fcgi' \
+) | \
+    xargs perl -pe '$p=$ENV{perldir}; s{^#\!\S+}{#!$p/perl}' -i       >>$LOG 2>&1
+
 popd                                                                  >>$LOG 2>&1
 
 echo "- install CGI::Session::Driver::openxpki"
