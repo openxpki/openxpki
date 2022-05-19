@@ -120,13 +120,14 @@ our \$VERSION = '$OXI_VERSION';
 1;
 __VERSION
 
-echo "- purge possible target locations"
-while read -d : path; do
-    test $path == "." && continue
-    echo "    $path/OpenXPKI*"
-    rm -rf $path/OpenXPKI*
-    rm -rf $path/auto/OpenXPKI*
-done <<< $(perl -e 'print "$_:" for @INC')
+echo "- purge installed code"
+perl -e 'use v5.10; say for grep { /^[^\.]/ } @INC' |\
+    xargs -I '{}' find '{}' -name 'OpenXPKI*' |\
+    sort |\
+    uniq |\
+    while read path; do
+        test -w "$path" && echo "    $path" && rm -rf "$path" || true
+    done
 
 pushd $OXI_CORE_DIR/server                                            >>$LOG 2>&1
 perl Makefile.PL                                                      >>$LOG 2>&1
