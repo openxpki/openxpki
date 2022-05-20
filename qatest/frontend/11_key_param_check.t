@@ -17,7 +17,7 @@ my $result;
 my $client = TestCGI::factory('democa');
 
 # create temp dir
--d "tmp/" || mkdir "tmp/";
+-d "/tmp/oxi-test/" || mkdir "/tmp/oxi-test/";
 
 $result = $client->mock_request({
     'page' => 'workflow!index!wf_type!certificate_signing_request_v2',
@@ -62,11 +62,11 @@ is($result->{status}->{message}, 'Used key parameter is not allowed by policy (k
 # ECC Key with bad curves
 for my $curve (qw(secp192r1 secp256k1 prime192v1)) {
 
-    -e "tmp/ecckey.pem" && unlink "tmp/ecckey.pem";
-    `openssl ecparam -name $curve -genkey -noout -out tmp/ecckey.pem`;
-    ok(-e "tmp/ecckey.pem");
+    -e "/tmp/oxi-test/ecckey.pem" && unlink "/tmp/oxi-test/ecckey.pem";
+    `openssl ecparam -name $curve -genkey -noout -out /tmp/oxi-test/ecckey.pem`;
+    ok(-e "/tmp/oxi-test/ecckey.pem");
 
-    $pkcs10 = `openssl req -new -subj "/CN=testbox.openxpki.org" -nodes -key tmp/ecckey.pem 2>/dev/null`;
+    $pkcs10 = `openssl req -new -subj "/CN=testbox.openxpki.org" -nodes -key /tmp/oxi-test/ecckey.pem 2>/dev/null`;
 
     $result = $client->mock_request({
         'action' => 'workflow!index',
@@ -89,11 +89,11 @@ $result = $client->mock_request({
 # ECC with supported curve
 for my $curve (qw(secp256r1 prime256v1)) {
 
-    -e "tmp/ecckey.pem" && unlink "tmp/ecckey.pem";
-    `openssl ecparam -name $curve -genkey -noout -out tmp/ecckey.pem`;
-    ok(-e "tmp/ecckey.pem");
+    -e "/tmp/oxi-test/ecckey.pem" && unlink "/tmp/oxi-test/ecckey.pem";
+    `openssl ecparam -name $curve -genkey -noout -out /tmp/oxi-test/ecckey.pem`;
+    ok(-e "/tmp/oxi-test/ecckey.pem");
 
-    $pkcs10 = `openssl req -new -subj "/CN=testbox.openxpki.org" -nodes -key tmp/ecckey.pem 2>/dev/null`;
+    $pkcs10 = `openssl req -new -subj "/CN=testbox.openxpki.org" -nodes -key /tmp/oxi-test/ecckey.pem 2>/dev/null`;
 
     $result = $client->mock_request({
         'page' => 'workflow!index!wf_type!certificate_signing_request_v2',

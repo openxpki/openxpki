@@ -26,7 +26,7 @@ my $ua = LWP::UserAgent->new();
 
 my $ssl_opts = {
     verify_hostname => 0,
-    SSL_ca_file => 'tmp/chain.pem',
+    SSL_ca_file => '/tmp/oxi-test/chain.pem',
 };
 $ua->ssl_opts( %{$ssl_opts} );
 

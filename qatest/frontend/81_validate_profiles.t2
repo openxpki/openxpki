@@ -21,7 +21,7 @@ my $client = TestCGI::factory('democa');
 -d "samples" || die "Please put your certificate samples into the samples/ directory";
 
 # create temp dir
--d "tmp/" || mkdir "tmp/";
+-d "/tmp/oxi-test/" || mkdir "/tmp/oxi-test/";
 
 sub run_test {
 
@@ -84,8 +84,8 @@ sub run_test {
         'action' => 'workflow!select!wf_action!csr_upload_pkcs10!wf_id!'.$wf_id,
     });
 
-    my $keyname = "tmp/$profile.$style.key";
-    my $csrname = "tmp/$profile.$style.csr";
+    my $keyname = "/tmp/oxi-test/$profile.$style.key";
+    my $csrname = "/tmp/oxi-test/$profile.$style.csr";
     my $config  = '';
 
     if ($x509->SubjectAltName) {
@@ -108,7 +108,7 @@ sub run_test {
             sprintf "%s:%s", $typemap->{$type}, $value;
         } @{$x509->SubjectAltName};
 
-open (my $fh, ">", "tmp/openssl.cnf");
+open (my $fh, ">", "/tmp/oxi-test/openssl.cnf");
 print $fh "[ req ]
 default_bits        = 2048
 default_keyfile     = privkey.pem
@@ -122,7 +122,7 @@ CN=ignore.me
 subjectAltName=" . join ",", @san;
 
         close $fh;
-        $config = "-config tmp/openssl.cnf";
+        $config = "-config /tmp/oxi-test/openssl.cnf";
     }
 
     my $subject = `openssl  x509 -noout -subject -in $file`;
@@ -187,11 +187,11 @@ subjectAltName=" . join ",", @san;
          'page' => 'certificate!download!format!pem!identifier!'.$cert_identifier
     });
 
-    open(CERT, ">tmp/$profile.$style.id");
+    open(CERT, ">/tmp/oxi-test/$profile.$style.id");
     print CERT $cert_identifier;
     close CERT;
 
-    open(CERT, ">tmp/$profile.$style.crt");
+    open(CERT, ">/tmp/oxi-test/$profile.$style.crt");
     print CERT $result ;
     close CERT;
 

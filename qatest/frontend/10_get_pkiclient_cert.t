@@ -17,7 +17,7 @@ my $result;
 my $client = TestCGI::factory('democa', 0);
 
 # create temp dir
--d "tmp/" || mkdir "tmp/";
+-d "/tmp/oxi-test/" || mkdir "/tmp/oxi-test/";
 
 $result = $client->mock_request({
     'page' => 'workflow!index!wf_type!certificate_signing_request_v2',
@@ -48,7 +48,7 @@ $result = $client->mock_request({
 });
 
 # Create the pkcs10
-my $pkcs10 = `openssl req -new -newkey rsa:3000 -subj "/CN=testbox.openxpki.org:pkiclient" -nodes -keyout tmp/pkiclient.key 2>/dev/null`;
+my $pkcs10 = `openssl req -new -newkey rsa:3000 -subj "/CN=testbox.openxpki.org:pkiclient" -nodes -keyout /tmp/oxi-test/pkiclient.key 2>/dev/null`;
 
 $client->run_action('workflow' => {
     'pkcs10' => $pkcs10,
@@ -81,11 +81,11 @@ $result = $client->mock_request({
      'page' => 'certificate!download!format!pem!identifier!'.$cert_identifier
 });
 
-open(CERT, ">tmp/pkiclient.id");
+open(CERT, ">/tmp/oxi-test/pkiclient.id");
 print CERT $cert_identifier;
 close CERT;
 
-open(CERT, ">tmp/pkiclient.crt");
+open(CERT, ">/tmp/oxi-test/pkiclient.crt");
 print CERT $result ;
 close CERT;
 

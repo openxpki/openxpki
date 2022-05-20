@@ -27,11 +27,11 @@ $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "IO::Socket::SSL";
 
 my $ssl_opts = {
     verify_hostname => 0,
-    SSL_ca_file => 'tmp/chain.pem',
+    SSL_ca_file => '/tmp/oxi-test/chain.pem',
 };
 $ua->ssl_opts( %{$ssl_opts} );
 
-my $pkcs10 = `openssl req -new -subj "/CN=est-manual-test.openxpki.org" -nodes -newkey rsa:2048 -keyout tmp/estcert2.key -outform der | openssl base64 -e 2>/dev/null`;
+my $pkcs10 = `openssl req -new -subj "/CN=est-manual-test.openxpki.org" -nodes -newkey rsa:2048 -keyout /tmp/oxi-test/estcert2.key -outform der | openssl base64 -e 2>/dev/null`;
 
 my $response = $ua->post("https://$host/.well-known/est/simpleenroll",
     Content_Type => 'application/pkcs10', Content => $pkcs10 );
@@ -84,12 +84,12 @@ my $body = $response->decoded_content;
 like($response->header( 'Content-Type' ),"/application/pkcs7-mime/");
 like($body,"/\\A[a-zA-Z0-9\+\/ ]+=*\\z/xms");
 
-open CERT, ">", "tmp/estclient2.p7";
+open CERT, ">", "/tmp/oxi-test/estclient2.p7";
 print CERT "-----BEGIN PKCS7-----\n$body\n-----END PKCS7-----\n";
 close CERT;
 
--e 'tmp/estclient2.crt' && unlink('tmp/estclient2.crt');
-`openssl pkcs7 -in tmp/estclient2.p7 -print_certs > tmp/estclient2.crt`;
+-e '/tmp/oxi-test/estclient2.crt' && unlink('/tmp/oxi-test/estclient2.crt');
+`openssl pkcs7 -in /tmp/oxi-test/estclient2.p7 -print_certs > /tmp/oxi-test/estclient2.crt`;
 is($?,0);
 
-ok(-f 'tmp/estclient2.crt');
+ok(-f '/tmp/oxi-test/estclient2.crt');

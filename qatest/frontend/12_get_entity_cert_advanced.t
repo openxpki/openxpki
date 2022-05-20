@@ -19,7 +19,7 @@ my $result;
 my $client = TestCGI::factory('democa');
 
 # create temp dir
--d "tmp/" || mkdir "tmp/";
+-d "/tmp/oxi-test/" || mkdir "/tmp/oxi-test/";
 
 $result = $client->mock_request({
     'page' => 'workflow!index!wf_type!certificate_signing_request_v2',
@@ -85,11 +85,11 @@ $result = $client->mock_request({
      'page' => 'certificate!download!format!pem!identifier!'.$cert_identifier
 });
 
-open(CERT, ">tmp/entity12a.id");
+open(CERT, ">/tmp/oxi-test/entity12a.id");
 print CERT $cert_identifier;
 close CERT;
 
-open(CERT, ">tmp/entity12a.crt");
+open(CERT, ">/tmp/oxi-test/entity12a.crt");
 print CERT $result ;
 close CERT;
 

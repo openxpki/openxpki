@@ -20,21 +20,21 @@ my $sscep = -e "./sscep" ? './sscep' : 'sscep';
 
 SKIP: { skip 'sscep not available', 12 if (system "$sscep > /dev/null 2>&1");
 
-`$sscep getca -c tmp/cacert -u http://localhost/scep/scep`;
+`$sscep getca -c /tmp/oxi-test/cacert -u http://localhost/scep/scep`;
 
-ok((-s "tmp/cacert-0"),'CA certs present') || die;
+ok((-s "/tmp/oxi-test/cacert-0"),'CA certs present') || die;
 
-`rm -f tmp/entity.*`;
+`rm -f /tmp/oxi-test/entity.*`;
 
 # Create the pkcs10
-`openssl req -new -nodes -keyout tmp/entity.key -out tmp/entity.csr -subj "/O=TestMe" -config openssl.conf 2>/dev/null`;
+`openssl req -new -nodes -keyout /tmp/oxi-test/entity.key -out /tmp/oxi-test/entity.csr -subj "/O=TestMe" -config openssl.conf 2>/dev/null`;
 
-ok((-s "tmp/entity.csr"), 'csr present') || die;
+ok((-s "/tmp/oxi-test/entity.csr"), 'csr present') || die;
 
 # do on behalf request with pkiclient certificate
-my $scep = `$sscep enroll -v -u http://localhost/scep/scep -M custid=12345 -K tmp/pkiclient.key -O tmp/pkiclient.crt -r tmp/entity.csr -k tmp/entity.key -c tmp/cacert-0 -l tmp/entity.crt  -t 1 -n 1 |  grep "Read request with transaction id"`;
+my $scep = `$sscep enroll -v -u http://localhost/scep/scep -M custid=12345 -K /tmp/oxi-test/pkiclient.key -O /tmp/oxi-test/pkiclient.crt -r /tmp/oxi-test/entity.csr -k /tmp/oxi-test/entity.key -c /tmp/oxi-test/cacert-0 -l /tmp/oxi-test/entity.crt  -t 1 -n 1 |  grep "Read request with transaction id"`;
 
-ok((! -e "tmp/entity.crt"), 'No certificate issued');
+ok((! -e "/tmp/oxi-test/entity.crt"), 'No certificate issued');
 
 my @t = split(/:\s+/, $scep);
 my $sceptid = $t[2];
@@ -69,12 +69,12 @@ $result = $client->mock_request({
 is($result->{main}->[0]->{content}->{data}->[-1]->[2], 'global_set_error_invalid_subject', 'broken subject');
 
 # Create the pkcs10
-`openssl req -new -nodes -keyout tmp/entity.key -out tmp/entity.csr -subj "/CN=entity.openxpki.org" -config openssl.conf -reqexts req_template_v1 2>/dev/null`;
+`openssl req -new -nodes -keyout /tmp/oxi-test/entity.key -out /tmp/oxi-test/entity.csr -subj "/CN=entity.openxpki.org" -config openssl.conf -reqexts req_template_v1 2>/dev/null`;
 
-ok((-s "tmp/entity.csr"), 'csr present') || die;
+ok((-s "/tmp/oxi-test/entity.csr"), 'csr present') || die;
 
 # do on behalf request with pkiclient certificate
-$scep = `$sscep enroll -v -u http://localhost/scep/scep -M custid=12345 -K tmp/pkiclient.key -O tmp/pkiclient.crt -r tmp/entity.csr -k tmp/entity.key -c tmp/cacert-0 -l tmp/entity.crt  -t 1 -n 1 |  grep "Read request with transaction id"`;
+$scep = `$sscep enroll -v -u http://localhost/scep/scep -M custid=12345 -K /tmp/oxi-test/pkiclient.key -O /tmp/oxi-test/pkiclient.crt -r /tmp/oxi-test/entity.csr -k /tmp/oxi-test/entity.key -c /tmp/oxi-test/cacert-0 -l /tmp/oxi-test/entity.crt  -t 1 -n 1 |  grep "Read request with transaction id"`;
 
 @t = split(/:\s+/, $scep);
 $sceptid = $t[2];
@@ -116,11 +116,11 @@ ok($cert_identifier,'Cert Identifier found');
 diag($cert_identifier);
 
 # fetch cert with sscep
-`$sscep enroll -u http://localhost/scep/scep -K tmp/pkiclient.key -O tmp/pkiclient.crt -r tmp/entity.csr -k tmp/entity.key -c tmp/cacert-0 -l tmp/entity.crt  -t 1 -n 1`;
+`$sscep enroll -u http://localhost/scep/scep -K /tmp/oxi-test/pkiclient.key -O /tmp/oxi-test/pkiclient.crt -r /tmp/oxi-test/entity.csr -k /tmp/oxi-test/entity.key -c /tmp/oxi-test/cacert-0 -l /tmp/oxi-test/entity.crt  -t 1 -n 1`;
 
-ok(-e "tmp/entity.crt", "Cert exists");
+ok(-e "/tmp/oxi-test/entity.crt", "Cert exists");
 
-open(CERT, ">tmp/entity.id");
+open(CERT, ">/tmp/oxi-test/entity.id");
 print CERT $cert_identifier;
 close CERT;
 

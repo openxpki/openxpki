@@ -20,11 +20,11 @@ my $result;
 my $client = TestCGI::factory('democa');
 
 # Create the pkcs10
-`openssl req -new -subj "/CN=entity-hmac-test.openxpki.org" -nodes -keyout tmp/entity-hmac.key -out tmp/entity-hmac.csr 2>/dev/null`;
+`openssl req -new -subj "/CN=entity-hmac-test.openxpki.org" -nodes -keyout /tmp/oxi-test/entity-hmac.key -out /tmp/oxi-test/entity-hmac.csr 2>/dev/null`;
 
-ok((-s "tmp/entity-hmac.csr"), 'csr present') || die;
+ok((-s "/tmp/oxi-test/entity-hmac.csr"), 'csr present') || die;
 
-my $pkcs10 = `cat tmp/entity-hmac.csr`;
+my $pkcs10 = `cat /tmp/oxi-test/entity-hmac.csr`;
 my $pem = $pkcs10;
 $pem =~ s/-----(BEGIN|END)[^-]+-----//g;
 $pem =~ s/\s//xmsg;

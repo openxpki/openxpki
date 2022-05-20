@@ -27,7 +27,7 @@ $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "IO::Socket::SSL";
 
 my $ssl_opts = {
     verify_hostname => 0,
-    SSL_ca_file => 'tmp/chain.pem',
+    SSL_ca_file => '/tmp/oxi-test/chain.pem',
 };
 $ua->ssl_opts( %{$ssl_opts} );
 
@@ -45,11 +45,11 @@ like($body,"/\\A[a-zA-Z0-9\+\/ ]+=*\\z/xms");
 $body =~ s{^\s*}{}gxms;
 $body =~ s{\s*$}{}gxms;
 
-open CHAIN, ">", "tmp/estchain.p7";
+open CHAIN, ">", "/tmp/oxi-test/estchain.p7";
 print CHAIN "-----BEGIN PKCS7-----\n$body\n-----END PKCS7-----\n";
 close CHAIN;
 
-`openssl pkcs7 -in tmp/estchain.p7 -print_certs > tmp/estchain.pem`;
+`openssl pkcs7 -in /tmp/oxi-test/estchain.p7 -print_certs > /tmp/oxi-test/estchain.pem`;
 
 $response = $ua->get("https://$host/.well-known/est/csrattrs");
 ok($response->is_success);

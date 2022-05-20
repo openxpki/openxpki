@@ -21,16 +21,16 @@ my $client = TestCGI::factory('democa');
 
 my @cert_identifier;
 
--d "tmp/" || mkdir "tmp/";
+-d "/tmp/oxi-test" or mkdir "/tmp/oxi-test";
 
-my @files = <tmp/*>;
+my @files = </tmp/oxi-test/*>;
 foreach my $file (@files) {
     note 'Unlink '  .$file;
     # Load cert status page using cert identifier
     unlink $file;
 }
 
-`echo "" | openssl s_client -connect localhost:443  -showcerts | openssl crl2pkcs7 -nocrl -certfile /dev/stdin  | openssl pkcs7 -print_certs > tmp/chain.pem`;
+`echo "" | openssl s_client -connect localhost:443  -showcerts | openssl crl2pkcs7 -nocrl -certfile /dev/stdin  | openssl pkcs7 -print_certs > /tmp/oxi-test/chain.pem`;
 
-ok(-d "tmp/");
-ok(-s "tmp/chain.pem");
+ok(-d "/tmp/oxi-test/");
+ok(-s "/tmp/oxi-test/chain.pem");

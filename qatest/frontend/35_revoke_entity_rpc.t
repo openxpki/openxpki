@@ -18,11 +18,11 @@ use Test::More tests => 2;
 
 package main;
 
-SKIP: { skip 'tmp/entity.id does not exist (sscep not available)', 2 unless -r 'tmp/entity.id';
+SKIP: { skip '/tmp/oxi-test/entity.id does not exist (sscep not available)', 2 unless -r '/tmp/oxi-test/entity.id';
 
 my $cert_identifier = do { # slurp
     local $INPUT_RECORD_SEPARATOR;
-    open my $HANDLE, '<tmp/entity.id';
+    open my $HANDLE, '</tmp/oxi-test/entity.id';
     <$HANDLE>;
 };
 chomp $cert_identifier;
@@ -34,9 +34,9 @@ $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "IO::Socket::SSL";
 
 my $ssl_opts = {
     verify_hostname => 0,
-    SSL_key_file => 'tmp/pkiclient.key',
-    SSL_cert_file => 'tmp/pkiclient.crt',
-    SSL_ca_file => 'tmp/chain.pem',
+    SSL_key_file => '/tmp/oxi-test/pkiclient.key',
+    SSL_cert_file => '/tmp/oxi-test/pkiclient.crt',
+    SSL_ca_file => '/tmp/oxi-test/chain.pem',
 };
 $ua->ssl_opts( %{$ssl_opts} );
 

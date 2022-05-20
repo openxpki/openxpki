@@ -21,27 +21,27 @@ my $sscep = -e "./sscep" ? './sscep' : 'sscep';
 
 SKIP: { skip 'sscep not available', 9 if (system "$sscep > /dev/null 2>&1");
 
-ok((-s "tmp/entity.crt"),'Old cert present') || die;
+ok((-s "/tmp/oxi-test/entity.crt"),'Old cert present') || die;
 
 # Generate new CSR
-`openssl req -new -subj "/DC=org/DC=OpenXPKI/DC=Test Deployment/CN=entity.openxpki.org" -nodes -keyout tmp/entity2.key -out tmp/entity2.csr 2>/dev/null`;
+`openssl req -new -subj "/DC=org/DC=OpenXPKI/DC=Test Deployment/CN=entity.openxpki.org" -nodes -keyout /tmp/oxi-test/entity2.key -out /tmp/oxi-test/entity2.csr 2>/dev/null`;
 
-ok((-s "tmp/entity.csr"), 'csr present') || die;
+ok((-s "/tmp/oxi-test/entity.csr"), 'csr present') || die;
 
-`rm -f tmp/entity2.crt`;
+`rm -f /tmp/oxi-test/entity2.crt`;
 
 # do on behalf request with old certificate
-my $scep = `$sscep enroll -v -u http://localhost/scep/scep -K tmp/entity.key -O tmp/entity.crt -r tmp/entity2.csr -k tmp/entity2.key -c tmp/cacert-0 -l tmp/entity2.crt -t 1 -n 1 |  grep "Read request with transaction id"`;
+my $scep = `$sscep enroll -v -u http://localhost/scep/scep -K /tmp/oxi-test/entity.key -O /tmp/oxi-test/entity.crt -r /tmp/oxi-test/entity2.csr -k /tmp/oxi-test/entity2.key -c /tmp/oxi-test/cacert-0 -l /tmp/oxi-test/entity2.crt -t 1 -n 1 |  grep "Read request with transaction id"`;
 
-ok(-s "tmp/entity2.crt", "Renewed cert exists");
+ok(-s "/tmp/oxi-test/entity2.crt", "Renewed cert exists");
 
-my $data = `openssl  x509 -in tmp/entity2.crt -outform der`;
+my $data = `openssl  x509 -in /tmp/oxi-test/entity2.crt -outform der`;
 my $cert_identifier = sha1_base64($data);
 $cert_identifier =~ tr/+\//-_/;
 
 diag('Cert Identifier '  . $cert_identifier);
 
-open(CERT, ">tmp/entity2.id");
+open(CERT, ">/tmp/oxi-test/entity2.id");
 print CERT $cert_identifier;
 close CERT;
 
@@ -83,6 +83,6 @@ is($client->get_field_from_result('is_replace'), 1);
 ok($client->get_field_from_result('notafter'));
 ok($client->get_field_from_result('revocation_workflow_id'));
 
-is(`openssl  x509 -noout -enddate -in tmp/entity.crt`, `openssl  x509 -noout -enddate -in tmp/entity2.crt`, 'Notafter matches');
+is(`openssl  x509 -noout -enddate -in /tmp/oxi-test/entity.crt`, `openssl  x509 -noout -enddate -in /tmp/oxi-test/entity2.crt`, 'Notafter matches');
 
 }

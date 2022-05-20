@@ -16,11 +16,11 @@ package main;
 my $result;
 my $client = TestCGI::factory('democa');
 
-SKIP: { skip 'tmp/entity.id does not exist (sscep not available)', 3 unless -r 'tmp/entity.id';
+SKIP: { skip '/tmp/oxi-test/entity.id does not exist (sscep not available)', 3 unless -r '/tmp/oxi-test/entity.id';
 
 my $cert_identifier = do { # slurp
     local $INPUT_RECORD_SEPARATOR;
-    open my $HANDLE, '<tmp/entity.id';
+    open my $HANDLE, '</tmp/oxi-test/entity.id';
     <$HANDLE>;
 };
 chomp $cert_identifier;

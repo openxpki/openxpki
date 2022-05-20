@@ -20,21 +20,21 @@ my $sscep = -e "./sscep" ? './sscep' : 'sscep';
 
 SKIP: { skip 'sscep not available', 6 if (system "$sscep > /dev/null 2>&1");
 
-`$sscep getca -c tmp/cacert -u http://localhost/scep/scep`;
+`$sscep getca -c /tmp/oxi-test/cacert -u http://localhost/scep/scep`;
 
-ok((-s "tmp/cacert-0"),'CA certs present') || die;
+ok((-s "/tmp/oxi-test/cacert-0"),'CA certs present') || die;
 
-`rm -rf tmp/entity-fail.crt`;
+`rm -rf /tmp/oxi-test/entity-fail.crt`;
 
 # Create the pkcs10
-`openssl req -new -subj "/CN=entity.openxpki.org" -nodes -keyout tmp/entity-fail.key -out tmp/entity-fail.csr 2>/dev/null`;
+`openssl req -new -subj "/CN=entity.openxpki.org" -nodes -keyout /tmp/oxi-test/entity-fail.key -out /tmp/oxi-test/entity-fail.csr 2>/dev/null`;
 
-ok((-s "tmp/entity-fail.csr"), 'csr present') || die;
+ok((-s "/tmp/oxi-test/entity-fail.csr"), 'csr present') || die;
 
 # do on behalf request with revoked pkiclient certificate
-`$sscep enroll -u http://localhost/scep/scep -K tmp/pkiclient.key -O tmp/pkiclient.crt -r tmp/entity-fail.csr -k tmp/entity-fail.key -c tmp/cacert-0 -l tmp/entity-fail.crt  -t 1 -n 1`;
+`$sscep enroll -u http://localhost/scep/scep -K /tmp/oxi-test/pkiclient.key -O /tmp/oxi-test/pkiclient.crt -r /tmp/oxi-test/entity-fail.csr -k /tmp/oxi-test/entity-fail.key -c /tmp/oxi-test/cacert-0 -l /tmp/oxi-test/entity-fail.crt  -t 1 -n 1`;
 
-ok(! -e "tmp/entity-fail.crt", "Cert not exists");
+ok(! -e "/tmp/oxi-test/entity-fail.crt", "Cert not exists");
 
 # Log in and approve request
 $result = $client->mock_request({

@@ -20,9 +20,9 @@ $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "IO::Socket::SSL";
 
 my $ssl_opts = {
     verify_hostname => 0,
-    SSL_key_file => 'tmp/pkiclient.key',
-    SSL_cert_file => 'tmp/pkiclient.crt',
-    SSL_ca_file => 'tmp/chain.pem',
+    SSL_key_file => '/tmp/oxi-test/pkiclient.key',
+    SSL_cert_file => '/tmp/oxi-test/pkiclient.crt',
+    SSL_ca_file => '/tmp/oxi-test/chain.pem',
 };
 my $client = TestCGI->new( ssl_opts => $ssl_opts );
 

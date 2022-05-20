@@ -21,7 +21,7 @@ my $client = TestCGI::factory('democa');
 
 my @cert_identifier;
 
-my @files = <tmp/*.id>;
+my @files = </tmp/oxi-test/*.id>;
 foreach my $file (@files) {
 
     note "Revoke $file";

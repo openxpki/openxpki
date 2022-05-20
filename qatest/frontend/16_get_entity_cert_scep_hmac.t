@@ -22,23 +22,23 @@ my $sscep = -e "./sscep" ? './sscep' : 'sscep';
 
 SKIP: { skip 'sscep not available', 10 if (system "$sscep > /dev/null 2>&1");
 
-`$sscep getca -c tmp/cacert -u http://localhost/scep/scep`;
+`$sscep getca -c /tmp/oxi-test/cacert -u http://localhost/scep/scep`;
 
-ok((-s "tmp/cacert-0"),'CA certs present') || die;
+ok((-s "/tmp/oxi-test/cacert-0"),'CA certs present') || die;
 
 # Create the pkcs10
-`openssl req -new -subj "/CN=entity-scep-hmac-test.openxpki.org" -nodes -keyout tmp/entity-scep-hmac.key -out tmp/entity-scep-hmac.csr 2>/dev/null`;
+`openssl req -new -subj "/CN=entity-scep-hmac-test.openxpki.org" -nodes -keyout /tmp/oxi-test/entity-scep-hmac.key -out /tmp/oxi-test/entity-scep-hmac.csr 2>/dev/null`;
 
-ok((-s "tmp/entity-scep-hmac.csr"), 'csr present') || die;
+ok((-s "/tmp/oxi-test/entity-scep-hmac.csr"), 'csr present') || die;
 
-my $pem = `cat tmp/entity-scep-hmac.csr`;
+my $pem = `cat /tmp/oxi-test/entity-scep-hmac.csr`;
 $pem =~ s/-----(BEGIN|END)[^-]+-----//g;
 $pem =~ s/\s//xmsg;
 
 my $hmac = hmac_sha256_hex(decode_base64($pem), 'verysecret');
 
 # do on with hmac attached certificate
-my $scep = `$sscep enroll -v -u http://localhost/scep/scep -M signature=$hmac -r tmp/entity-scep-hmac.csr -k tmp/entity-scep-hmac.key -c tmp/cacert-0 -l tmp/entity-scep-hmac.crt  -t 1 -n 1 -v |  grep "Read request with transaction id"
+my $scep = `$sscep enroll -v -u http://localhost/scep/scep -M signature=$hmac -r /tmp/oxi-test/entity-scep-hmac.csr -k /tmp/oxi-test/entity-scep-hmac.key -c /tmp/oxi-test/cacert-0 -l /tmp/oxi-test/entity-scep-hmac.crt  -t 1 -n 1 -v |  grep "Read request with transaction id"
 `;
 my @t = split(/:\s+/, $scep);
 my $sceptid = $t[2];

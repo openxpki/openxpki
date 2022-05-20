@@ -43,6 +43,6 @@ $result = $client->mock_request({
 
 ok($result, 'CRL is not empty');
 
-open(CERT, ">tmp/crl.txt");
+open(CERT, ">/tmp/oxi-test/crl.txt");
 print CERT $result ;
 close CERT;

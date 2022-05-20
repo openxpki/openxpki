@@ -23,9 +23,9 @@ my $ua = LWP::UserAgent->new();
 my $ssl_opts = {
     verify_hostname => 0,
     SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_NONE,
-    SSL_key_file => 'tmp/pkiclient.key',
-    SSL_cert_file => 'tmp/pkiclient.crt',
-    SSL_ca_file => 'tmp/chain.pem',
+    SSL_key_file => '/tmp/oxi-test/pkiclient.key',
+    SSL_cert_file => '/tmp/oxi-test/pkiclient.crt',
+    SSL_ca_file => '/tmp/oxi-test/chain.pem',
 };
 $ua->ssl_opts( %{$ssl_opts} );
 

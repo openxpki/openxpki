@@ -21,18 +21,18 @@ SKIP: { skip 'sscep not available', 12 if (system "$sscep > /dev/null 2>&1");
 
 my $crl= do { # slurp
     local $INPUT_RECORD_SEPARATOR;
-    open my $HANDLE, '<tmp/crl.txt';
+    open my $HANDLE, '</tmp/oxi-test/crl.txt';
     <$HANDLE>;
 };
 
 for my $cert (('entity','entity2','pkiclient')) {
 
-    ok(-e "tmp/$cert.id", "No such cert $cert.id") or next;
+    ok(-e "/tmp/oxi-test/$cert.id", "No such cert $cert.id") or next;
 
     # Load cert status page using cert identifier
     my $cert_identifier = do { # slurp
         local $INPUT_RECORD_SEPARATOR;
-        open my $HANDLE, "<tmp/$cert.id";
+        open my $HANDLE, "</tmp/oxi-test/$cert.id";
         <$HANDLE>;
     };
 

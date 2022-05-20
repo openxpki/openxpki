@@ -21,19 +21,19 @@ my $sscep = -e "./sscep" ? './sscep' : 'sscep';
 
 SKIP: { skip 'sscep not available', 7 if (system "$sscep > /dev/null 2>&1");
 
-ok((-s "tmp/entity.crt"),'Old cert present') || die;
+ok((-s "/tmp/oxi-test/entity.crt"),'Old cert present') || die;
 
 # Generate new CSR
-`openssl req -new -subj "/DC=org/DC=OpenXPKI/DC=Test Deployment/CN=entity.openxpki.org" -nodes -keyout tmp/entity4.key -out tmp/entity4.csr 2>/dev/null`;
+`openssl req -new -subj "/DC=org/DC=OpenXPKI/DC=Test Deployment/CN=entity.openxpki.org" -nodes -keyout /tmp/oxi-test/entity4.key -out /tmp/oxi-test/entity4.csr 2>/dev/null`;
 
-ok((-s "tmp/entity4.csr"), 'csr present') || die;
+ok((-s "/tmp/oxi-test/entity4.csr"), 'csr present') || die;
 
-`rm -f tmp/entity4.crt`;
+`rm -f /tmp/oxi-test/entity4.crt`;
 
 # do on behalf request with old certificate
-my $scep = `$sscep enroll -v -u http://localhost/scep/scep -K tmp/entity2.key -O tmp/entity2.crt -r tmp/entity4.csr -k tmp/entity4.key -c tmp/cacert-0 -l tmp/entity4.crt -t 1 -n 1 |  grep "Read request with transaction id"`;
+my $scep = `$sscep enroll -v -u http://localhost/scep/scep -K /tmp/oxi-test/entity2.key -O /tmp/oxi-test/entity2.crt -r /tmp/oxi-test/entity4.csr -k /tmp/oxi-test/entity4.key -c /tmp/oxi-test/cacert-0 -l /tmp/oxi-test/entity4.crt -t 1 -n 1 |  grep "Read request with transaction id"`;
 
-ok(! -s "tmp/entity4.crt", "Renewed cert not exists");
+ok(! -s "/tmp/oxi-test/entity4.crt", "Renewed cert not exists");
 
 my @t = split(/:\s+/, $scep);
 my $sceptid = $t[2];

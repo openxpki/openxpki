@@ -20,7 +20,7 @@ my $result;
 my $client = TestCGI::factory('democa');
 
 # create temp dir
--d "tmp/" || mkdir "tmp/";
+-d "/tmp/oxi-test/" || mkdir "/tmp/oxi-test/";
 
 $result = $client->mock_request({
     'page' => 'workflow!index!wf_type!certificate_signing_request_v2',
@@ -97,17 +97,17 @@ $result = $client->mock_request({
 is($result->{main}->[0]->{content}->{data}->[2]->{name}, '_download');
 is($result->{main}->[0]->{content}->{data}->[2]->{value}->{mimetype}, 'application/x-pkcs12');
 
-open(CERT, ">tmp/entity26.id");
+open(CERT, ">/tmp/oxi-test/entity26.id");
 print CERT $cert_identifier;
 close CERT;
 
-open(CERT, ">tmp/entity26.p12");
+open(CERT, ">/tmp/oxi-test/entity26.p12");
 print CERT decode_base64($result->{main}->[0]->{content}->{data}->[2]->{value}->{data});
 close CERT;
 
-open(CERT, ">tmp/entity26.pass");
+open(CERT, ">/tmp/oxi-test/entity26.pass");
 print CERT $password ;
 close CERT;
 
-my $rc = system("openssl pkcs12 -in  tmp/entity26.p12 -nodes -passin pass:'' -out /dev/null");
+my $rc = system("openssl pkcs12 -in  /tmp/oxi-test/entity26.p12 -nodes -passin pass:'' -out /dev/null");
 is($rc,0);

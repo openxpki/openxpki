@@ -19,17 +19,17 @@ my $client = TestCGI::factory('democa');
 
 my $sscep = -e "./sscep" ? './sscep' : 'sscep';
 
-SKIP: { skip 'sscep not available', 8 if (system "$sscep > /dev/null");
+SKIP: { skip 'sscep not available', 8 if (system "$sscep > /dev/null 2>&1");
 
 # Generate new CSR
-`openssl req -new -subj "/DC=org/DC=OpenXPKI/DC=Test Deployment/CN=entity.openxpki.org" -nodes -keyout tmp/entity3.key -out tmp/entity3.csr 2>/dev/null`;
+`openssl req -new -subj "/DC=org/DC=OpenXPKI/DC=Test Deployment/CN=entity.openxpki.org" -nodes -keyout /tmp/oxi-test/entity3.key -out /tmp/oxi-test/entity3.csr 2>/dev/null`;
 
-ok((-s "tmp/entity3.csr"), 'csr present') || die;
+ok((-s "/tmp/oxi-test/entity3.csr"), 'csr present') || die;
 
-`rm -f tmp/entity3.crt`;
+`rm -f /tmp/oxi-test/entity3.crt`;
 
 # initial request
-my $scep = `$sscep enroll -v -u http://localhost/scep/scep  -r tmp/entity3.csr -k tmp/entity3.key -c tmp/cacert-0 -l tmp/entity3.crt -t 1 -n 1 |  grep "Read request with transaction id"`;
+my $scep = `$sscep enroll -v -u http://localhost/scep/scep  -r /tmp/oxi-test/entity3.csr -k /tmp/oxi-test/entity3.key -c /tmp/oxi-test/cacert-0 -l /tmp/oxi-test/entity3.crt -t 1 -n 1 |  grep "Read request with transaction id"`;
 
 my @t = split(/:\s+/, $scep);
 my $sceptid = $t[2];
@@ -78,17 +78,17 @@ $result = $client->mock_request({
 ok($client->get_field_from_result('check_policy_subject_duplicate'));
 ok($client->get_field_from_result('revocation_workflow_id'));
 
-`$sscep enroll -u http://localhost/scep/scep  -r tmp/entity3.csr -k tmp/entity3.key -c tmp/cacert-0 -l tmp/entity3.crt -t 1 -n 1`;
+`$sscep enroll -u http://localhost/scep/scep  -r /tmp/oxi-test/entity3.csr -k /tmp/oxi-test/entity3.key -c /tmp/oxi-test/cacert-0 -l /tmp/oxi-test/entity3.crt -t 1 -n 1`;
 
-ok(-s "tmp/entity3.crt", "new cert exists");
+ok(-s "/tmp/oxi-test/entity3.crt", "new cert exists");
 
-my $data = `openssl  x509 -in tmp/entity3.crt -outform der`;
+my $data = `openssl  x509 -in /tmp/oxi-test/entity3.crt -outform der`;
 my $cert_identifier = sha1_base64($data);
 $cert_identifier =~ tr/+\//-_/;
 
 diag('Cert Identifier '  . $cert_identifier);
 
-open(CERT, ">tmp/entity3.id");
+open(CERT, ">/tmp/oxi-test/entity3.id");
 print CERT $cert_identifier;
 close CERT;
 

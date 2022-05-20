@@ -22,7 +22,7 @@ use Test::More tests => 10;
 package main;
 
 # Create the pkcs10
-my $pkcs10 = `openssl req -new -subj "/CN=entity-rpc2.openxpki.org" -nodes -keyout tmp/entity-rpc.key 2>/dev/null`;
+my $pkcs10 = `openssl req -new -subj "/CN=entity-rpc2.openxpki.org" -nodes -keyout /tmp/oxi-test/entity-rpc.key 2>/dev/null`;
 
 ok( $pkcs10  , 'csr present') || die;
 
@@ -33,7 +33,7 @@ $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "IO::Socket::SSL";
 
 my $ssl_opts = {
     verify_hostname => 0,
-    SSL_ca_file => 'tmp/chain.pem',
+    SSL_ca_file => '/tmp/oxi-test/chain.pem',
 };
 $ua->ssl_opts( %{$ssl_opts} );
 

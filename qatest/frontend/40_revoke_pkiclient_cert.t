@@ -17,7 +17,7 @@ my $result;
 my $client = TestCGI::factory('democa');
 
 # create temp dir
--d "tmp/" || mkdir "tmp/";
+-d "/tmp/oxi-test/" || mkdir "/tmp/oxi-test/";
 
 $result = $client->mock_request({
     'page' => 'workflow!index!wf_type!certificate_revocation_request_v2',
@@ -27,7 +27,7 @@ is($result->{main}->[0]->{content}->{fields}->[5]->{name}, 'wf_token');
 
 my $cert_identifier = do { # slurp
     local $INPUT_RECORD_SEPARATOR;
-    open my $HANDLE, '<tmp/pkiclient.id';
+    open my $HANDLE, '</tmp/oxi-test/pkiclient.id';
     <$HANDLE>;
 };
 

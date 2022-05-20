@@ -19,7 +19,7 @@ my $client = TestCGI::factory('democa');
 # Load cert status page using cert identifier
 my $cert_identifier = do { # slurp
     local $INPUT_RECORD_SEPARATOR;
-    open my $HANDLE, "<tmp/entity12.id";
+    open my $HANDLE, "</tmp/oxi-test/entity12.id";
     <$HANDLE>;
 };
 
