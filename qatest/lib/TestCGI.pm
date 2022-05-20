@@ -167,9 +167,10 @@ sub mock_request {
         ));
 
     } else {
-        my $qsa = '?';
-        map { $qsa .= sprintf "%s=%s&", $_, uri_escape($data->{$_} // ''); } keys %{$data};
-        $res = $ua->get( $server_endpoint.$qsa );
+        my $qsa = join "&", map { sprintf "%s=%s", $_, uri_escape($data->{$_} // ''); } keys %{$data};
+        my $url = "$server_endpoint?$qsa";
+        $self->logger()->trace($url) if $self->logger->is_trace;
+        $res = $ua->get($url);
     }
 
     # Check the outcome of the response
