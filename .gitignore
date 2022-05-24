@@ -37,4 +37,4 @@ tools/docker-test/scripts.tar
 myperl-openxpki-ee/
 
 # Config file created by script in openxpki-docker-ee
-.oxi-docker-coretest
+.oxi-docker-tempdir
