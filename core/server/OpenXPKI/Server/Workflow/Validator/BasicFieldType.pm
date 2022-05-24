@@ -55,7 +55,7 @@ sub _validate {
                 # skip empty
                 next if (!defined $vv || $vv eq '');
                 next if ($vv =~ $regex);
-                ##! 8: "$field - regex failed on value '$vv'"
+                ##! 8: "$field - regex $regex failed on value '$vv'"
                 push @no_value, { name => $field, error => "I18N_OPENXPKI_UI_VALIDATOR_REGEX_FAILED" };
                 last;
             }
