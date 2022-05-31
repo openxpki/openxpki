@@ -348,7 +348,7 @@ WriteMakefile(
         'Proc::SafeExec'                => '1.4',
         'Regexp::Common'                => '2',
         'SOAP::Lite'                    => 0,
-        'SQL::Abstract::More'           => '1.28',      # OpenXPKI::Server::Database
+        'SQL::Abstract::More'           => '1.38',      # OpenXPKI::Server::Database
         'Sub::Exporter'                 => 0,           # OpenXPKI::MooseParams
         'Sys::SigAction'                => '0.06',
         'Template'                      => '2.15',
