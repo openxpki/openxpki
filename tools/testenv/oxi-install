@@ -138,8 +138,9 @@ fi
 echo "- install OpenXPKI"
 make install                                                          >>$LOG 2>&1
 
-echo "- replace shebang in Perl scripts"
-export perldir=$(grep ^SITEPREFIX Makefile | tr -d " " | cut -d= -f2)/bin
+export perldir=$(grep ^INSTALLBIN Makefile | tr -d " " | cut -d= -f2)
+test -x $perldir/perl || (echo "INSTALLBIN/perl does not exist (INSTALLBIN = $perldir, read from Makefile)" >>$LOG; exit 1)
+echo "- replace shebang in Perl scripts with #!$perldir/perl"
 ( \
     find $OXI_CORE_DIR/server/bin/ -type f -printf "$perldir/%f\n"; \
     find /usr/lib/cgi-bin -name '*.fcgi' \
