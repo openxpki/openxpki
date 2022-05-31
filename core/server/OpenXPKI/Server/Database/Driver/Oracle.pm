@@ -48,7 +48,7 @@ sub on_connect {
 
 # Parameters for SQL::Abstract::More
 sub sqlam_params {
-    sql_dialect => 'Oracle',
+    sql_dialect => 'Oracle', # this also sets: limit_offset => "RowNum"
 };
 
 sub sequence_create_query {

@@ -40,9 +40,7 @@ sub perform_checks { }
 sub on_connect { }
 
 # Parameters for SQL::Abstract::More
-sub sqlam_params {
-    limit_offset => 'FetchFirst',    # see SQL::Abstract::Limit source code
-}
+sub sqlam_params { }
 
 sub sequence_create_query {
     my ($self, $dbi, $seq) = @_;
