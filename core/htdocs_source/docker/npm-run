@@ -1,0 +1,25 @@
+#!/bin/bash
+set -e
+
+test -z $1 && echo "Please specify an 'npm run' command as argument" && exit 1 || true
+
+echo -e "\n[Copy source code without node_modules/]"
+OPTS=(-rlD --delete --inplace --quiet)
+
+# Do not use the bind-mounted node_modules/ from the host...
+rsync "${OPTS[@]}" \
+  --exclude node_modules \
+  --exclude dist \
+  --exclude dist-dev \
+  --exclude docker \
+  /source/ /build
+
+# ...instead use /node_modules/ from the container
+rsync "${OPTS[@]}" \
+  /node_modules/ /build/node_modules
+
+echo -e "\n[npm run $1]"
+cd /build
+# The output path for compiled assets is changed to /compiled via
+# OPENXPKI_BUILD_OUTPUT_PATH (which is read inpackage.json).
+OPENXPKI_BUILD_OUTPUT_PATH=/compiled npm run $1
