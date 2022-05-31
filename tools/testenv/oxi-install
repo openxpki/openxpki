@@ -121,7 +121,7 @@ our \$VERSION = '$OXI_VERSION';
 __VERSION
 
 echo "- purge installed code"
-perl -e 'use v5.10; say for grep { /^[^\.]/ } @INC' |\
+perl -e 'use v5.10; say for grep { -d && /^[^\.]/ } @INC' |\
     xargs -I '{}' find '{}' -name 'OpenXPKI*' |\
     sort |\
     uniq |\
