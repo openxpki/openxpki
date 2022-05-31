@@ -360,7 +360,7 @@ sub select {
 # Returns: DBI statement handle
 sub select_one {
     my $self = shift;
-    return $self->select(@_)->fetchrow_hashref;
+    return $self->select(@_, limit => 1)->fetchrow_hashref;
 }
 
 # SELECT - return all rows as list of arrays
