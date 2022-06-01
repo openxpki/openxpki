@@ -34,7 +34,7 @@ export default class TestController extends Controller {
             let emptyResponse = () => new Promise(resolve => {
                 let response = [
                     200,
-                    {'content-type': 'application/javascript'},
+                    {'Content-Type': 'application/javascript'},
                     '{}'
                 ];
                 resolve(response);
@@ -101,10 +101,12 @@ export default class TestController extends Controller {
              * POST requests
              */
             this.post('/openxpki/cgi-bin/webui.fcgi', req => {
+                let headers = req.requestHeaders
+                let contentType = headers[Object.keys(headers).find(el => el.toLowerCase() == 'content-type')]
                 console.info(`MOCKUP SERVER> POST request: ${req.url}`);
                 console.debug(req);
                 let params;
-                if (req.requestHeaders['content-type'].match(/^application\/x-www-form-urlencoded/)) {
+                if (contentType.match(/^application\/x-www-form-urlencoded/)) {
                     params = decodeURIComponent(req.requestBody.replace(/\+/g, ' ')).split('&').join("\n");
                 }
                 else {
