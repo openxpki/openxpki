@@ -390,7 +390,7 @@ sub __extract_payload {
     OpenXPKI::Exception->throw( message => 'Unable to initialize decrpytion key' )
         unless ($cbc);
 
-    return $cbc->decrypt( $req->{content}->{contentInfo}->{content} );
+    return $cbc->decrypt( $self->request()->payload() );
 
 }
 
