@@ -107,7 +107,7 @@ our $schema = "
     EncryptedContentInfo ::= SEQUENCE {
         contentType ContentType,
         contentEncryptionAlgorithm AlgorithmIdentifier,
-        content [0] IMPLICIT EncryptedContent OPTIONAL
+        content ANY
     }
 
     EncryptedContent ::= OCTET STRING
@@ -444,7 +444,6 @@ sub __build_rcptlist {
 sub __build_payload {
     my $self = shift;
     return decode_tag( $self->parsed()->{content}->{contentInfo}->{content} );
-
 }
 
 sub find_oid {
@@ -464,9 +463,46 @@ sub decode_tag {
     # length starts after the tag so we need to use tagbytes as offset
     my ($lengthbytes, $length) = asn_decode_length(substr($raw, $tagbytes));
 
+    # offset at the head of the first segment
+    my $offset = $tagbytes + $lengthbytes;
+
+    # return directly if it this is not a constructed tag (Bit6 is set)
     # we are not interessted in the actual values of tag and length but
-    # we need to strip those sequences from the top of the raw value
-    return substr($raw, $tagbytes + $lengthbytes);
+    # just strip the header of the raw buffer
+    return substr($raw, $offset) unless ($tag & 0x20);
+    # constructed mode means that the buffer contains multiple segments
+    # where each one is an encoded tag with tag, lenght, value
+    # [[tag, length][seg1][seg2][seg3]...
+    $tag &= 0xDF;
+
+    # inifinite length encoding - the value has two null bytes at the end
+    # the proper size of the raw value is already handled by the asn1 parser
+    # the while loop is a safety net, itag == 0 should be seen in any case
+    $length = length($raw)-2 if ($length == -1);
+    my $buffer;
+    while ($offset < $length) {
+        # read the tag header from the segment at offset
+        my ($tagbytes, $itag) = asn_decode_tag(substr($raw, $offset));
+        last if ($itag == 0);
+        # The inner and outer tags must be the same - it might be possible
+        # to have nested constructed tags but we dont want to support this now
+        # tag == 128 is a context specific outer tag with no lower tag number
+        die sprintf("Inner (%02d) and outer (%02d) tag do not match!?", $itag == $tag)
+            unless($tag == 128 || $itag == $tag);
+
+        # set offset to the right end of the tag header of the current segment
+        $offset += $tagbytes;
+        # ...and decode the length header of the segment
+        my ($lengthbytes, $length) = asn_decode_length(substr($raw, $offset));
+        # forward offset beyond the length header to the left end of the value
+        $offset += $lengthbytes;
+
+        # An infinite lenght should not be possible here but lets check it
+        die "Infinite length found in constructed item" if ($length == -1);
+        $buffer .= substr($raw, $offset, $length);
+        $offset += $length;
+    }
+    return $buffer;
 }
 
 =head2 encode_tag
