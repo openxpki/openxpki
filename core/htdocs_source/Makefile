@@ -4,7 +4,9 @@ IMAGE=oxiuibuild
 .DEFAULT_GOAL := help
 BUILD_UNMINIFIED = 0
 
-ifneq (, $(shell command -v podman))
+# "shell bash -c ..."" required to support both:
+# systems where "command" is a binary and those where it's a shell builtin.
+ifneq (, $(shell bash -c 'command -v podman'))
 	RUN_C = podman
 	RUN_C_OPTS =
 else
