@@ -22,6 +22,13 @@ export default [
                 },
                 {
                     type: "text",
+                    name: "text_maybe",
+                    label: "Text",
+                    value: "",
+                    is_optional: 1,
+                },
+                {
+                    type: "text",
                     name: "comment",
                     label: "Comment (will be used in autocomplete below)",
                     value: "rain",
@@ -90,6 +97,16 @@ export default [
                         { value: 1, label: "Major" },
                         { value: 2, label: "Tom" },
                     ],
+                },
+                {
+                    type: "select",
+                    name: "select_it_maybe",
+                    label: "Select, no preset",
+                    options: [
+                        { value: 1, label: "Major" },
+                        { value: 2, label: "Tom" },
+                    ],
+                    is_optional: 1,
                 },
                 {
                     type: "select",
