@@ -77,11 +77,31 @@ npm run lint:js
 npm run lint:js:fix
 ```
 
-### Build (production)
+### Build Ember app
+
+####  Using Docker
 
 ```bash
-make
-# or manually:
+make ember
+```
+
+#### Verdaccio (local npmjs.org cache)
+
+If the container repeatedly gets rebuilt it may need to reinstall the NPM modules (e.g. if you do changes to the Docker build phase). In this case you may want to use the local npmjs.org cache server [verdaccio](https://verdaccio.org/). If it runs on your host on default port 4873 the Makefile should detect it and configures `npm` during container building to use the local cache.
+
+To use _verdaccio_ run these steps:
+
+```bash
+nvm use
+npm install -g verdaccio
+nvm exec verdaccio -l 0.0.0.0:4873
+```
+
+
+
+#### On your host machine
+
+```bash
 nvm use
 npm run build
 ```

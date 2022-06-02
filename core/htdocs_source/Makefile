@@ -2,16 +2,31 @@ IMAGE=oxiuibuild
 -include Makefile.local
 
 .DEFAULT_GOAL := help
-BUILD_UNMINIFIED = 0
 
-# "shell bash -c ..."" required to support both:
-# systems where "command" is a binary and those where it's a shell builtin.
+BUILD_UNMINIFIED = 0
+DEV_SERVER_FORWARD_TO ?= https://localhost:443
+NPM_CUSTOM_REGISTRY ?= http://localhost:4873
+
+#
+# Check if "verdaccio" npmjs.org proxy runs on port 4873
+#
+MANAGER_OPTS_BUILD =
+# "shell bash -c ..."" is required to support both:
+# systems where "command" is a binary and those where it's a shell builtin
+ifneq (, $(shell bash -c 'command -v telnet'))
+ifneq (, $(shell echo "close" | telnet localhost 4873 2>/dev/null | grep -i connected))
+	MANAGER_OPTS_BUILD = --network host --build-arg NPM_CUSTOM_REGISTRY=$(NPM_CUSTOM_REGISTRY)
+endif
+endif
+
 ifneq (, $(shell bash -c 'command -v podman'))
-	RUN_C = podman
-	RUN_C_OPTS =
+	MANAGER = podman
+	MANAGER_OPTS_RUN = --network host
+#	MANAGER_OPTS = --network slirp4netns:allow_host_loopback=true
 else
-	RUN_C = docker
-	RUN_C_OPTS = --user `id -u`:`id -g`
+	MANAGER = docker
+	MANAGER_OPTS_RUN = --network host --user `id -u`:`id -g`
+#	MANAGER_OPTS = --add-host host.containers.internal:host-gateway
 endif
 
 help:
@@ -22,18 +37,30 @@ help:
 #
 ember: docker-build compile ## compile Ember code using a Docker image
 
-nocache: docker-build-nocache compile ## compile Ember code in Docker without cache (force re-installation of node_modules)
+nocache: MANAGER_OPTS_BUILD += --no-cache
+nocache: ember ## compile Ember code in Docker without cache (force re-installation of node_modules)
 
 debug: BUILD_UNMINIFIED = 1 ## compile Ember but with unminified JavaScript + incl. sourcemaps
 debug: ember
 
 compile:
-	$(RUN_C) run -ti --rm \
+	$(MANAGER) run $(MANAGER_OPTS_RUN) -ti --rm \
 	  -v $(abspath ./):/source:ro \
 	  -v $(abspath ../server/htdocs):/compiled \
-	  -e "OPENXPKI_UI_BUILD_UNMINIFIED=${BUILD_UNMINIFIED}" \
-	  $(RUN_C_OPTS) $(IMAGE) build
+	  -e "OPENXPKI_UI_BUILD_UNMINIFIED=$(BUILD_UNMINIFIED)" \
+	  $(IMAGE) \
+	  build
 	perl update-manifest.pl $(abspath ../server)
+
+#
+# Run local Ember.js development server
+#
+serve: docker-build ## run Ember.js development server
+	$(MANAGER) run $(MANAGER_OPTS_RUN) -ti --rm \
+	  -v $(abspath ./):/source:ro \
+	  -e "DEV_SERVER_FORWARD_TO=$(DEV_SERVER_FORWARD_TO)" \
+	  $(IMAGE) \
+	  serve
 
 #
 # Build Docker image
@@ -41,11 +68,7 @@ compile:
 # Docker image is built using the internal Docker cache, the last image
 # layer holding the copy of the source code is invalidated on code changes
 docker-build:
-	$(RUN_C) build -f docker/Dockerfile -t $(IMAGE) .
-
-# force rebuild, will also update Node.js module dependencies
-docker-build-nocache:
-	$(RUN_C) build -f docker/Dockerfile --no-cache -t $(IMAGE) .
+	$(MANAGER) build $(MANAGER_OPTS_BUILD) -f docker/Dockerfile -t $(IMAGE) .
 
 prune: ## remove Docker image
-	$(RUN_C) rmi $(IMAGE)
+	$(MANAGER) rmi $(IMAGE)

@@ -10,6 +10,8 @@
 # assets for Vagrant VM
 oracle-xe-*.rpm.zip
 
+Makefile.local
+
 #
 # Generated files
 #

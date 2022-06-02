@@ -21,7 +21,7 @@
     "lint:hbs:fix": "ember-template-lint . --fix",
     "lint:js": "eslint . --cache",
     "lint:js:fix": "eslint . --fix",
-    "serve": "ember serve --host=0.0.0.0 --proxy=https://localhost:8443 --secure-proxy false --output-path=dist-dev",
+    "serve": "ember serve --host=0.0.0.0 --proxy=$DEV_SERVER_FORWARD_TO --secure-proxy false --output-path=dist-dev",
     "test": "npm-run-all lint test:*",
     "test:ember": "ember test",
     "docs": "jsdoc -c .jsdoc.js --verbose app"
