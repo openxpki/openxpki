@@ -691,7 +691,7 @@ sub create_cert_response {
                 }]
             },
             'contentInfo' => {
-                'content' => $cbc->encrypt($payload),
+                'content' => encode_tag( $cbc->encrypt($payload), 0x80 ),
                 'contentType' => '1.2.840.113549.1.7.1', #id-data
                 'contentEncryptionAlgorithm' => {
                     'algorithm' => find_oid( $self->enc_alg() ),
