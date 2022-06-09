@@ -298,10 +298,14 @@ around BUILDARGS => sub {
     if (@_ == 1) {
         my $request = shift;
         # Base64 encoded without boundary markers
-        if ($request =~ m{\AMII([[:print:]]|\s)+\z}) {
-            $request = decode_base64($request);
+        # This regex is not exact but sufficient to be fast and
+        # unambigous related to the expected data
+        if ($request =~ m{\AM([[:print:]]|\s)+\z}) {
+            ##! 64: 'base64 request without boundaries, decoding...'
+            $request = decode_base64($request);            
         }
         my $outer = OpenXPKI::Crypt::PKCS7->new($request);
+        ##! 128: $outer->parsed()
         return $class->$orig(_asn1 => $asn, message => $outer );
     }
 

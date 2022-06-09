@@ -40,10 +40,12 @@ command "scep_unwrap_message" => {
 } => sub {
 
     my ($self, $params) = @_;
-
+    
+    ##! 64: 'unpack message'
     ##! 128: $params->message
     my $req = OpenXPKI::Crypt::PKCS7::SCEP->new($params->message);
-
+    
+    ##! 32: 'message unwrapped'
     my $res = {
         #alias => $token_alias,
         transaction_id => $req->transaction_id(),
