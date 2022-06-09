@@ -3,11 +3,11 @@ package OpenXPKI::Crypt::PKCS7;
 use strict;
 use warnings;
 use English;
-use Data::Dumper;
 use Digest::SHA qw(sha1_base64 sha1_hex);
 use MIME::Base64;
 use Moose;
 use Convert::ASN1 ':tag';
+use OpenXPKI::Debug;
 use OpenXPKI::Crypt::DN;
 use OpenXPKI::Crypt::X509;
 use Moose::Exporter;
@@ -337,9 +337,11 @@ around BUILDARGS => sub {
     $asn->prepare($schema) or die( "Internal error in " . __PACKAGE__ . ": " . $asn->error );
 
     if ($data =~ m{-----BEGIN\ ([^-]+)-----\s*(.*)\s*-----END\ \1-----}xms) {
+        ##! 8: 'PEM data - decoding'
         $data = decode_base64($2);
     }
 
+    ##! 64: 'Incoming data ' . encode_base64($data,'');
     my $parser = $asn->find('PKCS7TypeOnlyInfo');
     my $type = $parser->decode( $data ) or
       die( "decode: " . $parser->error .
@@ -347,8 +349,10 @@ around BUILDARGS => sub {
 
     # signedData
     if ($type->{contentType} eq '1.2.840.113549.1.7.2') {
+        ##! 32: 'Signed data'
         $parser = $asn->find('PKCS7ContentInfoSignedData');
     } elsif ($type->{contentType} eq '1.2.840.113549.1.7.3') {
+        ##! 32: 'Enveloped data'
         $parser = $asn->find('PKCS7ContentInfoEnvelopedData');
     }
 
