@@ -22,7 +22,9 @@ Vagrant.configure("2") do |config|
 
   # Do not try to update VirtualBox Guest Additions (which fails anyway).
   # Instead we do that manually in assets/provision-basic.sh
-  config.vbguest.auto_update = false
+  if defined? (config.vbguest)
+      config.vbguest.auto_update = false
+  end
 
   # Default VM - testing on debian jessie
   config.vm.define "develop", primary:true do |dev|
