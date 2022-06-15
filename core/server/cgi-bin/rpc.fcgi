@@ -254,8 +254,9 @@ while (my $cgi = CGI::Fast->new()) {
             else {
                 my $raw = $cgi->param($k);  # assume this is an UTF-8 encoded octet stream
                 return unless defined $raw; # ..to be able to test for undef below
+                # decode UTF-8
                 my $value = eval { Encode::decode("UTF-8", $raw, Encode::LEAVE_SRC | Encode::FB_CROAK) }
-                    or die failure(40007, [undef, "Could not decode field '$k' - $EVAL_ERROR"]);
+                    // die failure(40007, [undef, "Could not decode field '$k' - $EVAL_ERROR"]);
                 return $value;
             }
         };
