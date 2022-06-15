@@ -82,12 +82,12 @@ sub _get_secret_def {
     }
     # Try to load secret definitions that were not queried yet
     else {
-        ##! 16: "query definition '$realm.crypto.secr_t.$alias'"
+        ##! 16: "query definition '$realm.crypto.secr3t.$alias'"
         $def = $self->_load(['crypto', 'secret'], $realm, $alias);
 
         # Handle imports (i.e. references to global definition)
         if (defined $def and $def->{import}) {
-            ##! 16: "'import' statement - query definition 'system.crypto.secr_t.$alias"
+            ##! 16: "'import' statement - query definition 'system.crypto.secr3t.$alias"
             my $global_def = $self->_load(['system', 'crypto', 'secret'], '_global', $alias);
             if ($global_def) {
                 ##! 16: "global definition successfully imported"
@@ -185,6 +185,7 @@ the given config data I<HashRef>.
 
 sub _create_object {
     my ($self, $secret_def) = @_;
+    ##! 1: "start"
 
     my $realm = $secret_def->{_realm};
     my $method = lc($secret_def->{method} || "");
@@ -192,6 +193,7 @@ sub _create_object {
     my $share_store = lc($secret_def->{share_store} || "");
     my $group = $secret_def->{_alias};
 
+    ##! 2: "method: $method"
     if ('literal' eq $method) {
         require OpenXPKI::Crypto::Secret::Plain;
         my $secret = OpenXPKI::Crypto::Secret::Plain->new(
@@ -200,7 +202,7 @@ sub _create_object {
         if (defined $secret_def->{value}) {
             $secret->set_secret($secret_def->{value});
         } else {
-            CTX('log')->application->warn("Creating literal secret but secret value is undef");
+            CTX('log')->application->warn("Creating literal secret but secret value is not specified");
         }
         return $secret;
     }
@@ -372,8 +374,8 @@ sub _load_from_cache {
         return $row->{data};
     }
     OpenXPKI::Exception->throw (
-        message => "Unsupported cache type",
-        params  => { TYPE => $cache_type, GROUP => $alias }
+        message => "Unsupported cache type for secret",
+        params  => { TYPE => $cache_type, REALM => $realm, GROUP => $alias }
     );
 }
 
@@ -500,9 +502,9 @@ sub get_infos {
     }
 
     my $result;
-    ##! 2: "build list"
+    ##! 2: "build list:"
     for my $alias (@name_list) {
-        ##! 16: "$alias"
+        ##! 16: "- $alias"
         my $def = $self->_get_secret_def($alias)
             or OpenXPKI::Exception->throw(
                 message => "I18N_OPENXPKI_CRYPTO_SECRETMANAGER_GET_SECRET_GROUPS_GROUP_NOT_FOUND",
