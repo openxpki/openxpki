@@ -19,8 +19,7 @@ use DateTime;
 use lib "$Bin/../lib";
 use OpenXPKI::Test;
 
-plan tests => 20;
-
+plan tests => 23;
 my $temp_tokenmanager = tempdir( CLEANUP => 1 );
 
 #
@@ -45,6 +44,13 @@ my $oxitest = OpenXPKI::Test->new(
                 value => "root",
                 cache => "daemon",
             },
+            # Plain secret, 1 part
+            monkey_island_lonesome => {
+                export => 1,
+                method => "plain",
+                total_shares => 1,
+                cache => "daemon",
+            },
             # Plain secret, 3 parts
             monkey_island => {
                 export => 1,
@@ -58,6 +64,12 @@ my $oxitest = OpenXPKI::Test->new(
                 method => "literal",
                 value => "onceuponatime",
                 cache => "session",
+            },
+            # Secret with missing cache type
+            lechuck => {
+                export => 1,
+                method => "plain",
+                total_shares => 1,
             },
             # Import global secret
             default => {
@@ -81,6 +93,8 @@ lives_ok {
 } "instantiate TokenManager";
 
 my $phrase = "elaine";
+my $phrase2 = "marley";
+my $phrase3 = "governor";
 
 # non-existing secret
 throws_ok {
@@ -98,10 +112,22 @@ throws_ok {
 } qr/ no .* export /msxi, "prevent retrieval of unexportable secret";
 
 #
+# cache type "daemon" - single part secret
+#
+lives_and {
+    $tm->set_secret_part({ GROUP => "monkey_island_lonesome", VALUE => $phrase });
+    is $tm->get_secret_inserted_part_count("monkey_island_lonesome"), 1;
+} "single part secret: set part 1, completion status 1/1";
+
+lives_and {
+    is $tm->get_secret("monkey_island_lonesome"), $phrase;
+} "single part secret: retrieve";
+
+#
 # cache type "daemon" - multipart secret
 #
 lives_and {
-    $tm->set_secret_part({ GROUP => "monkey_island", PART => 2, VALUE => $phrase });
+    $tm->set_secret_part({ GROUP => "monkey_island", PART => 2, VALUE => $phrase2 });
     is $tm->get_secret_inserted_part_count("monkey_island"), 1;
 } "multipart secret: set part 2, completion status 1/3";
 
@@ -111,12 +137,12 @@ lives_and {
 } "multipart secret: set part 1, completion status 2/3";
 
 lives_and {
-    $tm->set_secret_part({ GROUP => "monkey_island", PART => 3, VALUE => $phrase });
+    $tm->set_secret_part({ GROUP => "monkey_island", PART => 3, VALUE => $phrase3 });
     is $tm->get_secret_inserted_part_count("monkey_island"), 3;
 } "multipart secret: set part 3, completion status 3/3";
 
 lives_and {
-    is $tm->get_secret("monkey_island"), $phrase x 3;
+    is $tm->get_secret("monkey_island"), $phrase.$phrase2.$phrase3;
 } "multipart secret: retrieve";
 
 lives_and {
@@ -144,6 +170,13 @@ lives_ok {
 lives_and {
     is $tm->get_secret("monkey_island_session"), "peace_pipe";
 } "session cache: retrieve secret";
+
+#
+# Missing cache type
+#
+throws_ok {
+    $tm->set_secret_part({ GROUP => "lechuck", VALUE => $phrase });
+} qr/ no .* type /msxi, "complain about missing cache type";
 
 #
 # Imported global secret
