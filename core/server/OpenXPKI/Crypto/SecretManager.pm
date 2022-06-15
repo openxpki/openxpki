@@ -342,7 +342,12 @@ L<OpenXPKI::Crypto::SecretRole/thaw> or C<undef>.
 sub _load_from_cache {
     my ($self, $realm, $alias, $cache_type) = @_;
 
-    $cache_type = lc($cache_type || "");
+    OpenXPKI::Exception->throw (
+        message => "No cache type given for secret",
+        params  => { REALM => $realm, GROUP => $alias }
+    ) unless defined $cache_type;
+
+    $cache_type = lc($cache_type);
 
     ##! 2: "check cache ($cache_type) for serialized data of '$alias'"
     my $dump = "";
