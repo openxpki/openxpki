@@ -19,7 +19,7 @@ use DateTime;
 use lib "$Bin/../lib";
 use OpenXPKI::Test;
 
-plan tests => 23;
+plan tests => 25;
 my $temp_tokenmanager = tempdir( CLEANUP => 1 );
 
 #
@@ -50,6 +50,7 @@ my $oxitest = OpenXPKI::Test->new(
                 method => "plain",
                 total_shares => 1,
                 cache => "daemon",
+                kcv => '$argon2id$v=19$m=32768,t=3,p=1$NnJ6dGVBY2FwdGxkVE50ZGZRQkE4QT09$Q3d2HAWq7UCMLdipbacwYQ',
             },
             # Plain secret, 3 parts
             monkey_island => {
@@ -114,6 +115,14 @@ throws_ok {
 #
 # cache type "daemon" - single part secret
 #
+throws_ok {
+    $tm->set_secret_part({ GROUP => "monkey_island_lonesome", VALUE => "wrong" });
+} qr/I18N_OPENXPKI_UI_SECRET_UNLOCK_KCV_MISMATCH/, "single part secret: fail on wrong value (kcv check)";
+
+lives_and {
+    is $tm->is_secret_complete("monkey_island_lonesome"), 0;
+} "single part secret: completion status = false";
+
 lives_and {
     $tm->set_secret_part({ GROUP => "monkey_island_lonesome", VALUE => $phrase });
     is $tm->get_secret_inserted_part_count("monkey_island_lonesome"), 1;

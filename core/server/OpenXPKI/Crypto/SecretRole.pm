@@ -128,9 +128,6 @@ sub freeze {
     ##! 1: "start"
     ##! 2: "serializing " . (scalar @{ $self->_get_parts }) . " parts"
 
-    # FIXME fail with Exception?
-    return undef unless scalar @{ $self->_get_parts };
-
     my $decoder = OpenXPKI::Serialization::Simple->new;
     my $dump = CTX('volatile_vault')->encrypt($decoder->serialize($self->_get_parts));
     ##! 2: "created " . (defined $dump ? length($dump) : 0) . " bytes dump data"
