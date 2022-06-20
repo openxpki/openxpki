@@ -29,6 +29,7 @@ sub init {
         $self->{_crypt} = Crypt::CBC->new(
             -key => $self->{EncryptKey},
             -cipher => 'Crypt::OpenSSL::AES',
+            -nodeprecate => 1,
         );
     }
 
