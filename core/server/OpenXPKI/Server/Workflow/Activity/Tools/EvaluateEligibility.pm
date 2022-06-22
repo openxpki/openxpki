@@ -130,7 +130,7 @@ sub execute {
         my $plain_result = $config->get( [ @prefix, 'value' ] );
         ##! 32: 'static check - result is ' . Dumper $plain_result
         # check the ref and explicit return to make sure it was not a stupid config
-        $res = (ref $plain_result eq '' && $plain_result eq '1');
+        $res = (defined $plain_result && ref $plain_result eq '' && $plain_result eq '1');
 
         CTX('log')->application()->debug("Eligibility check without path - result " . (defined $plain_result ? $plain_result : undef));
 

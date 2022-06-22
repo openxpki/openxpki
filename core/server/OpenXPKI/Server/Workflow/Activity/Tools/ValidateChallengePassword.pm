@@ -41,9 +41,12 @@ sub execute {
     my @attrib = $config->get_scalar_as_list( [ @prefix, 'args' ] );
     my $tt = OpenXPKI::Template->new();
     my @path;
-    my $param =  { context => $context->param() };
+    my $param = { context => $context->param() };
+    ##! 128: $param
     foreach my $item (@attrib) {
+        ##! 64: 'Rendering ' .$item
         my $out = $tt->render($item, $param);
+        ##! 32: 'Got path ' .$out
         push @path, $out if ($out);
     }
 
@@ -61,15 +64,17 @@ sub execute {
 
         CTX('log')->application()->info("validate challenge using bind " . ($res ? "validated" : "validation FAILED!"));
 
-
     } else {
 
         # for the moment we use plain text passwords only
         my $password = $config->get( [ @prefix, 'value', @path ] ) ;
-        ##! 32: 'expected challenge is ' . $password
-        $res = ($password eq $challenge_password ? 1 : 0);
-        CTX('log')->application()->info("validate challenge using compare " . ($res ? "validated" : "validation FAILED!"));
-
+        if ($password) {
+            ##! 32: 'expected challenge is ' . $password
+            $res = ($password eq $challenge_password ? 1 : 0);
+            CTX('log')->application()->info("validate challenge using compare " . ($res ? "validated" : "validation FAILED!"));
+        } else {
+            CTX('log')->application()->info("no challenge password was returned from config");
+        }
     }
 
     $context->param( $target_key => $res);
