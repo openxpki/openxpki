@@ -12,7 +12,7 @@ use MIME::Base64;
 use CGI::Session;
 use URI::Escape;
 use Log::Log4perl::MDC;
-use Crypt::JWT qw(encode_jwt);
+use Crypt::JWT qw(encode_jwt decode_jwt);
 
 # Project modules
 use OpenXPKI::Template;
@@ -259,17 +259,40 @@ sub __load_class {
         return (undef, undef);
     }
 
-    $method  = 'index' if (!$method );
-
-    my %extra;
-    if ($param) {
+    my $extra = {};
+    # the request is encoded in an encrypted jwt structure
+    if ($class eq 'encrypted') {
+        # TODO - consolidate with JWT code from Request.pm
+        my $jwt_key = $self->session->param('jwt_encryption_key');
+        unless ($jwt_key) {
+            $self->logger->debug("JWT encrypted request but client session contains no decryption key");
+            return (undef, undef);
+        }
+        # as the token has non-word characters the above regex does not contain the full payload
+        # we therefore read the payload directly from call stripping the class name
+        my $decoded = decode_jwt(token => substr($call,10), key => $jwt_key);
+        if ($decoded->{page}) {
+            $self->logger()->debug("Encrypted request with page " . $decoded->{page});
+            ($class, $method) = ($decoded->{page} =~ /\A (\w+)\!? (\w+)? \z/xms);
+        } else {
+            $class = $decoded->{class};
+            $method = $decoded->{method};
+        }
+        my %secure = map { $_ =~ m{\A(page|class|method)\z} ? () : ($_ => $decoded->{$_})  } keys %$decoded;
+        $self->logger()->debug("Encrypted request to $class / $method");
+        $self->logger()->trace("Encrypted request secure params " . Dumper \%secure ) if ($self->logger->is_trace && (keys %secure));
+        $extra->{__secure} = { %secure, (__jwt_key => $jwt_key ) };
+    }
+    elsif ($param) {
         my @extra = split /!/, $param;
         while (my $key = shift @extra) {
             my $val = shift @extra // '';
-            $extra{$key} = Encode::decode("UTF-8", uri_unescape($val));
+            $extra->{$key} = Encode::decode("UTF-8", uri_unescape($val));
         }
-        $self->logger()->trace("Found extra params " . Dumper \%extra ) if $self->logger->is_trace;
+        $self->logger()->trace("Found extra params " . Dumper $extra ) if $self->logger->is_trace;
     }
+
+    $method  = 'index' if (!$method );
 
     $self->logger()->debug("Loading handler class $class");
 
@@ -280,7 +303,7 @@ sub __load_class {
         return (undef, undef);
     }
 
-    my $result = $class->new({ client => $self, req => $req, extra => \%extra });
+    my $result = $class->new({ client => $self, req => $req, extra => $extra });
 
     return ($result, $method);
 

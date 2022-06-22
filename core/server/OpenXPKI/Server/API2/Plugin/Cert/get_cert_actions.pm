@@ -172,7 +172,12 @@ command "get_cert_actions" => {
         # all conditions are met, check workflow permissions
         if ($conn->exists([ 'workflow', 'def', $item->{workflow}, 'acl', $role, 'creator' ] )) {
             ##! 32: 'Adding Item ' . $item->{label}
-            push @actions, { label => $item->{label}, workflow => $item->{workflow} };
+            push @actions, {
+                label => $item->{label},
+                workflow => $item->{workflow},
+                autorun => ($item->{autorun} ? 1 : 0),
+                ($item->{param} ? (param => $item->{param}) : ()),
+            };
         }
     }
 

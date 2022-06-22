@@ -15,6 +15,8 @@ use HTML::Entities;
 use JSON;
 use Moose::Util::TypeConstraints;
 use Data::UUID;
+use Crypt::JWT qw( encode_jwt );
+use Crypt::PRNG;
 
 # Project modules
 use OpenXPKI::i18n qw( i18nTokenizer );
@@ -98,6 +100,12 @@ has type => (
     is => 'ro',
     isa => 'Str',
     default => 'json',
+);
+
+has _prefix_jwt => (
+    is => 'ro',
+    isa => 'Str',
+    default => '_encrypted_jwt_',
 );
 
 sub BUILD {
@@ -324,6 +332,7 @@ sub __param {
 
     confess "param() / multi_param() expect a single key (string) as argument\n" if (not $key or ref $key); # die
 
+    my $prefix_jwt = $self->_prefix_jwt;
     my @queries = (
         # Try extra parameters appended to action
         sub { return $self->extra->{$key} },
@@ -993,9 +1002,36 @@ sub decrypted_param {
         $self->logger->debug("Parameter '".$param_name."'' was not JWT encrypted");
         return;
     }
-
+    delete $item->{__jwt_key};
     return $item;
 
+}
+
+# encrypt given data
+sub _encrypt_jwt {
+    my ($self, $value) = @_;
+
+    die "Only values of type HashRef are supported for encrypted input fields\n"
+      unless ref $value eq 'HASH';
+
+    my $key = $self->_session->param('jwt_encryption_key');
+    if (not $key) {
+        $key = Crypt::PRNG::random_bytes(32);
+        $self->_session->param('jwt_encryption_key', $key);
+    }
+
+    my $token = encode_jwt(
+        payload => $value,
+        enc => 'A256CBC-HS512',
+        alg => 'PBES2-HS512+A256KW', # uses "HMAC-SHA512" as the PRF and "AES256-WRAP" for the encryption scheme
+        key => $key, # can be any length for PBES2-HS512+A256KW
+        extra_headers => {
+            p2c => 8000, # PBES2 iteration count
+            p2s => 32,   # PBES2 salt length
+        },
+    );
+
+    return $token
 }
 
 =head2 make_autocomplete_query

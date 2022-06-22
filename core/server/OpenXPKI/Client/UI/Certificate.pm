@@ -762,7 +762,21 @@ sub init_detail {
 
         if (defined $reply->{workflow} && ref $reply->{workflow} eq 'ARRAY') {
             foreach my $item (@{$reply->{workflow}}) {
-                push @actions, { page => $baseurl.$item->{workflow}, label => $item->{label}, target => '_blank' };
+                my $page;
+                if ($item->{autorun} || $item->{param}) {
+                    my $action = {
+                        %{$item->{param} // {}},
+                        page => 'workflow!' . ($item->{autorun} ? 'start' : 'index'),
+                        cert_identifier => $cert_identifier,
+                        wf_type => $item->{workflow},
+                    };
+                    $self->logger()->trace("compile token" . Dumper $action) if $self->logger->is_trace;
+                    my $token = $self->_encrypt_jwt($action);
+                    $page = 'encrypted!'.$token;
+                } else {
+                    $page = $baseurl.$item->{workflow};
+                }
+                push @actions, { page => $page, label => $item->{label}, target => '_blank' };
             }
         }
 

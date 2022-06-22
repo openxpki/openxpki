@@ -16,8 +16,6 @@ use Date::Parse;
 use YAML::Loader;
 use Try::Tiny;
 use MIME::Base64;
-use Crypt::JWT qw( encode_jwt );
-use Crypt::PRNG;
 
 # Project modules
 use OpenXPKI::DateTime;
@@ -212,9 +210,26 @@ sub init_start {
     my $self = shift;
     my $args = shift;
 
+    my $params = $self->decrypted_param('__secure');
+    my $wf_type;
+    if ($params) {
+        $wf_type = $params->{'wf_type'};
+        delete $params->{'wf_type'};
+    } else {
+        $wf_type = $self->param('wf_type');
+    }
+
+    if (!$wf_type) {
+        # todo - handle errors
+        $self->logger()->error("No workflow given to init_start");
+        return $self;
+    }
+
     my $wf_info = $self->send_command_v2( 'create_workflow_instance', {
-       workflow => scalar $self->param('wf_type'), params => {}, ui_info => 1,
-       $self->__tenant(),
+        workflow => $wf_type,
+        params => ($params // {}),
+        ui_info => 1,
+        $self->__tenant(),
     });
 
     if (!$wf_info) {
@@ -2645,33 +2660,6 @@ sub __render_input_field {
 
 }
 
-# encrypt given data
-sub _encrypt_jwt {
-    my ($self, $value) = @_;
-
-    die "Only values of type HashRef are supported for encrypted input fields\n"
-      unless ref $value eq 'HASH';
-
-    my $key = $self->_session->param('jwt_encryption_key');
-    if (not $key) {
-        $key = Crypt::PRNG::random_bytes(32);
-        $self->_session->param('jwt_encryption_key', $key);
-    }
-
-    my $token = encode_jwt(
-        payload => $value,
-        enc => 'A256CBC-HS512',
-        alg => 'PBES2-HS512+A256KW', # uses "HMAC-SHA512" as the PRF and "AES256-WRAP" for the encryption scheme
-        key => $key, # can be any length for PBES2-HS512+A256KW
-        extra_headers => {
-            p2c => 8000, # PBES2 iteration count
-            p2s => 32,   # PBES2 salt length
-        },
-    );
-
-    return $token
-}
-
 =head2 __delegate_call
 
 Used to delegate the rendering to another class, requires the method
@@ -3826,7 +3814,6 @@ sub __render_workflow_action_head {
         className => 'workflow workflow-action ' . ($wf_action_info->{uiclass} || ''),
         canonical_uri => sprintf('workflow!load!wf_id!%01d!wf_action!%s', $wf_info->{workflow}->{id}, $wf_action),
     });
-
 }
 
 sub __render_workflow_action_body {
