@@ -1446,10 +1446,6 @@ msgstr ""
 "tuo sistema."
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
-msgstr "Paese"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_RESPONDER_LABEL"
 msgstr "Persone Fisiche (Email Sicura / Autenticazione)"
 
@@ -1552,12 +1548,6 @@ msgstr "URI"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
 msgstr "URI"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_PROFILE_STATE_DESC"
-msgstr ""
-"Inserisci il nome completo a dominio (FQN = Fully Qualified Hostname) del "
-"tuo sistema."
 
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL"
 msgstr "Client TLS"
@@ -2145,29 +2135,23 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_LABEL"
 msgstr "Seleziona Certificato"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_FORM_DESC"
-msgstr " "
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_FORM_LABEL"
-msgstr "Modifica Dati"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_PERSIST_DESC"
-msgstr "Rendi permanenti i dati modificati salvandoli nel database"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_PERSIST_LABEL"
 msgstr "Conferma Dati"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_TERMINATE_DESC"
-msgstr ""
-"Abbandona questo workflow. Questa azione lascerà i metadati non modificati."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_TERMINATE_LABEL"
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_SET_NOTIFY_ACTIVE_LABEL"
 msgstr "Abbandona Modifiche"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_CONTEXT_DESC"
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_SET_NOTIFY_INACTIVE_LABEL"
+msgstr "Abbandona Modifiche"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_BASE_DESC"
 msgstr "Inserisci le informazioni richieste, utilizzando il modulo qui sotto."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_CONTEXT_LABEL"
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_BASE_LABEL"
 msgstr "Aggiorna Informazioni"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CLEANUP_DESC"
@@ -2576,6 +2560,19 @@ msgstr "Specifica Opzioni Report"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SET_ISSUER_DESC"
 msgstr "Emetti una nuova Lista Revoche"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SHOWMETA_LOAD_DATA_DESC"
+msgstr ""
+"Inserisci l’identificatore del certificato oppure usa la funzione Cerca per "
+"trovare il certificato di cui vuoi modificare i metadati. Se non riesci a "
+"trovare/identificare il tuo certificato, usa la funzione Cerca del menu "
+"principale. La lista dei risultati contiene un link per modificare i "
+"metadati."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SHOWMETA_LOAD_DATA_LABEL"
+msgstr "Seleziona Certificato"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SLEEP_LABEL"
@@ -3228,12 +3225,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_LABEL"
 msgstr "Indirizzo Email"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_PLACEHOLDER"
-msgstr "Indirizzo Email del proprietario del certificato"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_TOOLTIP"
-msgstr " "
-
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EXPIRY_NOTIFICATION_DESC"
 msgstr " "
@@ -3258,17 +3249,8 @@ msgstr " "
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_GROUP_LABEL"
 msgstr "Richiedente/Proprietario"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_DESC"
-msgstr " "
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_LABEL"
 msgstr "Richiedente/Proprietario"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_PLACEHOLDER"
-msgstr "Nome del Richiedente/Proprietario"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_TOOLTIP"
-msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_DESC"
 msgstr "Identificatore di Sistema"
@@ -3394,27 +3376,6 @@ msgstr ""
 "caricare un file dal tuo computer."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
-msgstr "La tua richiesta codificata in formato PKCS10"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_DESC"
-msgstr ""
-"Incolla la tua richiesta in formato PKCS10 direttamente nel campo testuale "
-"oppure usa il pulsante upload per caricare un file dal tuo computer"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_LABEL"
-msgstr "Richiesta PKCS10"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_PLACEHOLDER"
-msgstr ""
-"Incolla la tua richiesta in formato PEM qui (deve iniziare con -----BEGIN "
-"CERTIFICATE REQUEST——) oppure usa il pulsante browse/upload qui sotto per "
-"caricare un file dal tuo computer."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_TOOLTIP"
 msgstr "La tua richiesta codificata in formato PKCS10"
 
 #, fuzzy
@@ -4456,9 +4417,6 @@ msgstr ""
 "Questo Workflow è stato interrotto da un evento imprevisto, contatta per "
 "favore il team di supporto!"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_LABEL"
-msgstr "Stato"
-
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_FAILURE_DESC"
 msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
@@ -4519,31 +4477,20 @@ msgstr ""
 "tua azione di massa. Puoi selezionare i singoli elementi nella pagina "
 "successiva."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_DESC"
-msgstr ""
-"Qui sotto puoi vedere i nuovi metadati per questo certificato, scegli con "
-"quale azione intendi proseguire:<br>Modifica Dati riporterà al form di "
-"modifica, Abbandona Modifiche terminerà questo Workflow senza riscrivere i "
-"metadati nel database, Conferma dati renderà definitivi i metadati, "
-"salvandoli nel database e terminando il Workflow."
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_EDIT_DATA_LABEL"
+msgstr "Aggiorna"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_LABEL"
-msgstr "Controlla Dati"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_INITIAL_DESC"
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_INITIAL_DATA_DESC"
 msgstr ""
 "Per modificare i Metadati di un certificato, inserisci l’identificatore."
 "<br>Se non conosci l’identificatore del certificato, usa la funzione Ricerca "
 "per trovarlo."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_INITIAL_LABEL"
-msgstr "Stato"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_DESC"
-msgstr "Le modifiche sono state salvate in via definitiva nel database."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
-msgstr "I Metadati sono stati aggiornati"
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_UPDATE_PENDING_DESC"
+msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC"
@@ -4650,6 +4597,14 @@ msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_LABEL"
 msgstr "Certificato Emesso"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_DESC"
+msgstr "Le modifiche sono state salvate in via definitiva nel database."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_LABEL"
+msgstr "I Metadati sono stati aggiornati"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
 msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
@@ -4766,12 +4721,6 @@ msgstr "Esporta il Certificato nel formato desiderato"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_LABEL"
 msgstr "Esporta Certificato"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_DESC"
-msgstr "Esporta il Certificato nel formato desiderato"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_LABEL"
-msgstr "Esporta Certificato"
-
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"
 msgstr ""
@@ -4788,14 +4737,6 @@ msgstr "Modifica i Metadati di un certificato."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_LABEL"
 msgstr "Modifica Metadati"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_DESC"
-msgstr "Esporta il Certificato nel formato desiderato"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_LABEL"
-msgstr "Esporta Certificato"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_DESC"
 msgstr "Emetti le Liste Revoche (CRL)."
@@ -5104,6 +5045,10 @@ msgstr "Chiave"
 #~ msgstr "Il token di firma della CRL non è online"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
+#~ msgstr "Paese"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_NODEID"
 #~ msgstr "Nome Organizzazione"
 
@@ -5151,6 +5096,12 @@ msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_LABEL"
 #~ msgstr "Certificato per l’Autenticazione dell’adesione a SCEP"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_PROFILE_STATE_DESC"
+#~ msgstr ""
+#~ "Inserisci il nome completo a dominio (FQN = Fully Qualified Hostname) del "
+#~ "tuo sistema."
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_BASIC_DESC"
 #~ msgstr "Profilo per gli utenti che usano l’Autenticazione TLS."
@@ -5267,6 +5218,30 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_AUTH_LABEL"
 #~ msgstr "Persist CRR"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_FORM_DESC"
+#~ msgstr " "
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_FORM_LABEL"
+#~ msgstr "Modifica Dati"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_PERSIST_DESC"
+#~ msgstr "Rendi permanenti i dati modificati salvandoli nel database"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_TERMINATE_DESC"
+#~ msgstr ""
+#~ "Abbandona questo workflow. Questa azione lascerà i metadati non "
+#~ "modificati."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_TERMINATE_LABEL"
+#~ msgstr "Abbandona Modifiche"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_CONTEXT_DESC"
+#~ msgstr ""
+#~ "Inserisci le informazioni richieste, utilizzando il modulo qui sotto."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_CONTEXT_LABEL"
+#~ msgstr "Aggiorna Informazioni"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRW_DESC"
@@ -6145,6 +6120,12 @@ msgstr "Chiave"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_PLACEHOLDER"
 #~ msgstr "Nome del Richiedente/Proprietario"
 
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_PLACEHOLDER"
+#~ msgstr "Indirizzo Email del proprietario del certificato"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_TOOLTIP"
+#~ msgstr " "
+
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_PLACEHOLDER"
 #~ msgstr "Indirizzo Email del proprietario del certificato"
@@ -6156,6 +6137,37 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_META_ENDPOINT_TOOLTIP"
 #~ msgstr " "
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_DESC"
+#~ msgstr " "
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_PLACEHOLDER"
+#~ msgstr "Nome del Richiedente/Proprietario"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_TOOLTIP"
+#~ msgstr " "
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_DESC"
+#~ msgstr ""
+#~ "Incolla la tua richiesta in formato PKCS10 direttamente nel campo "
+#~ "testuale oppure usa il pulsante upload per caricare un file dal tuo "
+#~ "computer"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_LABEL"
+#~ msgstr "Richiesta PKCS10"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_PLACEHOLDER"
+#~ msgstr ""
+#~ "Incolla la tua richiesta in formato PEM qui (deve iniziare con -----BEGIN "
+#~ "CERTIFICATE REQUEST——) oppure usa il pulsante browse/upload qui sotto per "
+#~ "caricare un file dal tuo computer."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_TOOLTIP"
+#~ msgstr "La tua richiesta codificata in formato PKCS10"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_SUBJECT_CHANGED_WARNING"
@@ -6489,6 +6501,9 @@ msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_DESC"
 #~ msgstr "Esporta lo stato iniziale"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_LABEL"
+#~ msgstr "Stato"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_BEGIN_LOOP_NEED_CSR_DESC"
@@ -7169,11 +7184,19 @@ msgstr "Chiave"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_F1E981_X509_PREPARED_LABEL"
 #~ msgstr "FAILURE"
 
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_DESC"
+#~ msgstr ""
+#~ "Qui sotto puoi vedere i nuovi metadati per questo certificato, scegli con "
+#~ "quale azione intendi proseguire:<br>Modifica Dati riporterà al form di "
+#~ "modifica, Abbandona Modifiche terminerà questo Workflow senza riscrivere "
+#~ "i metadati nel database, Conferma dati renderà definitivi i metadati, "
+#~ "salvandoli nel database e terminando il Workflow."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_LABEL"
+#~ msgstr "Controlla Dati"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_DESC"
 #~ msgstr "Questo Workflow è sospeso e verrà fatto proseguire dal Watchdog."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_LABEL"
-#~ msgstr "Aggiorna"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_FAILURE_DESC"
 #~ msgstr ""
@@ -7182,13 +7205,24 @@ msgstr "Chiave"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_FAILURE_LABEL"
 #~ msgstr "FALLIMENTO"
 
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_DESC"
-#~ msgstr "Questa Richiesta di Revoca è in attesa di approvazione."
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_INITIAL_DESC"
+#~ msgstr ""
+#~ "Per modificare i Metadati di un certificato, inserisci l’identificatore."
+#~ "<br>Se non conosci l’identificatore del certificato, usa la funzione "
+#~ "Ricerca per trovarlo."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_INITIAL_LABEL"
+#~ msgstr "Stato"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_LABEL"
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_PENDING_LABEL"
 #~ msgstr "In Attesa di Approvazione"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_DESC"
+#~ msgstr "Le modifiche sono state salvate in via definitiva nel database."
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
+#~ msgstr "I Metadati sono stati aggiornati"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_DESC"
@@ -7302,6 +7336,20 @@ msgstr "Chiave"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_LABEL"
+#~ msgstr "Esporta Certificato"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_DESC"
+#~ msgstr "Esporta il Certificato nel formato desiderato"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_LABEL"
+#~ msgstr "Esporta Certificato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_DESC"
+#~ msgstr "Esporta il Certificato nel formato desiderato"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_LABEL"
 #~ msgstr "Esporta Certificato"
 
 #, fuzzy
