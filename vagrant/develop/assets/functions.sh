@@ -17,7 +17,7 @@ trap '_exit $?' EXIT
 function install_packages {
     to_install=()
     for pkg in "$@"; do
-        installed=$(/usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' $pkg 2>&1 | grep -ci installed)
+        installed=$(/usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' $pkg 2>&1 | grep -ci ^installed)
         [ $installed -eq 0 ] && to_install=("${to_install[@]}" $pkg)
     done
     if [ "${#to_install[@]}" -gt 0 ]; then
