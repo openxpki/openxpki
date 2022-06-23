@@ -16,7 +16,7 @@ if [ $docker_count -eq 0 ]; then
 
   echo "deb [arch=$ARCH signed-by=$KEYRING] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | tee $APT_FILE > /dev/null
   apt-get -q=2 update && apt-get -q=2 -o=Dpkg::Use-Pty=0 -y install \
-    docker-ce docker-ce-cli containerd.io
+    docker-ce docker-ce-cli containerd.io docker-compose-plugin
 else
   echo "Docker CE - already installed."
 fi
