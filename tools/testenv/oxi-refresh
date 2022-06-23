@@ -189,7 +189,7 @@ fi
 #
 echo ""
 echo "Install OpenXPKI"
-$(dirname $0)/oxi-install "$@" | sed 's/^/  /g'
+$(dirname $0)/oxi-install "$@" | sed -u 's/^/  /g'
 
 # configure web server
 echo -e "\nConfigure Apache web server"
