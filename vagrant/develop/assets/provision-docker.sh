@@ -1,5 +1,5 @@
 #!/bin/bash
-# Install Docker Community Edition
+# Install Docker CE
 
 docker_count=$(dpkg -s docker-ce | grep -c "Status:.*installed")
 set -e

@@ -21,12 +21,12 @@ function install_packages {
         [ $installed -eq 0 ] && to_install=("${to_install[@]}" $pkg)
     done
     if [ "${#to_install[@]}" -gt 0 ]; then
-        echo "Installing packages: ${to_install[@]}"
+        echo "Install packages: ${to_install[@]}"
         set -e
         # quiet mode -q=2 implies -y
         DEBIAN_FRONTEND=noninteractive apt-get -q=2 install "${to_install[@]}" >$LOG 2>&1
         set +e
     else
-        echo "All needed OS packages already installed ($@)"
+        echo "Required packages already installed ($@)"
     fi
 }

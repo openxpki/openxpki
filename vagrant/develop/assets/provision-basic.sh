@@ -24,18 +24,18 @@ install_vbox=0
 if $(command -v VBoxService >/dev/null); then
     INSTALLED_VBOX=$(VBoxService --version | sed -r 's/^([0-9\.]+).*/\1/')
     if [ "$INSTALLED_VBOX" != "$VBOX" ]; then
-        echo "Installed VBoxGuestAdditions ($INSTALLED_VBOX) do not match Virtualbox version ($VBOX)"
+        echo "VBoxGuestAdditions ($INSTALLED_VBOX) do not match Virtualbox version ($VBOX)"
         install_vbox=1
     else
-        echo "Installed VBoxGuestAdditions match Virtualbox version $VBOX"
+        echo "VBoxGuestAdditions match Virtualbox version $VBOX"
     fi
 else
     install_vbox=1
 fi
 if [ $install_vbox -eq 1 ]; then
-    echo "Removing old VBoxGuestAdditions"
+    echo "VBoxGuestAdditions - remove old version"
     apt-get -q=2 remove virtualbox-guest-utils >$LOG 2>&1 || echo
-    echo "Installing VBoxGuestAdditions"
+    echo "VBoxGuestAdditions - install new version $VBOX"
     set -e
     cd /tmp
     wget -q http://download.virtualbox.org/virtualbox/$VBOX/VBoxGuestAdditions_$VBOX.iso >$LOG 2>&1
@@ -49,9 +49,10 @@ fi
 #
 # Install some requirements
 #
-echo "Installing some required packages"
+echo "Apt - update package list"
 apt-get update >$LOG 2>&1
-apt-get upgrade --assume-yes
+echo "Apt - upgrade"
+apt-get upgrade --assume-yes >$LOG 2>&1
 # libzip-dev - for Net::SSLeay
 # libexpat1-dev - for XML::Parser
 # linux-headers-amd64 - required to compile guest addons using "vagrant vbguest" (on the host)
@@ -62,14 +63,21 @@ install_packages mc rsync gettext \
   linux-headers-amd64 \
   mc
 
-apt-get install -t $(lsb_release -sc)-backports git
+if ! command -v git >/dev/null; then
+    echo "Git"
+    apt-get install -q=2 -t $(lsb_release -sc)-backports git >$LOG 2>&1
+else
+    echo "Git - already installed."
+fi
 
 #
 # Install CPANminus
 #
 if ! command -v cpanm >/dev/null; then
-    echo "Installing cpanm"
+    echo "cpanm"
     curl -s -L https://cpanmin.us | perl - --sudo App::cpanminus >$LOG 2>&1 || _exit $?
+else
+    echo "cpanm is already installed."
 fi
 
 #
