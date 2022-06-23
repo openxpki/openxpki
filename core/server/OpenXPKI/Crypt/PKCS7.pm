@@ -42,6 +42,7 @@ our %oids = (
     '1.2.840.113549.1.9.3'    => 'contentType',
     '1.2.840.113549.1.9.4'    => 'messageDigest',
     '1.2.840.113549.1.9.5'    => 'signingTime',
+    '1.2.840.113549.1.9.52'   => 'id-aa-CMSAlgorithmProtection',
 
     # signature digests
     '1.2.840.113549.2.5' => 'md5',
@@ -384,7 +385,6 @@ sub __build_envelope_signed_data {
 
     my $digest_oid = $si->{digestAlgorithm}->{algorithm};
     my $sig_oid = $si->{digestEncryptionAlgorithm}->{algorithm};
-
     my $mapattrib = sub {
         my $attr = shift;
         my %attrib = map {
@@ -475,7 +475,7 @@ sub decode_tag {
     # just strip the header of the raw buffer
     return substr($raw, $offset) unless ($tag & 0x20);
     # constructed mode means that the buffer contains multiple segments
-    # where each one is an encoded tag with tag, lenght, value
+    # where each one is an encoded tag with tag, length, value
     # [[tag, length][seg1][seg2][seg3]...
     $tag &= 0xDF;
 
@@ -487,11 +487,19 @@ sub decode_tag {
     while ($offset < $length) {
         # read the tag header from the segment at offset
         my ($tagbytes, $itag) = asn_decode_tag(substr($raw, $offset));
+
+        # the tag contains a constructed structure we do not want to parse
+        # so we return the binary tag data without any conversions
+        if (($itag & 0x20 && !$buffer)) {
+            $buffer = $raw;
+            last;
+        }
+
         last if ($itag == 0);
         # The inner and outer tags must be the same - it might be possible
         # to have nested constructed tags but we dont want to support this now
         # tag == 128 is a context specific outer tag with no lower tag number
-        die sprintf("Inner (%02d) and outer (%02d) tag do not match!?", $itag == $tag)
+        die sprintf("Inner (%02d) and outer (%02d) tag do not match!?", $itag, $tag)
             unless($tag == 128 || $itag == $tag);
 
         # set offset to the right end of the tag header of the current segment
