@@ -521,7 +521,7 @@ sub decode_tag {
 
 Takes a value and a class and encodes value as ASN1 tag. The class can
 be any valid class number (integer) or a class name from the following
-list:
+list. OIDs can be given as byte string or in dotted decimal notation.
 
 =over
 
@@ -574,6 +574,33 @@ sub encode_tag {
 
     if ($class !~ m{\A\d+\z}) {
         $class = $tagmap{$class} || die "Invalid class name given";
+    }
+
+    # object identifier in dottet decimal notation
+    if ($class == 6 && $value =~ m{\A\d+\.}) {
+        # this code is borrowed from Convert::BER
+        my @data = ($value =~ /(\d+)/g);
+        # the first two digits are combined into one character
+        my $first = $data[1] + ($data[0] * 40);
+        splice(@data,0,2,$first);
+        # values >128 are encoded with variable length where each character
+        # holds seven bits of value, the end of the digit is encoded with
+        # the last character having MSB=0 and all others have MSB=1
+        # Example: 840 = 110|1001000 =  10000110 + 01001000
+        @data = map {
+            my @d = ($_);
+            if($_ >= 0x80) {
+                @d = ();
+                my $v = 0 | $_; # unsigned
+                while($v) {
+                unshift(@d, 0x80 | ($v & 0x7f));
+                $v >>= 7;
+                }
+                $d[-1] &= 0x7f;
+            }
+            @d;
+        } @data;
+        $value = CORE::pack("C*", @data);
     }
 
     return asn_encode_tag($class).asn_encode_length(length($value)).$value;

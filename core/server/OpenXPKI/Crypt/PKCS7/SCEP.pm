@@ -492,7 +492,8 @@ sub __generate_response {
         { 'type' => '2.16.840.1.113733.1.9.2', 'values' => [ encode_tag( '3', 'PrintableString') ] }, # messageType
         { 'type' => '2.16.840.1.113733.1.9.7', 'values' => [ encode_tag( $self->transaction_id(), 'PrintableString') ] }, # transactionID
         { 'type' => '1.2.840.113549.1.9.4', 'values' => [ encode_tag( $payload_digest ) ] }, # payload digest
-        { 'type' => '1.2.840.113549.1.9.5', 'values' => [ encode_tag( DateTime->now()->strftime("%Y%m%d%H%M%SZ"), 23) ] }, # signingTime
+        { 'type' => '1.2.840.113549.1.9.5', 'values' => [ encode_tag( DateTime->now()->strftime("%y%m%d%H%M%SZ"), 23) ] }, # signingTime
+        { 'type' => '1.2.840.113549.1.9.3', 'values' => [ encode_tag( '1.2.840.113549.1.7.1', 6 ) ] }, # contentType (id-data)
     );
 
     my %payload;
@@ -553,6 +554,8 @@ sub __generate_response {
     my $parser = $asn1->find('SetOfAuthenticatedAttribute') || die $asn1->error;
     my $attributeContent = $parser->encode(\@authAttr) || die $parser->error;
 
+    ##! 128: 'Attribute Content ' . encode_base64($attributeContent)
+
     my $skey = $self->ratoken_key();
     my $racert = $self->ratoken();
 
@@ -569,9 +572,11 @@ sub __generate_response {
         ) unless ($pkAlg eq 'RSA');
 
         ##! 64: 'Token API'
+        my $attribute_digest = digest_data( uc($self->digest_alg()), $attributeContent);
+        ##! 128: 'Attribute Content ' . encode_base64($attribute_digest)
         $signature = $skey->command({
             COMMAND => 'sign_digest',
-            DIGEST => digest_data( uc($self->digest_alg()), $attributeContent),
+            DIGEST => $attribute_digest,
         });
     } elsif (ref $skey eq 'Crypt::PK::RSA') {
         ##! 64: 'RSA soft key'
