@@ -189,12 +189,13 @@ sub __generate_response {
     ##! 64: 'Using alias ' . $params->alias
     my $req = OpenXPKI::Crypt::PKCS7::SCEP->new(
         request_nonce => $params->request_nonce || '',
-        reply_nonce => $params->reply_nonce || '',
         transaction_id => $params->transaction_id,
         digest_alg => $params->digest_alg,
         enc_alg => $params->enc_alg,
         ($mode eq 'success' ? (signer => OpenXPKI::Crypt::X509->new($params->signer)) : ()),
     );
+
+    $req->reply_nonce($params->reply_nonce) if ($params->reply_nonce);
 
     my $token = CTX('crypto_layer')->get_token({ TYPE => 'scep', NAME => $params->alias });
     $req->ratoken_key( $token );
