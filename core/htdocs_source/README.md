@@ -42,14 +42,14 @@ nvm install
 
 ```bash
 nvm use
-npm install -g ember-cli ember-cli-update npm-check-updates
+pnpm install -g ember-cli ember-cli-update npm-check-updates
 ```
 
 ## Installation of required Node.js modules
 
 ```bash
 nvm use
-npm install
+pnpm install
 ```
 
 ## Running / Development
@@ -58,7 +58,7 @@ To run the web UI locally you have to:
 
 1. Start an OpenXPKI backend via Docker or Vagrant. It's expected to listen on localhost:8443
 2. Now run the Ember based web UI with live reload (on code changes) via:
-   `npm run serve` (this calls "ember serve ..." and proxies AJAX requests to localhost:8443)
+   `pnpm run serve` (this calls "ember serve ..." and proxies AJAX requests to localhost:8443)
 3. Visit the web UI at [http://localhost:4200/openxpki/#/](http://localhost:4200/openxpki/#/).
 4. Visit tests at [http://localhost:4200/openxpki/#/test](http://localhost:4200/openxpki/#/test).
 
@@ -67,14 +67,14 @@ To run the web UI locally you have to:
 ```bash
 nvm use
 # Handlebars templates and JavaScript
-npm run lint
-npm run lint:fix
+pnpm run lint
+pnpm run lint:fix
 # only Handlebars templates
-npm run lint:hbs
-npm run lint:hbs:fix
+pnpm run lint:hbs
+pnpm run lint:hbs:fix
 # only JavaScript
-npm run lint:js
-npm run lint:js:fix
+pnpm run lint:js
+pnpm run lint:js:fix
 ```
 
 ### Build Ember app
@@ -93,7 +93,7 @@ To use _verdaccio_ run these steps:
 
 ```bash
 nvm use
-npm install -g verdaccio
+pnpm install -g verdaccio
 nvm exec verdaccio -l 0.0.0.0:4873
 ```
 
@@ -103,7 +103,7 @@ nvm exec verdaccio -l 0.0.0.0:4873
 
 ```bash
 nvm use
-npm run build
+pnpm run build
 ```
 
 ### Updating ember-cli
@@ -111,10 +111,9 @@ npm run build
 ```bash
 nvm use
 ember-cli-update
-npm audit fix
-npm dedupe
+pnpm audit fix
 # to install the modules on your host and update package-lock.json:
-npm install
+pnpm install
 ```
 
 After this a [rebuild](#build-production) needs to be done.
@@ -126,7 +125,7 @@ nvm use
 # NOTE: the following command belongs to the package "npm-check-updates", not "ncu"!
 ncu -u
 # to install the modules on your host and update package-lock.json:
-npm install
+pnpm install
 ```
 
 After this a [rebuild](#build-production) needs to be done.
