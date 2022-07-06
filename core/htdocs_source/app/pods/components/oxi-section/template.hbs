@@ -1,6 +1,6 @@
 {{#if @renderAsCard}}
 
-    <div class="card bg-light mb-3">
+    <div class="card bg-light mb-3 ms-3">
 
         {{#if (or @content.content.label @content.content.description)}}
             <div class="card-header py-2">
@@ -27,8 +27,8 @@
         <div class="mb-3">{{{@content.content.description}}}</div>
     {{/if}}
 
-    <span {{on-init this.initialized}}>
+    <div {{on-init this.initialized}} class="ms-3">
         {{component this.type def=this.sectionData buttonClick=this.buttonClick isInfoBox=@isInfoBox}}
-    </span>
+    </div>
 
 {{/if}}
