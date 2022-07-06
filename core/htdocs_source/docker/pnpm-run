@@ -4,15 +4,29 @@ set -e
 test -z $1 && echo "Please specify a 'pnpm run' command as argument" && exit 1 || true
 
 echo -e "\n[Copy source code without node_modules/]"
-OPTS=(-rlD --delete --inplace --quiet)
+OPTS=(--recursive --links --devices --specials --times --delete --inplace --quiet)
 
 # Do not use the bind-mounted node_modules/ from the host...
-rsync "${OPTS[@]}" \
-  --exclude node_modules \
-  --exclude dist \
-  --exclude dist-dev \
-  --exclude docker \
-  /source/ /build
+if [ "$1" == "serve" ]; then
+  # in "serve" mode continuously sync code to allow Ember to pick up changes
+  # and do recompilation
+  (while true; do \
+    rsync "${OPTS[@]}" \
+      --exclude node_modules \
+      --exclude dist \
+      --exclude dist-dev \
+      --exclude docker \
+      /source/ /build; \
+    sleep 1; \
+  done) &
+else
+  rsync "${OPTS[@]}" \
+    --exclude node_modules \
+    --exclude dist \
+    --exclude dist-dev \
+    --exclude docker \
+    /source/ /build
+fi
 
 # ...instead use /node_modules/ from the container
 rsync "${OPTS[@]}" \
