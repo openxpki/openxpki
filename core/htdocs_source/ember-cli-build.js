@@ -41,7 +41,7 @@ module.exports = function(defaults) {
     },
 
     'ember-bootstrap': {
-      bootstrapVersion: 4,
+      bootstrapVersion: 5,
       importBootstrapCSS: true,
       importBootstrapFont: false,
       // only include used components into compiled JS
