@@ -1,0 +1,13 @@
+/******************************************************************************
+ * Bootstrap v5 fixes
+ */
+
+a {
+  text-decoration: none;
+}
+
+/* pre-scrollable was removed in Bootstrap v5 */
+.pre-scrollable {
+  max-height: 20rem;
+  overflow-y: scroll;
+}
