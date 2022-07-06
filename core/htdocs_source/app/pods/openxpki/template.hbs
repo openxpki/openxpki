@@ -19,7 +19,7 @@
         <navbar.toggle />
     </div>
     <navbar.content>
-        <navbar.nav class="mr-auto" as |nav|>
+        <navbar.nav class="me-auto" as |nav|>
             {{#each this.model.navEntries as |navEntry|}}
                 {{#if navEntry.entries.length}}
                     <nav.dropdown class="mx-2" as |dd|>
@@ -180,7 +180,7 @@
                                 }}
                                 {{#if entry.right}}
                                     {{#if showInfo}}
-                                        <div class="col-12 col-lg-4 order-2 order-lg-1 pr-lg-0 oxi-infobox">
+                                        <div class="col-12 col-lg-4 order-2 order-lg-1 pe-lg-0 oxi-infobox">
                                             {{#each entry.right as |rightEntry|}}
                                                 <div class="card bg-light border-secondary">
                                                     <div class="card-body p-1">
@@ -193,7 +193,7 @@
                                             {{/each}}
                                         </div>
                                     {{/if}}
-                                    <div class="col-6 col-lg-1 order-1 order-lg-2 pt-3 pl-lg-0">
+                                    <div class="col-6 col-lg-1 order-1 order-lg-2 pt-3 ps-lg-0">
                                         <BsButton
                                             @type="light"
                                             class="btn-sm"
