@@ -16,11 +16,11 @@
         />
         <div class="invalid-feedback">{{@error}}</div>
     </div>
-    <div class="col-lg-2">
+    <div class="col-lg-2 d-flex flex-column justify-content-start gap-2">
         {{#if @content.allow_upload}}
             <BsButton
                 @type="light"
-                class="oxi-btn-exceptional btn-block btn-sm"
+                class="oxi-btn-exceptional btn-sm"
                 @onClick={{this.openFileUpload}}
                 disabled={{this.hasContent}}
                 @icon="glyphicon glyphicon-folder-open"
@@ -41,7 +41,7 @@
         {{#if (or @content.allow_upload @content.autofill)}}
             <BsButton
                 @type="light"
-                class="oxi-btn-cancel btn-block btn-sm"
+                class="oxi-btn-cancel btn-sm"
                 @onClick={{this.resetInput}}
                 disabled={{not this.hasContent}}
                 @icon="glyphicon glyphicon-trash"
