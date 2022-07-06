@@ -3,11 +3,9 @@
         <div class="col-lg-8">
             <div class="input-group">
                 <input type="text" value={{this.label}} {{on "input" this.onFileNameChange}} readonly={{this.isLink}} class="form-control" />
-                <div class="input-group-append">
-                    <BsButton class="btn oxi-btn-optional" @onClick={{this.download}} @icon="glyphicon glyphicon-download-alt">
-                        {{t 'component.oxi_download.download'}}
-                    </BsButton>
-                </div>
+                <BsButton class="btn oxi-btn-optional" @onClick={{this.download}} @icon="glyphicon glyphicon-download-alt">
+                    {{t 'component.oxi_download.download'}}
+                </BsButton>
             </div>
         </div>
         <div class="col-lg-4">

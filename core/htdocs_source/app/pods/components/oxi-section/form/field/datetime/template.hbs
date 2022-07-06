@@ -12,23 +12,21 @@
                 placeholder={{@content.placeholder}}
                 required={{not @content.is_optional}}
             />
-            <div class="invalid-feedback">{{@error}}</div>
-            <div class="input-group-append">
-                {{#if this.allowClearing}}
-                    <BsButton
-                        @onClick={{this.flatpickr.clear}}
-                        @icon="glyphicon glyphicon-trash"
-                        @type="light"
-                        class="oxi-btn-cancel btn-sm"
-                    >
-                    </BsButton>
-                {{/if}}
+            {{#if this.allowClearing}}
                 <BsButton
-                    @onClick={{this.flatpickr.open}}
-                    @icon="glyphicon glyphicon-calendar"
+                    @onClick={{this.flatpickr.clear}}
+                    @icon="glyphicon glyphicon-trash"
+                    @type="light"
+                    class="oxi-btn-cancel btn-sm"
                 >
                 </BsButton>
-            </div>
+            {{/if}}
+            <BsButton
+                @onClick={{this.flatpickr.open}}
+                @icon="glyphicon glyphicon-calendar"
+            >
+            </BsButton>
+            <div class="invalid-feedback">{{@error}}</div>
         </div>
     </div>
     <div class="col-lg-4">

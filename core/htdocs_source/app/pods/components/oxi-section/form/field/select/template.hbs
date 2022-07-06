@@ -1,7 +1,7 @@
 {{#if this.isStatic}}
     <div class="oxi-no-input" {{may-focus this true}}>{{@content.options.0.label}}</div>
 {{else if @content.editable}}
-    <div class="input-group">
+    <div class="input-group has-validation">
         {{#if this.customMode}}
             <input
                 type="text"
@@ -22,16 +22,14 @@
                 {{may-focus this true}}
             />
         {{/if}}
-        <span class="input-group-append">
-            <BsButton
-                @type=""
-                @active={{this.customMode}}
-                @onClick={{this.toggleCustomMode}}
-                class="btn-light border-secondary"
-            >
-                {{t 'component.oxifield_select.custom_value'}}
-            </BsButton>
-        </span>
+        <BsButton
+            @type=""
+            @active={{this.customMode}}
+            @onClick={{this.toggleCustomMode}}
+            class="btn-light border-secondary"
+        >
+            {{t 'component.oxifield_select.custom_value'}}
+        </BsButton>
         <div class="invalid-feedback">{{@error}}</div>
     </div>
 {{else}}
