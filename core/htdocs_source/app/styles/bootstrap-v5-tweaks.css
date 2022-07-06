@@ -5,6 +5,9 @@
 a {
   text-decoration: none;
 }
+a:hover {
+  text-decoration: underline;
+}
 
 /* pre-scrollable was removed in Bootstrap v5 */
 .pre-scrollable {
