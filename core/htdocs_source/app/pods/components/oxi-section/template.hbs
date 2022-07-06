@@ -29,7 +29,7 @@
             <div class="mb-3">{{{@content.content.description}}}</div>
         {{/if}}
 
-        <div {{on-init this.initialized}} class="ms-3">
+        <div {{on-init this.initialized}} class={{if (not @isInfoBox) "ms-3"}}>
             {{component this.type def=this.sectionData buttonClick=this.buttonClick isInfoBox=@isInfoBox}}
         </div>
     </div>
