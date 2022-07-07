@@ -25,7 +25,7 @@ export default class OxiLabelComponent extends Component {
 
     get cssClasses() {
         let classes = [];
-        if (this.args.inline || Array.isArray(this.args.text)) classes.push('d-inline-flex');
+        if (Array.isArray(this.args.text)) classes.push('d-inline-flex');
         if (this.args.tooltip || this.args.raw_tooltip || this.args.tooltip_page) classes.push('oxi-has-tooltip')
         return classes.join(' ');
     }

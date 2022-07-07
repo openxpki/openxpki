@@ -23,9 +23,8 @@
         <OxiBase::Label
             @text={{v}}
             @raw={{false}}
-            @inline={{true}}
             @tooltip={{if @truncate v}}
-            @class="oxi-formatted-subject {{if @truncate "oxi-truncate"}}"
+            @class="oxi-formatted-subject {{if @truncate "oxi-truncate"}} d-inline-flex"
         />
 
     {{else if (eq "nl2br" this.format)}}
