@@ -50,7 +50,7 @@ specifiers:
   qunit-dom: ^2.0.0
   superstruct: ^0.16.0
   tippy.js: ^6.3.7
-  uplot: ^1.6.16
+  uplot: ^1.6.21
   webpack: ^5.72.1
 
 devDependencies:
@@ -103,7 +103,7 @@ devDependencies:
   qunit-dom: 2.0.0
   superstruct: 0.16.0
   tippy.js: 6.3.7
-  uplot: 1.6.16
+  uplot: 1.6.21
   webpack: 5.73.0
 
 packages:
@@ -13737,8 +13737,8 @@ packages:
       xdg-basedir: 4.0.0
     dev: true
 
-  /uplot/1.6.16:
-    resolution: {integrity: sha512-Rh0WtFgtZdYk70Knu1VyZYbwlx5GuoIFBezZuHwlEUiREsIjOKpe3CXLXLaKc7/49Z7XhQ/bazgF/f1zercxgw==}
+  /uplot/1.6.21:
+    resolution: {integrity: sha512-Xd7m2GSHyzhz+mP9CzYTalzp9WDlHzTorNY1yDvg6E+wiCwMIIY+MLfNveObyp3qVMH4kP8mOhRX4k4S9YLHRQ==}
     dev: true
 
   /uri-js/4.4.1:
