@@ -8,17 +8,15 @@
   *************************************
 }}
 <BsNavbar
-    @type="light"
     @backgroundColor=""
     class="py-2 py-lg-0 mb-3 oxi-navbar"
     @collapsed={{true}}
     @onCollapse={{action (mut this.collapsed) true}}
-    @onExpand={{action (mut this.collapsed) false}} as |navbar|
+    @onExpand={{action (mut this.collapsed) false}}
+    as |navbar|
 >
-    <div class="navbar-header">
-        <navbar.toggle />
-    </div>
-    <navbar.content>
+    <navbar.toggle toggle={{true}} />
+    <navbar.content id="oxi-navbar">
         <navbar.nav class="me-auto" as |nav|>
             {{#each this.model.navEntries as |navEntry|}}
                 {{#if navEntry.entries.length}}
