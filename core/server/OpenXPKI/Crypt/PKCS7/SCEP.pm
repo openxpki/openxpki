@@ -493,7 +493,7 @@ sub __generate_response {
         { 'type' => '2.16.840.1.113733.1.9.7', 'values' => [ encode_tag( $self->transaction_id(), 'PrintableString') ] }, # transactionID
         { 'type' => '1.2.840.113549.1.9.4', 'values' => [ encode_tag( $payload_digest ) ] }, # payload digest
         { 'type' => '1.2.840.113549.1.9.5', 'values' => [ encode_tag( DateTime->now()->strftime("%y%m%d%H%M%SZ"), 23) ] }, # signingTime
-        { 'type' => '1.2.840.113549.1.9.3', 'values' => [ encode_tag( '1.2.840.113549.1.7.1', 6 ) ] }, # contentType (id-data)
+        { 'type' => '1.2.840.113549.1.9.3', 'values' => [ encode_tag( '1.2.840.113549.1.7.1', 'OID' ) ] }, # contentType (id-data)
     );
 
     my %payload;
@@ -551,10 +551,43 @@ sub __generate_response {
         'values' => [ encode_tag( $self->reply_nonce() ) ]
     }; # senderNonce
 
-    my $parser = $asn1->find('SetOfAuthenticatedAttribute') || die $asn1->error;
-    my $attributeContent = $parser->encode(\@authAttr) || die $parser->error;
+    # The ASN1 spec demands that the elemements in authAttr needs to be "lexically sorted"
+    # by their encoded value. We first walk the array and create the asn1 binary encoding
 
-    ##! 128: 'Attribute Content ' . encode_base64($attributeContent)
+    map {
+        # Encode type as OID and value as set (we only have single item lists)
+        # and concatenate them into a sequence
+        $_->{asn1} = encode_tag(
+            encode_tag( $_->{type}, 'OID' ) . encode_tag( $_->{values}->[0], 0x31 )
+        , 0x30 );
+    } @authAttr;
+
+    # Sort the array by shifting groups of 32 bits as integers from the left
+    # and compare them until we got a difference, creates a helper structure
+    # inline of the array to cache the values used for sorting
+    @authAttr = sort {
+        my $idx = 0;
+        while(1) {
+            # vec extracts bits from the left and converts them to an integer
+            $a->{sort}->[$idx] ||= vec($a->{asn1},$idx,32);
+            $b->{sort}->[$idx] ||= vec($b->{asn1},$idx,32);
+            my $cmp = ($a->{sort}->[$idx] <=> $b->{sort}->[$idx]);
+            # items like the nonces have a very similar ID and same tag/length
+            # bytes so they differ late (bit 13) - so we try this for the
+            # leftmost bits until they differs
+            return $cmp if ($cmp);
+            $idx++;
+            # safety net, should never happen at least for our usage scenarios
+            die "Unable to sort" if ($idx > 5);
+        }
+    } @authAttr;
+    ##! 16: \@authAttr
+
+    # The binary stream to sign is constructed from the list of the values
+    # we already have the binary data from the helper so we just need to
+    # add the outer "set of" tag (0x11 + 0x20 as it is constructed)
+    my $attributeContent = encode_tag( join('', (map { $_->{asn1} } @authAttr) ), 0x31 );
+    ##! 128: 'attribute content ' . encode_base64($attributeContent)
 
     my $skey = $self->ratoken_key();
     my $racert = $self->ratoken();
@@ -572,11 +605,9 @@ sub __generate_response {
         ) unless ($pkAlg eq 'RSA');
 
         ##! 64: 'Token API'
-        my $attribute_digest = digest_data( uc($self->digest_alg()), $attributeContent);
-        ##! 128: 'Attribute Content ' . encode_base64($attribute_digest)
         $signature = $skey->command({
             COMMAND => 'sign_digest',
-            DIGEST => $attribute_digest,
+            DIGEST => digest_data( uc($self->digest_alg()), $attributeContent),
         });
     } elsif (ref $skey eq 'Crypt::PK::RSA') {
         ##! 64: 'RSA soft key'
@@ -587,7 +618,7 @@ sub __generate_response {
 
     my $digestAlg = find_oid($self->digest_alg());
     ##! 128: 'signature done'
-    $parser = $asn1->find('PKCS7ContentInfoSignedData');
+    my $parser = $asn1->find('PKCS7ContentInfoSignedData');
     my $pkcs7sig = $parser->encode({
         contentType => '1.2.840.113549.1.7.2', # pkcs7-signedData
         content => {
