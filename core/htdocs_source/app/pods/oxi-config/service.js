@@ -107,7 +107,7 @@ export default class OxiConfigService extends Service {
     get tooltipDelay() {
         return (this.localConfig.accessibility?.tooltipDelay?.match(/^\s+$/i)
             ? this.localConfig.accessibility.tooltipDelay
-            : 1000
+            : 500
         );
     }
 }
