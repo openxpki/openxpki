@@ -23,15 +23,6 @@ img.toplogo {
   height: 40px;
 }
 
-/* Navigation bar (menu) */
-.oxi-navbar {
-  background-color: #e8e8e8;
-  border-bottom: 2px solid #757373;
-}
-.oxi-navbar.navbar-light .navbar-nav .nav-link {
-  color: #484b4f;
-}
-
 /* Content */
 .oxi-page {
   background-color: #f5f5f5;
