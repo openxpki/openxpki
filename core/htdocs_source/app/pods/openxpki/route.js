@@ -36,14 +36,8 @@ export default class OpenXpkiRoute extends Route {
 
     // Reserved Ember function
     beforeModel(transition) {
-        let queryParams = transition.to.queryParams;
         let modelId = transition.to.params.model_id;
         debug("openxpki/route - beforeModel: model_id = " + modelId);
-
-        // "force" is only evaluated above using "refreshModel: true"
-        if (queryParams.force) {
-            delete queryParams.force;
-        }
 
         /*
          * load requested page part
@@ -51,8 +45,8 @@ export default class OpenXpkiRoute extends Route {
         let request = {
             page: modelId
         };
-        if (queryParams.limit) { request.limit = queryParams.limit }
-        if (queryParams.startat) { request.startat = queryParams.startat }
+        if (transition.to.queryParams.limit) { request.limit = transition.to.queryParams.limit }
+        if (transition.to.queryParams.startat) { request.startat = transition.to.queryParams.startat }
 
         // load as top content if 'modelId' is part of navigation or in 'topTarget' list
         let flatList = this.content.navEntries.reduce((p, n) => p.concat(n, n.entries || []), []);
