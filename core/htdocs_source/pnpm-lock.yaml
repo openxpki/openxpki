@@ -7,7 +7,6 @@ specifiers:
   '@glimmer/component': ^1.1.2
   '@glimmer/tracking': ^1.1.2
   bootstrap: ^5.1.3
-  broccoli-asset-rev: ^3.0.0
   broccoli-funnel: ^3.0.8
   caniuse-lite: ^1.0.30001335
   copy-text-to-clipboard: ^3.0.1
@@ -63,7 +62,6 @@ devDependencies:
   '@glimmer/component': 1.1.2_@babel+core@7.18.6
   '@glimmer/tracking': 1.1.2
   bootstrap: 5.1.3_@popperjs+core@2.11.5
-  broccoli-asset-rev: 3.0.0
   broccoli-funnel: 3.0.8
   caniuse-lite: 1.0.30001336
   copy-text-to-clipboard: 3.0.1
@@ -4296,7 +4294,7 @@ packages:
     dev: true
 
   /blank-object/1.0.2:
-    resolution: {integrity: sha1-+ZB5P76ajI3QE/syGUIL7IHV9Lk=}
+    resolution: {integrity: sha512-kXQ19Xhoghiyw66CUiGypnuRpWlbHAzY/+NyvqTEdTfhfQGH1/dbEMYiXju7fYKIFePpzp/y9dsu5Cu/PkmawQ==}
     dev: true
 
   /bluebird/3.7.2:
@@ -4450,27 +4448,6 @@ packages:
       symlink-or-copy: 1.3.1
     dev: true
 
-  /broccoli-asset-rev/3.0.0:
-    resolution: {integrity: sha512-gAHQZnwvtl74tGevUqGuWoyOdJUdMMv0TjGSMzbdyGImr9fZcnM6xmggDA8bUawrMto9NFi00ZtNUgA4dQiUBw==}
-    dependencies:
-      broccoli-asset-rewrite: 2.0.0
-      broccoli-filter: 1.3.0
-      broccoli-persistent-filter: 1.4.6
-      json-stable-stringify: 1.0.1
-      minimatch: 3.1.2
-      rsvp: 3.6.2
-    transitivePeerDependencies:
-      - supports-color
-    dev: true
-
-  /broccoli-asset-rewrite/2.0.0:
-    resolution: {integrity: sha512-dqhxdQpooNi7LHe8J9Jdxp6o3YPFWl4vQmint6zrsn2sVbOo+wpyiX3erUSt0IBtjNkAxqJjuvS375o2cLBHTA==}
-    dependencies:
-      broccoli-filter: 1.3.0
-    transitivePeerDependencies:
-      - supports-color
-    dev: true
-
   /broccoli-babel-transpiler/7.8.1:
     resolution: {integrity: sha512-6IXBgfRt7HZ61g67ssBc6lBb3Smw3DPZ9dEYirgtvXWpRZ2A9M22nxy6opEwJDgDJzlu/bB7ToppW33OFkA1gA==}
     engines: {node: '>= 6'}
@@ -4507,7 +4484,7 @@ packages:
     dev: true
 
   /broccoli-caching-writer/2.3.1:
-    resolution: {integrity: sha1-uTz1j5Jk8AMHWGjbBXdPTn8lvQc=}
+    resolution: {integrity: sha512-lfoDx98VaU8tG4mUXCxKdKyw2Lr+iSIGUjCgV83KC2zRC07SzYTGuSsMqpXFiOQlOGuoJxG3NRoyniBa1BWOqA==}
     dependencies:
       broccoli-kitchen-sink-helpers: 0.2.9
       broccoli-plugin: 1.1.0
@@ -4600,22 +4577,6 @@ packages:
     dependencies:
       broccoli-plugin: 1.3.1
       mkdirp: 0.5.6
-    dev: true
-
-  /broccoli-filter/1.3.0:
-    resolution: {integrity: sha512-VXJXw7eBfG82CFxaBDjYmyN7V72D4In2zwLVQJd/h3mBfF3CMdRTsv2L20lmRTtCv1sAHcB+LgMso90e/KYiLw==}
-    dependencies:
-      broccoli-kitchen-sink-helpers: 0.3.1
-      broccoli-plugin: 1.3.1
-      copy-dereference: 1.0.0
-      debug: 2.6.9
-      mkdirp: 0.5.6
-      promise-map-series: 0.2.3
-      rsvp: 3.6.2
-      symlink-or-copy: 1.3.1
-      walk-sync: 0.3.4
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /broccoli-funnel-reducer/1.0.0:
@@ -5498,7 +5459,7 @@ packages:
     dev: true
 
   /color-name/1.1.3:
-    resolution: {integrity: sha1-p9BVi9icQveV3UIyj3QIMcpTvCU=}
+    resolution: {integrity: sha512-72fSenhMw2HZMTVHeCA9KCmpEIbzWiQsjN+BHcBbS9vr1mtt+vJjPdksIBNUmKAW8TFUDPJK5SUU3QhE9NEXDw==}
     dev: true
 
   /color-name/1.1.4:
@@ -5856,10 +5817,6 @@ packages:
       mkdirp: 0.5.6
       rimraf: 2.7.1
       run-queue: 1.0.3
-    dev: true
-
-  /copy-dereference/1.0.0:
-    resolution: {integrity: sha1-axMYZUIP2BtBO6mUtE02VTERUrY=}
     dev: true
 
   /copy-descriptor/0.1.1:
@@ -8062,7 +8019,7 @@ packages:
     dev: true
 
   /fast-ordered-set/1.0.3:
-    resolution: {integrity: sha1-P7s2Y097555PftvbSjV97iXRhOs=}
+    resolution: {integrity: sha512-MxBW4URybFszOx1YlACEoK52P6lE3xiFcPaGCUZ7QQOZ6uJXKo++Se8wa31SjcZ+NC/fdAWX7UtKEfaGgHS2Vg==}
     dependencies:
       blank-object: 1.0.2
     dev: true
@@ -9814,7 +9771,7 @@ packages:
     dev: true
 
   /json-stable-stringify/1.0.1:
-    resolution: {integrity: sha1-mnWdOcXy/1A/1TAGRu1EX4jE+a8=}
+    resolution: {integrity: sha512-i/J297TW6xyj7sDFa7AmBPkQvLIxWr2kKPWI26tXydnZrzVAocNqn5DMNT1Mzk0vit1V5UkRM7C1KdVNp7Lmcg==}
     dependencies:
       jsonify: 0.0.0
     dev: true
@@ -9858,7 +9815,7 @@ packages:
     dev: true
 
   /jsonify/0.0.0:
-    resolution: {integrity: sha1-LHS27kHZPKUbe1qu6PUDYx0lKnM=}
+    resolution: {integrity: sha512-trvBk1ki43VZptdBI5rIlG4YOzyeH/WefQt5rj1grasPn4iiZWKet8nkgc4GlsAylaztn0qZfUYOiTsASJFdNA==}
     dev: true
 
   /jsonparse/1.3.1:
@@ -11075,7 +11032,7 @@ packages:
       - libnpx
 
   /object-assign/4.1.1:
-    resolution: {integrity: sha1-IQmtx5ZYh8/AXLvUQsrIv7s2CGM=}
+    resolution: {integrity: sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==}
     engines: {node: '>=0.10.0'}
     dev: true
 
@@ -11483,7 +11440,7 @@ packages:
     dev: true
 
   /path-is-absolute/1.0.1:
-    resolution: {integrity: sha1-F0uSaHNVNP+8es5r9TpanhtcX18=}
+    resolution: {integrity: sha512-AVbw3UJ2e9bq64vSaS9Am0fje1Pa8pbGqTTsmXfaIiMpnr5DlDhfJOuLj9Sf95ZPVDAUerDfEk88MPmPe7UCQg==}
     engines: {node: '>=0.10.0'}
     dev: true
 
@@ -11502,7 +11459,7 @@ packages:
     dev: true
 
   /path-posix/1.0.0:
-    resolution: {integrity: sha1-BrJhE/Vr6rBCVFojv6iAA8ysJg8=}
+    resolution: {integrity: sha512-1gJ0WpNIiYcQydgg3Ed8KzvIqTsDpNwq+cjBCssvBtuTWjEqY1AW+i+OepiEMqDCzyro9B2sLAe4RBPajMYFiA==}
     dev: true
 
   /path-root-regex/0.1.2:

@@ -33,7 +33,6 @@
     "@glimmer/component": "^1.1.2",
     "@glimmer/tracking": "^1.1.2",
     "bootstrap": "^5.1.3",
-    "broccoli-asset-rev": "^3.0.0",
     "broccoli-funnel": "^3.0.8",
     "caniuse-lite": "^1.0.30001335",
     "copy-text-to-clipboard": "^3.0.1",
