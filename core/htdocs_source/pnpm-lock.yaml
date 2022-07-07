@@ -38,11 +38,11 @@ specifiers:
   eslint-config-prettier: ^8.5.0
   eslint-plugin-ember: ^10.6.1
   eslint-plugin-node: ^11.1.0
-  eslint-plugin-prettier: ^4.0.0
+  eslint-plugin-prettier: ^4.2.1
   eslint-plugin-qunit: ^7.2.0
   js-yaml: ^4.1.0
   loader.js: ^4.7.0
-  luxon: ^2.0.2
+  luxon: ^2.4.0
   npm-run-all: ^4.1.5
   path2d-polyfill: ^1.1.2
   pretender: ^3.4.7
@@ -92,11 +92,11 @@ devDependencies:
   eslint-config-prettier: 8.5.0_eslint@8.19.0
   eslint-plugin-ember: 10.6.1_eslint@8.19.0
   eslint-plugin-node: 11.1.0_eslint@8.19.0
-  eslint-plugin-prettier: 4.0.0_7uxdfn2xinezdgvmbammh6ev5i
+  eslint-plugin-prettier: 4.2.1_7uxdfn2xinezdgvmbammh6ev5i
   eslint-plugin-qunit: 7.3.0_eslint@8.19.0
   js-yaml: 4.1.0
   loader.js: 4.7.0
-  luxon: 2.0.2
+  luxon: 2.4.0
   npm-run-all: 4.1.5
   path2d-polyfill: 1.1.2
   pretender: 3.4.7
@@ -4027,7 +4027,7 @@ packages:
       glob: 7.2.0
       pkg-up: 3.1.0
       reselect: 4.1.6
-      resolve: 1.22.0
+      resolve: 1.22.1
     dev: true
 
   /babel-plugin-polyfill-corejs2/0.3.1_@babel+core@7.17.10:
@@ -7466,13 +7466,13 @@ packages:
       eslint-utils: 2.1.0
       ignore: 5.2.0
       minimatch: 3.1.2
-      resolve: 1.22.0
+      resolve: 1.22.1
       semver: 6.3.0
     dev: true
 
-  /eslint-plugin-prettier/4.0.0_7uxdfn2xinezdgvmbammh6ev5i:
-    resolution: {integrity: sha512-98MqmCJ7vJodoQK359bqQWaxOE0CS8paAz/GgjaZLyex4TTk3g9HugoO89EqWCrFiOqn9EVvcoo7gZzONCWVwQ==}
-    engines: {node: '>=6.0.0'}
+  /eslint-plugin-prettier/4.2.1_7uxdfn2xinezdgvmbammh6ev5i:
+    resolution: {integrity: sha512-f/0rXLXUt0oFYs8ra4w49wYZBG5GKZpAYsJSm6rnYL5uVDjd+zowwMwVZHnAjf4edNrKpCDYfXDgmRE/Ak7QyQ==}
+    engines: {node: '>=12.0.0'}
     peerDependencies:
       eslint: '>=7.28.0'
       eslint-config-prettier: '*'
@@ -10109,8 +10109,9 @@ packages:
     engines: {node: '>=12'}
     dev: true
 
-  /luxon/2.0.2:
-    resolution: {integrity: sha512-ZRioYLCgRHrtTORaZX1mx+jtxKtKuI5ZDvHNAmqpUzGqSrR+tL4FVLn/CUGMA3h0+AKD1MAxGI5GnCqR5txNqg==}
+  /luxon/2.4.0:
+    resolution: {integrity: sha512-w+NAwWOUL5hO0SgwOHsMBAmZ15SoknmQXhSO0hIbJCAmPKSsGeK8MlmhYh2w6Iib38IxN2M+/ooXWLbeis7GuA==}
+    engines: {node: '>=12'}
     dev: true
 
   /magic-string/0.24.1:
@@ -12108,7 +12109,7 @@ packages:
     engines: {node: 10.* || >= 12}
     dependencies:
       path-root: 0.1.1
-      resolve: 1.22.0
+      resolve: 1.22.1
     dev: true
 
   /resolve-package-path/4.0.3:
