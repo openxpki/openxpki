@@ -28,7 +28,7 @@ specifiers:
   ember-export-application-global: ^2.0.1
   ember-fetch: ^8.1.1
   ember-flatpickr: ^3.1.1
-  ember-intl: ^5.7.0
+  ember-intl: git://github.com/ember-intl/ember-intl.git#f364dba
   ember-load-initializers: ^2.1.2
   ember-modifier: ^2.1.2
   ember-page-title: ^7.0.0
@@ -85,7 +85,7 @@ devDependencies:
   ember-export-application-global: 2.0.1
   ember-fetch: 8.1.1
   ember-flatpickr: 3.1.1_@babel+core@7.18.6
-  ember-intl: 5.7.0
+  ember-intl: github.com/ember-intl/ember-intl/f364dba_webpack@5.73.0
   ember-load-initializers: 2.1.2_@babel+core@7.18.6
   ember-modifier: 2.1.2_@babel+core@7.18.6
   ember-page-title: 7.0.0
@@ -2692,43 +2692,70 @@ packages:
       - supports-color
     dev: true
 
-  /@formatjs/ecma402-abstract/1.11.4:
-    resolution: {integrity: sha512-EBikYFp2JCdIfGEb5G9dyCkTGDmC57KSHhRQOC3aYxoPWVZvfWCDjZwkGYHN7Lis/fmuWl906bnNTJifDQ3sXw==}
+  /@formatjs/ecma402-abstract/1.11.8:
+    resolution: {integrity: sha512-fgLqyWlwmTEuqV/TSLEL/t9JOmHNLFvCdgzXB0jc2w+WOItPCOJ1T0eyN6fQBQKRPfSqqNlu+kWj7ijcOVTVVQ==}
     dependencies:
-      '@formatjs/intl-localematcher': 0.2.25
+      '@formatjs/intl-localematcher': 0.2.28
       tslib: 2.4.0
     dev: true
 
-  /@formatjs/ecma402-abstract/1.6.4:
-    resolution: {integrity: sha512-ukFjGD9dLsxcD9D5AEshJqQElPQeUAlTALT/lzIV6OcYojyuU81gw/uXDUOrs6XW79jtOJwQDkLqHbCJBJMOTw==}
-    dependencies:
-      tslib: 2.4.0
-    dev: true
-
-  /@formatjs/fast-memoize/1.2.1:
-    resolution: {integrity: sha512-Rg0e76nomkz3vF9IPlKeV+Qynok0r7YZjL6syLz4/urSg0IbjPZCB/iYUMNsYA643gh4mgrX3T7KEIFIxJBQeg==}
+  /@formatjs/fast-memoize/1.2.4:
+    resolution: {integrity: sha512-9ARYoLR8AEzXvj2nYrOVHY/h1dDMDWGTnKDLXSISF1uoPakSmfcZuSqjiqZX2wRkEUimPxdwTu/agyozBtZRHA==}
     dependencies:
       tslib: 2.4.0
     dev: true
 
-  /@formatjs/icu-messageformat-parser/2.1.0:
-    resolution: {integrity: sha512-Qxv/lmCN6hKpBSss2uQ8IROVnta2r9jd3ymUEIjm2UyIkUCHVcbUVRGL/KS/wv7876edvsPe+hjHVJ4z8YuVaw==}
+  /@formatjs/icu-messageformat-parser/2.1.4:
+    resolution: {integrity: sha512-3PqMvKWV1oyok0BuiXUAHIaotdhdTJw6OICqCZbfUgKT+ZRwRWO4IlCgvXJeCITaKS5p+PY0XXKjf/vUyIpWjQ==}
     dependencies:
-      '@formatjs/ecma402-abstract': 1.11.4
-      '@formatjs/icu-skeleton-parser': 1.3.6
+      '@formatjs/ecma402-abstract': 1.11.8
+      '@formatjs/icu-skeleton-parser': 1.3.10
       tslib: 2.4.0
     dev: true
 
-  /@formatjs/icu-skeleton-parser/1.3.6:
-    resolution: {integrity: sha512-I96mOxvml/YLrwU2Txnd4klA7V8fRhb6JG/4hm3VMNmeJo1F03IpV2L3wWt7EweqNLES59SZ4d6hVOPCSf80Bg==}
+  /@formatjs/icu-skeleton-parser/1.3.10:
+    resolution: {integrity: sha512-kXJmtLDqFF5aLTf8IxdJXnhrIX1Qb4Qp3a9jqRecGDYfzOa9hMhi9U0nKyhrJJ4cXxBzptcgb+LWkyeHL6nlBQ==}
     dependencies:
-      '@formatjs/ecma402-abstract': 1.11.4
+      '@formatjs/ecma402-abstract': 1.11.8
       tslib: 2.4.0
     dev: true
 
-  /@formatjs/intl-localematcher/0.2.25:
-    resolution: {integrity: sha512-YmLcX70BxoSopLFdLr1Ds99NdlTI2oWoLbaUW2M406lxOIPzE1KQhRz2fPUkq34xVZQaihCoU29h0KK7An3bhA==}
+  /@formatjs/intl-displaynames/6.0.3:
+    resolution: {integrity: sha512-Mxh6W1VOlmiEvO/QPBrBQHlXrIn5VxjJWyyEI0V7ZHNGl0ee8AjSlq7vIJG8GodRJqGUuutF6N3OB/6qFv0YWg==}
     dependencies:
+      '@formatjs/ecma402-abstract': 1.11.8
+      '@formatjs/intl-localematcher': 0.2.28
+      tslib: 2.4.0
+    dev: true
+
+  /@formatjs/intl-listformat/7.0.3:
+    resolution: {integrity: sha512-ampNLRGZl/08epHa3i5sRmcHGLneC6JrknexbbgnexYFNSmJ6AbL/dCzgrQzw2Efl+5AZK7UbNFxcDYY3RePvw==}
+    dependencies:
+      '@formatjs/ecma402-abstract': 1.11.8
+      '@formatjs/intl-localematcher': 0.2.28
+      tslib: 2.4.0
+    dev: true
+
+  /@formatjs/intl-localematcher/0.2.28:
+    resolution: {integrity: sha512-FLsc6Gifs1np/8HnCn/7Q+lHMmenrD5fuDhRT82yj0gi9O19kfaFwjQUw1gZsyILuRyT93GuzdifHj7TKRhBcw==}
+    dependencies:
+      tslib: 2.4.0
+    dev: true
+
+  /@formatjs/intl/2.3.1:
+    resolution: {integrity: sha512-f06qZ/ukpeN24gc01qFjh3P+r3FU/ikY4yG+fDJu6dPNvpUQzDy98lYogA1dr6ig2UtrnoEk3xncyFPL1e9cZw==}
+    peerDependencies:
+      typescript: ^4.5
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      '@formatjs/ecma402-abstract': 1.11.8
+      '@formatjs/fast-memoize': 1.2.4
+      '@formatjs/icu-messageformat-parser': 2.1.4
+      '@formatjs/intl-displaynames': 6.0.3
+      '@formatjs/intl-listformat': 7.0.3
+      intl-messageformat: 10.1.1
       tslib: 2.4.0
     dev: true
 
@@ -4508,7 +4535,7 @@ packages:
     dev: true
 
   /broccoli-caching-writer/3.0.3:
-    resolution: {integrity: sha1-C9LJapc41qarWQ8HujXFFX19tHY=}
+    resolution: {integrity: sha512-g644Kb5uBPsy+6e2DvO3sOc+/cXZQQNgQt64QQzjA9TSdP0dl5qvetpoNIx4sy/XIjrPYG1smEidq9Z9r61INw==}
     dependencies:
       broccoli-kitchen-sink-helpers: 0.3.1
       broccoli-plugin: 1.3.1
@@ -4654,7 +4681,7 @@ packages:
     dev: true
 
   /broccoli-kitchen-sink-helpers/0.3.1:
-    resolution: {integrity: sha1-d8fBgZS5ZkFj7E/O4nk0RJJuDAY=}
+    resolution: {integrity: sha512-gqYnKSJxBSjj/uJqeuRAzYVbmjWhG0mOZ8jrp6+fnUIOgLN6MvI7XxBECDHkYMIFPJ8Smf4xaI066Q2FqQDnXg==}
     dependencies:
       glob: 5.0.15
       mkdirp: 0.5.6
@@ -4894,7 +4921,7 @@ packages:
       ensure-posix-path: 1.1.1
       fs-extra: 8.1.0
       minimatch: 3.1.2
-      resolve: 1.22.0
+      resolve: 1.22.1
       rsvp: 4.8.5
       symlink-or-copy: 1.3.1
       walk-sync: 1.1.4
@@ -5193,7 +5220,7 @@ packages:
     dev: true
 
   /call-me-maybe/1.0.1:
-    resolution: {integrity: sha1-JtII6onje1y95gJQoV8DHBak1ms=}
+    resolution: {integrity: sha512-wCyFsDQkKPwwF8BDwOiWNx/9K45L/hvggQiDbve+viMNMQnWhrlYIuBk09offfwCRtCO9P6XwUttufzU11WCVw==}
     dev: true
 
   /callsites/3.1.0:
@@ -5366,8 +5393,8 @@ packages:
       static-extend: 0.1.2
     dev: true
 
-  /cldr-core/36.0.0:
-    resolution: {integrity: sha512-QLnAjt20rZe38c8h8OJ9jPND+O4o5O8Nw0TK/P3KpNn1cmOhMu0rk6Kc3ap96c5OStQ9gAngs9+Be2sum26NOw==}
+  /cldr-core/41.0.0:
+    resolution: {integrity: sha512-8UL/NVueD9BeyrYGjZWrAvhowmQt4THriUB04jxRHWST9Lmc9K1pISPjnbh0kIfRueslZ37EvQ53dxOm5w8pjQ==}
     dev: true
 
   /clean-base-url/1.0.0:
@@ -7071,45 +7098,6 @@ packages:
       - supports-color
     dev: true
 
-  /ember-intl/5.7.0:
-    resolution: {integrity: sha512-NcQFPeV9wxyOX7Tb0y+84CXHPt5XleYUlszywx5aQgJQ4yE6in3kHjI804CRKtLz6OY0rzVfTa5Jc/y8CtI+0Q==}
-    engines: {node: '>= 10.*'}
-    peerDependencies:
-      typescript: ^4.0.0
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-    dependencies:
-      broccoli-caching-writer: 3.0.3
-      broccoli-funnel: 3.0.8
-      broccoli-merge-files: 0.8.0
-      broccoli-merge-trees: 4.2.0
-      broccoli-source: 3.0.1
-      broccoli-stew: 3.0.0
-      calculate-cache-key-for-tree: 2.0.0
-      cldr-core: 36.0.0
-      ember-auto-import: 1.12.1
-      ember-cli-babel: 7.26.11
-      ember-cli-typescript: 4.2.1
-      extend: 3.0.2
-      fast-memoize: 2.5.2
-      has-unicode: 2.0.1
-      intl-messageformat: 9.13.0
-      intl-messageformat-parser: 6.4.4
-      js-yaml: 3.14.1
-      json-stable-stringify: 1.0.1
-      locale-emoji: 0.3.0
-      lodash.castarray: 4.4.0
-      lodash.last: 3.0.0
-      lodash.omit: 4.5.0
-      mkdirp: 1.0.4
-      silent-error: 1.1.1
-    transitivePeerDependencies:
-      - supports-color
-      - webpack-cli
-      - webpack-command
-    dev: true
-
   /ember-load-initializers/2.1.2_@babel+core@7.18.6:
     resolution: {integrity: sha512-CYR+U/wRxLbrfYN3dh+0Tb6mFaxJKfdyz+wNql6cqTrA0BBi9k6J3AaKXj273TqvEpyyXegQFFkZEiuZdYtgJw==}
     engines: {node: 6.* || 8.* || >= 10.*}
@@ -8707,7 +8695,7 @@ packages:
     dev: true
 
   /glob-parent/3.1.0:
-    resolution: {integrity: sha1-nmr2KZ2NO9K9QEMIMr0RPfkGxa4=}
+    resolution: {integrity: sha512-E8Ak/2+dZY6fnzlR7+ueWvhsH1SjHr4jjss4YS/h4py44jY9MhK/VFdaZJAWDz6BbL21KeteKxFSFpq8OS5gVA==}
     dependencies:
       is-glob: 3.1.0
       path-dirname: 1.0.2
@@ -8940,7 +8928,7 @@ packages:
     dev: true
 
   /has-unicode/2.0.1:
-    resolution: {integrity: sha1-4Ob+aijPUROIVeCG0Wkedx3iqLk=}
+    resolution: {integrity: sha512-8Rf9Y83NBReMnx0gFzA8JImQACstCYWUplepDa9xprwwtmgEZUF0h/i5xSA625zB/I37EtrswSST6OXxwaaIJQ==}
     dev: true
 
   /has-value/0.3.1:
@@ -9361,20 +9349,12 @@ packages:
       side-channel: 1.0.4
     dev: true
 
-  /intl-messageformat-parser/6.4.4:
-    resolution: {integrity: sha512-7AaFKNZEfzLQR6+jivOuz9e7yA8ka5KrmLebgY4QHTRLf8r64dp3LjnW98LkBWjdk8GK0sawD2dHDqW++A/pXA==}
-    deprecated: We've written a new parser that's 6x faster and is backwards compatible. Please use @formatjs/icu-messageformat-parser
+  /intl-messageformat/10.1.1:
+    resolution: {integrity: sha512-FeJne2oooYW6shLPbrqyjRX6hTELVrQ90Dn88z7NomLk/xZBCLxLPAkgaYaTQJBRBV78nZ933d8APHHkTQrD9Q==}
     dependencies:
-      '@formatjs/ecma402-abstract': 1.6.4
-      tslib: 2.4.0
-    dev: true
-
-  /intl-messageformat/9.13.0:
-    resolution: {integrity: sha512-7sGC7QnSQGa5LZP7bXLDhVDtQOeKGeBFGHF2Y8LVBwYZoQZCgWeKoPGTa5GMG8g/TzDgeXuYJQis7Ggiw2xTOw==}
-    dependencies:
-      '@formatjs/ecma402-abstract': 1.11.4
-      '@formatjs/fast-memoize': 1.2.1
-      '@formatjs/icu-messageformat-parser': 2.1.0
+      '@formatjs/ecma402-abstract': 1.11.8
+      '@formatjs/fast-memoize': 1.2.4
+      '@formatjs/icu-messageformat-parser': 2.1.4
       tslib: 2.4.0
     dev: true
 
@@ -10135,7 +10115,7 @@ packages:
     dev: true
 
   /lodash.castarray/4.4.0:
-    resolution: {integrity: sha1-wCUTUV4wna3dTCTGDP3c9ZdtkRU=}
+    resolution: {integrity: sha512-aVx8ztPv7/2ULbArGJ2Y42bG1mEQ5mGjpdvrbJcJFU3TbYybe+QlLS4pst9zV52ymy2in1KpFPiZnAOATxD4+Q==}
     dev: true
 
   /lodash.clonedeep/4.5.0:
@@ -10153,7 +10133,7 @@ packages:
     dev: true
 
   /lodash.defaults/4.2.0:
-    resolution: {integrity: sha1-0JF4cW/+pN3p5ft7N/bwgCJ0WAw=}
+    resolution: {integrity: sha512-qjxPLHd3r5DnsdGacqOMU6pb/avJzdh9tFX2ymgoZE27BmjXrNy/y4LoaiTeAb+O3gL8AfpJGtqfX/ae2leYYQ==}
     dev: true
 
   /lodash.defaultsdeep/4.6.1:
@@ -10196,7 +10176,7 @@ packages:
     dev: true
 
   /lodash.last/3.0.0:
-    resolution: {integrity: sha1-JC9mMRLdTG5jcoxgo8kJ0b2tvUw=}
+    resolution: {integrity: sha512-14mq7rSkCxG4XMy9lF2FbIOqqgF0aH0NfPuQ3LPR3vIh0kHnUvIYP70dqa1Hf47zyXfQ8FzAg0MYOQeSuE1R7A==}
     dev: true
 
   /lodash.memoize/4.1.2:
@@ -10208,7 +10188,7 @@ packages:
     dev: true
 
   /lodash.omit/4.5.0:
-    resolution: {integrity: sha1-brGa5aHuHdnfC5aeZs4Lf6MLXmA=}
+    resolution: {integrity: sha512-XeqSp49hNGmlkj2EJlfrQFIzQ6lXdNro9sddtQzcJY8QaoC2GO0DT7xaIokHeyM+mIT0mPMlPvkYzg2xCuHdZg==}
     dev: true
 
   /lodash.restparam/3.6.1:
@@ -11503,7 +11483,7 @@ packages:
     dev: true
 
   /path-dirname/1.0.2:
-    resolution: {integrity: sha1-zDPSTVJeCZpTiMAzbG4yuRYGCeA=}
+    resolution: {integrity: sha512-ALzNPpyNq9AqXMBjeymIjFDAkAFH06mHJH/cSBHAgU0s4vfpBn6b2nf8tiRLvagKD8RbTpq2FKTBg7cl9l3c7Q==}
     dev: true
 
   /path-exists/3.0.0:
@@ -14481,4 +14461,47 @@ packages:
   /yocto-queue/1.0.0:
     resolution: {integrity: sha512-9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g==}
     engines: {node: '>=12.20'}
+    dev: true
+
+  github.com/ember-intl/ember-intl/f364dba_webpack@5.73.0:
+    resolution: {tarball: https://codeload.github.com/ember-intl/ember-intl/tar.gz/f364dba}
+    id: github.com/ember-intl/ember-intl/f364dba
+    name: ember-intl
+    version: 6.0.0-beta.3
+    engines: {node: 14.* || >= 16}
+    peerDependencies:
+      typescript: '4'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      '@formatjs/icu-messageformat-parser': 2.1.4
+      '@formatjs/intl': 2.3.1
+      broccoli-caching-writer: 3.0.3
+      broccoli-funnel: 3.0.8
+      broccoli-merge-files: 0.8.0
+      broccoli-merge-trees: 4.2.0
+      broccoli-source: 3.0.1
+      broccoli-stew: 3.0.0
+      calculate-cache-key-for-tree: 2.0.0
+      cldr-core: 41.0.0
+      ember-auto-import: 2.4.2_webpack@5.73.0
+      ember-cli-babel: 7.26.11
+      ember-cli-typescript: 5.1.0
+      eventemitter3: 4.0.7
+      extend: 3.0.2
+      fast-memoize: 2.5.2
+      has-unicode: 2.0.1
+      intl-messageformat: 10.1.1
+      js-yaml: 4.1.0
+      json-stable-stringify: 1.0.1
+      locale-emoji: 0.3.0
+      lodash.castarray: 4.4.0
+      lodash.last: 3.0.0
+      lodash.omit: 4.5.0
+      mkdirp: 1.0.4
+      silent-error: 1.1.1
+    transitivePeerDependencies:
+      - supports-color
+      - webpack
     dev: true
