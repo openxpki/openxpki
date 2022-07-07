@@ -466,11 +466,14 @@ export default class OxiSectionFormComponent extends Component {
             this.loading = false;
             if (res?.status?.field_errors !== undefined) {
                 for (const faultyField of res.status.field_errors) {
+                    debug(`oxi-section/form (${this.args.def.action}): server reports faulty field: ${faultyField.name}`);
                     let clones = this.fields.filter(f => f.name === faultyField.name);
+                    // if no index given: mark all clones as faulty
                     if (typeof faultyField.index === "undefined") {
                         for (const clone of clones) {
                             this.setFieldError(clone, faultyField.error);
                         }
+                    // otherwise just pick the specified clone
                     } else {
                         this.setFieldError(clones[faultyField.index], faultyField.error);
                     }

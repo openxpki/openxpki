@@ -54,6 +54,7 @@
                 error=@field._error
             ) as |FieldInstance|
         }}
+            {{{ concat '<!-- field: ' @field.name ' -->' }}}
             <FieldInstance>
             </FieldInstance>
         {{/let}}
