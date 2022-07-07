@@ -14,7 +14,6 @@ specifiers:
   ember-auto-import: ^2.4.1
   ember-bootstrap: ^5.1.1
   ember-cli: ^4.4.0
-  ember-cli-app-version: ^5.0.0
   ember-cli-babel: ^7.26.11
   ember-cli-dependency-checker: ^3.3.1
   ember-cli-head: ^2.0.0
@@ -69,7 +68,6 @@ devDependencies:
   ember-auto-import: 2.4.2_webpack@5.73.0
   ember-bootstrap: 5.1.1_3faqrwdymke573ahf6cqpc646y
   ember-cli: 4.4.0
-  ember-cli-app-version: 5.0.0
   ember-cli-babel: 7.26.11
   ember-cli-dependency-checker: 3.3.1_ember-cli@4.4.0
   ember-cli-head: 2.0.0
@@ -6373,16 +6371,6 @@ packages:
       silent-error: 1.1.1
     transitivePeerDependencies:
       - '@babel/core'
-      - supports-color
-    dev: true
-
-  /ember-cli-app-version/5.0.0:
-    resolution: {integrity: sha512-afhx/CXDOMNXzoe4NDPy5WUfxWmYYHUzMCiTyvPBxCDBXYcMrtxNWxvgaSaeqcoHVEmqzeyBj8V82tzmT1dcyw==}
-    engines: {node: 10.* || >= 12}
-    dependencies:
-      ember-cli-babel: 7.26.11
-      git-repo-info: 2.1.1
-    transitivePeerDependencies:
       - supports-color
     dev: true
 
