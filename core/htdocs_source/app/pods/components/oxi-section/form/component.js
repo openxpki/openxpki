@@ -5,6 +5,13 @@ import { isArray } from '@ember/array';
 import { inject } from '@ember/service';
 import { debug } from '@ember/debug';
 
+/*
+ * Field data:
+ * Underscore prefixed properties are meta data that is only used in
+ * oxi-section/form and oxi-section/form/field components.
+ * They will be excluded from the plain hash that is passed down to the field
+ * implementations oxi-section/form/field/* via @content.
+ */
 class Field {
     /*
      * Common
@@ -18,7 +25,7 @@ class Field {
     tooltip;
     placeholder;
     actionOnChange;
-    @tracked _error; // client-side error state
+    @tracked _error; // client- or server-side error state
     autofill;
     /*
      * Clonable fields
@@ -79,15 +86,26 @@ class Field {
 
     clone() {
         let field = new Field();
-        Object.keys(Object.getPrototypeOf(this)).forEach(k => field[k] = this[k]); // @tracked properties
-        Object.keys(this).forEach(k => field[k] = this[k]);                        // public class properties
+        // @tracked properties
+        Object.keys(Object.getPrototypeOf(this)).forEach(k => field[k] = this[k]);
+        // public class properties
+        Object.keys(this).forEach(k => field[k] = this[k]);
         return field;
     }
 
+    /**
+     * Returns all non-private properties (i.e. no leading underscore) as a plain hash/object
+     */
     toPlainHash() {
         let hash = {};
-        Object.keys(Object.getPrototypeOf(this)).forEach(k => hash[k] = this[k]); // @tracked properties
-        Object.keys(this).forEach(k => hash[k] = this[k]);                        // public class properties
+        // @tracked non-private properties
+        Object.keys(Object.getPrototypeOf(this))
+            .filter(k => k.charAt(0) != '_')
+            .forEach(k => hash[k] = this[k]);
+        // non-private class properties
+        Object.keys(this)
+            .filter(k => k.charAt(0) != '_')
+            .forEach(k => hash[k] = this[k]);
         return hash;
     }
 }
