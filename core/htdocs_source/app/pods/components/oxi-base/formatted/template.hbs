@@ -44,10 +44,10 @@
 
     {{else if (eq "certstatus" this.format)}}
         <OxiBase::Label
-            @class="oxi-formatted-certstatus certstatus-{{lc (try v.value v.label)}} {{@class}}"
-            @tooltip={{v.tooltip}}
             @text={{v.label}}
             @raw={{true}}
+            @tooltip={{v.tooltip}}
+            @class="oxi-formatted-certstatus certstatus-{{lc (try v.value v.label)}} {{@class}}"
         />
 
     {{else if (eq "link" this.format)}}
