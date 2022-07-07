@@ -27,12 +27,12 @@
     "docs": "jsdoc -c .jsdoc.js --verbose app"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.18.2",
     "@ember/jquery": "^2.0.0",
     "@ember/optional-features": "^2.0.0",
     "@ember/test-helpers": "^2.7.0",
     "@glimmer/component": "^1.1.2",
     "@glimmer/tracking": "^1.1.2",
-    "babel-eslint": "^10.1.0",
     "bootstrap": "^5.1.3",
     "broccoli-asset-rev": "^3.0.0",
     "broccoli-funnel": "^3.0.8",
