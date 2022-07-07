@@ -2,6 +2,13 @@
  * Bootstrap v5 fixes
  */
 
+/* Re-add .pre-scrollable which was removed in Bootstrap v5 */
+.pre-scrollable {
+  max-height: 20rem;
+  overflow-y: scroll;
+}
+
+/* Links: only underline on hover */
 a {
   text-decoration: none;
 }
@@ -9,8 +16,28 @@ a:hover {
   text-decoration: underline;
 }
 
-/* pre-scrollable was removed in Bootstrap v5 */
-.pre-scrollable {
-  max-height: 20rem;
-  overflow-y: scroll;
+/* Navigation bar: improve dropdown header appearance */
+.navbar .dropdown-header {
+  border-bottom: 1px solid #e9ecef;
+  padding: 0.5rem 0.5rem 0.1rem 0.5rem;
+}
+
+/* Forms: do not set green color for labels of "valid" checkboxes */
+.was-validated .form-check-input:valid ~ .form-check-label {
+    color: inherit;
+}
+
+/* Forms: more discreet colors for border and check mark in valid input fields */
+.was-validated .form-control:valid:not([multiple]):not([size]), .was-validated .form-control:valid:not([multiple])[size="1"], .form-control.is-valid:not([multiple]):not([size]), .form-control.is-valid:not([multiple])[size="1"] {
+    border-color: #5c8866;
+    background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") right 0.75rem center/8px 10px no-repeat, #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%23c8d6cb' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e") center right 1.75rem/calc(0.75em + 0.375rem) calc(0.75em + 0.375rem) no-repeat;
+}
+.was-validated .form-select:valid:not([multiple]):not([size]), .was-validated .form-select:valid:not([multiple])[size="1"], .form-select.is-valid:not([multiple]):not([size]), .form-select.is-valid:not([multiple])[size="1"] {
+    border-color: #5c8866;
+    background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") right 0.75rem center/8px 10px no-repeat, #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%23c8d6cb' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e") center right 1.75rem/calc(0.75em + 0.375rem) calc(0.75em + 0.375rem) no-repeat;
+}
+
+/* Forms: lighter placeholder color */
+.form-control::placeholder {
+  color: #aab4bc;
 }
