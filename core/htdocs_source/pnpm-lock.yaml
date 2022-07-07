@@ -27,7 +27,7 @@ specifiers:
   ember-flatpickr: ^3.2.3
   ember-intl: git://github.com/ember-intl/ember-intl.git#f364dba
   ember-load-initializers: ^2.1.2
-  ember-modifier: ^2.1.2
+  ember-modifier: ^3.2.7
   ember-page-title: ^7.0.0
   ember-qunit: ^5.1.5
   ember-resolver: ^8.0.3
@@ -81,7 +81,7 @@ devDependencies:
   ember-flatpickr: 3.2.3_l4wjsiu5xua2l4pikdsxluugwi
   ember-intl: github.com/ember-intl/ember-intl/f364dba_webpack@5.73.0
   ember-load-initializers: 2.1.2_@babel+core@7.18.6
-  ember-modifier: 2.1.2_@babel+core@7.18.6
+  ember-modifier: 3.2.7_@babel+core@7.18.6
   ember-page-title: 7.0.0
   ember-qunit: 5.1.5_m2vpijm5kklvqmlfibufmotnbi
   ember-resolver: 8.0.3_@babel+core@7.18.6
@@ -2105,19 +2105,6 @@ packages:
 
   /@babel/plugin-transform-typescript/7.5.5_@babel+core@7.18.6:
     resolution: {integrity: sha512-pehKf4m640myZu5B2ZviLaiBlxMCjSZ1qTEO459AXKX5GnPueyulJeCqZFs1nz/Ya2dDzXQ1NxZ/kKNWyD4h6w==}
-    peerDependencies:
-      '@babel/core': ^7.0.0-0
-    dependencies:
-      '@babel/core': 7.18.6
-      '@babel/helper-create-class-features-plugin': 7.17.9_@babel+core@7.18.6
-      '@babel/helper-plugin-utils': 7.16.7
-      '@babel/plugin-syntax-typescript': 7.17.10_@babel+core@7.18.6
-    transitivePeerDependencies:
-      - supports-color
-    dev: true
-
-  /@babel/plugin-transform-typescript/7.8.7_@babel+core@7.18.6:
-    resolution: {integrity: sha512-7O0UsPQVNKqpHeHLpfvOG4uXmlw+MOxYvUv6Otc9uH5SYMIxvF6eBdjkWvC3f9G+VXe0RsNExyAQBeTRug/wqQ==}
     peerDependencies:
       '@babel/core': ^7.0.0-0
     dependencies:
@@ -6610,29 +6597,6 @@ packages:
       - supports-color
     dev: true
 
-  /ember-cli-typescript/3.1.4_@babel+core@7.18.6:
-    resolution: {integrity: sha512-HJ73kL45OGRmIkPhBNFt31I1SGUvdZND+LCH21+qpq3pPlFpJG8GORyXpP+2ze8PbnITNLzwe5AwUrpyuRswdQ==}
-    engines: {node: 8.* || >= 10.*}
-    dependencies:
-      '@babel/plugin-proposal-nullish-coalescing-operator': 7.16.7_@babel+core@7.18.6
-      '@babel/plugin-proposal-optional-chaining': 7.16.7_@babel+core@7.18.6
-      '@babel/plugin-transform-typescript': 7.8.7_@babel+core@7.18.6
-      ansi-to-html: 0.6.15
-      broccoli-stew: 3.0.0
-      debug: 4.3.4
-      ember-cli-babel-plugin-helpers: 1.1.1
-      execa: 3.4.0
-      fs-extra: 8.1.0
-      resolve: 1.22.1
-      rsvp: 4.8.5
-      semver: 6.3.0
-      stagehand: 1.0.0
-      walk-sync: 2.2.0
-    transitivePeerDependencies:
-      - '@babel/core'
-      - supports-color
-    dev: true
-
   /ember-cli-typescript/4.2.1:
     resolution: {integrity: sha512-0iKTZ+/wH6UB/VTWKvGuXlmwiE8HSIGcxHamwNhEC5x1mN3z8RfvsFZdQWYUzIWFN2Tek0gmepGRPTwWdBYl/A==}
     engines: {node: 10.* || >= 12.*}
@@ -7036,22 +7000,6 @@ packages:
       ember-cli-babel: 7.26.11
       ember-cli-version-checker: 2.2.0
       ember-compatibility-helpers: 1.2.6_@babel+core@7.18.6
-    transitivePeerDependencies:
-      - '@babel/core'
-      - supports-color
-    dev: true
-
-  /ember-modifier/2.1.2_@babel+core@7.18.6:
-    resolution: {integrity: sha512-3Lsu1fV1sIGa66HOW07RZc6EHISwKt5VA5AUnFss2HX6OTfpxTJ2qvPctt2Yt0XPQXJ4G6BQasr/F35CX7UGJA==}
-    engines: {node: 10.* || >= 12}
-    dependencies:
-      ember-cli-babel: 7.26.11
-      ember-cli-normalize-entity-name: 1.0.0
-      ember-cli-string-utils: 1.1.0
-      ember-cli-typescript: 3.1.4_@babel+core@7.18.6
-      ember-compatibility-helpers: 1.2.6_@babel+core@7.18.6
-      ember-destroyable-polyfill: 2.0.3_@babel+core@7.18.6
-      ember-modifier-manager-polyfill: 1.2.0_@babel+core@7.18.6
     transitivePeerDependencies:
       - '@babel/core'
       - supports-color
@@ -7780,22 +7728,6 @@ packages:
       is-stream: 2.0.1
       merge-stream: 2.0.0
       npm-run-path: 3.1.0
-      onetime: 5.1.2
-      p-finally: 2.0.1
-      signal-exit: 3.0.7
-      strip-final-newline: 2.0.0
-    dev: true
-
-  /execa/3.4.0:
-    resolution: {integrity: sha512-r9vdGQk4bmCuK1yKQu1KTwcT2zwfWdbdaXfCtAh+5nU/4fSX+JAb7vZGvI5naJrQlvONrEB20jeruESI69530g==}
-    engines: {node: ^8.12.0 || >=9.7.0}
-    dependencies:
-      cross-spawn: 7.0.3
-      get-stream: 5.2.0
-      human-signals: 1.1.1
-      is-stream: 2.0.1
-      merge-stream: 2.0.0
-      npm-run-path: 4.0.1
       onetime: 5.1.2
       p-finally: 2.0.1
       signal-exit: 3.0.7
