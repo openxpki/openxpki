@@ -24,7 +24,7 @@ specifiers:
   ember-cli-update: ^1.0.1
   ember-export-application-global: ^2.0.1
   ember-fetch: ^8.1.1
-  ember-flatpickr: ^3.1.1
+  ember-flatpickr: ^3.2.3
   ember-intl: git://github.com/ember-intl/ember-intl.git#f364dba
   ember-load-initializers: ^2.1.2
   ember-modifier: ^2.1.2
@@ -78,7 +78,7 @@ devDependencies:
   ember-cli-update: 1.0.1
   ember-export-application-global: 2.0.1
   ember-fetch: 8.1.1
-  ember-flatpickr: 3.1.1_@babel+core@7.18.6
+  ember-flatpickr: 3.2.3_l4wjsiu5xua2l4pikdsxluugwi
   ember-intl: github.com/ember-intl/ember-intl/f364dba_webpack@5.73.0
   ember-load-initializers: 2.1.2_@babel+core@7.18.6
   ember-modifier: 2.1.2_@babel+core@7.18.6
@@ -2515,17 +2515,6 @@ packages:
       mkdirp: 1.0.4
       silent-error: 1.1.1
     transitivePeerDependencies:
-      - supports-color
-    dev: true
-
-  /@ember/render-modifiers/1.0.2_@babel+core@7.18.6:
-    resolution: {integrity: sha512-6tEnHl5+62NTSAG2mwhGMFPhUrJQjoVqV+slsn+rlTknm2Zik+iwxBQEbwaiQOU1FUYxkS8RWcieovRNMR8inQ==}
-    engines: {node: 6.* || 8.* || >= 10.*}
-    dependencies:
-      ember-cli-babel: 7.26.11
-      ember-modifier-manager-polyfill: 1.2.0_@babel+core@7.18.6
-    transitivePeerDependencies:
-      - '@babel/core'
       - supports-color
     dev: true
 
@@ -6989,22 +6978,23 @@ packages:
       - supports-color
     dev: true
 
-  /ember-flatpickr/3.1.1_@babel+core@7.18.6:
-    resolution: {integrity: sha512-01WO3WH0h/BvUE57IxWzTHrGMGlX/9KjrIIq/NuBmJOjcE8yVj9uGI5Y+TsUoPdtJ5q7VhEtnNttx0YJ2It8Ug==}
-    engines: {node: 10.* || >= 12}
+  /ember-flatpickr/3.2.3_l4wjsiu5xua2l4pikdsxluugwi:
+    resolution: {integrity: sha512-ON6FNh3gFSxDTam2UOyPOSeYki5qNqPqPEB+SS/Q+L+kPEvxmDMPeG/lWLLvdDsPR0X55W9q7uSjzZZAD/UxqA==}
+    engines: {node: 12.* || 14.* || >= 16}
     dependencies:
-      '@ember/render-modifiers': 1.0.2_@babel+core@7.18.6
+      '@ember/render-modifiers': 2.0.4_l4wjsiu5xua2l4pikdsxluugwi
       '@glimmer/component': 1.1.2_@babel+core@7.18.6
       '@glimmer/tracking': 1.1.2
       broccoli-funnel: 3.0.8
       broccoli-merge-trees: 4.2.0
       broccoli-stew: 3.0.0
       ember-cli-babel: 7.26.11
-      ember-cli-htmlbars: 5.7.2
-      ember-cli-typescript: 4.2.1
+      ember-cli-htmlbars: 6.1.0
+      ember-cli-typescript: 5.1.0
       flatpickr: 4.6.13
     transitivePeerDependencies:
       - '@babel/core'
+      - ember-source
       - supports-color
     dev: true
 
