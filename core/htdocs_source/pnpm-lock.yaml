@@ -2,7 +2,6 @@ lockfileVersion: 5.4
 
 specifiers:
   '@babel/eslint-parser': ^7.18.2
-  '@ember/jquery': ^2.0.0
   '@ember/optional-features': ^2.0.0
   '@ember/test-helpers': ^2.7.0
   '@glimmer/component': ^1.1.2
@@ -59,7 +58,6 @@ specifiers:
 
 devDependencies:
   '@babel/eslint-parser': 7.18.2_e47xv5ui6xrfmjzs5tdc45kbly
-  '@ember/jquery': 2.0.0
   '@ember/optional-features': 2.0.0
   '@ember/test-helpers': 2.8.1_l4wjsiu5xua2l4pikdsxluugwi
   '@glimmer/component': 1.1.2_@babel+core@7.18.6
@@ -2508,19 +2506,6 @@ packages:
 
   /@ember/edition-utils/1.2.0:
     resolution: {integrity: sha512-VmVq/8saCaPdesQmftPqbFtxJWrzxNGSQ+e8x8LLe3Hjm36pJ04Q8LeORGZkAeOhldoUX9seLGmSaHeXkIqoog==}
-    dev: true
-
-  /@ember/jquery/2.0.0:
-    resolution: {integrity: sha512-f8+WNqzXBNxl96jo0IwJBO5QCi0bnUlba9I7WbZcGhgnzszC76INJkw6l8UepZ1PMGG1H1wYpoIGoBBp5ZVmFA==}
-    engines: {node: 12.* || 14.* || >= 16}
-    dependencies:
-      broccoli-funnel: 3.0.8
-      broccoli-merge-trees: 4.2.0
-      ember-cli-babel: 7.26.11
-      jquery: 3.6.0
-      resolve: 1.22.0
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /@ember/optional-features/2.0.0:
@@ -9729,7 +9714,7 @@ packages:
     dev: true
 
   /istextorbinary/2.1.0:
-    resolution: {integrity: sha1-2+0qb1G+L3R1to+JRlgRFBt1iHQ=}
+    resolution: {integrity: sha512-kT1g2zxZ5Tdabtpp9VSdOzW9lb6LXImyWbzbQeTxoRtHhurC9Ej9Wckngr2+uepPL09ky/mJHmN9jeJPML5t6A==}
     engines: {node: '>=0.12'}
     dependencies:
       binaryextensions: 2.3.0
@@ -9753,10 +9738,6 @@ packages:
       '@types/node': 17.0.31
       merge-stream: 2.0.0
       supports-color: 8.1.1
-    dev: true
-
-  /jquery/3.6.0:
-    resolution: {integrity: sha512-JVzAR/AjBvVt2BmYhxRCSYysDsPcssdmTFnzyLEts9qNwmjmu4JTAMYubEfwVOSwpQ1I1sKKFcxhZCI2buerfw==}
     dev: true
 
   /js-string-escape/1.0.1:
@@ -12436,7 +12417,7 @@ packages:
     dev: true
 
   /rsvp/3.2.1:
-    resolution: {integrity: sha1-B8tKXfJa3Z6Cbrxn3Mn9idsn2Eo=}
+    resolution: {integrity: sha512-Rf4YVNYpKjZ6ASAmibcwTNciQ5Co5Ztq6iZPEykHpkoflnD/K5ryE/rHehFsTm4NJj8nKDhbi3eKBWGogmNnkg==}
     dev: true
 
   /rsvp/3.6.2:

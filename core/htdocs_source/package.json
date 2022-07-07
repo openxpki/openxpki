@@ -28,7 +28,6 @@
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.18.2",
-    "@ember/jquery": "^2.0.0",
     "@ember/optional-features": "^2.0.0",
     "@ember/test-helpers": "^2.7.0",
     "@glimmer/component": "^1.1.2",
