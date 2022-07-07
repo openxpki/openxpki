@@ -17,6 +17,7 @@
                         @format={{item.format}}
                         @value={{item.value}}
                         @truncate={{@isInfoBox}}
+                        @class={{if (eq "tooltip" item.format) "d-inline-flex"}}
                     />
                 </div>
             {{/if}}
