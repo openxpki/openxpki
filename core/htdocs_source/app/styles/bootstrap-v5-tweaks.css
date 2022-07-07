@@ -41,3 +41,8 @@ a:hover {
 .form-control::placeholder {
   color: #aab4bc;
 }
+
+/* Tables: lighter color for thick border between head and body */
+.table > :not(:first-child) {
+  border-top-color: var(--bs-secondary);
+}
