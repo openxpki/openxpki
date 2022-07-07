@@ -609,7 +609,6 @@ div.required input.flatpickr-input {
  * Others
  */
 .hover-element {
-  display: inline flex;
   flex-direction: column;
 }
 
