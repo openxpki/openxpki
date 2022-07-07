@@ -13,7 +13,7 @@ import { inject } from '@ember/service';
 export default class UrlFor extends Helper {
     @inject router;
 
-    compute([route, model, params]) {
+    compute([ route, model, params = {} ]) {
         return this.router.urlFor(route, model, { queryParams: params });
     }
 }
