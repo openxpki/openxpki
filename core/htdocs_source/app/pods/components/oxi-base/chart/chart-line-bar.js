@@ -1,6 +1,5 @@
 'use strict'
 
-import 'path2d-polyfill'; // IE11 support for Path2D (which uPlot uses)
 import uPlot from 'uplot';
 import seriesBarsPlugin from './uplot/seriesbars-plugin';
 import axisTimestampConfig from './uplot/axis-timestamp-config';
