@@ -4,7 +4,7 @@
         {{#each this.items as |item|}}
             <div class="row {{item.className}} py-1 px-2 oxi-keyvalue-head">
             {{#if item.isHead}}
-                <div class="col-12">{{item.value}}</div>
+                <div class="col-12 px-0 border-2 border-bottom mt-2 fst-italic">{{item.value}}</div>
             {{else}}
                 <div class="col-auto px-0 text-secondary fw-bold {{if @isInfoBox "oxi-keyvalue-label-infobox" "oxi-keyvalue-label"}}">
                     {{~item.label~}}
