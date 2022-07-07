@@ -106,11 +106,22 @@ nvm use
 pnpm run build
 ```
 
-### Updating ember-cli
+### Update ember-cli
+
+Also see [the Ember CLI update guide](https://cli.emberjs.com/release/basic-use/upgrading/).
 
 ```bash
 nvm use
-ember-cli-update
+pnpm remove ember-cli ember-cli-update
+pnpm install --save-dev ember-cli ember-cli-update
+./node_modules/.bin/ember --version
+```
+
+### Update the Ember app (config, dependencies etc.)
+
+```bash
+nvm use
+./node_modules/.bin/ember-cli-update
 pnpm audit fix
 # to install the modules on your host and update package-lock.json:
 pnpm install
