@@ -74,7 +74,7 @@
     "prettier": "^2.6.2",
     "qunit": "^2.19.1",
     "qunit-dom": "^2.0.0",
-    "superstruct": "^0.15.2",
+    "superstruct": "^0.16.0",
     "tippy.js": "^6.3.7",
     "uplot": "^1.6.16",
     "webpack": "^5.72.1"
