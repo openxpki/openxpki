@@ -11,13 +11,16 @@ export default class OpenXpkiController extends Controller {
     @inject('oxi-content') content;
     @inject router;
 
-    // Reserved Ember properties
-    // https://api.emberjs.com/ember/release/classes/Controller
+    /*
+      Reserved Ember property:
+      defines the supported query parameters. Ember makes them available as this.count etc.
+      https://api.emberjs.com/ember/release/classes/Controller
+    */
     queryParams = [
         "count",
         "limit",
         "startat",
-        "force" // supported query parameters, available as this.count etc.
+        "force",
     ];
 
     // FIXME Remove those three?! (auto-injected by Ember, see queryParams above)
