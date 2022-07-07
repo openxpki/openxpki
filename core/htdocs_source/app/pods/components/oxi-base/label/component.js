@@ -22,7 +22,6 @@ export default class OxiLabelComponent extends Component {
     @inject('oxi-config') config;
 
     @tracked tooltipContent = null;
-    @tracked tooltipReady = false;
 
     get cssClasses() {
         let classes = [];
@@ -40,12 +39,5 @@ export default class OxiLabelComponent extends Component {
         }).then((doc) => {
             this.tooltipContent = doc;
         });
-    }
-
-    @action
-    setTooltipReady(element) {
-        // Referenced via @updateFor={{this.tooltipReady}} -- this
-        // will trigger a repositioning if the content is too big
-        this.tooltipReady = true;
     }
 }

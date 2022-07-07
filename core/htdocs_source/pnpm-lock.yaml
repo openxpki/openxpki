@@ -36,7 +36,7 @@ specifiers:
   ember-resolver: ^8.0.3
   ember-source: ~3.28.1
   ember-template-lint: ^3.7.0
-  ember-tooltips: ^3.4.7
+  ember-tippy: ^2.0.0
   eslint: ^7.32.0
   eslint-config-prettier: ^8.3.0
   eslint-plugin-ember: ^10.5.5
@@ -53,6 +53,7 @@ specifiers:
   qunit: ^2.17.2
   qunit-dom: ^2.0.0
   superstruct: ^0.15.2
+  tippy.js: ^6.3.7
   uplot: ^1.6.16
   webpack: ^5.53.0
 
@@ -92,7 +93,7 @@ devDependencies:
   ember-resolver: 8.0.3_@babel+core@7.17.10
   ember-source: 3.28.1_@babel+core@7.17.10
   ember-template-lint: 3.7.0
-  ember-tooltips: 3.4.7
+  ember-tippy: 2.0.0_62qtcuvogc5hwgsrtpfntsggc4
   eslint: 7.32.0
   eslint-config-prettier: 8.3.0_eslint@7.32.0
   eslint-plugin-ember: 10.5.5_eslint@7.32.0
@@ -109,6 +110,7 @@ devDependencies:
   qunit: 2.17.2
   qunit-dom: 2.0.0
   superstruct: 0.15.2
+  tippy.js: 6.3.7
   uplot: 1.6.16
   webpack: 5.53.0
 
@@ -1512,6 +1514,21 @@ packages:
       semver: 7.3.7
     dev: true
 
+  /@embroider/macros/0.47.2:
+    resolution: {integrity: sha512-ViNWluJCeM5OPlM3rs8kdOz3RV5rpfXX5D2rDnc/q86xRS0xf4NFEjYRV7W6fBcD0b3v5jSHDTwrjq9Kee4rHg==}
+    engines: {node: 12.* || 14.* || >= 16}
+    dependencies:
+      '@embroider/shared-internals': 0.47.2
+      assert-never: 1.2.1
+      ember-cli-babel: 7.26.11
+      find-up: 5.0.0
+      lodash: 4.17.21
+      resolve: 1.22.0
+      semver: 7.3.7
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
   /@embroider/macros/1.8.3:
     resolution: {integrity: sha512-gnIOfTL/pUkoD6oI7JyWOqXlVIUgZM+CnbH10/YNtZr2K0hij9eZQMdgjOZZVgN0rKOFw9dIREqc1ygrJHRYQA==}
     engines: {node: 12.* || 14.* || >= 16}
@@ -1537,6 +1554,19 @@ packages:
       lodash: 4.17.21
       pkg-up: 3.1.0
       resolve-package-path: 1.2.7
+      semver: 7.3.7
+      typescript-memoize: 1.1.0
+    dev: true
+
+  /@embroider/shared-internals/0.47.2:
+    resolution: {integrity: sha512-SxdZYjAE0fiM5zGDz+12euWIsQZ1tsfR1k+NKmiWMyLhA5T3pNgbR2/Djvx/cVIxOtEavGGSllYbzRKBtV4xMg==}
+    engines: {node: 12.* || 14.* || >= 16}
+    dependencies:
+      babel-import-util: 0.2.0
+      ember-rfc176-data: 0.3.17
+      fs-extra: 9.1.0
+      lodash: 4.17.21
+      resolve-package-path: 4.0.3
       semver: 7.3.7
       typescript-memoize: 1.1.0
     dev: true
@@ -2689,6 +2719,11 @@ packages:
       - supports-color
     dev: true
 
+  /babel-import-util/0.2.0:
+    resolution: {integrity: sha512-CtWYYHU/MgK88rxMrLfkD356dApswtR/kWZ/c6JifG1m10e7tBBrs/366dFzWMAoqYmG5/JSh+94tUSpIwh+ag==}
+    engines: {node: '>= 12.*'}
+    dev: true
+
   /babel-import-util/1.2.2:
     resolution: {integrity: sha512-8HgkHWt5WawRFukO30TuaL9EiDUOdvyKtDwLma4uBNeUSDbOO0/hiPfavrOWxSS6J6TKXfukWHZ3wiqZhJ8ONQ==}
     engines: {node: '>= 12.*'}
@@ -2786,11 +2821,6 @@ packages:
     dependencies:
       '@babel/types': 7.17.10
       lodash: 4.17.21
-    dev: true
-
-  /babel-plugin-htmlbars-inline-precompile/3.2.0:
-    resolution: {integrity: sha512-IUeZmgs9tMUGXYu1vfke5I18yYJFldFGdNFQOWslXTnDWXzpwPih7QFduUqvT+awDpDuNtXpdt5JAf43Q1Hhzg==}
-    engines: {node: 8.* || 10.* || >= 12.*}
     dev: true
 
   /babel-plugin-htmlbars-inline-precompile/5.3.1:
@@ -3349,15 +3379,6 @@ packages:
       - supports-color
     dev: true
 
-  /broccoli-merge-trees/2.0.1:
-    resolution: {integrity: sha512-WjaexJ+I8BxP5V5RNn6um/qDRSmKoiBC/QkRi79FT9ClHfldxRyCDs9mcV7mmoaPlsshmmPaUz5jdtcKA6DClQ==}
-    dependencies:
-      broccoli-plugin: 1.3.1
-      merge-trees: 1.0.1
-    transitivePeerDependencies:
-      - supports-color
-    dev: true
-
   /broccoli-merge-trees/3.0.2:
     resolution: {integrity: sha512-ZyPAwrOdlCddduFbsMyyFzJUrvW6b04pMvDiAQZrCwghlvgowJDY+EfoXn+eR1RRA5nmGHJ+B68T63VnpRiT1A==}
     engines: {node: '>=6.0.0'}
@@ -3400,14 +3421,6 @@ packages:
   /broccoli-node-info/2.2.0:
     resolution: {integrity: sha512-VabSGRpKIzpmC+r+tJueCE5h8k6vON7EIMMWu6d/FyPdtijwLQ7QvzShEw+m3mHoDzUaj/kiZsDYrS8X2adsBg==}
     engines: {node: 8.* || >= 10.*}
-    dev: true
-
-  /broccoli-output-wrapper/2.0.0:
-    resolution: {integrity: sha512-V/ozejo+snzNf75i/a6iTmp71k+rlvqjE3+jYfimuMwR1tjNNRdtfno+NGNQB2An9bIAeqZnKhMDurAznHAdtA==}
-    dependencies:
-      heimdalljs-logger: 0.1.10
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /broccoli-output-wrapper/3.2.5:
@@ -3510,21 +3523,6 @@ packages:
       symlink-or-copy: 1.3.1
     dev: true
 
-  /broccoli-plugin/3.1.0:
-    resolution: {integrity: sha512-7w7FP8WJYjLvb0eaw27LO678TGGaom++49O1VYIuzjhXjK5kn2+AMlDm7CaUFw4F7CLGoVQeZ84d8gICMJa4lA==}
-    engines: {node: 8.* || 10.* || >= 12.*}
-    dependencies:
-      broccoli-node-api: 1.7.0
-      broccoli-output-wrapper: 2.0.0
-      fs-merger: 3.2.1
-      promise-map-series: 0.2.3
-      quick-temp: 0.1.8
-      rimraf: 2.7.1
-      symlink-or-copy: 1.3.1
-    transitivePeerDependencies:
-      - supports-color
-    dev: true
-
   /broccoli-plugin/4.0.7:
     resolution: {integrity: sha512-a4zUsWtA1uns1K7p9rExYVYG99rdKeGRymW0qOCNkvDPHQxVi3yVyJHhQbM3EZwdt2E0mnhr5e0c/bPpJ7p3Wg==}
     engines: {node: 10.* || >= 12.*}
@@ -3607,15 +3605,6 @@ packages:
       rsvp: 4.8.5
       symlink-or-copy: 1.3.1
       walk-sync: 1.1.4
-    transitivePeerDependencies:
-      - supports-color
-    dev: true
-
-  /broccoli-string-replace/0.1.2:
-    resolution: {integrity: sha1-HtkvhWgK+NUDAjkl51Tk4zZ2uR8=}
-    dependencies:
-      broccoli-persistent-filter: 1.4.6
-      minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -5129,28 +5118,6 @@ packages:
       - supports-color
     dev: true
 
-  /ember-cli-htmlbars/4.5.0:
-    resolution: {integrity: sha512-bYJpK1pqFu9AadDAGTw05g2LMNzY8xTCIqQm7dMJmKEoUpLRFbPf4SfHXrktzDh7Q5iggl6Skzf1M0bPlIxARw==}
-    engines: {node: 8.* || 10.* || >= 12.*}
-    dependencies:
-      '@ember/edition-utils': 1.2.0
-      babel-plugin-htmlbars-inline-precompile: 3.2.0
-      broccoli-debug: 0.6.5
-      broccoli-persistent-filter: 2.3.1
-      broccoli-plugin: 3.1.0
-      common-tags: 1.8.2
-      ember-cli-babel-plugin-helpers: 1.1.1
-      fs-tree-diff: 2.0.1
-      hash-for-dep: 1.5.1
-      heimdalljs-logger: 0.1.10
-      json-stable-stringify: 1.0.1
-      semver: 6.3.0
-      strip-bom: 4.0.0
-      walk-sync: 2.2.0
-    transitivePeerDependencies:
-      - supports-color
-    dev: true
-
   /ember-cli-htmlbars/5.7.2:
     resolution: {integrity: sha512-Uj6R+3TtBV5RZoJY14oZn/sNPnc+UgmC8nb5rI4P3fR/gYoyTFIZSXiIM7zl++IpMoIrocxOrgt+mhonKphgGg==}
     engines: {node: 10.* || >= 12.*}
@@ -6016,23 +5983,22 @@ packages:
       - supports-color
     dev: true
 
-  /ember-tooltips/3.4.7:
-    resolution: {integrity: sha512-tTcLi6gteB7N7gHo0LeMNN0k++lPpNNqf1aeho8dqs/0MV0LwUdf6GgzP6Urf92pvF50aw2lZcpd4FVRz5+XbQ==}
-    engines: {node: 8.* || >= 10.*}
+  /ember-tippy/2.0.0_62qtcuvogc5hwgsrtpfntsggc4:
+    resolution: {integrity: sha512-nMCZwOJF6CF0XkfOs3NTt35hBm+927Y8PYntFCCNO0cdcOe840kWftr6j82DokDjvIdAZKhCV3cMmiOpdbDYYg==}
+    engines: {node: 12.* || 14.* || >= 16}
+    peerDependencies:
+      tippy.js: ^6.0.0
     dependencies:
-      broccoli-file-creator: 2.1.1
-      broccoli-funnel: 2.0.2
-      broccoli-merge-trees: 2.0.1
-      broccoli-source: 2.1.2
-      broccoli-string-replace: 0.1.2
+      '@embroider/macros': 0.47.2
+      ember-auto-import: 2.4.2_webpack@5.53.0
       ember-cli-babel: 7.26.11
-      ember-cli-htmlbars: 4.5.0
-      ember-in-element-polyfill: 1.0.1
-      popper.js: 1.16.1
-      resolve: 1.22.0
-      tooltip.js: 1.3.3
+      ember-cli-htmlbars: 5.7.2
+      ember-modifier: 3.2.7_@babel+core@7.17.10
+      tippy.js: 6.3.7
     transitivePeerDependencies:
+      - '@babel/core'
       - supports-color
+      - webpack
     dev: true
 
   /emoji-regex/8.0.0:
@@ -8808,19 +8774,6 @@ packages:
     resolution: {integrity: sha512-abv/qOcuPfk3URPfDzmZU1LKmuw8kT+0nIHvKrKgFrwifol/doWcdA4ZqsWQ8ENrFKkd67Mfpo/LovbIUsbt3w==}
     dev: true
 
-  /merge-trees/1.0.1:
-    resolution: {integrity: sha1-zL5nRWl4f53vF/1G5lJfVwC70j4=}
-    dependencies:
-      can-symlink: 1.0.0
-      fs-tree-diff: 0.5.9
-      heimdalljs: 0.2.6
-      heimdalljs-logger: 0.1.10
-      rimraf: 2.7.1
-      symlink-or-copy: 1.3.1
-    transitivePeerDependencies:
-      - supports-color
-    dev: true
-
   /merge-trees/2.0.0:
     resolution: {integrity: sha512-5xBbmqYBalWqmhYm51XlohhkmVOua3VAUrrWh8t9iOkaLpS6ifqm/UVuUjQCeDVJ9Vx3g2l6ihfkbLSTeKsHbw==}
     dependencies:
@@ -9703,11 +9656,6 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       find-up: 3.0.0
-    dev: true
-
-  /popper.js/1.16.1:
-    resolution: {integrity: sha512-Wb4p1J4zyFTbM+u6WuO4XstYx4Ky9Cewe4DWrel7B0w6VVICvPwdOpotjzcf6eD8TsckVnIMNONQyPIUFOUbCQ==}
-    deprecated: You can find the new Popper v2 at @popperjs/core, this package is dedicated to the legacy v1
     dev: true
 
   /portfinder/1.0.28:
@@ -11431,6 +11379,12 @@ packages:
       - supports-color
     dev: true
 
+  /tippy.js/6.3.7:
+    resolution: {integrity: sha512-E1d3oP2emgJ9dRQZdf3Kkn0qJgI6ZLpyS5z6ZkY1DF3kaQaBsGZsndEpHwx+eC+tYM41HaSNvNtLx8tU57FzTQ==}
+    dependencies:
+      '@popperjs/core': 2.11.5
+    dev: true
+
   /tmp/0.0.28:
     resolution: {integrity: sha1-Fyc1t/YU6nrzlmT6hM8N5OUV0SA=}
     engines: {node: '>=0.4.0'}
@@ -11512,13 +11466,6 @@ packages:
   /toidentifier/1.0.1:
     resolution: {integrity: sha512-o5sSPKEkg/DIQNmH43V0/uerLrpzVedkUh8tGNvaeXpfpuwjKenlSox/2O/BTlZUtEe+JG7s5YhEz608PlAHRA==}
     engines: {node: '>=0.6'}
-    dev: true
-
-  /tooltip.js/1.3.3:
-    resolution: {integrity: sha512-XWWuy/dBdF/F/YpRE955yqBZ4VdLfiTAUdOqoU+wJm6phJlMpEzl/iYHZ+qJswbeT9VG822bNfsETF9wzmoy5A==}
-    deprecated: Tooltip.js is not supported anymore, please migrate to tippy.js
-    dependencies:
-      popper.js: 1.16.1
     dev: true
 
   /tr46/0.0.3:

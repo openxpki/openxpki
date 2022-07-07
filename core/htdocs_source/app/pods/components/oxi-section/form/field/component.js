@@ -21,15 +21,22 @@ export default class OxiFieldMainComponent extends Component {
         return `oxi-section/form/field/${this.args.field.type}`;
     }
 
-    // Options for <EmberTooltip>, i.e. Popper.js
-    // See https://popper.js.org/docs/v1/#modifiers..preventOverflow
+    /*
+     * Options for <Tippy>, i.e. Popper.js
+     * See
+     *   https://atomiks.github.io/tippyjs/v6/all-props/#popperoptions and
+     *   https://popper.js.org/docs/v2/modifiers/prevent-overflow/
+     */
     get popperOptions() {
         return {
-            modifiers: {
-                preventOverflow: {
-                    escapeWithReference: false,
-                }
-            }
+            modifiers: [
+                {
+                    name: 'preventOverflow',
+                    options: {
+                        tether: false, // allow Popper to leave its overflow area to always stick with reference?
+                    },
+                },
+            ],
         }
     }
 

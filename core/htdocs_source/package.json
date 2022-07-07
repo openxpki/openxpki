@@ -62,7 +62,7 @@
     "ember-resolver": "^8.0.3",
     "ember-source": "~3.28.1",
     "ember-template-lint": "^3.7.0",
-    "ember-tooltips": "^3.4.7",
+    "ember-tippy": "^2.0.0",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-ember": "^10.5.5",
@@ -79,6 +79,7 @@
     "qunit": "^2.17.2",
     "qunit-dom": "^2.0.0",
     "superstruct": "^0.15.2",
+    "tippy.js": "^6.3.7",
     "uplot": "^1.6.16",
     "webpack": "^5.53.0"
   },

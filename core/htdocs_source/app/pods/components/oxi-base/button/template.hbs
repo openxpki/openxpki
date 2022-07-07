@@ -6,7 +6,7 @@
         target="{{@button.target}}"
     >
         {{#if @button.tooltip}}
-            <EmberTooltip>{{@button.tooltip}}</EmberTooltip>
+            <Tippy>{{@button.tooltip}}</Tippy>
         {{/if}}
         {{#if @button.image}}
             <img src={{@button.image}}/>
@@ -24,7 +24,7 @@
         disabled={{@button.disabled}}
     >
         {{#if @button.tooltip}}
-            <EmberTooltip>{{@button.tooltip}}</EmberTooltip>
+            <Tippy>{{@button.tooltip}}</Tippy>
         {{/if}}
         {{#if @button.image}}
             <img src={{@button.image}}/>

@@ -11,22 +11,25 @@
                 <div class="col-auto p-0">
                     <span class="glyphicon glyphicon-info-sign text-primary oxi-tooltip-icon {{unless @field.tooltip "d-none"}}">
                         {{! Show a tooltip on tab focus or mouseover }}
-                        <EmberTooltip
-                            @popperContainer="body"
+                        <Tippy
                             @popperOptions={{this.popperOptions}}
-                            @side="top-start"
+                            @placement="top-start"
                         >
                             {{@field.tooltip}}
-                        </EmberTooltip>
-                        {{!
-                            To show tooltip on mouseover, but NOT on (tab) focus:
-                                <EmberTooltip @event="focus" @showOn="mouseenter" @hideOn="mouseleave">
+                        </Tippy>
+                        {{!--
 
-                            Due to a bug in EmberTooltip we have to set @event="focus" although we
-                            do NOT want the tooltip to show on focus - uuh ooh.
-                            In EmberTooltip's code @event is overridden by @showOn and @hideOn but setting
-                            it is necessary to prevent the automatic addition of a 'focusin' event listener.
-                        }}
+                        NOTE:
+                          ember-tippy is better configurable and the display seems more stable.
+                          (BsTooltip tooltips sometimes flicker)
+
+                        <BsTooltip
+                            @popperConfig={{this.getPopperOptions}}
+                            @placement="top"
+                        >
+                            {{@field.tooltip}}
+                        </BsTooltip>
+                        --}}
                     </span>
                 </div>
             {{/if}}
