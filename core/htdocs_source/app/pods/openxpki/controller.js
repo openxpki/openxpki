@@ -2,14 +2,14 @@ import Controller from '@ember/controller';
 import { tracked } from '@glimmer/tracking';
 import { action, computed, set } from '@ember/object';
 import { gt } from '@ember/object/computed';
-import { inject } from '@ember/service';
+import { service } from '@ember/service';
 import lite from 'caniuse-lite';
 import { detect } from 'detect-browser'
 
 export default class OpenXpkiController extends Controller {
-    @inject('oxi-config') config;
-    @inject('oxi-content') content;
-    @inject router;
+    @service('oxi-config') config;
+    @service('oxi-content') content;
+    @service router;
 
     /*
       Reserved Ember property:

@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
-import { inject } from '@ember/service';
+import { service } from '@ember/service';
 
 export default class ApplicationFooter extends Component {
-    @inject('oxi-config') config;
+    @service('oxi-config') config;
 }

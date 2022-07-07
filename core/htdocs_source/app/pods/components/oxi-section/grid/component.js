@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { inject } from '@ember/service';
+import { service } from '@ember/service';
 import { action, computed, set, setProperties } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 
@@ -15,7 +15,7 @@ import { tracked } from '@glimmer/tracking';
  * @module component/oxi-section/grid
  */
 export default class OxiSectionGridComponent extends Component {
-    @inject('oxi-content') content;
+    @service('oxi-content') content;
 
     @tracked rawData = [];
     @tracked pager = {};

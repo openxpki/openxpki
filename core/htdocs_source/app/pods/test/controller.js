@@ -1,7 +1,7 @@
 import Controller from '@ember/controller';
 import { action } from "@ember/object";
 import { tracked } from '@glimmer/tracking';
-import { inject } from '@ember/service';
+import { service } from '@ember/service';
 import Pretender from 'pretender';
 import section_chart from './section-chart';
 import section_form from './section-form';
@@ -10,7 +10,7 @@ import section_keyvalue from './section-keyvalue';
 import section_tiles from './section-tiles';
 
 export default class TestController extends Controller {
-    @inject('oxi-locale') oxiLocale;
+    @service('oxi-locale') oxiLocale;
 
     constructor() {
         super(...arguments);

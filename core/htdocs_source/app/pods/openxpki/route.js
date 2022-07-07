@@ -1,6 +1,6 @@
 import Route from '@ember/routing/route';
 import { tracked } from '@glimmer/tracking';
-import { inject } from '@ember/service';
+import { service } from '@ember/service';
 import { Promise } from 'rsvp';
 import { debug } from '@ember/debug';
 
@@ -8,8 +8,8 @@ import { debug } from '@ember/debug';
  * @module route/openxpki
  */
 export default class OpenXpkiRoute extends Route {
-    @inject('oxi-config') config;
-    @inject('oxi-content') content;
+    @service('oxi-config') config;
+    @service('oxi-content') content;
 
     // Reserved Ember property "queryParams"
     // https://api.emberjs.com/ember/3.17/classes/Route/properties/queryParams?anchor=queryParams

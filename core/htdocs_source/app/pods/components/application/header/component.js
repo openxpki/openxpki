@@ -1,7 +1,7 @@
 import Component from '@glimmer/component';
-import { inject } from '@ember/service';
+import { service } from '@ember/service';
 
 export default class ApplicationHeader extends Component {
-    @inject('oxi-config') config;
-    @inject('oxi-content') content;
+    @service('oxi-config') config;
+    @service('oxi-content') content;
 }

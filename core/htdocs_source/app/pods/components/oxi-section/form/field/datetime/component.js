@@ -1,11 +1,11 @@
 import Component from '@glimmer/component';
 import { action, computed } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
-import { inject } from '@ember/service';
+import { service } from '@ember/service';
 import { DateTime, SystemZone } from 'luxon';
 
 export default class OxiFieldDatetimeComponent extends Component {
-    @inject('oxi-locale') oxiLocale;
+    @service('oxi-locale') oxiLocale;
 
     date;
     flatpickr; // reference to the JS object

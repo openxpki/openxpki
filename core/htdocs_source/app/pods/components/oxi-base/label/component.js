@@ -1,7 +1,7 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
-import { inject } from '@ember/service';
+import { service } from '@ember/service';
 
 /**
  * Shows a label (a text) and escapes special characters.
@@ -18,8 +18,8 @@ import { inject } from '@ember/service';
  * @module component/oxi-base/label
  */
 export default class OxiLabelComponent extends Component {
-    @inject('oxi-content') content;
-    @inject('oxi-config') config;
+    @service('oxi-content') content;
+    @service('oxi-config') config;
 
     @tracked tooltipContent = null;
 

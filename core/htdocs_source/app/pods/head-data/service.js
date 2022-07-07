@@ -1,7 +1,7 @@
-import Service, { inject } from '@ember/service';
+import Service, { service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
-// import { inject } from '@ember/service';
+// import { service } from '@ember/service';
 
 export default class HeadDataService extends Service {
-    @inject('oxi-config') config;
+    @service('oxi-config') config;
 }

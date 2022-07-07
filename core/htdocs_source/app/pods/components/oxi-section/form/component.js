@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import { action } from "@ember/object";
 import { tracked } from '@glimmer/tracking';
 import { isArray } from '@ember/array';
-import { inject } from '@ember/service';
+import { service } from '@ember/service';
 import { debug } from '@ember/debug';
 
 /*
@@ -122,8 +122,8 @@ class Field {
  * @module component/oxi-section/form
  */
 export default class OxiSectionFormComponent extends Component {
-    @inject('intl') intl;
-    @inject('oxi-content') content;
+    @service('intl') intl;
+    @service('oxi-content') content;
 
     @tracked loading = false;
     @tracked fields = [];

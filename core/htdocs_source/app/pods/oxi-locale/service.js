@@ -1,9 +1,9 @@
 import Service from '@ember/service';
-import { inject } from '@ember/service';
+import { service } from '@ember/service';
 import { debug } from '@ember/debug';
 
 export default class OxiLocaleService extends Service {
-    @inject('intl') intl;
+    @service('intl') intl;
 
     _locale = null;
 

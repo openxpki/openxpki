@@ -3,11 +3,11 @@ import { tracked  } from '@glimmer/tracking';
 import { action, set } from '@ember/object';
 import { scheduleOnce } from '@ember/runloop';
 import { isArray } from '@ember/array';
-import { inject } from '@ember/service';
+import { service } from '@ember/service';
 
 export default class OxiFieldTextComponent extends Component {
-    @inject('intl') intl;
-    @inject('oxi-content') content;
+    @service('intl') intl;
+    @service('oxi-content') content;
 
     /*
      * Note: the search input field is two-fold:

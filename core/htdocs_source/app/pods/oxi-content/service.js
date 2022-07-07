@@ -1,5 +1,5 @@
 import Service from '@ember/service';
-import { inject } from '@ember/service';
+import { service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { later, cancel } from '@ember/runloop';
 import { isArray } from '@ember/array';
@@ -14,11 +14,11 @@ import fetch from 'fetch';
  * @module service/oxi-content
  */
 export default class OxiContentService extends Service {
-    @inject router;
-    @inject('intl') intl;
-    @inject('oxi-config') oxiConfig;
-    @inject('oxi-locale') oxiLocale;
-    @inject('oxi-backend') backend;
+    @service router;
+    @service('intl') intl;
+    @service('oxi-config') oxiConfig;
+    @service('oxi-locale') oxiLocale;
+    @service('oxi-backend') backend;
 
     @tracked user = null;
     @tracked page = null;
