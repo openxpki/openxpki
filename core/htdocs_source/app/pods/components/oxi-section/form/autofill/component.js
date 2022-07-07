@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import { action } from "@ember/object";
 import { inject } from '@ember/service';
 import { debug } from '@ember/debug';
-import { assert, optional, union, enums, object, type, boolean, string } from 'superstruct';
+//import { assert, optional, union, enums, object, type, boolean, string } from 'superstruct';
 
 /**
  * Implements autofill functionality, e.g. shows a button and sends a request
@@ -41,12 +41,13 @@ export default class Autofill extends Component {
     constructor() {
         super(...arguments);
 
-        /*
-        NOTE: we could also use one of these type checkers:
+// TODO Reactivate type checking (with "superstruct", not "ow"!) once we drop IE11 support
+/*
+        NOTE: we could also use one of these:
           https://www.npmjs.com/package/joi
           https://www.npmjs.com/package/yup (too many issues?)
           https://www.npmjs.com/package/ajv (too bloated? - but good quality)
-        */
+
         // type validation
         assert(this.args.config, object({
             'request': object({
@@ -62,6 +63,7 @@ export default class Autofill extends Component {
             'autorun': optional(union(boolean(), enums([0, 1, '0', '1']))),
             'button_label': optional(string()),
         }));
+*/
 
         // Config
         this.request = this.args.config.request;
