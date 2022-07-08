@@ -5,21 +5,12 @@
 // https://github.com/leeoniya/uPlot/blob/1.6.4/src/domClasses.js
 const pre = 'u-';
 const UPLOT          =       'uplot';
-const ORI_HZ         = pre + 'hz';
-const ORI_VT         = pre + 'vt';
 const TITLE          = pre + 'title';
 const WRAP           = pre + 'wrap';
 const UNDER          = pre + 'under';
 const OVER           = pre + 'over';
-const OFF            = pre + 'off';
-const SELECT         = pre + 'select';
-const CURSOR_X       = pre + 'cursor-x';
-const CURSOR_Y       = pre + 'cursor-y';
-const CURSOR_PT      = pre + 'cursor-pt';
 const LEGEND         = pre + 'legend'
-const LEGEND_LIVE    = pre + 'live';
 const LEGEND_INLINE  = pre + 'inline';
-const LEGEND_THEAD   = pre + 'thead';
 const LEGEND_SERIES  = pre + 'series';
 const LEGEND_MARKER  = pre + 'marker';
 const LEGEND_LABEL   = pre + 'label';
@@ -74,9 +65,7 @@ export default function ChartPie(element, opts, data) {
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
 
     const wrap = placeDiv(WRAP, root);
-    const under = placeDiv(UNDER, wrap);
     wrap.appendChild(svg);
-    const over = placeDiv(OVER, wrap);
 
     wrap.style.width = opts.width + 'px';
     wrap.style.height = opts.height + 'px';
@@ -87,7 +76,7 @@ export default function ChartPie(element, opts, data) {
 
     let filled = 0;
     for (let row of data) {
-        let time = row.shift();
+        row.shift(); // time
         for (let i=0; i<row.length; i++) {
             let circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle'),
                 startAngle = -90,
