@@ -39,7 +39,7 @@ export default class OxiFieldTextComponent extends Component {
             }
             let params;
             if (params = content.autocomplete_query?.params) {
-                if (Object.prototype.toString.call(params) !== '[object Object]')
+                if (Object.prototype.toString.call(params) != '[object Object]')
                     throw new Error(`oxi-section/form/field/text: parameter "autocomplete_query.params" must be a hash`);
 
                 for (const [param_name, ref_field] of Object.entries(params)) {
