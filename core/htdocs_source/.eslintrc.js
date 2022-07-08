@@ -9,6 +9,11 @@ module.exports = {
     ecmaFeatures: {
       legacyDecorators: true,
     },
+    babelOptions: {
+      "plugins": [
+        [ "@babel/plugin-syntax-decorators", { version: '2021-12' } ],
+      ],
+    },
     requireConfigFile: false,
   },
   plugins: ['ember'],
