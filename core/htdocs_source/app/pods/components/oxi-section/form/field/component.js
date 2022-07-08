@@ -1,7 +1,6 @@
 import Component from '@glimmer/component';
 import { action } from "@ember/object";
 import { service } from '@ember/service';
-import { debug } from '@ember/debug';
 
 export default class OxiFieldMainComponent extends Component {
     @service('oxi-backend') backend;

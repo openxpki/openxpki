@@ -2,7 +2,6 @@ import Component from '@glimmer/component';
 import { tracked  } from '@glimmer/tracking';
 import { action, set } from '@ember/object';
 import { scheduleOnce } from '@ember/runloop';
-import { isArray } from '@ember/array';
 import { service } from '@ember/service';
 
 export default class OxiFieldTextComponent extends Component {
@@ -37,8 +36,8 @@ export default class OxiFieldTextComponent extends Component {
             if (content.autocomplete_query?.action === undefined) {
                 throw new Error(`oxi-section/form/field/text: parameter "autocomplete_query.action" missing`);
             }
-            let params;
-            if (params = content.autocomplete_query?.params) {
+            let params = content.autocomplete_query?.params;
+            if (params) {
                 if (Object.prototype.toString.call(params) != '[object Object]')
                     throw new Error(`oxi-section/form/field/text: parameter "autocomplete_query.params" must be a hash`);
 

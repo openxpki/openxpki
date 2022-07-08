@@ -70,7 +70,7 @@ class Field {
         let instance = new this(); // "this" in static methods refers to class
         for (const attr of Object.keys(sourceHash)) {
             // @tracked properties are prototype properties, the others instance properties
-            if (! (this.prototype.hasOwnProperty(attr) || instance.hasOwnProperty(attr))) {
+            if (! (Object.prototype.hasOwnProperty.call(Object.getPrototypeOf(this), attr) || Object.prototype.hasOwnProperty.call(instance, attr))) {
                 /* eslint-disable-next-line no-console */
                 console.error(
                     `oxi-section/form: unknown property "${attr}" in field "${sourceHash.name}". ` +

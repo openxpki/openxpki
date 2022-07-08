@@ -1,6 +1,5 @@
 import Component from '@glimmer/component';
 import { action } from "@ember/object";
-import { debug } from '@ember/debug';
 import { guidFor } from '@ember/object/internals';
 
 import ChartPie from './chart-pie';
