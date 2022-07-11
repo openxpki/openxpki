@@ -377,18 +377,18 @@ export default class OxiSectionFormComponent extends Component {
         return this.args.def.fields.filter(this.hiddenFieldFilter).length;
     }
 
-    /*
-    Sub components of oxi-section/form/field should call this by using the
-    modifier
-      {{may-focus this true}} or
-      {{may-focus this false}}
-    depending on if it is an editable input field that may sensibly receive
-    the focus.
-    If it is editable, {{may-focus...}} has to be attached to the DOM element
-    that shall receive the input focus.
-    */
+    /**
+     * Sub components of oxi-section/form/field should call this by using the
+     * modifier
+     *   {{on-init @setFocusInfo true}} or
+     *   {{on-init @setFocusInfo false}}
+     * depending on if it is an editable input field that may sensibly receive
+     * the focus.
+     * If it is editable, {{on-init @setFocusInfo true}} has to be attached to the DOM element
+     * that shall receive the input focus.
+     */
     @action
-    setFocusInfo(field, mayFocus, element) { // 'field' is injected in our template via (fn ...)
+    setFocusInfoFor(field, element, mayFocus) { // 'field' is injected in our template via (fn ...)
         /*
          * A) Focus for newly added clone fields
          */
@@ -427,7 +427,7 @@ export default class OxiSectionFormComponent extends Component {
                 // Wrap the focus() in a setTimeout() as otherwise Ember will complain
                 // > You attempted to update `hoverState` on `<wrapperClass:ember197>`,
                 // > but it had already been used previously in the same computation.
-                // Obviously our {{may-focus}} modifier gets triggered by focus changes.
+                // Obviously our {{on-init @setFocusInfo ...}} modifier gets triggered by focus changes.
                 setTimeout(() => elementToFocus.focus(), 1);
                 return;
             }

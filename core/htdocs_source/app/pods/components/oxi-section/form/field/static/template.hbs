@@ -1,5 +1,5 @@
 <!-- components/oxi-section/form/field/static -->
-<div class="oxi-no-input" {{may-focus this false}}>
+<div class="oxi-no-input" {{on-init @setFocusInfo false}}>
     {{#if @content.verbose}}
         {{{@content.verbose}}}
     {{else if @content.value}}

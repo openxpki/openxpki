@@ -1,6 +1,6 @@
 {{!--
-The top HTML element in the template of this component has to be <select>
-as otherwise the calling components' use of {{may-focus}} would not work.
+The top HTML element this template has to be <select> as otherwise the calling
+components' use of {{on-init @setFocusInfo ...}} would not work.
 --}}
 <select ...attributes class="form-control form-select" {{on "change" this.listChanged}} {{on-init this.startup}}>
     {{#each @list as |item|}}

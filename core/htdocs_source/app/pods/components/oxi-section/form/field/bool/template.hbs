@@ -5,7 +5,7 @@
         checked={{@content.value}}
         id={{@content.name}}
         {{on "change" this.onInput}}
-        {{may-focus this false}}
+        {{on-init @setFocusInfo false}}
     />
     <label class="form-check-label" for={{@content.name}}>
         {{@content.label}}

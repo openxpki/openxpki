@@ -1,6 +1,10 @@
 <!-- components/oxi-section/form/field/select -->
 {{#if this.isStatic}}
-    <div class="oxi-no-input" {{may-focus this false}}>{{@content.options.0.label}}</div>
+    <div class="oxi-no-input"
+        {{on-init @setFocusInfo false}}
+    >
+        {{@content.options.0.label}}
+    </div>
 {{else if @content.editable}}
     <div class="input-group has-validation">
         {{#if this.customMode}}
@@ -12,7 +16,7 @@
                 required={{not @content.is_optional}}
                 {{on "input" this.onCustomInput}}
                 {{on-init this.onCustomInsert}}
-                {{may-focus this true}}
+                {{on-init @setFocusInfo true}}
             />
         {{else}}
             <OxiBase::Select
@@ -20,7 +24,7 @@
                 @selected={{this.sanitizedValue}}
                 @onChange={{this.optionSelected}}
                 required={{not @content.is_optional}}
-                {{may-focus this true}}
+                {{on-init @setFocusInfo true}}
             />
         {{/if}}
         <BsButton
@@ -39,7 +43,7 @@
         @selected={{this.sanitizedValue}}
         @onChange={{this.optionSelected}}
         required={{not @content.is_optional}}
-        {{may-focus this true}}
+        {{on-init @setFocusInfo true}}
     />
     <div class="invalid-feedback">{{@error}}</div>
 {{/if}}

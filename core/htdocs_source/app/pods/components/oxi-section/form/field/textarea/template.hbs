@@ -12,7 +12,7 @@
             {{on "input" this.onInput}}
             {{on "drop" this.fileDropped}}
             {{on "dragover" this.showCopyEffect}}
-            {{may-focus this true}}
+            {{on-init @setFocusInfo true}}
         />
         <div class="invalid-feedback">{{@error}}</div>
     </div>

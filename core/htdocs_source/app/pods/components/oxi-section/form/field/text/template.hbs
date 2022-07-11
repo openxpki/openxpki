@@ -14,7 +14,7 @@
         {{on "focus" this.onFocus}}
         {{on "blur" this.onBlur}}
         {{on "paste" this.onPaste}}
-        {{may-focus this true}}
+        {{on-init @setFocusInfo true}}
     />
     <div class="invalid-feedback">{{@error}}</div>
 

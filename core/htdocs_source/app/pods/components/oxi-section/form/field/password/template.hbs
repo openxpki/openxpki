@@ -6,6 +6,6 @@
     placeholder={{@content.placeholder}}
     required={{not @content.is_optional}}
     {{on "input" this.onInput}}
-    {{may-focus this true}}
+    {{on-init @setFocusInfo true}}
 />
 <div class="invalid-feedback">{{@error}}</div>
