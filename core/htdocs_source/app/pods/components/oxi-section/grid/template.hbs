@@ -6,7 +6,7 @@
                 @pager={{@def.pager}}
                 @pages={{this.pages}}
                 @pagesizes={{this.pagesizes}}
-                @setPage={{this.setPage}}
+                @setPage={{this.updatePage}}
             />
         </div>
     </div>
@@ -17,7 +17,7 @@
         <thead>
             <tr>
                 {{#if this.isBulkable}}
-                    <th {{action "select"}}>
+                    <th {{on "click" this.selectAll}}>
                         <span class="oxi-checkbox {{if this.allChecked "checked"}}"></span>
                         {{t 'component.oxisection_grid.select_all'}}
                     </th>
@@ -55,7 +55,7 @@
             {{#each this.sortedData as |row index|}}
                 <tr class="context {{row.className}}" role={{if this.hasAction "button"}}>
                     {{#if this.isBulkable}}
-                        <td {{action "select" row}}>
+                        <td {{on "click" (fn this.select row)}}>
                             <span class="oxi-checkbox {{if row.checked "checked"}}"></span>
                         </td>
                     {{/if}}
@@ -121,7 +121,7 @@
                 @pager={{@def.pager}}
                 @pages={{this.pages}}
                 @pagesizes={{this.pagesizes}}
-                @setPage={{this.setPage}}
+                @setPage={{this.updatePage}}
             />
         {{/if}}
     </div>
