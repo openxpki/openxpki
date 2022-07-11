@@ -10,15 +10,13 @@
 <BsNavbar
     @backgroundColor="secondary"
     class="py-2 py-lg-0 mb-3 bg-opacity-10 border-2 border-bottom border-secondary"
-    @collapsed={{true}}
-    @onCollapse={{action (mut this.collapsed) true}}
-    @onExpand={{action (mut this.collapsed) false}}
     as |navbar|
 >
     <navbar.toggle toggle={{true}} />
     <navbar.content id="oxi-navbar">
         <navbar.nav class="me-auto" as |nav|>
             {{#each this.model.navEntries as |navEntry|}}
+                {{!-- sub menu --}}
                 {{#if navEntry.entries.length}}
                     <nav.dropdown class="mx-2" as |dd|>
                         <dd.toggle>
@@ -31,7 +29,11 @@
                                     {{#if entry.key}}
                                         {{! We need the href in addition to the click handler to support
                                             opening the page in a new window }}
-                                        <a class="dropdown-item" href="{{url-for "openxpki" entry.key}}" {{on "click" (fn this.navigateTo entry.key)}}>
+                                        <a
+                                            class="dropdown-item"
+                                            href="{{url-for "openxpki" entry.key}}"
+                                            {{on "click" (fn this.navigateTo entry.key navbar.collapse)}}
+                                        >
                                             {{entry.label}}
                                         </a>
                                     {{else}}
@@ -45,9 +47,14 @@
                             {{/each}}
                         </dd.menu>
                     </nav.dropdown>
+                {{!-- plain menu item --}}
                 {{else}}
                     <nav.item class="mx-2">
-                        <a class="nav-link" href="{{url-for "openxpki" navEntry.key}}" {{on "click" (fn this.navigateTo navEntry.key)}}>
+                        <a
+                            class="nav-link"
+                            href="{{url-for "openxpki" navEntry.key}}"
+                            {{on "click" (fn this.navigateTo navEntry.key navbar.collapse)}}
+                        >
                             {{navEntry.label}}
                         </a>
                     </nav.item>
