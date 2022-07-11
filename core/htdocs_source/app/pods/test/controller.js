@@ -21,7 +21,7 @@ export default class TestController extends Controller {
          */
         const server = new Pretender(function() {
             // simulate localconfig.yaml
-            this.get('/openxpki/localconfig.yaml', request => [
+            this.get('/openxpki/localconfig.yaml', request => [ // eslint-disable-line ember/classic-decorator-no-classic-methods
                     200,
                     { "Content-type": "application/yaml" },
                     'header: |-' + "\n" +
@@ -43,7 +43,7 @@ export default class TestController extends Controller {
             /* ************************
              * GET requests
              */
-            this.get('/openxpki/cgi-bin/webui.fcgi', req => {
+            this.get('/openxpki/cgi-bin/webui.fcgi', req => { // eslint-disable-line ember/classic-decorator-no-classic-methods
                 console.info(`MOCKUP SERVER> GET request: ${req.url}`);
                 console.info(Object.entries(req.queryParams).map(e => `MOCKUP SERVER> ${e[0]} = ${e[1]}`).join("\n"));
                 console.debug(req);
@@ -89,7 +89,7 @@ export default class TestController extends Controller {
             /*
              * Autofill
              */
-            this.get('/autofill', req => {
+            this.get('/autofill', req => { // eslint-disable-line ember/classic-decorator-no-classic-methods
                 console.info(`MOCKUP SERVER> autofill request`);
                 console.info(Object.entries(req.queryParams).map(e => `MOCKUP SERVER> ${e[0]} = ${e[1]}`).join("\n"));
                 console.debug(req);
