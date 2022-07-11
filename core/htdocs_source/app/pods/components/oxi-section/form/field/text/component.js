@@ -70,10 +70,7 @@ export default class OxiFieldTextComponent extends Component {
         let newCursorPos = inputField.selectionStart + pasteCleaned.length;
 
         // put cursor into right position after Ember rendered all updates
-        scheduleOnce('afterRender', this, () => {
-            inputField.focus();
-            inputField.setSelectionRange(newCursorPos, newCursorPos);
-        });
+        scheduleOnce('afterRender', this, this.setCursorPos, inputField, newCursorPos);
 
         let value =
             oldVal.slice(0, inputField.selectionStart) +
@@ -82,6 +79,11 @@ export default class OxiFieldTextComponent extends Component {
 
         this.setValue(value);
         event.preventDefault();
+    }
+
+    setCursorPos(inputField, pos) {
+        inputField.focus()
+        inputField.setSelectionRange(pos, pos);
     }
 
     setValue(value, runAutocomplete = true) {
