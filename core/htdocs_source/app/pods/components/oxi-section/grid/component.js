@@ -18,6 +18,7 @@ class Pager {
     @tracked pagesizes
     @tracked pagersize
     @tracked pagerurl
+    @tracked disabled = false
 
     fillFromHash(sourceHash) {
         for (const attr of Object.keys(sourceHash)) {
