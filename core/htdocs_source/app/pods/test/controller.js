@@ -84,7 +84,7 @@ export default class TestController extends Controller {
                 }
 
                 return emptyResponse();
-            });
+            }, 1000);
 
             /*
              * Autofill
