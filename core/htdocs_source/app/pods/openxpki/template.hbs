@@ -146,13 +146,18 @@
                 <ul class="nav nav-tabs mb-3">
                     {{#each this.model.tabs as |entry|}}
                         <li class="nav-item">
-                            <a class="nav-link {{if entry.active "active"}}" {{on "click" (fn this.activateTab entry)}} href="#">
-                                {{if entry.page.shortlabel entry.page.shortlabel entry.page.label}}
-                                <span class="tab-close" {{on "click" (fn this.closeTab entry)}} role="button">
-                                    {{!-- template-lint-disable no-bare-strings --}}
-                                    &times;
-                                </span>
-                            </a>
+                            <div class="nav-link {{if entry.active "active bg-primary bg-opacity-10"}}">
+                                <div class="btn-group" role="group">
+                                    <button class="btn" type="button" {{on "click" (fn this.activateTab entry)}}>
+                                        {{if entry.page.shortlabel entry.page.shortlabel entry.page.label}}
+                                    </button>
+                                    {{#if entry.active}}
+                                        <button class="btn" type="button" {{on "click" (fn this.closeTab entry)}}>
+                                            <i class="glyphicon glyphicon-remove"></i>
+                                        </button>
+                                    {{/if}}
+                                </div>
+                            </div>
                         </li>
                     {{/each}}
                 </ul>
