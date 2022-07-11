@@ -17,7 +17,7 @@
         <thead>
             <tr>
                 {{#if this.isBulkable}}
-                    <th {{on "click" this.selectAll}}>
+                    <th {{on "click" this.selectAll}} role="button">
                         <span class="oxi-checkbox {{if this.allChecked "checked"}}"></span>
                         {{t 'component.oxisection_grid.select_all'}}
                     </th>
@@ -27,7 +27,7 @@
                 {{/if}}
                 {{#each this.formattedColumns as |column|}}
                     {{#if column.sortable}}
-                        <th {{on "click" (fn this.sort column.sortPage)}} class="sortable {{if column.isSorted "bg-secondary text-white"}}">
+                        <th {{on "click" (fn this.sort column.sortPage)}} class="sortable {{if column.isSorted "bg-secondary text-white"}}" role="button">
                             <span>{{column.sTitle}}</span>
                             {{#if column.isSorted}}
                                 <button type="button" class="btn btn-light btn-sm float-end">
@@ -55,7 +55,7 @@
             {{#each this.sortedData as |row index|}}
                 <tr class="context {{row.className}}" role={{if this.hasAction "button"}}>
                     {{#if this.isBulkable}}
-                        <td {{on "click" (fn this.select row)}}>
+                        <td {{on "click" (fn this.select row)}} role="button">
                             <span class="oxi-checkbox {{if row.checked "checked"}}"></span>
                         </td>
                     {{/if}}
@@ -66,16 +66,15 @@
                                 <dd.menu @renderInPlace={{false}} as |ddm|>
                                     {{#each @def.actions as |action|}}
                                         <ddm.item>
-                                            <a
+                                            <button
                                                 class="dropdown-item"
-                                                role="button"
                                                 {{on "click" (fn this.executeAction row action)}}
                                             >
                                                 {{action.label}}
                                                 {{#if action.icon}}
                                                     <span class="float-end glyphicon glyphicon-{{action.icon}}"></span>
                                                 {{/if}}
-                                            </a>
+                                            </button>
                                         </ddm.item>
                                     {{/each}}
                                 </dd.menu>
@@ -83,7 +82,7 @@
                         </td>
                     {{/if}}
                     {{#each row.data as |value|}}
-                        <td {{on "click" (fn this.executeAction row this.firstAction)}}>
+                        <td {{on "click" (fn this.executeAction row this.firstAction)}} role="button">
                             <OxiBase::Formatted @format={{value.format}} @value={{value.value}}/>
                         </td>
                     {{/each}}
@@ -105,7 +104,7 @@
     <div class="dropdown">
         <ul class="dropdown-menu" role="menu">
             {{#each @def.actions as |action|}}
-                <a class="dropdown-item" role="button" tabindex="-1" href="#">{{action.label}}</a>
+                <button class="dropdown-item" tabindex="-1" href="#">{{action.label}}</button>
             {{/each}}
         </ul>
     </div>

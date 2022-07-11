@@ -6,7 +6,7 @@
             </li>
             {{#each @pagesizes as |pagesize|}}
                 <li class="page-item {{if pagesize.active "active"}}">
-                    <a class="page-link" {{on "click" (fn @setPage pagesize)}}>{{pagesize.limit}}</a>
+                    <button class="page-link" {{on "click" (fn @setPage pagesize)}}>{{pagesize.limit}}</button>
                 </li>
             {{/each}}
         </ul>
@@ -16,21 +16,21 @@
         <nav class="col col-lg-auto oxi-pager">
             <ul class="pagination">
                 <li class="page-item {{if @pages.prev.disabled "disabled"}}">
-                    <a class="page-link" aria-label={{t 'pagination.previous'}} {{on "click" (fn @setPage @pages.prev)}}>
+                    <button class="page-link" aria-label={{t 'pagination.previous'}} {{on "click" (fn @setPage @pages.prev)}}>
                         {{!-- template-lint-disable no-bare-strings --}}
                         <span aria-hidden="true">&laquo;</span>
-                    </a>
+                    </button>
                 </li>
                 {{#each @pages as |page|}}
                     <li class="page-item {{if page.active "active"}}">
-                        <a class="page-link" {{on "click" (fn @setPage page)}}>{{page.num}}</a>
+                        <button class="page-link" {{on "click" (fn @setPage page)}}>{{page.num}}</button>
                     </li>
                 {{/each}}
                 <li class="page-item {{if @pages.next.disabled "disabled"}}">
-                    <a class="page-link" aria-label={{t 'pagination.next'}} {{on "click" (fn @setPage @pages.next)}}>
+                    <button class="page-link" aria-label={{t 'pagination.next'}} {{on "click" (fn @setPage @pages.next)}}>
                         {{!-- template-lint-disable no-bare-strings --}}
                         <span aria-hidden="true">&raquo;</span>
-                    </a>
+                    </button>
                 </li>
             </ul>
         </nav>

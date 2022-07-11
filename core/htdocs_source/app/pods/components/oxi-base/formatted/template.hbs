@@ -71,6 +71,7 @@
     {{else if (eq "code" this.format)}}
         <code
             title="{{t 'component.oxi_code.copy'}}"
+            {{!-- template-lint-disable no-invalid-interactive --}}
             {{on "dblclick" this.selectCode}}
             class="oxi-formatted-code {{@class}}"
         >{{this.valueStr}}</code>

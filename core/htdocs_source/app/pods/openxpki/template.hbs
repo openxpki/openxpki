@@ -141,7 +141,7 @@
                         <li class="nav-item">
                             <a class="nav-link {{if entry.active "active"}}" {{action "activateTab" entry}} href="#">
                                 {{if entry.page.shortlabel entry.page.shortlabel entry.page.label}}
-                                <span class="tab-close" {{action "closeTab" entry}}>
+                                <span class="tab-close" {{action "closeTab" entry}} role="button">
                                     {{!-- template-lint-disable no-bare-strings --}}
                                     &times;
                                 </span>

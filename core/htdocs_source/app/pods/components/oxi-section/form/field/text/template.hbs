@@ -3,6 +3,7 @@
     {{on "keydown" this.onKeydown}}
     {{on "mousedown" this.onMouseDown}}
     class="dropdown"
+    role="button"
 >
     <input
         type="text"
@@ -20,9 +21,9 @@
 
     <div class="dropdown-menu {{if this.isDropdownOpen "show"}}" role="menu">
         {{#each this.searchResults as |result|}}
-            <a class="dropdown-item {{if result.active "active"}}" {{action "selectResult" result}}>{{result.label}}</a>
+            <button class="dropdown-item {{if result.active "active"}}" {{action "selectResult" result}}>{{result.label}}</button>
         {{else}}
-            <a class="dropdown-item">{{t 'component.oxifield_text.no_search_results'}}</a>
+            <button class="dropdown-item">{{t 'component.oxifield_text.no_search_results'}}</button>
         {{/each}}
     </div>
 </div>
