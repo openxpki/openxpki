@@ -21,9 +21,9 @@
 
     <div class="dropdown-menu {{if this.isDropdownOpen "show"}}" role="menu">
         {{#each this.searchResults as |result|}}
-            <button class="dropdown-item {{if result.active "active"}}" {{action "selectResult" result}}>{{result.label}}</button>
+            <button class="dropdown-item {{if result.active "active"}}" type="button" {{action "selectResult" result}}>{{result.label}}</button>
         {{else}}
-            <button class="dropdown-item">{{t 'component.oxifield_text.no_search_results'}}</button>
+            <button class="dropdown-item" type="button">{{t 'component.oxifield_text.no_search_results'}}</button>
         {{/each}}
     </div>
 </div>

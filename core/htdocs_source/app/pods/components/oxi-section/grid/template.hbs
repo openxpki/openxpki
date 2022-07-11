@@ -67,8 +67,7 @@
                                     {{#each @def.actions as |action|}}
                                         <ddm.item>
                                             <button
-                                                class="dropdown-item"
-                                                {{on "click" (fn this.executeAction row action)}}
+                                                class="dropdown-item" type="button" {{on "click" (fn this.executeAction row action)}}
                                             >
                                                 {{action.label}}
                                                 {{#if action.icon}}
@@ -104,7 +103,7 @@
     <div class="dropdown">
         <ul class="dropdown-menu" role="menu">
             {{#each @def.actions as |action|}}
-                <button class="dropdown-item" tabindex="-1" href="#">{{action.label}}</button>
+                <button class="dropdown-item" tabindex="-1" href="#" type="button">{{action.label}}</button>
             {{/each}}
         </ul>
     </div>
