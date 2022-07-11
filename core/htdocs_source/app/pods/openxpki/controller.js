@@ -140,7 +140,7 @@ export default class OpenXpkiController extends Controller {
 
     @action
     clearPopupData() {
-        return this.set("model.popup", null);
+        return this.model.popup = null
     }
 
     @action
