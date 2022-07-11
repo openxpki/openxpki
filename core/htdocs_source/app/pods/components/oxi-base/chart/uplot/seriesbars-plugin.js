@@ -154,11 +154,6 @@ export default function seriesBarsPlugin(opts) {
         });
     }
 
-    function range(u, dataMin, dataMax) {
-        let [min, max] = uPlot.rangeNum(0, dataMax, 0.05, true);
-        return [0, max];
-    }
-
     let qt;
     let hovered = null;
 
@@ -207,11 +202,6 @@ export default function seriesBarsPlugin(opts) {
             }
         },
         opts: (u, opts) => {
-            const yScaleOpts = {
-                range,
-                ori: ori == 0 ? 1 : 0,
-            };
-
             uPlot.assign(opts, {
                 select: {show: false},
                 cursor: {

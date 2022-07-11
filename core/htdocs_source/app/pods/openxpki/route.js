@@ -1,7 +1,5 @@
 import Route from '@ember/routing/route';
-import { tracked } from '@glimmer/tracking';
 import { service } from '@ember/service';
-import { Promise } from 'rsvp';
 import { debug } from '@ember/debug';
 
 /**

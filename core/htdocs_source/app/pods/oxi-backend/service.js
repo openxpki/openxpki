@@ -1,6 +1,5 @@
 import Service from '@ember/service';
 import { service } from '@ember/service';
-import { debug } from '@ember/debug';
 import fetch from 'fetch';
 //import { assert, optional, enums } from 'superstruct';
 
