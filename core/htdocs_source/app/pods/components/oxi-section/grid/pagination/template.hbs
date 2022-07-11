@@ -1,19 +1,6 @@
 <div class="row justify-content-end">
-    <nav class="col col-lg-auto oxi-pager">
-        <ul class="pagination">
-            <li class="page-item disabled pagination-label">
-                <span class="page-link">{{t 'pagination.items_per_page'}}</span>
-            </li>
-            {{#each @pagesizes as |pagesize|}}
-                <li class="page-item {{if pagesize.active "active"}}">
-                    <button class="page-link" type="button" {{on "click" (fn @setPage pagesize)}}>{{pagesize.limit}}</button>
-                </li>
-            {{/each}}
-        </ul>
-    </nav>
-
     {{#if @pages.length}}
-        <nav class="col col-lg-auto oxi-pager">
+        <div class="col col-lg-auto oxi-pager">
             <ul class="pagination">
                 <li class="page-item {{if @pages.prev.disabled "disabled"}}">
                     <button class="page-link" aria-label={{t 'pagination.previous'}} type="button" {{on "click" (fn @setPage @pages.prev)}}>
@@ -33,14 +20,27 @@
                     </button>
                 </li>
             </ul>
-        </nav>
+        </div>
     {{/if}}
 
-    <nav class="col col-lg-auto oxi-pager">
+    <div class="col col-lg-auto oxi-pager">
         <ul class="pagination">
-            <li class="page-item disabled total">
+            <li class="page-item disabled pagination-label">
+                <span class="page-link">{{t 'pagination.items_per_page'}}</span>
+            </li>
+            {{#each @pagesizes as |pagesize|}}
+                <li class="page-item {{if pagesize.active "active"}}">
+                    <button class="page-link" type="button" {{on "click" (fn @setPage pagesize)}}>{{pagesize.limit}}</button>
+                </li>
+            {{/each}}
+        </ul>
+    </div>
+
+    <div class="col col-lg-auto oxi-pager">
+        <ul class="pagination">
+            <li class="page-item disabled pagination-label">
                 <span class="page-link">{{t 'pagination.x_items' count=@pager.count}}</span>
             </li>
         </ul>
-    </nav>
+    </div>
 </div>
