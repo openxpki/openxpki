@@ -59,8 +59,7 @@
 {{#if @content.allow_upload}}
     <input
         type="file"
-        class="oxi-file-input"
-        style="display:none"
+        class="oxi-file-input d-none"
         {{on "change" this.fileSelected}}
         {{on-init this.setFileUploadElement}}
     />

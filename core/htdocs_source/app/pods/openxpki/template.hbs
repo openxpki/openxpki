@@ -88,8 +88,8 @@
     <div class="row">
         <div class="col oxi-message">
             {{#if this.model.status.href}}
-                <a href="{{this.model.status.href}}" target="_blank" hidden={{this.statusHidden}}>
-                    <div class="alert {{this.statusClass}}" style="cursor:pointer;">
+                <a href="{{this.model.status.href}}" target="_blank" hidden={{this.statusHidden}} rel="noopener noreferrer">
+                    <div class="alert {{this.statusClass}}">
                         <OxiBase::Formatted @format="nl2br" @value={{this.model.status.message}}/>
                     </div>
                 </a>
