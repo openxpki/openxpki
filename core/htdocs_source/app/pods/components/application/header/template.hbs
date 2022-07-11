@@ -6,7 +6,8 @@
             </div>
         {{else}}
             <div class="col">
-                <a href="./#/"><img src="{{this.rootURL}}img/logo.png"></a>
+                {{!-- template-lint-disable no-bare-strings --}}
+                <a href="./#/"><img src="{{this.rootURL}}img/logo.png" alt="OpenXPKI"></a>
             </div>
             <div class="col d-none d-md-flex justify-content-center">
                 <h4 class="oxi-header">
