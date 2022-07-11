@@ -199,23 +199,26 @@ export default class OxiSectionGridComponent extends Component {
     }
 
     get data() {
-        let columns = this.formattedColumns;
-        let titles = this.rawColumns.getEach("sTitle");
-        let classIndex = titles.indexOf("_status");
+        let columns = this.formattedColumns
+        let titles = this.rawColumns.getEach("sTitle")
+        let classIndex = titles.indexOf("_status")
         if (classIndex === -1) {
-            classIndex = titles.indexOf("_className");
+            classIndex = titles.indexOf("_className")
         }
-        let results = [];
-        let y, j, len;
+        let results = []
+        let y, j, len
         for (y = j = 0, len = this.rawData.length; j < len; y = ++j) {
             let row = this.rawData[y];
 
-            let cssClass = row[classIndex]
-            if (Object.prototype.toString.call(cssClass) == '[object Object]') cssClass = cssClass.value
-            cssClass = cssClass.toLowerCase()
+            let cssClass = ''
+            if (classIndex != -1) {
+                let _classname = row[classIndex]
+                if (Object.prototype.toString.call(_classname) == '[object Object]') _classname = _classname.value
+                cssClass = `gridrow-${_classname.toLowerCase()}`
+            }
 
             results.push({
-                className: `gridrow-${cssClass}`,
+                className: cssClass,
                 originalData: row,
                 data: columns.map(col => {
                     return {
@@ -225,9 +228,9 @@ export default class OxiSectionGridComponent extends Component {
                 }),
                 checked: row.checked ? true : false,
                 originalIndex: y
-            });
+            })
         }
-        return results;
+        return results
     }
 
     // split sorting from row data generation in "get data()" for better performance when re-sorting
