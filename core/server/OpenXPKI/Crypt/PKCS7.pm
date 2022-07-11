@@ -563,6 +563,7 @@ sub encode_tag {
         'OCTET STRING' => 4,
         'NULL' => 5,
         'OBJECT IDENTIFIER' => 6,
+        'OID' => 6,
         'UTF8String' => 12,
         'SEQUENCE' => 16,
         'SET' => 17,
