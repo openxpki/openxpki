@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2022-03-14 11:45+0100\n"
+"PO-Revision-Date: 2022-06-22 19:34+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -11,7 +11,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.3\n"
+"X-Generator: Poedit 3.0.1\n"
 "X-Poedit-Bookmarks: -1,-1,77,-1,-1,-1,-1,-1,-1,-1\n"
 
 msgid "I18N_OPENXPKI_UI_ACTION_NOT_FOUND"
@@ -1173,9 +1173,6 @@ msgstr "Servername"
 msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC"
 msgstr "Geben Sie bitte den FQDN (Hostname) des Systems an."
 
-msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
-msgstr "Ort / Lokalität (L)"
-
 msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_RESPONDER_LABEL"
 msgstr "OCSP-Responder"
 
@@ -1275,9 +1272,6 @@ msgstr "URI"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
 msgstr "URI"
-
-msgid "I18N_OPENXPKI_UI_PROFILE_STATE_DESC"
-msgstr "Region oder Bundesland (ST)"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL"
 msgstr "TLS Client"
@@ -1796,28 +1790,19 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_LABEL"
 msgstr "Zertifikat wählen"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_FORM_DESC"
-msgstr " "
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_FORM_LABEL"
-msgstr "Daten bearbeiten"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_PERSIST_DESC"
-msgstr "Speichert die Änderungen in der Datenbank."
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_PERSIST_LABEL"
-msgstr "Persist Data"
+msgstr "Änderungen speichern"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_TERMINATE_DESC"
-msgstr "Workflow abbrechen. Alle Änderungen werden verworfen."
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_SET_NOTIFY_ACTIVE_LABEL"
+msgstr "aktiviere Benachrichtigung"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_TERMINATE_LABEL"
-msgstr "Änderung abbrechen"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_SET_NOTIFY_INACTIVE_LABEL"
+msgstr "deaktiviere Benachrichtigung"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_CONTEXT_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_BASE_DESC"
 msgstr "Bitte passen Sie die Meta-Daten über das folgende Formular an."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_CONTEXT_LABEL"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_UPDATE_BASE_LABEL"
 msgstr "Meta-Daten anpassen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CLEANUP_DESC"
@@ -2224,6 +2209,19 @@ msgstr ""
 "ausgestellten Zertifikates so angepasst wird, dass es nicht vor oder nach "
 "der Ausstellenden CA gültig ist. Dies funktioniert nur, wenn sich die "
 "Gültigkeitszeiträume von CA und Zertifikat überlappen."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SHOWMETA_LOAD_DATA_DESC"
+msgstr ""
+"Geben Sie den Zeritifikatsidentifier an oder verwenden Sie die automatische "
+"Suche, um das Zertifikat zu finden, zu dem Sie die Metainformationen ändern "
+"möchten. Falls Sie das Zertifikat nicht finden oder auswählen können, "
+"verwenden Sie bitte die Zertifikatssuche. Das Ergebnis enthält einen "
+"direkten Link, um die Änderung auszuführen."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SHOWMETA_LOAD_DATA_LABEL"
+msgstr "Zertifikat wählen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SLEEP_LABEL"
 msgstr "wartend"
@@ -2812,12 +2810,6 @@ msgstr "E-Mail-Adresse des Verantwortlichen für dieses Zertifikat."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_LABEL"
 msgstr "E-Mail-Adresse"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_PLACEHOLDER"
-msgstr "E-Mail-Adresse des Verantwortlichen"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EMAIL_TOOLTIP"
-msgstr " "
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_EXPIRY_NOTIFICATION_DESC"
 msgstr " "
 
@@ -2840,17 +2832,8 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_OWNER_GROUP_LABEL"
 msgstr "Eigentümer (Gruppe)"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_DESC"
-msgstr " "
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_LABEL"
 msgstr "Antragsteller/Verantwortlicher"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_PLACEHOLDER"
-msgstr "Name des Antragstellers/Verantwortlichen"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_TOOLTIP"
-msgstr " "
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_SYSTEM_ID_DESC"
 msgstr "System Identifier"
@@ -2968,23 +2951,6 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
 msgstr "Ihr PKCS#10 Zertifikatsantrag"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_DESC"
-msgstr ""
-" Paste your PKCS7 formated request/response directly into the field or use "
-"the upload button to load a file from your local computer"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_LABEL"
-msgstr "PKCS7 Eingabe"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_PLACEHOLDER"
-msgstr ""
-"Fügen Sie hier den PEM kodierten PKCS7 Block ein ( -----BEGIN PKCS7-----) "
-"oder verwenden Sie 'Durchsuchen', um eine Datei von ihrem "
-"Arbeitsplatzrechner auszuwählen."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_TOOLTIP"
-msgstr "Your PKCS7 encoded request/response"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_CERTIFICATE_KEY_DUPLICATE"
 msgstr "Policy Verletzung: Zertifikate mit diesem Schlüssel"
@@ -3960,10 +3926,6 @@ msgstr ""
 "Dieser Workflow wurde unerwartet beendet. Bitte kontaktieren Sie den "
 "Helpdesk."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_LABEL"
-msgstr "Zustand"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_PRIVATEKEY_FAILURE_DESC"
 msgstr "Der Export des privaten Schlüssels ist fehlgeschlagen"
 
@@ -4026,30 +3988,22 @@ msgstr "Zustand"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_MANUAL_RECHECK_BUTTON"
 msgstr "Status erneut prüfen"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_EDIT_DATA_LABEL"
+msgstr "Meta-Daten des Zertifikates aktualisieren"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_INITIAL_DATA_DESC"
 msgstr ""
-"Änderungen an den Daten werden zunächst nur in diesem Workflow gespeichert, "
-"um die Daten abschliessend beim Zertifikat abzulegen muss der Workflow mit "
-"\"Daten speichern\" erfolgreich abgeschlossen werden."
+"Nachfolgenden sehen Sie die derzeit hinterlegten Meta-Daten des gewähten "
+"Zertifikates. Verwenden Sie die verschiedenen Optionen um die Daten zu "
+"ändern. Sie müssen die Daten anschließend abspeichern, anderenfalls gehen "
+"die Änderungen verloren."
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_CHOOSE_ACTION_LABEL"
-msgstr "Meta-Daten prüfen"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_INITIAL_DESC"
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_UPDATE_PENDING_DESC"
 msgstr ""
-"Aktualisierung der Meta-Daten eines Zertifikates. Geben Sie den "
-"Zertifikatsidentifier an oder verwenden Sie die Suchfunktion um dieses zu "
-"finden."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_INITIAL_LABEL"
-msgstr " "
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_DESC"
-msgstr "Die Änderungen wurden gespeichert."
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_SUCCESS_LABEL"
-msgstr "Meta-Daten aktualisiert"
+"Sie haben die Meta-Daten des Zertifikates wie unten dargestellt geändert. "
+"Sie können die Daten weiter bearbeiten oder die Daten mit <i>Änderungen "
+"speichern</i> übernehmen. Falls Sie den Workflow abbrechen werden ihre "
+"Änderungen verworfen."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_DESC"
 msgstr ""
@@ -4162,6 +4116,15 @@ msgstr "Für Ihre Suchanfrage wurden keine Ergebnisse gefunden."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_LABEL"
 msgstr "keine Ergebnisse"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_RESULT_DESC"
+msgstr ""
+"Die Meta-Daten des Zertifikates werden in der nachfolgenden Tabelle "
+"angezeigt. Über die Detailansicht des Zertifikates ist ein Workflow zur "
+"Änderung der Informationen verfügbar."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_RESULT_LABEL"
+msgstr "Zertifikat Meta-Daten"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
 msgstr ""
@@ -4280,12 +4243,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_LABEL"
 msgstr "Zertifikat ausstellen"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_DESC"
-msgstr "Zertifikat exportieren"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_LABEL"
-msgstr "Zertifikat exportieren"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"
 msgstr "Veröffentlicht das Zertifikat zu definierten Zielen."
 
@@ -4297,12 +4254,6 @@ msgstr "Ändern der Meta-Daten eines Zertifikates"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_LABEL"
 msgstr "Meta-Daten ändern"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_DESC"
-msgstr "Importiert Sperrliste von externen CAs"
-
-msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_LABEL"
-msgstr "Sperrliste importieren"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_DESC"
 msgstr "Erlaubt das Ausstellen von Sperrlisten."
@@ -4439,523 +4390,3 @@ msgstr "aufwecken"
 
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "ja"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_CUST"
-#~ msgstr "ja"
-
-#~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
-#~ msgstr "Ersteller"
-
-#~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_KEY_POLICY_FAILED"
-#~ msgstr "Schlüsselparameter fehlerhaft (Algorithmus/Schlüssellänge)"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST2001"
-#~ msgstr "GOST 2001"
-
-#~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST94"
-#~ msgstr "GOST 94"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"
-#~ msgstr "Keystore Download"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT"
-#~ msgstr "Download Format"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_DESC"
-#~ msgstr ""
-#~ "Format des Downloads, die meisten Anwendungen benötigen einen PKCS12 "
-#~ "Container."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_KEY_FORMAT_LABEL"
-#~ msgstr "Download Format"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_DESC"
-#~ msgstr "Das Passwort für die Verschlüsselung der Exportdatei."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_PASSWORD_LABEL"
-#~ msgstr "Passwort"
-
-#~ msgid "I18N_OPENXPKI_UI_PAUSED_CRL_TOKEN_NOT_USABLE"
-#~ msgstr "CA Schlüssel ist nicht verfügbar"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_NODEID"
-#~ msgstr "Node ID"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_NODEID_DESC"
-#~ msgstr "Numerische ID des Knoten"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_DESC"
-#~ msgstr "Profil für den Betrieb eines OCSP-Responders"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_SIGNER"
-#~ msgstr "OCSP Signer"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_OPENVPN_CLIENT_LABEL"
-#~ msgstr "OpenVPN Client Zertifikat"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_OPENVPN_CLIENT_SERVER_DESC"
-#~ msgstr "OpenVPN Serverzertifikat"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_OPENVPN_CLIENT_SERVER_LABEL"
-#~ msgstr "OpenVPN Serverzertifikat"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_OPENVPN_CLIENT_USER_DESC"
-#~ msgstr "OpenVPN Zertifikat für natürliche Personen."
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_OPENVPN_CLIENT_USER_LABEL"
-#~ msgstr "OpenVPN Benutzerzertifikat"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_GUID"
-#~ msgstr "Microsoft GUID"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_GUID_DESCRIPTION"
-#~ msgstr "GUID"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_SAN_UPN_DESCRIPTION"
-#~ msgstr "UPN"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_BASIC_DESC"
-#~ msgstr "I18N_OPENXPKI_PROFILE_SCEP_CLIENT_BASIC_DESC"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_BASIC_LABEL"
-#~ msgstr "Basic SCEP client naming style"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_LABEL"
-#~ msgstr "Certificate for SCEP Enrollment Authentitcation"
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_BASIC_DESC"
-#~ msgstr "A profile for clients using TLS authentication."
-
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_BASIC_LABEL"
-#~ msgstr "TLS Client / Default Naming"
-
-#~ msgid "I18N_OPENXPKI_UI_REPORT_SUMMARY"
-#~ msgstr "Übersicht Zertifikate"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_SECRET_GROUP_DOES_NOT_EXIST"
-#~ msgstr "Zertifikat existiert nicht"
-
-#~ msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_HISTORY"
-#~ msgstr ""
-#~ "Sie haben nicht die notwendigen Rechte um die Workflow-Historie zu "
-#~ "betrachten"
-
-#~ msgid "I18N_OPENXPKI_UI_UNAUTHORIZED_ACCESS_TO_WORKFLOW_LOG"
-#~ msgstr ""
-#~ "Sie haben nicht die notwendigen Rechte um das Workflow-Protokoll zu "
-#~ "betrachten"
-
-#~ msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_INVALID_ALGORITHM_OR_LENGTH"
-#~ msgstr "Die Angabe der Schlüsselparameter ist ungültig"
-
-#~ msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_CONFIGURATION_ERROR_MIN_MISSING"
-#~ msgstr "Die Angabe der Schlüsselparameter hat eine ungültige Schlüssellänge"
-
-#~ msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_INVALID_ALGORITHM"
-#~ msgstr "Der Schlüssel verwendet einen ungültigen Algorithmus"
-
-#~ msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_INVALID_CSR_TYPE"
-#~ msgstr "Der übergebene Schlüssel besitzt ein ungültiges Containerformat"
-
-#~ msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_KEY_TOO_LONG"
-#~ msgstr "Der Schlüssel ist zu lang"
-
-#~ msgid "I18N_OPENXPKI_UI_VALIDATOR_KEYLENGTH_KEY_TOO_SHORT"
-#~ msgstr "Der Schlüssel ist zu kurz"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED"
-#~ msgstr "Sie sind nicht berechtigt diesen Workflow zu öffnen."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACCESS_NOT_ALLOWED_FOR_ROLE"
-#~ msgstr ""
-#~ "Der Zugriff auf diesen Workflow ist für ihre Benutzerrolle nicht gestattet"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_APPROVE_LABEL"
-#~ msgstr "Freigeben"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_AUTH_FORM_DESC"
-#~ msgstr ""
-#~ "This workflow is to invalidate (revoke) an existing certificate. <br>If "
-#~ "you came here with a certificate already selected, please check if the "
-#~ "given certificate identifier and subject is what you requested and push "
-#~ "the continue button.<br>In case you initialised this process, please type "
-#~ "the certificate identifier or use the autosearch function to find your "
-#~ "certificate."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERT_AUTH_LABEL"
-#~ msgstr "Finish"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ADD_AUTHENTICATION_DESC"
-#~ msgstr "Add Authentication"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ADD_AUTHENTICATION_LABEL"
-#~ msgstr "Add Authentication"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ALLOW_RETRY_DESC"
-#~ msgstr "Allow Retry"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_ALLOW_RETRY_LABEL"
-#~ msgstr "Allow Retry"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_DENY_AUTHENTICATION_DESC"
-#~ msgstr "Deny Authentication"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_DENY_AUTHENTICATION_LABEL"
-#~ msgstr "Deny Authentication"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_FAIL_LABEL"
-#~ msgstr "Fail"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_DESC"
-#~ msgstr "Export initial state"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_OPENVPN_EXPORT_INITIALIZE_LABEL"
-#~ msgstr "Set Information"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCEPGETCA_INITIALIZE_LABEL"
-#~ msgstr "Start Search"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_SCPU_GENERATE_ACT_CODE"
-#~ msgstr "Generate Code"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_APPROVE"
-#~ msgstr "Antrag genehmigen"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_REJECT"
-#~ msgstr "Antrag ablehnen"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_SUBMIT"
-#~ msgstr "Antrag einreichen"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ELIGIBILITY_RESULT_LABEL"
-#~ msgstr "Result of Eligibility Check"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_DESC"
-#~ msgstr ""
-#~ "This workflow handles certificate enrollment requests using the SCEP "
-#~ "interface."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ENROLLMENT_LABEL"
-#~ msgstr "SCEP Enrollment"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ACTIVE_CERT_COUNT_LABEL"
-#~ msgstr "Active Certificate Count"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_ALLOWED_CERT_COUNT_LABEL"
-#~ msgstr "Allowed Certificate Count"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CREATOR_LABEL"
-#~ msgstr "Creator"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IN_RENEWAL_WINDOW_LABEL"
-#~ msgstr "In Renewal Period"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IN_REPLACE_WINDOW_LABEL"
-#~ msgstr "In Replace Period"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_IS_SELF_SIGNED_LABEL"
-#~ msgstr "Request is SelfSigned"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ARS_GROUP_PLACEHOLDER"
-#~ msgstr "Name of the Requestor/Owner"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_ENDPOINT_PLACEHOLDER"
-#~ msgstr "certificate holders email address"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_META_ARS_GROUP_TOOLTIP"
-#~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_META_ENDPOINT_TOOLTIP"
-#~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_DESC"
-#~ msgstr "The certificate to be replaced by this workflow."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_LABEL"
-#~ msgstr "Replaced Certificate"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SCEP_TOKEN_PLACEHOLDER"
-#~ msgstr "additional comments to help us processing the request"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SERVER_TOOLTIP"
-#~ msgstr "The type of csr, usually PKCS10."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_SIGNER_SUBJECT_MATCH_LABEL"
-#~ msgstr "Request Subject Matches"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_INFO"
-#~ msgstr "Technische Informationen"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_EXCEPTION"
-#~ msgstr "exception"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FAILED"
-#~ msgstr "fehlgeschlagen"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_FINISHED"
-#~ msgstr "abgeschlossen"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_MANUAL"
-#~ msgstr "manuell"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_PAUSE"
-#~ msgstr "pausiert"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_RETRY_EXCEEDED"
-#~ msgstr "zu viele Fehlversuche"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_META_CERT_SUBJECT_HINT"
-#~ msgstr ""
-#~ "Finde nur Workflows in diesem Status, exakte Suche, keine Platzhalter "
-#~ "erlaubt, mehrere Werte können mit Leerzeichen getrennt angegeben werden."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE"
-#~ msgstr "Workflow Status"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_INITIAL_DESC"
-#~ msgstr "Initial state"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_AUTH_INITIAL_LABEL"
-#~ msgstr "State"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_DESC"
-#~ msgstr "Initialisierung..."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_LABEL"
-#~ msgstr "CRL erstellen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_DESC"
-#~ msgstr ""
-#~ "Dieser Workflow wurde erfolgreich beenden und kann nicht erneut gestartet "
-#~ "werden."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_KEY_PASSWORD_DESC"
-#~ msgstr ""
-#~ "Dieser Workflow wurde erfolgreich beenden und kann nicht erneut gestartet "
-#~ "werden."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_SAN_DESC"
-#~ msgstr ""
-#~ "Dieser Workflow wurde erfolgreich beenden und kann nicht erneut gestartet "
-#~ "werden."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_DESC"
-#~ msgstr ""
-#~ "Dieser Workflow ist fehlgeschlagen und kann nicht weiter bearbeitet "
-#~ "werden."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_FAILURE_LABEL"
-#~ msgstr "fehlgeschlagen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_ISSUE_DESC"
-#~ msgstr ""
-#~ "Der Antrag muss nun geprüft und freigegeben werden. Sie können den Status "
-#~ "dieses Vorgangs auf dieser Seite verfolgen."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_PENDING_ISSUE_LABEL"
-#~ msgstr "Antrag erwartet Freigabe"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_FAILURE_DESC"
-#~ msgstr "This workflow failed finally and can not be restarted"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_FAILURE_LABEL"
-#~ msgstr "FAILURE"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_INITIAL_DESC"
-#~ msgstr "Enrollment initial state"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_INITIAL_LABEL"
-#~ msgstr "State"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_APPROVAL_DESC"
-#~ msgstr "Approval pending"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_APPROVAL_LABEL"
-#~ msgstr "Approval pending"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_MANUAL_AUTHENTICATION_DESC"
-#~ msgstr "Manual authentication pending"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_MANUAL_AUTHENTICATION_LABEL"
-#~ msgstr "Manual authentication pending"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_POLICY_DESC"
-#~ msgstr "Approval pending (policy error)"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_ENROLL_PENDING_POLICY_LABEL"
-#~ msgstr "Approval pending"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_DESCRIPTION"
-#~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION_LABEL"
-#~ msgstr ""
-#~ "This workflow was interrupted by an unexpected event, please contact the "
-#~ "support team!"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_DESC"
-#~ msgstr ""
-#~ "Dieser Workflow ist fehlgeschlagen und kann nicht neu gestartet werden."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_FAILURE_LABEL"
-#~ msgstr "FEHLER"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_EXPORT_INITIAL_DESC"
-#~ msgstr "Initialisieren..."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_DESC"
-#~ msgstr "Dieser Workflow wurde pausiert und wird automatisch fortgeführt."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_METADATA_DATA_UPDATE_LABEL"
-#~ msgstr "Aktualisiert"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_DESC"
-#~ msgstr ""
-#~ "Prüfen Sie die Details ihres Änderungsauftrages. Drücken Sie 'Daten "
-#~ "speichern', um die angezeigten Informationen für alle in der Liste "
-#~ "enthaltenen Zertifikate zu übernehmen."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_META_BULK_PENDING_LABEL"
-#~ msgstr "Änderungen prüfen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_DESC"
-#~ msgstr ""
-#~ "The certificate was issued and will be send to the SCEP client on request."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_OPENVPN_EXPORT_SUCCESS_LABEL"
-#~ msgstr "SUCCESS"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PAUSE_LABEL"
-#~ msgstr "FAILURE"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PENDING_LABEL"
-#~ msgstr "Approval Pending"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PIN_UNBLOCK_GET_ACT_CODE_DESC"
-#~ msgstr ""
-#~ "Please push the 'generate code' button to create a set of activation "
-#~ "codes. Write down the codes and pass them to the card owner."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_PIN_UNBLOCK_GET_ACT_CODE_LABEL"
-#~ msgstr "Generate Activation Code"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REVIEW_DESC"
-#~ msgstr "The request was finally rejected and can not be restartet."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REVIEW_LABEL"
-#~ msgstr "State"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_DESCRIPTION"
-#~ msgstr ""
-#~ "This workflow is currently handled by the system and will continue "
-#~ "automagically. The reason for this pause and the time of the next "
-#~ "scheduled execution is shown below for your information."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED_DESCRIPTION"
-#~ msgstr ""
-#~ "This task was planed to be automagically retried but did not succeed "
-#~ "within the expected period of time. The reason for this pause and the "
-#~ "time of the last execution is shown below, if you want this process to be "
-#~ "continued, an operator needs to manually wake it up."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATUS_EXCEPTION"
-#~ msgstr ""
-#~ "Dieser Workflow wurde ungeplant unterbrochen und erforderte einen "
-#~ "manuellen Eingriff."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_DESC"
-#~ msgstr "Certificate Export"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_AUTH_LABEL"
-#~ msgstr "Certificate Export"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_DESC"
-#~ msgstr "Massenänderung von Metadaten für eine Liste von Zertifikaten."
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_META_BULK_LABEL"
-#~ msgstr "Massenänderung Metadaten"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_DESC"
-#~ msgstr "Certificate Export"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_OPENVPN_EXPORT_LABEL"
-#~ msgstr "Certificate Export"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_TOKEN_LABEL"
-#~ msgstr "SCEP RA Token erstellen"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_FETCH_PUK_DESC"
-#~ msgstr "Publish CA Information"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_FETCH_PUK_LABEL"
-#~ msgstr "Publish CA Information"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_PERSONALIZATION_DESC"
-#~ msgstr "Publish CA Information"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_PERSONALIZATION_LABEL"
-#~ msgstr "Publish CA Information"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_PIN_UNBLOCK_DESC"
-#~ msgstr ""
-#~ "Veröffentlicht CA Informationen (CA Zertifikate and CRLs) zu definierten "
-#~ "Zielen."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_PIN_UNBLOCK_LABEL"
-#~ msgstr "Publish CA Information"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_REVOKE_DESC"
-#~ msgstr "Publish CA Information"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SMARTCARD_REVOKE_LABEL"
-#~ msgstr "Publish CA Information"
