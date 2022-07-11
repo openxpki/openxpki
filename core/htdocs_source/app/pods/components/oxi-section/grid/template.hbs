@@ -52,7 +52,7 @@
             </tr>
         </thead>
         <tbody>
-            {{#each this.sortedData as |row index|}}
+            {{#each this.sortedData as |row|}}
                 <tr class="context {{row.className}}" role={{if this.hasAction "button"}}>
                     {{#if this.isBulkable}}
                         <td {{on "click" (fn this.select row)}} role="button">
