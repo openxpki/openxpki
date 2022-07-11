@@ -20,7 +20,7 @@
                 <li class="text-end tenant">
                     {{#if this.hasMultipleTenants}}
                         {{t 'userinfo.tenant'}}
-                        <BsDropdown style="display: inline" as |dd|>
+                        <BsDropdown class="d-inline" as |dd|>
                             <dd.toggle>
                                 <strong>{{this.currentTenant}}</strong> <span class="caret"></span>
                             </dd.toggle>

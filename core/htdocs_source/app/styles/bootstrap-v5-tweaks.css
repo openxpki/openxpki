@@ -61,3 +61,8 @@ a:hover {
 .table > :not(:first-child) {
   border-top-color: var(--bs-secondary);
 }
+
+/* Missing class for white-space: pre-wrap */
+.text-prewrap {
+  white-space: pre-wrap
+}
