@@ -2,7 +2,7 @@
     <nav class="col col-lg-auto oxi-pager">
         <ul class="pagination">
             <li class="page-item disabled pagination-label">
-                <a class="page-link">{{t 'pagination.items_per_page'}}</a>
+                <span class="page-link">{{t 'pagination.items_per_page'}}</span>
             </li>
             {{#each @pagesizes as |pagesize|}}
                 <li class="page-item {{if pagesize.active "active"}}">
@@ -39,7 +39,7 @@
     <nav class="col col-lg-auto oxi-pager">
         <ul class="pagination">
             <li class="page-item disabled total">
-                <a class="page-link">{{t 'pagination.x_items' count=@pager.count}}</a>
+                <span class="page-link">{{t 'pagination.x_items' count=@pager.count}}</span>
             </li>
         </ul>
     </nav>
