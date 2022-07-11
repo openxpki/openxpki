@@ -40,7 +40,7 @@
             @fade={{true}}
             @backdrop={{true}}
             @backdropClose={{false}}
-            @onHidden={{action "resetConfirmState"}}
+            {{on "hidden" this.resetConfirmState}}
             as |Modal|
         >
             <Modal.header>
@@ -52,10 +52,10 @@
                 {{{@button.confirm.description}}}
             </Modal.body>
             <Modal.footer>
-                <BsButton @onClick={{this.executeAction}} @type="primary">
+                <BsButton {{on "click" this.executeAction}} @type="primary">
                     {{if @button.confirm.confirm_label @button.confirm.confirm_label (t 'button.confirm_dialog.ok')}}
                 </BsButton>
-                <BsButton @onClick={{action Modal.close}}>
+                <BsButton {{on "click" Modal.close}}>
                     {{if @button.confirm.cancel_label @button.confirm.cancel_label (t 'button.confirm_dialog.cancel')}}
                 </BsButton>
             </Modal.footer>

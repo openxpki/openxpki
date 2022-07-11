@@ -146,9 +146,9 @@
                 <ul class="nav nav-tabs mb-3">
                     {{#each this.model.tabs as |entry|}}
                         <li class="nav-item">
-                            <a class="nav-link {{if entry.active "active"}}" {{action "activateTab" entry}} href="#">
+                            <a class="nav-link {{if entry.active "active"}}" {{on "click" (fn this.activateTab entry)}} href="#">
                                 {{if entry.page.shortlabel entry.page.shortlabel entry.page.label}}
-                                <span class="tab-close" {{action "closeTab" entry}} role="button">
+                                <span class="tab-close" {{on "click" (fn this.closeTab entry)}} role="button">
                                     {{!-- template-lint-disable no-bare-strings --}}
                                     &times;
                                 </span>
@@ -225,9 +225,9 @@
         @fade={{true}}
         @backdrop={{true}}
         @backdropClose={{false}}
-        @onHidden={{action "clearPopupData"}}
         @size={{if popup.page.isLarge "xl" "lg"}}
         @scrollable={{true}}
+        {{on "hidden" this.clearPopupData}}
         as |Modal|
     >
         <Modal.header class="bg-secondary text-white">
@@ -241,7 +241,7 @@
             {{/each}}
         </Modal.body>
         <Modal.footer>
-            <BsButton @onClick={{action Modal.close}}>{{t 'site.close_popup'}}</BsButton>
+            <BsButton {{on "click" Modal.close}}>{{t 'site.close_popup'}}</BsButton>
         </Modal.footer>
     </BsModal>
 {{/let}}
@@ -262,8 +262,8 @@
         {{{this.model.error}}}
     </Modal.body>
     <Modal.footer>
-        <BsButton @onClick={{action "reload"}} @type="primary">{{t 'error_popup.reload'}}</BsButton>
-        <BsButton @onClick={{action Modal.close}}>{{t 'site.close_popup'}}</BsButton>
+        <BsButton {{on "click" this.reload}} @type="primary">{{t 'error_popup.reload'}}</BsButton>
+        <BsButton {{on "click" Modal.close}}>{{t 'site.close_popup'}}</BsButton>
     </Modal.footer>
 </BsModal>
 
