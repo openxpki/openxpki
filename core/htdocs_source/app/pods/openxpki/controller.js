@@ -66,7 +66,7 @@ export default class OpenXpkiController extends Controller {
         }
 
         const browser = detect()
-        if (!browser) return
+        if (!browser) return null
 
         // translate 'detect-browser' name to 'caniuse' name
         let name = map[browser.name] || browser.name
@@ -75,21 +75,21 @@ export default class OpenXpkiController extends Controller {
 
         // look if 'caniuse' knows this browser
         let agent = lite.agents[name]
-        if (!agent) return
+        if (!agent) return null
 
         // look if 'caniuse' knows this version
         let version = browser.version
         const known_version = Object.keys(agent.release_date).find(v => version.match(new RegExp(`^${v}(\\.|$)`)))
-        if (!known_version) return
+        if (!known_version) return null
 
         // calculate browser age (release date)
         let release_date = agent.release_date[known_version]
-        if (!release_date) return
+        if (!release_date) return null
 
         let now = parseInt(new Date() / 1000)
         let age = parseInt((now - release_date) / (60*60*24))
 
-        if (age < old_age) return
+        if (age < old_age) return null
 
         console.info(`Detected browser "${agent.browser} ${known_version}" is ${age} days old (max. supported browser age: ${old_age} days)`)
         return `${agent.browser} ${known_version}`
