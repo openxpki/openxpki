@@ -49,7 +49,7 @@
                 </h4>
             </Modal.header>
             <Modal.body>
-                {{{@button.confirm.description}}}
+                {{html @button.confirm.description}}
             </Modal.body>
             <Modal.footer>
                 <BsButton {{on "click" this.executeAction}} @type="primary">

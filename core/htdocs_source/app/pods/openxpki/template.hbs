@@ -131,7 +131,7 @@
     {{#if this.model.tabs.firstObject.page.description}}
         <div class="row">
             <div class="col mb-3">
-                {{{this.model.tabs.firstObject.page.description}}}
+                {{html this.model.tabs.firstObject.page.description}}
             </div>
         </div>
     {{/if}}
@@ -264,7 +264,7 @@
         <h4 class="modal-title">{{t 'error_popup.header'}}</h4>
     </Modal.header>
     <Modal.body>
-        {{{this.model.error}}}
+        {{html this.model.error}}
     </Modal.body>
     <Modal.footer>
         <BsButton {{on "click" this.reload}} @type="primary">{{t 'error_popup.reload'}}</BsButton>

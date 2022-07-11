@@ -9,7 +9,7 @@
                     <h4>{{@content.content.label}}</h4>
                 {{/if}}
                 {{#if @content.content.description}}
-                    {{{@content.content.description}}}
+                    {{html @content.content.description}}
                 {{/if}}
             </div>
         {{/if}}
@@ -26,7 +26,7 @@
             <h4>{{@content.content.label}}</h4>
         {{/if}}
         {{#if @content.content.description}}
-            <div class="mb-3">{{{@content.content.description}}}</div>
+            <div class="mb-3">{{html @content.content.description}}</div>
         {{/if}}
 
         <div {{on-init this.initialized}} class={{unless @isInfoBox "ms-3"}}>
