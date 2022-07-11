@@ -372,6 +372,6 @@ export default class OxiContentService extends Service {
                 }
             }
         }
-        this.navEntries = this.navEntries; // trigger updates
+        this.navEntries = this.navEntries; // eslint-disable-line no-self-assign -- trigger Ember update
     }
 }
