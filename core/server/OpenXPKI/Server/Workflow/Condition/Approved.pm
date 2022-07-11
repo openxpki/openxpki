@@ -72,7 +72,10 @@ sub evaluate
 
         my $role = $approval->{session_role};
         ##! 16: 'Role of current approval ' . $role
-        if ($required{$role} > 1) {
+        if (!$required{$role}) {
+            # we are not looking for this approval type - ignore it
+        }
+        elsif ($required{$role} > 1) {
             $required{$role}--;
         }
         else {
