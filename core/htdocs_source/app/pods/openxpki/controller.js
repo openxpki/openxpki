@@ -1,7 +1,6 @@
 import Controller from '@ember/controller';
 import { tracked } from '@glimmer/tracking';
-import { action, computed, set } from '@ember/object';
-import { gt } from '@ember/object/computed';
+import { action, set } from '@ember/object';
 import { service } from '@ember/service';
 import lite from 'caniuse-lite';
 import { detect } from 'detect-browser'
@@ -31,10 +30,9 @@ export default class OpenXpkiController extends Controller {
     @tracked loading = false;
     @tracked showInfoBlock = false;
 
-    @computed("model.status.{level,message}")
     get statusClass() {
-        let level = this.get("model.status.level");
-        let message = this.get("model.status.message");
+        let level = this.model?.status?.level;
+        let message = this.model?.status?.message;
         if (!message) { return "hide" }
         if (level === "error") { return "alert-danger" }
         if (level === "success") { return "alert-success" }
@@ -42,9 +40,8 @@ export default class OpenXpkiController extends Controller {
         return "alert-info";
     }
 
-    @computed("model.status.message")
     get statusHidden() {
-        let message = this.get("model.status.message");
+        let message = this.model?.status?.message;
         return !message;
     }
 
@@ -98,7 +95,9 @@ export default class OpenXpkiController extends Controller {
         return `${agent.browser} ${known_version}`
     }
 
-    @gt("model.tabs.length", 1) showTabs;
+    get showTabs() {
+        return this.model.tabs.length > 1
+    }
 
     // We don't use <ddm.LinkTo> but our own method to navigate to target page.
     // This way we can force Ember to do a transition even if the new page is
@@ -118,7 +117,7 @@ export default class OpenXpkiController extends Controller {
 
     @action
     activateTab(entry) {
-        let tabs = this.get("model.tabs");
+        let tabs = this.model.tabs;
         tabs.setEach("active", false);
         set(entry, "active", true);
         return false;
@@ -126,7 +125,7 @@ export default class OpenXpkiController extends Controller {
 
     @action
     closeTab(entry) {
-        let tabs = this.get("model.tabs");
+        let tabs = this.model.tabs;
         tabs.removeObject(entry);
         if (!tabs.findBy("active", true)) {
             tabs.set("lastObject.active", true);
