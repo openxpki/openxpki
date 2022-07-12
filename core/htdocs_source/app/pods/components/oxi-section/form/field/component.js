@@ -70,7 +70,7 @@ export default class OxiFieldMainComponent extends Component {
         if (event.keyCode === 13 && this.field.type !== "textarea") {
             event.stopPropagation();
             event.preventDefault();
-            this.args.submit();
+            this.args.onSubmit();
         }
         // TAB --> clonable fields: add another clone
         if (event.keyCode === 9 && this.field._lastCloneInGroup && this.field.value !== null && this.field.value !== "") {
