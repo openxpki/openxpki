@@ -64,6 +64,8 @@ module.exports = function(defaults) {
       includeExternalHelpers: true, // import these helpers from a shared module, reducing app size overall
     },
 
+    // https://cli.emberjs.com/release/advanced-use/asset-compilation/
+    // https://babeljs.io/docs/en/babel-preset-env
     'babel': {
       // sourcemaps work without the following, but for some reason it generates smaller files:
       sourceMaps: (process.env.OPENXPKI_UI_BUILD_UNMINIFIED == 1) ? 'inline' : false,
