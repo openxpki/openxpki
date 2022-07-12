@@ -8,8 +8,8 @@
   overflow-y: scroll;
 }
 
-/* Links: only underline on hover */
-a {
+/* Links: only underline on hover (except navbar items) */
+a, .navbar a:hover {
   text-decoration: none;
 }
 a:hover {
