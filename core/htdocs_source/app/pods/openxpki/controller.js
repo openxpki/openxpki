@@ -103,9 +103,9 @@ export default class OpenXpkiController extends Controller {
     // This way we can force Ember to do a transition even if the new page is
     // the same page as before by setting parameter "force" a timestamp.
     @action
-    navigateTo(page, navbarCollapsFunc, event) {
+    navigateTo(page, navbarCollapseFunc, event) {
         if (event) { event.stopPropagation(); event.preventDefault() }
-        navbarCollapsFunc()
+        if (navbarCollapseFunc) navbarCollapseFunc()
         this.router.transitionTo('openxpki', page, { queryParams: { force: (new Date()).valueOf() } })
     }
 
