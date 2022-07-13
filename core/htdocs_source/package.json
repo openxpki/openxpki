@@ -79,5 +79,8 @@
   },
   "ember": {
     "edition": "octane"
+  },
+  "dependencies": {
+    "broccoli-asset-rev": "^3.0.0"
   }
 }
