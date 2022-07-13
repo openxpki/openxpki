@@ -32,14 +32,14 @@ module.exports = function(defaults) {
   let app = new EmberApp(defaults, {
     ...on_production,
 
-    'minifyCSS': {
-      // for available options see https://github.com/jakubpawlowicz/clean-css/tree/v3.4.28
-      options: {
-        processImport: true,
-        keepBreaks: true,
-      }
-    },
+    // store app config in compiled JS file instead of <meta> tag
+    'storeConfigInMeta': false,
 
+    /*******************************
+      Assets to include
+    ********************************/
+
+    // Bootstrap
     'ember-bootstrap': {
       bootstrapVersion: 5,
       importBootstrapCSS: true,
@@ -48,9 +48,63 @@ module.exports = function(defaults) {
       whitelist: ['bs-button', 'bs-modal', 'bs-dropdown', 'bs-navbar', 'bs-collapse'],
     },
 
+    // fetch() polyfill (does not exist in core-js via ember-cli-babel, so we need to add it)
+    'ember-fetch': {
+      preferNative: true,
+    },
+
+    // flatpickr date picker
+    'flatpickr': {
+      locales: ['de', 'it', 'ja', 'ru', 'zh'],
+    },
+
+    /*******************************
+      ES6 support / transpilation
+    ********************************/
+
+    // ember-cli-babel - convert ES6 code with Babel to code supported by
+    // target browsers as specified in config/targets.js
+    'ember-cli-babel': {
+      includePolyfill: true,
+      includeExternalHelpers: true, // import these helpers from a shared module, reducing app size overall
+    },
+
+    // @babel/preset-env (!) configuration used by ember-cli-babel
+    // https://cli.emberjs.com/release/advanced-use/asset-compilation/
+    // https://babeljs.io/docs/en/babel-preset-env
+    'babel': {
+      // sourcemaps work without the following, but for some reason it generates smaller files:
+      sourceMaps: (process.env.OPENXPKI_UI_BUILD_UNMINIFIED == 1) ? 'inline' : false,
+    },
+
+    /*******************************
+      Modifications
+    ********************************/
+
+    // clean-css - minify CSS definitions
     /*
-      Configure ember-auto-import (which uses Webpack to create the chunk.xx
-      files with imported modules).
+      Currently Ember CLI automatically minifies CSS files using clean-css when
+      building for production environment.
+      Dependency chain:
+      ember-cli
+        -> ember-cli-preprocess-registry (3.3.0)
+          -> broccoli-clean-css (1.1.0)
+            -> clean-css-promise (0.1.1)
+              -> clean-css (3.4.28)
+      ember-cli-preprocess-registry uses the fallback broccoli-clean-css
+      when no other "minify-css" preprocessor was registered in Ember.
+      One example of such an alternative preprocessor is ember-cli-clean-css.
+    */
+    'minifyCSS': {
+      // available options: https://github.com/jakubpawlowicz/clean-css/tree/v3.4.28
+      options: {
+        processImport: true,
+        keepBreaks: true,
+      }
+    },
+
+    // ember-auto-import - create asset bundles from imported modules
+    /*
       We adjust the names of the output files. We remove the hash as obviously
       an additional hash is appended by 'broccoli-asset-rev' using the
       'fingerprint' configuration below.
@@ -71,38 +125,11 @@ module.exports = function(defaults) {
       }
     },
 
-    // fingerprinting of assets in production build
-    // (i.e. "openxpki.js" or "openxpki-1312d860591f9801798c1ef46052a7ea.js")
+    // broccoli-asset-rev - fingerprint assets in production build
+    // (i.e. "openxpki-1312d860591f9801798c1ef46052a7ea.js")
     'fingerprint': {
       enabled: true,
       extensions: ['js', 'css', 'map'], // default also includes 'png', 'jpg', 'gif'
-    },
-
-    // store app config in compiled JS file instead of <meta> tag
-    'storeConfigInMeta': false,
-
-    // use Babel to convert ES6 Javascript code to code supported by target browsers as specified in config/targets.js
-    'ember-cli-babel': {
-      includePolyfill: true,
-      includeExternalHelpers: true, // import these helpers from a shared module, reducing app size overall
-    },
-
-    // @babel/preset-env (!) configuration used by ember-cli-babel
-    // https://cli.emberjs.com/release/advanced-use/asset-compilation/
-    // https://babeljs.io/docs/en/babel-preset-env
-    'babel': {
-      // sourcemaps work without the following, but for some reason it generates smaller files:
-      sourceMaps: (process.env.OPENXPKI_UI_BUILD_UNMINIFIED == 1) ? 'inline' : false,
-    },
-
-    // fetch() polyfill does not exist in core-js (via ember-cli-babel), so we need to add it:
-    'ember-fetch': {
-      preferNative: true,
-    },
-
-    // flatpickr date picker
-    'flatpickr': {
-      locales: ['de', 'it', 'ja', 'ru', 'zh'],
     },
   });
 
