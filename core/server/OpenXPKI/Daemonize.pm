@@ -49,6 +49,13 @@ has old_sig_set => (
     init_arg => undef,
 );
 
+has is_parent => (
+    is => 'rw',
+    isa => 'Bool',
+    default => 1,
+    init_arg => undef,
+);
+
 =head1 METHODS
 
 =head2 fork_child
@@ -103,6 +110,8 @@ sub fork_child {
     # parent process: return on successful fork
     if ($pid > 0) { return $pid }
 
+    $self->is_parent(0);
+
     #
     # child process
     #
@@ -140,7 +149,7 @@ L</fork_child>).
 =cut
 sub DEMOLISH {
     my $self = shift;
-    $SIG{'CHLD'} = 'IGNORE';
+    $SIG{'CHLD'} = 'IGNORE' if $self->is_parent;
 }
 
 # "The most paranoid of programmers block signals for a fork to prevent a
