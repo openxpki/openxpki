@@ -30,19 +30,12 @@ export default class OpenXpkiController extends Controller {
     @tracked loading = false;
     @tracked showInfoBlock = false;
 
-    get statusClass() {
-        let level = this.model?.status?.level;
-        let message = this.model?.status?.message;
-        if (!message) { return "hide" }
+    @action
+    getStatusClass(level) {
         if (level === "error") { return "alert-danger" }
         if (level === "success") { return "alert-success" }
         if (level === "warn") { return "alert-warning" }
         return "alert-info";
-    }
-
-    get statusHidden() {
-        let message = this.model?.status?.message;
-        return !message;
     }
 
     get oldBrowser() {

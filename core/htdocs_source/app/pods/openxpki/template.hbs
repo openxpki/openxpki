@@ -87,61 +87,13 @@
         </div>
     </div>
 
-    {{!
-      *************************************
-      Messages
-      *************************************
-    }}
-    <div class="row">
-        <div class="col oxi-message">
-            {{#if this.model.status.href}}
-                <a href="{{this.model.status.href}}" target="_blank" hidden={{this.statusHidden}} rel="noopener noreferrer">
-                    <div class="alert {{this.statusClass}}">
-                        <OxiBase::Formatted @format="nl2br" @value={{this.model.status.message}}/>
-                    </div>
-                </a>
-            {{else}}
-                <div class="alert {{this.statusClass}}" hidden={{this.statusHidden}}>
-                    <OxiBase::Formatted @format="nl2br" @value={{this.model.status.message}}/>
-                </div>
-            {{/if}}
-        </div>
-    </div>
-
-    {{!
-      *************************************
-      Breadcrumb and page title
-      *************************************
-    }}
-    <div class="row">
-        <div class="col oxi-pagehead">
-            {{#if this.model.tabs.firstObject.page.breadcrumb.length}}
-                <ol class="breadcrumb">
-                    {{#each this.model.tabs.firstObject.page.breadcrumb as |entry|}}
-                        {{#if entry.label}}<li class="breadcrumb-item {{entry.className}}">{{entry.label}}</li>{{/if}}
-                    {{/each}}
-                </ol>
-            {{/if}}
-            {{#if this.model.tabs.firstObject.page.label}}
-                <h3>{{this.model.tabs.firstObject.page.label}}</h3>
-            {{/if}}
-        </div>
-    </div>
-
-    {{#if this.model.tabs.firstObject.page.description}}
-        <div class="row">
-            <div class="col mb-3">
-                {{html this.model.tabs.firstObject.page.description}}
-            </div>
-        </div>
-    {{/if}}
-    {{!
-      *************************************
-      Tab bar
-      *************************************
-    }}
     <div class="row">
         <div class="col">
+            {{!
+              *************************************
+              Tab bar
+              *************************************
+            }}
             {{#if this.showTabs}}
                 <ul class="nav nav-tabs mb-3">
                     {{#each this.model.tabs as |entry|}}
@@ -162,9 +114,67 @@
                     {{/each}}
                 </ul>
             {{/if}}
+            {{!
+              *************************************
+              Tab content
+              *************************************
+            }}
             <div class="tab-content pb-3">
                 {{#each this.model.tabs as |entry|}}
                     <div class="tab-pane {{if entry.active "active"}}">
+                        {{!
+                          *************************************
+                          Messages
+                          *************************************
+                        }}
+                        <div class="row">
+                            <div class="col oxi-message">
+                                {{#let (echo this.getStatusClass entry.status.level) as |cssClass|}}
+                                    {{#if entry.status.message}}
+                                        {{#if entry.status.href}}
+                                            <a href="{{entry.status.href}}" target="_blank" rel="noopener noreferrer">
+                                                <div class="alert {{cssClass}}">
+                                                    <OxiBase::Formatted @format="nl2br" @value={{entry.status.message}}/>
+                                                </div>
+                                            </a>
+                                        {{else}}
+                                            <div class="alert {{cssClass}}">
+                                                <OxiBase::Formatted @format="nl2br" @value={{entry.status.message}}/>
+                                            </div>
+                                        {{/if}}
+                                    {{/if}}
+                                {{/let}}
+                            </div>
+                        </div>
+
+                        {{!
+                          *************************************
+                          Breadcrumb and page title
+                          *************************************
+                        }}
+                        <div class="row">
+                            <div class="col oxi-pagehead">
+                                {{#if entry.page.breadcrumb.length}}
+                                    <ol class="breadcrumb">
+                                        {{#each entry.page.breadcrumb as |bc|}}
+                                            {{#if bc.label}}<li class="breadcrumb-item {{bc.className}}">{{bc.label}}</li>{{/if}}
+                                        {{/each}}
+                                    </ol>
+                                {{/if}}
+                                {{#if entry.page.label}}
+                                    <h3>{{entry.page.label}}</h3>
+                                {{/if}}
+                            </div>
+                            </div>
+
+                        {{#if entry.page.description}}
+                            <div class="row">
+                                <div class="col mb-3">
+                                    {{html entry.page.description}}
+                                </div>
+                            </div>
+                        {{/if}}
+
                         {{#let (and entry.right this.showInfoBlock) as |showInfo|}}
                             <div class="row">
                                 {{!

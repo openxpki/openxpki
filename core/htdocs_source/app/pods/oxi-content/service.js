@@ -112,7 +112,7 @@ export default class OxiContentService extends Service {
                 // Page contents
                 if (doc.page && doc.main) {
                     debug("updateRequest(): response - \"page\" and \"main\"");
-                    this._setPageContent(realTarget, doc.page, doc.main, doc.right);
+                    this._setPageContent(realTarget, doc.page, doc.main, doc.right, doc.status);
                 }
 
                 this._setLoadingBanner(null);
@@ -319,12 +319,13 @@ export default class OxiContentService extends Service {
         this.error = this.intl.t('error_popup.message.server', { code: status_code });
     }
 
-    _setPageContent(target, page, main, right) {
+    _setPageContent(target, page, main, right, status) {
         let newTab = {
             active: true,
-            page: page,
-            main: main,
-            right: right
+            page,
+            main,
+            right,
+            status,
         };
 
         // Mark the first form on screen: only the first one is allowed to focus
