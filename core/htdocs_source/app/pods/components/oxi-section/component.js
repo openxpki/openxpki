@@ -1,11 +1,11 @@
 import Component from '@glimmer/component';
 import { action, set } from "@ember/object";
 import { debug } from '@ember/debug';
-import { inject } from '@ember/service';
+import { service } from '@ember/service';
 
 export default class OxiSectionComponent extends Component {
-    @inject router;
-    @inject('oxi-content') content;
+    @service router;
+    @service('oxi-content') content;
 
     get type() {
         return `oxi-section/${this.args.content.type}`;

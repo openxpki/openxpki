@@ -1,7 +1,7 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
-import { inject } from '@ember/service';
+import { service } from '@ember/service';
 
 /**
  * Shows a label (a text) and escapes special characters.
@@ -18,15 +18,14 @@ import { inject } from '@ember/service';
  * @module component/oxi-base/label
  */
 export default class OxiLabelComponent extends Component {
-    @inject('oxi-content') content;
-    @inject('oxi-config') config;
+    @service('oxi-content') content;
+    @service('oxi-config') config;
 
     @tracked tooltipContent = null;
-    @tracked tooltipReady = false;
 
     get cssClasses() {
         let classes = [];
-        if (this.args.inline || Array.isArray(this.args.text)) classes.push('d-inline-flex');
+        if (Array.isArray(this.args.text)) classes.push('d-inline-flex');
         if (this.args.tooltip || this.args.raw_tooltip || this.args.tooltip_page) classes.push('oxi-has-tooltip')
         return classes.join(' ');
     }
@@ -40,12 +39,5 @@ export default class OxiLabelComponent extends Component {
         }).then((doc) => {
             this.tooltipContent = doc;
         });
-    }
-
-    @action
-    setTooltipReady(element) {
-        // Referenced via @updateFor={{this.tooltipReady}} -- this
-        // will trigger a repositioning if the content is too big
-        this.tooltipReady = true;
     }
 }

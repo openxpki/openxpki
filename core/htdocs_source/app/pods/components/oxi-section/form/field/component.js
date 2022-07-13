@@ -1,12 +1,11 @@
 import Component from '@glimmer/component';
 import { action } from "@ember/object";
-import { inject } from '@ember/service';
-import { debug } from '@ember/debug';
+import { service } from '@ember/service';
 
 export default class OxiFieldMainComponent extends Component {
-    @inject('oxi-backend') backend;
-    @inject('intl') intl;
-    @inject('oxi-config') config;
+    @service('oxi-backend') backend;
+    @service('intl') intl;
+    @service('oxi-config') config;
 
     get isBool() {
         return this.args.field.type === 'bool';
@@ -21,15 +20,22 @@ export default class OxiFieldMainComponent extends Component {
         return `oxi-section/form/field/${this.args.field.type}`;
     }
 
-    // Options for <EmberTooltip>, i.e. Popper.js
-    // See https://popper.js.org/docs/v1/#modifiers..preventOverflow
+    /*
+     * Options for <Tippy>, i.e. Popper.js
+     * See
+     *   https://atomiks.github.io/tippyjs/v6/all-props/#popperoptions and
+     *   https://popper.js.org/docs/v2/modifiers/prevent-overflow/
+     */
     get popperOptions() {
         return {
-            modifiers: {
-                preventOverflow: {
-                    escapeWithReference: false,
-                }
-            }
+            modifiers: [
+                {
+                    name: 'preventOverflow',
+                    options: {
+                        tether: false, // allow Popper to leave its overflow area to always stick with reference?
+                    },
+                },
+            ],
         }
     }
 
@@ -64,7 +70,7 @@ export default class OxiFieldMainComponent extends Component {
         if (event.keyCode === 13 && this.field.type !== "textarea") {
             event.stopPropagation();
             event.preventDefault();
-            this.args.submit();
+            this.args.onSubmit();
         }
         // TAB --> clonable fields: add another clone
         if (event.keyCode === 9 && this.field._lastCloneInGroup && this.field.value !== null && this.field.value !== "") {

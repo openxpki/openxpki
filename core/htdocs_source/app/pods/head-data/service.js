@@ -1,7 +1,10 @@
-import Service, { inject } from '@ember/service';
-import { tracked } from '@glimmer/tracking';
-// import { inject } from '@ember/service';
+import Service, { service } from '@ember/service';
 
+/*
+  This service is auto-injected into app/templates/head.hbs by Ember CLI.
+  An instance of this service can be accessed via the 'model' attribute
+  in app/templates/head.hbs.
+*/
 export default class HeadDataService extends Service {
-    @inject('oxi-config') config;
+    @service('oxi-config') config;
 }

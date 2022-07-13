@@ -8,19 +8,15 @@
   *************************************
 }}
 <BsNavbar
-    @type="light"
-    @backgroundColor=""
-    class="py-2 py-lg-0 mb-3 oxi-navbar"
-    @collapsed={{true}}
-    @onCollapse={{action (mut this.collapsed) true}}
-    @onExpand={{action (mut this.collapsed) false}} as |navbar|
+    @backgroundColor="secondary"
+    class="py-2 py-lg-0 mb-3 bg-opacity-10 border-2 border-bottom border-secondary"
+    as |navbar|
 >
-    <div class="navbar-header">
-        <navbar.toggle />
-    </div>
-    <navbar.content>
-        <navbar.nav class="mr-auto" as |nav|>
+    <navbar.toggle toggle={{true}} />
+    <navbar.content id="oxi-navbar">
+        <navbar.nav class="me-auto" as |nav|>
             {{#each this.model.navEntries as |navEntry|}}
+                {{!-- sub menu --}}
                 {{#if navEntry.entries.length}}
                     <nav.dropdown class="mx-2" as |dd|>
                         <dd.toggle>
@@ -33,7 +29,11 @@
                                     {{#if entry.key}}
                                         {{! We need the href in addition to the click handler to support
                                             opening the page in a new window }}
-                                        <a class="dropdown-item" href="{{url-for "openxpki" entry.key}}" {{on "click" (fn this.navigateTo entry.key)}}>
+                                        <a
+                                            class="dropdown-item"
+                                            href="{{url-for "openxpki" entry.key}}"
+                                            {{on "click" (fn this.navigateTo entry.key navbar.collapse)}}
+                                        >
                                             {{entry.label}}
                                         </a>
                                     {{else}}
@@ -47,9 +47,14 @@
                             {{/each}}
                         </dd.menu>
                     </nav.dropdown>
+                {{!-- plain menu item --}}
                 {{else}}
                     <nav.item class="mx-2">
-                        <a class="nav-link" href="{{url-for "openxpki" navEntry.key}}" {{on "click" (fn this.navigateTo navEntry.key)}}>
+                        <a
+                            class="nav-link"
+                            href="{{url-for "openxpki" navEntry.key}}"
+                            {{on "click" (fn this.navigateTo navEntry.key navbar.collapse)}}
+                        >
                             {{navEntry.label}}
                         </a>
                     </nav.item>
@@ -82,79 +87,94 @@
         </div>
     </div>
 
-    {{!
-      *************************************
-      Messages
-      *************************************
-    }}
-    <div class="row">
-        <div class="col oxi-message">
-            {{#if this.model.status.href}}
-                <a href="{{this.model.status.href}}" target="_blank" hidden={{this.statusHidden}}>
-                    <div class="alert {{this.statusClass}}" style="cursor:pointer;">
-                        <OxiBase::Formatted @format="nl2br" @value={{this.model.status.message}}/>
-                    </div>
-                </a>
-            {{else}}
-                <div class="alert {{this.statusClass}}" hidden={{this.statusHidden}}>
-                    <OxiBase::Formatted @format="nl2br" @value={{this.model.status.message}}/>
-                </div>
-            {{/if}}
-        </div>
-    </div>
-
-    {{!
-      *************************************
-      Breadcrumb and page title
-      *************************************
-    }}
-    <div class="row">
-        <div class="col oxi-pagehead">
-            {{#if this.model.tabs.firstObject.page.breadcrumb.length}}
-                <ol class="breadcrumb">
-                    {{#each this.model.tabs.firstObject.page.breadcrumb as |entry|}}
-                        {{#if entry.label}}<li class="breadcrumb-item {{entry.className}}">{{entry.label}}</li>{{/if}}
-                    {{/each}}
-                </ol>
-            {{/if}}
-            {{#if this.model.tabs.firstObject.page.label}}
-                <h3>{{this.model.tabs.firstObject.page.label}}</h3>
-            {{/if}}
-        </div>
-    </div>
-
-    {{#if this.model.tabs.firstObject.page.description}}
-        <div class="row">
-            <div class="col mb-3">
-                {{{this.model.tabs.firstObject.page.description}}}
-            </div>
-        </div>
-    {{/if}}
-    {{!
-      *************************************
-      Tab bar
-      *************************************
-    }}
     <div class="row">
         <div class="col">
+            {{!
+              *************************************
+              Tab bar
+              *************************************
+            }}
             {{#if this.showTabs}}
                 <ul class="nav nav-tabs mb-3">
                     {{#each this.model.tabs as |entry|}}
                         <li class="nav-item">
-                            <a class="nav-link {{if entry.active "active"}}" {{action "activateTab" entry}} href="#">
-                                {{if entry.page.shortlabel entry.page.shortlabel entry.page.label}}
-                                <span class="tab-close" {{action "closeTab" entry}}>
-                                    {{!-- template-lint-disable no-bare-strings --}}
-                                    &times;
-                                </span>
-                            </a>
+                            <div class="nav-link {{if entry.active "active bg-primary bg-opacity-10"}}">
+                                <div class="btn-group" role="group">
+                                    <button class="btn" type="button" {{on "click" (fn this.activateTab entry)}}>
+                                        {{if entry.page.shortlabel entry.page.shortlabel entry.page.label}}
+                                    </button>
+                                    {{#if entry.active}}
+                                        <button class="btn" type="button" {{on "click" (fn this.closeTab entry)}}>
+                                            <i class="glyphicon glyphicon-remove"></i>
+                                        </button>
+                                    {{/if}}
+                                </div>
+                            </div>
                         </li>
                     {{/each}}
                 </ul>
             {{/if}}
+            {{!
+              *************************************
+              Tab content
+              *************************************
+            }}
             <div class="tab-content pb-3">
                 {{#each this.model.tabs as |entry|}}
                     <div class="tab-pane {{if entry.active "active"}}">
+                        {{!
+                          *************************************
+                          Messages
+                          *************************************
+                        }}
+                        <div class="row">
+                            <div class="col oxi-message">
+                                {{#let (echo this.getStatusClass entry.status.level) as |cssClass|}}
+                                    {{#if entry.status.message}}
+                                        {{#if entry.status.href}}
+                                            <a href="{{entry.status.href}}" target="_blank" rel="noopener noreferrer">
+                                                <div class="alert {{cssClass}}">
+                                                    <OxiBase::Formatted @format="nl2br" @value={{entry.status.message}}/>
+                                                </div>
+                                            </a>
+                                        {{else}}
+                                            <div class="alert {{cssClass}}">
+                                                <OxiBase::Formatted @format="nl2br" @value={{entry.status.message}}/>
+                                            </div>
+                                        {{/if}}
+                                    {{/if}}
+                                {{/let}}
+                            </div>
+                        </div>
+
+                        {{!
+                          *************************************
+                          Breadcrumb and page title
+                          *************************************
+                        }}
+                        <div class="row">
+                            <div class="col oxi-pagehead">
+                                {{#if entry.page.breadcrumb.length}}
+                                    <ol class="breadcrumb">
+                                        {{#each entry.page.breadcrumb as |bc|}}
+                                            {{#if bc.label}}<li class="breadcrumb-item {{bc.className}}">{{bc.label}}</li>{{/if}}
+                                        {{/each}}
+                                    </ol>
+                                {{/if}}
+                                {{#if entry.page.label}}
+                                    <h3>{{entry.page.label}}</h3>
+                                {{/if}}
+                            </div>
+                            </div>
+
+                        {{#if entry.page.description}}
+                            <div class="row">
+                                <div class="col mb-3">
+                                    {{html entry.page.description}}
+                                </div>
+                            </div>
+                        {{/if}}
+
                         {{#let (and entry.right this.showInfoBlock) as |showInfo|}}
                             <div class="row">
                                 {{!
@@ -162,6 +182,7 @@
                                 }}
                                 <div class="col-11 {{if showInfo "col-lg-7"}} oxi-main order-0">
                                     {{#each entry.main as |mainEntry|}}
+                                        <!-- entry.main item -->
                                         {{! extra row/col level to restrict form width if info block
                                              is hidden (as overly long input fields look ugly) }}
                                         <div class="row">
@@ -179,7 +200,7 @@
                                 }}
                                 {{#if entry.right}}
                                     {{#if showInfo}}
-                                        <div class="col-12 col-lg-4 order-2 order-lg-1 pr-lg-0 oxi-infobox">
+                                        <div class="col-12 col-lg-4 order-2 order-lg-1 pe-lg-0 oxi-infobox">
                                             {{#each entry.right as |rightEntry|}}
                                                 <div class="card bg-light border-secondary">
                                                     <div class="card-body p-1">
@@ -192,7 +213,7 @@
                                             {{/each}}
                                         </div>
                                     {{/if}}
-                                    <div class="col-6 col-lg-1 order-1 order-lg-2 pt-3 pl-lg-0">
+                                    <div class="col-6 col-lg-1 order-1 order-lg-2 pt-3 ps-lg-0">
                                         <BsButton
                                             @type="light"
                                             class="btn-sm"
@@ -219,9 +240,9 @@
         @fade={{true}}
         @backdrop={{true}}
         @backdropClose={{false}}
-        @onHidden={{action "clearPopupData"}}
         @size={{if popup.page.isLarge "xl" "lg"}}
         @scrollable={{true}}
+        {{on "hidden" this.clearPopupData}}
         as |Modal|
     >
         <Modal.header class="bg-secondary text-white">
@@ -235,7 +256,7 @@
             {{/each}}
         </Modal.body>
         <Modal.footer>
-            <BsButton @onClick={{action Modal.close}}>{{t 'site.close_popup'}}</BsButton>
+            <BsButton {{on "click" Modal.close}}>{{t 'site.close_popup'}}</BsButton>
         </Modal.footer>
     </BsModal>
 {{/let}}
@@ -253,11 +274,11 @@
         <h4 class="modal-title">{{t 'error_popup.header'}}</h4>
     </Modal.header>
     <Modal.body>
-        {{{this.model.error}}}
+        {{html this.model.error}}
     </Modal.body>
     <Modal.footer>
-        <BsButton @onClick={{action "reload"}} @type="primary">{{t 'error_popup.reload'}}</BsButton>
-        <BsButton @onClick={{action Modal.close}}>{{t 'site.close_popup'}}</BsButton>
+        <BsButton {{on "click" this.reload}} @type="primary">{{t 'error_popup.reload'}}</BsButton>
+        <BsButton {{on "click" Modal.close}}>{{t 'site.close_popup'}}</BsButton>
     </Modal.footer>
 </BsModal>
 

@@ -1,7 +1,66 @@
 import Component from '@glimmer/component';
-import { inject } from '@ember/service';
-import { action, computed, set, setProperties } from '@ember/object';
+import { service } from '@ember/service';
+import { action, set } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import { A } from '@ember/array'
+
+/*
+ * Pager data, representing the current page, sort order etc.
+ */
+class Pager {
+    @tracked num
+    @tracked active
+    @tracked count = 0
+    @tracked startat = 0
+    @tracked limit = Number.MAX_VALUE
+    @tracked order
+    @tracked reverse = false
+    @tracked pagesizes
+    @tracked pagersize
+    @tracked pagerurl
+    @tracked disabled = false
+
+    fillFromHash(sourceHash) {
+        for (const attr of Object.keys(sourceHash)) {
+            // @tracked properties are prototype properties, the others instance properties
+            if (! (Object.prototype.hasOwnProperty.call(Object.getPrototypeOf(this), attr) || Object.prototype.hasOwnProperty.call(this, attr))) {
+                /* eslint-disable-next-line no-console */
+                console.error(
+                    `oxi-section/grid: unknown property "${attr}" in field "${sourceHash.name}". ` +
+                    `If it's a new property, please add it to class 'Pager' defined in app/pod/components/oxi-section/grid/component.js`
+                )
+            }
+            else {
+                this[attr] = sourceHash[attr]
+            }
+        }
+    }
+
+    clone() {
+        let twin = new Pager()
+        // @tracked properties
+        Object.keys(Object.getPrototypeOf(this)).forEach(k => twin[k] = this[k])
+        // public class properties
+        Object.keys(this).forEach(k => twin[k] = this[k])
+        return twin
+    }
+
+    /**
+     * Returns all non-private properties (i.e. no leading underscore) as a plain hash/object
+     */
+    toPlainHash() {
+        let hash = {}
+        // @tracked non-private properties
+        Object.keys(Object.getPrototypeOf(this))
+            .filter(k => k.charAt(0) != '_')
+            .forEach(k => hash[k] = this[k])
+        // non-private class properties
+        Object.keys(this)
+            .filter(k => k.charAt(0) != '_')
+            .forEach(k => hash[k] = this[k])
+        return hash
+    }
+}
 
 /**
  * Draws a grid.
@@ -15,21 +74,16 @@ import { tracked } from '@glimmer/tracking';
  * @module component/oxi-section/grid
  */
 export default class OxiSectionGridComponent extends Component {
-    @inject('oxi-content') content;
+    @service('oxi-content') content;
 
-    @tracked rawData = [];
-    @tracked pager = {};
+    @tracked rawData = A([]);
+    @tracked pager = new Pager();
 
     constructor() {
         super(...arguments);
 
         this.rawData = this.args.def.data || [];
-
-        this.pager = this.args.def.pager || {};
-        if (this.pager.count == null)   { this.pager.count = 0 }
-        if (this.pager.startat == null) { this.pager.startat = 0 }
-        if (this.pager.limit == null)   { this.pager.limit = Number.MAX_VALUE }
-        if (this.pager.reverse == null) { this.pager.reverse = 0 }
+        this.pager.fillFromHash(this.args.def.pager || {});
     }
 
     get rawColumns() { return (this.args.def.columns || []) }
@@ -46,7 +100,6 @@ export default class OxiSectionGridComponent extends Component {
         .filter(col => col.sTitle[0] !== "_" && col.bVisible !== 0);
     }
 
-    @computed("pager.{startat,limit,order,reverse}")
     get pages() {
         let pager = this.pager;
         if (!pager) { return [] }
@@ -101,7 +154,6 @@ export default class OxiSectionGridComponent extends Component {
         return o;
     }
 
-    @computed("pager.{pagesizes,limit,startat,order,reverse}")
     get pagesizes() {
         let pager = this.pager;
         if (!pager.pagesizes) { return [] }
@@ -120,7 +172,6 @@ export default class OxiSectionGridComponent extends Component {
         });
     }
 
-    @computed("visibleColumns", "pager.{limit,startat,order,reverse}")
     get formattedColumns() {
         let results = [];
         for (const column of this.visibleColumns) {
@@ -138,8 +189,8 @@ export default class OxiSectionGridComponent extends Component {
                 // pager information to change sorting
                 sortPage: {
                     limit: this.pager.limit,
-                    order: order,
-                    reverse: +reverse,
+                    order,
+                    reverse,
                     startat: this.pager.startat
                 }
             });
@@ -147,21 +198,27 @@ export default class OxiSectionGridComponent extends Component {
         return results;
     }
 
-    @computed("rawData")
     get data() {
-        let data = this.rawData;
-        let columns = this.formattedColumns;
-        let titles = this.rawColumns.getEach("sTitle");
-        let classIndex = titles.indexOf("_status");
+        let columns = this.formattedColumns
+        let titles = this.rawColumns.getEach("sTitle")
+        let classIndex = titles.indexOf("_status")
         if (classIndex === -1) {
-            classIndex = titles.indexOf("_className");
+            classIndex = titles.indexOf("_className")
         }
-        let results = [];
-        let y, j, len;
-        for (y = j = 0, len = data.length; j < len; y = ++j) {
-            let row = data[y];
+        let results = []
+        let y, j, len
+        for (y = j = 0, len = this.rawData.length; j < len; y = ++j) {
+            let row = this.rawData[y];
+
+            let cssClass = ''
+            if (classIndex != -1) {
+                let _classname = row[classIndex]
+                if (Object.prototype.toString.call(_classname) == '[object Object]') _classname = _classname.value
+                cssClass = `gridrow-${_classname.toLowerCase()}`
+            }
+
             results.push({
-                className: `gridrow-${row[classIndex]}`,
+                className: cssClass,
                 originalData: row,
                 data: columns.map(col => {
                     return {
@@ -169,29 +226,27 @@ export default class OxiSectionGridComponent extends Component {
                         value: row[col.index],
                     }
                 }),
-                checked: false,
+                checked: row.checked ? true : false,
                 originalIndex: y
-            });
+            })
         }
-
-        return results;
+        return results
     }
 
     // split sorting from row data generation in "get data()" for better performance when re-sorting
-    @computed("data", "formattedColumns", "pager.reverse")
     get sortedData() {
         // server-side sorting
         if (this.hasPager) return this.data;
 
         // client-side sorting
-        let data = this.data.toArray();
-        let column = this.formattedColumns.findBy("isSorted");
-        let sortNum = this.formattedColumns.indexOf(column);
-        if (sortNum >= 0) {
+        let data = this.data.toArray()
+
+        let col_index = this.formattedColumns.findIndex(col => col.isSorted)
+        if (col_index >= 0) {
             let re = /^[0-9.]+$/;
             data.sort(function(a, b) {
-                a = a.data[sortNum].value;
-                b = b.data[sortNum].value;
+                a = a.data[col_index].value;
+                b = b.data[col_index].value;
                 if (re.test(a) && re.test(b)) {
                     a = parseFloat(a, 10);
                     b = parseFloat(b, 10);
@@ -205,22 +260,18 @@ export default class OxiSectionGridComponent extends Component {
         return data;
     }
 
-    @computed("sortedData.@each.checked")
     get allChecked() {
         return this.sortedData.isEvery("checked", true);
     }
 
-    @computed("sortedData.@each.checked")
     get noneChecked() {
         return this.sortedData.isEvery("checked", false);
     }
 
-    @computed("buttons.@each.select")
     get isBulkable() {
         return this.buttons.isAny("select");
     }
 
-    @computed("args.def.buttons", "noneChecked")
     get buttons() {
         let buttons = this.args.def.buttons || [];
         return buttons.map(b => {
@@ -278,34 +329,35 @@ export default class OxiSectionGridComponent extends Component {
         }
     }
 
+    // (de-)select single row
     @action
     select(row) {
-        // (de-)select single row
-        if (row) {
-            set(row, "checked", !row.checked);
-        }
-        // (de-)select all
-        else {
-            this.sortedData.setEach("checked", !this.allChecked);
-        }
+        set(this.rawData[row.originalIndex], "checked", !this.rawData[row.originalIndex].checked)
+        this.rawData = this.rawData // eslint-disable-line no-self-assign -- trigger Ember update
+    }
+
+    // (de-)select all rows
+    @action
+    selectAll() {
+        this.rawData.setEach("checked", !this.allChecked)
+        this.rawData = this.rawData // eslint-disable-line no-self-assign -- trigger Ember update
     }
 
     @action
-    setPage(page) {
-        if (page.disabled || page.active) {
+    updatePage(page) {
+            if (page.disabled || page.active) {
             return;
         }
-        let pager = this.pager;
         return this.content.updateRequest({
-            page:    pager.pagerurl,
+            page:    this.pager.pagerurl,
             limit:   page.limit,
             startat: page.startat,
             order:   page.order,
-            reverse: page.reverse,
+            reverse: page.reverse ? 1 : 0,
         })
         .then((res) => {
             this.rawData = res.data || [];
-            setProperties(pager, page);
+            this.pager.fillFromHash(page);
         });
     }
 
@@ -313,11 +365,11 @@ export default class OxiSectionGridComponent extends Component {
     sort(page) {
         // server-side sorting
         if (this.hasPager) {
-            if (page.order) this.setPage(page)
+            if (page.order) this.updatePage(page)
         }
         // client-side sorting
         else {
-            setProperties(this.pager, page);
+            this.pager.fillFromHash(page);
         }
     }
 }

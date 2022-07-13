@@ -1,8 +1,8 @@
 <BsButton
-    class="oxi-btn-exceptional btn-block btn-sm"
+    class="oxi-btn-exceptional btn-sm"
     @icon="glyphicon glyphicon-refresh"
     @onClick={{this.query}}
     disabled={{@disabled}}
 >
-    <EmberTooltip>{{this.buttonLabel}}</EmberTooltip>
+    <Tippy>{{this.buttonLabel}}</Tippy>
 </BsButton>

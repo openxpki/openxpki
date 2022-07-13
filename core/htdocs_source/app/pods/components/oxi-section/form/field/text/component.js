@@ -2,12 +2,11 @@ import Component from '@glimmer/component';
 import { tracked  } from '@glimmer/tracking';
 import { action, set } from '@ember/object';
 import { scheduleOnce } from '@ember/runloop';
-import { isArray } from '@ember/array';
-import { inject } from '@ember/service';
+import { service } from '@ember/service';
 
 export default class OxiFieldTextComponent extends Component {
-    @inject('intl') intl;
-    @inject('oxi-content') content;
+    @service('intl') intl;
+    @service('oxi-content') content;
 
     /*
      * Note: the search input field is two-fold:
@@ -37,9 +36,9 @@ export default class OxiFieldTextComponent extends Component {
             if (content.autocomplete_query?.action === undefined) {
                 throw new Error(`oxi-section/form/field/text: parameter "autocomplete_query.action" missing`);
             }
-            let params;
-            if (params = content.autocomplete_query?.params) {
-                if (Object.prototype.toString.call(params) !== '[object Object]')
+            let params = content.autocomplete_query?.params;
+            if (params) {
+                if (Object.prototype.toString.call(params) != '[object Object]')
                     throw new Error(`oxi-section/form/field/text: parameter "autocomplete_query.params" must be a hash`);
 
                 for (const [param_name, ref_field] of Object.entries(params)) {
@@ -71,10 +70,7 @@ export default class OxiFieldTextComponent extends Component {
         let newCursorPos = inputField.selectionStart + pasteCleaned.length;
 
         // put cursor into right position after Ember rendered all updates
-        scheduleOnce('afterRender', this, () => {
-            inputField.focus();
-            inputField.setSelectionRange(newCursorPos, newCursorPos);
-        });
+        scheduleOnce('afterRender', this, this.setCursorPos, inputField, newCursorPos);
 
         let value =
             oldVal.slice(0, inputField.selectionStart) +
@@ -83,6 +79,11 @@ export default class OxiFieldTextComponent extends Component {
 
         this.setValue(value);
         event.preventDefault();
+    }
+
+    setCursorPos(inputField, pos) {
+        inputField.focus()
+        inputField.setSelectionRange(pos, pos);
     }
 
     setValue(value, runAutocomplete = true) {

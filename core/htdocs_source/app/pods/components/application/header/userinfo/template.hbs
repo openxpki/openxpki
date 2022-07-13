@@ -2,29 +2,29 @@
     <div class="userinfo text-nowrap">
         <ul class="nav flex-column">
             {{!-- template-lint-disable no-bare-strings --}}
-            <li class="text-right user">
+            <li class="text-end user">
                 {{t 'userinfo.name'}}
                 <strong>{{this.content.user.realname}} <span>({{this.content.user.role}})</span></strong>
             </li>
-            <li class="text-right pki_realm">
+            <li class="text-end pki_realm">
                 {{t 'userinfo.realm'}}
                 <strong>{{this.content.user.pki_realm_label}} <span>({{this.content.user.pki_realm}})</span></strong>
             </li>
             {{#if this.content.user.last_login}}
-            <li class="text-right last_login">
+            <li class="text-end last_login">
                 {{t 'userinfo.last_login'}}
                 <strong><OxiBase::Formatted @format="timestamp" @value={{this.content.user.last_login}} @class="big" @truncate={{true}} /></strong>
             </li>
             {{/if}}
             {{#if this.currentTenant}}
-                <li class="text-right tenant">
+                <li class="text-end tenant">
                     {{#if this.hasMultipleTenants}}
                         {{t 'userinfo.tenant'}}
-                        <BsDropdown style="display: inline" as |dd|>
+                        <BsDropdown class="d-inline" as |dd|>
                             <dd.toggle>
                                 <strong>{{this.currentTenant}}</strong> <span class="caret"></span>
                             </dd.toggle>
-                            <dd.menu class="dropdown-menu-right" as |ddm|>
+                            <dd.menu class="dropdown-menu-end" as |ddm|>
                                 {{#each this.content.user.tenants as |t|}}
                                     <ddm.item>
                                         <ddm.linkTo {{on 'click' (fn this.setTenant t)}}>{{t.label}}</ddm.linkTo>

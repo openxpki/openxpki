@@ -23,9 +23,8 @@
         <OxiBase::Label
             @text={{v}}
             @raw={{false}}
-            @inline={{true}}
             @tooltip={{if @truncate v}}
-            @class="oxi-formatted-subject {{if @truncate "oxi-truncate"}}"
+            @class="oxi-formatted-subject {{if @truncate "oxi-truncate"}} d-inline-flex"
         />
 
     {{else if (eq "nl2br" this.format)}}
@@ -45,10 +44,10 @@
 
     {{else if (eq "certstatus" this.format)}}
         <OxiBase::Label
-            @class="oxi-formatted-certstatus certstatus-{{lc (try v.value v.label)}} {{@class}}"
-            @tooltip={{v.tooltip}}
             @text={{v.label}}
             @raw={{true}}
+            @tooltip={{v.tooltip}}
+            @class="oxi-formatted-certstatus certstatus-{{lc (try v.value v.label)}} {{@class}}"
         />
 
     {{else if (eq "link" this.format)}}
@@ -72,12 +71,13 @@
     {{else if (eq "code" this.format)}}
         <code
             title="{{t 'component.oxi_code.copy'}}"
+            {{!-- template-lint-disable no-invalid-interactive --}}
             {{on "dblclick" this.selectCode}}
             class="oxi-formatted-code {{@class}}"
         >{{this.valueStr}}</code>
 
     {{else if (eq "asciidata" this.format)}}
-        <div class="hover-element" class="oxi-formatted-asciidata {{@class}}">
+        <div class="hover-element oxi-formatted-asciidata {{@class}}">
             <pre class="content pre-scrollable">{{this.valueStr}}</pre>
             <div class="menu">
                 <OxiBase::Download @data={{this.valueStr}} />

@@ -1,4 +1,4 @@
-@import url("bootstrap-v4-tweaks.css");
+@import url("bootstrap-v5-tweaks.css");
 @import url("glyphicons.css");
 
 /******************************************************************************
@@ -21,15 +21,6 @@ body {
 
 img.toplogo {
   height: 40px;
-}
-
-/* Navigation bar (menu) */
-.oxi-navbar {
-  background-color: #e8e8e8;
-  border-bottom: 2px solid #757373;
-}
-.oxi-navbar.navbar-light .navbar-nav .nav-link {
-  color: #484b4f;
 }
 
 /* Content */
@@ -86,22 +77,6 @@ img.toplogo {
   height: 60px;
   padding-top: 20px;
   background-color: #f5f5f5;
-}
-
-.tab-close {
-  font-size: 18px;
-  font-weight: bold;
-  line-height: 1;
-  color: #000;
-  text-shadow: 0 1px 0 #fff;
-  opacity: 0.2;
-}
-
-.tab-close:hover, .tab-close:focus {
-  color: #000;
-  text-decoration: none;
-  cursor: pointer;
-  opacity: 0.5;
 }
 
 .userinfo {
@@ -618,7 +593,6 @@ div.required input.flatpickr-input {
  * Others
  */
 .hover-element {
-  display: inline flex;
   flex-direction: column;
 }
 

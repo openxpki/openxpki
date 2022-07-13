@@ -1,23 +1,25 @@
 import Controller from '@ember/controller';
 import { tracked } from '@glimmer/tracking';
-import { action, computed, set } from '@ember/object';
-import { gt } from '@ember/object/computed';
-import { inject } from '@ember/service';
+import { action, set } from '@ember/object';
+import { service } from '@ember/service';
 import lite from 'caniuse-lite';
 import { detect } from 'detect-browser'
 
 export default class OpenXpkiController extends Controller {
-    @inject('oxi-config') config;
-    @inject('oxi-content') content;
-    @inject router;
+    @service('oxi-config') config;
+    @service('oxi-content') content;
+    @service router;
 
-    // Reserved Ember properties
-    // https://api.emberjs.com/ember/release/classes/Controller
+    /*
+      Reserved Ember property:
+      defines the supported query parameters. Ember makes them available as this.count etc.
+      https://api.emberjs.com/ember/release/classes/Controller
+    */
     queryParams = [
         "count",
         "limit",
         "startat",
-        "force" // supported query parameters, available as this.count etc.
+        "force",
     ];
 
     // FIXME Remove those three?! (auto-injected by Ember, see queryParams above)
@@ -28,21 +30,12 @@ export default class OpenXpkiController extends Controller {
     @tracked loading = false;
     @tracked showInfoBlock = false;
 
-    @computed("model.status.{level,message}")
-    get statusClass() {
-        let level = this.get("model.status.level");
-        let message = this.get("model.status.message");
-        if (!message) { return "hide" }
+    @action
+    getStatusClass(level) {
         if (level === "error") { return "alert-danger" }
         if (level === "success") { return "alert-success" }
         if (level === "warn") { return "alert-warning" }
         return "alert-info";
-    }
-
-    @computed("model.status.message")
-    get statusHidden() {
-        let message = this.get("model.status.message");
-        return !message;
     }
 
     get oldBrowser() {
@@ -66,7 +59,7 @@ export default class OpenXpkiController extends Controller {
         }
 
         const browser = detect()
-        if (!browser) return
+        if (!browser) return null
 
         // translate 'detect-browser' name to 'caniuse' name
         let name = map[browser.name] || browser.name
@@ -75,35 +68,38 @@ export default class OpenXpkiController extends Controller {
 
         // look if 'caniuse' knows this browser
         let agent = lite.agents[name]
-        if (!agent) return
+        if (!agent) return null
 
         // look if 'caniuse' knows this version
         let version = browser.version
         const known_version = Object.keys(agent.release_date).find(v => version.match(new RegExp(`^${v}(\\.|$)`)))
-        if (!known_version) return
+        if (!known_version) return null
 
         // calculate browser age (release date)
         let release_date = agent.release_date[known_version]
-        if (!release_date) return
+        if (!release_date) return null
 
         let now = parseInt(new Date() / 1000)
         let age = parseInt((now - release_date) / (60*60*24))
 
-        if (age < old_age) return
+        if (age < old_age) return null
 
         console.info(`Detected browser "${agent.browser} ${known_version}" is ${age} days old (max. supported browser age: ${old_age} days)`)
         return `${agent.browser} ${known_version}`
     }
 
-    @gt("model.tabs.length", 1) showTabs;
+    get showTabs() {
+        return this.model.tabs.length > 1
+    }
 
     // We don't use <ddm.LinkTo> but our own method to navigate to target page.
     // This way we can force Ember to do a transition even if the new page is
     // the same page as before by setting parameter "force" a timestamp.
     @action
-    navigateTo(page, event) {
+    navigateTo(page, navbarCollapseFunc, event) {
         if (event) { event.stopPropagation(); event.preventDefault() }
-        this.router.transitionTo('openxpki', page, { queryParams: { force: (new Date()).valueOf() } });
+        if (navbarCollapseFunc) navbarCollapseFunc()
+        this.router.transitionTo('openxpki', page, { queryParams: { force: (new Date()).valueOf() } })
     }
 
     @action
@@ -115,7 +111,7 @@ export default class OpenXpkiController extends Controller {
 
     @action
     activateTab(entry) {
-        let tabs = this.get("model.tabs");
+        let tabs = this.model.tabs;
         tabs.setEach("active", false);
         set(entry, "active", true);
         return false;
@@ -123,7 +119,7 @@ export default class OpenXpkiController extends Controller {
 
     @action
     closeTab(entry) {
-        let tabs = this.get("model.tabs");
+        let tabs = this.model.tabs;
         tabs.removeObject(entry);
         if (!tabs.findBy("active", true)) {
             tabs.set("lastObject.active", true);
@@ -138,7 +134,7 @@ export default class OpenXpkiController extends Controller {
 
     @action
     clearPopupData() {
-        return this.set("model.popup", null);
+        return this.model.popup = null
     }
 
     @action

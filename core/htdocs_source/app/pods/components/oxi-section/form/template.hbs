@@ -1,3 +1,4 @@
+<!-- components/oxi-section/form -->
 {{!
     "novalidate" disables the browser's default validation and
     gets rid of "Please fill out this field" popups
@@ -11,15 +12,13 @@
             @setValue={{fn this.setFieldValue field}}
             @setName={{fn this.setFieldName field}}
             @setError={{fn this.setFieldError field}}
-            @submit={{this.submit}}
-            @setFocusInfo={{fn this.setFocusInfo field}}
+            @onSubmit={{this.submit}}
+            @setFocusInfo={{fn this.setFocusInfoFor field}}
             @encodeFields={{this.encodeFields}}
         />
     {{/each}}
-</form>
 
-<form>
-    <div class="form-group row">
+    <div class="row">
         <div class="offset-lg-2 col-lg-7">
             <OxiBase::ButtonContainer @buttons={{@def.buttons}} @buttonClick={{@buttonClick}}>
                 <BsButton

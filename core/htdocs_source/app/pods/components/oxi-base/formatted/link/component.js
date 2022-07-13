@@ -1,9 +1,9 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
-import { inject } from '@ember/service';
+import { service } from '@ember/service';
 
 export default class OxiFormattedLinkComponent extends Component {
-    @inject('oxi-content') content;
+    @service('oxi-content') content;
 
     @action
     internalLinkClick(event) {

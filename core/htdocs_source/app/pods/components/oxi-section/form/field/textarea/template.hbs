@@ -1,3 +1,4 @@
+<!-- components/oxi-section/form/field/textarea -->
 <div class="row">
     <div class="col-lg-10">
         <textarea
@@ -11,20 +12,20 @@
             {{on "input" this.onInput}}
             {{on "drop" this.fileDropped}}
             {{on "dragover" this.showCopyEffect}}
-            {{may-focus this true}}
+            {{on-init @setFocusInfo true}}
         />
         <div class="invalid-feedback">{{@error}}</div>
     </div>
-    <div class="col-lg-2">
+    <div class="col-lg-2 d-flex flex-column justify-content-start gap-2">
         {{#if @content.allow_upload}}
             <BsButton
                 @type="light"
-                class="oxi-btn-exceptional btn-block btn-sm"
+                class="oxi-btn-exceptional btn-sm"
                 @onClick={{this.openFileUpload}}
                 disabled={{this.hasContent}}
                 @icon="glyphicon glyphicon-folder-open"
             >
-                <EmberTooltip>{{t 'component.oxifield_textarea.open'}}</EmberTooltip>
+                <Tippy>{{t 'component.oxifield_textarea.open'}}</Tippy>
             </BsButton>
         {{/if}}
 
@@ -40,12 +41,12 @@
         {{#if (or @content.allow_upload @content.autofill)}}
             <BsButton
                 @type="light"
-                class="oxi-btn-cancel btn-block btn-sm"
+                class="oxi-btn-cancel btn-sm"
                 @onClick={{this.resetInput}}
                 disabled={{not this.hasContent}}
                 @icon="glyphicon glyphicon-trash"
             >
-                <EmberTooltip>{{t 'component.oxifield_textarea.reset'}}</EmberTooltip>
+                <Tippy>{{t 'component.oxifield_textarea.reset'}}</Tippy>
             </BsButton>
         {{/if}}
     </div>
@@ -58,8 +59,7 @@
 {{#if @content.allow_upload}}
     <input
         type="file"
-        class="oxi-file-input form-control-file"
-        style="display:none"
+        class="oxi-file-input d-none"
         {{on "change" this.fileSelected}}
         {{on-init this.setFileUploadElement}}
     />

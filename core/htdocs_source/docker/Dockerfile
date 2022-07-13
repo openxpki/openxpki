@@ -12,20 +12,24 @@ WORKDIR /
 
 RUN mkdir /build && chmod 0777 /build
 
-# Copy depency lists separately to allow for Docker caching
-COPY package.json /package.json
-COPY package-lock.json /package-lock.json
-
-ARG NPM_CUSTOM_REGISTRY
-
 # use alternative (local) npm registry if available
+ARG NPM_CUSTOM_REGISTRY
 RUN test -n "$NPM_CUSTOM_REGISTRY" \
   && echo "==========\nUsing npm registry $NPM_CUSTOM_REGISTRY\n==========" \
   && npm config set registry $NPM_CUSTOM_REGISTRY \
   || true
+
+# install pnpm
+RUN npm install -g pnpm \
+  && pnpm config set auto-install-peers true
+
+# Copy depency lists separately to allow for Docker caching
+COPY package.json /
+COPY pnpm-lock.yaml /
+
 # install node modules into /node_modules/
-RUN npm install
+RUN pnpm install
 
 # Wrapper script to run "npm run"
-COPY docker/npm-run /
-ENTRYPOINT [ "/npm-run" ]
+COPY docker/pnpm-run /
+ENTRYPOINT [ "/pnpm-run" ]

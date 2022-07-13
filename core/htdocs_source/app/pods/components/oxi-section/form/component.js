@@ -2,9 +2,16 @@ import Component from '@glimmer/component';
 import { action } from "@ember/object";
 import { tracked } from '@glimmer/tracking';
 import { isArray } from '@ember/array';
-import { inject } from '@ember/service';
+import { service } from '@ember/service';
 import { debug } from '@ember/debug';
 
+/*
+ * Field data:
+ * Underscore prefixed properties are meta data that is only used in
+ * oxi-section/form and oxi-section/form/field components.
+ * They will be excluded from the plain hash that is passed down to the field
+ * implementations oxi-section/form/field/* via @content.
+ */
 class Field {
     /*
      * Common
@@ -18,7 +25,7 @@ class Field {
     tooltip;
     placeholder;
     actionOnChange;
-    @tracked _error; // client-side error state
+    @tracked _error; // client- or server-side error state
     autofill;
     /*
      * Clonable fields
@@ -63,7 +70,7 @@ class Field {
         let instance = new this(); // "this" in static methods refers to class
         for (const attr of Object.keys(sourceHash)) {
             // @tracked properties are prototype properties, the others instance properties
-            if (! (this.prototype.hasOwnProperty(attr) || instance.hasOwnProperty(attr))) {
+            if (! (Object.prototype.hasOwnProperty.call(Object.getPrototypeOf(this), attr) || Object.prototype.hasOwnProperty.call(instance, attr))) {
                 /* eslint-disable-next-line no-console */
                 console.error(
                     `oxi-section/form: unknown property "${attr}" in field "${sourceHash.name}". ` +
@@ -79,15 +86,26 @@ class Field {
 
     clone() {
         let field = new Field();
-        Object.keys(Object.getPrototypeOf(this)).forEach(k => field[k] = this[k]); // @tracked properties
-        Object.keys(this).forEach(k => field[k] = this[k]);                        // public class properties
+        // @tracked properties
+        Object.keys(Object.getPrototypeOf(this)).forEach(k => field[k] = this[k]);
+        // public class properties
+        Object.keys(this).forEach(k => field[k] = this[k]);
         return field;
     }
 
+    /**
+     * Returns all non-private properties (i.e. no leading underscore) as a plain hash/object
+     */
     toPlainHash() {
         let hash = {};
-        Object.keys(Object.getPrototypeOf(this)).forEach(k => hash[k] = this[k]); // @tracked properties
-        Object.keys(this).forEach(k => hash[k] = this[k]);                        // public class properties
+        // @tracked non-private properties
+        Object.keys(Object.getPrototypeOf(this))
+            .filter(k => k.charAt(0) != '_')
+            .forEach(k => hash[k] = this[k]);
+        // non-private class properties
+        Object.keys(this)
+            .filter(k => k.charAt(0) != '_')
+            .forEach(k => hash[k] = this[k]);
         return hash;
     }
 }
@@ -104,8 +122,8 @@ class Field {
  * @module component/oxi-section/form
  */
 export default class OxiSectionFormComponent extends Component {
-    @inject('intl') intl;
-    @inject('oxi-content') content;
+    @service('intl') intl;
+    @service('oxi-content') content;
 
     @tracked loading = false;
     @tracked fields = [];
@@ -237,13 +255,6 @@ export default class OxiSectionFormComponent extends Component {
         });
     }
 
-    _fromEntries(iterable) {
-        return [...iterable].reduce((obj, [key, val]) => {
-            obj[key] = val;
-            return obj;
-        }, {});
-    }
-
     _encodeFields({ fieldNames, includeEmpty = false, renameMap = new Map() }) {
         let result = new Map();
 
@@ -281,7 +292,7 @@ export default class OxiSectionFormComponent extends Component {
 
             debug(`${name} = ${ potentialClones[0].clonable ? `[${value}]` : `"${value}"` }`);
         }
-        return this._fromEntries(result); // FIXME: once we drop IE11 support replace with: return Object.fromEntries(result);
+        return Object.fromEntries(result);
     }
 
     /**
@@ -359,18 +370,18 @@ export default class OxiSectionFormComponent extends Component {
         return this.args.def.fields.filter(this.hiddenFieldFilter).length;
     }
 
-    /*
-    Sub components of oxi-section/form/field should call this by using the
-    modifier
-      {{may-focus this true}} or
-      {{may-focus this false}}
-    depending on if it is an editable input field that may sensibly receive
-    the focus.
-    If it is editable, {{may-focus...}} has to be attached to the DOM element
-    that shall receive the input focus.
-    */
+    /**
+     * Sub components of oxi-section/form/field should call this by using the
+     * modifier
+     *   {{on-init @setFocusInfo true}} or
+     *   {{on-init @setFocusInfo false}}
+     * depending on if it is an editable input field that may sensibly receive
+     * the focus.
+     * If it is editable, {{on-init @setFocusInfo true}} has to be attached to the DOM element
+     * that shall receive the input focus.
+     */
     @action
-    setFocusInfo(field, mayFocus, element) { // 'field' is injected in our template via (fn ...)
+    setFocusInfoFor(field, element, mayFocus) { // 'field' is injected in our template via (fn ...)
         /*
          * A) Focus for newly added clone fields
          */
@@ -409,7 +420,7 @@ export default class OxiSectionFormComponent extends Component {
                 // Wrap the focus() in a setTimeout() as otherwise Ember will complain
                 // > You attempted to update `hoverState` on `<wrapperClass:ember197>`,
                 // > but it had already been used previously in the same computation.
-                // Obviously our {{may-focus}} modifier gets triggered by focus changes.
+                // Obviously our {{on-init @setFocusInfo ...}} modifier gets triggered by focus changes.
                 setTimeout(() => elementToFocus.focus(), 1);
                 return;
             }
@@ -448,11 +459,14 @@ export default class OxiSectionFormComponent extends Component {
             this.loading = false;
             if (res?.status?.field_errors !== undefined) {
                 for (const faultyField of res.status.field_errors) {
+                    debug(`oxi-section/form (${this.args.def.action}): server reports faulty field: ${faultyField.name}`);
                     let clones = this.fields.filter(f => f.name === faultyField.name);
+                    // if no index given: mark all clones as faulty
                     if (typeof faultyField.index === "undefined") {
                         for (const clone of clones) {
                             this.setFieldError(clone, faultyField.error);
                         }
+                    // otherwise just pick the specified clone
                     } else {
                         this.setFieldError(clones[faultyField.index], faultyField.error);
                     }

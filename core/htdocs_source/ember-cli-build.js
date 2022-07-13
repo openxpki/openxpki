@@ -41,7 +41,7 @@ module.exports = function(defaults) {
     },
 
     'ember-bootstrap': {
-      bootstrapVersion: 4,
+      bootstrapVersion: 5,
       importBootstrapCSS: true,
       importBootstrapFont: false,
       // only include used components into compiled JS
@@ -58,12 +58,15 @@ module.exports = function(defaults) {
     // store app config in compiled JS file instead of <meta> tag
     'storeConfigInMeta': false,
 
-    // support e.g. IE11
+    // use Babel to convert ES6 Javascript code to code supported by target browsers as specified in config/targets.js
     'ember-cli-babel': {
       includePolyfill: true,
       includeExternalHelpers: true, // import these helpers from a shared module, reducing app size overall
     },
 
+    // @babel/preset-env (!) configuration used by ember-cli-babel
+    // https://cli.emberjs.com/release/advanced-use/asset-compilation/
+    // https://babeljs.io/docs/en/babel-preset-env
     'babel': {
       // sourcemaps work without the following, but for some reason it generates smaller files:
       sourceMaps: (process.env.OPENXPKI_UI_BUILD_UNMINIFIED == 1) ? 'inline' : false,

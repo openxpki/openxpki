@@ -1,3 +1,4 @@
+<!-- components/oxi-section/form/field/passwordverify -->
 {{#if this.isFixed}}
 
     <input type="text" class="form-control mb-2"
@@ -10,7 +11,7 @@
         placeholder={{this.placeholder}}
         required={{not @content.is_optional}}
         {{on "input" this.confirmPasswordChange}}
-        {{may-focus this true}}
+        {{on-init @setFocusInfo true}}
     />
 
 {{else}}
@@ -19,7 +20,7 @@
         value={{this.password}}
         required={{not @content.is_optional}}
         {{on "input" this.passwordChange}}
-        {{may-focus this true}}
+        {{on-init @setFocusInfo true}}
     />
     <input type="password" class="form-control"
         value={{this.confirm}}

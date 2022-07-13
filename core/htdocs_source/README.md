@@ -27,8 +27,8 @@ You will need the following things properly installed on your computer.
 
 * [Git](https://git-scm.com/)
 * [Node.js](https://nodejs.org/) (with npm)
-* [Ember CLI](https://ember-cli.com/)
-* ([Google Chrome](https://google.com/chrome/) for unit tests)
+* [Ember CLI](https://cli.emberjs.com/release/)
+* [Google Chrome](https://google.com/chrome/) for unit tests
 
 ### Node.js
 
@@ -42,14 +42,14 @@ nvm install
 
 ```bash
 nvm use
-npm install -g ember-cli ember-cli-update npm-check-updates
+pnpm install -g ember-cli ember-cli-update npm-check-updates
 ```
 
 ## Installation of required Node.js modules
 
 ```bash
 nvm use
-npm install
+pnpm install
 ```
 
 ## Running / Development
@@ -58,7 +58,7 @@ To run the web UI locally you have to:
 
 1. Start an OpenXPKI backend via Docker or Vagrant. It's expected to listen on localhost:8443
 2. Now run the Ember based web UI with live reload (on code changes) via:
-   `npm run serve` (this calls "ember serve ..." and proxies AJAX requests to localhost:8443)
+   `pnpm run serve` (this calls "ember serve ..." and proxies AJAX requests to localhost:8443)
 3. Visit the web UI at [http://localhost:4200/openxpki/#/](http://localhost:4200/openxpki/#/).
 4. Visit tests at [http://localhost:4200/openxpki/#/test](http://localhost:4200/openxpki/#/test).
 
@@ -67,14 +67,14 @@ To run the web UI locally you have to:
 ```bash
 nvm use
 # Handlebars templates and JavaScript
-npm run lint
-npm run lint:fix
+pnpm run lint
+pnpm run lint:fix
 # only Handlebars templates
-npm run lint:hbs
-npm run lint:hbs:fix
+pnpm run lint:hbs
+pnpm run lint:hbs:fix
 # only JavaScript
-npm run lint:js
-npm run lint:js:fix
+pnpm run lint:js
+pnpm run lint:js:fix
 ```
 
 ### Build Ember app
@@ -93,7 +93,7 @@ To use _verdaccio_ run these steps:
 
 ```bash
 nvm use
-npm install -g verdaccio
+pnpm install -g verdaccio
 nvm exec verdaccio -l 0.0.0.0:4873
 ```
 
@@ -103,18 +103,28 @@ nvm exec verdaccio -l 0.0.0.0:4873
 
 ```bash
 nvm use
-npm run build
+pnpm run build
 ```
 
-### Updating ember-cli
+### Update ember-cli
+
+Also see [the Ember CLI update guide](https://cli.emberjs.com/release/basic-use/upgrading/).
 
 ```bash
 nvm use
-ember-cli-update
-npm audit fix
-npm dedupe
+pnpm remove ember-cli ember-cli-update
+pnpm install --save-dev ember-cli ember-cli-update
+./node_modules/.bin/ember --version
+```
+
+### Update the Ember app (config, dependencies etc.)
+
+```bash
+nvm use
+./node_modules/.bin/ember-cli-update
+pnpm audit fix
 # to install the modules on your host and update package-lock.json:
-npm install
+pnpm install
 ```
 
 After this a [rebuild](#build-production) needs to be done.
@@ -126,7 +136,7 @@ nvm use
 # NOTE: the following command belongs to the package "npm-check-updates", not "ncu"!
 ncu -u
 # to install the modules on your host and update package-lock.json:
-npm install
+pnpm install
 ```
 
 After this a [rebuild](#build-production) needs to be done.
@@ -162,7 +172,7 @@ export default class OxiFieldTextComponent extends OxiFieldRawtextComponent {
 ## Further Reading / Useful Links
 
 * [ember.js](https://emberjs.com/)
-* [ember-cli](https://ember-cli.com/)
+* [ember-cli](https://cli.emberjs.com/release/)
 * Development Browser Extensions
   * [ember inspector for chrome](https://chrome.google.com/webstore/detail/ember-inspector/bmdblncegkenkacieihfhpjfppoconhi)
   * [ember inspector for firefox](https://addons.mozilla.org/en-US/firefox/addon/ember-inspector/)

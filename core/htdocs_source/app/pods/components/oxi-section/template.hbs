@@ -1,6 +1,7 @@
+<!-- components/oxi-section -->
 {{#if @renderAsCard}}
 
-    <div class="card bg-light mb-3">
+    <div class="card bg-light mb-3 ms-3">
 
         {{#if (or @content.content.label @content.content.description)}}
             <div class="card-header py-2">
@@ -8,7 +9,7 @@
                     <h4>{{@content.content.label}}</h4>
                 {{/if}}
                 {{#if @content.content.description}}
-                    {{{@content.content.description}}}
+                    {{html @content.content.description}}
                 {{/if}}
             </div>
         {{/if}}
@@ -20,15 +21,17 @@
 
 {{else}}
 
-    {{#if @content.content.label}}
-        <h4>{{@content.content.label}}</h4>
-    {{/if}}
-    {{#if @content.content.description}}
-        <div class="mb-3">{{{@content.content.description}}}</div>
-    {{/if}}
+    <div class="mt-1 mb-3">
+        {{#if @content.content.label}}
+            <h4>{{@content.content.label}}</h4>
+        {{/if}}
+        {{#if @content.content.description}}
+            <div class="mb-3">{{html @content.content.description}}</div>
+        {{/if}}
 
-    <span {{on-init this.initialized}}>
-        {{component this.type def=this.sectionData buttonClick=this.buttonClick isInfoBox=@isInfoBox}}
-    </span>
+        <div {{on-init this.initialized}} class={{unless @isInfoBox "ms-3"}}>
+            {{component this.type def=this.sectionData buttonClick=this.buttonClick isInfoBox=@isInfoBox}}
+        </div>
+    </div>
 
 {{/if}}

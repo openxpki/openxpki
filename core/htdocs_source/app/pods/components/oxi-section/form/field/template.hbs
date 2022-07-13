@@ -1,7 +1,8 @@
-<div class="form-group row {{if @field.is_optional "optional" "required"}} {{@field.class}}">
-    <label class="col-md-2 col-form-label text-md-right">
+<!-- components/oxi-section/form/field -->
+<div class="row {{if @field.is_optional "optional" "required"}} {{@field.class}} py-1">
+    <label class="col-md-2 col-form-label text-md-end">
         <div class="row">
-            <div class="col-auto col-md pr-1">
+            <div class="col-auto col-md pe-1">
                 {{#unless this.isBool}}
                     {{@field.label}}
                 {{/unless}}
@@ -10,22 +11,25 @@
                 <div class="col-auto p-0">
                     <span class="glyphicon glyphicon-info-sign text-primary oxi-tooltip-icon {{unless @field.tooltip "d-none"}}">
                         {{! Show a tooltip on tab focus or mouseover }}
-                        <EmberTooltip
-                            @popperContainer="body"
+                        <Tippy
                             @popperOptions={{this.popperOptions}}
-                            @side="top-start"
+                            @placement="top-start"
                         >
                             {{@field.tooltip}}
-                        </EmberTooltip>
-                        {{!
-                            To show tooltip on mouseover, but NOT on (tab) focus:
-                                <EmberTooltip @event="focus" @showOn="mouseenter" @hideOn="mouseleave">
+                        </Tippy>
+                        {{!--
 
-                            Due to a bug in EmberTooltip we have to set @event="focus" although we
-                            do NOT want the tooltip to show on focus - uuh ooh.
-                            In EmberTooltip's code @event is overridden by @showOn and @hideOn but setting
-                            it is necessary to prevent the automatic addition of a 'focusin' event listener.
-                        }}
+                        NOTE:
+                          ember-tippy is better configurable and the display seems more stable.
+                          (BsTooltip tooltips sometimes flicker)
+
+                        <BsTooltip
+                            @popperConfig={{this.getPopperOptions}}
+                            @placement="top"
+                        >
+                            {{@field.tooltip}}
+                        </BsTooltip>
+                        --}}
                     </span>
                 </div>
             {{/if}}
@@ -38,6 +42,7 @@
         </div>
     {{/if}}
 
+    {{!-- template-lint-disable no-invalid-interactive --}}
     <div class="col" {{on "keydown" this.onKeydown}}>
         {{#let
             (component
@@ -50,6 +55,7 @@
                 error=@field._error
             ) as |FieldInstance|
         }}
+            {{html (concat '<!-- field: ' @field.name ' -->')}}
             <FieldInstance>
             </FieldInstance>
         {{/let}}

@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { inject as service } from '@ember/service';
+import { service } from '@ember/service';
 import { inject as controller } from '@ember/controller';
 import { action } from '@ember/object';
 
@@ -8,10 +8,10 @@ export default class ApplicationHeaderUserinfo extends Component {
     @controller('openxpki') openxpki;
 
     get currentTenant() {
-        if (!this.content.tenant || !this.content.user.tenants) return;
+        if (!this.content.tenant || !this.content.user.tenants) return null;
 
         let tenant = this.content.user.tenants.find(t => t.value == this.content.tenant);
-        if (!tenant === undefined) return;
+        if (!tenant === undefined) return null;
 
         return tenant.label === tenant.value ? tenant.label : `${tenant.label} (${tenant.value})`;
     }
@@ -22,14 +22,14 @@ export default class ApplicationHeaderUserinfo extends Component {
     }
 
     get tenants() {
-        if (!this.content.tenant) return;
+        if (!this.content.tenant) return [];
         let tenants = this.content.user.tenants;
         for (let ii = 0; ii < tenants.length; ii++) {
             if (tenants[ii].value == this.content.tenant) {
                 return tenants[ii];
             }
         }
-        return;
+        return [];
     }
 
     @action

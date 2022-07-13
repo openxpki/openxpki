@@ -1,28 +1,34 @@
 {{~#each (arrayify @text) as |txt|~}}
     <div class="{{@class}} {{this.cssClasses}}">
         {{#if @tooltip}}
-            <EmberTooltip @delay={{this.config.tooltipDelay}}>
-                {{@tooltip}}
-            </EmberTooltip>
-        {{else if @raw_tooltip}}
-            <EmberTooltip @delay={{this.config.tooltipDelay}}>
-                {{{defuse @raw_tooltip}}}
-            </EmberTooltip>
-        {{else if @tooltip_page}}
-            <EmberPopover
+            <Tippy
                 @delay={{this.config.tooltipDelay}}
+                @placement="top-start"
+            >
+                {{@tooltip}}
+            </Tippy>
+        {{else if @raw_tooltip}}
+            <Tippy
+                @delay={{this.config.tooltipDelay}}
+                @placement="top-start"
+            >
+                {{html @raw_tooltip}}
+            </Tippy>
+        {{else if @tooltip_page}}
+            <Tippy
+                @delay={{this.config.tooltipDelay}}
+                @placement="top-start"
                 @onShow={{this.fetchTooltip}}
-                @updateFor={{this.tooltipReady}}
             >
                 {{#if this.tooltipContent}}
-                    <OxiSection @content={{this.tooltipContent}} @onInit={{this.setTooltipReady}}/>
+                    <OxiSection @content={{this.tooltipContent}}/>
                 {{else}}
-                    wait...
+                    <span class="glyphicon glyphicon-refresh spin"></span>
                 {{/if}}
-            </EmberPopover>
+            </Tippy>
         {{/if}}
     {{#if @raw}}
-        {{{defuse txt}}}
+        {{html txt}}
     {{else}}
         {{txt}}
     {{/if}}

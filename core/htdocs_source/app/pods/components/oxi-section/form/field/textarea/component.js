@@ -1,11 +1,11 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
-import { inject } from '@ember/service';
+import { service } from '@ember/service';
 import { debug } from '@ember/debug';
 
 export default class OxiFieldTextareaComponent extends Component {
-    @inject('intl') intl;
+    @service('intl') intl;
 
     fileUploadElement = null;
 

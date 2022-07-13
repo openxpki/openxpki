@@ -1,12 +1,13 @@
-<div class="container-fluid">
+<div class="container-fluid pe-lg-4">
     <div class="row py-2 align-items-center oxi-header-bar {{this.content.tenantCssClass}}">
         {{#if this.config.header}}
             <div class="col">
-                {{{this.config.header}}}
+                {{html this.config.header}}
             </div>
         {{else}}
             <div class="col">
-                <a href="./#/"><img src="{{this.rootURL}}img/logo.png"></a>
+                {{!-- template-lint-disable no-bare-strings --}}
+                <a href="./#/"><img src="{{this.rootURL}}img/logo.png" alt="OpenXPKI"></a>
             </div>
             <div class="col d-none d-md-flex justify-content-center">
                 <h4 class="oxi-header">

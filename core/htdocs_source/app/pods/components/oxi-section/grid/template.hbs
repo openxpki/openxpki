@@ -1,3 +1,4 @@
+<!-- components/oxi-section/grid -->
 {{#if @def.pager}}
     <div class="row mb-2">
         <div class="col-12">
@@ -5,18 +6,18 @@
                 @pager={{@def.pager}}
                 @pages={{this.pages}}
                 @pagesizes={{this.pagesizes}}
-                @setPage={{this.setPage}}
+                @setPage={{this.updatePage}}
             />
         </div>
     </div>
 {{/if}}
 
-<div class="oxi-grid">
-    <table class="table table-sm table-bordered table-striped table-hover table-responsive {{@def.className}}">
+<div class="oxi-grid table-responsive">
+    <table class="table table-sm table-bordered table-striped table-hover {{@def.className}}">
         <thead>
             <tr>
                 {{#if this.isBulkable}}
-                    <th {{action "select"}}>
+                    <th {{on "click" this.selectAll}} role="button">
                         <span class="oxi-checkbox {{if this.allChecked "checked"}}"></span>
                         {{t 'component.oxisection_grid.select_all'}}
                     </th>
@@ -26,20 +27,20 @@
                 {{/if}}
                 {{#each this.formattedColumns as |column|}}
                     {{#if column.sortable}}
-                        <th {{on "click" (fn this.sort column.sortPage)}} class="sortable {{if column.isSorted "bg-secondary text-white"}}">
+                        <th {{on "click" (fn this.sort column.sortPage)}} class="sortable {{if column.isSorted "bg-secondary text-white"}}" role="button">
                             <span>{{column.sTitle}}</span>
                             {{#if column.isSorted}}
-                                <button type="button" class="btn btn-light btn-sm float-right">
+                                <div class="btn btn-light btn-sm float-end">
                                     {{#if this.pager.reverse}}
                                         <span class="glyphicon glyphicon-sort-by-attributes-alt"></span>
                                     {{else}}
                                         <span class="glyphicon glyphicon-sort-by-attributes"></span>
                                     {{/if}}
-                                </button>
+                                </div>
                             {{else}}
-                                <button type="button" class="btn btn-light btn-sm float-right">
+                                <div class="btn btn-light btn-sm float-end">
                                     <span class="glyphicon glyphicon-sort-by-attributes text-muted"></span>
-                                </button>
+                                </div>
                             {{/if}}
                         </th>
                     {{else}}
@@ -51,10 +52,10 @@
             </tr>
         </thead>
         <tbody>
-            {{#each this.sortedData as |row index|}}
+            {{#each this.sortedData as |row|}}
                 <tr class="context {{row.className}}" role={{if this.hasAction "button"}}>
                     {{#if this.isBulkable}}
-                        <td {{action "select" row}}>
+                        <td {{on "click" (fn this.select row)}} role="button">
                             <span class="oxi-checkbox {{if row.checked "checked"}}"></span>
                         </td>
                     {{/if}}
@@ -65,16 +66,14 @@
                                 <dd.menu @renderInPlace={{false}} as |ddm|>
                                     {{#each @def.actions as |action|}}
                                         <ddm.item>
-                                            <a
-                                                class="dropdown-item"
-                                                role="button"
-                                                {{on "click" (fn this.executeAction row action)}}
+                                            <button
+                                                class="dropdown-item" type="button" {{on "click" (fn this.executeAction row action)}}
                                             >
                                                 {{action.label}}
                                                 {{#if action.icon}}
-                                                    <span class="float-right glyphicon glyphicon-{{action.icon}}"></span>
+                                                    <span class="float-end glyphicon glyphicon-{{action.icon}}"></span>
                                                 {{/if}}
-                                            </a>
+                                            </button>
                                         </ddm.item>
                                     {{/each}}
                                 </dd.menu>
@@ -82,7 +81,8 @@
                         </td>
                     {{/if}}
                     {{#each row.data as |value|}}
-                        <td {{on "click" (fn this.executeAction row this.firstAction)}}>
+                        {{!-- template-lint-disable require-presentational-children --}}
+                        <td {{on "click" (fn this.executeAction row this.firstAction)}} role="button">
                             <OxiBase::Formatted @format={{value.format}} @value={{value.value}}/>
                         </td>
                     {{/each}}
@@ -104,7 +104,7 @@
     <div class="dropdown">
         <ul class="dropdown-menu" role="menu">
             {{#each @def.actions as |action|}}
-                <a class="dropdown-item" role="button" tabindex="-1" href="#">{{action.label}}</a>
+                <button class="dropdown-item" tabindex="-1" href="#" type="button">{{action.label}}</button>
             {{/each}}
         </ul>
     </div>
@@ -120,7 +120,7 @@
                 @pager={{@def.pager}}
                 @pages={{this.pages}}
                 @pagesizes={{this.pagesizes}}
-                @setPage={{this.setPage}}
+                @setPage={{this.updatePage}}
             />
         {{/if}}
     </div>

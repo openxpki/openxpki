@@ -628,18 +628,19 @@ cgi-bin/healthcheck.fcgi
 # NOTE:
 #   core/htdocs_source/update-manifest.pl will update the list below.
 #   UPDATE_MANIFEST_UI_LIST - do not remove this comment
-htdocs/assets/bootstrap-v4-tweaks-ab92eeef543fbc1b09c6c4a88b5d88b3.css
-htdocs/assets/chunk.143.7c87fac1bd9ba3379ff9.js
-htdocs/assets/chunk.15.dc672b2fc9d1e9863775.js
-htdocs/assets/chunk.15.dc672b2fc9d1e9863775.js.LICENSE.txt
-htdocs/assets/chunk.178.c4ce0d4e6b2337f4b577.js
-htdocs/assets/chunk.958.5f17ee27b3598d43962d.js
-htdocs/assets/chunk.958.5f17ee27b3598d43962d.js.LICENSE.txt
-htdocs/assets/glyphicons-8dfa4dd41b8ab62e14cf32e7dd3756bc.css
-htdocs/assets/openxpki-2aade0af2c6bfe73d96234a86744267d.js
-htdocs/assets/openxpki-5cb3d0e370b7904107f7a909bf30f597.css
-htdocs/assets/vendor-67e170cb8fa57fdce6f57b2b245651ad.css
-htdocs/assets/vendor-838718aa57d590602ec974411bf6230c.js
+htdocs/assets/bootstrap-v5-tweaks.css
+htdocs/assets/chunk.143.af3ad7d20257c1804227.css
+htdocs/assets/chunk.143.af3ad7d20257c1804227.js
+htdocs/assets/chunk.165.0203d5991ad507e954a7.js
+htdocs/assets/chunk.165.0203d5991ad507e954a7.js.LICENSE.txt
+htdocs/assets/chunk.178.008e1ea906ba9b7e32d3.js
+htdocs/assets/chunk.968.518b39c8eaa64cc42e11.js
+htdocs/assets/chunk.968.518b39c8eaa64cc42e11.js.LICENSE.txt
+htdocs/assets/glyphicons.css
+htdocs/assets/openxpki.css
+htdocs/assets/openxpki.js
+htdocs/assets/vendor.css
+htdocs/assets/vendor.js
 htdocs/default.html
 htdocs/favicon.png
 htdocs/fonts/glyphicons-halflings-regular.eot

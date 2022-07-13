@@ -6,8 +6,7 @@
         <div class="col p-0 oxi-the-void">
         </div>
         <div
-            class="col-12 p-0 oxi-content"
-            class={{if this.restricted_width 'oxi-width-restricted' 'oxi-width-full'}}
+            class="col-12 p-0 oxi-content {{if this.restricted_width 'oxi-width-restricted' 'oxi-width-full'}}"
             {{on-init this.removeLoader}}
         >
             <div class="oxi-push-footer">
@@ -16,7 +15,7 @@
             </div>
             <Application::Footer/>
         </div>
-        <div class="col p-0 oxi-resize-overlay" {{on 'click' this.toggleWidth}}>
+        <div class="col p-0 oxi-resize-overlay" {{on 'click' this.toggleWidth}} role="button">
             <span></span>
         </div>
         <div class="col p-0 oxi-the-void">

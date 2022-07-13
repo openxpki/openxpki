@@ -1,6 +1,6 @@
 {{#if this.isString}}
     {{#if @raw}}
-        {{{defuse @value}}}
+        {{html @value}}
     {{else}}
         {{@value}}
     {{/if}}
@@ -19,7 +19,7 @@
     </BsButton>
     {{#if this.detailsOpen}}
         <div class="card card-body bg-light">
-            <pre style="white-space: pre-wrap">{{this.asJSON}}</pre>
+            <pre class="text-prewrap">{{this.asJSON}}</pre>
         </div>
     {{/if}}
 {{/if}}

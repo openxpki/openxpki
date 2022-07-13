@@ -1,6 +1,5 @@
 import Service from '@ember/service';
-import { inject } from '@ember/service';
-import { debug } from '@ember/debug';
+import { service } from '@ember/service';
 import fetch from 'fetch';
 //import { assert, optional, enums } from 'superstruct';
 
@@ -10,7 +9,7 @@ import fetch from 'fetch';
  * @module service/oxi-backend
  */
 export default class OxiBackendService extends Service {
-    @inject('intl') intl;
+    @service('intl') intl;
 
     request({ url, method = 'GET', headers = {}, data, contentType }) {
         // type validation

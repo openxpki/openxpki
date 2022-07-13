@@ -1,7 +1,12 @@
+<!-- components/oxi-section/form/field/select -->
 {{#if this.isStatic}}
-    <div class="oxi-no-input" {{may-focus this true}}>{{@content.options.0.label}}</div>
+    <div class="oxi-no-input"
+        {{on-init @setFocusInfo false}}
+    >
+        {{@content.options.0.label}}
+    </div>
 {{else if @content.editable}}
-    <div class="input-group">
+    <div class="input-group has-validation">
         {{#if this.customMode}}
             <input
                 type="text"
@@ -11,7 +16,7 @@
                 required={{not @content.is_optional}}
                 {{on "input" this.onCustomInput}}
                 {{on-init this.onCustomInsert}}
-                {{may-focus this true}}
+                {{on-init @setFocusInfo true}}
             />
         {{else}}
             <OxiBase::Select
@@ -19,19 +24,17 @@
                 @selected={{this.sanitizedValue}}
                 @onChange={{this.optionSelected}}
                 required={{not @content.is_optional}}
-                {{may-focus this true}}
+                {{on-init @setFocusInfo true}}
             />
         {{/if}}
-        <span class="input-group-append">
-            <BsButton
-                @type=""
-                @active={{this.customMode}}
-                @onClick={{this.toggleCustomMode}}
-                class="btn-light border-secondary"
-            >
-                {{t 'component.oxifield_select.custom_value'}}
-            </BsButton>
-        </span>
+        <BsButton
+            @type=""
+            @active={{this.customMode}}
+            @onClick={{this.toggleCustomMode}}
+            class="btn-light border-secondary"
+        >
+            {{t 'component.oxifield_select.custom_value'}}
+        </BsButton>
         <div class="invalid-feedback">{{@error}}</div>
     </div>
 {{else}}
@@ -40,7 +43,7 @@
         @selected={{this.sanitizedValue}}
         @onChange={{this.optionSelected}}
         required={{not @content.is_optional}}
-        {{may-focus this true}}
+        {{on-init @setFocusInfo true}}
     />
     <div class="invalid-feedback">{{@error}}</div>
 {{/if}}

@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { action } from "@ember/object";
-import { inject } from '@ember/service';
+import { service } from '@ember/service';
 import { debug } from '@ember/debug';
 //import { assert, optional, union, enums, object, type, boolean, string } from 'superstruct';
 
@@ -23,8 +23,8 @@ import { debug } from '@ember/debug';
  */
 
 export default class Autofill extends Component {
-    @inject('intl') intl;
-    @inject('oxi-backend') backend;
+    @service('intl') intl;
+    @service('oxi-backend') backend;
 
     request;
     autorun;

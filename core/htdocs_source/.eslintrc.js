@@ -2,29 +2,39 @@
 
 module.exports = {
   root: true,
-  parser: 'babel-eslint',
+  parser: '@babel/eslint-parser',
   parserOptions: {
     ecmaVersion: 2018,
     sourceType: 'module',
     ecmaFeatures: {
       legacyDecorators: true,
     },
+    babelOptions: {
+      "plugins": [
+        [ "@babel/plugin-syntax-decorators", { version: '2021-12' } ],
+      ],
+    },
+    requireConfigFile: false,
   },
   plugins: ['ember'],
   extends: [
     'eslint:recommended',
     'plugin:ember/recommended',
-    'plugin:prettier/recommended',
   ],
   env: {
     browser: true,
   },
-  rules: {},
+  rules: {
+    'no-unused-vars': [ 'error', {
+      'args': 'none', // do not complain about unused function arguments
+    } ],
+  },
   overrides: [
     // node files
     {
       files: [
         './.eslintrc.js',
+        './.jsdoc.js',
         './.prettierrc.js',
         './.template-lintrc.js',
         './ember-cli-build.js',
@@ -50,7 +60,7 @@ module.exports = {
       },
     },
     {
-      // Test files:
+      // test files
       files: ['tests/**/*-test.{js,ts}'],
       extends: ['plugin:qunit/recommended'],
     },

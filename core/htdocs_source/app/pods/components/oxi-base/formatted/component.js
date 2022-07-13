@@ -1,7 +1,6 @@
 import Component from '@glimmer/component';
 import { DateTime } from 'luxon';
 import { action } from '@ember/object';
-import copy from 'copy-text-to-clipboard';
 
 /**
  * Shows a formatted piece of text or data.

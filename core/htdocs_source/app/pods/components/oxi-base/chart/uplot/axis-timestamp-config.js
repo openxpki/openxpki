@@ -22,7 +22,6 @@ const s  = ms * 1e3,
       m  = s  * 60,
       h  = m  * 60,
       d  = h  * 24,
-      mo = d  * 30,
       y  = d  * 365;
 
 export default [
