@@ -58,12 +58,13 @@ module.exports = function(defaults) {
     // store app config in compiled JS file instead of <meta> tag
     'storeConfigInMeta': false,
 
-    // support e.g. IE11
+    // use Babel to convert ES6 Javascript code to code supported by target browsers as specified in config/targets.js
     'ember-cli-babel': {
       includePolyfill: true,
       includeExternalHelpers: true, // import these helpers from a shared module, reducing app size overall
     },
 
+    // @babel/preset-env (!) configuration used by ember-cli-babel
     // https://cli.emberjs.com/release/advanced-use/asset-compilation/
     // https://babeljs.io/docs/en/babel-preset-env
     'babel': {
