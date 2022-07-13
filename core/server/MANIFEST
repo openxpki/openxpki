@@ -628,19 +628,19 @@ cgi-bin/healthcheck.fcgi
 # NOTE:
 #   core/htdocs_source/update-manifest.pl will update the list below.
 #   UPDATE_MANIFEST_UI_LIST - do not remove this comment
-htdocs/assets/bootstrap-v5-tweaks.css
-htdocs/assets/chunk.143.af3ad7d20257c1804227.css
-htdocs/assets/chunk.143.af3ad7d20257c1804227.js
-htdocs/assets/chunk.165.0203d5991ad507e954a7.js
-htdocs/assets/chunk.165.0203d5991ad507e954a7.js.LICENSE.txt
-htdocs/assets/chunk.178.008e1ea906ba9b7e32d3.js
-htdocs/assets/chunk.968.518b39c8eaa64cc42e11.js
-htdocs/assets/chunk.968.518b39c8eaa64cc42e11.js.LICENSE.txt
-htdocs/assets/glyphicons.css
-htdocs/assets/openxpki.css
-htdocs/assets/openxpki.js
-htdocs/assets/vendor.css
-htdocs/assets/vendor.js
+htdocs/assets/autoimport-165-ea1b0835dc631eb9f7c060c546d18897.js
+htdocs/assets/autoimport-165.js.LICENSE.txt
+htdocs/assets/autoimport-968-b6d3ace1e7ce5b08459c7178a056cf8e.js
+htdocs/assets/autoimport-968.js.LICENSE.txt
+htdocs/assets/autoimport-app-44a53b841248ae85ad2ffb537b9c882f.css
+htdocs/assets/autoimport-app-d6da7e3649deeb20a65e306eb564e5c8.js
+htdocs/assets/autoimport-tests-c41f78e1150ef61366829d4f840733e4.js
+htdocs/assets/bootstrap-v5-tweaks-eceba2603661927924740a0a5e1f57b3.css
+htdocs/assets/glyphicons-8dfa4dd41b8ab62e14cf32e7dd3756bc.css
+htdocs/assets/openxpki-1207b57d7acdaac7fe2bbe20cd0a5923.css
+htdocs/assets/openxpki-8ea4479643915649dac062b8c4de1936.js
+htdocs/assets/vendor-860a049e3d680c5daedbd1a5cc3f1858.css
+htdocs/assets/vendor-90ba54409b0c03f00b127209a972638a.js
 htdocs/default.html
 htdocs/favicon.png
 htdocs/fonts/glyphicons-halflings-regular.eot
