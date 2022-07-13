@@ -48,6 +48,29 @@ module.exports = function(defaults) {
       whitelist: ['bs-button', 'bs-modal', 'bs-dropdown', 'bs-navbar', 'bs-collapse'],
     },
 
+    /*
+      Configure ember-auto-import (which uses Webpack to create the chunk.xx
+      files with imported modules).
+      We adjust the names of the output files. We remove the hash as obviously
+      an additional hash is appended by 'broccoli-asset-rev' using the
+      'fingerprint' configuration below.
+      Also see https://github.com/ef4/ember-auto-import/issues/519
+    */
+    'autoImport': {
+      // JS assets
+      webpack: {
+        output: {
+          // https://webpack.js.org/configuration/output/#template-strings
+          filename: 'autoimport-[name].js',
+        },
+        optimization: { realContentHash: true }, // default now?!
+      },
+      // CSS assets
+      miniCssExtractPluginOptions: {
+        filename: `autoimport-[name].css`,
+      }
+    },
+
     // fingerprinting of assets in production build
     // (i.e. "openxpki.js" or "openxpki-1312d860591f9801798c1ef46052a7ea.js")
     'fingerprint': {
@@ -71,15 +94,6 @@ module.exports = function(defaults) {
       // sourcemaps work without the following, but for some reason it generates smaller files:
       sourceMaps: (process.env.OPENXPKI_UI_BUILD_UNMINIFIED == 1) ? 'inline' : false,
     },
-
-    // options for @babel/preset-env (evaluated by 'ember-cli-babel' and passed on)
-    // 'babel': {
-    //   useBuiltIns: 'usage', // auto import polyfills without the need to specify them
-    //   // options for core-js, see https://babeljs.io/docs/en/babel-preset-env#corejs
-    //   corejs: {
-    //     version: '3.9.1',
-    //   },
-    // },
 
     // fetch() polyfill does not exist in core-js (via ember-cli-babel), so we need to add it:
     'ember-fetch': {
