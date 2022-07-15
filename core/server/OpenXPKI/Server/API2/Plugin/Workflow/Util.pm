@@ -257,11 +257,11 @@ sub _execute_activity_async {
         return $pid;
     }
 
-    Log::Log4perl::MDC->put('wfid', $workflow->id());
-    Log::Log4perl::MDC->put('wftype', $workflow->type());
-
     # child process
     try {
+        Log::Log4perl::MDC->put('wfid', $workflow->id());
+        Log::Log4perl::MDC->put('wftype', $workflow->type());
+
         ##! 16: 'I am the child process running the activity'
         # append fork info to process name
         OpenXPKI::Server::__set_process_name("workflow: id %d (detached)", $workflow->id());
@@ -284,17 +284,17 @@ sub _execute_activity_async {
         # DB commits are done inside the workflow engine
     }
     catch {
-        # DB rollback is not needed as this process will terminate now anyway
-        local $@ = $_; # makes OpenXPKI::Exception compatible with Try::Tiny
+        # make OpenXPKI::Exception compatible with Try::Tiny
+        local $@ = $_;
         # make sure the cleanup code does not die as this would escape this method
         eval { CTX('log')->system->error($_) };
+        # DB rollback is not needed as this process will terminate now anyway
     };
 
     eval { CTX('dbi')->disconnect };
-    CTX('config')->cleanup();
+    eval { CTX('config')->cleanup() };
     ##! 16: 'Backgrounded workflow finished - exit child'
     exit;
-
 }
 
 # runs the given workflow activity on the Workflow engine
