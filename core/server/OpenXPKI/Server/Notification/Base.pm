@@ -71,11 +71,33 @@ If the method returns a non-empty value, it is persisted back
 into the workflow.
 
 =cut
+
 sub notify {
 
     OpenXPKI::Exception->throw(
         message => 'I18N_OPENXPKI_SERVER_NOTIFICATION_BASE_NOTIFY_UNIMPLEMENTED',
     );
+
+}
+
+
+=head2 _render_filename( FILENAME )
+
+Expand a relative filename to its absolute path using template_dir.
+
+=cut
+
+sub _render_filename {
+
+    ##! 4: 'start'
+    my $self = shift;
+    my $filename = shift;
+
+    if ($filename !~ m{\A/}) {
+        $filename = $self->template_dir() . $filename;
+    }
+
+    return $filename;
 
 }
 
@@ -87,6 +109,7 @@ returns the template with vars inserted as string.
 If path is relative, it is prefixed with template dir.
 
 =cut
+
 sub _render_template_file {
 
     ##! 4: 'start'
@@ -126,6 +149,7 @@ Expects template string and hashref to the vars.
 returns the template with vars inserted as string.
 
 =cut
+
 sub _render_template {
 
     ##! 4: 'start'

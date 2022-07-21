@@ -19,11 +19,13 @@ are read from the filesystem.
         username: smtpuser
         password: smtppass
         debug: 0
+        use_html: 0
 
     default:
         to: "[% cert_info.requestor_email %]"
         from: no-reply@openxpki.org
         reply: helpdesk@openxpki.org
+        sender: envelope-sender@openxpki.org
         cc: helpdesk@openxpki.org
         prefix: PKI-Request [% meta_wf_id %]
 
@@ -45,7 +47,7 @@ are read from the filesystem.
 Calling the notifier with C<MESSAGE=csr_created> will send out two mails.
 One to the requestor and one to the ra-officer, both are CC'ed to helpdesk.
 
-=head2 Recipients
+=head2 Recipients and Headers
 
 =over
 
@@ -61,6 +63,25 @@ a list at the comma, so you can use loop/join to create multiple recipients.
 
 If you directly pass an array, each item is processed using template toolkit
 but must return a single address.
+
+=item from
+
+Sets the from address, can be an email adress or a verbose sender name
+with the email address in angle brackets. Can be a toolkit template.
+
+=item reply
+
+Similar to I<from>, sets the I<Reply-To> header field.
+
+=item sender
+
+Sets the I<Sender> field in the header, if not given this defaults to the
+from address, if you pass the empty string the value is set to the local
+unix user account running the OpenXPKI service.
+
+=item prefix
+
+A prefix that is added to each subject line.
 
 =back
 
@@ -103,6 +124,7 @@ use OpenXPKI::Serialization::Simple;
 
 use Net::SMTP;
 use Net::Domain;
+use MIME::Entity;
 
 use Moose;
 use Encode;
@@ -442,12 +464,7 @@ sub notify {
             next MAIL_HANDLE;
         }
 
-        if ($self->use_html()) {
-            $self->_send_html( $cfg, \%vars ) || push @failed, $handle;
-        } else {
-            $self->_send_plain( $cfg, \%vars ) ||  push @failed, $handle;
-        }
-
+        $self->_send_message( $cfg, \%vars ) || push @failed, $handle;
     }
 
     $self->failed( \@failed );
@@ -499,194 +516,151 @@ sub _render_receipient {
 
 }
 
-=head2 _send_plain
 
-Send the message using Net::SMTP
-
-=cut
-sub _send_plain {
-
-    my $self = shift;
-    my $cfg = shift;
-    my $vars = shift;
-
-    my $output = $self->_render_template_file( $cfg->{template}.'.txt', $vars );
-
-    if (!$output) {
-        CTX('log')->system()->error("Mail body is empty ($cfg->{template})");
-
-        return 0;
-    }
-
-    my $subject = $self->_render_template( $cfg->{subject}, $vars );
-    if (!$subject) {
-        CTX('log')->system()->error("Mail subject is empty ($cfg->{template})");
-
-        return 0;
-    }
-
-    # Now send the message
-    # For Net::SMTP we need to build the full message including the header part
-    my $smtpmsg = "User-Agent: OpenXPKI Notification Service using Net::SMTP\n";
-    $smtpmsg .= "Date: " . DateTime->now()->strftime("%a, %d %b %Y %H:%M:%S %z\n");
-    $smtpmsg .= "OpenXPKI-Thread-Id: " . (defined $vars->{'thread'} ? $vars->{'thread'} : 'undef') . "\n";
-    $smtpmsg .= "From: " . $cfg->{from} . "\n";
-    $smtpmsg .= "To: " . $vars->{to} . "\n";
-    $smtpmsg .= "Cc: " . join(",", @{$vars->{cc}}) . "\n" if ($vars->{cc});
-    $smtpmsg .= "Reply-To: " . $cfg->{reply} . "\n" if ($cfg->{reply});
-    $smtpmsg .= "Subject: ".Encode::encode('MIME-B', "$vars->{prefix} $subject")."\n";
-    $smtpmsg .= "MIME-Version: 1.0\n";
-    $smtpmsg .= "Content-Transfer-Encoding: 8bit\n";
-    $smtpmsg .= "Content-Type: text/plain; charset=utf-8\n";
-    $smtpmsg .= "\n". Encode::encode_utf8($output);
-
-    ##! 64: "SMTP Msg --------------------\n$smtpmsg\n ----------------------------------";
-
-    my $smtp = $self->transport();
-    if (!$smtp) {
-        CTX('log')->system()->error(sprintf("Failed sending notification - no smtp transport"));
-
-        return undef;
-    }
-
-     ##! 128: 'SMTP Transport ' . Dumper $smtp
-
-    $smtp->mail( $cfg->{from} );
-    $smtp->to( $vars->{to} );
-
-    foreach my $cc (@{$vars->{cc}}) {
-        $smtp->to( $cc );
-    }
-
-    $smtp->data();
-
-    # Sign if SMIME is set up
-
-    if (my $smime = $self->_smime()) {
-        $smtpmsg = $smime->sign($smtpmsg);
-    }
-
-    $smtp->datasend($smtpmsg);
-
-    if( !$smtp->dataend() ) {
-        CTX('log')->system()->warn(sprintf("Failed sending notification (%s, %s)", $vars->{to}, $subject));
-        return 0;
-    }
-    CTX('log')->system()->info(sprintf("Notification was send (%s, %s)", $vars->{to}, $subject));
-
-
-    return 1;
-
-}
-
-=head2 _send_html
+=head2 _send_message
 
 Send the message using MIME::Tools
 
 =cut
 
-sub _send_html {
+sub _send_message {
 
     my $self = shift;
     my $cfg = shift;
     my $vars = shift;
 
-    require MIME::Entity;
-
     # Parse the templates - txt and html
-    my $plain = $self->_render_template_file( $cfg->{template}.'.txt', $vars );
-    my $html = $self->_render_template_file( $cfg->{template}.'.html', $vars );
+    # it is ok to not have a plain text version
 
+    my ($plain, $html);
+    if ($self->use_html()) {
+        ##! 16: 'Using html template'
+        # this causes an error message in the file loader if the file does not exist
+        $html = $self->_render_template_file( $cfg->{template}.'.html', $vars );
+        # having no text part is ok so prevent the error message by checking first
+        my $filename = $self->_render_filename( $cfg->{template}.'.txt' );
+        if (-e $filename) {
+            ##! 32: 'Plain exists'
+            $plain = $self->_render_template_file( $filename , $vars );
+        }
+    } else {
+        ##! 16: 'Using plain template'
+        # again - error message if file does not exist as this is mandatory
+        $plain = $self->_render_template_file( $cfg->{template}.'.txt', $vars );
+    }
+
+    # something went wrong, nothing to send
     if (!$plain && !$html) {
-        CTX('log')->system()->error("Both mail parts are empty ($cfg->{template})");
-
+        CTX('log')->system()->error("No content for mail body ($cfg->{template})");
         return 0;
     }
 
+    # Go ahead and build the message
     # Parse the subject
     my $subject = $self->_render_template($cfg->{subject}, $vars);
+    ##! 16: $subject
     if (!$subject) {
         CTX('log')->system()->error("Mail subject is empty ($cfg->{template})");
-
         return 0;
     }
 
     my @args = (
-        From    => Encode::encode_utf8($cfg->{from}),
-        To      => Encode::encode_utf8($vars->{to}),
-        Subject => Encode::encode_utf8("$vars->{prefix} $subject"),
-        Type    =>'multipart/alternative',
+        From    => Encode::encode("UTF-8", $cfg->{from}),
+        To      => Encode::encode("UTF-8", $vars->{to}),
+        Subject => Encode::encode("MIME-B", "$vars->{prefix} $subject"),
         Charset => 'UTF-8',
+        'X-User-Agent' => 'OpenXPKI Notification Service',
     );
 
+    # add thread id if set
+    push @args, ('X-OpenXPKI-Thread-Id' => $vars->{'thread'}) if ($vars->{'thread'});
+
+    # add CC headers - NO UTF8 escape as this is expected to be mail address only
     push @args, (Cc => join(",", @{$vars->{cc}})) if ($vars->{cc});
-    push @args, ("Reply-To" => $cfg->{reply}) if ($cfg->{reply});
 
-    ##! 16: 'Building with args: ' . Dumper @args
+    # add Reply - can have UTF8 characters
+    push @args, ("Reply-To" => Encode::encode("UTF-8", $cfg->{reply})) if ($cfg->{reply});
 
-    my $msg = MIME::Entity->build( @args );
-
-    # Plain part
-    if ($plain) {
-        ##! 16: ' Attach plain text'
-        $msg->attach(
-            Type     =>'text/plain',
-            Data     => Encode::encode_utf8($plain)
-        );
+    # the MIME::Entity class auto adds the "sender" header item to the
+    # local system user running the process - pass a non empty value to
+    # force a special sender, pass an empty value to keep the default
+    # behaviour. If nothing is given, the from value is copied as sender
+    if ($cfg->{sender}) {
+        push @args, (Sender => Encode::encode("UTF-8", $cfg->{sender}));
+    } elsif (!defined $cfg->{sender}) {
+        push @args, (Sender => Encode::encode("UTF-8", $cfg->{from}));
     }
 
-    ##! 16: 'base created'
+    # plain text only - send a single part message
+    my $msg;
+    if (!$html) {
+        push @args, (Type => 'text/plain');
+        push @args, (Data => [ $plain ]);
+        ##! 16: 'Building single part with args: ' . Dumper @args
+        $msg = MIME::Entity->build( @args );
 
-    # look for images - makes the mail a bit complicated as we need to build a second mime container
-    if ($html && $cfg->{images}) {
-
-        ##! 16: ' Multipart html + image'
-
-        my $html_part = MIME::Entity->build(
-            'Type' => 'multipart/related',
-        );
-
-        # The HTML Body
-        $html_part->attach(
-            Type        =>'text/html',
-            Data        => Encode::encode_utf8($html)
-        );
-
-        # The hash contains the image id and the filename
-        ATTACH_IMAGE:
-        foreach my $imgid (keys(%{$cfg->{images}})) {
-            my $imgfile = $self->template_dir().'images/'.$cfg->{images}->{$imgid};
-            if (! -e $imgfile) {
-                CTX('log')->system()->error(sprintf("HTML Notify - imagefile not found (%s)", $imgfile));
-
-                next ATTACH_IMAGE;
-            }
-
-            $cfg->{images}->{$imgid} =~ /\.(gif|png|jpg)$/i;
-            my $mime = lc($1);
-
-            if (!$mime) {
-                CTX('log')->system()->error(sprintf("HTML Notify - invalid image extension", $imgfile));
-
-                next ATTACH_IMAGE;
-            }
-
-            $html_part->attach(
-                Type => 'image/'.$mime,
-                Id   => $imgid,
-                Path => $imgfile,
+    } else {
+        push @args, (Type => 'multipart/alternative');
+        ##! 16: 'Building multipart part with args: ' . Dumper @args
+        $msg = MIME::Entity->build( @args );
+        if ($plain) {
+            ##! 16: ' Attach plain text'
+            $msg->attach(
+                Type     =>'text/plain',
+                Data     => Encode::encode("UTF-8", $plain)
             );
         }
 
-        $msg->add_part($html_part);
+        # look for images - makes the mail a bit complicated as we need to build a second mime container
+        if ($cfg->{images}) {
 
-    } elsif ($html) {
-        ##! 16: ' html without image'
-        ## Add the html part:
-        $msg->attach(
-            Type        =>'text/html',
-            Data        => Encode::encode_utf8($html)
-        );
+            ##! 16: ' Multipart html + image'
+            my $html_part = MIME::Entity->build(
+                'Type' => 'multipart/related',
+            );
+
+            # The HTML Body
+            $html_part->attach(
+                Type        =>'text/html',
+                Data        => Encode::encode("UTF-8", $html)
+            );
+
+            # The hash contains the image id and the filename
+            ATTACH_IMAGE:
+            foreach my $imgid (keys(%{$cfg->{images}})) {
+                my $imgfile = $self->template_dir().'images/'.$cfg->{images}->{$imgid};
+                if (! -e $imgfile) {
+                    CTX('log')->system()->error(sprintf("HTML Notify - imagefile not found (%s)", $imgfile));
+
+                    next ATTACH_IMAGE;
+                }
+
+                $cfg->{images}->{$imgid} =~ /\.(gif|png|jpg)$/i;
+                my $mime = lc($1);
+
+                if (!$mime) {
+                    CTX('log')->system()->error(sprintf("HTML Notify - invalid image extension", $imgfile));
+
+                    next ATTACH_IMAGE;
+                }
+
+                $html_part->attach(
+                    Type => 'image/'.$mime,
+                    Id   => $imgid,
+                    Path => $imgfile,
+                );
+            }
+
+            $msg->add_part($html_part);
+
+        } else {
+            ##! 16: ' html without image'
+            ## Add the html part:
+            $msg->attach(
+                Type        =>'text/html',
+                Data        => Encode::encode("UTF-8", $html)
+            );
+        }
     }
 
     # a reusable Net::SMTP object
@@ -721,13 +695,10 @@ sub _send_html {
 
     if(!$res) {
         CTX('log')->system()->error(sprintf("Failed sending notification (%s, %s)", $vars->{to}, $subject));
-
         return 0;
     }
 
     CTX('log')->system()->info(sprintf("Notification was send (%s, %s)", $vars->{to}, $subject));
-
-
     return 1;
 
 }
