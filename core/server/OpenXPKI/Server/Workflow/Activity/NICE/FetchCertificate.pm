@@ -28,6 +28,10 @@ sub execute {
 
     my $set_context = $nice_backend->fetchCertificate($param);
 
+    if (!$set_context->{cert_identifier} && $self->get_max_allowed_retries()) {
+        $self->pause('I18N_OPENXPKI_UI_NICE_ISSUANCE_PENDING');
+    }
+
     ##! 64: 'Setting Context ' . Dumper $set_context
     #while (my ($key, $value) = each(%$set_context)) {
     foreach my $key (keys %{$set_context} ) {
@@ -42,11 +46,14 @@ __END__
 
 =head1 Name
 
-OpenXPKI::Server::Workflow::Activity::NICE::IssueCertificate;
+OpenXPKI::Server::Workflow::Activity::NICE::FetchCertificate;
 
 =head1 Description
 
 Fetch a certificate for a pending certificate signing request.
+
+If no cert_identifer is found in the response and retry_count is set,
+the activity will go into pause.
 
 See OpenXPKI::Server::NICE::fetchCertificate for details
 
@@ -54,14 +61,7 @@ See OpenXPKI::Server::NICE::fetchCertificate for details
 
 =head2 Input
 
-=over
-
-=item transaction_id
-
-Transaction id of the request, not required for the Local backend but
-might be required by some remote backends to handle polling/retry.
-
-=back
+All input parameters to the method are passed to the backend.
 
 =head2 Output
 
@@ -70,3 +70,5 @@ might be required by some remote backends to handle polling/retry.
 =item cert_identifier - the identifier of the issued certificate
 
 =back
+
+All other parameters from the response are also added to the context.
