@@ -197,8 +197,6 @@ sub _start_openxpki_server {
     my ($self) = @_;
     # TODO Replace test specific server startup with OpenXPKI::Server->start() once we have a complete test env (so all context objects + watchdog will be initialized)
 
-    OpenXPKI::Server::Watchdog->start_or_reload;
-
     my $server = OpenXPKI::Server->new(
         'SILENT' => $ENV{TEST_VERBOSE} ? 0 : 1,
         'TYPE'   => 'Fork', # type "Fork" will background (fork) the main server process and also fork off child processes on incoming requests

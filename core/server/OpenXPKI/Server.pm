@@ -64,7 +64,6 @@ sub __init_server {
             $p{SKIP} = [ 'redirect_stderr' ];
         }
         OpenXPKI::Server::Init::init( \%p );
-        OpenXPKI::Server::Watchdog->start_or_reload;
     };
     $self->__log_and_die($EVAL_ERROR, 'server initialization') if $EVAL_ERROR;
 }
@@ -112,7 +111,7 @@ sub start {
     $self->__init_user_interfaces;
     $self->__init_net_server;
 
-    ##! 1: "server is up"
+    ##! 1: "server is up (type = " . $self->{TYPE} . ")"
 
     CTX('log')->system()->info("Server is running");
 
@@ -235,52 +234,44 @@ sub pre_loop_hook {
 
     ### drop privileges
     eval{
-
         # Set verbose process name
         OpenXPKI::Server::__set_process_name("server");
 
-        if( $self->{PARAMS}->{process_group} ne $) ){
-            $self->log(
-                2,
-                "Setting gid to \"$self->{PARAMS}->{process_group}\""
-            );
-            CTX('log')->system()->debug("Setting gid to to "
-                            . $self->{PARAMS}->{process_group});
+        if ( $self->{PARAMS}->{process_group} ne $) ){
+            $self->log(2, "Setting gid to \"$self->{PARAMS}->{process_group}\"");
+            CTX('log')->system->debug("Setting gid to \"$self->{PARAMS}->{process_group}\"");
 
             set_gid( $self->{PARAMS}->{process_group} );
         }
-        if( $self->{PARAMS}->{process_owner} ne $> ){
-            $self->log(
-                2,
-                "Setting uid to \"$self->{PARAMS}->{process_owner}\""
-            );
-            CTX('log')->system()->debug("Setting uid to to " . $self->{PARAMS}->{process_owner});
+        if ( $self->{PARAMS}->{process_owner} ne $> ){
+            $self->log(2, "Setting uid to \"$self->{PARAMS}->{process_owner}\"");
+            CTX('log')->system->debug("Setting uid to \"$self->{PARAMS}->{process_owner}\"");
 
             set_uid( $self->{PARAMS}->{process_owner} );
         }
     };
-    if( $EVAL_ERROR ){
-        if ( $> == 0 ) {
-            CTX('log')->system()->fatal($EVAL_ERROR);
-
-        die $EVAL_ERROR;
-        } elsif( $< == 0) {
-            CTX('log')->system()->warn("Effective UID changed, but Real UID is 0: $EVAL_ERROR");
+    if ($EVAL_ERROR){
+        if ($> == 0) {
+            CTX('log')->system->fatal($EVAL_ERROR);
+            die $EVAL_ERROR;
+        } elsif($< == 0) {
+            CTX('log')->system->warn("Effective UID changed, but Real UID is 0: $EVAL_ERROR");
         } else {
-            CTX('log')->system()->error($EVAL_ERROR);
-
+            CTX('log')->system->error($EVAL_ERROR);
         }
     }
-    if ($self->{TYPE} eq 'Simple') {
-        # the Net::Server::Fork forked children have the DEFAULT
-        # signal handler for SIGCHLD (instead of the Net::Server
-        # sigchld handler).
-        # We need it, too, because otherwise
-        # $? is -1 after a `$command` backtick call
-        # (for example when doing external dynamic authentication) ...
-        $SIG{'CHLD'} = 'DEFAULT';
-    }
 
+    # For Net::Server::Fork (and PreFork) we don't overwrite the SIGCHLD handler
+    # to not interfere with their child tracking.
+    # The child processes of Fork and PreFork will set SIGCHLD set to 'DEFAULT'
+    # so that calls to system() etc. work.
+    # For Net::Server::Single we do use our special SIGCHLD handler to make
+    # subsequent calls to system() work (which happen in the same process).
+    my $is_forking = $self->{TYPE} eq 'Fork' || $self->{TYPE} eq 'PreFork';
+
+    # Start watchdog late in Net::Server startup phase so that Net::Server's
+    # SIGCHLD handler has been set.
+    OpenXPKI::Server::Watchdog->start_or_reload(keep_parent_sigchld => $is_forking);
 }
 
 # calles with PreFork when child is forked
@@ -882,7 +873,7 @@ the socket ownership based on the configuration.
 =head2 pre_loop_hook
 
 Drops privileges to the user configured in the configuration file just
-before starting the main server loop.
+before starting the main server loop. Also starts the Watchdog process.
 
 =head2 command
 

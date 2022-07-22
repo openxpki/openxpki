@@ -77,6 +77,19 @@ default: 1
 
 =back
 
+=item keep_parent_sigchld
+
+I<Bool> value: set to 1 to prevent installation of special C<SIGCHLD> handler
+and keep the current handler instead.
+The special C<SIGCHLD> handler allows for execution of C<system()> and the like
+in the parent process after starting the watchdog. But it will prevent reaping
+zombie processes that are forked via other modules (e.g. L<Net::Server>).
+Setting this to 1 should only be neccessary in the process where
+L<Net::Server/run> is called.
+default: 0
+
+=back
+
 =cut
 
 # Core modules
@@ -173,6 +186,12 @@ has interval_auto_archiving => (
     default => 0,
 );
 
+has keep_parent_sigchld => (
+    is => 'rw',
+    isa => 'Bool',
+    default => 0,
+);
+
 has _uid => (
     is => 'ro',
     isa => 'Str',
@@ -211,8 +230,6 @@ has _session_purge_handler => (
     init_arg => undef,
     predicate => 'do_session_purge',
 );
-
-
 
 around BUILDARGS => sub {
 
@@ -271,6 +288,8 @@ config.
 
 =cut
 sub start_or_reload {
+    my %args = @_;
+
     ##! 1: 'start_or_reload'
     my $pids = OpenXPKI::Control::get_pids();
 
@@ -283,6 +302,7 @@ sub start_or_reload {
         my $watchdog = OpenXPKI::Server::Watchdog->new( {
             user  => OpenXPKI::Server::__get_numerical_user_id(  $config->get('system.server.user') ),
             group => OpenXPKI::Server::__get_numerical_group_id( $config->get('system.server.group') ),
+            keep_parent_sigchld => $args{keep_parent_sigchld} ? 1 : 0,
         } );
 
         $watchdog->run;
@@ -327,6 +347,7 @@ Forks away a worker child, returns the pid of the worker
 
 sub run {
     my $self = shift;
+    ##! 1: 'start'
 
     CTX('log')->system->info('Starting watchdog');
 
@@ -347,7 +368,9 @@ sub run {
     my $fork_helper = OpenXPKI::Daemonize->new(
         sighup_handler  => \&OpenXPKI::Server::Watchdog::_sig_hup,
         sigterm_handler => \&OpenXPKI::Server::Watchdog::_sig_term,
+        keep_parent_sigchld => $self->keep_parent_sigchld,
     );
+
     $fork_helper->gid($self->_gid) if $self->_gid;
     $fork_helper->uid($self->_uid) if $self->_uid;
 
@@ -358,7 +381,6 @@ sub run {
     if ($pid > 0) { return $pid }
 
     # child process
-    ##! 16: 'child here'
     try {
         #
         # init
@@ -403,6 +425,8 @@ sub run {
         $self->__main_loop;
     }
     catch {
+        # make OpenXPKI::Exception compatible with Try::Tiny
+        local $@ = $_;
         # make sure the cleanup code does not die as this would escape run()
         eval { CTX('log')->system->error($_) };
     };

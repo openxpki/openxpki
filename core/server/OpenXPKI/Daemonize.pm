@@ -43,18 +43,53 @@ has gid => (
     isa => 'Int',
 );
 
+has keep_parent_sigchld => (
+    is => 'rw',
+    isa => 'Bool',
+    default => 0,
+);
+
 has old_sig_set => (
     is => 'rw',
     isa => 'POSIX::SigSet',
     init_arg => undef,
 );
 
-has is_parent => (
-    is => 'rw',
-    isa => 'Bool',
-    default => 1,
-    init_arg => undef,
-);
+# Store PIDs of forked child processes.
+# The list is purged after fork() so it doesn't grow with every child process.
+# By using a package variable this acts like a Singleton, so a new instance
+# of OpenXPKI::Daemonize won't delete collected child PIDs of previous instance.
+my $current_pid = $$;
+my %child_pids_by_parent = ();
+
+sub _get_child_pids {
+    if ($current_pid != $$) { $current_pid = $$; %child_pids_by_parent = () } # reset PID list after fork()
+    return keys %child_pids_by_parent;
+}
+
+sub _add_child_pid {
+    my $pid = shift;
+    if ($current_pid != $$) { $current_pid = $$; %child_pids_by_parent = () } # reset PID list after fork()
+    $child_pids_by_parent{$pid} = 1;
+}
+
+sub _remove_child_pid {
+    my $pid = shift;
+    delete $child_pids_by_parent{$pid};
+}
+
+our %instance = ($$ => 'root  ');
+around BUILDARGS => sub {
+    my ($orig, $class, %params) = @_;
+
+    # Environment always wins
+    if ($params{_i}) {
+        $instance{$$} = $params{_i};
+        delete $params{_i};
+    }
+
+    return $class->$orig(%params);
+};
 
 =head1 METHODS
 
@@ -94,29 +129,73 @@ child reaping to the operating system via C<$SIG{'CHLD'} = 'IGNORE'>.
 Also see L<https://perldoc.perl.org/perlipc#Signals>.
 
 =cut
+
+sub templog($;$) {
+    my $msg = shift;
+    my $is_test = shift;
+    open my $fh, '>>', '/tmp/oxi';
+    print $fh "[$$] $instance{$$}: " .($is_test ? '' : '### '). "$msg --- " .($SIG{'CHLD'}//'undef'). "\n";
+    close $fh;
+}
+
+sub _reaper {
+    # Don't overwrite current error and status codes outside this signal handler
+    local ($!, $?);
+
+    # Only try to reap the children we forked ourselves
+    my @kids = _get_child_pids;
+
+    # Clean up any child process that became a zombie via non-blocking waitpid().
+    # By explicitely NOT calling waitpid(-1, ...) we avoid interfering with
+    # calls to system() and others.
+    # (see https://perldoc.perl.org/functions/waitpid)
+    for my $pid (@kids) {
+        templog "trying $pid";
+        my $code = waitpid($pid, POSIX::WNOHANG);
+        # SIGCHLD will also be sent if a child process was only stopped,
+        # not terminated. So we check $? aka "native status" of waitpid()
+        # via POSIX::WIFEXITED.
+        if ($code > 0 && POSIX::WIFEXITED($?)) {
+            templog "reaped PID $code";
+            _remove_child_pid($pid);
+        }
+    }
+
+    # If we needed SysV compatibility, we would have to put the signal
+    # handler in an own sub and reinstall it here:
+    #   $SIG{'CHLD'} = \&_reaper;
+}
+
 sub fork_child {
     my ($self) = @_;
 
-    # reap child processes while allowing e.g. system() to work properly
-    $SIG{'CHLD'} = sub {
-        # Reap any child process (-1) that became a zombie.
-        # The loop is needed as there would be no second SIGCHLD if another
-        # process dies while this handler runs.
-        1 while waitpid(-1, POSIX::WNOHANG()) > 0; # do nothing, just reap
-    };
+    ##! 1: 'start'
+
+    # Reap child processes while allowing e.g. system() to work properly.
+    $SIG{'CHLD'} = \&_reaper unless $self->keep_parent_sigchld;
 
     my $pid = $self->_try_fork($self->max_fork_redo);
 
     # parent process: return on successful fork
-    if ($pid > 0) { return $pid }
-
-    $self->is_parent(0);
+    if ($pid > 0) {
+        templog "forked $pid";
+        _add_child_pid($pid);
+        return $pid;
+    }
 
     #
     # child process
     #
 
-    $SIG{'CHLD'} = 'DEFAULT'; # reset SIGCHLD handler so calls to system() etc. work
+    # if parent did NOT set our special handler for them and us...
+    if ($self->keep_parent_sigchld) {
+        # don't pass on this behaviour, i.e. use our custom signal handler if
+        # child forks a grandchild using the same instance of OpenXPKI::Daemonize
+        $self->keep_parent_sigchld(0);
+        # allow execution of system() etc.
+        $SIG{'CHLD'} = 'default';
+    }
+
     $SIG{'HUP'}  = $self->sighup_handler  if $self->sighup_handler;
     $SIG{'TERM'} = $self->sigterm_handler if $self->sigterm_handler;
 
@@ -147,9 +226,9 @@ Hand C<SIGCHLD> processing over to operating system (see note on C<SIGCHLD> at
 L</fork_child>).
 
 =cut
-sub DEMOLISH {
-    my $self = shift;
-    $SIG{'CHLD'} = 'IGNORE' if $self->is_parent;
+END {
+    templog "setting \$SIG{'CHLD'} = 'IGNORE'";
+    $SIG{'CHLD'} = 'IGNORE';
 }
 
 # "The most paranoid of programmers block signals for a fork to prevent a
