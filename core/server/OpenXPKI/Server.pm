@@ -37,7 +37,6 @@ sub new {
 
     ## get parameters
     $self->{TYPE}   = $keys->{TYPE} // 'Fork';
-    $self->{CONFIG} = $keys->{CONFIG};
     $self->{SILENT} = $keys->{SILENT};
     $self->{BACKGROUND} = ($keys->{NODETACH} ? 0 : 1);
 
@@ -76,7 +75,6 @@ sub __init_net_server {
     ##! 1: "start"
 
     eval {
-        ## start the server
         $self->{PARAMS} = $self->__get_server_config();
 
         # Net::Server does not provide a hook that lets us change the
@@ -831,32 +829,28 @@ OpenXPKI::Server - central server class (the daemon class).
 
 =head1 Description
 
-This is the main server class of OpenXPKI. If you want to start an
-OpenXPKI server then you must instantiate this class. Please always
-remember that an instantiation of this module is a startup of a
+This is the main server class of OpenXPKI. It will start the OpenXPKI
 trustcenter.
 
 =head1 Functions
 
 =head2 new
 
-starts the server. It needs some parameters to configure the server
-but if they are correct then an exec will be performed. The parameters
-are the following ones:
+Constructor. Parameters to configure the server:
 
 =over
 
-=item * DAEMON_USER
+=item * TYPE - (I<Str>) C<Fork> or C<PreFork>, default: C<Fork>
 
-=item * DAEMON_GROUP
+=item * SILENT - (I<Bool>) silent startup with start-stop-daemons during System V init
 
-=item * CONFIG
-
-=item * SILENT (for silent startup with start-stop-daemons during System V init)
+=item * NODETACH - (I<Bool>) run the parent process in foreground (i.e. no daemon)
 
 =back
 
-All parameters are required.
+=head2 start
+
+Start the server process. This method never returns.
 
 =head2 process_request
 
