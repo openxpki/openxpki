@@ -562,6 +562,10 @@ OpenXPKI/Server/NICE/Null.pm
 OpenXPKI/Server/NICE/Factory.pm
 OpenXPKI/Server/NICE/Local.pm
 
+OpenXPKI/Server/NICE/Role/KeyGenerationLocal.pm
+OpenXPKI/Server/NICE/Role/KeyInDataPool.pm
+
+OpenXPKI/Server/Workflow/Activity/NICE/CallMethod.pm
 OpenXPKI/Server/Workflow/Activity/NICE/CheckForRevocation.pm
 OpenXPKI/Server/Workflow/Activity/NICE/FetchCertificate.pm
 OpenXPKI/Server/Workflow/Activity/NICE/FetchKey.pm

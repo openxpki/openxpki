@@ -49,6 +49,18 @@ has 'last_error' => (
     default => '',
 );
 
+has import_chain => (
+    is => 'rw',
+    isa => 'Str',
+    default => 'none'
+);
+
+has register_issuer => (
+    is => 'rw',
+    isa => 'Str',
+    default => ''
+);
+
 # Moose pre-constuctor to map single argument activity into expected hashref
 
 around BUILDARGS => sub {
@@ -106,6 +118,7 @@ sub __persistCertificateInformation {
 
     my $x509 = OpenXPKI::Crypt::X509->new( $cert_info->{certificate} );
 
+    # this is the entity certificate that should be imported
     my $cert_data = $x509 ->db_hash();
     my $identifier = $cert_data->{identifier};
 
@@ -128,6 +141,8 @@ sub __persistCertificateInformation {
     # Try to autodetected the ca_identifier ....
     my $ca_id = $cert_info->{ca_identifier};
     if (not $ca_id) {
+        # search the issuer based on the key identifier or, if not set
+        # using the issuer subject
         my $issuer = CTX('dbi')->select_one(
             from => 'certificate',
             columns => [ 'identifier' ],
@@ -140,13 +155,19 @@ sub __persistCertificateInformation {
             },
         );
         ##! 32: 'returned issuer ' . Dumper( $issuer )
+        # the issuer is already in the database
         if ($issuer->{identifier}) {
             $ca_id = $issuer->{identifier};
-        } else {
+
+        # the issuer is not in the database but we have the chain
+        } elsif ($cert_info->{chain}) {
+            CTX('log')->application()->info("Unknown issuer - try to import chain for new certificate");
+            $ca_id = $self->__import_chain( $cert_info->{chain} );
+        }
+
+        if (!$ca_id) {
             $ca_id = 'unknown';
             CTX('log')->application()->warn("NICE certificate issued with unknown issuer! ($identifier / ".$cert_data->{issuer_dn}.")");
-
-
         }
     }
 
@@ -204,6 +225,61 @@ sub __persistCertificateInformation {
         );
     }
     return $identifier;
+}
+
+sub __import_chain {
+
+    my $self = shift;
+    my $chain = shift;
+
+    # we are not expected to do anything
+    return if ($self->import_chain() eq 'none');
+
+    # if we do not have a chain we can not do anything
+    return unless($chain->[0]);
+
+    ##! 32: 'Import chain with mode ' . $self->import_chain()
+    ##! 128: $chain
+
+    CTX('log')->application()->info("Start automatic import of chain for new certificate");
+    my $res = CTX('api2')->import_chain(
+        chain => $chain,
+        import_root => (($self->import_chain() eq 'all') ? 1 : 0)
+    );
+
+    if (!$res || scalar @{$res->{failed}}) {
+        CTX('log')->application()->error("error importing chain");
+        OpenXPKI::Exception->throw(
+            message => 'DICE error importing chain',
+            error => $res->{failed},
+        );
+    }
+    ##! 64: $chain
+    # the last item in the chain is either the last item of the imported
+    if (@{$res->{imported}}) {
+        my $issuer_identifier = $res->{imported}->[-1]->{identifier};
+        ##! 8: 'New intermediate was imported ' . $issuer_identifier
+        if (my $issuer_group = $self->register_issuer()) {
+            ##! 8: 'Register as issuer in ' . $issuer_group
+            my $issuer_alias = CTX('api2')->register_alias(
+                identifier =>  $issuer_identifier,
+                alias_group => $issuer_group,
+            );
+        }
+        CTX('log')->application()->info("NICE imported new issuer $issuer_identifier");
+        return $issuer_identifier;
+    }
+
+    # should not be possible
+    OpenXPKI::Exception->throw(
+        message => 'DICE error importing chain',
+        error => 'nothing was found or imported',
+    ) unless(@{$res->{existed}});
+
+    # issuer is the last item of the existed list
+    ##! 8: 'Intermediate was already in database'
+    return $res->{existed}->[-1]->{identifier};
+
 }
 
 sub __fetchPersistedCertificateInformation {
@@ -565,35 +641,56 @@ Expect the name of the context field, and its new value.
 =head2 __persistCertificateInformation
 
 Persist a certificate into the certificate table and store implementation
-specific information in the datapool. The first parameter is mandatory with
-all fields given below. The second parameter is serialized "as is" and stored
-in the datapool and can be retrieved later using C<__fetchPersistedCertificateInformation>.
+specific information in the datapool. The first parameter is a hash with
+the fields explained below. The second parameter is serialized "as is"
+and stored in the datapool and can be retrieved later using
+C<__fetchPersistedCertificateInformation>.
 
-=head3 certificate_information
+=head3 Mandatory Keys
 
 =over
 
 =item certificate - the PEM encoded certificate
 
-=item ca_identifier - the identifier of the issuing ca
+The PEM encoded certificate.
 
 =item csr_serial - serial number of the processed csr
 
+
 =back
 
-The certificate is expected to be a x509 structure. A pkcs7 container with
-the entity certificate and its chain is also accepted.
+=head3 Optional Keys
 
-If the ca_identifier is not set, we try to autodetect it by searching the
-certificate table for a certificate which matches the authority key identifier.
-If the certificate has no authority key identifier set, the lookup is done on
-the the issuer dn.
+=item ca_identifier - the identifier of the issuing ca
+
+Identifier of the issuer certificate, if not set the method tries to
+autodetect it by searching the certificate table for a certificate
+matching the authority key identifier. If the certificate has no
+authority key identifier set, the lookup is done on the the issuer dn.
+
+If no match is found, the I<chain> parameter is evaluated.
+
+If no issuer identifier can be found, it is set to I<unknown>.
+
+=item chain - array ref holding the chain as PEM blocks
+
+For implementations working with external issuers, this provides an
+alternative to complete the issuer chain. Passes the parameter as
+input to the C<__import_chain> method.
+
+=back
 
 =head2 __fetchPersistedCertificateInformation
 
 Return the hashref for a given certificate identifiere stored within the
 datapool using C<__persistCertificateInformation>.
 
+=head2 __import_chain
+
+Expects a list of PEM encoded certificates to import. The first item must
+be the entity certificate. Import must be activated by setting the
+I<import_chain> parameter, imported entities can be registered as a new
+alias setting the I<register_issuer> parameter.
 
 =head1 Implementors Guide
 
@@ -604,14 +701,35 @@ can ommit the implementation of the second steps.
 The activity definitions in OpenXPKI::Server::Workflow::Activity::NICE::*
 show the expected usage of the API functions.
 
-=head1 issue/renew Certificate
+=head2 Class Attributes
 
-The request information must be taken from the csr and csr_attributes t
+The following class attributes can to be set from the implementing class
+to modify internal behaviour.
+
+=over
+
+=item import_chain
+
+Default is I<none> which deactivates any import of chain certificates,
+valid values are I<all> which also imports missing root certificates and
+I<chain> which requires the root exist in the database.
+
+=item register_issuer
+
+Default is empty, needs to be set to the name of an alias group.
+
+If a new entity is imported into the database by C<import_chain>, it is
+added to the alias group given as I<register_issuer>.
+
+B<Note>: auto registration of a "new" issuer is not run if the certificate
+already exists in the database.
+
+=back
+
+=head2 issue/renew Certificate
+
+The request information must be taken from the csr and csr_attributes tables.
 
 The method must persist the certificate by calling __persistCertificateInformation
 and write the certificates identifier into the context parameter cert_identifier.
-
-If the request was dispatched but is still pending, the  must
-be written into the cert_identifier context value. If cert_identifier is not set
-after execution, the workflow will call this method again.
 

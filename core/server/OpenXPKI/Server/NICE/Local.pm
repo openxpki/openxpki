@@ -17,6 +17,10 @@ use MIME::Base64;
 use Moose;
 #use namespace::autoclean; # Conflicts with Debugger
 extends 'OpenXPKI::Server::NICE';
+with qw(
+    OpenXPKI::Server::NICE::Role::KeyGenerationLocal
+    OpenXPKI::Server::NICE::Role::KeyInDataPool
+);
 
 has use_revocation_id => (
     is => 'rw',
@@ -595,122 +599,12 @@ sub __prepare_crl_data {
     return @cert_timestamps;
 }
 
-sub generateKey {
-
-    my $self = shift;
-
-    my $mode = shift; # not used
-    my $key_alg = shift;
-    my $key_params = shift;
-    my $key_transport = shift;
-    my $extra = shift || {};
-
-    my $params = {
-        key_alg => $key_alg,
-        password => $key_transport->{password},
-        enc_alg => $key_transport->{algorithm},
-    };
-
-    # password check
-    if (not $params->{password}) {
-        $self->last_error('I18N_OPENXPKI_UI_NICE_GENERATE_KEY_NO_PASSWORD');
-        return;
-    }
-
-    foreach my $key (keys %{$key_params}) {
-        my $value = $key_params->{$key};
-        if ( defined $value && $value ne '' ) {
-            if ($key =~ /curve_name/i) {
-                $params->{curve} = $value;
-            } elsif ($key =~ /key_length/i) {
-                $params->{key_length} = $value;
-            }
-        }
-    }
-
-    # command definition
-    my $res;
-    CTX('log')->audit('key')->info("generating private key via NICE");
-
-    eval {
-        my $pkcs8 = CTX('api2')->generate_key(%$params);
-
-        my $pubkey = CTX('api2')->get_default_token()->command({
-            COMMAND => "get_pubkey",
-            DATA => $pkcs8,
-            PASSWD => $params->{password},
-        });
-
-        my $pub = OpenXPKI::Crypt::PubKey->new($pubkey);
-
-        $res = {
-            pkey => $pkcs8,
-            pubkey => encode_base64($pub->data, ''),
-            key_id => $pub->get_subject_key_id,
-        };
-    };
-    if ($EVAL_ERROR) {
-        CTX('log')->application()->error('Error generating private key: ' . $EVAL_ERROR);
-    }
-    return $res;
-
-}
-
-sub fetchKey {
-
-    my $self = shift;
-
-    my $key_identifier = shift;
-    my $password = shift || '';
-    my $key_transport = {
-        password => $password,
-        algorithm => 'aes256',
-        %{shift || {}}
-    };
-    my $params = shift;
-
-    # password check
-    if (not $password) {
-        OpenXPKI::Exception->throw(
-            message => 'No password set for key encryption'
-        );
-    }
-
-    my $pkey;
-    my $datapool = CTX('api2')->get_data_pool_entry(
-        namespace =>  'certificate.privatekey',
-        key       =>  $key_identifier
-    );
-
-    if (!$datapool) {
-        $self->last_error('I18N_OPENXPKI_UI_NICE_FETCH_KEY_NO_SUCH_KEY');
-        CTX('log')->application()->error('No key found for this key_id');
-        return;
-    }
-
-    eval {
-        $pkey = CTX('api2')->convert_private_key(
-            private_key => $datapool->{value},
-            format     => 'OPENSSL_PRIVKEY',
-            password   => $password,
-            # fallback to password is done in API, Algo is always aes256
-            passout => $key_transport->{password} || '',
-        );
-    };
-    if ($EVAL_ERROR || !$pkey) {
-        $self->last_error('I18N_OPENXPKI_UI_NICE_FETCH_KEY_DECRYPT_FAILED');
-        CTX('log')->application()->error('Unable to export private key: ' . ($EVAL_ERROR || 'unknown error'));
-    }
-
-    return $pkey;
-
-}
-
 sub testConnection {
     return;
 }
 
 1;
+
 __END__
 
 =head1 Name
@@ -804,29 +698,11 @@ included in the CRL, by default the CRL also lists expired certificates.
 
 =head2 generateKey
 
-Calls the local API method generate_key, input parameters are "drop in"
-compatible to the Tools::GenerateKey activity. The return value is a hash:
-
-=over
-
-=item pkey
-
-The PEM encoded private key, including header/footer lines
-
-=item pubkey
-
-The base64 encoded public key (no line breaks or headers)
-
-=item key_id
-
-The key identifier, sha1 hash (uppercase hex) of pubkey, same format
-as subject_key_id of PKCS10 and x509 classes.
-
-=back
+See OpenXPKI::Server::NICE::Role::KeyGenerationLocal
 
 =head2 fetchKey
 
-Loads the private key from the datapool based on the used key_id.
+See OpenXPKI::Server::NICE::Role::KeyInDataPool
 
 =head2 testConnection
 
