@@ -1,9 +1,64 @@
 package OpenXPKI::Daemonize;
 use Moose;
 
-=head1 Name
+=head1 NAME
 
 OpenXPKI::Daemonize - Helper functions to cleanly fork background processes
+
+=head1 DESCRIPTION
+
+=head2 Note on SIGCHLD
+
+The requirements for a proper C<SIGCHLD> handling are:
+
+=over
+
+=item * avoid zombie processes of our forked children by calling C<waitpid()>
+on them,
+
+=item * allow follow up code to evaluate the status of e.g. C<sytem()> calls
+or doing own C<waitpid()> on children not forked by C<OpenXPKI::Daemonize>,
+
+=item * avoid interfering with L<Net::Server>'s C<SIGCHLD> handler.
+
+=back
+
+The most compatible way to handle C<SIGCHLD> is to set it to C<'DEFAULT'>,
+letting Perl handle it. This way commands like C<system()> will work properly.
+
+But for the C<OpenXPKI::Daemonize> parent process to be able to reap its child
+processes we need a custom C<SIGCHLD> handler to call C<waitpid()> on them.
+So in our custom handler we keep track of the PIDs of our own forked children
+and only reap those. Other children (e.g. forked via C<system()>) are left
+untouched.
+
+Thus there are two usage modes:
+
+=over
+
+=item 1. Default (C<keep_parent_sigchld =E<gt> 0>):
+
+Parent: install custom C<SIGCHLD> handler (NOT compatible with C<Net::Server>
+parent process, reaps children forked by us, C<system()> compatible)
+
+Child: inherit parent's custom handler
+
+=item 2. C<keep_parent_sigchld =E<gt> 1> (for use in C<Net::Server> parent
+process):
+
+Parent: do not touch C<SIGCHLD> handler (to keep C<Net::Server>'s handler,
+reaps children forked by us via existing handler, NOT C<system()> compatible)
+
+Child: set C<$SIG{'CHLD'} = 'DEFAULT'>.
+
+=back
+
+Obviously due to a bug maybe related to L<https://github.com/Perl/perl5/issues/17662>)
+and maybe in conjunction with our use of L<Net::Server> C<SIGCHLD> handling is
+not reset when the parent process exits. That is why in an L</END block> we
+explicitely hand over child reaping to the operating system.
+
+Also see L<https://perldoc.perl.org/perlipc#Signals>.
 
 =cut
 
@@ -17,38 +72,78 @@ use POSIX ();
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 
+=head1 ATTRIBUTES
+
+=head2 max_fork_redo
+
+Optional: I<Int> max. retries in case forking fails. Default: 5.
+
+=cut
 has max_fork_redo => (
     is => 'rw',
     isa => 'Int',
     default => 5,
 );
 
+=head2 sighup_handler
+
+Optional: I<CodeRef> handler for C<SIGHUP> signals.
+
+=cut
 has sighup_handler => (
     is => 'rw',
     isa => 'CodeRef',
 );
 
+=head2 sigterm_handler
+
+Optional: I<CodeRef> handler for C<SIGTERM> signals.
+
+=cut
 has sigterm_handler => (
     is => 'rw',
     isa => 'CodeRef',
 );
 
+=head2 uid
+
+Optional: I<Int> user ID to set for the newly forked child process.
+
+Default: do not change ID
+
+=cut
 has uid => (
     is => 'rw',
     isa => 'Int',
 );
 
+=head2 gid
+
+Optional: I<Int> group ID to set for the newly forked child process.
+
+Default: do not change ID
+
+=cut
 has gid => (
     is => 'rw',
     isa => 'Int',
 );
 
+=head2 keep_parent_sigchld
+
+Optional: I<Bool> C<1> = parent: keep currently set C<SIGCHLD> handler,
+child: set C<SIGCHLD> to C<default>.
+
+Default: 0
+
+=cut
 has keep_parent_sigchld => (
     is => 'rw',
     isa => 'Bool',
     default => 0,
 );
 
+#
 has old_sig_set => (
     is => 'rw',
     isa => 'POSIX::SigSet',
@@ -94,26 +189,6 @@ B<Note on STDIN, STDOUT, STDERR>
 All IO handles will be connected to I</dev/null> with one exception: if C<STDERR>
 was already redirected to a file (and is not a terminal) then it is left untouched.
 This is to make sure error messages still go to the desired log files.
-
-B<Note on SIGCHLD>
-
-The most compatible way to handle C<SIGCHLD> seems to set it to C<'DEFAULT'>,
-letting Perl handle it. This way commands like C<system()> will work properly.
-
-For the child process we set C<$SIG{'CHLD'} = 'DEFAULT'>.
-
-The problem is that child processes will become zombies unless the parent
-calls C<waitpid()> to reap them.
-
-For the parent process we set up an own C<SIGCHLD> handler that calls C<waitpid()>
-to properly reap child processes without affecting calls to C<system()>.
-
-Obviously due to a bug (L<https://github.com/Perl/perl5/issues/17662>) maybe in
-conjunction with our use of L<Net::Server> C<SIGCHLD> handling is not reset when
-the parent process exits. That is why in C<DEMOLISH> we explicitely hand over
-child reaping to the operating system via C<$SIG{'CHLD'} = 'IGNORE'>.
-
-Also see L<https://perldoc.perl.org/perlipc#Signals>.
 
 =cut
 
@@ -196,10 +271,10 @@ sub _reaper {
     $SIG{'CHLD'} = \&OpenXPKI::Daemonize::_reaper;
 }
 
-=head2 DEMOLISH
+=head2 END block
 
-Hand C<SIGCHLD> processing over to operating system (see note on C<SIGCHLD> at
-L</fork_child>).
+Hand C<SIGCHLD> processing over to operating system via
+C<$SIG{'CHLD'} = 'IGNORE'>, see L</Note on SIGCHLD>.
 
 =cut
 END {
