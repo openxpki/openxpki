@@ -78,19 +78,6 @@ sub _remove_child_pid {
     delete $child_pids_by_parent{$pid};
 }
 
-our %instance = ($$ => 'root  ');
-around BUILDARGS => sub {
-    my ($orig, $class, %params) = @_;
-
-    # Environment always wins
-    if ($params{_i}) {
-        $instance{$$} = $params{_i};
-        delete $params{_i};
-    }
-
-    return $class->$orig(%params);
-};
-
 =head1 METHODS
 
 =head2 fork_child
@@ -130,42 +117,6 @@ Also see L<https://perldoc.perl.org/perlipc#Signals>.
 
 =cut
 
-sub templog($;$) {
-    my $msg = shift;
-    my $is_test = shift;
-    open my $fh, '>>', '/tmp/oxi';
-    print $fh "[$$] $instance{$$}: " .($is_test ? '' : '### '). "$msg --- " .($SIG{'CHLD'}//'undef'). "\n";
-    close $fh;
-}
-
-sub _reaper {
-    # Don't overwrite current error and status codes outside this signal handler
-    local ($!, $?);
-
-    # Only try to reap the children we forked ourselves
-    my @kids = _get_child_pids;
-
-    # Clean up any child process that became a zombie via non-blocking waitpid().
-    # By explicitely NOT calling waitpid(-1, ...) we avoid interfering with
-    # calls to system() and others.
-    # (see https://perldoc.perl.org/functions/waitpid)
-    for my $pid (@kids) {
-        templog "trying $pid";
-        my $code = waitpid($pid, POSIX::WNOHANG);
-        # SIGCHLD will also be sent if a child process was only stopped,
-        # not terminated. So we check $? aka "native status" of waitpid()
-        # via POSIX::WIFEXITED.
-        if ($code > 0 && POSIX::WIFEXITED($?)) {
-            templog "reaped PID $code";
-            _remove_child_pid($pid);
-        }
-    }
-
-    # If we needed SysV compatibility, we would have to put the signal
-    # handler in an own sub and reinstall it here:
-    #   $SIG{'CHLD'} = \&_reaper;
-}
-
 sub fork_child {
     my ($self) = @_;
 
@@ -178,7 +129,6 @@ sub fork_child {
 
     # parent process: return on successful fork
     if ($pid > 0) {
-        templog "forked $pid";
         _add_child_pid($pid);
         return $pid;
     }
@@ -220,6 +170,33 @@ sub fork_child {
     return $pid;
 }
 
+# SIGCHLD handler
+sub _reaper {
+    # Don't overwrite current error and status codes outside this signal handler
+    local ($!, $?);
+
+    # Only try to reap the children we forked ourselves
+    my @kids = _get_child_pids;
+
+    # Clean up any child process that became a zombie via non-blocking waitpid().
+    # By explicitely NOT calling waitpid(-1, ...) we avoid interfering with
+    # calls to system() and others.
+    # (see https://perldoc.perl.org/functions/waitpid)
+    for my $pid (@kids) {
+        my $code = waitpid($pid, POSIX::WNOHANG);
+        # SIGCHLD will also be sent if a child process was only stopped,
+        # not terminated. So we check $? aka "native status" of waitpid()
+        # via POSIX::WIFEXITED.
+        if ($code > 0 && POSIX::WIFEXITED($?)) {
+            _remove_child_pid($pid);
+        }
+    }
+
+    # If we needed SysV compatibility, we would have to put the signal
+    # handler in an own sub and reinstall it here:
+    #   $SIG{'CHLD'} = \&_reaper;
+}
+
 =head2 DEMOLISH
 
 Hand C<SIGCHLD> processing over to operating system (see note on C<SIGCHLD> at
@@ -227,7 +204,6 @@ L</fork_child>).
 
 =cut
 END {
-    templog "setting \$SIG{'CHLD'} = 'IGNORE'";
     $SIG{'CHLD'} = 'IGNORE';
 }
 
