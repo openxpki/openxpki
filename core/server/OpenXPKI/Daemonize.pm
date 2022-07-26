@@ -192,9 +192,8 @@ sub _reaper {
         }
     }
 
-    # If we needed SysV compatibility, we would have to put the signal
-    # handler in an own sub and reinstall it here:
-    #   $SIG{'CHLD'} = \&_reaper;
+    # SysV compatibility: reinstall signal handler
+    $SIG{'CHLD'} = \&OpenXPKI::Daemonize::_reaper;
 }
 
 =head2 DEMOLISH
