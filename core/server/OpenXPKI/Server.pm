@@ -173,15 +173,19 @@ sub post_bind_hook {
 
     # socket ownership defaults to daemon user/group...
     # ... but can be overwritten in the config file
-    my $socket_owner = $self->{PARAMS}->{socket_owner} // $self->{PARAMS}->{process_owner};
-    my $socket_group = $self->{PARAMS}->{socket_group} // $self->{PARAMS}->{process_group};
+    my $process_owner = $self->{PARAMS}->{process_owner};
+    my $process_group = $self->{PARAMS}->{process_group};
+    my $socket_owner = $self->{PARAMS}->{socket_owner} // $process_owner;
+    my $socket_group = $self->{PARAMS}->{socket_group} // $process_group;
 
     if (($socket_owner != -1) || ($socket_group != -1)) {
         # try to change socket ownership
+        ##! 16: 'chown socket: ' .  $socketfile . ' user: ' . $socket_owner . ' group: ' . $socket_group
         CTX('log')->system()->debug("Setting socket file '$socketfile' ownership to "
             . (( $socket_owner != -1) ? $socket_owner : 'unchanged' )
             . '/'
-            . (( $socket_group != -1) ? $socket_group : 'unchanged' ));
+            . (( $socket_group != -1) ? $socket_group : 'unchanged' )
+        );
 
 
         if (! chown $socket_owner, $socket_group, $socketfile) {
@@ -203,10 +207,9 @@ sub post_bind_hook {
 
     # change the owner of the pidfile to the daemon user
     my $pidfile = $self->{PARAMS}->{pid_file};
-    ##! 16: 'chown pidfile: ' .  $pidfile . ' user: ' . $self->{PARAMS}->{process_owner} . ' group: ' . $self->{PARAMS}->{process_group}
-    if (! chown $self->{PARAMS}->{process_owner}, $self->{PARAMS}->{process_group}, $pidfile) {
-        CTX('log')->system()->error("Could not change ownership for pidfile '$pidfile' to '$socket_owner:$socket_group'");
-
+    ##! 16: 'chown pidfile: ' .  $pidfile . ' user: ' . $process_owner . ' group: ' . $process_group
+    if (! chown $process_owner, $process_group, $pidfile) {
+        CTX('log')->system()->error("Could not change ownership for pidfile '$pidfile' to '$process_owner:$process_group'");
     }
 
     my $env = CTX('config')->get_hash('system.server.environment');
