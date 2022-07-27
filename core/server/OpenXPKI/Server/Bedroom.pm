@@ -186,8 +186,10 @@ sub new_child {
     #
     ##! 1: 'child: $SIG{"CHLD"}: ' . ($SIG{'CHLD'}//'<undef>')
 
-    # allow execution of system() etc. if parent did NOT set our special handler for them and us
-    $SIG{'CHLD'} = 'default' if $args{keep_parent_sigchld};
+    # Set DEFAULT SIGCHLD handler to allow execution of system() etc. unless
+    # parent set our special handler that does the same and more.
+    $SIG{'CHLD'} = 'DEFAULT' if $args{keep_parent_sigchld};
+
     $SIG{'HUP'}  = $args{sighup_handler}  if $args{sighup_handler};
     $SIG{'TERM'} = $args{sigterm_handler} if $args{sigterm_handler};
 
