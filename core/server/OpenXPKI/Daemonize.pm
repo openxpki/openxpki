@@ -19,7 +19,14 @@ on them,
 =item * allow follow up code to evaluate the status of e.g. C<sytem()> calls
 or doing own C<waitpid()> on children not forked by C<OpenXPKI::Daemonize>,
 
-=item * avoid interfering with L<Net::Server>'s C<SIGCHLD> handler.
+=item * avoid interfering with L<Net::Server>'s C<SIGCHLD> handler,
+
+=item * keep the C<OpenXPKI::Daemonize> instance that contains the C<SIGCHLD>
+handler alive as long as there are child processes. Destroying the instance
+too early could lead to errors: without resetting C<SIGCHLD> handler to
+C<'IGNORE'> a finished child process would raise the error
+I<"Signal SIGCHLD received, but no signal handler set">. When set to C<'IGNORE'>
+e.g. a following C<system()> call from code higher up the hierarchy would fail.
 
 =back
 
@@ -53,10 +60,17 @@ Child: set C<$SIG{'CHLD'} = 'DEFAULT'>.
 
 =back
 
-Obviously due to a bug maybe related to L<https://github.com/Perl/perl5/issues/17662>)
-and maybe in conjunction with our use of L<Net::Server> C<SIGCHLD> handling is
-not reset when the parent process exits. That is why in an L</END block> we
-explicitely hand over child reaping to the operating system.
+If this object is destroyed while the C<$SIG{'CHLD'}> still refers to our
+handler then children exiting later on will raise the internal Perl error
+I<"Signal SIGCHLD received, but no signal handler set.">
+
+That is why in L</DEMOLISH> we explicitely hand over child reaping to the
+operating system. But this also means after this the process will not be
+able to call C<system()> and the like anymore. So a better solution is to
+keep this object alive as long as possible, ideally until C<OpenXPKI::Server>
+shuts down.
+
+Also see L<https://github.com/Perl/perl5/issues/17662>, might be related.
 
 Also see L<https://perldoc.perl.org/perlipc#Signals>.
 
@@ -271,13 +285,21 @@ sub _reaper {
     $SIG{'CHLD'} = \&OpenXPKI::Daemonize::_reaper;
 }
 
-=head2 END block
+=head2 DEMOLISH
 
 Hand C<SIGCHLD> processing over to operating system via
 C<$SIG{'CHLD'} = 'IGNORE'>, see L</Note on SIGCHLD>.
 
 =cut
-END {
+sub DEMOLISH {
+    my $self = shift;
+    my $global_destruction = shift;
+
+    if ($SIG{'CHLD'} eq \&_reaper and not $global_destruction) {
+        warn "WARNING: OpenXPKI::Daemonize will be destroyed while \$SIG{'CHLD'} still referred to our handler. It was set to 'IGNORE' instead.";
+    }
+
+    # Prevent "Signal SIGCHLD received, but no signal handler set."
     $SIG{'CHLD'} = 'IGNORE';
 }
 
