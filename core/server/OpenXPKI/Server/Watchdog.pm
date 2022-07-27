@@ -399,18 +399,15 @@ sub run {
         );
     }
 
-    my $fork_helper = OpenXPKI::Daemonize->new(
-        sighup_handler  => \&OpenXPKI::Server::Watchdog::_sig_hup,
-        sigterm_handler => \&OpenXPKI::Server::Watchdog::_sig_term,
+    # FORK - parent returns PID, child returns 0
+    my $pid = OpenXPKI::Daemonize->new->fork_child(
+        sighup_handler  => \&_sig_hup,
+        sigterm_handler => \&_sig_term,
         keep_parent_sigchld => $self->keep_parent_sigchld,
         max_fork_redo => $self->max_fork_redo,
+        $self->userid ? (uid => $self->userid) : (),
+        $self->groupid ? (gid => $self->groupid) : (),
     );
-
-    $fork_helper->gid($self->groupid) if $self->groupid;
-    $fork_helper->uid($self->userid) if $self->userid;
-
-    # FORK
-    my $pid = $fork_helper->fork_child; # parent returns PID, child returns 0
 
     # parent process: return
     if ($pid > 0) { return $pid }

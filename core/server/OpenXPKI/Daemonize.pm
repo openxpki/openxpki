@@ -85,77 +85,7 @@ use POSIX ();
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
-
-=head1 ATTRIBUTES
-
-=head2 max_fork_redo
-
-Optional: I<Int> max. retries in case forking fails. Default: 5.
-
-=cut
-has max_fork_redo => (
-    is => 'rw',
-    isa => 'Int',
-    default => 5,
-);
-
-=head2 sighup_handler
-
-Optional: I<CodeRef> handler for C<SIGHUP> signals.
-
-=cut
-has sighup_handler => (
-    is => 'rw',
-    isa => 'CodeRef',
-);
-
-=head2 sigterm_handler
-
-Optional: I<CodeRef> handler for C<SIGTERM> signals.
-
-=cut
-has sigterm_handler => (
-    is => 'rw',
-    isa => 'CodeRef',
-);
-
-=head2 uid
-
-Optional: I<Int> user ID to set for the newly forked child process.
-
-Default: do not change ID
-
-=cut
-has uid => (
-    is => 'rw',
-    isa => 'Int',
-);
-
-=head2 gid
-
-Optional: I<Int> group ID to set for the newly forked child process.
-
-Default: do not change ID
-
-=cut
-has gid => (
-    is => 'rw',
-    isa => 'Int',
-);
-
-=head2 keep_parent_sigchld
-
-Optional: I<Bool> C<1> = parent: keep currently set C<SIGCHLD> handler,
-child: set C<SIGCHLD> to C<default>.
-
-Default: 0
-
-=cut
-has keep_parent_sigchld => (
-    is => 'rw',
-    isa => 'Bool',
-    default => 0,
-);
+use OpenXPKI::MooseParams;
 
 #
 has old_sig_set => (
@@ -204,17 +134,43 @@ All IO handles will be connected to I</dev/null> with one exception: if C<STDERR
 was already redirected to a file (and is not a terminal) then it is left untouched.
 This is to make sure error messages still go to the desired log files.
 
+B<Parameters>
+
+=over
+
+=item * C<max_fork_redo> I<Int> - optional: max. retries in case forking fails. Default: 5.
+
+=item * C<sighup_handler> I<CodeRef> - optional: handler for C<SIGHUP> signals.
+
+=item * C<sigterm_handler> I<CodeRef> - optional: handler for C<SIGTERM> signals.
+
+=item * C<uid> I<Int> - optional: user ID to set for the newly forked child process. Default: do not change ID.
+
+=item * C<gid> I<Int> - optional: group ID to set for the newly forked child process. Default: do not change ID.
+
+=item * C<keep_parent_sigchld> I<Bool> - optional: C<1> = parent: keep currently installed C<SIGCHLD> handler,
+child: set C<SIGCHLD> to C<default>. Default: 0
+
+=back
+
 =cut
 
 sub fork_child {
-    my ($self) = @_;
+    my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
+        max_fork_redo => { isa => 'Int', optional => 1,default => 5 },
+        sighup_handler => { isa => 'CodeRef', optional => 1 },
+        sigterm_handler => { isa => 'CodeRef', optional => 1 },
+        uid => { isa => 'Int', optional => 1 },
+        gid => { isa => 'Int', optional => 1 },
+        keep_parent_sigchld => { isa => 'Bool', optional => 1, default => 0 },
+    );
 
     ##! 1: 'start'
 
     # Reap child processes while allowing e.g. system() to work properly.
-    $SIG{'CHLD'} = \&_reaper unless $self->keep_parent_sigchld;
+    $SIG{'CHLD'} = \&_reaper if not $args{keep_parent_sigchld};
 
-    my $pid = $self->_try_fork($self->max_fork_redo);
+    my $pid = $self->_try_fork($args{max_fork_redo});
 
     # parent process: return on successful fork
     if ($pid > 0) {
@@ -226,25 +182,18 @@ sub fork_child {
     # child process
     #
 
-    # if parent did NOT set our special handler for them and us...
-    if ($self->keep_parent_sigchld) {
-        # don't pass on this behaviour, i.e. use our custom signal handler if
-        # child forks a grandchild using the same instance of OpenXPKI::Daemonize
-        $self->keep_parent_sigchld(0);
-        # allow execution of system() etc.
-        $SIG{'CHLD'} = 'default';
-    }
+    # allow execution of system() etc. if parent did NOT set our special handler for them and us
+    $SIG{'CHLD'} = 'default' if $args{keep_parent_sigchld};
+    $SIG{'HUP'}  = $args{sighup_handler}  if $args{sighup_handler};
+    $SIG{'TERM'} = $args{sigterm_handler} if $args{sigterm_handler};
 
-    $SIG{'HUP'}  = $self->sighup_handler  if $self->sighup_handler;
-    $SIG{'TERM'} = $self->sigterm_handler if $self->sigterm_handler;
-
-    if ($self->gid) {
-        POSIX::setgid($self->gid);
+    if ($args{gid}) {
+        POSIX::setgid($args{gid});
     }
-    if ($self->uid) {
-        POSIX::setuid($self->uid);
-        $ENV{USER} = getpwuid($self->uid);
-        $ENV{HOME} = ((getpwuid($self->uid))[7]);
+    if ($args{uid}) {
+        POSIX::setuid($args{uid});
+        $ENV{USER} = getpwuid($args{uid});
+        $ENV{HOME} = ((getpwuid($args{uid}))[7]);
     }
 
     umask 0;
@@ -282,7 +231,7 @@ sub _reaper {
     }
 
     # SysV compatibility: reinstall signal handler
-    $SIG{'CHLD'} = \&OpenXPKI::Daemonize::_reaper;
+    $SIG{'CHLD'} = \&_reaper;
 }
 
 =head2 DEMOLISH
@@ -295,7 +244,7 @@ sub DEMOLISH {
     my $self = shift;
     my $global_destruction = shift;
 
-    if ($SIG{'CHLD'} eq \&_reaper and not $global_destruction) {
+    if (($SIG{'CHLD'} // '') eq \&_reaper and not $global_destruction) {
         warn "WARNING: OpenXPKI::Daemonize will be destroyed while \$SIG{'CHLD'} still referred to our handler. It was set to 'IGNORE' instead.";
     }
 
