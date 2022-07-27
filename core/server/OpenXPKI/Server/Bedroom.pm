@@ -1,9 +1,9 @@
-package OpenXPKI::Daemonize;
+package OpenXPKI::Server::Bedroom;
 use Moose;
 
 =head1 NAME
 
-OpenXPKI::Daemonize - Helper functions to cleanly fork background processes
+OpenXPKI::Server::Bedroom - Helper module to... err... make child processes
 
 =head1 DESCRIPTION
 
@@ -17,11 +17,11 @@ The requirements for a proper C<SIGCHLD> handling are:
 on them,
 
 =item * allow follow up code to evaluate the status of e.g. C<sytem()> calls
-or doing own C<waitpid()> on children not forked by C<OpenXPKI::Daemonize>,
+or doing own C<waitpid()> on children not forked by C<OpenXPKI::Server::Bedroom>,
 
 =item * avoid interfering with L<Net::Server>'s C<SIGCHLD> handler,
 
-=item * keep the C<OpenXPKI::Daemonize> instance that contains the C<SIGCHLD>
+=item * keep the C<OpenXPKI::Server::Bedroom> instance that contains the C<SIGCHLD>
 handler alive as long as there are child processes. Destroying the instance
 too early could lead to errors: without resetting C<SIGCHLD> handler to
 C<'IGNORE'> a finished child process would raise the error
@@ -33,7 +33,7 @@ e.g. a following C<system()> call from code higher up the hierarchy would fail.
 The most compatible way to handle C<SIGCHLD> is to set it to C<'DEFAULT'>,
 letting Perl handle it. This way commands like C<system()> will work properly.
 
-But for the C<OpenXPKI::Daemonize> parent process to be able to reap its child
+But for the C<OpenXPKI::Server::Bedroom> parent process to be able to reap its child
 processes we need a custom C<SIGCHLD> handler to call C<waitpid()> on them.
 So in our custom handler we keep track of the PIDs of our own forked children
 and only reap those. Other children (e.g. forked via C<system()>) are left
@@ -97,7 +97,7 @@ has old_sig_set => (
 # Store PIDs of forked child processes.
 # The list is purged after fork() so it doesn't grow with every child process.
 # By using a package variable this acts like a Singleton, so a new instance
-# of OpenXPKI::Daemonize won't delete collected child PIDs of previous instance.
+# of OpenXPKI::Server::Bedroom won't delete collected child PIDs of previous instance.
 my $current_pid = $$;
 my %child_pids_by_parent = ();
 
@@ -119,7 +119,7 @@ sub _remove_child_pid {
 
 =head1 METHODS
 
-=head2 fork_child
+=head2 new_child
 
 Tries to fork a child process.
 
@@ -155,7 +155,7 @@ child: set C<SIGCHLD> to C<default>. Default: 0
 
 =cut
 
-sub fork_child {
+sub new_child {
     my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
         max_fork_redo => { isa => 'Int', optional => 1,default => 5 },
         sighup_handler => { isa => 'CodeRef', optional => 1 },
@@ -165,15 +165,18 @@ sub fork_child {
         keep_parent_sigchld => { isa => 'Bool', optional => 1, default => 0 },
     );
 
-    ##! 1: 'start'
+    ##! 1: 'start - $SIG{"CHLD"}: ' . ($SIG{'CHLD'}//'<undef>')
 
     # Reap child processes while allowing e.g. system() to work properly.
-    $SIG{'CHLD'} = \&_reaper if not $args{keep_parent_sigchld};
+    $SIG{'CHLD'} = \&_catch_them_all if not $args{keep_parent_sigchld};
+
+    ##! 1: 'start - $SIG{"CHLD"}: ' . ($SIG{'CHLD'}//'<undef>')
 
     my $pid = $self->_try_fork($args{max_fork_redo});
 
     # parent process: return on successful fork
     if ($pid > 0) {
+        ##! 1: "parent: child PID = $pid"
         _add_child_pid($pid);
         return $pid;
     }
@@ -181,6 +184,7 @@ sub fork_child {
     #
     # child process
     #
+    ##! 1: 'child: $SIG{"CHLD"}: ' . ($SIG{'CHLD'}//'<undef>')
 
     # allow execution of system() etc. if parent did NOT set our special handler for them and us
     $SIG{'CHLD'} = 'default' if $args{keep_parent_sigchld};
@@ -209,7 +213,7 @@ sub fork_child {
 }
 
 # SIGCHLD handler
-sub _reaper {
+sub _catch_them_all {
     # Don't overwrite current error and status codes outside this signal handler
     local ($!, $?);
 
@@ -231,7 +235,7 @@ sub _reaper {
     }
 
     # SysV compatibility: reinstall signal handler
-    $SIG{'CHLD'} = \&_reaper;
+    $SIG{'CHLD'} = \&_catch_them_all;
 }
 
 =head2 DEMOLISH
@@ -242,14 +246,18 @@ C<$SIG{'CHLD'} = 'IGNORE'>, see L</Note on SIGCHLD>.
 =cut
 sub DEMOLISH {
     my $self = shift;
-    my $global_destruction = shift;
+    my $is_global_destruction = shift;
+    my $is_our_handler = ($SIG{'CHLD'} // '') eq \&_catch_them_all;
 
-    if (($SIG{'CHLD'} // '') eq \&_reaper and not $global_destruction) {
-        warn "WARNING: OpenXPKI::Daemonize will be destroyed while \$SIG{'CHLD'} still referred to our handler. It was set to 'IGNORE' instead.";
-    }
+    ##! 1: 'start - global destruction: ' . ($is_global_destruction ? 'yes' : 'no') . ', $SIG{"CHLD"}: ' . ($SIG{'CHLD'}//'<undef>') . ' - our handler: ' . ($is_our_handler ? 'yes' : 'no')
 
     # Prevent "Signal SIGCHLD received, but no signal handler set."
     $SIG{'CHLD'} = 'IGNORE';
+
+    # Warn of consequences if this is not Perls global destruction
+    if ($is_our_handler and not $is_global_destruction) {
+        warn "WARNING: OpenXPKI::Server::Bedroom is about to be destroyed but \$SIG{'CHLD'} still referred to our handler. It was set to 'IGNORE' instead.";
+    }
 }
 
 # "The most paranoid of programmers block signals for a fork to prevent a

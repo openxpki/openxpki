@@ -31,6 +31,7 @@ use OpenXPKI::Server::Notification::Handler;
 use OpenXPKI::Workflow::Handler;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Session;
+use OpenXPKI::Server::Bedroom;
 
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Serialization::Fast;
@@ -56,6 +57,7 @@ my @init_tasks = qw(
   authentication
   notification
   server
+  bedroom
 );
 #
 
@@ -352,6 +354,13 @@ sub __do_init_server {
 sub __do_init_notification {
     OpenXPKI::Server::Context::setcontext({
         notification => OpenXPKI::Server::Notification::Handler->new(),
+    });
+    return 1;
+}
+
+sub __do_init_bedroom {
+    OpenXPKI::Server::Context::setcontext({
+        bedroom => OpenXPKI::Server::Bedroom->new(),
     });
     return 1;
 }

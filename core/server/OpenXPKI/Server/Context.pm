@@ -33,6 +33,7 @@ sub reset {
             log              => undef,
             dbi              => undef,
             dbi_log          => undef,
+            bedroom          => undef,
 
             # user-settable
             api            => undef,

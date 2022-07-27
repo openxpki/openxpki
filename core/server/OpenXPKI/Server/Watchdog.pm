@@ -34,7 +34,6 @@ use OpenXPKI::Server;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::DateTime;
-use OpenXPKI::Daemonize;
 
 
 our $TERMINATE = 0;
@@ -400,7 +399,7 @@ sub run {
     }
 
     # FORK - parent returns PID, child returns 0
-    my $pid = OpenXPKI::Daemonize->new->fork_child(
+    my $pid = CTX('bedroom')->new_child(
         sighup_handler  => \&_sig_hup,
         sigterm_handler => \&_sig_term,
         keep_parent_sigchld => $self->keep_parent_sigchld,

@@ -10,7 +10,6 @@ Makefile.PL
 OpenXPKI.pm
 OpenXPKI/Config.pm
 OpenXPKI/Control.pm
-OpenXPKI/Daemonize.pm
 OpenXPKI/DateTime.pm
 OpenXPKI/Debug.pm
 OpenXPKI/Dumper.pm
@@ -342,6 +341,7 @@ OpenXPKI/Server/API2/Plugin/Workflow/start_workflow.pm
 OpenXPKI/Server/API2/Plugin/Workflow/wakeup_resume_workflow.pm
 
 
+OpenXPKI/Server/Bedroom.pm
 OpenXPKI/Server/Context.pm
 OpenXPKI/Server/Init.pm
 OpenXPKI/Server/Session.pm

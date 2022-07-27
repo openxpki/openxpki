@@ -8,7 +8,6 @@ use Try::Tiny;
 # Project modules
 use OpenXPKI::Server;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Daemonize;
 use OpenXPKI::Connector::WorkflowContext;
 use OpenXPKI::MooseParams;
 use OpenXPKI::Debug;
@@ -248,7 +247,7 @@ sub _execute_activity_async {
         $workflow->state(), $workflow->id(), $workflow->type()));
 
     # FORK
-    my $pid = OpenXPKI::Daemonize->new->fork_child; # parent returns PID, child returns 0
+    my $pid = CTX('bedroom')->new_child; # parent returns PID, child returns 0
 
     # parent process
     if ($pid > 0) {
