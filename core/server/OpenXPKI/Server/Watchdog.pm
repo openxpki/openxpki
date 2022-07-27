@@ -16,80 +16,6 @@ The namespace is I<system.watchdog>. The properties are:
 
 =over
 
-=item max_fork_redo
-
-Retry this often to fork away the initial watchdog process before
-failing finally.
-default: 5
-
-=item max_exception_threshhold
-
-There are situations (database locks, no free resources) where a watchdog
-can not fork away a new worker. After I<max_exception_threshhold> errors
-occured, we kill the watchdog. B<This is a fatal error that must be handled!>
-default: 10
-
-=item interval_sleep_exception
-
-The number of seconds to sleep after the watchdog ran into an exception.
-default: 60
-
-=item interval_sleep_overload
-
-The number of seconds to sleep after the watchdog ran into an exception.
-default: 15
-
-=item max_tries_hanging_workflows
-
-Try to restarted stale workflows this often before failing them.
-default:  3
-
-=item max_instance_count
-
-Allow multiple watchdogs in parallel. This controls the number of control
-process, setting this to more than one is usually not necessary (and also
-not wise).
-
-default: 1
-
-=item max_worker_count
-
-Maximum number of workers that the watchdog can run in parallel. No new
-workflows are woke up if this limit is reached and the watchdog will
-sleep for I<interval_sleep_overload> seconds.
-
-default: 50
-
-=item interval_wait_initial
-
-Seconds to wait after server start before the watchdog starts scanning.
-default: 10;
-
-=item interval_loop_idle
-
-Seconds between two scan runs if no result was found on last run.
-default: 5
-
-=item interval_loop_run
-
-Seconds between two scan runs if a result was found on last run.
-default: 1
-
-=back
-
-=item keep_parent_sigchld
-
-I<Bool> value: set to 1 to prevent installation of special C<SIGCHLD> handler
-and keep the current handler instead.
-The special C<SIGCHLD> handler allows for execution of C<system()> and the like
-in the parent process after starting the watchdog. But it will prevent reaping
-zombie processes that are forked via other modules (e.g. L<Net::Server>).
-Setting this to 1 should only be neccessary in the process where
-L<Net::Server/run> is called.
-default: 0
-
-=back
-
 =cut
 
 # Core modules
@@ -115,101 +41,222 @@ our $TERMINATE = 0;
 our $RELOAD = 0;
 
 
+=item max_fork_redo
+
+Retry this often to fork away the initial watchdog process before
+failing finally.
+default: 5
+
+=cut
 has max_fork_redo => (
     is => 'rw',
     isa => 'Int',
-    default =>  5
+    default => 5,
 );
+
+=item max_exception_threshhold
+
+There are situations (database locks, no free resources) where a watchdog
+can not fork away a new worker. After I<max_exception_threshhold> errors
+occured, we kill the watchdog. B<This is a fatal error that must be handled!>
+default: 10
+
+=cut
 has max_exception_threshhold => (
     is => 'rw',
     isa => 'Int',
-    default =>  10
+    default => 10,
 );
 
+=item interval_sleep_exception
+
+The number of seconds to sleep after the watchdog ran into an exception.
+default: 60
+
+=cut
 has interval_sleep_exception => (
     is => 'rw',
     isa => 'Int',
-    default =>  60
+    default => 60,
 );
 
+=item interval_sleep_overload
+
+The number of seconds to sleep after the watchdog ran into an exception.
+default: 15
+
+=cut
 has interval_sleep_overload => (
     is => 'rw',
     isa => 'Int',
-    default =>  15
+    default => 15,
 );
 
+=item max_tries_hanging_workflows
+
+Try to restarted stale workflows this often before failing them.
+default:  3
+
+=cut
 has max_tries_hanging_workflows => (
     is => 'rw',
     isa => 'Int',
-    default =>  3
+    default => 3,
 );
 
+=item max_instance_count
+
+Allow multiple watchdogs in parallel. This controls the number of control
+process, setting this to more than one is usually not necessary (and also
+not wise).
+
+default: 1
+
+=cut
 has max_instance_count => (
     is => 'rw',
     isa => 'Int',
-    default =>  1
+    default => 1,
 );
 
+=item max_worker_count
+
+Maximum number of workers that the watchdog can run in parallel. No new
+workflows are woke up if this limit is reached and the watchdog will
+sleep for I<interval_sleep_overload> seconds.
+
+default: 50
+
+=cut
 has max_worker_count => (
     is => 'rw',
     isa => 'Int',
-    default =>  50
+    default => 50,
 );
+
 # All timers in seconds
+=item interval_wait_initial
+
+Seconds to wait after server start before the watchdog starts scanning.
+default: 10;
+
+=cut
 has interval_wait_initial => (
     is => 'rw',
     isa => 'Int',
-    default =>  10
+    default => 10,
 );
 
+=item interval_loop_idle
+
+Seconds between two scan runs if no result was found on last run.
+default: 5
+
+=cut
 has interval_loop_idle => (
     is => 'rw',
     isa => 'Int',
-    default =>  5
+    default => 5,
 );
 
+=item interval_loop_run
+
+Seconds between two scan runs if a result was found on last run.
+default: 1
+
+=cut
 has interval_loop_run => (
     is => 'rw',
     isa => 'Int',
-    default =>  1
+    default => 1,
 );
 
+=item interval_session_purge
+
+Seconds between two purges of expired sessions from backend.
+default: 0 (do not purge expired sessions)
+
+=cut
 has interval_session_purge => (
     is => 'rw',
     isa => 'Int',
-    default => 0
+    default => 0,
 );
 
+=item interval_auto_archiving
+
+Seconds between two attempts to archive workflows whose "archive_at" date was
+exceeded.
+default: 0 (do not archive workflows)
+
+=cut
 has interval_auto_archiving => (
     is => 'rw',
     isa => 'Int',
     default => 0,
 );
 
+=item userid
+
+User ID to run the forked child process as.
+Default: 0
+
+This attribute cannot be set via config / constructor.
+
+=cut
+has userid => (
+    is => 'rw',
+    isa => 'Int',
+    default => 0,
+    init_arg => undef,
+);
+
+=item groupid
+
+Group ID to run the forked child process as.
+Default: 0
+
+This attribute cannot be set via config / constructor.
+
+=cut
+has groupid => (
+    is => 'rw',
+    isa => 'Int',
+    default => 0,
+    init_arg => undef,
+);
+
+=item keep_parent_sigchld
+
+I<Bool> value: set to 1 to prevent installation of special C<SIGCHLD> handler
+and keep the current handler instead.
+The special C<SIGCHLD> handler allows for execution of C<system()> and the like
+in the parent process after starting the watchdog. But it will prevent reaping
+zombie processes that are forked via other modules (e.g. L<Net::Server>).
+Setting this to 1 should only be neccessary in the process where
+L<Net::Server/run> is called.
+default: 0
+
+This attribute cannot be set via config / constructor.
+
+=cut
 has keep_parent_sigchld => (
     is => 'rw',
     isa => 'Bool',
     default => 0,
+    init_arg => undef,
 );
 
-has _uid => (
-    is => 'ro',
-    isa => 'Str',
-    default => '0',
-);
+=back
 
-has _gid => (
-    is => 'ro',
-    isa => 'Str',
-    default => '0',
-);
+=cut
 
 ### TODO: maybe we should measure the count of exception in a certain time interval?
 has _exception_count => (
     is => 'rw',
     isa => 'Int',
-    init_arg => undef,
     default => 0,
+    init_arg => undef,
 );
 
 has _next_session_cleanup => (
@@ -227,30 +274,18 @@ has _next_auto_archiving => (
 has _session_purge_handler => (
     is => 'rw',
     isa => 'OpenXPKI::Server::Session',
-    init_arg => undef,
     predicate => 'do_session_purge',
+    init_arg => undef,
 );
 
 around BUILDARGS => sub {
-
     my $orig = shift;
     my $class = shift;
 
-    # Holds user and group id
-    my $args = shift;
+    my $config = CTX('config')->get_hash('system.watchdog') // {};
 
-    my $config = CTX('config')->get_hash('system.watchdog');
-
-    $config = {} unless($config); # Moose complains on null
-
-    # Add uid/gid
-    $config->{_uid} = $args->{user}  if( $args->{user} );
-    $config->{_gid} = $args->{group} if( $args->{group} );
-
-    # This automagically sets all entries from the config
-    # to the corresponding class attributes
-    return $class->$orig($config);
-
+    # Set class attributes from corresponding entries of the config
+    return $class->$orig(%$config, @_);
 };
 
 =head1 STATIC METHODS
@@ -288,9 +323,10 @@ config.
 
 =cut
 sub start_or_reload {
+    my $class = shift;
     my %args = @_;
 
-    ##! 1: 'start_or_reload'
+    ##! 1: 'start'
     my $pids = OpenXPKI::Control::get_pids();
 
     # Start watchdog if not running
@@ -299,12 +335,10 @@ sub start_or_reload {
 
         return 0 if $config->get('system.watchdog.disabled');
 
-        my $watchdog = OpenXPKI::Server::Watchdog->new( {
-            user  => OpenXPKI::Server::__get_numerical_user_id(  $config->get('system.server.user') ),
-            group => OpenXPKI::Server::__get_numerical_group_id( $config->get('system.server.group') ),
-            keep_parent_sigchld => $args{keep_parent_sigchld} ? 1 : 0,
-        } );
-
+        my $watchdog = OpenXPKI::Server::Watchdog->new();
+        $watchdog->userid( OpenXPKI::Server::__get_numerical_user_id ( $config->get('system.server.user')  )),
+        $watchdog->groupid(OpenXPKI::Server::__get_numerical_group_id( $config->get('system.server.group') )),
+        $watchdog->keep_parent_sigchld($args{keep_parent_sigchld} ? 1 : 0);
         $watchdog->run;
     }
     # Signal reload
@@ -371,8 +405,8 @@ sub run {
         keep_parent_sigchld => $self->keep_parent_sigchld,
     );
 
-    $fork_helper->gid($self->_gid) if $self->_gid;
-    $fork_helper->uid($self->_uid) if $self->_uid;
+    $fork_helper->gid($self->groupid) if $self->groupid;
+    $fork_helper->uid($self->userid) if $self->userid;
 
     # FORK
     my $pid = $fork_helper->fork_child; # parent returns PID, child returns 0

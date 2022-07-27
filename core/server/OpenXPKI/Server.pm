@@ -324,7 +324,7 @@ sub sig_hup {
         OpenXPKI::Server::Watchdog->terminate;
     }
     else {
-        OpenXPKI::Server::Watchdog->start_or_reload;
+        OpenXPKI::Server::Watchdog->start_or_reload(keep_parent_sigchld => 1);
     }
 }
 
