@@ -403,6 +403,7 @@ sub run {
         sighup_handler  => \&OpenXPKI::Server::Watchdog::_sig_hup,
         sigterm_handler => \&OpenXPKI::Server::Watchdog::_sig_term,
         keep_parent_sigchld => $self->keep_parent_sigchld,
+        max_fork_redo => $self->max_fork_redo,
     );
 
     $fork_helper->gid($self->groupid) if $self->groupid;
