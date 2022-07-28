@@ -128,7 +128,7 @@ sub get_action_info {
     my ($prefix, $name) = ($action_name =~ m{ \A (\w+?)_(\w+) \z }xs);
 
     my @path;
-    if ($prefix eq 'global') {
+    if (($prefix//'') eq 'global') {
         @path = ('workflow','global','action',$name);
     } else {
         @path = ('workflow','def', $wf_name, 'action' , $name);
