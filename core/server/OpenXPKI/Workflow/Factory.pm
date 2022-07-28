@@ -145,9 +145,8 @@ sub get_action_info {
     my @input = $conn->get_scalar_as_list([ @path, 'input' ]);
     my @fields;
     foreach my $field_name (@input) {
-        ##! 64: 'Field info ' . Dumper $field
-
         my $field = $self->get_field_info( $field_name, $wf_name );
+        ##! 64: 'Field info: ' . Dumper $field
 
         $field->{type} = 'text' unless ($field->{type});
         $field->{clonable} = (defined $field->{min} || $field->{max}) || 0;
@@ -280,7 +279,7 @@ sub get_action_and_state_info {
 
     # check defined actions and only list the possible ones
     # (non global actions are prefixed)
-    ##! 64: 'Available actions ' . Dumper keys %{ $action_info->{$action} }
+    ##! 64: 'Available actions: ' . join(', ', keys %$action_info)
     $state_info->{option} = [];
     if ($state_info->{autoselect} && $state_info->{autoselect} !~ m{\Aglobal_}) {
         $state_info->{autoselect} = $wf_prefix.'_'.$state_info->{autoselect};
@@ -313,7 +312,7 @@ sub get_action_and_state_info {
         }
 
         my $action = sprintf("%s_%s", $global ? "global" : $wf_prefix, $option_base);
-        ##! 16: 'Activity ' . $action
+        ##! 16: 'Action: ' . $action
         next unless($action_info->{$action});
 
         push @{$state_info->{option}}, $action;
