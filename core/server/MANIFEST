@@ -519,6 +519,7 @@ OpenXPKI/Server/Workflow/Condition/Connector/Exists.pm
 OpenXPKI/Server/Workflow/Condition/Connector/IsValue.pm
 OpenXPKI/Server/Workflow/Condition/DatapoolEntry.pm
 OpenXPKI/Server/Workflow/Condition/DateTime.pm
+OpenXPKI/Server/Workflow/Condition/Evaluate.pm
 OpenXPKI/Server/Workflow/Condition/HasRole.pm
 OpenXPKI/Server/Workflow/Condition/IsCertificateOwner.pm
 OpenXPKI/Server/Workflow/Condition/IsWrappedRequest.pm

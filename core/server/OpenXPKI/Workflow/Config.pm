@@ -415,6 +415,9 @@ sub __process_conditions {
         # Get the implementation class
         my $condition_class = $conn->get([ @path, 'class' ] );
 
+        # FIXME - remove once upstream Workflow::Condition::Evaluate got rid of the "Safe" module
+        $condition_class = "OpenXPKI::Server::Workflow::Condition::Evaluate" if "Workflow::Condition::Evaluate" eq $condition_class;
+
         my $condition = {
             name => $prefix.$condition_name,
             class => $condition_class,
