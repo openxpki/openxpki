@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2022-06-22 19:34+0200\n"
+"PO-Revision-Date: 2022-08-02 11:15+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -266,6 +266,9 @@ msgstr "gültig zum"
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_AUTHORIZE"
 msgstr "Berechtigung als Registrar beantragen"
 
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_ESCROW_KEY"
+msgstr "Starte Wiederherstellung des privaten Schlüssels"
+
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_LABEL"
 msgstr "Aktion"
 
@@ -416,6 +419,9 @@ msgstr "die Sperrung wird nach dem angegebenen Zeitpunkt ausgeführt"
 
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "verzögerte Sperrung beantragt"
+
+msgid "I18N_OPENXPKI_UI_DICE_UPDATE_DOMAINLIST"
+msgstr "Aktualisiere Domainliste"
 
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
 msgstr "FEHLER"
@@ -691,6 +697,9 @@ msgstr "Unverschlüsselt"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATE_KEY_FAILED"
 msgstr "Privater Schlüssel konnte nicht exportiert werden."
+
+msgid "I18N_OPENXPKI_UI_FIELD_DOMAINLIST"
+msgstr "Domainliste"
 
 msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
 msgstr "Fehlercode"
@@ -1000,6 +1009,15 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_NICE_GENERATE_KEY_NO_PASSWORD"
 msgstr "Kann keinen Schlüssel ohne Passwort erstellen"
 
+msgid "I18N_OPENXPKI_UI_NICE_GENERIC_RESULT_NOT_A_HASH"
+msgstr "Rückgabewert hat ungültiges Format (kein Hash)"
+
+msgid "I18N_OPENXPKI_UI_NICE_ISSUANCE_PENDING"
+msgstr "Ausstellung ausstehend"
+
+msgid "I18N_OPENXPKI_UI_NICE_UPDATE_DOMAINLIST"
+msgstr "Aktualisiere Domainliste"
+
 # Remove?
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "Nein"
@@ -1158,6 +1176,9 @@ msgstr "E-Mail"
 msgid "I18N_OPENXPKI_UI_PROFILE_EMAILADDRESS_DESC"
 msgstr "E-Mail-Adresse"
 
+msgid "I18N_OPENXPKI_UI_PROFILE_ESCROW_OFFICER_LABEL"
+msgstr "Escrow Officer"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_EXTRA_HOSTNAME"
 msgstr "weitere Hostnamen"
 
@@ -1305,6 +1326,9 @@ msgstr "Benutzername"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_USERNAME_DESC"
 msgstr "Benutzername"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_USER_ESCROW_LABEL"
+msgstr "Benutzer, nur Verschlüsselung (mit Escrow)"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_USER_LABEL"
 msgstr "Benutzer (Secure eMail/Anmeldung)"
@@ -3455,9 +3479,8 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_LINK_MESSAGE_LABEL"
 msgstr "Link"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_VALIDATOR_EXPIRATION_DATE_FAILED"
-msgstr "Bitte geben Sie eine vollständige URL inkl. http(s):// ein"
+msgstr "Das Ablaufdatum muss in der Zukunft liegen!"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_MOTD_VALIDATOR_LINK_FAILED"
 msgstr "Bitte geben Sie eine vollständige URL inkl. http(s):// ein"
@@ -4126,6 +4149,17 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_RESULT_LABEL"
 msgstr "Zertifikat Meta-Daten"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_DESC"
+msgstr ""
+"Das Zertifikat wurde gesperrt. Bitte beachten Sie, dass die Bekanntmachung "
+"der Sperrung erst nach Ausstellung und Verteilung einer neuen Sperrliste "
+"wirksam wird."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_LABEL"
+msgstr "Zertifikat gesperrt"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
 msgstr ""
 "Dieser Workflow wurde erfolgreich abgeschlossen und kann nicht erneut "
@@ -4286,6 +4320,14 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EDITUSER_LABEL"
 msgstr "Typ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_ESCROWKEY_DESC"
+msgstr "Aufstellung der Menge an Zertifikaten nach Status."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_ESCROWKEY_LABEL"
+msgstr "Privaten Schlüssel herunterladen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_DESC"
 msgstr ""

@@ -331,6 +331,10 @@ msgid "I18N_OPENXPKI_UI_CERT_ACTION_AUTHORIZE"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_ESCROW_KEY"
+msgstr "Отозван"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_LABEL"
 msgstr "Родительский технологический процесс"
 
@@ -517,6 +521,10 @@ msgstr "SPKAC-строка пуста."
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "Технологические процессы отзыва сертификатов"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DICE_UPDATE_DOMAINLIST"
+msgstr "Статус"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
@@ -884,6 +892,10 @@ msgstr "Дочерние технологические процессы"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATE_KEY_FAILED"
 msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_FIELD_DOMAINLIST"
+msgstr "Профиль пользователя"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
@@ -1310,6 +1322,23 @@ msgstr ""
 "также произвольный набор альтернативных имен."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_GENERIC_RESULT_NOT_A_HASH"
+msgstr ""
+"Используйте данный профиль сертификата только если Вы отчетливо "
+"представляете себе необходимую структуру имени субъекта сертификата, хорошо "
+"знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
+"части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
+"также произвольный набор альтернативных имен."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_ISSUANCE_PENDING"
+msgstr "Временно блокирован"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_UPDATE_DOMAINLIST"
+msgstr "Статус"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "Имя учетной записи"
 
@@ -1534,6 +1563,10 @@ msgstr "Адрес электронной почты"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_EMAILADDRESS_DESC"
 msgstr "Ваш адрес электронной почты, например petr.ivanov@mail.ru"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_ESCROW_OFFICER_LABEL"
+msgstr "Профиль пользователя"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_EXTRA_HOSTNAME"
@@ -1766,6 +1799,10 @@ msgstr ""
 "имя Вашей учетной записи и адрес электронной почты. Это простейший профиль "
 "пользователя, который следует использовать, если нет особых требований к "
 "сертифкату. В противном случае следует использовать расширенный профиль."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_USER_ESCROW_LABEL"
+msgstr "Профиль пользователя"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_USER_LABEL"
@@ -5066,6 +5103,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_LABEL"
 msgstr "Технологические процессы"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_RESULT_DESC"
+msgstr "Технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_RESULT_LABEL"
+msgstr "Технологические процессы"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_DESC"
 msgstr "Технологические процессы"
 
@@ -5245,6 +5290,18 @@ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EDITUSER_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_ESCROWKEY_DESC"
+msgstr ""
+"Для использования данного профиля сертификата достаточно ввести Ваше имя, "
+"имя Вашей учетной записи и адрес электронной почты. Это простейший профиль "
+"пользователя, который следует использовать, если нет особых требований к "
+"сертифкату. В противном случае следует использовать расширенный профиль."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_ESCROWKEY_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy

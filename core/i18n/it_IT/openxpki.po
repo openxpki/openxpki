@@ -329,6 +329,10 @@ msgstr "non dopo il"
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_AUTHORIZE"
 msgstr "Azione"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_ESCROW_KEY"
+msgstr "Revoca"
+
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_LABEL"
 msgstr "Azione"
 
@@ -511,6 +515,10 @@ msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr ""
 "Con la Revoca ritardata, puoi programmare la revoca di un certificato in una "
 "data futura."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DICE_UPDATE_DOMAINLIST"
+msgstr "Mostra i workflow correlati"
 
 # Remove?
 #, fuzzy
@@ -886,6 +894,10 @@ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATE_KEY_FAILED"
 msgstr "Catena di certificazione"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_FIELD_DOMAINLIST"
+msgstr "Indirizzo IP"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
 msgstr "Paese"
 
@@ -1253,6 +1265,18 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_NICE_GENERATE_KEY_NO_PASSWORD"
 msgstr "Password della Chiave"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_GENERIC_RESULT_NOT_A_HASH"
+msgstr "Password della Chiave"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_ISSUANCE_PENDING"
+msgstr "In attesa di revoca"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_UPDATE_DOMAINLIST"
+msgstr "Mostra i workflow correlati"
+
 # Remove?
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NO"
@@ -1427,6 +1451,10 @@ msgstr "E-mail:"
 msgid "I18N_OPENXPKI_UI_PROFILE_EMAILADDRESS_DESC"
 msgstr "Indirizzo Email"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_ESCROW_OFFICER_LABEL"
+msgstr "Persone Fisiche (Email Sicura / Autenticazione)"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_EXTRA_HOSTNAME"
 msgstr "Nomi host addizionali"
 
@@ -1582,6 +1610,10 @@ msgstr "Nome utente"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_USERNAME_DESC"
 msgstr "Nome utente"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_USER_ESCROW_LABEL"
+msgstr "Persone Fisiche (Email Sicura / Autenticazione)"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_USER_LABEL"
 msgstr "Persone Fisiche (Email Sicura / Autenticazione)"
@@ -4599,6 +4631,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_LABEL"
 msgstr "Certificato Emesso"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_RESULT_DESC"
+msgstr "Le modifiche sono state salvate in via definitiva nel database."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_RESULT_LABEL"
+msgstr "I Metadati sono stati aggiornati"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_DESC"
 msgstr "Le modifiche sono state salvate in via definitiva nel database."
 
@@ -4772,6 +4812,14 @@ msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EDITUSER_LABEL"
 msgstr "Tipo"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_ESCROWKEY_DESC"
+msgstr "Name of the SCEP endpoint receiving this request."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_ESCROWKEY_LABEL"
+msgstr "SCEP Endpoint"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_DESC"

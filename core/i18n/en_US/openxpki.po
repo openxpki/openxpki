@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2022-06-22 19:34+0200\n"
+"PO-Revision-Date: 2022-08-01 17:06+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -266,6 +266,9 @@ msgstr "valid at"
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_AUTHORIZE"
 msgstr "Authorize"
 
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_ESCROW_KEY"
+msgstr "Download key restore file."
+
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_LABEL"
 msgstr "Action"
 
@@ -412,6 +415,9 @@ msgstr "This is just a prefix"
 
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "Delayed revocation requested."
+
+msgid "I18N_OPENXPKI_UI_DICE_UPDATE_DOMAINLIST"
+msgstr "Update Domainlist"
 
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
 msgstr "fail"
@@ -688,6 +694,9 @@ msgstr "Export unencrypted"
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATE_KEY_FAILED"
 msgstr "Private key could not be decrypted/loaded."
 
+msgid "I18N_OPENXPKI_UI_FIELD_DOMAINLIST"
+msgstr "Domain List"
+
 msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
 msgstr "Error Code"
 
@@ -718,7 +727,7 @@ msgid "I18N_OPENXPKI_UI_INVALID_PROFILE"
 msgstr "Invalid Profile"
 
 msgid "I18N_OPENXPKI_UI_ISSUERS_LIST"
-msgstr " Issuing certificates of this Realm"
+msgstr " Issuing certificates of this realm"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_KEY"
@@ -728,13 +737,13 @@ msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM"
 msgstr "Key Parameters"
 
 msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_CURVE_NAME"
-msgstr "Curve name"
+msgstr "Curve Name"
 
 msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_ENC_ALG"
 msgstr "Encryption"
 
 msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_KEY_LENGTH"
-msgstr "Key length"
+msgstr "Key Length"
 
 msgid "I18N_OPENXPKI_UI_KEYGEN_PARAM_PARAMSET"
 msgstr "Parameters"
@@ -743,7 +752,7 @@ msgid "I18N_OPENXPKI_UI_KEYSTORE_ALIAS_CONTAINS_INVALID_CHARACTERS"
 msgstr "Alias does contain characters other than a-z A-Z 0-9 - _ ."
 
 msgid "I18N_OPENXPKI_UI_KEY_ALG"
-msgstr "Key algorithm"
+msgstr "Key Algorithm"
 
 msgid "I18N_OPENXPKI_UI_KEY_ALG_DSA"
 msgstr "DSA (Signature only)"
@@ -755,7 +764,7 @@ msgid "I18N_OPENXPKI_UI_KEY_ALG_RSA"
 msgstr "RSA"
 
 msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME"
-msgstr "Curve name"
+msgstr "Curve Name"
 
 msgid "I18N_OPENXPKI_UI_KEY_CURVE_NAME_C2TNB191V1"
 msgstr "Curve c2tnb191v1"
@@ -803,10 +812,10 @@ msgid "I18N_OPENXPKI_UI_KEY_IDENTIFIER"
 msgstr "Key Identifier"
 
 msgid "I18N_OPENXPKI_UI_KEY_KEY_ALG"
-msgstr "Key algorithm"
+msgstr "Key Algorithm"
 
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH"
-msgstr "Key length"
+msgstr "Key Length"
 
 msgid "I18N_OPENXPKI_UI_KEY_KEY_LENGTH_2048"
 msgstr "2048 bit"
@@ -993,6 +1002,15 @@ msgstr "Export of private Key failed (no such key)"
 msgid "I18N_OPENXPKI_UI_NICE_GENERATE_KEY_NO_PASSWORD"
 msgstr "Unable to generate a key without a password"
 
+msgid "I18N_OPENXPKI_UI_NICE_GENERIC_RESULT_NOT_A_HASH"
+msgstr "Returned data has invalid format (not a hash)"
+
+msgid "I18N_OPENXPKI_UI_NICE_ISSUANCE_PENDING"
+msgstr "issuance pending"
+
+msgid "I18N_OPENXPKI_UI_NICE_UPDATE_DOMAINLIST"
+msgstr "Update Domainlist"
+
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "No"
 
@@ -1138,10 +1156,13 @@ msgid "I18N_OPENXPKI_UI_PROFILE_DEPARTMENT_DESC"
 msgstr "Department"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_EMAILADDRESS"
-msgstr "E-mail:"
+msgstr "Email"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_EMAILADDRESS_DESC"
 msgstr "Email address"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_ESCROW_OFFICER_LABEL"
+msgstr "Escrow Officer"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_EXTRA_HOSTNAME"
 msgstr "Additional Hostnames"
@@ -1291,8 +1312,11 @@ msgstr "Username"
 msgid "I18N_OPENXPKI_UI_PROFILE_USERNAME_DESC"
 msgstr "Username"
 
+msgid "I18N_OPENXPKI_UI_PROFILE_USER_ESCROW_LABEL"
+msgstr "User, Encryption only (with escrow)"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_USER_LABEL"
-msgstr "People (Secure Email / Authentication)"
+msgstr "User, Sign and Encrypt"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_VALIDITY"
 msgstr "Validity"
@@ -3893,6 +3917,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_RESULT_LABEL"
 msgstr "Certificate Metadata"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_DESC"
+msgstr "The new password was persisted in the database"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_LABEL"
+msgstr "New Password Set"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
 msgstr "This workflow has finished with success and can not be restarted"
 
@@ -4040,6 +4072,13 @@ msgstr "Edit attributes of user accounts"
 # edituser workflow
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EDITUSER_LABEL"
 msgstr "Edit User"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_ESCROWKEY_DESC"
+msgstr ""
+"Download the private key encrypted to be restored by an escrow officer."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_ESCROWKEY_LABEL"
+msgstr "Download a formerly escrowed key"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_DESC"
 msgstr "Download the private key for an issued certificate."

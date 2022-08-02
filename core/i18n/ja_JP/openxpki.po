@@ -275,6 +275,10 @@ msgstr "指定日時に有効:"
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_AUTHORIZE"
 msgstr "認可"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_ESCROW_KEY"
+msgstr "失効"
+
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_LABEL"
 msgstr "実行"
 
@@ -430,6 +434,10 @@ msgstr "証明書を失効する理由を指定します。"
 
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "遅延失効がリクエストされました。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DICE_UPDATE_DOMAINLIST"
+msgstr "関連するワークフローを表示する"
 
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
 msgstr "失敗"
@@ -733,6 +741,10 @@ msgstr "暗号化なし"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATE_KEY_FAILED"
 msgstr "秘密鍵は復号化/読み込みできませんでした。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_FIELD_DOMAINLIST"
+msgstr "利用可能なプロファイルの情報"
 
 msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
 msgstr "エラーコード"
@@ -1067,6 +1079,18 @@ msgstr "キーがないため、取得できませんでした。"
 msgid "I18N_OPENXPKI_UI_NICE_GENERATE_KEY_NO_PASSWORD"
 msgstr "パスワード無しでキーを生成しました。"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_GENERIC_RESULT_NOT_A_HASH"
+msgstr "パスワード無しでキーを生成しました。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_ISSUANCE_PENDING"
+msgstr "失効保留中"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_UPDATE_DOMAINLIST"
+msgstr "関連するワークフローを表示する"
+
 # Remove?
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "いいえ"
@@ -1233,6 +1257,10 @@ msgstr "Eメール:"
 msgid "I18N_OPENXPKI_UI_PROFILE_EMAILADDRESS_DESC"
 msgstr "Eメールアドレス"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_ESCROW_OFFICER_LABEL"
+msgstr "User Profile"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_EXTRA_HOSTNAME"
 msgstr "追加のホスト名"
 
@@ -1385,6 +1413,10 @@ msgstr "ユーザ名"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_USERNAME_DESC"
 msgstr "ユーザ名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_USER_ESCROW_LABEL"
+msgstr "User Profile"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_USER_LABEL"
 msgstr "User Profile"
@@ -4164,6 +4196,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_LABEL"
 msgstr "検索結果がありません。"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_RESULT_DESC"
+msgstr "メタデータが更新されました。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_RESULT_LABEL"
+msgstr "メタデータ更新"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_DESC"
 msgstr "メタデータが更新されました。"
 
@@ -4310,6 +4350,14 @@ msgstr "This workflow failed finally and can not be restarted"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EDITUSER_LABEL"
 msgstr "FAILURE"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_ESCROWKEY_DESC"
+msgstr "私有鍵のダウンロード"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_ESCROWKEY_LABEL"
+msgstr "私有鍵のダウンロード"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_DESC"

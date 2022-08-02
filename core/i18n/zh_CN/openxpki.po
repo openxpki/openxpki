@@ -266,6 +266,10 @@ msgstr "有效期"
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_AUTHORIZE"
 msgstr "授权"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_ACTION_ESCROW_KEY"
+msgstr "提出一个<b>证书吊销请求</b>。"
+
 msgid "I18N_OPENXPKI_UI_CERT_ACTION_LABEL"
 msgstr "操作"
 
@@ -417,6 +421,10 @@ msgstr "指定您希望吊销证书的原因。"
 
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "已请求延迟吊销。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_DICE_UPDATE_DOMAINLIST"
+msgstr "显示相关的工作流程"
 
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
 msgstr "失败"
@@ -704,6 +712,10 @@ msgstr "导出未加密"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATE_KEY_FAILED"
 msgstr "私钥无法被解密/加载。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_FIELD_DOMAINLIST"
+msgstr "有关可用配置文件的信息"
 
 msgid "I18N_OPENXPKI_UI_FIELD_ERROR_CODE"
 msgstr "错误码"
@@ -1035,6 +1047,18 @@ msgstr "私钥导出失败（没有这样的密钥）"
 msgid "I18N_OPENXPKI_UI_NICE_GENERATE_KEY_NO_PASSWORD"
 msgstr "没有密码无法生成密钥"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_GENERIC_RESULT_NOT_A_HASH"
+msgstr "没有密码无法生成密钥"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_ISSUANCE_PENDING"
+msgstr "吊销中"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_UPDATE_DOMAINLIST"
+msgstr "显示相关的工作流程"
+
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "不"
 
@@ -1200,6 +1224,10 @@ msgstr "电子邮件："
 msgid "I18N_OPENXPKI_UI_PROFILE_EMAILADDRESS_DESC"
 msgstr "电子邮件地址"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_ESCROW_OFFICER_LABEL"
+msgstr "人员（安全电子邮件/身份验证）"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_EXTRA_HOSTNAME"
 msgstr "额外主机名"
 
@@ -1351,6 +1379,10 @@ msgstr "用户名"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_USERNAME_DESC"
 msgstr "用户名"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_USER_ESCROW_LABEL"
+msgstr "人员（安全电子邮件/身份验证）"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_USER_LABEL"
 msgstr "人员（安全电子邮件/身份验证）"
@@ -4000,6 +4032,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SEARCH_SCEP_NORESULT_LABEL"
 msgstr "空结果"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_RESULT_DESC"
+msgstr "所做的更改已保存到数据库中。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_RESULT_LABEL"
+msgstr "元数据已更新"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_DESC"
 msgstr "所做的更改已保存到数据库中。"
 
@@ -4146,6 +4186,14 @@ msgstr "证书注册工作流程，用于通过自动界面（例如SCEP，RPC�
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EDITUSER_LABEL"
 msgstr "类型"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_ESCROWKEY_DESC"
+msgstr "私钥下载"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_ESCROWKEY_LABEL"
+msgstr "私钥下载"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_DESC"
 msgstr "私钥下载"
