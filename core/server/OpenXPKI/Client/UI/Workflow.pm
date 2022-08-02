@@ -243,7 +243,7 @@ sub init_start {
     $self->logger()->info(sprintf "Create new workflow %s, got id %01d",  $wf_info->{workflow}->{type}, $wf_info->{workflow}->{id} );
 
     # this duplicates code from action_index
-    if ($wf_info->{workflow}->{id} > 0) {
+    if ($wf_info->{workflow}->{id} > 0 && !(grep { $_ =~ m{\A_} } keys %{$wf_info->{workflow}->{context}})) {
 
         my $redirect = 'workflow!load!wf_id!'.$wf_info->{workflow}->{id};
         my @activity = keys %{$wf_info->{activity}};
