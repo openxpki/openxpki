@@ -36,12 +36,9 @@ sub _evaluate
     if (!defined $config_mode) {
 
         CTX('log')->application()->debug("KeyGenerationMode condition fall back to autodetect");
-
-
         if ($config->exists( [ 'profile', $profile, 'key', 'alg' ] ) ||
-        $config->exists( [ 'profile', 'default', 'key', 'alg' ] )) {
+            $config->exists( [ 'profile', 'default', 'key', 'alg' ] )) {
             $config_mode = 'both';
-
         } else {
             $config_mode = 'client';
         }
@@ -75,8 +72,14 @@ __END__
 
 OpenXPKI::Server::Workflow::Condition::KeyGenerationMode
 
-Check if the profile allows key generation as specified by the "generate"
-parameter.
+=head1 DESCRIPTION
+
+Check if the profile allows key generation as specified by the
+I<key.generate> parameter. If the profile itself does not have such a
+section, the profile default settings are checked. If neither one
+exists, the existence of I<key.alg> is checked.
+
+=head1 Configuration
 
 Example:
 
@@ -87,10 +90,35 @@ Example:
             _map_profile: $cert_profile
 
 
-Returns true if the key generation setting is either escrow, server or both.
-The setting is obtained for the given profile (by profile or from the default
-setting) from the node I<key.generate>. If this node is missing, client is
-allowed and server is assumed ok if I<key.alg> is not empty.
+=head2 Parameters
 
-If the profile parameter is not given in the configuration, the context value
-of cert_profile is used.
+=over
+
+=item generate
+
+The generation mode that should be checked
+
+=item profile
+
+The name of the profile to check, if not set the context value
+of I<cert_profile> is used.
+
+=back
+
+=head2 Rules
+
+=over
+
+=item server
+
+Returns true if the mode is not I<client>.
+
+=item client
+
+Returns true if the mode is either I<client> or I<both>.
+
+=item escrow
+
+Returns true if the mode is  I<escrow>.
+
+=back
