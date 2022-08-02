@@ -30,6 +30,9 @@
             <img src={{@button.image}} alt="" role="presentation"/>
             <br/>
         {{/if}}
+        {{#if @button.loading}}
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        {{/if}}
         {{@button.label}}
     </BsButton>
 
