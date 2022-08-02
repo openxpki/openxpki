@@ -1,8 +1,11 @@
 package OpenXPKI::Server::NICE::Role::KeyGenerationLocal;
 
 use English;
+use MIME::Base64;
+
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
+use OpenXPKI::Server::Context qw( CTX );
 
 use Moose::Role;
 
