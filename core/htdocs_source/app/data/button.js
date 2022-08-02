@@ -19,19 +19,19 @@ export default class Button extends Base {
 
     // Common
     format
-    label      // mandatory
+    label                               // mandatory
     tooltip
     image
-    @tracked loading = false // pure client-side status
+    @tracked loading = false            // pure client-side status
     // <a href> mode
-    href       // mandatory - triggers the <a href...> format
+    href                                // mandatory - triggers the <a href...> format
     target
     // <button> mode
     page
     disabled
     /* confirm = {
-     *     label: "Really sure?",          // mandatory if "confirm" exists
-     *     description: "Think!",          // mandatory if "confirm" exists
+     *     label: "Really sure?",       / mandatory if "confirm" exists
+     *     description: "Think!",       / mandatory if "confirm" exists
      *     confirm_label: ""
      *     cancel_label: ""
      * }
@@ -45,4 +45,10 @@ export default class Button extends Base {
     description
     break_before
     break_after
+
+    /*
+     * oxi-section/grid
+     */
+    select
+    selection
 }
