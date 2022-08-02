@@ -70,7 +70,7 @@ or "LIKE" "expression for the attributes keys as defined in get_cert_attributes.
 command "get_cert" => {
     identifier => { isa => 'Base64', required => 1, },
     format     => { isa => 'AlphaPunct', matching => qr{ \A ( PEM | DER | TXT | TXTPEM | HASH | DBINFO | PKCS7 ) \Z }x, default => "HASH" },
-    attribute  => { isa => 'Str', },
+    attribute  => { isa => 'ArrayRefOrStr', coerce => 1 },
 } => sub {
     my ($self, $params) = @_;
 
