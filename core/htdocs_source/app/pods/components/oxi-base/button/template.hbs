@@ -19,9 +19,9 @@
     <BsButton
         ...attributes
         @type=""
-        class="{{if @button.loading "oxi-btn-loading"}} {{this.additionalCssClass}}"
+        class={{this.additionalCssClass}}
         @onClick={{this.click}}
-        disabled={{@button.disabled}}
+        disabled={{or @button.disabled @button.loading}}
     >
         {{#if @button.tooltip}}
             <Tippy>{{@button.tooltip}}</Tippy>

@@ -11,20 +11,21 @@ import { debug } from '@ember/debug';
  *
  * 1. show a `<a href/>` tag and simply open the given URL:
  *    ```html
- *    <OxiBase::Button @button={{myDef2}} class="btn btn-secondary"/>
+ *    <OxiBase::Button @button={{buttonObj1}} class="btn btn-secondary"/>
  *    ```
  * 2. show a `<button/>` tag and handle clicks via callback:
  *    ```html
- *    <OxiBase::Button @button={{myDef1}} @onClick={{sendData}} class="btn btn-secondary"/>
+ *    <OxiBase::Button @button={{buttonObj2}} @onClick={{sendData}} class="btn btn-secondary"/>
  *    ```
  *
- * @param { hash } button - the button definition.
+ * @param { Button } button - the button definition
  * Mode 1 `<a href>`:
  * ```javascript
  * {
  *     format: "primary",
  *     label: "Learn",                     // mandatory
  *     tooltip: "Just fyi",
+ *     image: "https://...",
  *     href: "https://www.openxpki.org",   // mandatory - triggers the <a href...> format
  *     target: "_blank",
  * }
@@ -35,6 +36,7 @@ import { debug } from '@ember/debug';
  *     format: "expected",
  *     label: "Move",                      // mandatory
  *     tooltip: "This should move it",
+ *     image: "https://...",
  *     disabled: false,
  *     confirm: {
  *         label: "Really sure?",          // mandatory if "confirm" exists
@@ -67,6 +69,7 @@ export default class OxiButtonComponent extends Component {
     @tracked showConfirmDialog = false;
 
     get additionalCssClass() {
+        if (this.args.button.loading) { return "oxi-btn-loading" }
         if (!this.args.button.format) { return "btn-light border-secondary" }
         let cssClass = format2css[this.args.button.format];
         if (cssClass === undefined) {
