@@ -15,7 +15,7 @@ import { debug } from '@ember/debug';
  *    ```
  * 2. show a `<button/>` tag and handle clicks via callback:
  *    ```html
- *    <OxiBase::Button @button={{buttonObj2}} @onClick={{sendData}} class="btn btn-secondary"/>
+ *    <OxiBase::Button @button={{buttonObj2}} class="btn btn-secondary"/>
  *    ```
  *
  * @param { Button } button - the button definition
@@ -44,16 +44,17 @@ import { debug } from '@ember/debug';
  *         confirm_label: ""
  *         cancel_label: ""
  *     },
+ *     onClick: this.buttonClick,           // callback: Button object will be passed to the handler as single parameter
  * }
  * ```
- * @param { callback } onClick - Action handler to be called.
- * The `button` hash will be passed on to the handler as single parameter.
  * @module component/oxi-base/button
  */
 
 // mapping of format codes to CSS classes applied to the button
 let format2css = {
     primary:        "btn-primary",
+    submit:         "oxi-btn-submit",
+    loading:        "oxi-btn-loading",
     cancel:         "oxi-btn-cancel",
     reset:          "oxi-btn-reset",
     expected:       "oxi-btn-expected",
@@ -123,7 +124,7 @@ export default class OxiButtonComponent extends Component {
     @action
     executeAction() {
         this.resetConfirmState();
-        this.args.onClick(this.args.button);
+        this.args.button.onClick?.(this.args.button); // invoke callback
     }
 
     @action

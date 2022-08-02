@@ -5,6 +5,7 @@ import { isArray } from '@ember/array';
 import { service } from '@ember/service';
 import { debug } from '@ember/debug';
 import Field from 'openxpki/data/field';
+import Button from 'openxpki/data/button';
 
 /**
  * Draws a form.
@@ -20,6 +21,7 @@ import Field from 'openxpki/data/field';
 export default class OxiSectionFormComponent extends Component {
     @service('intl') intl;
     @service('oxi-content') content;
+    @service router;
 
     @tracked loading = false;
     @tracked fields = [];
@@ -326,7 +328,7 @@ export default class OxiSectionFormComponent extends Component {
 
     @action
     reset() {
-        this.args.buttonClick({ page: this.args.def.reset });
+        this.router.transitionTo("openxpki", this.args.def.reset)
     }
 
     @action

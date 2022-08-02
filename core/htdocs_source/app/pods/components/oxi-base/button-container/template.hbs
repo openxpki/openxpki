@@ -13,7 +13,7 @@
                         </div>
                     {{else}}
                         <div class="col-6 col-md-4">
-                            <OxiBase::Button @button={{btn}} class="d-block w-100" @onClick={{@buttonClick}}/>
+                            <OxiBase::Button @button={{btn}} class="d-block w-100"/>
                         </div>
                         <div class="col-6 col-md-8">
                             {{btn.description}}
@@ -33,7 +33,7 @@
                         {{#if btn.section}}
                             <!-- Section are not supported yet -->
                         {{else}}
-                            <OxiBase::Button @button={{btn}} @onClick={{@buttonClick}}/>
+                            <OxiBase::Button @button={{btn}}/>
                         {{/if}}
                     {{/each}}
                 </div>

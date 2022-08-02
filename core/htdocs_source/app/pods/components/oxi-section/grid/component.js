@@ -277,10 +277,29 @@ export default class OxiSectionGridComponent extends Component {
         return buttons.map(b => {
             if (b.select) {
                 set(b, "disabled", this.noneChecked);
+                b.onClick = this.selectClick;
             }
             return b;
         })
     }
+
+    @action
+    selectClick(button) {
+        let columns = this.rawColumns.getEach("sTitle");
+        let index = columns.indexOf(button.select);
+        if (index === -1) {
+            throw new Error(`There is no column matching "${button.select}"`);
+        }
+        let request = {
+            action: button.action
+        };
+        request[button.selection] = this.sortedData.filterBy("checked").getEach("originalData").getEach("" + index);
+        set(button, "loading", true);
+
+        this.content.updateRequest(request)
+        .then(() => set(button, "loading", false));
+    }
+
 
     @action
     executeAction(row, act) {
@@ -304,28 +323,6 @@ export default class OxiSectionGridComponent extends Component {
                 page: path,
                 target: act.target
             });
-        }
-    }
-
-    @action
-    buttonClick(button) {
-        if (button.select) {
-            let columns = this.rawColumns.getEach("sTitle");
-            let index = columns.indexOf(button.select);
-            if (index === -1) {
-                throw new Error(`There is no column matching "${button.select}"`);
-            }
-            let request = {
-                action: button.action
-            };
-            request[button.selection] = this.sortedData.filterBy("checked").getEach("originalData").getEach("" + index);
-            set(button, "loading", true);
-
-            this.content.updateRequest(request)
-            .then(() => set(button, "loading", false));
-        }
-        else {
-            this.args.buttonClick(button);
         }
     }
 

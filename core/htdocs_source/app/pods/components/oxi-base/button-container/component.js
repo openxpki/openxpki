@@ -4,7 +4,7 @@ import Component from '@glimmer/component';
  * Shows buttons as a group.
  *
  * ```html
- * <OxiBase::ButtonContainer @buttons={{data}} @buttonClick={{myFunc}}/>
+ * <OxiBase::ButtonContainer @buttons={{data}}/>
  * ```
  *
  * @param { array } buttons - List of button definitions to be passed to {@link module:oxi-base/button}

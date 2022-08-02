@@ -17,7 +17,10 @@ export default class OxiSectionComponent extends Component {
         let buttons = []
         for (const buttonHash of this.args.content?.content?.buttons ?? []) {
             // convert hash into field
-            buttons.push(Button.fromHash(buttonHash))
+            buttons.push(Button.fromHash({
+                ...buttonHash,
+                onClick: this.buttonClick, // add click handler
+            }))
         }
 
         return {
@@ -32,7 +35,7 @@ export default class OxiSectionComponent extends Component {
 
     @action
     buttonClick(button) {
-        debug("oxisection/main: buttonClick");
+        debug("oxisection: buttonClick");
         set(button, "loading", true);
         if (button.action) {
             this.content.updateRequest({ action: button.action })

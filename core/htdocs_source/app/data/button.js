@@ -23,6 +23,7 @@ export default class Button extends Base {
     tooltip
     image
     @tracked loading = false            // pure client-side status
+    onClick                             // pure client-side status
     // <a href> mode
     href                                // mandatory - triggers the <a href...> format
     target

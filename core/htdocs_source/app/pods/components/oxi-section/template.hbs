@@ -15,7 +15,7 @@
         {{/if}}
 
         <div class="card-body py-2 px-0" {{on-init this.initialized}}>
-            {{component this.type def=this.sectionData buttonClick=this.buttonClick isInfoBox=@isInfoBox}}
+            {{component this.type def=this.sectionData isInfoBox=@isInfoBox}}
         </div>
     </div>
 
@@ -30,7 +30,7 @@
         {{/if}}
 
         <div {{on-init this.initialized}} class={{unless @isInfoBox "ms-3"}}>
-            {{component this.type def=this.sectionData buttonClick=this.buttonClick isInfoBox=@isInfoBox}}
+            {{component this.type def=this.sectionData isInfoBox=@isInfoBox}}
         </div>
     </div>
 
