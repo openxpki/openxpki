@@ -6,27 +6,32 @@ export default class Base {
     static get _idField() { return 'name' }
 
     /**
-     * Static method to create an instance with the attributes set to the given
+     * Static method to create an instance with the properties set to the given
      * hash values of the same name.
      */
     static fromHash(sourceHash) {
         let instance = new this() // "this" in static methods refers to class
-        for (const attr of Object.keys(sourceHash)) {
-            // @tracked properties are prototype properties, the others instance properties
-            if (! (Object.prototype.hasOwnProperty.call(Object.getPrototypeOf(this), attr) || Object.prototype.hasOwnProperty.call(instance, attr))) {
+
+        let props = [
+            ...Object.getOwnPropertyNames(instance),                        // "normal" instance properties
+            ...Object.getOwnPropertyNames(Object.getPrototypeOf(instance)), // @tracked properties
+        ]
+
+        for (const prop of Object.keys(sourceHash)) {
+            if (props.findIndex(el => el == prop) == -1) {
                 /* eslint-disable-next-line no-console */
-                console.error(`Attempt to set unknown property "${attr}" in ${this.name} instance "${sourceHash[this._idField] ?? '<unknown>'}". `)
+                console.error(`Attempt to set unknown property "${prop}" in ${this.name} instance "${sourceHash[this._idField] ?? '<unknown>'}". `)
                 console.error(`If it's a new property, please add it to ${this._type}.js`)
             }
             else {
-                instance[attr] = sourceHash[attr]
+                instance[prop] = sourceHash[prop]
             }
         }
         return instance
     }
 
     /**
-     * Clones the object and returns a new instance with the same attributes.
+     * Clones the object and returns a new instance with the same properties.
      */
     clone() {
         let obj = new this.constructor()

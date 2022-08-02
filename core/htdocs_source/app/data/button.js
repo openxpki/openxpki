@@ -11,24 +11,24 @@ export default class Button extends Base {
     /*
      * oxi-section
      */
-    action
+    @tracked action
 
     /*
      * oxi-base/button
      */
 
     // Common
-    format
-    label                               // mandatory
-    tooltip
-    image
+    @tracked format
+    @tracked label                      // mandatory
+    @tracked tooltip
+    @tracked image
     @tracked loading = false            // pure client-side status
     onClick                             // pure client-side status
     // <a href> mode
-    href                                // mandatory - triggers the <a href...> format
-    target
+    @tracked href                       // mandatory - triggers the <a href...> format
+    @tracked target
     // <button> mode
-    page
+    @tracked page
     disabled
     /* confirm = {
      *     label: "Really sure?",       / mandatory if "confirm" exists
@@ -50,6 +50,6 @@ export default class Button extends Base {
     /*
      * oxi-section/grid
      */
-    select
-    selection
+    @tracked select
+    @tracked selection
 }

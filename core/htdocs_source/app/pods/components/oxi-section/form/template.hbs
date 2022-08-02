@@ -20,24 +20,7 @@
 
     <div class="row">
         <div class="offset-lg-2 col-lg-7">
-            <OxiBase::ButtonContainer @buttons={{@def.buttons}}>
-                <BsButton
-                    @type="light"
-                    @onClick={{this.submit}}
-                    class={{if this.loading "oxi-btn-loading" "oxi-btn-submit"}}
-                >
-                    {{try @def.submit_label (t 'component.oxisection_form.submit')}}
-                </BsButton>
-                {{#if @def.reset}}
-                    <BsButton
-                        @type="light"
-                        @onClick={{this.reset}}
-                        class="oxi-btn-reset"
-                    >
-                        {{try @def.reset_label (t 'component.oxisection_form.reset')}}
-                    </BsButton>
-                {{/if}}
-            </OxiBase::ButtonContainer>
+            <OxiBase::ButtonContainer @buttons={{this.buttons}} />
         </div>
     </div>
 </form>

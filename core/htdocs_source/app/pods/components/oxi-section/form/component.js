@@ -30,6 +30,29 @@ export default class OxiSectionFormComponent extends Component {
     focusFeedback = {}; // gets filled with the field feedback if they may receive the focus
     initialFocussingDone = false;
 
+    get buttons() {
+        let buttons = []
+
+        // We cannot use Button.fromHash() here as the would prevent Ember from
+        // tracking state changes.
+        let submit = new Button()
+        submit.label = this.args.def.submit_label || this.intl.t('component.oxisection_form.submit')
+        submit.format = this.loading ? "loading" : "submit"
+        submit.onClick = this.submit
+        buttons.push(submit)
+
+        if (this.args.def.reset) {
+            let reset = new Button()
+            reset.label = this.args.def.reset_label || this.intl.t('component.oxisection_form.reset'),
+            reset.format = "reset"
+            reset.onClick =
+            buttons.push(reset)
+        }
+
+        buttons.push(...this.args.def.buttons)
+        return buttons
+    }
+
     hiddenFieldFilter(f) {
         return f.type !== "hidden" && f.type !== "encrypted";
     }
@@ -328,6 +351,7 @@ export default class OxiSectionFormComponent extends Component {
 
     @action
     reset() {
+        debug(`oxi-section/form (${this.args.def.action}): reset`)
         this.router.transitionTo("openxpki", this.args.def.reset)
     }
 
