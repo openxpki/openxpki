@@ -95,8 +95,8 @@ while (my $cgi = CGI::Fast->new()) {
             $response = OpenXPKI::Client::Service::Response->new ( 40001 );
             $log->info($response->{error} || 'Unable to extract signer certficate');
         # Enrollment request
-        } elsif ($client->message_type eq 'PKCSReq' || $client->message_type eq 'GetCertInitial') {
-            # TODO - need to handle GetCertInitial
+        } elsif ($client->message_type =~ m{(PKCSReq|RenewalReq|GetCertInitial)}) {
+            # TODO - improve handling of GetCertInitial and RenewalReq
             $log->debug("Handle enrollment");
             $response = $client->handle_enrollment_request($cgi);
 

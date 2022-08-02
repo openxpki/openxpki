@@ -47,6 +47,7 @@ our $schema = "
 
 our %mapMessageTypes = (
     '3' => 'CertRep',  # Response to certificate or CRL request
+    '17' => 'RenewalReq', # Renewal Request
     '19' => 'PKCSReq',  # PKCS#10 certificate request
     '20' => 'GetCertInitial', # Certificate polling in manual enrollment
     '21' => 'GetCert', #Retrieve a certificate
