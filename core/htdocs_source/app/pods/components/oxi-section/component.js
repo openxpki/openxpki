@@ -3,66 +3,7 @@ import { action, set } from "@ember/object";
 import { debug } from '@ember/debug';
 import { service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
-
-/*
- * Button data
- */
-class Button {
-    /*
-     * oxi-section
-     */
-    action;
-
-    /*
-     * oxi-base/button
-     */
-    // common
-    format;
-    label;      // mandatory
-    tooltip;
-    image;
-    @tracked loading = false; // pure client-side status
-    // <a href> mode
-    href;       // mandatory - triggers the <a href...> format
-    target;
-    // <button> mode
-    page;
-    disabled;
-    /* confirm = {
-     *     label: "Really sure?",          // mandatory if "confirm" exists
-     *     description: "Think!",          // mandatory if "confirm" exists
-     *     confirm_label: ""
-     *     cancel_label: ""
-     * }
-     */
-    confirm;
-
-    /*
-     * oxi-base/button-container
-     */
-    section;
-    description;
-    break_before;
-    break_after;
-
-    static fromHash(sourceHash) {
-        let instance = new this(); // "this" in static methods refers to class
-        for (const attr of Object.keys(sourceHash)) {
-            // @tracked properties are prototype properties, the others instance properties
-            if (! (Object.prototype.hasOwnProperty.call(Object.getPrototypeOf(this), attr) || Object.prototype.hasOwnProperty.call(instance, attr))) {
-                /* eslint-disable-next-line no-console */
-                console.error(
-                    `oxi-section: unknown property "${attr}" in button "${sourceHash.label}". ` +
-                    `If it's a new property, please add it to class 'Button' defined in app/pod/components/oxi-section/component.js`
-                );
-            }
-            else {
-                instance[attr] = sourceHash[attr];
-            }
-        }
-        return instance;
-    }
-}
+import Button from 'openxpki/data/button';
 
 export default class OxiSectionComponent extends Component {
     @service router;
