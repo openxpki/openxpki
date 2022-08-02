@@ -68,8 +68,7 @@ sub get_command
     }
 
     ## build the command
-
-    my $command  = "smime -encrypt -nosmimecap";
+    my $command  = "smime -encrypt -nosmimecap -binary";
     $command .= " -engine $engine" if ($engine);
     $command .= " -in ". $self->write_temp_file( $self->{CONTENT} );
     $command .= " -out ".$self->get_outfile();
