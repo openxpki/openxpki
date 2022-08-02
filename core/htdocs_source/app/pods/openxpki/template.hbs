@@ -242,7 +242,7 @@
         @backdropClose={{false}}
         @size={{if popup.page.isLarge "xl" "lg"}}
         @scrollable={{true}}
-        {{on "hidden" this.clearPopupData}}
+        @onHidden={{this.clearPopupData}}
         as |Modal|
     >
         <Modal.header class="bg-secondary text-white">

@@ -40,7 +40,7 @@
             @fade={{true}}
             @backdrop={{true}}
             @backdropClose={{false}}
-            {{on "hidden" this.resetConfirmState}}
+            @onHidden={{this.resetConfirmState}}
             as |Modal|
         >
             <Modal.header>
