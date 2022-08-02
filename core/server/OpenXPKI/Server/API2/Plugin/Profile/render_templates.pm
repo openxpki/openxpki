@@ -175,9 +175,8 @@ command "render_san_from_template" => {
 
         # Each list item is a template to be parsed
         for my $line_template (@values) {
-            my $result = $self->process_template($line_template, $vars);
-            ## split up internal multiples (sep by |)
-            push @entries, (split (/\|/, $result)) if $result;
+            my @result = $self->process_template($line_template, $vars);
+            push @entries, @result if @result;
         }
 
         # merge into the preset hash
@@ -256,7 +255,7 @@ command "render_metadata_from_template" => {
     }
 
     my $profile_path = "profile.$profile.style.$style.metadata";
-    # Check for SAN Template
+    # Check for Template
     my @meta_template_keys = $config->get_keys("$profile_path");
     my $metadata = {};
 
@@ -270,9 +269,8 @@ command "render_metadata_from_template" => {
 
         # Each list item is a template to be parsed
         for my $line_template (@values) {
-            my $result = $self->process_template($line_template, $vars);
-            ## split up internal multiples (sep by |)
-            push @entries, (split (/\|/, $result)) if ($result);
+            my @result = $self->process_template($line_template, $vars);
+            push @entries, @result if @result;
         }
 
         ##! 32: 'Entries are ' . Dumper @entries
@@ -318,15 +316,34 @@ B<Parameters>
 =back
 
 =cut
+
 sub process_template {
     my ($self, $template, $vars) = @_;
     my $result;
 
     my $oxtt = OpenXPKI::Template->new();
+
+    if ($template =~ m{\A\$(\S+?)(\.(\S+))?\z}) {
+        ##! 32: 'Using shortcut template'
+        my $res = $oxtt->render_from_shortcut( $template, $vars );
+        ##! 64: $res
+        return unless ($res);
+        # this should not happen
+        return $res unless(wantarray);
+        # make array from scalar item or list ref
+        return (ref $res eq 'ARRAY') ? @{$res} : ($res);
+    }
+
+    ##! 32: 'Toolkit template'
     my $res = $oxtt->render( $template, $vars );
+    ##! 64: $res
+    return unless ($res);
 
-    return $res;
+    # subject render expects a scalar
+    return $res unless(wantarray);
 
+    # split processed template at the pipe symbol
+    return (split (/\|/, $res));
 }
 
 =head2 cleanup_for_tt

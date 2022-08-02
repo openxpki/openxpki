@@ -40,6 +40,7 @@ thrown.
 =cut
 
 sub render {
+
     my ($self, $template, $tt_param) = @_;
 
     ##! 16: 'template: ' . $template
@@ -114,6 +115,83 @@ sub render_from_file {
 
     return $self->render($template, $tt_param);
 
+}
+
+=head2 render_from_shortcut
+
+Expects the template to be a shortcut pattern, starting with the dollar
+sign followed by the key name and an optional subkey, separated by a dot.
+Allowed charaters are word characters and the dash.
+
+To support lean shortcuts from e.g. the context, the second argument
+can be a subroutine reference that returns the value for a given key
+instead of a hash ref.
+
+Will die if the given template is not a shortcut.
+
+B<Will return non-scalar values if the requested key is not a scalar!>
+
+=head3 Examples
+
+=over
+
+=item $foo
+
+return $params->{foo}
+
+=item $foo.bar
+
+return $params->{foo}->{bar}
+
+will die if $params->{foo} is not a hash reference.
+
+=item $foo.0
+
+$params->{foo}->[0] if $params->{foo} is an array ref.
+$params->{foo}->{0} if $params->{foo} is a hash ref.
+
+will die if $params->{foo} is not a hash/array reference.
+
+=back
+
+=cut
+
+sub render_from_shortcut {
+
+    my ($self, $template, $tt_param) = @_;
+
+    $template =~ m{\A\$([\w-]+)(\.([\w-]+))?\z};
+
+    my $key = $1 || die "Template is not a valid shortcut pattern";
+    my $subkey = $3;
+
+    ##! 16: "key: $key - subkey  $subkey"
+
+    # tt_param can be a function ref or a hash
+    my $res;
+    if (ref $tt_param eq 'CODE') {
+        $res = $tt_param->( $key );
+    } elsif (ref $tt_param eq 'HASH') {
+        $res = $tt_param->{$key};
+    } else {
+        return;
+    }
+    return unless (defined $res);
+
+    if (OpenXPKI::Serialization::Simple::is_serialized($res)) {
+        ##! 32: ' needs deserialize '
+        $res = OpenXPKI::Serialization::Simple->new()->deserialize( $res );
+    }
+
+    return $res unless(defined $subkey);
+
+    if (ref $res eq 'HASH') {
+        return $res->{$subkey};
+    } elsif (ref $res eq 'ARRAY' && $res =~ /\A\d+\z/) {
+        return $res->[$subkey];
+    }
+
+    die "Template with subkey requested ($template) but value is of wrong data type";
 }
 
 

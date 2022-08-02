@@ -3329,12 +3329,15 @@ sub __render_fields {
             # deflist: iterate over each label/value pair and render the value template
             if ($item->{format} eq "deflist") {
                 $item->{value} = [
-                    map { {
-                        # $_ is a HashRef: { label => STR, key => STR, value => STR } where key is the field name (not needed here)
-                        label => $_->{label},
-                        value => $self->send_command_v2('render_template', { template => $field->{template}, params => $_ }),
-                        format => 'raw',
-                    } }
+                    map {
+                        my $val = $self->send_command_v2('render_template', { template => $field->{template}, params => $_ });
+                        {
+                            # $_ is a HashRef: { label => STR, key => STR, value => STR } where key is the field name (not needed here)
+                            label => $_->{label},
+                            value => [ split (/\|/, $val) ],
+                            format => 'raw',
+                        }
+                    }
                     @{ $item->{value} }
                 ];
 

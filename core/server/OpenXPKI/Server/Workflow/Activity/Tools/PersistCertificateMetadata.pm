@@ -7,6 +7,7 @@ package OpenXPKI::Server::Workflow::Activity::Tools::PersistCertificateMetadata;
 use strict;
 use base qw( OpenXPKI::Server::Workflow::Activity );
 
+use Workflow::Exception qw(configuration_error workflow_error);
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
@@ -37,7 +38,6 @@ sub execute {
 
     if (!$style) {
         CTX('log')->application()->info("No style defined, skipping metadata");
-
         return 1;
     }
 
@@ -60,7 +60,6 @@ sub execute {
 
     if (not defined $metadata) {
         CTX('log')->application()->info("No metadata for $profile / $style ");
-
         return 1;
     }
 
@@ -68,25 +67,20 @@ sub execute {
 
     # Add result to the cert_attributes table
     my $dbi = CTX('dbi');
-    foreach my $key (keys(%{$metadata})) {
-        my $value = $metadata->{$key};
-        next if ($value eq '');
-        $value = $ser->serialize( $value ) if (ref $value ne '');
 
+    my $insert_item = sub {
+        my ($key, $value) = @_;
+        return if ($value eq '');
         ##! 32: 'Add new attribute ' . $key . ' value ' . $value
-
         ## This is a workaround for an upstream bug in the mysql driver
         # we expand a single dash, dot (or e,+) to the verbose "n/a"
         # see https://github.com/openxpki/openxpki/issues/198
         # and https://rt.cpan.org/Public/Bug/Display.html?id=97541
-
         if ($value =~ m{ \A (-|\.|e|\+) \z }x) {
             $value = 'n/a';
             CTX('log')->application()->debug(sprintf ('Replace metadata dash/dot by verbose "n/a" on %s / %s',
                     $cert_identifier, $key));
-
         }
-
         $dbi->insert(
             into => 'certificate_attributes',
             values => {
@@ -96,6 +90,21 @@ sub execute {
                 attribute_value      => $value,
             }
         );
+    };
+
+    foreach my $key (keys(%{$metadata})) {
+        my $value = $metadata->{$key};
+
+        if (!ref $value) {
+            $insert_item->( $key, $value);
+            next;
+        }
+
+        workflow_error('Received metadata is not scalar or array') unless(ref $value eq 'ARRAY');
+
+        foreach my $val (@{$value}) {
+            $insert_item->( $key, $val);
+        }
     }
     return 1;
 
