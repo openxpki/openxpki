@@ -11,7 +11,7 @@ sub SDumper {
 sub CensorHash {
     my $data = shift;
     return $data unless(ref $data eq 'HASH');
-    my @wordlist = ('_password','_private_key');
+    my @wordlist = ('password','_password','_private_key');
     my %out = map {
         my $vv = $data->{$_};
         my $kk = $_;
