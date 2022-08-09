@@ -1,10 +1,3 @@
-## OpenXPKI::Crypto::Backend::OpenSSL::Command::create_pkcs12
-## Written 2005 by Michael Bell for the OpenXPKI project
-## Rewritten 2006 by Julia Dubenskaya for the OpenXPKI project
-## enhanced 2006 by Alexander Klink for the OpenXPKI project
-## to support Cryptographic Service Provider names
-## (C) Copyright 2005-2006 by The OpenXPKI Project
-
 use strict;
 use warnings;
 
@@ -17,9 +10,6 @@ sub get_command
     my $self = shift;
 
     ## compensate missing parameters
-
-    
-
     my $engine = "";
     my $engine_usage = $self->{ENGINE}->get_engine_usage();
     $engine = $self->{ENGINE}->get_engine()
@@ -87,39 +77,63 @@ sub get_command
         }
     }
 
+    OpenXPKI::Exception->throw(
+        message => 'Invalid value for KEY_PBE given to create_pkcs12 command',
+        params => { KEY_PBE => $self->{KEY_PBE} },
+    ) if ($self->{KEY_PBE} && $self->{KEY_PBE} !~ m{\A([A-Z0-9-]+)\z});
+
+    OpenXPKI::Exception->throw(
+        message => 'Invalid value for CERT_PBE given to create_pkcs12 command',
+        params => { CERT_PBE => $self->{CERT_PBE} },
+    ) if ($self->{CERT_PBE} && $self->{CERT_PBE} !~ m{\A([A-Z0-9-]+)\z});
+
+    OpenXPKI::Exception->throw(
+        message => 'Invalid value for MACALG given to create_pkcs12 command',
+        params => { MACALG => $self->{MACALG} },
+    ) if ($self->{MACALG} && $self->{MACALG} !~ m{\A([a-z0-9]+)\z});
+
     ## build the command
+    my @command = ('pkcs12','-export');
+    # optional engine use
+    push @command, ('-engine',$engine) if ($engine);
 
-    my $command  = "pkcs12 -export";
-    $command .= " -engine $engine" if ($engine);
-    $command .= " -inkey ". $self->write_temp_file( $self->{KEY} ) ;
-    $command .= " -in ". $self->write_temp_file( $self->{CERT} );
-    $command .= " -out ".$self->get_outfile();
+    # mandatory arguments
+    push @command, ('-inkey', $self->write_temp_file( $self->{KEY} )) ;
+    push @command, ('-in', $self->write_temp_file( $self->{CERT} ));
+    push @command, ('-out', $self->get_outfile());
 
-    $command .= " -keypbe ".$self->{KEY_PBE} if ($self->{KEY_PBE});
-    $command .= " -certpbe ".$self->{CERT_PBE} if ($self->{CERT_PBE});
+    # extra key specs
+    push @command, ('-keypbe', $self->{KEY_PBE}) if ($self->{KEY_PBE});
+    push @command, ('-certpbe', $self->{CERT_PBE}) if ($self->{CERT_PBE});
+    push @command, ('-macalg', $self->{MACALG}) if ($self->{MACALG});
 
-    $command .= " -name " . $self->{ALIAS} if ($self->{ALIAS});
+    # the legacy flag is only available in openssl 1.1!
+    push @command, ('-legacy') if ($self->{LEGACY});
 
+    # set an alias name
+    push @command, ('-name', $self->{ALIAS}) if ($self->{ALIAS});
+
+    # csp name
     if (defined $self->{CSP}) {
-        $command .= " -CSP " . q{"} . $self->{CSP} . q{"};
+        push @command, ('-CSP', q{"} . $self->{CSP} . q{"} );
     }
 
     if (exists $self->{CHAIN} && scalar @{$self->{CHAIN}}) {
         my $chain = join("\n", @{$self->{CHAIN}});
-        $command .= " -certfile ".$self->write_temp_file( $chain );
+        push @command, ('-certfile', $self->write_temp_file( $chain ) );
     }
 
-    $command .= " -passin env:pwd";
+    push @command, ('-passin','env:pwd');
     $self->set_env ("pwd" => $self->{PASSWD});
 
-    $command .= " -passout env:p12pwd";
+    push @command, ('-passout','env:p12pwd');
     if ($self->{PKCS12_PASSWD} && !$self->{NOPASSWD}) {
         $self->set_env ('p12pwd' => $self->{PKCS12_PASSWD});
     } else {
         $self->set_env ('p12pwd' => '');
     }
 
-    return [ $command ];
+    return [ \@command ];
 }
 
 sub hide_output
@@ -169,9 +183,13 @@ set NOPASSWD to 1.
 
 =item * NOPASSWD (optional)
 
-=item * KEY_PBE, CERT_PBE, CSP (optional)
+=item * KEY_PBE, CERT_PBE, CSP, MACALG (optional)
 
 Passed as is to the openssl options with the same name.
+
+=item * LEGACY
+
+If true, append the I<legacy> flag to the command (OpenSSL 1.1 only)
 
 =back
 

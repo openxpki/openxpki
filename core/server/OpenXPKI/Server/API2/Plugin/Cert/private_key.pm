@@ -28,7 +28,7 @@ I<cert_identifier> is mandatory.
 
 command "get_private_key_for_cert" => {
     identifier => { isa => 'Base64', required => 1, },
-    format     => { isa => 'Str', matching => qr{ \A ( PKCS8_(PEM|DER) | OPENSSL_(PRIVKEY|RSA) | PKCS12 | JAVA_KEYSTORE ) \z }xms, required => 1, },
+    format     => { isa => 'Str', matching => qr{ \A ( PKCS8_(PEM|DER) | OPENSSL_(PRIVKEY|RSA) | PKCS12(_LEGACY)? | JAVA_KEYSTORE ) \z }xms, required => 1, },
     password   => { isa => 'Str', required => 1, },
     passout    => { isa => 'Str', },
     nopassword => { isa => 'Bool', default => 0, },
@@ -78,6 +78,12 @@ I<chain>.
 =item PKCS8_DER (PKCS#8 in DER format)
 
 =item PKCS12 (PKCS#12 in DER format)
+
+Enforces AES-128-CBC and PBE-SHA1-3DES for key/certificate encryption
+
+=item PKCS12_LEGACY (PKCS#12 in DER format)
+
+Enforces PBE-SHA1-RC2-40 and PBE-SHA1-DES for key/certificate encryption
 
 =item OPENSSL_PRIVKEY (OpenSSL native key format in PEM)
 
@@ -142,7 +148,7 @@ If the input password does not decrypt the private key, an exception is thrown.
 command "convert_private_key" => {
 
     private_key => { isa => 'PEMPKey', required => 1 },
-    format     => { isa => 'Str', matching => qr{ \A ( PKCS8_(PEM|DER) | OPENSSL_(PRIVKEY|RSA) | PKCS12 | JAVA_KEYSTORE ) \z }xms, required => 1, },
+    format     => { isa => 'Str', matching => qr{ \A ( PKCS8_(PEM|DER) | OPENSSL_(PRIVKEY|RSA) | PKCS12(_LEGACY)? | JAVA_KEYSTORE ) \z }xms, required => 1, },
     password   => { isa => 'Str', required => 1, },
     passout    => { isa => 'Str', },
     nopassword => { isa => 'Bool', default => 0, },
@@ -217,7 +223,7 @@ command "convert_private_key" => {
         }
 
     }
-    elsif ( $format eq 'PKCS12' or $format eq 'JAVA_KEYSTORE' ) {
+    elsif ( $format =~ m{\A(PKCS12|JAVA_KEYSTORE)} ) {
 
         my @chain;
 
@@ -250,6 +256,18 @@ command "convert_private_key" => {
             CERT    => $certificate,
             CHAIN   => \@chain,
         };
+
+        # newer openssl versions use other default algorithms
+        # we try to add suitable defaults independantly from the used
+        # openssl backend, the chosen ones are a tradeoff between
+        # compatibility and security
+        if ($format eq 'PKCS12') {
+            $command_hashref->{KEY_PBE} = 'AES-128-CBC';
+            $command_hashref->{CERT_PBE} = 'PBE-SHA1-3DES';
+        } elsif ($format eq 'PKCS12_LEGACY') {
+            $command_hashref->{KEY_PBE} = 'PBE-SHA1-RC2-40';
+            $command_hashref->{CERT_PBE} = 'PBE-SHA1-DES';
+        } # anything else is JavaKS and we use the system defaults
 
         if ($nopassword) {
             $command_hashref->{NOPASSWD} = 1;
