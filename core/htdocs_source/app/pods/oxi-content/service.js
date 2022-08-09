@@ -109,10 +109,17 @@ export default class OxiContentService extends Service {
                     return doc;
                 }
 
-                // Page contents
+                // Set page contents
                 if (doc.page && doc.main) {
                     debug("updateRequest(): response - \"page\" and \"main\"");
                     this._setPageContent(realTarget, doc.page, doc.main, doc.right, doc.status);
+                }
+                // or (e.g. on error) set error code for current tab
+                else {
+                    if (doc.status && this.tabs.length > 0) {
+                        let currentTab = this.tabs.findBy("active") // findBy() is an EmberArray method
+                        emSet(currentTab, 'status', doc.status)
+                    }
                 }
 
                 this._setLoadingBanner(null);
@@ -351,7 +358,7 @@ export default class OxiContentService extends Service {
         // Current tab
         else if (target === "active") {
             let tabs = this.tabs;
-            let index = tabs.indexOf(tabs.findBy("active"));
+            let index = tabs.indexOf(tabs.findBy("active")); // findBy() is an EmberArray method
             tabs.replace(index, 1, [newTab]); // top
         }
         // Set as only tab
