@@ -8,13 +8,49 @@ import section_form from './section-form';
 import section_grid from './section-grid';
 import section_keyvalue from './section-keyvalue';
 import section_tiles from './section-tiles';
+import Button from 'openxpki/data/button';
 
 export default class TestController extends Controller {
     @service('oxi-locale') oxiLocale;
 
+    @tracked
+    selectedFormIndex = 0
+
+    charts = section_chart
+    forms = section_form
+    sections = [
+        section_grid,
+        section_keyvalue,
+        section_tiles,
+    ]
+
+    get formNavButtons() {
+        let buttons = []
+        this.forms.forEach((form, i) => {
+            buttons.push(Button.fromHash({
+                format: "optional",
+                label: form.content.title,
+                onClick: btn => this.setCurrentForm(i),
+            }))
+        })
+        return buttons
+    }
+
     constructor() {
         super(...arguments);
         this.oxiLocale.locale = 'de-DE';
+        this.langButtons = [
+            Button.fromHash({
+                format: "expected",
+                label: "de-DE",
+                onClick: btn => this.setLang("de-DE"),
+            }),
+            Button.fromHash({
+                format: "expected",
+                label: "en-US",
+                onClick: btn => this.setLang("en-US"),
+            }),
+        ]
 
         /*
          * set up request interceptor / server mockup
@@ -162,18 +198,4 @@ export default class TestController extends Controller {
     setCurrentForm(index) {
         this.selectedFormIndex = index;
     }
-
-    @tracked
-    selectedFormIndex = 0;
-
-    charts = section_chart;
-
-    forms = section_form;
-
-    sections = [
-        section_grid,
-        section_keyvalue,
-        section_tiles,
-    ];
-
 }
