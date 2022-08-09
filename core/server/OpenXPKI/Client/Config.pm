@@ -283,17 +283,9 @@ sub __init_default {
     # in case an explicit script name is set, we do NOT use the default.conf
     my $service = $self->service();
     my $env_file = 'OPENXPKI_'.uc($service).'_CLIENT_CONF_FILE';
-    my $env_socket = 'OPENXPKI_'.uc($service).'_CLIENT_CONF_SOCKET';
 
     my $configfile;
-    if (my $conf_socket = $ENV{$env_socket}) {
-        my $client = OpenXPKI::Client->new( socketfile => $conf_socket );
-        $self->client($client);
-        my $reply = $client->send_receive_service_msg('GET_ENDPOINT_CONFIG', { 'interface' => $service });
-        die "Unable to fetch endpoint default configuration from backend" unless (ref $reply->{PARAMS});
-        return $reply->{PARAMS}->{CONFIG};
-
-    } elsif ($ENV{$env_file}) {
+    if ($ENV{$env_file}) {
         -f $ENV{$env_file}
             || die sprintf "Explicit config file not found (%s, from env %s)", $ENV{$env_file}, $env_file;
 
