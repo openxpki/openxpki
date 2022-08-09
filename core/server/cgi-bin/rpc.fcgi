@@ -104,13 +104,14 @@ sub failure {
         }
     }
 
+    $message .= ': '.$details_log if ($details_log);
     # $log might not yet be initialised
-    eval { $log->error($code . ' - ' . join(': ', $message, $details_log // ())) };
+    $log ? $log->error("$code - $message") : warn "$code - $message";
 
     return {
         error => {
             code => $code,
-            message => join(': ', $message, $details_public // ()),
+            message => $message,
             data => $data,
         },
         rpc_failure => 1, # flag to help error handling
@@ -160,6 +161,7 @@ sub send_output {
         }
     }
 }
+
 
 eval {
     $config = OpenXPKI::Client::Config->new('rpc');
