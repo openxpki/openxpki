@@ -43,9 +43,9 @@ export default class OxiSectionFormComponent extends Component {
 
         if (this.args.def.reset) {
             let reset = new Button()
-            reset.label = this.args.def.reset_label || this.intl.t('component.oxisection_form.reset'),
+            reset.label = this.args.def.reset_label || this.intl.t('component.oxisection_form.reset')
             reset.format = "reset"
-            reset.onClick =
+            reset.onClick = this.reset
             buttons.push(reset)
         }
 
