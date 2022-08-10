@@ -422,10 +422,6 @@ msgstr "指定您希望吊销证书的原因。"
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "已请求延迟吊销。"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_DICE_UPDATE_DOMAINLIST"
-msgstr "显示相关的工作流程"
-
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
 msgstr "失败"
 
@@ -690,6 +686,10 @@ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_OPENSSL_PRIVKEY"
 msgstr "OpenSSL 本地"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS12"
+msgstr "PKCS12"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS12_LEGACY"
 msgstr "PKCS12"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS8_DER"
@@ -1054,6 +1054,10 @@ msgstr "没有密码无法生成密钥"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NICE_ISSUANCE_PENDING"
 msgstr "吊销中"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_KEYGEN_DELAYED"
+msgstr "IDEA"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NICE_UPDATE_DOMAINLIST"
@@ -3711,10 +3715,6 @@ msgstr "此工作流程最终失败。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_LABEL"
 msgstr "失败"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
-msgstr "此工作流程最终失败，无法重新启动"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_LABEL"
 msgstr " "
 
@@ -4316,6 +4316,10 @@ msgstr "是"
 #~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
 #~ msgstr "Creator"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_DICE_UPDATE_DOMAINLIST"
+#~ msgstr "显示相关的工作流程"
+
 #~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_KEY_POLICY_FAILED"
 #~ msgstr "Key policy failed (wrong size/algorithm)"
 
@@ -4674,6 +4678,10 @@ msgstr "是"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_LABEL"
 #~ msgstr "签署CRL"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
+#~ msgstr "此工作流程最终失败，无法重新启动"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_DESC"
 #~ msgstr "此工作流程已成功完成，无法重新启动"

@@ -516,10 +516,6 @@ msgstr ""
 "Con la Revoca ritardata, puoi programmare la revoca di un certificato in una "
 "data futura."
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_DICE_UPDATE_DOMAINLIST"
-msgstr "Mostra i workflow correlati"
-
 # Remove?
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
@@ -863,6 +859,10 @@ msgstr "Descrizione del profilo client OpenVPN per gli utenti"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS12"
+msgstr "Informazioni Processi"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS12_LEGACY"
 msgstr "Informazioni Processi"
 
 #, fuzzy
@@ -1272,6 +1272,10 @@ msgstr "Password della Chiave"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NICE_ISSUANCE_PENDING"
 msgstr "In attesa di revoca"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_KEYGEN_DELAYED"
+msgstr "IDEA"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NICE_UPDATE_DOMAINLIST"
@@ -4273,9 +4277,6 @@ msgstr "Questo Workflow è definitivamente fallito."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_LABEL"
 msgstr "FALLIMENTO"
 
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
-msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato."
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_LABEL"
 msgstr "Stato"
 
@@ -5042,6 +5043,10 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
 #~ msgstr "Creator"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_DICE_UPDATE_DOMAINLIST"
+#~ msgstr "Mostra i workflow correlati"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_KEY_POLICY_FAILED"
@@ -6447,6 +6452,10 @@ msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_LABEL"
 #~ msgstr "Seriale"
+
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
+#~ msgstr ""
+#~ "Questo Workflow è definitivamente fallito e non può essere riavviato."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRW_INITIAL_DESC"

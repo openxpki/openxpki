@@ -523,10 +523,6 @@ msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "Технологические процессы отзыва сертификатов"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_DICE_UPDATE_DOMAINLIST"
-msgstr "Статус"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
 msgstr "Имя учетной записи"
 
@@ -858,6 +854,10 @@ msgstr "Экспорт"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS12"
+msgstr "Профиль пользователя"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS12_LEGACY"
 msgstr "Профиль пользователя"
 
 #, fuzzy
@@ -1333,6 +1333,10 @@ msgstr ""
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NICE_ISSUANCE_PENDING"
 msgstr "Временно блокирован"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_KEYGEN_DELAYED"
+msgstr "Имя учетной записи"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NICE_UPDATE_DOMAINLIST"
@@ -4746,10 +4750,6 @@ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_LABEL"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
@@ -9743,6 +9743,10 @@ msgstr "Имя учетной записи"
 #~ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_DICE_UPDATE_DOMAINLIST"
+#~ msgstr "Статус"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_ENROLLMENT_ERROR_KEY_POLICY_FAILED"
 #~ msgstr "Родительский технологический процесс"
 
@@ -12235,6 +12239,10 @@ msgstr "Имя учетной записи"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FLAG_NOTIFY_SEND_LABEL"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
 #~ msgstr "Дочерние технологические процессы"
 
 #, fuzzy

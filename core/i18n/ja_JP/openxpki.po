@@ -435,10 +435,6 @@ msgstr "証明書を失効する理由を指定します。"
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "遅延失効がリクエストされました。"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_DICE_UPDATE_DOMAINLIST"
-msgstr "関連するワークフローを表示する"
-
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
 msgstr "失敗"
 
@@ -715,6 +711,10 @@ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_OPENSSL_PRIVKEY"
 msgstr "OpenSSL形式"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS12"
+msgstr "PKCS12"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS12_LEGACY"
 msgstr "PKCS12"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS8_DER"
@@ -1086,6 +1086,10 @@ msgstr "パスワード無しでキーを生成しました。"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NICE_ISSUANCE_PENDING"
 msgstr "失効保留中"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_KEYGEN_DELAYED"
+msgstr "IDEA"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NICE_UPDATE_DOMAINLIST"
@@ -3862,10 +3866,6 @@ msgstr "このワークフローは失敗しました。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_LABEL"
 msgstr "失敗"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
-msgstr "このワークフローは正常に終了しました。"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_LABEL"
 msgstr " "
 
@@ -4502,6 +4502,10 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_CI_STATUS_OK_LABEL"
 #~ msgstr "作成者"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_DICE_UPDATE_DOMAINLIST"
+#~ msgstr "関連するワークフローを表示する"
 
 #~ msgid "I18N_OPENXPKI_UI_DOWNLOAD_SHOW_AS_TEXT"
 #~ msgstr "証明書を画面に表示する（PEM）"
@@ -5828,6 +5832,10 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_INITIAL_LABEL"
 #~ msgstr "初期化中"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
+#~ msgstr "このワークフローは正常に終了しました。"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CSR_ENTER_CERT_INFO_DESC"
 #~ msgstr "このワークフローは成功しました。"

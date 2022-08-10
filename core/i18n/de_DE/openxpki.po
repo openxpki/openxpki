@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2022-08-02 11:15+0200\n"
+"PO-Revision-Date: 2022-08-10 08:59+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -420,9 +420,6 @@ msgstr "die Sperrung wird nach dem angegebenen Zeitpunkt ausgeführt"
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "verzögerte Sperrung beantragt"
 
-msgid "I18N_OPENXPKI_UI_DICE_UPDATE_DOMAINLIST"
-msgstr "Aktualisiere Domainliste"
-
 msgid "I18N_OPENXPKI_UI_DNS_CHECK_FAIL"
 msgstr "FEHLER"
 
@@ -673,6 +670,9 @@ msgstr "OpenSSL Format"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS12"
 msgstr "PKCS12"
+
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS12_LEGACY"
+msgstr "PKCS12 (Kompatibilitätsmodus)"
 
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS8_DER"
 msgstr "PKCS8 (DER)"
@@ -1014,6 +1014,9 @@ msgstr "Rückgabewert hat ungültiges Format (kein Hash)"
 
 msgid "I18N_OPENXPKI_UI_NICE_ISSUANCE_PENDING"
 msgstr "Ausstellung ausstehend"
+
+msgid "I18N_OPENXPKI_UI_NICE_KEYGEN_DELAYED"
+msgstr "Schlüsselerzeugung ausstehend"
 
 msgid "I18N_OPENXPKI_UI_NICE_UPDATE_DOMAINLIST"
 msgstr "Aktualisiere Domainliste"
@@ -3765,11 +3768,6 @@ msgstr "Dieser Workflow ist fehlgeschlagen"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_FAILURE_LABEL"
 msgstr "FEHLER"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
-msgstr ""
-"Dieser Workflow ist fehlgeschlagen und kann nicht erneut gestartet werden."
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_LABEL"
 msgstr " "
 
@@ -4432,3 +4430,11 @@ msgstr "aufwecken"
 
 msgid "I18N_OPENXPKI_UI_YES"
 msgstr "ja"
+
+#~ msgid "I18N_OPENXPKI_UI_DICE_UPDATE_DOMAINLIST"
+#~ msgstr "Aktualisiere Domainliste"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
+#~ msgstr ""
+#~ "Dieser Workflow ist fehlgeschlagen und kann nicht erneut gestartet werden."
