@@ -97,8 +97,6 @@ pnpm install -g verdaccio
 nvm exec verdaccio -l 0.0.0.0:4873
 ```
 
-
-
 #### On your host machine
 
 ```bash
@@ -129,7 +127,7 @@ pnpm install
 
 After this a [rebuild](#build-production) needs to be done.
 
-### Updating dependencies
+### Update dependencies
 
 ```bash
 nvm use
@@ -141,13 +139,33 @@ pnpm install
 
 After this a [rebuild](#build-production) needs to be done.
 
-### Running Tests (currently not used)
+### Run tests
 
-```bash
-nvm use
-ember test
-ember test --server
-```
+1. Start the OpenXPKI server on port 8443, e.g. via Vagrant machine "develop"
+
+   > The Vagrant machine can be started as follows:
+   >
+   > ```bash
+   > cd vagrant/develop
+   > vagrant up && vagrant ssh
+   > ```
+   > Then in the Vagrant machine:
+   > ```bash
+   > sudo su
+   > docker start mariadb && openxpkictl start
+   > ```
+
+2. Start the Ember development server:
+
+   ```bash
+   make serve
+
+   ## The following currently fails for unknown reasons:
+   # ember test
+   # ember test --server
+   ```
+
+3. Now in your browser open http://localhost:4200/openxpki/tests
 
 ## Hints
 
