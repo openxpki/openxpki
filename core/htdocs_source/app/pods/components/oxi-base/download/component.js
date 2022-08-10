@@ -133,13 +133,14 @@ export default class OxiDownloadComponent extends Component {
     @action
     copyToClipboard(/*event*/) {
         if (this.isLink) return;
-        copy(this.rawData, { target: this.baseElement });
+        copy(this.rawData, { target: this.baseElement }); // target = DOM element where the temporary textarea will be appended,
+                                                          // to stay within a focus trap, like in a modal.
         /* eslint-disable-next-line no-console */
         console.info("Contents copied to clipboard");
     }
 
     @action
-    onInsert(element) {
+    onInit(element) {
         this.baseElement = element;
         if (this.args.autoDownload) this.download();
     }
