@@ -70,8 +70,7 @@ export default class OxiConfigService extends Service {
 
         // add current path if given path is relative
         if (! path.match(/^\//)) baseUrl += window.location.pathname;
-
-        return baseUrl.replace(/\/$/, '') + '/' + path.replace(/^\//, '');
+        return baseUrl.replace(/(tests)?\/?$/, '') + '/' + path.replace(/^\//, '');
     }
 
     get backendUrl() {
