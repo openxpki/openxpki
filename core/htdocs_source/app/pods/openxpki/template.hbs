@@ -87,6 +87,33 @@
         </div>
     </div>
 
+    {{!
+      *************************************
+      Show (error) message if no tab exists yet
+      *************************************
+    }}
+    {{#unless this.model.tabs}}
+        <div class="row">
+            <div class="col oxi-message">
+                {{#let (echo this.getStatusClass this.model.status.level) as |cssClass|}}
+                    {{#if this.model.status.message}}
+                        {{#if this.model.status.href}}
+                            <a href="{{this.model.status.href}}" target="_blank" rel="noopener noreferrer">
+                                <div class="alert {{cssClass}}">
+                                    <OxiBase::Formatted @format="nl2br" @value={{this.model.status.message}}/>
+                                </div>
+                            </a>
+                        {{else}}
+                            <div class="alert {{cssClass}}">
+                                <OxiBase::Formatted @format="nl2br" @value={{this.model.status.message}}/>
+                            </div>
+                        {{/if}}
+                    {{/if}}
+                {{/let}}
+            </div>
+        </div>
+    {{/unless}}
+
     <div class="row">
         <div class="col">
             {{!
@@ -124,7 +151,7 @@
                     <div class="tab-pane {{if entry.active "active"}}">
                         {{!
                           *************************************
-                          Messages
+                          Tab-specific messages
                           *************************************
                         }}
                         <div class="row">
