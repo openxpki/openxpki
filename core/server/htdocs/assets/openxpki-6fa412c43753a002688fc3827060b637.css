@@ -383,13 +383,13 @@ div.required input.flatpickr-input{background-color:#fff3c2}
 .oxi-btn-loading{color:#fff;background-color:#428bca;border-color:#357ebd}
 .oxi-btn-loading.active,.oxi-btn-loading:active,.oxi-btn-loading:focus,.oxi-btn-loading:hover{color:#fff;background-color:#3276b1;border-color:#285e8e}
 .oxi-button-container a.btn::before{content:"\e144";font-size:80%}
-.oxi-btn-expected:focus,.oxi-btn-expected:not(:hover),.oxi-btn-submit:focus,.oxi-btn-submit:not(:hover){color:#333;border-color:#ccc;background-color:#c9e2b3}
-.oxi-btn-optional:focus,.oxi-btn-optional:not(:hover){color:#333;border-color:#ccc;background-color:#e4e4da}
-.oxi-btn-cancel:focus,.oxi-btn-cancel:not(:hover),.oxi-btn-failure:focus,.oxi-btn-failure:not(:hover){color:#333;border-color:#ccc;background-color:#e39f9f}
-.oxi-btn-alternative:focus,.oxi-btn-alternative:not(:hover),.oxi-btn-reset:focus,.oxi-btn-reset:not(:hover){color:#333;border-color:#ccc;background-color:#ffd78c}
-.oxi-btn-exceptional:focus,.oxi-btn-exceptional:not(:hover){color:#333;border-color:#ccc;background-color:#79d1f3}
-.oxi-btn-terminate:focus,.oxi-btn-terminate:not(:hover){color:#333;border-color:#ccc;background-color:#ad7fa8}
-.oxi-btn-tile:not(:hover){background:0 0;border:1px solid transparent}
+.oxi-btn-expected,.oxi-btn-expected:focus,.oxi-btn-submit,.oxi-btn-submit:focus{color:#333;border-color:#ccc;background-color:#c9e2b3}
+.oxi-btn-optional,.oxi-btn-optional:focus{color:#333;border-color:#ccc;background-color:#e4e4da}
+.oxi-btn-cancel,.oxi-btn-cancel:focus,.oxi-btn-failure,.oxi-btn-failure:focus{color:#333;border-color:#ccc;background-color:#e39f9f}
+.oxi-btn-alternative,.oxi-btn-alternative:focus,.oxi-btn-reset,.oxi-btn-reset:focus{color:#333;border-color:#ccc;background-color:#ffd78c}
+.oxi-btn-exceptional,.oxi-btn-exceptional:focus{color:#333;border-color:#ccc;background-color:#79d1f3}
+.oxi-btn-terminate,.oxi-btn-terminate:focus{color:#333;border-color:#ccc;background-color:#ad7fa8}
+.oxi-btn-tile{background:0 0;border:1px solid transparent}
 .ember-tooltip .tooltip-inner{background-color:revert;max-width:40em}
 .ember-tooltip{max-width:40em}
 .ember-popover{background-color:#eee;border-color:#aaa;max-width:40em}
