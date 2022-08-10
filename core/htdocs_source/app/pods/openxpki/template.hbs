@@ -301,7 +301,7 @@
         <h4 class="modal-title">{{t 'error_popup.header'}}</h4>
     </Modal.header>
     <Modal.body>
-        {{html this.model.error}}
+        <OxiBase::Formatted::Arbitrary @value={{this.model.error}} />
     </Modal.body>
     <Modal.footer>
         <BsButton {{on "click" this.reload}} @type="primary">{{t 'error_popup.reload'}}</BsButton>
