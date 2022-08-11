@@ -337,7 +337,7 @@ around BUILDARGS => sub {
     my $asn = Convert::ASN1->new;
     $asn->prepare($schema) or die( "Internal error in " . __PACKAGE__ . ": " . $asn->error );
 
-    if ($data =~ m{-----BEGIN\ ([^-]+)-----\s*(.*)\s*-----END\ \1-----}xms) {
+    if ($data =~ m{\A(?!\x06)-----BEGIN\ ([^-]+)-----\s*(.*)\s*-----END\ \1-----}xms) {
         ##! 8: 'PEM data - decoding'
         $data = decode_base64($2);
     }
