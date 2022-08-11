@@ -5,17 +5,20 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10;
 
 use strict;
+use English;
 use base qw( OpenXPKI::Server::Workflow::Activity );
+
+use Crypt::PKCS10;
+use Digest::SHA qw(sha1_hex);
+use MIME::Base64;
+use Template;
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use English;
 use OpenXPKI::DN;
-use Crypt::PKCS10;
 use OpenXPKI::Serialization::Simple;
-use Template;
-use Digest::SHA qw(sha1_hex);
+use Workflow::Exception qw(configuration_error workflow_error);
 
 sub execute {
     ##! 1: 'execute'
@@ -35,6 +38,7 @@ sub execute {
     my $subject_prefix = $self->param('subject_prefix') || 'cert_';
     my $verify_signature = $self->param('verify_signature') ? 1 : 0;
 
+    my $target_key = $self->param('target_key');
 
     # Cleanup any existing values
     $context->param({
@@ -56,28 +60,52 @@ sub execute {
 
     # extract subject from CSR and add a context entry for it
     Crypt::PKCS10->setAPIversion(1);
-    my $decoded = Crypt::PKCS10->new( $pkcs10, ignoreNonBase64 => 1, verifySignature => $verify_signature);
 
-    # if decoded is not set we have either a parse error or a signature problem
-    if (!$decoded) {
-        my $error = Crypt::PKCS10->error;
-        # if this works now it is the signature
-        $decoded = Crypt::PKCS10->new($pkcs10,
-            ignoreNonBase64 => 1,
-            verifySignature => 0 );
 
-        # if its still undef the structure is broken
-        OpenXPKI::Exception->throw(
-            message => 'PKCS10 structure can not be parsed: ' . $error
-        ) unless ($decoded);
+    my $decoded = Crypt::PKCS10->new( $pkcs10,
+        ignoreNonBase64 => 1,
+        verifySignature => 0 );
 
-        CTX('log')->application()->warn("PKCS#10 signature invalid ($error)");
+    my $error;
+    $error = Crypt::PKCS10->error unless($decoded);
 
-        $param->{'csr_signature_valid'} = 0;
-    } elsif ($verify_signature) {
-        $param->{'csr_signature_valid'} = 1;
-        CTX('log')->application()->debug("PKCS#10 signature valid");
+    # try to unwrap as PKCS7 renewal request containers if allowed
+    if (!$decoded && $self->param('unwrap_pkcs7')) {
+
+        eval{
+            ##! 16: 'try to parse a PKCS7'
+            my $p7 = OpenXPKI::Crypt::PKCS7->new($pkcs10);
+            ##! 128: $p7->envelope()
+            $pkcs10 = $p7->payload();
+            ##! 32: encode_base64($pkcs10)
+            $decoded = Crypt::PKCS10->new( $pkcs10,
+                ignoreNonBase64 => 1,
+                verifySignature => 0 );
+
+            die Crypt::PKCS10->error unless($decoded);
+
+            # set target_key to enforce write back to context
+            $target_key ||= 'pkcs10';
+            $error = undef;
+            CTX('log')->application()->info("Input was PKCS7 container, unwrapped payload");
+        };
+        $error = $EVAL_ERROR if($EVAL_ERROR);
     }
+
+    workflow_error('PKCS10 structure can not be parsed', { error => $error }) unless($decoded);
+
+    if ($verify_signature) {
+        if ($decoded->checkSignature()) {
+            $param->{'csr_signature_valid'} = 1;
+            CTX('log')->application()->debug("PKCS#10 signature valid");
+        } else {
+            $param->{'csr_signature_valid'} = 0;
+            CTX('log')->application()->warn("PKCS#10 signature invalid ($error)");
+        }
+    }
+
+    # write back the cleaned PEM block if target_key is set
+    $param->{$target_key} = $decoded->csrRequest(1) if ($target_key);
 
     my %hashed_dn;
     my $csr_subject = $decoded->subject();
@@ -359,6 +387,21 @@ so you B<MUST> handle this.
 Prefix for context output keys to write the subject information into
 (cert_subject_parts, cert_san_parts, cert_subject_alt_name).
 Default is I<cert_>.
+
+=item target_key
+
+If set, the "cleaned" PKCS10 container is written back to this context
+value. This is useful if you have a "dirty" input.
+When combined with the I<unwrap_pkcs7> this receives the extracted
+PEM encodede request.
+
+=item unwrap_pkcs7
+
+Renewal requests made by e.g. windows servers come with the PEM headers
+of a "normal" PKCS10 formatted request but are enveloped into a PKCS7
+signature. When set to a true value, the class will extract the payload
+from the given container and write it back to I<target_key>. If not set,
+the container is written to I<pkcs10>.
 
 =back
 
