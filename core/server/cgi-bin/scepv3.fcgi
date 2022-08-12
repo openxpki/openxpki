@@ -110,6 +110,7 @@ while (my $cgi = CGI::Fast->new()) {
 
         if (!$response->is_server_error()) {
             my $out = $client->generate_pkcs7_response( $response );
+            $log->trace($out) if ($log->is_trace);
             $out = decode_base64($out);
             print $cgi->header(
                 -status => $response->http_status_line(),
@@ -147,6 +148,7 @@ while (my $cgi = CGI::Fast->new()) {
             'charset' => 'utf8',
         );
         print $response->error_message()."\n";
+        $log->debug($response->error_message()) if ($log->is_trace);
     } elsif ($mime eq 'text/plain') {
         print $cgi->header(
             -status => $response->http_status_line(),
@@ -155,6 +157,7 @@ while (my $cgi = CGI::Fast->new()) {
             'content-length' => length $response->result,
         );
         print $response->result;
+        $log->trace($response->result) if ($log->is_trace);
     } else {
         my $out = decode_base64($response->result);
         print $cgi->header(
@@ -164,5 +167,6 @@ while (my $cgi = CGI::Fast->new()) {
             'content-length' => length $out,
         );
         print $out;
+        $log->trace($response->result) if ($log->is_trace);
     }
 }
