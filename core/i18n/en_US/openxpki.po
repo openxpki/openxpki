@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2022-08-10 08:57+0200\n"
+"PO-Revision-Date: 2022-08-16 10:45+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -116,8 +116,17 @@ msgstr "not before"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE"
 msgstr "Profile"
 
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_FOREIGN_REALM"
+msgstr "n/a (certificate is from foreign realm)"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_HINT"
 msgstr "Show only certificates based on this profile"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_NO_ENDENTITY"
+msgstr "n/a (certificate is not an end entity)"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_UNKNOWN"
+msgstr "unknown"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE"
 msgstr "Revocation Reason"
@@ -3916,14 +3925,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_RESULT_LABEL"
 msgstr "Certificate Metadata"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_DESC"
-msgstr "The new password was persisted in the database"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_LABEL"
-msgstr "New Password Set"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
 msgstr "This workflow has finished with success and can not be restarted"
 
@@ -4191,3 +4192,11 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
 #~ msgstr "This workflow failed finally and can not be restarted"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_DESC"
+#~ msgstr "The new password was persisted in the database"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_LABEL"
+#~ msgstr "New Password Set"

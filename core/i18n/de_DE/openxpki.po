@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2022-08-10 08:59+0200\n"
+"PO-Revision-Date: 2022-08-16 10:46+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -117,8 +117,17 @@ msgstr "gültig ab"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE"
 msgstr "Profil"
 
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_FOREIGN_REALM"
+msgstr "n/a (Zertifikat nicht aus diesem Realm)"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_HINT"
 msgstr "Zertifikate die basierend auf diesem Profil erstellt wurden"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_NO_ENDENTITY"
+msgstr "n/a (kein End-Entity Zertifikat)"
+
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_UNKNOWN"
+msgstr "Profil unbekannt"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE"
 msgstr "Grund der Revozierung"
@@ -4147,17 +4156,6 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_RESULT_LABEL"
 msgstr "Zertifikat Meta-Daten"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_DESC"
-msgstr ""
-"Das Zertifikat wurde gesperrt. Bitte beachten Sie, dass die Bekanntmachung "
-"der Sperrung erst nach Ausstellung und Verteilung einer neuen Sperrliste "
-"wirksam wird."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_LABEL"
-msgstr "Zertifikat gesperrt"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
 msgstr ""
 "Dieser Workflow wurde erfolgreich abgeschlossen und kann nicht erneut "
@@ -4438,3 +4436,14 @@ msgstr "ja"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
 #~ msgstr ""
 #~ "Dieser Workflow ist fehlgeschlagen und kann nicht erneut gestartet werden."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_DESC"
+#~ msgstr ""
+#~ "Das Zertifikat wurde gesperrt. Bitte beachten Sie, dass die "
+#~ "Bekanntmachung der Sperrung erst nach Ausstellung und Verteilung einer "
+#~ "neuen Sperrliste wirksam wird."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_LABEL"
+#~ msgstr "Zertifikat gesperrt"

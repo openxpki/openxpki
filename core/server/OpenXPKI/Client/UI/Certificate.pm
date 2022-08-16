@@ -634,19 +634,6 @@ sub init_detail {
         shortlabel => $dn{CN}[0]
     });
 
-    my @fields = ( { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', format => 'link',  value => {
-            page => 'certificate!search!subject!'.uri_escape_utf8($cert->{subject}),
-            label => $self-> __prepare_dn_for_display($cert->{subject}),
-            target => '_top',
-            tooltip => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SUBJECT'
-        }});
-
-    if ($cert_attribute && $cert_attribute->{subject_alt_name}) {
-        my @sanlist = map {
-            { page => 'certificate!search!san!'.uri_escape_utf8($_), label => $_, target => '_top', tooltip => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SAN' }
-        } @{$cert_attribute->{subject_alt_name}};
-        push @fields, { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SAN', value => \@sanlist, 'format' => 'linklist' };
-    }
 
     # check if this is a entity certificate from the current realm
     my $is_local_entity = 0;
@@ -655,11 +642,51 @@ sub init_detail {
         $is_local_entity = 1;
     }
 
+    my @fields;
+
+    # Add search links to subject / SAN and profile only for local entity certificates
     if ($is_local_entity) {
-        my $cert_profile  = $self->send_command_v2( 'get_profile_for_cert', { identifier => $cert_identifier }, 1);
-        if ($cert_profile) {
-            push @fields, { label => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE', value => $cert_profile };
+
+        push @fields, { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', format => 'link',  value => {
+            page => 'certificate!search!subject!'.uri_escape_utf8($cert->{subject}),
+            label => $self-> __prepare_dn_for_display($cert->{subject}),
+            target => '_top',
+            tooltip => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SUBJECT'
+        }};
+
+        if ($cert_attribute && $cert_attribute->{subject_alt_name}) {
+            my @sanlist = map {
+                { page => 'certificate!search!san!'.uri_escape_utf8($_), label => $_, target => '_top', tooltip => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SIMILAR_SAN' }
+            } @{$cert_attribute->{subject_alt_name}};
+            push @fields, { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SAN', value => \@sanlist, 'format' => 'linklist' };
         }
+
+        my $cert_profile = $self->send_command_v2( 'get_profile_for_cert', { identifier => $cert_identifier }, 1) || 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_UNKNOWN';
+        push @fields, {
+            label => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE',
+            value => $cert_profile
+        };
+
+    # this is either from another realm or not an end-entity
+    } else {
+
+        push @fields, {
+            label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT',
+            value => $self-> __prepare_dn_for_display($cert->{subject}),
+        };
+
+        push @fields, {
+            label => 'I18N_OPENXPKI_UI_CERTIFICATE_SAN',
+            value => $cert_attribute->{subject_alt_name},
+            'format' => 'ullist'
+        } if ($cert_attribute && $cert_attribute->{subject_alt_name});
+
+
+        push @fields, {
+            label => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE',
+            value => ($cert->{req_key} ? 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_FOREIGN_REALM' : 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_NO_ENDENTITY'),
+        };
+
     }
 
     my $status_label = 'I18N_OPENXPKI_UI_CERT_STATUS_'.$cert->{status};

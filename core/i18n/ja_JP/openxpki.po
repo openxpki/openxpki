@@ -127,8 +127,20 @@ msgstr "発行日"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE"
 msgstr "プロファイル"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_FOREIGN_REALM"
+msgstr "このプロファイルに基づく証明書のみ表示します。"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_HINT"
 msgstr "このプロファイルに基づく証明書のみ表示します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_NO_ENDENTITY"
+msgstr "このプロファイルに基づく証明書のみ表示します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_UNKNOWN"
+msgstr "プロファイル"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE"
 msgstr "失効理由"
@@ -4203,14 +4215,6 @@ msgstr "メタデータが更新されました。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_RESULT_LABEL"
 msgstr "メタデータ更新"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_DESC"
-msgstr "メタデータが更新されました。"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_LABEL"
-msgstr "メタデータ更新"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
 msgstr "このワークフローは成功して終了し、再実行はできません"
 
@@ -6697,6 +6701,14 @@ msgstr "はい"
 #~ "This workflow is running in the background or at the attention of another "
 #~ "user. Use the Recheck button to update the status and see when its "
 #~ "finished."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_DESC"
+#~ msgstr "メタデータが更新されました。"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_LABEL"
+#~ msgstr "メタデータ更新"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS"
 #~ msgstr "ワークフローは成功して終了し、再実行はできません"

@@ -145,7 +145,19 @@ msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE"
 msgstr "Numero di serie del certificato"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_FOREIGN_REALM"
+msgstr "Numero di serie del certificato"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_HINT"
+msgstr "Numero di serie del certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_NO_ENDENTITY"
+msgstr "Numero di serie del certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_UNKNOWN"
 msgstr "Numero di serie del certificato"
 
 #, fuzzy
@@ -4639,14 +4651,6 @@ msgstr "Le modifiche sono state salvate in via definitiva nel database."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_RESULT_LABEL"
 msgstr "I Metadati sono stati aggiornati"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_DESC"
-msgstr "Le modifiche sono state salvate in via definitiva nel database."
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_LABEL"
-msgstr "I Metadati sono stati aggiornati"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
 msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 
@@ -7343,6 +7347,14 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SCEPGETCA_REVIEW_LABEL"
 #~ msgstr "SUCCESSO"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_DESC"
+#~ msgstr "Le modifiche sono state salvate in via definitiva nel database."
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_LABEL"
+#~ msgstr "I Metadati sono stati aggiornati"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_VALIDITY_WARNING_CERTIFICATE_DESC"

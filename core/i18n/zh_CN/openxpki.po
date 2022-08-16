@@ -122,8 +122,20 @@ msgstr "不早于"
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE"
 msgstr "配置文件"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_FOREIGN_REALM"
+msgstr "仅显示基于此配置文件的证书"
+
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_HINT"
 msgstr "仅显示基于此配置文件的证书"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_NO_ENDENTITY"
+msgstr "仅显示基于此配置文件的证书"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERTIFICATE_PROFILE_UNKNOWN"
+msgstr "配置文件"
 
 msgid "I18N_OPENXPKI_UI_CERTIFICATE_REASON_CODE"
 msgstr "吊销原因"
@@ -4039,14 +4051,6 @@ msgstr "所做的更改已保存到数据库中。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_RESULT_LABEL"
 msgstr "元数据已更新"
 
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_DESC"
-msgstr "所做的更改已保存到数据库中。"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_LABEL"
-msgstr "元数据已更新"
-
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SUCCESS_DESC"
 msgstr "此工作流程已成功完成，无法重新启动"
 
@@ -4820,6 +4824,14 @@ msgstr "是"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REVIEW_LABEL"
 #~ msgstr "Review"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_DESC"
+#~ msgstr "所做的更改已保存到数据库中。"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_SHOWMETA_SUCCESS_LABEL"
+#~ msgstr "元数据已更新"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_DESCRIPTION"
 #~ msgstr ""
