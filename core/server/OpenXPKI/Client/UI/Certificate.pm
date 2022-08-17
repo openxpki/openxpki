@@ -822,10 +822,14 @@ sub init_detail {
             attribute => "system_workflow%",
             $self->__tenant()
         }))) {
-        push @fields, { label => 'I18N_OPENXPKI_UI_CERT_RELATED_LABEL', format => 'link', value => {
-          page => 'certificate!related!identifier!'.$cert_identifier,
-            label => 'I18N_OPENXPKI_UI_CERT_RELATED_HINT'
-        }};
+        push @fields, {
+            label => 'I18N_OPENXPKI_UI_CERT_RELATED_LABEL',
+            format => 'link',
+            value => {
+                page => 'certificate!related!identifier!'.$cert_identifier,
+                label => 'I18N_OPENXPKI_UI_CERT_RELATED_HINT',
+            }
+        };
     }
 
     $self->add_section({
@@ -948,7 +952,11 @@ sub init_related {
 
     my $cert_identifier = $self->param('identifier');
 
-    my $cert = $self->send_command_v2( 'get_cert', {  identifier => $cert_identifier, format => 'DBINFO', attribute => 'system_workflow%' });
+    my $cert = $self->send_command_v2( 'get_cert', {
+        identifier => $cert_identifier,
+        format => 'DBINFO',
+        attribute => 'system_workflow%'
+    });
     $self->logger()->trace("result: " . Dumper $cert) if $self->logger->is_trace;
 
     my %dn = OpenXPKI::DN->new( $cert->{subject} )->get_hashed_content();
@@ -965,7 +973,8 @@ sub init_related {
 
     my @result;
     if (scalar @wfid) {
-        my $cert_workflows = $self->send_command_v2( 'search_workflow_instances', { id => \@wfid, check_acl => 1, $self->__tenant() });
+        my $cert_workflows = $self->send_command_v2( 'search_workflow_instances', {
+            id => \@wfid, check_acl => 1, $self->__tenant() });
         $self->logger()->trace("workflow results" . Dumper $cert_workflows) if ($self->logger()->is_trace());;
 
         my $workflow_labels = $self->send_command_v2( 'get_workflow_instance_types');
@@ -987,10 +996,10 @@ sub init_related {
         content => {
             label => 'I18N_OPENXPKI_UI_CERTIFICATE_RELATED_WORKFLOW_LABEL',
             actions => [{
-                path => 'workflow!load!wf_id!{serial}',
+                path => 'workflow!info!wf_id!{serial}',
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_OPEN_WORKFLOW_LABEL',
                 icon => 'view',
-                target => 'tab',
+                target => 'popup',
             }],
             columns => [
                 { sTitle => "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL" },
