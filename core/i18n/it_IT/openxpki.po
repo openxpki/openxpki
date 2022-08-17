@@ -82,6 +82,10 @@ msgid "I18N_OPENXPKI_UI_BULK_PENDING_REVOCATION_LABEL"
 msgstr "Richiesta di Revoca"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_RECHECK_LABEL"
+msgstr "Respingi Richiesta"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_BULK_REJECT_CRR_LABEL"
 msgstr "Respingi Richiesta"
 
@@ -1649,6 +1653,10 @@ msgstr "3 anni"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "entità / certificato non più attivi"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_RELATED_WORKFLOW_LIST"
+msgstr "Workflow"
 
 # Remove?
 #, fuzzy
@@ -4016,6 +4024,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE"
 msgstr "Consenti Retry"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_RELOAD_RELATED_LIST"
+msgstr "Suggerimenti per la compilazione dei campi del modulo:"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_CURRENT_LABEL"
 msgstr "Report Completo Certificati"
 
@@ -4091,6 +4103,14 @@ msgstr "Azione richiesta non disponibile"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_RESET_BUTTON"
 msgstr "Forza Ripristino"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REVOCATION_WORKFLOW_EXISTS_WARNING_CONFIRM_DESC"
+msgstr "Modifica le informazioni della Richiesta di Revoca"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REVOCATION_WORKFLOW_EXISTS_WARNING_CONFIRM_LABEL"
+msgstr "Modifica Richiesta"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_HINT"

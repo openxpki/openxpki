@@ -69,6 +69,10 @@ msgstr "批量批准或拒绝待定的证书吊销请求。"
 msgid "I18N_OPENXPKI_UI_BULK_PENDING_REVOCATION_LABEL"
 msgstr "证书吊销请求"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_RECHECK_LABEL"
+msgstr "拒绝选择"
+
 msgid "I18N_OPENXPKI_UI_BULK_REJECT_CRR_LABEL"
 msgstr "拒绝选择"
 
@@ -1417,6 +1421,10 @@ msgstr "3 年"
 
 msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "不支持给出的原因码"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_RELATED_WORKFLOW_LIST"
+msgstr "请求工作流程ID"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_LABEL"
@@ -3478,6 +3486,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE"
 msgstr "您当前的角色禁止访问此工作流程属性"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_RELOAD_RELATED_LIST"
+msgstr "提示填写表格字段"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_CURRENT_LABEL"
 msgstr "证书详细报告"
 
@@ -3547,6 +3559,18 @@ msgstr "请求的操作不可用-打开当前状态"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_RESET_BUTTON"
 msgstr "返回"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REVOCATION_WORKFLOW_EXISTS_WARNING_CONFIRM_DESC"
+msgstr ""
+"您可以继续您的请求，但是没有有效的令牌可用于按要求的日期颁发证书！ 您需要先添"
+"加一个新的CA令牌，然后才能完成此请求！"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REVOCATION_WORKFLOW_EXISTS_WARNING_CONFIRM_LABEL"
+msgstr ""
+"您可以继续您的请求，但是没有有效的令牌可用于按要求的日期颁发证书！ 您需要先添"
+"加一个新的CA令牌，然后才能完成此请求！"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_HINT"

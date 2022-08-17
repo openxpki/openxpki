@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2022-08-16 10:45+0200\n"
+"PO-Revision-Date: 2022-08-17 11:36+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -61,6 +61,9 @@ msgstr "Bulk approve or reject outstanding certificate revocation requests."
 
 msgid "I18N_OPENXPKI_UI_BULK_PENDING_REVOCATION_LABEL"
 msgstr "Certificate Revocation Requests"
+
+msgid "I18N_OPENXPKI_UI_BULK_RECHECK_LABEL"
+msgstr "Re-run Checks"
 
 msgid "I18N_OPENXPKI_UI_BULK_REJECT_CRR_LABEL"
 msgstr "Reject Selected"
@@ -1344,6 +1347,9 @@ msgstr "3 years"
 
 msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "Reason code given is not supported"
+
+msgid "I18N_OPENXPKI_UI_RELATED_WORKFLOW_LIST"
+msgstr "Related Workflows"
 
 msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_LABEL"
 msgstr "Report Configuration"
@@ -3358,6 +3364,9 @@ msgstr "Run State"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_PROPERTY_ACCESS_NOT_ALLOWED_FOR_ROLE"
 msgstr "Access to this workflow property is forbidden for your current role"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_RELOAD_RELATED_LIST"
+msgstr "Re-evaluate Related"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_CURRENT_LABEL"
 msgstr "Current Certificates"
 
@@ -3422,6 +3431,17 @@ msgstr "Requested action not available - opening current state"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_RESET_BUTTON"
 msgstr "Go Back"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REVOCATION_WORKFLOW_EXISTS_WARNING_CONFIRM_DESC"
+msgstr ""
+"Other workflows to request revocation of this certificate were found. Please "
+"terminate those workflows now to avoid conflicts while performing the "
+"revocation. Failure to handle this situation properly might cause broken "
+"workflows! Use the 'Re-evaluate Related' button to update the status of this "
+"workflow after closing others."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REVOCATION_WORKFLOW_EXISTS_WARNING_CONFIRM_LABEL"
+msgstr "Conflicting Workflows Found"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_HINT"
 msgstr ""

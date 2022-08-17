@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2022-08-16 10:46+0200\n"
+"PO-Revision-Date: 2022-08-17 10:27+0200\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -61,6 +61,9 @@ msgstr "Ausstehende Sperranträge gesammelt bestätigen oder ablehnen."
 
 msgid "I18N_OPENXPKI_UI_BULK_PENDING_REVOCATION_LABEL"
 msgstr "Sperranträge"
+
+msgid "I18N_OPENXPKI_UI_BULK_RECHECK_LABEL"
+msgstr "Erneut überprüfen"
 
 msgid "I18N_OPENXPKI_UI_BULK_REJECT_CRR_LABEL"
 msgstr "Ausgewählte ablehnen"
@@ -1359,6 +1362,9 @@ msgstr "3 Jahre"
 
 msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "Sperrgrund nicht unterstützt"
+
+msgid "I18N_OPENXPKI_UI_RELATED_WORKFLOW_LIST"
+msgstr "Verwandte Workflows"
 
 msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_LABEL"
 msgstr "Report Konfiguration"
@@ -3523,6 +3529,9 @@ msgstr ""
 "Der Zugriff auf diese Workfloweigenschaft ist für ihre Benutzerrolle nicht "
 "gestattet"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_RELOAD_RELATED_LIST"
+msgstr "Aktualisiere Verwandte"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_CURRENT_LABEL"
 msgstr "Aktuelle Zertifikate"
 
@@ -3587,6 +3596,16 @@ msgstr "Die gewünschte Aktion ist nicht verfügbar - öffne aktuellen Status"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_RESET_BUTTON"
 msgstr "zurück"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REVOCATION_WORKFLOW_EXISTS_WARNING_CONFIRM_DESC"
+msgstr ""
+"Es wurden weitere Workflows zur Sperrung dieses Zertifikates gefunden. Bitte "
+"beenden Sie diese bevor Sie fortfahren, da durch parallele Sperranträge "
+"Konflikte bei der Workflos-Ausführung entstehen können! Aktualisieren den "
+"Status dieses Workflow mittels 'Aktualisere Verwandte'."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REVOCATION_WORKFLOW_EXISTS_WARNING_CONFIRM_LABEL"
+msgstr "Konkurrierende Sperranträge"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_HINT"
 msgstr ""

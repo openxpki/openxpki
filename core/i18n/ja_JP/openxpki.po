@@ -69,6 +69,10 @@ msgstr "証明書失効リクエストは一括での承認/否認をします�
 msgid "I18N_OPENXPKI_UI_BULK_PENDING_REVOCATION_LABEL"
 msgstr "証明書失効リクエスト"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_BULK_RECHECK_LABEL"
+msgstr "選択拒否"
+
 msgid "I18N_OPENXPKI_UI_BULK_REJECT_CRR_LABEL"
 msgstr "選択拒否"
 
@@ -1451,6 +1455,10 @@ msgstr "3年"
 
 msgid "I18N_OPENXPKI_UI_REASON_CODE_NOT_SUPPORTED"
 msgstr "指定された理由コードはサポートされていません"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_RELATED_WORKFLOW_LIST"
+msgstr "ワークフローIDのリクエスト"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_REPORT_CONFIG_LABEL"
@@ -3627,6 +3635,10 @@ msgstr ""
 "現在の権限ではこのワークフロープロパティーへのアクセスは禁止されています"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_RELOAD_RELATED_LIST"
+msgstr "フォームフィールドを記入するためのヒント"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_REPORT_CURRENT_LABEL"
 msgstr "証明書の詳細レポート"
 
@@ -3696,6 +3708,17 @@ msgstr "リクエストされたアクションは利用できません"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_RESET_BUTTON"
 msgstr "戻る"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REVOCATION_WORKFLOW_EXISTS_WARNING_CONFIRM_DESC"
+msgstr ""
+"リクエストを続行できますが、リクエストされた日付の証明書を発行するための有効"
+"なトークンがありません！このリクエストを完了するには、新しいCAトークンを追加"
+"する必要があります！"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_REVOCATION_WORKFLOW_EXISTS_WARNING_CONFIRM_LABEL"
+msgstr "CAライフタイムの不一致"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_HINT"
