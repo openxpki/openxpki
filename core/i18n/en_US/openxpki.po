@@ -1789,7 +1789,7 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CLEANUP_DESC"
 msgstr "Cleanup the workflow"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CLEANUP_LABEL"
-msgstr "Finish"
+msgstr "Cleanup"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CREATE_CRR_DESC"
 msgstr ""

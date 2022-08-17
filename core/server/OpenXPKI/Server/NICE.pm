@@ -495,9 +495,10 @@ If the fetch finally failed, it should unset the cert_identifier.
 
 =head2 revokeCertificate
 
-Request the ca to add this certificate to its revocation list. Expects the
-serial of the certificate revocation request. If the given reason is not
-supported by the backend, "unspecified" should be used.
+Request the ca to add this certificate to its revocation list. Expects
+the cert_identifer (mandatory) and optional additional information
+about the revocation. Some backends can handle an extra parameter hash
+at the end of the list.
 
 =head3 Parameters
 
@@ -505,9 +506,13 @@ supported by the backend, "unspecified" should be used.
 
 =item cert_identifier - the certificate identifier of the cert to revoke
 
-=item reason_code
+=item reason_code - the reason code (depends on the backend)
 
-=item invalidity_time
+=item revocation_time - time of revocation, epoch
+
+=item invalidity_time - invalidity time (for keyCompromise), epoch
+
+=item hold_instruction_code - depends on the backend
 
 =back
 

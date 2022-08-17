@@ -32,33 +32,41 @@ sub execute {
     );
 
     if (!defined $cert) {
-        workflow_error('nice certificate to be revoked not found in database');
+        workflow_error('certificate to be revoked not found in database');
     }
+
+    ##! 64: $cert
 
     if ($cert->{pki_realm} ne CTX('session')->data->pki_realm) {
         workflow_error('certificate is not in the current realm');
     }
 
     if ($cert->{status} ne 'ISSUED') {
-        workflow_error('certificate to be revoked is not in state "issued"');
+        workflow_error('certificate to be revoked is not in state "issued"', status => $cert->{status});
     }
-
-    if (!$cert->{reason_code}) {
-        workflow_error('nice certificate to be revoked has no reason code set');
-    }
-
-    CTX('log')->application()->info("start cert revocation for identifier $cert_identifier, workflow " . $workflow->id);
 
     my $param = $self->param();
     delete $param->{'cert_identifier'};
+    # prior to v3.22 the revocation was a two step process where the revocation information was
+    # persisted into the table using PersistCRR and this method only set the status
+    # for backward compatibility we use information from the cert table as fallback before reading the context
+    my $reason_code     = $self->param('reason_code') // $cert->{reason_code} || $context->param('reason_code') || 'unspecified';
+    my $revocation_time = $self->param('revocation_time') // 0;
+    my $invalidity_time = $self->param('invalidity_time') // $cert->{'invalidity_time'} || $context->param('invalidity_time') || 0;
+    my $hold_instruction_code = $self->param('hold_instruction_code') // $context->param('hold_instruction_code');
+
+
+    CTX('log')->application()->info("start cert revocation for identifier $cert_identifier, workflow " . $workflow->id);
 
     my $res = $nice_backend->revokeCertificate(
-        $cert->{identifier},
-        $cert->{reason_code},
-        $cert->{revocation_time},
-        $cert->{invalidity_time},
+        $cert_identifier,
+        $reason_code,
+        $revocation_time,
+        $invalidity_time,
+        $hold_instruction_code,
         $param
     );
+    ##! 64: $res
     if (!$res) {
         $self->pause('I18N_OPENXPKI_UI_NICE_BACKEND_ERROR');
     } elsif (ref $res eq 'HASH') {
@@ -70,12 +78,12 @@ sub execute {
         }
     }
 
-    ##! 32: 'Add workflow id ' . $workflow->id.' to cert_attributes ' for cert ' . $set_context->{cert_identifier}
+    ##! 32: 'Add workflow id ' . $workflow->id . ' to cert_attributes for cert ' . $cert_identifier
     CTX('dbi')->insert(
         into => 'certificate_attributes',
         values => {
             attribute_key => AUTO_ID,
-            identifier => $cert->{identifier},
+            identifier => $cert_identifier,
             attribute_contentkey => 'system_workflow_crr',
             attribute_value => $workflow->id,
         }
@@ -93,4 +101,26 @@ OpenXPKI::Server::Workflow::Activity::NICE::RevokeCertificate;
 
 Start certificate revocation using the configured NICE backend.
 
-See OpenXPKI::Server::NICE::revokeCertificate for details
+Does no longer require to use CRR::PersistRequest before, revocation
+details are now set via parameters or read direclty from the context
+if they are not set in the certificate table already.
+
+The paramters are passed to the selected backend, see
+OpenXPKI::Server::NICE::revokeCertificate and the backend
+implementation for details.
+
+=head1 Parameters
+
+=head2 Input
+
+=over
+
+=item reason_code
+
+=item revocation_time
+
+=item invalidity_time
+
+=item hold_instruction_code
+
+=back

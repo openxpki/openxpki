@@ -20,12 +20,7 @@ extends 'OpenXPKI::Server::NICE';
 with qw(
     OpenXPKI::Server::NICE::Role::KeyGenerationLocal
     OpenXPKI::Server::NICE::Role::KeyInDataPool
-);
-
-has use_revocation_id => (
-    is => 'rw',
-    isa => 'Bool',
-    default => 0,
+    OpenXPKI::Server::NICE::Role::RevokeCertificate
 );
 
 sub BUILD {
@@ -317,75 +312,6 @@ sub issueCertificate {
 
 sub renewCertificate {
     return issueCertificate( @_ );
-}
-
-sub revokeCertificate {
-
-    my $self = shift;
-    my $cert_identifier = shift;
-
-    # default mode - do not use revocation_id
-    if (!$self->use_revocation_id()) {
-        CTX('dbi')->update(
-            table => 'certificate',
-            set => { status => 'CRL_ISSUANCE_PENDING' },
-            where => {
-               identifier => $cert_identifier,
-            },
-        );
-        return 1;
-    }
-
-    ##! 16: 'Start database query to write revocation_id'
-    CTX('dbi')->update(
-        table => 'certificate',
-        set => {
-            status => 'CRL_ISSUANCE_PENDING',
-            revocation_id => \[ '(SELECT coalesce(max(revocation_id)+1, 1) FROM certificate) '],
-        },
-        where => {
-           identifier => $cert_identifier,
-           revocation_id => undef,
-        }
-    );
-
-    ##! 32: 'Query to set revocation_id was accepted by dbi'
-    my $cert = CTX('dbi')->select_one(
-        from => 'certificate',
-        columns => ['revocation_id'],
-        where => { identifier => $cert_identifier },
-    );
-    ##! 32: 'Got revocation id back from database ' . $cert->{'revocation_id'}
-
-    return { revocation_id => $cert->{'revocation_id'} };
-
-}
-
-sub checkForRevocation {
-
-    my $self = shift;
-    my $cert_identifier  = shift;
-
-    # As the local crl issuance process will set the state in the certificate
-    # table directly, we get the certificate status from the local table
-
-    my @cols = ('status');
-    if ($self->use_revocation_id()) {
-        push @cols, 'revocation_id';
-    }
-
-    ##! 16: 'Checking revocation status'
-    my $cert = CTX('dbi')->select_one(
-        from => 'certificate',
-        columns => \@cols,
-        where => { identifier => $cert_identifier },
-    );
-
-    CTX('log')->application()->debug("Check for revocation of $cert_identifier, result: " . $cert->{status});
-
-    ##! 32: 'certificate status ' . $cert->{status}
-    return ($cert->{status} eq 'REVOKED') ? ($cert->{revocation_id} || 1) : 0;
-
 }
 
 

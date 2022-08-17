@@ -20,6 +20,8 @@ sub execute
     my $serializer = OpenXPKI::Serialization::Simple->new();
     my $dbi        = CTX('dbi');
 
+    CTX('log')->deprecated->error('Using PersistRequest for revocations is deprecated - see NICE::RevokeCertificate');
+
     my $identifier = $self->param('cert_identifier') // $context->param('cert_identifier');
 
     my $cert = $dbi->select_one(

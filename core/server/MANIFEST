@@ -565,6 +565,7 @@ OpenXPKI/Server/NICE/Local.pm
 
 OpenXPKI/Server/NICE/Role/KeyGenerationLocal.pm
 OpenXPKI/Server/NICE/Role/KeyInDataPool.pm
+OpenXPKI/Server/NICE/Role/RevokeCertificate.pm
 
 OpenXPKI/Server/Workflow/Activity/NICE/CallMethod.pm
 OpenXPKI/Server/Workflow/Activity/NICE/CheckForRevocation.pm
