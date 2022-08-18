@@ -15,11 +15,12 @@ The default wrapper looks for its config file at ``/etc/openxpki/rpc/default.con
 The config uses plain ini format, a default is deployed by the package::
 
   [global]
-  log_config = /etc/openxpki/rpc/log.conf
-  log_facility = client.rpc
   socket = /var/openxpki/openxpki.socket
   locale_directory: /usr/share/locale
   default_language: en_US
+
+  [logger]
+  log_level = WARN
 
   [auth]
   stack = _System
@@ -31,9 +32,9 @@ The config uses plain ini format, a default is deployed by the package::
   [output]
   use_http_status_codes=0
 
-The global/auth parameters are described in the common wrapper documentation
-(:ref:`subsystem-wrapper`). Config path extension and TLS Authentication is
-supported.
+The global/auth/logger parameters are described in the common wrapper
+documentation (:ref:`subsystem-wrapper`). Config path extension and
+TLS Authentication is supported.
 
 
 TLS Authentication

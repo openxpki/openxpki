@@ -16,10 +16,11 @@ The default wrapper looks for its config file at ``/etc/openxpki/scep/default.co
 The config uses plain ini format, a default is deployed by the package::
 
   [global]
-  log_config = /etc/openxpki/soap/log.conf
-  log_facility = client.soap
   socket = /var/openxpki/openxpki.socket
   modules = OpenXPKI::SOAP::Revoke OpenXPKI::SOAP::Smartcard
+
+  [logger]
+  log_level = WARN
 
   [auth]
   stack = _System

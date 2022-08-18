@@ -112,6 +112,34 @@ has 'logger' => (
     builder => '__init_logger',
 );
 
+=head3 logconf
+
+The default configuration for the logger when created from the I<logger>
+section of the global config file. This contains the details for a file
+appender, minimum configuration is to set the loglevel, it might also be
+useful to set a custom filename, the filename is used as pattern and
+expanded with the value of I<service>.
+
+    [logger]
+    log_level = WARN
+    filename  = /var/log/openxpki/%s.log
+
+=cut
+
+has 'logconf' => (
+    is => 'rw',
+    isa => 'HashRef',
+    default => sub { return {
+        recreate    => 1,
+        recreate_check_interval => 120,
+        filename    => '/var/log/openxpki/%s.log',
+        layout      => 'Log::Log4perl::Layout::PatternLayout',
+        'layout.ConversionPattern' => '%d %p{3} %m []%n',
+        syswrite    => 1,
+        utf8        => 1
+    }}
+);
+
 =head3 default
 
 Accessor to the default configuration, usually read from I<default.conf>.
@@ -425,9 +453,50 @@ sub __init_logger {
     my $self = shift;
     my $config = $self->default();
 
-    OpenXPKI::Log4perl->init_or_fallback( $config->{global}->{log_config} );
+    # if no logger section was found we use the log settings from global
+    # if those are also missing this falls back to a SCREEN appender
+    if (!$config->{logger}) {
+        OpenXPKI::Log4perl->init_or_fallback( $config->{global}->{log_config} );
+        return Log::Log4perl->get_logger($config->{global}->{log_facility} || '');
+    }
 
-    return Log::Log4perl->get_logger($config->{global}->{log_facility} || '');
+    # logger section is merged with the default config from the class
+    my $conf = {
+        %{$self->logconf()},
+        %{$config->{logger}}
+    };
+
+    # extract the loglevel from the config hash
+    my $loglevel = uc($conf->{log_level}) || 'WARN';
+    delete $conf->{log_level};
+
+    # facility is constructed from service
+    my $log_facility = 'client.'.$self->service();
+
+    # fill in the service name into the filename pattern
+    $conf->{filename} = sprintf($conf->{filename}, $self->service());
+
+    # add the MDC part to the conversion pattern in case it is not set (empty [] in string)
+    if ($conf->{'layout.ConversionPattern'} && $conf->{'layout.ConversionPattern'} =~ m{\[\]}) {
+        if ($self->service() eq 'webui') {
+            $conf->{'layout.ConversionPattern'} =~ s{\[\]}{[pid=%P|sid=%X{sid}]};
+        } else {
+            $conf->{'layout.ConversionPattern'} =~ s{\[\]}{[pid=%P|ep=%X{endpoint}]};
+        }
+    }
+
+    # assemble the final hash
+    my $log_config = {
+        "log4perl.category.$log_facility" => "$loglevel, Logfile",
+        'log4perl.appender.Logfile'       => 'Log::Log4perl::Appender::File',
+    };
+    map {
+        $log_config->{'log4perl.appender.Logfile.'.$_} = $conf->{$_};
+    } keys %{$conf};
+
+    OpenXPKI::Log4perl->init_or_fallback( $log_config );
+    return Log::Log4perl->get_logger( $log_facility );
+
 }
 
 1;

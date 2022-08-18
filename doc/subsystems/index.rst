@@ -39,28 +39,45 @@ Global Default Config
 ^^^^^^^^^^^^^^^^^^^^^
 
 The name of the global config file must be ``default.conf`` and consists
-of a [global] section holding information on logger and socket::
+of three section holding information on logger, auth and socket::
 
     [global]
-    log_config = /etc/openxpki/rpc/log.conf
-    log_facility = client.rpc
     socket = /var/openxpki/openxpki.socket
+
+    [logger]
+    log_level = WARN
 
     [auth]
     stack = _System
 
+**socket** Full path of the OpenXPKI socket file
+
+**log_level** A Log4perl log level, the logger will be auto created to use
+a Log4perl Appender with a logfile at /var/log/openxpki/<servicename>.log.
+
+**stack** Name of the authentication stack, default is to connect as
+Anonymous, all additional attributes are passed unaltered to the
+authentication layer. See OpenXPKI::Client::Simple.
+
+Alternative logger configuration (default before v3.22)
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+If you want to have more control over the logger, omit the logger section,
+create a Log4perl configuration file and add it in the I<global> section:
+
+  [global]
+  ....other setting....
+  log_config = /etc/openxpki/rpc/log.conf
+  log_facility = client.rpc
+
 **log_config** must point to the Log4perl configuration file that should be
-used by this wrapper. If the file is not found or the opion is missing, the
+used by this wrapper. If the file is not found or the option is missing, a
 default logger writing to STDERR is used.
 
 **log_facility** The facility name to log with, this is useful if you want to
 log to the same file from multiple different systems.
 
-**socket** Full path of the OpenXPKI socket file
-
-**stack** Name of the authentication stack, default is to connect as
-Anonymous, all additional attributes are passed unaltered to the
-authentication layer. See OpenXPKI::Client::Simple.
+See OpenXPKI::Client:Config for more details on logger configuration.
 
 Config Path Expansion
 ^^^^^^^^^^^^^^^^^^^^^^

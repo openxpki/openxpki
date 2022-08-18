@@ -15,20 +15,28 @@ Wrapper Configuration
 The default wrapper looks for its config file at ``/etc/openxpki/scep/default.conf``.
 The config uses plain ini format, a default is deployed by the package::
 
-    [global]
-    log_config = /etc/openxpki/scep/log.conf
-    log_facility = client.scep
-    socket=/var/openxpki/openxpki.socket
-    realm=democa
+  [global]
+  socket=/var/openxpki/openxpki.socket
+  realm=democa
+  servername=generic
 
-    iprange=0.0.0.0/0
-    servername=scep-server-1
-    encryption_algorithm=3DES
+  [logger]
+  # A loglevel of DEBUG MIGHT disclose sensitive user input data
+  # A loglevel of TRACE WILL dump any communication unfiltered
+  log_level = INFO
+
+  [auth]
+  stack=_System
+
+  # OpenXPKI supports mapping additional URL Parameters to the workflow
+  # Those must be whitelisted here for security reasons
+  [PKIOperation]
+  param = signature
 
 Parameters
 ^^^^^^^^^^
 
-**log_config/log_facility/socket**
+**logger/auth/socket**
 
 Described in the common wrapper documentation (:ref:`subsystem-wrapper`).
 
