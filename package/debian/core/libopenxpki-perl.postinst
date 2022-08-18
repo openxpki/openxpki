@@ -74,13 +74,16 @@ case "$1" in
         chown -R openxpki:root /etc/openxpki/
 
         # Fix directory permissions
+        # socket directory
         chown openxpki:openxpki /var/openxpki
-        chown openxpki:openxpki /var/log/openxpki
-        # As apache is in the openxpki group this allows writing the UI logs
-        chmod 4775 /var/log/openxpki
+        chmod 755 /var/openxpki
 
-        # add apache user to openxpki group (to allow connecting the socket)
-        usermod -a -G openxpki www-data
+        # Log directory needs to be writable by the server and the apache
+        # apache creates the files with his primary group so we need
+        # the group to have write permission on the log directory
+        chown openxpki:www-data /var/log/openxpki
+        # to prevent apache from deleting the server log we add the sticky bit
+        chmod 1775 /var/log/openxpki
 
         # create index.html as symlink to default.html
         test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/index.html
