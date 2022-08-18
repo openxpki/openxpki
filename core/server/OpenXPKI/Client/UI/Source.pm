@@ -6,10 +6,12 @@ package OpenXPKI::Client::UI::Source;
 =head1 OpenXPKI::Client::UI::Source
 
 Load content from disk and output it. The path to the content files is
-created from the predefined source path plus the realm name. The basename
-of the file must be passed as parameter I<file> in the query, the extension
-is added by the class. Note that file names are sanitzed and must not
-contain characters other then I<a-zA-Z0-9_->
+created from the predefined source path plus the realm name. If you want
+to reuse content for multiple realms, create a folder _global which is
+always checked if there is no dedicated folder for the current realm.
+The basename of the file must be passed as parameter I<file> in the query,
+the extension is added by the class. Note that file names are sanitzed and
+must not contain characters other then I<a-zA-Z0-9_->
 
 =cut
 
@@ -130,10 +132,20 @@ sub _build_path {
     }
 
     my $realm_path = $self->_session->param('pki_realm') || 'default';
-    $realm_path .= '/';
 
-    my $path = $self->_basepath(). $realm_path . $file. '.' . $ext;
+    my $path = $self->_basepath();
+    # Check if there is a directory for this realm
+    if (-d $path.$realm_path) {
+        $path .= $realm_path;
+    } elsif (-d $path.'_global') {
+        $path .= '_global'
+    } else {
+        $self->logger()->error('No realm and also no global directory found');
+        $self->_notfound();
+        return $self;
+    }
 
+    $path .= "/$file.$ext";
     $self->logger()->debug('Try to source file from ' . $path);
 
     if (! -f $path) {
