@@ -115,6 +115,7 @@ while (my $cgi = CGI::Fast->new()) {
             print $cgi->header(
                 -status => $response->http_status_line(),
                 -type => 'application/x-pki-message',
+                -charset => '',
                 'content-length' => length $out,
             );
             print $out;
