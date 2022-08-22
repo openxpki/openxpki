@@ -63,9 +63,9 @@ case "$1" in
 
             # static home
             if [ ! -d /var/www/static ]; then
-                mkdir -p -m755 /var/www/static/democa
-                chown www-data:www-data /var/www/static/democa
-                cp /usr/share/doc/libopenxpki-perl/examples/home.html /var/www/static/democa/home.html
+                mkdir -p -m755 /var/www/static/_global/
+                chown www-data:www-data /var/www/static/_global/
+                cp /usr/share/doc/libopenxpki-perl/examples/home.html /var/www/static/_global/home.html
             fi;
 
         fi;
