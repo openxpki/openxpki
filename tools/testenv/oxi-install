@@ -108,8 +108,8 @@ test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/ind
 # Community config: copy home.html
 if [ -e $OXI_TEST_SAMPLECONFIG_DIR/contrib/home.html ]; then
     echo -e "- copy static home.html"
-    mkdir -p /var/www/static/democa
-    cp $OXI_TEST_SAMPLECONFIG_DIR/contrib/home.html /var/www/static/democa/home.html
+    mkdir -p /var/www/static/_global
+    cp $OXI_TEST_SAMPLECONFIG_DIR/contrib/home.html /var/www/static/_global/home.html
 fi
 
 # Set version so Makefile.PL does not need "vergen" (which we will not copy to $OXI_CORE_DIR)
