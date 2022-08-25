@@ -59,6 +59,7 @@ component:
     submit: "Send"
     reset: "Reset"
     missing_value: "Please specify a value"
+    validation_failed: "Value failed allowed expression"
   oxisection_grid:
     select_all: "all"
   oxi_download:

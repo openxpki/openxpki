@@ -59,6 +59,7 @@ component:
     submit: "Senden"
     reset: "Zurücksetzen"
     missing_value: "Fehlende Eingabe - bitte ergänzen"
+    validation_failed: "Der Wert entspricht nicht dem geforderten Format"
   oxisection_grid:
     select_all: "alle"
   oxi_download:

@@ -226,6 +226,21 @@ export default class OxiSectionFormComponent extends Component {
         field.value = value;
         this.setFieldError(field, null);
 
+        // check validation regex
+        if (field.ecma_match) {
+            try {
+                let re = new RegExp(field.ecma_match);
+                if (! re.test(field.value)) {
+                    this.setFieldError(field, this.intl.t('component.oxisection_form.validation_failed'));
+                    return Promise.resolve();
+                }
+            }
+            catch (err) {
+                /* eslint-disable-next-line no-console */
+                console.debug(`Invalid validation regex for field ${field.name}: ecma_match = ${field.ecma_match}.\n${err}`);
+            }
+        }
+
         // action on change?
         if (!field.actionOnChange) { return Promise.resolve() }
 
