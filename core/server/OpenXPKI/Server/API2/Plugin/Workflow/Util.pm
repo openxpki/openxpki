@@ -404,6 +404,8 @@ sub get_wf_info {
         ? $args{workflow}
         : CTX('workflow_factory')->get_workflow({ ID => $args{id} });
 
+    ##! 2: 'workflow type = ' . $workflow->type
+
     my $head = CTX('config')->get_hash([ 'workflow', 'def', $workflow->type, 'head' ]);
 
     my $basic_wf_info = {
@@ -425,6 +427,8 @@ sub get_wf_info {
         }
     };
 
+    ##! 64: Dumper($basic_wf_info) unless $args{with_ui_info}
+
     return $basic_wf_info unless $args{with_ui_info};
 
     my $action_state_info = $self->factory->get_action_and_state_info(
@@ -435,7 +439,7 @@ sub get_wf_info {
         { %{$workflow->context->param } }, # make a copy
     );
 
-    return {
+    my $result = {
         # workflow => { ... }
         %{ $basic_wf_info },
         # activity => { ... }
@@ -444,6 +448,10 @@ sub get_wf_info {
         # handles => [ ... ]
         handles => $workflow->get_global_actions(),
     };
+
+    ##! 64: Dumper($result)
+
+    return $result;
 }
 
 =head2 watch
