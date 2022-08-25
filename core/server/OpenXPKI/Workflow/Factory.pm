@@ -112,10 +112,10 @@ sub list_workflow_titles {
 
 Return the UI info for the named action.
 
-Todo: Some of this code is duplicated in the OpenXPKI::Workflow::Config - might
-be useful to merge this into a helper. Might be useful in the API.
-
 =cut
+
+# TODO: Some of this code is duplicated in the OpenXPKI::Workflow::Config - might be useful to merge this into a helper. Might be useful in the API.
+
 sub get_action_info {
     my $self = shift;
     my $action_name = shift;
@@ -185,9 +185,9 @@ sub get_field_info {
 
     # Check for option tag and do explicit calls to ensure recursive resolving.
     # This code is duplicated in OpenXPKI::Server::API2::Plugin::Profile::Util
-    # as we need the same syntax in the profiles - TODO move to common API
+    # as we need the same syntax in the profiles
+    # TODO move to common API
     if ($field->{option}) {
-
         my $mode = $conn->get( [ @field_path, 'option', 'mode' ] ) || 'list';
         my @option;
         if ($mode eq 'keyvalue') {

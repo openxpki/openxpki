@@ -281,6 +281,7 @@ sub __process_fields {
         my $match = $conn->get( [ @path, 'match' ] ) || '';
 
         ##! 64: "Adding basic validator for $context_key with $type:$is_array:$is_required:$match"
+        # this string will be interpreted in OpenXPKI::Server::Workflow::Validator::BasicFieldType
         $field->{basic_validator} = sprintf ("%s:%s:%01d:%01d:%s", $context_key, $type, $is_array, $is_required, $match);
 
         push @result, $field;
@@ -341,7 +342,7 @@ sub __process_actions {
 
         ##! 32: 'Basic validator ' . Dumper \@basic_validator
 
-        # add basic validator - if required
+        # add basic validator - if required (class: OpenXPKI::Server::Workflow::Validator::BasicFieldType)
         push @validators, { name => '_internal_basic_field_type', arg => \@basic_validator } if (scalar @basic_validator > 0);
 
         # Attach validators - name => $name, arg  => [ $value ]
