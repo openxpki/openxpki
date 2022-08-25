@@ -27,7 +27,7 @@ sub execute {
     my $fh;
     my $buffer;
 
-    
+
     my $valid_at;
     if ($self->param('valid_at')) {
        $valid_at = OpenXPKI::DateTime::get_validity({
@@ -58,11 +58,27 @@ sub execute {
         tenant => ($workflow->attrib('tenant') || ''),
     };
 
-    # try to read those from the activity config
-    foreach my $key (qw(cutoff_notbefore cutoff_notafter include_revoked include_expired unique_subject profile subject head delimiter format tenant)) {
-        if (defined $self->param($key)) {
-            $p->{$key} = $self->param($key);
+    my @param = qw(cutoff_notbefore cutoff_notafter include_revoked include_expired unique_subject profile subject head delimiter format tenant);
+    my $query_attr;
+
+
+    foreach my $key ($self->param()) {
+        # we are not interessted in undef parameters
+        next unless defined $self->param($key);
+        ##! 64: $key
+        # keys for supported attributes
+        if ($key =~ /\A(meta_|system_|subject_alt_name)\z/) {
+            ##! 32: 'Add as attribute ' . $key
+            $query_attr->{$key} = $self->param($key);
+
+            $query_attr->{$key} = undef
+                if (ref $query_attr->{$key} eq '' && $query_attr->{$key} eq '<undef>');
+            next;
         }
+        # general setting parameters
+        next unless (grep { $key eq $_ } @param);
+        ##! 32: 'Add as param ' . $key
+        $p->{$key} = $self->param($key);
     }
 
 
@@ -73,27 +89,41 @@ sub execute {
     my $tt = OpenXPKI::Template->new();
     if ($report_config) {
         my $config = CTX('config');
-
+        ##! 16: 'Loading config ' . $report_config
         # override selector config
-        foreach my $key (qw(cutoff_notbefore cutoff_notafter include_revoked include_expired unique_subject profile subject head delimiter format tenant)) {
-            if ($config->exists(['report', $report_config, $key])) {
-
-                # profile and subject can be a list
-                if ($key eq 'profile' || $key eq 'subject') {
-                    my @opt = $config->get_scalar_as_list(['report', $report_config, $key]);
-                    $p->{$key} = \@opt;
+        foreach my $key ($config->get_keys(['report', $report_config ])) {
+            ##! 64: $key
+            if ($key =~ /\A(meta_|system_|subject_alt_name)/) {
+                ##! 32: 'Add as attribute ' . $key
+                my @val = $config->get_scalar_as_list(['report', $report_config, $key]);
+                if (scalar @val > 1) {
+                    $query_attr->{$key} = [ @val ];
+                } elsif ($val[0] eq '<undef>') {
+                    $query_attr->{$key} = undef;
+                } elsif ($val[0] =~ m{[%\?]}) {
+                    $query_attr->{$key} = { '-like' => $val[0] };
                 } else {
-                    $p->{$key} = $config->get(['report', $report_config, $key]);
+                    $query_attr->{$key} = $val[0];
                 }
+                next;
+            }
+            # general setting parameters
+            next unless (grep { $key eq $_ } @param);
+
+            # profile and subject can be a list
+            if ($key eq 'profile' || $key eq 'subject') {
+                $p->{$key} = [ $config->get_scalar_as_list(['report', $report_config, $key]) ];
+            } else {
+                $p->{$key} = $config->get(['report', $report_config, $key]);
             }
         }
 
         @columns = $config->get_list(['report', $report_config, 'cols']);
-        @head = map { $_->{head} } @columns;
+        @head = map { $_->{head} // '' } @columns;
     }
 
     ##! 16: 'Params ' . Dumper $p
-
+    ##! 16: 'Query Attributes ' . Dumper $query_attr
 
     # If include_revoke it not set, we filter on ISSUED status
     if (!$p->{include_revoked}) {
@@ -163,10 +193,9 @@ sub execute {
         $need_csr = 1;
     }
 
-
     foreach my $col (@columns) {
         # If templating is active, we load all attributes
-        if ($col->{template}) { $need_attr = 1; last; }
+        if ($col->{template} && $col->{template} =~ m{attribute}) { $need_attr = 1; last; }
         # List all atrributes that are required for joined loading
         if ($col->{attribute}) { push @attr, $col->{attribute}; }
     }
@@ -200,9 +229,26 @@ sub execute {
             $ii++;
             $join .= " =>certificate.identifier=ca${ii}.identifier,ca${ii}.attribute_contentkey='$aa' certificate_attributes|ca${ii} ";
             push @{$cols}, "ca${ii}.attribute_value as $aa";
+
+            if (exists $query_attr->{$aa}) {
+                $where{"ca${ii}.attribute_value"} = $query_attr->{$aa};
+                delete $query_attr->{$aa};
+            }
+
         }
     }
 
+    # attribute based query filters, to be added as joins if they do not already exists
+    my $ii=0;
+    foreach my $key (keys %{$query_attr}) {
+        ##! 16: 'Checking key ' . $key
+        $ii++;
+        $join .= " =>certificate.identifier=cas${ii}.identifier,cas${ii}.attribute_contentkey='$key' certificate_attributes|cas${ii} ";
+        $where{"cas${ii}.attribute_value"} = $query_attr->{$key};
+    }
+
+    ##! 32: $join
+    ##! 32: $cols
     ##! 32: \%where
 
     if ($join) {
@@ -211,6 +257,7 @@ sub execute {
             order_by => [ '-notbefore', '-req_key' ],
             columns  => $cols,
             where => \%where,
+            ($query_attr ? (distinct => 1) : ()),
         );
     } else {
         $sth = CTX('dbi')->select(
@@ -218,6 +265,7 @@ sub execute {
             order_by => [ '-notbefore', '-req_key' ],
             columns  => $cols,
             where => \%where,
+            ($query_attr ? (distinct => 1) : ()),
         );
     }
 
@@ -290,19 +338,19 @@ sub execute {
 
     my $json;
     if (!$fh) { # target memory, receives only the data!
-    
+
         $buffer = {
             header => ["request id", "subject", "serial", "identifier", "notbefore", "notafter", "status", "issuer", @head],
             value => [],
         };
         $buffer->{title} = $head if ($head);
-        
+
     } elsif ($p->{format} eq 'json') {
 
         $json = JSON->new();
-        if ($head) { 
+        if ($head) {
             my $bb = $json->encode({ title => $head });
-            chop($bb); # replace the closing bracket with a comma 
+            chop($bb); # replace the closing bracket with a comma
             print $fh "$bb,";
         } else {
             print $fh "{";
@@ -392,10 +440,10 @@ sub execute {
         }
     }
 
-    
+
     # close json structure
     print $fh "]}" if ($json);
-    
+
     # close file handle
     close $fh if ($fh);
 
@@ -438,8 +486,8 @@ parameters, the default is to print all currenty valid certificates.
 =item format
 
 Default is I<csv> using I<delimiter> to create lines. If set to I<json>,
-the result is encoded using JSON with the keys I<title>, I<head> and 
-I<data>. Set to I<memory> to retrieve the data portion of the report 
+the result is encoded using JSON with the keys I<title>, I<head> and
+I<data>. Set to I<memory> to retrieve the data portion of the report
 directly in the context value defined by I<target_key>.
 
 =item target_key
@@ -542,11 +590,28 @@ used as wildcard. Mutiple expressions are possible and or'ed together.
 Only include certificates with this profile in the report, mutliple
 profiles can be passed as list.
 
+=item subject_alt_name
+
+Filter certificates having a certain subject_alt_name set, can be a
+scalar with SQL wildcards OR a list of items.
+
+=item meta_*, system_*
+
+Lets you search for any certificate attribute having a listed prefix.
+You can set the special value I<<undef>> (including the angle brackets)
+to search for rows without a certain attribute.
+
 =item report_config
 
 Lookup extended specifications in the config system at report.<report_config>.
+
+=back
+
+=head2 Report Config
+
 The config can contain any of the filter controls which will override any
 given value from the activity if a value is given.
+
 Additional columns can also be specified, these are appended at the end
 of each line.
 
@@ -560,11 +625,13 @@ of each line.
      - head: The profile given in the CSR
        csr: profile
 
-The I<cert> key takes the value from the named column from the certificate
-table, I<attribute> shows the value of the attribute. I<template> is passed
-to OpenXPKI::Template with I<cert> and I<attribute> set. Note that all
-attributes are lists, even if there are single valued!
+Each column definition should have a value for I<head> that is printed
+in the reprt header to identify this column. Each column must have
+exactly one of the following keys that describes the content to display.
 
+=head3 cert
+
+Show the value of the named column from the certificate table.
 Available columns are:
 
 =over
@@ -591,11 +658,30 @@ Available columns are:
 
 =item authority_key_identifier
 
-=item profile (from csr)
-
 =back
 
-=back
+=head2 csr
+
+Show the value of the named column from the csr table, the only valid
+name is I<profile>.
+
+=head2 attribute
+
+Show the value of the given attribute from the certificate_attributes
+table. If the given attribute is multivalued, the behaviour depends on
+the remaining report spec. If you have any other column that is using
+a template to render an attribute, you will see a single line with a
+random pick from the list of attributes. If you do not have such a
+column, you will get multiple lines for the same certificate, one for
+each value of the attribute.
+
+=head2 template
+
+The string is rendered with OpenXPKI::Template, the input paramaters
+are the columns of the cert as defined above in the key I<cert> and
+all attributes as returned from get_cert_attributes API call as
+hash in the I<attribute> key. Note that all attributes are lists,
+even if there are single valued!
 
 =head2 Full example
 
