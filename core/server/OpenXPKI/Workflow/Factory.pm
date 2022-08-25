@@ -1,7 +1,3 @@
-## OpenXPKI::Workflow::Factory
-##
-## Written 2007 by Alexander Klink for the OpenXPKI project
-## (C) Copyright 2007 by The OpenXPKI Project
 package OpenXPKI::Workflow::Factory;
 
 use strict;
@@ -10,6 +6,8 @@ use warnings;
 use Workflow 1.36;
 use base qw( Workflow::Factory );
 use English;
+use Scalar::Util qw( blessed );
+
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
@@ -224,7 +222,7 @@ sub get_field_info {
         $field->{option} = \@option;
     }
 
-    # add a field for the ECMA equivalent of the regex
+    # add ECMA equivalent of the regex (duplicated in OpenXPKI::Server::API2::Plugin::Profile::Util->get_input_elements)
     if ($field->{match}) {
         my $ecma_match = $self->_perlre_to_ecma($field->{match});
         $field->{ecma_match} = $ecma_match if $ecma_match;
@@ -234,11 +232,14 @@ sub get_field_info {
 
 }
 
+# Static method.
 # Tries to convert a Perl RegEx (given as string) into an ECMA compatible version.
 # Returns nothing if the Perl RegEx contains special sequences that cannot be
 # translated.
 sub _perlre_to_ecma {
-    my ($self, $perl_re) = @_;
+    # allow this sub to be called like AA->bb, AA::bb and $a->bb
+    my $perl_re = shift; # might be $obj or __PACKAGE__
+    $perl_re = shift if ($perl_re and (blessed $perl_re or $perl_re eq __PACKAGE__));
 
     # stop if Perl RegEx contains non-translatable sequences
     return if (

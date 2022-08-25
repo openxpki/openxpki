@@ -26,6 +26,7 @@ export default class Field extends Base {
     actionOnChange
     @tracked _error // client- or server-side error state
     autofill
+    ecma_match
     /*
      * Clonable fields
      */

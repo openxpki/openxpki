@@ -4,7 +4,7 @@ use Moose;
 # Project modules
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-
+use OpenXPKI::Workflow::Factory;
 
 =head2 get_input_elements
 
@@ -141,6 +141,12 @@ sub get_input_elements {
         }
 
         $lcinput{clonable} = 1 if ($lcinput{min} || $lcinput{max});
+
+        # add ECMA equivalent of the regex (duplicated in OpenXPKI::Workflow::Factory->get_field_info)
+        if ($lcinput{match}) {
+            my $ecma_match = OpenXPKI::Workflow::Factory->_perlre_to_ecma($lcinput{match});
+            $lcinput{ecma_match} = $ecma_match if $ecma_match;
+        }
 
         push @definitions, \%lcinput;
     }

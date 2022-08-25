@@ -380,6 +380,7 @@ sub __translate_form_def {
             placeholder => (defined $field->{placeholder} ? $field->{placeholder} : $field->{default}),
             value => $values->{$field->{id}},
         };
+        $new->{ecma_match} = $field->{ecma_match} if $field->{ecma_match};
 
         $field->{type} //= '';
         if ($field->{type} eq 'select') {
