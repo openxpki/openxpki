@@ -222,11 +222,37 @@ sub get_field_info {
             }
         }
         $field->{option} = \@option;
+    }
 
+    # add a field for the ECMA equivalent of the regex
+    if ($field->{match}) {
+        my $ecma_match = $self->_perlre_to_ecma($field->{match});
+        $field->{ecma_match} = $ecma_match if $ecma_match;
     }
 
     return $field;
 
+}
+
+# Tries to convert a Perl RegEx (given as string) into an ECMA compatible version.
+# Returns nothing if the Perl RegEx contains special sequences that cannot be
+# translated.
+sub _perlre_to_ecma {
+    my ($self, $perl_re) = @_;
+
+    # stop if Perl RegEx contains non-translatable sequences
+    return if (
+        $perl_re =~ / (?<!\\) (\\\\)* \\([luLUxpPNoQEraevhGXK]|[04]\d+)/x # special escape sequences
+        or $perl_re =~ / ^\[:[^\:\]]+:\] /x # character classes
+    );
+
+    my $ecma_re = $perl_re;
+    $ecma_re =~ s/ (?<!\\) (\\\\)* \s+ /$1 || ''/gxe; # remove whitespace after even number of backslashes (or none)
+    $ecma_re =~ s/ \\ (\s+) /$1/gx;            # remove backslash of escaped whitespace
+    $ecma_re =~ s/^\\A/^/;                     # \A -> ^
+    $ecma_re =~ s/\\[zZ]$/\$/;                 # \z -> $
+
+    return $ecma_re;
 }
 
 # Returns a HashRef with configuration details (actions, states) of the given

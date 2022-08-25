@@ -188,10 +188,9 @@ sub _openapi_field_schema {
 
         # field contains regular expression
         if ($wf_field->{match}) {
-            my $ecma_regex = $self->_perlre_to_ecma($wf_field->{match});
-            if ($ecma_regex) {
+            if ($wf_field->{ecma_match}) {
                 $field->{type} = 'string';
-                $field->{pattern} = $ecma_regex;
+                $field->{pattern} = $wf_field->{ecma_match};
             }
             else {
                 push @hints, 'String must match the Perl regex /'.$wf_field->{match}.'/msx .';
@@ -305,27 +304,6 @@ sub _get_input_fields {
     }
 
     return $result;
-}
-
-# Tries to convert a Perl RegEx (given as string) into an ECMA compatible version.
-# Returns nothing if the Perl RegEx contains special sequences that cannot be
-# translated.
-sub _perlre_to_ecma {
-    my ($self, $perl_re) = @_;
-
-    # stop if Perl RegEx contains non-translatable sequences
-    return if (
-        $perl_re =~ / (?<!\\) (\\\\)* \\([luLUxpPNoQEraevhGXK]|[04]\d+)/x # special escape sequences
-        or $perl_re =~ / ^\[:[^\:\]]+:\] /x # character classes
-    );
-
-    my $ecma_re = $perl_re;
-    $ecma_re =~ s/ (?<!\\) (\\\\)* \s+ /$1 || ''/gxe; # remove whitespace after even number of backslashes (or none)
-    $ecma_re =~ s/ \\ (\s+) /$1/gx;            # remove backslash of escaped whitespace
-    $ecma_re =~ s/^\\A/^/;                     # \A -> ^
-    $ecma_re =~ s/\\[zZ]$/\$/;                 # \z -> $
-
-    return $ecma_re;
 }
 
 __PACKAGE__->meta->make_immutable;
