@@ -2627,6 +2627,7 @@ sub __render_input_field {
         push @all_items, $enc_field;
     }
 
+    # set (default) value and handle clonable fields
     if (defined $value) {
         # clonables need array as value
         if ($item->{clonable}) {
@@ -2644,6 +2645,7 @@ sub __render_input_field {
         $item->{value} = $field->{default};
     }
 
+    # template processing
     if ($item->{type} eq 'static' && $field->{template}) {
         if (OpenXPKI::Serialization::Simple::is_serialized($value)) {
             $item->{value} = $self->serializer()->deserialize($value);
@@ -2652,8 +2654,8 @@ sub __render_input_field {
     }
 
     # type 'encrypted'
-    for (@all_items) {
-        $_->{value} = $self->_encrypt_jwt($_->{value}) if $_->{type} eq 'encrypted';
+    for my $item (@all_items) {
+        $item->{value} = $self->_encrypt_jwt($item->{value}) if $item->{type} eq 'encrypted';
     }
 
     return @all_items;
