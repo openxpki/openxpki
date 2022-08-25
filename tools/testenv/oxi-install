@@ -71,8 +71,11 @@ echo
 #
 # Grab and install Perl module dependencies from Makefile.PL using PPI
 #
-# fix problems with old IO::Socket::SSL:
-cpanm --notest IO::Socket::SSL                                        >>$LOG 2>&1
+# fix problems with old IO::Socket::SSL (logical NOT needed because in Bash 0 = true)
+if perl -e 'use version; use IO::Socket::SSL; exit !(version->parse($IO::Socket::SSL::VERSION) < version->parse("2.074"))'; then
+    echo "Update potentially buggy IO::Socket::SSL"
+    cpanm --notest IO::Socket::SSL                                    >>$LOG 2>&1
+fi
 
 echo "Check and install Perl module dependencies"
 # Install PPI (the check avoids unneccessary requests to CPAN)
