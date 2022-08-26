@@ -24,13 +24,14 @@ my $db = DatabaseTest->new(
         [ 2, "Buergersteig",  1 ],
         [ 3, "Rathaus",       42 ],
         [ 4, "Kindergarten",  3 ],
+        [ 5, "Luft",          undef ],
     ],
 );
 
 #
 # tests
 #
-$db->run("SQL DELETE", 12, sub {
+$db->run("SQL DELETE", 14, sub {
     my $t = shift;
     my $dbi = $t->dbi;
     my $rownum;
@@ -42,13 +43,14 @@ $db->run("SQL DELETE", 12, sub {
             where => { entropy => 99 },
         );
         ok $rownum == 0;
-    } "no update with non-matching where clause";
+    } "no deletion with non-matching where clause";
 
     cmp_bag $t->get_data, [
         [ 1, "Litfasssaeule", 1 ],
         [ 2, "Buergersteig",  1 ],
         [ 3, "Rathaus",       42 ],
         [ 4, "Kindergarten",  3 ],
+        [ 5, "Luft",          undef ],
     ], "all rows are still there";
 
     # delete one existing row
@@ -64,6 +66,7 @@ $db->run("SQL DELETE", 12, sub {
         [ 1, "Litfasssaeule", 1],
         [ 2, "Buergersteig",  1],
         [ 4, "Kindergarten",  3],
+        [ 5, "Luft",          undef ],
     ], "deleted rows are really gone";
 
     # delete two existing rows
@@ -74,6 +77,20 @@ $db->run("SQL DELETE", 12, sub {
         );
         is $rownum, 2;
     } "delete multiple rows";
+
+    cmp_bag $t->get_data, [
+        [ 4, "Kindergarten",  3],
+        [ 5, "Luft",          undef ],
+    ], "deleted rows are really gone";
+
+    # delete using literal WHERE clause
+    lives_and {
+        $rownum = $dbi->delete(
+            from => "test",
+            where => \"entropy IS NULL",
+        );
+        is $rownum, 1;
+    } "delete using literal WHERE clause";
 
     cmp_bag $t->get_data, [
         [ 4, "Kindergarten",  3],

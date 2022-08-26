@@ -58,17 +58,28 @@ sub _add_namespace_to {
 # Calls the given SQL::Abstract::More method after converting the parameters.
 # Sets $self->sql_str and $self->sql_params
 sub _make_query {
-    my ($self, %args) = named_args(\@_,   # OpenXPKI::MooseParams
+    my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
         method    => { isa => 'Str' },
         args      => { isa => 'HashRef' },
         query_obj => { isa => 'OpenXPKI::Server::Database::Query', optional => 1 },
     );
-    my $method = $args{method};
-    my $method_args = $args{args};
-    my $query = $args{query_obj} // OpenXPKI::Server::Database::Query->new;
+    my $method = $params{method};
+    my $args = $params{args};
+    my $query = $params{query_obj} // OpenXPKI::Server::Database::Query->new;
+
+    # Workaround for passing literal WHERE queries.
+    # Required because:
+    #  - SQL::Abstract::More expects a Scalar while (the later invoked)
+    #  - SQL::Abstract       expects a ScalarRef.
+    # So we expect a ScalarRef and wrap it for SQL::Abstract::More.
+    my $is_scalar_ref = $args->{where} && ref $args->{where} eq 'SCALAR';
+    if ($is_scalar_ref) {
+        $args->{where} = { -and => [ $args->{where} ] }; # wrap ScalarRef in innocuous query
+    }
 
     # Prefix arguments with dash "-"
-    my %sqlam_args = map { '-'.$_ => $method_args->{$_} } keys %$method_args;
+    my %sqlam_args = map { '-'.$_ => $args->{$_} } keys %$args;
+
     ##! 4: "SQL::Abstract::More->$method(" . join(", ", map { sprintf "%s = %s", $_, Data::Dumper->new([$sqlam_args{$_}])->Indent(0)->Terse(1)->Dump } sort keys %sqlam_args) . ")"
 
     # Call SQL::Abstract::More method and store results
@@ -88,7 +99,7 @@ sub select {
         columns   => { isa => 'ArrayRef[Str]' },
         from      => { isa => 'Str | ArrayRef[Str]', optional => 1 },
         from_join => { isa => 'Str', optional => 1 },
-        where     => { isa => 'Str | ArrayRef | HashRef', optional => 1 },
+        where     => { isa => 'ScalarRef | ArrayRef | HashRef', optional => 1 },
         group_by  => { isa => 'Str | ArrayRef', optional => 1 },
         having    => { isa => 'Str | ArrayRef | HashRef', optional => 1, depends => ['group_by'] },
         order_by  => { isa => 'Str | ArrayRef', optional => 1 },
@@ -173,7 +184,7 @@ sub update {
     my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
         table => { isa => 'Str' },
         set   => { isa => 'HashRef' },
-        where => { isa => 'Str | ArrayRef | HashRef' }, # require WHERE clause to prevent accidential updates on all rows
+        where => { isa => 'ScalarRef | ArrayRef | HashRef' }, # require WHERE clause to prevent accidential updates on all rows
     );
     # Add namespace to table name
     $params{'table'} = $self->_add_namespace_to($params{'table'});
@@ -184,7 +195,7 @@ sub update {
 sub delete {
     my ($self, %params) = named_args(\@_,   # OpenXPKI::MooseParams
         from      => { isa => 'Str' },
-        where     => { isa => 'Str | ArrayRef | HashRef', optional => 1 },
+        where     => { isa => 'ScalarRef | ArrayRef | HashRef', optional => 1 },
         all       => { isa => 'Bool', optional => 1 },
     );
     OpenXPKI::Exception->throw(message => "Either 'where' or 'all' must be specified")

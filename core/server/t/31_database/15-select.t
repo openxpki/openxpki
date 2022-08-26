@@ -31,7 +31,7 @@ my $db = DatabaseTest->new(
 #
 # tests
 #
-$db->run("SQL SELECT", 9, sub {
+$db->run("SQL SELECT", 10, sub {
     my $t = shift;
     my $dbi = $t->dbi;
     my $sth;
@@ -122,6 +122,7 @@ $db->run("SQL SELECT", 9, sub {
 
     lives_ok { $dbi->rollback() } "rollback";
 
+    # sub query
     lives_and {
         $sth = $dbi->select(
             from => "test",
@@ -139,6 +140,20 @@ $db->run("SQL SELECT", 9, sub {
             [ "Kindergarten" ],
         ];
     } "select with sub query";
+
+    # select with literal WHERE clause
+    lives_and {
+        $sth = $dbi->select(
+            from => "test",
+            columns => [ "text" ],
+            where => \"id >= 3",
+        );
+        is_deeply $sth->fetchall_arrayref, [
+            [ "Rathaus" ],
+            [ "Kindergarten" ],
+            [ "Luft" ],
+        ];
+    } "select with literal WHERE clause";
 });
 
 done_testing($db->test_no);

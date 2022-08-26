@@ -729,7 +729,7 @@ Named parameters:
 
 Please note that you cannot specify C<from> and C<from_join> at the same time.
 
-=item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
+=item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES>. A literal query can be defined using a ScalarRef: C<where =E<gt> \"id >= 3"> (I<ScalarRef | ArrayRef | HashRef>)
 
 =item * B<group_by> - GROUP BY column (or list of) (I<Str | ArrayRef>)
 
@@ -878,7 +878,7 @@ Named parameters:
 
 =item * B<set> - Hash with column name / value pairs. Please note that C<undef> is interpreted as C<NULL> (I<HashRef>, required)
 
-=item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
+=item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES>. A literal query can be defined using a ScalarRef: C<where =E<gt> \"id >= 3"> (I<ScalarRef | ArrayRef | HashRef>)
 
 =back
 
@@ -938,7 +938,7 @@ Named parameters:
 
 =item * B<from> - Table name (I<Str>, required)
 
-=item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
+=item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES>. A literal query can be defined using a ScalarRef: C<where =E<gt> \"id >= 3"> (I<ScalarRef | ArrayRef | HashRef>)
 
 =item * B<all> - Set this to 1 instead of specifying C<where> to delete all rows (I<Bool>)
 

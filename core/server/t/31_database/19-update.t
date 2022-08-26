@@ -30,7 +30,7 @@ my $db = DatabaseTest->new(
 #
 # tests
 #
-$db->run("SQL UPDATE", 3, sub {
+$db->run("SQL UPDATE", 5, sub {
     my $t = shift;
     my $dbi = $t->dbi;
     my $rownum;
@@ -59,6 +59,24 @@ $db->run("SQL UPDATE", 3, sub {
     cmp_bag $t->get_data, [
         [ 1, "Litfasssaeule", 5 ],
         [ 2, "Buergersteig",  5 ],
+        [ 3, "Rathaus",       42 ],
+        [ 4, "Kindergarten",  3 ],
+    ], "correct data after update";
+
+    # update using literal WHERE clause
+    lives_and {
+        $rownum = $dbi->update(
+            table => "test",
+            set => { entropy => 333 },
+            where => \"entropy = 5",
+        );
+        is $rownum, 2;
+    } "update 2 rows using literal WHERE clause";
+
+    # check data
+    cmp_bag $t->get_data, [
+        [ 1, "Litfasssaeule", 333 ],
+        [ 2, "Buergersteig",  333 ],
         [ 3, "Rathaus",       42 ],
         [ 4, "Kindergarten",  3 ],
     ], "correct data after update";
