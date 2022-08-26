@@ -23,7 +23,7 @@ sub execute
     my $cert_subject = $self->param('cert_subject');
     $cert_subject = $context->param('cert_subject') unless(defined $cert_subject);
 
-    # prevent creating havoc (subject is empty = no where query!)
+    # prevent creating havoc (subject is empty = no WHERE clause!)
     if (!$cert_subject) {
         $context->param( { $target_key => undef } );
          CTX('log')->application()->debug("Policy subject duplicate check skipped due to empty subject");
