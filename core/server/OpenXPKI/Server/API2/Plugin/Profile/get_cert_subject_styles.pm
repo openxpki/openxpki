@@ -49,6 +49,8 @@ command "get_cert_subject_styles" => {
     my ($self, $params) = @_;
     my $styles = {};
 
+    CTX('log')->deprecated->error('API command "get_cert_subject_styles" is deprecated and will be removed');
+
     my $config = CTX('config');
     my @style_names = $config->get_keys([ 'profile', $params->profile, 'style' ]);
 
