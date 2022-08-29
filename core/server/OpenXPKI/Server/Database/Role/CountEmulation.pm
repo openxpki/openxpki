@@ -24,7 +24,7 @@ __END__;
 =head1 Description
 
 This is the default implementation to count the number of rows in a select
-by using SELECT COUNT(*) from (...) as tmp
+by using C<SELECT COUNT(*) ... from (...) as tmp>
 
-It might be overriden if the specifica RDBMS requires a different syntax
+It might be overriden if the specific RDBMS requires a different syntax
 (e.g. Oracle) or there is a builtin method.

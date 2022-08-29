@@ -299,6 +299,7 @@ sub _driver_return_val_to_list {
     return @$normalized;
 }
 
+# To remain fork safe DO NOT CACHE this (also do not convert into a lazy attribute).
 sub dbh {
     my $self = shift;
     # If this is too slow due to DB pings, we could pass "no_ping" attribute to
@@ -637,6 +638,9 @@ For more details see L<OpenXPKI::Server::Database::Role::Driver>.
          .    .---------------------.
          ....>| O:S:D::Role::Driver |
          .    '---------------------'
+         .    .------------------------------.
+         ....>| O:S:D::Role::CountEmulation  |
+         .    '------------------------------'
          .    .------------------------------.    .--------------------------------.
          ....>| O:S:D::Role::SequenceSupport | or | O:S:D::Role::SequenceEmulation |
          .    '------------------------------'    '--------------------------------'
@@ -723,19 +727,19 @@ Named parameters:
 
 =item * B<from> - Table name (or list of) (I<Str | ArrayRef[Str]>, required)
 
-=item * B<from_join> - A B<string> to describe table relations for FROM .. JOIN following the spec in L<SQL::Abstract::More/join> (I<Str>)
+=item * B<from_join> - A B<string> to describe table relations for I<FROM .. JOIN> following the spec in L<SQL::Abstract::More/join> (I<Str>)
 
     from_join => "certificate  req_key=req_key  csr"
 
 Please note that you cannot specify C<from> and C<from_join> at the same time.
 
-=item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES>. A literal query can be defined using a ScalarRef: C<where =E<gt> \"id >= 3"> (I<ScalarRef | ArrayRef | HashRef>)
+=item * B<where> - I<WHERE> clause following the spec in L<SQL::Abstract/WHERE-CLAUSES>. A literal query can be defined using a ScalarRef: C<where =E<gt> \"id E<gt>= 3"> (I<ScalarRef | ArrayRef | HashRef>)
 
-=item * B<group_by> - GROUP BY column (or list of) (I<Str | ArrayRef>)
+=item * B<group_by> - I<GROUP BY> column (or list of) (I<Str | ArrayRef>)
 
-=item * B<having> - HAVING clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
+=item * B<having> - I<HAVING> clause following the spec in L<SQL::Abstract/WHERE-CLAUSES> (I<Str | ArrayRef | HashRef>)
 
-=item * B<order_by> - Plain ORDER BY string or list of columns. Each column name can be preceded by a "-" for descending sort (I<Str | ArrayRef>)
+=item * B<order_by> - Plain I<ORDER BY> string or list of columns. Each column name can be preceded by a "-" for descending sort (I<Str | ArrayRef>)
 
 =item * B<limit> - (I<Int>)
 
@@ -866,7 +870,7 @@ C<undef> is interpreted as C<NULL> (I<HashRef>, required).
 
 Updates rows in the database and returns the number of affected rows.
 
-A WHERE clause is required to prevent accidential updates of all rows in a table.
+A I<WHERE> clause is required to prevent accidential updates of all rows in a table.
 
 Please note that C<NULL> values will be converted to Perl C<undef>.
 
@@ -878,7 +882,7 @@ Named parameters:
 
 =item * B<set> - Hash with column name / value pairs. Please note that C<undef> is interpreted as C<NULL> (I<HashRef>, required)
 
-=item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES>. A literal query can be defined using a ScalarRef: C<where =E<gt> \"id >= 3"> (I<ScalarRef | ArrayRef | HashRef>)
+=item * B<where> - I<WHERE> clause following the spec in L<SQL::Abstract/WHERE-CLAUSES>. A literal query can be defined using a ScalarRef: C<where =E<gt> \"id E<gt>= 3"> (I<ScalarRef | ArrayRef | HashRef>)
 
 =back
 
@@ -886,8 +890,8 @@ Named parameters:
 
 =head2 merge
 
-Either directly executes or emulates an SQL MERGE (you could also call it
-REPLACE) function and returns the number of affected rows.
+Either directly executes or emulates an SQL I<MERGE> (you could also call it
+I<REPLACE>) function and returns the number of affected rows.
 
 Please note that e.g. MySQL returns 2 (not 1) if an update was performed. So
 you should only use the return value to test for 0 / FALSE.
@@ -898,21 +902,21 @@ Named parameters:
 
 =item * B<into> - Table name (I<Str>, required)
 
-=item * B<set> - Columns that are always set (INSERT or UPDATE). Hash with
+=item * B<set> - Columns that are always set (I<INSERT> or I<UPDATE>). Hash with
 column name / value pairs.
 
 Please note that C<undef> is interpreted as C<NULL> (I<HashRef>, required)
 
-=item * B<set_once> - Columns that are only set on INSERT (additional to those
+=item * B<set_once> - Columns that are only set on I<INSERT> (additional to those
 in the C<where> parameter. Hash with column name / value pairs.
 
 Please note that C<undef> is interpreted as C<NULL> (I<HashRef>, required)
 
-=item * B<where> - WHERE clause specification that must contain the PRIMARY KEY
-columns and only allows "AND" and "equal" operators:
-C<<{ col1 => val1, col2 => val2 }>> (I<HashRef>)
+=item * B<where> - I<WHERE> clause specification that must contain the I<PRIMARY KEY>
+columns and only allows I<AND> and I<equal> operators:
+C<{ col1 =E<gt> val1, col2 =E<gt> val2 }> (I<HashRef>)
 
-The values from the WHERE clause are also inserted if the row does not exist
+The values from the I<WHERE> clause are also inserted if the row does not exist
 (together with those from C<set_once>)!
 
 =back
@@ -938,7 +942,7 @@ Named parameters:
 
 =item * B<from> - Table name (I<Str>, required)
 
-=item * B<where> - WHERE clause following the spec in L<SQL::Abstract/WHERE-CLAUSES>. A literal query can be defined using a ScalarRef: C<where =E<gt> \"id >= 3"> (I<ScalarRef | ArrayRef | HashRef>)
+=item * B<where> - I<WHERE> clause following the spec in L<SQL::Abstract/WHERE-CLAUSES>. A literal query can be defined using a ScalarRef: C<where =E<gt> \"id E<gt>= 3"> (I<ScalarRef | ArrayRef | HashRef>)
 
 =item * B<all> - Set this to 1 instead of specifying C<where> to delete all rows (I<Bool>)
 
@@ -1015,6 +1019,8 @@ Calling this method is the same as:
     $db->commit;
 
 For more informations see L<OpenXPKI::Server::Database/delete>.
+
+=cut
 
 ################################################################################
 
