@@ -81,6 +81,7 @@ use English;
 
 # CPAN modules
 use POSIX ();
+use IO::Handle;
 
 # Project modules
 use OpenXPKI::Debug;
@@ -99,22 +100,36 @@ has old_sig_set => (
 # By using a package variable this acts like a Singleton, so a new instance
 # of OpenXPKI::Server::Bedroom won't delete collected child PIDs of previous instance.
 my $current_pid = $$;
-my %child_pids_by_parent = ();
+my %children = ();
 
-sub _get_child_pids {
-    if ($current_pid != $$) { $current_pid = $$; %child_pids_by_parent = () } # reset PID list after fork()
-    return keys %child_pids_by_parent;
+# reset PID list after fork()
+sub _validate_child_list {
+    return if $current_pid == $$;
+
+    $current_pid = $$;
+    for my $pid (keys %children) {
+        close $children{$pid} if $children{$pid};
+    }
+    %children = ();
 }
 
-sub _add_child_pid {
-    my $pid = shift;
-    if ($current_pid != $$) { $current_pid = $$; %child_pids_by_parent = () } # reset PID list after fork()
-    $child_pids_by_parent{$pid} = 1;
+sub _get_child_pids {
+    _validate_child_list;
+    return keys %children;
+}
+
+sub _add_child {
+    my ($pid, $fh) = @_;
+    _validate_child_list;
+    $children{$pid} = $fh || 0;
 }
 
 sub _remove_child_pid {
     my $pid = shift;
-    delete $child_pids_by_parent{$pid};
+    # close and remove filehandle used to read child's STDOUT
+    close $children{$pid} if $children{$pid};
+    # remove child PID
+    delete $children{$pid};
 }
 
 =head1 METHODS
@@ -151,6 +166,8 @@ B<Parameters>
 =item * C<keep_parent_sigchld> I<Bool> - optional: C<1> = parent: keep currently installed C<SIGCHLD> handler,
 child: set C<SIGCHLD> to C<default>. Default: 0
 
+=item * C<capture_stdout> I<Bool> - optional: C<1> = redirect child process I<STDOUT> to a filehandle that can be queried using L</get_stdout_fh>. Default: 0
+
 =back
 
 =cut
@@ -163,6 +180,7 @@ sub new_child {
         uid => { isa => 'Int', optional => 1 },
         gid => { isa => 'Int', optional => 1 },
         keep_parent_sigchld => { isa => 'Bool', optional => 1, default => 0 },
+        capture_stdout => { isa => 'Bool', optional => 1, default => 0 },
     );
 
     ##! 1: 'start - $SIG{"CHLD"}: ' . ($SIG{'CHLD'}//'<undef>')
@@ -172,12 +190,12 @@ sub new_child {
 
     ##! 1: 'start - $SIG{"CHLD"}: ' . ($SIG{'CHLD'}//'<undef>')
 
-    my $pid = $self->_try_fork($args{max_fork_redo});
+    # FORK!
+    my ($pid, $fh_from_child)  = $self->_try_fork($args{max_fork_redo}, $args{capture_stdout});
 
     # parent process: return on successful fork
     if ($pid > 0) {
         ##! 1: "parent: child PID = $pid"
-        _add_child_pid($pid);
         return $pid;
     }
 
@@ -205,13 +223,40 @@ sub new_child {
     umask 0;
     chdir '/';
     open STDIN,  '<',  '/dev/null';
-    open STDOUT, '>',  '/dev/null';
-    open STDERR, '>>', '/dev/null' if (-t STDERR); # only touch STDERR if it's not already redirected to a file
+    if ($args{capture_stdout}) {
+        # STDOUT is already redirected to parent's $fh_from_child
+        open(STDERR, '>&', STDOUT) if -t STDERR; # only touch STDERR if it's not already redirected to a file
+    }
+    else {
+        open STDOUT, '>',  '/dev/null';
+        open STDERR, '>>', '/dev/null' if -t STDERR; # only touch STDERR if it's not already redirected to a file
+    }
 
     # Re-seed Perl random number generator
     srand(time ^ $PROCESS_ID);
 
     return $pid;
+}
+
+=head2 get_stdout_fh
+
+Returns the I<STDOUT> filehandle for the given child pid. Is C<undef> if the
+child process was not started using C<new_child(... capture_stdout =E<gt> 1)>.
+
+B<Parameters>
+
+=over
+
+=item * C<$pid> I<Int> - child process PID
+
+=back
+
+=cut
+sub get_stdout_fh {
+    my ($self, $pid) = positional_args(\@_,     # OpenXPKI::MooseParams
+        { isa => 'Int' },
+    );
+    return $children{$pid};
 }
 
 # SIGCHLD handler
@@ -286,16 +331,28 @@ sub _unblock_sigint {
 }
 
 sub _try_fork {
-    my ($self, $max_tries) = @_;
+    my ($self, $max_tries, $capture_stdout) = @_;
+    my $fh_from_child;
 
     for (my $i = 0; $i < $max_tries; $i++) {
+        # FORK during blocked SIGINT
         $self->_block_sigint;
-        my $pid = fork;
+        my $pid = $capture_stdout
+            ? open($fh_from_child, "-|") # fork and redirect child STDOUT to our filehandle
+            : fork;
         $self->_unblock_sigint;
-        # parent or child: successful fork
-        if (defined $pid) { return $pid }
 
-        # parent: unsuccessful fork
+        # parent or child: success
+        if (defined $pid) {
+            # parent: register child
+            _add_child($pid, $fh_from_child) if $pid > 0;
+            # child: autoflush STDOUT if redirected to pipe
+            STDOUT->autoflush(1) if ($capture_stdout and $pid == 0); # autoflush() from IO::Handle
+            # both: return
+            return ($pid, $fh_from_child);
+        }
+
+        # parent: failed fork
 
         # EAGAIN - fork cannot allocate sufficient memory to copy the parent's
         #          page tables and allocate a task structure for the child.
