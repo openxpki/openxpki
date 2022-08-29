@@ -28,7 +28,7 @@ I<cert_identifier> is mandatory.
 
 command "get_private_key_for_cert" => {
     identifier => { isa => 'Base64', required => 1, },
-    format     => { isa => 'Str', matching => qr{ \A ( PKCS8_(PEM|DER) | OPENSSL_(PRIVKEY|RSA) | PKCS12(_LEGACY)? | JAVA_KEYSTORE ) \z }xms, required => 1, },
+    format     => { isa => 'Str', matching => qr{ \A ( PKCS8_(PEM|DER) | OPENSSL_(PRIVKEY|RSA) | PKCS12(_LEGACY|_VANILLA)? | JAVA_KEYSTORE ) \z }xms, required => 1, },
     password   => { isa => 'Str', required => 1, },
     passout    => { isa => 'Str', },
     nopassword => { isa => 'Bool', default => 0, },
@@ -79,11 +79,20 @@ I<chain>.
 
 =item PKCS12 (PKCS#12 in DER format)
 
-Enforces AES-128-CBC and PBE-SHA1-3DES for key/certificate encryption
+Enforces AES-256-CBC for key and certificate encryption, this is the
+default format in OpenSSL 3.0 and should work on most recent systems.
 
 =item PKCS12_LEGACY (PKCS#12 in DER format)
 
-Enforces PBE-SHA1-RC2-40 and PBE-SHA1-DES for key/certificate encryption
+Enforces PBE-SHA1-RC2-40 and PBE-SHA1-3DES for key/certificate. Should
+work on most aged systems but does NOT work on modern systems where RC2
+is deprecated / prevented due to security reasons.
+
+=item PKCS12_VANILLA (PKCS#12 in DER format)
+
+Do not pass any options to OpenSSL and use the default format. This is
+considered dangerous as changes in the system environment might affect
+the format of your generated containers.
 
 =item OPENSSL_PRIVKEY (OpenSSL native key format in PEM)
 
@@ -148,7 +157,7 @@ If the input password does not decrypt the private key, an exception is thrown.
 command "convert_private_key" => {
 
     private_key => { isa => 'PEMPKey', required => 1 },
-    format     => { isa => 'Str', matching => qr{ \A ( PKCS8_(PEM|DER) | OPENSSL_(PRIVKEY|RSA) | PKCS12(_LEGACY)? | JAVA_KEYSTORE ) \z }xms, required => 1, },
+    format     => { isa => 'Str', matching => qr{ \A ( PKCS8_(PEM|DER) | OPENSSL_(PRIVKEY|RSA) | PKCS12(_LEGACY|_VANILLA)? | JAVA_KEYSTORE ) \z }xms, required => 1, },
     password   => { isa => 'Str', required => 1, },
     passout    => { isa => 'Str', },
     nopassword => { isa => 'Bool', default => 0, },
@@ -262,11 +271,11 @@ command "convert_private_key" => {
         # openssl backend, the chosen ones are a tradeoff between
         # compatibility and security
         if ($format eq 'PKCS12') {
-            $command_hashref->{KEY_PBE} = 'AES-128-CBC';
-            $command_hashref->{CERT_PBE} = 'PBE-SHA1-3DES';
+            $command_hashref->{KEY_PBE} = 'AES-256-CBC';
+            $command_hashref->{CERT_PBE} = 'AES-256-CBC';
         } elsif ($format eq 'PKCS12_LEGACY') {
             $command_hashref->{KEY_PBE} = 'PBE-SHA1-RC2-40';
-            $command_hashref->{CERT_PBE} = 'PBE-SHA1-DES';
+            $command_hashref->{CERT_PBE} = 'PBE-SHA1-3DES';
         } # anything else is JavaKS and we use the system defaults
 
         if ($nopassword) {
