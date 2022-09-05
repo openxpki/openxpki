@@ -227,7 +227,9 @@ export default class OxiSectionFormComponent extends Component {
         this.setFieldError(field, null);
 
         // check validation regex
-        if (field.ecma_match) {
+        // (only for non-empty fields; the check if a required field is empty
+        // is done via HTML <input> attribute required="..." in each component)
+        if (field.ecma_match && value !== "") {
             try {
                 let re = new RegExp(field.ecma_match);
                 if (! re.test(field.value)) {
