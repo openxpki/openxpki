@@ -36,12 +36,20 @@ copyrightYear: 2021
 #
 # Site header
 #
-header: |-
-    <h3>
-        <a href="./#/"><img src="img/logo.png" class="toplogo"></a>
-        &nbsp;
-        <small>Open Source Trustcenter</small>
-    </h3>
+header:
+    logo: img/logo.png
+    title: Open Source Trustcenter
+
+    # instead of specifying "logo" and/or "title" the header may be freely styled:
+    html: |-
+        <div class="col">
+            <a href="./#/"><img src="img/logo.png" alt="OpenXPKI"></a>
+        </div>
+        <div class="col d-none d-md-flex justify-content-center">
+            <h4 class="oxi-header">
+                Open Source Trustcenter
+            </h4>
+        </div>
 
 #
 # Site footer
