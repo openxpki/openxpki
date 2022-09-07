@@ -92,7 +92,22 @@ export default class OxiConfigService extends Service {
     }
 
     get header() {
-        return this.localConfig.header;
+        let header = this.localConfig.header
+        // if YAML parameter 'header' is an object
+        if ( typeof header === 'object' && !Array.isArray(header) && header !== null) {
+            return this.localConfig.header;
+        }
+        return null
+    }
+
+    get oldHeader() {
+        // if YAML parameter 'header' is a string (or undefined)
+        if (!this.header && this.localConfig.header) {
+            /* eslint-disable-next-line no-console */
+            console.warn("Deprecation warning: Parameter 'header' in localconfig.yaml is now expected to be a hash structure. Please consult the latest localconfig.yaml.template");
+            return this.localConfig.header
+        }
+        return null
     }
 
     get footer() {

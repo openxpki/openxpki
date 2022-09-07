@@ -1,22 +1,26 @@
-<div class="container-fluid pe-lg-4">
-    <div class="row py-2 align-items-center oxi-header-bar {{this.content.tenantCssClass}}">
-        {{#if this.config.header}}
+<div class="oxi-header-bar">
+    <div class="container-fluid pe-lg-4">
+        <div class="row py-2 align-items-center {{this.content.tenantCssClass}}">
+            {{#if this.config.header.html}}
+                {{html this.config.header.html}}
+            {{else if this.config.oldHeader}}
+                <div class="col">
+                    {{html this.config.oldHeader}}
+                </div>
+            {{else}}
+                <div class="col">
+                    {{!-- template-lint-disable no-bare-strings --}}
+                    <a href="./#/"><img src={{try this.config.header.logo (concat this.rootURL "img/logo.png")}} alt="OpenXPKI"></a>
+                </div>
+                <div class="col d-none d-md-flex justify-content-center">
+                    <h4 class="oxi-header">
+                        {{try this.config.header.title (t 'site.header')}}
+                    </h4>
+                </div>
+            {{/if}}
             <div class="col">
-                {{html this.config.header}}
+                <Application::Header::Userinfo/>
             </div>
-        {{else}}
-            <div class="col">
-                {{!-- template-lint-disable no-bare-strings --}}
-                <a href="./#/"><img src="{{this.rootURL}}img/logo.png" alt="OpenXPKI"></a>
-            </div>
-            <div class="col d-none d-md-flex justify-content-center">
-                <h4 class="oxi-header">
-                    {{t 'site.header'}}
-                </h4>
-            </div>
-        {{/if}}
-        <div class="col">
-            <Application::Header::Userinfo/>
         </div>
     </div>
 </div>
