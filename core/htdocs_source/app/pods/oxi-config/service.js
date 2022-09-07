@@ -18,7 +18,7 @@ export default class OxiConfigService extends Service {
         super(...arguments);
 
         // load custom YAML config
-        let url = ENV.rootURL.replace(/\/$/, '') + '/localconfig.yaml';
+        let url = this._rel2absUrl('localconfig.yaml');
         this.ready = this._loadRemote(url)
             .then( yamlStr => {
                 console.debug(`Custom config (YAML):\n${yamlStr}`);
