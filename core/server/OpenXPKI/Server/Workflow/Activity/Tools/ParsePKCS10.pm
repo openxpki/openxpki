@@ -315,7 +315,7 @@ sub execute {
             profile => $cert_profile,
             style => $cert_subject_style,
             section => 'info',
-            preset => { userinfo => $userinfo },
+            preset =>  { %hashed_dn, ( userinfo => $userinfo ) },
         );
         if ($cert_info) {
             $param->{$subject_prefix.'info'} = $cert_info;
