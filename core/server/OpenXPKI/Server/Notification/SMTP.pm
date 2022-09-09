@@ -595,7 +595,7 @@ sub _send_message {
     my $msg;
     if (!$html) {
         push @args, (Type => 'text/plain');
-        push @args, (Data => [ $plain ]);
+        push @args, (Data => [ Encode::encode("UTF-8", $plain) ]);
         ##! 16: 'Building single part with args: ' . Dumper @args
         $msg = MIME::Entity->build( @args );
 
