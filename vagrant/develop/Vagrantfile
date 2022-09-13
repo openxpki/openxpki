@@ -34,20 +34,22 @@ Vagrant.configure("2") do |config|
       # prevent Vagrant error "stdin: is not a tty"
       dev.vm.provision "Edit /root/.profile", :type => "shell", :inline => "sed -ri 's/^(mesg.*)/# \\1/' /root/.profile"
 
-      # Basic setup
       dev.vm.provision "Create /run-env", :type => "shell", :inline => "mkdir -p /run-env && chmod 0777 /run-env"
       dev.vm.provision "Basic setup", :type => "shell", :path => "assets/provision-basic.sh", :args => virtualbox_version()
 
       # Install Docker CE
       dev.vm.provision "Install Docker", :type => "shell", :path => "assets/provision-docker.sh"
 
-      # Install databases (partly as Docker images)
       #dev.vm.provision :shell, :type => "shell", :path => "assets/oracle/provision.sh"
+
+      # Install MariaDB (Docker container)
       dev.vm.provision "Install MariaDB", :type => "shell", :path => "assets/mysql/provision.sh"
-      dev.vm.provision "Install SQLite", :type => "shell", :path => "assets/sqlite/provision.sh"
 
       # Install OpenXPKI
       dev.vm.provision "Install OpenXPKI", :type => "shell", :path => "assets/provision-openxpki.sh"
+
+      # Install SQLite (needs OpenXPKI installed / OXI_CORE_DIR)
+      dev.vm.provision "Install SQLite", :type => "shell", :path => "assets/sqlite/provision.sh"
 
       # Cleanup
       dev.vm.provision "Cleanup", :type => "shell", :path => "assets/provision-cleanup.sh"
