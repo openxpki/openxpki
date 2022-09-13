@@ -3,9 +3,10 @@ set -euo pipefail
 
 # Basic Vagrant Box setup
 
-. /vagrant/assets/functions.sh
+ROOTDIR="$(dirname "$0")"; mountpoint -q /vagrant && ROOTDIR=/vagrant/assets
+. "$ROOTDIR/functions.sh"
 
-VBOX="$1"
+VBOX_VERSION="$1"
 
 #
 # Environment
@@ -24,8 +25,7 @@ while read def; do export $def; done < /etc/environment
 #
 echo "Apt - update package list"
 apt-get update >$LOG 2>&1
-echo "Apt - upgrade"
-apt-get upgrade --assume-yes >$LOG 2>&1
+
 # libzip-dev - for Net::SSLeay
 # libexpat1-dev - for XML::Parser
 # linux-headers-amd64 - required to compile guest addons using "vagrant vbguest" (on the host)
@@ -34,33 +34,41 @@ install_packages mc rsync gettext \
   libssl-dev libzip-dev libexpat1-dev \
   libtest-deep-perl libtest-exception-perl \
   linux-headers-amd64 \
-  mc
+  build-essential curl
+
+echo "Apt - upgrade"
+apt-get upgrade --assume-yes --with-new-pkgs >$LOG 2>&1
 
 #
 # Install Virtualbox guest addins
 #
-install_vbox=0
-if $(command -v VBoxService >/dev/null); then
-    INSTALLED_VBOX=$(VBoxService --version | sed -r 's/^([0-9\.]+).*/\1/')
-    if [ "$INSTALLED_VBOX" != "$VBOX" ]; then
-        echo "VBoxGuestAdditions ($INSTALLED_VBOX) do not match Virtualbox version ($VBOX)"
-        install_vbox=1
-    else
-        echo "VBoxGuestAdditions match Virtualbox version $VBOX"
+if command -v dmidecode >/dev/null; then
+    if [[ "$(dmidecode -s bios-version)" == "VirtualBox" ]]; then
+        install_vbox=0
+        if command -v VBoxService >/dev/null; then
+            INSTALLED_VBOX=$(VBoxService --version | sed -r 's/^([0-9\.]+).*/\1/')
+            if [ "$INSTALLED_VBOX" != "${VBOX_VERSION}" ]; then
+                echo "VBoxGuestAdditions v${INSTALLED_VBOX} != Virtualbox v${VBOX_VERSION}"
+                install_vbox=1
+            else
+                echo "VBoxGuestAdditions == Virtualbox == v${VBOX_VERSION}"
+            fi
+        else
+            install_vbox=1
+        fi
+        if [ $install_vbox -eq 1 ]; then
+            install_packages libx11-6
+            echo "VBoxGuestAdditions - remove old version"
+            apt-get -q=2 remove virtualbox-guest-utils >$LOG 2>&1 || echo
+            echo "VBoxGuestAdditions - install new version ${VBOX_VERSION}"
+            cd /tmp
+            wget -q http://download.virtualbox.org/virtualbox/${VBOX_VERSION}/VBoxGuestAdditions_${VBOX_VERSION}.iso >$LOG 2>&1
+            mount VBoxGuestAdditions_${VBOX_VERSION}.iso -o loop /mnt                   >$LOG 2>&1
+            sh /mnt/VBoxLinuxAdditions.run --nox11 -- --force                 >$LOG 2>&1
+            umount /mnt
+            rm VBoxGuestAdditions_${VBOX_VERSION}.iso
+        fi
     fi
-else
-    install_vbox=1
-fi
-if [ $install_vbox -eq 1 ]; then
-    echo "VBoxGuestAdditions - remove old version"
-    apt-get -q=2 remove virtualbox-guest-utils >$LOG 2>&1 || echo
-    echo "VBoxGuestAdditions - install new version $VBOX"
-    cd /tmp
-    wget -q http://download.virtualbox.org/virtualbox/$VBOX/VBoxGuestAdditions_$VBOX.iso >$LOG 2>&1
-    mount VBoxGuestAdditions_$VBOX.iso -o loop /mnt                   >$LOG 2>&1
-    sh /mnt/VBoxLinuxAdditions.run --nox11 -- --force                 >$LOG 2>&1
-    umount /mnt
-    rm VBoxGuestAdditions_$VBOX.iso
 fi
 
 #
@@ -87,8 +95,11 @@ fi
 # Helper scripts
 #
 tools_dir="$OXI_SOURCE_DIR/tools/testenv"
-if ! $(grep -q $tools_dir /root/.bashrc); then
-    echo "export PATH=$PATH:$tools_dir" >> /root/.bashrc
-    echo "export PATH=$PATH:$tools_dir" >> /home/vagrant/.profile
-    echo "$tools_dir/oxi-help"          >> /home/vagrant/.profile
+if ! grep -q "$tools_dir" /root/.bashrc; then
+    echo "Set \$PATH and run 'oxi-help' on login"
+    echo "export PATH=\$PATH:$tools_dir" >> /root/.bashrc
+    if [[ -d /home/vagrant ]]; then
+        echo "export PATH=\$PATH:$tools_dir" >> /home/vagrant/.profile
+        echo "$tools_dir/oxi-help"           >> /home/vagrant/.profile
+    fi
 fi

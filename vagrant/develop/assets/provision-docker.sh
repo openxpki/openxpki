@@ -1,6 +1,7 @@
 #!/bin/bash
 # Install Docker CE
 
+set +e
 docker_count=$(dpkg -s docker-ce | grep -c "Status:.*installed")
 set -e
 

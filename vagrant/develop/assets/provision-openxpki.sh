@@ -1,7 +1,8 @@
 #!/bin/bash
 # Install OpenXPKI
 
-. /vagrant/assets/functions.sh
+ROOTDIR="$(dirname "$0")"; mountpoint -q /vagrant && ROOTDIR=/vagrant/assets
+. "$ROOTDIR/functions.sh"
 
 #
 # Configure OpenXPKI
@@ -38,17 +39,17 @@ else
 fi
 
 # pkiadm
-if ! $(grep -q pkiadm /etc/passwd); then
-    echo "System user 'pkiadm'"
-    adduser --quiet --system --disabled-password --group pkiadm
-    usermod pkiadm -G openxpki
-    # In case somebody decided to change the home base
-    HOME=`grep pkiadm /etc/passwd | cut -d":" -f6`
-    chown pkiadm:openxpki $HOME
-    chmod 750 $HOME
-else
-    echo "System user 'pkiadm' - already set up."
-fi
+# if ! $(grep -q pkiadm /etc/passwd); then
+#     echo "System user 'pkiadm'"
+#     adduser --quiet --system --disabled-password --group pkiadm
+#     usermod pkiadm -G openxpki
+#     # In case somebody decided to change the home base
+#     HOME=`grep pkiadm /etc/passwd | cut -d":" -f6`
+#     chown pkiadm:openxpki $HOME
+#     chmod 750 $HOME
+# else
+#     echo "System user 'pkiadm' - already set up."
+# fi
 
 # Create the sudo file to restart oxi from pkiadm
 if [ -d /etc/sudoers.d ]; then

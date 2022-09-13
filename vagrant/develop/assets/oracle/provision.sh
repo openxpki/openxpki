@@ -2,7 +2,8 @@
 # Provision a Vagrant box (VirtualBox VM) for testing and development:
 # Install Oracle XE client and set up database
 
-. /vagrant/assets/functions.sh
+ROOTDIR="$(dirname "$0")/.."; mountpoint -q /vagrant && ROOTDIR=/vagrant/assets
+. "$ROOTDIR/functions.sh"
 
 #
 # Config

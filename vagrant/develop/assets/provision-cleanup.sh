@@ -1,7 +1,8 @@
 #!/bin/bash
 # Cleanup
 
-. /vagrant/assets/functions.sh
+ROOTDIR="$(dirname "$0")"; mountpoint -q /vagrant && ROOTDIR=/vagrant/assets
+. "$ROOTDIR/functions.sh"
 
 #
 # Cleanup
