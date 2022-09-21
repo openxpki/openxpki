@@ -272,13 +272,14 @@ OpenXPKI/Server/API2/Plugin/Crypto/password_quality/CheckLegacyRole.pm
 OpenXPKI/Server/API2/Plugin/Crypto/password_quality/CheckStandardRole.pm
 OpenXPKI/Server/API2/Plugin/Crypto/password_quality/TopPasswords.pm
 OpenXPKI/Server/API2/Plugin/Crypto/password_quality/Validate.pm
+OpenXPKI/Server/API2/Plugin/Datapool/clear_data_pool_namespace.pm
 OpenXPKI/Server/API2/Plugin/Datapool/create_datapool_encryption_key.pm
+OpenXPKI/Server/API2/Plugin/Datapool/delete_data_pool_entry.pm
 OpenXPKI/Server/API2/Plugin/Datapool/get_data_pool_entry.pm
 OpenXPKI/Server/API2/Plugin/Datapool/get_datavault_status.pm
 OpenXPKI/Server/API2/Plugin/Datapool/list_data_pool_entries.pm
 OpenXPKI/Server/API2/Plugin/Datapool/modify_data_pool_entry.pm
 OpenXPKI/Server/API2/Plugin/Datapool/set_data_pool_entry.pm
-OpenXPKI/Server/API2/Plugin/Datapool/delete_data_pool_entry.pm
 OpenXPKI/Server/API2/Plugin/Datapool/Util.pm
 OpenXPKI/Server/API2/Plugin/Import/import_crl.pm
 OpenXPKI/Server/API2/Plugin/Profile/Util.pm
@@ -440,6 +441,7 @@ OpenXPKI/Server/Workflow/Activity/Tools/Connector/GetValue.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CopyCertificateMetadata.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CopyContextFromWorkflow.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CRLExport.pm
+OpenXPKI/Server/Workflow/Activity/Tools/Datapool/ClearNamespace.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/DeleteEntry.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/GetEntry.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Datapool/ModifyEntry.pm
