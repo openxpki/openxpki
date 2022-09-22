@@ -40,11 +40,11 @@ command "scep_unwrap_message" => {
 } => sub {
 
     my ($self, $params) = @_;
-    
+
     ##! 64: 'unpack message'
     ##! 128: $params->message
     my $req = OpenXPKI::Crypt::PKCS7::SCEP->new($params->message);
-    
+
     ##! 32: 'message unwrapped'
     my $res = {
         #alias => $token_alias,
@@ -142,6 +142,8 @@ command "scep_generate_cert_response" => {
     digest_alg  => { isa => 'Str', default => 'sha256' },
     enc_alg     => { isa => 'Str', default => 'aes-256-cbc' },
     key_alg     => { isa => 'Str', default => 'rsaEncryption' },
+    chain       => { isa => 'Str', default => 'chain' , matching => qr{ \A ( none | chain | fullchain ) \Z }x, },
+
 } => sub {
 
     my ($self, $params) = @_;
@@ -204,9 +206,17 @@ sub __generate_response {
     $req->ratoken( OpenXPKI::Crypt::X509->new($racert) );
 
     if ($mode eq 'success') {
-        my $chain = $self->api->get_chain( start_with => $params->identifier, format => 'DER' );
+        if ($params->chain eq 'none') {
+            my $cert = $self->api->get_cert( identifier => $params->identifier, format => 'DER' );
+            $req->certs( [ $cert ] );
+        } else {
+            my $chain = $self->api->get_chain( start_with => $params->identifier, format => 'DER' );
+            if ($chain->{complete} && $params->chain ne 'fullchain') {
+                pop @{$chain->{certificates}};
+            }
+            $req->certs( $chain->{certificates} );
+        }
         $req->key_alg( $params->key_alg );
-        $req->certs( $chain->{certificates} );
         return encode_base64($req->create_cert_response());
     }
 

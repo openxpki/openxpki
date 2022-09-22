@@ -121,6 +121,8 @@ sub generate_pkcs7_response {
     }
 
     if (!$response->is_server_error()) {
+        my $conf = $self->config()->config();
+        $params{chain} = $conf->{output}->{chain} || 'chain';
         return $self->backend()->run_command('scep_generate_cert_response',
         { %params, (
             identifier  => $response->result,
