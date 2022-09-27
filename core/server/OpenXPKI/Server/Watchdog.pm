@@ -838,7 +838,6 @@ sub __flag_for_archiving {
     # severe error during archiving.
     my $update_count;
     try {
-        # "" it to undef later on, so a permanent value of 0 is an indicator
         $update_count = $self->{dbi}->update(
             table => 'workflow',
             set => {
@@ -871,6 +870,3 @@ sub __flag_for_archiving {
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
-
-1;
-__END__
