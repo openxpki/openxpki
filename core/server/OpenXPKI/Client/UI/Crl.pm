@@ -21,7 +21,7 @@ sub init_index {
     my $self = shift;
     my $args = shift;
 
-    $self->_page({
+    $self->resp->page({
         label => 'I18N_OPENXPKI_UI_CRL_CURRENT_LISTS',
     });
 
@@ -96,7 +96,7 @@ sub init_list {
 
     $self->logger()->trace("result: " . Dumper $crl_list) if $self->logger->is_trace;
 
-    $self->_page({
+    $self->resp->page({
         label => 'I18N_OPENXPKI_UI_CRL_LIST_FOR_ISSUER ',
         description => $self->_escape( $issuer_info->{subject} ),
     });
@@ -154,14 +154,14 @@ sub init_detail {
     });
     $self->logger()->trace("result: " . Dumper $crl_hash) if $self->logger->is_trace;
 
-    $self->_page({
+    $self->resp->page({
         label => 'I18N_OPENXPKI_UI_CRL_LIST_VIEW_DETAIL #' . $crl_hash->{crl_number},
         shortlabel => 'CRL #' . $crl_hash->{crl_number},
     });
 
     my @fields = $self->__print_detail( $crl_hash );
 
-    $self->_result()->{main} = [{
+    $self->resp->result->{main} = [{
         type => 'keyvalue',
         content => {
             label => '',

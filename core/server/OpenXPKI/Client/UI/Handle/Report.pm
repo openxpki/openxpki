@@ -14,7 +14,7 @@ sub render_report_list {
 
     $self->logger()->trace( 'render_report_list: ' . Dumper $wf_info ) if $self->logger->is_trace;
 
-    $self->_page({
+    $self->resp->page({
         label => $wf_info->{label},
         description => $wf_info->{description},
     });

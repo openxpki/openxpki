@@ -106,7 +106,7 @@ sub _init_backend {
                 # The session has gone - start a new one - might happen if the gui
                 # was idle too long or the server was flushed
                 $client->init_session({ SESSION_ID => undef });
-                $self->_status({ level => 'warn', message => i18nGettext('I18N_OPENXPKI_UI_BACKEND_SESSION_GONE')});
+                $self->set_status(i18nGettext('I18N_OPENXPKI_UI_BACKEND_SESSION_GONE'), 'warn');
             } else {
                 $self->logger()->error('Error creating backend session: ' . $eval_err->{message});
                 $self->logger()->trace($eval_err);
@@ -340,7 +340,7 @@ sub __get_action {
         } else {
 
             $self->logger()->debug("Request with invalid rtoken ($rtoken_request != $rtoken_session)!");
-            $self->_status({ level => 'error', 'message' => i18nGettext('I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID')});
+            $self->set_status(i18nGettext('I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID'), 'error');
         }
     }
     return;
@@ -400,7 +400,7 @@ sub handle_page {
             $self->logger()->debug("Method is $method");
             $result->$method( $method_args );
         } else {
-            $self->_status({ level => 'error', 'message' => i18nGettext('I18N_OPENXPKI_UI_ACTION_NOT_FOUND')});
+            $self->set_status(i18nGettext('I18N_OPENXPKI_UI_ACTION_NOT_FOUND'), 'error');
         }
     }
 

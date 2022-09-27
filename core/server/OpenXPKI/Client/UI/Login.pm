@@ -24,11 +24,11 @@ sub init_realm_select {
 
     my @realms = sort { lc($a->{label}) cmp lc($b->{label}) } @{$realms};
 
-    $self->_page ({
+    $self->resp->page ({
         'label' => 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN',
         'description' => 'I18N_OPENXPKI_UI_LOGIN_REALM_SELECTION_DESC'
     });
-    $self->_result()->{main} = [{ 'type' => 'form', 'action' => 'login!realm',  content => {
+    $self->resp->result->{main} = [{ 'type' => 'form', 'action' => 'login!realm',  content => {
         fields => [
             { 'name' => 'pki_realm', 'label' => 'I18N_OPENXPKI_UI_PKI_REALM_LABEL', 'type' => 'select', 'options' => \@realms },
         ]}
@@ -43,12 +43,12 @@ sub init_auth_stack {
 
     my @stacks = sort { lc($a->{label}) cmp lc($b->{label}) } @{$stacks};
 
-    $self->_page ({
+    $self->resp->page ({
         'label' => 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN',
         'description' => 'I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_DESC',
     });
 
-    $self->_result()->{main} = [
+    $self->resp->result->{main} = [
         { 'type' => 'form', 'action' => 'login!stack', content => {
             title => '', submit_label => 'I18N_OPENXPKI_UI_LOGIN_SUBMIT',
             fields => [
@@ -86,11 +86,11 @@ sub init_login_passwd {
         { 'name' => 'password', 'label' => 'I18N_OPENXPKI_UI_LOGIN_PASSWORD', 'type' => 'password' },
     ] unless ($args->{field});
 
-    $self->_page ({
+    $self->resp->page ({
         'label' => $args->{label} || 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN',
         'description' => $args->{description} || '',
     });
-    $self->_result()->{main} = [{
+    $self->resp->result->{main} = [{
         type => 'form',
         action => 'login!password',
         content => {
@@ -110,7 +110,7 @@ sub init_login_missing_data {
     my $self = shift;
     my $args = shift;
 
-    $self->_page ({
+    $self->resp->page ({
         'label' => 'I18N_OPENXPKI_UI_LOGIN_NO_DATA_HEAD'
     });
 
@@ -131,7 +131,7 @@ sub init_logout {
     my $self = shift;
     my $args = shift;
 
-    $self->_page ({
+    $self->resp->page ({
         'label' => 'I18N_OPENXPKI_UI_HOME_LOGOUT_HEAD'
     });
 

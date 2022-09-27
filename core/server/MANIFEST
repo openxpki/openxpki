@@ -61,6 +61,7 @@ OpenXPKI/Client/UI/Information.pm
 OpenXPKI/Client/UI/Login.pm
 OpenXPKI/Client/UI/Profile.pm
 OpenXPKI/Client/UI/Request.pm
+OpenXPKI/Client/UI/Response.pm
 OpenXPKI/Client/UI/Result.pm
 OpenXPKI/Client/UI/Secret.pm
 OpenXPKI/Client/UI/Source.pm

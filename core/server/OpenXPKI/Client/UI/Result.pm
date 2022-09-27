@@ -21,6 +21,7 @@ use Crypt::PRNG;
 # Project modules
 use OpenXPKI::i18n qw( i18nTokenizer );
 use OpenXPKI::Serialization::Simple;
+use OpenXPKI::Client::UI::Response;
 
 
 # Attributes set via constructor by OpenXPKI::Client::UI->__load_class()
@@ -33,7 +34,7 @@ has req => (
 has extra => (
     is => 'rw',
     isa => 'HashRef',
-    default => sub { return {}; },
+    default => sub { {} },
 );
 
 has _client => (
@@ -43,21 +44,13 @@ has _client => (
 );
 
 # Internal attributes
-has _error => (
-    is => 'rw',
-    isa => 'HashRef|Undef',
-);
 
-has _page => (
-    is => 'rw',
-    isa => 'HashRef|Undef',
+has resp => (
+    is => 'ro',
+    isa => 'OpenXPKI::Client::UI::Response',
     lazy => 1,
-    default => undef,
-);
-
-has _status => (
-    is => 'rw',
-    isa => 'HashRef|Undef',
+    default => sub { OpenXPKI::Client::UI::Response->new(ui_result => shift) },
+    handles => [ qw( redirect set_refresh has_refresh set_status has_status add_section render_to_str ) ],
 );
 
 has _last_reply => (
@@ -70,23 +63,6 @@ has _session => (
     isa => 'CGI::Session',
     lazy => 1,
     builder => '_init_session',
-);
-
-has _result => (
-    is => 'rw',
-    isa => 'HashRef|Undef',
-    default => sub { {} },
-);
-
-has _refresh => (
-    is => 'rw',
-    isa => 'HashRef|Undef',
-);
-
-has redirect => (
-    is => 'rw',
-    isa => 'Str|HashRef',
-    default => '',
 );
 
 has serializer => (
@@ -112,8 +88,8 @@ sub BUILD {
 
     my $self = shift;
     # load global client status if set
-    if ($self->_client()->_status()) {
-        $self->_status(  $self->_client()->_status() );
+    if (my $status = $self->_client->_status) {
+        $self->resp->raw_status($status);
     }
 
 }
@@ -133,41 +109,6 @@ sub cgi {
 
 }
 
-sub add_section {
-
-    my $self = shift;
-    my $arg = shift;
-
-    push @{$self->_result()->{main}}, $arg;
-
-    return $self;
-
-}
-
-sub set_status {
-
-    my $self = shift;
-    my $message = shift;
-    my $level = shift || 'info';
-    my $href = shift || '';
-
-    $self->_status({ level => $level, message => $message, href => $href });
-
-    return $self;
-
-}
-
-sub refresh() {
-
-    my $self = shift;
-    my $location = shift;
-    my $timeout = shift || 60;
-
-    $self->_refresh({ href => $location, timeout => $timeout * 1000 });
-
-    return $self;
-
-}
 
 =head2 send_command
 
@@ -279,7 +220,7 @@ sub set_status_from_error_reply {
     } else {
         $self->logger()->trace(Dumper $reply) if $self->logger()->is_trace;
     }
-    $self->_status({ level => 'error', message => $message });
+    $self->set_status($message, 'error');
 
     return $self;
 }
@@ -358,6 +299,30 @@ sub __tenant {
     return ();
 }
 
+sub __persist_status {
+    my $self = shift;
+    my $status = shift;
+
+    my $session_key = $self->__generate_uid();
+    $self->_session->param($session_key, $status);
+    $self->_session->expire($session_key, 15);
+
+    return '_status_id!' . $session_key;
+}
+
+sub __fetch_status {
+    my $self = shift;
+
+    my $session_key = $self->param('_status_id');
+    return unless $session_key;
+
+    my $status = $self->_session->param($session_key);
+    return unless ($status && ref $status eq 'HASH');
+
+    $self->logger->debug("Set persisted status: " . $status->{message});
+    return $status;
+}
+
 sub param_from_fields {
 
     my ($self, $fields) = @_;
@@ -412,96 +377,37 @@ to the browser.
 
 =cut
 sub render {
-
     my $self = shift;
-    my $output = shift;
 
-    my $result = $self->_result();
-
-    $result->{error} = $self->_error() if $self->_error();
-
-
-    if ($self->_status()) {
-        $result->{status} = $self->_status();
-    } elsif ($self->param('_status')) {
-        my $status = $self->_session->param(scalar $self->param('_status'));
-        if ($status && ref $status eq 'HASH') {
-            $self->logger()->debug("Set persisted status " . $status->{message});
-            $result->{status} = $status;
-        }
-    }
-
-
-    $result->{page} = $self->_page() if $self->_page();
-    $result->{refresh} = $self->_refresh() if ($self->_refresh());
-
-    my $body;
-    # page redirect
-    my $redirect = $self->redirect;
-    my $redirect_url;
-    if ($redirect) {
-        if (ref $redirect ne 'HASH') {
-            $redirect = { goto => $redirect };
-        }
-
-        # Persist and append status
-        if ($result->{status}) {
-            my $uid = $self->__generate_uid();
-            $self->__temp_param($uid, $result->{status}, 15);
-            $redirect->{goto} .= '!_status!' . $uid;
-        }
-        $redirect_url = $redirect->{goto};
-
-        $redirect->{session_id} = $self->_session->id;
-        $body = encode_json( $redirect );
-
-    # raw data
-    } elsif ($result->{_raw}) {
-        $body = i18nTokenizer ( encode_json($result->{_raw}) );
-
-    # regular response
-    } else {
-        $result->{session_id} = $self->_session->id;
-
-        # Add message of the day if set and we have a page section
-        if ($result->{page} && (my $motd = $self->_session()->param('motd'))) {
-             $self->_session()->param('motd', undef);
-             $result->{status} = $motd;
-        }
-        $body = i18nTokenizer ( encode_json($result) );
-    }
-
-
+    my $body = $self->resp->render_to_str;
     my $cgi = $self->cgi;
-    # Return the output into the given pointer
-    if ($output && ref $output eq 'SCALAR') {
-        $$output = $body;
 
-    } elsif (ref $cgi) {
-        if ($cgi->http('HTTP_X-OPENXPKI-Client')) {
-            # Start output stream
-            print $cgi->header( @main::header );
-            print $body;
+    if (not ref $cgi) {
+        $self->logger->error("Cannot render result - CGI object not available");
+        return $self;
+    }
 
-        } else {
-            my $url;
-            # redirect to given page
-            if ($redirect_url) {
-                $url = $redirect_url;
-            # redirect to downloads / result pages
-            } elsif ($body) {
-                $url = $self->__persist_response( { data => $body } );
-            }
-            # if url does not start with http or slash, prepend baseurl + route name
-            if ($url !~ m{\A http|/}x) {
-                my $baseurl = $self->_session()->param('baseurl');
-                $url = sprintf("%sopenxpki/%s", $baseurl, $url);
-            }
-            print $cgi->redirect($url);
-        }
+    if ($cgi->http('HTTP_X-OPENXPKI-Client')) {
+        # Start output stream
+        # FIXME Remove direct access to @main::header
+        print $cgi->header( @main::header );
+        print $body;
 
     } else {
-        $self->logger->error("Cannot render result - CGI object not available");
+        my $url;
+        # redirect to given page
+        if ($self->resp->has_redirect) {
+            $url = $self->resp->redirect->{goto};
+        # redirect to downloads / result pages
+        } elsif ($body) {
+            $url = $self->__persist_response( { data => $body } );
+        }
+        # if url does not start with http or slash, prepend baseurl + route name
+        if ($url !~ m{\A http|/}x) {
+            my $baseurl = $self->_session->param('baseurl');
+            $url = sprintf("%sopenxpki/%s", $baseurl, $url);
+        }
+        print $cgi->redirect($url);
     }
 
     return $self;
@@ -729,14 +635,11 @@ sub __persist_response {
     $self->logger()->debug('persist response ' . $id);
 
     # Auto Persist - use current result when no data is given
-    if (!defined $data) {
-        my $out;
-        $self->render( \$out );
-        $data = { data => $out };
+    if (not defined $data) {
+        $data = { data => $self->render_to_str };
     }
 
     $self->_session->param('response_'.$id, $data );
-
     $self->_session->expire('response_'.$id, $expire) if ($expire);
 
     return  "result!fetch!id!$id";
@@ -826,34 +729,6 @@ sub __render_pager {
         reverse => $result->{query}->{reverse} ? 1 : 0,
     }
 }
-
-
-=head2 __temp_param
-
-Get or set a temporary session parameter, the value is auto-destroyed after
-it was not being used for a given time period, default is 15 minutes.
-
-=cut
-
-sub __temp_param {
-
-    my $self = shift;
-    my $key = shift;
-    my $data = shift;
-    my $expire = shift;
-
-    # one argument - get request
-    if (!defined $data) {
-        return $self->_session->param( $key );
-    }
-
-    $expire = '+15m' unless defined $expire;
-    $self->_session->param($key, $data);
-    $self->_session->expire($key, $expire) if ($expire);
-
-    return $self;
-}
-
 
 =head2 __build_attribute_subquery
 

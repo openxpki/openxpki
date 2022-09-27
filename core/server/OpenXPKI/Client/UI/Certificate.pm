@@ -87,7 +87,7 @@ sub init_search {
     my $self = shift;
     my $args = shift;
 
-    $self->_page({
+    $self->resp->page({
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_LABEL',
         description => '',
     });
@@ -257,7 +257,7 @@ sub init_result {
 
     my $criteria = '<br>' . (join ", ", @{$result->{criteria}});
 
-    $self->_page({
+    $self->resp->page({
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL',
         description => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_DESC' . $criteria ,
         breadcrumb => [
@@ -484,7 +484,7 @@ sub init_pager {
 
     $self->logger()->trace( "dumper result: " . Dumper @result) if $self->logger->is_trace;
 
-    $self->_result()->{_raw} = {
+    $self->resp->result->{_raw} = {
         _returnType => 'partial',
         data => \@result,
     };
@@ -545,7 +545,7 @@ sub init_mine {
 
     $self->logger()->trace( "search result: " . Dumper $search_result) if $self->logger->is_trace;
 
-    $self->_page({
+    $self->resp->page({
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_MINE_LABEL',
         description => 'I18N_OPENXPKI_UI_CERTIFICATE_MINE_DESC',
     });
@@ -602,7 +602,7 @@ sub init_detail {
         attribute => 'subject_alt_name' }, 1);
 
     if (!$cert) {
-        $self->_page({
+        $self->resp->page({
             label => 'I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL',
             shortlabel => 'I18N_OPENXPKI_UI_CERT_STATUS_UNKNOWN'
         });
@@ -629,7 +629,7 @@ sub init_detail {
 
     my %dn = OpenXPKI::DN->new( $cert->{subject} )->get_hashed_content();
 
-    $self->_page({
+    $self->resp->page({
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL',
         shortlabel => $dn{CN}[0]
     });
@@ -866,7 +866,7 @@ sub init_text {
 
     $self->logger()->trace("Cert data: " . Dumper $pem) if $self->logger->is_trace;
 
-    $self->_page({
+    $self->resp->page({
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL',
         shortlabel => $cert_identifier,
         isLarge => ($format ne 'PEM') ? 1 : 0,
@@ -901,7 +901,7 @@ sub init_chain {
 
     my $chain = $self->send_command_v2 ( "get_chain", { start_with => $cert_identifier, format => 'DBINFO', 'keeproot' => 1 });
 
-    $self->_page({
+    $self->resp->page({
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_CHAIN_LABEL',
         shortlabel => 'I18N_OPENXPKI_UI_CERTIFICATE_CHAIN_LABEL',
     });
@@ -961,7 +961,7 @@ sub init_related {
 
     my %dn = OpenXPKI::DN->new( $cert->{subject} )->get_hashed_content();
 
-    $self->_page({
+    $self->resp->page({
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_RELATIONS_LABEL',
         shortlabel => $dn{CN}[0]
     });
@@ -1119,7 +1119,7 @@ sub init_parse {
         value => $pem
     });
 
-    $self->_page({
+    $self->resp->page({
         label => '',
         description => ''
     });
@@ -1204,7 +1204,7 @@ sub action_autocomplete {
 
     $self->logger()->trace( "search result: " . Dumper \@result) if $self->logger->is_trace;
 
-    $self->_result()->{_raw} = \@result;
+    $self->resp->result->{_raw} = \@result;
 
     return $self;
 

@@ -13,7 +13,7 @@ extends 'OpenXPKI::Client::UI::Result';
 sub BUILD {
 
     my $self = shift;
-    $self->_page ({'label' => 'I18N_OPENXPKI_UI_HOME_WELCOME_HEAD'});
+    $self->resp->page ({'label' => 'I18N_OPENXPKI_UI_HOME_WELCOME_HEAD'});
 }
 
 sub init_welcome {

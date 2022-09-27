@@ -30,7 +30,7 @@ has _basepath => (
 
 sub BUILD {
     my $self = shift;
-    $self->_page ({'label' => ''});
+    $self->resp->page ({'label' => ''});
 }
 
 
@@ -90,7 +90,7 @@ sub init_json {
 
     my $json = decode_json(join("",@content));
 
-    $self->_result()->{_raw} = $json;
+    $self->resp->result->{_raw} = $json;
     return $self;
 
 }

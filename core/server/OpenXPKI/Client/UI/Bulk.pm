@@ -23,7 +23,7 @@ sub init_index {
     my $self = shift;
     my $args = shift;
 
-    $self->_page({
+    $self->resp->page({
         label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE',
         description => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION',
     });

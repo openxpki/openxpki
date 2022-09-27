@@ -14,7 +14,7 @@ sub init_index {
     my $self = shift;
     my $args = shift;
     # render title + empty search form
-    $self->_page({
+    $self->resp->page({
         label => 'I18N_OPENXPKI_UI_USER_TITLE',
     });
     $self->render_search_form();
@@ -96,7 +96,7 @@ sub init_result {
 
     my $criteria = '<br>' . (join ", ", @{$result->{criteria}});
 
-    $self->_page({
+    $self->resp->page({
         label => 'I18N_OPENXPKI_UI_USER_SEARCH_RESULT_LABEL',
         description => 'I18N_OPENXPKI_UI_USER_SEARCH_RESULT_DESC' . $criteria ,
         breadcrumb => [
@@ -169,7 +169,7 @@ sub init_pager {
 
     $self->logger()->trace( "dumper result: " . Dumper @result) if $self->logger->is_trace;
 
-    $self->_result()->{_raw} = {
+    $self->resp->result->{_raw} = {
         _returnType => 'partial',
         data => \@result,
     };
@@ -372,7 +372,7 @@ sub init_search {
     my $self = shift;
     my $args = shift;
 
-    $self->_page({
+    $self->resp->page({
         label => 'I18N_OPENXPKI_UI_USER_SEARCH_LABEL',
     });
     # check if there are any preset values for the search fields

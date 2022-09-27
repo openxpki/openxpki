@@ -21,7 +21,7 @@ sub render_process_status {
 
     $self->logger()->trace("result: " . Dumper $process ) if $self->logger->is_trace;
 
-    $self->_page({
+    $self->resp->page({
         label => 'Running processes (global)',
     });
 
@@ -72,7 +72,7 @@ sub render_system_status {
     my $warning = 0;
     my $critical = 0;
 
-    $self->_page({
+    $self->resp->page({
         label => 'OpenXPKI system status',
     });
 

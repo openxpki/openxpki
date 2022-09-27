@@ -289,7 +289,7 @@ sub init_load {
     });
 
     if (!$wf_info) {
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error') unless($self->_status());
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error') unless $self->resp->has_status;
         return $self->init_search({ preset => { wf_id => $id } });
     }
 
@@ -326,11 +326,11 @@ sub init_context {
     });
 
     if (!$wf_info) {
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error') unless($self->_status());
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error') unless $self->resp->has_status;
         return $self;
     }
 
-    $self->_page({
+    $self->resp->page({
         label => 'I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL #' . $wf_info->{workflow}->{id},
         isLarge => 1,
     });
@@ -377,11 +377,11 @@ sub init_attribute {
     });
 
     if (!$wf_info) {
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error') unless($self->_status());
+        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error') unless $self->resp->has_status;
         return $self;
     }
 
-    $self->_page({
+    $self->resp->page({
         label => 'I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL #' . $wf_info->{workflow}->{id},
         isLarge => 1,
     });
@@ -428,7 +428,7 @@ sub init_info {
     });
 
     if (!$wf_info) {
-        $self->_page({
+        $self->resp->page({
             label => '',
             shortlabel => '',
             description => 'I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION',
@@ -488,7 +488,7 @@ sub init_info {
     }
 
     my $label = sprintf("%s (#%01d)", ($wf_info->{workflow}->{title} || $wf_info->{workflow}->{label} || $wf_info->{workflow}->{type}), $wf_info->{workflow}->{id});
-    $self->_page({
+    $self->resp->page({
         label => $label,
         shortlabel => $label,
         description => '',
@@ -524,7 +524,7 @@ sub init_search {
     my $self = shift;
     my $args = shift;
 
-    $self->_page({
+    $self->resp->page({
         label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_LABEL',
         description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESC',
     });
@@ -735,10 +735,10 @@ sub init_result {
 
     # Add page header from result - optional
     if ($result->{page} && ref $result->{page} ne 'HASH') {
-        $self->_page($result->{page});
+        $self->resp->page($result->{page});
     } else {
         my $criteria = $result->{criteria} ? '<br>' . (join ", ", @{$result->{criteria}}) : '';
-        $self->_page({
+        $self->resp->page({
             label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_LABEL',
             description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION' . $criteria ,
             breadcrumb => [
@@ -961,7 +961,7 @@ sub init_pager {
 
     $self->logger()->trace( "dumper result: " . Dumper @result) if $self->logger->is_trace;
 
-    $self->_result()->{_raw} = {
+    $self->resp->result->{_raw} = {
         _returnType => 'partial',
         data => \@result,
     };
@@ -983,7 +983,7 @@ sub init_history {
     my $id = $self->param('wf_id');
     my $view = $self->param('view') || '';
 
-    $self->_page({
+    $self->resp->page({
         label => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_TITLE',
         description => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_DESCRIPTION',
         isLarge => 1,
@@ -1048,7 +1048,7 @@ sub init_mine {
     my $self = shift;
     my $args = shift;
 
-    $self->_page({
+    $self->resp->page({
         label => 'I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE',
         description => 'I18N_OPENXPKI_UI_MY_WORKFLOW_DESCRIPTION',
     });
@@ -1099,7 +1099,7 @@ sub init_task {
     my $self = shift;
     my $args = shift;
 
-    $self->_page({
+    $self->resp->page({
         label => 'I18N_OPENXPKI_UI_WORKFLOW_OUTSTANDING_TASKS_LABEL'
     });
 
@@ -1133,7 +1133,7 @@ sub init_log {
     my $id = $self->param('wf_id');
     my $view = $self->param('view') || '';
 
-    $self->_page({
+    $self->resp->page({
         label => 'I18N_OPENXPKI_UI_WORKFLOW_LOG',
         isLarge => 1,
     });
@@ -1716,14 +1716,14 @@ sub action_bulk {
         # that the action was not successful. We can slurp the verbose error
         # from the result status item and display it in the table
         if (!$wf_info) {
-            $errors->{$id} = $self->_status()->{message} || 'I18N_OPENXPKI_UI_APPLICATION_ERROR';
+            $errors->{$id} = $self->resp->has_status ? $self->resp->raw_status->{message} : 'I18N_OPENXPKI_UI_APPLICATION_ERROR';
         } else {
             push @success, $wf_info;
             $self->logger()->trace('Result on '.$id.': '. Dumper $wf_info) if $self->logger->is_trace;
         }
     }
 
-    $self->_page({
+    $self->resp->page({
         label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_LABEL',
         description => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_DESC',
     });
@@ -1995,7 +1995,7 @@ sub __render_from_workflow {
         my $label = $self->__get_proc_state_label($wf_proc_state); # reuse labels from init_info popup
         my $desc = $irregular{$wf_proc_state};
 
-        $self->_page({
+        $self->resp->page({
             label => $label,
             breadcrumb => $self->__get_breadcrumb($wf_info, $wf_info->{state}->{label}),
             shortlabel => $wf_info->{workflow}->{id},
@@ -2031,10 +2031,10 @@ sub __render_from_workflow {
                 # automated reload of the page
                 my $to_sleep = $wf_info->{workflow}->{wake_up_at} - time();
                 if ($to_sleep < 30) {
-                    $self->refresh('workflow!load!wf_id!'.$wf_info->{workflow}->{id}, 30);
+                    $self->set_refresh('workflow!load!wf_id!'.$wf_info->{workflow}->{id}, 30);
                     $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_30SEC','info');
                 } elsif ($to_sleep < 300) {
-                    $self->refresh('workflow!load!wf_id!'.$wf_info->{workflow}->{id}, $to_sleep + 30);
+                    $self->set_refresh('workflow!load!wf_id!'.$wf_info->{workflow}->{id}, $to_sleep + 30);
                     $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_5MIN','info');
                 } else {
                     $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED','info');
@@ -2096,7 +2096,7 @@ sub __render_from_workflow {
                 $self->logger()->debug('Auto Refresh when running' . $elapsed .' / ' . $timeout );
             }
 
-            $self->refresh('workflow!load!wf_id!'.$wf_info->{workflow}->{id}, $timeout);
+            $self->set_refresh('workflow!load!wf_id!'.$wf_info->{workflow}->{id}, $timeout);
 
         # workflow halted by exception
         } elsif ( $wf_proc_state eq 'exception') {
@@ -2122,7 +2122,7 @@ sub __render_from_workflow {
             }
 
             # if we come here from a failed action the status is set already
-            if (!$self->_status()) {
+            if (!$self->resp->has_status()) {
                 $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION','error');
             }
 
@@ -2149,7 +2149,7 @@ sub __render_from_workflow {
 
     } else {
 
-        $self->_page({
+        $self->resp->page({
             label => $wf_info->{state}->{label} || $wf_info->{workflow}->{title} || $wf_info->{workflow}->{label},
             breadcrumb => $self->__get_breadcrumb($wf_info),
             shortlabel => $wf_info->{workflow}->{id},
@@ -2163,7 +2163,7 @@ sub __render_from_workflow {
         # Some field types are able to override the status during render so
         # this might not be the final status line!
         if ( $wf_info->{state}->{status} && ref $wf_info->{state}->{status} eq 'HASH' ) {
-            $self->_status( $wf_info->{state}->{status} );
+            $self->resp->raw_status( $wf_info->{state}->{status} );
 
         # Finished workflow
         } elsif ('finished' eq $wf_proc_state) {
@@ -2360,7 +2360,7 @@ sub __render_from_workflow {
 
             }
 
-            $self->_result()->{right} = [{
+            $self->resp->result->{right} = [{
                 type => 'keyvalue',
                 content => {
                     label => '',
@@ -3029,7 +3029,7 @@ sub __render_fields {
                 my $v = $item->{value};
                 my $target = $v->{target} || 'workflow!load!wf_id!'.$wf_info->{workflow}->{id};
                 my $pause = $v->{pause} || 1;
-                $self->refresh($target, $pause);
+                $self->set_refresh($target, $pause);
                 if ($v->{label}) {
                     $self->set_status($v->{label}, ($v->{level} || 'info'));
                 }
@@ -3726,7 +3726,7 @@ sub __check_for_validation_error {
         } else {
             $self->logger()->info('Input validation error');
         }
-        $self->_status({ level => 'error', message => $validator_msg, field_errors => $field_errors });
+        $self->resp->raw_status({ level => 'error', message => $validator_msg, field_errors => $field_errors });
         $self->logger()->trace('validation details' . Dumper $field_errors ) if $self->logger->is_trace;
         return $field_errors;
     }
@@ -3812,7 +3812,7 @@ sub __render_workflow_action_head {
         $breadcrumb  = $self->__get_breadcrumb($wf_info);
     }
 
-    $self->_page({
+    $self->resp->page({
         label => $label,
         breadcrumb => $breadcrumb,
         shortlabel => $wf_info->{workflow}->{id},
