@@ -767,15 +767,15 @@ sub __fetch_response {
 
 =head2 __generate_uid
 
-Generate a random uid (base64 encoded with dangerours chars removed)
+Generate a random uid (RFC 3548 URL and filename safe base64)
 
 =cut
 sub __generate_uid {
-
     my $self = shift;
-    my $queryid = sha1_base64(time.rand().$$);
-    $queryid =~ s{[+/]}{}g;
-    return $queryid;
+    my $uid = sha1_base64(time.rand().$$);
+    ## RFC 3548 URL and filename safe base64
+    $uid =~ tr/+\//-_/;
+    return $uid;
 }
 
 =head2 __render_pager
