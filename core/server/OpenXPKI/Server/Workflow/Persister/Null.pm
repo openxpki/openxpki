@@ -70,10 +70,6 @@ OpenXPKI::Server::Workflow::Persister::Null
 
 =head1 Description
 
-B<THIS IS AN EXPERIMENTAL FEATURE>
-
 This class provides a persister for "throw away" workflows. Those are not
 persisted and therefore are only useable for "one shot" operations.
 Be aware that you loose all workflow related data once the workflows ends!
-
-
