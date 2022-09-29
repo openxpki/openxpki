@@ -15,6 +15,7 @@ use JSON;
 use OpenXPKI::i18n qw( i18nTokenizer );
 use OpenXPKI::Client::UI::Response::Page;
 use OpenXPKI::Client::UI::Response::Redirect;
+use OpenXPKI::Client::UI::Response::Refresh;
 use OpenXPKI::Client::UI::Response::Status;
 
 sub has_hash($@) {
@@ -94,9 +95,12 @@ has _status => (
     reader => 'status',
 );
 
-has_hash raw_refresh => (
-    allowed_keys => [qw( href timeout )],
-    predicate => 'has_refresh',
+has _refresh => (
+    is => 'rw',
+    isa => 'OpenXPKI::Client::UI::Response::Refresh',
+    default => sub { OpenXPKI::Client::UI::Response::Refresh->new },
+    lazy => 1,
+    reader => 'refresh',
 );
 
 sub set_redirect { shift->_redirect(OpenXPKI::Client::UI::Response::Redirect->new(@_)) }
@@ -105,15 +109,7 @@ sub set_page { shift->_page(OpenXPKI::Client::UI::Response::Page->new(@_)) }
 
 sub set_status { shift->_status(OpenXPKI::Client::UI::Response::Status->new(@_)) }
 
-sub set_refresh {
-    my $self = shift;
-    my $location = shift;
-    my $timeout = shift || 60;
-
-    $self->raw_refresh({ href => $location, timeout => $timeout * 1000 });
-
-    return $self;
-}
+sub set_refresh { shift->_refresh(OpenXPKI::Client::UI::Response::Refresh->new(@_)) }
 
 sub add_section {
     my $self = shift;
@@ -138,7 +134,7 @@ sub render_to_str {
     my $status = $self->status->is_set ? $self->status->resolve : $self->ui_result->__fetch_status;
     $result->{status} = $status if $status;
     $result->{page} = $self->page->resolve if $self->page->is_set;
-    $result->{refresh} = $self->raw_refresh if $self->has_refresh;
+    $result->{refresh} = $self->refresh->resolve if $self->refresh->is_set;
 
     my $body;
 

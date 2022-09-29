@@ -2023,10 +2023,10 @@ sub __render_from_workflow {
                 # automated reload of the page
                 my $to_sleep = $wf_info->{workflow}->{wake_up_at} - time();
                 if ($to_sleep < 30) {
-                    $self->set_refresh('workflow!load!wf_id!'.$wf_info->{workflow}->{id}, 30);
+                    $self->set_refresh(uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}, timeout => 30);
                     $self->status->info('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_30SEC');
                 } elsif ($to_sleep < 300) {
-                    $self->set_refresh('workflow!load!wf_id!'.$wf_info->{workflow}->{id}, $to_sleep + 30);
+                    $self->set_refresh(uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}, timeout => $to_sleep + 30);
                     $self->status->info('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_5MIN');
                 } else {
                     $self->status->info('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED');
@@ -2088,7 +2088,7 @@ sub __render_from_workflow {
                 $self->logger()->debug('Auto Refresh when running' . $elapsed .' / ' . $timeout );
             }
 
-            $self->set_refresh('workflow!load!wf_id!'.$wf_info->{workflow}->{id}, $timeout);
+            $self->set_refresh(uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}, timeout => $timeout);
 
         # workflow halted by exception
         } elsif ( $wf_proc_state eq 'exception') {
@@ -3023,7 +3023,7 @@ sub __render_fields {
                 my $v = $item->{value};
                 my $target = $v->{target} || 'workflow!load!wf_id!'.$wf_info->{workflow}->{id};
                 my $pause = $v->{pause} || 1;
-                $self->set_refresh($target, $pause);
+                $self->set_refresh(uri => $target, timeout => $pause);
                 if ($v->{label}) {
                     $self->status->message($v->{label});
                     $self->status->level($v->{level}) if $v->{level};

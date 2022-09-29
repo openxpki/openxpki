@@ -51,10 +51,10 @@ has resp => (
     lazy => 1,
     default => sub { OpenXPKI::Client::UI::Response->new(ui_result => shift) },
     handles => [ qw(
-        redirect set_redirect
-        set_refresh has_refresh
-        status set_status
         page set_page
+        redirect set_redirect
+        refresh set_refresh
+        status set_status
         add_section
         render_to_str
     ) ],
