@@ -87,13 +87,13 @@ sub init_error {
     my $self = shift;
     my $args = shift;
 
-    $self->resp->result->{main} = [{
+    $self->add_section({
         type => 'text',
         content => {
             headline => 'I18N_OPENXPKI_UI_OOPS',
             paragraphs => [{text=>'I18N_OPENXPKI_UI_OOPS'}]
         }
-    }];
+    });
 
     return $self;
 }

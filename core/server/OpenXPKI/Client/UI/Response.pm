@@ -68,15 +68,9 @@ has ui_result => (
 
 has_hash result => (
     lazy => 1,
-    default => sub { {} },
-);
-
-has _redirect => (
-    is => 'rw',
-    isa => 'OpenXPKI::Client::UI::Response::Redirect',
-    default => sub { OpenXPKI::Client::UI::Response::Redirect->new },
-    lazy => 1,
-    reader => 'redirect',
+    default => sub { {
+        main => [],
+    } },
 );
 
 has _page => (
@@ -87,12 +81,12 @@ has _page => (
     reader => 'page',
 );
 
-has _status => (
+has _redirect => (
     is => 'rw',
-    isa => 'OpenXPKI::Client::UI::Response::Status',
-    default => sub { OpenXPKI::Client::UI::Response::Status->new },
+    isa => 'OpenXPKI::Client::UI::Response::Redirect',
+    default => sub { OpenXPKI::Client::UI::Response::Redirect->new },
     lazy => 1,
-    reader => 'status',
+    reader => 'redirect',
 );
 
 has _refresh => (
@@ -103,19 +97,24 @@ has _refresh => (
     reader => 'refresh',
 );
 
-sub set_redirect { shift->_redirect(OpenXPKI::Client::UI::Response::Redirect->new(@_)) }
+has _status => (
+    is => 'rw',
+    isa => 'OpenXPKI::Client::UI::Response::Status',
+    default => sub { OpenXPKI::Client::UI::Response::Status->new },
+    lazy => 1,
+    reader => 'status',
+);
 
 sub set_page { shift->_page(OpenXPKI::Client::UI::Response::Page->new(@_)) }
-
-sub set_status { shift->_status(OpenXPKI::Client::UI::Response::Status->new(@_)) }
-
+sub set_redirect { shift->_redirect(OpenXPKI::Client::UI::Response::Redirect->new(@_)) }
 sub set_refresh { shift->_refresh(OpenXPKI::Client::UI::Response::Refresh->new(@_)) }
+sub set_status { shift->_status(OpenXPKI::Client::UI::Response::Status->new(@_)) }
 
 sub add_section {
     my $self = shift;
     my $arg = shift;
 
-    push @{$self->result()->{main}}, $arg;
+    push @{$self->result->{main}}, $arg;
 
     return $self;
 }

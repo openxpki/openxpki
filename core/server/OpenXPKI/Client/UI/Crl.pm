@@ -161,14 +161,14 @@ sub init_detail {
 
     my @fields = $self->__print_detail( $crl_hash );
 
-    $self->resp->result->{main} = [{
+    $self->add_section({
         type => 'keyvalue',
         content => {
             label => '',
             description => '',
             data => \@fields,
-        }},
-    ];
+        }
+    });
 
 }
 
