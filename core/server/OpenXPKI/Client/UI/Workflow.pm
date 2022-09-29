@@ -2354,14 +2354,15 @@ sub __render_from_workflow {
 
             }
 
-            $self->resp->_result->{right} = [{
+            $self->add_infobox_section({
                 type => 'keyvalue',
                 content => {
                     label => '',
                     description => '',
                     data => $data,
                     buttons => \@buttons_handle,
-            }}];
+                },
+            });
         }
     }
 

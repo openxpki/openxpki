@@ -70,6 +70,7 @@ has_hash _result => (
     lazy => 1,
     default => sub { {
         main => [],
+        right => [],
     } },
 );
 
@@ -114,8 +115,17 @@ sub add_section {
     my $self = shift;
     my $arg = shift;
 
+    die "Section data passed to 'add_section' must be a HashRef" unless ref $arg eq 'HASH';
     push @{$self->_result->{main}}, $arg;
+    return $self;
+}
 
+sub add_infobox_section {
+    my $self = shift;
+    my $arg = shift;
+
+    die "Section data passed to 'add_infobox_section' must be a HashRef" unless ref $arg eq 'HASH';
+    push @{$self->_result->{right}}, $arg;
     return $self;
 }
 

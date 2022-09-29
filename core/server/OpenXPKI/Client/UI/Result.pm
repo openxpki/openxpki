@@ -55,7 +55,7 @@ has resp => (
         redirect set_redirect
         refresh set_refresh
         status set_status
-        add_section
+        add_section add_infobox_section
         render_to_str
     ) ],
 );
