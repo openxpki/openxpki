@@ -51,7 +51,7 @@ has resp => (
     lazy => 1,
     default => sub { OpenXPKI::Client::UI::Response->new(ui_result => shift) },
     handles => [ qw(
-        redirect has_redirect
+        redirect set_redirect
         set_refresh has_refresh
         status set_status
         page set_page
@@ -403,8 +403,8 @@ sub render {
     } else {
         my $url;
         # redirect to given page
-        if ($self->has_redirect) {
-            $url = $self->redirect->{goto};
+        if ($self->redirect->is_set) {
+            $url = $self->redirect->to;
         # redirect to downloads / result pages
         } elsif ($body) {
             $url = $self->__persist_response( { data => $body } );
@@ -436,7 +436,7 @@ sub init_fetch {
 
     if (!$data) {
         $self->logger()->error('Got empty response');
-        $self->redirect('home!welcome');
+        $self->redirect->to('home!welcome');
         return $self;
     }
 

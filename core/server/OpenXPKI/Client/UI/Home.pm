@@ -31,13 +31,13 @@ sub init_welcome {
 
     if ($redirect) {
         $self->logger()->debug('Found redirect - redirecting user to ' . $redirect);
-        $self->redirect($redirect);
+        $self->redirect->to($redirect);
     } else {
         # check if there are custom landmarks for this user
         my $landmark = $self->_client->session()->param('landmark');
         if ($landmark && $landmark->{welcome}) {
             $self->logger()->debug('Found welcome landmark - redirecting user to ' . $landmark->{welcome});
-            $self->redirect($landmark->{welcome});
+            $self->redirect->to($landmark->{welcome});
         } else {
             $self->init_index();
         }
@@ -71,7 +71,7 @@ Redirect to workflow!task
 sub init_task {
 
     my $self = shift;
-    $self->redirect('workflow!task');
+    $self->redirect->to('workflow!task');
 
 }
 

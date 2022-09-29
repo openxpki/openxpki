@@ -147,7 +147,7 @@ sub init_index {
 
     my $self = shift;
 
-    $self->redirect('redirect!welcome');
+    $self->redirect->to('redirect!welcome');
 
     return $self;
 }

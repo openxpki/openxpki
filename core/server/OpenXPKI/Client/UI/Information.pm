@@ -26,7 +26,7 @@ sub init_index {
     my $self = shift;
     my $args = shift;
 
-    $self->redirect('home!index');
+    $self->redirect->to('home!index');
 
     return $self;
 }

@@ -91,7 +91,7 @@ sub action_result {
     # Read query pattern and list info from persisted data
     my $spec = $self->_client->session()->param('bulk_'.$queryid);
     if (!$spec) {
-        return $self->redirect('bulk!index');
+        return $self->redirect->to('bulk!index');
     }
 
     my $query = {};
@@ -202,7 +202,7 @@ sub action_result {
         'button' => \@buttons,
     });
 
-    $self->redirect( 'bulk!result!id!'.$queryid  );
+    $self->redirect->to('bulk!result!id!'.$queryid);
 
     return $self;
 

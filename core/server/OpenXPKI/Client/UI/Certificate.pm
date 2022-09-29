@@ -591,7 +591,7 @@ sub init_detail {
 
     # empty submission
     if (!$cert_identifier) {
-        $self->redirect('certificate!search');
+        $self->redirect->to('certificate!search');
         return;
     }
 
@@ -1036,7 +1036,7 @@ sub init_download {
 
     my $cert_info = $self->send_command_v2 ( "get_cert", {'identifier' => $cert_identifier, 'format' => 'DBINFO' });
     if (!$cert_info) {
-        $self->redirect('certificate!search');
+        $self->redirect->to('certificate!search');
         return;
     }
 
@@ -1264,14 +1264,14 @@ sub action_find {
                 'criteria' => [ sprintf '<nobr><b>I18N_OPENXPKI_UI_CERTIFICATE_SERIAL:</b> <i>%s</i></nobr>', $self->param('cert_serial') ]
             });
 
-            return $self->redirect( 'certificate!result!id!'.$queryid  );
+            return $self->redirect->to('certificate!result!id!'.$queryid);
         }
     } else {
         $self->status->error('I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_MUST_PROIVDE_IDENTIFIER_OR_SERIAL');
         return $self->init_search();
     }
 
-    $self->redirect( 'certificate!detail!identifier!'.$cert_identifier );
+    $self->redirect->to('certificate!detail!identifier!'.$cert_identifier);
 
 }
 
@@ -1453,7 +1453,7 @@ sub action_search {
         'criteria' => \@criteria
     });
 
-    $self->redirect( 'certificate!result!id!'.$queryid  );
+    $self->redirect->to('certificate!result!id!'.$queryid);
 
     return $self;
 

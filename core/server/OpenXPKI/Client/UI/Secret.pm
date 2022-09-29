@@ -111,10 +111,10 @@ sub init_clear {
 
     if ($status) {
         $self->status->success('I18N_OPENXPKI_UI_SECRET_STATUS_CLEARED');
-        $self->redirect('secret!index');
+        $self->redirect->to('secret!index');
     } elsif (defined $status) {
         $self->status->success('I18N_OPENXPKI_UI_SECRET_STATUS_CLEAR_FAILED');
-        $self->redirect('secret!index');
+        $self->redirect->to('secret!index');
     }
 
     return $self;
@@ -132,10 +132,10 @@ sub action_unlock {
 
     if ($msg) {
         $self->status->success('I18N_OPENXPKI_UI_SECRET_STATUS_ACCEPTED');
-        $self->redirect('secret!index');
+        $self->redirect->to('secret!index');
     } elsif(defined $msg) {
         $self->status->error('I18N_OPENXPKI_UI_SECRET_STATUS_UNLOCK_FAILED');
-        $self->redirect('secret!index');
+        $self->redirect->to('secret!index');
     }
 
     return $self;

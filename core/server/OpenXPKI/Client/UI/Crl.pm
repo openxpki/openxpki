@@ -184,7 +184,7 @@ sub init_download {
 
      # No format, draw a list
     if (!$format || $format !~ /(pem|txt|der)/i) {
-        $self->redirect('crl!detail!crl_key!'.$crl_key);
+        $self->redirect->to('crl!detail!crl_key!'.$crl_key);
     }
 
     my $data = $self->send_command_v2( 'get_crl', {

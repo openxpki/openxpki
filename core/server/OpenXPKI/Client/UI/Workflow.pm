@@ -250,7 +250,7 @@ sub init_start {
         if (scalar @activity == 1) {
             $redirect .= '!wf_action!'.$activity[0];
         }
-        $self->redirect($redirect);
+        $self->redirect->to($redirect);
 
     } else {
         # one shot workflow
@@ -1098,7 +1098,7 @@ sub init_task {
     my $tasklist = $self->_client->session()->param('tasklist')->{default};
 
     if (!@$tasklist) {
-        return $self->redirect('home');
+        return $self->redirect->to('home');
     }
 
     $self->logger()->trace( "got tasklist: " . Dumper $tasklist) if $self->logger->is_trace;
@@ -1341,7 +1341,7 @@ sub action_index {
         if ($wf_action) {
             $redirect .= '!wf_action!'.$wf_action;
         }
-        $self->redirect($redirect);
+        $self->redirect->to($redirect);
         return $self;
     }
 
@@ -1438,7 +1438,7 @@ sub action_load {
     my $self = shift;
     my $args = shift;
 
-    $self->redirect('workflow!load!wf_id!'.$self->param('wf_id').'!_seed!'.time() );
+    $self->redirect->to('workflow!load!wf_id!'.$self->param('wf_id').'!_seed!'.time());
     return $self;
 
 }
@@ -1635,7 +1635,7 @@ sub action_search {
         'criteria' => \@criteria
     });
 
-    $self->redirect( 'workflow!result!id!'.$queryid  );
+    $self->redirect->to('workflow!result!id!'.$queryid);
 
     return $self;
 
@@ -3029,7 +3029,7 @@ sub __render_fields {
                     $self->status->level($v->{level}) if $v->{level};
                 }
             } else {
-                $self->redirect($item->{value});
+                $self->redirect->to($item->{value});
             }
             # we dont want this to show up in the result so we unset its value
             $item = undef;

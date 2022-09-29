@@ -14,6 +14,7 @@ use JSON;
 # Project modules
 use OpenXPKI::i18n qw( i18nTokenizer );
 use OpenXPKI::Client::UI::Response::Page;
+use OpenXPKI::Client::UI::Response::Redirect;
 use OpenXPKI::Client::UI::Response::Status;
 
 sub has_hash($@) {
@@ -69,10 +70,12 @@ has_hash result => (
     default => sub { {} },
 );
 
-has_hash redirect => (
-    allowed_keys => [qw( goto type )],
-    store_str_in => 'goto',
-    predicate => 'has_redirect',
+has _redirect => (
+    is => 'rw',
+    isa => 'OpenXPKI::Client::UI::Response::Redirect',
+    default => sub { OpenXPKI::Client::UI::Response::Redirect->new },
+    lazy => 1,
+    reader => 'redirect',
 );
 
 has _page => (
@@ -95,6 +98,8 @@ has_hash raw_refresh => (
     allowed_keys => [qw( href timeout )],
     predicate => 'has_refresh',
 );
+
+sub set_redirect { shift->_redirect(OpenXPKI::Client::UI::Response::Redirect->new(@_)) }
 
 sub set_page { shift->_page(OpenXPKI::Client::UI::Response::Page->new(@_)) }
 
@@ -138,16 +143,14 @@ sub render_to_str {
     my $body;
 
     # page redirect
-    if ($self->has_redirect) {
-        my $redirect = $self->redirect;
+    if ($self->redirect->is_set) {
         # Persist and append status
-        if ($result->{status}) {
-            my $url_param = $self->ui_result->__persist_status($result->{status});
-            $redirect->{goto} .= '!' . $url_param;
+        if ($status) {
+            my $url_param = $self->ui_result->__persist_status($status);
+            $self->redirect->to($self->redirect->to . '!' . $url_param);
         }
-
         $body = encode_json({
-            %$redirect,
+            %{ $self->redirect->resolve },
             session_id => $self->ui_result->_session->id
         });
 

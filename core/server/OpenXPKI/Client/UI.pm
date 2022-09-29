@@ -168,7 +168,7 @@ sub handle_request {
         my $goto = $1;
         my $result = OpenXPKI::Client::UI::Result->new({ client => $self, req => $req });
         $self->logger()->debug("Send redirect to $goto");
-        $result->redirect( $goto );
+        $result->redirect->to($goto);
         return $result->render();
     }
 
@@ -190,7 +190,7 @@ sub handle_request {
         if ($redirectTo) {
             $self->logger()->debug("External redirect on logout to " . $redirectTo);
             my $result = OpenXPKI::Client::UI::Result->new({ client => $self, req => $req });
-            $result->redirect( $redirectTo );
+            $result->redirect->to($redirectTo);
             return $result->render();
         }
 
@@ -458,7 +458,7 @@ sub handle_login {
 
     # this is the incoming logout action
     if ($page eq 'logout') {
-        $result->redirect( { goto => 'login!logout' } );
+        $result->redirect->to('login!logout');
         return $result->render();
     }
 
@@ -513,7 +513,7 @@ sub handle_login {
         } elsif (my $loginurl = $self->_config()->{loginurl}) {
 
             $self->logger()->debug("Redirect to external login page " . $loginurl );
-            $result->redirect( { goto => $loginurl, type => 'external' } );
+            $result->redirect->external($loginurl);
             return $result->render();
             # Do a real exit to skip the error handling of the script body
             exit;
@@ -521,7 +521,7 @@ sub handle_login {
         } elsif ( $cgi->http('HTTP_X-OPENXPKI-Client') ) {
 
             # Session is gone but we are still in the ember application
-            $result->redirect('login');
+            $result->redirect->to('login');
 
         } else {
 
@@ -535,7 +535,7 @@ sub handle_login {
             }
             $url .= '/#/openxpki/login';
             $self->logger()->debug('Redirect to login page: ' . $url);
-            $result->redirect($url);
+            $result->redirect->to($url);
         }
     }
 
@@ -635,7 +635,7 @@ sub handle_login {
                     { baseurl => $session->param('baseurl') } );
 
                 $self->logger()->debug("No auth data in environment - redirect found $loginurl");
-                $result->redirect( { goto => $loginurl, type => 'external' } );
+                $result->redirect->external($loginurl);
                 return $result->render();
 
             # bad luck - something seems to be really wrong
@@ -748,7 +748,7 @@ sub handle_login {
             $self->logger->trace('CGI Header ' . Dumper \@main::header ) if $self->logger->is_trace;
 
             if ($auth_info->{login}) {
-                $result->redirect( $auth_info->{login} );
+                $result->redirect->to($auth_info->{login});
             } else {
                 $result->init_index();
             }

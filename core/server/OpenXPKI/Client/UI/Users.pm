@@ -249,7 +249,7 @@ sub action_search {
         'criteria' => \@criteria
     });
     # after handling the search: redirect to result page
-    $self->redirect( 'users!result!id!'.$queryid  );
+    $self->redirect->to('users!result!id!'.$queryid);
 
     return $self;
 
