@@ -61,11 +61,11 @@ has '_auth' => (
 );
 
 # Hold warnings from init
-has _status => (
+has '_status' => (
     is => 'rw',
-    isa => 'HashRef|Undef',
+    isa => 'OpenXPKI::Client::UI::Response::Status',
+    default => sub { OpenXPKI::Client::UI::Response::Status->new },
     lazy => 1,
-    default => undef
 );
 
 =head2 _init_backend
@@ -106,7 +106,7 @@ sub _init_backend {
                 # The session has gone - start a new one - might happen if the gui
                 # was idle too long or the server was flushed
                 $client->init_session({ SESSION_ID => undef });
-                $self->set_status(i18nGettext('I18N_OPENXPKI_UI_BACKEND_SESSION_GONE'), 'warn');
+                $self->_status->warn(i18nGettext('I18N_OPENXPKI_UI_BACKEND_SESSION_GONE'));
             } else {
                 $self->logger()->error('Error creating backend session: ' . $eval_err->{message});
                 $self->logger()->trace($eval_err);
@@ -340,7 +340,7 @@ sub __get_action {
         } else {
 
             $self->logger()->debug("Request with invalid rtoken ($rtoken_request != $rtoken_session)!");
-            $self->set_status(i18nGettext('I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID'), 'error');
+            $self->_status->error(i18nGettext('I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID'));
         }
     }
     return;
@@ -400,7 +400,7 @@ sub handle_page {
             $self->logger()->debug("Method is $method");
             $result->$method( $method_args );
         } else {
-            $self->set_status(i18nGettext('I18N_OPENXPKI_UI_ACTION_NOT_FOUND'), 'error');
+            $self->_status->error(i18nGettext('I18N_OPENXPKI_UI_ACTION_NOT_FOUND'));
         }
     }
 
@@ -421,7 +421,7 @@ sub handle_page {
             $self->logger()->error("Failed loading page class");
             $result = OpenXPKI::Client::UI::Bootstrap->new({ client => $self,  cgi => $cgi });
             $result->init_error();
-            $result->set_status(i18nGettext('I18N_OPENXPKI_UI_PAGE_NOT_FOUND'),'error');
+            $result->status->error(i18nGettext('I18N_OPENXPKI_UI_PAGE_NOT_FOUND'));
 
         } else {
             $method  = "init_$method";
@@ -763,7 +763,7 @@ sub handle_login {
         # Failure here is likely a wrong password
 
         if ($reply->{'ERROR'} && $reply->{'ERROR'}->{CLASS} eq 'OpenXPKI::Exception::Authentication') {
-            $result->set_status(i18nGettext( $reply->{'ERROR'}->{LABEL} ),'error');
+            $result->status->error(i18nGettext( $reply->{'ERROR'}->{LABEL} ));
         } else {
             $result->set_status_from_error_reply($reply);
         }

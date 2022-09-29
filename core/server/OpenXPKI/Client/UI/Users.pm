@@ -72,7 +72,7 @@ sub init_result {
 
     # result expired or broken id
     if (!$result || !$result->{count}) {
-        $self->set_status('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY','error');
+        $self->status->error('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY');
         return $self->render_search_form();
     }
 
@@ -133,7 +133,7 @@ sub init_pager {
 
     # result expired or broken id
     if (!$result || !$result->{count}) {
-        $self->set_status('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY','error');
+        $self->status->error('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY');
         return $self->render_search_form();
     }
 
@@ -236,7 +236,7 @@ sub action_search {
 
     # No results founds
     if (!$result_count) {
-        $self->set_status('I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES','error');
+        $self->status->error('I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES');
         return $self->render_search_form({ preset => $input });
     }
     # store search query in session for paging etc...

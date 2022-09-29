@@ -292,11 +292,11 @@ sub render_system_status {
 
 
     if ($critical) {
-        $self->set_status('Your system status is critical!','error');
+        $self->status->error('Your system status is critical!');
     } elsif($warning) {
-        $self->set_status('Your system status requires your attention!','warn');
+        $self->status->warn('Your system status requires your attention!');
     } else {
-        $self->set_status('System status is good','success');
+        $self->status->success('System status is good');
     }
 
     return $self;

@@ -50,7 +50,7 @@ has resp => (
     isa => 'OpenXPKI::Client::UI::Response',
     lazy => 1,
     default => sub { OpenXPKI::Client::UI::Response->new(ui_result => shift) },
-    handles => [ qw( redirect set_refresh has_refresh set_status has_status add_section render_to_str ) ],
+    handles => [ qw( redirect has_redirect set_refresh has_refresh status add_section render_to_str ) ],
 );
 
 has _last_reply => (
@@ -87,9 +87,9 @@ has _prefix_jwt => (
 sub BUILD {
 
     my $self = shift;
-    # load global client status if set
-    if (my $status = $self->_client->_status) {
-        $self->resp->raw_status($status);
+    # load global client status (warnings from init) if set
+    if ($self->_client->_status->is_set) {
+        $self->resp->_status($self->_client->_status);
     }
 
 }
@@ -220,7 +220,7 @@ sub set_status_from_error_reply {
     } else {
         $self->logger()->trace(Dumper $reply) if $self->logger()->is_trace;
     }
-    $self->set_status($message, 'error');
+    $self->status->error($message);
 
     return $self;
 }
@@ -396,8 +396,8 @@ sub render {
     } else {
         my $url;
         # redirect to given page
-        if ($self->resp->has_redirect) {
-            $url = $self->resp->redirect->{goto};
+        if ($self->has_redirect) {
+            $url = $self->redirect->{goto};
         # redirect to downloads / result pages
         } elsif ($body) {
             $url = $self->__persist_response( { data => $body } );

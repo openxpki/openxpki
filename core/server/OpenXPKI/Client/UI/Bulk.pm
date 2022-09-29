@@ -145,7 +145,7 @@ sub action_result {
 
     # No results founds
     if (!$result_count) {
-        $self->set_status('I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES','error');
+        $self->status->error('I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES');
         return $self->init_index();
     }
 

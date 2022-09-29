@@ -233,7 +233,7 @@ sub init_result {
 
     # result expired or broken id
     if (!$result || !$result->{count}) {
-        $self->set_status('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY','error');
+        $self->status->error('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY');
         return $self->init_search();
     }
 
@@ -343,7 +343,7 @@ sub init_export {
 
     # result expired or broken id
     if (!$result || !$result->{count}) {
-        $self->set_status('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY','error');
+        $self->status->error('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY');
         return $self->init_search();
     }
 
@@ -445,7 +445,7 @@ sub init_pager {
 
     # result expired or broken id
     if (!$result || !$result->{count}) {
-        $self->set_status('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY','error');
+        $self->status->error('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY');
         return $self->init_search();
     }
 
@@ -1225,7 +1225,7 @@ sub action_find {
     if ($cert_identifier) {
         my $cert = $self->send_command_v2( 'get_cert', {  identifier => $cert_identifier, format => 'DBINFO' });
         if (!$cert) {
-            $self->set_status('I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_NO_SUCH_IDENTIFIER','error');
+            $self->status->error('I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_NO_SUCH_IDENTIFIER');
             return $self->init_search();
         }
     } elsif (my $serial = $self->param('cert_serial')) {
@@ -1247,7 +1247,7 @@ sub action_find {
             $self->__tenant(),
         });
         if (!$search_result || @{$search_result} == 0) {
-            $self->set_status('I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_NO_SUCH_SERIAL','error');
+            $self->status->error('I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_NO_SUCH_SERIAL');
             return $self->init_search();
 
         } elsif (scalar @{$search_result} == 1) {
@@ -1273,7 +1273,7 @@ sub action_find {
             return $self->redirect( 'certificate!result!id!'.$queryid  );
         }
     } else {
-        $self->set_status('I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_MUST_PROIVDE_IDENTIFIER_OR_SERIAL','error');
+        $self->status->error('I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_MUST_PROIVDE_IDENTIFIER_OR_SERIAL');
         return $self->init_search();
     }
 
@@ -1395,7 +1395,7 @@ sub action_search {
 
     # No results founds
     if (!$result_count) {
-        $self->set_status('I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES','error');
+        $self->status->error('I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES');
         return $self->init_search({ preset => $input });
     }
 

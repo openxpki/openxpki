@@ -13,7 +13,7 @@ use JSON;
 
 # Project modules
 use OpenXPKI::i18n qw( i18nTokenizer );
-
+use OpenXPKI::Client::UI::Response::Status;
 
 sub has_hash($@) {
     my $name = shift;
@@ -79,9 +79,12 @@ has_hash page => (
     predicate => 'has_page',
 );
 
-has_hash raw_status => (
-    allowed_keys => [qw( level message href field_errors )],
-    predicate => 'has_status',
+has _status => (
+    is => 'rw',
+    isa => 'OpenXPKI::Client::UI::Response::Status',
+    default => sub { OpenXPKI::Client::UI::Response::Status->new },
+    lazy => 1,
+    reader => 'status',
 );
 
 has_hash raw_refresh => (
@@ -89,17 +92,7 @@ has_hash raw_refresh => (
     predicate => 'has_refresh',
 );
 
-
-sub set_status {
-    my $self = shift;
-    my $message = shift;
-    my $level = shift || 'info';
-    my $href = shift || '';
-
-    $self->raw_status({ level => $level, message => $message, href => $href });
-
-    return $self;
-}
+sub set_status { shift->_status(OpenXPKI::Client::UI::Response::Status->new(@_)) }
 
 sub set_refresh {
     my $self = shift;
@@ -131,7 +124,7 @@ sub render_to_str {
 
     my $result = $self->result;
 
-    my $status = $self->has_status ? $self->raw_status : $self->ui_result->__fetch_status;
+    my $status = $self->status->is_set ? $self->status->resolve : $self->ui_result->__fetch_status;
     $result->{status} = $status if $status;
     $result->{page} = $self->page if $self->has_page;
     $result->{refresh} = $self->raw_refresh if $self->has_refresh;

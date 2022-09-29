@@ -111,10 +111,10 @@ sub init_clear {
     my $status = $self->send_command_v2("clear_secret", {secret => $secret});
 
     if ($status) {
-        $self->set_status('I18N_OPENXPKI_UI_SECRET_STATUS_CLEARED','success');
+        $self->status->success('I18N_OPENXPKI_UI_SECRET_STATUS_CLEARED');
         $self->redirect('secret!index');
     } elsif (defined $status) {
-        $self->set_status('I18N_OPENXPKI_UI_SECRET_STATUS_CLEAR_FAILED','success');
+        $self->status->success('I18N_OPENXPKI_UI_SECRET_STATUS_CLEAR_FAILED');
         $self->redirect('secret!index');
     }
 
@@ -132,10 +132,10 @@ sub action_unlock {
     $self->logger()->trace('Return ' . Dumper $msg) if $self->logger->is_trace;
 
     if ($msg) {
-        $self->set_status('I18N_OPENXPKI_UI_SECRET_STATUS_ACCEPTED','success');
+        $self->status->success('I18N_OPENXPKI_UI_SECRET_STATUS_ACCEPTED');
         $self->redirect('secret!index');
     } elsif(defined $msg) {
-        $self->set_status('I18N_OPENXPKI_UI_SECRET_STATUS_UNLOCK_FAILED','error');
+        $self->status->error('I18N_OPENXPKI_UI_SECRET_STATUS_UNLOCK_FAILED');
         $self->redirect('secret!index');
     }
 

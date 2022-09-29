@@ -321,7 +321,7 @@ sub render_server_password {
         if ($field->{name} eq '_password') {
             $value = $self->send_command_v2( 'get_random', \%extra );
             if (!$value) {
-                $self->set_status('I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_ERROR_LABEL','error');
+                $self->status->error('I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_ERROR_LABEL');
                 $self->add_section({
                     type => 'text',
                     content => {

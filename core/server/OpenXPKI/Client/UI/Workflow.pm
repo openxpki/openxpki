@@ -185,7 +185,7 @@ sub init_index {
     });
 
     if (!$wf_info) {
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error');
+        $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION');
         return $self;
     }
 
@@ -289,7 +289,7 @@ sub init_load {
     });
 
     if (!$wf_info) {
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error') unless $self->resp->has_status;
+        $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION') unless $self->status->is_set;
         return $self->init_search({ preset => { wf_id => $id } });
     }
 
@@ -326,7 +326,7 @@ sub init_context {
     });
 
     if (!$wf_info) {
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error') unless $self->resp->has_status;
+        $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION') unless $self->status->is_set;
         return $self;
     }
 
@@ -377,7 +377,7 @@ sub init_attribute {
     });
 
     if (!$wf_info) {
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error') unless $self->resp->has_status;
+        $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION') unless $self->status->is_set;
         return $self;
     }
 
@@ -704,7 +704,7 @@ sub init_result {
     # result expired or broken id
     if (!$result || !$result->{count}) {
 
-        $self->set_status('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY','error');
+        $self->status->error('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY');
         return $self->init_search();
 
     }
@@ -835,7 +835,7 @@ sub init_export {
 
     # result expired or broken id
     if (!$result || !$result->{count}) {
-        $self->set_status('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY','error');
+        $self->status->error('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY');
         return $self->init_search();
     }
 
@@ -920,7 +920,7 @@ sub init_pager {
 
     # result expired or broken id
     if (!$result || !$result->{count}) {
-        $self->set_status('Search result expired or empty!','error');
+        $self->status->error('Search result expired or empty!');
         return $self->init_search();
     }
 
@@ -1228,7 +1228,7 @@ sub action_index {
     my $wf_info;
     # wf_token found, so its a real action
     if (!$wf_token) {
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN!','error');
+        $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN!');
         return $self;
     }
 
@@ -1258,7 +1258,7 @@ sub action_index {
     if ($wf_args->{wf_id}) {
 
         if (!$wf_args->{wf_action}) {
-            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION!','error');
+            $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION!');
             return $self;
         }
         Log::Log4perl::MDC->put('wfid', $wf_args->{wf_id});
@@ -1327,7 +1327,7 @@ sub action_index {
         );
 
     } else {
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION!','error');
+        $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_NO_ACTION!');
         return $self;
     }
 
@@ -1380,21 +1380,21 @@ sub action_handle {
     my $wf_info;
     # wf_token found, so its a real action
     if (!$wf_token) {
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN!','error');
+        $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN!');
         return $self;
     }
 
     my $wf_args = $self->__fetch_wf_token( $wf_token );
 
     if (!$wf_args->{wf_id}) {
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_HANDLE_WITHOUT_ID!','error');
+        $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_HANDLE_WITHOUT_ID!');
         return $self;
     }
 
     my $handle = $wf_args->{wf_handle};
 
     if (!$wf_args->{wf_handle}) {
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_HANDLE_WITHOUT_ACTION!','error');
+        $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_HANDLE_WITHOUT_ACTION!');
         return $self;
     }
 
@@ -1479,7 +1479,7 @@ sub action_select {
         $wf_id = $wf_args->{wf_id};
         if (!$wf_id) {
             $self->logger()->error('No workflow id given');
-            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error');
+            $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION');
             return $self;
         }
     }
@@ -1492,7 +1492,7 @@ sub action_select {
     $self->logger()->trace('wf_info ' . Dumper  $wf_info) if $self->logger->is_trace;
 
     if (!$wf_info) {
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error');
+        $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION');
         return $self;
     }
 
@@ -1606,7 +1606,7 @@ sub action_search {
     if (!$result_count) {
         # if $result_count is undefined there was an error with the query
         # status was set to the error message from the run_command sub
-        $self->set_status('I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES','error') if (defined $result_count);
+        $self->status->error('I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES') if (defined $result_count);
         return $self->init_search({ preset => $input });
     }
 
@@ -1664,14 +1664,14 @@ sub action_bulk {
 
     my $wf_token = $self->param('wf_token') || '';
     if (!$wf_token) {
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN!','error');
+        $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_ACTION_WITHOUT_TOKEN!');
         return $self;
     }
 
     # token contains the name of the action to do and extra params
     my $wf_args = $self->__fetch_wf_token( $wf_token );
     if (!$wf_args->{wf_action}) {
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_HANDLE_WITHOUT_ACTION!','error');
+        $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_HANDLE_WITHOUT_ACTION!');
         return $self;
     }
 
@@ -1697,7 +1697,7 @@ sub action_bulk {
 
 
     if (!$command) {
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_HANDLE_WITHOUT_ACTION!','error');
+        $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_INVALID_REQUEST_HANDLE_WITHOUT_ACTION!');
         return $self;
     }
 
@@ -1716,7 +1716,7 @@ sub action_bulk {
         # that the action was not successful. We can slurp the verbose error
         # from the result status item and display it in the table
         if (!$wf_info) {
-            $errors->{$id} = $self->resp->has_status ? $self->resp->raw_status->{message} : 'I18N_OPENXPKI_UI_APPLICATION_ERROR';
+            $errors->{$id} = $self->status->is_set ? $self->status->message : 'I18N_OPENXPKI_UI_APPLICATION_ERROR';
         } else {
             push @success, $wf_info;
             $self->logger()->trace('Result on '.$id.': '. Dumper $wf_info) if $self->logger->is_trace;
@@ -1730,7 +1730,7 @@ sub action_bulk {
 
     if ($errors) {
 
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_HAS_FAILED_ITEMS_STATUS', 'error');
+        $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_HAS_FAILED_ITEMS_STATUS');
 
         my @failed_id = keys %{$errors};
         my $failed_result = $self->send_command_v2( 'search_workflow_instances', { id => \@failed_id, $self->__tenant() } );
@@ -1768,7 +1768,7 @@ sub action_bulk {
             }
         });
     } else {
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_ACTION_SUCCESS_STATUS', 'success');
+        $self->status->success('I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_ACTION_SUCCESS_STATUS');
     }
 
     if (@success) {
@@ -1883,7 +1883,7 @@ sub __render_from_workflow {
 
     $self->logger()->trace( "wf_info: " . Dumper $wf_info) if $self->logger->is_trace;
     if (!$wf_info) {
-        $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION','error');
+        $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION');
         return $self;
     }
 
@@ -1895,7 +1895,7 @@ sub __render_from_workflow {
     my $wf_action;
     if($args->{wf_action}) {
         if (!$wf_info->{activity}->{$args->{wf_action}}) {
-            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE','warn');
+            $self->status->warn('I18N_OPENXPKI_UI_WORKFLOW_REQUESTED_ACTION_NOT_AVAILABLE');
         } else {
             $wf_action = $args->{wf_action};
         }
@@ -2032,12 +2032,12 @@ sub __render_from_workflow {
                 my $to_sleep = $wf_info->{workflow}->{wake_up_at} - time();
                 if ($to_sleep < 30) {
                     $self->set_refresh('workflow!load!wf_id!'.$wf_info->{workflow}->{id}, 30);
-                    $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_30SEC','info');
+                    $self->status->info('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_30SEC');
                 } elsif ($to_sleep < 300) {
                     $self->set_refresh('workflow!load!wf_id!'.$wf_info->{workflow}->{id}, $to_sleep + 30);
-                    $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_5MIN','info');
+                    $self->status->info('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_5MIN');
                 } else {
-                    $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED','info');
+                    $self->status->info('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED');
                 }
 
                 @buttons = ({
@@ -2050,7 +2050,7 @@ sub __render_from_workflow {
                     value => $wf_action_info->{label}
                 };
             } else {
-                $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED','error');
+                $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_RETRY_EXCEEDED');
                 push @fields, {
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_EXCEPTION_FAILED_ACTION_LABEL',
                     value => $wf_action_info->{label}
@@ -2065,7 +2065,7 @@ sub __render_from_workflow {
         # if the workflow is currently runnig, show info without buttons
         } elsif ($wf_proc_state eq 'running') {
 
-            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL','info');
+            $self->status->info('I18N_OPENXPKI_UI_WORKFLOW_STATE_RUNNING_LABEL');
 
             @fields = ({
                     label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL',
@@ -2122,8 +2122,8 @@ sub __render_from_workflow {
             }
 
             # if we come here from a failed action the status is set already
-            if (!$self->resp->has_status()) {
-                $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION','error');
+            if (!$self->status->is_set) {
+                $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_STATE_EXCEPTION');
             }
 
         } # end proc_state switch
@@ -2162,33 +2162,35 @@ sub __render_from_workflow {
         # To finalize without status message use state name "NOSTATUS".
         # Some field types are able to override the status during render so
         # this might not be the final status line!
-        if ( $wf_info->{state}->{status} && ref $wf_info->{state}->{status} eq 'HASH' ) {
-            $self->resp->raw_status( $wf_info->{state}->{status} );
+        my $status = $wf_info->{state}->{status};
+        if ($status and ref $status eq 'HASH') {
+            $self->status->level($status->{level}) if $status->{level};
+            $self->status->message($status->{message}) if $status->{message};
 
         # Finished workflow
         } elsif ('finished' eq $wf_proc_state) {
             # add special colors for success and failure
             my $state = $wf_info->{workflow}->{state};
             if ('SUCCESS' eq $state) {
-                $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATUS_SUCCESS', 'success');
+                $self->status->success('I18N_OPENXPKI_UI_WORKFLOW_STATUS_SUCCESS');
             }
             elsif ('FAILURE' eq $state) {
-                $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATUS_FAILURE', 'error');
+                $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_STATUS_FAILURE');
             }
             elsif ('CANCELED' eq $state) {
-                $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATUS_CANCELED', 'warn');
+                $self->status->warn('I18N_OPENXPKI_UI_WORKFLOW_STATUS_CANCELED');
             }
             elsif ('NOSTATUS' ne $state) {
-                $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATUS_MISC_FINAL', 'warn');
+                $self->status->warn('I18N_OPENXPKI_UI_WORKFLOW_STATUS_MISC_FINAL');
             }
 
         # Archived workflow
         } elsif ('archived' eq $wf_proc_state) {
-            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED', 'info');
+            $self->status->info('I18N_OPENXPKI_UI_WORKFLOW_STATE_ARCHIVED');
 
         # Forcibly failed workflow
         } elsif ('failed' eq $wf_proc_state) {
-            $self->set_status('I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILED', 'error');
+            $self->status->error('I18N_OPENXPKI_UI_WORKFLOW_STATE_FAILED');
         }
 
         my $fields = $self->__render_fields( $wf_info, $view );
@@ -3031,7 +3033,8 @@ sub __render_fields {
                 my $pause = $v->{pause} || 1;
                 $self->set_refresh($target, $pause);
                 if ($v->{label}) {
-                    $self->set_status($v->{label}, ($v->{level} || 'info'));
+                    $self->status->message($v->{label});
+                    $self->status->level($v->{level}) if $v->{level};
                 }
             } else {
                 $self->redirect($item->{value});
@@ -3726,7 +3729,8 @@ sub __check_for_validation_error {
         } else {
             $self->logger()->info('Input validation error');
         }
-        $self->resp->raw_status({ level => 'error', message => $validator_msg, field_errors => $field_errors });
+        $self->status->error($validator_msg);
+        $self->status->field_errors($field_errors);
         $self->logger()->trace('validation details' . Dumper $field_errors ) if $self->logger->is_trace;
         return $field_errors;
     }

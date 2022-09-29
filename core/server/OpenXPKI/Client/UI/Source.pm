@@ -162,7 +162,7 @@ sub _notfound {
 
     my $self = shift;
 
-    $self->set_status('No results','error');
+    $self->status->error('No results');
     $self->add_section({
         type => 'text',
         content => {
