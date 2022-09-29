@@ -17,61 +17,12 @@ use OpenXPKI::Client::UI::Response::Page;
 use OpenXPKI::Client::UI::Response::Redirect;
 use OpenXPKI::Client::UI::Response::Refresh;
 use OpenXPKI::Client::UI::Response::Status;
-
-sub has_hash($@) {
-    my $name = shift;
-    my %spec = @_;
-
-    # default type 'HashRef' (we need an anonymous type object instead of
-    # string 'HashRef' to be able to add coercion later on)
-    my $type = subtype(as 'HashRef');
-
-    my $keys = $spec{allowed_keys};
-    if ($keys) {
-        delete $spec{allowed_keys};
-        die "'allowed_keys' must be an ArrayRef" unless ref $keys eq 'ARRAY';
-        # create subtype to check hash keys
-        my $re = join ' | ', @$keys;
-        $type = subtype(
-            as 'HashRef',
-            where { all { /^( $re )$/x } keys %{$_} },
-            message {
-                ref $_ eq 'HASH'
-                    ? sprintf "Hash key '%s' is not allowed", $name, first { $_ !~ /^( $re )$/x } keys %{$_}
-                    : sprintf "Expected HASH ref, got: %s", (ref($_) ? ref($_).' ref' : "Scalar '$_'")
-            },
-        );
-    }
-    # optionally coerce plain string into hash value
-    my $str_target = $spec{store_str_in};
-    if ($str_target) {
-        delete $spec{store_str_in};
-        if ($keys and none { $_ eq $str_target } @$keys) {
-            die "Attribute '$name': key given in 'store_str_in' must be part of 'allowed_keys'";
-        }
-        coerce $type, from 'Str', via { { "$str_target" => $_ } };
-    }
-    # create attribute
-    has "$name" => (
-        is => 'rw',
-        isa => $type,
-        $str_target ? (coerce => 1) : (),
-        %spec,
-    );
-}
+use OpenXPKI::Client::UI::Response::ScalarParams;
 
 has ui_result => (
     is => 'ro',
     isa => duck_type( [qw( _session __persist_status __fetch_status )] ),
     required => 1,
-);
-
-has_hash _result => (
-    lazy => 1,
-    default => sub { {
-        main => [],
-        right => [],
-    } },
 );
 
 has _page => (
@@ -106,28 +57,66 @@ has _status => (
     reader => 'status',
 );
 
+has _scalar_params => (
+    is => 'rw',
+    isa => 'OpenXPKI::Client::UI::Response::ScalarParams',
+    default => sub { OpenXPKI::Client::UI::Response::ScalarParams->new },
+    lazy => 1,
+    handles => [qw( rtoken language tenant ping )]
+);
+
+has 'user' => (
+    is => 'rw',
+    isa => 'HashRef',
+    predicate => 'has_user',
+);
+
+has 'menu' => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    predicate => 'has_menu',
+);
+
+has 'on_exception' => (
+    is => 'rw',
+    isa => 'ArrayRef[Hashref]',
+    predicate => 'has_on_exception',
+    # status_code => [ 400, 401 ],
+    # redirect => $uri
+);
+
+has 'raw_response' => (
+    is => 'rw',
+    isa => 'Any',
+    predicate => 'has_raw_response',
+);
+
+has '_main' => (
+    is => 'rw',
+    isa => 'ArrayRef[HashRef]',
+    traits  => ['Array'],
+    handles => {
+        add_section => 'push',
+    },
+    default => sub { [] },
+    predicate => 'has_main',
+);
+
+has '_infobox' => (
+    is => 'rw',
+    isa => 'ArrayRef[HashRef]',
+    traits  => ['Array'],
+    handles => {
+        add_infobox_section => 'push',
+    },
+    default => sub { [] },
+    predicate => 'has_infobox',
+);
+
 sub set_page { shift->_page(OpenXPKI::Client::UI::Response::Page->new(@_)) }
 sub set_redirect { shift->_redirect(OpenXPKI::Client::UI::Response::Redirect->new(@_)) }
 sub set_refresh { shift->_refresh(OpenXPKI::Client::UI::Response::Refresh->new(@_)) }
 sub set_status { shift->_status(OpenXPKI::Client::UI::Response::Status->new(@_)) }
-
-sub add_section {
-    my $self = shift;
-    my $arg = shift;
-
-    die "Section data passed to 'add_section' must be a HashRef" unless ref $arg eq 'HASH';
-    push @{$self->_result->{main}}, $arg;
-    return $self;
-}
-
-sub add_infobox_section {
-    my $self = shift;
-    my $arg = shift;
-
-    die "Section data passed to 'add_infobox_section' must be a HashRef" unless ref $arg eq 'HASH';
-    push @{$self->_result->{right}}, $arg;
-    return $self;
-}
 
 =head2 render_to_str
 
@@ -138,48 +127,52 @@ string.
 sub render_to_str {
     my $self = shift;
 
-    my $result = $self->_result;
-
     my $status = $self->status->is_set ? $self->status->resolve : $self->ui_result->__fetch_status;
-    $result->{status} = $status if $status;
-    $result->{page} = $self->page->resolve if $self->page->is_set;
-    $result->{refresh} = $self->refresh->resolve if $self->refresh->is_set;
 
-    my $body;
-
-    # page redirect
+    # A) page redirect
     if ($self->redirect->is_set) {
         # Persist and append status
         if ($status) {
             my $url_param = $self->ui_result->__persist_status($status);
             $self->redirect->to($self->redirect->to . '!' . $url_param);
         }
-        $body = encode_json({
+        return encode_json({
             %{ $self->redirect->resolve },
             session_id => $self->ui_result->_session->id
         });
-
-    # raw data
-    } elsif ($result->{_raw}) {
-        $body = i18nTokenizer(
-            encode_json($result->{_raw})
-        );
-
-    # regular response
-    } else {
-        $result->{session_id} = $self->ui_result->_session->id;
-
-        # Add message of the day if set and we have a page section
-        if ($result->{page} && (my $motd = $self->ui_result->_session->param('motd'))) {
-             $self->ui_result->_session->param('motd', undef);
-             $result->{status} = $motd;
-        }
-        $body = i18nTokenizer(
-            encode_json($result)
-        );
     }
 
-    return $body;
+    my $result = {};
+
+    # dedicated data transfer objects (DTO) for complex parameters
+    $result->{status} = $status if $status;
+    $result->{page} = $self->page->resolve if $self->page->is_set;
+    $result->{refresh} = $self->refresh->resolve if $self->refresh->is_set;
+
+    # one DTO for several simple parameters
+    $result = { %$result, %{$self->_scalar_params->resolve} } if $self->_scalar_params->is_set;
+
+    # not-yet-DTO parameters
+    $result->{main} = $self->_main if $self->has_main;
+    $result->{right} = $self->_infobox if $self->has_infobox;
+    $result->{user} = $self->user if $self->has_user;
+    $result->{structure} = $self->menu if $self->has_menu;
+    $result->{on_exception} = $self->on_exception if $self->has_on_exception;
+
+    # B) raw data
+    if ($self->has_raw_response) {
+        return i18nTokenizer(encode_json($self->raw_response));
+    }
+
+    # C) regular response
+    $result->{session_id} = $self->ui_result->_session->id;
+
+    # add message of the day if set and we have a page section
+    if ($self->page->is_set && (my $motd = $self->ui_result->_session->param('motd'))) {
+         $self->ui_result->_session->param('motd', undef);
+         $result->{status} = $motd;
+    }
+    return i18nTokenizer(encode_json($result));
 }
 
 __PACKAGE__->meta->make_immutable;

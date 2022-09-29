@@ -955,10 +955,10 @@ sub init_pager {
 
     $self->logger()->trace( "dumper result: " . Dumper @result) if $self->logger->is_trace;
 
-    $self->resp->_result->{_raw} = {
+    $self->raw_response({
         _returnType => 'partial',
         data => \@result,
-    };
+    });
 
     return $self;
 }

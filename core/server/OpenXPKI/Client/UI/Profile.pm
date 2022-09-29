@@ -31,7 +31,7 @@ sub action_get_styles_for_profile {
 
     my $cert_subject_style = $styles[0]->{value};
 
-    $self->resp->_result->{_raw} = {
+    $self->raw_response({
         _returnType => 'partial',
         fields => [{
             name => "cert_subject_style",
@@ -40,7 +40,7 @@ sub action_get_styles_for_profile {
             type => 'select',
             options => \@styles
         }]
-    };
+    });
 
     return $self;
 
@@ -94,10 +94,10 @@ sub action_get_key_param {
         }
     }
 
-    $self->resp->_result->{_raw} = {
+    $self->raw_response({
         _returnType => 'partial',
         fields => \@fields
-    };
+    });
     return $self;
 
 }

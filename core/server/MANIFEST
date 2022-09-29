@@ -66,6 +66,7 @@ OpenXPKI/Client/UI/Response/DTORole.pm
 OpenXPKI/Client/UI/Response/Page.pm
 OpenXPKI/Client/UI/Response/Redirect.pm
 OpenXPKI/Client/UI/Response/Refresh.pm
+OpenXPKI/Client/UI/Response/ScalarParams.pm
 OpenXPKI/Client/UI/Response/Status.pm
 OpenXPKI/Client/UI/Result.pm
 OpenXPKI/Client/UI/Secret.pm

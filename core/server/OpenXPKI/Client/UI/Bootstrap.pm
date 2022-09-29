@@ -26,9 +26,8 @@ sub init_structure {
         $self->logger->debug('Generate rtoken');
         $session->param('rtoken', Digest::SHA::sha1_hex( $$. $session->id() . rand(2**32) ) );
     }
-    $self->resp->_result->{rtoken} = $session->param('rtoken');
-
-    $self->resp->_result->{language} = get_language();
+    $self->rtoken($session->param('rtoken'));
+    $self->language(get_language());
 
     # To issue redirects to the UI, we store the referrer
     # default is mainly relevant for test scripts
@@ -39,11 +38,11 @@ sub init_structure {
     $self->logger->debug("Baseurl from referrer: " . $baseurl);
 
     if ($session->param('is_logged_in') && $user) {
-        $self->resp->_result->{user} = $user;
+        $self->user($user);
 
         # Preselect tenant, for now we just pick the first from the list
         if ($user->{tenants}) {
-            $self->resp->_result->{tenant} = $user->{tenants}->[0]->{value};
+            $self->tenant($user->{tenants}->[0]->{value});
             $self->logger->trace('Preset tenant from items ' . Dumper $user->{tenants}) if $self->logger->is_trace;
         }
 
@@ -52,30 +51,30 @@ sub init_structure {
             $user->{last_login} = $last_login;
         }
 
-        $self->resp->_result->{structure} = $session->param('menu');
+        $self->menu($session->param('menu'));
 
         # Ping endpoint
         if (my $ping = $session->param('ping')) {
-            $self->resp->_result->{ping} = $ping;
+            $self->ping($ping);
         }
 
         # Redirection targets for apache based SSO Handling
         if (my $auth = $session->param('authinfo')) {
             if (my $target = ($auth->{resume} || $auth->{login})) {
-                $self->resp->_result->{on_exception} = [{
+                $self->on_exception([{
                     status_code => [ 403, 401 ],
                     redirect => $target,
-                }];
+                }]);
             }
         }
     }
 
     # default menu if nothing was set before
-    $self->resp->_result->{structure} ||= [{
+    $self->menu([{
         key => 'logout',
         label => 'I18N_OPENXPKI_UI_CLEAR_LOGIN',
         entries => [],
-    }];
+    }]) unless $self->has_menu;
 
     return $self;
 

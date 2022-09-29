@@ -84,7 +84,7 @@ sub init_json {
 
     my $json = decode_json(join("",@content));
 
-    $self->resp->_result->{_raw} = $json;
+    $self->raw_response($json);
     return $self;
 
 }
