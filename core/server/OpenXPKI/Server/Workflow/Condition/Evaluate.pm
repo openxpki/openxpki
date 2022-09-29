@@ -37,7 +37,9 @@ sub evaluate {
     local $SIG{__WARN__} = sub { $warnings .= $_[0] };
 
     # eval
+    no warnings 'uninitialized';
     my $rv = eval $to_eval;
+    use warnings;
 
     CTX('log')->workflow->warn("Error while evaluating condition '$to_eval': $EVAL_ERROR") if $EVAL_ERROR;
     CTX('log')->workflow->warn("Warning while evaluating condition '$to_eval': $warnings") if $warnings;
