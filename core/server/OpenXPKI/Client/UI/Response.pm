@@ -66,7 +66,7 @@ has ui_result => (
     required => 1,
 );
 
-has_hash result => (
+has_hash _result => (
     lazy => 1,
     default => sub { {
         main => [],
@@ -114,7 +114,7 @@ sub add_section {
     my $self = shift;
     my $arg = shift;
 
-    push @{$self->result->{main}}, $arg;
+    push @{$self->_result->{main}}, $arg;
 
     return $self;
 }
@@ -128,7 +128,7 @@ string.
 sub render_to_str {
     my $self = shift;
 
-    my $result = $self->result;
+    my $result = $self->_result;
 
     my $status = $self->status->is_set ? $self->status->resolve : $self->ui_result->__fetch_status;
     $result->{status} = $status if $status;

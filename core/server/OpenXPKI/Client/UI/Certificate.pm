@@ -483,7 +483,7 @@ sub init_pager {
 
     $self->logger()->trace( "dumper result: " . Dumper @result) if $self->logger->is_trace;
 
-    $self->resp->result->{_raw} = {
+    $self->resp->_result->{_raw} = {
         _returnType => 'partial',
         data => \@result,
     };
@@ -1198,7 +1198,7 @@ sub action_autocomplete {
 
     $self->logger()->trace( "search result: " . Dumper \@result) if $self->logger->is_trace;
 
-    $self->resp->result->{_raw} = \@result;
+    $self->resp->_result->{_raw} = \@result;
 
     return $self;
 
