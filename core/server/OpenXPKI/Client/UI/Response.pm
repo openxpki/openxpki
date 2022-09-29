@@ -129,7 +129,9 @@ sub render_to_str {
 
     my $status = $self->status->is_set ? $self->status->resolve : $self->ui_result->__fetch_status;
 
+    #
     # A) page redirect
+    #
     if ($self->redirect->is_set) {
         # Persist and append status
         if ($status) {
@@ -142,36 +144,42 @@ sub render_to_str {
         });
     }
 
+
+    #
+    # B) raw data
+    #
+    if ($self->has_raw_response) {
+        return i18nTokenizer(encode_json($self->raw_response));
+    }
+
+    #
+    # C) regular response
+    #
     my $result = {};
 
-    # dedicated data transfer objects (DTO) for complex parameters
+    # Dedicated data transfer objects (DTO) for complex parameters
     $result->{status} = $status if $status;
+    if ($self->page->is_set && (my $motd = $self->ui_result->_session->param('motd'))) {
+        # show message of the day if we have a page section (may overwrite status)
+        $self->ui_result->_session->param('motd', undef);
+        $result->{status} = $motd;
+    }
+
     $result->{page} = $self->page->resolve if $self->page->is_set;
     $result->{refresh} = $self->refresh->resolve if $self->refresh->is_set;
 
-    # one DTO for several simple parameters
+    # One DTO for several simple parameters
     $result = { %$result, %{$self->_scalar_params->resolve} } if $self->_scalar_params->is_set;
 
-    # not-yet-DTO parameters
+    # Not-yet-DTO parameters
     $result->{main} = $self->_main if $self->has_main;
     $result->{right} = $self->_infobox if $self->has_infobox;
     $result->{user} = $self->user if $self->has_user;
     $result->{structure} = $self->menu if $self->has_menu;
     $result->{on_exception} = $self->on_exception if $self->has_on_exception;
 
-    # B) raw data
-    if ($self->has_raw_response) {
-        return i18nTokenizer(encode_json($self->raw_response));
-    }
-
-    # C) regular response
     $result->{session_id} = $self->ui_result->_session->id;
 
-    # add message of the day if set and we have a page section
-    if ($self->page->is_set && (my $motd = $self->ui_result->_session->param('motd'))) {
-         $self->ui_result->_session->param('motd', undef);
-         $result->{status} = $motd;
-    }
     return i18nTokenizer(encode_json($result));
 }
 
