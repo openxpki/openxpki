@@ -28,12 +28,6 @@ has _basepath => (
     lazy => 1,
 );
 
-sub BUILD {
-    my $self = shift;
-    $self->resp->page ({'label' => ''});
-}
-
-
 =head2 init_html
 
 Load a file from disk that contains HTML. The content of the file is rendered

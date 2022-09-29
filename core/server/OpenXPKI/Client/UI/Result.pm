@@ -50,7 +50,14 @@ has resp => (
     isa => 'OpenXPKI::Client::UI::Response',
     lazy => 1,
     default => sub { OpenXPKI::Client::UI::Response->new(ui_result => shift) },
-    handles => [ qw( redirect has_redirect set_refresh has_refresh status add_section render_to_str ) ],
+    handles => [ qw(
+        redirect has_redirect
+        set_refresh has_refresh
+        status set_status
+        page set_page
+        add_section
+        render_to_str
+    ) ],
 );
 
 has _last_reply => (

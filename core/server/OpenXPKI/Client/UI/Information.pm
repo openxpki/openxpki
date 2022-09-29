@@ -12,7 +12,7 @@ extends 'OpenXPKI::Client::UI::Result';
 sub BUILD {
 
     my $self = shift;
-    $self->resp->page ({'label' => 'I18N_OPENXPKI_UI_HOME_WELCOME_HEAD'});
+    $self->page->label('I18N_OPENXPKI_UI_HOME_WELCOME_HEAD');
 }
 
 
@@ -46,9 +46,7 @@ sub init_issuer {
     my $issuers = $self->send_command_v2( 'get_ca_list' );
     $self->logger()->trace("result: " . Dumper $issuers) if $self->logger->is_trace;
 
-    $self->resp->page({
-        label => 'I18N_OPENXPKI_UI_ISSUERS_LIST',
-    });
+    $self->page->label('I18N_OPENXPKI_UI_ISSUERS_LIST');
 
 
     my @result;
@@ -102,10 +100,10 @@ sub init_policy {
     my $self = shift;
     my $args = shift;
 
-    $self->resp->page({
+    $self->set_page(
         label => 'Policy documents',
         description => '',
-    });
+    );
 
     $self->add_section({
         type => 'text',

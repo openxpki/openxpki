@@ -87,10 +87,9 @@ sub init_search {
     my $self = shift;
     my $args = shift;
 
-    $self->resp->page({
+    $self->set_page(
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_LABEL',
-        description => '',
-    });
+    );
 
     my $profile = $self->send_command_v2( 'list_used_profiles' );
 
@@ -257,14 +256,14 @@ sub init_result {
 
     my $criteria = '<br>' . (join ", ", @{$result->{criteria}});
 
-    $self->resp->page({
+    $self->set_page(
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_LABEL',
         description => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_DESC' . $criteria ,
         breadcrumb => [
             { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_LABEL', className => 'cert-search' },
             { label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_RESULT_TITLE', className => 'cert-search-result' }
         ],
-    });
+    );
 
     my $pager = $self->__render_pager( $result, { limit => $limit, startat => $startat } );
 
@@ -545,10 +544,10 @@ sub init_mine {
 
     $self->logger()->trace( "search result: " . Dumper $search_result) if $self->logger->is_trace;
 
-    $self->resp->page({
+    $self->set_page(
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_MINE_LABEL',
         description => 'I18N_OPENXPKI_UI_CERTIFICATE_MINE_DESC',
-    });
+    );
 
     my @result = $self->__render_result_list( $search_result, $self->__default_grid_row() );
 
@@ -602,10 +601,10 @@ sub init_detail {
         attribute => 'subject_alt_name' }, 1);
 
     if (!$cert) {
-        $self->resp->page({
+        $self->set_page(
             label => 'I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL',
             shortlabel => 'I18N_OPENXPKI_UI_CERT_STATUS_UNKNOWN'
-        });
+        );
 
         $self->add_section({
             type => 'keyvalue',
@@ -629,10 +628,10 @@ sub init_detail {
 
     my %dn = OpenXPKI::DN->new( $cert->{subject} )->get_hashed_content();
 
-    $self->resp->page({
+    $self->set_page(
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL',
         shortlabel => $dn{CN}[0]
-    });
+    );
 
 
     # check if this is a entity certificate from the current realm
@@ -866,11 +865,11 @@ sub init_text {
 
     $self->logger()->trace("Cert data: " . Dumper $pem) if $self->logger->is_trace;
 
-    $self->resp->page({
+    $self->set_page(
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_DETAIL_LABEL',
         shortlabel => $cert_identifier,
-        isLarge => ($format ne 'PEM') ? 1 : 0,
-    });
+        large => ($format ne 'PEM') ? 1 : 0,
+    );
 
     $self->add_section({
         type => 'text',
@@ -901,10 +900,10 @@ sub init_chain {
 
     my $chain = $self->send_command_v2 ( "get_chain", { start_with => $cert_identifier, format => 'DBINFO', 'keeproot' => 1 });
 
-    $self->resp->page({
+    $self->set_page(
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_CHAIN_LABEL',
         shortlabel => 'I18N_OPENXPKI_UI_CERTIFICATE_CHAIN_LABEL',
-    });
+    );
 
     # Download links
     my $base =  $self->_client()->_config()->{'scripturl'} . "?page=certificate!download!identifier!%s!format!%s";
@@ -961,10 +960,10 @@ sub init_related {
 
     my %dn = OpenXPKI::DN->new( $cert->{subject} )->get_hashed_content();
 
-    $self->resp->page({
+    $self->set_page(
         label => 'I18N_OPENXPKI_UI_CERTIFICATE_RELATIONS_LABEL',
         shortlabel => $dn{CN}[0]
-    });
+    );
 
     # run a workflow search using the given ids from the cert attributes
     my @wfid = values %{$cert->{cert_attributes}};
@@ -1117,11 +1116,6 @@ sub init_parse {
     my @fields = ({
         label => 'Body',
         value => $pem
-    });
-
-    $self->resp->page({
-        label => '',
-        description => ''
     });
 
     $self->add_section({

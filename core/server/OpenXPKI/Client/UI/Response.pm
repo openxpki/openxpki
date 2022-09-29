@@ -13,6 +13,7 @@ use JSON;
 
 # Project modules
 use OpenXPKI::i18n qw( i18nTokenizer );
+use OpenXPKI::Client::UI::Response::Page;
 use OpenXPKI::Client::UI::Response::Status;
 
 sub has_hash($@) {
@@ -74,9 +75,12 @@ has_hash redirect => (
     predicate => 'has_redirect',
 );
 
-has_hash page => (
-    allowed_keys => [qw( label shortlabel description breadcrumb className isLarge canonical_uri )],
-    predicate => 'has_page',
+has _page => (
+    is => 'rw',
+    isa => 'OpenXPKI::Client::UI::Response::Page',
+    default => sub { OpenXPKI::Client::UI::Response::Page->new },
+    lazy => 1,
+    reader => 'page',
 );
 
 has _status => (
@@ -91,6 +95,8 @@ has_hash raw_refresh => (
     allowed_keys => [qw( href timeout )],
     predicate => 'has_refresh',
 );
+
+sub set_page { shift->_page(OpenXPKI::Client::UI::Response::Page->new(@_)) }
 
 sub set_status { shift->_status(OpenXPKI::Client::UI::Response::Status->new(@_)) }
 
@@ -126,7 +132,7 @@ sub render_to_str {
 
     my $status = $self->status->is_set ? $self->status->resolve : $self->ui_result->__fetch_status;
     $result->{status} = $status if $status;
-    $result->{page} = $self->page if $self->has_page;
+    $result->{page} = $self->page->resolve if $self->page->is_set;
     $result->{refresh} = $self->raw_refresh if $self->has_refresh;
 
     my $body;

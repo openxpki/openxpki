@@ -14,9 +14,7 @@ sub init_index {
     my $self = shift;
     my $args = shift;
     # render title + empty search form
-    $self->resp->page({
-        label => 'I18N_OPENXPKI_UI_USER_TITLE',
-    });
+    $self->page->label('I18N_OPENXPKI_UI_USER_TITLE');
     $self->render_search_form();
     # count users + store result object in session to allow paging
     my $result_count = $self->send_command_v2( 'search_users_count', {}  );
@@ -96,14 +94,14 @@ sub init_result {
 
     my $criteria = '<br>' . (join ", ", @{$result->{criteria}});
 
-    $self->resp->page({
+    $self->set_page(
         label => 'I18N_OPENXPKI_UI_USER_SEARCH_RESULT_LABEL',
         description => 'I18N_OPENXPKI_UI_USER_SEARCH_RESULT_DESC' . $criteria ,
         breadcrumb => [
             { label => 'I18N_OPENXPKI_UI_USER_SEARCH_LABEL', className => 'user-search' },
             { label => 'I18N_OPENXPKI_UI_USER_SEARCH_RESULT_TITLE', className => 'user-search-result' }
         ],
-    });
+    );
 
     my $pager = $self->__render_pager( $result, { limit => $limit, startat => $startat } );
     my @result = $self->__render_result_list( $query_result);
@@ -372,9 +370,7 @@ sub init_search {
     my $self = shift;
     my $args = shift;
 
-    $self->resp->page({
-        label => 'I18N_OPENXPKI_UI_USER_SEARCH_LABEL',
-    });
+    $self->page->label('I18N_OPENXPKI_UI_USER_SEARCH_LABEL');
     # check if there are any preset values for the search fields
     my $preset;
     if (my $queryid = $self->param('query')) {

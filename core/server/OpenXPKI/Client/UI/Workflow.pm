@@ -330,10 +330,10 @@ sub init_context {
         return $self;
     }
 
-    $self->resp->page({
+    $self->set_page(
         label => 'I18N_OPENXPKI_UI_WORKFLOW_CONTEXT_LABEL #' . $wf_info->{workflow}->{id},
-        isLarge => 1,
-    });
+        large => 1,
+    );
 
     my %buttons;
     %buttons = ( buttons => [{
@@ -381,10 +381,10 @@ sub init_attribute {
         return $self;
     }
 
-    $self->resp->page({
+    $self->set_page(
         label => 'I18N_OPENXPKI_UI_WORKFLOW_ATTRIBUTE_LABEL #' . $wf_info->{workflow}->{id},
-        isLarge => 1,
-    });
+        large => 1,
+    );
 
     my %buttons;
     %buttons = ( buttons => [{
@@ -428,11 +428,7 @@ sub init_info {
     });
 
     if (!$wf_info) {
-        $self->resp->page({
-            label => '',
-            shortlabel => '',
-            description => 'I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION',
-        });
+        $self->page->description('I18N_OPENXPKI_UI_WORKFLOW_UNABLE_TO_LOAD_WORKFLOW_INFORMATION');
         $self->logger()->warn('Unable to load workflow info for id ' . $id);
         return $self;
     }
@@ -488,12 +484,10 @@ sub init_info {
     }
 
     my $label = sprintf("%s (#%01d)", ($wf_info->{workflow}->{title} || $wf_info->{workflow}->{label} || $wf_info->{workflow}->{type}), $wf_info->{workflow}->{id});
-    $self->resp->page({
-        label => $label,
+    $self->set_page(
         shortlabel => $label,
-        description => '',
-        isLarge => 1,
-    });
+        large => 1,
+    );
 
     my $proc_state = $wf_info->{workflow}->{proc_state};
 
@@ -524,10 +518,10 @@ sub init_search {
     my $self = shift;
     my $args = shift;
 
-    $self->resp->page({
+    $self->set_page(
         label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_LABEL',
         description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_DESC',
-    });
+    );
 
     my $workflows = $self->send_command_v2( 'get_workflow_instance_types' );
     return $self unless(defined $workflows);
@@ -734,18 +728,18 @@ sub init_result {
     $self->logger()->trace( "search result: " . Dumper $search_result) if $self->logger->is_trace;
 
     # Add page header from result - optional
-    if ($result->{page} && ref $result->{page} ne 'HASH') {
-        $self->resp->page($result->{page});
+    if ($result->{page} && ref $result->{page} eq 'HASH') {
+        $self->set_page(%{ $result->{page} });
     } else {
         my $criteria = $result->{criteria} ? '<br>' . (join ", ", @{$result->{criteria}}) : '';
-        $self->resp->page({
+        $self->set_page(
             label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_LABEL',
             description => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_DESCRIPTION' . $criteria ,
             breadcrumb => [
                 { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_LABEL', className => 'workflow-search' },
                 { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_RESULTS_TITLE', className => 'workflow-search-result' }
             ],
-        });
+        );
     }
 
     my $pager_args = $result->{pager} || {};
@@ -983,11 +977,11 @@ sub init_history {
     my $id = $self->param('wf_id');
     my $view = $self->param('view') || '';
 
-    $self->resp->page({
+    $self->set_page(
         label => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_TITLE',
         description => 'I18N_OPENXPKI_UI_WORKFLOW_HISTORY_DESCRIPTION',
-        isLarge => 1,
-    });
+        large => 1,
+    );
 
     my $workflow_history = $self->send_command_v2( 'get_workflow_history', { id => $id } );
 
@@ -1048,10 +1042,10 @@ sub init_mine {
     my $self = shift;
     my $args = shift;
 
-    $self->resp->page({
+    $self->set_page(
         label => 'I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE',
         description => 'I18N_OPENXPKI_UI_MY_WORKFLOW_DESCRIPTION',
-    });
+    );
 
     my $tasklist = $self->_client->session()->param('tasklist')->{mine};
 
@@ -1099,9 +1093,7 @@ sub init_task {
     my $self = shift;
     my $args = shift;
 
-    $self->resp->page({
-        label => 'I18N_OPENXPKI_UI_WORKFLOW_OUTSTANDING_TASKS_LABEL'
-    });
+    $self->page->label('I18N_OPENXPKI_UI_WORKFLOW_OUTSTANDING_TASKS_LABEL');
 
     my $tasklist = $self->_client->session()->param('tasklist')->{default};
 
@@ -1133,10 +1125,10 @@ sub init_log {
     my $id = $self->param('wf_id');
     my $view = $self->param('view') || '';
 
-    $self->resp->page({
+    $self->set_page(
         label => 'I18N_OPENXPKI_UI_WORKFLOW_LOG',
-        isLarge => 1,
-    });
+        large => 1,
+    );
 
     my $result = $self->send_command_v2( 'get_workflow_log', { id => $id } );
 
@@ -1723,10 +1715,10 @@ sub action_bulk {
         }
     }
 
-    $self->resp->page({
+    $self->set_page(
         label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_LABEL',
         description => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_RESULT_DESC',
-    });
+    );
 
     if ($errors) {
 
@@ -1995,14 +1987,14 @@ sub __render_from_workflow {
         my $label = $self->__get_proc_state_label($wf_proc_state); # reuse labels from init_info popup
         my $desc = $irregular{$wf_proc_state};
 
-        $self->resp->page({
+        $self->set_page(
             label => $label,
             breadcrumb => $self->__get_breadcrumb($wf_info, $wf_info->{state}->{label}),
             shortlabel => $wf_info->{workflow}->{id},
             description => $desc,
-            className => 'workflow workflow-proc-state workflow-proc-'.$wf_proc_state,
-            ($wf_info->{workflow}->{id} ? (canonical_uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}) : ()),
-        });
+            css_class => 'workflow workflow-proc-state workflow-proc-'.$wf_proc_state,
+            ($wf_info->{workflow}->{id} ? (uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}) : ()),
+        );
 
         my @buttons;
         my @fields;
@@ -2149,14 +2141,14 @@ sub __render_from_workflow {
 
     } else {
 
-        $self->resp->page({
+        $self->set_page(
             label => $wf_info->{state}->{label} || $wf_info->{workflow}->{title} || $wf_info->{workflow}->{label},
             breadcrumb => $self->__get_breadcrumb($wf_info),
             shortlabel => $wf_info->{workflow}->{id},
             description => $self->__get_templated_description($wf_info, $wf_info->{state}),
-            className => 'workflow workflow-page ' . ($wf_info->{state}->{uiclass} || ''),
-            ($wf_info->{workflow}->{id} ? (canonical_uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}) : ()),
-        });
+            css_class => 'workflow workflow-page ' . ($wf_info->{state}->{uiclass} || ''),
+            ($wf_info->{workflow}->{id} ? (uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}) : ()),
+        );
 
         # Set status decorator on final states (uses proc_state).
         # To finalize without status message use state name "NOSTATUS".
@@ -3816,14 +3808,14 @@ sub __render_workflow_action_head {
         $breadcrumb  = $self->__get_breadcrumb($wf_info);
     }
 
-    $self->resp->page({
+    $self->set_page(
         label => $label,
         breadcrumb => $breadcrumb,
         shortlabel => $wf_info->{workflow}->{id},
         description => $self->__get_templated_description($wf_info, $wf_action_info),
-        className => 'workflow workflow-action ' . ($wf_action_info->{uiclass} || ''),
-        canonical_uri => sprintf('workflow!load!wf_id!%01d!wf_action!%s', $wf_info->{workflow}->{id}, $wf_action),
-    });
+        css_class => 'workflow workflow-action ' . ($wf_action_info->{uiclass} || ''),
+        uri => sprintf('workflow!load!wf_id!%01d!wf_action!%s', $wf_info->{workflow}->{id}, $wf_action),
+    );
 }
 
 sub __render_workflow_action_body {

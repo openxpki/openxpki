@@ -23,10 +23,10 @@ sub init_index {
     my $self = shift;
     my $args = shift;
 
-    $self->resp->page({
+    $self->set_page(
         label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE',
         description => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION',
-    });
+    );
 
     # Spec holds additional search attributes and list definition
     my @bulklist = @{$self->_session->param('bulk')->{default}};

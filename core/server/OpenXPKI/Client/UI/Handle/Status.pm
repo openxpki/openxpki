@@ -21,9 +21,7 @@ sub render_process_status {
 
     $self->logger()->trace("result: " . Dumper $process ) if $self->logger->is_trace;
 
-    $self->resp->page({
-        label => 'Running processes (global)',
-    });
+    $self->page->label('Running processes (global)');
 
     my @result;
     my $now = time;
@@ -72,9 +70,7 @@ sub render_system_status {
     my $warning = 0;
     my $critical = 0;
 
-    $self->resp->page({
-        label => 'OpenXPKI system status',
-    });
+    $self->page->label('OpenXPKI system status');
 
     if ($status->{secret_offline}) {
         push @fields, {

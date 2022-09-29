@@ -31,11 +31,10 @@ sub init_index {
         ];
     }
 
-    $self->resp->page ({
+    $self->set_page(
         label => 'I18N_OPENXPKI_UI_SECRET_PAGE_LABEL',
         description => 'I18N_OPENXPKI_UI_SECRET_PAGE_DESC',
-        target => 'main'
-    });
+    );
 
     $self->add_section({
         type => 'grid',
@@ -64,7 +63,7 @@ sub init_manage {
     my $secret = $self->param('id');
 
     if (not $secret) {
-        $self->resp->page ({ shortlabel => 'I18N_OPENXPKI_UI_SECRET_LITERAL_NOT_SETABLE_LABEL' });
+        $self->page->shortlabel('I18N_OPENXPKI_UI_SECRET_LITERAL_NOT_SETABLE_LABEL');
         $self->add_section({
             type => 'text',
             content => {
@@ -78,7 +77,7 @@ sub init_manage {
     return unless defined $status;
 
     if ($status) {
-        $self->resp->page ({ shortlabel => 'I18N_OPENXPKI_UI_SECRET_CLEAR_SECRET_LABEL' });
+        $self->page->shortlabel('I18N_OPENXPKI_UI_SECRET_CLEAR_SECRET_LABEL');
         $self->add_section({
             type => 'text',
             content => {
@@ -86,7 +85,7 @@ sub init_manage {
             }
         });
     } else {
-        $self->resp->page ({ label => 'I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL' });
+        $self->page->label('I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL');
         $self->add_section({
             type => 'form',
             action => 'secret!unlock',
