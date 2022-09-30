@@ -29,7 +29,7 @@ has 'reset_label' => (
 
 has '_fields' => (
     is => 'rw',
-    isa => 'ArrayRef[HashRef]',
+    isa => 'ArrayRef',
     traits => [ 'Array' ],
     handles => {
         _add_field => 'push',
@@ -47,7 +47,7 @@ sub is_set { shift->has_any_value }
 
 sub add_field {
     my $self = shift;
-    $self->_add_field({ @_ });
+    $self->_add_field(scalar @_ == 1 ? $_[0] : { @_ });
     return $self; # allows method chaining
 }
 
