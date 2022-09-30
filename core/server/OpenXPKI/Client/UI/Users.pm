@@ -352,7 +352,6 @@ sub render_search_form {
         action => 'users!search',
         content => {
            description => 'I18N_OPENXPKI_UI_USER_SEARCH_DESC',
-           title => '',
            submit_label => 'I18N_OPENXPKI_UI_USER_SEARCH_SUBMIT_LABEL',
            fields => \@fields
         }},

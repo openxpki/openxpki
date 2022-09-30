@@ -167,7 +167,6 @@ sub init_search {
         action => 'certificate!search',
         content => {
            description => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_DESC',
-           title => '',
            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
            fields => \@fields
         }},
@@ -177,7 +176,6 @@ sub init_search {
         type => 'form',
         action => 'certificate!find',
         content => {
-           title => '',
            description => 'I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL',
            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
            fields => [

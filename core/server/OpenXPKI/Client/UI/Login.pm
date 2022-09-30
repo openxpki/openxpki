@@ -56,7 +56,7 @@ sub init_auth_stack {
         type => 'form',
         action => 'login!stack',
         content => {
-            title => '', submit_label => 'I18N_OPENXPKI_UI_LOGIN_SUBMIT',
+            submit_label => 'I18N_OPENXPKI_UI_LOGIN_SUBMIT',
             fields => [
                 { 'name' => 'auth_stack', 'label' => 'Handler', 'type' => 'select', 'options' => \@stacks },
             ],
