@@ -19,6 +19,7 @@ use OpenXPKI::Client::UI::Response::Redirect;
 use OpenXPKI::Client::UI::Response::Refresh;
 use OpenXPKI::Client::UI::Response::Status;
 use OpenXPKI::Client::UI::Response::ScalarParams;
+use OpenXPKI::Client::UI::Response::User;
 use OpenXPKI::Client::UI::Response::Section::Form;
 
 has ui_result => (
@@ -59,18 +60,20 @@ has _status => (
     reader => 'status',
 );
 
+has _user => (
+    is => 'rw',
+    isa => 'OpenXPKI::Client::UI::Response::User',
+    default => sub { OpenXPKI::Client::UI::Response::User->new },
+    lazy => 1,
+    reader => 'user',
+);
+
 has _scalar_params => (
     is => 'rw',
     isa => 'OpenXPKI::Client::UI::Response::ScalarParams',
     default => sub { OpenXPKI::Client::UI::Response::ScalarParams->new },
     lazy => 1,
     handles => [qw( rtoken language tenant ping )]
-);
-
-has 'user' => (
-    is => 'rw',
-    isa => 'HashRef',
-    predicate => 'has_user',
 );
 
 has 'menu' => (
@@ -111,6 +114,7 @@ sub set_page { shift->_page(OpenXPKI::Client::UI::Response::Page->new(@_)) }
 sub set_redirect { shift->_redirect(OpenXPKI::Client::UI::Response::Redirect->new(@_)) }
 sub set_refresh { shift->_refresh(OpenXPKI::Client::UI::Response::Refresh->new(@_)) }
 sub set_status { shift->_status(OpenXPKI::Client::UI::Response::Status->new(@_)) }
+sub set_user { shift->_user(OpenXPKI::Client::UI::Response::User->new(@_)) }
 
 sub add_section {
     my $self = shift;
@@ -178,6 +182,7 @@ sub render_to_str {
 
     $result->{page} = $self->page->resolve if $self->page->is_set;
     $result->{refresh} = $self->refresh->resolve if $self->refresh->is_set;
+    $result->{user} = $self->user->resolve if $self->user->is_set;
 
     # One DTO for several simple parameters
     $result = { %$result, %{$self->_scalar_params->resolve} } if $self->_scalar_params->is_set;
@@ -185,7 +190,6 @@ sub render_to_str {
     # Not-yet-DTO parameters
     $result->{main} = $self->_main if $self->has_main;
     $result->{right} = $self->_infobox if $self->has_infobox;
-    $result->{user} = $self->user if $self->has_user;
     $result->{structure} = $self->menu if $self->has_menu;
     $result->{on_exception} = $self->on_exception if $self->has_on_exception;
 

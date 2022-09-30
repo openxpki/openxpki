@@ -55,7 +55,8 @@ has resp => (
         redirect set_redirect
         refresh set_refresh
         status set_status
-        user menu has_menu on_exception
+        user set_user
+        menu has_menu on_exception
         rtoken language tenant ping
         add_section add_infobox_section
         raw_response

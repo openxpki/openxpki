@@ -37,8 +37,8 @@ sub init_structure {
     $session->flush;
     $self->logger->debug("Baseurl from referrer: " . $baseurl);
 
-    if ($session->param('is_logged_in') && $user) {
-        $self->user($user);
+    if ($session->param('is_logged_in') and $user) {
+        $self->set_user(%{ $user });
 
         # Preselect tenant, for now we just pick the first from the list
         if ($user->{tenants}) {
@@ -48,7 +48,7 @@ sub init_structure {
 
         # Last Login
         if (my $last_login = $session->param('userinfo')->{last_login}) {
-            $user->{last_login} = $last_login;
+            $self->user->last_login($last_login);
         }
 
         $self->menu($session->param('menu'));

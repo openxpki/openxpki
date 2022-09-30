@@ -70,6 +70,7 @@ OpenXPKI/Client/UI/Response/ScalarParams.pm
 OpenXPKI/Client/UI/Response/Section/Form.pm
 OpenXPKI/Client/UI/Response/SectionRole.pm
 OpenXPKI/Client/UI/Response/Status.pm
+OpenXPKI/Client/UI/Response/User.pm
 OpenXPKI/Client/UI/Result.pm
 OpenXPKI/Client/UI/Secret.pm
 OpenXPKI/Client/UI/Source.pm
