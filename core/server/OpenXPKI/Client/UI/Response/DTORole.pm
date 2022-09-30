@@ -14,6 +14,12 @@ requires 'is_set';
 
 Returns a I<HashRef> with all attribute values (if they are set).
 
+If an attribute value is itself an object that consumes
+C<OpenXPKI::Client::UI::Response::DTORole> (or an L<ArrayRef> containing such
+objects) the attribute value is transformed first. So a call to C<transform>
+may lead to recursive calls of the same method in children (i.e. attributes of
+the current object) and so on.
+
 Per default, the attribute name is used as hash key. To override this the
 Moose attribute parameter I<documentation> may be used.
 
@@ -65,14 +71,30 @@ sub resolve {
             $parent->{$k} //= {};
             $parent = $parent->{$k};
         };
-        # set value
+
+        # transform value if it's a DTO or an ArrayRef of DTOs
         my $val = $attr->get_value($self);
-        $parent->{$keyparts[-1]} = does_role($val, 'OpenXPKI::Client::UI::Response::DTORole') ? $val->resolve : $val;
+        my $maybe_resolve = sub { my $v = shift; return (does_role($v, 'OpenXPKI::Client::UI::Response::DTORole') ? $v->resolve : $v) };
+        if ($attr->type_constraint->is_a_type_of('ArrayRef')) {
+            $val = [ map { $maybe_resolve->($_) } @{ $val } ];
+        }
+        else {
+            $val = $maybe_resolve->($val);
+        }
+
+        # store value in response hash
+        $parent->{$keyparts[-1]} = $val;
     }
 
     return $result;
 }
 
+=head2 has_any_value
+
+Returns C<1> if any attributes of the consuming object have a value set (also
+if a C<default> was specified).
+
+=cut
 sub has_any_value {
     my $self = shift;
 
