@@ -86,17 +86,14 @@ sub init_manage {
         });
     } else {
         $self->page->label('I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL');
-        $self->add_section({
-            type => 'form',
+        $self->add_form(
             action => 'secret!unlock',
-            content => {
-                fields => [
-                    { 'name' => 'phrase', 'label' => 'I18N_OPENXPKI_UI_SECRET_PASSPHRASE_LABEL', 'type' => 'password', placeholder => 'I18N_OPENXPKI_UI_SECRET_PASSPHRASE_LABEL' },
-                    { 'name' => 'id', 'type' => 'hidden', value => $secret }
-                ],
-                submit_label => 'I18N_OPENXPKI_UI_SECRET_UNLOCK_BUTTON',
-            }
-        });
+            submit_label => 'I18N_OPENXPKI_UI_SECRET_UNLOCK_BUTTON',
+        )->add_field(
+            'name' => 'phrase', 'label' => 'I18N_OPENXPKI_UI_SECRET_PASSPHRASE_LABEL', 'type' => 'password', placeholder => 'I18N_OPENXPKI_UI_SECRET_PASSPHRASE_LABEL',
+        )->add_field(
+            'name' => 'id', 'type' => 'hidden', value => $secret,
+        );
     }
 
     return $self;

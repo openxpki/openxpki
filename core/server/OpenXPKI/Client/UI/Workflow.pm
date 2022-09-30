@@ -563,45 +563,52 @@ sub init_search {
         keys %{ $self->__proc_state_i18n }
     ];
 
-    my @fields = (
-        { name => 'wf_type',
-          label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_LABEL',
-          type => 'select',
-          is_optional => 1,
-          options => \@wfl_list,
-          value => $preset->{wf_type}
-
-        },
-        { name => 'wf_proc_state',
-          label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL',
-          type => 'select',
-          is_optional => 1,
-          prompt => '',
-          options => $proc_states,
-          value => $preset->{wf_proc_state}
-        },
-        { name => 'wf_state',
-          label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_LABEL',
-          placeholder => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_PLACEHOLDER',
-          type => 'text',
-          is_optional => 1,
-          prompt => '',
-          value => $preset->{wf_state}
-        },
-        { name => 'wf_creator',
-          label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL',
-          placeholder => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_PLACEHOLDER',
-          type => 'text',
-          is_optional => 1,
-          value => $preset->{wf_creator}
-        },
-        { name => 'last_update',
-          label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL',
-          'keys' => $self->__validity_options(),
-          type => 'datetime',
-          is_optional => 1,
-          value => $preset->{last_update},
-        }
+    my $form = $self->new_form(
+        action => 'workflow!search',
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_DATABASE_TITLE',
+        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
+    )
+    ->add_field(
+        name => 'wf_type',
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_LABEL',
+        type => 'select',
+        is_optional => 1,
+        options => \@wfl_list,
+        value => $preset->{wf_type}
+    )
+    ->add_field(
+        name => 'wf_proc_state',
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL',
+        type => 'select',
+        is_optional => 1,
+        prompt => '',
+        options => $proc_states,
+        value => $preset->{wf_proc_state}
+    )
+    ->add_field(
+        name => 'wf_state',
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_LABEL',
+        placeholder => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_PLACEHOLDER',
+        type => 'text',
+        is_optional => 1,
+        prompt => '',
+        value => $preset->{wf_state}
+    )
+    ->add_field(
+        name => 'wf_creator',
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL',
+        placeholder => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_PLACEHOLDER',
+        type => 'text',
+        is_optional => 1,
+        value => $preset->{wf_creator}
+    )
+    ->add_field(
+        name => 'last_update',
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL',
+        'keys' => $self->__validity_options(),
+        type => 'datetime',
+        is_optional => 1,
+        value => $preset->{last_update},
     );
 
     # Searchable attributes are read from the menu bootstrap
@@ -616,7 +623,7 @@ sub init_search {
             }
         }
         unshift @meta_description, { value => 'I18N_OPENXPKI_UI_WORKFLOW_METADATA_LABEL', format => 'head' } if (@meta_description);
-        push @fields, {
+        $form->add_field(
             name => 'attributes',
             label => 'I18N_OPENXPKI_UI_WORKFLOW_METADATA_LABEL',
             placeholder => 'I18N_OPENXPKI_UI_SEARCH_METADATA_PLACEHOLDER',
@@ -625,34 +632,22 @@ sub init_search {
             is_optional => 1,
             'clonable' => 1,
             'value' => $preset->{attributes} || [],
-        } if (@attrib);
+        ) if scalar @attrib;
 
     }
 
-    $self->add_section({
-        type => 'form',
+    $self->add_form(
         action => 'workflow!load',
-        content => {
-            label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_BY_ID_TITLE',
-            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
-            fields => [{
-                name => 'wf_id',
-                label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL',
-                type => 'text',
-                value => $preset->{wf_id} || '',
-            }]
-    }});
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_BY_ID_TITLE',
+        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
+    )->add_field(
+        name => 'wf_id',
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL',
+        type => 'text',
+        value => $preset->{wf_id} || '',
+    );
 
-    $self->add_section({
-        type => 'form',
-        action => 'workflow!search',
-        content => {
-            label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_DATABASE_TITLE',
-            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
-            fields => \@fields
-
-        }
-    });
+    $self->add_section($form);
 
     $self->add_section({
         type => 'keyvalue',
@@ -3882,34 +3877,28 @@ sub __render_workflow_action_body {
         }});
 
     } else {
-
+        my $form = $self->add_form(
+            action => 'workflow',
+            #label => $wf_action_info->{label},
+            #description => $wf_action_info->{description},
+            submit_label => $wf_action_info->{button} || 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
+            buttons => $self->__get_form_buttons( $wf_info ),
+        );
         # record the workflow info in the session
         push @fields, $self->__register_wf_token( $wf_info, {
             wf_action => $wf_action,
             wf_fields => \@fields,
         });
+        $form->add_field(%{ $_ }) for (@fields, @additional_fields);
 
         $self->add_section({
-            type => 'form',
-            action => 'workflow',
+            type => 'keyvalue',
             content => {
-                #label => $wf_action_info->{label},
-                #description => $wf_action_info->{description},
-                submit_label => $wf_action_info->{button} || 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
-                fields => [ @fields, @additional_fields ],
-                buttons => $self->__get_form_buttons( $wf_info ),
+                label => 'I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST',
+                description => '',
+                data => \@fielddesc,
             }
-        });
-
-        if (@fielddesc) {
-            $self->add_section({
-                type => 'keyvalue',
-                content => {
-                    label => 'I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST',
-                    description => '',
-                    data => \@fielddesc
-            }});
-        }
+        }) if scalar @fielddesc;
     }
 }
 

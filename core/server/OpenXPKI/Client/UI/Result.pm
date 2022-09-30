@@ -60,6 +60,7 @@ has resp => (
         add_section add_infobox_section
         raw_response
         render_to_str
+        new_form add_form
     ) ],
 );
 

@@ -34,12 +34,16 @@ sub init_index {
     BULKITEM:
     foreach my $bulk (@bulklist) {
 
-        my @fields = ({
+        my $form = $self->add_form(
+            action => 'bulk!result',
+            label => $bulk->{label},
+            description => $bulk->{description},
+            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
+        )->add_field(
             name => 'wf_creator',
-              label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL',
-              type => 'text',
-              is_optional => 1,
-            }
+            label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL',
+            type => 'text',
+            is_optional => 1,
         );
 
         if ($bulk->{attributes}) {
@@ -48,34 +52,23 @@ sub init_index {
                 push @attrib, { value => $item->{key}, label=> $item->{label} };
 
             }
-            push @fields, {
+            $form->add_field(
                 name => 'attributes',
                 label => 'Metadata',
                 'keys' => \@attrib,
                 type => 'text',
                 is_optional => 1,
-                'clonable' => 1
-            };
+                'clonable' => 1,
+            );
         }
 
         my $id = $self->__generate_uid();
         $self->_client->session()->param('bulk_'.$id, $bulk );
-        push @fields, {
+        $form->add_field(
             name => 'formid',
             type => 'hidden',
-            value => $id
-        };
-
-        $self->add_section({
-            type => 'form',
-            action => 'bulk!result',
-            content => {
-                label => $bulk->{label},
-                description => $bulk->{description},
-                submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
-                fields => \@fields
-            }
-        });
+            value => $id,
+        );
     } # end bulkitem
 
     return $self;

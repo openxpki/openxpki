@@ -87,8 +87,12 @@ sub init_search {
     my $self = shift;
     my $args = shift;
 
-    $self->set_page(
-        label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_LABEL',
+    $self->set_page(label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_LABEL');
+
+    my $form = $self->add_form(
+        action => 'certificate!search',
+        description => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_DESC',
+        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
     );
 
     my $profile = $self->send_command_v2( 'list_used_profiles' );
@@ -122,21 +126,26 @@ sub init_search {
         }
     }
 
-    my @fields = (
-        { name => 'subject', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', placeholder => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SUBJECT_PLACEHOLDER',
-            type => 'text', is_optional => 1, value => $preset->{subject} },
-        { name => 'san', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SAN', placeholder => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SAN_PLACEHOLDER',
-            type => 'text', is_optional => 1, value => $preset->{san} },
-        { name => 'status', label => 'I18N_OPENXPKI_UI_CERTIFICATE_STATUS',
-            type => 'select', is_optional => 1, prompt => 'all', options => \@states, , value => $preset->{status} },
-        { name => 'profile', label => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE',
-            type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list, value => $preset->{profile} },
-        { name => 'issuer_identifier', label => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER',
-            type => 'select', is_optional => 1, prompt => 'all', options => \@issuer_list, value => $preset->{issuer_identifier} },
-        { name => 'validity', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY', placeholder => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_VALIDITY_PLACEHOLDER',
-            type => 'datetime', is_optional => 1, clonable => 1,
-            'keys' => $self->__validity_options(), value => $preset->{validity_options} || [ { key => 'valid_at', value => '' }], },
-   );
+    $form->add_field(
+        name => 'subject', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SUBJECT', placeholder => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SUBJECT_PLACEHOLDER',
+        type => 'text', is_optional => 1, value => $preset->{subject},
+    )->add_field(
+        name => 'san', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SAN', placeholder => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SAN_PLACEHOLDER',
+        type => 'text', is_optional => 1, value => $preset->{san},
+    )->add_field(
+        name => 'status', label => 'I18N_OPENXPKI_UI_CERTIFICATE_STATUS',
+        type => 'select', is_optional => 1, prompt => 'all', options => \@states, , value => $preset->{status},
+    )->add_field(
+        name => 'profile', label => 'I18N_OPENXPKI_UI_CERTIFICATE_PROFILE',
+        type => 'select', is_optional => 1, prompt => 'all', options => \@profile_list, value => $preset->{profile},
+    )->add_field(
+        name => 'issuer_identifier', label => 'I18N_OPENXPKI_UI_CERTIFICATE_ISSUER',
+        type => 'select', is_optional => 1, prompt => 'all', options => \@issuer_list, value => $preset->{issuer_identifier},
+    )->add_field(
+        name => 'validity', label => 'I18N_OPENXPKI_UI_CERTIFICATE_VALIDITY', placeholder => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_VALIDITY_PLACEHOLDER',
+        type => 'datetime', is_optional => 1, clonable => 1,
+        'keys' => $self->__validity_options(), value => $preset->{validity_options} || [ { key => 'valid_at', value => '' }],
+    );
 
     my $attributes = $self->_client->session()->param('certsearch')->{default}->{attributes};
     my @meta_description;
@@ -148,7 +157,7 @@ sub init_search {
                 push @meta_description, { label=> $item->{label}, value => $item->{description}, format => 'raw' };
             }
         }
-        push @fields, {
+        $form->add_field(
             name => 'attributes',
             label => 'I18N_OPENXPKI_UI_CERTIFICATE_METADATA',
             placeholder => 'I18N_OPENXPKI_UI_SEARCH_METADATA_PLACEHOLDER',
@@ -157,34 +166,21 @@ sub init_search {
             is_optional => 1,
             'clonable' => 1,
             'value' => $preset->{attributes} || [{ 'key' => $attrib[0]->{value}, value => ''}],
-        } if (@attrib);
+        ) if (@attrib);
 
         unshift @meta_description, { value => 'I18N_OPENXPKI_UI_CERTIFICATE_METADATA', format => 'head' } if (@meta_description);
     }
 
-    $self->add_section({
-        type => 'form',
-        action => 'certificate!search',
-        content => {
-           description => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_DESC',
-           submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
-           fields => \@fields
-        }},
-    );
-
-    $self->add_section({
-        type => 'form',
+    $self->add_form(
         action => 'certificate!find',
-        content => {
-           description => 'I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL',
-           submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
-           fields => [
-               { name => 'cert_identifier', label => 'I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER',
-                type => 'text', is_optional => 1, value => $preset->{cert_identifier} },
-               { name => 'cert_serial', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SERIAL', placeholder => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SERIAL_PLACEHOLDER',
-                type => 'text', is_optional => 1, value => $preset->{cert_serial} },
-           ]
-        }},
+        description => 'I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL',
+        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
+    )->add_field(
+        name => 'cert_identifier', label => 'I18N_OPENXPKI_UI_CERTIFICATE_IDENTIFIER',
+        type => 'text', is_optional => 1, value => $preset->{cert_identifier},
+    )->add_field(
+        name => 'cert_serial', label => 'I18N_OPENXPKI_UI_CERTIFICATE_SERIAL', placeholder => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_SERIAL_PLACEHOLDER',
+        type => 'text', is_optional => 1, value => $preset->{cert_serial},
     );
 
     $self->add_section({

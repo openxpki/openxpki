@@ -28,15 +28,11 @@ sub init_realm_select {
         label => 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN',
         description => 'I18N_OPENXPKI_UI_LOGIN_REALM_SELECTION_DESC'
     );
-    $self->add_section({
-        type => 'form',
+    $self->add_form(
         action => 'login!realm',
-        content => {
-            fields => [
-                { name => 'pki_realm', label => 'I18N_OPENXPKI_UI_PKI_REALM_LABEL', type => 'select', options => \@realms },
-            ],
-        },
-    });
+    )->add_field(
+        name => 'pki_realm', label => 'I18N_OPENXPKI_UI_PKI_REALM_LABEL', type => 'select', options => \@realms,
+    );
     return $self;
 }
 
@@ -52,16 +48,12 @@ sub init_auth_stack {
         description => 'I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_DESC',
     );
 
-    $self->add_section({
-        type => 'form',
+    $self->add_form(
         action => 'login!stack',
-        content => {
-            submit_label => 'I18N_OPENXPKI_UI_LOGIN_SUBMIT',
-            fields => [
-                { 'name' => 'auth_stack', 'label' => 'Handler', 'type' => 'select', 'options' => \@stacks },
-            ],
-        },
-    });
+        submit_label => 'I18N_OPENXPKI_UI_LOGIN_SUBMIT',
+    )->add_field(
+        'name' => 'auth_stack', 'label' => 'Handler', 'type' => 'select', 'options' => \@stacks,
+    );
 
     my @stackdesc = map {
         $_->{description} ? ({ label => $_->{label}, value => $_->{description}, format => 'raw' }) : ()
@@ -88,23 +80,20 @@ sub init_login_passwd {
     my $args = shift;
 
     $args->{field} = [
-        { 'name' => 'username', 'label' => 'I18N_OPENXPKI_UI_LOGIN_USERNAME', 'type' => 'text' },
-        { 'name' => 'password', 'label' => 'I18N_OPENXPKI_UI_LOGIN_PASSWORD', 'type' => 'password' },
-    ] unless ($args->{field});
+        { name => 'username', label => 'I18N_OPENXPKI_UI_LOGIN_USERNAME', type => 'text' },
+        { name => 'password', label => 'I18N_OPENXPKI_UI_LOGIN_PASSWORD', type => 'password' },
+    ] unless $args->{field};
 
     $self->set_page(
         label => $args->{label} || 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN',
         description => $args->{description} || '',
     );
-    $self->add_section({
-        type => 'form',
+    my $form = $self->add_form(
         action => 'login!password',
-        content => {
-            fields => $args->{field},
-            submit_label => $args->{button} || 'I18N_OPENXPKI_UI_LOGIN_BUTTON',
-            buttons => [{ label => 'I18N_OPENXPKI_UI_LOGIN_ABORT_BUTTON', page => 'logout', format => 'failure' }],
-        },
-    });
+        submit_label => $args->{button} || 'I18N_OPENXPKI_UI_LOGIN_BUTTON',
+        buttons => [{ label => 'I18N_OPENXPKI_UI_LOGIN_ABORT_BUTTON', page => 'logout', format => 'failure' }],
+    );
+    $form->add_field(%{ $_ }) for @{ $args->{field} };
 
     return $self;
 

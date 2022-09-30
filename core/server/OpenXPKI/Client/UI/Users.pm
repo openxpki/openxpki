@@ -332,30 +332,30 @@ Renders the search form
 sub render_search_form {
     my $self = shift;
     my $args = shift;
-    my $preset;
-    if ($args->{preset}) {
-        $preset = $args->{preset};
-    }
-    # define search fields
-    my @fields = (
-        { name => 'username', label => 'I18N_OPENXPKI_UI_USER_USERNAME', type => 'text', is_optional => 1, value => $preset->{username} },
-        { name => 'mail', label => 'I18N_OPENXPKI_UI_USER_MAIL', type => 'text', is_optional => 1, value => $preset->{mail} },
-        { name => 'realname', label => 'I18N_OPENXPKI_UI_USER_REALNAME',type => 'text', is_optional => 1, value => $preset->{realname} },
-        { name => 'role', label => 'I18N_OPENXPKI_UI_USER_ROLE',type => 'select', options => [
-            { label => 'I18N_OPENXPKI_UI_USER_ROLE_USER', value => 'User'},
-            { label=> 'I18N_OPENXPKI_UI_USER_ROLE_RAOP',value=> 'RA Operator'}],
-             is_optional => 1, value => $preset->{role} },
-    );
+
     # add search form to current page
-    $self->add_section({
-        type => 'form',
+    my $form = $self->add_form(
         action => 'users!search',
-        content => {
-           description => 'I18N_OPENXPKI_UI_USER_SEARCH_DESC',
-           submit_label => 'I18N_OPENXPKI_UI_USER_SEARCH_SUBMIT_LABEL',
-           fields => \@fields
-        }},
+        description => 'I18N_OPENXPKI_UI_USER_SEARCH_DESC',
+        submit_label => 'I18N_OPENXPKI_UI_USER_SEARCH_SUBMIT_LABEL',
     );
+
+    # define search fields
+    my $preset = $args->{preset} // {};
+    $form->add_field(
+        name => 'username', label => 'I18N_OPENXPKI_UI_USER_USERNAME', type => 'text', is_optional => 1, value => $preset->{username},
+    )->add_field(
+        name => 'mail', label => 'I18N_OPENXPKI_UI_USER_MAIL', type => 'text', is_optional => 1, value => $preset->{mail},
+    )->add_field(
+        name => 'realname', label => 'I18N_OPENXPKI_UI_USER_REALNAME', type => 'text', is_optional => 1, value => $preset->{realname},
+    )->add_field(
+        name => 'role', label => 'I18N_OPENXPKI_UI_USER_ROLE',type => 'select', is_optional => 1, value => $preset->{role},
+        options => [
+            { label => 'I18N_OPENXPKI_UI_USER_ROLE_USER', value => 'User'},
+            { label=> 'I18N_OPENXPKI_UI_USER_ROLE_RAOP',value=> 'RA Operator'},
+        ],
+    );
+
     return $self;
 }
 

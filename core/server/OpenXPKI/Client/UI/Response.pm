@@ -10,6 +10,7 @@ use List::Util qw( none all first );
 # CPAN modules
 use CGI 4.08 qw( -utf8 );
 use JSON;
+use Moose::Util qw( does_role );
 
 # Project modules
 use OpenXPKI::i18n qw( i18nTokenizer );
@@ -18,6 +19,7 @@ use OpenXPKI::Client::UI::Response::Redirect;
 use OpenXPKI::Client::UI::Response::Refresh;
 use OpenXPKI::Client::UI::Response::Status;
 use OpenXPKI::Client::UI::Response::ScalarParams;
+use OpenXPKI::Client::UI::Response::Section::Form;
 
 has ui_result => (
     is => 'ro',
@@ -94,10 +96,6 @@ has 'raw_response' => (
 has '_main' => (
     is => 'rw',
     isa => 'ArrayRef[HashRef]',
-    traits  => ['Array'],
-    handles => {
-        add_section => 'push',
-    },
     default => sub { [] },
     predicate => 'has_main',
 );
@@ -105,10 +103,6 @@ has '_main' => (
 has '_infobox' => (
     is => 'rw',
     isa => 'ArrayRef[HashRef]',
-    traits  => ['Array'],
-    handles => {
-        add_infobox_section => 'push',
-    },
     default => sub { [] },
     predicate => 'has_infobox',
 );
@@ -117,6 +111,23 @@ sub set_page { shift->_page(OpenXPKI::Client::UI::Response::Page->new(@_)) }
 sub set_redirect { shift->_redirect(OpenXPKI::Client::UI::Response::Redirect->new(@_)) }
 sub set_refresh { shift->_refresh(OpenXPKI::Client::UI::Response::Refresh->new(@_)) }
 sub set_status { shift->_status(OpenXPKI::Client::UI::Response::Status->new(@_)) }
+
+sub add_section {
+    my $self = shift;
+    my $section = shift;
+
+    push @{ $self->_main }, (does_role($section, 'OpenXPKI::Client::UI::Response::DTORole') ? $section->resolve : $section);
+}
+
+sub add_infobox_section {
+    my $self = shift;
+    my $section = shift;
+
+    push @{ $self->_infobox }, (does_role($section, 'OpenXPKI::Client::UI::Response::DTORole') ? $section->resolve : $section);
+}
+
+sub new_form { my $self = shift; OpenXPKI::Client::UI::Response::Section::Form->new(@_) }
+sub add_form { my $self = shift; my $form = $self->new_form(@_); $self->add_section($form); return $form }
 
 =head2 render_to_str
 
