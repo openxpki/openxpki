@@ -262,7 +262,7 @@ sub render_key_select {
              $item->{value} = 'pkcs10';
         }
 
-        push @fields, $item;
+        push @fields, $item, @more_items;
     }
 
     # record the workflow info in the session
