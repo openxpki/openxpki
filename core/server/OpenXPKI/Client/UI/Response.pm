@@ -98,14 +98,22 @@ has 'raw_response' => (
 
 has '_main' => (
     is => 'rw',
-    isa => 'ArrayRef[HashRef]',
+    isa => 'ArrayRef',
+    traits => ['Array'],
+    handles => {
+        add_section => 'push',
+    },
     default => sub { [] },
     predicate => 'has_main',
 );
 
 has '_infobox' => (
     is => 'rw',
-    isa => 'ArrayRef[HashRef]',
+    isa => 'ArrayRef',
+    traits => ['Array'],
+    handles => {
+        add_infobox_section => 'push',
+    },
     default => sub { [] },
     predicate => 'has_infobox',
 );
@@ -115,20 +123,6 @@ sub set_redirect { shift->_redirect(OpenXPKI::Client::UI::Response::Redirect->ne
 sub set_refresh { shift->_refresh(OpenXPKI::Client::UI::Response::Refresh->new(@_)) }
 sub set_status { shift->_status(OpenXPKI::Client::UI::Response::Status->new(@_)) }
 sub set_user { shift->_user(OpenXPKI::Client::UI::Response::User->new(@_)) }
-
-sub add_section {
-    my $self = shift;
-    my $section = shift;
-
-    push @{ $self->_main }, (does_role($section, 'OpenXPKI::Client::UI::Response::DTORole') ? $section->resolve : $section);
-}
-
-sub add_infobox_section {
-    my $self = shift;
-    my $section = shift;
-
-    push @{ $self->_infobox }, (does_role($section, 'OpenXPKI::Client::UI::Response::DTORole') ? $section->resolve : $section);
-}
 
 sub new_form { my $self = shift; OpenXPKI::Client::UI::Response::Section::Form->new(@_) }
 sub add_form { my $self = shift; my $form = $self->new_form(@_); $self->add_section($form); return $form }
@@ -188,8 +182,10 @@ sub render_to_str {
     $result = { %$result, %{$self->_scalar_params->resolve} } if $self->_scalar_params->is_set;
 
     # Not-yet-DTO parameters
-    $result->{main} = $self->_main if $self->has_main;
-    $result->{right} = $self->_infobox if $self->has_infobox;
+    my $maybe_resolve = sub { my $v = shift; return (does_role($v, 'OpenXPKI::Client::UI::Response::DTORole') ? $v->resolve : $v) };
+
+    $result->{main} = [ map { $maybe_resolve->($_) } @{ $self->_main } ] if $self->has_main;
+    $result->{right} = [ map { $maybe_resolve->($_) } @{ $self->_infobox } ] if $self->has_infobox;
     $result->{structure} = $self->menu if $self->has_menu;
     $result->{on_exception} = $self->on_exception if $self->has_on_exception;
 

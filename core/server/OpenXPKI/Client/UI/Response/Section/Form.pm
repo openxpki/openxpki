@@ -34,7 +34,6 @@ has '_fields' => (
     handles => {
         _add_field => 'push',
     },
-    default => sub { [] },
     documentation => 'content/fields',
 );
 
