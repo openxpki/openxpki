@@ -89,7 +89,6 @@ sub init_manage {
         $self->add_section({
             type => 'form',
             action => 'secret!unlock',
-            target => 'top',
             content => {
                 fields => [
                     { 'name' => 'phrase', 'label' => 'I18N_OPENXPKI_UI_SECRET_PASSPHRASE_LABEL', 'type' => 'password', placeholder => 'I18N_OPENXPKI_UI_SECRET_PASSPHRASE_LABEL' },
