@@ -26,14 +26,14 @@ use OpenXPKI::Client::UI::Response::Sections;
 use OpenXPKI::Client::UI::Response::Status;
 use OpenXPKI::Client::UI::Response::User;
 
-has ui_result => (
+has 'ui_result'=> (
     documentation => 'IGNORE',
     is => 'ro',
     isa => duck_type( [qw( _session __persist_status __fetch_status )] ),
     required => 1,
 );
 
-has _redirect => (
+has '_redirect'=> (
     documentation => 'IGNORE',
     is => 'rw',
     isa => 'OpenXPKI::Client::UI::Response::Redirect',
@@ -50,7 +50,7 @@ has 'raw_response' => (
     predicate => 'has_raw_response',
 );
 
-has _page => (
+has '_page'=> (
     documentation => 'page',
     is => 'rw',
     isa => 'OpenXPKI::Client::UI::Response::PageInfo',
@@ -59,7 +59,7 @@ has _page => (
     reader => 'page',
 );
 
-has _refresh => (
+has '_refresh'=> (
     documentation => 'refresh',
     is => 'rw',
     isa => 'OpenXPKI::Client::UI::Response::Refresh',
@@ -68,7 +68,7 @@ has _refresh => (
     reader => 'refresh',
 );
 
-has _status => (
+has '_status'=> (
     documentation => 'status',
     is => 'rw',
     isa => 'OpenXPKI::Client::UI::Response::Status',
@@ -77,7 +77,7 @@ has _status => (
     reader => 'status',
 );
 
-has _user => (
+has '_user'=> (
     documentation => 'user',
     is => 'rw',
     isa => 'OpenXPKI::Client::UI::Response::User',
@@ -86,7 +86,7 @@ has _user => (
     reader => 'user',
 );
 
-has _menu => (
+has '_menu'=> (
     documentation => 'structure',
     is => 'rw',
     isa => 'OpenXPKI::Client::UI::Response::Menu',
@@ -95,7 +95,7 @@ has _menu => (
     reader => 'menu',
 );
 
-has _on_exception => (
+has '_on_exception'=> (
     documentation => 'on_exception',
     is => 'rw',
     isa => 'OpenXPKI::Client::UI::Response::OnException',
@@ -104,7 +104,7 @@ has _on_exception => (
     reader => 'on_exception',
 );
 
-has _main => (
+has '_main'=> (
     documentation => 'main',
     is => 'rw',
     isa => 'OpenXPKI::Client::UI::Response::Sections',
@@ -113,7 +113,7 @@ has _main => (
     reader => 'main',
 );
 
-has _infobox => (
+has '_infobox'=> (
     documentation => 'right',
     is => 'rw',
     isa => 'OpenXPKI::Client::UI::Response::Sections',
