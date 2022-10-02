@@ -28,7 +28,7 @@ sub init_realm_select {
         label => 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN',
         description => 'I18N_OPENXPKI_UI_LOGIN_REALM_SELECTION_DESC'
     );
-    $self->add_form(
+    $self->main->add_form(
         action => 'login!realm',
     )->add_field(
         name => 'pki_realm', label => 'I18N_OPENXPKI_UI_PKI_REALM_LABEL', type => 'select', options => \@realms,
@@ -48,7 +48,7 @@ sub init_auth_stack {
         description => 'I18N_OPENXPKI_UI_LOGIN_STACK_SELECTION_DESC',
     );
 
-    $self->add_form(
+    $self->main->add_form(
         action => 'login!stack',
         submit_label => 'I18N_OPENXPKI_UI_LOGIN_SUBMIT',
     )->add_field(
@@ -88,7 +88,7 @@ sub init_login_passwd {
         label => $args->{label} || 'I18N_OPENXPKI_UI_LOGIN_PLEASE_LOG_IN',
         description => $args->{description} || '',
     );
-    my $form = $self->add_form(
+    my $form = $self->main->add_form(
         action => 'login!password',
         submit_label => $args->{button} || 'I18N_OPENXPKI_UI_LOGIN_BUTTON',
         buttons => [{ label => 'I18N_OPENXPKI_UI_LOGIN_ABORT_BUTTON', page => 'logout', format => 'failure' }],

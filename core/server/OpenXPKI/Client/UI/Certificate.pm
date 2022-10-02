@@ -89,7 +89,7 @@ sub init_search {
 
     $self->set_page(label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_LABEL');
 
-    my $form = $self->add_form(
+    my $form = $self->main->add_form(
         action => 'certificate!search',
         description => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_DESC',
         submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
@@ -171,7 +171,7 @@ sub init_search {
         unshift @meta_description, { value => 'I18N_OPENXPKI_UI_CERTIFICATE_METADATA', format => 'head' } if (@meta_description);
     }
 
-    $self->add_form(
+    $self->main->add_form(
         action => 'certificate!find',
         description => 'I18N_OPENXPKI_UI_CERTIFICATE_BY_IDENTIFIER_OR_SERIAL',
         submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',

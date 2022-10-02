@@ -75,7 +75,7 @@ sub render_profile_select {
         wf_fields => \@fields,
     });
 
-    my $form = $self->add_form(
+    my $form = $self->main->add_form(
         action => 'workflow',
         submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
     );
@@ -170,7 +170,7 @@ sub render_subject_form {
         wf_fields => $fields,
     });
 
-    my $form = $self->add_form(
+    my $form = $self->main->add_form(
         action => 'workflow',
         submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
         buttons => $self->__get_form_buttons( $wf_info ),
@@ -266,7 +266,7 @@ sub render_key_select {
         cert_profile => $context->{cert_profile}
     });
 
-    my $form = $self->add_form(
+    my $form = $self->main->add_form(
         action => 'workflow',
         submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
     );
@@ -336,7 +336,7 @@ sub render_server_password {
         cert_profile => $context->{cert_profile}
     });
 
-    my $form = $self->add_form(
+    my $form = $self->main->add_form(
         action => 'workflow',
         submit_label => $wf_action_info->{button} || 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
     );

@@ -65,7 +65,6 @@ has resp => (
         status
         tenant
         user set_user
-        new_form add_form
     ) ],
 );
 

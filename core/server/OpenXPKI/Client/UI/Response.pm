@@ -10,7 +10,6 @@ use OpenXPKI::Client::UI::Response::OnException;
 use OpenXPKI::Client::UI::Response::PageInfo;
 use OpenXPKI::Client::UI::Response::Redirect;
 use OpenXPKI::Client::UI::Response::Refresh;
-use OpenXPKI::Client::UI::Response::Section::Form;
 use OpenXPKI::Client::UI::Response::Sections;
 use OpenXPKI::Client::UI::Response::Status;
 use OpenXPKI::Client::UI::Response::User;
@@ -117,9 +116,6 @@ has 'user'=> (
 sub set_page { shift->page(OpenXPKI::Client::UI::Response::PageInfo->new(@_)) }
 sub set_refresh { shift->refresh(OpenXPKI::Client::UI::Response::Refresh->new(@_)) }
 sub set_user { shift->user(OpenXPKI::Client::UI::Response::User->new(@_)) }
-
-sub new_form { my $self = shift; OpenXPKI::Client::UI::Response::Section::Form->new(@_) }
-sub add_form { my $self = shift; my $form = $self->new_form(@_); $self->main->add_section($form); return $form }
 
 sub is_set { 1 } # required by OpenXPKI::Client::UI::Response::DTORole
 

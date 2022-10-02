@@ -86,7 +86,7 @@ sub init_manage {
         });
     } else {
         $self->page->label('I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL');
-        $self->add_form(
+        $self->main->add_form(
             action => 'secret!unlock',
             submit_label => 'I18N_OPENXPKI_UI_SECRET_UNLOCK_BUTTON',
         )->add_field(

@@ -34,7 +34,7 @@ sub init_index {
     BULKITEM:
     foreach my $bulk (@bulklist) {
 
-        my $form = $self->add_form(
+        my $form = $self->main->add_form(
             action => 'bulk!result',
             label => $bulk->{label},
             description => $bulk->{description},

@@ -334,7 +334,7 @@ sub render_search_form {
     my $args = shift;
 
     # add search form to current page
-    my $form = $self->add_form(
+    my $form = $self->main->add_form(
         action => 'users!search',
         description => 'I18N_OPENXPKI_UI_USER_SEARCH_DESC',
         submit_label => 'I18N_OPENXPKI_UI_USER_SEARCH_SUBMIT_LABEL',

@@ -524,37 +524,32 @@ sub init_search {
     );
 
     my $workflows = $self->send_command_v2( 'get_workflow_instance_types' );
-    return $self unless(defined $workflows);
+    return $self unless defined $workflows;
+    $self->logger->trace('Workflows: ' . Dumper $workflows) if $self->logger->is_trace;
 
-    $self->logger()->trace('Workflows ' . Dumper $workflows) if $self->logger->is_trace;
+    my $preset = $args->{preset} // $self->__wf_search_presets;
+    $self->logger->trace('Presets: ' . Dumper $preset) if $self->logger->is_trace;
 
-    my $preset = $self->_session->param('wfsearch')->{default}->{preset} || {};
-    # convert preset for last_update
-    foreach my $key (qw(last_update_before last_update_after)) {
-        next unless ($preset->{$key});
-        $preset->{last_update} = {
-            key => $key,
-            value => OpenXPKI::DateTime::get_validity({
-                VALIDITY => $preset->{$key},
-                VALIDITYFORMAT => 'detect'
-            })->epoch()
-        };
-    }
+    #
+    # Search by ID
+    #
+    $self->main->add_form(
+        action => 'workflow!load',
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_BY_ID_TITLE',
+        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
+    )->add_field(
+        name => 'wf_id',
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL',
+        type => 'text',
+        value => $preset->{wf_id} || '',
+    );
 
-    if ($args->{preset}) {
-        $preset = $args->{preset};
-
-    } elsif (my $queryid = $self->param('query')) {
-        my $result = $self->_client->session()->param('query_wfl_'.$queryid);
-        $preset = $result->{input};
-    }
-
-    $self->logger()->trace('Preset ' . Dumper $preset) if $self->logger->is_trace;
-
-    # TODO Sorting / I18
-    my @wf_names = keys %{$workflows};
-    my @wfl_list = map { {'value' => $_, 'label' => $workflows->{$_}->{label}} } @wf_names ;
-    @wfl_list = sort { lc($a->{'label'}) cmp lc($b->{'label'}) } @wfl_list;
+    #
+    # Search by workflow attributes
+    #
+    my @wf_types = sort { lc($a->{'label'}) cmp lc($b->{'label'}) }
+      map { {'value' => $_, 'label' => $workflows->{$_}->{label}} }
+      keys %{$workflows};
 
     my $proc_states = [
         sort { $a->{label} cmp $b->{label} }
@@ -563,7 +558,7 @@ sub init_search {
         keys %{ $self->__proc_state_i18n }
     ];
 
-    my $form = $self->new_form(
+    my $form = $self->main->add_form(
         action => 'workflow!search',
         label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_DATABASE_TITLE',
         submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
@@ -573,7 +568,7 @@ sub init_search {
         label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_LABEL',
         type => 'select',
         is_optional => 1,
-        options => \@wfl_list,
+        options => \@wf_types,
         value => $preset->{wf_type}
     )
     ->add_field(
@@ -611,18 +606,16 @@ sub init_search {
         value => $preset->{last_update},
     );
 
-    # Searchable attributes are read from the menu bootstrap
+    # Searchable attributes are read from the 'uicontrol' config section
     my $attributes = $self->_session->param('wfsearch')->{default}->{attributes};
-    my @meta_description;
+    my @meta_descr;
     if ($attributes && (ref $attributes eq 'ARRAY')) {
         my @attrib;
-        foreach my $item (@{$attributes}) {
-            push @attrib, { value => $item->{key}, label=> $item->{label} };
-            if ($item->{description}) {
-                push @meta_description, { label=> $item->{label}, value => $item->{description}, format => 'raw' };
-            }
+        foreach my $a (@{$attributes}) {
+            push @attrib, { value => $a->{key}, label=> $a->{label} };
+            push @meta_descr, { label=> $a->{label}, value => $a->{description}, format => 'raw' } if $a->{description};
         }
-        unshift @meta_description, { value => 'I18N_OPENXPKI_UI_WORKFLOW_METADATA_LABEL', format => 'head' } if (@meta_description);
+        unshift @meta_descr, { value => 'I18N_OPENXPKI_UI_WORKFLOW_METADATA_LABEL', format => 'head' } if @meta_descr;
         $form->add_field(
             name => 'attributes',
             label => 'I18N_OPENXPKI_UI_WORKFLOW_METADATA_LABEL',
@@ -636,36 +629,51 @@ sub init_search {
 
     }
 
-    $self->add_form(
-        action => 'workflow!load',
-        label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SEARCH_BY_ID_TITLE',
-        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SUBMIT_LABEL',
-    )->add_field(
-        name => 'wf_id',
-        label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_SERIAL_LABEL',
-        type => 'text',
-        value => $preset->{wf_id} || '',
-    );
-
-    $self->main->add_section($form);
-
+    #
+    # Hints
+    #
     $self->main->add_section({
         type => 'keyvalue',
         content => {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_FIELD_HINT_LIST',
-            description => '',
             data => [
               { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_LABEL', value => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_TYPE_HINT', format => 'raw' },
               { label => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_LABEL', value => 'I18N_OPENXPKI_UI_WORKFLOW_PROC_STATE_HINT', format => 'raw' },
               { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_LABEL', value => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_STATE_HINT', format => 'raw' },
               { label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_LABEL', value => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_CREATOR_HINT', format => 'raw' },
               { label => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_LABEL', value => 'I18N_OPENXPKI_UI_WORKFLOW_LAST_UPDATE_HINT', format => 'raw' },
-              @meta_description
+              @meta_descr,
             ]
         }
     });
 
     return $self;
+}
+
+sub __wf_search_presets {
+    my $self = shift;
+    my $preset;
+
+    if (my $queryid = $self->param('query')) {
+        my $result = $self->_client->session->param("query_wfl_${queryid}");
+        $preset = $result->{input};
+
+    } else {
+        $preset = $self->_session->param('wfsearch')->{default}->{preset} || {};
+        # convert preset for last_update
+        foreach my $key (qw(last_update_before last_update_after)) {
+            next unless ($preset->{$key});
+            $preset->{last_update} = {
+                key => $key,
+                value => OpenXPKI::DateTime::get_validity({
+                    VALIDITY => $preset->{$key},
+                    VALIDITYFORMAT => 'detect',
+                })->epoch()
+            };
+        }
+    }
+
+    return $preset;
 }
 
 =head2 init_result
@@ -3877,7 +3885,7 @@ sub __render_workflow_action_body {
         }});
 
     } else {
-        my $form = $self->add_form(
+        my $form = $self->main->add_form(
             action => 'workflow',
             #label => $wf_action_info->{label},
             #description => $wf_action_info->{description},

@@ -4,8 +4,13 @@ use Moose;
 
 with 'OpenXPKI::Client::UI::Response::DTORole';
 
+# CPAN modules
 use Moose::Util::TypeConstraints;
 use Moose::Util qw( does_role );
+
+# Project modules
+use OpenXPKI::Client::UI::Response::Section::Form;
+
 
 subtype 'HashRefOrSection',
     as 'Ref',
@@ -33,5 +38,13 @@ sub add_section {
     $self->_add_section(@_);
     return $self; # allows for method chaining
 }
+
+sub add_form {
+    my $self = shift;
+    my $s = OpenXPKI::Client::UI::Response::Section::Form->new(@_);
+    $self->add_section($s);
+    return $s;
+}
+
 
 __PACKAGE__->meta->make_immutable;
