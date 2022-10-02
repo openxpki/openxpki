@@ -52,17 +52,16 @@ has resp => (
     default => sub { OpenXPKI::Client::UI::Response->new(ui_result => shift) },
     handles => [ qw(
         page set_page
-        redirect set_redirect
+        redirect
         refresh set_refresh
-        status set_status
+        status
         user set_user
         menu
         on_exception
         rtoken language tenant ping
         main
         infobox
-        raw_response
-        render_to_str
+        raw_response has_raw_response
         new_form add_form
     ) ],
 );
@@ -103,7 +102,7 @@ sub BUILD {
     my $self = shift;
     # load global client status (warnings from init) if set
     if ($self->_client->_status->is_set) {
-        $self->resp->_status($self->_client->_status);
+        $self->resp->status($self->_client->_status);
     }
 
 }
@@ -384,6 +383,55 @@ sub logger {
     return $self->_client()->logger();
 }
 
+=head2 _render_to_str
+
+Assemble the return hash from the internal caches and return the result as a
+string.
+
+=cut
+sub _render_to_str {
+    my $self = shift;
+
+    my $status = $self->status->is_set ? $self->status->resolve : $self->__fetch_status;
+
+    #
+    # A) page redirect
+    #
+    if ($self->redirect->is_set) {
+        if ($status) {
+            # persist status and append to redirect URL
+            my $url_param = $self->__persist_status($status);
+            $self->redirect->to($self->redirect->to . '!' . $url_param);
+        }
+        return encode_json({
+            %{ $self->redirect->resolve },
+            session_id => $self->_session->id
+        });
+    }
+
+    #
+    # B) raw data
+    #
+    if ($self->has_raw_response) {
+        return i18nTokenizer(encode_json($self->raw_response));
+    }
+
+    #
+    # C) regular response
+    #
+    my $result = $self->resp->resolve;
+
+    # show message of the day if we have a page section (may overwrite status)
+    if ($self->page->is_set && (my $motd = $self->_session->param('motd'))) {
+        $self->_session->param('motd', undef);
+        $result->{status} = $motd;
+    }
+    # add session ID
+    $result->{session_id} = $self->_session->id;
+
+    return i18nTokenizer(encode_json($result));
+}
+
 =head2 render
 
 Assemble the return hash from the internal caches and send the result
@@ -393,7 +441,7 @@ to the browser.
 sub render {
     my $self = shift;
 
-    my $body = $self->resp->render_to_str;
+    my $body = $self->_render_to_str;
     my $cgi = $self->cgi;
 
     if (not ref $cgi) {
@@ -650,7 +698,7 @@ sub __persist_response {
 
     # Auto Persist - use current result when no data is given
     if (not defined $data) {
-        $data = { data => $self->render_to_str };
+        $data = { data => $self->_render_to_str };
     }
 
     $self->_session->param('response_'.$id, $data );
