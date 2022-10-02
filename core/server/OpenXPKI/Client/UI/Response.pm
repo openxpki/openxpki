@@ -14,13 +14,14 @@ use Moose::Util qw( does_role );
 
 # Project modules
 use OpenXPKI::i18n qw( i18nTokenizer );
+use OpenXPKI::Client::UI::Response::Menu;
 use OpenXPKI::Client::UI::Response::Page;
 use OpenXPKI::Client::UI::Response::Redirect;
 use OpenXPKI::Client::UI::Response::Refresh;
+use OpenXPKI::Client::UI::Response::Section::Form;
 use OpenXPKI::Client::UI::Response::Status;
 use OpenXPKI::Client::UI::Response::ScalarParams;
 use OpenXPKI::Client::UI::Response::User;
-use OpenXPKI::Client::UI::Response::Section::Form;
 
 has ui_result => (
     is => 'ro',
@@ -68,18 +69,20 @@ has _user => (
     reader => 'user',
 );
 
+has _menu => (
+    is => 'rw',
+    isa => 'OpenXPKI::Client::UI::Response::Menu',
+    default => sub { OpenXPKI::Client::UI::Response::Menu->new },
+    lazy => 1,
+    reader => 'menu',
+);
+
 has _scalar_params => (
     is => 'rw',
     isa => 'OpenXPKI::Client::UI::Response::ScalarParams',
     default => sub { OpenXPKI::Client::UI::Response::ScalarParams->new },
     lazy => 1,
     handles => [qw( rtoken language tenant ping )]
-);
-
-has 'menu' => (
-    is => 'rw',
-    isa => 'ArrayRef',
-    predicate => 'has_menu',
 );
 
 has 'on_exception' => (
@@ -177,6 +180,7 @@ sub render_to_str {
     $result->{page} = $self->page->resolve if $self->page->is_set;
     $result->{refresh} = $self->refresh->resolve if $self->refresh->is_set;
     $result->{user} = $self->user->resolve if $self->user->is_set;
+    $result->{structure} = $self->menu->resolve if $self->menu->is_set;
 
     # One DTO for several simple parameters
     $result = { %$result, %{$self->_scalar_params->resolve} } if $self->_scalar_params->is_set;
@@ -186,7 +190,6 @@ sub render_to_str {
 
     $result->{main} = [ map { $maybe_resolve->($_) } @{ $self->_main } ] if $self->has_main;
     $result->{right} = [ map { $maybe_resolve->($_) } @{ $self->_infobox } ] if $self->has_infobox;
-    $result->{structure} = $self->menu if $self->has_menu;
     $result->{on_exception} = $self->on_exception if $self->has_on_exception;
 
     $result->{session_id} = $self->ui_result->_session->id;

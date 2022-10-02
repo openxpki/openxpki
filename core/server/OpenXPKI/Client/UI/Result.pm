@@ -56,7 +56,8 @@ has resp => (
         refresh set_refresh
         status set_status
         user set_user
-        menu has_menu on_exception
+        menu
+        on_exception
         rtoken language tenant ping
         add_section add_infobox_section
         raw_response

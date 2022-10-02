@@ -825,7 +825,7 @@ sub _recreate_frontend_session() {
 
     # menu
     my $reply = $self->backend->send_receive_command_msg( 'get_menu' );
-    $self->_set_menu($session, $reply->{PARAMS}) if ref $reply->{PARAMS} eq 'HASH';
+    $self->_set_menu($session, $reply->{PARAMS}) if $reply->{PARAMS};
 
     $session->flush;
 
@@ -838,7 +838,7 @@ sub _set_menu {
 
     $self->logger->trace('Menu ' . Dumper $menu) if $self->logger->is_trace;
 
-    $session->param('menu', $menu->{main});
+    $session->param('menu_items', $menu->{main} || []);
 
     # persist the optional parts of the menu hash (landmark, tasklist, search attribs)
     $session->param('landmark', $menu->{landmark} || {});

@@ -51,7 +51,8 @@ sub init_structure {
             $self->user->last_login($last_login);
         }
 
-        $self->menu($session->param('menu'));
+        # Menu items
+        $self->menu->items($session->param('menu_items'));
 
         # Ping endpoint
         if (my $ping = $session->param('ping')) {
@@ -70,11 +71,10 @@ sub init_structure {
     }
 
     # default menu if nothing was set before
-    $self->menu([{
+    $self->menu->add_item({
         key => 'logout',
         label => 'I18N_OPENXPKI_UI_CLEAR_LOGIN',
-        entries => [],
-    }]) unless $self->has_menu;
+    }) unless $self->menu->is_set;
 
     return $self;
 
