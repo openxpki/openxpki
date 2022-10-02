@@ -548,12 +548,12 @@ sub init_search {
     # Search by workflow attributes
     #
     my @wf_types = sort { lc($a->{'label'}) cmp lc($b->{'label'}) }
-      map { {'value' => $_, 'label' => $workflows->{$_}->{label}} }
+      map { { 'label' => i18nGettext($workflows->{$_}->{label}), 'value' => $_ } }
       keys %{$workflows};
 
     my $proc_states = [
-        sort { $a->{label} cmp $b->{label} }
-        map { { label => i18nGettext($self->__get_proc_state_label($_)), value => $_} }
+        sort { lc($a->{label}) cmp lc($b->{label}) }
+        map { { 'label' => i18nGettext($self->__get_proc_state_label($_)), 'value' => $_ } }
         grep { $_ ne 'running' }
         keys %{ $self->__proc_state_i18n }
     ];
