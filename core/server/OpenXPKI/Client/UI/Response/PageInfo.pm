@@ -1,4 +1,4 @@
-package OpenXPKI::Client::UI::Response::Page;
+package OpenXPKI::Client::UI::Response::PageInfo;
 
 use Moose;
 

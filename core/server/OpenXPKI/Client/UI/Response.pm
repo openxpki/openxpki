@@ -16,7 +16,7 @@ use Moose::Util qw( does_role );
 use OpenXPKI::i18n qw( i18nTokenizer );
 use OpenXPKI::Client::UI::Response::Menu;
 use OpenXPKI::Client::UI::Response::OnException;
-use OpenXPKI::Client::UI::Response::Page;
+use OpenXPKI::Client::UI::Response::PageInfo;
 use OpenXPKI::Client::UI::Response::Redirect;
 use OpenXPKI::Client::UI::Response::Refresh;
 use OpenXPKI::Client::UI::Response::Section::Form;
@@ -32,8 +32,8 @@ has ui_result => (
 
 has _page => (
     is => 'rw',
-    isa => 'OpenXPKI::Client::UI::Response::Page',
-    default => sub { OpenXPKI::Client::UI::Response::Page->new },
+    isa => 'OpenXPKI::Client::UI::Response::PageInfo',
+    default => sub { OpenXPKI::Client::UI::Response::PageInfo->new },
     lazy => 1,
     reader => 'page',
 );
@@ -122,7 +122,7 @@ has '_infobox' => (
     predicate => 'has_infobox',
 );
 
-sub set_page { shift->_page(OpenXPKI::Client::UI::Response::Page->new(@_)) }
+sub set_page { shift->_page(OpenXPKI::Client::UI::Response::PageInfo->new(@_)) }
 sub set_redirect { shift->_redirect(OpenXPKI::Client::UI::Response::Redirect->new(@_)) }
 sub set_refresh { shift->_refresh(OpenXPKI::Client::UI::Response::Refresh->new(@_)) }
 sub set_status { shift->_status(OpenXPKI::Client::UI::Response::Status->new(@_)) }

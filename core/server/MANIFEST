@@ -66,7 +66,7 @@ OpenXPKI/Client/UI/Response/DTORole.pm
 OpenXPKI/Client/UI/Response/Menu.pm
 OpenXPKI/Client/UI/Response/OnException.pm
 OpenXPKI/Client/UI/Response/OnException/Handler.pm
-OpenXPKI/Client/UI/Response/Page.pm
+OpenXPKI/Client/UI/Response/PageInfo.pm
 OpenXPKI/Client/UI/Response/Redirect.pm
 OpenXPKI/Client/UI/Response/Refresh.pm
 OpenXPKI/Client/UI/Response/ScalarParams.pm
