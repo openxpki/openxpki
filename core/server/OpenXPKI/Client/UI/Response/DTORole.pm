@@ -56,11 +56,17 @@ sub resolve {
     my $self = shift;
 
     my $result = {};
-    for my $attr ($self->meta->get_all_attributes) {
+    my @all_attrs = $self->meta->get_all_attributes;
+    for my $attr (@all_attrs) {
         # check which attributes are set
         next unless $attr->has_value($self);
         # use either 'documentation' or the attribute name as the key
         my $key = $attr->{documentation} // $attr->name;
+
+        # make sure there's only one attribute if it is marked as 'ROOT'
+        die sprintf "Error in %s: attribute '%s' is marked as 'ROOT' - no other attributes are allowed\n", $self->meta->name, $attr->name
+            if ('ROOT' eq $key and scalar @all_attrs > 1);
+
         my @keyparts = split '/', $key, -1; # -1 = don't strip trailing empty fields
         # append attr name if key had trailing /
         $keyparts[-1] = $attr->name unless $keyparts[-1];
@@ -82,8 +88,14 @@ sub resolve {
             $val = $maybe_resolve->($val);
         }
 
-        # store value in response hash
-        $parent->{$keyparts[-1]} = $val;
+        if ('ROOT' eq $key) {
+            # directly return value if marked as 'ROOT'
+            return $val;
+        }
+        else {
+            # store value in response hash
+            $parent->{$keyparts[-1]} = $val;
+        }
     }
 
     return $result;
