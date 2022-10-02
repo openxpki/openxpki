@@ -36,7 +36,7 @@ sub init_index {
         description => 'I18N_OPENXPKI_UI_SECRET_PAGE_DESC',
     );
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'grid',
         className => 'secret',
         content => {
@@ -64,7 +64,7 @@ sub init_manage {
 
     if (not $secret) {
         $self->page->shortlabel('I18N_OPENXPKI_UI_SECRET_LITERAL_NOT_SETABLE_LABEL');
-        $self->add_section({
+        $self->main->add_section({
             type => 'text',
             content => {
                 description => 'I18N_OPENXPKI_UI_SECRET_LITERAL_NOT_SETABLE_DESC'
@@ -78,7 +78,7 @@ sub init_manage {
 
     if ($status) {
         $self->page->shortlabel('I18N_OPENXPKI_UI_SECRET_CLEAR_SECRET_LABEL');
-        $self->add_section({
+        $self->main->add_section({
             type => 'text',
             content => {
                 description => 'I18N_OPENXPKI_UI_SECRET_COMPLETE_INFO - <a href="#/openxpki/secret!clear!id!'.$secret.'">[I18N_OPENXPKI_UI_SECRET_CLEAR_SECRET_LABEL]</a>.'

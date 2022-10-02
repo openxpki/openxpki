@@ -183,7 +183,7 @@ sub init_search {
         type => 'text', is_optional => 1, value => $preset->{cert_serial},
     );
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'keyvalue',
         content => {
             label => 'I18N_OPENXPKI_UI_CERTIFICATE_SEARCH_FIELD_HINT_LIST',
@@ -271,7 +271,7 @@ sub init_result {
 
     $self->logger()->trace( "dumper result: " . Dumper @result) if $self->logger->is_trace;
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'grid',
         className => 'certificate',
         content => {
@@ -547,7 +547,7 @@ sub init_mine {
 
     $self->logger()->trace( "dumper result: " . Dumper @result) if $self->logger->is_trace;
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'grid',
         className => 'certificate',
         content => {
@@ -600,7 +600,7 @@ sub init_detail {
             shortlabel => 'I18N_OPENXPKI_UI_CERT_STATUS_UNKNOWN'
         );
 
-        $self->add_section({
+        $self->main->add_section({
             type => 'keyvalue',
             content => {
                 label => '',
@@ -825,7 +825,7 @@ sub init_detail {
         };
     }
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'keyvalue',
         content => {
             label => '',
@@ -865,7 +865,7 @@ sub init_text {
         large => ($format ne 'PEM') ? 1 : 0,
     );
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'text',
         content => {
             label => '',
@@ -911,7 +911,7 @@ sub init_chain {
             sprintf ($pattern, $cert->{identifier}, 'install', 'I18N_OPENXPKI_UI_DOWNLOAD_SHORT_INSTALL').
             '</ul>';
 
-        $self->add_section({
+        $self->main->add_section({
             type => 'keyvalue',
             content => {
                 label => '',
@@ -983,7 +983,7 @@ sub init_related {
         }
     }
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'grid',
         className => 'workflow',
         content => {
@@ -1112,7 +1112,7 @@ sub init_parse {
         value => $pem
     });
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'keyvalue',
         content => {
             label => 'Parsed Content',

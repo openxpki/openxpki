@@ -86,7 +86,7 @@ sub init_error {
     my $self = shift;
     my $args = shift;
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'text',
         content => {
             headline => 'I18N_OPENXPKI_UI_OOPS',

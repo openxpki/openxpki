@@ -30,7 +30,7 @@ sub render_report_list {
 
     my $fetchid = $self->__persist_response( \@source );
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'grid',
         className => 'report',
         content => {

@@ -82,7 +82,7 @@ sub render_profile_select {
     $form->add_field(%{ $_ }) for @fields;
 
     if (@profiledesc > 0) {
-        $self->add_section({
+        $self->main->add_section({
             type => 'keyvalue',
             content => {
                 label => 'I18N_OPENXPKI_UI_PROFILE_HINT_LIST',
@@ -178,7 +178,7 @@ sub render_subject_form {
     $form->add_field(%{ $_ }) for @{ $fields };
 
     if (@fielddesc) {
-        $self->add_section({
+        $self->main->add_section({
             type => 'keyvalue',
             content => {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST',
@@ -313,7 +313,7 @@ sub render_server_password {
             $value = $self->send_command_v2( 'get_random', \%extra );
             if (!$value) {
                 $self->status->error('I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_ERROR_LABEL');
-                $self->add_section({
+                $self->main->add_section({
                     type => 'text',
                     content => {
                         label => 'I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_LABEL',

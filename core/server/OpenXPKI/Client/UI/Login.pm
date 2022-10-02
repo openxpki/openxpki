@@ -60,7 +60,7 @@ sub init_auth_stack {
     } @stacks;
 
     if (@stackdesc > 0) {
-        $self->add_section({
+        $self->main->add_section({
             type => 'keyvalue',
             content => {
                 label => 'I18N_OPENXPKI_UI_STACK_HINT_LIST',
@@ -107,7 +107,7 @@ sub init_login_missing_data {
 
     $self->page->label('I18N_OPENXPKI_UI_LOGIN_NO_DATA_HEAD');
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'text',
         content => {
             label => '',
@@ -126,7 +126,7 @@ sub init_logout {
 
     $self->page->label('I18N_OPENXPKI_UI_HOME_LOGOUT_HEAD');
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'text',
         content => {
             label => '',

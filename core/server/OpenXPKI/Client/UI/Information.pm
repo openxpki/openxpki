@@ -67,7 +67,7 @@ sub init_issuer {
     # I18N_OPENXPKI_UI_TOKEN_STATUS_OFFLINE
     # I18N_OPENXPKI_UI_TOKEN_STATUS_UNKNOWN
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'grid',
         className => 'cacertificate',
         content => {
@@ -105,7 +105,7 @@ sub init_policy {
         description => '',
     );
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'text',
         content => {
             description => 'tbd',
@@ -124,7 +124,7 @@ sub init_process {
     my $self = shift;
     my $args = shift;
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'text',
         content => {
             description => 'This was moved to a workflow, please update your uicontrol files to workflow!index!wf_type!status_process',
@@ -138,7 +138,7 @@ sub init_status {
     my $self = shift;
     my $args = shift;
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'text',
         content => {
             description => 'This was moved to a workflow, please update your uicontrol files to workflow!index!wf_type!status_system',

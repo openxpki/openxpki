@@ -342,7 +342,7 @@ sub init_context {
         format => "primary",
     }]) if ($view eq 'result');
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'keyvalue',
         content => {
             label => '',
@@ -393,7 +393,7 @@ sub init_attribute {
         format => "primary",
     }]) if ($view eq 'result');
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'keyvalue',
         content => {
             label => '',
@@ -491,7 +491,7 @@ sub init_info {
 
     my $proc_state = $wf_info->{workflow}->{proc_state};
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'keyvalue',
         content => {
             label => $self->__get_proc_state_label($proc_state),
@@ -647,9 +647,9 @@ sub init_search {
         value => $preset->{wf_id} || '',
     );
 
-    $self->add_section($form);
+    $self->main->add_section($form);
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'keyvalue',
         content => {
             label => 'I18N_OPENXPKI_UI_WORKFLOW_SEARCH_FIELD_HINT_LIST',
@@ -778,7 +778,7 @@ sub init_result {
             };
     }
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'grid',
         className => 'workflow',
         content => {
@@ -1004,7 +1004,7 @@ sub init_history {
 
     $self->logger()->trace( "dumper result: " . Dumper $workflow_history) if $self->logger->is_trace;
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'grid',
         className => 'workflow',
         content => {
@@ -1138,7 +1138,7 @@ sub init_log {
 
     $self->logger()->trace( "dumper result: " . Dumper $result) if $self->logger->is_trace;
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'grid',
         className => 'workflow',
         content => {
@@ -1737,7 +1737,7 @@ sub action_bulk {
         my @fault_head = @{$self->__default_grid_head};
         $fault_head[$pos_state] = { sTitle => 'Error' };
 
-        $self->add_section({
+        $self->main->add_section({
             type => 'grid',
             className => 'workflow',
             content => {
@@ -1762,7 +1762,7 @@ sub action_bulk {
 
         my @result_done = $self->__render_result_list( \@success, $self->__default_grid_row );
 
-        $self->add_section({
+        $self->main->add_section({
             type => 'grid',
             className => 'workflow',
             content => {
@@ -1792,7 +1792,7 @@ sub action_bulk {
         'query' => { id => \@serials },
     });
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'text',
         content => {
             buttons => [{
@@ -2115,7 +2115,7 @@ sub __render_from_workflow {
 
         } # end proc_state switch
 
-        $self->add_section({
+        $self->main->add_section({
             type => 'keyvalue',
             content => {
                 data => \@fields,
@@ -2189,7 +2189,7 @@ sub __render_from_workflow {
 
         if (!@$fields && $wf_info->{workflow}->{state} eq 'INITIAL') {
             # initial step of workflow without fields
-            $self->add_section({
+            $self->main->add_section({
                 type => 'text',
                 content => {
                     label => '',
@@ -2214,7 +2214,7 @@ sub __render_from_workflow {
 
             # if we have no fields at all in the output we need an empty
             # section to make the UI happy and to show the buttons, if any
-            $self->add_section({
+            $self->main->add_section({
                 type => 'text',
                 content => {
                     buttons => $buttons,
@@ -2231,7 +2231,7 @@ sub __render_from_workflow {
 
                 # check if we have normal fields on the stack to output
                 if (@section_fields) {
-                    $self->add_section({
+                    $self->main->add_section({
                         type => 'keyvalue',
                         content => {
                             label => '',
@@ -2243,7 +2243,7 @@ sub __render_from_workflow {
 
                 if ($field->{format} eq 'grid') {
                     $self->logger()->trace('Adding grid ' . Dumper $field) if $self->logger->is_trace;
-                    $self->add_section({
+                    $self->main->add_section({
                         type => 'grid',
                         className => 'workflow',
                         content => {
@@ -2262,7 +2262,7 @@ sub __render_from_workflow {
                 } elsif ($field->{format} eq 'chart') {
 
                     $self->logger()->trace('Adding chart ' . Dumper $field) if $self->logger->is_trace;
-                    $self->add_section({
+                    $self->main->add_section({
                         type => 'chart',
                         content => {
                             label => $field->{label} || '',
@@ -2276,7 +2276,7 @@ sub __render_from_workflow {
             }
             # no chart/grid in the last position => output items on the stack
 
-            $self->add_section({
+            $self->main->add_section({
                 type => 'keyvalue',
                 content => {
                     label => '',
@@ -2349,7 +2349,7 @@ sub __render_from_workflow {
 
             }
 
-            $self->add_infobox_section({
+            $self->infobox->add_section({
                 type => 'keyvalue',
                 content => {
                     label => '',
@@ -3677,7 +3677,7 @@ sub __render_task_list {
 
     }
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'grid',
         className => 'workflow',
         content => {
@@ -3867,7 +3867,7 @@ sub __render_workflow_action_body {
 
     # Render the context values if there are no fields
     if (!scalar @fields) {
-        $self->add_section({
+        $self->main->add_section({
             type => 'keyvalue',
             content => {
                 label => '',
@@ -3891,7 +3891,7 @@ sub __render_workflow_action_body {
         });
         $form->add_field(%{ $_ }) for (@fields, @additional_fields);
 
-        $self->add_section({
+        $self->main->add_section({
             type => 'keyvalue',
             content => {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST',

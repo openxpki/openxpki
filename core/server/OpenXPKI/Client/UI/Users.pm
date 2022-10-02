@@ -296,7 +296,7 @@ sub __render_result_table {
         { sTitle => "I18N_OPENXPKI_UI_USER_ROLE"}
 
     ];
-    $self->add_section({
+    $self->main->add_section({
         type => 'grid',
         className => 'users',
         content => {

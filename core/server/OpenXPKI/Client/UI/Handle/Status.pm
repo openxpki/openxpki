@@ -36,7 +36,7 @@ sub render_process_status {
 
     @result = sort { $a->[1] < $b->[1] } @result;
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'grid',
         className => 'proc',
         content => {
@@ -219,7 +219,7 @@ sub render_system_status {
         format => 'deflist',
     } if ($status->{config});
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'keyvalue',
         content => {
             data => \@fields
@@ -258,7 +258,7 @@ sub render_system_status {
             ];
         }
 
-        $self->add_section({
+        $self->main->add_section({
             type => 'grid',
             className => 'token',
             content => {
@@ -278,7 +278,7 @@ sub render_system_status {
 
     }
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'text',
         content => {
             label => '',
@@ -340,7 +340,7 @@ sub render_token_status {
             ];
         }
 
-        $self->add_section({
+        $self->main->add_section({
             type => 'grid',
             className => 'token',
             content => {
@@ -360,7 +360,7 @@ sub render_token_status {
 
     }
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'text',
         content => {
             label => '',

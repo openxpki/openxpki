@@ -63,6 +63,8 @@ sub resolve {
         # use either 'documentation' or the attribute name as the key
         my $key = $attr->{documentation} // $attr->name;
 
+        next if 'IGNORE' eq $key;
+
         # make sure there's only one attribute if it is marked as 'ROOT'
         die sprintf "Error in %s: attribute '%s' is marked as 'ROOT' - no other attributes are allowed\n", $self->meta->name, $attr->name
             if ('ROOT' eq $key and scalar @all_attrs > 1);

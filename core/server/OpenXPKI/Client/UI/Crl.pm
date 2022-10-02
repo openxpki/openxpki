@@ -44,7 +44,7 @@ sub init_index {
 
         if (!@$crl_list) {
 
-            $self->add_section({
+            $self->main->add_section({
                 type => 'text',
                 content => {
                     label => $self->_escape($issuer->{subject}),
@@ -56,7 +56,7 @@ sub init_index {
 
             my @fields = $self->__print_detail( $crl_hash, $issuer );
 
-            $self->add_section({
+            $self->main->add_section({
                 type => 'keyvalue',
                 content => {
                     label => $self->_escape($issuer->{subject}),
@@ -112,7 +112,7 @@ sub init_list {
         ];
     }
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'grid',
         className => 'crl',
         content => {
@@ -161,7 +161,7 @@ sub init_detail {
 
     my @fields = $self->__print_detail( $crl_hash );
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'keyvalue',
         content => {
             label => '',

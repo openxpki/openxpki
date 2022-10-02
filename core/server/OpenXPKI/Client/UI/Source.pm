@@ -49,7 +49,7 @@ sub init_html {
 
     $self->logger()->debug('Got content ' . join("",@content));
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'text',
         content => {
             label => '',
@@ -157,7 +157,7 @@ sub _notfound {
     my $self = shift;
 
     $self->status->error('No results');
-    $self->add_section({
+    $self->main->add_section({
         type => 'text',
         content => {
             label => 'Not found!',

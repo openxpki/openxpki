@@ -69,9 +69,9 @@ OpenXPKI/Client/UI/Response/OnException/Handler.pm
 OpenXPKI/Client/UI/Response/PageInfo.pm
 OpenXPKI/Client/UI/Response/Redirect.pm
 OpenXPKI/Client/UI/Response/Refresh.pm
-OpenXPKI/Client/UI/Response/ScalarParams.pm
 OpenXPKI/Client/UI/Response/Section/Form.pm
 OpenXPKI/Client/UI/Response/SectionRole.pm
+OpenXPKI/Client/UI/Response/Sections.pm
 OpenXPKI/Client/UI/Response/Status.pm
 OpenXPKI/Client/UI/Response/User.pm
 OpenXPKI/Client/UI/Result.pm

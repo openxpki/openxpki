@@ -59,7 +59,8 @@ has resp => (
         menu
         on_exception
         rtoken language tenant ping
-        add_section add_infobox_section
+        main
+        infobox
         raw_response
         render_to_str
         new_form add_form
