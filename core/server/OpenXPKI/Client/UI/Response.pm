@@ -36,31 +36,23 @@ has 'raw_response' => (
 #
 # Items of the response hash
 #
-has 'page'=> (
+has 'infobox'=> (
+    documentation => 'right',
     is => 'rw',
-    isa => 'OpenXPKI::Client::UI::Response::PageInfo',
-    default => sub { OpenXPKI::Client::UI::Response::PageInfo->new },
+    isa => 'OpenXPKI::Client::UI::Response::Sections',
+    default => sub { OpenXPKI::Client::UI::Response::Sections->new },
     lazy => 1,
 );
 
-has 'refresh'=> (
+has 'language' => (
     is => 'rw',
-    isa => 'OpenXPKI::Client::UI::Response::Refresh',
-    default => sub { OpenXPKI::Client::UI::Response::Refresh->new },
-    lazy => 1,
+    isa => 'Str',
 );
 
-has 'status'=> (
+has 'main'=> (
     is => 'rw',
-    isa => 'OpenXPKI::Client::UI::Response::Status',
-    default => sub { OpenXPKI::Client::UI::Response::Status->new },
-    lazy => 1,
-);
-
-has 'user'=> (
-    is => 'rw',
-    isa => 'OpenXPKI::Client::UI::Response::User',
-    default => sub { OpenXPKI::Client::UI::Response::User->new },
+    isa => 'OpenXPKI::Client::UI::Response::Sections',
+    default => sub { OpenXPKI::Client::UI::Response::Sections->new },
     lazy => 1,
 );
 
@@ -79,18 +71,22 @@ has 'on_exception'=> (
     lazy => 1,
 );
 
-has 'main'=> (
+has 'page'=> (
     is => 'rw',
-    isa => 'OpenXPKI::Client::UI::Response::Sections',
-    default => sub { OpenXPKI::Client::UI::Response::Sections->new },
+    isa => 'OpenXPKI::Client::UI::Response::PageInfo',
+    default => sub { OpenXPKI::Client::UI::Response::PageInfo->new },
     lazy => 1,
 );
 
-has 'infobox'=> (
-    documentation => 'right',
+has 'ping' => (
     is => 'rw',
-    isa => 'OpenXPKI::Client::UI::Response::Sections',
-    default => sub { OpenXPKI::Client::UI::Response::Sections->new },
+    isa => 'Str',
+);
+
+has 'refresh'=> (
+    is => 'rw',
+    isa => 'OpenXPKI::Client::UI::Response::Refresh',
+    default => sub { OpenXPKI::Client::UI::Response::Refresh->new },
     lazy => 1,
 );
 
@@ -99,9 +95,11 @@ has 'rtoken' => (
     isa => 'Str',
 );
 
-has 'language' => (
+has 'status'=> (
     is => 'rw',
-    isa => 'Str',
+    isa => 'OpenXPKI::Client::UI::Response::Status',
+    default => sub { OpenXPKI::Client::UI::Response::Status->new },
+    lazy => 1,
 );
 
 has 'tenant' => (
@@ -109,9 +107,11 @@ has 'tenant' => (
     isa => 'Str',
 );
 
-has 'ping' => (
+has 'user'=> (
     is => 'rw',
-    isa => 'Str',
+    isa => 'OpenXPKI::Client::UI::Response::User',
+    default => sub { OpenXPKI::Client::UI::Response::User->new },
+    lazy => 1,
 );
 
 sub set_page { shift->page(OpenXPKI::Client::UI::Response::PageInfo->new(@_)) }

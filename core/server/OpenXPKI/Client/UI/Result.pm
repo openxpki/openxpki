@@ -51,17 +51,20 @@ has resp => (
     lazy => 1,
     default => sub { OpenXPKI::Client::UI::Response->new(ui_result => shift) },
     handles => [ qw(
-        page set_page
         redirect
-        refresh set_refresh
-        status
-        user set_user
+        raw_response has_raw_response
+        infobox
+        language
+        main
         menu
         on_exception
-        rtoken language tenant ping
-        main
-        infobox
-        raw_response has_raw_response
+        page set_page
+        ping
+        refresh set_refresh
+        rtoken
+        status
+        tenant
+        user set_user
         new_form add_form
     ) ],
 );
