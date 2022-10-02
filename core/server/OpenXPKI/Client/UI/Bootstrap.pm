@@ -62,10 +62,10 @@ sub init_structure {
         # Redirection targets for apache based SSO Handling
         if (my $auth = $session->param('authinfo')) {
             if (my $target = ($auth->{resume} || $auth->{login})) {
-                $self->on_exception([{
+                $self->on_exception->add_handler(
                     status_code => [ 403, 401 ],
                     redirect => $target,
-                }]);
+                );
             }
         }
     }

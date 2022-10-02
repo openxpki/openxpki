@@ -15,6 +15,7 @@ use Moose::Util qw( does_role );
 # Project modules
 use OpenXPKI::i18n qw( i18nTokenizer );
 use OpenXPKI::Client::UI::Response::Menu;
+use OpenXPKI::Client::UI::Response::OnException;
 use OpenXPKI::Client::UI::Response::Page;
 use OpenXPKI::Client::UI::Response::Redirect;
 use OpenXPKI::Client::UI::Response::Refresh;
@@ -77,20 +78,20 @@ has _menu => (
     reader => 'menu',
 );
 
+has _on_exception => (
+    is => 'rw',
+    isa => 'OpenXPKI::Client::UI::Response::OnException',
+    default => sub { OpenXPKI::Client::UI::Response::OnException->new },
+    lazy => 1,
+    reader => 'on_exception',
+);
+
 has _scalar_params => (
     is => 'rw',
     isa => 'OpenXPKI::Client::UI::Response::ScalarParams',
     default => sub { OpenXPKI::Client::UI::Response::ScalarParams->new },
     lazy => 1,
     handles => [qw( rtoken language tenant ping )]
-);
-
-has 'on_exception' => (
-    is => 'rw',
-    isa => 'ArrayRef[Hashref]',
-    predicate => 'has_on_exception',
-    # status_code => [ 400, 401 ],
-    # redirect => $uri
 );
 
 has 'raw_response' => (
@@ -181,6 +182,7 @@ sub render_to_str {
     $result->{refresh} = $self->refresh->resolve if $self->refresh->is_set;
     $result->{user} = $self->user->resolve if $self->user->is_set;
     $result->{structure} = $self->menu->resolve if $self->menu->is_set;
+    $result->{on_exception} = $self->on_exception->resolve if $self->on_exception->is_set;
 
     # One DTO for several simple parameters
     $result = { %$result, %{$self->_scalar_params->resolve} } if $self->_scalar_params->is_set;
@@ -190,7 +192,6 @@ sub render_to_str {
 
     $result->{main} = [ map { $maybe_resolve->($_) } @{ $self->_main } ] if $self->has_main;
     $result->{right} = [ map { $maybe_resolve->($_) } @{ $self->_infobox } ] if $self->has_infobox;
-    $result->{on_exception} = $self->on_exception if $self->has_on_exception;
 
     $result->{session_id} = $self->ui_result->_session->id;
 
