@@ -1,9 +1,7 @@
 package OpenXPKI::Client::UI::Response::Status;
+use OpenXPKI::Client::UI::Response::DTO;
 
-use Moose;
 use Moose::Util::TypeConstraints qw( enum );
-
-with 'OpenXPKI::Client::UI::Response::DTORole';
 
 has 'level' => (
     is => 'rw',
@@ -31,6 +29,7 @@ sub success { my $self = shift; $self->level('success'); $self->message(shift) }
 sub warn    { my $self = shift; $self->level('warn');    $self->message(shift) }
 sub error   { my $self = shift; $self->level('error');   $self->message(shift) }
 
+# overrides OpenXPKI::Client::UI::Response::DTORole->is_set()
 sub is_set {
     my $self = shift;
     return ($self->message || scalar(@{$self->field_errors // []}) ? 1 : 0);

@@ -1,8 +1,5 @@
 package OpenXPKI::Client::UI::Response::User;
-
-use Moose;
-
-with 'OpenXPKI::Client::UI::Response::DTORole';
+use OpenXPKI::Client::UI::Response::DTO;
 
 # The attributes are roughly equal to (and are built from) the results of the
 # "get_session_info" API command, modified in OpenXPKI::Client::UI::Bootstrap.
@@ -16,8 +13,5 @@ has 'checksum' => (is => 'rw', isa => 'Str');
 has 'sid' => (is => 'rw', isa => 'Str');
 has 'last_login' => (is => 'rw', isa => 'Int');
 has 'tenants' => (is => 'rw', isa => 'ArrayRef');
-
-
-sub is_set { shift->has_any_value }
 
 __PACKAGE__->meta->make_immutable;

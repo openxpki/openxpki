@@ -1,9 +1,7 @@
 package OpenXPKI::Client::UI::Response::Section::Form;
-
-use Moose;
+use OpenXPKI::Client::UI::Response::DTO;
 
 with 'OpenXPKI::Client::UI::Response::SectionRole';
-
 
 has 'action' => (
     is => 'rw',
@@ -41,8 +39,6 @@ sub BUILD {
     my $self = shift;
     $self->type('form');
 }
-
-sub is_set { shift->has_any_value }
 
 sub add_field {
     my $self = shift;

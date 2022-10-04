@@ -1,8 +1,5 @@
 package OpenXPKI::Client::UI::Response::Refresh;
-
-use Moose;
-
-with 'OpenXPKI::Client::UI::Response::DTORole';
+use OpenXPKI::Client::UI::Response::DTO;
 
 has 'uri' => (
     is => 'rw',
@@ -18,6 +15,7 @@ has 'timeout' => (
     default => 60,
 );
 
+# overrides OpenXPKI::Client::UI::Response::DTORole->is_set()
 sub is_set {
     my $self = shift;
     return $self->has_href;

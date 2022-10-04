@@ -1,8 +1,5 @@
 package OpenXPKI::Client::UI::Response;
-
-use Moose;
-
-with 'OpenXPKI::Client::UI::Response::DTORole';
+use OpenXPKI::Client::UI::Response::DTO;
 
 # Project modules
 use OpenXPKI::Client::UI::Response::Menu;
@@ -16,13 +13,12 @@ use OpenXPKI::Client::UI::Response::User;
 
 #
 # Internal attributes
+#   documentation => 'IGNORE' tells OpenXPKI::Client::UI::Response::DTORole->resolve
+#   to exclude these attributes from the hash it builds.
 #
-has 'redirect'=> (
+has_dto 'redirect' => (
     documentation => 'IGNORE',
-    is => 'rw',
-    isa => 'OpenXPKI::Client::UI::Response::Redirect',
-    default => sub { OpenXPKI::Client::UI::Response::Redirect->new },
-    lazy => 1,
+    class => 'OpenXPKI::Client::UI::Response::Redirect',
 );
 
 has 'raw_response' => (
@@ -34,13 +30,12 @@ has 'raw_response' => (
 
 #
 # Items of the response hash
+#   documentation => '...' tells OpenXPKI::Client::UI::Response::DTORole->resolve
+#   to use the given name (not the attribute name) as hash key for this value.
 #
-has 'infobox'=> (
+has_dto 'infobox' => (
     documentation => 'right',
-    is => 'rw',
-    isa => 'OpenXPKI::Client::UI::Response::Sections',
-    default => sub { OpenXPKI::Client::UI::Response::Sections->new },
-    lazy => 1,
+    class => 'OpenXPKI::Client::UI::Response::Sections',
 );
 
 has 'language' => (
@@ -48,33 +43,21 @@ has 'language' => (
     isa => 'Str',
 );
 
-has 'main'=> (
-    is => 'rw',
-    isa => 'OpenXPKI::Client::UI::Response::Sections',
-    default => sub { OpenXPKI::Client::UI::Response::Sections->new },
-    lazy => 1,
+has_dto 'main' => (
+    class => 'OpenXPKI::Client::UI::Response::Sections',
 );
 
-has 'menu'=> (
+has_dto 'menu' => (
     documentation => 'structure',
-    is => 'rw',
-    isa => 'OpenXPKI::Client::UI::Response::Menu',
-    default => sub { OpenXPKI::Client::UI::Response::Menu->new },
-    lazy => 1,
+    class => 'OpenXPKI::Client::UI::Response::Menu',
 );
 
-has 'on_exception'=> (
-    is => 'rw',
-    isa => 'OpenXPKI::Client::UI::Response::OnException',
-    default => sub { OpenXPKI::Client::UI::Response::OnException->new },
-    lazy => 1,
+has_dto 'on_exception' => (
+    class => 'OpenXPKI::Client::UI::Response::OnException',
 );
 
-has 'page'=> (
-    is => 'rw',
-    isa => 'OpenXPKI::Client::UI::Response::PageInfo',
-    default => sub { OpenXPKI::Client::UI::Response::PageInfo->new },
-    lazy => 1,
+has_dto 'page' => (
+    class => 'OpenXPKI::Client::UI::Response::PageInfo',
 );
 
 has 'ping' => (
@@ -82,11 +65,8 @@ has 'ping' => (
     isa => 'Str',
 );
 
-has 'refresh'=> (
-    is => 'rw',
-    isa => 'OpenXPKI::Client::UI::Response::Refresh',
-    default => sub { OpenXPKI::Client::UI::Response::Refresh->new },
-    lazy => 1,
+has_dto 'refresh' => (
+    class => 'OpenXPKI::Client::UI::Response::Refresh',
 );
 
 has 'rtoken' => (
@@ -94,11 +74,8 @@ has 'rtoken' => (
     isa => 'Str',
 );
 
-has 'status'=> (
-    is => 'rw',
-    isa => 'OpenXPKI::Client::UI::Response::Status',
-    default => sub { OpenXPKI::Client::UI::Response::Status->new },
-    lazy => 1,
+has_dto 'status' => (
+    class => 'OpenXPKI::Client::UI::Response::Status',
 );
 
 has 'tenant' => (
@@ -106,17 +83,15 @@ has 'tenant' => (
     isa => 'Str',
 );
 
-has 'user'=> (
-    is => 'rw',
-    isa => 'OpenXPKI::Client::UI::Response::User',
-    default => sub { OpenXPKI::Client::UI::Response::User->new },
-    lazy => 1,
+has_dto 'user' => (
+    class => 'OpenXPKI::Client::UI::Response::User',
 );
 
 sub set_page { shift->page(OpenXPKI::Client::UI::Response::PageInfo->new(@_)) }
 sub set_refresh { shift->refresh(OpenXPKI::Client::UI::Response::Refresh->new(@_)) }
 sub set_user { shift->user(OpenXPKI::Client::UI::Response::User->new(@_)) }
 
-sub is_set { 1 } # required by OpenXPKI::Client::UI::Response::DTORole
+# overrides OpenXPKI::Client::UI::Response::DTORole->is_set()
+sub is_set { 1 }
 
 __PACKAGE__->meta->make_immutable;

@@ -1,8 +1,5 @@
 package OpenXPKI::Client::UI::Response::Sections;
-
-use Moose;
-
-with 'OpenXPKI::Client::UI::Response::DTORole';
+use OpenXPKI::Client::UI::Response::DTO;
 
 # CPAN modules
 use Moose::Util::TypeConstraints;
@@ -31,6 +28,7 @@ has 'sections' => (
 );
 
 
+# overrides OpenXPKI::Client::UI::Response::DTORole->is_set()
 sub is_set { ! shift->_no_section }
 
 sub add_section {

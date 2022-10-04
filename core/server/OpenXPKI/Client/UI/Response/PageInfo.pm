@@ -1,8 +1,5 @@
 package OpenXPKI::Client::UI::Response::PageInfo;
-
-use Moose;
-
-with 'OpenXPKI::Client::UI::Response::DTORole';
+use OpenXPKI::Client::UI::Response::DTO;
 
 has 'label' => (
     is => 'rw',
@@ -41,10 +38,5 @@ has 'uri' => (
     isa => 'Str',
     documentation => 'canonical_uri',
 );
-
-sub is_set {
-    my $self = shift;
-    return $self->has_any_value;
-}
 
 __PACKAGE__->meta->make_immutable;

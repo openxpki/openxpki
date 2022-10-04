@@ -3,9 +3,6 @@ package OpenXPKI::Client::UI::Response::SectionRole;
 use Moose::Role;
 use Moose::Util::TypeConstraints qw( enum );
 
-with 'OpenXPKI::Client::UI::Response::DTORole';
-
-
 has 'type' => (
     is => 'rw',
     isa => enum([qw( text keyvalue grid form chart tiles )]),

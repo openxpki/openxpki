@@ -8,7 +8,12 @@ use List::Util qw( any );
 # CPAN modules
 use Moose::Util qw( does_role );
 
-requires 'is_set';
+=head1 DESCRIPTION
+
+B<Not intended for direct use.> Please use L<OpenXPKI::Client::UI::Response::DTO>
+instead.
+
+=head1 METHODS
 
 =head2 resolve
 
@@ -103,13 +108,15 @@ sub resolve {
     return $result;
 }
 
-=head2 has_any_value
+=head2 is_set
 
 Returns C<1> if any attributes of the consuming object have a value set (also
 if a C<default> was specified).
 
+Should be overridden if required.
+
 =cut
-sub has_any_value {
+sub is_set {
     my $self = shift;
 
     return any { $_->has_value($self) } $self->meta->get_all_attributes;

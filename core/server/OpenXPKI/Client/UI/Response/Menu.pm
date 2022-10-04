@@ -1,8 +1,5 @@
 package OpenXPKI::Client::UI::Response::Menu;
-
-use Moose;
-
-with 'OpenXPKI::Client::UI::Response::DTORole';
+use OpenXPKI::Client::UI::Response::DTO;
 
 has 'items' => (
     is => 'rw',
@@ -17,6 +14,7 @@ has 'items' => (
 );
 
 
+# overrides OpenXPKI::Client::UI::Response::DTORole->is_set()
 sub is_set { ! shift->_no_item }
 
 sub add_item {

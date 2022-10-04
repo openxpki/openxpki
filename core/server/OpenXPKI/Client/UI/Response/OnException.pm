@@ -1,8 +1,5 @@
 package OpenXPKI::Client::UI::Response::OnException;
-
-use Moose;
-
-with 'OpenXPKI::Client::UI::Response::DTORole';
+use OpenXPKI::Client::UI::Response::DTO;
 
 # Project modules
 use OpenXPKI::Client::UI::Response::OnException::Handler;
@@ -20,6 +17,7 @@ has 'handlers' => (
 );
 
 
+# overrides OpenXPKI::Client::UI::Response::DTORole->is_set()
 sub is_set { ! shift->_no_handler }
 
 sub add_handler {

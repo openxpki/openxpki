@@ -1,9 +1,7 @@
 package OpenXPKI::Client::UI::Response::Redirect;
+use OpenXPKI::Client::UI::Response::DTO;
 
-use Moose;
 use Moose::Util::TypeConstraints qw( enum );
-
-with 'OpenXPKI::Client::UI::Response::DTORole';
 
 has 'to' => (
     is => 'rw',
@@ -25,6 +23,7 @@ sub external {
     $self->to($to);
 }
 
+# overrides OpenXPKI::Client::UI::Response::DTORole->is_set()
 sub is_set {
     my $self = shift;
     return $self->has_goto;

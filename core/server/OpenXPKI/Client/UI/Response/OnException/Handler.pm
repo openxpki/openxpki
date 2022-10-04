@@ -1,8 +1,5 @@
 package OpenXPKI::Client::UI::Response::OnException::Handler;
-
-use Moose;
-
-with 'OpenXPKI::Client::UI::Response::DTORole';
+use OpenXPKI::Client::UI::Response::DTO;
 
 has 'status_code' => (
     is => 'rw',
@@ -13,11 +10,5 @@ has 'redirect' => (
     is => 'rw',
     isa => 'Str',
 );
-
-
-sub is_set {
-    my $self = shift;
-    return $self->has_any_value;
-}
 
 __PACKAGE__->meta->make_immutable;

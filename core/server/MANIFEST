@@ -62,6 +62,7 @@ OpenXPKI/Client/UI/Login.pm
 OpenXPKI/Client/UI/Profile.pm
 OpenXPKI/Client/UI/Request.pm
 OpenXPKI/Client/UI/Response.pm
+OpenXPKI/Client/UI/Response/DTO.pm
 OpenXPKI/Client/UI/Response/DTORole.pm
 OpenXPKI/Client/UI/Response/Menu.pm
 OpenXPKI/Client/UI/Response/OnException.pm
