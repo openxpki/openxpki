@@ -222,7 +222,7 @@ sub handle_request {
 
     # Only handle requests if we have an open channel
     if ( $reply->{SERVICE_MSG} eq 'SERVICE_READY' ) {
-        return $self->handle_page( { req => $req } );
+        return $self->handle_page( { req => $req, load_action => 1 } );
     }
 
     # if the backend session logged out but did not terminate
@@ -374,16 +374,11 @@ sub handle_page {
     my $req = $args->{req};
     my $cgi = $req->cgi();
 
-    # set action and page - args always wins about cgi
+    # set action and page - args always wins over CGI
 
     my $result;
-    my $action = '';
-    # action is only valid explicit or within a post request
-    if (defined $args->{action}) {
-       $action = $args->{action};
-    } else {
-        $action = $self->__get_action($req);
-    }
+    # action is only valid within a post request
+    my $action = $args->{load_action} ? $self->__get_action($req) : '';
 
     $self->logger()->trace('Handle page: ' . Dumper { map { $_ => $args->{$_} } grep { $_ ne 'req' } keys %$args } ) if $self->logger->is_trace;
 
@@ -508,7 +503,7 @@ sub handle_login {
         if (my $loginpage = $self->_config()->{loginpage}) {
 
             # internal call to handle_page
-            return $self->handle_page({ action => '', page => $loginpage, req => $req });
+            return $self->handle_page({ page => $loginpage, req => $req });
 
         } elsif (my $loginurl = $self->_config()->{loginurl}) {
 
