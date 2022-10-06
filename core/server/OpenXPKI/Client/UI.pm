@@ -7,12 +7,14 @@ use English;
 use Encode;
 use Data::Dumper;
 use MIME::Base64;
+use Module::Load;
 
 # CPAN modules
 use CGI::Session;
 use URI::Escape;
 use Log::Log4perl::MDC;
-use Crypt::JWT qw(encode_jwt decode_jwt);
+use Crypt::JWT qw( encode_jwt decode_jwt );
+use Feature::Compat::Try;
 
 # Project modules
 use OpenXPKI::Template;
@@ -249,14 +251,15 @@ sub __load_class {
     my $self = shift;
     my $call = shift;
     my $req = shift;
+    my $is_action = shift;
 
-    $self->logger()->debug("Incoming call to load_class $call");
+    $self->logger->debug("Incoming call to load_class $call");
 
     my ($class, $remainder) = ($call =~ /\A (\w+)\!? (.*) \z/xms);
     my ($method, $param_raw);
 
     if (!$class) {
-        $self->logger()->error("Failed to parse page load string $call");
+        $self->logger->error("Failed to parse page load string $call");
         return;
     }
 
@@ -273,15 +276,15 @@ sub __load_class {
         # we therefore read the payload directly from call stripping the class name
         my $decoded = $req->_decrypt_jwt($remainder);
         if ($decoded->{page}) {
-            $self->logger()->debug("Encrypted request with page " . $decoded->{page});
+            $self->logger->debug("Encrypted request with page " . $decoded->{page});
             ($class, $method) = ($decoded->{page} =~ /\A (\w+)\!? (\w+)? \z/xms);
         } else {
             $class = $decoded->{class};
             $method = $decoded->{method};
         }
         my %secure = map { $_ =~ m{\A(page|class|method)\z} ? () : ($_ => $decoded->{$_})  } keys %$decoded;
-        $self->logger()->debug("Encrypted request to $class / $method");
-        $self->logger()->trace("Encrypted request secure params " . Dumper \%secure ) if ($self->logger->is_trace && (keys %secure));
+        $self->logger->debug("Encrypted request to $class / $method");
+        $self->logger->trace("Encrypted request secure params " . Dumper \%secure ) if ($self->logger->is_trace && (keys %secure));
         $params->{__secure} = { %secure, (__jwt_key => $jwt_key ) };
     }
     else {
@@ -296,21 +299,44 @@ sub __load_class {
         }
     }
 
-    $method  = 'index' if (!$method );
+    $method  = 'index' unless $method;
 
-    $self->logger()->debug("Loading handler class $class");
+    $self->logger->debug("Loading handler class $class");
 
-    $class = "OpenXPKI::Client::UI::".ucfirst($class);
-    eval "use $class;1";
-    if ($EVAL_ERROR) {
-        $self->logger()->error("Failed loading handler class $class: $EVAL_ERROR");
-        return;
+    my @variants;
+    # action!...
+    if ($is_action) {
+        @variants = (
+            sprintf("OpenXPKI::Client::UI::%s::Action::%s", ucfirst($class), ucfirst($method)),
+            sprintf("OpenXPKI::Client::UI::%s::Action", ucfirst($class)),
+            sprintf("OpenXPKI::Client::UI::%s", ucfirst($class)),
+        );
+    }
+    # init!...
+    else {
+        @variants = (
+            sprintf("OpenXPKI::Client::UI::%s::%s", ucfirst($class), ucfirst($method)),
+            sprintf("OpenXPKI::Client::UI::%s::Init", ucfirst($class)),
+            sprintf("OpenXPKI::Client::UI::%s", ucfirst($class)),
+        );
     }
 
-    my $result = $class->new({ client => $self, req => $req, extra => $params });
+    for my $pkg (@variants) {
+        try {
+            load $pkg;
+        }
+        catch ($err) {
+            next;
+        }
+        die "Package '$pkg' must inherit from OpenXPKI::Client::UI::Result" unless $pkg->isa('OpenXPKI::Client::UI::Result');
 
-    return ($result, $method);
+        my $obj = $pkg->new({ client => $self, req => $req, extra => $params });
 
+        return ($obj, $method);
+    }
+
+    $self->logger->error("Could not find any handler class for '".ucfirst($class)."'");
+    return;
 }
 
 
@@ -392,7 +418,7 @@ sub handle_page {
         $self->logger()->info('handle action ' . $action);
 
         my $method;
-        ($result, $method) = $self->__load_class( $action, $req );
+        ($result, $method) = $self->__load_class($action, $req, 1);
 
         if ($result) {
             $method  = "action_$method";
@@ -413,12 +439,12 @@ sub handle_page {
 
         my $method;
         if ($page) {
-            ($result, $method) = $self->__load_class( $page, $req );
+            ($result, $method) = $self->__load_class($page, $req);
         }
 
         if (!$result) {
             $self->logger()->error("Failed loading page class");
-            $result = OpenXPKI::Client::UI::Bootstrap->new({ client => $self,  cgi => $cgi });
+            $result = OpenXPKI::Client::UI::Bootstrap->new({ client => $self, cgi => $cgi });
             $result->init_error();
             $result->status->error(i18nGettext('I18N_OPENXPKI_UI_PAGE_NOT_FOUND'));
 
