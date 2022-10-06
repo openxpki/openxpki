@@ -159,7 +159,7 @@ sub handle_request {
     my $cgi = $req->cgi();
 
     my $page = $req->param('page') || '';
-    my $action = $self->__get_action( $req ) || '';
+    my $action = $self->__get_action($req);
 
     $self->logger()->debug('Incoming request: ' . join(', ', $page ? "page '$page'" : (), $action ? "action '$action'" : ()));
 
@@ -315,7 +315,7 @@ sub __load_class {
 Expect a reference to the cgi object. Returns the value of
 cgi->param('action') if set and the XSRFtoken is valid. If the token is
 invalid, returns undef and sets the global status to error. If parameter
-is empty or not set returns undef.
+is empty or not set returns an empty string.
 
 =cut
 
@@ -343,7 +343,7 @@ sub __get_action {
             $self->_status({ level => 'error', 'message' => i18nGettext('I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID')});
         }
     }
-    return;
+    return '';
 
 }
 
@@ -382,7 +382,7 @@ sub handle_page {
     if (defined $args->{action}) {
        $action = $args->{action};
     } else {
-        $action = $self->__get_action( $req );
+        $action = $self->__get_action($req);
     }
 
     $self->logger()->trace('Handle page: ' . Dumper { map { $_ => $args->{$_} } grep { $_ ne 'req' } keys %$args } ) if $self->logger->is_trace;
@@ -468,7 +468,7 @@ sub handle_login {
     }
 
     # action is only valid within a post request
-    my $action = $self->__get_action( $req ) || '';
+    my $action = $self->__get_action($req);
 
     $self->logger()->info('not logged in - doing auth - page is '.$page.' - action is ' . $action);
 
@@ -676,7 +676,7 @@ sub handle_login {
 
             # form send / credentials are passed (works with an empty form too...)
 
-            if (($self->__get_action($req) || '') eq 'login!password') {
+            if (($self->__get_action($req)) eq 'login!password') {
                 $self->logger()->debug('Seems to be an auth try - validating');
                 ##FIXME - Input validation
 
