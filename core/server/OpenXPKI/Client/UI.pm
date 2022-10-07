@@ -256,7 +256,7 @@ sub __load_class {
 
     if (!$class) {
         $self->logger()->error("Failed to parse page load string $call");
-        return (undef, undef);
+        return;
     }
 
     my $params = {};
@@ -266,7 +266,7 @@ sub __load_class {
         my $jwt_key = $self->session->param('jwt_encryption_key');
         unless ($jwt_key) {
             $self->logger->debug("JWT encrypted request but client session contains no decryption key");
-            return (undef, undef);
+            return;
         }
         # as the token has non-word characters the above regex does not contain the full payload
         # we therefore read the payload directly from call stripping the class name
@@ -300,7 +300,7 @@ sub __load_class {
     eval "use $class;1";
     if ($EVAL_ERROR) {
         $self->logger()->error("Failed loading handler class $class: $EVAL_ERROR");
-        return (undef, undef);
+        return;
     }
 
     my $result = $class->new({ client => $self, req => $req, extra => $params });
