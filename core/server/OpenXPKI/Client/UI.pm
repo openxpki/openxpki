@@ -252,7 +252,8 @@ sub __load_class {
 
     $self->logger()->debug("Incoming call to load_class $call");
 
-    my ($class, $method, $param_raw) = ($call =~ /\A (\w+)\!? (\w+)? \!?(.*) \z/xms);
+    my ($class, $remainder) = ($call =~ /\A (\w+)\!? (.*) \z/xms);
+    my ($method, $param_raw);
 
     if (!$class) {
         $self->logger()->error("Failed to parse page load string $call");
@@ -270,7 +271,7 @@ sub __load_class {
         }
         # as the token has non-word characters the above regex does not contain the full payload
         # we therefore read the payload directly from call stripping the class name
-        my $decoded = decode_jwt(token => substr($call,10), key => $jwt_key);
+        my $decoded = $req->_decrypt_jwt($remainder);
         if ($decoded->{page}) {
             $self->logger()->debug("Encrypted request with page " . $decoded->{page});
             ($class, $method) = ($decoded->{page} =~ /\A (\w+)\!? (\w+)? \z/xms);
@@ -283,13 +284,16 @@ sub __load_class {
         $self->logger()->trace("Encrypted request secure params " . Dumper \%secure ) if ($self->logger->is_trace && (keys %secure));
         $params->{__secure} = { %secure, (__jwt_key => $jwt_key ) };
     }
-    elsif ($param_raw) {
-        my @parts = split /!/, $param_raw;
-        while (my $key = shift @parts) {
-            my $val = shift @parts // '';
-            $params->{$key} = Encode::decode("UTF-8", uri_unescape($val));
+    else {
+        ($method, $param_raw) = ($remainder =~ /\A (\w+)? \!?(.*) \z/xms);
+        if ($param_raw) {
+            my @parts = split /!/, $param_raw;
+            while (my $key = shift @parts) {
+                my $val = shift @parts // '';
+                $params->{$key} = Encode::decode("UTF-8", uri_unescape($val));
+            }
+            $self->logger->trace("Found extra params: " . Dumper $params) if $self->logger->is_trace;
         }
-        $self->logger()->trace("Found extra params " . Dumper $params ) if $self->logger->is_trace;
     }
 
     $method  = 'index' if (!$method );
