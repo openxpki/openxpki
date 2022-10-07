@@ -80,6 +80,8 @@ OpenXPKI/Client/UI/Secret.pm
 OpenXPKI/Client/UI/Source.pm
 OpenXPKI/Client/UI/Users.pm
 OpenXPKI/Client/UI/Workflow.pm
+OpenXPKI/Client/UI/Workflow/Action.pm
+OpenXPKI/Client/UI/Workflow/Init.pm
 
 
 ## Config Layers
