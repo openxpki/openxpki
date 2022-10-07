@@ -252,14 +252,14 @@ sub __load_class {
 
     $self->logger()->debug("Incoming call to load_class $call");
 
-    my ($class, $method, $param) = ($call =~ /\A (\w+)\!? (\w+)? \!?(.*) \z/xms);
+    my ($class, $method, $param_raw) = ($call =~ /\A (\w+)\!? (\w+)? \!?(.*) \z/xms);
 
     if (!$class) {
         $self->logger()->error("Failed to parse page load string $call");
         return (undef, undef);
     }
 
-    my $extra = {};
+    my $params = {};
     # the request is encoded in an encrypted jwt structure
     if ($class eq 'encrypted') {
         # TODO - consolidate with JWT code from Request.pm
@@ -281,15 +281,15 @@ sub __load_class {
         my %secure = map { $_ =~ m{\A(page|class|method)\z} ? () : ($_ => $decoded->{$_})  } keys %$decoded;
         $self->logger()->debug("Encrypted request to $class / $method");
         $self->logger()->trace("Encrypted request secure params " . Dumper \%secure ) if ($self->logger->is_trace && (keys %secure));
-        $extra->{__secure} = { %secure, (__jwt_key => $jwt_key ) };
+        $params->{__secure} = { %secure, (__jwt_key => $jwt_key ) };
     }
-    elsif ($param) {
-        my @extra = split /!/, $param;
-        while (my $key = shift @extra) {
-            my $val = shift @extra // '';
-            $extra->{$key} = Encode::decode("UTF-8", uri_unescape($val));
+    elsif ($param_raw) {
+        my @parts = split /!/, $param_raw;
+        while (my $key = shift @parts) {
+            my $val = shift @parts // '';
+            $params->{$key} = Encode::decode("UTF-8", uri_unescape($val));
         }
-        $self->logger()->trace("Found extra params " . Dumper $extra ) if $self->logger->is_trace;
+        $self->logger()->trace("Found extra params " . Dumper $params ) if $self->logger->is_trace;
     }
 
     $method  = 'index' if (!$method );
@@ -303,7 +303,7 @@ sub __load_class {
         return (undef, undef);
     }
 
-    my $result = $class->new({ client => $self, req => $req, extra => $extra });
+    my $result = $class->new({ client => $self, req => $req, extra => $params });
 
     return ($result, $method);
 
