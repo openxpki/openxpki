@@ -21,9 +21,9 @@ sub init_index {
     my $self = shift;
     my $args = shift;
 
-    $self->_page({
+    $self->set_page(
         label => 'I18N_OPENXPKI_UI_CRL_CURRENT_LISTS',
-    });
+    );
 
     my $issuers = $self->send_command_v2( 'get_ca_list' );
 
@@ -44,7 +44,7 @@ sub init_index {
 
         if (!@$crl_list) {
 
-            $self->add_section({
+            $self->main->add_section({
                 type => 'text',
                 content => {
                     label => $self->_escape($issuer->{subject}),
@@ -56,7 +56,7 @@ sub init_index {
 
             my @fields = $self->__print_detail( $crl_hash, $issuer );
 
-            $self->add_section({
+            $self->main->add_section({
                 type => 'keyvalue',
                 content => {
                     label => $self->_escape($issuer->{subject}),
@@ -96,10 +96,10 @@ sub init_list {
 
     $self->logger()->trace("result: " . Dumper $crl_list) if $self->logger->is_trace;
 
-    $self->_page({
+    $self->set_page(
         label => 'I18N_OPENXPKI_UI_CRL_LIST_FOR_ISSUER ',
         description => $self->_escape( $issuer_info->{subject} ),
-    });
+    );
 
     my @result;
     foreach my $crl (@{$crl_list}) {
@@ -112,7 +112,7 @@ sub init_list {
         ];
     }
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'grid',
         className => 'crl',
         content => {
@@ -154,21 +154,21 @@ sub init_detail {
     });
     $self->logger()->trace("result: " . Dumper $crl_hash) if $self->logger->is_trace;
 
-    $self->_page({
+    $self->set_page(
         label => 'I18N_OPENXPKI_UI_CRL_LIST_VIEW_DETAIL #' . $crl_hash->{crl_number},
         shortlabel => 'CRL #' . $crl_hash->{crl_number},
-    });
+    );
 
     my @fields = $self->__print_detail( $crl_hash );
 
-    $self->_result()->{main} = [{
+    $self->main->add_section({
         type => 'keyvalue',
         content => {
             label => '',
             description => '',
             data => \@fields,
-        }},
-    ];
+        }
+    });
 
 }
 
@@ -184,7 +184,7 @@ sub init_download {
 
      # No format, draw a list
     if (!$format || $format !~ /(pem|txt|der)/i) {
-        $self->redirect('crl!detail!crl_key!'.$crl_key);
+        $self->redirect->to('crl!detail!crl_key!'.$crl_key);
     }
 
     my $data = $self->send_command_v2( 'get_crl', {

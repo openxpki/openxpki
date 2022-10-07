@@ -14,9 +14,7 @@ sub init_index {
     my $self = shift;
     my $args = shift;
     # render title + empty search form
-    $self->_page({
-        label => 'I18N_OPENXPKI_UI_USER_TITLE',
-    });
+    $self->page->label('I18N_OPENXPKI_UI_USER_TITLE');
     $self->render_search_form();
     # count users + store result object in session to allow paging
     my $result_count = $self->send_command_v2( 'search_users_count', {}  );
@@ -72,7 +70,7 @@ sub init_result {
 
     # result expired or broken id
     if (!$result || !$result->{count}) {
-        $self->set_status('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY','error');
+        $self->status->error('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY');
         return $self->render_search_form();
     }
 
@@ -96,14 +94,14 @@ sub init_result {
 
     my $criteria = '<br>' . (join ", ", @{$result->{criteria}});
 
-    $self->_page({
+    $self->set_page(
         label => 'I18N_OPENXPKI_UI_USER_SEARCH_RESULT_LABEL',
         description => 'I18N_OPENXPKI_UI_USER_SEARCH_RESULT_DESC' . $criteria ,
         breadcrumb => [
             { label => 'I18N_OPENXPKI_UI_USER_SEARCH_LABEL', className => 'user-search' },
             { label => 'I18N_OPENXPKI_UI_USER_SEARCH_RESULT_TITLE', className => 'user-search-result' }
         ],
-    });
+    );
 
     my $pager = $self->__render_pager( $result, { limit => $limit, startat => $startat } );
     my @result = $self->__render_result_list( $query_result);
@@ -133,7 +131,7 @@ sub init_pager {
 
     # result expired or broken id
     if (!$result || !$result->{count}) {
-        $self->set_status('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY','error');
+        $self->status->error('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY');
         return $self->render_search_form();
     }
 
@@ -169,10 +167,10 @@ sub init_pager {
 
     $self->logger()->trace( "dumper result: " . Dumper @result) if $self->logger->is_trace;
 
-    $self->_result()->{_raw} = {
+    $self->raw_response({
         _returnType => 'partial',
         data => \@result,
-    };
+    });
 
     return $self;
 }
@@ -236,7 +234,7 @@ sub action_search {
 
     # No results founds
     if (!$result_count) {
-        $self->set_status('I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES','error');
+        $self->status->error('I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES');
         return $self->render_search_form({ preset => $input });
     }
     # store search query in session for paging etc...
@@ -251,7 +249,7 @@ sub action_search {
         'criteria' => \@criteria
     });
     # after handling the search: redirect to result page
-    $self->redirect( 'users!result!id!'.$queryid  );
+    $self->redirect->to('users!result!id!'.$queryid);
 
     return $self;
 
@@ -298,7 +296,7 @@ sub __render_result_table {
         { sTitle => "I18N_OPENXPKI_UI_USER_ROLE"}
 
     ];
-    $self->add_section({
+    $self->main->add_section({
         type => 'grid',
         className => 'users',
         content => {
@@ -334,31 +332,30 @@ Renders the search form
 sub render_search_form {
     my $self = shift;
     my $args = shift;
-    my $preset;
-    if ($args->{preset}) {
-        $preset = $args->{preset};
-    }
-    # define search fields
-    my @fields = (
-        { name => 'username', label => 'I18N_OPENXPKI_UI_USER_USERNAME', type => 'text', is_optional => 1, value => $preset->{username} },
-        { name => 'mail', label => 'I18N_OPENXPKI_UI_USER_MAIL', type => 'text', is_optional => 1, value => $preset->{mail} },
-        { name => 'realname', label => 'I18N_OPENXPKI_UI_USER_REALNAME',type => 'text', is_optional => 1, value => $preset->{realname} },
-        { name => 'role', label => 'I18N_OPENXPKI_UI_USER_ROLE',type => 'select', options => [
-            { label => 'I18N_OPENXPKI_UI_USER_ROLE_USER', value => 'User'},
-            { label=> 'I18N_OPENXPKI_UI_USER_ROLE_RAOP',value=> 'RA Operator'}],
-             is_optional => 1, value => $preset->{role} },
-    );
+
     # add search form to current page
-    $self->add_section({
-        type => 'form',
+    my $form = $self->main->add_form(
         action => 'users!search',
-        content => {
-           description => 'I18N_OPENXPKI_UI_USER_SEARCH_DESC',
-           title => '',
-           submit_label => 'I18N_OPENXPKI_UI_USER_SEARCH_SUBMIT_LABEL',
-           fields => \@fields
-        }},
+        description => 'I18N_OPENXPKI_UI_USER_SEARCH_DESC',
+        submit_label => 'I18N_OPENXPKI_UI_USER_SEARCH_SUBMIT_LABEL',
     );
+
+    # define search fields
+    my $preset = $args->{preset} // {};
+    $form->add_field(
+        name => 'username', label => 'I18N_OPENXPKI_UI_USER_USERNAME', type => 'text', is_optional => 1, value => $preset->{username},
+    )->add_field(
+        name => 'mail', label => 'I18N_OPENXPKI_UI_USER_MAIL', type => 'text', is_optional => 1, value => $preset->{mail},
+    )->add_field(
+        name => 'realname', label => 'I18N_OPENXPKI_UI_USER_REALNAME', type => 'text', is_optional => 1, value => $preset->{realname},
+    )->add_field(
+        name => 'role', label => 'I18N_OPENXPKI_UI_USER_ROLE',type => 'select', is_optional => 1, value => $preset->{role},
+        options => [
+            { label => 'I18N_OPENXPKI_UI_USER_ROLE_USER', value => 'User'},
+            { label=> 'I18N_OPENXPKI_UI_USER_ROLE_RAOP',value=> 'RA Operator'},
+        ],
+    );
+
     return $self;
 }
 
@@ -372,9 +369,7 @@ sub init_search {
     my $self = shift;
     my $args = shift;
 
-    $self->_page({
-        label => 'I18N_OPENXPKI_UI_USER_SEARCH_LABEL',
-    });
+    $self->page->label('I18N_OPENXPKI_UI_USER_SEARCH_LABEL');
     # check if there are any preset values for the search fields
     my $preset;
     if (my $queryid = $self->param('query')) {

@@ -31,13 +31,12 @@ sub init_index {
         ];
     }
 
-    $self->_page ({
+    $self->set_page(
         label => 'I18N_OPENXPKI_UI_SECRET_PAGE_LABEL',
         description => 'I18N_OPENXPKI_UI_SECRET_PAGE_DESC',
-        target => 'main'
-    });
+    );
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'grid',
         className => 'secret',
         content => {
@@ -64,8 +63,8 @@ sub init_manage {
     my $secret = $self->param('id');
 
     if (not $secret) {
-        $self->_page ({ shortlabel => 'I18N_OPENXPKI_UI_SECRET_LITERAL_NOT_SETABLE_LABEL' });
-        $self->add_section({
+        $self->page->shortlabel('I18N_OPENXPKI_UI_SECRET_LITERAL_NOT_SETABLE_LABEL');
+        $self->main->add_section({
             type => 'text',
             content => {
                 description => 'I18N_OPENXPKI_UI_SECRET_LITERAL_NOT_SETABLE_DESC'
@@ -78,27 +77,23 @@ sub init_manage {
     return unless defined $status;
 
     if ($status) {
-        $self->_page ({ shortlabel => 'I18N_OPENXPKI_UI_SECRET_CLEAR_SECRET_LABEL' });
-        $self->add_section({
+        $self->page->shortlabel('I18N_OPENXPKI_UI_SECRET_CLEAR_SECRET_LABEL');
+        $self->main->add_section({
             type => 'text',
             content => {
                 description => 'I18N_OPENXPKI_UI_SECRET_COMPLETE_INFO - <a href="#/openxpki/secret!clear!id!'.$secret.'">[I18N_OPENXPKI_UI_SECRET_CLEAR_SECRET_LABEL]</a>.'
             }
         });
     } else {
-        $self->_page ({ label => 'I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL' });
-        $self->add_section({
-            type => 'form',
+        $self->page->label('I18N_OPENXPKI_UI_SECRET_UNLOCK_LABEL');
+        $self->main->add_form(
             action => 'secret!unlock',
-            target => 'top',
-            content => {
-                fields => [
-                    { 'name' => 'phrase', 'label' => 'I18N_OPENXPKI_UI_SECRET_PASSPHRASE_LABEL', 'type' => 'password', placeholder => 'I18N_OPENXPKI_UI_SECRET_PASSPHRASE_LABEL' },
-                    { 'name' => 'id', 'type' => 'hidden', value => $secret }
-                ],
-                submit_label => 'I18N_OPENXPKI_UI_SECRET_UNLOCK_BUTTON',
-            }
-        });
+            submit_label => 'I18N_OPENXPKI_UI_SECRET_UNLOCK_BUTTON',
+        )->add_field(
+            'name' => 'phrase', 'label' => 'I18N_OPENXPKI_UI_SECRET_PASSPHRASE_LABEL', 'type' => 'password', placeholder => 'I18N_OPENXPKI_UI_SECRET_PASSPHRASE_LABEL',
+        )->add_field(
+            'name' => 'id', 'type' => 'hidden', value => $secret,
+        );
     }
 
     return $self;
@@ -111,11 +106,11 @@ sub init_clear {
     my $status = $self->send_command_v2("clear_secret", {secret => $secret});
 
     if ($status) {
-        $self->set_status('I18N_OPENXPKI_UI_SECRET_STATUS_CLEARED','success');
-        $self->redirect('secret!index');
+        $self->status->success('I18N_OPENXPKI_UI_SECRET_STATUS_CLEARED');
+        $self->redirect->to('secret!index');
     } elsif (defined $status) {
-        $self->set_status('I18N_OPENXPKI_UI_SECRET_STATUS_CLEAR_FAILED','success');
-        $self->redirect('secret!index');
+        $self->status->success('I18N_OPENXPKI_UI_SECRET_STATUS_CLEAR_FAILED');
+        $self->redirect->to('secret!index');
     }
 
     return $self;
@@ -132,11 +127,11 @@ sub action_unlock {
     $self->logger()->trace('Return ' . Dumper $msg) if $self->logger->is_trace;
 
     if ($msg) {
-        $self->set_status('I18N_OPENXPKI_UI_SECRET_STATUS_ACCEPTED','success');
-        $self->redirect('secret!index');
+        $self->status->success('I18N_OPENXPKI_UI_SECRET_STATUS_ACCEPTED');
+        $self->redirect->to('secret!index');
     } elsif(defined $msg) {
-        $self->set_status('I18N_OPENXPKI_UI_SECRET_STATUS_UNLOCK_FAILED','error');
-        $self->redirect('secret!index');
+        $self->status->error('I18N_OPENXPKI_UI_SECRET_STATUS_UNLOCK_FAILED');
+        $self->redirect->to('secret!index');
     }
 
     return $self;

@@ -26,9 +26,8 @@ sub init_structure {
         $self->logger->debug('Generate rtoken');
         $session->param('rtoken', Digest::SHA::sha1_hex( $$. $session->id() . rand(2**32) ) );
     }
-    $self->_result->{rtoken} = $session->param('rtoken');
-
-    $self->_result->{language} = get_language();
+    $self->rtoken($session->param('rtoken'));
+    $self->language(get_language());
 
     # To issue redirects to the UI, we store the referrer
     # default is mainly relevant for test scripts
@@ -38,44 +37,44 @@ sub init_structure {
     $session->flush;
     $self->logger->debug("Baseurl from referrer: " . $baseurl);
 
-    if ($session->param('is_logged_in') && $user) {
-        $self->_result->{user} = $user;
+    if ($session->param('is_logged_in') and $user) {
+        $self->set_user(%{ $user });
 
         # Preselect tenant, for now we just pick the first from the list
         if ($user->{tenants}) {
-            $self->_result->{tenant} = $user->{tenants}->[0]->{value};
+            $self->tenant($user->{tenants}->[0]->{value});
             $self->logger->trace('Preset tenant from items ' . Dumper $user->{tenants}) if $self->logger->is_trace;
         }
 
         # Last Login
         if (my $last_login = $session->param('userinfo')->{last_login}) {
-            $user->{last_login} = $last_login;
+            $self->user->last_login($last_login);
         }
 
-        $self->_result->{structure} = $session->param('menu');
+        # Menu items
+        $self->menu->items($session->param('menu_items'));
 
         # Ping endpoint
         if (my $ping = $session->param('ping')) {
-            $self->_result->{ping} = $ping;
+            $self->ping($ping);
         }
 
         # Redirection targets for apache based SSO Handling
         if (my $auth = $session->param('authinfo')) {
             if (my $target = ($auth->{resume} || $auth->{login})) {
-                $self->_result->{on_exception} = [{
+                $self->on_exception->add_handler(
                     status_code => [ 403, 401 ],
                     redirect => $target,
-                }];
+                );
             }
         }
     }
 
     # default menu if nothing was set before
-    $self->_result->{structure} ||= [{
+    $self->menu->add_item({
         key => 'logout',
         label => 'I18N_OPENXPKI_UI_CLEAR_LOGIN',
-        entries => [],
-    }];
+    }) unless $self->menu->is_set;
 
     return $self;
 
@@ -87,13 +86,13 @@ sub init_error {
     my $self = shift;
     my $args = shift;
 
-    $self->_result->{main} = [{
+    $self->main->add_section({
         type => 'text',
         content => {
             headline => 'I18N_OPENXPKI_UI_OOPS',
             paragraphs => [{text=>'I18N_OPENXPKI_UI_OOPS'}]
         }
-    }];
+    });
 
     return $self;
 }

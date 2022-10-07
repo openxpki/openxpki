@@ -21,9 +21,7 @@ sub render_process_status {
 
     $self->logger()->trace("result: " . Dumper $process ) if $self->logger->is_trace;
 
-    $self->_page({
-        label => 'Running processes (global)',
-    });
+    $self->page->label('Running processes (global)');
 
     my @result;
     my $now = time;
@@ -38,7 +36,7 @@ sub render_process_status {
 
     @result = sort { $a->[1] < $b->[1] } @result;
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'grid',
         className => 'proc',
         content => {
@@ -72,9 +70,7 @@ sub render_system_status {
     my $warning = 0;
     my $critical = 0;
 
-    $self->_page({
-        label => 'OpenXPKI system status',
-    });
+    $self->page->label('OpenXPKI system status');
 
     if ($status->{secret_offline}) {
         push @fields, {
@@ -223,7 +219,7 @@ sub render_system_status {
         format => 'deflist',
     } if ($status->{config});
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'keyvalue',
         content => {
             data => \@fields
@@ -262,7 +258,7 @@ sub render_system_status {
             ];
         }
 
-        $self->add_section({
+        $self->main->add_section({
             type => 'grid',
             className => 'token',
             content => {
@@ -282,7 +278,7 @@ sub render_system_status {
 
     }
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'text',
         content => {
             label => '',
@@ -292,11 +288,11 @@ sub render_system_status {
 
 
     if ($critical) {
-        $self->set_status('Your system status is critical!','error');
+        $self->status->error('Your system status is critical!');
     } elsif($warning) {
-        $self->set_status('Your system status requires your attention!','warn');
+        $self->status->warn('Your system status requires your attention!');
     } else {
-        $self->set_status('System status is good','success');
+        $self->status->success('System status is good');
     }
 
     return $self;
@@ -344,7 +340,7 @@ sub render_token_status {
             ];
         }
 
-        $self->add_section({
+        $self->main->add_section({
             type => 'grid',
             className => 'token',
             content => {
@@ -364,7 +360,7 @@ sub render_token_status {
 
     }
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'text',
         content => {
             label => '',

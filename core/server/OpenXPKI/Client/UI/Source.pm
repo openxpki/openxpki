@@ -28,12 +28,6 @@ has _basepath => (
     lazy => 1,
 );
 
-sub BUILD {
-    my $self = shift;
-    $self->_page ({'label' => ''});
-}
-
-
 =head2 init_html
 
 Load a file from disk that contains HTML. The content of the file is rendered
@@ -55,7 +49,7 @@ sub init_html {
 
     $self->logger()->debug('Got content ' . join("",@content));
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'text',
         content => {
             label => '',
@@ -90,7 +84,7 @@ sub init_json {
 
     my $json = decode_json(join("",@content));
 
-    $self->_result()->{_raw} = $json;
+    $self->raw_response($json);
     return $self;
 
 }
@@ -162,8 +156,8 @@ sub _notfound {
 
     my $self = shift;
 
-    $self->set_status('No results','error');
-    $self->add_section({
+    $self->status->error('No results');
+    $self->main->add_section({
         type => 'text',
         content => {
             label => 'Not found!',

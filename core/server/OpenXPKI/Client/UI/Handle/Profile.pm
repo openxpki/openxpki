@@ -75,17 +75,14 @@ sub render_profile_select {
         wf_fields => \@fields,
     });
 
-    $self->add_section({
-        type => 'form',
+    my $form = $self->main->add_form(
         action => 'workflow',
-        content => {
-            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
-            fields => \@fields
-        }
-    });
+        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
+    );
+    $form->add_field(%{ $_ }) for @fields;
 
     if (@profiledesc > 0) {
-        $self->add_section({
+        $self->main->add_section({
             type => 'keyvalue',
             content => {
                 label => 'I18N_OPENXPKI_UI_PROFILE_HINT_LIST',
@@ -142,9 +139,9 @@ sub render_subject_form {
     $self->logger()->debug( " Render subject for $field_name, section $section in $wf_action" );
 
     # Allowed types are cert_subject, cert_san, cert_info
-    my $fields = $self->send_command_v2( 'get_field_definition',
-        { profile => $cert_profile, style => $cert_subject_style, 'section' =>  $section }
-    );
+    my $fields = $self->send_command_v2('get_field_definition' => {
+        profile => $cert_profile, style => $cert_subject_style, 'section' => $section,
+    });
 
     $self->logger()->trace( 'Profile fields' . Dumper $fields ) if $self->logger->is_trace;
 
@@ -173,18 +170,15 @@ sub render_subject_form {
         wf_fields => $fields,
     });
 
-    $self->add_section({
-        type => 'form',
+    my $form = $self->main->add_form(
         action => 'workflow',
-        content => {
-            submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
-            fields => $fields,
-            buttons => $self->__get_form_buttons( $wf_info ),
-        }
-    });
+        submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
+        buttons => $self->__get_form_buttons( $wf_info ),
+    );
+    $form->add_field(%{ $_ }) for @{ $fields };
 
     if (@fielddesc) {
-        $self->add_section({
+        $self->main->add_section({
             type => 'keyvalue',
             content => {
                 label => 'I18N_OPENXPKI_UI_WORKFLOW_FIELD_HINT_LIST',
@@ -262,7 +256,7 @@ sub render_key_select {
              $item->{value} = 'pkcs10';
         }
 
-        push @fields, $item;
+        push @fields, $item, @more_items;
     }
 
     # record the workflow info in the session
@@ -272,14 +266,11 @@ sub render_key_select {
         cert_profile => $context->{cert_profile}
     });
 
-    $self->add_section({
-        type => 'form',
+    my $form = $self->main->add_form(
         action => 'workflow',
-        content => {
         submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
-            fields => \@fields
-        }
-    });
+    );
+    $form->add_field(%{ $_ }) for @fields;
 
     return $self;
 
@@ -321,8 +312,8 @@ sub render_server_password {
         if ($field->{name} eq '_password') {
             $value = $self->send_command_v2( 'get_random', \%extra );
             if (!$value) {
-                $self->set_status('I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_ERROR_LABEL','error');
-                $self->add_section({
+                $self->status->error('I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_ERROR_LABEL');
+                $self->main->add_section({
                     type => 'text',
                     content => {
                         label => 'I18N_OPENXPKI_UI_PROFILE_UNABLE_TO_GENERATE_PASSWORD_LABEL',
@@ -345,14 +336,11 @@ sub render_server_password {
         cert_profile => $context->{cert_profile}
     });
 
-    $self->add_section({
-        type => 'form',
+    my $form = $self->main->add_form(
         action => 'workflow',
-        content => {
         submit_label => $wf_action_info->{button} || 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
-            fields => \@fields
-        }
-    });
+    );
+    $form->add_field(%{ $_ }) for @fields;
 
     return $self;
 

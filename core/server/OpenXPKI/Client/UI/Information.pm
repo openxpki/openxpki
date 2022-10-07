@@ -12,7 +12,7 @@ extends 'OpenXPKI::Client::UI::Result';
 sub BUILD {
 
     my $self = shift;
-    $self->_page ({'label' => 'I18N_OPENXPKI_UI_HOME_WELCOME_HEAD'});
+    $self->page->label('I18N_OPENXPKI_UI_HOME_WELCOME_HEAD');
 }
 
 
@@ -26,7 +26,7 @@ sub init_index {
     my $self = shift;
     my $args = shift;
 
-    $self->redirect('home!index');
+    $self->redirect->to('home!index');
 
     return $self;
 }
@@ -46,9 +46,7 @@ sub init_issuer {
     my $issuers = $self->send_command_v2( 'get_ca_list' );
     $self->logger()->trace("result: " . Dumper $issuers) if $self->logger->is_trace;
 
-    $self->_page({
-        label => 'I18N_OPENXPKI_UI_ISSUERS_LIST',
-    });
+    $self->page->label('I18N_OPENXPKI_UI_ISSUERS_LIST');
 
 
     my @result;
@@ -69,7 +67,7 @@ sub init_issuer {
     # I18N_OPENXPKI_UI_TOKEN_STATUS_OFFLINE
     # I18N_OPENXPKI_UI_TOKEN_STATUS_UNKNOWN
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'grid',
         className => 'cacertificate',
         content => {
@@ -102,12 +100,12 @@ sub init_policy {
     my $self = shift;
     my $args = shift;
 
-    $self->_page({
+    $self->set_page(
         label => 'Policy documents',
         description => '',
-    });
+    );
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'text',
         content => {
             description => 'tbd',
@@ -126,7 +124,7 @@ sub init_process {
     my $self = shift;
     my $args = shift;
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'text',
         content => {
             description => 'This was moved to a workflow, please update your uicontrol files to workflow!index!wf_type!status_process',
@@ -140,7 +138,7 @@ sub init_status {
     my $self = shift;
     my $args = shift;
 
-    $self->add_section({
+    $self->main->add_section({
         type => 'text',
         content => {
             description => 'This was moved to a workflow, please update your uicontrol files to workflow!index!wf_type!status_system',

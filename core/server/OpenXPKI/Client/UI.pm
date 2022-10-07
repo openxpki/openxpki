@@ -61,11 +61,11 @@ has '_auth' => (
 );
 
 # Hold warnings from init
-has _status => (
+has '_status' => (
     is => 'rw',
-    isa => 'HashRef|Undef',
+    isa => 'OpenXPKI::Client::UI::Response::Status',
+    default => sub { OpenXPKI::Client::UI::Response::Status->new },
     lazy => 1,
-    default => undef
 );
 
 =head2 _init_backend
@@ -106,7 +106,7 @@ sub _init_backend {
                 # The session has gone - start a new one - might happen if the gui
                 # was idle too long or the server was flushed
                 $client->init_session({ SESSION_ID => undef });
-                $self->_status({ level => 'warn', message => i18nGettext('I18N_OPENXPKI_UI_BACKEND_SESSION_GONE')});
+                $self->_status->warn(i18nGettext('I18N_OPENXPKI_UI_BACKEND_SESSION_GONE'));
             } else {
                 $self->logger()->error('Error creating backend session: ' . $eval_err->{message});
                 $self->logger()->trace($eval_err);
@@ -168,7 +168,7 @@ sub handle_request {
         my $goto = $1;
         my $result = OpenXPKI::Client::UI::Result->new({ client => $self, req => $req });
         $self->logger()->debug("Send redirect to $goto");
-        $result->redirect( $goto );
+        $result->redirect->to($goto);
         return $result->render();
     }
 
@@ -190,7 +190,7 @@ sub handle_request {
         if ($redirectTo) {
             $self->logger()->debug("External redirect on logout to " . $redirectTo);
             my $result = OpenXPKI::Client::UI::Result->new({ client => $self, req => $req });
-            $result->redirect( $redirectTo );
+            $result->redirect->to($redirectTo);
             return $result->render();
         }
 
@@ -344,7 +344,7 @@ sub __get_action {
         } else {
 
             $self->logger()->debug("Request with invalid rtoken ($rtoken_request != $rtoken_session)!");
-            $self->_status({ level => 'error', 'message' => i18nGettext('I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID')});
+            $self->_status->error(i18nGettext('I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID'));
         }
     }
     return '';
@@ -399,7 +399,7 @@ sub handle_page {
             $self->logger()->debug("Method is $method");
             $result->$method( $method_args );
         } else {
-            $self->_status({ level => 'error', 'message' => i18nGettext('I18N_OPENXPKI_UI_ACTION_NOT_FOUND')});
+            $self->_status->error(i18nGettext('I18N_OPENXPKI_UI_ACTION_NOT_FOUND'));
         }
     }
 
@@ -420,7 +420,7 @@ sub handle_page {
             $self->logger()->error("Failed loading page class");
             $result = OpenXPKI::Client::UI::Bootstrap->new({ client => $self,  cgi => $cgi });
             $result->init_error();
-            $result->set_status(i18nGettext('I18N_OPENXPKI_UI_PAGE_NOT_FOUND'),'error');
+            $result->status->error(i18nGettext('I18N_OPENXPKI_UI_PAGE_NOT_FOUND'));
 
         } else {
             $method  = "init_$method";
@@ -457,7 +457,7 @@ sub handle_login {
 
     # this is the incoming logout action
     if ($page eq 'logout') {
-        $result->redirect( { goto => 'login!logout' } );
+        $result->redirect->to('login!logout');
         return $result->render();
     }
 
@@ -512,7 +512,7 @@ sub handle_login {
         } elsif (my $loginurl = $self->_config()->{loginurl}) {
 
             $self->logger()->debug("Redirect to external login page " . $loginurl );
-            $result->redirect( { goto => $loginurl, type => 'external' } );
+            $result->redirect->external($loginurl);
             return $result->render();
             # Do a real exit to skip the error handling of the script body
             exit;
@@ -520,7 +520,7 @@ sub handle_login {
         } elsif ( $cgi->http('HTTP_X-OPENXPKI-Client') ) {
 
             # Session is gone but we are still in the ember application
-            $result->redirect('login');
+            $result->redirect->to('login');
 
         } else {
 
@@ -534,7 +534,7 @@ sub handle_login {
             }
             $url .= '/#/openxpki/login';
             $self->logger()->debug('Redirect to login page: ' . $url);
-            $result->redirect($url);
+            $result->redirect->to($url);
         }
     }
 
@@ -634,7 +634,7 @@ sub handle_login {
                     { baseurl => $session->param('baseurl') } );
 
                 $self->logger()->debug("No auth data in environment - redirect found $loginurl");
-                $result->redirect( { goto => $loginurl, type => 'external' } );
+                $result->redirect->external($loginurl);
                 return $result->render();
 
             # bad luck - something seems to be really wrong
@@ -747,7 +747,7 @@ sub handle_login {
             $self->logger->trace('CGI Header ' . Dumper \@main::header ) if $self->logger->is_trace;
 
             if ($auth_info->{login}) {
-                $result->redirect( $auth_info->{login} );
+                $result->redirect->to($auth_info->{login});
             } else {
                 $result->init_index();
             }
@@ -762,7 +762,7 @@ sub handle_login {
         # Failure here is likely a wrong password
 
         if ($reply->{'ERROR'} && $reply->{'ERROR'}->{CLASS} eq 'OpenXPKI::Exception::Authentication') {
-            $result->set_status(i18nGettext( $reply->{'ERROR'}->{LABEL} ),'error');
+            $result->status->error(i18nGettext( $reply->{'ERROR'}->{LABEL} ));
         } else {
             $result->set_status_from_error_reply($reply);
         }
@@ -824,7 +824,7 @@ sub _recreate_frontend_session() {
 
     # menu
     my $reply = $self->backend->send_receive_command_msg( 'get_menu' );
-    $self->_set_menu($session, $reply->{PARAMS}) if ref $reply->{PARAMS} eq 'HASH';
+    $self->_set_menu($session, $reply->{PARAMS}) if $reply->{PARAMS};
 
     $session->flush;
 
@@ -837,7 +837,7 @@ sub _set_menu {
 
     $self->logger->trace('Menu ' . Dumper $menu) if $self->logger->is_trace;
 
-    $session->param('menu', $menu->{main});
+    $session->param('menu_items', $menu->{main} || []);
 
     # persist the optional parts of the menu hash (landmark, tasklist, search attribs)
     $session->param('landmark', $menu->{landmark} || {});
