@@ -505,8 +505,8 @@ sub __wf_search_presets {
     my $preset;
 
     if (my $queryid = $self->param('query')) {
-        my $result = $self->_client->session->param("query_wfl_${queryid}");
-        $preset = $result->{input};
+        my $result = $self->__load_query($queryid);
+        $preset = $result->{input} if $result;
 
     } else {
         $preset = $self->_session->param('wfsearch')->{default}->{preset} || {};
@@ -546,15 +546,7 @@ sub init_result {
     if ($limit > 500) {  $limit = 500; }
 
     # Load query from session
-    my $result = $self->_client->session()->param('query_wfl_'.$queryid);
-
-    # result expired or broken id
-    if (!$result || !$result->{count}) {
-
-        $self->status->error('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY');
-        return $self->init_search();
-
-    }
+    my $result = $self->__load_query($queryid) or return $self->init_search();
 
     # Add limits
     my $query = $result->{query};
@@ -678,13 +670,7 @@ sub init_export {
     if ($limit > 500) {  $limit = 500; }
 
     # Load query from session
-    my $result = $self->_client->session()->param('query_wfl_'.$queryid);
-
-    # result expired or broken id
-    if (!$result || !$result->{count}) {
-        $self->status->error('I18N_OPENXPKI_UI_SEARCH_RESULT_EXPIRED_OR_EMPTY');
-        return $self->init_search();
-    }
+    my $result = $self->__load_query($queryid) or return $self->init_search();
 
     # Add limits
     my $query = $result->{query};
@@ -763,13 +749,7 @@ sub init_pager {
     my $queryid = $self->param('id');
 
     # Load query from session
-    my $result = $self->_client->session()->param('query_wfl_'.$queryid);
-
-    # result expired or broken id
-    if (!$result || !$result->{count}) {
-        $self->status->error('Search result expired or empty!');
-        return $self->init_search();
-    }
+    my $result = $self->__load_query($queryid) or return $self->init_search();
 
     my $startat = $self->param('startat');
 
@@ -1102,7 +1082,7 @@ sub __render_task_list {
                 'column' => $column,
                 'pager' => $pager_args,
             };
-            $self->_client->session()->param('query_wfl_'.$queryid, $_query );
+            $self->__save_query($queryid => $_query);
             $pager = $self->__render_pager( $_query, $pager_args );
         }
 

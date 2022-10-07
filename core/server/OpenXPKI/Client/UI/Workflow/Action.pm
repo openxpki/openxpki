@@ -473,9 +473,7 @@ sub action_search {
         push @criteria, sprintf '<nobr><b>%s:</b> <i>%s</i></nobr>', $item->{label}, $val;
     }
 
-    my $queryid = $self->__generate_uid();
-    $self->_client->session()->param('query_wfl_'.$queryid, {
-        'id' => $queryid,
+    my $queryid = $self->__save_query({
         'type' => 'workflow',
         'count' => $result_count,
         'query' => $query,
@@ -483,7 +481,7 @@ sub action_search {
         'header' => $header,
         'column' => $body,
         'pager'  => $spec->{pager} || {},
-        'criteria' => \@criteria
+        'criteria' => \@criteria,
     });
 
     $self->redirect->to('workflow!result!id!'.$queryid);
@@ -640,9 +638,7 @@ sub action_bulk {
     }
 
     # persist the selected ids and add button to recheck the status
-    my $queryid = $self->__generate_uid();
-    $self->_client->session()->param('query_wfl_'.$queryid, {
-        'id' => $queryid,
+    my $queryid = $self->__save_query({
         'type' => 'workflow',
         'count' => scalar @serials,
         'query' => { id => \@serials },

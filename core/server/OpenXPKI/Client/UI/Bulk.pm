@@ -179,8 +179,7 @@ sub action_result {
         page => 'bulk!index!' . $self->__generate_uid(),
     };
 
-    $self->_client->session()->param('query_wfl_'.$queryid, {
-        'id' => $queryid,
+    $self->__save_query($queryid => {
         'type' => 'bulk',
         'count' => $result_count,
         'query' => $query,
