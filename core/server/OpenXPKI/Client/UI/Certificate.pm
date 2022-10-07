@@ -8,7 +8,6 @@ use Math::BigInt;
 # CPAN modules
 use URI::Escape;
 use DateTime;
-use Digest::SHA qw(sha1_base64);
 
 # Project modules
 use OpenXPKI::DN;

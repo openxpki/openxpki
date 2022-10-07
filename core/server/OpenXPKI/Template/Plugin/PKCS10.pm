@@ -31,7 +31,6 @@ use base qw( Template::Plugin );
 use Template::Plugin;
 
 use Data::Dumper;
-use Digest::SHA qw(sha1_hex sha1_base64);
 use OpenXPKI::Crypt::PKCS10;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );

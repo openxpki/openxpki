@@ -7,7 +7,6 @@ use warnings;
 use English;
 
 use Convert::ASN1;
-use Digest::SHA qw(sha1_base64 sha1_hex);
 use MIME::Base64;
 use Moose;
 

@@ -3,7 +3,6 @@ package OpenXPKI::Crypt::PKCS7;
 use strict;
 use warnings;
 use English;
-use Digest::SHA qw(sha1_base64 sha1_hex);
 use MIME::Base64;
 use Moose;
 use Convert::ASN1 ':tag';
