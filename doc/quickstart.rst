@@ -5,7 +5,7 @@ Quickstart guide
 
 OpenXPKI is an easy-to-deploy and easy-to-use RA/CA software that makes
 handling of certificates easy but nevertheless you should **really**
-have some basic knownledge on what a PKI is. If you just want to see
+have some basic knowledge on what a PKI is. If you just want to see
 "OpenXPKI in action" for a first impression of the tool, use the
 public demo at https://demo.openxpki.org.
 
@@ -13,7 +13,7 @@ Support
 -------
 
 If you need help, please use the mailing list and do **NOT** open items
-in the issue tracker on github. For details and additional support options
+in the issue tracker on GitHub. For details and additional support options
 have a look at http://www.openxpki.org/support.html.
 
 Vagrant
@@ -142,7 +142,7 @@ Sample / Demo Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The debian package comes with a shell script ``sampleconfig.sh`` that does all the work for you
-(look in /usr/share/doc/libopenxpki-perl/examples/). The script will create a two stage ca with
+(look in /usr/share/doc/libopenxpki-perl/examples/). The script will create a two-stage ca with
 a root ca certificate and below your issuing ca and certs for SCEP and the internal datasafe.
 
 It will also start the required services, you should be able to log into the system via the
@@ -456,7 +456,7 @@ Support for Java Keystore
 -------------------------
 
 OpenXPKI can assemble server generated keys into java keystores for
-immediate use with java based applications like tomcat. This requires
+immediate use with java-based applications like tomcat. This requires
 a recent version of java ``keytool`` installed. On debian, this is
 provided by the package ``openjdk-7-jre``. Note: You can set the
 location of the keytool binary in ``system.crypto.token.javajks``, the
