@@ -21,4 +21,8 @@ export default class OxiSectionKeyvalueComponent extends Component {
         // (this could only happen with format 'raw' and empty values)
         return items.filter(item => item.format !== 'raw' || item.value !== '');
     }
+
+    get hasLabels() {
+        return this.items.filter(i => typeof i.label === 'defined' && i.label !== 0 && i.label !== null).length > 0;
+    }
 }
