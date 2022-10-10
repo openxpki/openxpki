@@ -330,7 +330,7 @@ sub __load_class {
         catch ($err) {
             next;
         }
-        die "Package '$pkg' must inherit from OpenXPKI::Client::UI::Result" unless $pkg->isa('OpenXPKI::Client::UI::Result');
+        die "Package $pkg must inherit from OpenXPKI::Client::UI::Result" unless $pkg->isa('OpenXPKI::Client::UI::Result');
 
         my $obj = $pkg->new({ client => $self, req => $req, extra => $params });
 
