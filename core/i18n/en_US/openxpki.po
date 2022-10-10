@@ -741,6 +741,9 @@ msgstr "Export unencrypted"
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATE_KEY_FAILED"
 msgstr "Private key could not be decrypted/loaded."
 
+msgid "I18N_OPENXPKI_UI_EXTERNAL_PROCESS_TERMINATED"
+msgstr "The external process was terminated unexpectedly."
+
 msgid "I18N_OPENXPKI_UI_FIELD_DOMAINLIST"
 msgstr "Domain List"
 
@@ -1036,6 +1039,24 @@ msgstr "This page shows a list of all workflows started by you."
 
 msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
 msgstr "My Workflows"
+
+msgid "I18N_OPENXPKI_UI_NCIPHER_CONSOLE_DESC"
+msgstr "Console: nFast 'preload' script"
+
+msgid "I18N_OPENXPKI_UI_NCIPHER_ERROR_NO_CONSOLE"
+msgstr "The query workflow did not return any console output."
+
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_PASSPHRASE_LABEL"
+msgstr "Passphrase"
+
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_SUBMIT_LABEL"
+msgstr "Send"
+
+msgid "I18N_OPENXPKI_UI_NCIPHER_PAGE_DESC"
+msgstr "Please follow the instructions of the console output."
+
+msgid "I18N_OPENXPKI_UI_NCIPHER_PAGE_LABEL"
+msgstr "Unlock NCipher HSM"
 
 msgid "I18N_OPENXPKI_UI_NICE_BACKEND_ERROR"
 msgstr "Backend Communication Error"

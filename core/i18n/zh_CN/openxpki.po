@@ -776,6 +776,10 @@ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATE_KEY_FAILED"
 msgstr "私钥无法被解密/加载。"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_EXTERNAL_PROCESS_TERMINATED"
+msgstr "处理信息"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_FIELD_DOMAINLIST"
 msgstr "有关可用配置文件的信息"
 
@@ -1096,6 +1100,30 @@ msgstr "此页面显示您启动的所有工作流程的列表。"
 
 msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
 msgstr "我的工作流程"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_CONSOLE_DESC"
+msgstr "国家"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_ERROR_NO_CONSOLE"
+msgstr "错误码"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_PASSPHRASE_LABEL"
+msgstr "密码短语"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_SUBMIT_LABEL"
+msgstr "马上搜索"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_PAGE_DESC"
+msgstr "该列表显示了在此域中定义的密钥组的状态。 要登录/注销，请单击该行。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_PAGE_LABEL"
+msgstr "管理秘密"
 
 msgid "I18N_OPENXPKI_UI_NICE_BACKEND_ERROR"
 msgstr "后端通讯错误"

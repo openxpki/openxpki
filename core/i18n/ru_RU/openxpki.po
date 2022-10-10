@@ -954,6 +954,10 @@ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATE_KEY_FAILED"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_EXTERNAL_PROCESS_TERMINATED"
+msgstr "Профиль пользователя"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_FIELD_DOMAINLIST"
 msgstr "Профиль пользователя"
 
@@ -1359,6 +1363,35 @@ msgstr "Описания пока нет"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
 msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_CONSOLE_DESC"
+msgstr ""
+"Используйте данный профиль сертификата только если Вы отчетливо "
+"представляете себе необходимую структуру имени субъекта сертификата, хорошо "
+"знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
+"части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
+"также произвольный набор альтернативных имен."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_ERROR_NO_CONSOLE"
+msgstr "Имя владельца сертификата, например, Иван Петрович Сидоров."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_PASSPHRASE_LABEL"
+msgstr "Родительский технологический процесс"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_SUBMIT_LABEL"
+msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_PAGE_DESC"
+msgstr "Имя Вашей учетной записи в информационной системе, например aivanov"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_PAGE_LABEL"
+msgstr "Родительский технологический процесс"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NICE_BACKEND_ERROR"

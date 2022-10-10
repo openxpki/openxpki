@@ -806,6 +806,10 @@ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATE_KEY_FAILED"
 msgstr "秘密鍵は復号化/読み込みできませんでした。"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_EXTERNAL_PROCESS_TERMINATED"
+msgstr "プロセス情報"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_FIELD_DOMAINLIST"
 msgstr "利用可能なプロファイルの情報"
 
@@ -1129,6 +1133,32 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
 msgstr "自分のワークフロー"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_CONSOLE_DESC"
+msgstr "国"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_ERROR_NO_CONSOLE"
+msgstr "エラーコード"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_PASSPHRASE_LABEL"
+msgstr "パスフレーズ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_SUBMIT_LABEL"
+msgstr "今すぐ検索"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_PAGE_DESC"
+msgstr ""
+"このレルムに定義されている秘密鍵のグループが一覧表示されます。ログイン/ログア"
+"ウトするには、行をクリックします。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_PAGE_LABEL"
+msgstr "秘密鍵の管理"
 
 msgid "I18N_OPENXPKI_UI_NICE_BACKEND_ERROR"
 msgstr "バックエンドエラー"
