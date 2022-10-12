@@ -162,6 +162,7 @@ sub execute_action {
     my ( $self, $action_name, $autorun ) = @_;
     ##! 1: 'execute_action '.$action_name
 
+    no warnings 'recursion';
     # note - transaction is already open as it was started either in
     # the service layer or the watchdog. For autorun with DBI persister
     # the persister will do a commit/start when required
