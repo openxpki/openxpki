@@ -129,7 +129,7 @@ our $schema = "
             certSet         [0] IMPLICIT ExtendedCertificatesAndCertificates,
             certSequence    [2] IMPLICIT Certificates
         },
-        -- crls
+        crls                [1] IMPLICIT CertificateRevocationLists OPTIONAL,
         signerInfos     SignerInfos
     }
 
@@ -159,11 +159,7 @@ our $schema = "
 
     Certificates ::= SEQUENCE OF Certificate
 
-    CertificateRevocationLists ::= SET OF CertificateList
-
-    CertificateList ::= SEQUENCE OF Certificate -- This may be defined incorrectly
-
-    CRLSequence ::= SEQUENCE OF CertificateList
+    CertificateRevocationLists ::= SET OF ANY
 
     Certificate ::= ANY
 

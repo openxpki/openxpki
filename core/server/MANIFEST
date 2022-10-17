@@ -105,6 +105,7 @@ OpenXPKI/Crypt/PKCS7.pm
 OpenXPKI/Crypt/PKCS10.pm
 OpenXPKI/Crypt/PubKey.pm
 OpenXPKI/Crypt/X509.pm
+OpenXPKI/Crypt/PKCS7/CertificateList.pm
 OpenXPKI/Crypt/PKCS7/SCEP.pm
 
 ## Crypto layer
@@ -446,6 +447,7 @@ OpenXPKI/Server/Workflow/Activity/User/PersistUserData.pm
 OpenXPKI/Server/Workflow/Activity/Tools/AddCertExtension.pm
 OpenXPKI/Server/Workflow/Activity/Tools/AppendCertificateMetadata.pm
 OpenXPKI/Server/Workflow/Activity/Tools/Approve.pm
+OpenXPKI/Server/Workflow/Activity/Tools/BuildPKCS7CertList.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CalculateApprovalPoints.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CalculateArgon2Key.pm
 OpenXPKI/Server/Workflow/Activity/Tools/CalculateRequestHMAC.pm
