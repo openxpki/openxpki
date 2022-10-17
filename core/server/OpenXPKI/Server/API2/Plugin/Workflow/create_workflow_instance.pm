@@ -11,6 +11,7 @@ use English;
 use Scalar::Util 'blessed';
 
 # Project modules
+use OpenXPKI::DateTime;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Types;
@@ -280,6 +281,7 @@ sub _handle_lock {
     my $namespace = 'workflow.lock';
     my $on_error = 'die';
     my $key;
+    my $expiry;
 
     ##! 32: $lock
     if (!ref $lock) {
@@ -287,6 +289,12 @@ sub _handle_lock {
     } else {
         $key = $lock->{key};
         $namespace = $lock->{namespace} if ($lock->{namespace});
+
+        $expiry = OpenXPKI::DateTime::get_validity({
+            VALIDITY => $lock->{expiry},
+            VALIDITYFORMAT => 'detect',
+        })->epoch() if ($lock->{expiry});
+
         if ($lock->{on_error}) {
             if ($lock->{on_error} =~ m{\A(die|skip|workflow|force)\z}) {
                 $on_error = $lock->{on_error};
@@ -316,6 +324,7 @@ sub _handle_lock {
             value => $id,
             encrypt => 0,
             force => ($on_error eq 'force'),
+            ($expiry ? (expiration_date => $expiry): ()),
         );
         ##! 32: 'Lock was created'
         CTX('log')->workflow->info(sprintf "Lock for workflow #%01d was created with %s/%s", $id, $namespace, $key);
