@@ -212,14 +212,16 @@ sub handle_request {
     if ( $reply->{SERVICE_MSG} eq 'ERROR' ) {
         my $result = OpenXPKI::Client::UI::Result->new({ client => $self, req => $req });
         $self->logger()->debug("Got error from server");
-        return $result->set_status_from_error_reply( $reply );
+        $result->set_status_from_error_reply($reply);
+        return $result->render;
     }
 
 
     # Call to bootstrap components
     if ($page =~ /^bootstrap!(.+)/) {
         my $result = OpenXPKI::Client::UI::Bootstrap->new({ client => $self, req => $req });
-        return $result->init_structure( )->render();
+        $result->init_structure;
+        return $result->render;
     }
 
     # Only handle requests if we have an open channel
