@@ -274,12 +274,9 @@ Dynamic form rendering
 If a select field is defined with the property "actionOnChange", each change event of this pulldown will trigger
 an submit of all formvalues (without validity checks etc) to the server with key "action" set to the value of "actionOnChange".
 
-The returned JSON must contain the key "_returnType" which should have the value "partial" or "full".
-This "_returnType" defines the mode of re-definition of the content of the form.
-
 **Partial redefinition:**
 
-Beside the key "_returntype" the key "fields"  is expected in the returned JSON-Structure.
+The key "fields" is expected in the returned JSON-Structure.
 "fields" contains an array, which is semantically identic to the key "fields" in the definition of the form.
 This array "fields" must contain only only the fields (and properties), which should react to the change of the (master-)field (pulldown) .
 The property "name" is required (otherwise the client can not identify the field).
@@ -296,9 +293,9 @@ You can define more than one (cascading) dependent select.
 ::
 
     fields => [
-        { name => 'cert_typ', label => 'Typ',value=> 't2', prompt => 'please select a type',  type => 'select', actionOnChange => 'test_dep_select!change_type', options=>[{value=>'t1',label=>'Typ 1'},{value=>'t2',label=>'Typ 2'},{value=>'t3',label=>'Typ 3'}] },
-        { name => 'cert_subtyp', label => 'Sub-Type',prompt => 'first select type!', type => 'select',options=>[] },
-        { name => 'special', label => 'Spezial (nur Typ 2',  type => 'checkbox',visible => 0 },
+        { name => 'cert_typ', label => 'Typ',value=> 't2', prompt => 'please select a type', type => 'select', actionOnChange => 'test_dep_select!change_type', options => [{value=>'t1',label=>'Typ 1'},{value=>'t2',label=>'Typ 2'},{value=>'t3',label=>'Typ 3'}] },
+        { name => 'cert_subtyp', label => 'Sub-Type', prompt => 'first select type!', type => 'select', options => [] },
+        { name => 'special', label => 'Special (only type 2)', type => 'checkbox', visible => 0 },
     ]
 
 ..
@@ -308,10 +305,9 @@ You can define more than one (cascading) dependent select.
 ::
 
     {
-        _returnType => 'partial',
         fields => [
-            { name => 'cert_subtyp', options=> [{value=>'x', label => 'Subtyp X'},...],value=>'x'} ,
-            { name => 'special',visible=> 1 }
+            { name => 'cert_subtype', options => [{value=>'x', label => 'Subtype X'}, ...], value => 'x' } ,
+            { name => 'special', visible=> 1 }
         ]
     };
 
