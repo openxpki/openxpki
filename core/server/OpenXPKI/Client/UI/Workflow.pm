@@ -337,7 +337,7 @@ sub __render_from_workflow {
             shortlabel => $wf_info->{workflow}->{id},
             description => $desc,
             css_class => 'workflow workflow-proc-state workflow-proc-'.$wf_proc_state,
-            ($wf_info->{workflow}->{id} ? (uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}) : ()),
+            ($wf_info->{workflow}->{id} ? (canonical_uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}) : ()),
         );
 
         my @buttons;
@@ -491,7 +491,7 @@ sub __render_from_workflow {
             shortlabel => $wf_info->{workflow}->{id},
             description => $self->__get_templated_description($wf_info, $wf_info->{state}),
             css_class => 'workflow workflow-page ' . ($wf_info->{state}->{uiclass} || ''),
-            ($wf_info->{workflow}->{id} ? (uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}) : ()),
+            ($wf_info->{workflow}->{id} ? (canonical_uri => 'workflow!load!wf_id!'.$wf_info->{workflow}->{id}) : ()),
         );
 
         # Set status decorator on final states (uses proc_state).
@@ -2016,7 +2016,7 @@ sub __render_workflow_action_head {
         shortlabel => $wf_info->{workflow}->{id},
         description => $self->__get_templated_description($wf_info, $wf_action_info),
         css_class => 'workflow workflow-action ' . ($wf_action_info->{uiclass} || ''),
-        uri => sprintf('workflow!load!wf_id!%01d!wf_action!%s', $wf_info->{workflow}->{id}, $wf_action),
+        canonical_uri => sprintf('workflow!load!wf_id!%01d!wf_action!%s', $wf_info->{workflow}->{id}, $wf_action),
     );
 }
 

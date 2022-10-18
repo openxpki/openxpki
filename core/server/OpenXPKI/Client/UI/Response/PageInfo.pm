@@ -33,10 +33,10 @@ has 'large' => (
     documentation => 'isLarge',
 );
 
-has 'uri' => (
+# TODO: Not used as of 2022-10-18. We keep it for future testing purposes. Set in OpenXPKI::Client::UI::Workflow->__render_from_workflow()
+has 'canonical_uri' => (
     is => 'rw',
     isa => 'Str',
-    documentation => 'canonical_uri',
 );
 
 __PACKAGE__->meta->make_immutable;
