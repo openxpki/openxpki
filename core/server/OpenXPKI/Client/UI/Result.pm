@@ -125,57 +125,26 @@ sub cgi {
 
 }
 
-
-=head2 send_command
-
-Expects the name of the command as first and the parameter hash as second
-argument. Sends the named command to the backend and returned the result.
-If the command does not succeed, set_status_from_error_reply is called
-and undef is returned. In case the command was a workflow action and the
-backend reports a validation error, the error from the validator is set
-as status.
-
-If you set a true value for the third parameter, the global status is
-B<not> set if an error occurs.
-
-=cut
-
-sub send_command {
-
-    my $self = shift;
-    my $command = shift;
-    my $params = shift || {};
-    my $nostatus = shift || 0;
-
-    $self->logger()->warn("APIv1 command - try to autoconvert");
-
-    my $newparam;
-    map { $newparam->{lc($_)} => $params->{$_} } keys %$params;
-
-    my $backend = $self->_client()->backend();
-    my $reply = $backend->send_receive_service_msg(
-        'COMMAND', { COMMAND => $command, PARAMS => $newparam, API => 2 }
-    );
-    $self->_last_reply( $reply );
-
-    $self->logger()->trace('send command raw reply: '. Dumper $reply) if $self->logger()->is_trace;
-
-    if ( $reply->{SERVICE_MSG} ne 'COMMAND' ) {
-        if (!$nostatus) {
-            $self->logger()->error("command $command failed ($reply->{SERVICE_MSG})");
-            $self->logger()->trace("command reply ". Dumper $reply) if $self->logger()->is_trace;
-            $self->set_status_from_error_reply( $reply );
-        }
-        return undef;
-    }
-
-    return $reply->{PARAMS};
-
-}
-
 =head2 send_command_v2
 
-Copy of send_command but uses the API2 methods.
+Sends the given command to the backend and returns the result.
+
+If an error occurs while executing the command (e.g. validation error from a
+workflow action), the global status is set in the response sent to the client,
+so the UI can show the error. This can be suppressed by setting the third
+parameter to C<1>.
+
+B<Parameters>
+
+=over
+
+=item * I<Str> C<$command> - command
+
+=item * I<HashRef> C<$params> - parameters to the command
+
+=item * I<Bool> C<$nostatus> - Set to C<1> to prevent setting the global status in case of errors. Default: 0
+
+=back
 
 =cut
 
