@@ -8,6 +8,7 @@ use Data::Dumper;
 use Digest::SHA qw(sha1_base64);
 use MIME::Base64;
 use Carp qw( confess );
+use Encode;
 
 # CPAN modules
 use CGI 4.08 qw( -utf8 );
@@ -545,7 +546,7 @@ sub init_fetch {
         }
 
         print $cgi->header( @main::header, -type => $data->{mime}, -attachment => $data->{attachment} );
-        utf8::encode($dp->{value}) if ($data->{mime} =~ /utf-8/i);
+        Encode::encode('UTF-8', $dp->{value}) if $data->{mime} =~ /utf-8/i;
         print $dp->{value};
 
     } elsif ($type eq 'report') {
