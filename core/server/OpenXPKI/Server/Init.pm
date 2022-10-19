@@ -201,7 +201,6 @@ sub __do_init_config_versioned {
 }
 
 sub __do_init_i18n {
-    my $keys = { @_ };
     ##! 1: "init i18n"
     my $prefix = CTX('config')->get('system.server.i18n.locale_directory');
     OpenXPKI::Exception->throw(
