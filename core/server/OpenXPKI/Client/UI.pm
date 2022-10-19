@@ -7,7 +7,7 @@ use English;
 use Encode;
 use Data::Dumper;
 use MIME::Base64;
-use Module::Load;
+use Module::Load ();
 
 # CPAN modules
 use CGI::Session;
@@ -325,7 +325,7 @@ sub __load_class {
 
     for my $pkg (@variants) {
         try {
-            load $pkg;
+            Module::Load::load($pkg);
         }
         catch ($err) {
             next;
