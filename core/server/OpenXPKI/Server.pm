@@ -15,6 +15,7 @@ use Net::Server::Daemonize qw( set_uid set_gid );
 
 use English;
 use Socket;
+use Scalar::Util qw( blessed );
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
@@ -792,7 +793,7 @@ sub __log_and_die {
     my $when  = shift;
 
     my $log_message;
-    if (ref $error eq 'OpenXPKI::Exception') {
+    if (blessed $error and $error->isa('OpenXPKI::Exception')) {
         ##! 16: 'error is exception'
         $error->show_trace(0);
         my $msg = $error->full_message();
@@ -800,11 +801,11 @@ sub __log_and_die {
     }
     else {
         ##! 16: 'error is something else'
-        $log_message = "Eval error during $when: $error";
+        $log_message = "Error during $when: $error";
     }
     ##! 16: 'log_message: ' . $log_message
 
-    CTX('log')->system()->fatal($log_message);
+    CTX('log')->system->fatal($log_message);
 
     # die gracefully
     $ERRNO = 1;

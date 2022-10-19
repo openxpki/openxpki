@@ -15,6 +15,8 @@ use warnings;
 use English;
 use Errno;
 use Log::Log4perl;
+use Feature::Compat::Try;
+use Scalar::Util qw( blessed );
 use OpenXPKI::Debug;
 use OpenXPKI::i18n qw(set_language set_locale_prefix);
 use OpenXPKI::Exception;
@@ -109,24 +111,23 @@ sub init {
             log_wrapper("Initialization task '$task'");
         }
 
-        eval "__do_init_$task(\$keys);";
-        if (my $exc = OpenXPKI::Exception->caught())
-        {
-            my $msg = $exc->message() || '<no message>';
-            log_wrapper("Exception during initialization task '$task': " . $msg, "fatal");
-            print "Exception during initialization task '$task': " . $msg;
-            $exc->rethrow();
+        # call init function
+        try {
+            my $func = \&{ __PACKAGE__."::__do_init_$task" };
+            $func->($keys);
         }
-        elsif (my $eval_err = $EVAL_ERROR)
-        {
-            log_wrapper("Eval error during initialization task '$task': " . $eval_err, "fatal");
-
-            OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVER_INIT_TASK_INIT_FAILURE",
-            params  => {
-                task => $task,
-                EVAL_ERROR => $eval_err,
-            });
+        catch ($err) {
+            if (blessed $err and $err->isa('OpenXPKI::Exception')) {
+                my $msg = $err->message || '<no message>';
+                log_wrapper("Error during initialization task '$task': $msg", "fatal");
+                $err->rethrow;
+            } else {
+                log_wrapper("Error during initialization task '$task': $err", "fatal");
+                OpenXPKI::Exception->throw(
+                    message => "I18N_OPENXPKI_SERVER_INIT_TASK_INIT_FAILURE",
+                    params  => { task => $task, ERROR => $err },
+                );
+            }
         }
 
         $is_initialized{$task}++;
