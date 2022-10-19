@@ -34,6 +34,7 @@ sub reset {
             dbi              => undef,
             dbi_log          => undef,
             bedroom          => undef,
+            terminal         => undef,
 
             # user-settable
             api            => undef,
