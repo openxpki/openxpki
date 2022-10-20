@@ -19,10 +19,10 @@ Log::Log4perl->easy_init({ level => $OFF });
 
 # Project modules
 try {
-    require OpenXPKI::Server::ProcTerminal;
+    require OpenXPKI::Server::ProcTerminal::Client;
 }
 catch ($err) {
-    plan skip_all => "OpenXPKI::Server::ProcTerminal (EE code) not available";
+    plan skip_all => "OpenXPKI::Server::ProcTerminal::Client (EE code) not available";
 };
 
 sub wait_for {
@@ -41,7 +41,7 @@ sub wait_for {
 
 my $tempdir = File::Temp::tempdir(CLEANUP => 1);
 
-my $term = OpenXPKI::Server::ProcTerminal->new(
+my $term = OpenXPKI::Server::ProcTerminal::Client->new(
     server_pidfile => "$tempdir/terminal.pid",
     socket_file => "$tempdir/terminal.sock",
     system_command => ['/bin/bash', '-c', "$Bin/bash-proc.sh" ],
