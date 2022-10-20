@@ -248,6 +248,14 @@ around BUILDARGS => sub {
 
 };
 
+=item get_notbefore / get_notafter I<format>
+
+Returns the notbefore / notafter date in the given format. For allowed
+formats see OpenXPKI::DateTime::convert_date, without format a DateTime
+object is returned.
+
+=cut
+
 sub get_notbefore {
     my $self = shift;
     return $self->_get_validity( $self->notbefore(), shift );
@@ -258,6 +266,16 @@ sub get_notafter {
     return $self->_get_validity( $self->notafter(), shift );
 }
 
+=head2 is_selfsigned
+
+returns true if the certificate is self-signed.
+
+Note: the check is (currently) done the subject/authority key identifier
+or by a comparison of subject and issuer DN and not on a cryptographic
+level - so there might be situations where this is not accurate.
+
+=cut
+
 sub is_selfsigned {
 
     my $self = shift;
@@ -267,6 +285,29 @@ sub is_selfsigned {
     }
     return $self->get_issuer eq $self->get_subject;
 
+}
+
+=head2 is_ca
+
+returns true if the certificate has the keyUsage keyCertSign and
+BasicContraints "cA" set (critical), false otherwise.
+
+=cut
+
+sub is_ca {
+
+    my $self = shift;
+
+    my $keyUsage = $self->_cert->KeyUsage();
+    return 0 unless (grep { 'keyCertSign' } @{$keyUsage});
+
+    my $constraint = $self->_cert->BasicConstraints();
+    return 1 if (ref $constraint eq 'ARRAY' &&
+        @{$constraint} == 2 &&
+        $constraint->[0] eq 'critical' &&
+        $constraint->[1] eq 'cA = 1');
+
+    return 0;
 }
 
 sub _build_san {
