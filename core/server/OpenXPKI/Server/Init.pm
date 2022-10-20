@@ -31,14 +31,11 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Bedroom;
 
-use OpenXPKI::Serialization::Simple;
-use OpenXPKI::Serialization::Fast;
-
 
 # define an array of hash refs mapping the task id to the corresponding
 # init code. the order of the array elements is also the default execution
 # order.
-my @init_tasks = qw(
+my @INIT_TASKS = qw(
   config_versioned
   i18n
   log
@@ -57,8 +54,8 @@ my @init_tasks = qw(
 );
 #
 
-my %is_initialized;
-sub reset { %is_initialized = map { $_ => 0 } @init_tasks }
+my %IS_INITIALIZED;
+sub reset { %IS_INITIALIZED = map { $_ => 0 } @INIT_TASKS }
 OpenXPKI::Server::Init::reset(); # there is also CORE::reset() so we need the package prefix
 
 # holds log statements until the logging subsystem has been initialized
@@ -68,12 +65,11 @@ sub init {
     my $keys = shift;
 
     # TODO Rework this: we create a temporary in-memory session to allow access to realm parts of the config
-    OpenXPKI::Server::Context::setcontext({ 'session' =>
-        OpenXPKI::Server::Session->new(type => "Memory")->create()
+    OpenXPKI::Server::Context::setcontext({
+        'session' => OpenXPKI::Server::Session->new(type => "Memory")->create()
     }) unless OpenXPKI::Server::Context::hascontext('session');
 
-    log_wrapper("OpenXPKI initialization")
-        unless (exists $keys->{SILENT} and $keys->{SILENT});
+    log_wrapper("OpenXPKI initialization") unless $keys->{SILENT};
 
     my @tasks;
 
@@ -81,31 +77,27 @@ sub init {
         @tasks = @{$keys->{TASKS}};
     } elsif ($keys->{SKIP}) {
         my %skip = map {$_=>1} @{$keys->{SKIP}};
-        @tasks =  grep { !$skip{$_} } @init_tasks;
+        @tasks = grep { !$skip{$_} } @INIT_TASKS;
         delete $keys->{SKIP};
     } else {
-        @tasks = @init_tasks;
+        @tasks = @INIT_TASKS;
     }
 
     delete $keys->{TASKS};
 
-
-  TASK:
     foreach my $task (@tasks) {
         ##! 16: 'task: ' . $task
-        if (! exists $is_initialized{$task}) {
+        if (! exists $IS_INITIALIZED{$task}) {
             OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_INIT_TASK_ILLEGAL_TASK_ACTION",
             params  => {
                 task => $task,
             });
         }
-        next TASK if $is_initialized{$task};
+        next if $IS_INITIALIZED{$task};
 
         ##! 16: 'do_init_' . $task
-        if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
-            log_wrapper("Initialization task '$task'");
-        }
+        log_wrapper("Initialization task '$task'") unless $keys->{SILENT};
 
         # call init function
         try {
@@ -126,39 +118,32 @@ sub init {
             }
         }
 
-        $is_initialized{$task}++;
+        $IS_INITIALIZED{$task}++;
 
-        # suppress informational output if SILENT is specified
-        if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
-            log_wrapper("Initialization task '$task' finished","debug");
-        }
+        log_wrapper("Initialization task '$task' finished", "debug") unless $keys->{SILENT};
     }
 
-    if (! (exists $keys->{SILENT} && $keys->{SILENT})) {
-        log_wrapper("OpenXPKI initialization finished");
-    }
+    log_wrapper("OpenXPKI initialization finished") unless $keys->{SILENT};
 
     OpenXPKI::Server::Context::killsession();
 
     return 1;
 }
 
-
 sub log_wrapper {
     my $msg = shift;
     my $prio = shift || 'info';
 
-    if ($is_initialized{'log'}) {
-
+    if ($IS_INITIALIZED{'log'}) {
         if (scalar @log_queue) {
             foreach my $entry (@log_queue) {
                 my $msg = $entry->[0];
                 my $prio = $entry->[1];
-                CTX('log')->system()->$prio($msg);
+                CTX('log')->system->$prio($msg);
             }
             @log_queue = ();
         }
-        CTX('log')->system()->$prio($msg);
+        CTX('log')->system->$prio($msg);
     } else {
         # log system not yet prepared, queue log statement
         push @log_queue, [$msg, $prio];
@@ -166,16 +151,8 @@ sub log_wrapper {
     return 1;
 }
 
-
 sub get_remaining_init_tasks {
-    my @remaining_tasks;
-
-    foreach my $task (@init_tasks) {
-    if (! $is_initialized{$task}) {
-        push @remaining_tasks, $task;
-    }
-    }
-
+    my @remaining_tasks = map { not $IS_INITIALIZED{$_} } @INIT_TASKS;
     return @remaining_tasks;
 }
 
@@ -187,6 +164,7 @@ sub __do_init_workflow_factory {
     ##! 1: 'init workflow factory'
     my $workflow_factory = OpenXPKI::Workflow::Handler->new();
     $workflow_factory->load_default_factories;
+
     OpenXPKI::Server::Context::setcontext({
         'workflow_factory' => $workflow_factory
     });
@@ -195,6 +173,7 @@ sub __do_init_workflow_factory {
 sub __do_init_config_versioned {
     ##! 1: "init config"
     my $config = OpenXPKI::Config->new();
+
     OpenXPKI::Server::Context::setcontext({
         'config' => $config
     });
@@ -202,10 +181,10 @@ sub __do_init_config_versioned {
 
 sub __do_init_i18n {
     ##! 1: "init i18n"
-    my $prefix = CTX('config')->get('system.server.i18n.locale_directory');
-    OpenXPKI::Exception->throw(
-        message => 'I18N_OPENXPKI_SERVER_INIT_LOCALE_DIRECTORY_MISSING',
-    ) unless $prefix;
+    my $prefix = CTX('config')->get('system.server.i18n.locale_directory')
+        or OpenXPKI::Exception->throw(
+            message => 'I18N_OPENXPKI_SERVER_INIT_LOCALE_DIRECTORY_MISSING',
+        );
     my $language = CTX('config')->get('system.server.i18n.default_language') || 'C';
 
     set_locale_prefix($prefix);
@@ -239,15 +218,12 @@ sub __do_init_prepare_daemon {
     ##! 1: "init prepare daemon"
 
     # create new session
-    POSIX::setsid or
-    die "unable to create new session!: $!";
+    POSIX::setsid or die "unable to create new session!: $!";
 
     # prepare daemonizing myself
     # redirect filehandles
-    open STDOUT, ">/dev/null" or
-    die "unable to write to /dev/null!: $!";
-    open STDIN, "/dev/null" or
-    die "unable to read from /dev/null!: $!";
+    open STDOUT, ">/dev/null" or die "unable to write to /dev/null!: $!";
+    open STDIN, "/dev/null" or die "unable to read from /dev/null!: $!";
 
     chdir '/';
 
@@ -279,10 +255,9 @@ sub __do_init_redirect_stderr {
 
 sub __do_init_volatile_vault {
     ##! 1: "init volatile vault"
-
     my $token = CTX('api2')->get_default_token();
-
     my $vault = OpenXPKI::Crypto::VolatileVault->new({ TOKEN => $token });
+
     OpenXPKI::Server::Context::setcontext({
         'volatile_vault' => $vault
     });
@@ -313,7 +288,7 @@ sub __do_init_acl {
 }
 
 sub __do_init_api {
-    warn "v1 api does no longer exist";
+    warn "API v1 does no longer exist";
 }
 
 sub __do_init_api2 {
@@ -323,6 +298,7 @@ sub __do_init_api2 {
         # acl_rule_accessor => sub { CTX('config')->get_hash('acl.rules.' . CTX('session')->data->role ) },
         log => CTX('log')->system,
     );
+
     OpenXPKI::Server::Context::setcontext({
         'api2' => $api->autoloader
     });
@@ -334,6 +310,7 @@ sub __do_init_authentication {
         or OpenXPKI::Exception->throw (
             message => "I18N_OPENXPKI_SERVER_INIT_DO_INIT_AUTHENTICATION_INSTANTIATION_FAILURE"
         );
+
     OpenXPKI::Server::Context::setcontext({
         'authentication' => $obj
     });
@@ -344,6 +321,7 @@ sub __do_init_server {
     ##! 1: "init server"
     ##! 16: '__do_init_server: ' . Dumper($keys)
     return unless defined $keys->{SERVER};
+
     OpenXPKI::Server::Context::setcontext({
         'server' => $keys->{SERVER}
     });
