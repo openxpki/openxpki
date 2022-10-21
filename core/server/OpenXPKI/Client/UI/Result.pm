@@ -50,7 +50,7 @@ has resp => (
     is => 'ro',
     isa => 'OpenXPKI::Client::UI::Response',
     lazy => 1,
-    default => sub { OpenXPKI::Client::UI::Response->new(ui_result => shift) },
+    default => sub { OpenXPKI::Client::UI::Response->new },
     handles => [ qw(
         redirect
         raw_response has_raw_response
