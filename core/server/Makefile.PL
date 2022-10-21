@@ -338,6 +338,7 @@ WriteMakefile(
         'MooseX::InsideOut'             => '0.106',     # OpenXPKI::Crypto::Secret::Split etc.
         'MooseX::NonMoose'              => 0,           # OpenXPKI::Server::Workflow::Validator::PasswordQuality
         'MooseX::Params::Validate'      => '0.21',      # OpenXPKI::Server::Database
+        'MooseX::StrictConstructor'     => '0.21',
         'Net::DNS'                      => '0.83',
         'Net::LDAP'                     => '0.32',
         'Net::Server'                   => '0.94',

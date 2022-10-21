@@ -1,6 +1,6 @@
 package OpenXPKI::Client::UI::Response::SectionRole;
-
 use Moose::Role;
+
 use Moose::Util::TypeConstraints qw( enum );
 
 has 'type' => (

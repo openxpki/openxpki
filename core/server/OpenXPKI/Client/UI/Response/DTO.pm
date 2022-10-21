@@ -2,6 +2,7 @@ package OpenXPKI::Client::UI::Response::DTO;
 
 # CPAN modules
 use Moose ();
+use MooseX::StrictConstructor ();
 use Moose::Exporter;
 
 # Project modules
@@ -39,7 +40,7 @@ This will modify your package as follows:
 
 =cut
 Moose::Exporter->setup_import_methods(
-    also => [ "Moose" ],
+    also => [ "Moose", "MooseX::StrictConstructor" ],
     with_meta => [ "has_dto" ],
     base_class_roles => [ "OpenXPKI::Client::UI::Response::DTORole" ],
 );
