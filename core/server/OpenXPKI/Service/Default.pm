@@ -1,10 +1,3 @@
-## OpenXPKI::Service::Default.pm
-##
-## Written 2005-2006 by Michael Bell and Martin Bartosch for the OpenXPKI project
-## Polished to use a state-machine like interface 2007 by Alexander Klink
-## for the OpenXPKI project
-## (C) Copyright 2005-2007 by The OpenXPKI Project
-
 package OpenXPKI::Service::Default;
 
 use base qw( OpenXPKI::Service );
@@ -36,6 +29,8 @@ use Log::Log4perl::MDC;
 my %state_of :ATTR;     # the current state of the service
 
 my %max_execution_time  : ATTR( :set<max_execution_time> );
+
+my %api :ATTR; # API instance
 
 sub init {
     my $self  = shift;
@@ -647,9 +642,21 @@ sub __handle_COMMAND : PRIVATE {
     }
 
     eval {
+        # API2 instance
+        # (late initialization because CTX('config') needs CTX('session'), i.e. logged in user)
+        if (not $api{$ident}) {
+            my $enable_acls = not CTX('config')->get(['api','acl','disabled']);
+            $api{$ident} = OpenXPKI::Server::API2->new(
+                enable_acls => $enable_acls,
+                acl_rule_accessor => sub { CTX('config')->get_hash(['api','acl', CTX('session')->data->role]) },
+            );
+        }
+
+        # API wrapper
         $command = OpenXPKI::Service::Default::CommandApi2->new(
             command => $data->{PARAMS}->{COMMAND},
             params  => $data->{PARAMS}->{PARAMS},
+            api => $api{$ident},
         );
     };
     if (my $exc = OpenXPKI::Exception->caught()) {

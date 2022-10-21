@@ -21,11 +21,7 @@ Default service command class to execute commands via the new API (API2).
 has api => (
     is => 'rw',
     isa => 'OpenXPKI::Server::API2',
-    lazy => 1,
-    default => sub { OpenXPKI::Server::API2->new(
-        enable_acls => (not CTX('config')->get(['api','acl','disabled'])),
-        acl_rule_accessor => sub { CTX('config')->get_hash(['api','acl', CTX('session')->data->role ] ) },
-    ) },
+    required => 1,
 );
 
 has command => (
