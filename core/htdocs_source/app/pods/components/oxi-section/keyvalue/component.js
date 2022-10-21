@@ -23,6 +23,6 @@ export default class OxiSectionKeyvalueComponent extends Component {
     }
 
     get hasLabels() {
-        return this.items.filter(i => typeof i.label === 'defined' && i.label !== 0 && i.label !== null).length > 0;
+        return this.items.filter(i => typeof i.label !== 'undefined' && i.label !== 0 && i.label !== null).length > 0;
     }
 }
