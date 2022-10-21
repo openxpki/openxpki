@@ -22,7 +22,6 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server;
 use OpenXPKI::Server::Session;
 use OpenXPKI::Server::Context qw( CTX );
-use OpenXPKI::Service::Default::CommandApi2;
 use Log::Log4perl::MDC;
 
 
@@ -598,111 +597,63 @@ sub __handle_COMMAND : PRIVATE {
     my $ident   = ident $self;
     my $data    = shift;
 
+    my $command = $data->{PARAMS}->{COMMAND};
+    my $params = $data->{PARAMS}->{PARAMS};
+    my $api_version = $data->{PARAMS}->{API} || 2;
+
     OpenXPKI::Exception->throw(
         message => 'I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_COMMAND_MISSING',
-    ) unless exists $data->{PARAMS}->{COMMAND};
+    ) unless $command;
 
-    ##! 16: "executing access control before doing anything else"
-    #eval {
-        # FIXME - ACL
-        #CTX('acl')->authorize ({
-        #        ACTIVITY      => "Service::".$data->{PARAMS}->{COMMAND},
-        #        AFFECTED_ROLE => "",
-        #});
-    #};
-    ##! 32: 'Callstack ' . Dumper $data
-    if (0 || $EVAL_ERROR) {
-        ##! 1: "Permission denied for Service::".$data->{PARAMS}->{COMMAND}."."
-        if (my $exc = OpenXPKI::Exception->caught()) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_PERMISSION_DENIED',
-                params  => {
-                    EXCEPTION => $exc,
-                },
-            );
-        } else {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_PERMISSION_DENIED',
-                params  => {
-                    ERROR => $EVAL_ERROR,
-                },
-            );
-        }
-        return;
-    }
-    ##! 16: "access to command granted"
+    OpenXPKI::Exception->throw (
+        message => "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_UNKNWON_COMMAND_API_VERSION",
+        params  => $data->{PARAMS},
+    ) unless $api_version =~ /^2$/;
 
-    my $command;
-    my $api = $data->{PARAMS}->{API} || 2;
-    if ($api !~ /^2$/) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_UNKNWON_COMMAND_API_VERSION",
-            params  => $data->{PARAMS},
+    # API2 instance
+    # (late initialization because CTX('config') needs CTX('session'), i.e. logged in user)
+    if (not $api{$ident}) {
+        my $enable_acls = not CTX('config')->get(['api','acl','disabled']);
+        $api{$ident} = OpenXPKI::Server::API2->new(
+            enable_acls => $enable_acls,
+            acl_rule_accessor => sub { CTX('config')->get_hash(['api','acl', CTX('session')->data->role]) },
         );
     }
 
-    eval {
-        # API2 instance
-        # (late initialization because CTX('config') needs CTX('session'), i.e. logged in user)
-        if (not $api{$ident}) {
-            my $enable_acls = not CTX('config')->get(['api','acl','disabled']);
-            $api{$ident} = OpenXPKI::Server::API2->new(
-                enable_acls => $enable_acls,
-                acl_rule_accessor => sub { CTX('config')->get_hash(['api','acl', CTX('session')->data->role]) },
-            );
-        }
-
-        # API wrapper
-        $command = OpenXPKI::Service::Default::CommandApi2->new(
-            command => $data->{PARAMS}->{COMMAND},
-            params  => $data->{PARAMS}->{PARAMS},
-            api => $api{$ident},
-        );
-    };
-    if (my $exc = OpenXPKI::Exception->caught()) {
-        if ($exc->message() =~ m{ I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_INVALID_COMMAND }xms) {
-            ##! 16: "Invalid command $data->{PARAMS}->{COMMAND}"
-            # fall-through intended
-        } else {
-            $exc->rethrow();
-        }
-    }
-    elsif ($EVAL_ERROR) {
-        OpenXPKI::Exception->throw (
-            message => "I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_COULD_NOT_INSTANTIATE_COMMAND",
-            params  => { EVAL_ERROR => $EVAL_ERROR },
-        );
-    }
-    return unless defined $command;
-
-    ##! 16: 'command class instantiated successfully'
     my $result;
     eval {
-        CTX('log')->system->debug("Executing command ".$data->{PARAMS}->{COMMAND});
+        CTX('log')->system->debug("Executing command $command");
 
+        # execution timeout
         my $sh;
         if ($max_execution_time{$ident}) {
-            $sh = set_sig_handler( 'ALRM' ,sub {
-                CTX('log')->system->error("Service command ".$data->{PARAMS}->{COMMAND}." was aborted after " . $max_execution_time{$ident});
-                CTX('log')->system->trace("Call was " . Dumper $data->{PARAMS} );
+            $sh = set_sig_handler('ALRM' => sub {
+                CTX('log')->system->error("Service command $command was aborted after " . $max_execution_time{$ident});
+                CTX('log')->system->trace("Call was " . Dumper $data->{PARAMS});
                 OpenXPKI::Exception->throw(
                     message => "Server took too long to respond to your request - aborted!",
-                    params => {
-                        COMMAND => $data->{PARAMS}->{COMMAND}
-                    }
+                    params => { COMMAND => $command },
                 );
             });
             sig_alarm( $max_execution_time{$ident} );
         }
 
-        # enclose command with DBI transaction
+        # check parameters
+        if ($params) {
+            my @violated = grep { $_ =~ /\A_/ } (keys %{$params});
+            OpenXPKI::Exception->throw(
+                message => 'Access to private API command parameters via socket not allowed',
+                params => { keys => \@violated },
+            ) if (@violated);
+        }
+
+        # execute command enclosed with DBI transaction
         CTX('dbi')->start_txn();
-        $result = $command->execute();
+        $result = $api{$ident}->dispatch(command => $command, params => $params);
         CTX('dbi')->commit();
 
-        if ($sh) {
-            sig_alarm(0);
-        }
+        # reset timeout
+        sig_alarm(0) if $sh;
     };
 
     if (my $error = $EVAL_ERROR) {
@@ -722,16 +673,12 @@ sub __handle_COMMAND : PRIVATE {
         );
     }
 
-    ##! 16: 'command executed successfully'
-    # sanity checks on command reply
-    if (! defined $result || ref $result ne 'HASH') {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVICE_DEFAULT_COMMAND_ILLEGAL_COMMAND_RETURN_VALUE',
-        );
-        return;
-    }
-    ##! 16: 'returning result'
-    return $result;
+    ##! 16: 'command executed successfully - returning result'
+    return {
+        SERVICE_MSG => 'COMMAND',
+        COMMAND => $command,
+        PARAMS => $result,
+    };
 }
 
 sub __pki_realm_choice_available : PRIVATE {
@@ -1195,7 +1142,7 @@ Handles the STATUS message by sending back role and user information.
 
 =item * __handle_COMMAND
 
-Handles the COMMAND message by calling the corresponding command if
+Handles the COMMAND message by calling the corresponding API command if
 the user is authorized.
 
 =item * __pki_realm_choice_available

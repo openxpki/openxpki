@@ -609,7 +609,6 @@ OpenXPKI/Serialization/JSON.pm
 OpenXPKI/Serialization/Legacy.pm
 OpenXPKI/Service.pm
 OpenXPKI/Service/Default.pm
-OpenXPKI/Service/Default/CommandApi2.pm
 
 OpenXPKI/Service/LibSCEP.pm
 OpenXPKI/Service/LibSCEP/Command.pm
