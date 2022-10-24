@@ -1038,11 +1038,17 @@ msgstr "Meine Workflows"
 msgid "I18N_OPENXPKI_UI_NCIPHER_CONSOLE_DESC"
 msgstr "Konsole: nFast 'preload' Skript"
 
-msgid "I18N_OPENXPKI_UI_NCIPHER_ERROR_NO_CONSOLE"
-msgstr "Der Abfrage-Workflow lieferte keine Konsolenausgabe."
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_FINISH_LABEL"
+msgstr "HSM freischalten"
 
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_PASSPHRASE_LABEL"
 msgstr "Passphrase"
+
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_REFRESH_LABEL"
+msgstr "Bildschirm aktualisieren"
+
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_STOP_LABEL"
+msgstr "HSM sperren"
 
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_SUBMIT_LABEL"
 msgstr "Senden"

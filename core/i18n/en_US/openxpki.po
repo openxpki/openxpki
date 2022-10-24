@@ -1043,11 +1043,17 @@ msgstr "My Workflows"
 msgid "I18N_OPENXPKI_UI_NCIPHER_CONSOLE_DESC"
 msgstr "Console: nFast 'preload' script"
 
-msgid "I18N_OPENXPKI_UI_NCIPHER_ERROR_NO_CONSOLE"
-msgstr "The query workflow did not return any console output."
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_FINISH_LABEL"
+msgstr "Unlock HSM"
 
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_PASSPHRASE_LABEL"
 msgstr "Passphrase"
+
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_REFRESH_LABEL"
+msgstr "Refresh screen"
+
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_STOP_LABEL"
+msgstr "Lock HSM"
 
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_SUBMIT_LABEL"
 msgstr "Send"

@@ -1314,12 +1314,20 @@ msgid "I18N_OPENXPKI_UI_NCIPHER_CONSOLE_DESC"
 msgstr "Paese"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_NCIPHER_ERROR_NO_CONSOLE"
-msgstr "Paese"
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_FINISH_LABEL"
+msgstr "cerca adesso"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_PASSPHRASE_LABEL"
 msgstr "Relazioni"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_REFRESH_LABEL"
+msgstr "cerca adesso"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_STOP_LABEL"
+msgstr "cerca adesso"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_SUBMIT_LABEL"

@@ -1139,12 +1139,20 @@ msgid "I18N_OPENXPKI_UI_NCIPHER_CONSOLE_DESC"
 msgstr "国"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_NCIPHER_ERROR_NO_CONSOLE"
-msgstr "エラーコード"
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_FINISH_LABEL"
+msgstr "今すぐ検索"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_PASSPHRASE_LABEL"
 msgstr "パスフレーズ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_REFRESH_LABEL"
+msgstr "今すぐ検索"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_STOP_LABEL"
+msgstr "今すぐ検索"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_SUBMIT_LABEL"

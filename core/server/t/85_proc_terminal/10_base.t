@@ -60,14 +60,14 @@ lives_and { ok $term->_check_server } "server is running";
 
 lives_ok {
     wait_for($term, 'password #1');
-    $term->input_password("pwd:1\n");
+    $term->input("pwd:1\n");
     #note ">> pwd:1";
     wait_for($term, 'PASSWORD_OK');
 } "correct password gets accepted";
 
 lives_ok {
     wait_for($term, 'password #2');
-    $term->input_password("pwd:2\n");
+    $term->input("pwd:2\n");
     #note ">> pwd:2";
     wait_for($term, 'PASSWORD_WRONG');
 } "wrong password gets rejected";
