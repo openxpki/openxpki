@@ -30,9 +30,9 @@ sub wait_for {
 
     note "Waiting for: '$expected'";
 
-    for (my $tries = 3; $tries > 0; $tries--) {
+    for (my $tries = 5; $tries > 0; $tries--) {
         my $all_output = $term->output;
-        #note join("\n", map { "<< $_" } split /\n/, $all_output);
+        note join("\n", map { "<< $_" } split /\n/, $all_output);
         return 1 if ($all_output =~ /\Q$expected\E/);
         sleep 1;
     }
@@ -41,46 +41,42 @@ sub wait_for {
 
 my $tempdir = File::Temp::tempdir(CLEANUP => 1);
 
-for my $use_pseudo_terminal (0,1) {
-    note "Using process terminal in " . ($use_pseudo_terminal ? 'pseudo TTY' : 'pipe') . " mode";
+my $term = OpenXPKI::Server::ProcTerminal::Client->new(
+    name => 'test',
+    server_pidfile => "$tempdir/terminal.pid",
+    socket_file => "$tempdir/terminal.sock",
+    system_command => ['/bin/bash', '-c', "$Bin/bash-proc.sh" ],
+);
 
-    my $term = OpenXPKI::Server::ProcTerminal::Client->new(
-        name => 'test',
-        server_pidfile => "$tempdir/terminal.pid",
-        socket_file => "$tempdir/terminal.sock",
-        system_command => ['/bin/bash', '-c', "$Bin/bash-proc.sh" ],
-        use_pseudo_terminal => $use_pseudo_terminal,
-    );
+lives_and { ok !$term->_check_server } "no server";
+lives_and { ok !$term->is_running } "no external process";
 
-    lives_and { ok !$term->_check_server } "no server";
-    lives_and { ok !$term->is_running } "no external process";
+lives_ok { $term->run } "start external process";
+lives_and { ok $term->is_running } "external process is running";
 
-    lives_ok { $term->run } "start external process";
-    lives_and { ok $term->is_running } "external process is running";
+dies_ok { $term->run } "complain when trying to start another external process";
 
-    dies_ok { $term->run } "complain when trying to start another external process";
+lives_and { ok $term->_check_server } "server is running";
 
-    lives_and { ok $term->_check_server } "server is running";
+lives_ok {
+    wait_for($term, 'password #1');
+    $term->input_password("pwd:1\n");
+    #note ">> pwd:1";
+    wait_for($term, 'PASSWORD_OK');
+} "correct password gets accepted";
 
-    lives_ok {
-        wait_for($term, 'password #1');
-        $term->input_password("pwd:1\n");
-        #note ">> pwd:1";
-        wait_for($term, 'PASSWORD_OK');
-    } "correct password gets accepted";
+lives_ok {
+    wait_for($term, 'password #2');
+    $term->input_password("pwd:2\n");
+    #note ">> pwd:2";
+    wait_for($term, 'PASSWORD_WRONG');
+} "wrong password gets rejected";
 
-    lives_ok {
-        wait_for($term, 'password #2');
-        $term->input_password("pwd:2\n");
-        #note ">> pwd:2";
-        wait_for($term, 'PASSWORD_WRONG');
-    } "wrong password gets rejected";
+sleep 1 while ($term->is_running);
 
-    lives_and { is $term->exit_code, 33 } "correct exit code";
+lives_and { is $term->exit_code, 33 } "correct exit code";
 
-    lives_ok { $term->stop_server } "stop server";
-    lives_and { ok !$term->_check_server } "no server";
-
-}
+lives_ok { $term->stop_server } "stop server";
+lives_and { ok !$term->_check_server } "no server";
 
 done_testing;

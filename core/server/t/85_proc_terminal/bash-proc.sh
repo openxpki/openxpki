@@ -15,10 +15,10 @@ while /bin/true; do
         echo -e "\nERROR during read: $?"
     fi
     echo -e "\nProcessing [$passwd] ..."
-    sleep 1
     if [[ $passwd == "pwd:1" ]]; then echo "PASSWORD_OK"; else echo "PASSWORD_WRONG"; fi
     if [[ $num == 2 ]]; then break; fi
 done
 
+sleep 2
 echo "Exiting"
 exit 33
