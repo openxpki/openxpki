@@ -19,6 +19,7 @@
                         @format={{item.format}}
                         @value={{item.value}}
                         @truncate={{@isInfoBox}}
+                        @class={{if item._refreshing "refreshing"}}
                     />
                 </div>
             {{/if}}
