@@ -1365,15 +1365,6 @@ msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_NCIPHER_CONSOLE_DESC"
-msgstr ""
-"Используйте данный профиль сертификата только если Вы отчетливо "
-"представляете себе необходимую структуру имени субъекта сертификата, хорошо "
-"знаете компоненты этой структуры и соглашения об использовании имен в Вашей "
-"части инфраструктуры открытых ключей. Данный профиль позволяет использовать "
-"также произвольный набор альтернативных имен."
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_FINISH_LABEL"
 msgstr "Дочерние технологические процессы"
 
@@ -1382,11 +1373,7 @@ msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_PASSPHRASE_LABEL"
 msgstr "Родительский технологический процесс"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_REFRESH_LABEL"
-msgstr "Дочерние технологические процессы"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_STOP_LABEL"
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_RESET_LABEL"
 msgstr "Дочерние технологические процессы"
 
 #, fuzzy
@@ -10086,6 +10073,14 @@ msgstr "Имя учетной записи"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_KEY_ENC_"
 #~ msgstr "Имя учетной записи"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_REFRESH_LABEL"
+#~ msgstr "Дочерние технологические процессы"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_START_LABEL"
+#~ msgstr "Дочерние технологические процессы"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_NOT_IN_RENWAL_WINDOW_WARNING"

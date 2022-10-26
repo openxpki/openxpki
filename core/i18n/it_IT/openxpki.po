@@ -1310,10 +1310,6 @@ msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
 msgstr "Workflow"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_NCIPHER_CONSOLE_DESC"
-msgstr "Paese"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_FINISH_LABEL"
 msgstr "cerca adesso"
 
@@ -1322,11 +1318,7 @@ msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_PASSPHRASE_LABEL"
 msgstr "Relazioni"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_REFRESH_LABEL"
-msgstr "cerca adesso"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_STOP_LABEL"
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_RESET_LABEL"
 msgstr "cerca adesso"
 
 #, fuzzy
@@ -5396,6 +5388,14 @@ msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST94"
 #~ msgstr "GOST 94"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_REFRESH_LABEL"
+#~ msgstr "cerca adesso"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_START_LABEL"
+#~ msgstr "cerca adesso"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_NOT_IN_RENWAL_WINDOW_WARNING"

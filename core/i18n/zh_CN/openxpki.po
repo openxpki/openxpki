@@ -1102,10 +1102,6 @@ msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
 msgstr "我的工作流程"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_NCIPHER_CONSOLE_DESC"
-msgstr "国家"
-
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_FINISH_LABEL"
 msgstr "马上搜索"
 
@@ -1114,11 +1110,7 @@ msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_PASSPHRASE_LABEL"
 msgstr "密码短语"
 
 #, fuzzy
-msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_REFRESH_LABEL"
-msgstr "马上搜索"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_STOP_LABEL"
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_RESET_LABEL"
 msgstr "马上搜索"
 
 #, fuzzy
@@ -4658,6 +4650,14 @@ msgstr "是"
 
 #~ msgid "I18N_OPENXPKI_UI_KEY_ALG_GOST94"
 #~ msgstr "GOST 94"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_REFRESH_LABEL"
+#~ msgstr "马上搜索"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_START_LABEL"
+#~ msgstr "马上搜索"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_OPENVPN_EXPORT_FILENAME_LABEL"

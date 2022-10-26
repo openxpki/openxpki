@@ -1040,20 +1040,14 @@ msgstr "This page shows a list of all workflows started by you."
 msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
 msgstr "My Workflows"
 
-msgid "I18N_OPENXPKI_UI_NCIPHER_CONSOLE_DESC"
-msgstr "Console: nFast 'preload' script"
-
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_FINISH_LABEL"
-msgstr "Unlock HSM"
+msgstr "Finish: Unlock HSM"
 
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_PASSPHRASE_LABEL"
 msgstr "Passphrase"
 
-msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_REFRESH_LABEL"
-msgstr "Refresh screen"
-
-msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_STOP_LABEL"
-msgstr "Lock HSM"
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_RESET_LABEL"
+msgstr "Reset: Lock HSM"
 
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_SUBMIT_LABEL"
 msgstr "Send"
@@ -1062,7 +1056,7 @@ msgid "I18N_OPENXPKI_UI_NCIPHER_PAGE_DESC"
 msgstr "Please follow the instructions of the console output."
 
 msgid "I18N_OPENXPKI_UI_NCIPHER_PAGE_LABEL"
-msgstr "Unlock NCipher HSM"
+msgstr "Unlock nCipher HSM"
 
 msgid "I18N_OPENXPKI_UI_NICE_BACKEND_ERROR"
 msgstr "Backend Communication Error"

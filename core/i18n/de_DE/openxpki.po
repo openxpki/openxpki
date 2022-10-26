@@ -1035,20 +1035,14 @@ msgstr "Diese Seite zeigt alle von ihnen initierten Workflows."
 msgid "I18N_OPENXPKI_UI_MY_WORKFLOW_TITLE"
 msgstr "Meine Workflows"
 
-msgid "I18N_OPENXPKI_UI_NCIPHER_CONSOLE_DESC"
-msgstr "Konsole: nFast 'preload' Skript"
-
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_FINISH_LABEL"
-msgstr "HSM freischalten"
+msgstr "Fertig: HSM freischalten"
 
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_PASSPHRASE_LABEL"
 msgstr "Passphrase"
 
-msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_REFRESH_LABEL"
-msgstr "Bildschirm aktualisieren"
-
-msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_STOP_LABEL"
-msgstr "HSM sperren"
+msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_RESET_LABEL"
+msgstr "Reset: HSM sperren"
 
 msgid "I18N_OPENXPKI_UI_NCIPHER_INPUT_SUBMIT_LABEL"
 msgstr "Senden"
@@ -1057,7 +1051,7 @@ msgid "I18N_OPENXPKI_UI_NCIPHER_PAGE_DESC"
 msgstr "Bitte folgen Sie den Anweisungen der Konsolenausgabe."
 
 msgid "I18N_OPENXPKI_UI_NCIPHER_PAGE_LABEL"
-msgstr "Freischaltung NCipher HSM"
+msgstr "Freischaltung nCipher HSM"
 
 msgid "I18N_OPENXPKI_UI_NICE_BACKEND_ERROR"
 msgstr "Fehler bei der Backend-Kommunikation"
