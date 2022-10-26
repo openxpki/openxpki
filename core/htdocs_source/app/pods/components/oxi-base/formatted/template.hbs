@@ -7,7 +7,7 @@
         <OxiBase::Label
             @text={{v}}
             @tooltip={{if @truncate v}}
-            @class="oxi-formatted-text {{if @truncate "oxi-truncate"}}"
+            @class="oxi-formatted-text {{if @truncate "oxi-truncate"}} {{@class}}"
         />
 
     {{else if (eq "raw" this.format)}}
@@ -15,14 +15,14 @@
             @text={{this.valueStr}}
             @raw={{true}}
             @raw_tooltip={{if @truncate v}}
-            @class="oxi-formatted-raw {{if @truncate "oxi-truncate"}}"
+            @class="oxi-formatted-raw {{if @truncate "oxi-truncate"}} {{@class}}"
         />
 
     {{else if (eq "subject" this.format)}}
         <OxiBase::Label
             @text={{v}}
             @tooltip={{if @truncate v}}
-            @class="oxi-formatted-subject {{if @truncate "oxi-truncate"}} d-inline-flex"
+            @class="oxi-formatted-subject {{if @truncate "oxi-truncate"}} d-inline-flex {{@class}}"
         />
 
     {{else if (eq "nl2br" this.format)}}
