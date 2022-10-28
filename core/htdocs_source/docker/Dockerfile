@@ -17,7 +17,7 @@ ARG NPM_CUSTOM_REGISTRY
 RUN test -n "$NPM_CUSTOM_REGISTRY" \
   && echo "==========\nUsing npm registry $NPM_CUSTOM_REGISTRY\n==========" \
   && npm config set registry $NPM_CUSTOM_REGISTRY \
-  || true
+  || echo "\nNo custom npm registry set (or it did not respond)\n"
 
 # install pnpm
 RUN npm install -g pnpm \
