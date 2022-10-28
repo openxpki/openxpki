@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-test -z $1 && echo "Please specify a 'pnpm run' command as argument" && exit 1 || true
+test -z $1 && echo "Please specify a command as argument" && exit 1 || true
 
 echo -e "\n[Copy source code without node_modules/]"
 OPTS=(--recursive --links --devices --specials --times --delete --inplace --quiet)
@@ -32,8 +32,21 @@ fi
 rsync "${OPTS[@]}" \
   /node_modules/ /build/node_modules
 
-echo -e "\n[pnpm run $1]"
-cd /build
-# The output path for compiled assets is changed to /compiled via
-# OPENXPKI_BUILD_OUTPUT_PATH (which is read inpackage.json).
-OPENXPKI_BUILD_OUTPUT_PATH=/compiled pnpm run $1
+if [[ "$1" == "serve" || "$1" == "build" ]]; then
+  cd /build
+  echo -e "\n[pnpm run $1]"
+  # The output path for compiled assets can be changed via
+  # OPENXPKI_BUILD_OUTPUT_PATH (which is read in package.json).
+  OPENXPKI_BUILD_OUTPUT_PATH=/compiled pnpm run "$1"
+  exit
+fi
+
+if [ "$1" == "update-ember" ]; then
+  echo -e "\n[Update ember-cli and ember-cli-update]"
+  pnpm remove ember-cli ember-cli-update
+  pnpm install --save-dev ember-cli ember-cli-update
+  cp package.json pnpm-lock.yaml /output
+
+  echo -e "\nDone.\npackage.json and pnpm-lock.yaml were updated on your host."
+  exit
+fi

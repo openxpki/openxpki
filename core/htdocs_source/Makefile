@@ -53,15 +53,7 @@ help:
 #
 # Compile Ember
 #
-ember: docker-build compile ## compile Ember code using a Docker image
-
-nocache: MANAGER_OPTS_BUILD += --no-cache
-nocache: ember ## compile Ember code in Docker without cache (force re-installation of node_modules)
-
-debug: BUILD_UNMINIFIED = 1 ## compile Ember but with unminified JavaScript + incl. sourcemaps
-debug: ember
-
-compile:
+ember: docker-build ## compile Ember code using a Docker image
 	$(MANAGER) run $(MANAGER_OPTS_RUN) -ti --rm \
 	  -v $(abspath ./):/source:ro \
 	  -v $(abspath ../server/htdocs):/compiled \
@@ -69,6 +61,12 @@ compile:
 	  $(IMAGE) \
 	  build
 	perl update-manifest.pl $(abspath ../server)
+
+nocache: MANAGER_OPTS_BUILD += --no-cache
+nocache: ember ## compile Ember code in Docker without cache (force re-installation of node_modules)
+
+debug: BUILD_UNMINIFIED = 1 ## compile Ember but with unminified JavaScript + incl. sourcemaps
+debug: ember
 
 #
 # Run local Ember.js development server
@@ -79,6 +77,16 @@ serve: docker-build ## run Ember.js development server
 	  -e "DEV_SERVER_FORWARD_TO=$(DEV_SERVER_FORWARD_TO)" \
 	  $(IMAGE) \
 	  serve
+
+#
+# Update Ember
+#
+update-ember: docker-build
+	$(MANAGER) run $(MANAGER_OPTS_RUN) -ti --rm \
+	  -v $(abspath ./):/source:ro \
+	  -v $(abspath ./):/output \
+	  $(IMAGE) \
+	  update-ember
 
 #
 # Build Docker image
