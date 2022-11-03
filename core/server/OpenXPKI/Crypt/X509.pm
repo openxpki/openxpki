@@ -248,6 +248,18 @@ around BUILDARGS => sub {
 
 };
 
+
+=item cn
+
+Get the value of the subject CN field.
+
+=cut
+
+sub cn {
+    my $self = shift;
+    return $self->subject_hash()->{CN}->[0];
+}
+
 =item get_notbefore / get_notafter I<format>
 
 Returns the notbefore / notafter date in the given format. For allowed
