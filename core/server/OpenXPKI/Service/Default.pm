@@ -626,16 +626,19 @@ sub __handle_COMMAND : PRIVATE {
 
         # execution timeout
         my $sh;
-        if ($max_execution_time{$ident}) {
-            $sh = set_sig_handler('ALRM' => sub {
-                CTX('log')->system->error("Service command $command was aborted after " . $max_execution_time{$ident});
-                CTX('log')->system->trace("Call was " . Dumper $data->{PARAMS});
-                OpenXPKI::Exception->throw(
-                    message => "Server took too long to respond to your request - aborted!",
-                    params => { COMMAND => $command },
+
+        my $timeout = $data->{PARAMS}->{TIMEOUT} || $max_execution_time{$ident};
+        if ($timeout) {
+            ##! 16: 'running command with timeout of ' . $timeout
+            $sh = set_sig_handler( 'ALRM' ,sub {
+                CTX('log')->system->error("Service command ".$command." was aborted after " . $timeout);
+                CTX('log')->system->trace("Call was " . Dumper $data->{PARAMS} );
+                OpenXPKI::Exception::Timeout->throw(
+                    message => "Command took too long to - aborted!",
+                    params => { command => $command }
                 );
             });
-            sig_alarm( $max_execution_time{$ident} );
+            sig_alarm( $timeout );
         }
 
         # check parameters

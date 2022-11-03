@@ -221,7 +221,7 @@ sub talk {
 
     if ($EVAL_ERROR) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_CLIENT_SEND_RECEIVE_SERVICE_MSG_ERROR_DURING_SEND_SERVICE_MSG',
+            message => 'Error while writing to socket',
             params  => {
                 EVAL_ERROR => $EVAL_ERROR,
             },
@@ -231,8 +231,12 @@ sub talk {
     my $result;
     my $sh = set_sig_handler('ALRM', sub {
         $self->close_connection();
-        OpenXPKI::Exception->throw(
-            message => "I18N_OPENXPKI_CLIENT_COLLECT_TIMEOUT",
+        OpenXPKI::Exception::Timeout->throw(
+            message => 'Timeout while reading from socket',
+            params  => {
+                command => ($msg->{SERVICE_MSG} eq 'COMMAND' ? $msg->{PARAMS}->{COMMAND} : $msg->{SERVICE_MSG}),
+                timeout => $self->timeout()
+            },
         );
     });
 
@@ -244,7 +248,7 @@ sub talk {
 
     if (my $eval_err = $EVAL_ERROR) {
         OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_CLIENT_SEND_RECEIVE_SERVICE_MSG_ERROR_DURING_COLLECT',
+            message => 'Error while reading from socket',
             params  => {
                 EVAL_ERROR => $eval_err,
             },

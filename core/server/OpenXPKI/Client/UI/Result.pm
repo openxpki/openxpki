@@ -153,18 +153,23 @@ sub send_command_v2 {
     my $self = shift;
     my $command = shift;
     my $params = shift || {};
-    my $nostatus = shift || 0;
+
+    my $flags = shift || { nostatus => 0 };
+    # legacy - third argument was boolean "nostatus"
+    if (!ref $flags && $flags) {
+        $flags = { nostatus => 1 };
+    }
 
     my $backend = $self->_client()->backend();
     my $reply = $backend->send_receive_service_msg(
-        'COMMAND', { COMMAND => $command, PARAMS => $params, API => 2 }
+        'COMMAND', { COMMAND => $command, PARAMS => $params, API => 2, TIMEOUT => ($flags->{timeout} || 0 ) }
     );
     $self->_last_reply( $reply );
 
     $self->logger()->trace('send command raw reply: '. Dumper $reply) if $self->logger->is_trace;
 
     if ( $reply->{SERVICE_MSG} ne 'COMMAND' ) {
-        if (!$nostatus) {
+        if (!$flags->{nostatus}) {
             $self->logger()->error("command $command failed ($reply->{SERVICE_MSG})");
             $self->logger()->trace("command reply ". Dumper $reply) if $self->logger()->is_trace;
             $self->set_status_from_error_reply( $reply );

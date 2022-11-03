@@ -26,6 +26,10 @@ use Exception::Class (
         isa         => 'OpenXPKI::Exception',
         fields => [ 'error', 'authinfo' ],
     },
+    'OpenXPKI::Exception::Timeout' => {
+        isa         => 'OpenXPKI::Exception',
+        fields => [ 'error', 'command', 'timeout' ],
+    },
 );
 
 my $log4perl_logger;
