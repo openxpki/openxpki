@@ -348,7 +348,7 @@ sub __do_init_terminal {
         require OpenXPKI::Server::ProcTerminal;
     }
     catch ($err) {
-        return if $err =~ /locate.*\@INC/; # silently fail if file does not exist
+        return if $err =~ m{locate OpenXPKI/Server/ProcTerminal\.pm in \@INC}; # silently fail if file does not exist
         die $err;
     }
 
