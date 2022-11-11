@@ -55,12 +55,14 @@ sub execute {
         subject => '',
         delimiter => '|',
         format => 'csv',
+        aggregate => '',
         tenant => ($workflow->attrib('tenant') || ''),
+        head => 'Full Certificate Report, Realm [% pki_realm %], Validity Date: [% valid_at %], Export Date: [% export_date %][% IF report_config %], Report Config [% report_config %][% END %]',
     };
 
-    my @param = qw(cutoff_notbefore cutoff_notafter include_revoked include_expired unique_subject profile subject head delimiter format tenant);
+    # define general setting parameters
+    my @param = keys %{$p};
     my $query_attr;
-
 
     foreach my $key ($self->param()) {
         # we are not interessted in undef parameters
@@ -117,13 +119,13 @@ sub execute {
                 $p->{$key} = $config->get(['report', $report_config, $key]);
             }
         }
-
         @columns = $config->get_list(['report', $report_config, 'cols']);
         @head = map { $_->{head} // '' } @columns;
     }
 
     ##! 16: 'Params ' . Dumper $p
     ##! 16: 'Query Attributes ' . Dumper $query_attr
+    configuration_error('Invalid value for aggregate parameter') unless(!$p->{aggregate} || $p->{aggregate} eq 'count');
 
     # If include_revoke it not set, we filter on ISSUED status
     if (!$p->{include_revoked}) {
@@ -169,14 +171,12 @@ sub execute {
         $where{'notafter'} = { '>=', $expiry_cutoff };
     }
 
-
     # Allow pattern search with *Subject* and %Subject%
     if ($p->{subject}) {
         my $subject = ref $p->{subject} ? $p->{subject} : [ $p->{subject} ];
         @$subject = map { s/\*/%/g; $_ } @$subject;
         $where{'certificate.subject'} = { 'like' => $subject };
     }
-
 
     my $need_csr = 0;
     my $need_attr = 0;
@@ -214,8 +214,10 @@ sub execute {
         'certificate.subject_key_identifier',
         'certificate.authority_key_identifier'
     ];
+    my @header = ("request id", "subject", "serial", "identifier", "notbefore", "notafter", "status", "issuer");
 
     my $join = '';
+    my @groupby;
     # join csr table for profile
     if ($need_csr) {
         $join = ' {req_key=req_key,pki_realm=pki_realm} csr ';
@@ -225,10 +227,16 @@ sub execute {
     # If single attributes are requested, create extra joins
     if (!$need_attr && @attr) {
         my $ii=0;
+        # if aggregate is on we reset the columns list
+        if ($p->{aggregate}) {
+            $cols = [];
+            @header = ();
+        }
         foreach my $aa (@attr) {
             $ii++;
             $join .= " =>certificate.identifier=ca${ii}.identifier,ca${ii}.attribute_contentkey='$aa' certificate_attributes|ca${ii} ";
             push @{$cols}, "ca${ii}.attribute_value as $aa";
+            push @groupby, $aa if ($p->{aggregate});
 
             if (exists $query_attr->{$aa}) {
                 $where{"ca${ii}.attribute_value"} = $query_attr->{$aa};
@@ -250,8 +258,18 @@ sub execute {
     ##! 32: $join
     ##! 32: $cols
     ##! 32: \%where
+    if (@groupby) {
+        push @{$cols}, 'count(*) as amount';
+        push @head, '';
+        $sth = CTX('dbi')->select(
+            ($join ? (from_join => 'certificate '.$join) : (from => 'certificate')),
+            columns  => $cols,
+            where => \%where,
+            group_by => \@groupby,
+            order_by => \@groupby
+        );
 
-    if ($join) {
+    } elsif ($join) {
         $sth = CTX('dbi')->select(
             from_join => 'certificate '.$join,
             order_by => [ '-notbefore', '-req_key' ],
@@ -270,10 +288,6 @@ sub execute {
     }
 
     my $delim = $p->{delimiter} || '|';
-
-    if (!defined $p->{head}) {
-        $p->{head} = "Full Certificate Report, Realm [% pki_realm %], Validity Date: [% valid_at %], Export Date: [% export_date %][% IF report_config %], Report Config [% report_config %][% END %]";
-    }
 
     my $head = $tt->render($p->{head}, {
         pki_realm => $pki_realm,
@@ -340,7 +354,7 @@ sub execute {
     if (!$fh) { # target memory, receives only the data!
 
         $buffer = {
-            header => ["request id", "subject", "serial", "identifier", "notbefore", "notafter", "status", "issuer", @head],
+            header => [@header, @head],
             value => [],
         };
         $buffer->{title} = $head if ($head);
@@ -355,13 +369,12 @@ sub execute {
         } else {
             print $fh "{";
         }
-        my $bb = $json->encode(["request id", "subject", "serial", "identifier", "notbefore", "notafter", "status", "issuer", @head]);
+        my $bb = $json->encode([@header, @head]);
         print $fh '"header":'.$bb.'],{"data":[';
 
     } else {
-
         if ($head) { print $fh $head."\n"; }
-        print $fh join($delim, "request id", "subject", "serial", "identifier", "notbefore", "notafter", "status", "issuer", @head)."\n";
+        print $fh join($delim, @header, @head)."\n";
     }
 
     my $subject_seen = {};
@@ -376,24 +389,28 @@ sub execute {
             $subject_seen ->{ $subject } = 1;
         }
 
-        my $serial = unpack('H*', Math::BigInt->new( $item->{cert_key})->to_bytes );
-
-        my $status = $item->{status};
-        if ($status eq 'ISSUED' && $item->{notafter} < $epoch) {
-            $status = 'EXPIRED';
-        }
 
         $cnt++;
-        my @line = (
-            $item->{req_key},
-            $item->{subject},
-            $serial,
-            $item->{identifier},
-            DateTime->from_epoch( epoch => $item->{notbefore} )->iso8601(),
-            DateTime->from_epoch( epoch => $item->{notafter} )->iso8601(),
-            $status,
-            $item->{issuer_dn}
-        );
+        my @line;
+        # default header is on, add default items
+        if (@header) {
+            my $serial = unpack('H*', Math::BigInt->new( $item->{cert_key})->to_bytes );
+
+            my $status = $item->{status};
+            if ($status eq 'ISSUED' && $item->{notafter} < $epoch) {
+                $status = 'EXPIRED';
+            }
+            @line = (
+                $item->{req_key},
+                $item->{subject},
+                $serial,
+                $item->{identifier},
+                DateTime->from_epoch( epoch => $item->{notbefore} )->iso8601(),
+                DateTime->from_epoch( epoch => $item->{notafter} )->iso8601(),
+                $status,
+                $item->{issuer_dn}
+            );
+        }
 
         my $attrib;
         if ($need_attr) {
@@ -428,6 +445,9 @@ sub execute {
                     push @line, '';
                 }
             }
+        }
+        if (@groupby) {
+            push @line, $item->{amount}
         }
 
         if (!$fh) {
@@ -578,6 +598,12 @@ for each subject is included in the report. Note that filtering on subject
 is done AFTER the other filters, e.g. in case you do not include revoked
 certifiates you get the latest one that was not revoked. Subjects are
 compared case insensitive!
+
+=item aggregate
+
+Pass the name of a column you want to aggregate the result on. This will
+turn off the default columns and append the rowcount per line as the last
+column.
 
 =item subject
 
