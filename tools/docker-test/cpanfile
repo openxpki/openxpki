@@ -6,7 +6,6 @@ requires 'Cache::LRU' => '0';
 requires 'Class::Std' => '0.0.8';
 requires 'Config::Merge' => '1';
 requires 'Config::Std' => '0';
-requires 'Config::Versioned' => '0';
 requires 'Connector' => '1.32';
 requires 'Crypt::Argon2' => '0';
 requires 'Crypt::CBC' => '2.29';
