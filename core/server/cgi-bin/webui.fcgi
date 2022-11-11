@@ -238,6 +238,8 @@ while (my $cgi = CGI::Fast->new()) {
     # Set the path to the directory component of the script, this
     # automagically creates seperate cookies for path based realms
     my $realm_mode = $conf->{global}->{realm_mode} || '';
+    my $realm_detect;
+    $log->debug('realm_mode is ' . $realm_mode);
     if ($realm_mode eq "path") {
 
         my $script_path = $ENV{'REQUEST_URI'};
@@ -260,21 +262,34 @@ while (my $cgi = CGI::Fast->new()) {
                     $backend_client->detach();
                     next;
                 }
-                $log->debug('detected realm is ' . $conf->{realm}->{$script_realm});
-
-                my ($realm, $stack) = split (/;/,$conf->{realm}->{$script_realm});
-                $session_front->param('pki_realm', $realm);
-                if ($stack) {
-                    $session_front->param('auth_stack', $stack);
-                    $log->debug('Auto-Select stack based on realm path');
-                }
+                $realm_detect = $conf->{realm}->{$script_realm};
             } else {
                 $log->warn('Unable to read realm from url path');
             }
         }
+    } elsif ($realm_mode eq "hostname") {
+        my $host = $ENV{HTTP_HOST};
+        $log->trace('realm map is: ' . Dumper $conf->{realm});
+        foreach my $rule (keys %{$conf->{realm}}) {
+            next unless ($host =~ qr/\A$rule\z/);
+            $log->trace("realm detection match: $host / $rule ");
+            $realm_detect = $conf->{realm}->{$rule};
+            last;
+        }
+        $log->warn('Unable to find realm from hostname: ' . $host) unless($realm_detect);
     } elsif ($realm_mode eq "fixed") {
         # Fixed realm mode, mode must be defined in the config
-        $session_front->param('pki_realm', $conf->{global}->{realm});
+        $realm_detect = $conf->{global}->{realm};
+    }
+
+    if ($realm_detect) {
+        $log->debug('detected realm is ' . $realm_detect);
+        my ($realm, $stack) = split (/;/,$realm_detect);
+        $session_front->param('pki_realm', $realm);
+        if ($stack) {
+            $session_front->param('auth_stack', $stack);
+            $log->debug('Auto-Select stack based on realm detection');
+        }
     }
 
     if ($conf->{login} && $conf->{login}->{stack}) {
