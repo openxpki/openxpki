@@ -15,10 +15,13 @@ use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($FATAL);
 
 my $client;
-my @allowed_methods = ('ping');
+my @allowed_methods;
 
 # do NOT expose this unless you are in a test environment
+# set directly from here, e.g. for testing
 # push @allowed_methods ,'showenv';
+# set from ENV via apache
+@allowed_methods = split /\W+/, $ENV{OPENXPKI_HEALTHCHECK} if ($ENV{OPENXPKI_HEALTHCHECK});
 
 my $socketfile = $ENV{OPENXPKI_CLIENT_SOCKETFILE} || '/var/openxpki/openxpki.socket';
 
@@ -53,25 +56,32 @@ sub ping {
     }
 }
 
-sub showenv {
+my %dispatch = (
+    showenv => sub {
+        my $cgi = shift;
+        print $cgi->header( -type => 'application/json', charset => 'utf8', -status => 200 );
+        print encode_json( \%ENV );
+    }
+);
 
-    my $cgi = shift;
-    print $cgi->header( -type => 'application/json', charset => 'utf8', -status => 200 );
-    print encode_json( \%ENV );
-
-}
 DEBUG("Start healtcheck pid $$");
 while (my $cgi = CGI::Fast->new()) {
 
     $ENV{REQUEST_URI} =~ m{healthcheck/(\w+)};
     my $method = $1 || 'ping';
-    $method = 'ping' unless( grep { m{\A$method\z} } @allowed_methods );
 
-    if ($method eq 'showenv') {
-        showenv($cgi);
-    } else {
+    if ($method eq 'ping') {
         ping($cgi);
+        next;
     }
+
+    if ( grep { m{\A$method\z} } @allowed_methods ) {
+        $dispatch{$method}($cgi);
+        next;
+    }
+
+    print $cgi->header( -type => 'text/plain', charset => 'utf8', -status => 404 );
+    print "Method unsupported or not allowed\n";
 
 }
 
