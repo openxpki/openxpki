@@ -58,6 +58,12 @@ sub update {
         my (  $last_state, $action_name, $exception ) = @_;
         $prio = 'error';
         $msg = "Workflow $id/$type/$state failed on $action_name from $last_state, error: $exception";
+    } elsif ( $event eq 'retry_exceeded' ) {
+        $prio = 'error';
+        $msg = "Workflow $id/$type/$state retry_exceeded";
+    } elsif ( $event eq 'exception' ) {
+        $prio = 'error';
+        $msg = "Workflow $id/$type/$state uncaught exception";
     }
 
 
