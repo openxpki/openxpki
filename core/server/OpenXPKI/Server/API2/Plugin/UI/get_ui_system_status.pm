@@ -82,7 +82,7 @@ command "get_ui_system_status" => {
     # - get last expiring CRL for each token (identifier)
     # - within these get the CRL which expires first
     my $crl_expiry;
-    if ($groups->{certsign}) {
+    if ($groups->{certsign} && CTX('config')->exists('crl')) {
         my $now = time;
         my $db_crl = CTX('dbi')->select_one(
             columns => [ "MAX(next_update) AS latest_update" ],
