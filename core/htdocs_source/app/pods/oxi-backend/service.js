@@ -42,9 +42,8 @@ export default class OxiBackendService extends Service {
         }
 
         return fetch(url, params)
-        // Network error, thrown by fetch() itself
+        // Log and rethrow network errors
         .catch(error => {
-            this.error = this.intl.t('error_popup.message.network', { reason: error.message });
             console.error('The server connection seems to be lost', error);
             throw error;
         });
