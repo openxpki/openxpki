@@ -3,7 +3,7 @@ use OpenXPKI::Client::UI::Response::DTO;
 
 has 'label' => (
     is => 'rw',
-    isa => 'Str',
+    isa => 'Str|Undef',
 );
 
 has 'shortlabel' => (
