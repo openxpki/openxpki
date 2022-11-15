@@ -9,6 +9,9 @@ PACKAGES=			\
 
 DEBIAN_VERSION = $(shell cat /etc/debian_version)
 
+# As we use --recursive in dh-make-perl make sure that all deps that
+# are available from the debian repositories are contained in the
+# build-deps.list as they will otherwise built again!
 EXTERNAL=				\
 	Class__Observable \
 	Config__Merge \
@@ -24,9 +27,7 @@ EXTERNAL=				\
 	JSON__MaybeXS \
 	Log__Log4perl__Layout__JSON \
 	Proc__SafeExec \
-	YAML__Tiny
-
-EXTERNAL2= \
+	YAML__Tiny \
 	Connector \
 	Workflow
 
@@ -35,19 +36,15 @@ CORE = \
     Module__Build__Tiny \
     Module__Load
 
-.PHONY : $(PACKAGES) $(EXTERNAL) $(EXTERNAL2) CGI
+.PHONY : $(PACKAGES) $(EXTERNAL) CGI
 
 openxpki: $(PACKAGES)
 
-cpan: cpan_dependency cpan_dependency2
+cpan: cpan_dependency
 
 cpan_dependency: $(EXTERNAL)
 
-cpan_dependency2: $(EXTERNAL2)
-
-release: cpan_dependency cpan_dependency2 Crypt__LibSCEP openxpki
-
-trusty: CGI Module__Build__Tiny Module__Load
+release: cpan_dependency Crypt__LibSCEP openxpki
 
 default:	clean
 	$(MAKE) $(EXTERNAL)
@@ -55,17 +52,13 @@ default:	clean
 	$(MAKE) resultlocal
 	$(MAKE) check
 
-# Fetch outdated version of Workflow because the newest isn't
-# compatible with OpenXPKI
+# run dh-make-perl with --install --recursive to auto-build/add missing dependancies
+# for Buster this is required for at least Feature::Compat::Try pulling in
+# Syntax::Keyword::Try and other deps that are too old in buster repos
 $(EXTERNAL):
 	test -d deb || mkdir deb
 	test -d deb/cpan || mkdir deb/cpan/
-	cd deb/cpan/ && DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl --build $($@_BUILDOPTS) --cpan $(subst __,::,$@)
-
-$(EXTERNAL2):
-	test -d deb || mkdir deb
-	test -d deb/cpan || mkdir deb/cpan/
-	cd deb/cpan/ && PERL5LIB=`pwd`"/../../lib/:$PERL5LIB" DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl --build --cpan $(subst __,::,$@)
+	cd deb/cpan/ && DEBEMAIL=debian@openxpki.org DEBFULLNAME="OpenXPKI Foundation" DEB_BUILD_OPTIONS=nocheck dh-make-perl --build $($@_BUILDOPTS) --recursive --install --cpan $(subst __,::,$@)
 
 $(CORE):
 	test -d deb || mkdir deb
