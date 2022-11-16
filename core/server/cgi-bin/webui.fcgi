@@ -6,21 +6,26 @@
 # the use CGI::Fast from the modules list.
 # In either case, you might need to change the extension of the scripturl in
 # the webui config file.
+use strict;
+use warnings;
+use English;
 
+# Core modules
+use Data::Dumper;
+use MIME::Base64 qw( encode_base64 decode_base64 );
+use Digest::SHA;
+
+# CPAN modules
 use CGI 4.08;
 use CGI::Fast;
 use CGI::Session;
 use JSON;
-use English;
-use strict;
-use warnings;
-use Data::Dumper;
 use Config::Std;
-use OpenXPKI::Log4perl;
 use Log::Log4perl::MDC;
-use MIME::Base64 qw( encode_base64 decode_base64 );
-use Digest::SHA;
 use Crypt::CBC;
+
+# Project modules
+use OpenXPKI::Log4perl;
 use OpenXPKI::i18n qw( i18nGettext i18nTokenizer set_language set_locale_prefix);
 use OpenXPKI::Client;
 use OpenXPKI::Client::Config;
