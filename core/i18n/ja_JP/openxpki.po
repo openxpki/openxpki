@@ -733,6 +733,10 @@ msgstr "PKCS12"
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS12_LEGACY"
 msgstr "PKCS12"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS12_VANILLA"
+msgstr "PKCS12"
+
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS8_DER"
 msgstr "PKCS8 (DER)"
 
@@ -1108,12 +1112,24 @@ msgid "I18N_OPENXPKI_UI_NICE_KEYGEN_DELAYED"
 msgstr "IDEA"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_NO_SUCH_BACKEND"
+msgstr "バックエンドエラー"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_NICE_UPDATE_DOMAINLIST"
 msgstr "関連するワークフローを表示する"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "いいえ"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NOTIFY_PENDING_NEXT_RUN"
+msgstr ""
+"別名で<b>正確な</b>検索を行います。ワイルドカードとして '*' や '_' を指定する"
+"と、部分一致の検索を行います。特定の別名タイプを指定する場合、コロンを付けた"
+"プレフィックスを指定します。例えば 'IP:10.*' は、サブネット 10.x のIPアドレス"
+"である別名アイテムを検索します。"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE"
@@ -1297,6 +1313,10 @@ msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC"
 msgstr "システムに最も適したホスト名（ドメイン名）を入力します。"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
+msgstr "国"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_RESPONDER_LABEL"
 msgstr "User Profile"
 
@@ -1399,6 +1419,10 @@ msgstr "URI"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
 msgstr "URI"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_STATE_DESC"
+msgstr "システムに最も適したホスト名（ドメイン名）を入力します。"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL"
 msgstr "TLS Client Profile"
@@ -2163,6 +2187,10 @@ msgstr "自動ポリシーの決定を無効にして、登録を続行します
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_LABEL"
 msgstr "ポリシーを無効にする"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_REEVALUATE_POLICY_LABEL"
+msgstr "有効性の編集"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_INITIALIZE_DESC"
 msgstr " "
 
@@ -2177,6 +2205,17 @@ msgstr "このワークフローをキャンセルします。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_CANCEL_LABEL"
 msgstr "リクエストのキャンセル"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_IMPORTCRL_UPLOAD_DESC"
+msgstr ""
+"PKCS10形式でご要望を提供してください。ブロックをテキストエリアに投稿するか、"
+"アップロードボタンを使用してローカルコンピュータのファイルを使用することがで"
+"きます。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_IMPORTCRL_UPLOAD_LABEL"
+msgstr "CSR(PKCS10)のアップロード"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_DESC"
 msgstr ""
@@ -2554,6 +2593,10 @@ msgstr "証明書識別子のリストはスペースまたは改行で区切ら
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_LABEL"
+msgstr "証明書リスト"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_LIST_LABEL"
 msgstr "証明書リスト"
 
 #, fuzzy
@@ -3067,6 +3110,10 @@ msgstr ""
 "あなた自身でパスワードを設定することも、自動的にパスワードを作成することもで"
 "きます。"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PEMCRL_LABEL"
+msgstr "Eメール"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_DESC"
 msgstr ""
 "PKCS10形式のリクエストを直接フィールドに貼り付けるか、アップロードボタンを使"
@@ -3083,6 +3130,23 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
 msgstr "PKCS10でエンコードされたリクエスト"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_DESC"
+msgstr ""
+"PKCS7形式の証明書バンドルをフィールドに直接貼り付けるか、アップロードボタンを"
+"使用してローカルコンピューターからファイルをロードしてください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_LABEL"
+msgstr "PKCS7"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_PLACEHOLDER"
+msgstr ""
+"PEMエンコードされたリクエストをここに貼り付けて(----- BEGIN PKCS7 ----- のよ"
+"うにする必要があります)、または下の参照/アップロードボタンを使用してコン"
+"ピューターからファイルをロードしてください。"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_TOOLTIP"
+msgstr "PKCS7エンコードされたリクエスト"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_CERTIFICATE_KEY_DUPLICATE"
 msgstr "重複した鍵証明書"
@@ -3859,6 +3923,10 @@ msgstr "初期状態"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_INITIAL_LABEL"
 msgstr "初期状態"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRLIMPORT_SUCCESS_DESC"
+msgstr "証明書が失効され、失効リストが発行されました。"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_BACKGROUND_DESC"
 msgstr ""
 "証明書失効リストの作成は、内部プロセスに移行されました。失効した証明書の数に"
@@ -4349,6 +4417,14 @@ msgstr "証明書のメタデータを変更します。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_LABEL"
 msgstr "メタデータの変更"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_DESC"
+msgstr "証明書をエクスポートします。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_LABEL"
+msgstr "証明書のエクスポート"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_DESC"
 msgstr "CRLを発行します。"
 
@@ -4399,6 +4475,15 @@ msgstr "タイプ"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_DESC"
 msgstr ""
 "期限切れになる証明書について、メールで期限切れの通知を送信してください。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_ESCALATION_DESC"
+msgstr ""
+"期限切れになる証明書について、メールで期限切れの通知を送信してください。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_ESCALATION_LABEL"
+msgstr "証明書失効通知"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 msgstr "証明書失効通知"
@@ -4464,6 +4549,10 @@ msgstr "SCEP GetCA"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RESETPASS_LABEL"
 msgstr "SCEP GetCA"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_GETCA_SHOW_CHAIN_LABEL"
+msgstr "SCEP検索"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_DESC"
 msgstr "トランザクションIDでSCEPワークフローを検索する"
 
@@ -4492,6 +4581,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_USER_AGENT_DESC"
 msgstr ""
 "このワークフローでは、SCEPインターフェイスを使用して証明書の登録リクエストを"
 "処理します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_VALIDATOR_PEMCRL_INVALID"
+msgstr "http（s）://で始まる正しい形式のURLを入力してください"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKEUP_AT_LABEL"
 msgstr "実行"
@@ -4583,10 +4676,6 @@ msgstr "はい"
 #~ msgid "I18N_OPENXPKI_UI_PAUSED_CRL_TOKEN_NOT_USABLE"
 #~ msgstr "CRL署名トークンがオンラインではありません"
 
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
-#~ msgstr "国"
-
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_NODEID"
 #~ msgstr "ノードID"
 
@@ -4631,10 +4720,6 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_LABEL"
 #~ msgstr "SCEP登録認証の証明書"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_STATE_DESC"
-#~ msgstr "システムに最も適したホスト名（ドメイン名）を入力します。"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_BASIC_DESC"
 #~ msgstr "TLS認証を使用するクライアントのプロファイル"
@@ -5346,6 +5431,10 @@ msgstr "はい"
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_APPROVE"
 #~ msgstr "リクエストの承認"
 
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_OVERRIDE_POLICY_LABEL"
+#~ msgstr "ポリシーを無効にする"
+
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_REJECT"
 #~ msgstr "リクエストの拒否"
 
@@ -5624,23 +5713,6 @@ msgstr "はい"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_TOOLTIP"
 #~ msgstr " "
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_DESC"
-#~ msgstr ""
-#~ "PKCS7形式の証明書バンドルをフィールドに直接貼り付けるか、アップロードボタ"
-#~ "ンを使用してローカルコンピューターからファイルをロードしてください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_LABEL"
-#~ msgstr "PKCS7"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_PLACEHOLDER"
-#~ msgstr ""
-#~ "PEMエンコードされたリクエストをここに貼り付けて(----- BEGIN PKCS7 ----- の"
-#~ "ようにする必要があります)、または下の参照/アップロードボタンを使用してコン"
-#~ "ピューターからファイルをロードしてください。"
-
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_TOOLTIP"
-#~ msgstr "PKCS7エンコードされたリクエスト"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_REPLACE_CERT_IDENTIFIER_DESC"
 #~ msgstr "このワークフローで置き換えられる証明書。"
@@ -6768,14 +6840,6 @@ msgstr "はい"
 #~ msgstr "証明書をエクスポートします。"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_LABEL"
-#~ msgstr "証明書のエクスポート"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_DESC"
-#~ msgstr "証明書をエクスポートします。"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_LABEL"
 #~ msgstr "証明書のエクスポート"
 
 #, fuzzy

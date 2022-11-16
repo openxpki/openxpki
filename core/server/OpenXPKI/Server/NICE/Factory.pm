@@ -26,7 +26,7 @@ sub getHandler {
 
     if(!eval("require $BackendClass")){
         OpenXPKI::Exception->throw(
-              message => "I18N_OPENXPKI_SERVER_NICE_NO_SUCH_BACKEND",
+              message => "I18N_OPENXPKI_UI_NICE_NO_SUCH_BACKEND",
               params => {
                   backend => $backend,
                   class =>  $BackendClass,

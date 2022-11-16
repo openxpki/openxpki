@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2022-08-17 10:27+0200\n"
+"PO-Revision-Date: 2022-11-21 15:17+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -411,23 +411,17 @@ msgstr "Challenge Password"
 msgid "I18N_OPENXPKI_UI_CSR_KEY_GENERATION_FAILED"
 msgstr "Schlüsselerzeugung fehlgeschlagen"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION"
-msgstr "die Sperrung wird nach dem angegebenen Zeitpunkt ausgeführt"
+msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_CERT"
 msgstr ""
-"Eine verzögerte Sperrung erlaubt es ein Zertifikat zu einem Zeitpunkt in der "
-"Zukunft automatisch zu sperren."
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_DISCONTINUED"
-msgstr "ohne Angabe / andere Gründe"
+msgstr ""
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_CUST_WORKFLOW_FIELD_REVOCATION_REASON_OPTION_KEY"
-msgstr "die Sperrung wird nach dem angegebenen Zeitpunkt ausgeführt"
+msgstr ""
 
 msgid "I18N_OPENXPKI_UI_DELAYED_REVOCATION_REQUESTED"
 msgstr "verzögerte Sperrung beantragt"
@@ -1033,12 +1027,18 @@ msgstr "Ausstellung ausstehend"
 msgid "I18N_OPENXPKI_UI_NICE_KEYGEN_DELAYED"
 msgstr "Schlüsselerzeugung ausstehend"
 
+msgid "I18N_OPENXPKI_UI_NICE_NO_SUCH_BACKEND"
+msgstr "Konfiguriertes NICE backend ist nicht verfügbar!"
+
 msgid "I18N_OPENXPKI_UI_NICE_UPDATE_DOMAINLIST"
 msgstr "Aktualisiere Domainliste"
 
 # Remove?
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "Nein"
+
+msgid "I18N_OPENXPKI_UI_NOTIFY_PENDING_NEXT_RUN"
+msgstr "Workflow wartet auf nächste Benachrichtung"
 
 msgid "I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE"
 msgstr "Unter dieser Adresse ist keine Service eingerichtet."
@@ -1212,6 +1212,9 @@ msgstr "Servername"
 msgid "I18N_OPENXPKI_UI_PROFILE_HOSTNAME_DESC"
 msgstr "Geben Sie bitte den FQDN (Hostname) des Systems an."
 
+msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
+msgstr "Ort / Lokalität (L)"
+
 msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_RESPONDER_LABEL"
 msgstr "OCSP-Responder"
 
@@ -1311,6 +1314,9 @@ msgstr "URI"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
 msgstr "URI"
+
+msgid "I18N_OPENXPKI_UI_PROFILE_STATE_DESC"
+msgstr "Region oder Bundesland (ST)"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL"
 msgstr "TLS Client"
@@ -2091,6 +2097,9 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_LABEL"
 msgstr "Policy ignorieren"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_REEVALUATE_POLICY_LABEL"
+msgstr "Policy erneut prüfen"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_INITIALIZE_DESC"
 msgstr " "
 
@@ -2105,6 +2114,12 @@ msgstr "Cancel this workflow."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_CANCEL_LABEL"
 msgstr "Workflow abbrechen"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_IMPORTCRL_UPLOAD_DESC"
+msgstr "Importieren Sie eine extern erstellte CRL in diesen Realm."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_IMPORTCRL_UPLOAD_LABEL"
+msgstr "CRL hochladen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_DESC"
 msgstr ""
@@ -2483,6 +2498,9 @@ msgstr "Liste von Zertfifikats-IDs, getrennt mit Leerzeichen oder zeilenweise"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_LABEL"
 msgstr "Zertifikat"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_LIST_LABEL"
+msgstr "Zertifikate"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_PLACEHOLDER"
 msgstr " "
@@ -2982,6 +3000,9 @@ msgstr ""
 " Sie können hier ein Passwort eingeben oder die PKI ein Kennwort erzeugen "
 "lassen"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PEMCRL_LABEL"
+msgstr "PEM Kodierte Sperrliste"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_DESC"
 msgstr " "
 
@@ -2996,6 +3017,22 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
 msgstr "Ihr PKCS#10 Zertifikatsantrag"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_DESC"
+msgstr " "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_LABEL"
+msgstr "PKCS#7 Container"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_PLACEHOLDER"
+msgstr ""
+"Fügen Sie hier den PEM kodierten Zertifikatsantrag ein ( -----BEGIN "
+"PKCS7-----) oder verwenden Sie 'Durchsuchen', um eine Datei von ihrem "
+"Arbeitsplatzrechner auszuwählen."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_TOOLTIP"
+msgstr "Ihr PKCS#7 Container"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_POLICY_CERTIFICATE_KEY_DUPLICATE"
 msgstr "Policy Verletzung: Zertifikate mit diesem Schlüssel"
@@ -3754,6 +3791,11 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_INITIAL_LABEL"
 msgstr "Zertifikat veröffentlichen"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRLIMPORT_SUCCESS_DESC"
+msgstr ""
+"Die Sperrliste wurde importiert, falls erforderlich starten Sie eine "
+"Publizierung bitte manuell."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_BACKGROUND_DESC"
 msgstr ""
 "Die Sperrliste wird im Hintergrund erzeugt. Abhängig von der Anzahl der "
@@ -4307,6 +4349,12 @@ msgstr "Ändern der Meta-Daten eines Zertifikates"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_LABEL"
 msgstr "Meta-Daten ändern"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_DESC"
+msgstr "Importiert Sperrlisten von externen CAs"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_LABEL"
+msgstr "Sperrliste importieren"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_DESC"
 msgstr "Erlaubt das Ausstellen von Sperrlisten."
 
@@ -4339,13 +4387,13 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EDITUSER_LABEL"
 msgstr "Typ"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_ESCROWKEY_DESC"
-msgstr "Aufstellung der Menge an Zertifikaten nach Status."
+msgstr ""
+"Laden Sie einen hinterlegten Schlüssel zur Wiederherstellung durch einen "
+"Escrow-Officer herunter"
 
-#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_ESCROWKEY_LABEL"
-msgstr "Privaten Schlüssel herunterladen"
+msgstr "Hinterlegten Schlüssel herunterladen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_EXPORT_PRIVATEKEY_DESC"
 msgstr ""
@@ -4360,6 +4408,12 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_DESC"
 msgstr ""
 "Ablaufwarnungen per E-Mail für alle Zertifikate versenden, welche in den "
 "nächsten 30 Tagen ablaufen."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_ESCALATION_DESC"
+msgstr "  "
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_ESCALATION_LABEL"
+msgstr "Ablaufwarnung (eskalierend)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
 msgstr "Ablaufwarnung"
@@ -4421,6 +4475,9 @@ msgstr "Search for SCEP workflows by transaction id"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RESETPASS_LABEL"
 msgstr "SCEP Search"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_GETCA_SHOW_CHAIN_LABEL"
+msgstr "Zeige gespeicherte Antwort zu SCEP GetCACert"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_DESC"
 msgstr "Enrollment-Workflow nach 'transaction id' suchen"
 
@@ -4445,6 +4502,9 @@ msgstr "Workflowinformationen konnten nicht geladen werden."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_USER_AGENT_DESC"
 msgstr "Von der Client-Software übermittelter User-Agent"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_VALIDATOR_PEMCRL_INVALID"
+msgstr "CRL Daten sind fehlerhaft"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKEUP_AT_LABEL"
 msgstr "aufwecken"
 
@@ -4453,6 +4513,10 @@ msgstr "ja"
 
 #~ msgid "I18N_OPENXPKI_UI_DICE_UPDATE_DOMAINLIST"
 #~ msgstr "Aktualisiere Domainliste"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_OVERRIDE_POLICY_LABEL"
+#~ msgstr "Policy ignorieren"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"

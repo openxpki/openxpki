@@ -882,6 +882,10 @@ msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS12_LEGACY"
 msgstr "Informazioni Processi"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS12_VANILLA"
+msgstr "Informazioni Processi"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_EXPORT_PRIVATEKEY_KEY_FORMAT_PKCS8_DER"
 msgstr "Descrizione del profilo client OpenVPN per gli utenti"
 
@@ -1294,6 +1298,10 @@ msgid "I18N_OPENXPKI_UI_NICE_KEYGEN_DELAYED"
 msgstr "IDEA"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_NICE_NO_SUCH_BACKEND"
+msgstr "Errore sconosciuto"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_NICE_UPDATE_DOMAINLIST"
 msgstr "Mostra i workflow correlati"
 
@@ -1301,6 +1309,10 @@ msgstr "Mostra i workflow correlati"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "Chiave"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NOTIFY_PENDING_NEXT_RUN"
+msgstr "Numero di serie del certificato"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_NO_SUCH_REALM_OR_SERVICE"
@@ -1494,6 +1506,10 @@ msgstr ""
 "tuo sistema."
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
+msgstr "Paese"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_PROFILE_OCSP_RESPONDER_LABEL"
 msgstr "Persone Fisiche (Email Sicura / Autenticazione)"
 
@@ -1596,6 +1612,12 @@ msgstr "URI"
 
 msgid "I18N_OPENXPKI_UI_PROFILE_SAN_URI_DESCRIPTION"
 msgstr "URI"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_PROFILE_STATE_DESC"
+msgstr ""
+"Inserisci il nome completo a dominio (FQN = Fully Qualified Hostname) del "
+"tuo sistema."
 
 msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_LABEL"
 msgstr "Client TLS"
@@ -2453,6 +2475,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_OVERRIDE_POLICY_LABEL"
 msgstr "Scavalca Policy"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_ENROLL_REEVALUATE_POLICY_LABEL"
+msgstr "Modifica Validità"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_EXPORT_PRIVATEKEY_INITIALIZE_DESC"
 msgstr "Esporta lo stato iniziale"
 
@@ -2469,6 +2495,18 @@ msgstr "Cancella questo workflow."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_GLOBAL_CANCEL_LABEL"
 msgstr "Cancella Richiesta"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_IMPORTCRL_UPLOAD_DESC"
+msgstr ""
+"Per favore forniscici la tua richiesta in formato PKCS10. Puoi inserire "
+"tramite copia/incolla il blocco nel campo testo, oppure caricare il file "
+"contenente la richiesta direttamente dal tuo hard disk, tramite il pulsante "
+"Upload."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_IMPORTCRL_UPLOAD_LABEL"
+msgstr "Carica CSR (PKCS10)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_INIT_ISSUE_CRL_DESC"
 msgstr ""
@@ -2872,6 +2910,10 @@ msgstr "Certificato"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_LABEL"
+msgstr "Certificato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERTIFICATE_LIST_LABEL"
 msgstr "Certificato"
 
 #, fuzzy
@@ -3417,6 +3459,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PASSWORD_TYPE_TOOLTIP"
 msgstr ""
 "Puoi inserire una tua password o lasciare che il server ne generi una per te."
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PEMCRL_LABEL"
+msgstr "Email"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_DESC"
 msgstr ""
 "Incolla la tua richiesta in formato PKCS10 direttamente nel campo testuale "
@@ -3432,6 +3478,27 @@ msgstr ""
 "caricare un file dal tuo computer."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS10_TOOLTIP"
+msgstr "La tua richiesta codificata in formato PKCS10"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_DESC"
+msgstr ""
+"Incolla la tua richiesta in formato PKCS10 direttamente nel campo testuale "
+"oppure usa il pulsante upload per caricare un file dal tuo computer"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_LABEL"
+msgstr "Richiesta PKCS10"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_PLACEHOLDER"
+msgstr ""
+"Incolla la tua richiesta in formato PEM qui (deve iniziare con -----BEGIN "
+"CERTIFICATE REQUEST——) oppure usa il pulsante browse/upload qui sotto per "
+"caricare un file dal tuo computer."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_TOOLTIP"
 msgstr "La tua richiesta codificata in formato PKCS10"
 
 #, fuzzy
@@ -4262,6 +4329,12 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CERT_PUBLISH_INITIAL_LABEL"
 msgstr "Stato"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRLIMPORT_SUCCESS_DESC"
+msgstr ""
+"Il certificato è stato revocato ed è stata emessa una nuova Lista Revoche "
+"(CRL)."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRL_ISSUE_BACKGROUND_DESC"
 msgstr "Inizializzo..."
 
@@ -4803,6 +4876,14 @@ msgstr "Modifica i Metadati di un certificato."
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CHANGE_METADATA_LABEL"
 msgstr "Modifica Metadati"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_DESC"
+msgstr "Esporta il Certificato nel formato desiderato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_LABEL"
+msgstr "Esporta Certificato"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_ISSUANCE_DESC"
 msgstr "Emetti le Liste Revoche (CRL)."
 
@@ -4860,6 +4941,14 @@ msgstr "Tipo"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_DESC"
 msgstr "Esporta il Certificato nel formato desiderato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_ESCALATION_DESC"
+msgstr "Esporta il Certificato nel formato desiderato"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_ESCALATION_LABEL"
+msgstr "Esporta Certificato"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_NOTIFY_EXPIRY_LABEL"
@@ -4935,6 +5024,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_RESETPASS_LABEL"
 msgstr "Ricerca nei Workflow"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_GETCA_SHOW_CHAIN_LABEL"
+msgstr "Ricerca nei Workflow"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_SCEP_SEARCH_DESC"
 msgstr "Ricerca nei Workflow usando i filtri qui sotto."
 
@@ -4966,6 +5059,12 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_USER_AGENT_DESC"
 msgstr ""
 "Questo Workflow gestisce le richieste di sottoscrizione dei certificati "
 "tramite interfaccia SCEP."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_VALIDATOR_PEMCRL_INVALID"
+msgstr ""
+"Per favore inserisci un URL correttamente formattato, con il prefisso "
+"http(s)://"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_WAKEUP_AT_LABEL"
 msgstr "Riavvia"
@@ -5122,10 +5221,6 @@ msgstr "Chiave"
 #~ msgstr "Il token di firma della CRL non è online"
 
 #, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_LOCALITY_DESC"
-#~ msgstr "Paese"
-
-#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_NODEID"
 #~ msgstr "Nome Organizzazione"
 
@@ -5173,12 +5268,6 @@ msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_SCEP_CLIENT_LABEL"
 #~ msgstr "Certificato per l’Autenticazione dell’adesione a SCEP"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_PROFILE_STATE_DESC"
-#~ msgstr ""
-#~ "Inserisci il nome completo a dominio (FQN = Fully Qualified Hostname) del "
-#~ "tuo sistema."
 
 #~ msgid "I18N_OPENXPKI_UI_PROFILE_TLS_CLIENT_BASIC_DESC"
 #~ msgstr "Profilo per gli utenti che usano l’Autenticazione TLS."
@@ -5940,6 +6029,10 @@ msgstr "Chiave"
 #~ msgstr "continua"
 
 #, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_OVERRIDE_POLICY_LABEL"
+#~ msgstr "Scavalca Policy"
+
+#, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_PERSIST_DATA"
 #~ msgstr "Persist CSR"
 
@@ -6223,28 +6316,6 @@ msgstr "Chiave"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_META_REQUESTOR_TOOLTIP"
 #~ msgstr " "
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_DESC"
-#~ msgstr ""
-#~ "Incolla la tua richiesta in formato PKCS10 direttamente nel campo "
-#~ "testuale oppure usa il pulsante upload per caricare un file dal tuo "
-#~ "computer"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_LABEL"
-#~ msgstr "Richiesta PKCS10"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_PLACEHOLDER"
-#~ msgstr ""
-#~ "Incolla la tua richiesta in formato PEM qui (deve iniziare con -----BEGIN "
-#~ "CERTIFICATE REQUEST——) oppure usa il pulsante browse/upload qui sotto per "
-#~ "caricare un file dal tuo computer."
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_PKCS7_TOOLTIP"
-#~ msgstr "La tua richiesta codificata in formato PKCS10"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_RENEWAL_SUBJECT_CHANGED_WARNING"
@@ -7431,14 +7502,6 @@ msgstr "Chiave"
 #~ msgstr "Esporta il Certificato nel formato desiderato"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_EXPORT_LABEL"
-#~ msgstr "Esporta Certificato"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_DESC"
-#~ msgstr "Esporta il Certificato nel formato desiderato"
-
-#, fuzzy
-#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CRL_IMPORT_LABEL"
 #~ msgstr "Esporta Certificato"
 
 #, fuzzy

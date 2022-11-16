@@ -50,7 +50,7 @@ sub execute {
                 message => "I18N_OPENXPKI_WORKFLOW_ACTIVITY_TOOLS_PAUSE_MISSING_DURATION"
         ) unless($interval);
 
-        $reason = 'I18N_OPENXPKI_WORKFLOW_ACTIVITY_TOOLS_PAUSE_NO_REASON' unless ($reason);
+        $reason = 'I18N_OPENXPKI_WORKFLOW_UI_PAUSE_NO_REASON' unless ($reason);
 
         $self->set_max_allowed_retries(1);
         $self->pause( $reason, $interval );
