@@ -14,6 +14,7 @@ use English;
 use Data::Dumper;
 use MIME::Base64 qw( encode_base64 decode_base64 );
 use Digest::SHA;
+use Scalar::Util qw( blessed );
 
 # CPAN modules
 use CGI 4.08;
@@ -330,7 +331,7 @@ while (my $cgi = CGI::Fast->new()) {
         $log->trace(ref($result).' - '.Dumper({ map { $_ => $result->{$_} } qw( type _page redirect extra _result ) }) ) if $log->is_trace();
     };
 
-    if (!$result || ref $result !~ /OpenXPKI::Client::UI/) {
+    unless (blessed $result and $result->isa('OpenXPKI::Client::UI::Result')) {
         __handle_error($cgi, $EVAL_ERROR);
         $log->trace('Result: ' . Dumper $result) if $log->is_trace();
     }
