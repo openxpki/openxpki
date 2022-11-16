@@ -44,13 +44,10 @@ has _client => (
     init_arg => 'client',
 );
 
-# Internal attributes
-
 has resp => (
     is => 'ro',
     isa => 'OpenXPKI::Client::UI::Response',
-    lazy => 1,
-    default => sub { OpenXPKI::Client::UI::Response->new },
+    required => 1,
     handles => [ qw(
         redirect
         raw_response has_raw_response
@@ -68,6 +65,8 @@ has resp => (
         user set_user
     ) ],
 );
+
+# Internal attributes
 
 has _last_reply => (
     is => 'rw',
@@ -99,16 +98,6 @@ has _prefix_jwt => (
     isa => 'Str',
     default => '_encrypted_jwt_',
 );
-
-sub BUILD {
-
-    my $self = shift;
-    # load global client status (warnings from init) if set
-    if ($self->_client->_status->is_set) {
-        $self->resp->status($self->_client->_status);
-    }
-
-}
 
 sub _init_session {
 
