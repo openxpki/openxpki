@@ -472,7 +472,7 @@ sub handle_login {
     my $cgi = $req->cgi();
     my $reply = $args->{reply};
 
-    $reply = $self->backend()->send_receive_service_msg('PING') if (!$reply);
+    $reply = $self->backend->send_receive_service_msg('PING') if (!$reply);
 
     my $status = $reply->{SERVICE_MSG};
 
@@ -480,24 +480,25 @@ sub handle_login {
 
     # Login works in three steps realm -> auth stack -> credentials
 
-    my $session = $self->session();
+    my $session = $self->session;
     my $page = $req->param('page') || '';
 
     # this is the incoming logout action
     if ($page eq 'logout') {
         $result->redirect->to('login!logout');
-        return $result->render();
+        return $result->render;
     }
 
     # this is the redirect to the "you have been logged out page"
     if ($page eq 'login!logout') {
-        return $result->init_logout()->render();
+        $result->init_logout;
+        return $result->render;
     }
 
     # action is only valid within a post request
     my $action = $self->__get_action($req);
 
-    $self->logger()->info('not logged in - doing auth - page is '.$page.' - action is ' . $action);
+    $self->logger->info('not logged in - doing auth - page is '.$page.' - action is ' . $action);
 
     # Special handling for pki_realm and stack params
     if ($action eq 'login!realm' && $req->param('pki_realm')) {
