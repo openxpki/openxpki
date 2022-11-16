@@ -30,6 +30,13 @@ has 'session' => (
     isa => 'CGI::Session|Undef',
 );
 
+# Response structure (JSON or some raw bytes) and HTTP headers
+has 'resp' => (
+    is => 'rw',
+    isa => 'OpenXPKI::Client::UI::Response',
+    required => 1,
+);
+
 # the OXI::Client object
 has 'backend' => (
     is => 'rw',
@@ -61,31 +68,6 @@ has '_auth' => (
     init_arg => 'auth',
     predicate => 'has_auth',
 );
-
-# Hold warnings from init
-has '_status' => (
-    is => 'rw',
-    isa => 'OpenXPKI::Client::UI::Response::Status',
-    default => sub { OpenXPKI::Client::UI::Response::Status->new },
-    lazy => 1,
-);
-
-# Response structure (JSON or some raw bytes) and HTTP headers
-has '_response' => (
-    is => 'rw',
-    isa => 'OpenXPKI::Client::UI::Response',
-    builder => '_build_response',
-    lazy => 1,
-);
-
-sub _build_response {
-    my $self = shift;
-
-    my $resp = OpenXPKI::Client::UI::Response->new;
-    # load global client status (warnings from init) if set
-    $resp->status($self->_status) if $self->_status->is_set;
-    return $resp;
-}
 
 =head2 _init_backend
 
@@ -125,7 +107,7 @@ sub _init_backend {
                 # The session has gone - start a new one - might happen if the gui
                 # was idle too long or the server was flushed
                 $client->init_session({ SESSION_ID => undef });
-                $self->_status->warn(i18nGettext('I18N_OPENXPKI_UI_BACKEND_SESSION_GONE'));
+                $self->resp->status->warn(i18nGettext('I18N_OPENXPKI_UI_BACKEND_SESSION_GONE'));
             } else {
                 $self->logger()->error('Error creating backend session: ' . $eval_err->{message});
                 $self->logger()->trace($eval_err);
@@ -188,7 +170,7 @@ sub handle_request {
         my $result = OpenXPKI::Client::UI::Result->new({
             client => $self,
             req => $req,
-            resp => $self->_response,
+            resp => $self->resp,
         });
         $self->logger()->debug("Send redirect to $goto");
         $result->redirect->to($goto);
@@ -215,7 +197,7 @@ sub handle_request {
             my $result = OpenXPKI::Client::UI::Result->new({
                 client => $self,
                 req => $req,
-                resp => $self->_response,
+                resp => $self->resp,
             });
             $result->redirect->to($redirectTo);
             return $result->render();
@@ -238,7 +220,7 @@ sub handle_request {
         my $result = OpenXPKI::Client::UI::Result->new({
             client => $self,
             req => $req,
-            resp => $self->_response,
+            resp => $self->resp,
         });
         $self->logger()->debug("Got error from server");
         $result->set_status_from_error_reply($reply);
@@ -251,7 +233,7 @@ sub handle_request {
         my $result = OpenXPKI::Client::UI::Bootstrap->new({
             client => $self,
             req => $req,
-            resp => $self->_response,
+            resp => $self->resp,
         });
         $result->init_structure;
         return $result->render;
@@ -369,7 +351,7 @@ sub __load_class {
             client => $self,
             req => $req,
             extra => $params,
-            resp => $self->_response,
+            resp => $self->resp,
         });
 
         return ($obj, $method);
@@ -410,7 +392,7 @@ sub __get_action {
         } else {
 
             $self->logger()->debug("Request with invalid rtoken ($rtoken_request != $rtoken_session)!");
-            $self->_status->error(i18nGettext('I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID'));
+            $self->resp->status->error(i18nGettext('I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID'));
         }
     }
     return '';
@@ -465,7 +447,7 @@ sub handle_page {
             $self->logger()->debug("Method is $method");
             $result->$method( $method_args );
         } else {
-            $self->_status->error(i18nGettext('I18N_OPENXPKI_UI_ACTION_NOT_FOUND'));
+            $self->resp->status->error(i18nGettext('I18N_OPENXPKI_UI_ACTION_NOT_FOUND'));
         }
     }
 
@@ -517,7 +499,7 @@ sub handle_login {
     my $result = OpenXPKI::Client::UI::Login->new({
         client => $self,
         req => $req,
-        resp => $self->_response,
+        resp => $self->resp,
     });
 
     # Login works in three steps realm -> auth stack -> credentials
@@ -813,9 +795,9 @@ sub handle_login {
             # FIXME Remove direct access to $main::cookie and main::encrypt_cookie
             if ($main::cookie) {
                 $main::cookie->{'-value'} = main::encrypt_cookie($session->id);
-                push @main::header, ('-cookie', $cgi->cookie( $main::cookie ));
+                $self->resp->add_header(-cookie => $cgi->cookie($main::cookie));
             }
-            $self->logger->trace('CGI Header ' . Dumper \@main::header ) if $self->logger->is_trace;
+            $self->logger->trace('CGI Header ' . Dumper $self->resp->headers) if $self->logger->is_trace;
 
             if ($auth_info->{login}) {
                 $result->redirect->to($auth_info->{login});
@@ -1039,10 +1021,9 @@ sub logout_session {
     # flush the session cookie
     if ($cgi && $main::cookie) {
         $main::cookie->{'-value'} = main::encrypt_cookie($self->session->id);
-        push @main::header, ('-cookie', $cgi->cookie( $main::cookie ));
+        $self->resp->add_header(-cookie => $cgi->cookie($main::cookie));
     }
 
 }
-
 
 1;

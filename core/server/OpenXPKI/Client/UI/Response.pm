@@ -28,6 +28,18 @@ has 'raw_response' => (
     predicate => 'has_raw_response',
 );
 
+# HTTP headers
+has 'headers' => (
+    documentation => 'IGNORE',
+    is => 'rw',
+    isa => 'ArrayRef',
+    traits => ['Array'],
+    handles => {
+        add_header => 'push',
+        get_headers => 'elements',
+    }
+);
+
 #
 # Items of the response hash
 #   documentation => '...' tells OpenXPKI::Client::UI::Response::DTORole->resolve

@@ -32,6 +32,8 @@ use OpenXPKI::Client;
 use OpenXPKI::Client::Config;
 use OpenXPKI::Client::UI;
 use OpenXPKI::Client::UI::Request;
+use OpenXPKI::Client::UI::Response;
+
 
 my $conf;
 my $log;
@@ -197,8 +199,6 @@ while (my $cgi = CGI::Fast->new()) {
 
     $log->debug('check for cgi session, fcgi pid '. $$ );
 
-    our @header = @header_tpl;
-
     # TODO - encrypt for protection!
     my $sess_id = $cgi->cookie('oxisess-webui') || undef;
 
@@ -302,9 +302,6 @@ while (my $cgi = CGI::Fast->new()) {
         $ENV{OPENXPKI_AUTH_STACK} = $conf->{login}->{stack};
     }
 
-    push @header, ('-cookie', $cgi->cookie( $cookie ));
-    push @header, ('-type','application/json; charset=UTF-8');
-
     $log->trace('Init UI using backend ' . ref $backend_client);
 
     my $result;
@@ -316,18 +313,24 @@ while (my $cgi = CGI::Fast->new()) {
             $pkey{auth} = \$pk;
         }
 
+        my $response = OpenXPKI::Client::UI::Response->new;
+        $response->add_header(@header_tpl);
+        $response->add_header(-cookie => $cgi->cookie($cookie));
+        $response->add_header(-type => 'application/json; charset=UTF-8');
+
         my $client = OpenXPKI::Client::UI->new({
             backend => $backend_client,
             session => $session_front,
             logger => $log,
             config => $conf->{global},
+            resp => $response,
             %pkey,
         });
 
         my $req = OpenXPKI::Client::UI::Request->new( cgi => $cgi, logger => $log, session => $session_front );
         $log->trace(ref($req).' - '.Dumper({ map { $_ => $req->{$_} } qw( method cache cgi ) }) ) if ($log->is_trace());
         $result = $client->handle_request( $req );
-        $log->debug('Request handled');
+        $log->debug('Finished request handling');
         $log->trace(ref($result).' - '.Dumper({ map { $_ => $result->{$_} } qw( type _page redirect extra _result ) }) ) if $log->is_trace();
     };
 
