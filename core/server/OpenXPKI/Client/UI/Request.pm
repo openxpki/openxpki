@@ -18,7 +18,7 @@ use Moose::Util::TypeConstraints;
 has cgi => (
     required => 1,
     is => 'ro',
-    isa => duck_type( [qw( param multi_param content_type )] ), # not "isa => 'CGI'" as we use CGIMock in tests
+    isa => duck_type( [qw( param multi_param content_type cookie header )] ), # not "isa => 'CGI'" as we use CGIMock in tests
 );
 
 has session => (

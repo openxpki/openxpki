@@ -792,12 +792,7 @@ sub handle_login {
 
             Log::Log4perl::MDC->put('sid', substr($session->id,0,4));
 
-            # FIXME Remove direct access to $main::cookie and main::encrypt_cookie
-            if ($main::cookie) {
-                $main::cookie->{'-value'} = main::encrypt_cookie($session->id);
-                $self->resp->add_header(-cookie => $cgi->cookie($main::cookie));
-            }
-            $self->logger->trace('CGI Header ' . Dumper $self->resp->headers) if $self->logger->is_trace;
+            $self->resp->session_id($session->id);
 
             if ($auth_info->{login}) {
                 $result->redirect->to($auth_info->{login});
@@ -1010,19 +1005,16 @@ sub logout_session {
 
     $self->logger->info("session logout");
 
-    my $session = $self->session();
-    $self->backend()->logout();
-    $self->session()->delete();
-    $self->session()->flush();
-    $self->session( $self->session()->new() );
+    my $session = $self->session;
+    $self->backend->logout;
+    $self->session->delete;
+    $self->session->flush;
+    $self->session($self->session->new);
 
     Log::Log4perl::MDC->put('sid', substr($self->session->id,0,4));
 
     # flush the session cookie
-    if ($cgi && $main::cookie) {
-        $main::cookie->{'-value'} = main::encrypt_cookie($self->session->id);
-        $self->resp->add_header(-cookie => $cgi->cookie($main::cookie));
-    }
+    $self->resp->session_id($self->session->id);
 
 }
 

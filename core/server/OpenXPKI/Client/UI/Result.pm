@@ -418,8 +418,10 @@ sub render {
     }
 
     if ($cgi->http('HTTP_X-OPENXPKI-Client')) {
+        my $headers = $self->get_headers($cgi);
+        $self->logger->trace("Response headers: $headers") if $self->logger->is_trace;
         # Start output stream
-        print $cgi->header($self->get_headers);
+        print $headers;
         print $body;
 
     } else {
@@ -485,7 +487,7 @@ sub init_fetch {
 
     if ($data->{data}) {
         $self->add_header(-type => $data->{mime}, -attachment => $data->{attachment});
-        print $cgi->header($self->get_headers);
+        print $self->get_headers($cgi);
         print $data->{data};
         exit;
     }
@@ -496,7 +498,7 @@ sub init_fetch {
     if ($type eq 'file') {
         open (my $fh, "<", $source) || die 'Unable to open file';
         $self->add_header(-type => $data->{mime}, -attachment => $data->{attachment});
-        print $cgi->header($self->get_headers);
+        print $self->get_headers($cgi);
         while (my $line = <$fh>) {
             print $line;
         }
@@ -512,7 +514,7 @@ sub init_fetch {
         }
 
         $self->add_header(-type => $data->{mime}, -attachment => $data->{attachment});
-        print $cgi->header($self->get_headers);
+        print $self->get_headers($cgi);
         Encode::encode('UTF-8', $dp->{value}) if $data->{mime} =~ /utf-8/i;
         print $dp->{value};
 
@@ -527,7 +529,7 @@ sub init_fetch {
         }
 
         $self->add_header(-type => $report->{mime_type}, -attachment => $report->{report_name});
-        print $cgi->header($self->get_headers);
+        print $self->get_headers($cgi);
         print $report->{report_value};
 
     }

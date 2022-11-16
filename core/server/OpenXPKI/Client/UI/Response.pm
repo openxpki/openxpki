@@ -1,6 +1,12 @@
 package OpenXPKI::Client::UI::Response;
 use OpenXPKI::Client::UI::Response::DTO;
 
+# Core modules
+use MIME::Base64 qw( encode_base64 );
+
+# CPAN modules
+use Crypt::CBC;
+
 # Project modules
 use OpenXPKI::Client::UI::Response::Menu;
 use OpenXPKI::Client::UI::Response::OnException;
@@ -12,9 +18,19 @@ use OpenXPKI::Client::UI::Response::Status;
 use OpenXPKI::Client::UI::Response::User;
 
 #
-# Internal attributes
+# Constructor parameters
 #   documentation => 'IGNORE' tells OpenXPKI::Client::UI::Response::DTORole->resolve
 #   to exclude these attributes from the hash it builds.
+#
+has 'cookie_cipher' => (
+    documentation => 'IGNORE',
+    is => 'ro',
+    isa => 'Crypt::CBC',
+    predicate => 'has_cookie_cipher',
+);
+
+#
+# Internal attributes
 #
 has_dto 'redirect' => (
     documentation => 'IGNORE',
@@ -36,8 +52,20 @@ has 'headers' => (
     traits => ['Array'],
     handles => {
         add_header => 'push',
-        get_headers => 'elements',
     }
+);
+
+has 'session_id' => (
+    documentation => 'IGNORE',
+    is => 'rw',
+    isa => 'Str',
+);
+
+has 'cookie_path' => (
+    documentation => 'IGNORE',
+    is => 'rw',
+    isa => 'Str',
+    predicate => 'has_cookie_path',
 );
 
 #
@@ -105,5 +133,33 @@ sub set_user { shift->user(OpenXPKI::Client::UI::Response::User->new(@_)) }
 
 # overrides OpenXPKI::Client::UI::Response::DTORole->is_set()
 sub is_set { 1 }
+
+=head2 get_headers
+
+Returns the HTTP header string containing all headers stored via L<add_header>
+plus the session cookie that contains the (encrypted) session id.
+
+=cut
+sub get_headers {
+    my $self = shift;
+    my $cgi = shift;
+
+    # assemble cookie
+    my $cookie = {
+        -name => 'oxisess-webui',
+        -value => ($self->session_id and $self->has_cookie_cipher)
+            ? encode_base64($self->cookie_cipher->encrypt($self->session_id))
+            : $self->session_id,
+        $self->has_cookie_path ? (-path => $self->cookie_path) : (),
+        -SameSite => 'Strict',
+        -Secure => ($ENV{'HTTPS'} ? 1 : 0),
+        -HttpOnly => 1,
+    };
+
+    return $cgi->header(
+        @{ $self->headers },
+        -cookie => $cgi->cookie($cookie),
+    )
+}
 
 __PACKAGE__->meta->make_immutable;
