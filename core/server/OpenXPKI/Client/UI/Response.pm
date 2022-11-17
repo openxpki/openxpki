@@ -22,11 +22,11 @@ use OpenXPKI::Client::UI::Response::User;
 #   documentation => 'IGNORE' tells OpenXPKI::Client::UI::Response::DTORole->resolve
 #   to exclude these attributes from the hash it builds.
 #
-has 'cookie_cipher' => (
+has 'session_cookie' => (
     documentation => 'IGNORE',
     is => 'ro',
-    isa => 'Crypt::CBC',
-    predicate => 'has_cookie_cipher',
+    isa => 'OpenXPKI::Client::UI::SessionCookie',
+    required => 1,
 );
 
 #
@@ -53,19 +53,6 @@ has 'headers' => (
     handles => {
         add_header => 'push',
     }
-);
-
-has 'session_id' => (
-    documentation => 'IGNORE',
-    is => 'rw',
-    isa => 'Str',
-);
-
-has 'cookie_path' => (
-    documentation => 'IGNORE',
-    is => 'rw',
-    isa => 'Str',
-    predicate => 'has_cookie_path',
 );
 
 #
@@ -144,21 +131,9 @@ sub get_headers {
     my $self = shift;
     my $cgi = shift;
 
-    # assemble cookie
-    my $cookie = {
-        -name => 'oxisess-webui',
-        -value => ($self->session_id and $self->has_cookie_cipher)
-            ? encode_base64($self->cookie_cipher->encrypt($self->session_id))
-            : $self->session_id,
-        $self->has_cookie_path ? (-path => $self->cookie_path) : (),
-        -SameSite => 'Strict',
-        -Secure => ($ENV{'HTTPS'} ? 1 : 0),
-        -HttpOnly => 1,
-    };
-
     return $cgi->header(
         @{ $self->headers },
-        -cookie => $cgi->cookie($cookie),
+        -cookie => $self->session_cookie->build,
     )
 }
 

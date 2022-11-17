@@ -792,7 +792,7 @@ sub handle_login {
 
             Log::Log4perl::MDC->put('sid', substr($session->id,0,4));
 
-            $self->resp->session_id($session->id);
+            $self->resp->session_cookie->id($session->id);
 
             if ($auth_info->{login}) {
                 $result->redirect->to($auth_info->{login});
@@ -1014,7 +1014,7 @@ sub logout_session {
     Log::Log4perl::MDC->put('sid', substr($self->session->id,0,4));
 
     # flush the session cookie
-    $self->resp->session_id($self->session->id);
+    $self->resp->session_cookie->id($self->session->id);
 
 }
 

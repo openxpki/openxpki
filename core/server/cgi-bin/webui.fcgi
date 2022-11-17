@@ -33,6 +33,7 @@ use OpenXPKI::Client::Config;
 use OpenXPKI::Client::UI;
 use OpenXPKI::Client::UI::Request;
 use OpenXPKI::Client::UI::Response;
+use OpenXPKI::Client::UI::SessionCookie;
 
 
 my $conf;
@@ -152,38 +153,17 @@ sub __get_cookie_cipher {
 
 }
 
-=head2 decrypt_cookie
-
-Reverse to encrypt_cookie
-
-=cut
-
-sub decrypt_cookie {
-
-    my $value = shift;
-
-    return unless($value);
-
-    my $cipher = __get_cookie_cipher();
-    return $value unless ($cipher);
-    my $plain;
-    eval {
-        $plain = $cipher->decrypt(decode_base64($value));
-    };
-    if (!$plain) {
-        $log->error("Unable to decrypt cookie ($EVAL_ERROR)");
-    }
-    return $plain;
-}
-
 while (my $cgi = CGI::Fast->new()) {
-
     $log->debug('check for cgi session, fcgi pid '. $$ );
 
-    # TODO - encrypt for protection!
-    my $sess_id = $cgi->cookie('oxisess-webui') || undef;
+    my $session_cookie = OpenXPKI::Client::UI::SessionCookie->new(
+        cgi => $cgi,
+        cipher => __get_cookie_cipher(),
+    );
 
-    $sess_id = decrypt_cookie($sess_id);
+    my $sess_id;
+    eval { $sess_id = $session_cookie->fetch_id };
+    $log->error($EVAL_ERROR) if $EVAL_ERROR;
 
     Log::Log4perl::MDC->remove();
     Log::Log4perl::MDC->put('sid', $sess_id ? substr($sess_id,0,4) : undef);
@@ -211,11 +191,10 @@ while (my $cgi = CGI::Fast->new()) {
         $session_front->expire( $conf->{session}->{timeout} );
     }
 
-    my $response = OpenXPKI::Client::UI::Response->new(
-        cookie_cipher => __get_cookie_cipher(),
-    );
+    $session_cookie->id($session_front->id);
+
+    my $response = OpenXPKI::Client::UI::Response->new(session_cookie => $session_cookie);
     $response->add_header(@header_tpl);
-    $response->session_id($session_front->id);
 
     $log->debug('session id (front) is '. $session_front->id);
 
@@ -229,7 +208,7 @@ while (my $cgi = CGI::Fast->new()) {
         my $script_path = $ENV{'REQUEST_URI'};
         # Strip off cgi-bin, last word of the path and discard query string
         $script_path =~ s|\/(f?cgi-bin\/)?([^\/]+)((\?.*)?)$||;
-        $response->cookie_path($script_path);
+        $response->session_cookie->path($script_path);
 
         $log->debug('script path is ' . $script_path);
 
