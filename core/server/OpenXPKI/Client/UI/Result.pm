@@ -25,11 +25,13 @@ use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Client::UI::Response;
 
 
-# Attributes set via constructor by OpenXPKI::Client::UI->__load_class()
+# Attributes set via constructor
+
 has req => (
     is => 'ro',
     isa => 'OpenXPKI::Client::UI::Request',
     predicate => 'has_req',
+    required => 1,
 );
 
 has extra => (
@@ -42,6 +44,7 @@ has _client => (
     is => 'ro',
     isa => 'OpenXPKI::Client::UI',
     init_arg => 'client',
+    required => 1,
 );
 
 has resp => (
