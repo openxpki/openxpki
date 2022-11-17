@@ -421,7 +421,6 @@ sub handle_page {
 
     my $self = shift;
     my $args = shift;
-    my $method_args = shift || {};
 
     my $req = $args->{req};
 
@@ -444,7 +443,7 @@ sub handle_page {
         if ($obj) {
             $method  = "action_$method";
             $self->logger()->debug("Method is $method");
-            $obj->$method( $method_args );
+            $obj->$method();
         } else {
             $self->resp->status->error(i18nGettext('I18N_OPENXPKI_UI_ACTION_NOT_FOUND'));
         }
@@ -472,7 +471,7 @@ sub handle_page {
         } else {
             $method  = "init_$method";
             $self->logger()->debug("Method is $method");
-            $obj->$method( $method_args );
+            $obj->$method();
         }
     }
 
