@@ -1,6 +1,12 @@
 package OpenXPKI::Client::UI::Response;
 use OpenXPKI::Client::UI::Response::DTO;
 
+# Core modules
+use MIME::Base64 qw( encode_base64 );
+
+# CPAN modules
+use Crypt::CBC;
+
 # Project modules
 use OpenXPKI::Client::UI::Response::Menu;
 use OpenXPKI::Client::UI::Response::OnException;
@@ -12,9 +18,19 @@ use OpenXPKI::Client::UI::Response::Status;
 use OpenXPKI::Client::UI::Response::User;
 
 #
-# Internal attributes
+# Constructor parameters
 #   documentation => 'IGNORE' tells OpenXPKI::Client::UI::Response::DTORole->resolve
 #   to exclude these attributes from the hash it builds.
+#
+has 'session_cookie' => (
+    documentation => 'IGNORE',
+    is => 'ro',
+    isa => 'OpenXPKI::Client::UI::SessionCookie',
+    required => 1,
+);
+
+#
+# Internal attributes
 #
 has_dto 'redirect' => (
     documentation => 'IGNORE',
@@ -26,6 +42,17 @@ has 'raw_response' => (
     is => 'rw',
     isa => 'Any',
     predicate => 'has_raw_response',
+);
+
+# HTTP headers
+has 'headers' => (
+    documentation => 'IGNORE',
+    is => 'rw',
+    isa => 'ArrayRef',
+    traits => ['Array'],
+    handles => {
+        add_header => 'push',
+    }
 );
 
 #
@@ -93,5 +120,21 @@ sub set_user { shift->user(OpenXPKI::Client::UI::Response::User->new(@_)) }
 
 # overrides OpenXPKI::Client::UI::Response::DTORole->is_set()
 sub is_set { 1 }
+
+=head2 get_headers
+
+Returns the HTTP header string containing all headers stored via L<add_header>
+plus the session cookie that contains the (encrypted) session id.
+
+=cut
+sub get_headers {
+    my $self = shift;
+    my $cgi = shift;
+
+    return $cgi->header(
+        @{ $self->headers },
+        -cookie => $self->session_cookie->build,
+    )
+}
 
 __PACKAGE__->meta->make_immutable;

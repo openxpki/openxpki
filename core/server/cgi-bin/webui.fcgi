@@ -6,26 +6,35 @@
 # the use CGI::Fast from the modules list.
 # In either case, you might need to change the extension of the scripturl in
 # the webui config file.
+use strict;
+use warnings;
+use English;
 
+# Core modules
+use Data::Dumper;
+use MIME::Base64 qw( encode_base64 decode_base64 );
+use Digest::SHA;
+use Scalar::Util qw( blessed );
+
+# CPAN modules
 use CGI 4.08;
 use CGI::Fast;
 use CGI::Session;
 use JSON;
-use English;
-use strict;
-use warnings;
-use Data::Dumper;
 use Config::Std;
-use OpenXPKI::Log4perl;
 use Log::Log4perl::MDC;
-use MIME::Base64 qw( encode_base64 decode_base64 );
-use Digest::SHA;
 use Crypt::CBC;
+
+# Project modules
+use OpenXPKI::Log4perl;
 use OpenXPKI::i18n qw( i18nGettext i18nTokenizer set_language set_locale_prefix);
 use OpenXPKI::Client;
 use OpenXPKI::Client::Config;
 use OpenXPKI::Client::UI;
 use OpenXPKI::Client::UI::Request;
+use OpenXPKI::Client::UI::Response;
+use OpenXPKI::Client::UI::SessionCookie;
+
 
 my $conf;
 my $log;
@@ -144,59 +153,17 @@ sub __get_cookie_cipher {
 
 }
 
-=head2 encrypt_cookie
-
-The key is read from the config, the cookie value is expected as argument.
-Returns the encrypted value, if no key is set, returns the plain input value.
-
-=cut
-
-sub encrypt_cookie {
-
-    my $value = shift;
-    return $value unless ($value);
-
-    my $cipher = __get_cookie_cipher();
-    return $value unless ($cipher);
-
-    return encode_base64($cipher->encrypt($value));
-
-}
-
-=head2 decrypt_cookie
-
-Reverse to encrypt_cookie
-
-=cut
-
-sub decrypt_cookie {
-
-    my $value = shift;
-
-    return unless($value);
-
-    my $cipher = __get_cookie_cipher();
-    return $value unless ($cipher);
-    my $plain;
-    eval {
-        $plain = $cipher->decrypt(decode_base64($value));
-    };
-    if (!$plain) {
-        $log->error("Unable to decrypt cookie ($EVAL_ERROR)");
-    }
-    return $plain;
-}
-
 while (my $cgi = CGI::Fast->new()) {
-
     $log->debug('check for cgi session, fcgi pid '. $$ );
 
-    our @header = @header_tpl;
+    my $session_cookie = OpenXPKI::Client::UI::SessionCookie->new(
+        cgi => $cgi,
+        cipher => __get_cookie_cipher(),
+    );
 
-    # TODO - encrypt for protection!
-    my $sess_id = $cgi->cookie('oxisess-webui') || undef;
-
-    $sess_id = decrypt_cookie($sess_id);
+    my $sess_id;
+    eval { $sess_id = $session_cookie->fetch_id };
+    $log->error($EVAL_ERROR) if $EVAL_ERROR;
 
     Log::Log4perl::MDC->remove();
     Log::Log4perl::MDC->put('sid', $sess_id ? substr($sess_id,0,4) : undef);
@@ -216,7 +183,6 @@ while (my $cgi = CGI::Fast->new()) {
        next;
     }
 
-
     my $driver_args = $conf->{session_driver} ? $conf->{session_driver} : { Directory => '/tmp' };
     my $session_front = new CGI::Session($conf->{session}->{driver}, $sess_id, $driver_args );
     Log::Log4perl::MDC->put('sid', substr($session_front->id,0,4));
@@ -225,13 +191,10 @@ while (my $cgi = CGI::Fast->new()) {
         $session_front->expire( $conf->{session}->{timeout} );
     }
 
-    our $cookie = {
-        -name => 'oxisess-webui',
-        -value => encrypt_cookie($session_front->id),
-        -SameSite => 'Strict',
-        -Secure => ($ENV{'HTTPS'} ? 1 : 0),
-        -HttpOnly => 1,
-    };
+    $session_cookie->id($session_front->id);
+
+    my $response = OpenXPKI::Client::UI::Response->new(session_cookie => $session_cookie);
+    $response->add_header(@header_tpl);
 
     $log->debug('session id (front) is '. $session_front->id);
 
@@ -245,7 +208,7 @@ while (my $cgi = CGI::Fast->new()) {
         my $script_path = $ENV{'REQUEST_URI'};
         # Strip off cgi-bin, last word of the path and discard query string
         $script_path =~ s|\/(f?cgi-bin\/)?([^\/]+)((\?.*)?)$||;
-        $cookie->{path} = $script_path;
+        $response->session_cookie->path($script_path);
 
         $log->debug('script path is ' . $script_path);
 
@@ -296,8 +259,7 @@ while (my $cgi = CGI::Fast->new()) {
         $ENV{OPENXPKI_AUTH_STACK} = $conf->{login}->{stack};
     }
 
-    push @header, ('-cookie', $cgi->cookie( $cookie ));
-    push @header, ('-type','application/json; charset=UTF-8');
+    $response->add_header(-type => 'application/json; charset=UTF-8');
 
     $log->trace('Init UI using backend ' . ref $backend_client);
 
@@ -315,17 +277,18 @@ while (my $cgi = CGI::Fast->new()) {
             session => $session_front,
             logger => $log,
             config => $conf->{global},
+            resp => $response,
             %pkey,
         });
 
         my $req = OpenXPKI::Client::UI::Request->new( cgi => $cgi, logger => $log, session => $session_front );
         $log->trace(ref($req).' - '.Dumper({ map { $_ => $req->{$_} } qw( method cache cgi ) }) ) if ($log->is_trace());
         $result = $client->handle_request( $req );
-        $log->debug('Request handled');
+        $log->debug('Finished request handling');
         $log->trace(ref($result).' - '.Dumper({ map { $_ => $result->{$_} } qw( type _page redirect extra _result ) }) ) if $log->is_trace();
     };
 
-    if (!$result || ref $result !~ /OpenXPKI::Client::UI/) {
+    unless (blessed $result and $result->isa('OpenXPKI::Client::UI::Result')) {
         __handle_error($cgi, $EVAL_ERROR);
         $log->trace('Result: ' . Dumper $result) if $log->is_trace();
     }

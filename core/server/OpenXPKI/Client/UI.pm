@@ -30,6 +30,13 @@ has 'session' => (
     isa => 'CGI::Session|Undef',
 );
 
+# Response structure (JSON or some raw bytes) and HTTP headers
+has 'resp' => (
+    is => 'rw',
+    isa => 'OpenXPKI::Client::UI::Response',
+    required => 1,
+);
+
 # the OXI::Client object
 has 'backend' => (
     is => 'rw',
@@ -60,14 +67,6 @@ has '_auth' => (
     isa => 'Ref',
     init_arg => 'auth',
     predicate => 'has_auth',
-);
-
-# Hold warnings from init
-has '_status' => (
-    is => 'rw',
-    isa => 'OpenXPKI::Client::UI::Response::Status',
-    default => sub { OpenXPKI::Client::UI::Response::Status->new },
-    lazy => 1,
 );
 
 =head2 _init_backend
@@ -108,7 +107,7 @@ sub _init_backend {
                 # The session has gone - start a new one - might happen if the gui
                 # was idle too long or the server was flushed
                 $client->init_session({ SESSION_ID => undef });
-                $self->_status->warn(i18nGettext('I18N_OPENXPKI_UI_BACKEND_SESSION_GONE'));
+                $self->resp->status->warn(i18nGettext('I18N_OPENXPKI_UI_BACKEND_SESSION_GONE'));
             } else {
                 $self->logger()->error('Error creating backend session: ' . $eval_err->{message});
                 $self->logger()->trace($eval_err);
@@ -168,7 +167,11 @@ sub handle_request {
     # Check for goto redirection first
     if ($action =~ /^redirect!(.+)/  || $page =~ /^redirect!(.+)/) {
         my $goto = $1;
-        my $result = OpenXPKI::Client::UI::Result->new({ client => $self, req => $req });
+        my $result = OpenXPKI::Client::UI::Result->new({
+            client => $self,
+            req => $req,
+            resp => $self->resp,
+        });
         $self->logger()->debug("Send redirect to $goto");
         $result->redirect->to($goto);
         return $result->render();
@@ -191,7 +194,11 @@ sub handle_request {
         # now perform the redirect if set
         if ($redirectTo) {
             $self->logger()->debug("External redirect on logout to " . $redirectTo);
-            my $result = OpenXPKI::Client::UI::Result->new({ client => $self, req => $req });
+            my $result = OpenXPKI::Client::UI::Result->new({
+                client => $self,
+                req => $req,
+                resp => $self->resp,
+            });
             $result->redirect->to($redirectTo);
             return $result->render();
         }
@@ -210,7 +217,11 @@ sub handle_request {
     }
 
     if ( $reply->{SERVICE_MSG} eq 'ERROR' ) {
-        my $result = OpenXPKI::Client::UI::Result->new({ client => $self, req => $req });
+        my $result = OpenXPKI::Client::UI::Result->new({
+            client => $self,
+            req => $req,
+            resp => $self->resp,
+        });
         $self->logger()->debug("Got error from server");
         $result->set_status_from_error_reply($reply);
         return $result->render;
@@ -219,7 +230,11 @@ sub handle_request {
 
     # Call to bootstrap components
     if ($page =~ /^bootstrap!(.+)/) {
-        my $result = OpenXPKI::Client::UI::Bootstrap->new({ client => $self, req => $req });
+        my $result = OpenXPKI::Client::UI::Bootstrap->new({
+            client => $self,
+            req => $req,
+            resp => $self->resp,
+        });
         $result->init_structure;
         return $result->render;
     }
@@ -332,7 +347,12 @@ sub __load_class {
         }
         die "Package $pkg must inherit from OpenXPKI::Client::UI::Result" unless $pkg->isa('OpenXPKI::Client::UI::Result');
 
-        my $obj = $pkg->new({ client => $self, req => $req, extra => $params });
+        my $obj = $pkg->new({
+            client => $self,
+            req => $req,
+            extra => $params,
+            resp => $self->resp,
+        });
 
         return ($obj, $method);
     }
@@ -372,7 +392,7 @@ sub __get_action {
         } else {
 
             $self->logger()->debug("Request with invalid rtoken ($rtoken_request != $rtoken_session)!");
-            $self->_status->error(i18nGettext('I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID'));
+            $self->resp->status->error(i18nGettext('I18N_OPENXPKI_UI_REQUEST_TOKEN_NOT_VALID'));
         }
     }
     return '';
@@ -427,7 +447,7 @@ sub handle_page {
             $self->logger()->debug("Method is $method");
             $result->$method( $method_args );
         } else {
-            $self->_status->error(i18nGettext('I18N_OPENXPKI_UI_ACTION_NOT_FOUND'));
+            $self->resp->status->error(i18nGettext('I18N_OPENXPKI_UI_ACTION_NOT_FOUND'));
         }
     }
 
@@ -472,32 +492,37 @@ sub handle_login {
     my $cgi = $req->cgi();
     my $reply = $args->{reply};
 
-    $reply = $self->backend()->send_receive_service_msg('PING') if (!$reply);
+    $reply = $self->backend->send_receive_service_msg('PING') if (!$reply);
 
     my $status = $reply->{SERVICE_MSG};
 
-    my $result = OpenXPKI::Client::UI::Login->new({ client => $self, req => $req });
+    my $result = OpenXPKI::Client::UI::Login->new({
+        client => $self,
+        req => $req,
+        resp => $self->resp,
+    });
 
     # Login works in three steps realm -> auth stack -> credentials
 
-    my $session = $self->session();
+    my $session = $self->session;
     my $page = $req->param('page') || '';
 
     # this is the incoming logout action
     if ($page eq 'logout') {
         $result->redirect->to('login!logout');
-        return $result->render();
+        return $result->render;
     }
 
     # this is the redirect to the "you have been logged out page"
     if ($page eq 'login!logout') {
-        return $result->init_logout()->render();
+        $result->init_logout;
+        return $result->render;
     }
 
     # action is only valid within a post request
     my $action = $self->__get_action($req);
 
-    $self->logger()->info('not logged in - doing auth - page is '.$page.' - action is ' . $action);
+    $self->logger->info('not logged in - doing auth - page is '.$page.' - action is ' . $action);
 
     # Special handling for pki_realm and stack params
     if ($action eq 'login!realm' && $req->param('pki_realm')) {
@@ -767,12 +792,7 @@ sub handle_login {
 
             Log::Log4perl::MDC->put('sid', substr($session->id,0,4));
 
-            # FIXME Remove direct access to $main::cookie and main::encrypt_cookie
-            if ($main::cookie) {
-                $main::cookie->{'-value'} = main::encrypt_cookie($session->id);
-                push @main::header, ('-cookie', $cgi->cookie( $main::cookie ));
-            }
-            $self->logger->trace('CGI Header ' . Dumper \@main::header ) if $self->logger->is_trace;
+            $self->resp->session_cookie->id($session->id);
 
             if ($auth_info->{login}) {
                 $result->redirect->to($auth_info->{login});
@@ -985,21 +1005,17 @@ sub logout_session {
 
     $self->logger->info("session logout");
 
-    my $session = $self->session();
-    $self->backend()->logout();
-    $self->session()->delete();
-    $self->session()->flush();
-    $self->session( $self->session()->new() );
+    my $session = $self->session;
+    $self->backend->logout;
+    $self->session->delete;
+    $self->session->flush;
+    $self->session($self->session->new);
 
     Log::Log4perl::MDC->put('sid', substr($self->session->id,0,4));
 
     # flush the session cookie
-    if ($cgi && $main::cookie) {
-        $main::cookie->{'-value'} = main::encrypt_cookie($self->session->id);
-        push @main::header, ('-cookie', $cgi->cookie( $main::cookie ));
-    }
+    $self->resp->session_cookie->id($self->session->id);
 
 }
-
 
 1;

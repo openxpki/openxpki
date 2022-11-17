@@ -44,13 +44,10 @@ has _client => (
     init_arg => 'client',
 );
 
-# Internal attributes
-
 has resp => (
     is => 'ro',
     isa => 'OpenXPKI::Client::UI::Response',
-    lazy => 1,
-    default => sub { OpenXPKI::Client::UI::Response->new },
+    required => 1,
     handles => [ qw(
         redirect
         raw_response has_raw_response
@@ -66,8 +63,12 @@ has resp => (
         status
         tenant
         user set_user
+        add_header
+        get_headers
     ) ],
 );
+
+# Internal attributes
 
 has _last_reply => (
     is => 'rw',
@@ -99,16 +100,6 @@ has _prefix_jwt => (
     isa => 'Str',
     default => '_encrypted_jwt_',
 );
-
-sub BUILD {
-
-    my $self = shift;
-    # load global client status (warnings from init) if set
-    if ($self->_client->_status->is_set) {
-        $self->resp->status($self->_client->_status);
-    }
-
-}
 
 sub _init_session {
 
@@ -427,9 +418,10 @@ sub render {
     }
 
     if ($cgi->http('HTTP_X-OPENXPKI-Client')) {
+        my $headers = $self->get_headers($cgi);
+        $self->logger->trace("Response headers: $headers") if $self->logger->is_trace;
         # Start output stream
-        # FIXME Remove direct access to @main::header
-        print $cgi->header( @main::header );
+        print $headers;
         print $body;
 
     } else {
@@ -494,7 +486,8 @@ sub init_fetch {
     my $cgi = $self->cgi();
 
     if ($data->{data}) {
-        print $cgi->header( @main::header, -type => $data->{mime}, -attachment => $data->{attachment} );
+        $self->add_header(-type => $data->{mime}, -attachment => $data->{attachment});
+        print $self->get_headers($cgi);
         print $data->{data};
         exit;
     }
@@ -504,7 +497,8 @@ sub init_fetch {
 
     if ($type eq 'file') {
         open (my $fh, "<", $source) || die 'Unable to open file';
-        print $cgi->header( @main::header, -type => $data->{mime}, -attachment => $data->{attachment} );
+        $self->add_header(-type => $data->{mime}, -attachment => $data->{attachment});
+        print $self->get_headers($cgi);
         while (my $line = <$fh>) {
             print $line;
         }
@@ -519,7 +513,8 @@ sub init_fetch {
             die "Requested data not found/expired";
         }
 
-        print $cgi->header( @main::header, -type => $data->{mime}, -attachment => $data->{attachment} );
+        $self->add_header(-type => $data->{mime}, -attachment => $data->{attachment});
+        print $self->get_headers($cgi);
         Encode::encode('UTF-8', $dp->{value}) if $data->{mime} =~ /utf-8/i;
         print $dp->{value};
 
@@ -533,7 +528,8 @@ sub init_fetch {
             die "Requested data not found/expired";
         }
 
-        print $cgi->header( @main::header, -type => $report->{mime_type}, -attachment => $report->{report_name} );
+        $self->add_header(-type => $report->{mime_type}, -attachment => $report->{report_name});
+        print $self->get_headers($cgi);
         print $report->{report_value};
 
     }
