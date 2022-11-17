@@ -423,17 +423,14 @@ sub handle_page {
     my $args = shift;
 
     my $req = $args->{req};
-
-    # set action and page - args always wins over CGI
-
-    my $obj;
-    # action is only valid within a post request
+    # Set action or page - args always wins over CGI.
+    # Action is only valid within a post request
     my $action = $args->{load_action} ? $self->__get_action($req) : '';
+    my $page = (defined $args->{page} ? $args->{page} : $req->param('page')) || 'home';
 
     $self->logger()->trace('Handle page: ' . Dumper { map { $_ => $args->{$_} } grep { $_ ne 'req' } keys %$args } ) if $self->logger->is_trace;
 
-    my $page = (defined $args->{page} ? $args->{page} : $req->param('page')) || 'home';
-
+    my $obj;
     if ($action) {
         $self->logger()->info('handle action ' . $action);
 
