@@ -167,11 +167,11 @@ sub handle_request {
     # Check for goto redirection first
     if ($action =~ /^redirect!(.+)/  || $page =~ /^redirect!(.+)/) {
         my $goto = $1;
-        my $result = OpenXPKI::Client::UI::Result->new({
+        my $result = OpenXPKI::Client::UI::Result->new(
             client => $self,
             req => $req,
             resp => $self->resp,
-        });
+        );
         $self->logger()->debug("Send redirect to $goto");
         $result->redirect->to($goto);
         return $result->render();
@@ -194,11 +194,11 @@ sub handle_request {
         # now perform the redirect if set
         if ($redirectTo) {
             $self->logger()->debug("External redirect on logout to " . $redirectTo);
-            my $result = OpenXPKI::Client::UI::Result->new({
+            my $result = OpenXPKI::Client::UI::Result->new(
                 client => $self,
                 req => $req,
                 resp => $self->resp,
-            });
+            );
             $result->redirect->to($redirectTo);
             return $result->render();
         }
@@ -217,11 +217,11 @@ sub handle_request {
     }
 
     if ( $reply->{SERVICE_MSG} eq 'ERROR' ) {
-        my $result = OpenXPKI::Client::UI::Result->new({
+        my $result = OpenXPKI::Client::UI::Result->new(
             client => $self,
             req => $req,
             resp => $self->resp,
-        });
+        );
         $self->logger()->debug("Got error from server");
         $result->set_status_from_error_reply($reply);
         return $result->render;
@@ -230,11 +230,11 @@ sub handle_request {
 
     # Call to bootstrap components
     if ($page =~ /^bootstrap!(.+)/) {
-        my $result = OpenXPKI::Client::UI::Bootstrap->new({
+        my $result = OpenXPKI::Client::UI::Bootstrap->new(
             client => $self,
             req => $req,
             resp => $self->resp,
-        });
+        );
         $result->init_structure;
         return $result->render;
     }
@@ -347,12 +347,12 @@ sub __load_class {
         }
         die "Package $pkg must inherit from OpenXPKI::Client::UI::Result" unless $pkg->isa('OpenXPKI::Client::UI::Result');
 
-        my $obj = $pkg->new({
+        my $obj = $pkg->new(
             client => $self,
             req => $req,
             extra => $params,
             resp => $self->resp,
-        });
+        );
 
         return ($obj, $method);
     }
@@ -491,11 +491,11 @@ sub handle_login {
 
     my $status = $reply->{SERVICE_MSG};
 
-    my $result = OpenXPKI::Client::UI::Login->new({
+    my $result = OpenXPKI::Client::UI::Login->new(
         client => $self,
         req => $req,
         resp => $self->resp,
-    });
+    );
 
     # Login works in three steps realm -> auth stack -> credentials
 
