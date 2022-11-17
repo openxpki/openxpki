@@ -167,11 +167,11 @@ sub handle_request {
     # Check for goto redirection first
     if ($action =~ /^redirect!(.+)/  || $page =~ /^redirect!(.+)/) {
         my $goto = $1;
-        my $result = OpenXPKI::Client::UI::Result->new({
+        my $result = OpenXPKI::Client::UI::Result->new(
             client => $self,
             req => $req,
             resp => $self->resp,
-        });
+        );
         $self->logger()->debug("Send redirect to $goto");
         $result->redirect->to($goto);
         return $result->render();
@@ -194,11 +194,11 @@ sub handle_request {
         # now perform the redirect if set
         if ($redirectTo) {
             $self->logger()->debug("External redirect on logout to " . $redirectTo);
-            my $result = OpenXPKI::Client::UI::Result->new({
+            my $result = OpenXPKI::Client::UI::Result->new(
                 client => $self,
                 req => $req,
                 resp => $self->resp,
-            });
+            );
             $result->redirect->to($redirectTo);
             return $result->render();
         }
@@ -217,11 +217,11 @@ sub handle_request {
     }
 
     if ( $reply->{SERVICE_MSG} eq 'ERROR' ) {
-        my $result = OpenXPKI::Client::UI::Result->new({
+        my $result = OpenXPKI::Client::UI::Result->new(
             client => $self,
             req => $req,
             resp => $self->resp,
-        });
+        );
         $self->logger()->debug("Got error from server");
         $result->set_status_from_error_reply($reply);
         return $result->render;
@@ -230,11 +230,11 @@ sub handle_request {
 
     # Call to bootstrap components
     if ($page =~ /^bootstrap!(.+)/) {
-        my $result = OpenXPKI::Client::UI::Bootstrap->new({
+        my $result = OpenXPKI::Client::UI::Bootstrap->new(
             client => $self,
             req => $req,
             resp => $self->resp,
-        });
+        );
         $result->init_structure;
         return $result->render;
     }
@@ -270,7 +270,7 @@ sub __load_class {
     my $req = shift;
     my $is_action = shift;
 
-    $self->logger->debug("Incoming call to load_class $call");
+    $self->logger->debug("Trying to load class for call: $call");
 
     my ($class, $remainder) = ($call =~ /\A (\w+)\!? (.*) \z/xms);
     my ($method, $param_raw);
@@ -318,8 +318,6 @@ sub __load_class {
 
     $method  = 'index' unless $method;
 
-    $self->logger->debug("Loading handler class $class");
-
     my @variants;
     # action!...
     if ($is_action) {
@@ -341,18 +339,19 @@ sub __load_class {
     for my $pkg (@variants) {
         try {
             Module::Load::load($pkg);
+            $self->logger->debug("Handler class '$pkg' loaded");
         }
         catch ($err) {
             next;
         }
         die "Package $pkg must inherit from OpenXPKI::Client::UI::Result" unless $pkg->isa('OpenXPKI::Client::UI::Result');
 
-        my $obj = $pkg->new({
+        my $obj = $pkg->new(
             client => $self,
             req => $req,
             extra => $params,
             resp => $self->resp,
-        });
+        );
 
         return ($obj, $method);
     }
@@ -421,38 +420,41 @@ sub handle_page {
 
     my $self = shift;
     my $args = shift;
-    my $method_args = shift || {};
 
     my $req = $args->{req};
-    my $cgi = $req->cgi();
-
-    # set action and page - args always wins over CGI
-
-    my $result;
-    # action is only valid within a post request
+    # Set action or page - args always wins over CGI.
+    # Action is only valid within a post request
     my $action = $args->{load_action} ? $self->__get_action($req) : '';
+    my $page = (defined $args->{page} ? $args->{page} : $req->param('page')) || 'home';
+    my @page_method_args;
 
     $self->logger()->trace('Handle page: ' . Dumper { map { $_ => $args->{$_} } grep { $_ ne 'req' } keys %$args } ) if $self->logger->is_trace;
 
-    my $page = (defined $args->{page} ? $args->{page} : $req->param('page')) || 'home';
-
+    my $obj;
+    my $redirected_from;
     if ($action) {
         $self->logger()->info('handle action ' . $action);
 
         my $method;
-        ($result, $method) = $self->__load_class($action, $req, 1);
+        ($obj, $method) = $self->__load_class($action, $req, 1);
 
-        if ($result) {
+        if ($obj) {
             $method  = "action_$method";
-            $self->logger()->debug("Method is $method");
-            $result->$method( $method_args );
+            $self->logger->debug("Calling method: $method()");
+            $obj->$method();
+            # Follow an internal redirect to an init_* method
+            if (my $target = $obj->internal_redirect_target) {
+                ($page, @page_method_args) = @$target;
+                $redirected_from = $obj;
+                $self->logger->trace("Internal redirect to: $page") if $self->logger->is_trace;
+            }
         } else {
             $self->resp->status->error(i18nGettext('I18N_OPENXPKI_UI_ACTION_NOT_FOUND'));
         }
     }
 
-    # Render a page only if there is no action result
-    if (!$result) {
+    # Render a page only if there is no action or object instantiation failed
+    if (not $obj or $redirected_from) {
 
         # Handling of special page requests - to be replaced by hash if it grows
         if ($page eq 'welcome') {
@@ -461,25 +463,30 @@ sub handle_page {
 
         my $method;
         if ($page) {
-            ($result, $method) = $self->__load_class($page, $req);
+            ($obj, $method) = $self->__load_class($page, $req);
         }
 
-        if (!$result) {
+        if (!$obj) {
             $self->logger()->error("Failed loading page class");
-            $result = OpenXPKI::Client::UI::Bootstrap->new({ client => $self, cgi => $cgi });
-            $result->init_error();
-            $result->status->error(i18nGettext('I18N_OPENXPKI_UI_PAGE_NOT_FOUND'));
+            $obj = OpenXPKI::Client::UI::Bootstrap->new(
+                client => $self,
+                req => $req,
+                resp => $self->resp,
+            );
+            $obj->init_error();
+            $obj->status->error(i18nGettext('I18N_OPENXPKI_UI_PAGE_NOT_FOUND'));
 
         } else {
             $method  = "init_$method";
-            $self->logger()->debug("Method is $method");
-            $result->$method( $method_args );
+            $self->logger->debug("Calling method: $method()");
+            $obj->status($redirected_from->status) if $redirected_from;
+            $obj->$method(@page_method_args);
         }
     }
 
     Log::Log4perl::MDC->put('wfid', undef);
 
-    return $result->render();
+    return $obj->render();
 
 }
 
@@ -496,11 +503,11 @@ sub handle_login {
 
     my $status = $reply->{SERVICE_MSG};
 
-    my $result = OpenXPKI::Client::UI::Login->new({
+    my $result = OpenXPKI::Client::UI::Login->new(
         client => $self,
         req => $req,
         resp => $self->resp,
-    });
+    );
 
     # Login works in three steps realm -> auth stack -> credentials
 

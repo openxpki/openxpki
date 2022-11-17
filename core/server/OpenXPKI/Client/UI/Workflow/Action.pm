@@ -123,8 +123,7 @@ sub action_index {
 
             $self->logger()->error("workflow acton failed!");
             my $extra = { wf_id => $wf_args->{wf_id}, wf_action => $wf_args->{wf_action} };
-            $self->init_load($extra);
-            return $self;
+            return $self->internal_redirect('workflow!load' => $extra);
         }
 
         $self->logger()->trace("wf info after execute: " . Dumper $wf_info ) if $self->logger->is_trace;
@@ -148,8 +147,7 @@ sub action_index {
             # pass required arguments via extra and reload init page
 
             my $extra = { wf_type => $wf_args->{wf_type} };
-            $self->init_index($extra);
-            return $self;
+            return $self->internal_redirect('workflow!index' => $extra);
         }
         $self->logger()->trace("wf info on create: " . Dumper $wf_info ) if $self->logger->is_trace;
 
@@ -450,9 +448,8 @@ sub action_search {
         # if $result_count is undefined there was an error with the query
         # status was set to the error message from the run_command sub
         $self->status->error('I18N_OPENXPKI_UI_SEARCH_HAS_NO_MATCHES') if (defined $result_count);
-        return $self->init_search({ preset => $input });
+        return $self->internal_redirect('workflow!search' => { preset => $input });
     }
-
 
     my @criteria;
     foreach my $item ((
