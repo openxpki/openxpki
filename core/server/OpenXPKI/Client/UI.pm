@@ -461,7 +461,11 @@ sub handle_page {
 
         if (!$obj) {
             $self->logger()->error("Failed loading page class");
-            $obj = OpenXPKI::Client::UI::Bootstrap->new({ client => $self, cgi => $req->cgi });
+            $obj = OpenXPKI::Client::UI::Bootstrap->new(
+                client => $self,
+                req => $req,
+                resp => $self->resp,
+            );
             $obj->init_error();
             $obj->status->error(i18nGettext('I18N_OPENXPKI_UI_PAGE_NOT_FOUND'));
 
