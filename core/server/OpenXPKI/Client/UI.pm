@@ -270,7 +270,7 @@ sub __load_class {
     my $req = shift;
     my $is_action = shift;
 
-    $self->logger->debug("Incoming call to load_class $call");
+    $self->logger->debug("Trying to load class for call: $call");
 
     my ($class, $remainder) = ($call =~ /\A (\w+)\!? (.*) \z/xms);
     my ($method, $param_raw);
@@ -318,8 +318,6 @@ sub __load_class {
 
     $method  = 'index' unless $method;
 
-    $self->logger->debug("Loading handler class $class");
-
     my @variants;
     # action!...
     if ($is_action) {
@@ -341,6 +339,7 @@ sub __load_class {
     for my $pkg (@variants) {
         try {
             Module::Load::load($pkg);
+            $self->logger->debug("Handler class '$pkg' loaded");
         }
         catch ($err) {
             next;
@@ -427,10 +426,12 @@ sub handle_page {
     # Action is only valid within a post request
     my $action = $args->{load_action} ? $self->__get_action($req) : '';
     my $page = (defined $args->{page} ? $args->{page} : $req->param('page')) || 'home';
+    my @page_method_args;
 
     $self->logger()->trace('Handle page: ' . Dumper { map { $_ => $args->{$_} } grep { $_ ne 'req' } keys %$args } ) if $self->logger->is_trace;
 
     my $obj;
+    my $redirected_from;
     if ($action) {
         $self->logger()->info('handle action ' . $action);
 
@@ -439,15 +440,21 @@ sub handle_page {
 
         if ($obj) {
             $method  = "action_$method";
-            $self->logger()->debug("Method is $method");
+            $self->logger->debug("Calling method: $method()");
             $obj->$method();
+            # Follow an internal redirect to an init_* method
+            if (my $target = $obj->internal_redirect_target) {
+                ($page, @page_method_args) = @$target;
+                $redirected_from = $obj;
+                $self->logger->trace("Internal redirect to: $page") if $self->logger->is_trace;
+            }
         } else {
             $self->resp->status->error(i18nGettext('I18N_OPENXPKI_UI_ACTION_NOT_FOUND'));
         }
     }
 
     # Render a page only if there is no action or object instantiation failed
-    if (!$obj) {
+    if (not $obj or $redirected_from) {
 
         # Handling of special page requests - to be replaced by hash if it grows
         if ($page eq 'welcome') {
@@ -471,8 +478,9 @@ sub handle_page {
 
         } else {
             $method  = "init_$method";
-            $self->logger()->debug("Method is $method");
-            $obj->$method();
+            $self->logger->debug("Calling method: $method()");
+            $obj->status($redirected_from->status) if $redirected_from;
+            $obj->$method(@page_method_args);
         }
     }
 

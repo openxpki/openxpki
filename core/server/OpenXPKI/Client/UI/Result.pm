@@ -104,6 +104,17 @@ has _prefix_jwt => (
     default => '_encrypted_jwt_',
 );
 
+# Redirection (from an action_* method) to an init_* method that may live
+# in another class.
+# The ArrayRef holds the page call (e.g. "home!welcome") plus additional
+# arguments that shall be passed to the method.
+has _internal_redirect_target => (
+    is => 'rw',
+    isa => 'ArrayRef',
+    reader => 'internal_redirect_target',
+    init_arg => undef,
+);
+
 sub _init_session {
 
     my $self = shift;
@@ -117,6 +128,21 @@ sub cgi {
     return unless ($self->has_req());
     return $self->req()->cgi;
 
+}
+
+=head2 internal_redirect
+
+Internal redirection from an C<action_*> method to a page (C<init_*> method).
+
+From within an C<action_*> method you may do this:
+
+    return $self->internal_redirect('home!welcome' => { name => "OpenXPKI" });
+
+=cut
+sub internal_redirect {
+    my $self = shift;
+    $self->_internal_redirect_target([ @_ ]);
+    return $self;
 }
 
 =head2 send_command_v2
