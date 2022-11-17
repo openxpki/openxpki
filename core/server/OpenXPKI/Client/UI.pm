@@ -424,11 +424,10 @@ sub handle_page {
     my $method_args = shift || {};
 
     my $req = $args->{req};
-    my $cgi = $req->cgi();
 
     # set action and page - args always wins over CGI
 
-    my $result;
+    my $obj;
     # action is only valid within a post request
     my $action = $args->{load_action} ? $self->__get_action($req) : '';
 
@@ -440,19 +439,19 @@ sub handle_page {
         $self->logger()->info('handle action ' . $action);
 
         my $method;
-        ($result, $method) = $self->__load_class($action, $req, 1);
+        ($obj, $method) = $self->__load_class($action, $req, 1);
 
-        if ($result) {
+        if ($obj) {
             $method  = "action_$method";
             $self->logger()->debug("Method is $method");
-            $result->$method( $method_args );
+            $obj->$method( $method_args );
         } else {
             $self->resp->status->error(i18nGettext('I18N_OPENXPKI_UI_ACTION_NOT_FOUND'));
         }
     }
 
-    # Render a page only if there is no action result
-    if (!$result) {
+    # Render a page only if there is no action or object instantiation failed
+    if (!$obj) {
 
         # Handling of special page requests - to be replaced by hash if it grows
         if ($page eq 'welcome') {
@@ -461,25 +460,25 @@ sub handle_page {
 
         my $method;
         if ($page) {
-            ($result, $method) = $self->__load_class($page, $req);
+            ($obj, $method) = $self->__load_class($page, $req);
         }
 
-        if (!$result) {
+        if (!$obj) {
             $self->logger()->error("Failed loading page class");
-            $result = OpenXPKI::Client::UI::Bootstrap->new({ client => $self, cgi => $cgi });
-            $result->init_error();
-            $result->status->error(i18nGettext('I18N_OPENXPKI_UI_PAGE_NOT_FOUND'));
+            $obj = OpenXPKI::Client::UI::Bootstrap->new({ client => $self, cgi => $req->cgi });
+            $obj->init_error();
+            $obj->status->error(i18nGettext('I18N_OPENXPKI_UI_PAGE_NOT_FOUND'));
 
         } else {
             $method  = "init_$method";
             $self->logger()->debug("Method is $method");
-            $result->$method( $method_args );
+            $obj->$method( $method_args );
         }
     }
 
     Log::Log4perl::MDC->put('wfid', undef);
 
-    return $result->render();
+    return $obj->render();
 
 }
 
