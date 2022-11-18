@@ -65,6 +65,8 @@ set, otherwise returns a literal 1.
 
 =item hold instruction code (not set)
 
+=back
+
 =cut
 
 sub revokeCertificate {

@@ -636,7 +636,7 @@ context value. Does B<not> deserialize the content.
 =head2 _set_context_param
 
 Expect the name of the context field, and its new value.
- Does B<not> serialize the content.
+Does B<not> serialize the content.
 
 =head2 __persistCertificateInformation
 
@@ -656,10 +656,11 @@ The PEM encoded certificate.
 
 =item csr_serial - serial number of the processed csr
 
-
 =back
 
 =head3 Optional Keys
+
+=over
 
 =item ca_identifier - the identifier of the issuing ca
 

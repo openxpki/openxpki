@@ -26,6 +26,8 @@ Loads the private key from the datapool, handles three parameters
 A hash with the keys I<algorithm> and I<password>. The default is to
 set the incoming password as transport password and use aes256.
 
+=back
+
 =cut
 
 sub fetchKey {
