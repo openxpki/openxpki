@@ -31,7 +31,7 @@ sub action_get_styles_for_profile {
 
     my $cert_subject_style = $styles[0]->{value};
 
-    $self->raw_response({
+    $self->confined_response({
         fields => [{
             name => "cert_subject_style",
             label => 'I18N_OPENXPKI_UI_WORKFLOW_FIELD_CERT_SUBJECT_STYLE_LABEL',
@@ -93,7 +93,7 @@ sub action_get_key_param {
         }
     }
 
-    $self->raw_response({ fields => \@fields });
+    $self->confined_response({ fields => \@fields });
     return $self;
 
 }

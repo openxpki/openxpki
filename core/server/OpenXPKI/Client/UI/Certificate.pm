@@ -476,7 +476,7 @@ sub init_pager {
 
     $self->logger()->trace( "dumper result: " . Dumper @result) if $self->logger->is_trace;
 
-    $self->raw_response({ data => \@result });
+    $self->confined_response({ data => \@result });
 
     return $self;
 }
@@ -1188,7 +1188,7 @@ sub action_autocomplete {
 
     $self->logger()->trace( "search result: " . Dumper \@result) if $self->logger->is_trace;
 
-    $self->raw_response(\@result);
+    $self->confined_response(\@result);
 
     return $self;
 

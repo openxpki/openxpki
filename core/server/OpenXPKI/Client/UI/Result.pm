@@ -67,12 +67,12 @@ Enforce a client side redirect to the given page:
     $self->redirect->to('workflow!search');
     $self->redirect->external('https://...');
 
-=head2 raw_response
+=head2 confined_response
 
 Enforce a "raw" response, i.e. to return an arbitrary JSON structure to the web
 UI. Used e.g. for responses to autocomplete queries.
 
-    $self->raw_response([1,2,3]);
+    $self->confined_response([1,2,3]);
 
 =head2 main
 
@@ -210,7 +210,7 @@ has resp => (
     required => 1,
     handles => [ qw(
         redirect
-        raw_response has_raw_response
+        confined_response has_confined_response
         infobox
         language
         main
@@ -570,8 +570,8 @@ sub _render_to_str {
     #
     # B) raw data
     #
-    if ($self->has_raw_response) {
-        return i18nTokenizer(encode_json($self->raw_response));
+    if ($self->has_confined_response) {
+        return i18nTokenizer(encode_json($self->confined_response));
     }
 
     #

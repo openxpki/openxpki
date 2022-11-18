@@ -37,11 +37,11 @@ has_dto 'redirect' => (
     class => 'OpenXPKI::Client::UI::Response::Redirect',
 );
 
-has 'raw_response' => (
+has 'confined_response' => (
     documentation => 'IGNORE',
     is => 'rw',
     isa => 'Any',
-    predicate => 'has_raw_response',
+    predicate => 'has_confined_response',
 );
 
 # HTTP headers
