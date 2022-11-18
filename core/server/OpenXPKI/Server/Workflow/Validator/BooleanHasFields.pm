@@ -1,13 +1,11 @@
 package OpenXPKI::Server::Workflow::Validator::BooleanHasFields;
 
-use strict;
-use warnings;
 use Moose;
+extends 'OpenXPKI::Server::Workflow::Validator';
+
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
-
-extends 'OpenXPKI::Server::Workflow::Validator';
 
 sub _validate {
 
@@ -34,7 +32,7 @@ sub _validate {
     return 1;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 

@@ -1,17 +1,13 @@
 package OpenXPKI::Server::Authentication::Command;
 
-use strict;
-use warnings;
+use Moose;
+extends 'OpenXPKI::Server::Authentication::Base';
 
 use OpenXPKI::Debug;
 use Proc::SafeExec;
 use OpenXPKI::Template;
 use OpenXPKI::Server::Authentication::Handle;
 use OpenXPKI::Server::Context qw( CTX );
-
-use Moose;
-
-extends 'OpenXPKI::Server::Authentication::Base';
 
 has env => (
     is => 'ro',
@@ -148,7 +144,8 @@ sub handleInput {
     );
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
+
 __END__
 
 =head1 OpenXPKI::Server::Authentication::Command

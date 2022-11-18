@@ -1,5 +1,7 @@
 package OpenXPKI::Server::Session::Data;
+
 use Moose;
+
 use utf8;
 
 # CPAN modules
@@ -25,7 +27,7 @@ application logic
 has is_dirty => ( is => 'rw', isa => 'Bool', init_arg => undef, default => 0);
 has _is_empty => ( is => 'rw', isa => 'Bool', init_arg => undef, default => 1);
 
- has '_json' => (
+has '_json' => (
     is => 'ro',
     isa => 'JSON',
     # explicit utf8 off here as we exchange the UTF8 string with the database!

@@ -1,18 +1,14 @@
 package TestNotificationDummyHandler;
 
-use strict;
-use warnings;
-use English;
+use Moose;
+extends 'OpenXPKI::Server::Notification::Base';
 
+use English;
 
 use DateTime;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-
-use Moose;
-
-extends 'OpenXPKI::Server::Notification::Base';
 
 our $RESULT;
 
@@ -26,4 +22,4 @@ sub notify {
     $RESULT = $rendered;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

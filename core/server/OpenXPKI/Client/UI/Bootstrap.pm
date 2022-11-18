@@ -1,7 +1,3 @@
-# OpenXPKI::Client::UI::Bootstrap
-# Written 2013 by Oliver Welter
-# (C) Copyright 2013 by The OpenXPKI Project
-
 package OpenXPKI::Client::UI::Bootstrap;
 use Moose;
 
@@ -96,4 +92,5 @@ sub init_error {
 
     return $self;
 }
-1;
+
+__PACKAGE__->meta->make_immutable;

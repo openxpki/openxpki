@@ -1,15 +1,12 @@
-
 package OpenXPKI::Server::Workflow::Validator;
 
-use strict;
-
 use Moose;
+extends 'Workflow::Validator';
+
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Template;
-
-extends 'Workflow::Validator';
 
 has 'params' => (
     is => 'rw',
@@ -198,7 +195,8 @@ sub _preset_args {
     return undef;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
+
 __END__
 
 =head1 Name
@@ -281,5 +279,3 @@ templates or static values.
 Log event for validation process must use facility application and
 should use priorities error and debug. Configuration errors should
 trigger OpenXPKI::Exception and log to workflow/error.
-
-

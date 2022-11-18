@@ -1,4 +1,9 @@
-=head1 Name
+package OpenXPKI::Server::Notification::SMTP;
+
+use Moose;
+extends 'OpenXPKI::Server::Notification::Base';
+
+=head1 NAME
 
 OpenXPKI::Server::Notification::SMTP - Notification via SMTP
 
@@ -108,12 +113,7 @@ certificate_p12_file (PKCS12 support requires Crypt::SMIME 0.17!).
 
 =cut
 
-package OpenXPKI::Server::Notification::SMTP;
-
-use strict;
-use warnings;
 use English;
-
 
 use DateTime;
 use OpenXPKI::Server::Context qw( CTX );
@@ -126,12 +126,7 @@ use Net::SMTP;
 use Net::Domain;
 use MIME::Entity;
 
-use Moose;
 use Encode;
-
-extends 'OpenXPKI::Server::Notification::Base';
-
-#use namespace::autoclean; # Comnflicts with Debugger
 
 # Attribute Setup
 
@@ -716,6 +711,6 @@ sub _cleanup {
     return;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__

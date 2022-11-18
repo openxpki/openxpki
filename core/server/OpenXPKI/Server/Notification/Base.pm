@@ -1,23 +1,17 @@
-## OpenXPKI::Server::Notification::Base
-## Base class for all notification interfaces
-##
-## Written 2013 by Oliver Welter for the OpenXPKI project
-## (C) Copyright 2013 by The OpenXPKI Project
+package OpenXPKI::Server::Notification::Base;
 
-=head1 Name
+use Moose;
 
-OpenXPKI::Server::Notification::SMTP - Notification via SMTP
+=head1 NAME
 
-=head1 Description
+OpenXPKI::Server::Notification::Base - Notification interface base class
+
+=head1 DESCRIPTION
 
 Base class for all notifications handlers.
 
 =cut
 
-package OpenXPKI::Server::Notification::Base;
-
-use strict;
-use warnings;
 use English;
 
 use DateTime;
@@ -27,8 +21,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::FileUtils;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Template;
-
-use Moose;
 
 # Attribute Setup
 
@@ -171,8 +163,7 @@ sub _render_template {
 
 }
 
-
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 

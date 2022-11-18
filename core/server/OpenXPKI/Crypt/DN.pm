@@ -1,9 +1,9 @@
 package OpenXPKI::Crypt::DN;
 
 use Moose;
-use OpenXPKI::DN;
-
 with 'OpenXPKI::Role::SubjectOID';
+
+use OpenXPKI::DN;
 
 has sequence => (
     is => 'rw',
@@ -84,6 +84,6 @@ sub from_string {
 
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__;

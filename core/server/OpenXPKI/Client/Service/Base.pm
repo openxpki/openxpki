@@ -1,8 +1,7 @@
 package OpenXPKI::Client::Service::Base;
-
 use Moose;
-use warnings;
-use strict;
+
+
 use Carp;
 use English;
 use Data::Dumper;
@@ -390,6 +389,6 @@ sub terminate {
     }
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__;

@@ -1,13 +1,8 @@
-# OpenXPKI::Client::UI::Secret
-# Written 2013 by Oliver Welter
-# (C) Copyright 2013 by The OpenXPKI Project
-
 package OpenXPKI::Client::UI::Secret;
-
 use Moose;
-use Data::Dumper;
-
 extends 'OpenXPKI::Client::UI::Result';
+
+use Data::Dumper;
 
 sub init_index {
     my ($self, $args) = @_;
@@ -137,5 +132,4 @@ sub action_unlock {
     return $self;
 }
 
-1;
-
+__PACKAGE__->meta->make_immutable;

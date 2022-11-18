@@ -1,9 +1,6 @@
 package OpenXPKI::Client::Service::Response;
-
-use strict;
-use warnings;
-
 use Moose;
+
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
@@ -145,8 +142,10 @@ sub is_client_error {
 
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
  __END__;
 
-=head1 OpenXPKI::Client::Service::Response
+=head1 NAME
+
+OpenXPKI::Client::Service::Response

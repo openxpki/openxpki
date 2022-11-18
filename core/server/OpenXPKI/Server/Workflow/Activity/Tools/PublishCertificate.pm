@@ -1,12 +1,11 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::PublishCertificate;
 
-use strict;
-use English;
-
 use Moose;
 use MooseX::NonMoose;
 extends qw( OpenXPKI::Server::Workflow::Activity );
 with qw( OpenXPKI::Server::Workflow::Role::Publish );
+
+use English;
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
@@ -124,7 +123,8 @@ sub execute {
     return 1;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
+
 __END__
 
 =head1 Name

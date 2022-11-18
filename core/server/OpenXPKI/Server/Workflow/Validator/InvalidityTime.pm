@@ -1,9 +1,7 @@
 package OpenXPKI::Server::Workflow::Validator::InvalidityTime;
 
-use strict;
-use warnings;
-
 use Moose;
+extends 'OpenXPKI::Server::Workflow::Validator';
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug;
@@ -12,8 +10,6 @@ use OpenXPKI::Exception;
 use Workflow::Exception qw( validation_error );
 
 use DateTime;
-
-extends 'OpenXPKI::Server::Workflow::Validator';
 
 sub _preset_args {
     return [ qw(invalidity_time cert_identifier) ];
@@ -80,7 +76,7 @@ sub _validate {
     return 1;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 

@@ -1,15 +1,7 @@
-# OpenXPKI::Config
-#
-# Written 2012 by Oliver Welter for the OpenXPKI project
-# Copyright (C) 2012 by The OpenXPKI Project
-#
-
 package OpenXPKI::Config;
-
-use strict;
-use warnings;
-use English;
 use Moose;
+
+use English;
 use OpenXPKI::Config::Backend;
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
@@ -238,10 +230,8 @@ sub get_inherit {
 
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
-1;
 __DATA__
 
 =head1 NAME

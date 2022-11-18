@@ -1,18 +1,16 @@
 package OpenXPKI::Server::Authentication::OneTimePassword;
 
-use strict;
-use warnings;
+use Moose;
+extends 'OpenXPKI::Server::Authentication::Base';
 
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Authentication::Handle;
 use OpenXPKI::Server::Context qw( CTX );
 
-use Moose;
 use Data::Dumper;
 use Digest::SHA;
 use MIME::Base64;
 
-extends 'OpenXPKI::Server::Authentication::Base';
 
 has namespace => (
     is => 'ro',
@@ -100,7 +98,7 @@ sub handleInput {
 
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 

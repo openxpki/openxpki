@@ -1,8 +1,6 @@
 package OpenXPKI::Client::SCEP;
-
 use Moose;
-use warnings;
-use strict;
+
 use Carp;
 use English;
 
@@ -120,7 +118,7 @@ sub send_request {
 
 }
 
-1; # Magic true value required at end of module
+__PACKAGE__->meta->make_immutable;
 
 __END__
 

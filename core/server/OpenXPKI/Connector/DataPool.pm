@@ -1,15 +1,14 @@
 package OpenXPKI::Connector::DataPool;
 
-use strict;
-use warnings;
-use English;
 use Moose;
+extends 'Connector';
+
+use English;
 use DateTime;
 use Data::Dumper;
 use OpenXPKI::DateTime;
 use OpenXPKI::Server::Context qw( CTX );
 
-extends 'Connector';
 
 has key => (
     is  => 'ro',
@@ -191,11 +190,8 @@ sub set {
 
 }
 
-
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
-1;
 __END__
 
 =head1 NAME

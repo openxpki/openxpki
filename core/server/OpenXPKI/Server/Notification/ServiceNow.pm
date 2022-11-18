@@ -1,16 +1,12 @@
-## OpenXPKI::Server::Notification::ServiceNow
-## Notifier for the ServiceNow Ticket System
-## using their public SOAP API via SOAP::Lite
-##
-## Written 2013 by Oliver Welter for the OpenXPKI project
-## (C) Copyright 2013 by The OpenXPKI Project
-
 package OpenXPKI::Server::Notification::ServiceNow;
 
-use strict;
-use warnings;
-use English;
+use Moose;
+extends 'OpenXPKI::Server::Notification::Base';
 
+## Notifier for the ServiceNow Ticket System
+## using their public SOAP API via SOAP::Lite
+
+use English;
 
 use DateTime;
 use OpenXPKI::Server::Context qw( CTX );
@@ -23,10 +19,6 @@ use SOAP::Lite on_fault => sub {
     OpenXPKI::Exception->throw(message => 'I18N_OPENXPKI_SERVER_NOTIFICATION_SERVICENOW_SOAP_ERROR',
         params => { error => ref $res ? $res->faultdetail : $soap->transport->status } );
 };
-
-use Moose;
-
-extends 'OpenXPKI::Server::Notification::Base';
 
 has 'transport' => (
     is      => 'ro',
@@ -357,4 +349,4 @@ sub _prepare_params {
 
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

@@ -1,4 +1,3 @@
-
 package OpenXPKI::Client::UI::Handle::Profile;
 
 use Moose;
@@ -425,6 +424,6 @@ sub __translate_form_def {
 
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__

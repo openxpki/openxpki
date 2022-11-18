@@ -83,4 +83,5 @@ sub has_dto {
     ));
 }
 
+# No __PACKAGE__->meta->make_immutable: we said "use Moose ();" and thus did not enable Moose meta magic
 1;

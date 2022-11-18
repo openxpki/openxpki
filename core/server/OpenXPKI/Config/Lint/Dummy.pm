@@ -1,9 +1,9 @@
 package OpenXPKI::Config::Lint::Dummy;
 
-use Data::Dumper;
 use Moose;
-
 with 'OpenXPKI::Config::Lint::Role';
+
+use Data::Dumper;
 
 sub lint {
 
@@ -25,8 +25,7 @@ sub lint {
     return;
 }
 
-
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__;
 

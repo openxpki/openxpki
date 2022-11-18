@@ -1,16 +1,13 @@
 package OpenXPKI::Template::Plugin::Utils;
 
-use strict;
-use warnings;
+use Moose;
+extends 'Template::Plugin';
+
 use utf8;
 
-use Moose;
 use Template::Plugin;
 use MIME::Base64;
 use Data::Dumper;
-
-extends 'Template::Plugin';
-
 
 =head1 OpenXPKI::Template::Plugin::Utils
 
@@ -83,4 +80,4 @@ sub to_base64 {
     return MIME::Base64::encode_base64($string, '');
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

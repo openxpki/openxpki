@@ -1,17 +1,15 @@
 package OpenXPKI::Server::Authentication::Password;
 
-use strict;
-use warnings;
+use Moose;
+extends 'OpenXPKI::Server::Authentication::Base';
+
 use English;
 
-use Moose;
 use Data::Dumper;
 use OpenXPKI::Debug;
 use OpenXPKI::Password;
 use OpenXPKI::Server::Authentication::Handle;
 use OpenXPKI::Server::Context qw( CTX );
-
-extends 'OpenXPKI::Server::Authentication::Base';
 
 has mode => (
     is => 'ro',
@@ -94,7 +92,7 @@ sub handleInput {
 
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 

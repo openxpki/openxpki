@@ -1,5 +1,7 @@
 package OpenXPKI::Server::Log;
 
+use Moose;
+
 =head1 Name
 
 OpenXPKI::Server::Log - logging implementation for OpenXPKI
@@ -16,10 +18,7 @@ things to meet our requirements.
 
 =cut
 
-use strict;
-use warnings;
 use English;
-use Moose;
 
 use OpenXPKI::Log4perl;
 use Log::Log4perl::Level;
@@ -251,7 +250,7 @@ for my $prio (qw/ debug info warn error fatal trace /) {
     };
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 

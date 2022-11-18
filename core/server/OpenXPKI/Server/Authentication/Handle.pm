@@ -1,9 +1,7 @@
 package OpenXPKI::Server::Authentication::Handle;
 
-use strict;
-use warnings;
-
 use Moose;
+
 use Moose::Util::TypeConstraints;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
@@ -122,9 +120,9 @@ sub is_valid {
 
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
- __END__;
+__END__;
 
 =head1 OpenXPKI::Server::Authentication::Handle
 

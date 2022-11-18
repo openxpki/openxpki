@@ -1,9 +1,9 @@
 package OpenXPKI::Client::UI::Users;
-
 use Moose;
+extends 'OpenXPKI::Client::UI::Result';
+
 use Data::Dumper;
 
-extends 'OpenXPKI::Client::UI::Result';
 
 =head2 init_index
 
@@ -378,4 +378,4 @@ sub init_search {
     return $self;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

@@ -1,8 +1,9 @@
 package OpenXPKI::Server::Session::Data::SCEP;
-use Moose;
-use utf8;
 
+use Moose;
 extends 'OpenXPKI::Server::Session::Data';
+
+use utf8;
 
 =head1 NAME
 

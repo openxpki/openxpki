@@ -1,10 +1,6 @@
-# OpenXPKI::Client::UI::Bulk
-# Written 2013 by Oliver Welter
-# (C) Copyright 2013 by The OpenXPKI Project
-
 package OpenXPKI::Client::UI::Bulk;
-
 use Moose;
+
 use Template;
 use Data::Dumper;
 use Date::Parse;
@@ -200,6 +196,4 @@ sub action_result {
 
 }
 
-1;
-
-
+__PACKAGE__->meta->make_immutable;

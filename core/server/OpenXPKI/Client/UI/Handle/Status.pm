@@ -1,7 +1,6 @@
-
 package OpenXPKI::Client::UI::Handle::Status;
-
 use Moose;
+
 use Data::Dumper;
 use English;
 use OpenXPKI::DateTime;
@@ -371,6 +370,7 @@ sub render_token_status {
     return $self;
 
 }
-1;
+
+__PACKAGE__->meta->make_immutable;
 
 __END__

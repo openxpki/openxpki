@@ -1,10 +1,9 @@
 package OpenXPKI::Server::Workflow::Validator::CertSubjectFields;
 
-use strict;
-use warnings;
-use utf8;
-
 use Moose;
+extends 'OpenXPKI::Server::Workflow::Validator';
+
+use utf8;
 
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Server::Context qw( CTX );
@@ -12,9 +11,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 use English;
 use Template;
-
-
-extends 'OpenXPKI::Server::Workflow::Validator';
 
 sub _validate {
 
@@ -120,7 +116,7 @@ sub _validate {
     return 1;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 

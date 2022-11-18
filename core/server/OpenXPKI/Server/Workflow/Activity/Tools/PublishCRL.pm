@@ -1,13 +1,11 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::PublishCRL;
 
-use strict;
-use English;
-
-
 use Moose;
 use MooseX::NonMoose;
 extends qw( OpenXPKI::Server::Workflow::Activity );
 with qw( OpenXPKI::Server::Workflow::Role::Publish );
+
+use English;
 
 use MIME::Base64;
 use OpenXPKI::Server::Context qw( CTX );
@@ -155,7 +153,8 @@ sub execute {
     return;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
+
 __END__
 
 =head1 Name

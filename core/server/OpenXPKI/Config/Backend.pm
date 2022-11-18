@@ -1,13 +1,14 @@
 package OpenXPKI::Config::Backend;
 
+use Moose;
+extends 'Connector::Builtin::Memory';
+
 use Storable qw(freeze);
 use Config::Merge;
 use YAML;
 use Data::Dumper;
 use Digest::SHA qw(sha256_hex);
 
-use Moose;
-extends 'Connector::Builtin::Memory';
 
 has 'checksum' => (
     is => 'rw',
@@ -81,7 +82,7 @@ sub cm2tree {
     }
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __DATA__
 

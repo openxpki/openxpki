@@ -1,19 +1,18 @@
-## OpenXPKI::Server::Notification::Handler
-##
-## Written 2013 by Oliver Welter for the OpenXPKI project
-## (C) Copyright 2013 by The OpenXPKI Project
+package OpenXPKI::Server::Notification::Handler;
+
+use Moose;
 
 =head1 NAME
 
- OpenXPKI::Server::Notification::Handler
+OpenXPKI::Server::Notification::Handler
 
-=head1 Description
+=head1 DESCRIPTION
 
 Interface to the new notification system. Checks the requested
 notification against all configured backends and starts the
 delivery according to the configuration.
 
-=head1 Methods
+=head1 METHODS
 
 =head2 notify({ MESSAGE, WORKFLOW })
 
@@ -21,19 +20,13 @@ Execute the notifcations for MESSAGE and.
 
 =cut
 
-package OpenXPKI::Server::Notification::Handler;
-
-use strict;
-use warnings;
 use English;
-
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
 use OpenXPKI::Serialization::Simple;
 
-use Moose;
 
 # Attribute Setup
 
@@ -274,4 +267,4 @@ sub _prepare_template_vars {
 
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

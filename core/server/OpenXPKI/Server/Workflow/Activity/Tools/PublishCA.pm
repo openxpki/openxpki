@@ -1,8 +1,5 @@
 package OpenXPKI::Server::Workflow::Activity::Tools::PublishCA;
 
-use strict;
-use English;
-
 use Moose;
 use MooseX::NonMoose;
 extends qw( OpenXPKI::Server::Workflow::Activity );
@@ -67,7 +64,8 @@ sub execute {
     return;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
+
 __END__
 
 =head1 Name

@@ -1,21 +1,14 @@
-# OpenXPKI::Serialization::Simple
-#
-# Written 2012 by Oliver Welter for the OpenXPKI project
-# Copyright (C) 2012 by The OpenXPKI Project
-#
-#
+package OpenXPKI::Serialization::Simple;
+
+use Moose;
+
 =head1 NAME
 
 OpenXPKI::Serialization::Simple
 
 =cut
 
-package OpenXPKI::Serialization::Simple;
-
-use strict;
-use warnings;
 use English;
-use Moose;
 
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
@@ -124,4 +117,4 @@ sub is_serialized {
 
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

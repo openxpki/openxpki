@@ -1,11 +1,9 @@
 package OpenXPKI::Connector::Regex;
 
-use strict;
-use warnings;
-use English;
 use Moose;
-
 extends 'Connector';
+
+use English;
 
 has replace => (
     is  => 'ro',
@@ -111,10 +109,8 @@ sub get_meta {
     return { TYPE  => ($self->is_value() ? "hash" : "scalar") };
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
-1;
 __END__
 
 =head1 NAME

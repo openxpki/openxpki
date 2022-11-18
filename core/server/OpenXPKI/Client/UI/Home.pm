@@ -1,14 +1,11 @@
-# OpenXPKI::Client::UI::Home
-# Written 2013 by Oliver Welter
-# (C) Copyright 2013 by The OpenXPKI Project
-
 package OpenXPKI::Client::UI::Home;
-
 use Moose;
+
+extends 'OpenXPKI::Client::UI::Result';
+
 use Template;
 use Data::Dumper;
 
-extends 'OpenXPKI::Client::UI::Result';
 
 sub BUILD {
 
@@ -75,4 +72,4 @@ sub init_task {
 
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

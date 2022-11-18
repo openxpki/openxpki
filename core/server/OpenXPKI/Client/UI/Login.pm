@@ -1,13 +1,10 @@
-# OpenXPKI::Client::UI::Login
-# Written 2013 by Oliver Welter
-# (C) Copyright 2013 by The OpenXPKI Project
-
 package OpenXPKI::Client::UI::Login;
-
 use Moose;
-use Data::Dumper;
 
 extends 'OpenXPKI::Client::UI::Result';
+
+use Data::Dumper;
+
 
 my $meta = __PACKAGE__->meta;
 
@@ -147,4 +144,4 @@ sub init_index {
     return $self;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

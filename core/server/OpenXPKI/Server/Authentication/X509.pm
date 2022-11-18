@@ -1,7 +1,8 @@
 package OpenXPKI::Server::Authentication::X509;
 
-use strict;
-use warnings;
+use Moose;
+extends 'OpenXPKI::Server::Authentication::Base';
+
 use English;
 
 use OpenXPKI::Debug;
@@ -10,10 +11,7 @@ use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Crypt::X509;
 use MIME::Base64;
 
-use Moose;
 use OpenXPKI::Server::Authentication::Handle;
-
-extends 'OpenXPKI::Server::Authentication::Base';
 
 
 has path => (
@@ -190,7 +188,8 @@ sub _validation_result {
 
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
+
 __END__
 
 =head1 Name

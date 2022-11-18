@@ -1552,5 +1552,4 @@ sub __prepare_dn_for_display {
     return \@dn;
 }
 
-
-1;
+__PACKAGE__->meta->make_immutable;

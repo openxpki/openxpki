@@ -1,14 +1,13 @@
 package OpenXPKI::Connector::FakeValidity;
 
-use strict;
-use warnings;
-use English;
 use Moose;
+extends 'Connector';
+
+use English;
 use DateTime;
 use OpenXPKI::DateTime;
 use OpenXPKI::Server::Context qw( CTX );
 
-extends 'Connector';
 
 has cut_wday => (
     is  => 'ro',
@@ -68,10 +67,8 @@ sub get_meta {
     return {TYPE  => "scalar" };
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
-1;
 __END__
 
 =head1 NAME

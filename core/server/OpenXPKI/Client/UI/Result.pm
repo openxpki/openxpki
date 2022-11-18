@@ -1193,5 +1193,4 @@ sub fetch_autocomplete_params {
 
 }
 
-
 __PACKAGE__->meta->make_immutable;

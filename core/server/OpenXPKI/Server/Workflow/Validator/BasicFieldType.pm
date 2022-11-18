@@ -1,5 +1,7 @@
 package OpenXPKI::Server::Workflow::Validator::BasicFieldType;
+
 use Moose;
+extends 'OpenXPKI::Server::Workflow::Validator';
 
 # Core modules
 use Encode;
@@ -12,8 +14,6 @@ use Try::Tiny;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
-
-extends 'OpenXPKI::Server::Workflow::Validator';
 
 sub _validate {
 
@@ -81,7 +81,7 @@ sub _validate {
     }
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 

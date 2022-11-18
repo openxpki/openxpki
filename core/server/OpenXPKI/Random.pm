@@ -1,7 +1,6 @@
 package OpenXPKI::Random;
+use Moose;
 
-use strict;
-use warnings;
 use utf8;
 
 use OpenXPKI::Debug;
@@ -10,7 +9,6 @@ use OpenXPKI::Server::Context qw( CTX );
 use MIME::Base64;
 
 use POSIX;
-use Moose;
 
 =head1 OpenXPKI::Random
 
@@ -172,7 +170,7 @@ sub _get_regular_random {
 
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__;
 

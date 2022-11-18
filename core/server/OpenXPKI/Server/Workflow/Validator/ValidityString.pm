@@ -1,9 +1,7 @@
 package OpenXPKI::Server::Workflow::Validator::ValidityString;
 
-use strict;
-use warnings;
-
 use Moose;
+extends 'OpenXPKI::Server::Workflow::Validator';
 
 use OpenXPKI::DateTime;
 use OpenXPKI::Server::Context qw( CTX );
@@ -11,8 +9,6 @@ use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 
 use Workflow::Exception qw( validation_error configuration_error );
-
-extends 'OpenXPKI::Server::Workflow::Validator';
 
 sub _validate {
 
@@ -63,7 +59,7 @@ sub _validate {
     return 1;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 

@@ -1,11 +1,10 @@
 package OpenXPKI::Crypt::PKCS7::CertificateList;
+use Moose;
 
-use strict;
-use warnings;
 use English;
+
 use MIME::Base64;
 use Digest::SHA qw(sha256);
-use Moose;
 use Convert::ASN1 ':tag';
 
 use OpenXPKI::Debug;
@@ -24,7 +23,7 @@ After adding the certificate to the I<certs> attribute call I<data> or
 I<pem> to get the PKCS7 structure. The class does no checks or any
 sorting on the list of items passed so make sure to sanitize your data.
 
-=head2 Parameters / Accessor methods
+=head1 PARAMETERS / ACCESSOR METHODS
 
 =cut
 
@@ -34,7 +33,7 @@ has _asn1 => (
     isa => 'Convert::ASN1',
 );
 
-=head3 certs
+=head2 certs
 
 An array ref holding the DER encoded certificates that will be part of
 the final structure.
@@ -47,7 +46,7 @@ has certs => (
     default => sub { return [] }
 );
 
-=head3 crls
+=head2 crls
 
 An array ref holding the DER encoded CRLs that will be part of
 the final structure. If not set, the tag is also not created,
@@ -64,7 +63,7 @@ has crls => (
     default => sub { return [] }
 );
 
-=item keep_duplicates
+=head2 keep_duplicates
 
 The default is to not add a certificate more than once even if it occurs
 multiple times in the input. Set to true if you explicitly want to keep
@@ -79,7 +78,7 @@ has keep_duplicates => (
 );
 
 
-=head3 data
+=head2 data
 
 The DER encoded PKCS7 structure.
 
@@ -92,7 +91,7 @@ has data => (
     builder => '__build_pkcs7'
 );
 
-=head3 pem
+=head2 pem
 
 The PEM encoded PKCS7 structure.
 
@@ -128,6 +127,10 @@ around BUILDARGS => sub {
     return $class->$orig( @_, _asn1 => $asn );
 
 };
+
+=head1 METHODS
+
+=cut
 
 sub __build_pkcs7 {
 
@@ -179,7 +182,7 @@ sub __build_pkcs7 {
 
 }
 
-=item add_cert
+=head2 add_cert
 
 Expects a DER or PEM encoded certificate as argument and appends it to
 the list of certificates.
@@ -199,4 +202,4 @@ sub add_cert {
 
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

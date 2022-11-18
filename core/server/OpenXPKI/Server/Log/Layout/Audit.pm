@@ -1,10 +1,10 @@
 package OpenXPKI::Server::Log::Layout::Audit;
 
 use Moose;
+extends 'Log::Log4perl::Layout::PatternLayout';
+
 use Log::Log4perl;
 use Data::Dumper;
-
-extends 'Log::Log4perl::Layout::PatternLayout';
 
 sub render {
     my $self = shift;
@@ -26,7 +26,7 @@ sub render {
     return $self->SUPER::render( $message, $category, $priority, $caller_level );
 };
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 =head1 Name
 

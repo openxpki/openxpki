@@ -1,13 +1,14 @@
 package OpenXPKI::Config::Loader;
 
+use Moose;
+extends 'Connector::Builtin::Memory';
+
 use Storable qw(freeze thaw);
 use Digest::SHA qw(sha256_hex);
 use MIME::Base64;
 use OpenXPKI::FileUtils;
 use Proc::SafeExec;
-use Moose;
 
-extends 'Connector::Builtin::Memory';
 
 has '+LOCATION' => ( required => 1 );
 
@@ -139,7 +140,7 @@ sub _build_config {
     return $tree;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __DATA__
 

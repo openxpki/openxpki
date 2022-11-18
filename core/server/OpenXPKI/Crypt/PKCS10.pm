@@ -1,16 +1,14 @@
 package OpenXPKI::Crypt::PKCS10;
 
-use strict;
-use warnings;
+use Moose;
+
 use English;
 
 use OpenXPKI::DN;
 use Digest::SHA qw(sha1_base64 sha1_hex);
 use OpenXPKI::DateTime;
 use MIME::Base64;
-use Moose;
 use Crypt::PKCS10 1.8;
-
 
 has _pkcs10 => (
     is => 'ro',
@@ -203,8 +201,6 @@ around BUILDARGS => sub {
 
 };
 
-
-1;
-
+__PACKAGE__->meta->make_immutable;
 
 __END__;

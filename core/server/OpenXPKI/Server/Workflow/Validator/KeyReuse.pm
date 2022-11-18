@@ -1,18 +1,15 @@
 package OpenXPKI::Server::Workflow::Validator::KeyReuse;
 
-use strict;
-use warnings;
-use English;
 use Moose;
+extends 'OpenXPKI::Server::Workflow::Validator';
+
+use English;
 
 use Workflow::Exception qw( validation_error );
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug;
 
 use OpenXPKI::Crypt::PKCS10;
-
-
-extends 'OpenXPKI::Server::Workflow::Validator';
 
 sub _validate {
     my ( $self, $wf, $pkcs10 ) = @_;
@@ -58,7 +55,7 @@ sub _validate {
     return 1;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 

@@ -1,5 +1,7 @@
 package OpenXPKI::Workflow::Handler;
 
+use Moose;
+
 =head1 NAME
 
 OpenXPKI::Workflow::Handler - Workflow factory manager
@@ -14,7 +16,6 @@ specify additional instances that should be created to the constructor.
 
 =cut
 
-use Moose;
 use English;
 
 use OpenXPKI::Server::Context qw( CTX );
@@ -151,6 +152,6 @@ sub get_factory {
     return $workflow_factory;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__

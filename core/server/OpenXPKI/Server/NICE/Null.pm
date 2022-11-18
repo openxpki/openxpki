@@ -1,17 +1,10 @@
 package OpenXPKI::Server::NICE::Null;
 
-use English;
-use OpenXPKI::Exception;
-use OpenXPKI::Server::Context qw( CTX );
-
 use Moose;
-#use namespace::autoclean; # Conflicts with Debugger
-
-
 extends 'OpenXPKI::Server::NICE';
 
+__PACKAGE__->meta->make_immutable;
 
-1;
 __END__
 
 =head1 Name

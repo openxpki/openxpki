@@ -1,13 +1,9 @@
-# OpenXPKI::Client::UI::Information
-# Written 2013 by Oliver Welter
-# (C) Copyright 2013 by The OpenXPKI Project
-
 package OpenXPKI::Client::UI::Information;
-
 use Moose;
-use Data::Dumper;
 
 extends 'OpenXPKI::Client::UI::Result';
+
+use Data::Dumper;
 
 sub BUILD {
 
@@ -146,4 +142,4 @@ sub init_status {
     });
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

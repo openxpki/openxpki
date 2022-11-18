@@ -1,10 +1,10 @@
 package OpenXPKI::Crypt::PKCS7::SCEP;
 
-use strict;
-use warnings;
+use Moose;
+with 'OpenXPKI::Role::IssuerSerial';
+
 use English;
 use MIME::Base64;
-use Moose;
 use Convert::ASN1 ':tag';
 use Crypt::CBC;
 use Crypt::Digest qw( digest_data );
@@ -17,8 +17,6 @@ use OpenXPKI::Crypt::X509;
 use OpenXPKI::Crypt::PKCS7 qw(encode_tag decode_tag find_oid);
 # CTX is only used to generate random for nonce and keys
 use OpenXPKI::Server::Context qw( CTX );
-
-with 'OpenXPKI::Role::IssuerSerial';
 
 =head1 NAME
 
@@ -787,5 +785,4 @@ sub create_failure_response {
 
 }
 
-
-1;
+__PACKAGE__->meta->make_immutable;

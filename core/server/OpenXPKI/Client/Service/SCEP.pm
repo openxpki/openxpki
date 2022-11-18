@@ -1,8 +1,6 @@
 package OpenXPKI::Client::Service::SCEP;
-
 use Moose;
-use warnings;
-use strict;
+
 use Carp;
 use English;
 use Data::Dumper;
@@ -188,6 +186,6 @@ around 'build_params' => sub {
     return $params;
 };
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__;

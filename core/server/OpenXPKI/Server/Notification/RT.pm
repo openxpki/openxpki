@@ -1,17 +1,12 @@
-## OpenXPKI::Server::Notification::RT
+package OpenXPKI::Server::Notification::RT;
+
+use Moose;
+extends 'OpenXPKI::Server::Notification::Base';
+
 ## SMTP Notifier using RT::Client::REST to connect to a
 ## RT RequestTracker ticket system
-##
-## Written 2013 by Oliver Welter for the OpenXPKI project
-## (C) Copyright 2013 by The OpenXPKI Project
 
-package OpenXPKI::Server::Notification::RT;
-#use base qw( OpenXPKI::Server::Notification );
-
-use strict;
-use warnings;
 use English;
-
 
 use DateTime;
 use OpenXPKI::Server::Context qw( CTX );
@@ -21,11 +16,6 @@ use OpenXPKI::Serialization::Simple;
 
 use RT::Client::REST;
 use RT::Client::REST::Ticket;
-
-use Moose;
-
-extends 'OpenXPKI::Server::Notification::Base';
-
 
 has 'rt' => (
     is => 'ro',
@@ -313,5 +303,4 @@ sub _set_flags {
     return;
 }
 
-
-1;
+__PACKAGE__->meta->make_immutable;

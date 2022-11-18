@@ -93,8 +93,7 @@ sub check_dns {
 
 }
 
-1;
-
+__PACKAGE__->meta->make_immutable;
 
 =head1 NAME
 

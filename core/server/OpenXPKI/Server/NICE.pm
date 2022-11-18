@@ -1,9 +1,8 @@
 package OpenXPKI::Server::NICE;
 
-use strict;
-use warnings;
-use English;
+use Moose;
 
+use English;
 
 use Encode;
 use OpenXPKI::Server::Context qw( CTX );
@@ -13,8 +12,6 @@ use OpenXPKI::Crypt::X509;
 use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Database::Legacy;
 use OpenXPKI::Server::Database; # to get AUTO_ID
-use Moose;
-#use namespace::autoclean; # Comnflicts with Debugger
 
 # Attribute Setup
 
@@ -23,7 +20,6 @@ has 'activity' => (
     isa => 'Object|Undef',
     reader => '_get_activity',
 );
-
 
 has 'workflow' => (
     is  => 'ro',
@@ -390,7 +386,6 @@ sub fetchKey {
 # Speeds up Moose
 __PACKAGE__->meta->make_immutable;
 
-1;
 __END__
 
 =head1 Name

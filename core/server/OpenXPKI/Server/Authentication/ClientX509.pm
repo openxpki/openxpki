@@ -1,7 +1,8 @@
 package OpenXPKI::Server::Authentication::ClientX509;
 
-use strict;
-use warnings;
+use Moose;
+extends 'OpenXPKI::Server::Authentication::X509';
+
 use English;
 
 use OpenXPKI::Debug;
@@ -10,10 +11,6 @@ use OpenXPKI::Server::Context qw( CTX );
 
 use DateTime;
 use Data::Dumper;
-
-use Moose;
-
-extends 'OpenXPKI::Server::Authentication::X509';
 
 sub handleInput {
 
@@ -50,7 +47,8 @@ sub handleInput {
 
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
+
 __END__
 
 =head1 OpenXPKI::Server::Authentication::ClientX509

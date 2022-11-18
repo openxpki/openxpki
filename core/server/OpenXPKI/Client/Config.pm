@@ -1,6 +1,6 @@
 package OpenXPKI::Client::Config;
-
 use Moose;
+
 use File::Spec;
 use Cache::LRU;
 use Config::Std;
@@ -499,6 +499,6 @@ sub __init_logger {
 
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__;

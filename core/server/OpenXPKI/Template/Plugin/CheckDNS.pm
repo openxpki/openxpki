@@ -1,5 +1,8 @@
 package OpenXPKI::Template::Plugin::CheckDNS;
 
+use Moose;
+extends 'Template::Plugin';
+
 =head1 OpenXPKI::Template::Plugin::CheckDNS
 
 =head2 How to use
@@ -13,20 +16,14 @@ to the "USE" statement:
 
 =cut
 
-use strict;
-use warnings;
 use utf8;
 
-use Moose;
 use Net::DNS;
-use Template::Plugin;
-
 
 use HTML::Entities;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 
-extends 'Template::Plugin';
 
 has 'resolver' => (
     is => 'ro',
@@ -201,4 +198,4 @@ sub resolve {
 
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

@@ -1,19 +1,24 @@
+package OpenXPKI::Client::Simple;
+use Moose;
 
-=head1 OpenXPKI::Client::Simple
+=head1 NAME
 
-An easy to use class to connect to the openxpki daemon and run commands
+OpenXPKI::Client::Simple - an easy way to connect to the openxpki daemon and run commands
+
+=head1 DESCRIPTION
+
 Designed as a kind of CLI interface for inline use within scripts. By
 default, it will not handle sessions and create a new session using the
 given auth info on each new instance (subsequent commands within one call
 are run on the same session). If you pass (and maintain) a session object to
 the constructor, it is used to persist the backend session during requests.
 
-=head2 Construction
+=head1 CONSTRUCTION
 
 The client is constructed calling the new method, the required configuration
 can be set via one of three options:
 
-=head3 Explicit Config
+=head2 Explicit Config
 
 Pass the configuration as hash to the new method, must set at least
 I<config.socket> and I<config.realm> (omit if server has only one realm).
@@ -24,7 +29,7 @@ I<auth.stack> and appropriate keys for the chosen login method.
 An instance of Log4perl can be passed via I<logger>, default is to log to
 STDERR with loglevel error.
 
-=head3 Explicit Config from File
+=head2 Explicit Config from File
 
 Pass the name of the config file to use as string to the new method, the
 file must be in the standard config ini format and have at least a section
@@ -36,7 +41,7 @@ You can set a loglevel and logfile location using I<log.file> and
 I<log.level>. Loglevel must be a Log4perl Level name without the leading
 dollar sign (e.g. level=DEBUG).
 
-=head3 Implicit Config from File
+=head2 Implicit Config from File
 
 If you do not pass a I<config> argument to the new method, the class tries
 to find a config file at
@@ -56,10 +61,6 @@ arguments the settings in the file are ignored.
 
 =cut
 
-package OpenXPKI::Client::Simple;
-
-use strict;
-use warnings;
 use English;
 use POSIX qw( strftime );
 use Getopt::Long;
@@ -72,8 +73,6 @@ use OpenXPKI::Serialization::Simple;
 use Log::Log4perl qw(:easy :levels);
 use Log::Log4perl::Level;
 
-
-use Moose;
 use Data::Dumper;
 
 has auth => (
@@ -149,6 +148,9 @@ sub _build_logger {
     return Log::Log4perl->get_logger();
 };
 
+=head1 METHODS
+
+=cut
 
 around BUILDARGS => sub {
 
@@ -665,7 +667,7 @@ sub __reinit_session {
 
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 

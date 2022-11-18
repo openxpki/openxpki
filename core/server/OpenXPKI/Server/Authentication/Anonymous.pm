@@ -1,12 +1,10 @@
 package OpenXPKI::Server::Authentication::Anonymous;
 
-use strict;
-use warnings;
-
 use Moose;
+extends 'OpenXPKI::Server::Authentication::Base';
+
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Authentication::Handle;
-extends 'OpenXPKI::Server::Authentication::Base';
 
 has user => (
     is => 'ro',
@@ -51,7 +49,7 @@ sub handleInput {
     );
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 

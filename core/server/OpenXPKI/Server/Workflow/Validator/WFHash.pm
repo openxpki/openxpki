@@ -1,17 +1,13 @@
 package OpenXPKI::Server::Workflow::Validator::WFHash;
 
-use strict;
-
 use Moose;
+extends 'OpenXPKI::Server::Workflow::Validator';
 
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 
 use Workflow::Exception qw( configuration_error validation_error );
-
-
-extends 'OpenXPKI::Server::Workflow::Validator';
 
 sub _validate {
     my ( $self, $wf, $key ) = @_;
@@ -39,7 +35,7 @@ sub _validate {
     return 1;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 

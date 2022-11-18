@@ -1,16 +1,14 @@
 package OpenXPKI::Connector::WorkflowContext;
 
-use strict;
-use warnings;
-use English;
 use Moose;
+extends 'Connector';
+
+use English;
 use DateTime;
 use Data::Dumper;
 use OpenXPKI::DateTime;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Serialization::Simple;
-
-extends 'Connector';
 
 our $CONTEXT = {};
 
@@ -109,7 +107,7 @@ sub _get_node {
     return $val;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__;
 

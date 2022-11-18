@@ -1,24 +1,17 @@
-## OpenXPKI::Server::Notification::Connector
-## Notifier that sends the compiled message using a Connector
-
 package OpenXPKI::Server::Notification::Connector;
 
-use strict;
-use warnings;
+use Moose;
+extends 'OpenXPKI::Server::Notification::Base';
+
 use English;
 
 use Data::Dumper;
-
 use JSON;
 use YAML::Loader;
 use DateTime;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-
-use Moose;
-
-extends 'OpenXPKI::Server::Notification::Base';
 
 has 'backend' => (
     is => 'ro',
@@ -162,13 +155,13 @@ sub _cleanup {
 
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
-=head1 Name
+=head1 NAME
 
 OpenXPKI::Server::Notification::Connector - Notification via Connector
 
-=head1 Description
+=head1 DESCRIPTION
 
 This class implements a notifier that sends out notifications via the "set"
 method of a Connector backend. The payload can be created in different ways.

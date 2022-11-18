@@ -1,12 +1,11 @@
 package OpenXPKI::Connector::Secret;
 
-use strict;
-use warnings;
-use English;
 use Moose;
+extends 'Connector';
+
+use English;
 use OpenXPKI::Server::Context qw( CTX );
 
-extends 'Connector';
 
 sub get {
 
@@ -44,10 +43,8 @@ sub get_meta {
 
 }
 
-no Moose;
 __PACKAGE__->meta->make_immutable;
 
-1;
 __END__
 
 =head1 NAME

@@ -1,12 +1,10 @@
 package OpenXPKI::Crypt::PubKey;
 
-use strict;
-use warnings;
-use English;
+use Moose;
 
+use English;
 use Digest::SHA qw( sha1_hex );
 use MIME::Base64;
-use Moose;
 
 has data => (
     is => 'ro',
@@ -119,8 +117,6 @@ around BUILDARGS => sub {
 
 };
 
-
-1;
-
+__PACKAGE__->meta->make_immutable;
 
 __END__;

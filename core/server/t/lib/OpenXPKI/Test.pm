@@ -1,5 +1,7 @@
 package OpenXPKI::Test;
+
 use Moose;
+
 use utf8;
 
 =head1 NAME
@@ -1281,4 +1283,5 @@ sub auth_config {
     };
 }
 
+# this Moose instance MUST NOT be made immutable as we access $self->meta during runtime
 1;

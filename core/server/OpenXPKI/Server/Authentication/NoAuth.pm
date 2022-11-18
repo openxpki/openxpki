@@ -1,15 +1,12 @@
 package OpenXPKI::Server::Authentication::NoAuth;
 
-use strict;
-use warnings;
-
 use Moose;
+extends 'OpenXPKI::Server::Authentication::Base';
+
 use OpenXPKI::Debug;
 use OpenXPKI::Password;
 use OpenXPKI::Server::Authentication::Handle;
 use OpenXPKI::Server::Context qw( CTX );
-
-extends 'OpenXPKI::Server::Authentication::Base';
 
 
 sub parseRole {
@@ -65,7 +62,7 @@ sub handleInput {
     );
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 

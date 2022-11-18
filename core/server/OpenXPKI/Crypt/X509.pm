@@ -1,14 +1,12 @@
 package OpenXPKI::Crypt::X509;
+use Moose;
 
-use strict;
-use warnings;
 use English;
 
 use OpenXPKI::DN;
 use Digest::SHA qw(sha1_base64 sha1_hex);
 use OpenXPKI::DateTime;
 use MIME::Base64;
-use Moose;
 use Crypt::X509 0.53;
 
 has data => (
@@ -248,8 +246,9 @@ around BUILDARGS => sub {
 
 };
 
+=head1 METHODS
 
-=item cn
+=head2 cn
 
 Get the value of the subject CN field.
 
@@ -260,7 +259,7 @@ sub cn {
     return $self->subject_hash()->{CN}->[0];
 }
 
-=item get_notbefore / get_notafter I<format>
+=head2 get_notbefore / get_notafter I<format>
 
 Returns the notbefore / notafter date in the given format. For allowed
 formats see OpenXPKI::DateTime::convert_date, without format a DateTime
@@ -407,6 +406,6 @@ sub _to_db_hash {
 
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__;

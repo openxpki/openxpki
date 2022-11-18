@@ -1,14 +1,9 @@
-# OpenXPKI::Client::UI::Crl
-# Written 2013 by Oliver Welter
-# (C) Copyright 2013 by The OpenXPKI Project
-
 package OpenXPKI::Client::UI::Crl;
-
 use Moose;
-use Data::Dumper;
 
 extends 'OpenXPKI::Client::UI::Result';
 
+use Data::Dumper;
 
 =head2 init_index
 
@@ -241,4 +236,4 @@ sub __print_detail {
 
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

@@ -1,7 +1,15 @@
 package OpenXPKI::Server::NICE::Local;
 
+use Moose;
+extends 'OpenXPKI::Server::NICE';
+with qw(
+    OpenXPKI::Server::NICE::Role::KeyGenerationLocal
+    OpenXPKI::Server::NICE::Role::KeyInDataPool
+    OpenXPKI::Server::NICE::Role::RevokeCertificate
+);
 
 use English;
+
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
 use OpenXPKI::Crypto::Profile::Certificate;
@@ -13,15 +21,6 @@ use OpenXPKI::Serialization::Simple;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Workflow::WFObject::WFArray;
 use MIME::Base64;
-
-use Moose;
-#use namespace::autoclean; # Conflicts with Debugger
-extends 'OpenXPKI::Server::NICE';
-with qw(
-    OpenXPKI::Server::NICE::Role::KeyGenerationLocal
-    OpenXPKI::Server::NICE::Role::KeyInDataPool
-    OpenXPKI::Server::NICE::Role::RevokeCertificate
-);
 
 sub BUILD {
 
@@ -529,7 +528,7 @@ sub testConnection {
     return;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 

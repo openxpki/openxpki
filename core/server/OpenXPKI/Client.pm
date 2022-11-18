@@ -1,16 +1,9 @@
-# OpenXPKI::Client
-# Written 2006 by Michael Bell and Martin Bartosch for the OpenXPKI project
-# (C) Copyright 2006 by The OpenXPKI Project
-
 package OpenXPKI::Client;
-
-use warnings;
-use strict;
-use Carp;
-use English;
-
 use Moose;
 
+use English;
+
+use Carp;
 use Socket;
 
 use Sys::SigAction qw( sig_alarm set_sig_handler );
@@ -502,7 +495,8 @@ sub get_session_id {
     return $self->session_id();
 }
 
-1;
+__PACKAGE__->meta->make_immutable;
+
 __END__
 
 =head1 NAME
