@@ -851,31 +851,27 @@ sub __purge_wf_token {
 
 =head2 __persist_response
 
-Persist the current response to retrieve it after a http roundtrip
-Used to break out of the JS app for downloads or reroute result pages
+Persist the given response data to retrieve it after an HTTP roundtrip.
+Used to break out of the JavaScript app for downloads or to reroute result
+pages.
+
+Returns the page call URI for L<OpenXPKI::Client::UI::Cache/init_fetch>.
 
 =cut
 
 sub __persist_response {
 
     my $self = shift;
-    my $data = shift;
-    my $expire = shift;
+    my $data = shift // die "Attempt to persist empty response data";
+    my $expire = shift // '+5m';
 
-    $expire = '+5m' unless defined $expire;
-
-    my $id = $self->__generate_uid();
-    $self->logger()->debug('persist response ' . $id);
-
-    # Auto Persist - use current result when no data is given
-    if (not defined $data) {
-        $data = { data => $self->_render_to_str };
-    }
+    my $id = $self->__generate_uid;
+    $self->log->debug('persist response ' . $id);
 
     $self->_session->param('response_'.$id, $data );
-    $self->_session->expire('response_'.$id, $expire) if ($expire);
+    $self->_session->expire('response_'.$id, $expire) if $expire;
 
-    return  "result!fetch!id!$id";
+    return  "cache!fetch!id!$id";
 
 }
 
