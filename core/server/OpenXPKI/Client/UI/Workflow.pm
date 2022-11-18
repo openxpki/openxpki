@@ -1422,7 +1422,6 @@ sub __render_fields {
             }
 
             # merge items from field param
-            $self->logger()->info(Dumper [ $vv, $param ]);
             map { $vv->{$_} ||= $param->{$_}  } ('mime','label','binary','hide','auto','filename');
 
             # guess filename from a file source
