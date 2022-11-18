@@ -529,16 +529,24 @@ sub param_from_fields {
     return $param;
 }
 
-=head2 logger
+=head2 log
 
-Return the class logger (log4perl ref)
+Return the class logger (log4perl ref).
 
 =cut
-
-sub logger {
-
+sub log {
     my $self = shift;
-    return $self->_client()->logger();
+    return $self->_client->logger;
+}
+
+=head2 logger
+
+Deprecated alias for L</log>.
+
+=cut
+sub logger {
+    my $self = shift;
+    return $self->_client->logger;
 }
 
 =head2 _render_to_str
