@@ -1,7 +1,5 @@
 package OpenXPKI::Server::Workflow::Validator::KeyReuse;
 
-use base qw( Workflow::Validator );
-
 use strict;
 use warnings;
 use English;
