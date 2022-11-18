@@ -47,6 +47,163 @@ has _client => (
     required => 1,
 );
 
+=head1 RESPONSE RELATED ATTRIBUTES AND METHODS
+
+Most of the following methods are accessors to attributes. Except from those
+starting with C<set_*> they can also be called without arguments to retrieve
+the current value.
+
+Please note that currently some of these attributes are of type I<Scalar>,
+I<ArrayRef> or I<HashRef> while others are "data transfer objects" (DTOs) that
+use L<OpenXPKI::Client::UI::Response::DTO> and encapsulate several values.
+The DTOs have a C<resolve> method which recursively builds a I<HashRef> from
+the encapsulated data. The I<HashRef> gets converted to JSON
+(in L</_render_to_str>) and is sent to the web UI.
+
+=head2 redirect
+
+Enforce a client side redirect to the given page:
+
+    $self->redirect->to('workflow!search');
+    $self->redirect->external('https://...');
+
+=head2 raw_response
+
+Enforce a "raw" response, i.e. to return an arbitrary JSON structure to the web
+UI. Used e.g. for responses to autocomplete queries.
+
+    $self->raw_response([1,2,3]);
+
+=head2 main
+
+Set the structure of the main contents.
+
+    $self->main->add_section(...);
+    $self->main->add_form(...);
+
+C<add_form> receives constructor parameters for L<OpenXPKI::Client::UI::Response::Section::Form>.
+
+=head2 infobox
+
+Set the structure of the right hand side info box.
+
+Usage equivalent to L</main>.
+
+=head2 language
+
+Set the language.
+
+    $self->language('de');
+
+=head2 menu
+
+Set the menu structure.
+
+    $self->menu->items([ ... ]);
+    # or
+    $self->menu->add_item({
+        key => 'logout',
+        label => 'I18N_OPENXPKI_UI_CLEAR_LOGIN',
+    });
+
+=head2 on_exception
+
+Add an exception handler for HTTP codes.
+
+    $self->on_exception->add_handler(
+        status_code => [ 403, 401 ],
+        redirect => $target,
+    );
+
+=head2 page and set_page
+
+Set page related information.
+
+    $self->page->label('I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE');
+    $self->page->shortlabel('I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE');
+    $self->page->description('I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION');
+    $self->page->breadcrumb([...]);
+    $self->page->css_class('important');
+    $self->page->large(1);
+
+    # set several attributes at once
+    $self->set_page(
+        label => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_TITLE',
+        description => 'I18N_OPENXPKI_UI_WORKFLOW_BULK_DESCRIPTION',
+    );
+
+=head2 ping
+
+Configure keepalive ping to an endpoint.
+
+    $self->ping({ href => '...', timeout => 30 }); # timeout is in milliseconds
+
+=head2 refresh and set_refresh
+
+Configure a periodic page refresh timer.
+
+    $self->refresh->uri("workflow!load!wf_id!$wf_id");
+    $self->refresh->timeout(30);
+
+    # set several attributes at once
+    $self->set_refresh(
+        uri => "workflow!load!wf_id!$wf_id",
+        timeout => 30,
+    );
+
+=head2 rtoken
+
+Set the request token.
+
+    $self->rtoken($rtoken);
+
+=head2 status
+
+Set status or error message.
+
+    $self->status->info('I18N_OPENXPKI_UI_WORKFLOW_STATE_WATCHDOG_PAUSED_30SEC');
+    $self->status->success('...');
+    $self->status->warn('...');
+    $self->status->error('...');
+
+=head2 tenant
+
+Set the tenant.
+
+    $self->tenant($tenant);
+
+=head2 user and set_user
+
+Set user related information.
+
+    $self->user->name(...);
+    $self->user->role(...);
+    $self->user->realname(...);
+    $self->user->role_label(...);
+    $self->user->pki_realm(...);
+    $self->user->pki_realm_label(...);
+    $self->user->checksum(...);
+    $self->user->sid(...);
+    $self->user->last_login($timestamp);
+    $self->user->tenants([...]);
+
+    # set several attributes at once
+    $self->set_user(%{ $user });
+
+=head2 add_header
+
+Add one or more HTTP response headers.
+
+    $response->add_header(-type => 'application/json; charset=UTF-8');
+    $self->add_header(-type => $data->{mime}, -attachment => $data->{attachment});
+
+=head2 get_headers
+
+Return the string containing the HTTP headers.
+
+    print $self->get_headers($cgi);
+
+=cut
 has resp => (
     is => 'ro',
     isa => 'OpenXPKI::Client::UI::Response',
@@ -114,6 +271,10 @@ has _internal_redirect_target => (
     reader => 'internal_redirect_target',
     init_arg => undef,
 );
+
+=head1 METHODS
+
+=cut
 
 sub _init_session {
 
