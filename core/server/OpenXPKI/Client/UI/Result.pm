@@ -197,11 +197,11 @@ Add one or more HTTP response headers.
     $response->add_header(-type => 'application/json; charset=UTF-8');
     $self->add_header(-type => $data->{mime}, -attachment => $data->{attachment});
 
-=head2 get_headers
+=head2 get_header_str
 
 Return the string containing the HTTP headers.
 
-    print $self->get_headers($cgi);
+    print $self->get_header_str($cgi);
 
 =cut
 has resp => (
@@ -224,7 +224,7 @@ has resp => (
         tenant
         user set_user
         add_header
-        get_headers
+        get_header_str
     ) ],
 );
 
@@ -608,7 +608,7 @@ sub render {
     }
 
     if ($cgi->http('HTTP_X-OPENXPKI-Client')) {
-        my $headers = $self->get_headers($cgi);
+        my $headers = $self->get_header_str($cgi);
         $self->logger->trace("Response headers: $headers") if $self->logger->is_trace;
         # Start output stream
         print $headers;
@@ -677,7 +677,7 @@ sub init_fetch {
 
     if ($data->{data}) {
         $self->add_header(-type => $data->{mime}, -attachment => $data->{attachment});
-        print $self->get_headers($cgi);
+        print $self->get_header_str($cgi);
         print $data->{data};
         exit;
     }
@@ -688,7 +688,7 @@ sub init_fetch {
     if ($type eq 'file') {
         open (my $fh, "<", $source) || die 'Unable to open file';
         $self->add_header(-type => $data->{mime}, -attachment => $data->{attachment});
-        print $self->get_headers($cgi);
+        print $self->get_header_str($cgi);
         while (my $line = <$fh>) {
             print $line;
         }
@@ -704,7 +704,7 @@ sub init_fetch {
         }
 
         $self->add_header(-type => $data->{mime}, -attachment => $data->{attachment});
-        print $self->get_headers($cgi);
+        print $self->get_header_str($cgi);
         Encode::encode('UTF-8', $dp->{value}) if $data->{mime} =~ /utf-8/i;
         print $dp->{value};
 
@@ -719,7 +719,7 @@ sub init_fetch {
         }
 
         $self->add_header(-type => $report->{mime_type}, -attachment => $report->{report_name});
-        print $self->get_headers($cgi);
+        print $self->get_header_str($cgi);
         print $report->{report_value};
 
     }

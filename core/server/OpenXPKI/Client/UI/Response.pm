@@ -121,13 +121,13 @@ sub set_user { shift->user(OpenXPKI::Client::UI::Response::User->new(@_)) }
 # overrides OpenXPKI::Client::UI::Response::DTORole->is_set()
 sub is_set { 1 }
 
-=head2 get_headers
+=head2 get_header_str
 
 Returns the HTTP header string containing all headers stored via L<add_header>
 plus the session cookie that contains the (encrypted) session id.
 
 =cut
-sub get_headers {
+sub get_header_str {
     my $self = shift;
     my $cgi = shift;
 
