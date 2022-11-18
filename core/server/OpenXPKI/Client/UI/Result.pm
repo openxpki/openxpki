@@ -682,107 +682,11 @@ sub render {
     return $self;
 }
 
-=head2 init_fetch
-
-Method to send the result persisted with __persist_response
-
-=cut
-
-sub init_fetch {
-
-    my $self = shift;
-    my $arg = shift;
-
-    my $response = $self->param('id');
-    my $data = $self->__fetch_response( $response );
-
-    if (!$data) {
-        $self->logger()->error('Got empty response');
-        $self->redirect->to('home!welcome');
-        return $self;
-    }
-
-    $self->logger()->trace('Got response ' . Dumper $data) if $self->logger()->is_trace;
-
-    # support multi-valued responses (persisted as array ref)
-    if (ref $data eq 'ARRAY') {
-        my $idx = $self->param('idx');
-        $self->logger()->debug('Found mulitvalued response, index is  ' . $idx);
-        if (!defined $idx || ($idx > scalar @{$data})) {
-            die "Invalid index";
-        }
-        $data = $data->[$idx];
-    }
-
-    if (ref $data ne 'HASH') {
-        die "Invalid, incomplete or expired fetch statement";
-    }
-
-    $data->{mime} = "application/json; charset=UTF-8" unless($data->{mime});
-
-    # Start output stream
-    my $cgi = $self->cgi();
-
-    if ($data->{data}) {
-        $self->add_header(-type => $data->{mime}, -attachment => $data->{attachment});
-        print $self->get_header_str($cgi);
-        print $data->{data};
-        exit;
-    }
-
-    my ($type, $source) = ($data->{source} =~ m{(\w+):(.*)});
-    $self->logger()->debug('Fetch source: '.$type.', Key: '.$source );
-
-    if ($type eq 'file') {
-        open (my $fh, "<", $source) || die 'Unable to open file';
-        $self->add_header(-type => $data->{mime}, -attachment => $data->{attachment});
-        print $self->get_header_str($cgi);
-        while (my $line = <$fh>) {
-            print $line;
-        }
-        close $fh;
-    } elsif ($type eq 'datapool') {
-        # todo - catch exceptions/not found
-        my $dp = $self->send_command_v2( 'get_data_pool_entry', {
-            namespace => 'workflow.download',
-            key => $source,
-        });
-        if (!$dp->{value}) {
-            die "Requested data not found/expired";
-        }
-
-        $self->add_header(-type => $data->{mime}, -attachment => $data->{attachment});
-        print $self->get_header_str($cgi);
-        Encode::encode('UTF-8', $dp->{value}) if $data->{mime} =~ /utf-8/i;
-        print $dp->{value};
-
-    } elsif ($type eq 'report') {
-        # todo - catch exceptions/not found
-        my $report = $self->send_command_v2( 'get_report', {
-            name => $source,
-            format => 'ALL',
-        });
-        if (!$report) {
-            die "Requested data not found/expired";
-        }
-
-        $self->add_header(-type => $report->{mime_type}, -attachment => $report->{report_name});
-        print $self->get_header_str($cgi);
-        print $report->{report_value};
-
-    }
-
-    exit;
-
-}
-
-
 =head2 _escape ( string )
 
 Replace html entities in string by their encoding
 
 =cut
-
 sub _escape {
 
     my $self = shift;
@@ -790,8 +694,6 @@ sub _escape {
     return encode_entities($arg);
 
 }
-
-
 
 =head2 __register_wf_token( wf_info, token )
 
@@ -801,7 +703,6 @@ with the definiton of a hidden field which can be directly
 pushed onto the field list. wf_info can be undef / empty string.
 
 =cut
-
 sub __register_wf_token {
 
     my $self = shift;
@@ -828,7 +729,6 @@ as string and an optional hash to pass as initial parameters to the
 create method. Returns the full action target as string.
 
 =cut
-
 sub __register_wf_token_initial {
 
     my $self = shift;
@@ -846,8 +746,6 @@ sub __register_wf_token_initial {
     $self->_session->param($id, $token);
     return  "workflow!index!wf_token!$id";
 }
-
-
 
 =head2 __fetch_wf_token( wf_token, purge )
 

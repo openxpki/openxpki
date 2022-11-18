@@ -51,6 +51,7 @@ OpenXPKI/Client/Service/Role/PickupWorkflow.pm
 OpenXPKI/Client/UI.pm
 OpenXPKI/Client/UI/Bootstrap.pm
 OpenXPKI/Client/UI/Bulk.pm
+OpenXPKI/Client/UI/Cache.pm
 OpenXPKI/Client/UI/Certificate.pm
 OpenXPKI/Client/UI/Crl.pm
 OpenXPKI/Client/UI/Handle/Profile.pm
