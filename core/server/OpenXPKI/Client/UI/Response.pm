@@ -44,6 +44,20 @@ has 'confined_response' => (
     predicate => 'has_confined_response',
 );
 
+has 'raw_bytes' => (
+    documentation => 'IGNORE',
+    is => 'rw',
+    isa => 'Str',
+    predicate => 'has_raw_bytes',
+);
+
+has 'raw_bytes_callback' => (
+    documentation => 'IGNORE',
+    is => 'rw',
+    isa => 'CodeRef',
+    predicate => 'has_raw_bytes_callback',
+);
+
 # HTTP headers
 has 'headers' => (
     documentation => 'IGNORE',

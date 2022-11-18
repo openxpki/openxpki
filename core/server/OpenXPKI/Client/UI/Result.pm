@@ -58,7 +58,7 @@ I<ArrayRef> or I<HashRef> while others are "data transfer objects" (DTOs) that
 use L<OpenXPKI::Client::UI::Response::DTO> and encapsulate several values.
 The DTOs have a C<resolve> method which recursively builds a I<HashRef> from
 the encapsulated data. The I<HashRef> gets converted to JSON
-(in L</_render_to_str>) and is sent to the web UI.
+(in L</_render_body_to_str>) and is sent to the web UI.
 
 =head2 redirect
 
@@ -69,8 +69,8 @@ Enforce a client side redirect to the given page:
 
 =head2 confined_response
 
-Enforce a "raw" response, i.e. to return an arbitrary JSON structure to the web
-UI. Used e.g. for responses to autocomplete queries.
+Enforce response to a confined request, i.e. and autocomplete query. Returns
+an arbitrary JSON structure to the web UI.
 
     $self->confined_response([1,2,3]);
 
@@ -195,13 +195,27 @@ Set user related information.
 Add one or more HTTP response headers.
 
     $response->add_header(-type => 'application/json; charset=UTF-8');
-    $self->add_header(-type => $data->{mime}, -attachment => $data->{attachment});
 
 =head2 get_header_str
 
 Return the string containing the HTTP headers.
 
     print $self->get_header_str($cgi);
+
+=head2 raw_bytes and raw_bytes_callback
+
+Set a raw byte output (i.e. no JSON response) to send files to the client.
+
+    $self->add_header(-type => $data->{mime}, -attachment => $data->{attachment});
+    $self->raw_bytes($data);
+
+    # to avoid storing large data in memory
+    $self->raw_bytes_callback(sub {
+        my $consume = shift;
+        open (my $fh, "<", $source) || die "Unable to open $source: $!";
+        while (my $line = <$fh>) { $consume->($line) }
+        close $fh;
+    });
 
 =cut
 has resp => (
@@ -225,6 +239,7 @@ has resp => (
         user set_user
         add_header
         get_header_str
+        raw_bytes has_raw_bytes raw_bytes_callback has_raw_bytes_callback
     ) ],
 );
 
@@ -549,13 +564,13 @@ sub logger {
     return $self->_client->logger;
 }
 
-=head2 _render_to_str
+=head2 _render_body_to_str
 
 Assemble the return hash from the internal caches and return the result as a
 string.
 
 =cut
-sub _render_to_str {
+sub _render_body_to_str {
     my $self = shift;
 
     my $status = $self->status->is_set ? $self->status->resolve : $self->__fetch_status;
@@ -576,7 +591,7 @@ sub _render_to_str {
     }
 
     #
-    # B) raw data
+    # B) response to a confined request, i.e. no page update (auto-complete etc.)
     #
     if ($self->has_confined_response) {
         return i18nTokenizer(encode_json($self->confined_response));
@@ -606,8 +621,6 @@ to the browser.
 =cut
 sub render {
     my $self = shift;
-
-    my $body = $self->_render_to_str;
     my $cgi = $self->cgi;
 
     if (not ref $cgi) {
@@ -615,27 +628,54 @@ sub render {
         return $self;
     }
 
-    if ($cgi->http('HTTP_X-OPENXPKI-Client')) {
+    # helper to print HTTP headers
+    my $print_headers = sub {
         my $headers = $self->get_header_str($cgi);
         $self->logger->trace("Response headers: $headers") if $self->logger->is_trace;
-        # Start output stream
         print $headers;
-        print $body;
+    };
 
+    # File download
+    if ($self->has_raw_bytes or $self->has_raw_bytes_callback) {
+        $print_headers->();
+        # A) raw bytes in memory
+        if ($self->has_raw_bytes) {
+            $self->logger->debug("Sending raw bytes (in memory)");
+            print $self->raw_bytes;
+        }
+        # B) raw bytes retrieved by callback function
+        elsif ($self->has_raw_bytes_callback) {
+            $self->logger->debug("Sending raw bytes (via callback)");
+            # run callback, passing a printing function as argument
+            $self->raw_bytes_callback->(sub { print @_ });
+        }
+
+    # Standard JSON response
+    } elsif ($cgi->http('HTTP_X-OPENXPKI-Client')) {
+        $print_headers->();
+        $self->logger->debug("Sending JSON response");
+        print $self->_render_body_to_str;
+
+    # Redirects
     } else {
-        my $url;
+        my $url = '';
         # redirect to given page
         if ($self->redirect->is_set) {
             $url = $self->redirect->to;
+
         # redirect to downloads / result pages
-        } elsif ($body) {
+        } elsif (my $body = $self->_render_body_to_str) {
             $url = $self->__persist_response( { data => $body } );
         }
+
         # if url does not start with http or slash, prepend baseurl + route name
         if ($url !~ m{\A http|/}x) {
             my $baseurl = $self->_session->param('baseurl');
             $url = sprintf("%sopenxpki/%s", $baseurl, $url);
         }
+
+        # HTTP redirect
+        $self->logger->debug("Sending HTTP redirect to: $url");
         print $cgi->redirect($url);
     }
 
