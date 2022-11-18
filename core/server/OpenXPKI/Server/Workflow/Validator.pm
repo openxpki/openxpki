@@ -1,6 +1,7 @@
 package OpenXPKI::Server::Workflow::Validator;
 
 use Moose;
+use MooseX::NonMoose;
 extends 'Workflow::Validator';
 
 use OpenXPKI::Debug;
