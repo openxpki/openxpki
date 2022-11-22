@@ -1,6 +1,7 @@
 package OpenXPKI::Template::Plugin::CheckDNS;
 
 use Moose;
+use MooseX::NonMoose;
 extends 'Template::Plugin';
 
 =head1 OpenXPKI::Template::Plugin::CheckDNS

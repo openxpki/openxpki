@@ -1,6 +1,7 @@
 package OpenXPKI::Template::Plugin::Utils;
 
 use Moose;
+use MooseX::NonMoose;
 extends 'Template::Plugin';
 
 use utf8;
