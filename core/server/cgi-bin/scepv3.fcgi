@@ -8,7 +8,6 @@ use CGI::Fast;
 use Data::Dumper;
 use English;
 use MIME::Base64;
-
 use OpenXPKI::Client::Config;
 use OpenXPKI::Client::Service::SCEP;
 
@@ -77,6 +76,7 @@ while (my $cgi = CGI::Fast->new()) {
     $log->debug("Config created");
 
     my $response;
+    my @extra_header;
     if ($operation eq 'PKIOperation') {
 
         # this internally triggers a call to the backend to unwrap the
@@ -99,12 +99,12 @@ while (my $cgi = CGI::Fast->new()) {
             # TODO - improve handling of GetCertInitial and RenewalReq
             $log->debug("Handle enrollment");
             $response = $client->handle_enrollment_request($cgi);
-
         # Request for CRL or GetCert with IssuerSerial in Payload
         } else {
             $response = $client->handle_property_request($cgi, $client->message_type);
         }
 
+        @extra_header = %{ $response->extra_headers() } if ($conf->{output}->{headers});
         $log->debug('Status: ' . $response->http_status_line());
         $log->trace(Dumper $response) if ($log->is_trace);
 
@@ -117,6 +117,7 @@ while (my $cgi = CGI::Fast->new()) {
                 -type => 'application/x-pki-message',
                 -charset => '',
                 'content-length' => length $out,
+                @extra_header
             );
             print $out;
         }
@@ -142,11 +143,13 @@ while (my $cgi = CGI::Fast->new()) {
         $response = $client->handle_property_request($cgi);
     }
 
+    @extra_header = %{ $response->extra_headers() } if ($conf->{output}->{headers});
     if ($response->is_server_error()) {
         print $cgi->header(
             -status => $response->http_status_line(),
             -type => 'text/plain',
             'charset' => 'utf8',
+            @extra_header
         );
         print $response->error_message()."\n";
         $log->debug($response->error_message()) if ($log->is_trace);
@@ -156,6 +159,7 @@ while (my $cgi = CGI::Fast->new()) {
             -type => 'text/plain',
             'charset' => 'utf8',
             'content-length' => length $response->result,
+            @extra_header
         );
         print $response->result;
         $log->trace($response->result) if ($log->is_trace);
@@ -166,6 +170,7 @@ while (my $cgi = CGI::Fast->new()) {
             -type => $mime,
             -charset => '',
             'content-length' => length $out,
+            @extra_header
         );
         print $out;
         $log->trace($response->result) if ($log->is_trace);

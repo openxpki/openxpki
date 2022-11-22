@@ -70,12 +70,16 @@ while (my $cgi = CGI::Fast->new()) {
     # close backend connection
     $client->terminate();
 
+    my $conf = $config->config();
+    my @extra_header;
+    @extra_header = %{ $response->extra_headers() } if ($conf->{output}->{headers});
     if ($response->has_error()) {
 
         print $cgi->header(
             -status => $response->http_status_line(),
             -type => 'text/plain',
             'charset' => 'utf8',
+            @extra_header
         );
         print $response->error_message()."\n";
 
@@ -87,14 +91,13 @@ while (my $cgi = CGI::Fast->new()) {
             -type => 'text/plain',
             'charset' => 'utf8',
             '-retry-after' => $response->retry_after(),
-            'x-openxpki-transaction-id' => $transaction_id,
+            @extra_header
         );
         print "202 Request Pending - Retry Later ($transaction_id)\n";
 
     } else {
 
         # Default is base64 encoding, but we can turn on binary
-        my $conf = $config->config();
         my $encoding = $conf->{output}->{encoding} || 'base64';
         my $out = $response->result;
         if ($encoding eq 'binary') {
@@ -107,7 +110,8 @@ while (my $cgi = CGI::Fast->new()) {
             -type => $mime,
             'content-length' => length $out,
             'content-transfer-encoding' => $encoding,
-            'charset' => ''
+            'charset' => '',
+            @extra_header
         );
         print $out;
     }

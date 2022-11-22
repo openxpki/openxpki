@@ -3,6 +3,7 @@ use Moose;
 
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
+use OpenXPKI::i18n qw(i18nGettext);
 use OpenXPKI::Server::Context qw( CTX );
 
 ## constructor and destructor stuff
@@ -35,7 +36,15 @@ has retry_after => (
 has workflow => (
     is => 'rw',
     isa => 'HashRef',
+    predicate => 'has_workflow',
     default => sub { return {}; }
+);
+
+has extra_headers => (
+    is => 'rw',
+    isa => 'HashRef',
+    lazy => 1,
+    builder => '__build_extra_headers',
 );
 
 has result => (
@@ -51,7 +60,7 @@ has transaction_id => (
     lazy => 1,
     default => sub {
         my $self = shift;
-        return $self->workflow->{context}->{transaction_id};
+        return $self->workflow->{context}->{transaction_id} // '';
     },
 );
 
@@ -81,6 +90,33 @@ around BUILDARGS => sub {
     return $class->$orig( $args );
 
 };
+
+sub __build_extra_headers {
+
+    my $self = shift;
+    return {} unless($self->has_workflow());
+
+    my $workflow = $self->workflow();
+    my $extra_header = {};
+    if ($workflow->{id}) {
+        $extra_header->{'X-OpenXPKI-Workflow-Id'} = $workflow->{id};
+    }
+    if (my $tid = $self->transaction_id()) {
+        # this should usually be a hexadecimal string but to avoid any surprise
+        # we check this here and encoded if needed.
+        $tid = Encode::encode("MIME-B", $tid) if ($tid =~ m{\W});
+        $extra_header->{'X-OpenXPKI-Transaction-Id'} = $tid;
+    }
+    if (my $error = $workflow->{context}->{error_code}) {
+        # header must not be any longer than 76 chars in total
+        $error = substr(i18nGettext($error),0,64);
+        # use mime encode if header is non-us-ascii, 42 chars plus tags is the
+        # maximum to stay below 76 chars (starts to wrap otherwise)
+        $error = Encode::encode("MIME-B", substr($error,0,42)) if ($error =~ m{\W});
+        $extra_header->{'X-OpenXPKI-Error'} = $error;
+    }
+    return $extra_header;
+}
 
 
 sub http_status_code {
@@ -115,7 +151,7 @@ sub error_message {
     my $self = shift;
     return '' unless ($self->has_error());
 
-    return $self->__error_message() if ($self->has_error_message());
+    return i18nGettext($self->__error_message()) if ($self->has_error_message());
 
     return $OpenXPKI::Client::Service::Response::named_messages{$self->error()}
         || 'Unknown error';
