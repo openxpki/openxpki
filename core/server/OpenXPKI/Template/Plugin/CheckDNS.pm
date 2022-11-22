@@ -13,7 +13,7 @@ Plugin for Template::Toolkit to check FQDNs against DNS.
 You can pass a timeout in seconds and a comma seperated list of servers
 to the "USE" statement:
 
-    [% USE CheckDNS(timeout => 10, servers => '1.2.3.4,5.6.7.8') %]
+    [% USE CheckDNS(timeout = 10, servers = '1.2.3.4, 5.6.7.8') %]
 
 =cut
 
