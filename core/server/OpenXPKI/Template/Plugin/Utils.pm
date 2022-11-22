@@ -36,6 +36,16 @@ has 'uuid_gen' => (
 );
 
 
+# replicate behaviour of base class Template::Plugin: discard $context
+around BUILDARGS => sub {
+    my $orig = shift;
+    my $class = shift;
+    my $context = shift; # currently unused
+    my $args = shift // {};
+
+    return $class->$orig($args);
+};
+
 =head2 Methods
 
 =head3 uuid

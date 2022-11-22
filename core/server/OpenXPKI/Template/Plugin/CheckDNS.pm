@@ -21,6 +21,7 @@ use utf8;
 
 use Net::DNS;
 
+use Moose::Util::TypeConstraints;
 use HTML::Entities;
 use OpenXPKI::Debug;
 use OpenXPKI::Exception;
@@ -40,12 +41,26 @@ has 'timeout' => (
     default => 5,
 );
 
+
+my $type = subtype as 'ArrayRef';
+coerce $type, from 'Str', via { [ split /,/ ] };
 has 'servers' => (
     is => 'rw',
-    isa => 'ArrayRef|Undef',
-    lazy => 1,
-    default => undef
+    isa => $type,
+    coerce => 1,
+    predicate => 'has_servers',
 );
+
+
+# replicate behaviour of base class Template::Plugin: discard $context
+around BUILDARGS => sub {
+    my $orig = shift;
+    my $class = shift;
+    my $context = shift; # currently unused
+    my $args = shift // {};
+
+    return $class->$orig($args);
+};
 
 sub __check_fqdn {
 
@@ -54,28 +69,6 @@ sub __check_fqdn {
     return ($fqdn =~ m{ \A [a-z0-9] [a-z0-9-]* (\.[a-z0-9-]*[a-z0-9])+ \z }xi);
 
 }
-
-
-sub new {
-
-    my ($class, $context, $args) = @_;
-    $args ||= { };
-
-    my $self = bless {
-        _CONTEXT => $context,
-    }, $class;           # returns blessed MyPlugin object
-
-    if ($args->{timeout}) {
-        $self->timeout($args->{timeout});
-    }
-    if ($args->{servers}) {
-        my @s = split /,/, $args->{servers};
-        $self->servers( \@s );
-    }
-    return $self;
-
-}
-
 
 sub _init_dns {
 
@@ -88,7 +81,7 @@ sub _init_dns {
     # the resolver waits for retrans even if a timeout occured
     $rr->retrans($self->timeout());
 
-    if ($self->servers()) {
+    if ($self->has_servers()) {
         $rr->nameservers( @{$self->servers()} );
     }
     return $rr;
