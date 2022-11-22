@@ -41,16 +41,6 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
 
-sub new {
-    my $class = shift;
-    my $context = shift;
-
-    return bless {
-    _CONTEXT => $context,
-    }, $class;
-}
-
-
 =head2 get_hash(cert_identifier)
 
 Return the certificates database hash or undef if the identifier is

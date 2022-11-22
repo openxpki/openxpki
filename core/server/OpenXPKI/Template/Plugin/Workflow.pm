@@ -37,15 +37,6 @@ use Digest::SHA qw(sha1_hex);
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
-sub new {
-    my $class = shift;
-    my $context = shift;
-
-    return bless {
-    _CONTEXT => $context,
-    }, $class;
-}
-
 
 =head2 _load(wf_id)
 

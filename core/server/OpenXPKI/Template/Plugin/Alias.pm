@@ -36,15 +36,6 @@ use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
 
-sub new {
-    my $class = shift;
-    my $context = shift;
-
-    return bless {
-    _CONTEXT => $context,
-    }, $class;
-}
-
 =head2 cert_identifier
 
 Returns the certificate identifier for the given alias

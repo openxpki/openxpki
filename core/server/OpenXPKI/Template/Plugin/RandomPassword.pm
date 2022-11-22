@@ -1,8 +1,3 @@
-## OpenXPKI::Template::Plugin::RandomPassword
-##
-## Written by Martin Bartosch for the OpenXPKI project 2007
-## Copyright (C) 2007 The OpenXPKI Project
-
 package OpenXPKI::Template::Plugin::RandomPassword;
 
 use strict;
@@ -12,7 +7,6 @@ use utf8;
 use base qw( Template::Plugin );
 use Template::Plugin;
 
-
 use OpenXPKI::Random;
 use OpenXPKI::Password;
 use OpenXPKI::Debug;
@@ -20,14 +14,6 @@ use OpenXPKI::Exception;
 use Digest::SHA;
 use MIME::Base64;
 
-sub new {
-    my $class = shift;
-    my $context = shift;
-
-    return bless {
-    _CONTEXT => $context,
-    }, $class;
-}
 
 sub generate {
     my $self = shift;
