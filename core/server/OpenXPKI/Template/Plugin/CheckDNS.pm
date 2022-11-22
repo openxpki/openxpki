@@ -43,7 +43,7 @@ has 'timeout' => (
 
 
 my $type = subtype as 'ArrayRef';
-coerce $type, from 'Str', via { [ split /,/ ] };
+coerce $type, from 'Str', via { [ split /\s*,\s*/ ] };
 has 'servers' => (
     is => 'rw',
     isa => $type,
