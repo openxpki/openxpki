@@ -159,6 +159,21 @@ subtype 'PEMPubKey',
     where { $_ =~ m{ \A -----BEGIN\ PUBLIC\ KEY----- [^-]+ -----END\ PUBLIC\ KEY----- \Z }msx },
     message { sprintf "'%s' is not a PEM encoded public key container", ($_ ? "'$_'" : '<undef>') };
 
+
+=head2 Email
+
+An email address (or at least 99% of them).
+
+Allowed characters are word and dash, for the local part also the plus
+sign and a colon. A percent character is NOT allowed to avoid some nasty
+SQL issues.
+
+=cut
+subtype 'Email',
+    as 'Str',
+    where { $_ =~ m{ \A [\w\-\+:]+\@([\w\-]+\.)+(\w+) \z }msx },
+    message { sprintf "'%s' is not a valid email address", ($_ ? "'$_'" : '<undef>') };
+
 =head2 ArrayRefOrPEMCertChain
 
 An I<ArrayRef> of L</PEMCertChain> that will also accept a scalar of type

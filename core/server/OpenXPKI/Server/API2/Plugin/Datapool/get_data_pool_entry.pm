@@ -67,7 +67,7 @@ command "get_data_pool_entry" => {
     pki_realm => { isa => 'AlphaPunct', default => sub { CTX('session')->data->pki_realm } },
     namespace => { isa => 'AlphaPunct', required => 1, },
     # TODO Change type of "key" back to "AlphaPunct" once we have a private method to get encrypted data pool entries (where keys have more characters)
-    key       => { isa => 'Str', required => 1, },
+    key       => { isa => 'Str|Email', required => 1, },
     decrypt   => { isa => 'Bool', default => 1 },
 } => sub {
     my ($self, $params) = @_;

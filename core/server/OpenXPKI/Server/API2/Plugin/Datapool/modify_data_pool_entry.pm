@@ -100,8 +100,8 @@ Previously the parameter C<namespace> was optional which was a bug.
 command "modify_data_pool_entry" => {
     pki_realm       => { isa => 'AlphaPunct', default => sub { CTX('session')->data->pki_realm } },
     namespace       => { isa => 'AlphaPunct', required => 1, },
-    key             => { isa => 'Str', matching => qr/(?^msx: \A \$? [ \w \- \. : \s ]* \z )/, required => 1, },
-    newkey          => { isa => 'Str', matching => qr/(?^msx: \A \$? [ \w \- \. : \s ]* \z )/, },
+    key             => { isa => 'AlphaPunct|Email', required => 1, },
+    newkey          => { isa => 'AlphaPunct|Email', },
     expiration_date => { isa => 'Str|Undef', matching => sub { defined $_ ? ($_ =~ qr/(?^msx: \A \+?\d+ \z)/) : 1 }, },
     expiration_adjust => { isa => 'Str', matching => qr/newer|older|strict/, default => 'strict' },
     ignore_missing => { isa => 'Bool', default => 0 },

@@ -51,7 +51,7 @@ of the currently active session is accepted.
 command "delete_data_pool_entry" => {
     pki_realm       => { isa => 'AlphaPunct', default => sub { CTX('session')->data->pki_realm } },
     namespace       => { isa => 'AlphaPunct', required => 1, },
-    key             => { isa => 'AlphaPunct', required => 1, },
+    key             => { isa => 'AlphaPunct|Email', required => 1, },
 } => sub {
 
     my ($self, $params) = @_;

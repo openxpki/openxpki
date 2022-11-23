@@ -81,7 +81,7 @@ Requires a properly set up password safe certificate in the target realm.
 command "set_data_pool_entry" => {
     pki_realm       => { isa => 'AlphaPunct', default => sub { CTX('session')->data->pki_realm } },
     namespace       => { isa => 'AlphaPunct', required => 1, },
-    key             => { isa => 'AlphaPunct', required => 1, },
+    key             => { isa => 'AlphaPunct|Email', required => 1, },
     value           => { isa => 'Str', required => 1, },
     expiration_date => { isa => 'Int', matching => sub { $_ > time }, },
     force           => { isa => 'Bool', default => 0 },
