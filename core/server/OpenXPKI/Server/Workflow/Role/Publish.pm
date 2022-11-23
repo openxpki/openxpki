@@ -116,9 +116,9 @@ sub __walk_targets {
                 );
             }
         } elsif (!defined $res) {
-            CTX('log')->application()->warn("Entity publication to $target for ". $publish_key." returned undef");
+            CTX('log')->application->warn("Entity publication to $target for '$publish_key' returned undef");
         } else {
-            CTX('log')->application()->info("Entity publication to $target for ". $publish_key." done $res " );
+            CTX('log')->application->info("Finished entity publication to $target for '$publish_key'");
         }
     }
 
