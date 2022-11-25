@@ -419,7 +419,7 @@ sub run {
         # create memory-only session for workflow
         my $session = OpenXPKI::Server::Session->new(type => "Memory")->create;
         OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
-        Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
+        Log::Log4perl::MDC->put('sid', CTX('session')->short_id);
 
         $self->{dbi}                      = CTX('dbi');
         $self->{hanging_workflows}        = {};
@@ -754,7 +754,7 @@ sub __restore_session {
     # Set MDC for logging
     Log::Log4perl::MDC->put('user', CTX('session')->data->user);
     Log::Log4perl::MDC->put('role', CTX('session')->data->role);
-    Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
+    Log::Log4perl::MDC->put('sid', CTX('session')->short_id);
 }
 
 =head2 __auto_archive_workflows

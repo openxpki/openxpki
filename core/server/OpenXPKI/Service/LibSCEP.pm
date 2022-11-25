@@ -171,7 +171,7 @@ sub __init_session : PROTECTED {
         data_class => "OpenXPKI::Server::Session::Data::SCEP",
     )->create;
     OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
-    Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
+    Log::Log4perl::MDC->put('sid', $session->short_id);
 }
 
 sub __init_pki_realm : PROTECTED {

@@ -273,7 +273,7 @@ sub _execute_activity_async {
             $session->data->pki_realm( CTX('session')->data->pki_realm );
 
             OpenXPKI::Server::Context::setcontext({ session => $session, force => 1 });
-            Log::Log4perl::MDC->put('sid', substr(CTX('session')->id,0,4));
+            Log::Log4perl::MDC->put('sid', $session->short_id);
             Log::Log4perl::MDC->put('role', $session->data->role );
         }
 

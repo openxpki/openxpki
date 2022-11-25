@@ -228,6 +228,16 @@ persisted session was resumed.
 
 #######################################
 
+=head2 short_id
+
+Returns the short version (first 4 digits) of the session ID.
+
+=cut
+sub short_id {
+    my $self = shift;
+    return substr($self->id, 0, 4);
+}
+
 =head2 create
 
 Creates a new sesssion.
