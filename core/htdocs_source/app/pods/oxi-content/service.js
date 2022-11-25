@@ -110,7 +110,7 @@ export default class OxiContentService extends Service {
                 }
 
                 // Set page contents
-                if (doc.page && doc.main) {
+                if (doc.page || doc.main || doc.right) {
                     debug("updateRequest(): response - \"page\" and \"main\"");
                     this._setPageContent(realTarget, doc.page, doc.main, doc.right, doc.status);
                 }
