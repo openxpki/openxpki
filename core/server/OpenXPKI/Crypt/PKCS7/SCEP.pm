@@ -703,10 +703,13 @@ sub create_cert_response {
     my ($encryptedKey, $keyEncAlg);
     if ($pkAlg eq 'RSA') {
         if ($self->key_alg() eq 'rsaesOaep') {
-            $keyEncAlg = '1.2.840.113549.1.1.7';
+            $keyEncAlg = {
+                'algorithm' => '1.2.840.113549.1.1.7',
+                'parameters' => encode_tag('',0x30)
+            };
             $encryptedKey = Crypt::PK::RSA->new(\$rkey)->encrypt( $content_key, 'oaep' );
         } else {
-            $keyEncAlg = '1.2.840.113549.1.1.1';
+            $keyEncAlg = { 'algorithm' => '1.2.840.113549.1.1.1' };
             $encryptedKey = Crypt::PK::RSA->new(\$rkey)->encrypt( $content_key, 'v1.5' );
         }
     # TODO - Support for ECC
@@ -721,10 +724,7 @@ sub create_cert_response {
             'version' => 0,
             'recipientInfos' => {
                 'riSet' => [{
-                    'keyEncryptionAlgorithm' => {
-                        'algorithm' => $keyEncAlg,
-                        'parameters' => ''
-                    },
+                    'keyEncryptionAlgorithm' => $keyEncAlg,
                     'version' => 0,
                     'encryptedKey' => $encryptedKey,
                     'issuerAndSerialNumber' => {
