@@ -171,7 +171,7 @@ SQL issues.
 =cut
 subtype 'Email',
     as 'Str',
-    where { $_ =~ m{ \A [\w\-\+:]+\@([\w\-]+\.)+(\w+) \z }msx },
+    where { $_ =~ m{ \A [\w\-\+\.:]+\@([\w\-]+\.)+(\w+) \z }msx },
     message { sprintf "'%s' is not a valid email address", ($_ ? "'$_'" : '<undef>') };
 
 =head2 ArrayRefOrPEMCertChain
