@@ -232,12 +232,11 @@ sub _openapi_field_schema {
         # add hints to description
         $field->{description} .= ' ('.join(' ', @hints).')' if scalar @hints;
 
-        # Consistency checks
-        OpenXPKI::Exception->throw(
-            message => 'Inconsistency found: enum/select field is not allowed to have "match" specified',
-            params => { workflow => $workflow, field => $fieldname }
-        ) if ($field->{pattern} and $field->{enum});
-
+        # Consistency checks - should be a critical problem
+        if ($field->{pattern} and $field->{enum}) {
+            CTX('log')->system()->warn("Inconsistency found: enum/select field has additional match rule in $workflow / $fieldname");
+            delete $field->{pattern};
+        }
 
         $field_specs->{$fieldname} = $field;
     }
