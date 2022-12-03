@@ -18,7 +18,7 @@ PATH=/usr/sbin:/usr/bin:/sbin:/bin
 DESC="OpenXPKI daemon"
 NAME=openxpki
 DAEMON=/usr/bin/openxpkictl
-PIDFILE=/var/run/openxpkid.pid
+PIDFILE=/run/openxpkid.pid
 SCRIPTNAME=/etc/init.d/openxpkid
 
 # Exit if the package is not installed

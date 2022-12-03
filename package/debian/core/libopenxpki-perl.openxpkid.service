@@ -4,7 +4,7 @@ After=network.target apache2.service
 
 [Service]
 Type=exec
-PIDFile=/var/run/openxpkid.pid
+PIDFile=/run/openxpkid.pid
 ExecStart=/usr/bin/openxpkictl start --nd
 ExecStop=/usr/bin/openxpkictl stop
 # We want systemd to give the daemon some time to finish gracefully, but still want

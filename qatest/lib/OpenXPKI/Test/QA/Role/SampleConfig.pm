@@ -108,7 +108,7 @@ has path_socket_file => (
 
 has path_pid_file    => (
     is => 'rw', isa => 'Str', lazy => 1,
-    default => sub { shift->testenv_root."/var/run/openxpkid.pid" },
+    default => sub { shift->testenv_root."/run/openxpkid.pid" },
 );
 
 has path_stderr_file => (
