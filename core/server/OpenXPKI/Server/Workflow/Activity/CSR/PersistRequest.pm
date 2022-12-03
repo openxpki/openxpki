@@ -69,12 +69,7 @@ sub execute
         );
     }
 
-    my $source_ref = $serializer->deserialize($context->param('sources'));
-    if (! defined $source_ref) {
-        OpenXPKI::Exception->throw(
-            message => 'I18N_OPENXPKI_SERVER_WF_ACTIVITY_CSR_PERSISTREQUEST_SOURCES_UNDEFINED',
-        );
-    }
+    my $source_ref = $serializer->deserialize($context->param('sources')) || {};
 
     my $csr_serial = $dbi->next_id('csr');
 
@@ -98,14 +93,8 @@ sub execute
         ##! 16: '$subj_alt_names: ' . Dumper($subj_alt_names)
         ##! 16: '@subj_alt_names: ' . Dumper(\@subj_alt_names)
 
-        my $san_source = $source_ref->{'cert_subject_alt_name_parts'};
-        $san_source = $source_ref->{'cert_subject_alt_name'} unless($san_source);
-
-        if (! defined $san_source) {
-            OpenXPKI::Exception->throw(
-                message => 'I18N_OPENXPKI_SERVER_WF_ACTIVITY_CSR_PERSISTREQUEST_SUBJECT_ALT_NAME_SOURCE_UNDEFINED',
-            );
-        }
+        my $san_source = $source_ref->{'cert_subject_alt_name_parts'} ||
+            $source_ref->{'cert_subject_alt_name'} || '';
 
         foreach my $san (@subj_alt_names) {
             ##! 64: 'san: ' . $san
@@ -126,7 +115,7 @@ sub execute
     foreach my $validity_param (qw( notbefore notafter )) {
         my $val = $self->param($validity_param) || $context->param($validity_param);
         if ($val) {
-            my $source = $source_ref->{$validity_param};
+            my $source = $source_ref->{$validity_param} || '';
             ##! 16: $validity_param . ' ' .$val
             $dbi->insert(
                 into => 'csr_attributes',
@@ -184,7 +173,7 @@ sub execute
                     'req_key'              => $csr_serial,
                     'attribute_contentkey' => 'custom_' . $custom_key,
                     'attribute_value'      => $value,
-                    'attribute_source'     => $source_ref->{'cert_info'},
+                    'attribute_source'     => $source_ref->{'cert_info'} || '',
                 }
             );
         }
