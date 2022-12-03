@@ -1885,6 +1885,16 @@ msgstr "初始化"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_LABEL"
 msgstr "初始化"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_DESC"
+msgstr ""
+"服务器已为您生成密码。 请写下该密码，以备日后下载和安装私钥时使用！ 要确认您"
+"已识别正确的密码，请在给定的字段中重新输入该密码。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_LABEL"
+msgstr "你的密钥密码"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_DESC"
 msgstr ""
 "键入证书标识符或使用自动搜索功能来查找要为其更改元数据的证书。 如果无法找到/"
@@ -2409,6 +2419,10 @@ msgstr "创造者"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_UNABLE_TO_RESOLVE"
 msgstr "创造者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_SUCCESS_DESC"
+msgstr "此工作流程已成功完成，无法重新启动"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ERROR_DELAY_REVOCATION_TIME_NOT_IN_FUTURE"
 msgstr "延迟吊销的时间不在将来。"
@@ -4225,6 +4239,14 @@ msgstr "将CA信息（CA证书和CRL）发布到已定义的存储库。"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL"
 msgstr "发布CA信息"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_REQUEST_DESC"
+msgstr "证书签名请求（CSR）"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_REQUEST_LABEL"
+msgstr "证书签名请求（CSR）"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
 msgstr "证书吊销请求（CRR）"
 
@@ -4241,6 +4263,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_DESC"
 msgstr "证书注册工作流程，用于通过自动界面（例如SCEP，RPC）进行证书注册。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_LABEL"
+msgstr "证书注册"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_PREREG_DESC"
+msgstr "证书注册工作流程，用于通过自动界面（例如SCEP，RPC）进行证书注册。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_PREREG_LABEL"
 msgstr "证书注册"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"

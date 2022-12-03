@@ -1932,6 +1932,17 @@ msgstr "初期化する"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_LABEL"
 msgstr "初期化する"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_DESC"
+msgstr ""
+"自動的にパスワードが作成されました。必要に応じてこのパスワードを書き留めて、"
+"秘密鍵をダウンロードしてインストールしてください。パスワードの入力を確認する"
+"には、指定したフィールドにパスワードを再入力してください。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_LABEL"
+msgstr "あなたのキーパスワード"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_DESC"
 msgstr ""
 "証明書の識別子を入力するか、autosearch関数を使用して、メタデータを変更する証"
@@ -2498,6 +2509,10 @@ msgstr "作成者"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_UNABLE_TO_RESOLVE"
 msgstr "作成者"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_SUCCESS_DESC"
+msgstr "このワークフローは成功して終了し、再実行はできません"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ERROR_DELAY_REVOCATION_TIME_NOT_IN_FUTURE"
 msgstr "失効日を遅延する場合、現在の失効日より未来の日付を指定してください。"
@@ -4387,6 +4402,14 @@ msgstr "定義されたリポジトリにCA情報（CA証明書およびCRL）�
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL"
 msgstr "CA情報を公開する"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_REQUEST_DESC"
+msgstr "証明書署名リクエスト(CSR)"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_REQUEST_LABEL"
+msgstr "証明書署名リクエスト(CSR)"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
 msgstr "証明書失効リクエスト"
 
@@ -4403,6 +4426,14 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_DESC"
 msgstr "証明書を登録します。"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_LABEL"
+msgstr "証明書の登録"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_PREREG_DESC"
+msgstr "証明書を登録します。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_PREREG_LABEL"
 msgstr "証明書の登録"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"

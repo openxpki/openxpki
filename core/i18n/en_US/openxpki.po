@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2022-11-21 14:52+0100\n"
+"PO-Revision-Date: 2022-12-01 17:18+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -1781,6 +1781,14 @@ msgstr "Initialize"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_LABEL"
 msgstr "Initialize"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_DESC"
+msgstr ""
+"This is the secret you need to enroll certificates based on this "
+"preregistration. Please store it in a safe location!"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_LABEL"
+msgstr "Your Enrollment Key"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_DESC"
 msgstr ""
 "Type the certificate identifier or use the autosearch function to find the "
@@ -2306,6 +2314,10 @@ msgstr "Creator has no namespace set"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_UNABLE_TO_RESOLVE"
 msgstr "Unable to resolve creator in given namespace"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_SUCCESS_DESC"
+msgstr "This workflow has finished with success and can not be restarted"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ERROR_DELAY_REVOCATION_TIME_NOT_IN_FUTURE"
 msgstr "The time given for delayed revocation is not in the future."
 
@@ -2689,7 +2701,7 @@ msgstr ""
 "validity is near expiration (next update property)."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_LABEL"
-msgstr "Enforce creation of revocation lists."
+msgstr "Enforce creation"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_TOOLTIP"
 msgstr "Check this box to force issuance."
@@ -4082,6 +4094,15 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL"
 msgstr "Publish CA Information"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_REQUEST_DESC"
+msgstr ""
+"With certificate preregistration you can request the assignment of  "
+"hostnames to a commonName for later enrollment via an automated interface "
+"using a API key."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_REQUEST_LABEL"
+msgstr "Certificate Preregistration Request (CPRR)"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
 msgstr "Certificate Revocation Request"
 
@@ -4101,6 +4122,14 @@ msgstr ""
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_LABEL"
 msgstr "Certificate Enrollment"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_PREREG_DESC"
+msgstr ""
+"This enrollment workflow enrolls a given PKCS10 request based on an API key "
+"received via a former preregistration request workflow."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_PREREG_LABEL"
+msgstr "Certificate Enrollment (Prereg)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"
 msgstr "Publish certificate information to defined repositories."

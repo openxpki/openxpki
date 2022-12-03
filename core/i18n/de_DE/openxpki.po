@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2022-11-21 15:17+0100\n"
+"PO-Revision-Date: 2022-12-01 17:29+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -1830,6 +1830,18 @@ msgstr "Initialize"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTIFICATE_PUBLISHING_INITIALIZE_LABEL"
 msgstr "Initialize"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_DESC"
+msgstr ""
+"Die PKI hat ein Passwort für Sie erstellt. Bitte notieren Sie sich dieses "
+"Passwort da Sie es später benötigen, um den privaten Schlüssel des "
+"Zertifikates herunterzuladen und zu installieren. Um das Passwort zu "
+"bestätigen, geben Sie es bitte in das leere Feld ein!"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CERTREG_RETYPE_SERVER_PASSWORD_LABEL"
+msgstr "Passwort"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ACTION_CHANGEMETA_LOAD_DATA_DESC"
 msgstr ""
 "Geben Sie den Zeritifikatsidentifier an oder verwenden Sie die automatische "
@@ -2407,6 +2419,12 @@ msgstr "Ersteller ist keiner Domäne zugewiesen"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_UNABLE_TO_RESOLVE"
 msgstr "Erstellerkennung kann nicht aufgelöst werden"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_SUCCESS_DESC"
+msgstr ""
+"Das von Ihnen beantragte Zertifikat wurden mit den nachfolgend aufgeführten "
+"Informationen ausgestellt. Der Workflow ist hiermit abgeschlossen."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ERROR_DELAY_REVOCATION_TIME_NOT_IN_FUTURE"
 msgstr "Der gewünschte Sperrzeitpunkt liegt in der Vergangenheit."
 
@@ -2824,7 +2842,7 @@ msgstr ""
 "update)."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_LABEL"
-msgstr "Erstellen einer Sperrliste erzwingen."
+msgstr "Erstellung erzwingen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_FORCE_ISSUE_TOOLTIP"
 msgstr ""
@@ -4317,6 +4335,14 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CA_PUBLISH_LABEL"
 msgstr "CA Zertifikate und CRL publizieren"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_REQUEST_DESC"
+msgstr ""
+"Antrag zur Registrierung eines API-Schlüssels zur späteren Ausstellung eines "
+"Zertifikates über eine automatisch Schnittstelle."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_PREREG_REQUEST_LABEL"
+msgstr "Zertifikat Vorregistrierung (CPRR)"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERTIFICATE_REVOCATION_REQUEST_DESC"
 msgstr "Antrag zur Sperrung eines Zertifikates"
 
@@ -4335,7 +4361,15 @@ msgstr ""
 "RPC, etc.)."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_LABEL"
-msgstr "Zertifikat ausstellen"
+msgstr "Zertifikatsantrag (API)"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_PREREG_DESC"
+msgstr ""
+"Workflow zum automatischen Ausstellen von Zertifikaten (z. B. über SCEP, "
+"RPC, etc.) mittels API-Key basierend auf einer vorherigen Registrierung."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_ENROLL_PREREG_LABEL"
+msgstr "Zertifikatsantrag (PreReg)"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_TYPE_CERT_PUBLISH_DESC"
 msgstr "Veröffentlicht das Zertifikat zu definierten Zielen."
