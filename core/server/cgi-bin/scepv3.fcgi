@@ -90,10 +90,10 @@ while (my $cgi = CGI::Fast->new()) {
 
         } elsif (!$client->attr()->{alias}) {
             $response = OpenXPKI::Client::Service::Response->new ( 40002 );
-            $log->info($response->{error} || 'Unable to find RA certficate');
+            $log->info('Unable to find RA certficate');
         } elsif (!$client->signer) {
             $response = OpenXPKI::Client::Service::Response->new ( 40001 );
-            $log->info($response->{error} || 'Unable to extract signer certficate');
+            $log->info('Unable to extract signer certficate');
         # Enrollment request
         } elsif ($client->message_type =~ m{(PKCSReq|RenewalReq|GetCertInitial)}) {
             # TODO - improve handling of GetCertInitial and RenewalReq
