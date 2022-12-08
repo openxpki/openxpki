@@ -541,6 +541,8 @@ sub save_initial {
     }
 
     $self->context->param( wf_current_action => $action_name );
+    $self->context->param( wf_pause_msg => 'I18N_OPENXPKI_UI_WORKFLOW_MOVE_TO_BACKGROUND' );
+
     $self->persist_context(2);
     $self->_save();
 
