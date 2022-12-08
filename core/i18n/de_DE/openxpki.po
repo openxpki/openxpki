@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2022-12-01 17:29+0100\n"
+"PO-Revision-Date: 2022-12-06 09:51+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -1036,6 +1036,12 @@ msgstr "Aktualisiere Domainliste"
 # Remove?
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "Nein"
+
+msgid "I18N_OPENXPKI_UI_NOTIFY_EXPIRY_NOT_RENEWED"
+msgstr "abgelaufen"
+
+msgid "I18N_OPENXPKI_UI_NOTIFY_EXPIRY_RENEWED"
+msgstr "erneuert"
 
 msgid "I18N_OPENXPKI_UI_NOTIFY_PENDING_NEXT_RUN"
 msgstr "Workflow wartet auf nächste Benachrichtung"
@@ -2401,6 +2407,11 @@ msgstr "Workflow-Context"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_COUNT_TRY_LABEL"
 msgstr "Wiederholungen"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CPRR_SUCCESS_DESC"
+msgstr ""
+"Ihre Registrierung wurde bestätigt. Verwenden Sie den erstellten API "
+"Schlüssel um ihr Zertifikat für den unten genannten commonName zu erstellen."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_NOT_ALLOWED"
 msgstr "Sie sind nicht berechtigt diesen Workflow zu starten."
 
@@ -2418,12 +2429,6 @@ msgstr "Ersteller ist keiner Domäne zugewiesen"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_UNABLE_TO_RESOLVE"
 msgstr "Erstellerkennung kann nicht aufgelöst werden"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_SUCCESS_DESC"
-msgstr ""
-"Das von Ihnen beantragte Zertifikat wurden mit den nachfolgend aufgeführten "
-"Informationen ausgestellt. Der Workflow ist hiermit abgeschlossen."
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ERROR_DELAY_REVOCATION_TIME_NOT_IN_FUTURE"
 msgstr "Der gewünschte Sperrzeitpunkt liegt in der Vergangenheit."
@@ -4141,6 +4146,18 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_CERT_EXISTS_LABEL"
 msgstr "Gültiges RA Token gefunden"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_INITIAL_DESC"
+msgstr ""
+"Erstellt ein neues RA Zertifikat und registriert dieses als aktives RA Token."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_SUCCESS_DESC"
+msgstr ""
+"Ein neues RA Token wurde erstellt und registriert. Bedingt durch "
+"Zwischenspeicher kann die Sichtbarkeit des neuen Zertifikates an den "
+"Endpunkten  verzögert sein kann. Falls Sie manuelle Endpunktkonfigurationen "
+"im Einsatz haben, stellen Sie sicher dass sie diese bei Bedarf ebenfalls "
+"aktualisieren."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_DESC"
 msgstr "Der Antrag wurde abgelehnt und kann nicht erneut eingereicht werden."
 
@@ -4551,6 +4568,13 @@ msgstr "ja"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_OVERRIDE_POLICY_LABEL"
 #~ msgstr "Policy ignorieren"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_SUCCESS_DESC"
+#~ msgstr ""
+#~ "Das von Ihnen beantragte Zertifikat wurden mit den nachfolgend "
+#~ "aufgeführten Informationen ausgestellt. Der Workflow ist hiermit "
+#~ "abgeschlossen."
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"

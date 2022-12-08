@@ -1124,6 +1124,14 @@ msgid "I18N_OPENXPKI_UI_NO"
 msgstr "いいえ"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_NOTIFY_EXPIRY_NOT_RENEWED"
+msgstr "更新"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NOTIFY_EXPIRY_RENEWED"
+msgstr "更新"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_NOTIFY_PENDING_NEXT_RUN"
 msgstr ""
 "別名で<b>正確な</b>検索を行います。ワイルドカードとして '*' や '_' を指定する"
@@ -2489,6 +2497,10 @@ msgstr "ワークフローの状態"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_COUNT_TRY_LABEL"
 msgstr "再試行"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CPRR_SUCCESS_DESC"
+msgstr "このワークフローは成功して終了し、再実行はできません"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_NOT_ALLOWED"
 msgstr "このワークフローを開始することは許可されていません"
 
@@ -2509,10 +2521,6 @@ msgstr "作成者"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_UNABLE_TO_RESOLVE"
 msgstr "作成者"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_SUCCESS_DESC"
-msgstr "このワークフローは成功して終了し、再実行はできません"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ERROR_DELAY_REVOCATION_TIME_NOT_IN_FUTURE"
 msgstr "失効日を遅延する場合、現在の失効日より未来の日付を指定してください。"
@@ -4233,6 +4241,14 @@ msgstr "このワークフローは成功して終了し、再実行はできま
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_CERT_EXISTS_LABEL"
 msgstr "成功"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_INITIAL_DESC"
+msgstr "このワークフローは正常に終了しました。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_SUCCESS_DESC"
+msgstr "証明書が失効され、失効リストが発行されました。"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_DESC"
 msgstr "リクエストは拒否され、再実効はできません。"
 
@@ -5475,6 +5491,10 @@ msgstr "はい"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CONFIRM_LABEL_CANCEL"
 #~ msgstr "Retries"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_SUCCESS_DESC"
+#~ msgstr "このワークフローは成功して終了し、再実行はできません"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ELIGIBILITY_RESULT_LABEL"
 #~ msgstr "適正確認の結果"

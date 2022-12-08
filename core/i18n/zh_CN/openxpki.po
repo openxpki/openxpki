@@ -1091,6 +1091,14 @@ msgid "I18N_OPENXPKI_UI_NO"
 msgstr "不"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_NOTIFY_EXPIRY_NOT_RENEWED"
+msgstr "提出一个<b>证书续订请求</b>。"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NOTIFY_EXPIRY_RENEWED"
+msgstr "提出一个<b>证书续订请求</b>。"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_NOTIFY_PENDING_NEXT_RUN"
 msgstr ""
 "在所有SAN项目上搜索<b>完全匹配</b>匹配项。 可以通过添加 '*' 或 '_' 作为通配符"
@@ -2399,6 +2407,10 @@ msgstr "工作流程上下文"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_COUNT_TRY_LABEL"
 msgstr "重试次数"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CPRR_SUCCESS_DESC"
+msgstr "此工作流程已成功完成，无法重新启动"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_NOT_ALLOWED"
 msgstr "您无权启动此工作流程"
 
@@ -2419,10 +2431,6 @@ msgstr "创造者"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_UNABLE_TO_RESOLVE"
 msgstr "创造者"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_SUCCESS_DESC"
-msgstr "此工作流程已成功完成，无法重新启动"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ERROR_DELAY_REVOCATION_TIME_NOT_IN_FUTURE"
 msgstr "延迟吊销的时间不在将来。"
@@ -4070,6 +4078,14 @@ msgstr "此工作流程已成功完成，无法重新启动"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_CERT_EXISTS_LABEL"
 msgstr "成功"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_INITIAL_DESC"
+msgstr "此工作流程最终失败，无法重新启动"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_SUCCESS_DESC"
+msgstr "证书已被吊销，并发布了吊销列表。"
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_DESC"
 msgstr "该请求最终被拒绝，无法重新启动。"
 
@@ -4684,6 +4700,10 @@ msgstr "是"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_SUBMIT"
 #~ msgstr "Submit Request"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_SUCCESS_DESC"
+#~ msgstr "此工作流程已成功完成，无法重新启动"
 
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ELIGIBILITY_RESULT_LABEL"
 #~ msgstr "Result of Eligibility Check"

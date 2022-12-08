@@ -1311,6 +1311,14 @@ msgid "I18N_OPENXPKI_UI_NO"
 msgstr "Chiave"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_NOTIFY_EXPIRY_NOT_RENEWED"
+msgstr "Rinnova"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_NOTIFY_EXPIRY_RENEWED"
+msgstr "Rinnova"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_NOTIFY_PENDING_NEXT_RUN"
 msgstr "Numero di serie del certificato"
 
@@ -2798,6 +2806,10 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_COUNT_TRY_LABEL"
 msgstr "Retries"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CPRR_SUCCESS_DESC"
+msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_NOT_ALLOWED"
 msgstr "Creator"
 
@@ -2819,10 +2831,6 @@ msgstr "Creator"
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_UNABLE_TO_RESOLVE"
 msgstr "Creator"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_SUCCESS_DESC"
-msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ERROR_DELAY_REVOCATION_TIME_NOT_IN_FUTURE"
@@ -4668,6 +4676,16 @@ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_CERT_EXISTS_LABEL"
 msgstr "SUCCESSO"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_INITIAL_DESC"
+msgstr "Questo Workflow è definitivamente fallito e non può essere riavviato."
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_SUCCESS_DESC"
+msgstr ""
+"Il certificato è stato revocato ed è stata emessa una nuova Lista Revoche "
+"(CRL)."
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_DESC"
 msgstr ""
 "La Richiesta di revoca è stata definitivamente rifiutata e non può essere "
@@ -6075,6 +6093,10 @@ msgstr "Chiave"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_SUBMIT"
 #~ msgstr "continua"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_SUCCESS_DESC"
+#~ msgstr "Questo Workflow è terminato con successo e non può essere riavviato"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_ELIGIBILITY_RESULT_LABEL"

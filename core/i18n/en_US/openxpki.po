@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2022-12-01 17:18+0100\n"
+"PO-Revision-Date: 2022-12-06 09:51+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -1034,6 +1034,12 @@ msgstr "Update Domainlist"
 
 msgid "I18N_OPENXPKI_UI_NO"
 msgstr "No"
+
+msgid "I18N_OPENXPKI_UI_NOTIFY_EXPIRY_NOT_RENEWED"
+msgstr "expired"
+
+msgid "I18N_OPENXPKI_UI_NOTIFY_EXPIRY_RENEWED"
+msgstr "renewed"
 
 msgid "I18N_OPENXPKI_UI_NOTIFY_PENDING_NEXT_RUN"
 msgstr "Workflow paused until next notification"
@@ -2296,6 +2302,11 @@ msgstr "Workflow Context"
 msgid "I18N_OPENXPKI_UI_WORKFLOW_COUNT_TRY_LABEL"
 msgstr "Retries"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_CPRR_SUCCESS_DESC"
+msgstr ""
+"The prepregistration was approved. Use the API key generated during this "
+"workflow to request your certificate for the commonName mention below."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATE_NOT_ALLOWED"
 msgstr "You are not allowed to initiate this workflow"
 
@@ -2313,10 +2324,6 @@ msgstr "Creator has no namespace set"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_CREATOR_UNABLE_TO_RESOLVE"
 msgstr "Unable to resolve creator in given namespace"
-
-#, fuzzy
-msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_SUCCESS_DESC"
-msgstr "This workflow has finished with success and can not be restarted"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_ERROR_DELAY_REVOCATION_TIME_NOT_IN_FUTURE"
 msgstr "The time given for delayed revocation is not in the future."
@@ -3934,6 +3941,15 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_CERT_EXISTS_LABEL"
 msgstr "Valid RA Token exists"
 
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_INITIAL_DESC"
+msgstr "Generates a new RA certificate and registers it as active RA token."
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_RATOKEN_SUCCESS_DESC"
+msgstr ""
+"The new RA token certificate was created and registered. Response caching "
+"might delay the visibility of the new token on the endpoints. If you use "
+"manual token configurations for some endpoints make sure to update them."
+
 msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_REJECTED_DESC"
 msgstr "The request was finally rejected and can not be restartet."
 
@@ -4309,6 +4325,10 @@ msgstr "Yes"
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_BUTTON_OVERRIDE_POLICY_LABEL"
 #~ msgstr "Override Policy"
+
+#, fuzzy
+#~ msgid "I18N_OPENXPKI_UI_WORKFLOW_CSR_SUCCESS_DESC"
+#~ msgstr "This workflow has finished with success and can not be restarted"
 
 #, fuzzy
 #~ msgid "I18N_OPENXPKI_UI_WORKFLOW_STATE_CRR_INITIAL_DESC"
