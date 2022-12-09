@@ -1,7 +1,3 @@
-# OpenXPKI::Server::Workflow::Activity::Tools::PersistCertificateMetadata
-# Written by Oliver Welter for the OpenXPKI project 2013
-# Copyright (c) 2013 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::Tools::PersistCertificateMetadata;
 
 use strict;
@@ -64,50 +60,48 @@ sub execute {
     }
 
     ##! 32: 'Metadata is ' . Dumper $metadata
+    CTX('api2')->set_cert_metadata(
+        identifier => $cert_identifier,
+        attribute  => $metadata,
+        mode  => 'merge',
+    );
 
-    # Add result to the cert_attributes table
-    my $dbi = CTX('dbi');
-
-    my $insert_item = sub {
-        my ($key, $value) = @_;
-        return if ($value eq '');
-        ##! 32: 'Add new attribute ' . $key . ' value ' . $value
-        ## This is a workaround for an upstream bug in the mysql driver
-        # we expand a single dash, dot (or e,+) to the verbose "n/a"
-        # see https://github.com/openxpki/openxpki/issues/198
-        # and https://rt.cpan.org/Public/Bug/Display.html?id=97541
-        if ($value =~ m{ \A (-|\.|e|\+) \z }x) {
-            $value = 'n/a';
-            CTX('log')->application()->debug(sprintf ('Replace metadata dash/dot by verbose "n/a" on %s / %s',
-                    $cert_identifier, $key));
-        }
-        $dbi->insert(
-            into => 'certificate_attributes',
-            values => {
-                attribute_key        => AUTO_ID,
-                identifier           => $cert_identifier,
-                attribute_contentkey => 'meta_'.$key,
-                attribute_value      => $value,
-            }
-        );
-    };
-
-    foreach my $key (keys(%{$metadata})) {
-        my $value = $metadata->{$key};
-
-        if (!ref $value) {
-            $insert_item->( $key, $value);
-            next;
-        }
-
-        workflow_error('Received metadata is not scalar or array') unless(ref $value eq 'ARRAY');
-
-        foreach my $val (@{$value}) {
-            $insert_item->( $key, $val);
-        }
-    }
     return 1;
 
 }
 
 1;
+
+__END__
+
+=head1 Name
+
+OpenXPKI::Server::Workflow::Activity::Tools::PersistCertificateMetadata
+
+=head1 Description
+
+Render and persist the "per profile" metadata for a certificate based
+on the template found in the profile definition and the current workflow
+context.
+
+All parameters are directly read from the context, activity parameters
+are added as extra items to the template input hash.
+
+=head2 Context Items
+
+=over
+
+=item cert_identifier
+
+The identifier of the certificate
+
+=item cert_profile, cert_subject_style
+
+Determines the profile section to read the metadata node from
+
+=item cert_info, cert_subject_parts
+
+Merged together to build the input hash for the template engine, keys
+existing in both hashes are taken from I<cert_info>.
+
+=back

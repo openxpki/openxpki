@@ -275,6 +275,7 @@ OpenXPKI/Server/API2/Plugin/Cert/list_used_issuers.pm
 OpenXPKI/Server/API2/Plugin/Cert/private_key.pm
 OpenXPKI/Server/API2/Plugin/Cert/search_cert.pm
 OpenXPKI/Server/API2/Plugin/Cert/validate_certificate.pm
+OpenXPKI/Server/API2/Plugin/Cert/set_cert_metadata.pm
 OpenXPKI/Server/API2/Plugin/Cert/DateCondition.pm
 OpenXPKI/Server/API2/Plugin/Control/reload.pm
 OpenXPKI/Server/API2/Plugin/Control/version.pm

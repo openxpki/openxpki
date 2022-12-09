@@ -24,32 +24,12 @@ sub execute {
     my $cert_identifier = $context->param('cert_identifier');
     ##! 16: 'cert_identifier: ' . $cert_identifier
 
-    # map current database info into ArrayRef [ key => { value => ..., id => ...} ]
-    my $cert_metadata = $dbi->select(
-        from => 'certificate_attributes',
-        columns => ['*'],
-        where => {
-            identifier => $cert_identifier,
-            attribute_contentkey => { -like => 'meta_%' },
-        },
-    );
-    my $old_meta = {};
-    while (my $item = $cert_metadata->fetchrow_hashref) {
-        my $key = $item->{attribute_contentkey};
-        $old_meta->{$key} //= [];
-        push @{ $old_meta->{$key} }, { value => $item->{attribute_value}, id => $item->{attribute_key} };
-    }
-    ##! 32: 'Current meta attributes: ' . Dumper $old_meta
-
     my $param = $context->param();
     ##! 32: 'Update request: ' . Dumper $param
 
+    my $metadata = {};
     for my $key (keys %{$param}) {
         next if ($key !~ m{ \A meta_ }xms);
-
-        my @new_values;
-        my $is_scalar = 0;
-        # non scalar items - in context we have the square brackets!
 
         # deprecated - context key with extra brackets
         if ($key =~ m{ \A (\w+)\[\] }xms) {
@@ -57,76 +37,58 @@ sub execute {
             CTX('log')->deprecated->error("Deprecated usage of square brackets in field name ($key)");
         }
 
+        my @new_values;
         if (ref $param->{$key} eq 'ARRAY') {
             ##! 32: "attribute $key treated as ARRAY"
             @new_values = @{ $param->{$key} };
         } elsif (OpenXPKI::Serialization::Simple::is_serialized($param->{$key})) {
             ##! 32: "attribute $key treated as ARRAY (serialized)"
             @new_values = @{$ser->deserialize( $param->{$key} )};
-        } else {
+        } elsif ($param->{$key} ne '') {
             ##! 32: "attribute $key treated as SCALAR"
-            $is_scalar = 1;
             @new_values = ($param->{$key});
         }
 
-        my $old_to_delete = $old_meta->{$key} // [];
+        # strip the meta_ prefix from the key
+        $key = substr($key,5);
+        $metadata->{$key} = \@new_values;
 
-        # How this works:
-        # $old_to_delete is an ArrayRef with info about all existing values and their DB id.
-        # We run through the new values and compare them against the $old_to_delete,
-        # removing items from $old_to_delete if we want to keep.
-        for my $newval (@new_values) {
-            next unless (defined $newval && $newval ne '');
-
-            # check if value already exists in DB (last occurrance if there are multiple entries with the same value)
-            my ($index) = grep { $old_to_delete->[$_]->{value} eq $newval } 0..$#{$old_to_delete};
-            if (defined $index) {
-                ##! 32: "attr '$key': keeping existing value: '$newval'"
-                splice @$old_to_delete, $index, 1; # remove from $old_values so it doesn't get deleted from DB later on
-            }
-            else {
-                # if it's a scalar and any old value existed in DB:
-                # replace old value (instead of inserting the new one and deleting the old one)
-                if ($is_scalar and scalar(@$old_to_delete)) {
-                    my $oldval = shift(@$old_to_delete); # take first old value (attribute might contain multiple values if it was previously treated as a list)
-                    $dbi->update(
-                        table => 'certificate_attributes',
-                        set => { attribute_value => $newval },
-                        where => { attribute_key => $oldval->{id} },
-                    );
-                    ##! 16: "attr '$key': changed value '".$oldval->{value}."' => '$newval'"
-                    CTX('log')->application()->info(sprintf ('cert metadata changed, cert %s, attr %s, old value %s, new value %s',
-                           $cert_identifier, $key, $oldval->{value}, $newval));
-                }
-                else {
-                    $dbi->insert(
-                        into => 'certificate_attributes',
-                        values => {
-                            attribute_key        => AUTO_ID,
-                            identifier           => $cert_identifier,
-                            attribute_contentkey => $key,
-                            attribute_value      => $newval,
-                        }
-                    );
-                    ##! 16: "attr '$key': added value '$newval'"
-                    CTX('log')->application()->info(sprintf ('cert metadata added, cert %s, attr %s, value %s',
-                           $cert_identifier, $key, $newval));
-                }
-            }
-        }
-
-        # remove leftovers from the hash
-        for my $item (@$old_to_delete) {
-            $dbi->delete(
-                from => 'certificate_attributes',
-                where => { attribute_key => $item->{id} }
-            );
-            ##! 16: "attr '$key': deleted value '" . $item->{value} . "'"
-            CTX('log')->application()->info(sprintf ('cert metadata deleted, cert %s, attr %s, value %s',
-                   $cert_identifier, $key, $item->{value}));
-        }
     }
+
+    ##! 32: 'Metadata is ' . Dumper $metadata
+    CTX('api2')->set_cert_metadata(
+        identifier => $cert_identifier,
+        attribute  => $metadata,
+        mode  => 'overwrite',
+    );
+
     return 1;
 }
 
 1;
+
+=head1 Name
+
+OpenXPKI::Server::Workflow::Activity::Tools::UpdateCertificateMetadata
+
+=head1 Description
+
+Update the metadata stored in certificate_attributes with information
+taken from the current workflow context.
+
+=head2 Context Items
+
+=over
+
+=item cert_identifier
+
+The identifier of the certificate to update
+
+=item meta_*
+
+Any key in the context starting with I<meta_*> is considered to contain
+the expected information, set a key to an empty empty value to remove
+the original data from the system. Existing metadata items that do not
+have a matching key in the context are not modified.
+
+=back

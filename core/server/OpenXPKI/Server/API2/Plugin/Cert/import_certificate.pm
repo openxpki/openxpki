@@ -298,31 +298,15 @@ command "import_certificate" => {
     # append attributes if any
     my $attr = $params->has_attributes ? $params->attributes : {};
 
-    if ($attr) {
-        ##! 32: 'Attributes ' . Dumper $attr
-        foreach my $key (keys %{$attr}) {
-            my $val = $attr->{$key};
-            if (ref $val eq '') { $val = [ $val ] };
-
-            $dbi->delete(from => 'certificate_attributes',
-            where => {
-                identifier => $cert_identifier,
-                attribute_contentkey => 'meta_'.$key
-            });
-
-            foreach my $v (@{$val}) {
-                ##! 64: "Adding meta $key : $v"
-                $dbi->insert(
-                    into => 'certificate_attributes',
-                    values => {
-                        attribute_key        => AUTO_ID,
-                        identifier           => $cert_identifier,
-                        attribute_contentkey => 'meta_'.$key,
-                        attribute_value      => $v,
-                    }
-                );
-            }
-        }
+    ##! 32: 'Attributes ' . Dumper $attr
+    foreach my $key (keys %{$attr}) {
+        my $val = $attr->{$key};
+        if (ref $val eq '') { $val = [ $val ] };
+        CTX('api2')->set_cert_metadata(
+            identifier => $cert_identifier,
+            attribute  => { $key => $val },
+            mode  => 'overwrite',
+        );
     }
 
     CTX('log')->system()->info("Certificate ".$cert_hash->{subject}."/$cert_identifier was imported");
