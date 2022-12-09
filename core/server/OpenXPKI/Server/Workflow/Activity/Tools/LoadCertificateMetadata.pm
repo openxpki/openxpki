@@ -26,59 +26,56 @@ sub execute {
     }
 
     ##! 16: 'cert_identifier ' . $cert_identifier
-    my $sth = CTX('dbi')->select(
-        from => 'certificate_attributes',
-        columns => [ 'attribute_contentkey', 'attribute_value' ],
-        where => {
-            identifier => $cert_identifier,
-            attribute_contentkey => { -like => 'meta_%' },
-        },
+    my $attr = CTX('api2')->get_cert_attributes(
+        identifier => $cert_identifier,
+        attribute => 'meta_%'
     );
+    ##! 128: $attr
 
-    my $prefix = $self->param('prefix') || 'meta';
+    my $prefix = $self->param('prefix');
+    my $target_key = $self->param('target_key');
+
     ##! 16: 'Prefix ' . $prefix
+    ##! 16: $target_key
 
     my $context_data;
-    ##! 16: ' Size of cert_metadata '. scalar( @{$cert_metadata} )
-    while (my $metadata = $sth->fetchrow_hashref) {
-        ##! 32: 'Examine Key ' . $metadata->{ATTRIBUTE_KEY}
-        my $key = $metadata->{attribute_contentkey};
-        my $value = $metadata->{attribute_value};
-        # this should never happen - might be removed in next release
-        if (OpenXPKI::Serialization::Simple::is_serialized($value)) {
-            ##! 32: 'Deserialize '
-            $value = $ser->deserialize( $value );
+    foreach my $key (keys %{$attr}) {
+        ##! 16: $key
+        my $value = $attr->{$key};
+        ##! 64: $value
+
+        # replace the prefix if requested
+        if ($prefix) {
+            $key =~ s/^meta/$prefix/;
+
+        # default is to set hash in target_key without prefix
+        } elsif ($target_key) {
+            $key = substr($key,5);
+
         }
 
-        # find multivalues
-        if ($context_data->{$key}) {
-            ##! 32: 'set multivalue context for ' . $key
-            # on second element, create array with first one
-            if (!ref $context_data->{$key}) {
-                $context_data->{$key} = [ $context_data->{$key} ];
+        # collapse single value items
+        if (@{$value} == 1) {
+            ##! 32: 'collapse to scalar'
+            $value = $value->[0];
+            # legacy support - mutlivalues are now stored as individual lines
+            if (OpenXPKI::Serialization::Simple::is_serialized($value)) {
+                ##! 32: 'Deserialize '
+                $value = $ser->deserialize( $value );
             }
-            push @{$context_data->{$key}}, $value;
-        } else {
-            ##! 32: 'set scalar context for ' . $key
-            $context_data->{$key} = $value;
-        }
-    }
-
-    # write to the context, serialization and brackets are no longer required, #695
-    foreach my $key (keys %{$context_data}) {
-        my $val = $context_data->{$key};
-        my $tkey = $key;
-        if ($prefix ne 'meta') {
-            $tkey =~ s/^meta/$prefix/;
         }
 
-        ##! 64: 'Set key ' . $key . ' to ' . $val
-        $context->param( $tkey => $val  );
+        $context_data->{$key} = $value;
 
     }
 
     CTX('log')->application()->debug('Found metadata keys '. join(", ", keys %{$context_data}) .' for ' . $cert_identifier);
 
+    if ($target_key) {
+        $context->param( $target_key => $context_data );
+    } else {
+        $context->param( $context_data );
+    }
 
     return 1;
 }
@@ -97,6 +94,10 @@ Load the metadata assigned to a given certificate into the context.
 Set the expected prefix for the keys using the parameter I<prefix>. If
 no prefix value is given, the default I<meta> is used. Note: the prefix
 must not end with the underscore, it is appended by the class.
+
+If you set I<target_key>, the metadata is added to the context as a single
+hash item to this context key. The default is to strip the prefix I<meta>
+in this case but you can set an explicit prefix using I<prefix>.
 
 =head1 Configuration
 
@@ -122,6 +123,10 @@ not take care of any existing data if the key already exists!
 
 The identifier of the cert to load, default is the value of the context
 key cert_identifier.
+
+=item target_key
+
+Place the collected metadata into a single context item with this key.
 
 =back
 
