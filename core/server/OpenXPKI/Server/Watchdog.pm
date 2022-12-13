@@ -182,6 +182,18 @@ has interval_session_purge => (
     default => 0,
 );
 
+=item interval_crl_purge
+
+Seconds between two attempts to purge expired / superseded CRLs
+default: 0 (do not purge CRLs)
+
+=cut
+has interval_crl_purge => (
+    is => 'rw',
+    isa => 'Int',
+    default => 0,
+);
+
 =item interval_auto_archiving
 
 Seconds between two attempts to archive workflows whose "archive_at" date was
@@ -265,6 +277,12 @@ has _next_session_cleanup => (
 );
 
 has _next_auto_archiving => (
+    is => 'rw',
+    isa => 'Int',
+    init_arg => undef,
+);
+
+has _next_crl_purge => (
     is => 'rw',
     isa => 'Int',
     init_arg => undef,
@@ -450,6 +468,11 @@ sub run {
             CTX('log')->system->info("Initialize auto-archiving from watchdog with interval " . $self->interval_auto_archiving);
         }
 
+        if ($self->interval_crl_purge) {
+            $self->_next_crl_purge( time );
+            CTX('log')->system->info("Initialize crl purge from watchdog with interval " . $self->interval_crl_purge);
+        }
+
         #
         # main loop
         #
@@ -486,6 +509,7 @@ sub __main_loop {
             $self->__reload if $RELOAD;
             $self->__purge_expired_sessions;
             $self->__auto_archive_workflows;
+            $self->__purge_crl;
 
             # if slots_avail_count is zero, do a recalculation
             if (!$slots_avail_count) {
@@ -566,6 +590,37 @@ sub __purge_expired_sessions {
     $self->_next_session_cleanup( time + $self->interval_session_purge );
 }
 
+=head2 __purge_crl
+
+Purge expired CRLs
+
+Removes records from the CRL table if next_update is in the past
+
+=cut
+
+sub __purge_crl {
+
+    my $self = shift;
+    return unless ($self->interval_crl_purge and time > $self->_next_crl_purge);
+
+    CTX('log')->system()->debug("Init crl purge from watchdog");
+    eval {
+        $self->{dbi}->start_txn;
+        $self->{dbi}->delete(
+            from => 'crl',
+            where => {
+                'next_update'  => { '<', time() },
+            },
+        );
+        $self->{dbi}->commit;
+    };
+    if ($EVAL_ERROR) {
+        $self->{dbi}->rollback;
+        CTX('log')->system()->error("database error during crl purge: $EVAL_ERROR");
+    }
+    $self->_next_crl_purge( time + $self->interval_crl_purge );
+}
+
 # Does the actual reloading during the main loop
 sub __reload {
     my $self = shift;
@@ -587,6 +642,7 @@ sub __reload {
         interval_loop_run
         interval_session_purge
         interval_auto_archiving
+        interval_crl_purge
     )) {
         if ($new_cfg->{$key}) {
             ##! 16: 'Update key ' . $key
