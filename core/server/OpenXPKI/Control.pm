@@ -167,9 +167,16 @@ sub start {
             return 1;
         }
         if ($Minor < $minor) {
-            print STDERR sprintf "Config dependency (%s) not fullfilled by this release (%s)\n",
-                $core, $OpenXPKI::VERSION::VERSION;
-            return 1;
+            # config is set for the coming up major version while this
+            # is a development build (odd numbers are development)
+            if (($minor - $Minor) == 1  && $Minor%2) {
+                print STDERR sprintf "Config dependency (%s) matches upcoming release\n",
+                    $core;
+            } else {
+                print STDERR sprintf "Config dependency (%s) not fullfilled by this release (%s)\n",
+                    $core, $OpenXPKI::VERSION::VERSION;
+                return 1;
+            }
         }
     } else {
         print STDERR "Config depend is not set - unable to check config prereq!\n";
