@@ -2,16 +2,22 @@
 
 use strict;
 use warnings;
+
+# Core modules
 use English;
-use OpenXPKI::Debug;
-use OpenXPKI::Control;
+use Errno;
 use Getopt::Long;
 use Pod::Usage;
 use POSIX ":sys_wait_h";
-use Errno;
 use File::Spec;
-use Log::Log4perl qw( :easy );
 
+# CPAN modules
+use Log::Log4perl qw( :easy );
+use Feature::Compat::Try;
+
+# Project modules
+use OpenXPKI::Debug;
+use OpenXPKI::Control;
 use OpenXPKI::VERSION;
 
 
@@ -44,8 +50,8 @@ if ($params{version}) {
 
 pod2usage(-exitstatus => 0, -verbose => 2) if $params{man};
 pod2usage(-verbose => 1) if ($params{help});
-if (scalar @ARGV != 1) {
-    print STDERR "Usage: openxpkictl [OPTIONS] start|stop|restart|reload|status|version\n";
+if (scalar @ARGV < 1) {
+    print STDERR "Usage: openxpkictl [OPTIONS] start|stop|restart|reload|status|version|terminal\n";
     exit 0;
 }
 
@@ -143,6 +149,89 @@ if ($cmd eq 'version') {
 
     exit OpenXPKI::Control::reload( $args );
 
+} elsif ($cmd eq 'terminal') {
+
+    try {
+        # this is EE code:
+        require OpenXPKI::Server::ProcTerminal;
+    }
+    catch ($err) {
+        die "This is a feature of OpenXPKI Enterprise Edition\n" if $err =~ m{locate OpenXPKI/Server/ProcTerminal\.pm in \@INC}; # silently fail if file does not exist
+        die $err;
+    }
+
+    require OpenXPKI::Config;
+    my $config = OpenXPKI::Config->new();
+
+    my $manager = OpenXPKI::Server::ProcTerminal->new(
+        log => get_logger(),
+        config => $config->get_hash('system.terminal') // {},
+    );
+
+    my $subcmd = shift // '';
+
+    if ($subcmd eq 'status') {
+        my $maxlen = 0; for (@{ $manager->list }) { $maxlen = length if length > $maxlen };
+
+        for my $proc_name (@{ $manager->list }) {
+            my $ctrl = $manager->controller($proc_name);
+            my $pid = $ctrl->check_server(1);
+            printf "%-${maxlen}s - %s\n", $proc_name, $pid ? "running ($pid)" : "stopped";
+        }
+
+        exit 0;
+    }
+
+    if ($subcmd eq 'start') {
+        my $proc_name = shift // '';
+        if (not grep { $_ eq $proc_name } @{ $manager->list }) {
+            print STDERR "Please specify a valid terminal daemon name as argument.\n";
+            print STDERR "The 'status' subcommand will print a list of all available names.\n";
+            exit 1;
+        }
+        my $client = $manager->proc($proc_name);
+        $client->run();
+        exit 0;
+    }
+
+    my $stop = sub {
+        my $name = shift;
+        my $ctrl = $manager->controller($name);
+        my $pid = $ctrl->check_server(1); # needed to initialize internal is_running flag
+        if ($pid) {
+            my $client = $manager->proc($name);
+            $client->stop_server();
+        }
+    };
+
+    if ($subcmd eq 'stop') {
+        my $proc_name = shift // '';
+        if (not grep { $_ eq $proc_name } @{ $manager->list }) {
+            print STDERR "Please specify a valid terminal daemon name as argument.\n";
+            print STDERR "The 'status' subcommand will print a list of all available names.\n";
+            exit 1;
+        }
+        $stop->($proc_name);
+        exit 0;
+    }
+
+    if ($subcmd eq 'stopall') {
+        for my $proc_name (@{ $manager->list }) {
+            $stop->($proc_name);
+        }
+        exit 0;
+    }
+
+    print STDERR <<"HELP_TERMINAL";
+Unknown or no subcommand given: $subcmd.
+
+Available subcommands:
+  status        Show names and status of internally managed terminal daemons
+  start <name>  Start the given terminal daemon
+  stop <name>   Stop the given terminal daemon
+  stopall       Stop all running terminal daemons
+HELP_TERMINAL
+    exit 1;
 }
 
 ###########################################################################
@@ -167,6 +256,7 @@ openxpkictl [options] COMMAND
    restart          Restart OpenXPKI daemon
    status           Get OpenXPKI daemon status
    version          Print the OpenXPKI version and license info
+   terminal         Control terminal process servers (EE feature)
 
 See below for supported options.
 
@@ -178,28 +268,35 @@ Available commands:
 
 =item B<start>
 
-Starts the OpenXPKI daemon.
+Start the OpenXPKI daemon.
 
 =item B<stop>
 
-Stops the OpenXPKI daemon.
+Stop the OpenXPKI daemon.
 
 =item B<reload>
 
-Reloads the OpenXPKI daemon, re-reading the config repository.
+Reload the OpenXPKI daemon, re-reading the config repository.
 Note: Some changes need a restart, see the documentation!
 
 =item B<restart>
 
-Restarts the OpenXPKI daemon.
+Restart the OpenXPKI daemon.
 
 =item B<status>
 
-Checks the OpenXPKI daemon status.
+Check the OpenXPKI daemon status.
 
 =item B<version>
 
 Print information on the version and license.
+
+=item B<terminal>
+
+Control the terminal daemons (EE feature).
+
+A subcommand is required. Executing it without subcommand prints a list of
+the available commands.
 
 =back
 
