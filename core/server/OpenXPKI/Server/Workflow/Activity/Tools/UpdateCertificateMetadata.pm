@@ -1,7 +1,3 @@
-# OpenXPKI::Server::Workflow::Activity::Tools::UpdateCertificateMetadata
-# Written by Oliver Welter for the OpenXPKI project 2013
-# Copyright (c) 2013 by The OpenXPKI Project
-
 package OpenXPKI::Server::Workflow::Activity::Tools::UpdateCertificateMetadata;
 
 use strict;
@@ -44,7 +40,7 @@ sub execute {
         } elsif (OpenXPKI::Serialization::Simple::is_serialized($param->{$key})) {
             ##! 32: "attribute $key treated as ARRAY (serialized)"
             @new_values = @{$ser->deserialize( $param->{$key} )};
-        } elsif ($param->{$key} ne '') {
+        } elsif ($param->{$key}//'' ne '') {
             ##! 32: "attribute $key treated as SCALAR"
             @new_values = ($param->{$key});
         }
