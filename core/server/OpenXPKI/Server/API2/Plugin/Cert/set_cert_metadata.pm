@@ -100,7 +100,7 @@ command "set_cert_metadata" => {
         OpenXPKI::Exception->throw(
             message => "Attribute value for key $key is not a scalar"
         ) unless(ref $value eq '');
-        ##! 32: 'Add new attribute ' . $key . ' value ' . $value
+        ##! 32: "  -> add new '$key' attribute value '$value'"
         ## This is a workaround for an upstream bug in the mysql driver
         # we expand a single dash, dot (or e,+) to the verbose "n/a"
         # see https://github.com/openxpki/openxpki/issues/198
@@ -126,7 +126,7 @@ command "set_cert_metadata" => {
   KEY:
     foreach my $key (keys %{$metadata}) {
 
-        ##! 16: 'Key ' . $key
+        ##! 16: "Key '$key'"
         my $value = $metadata->{$key};
 
         # skip undef
@@ -145,11 +145,11 @@ command "set_cert_metadata" => {
             tenant => '',
         );
         my $item = $attr->{'meta_'.$key};
-        ##! 64: $item
+        ##! 64: "  OLD: " . Dumper($item)
 
         # nothing is set so we can just insert anything we find
         if (!$item) {
-            ##! 32: 'No item found, plain insert'
+            ##! 32: '  -> no item found, plain insert'
             if (!ref $value) {
                 $insert_item->( $key, $value);
                 next KEY;
@@ -161,12 +161,12 @@ command "set_cert_metadata" => {
         }
 
         if ($mode eq 'skip') {
-            ##! 32: 'Item found and skip is set'
+            ##! 32: '  -> item found in "skip" mode'
             next KEY;
         }
 
         if ($mode eq 'error') {
-            ##! 64: $value
+            ##! 64: '  -> error: item found in "error" mode'
             OpenXPKI::Exception->throw(
                 message => "Tried to set values for $key but items already exist"
             );
@@ -183,7 +183,6 @@ command "set_cert_metadata" => {
 
         # we are now in overwrite or merge mode
         # create list to add and mark those to keep
-        ##! 64: Dumper $item
         my %existing = map { $_ => 0 } @{$item};
         my @add;
         foreach my $val (@$value) {
@@ -196,16 +195,16 @@ command "set_cert_metadata" => {
             }
         }
 
-        ##! 64: \%existing
+        ##! 64: "  existing: " . join(", ", map { "$_: $existing{$_}" } keys %existing)
         my @delete = map { $existing{$_} ? () : $_ } keys %existing;
 
-        ##! 64: \@add
-        ##! 64: \@delete
+        ##! 64: "  add: " . join(", ", @add)
+        ##! 64: "  delete: " . join(", ", @delete)
 
         if ($mode eq 'overwrite') {
             # simple inplace overwrite for a single value
             if ((scalar @delete == 1) && (scalar @add == 1)) {
-                ##! 32: "Inplace update for $key with " . $add[0]
+                ##! 32: "  -> inplace update for '$key' with '$add[0]'"
                 $dbi->update(
                     table => 'certificate_attributes',
                     set => {
