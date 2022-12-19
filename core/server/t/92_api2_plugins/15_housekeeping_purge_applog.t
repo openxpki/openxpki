@@ -79,7 +79,7 @@ ok $dbi->insert_and_commit(
     into => 'application_log',
     values => {
         application_log_id  => $dbi->next_id('application_log'),
-        logtimestamp        => time - $maxage + 5, # should be kept when calling 'purge'
+        logtimestamp        => time - $maxage + 60, # should be kept when calling 'purge'
         workflow_id         => $wf_id,
         category            => 'openxpki.application',
         priority            => Log::Log4perl::Level::to_priority( "INFO" ),
