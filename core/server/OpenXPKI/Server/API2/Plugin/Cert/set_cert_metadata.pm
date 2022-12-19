@@ -222,7 +222,7 @@ command "set_cert_metadata" => {
                 from => 'certificate_attributes',
                 where => {
                     attribute_contentkey => 'meta_'.$key,
-                    identifier           => \@delete,
+                    attribute_value      => \@delete,
                 }
             );
         }
