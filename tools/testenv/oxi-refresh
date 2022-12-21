@@ -188,6 +188,11 @@ echo ""
 echo "Install OpenXPKI"
 $(dirname $0)/oxi-install "$@" | sed -u 's/^/  /g'
 
+# Disable version check for our test purposes
+# (OpenXPKI::Control checks for system.version.depend)
+echo -e "\nDisable version check"
+sed -zri 's/depend:\s*\n\s+core:[^\n]+\n//' /etc/openxpki/config.d/system/version.yaml
+
 # configure web server
 echo -e "\nConfigure Apache web server"
 cat $OXI_TEST_SAMPLECONFIG_DIR/contrib/apache2-openxpki-site.conf \

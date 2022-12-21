@@ -182,25 +182,3 @@ if [[ $IS_I18N -eq 1 ]]; then
         locale-gen                                                        >>$LOG 2>&1
     fi
 fi
-
-
-#
-# Write system version (OpenXPKI::Control checks it)
-#
-
-# in openxpki-docker-ee environment use modify-config
-# (needs OpenXPKI::Config::Backend, so OpenXPKI needs to be installed first)
-echo "- modify config (system.version.depend.core)"
-if command -v modify-config > /dev/null; then
-    TEMPDIR=$(mktemp -d)
-    echo "core: $OXI_VERSION" > $TEMPDIR/version.yaml
-    echo "system.version.depend: $TEMPDIR/version.yaml" > $TEMPDIR/mod.yaml
-
-    modify-config --src  /etc/openxpki/config.d --dest /etc/openxpki/config.d --mod $TEMPDIR/mod.yaml | sed 's/^/    /g'
-
-    rm -rf $TEMPDIR
-# try modifying file directly otherwise
-else
-    sed -zri 's/depend:\s*\n\s+core:[^\n]+\n//' /etc/openxpki/config.d/system/version.yaml
-    echo -e "\ndepend:\n    core: $OXI_VERSION" >> /etc/openxpki/config.d/system/version.yaml
-fi
