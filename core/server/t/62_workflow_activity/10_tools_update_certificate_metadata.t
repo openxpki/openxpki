@@ -11,7 +11,9 @@ use Test::Deep;
 use Test::Exception;
 use Data::UUID;
 
-#use OpenXPKI::Debug; $OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Workflow::Activity::Tools::UpdateCertificateMetadata.*'} = 32;
+#use OpenXPKI::Debug;
+#$OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::Workflow::Activity::Tools::UpdateCertificateMetadata'} = 100;
+#$OpenXPKI::Debug::LEVEL{'OpenXPKI::Server::API2::Plugin::Cert::set_cert_metadata'} = 100;
 
 # Project modules
 use lib "$Bin/../lib";
@@ -19,17 +21,38 @@ use lib "$Bin";
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::Database; # to get AUTO_ID
 use OpenXPKI::Test;
-use OpenXPKI::Test::WorkflowMock;
 
-plan tests => 4;
-
-# TODO Change test to start real workflow similar to 20_tools_setattribute.t
+plan tests => 3;
 
 #
 # Setup test context
 #
-my $oxitest = OpenXPKI::Test->new;
+my $cert_id = Data::UUID->new->create_b64;
 
+my $workflow_type = "TESTWORKFLOW".int(rand(2**32));
+my $oxitest = OpenXPKI::Test->new(
+    with => [ qw( TestRealms ) ],
+    also_init => "workflow_factory",
+    add_config => {
+        "realm.alpha.workflow.def.$workflow_type" => {
+            head => { prefix => "testwf", persister => 'OpenXPKI' },
+            state => {
+                INITIAL => { action => [ 'doit > DONE' ] },
+                DONE    => { },
+            },
+            action => {
+                doit => {
+                    class => 'OpenXPKI::Server::Workflow::Activity::Tools::UpdateCertificateMetadata',
+                },
+            },
+            acl => { PrincesOfTheUniverse => { creator => 'any' } },
+        },
+    },
+);
+
+$oxitest->session->data->role("PrincesOfTheUniverse");
+
+# Prepare DB
 sub insert_meta_attribute {
     my ($db, $cert_id, $key, $value) = @_;
     $db->insert_and_commit(
@@ -43,9 +66,6 @@ sub insert_meta_attribute {
     );
 }
 
-my $cert_id = Data::UUID->new->create_b64;
-
-# Prepare DB
 insert_meta_attribute($oxitest->dbi, $cert_id, meta_shoesize  => 9);
 insert_meta_attribute($oxitest->dbi, $cert_id, meta_color     => 'blue');
 insert_meta_attribute($oxitest->dbi, $cert_id, meta_hairstyle => 'bald');
@@ -54,42 +74,30 @@ insert_meta_attribute($oxitest->dbi, $cert_id, meta_cars      => 'ford');
 insert_meta_attribute($oxitest->dbi, $cert_id, meta_cars      => 'horch');
 insert_meta_attribute($oxitest->dbi, $cert_id, meta_birds     => 'magpie');
 insert_meta_attribute($oxitest->dbi, $cert_id, meta_birds     => 'crow');
-insert_meta_attribute($oxitest->dbi, $cert_id, meta_equal     => 'same');
-insert_meta_attribute($oxitest->dbi, $cert_id, meta_equal     => 'same');
-insert_meta_attribute($oxitest->dbi, $cert_id, meta_equal2    => 'yo');
-insert_meta_attribute($oxitest->dbi, $cert_id, meta_equal2    => 'yo');
-
-# Prepare workflow context
-my $wf = OpenXPKI::Test::WorkflowMock->new;
-$wf->context->param(cert_identifier   => $cert_id);
-$wf->context->param(meta_color        => 'red');
-$wf->context->param({ meta_hairstyle  => undef }); # setting to "undef" only works when passing a HashRef
-$wf->context->param('meta_cars'       => ['horch', 'tesla']);
-$wf->context->param('meta_birds'      => []);
-$wf->context->param(meta_morphosis    => 'butterfly');
-$wf->context->param('meta_physics'    => [ 'transcendency', 'ontology' ]);
-$wf->context->param('meta_equal'      => [ 'same', 'same' ]);
-$wf->context->param('meta_equal2'     => [ 'yo' ]);
-$wf->context->param('meta_equal_nu'   => [ 'this', 'this' ]);
 
 #
 # Tests
 #
-use_ok "OpenXPKI::Server::Workflow::Activity::Tools::UpdateCertificateMetadata";
+my $workflow;
 
-my $activity;
-lives_ok {
-    $activity = OpenXPKI::Server::Workflow::Activity::Tools::UpdateCertificateMetadata->new(
-        $wf,
-        {},
-    );
-} "Create activity object";
+# Create workflow
+lives_and {
+    $workflow = CTX('workflow_factory')->get_factory->create_workflow($workflow_type);
+    ok ref $workflow;
+} "Create test workflow" or die("Could not create workflow");
 
+# Run action that updates the attributes
 lives_ok {
-    CTX('dbi')->start_txn; # can't use $oxitest->dbi->dbh as the called method for some reason gets a new CTX('dbi') connection
-    $activity->execute($wf);
-    CTX('dbi')->commit;
-} "Execute activity";
+    $workflow->context->param(cert_identifier => $cert_id);
+    $workflow->context->param(meta_color      => 'red');
+    $workflow->context->param({ meta_hairstyle => undef }); # setting to "undef" only works when passing a HashRef
+    $workflow->context->param(meta_cars       => ['horch', 'tesla']);
+    $workflow->context->param(meta_birds      => []);
+    $workflow->context->param(meta_morphosis  => 'butterfly');
+    $workflow->context->param(meta_physics    => [ 'transcendency', 'ontology' ]);
+
+    $workflow->execute_action("testwf_doit");
+} "Execute workflow action";
 
 lives_and {
     my $meta = $oxitest->dbi->select_hashes(
@@ -106,12 +114,7 @@ lives_and {
         superhashof({ attribute_contentkey => 'meta_morphosis', attribute_value => 'butterfly' }),
         superhashof({ attribute_contentkey => 'meta_physics',   attribute_value => 'transcendency' }),
         superhashof({ attribute_contentkey => 'meta_physics',   attribute_value => 'ontology' }),
-        superhashof({ attribute_contentkey => 'meta_equal',     attribute_value => 'same' }),
-        superhashof({ attribute_contentkey => 'meta_equal',     attribute_value => 'same' }),
-        superhashof({ attribute_contentkey => 'meta_equal2',    attribute_value => 'yo' }),
-        superhashof({ attribute_contentkey => 'meta_equal_nu',  attribute_value => 'this' }),
-        superhashof({ attribute_contentkey => 'meta_equal_nu',  attribute_value => 'this' }),
-    );
+    ) or diag explain $meta;
 } "Correctly updated database";
 
 $oxitest->dbi->delete_and_commit(from => 'certificate_attributes', where => { identifier => $cert_id });
