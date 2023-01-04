@@ -41,7 +41,7 @@ sub __build_subject_oid_map {
         '2.5.4.23',                     => 'facsimileTelephoneNumber',
         '2.5.4.4'                       => [ 'surname', 'Surname', 'SN' ],
         '2.5.4.41'                      => [ 'name', 'Name' ],
-        '2.5.4.42'                      => ['givenName','GN'],
+        '2.5.4.42'                      => ['GN','givenName'],
         '2.5.4.43'                      => 'initials',
         '2.5.4.44'                      => 'generationQualifier',
         '2.5.4.45'                      => 'uniqueIdentifier',
@@ -74,14 +74,32 @@ sub render_rdn {
     my $self = shift;
     my $rdn = shift;
 
+    my $name = $self->render_rdn_type($rdn);
+    my $val = $self->render_rdn_value($rdn);
+    return "$name=$val";
+}
+
+sub render_rdn_type {
+
+    my $self = shift;
+    my $rdn = shift;
+
     my $name = $rdn->{type};
     my $oids = $self->subject_oid_map();
     if (my $oid = $oids->{$name}) {
-        $name = (ref $oid) ? $oid->[0] : $oid;
+        return $oid unless (ref $oid);
+        return $oid->[0];
     }
+    return $name;
+}
+
+sub render_rdn_value {
+
+    my $self = shift;
+    my $rdn = shift;
 
     my ($val) = values %{$rdn->{value}};
-    return "$name=$val";
+    return $val;
 }
 
 sub get_oid_for_name {
