@@ -473,8 +473,9 @@ sub set_oid_extension_sequence {
     my @section = split /\r?\n/, $value;
     push @values, @section;
 
+    # incoming value for critical should already be "true" or "false"
     return $self->set_extension(NAME => $name,
-        CRITICAL => $critical ? 'true' : 'false',
+        CRITICAL => $critical,
         VALUES   => [@values]);
 
 }
