@@ -1,7 +1,3 @@
-# OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10
-# Copyright (c) 2014 by The OpenXPKI Project
-# Largely copied from SCEPv2::ExtractCSR
-
 package OpenXPKI::Server::Workflow::Activity::Tools::ParsePKCS10;
 
 use strict;
@@ -16,7 +12,7 @@ use Template;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Exception;
 use OpenXPKI::Debug;
-use OpenXPKI::DN;
+use OpenXPKI::Crypt::DN;
 use OpenXPKI::Serialization::Simple;
 use Workflow::Exception qw(configuration_error workflow_error);
 
@@ -107,16 +103,12 @@ sub execute {
     # write back the cleaned PEM block if target_key is set
     $param->{$target_key} = $decoded->csrRequest(1) if ($target_key);
 
-    my %hashed_dn;
-    my $csr_subject = $decoded->subject();
-
-    if ($csr_subject) {
-        # TODO - extend Crypt::PKCS10 to return RFC compliant subject
-        my $dn = OpenXPKI::DN->new( $csr_subject );
-
-        %hashed_dn = $dn->get_hashed_content();
-        $param->{csr_subject} = $dn->get_rfc_2253_dn();
-        ##! 32: 'Subject DN ' . Dumper \%hashed_dn
+    my $hashed_dn;
+    if (my $csr_subject = $decoded->subjectSequence()) {
+        my $dn = OpenXPKI::Crypt::DN->new( sequence => $csr_subject );
+        $hashed_dn = $dn->as_hash();
+        $param->{csr_subject} = $dn->get_subject();
+        ##! 32: 'Subject DN ' . Dumper $hashed_dn
     }
 
     if ($self->param('key_params')) {
@@ -206,7 +198,7 @@ sub execute {
         $csr_san->{ $san_type } = \@items;
 
         # merge into dn, uppercase key name
-        $hashed_dn{'SAN_'.uc($san_type)} = \@items;
+        $hashed_dn->{'SAN_'.uc($san_type)} = \@items;
 
         # push items to @san_list in the nested array format as required by
 
@@ -219,7 +211,7 @@ sub execute {
 
     ##! 32: 'Extracted SAN ' . Dumper $csr_san
 
-    ##! 32: 'Merged DN ' . Dumper \%hashed_dn
+    ##! 32: 'Merged DN ' . Dumper $hashed_dn
 
     # Attributes, must be a list of OIDs, seperated by comma/blank
     my $attr = $self->param('req_attributes');
@@ -253,7 +245,7 @@ sub execute {
     # If the profile has NO ui section, we write the parsed hash and the SANs "as is" to the context
     if (!$cert_profile or !$cert_subject_style or !$config->exists(['profile', $cert_profile, 'style', $cert_subject_style, 'ui' ])) {
 
-        $param->{$subject_prefix.'subject_parts'} = $serializer->serialize( \%hashed_dn ) ;
+        $param->{$subject_prefix.'subject_parts'} = $serializer->serialize( $hashed_dn ) ;
         $source_ref->{$subject_prefix.'subject_parts'} = 'PKCS10';
 
         if (scalar @san_list) {
@@ -268,7 +260,7 @@ sub execute {
             profile => $cert_profile,
             style => $cert_subject_style,
             section => 'subject',
-            preset =>  { %hashed_dn, ( userinfo => $userinfo ) },
+            preset =>  { %{$hashed_dn}, ( userinfo => $userinfo ) },
         );
 
         $param->{$subject_prefix.'subject_parts'} = $serializer->serialize( $cert_subject_parts );
@@ -315,7 +307,7 @@ sub execute {
             profile => $cert_profile,
             style => $cert_subject_style,
             section => 'info',
-            preset =>  { %hashed_dn, ( userinfo => $userinfo ) },
+            preset =>  { %{$hashed_dn}, ( userinfo => $userinfo ) },
         );
         if ($cert_info) {
             $param->{$subject_prefix.'info'} = $cert_info;

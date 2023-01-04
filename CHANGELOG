@@ -8,3 +8,4 @@ Upgrades, Improvements and Bugfixes
 
 Removals, Deprecations, Breaking Changes
     + UI: localconfig.yaml is now loaded relative to current URL path
+    + PKCS10: enhanced parser will translate more OIDs to verbose names

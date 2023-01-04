@@ -32,6 +32,7 @@ use Template::Plugin;
 
 use Data::Dumper;
 use OpenXPKI::Crypt::PKCS10;
+use OpenXPKI::Crypt::DN;
 use OpenXPKI::Exception;
 use OpenXPKI::Server::Context qw( CTX );
 
@@ -181,7 +182,8 @@ sub dn {
     my $csr = $self->_load($pkcs10);
     if (!$csr) { return; }
 
-    my $dn= OpenXPKI::DN->new($csr->get_subject())->get_hashed_content();
+    my $csr_subject = $csr->subjectSequence();
+    my $dn = OpenXPKI::Crypt::DN->new( sequence => $csr_subject )->as_hash();
 
     if (!$component) {
         return $dn;
