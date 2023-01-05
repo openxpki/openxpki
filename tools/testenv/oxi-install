@@ -5,14 +5,13 @@ set -o pipefail
 
 if [[
     -z $OXI_SOURCE_DIR ||
-    -z $OXI_CORE_DIR ||
-    -z $OXI_TEST_SAMPLECONFIG_DIR
+    -z $OXI_CORE_DIR
 ]]; then
     cat <<EOF
 This script needs the following environment variables set:
     OXI_SOURCE_DIR              # source: public code, e.g. /code-repo
     OXI_EE_SOURCE_DIR           # source: EE code (optional)
-    OXI_TEST_SAMPLECONFIG_DIR   # source: config, e.g. /code-repo/config
+    OXI_TEST_SAMPLECONFIG_DIR   # source: config, e.g. /code-repo/config (optional)
     OXI_CORE_DIR                # target: where "core" gets copied to and tests are run, e.g. /opt/openxpki/core
 EOF
     exit 1
@@ -140,7 +139,7 @@ fi
 test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/index.html
 
 # Community config: copy home.html
-if [ -e $OXI_TEST_SAMPLECONFIG_DIR/contrib/home.html ]; then
+if [[ -n "$OXI_TEST_SAMPLECONFIG_DIR" && -e $OXI_TEST_SAMPLECONFIG_DIR/contrib/home.html ]]; then
     echo -e "- copy static home.html"
     mkdir -p /var/www/static/_global
     cp $OXI_TEST_SAMPLECONFIG_DIR/contrib/home.html /var/www/static/_global/home.html
