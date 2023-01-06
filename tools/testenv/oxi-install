@@ -107,13 +107,30 @@ if perl -e 'use version; use IO::Socket::SSL; exit !(version->parse($IO::Socket:
     cpanm --notest IO::Socket::SSL                                    >>$LOG 2>&1
 fi
 
-echo "Check and install Perl module dependencies"
+echo "Check and install Perl module dependencies (cpanfile)"
 # Install PPI (the check avoids unneccessary requests to CPAN)
 if ! perl -e 'use PPI;' >/dev/null 2>&1; then
     cpanm --notest PPI                                                >>$LOG 2>&1
 fi
 $OXI_SOURCE_DIR/tools/scripts/makefile2cpanfile.pl > /cpanfile
 cpanm --quiet --notest --installdeps /
+
+# Install DB modules in Docker environment
+if [ -n $DATABASE ]; then
+    case "$DATABASE" in
+        mysql|mariadb)
+            echo "Install DBD::MariaDB (environment variable DATABASE=$DATABASE detected)"
+            cpanm --quiet --notest --installdeps DBD::MariaDB
+            ;;
+        postgres)
+            echo "Install DBD::Pg (environment variable DATABASE=$DATABASE detected)"
+            cpanm --quiet --notest --installdeps DBD::Pg
+            ;;
+        *)
+            echo "ENV variable DATABASE has unknown value: '$DATABASE' - cannot install appropriate DBD::* module."
+            ;;
+    esac
+fi
 
 #
 # Compile OpenXPKI
