@@ -116,7 +116,7 @@ $OXI_SOURCE_DIR/tools/scripts/makefile2cpanfile.pl > /cpanfile
 cpanm --quiet --notest --installdeps /
 
 # Install DB modules in Docker environment
-if [ -n $DATABASE ]; then
+if [ -n "$DATABASE" ]; then
     case "$DATABASE" in
         mysql|mariadb)
             echo "Install DBD::MariaDB (environment variable DATABASE=$DATABASE detected)"
