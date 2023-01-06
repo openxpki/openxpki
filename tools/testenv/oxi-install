@@ -136,21 +136,28 @@ fi
 # Compile OpenXPKI
 #
 echo -e "\nCompilation and installation"
-echo -e "- synchronize source code from host to $OXI_CORE_DIR"
+echo "- synchronize source code from host to $OXI_CORE_DIR"
 rsync -a --delete --exclude=.git/ --exclude=node_modules/ $OXI_SOURCE_DIR/core/                 $OXI_CORE_DIR      >>$LOG 2>&1
 
 if [ -d $OXI_EE_SOURCE_DIR/opt/myperl/site_perl/OpenXPKI ]; then
-    echo -e "  --> incl. EE code"
-    rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/site_perl/OpenXPKI/  $OXI_CORE_DIR/server/OpenXPKI/     >>$LOG 2>&1
+    echo "  --> incl. EE code"
+    # Perl modules
+    rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/site_perl/OpenXPKI/  $OXI_CORE_DIR/server/OpenXPKI/  >>$LOG 2>&1
 fi
 
-echo -e "- synchronize UI code"
+echo "- synchronize UI code"
 rsync -a --delete --exclude=.git/ --exclude=node_modules/ $OXI_SOURCE_DIR/core/server/htdocs/   /var/www/openxpki/ >>$LOG 2>&1
 rsync -a --delete --exclude=.git/ $OXI_SOURCE_DIR/core/server/cgi-bin/ /usr/lib/cgi-bin/                           >>$LOG 2>&1
 
 if [ -d $OXI_EE_SOURCE_DIR/opt/myperl/share/cgi-bin ]; then
     echo -e "  --> incl. EE code"
-    rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/share/cgi-bin/ /usr/lib/cgi-bin/                        >>$LOG 2>&1
+    rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/share/cgi-bin/ /usr/lib/cgi-bin/                     >>$LOG 2>&1
+fi
+
+# EE scripts
+if [ -d $OXI_EE_SOURCE_DIR/opt/myperl/bin ]; then
+    echo "- synchronize EE scripts"
+    rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/bin/ $OXI_CORE_DIR/server/bin/                       >>$LOG 2>&1
 fi
 
 test -e /var/www/openxpki/index.html || ln -s default.html /var/www/openxpki/index.html
