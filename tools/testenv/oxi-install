@@ -211,7 +211,7 @@ echo "- replace shebang in Perl scripts with #!$perldir/perl"
     find $OXI_CORE_DIR/server/bin/ -type f -printf "$perldir/%f\n"; \
     find /usr/lib/cgi-bin -name '*.fcgi' \
 ) | \
-    xargs perl -pe '$p=$ENV{perldir}; s{^#\!\S+}{#!$p/perl}' -i       >>$LOG 2>&1
+    xargs perl -pe '$p=$ENV{perldir}; s{^#\!\S*perl\S*}{#!$p/perl}' -i  >>$LOG 2>&1
 
 popd                                                                  >>$LOG 2>&1
 
