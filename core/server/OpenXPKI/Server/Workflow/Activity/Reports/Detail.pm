@@ -69,7 +69,7 @@ sub execute {
         next unless defined $self->param($key);
         ##! 64: $key
         # keys for supported attributes
-        if ($key =~ /\A(meta_|system_|subject_alt_name)\z/) {
+        if ($key =~ /\A(meta_|system_|subject_alt_name\z)/) {
             ##! 32: 'Add as attribute ' . $key
             $query_attr->{$key} = $self->param($key);
 
