@@ -112,8 +112,15 @@ echo "Check and install Perl module dependencies (cpanfile)"
 if ! perl -e 'use PPI;' >/dev/null 2>&1; then
     cpanm --notest PPI                                                >>$LOG 2>&1
 fi
+# Generate cpanfile from Makefile.PL
 $OXI_SOURCE_DIR/tools/scripts/makefile2cpanfile.pl > /cpanfile
-cpanm --quiet --notest --installdeps /
+# Use CPAN module cache if available
+local_cpan=(); if [ -d "$OXI_CPAN_CACHE" ]; then
+    echo "=> Using local CPAN cache in $OXI_CPAN_CACHE"
+    local_cpan=(--from "$OXI_CPAN_CACHE")
+fi
+# Install modules
+cpanm "${local_cpan[@]}" --quiet --notest --installdeps /
 
 # Install DB modules in Docker environment
 if [ -n "$DATABASE" ]; then
