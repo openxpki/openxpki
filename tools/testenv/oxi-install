@@ -27,6 +27,9 @@ function _exit () {
         echo "$0: ERROR - last command exited with code $1, output:"
         echo "================================================================================"
         cat $LOG
+        echo "================================================================================"
+        echo "$0: end of last command log"
+        echo "================================================================================"
     fi
     rm -f $LOG
     exit $1
@@ -104,13 +107,13 @@ echo
 # be installed later on as a dependency.
 if perl -e 'use version; use IO::Socket::SSL; exit !(version->parse($IO::Socket::SSL::VERSION) < version->parse("2.074"))' 2>/dev/null; then
     echo "Update potentially buggy IO::Socket::SSL"
-    cpanm --notest IO::Socket::SSL                                    >>$LOG 2>&1
+    cpanm --notest IO::Socket::SSL >$LOG 2>&1
 fi
 
 echo "Check and install Perl module dependencies (cpanfile)"
 # Install PPI (the check avoids unneccessary requests to CPAN)
 if ! perl -e 'use PPI;' >/dev/null 2>&1; then
-    cpanm --notest PPI                                                >>$LOG 2>&1
+    cpanm --notest PPI >$LOG 2>&1
 fi
 # Generate cpanfile from Makefile.PL
 $OXI_SOURCE_DIR/tools/scripts/makefile2cpanfile.pl > /cpanfile
@@ -144,29 +147,29 @@ fi
 #
 echo -e "\nCompilation and installation"
 echo "- synchronize source code from host to $OXI_CORE_DIR"
-rsync -a --delete --exclude=.git/ --exclude=node_modules/ $OXI_SOURCE_DIR/core/                 $OXI_CORE_DIR      >>$LOG 2>&1
+rsync -a --delete --exclude=.git/ --exclude=node_modules/ $OXI_SOURCE_DIR/core/ $OXI_CORE_DIR >$LOG 2>&1
 
 # Copy EE Perl modules
 if [ -d $OXI_EE_SOURCE_DIR/opt/myperl/site_perl/OpenXPKI ]; then
     echo "  --> incl. EE code"
-    rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/site_perl/OpenXPKI/  $OXI_CORE_DIR/server/OpenXPKI/  >>$LOG 2>&1
+    rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/site_perl/OpenXPKI/  $OXI_CORE_DIR/server/OpenXPKI/ >$LOG 2>&1
 fi
 
 # Copy web UI files
 echo "- synchronize UI code"
-rsync -a --delete --exclude=.git/ --exclude=node_modules/ $OXI_SOURCE_DIR/core/server/htdocs/   /var/www/openxpki/ >>$LOG 2>&1
-rsync -a --delete --exclude=.git/ $OXI_SOURCE_DIR/core/server/cgi-bin/ /usr/lib/cgi-bin/                           >>$LOG 2>&1
+rsync -a --delete --exclude=.git/ --exclude=node_modules/ $OXI_SOURCE_DIR/core/server/htdocs/   /var/www/openxpki/ >$LOG 2>&1
+rsync -a --delete --exclude=.git/ $OXI_SOURCE_DIR/core/server/cgi-bin/ /usr/lib/cgi-bin/                           >$LOG 2>&1
 
 # Copy EE web UI files
 if [ -d $OXI_EE_SOURCE_DIR/opt/myperl/share/cgi-bin ]; then
     echo -e "  --> incl. EE code"
-    rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/share/cgi-bin/ /usr/lib/cgi-bin/                     >>$LOG 2>&1
+    rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/share/cgi-bin/ /usr/lib/cgi-bin/ >$LOG 2>&1
 fi
 
 # Copy EE scripts
 if [ -d $OXI_EE_SOURCE_DIR/opt/myperl/bin ]; then
     echo "- synchronize EE scripts and add them to Makefile.PL:"
-    rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/bin/ $OXI_CORE_DIR/server/bin/                       >>$LOG 2>&1
+    rsync -a $OXI_EE_SOURCE_DIR/opt/myperl/bin/ $OXI_CORE_DIR/server/bin/ >$LOG 2>&1
 
     # inject EE scripts into Makefile.PL's EXE_FILES array
     files=$(find $OXI_EE_SOURCE_DIR/opt/myperl/bin/ -type f -printf "bin/%f ")
@@ -202,25 +205,25 @@ perl -e 'use v5.10; say for grep { -d && /^[^\.]/ } @INC' |\
         test -w "$path" && echo "    $path" && rm -rf "$path" || true
     done
 
-pushd $OXI_CORE_DIR/server                                            >>$LOG 2>&1
-perl Makefile.PL                                                      >>$LOG 2>&1
+pushd $OXI_CORE_DIR/server                                              >$LOG 2>&1
+perl Makefile.PL                                                        >$LOG 2>&1
 if [[ $IS_COMPILE -eq 1 ]]; then
     echo "- compile OpenXPKI $OXI_VERSION"
-    make                                                              >>$LOG 2>&1
+    make                                                                >$LOG 2>&1
 fi
 echo "- install OpenXPKI"
-make install                                                          >>$LOG 2>&1
+make install                                                            >$LOG 2>&1
 
 export perldir=$(grep ^INSTALLBIN Makefile | tr -d " " | cut -d= -f2)
-test -x $perldir/perl || (echo "INSTALLBIN/perl does not exist (INSTALLBIN = $perldir, read from Makefile)" >>$LOG; exit 1)
+test -x $perldir/perl || (echo "INSTALLBIN/perl does not exist (INSTALLBIN = $perldir, read from Makefile)" >$LOG; exit 1)
 echo "- replace shebang in Perl scripts with #!$perldir/perl"
 ( \
     find $OXI_CORE_DIR/server/bin/ -type f -printf "$perldir/%f\n"; \
     find /usr/lib/cgi-bin -name '*.fcgi' \
 ) | \
-    xargs perl -pe '$p=$ENV{perldir}; s{^#\!\S*perl\S*}{#!$p/perl}' -i  >>$LOG 2>&1
+    xargs perl -pe '$p=$ENV{perldir}; s{^#\!\S*perl\S*}{#!$p/perl}' -i  >$LOG 2>&1
 
-popd                                                                  >>$LOG 2>&1
+popd                                                                    >$LOG 2>&1
 
 echo "- install CGI::Session::Driver::openxpki"
 mkdir -p /usr/share/perl5/CGI/Session/Driver
@@ -229,10 +232,10 @@ cp $OXI_CORE_DIR/server/CGI_Session_Driver/openxpki.pm /usr/share/perl5/CGI/Sess
 if [[ $IS_I18N -eq 1 ]]; then
     echo "- compile and install I18N files"
     echo "$OXI_VERSION" > $OXI_CORE_DIR/i18n/VERSION
-    pushd $OXI_CORE_DIR/i18n                                          >>$LOG 2>&1
-    make                                                              >>$LOG 2>&1
-    make install                                                      >>$LOG 2>&1
-    popd                                                              >>$LOG 2>&1
+    pushd $OXI_CORE_DIR/i18n                                            >$LOG 2>&1
+    make                                                                >$LOG 2>&1
+    make install                                                        >$LOG 2>&1
+    popd                                                                >$LOG 2>&1
 
     # Debian only...
     if command -v locale-gen >/dev/null; then
@@ -246,7 +249,7 @@ if [[ $IS_I18N -eq 1 ]]; then
             fi
         done
 
-        locale-gen                                                        >>$LOG 2>&1
+        locale-gen                                                        >$LOG 2>&1
     fi
 fi
 
