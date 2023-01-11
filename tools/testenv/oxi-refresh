@@ -186,7 +186,7 @@ fi
 #
 echo ""
 echo "Install OpenXPKI"
-$(dirname $0)/oxi-install "$@" | sed -u 's/^/  /g'
+$(dirname $0)/oxi-install "$@" | sed -u 's/^/    /mg'
 
 # Disable version check for our test purposes
 # (OpenXPKI::Control checks for system.version.depend)

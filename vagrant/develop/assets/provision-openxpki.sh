@@ -95,6 +95,6 @@ if command -v apache2 >/dev/null; then
 fi
 
 echo "Install OpenXPKI from host sources"
-$OXI_SOURCE_DIR/tools/testenv/oxi-refresh --full 2>&1 | tee $LOG | sed -u 's/^/> /g'
+$OXI_SOURCE_DIR/tools/testenv/oxi-refresh --full 2>&1 | tee $LOG | sed -u 's/^/    /mg'
 
 set +e
