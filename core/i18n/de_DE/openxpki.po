@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2022-12-06 09:51+0100\n"
+"PO-Revision-Date: 2023-01-13 08:29+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -25,6 +25,9 @@ msgstr "DNS Validierung"
 
 msgid "I18N_OPENXPKI_UI_APPROVAL_RULE_DOMAIN_VALIDATION_LABEL"
 msgstr "CMDB/Domain-Prüfung"
+
+msgid "I18N_OPENXPKI_UI_APPROVAL_RULE_IP_VALIDATION_LABEL"
+msgstr "IP Validierung"
 
 msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED"
 msgstr "Anmeldung fehlgeschlagen"
@@ -333,6 +336,9 @@ msgstr "unbekannt"
 
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
 msgstr "gültig"
+
+msgid "I18N_OPENXPKI_UI_CERT_SUBJECT_PARTS"
+msgstr "Subjectkomponenten"
 
 msgid "I18N_OPENXPKI_UI_CLEAR_LOGIN"
 msgstr "Anmeldung zurücksetzen"

@@ -29,6 +29,10 @@ msgid "I18N_OPENXPKI_UI_APPROVAL_RULE_DOMAIN_VALIDATION_LABEL"
 msgstr "証明書失効リクエスト"
 
 #, fuzzy
+msgid "I18N_OPENXPKI_UI_APPROVAL_RULE_IP_VALIDATION_LABEL"
+msgstr "データセーフトークン"
+
+#, fuzzy
 msgid "I18N_OPENXPKI_UI_AUTHENTICATION_FAILED"
 msgstr "ワークフローの取り消し"
 
@@ -349,6 +353,11 @@ msgstr "不明"
 
 msgid "I18N_OPENXPKI_UI_CERT_STATUS_VALID"
 msgstr "有効"
+
+# Remove?
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_CERT_SUBJECT_PARTS"
+msgstr "証明書ステータス"
 
 msgid "I18N_OPENXPKI_UI_CLEAR_LOGIN"
 msgstr "ログインをリセット"
