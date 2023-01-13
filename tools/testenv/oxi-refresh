@@ -85,11 +85,15 @@ set -e
 IS_RESTART=1
 IS_DBCONFIG=1
 IS_FULLCONFIG=0
+oxi_install_params=()
 # Bash string manipulation: use # to strip text off $@ and see if string still equals original $@
 [[ "${@#--no-restart}" != "$@" ]] && IS_RESTART=0
 [[ "${@#--no-dbconf}" != "$@" ]]  && IS_DBCONFIG=0
-[[ "${@#--fast}" != "$@" ]]       && IS_DBCONFIG=0
+[[ "${@#--fast}" != "$@" ]]       && IS_DBCONFIG=0 && oxi_install_params+=(--fast)
 [[ "${@#--full}" != "$@" ]]       && IS_FULLCONFIG=1
+[[ "${@#--full}" != "$@" ]]       && IS_FULLCONFIG=1
+[[ "${@#--no-i18n}" != "$@" ]]    && oxi_install_params+=(--no-i18n)
+[[ "${@#--no-compile}" != "$@" ]] && oxi_install_params+=(--no-compile)
 
 echo "[$([ "$IS_FULLCONFIG" -eq 1 ] && echo "X" || echo " ")] Overwrite /etc/openxpki, recreate DB and certs"
 echo "[$([ "$IS_DBCONFIG" -eq 1 ] && echo "X" || echo " ")] Write database configuration file"
@@ -186,7 +190,7 @@ fi
 #
 echo ""
 echo "Install OpenXPKI"
-$(dirname $0)/oxi-install "$@" | sed -u 's/^/    /mg'
+$(dirname $0)/oxi-install "${oxi_install_params[@]}" | sed -u 's/^/    /mg'
 
 # Disable version check for our test purposes
 # (OpenXPKI::Control checks for system.version.depend)
