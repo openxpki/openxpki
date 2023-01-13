@@ -160,6 +160,7 @@ if ($cmd eq 'version') {
         die $err;
     }
 
+    $ENV{OPENXPKI_CONF_PATH} = $args->{CONFIG} if $args->{CONFIG};
     require OpenXPKI::Config;
     my $config = OpenXPKI::Config->new();
 
