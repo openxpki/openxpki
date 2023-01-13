@@ -84,7 +84,7 @@ default format in OpenSSL 3.0 and should work on most recent systems.
 
 =item PKCS12_LEGACY (PKCS#12 in DER format)
 
-Enforces PBE-SHA1-RC2-40 and PBE-SHA1-3DES for key/certificate. Should
+Enforces PBE-SHA1-3DES (key) and PBE-SHA1-RC2-40 (certificate). Should
 work on most aged systems but does NOT work on modern systems where RC2
 is deprecated / prevented due to security reasons.
 
@@ -267,15 +267,15 @@ command "convert_private_key" => {
         };
 
         # newer openssl versions use other default algorithms
-        # we try to add suitable defaults independantly from the used
+        # we try to add suitable defaults independently from the used
         # openssl backend, the chosen ones are a tradeoff between
         # compatibility and security
         if ($format eq 'PKCS12') {
             $command_hashref->{KEY_PBE} = 'AES-256-CBC';
             $command_hashref->{CERT_PBE} = 'AES-256-CBC';
         } elsif ($format eq 'PKCS12_LEGACY') {
-            $command_hashref->{KEY_PBE} = 'PBE-SHA1-RC2-40';
-            $command_hashref->{CERT_PBE} = 'PBE-SHA1-3DES';
+            $command_hashref->{KEY_PBE} = 'PBE-SHA1-3DES';
+            $command_hashref->{CERT_PBE} = 'PBE-SHA1-RC2-40';
         } # anything else is JavaKS and we use the system defaults
 
         if ($nopassword) {
