@@ -9,7 +9,7 @@ of existing config or even the database schema.
 This page provides a summary of recommended and mandatory changes.
 Recommended items should be done but the installation will continue
 to work. Mandatory items MUST be done, as otherwise the system will
-not behave correctly or even wont start.
+not behave correctly or even will not start.
 
 For a quick overview of config changes, you should always check the
 config repository at https://github.com/openxpki/openxpki-config.
@@ -32,12 +32,12 @@ Release v3.x
 
 To upgrade from v2 or an earlier v3 installation to v3 please see the Upgrade document in the openxpki-config repository.
 
-In case you have written your own code or used the command line tools please note that the old API was removed and some output formats have changed! You can find the API documentation as "perldoc" the implementation classes (located in OpenXPKI::Server::API2::Plugin).
+In case you have written your own code or used the command line tools please note that the old API was removed, and some output formats have changed! You can find the API documentation as "perldoc" the implementation classes (located in OpenXPKI::Server::API2::Plugin).
 
 Release v2.3
 -------------
 
-The config parameters for the ClientX509 authentication handler has changed. In case you left the file "handler.yaml" and "stack.yaml" in realm/democa/auth/ unchanged you *MUST* remove or change the block for the "ClientX509" handler as the new/fixed handler will not work with the old config and OpenXPKI will not start at all!
+The config parameters for the ClientX509 authentication handler have changed. In case you left the file "handler.yaml" and "stack.yaml" in realm/democa/auth/ unchanged you *MUST* remove or change the block for the "ClientX509" handler as the new/fixed handler will not work with the old config and OpenXPKI will not start at all!
 
 Release v2.x
 -------------
@@ -69,7 +69,7 @@ You MUST upgrade your database schema::
 
 You SHOULD copy over the new default workflows, the old default workflows
 SHOULD continue working but some of the workflow classes have changed, so in
-case you made extensions please check the conifguration for deltas!
+case you made extensions please check the configuration for deltas!
 
 In case you use SCEP please note that the definition of the workflow to use
 has moved from the "outer" wrapper configuration to the "inner" configuration
@@ -83,10 +83,10 @@ Release v1.19
 -------------
 
 **Warning** We changed the internal serialization format which also
-affects the workflow persistance layer. Workflows or datapool structures
+affects the workflow persistence layer. Workflows or data pool structures
 that are created or modified will use the new serialization format which
-can not be read by older versions! So be aware that a downgrade or parallel
-operaton of new and old release versions is not possible!
+cannot be read by older versions! So be aware that a downgrade or parallel
+operation of new and old release versions is not possible!
 
 
 Release v1.18
@@ -95,11 +95,11 @@ Release v1.18
 Logging
 #######
 
-We removed the internal, hardcoded pattern formater for the log lines
+We removed the internal, hardcoded pattern formatter for the log lines
 and replaced it with native Log4perl patterns using Log4perl MDC variables
 to give you more control on what and where to write to. If you do not
 adjust your configs, you will still get your logs but information on
-packages, etc which was hardcoded before is now gone. Check the new
+packages, etc. which was hardcoded before is now gone. Check the new
 sample log.conf for the new format and logging options.
 
 Also note that the timestamps used in the application_log and audittrail
@@ -111,10 +111,10 @@ Sessions
 There is a new session handler to get rid of filesystem sessions. The
 frontend can write back the session information to the backend while
 the backend can use the database to store the session data. The provided
-example configuration uses those new handlers as defaults but the code
-still uses the old file based sessions if you dont explicitly set the
+example configuration uses those new handlers as defaults, but the code
+still uses the old file based sessions if you do not explicitly set the
 new ones. Note that you must create the sessions table yourself when
-upgrading::
+upgrading:
 
     CREATE TABLE IF NOT EXISTS `session` (
       `session_id` varchar(255) NOT NULL,
