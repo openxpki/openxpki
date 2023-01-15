@@ -114,7 +114,7 @@ the backend can use the database to store the session data. The provided
 example configuration uses those new handlers as defaults, but the code
 still uses the old file based sessions if you do not explicitly set the
 new ones. Note that you must create the sessions table yourself when
-upgrading:
+upgrading::
 
     CREATE TABLE IF NOT EXISTS `session` (
       `session_id` varchar(255) NOT NULL,
@@ -128,7 +128,7 @@ upgrading:
      ADD PRIMARY KEY (`session_id`), ADD INDEX(`modified`);
 
 If you use backend sessions, please also set the "cookey" secret phrase
-to encrypt the session cookies in the webui config. Otherwise a person
+to encrypt the session cookies in the webui config. Otherwise, a person
 with access to the server logs can very easily hijack running sessions!
 
 
@@ -141,7 +141,7 @@ permissions on the frontend logs after running the update::
 
     cd /var/openxpki/; chown www-data webui.log scep.log soap.log rpc.log
 
-We will fix this in the debian update with the next release.
+We will fix this in the Debian update with the next release.
 
 Release v1.11
 -------------
