@@ -2,6 +2,7 @@ package OpenXPKI::Server::Workflow::Validator::Connector;
 
 use strict;
 use warnings;
+use English;
 use base qw( OpenXPKI::Server::Workflow::Validator );
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
@@ -39,12 +40,20 @@ sub _validate {
 
     ##! 32: 'Validation Path is ' . join(".", @path);
     push @path, $value;
-    my $result = $cfg->get( \@path );
+    my $result;
+    eval{
+        $result = $cfg->get( \@path );
+    };
+    if ($EVAL_ERROR) {
+        ##! 32: 'got eval error during calling connector ' . $EVAL_ERROR
+        CTX('log')->application()->error("Exception while calling connector on path " . $self->path());
+        validation_error( 'I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_EXCEPTION' );
+        return 0;
+    }
 
     ##! 32: 'Raw result is ' . (defined $result ? $result : 'undef')
     if (!$result) {
         CTX('log')->application()->error("Validator failed on path " . $self->path());
-
         validation_error( $self->error() );
         return 0;
     }

@@ -1713,6 +1713,9 @@ msgstr "Ungültige Kombination von Eingabewerten"
 msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_HAS_ERRORS"
 msgstr "Bei der Überprüfung der Eingaben ist ein Fehler aufgetreten"
 
+msgid "I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_EXCEPTION"
+msgstr "Bei der Kommunikation mit einem externen System ist ein Fehler aufgetreten"
+
 msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_INVALID"
 msgstr "Die nachfolgenden Felder haben einen unerwarteten Eingabewert"
 
