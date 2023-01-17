@@ -110,6 +110,8 @@ sub execute {
         $param->{csr_subject} = $dn->get_subject();
         ##! 32: 'Subject DN ' . Dumper $hashed_dn
     }
+    # ensure that this is not undef as we convert it later to hash
+    $hashed_dn //= {};
 
     if ($self->param('key_params')) {
 
