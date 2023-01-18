@@ -1,11 +1,8 @@
 Please list items to be added to the final release comment here
 
 New Features
- 
+
 Upgrades, Improvements and Bugfixes
-    + UI: easy header styling via extended 'header' parameter in localconfig.yaml
-    + UI: customizable header background color via '.oxi-header-bar' in custom CSS file
 
 Removals, Deprecations, Breaking Changes
-    + UI: localconfig.yaml is now loaded relative to current URL path
-    + PKCS10: enhanced parser will translate more OIDs to verbose names
+
