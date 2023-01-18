@@ -191,14 +191,16 @@ sub execute
 
     my $target_key = $self->param('target_key') || 'cert_identifier_list';
 
-    if (@{$result}) {
+    my $ignore = $self->param('cert_identifier_ignore') || '';
+    ##! 32: $ignore
+    my @identifier = map {  ($_->{identifier} eq $ignore) ? () : $_->{identifier} } @{$result};
 
+    if (@identifier) {
         if ($limit && $limit eq 'single') {
             $target_key = $self->param('target_key') || 'cert_identifier';
-            $context->param( $target_key => $result->[0]->{identifier} );
+            $context->param( $target_key => $identifier[0] );
             CTX('log')->application()->trace("SearchCertificates result (single)" . $result->[0]->{identifier});
         } else {
-            my @identifier = map {  $_->{identifier} } @{$result};
             $context->param( $target_key => \@identifier );
             CTX('log')->application()->trace("SearchCertificates result " . Dumper \@identifier);
         }
@@ -303,6 +305,12 @@ prefixed by "asc" (default) or "desc" (reversed sorting)
 Limit the size of the result set. If you pass the special word I<single>
 the result is a scalar with the first identifier matching the query.
 In case I<target_key> is not set, the value is written to I<cert_identifier>.
+
+=item cert_identifier_ignore
+
+Pass a single certificate identifier that is removed from the list in case
+it was found. This is useful to exclude the certificate in the current
+workflow when looking for e.g. duplicates.
 
 =item include_expired
 

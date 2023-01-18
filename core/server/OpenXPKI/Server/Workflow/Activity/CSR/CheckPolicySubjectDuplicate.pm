@@ -26,8 +26,7 @@ sub execute
     # prevent creating havoc (subject is empty = no WHERE clause!)
     if (!$cert_subject) {
         $context->param( { $target_key => undef } );
-         CTX('log')->application()->debug("Policy subject duplicate check skipped due to empty subject");
-
+        CTX('log')->application()->debug("Policy subject duplicate check skipped due to empty subject");
         return 1;
     }
 
