@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: OpenXPKI 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-08 14:02+0200\n"
-"PO-Revision-Date: 2023-01-13 08:29+0100\n"
+"PO-Revision-Date: 2023-01-18 15:22+0100\n"
 "Last-Translator: OpenXPKI Team <i18n@openxpki.org>\n"
 "Language-Team: OpenXPKI developers list <openxpki-devel@lists.sourceforge."
 "net>\n"
@@ -1702,6 +1702,10 @@ msgstr ""
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_CHECK_FAILED"
 msgstr "Der Wert konnte intern nicht geprüft werden"
 
+msgid "I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_EXCEPTION"
+msgstr ""
+"Bei der Kommunikation mit einem externen System ist ein Fehler aufgetreten"
+
 msgid "I18N_OPENXPKI_UI_VALIDATOR_EMPTY_BUT_REQUIRED"
 msgstr ""
 "Dieses Feld erfordert die Angabe eines Wertes. Bitte stellen Sie sicher, "
@@ -1712,9 +1716,6 @@ msgstr "Ungültige Kombination von Eingabewerten"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_HAS_ERRORS"
 msgstr "Bei der Überprüfung der Eingaben ist ein Fehler aufgetreten"
-
-msgid "I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_EXCEPTION"
-msgstr "Bei der Kommunikation mit einem externen System ist ein Fehler aufgetreten"
 
 msgid "I18N_OPENXPKI_UI_VALIDATOR_FIELD_TYPE_INVALID"
 msgstr "Die nachfolgenden Felder haben einen unerwarteten Eingabewert"
@@ -2512,6 +2513,9 @@ msgstr "Freigaben"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVAL_ERRORS_LABEL"
 msgstr "Fehlgeschlagene Freigaberegeln"
+
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVAL_REPORTS_LABEL"
+msgstr "Ausgeführte Freigaberegeln"
 
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_CA_ALIAS_LABEL"
 msgstr "CA Alias"

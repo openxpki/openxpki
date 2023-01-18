@@ -1766,6 +1766,10 @@ msgstr "根据信息创建的通用名称超过了允许的64个字符的长度�
 msgid "I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_CHECK_FAILED"
 msgstr "无法根据给定的后端检查值"
 
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_VALIDATOR_CONNECTOR_EXCEPTION"
+msgstr "无法根据给定的后端检查值"
+
 msgid "I18N_OPENXPKI_UI_VALIDATOR_EMPTY_BUT_REQUIRED"
 msgstr "必填字段为空"
 
@@ -2513,6 +2517,10 @@ msgstr "批准"
 
 #, fuzzy
 msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVAL_ERRORS_LABEL"
+msgstr "批准"
+
+#, fuzzy
+msgid "I18N_OPENXPKI_UI_WORKFLOW_FIELD_APPROVAL_REPORTS_LABEL"
 msgstr "批准"
 
 #, fuzzy
