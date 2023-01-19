@@ -1,5 +1,8 @@
 #!/bin/bash
 
+if [ -n "$OPENXPKI_BUILD_DEBUG" ]; then
+    set -x
+fi
 set -e
 
 if [ ! -e "/openxpki/.git" ]; then
@@ -36,11 +39,17 @@ fetchgit() {
 
     cd /tmp
 
+    git config --global --add safe.directory /openxpki
     # code repo including git repo with a checkedout branch must be mounted at /openxpki
     # we clone the currently checked out branch from the mountpoint to /tmp
     mybranch=$(git -C /openxpki rev-parse --abbrev-ref HEAD)
     git clone /openxpki --branch "$mybranch" --single-branch
+
     cd openxpki
+
+    if [ $OPENXPKI_BUILD_TAG ]; then
+        git checkout $OPENXPKI_BUILD_TAG
+    fi
 
     git submodule init
     git submodule update --checkout

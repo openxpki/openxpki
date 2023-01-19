@@ -3,6 +3,10 @@ Docker Setup to Build OpenXPKI for Debian
 
 This directory provides a docker setup to build and sign packages for debian.
 
+The default is to build the top commit of the current branch. You can set
+OPENXPKI_BUILD_TAG to a commit or tag to build instead of HEAD but the
+target must be in the current branch.
+
 Step 1 - Container
 ------------------
 
@@ -11,7 +15,7 @@ Call `make build` or `make build-nocache` to create the docker container.
 Step 2 - CPAN Deps
 ------------------
 
-Create the directory `deps` and but any requried extra build dependancy
+Create the directory `deps` and put any requried extra build dependency
 packages there, this is required to build e.g. the perl packages for
 LibSCEP (`make Crypt__LibSCEP`).
 
