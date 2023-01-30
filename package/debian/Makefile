@@ -29,6 +29,7 @@ EXTERNAL=				\
 	Log__Log4perl__Layout__JSON \
 	Proc__SafeExec \
 	YAML__Tiny \
+	XS__Parse__Keyword \
 	Connector \
 	Workflow
 
