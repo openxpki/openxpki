@@ -85,7 +85,7 @@ __END__
 
 =head1 NAME
 
-OpenXPKI::Server::Workflow::Condition::CertificateAttribute
+OpenXPKI::Server::Workflow::Condition::CertificateHasAttribute
 
 =head1 SYNOPSIS
 
