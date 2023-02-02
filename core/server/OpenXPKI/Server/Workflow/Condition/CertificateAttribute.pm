@@ -10,7 +10,7 @@ use OpenXPKI::Debug;
 sub _evaluate {
     my $self = shift;
     CTX('log')->deprecated()->error('Please rename O::S::W::Condition::CertificateAttribute to CertificateHasAttribute');
-    $self->SUPER::_evaluate();
+    $self->SUPER::_evaluate(@_);
 }
 
 1;
