@@ -166,7 +166,7 @@ sub action_result {
 
     push @buttons, {
         label => 'I18N_OPENXPKI_UI_SEARCH_REFRESH',
-        page => 'redirect!bulk!result!id!' .$queryid,
+        page => 'redirect!workflow!result!id!' .$queryid,
         break_before => 1,
     };
 
@@ -190,7 +190,7 @@ sub action_result {
         'button' => \@buttons,
     });
 
-    $self->redirect->to('bulk!result!id!'.$queryid);
+    $self->redirect->to('workflow!result!id!'.$queryid);
 
     return $self;
 
