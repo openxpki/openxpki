@@ -56,8 +56,7 @@ sub validate {
 
     # replace named regexes
     if ($regex eq 'email') {
-        $regex = qr/ \A \S+\@([\w-]+\.)+(\w+) \z /xi;
-
+        $regex = qr/ \A [\w\+\.\-"'= ]+\@([\w-]+\.)+(\w+) \z /xi;
     } elsif ($regex eq 'fqdn') {
         $regex = qr/ \A (([a-z0-9][\w\-]*\.)+)[\w\-]{2,} \z /xi;
 
