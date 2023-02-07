@@ -34,9 +34,10 @@ EXTERNAL=				\
 	Workflow
 
 CORE = \
-    CGI \
-    Module__Build__Tiny \
-    Module__Load
+	CGI \
+	JSON__PP \
+	Module__Build__Tiny \
+	Module__Load
 
 .PHONY : $(PACKAGES) $(EXTERNAL) CGI
 
