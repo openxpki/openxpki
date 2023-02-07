@@ -25,6 +25,12 @@ export default class TestController extends Controller {
         section_tiles,
     ]
 
+    localconfig = `
+header:
+    logo: img/logo.png
+    title: Test page
+`
+
     localRequestPath = 'test-server'
     localRequestUrl = 'http://localhost:7780/' + this.localRequestPath
     localRequestButton = Button.fromHash({
@@ -113,14 +119,7 @@ export default class TestController extends Controller {
 
         // simulate localconfig.yaml
         server.get('/openxpki/localconfig.yaml', request => [ // eslint-disable-line ember/classic-decorator-no-classic-methods
-                200,
-                { "Content-type": "application/yaml" },
-                'header: |-' + "\n" +
-                '    <h3>' + "\n" +
-                '        <a href="./#/"><img src="img/logo.png" class="toplogo"></a>' + "\n" +
-                '        &nbsp;' + "\n" +
-                '        <small>Test page</small>' + "\n" +
-                '    </h3>' + "\n"
+                200, { "Content-type": "application/yaml" }, this.localconfig
         ]);
         let emptyResponse = () => new Promise(resolve => {
             let response = [
