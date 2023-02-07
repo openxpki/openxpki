@@ -98,6 +98,23 @@
             @class="oxi-formatted-download {{@class}}"
         />
 
+    {{else if (eq "unilist" this.format)}}
+        <dl class="oxi-formatted-unilist {{@class}}">
+            {{#each v as |item|}}
+                {{#if item.label}}
+                    <dt class="pt-1">{{item.label}}</dt>
+                {{/if}}
+                <dd class="m-0 {{if item.label "ps-3" "pt-2"}}">
+                    <OxiBase::Formatted
+                        @format={{item.format}}
+                        @value={{item.value}}
+                        @truncate={{@truncate}}
+                    />
+                </dd>
+            {{/each}}
+        </dl>
+
+    {{! legacy list format }}
     {{else if (eq "deflist" this.format)}}
         <dl class="oxi-formatted-deflist {{@class}}">
             {{#each v as |val|}}
@@ -110,6 +127,7 @@
             {{/each}}
         </dl>
 
+    {{! legacy list format }}
     {{else if (eq "ullist" this.format)}}
         <ul class="oxi-formatted-ullist list-unstyled {{@class}}">
             {{#each v as |val|}}
@@ -119,11 +137,13 @@
             {{/each}}
         </ul>
 
+    {{! legacy list format }}
     {{else if (eq "rawlist" this.format)}}
         <ul class="oxi-formatted-rawlist list-unstyled {{@class}}">
             {{#each v as |val|}} <li><OxiBase::Label @text={{val}} @raw={{true}} /> </li> {{/each}}
         </ul>
 
+    {{! legacy list format }}
     {{else if (eq "linklist" this.format)}}
         <ul class="oxi-formatted-linklist list-unstyled {{@class}}">
             {{#each v as |val|}}
