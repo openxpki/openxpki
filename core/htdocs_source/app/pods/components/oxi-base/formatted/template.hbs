@@ -3,20 +3,20 @@
     {{#if (eq "dummy-placeholder" this.format)}}
         {{!-- just so that all following "else if" look the same --}}
 
+    {{else if (or (not this.format) (eq "text" this.format))}}
+        <OxiBase::Label
+            @text={{v}}
+            @raw={{false}}
+            @tooltip={{if @truncate v}}
+            @class="oxi-formatted-text {{if @truncate "oxi-truncate"}}"
+        />
+
     {{else if (eq "raw" this.format)}}
         <OxiBase::Label
             @text={{this.valueStr}}
             @raw={{true}}
             @raw_tooltip={{if @truncate v}}
             @class="oxi-formatted-raw {{if @truncate "oxi-truncate"}}"
-        />
-
-    {{else if (eq "text" this.format)}}
-        <OxiBase::Label
-            @text={{v}}
-            @raw={{false}}
-            @tooltip={{if @truncate v}}
-            @class="oxi-formatted-text {{if @truncate "oxi-truncate"}}"
         />
 
     {{else if (eq "subject" this.format)}}
