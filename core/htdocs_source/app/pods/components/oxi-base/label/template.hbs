@@ -2,21 +2,21 @@
     <div class="{{@class}} {{this.cssClasses}}">
         {{#if @tooltip}}
             <Tippy
-                @delay={{this.config.tooltipDelay}}
+                @delay={{array this.config.tooltipDelay 50}}
                 @placement="top-start"
             >
                 {{@tooltip}}
             </Tippy>
         {{else if @raw_tooltip}}
             <Tippy
-                @delay={{this.config.tooltipDelay}}
+                @delay={{array this.config.tooltipDelay 50}}
                 @placement="top-start"
             >
                 {{html @raw_tooltip}}
             </Tippy>
         {{else if @tooltip_page}}
             <Tippy
-                @delay={{this.config.tooltipDelay}}
+                @delay={{array this.config.tooltipDelay 50}}
                 @placement="top-start"
                 @onShow={{this.fetchTooltip}}
             >
