@@ -59,13 +59,16 @@
         </a>
 
     {{else if (eq "tooltip" this.format)}}
+        {{! "d-inline-flex" prevents labels from taking the whole width and
+            tooltips being placed in the "center" from being above the
+            whitespace in case of short labels. }}
         <OxiBase::Label
             @text={{v.value}}
             @tooltip={{v.tooltip}}
             @tooltip_page={{v.tooltip_page}}
             @tooltip_page_args={{v.tooltip_page_args}}
             @raw={{false}}
-            @class="oxi-formatted-tooltip {{@class}}"
+            @class="oxi-formatted-tooltip d-inline-flex {{@class}}"
         />
 
     {{else if (eq "code" this.format)}}
