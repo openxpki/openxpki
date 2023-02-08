@@ -98,6 +98,12 @@
             @class="oxi-formatted-download {{@class}}"
         />
 
+    {{else if (eq "arbitrary" this.format)}}
+        <OxiBase::Formatted::Arbitrary
+            @value={{v}}
+            @class="oxi-formatted-arbitrary"
+        />
+
     {{else if (eq "unilist" this.format)}}
         <dl class="oxi-formatted-unilist {{@class}}">
             {{#each v as |item|}}

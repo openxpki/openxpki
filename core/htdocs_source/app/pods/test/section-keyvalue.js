@@ -6,7 +6,7 @@ export default {
         data: [
             {
                 format: "head",
-                value: "These is all we got:",
+                value: "Scalar types:",
             },
             {
                 format: "raw",
@@ -71,11 +71,6 @@ export default {
                 },
             },
             {
-                format: "head",
-                value: "More values...",
-                className: "spacer",
-            },
-            {
                 format: "tooltip",
                 label: "tooltip (short)",
                 value: {
@@ -135,63 +130,19 @@ export default {
                 },
             },
             {
-                format: "deflist",
-                label: "deflist",
-                value: [
-                    { label: "first", value: "PKI <a href=\"should be escaped\">" },
-                    { label: "second", value: "<a href=\"https://www.openxpki.org\">OpenXPKI</a>", format: "raw" },
-                    { label: "subject", value: [ "CN=sista.example.org", "DC=Test Deployment", "DC=PKI Examples", "DC=OpenXPKI", "DC=org" ] },
-                ],
-                className: "crosses",
+                format: "arbitrary",
+                label: "arbitrary",
+                value: {
+                    'one-two-three': [
+                        "first.loooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-example.org",
+                        "second.example.org"
+                    ],
+                },
             },
             {
-                format: "deflist",
-                label: "deflist (arbitrary)",
-                value: [
-                    {
-                        label: "hosts-by-group",
-                        value: {
-                            'one-two-three': [
-                                "first.loooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-example.org",
-                                "second.example.org"
-                            ],
-                        },
-                    },
-                    {
-                        label: "size",
-                        value: "1234"
-                    },
-                ],
-            },
-            {
-                format: "ullist",
-                label: "ullist",
-                value: [ "PKI", "OpenXPKI" ],
-            },
-            {
-                format: "rawlist",
-                label: "rawlist",
-                value: [ "PKI", "<a href=\"https://www.openxpki.org\">OpenXPKI</a>" ],
-            },
-            {
-                format: "linklist",
-                label: "linklist",
-                value: [
-                    {
-                        label: "Workflow History",
-                        page: "workflow!history!wf_id!13567",
-                        tooltip: "I feel like hovering",
-                    },
-                    {
-                        label: "Technical Log",
-                        page: "workflow!log!wf_id!13567",
-                        tooltip: "I feel like hovering",
-                    },
-                    {
-                        label: "Just a label (tooltip!)",
-                        tooltip: "I feel like hovering",
-                    }
-                ],
+                format: "head",
+                value: "List types...",
+                className: "spacer",
             },
             {
                 format: "unilist",
@@ -256,6 +207,15 @@ export default {
                                 value: "text without label",
                             },
                             {
+                                format: "arbitrary",
+                                value: {
+                                    'one-two-three': [
+                                        "first.loooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-example.org",
+                                        "second.example.org"
+                                    ],
+                                },
+                            },
+                            {
                                 format: "unilist",
                                 label: "list-level-3",
                                 value: [
@@ -279,6 +239,59 @@ export default {
                             },
                         ],
                     },
+                ],
+            },
+            {
+                format: "deflist",
+                label: "deflist",
+                value: [
+                    { label: "first", value: "PKI <a href=\"should be escaped\">" },
+                    { label: "second", value: "<a href=\"https://www.openxpki.org\">OpenXPKI</a>", format: "raw" },
+                    { label: "subject", value: [ "CN=sista.example.org", "DC=Test Deployment", "DC=PKI Examples", "DC=OpenXPKI", "DC=org" ] },
+                    {
+                        label: "hosts-by-group",
+                        value: {
+                            'one-two-three': [
+                                "first.loooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-oooooooooooooooooooo-example.org",
+                                "second.example.org"
+                            ],
+                        },
+                    },
+                    {
+                        label: "size",
+                        value: "1234"
+                    },
+                ],
+                className: "crosses",
+            },
+            {
+                format: "ullist",
+                label: "ullist",
+                value: [ "PKI", "OpenXPKI" ],
+            },
+            {
+                format: "rawlist",
+                label: "rawlist",
+                value: [ "PKI", "<a href=\"https://www.openxpki.org\">OpenXPKI</a>" ],
+            },
+            {
+                format: "linklist",
+                label: "linklist",
+                value: [
+                    {
+                        label: "Workflow History",
+                        page: "workflow!history!wf_id!13567",
+                        tooltip: "I feel like hovering",
+                    },
+                    {
+                        label: "Technical Log",
+                        page: "workflow!log!wf_id!13567",
+                        tooltip: "I feel like hovering",
+                    },
+                    {
+                        label: "Just a label (tooltip!)",
+                        tooltip: "I feel like hovering",
+                    }
                 ],
             },
             {
