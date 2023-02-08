@@ -397,6 +397,14 @@ code { white-space: pre; }
   vertical-align: sub;
 }
 
+.oxi-formatted-unilist,
+.oxi-formatted-deflist,
+.oxi-formatted-ullist,
+.oxi-formatted-rawlist,
+.oxi-formatted-linklist {
+  margin-bottom: 0;
+}
+
 /******************************************************************************
  * Form fields
  */
