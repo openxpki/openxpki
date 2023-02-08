@@ -56,6 +56,11 @@
             <OxiBase::Label @text={{v.label}} @raw={{true}} />
         </a>
 
+    {{else if (eq "email" this.format)}}
+        <a href="mailto:{{v.address}}" title={{v.tooltip}} class="oxi-formatted-email {{@class}}">
+            <OxiBase::Label @text={{try v.label v.address}} />
+        </a>
+
     {{else if (eq "tooltip" this.format)}}
         {{! "d-inline-flex" prevents labels from taking the whole width and
             tooltips being placed in the "center" from being above the
