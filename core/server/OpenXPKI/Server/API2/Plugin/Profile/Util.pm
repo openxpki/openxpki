@@ -36,13 +36,13 @@ sub get_input_elements {
 
     for my $input_name (@{$input_names}) {
         my ($input, $input_path);
-        ##! 32: "Input $input_name"
+        ##! 32: "input '$input_name'"
         # each input name can have a local or/and a global definiton,
         # we need to probe where to find it
         for my $path (['profile', $profile, 'template', $input_name], ['profile', 'template', $input_name]) {
             $input = $config->get_hash($path);
             if ($input) {
-                ##! 64: "Element found at $path"
+                ##! 64: "element found at " . join('.', @$path)
                 $input_path = $path;
                 last;
             }
@@ -69,7 +69,7 @@ sub get_input_elements {
 
         # if type is select, add options array ref
         if ($lcinput{type} && $lcinput{type} eq 'select') {
-            ##! 32: 'type is select'
+            ##! 32: "type = 'select'"
 
             # up to v3.1 the select fields in form elements only had a
             # list directly at option but we now want to support the
@@ -83,7 +83,7 @@ sub get_input_elements {
                 $options->{mode} = $config->get( [ @$input_path, 'option', 'mode' ] );
             }
 
-            ##! 64: 'Options is ' . Dumper $options
+            ##! 64: 'options = ' . Dumper $options
             if (ref $options eq 'ARRAY') {
                 # WARNING - this changes the return value for an API function!
                 $lcinput{options} = [ map {{ label => $_, value => $_ }} @{$options} ];
@@ -150,7 +150,7 @@ sub get_input_elements {
 
         push @definitions, \%lcinput;
     }
-    ##! 64: 'Definitions: ' . Dumper @definitions
+    ##! 64: 'definitions: ' . Dumper @definitions
     return \@definitions;
 }
 

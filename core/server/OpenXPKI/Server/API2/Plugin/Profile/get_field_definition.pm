@@ -10,6 +10,7 @@ OpenXPKI::Server::API2::Plugin::Profile::get_field_definition
 =cut
 
 # Project modules
+use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Server::API2::Plugin::Profile::Util;
 
