@@ -354,6 +354,7 @@ sub __translate_form_def {
     my $is_renewal = shift || 0;
 
     # TODO - Refactor profile definitions to make this obsolete
+    # TODO - Merge with OpenXPKI::Client::UI::Workflow::__render_input_field(), separately translate legacy and profile-only fields ("keep", "default", "keys")
     my @fields;
     foreach my $field (@{$fields}) {
 
