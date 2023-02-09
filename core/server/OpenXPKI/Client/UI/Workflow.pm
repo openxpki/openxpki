@@ -1503,6 +1503,56 @@ sub __render_output_field {
             $item->{value}->{autodownload} = 1;
         }
 
+    # format for cert_info block
+    } elsif ($item->{format} eq "request_info") {
+        $item->{format} = 'unilist';
+
+        my $default_types = {
+            email => 'email',
+            requestor_email => 'email',
+            owner_contact => 'email',
+        };
+
+        my $cert_values = ($item->{value} and ref $item->{value} eq 'HASH') ? $item->{value} : {};
+        $self->logger->trace("Field '$fieldname': values = " . Dumper $cert_values) if $self->logger->is_trace;
+
+        my @val;
+        my $cert_profile = $context->{cert_profile};
+        my $cert_subject_style = $context->{cert_subject_style};
+
+        # use customized field list from profile if we find profile and subject in the context
+        if ($cert_profile and $cert_subject_style) {
+
+            my $cert_fields = $self->send_command_v2(get_field_definition => {
+                profile => $cert_profile,
+                style => $cert_subject_style,
+                section => 'info',
+            });
+
+            foreach my $cert_field (@$cert_fields) {
+                my $cert_fieldname = $cert_field->{name};
+                my $value = $cert_values->{$cert_fieldname} or next;
+
+                push @val, {
+                    format => $cert_field->{format} // $default_types->{$cert_fieldname} // 'text',
+                    label => $cert_field->{label},
+                    value => $value,
+                };
+            }
+        # otherwise transform raw values to a text list
+        } else {
+            foreach my $key (sort keys %{$cert_values}) {
+                push @val, {
+                    format => $default_types->{$key} // 'text',
+                    label => $key,
+                    value => $cert_values->{$key},
+                };
+            }
+        }
+
+        $self->logger->trace("Field '$fieldname': unilist values = " . Dumper \@val) if $self->logger->is_trace;
+        $item->{value} = \@val;
+
     # legacy format for cert_info block
     } elsif ($item->{format} eq "cert_info") {
         $item->{format} = 'deflist';
