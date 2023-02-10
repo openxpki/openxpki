@@ -904,8 +904,8 @@ sub __render_input_field {
       unless wantarray;
 
     my $name = $field->{name};
-    next if ($name =~ m{ \A workflow_id }x);
-    next if ($name =~ m{ \A wf_ }x);
+    return if ($name =~ m{ \A workflow_id }x);
+    return if ($name =~ m{ \A wf_ }x);
 
     my $type = $field->{type} || 'text';
 
