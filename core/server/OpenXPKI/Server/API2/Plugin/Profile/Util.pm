@@ -5,6 +5,7 @@ use Moose;
 use OpenXPKI::Debug;
 use OpenXPKI::Server::Context qw( CTX );
 use OpenXPKI::Workflow::Factory;
+use OpenXPKI::Workflow::Field;
 
 =head2 get_input_elements
 
@@ -50,7 +51,8 @@ sub get_input_elements {
 
         if (not $input) {
             # check if there is a default section (only look in the profile!)
-            $input = $config->get_hash(['profile', $profile, 'template' , '_default' ])
+            $input_path = ['profile', $profile, 'template' , '_default' ];
+            $input = $config->get_hash($input_path)
                 or OpenXPKI::Exception->throw (
                     message => "I18N_OPENXPKI_SERVER_API_DEFAULT_NO_SUCH_INPUT_ELEMENT_DEFINED",
                     params => {
@@ -61,67 +63,20 @@ sub get_input_elements {
             # got a default item, create field using default
             $input->{id} = $input_name;
             $input->{label} = $input_name;
-
         }
 
         # convert keys to lower case
         my %lcinput = map { lc $_ => $input->{$_} } keys %{$input};
 
-        # if type is select, add options array ref
-        if ($lcinput{type} && $lcinput{type} eq 'select') {
-            ##! 32: "type = 'select'"
+        OpenXPKI::Workflow::Field->process(
+            field => \%lcinput,
+            config => $config,
+            path => $input_path,
+        );
 
-            # up to v3.1 the select fields in form elements only had a
-            # list directly at option but we now want to support the
-            # same syntax as in the regular workflows where option is
-            # a config node. For most config layouts the data is already
-            # in the lcinput hash
-
-            my $options = $lcinput{option};
+        if ($lcinput{option}) {
+            $lcinput{options} = $lcinput{option};
             delete $lcinput{option};
-
-            ##! 64: 'options = ' . Dumper $options
-            if (ref $options eq 'ARRAY') {
-                # WARNING - this changes the return value for an API function!
-                $lcinput{options} = [ map {{ label => $_, value => $_ }} @{$options} ];
-            } else {
-                my $mode = $config->get( [ @$input_path, 'option', 'mode' ] ) || 'list';
-                my @option;
-                if ($mode eq 'keyvalue') {
-                    @option = $config->get_list( [ @$input_path, 'option', 'item' ] );
-                    if (my $label = $config->get( [ @$input_path, 'option', 'label' ] )) {
-                        @option = map { { label => sprintf($label, $_->{label}, $_->{value}), value => $_->{value} } } @option;
-                    }
-                } else {
-                    my @item;
-                    if ($mode eq 'keys' || $mode eq 'map') {
-                        @item = $config->get_keys( [ @$input_path, 'option', 'item' ] );
-                    } else {
-                        # option.item holds the items as list, this is mandatory
-                        @item = $config->get_list( [ @$input_path, 'option', 'item' ] );
-                    }
-
-                    if ($mode eq 'map') {
-                        # expects that item is a link to a deeper hash structure
-                        # where the each hash item has a key "label" set
-                        # will hide items with an empty label
-                        foreach my $key (@item) {
-                            my $label = $config->get( [ @$input_path, 'option', 'item', $key, 'label' ] );
-                            next unless ($label);
-                            push @option, { value => $key, label => $label };
-                        }
-
-                    } elsif (my $label = $config->get( [ @$input_path, 'option', 'label' ] )) {
-                        # if set, we generate the values from option.label + key
-                        @option = map { { value => $_, label => $label.'_'.uc($_) } } @item;
-
-                    } else {
-                        # the minimum default - use keys as labels
-                        @option = map { { value => $_, label => $_  } }  @item;
-                    }
-                }
-                $lcinput{options} = \@option;
-            }
         }
 
         # SAN use fields with dynamic key/value assignment
@@ -135,14 +90,6 @@ sub get_input_elements {
                 push @keys, { value => $key->{value}, label => $key->{label} };
             }
             $lcinput{keys} = \@keys;
-        }
-
-        $lcinput{clonable} = 1 if ($lcinput{min} || $lcinput{max});
-
-        # add ECMA equivalent of the regex (duplicated in OpenXPKI::Workflow::Factory->get_field_info)
-        if ($lcinput{match}) {
-            my $ecma_match = OpenXPKI::Workflow::Factory->_perlre_to_ecma($lcinput{match});
-            $lcinput{ecma_match} = $ecma_match if $ecma_match;
         }
 
         push @definitions, \%lcinput;
