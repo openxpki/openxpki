@@ -387,15 +387,9 @@ sub __translate_form_def {
             $new->{is_optional} = 1;
         }
 
-        if ($field->{min}) {
-            $new->{min} = $field->{min};
-            $new->{clonable} = 1;
-        }
-
-        if (defined $field->{max}) {
-            $new->{max} = $field->{max};
-            $new->{clonable} = 1;
-        }
+        $new->{min} = $field->{min} if $field->{min};
+        $new->{max} = $field->{max} if defined $field->{max};
+        $new->{clonable} = $field->{clonable} if $field->{clonable}; # set by get_field_definition() if min/max is set
 
         # Check for key/value field
         if ($field->{keys}) {
