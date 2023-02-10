@@ -79,9 +79,6 @@ sub get_input_elements {
 
             my $options = $lcinput{option};
             delete $lcinput{option};
-            if (!ref $options) {
-                $options->{mode} = $config->get( [ @$input_path, 'option', 'mode' ] );
-            }
 
             ##! 64: 'options = ' . Dumper $options
             if (ref $options eq 'ARRAY') {
