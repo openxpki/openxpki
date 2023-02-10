@@ -370,14 +370,9 @@ sub __translate_form_def {
         };
         $new->{ecma_match} = $field->{ecma_match} if $field->{ecma_match};
 
-        $field->{type} //= '';
-        if ($field->{type} eq 'select') {
-            $new->{type} = 'select';
+        $new->{type} = $field->{type};
+        if ($new->{type} eq 'select') {
             $new->{options} = $field->{options};
-        } elsif ($field->{type} =~ m{static|textarea|datetime}) {
-               $new->{type} = $field->{type};
-        } else {
-            $new->{type} = 'text';
         }
 
         # reasons to make the field optional

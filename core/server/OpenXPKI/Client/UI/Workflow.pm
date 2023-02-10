@@ -904,13 +904,11 @@ sub __render_input_field {
       unless wantarray;
 
     my $name = $field->{name};
+    my $type = $field->{type};
+
     return if ($name =~ m{ \A workflow_id }x);
     return if ($name =~ m{ \A wf_ }x);
-
-    my $type = $field->{type} || 'text';
-
-    # fields to be filled only by server sided workflows
-    return if ($type eq "server");
+    return if ($type eq "server"); # fields to be filled only by server sided workflows
 
     # common attributes for all field types
     my $item = {
@@ -1317,7 +1315,7 @@ sub __render_output_field {
     }
     $item->{label} ||= $key;
 
-    my $field_type = $field->{type} || '';
+    my $field_type = $field->{type};
 
     # we have several formats that might have non-scalar values
     if (OpenXPKI::Serialization::Simple::is_serialized( $item->{value} ) ) {
@@ -2054,7 +2052,7 @@ sub __render_workflow_action_body {
         my $name = $field->{name};
         next if ($name =~ m{ \A workflow_id }x);
         next if ($name =~ m{ \A wf_ }x);
-        next if ($field->{type} && $field->{type} eq "server");
+        next if ($field->{type} eq "server");
 
         my $val = $self->param($name);
         if ($do_prefill && defined $val) {

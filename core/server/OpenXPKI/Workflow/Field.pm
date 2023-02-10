@@ -25,17 +25,23 @@ has 'field' => (
     required => 1,
 );
 
+
 sub process {
     my $class = shift;
     my $self = $class->new(@_);
 
+    # "type" default
     $self->field->{type} //= 'text';
+
+    # set "clonable" attribute
     $self->field->{clonable} = (defined $self->field->{min} || $self->field->{max}) ? 1: 0;
 
+    # process select options
     if ($self->field->{type} eq 'select') {
         $self->legacy_options or $self->resolve_options;
     }
 
+    # create "ecma_match"
     $self->perlre_to_ecma;
 
     return $self->field;
