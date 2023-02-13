@@ -159,13 +159,23 @@ sub render_subject_form {
         # translate profile field spec to workflow field spec
         $self->logger->trace('Profile field: ' . Dumper $field) if $self->logger->is_trace;
 
-        OpenXPKI::Client::UI::Handle::Profile::__translate_profile_field($field, $parent_name, $values->{$field->{id}}, $is_renewal);
+        my $id = $field->{id};
+        my $renew = $is_renewal ? ($field->{renew} || 'preset') : '';
+        delete $field->{renew};
 
+        OpenXPKI::Client::UI::Handle::Profile::__translate_profile_field($field, $parent_name);
         $self->logger->trace('Translated wf field: ' . Dumper $field) if $self->logger->is_trace;
 
         # web UI field spec
-        my ($item, @more_items) = $self->__render_input_field($field, $field->{value});
+        my ($item, @more_items) = $self->__render_input_field($field, $values->{$id});
         next unless $item;
+
+        # renewal policy - after __render_input_field() because value might get overridden
+        if ($renew eq 'clear') {
+            $item->{value} = undef;
+        } elsif ($renew eq 'keep') {
+            $item->{type} = 'static';
+        }
 
         $self->logger->trace('Web UI field: ' . Dumper $item) if $self->logger->is_trace;
 
@@ -365,8 +375,6 @@ B<Please note>: this will modify the given C<$fields> HashRef!
 sub __translate_profile_field {
     my $field = shift;
     my $parent_name = shift;
-    my $value = shift;
-    my $is_renewal = shift || 0;
 
     my $id = $field->{id};
     delete $field->{id};
@@ -387,7 +395,6 @@ sub __translate_profile_field {
     else {
         $field->{name} = sprintf('%s{%s}', $parent_name, $id); # search tag: #wf_fields_with_sub_items
     }
-    $field->{value} = $value;
 
     # support legacy name "default" for "placeholder"
     $field->{placeholder} //= $field->{default} if $field->{default};
@@ -395,16 +402,6 @@ sub __translate_profile_field {
 
     # support legacy usage of "description" for "tooltip"
     $field->{tooltip} //= $field->{description} if $field->{description};
-
-    # renewal policy
-    my $renew = $is_renewal ? ($field->{renew} || 'preset') : '';
-    delete $field->{renew};
-
-    if ($renew eq 'clear') {
-        $field->{value} = undef;
-    } elsif ($renew eq 'keep') {
-        $field->{type} = 'static';
-    }
 }
 
 __PACKAGE__->meta->make_immutable;
