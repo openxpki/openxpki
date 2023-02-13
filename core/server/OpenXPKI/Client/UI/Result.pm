@@ -577,7 +577,6 @@ sub param_from_fields {
             $param->{$name} = $vv;
         }
     }
-    $self->logger()->trace( "params: " . Dumper $param ) if $self->logger->is_trace;
     return $param;
 }
 
