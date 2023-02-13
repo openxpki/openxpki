@@ -356,18 +356,18 @@ sub send_command_v2 {
         $flags = { nostatus => 1 };
     }
 
-    my $backend = $self->_client()->backend();
+    my $backend = $self->_client->backend;
     my $reply = $backend->send_receive_service_msg(
         'COMMAND', { COMMAND => $command, PARAMS => $params, API => 2, TIMEOUT => ($flags->{timeout} || 0 ) }
     );
     $self->_last_reply( $reply );
 
-    $self->logger()->trace('send command raw reply: '. Dumper $reply) if $self->logger->is_trace;
+    $self->logger->trace("Raw backend reply to '$command': ". Dumper $reply) if $self->logger->is_trace;
 
     if ( $reply->{SERVICE_MSG} ne 'COMMAND' ) {
         if (!$flags->{nostatus}) {
-            $self->logger()->error("command $command failed ($reply->{SERVICE_MSG})");
-            $self->logger()->trace("command reply ". Dumper $reply) if $self->logger()->is_trace;
+            $self->logger->error("command $command failed ($reply->{SERVICE_MSG})");
+            $self->logger->trace("command reply ". Dumper $reply) if $self->logger->is_trace;
             $self->set_status_from_error_reply( $reply );
         }
         return undef;
