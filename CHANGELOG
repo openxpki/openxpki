@@ -6,3 +6,4 @@ Upgrades, Improvements and Bugfixes
 
 Removals, Deprecations, Breaking Changes
   + Remove API command "get_cert_subject_styles"
+  + Remove unused method OpenXPKI::Client::UI::Result::__register_wf_token_initial()

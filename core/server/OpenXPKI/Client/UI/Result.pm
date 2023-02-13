@@ -721,32 +721,6 @@ sub __register_wf_token {
     return { name => 'wf_token', type => 'hidden', value => $id };
 }
 
-
-=head2 __register_wf_token_initial ( wf_type, token )
-
-Create a token to init a new workflow, expects the name of the workflow
-as string and an optional hash to pass as initial parameters to the
-create method. Returns the full action target as string.
-
-=cut
-sub __register_wf_token_initial {
-
-    my $self = shift;
-    my $wf_info = shift;
-    my $wf_param = shift || {};
-
-    my $token = {
-        wf_type => $wf_info,
-        wf_param => $wf_param,
-        redirect => 1, # initial create always forces a reload of the page
-    };
-
-    my $id = $self->__generate_uid();
-    $self->logger()->debug('wf token id ' . $id);
-    $self->_session->param($id, $token);
-    return  "workflow!index!wf_token!$id";
-}
-
 =head2 __fetch_wf_token( wf_token, purge )
 
 Return the hashref stored by __register_wf_token for the given
