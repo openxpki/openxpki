@@ -41,6 +41,8 @@ sub process {
         $self->legacy_options or $self->resolve_options;
     }
 
+    $self->resolve_keys;
+
     # create "ecma_match"
     $self->perlre_to_ecma;
 
@@ -61,7 +63,7 @@ sub legacy_options {
     return 1;
 }
 
-# Check for option tag and do explicit calls to ensure recursive resolving.
+# "option" attribute: do explicit calls to ensure recursive config resolving.
 sub resolve_options {
     my $self = shift;
 
@@ -102,6 +104,23 @@ sub resolve_options {
     }
 
     $self->field->{option} = \@options;
+}
+
+# "keys" attribute: do explicit calls to ensure recursive config resolving.
+# (e.g. for SAN fields with dynamic key/value assignment)
+sub resolve_keys {
+    my $self = shift;
+
+    return unless $self->field->{keys};
+
+    my @keys;
+    my $size = $self->config->get_size([ @{$self->path}, 'keys' ]);
+    for (my $i=0; $i<$size; $i++) {
+        my $key = $self->config->get_hash([ @{$self->path}, 'keys', $i ]);
+        push @keys, { value => $key->{value}, label => $key->{label} };
+    }
+
+    $self->field->{keys} = \@keys;
 }
 
 # Tries to convert the Perl RegEx in 'match' into an ECMA compatible version.

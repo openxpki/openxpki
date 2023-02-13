@@ -923,6 +923,7 @@ sub __render_input_field {
     $item->{clonable} = 1 if $field->{clonable};
     $item->{is_optional} = 1 unless $field->{required};
     $item->{ecma_match} = $field->{ecma_match} if $field->{ecma_match};
+    $item->{keys} = $field->{keys} if $field->{keys};
 
     # includes dynamically generated additional fields
     my @all_items = ($item);
