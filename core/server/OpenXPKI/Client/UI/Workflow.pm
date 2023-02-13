@@ -914,10 +914,12 @@ sub __render_input_field {
     my $item = {
         name => $name,
         label => $field->{label} || $name,
-        type => $type
+        type => $type,
     };
-    $item->{placeholder} = $field->{placeholder} if ($field->{placeholder});
-    $item->{tooltip} = $field->{tooltip} if ($field->{tooltip});
+    $item->{placeholder} = $field->{placeholder} if $field->{placeholder};
+    $item->{tooltip} = $field->{tooltip} if $field->{tooltip};
+    $item->{min} = $field->{min} if defined $field->{min};
+    $item->{max} = $field->{max} if defined $field->{max};
     $item->{clonable} = 1 if $field->{clonable};
     $item->{is_optional} = 1 unless $field->{required};
     $item->{ecma_match} = $field->{ecma_match} if $field->{ecma_match};
