@@ -3,6 +3,7 @@ Please list items to be added to the final release comment here
 New Features
 
 Upgrades, Improvements and Bugfixes
+  + Certificate profile fields (profile.template.*.yaml) now support the same attributes as workflow fields
 
 Removals, Deprecations, Breaking Changes
   + Remove API command "get_cert_subject_styles"

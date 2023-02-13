@@ -131,42 +131,47 @@ sub render_subject_form {
 
     # Parse out the field name and type, we assume that there is only one activity with one field
     $wf_action = (keys %{$wf_info->{activity}})[0] unless($wf_action);
-    my $field_name = $wf_info->{activity}->{$wf_action}->{field}[0]->{name};
+    my $parent_name = $wf_info->{activity}->{$wf_action}->{field}[0]->{name};
 
     $section = substr($wf_info->{activity}->{$wf_action}->{field}[0]->{type}, 5) unless($section);
 
-    $self->logger()->debug( " Render subject for $field_name, section $section in $wf_action" );
+    $self->logger()->debug( " Render subject for $parent_name, section $section in $wf_action" );
 
     # Allowed types are cert_subject, cert_san, cert_info
-    my $fields = $self->send_command_v2('get_field_definition' => {
+    my $profile_fields = $self->send_command_v2('get_field_definition' => {
         profile => $cert_profile, style => $cert_subject_style, 'section' => $section,
     });
 
-    $self->logger()->trace( 'Profile fields' . Dumper $fields ) if $self->logger->is_trace;
+    $self->logger()->trace( 'Profile fields' . Dumper $profile_fields ) if $self->logger->is_trace;
 
     # Load preexisiting values from context
     my $values = {};
-    if ($context->{$field_name}) {
-        $values = $self->serializer()->deserialize( $context->{$field_name} );
+    if ($context->{$parent_name}) {
+        $values = $self->serializer()->deserialize( $context->{$parent_name} );
     }
-
+    $self->logger()->trace( 'Preset ' . Dumper $values ) if $self->logger->is_trace;
 
     my @fielddesc;
-    foreach my $field (@{$fields}) {
+    foreach my $field (@{$profile_fields}) {
         push @fielddesc, { label => $field->{label}, value => $field->{description}, format => 'raw' } if ($field->{description});
     }
 
-    $self->logger()->trace( 'Preset ' . Dumper $values ) if $self->logger->is_trace;
+    # Translate profile field definition to match workflow fields
+    OpenXPKI::Client::UI::Handle::Profile::__translate_profile_fields( $profile_fields, $parent_name, $values, $is_renewal );
 
-    # Map the old notation for the new UI
-    $fields = OpenXPKI::Client::UI::Handle::Profile::__translate_form_def( $fields, $field_name, $values, $is_renewal );
+    $self->logger()->trace( 'Mapped fields' . Dumper $profile_fields ) if $self->logger->is_trace;
 
-    $self->logger()->trace( 'Mapped fields' . Dumper $fields ) if $self->logger->is_trace;
+    my @fields;
+    foreach my $field (@{$profile_fields}) {
+        my ($item, @more_items) = $self->__render_input_field( $field );
+        next unless $item;
+        push @fields, $item, @more_items;
+    }
 
     # record the workflow info in the session
-    push @{$fields}, $self->__register_wf_token($wf_info, {
+    push @fields, $self->__register_wf_token($wf_info, {
         wf_action => $wf_action,
-        wf_fields => $fields, # search tag: #wf_fields_with_sub_items
+        wf_fields => \@fields, # search tag: #wf_fields_with_sub_items
     });
 
     my $form = $self->main->add_form(
@@ -174,7 +179,7 @@ sub render_subject_form {
         submit_label => 'I18N_OPENXPKI_UI_WORKFLOW_SUBMIT_BUTTON',
         buttons => $self->__get_form_buttons( $wf_info ),
     );
-    $form->add_field(%{ $_ }) for @{ $fields };
+    $form->add_field(%{ $_ }) for @fields;
 
     if (@fielddesc) {
         $self->main->add_section({
@@ -345,73 +350,61 @@ sub render_server_password {
 
 }
 
+=head2 __translate_profile_field
 
-sub __translate_form_def {
+Translate legacy and profile-only field attributes (e.g. C<keep>, C<default>
+for placeholder, etc.) to get a definition that matches workflow fields.
+
+B<Please note>: this will modify the given C<$fields> HashRef!
+
+=cut
+sub __translate_profile_fields {
 
     my $fields = shift;
-    my $field_name = shift;
+    my $parent_name = shift;
     my $values = shift;
     my $is_renewal = shift || 0;
 
-    # TODO - Refactor profile definitions to make this obsolete
-    # TODO - Merge with OpenXPKI::Client::UI::Workflow::__render_input_field(), separately translate legacy and profile-only fields ("keep", "default", "keys")
-    my @fields;
     foreach my $field (@{$fields}) {
 
-        my $renew = $is_renewal ? ($field->{renew} || 'preset') : '';
+        my $id = $field->{id};
+        delete $field->{id};
 
-        my $new = {
-            name => $field_name.'{'.$field->{id}.'}', # search tag: #wf_fields_with_sub_items
-            label => $field->{label},
-            tooltip => defined $field->{tooltip} ? $field->{tooltip} : $field->{description},
-             # Placeholder is the new attribute, fallback to old default
-            placeholder => (defined $field->{placeholder} ? $field->{placeholder} : $field->{default}),
-            value => $values->{$field->{id}},
-        };
-        $new->{ecma_match} = $field->{ecma_match} if $field->{ecma_match};
+        # default to "required" unless explicitely set or...
+        $field->{required} //= 1 unless (
+            (defined $field->{min} && $field->{min} == 0) or
+            ($field->{type} eq 'static')
+        );
 
-        $new->{type} = $field->{type};
-        if ($new->{type} eq 'select') {
-            $new->{options} = $field->{options};
-        }
-
-        # reasons to make the field optional
-        if ((defined $field->{min} && $field->{min} == 0)
-            || (defined $field->{required} && $field->{required} eq '0')
-            || ($field->{type} eq 'static')) {
-            $new->{is_optional} = 1;
-        }
-
-        $new->{min} = $field->{min} if $field->{min};
-        $new->{max} = $field->{max} if defined $field->{max};
-        $new->{clonable} = $field->{clonable} if $field->{clonable}; # set by get_field_definition() if min/max is set
-
-        # Check for key/value field
+        # translate field names in "keys" and adjust parent name
         if ($field->{keys}) {
-            $new->{name} =  $field_name.'{*}'; # this "parent" field name will be excluded from requests by the web UI
-            my $format = $field_name.'{%s}';   # search tag: #wf_fields_with_sub_items
-
-            my @keys = map { {
-                value => sprintf ($format, $_->{value}),
-                label => $_->{label}
-            } } @{$field->{keys}};
-            $new->{keys} = \@keys;
+            $field->{name} = $parent_name.'{*}'; # this "parent" field name will be excluded from requests by the web UI
+            for my $variant (@{$field->{keys}}) {
+                $variant->{value} = sprintf('%s{%s}', $parent_name, $variant->{value}), # search tag: #wf_fields_with_sub_items
+            }
         }
+        else {
+            $field->{name} = sprintf('%s{%s}', $parent_name, $id); # search tag: #wf_fields_with_sub_items
+        }
+        $field->{value} = $values->{$id};
+
+        # support legacy name "default" for "placeholder"
+        $field->{placeholder} //= $field->{default} if $field->{default};
+        delete $field->{default};
+
+        # support legacy usage of "description" for "tooltip"
+        $field->{tooltip} //= $field->{description} if $field->{description};
+
+        # renewal policy
+        my $renew = $is_renewal ? ($field->{renew} || 'preset') : '';
+        delete $field->{renew};
 
         if ($renew eq 'clear') {
-            $new->{value} = undef;
-
+            $field->{value} = undef;
         } elsif ($renew eq 'keep') {
-            $new->{type} = 'static';
-
+            $field->{type} = 'static';
         }
-
-        push @fields, $new;
-
     }
-
-    return \@fields;
-
 }
 
 __PACKAGE__->meta->make_immutable;

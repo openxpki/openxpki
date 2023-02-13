@@ -74,24 +74,6 @@ sub get_input_elements {
             path => $input_path,
         );
 
-        if ($lcinput{option}) {
-            $lcinput{options} = $lcinput{option};
-            delete $lcinput{option};
-        }
-
-        # SAN use fields with dynamic key/value assignment
-        # Those have a special section "keys" which is a list of hashes
-        # Get size of list to iterate
-        if ($lcinput{keys}) {
-            my $size = $config->get_size([ @$input_path, 'keys' ]);
-            my @keys;
-            for (my $i=0;$i<$size;$i++) {
-                my $key = $config->get_hash([ @$input_path, 'keys', $i ]);
-                push @keys, { value => $key->{value}, label => $key->{label} };
-            }
-            $lcinput{keys} = \@keys;
-        }
-
         push @definitions, \%lcinput;
     }
     ##! 64: 'definitions: ' . Dumper @definitions
