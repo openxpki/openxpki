@@ -533,9 +533,11 @@ sub param_from_fields {
             $vv = $v_list[0];
         }
 
+        # cert profile field name including sub item (e.g. "cert_info{requestor_email}") - search tag: #wf_fields_with_sub_items
         if ($name =~ m{ \A (\w+)\{(\w+)\} \z }xs) {
             $param->{$1} ||= ();
             $param->{$1}->{$2} = $vv;
+        # plain field name
         } else {
             $param->{$name} = $vv;
         }

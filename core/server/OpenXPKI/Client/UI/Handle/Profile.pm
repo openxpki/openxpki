@@ -166,7 +166,7 @@ sub render_subject_form {
     # record the workflow info in the session
     push @{$fields}, $self->__register_wf_token($wf_info, {
         wf_action => $wf_action,
-        wf_fields => $fields,
+        wf_fields => $fields, # search tag: #wf_fields_with_sub_items
     });
 
     my $form = $self->main->add_form(
@@ -229,7 +229,7 @@ sub render_key_select {
                 # We create the label as I18 string from the param name
                 my $label = 'I18N_OPENXPKI_UI_KEY_'.$pn;
                 push @fields, {
-                    name => "key_gen_params{$pn}",
+                    name => "key_gen_params{$pn}", # search tag: #wf_fields_with_sub_items
                     label => $label,
                     value => $key_gen_param_values->{ $pn },
                     type => 'select',
@@ -261,7 +261,7 @@ sub render_key_select {
     # record the workflow info in the session
     push @fields, $self->__register_wf_token($wf_info, {
         wf_action => $wf_action,
-        wf_fields => \@fields,
+        wf_fields => \@fields, # search tag: #wf_fields_with_sub_items
         cert_profile => $context->{cert_profile}
     });
 
@@ -361,7 +361,7 @@ sub __translate_form_def {
         my $renew = $is_renewal ? ($field->{renew} || 'preset') : '';
 
         my $new = {
-            name => $field_name.'{'.$field->{id}.'}',
+            name => $field_name.'{'.$field->{id}.'}', # search tag: #wf_fields_with_sub_items
             label => $field->{label},
             tooltip => defined $field->{tooltip} ? $field->{tooltip} : $field->{description},
              # Placeholder is the new attribute, fallback to old default
@@ -388,8 +388,8 @@ sub __translate_form_def {
 
         # Check for key/value field
         if ($field->{keys}) {
-            $new->{name} =  $field_name.'{*}';
-            my $format = $field_name.'{%s}';
+            $new->{name} =  $field_name.'{*}'; # this "parent" field name will be excluded from requests by the web UI
+            my $format = $field_name.'{%s}';   # search tag: #wf_fields_with_sub_items
 
             my @keys = map { {
                 value => sprintf ($format, $_->{value}),
